@@ -13,8 +13,8 @@ var msgbox = require('msgbox');
 
 
 var defaultTrip = {
-    beginDate: moment().add(3, 'days').startOf('day').hour(9).toDate(),
-    endDate: moment().add(4, 'days').startOf('day').hour(21).toDate(),
+    beginDate: moment().add(3, 'days').startOf('day').hour(18).toDate(),
+    endDate: moment().add(4, 'days').startOf('day').hour(9).toDate(),
     place: undefined,
     placeName: '',
     reason: '',
@@ -103,7 +103,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
     }else {
         var today = moment();
         if (!trip.beginDate || (new Date(trip.beginDate) < new Date())) {
-            trip.beginDate = today.startOf('day').hour(9).toDate();
+            trip.beginDate = today.startOf('day').hour(18).toDate();
         }
 
         trip.regenerate = false;
