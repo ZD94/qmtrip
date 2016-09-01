@@ -4,6 +4,7 @@ import moment = require('moment');
 var API = require("common/api");
 var Cookie = require('tiny-cookie');
 import { Staff, EStaffRole} from 'api/_types/staff';
+
 import { Models } from 'api/_types';
 import {
     TripDetail, EPlanStatus, ETripType, EInvoiceType, EAuditStatus, MTxPlaneLevel
@@ -39,6 +40,14 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
     API.require('tripPlan');
     await API.onload();
 
+    /*******************出差补助选择begin************************/
+    $scope.currentStaff = await Staff.getCurrent();
+    $scope.currentTp = await $scope.currentStaff.getTravelPolicy();
+    if($scope.currentTp){
+        $scope.currentTpSts = await $scope.currentTp.getSubsidyTemplates();
+    }
+    $scope.subsidy = {hasFirstDaySubsidy: true, hasLastDaySubsidy: true, template: null};
+
     /*******************判断是否为第一次的登录  史聪************************/
     let staff = await Staff.getCurrent();
     if(staff.roleId == EStaffRole.OWNER){
@@ -47,13 +56,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
             window.location.href = '#/guide/company-guide';
         }
     }
-
-    /*******************出差补助选择begin************************/
-    $scope.currentStaff = await Staff.getCurrent();
-    $scope.currentTp = await $scope.currentStaff.getTravelPolicy();
-    // $scope.currentTpSts = await $scope.currentTp.getSubsidyTemplates();
-    // $scope.subsidy = {hasFirstDaySubsidy: true, hasLastDaySubsidy: true, template: null};
-
 
 
     $scope.selectSubsidyTemplate = async function(){
@@ -222,7 +224,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
         timepicker: true
     };
     $scope.nextStep = async function() {
-        if (!$scope.subsidy.template) {
+        if ($scope.currentTpSts.length && (!$scope.subsidy || !$scope.subsidy.template)) {
             $scope.showErrorMsg('请选择补助信息');
             return false;
         }
