@@ -340,7 +340,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     console.info("budgets=>", budgets);
     let trip = $storage.local.get("trip");
     let query = result.query;
-    trip.reason = 'ceshiyuanyin';
+    // trip.reason = 'ceshiyuanyin';
     trip.beginDate = query.leaveDate;
     trip.endDate  = query.goBackDate;
     trip.createAt = new Date(result.createAt);

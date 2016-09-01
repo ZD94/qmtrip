@@ -1270,6 +1270,7 @@ class TripPlanModule {
         let account = tripApprove.account;
 
         let tripPlan = TripPlan.create(tripApprove);
+        tripPlan.auditUser = staff.id;
         tripPlan.startAt = moment(tripApprove.startAt).format(formatStr);
         tripPlan.backAt = moment(tripApprove.backAt).format(formatStr);
         tripPlan.id = tripApprove.id;
