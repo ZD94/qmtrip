@@ -88,9 +88,9 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
             /*if(err.code == -28 && err.msg == "您的账号还未激活"){
                 $scope.unactivated = true;
             }else */
-            if(err.code == -37 && err.msg == "您的手机号还未验证"){
+            if(err.code == -37 && err.msg.indexOf("您的手机号还未验证") != -1){
                 showMobilePopup();
-            }else if(err.code == -38 && err.msg == "您的邮箱还未验证"){
+            }else if(err.code == -38 && err.msg.indexOf("您的邮箱还未验证") != -1){
                 showEmailPopup();
             }else{
                 msgbox.log(err.msg || err);//显示错误消息

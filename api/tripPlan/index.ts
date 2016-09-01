@@ -325,7 +325,7 @@ class TripPlanModule {
         let openid = await API.auth.getOpenIdByAccount({accountId: staff.id});
         let values: any = {
             staffName: staff.name,
-            time: moment(tripApprove.createdAt).format(timeFormat),
+            time: moment(tripApprove.createdAt["value"]).format(timeFormat),
             projectName: tripApprove.title,
             goTrafficBudget: go,
             backTrafficBudget: back,
