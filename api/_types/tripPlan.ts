@@ -193,7 +193,7 @@ export class TripPlan extends ModelObject {
     set auditStatus(val: EAuditStatus) {}
 
     @Field({type: Types.STRING})
-    get auditUser(): string { return ''; }
+    get auditUser(): string { return null; }
     set auditUser(val: string) {}
     
     @Field({type: Types.STRING})
@@ -590,6 +590,8 @@ export class TripApprove extends ModelObject{
      */
     approve(params: {auditResult: EAuditStatus, auditRemark?: string, budgetId?: string, id?: string}): Promise<boolean> {
         params.id = this.id;
+        console.info(params);
+        console.info("liiiiiiiiiiiiiiiiiiiiiii");
         return API.tripPlan.approveTripPlan(params);
     }
 
