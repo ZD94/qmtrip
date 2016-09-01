@@ -5,9 +5,19 @@
 
 var url = window.location.href;
 var key = '';
+var p = 1;
+var pz = 20;
 var groups = /key=(\w+)/.exec(url);
 if (groups) {
   key = groups[1];
+}
+groups = /p=(\d+)/.exec(url);
+if (groups) {
+  p = groups[1];
+}
+groups = /pz=(\d+)/.exec(url);
+if (groups) {
+  pz = groups[1];
 }
 
 var prefers = [
@@ -48,7 +58,7 @@ var budgets = [];
 
 function getData() {
   return new Promise(function(resolve, reject) {
-    $.get('/api/budgets', {p: 1, pz: 20, key: key}, function(data) {
+    $.get('/api/budgets', {p: p, pz: pz, key: key}, function(data) {
       resolve(data);
     }, "json").error(reject);
   })
