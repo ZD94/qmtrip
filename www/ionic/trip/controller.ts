@@ -222,7 +222,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
         timepicker: true
     };
     $scope.nextStep = async function() {
-        if ($scope.currentTpSts.length && ($scope.subsidy || !$scope.subsidy.template)) {
+        if ($scope.currentTpSts.length && (!$scope.subsidy || !$scope.subsidy.template)) {
             $scope.showErrorMsg('请选择补助信息');
             return false;
         }
