@@ -35,14 +35,17 @@ export async function CompanyFirstController ($scope, Models, $stateParams){
             return false;
         }
         $scope.travelPolicy.company = staff.company;
+        $scope.travelPolicy.isDefault = true;
         await $scope.travelPolicy.save();
+        staff['travelPolicyId'] = $scope.travelPolicy.id;
+        await staff.save();
         //add   shicong
         window.location.href = '#/guide/company-second';
     }
 
 }
 
-export async function CompanySecondController ($scope, $injector){
+export async function CompanySecondController ($scope, $injector,wxApi){
     require("./company-guide.scss");
     return $injector.invoke(StaffInvitedController, $scope, {$scope});
 }

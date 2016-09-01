@@ -3,7 +3,8 @@
 import moment = require('moment');
 var API = require("common/api");
 var Cookie = require('tiny-cookie');
-import {Staff, EStaffRole} from 'api/_types/staff';
+import { Staff, EStaffRole} from 'api/_types/staff';
+
 import { Models } from 'api/_types';
 import {
     TripDetail, EPlanStatus, ETripType, EInvoiceType, EAuditStatus, MTxPlaneLevel
@@ -49,10 +50,11 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
 
     /*******************判断是否为第一次的登录  史聪************************/
     let staff = await Staff.getCurrent();
-    let isFirstLogin = await staff.company.getTravelPolicies();
-    console.log(isFirstLogin.length);
-    if(isFirstLogin.length == 0){
-        window.location.href = '#/guide/company-guide';
+    if(staff.roleId == EStaffRole.OWNER){
+        let isFirstLogin = await staff.company.getTravelPolicies();
+        if(isFirstLogin.length == 0){
+            window.location.href = '#/guide/company-guide';
+        }
     }
 
 
@@ -219,7 +221,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
         timepicker: true
     };
     $scope.nextStep = async function() {
-        if ($scope.currentTpSts.length && !$scope.subsidy.template) {
+        if ($scope.currentTpSts.length && (!$scope.subsidy || !$scope.subsidy.template)) {
             $scope.showErrorMsg('请选择补助信息');
             return false;
         }

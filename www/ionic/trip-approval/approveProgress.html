@@ -1,7 +1,12 @@
 <ion-view title="审批进度">
     <ion-content padding="true" scroll="true" class="has-header">
         <ion-list class="approveProgress">
-            <div class="tit">如审批一直没有结束，则该申请将于<br/>{{tripApprove.autoApproveTime | date:'yyyy-MM-dd HH:mm'}} 自动通过</div>
+            <div class="tit"
+                 ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE">
+                如审批一直没有结束，则该申请将于
+                <br/>
+                {{tripApprove.autoApproveTime | date:'yyyy-MM-dd HH:mm'}} 自动通过
+            </div>
             <div class="item" ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE" style="line-height: 39px;">
                 <span>等待审批</span>
                 <span style="float: right">{{tripApprove.approveUser.name}}</span>
@@ -12,7 +17,7 @@
                     <span style="float: right">{{item.staff.name}}</span>
                 </div>
                 <div ng-if="item.approveStatus==EApproveResult.REJECT">{{item.remark || "无"}}</div>
-                <div>{{item.createdAt|date: 'yyyy-MM-dd hh:mm:ss'}}</div>
+                <div>{{item.createdAt|date: 'yyyy-MM-dd HH:mm:ss'}}</div>
             </ion-item>
         </ion-list>
     </ion-content>

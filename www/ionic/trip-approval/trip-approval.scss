@@ -67,13 +67,25 @@
     background: rgb(36,149,218);
   }
 }
+.button-bar{
+  &.jl_approvelist{
+    .button{
+      padding: 0px 4px;
+    }
+  }
+}
 
 //适配iPhone5的menu高度
 @media (max-width: 320px){
   .button-bar{
     &.jl_approvelist{
       .button{
-        padding: 2px 4px 1px;
+        padding: 2px 0px 1px;
+      }
+      :nth-child(1){
+        flex:0;
+        -webkit-flex: 0;
+        min-width:54px;
       }
     }
   }
@@ -84,5 +96,18 @@
   text-align: center;
   h2{
     font-size: 16px;
+  }
+}
+
+.selectApproveUser{
+  position: absolute;
+  top:0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  line-height: 34px;
+  padding-right: 10px;
+  fake-input span{
+    text-align: right;
   }
 }

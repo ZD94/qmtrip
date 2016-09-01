@@ -38,6 +38,7 @@ class SelectTrafficPrefer extends AbstractPrefer<IFinalTicket> {
         let trains: IFinalTicket[] = [];
         let highTrains: IFinalTicket[] = [];
         let trains2: IFinalTicket[] = [];
+        let trains3: IFinalTicket[] = [];
         let flights: IFinalTicket[] = [];
         tickets.forEach( (v) => {
             if (v.type == TRAFFIC.TRAIN && /^[gc]/i.test(v.No)) {
@@ -48,12 +49,16 @@ class SelectTrafficPrefer extends AbstractPrefer<IFinalTicket> {
                 trains2.push(v);
                 return;
             }
+            if (v.type == TRAFFIC.TRAIN) {
+                trains3.push(v);
+            }
             flights.push(v);
         });
         if (highTrains.length) {
             trains = highTrains;
         }
         if (!trains.length) trains = trains2;
+        if (!trains.length) trains = trains3;
         if (!trains.length) return flights;
 
         trains.sort( function(v1, v2) {
@@ -74,7 +79,6 @@ class SelectTrafficPrefer extends AbstractPrefer<IFinalTicket> {
         } else {
             console.info(`平均时长无法决定选择飞机火车:${self.selectFlightDuration} < ${trains[midIdx].duration} < ${self.selectTrainDuration}`)
         }
-
         tickets = tickets.map( (v) => {
             if (!v.score) v.score = 0;
             if (!v.reasons) v.reasons = [];

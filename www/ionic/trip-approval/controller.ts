@@ -133,11 +133,8 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
 
     async function approve(result: EApproveResult, approveRemark?: string) {
         try{
-            // $scope.budgetId = '1471529270884Z4xl6y';
             await tripApprove.approve({approveResult: result, isNextApprove: $scope.isNextApprove || false, nextApproveUserId: tripApprove.approveUser.id, approveRemark: approveRemark, budgetId: $scope.budgetId});
             if(result == EApproveResult.PASS) {
-                console.info()
-                // window.location.href = "#/trip-approval/approved?staffId="+tripApprove.account.id +'&approveId='+approveId;
                 $ionicPopup.show({
                     title: '通过申请',
                     scope: $scope,
@@ -229,8 +226,9 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         };
         var value = await ngModalDlg.selectMode($scope,$scope.staffSelector);
         if(value){
-            approve(value.result);
             $scope.isNextApprove = value.isNextApprove;
+            $scope.isHasPermissionApprove = isHasPermissionApprove;
+            approve(value.result);
         }
         // $scope.isConfirm = true;
         // $scope.isNextApprove = false;
@@ -284,8 +282,6 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
             trip.hotelPlaceName = tripApprove.arrivalCity || '';
         }
 
-        console.info(tripApprove.query);
-        console.info(tripApprove.budgetInfo);
         await $storage.local.set('trip', trip);
         window.location.href="#/trip/create";
     };

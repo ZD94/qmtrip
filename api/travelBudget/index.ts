@@ -13,7 +13,7 @@ const moment = require('moment');
 const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
-import {ITicket, TravelBudgeItem} from "api/_types/travelbudget";
+import {ITicket, TravelBudgeItem, TRAFFIC} from "api/_types/travelbudget";
 import {
     TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
 } from "./strategy/index";
@@ -413,11 +413,13 @@ class ApiTravelBudget {
         let strategy = await TrafficBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
         let result =  await strategy.getResult(tickets);
         result.cabinClass = result.cabin;
-        let fullPriceObj = await API.place.getFlightFullPrice({
-            originPlace: originPlace,
-            destination: destinationPlace,
-        });
-        result.fullPrice = fullPriceObj.EPrice;
+        if (<number>result.type == <number>TRAFFIC.FLIGHT) {
+            let fullPriceObj = await API.place.getFlightFullPrice({
+                originPlace: originPlace,
+                destination: destinationPlace,
+            });
+            result.fullPrice = fullPriceObj ? fullPriceObj.EPrice : 0;
+        }
         return result;
     }
 
