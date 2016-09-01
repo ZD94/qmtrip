@@ -280,12 +280,18 @@ class ApiTravelBudget {
             hotelStar = policy.hotelLevel;
         }
         let gps = [];
-        if (/,/g.test(businessDistrict)) {
+        if (businessDistrict && /,/g.test(businessDistrict)) {
             gps = businessDistrict.split(/,/);
         } else {
-            let obj = API.plae.getCityInfo({cityCode: businessDistrict});
+            let obj;
+            if (businessDistrict) {
+                obj = API.place.getCityInfo({cityCode: businessDistrict});
+            } else {
+                obj = city;
+            }
             gps = [obj.latitude, obj.longitude];
         }
+
         let qs: any = {};
         let query = {
             star: hotelStar,
