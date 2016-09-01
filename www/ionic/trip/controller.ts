@@ -50,9 +50,11 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
     /*******************判断是否为第一次的登录  史聪************************/
     let staff = await Staff.getCurrent();
     let isFirstLogin = await staff.company.getTravelPolicies();
+    console.log(isFirstLogin.length);
     if(isFirstLogin.length == 0){
         window.location.href = '#/guide/company-guide';
     }
+
 
     $scope.selectSubsidyTemplate = async function(){
         var nshow = $ionicPopup.show({
@@ -220,7 +222,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
         timepicker: true
     };
     $scope.nextStep = async function() {
-        if (!$scope.subsidy.template) {
+        if ($scope.currentTpSts.length && !$scope.subsidy.template) {
             $scope.showErrorMsg('请选择补助信息');
             return false;
         }
