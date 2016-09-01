@@ -17,7 +17,7 @@
                     <span style="float: right">{{item.staff.name}}</span>
                 </div>
                 <div ng-if="item.approveStatus==EApproveResult.REJECT">{{item.remark || "无"}}</div>
-                <div>{{item.createdAt|date: 'yyyy-MM-dd hh:mm:ss'}}</div>
+                <div>{{item.createdAt|date: 'yyyy-MM-dd HH:mm:ss'}}</div>
             </ion-item>
         </ion-list>
     </ion-content>
