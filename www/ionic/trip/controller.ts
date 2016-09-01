@@ -3,7 +3,7 @@
 import moment = require('moment');
 var API = require("common/api");
 var Cookie = require('tiny-cookie');
-import { Staff } from 'api/_types/staff';
+import {Staff, EStaffRole} from 'api/_types/staff';
 import { Models } from 'api/_types';
 import {
     TripDetail, EPlanStatus, ETripType, EInvoiceType, EAuditStatus, MTxPlaneLevel
@@ -39,6 +39,14 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
     API.require('tripPlan');
     await API.onload();
 
+    /*******************出差补助选择begin************************/
+    $scope.currentStaff = await Staff.getCurrent();
+    $scope.currentTp = await $scope.currentStaff.getTravelPolicy();
+    if($scope.currentTp){
+        $scope.currentTpSts = await $scope.currentTp.getSubsidyTemplates();
+    }
+    $scope.subsidy = {hasFirstDaySubsidy: true, hasLastDaySubsidy: true, template: null};
+
     /*******************判断是否为第一次的登录  史聪************************/
     let staff = await Staff.getCurrent();
     let isFirstLogin = await staff.company.getTravelPolicies();
@@ -46,13 +54,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
     if(isFirstLogin.length == 0){
         window.location.href = '#/guide/company-guide';
     }
-
-    /*******************出差补助选择begin************************/
-    $scope.currentStaff = await Staff.getCurrent();
-    $scope.currentTp = await $scope.currentStaff.getTravelPolicy();
-    // $scope.currentTpSts = await $scope.currentTp.getSubsidyTemplates();
-    // $scope.subsidy = {hasFirstDaySubsidy: true, hasLastDaySubsidy: true, template: null};
-
 
 
     $scope.selectSubsidyTemplate = async function(){
