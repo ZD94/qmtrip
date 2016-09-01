@@ -134,7 +134,8 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     async function approve(result: EApproveResult, approveRemark?: string) {
         try{
             // $scope.budgetId = '1471529270884Z4xl6y';
-            await tripApprove.approve({approveResult: result, isNextApprove: $scope.isNextApprove || false, nextApproveUserId: tripApprove.approveUser.id, approveRemark: approveRemark, budgetId: $scope.budgetId});
+            // await tripApprove.approve({approveResult: result, isNextApprove: $scope.isNextApprove || false, nextApproveUserId: tripApprove.approveUser.id, approveRemark: approveRemark, budgetId: $scope.budgetId});
+            console.info(result,$scope.isNextApprove,tripApprove.approveUser.name,approveRemark);
             if(result == EApproveResult.PASS) {
                 // window.location.href = "#/trip-approval/approved?staffId="+tripApprove.account.id +'&approveId='+approveId;
                 $ionicPopup.show({
@@ -228,8 +229,8 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         };
         var value = await ngModalDlg.selectMode($scope,$scope.staffSelector);
         if(value){
-            approve(value.result);
             $scope.isNextApprove = value.isNextApprove;
+            approve(value.result);
         }
         // $scope.isConfirm = true;
         // $scope.isNextApprove = false;
