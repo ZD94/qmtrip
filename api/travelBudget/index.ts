@@ -188,24 +188,26 @@ class ApiTravelBudget {
                     }
                 }
 
-                let days = moment(goBackDate).diff(moment(leaveDate), 'days');
-                days = days + 1;
-                if (!subsidy.hasFirstDaySubsidy) {
-                    days = days -1;
-                }
-                if (!subsidy.hasLastDaySubsidy) {
-                    days = days - 1;
-                }
-                if (days > 0) {
-                    let budget: any = {};
-                    budget.fromDate = leaveDate;
-                    budget.endDate = goBackDate;
-                    budget.hasFirstDaySubsidy = subsidy.hasFirstDaySubsidy;
-                    budget.hasLastDaySubsidy = subsidy.hasLastDaySubsidy;
-                    budget.tripType = ETripType.SUBSIDY;
-                    budget.price = subsidy.template.subsidyMoney * days;
-                    budget.template = {id: subsidy.template.id, name: subsidy.template.name}
-                    budgets.push(budget);
+                if (subsidy && subsidy.template) {
+                    let days = moment(goBackDate).diff(moment(leaveDate), 'days');
+                    days = days + 1;
+                    if (!subsidy.hasFirstDaySubsidy) {
+                        days = days -1;
+                    }
+                    if (!subsidy.hasLastDaySubsidy) {
+                        days = days - 1;
+                    }
+                    if (days > 0) {
+                        let budget: any = {};
+                        budget.fromDate = leaveDate;
+                        budget.endDate = goBackDate;
+                        budget.hasFirstDaySubsidy = subsidy.hasFirstDaySubsidy;
+                        budget.hasLastDaySubsidy = subsidy.hasLastDaySubsidy;
+                        budget.tripType = ETripType.SUBSIDY;
+                        budget.price = subsidy.template.subsidyMoney * days;
+                        budget.template = {id: subsidy.template.id, name: subsidy.template.name}
+                        budgets.push(budget);
+                    }
                 }
                 resolve(true);
             })
