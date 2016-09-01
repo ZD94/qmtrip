@@ -152,7 +152,7 @@ class ApiTravelBudget {
                             originPlace: originPlace,
                             destinationPlace: destinationPlace,
                             leaveDate: leaveDate,
-                            leaveTime: earliestLeaveTime,
+                            earliestLeaveTime: earliestLeaveTime,
                             latestArrivalTime: latestArrivalTime,
                         });
                         budget.tripType = ETripType.OUT_TRIP;
@@ -168,7 +168,7 @@ class ApiTravelBudget {
                             originPlace: destinationPlace,
                             destinationPlace: originPlace,
                             leaveDate: goBackDate,
-                            leaveTime: earliestGoBackTime,
+                            earliestLeaveTime: earliestGoBackTime,
                             latestArrivalTime: latestGoBackTime,
                         });
                         budget.tripType = ETripType.BACK_TRIP;
