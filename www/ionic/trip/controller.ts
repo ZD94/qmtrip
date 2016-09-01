@@ -103,7 +103,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
     }else {
         var today = moment();
         if (!trip.beginDate || (new Date(trip.beginDate) < new Date())) {
-            trip.beginDate = today.startOf('day').hour(9).toDate();
+            trip.beginDate = today.startOf('day').hour(18).toDate();
         }
 
         trip.regenerate = false;
