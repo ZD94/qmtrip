@@ -69,9 +69,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
                     onTap: async function (e) {
                         try{
                             if(!$scope.subsidy.template){
-                                console.info("选定的补助模板：", $scope.subsidy.template);
-                                console.info("出发当天补助：", $scope.subsidy.hasFirstDaySubsidy);
-                                console.info("回城当天补助：", $scope.subsidy.hasLastDaySubsidy);
                                 e.preventDefault();
                                 msgbox.log("请选择补助模板");
                                 return false;
