@@ -85,6 +85,14 @@ $color:#4a4a4a;
           }
         }
       }
+      @media (max-width: 320px) {
+        .item-avatar{
+          padding-left:60px;
+          .bg_icon{
+            padding: 13px 15px;
+          }
+        }
+      }
     }
   }
   .list{
@@ -109,8 +117,7 @@ $color:#4a4a4a;
           font-size: 22px;
         }
         p{
-          font-size: 20px;
-          transform: scale(0.5);
+          font-size: 12px;
         }
       }
     }
