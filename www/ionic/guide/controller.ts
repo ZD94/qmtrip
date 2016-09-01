@@ -35,6 +35,7 @@ export async function CompanyFirstController ($scope, Models, $stateParams){
             return false;
         }
         $scope.travelPolicy.company = staff.company;
+        $scope.travelPolicy.isDefault = true;
         await $scope.travelPolicy.save();
         //add   shicong
         window.location.href = '#/guide/company-second';
