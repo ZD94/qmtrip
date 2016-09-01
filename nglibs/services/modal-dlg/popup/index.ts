@@ -7,7 +7,7 @@ import {EApproveResult} from "api/_types/tripPlan";
 export async function selectModeController ($scope){
     $scope.options.title = '同意出差';
     $scope.isNextApprove = false;
-
+    $scope.tripApprove.approveUser = '';
     $scope.chooseOption = function(isNextApprove) {
         $scope.isNextApprove = isNextApprove;
     };
