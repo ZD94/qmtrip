@@ -24,3 +24,58 @@
 
 @import "./date/date";
 
+.modal-popup{
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  min-height: 200px;
+  height: 200px;
+  width: 225px;
+  border-radius: 5px;
+  .bar.bar-light{
+    background: none;
+  }
+  .item{
+    padding: 7px;
+    font-size: 14px;
+    &.item-option-selected{
+      border: 1px #28a7e1 solid;
+    }
+    &:first-child{
+      margin-bottom: 10px;
+    }
+    .input-label{
+      display: inline;
+      font-size: 14px;
+    }
+  }
+  .button-bar{
+    padding-top: 20px;
+    .button{
+      &.button-block{
+        min-height: 20px;
+        line-height: 36px;
+        height: 40px;
+        border-radius: 0;
+        font-size: 14px;
+        margin: 0;
+        &.button-outline{
+          border-width: 1px;
+        }
+        &:last-child{
+          margin-left: 5px;
+        }
+      }
+    }
+  }
+}
+.modal-backdrop-bg{
+  transition: opacity 300ms ease-in-out;
+  background-color: #000;
+  opacity: 0;
+}
+.active .modal-backdrop-bg{
+  opacity: 0.5;
+}

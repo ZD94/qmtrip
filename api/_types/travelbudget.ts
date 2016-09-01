@@ -136,4 +136,8 @@ export class TravelBudgetLog extends ModelObject {
     @Field({type: Types.INTEGER})
     get type(): number { return 1};
     set type(t: number) {}
+
+    @Field({type: Types.INTEGER})
+    get status(): number{ return 0}
+    set status(status: number){}
 }

@@ -15,7 +15,7 @@ const utils = require("common/utils");
 import _ = require("lodash");
 import {ITicket, TravelBudgeItem} from "api/_types/travelbudget";
 import {
-    CommonHotelStrategy, TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
+    TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
 } from "./strategy/index";
 import {loadDefaultPrefer} from "./prefer/index";
 
@@ -39,7 +39,8 @@ interface BudgetOptions{
     checkInDate?: Date| string,
     checkOutDate?: Date|string,
     businessDistrict?: string,
-    staffId?: string
+    staffId?: string,
+    subsidy: any,
 }
 
 
@@ -86,7 +87,7 @@ class ApiTravelBudget {
             throw new Error(`差旅标准还未设置`);
         }
         let {leaveDate, goBackDate, isRoundTrip, originPlace, destinationPlace, checkInDate,
-            checkOutDate, businessDistrict, leaveTime, goBackTime, isNeedHotel, isNeedTraffic} = params;
+            checkOutDate, businessDistrict, leaveTime, goBackTime, isNeedHotel, isNeedTraffic, subsidy} = params;
 
         if (!Boolean(leaveDate)) {
             throw L.ERR.LEAVE_DATE_FORMAT_ERROR();
@@ -188,10 +189,22 @@ class ApiTravelBudget {
                 }
 
                 let days = moment(goBackDate).diff(moment(leaveDate), 'days');
-                if (Boolean(travelPolicy['subsidy']) && travelPolicy['subsidy'] > 0) {
+                days = days + 1;
+                if (!subsidy.hasFirstDaySubsidy) {
+                    days = days -1;
+                }
+                if (!subsidy.hasLastDaySubsidy) {
+                    days = days - 1;
+                }
+                if (days > 0) {
                     let budget: any = {};
+                    budget.fromDate = leaveDate;
+                    budget.endDate = goBackDate;
+                    budget.hasFirstDaySubsidy = subsidy.hasFirstDaySubsidy;
+                    budget.hasLastDaySubsidy = subsidy.hasLastDaySubsidy;
                     budget.tripType = ETripType.SUBSIDY;
-                    budget.price = travelPolicy['subsidy'] * (days+1);
+                    budget.price = subsidy.template.subsidyMoney * days;
+                    budget.template = {id: subsidy.template.id, name: subsidy.template.name}
                     budgets.push(budget);
                 }
                 resolve(true);
@@ -407,38 +420,13 @@ class ApiTravelBudget {
         let staff = await Staff.getCurrent();
         let content = await ApiTravelBudget.getBudgetInfo({id: budgetId, accountId: accountId});
         let budgets = content.budgets;
-        let fs = require("fs");
-        let d = new Date();
-        let prefix = `${d.getFullYear()}${d.getMonth()+1}${d.getDate()}${d.getHours()}${d.getMinutes()}`
         let ps = budgets.map( async (budget): Promise<any> => {
             if (!budget.id) {
                 return true;
             }
-            let originData = await cache.read(`${budget.id}:data`);
-            let markedData = await cache.read(`${budget.id}:marked`);
-            return Promise.all([
-                new Promise( (resolve, reject) => {
-                    //原始数据
-                    fs.writeFile(`./tmp/${prefix}-${staff.mobile}-data.json`, JSON.stringify(originData), function(err) {
-                        if (err) return reject(err);
-                        resolve(true);
-                    });
-                }),
-                new Promise( (resolve, reject) => {
-                    //打分排序后数据
-                    fs.writeFile(`./tmp/${prefix}-${staff.mobile}-marked.json`, JSON.stringify(markedData), function(err) {
-                        if (err) return reject(err);
-                        resolve(true);
-                    })
-                }),
-                new Promise( (resolve, reject) => {
-                    //预算结果
-                    fs.writeFile(`./tmp/${prefix}-${staff.mobile}-result.json`, JSON.stringify(budget), function(err) {
-                        if (err) return reject(err);
-                        resolve(true);
-                    })
-                })
-            ])
+            let log = await Models.travelBudgetLog.get(budget.id);
+            log.status = -1;
+            return log.save();
         });
         await Promise.all(ps);
         return true;

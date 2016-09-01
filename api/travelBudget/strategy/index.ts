@@ -63,7 +63,6 @@ function formatHotel(hotels: IHotel[]) : IFinalHotel[] {
 
 abstract class AbstractHotelStrategy {
     private prefers: IPrefer<IFinalHotel>[];
-    private _id: string;
     private isRecord: boolean;
 
     constructor(public qs: any, options: any) {
@@ -73,7 +72,6 @@ abstract class AbstractHotelStrategy {
             this.isRecord = false;
         }
         let d = new Date();
-        this._id = `ID${d.getFullYear()}${d.getMonth()+1}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}${Math.ceil(Math.random() * 1000)}`;
         this.prefers = [];
     }
 
@@ -111,14 +109,13 @@ abstract class AbstractHotelStrategy {
         });
         _hotels = await this.customMarkedScoreData(_hotels);
         let ret = _hotels[0];
-        let result = {
+        let result: any = {
             price: ret.price,
             agent: ret.agent,
             name: ret.name,
             star: ret.star,
             latitude: ret.latitude,
             longitude: ret.longitude,
-            id: this._id,
         }
 
         if (this.isRecord) {
@@ -130,7 +127,8 @@ abstract class AbstractHotelStrategy {
             travelBudgetLog.type = 2;
             travelBudgetLog.result = result;
             travelBudgetLog.markedData = _hotels;
-            await travelBudgetLog.save();
+            let log = await travelBudgetLog.save();
+            result.id = log.id;
         }
         return result;
     }
@@ -146,7 +144,7 @@ export class CommonHotelStrategy extends AbstractHotelStrategy {
         hotels.sort ( (v1, v2) => {
             let diff = v2.score - v1.score;
             if (diff) return diff;
-            return v1.price - v2.price;
+            return v2.price - v1.price;
         })
         return hotels;
     }
@@ -170,7 +168,6 @@ export class HighPriceHotelStrategy extends AbstractHotelStrategy {
 
 abstract class AbstractTicketStrategy {
     private prefers: IPrefer<IFinalTicket>[];
-    private _id: string;
     private isRecord: boolean;
 
     constructor(public qs: any, options: any) {
@@ -181,7 +178,6 @@ abstract class AbstractTicketStrategy {
         }
 
         let d = new Date();
-        this._id = `ID${d.getFullYear()}${d.getMonth()+1}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}${Math.ceil(Math.random() * 1000)}`;
         this.prefers = [];
     }
 
@@ -213,7 +209,7 @@ abstract class AbstractTicketStrategy {
         });
         _tickets = await this.customerMarkedScoreData(_tickets);
         let ret = _tickets[0];
-        let result = {
+        let result: any = {
             price: ret.price,
             type: <EInvoiceType>(<number>ret.type),
             No: ret.No,
@@ -221,7 +217,6 @@ abstract class AbstractTicketStrategy {
             cabin: ret.cabin,
             destination: ret.destination,
             originPlace: ret.originPlace,
-            id: this._id,
             departDateTime: ret.departDateTime,
             arrivalDateTime: ret.arrivalDateTime,
         } as TravelBudgeItem;
@@ -235,7 +230,8 @@ abstract class AbstractTicketStrategy {
             travelBudgetLog.type = 1;
             travelBudgetLog.result = result;
             travelBudgetLog.markedData = _tickets;
-            await travelBudgetLog.save();
+            let log = await travelBudgetLog.save();
+            result.id = log.id;
         }
         return result;
     }

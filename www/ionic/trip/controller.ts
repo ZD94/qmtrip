@@ -48,8 +48,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
     /*******************判断是否为第一次的登录  史聪************************/
     let staff = await Staff.getCurrent();
     let isFirstLogin = await staff.company.getTravelPolicies();
-    if(isFirstLogin.length < 1){
-        console.log('shicong');
+    if(isFirstLogin.length == 0){
         window.location.href = '#/guide/company-guide';
     }
 
@@ -219,6 +218,10 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
         timepicker: true
     };
     $scope.nextStep = async function() {
+        if (!$scope.subsidy.template) {
+            $scope.showErrorMsg('请选择补助信息');
+            return false;
+        }
         let beginMSecond = Date.now();
         API.require("travelBudget");
         await API.onload();
@@ -256,7 +259,8 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
             isRoundTrip: trip.round,
             isNeedHotel: trip.hotel,
             businessDistrict: trip.hotelPlace,
-            hotelName: trip.hotelName
+            hotelName: trip.hotelName,
+            subsidy: $scope.subsidy
         };
 
         if(params.originPlace == params.destinationPlace){
@@ -337,10 +341,8 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     await API.onload();
     let result = await API.travelBudget.getBudgetInfo({id: id});
     let budgets = result.budgets;
-    console.info("budgets=>", budgets);
     let trip = $storage.local.get("trip");
     let query = result.query;
-    // trip.reason = 'ceshiyuanyin';
     trip.beginDate = query.leaveDate;
     trip.endDate  = query.goBackDate;
     trip.createAt = new Date(result.createAt);
@@ -361,6 +363,20 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         }else if(budget.price > budget.fullPrice){
             budget.discount = '全价';
         }
+        if (budget.tripType == ETripType.HOTEL) {
+            budget.duringDays = moment(trip.endDate).diff(moment(trip.beginDate), 'days');
+        }
+        if (budget.tripType == ETripType.SUBSIDY) {
+            let days = moment(trip.endDate).diff(moment(trip.beginDate), 'days')
+            days = days + 1;
+            if (!budget.hasFirstDaySubsidy) {
+                days -= 1;
+            }
+            if (!budget.hasLastDaySubsidy) {
+                days -= 1;
+            }
+            budget.duringDays = days;
+        }
         return budget;
     })
     for(let budget of budgets) {
@@ -373,8 +389,6 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     }
 
     $scope.totalPrice = totalPrice;
-    let duringDays = moment(trip.endDate).diff(moment(trip.beginDate), 'days');
-    $scope.duringDays = duringDays + 1;
     $scope.budgets = budgets;
     $scope.EInvoiceType = EInvoiceType;
     $scope.ETripType = ETripType;

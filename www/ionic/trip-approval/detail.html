@@ -3,9 +3,11 @@
         <div class="flex-c10">
             <ion-scroll>
                 <div class="list">
-                    <div class="item opactic">{{APPROVE_TEXT[tripApprove.status]}}
+                    <div class="item opactic item-button-right">
+                        <span ng-if="tripApprove.status != EApproveStatus.WAIT_APPROVE">{{APPROVE_TEXT[tripApprove.status]}}</span>
+                        <span ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE">等待{{tripApprove.approveUser.name}}审批</span>
                         <span ng-show="tripApprove.status==EApproveStatus.REJECT">{{tripApprove.approveRemark}}</span>
-                        <button class="btn button-positive" style="float: right" ng-click="showApproveDetails()">审批详情</button>
+                        <a class="button button-small button-calm" ng-href="#/trip-approval/approveProgress?approveId={{approveId}}">审批进度</a>
                     </div>
                 </div>
 
@@ -64,7 +66,7 @@
 
                     <ion-item class="item-divider"><span>住宿</span><span class="spanRight">{{hotelBudget}}元</span></ion-item>
                     <ion-item ng-repeat="item in hotel">
-                        <span>{{item.startTime | date: 'MM/dd'}}至{{item.endTime | date: 'MM/dd'}},共{{subsidyDays || 1}}天</span>
+                        <span>{{item.startTime | date: 'MM/dd'}}至{{item.endTime | date: 'MM/dd'}},共{{item.duringDays || 1}}天</span>
                         <br/>
                         <i class="icon ion-home"></i>{{item.city}}
                         <br>
@@ -75,7 +77,7 @@
 
                     <ion-item class="item-divider"><span>补助</span><span class="spanRight">{{subsidyBudget}}元</span></ion-item>
                     <ion-item ng-repeat="item in subsidy">
-                        <span>{{item.startTime | date: 'MM/dd'}}至{{item.endTime | date: 'MM/dd'}},共{{subsidyDays|| 1}}天</span>
+                        <span>{{item.startTime | date: 'MM/dd'}}至{{item.endTime | date: 'MM/dd'}},共{{item.duringDays|| 1}}天</span>
                         <br>
                         <span ng-if="item.price > 0">
                             {{item.price / subsidyDays | currency: ''}}元/天
@@ -100,27 +102,27 @@
         </div>
     </ion-content>
 
-    <ion-content ng-show="isConfirm" padding="false" scroll="false" class="has-header">
-        <div class="flex-c10">
-            <ion-list show-delete="false">
-                <ion-item ng-click="chooseOption(false)" ng-class="{true: '', false: 'item-option-selected'}[isNextApprove]">直接同意</ion-item>
-                <ion-item ng-click="chooseOption(true)" ng-class="{true: 'item-option-selected', false: ''}[isNextApprove]" style="border-top: 1px #387ef5 solid">
-                    <span class="input-label">同意并转给</span>
-                    <ng-selector-list style="float: right;"
-                                      ng-model="tripApprove.approveUser"
-                                      dlg-options="staffSelector"
-                                      dlg-title="选择审批人"
-                                      dlg-placeholder="请选择审批人"
-                                      class="fake-input">
-                    </ng-selector-list>
-                </ion-item>
-            </ion-list>
+    <!--<ion-content ng-show="isConfirm" padding="false" scroll="false" class="has-header">-->
+        <!--<div class="flex-c10">-->
+            <!--<ion-list show-delete="false">-->
+                <!--<ion-item ng-click="chooseOption(false)" ng-class="{true: '', false: 'item-option-selected'}[isNextApprove]">直接同意</ion-item>-->
+                <!--<ion-item ng-click="chooseOption(true)" ng-class="{true: 'item-option-selected', false: ''}[isNextApprove]" style="border-top: 1px #387ef5 solid">-->
+                    <!--<span class="input-label">同意并转给</span>-->
+                    <!--<ng-selector-list style="float: right;"-->
+                                      <!--ng-model="tripApprove.approveUser"-->
+                                      <!--dlg-options="staffSelector"-->
+                                      <!--dlg-title="选择审批人"-->
+                                      <!--dlg-placeholder="请选择审批人"-->
+                                      <!--class="fake-input">-->
+                    <!--</ng-selector-list>-->
+                <!--</ion-item>-->
+            <!--</ion-list>-->
 
-            <div class="button-bar">
-                <a ng-click="cancelConfirm()" class="button button-assertive  button-block">取消</a>
-                <a ng-click="confirmApprove()" class="button button-positive  button-block">确认</a>
-            </div>
-        </div>
+            <!--<div class="button-bar">-->
+                <!--<a ng-click="cancelConfirm()" class="button button-assertive  button-block">取消</a>-->
+                <!--<a ng-click="confirmApprove()" class="button button-positive  button-block">确认</a>-->
+            <!--</div>-->
+        <!--</div>-->
 
-    </ion-content>
+    <!--</ion-content>-->
 </ion-view>
