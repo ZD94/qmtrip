@@ -1381,7 +1381,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     static async saveOrUpdateOpenId(params) {
         let {code} = params;
         let val = await cache.read(`wechat:${code}`);
-        let openid = val.openid;
+        let openid = val ? val.openid : '';
         if(!openid)
             return;
         let staff = await Staff.getCurrent();
@@ -1519,6 +1519,8 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
 
             //如果是登录页，直接跳转
             if(/^http\:\/\/\w*\.jingli365\.com\/(index\.html)?\#\/login\/(index)?/.test(redirect_url)){
+                let openid = await API.wechat.requestOpenIdByCode({code: query.code}); //获取微信openId;
+                await cache.write(`wechat:${query.code}`, JSON.stringify({openid: openid}));
                 redirect_url += redirect_url.indexOf('?') > 0 ? '&' : '?';
                 redirect_url += 'wxauthcode=' + query.code + '&wxauthstate=' + query.state;
                 res.redirect(redirect_url);
