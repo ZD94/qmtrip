@@ -49,10 +49,14 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     let curStaff = await Staff.getCurrent();
     if(tripApprove.approveUser && curStaff.id == tripApprove.approveUser.id) {
         isHasPermissionApprove = true;
+    }
+    if(curStaff.id == tripApprove.accountId){
         isSelf = true;
     }
     $scope.isHasPermissionApprove = isHasPermissionApprove;
     $scope.isSelf = isSelf;
+    console.info(tripApprove);
+
     let totalBudget: number = 0;
 
     if (tripApprove.status == EApproveStatus.WAIT_APPROVE && tripApprove.query && isHasPermissionApprove) {
