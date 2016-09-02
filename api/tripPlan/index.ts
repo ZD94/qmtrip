@@ -73,11 +73,11 @@ class TripPlanModule {
         tripPlan.query = JSON.stringify(query);
 
         if(query.originPlace) {
-            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace});
+            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace});
             tripPlan.deptCity = deptInfo.name;
         }
         tripPlan.arrivalCityCode = query.destinationPlace;
-        let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace});
+        let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace.id || query.destinationPlace.id });
         tripPlan.arrivalCity = arrivalInfo.name;
         tripPlan.isNeedHotel = query.isNeedHotel;
         tripPlan.isRoundTrip = query.isRoundTrip;
