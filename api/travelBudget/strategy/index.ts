@@ -71,7 +71,6 @@ abstract class AbstractHotelStrategy {
         } else {
             this.isRecord = false;
         }
-        let d = new Date();
         this.prefers = [];
     }
 

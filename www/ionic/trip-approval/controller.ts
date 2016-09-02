@@ -18,6 +18,12 @@ APPROVE_TEXT[EApproveStatus.PASS] = '审批通过';
 APPROVE_TEXT[EApproveStatus.REJECT] = '审批驳回';
 APPROVE_TEXT[EApproveStatus.WAIT_APPROVE] = '等待审批';
 
+let APPROVE_LOG_TEXT: any = {};
+APPROVE_LOG_TEXT[EApproveResult.AUTO_APPROVE] = '自动通过';
+APPROVE_LOG_TEXT[EApproveResult.PASS] = '审批通过';
+APPROVE_LOG_TEXT[EApproveResult.REJECT] = '审批驳回';
+APPROVE_LOG_TEXT[EApproveResult.WAIT_APPROVE] = '提交审批';
+
 export async function ApprovedController($scope, Models, $stateParams){
     let staffId = $stateParams.staffId;
     let staff = await Models.staff.get(staffId);
@@ -228,8 +234,8 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         var value = await ngModalDlg.selectMode($scope,$scope.staffSelector);
         if(value){
             $scope.isNextApprove = value.isNextApprove;
-            $scope.isHasPermissionApprove = isHasPermissionApprove;
             approve(value.result);
+            $scope.isHasPermissionApprove = false;
         }
         // $scope.isConfirm = true;
         // $scope.isNextApprove = false;
@@ -414,21 +420,19 @@ export async function ApproveProgressController ($scope, Models, $stateParams){
     let approveId = $stateParams.approveId;
     let tripApprove = await Models.tripApprove.get(approveId);
     $scope.tripApprove = tripApprove;
-    let APPROVE_LOG_TEXT = {};
+    $scope.$watch('tripApprove.status', function(n, o){
+        getLogs ();
+    });
     $scope.EApproveStatus = EApproveStatus;
-    APPROVE_LOG_TEXT[EApproveResult.AUTO_APPROVE] = '自动通过';
-    APPROVE_LOG_TEXT[EApproveResult.PASS] = '审批通过';
-    APPROVE_LOG_TEXT[EApproveResult.REJECT] = '审批驳回';
-    APPROVE_LOG_TEXT[EApproveResult.WAIT_APPROVE] = '提交审批';
     $scope.APPROVE_LOG_TEXT = APPROVE_LOG_TEXT;
-    let logs = await tripApprove.getApproveLogs();
-    logs = await Promise.all(logs.map(async (a) => {
-        a.staff = await Models.staff.get(a.userId);
-        console.log(a.remark);
-        console.info(a);
-        return a;
-    }));
-    $scope.logs = logs;
+    async function getLogs (){
+        let logs = await tripApprove.getApproveLogs();
+        logs = await Promise.all(logs.map(async (a) => {
+            a.staff = await Models.staff.get(a.userId)
+            return a;
+        }));
+        $scope.logs = logs;
+    }
 }
 
 export function RejectReasonController($scope){
