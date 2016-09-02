@@ -3,7 +3,7 @@
 import moment = require('moment');
 var API = require("common/api");
 var Cookie = require('tiny-cookie');
-import { Staff, EStaffRole} from 'api/_types/staff';
+import { Staff} from 'api/_types/staff';
 
 import { Models } from 'api/_types';
 import {
@@ -48,14 +48,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
     }
     $scope.subsidy = {hasFirstDaySubsidy: true, hasLastDaySubsidy: true, template: null};
 
-    /*******************判断是否为第一次的登录  史聪************************/
-    let staff = await Staff.getCurrent();
-    if(staff.roleId == EStaffRole.OWNER){
-        let isFirstLogin = await staff.company.getTravelPolicies();
-        if(isFirstLogin.length == 0){
-            window.location.href = '#/guide/company-guide';
-        }
-    }
+
 
 
     $scope.selectSubsidyTemplate = async function(){
