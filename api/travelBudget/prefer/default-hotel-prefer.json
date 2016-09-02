@@ -3,7 +3,7 @@
     "name":"starMatch",
     "options": {
       "expectStar": "<%=star%>",
-      "score": 500
+      "score": 10000
     }
   },
   {
@@ -16,6 +16,13 @@
     "name": "blackList",
     "options": {
       "score": -100
+    }
+  },
+  {
+    "name": "price",
+    "options": {
+      "score": 2000,
+      "percent": 0.7
     }
   }
 ]
