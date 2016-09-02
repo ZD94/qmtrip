@@ -69,6 +69,14 @@ class TravelPolicyModule{
             throw L.ERR.PERMISSION_DENY();
         }
 
+        var templates = await tp_delete.getSubsidyTemplates();
+        if(templates && templates.length>0){
+            await Promise.all(templates.map(async function(item){
+                await item.destroy();
+                return true;
+            }))
+        }
+
         await tp_delete.destroy();
         return true;
     }

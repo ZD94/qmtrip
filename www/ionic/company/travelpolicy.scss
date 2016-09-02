@@ -22,7 +22,6 @@
 
 .policySubsidy{
   overflow: hidden;
-  margin-top: 16px;
   font-size: 14px;
   > span{
     float: left;
@@ -31,6 +30,20 @@
     float: left;
     p{
       margin-top: 0;
+    }
+  }
+}
+
+.policyCard{
+  .item-body{
+    div{
+      margin-bottom: 10px;
+      &:last-child{
+        margin-bottom: 0;
+      }
+    }
+    p{
+      margin: 0;
     }
   }
 }
