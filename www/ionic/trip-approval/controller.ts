@@ -157,16 +157,17 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
             return;
         }
         var policy = await staff.getTravelPolicy();
+        $scope.policy = policy;
+        $scope.subsidies = await policy.getSubsidyTemplates();
+        $scope.MTrainLevel = MTrainLevel;
+        $scope.MPlaneLevel = MPlaneLevel;
+        $scope.MHotelLevel = MHotelLevel;
         if (policy) {   //判断是否设置差旅标准
             var show = $ionicPopup.alert({
                 title: '差旅标准',
-                template: '飞机:' + MPlaneLevel[policy.planeLevel] +
-                '<br>' +
-                '火车:' + MTrainLevel[policy.trainLevel] +
-                '<br>' +
-                '住宿:' + MHotelLevel[policy.hotelLevel] +
-                '<br>' +
-                '补助:' + policy.subsidy + '/天'
+                scope: $scope,
+                cssClass: 'policyPopup',
+                template: require('../policyPopupTemplate.html')
             })
         } else {
             var show = $ionicPopup.alert({   //定义show的原因是避免页面加载就执行

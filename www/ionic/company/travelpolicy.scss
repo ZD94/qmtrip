@@ -19,3 +19,18 @@
     background: none;
   }
 }
+
+.policySubsidy{
+  overflow: hidden;
+  margin-top: 16px;
+  font-size: 14px;
+  > span{
+    float: left;
+  }
+  > div{
+    float: left;
+    p{
+      margin-top: 0;
+    }
+  }
+}
