@@ -79,7 +79,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
             if(browserspec.is_wechat && $stateParams.wxauthcode) {
                 //保存accountId和openId关联
                 await API.onload();
-                await API.auth.saveOrUpdateOpenId();
+                await API.auth.saveOrUpdateOpenId({code: $stateParams.wxauthcode});
             }
 
             window.location.href = backUrl;
