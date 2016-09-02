@@ -209,8 +209,8 @@ class ApiTravelBudget {
                         budget.hasFirstDaySubsidy = subsidy.hasFirstDaySubsidy;
                         budget.hasLastDaySubsidy = subsidy.hasLastDaySubsidy;
                         budget.tripType = ETripType.SUBSIDY;
-                        budget.price = subsidy.template.subsidyMoney * days;
-                        budget.template = {id: subsidy.template.id, name: subsidy.template.name}
+                        budget.price = subsidy.template.target.subsidyMoney * days;
+                        budget.template = {id: subsidy.template.target.id, name: subsidy.template.target.name}
                         budgets.push(budget);
                     }
                 }
