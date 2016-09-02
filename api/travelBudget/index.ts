@@ -307,7 +307,12 @@ class ApiTravelBudget {
             checkInDate: checkInDate,
             checkOutDate: checkOutDate
         }
-        qs.prefers = loadDefaultPrefer(query, 'hotel');
+        let budgetConfig = staff.company.budgetConfig;
+        if (budgetConfig && budgetConfig.hotel) {
+            qs.prefers = budgetConfig.hotel;
+        } else {
+            qs.prefers = loadDefaultPrefer(query, 'hotel');
+        }
         qs.query = query;
         let hotels = await API.hotel.search_hotels(query);
         let strategy = await HotelBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
@@ -397,14 +402,19 @@ class ApiTravelBudget {
             cabin: trainCabins
         });
 
-        let qs: any = staff.company.budgetConfig;
+        let preferConfig: any = staff.company.budgetConfig;
         if (!params.earliestLeaveTime) {
             params.earliestLeaveTime = '09:00'
         }
         if (!params.latestArrivalTime) {
             params.latestArrivalTime = '21:00'
         }
-        qs.prefers = loadDefaultPrefer(params);
+        let qs: any = {};
+        if (preferConfig && preferConfig.traffic) {
+            qs.prefers = preferConfig.traffic;
+        } else {
+            qs.prefers = loadDefaultPrefer(params);
+        }
         qs.prefers = qs.prefers.map( (p) => {
             if (p.name == 'cabin') {
                 p.options['expectCabins'] = _.concat(cabinClass, trainCabins)
