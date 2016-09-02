@@ -1039,7 +1039,7 @@ async function SubsidyTemplatesController($scope, Models,$ionicPopup) {
                             return false;
                         }
                         saveSubsidyTemplates.push($scope.subsidyTemplate);
-                        $scope.subsidyTemplates.push($scope.subsidyTemplate);
+                        $scope.subsidyTemplates = saveSubsidyTemplates;
 
                         // var st = await $scope.subsidyTemplate.save();
                         // $scope.subsidyTemplates = await travelPolicy.getSubsidyTemplates();
