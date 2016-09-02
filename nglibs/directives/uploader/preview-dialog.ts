@@ -23,6 +23,7 @@ async function previewImageController($scope, $element){
     $scope.confirm = function(){
         var results = Promise.all($scope.canvases.map(function(canvas){
             return new Promise(function(resolve){
+                require('blueimp-canvas-to-blob');
                 canvas.toBlob(resolve);
             });
         }));
