@@ -613,39 +613,39 @@ class TripPlanModule {
         await tripApprove.save();
 
         //发送审核结果邮件
-        let self_url = config.host + '/index.html#/trip/list-detail?tripid=' + tripApprove.id;
-        let user = tripApprove.account;
-        if(!user) user = await Models.staff.get(tripApprove['accountId']);
-
-        let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
-        self_url = await API.wechat.shorturl({longurl: self_url});
-        let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
-
-        let self_values = {
-            username: user.name,
-            planNo: tripPlan.planNo,
-            approveTime: utils.now(),
-            approveUser: staff.name,
-            projectName: tripPlan.title,
-            goTrafficBudget: go,
-            backTrafficBudget: back,
-            hotelBudget: hotel,
-            otherBudget: others,
-            totalBudget: '￥' + tripPlan.budget,
-            url: self_url,
-            detailUrl: self_url,
-            time: moment(tripPlan.startAt).format('YYYY-MM-DD'),
-            destination: tripPlan.arrivalCity,
-            staffName: user.name,
-            startTime: moment(tripPlan.startAt).format('YYYY-MM-DD'),
-            arrivalCity: tripPlan.arrivalCity,
-            budget: tripPlan.budget,
-            tripPlanNo: tripPlan.planNo,
-            approveResult: approveResult,
-            reason: approveResult,
-            emailReason: params.auditRemark
-        };
-        API.notify.submitNotify({email: user.email, key: tplName, values: self_values, mobile: user.mobile, openid: openId});
+        // let self_url = config.host + '/index.html#/trip/list-detail?tripid=' + tripApprove.id;
+        // let user = tripApprove.account;
+        // if(!user) user = await Models.staff.get(tripApprove['accountId']);
+        //
+        // let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
+        // self_url = await API.wechat.shorturl({longurl: self_url});
+        // let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
+        //
+        // let self_values = {
+        //     username: user.name,
+        //     planNo: tripPlan.planNo,
+        //     approveTime: utils.now(),
+        //     approveUser: staff.name,
+        //     projectName: tripPlan.title,
+        //     goTrafficBudget: go,
+        //     backTrafficBudget: back,
+        //     hotelBudget: hotel,
+        //     otherBudget: others,
+        //     totalBudget: '￥' + tripPlan.budget,
+        //     url: self_url,
+        //     detailUrl: self_url,
+        //     time: moment(tripPlan.startAt).format('YYYY-MM-DD'),
+        //     destination: tripPlan.arrivalCity,
+        //     staffName: user.name,
+        //     startTime: moment(tripPlan.startAt).format('YYYY-MM-DD'),
+        //     arrivalCity: tripPlan.arrivalCity,
+        //     budget: tripPlan.budget,
+        //     tripPlanNo: tripPlan.planNo,
+        //     approveResult: approveResult,
+        //     reason: approveResult,
+        //     emailReason: params.auditRemark
+        // };
+        // API.notify.submitNotify({email: user.email, key: tplName, values: self_values, mobile: user.mobile, openid: openId});
         return true;
     }
 
@@ -1519,11 +1519,11 @@ class TripPlanModule {
 
         if(query.originPlace) {
             let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace}) || {name: null};
-            tripApprove.deptCityCode = query.originPlace;
+            tripApprove.deptCityCode = deptInfo.id;
             tripApprove.deptCity = deptInfo.name;
         }
 
-        tripApprove.arrivalCityCode = query.destinationPlace;
+        tripApprove.arrivalCityCode = arrivalInfo.id;
         tripApprove.arrivalCity = arrivalInfo.name;
         tripApprove.isNeedTraffic = query.isNeedTraffic;
         tripApprove.isNeedHotel = query.isNeedHotel;
