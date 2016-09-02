@@ -679,16 +679,18 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     var invoice = await Models.tripDetail.get($stateParams.detailId);
     $scope.invoice = invoice;
     $scope.EInvoiceType = EInvoiceType;
-    var latestInvoice = invoice.latestInvoice;
-    var invoiceImgs = [];
-    if(typeof latestInvoice =='string') {
-        latestInvoice = JSON.parse(latestInvoice);
-    }
 
-    for(let i of latestInvoice){
-        invoiceImgs.push('/trip-detail/'+$stateParams.detailId+'/invoice/'+i);
-    }
-    $scope.invoiceImgs = invoiceImgs;
+    $scope.$watch('invoice.latestInvoice', function(n, o){
+        var invoiceImgs = [];
+        var latestInvoice = $scope.invoice.latestInvoice;
+        if(typeof latestInvoice =='string') {
+            latestInvoice = JSON.parse(latestInvoice);
+        }
+        for(let i of latestInvoice){
+            invoiceImgs.push('/trip-detail/'+$stateParams.detailId+'/invoice/'+i);
+        }
+        $scope.invoiceImgs = invoiceImgs;
+    })
 
     let statusTxt = {};
     statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";

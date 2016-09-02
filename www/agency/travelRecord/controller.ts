@@ -144,21 +144,25 @@ export async function TravelDetailController($scope, $stateParams, $location, $a
                     tripDetail.latestInvoice = JSON.parse(tripDetail.latestInvoice);
                 }
                 $scope.curTripDetail = tripDetail;
-                var imageIds = tripDetail.latestInvoice;
-                var curTripDetailInoviceImgs = [];
-                await Promise.all(imageIds.map(function(invoiceId){
-                    invoiceId =  '/trip-detail/'+tripDetailId+'/invoice/' + invoiceId;
-                    curTripDetailInoviceImgs.push(invoiceId);
-                    return invoiceId;
-                }))
-                // $scope.curTripDetailInoviceImg = '/consume/invoice/' + tripDetail.id;
-                $scope.curTripDetailInoviceImgs = curTripDetailInoviceImgs;
                 return tripDetail;
             })
             .catch(function(err){
                 msgbox.log(err.msg ||err);
             });
     }
+    $scope.$watch('curTripDetail.latestInvoice', function(n, o){
+        var invoiceImgs = [];
+        if($scope.curTripDetail){
+            var latestInvoice = $scope.curTripDetail.latestInvoice;
+            if(typeof latestInvoice =='string') {
+                latestInvoice = JSON.parse(latestInvoice);
+            }
+            for(let i of latestInvoice){
+                invoiceImgs.push('/trip-detail/'+$scope.curTripDetail.id+'/invoice/'+i);
+            }
+        }
+        $scope.curTripDetailInoviceImgs = invoiceImgs;
+    })
 
     angular.element("#invoiceImg").bind("load", function() {
         $scope.showLoading = false;
