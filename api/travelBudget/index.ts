@@ -164,13 +164,14 @@ class ApiTravelBudget {
 
                 if (isNeedTraffic && isRoundTrip) {
                     try {
-                        let budget = await ApiTravelBudget.getTrafficBudget({
+                        let _params = {
                             originPlace: destinationPlace,
                             destinationPlace: originPlace,
                             leaveDate: goBackDate,
                             earliestLeaveTime: earliestGoBackTime,
                             latestArrivalTime: latestGoBackTime,
-                        });
+                        }
+                        let budget = await ApiTravelBudget.getTrafficBudget(params);
                         budget.tripType = ETripType.BACK_TRIP;
                         budgets.push(budget);
                     } catch (err) {

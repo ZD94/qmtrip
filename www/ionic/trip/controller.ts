@@ -353,11 +353,10 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     trip.createAt = new Date(result.createAt);
 
     if(query.originPlace) {
-        let originPlace = await API.place.getCityInfo({cityCode: query.originPlace});
+        let originPlace = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace});
         trip.originPlaceName = originPlace.name;
     }
-
-    let destination = await API.place.getCityInfo({cityCode: query.destinationPlace});
+    let destination = await API.place.getCityInfo({cityCode: query.destinationPlace.id || query.destinationPlace});
     trip.destinationPlaceName = destination.name;
     $scope.trip = trip;
     //补助,现在是0,后续可能会直接加入到预算中
