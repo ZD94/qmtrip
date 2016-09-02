@@ -165,3 +165,17 @@
     max-height: 155px;
   }
 }
+
+//调整安卓上popup的toggle样式  shicong
+
+body.platform-android div.popup{
+  .toggle-small.item-toggle .toggle{
+    top:10px
+  }
+  div.item-toggle{
+    label.toggle > div.track > div.handle{
+      top:7px;
+      left:8px;
+    }
+  }
+}
