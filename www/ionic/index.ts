@@ -143,7 +143,7 @@ ngapp.depend('ionic');
 ngapp.depend('nglibs');
 ngapp.depend('chart.js');
 ngapp.depend('hmTouchEvents');
-ngapp.root('ionic', '/trip/create');
+ngapp.root('ionic', '/staff/index');
 ngapp.useRoutePolicy(ngapp.RoutePolicy.None);
 ngapp.routeAddSingle('login');
 ngapp.routeAddSingle('guide');
