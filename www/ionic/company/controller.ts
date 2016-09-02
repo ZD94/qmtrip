@@ -802,15 +802,16 @@ export async function TravelpolicyController($scope, Models, $location, $ionicPo
     $scope.MHotelLevel = MHotelLevel;
     $scope.MPlaneLevel = MPlaneLevel;
     $scope.MTrainLevel = MTrainLevel;
-    $scope.travelPolicies = travelPolicies.map(function (policy) {
-        
+    let ps = travelPolicies.map(async function (policy) {
+        var subsidyTemplates = await policy.getSubsidyTemplates();
         if(policy.isDefault){
             $scope.defaultTravelpolicy = policy;
         }
-
-        var obj = {policy: policy, usernum: ''};
+        var obj = {policy: policy, usernum: '',subsidy:subsidyTemplates};
         return obj;
     })
+    $scope.travelPolicies = await Promise.all(ps);
+    console.info($scope.travelPolicies);
     await Promise.all($scope.travelPolicies.map(async function (obj) {
         var result = await obj.policy.getStaffs();
         obj.usernum = result.length;
@@ -953,6 +954,7 @@ export async function SubsidyTemplatesController($scope, Models, $location, $sta
     var travelPolicy = await Models.travelPolicy.get(tpId);
     var subsidyTemplates = await travelPolicy.getSubsidyTemplates();
     $scope.subsidyTemplates = subsidyTemplates;
+    console.info(subsidyTemplates);
 
     $scope.addTemplate = async function () {
         $scope.subsidyTemplate = SubsidyTemplate.create();
@@ -1126,7 +1128,7 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
     }
 }
 
-export async function StaffInvitedController($scope, Models, $storage, $stateParams, $ionicHistory, $ionicPopup,ClosePopupService,wxApi){
+export async function StaffInvitedController($scope, Models, $ionicHistory, $ionicPopup,  ClosePopupService,wxApi){
     require('./staff-invited.scss');
     var staff = await Staff.getCurrent();
     $scope.staff = staff;

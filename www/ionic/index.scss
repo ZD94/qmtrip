@@ -22,6 +22,33 @@ ion-side-menu {
   }
 }
 
+
+.policyPopup{
+  .popup-body{
+    padding: 10px 35px;
+    > div{
+      margin-bottom: 10px;
+      &.policySubsidy{
+        overflow: hidden;
+        margin-top: 16px;
+        font-size: 14px;
+        > span{
+          float: left;
+        }
+        > div{
+          float: left;
+          p{
+            margin-top: 0;
+          }
+        }
+      }
+      &:last-child{
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
 .item-thumbnail-left {
   &.menu-button{
     border-left: none;

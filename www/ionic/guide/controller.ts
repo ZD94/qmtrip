@@ -45,7 +45,7 @@ export async function CompanyFirstController ($scope, Models, $stateParams){
 
 }
 
-export async function CompanySecondController ($scope, $injector,wxApi){
+export async function CompanySecondController ($scope, $injector, wxApi){
     require("./company-guide.scss");
     return $injector.invoke(StaffInvitedController, $scope, {$scope});
 }

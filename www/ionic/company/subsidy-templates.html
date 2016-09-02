@@ -12,7 +12,12 @@
                     <p>补助金额：{{st.subsidyMoney}}元/天</p>
                 </div>
             </ion-item>
-            <div class="subsidyAttend">请根据公司需要为设置不同级别的补助模板（如一级城市、耳机城市、三级城市等或其他分类形式），设置好的补助模板可以供员工在生成出差预算的时候进行选择，可以使预算更加准确。<br/>如没有补助此项可以忽略。</div>
+            <div class="subsidyAttend">说明</br>
+                请根据公司差旅政策设置补助标准，如果不设置此项默认为零。</br>
+                员工在填写出差申请时，可选择对应的补助标准，系统将根据员工选择的标准计算差旅预算。</br>
+                补助标准没有数量限制，您可以根据企业实际差旅政策进行设置。</br>
+                例如：</br>
+                一线城市150元／天，二线城市100元／天</div>
         </ion-list>
         <div id="page13-markdown3">
             <div ng-if="!subsidyTemplates.length" class="getMoreOrNoMore">暂无记录</div>
