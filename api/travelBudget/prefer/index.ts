@@ -51,7 +51,8 @@ export var hotelPrefers = {
 export var ticketPrefers = {
     arrivalTime: require('./ticket-arrivaltime'),
     cheapSupplier: require('./ticket-cheapsupplier'),
-    selectTraffic: require('./ticket-selecttraffic'),
+    selectTraffic: require('./ticket-selectTrafficByTime'),
     cabin: require('./ticket-cabin'),
-    departTime: require('./ticket-departtime')
+    departTime: require('./ticket-departtime'),
+    trafficPrefer: require('./ticket-trafficprefer'),
 }
