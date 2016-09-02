@@ -590,8 +590,6 @@ export class TripApprove extends ModelObject{
      */
     approve(params: {auditResult: EAuditStatus, auditRemark?: string, budgetId?: string, id?: string}): Promise<boolean> {
         params.id = this.id;
-        console.info(params);
-        console.info("liiiiiiiiiiiiiiiiiiiiiii");
         return API.tripPlan.approveTripPlan(params);
     }
 
