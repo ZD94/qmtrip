@@ -90,7 +90,7 @@ angular
                 showUploader: '@',
                 item: '='
             },
-            controller: function($scope) {
+            controller: function($scope, $ionicPopup) {
                 //设置上传路径
                 let auth_data: any = $storage.local.get("auth_data");
                 let url = '/upload/ajax-upload-file?type=image';
@@ -126,11 +126,17 @@ angular
                     API.require('tripPlan');
                     await API.onload();
                     try {
+                        if(ret.ret != 0)
+                            throw new Error(ret.errMsg);
                         await $scope.item.uploadInvoice({
                             pictureFileId: ret.fileId
                         })
                     } catch(err) {
-                        alert(err.msg ? err.msg : err);
+                        console.error(err.msg ? err.msg : err);
+                        $ionicPopup.alert({
+                            title: '错误',
+                            template: err.msg ? err.msg : err
+                        });
                     }
                 }
             }

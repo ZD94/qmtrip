@@ -662,7 +662,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
     }
 }
 
-export async function InvoiceDetailController($scope , Models, $stateParams){
+export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup){
     //////绑定上传url
     let authDataStr = window['getAuthDataStr']();
     $scope.uploadUrl = '/upload/ajax-upload-file?type=image&'+authDataStr;
@@ -709,6 +709,14 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
         title = '住宿';
     }
     $scope.invoicefuc = {title:'上传'+title + '发票',done:function(response){
+        if(response.ret != 0){
+            console.error(response.errMsg);
+            $ionicPopup.alert({
+                title: '错误',
+                template: response.errMsg
+            });
+            return;
+        }
         var fileId = response.fileId;
         uploadInvoice(invoice, fileId,async function (err, result) {
             if (err) {

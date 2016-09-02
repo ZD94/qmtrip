@@ -66,13 +66,27 @@ function ngUploader($loading, wxApi): any {
                 var urls = files.map((file)=>file._file)
                 $scope.previewAndUpload(urls);
             };
-            uploader.onCompleteItem  = function (file, response, status, headers) {
+            uploader.onSuccessItem  = function (file, response, status, headers) {
                 fileIds.push(response.fileId);
+                uploader.removeFromQueue(file);
+            };
+            uploader.onErrorItem  = function (file, response, status, headers) {
+                fileIds.push(undefined);
             };
             uploader.onCompleteAll  = function (file, response, status, headers) {
                 console.info(fileIds);
-                var obj = {ret: 0, errMsg: "", fileId: fileIds}
+                var obj = {
+                    ret: 0,
+                    errMsg: '',
+                    fileId: fileIds
+                };
+                if(uploader.queue.length > 0){
+                    //msgbox.log('文件上传不成功:<br>'+uploader.queue.map((file)=>file.url).join('<br>'));
+                    obj.ret = -1;
+                    obj.errMsg = '文件上传不成功:<br>'+uploader.queue.map((file)=>file.file.name).join('<br>');
+                }
                 $scope.done()(obj);
+                uploader.clearQueue();
                 $loading.end();
             };
 
