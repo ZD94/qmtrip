@@ -182,7 +182,7 @@ class ApiTravelBudget {
                 if (isNeedHotel) {
                     try {
                         let budget = await ApiTravelBudget.getHotelBudget({
-                            cityId: destinationPlace,
+                            city: destinationPlace,
                             businessDistrict: businessDistrict,
                             checkInDate: checkInDate as string,
                             checkOutDate: checkOutDate as string
@@ -236,18 +236,18 @@ class ApiTravelBudget {
      *
      * @param {Object} params
      * @param {UUID} params.accountId 账号ID
-     * @param {String} params.cityId    城市ID
+     * @param {String} params.city    城市ID
      * @param {String} params.businessDistrict 商圈ID
      * @param {String} params.checkInDate 入住时间
      * @param {String} params.checkOutDate 离开时间
      * @return {Promise} {prize: 1000, hotel: "酒店名称"}
      */
     @clientExport
-    static async getHotelBudget(params: {cityId: string, businessDistrict: string,
+    static async getHotelBudget(params: {city: any, businessDistrict: string,
         checkInDate: string, checkOutDate: string}) :Promise<TravelBudgeItem> {
-        let {cityId, businessDistrict, checkInDate, checkOutDate} = params;
+        let {city, businessDistrict, checkInDate, checkOutDate} = params;
 
-        if (!Boolean(cityId)) {
+        if (!Boolean(city)) {
             throw L.ERR.CITY_NOT_EXIST();
         }
         if (!checkInDate || !validate.isDate(checkInDate)) {
@@ -268,7 +268,7 @@ class ApiTravelBudget {
         //查询是否有协议酒店
         let accordHotel;
         try {
-            accordHotel= await API.accordHotel.getAccordHotelByCity({cityId: cityId});
+            accordHotel= await API.accordHotel.getAccordHotelByCity({cityId: city.id || city});
         } catch(err) {
         }
         if (accordHotel) {
@@ -278,7 +278,7 @@ class ApiTravelBudget {
         //查询员工差旅标准
         let policy = await staff.getTravelPolicy();
         let hotelStar: number = 3;
-        let city = await API.place.getCityInfo({cityCode: cityId});
+        city = await API.place.getCityInfo({cityCode: city.id || city});
         if (!policy) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
@@ -333,7 +333,7 @@ class ApiTravelBudget {
      * @return {Promise} {price: "1000"}
      */
     @clientExport
-    static async getTrafficBudget(params: {originPlace: string, destinationPlace: string,
+    static async getTrafficBudget(params: {originPlace: any, destinationPlace: any,
         leaveDate: Date | string, earliestLeaveTime?: string, latestArrivalTime?: string}) : Promise<TravelBudgeItem> {
         let {originPlace, destinationPlace, leaveDate, earliestLeaveTime, latestArrivalTime} = params;
 
@@ -382,8 +382,8 @@ class ApiTravelBudget {
         }
 
         let companyPolicy = staff.company.budgetPolicy;
-        let m_originCity = await API.place.getCityInfo({cityCode: originPlace});
-        let m_destination = await API.place.getCityInfo({cityCode: destinationPlace});
+        let m_originCity = await API.place.getCityInfo({cityCode: originPlace.id || originPlace});
+        let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
 
         let flightTickets:ITicket[] = [];
         if (m_originCity && m_destination) {

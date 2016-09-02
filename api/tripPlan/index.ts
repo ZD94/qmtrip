@@ -73,11 +73,11 @@ class TripPlanModule {
         tripPlan.query = JSON.stringify(query);
 
         if(query.originPlace) {
-            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace});
+            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace});
             tripPlan.deptCity = deptInfo.name;
         }
         tripPlan.arrivalCityCode = query.destinationPlace;
-        let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace});
+        let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace.id || query.destinationPlace.id });
         tripPlan.arrivalCity = arrivalInfo.name;
         tripPlan.isNeedHotel = query.isNeedHotel;
         tripPlan.isRoundTrip = query.isRoundTrip;
@@ -612,7 +612,7 @@ class TripPlanModule {
         }
         await tripApprove.save();
 
-        // //发送审核结果邮件
+        //发送审核结果邮件
         // let self_url = config.host + '/index.html#/trip/list-detail?tripid=' + tripApprove.id;
         // let user = tripApprove.account;
         // if(!user) user = await Models.staff.get(tripApprove['accountId']);
@@ -620,7 +620,6 @@ class TripPlanModule {
         // let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
         // self_url = await API.wechat.shorturl({longurl: self_url});
         // let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
-        //
         //
         // let self_values = {
         //     username: user.name,
@@ -1516,15 +1515,15 @@ class TripPlanModule {
         tripApprove.backAt = query.goBackDate;
         tripApprove.query = JSON.stringify(query);
 
-        let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace}) || {name: null};
+        let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace.id|| query.destinationPlace}) || {name: null};
 
         if(query.originPlace) {
-            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace}) || {name: null};
-            tripApprove.deptCityCode = query.originPlace;
+            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace}) || {name: null};
+            tripApprove.deptCityCode = deptInfo.id;
             tripApprove.deptCity = deptInfo.name;
         }
 
-        tripApprove.arrivalCityCode = query.destinationPlace;
+        tripApprove.arrivalCityCode = arrivalInfo.id;
         tripApprove.arrivalCity = arrivalInfo.name;
         tripApprove.isNeedTraffic = query.isNeedTraffic;
         tripApprove.isNeedHotel = query.isNeedHotel;
