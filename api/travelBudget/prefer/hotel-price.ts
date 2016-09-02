@@ -102,7 +102,7 @@ class PricePrefer extends AbstractPrefer<IFinalHotel> {
                 if (v.price > expectPrice) {
                     let score = Math.floor(self.score * (1 - Math.pow((v.price - expectPrice) / (expectPrice - highestLimit), 2)));
                     v.score += score
-                    v.reasons.push(`价格在偏好价格上 ${score} $`);
+                    v.reasons.push(`价格在偏好价格上 ${score}`);
                 }
                 return v;
             });

@@ -80,9 +80,9 @@ abstract class AbstractHotelStrategy {
 
     async getMarkedScoreHotels(hotels: IFinalHotel[]) :Promise<IFinalHotel[]> {
         let self = this;
-        self.prefers.forEach( async (p) => {
-            hotels = await p.markScore(hotels);
-        })
+        for(let prefer of self.prefers) {
+            hotels = await prefer.markScore(hotels);
+        }
         return hotels;
     }
 
