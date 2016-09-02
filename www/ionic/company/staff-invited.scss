@@ -39,6 +39,14 @@
           width: 70%;
           border-radius: 30px;
         }
+        p{
+          color:#9c9c9c;
+          font-size: 12px;
+          word-break: break-all;
+          word-wrap: break-word;
+          text-overflow: clip;
+          white-space: normal;
+        }
       }
     }
     //&:last-child{
