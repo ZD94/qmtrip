@@ -21,7 +21,7 @@ var API = require("common/api");
 var utils = require("common/utils");
 var Logger = require("common/logger");
 var logger = new Logger('auth');
-
+import cache = require("common/cache");
 let msgConfig = C.message;
 var accountCols = Account['$fieldnames'];
 
@@ -1378,9 +1378,10 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      * @type {saveOrUpdateOpenId}
      */
     @clientExport
-    static async saveOrUpdateOpenId() {
-        var session = getSession();
-        let openid = session.wxopenid; //获取微信openId;
+    static async saveOrUpdateOpenId(params) {
+        let {code} = params;
+        let val = await cache.read(`wechat:${code}`);
+        let openid = val.openid;
         if(!openid)
             return;
         let staff = await Staff.getCurrent();
@@ -1446,8 +1447,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     static async authWeChatLogin(params: {code: string}):
     Promise<{token_id: string, user_id: string, timestamp: string, token_sign: string} | boolean> {
         let openid = await API.wechat.requestOpenIdByCode({code: params.code}); //获取微信openId;
-        var session = getSession();
-        session.wxopenid = openid;
+        await cache.write(`wechat:${params.code}`, {openid: openid});
         let accountId = await ApiAuth.getAccountIdByOpenId({openId: openid});
 
         if(!accountId) {
