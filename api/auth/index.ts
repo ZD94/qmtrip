@@ -8,7 +8,7 @@ import {AuthCert, Token, Account, AccountOpenid, ACCOUNT_STATUS} from "api/_type
 import {Staff, EInvitedLinkStatus} from "api/_types/staff";
 import validator = require('validator');
 import _ = require('lodash');
-import { getSession } from '../../common/model/client';
+import { getSession } from 'common/model';
 
 var sequelize = require("common/model").DB;
 var DBM = sequelize.models;
