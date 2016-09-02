@@ -171,7 +171,7 @@ class ApiTravelBudget {
                             earliestLeaveTime: earliestGoBackTime,
                             latestArrivalTime: latestGoBackTime,
                         }
-                        let budget = await ApiTravelBudget.getTrafficBudget(params);
+                        let budget = await ApiTravelBudget.getTrafficBudget(_params);
                         budget.tripType = ETripType.BACK_TRIP;
                         budgets.push(budget);
                     } catch (err) {
@@ -431,8 +431,8 @@ class ApiTravelBudget {
         result.cabinClass = result.cabin;
         if (<number>result.type == <number>TRAFFIC.FLIGHT) {
             let fullPriceObj = await API.place.getFlightFullPrice({
-                originPlace: originPlace,
-                destination: destinationPlace,
+                originPlace: m_originCity.id,
+                destination: m_destination.id,
             });
             result.fullPrice = fullPriceObj ? fullPriceObj.EPrice : 0;
         }
