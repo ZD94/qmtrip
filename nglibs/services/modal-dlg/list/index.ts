@@ -3,6 +3,9 @@ declare var API: any;
 var msgbox = require('msgbox');
 
 export async function selectFromListController($scope) {
+    if(typeof $scope.options.searchbox === 'undefined'){
+        $scope.options.searchbox = true;
+    }
     let form = $scope.form = {
         keyword: ''
     };

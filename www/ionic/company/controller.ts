@@ -4,7 +4,7 @@
 "use strict";
 import {EStaffRole, Staff, EStaffStatus, InvitedLink} from "api/_types/staff";
 import {EPlanStatus, ETripType, EAuditStatus} from 'api/_types/tripPlan';
-import {TravelPolicy, MHotelLevel, MPlaneLevel, MTrainLevel, SubsidyTemplate} from "api/_types/travelPolicy";
+import {TravelPolicy, MHotelLevel, MPlaneLevel, MTrainLevel,ETrainLevel, EHotelLevel, EPlaneLevel, SubsidyTemplate} from "api/_types/travelPolicy";
 import {Department} from "api/_types/department";
 import {AccordHotel} from "api/_types/accordHotel";
 import {ACCOUNT_STATUS} from "api/_types/auth"
@@ -873,9 +873,9 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
     } else {
         travelPolicy = TravelPolicy.create();
         travelPolicy.companyId = staff.company.id;
-        travelPolicy.planeLevel = 2;
-        travelPolicy.trainLevel = 3;
-        travelPolicy.hotelLevel = 2;
+        travelPolicy.planeLevel = EPlaneLevel.ECONOMY;
+        travelPolicy.trainLevel = ETrainLevel.SECOND_CLASS;
+        travelPolicy.hotelLevel = EHotelLevel.TWO_STAR;
     }
     $scope.travelPolicy = travelPolicy;
     $scope.savePolicy = async function () {
@@ -891,6 +891,31 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         $scope.travelPolicy.company = staff.company;
         await $scope.travelPolicy.save();
         $ionicHistory.goBack(-1);
+    }
+
+    let hotelLevels = [
+        { title: '国际五星', value: 5, desc: '万丽 喜来登 希尔顿 皇冠假日 等'},
+        { title: '高端商务', value: 4, desc: '福朋喜来登 诺富特 希尔顿逸林 假日酒店 等'},
+        { title: '精品连锁', value: 3, desc: '如家精选 和颐酒店 全季酒店 桔子水晶 智选假日 ZMAX 等'},
+        { title: '快捷连锁', value: 2, desc: '如家 莫泰 汉庭 IBIS 锦江之星 速8 等'},
+    ];
+    $scope.selectHotalLevel = {
+        searchbox: false,
+        query: () => [5, 4, 3, 2],
+        display: function(val){
+            for(let level of hotelLevels){
+                if(level.value === val){
+                    return level.title;
+                }
+            }
+        },
+        note: function(val){
+            for(let level of hotelLevels){
+                if(level.value === val){
+                    return level.desc;
+                }
+            }
+        }
     }
 
     $scope.deletePolicy = async function () {

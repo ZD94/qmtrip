@@ -5,6 +5,10 @@
   .new-item{
     color: $calm;
   }
+  .item-note{
+    max-width: 60%;
+    white-space: normal;
+  }
 }
 
 .ng-modal-select-map{
@@ -82,12 +86,4 @@
       }
     }
   }
-}
-.modal-backdrop-bg{
-  transition: opacity 300ms ease-in-out;
-  background-color: #000;
-  opacity: 0;
-}
-.active .modal-backdrop-bg{
-  opacity: 0.5;
 }
