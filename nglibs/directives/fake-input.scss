@@ -1,13 +1,20 @@
 @import "../../common/vendor/ionic/scss/variables";
 
-.item-input > fake-input,
-.item-input > .fake-input {
-  flex: 1 220px;
-  width: 100%;
-  height: $line-height-computed + $font-size-base;
-  padding-right: 44px;
-  font-size: $font-size-base;
-  line-height: $line-height-computed + $font-size-base;
+.item-input {
+  >fake-input, >.fake-input {
+    flex: 1 220px;
+    width: 100%;
+    height: $line-height-computed + $font-size-base;
+    padding-right: 44px;
+    font-size: $font-size-base;
+    line-height: $line-height-computed + $font-size-base;
+  }
+  &.item-select{
+    >ng-selector-list.fake-input{
+      padding-right: ($item-padding * 3);
+      text-align: right;
+    }
+  }
 }
 
 fake-input {
