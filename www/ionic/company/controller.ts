@@ -811,7 +811,6 @@ export async function TravelpolicyController($scope, Models, $location, $ionicPo
         return obj;
     })
     $scope.travelPolicies = await Promise.all(ps);
-    console.info($scope.travelPolicies);
     await Promise.all($scope.travelPolicies.map(async function (obj) {
         var result = await obj.policy.getStaffs();
         obj.usernum = result.length;
@@ -873,12 +872,12 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
 
     let saveSubsidyTemplates = [];
     let removeSubsidyTemplates = [];
-
+    $scope.subsidyTemplates = [];
     if ($stateParams.policyId) {
         travelPolicy = await Models.travelPolicy.get($stateParams.policyId);
         $scope.subsidyTemplates = subsidyTemplates = await travelPolicy.getSubsidyTemplates();
     } else {
-        $scope.subsidyTemplates = [];
+
         travelPolicy = TravelPolicy.create();
         travelPolicy.companyId = staff.company.id;
         travelPolicy.planeLevel = EPlaneLevel.ECONOMY;
@@ -1000,9 +999,11 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
 async function SubsidyTemplatesController($scope, Models,$ionicPopup) {
     require('./subsidy-templates.scss');
     $scope.showDelete = false;
+    if(!$scope.subsidyTemplates){
+        $scope.subsidyTemplates = [];
+    }
     let removeSubsidyTemplates= [];
     let saveSubsidyTemplates = [];
-
     $scope.addTemplate = async function () {
         $scope.subsidyTemplate = SubsidyTemplate.create();
         // $scope.subsidyTemplate.travelPolicy = travelPolicy;
