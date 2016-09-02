@@ -4,7 +4,7 @@
 "use strict";
 import {EStaffRole, Staff, EStaffStatus, InvitedLink} from "api/_types/staff";
 import {EPlanStatus, ETripType, EAuditStatus} from 'api/_types/tripPlan';
-import {TravelPolicy, MHotelLevel, MPlaneLevel, MTrainLevel, SubsidyTemplate} from "api/_types/travelPolicy";
+import {TravelPolicy, MHotelLevel, MPlaneLevel, MTrainLevel,ETrainLevel, EHotelLevel, EPlaneLevel, SubsidyTemplate} from "api/_types/travelPolicy";
 import {Department} from "api/_types/department";
 import {AccordHotel} from "api/_types/accordHotel";
 import {ACCOUNT_STATUS} from "api/_types/auth"
@@ -873,9 +873,9 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
     } else {
         travelPolicy = TravelPolicy.create();
         travelPolicy.companyId = staff.company.id;
-        travelPolicy.planeLevel = 2;
-        travelPolicy.trainLevel = 3;
-        travelPolicy.hotelLevel = 2;
+        travelPolicy.planeLevel = EPlaneLevel.ECONOMY;
+        travelPolicy.trainLevel = ETrainLevel.SECOND_CLASS;
+        travelPolicy.hotelLevel = EHotelLevel.TWO_STAR;
     }
     $scope.travelPolicy = travelPolicy;
     $scope.savePolicy = async function () {
