@@ -878,6 +878,7 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         travelPolicy = await Models.travelPolicy.get($stateParams.policyId);
         $scope.subsidyTemplates = subsidyTemplates = await travelPolicy.getSubsidyTemplates();
     } else {
+        $scope.subsidyTemplates = [];
         travelPolicy = TravelPolicy.create();
         travelPolicy.companyId = staff.company.id;
         travelPolicy.planeLevel = EPlaneLevel.ECONOMY;
@@ -1039,7 +1040,7 @@ async function SubsidyTemplatesController($scope, Models,$ionicPopup) {
                             return false;
                         }
                         saveSubsidyTemplates.push($scope.subsidyTemplate);
-                        $scope.subsidyTemplates = saveSubsidyTemplates;
+                        $scope.subsidyTemplates.push($scope.subsidyTemplate);
 
                         // var st = await $scope.subsidyTemplate.save();
                         // $scope.subsidyTemplates = await travelPolicy.getSubsidyTemplates();
