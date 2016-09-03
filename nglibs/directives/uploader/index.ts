@@ -46,25 +46,19 @@ function ngUploader($loading, wxApi): any {
                 autoUpload: false
             });
             var fileIds = [];
-            $scope.previewAndUpload = function(urls) {
-                console.info('upload:', urls)
-                showPreviewDialog($scope, ngModalDlg, urls, $scope.title)
-                    .then(function(blobs) {
-                        if(!blobs) {
-                            uploader.clearQueue();
-                            return;
-                        }
-                        for(let i=0; i<blobs.length; i++){
-                            uploader.queue[i]._file = blobs[i];
-                        }
-                        $loading.start();
-                        fileIds = [];
-                        uploader.uploadAll();
-                    });
-            };
             uploader.onAfterAddingAll = async function(files) {
                 var urls = files.map((file)=>file._file)
-                $scope.previewAndUpload(urls);
+                var blobs = await showPreviewDialog($scope, ngModalDlg, urls, $scope.title)
+                if(!blobs) {
+                    uploader.clearQueue();
+                    return;
+                }
+                //for(let i=0; i<blobs.length; i++){
+                //    uploader.queue[i]._file = blobs[i];
+                //}
+                $loading.start();
+                fileIds = [];
+                uploader.uploadAll();
             };
             uploader.onSuccessItem  = function (file, response, status, headers) {
                 fileIds.push(response.fileId);
