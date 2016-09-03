@@ -147,7 +147,7 @@ angular
         template: require('./invoice-img-item.html'),
         scope: {
             imgurl: '=',
-            loadingurl: '='
+            loadingurl: '@'
         },
         controller: function($scope) {
             // 显示票据之前先显示loading图
