@@ -8,6 +8,7 @@ import {ticketPrefers, hotelPrefers} from '../prefer'
 import {EInvoiceType} from "api/_types/tripPlan";
 import {IPrefer} from '../prefer'
 import {Models} from "../../_types/index";
+import PricePrefer = require("../prefer/hotel-price");
 
 function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
     let _tickets : IFinalTicket[] = [];
@@ -72,6 +73,7 @@ abstract class AbstractHotelStrategy {
             this.isRecord = false;
         }
         this.prefers = [];
+        this.prefers.push(new PricePrefer('pricePrefer', {}));
     }
 
     addPrefer(p: IPrefer<IFinalHotel>) {
@@ -101,7 +103,6 @@ abstract class AbstractHotelStrategy {
                 price: defaultPrice[this.qs.star]
             }
         }
-
         _hotels = await this.getMarkedScoreHotels(_hotels);
         _hotels.sort( (v1, v2) => {
             return v2.score - v1.score;
