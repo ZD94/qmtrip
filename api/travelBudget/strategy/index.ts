@@ -61,7 +61,7 @@ function formatHotel(hotels: IHotel[]) : IFinalHotel[] {
     return _hotels;
 }
 
-abstract class AbstractHotelStrategy {
+export abstract class AbstractHotelStrategy {
     private prefers: IPrefer<IFinalHotel>[];
     private isRecord: boolean;
 
@@ -165,7 +165,7 @@ export class HighPriceHotelStrategy extends AbstractHotelStrategy {
     }
 }
 
-abstract class AbstractTicketStrategy {
+export abstract class AbstractTicketStrategy {
     private prefers: IPrefer<IFinalTicket>[];
     private isRecord: boolean;
 

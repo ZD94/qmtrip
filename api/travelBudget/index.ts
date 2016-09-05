@@ -26,7 +26,7 @@ const defaultPrice = {
     "2": 350
 }
 
-interface BudgetOptions{
+export interface BudgetOptions{
     originPlace: string,
     destinationPlace: string,
     isNeedHotel: boolean,
@@ -46,7 +46,7 @@ interface BudgetOptions{
 }
 
 
-class ApiTravelBudget {
+export default class ApiTravelBudget {
 
     @clientExport
     static getBudgetInfo(params: {id: string, accountId? : string}) {
@@ -507,5 +507,3 @@ class ApiTravelBudget {
         })
     }
 }
-
-export= ApiTravelBudget;
