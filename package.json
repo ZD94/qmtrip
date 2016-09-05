@@ -138,6 +138,7 @@
     "load-script": "^1.0.0",
     "lunar-calendar": "^0.1.4",
     "md5": "^2.1.0",
+    "merge2": "^1.0.2",
     "notie": "^3.9.2",
     "postcss": "^5.1.2",
     "printf": "^0.2.5",
