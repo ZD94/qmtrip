@@ -393,6 +393,9 @@ class ApiTravelBudget {
                 leaveDate: leaveDate,
                 cabin: cabinClass
             });
+            if (!flightTickets) {
+                flightTickets = [];
+            }
         }
 
         let trainCabins = trainCabinClass.split(/,/g)
@@ -402,7 +405,9 @@ class ApiTravelBudget {
             leaveDate: leaveDate,
             cabin: trainCabins
         });
-
+        if (!trainTickets) {
+            trainTickets = [];
+        }
         let preferConfig: any = staff.company.budgetConfig;
         if (!params.earliestLeaveTime) {
             params.earliestLeaveTime = '09:00'
@@ -415,6 +420,9 @@ class ApiTravelBudget {
             qs.prefers = preferConfig.traffic;
         } else {
             qs.prefers = loadDefaultPrefer(params);
+        }
+        if (!qs.prefers) {
+            qs.prefers = [];
         }
         qs.prefers = qs.prefers.map( (p) => {
             if (p.name == 'cabin') {
