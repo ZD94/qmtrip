@@ -44,7 +44,7 @@
                             <div>
                                 <div class="label-bottom-left">
                                     <p>还将进行出差({{showManTimes}})</p>
-                                    <h2 class="ng-binding" style="text-align: center;">{{en.planTripNum || 0}}</h2>
+                                    <h2 class="ng-binding" style="text-align: center;">{{(en.planTripNum || 0)-(en.completeTripNum || 0)}}</h2>
                                 </div>
                                 <div class="label-right">
                                     <p>计划支出(元)</p>
