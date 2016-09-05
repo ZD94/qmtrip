@@ -7,7 +7,7 @@ process.env.NODE_PATH = '.:'+process.env.NODE_PATH;
 
 require('app-module-path').addPath(path.normalize(path.join(__dirname, '..')));
 var zone = require('common/zone');
-require('common/typescript').install();
+require('common/node_ts').install();
 
 global.Promise = require('bluebird');
 Promise.config({ longStackTraces: false });
