@@ -1011,7 +1011,7 @@ async function SubsidyTemplatesController($scope, Models,$ionicPopup) {
             title:'补助模板',
             cssClass:'subsidyPopup',
             template:'<div> <p>模板标题</p> ' +
-            '<input type="text" placeholder="请输入标题" ng-model="subsidyTemplate.name" maxlength="5"> </div>' +
+            '<input type="text" placeholder="请输入标题" ng-model="subsidyTemplate.name" maxlength="4"> </div>' +
             '<div> <p>补助金额（元/天）</p>' +
             '<input type="text" placeholder="请输入金额" ng-model="subsidyTemplate.subsidyMoney"> </div>',
             scope: $scope,
