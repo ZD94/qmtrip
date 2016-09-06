@@ -13,6 +13,8 @@ const VALID_PRICE = {
     "2": [120, 380],
 }
 
+const score = 10 * 10000;
+
 class PriceFilter extends AbstractPrefer<IFinalHotel> {
 
     constructor(name, options) {
@@ -20,14 +22,19 @@ class PriceFilter extends AbstractPrefer<IFinalHotel> {
     }
 
     async markScoreProcess(data:IFinalHotel[]):Promise<IFinalHotel[]> {
-        data = data.filter( (v)=> {
+        data = data.map( (v)=> {
+            if (!v.score) v.score = 0;
+            if (!v.reasons) v.reasons = [];
             let prices = VALID_PRICE[v.star];
             if (prices) {
                 let min = prices[0];
                 let max = prices[1];
-                return v.price >= min && v.price <= max;
+                if (!(v.price >= min && v.price <= max)) {
+                    v.score -= score;
+                    v.reasons.push(`价格不在有效区间内`);
+                }
             }
-            return true;
+            return v;
         })
         return data;
     }
