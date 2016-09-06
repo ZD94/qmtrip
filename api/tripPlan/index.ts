@@ -73,11 +73,11 @@ class TripPlanModule {
         tripPlan.query = JSON.stringify(query);
 
         if(query.originPlace) {
-            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace});
+            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace});
             tripPlan.deptCity = deptInfo.name;
         }
         tripPlan.arrivalCityCode = query.destinationPlace;
-        let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace});
+        let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace.id || query.destinationPlace.id });
         tripPlan.arrivalCity = arrivalInfo.name;
         tripPlan.isNeedHotel = query.isNeedHotel;
         tripPlan.isRoundTrip = query.isRoundTrip;
@@ -358,15 +358,15 @@ class TripPlanModule {
             approve_values.detailUrl = shortUrl;
             approve_values.name = staff.name;
             approve_values.destination = tripApprove.arrivalCity;
-            approve_values.startDate = moment(tripApprove.startAt).format('YYYY.MM.DD');
+            approve_values.startDate = moment(tripApprove.startAt["value"]).format('YYYY.MM.DD');
             if (openId) {
                 approve_values.approveUser = approveUser.name;
-                approve_values.content = `员工${staff.name}${moment(tripApprove.startAt).format('YYYY-MM-DD')}到${tripApprove.arrivalCity}的出差计划已经发送给您，预算：￥${tripApprove.budget}，等待您审批！`;
-                approve_values.autoApproveTime = moment(tripApprove.autoApproveTime).format(timeFormat);
+                approve_values.content = `员工${staff.name}${moment(tripApprove.startAt["value"]).format('YYYY-MM-DD')}到${tripApprove.arrivalCity}的出差计划已经发送给您，预算：￥${tripApprove.budget}，等待您审批！`;
+                approve_values.autoApproveTime = moment(tripApprove.autoApproveTime["value"]).format(timeFormat);
                 approve_values.staffName = staff.name;
-                approve_values.startDate = moment(tripApprove.startAt).format('YYYY.MM.DD');
-                approve_values.endDate = moment(tripApprove.backAt).format('YYYY.MM.DD');
-                approve_values.createdAt = moment(tripApprove.createdAt).format(timeFormat);
+                approve_values.startDate = moment(tripApprove.startAt["value"]).format('YYYY.MM.DD');
+                approve_values.endDate = moment(tripApprove.backAt["value"]).format('YYYY.MM.DD');
+                approve_values.createdAt = moment(tripApprove.createdAt["value"]).format(timeFormat);
                 let travelLine = "";
                 if(!tripApprove.deptCity) {
                     travelLine = tripApprove.arrivalCity;
@@ -379,7 +379,7 @@ class TripPlanModule {
                 approve_values.travelLine = travelLine;
                 approve_values.reason= tripApprove.title;
                 approve_values.budget = tripApprove.budget;
-                // approve_values.autoApproveTime = moment(tripApprove.autoApproveTime).format(timeFormat)
+                // approve_values.autoApproveTime = moment(tripApprove.autoApproveTime["value"]).format(timeFormat)
             }
             API.notify.submitNotify({
                 key: 'qm_notify_new_travelbudget',
@@ -612,7 +612,7 @@ class TripPlanModule {
         }
         await tripApprove.save();
 
-        // //发送审核结果邮件
+        //发送审核结果邮件
         // let self_url = config.host + '/index.html#/trip/list-detail?tripid=' + tripApprove.id;
         // let user = tripApprove.account;
         // if(!user) user = await Models.staff.get(tripApprove['accountId']);
@@ -620,7 +620,6 @@ class TripPlanModule {
         // let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
         // self_url = await API.wechat.shorturl({longurl: self_url});
         // let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
-        //
         //
         // let self_values = {
         //     username: user.name,
@@ -1125,7 +1124,7 @@ class TripPlanModule {
         if(params.isStaff)
             completeSql += ` and account_id='${staff.id}'`;
 
-        let planSql = `${completeSql}  and status in (${EPlanStatus.WAIT_UPLOAD}, ${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDITING}, ${EPlanStatus.AUDIT_NOT_PASS})`;
+        let planSql = `${completeSql}  and status in (${EPlanStatus.WAIT_UPLOAD}, ${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDITING}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.COMPLETE})`;
         completeSql += ` and status=${EPlanStatus.COMPLETE}`;
 
         let complete = `${selectSql} ${completeSql};`;
@@ -1170,7 +1169,7 @@ class TripPlanModule {
         let staff = await Staff.getCurrent();
         let company =staff.company;
         let completeSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status=${EPlanStatus.COMPLETE} and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
-        let planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
+        let planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
 
         let type = params.type;
         let selectKey = '', modelName = '';
@@ -1200,7 +1199,7 @@ class TripPlanModule {
         if(type == 'D') {
             selectKey = 'departmentId';
             completeSql = `from department.departments as d, staff.staffs as s, trip_plan.trip_plans as p where d.deleted_at is null and s.deleted_at is null and p.deleted_at is null and p.company_id='${company.id}' and d.id=s.department_id and p.account_id=s.id and p.start_at>'${params.startTime}' and p.start_at<'${params.endTime}'`;
-            planSql = `${completeSql} and p.status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING})`;
+            planSql = `${completeSql} and p.status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE})`;
             completeSql += ` and p.status=${EPlanStatus.COMPLETE}`;
             if(params.keyWord) {
                 let depts = await Models.department.find({where: {name: {$like: `%${params.keyWord}%`}}});
@@ -1516,15 +1515,15 @@ class TripPlanModule {
         tripApprove.backAt = query.goBackDate;
         tripApprove.query = JSON.stringify(query);
 
-        let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace}) || {name: null};
+        let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace.id|| query.destinationPlace}) || {name: null};
 
         if(query.originPlace) {
-            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace}) || {name: null};
-            tripApprove.deptCityCode = query.originPlace;
+            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace}) || {name: null};
+            tripApprove.deptCityCode = deptInfo.id;
             tripApprove.deptCity = deptInfo.name;
         }
 
-        tripApprove.arrivalCityCode = query.destinationPlace;
+        tripApprove.arrivalCityCode = arrivalInfo.id;
         tripApprove.arrivalCity = arrivalInfo.name;
         tripApprove.isNeedTraffic = query.isNeedTraffic;
         tripApprove.isNeedHotel = query.isNeedHotel;

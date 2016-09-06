@@ -4,7 +4,7 @@
 "use strict";
 import {EStaffRole, Staff, EStaffStatus, InvitedLink} from "api/_types/staff";
 import {EPlanStatus, ETripType, EAuditStatus} from 'api/_types/tripPlan';
-import {TravelPolicy, MHotelLevel, MPlaneLevel, MTrainLevel, SubsidyTemplate} from "api/_types/travelPolicy";
+import {TravelPolicy, MHotelLevel, MPlaneLevel, MTrainLevel,ETrainLevel, EHotelLevel, EPlaneLevel, SubsidyTemplate} from "api/_types/travelPolicy";
 import {Department} from "api/_types/department";
 import {AccordHotel} from "api/_types/accordHotel";
 import {ACCOUNT_STATUS} from "api/_types/auth"
@@ -811,7 +811,6 @@ export async function TravelpolicyController($scope, Models, $location, $ionicPo
         return obj;
     })
     $scope.travelPolicies = await Promise.all(ps);
-    console.info($scope.travelPolicies);
     await Promise.all($scope.travelPolicies.map(async function (obj) {
         var result = await obj.policy.getStaffs();
         obj.usernum = result.length;
@@ -864,18 +863,26 @@ export async function TravelpolicyController($scope, Models, $location, $ionicPo
     }
 }
 
-export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory, $ionicPopup, $location) {
+export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory, $ionicPopup, ngModalDlg) {
     require('./editpolicy.scss');
     var staff = await Staff.getCurrent();
     var travelPolicy;
+    var subsidyTemplates;
+
+
+    let saveSubsidyTemplates = [];
+    let removeSubsidyTemplates = [];
+    $scope.subsidyTemplates = [];
     if ($stateParams.policyId) {
         travelPolicy = await Models.travelPolicy.get($stateParams.policyId);
+        $scope.subsidyTemplates = subsidyTemplates = await travelPolicy.getSubsidyTemplates();
     } else {
+
         travelPolicy = TravelPolicy.create();
         travelPolicy.companyId = staff.company.id;
-        travelPolicy.planeLevel = 2;
-        travelPolicy.trainLevel = 3;
-        travelPolicy.hotelLevel = 2;
+        travelPolicy.planeLevel = EPlaneLevel.ECONOMY;
+        travelPolicy.trainLevel = ETrainLevel.SECOND_CLASS;
+        travelPolicy.hotelLevel = EHotelLevel.TWO_STAR;
     }
     $scope.travelPolicy = travelPolicy;
     $scope.savePolicy = async function () {
@@ -889,7 +896,16 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
             return false;
         }
         $scope.travelPolicy.company = staff.company;
-        await $scope.travelPolicy.save();
+        let travelPolicy = await $scope.travelPolicy.save();
+        for(let v of saveSubsidyTemplates) {
+            v.travelPolicy = travelPolicy;
+            await v.save();
+        }
+        for(let v of removeSubsidyTemplates) {
+            if (v && v.id) {
+                await v.destroy();
+            }
+        }
         $ionicHistory.goBack(-1);
     }
 
@@ -965,30 +981,37 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         }
     }
 
+
     $scope.subsidyTemplateList = async function(){
-        $location.path('/company/subsidy-templates').search({'travelPolicyId': $scope.travelPolicy.id}).replace();
+        let obj = await ngModalDlg.createDialog({
+            parent:$scope,
+            scope: {subsidyTemplates},
+            template: require('./subsidy-templates.html'),
+            controller: SubsidyTemplatesController
+        });
+        saveSubsidyTemplates = obj.saveSubsidyTemplates;
+        removeSubsidyTemplates = obj.removeSubsidyTemplates;
     }
 
 }
 
 
-export async function SubsidyTemplatesController($scope, Models, $location, $stateParams,$ionicPopup) {
+async function SubsidyTemplatesController($scope, Models,$ionicPopup) {
     require('./subsidy-templates.scss');
     $scope.showDelete = false;
-    var tpId = $stateParams.travelPolicyId;
-    var travelPolicy = await Models.travelPolicy.get(tpId);
-    var subsidyTemplates = await travelPolicy.getSubsidyTemplates();
-    $scope.subsidyTemplates = subsidyTemplates;
-    console.info(subsidyTemplates);
-
+    if(!$scope.subsidyTemplates){
+        $scope.subsidyTemplates = [];
+    }
+    let removeSubsidyTemplates= [];
+    let saveSubsidyTemplates = [];
     $scope.addTemplate = async function () {
         $scope.subsidyTemplate = SubsidyTemplate.create();
-        $scope.subsidyTemplate.travelPolicy = travelPolicy;
+        // $scope.subsidyTemplate.travelPolicy = travelPolicy;
         var ngshow = $ionicPopup.show({
             title:'补助模板',
             cssClass:'subsidyPopup',
             template:'<div> <p>模板标题</p> ' +
-            '<input type="text" placeholder="请输入标题" ng-model="subsidyTemplate.name" maxlength="5"> </div>' +
+            '<input type="text" placeholder="请输入标题" ng-model="subsidyTemplate.name" maxlength="4"> </div>' +
             '<div> <p>补助金额（元/天）</p>' +
             '<input type="text" placeholder="请输入金额" ng-model="subsidyTemplate.subsidyMoney"> </div>',
             scope: $scope,
@@ -1017,8 +1040,11 @@ export async function SubsidyTemplatesController($scope, Models, $location, $sta
                             msgbox.log("补助金额必须为数字");
                             return false;
                         }
-                        var st = await $scope.subsidyTemplate.save();
-                        $scope.subsidyTemplates = await travelPolicy.getSubsidyTemplates();
+                        saveSubsidyTemplates.push($scope.subsidyTemplate);
+                        $scope.subsidyTemplates.push($scope.subsidyTemplate);
+
+                        // var st = await $scope.subsidyTemplate.save();
+                        // $scope.subsidyTemplates = await travelPolicy.getSubsidyTemplates();
                     }
                 }
             ]
@@ -1040,8 +1066,11 @@ export async function SubsidyTemplatesController($scope, Models, $location, $sta
                     type: 'button-positive',
                     onTap: async function () {
                         try{
-                            await st.destroy();
+                            if (st && st.id) {
+                                await st.destroy();
+                            }
                             $scope.subsidyTemplates.splice(index, 1);
+                            removeSubsidyTemplates.push(st);
                         }catch(err){
                             msgbox.log(err.msg);
                         }
@@ -1049,6 +1078,14 @@ export async function SubsidyTemplatesController($scope, Models, $location, $sta
                 }
             ]
         });
+    }
+
+    $scope.goBack = function() {
+        let obj = {
+            removeSubsidyTemplates: removeSubsidyTemplates,
+            saveSubsidyTemplates: saveSubsidyTemplates
+        }
+        return $scope.confirmModal(obj);
     }
 }
 

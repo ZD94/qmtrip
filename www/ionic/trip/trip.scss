@@ -123,6 +123,9 @@
 
 //补助选择popup
 .selectSubsidy{
+  .scroll-bar-v{
+    right: -3px;//使滚动条在view外,即不可见
+  }
   .item-radio{
     border: 0;
     margin-bottom: 5px;
@@ -163,5 +166,19 @@
   ion-scroll{
     padding-top: 5px;
     max-height: 155px;
+  }
+}
+
+//调整安卓上popup的toggle样式  shicong
+
+body.platform-android div.popup{
+  .toggle-small.item-toggle .toggle{
+    top:10px
+  }
+  div.item-toggle{
+    label.toggle > div.track > div.handle{
+      top:7px;
+      left:8px;
+    }
   }
 }

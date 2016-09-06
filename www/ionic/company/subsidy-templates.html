@@ -1,4 +1,8 @@
-<ion-view title="补助模板">
+<ion-modal-view class="subsidyModel">
+    <ion-header-bar class="bar-stable">
+        <a class="button" ng-click="goBack()">返回</a>
+        <h1 class="title">补助模板</h1>
+    </ion-header-bar>
     <ion-content padding="true" class="has-header">
         <a ng-click="addTemplate()" id="page30-button89" class="button button-positive  button-block">新增补助模板</a>
         <a id="page29-button88" class="button button-stable  button-block" ng-click="showDelete = !showDelete;showReorder = false">管理模板</a>
@@ -12,15 +16,15 @@
                     <p>补助金额：{{st.subsidyMoney}}元/天</p>
                 </div>
             </ion-item>
-            <div class="subsidyAttend">说明</br>
-                请根据公司差旅政策设置补助标准，如果不设置此项默认为零。</br>
-                员工在填写出差申请时，可选择对应的补助标准，系统将根据员工选择的标准计算差旅预算。</br>
-                补助标准没有数量限制，您可以根据企业实际差旅政策进行设置。</br>
-                例如：</br>
+            <div class="subsidyAttend">说明<br/>
+                请根据公司差旅政策设置补助标准，如果不设置此项默认为零。<br/>
+                员工在填写出差申请时，可选择对应的补助标准，系统将根据员工选择的标准计算差旅预算。<br/>
+                补助标准没有数量限制，您可以根据企业实际差旅政策进行设置。<br/>
+                例如：<br/>
                 一线城市150元／天，二线城市100元／天</div>
         </ion-list>
         <div id="page13-markdown3">
             <div ng-if="!subsidyTemplates.length" class="getMoreOrNoMore">暂无记录</div>
         </div>
     </ion-content>
-</ion-view>
+</ion-modal-view>

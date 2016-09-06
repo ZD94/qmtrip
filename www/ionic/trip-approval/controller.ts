@@ -45,11 +45,18 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
 
     //判断有无审批权限
     let isHasPermissionApprove = false;
+    let isSelf = false;
     let curStaff = await Staff.getCurrent();
     if(tripApprove.approveUser && curStaff.id == tripApprove.approveUser.id) {
         isHasPermissionApprove = true;
     }
+    if(curStaff.id == tripApprove.accountId){
+        isSelf = true;
+    }
     $scope.isHasPermissionApprove = isHasPermissionApprove;
+    $scope.isSelf = isSelf;
+    console.info(tripApprove);
+
     let totalBudget: number = 0;
 
     if (tripApprove.status == EApproveStatus.WAIT_APPROVE && tripApprove.query && isHasPermissionApprove) {

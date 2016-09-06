@@ -29,7 +29,9 @@ gulplib.bundle_lib('bootstrap', {ex: true, require: ["bootstrap"]});
 gulplib.bundle_lib('angular', {ex: true, require: ['angular', 'common/client/angular']});
 gulplib.bundle_lib('ionic', {ex: true, require: ['./common/client/ionic/entry.js:ionic']});
 gulplib.bundle_lib('swiper', {ex: true, require: ['swiper']});
-gulplib.bundle_lib('img', {ex: true, require: ['arale-qrcode', 'hidpi-canvas', 'exif-js', 'exif-orient']})
+gulplib.bundle_lib('img', {ex: true, require: [
+    'arale-qrcode', 'hidpi-canvas', 'exif-js', 'exif-orient', 'blueimp-canvas-to-blob'
+]})
 gulplib.bundle_lib('base', {ex: true, require:[
     'md5', 'moment', 'printf', 'tiny-cookie', 'shoe', 'lodash', 'validator', 'scssify', 'cssify'
 ]})

@@ -17,6 +17,7 @@ module.exports = function(app) {
         url:config.hosts.main.www+'/upload/ajax-upload-file',
         reqAsBuffer: true,
         cache: false,
+        //timeout: 180000,
     }));
     app.get("/attachments/:id", getPublicFile);
     //app.post('/upload/ajax-upload-file', uploadActionFile);

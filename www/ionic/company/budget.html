@@ -25,7 +25,7 @@
                     <ion-item class="item">
                         <div>
                             <p>计划支出(元)</p>
-                            <h2 style="color: #4a90e2">{{(statistic.expenditure || 0) + (statistic.planBudget || 0)}}</h2>
+                            <h2 style="color: #4a90e2">{{statistic.planBudget || 0}}</h2>
                         </div>
                         <div>
                             <p>累计支出(元)</p>
@@ -35,7 +35,7 @@
                     <ion-item class="item">
                         <div>
                             <p>计划出差人数(次)</p>
-                            <h2 style="color: #9013fe">{{(statistic.completeTripNum || 0) + (statistic.planTripNum || 0)}}</h2>
+                            <h2 style="color: #9013fe">{{statistic.planTripNum || 0}}</h2>
                         </div>
                         <div>
                             <p>已完成出差人数(次)</p>

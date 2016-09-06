@@ -3,7 +3,7 @@
 import moment = require('moment');
 var API = require("common/api");
 var Cookie = require('tiny-cookie');
-import { Staff, EStaffRole} from 'api/_types/staff';
+import { Staff} from 'api/_types/staff';
 
 import { Models } from 'api/_types';
 import {
@@ -48,14 +48,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
     }
     $scope.subsidy = {hasFirstDaySubsidy: true, hasLastDaySubsidy: true, template: null};
 
-    /*******************判断是否为第一次的登录  史聪************************/
-    let staff = await Staff.getCurrent();
-    if(staff.roleId == EStaffRole.OWNER){
-        let isFirstLogin = await staff.company.getTravelPolicies();
-        if(isFirstLogin.length == 0){
-            window.location.href = '#/guide/company-guide';
-        }
-    }
+
 
 
     $scope.selectSubsidyTemplate = async function(){
@@ -353,11 +346,10 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     trip.createAt = new Date(result.createAt);
 
     if(query.originPlace) {
-        let originPlace = await API.place.getCityInfo({cityCode: query.originPlace});
+        let originPlace = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace});
         trip.originPlaceName = originPlace.name;
     }
-
-    let destination = await API.place.getCityInfo({cityCode: query.destinationPlace});
+    let destination = await API.place.getCityInfo({cityCode: query.destinationPlace.id || query.destinationPlace});
     trip.destinationPlaceName = destination.name;
     $scope.trip = trip;
     //补助,现在是0,后续可能会直接加入到预算中
@@ -670,7 +662,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
     }
 }
 
-export async function InvoiceDetailController($scope , Models, $stateParams){
+export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup){
     //////绑定上传url
     let authDataStr = window['getAuthDataStr']();
     $scope.uploadUrl = '/upload/ajax-upload-file?type=image&'+authDataStr;
@@ -687,16 +679,18 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
     var invoice = await Models.tripDetail.get($stateParams.detailId);
     $scope.invoice = invoice;
     $scope.EInvoiceType = EInvoiceType;
-    var latestInvoice = invoice.latestInvoice;
-    var invoiceImgs = [];
-    if(typeof latestInvoice =='string') {
-        latestInvoice = JSON.parse(latestInvoice);
-    }
 
-    for(let i of latestInvoice){
-        invoiceImgs.push('/trip-detail/'+$stateParams.detailId+'/invoice/'+i);
-    }
-    $scope.invoiceImgs = invoiceImgs;
+    $scope.$watch('invoice.latestInvoice', function(n, o){
+        var invoiceImgs = [];
+        var latestInvoice = $scope.invoice.latestInvoice;
+        if(typeof latestInvoice =='string') {
+            latestInvoice = JSON.parse(latestInvoice);
+        }
+        for(let i of latestInvoice){
+            invoiceImgs.push('/trip-detail/'+$stateParams.detailId+'/invoice/'+i);
+        }
+        $scope.invoiceImgs = invoiceImgs;
+    })
 
     let statusTxt = {};
     statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
@@ -717,6 +711,14 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
         title = '住宿';
     }
     $scope.invoicefuc = {title:'上传'+title + '发票',done:function(response){
+        if(response.ret != 0){
+            console.error(response.errMsg);
+            $ionicPopup.alert({
+                title: '错误',
+                template: response.errMsg
+            });
+            return;
+        }
         var fileId = response.fileId;
         uploadInvoice(invoice, fileId,async function (err, result) {
             if (err) {

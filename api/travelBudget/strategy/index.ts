@@ -8,6 +8,7 @@ import {ticketPrefers, hotelPrefers} from '../prefer'
 import {EInvoiceType} from "api/_types/tripPlan";
 import {IPrefer} from '../prefer'
 import {Models} from "../../_types/index";
+import PriceFilter = require("../prefer/hotel-pricefilter");
 
 function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
     let _tickets : IFinalTicket[] = [];
@@ -61,7 +62,7 @@ function formatHotel(hotels: IHotel[]) : IFinalHotel[] {
     return _hotels;
 }
 
-abstract class AbstractHotelStrategy {
+export abstract class AbstractHotelStrategy {
     private prefers: IPrefer<IFinalHotel>[];
     private isRecord: boolean;
 
@@ -72,6 +73,7 @@ abstract class AbstractHotelStrategy {
             this.isRecord = false;
         }
         this.prefers = [];
+        this.prefers.push(new PriceFilter('priceFilter', {}));
     }
 
     addPrefer(p: IPrefer<IFinalHotel>) {
@@ -80,9 +82,9 @@ abstract class AbstractHotelStrategy {
 
     async getMarkedScoreHotels(hotels: IFinalHotel[]) :Promise<IFinalHotel[]> {
         let self = this;
-        self.prefers.forEach( async (p) => {
-            hotels = await p.markScore(hotels);
-        })
+        for(let prefer of self.prefers) {
+            hotels = await prefer.markScore(hotels);
+        }
         return hotels;
     }
 
@@ -101,7 +103,6 @@ abstract class AbstractHotelStrategy {
                 price: defaultPrice[this.qs.star]
             }
         }
-
         _hotels = await this.getMarkedScoreHotels(_hotels);
         _hotels.sort( (v1, v2) => {
             return v2.score - v1.score;
@@ -165,7 +166,7 @@ export class HighPriceHotelStrategy extends AbstractHotelStrategy {
     }
 }
 
-abstract class AbstractTicketStrategy {
+export abstract class AbstractTicketStrategy {
     private prefers: IPrefer<IFinalTicket>[];
     private isRecord: boolean;
 

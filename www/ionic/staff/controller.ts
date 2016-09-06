@@ -13,7 +13,14 @@ API.require('checkcode');
 export async function IndexController($scope,Models) {
     require('./index.scss');
     API.require('tripPlan');
-    var staff = await Staff.getCurrent();
+    /*******************判断是否为第一次的登录  史聪************************/
+    let staff = await Staff.getCurrent();
+    if(staff.roleId == EStaffRole.OWNER){
+        let isFirstLogin = await staff.company.getTravelPolicies();
+        if(isFirstLogin.length == 0){
+            window.location.href = '#/guide/company-guide';
+        }
+    }
     var tripBudget = await API.tripPlan.statisticTripBudget({isStaff: true});
     console.info(tripBudget);
     $scope.tripBudget = tripBudget;
