@@ -370,9 +370,8 @@ class ApiAuth {
             if(defaultDeptment){
                 staff.department = defaultDeptment;
             }
-            if(defaultTravelPolicy && defaultTravelPolicy.id){
-                staff["travelPolicyId"] = defaultTravelPolicy.id;
-            }
+            staff.department = defaultDeptment;
+            staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
             staff = await staff.save();
         }else{
             throw {code: -1, msg: "短信验证码错误"};
