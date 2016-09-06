@@ -868,7 +868,7 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
     var staff = await Staff.getCurrent();
     var travelPolicy;
     var subsidyTemplates;
-
+    let policyId = $stateParams.policyId;
 
     let saveSubsidyTemplates = [];
     let removeSubsidyTemplates = [];
@@ -985,7 +985,7 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
     $scope.subsidyTemplateList = async function(){
         let obj = await ngModalDlg.createDialog({
             parent:$scope,
-            scope: {subsidyTemplates},
+            scope: {subsidyTemplates,policyId},
             template: require('./subsidy-templates.html'),
             controller: SubsidyTemplatesController
         });
@@ -1002,6 +1002,10 @@ async function SubsidyTemplatesController($scope, Models,$ionicPopup) {
     if(!$scope.subsidyTemplates){
         $scope.subsidyTemplates = [];
     }
+    var travelPolicy;
+    if($scope.policyId){
+        travelPolicy = await Models.travelPolicy.get($scope.policyId);
+    }
     let removeSubsidyTemplates= [];
     let saveSubsidyTemplates = [];
     $scope.addTemplate = async function () {
@@ -1011,7 +1015,7 @@ async function SubsidyTemplatesController($scope, Models,$ionicPopup) {
             title:'补助模板',
             cssClass:'subsidyPopup',
             template:'<div> <p>模板标题</p> ' +
-            '<input type="text" placeholder="请输入标题" ng-model="subsidyTemplate.name" maxlength="5"> </div>' +
+            '<input type="text" placeholder="请输入标题" ng-model="subsidyTemplate.name" maxlength="4"> </div>' +
             '<div> <p>补助金额（元/天）</p>' +
             '<input type="text" placeholder="请输入金额" ng-model="subsidyTemplate.subsidyMoney"> </div>',
             scope: $scope,
@@ -1040,11 +1044,16 @@ async function SubsidyTemplatesController($scope, Models,$ionicPopup) {
                             msgbox.log("补助金额必须为数字");
                             return false;
                         }
-                        saveSubsidyTemplates.push($scope.subsidyTemplate);
-                        $scope.subsidyTemplates.push($scope.subsidyTemplate);
-
-                        // var st = await $scope.subsidyTemplate.save();
-                        // $scope.subsidyTemplates = await travelPolicy.getSubsidyTemplates();
+                        if($scope.policyId){
+                            travelPolicy = await Models.travelPolicy.get($scope.policyId);
+                            $scope.subsidyTemplate.travelPolicy = travelPolicy;
+                            var st = await $scope.subsidyTemplate.save();
+                            $scope.subsidyTemplates.push(st);
+                            console.info(st);
+                        }else{
+                            saveSubsidyTemplates.push($scope.subsidyTemplate);
+                            $scope.subsidyTemplates.push($scope.subsidyTemplate);
+                        }
                     }
                 }
             ]
@@ -1070,7 +1079,9 @@ async function SubsidyTemplatesController($scope, Models,$ionicPopup) {
                                 await st.destroy();
                             }
                             $scope.subsidyTemplates.splice(index, 1);
-                            removeSubsidyTemplates.push(st);
+                            if(!$scope.policyId){
+                                removeSubsidyTemplates.push(st);
+                            }
                         }catch(err){
                             msgbox.log(err.msg);
                         }
