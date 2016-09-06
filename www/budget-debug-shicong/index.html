@@ -20,9 +20,6 @@
         .hidden {
             display: none;
         }
-        td{
-            min-width:250px;
-        }
         th{
             width:227px;
         }
@@ -34,75 +31,101 @@
 <body>
 
 <h2>预算调试页面</h2>
-<table class="table table-hover table-bordered">
+<table class="table table-bordered">
     <tbody>
         <tr>
             <th>选择原始数据</th>
             <td>
-                <select ng-model="originData" ng-options="x.title for x in originDatas">
+                <select ng-model="originData" ng-options="x.title for x in originDatas" ng-change="changeOrigin()">
                 </select>
             </td>
         </tr>
         <tr>
             <th>原始数据:</th>
-            <td placeholder="原始数据">
-                <table ng-if="showOriginData">
-                    <tr  ng-repeat="x in originData.originData">
-                        <!--酒店的数据-->
-                        <td ng-show="x.type !==0 && x.type!=1">{{x.name}}</td>
-                        <td ng-show="x.type !==0 && x.type!=1">{{x.star}}</td>
-                        <td ng-show="x.type !==0 && x.type!=1">{{x.agents[0].name}}</td>
-                        <td ng-show="x.type !==0 && x.type!=1">{{x.agents[0].price}}</td>
-                        <td ng-show="x.type !==0 && x.type!=1">{{x.latitude}}</td>
-                        <td ng-show="x.type !==0 && x.type!=1">{{x.longitude}}</td>
-                        <!--航班的数据-->
-                        <td ng-show="x.type == 1">{{x.No}}</td>
-                        <td ng-show="x.type == 1">{{x.carry}}</td>
-                        <td ng-show="x.type == 1">{{x.agents[0].name}}</td>
-                        <td ng-show="x.type == 1">{{x.agents[0].cabins[0].name}}</td>
-                        <td ng-show="x.type == 1">{{x.agents[0].cabins[0].price}}</td>
-                        <td ng-show="x.type == 1">{{x.destination}}</td>
-                        <td ng-show="x.type == 1">{{x.originPlace}}</td>
-                        <td ng-show="x.type == 1">{{x.departDateTime}}</td>
-                        <td ng-show="x.type == 1">{{x.arrivalDateTime}}</td>
-                        <!--火车的数据-->
-                        <td ng-show="x.type === 0">{{x.No}}</td>
-                        <td ng-show="x.type === 0">{{x.agents[0].name}}</td>
-                        <td ng-show="x.type === 0" ng-repeat="cabin in x.agents[0].cabins">
-                            <span>类型：{{cabin.name}}</span>
-                            <span>价格：{{cabin.price}}</span>
-                            <span>剩余量：{{cabin.remainNum}}</span>
-                        </td>
-                        <td ng-show="x.type === 0">{{x.duration}}</td>
-                        <td ng-show="x.type === 0">{{x.destination.id}}</td>
-                        <td ng-show="x.type === 0">{{x.destination.name}}</td>
-                        <td ng-show="x.type === 0">{{x.originPlace.id}}</td>
-                        <td ng-show="x.type === 0">{{x.originPlace.name}}</td>
-                    </tr>
-                </table>
-                <!--<textarea placeholder="原始数据" rows="8" cols="80" ng-if="showOriginData">{{originData.originData}}</textarea>-->
-                <a ng-hide="showOriginData" ng-click="showOriginData = !showOriginData">显示</a>
-                <a ng-show="showOriginData" ng-click="showOriginData = !showOriginData">隐藏</a>
-            </td>
-        </tr>
-        <tr>
-            <th>打完分数据:</th>
             <td>
-                <table ng-if="showScoreData">
-                    <tr  ng-repeat="x in originData.markedData">
-                        <!--酒店的数据-->
-                        <td ng-show="x.type !==0 && x.type!=1">{{x.name}}</td>
-                        <td ng-show="x.type !==0 && x.type!=1">{{x.star}}</td>
-                        <td ng-show="x.type !==0 && x.type!=1">{{x.price}}</td>
-                        <td ng-show="x.type !==0 && x.type!=1">{{x.score}}</td>
-                        <td ng-show="x.type !==0 && x.type!=1" ng-repeat="reason in x.reasons">
-                            {{reason}}
-                        </td>
-                    </tr>
-                </table>
-                <!--<textarea placeholder="打分后数据" rows="8" cols="80" >{{originData.markedData}}</textarea>-->
                 <a ng-hide="showScoreData" ng-click="showScoreData = !showScoreData">显示</a>
                 <a ng-show="showScoreData" ng-click="showScoreData = !showScoreData">隐藏</a>
+                <table  class="table-bordered text-center" ng-if="showScoreData">
+                    <tr ng-show="ishotel">
+                        <td>酒店名称</td>
+                        <td>星级</td>
+                        <td>价格</td>
+                        <td>分数</td>
+                        <td>原因</td>
+                        <td>经度</td>
+                        <td>纬度</td>
+                    </tr>
+                    <tr  ng-repeat="x in originData.markedData" ng-show="ishotel">
+                        <!--酒店的数据-->
+                        <td>{{x.name}}</td>
+                        <td>{{x.star}}</td>
+                        <td>{{x.price}}</td>
+                        <td>{{x.score}}</td>
+                        <td>
+                            <div ng-repeat="reason in x.reasons">{{reason}}</div>
+                        </td>
+                        <td>{{x.longitude}}</td>
+                        <td>{{x.latitude}}</td>
+                    </tr>
+                    <tr ng-show="!ishotel">
+                        <td colspan="8" style="font-size: 24px;background-color: #00EACF">航班的数据</td>
+                    </tr>
+                    <tr ng-show="!ishotel">
+                        <td>航班号</td>
+                        <td>始发地</td>
+                        <td>目的地</td>
+                        <td>航班价格</td>
+                        <td>分数</td>
+                        <td>原因</td>
+                        <td>出发时间</td>
+                        <td>到达时间</td>
+                    </tr>
+                    <tr ng-repeat="x in originData.markedData" ng-show="!ishotel&&x.originPlace.type!=2">
+                        <!--航班的数据-->
+                        <td>{{x.No}}</td>
+                        <td>{{x.originPlace}}</td>
+                        <td>{{x.destination}}</td>
+                        <td>{{x.price}}</td>
+                        <td>{{x.score}}</td>
+                        <td>
+                            <div ng-repeat="reason in x.reasons">{{reason}}</div>
+                        </td>
+                        <td>{{x.departDateTime}}</td>
+                        <td>{{x.arrivalDateTime}}</td>
+                    </tr>
+                </table>
+                <table class="table-bordered text-center" style="margin-top: 150px" ng-if="showScoreData">
+                    <tr ng-show="!ishotel">
+                        <td colspan="10" style="font-size: 24px;background-color: #00EACF">火车的数据</td>
+                    </tr>
+                    <tr ng-show="!ishotel">
+                        <td>车次</td>
+                        <td>价格</td>
+                        <td>分数</td>
+                        <td>原因</td>
+                        <td>出发地</td>
+                        <td>到达地</td>
+                        <td>出发时间</td>
+                        <td>到达时间</td>
+                        <td>时长</td>
+                        <td>剩余数</td>
+                    </tr>
+                    <tr ng-repeat="x in originData.markedData" ng-show="!ishotel&&x.type!=1">
+                        <!--火车的数据-->
+                        <td>{{x.No}}</td>
+                        <td>{{x.price}}</td>
+                        <td>{{x.score}}</td>
+                        <td>
+                            <div ng-repeat="reason in x.reasons">{{reason}}</div>
+                        </td>
+                        <td>{{x.originStation}}</td>
+                        <td>{{x.destinationStation}}</td>
+                        <td>{{x.departDateTime}}</td>
+                        <td>{{x.arrivalDateTime}}</td>
+                        <td>{{x.duration}}</td>
+                        <td>{{x.remainNum}}</td>
+                    </tr>
+                </table>
             </td>
         </tr>
         <tr>
@@ -117,28 +140,28 @@
         <tr>
             <th>打分详情</th>
             <td>
-                <div placeholder="打分详情" rows="8" cols="80" ng-if="hideScoreDetail">
-                    <table>
-                        <tr ng-repeat="prefer in originData.prefers">
-                            <td>{{prefer.name}}</td>
-                            <td>
-                                <input type="text" ng-model="prefer.options.score" value="分数：{{prefer.options.score}}">
+                <div placeholder="打分详情" ng-if="hideScoreDetail">
+                    <table class="son">
+                        <tr ng-repeat="prefer in ori_prefers" style="height:50px">
+                            <td style="color: #4A4EC1;padding-right: 5px">{{$index}}</td>
+                            <td style="padding-right: 15px">{{prefer.name}}</td>
+                            <!--<td><input type="text" style="width:1200px" ng-model="prefer.options" value="{{prefer.options}}"></td>-->
+                            <td ng-repeat="(x,y) in prefer.options">
+                                    {{x}}
+                                <input style="width:auto" ng-model="prefer.options[x]" type="text">
                             </td>
-                            <td>
-                                <input type="text" ng-model="prefer.options.percent" value="系数：{{prefer.options.percent}}">
-                            </td>
+                            <td style="padding-left: 15px;color: #9e0505" ng-click="delete($index)">删除</td>
                         </tr>
                     </table>
                 </div>
                 <a ng-show="hideScoreDetail" ng-click="hideScoreDetail = !hideScoreDetail">隐藏</a>
                 <a ng-hide="hideScoreDetail" ng-click="hideScoreDetail = !hideScoreDetail">显示</a>
                 <br/>
-                <select ng-model="prefer" ng-change="console.log('asdasds');">
+                <select ng-model="prefer" ng-change="change()">
                     <option ng-repeat="x in prefers" value="{{x.value}}">{{x.title}}</option>
                 </select>
             </td>
         </tr>
-
         <tr>
             <th>预算结果</th>
             <td>
@@ -152,7 +175,6 @@
                 <a ng-hide="hideCalResult" ng-click="hideCalResult = !hideCalResult">显示</a>
             </td>
         </tr>
-
         <tr>
             <td colspan="2" align="center">
                 <input type="button" class="btn btn-primary" value="获取预算" id="calBudgetBtn" ng-click="getBudget()"/>
