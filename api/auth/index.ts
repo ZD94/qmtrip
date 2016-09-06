@@ -1449,7 +1449,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     static async authWeChatLogin(params: {code: string}):
     Promise<{token_id: string, user_id: string, timestamp: string, token_sign: string} | boolean> {
         let openid = await API.wechat.requestOpenIdByCode({code: params.code}); //获取微信openId;
-        await cache.write(`wechat:${params.code}`, {openid: openid});
+        await cache.write(`wechat:${params.code}`, JSON.stringify({openid: openid}));
         let accountId = await ApiAuth.getAccountIdByOpenId({openId: openid});
 
         if(!accountId) {
@@ -1519,10 +1519,6 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
             let query = req.query;
             let redirect_url = query.redirect_url;
             let openid = ''
-            if (query.code) {
-                openid = await API.wechat.requestOpenIdByCode({code: query.code}); //获取微信openId;
-                await cache.write(`wechat:${query.code}`, JSON.stringify({openid: openid}));
-            }
             //如果是登录页，直接跳转
             if(/^http\:\/\/\w*\.jingli365\.com\/(index\.html)?\#\/login\/(index)?/.test(redirect_url)){
                 redirect_url += redirect_url.indexOf('?') > 0 ? '&' : '?';
