@@ -1,6 +1,12 @@
 
 var dyload = require('dyload');
 
+function isWeixinFile(url){
+    var o = new URL(url);
+    var protocol = o.protocol.toLocaleLowerCase();
+    return protocol === 'wxlocalresource:' || protocol === 'weixin:';
+}
+
 export function showPreviewDialog($scope, ngModalDlg, files, title): Promise<any>{
     return ngModalDlg.createDialog({
         parent: $scope,
@@ -81,7 +87,7 @@ function loadImage(url): Promise<HTMLImageElement>{
 }
 
 async function loadFileImage(url){
-    if(typeof url !== 'string' || !url.startsWith('wxLocalResource://')){
+    if(typeof url !== 'string' || !isWeixinFile(url)){
         url = await loadFile(url);
     }
     return loadImage(url);
@@ -100,8 +106,7 @@ async function getOrient(img): Promise<number>{
 
 async function image2Canvas(img): Promise<HTMLCanvasElement>{
     var orient = 1;
-    var wxproto = 'wxlocalresource://';
-    if(img.src.substr(0, wxproto.length).toLowerCase() !== wxproto) {
+    if(!isWeixinFile(img.src)) {
         orient = await getOrient(img);
     }
     if(orient != 1) {
