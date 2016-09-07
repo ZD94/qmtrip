@@ -6,7 +6,7 @@ var sequelize = require("common/model").DB;
 var DBM = sequelize.models;
 var _ = require('lodash');
 import {Paginate} from 'common/paginate';
-let L = require("common/language");
+import L from 'common/language';
 import {requireParams, clientExport} from 'common/api/helper';
 import {conditionDecorator, condition} from "../_decorator";
 import {Staff, EStaffStatus} from "api/_types/staff";

@@ -11,7 +11,7 @@ import {ACCOUNT_STATUS} from "api/_types/auth"
 import validator = require('validator');
 const moment = require("moment");
 const API = require("common/api");
-var L = require("common/language");
+import L from 'common/language';
 var msgbox = require('msgbox');
 var browserspec = require('browserspec');
 var printf = require('printf');

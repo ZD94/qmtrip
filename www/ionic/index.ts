@@ -1,5 +1,5 @@
 
-import * as L from 'common/language';
+import L from 'common/language';
 import { getSession } from 'common/model';
 require('ionic');
 

@@ -6,7 +6,7 @@ var _ = require("lodash");
 var sequelize = require("common/model").DB;
 let DBM = sequelize.models;
 let API = require("common/api");
-let L = require("common/language");
+import L from 'common/language';
 import {Department} from "api/_types/department";
 import {requireParams, clientExport} from 'common/api/helper';
 import { Models } from '../_types/index';

@@ -3,7 +3,7 @@
  */
 var sequelize = require("common/model").DB;
 var DBM = sequelize.models;
-let L = require("common/language");
+import L from 'common/language';
 let C = require("config");
 let API = require("common/api");
 let Logger = require('common/logger');

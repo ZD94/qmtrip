@@ -3,7 +3,7 @@
  */
 
 let API = require("common/api");
-let L = require("common/language");
+import L from 'common/language';
 let config = require("../../../config");
 import moment = require("moment");
 import _ = require('lodash');

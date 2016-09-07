@@ -1,7 +1,7 @@
 
 
 import ng = require('angular');
-import L = require('common/language');
+import L from 'common/language';
 
 import { ModelsInterface, initModels } from 'api/_types';
 import { ModelObjInterface } from 'common/model/interface';

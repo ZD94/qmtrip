@@ -11,7 +11,7 @@ import validator = require('validator');
 var sequelize = require("common/model").DB;
 var DBM = sequelize.models;
 var uuid = require("node-uuid");
-var L = require("common/language");
+import L from 'common/language';
 var C = require("config");
 var QRCODE_LOGIN_URL = '/auth/qrcode-login';
 var moment = require("moment");

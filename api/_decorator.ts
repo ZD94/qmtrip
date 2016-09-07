@@ -7,7 +7,7 @@ import {EAccountType} from "./_types/index";
  */
 const API = require("common/api");
 const _ = require("lodash");
-const L = require("common/language");
+import L from 'common/language';
 const Models = require("api/_types").Models;
 
 export function requirePermit(permits: string| string[], type?: number) {

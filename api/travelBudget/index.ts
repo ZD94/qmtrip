@@ -8,7 +8,7 @@ import {EPlaneLevel, ETrainLevel, MTrainLevel} from "../_types/travelPolicy";
 import {Staff} from "../_types/staff";
 const API = require("common/api");
 const validate = require("common/validate");
-const L = require("common/language");
+import L from 'common/language';
 const moment = require('moment');
 const cache = require("common/cache");
 const utils = require("common/utils");
