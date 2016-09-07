@@ -366,6 +366,24 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
 
 export async function PendingController($scope, $stateParams){
     require('./trip-approval.scss');
+    $scope.loadMore = async function() {
+        if (!$scope.Pager) {
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+            return;
+        }
+        try {
+            $scope.Pager = await $scope.Pager.nextPage();
+            $scope.Pager.map(function(v) {
+                $scope.tripApproves.push(v);
+            });
+            $scope.hasNextPage = true;
+        } catch (err) {
+            $scope.hasNextPage = false;
+        } finally {
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+        }
+    }
+
     const PAGE_SIZE = 10;
     let staff = await Staff.getCurrent();
     let tripApproves = [];
@@ -402,24 +420,6 @@ export async function PendingController($scope, $stateParams){
     $scope.enterDetail = function(approveId){
         window.location.href = `#/trip-approval/detail?approveId=${approveId}`;
     };
-
-    $scope.loadMore = async function() {
-        if (!$scope.Pager) {
-            $scope.$broadcast('scroll.infiniteScrollComplete');
-            return;
-        }
-        try {
-            $scope.Pager = await $scope.Pager.nextPage();
-            $scope.Pager.map(function(v) {
-                $scope.tripApproves.push(v);
-            });
-            $scope.hasNextPage = true;
-        } catch (err) {
-            $scope.hasNextPage = false;
-        } finally {
-            $scope.$broadcast('scroll.infiniteScrollComplete');
-        }
-    }
 }
 
 export async function ApproveProgressController ($scope, Models, $stateParams){

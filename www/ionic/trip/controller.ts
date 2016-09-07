@@ -514,9 +514,9 @@ export async function ListController($scope , $stateParams, Models){
             } catch(err) {
                 alert("获取数据时,发生异常");
                 return;
+            } finally {
+                $scope.$broadcast('scroll.infiniteScrollComplete');
             }
-            loadTripPlan(pager);
-            $scope.$broadcast('scroll.infiniteScrollComplete');
         }
     }
 
