@@ -1,25 +1,21 @@
-///<reference path="tripPlan.ts"/>
 import {Models, EGender, EAccountType} from 'api/_types';
 import { Company } from 'api/_types/company';
 import {TripPlan, TripApprove} from 'api/_types/tripPlan';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Department } from 'api/_types/department';
 import { Types, Values } from 'common/model';
-import { Account } from './auth';
+import { Account } from '../auth';
 import { getSession } from 'common/model';
-import { TableExtends, Table, Create, Field, ResolveRef, Reference } from 'common/model/common';
+import { TableExtends, Table, Create, Field, ResolveRef, Reference, RemoteCall } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
-import {PaginateInterface} from "../../common/model/interface";
-import utils = require("common/utils");
+import {PaginateInterface} from "common/model/interface";
 
 
 declare var API: any;
 
-
-export enum EInvitedLinkStatus {
-    ACTIVE = 1,
-    FORBIDDEN = 0
-};
+export {InvitedLink, EInvitedLinkStatus} from './invited-link';
+export {Credential} from './credential';
+export {PointChange} from './point-change';
 
 export enum EStaffStatus {
     FORBIDDEN = 0,
@@ -34,9 +30,9 @@ export enum EStaffRole {
     FINANCE = 3
 }
 
-function enumValues(e){
-    return Object.keys(e).map((k)=>e[k]).filter((v)=>(typeof v != 'number'));
-}
+//function enumValues(e){
+//    return Object.keys(e).map((k)=>e[k]).filter((v)=>(typeof v != 'number'));
+//}
 
 @TableExtends(Account, 'account')
 @Table(Models.staff, "staff.")
@@ -181,6 +177,12 @@ export class Staff extends ModelObject implements Account {
         return API.staff.modifyPwd(params);
     }
 
+    @RemoteCall()
+    async testServerFunc(){
+        console.log('testServerFunc');
+        return 'OK';
+    }
+
     /*async createInvitedLink(){
         var invitedLink = InvitedLink.create();
         invitedLink = await invitedLink.save();
@@ -206,114 +208,3 @@ export class Staff extends ModelObject implements Account {
     isValidateMobile: boolean;
     isValidateEmail: boolean;
 }
-
-@Table(Models.credential, "staff.")
-export class Credential extends ModelObject{
-    constructor(target: Object) {
-        super(target);
-    }
-    @Create()
-    static create(obj?: Object): Credential { return null; }
-
-    @Field({type: Types.UUID})
-    get id(): string { return Values.UUIDV1(); }
-    set id(val: string) {}
-
-    @Field({type: Types.INTEGER, defaultValue: 0})
-    get type(): number {return 0}
-    set type(type: number){}
-
-    @Field({type: Types.STRING(50)})
-    get idNo(): string {return null}
-    set idNo(idNo: string){}
-
-    @Field({type: Types.DATE})
-    get birthday(): Date {return null}
-    set birthday(birthday: Date){}
-
-    @Field({type: Types.DATE})
-    get validData(): Date {return null}
-    set validData(validData: Date){}
-
-    @ResolveRef({type: Types.UUID}, Models.staff)
-    get owner(): Staff { return null; }
-    set owner(val: Staff) {}
-}
-
-@Table(Models.pointChange, "staff.")
-export class PointChange extends ModelObject{
-    constructor(target: Object) {
-        super(target);
-    }
-    @Create()
-    static create(obj?: Object): PointChange { return null; }
-
-    @Field({type: Types.UUID})
-    get id(): string { return Values.UUIDV1(); }
-    set id(val: string) {}
-
-    @ResolveRef({type: Types.UUID}, Models.staff)
-    get staff(): Staff { return null; }
-
-    @Reference({type: Types.UUID})
-    getCompany(id?:string): Promise<Company> {
-        return Models.company.get(id);
-    }
-
-    @Reference({type: Types.UUID}, 'orderId')
-    getTripPlan(id?:string): Promise<TripPlan> {
-        return Models.tripPlan.get(id);
-    }
-
-    @Field({type: Types.INTEGER, defaultValue: 1})
-    get status(): number {return 1}
-    set status(status: number){}
-
-    @Field({type: Types.INTEGER})
-    get points(): number {return null}
-    set points(points: number){}
-
-    @Field({type: Types.INTEGER})
-    get currentPoint(): number {return null}
-    set currentPoint(currentPoint: number){}
-
-    @Field({type: Types.TEXT})
-    get remark(): string {return null}
-    set remark(remark: string){}
-
-}
-
-@Table(Models.invitedLink, "staff.")
-export class InvitedLink extends ModelObject{
-    constructor(target: Object) {
-        super(target);
-    }
-    @Create()
-    static create(obj?: Object): InvitedLink { return null; }
-
-    @Field({type: Types.UUID})
-    get id(): string { return Values.UUIDV1(); }
-    set id(val: string) {}
-
-    @ResolveRef({type: Types.UUID}, Models.staff)
-    get staff(): Staff { return null; }
-    set staff(val: Staff) {}
-
-    @Field({type: Types.DATE})
-    get expiresTime(): Date { return null; }
-    set expiresTime(val: Date) {}
-
-    @Field({type: Types.INTEGER, defaultValue: EInvitedLinkStatus.ACTIVE})
-    get status(): EInvitedLinkStatus {return EInvitedLinkStatus.ACTIVE}
-    set status(status: EInvitedLinkStatus){}
-
-    @Field({type: Types.STRING})
-    get goInvitedLink(): string { return ''; }
-    set goInvitedLink(val: string) {}
-
-    @Field({type:Types.STRING})
-    get linkToken(): string { return null; }
-    set linkToken(linkToken: string){}
-
-}
-
