@@ -366,29 +366,33 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
 
 export async function PendingController($scope, $stateParams){
     require('./trip-approval.scss');
-    $scope.loadMore = async function() {
-        if (!$scope.Pager) {
-            $scope.$broadcast('scroll.infiniteScrollComplete');
-            return;
-        }
-        try {
-            $scope.Pager = await $scope.Pager.nextPage();
-            $scope.Pager.map(function(v) {
-                $scope.tripApproves.push(v);
-            });
-            $scope.hasNextPage = true;
-        } catch (err) {
-            $scope.hasNextPage = false;
-        } finally {
-            $scope.$broadcast('scroll.infiniteScrollComplete');
-        }
-    }
-
     const PAGE_SIZE = 10;
     let staff = await Staff.getCurrent();
     let tripApproves = [];
     let Pager = await staff.getTripApproves({where: {status: [EApproveStatus.CANCEL, EApproveStatus.PASS, EApproveStatus.REJECT, EApproveStatus.WAIT_APPROVE]}, limit: PAGE_SIZE})
-    $scope.hasNextPage = (!Pager || !Pager.length) ? false : true;
+    var More = {
+        hasNextPage: function() {
+            return Pager.totalPages-1 > Pager.curPage;
+        },
+        loadMore: async function(){
+            if (!$scope.Pager) {
+                $scope.$broadcast('scroll.infiniteScrollComplete');
+                return;
+            }
+            try {
+                $scope.Pager = await $scope.Pager.nextPage();
+                $scope.Pager.map(function(v) {
+                    $scope.tripApproves.push(v);
+                });
+                $scope.hasNextPage = true;
+            } catch (err) {
+                $scope.hasNextPage = false;
+            } finally {
+                $scope.$broadcast('scroll.infiniteScrollComplete');
+            }
+        }
+    }
+    $scope.More = More;
     Pager.forEach((a) => {tripApproves.push(a);});
     $scope.tripApproves = tripApproves;
 
