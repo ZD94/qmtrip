@@ -2,9 +2,11 @@
 import {Staff, InvitedLink} from "api/_types/staff";
 import {TravelPolicy} from "api/_types/travelPolicy";
 import { StaffInvitedController } from '../company/controller';
+import validator = require('validator');
+import _ = require('lodash');
 
 var printf = require('printf');
-
+const API = require("common/api");
 const moment = require("moment");
 var msgbox = require('msgbox');
 var browserspec = require('browserspec');
@@ -53,7 +55,7 @@ export async function CompanyFirstController ($scope, Models, $stateParams){
                 }
             }
         }
-    }
+    };
 
     $scope.savePolicy = async function () {
         if(!$scope.travelPolicy.name){
