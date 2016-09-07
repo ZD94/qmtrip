@@ -6,7 +6,6 @@
 "use strict";
 import { EAccountType, Models } from '../_types/index';
 
-var API = require("common/api");
 var L = require("common/language");
 
 const ROLE_ID = {

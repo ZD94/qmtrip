@@ -2,18 +2,17 @@
  * Created by wyl on 16-01-20.
  */
 'use strict';
-var co = require("co");
 var _ = require("lodash");
 var sequelize = require("common/model").DB;
 let DBM = sequelize.models;
 let API = require("common/api");
 let L = require("common/language");
 import {Department} from "api/_types/department";
-import {validateApi, requireParams, clientExport} from 'common/api/helper';
-import { Models, EAccountType } from '../_types/index';
+import {requireParams, clientExport} from 'common/api/helper';
+import { Models } from '../_types/index';
 import { FindResult, PaginateInterface } from "common/model/interface";
 import {Staff, EStaffStatus} from "api/_types/staff";
-import {requirePermit, conditionDecorator, condition} from "../_decorator";
+import {conditionDecorator, condition} from "../_decorator";
 
 const departmentCols = Department['$fieldnames'];
 class DepartmentModule{
@@ -91,7 +90,7 @@ class DepartmentModule{
         {if: condition.isDepartmentAgency("0.id")}
     ])
     static async updateDepartment(params): Promise<Department>{
-        var staff = await Staff.getCurrent();
+        //var staff = await Staff.getCurrent();
         let dept = await Models.department.get(params.id);
         for(let key in params){
             dept[key] = params[key];
@@ -155,8 +154,8 @@ class DepartmentModule{
         {if: condition.isCompanyAgency("where.companyId")}
     ])
     static async getDepartments(params) :Promise<FindResult>{
-        let { accountId } = Zone.current.get("session");
-        var staff = await Staff.getCurrent();
+        //let { accountId } = Zone.current.get("session");
+        //var staff = await Staff.getCurrent();
 
         var options : any = {};
         options.where = _.pick(params.where, Object.keys(DBM.Department.attributes));

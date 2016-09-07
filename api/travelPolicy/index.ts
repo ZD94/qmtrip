@@ -6,14 +6,12 @@ var sequelize = require("common/model").DB;
 var DBM = sequelize.models;
 var _ = require('lodash');
 import {Paginate} from 'common/paginate';
-var API = require("common/api");
 let L = require("common/language");
-import {validateApi, requireParams, clientExport} from 'common/api/helper';
-import {requirePermit, conditionDecorator, condition} from "../_decorator";
-import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_types/staff";
-import types = require("api/_types/travelPolicy");
+import {requireParams, clientExport} from 'common/api/helper';
+import {conditionDecorator, condition} from "../_decorator";
+import {Staff, EStaffStatus} from "api/_types/staff";
 import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
-import { Models, EAccountType } from 'api/_types';
+import { Models } from 'api/_types';
 import { FindResult, PaginateInterface } from "common/model/interface";
 
 const travalPolicyCols = TravelPolicy['$fieldnames'];
@@ -102,7 +100,7 @@ class TravelPolicyModule{
     ])
     static async updateTravelPolicy(params) : Promise<TravelPolicy>{
         var id = params.id;
-        var staff = await Staff.getCurrent();
+        //var staff = await Staff.getCurrent();
 
         var tp = await Models.travelPolicy.get(id);
         for(var key in params){
@@ -132,7 +130,7 @@ class TravelPolicyModule{
     ])
     static async getTravelPolicy(params: {id: string, companyId?: string}) : Promise<TravelPolicy>{
         let id = params.id;
-        var staff = await Staff.getCurrent();
+        //var staff = await Staff.getCurrent();
         var tp = await Models.travelPolicy.get(id);
 
         return tp;
@@ -152,7 +150,7 @@ class TravelPolicyModule{
     static async getAllTravelPolicy(params): Promise<PaginateInterface<TravelPolicy> >{
 
         var staff = await Staff.getCurrent();
-        let companyId = params.companyId;
+        //let companyId = params.companyId;
 
         let options: any = {
             where: _.pick(params, ['name', 'planeLevel', 'planeDiscount', 'trainLevel', 'hotelLevel', 'hotelPrice', 'companyId', 'isChangeLevel', 'createdAt'])
@@ -186,7 +184,7 @@ class TravelPolicyModule{
     ])
     static async getTravelPolicies(params): Promise<FindResult>{
         var staff = await Staff.getCurrent();
-        let companyId = params.companyId;
+        //let companyId = params.companyId;
 
         var options: any = {
             where:  _.pick(params, Object.keys(DBM.TravelPolicy.attributes))
@@ -305,7 +303,7 @@ class TravelPolicyModule{
     ])
     static async updateSubsidyTemplate(params) : Promise<SubsidyTemplate>{
         var id = params.id;
-        var staff = await Staff.getCurrent();
+        //var staff = await Staff.getCurrent();
 
         var ah = await Models.subsidyTemplate.get(id);
         for(var key in params){

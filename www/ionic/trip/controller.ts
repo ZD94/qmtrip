@@ -2,12 +2,11 @@
 
 import moment = require('moment');
 var API = require("common/api");
-var Cookie = require('tiny-cookie');
 import { Staff} from 'api/_types/staff';
 
 import { Models } from 'api/_types';
 import {
-    TripDetail, EPlanStatus, ETripType, EInvoiceType, EAuditStatus, MTxPlaneLevel
+    TripDetail, EPlanStatus, ETripType, EInvoiceType, MTxPlaneLevel
 } from "api/_types/tripPlan";
 var msgbox = require('msgbox');
 
@@ -48,11 +47,11 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
     }
     $scope.subsidy = {hasFirstDaySubsidy: true, hasLastDaySubsidy: true, template: null};
 
-
-
+    var ret = await $scope.currentStaff.testServerFunc();
+    console.log('$scope.currentStaff.testServerFunc() return', ret);
 
     $scope.selectSubsidyTemplate = async function(){
-        var nshow = $ionicPopup.show({
+        $ionicPopup.show({
             title:'出差补助选择',
             cssClass:'selectSubsidy',
             template:require('./selectSubsidy.html'),
@@ -416,7 +415,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         });
 
         try {
-            let staff = await Staff.getCurrent();
+            //let staff = await Staff.getCurrent();
             let tripApprove = await API.tripPlan.saveTripApprove({budgetId: id, title: trip.reason||trip.reasonName, approveUserId: trip.auditUser.id});
             window.location.href = '#/trip/committed?id='+tripApprove.id;
         } catch(err) {

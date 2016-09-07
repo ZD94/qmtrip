@@ -1,6 +1,4 @@
 
-import _ = require('lodash');
-
 import { initModels } from 'api/_types';
 
 import { Staff, Credential, PointChange, InvitedLink } from 'api/_types/staff';

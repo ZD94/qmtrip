@@ -5,11 +5,8 @@
 let sequelize = require("common/model").DB;
 let DBM = sequelize.models;
 let API = require("common/api");
-let uuid = require("node-uuid");
-import _ = require('lodash');
 import L = require("common/language");
 import Logger = require('common/logger');
-import utils = require("common/utils");
 import {requireParams, clientExport} from 'common/api/helper';
 import {Agency, AgencyUser, EAgencyStatus, EAgencyUserRole} from "api/_types/agency";
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "../_decorator";
@@ -17,10 +14,6 @@ import { Models, EGender } from '../_types/index';
 import {md5} from "common/utils";
 import {FindResult} from "common/model/interface";
 let logger = new Logger("agency");
-
-let agencyCols = Agency['$fieldnames'];
-let agencyUserCols = AgencyUser['$fieldnames'];
-
 
 class AgencyModule {
     /**

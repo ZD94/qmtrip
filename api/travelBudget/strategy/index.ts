@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {ITicket, IFinalTicket, TRAFFIC, TravelBudgeItem, IHotel, IFinalHotel} from "api/_types/travelbudget";
+import {ITicket, IFinalTicket, TravelBudgeItem, IHotel, IFinalHotel} from "api/_types/travelbudget";
 import {ticketPrefers, hotelPrefers} from '../prefer'
 import {EInvoiceType} from "api/_types/tripPlan";
 import {IPrefer} from '../prefer'
@@ -177,7 +177,6 @@ export abstract class AbstractTicketStrategy {
             this.isRecord = false;
         }
 
-        let d = new Date();
         this.prefers = [];
     }
 
@@ -294,7 +293,7 @@ export class TrafficBudgetStrategyFactory {
 
 export class HotelBudgetStrategyFactory {
     static async getStrategy(qs, options) {
-        let policy = qs.policy;
+        //let policy = qs.policy;
         let prefers = qs.prefers;
         let strategy = new CommonHotelStrategy(qs, options);
         for(let p of prefers) {

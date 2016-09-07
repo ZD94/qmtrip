@@ -1,17 +1,9 @@
 "use strict";
-import {Staff, InvitedLink} from "api/_types/staff";
+import {Staff} from "api/_types/staff";
 import {TravelPolicy} from "api/_types/travelPolicy";
 import { StaffInvitedController } from '../company/controller';
-import validator = require('validator');
-import _ = require('lodash');
 
-var printf = require('printf');
-const API = require("common/api");
-const moment = require("moment");
 var msgbox = require('msgbox');
-var browserspec = require('browserspec');
-declare var ionic;
-declare var wx:any;
 
 export async function CompanyGuideController ($scope){
     require("./company-guide.scss");

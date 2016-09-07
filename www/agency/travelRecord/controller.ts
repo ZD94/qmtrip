@@ -3,9 +3,7 @@
  */
 "use strict";
 
-const API = require("common/api");
 var msgbox = require('msgbox');
-
 
 /*
  出差单列表

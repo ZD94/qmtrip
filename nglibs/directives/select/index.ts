@@ -38,7 +38,7 @@ angular
                 })
             },
             compile: function(element, attr, trans){
-                var removeAttr = element.removeAttr("ng-options");
+                element.removeAttr("ng-options");
                 element.removeAttr("ng-model");
                 return function (scope, element, attr, controller, transcludeFn) {
                     element.find("option").each(function (index, option) {

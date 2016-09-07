@@ -4,8 +4,6 @@
 var sequelize = require("common/model").DB;
 var DBM = sequelize.models;
 let L = require("common/language");
-let _ = require('lodash');
-let utils = require("common/utils");
 let C = require("config");
 let API = require("common/api");
 let Logger = require('common/logger');
@@ -329,7 +327,7 @@ class CompanyModule {
      */
     @requireParams(['domain'])
     static async isBlackDomain(params: {domain: string}) {
-        var domain = params.domain.toLowerCase();
+        //var domain = params.domain.toLowerCase();
         // let black = await DBM.BlackDomain.findAll({where: params});
         // if(black && black.length > 0) {
         //     return true;
@@ -348,8 +346,6 @@ class CompanyModule {
         return DBM.Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
             .then(function(companys){
                 return companys.map(function(c){
-                    var id = c.id;
-
                     return true;
                 })
             })

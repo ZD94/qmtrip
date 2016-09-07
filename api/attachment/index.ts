@@ -15,7 +15,7 @@ import * as path from 'path';
 
 async function fs_exists(file): Promise<boolean>{
     try{
-        var stat = await fs.statAsync(file);
+        await fs.statAsync(file);
         return true;
     }catch(e){
         if(e.code != 'ENOENT')

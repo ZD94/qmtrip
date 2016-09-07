@@ -40,7 +40,7 @@ export function selectMapPointController($scope){
         });
     }
 
-    var form = $scope.form = {
+    $scope.form = {
         selected: $scope.value,
         keyword: ''
     };
