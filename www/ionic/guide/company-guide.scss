@@ -34,8 +34,15 @@
 }
 //第二步的样式
 .invied_link{
+  .link_style,> *:nth-child(1) .about_link .countdown{
+    height:40px;
+    line-height: 40px;
+    flex:none;
+    -webkit-flex: none;
+  }
   .link_style{
-    line-height: 56px;
+    height:20px;
+    line-height: 20px;
   }
 }
 

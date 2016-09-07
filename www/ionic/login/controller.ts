@@ -258,6 +258,7 @@ export async function CompanyRegisterController ($scope, $stateParams){
     API.require("checkcode");
     API.require("auth");
     await API.onload();
+    require("./company-register.scss");
     $scope.form = {
         mobile:'',
         msgCode:'',
