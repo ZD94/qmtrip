@@ -70,6 +70,9 @@ app.controller('debug',function($scope, $http, $location){
     $http.post('/api/budgets?key='+url.key,{originData: originData, query: query, policy: policy, prefers: prefers, type: type})
         .success(function(datas){
             $scope.result = datas;
+            console.log(datas);
+            $scope.originData.markedData = datas.markedScoreData;
+            console.log($scope.originData.markedData);
         })
   };
   $scope.change = function(){

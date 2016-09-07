@@ -255,6 +255,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
 }
 
 export async function CompanyRegisterController ($scope, $stateParams){
+
     API.require("checkcode");
     API.require("auth");
     await API.onload();
@@ -266,7 +267,6 @@ export async function CompanyRegisterController ($scope, $stateParams){
         name:'',
         userName:''
     };
-
     $scope.showCount = false;
     $scope.beginCountDown = function(){
         $scope.showCount = true;
