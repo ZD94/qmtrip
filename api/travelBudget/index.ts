@@ -507,7 +507,7 @@ class ApiTravelBudget {
             try {
                 let factory = (type == 1) ? TrafficBudgetStrategyFactory : HotelBudgetStrategyFactory;
                 let strategy = await factory.getStrategy(qs, {isRecord: false});
-                let result = await strategy.getResult(JSON.parse(originData));
+                let result = await strategy.getResult(JSON.parse(originData), true);
                 res.json(result);
             } catch(err) {
                 next(err);
