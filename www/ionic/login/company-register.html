@@ -10,7 +10,7 @@
                 <div class="item item-input" style="padding-top: 0px;padding-bottom: 0px">
                     <!--<span class="input-label">重复密码</span>-->
                     <input type="text" placeholder="请输入验证码" ng-model="form.msgCode" required ng-required>
-                    <a class="button button-calm" ng-click="sendCode()" ng-if="!showCount">获取验证码</a>
+                    <a class="button button-calm getCodeBtn" ng-click="sendCode()" ng-if="!showCount">获取验证码</a>
                     <div class="button button-stable" style="width: 116px;text-align: center;" ng-if="showCount"><span id="countNum">{{beginNum}}</span>s</div>
                 </div>
             </ion-list>
@@ -18,7 +18,7 @@
             <ion-list>
                 <div class="item item-input">
                     <span class="input-label">登录密码</span>
-                    <input type="password" placeholder="请输入6-20位字母或数字" ng-model="form.pwd" required ng-required>
+                    <input id="password" type="password" placeholder="请输入6-20位字母或数字" ng-model="form.pwd" required ng-required>
                 </div>
             </ion-list>
             <div class="spacer" style="height:10px"></div>
