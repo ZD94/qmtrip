@@ -5,10 +5,11 @@ import {Staff} from 'api/_types/staff';
 import {Agency} from 'api/_types/agency';
 import {TravelPolicy} from "api/_types/travelPolicy";
 import { Types, Values } from 'common/model';
-import { Department } from './department';
+import { Department } from 'api/_types/department';
 import { TripPlan } from "api/_types/tripPlan";
 import { Table, Create, Field, Reference } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
+import { MoneyChange } from './money-change';
 declare var API: any;
 
 export enum ECompanyStatus {
@@ -202,41 +203,4 @@ export class Company extends ModelObject{
         
         return API.tripPlan.statisticTripPlanOfMonth(params);
     }
-}
-
-@Table(Models.moneyChange, 'company.')
-export class MoneyChange extends ModelObject {
-    constructor(target: Object) {
-        super(target);
-    }
-    @Create()
-    static create(obj?: Object): MoneyChange { return null; }
-
-    @Field({type: Types.UUID})
-    get id(): string { return Values.UUIDV1(); }
-    set id(val: string) {}
-
-    @Field({type: Types.UUID})
-    get companyId(): string { return null; }
-    set companyId(val: string) {}
-
-    @Field({type: Types.INTEGER})
-    get status(): number { return 0; }
-    set status(val: number) {}
-
-    @Field({type: Types.NUMERIC(15, 2)})
-    get money(): number { return 0; }
-    set money(val: number) {}
-
-    @Field({type: Types.INTEGER})
-    get channel(): number { return 0; }
-    set channel(val: number) {}
-
-    @Field({type: Types.UUID})
-    get userId(): string { return null; }
-    set userId(val: string) {}
-
-    @Field({type: Types.STRING})
-    get remark(): string { return ''; }
-    set remark(val: string) {}
 }
