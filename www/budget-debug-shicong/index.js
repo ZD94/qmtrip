@@ -70,7 +70,6 @@ app.controller('debug',function($scope, $http, $location){
     $http.post('/api/budgets?key='+url.key,{originData: originData, query: query, policy: policy, prefers: prefers, type: type})
         .success(function(datas){
             $scope.result = datas;
-            console.log(datas)
         })
   };
   $scope.change = function(){
@@ -79,6 +78,7 @@ app.controller('debug',function($scope, $http, $location){
 
     ori.push(JSON.parse(single));
     $scope.ori_prefers = ori;
+    console.log(ori);
   };
   $scope.changeOrigin = function(){
     $scope.ori_prefers = $scope.originData.prefers;

@@ -140,6 +140,8 @@
         <tr>
             <th>打分详情</th>
             <td>
+                <a ng-show="hideScoreDetail" ng-click="hideScoreDetail = !hideScoreDetail">隐藏</a>
+                <a ng-hide="hideScoreDetail" ng-click="hideScoreDetail = !hideScoreDetail">显示</a>
                 <div placeholder="打分详情" ng-if="hideScoreDetail">
                     <table class="son">
                         <tr ng-repeat="prefer in ori_prefers" style="height:50px">
@@ -154,8 +156,6 @@
                         </tr>
                     </table>
                 </div>
-                <a ng-show="hideScoreDetail" ng-click="hideScoreDetail = !hideScoreDetail">隐藏</a>
-                <a ng-hide="hideScoreDetail" ng-click="hideScoreDetail = !hideScoreDetail">显示</a>
                 <br/>
                 <select ng-model="prefer" ng-change="change()">
                     <option ng-repeat="x in prefers" value="{{x.value}}">{{x.title}}</option>
@@ -165,14 +165,13 @@
         <tr>
             <th>预算结果</th>
             <td>
-                <div placeholder="预算结果" rows="4" cols="80" ng-if="hideCalResult">
-                    <div>{{result.name}}</div>
-                    <div>{{result.price}}</div>
-                    <div>{{result.star}}</div>
-                    <div>{{result.agent}}</div>
-                </div>
                 <a ng-show="hideCalResult" ng-click="hideCalResult = !hideCalResult">隐藏</a>
                 <a ng-hide="hideCalResult" ng-click="hideCalResult = !hideCalResult">显示</a>
+                <div placeholder="预算结果" rows="4" cols="80" ng-if="hideCalResult">
+                    <div ng-repeat="(x,y) in result">
+                        {{x}}-------------------{{y}}
+                    </div>
+                </div>
             </td>
         </tr>
         <tr>
