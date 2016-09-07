@@ -1,9 +1,9 @@
 
 import { Table, Create, Field, ResolveRef } from 'common/model/common';
-import { Models } from '../index';
+import { Models } from 'api/_types';
 import { ModelObject } from 'common/model/object';
 import { Types, Values } from 'common/model';
-import { Staff } from './index';
+import { Staff } from './staff';
 
 @Table(Models.credential, "staff.")
 export class Credential extends ModelObject{

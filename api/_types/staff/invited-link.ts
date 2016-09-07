@@ -1,9 +1,9 @@
 
 import { Types, Values } from 'common/model';
 import { Table, Create, Field, ResolveRef } from 'common/model/common';
-import { Models } from '../index';
+import { Models } from 'api/_types';
 import { ModelObject } from 'common/model/object';
-import { Staff } from './index';
+import { Staff } from './staff';
 
 export enum EInvitedLinkStatus {
     ACTIVE = 1,
