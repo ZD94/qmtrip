@@ -23,8 +23,8 @@
                 <span class="spanRight">{{approve.budget | currency: ''}}元</span>
             </div>
         </div>
-        <div ng-if="vm.hasNextPage()" class="getMoreOrNoMore"><i class="icon ion-arrow-up-a"></i>&nbsp;上拉加载更多</div>
-        <div ng-if="!vm.hasNextPage()" class="getMoreOrNoMore">没有更多记录了</div>
-        <ion-infinite-scroll on-infinite="vm.loadMore()" ng-if="vm.hasNextPage()"></ion-infinite-scroll>
+        <div ng-if="More.hasNextPage()" class="getMoreOrNoMore"><i class="icon ion-arrow-up-a"></i>&nbsp;上拉加载更多</div>
+        <div ng-if="!More.hasNextPage()" class="getMoreOrNoMore">没有更多记录了</div>
+        <ion-infinite-scroll on-infinite="More.loadMore()" ng-if="More.hasNextPage()"></ion-infinite-scroll>
     </ion-content>
 </ion-view>
