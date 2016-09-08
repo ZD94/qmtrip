@@ -9,10 +9,9 @@ import {Department} from "api/_types/department";
 import {AccordHotel} from "api/_types/accordHotel";
 import {ACCOUNT_STATUS} from "api/_types/auth"
 import validator = require('validator');
-import _ = require('lodash');
 const moment = require("moment");
 const API = require("common/api");
-var L = require("common/language");
+import L from 'common/language';
 var msgbox = require('msgbox');
 var browserspec = require('browserspec');
 var printf = require('printf');
@@ -278,7 +277,6 @@ export async function RecordDetailController($scope, Models, $stateParams, $ioni
     let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;
     let subsidyDays:number = moment(tripPlan.backAt).diff(moment(tripPlan.startAt), 'days');
     let totalBudget: number = 0;
-    let budgetId;
     totalBudget = tripPlan.budget as number;
     tripDetails.forEach(function(detail) {
         switch (detail.type) {
@@ -416,7 +414,7 @@ export async function DepartmentController($scope, Models, $ionicPopup, $ionicLi
     $scope.newdepart = function () {
         $scope.newdepartment = Department.create();
         $scope.newdepartment.company = staff.company;
-        var nshow = $ionicPopup.show({
+        $ionicPopup.show({
             template: '<input type="text" ng-model="newdepartment.name">',
             title: '创建部门',
             scope: $scope,
@@ -448,7 +446,7 @@ export async function DepartmentController($scope, Models, $ionicPopup, $ionicLi
 
     $scope.editDept = function (item) {
         $scope.newdepartment = item;
-        var nshow = $ionicPopup.show({
+        $ionicPopup.show({
             template: '<input type="text" ng-model="newdepartment.name">',
             title: '修改部门',
             scope: $scope,
@@ -475,7 +473,7 @@ export async function DepartmentController($scope, Models, $ionicPopup, $ionicLi
     }
     
     $scope.deleteDept = function (department, index) {
-        var nshow = $ionicPopup.show({
+        $ionicPopup.show({
             title:'确定要删除部门吗?',
             scope: $scope,
             buttons:[
@@ -568,7 +566,7 @@ export async function StaffsController($scope, Models, $ionicPopup) {
     }
 
     $scope.delete = async function(id, index) {
-        var delshow = $ionicPopup.show({
+        $ionicPopup.show({
             title: '确定删除该员工吗？',
             scope: $scope,
             buttons: [
@@ -593,7 +591,7 @@ export async function StaffsController($scope, Models, $ionicPopup) {
     }
 
     $scope.forbidden = async function(id, index) {
-        var forshow = $ionicPopup.show({
+        $ionicPopup.show({
             title: '确定禁用该员工吗？',
             scope: $scope,
             buttons: [
@@ -729,7 +727,7 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
                 // 创建人修改管理员权限(二次确认)
                 if(currentstaff.roleId == EStaffRole.OWNER && preRole == EStaffRole.ADMIN && _staff.roleId == EStaffRole.COMMON){
                     ownerModifyAdmin = true;
-                    var nshow = $ionicPopup.show({
+                    $ionicPopup.show({
                         title: '确认要取消TA的管理员身份吗？',
                         scope: $scope,
                         buttons: [
@@ -828,7 +826,7 @@ export async function TravelpolicyController($scope, Models, $location, $ionicPo
         }
         if($scope.defaultTravelpolicy)
             $scope.tripPolicy.newDefaultTp = $scope.defaultTravelpolicy;
-        var nshow = $ionicPopup.show({
+        $ionicPopup.show({
             title:'设置默认标准',
             cssClass:'withCheck',
             template: require('./defaultPolicyTemplate.html'),
@@ -936,7 +934,7 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
     }
 
     $scope.deletePolicy = async function () {
-        var nshow = $ionicPopup.show({
+        $ionicPopup.show({
             title:'提示',
             template:'确定要删除该条差旅标准么?',
             scope: $scope,
@@ -1012,7 +1010,7 @@ async function SubsidyTemplatesController($scope, Models,$ionicPopup) {
     $scope.addTemplate = async function () {
         $scope.subsidyTemplate = SubsidyTemplate.create();
         // $scope.subsidyTemplate.travelPolicy = travelPolicy;
-        var ngshow = $ionicPopup.show({
+        $ionicPopup.show({
             title:'补助模板',
             cssClass:'subsidyPopup',
             template:'<div> <p>模板标题</p> ' +
@@ -1062,7 +1060,7 @@ async function SubsidyTemplatesController($scope, Models,$ionicPopup) {
     }
 
     $scope.deleteSt = async function(st, index){
-        var nshow = $ionicPopup.show({
+        $ionicPopup.show({
             title:'提示',
             template:'确认删除该条出差补助么？',
             scope: $scope,
@@ -1178,7 +1176,7 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
     }
 
     $scope.deleteAccordHotel = async function (accordHotel, index) {
-        var nshow = $ionicPopup.show({
+        $ionicPopup.show({
             title:'确定要删除该协议酒店吗?',
             scope: $scope,
             buttons:[

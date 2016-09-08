@@ -4,23 +4,19 @@
 "use strict";
 import {requireParams, clientExport} from "../../common/api/helper";
 import { Models, EAccountType } from "api/_types";
-import {AuthCert, Token, Account, AccountOpenid, ACCOUNT_STATUS} from "api/_types/auth";
+import {AuthCert, Account, AccountOpenid, ACCOUNT_STATUS} from "api/_types/auth";
 import {Staff, EInvitedLinkStatus} from "api/_types/staff";
 import validator = require('validator');
-import _ = require('lodash');
-import { getSession } from 'common/model';
 
 var sequelize = require("common/model").DB;
 var DBM = sequelize.models;
 var uuid = require("node-uuid");
-var L = require("common/language");
+import L from 'common/language';
 var C = require("config");
 var QRCODE_LOGIN_URL = '/auth/qrcode-login';
 var moment = require("moment");
 var API = require("common/api");
 var utils = require("common/utils");
-var Logger = require("common/logger");
-var logger = new Logger('auth');
 import cache = require("common/cache");
 let msgConfig = C.message;
 var accountCols = Account['$fieldnames'];
@@ -397,7 +393,7 @@ class ApiAuth {
 
         var mobile = data.mobile;
 
-        var staff = await Staff.getCurrent();
+        //var staff = await Staff.getCurrent();
 
         var type = ACCOUNT_TYPE.COMPANY_STAFF;
         //查询邮箱是否已经注册
@@ -618,7 +614,6 @@ class ApiAuth {
         var timestamp = Date.now() + 2 * oneDay;  //失效时间2天
         var sign = makeActiveSign(account.pwdToken, account.id, timestamp);
         var url = "accountId="+account.id+"&timestamp="+timestamp+"&sign="+sign+"&email="+account.email;
-        var templateName;
 
         var vals: any = {
             name: staff.name || account.mobile,
@@ -1077,7 +1072,6 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     @requireParams(["id"], accountCols)
     static async updateAccount(params){
         var id = params.id;
-        var old_email;
         var accobj = await Models.account.get(id);
         var staff = await Staff.getCurrent();
         if(params.email && staff && staff.company["domainName"] && params.email.indexOf(staff.company["domainName"]) == -1){
@@ -1518,7 +1512,6 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         app.all("/auth/get-wx-code", async function(req, res, next) {
             let query = req.query;
             let redirect_url = query.redirect_url;
-            let openid = ''
             //如果是登录页，直接跳转
             if(/^http\:\/\/\w*\.jingli365\.com\/(index\.html)?\#\/login\/(index)?/.test(redirect_url)){
                 redirect_url += redirect_url.indexOf('?') > 0 ? '&' : '?';

@@ -133,7 +133,7 @@ export async function EditEmailController($scope,Models,$ionicHistory,$ionicPopu
             })
             .then(function(data){
                 if(data){
-                    var alert = $ionicPopup.alert({
+                    $ionicPopup.alert({
                         title:'激活邮件发送成功',
                         template:'为保障您的权益和能够及时收到通知消息，请尽快到邮箱进行激活！',
                         okText:'确定'
@@ -193,7 +193,7 @@ export async function EditPwdController($scope,Models,$ionicHistory,$storage,$io
         await API.onload();
         staff.modifyPwd({ newPwd: $scope.form.newPwd, pwd: $scope.form.oldPwd })
             .then(async function(result){
-                var nshow = $ionicPopup.show({
+                $ionicPopup.show({
                     template: '<span>修改成功，请重新登录</span>',
                     title: '修改密码',
                     scope: $scope,

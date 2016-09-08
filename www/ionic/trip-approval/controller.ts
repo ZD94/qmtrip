@@ -3,13 +3,12 @@
  */
 "use strict";
 import {
-    ETripType, EAuditStatus, EInvoiceType, MTxPlaneLevel, EApproveStatus,
+    ETripType, EInvoiceType, MTxPlaneLevel, EApproveStatus,
     EApproveResult
 } from "api/_types/tripPlan";
 import {MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
 import {Staff} from "api/_types/staff";
 import moment = require('moment');
-import _ = require("lodash")
 const API = require("common/api");
 let APPROVE_TEXT: any = {};
 APPROVE_TEXT[EApproveStatus.CANCEL] = '已撤销';
@@ -176,14 +175,14 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         $scope.MPlaneLevel = MPlaneLevel;
         $scope.MHotelLevel = MHotelLevel;
         if (policy) {   //判断是否设置差旅标准
-            var show = $ionicPopup.alert({
+            $ionicPopup.alert({
                 title: '差旅标准',
                 scope: $scope,
                 cssClass: 'policyPopup',
                 template: require('../policyPopupTemplate.html')
             })
         } else {
-            var show = $ionicPopup.alert({   //定义show的原因是避免页面加载就执行
+            $ionicPopup.alert({   //定义show的原因是避免页面加载就执行
                 title: '提示',
                 template: '暂未设置差旅标准,请设置后查看'
             })
@@ -232,7 +231,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         $scope.staffSelector = {
             query: async function(keyword) {
                 let staff = await Staff.getCurrent();
-                let approveStaffId = $scope.tripApprove.account.id;
+                //let approveStaffId = $scope.tripApprove.account.id;
                 let staffs = await staff.company.getStaffs({where: {id: {$ne: staff.id}}});
                 return staffs;
             },
@@ -273,7 +272,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
 
     $scope.reCommitTripApprove = async function() {
         let tripApprove = $scope.tripApprove;
-        let tripDetails = $scope.budgets;
+        //let tripDetails = $scope.budgets;
         let trip: any = {
             regenerate: true,
             traffic: tripApprove.isNeedTraffic,

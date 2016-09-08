@@ -4,9 +4,6 @@
 'use strict';
 import { Models, EAccountType } from '../_types/index';
 import { EStaffRole } from '../_types/staff';
-var moment = require("moment");
-var fs = require('fs');
-var path = require('path');
 var API = require("common/api");
 let Logger = require('common/logger');
 let logger = new Logger("tripPlan.invoice");

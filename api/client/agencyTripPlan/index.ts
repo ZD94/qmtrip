@@ -3,11 +3,10 @@
  */
 
 let API = require("common/api");
-let L = require("common/language");
+import L from 'common/language';
 let config = require("../../../config");
 import moment = require("moment");
 import _ = require('lodash');
-import {validateApi} from "common/api/helper";
 
 
 export function getConsumeInvoiceImg(params) {
@@ -271,7 +270,7 @@ export function approveInvoice(params){
                 if(_score> 0 ){
                     _score += '积分已发放到您的积分账户';
                 }
-                let total = `全麦预算￥${order.budget},实际支出￥${order.expenditure},节省￥${s.toFixed(2)}`;
+                //let total = `全麦预算￥${order.budget},实际支出￥${order.expenditure},节省￥${s.toFixed(2)}`;
                 values.time = orderTime;
                 values.score = _score;
             }

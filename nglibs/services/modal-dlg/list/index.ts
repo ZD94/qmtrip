@@ -1,5 +1,4 @@
 
-declare var API: any;
 var msgbox = require('msgbox');
 
 export async function selectFromListController($scope) {
