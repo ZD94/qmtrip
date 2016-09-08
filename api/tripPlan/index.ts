@@ -3,9 +3,8 @@
  */
 "use strict";
 let sequelize = require("common/model").DB;
-let DBM = sequelize.models;
 let uuid = require("node-uuid");
-let L = require("common/language");
+import L from 'common/language';
 import utils = require("common/utils");
 let API = require('common/api');
 let Logger = require('common/logger');
@@ -16,7 +15,7 @@ let scheduler = require('common/scheduler');
 import _ = require('lodash');
 import {requireParams, clientExport} from 'common/api/helper';
 import {
-    Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog, ETripType, EAuditStatus,
+    Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus,
     TripApprove, EApproveStatus, EApproveResult
 } from "api/_types/tripPlan";
 import {Models} from "api/_types/index";
@@ -25,10 +24,6 @@ import {Staff, EStaffRole, EStaffStatus} from "api/_types/staff";
 import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import {getSession} from "common/model/index";
 import {AgencyUser} from "../_types/agency";
-
-let msgConfig = config.message
-let TripDetailCols = TripDetail['$fieldnames'];
-let TripPlanCols = TripPlan['$fieldnames'];
 
 class TripPlanModule {
     /**
@@ -1583,7 +1578,7 @@ class TripPlanModule {
     
     @clientExport
     static async getTripApproves(options: any): Promise<FindResult> {
-        let staff = await Staff.getCurrent();
+        //let staff = await Staff.getCurrent();
         if(!options.where) options.where = {};
         options.order = options.order || [['start_at', 'desc'], ['created_at', 'desc']];
         let paginate = await Models.tripApprove.find(options);

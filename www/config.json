@@ -1,5 +1,5 @@
 {
   "update": "./",
   "api": "/API",
-  "debug": false
+  "debug": true
 }

@@ -7,14 +7,14 @@ import {EAccountType} from "./_types/index";
  */
 const API = require("common/api");
 const _ = require("lodash");
-const L = require("common/language");
+import L from 'common/language';
 const Models = require("api/_types").Models;
 
 export function requirePermit(permits: string| string[], type?: number) {
     return function (target, key, desc) {
         let fn = desc.value;
         desc.value = async function (...args) {
-            let context = Zone.current.get('context');
+            //let context = Zone.current.get('context');
             let session = getSession();
             let account = Models.account.get(session.accountId);
             if(!account)

@@ -1,10 +1,10 @@
-import { regApiType } from 'common/api/helper';
-import { Models, EAccountType } from './index';
-import {Types, Values} from 'common/model';
-import validator = require("validator");
-import * as L from 'common/language';
-import { Table, Create, Field, TableIndex } from 'common/model/common';
+
+import L from 'common/language';
+import { Table, TableIndex, Create, Field } from 'common/model/common';
+import { Models, EAccountType } from 'api/_types';
 import { ModelObject } from 'common/model/object';
+import { Types } from 'common/model';
+import validator = require("validator");
 
 export enum ACCOUNT_STATUS {
     ACTIVE = 1,
@@ -12,25 +12,10 @@ export enum ACCOUNT_STATUS {
     FORBIDDEN = -1
 };
 
-@regApiType('API.')
-class AuthCert {
-    timestamp: string
-    token_id: string
-    user_id: string
-    token_sign: string
-
-    constructor(obj: any) {
-        this.timestamp = obj.timestamp;
-        this.token_id = obj.token_id;
-        this.user_id = obj.user_id;
-        this.token_sign = obj.token_sign;
-    }
-}
-
 @Table(Models.account, "auth.")
 @TableIndex('email', {unique: true})
 @TableIndex('mobile', {unique: true})
-class Account extends ModelObject{
+export class Account extends ModelObject{
     constructor(target: Object) {
         super(target);
     }
@@ -125,58 +110,3 @@ class Account extends ModelObject{
         }
     }
 }
-
-
-@Table(Models.token, "auth.")
-class Token extends ModelObject{
-    @Field({type: Types.UUID})
-    get id() { return null};
-    set id(id: string) {}
-
-    @Field({type: Types.UUID})
-    get accountId() {return null};
-    set accountId(accountId: string){}
-
-    @Field({type: Types.STRING})
-    get token() { return null};
-    set token(token: string) {}
-
-    @Field({type: Types.DATE})
-    get refreshAt() { return null};
-    set refreshAt(refreshDate) {}
-
-    @Field({type: Types.DATE})
-    get expireAt() { return null;}
-    set expireAt(expireAt) {}
-
-    @Field({type: Types.STRING})
-    get os() { return null;}
-    set os(os: string) {}
-}
-
-@Table(Models.accountOpenid, "auth.")
-class AccountOpenid extends ModelObject{
-    constructor(target: Object) {
-        super(target);
-    }
-    @Create()
-    static create(obj?: Object): AccountOpenid { return null; }
-
-    @Field({type: Types.UUID})
-    get id(): string { return Values.UUIDV1(); }
-    set id(val: string) {}
-
-    @Field({type: Types.UUID})
-    get accountId() {return null};
-    set accountId(accountId: string){}
-
-    @Field({type: Types.STRING})
-    get appId() {return null};
-    set appId(appId: string){}
-
-    @Field({type: Types.STRING})
-    get openId() { return null};
-    set openId(openId: string) {}
-}
-
-export {AuthCert, Account, Token, AccountOpenid}

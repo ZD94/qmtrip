@@ -1,5 +1,5 @@
 
-import L = require('common/language');
+import L from 'common/language';
 import { Models } from '../_types';
 import { clientExport } from 'common/api/helper';
 
