@@ -1,3 +1,3 @@
 
-export {Company, ECompanyStatus} from './company';
-export {MoneyChange} from './money-change';
+export * from './company';
+export * from './money-change';

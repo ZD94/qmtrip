@@ -18,11 +18,11 @@ import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus,
     TripApprove, EApproveStatus, EApproveResult
 } from "api/_types/tripPlan";
-import {Models} from "api/_types/index";
+import {Models} from "api/_types";
 import {FindResult} from "common/model/interface";
 import {Staff, EStaffRole, EStaffStatus} from "api/_types/staff";
 import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
-import {getSession} from "common/model/index";
+import {getSession} from "common/model";
 import {AgencyUser} from "../_types/agency";
 
 class TripPlanModule {

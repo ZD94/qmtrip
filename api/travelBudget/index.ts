@@ -17,7 +17,7 @@ import {ITicket, TravelBudgeItem, TRAFFIC} from "api/_types/travelbudget";
 import {
     TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
 } from "./strategy/index";
-import {loadDefaultPrefer} from "./prefer/index";
+import {loadDefaultPrefer} from "./prefer";
 
 // const defaultPrice = {
 //     "5": 500,

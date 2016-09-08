@@ -7,7 +7,7 @@ import {ITicket, IFinalTicket, TravelBudgeItem, IHotel, IFinalHotel} from "api/_
 import {ticketPrefers, hotelPrefers} from '../prefer'
 import {EInvoiceType} from "api/_types/tripPlan";
 import {IPrefer} from '../prefer'
-import {Models} from "../../_types/index";
+import {Models} from "api/_types/index";
 
 function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
     let _tickets : IFinalTicket[] = [];

@@ -10,7 +10,7 @@ let Logger = require('common/logger');
 let logger = new Logger('company');
 
 import {requireParams, clientExport} from "common/api/helper";
-import {Models} from "api/_types/index";
+import {Models} from "api/_types";
 import {Company, MoneyChange} from 'api/_types/company';
 import {Staff, EStaffRole} from "api/_types/staff";
 import {Agency, AgencyUser, EAgencyUserRole} from "api/_types/agency";

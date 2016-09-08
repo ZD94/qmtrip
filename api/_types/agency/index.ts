@@ -1,4 +1,4 @@
 
-export {Agency} from './agency';
-export {AgencyUser, EAgencyStatus, EAgencyUserRole} from './agency-user'
+export * from './agency';
+export * from './agency-user'
 
