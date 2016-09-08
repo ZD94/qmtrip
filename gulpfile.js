@@ -44,7 +44,7 @@ gulplib.bundle_lib('preload', {ex: true, require:[
 gulplib.bundle_lib('api', {require: ['common/client/api:common/api', 'common/api/helper', 'common/language']});
 gulplib.bundle_lib('calendar', {require: ['lunar-calendar', "calendar"]});
 gulplib.bundle_lib('msgbox', {require: ['notie', 'msgbox']});
-gulplib.bundle_lib('nglibs', {require: ['nglibs', 'api/_types', 'api/_types/*', 'common/model/client:common/model']});
+gulplib.bundle_lib('nglibs', {require: ['nglibs', 'api/_types', 'api/_types/**/*', 'common/model/client:common/model']});
 gulplib.bundle_lib('ngapp', {require: ['common/client/ngapp/index.ts:ngapp', 'browserspec']});
 
 //gulplib.angular_app('staff');
@@ -156,7 +156,7 @@ gulp.task('ionic.www.clean', function () {
     var del = require('del');
     return del('ionic/www');
 });
-gulp.task('ionic.www.files', ['post.manifest', 'ionic.www.clean'], function () {
+gulp.task('ionic.www.files', ['manifest', 'ionic.www.clean'], function () {
     var filter = require('gulp-filter');
     return ionic_files()
         .pipe(gulp.dest('ionic/www'));
