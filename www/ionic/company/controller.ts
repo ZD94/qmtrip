@@ -72,6 +72,7 @@ export async function BudgetController($scope) {
         $scope.statistic = statistic;
         $scope.saveMoneyChart.data = [statistic.savedMoney || 0, statistic.expenditure || 1];
     }
+
 }
 
 export async function BudgetStatisticsController($scope, $stateParams, Models) {

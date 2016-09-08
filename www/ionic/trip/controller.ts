@@ -39,7 +39,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
     require('./trip.scss');
     API.require('tripPlan');
     await API.onload();
-
     /*******************出差补助选择begin************************/
     $scope.currentStaff = await Staff.getCurrent();
     $scope.currentTp = await $scope.currentStaff.getTravelPolicy();
@@ -206,7 +205,8 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
             $scope.trip.beginDate = value.begin;
             $scope.trip.endDate = value.end;
         }
-    }
+
+    };
 
     $scope.endDateSelector = {
         beginDate: $scope.trip.beginDate,
