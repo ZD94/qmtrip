@@ -78,15 +78,17 @@
 
 //适配iPhone5的menu高度
 @media (max-width: 320px){
-  .button-bar{
-    &.jl_approvelist{
-      .button{
-        padding: 2px 0px 1px;
-      }
-      :nth-child(1){
-        flex:0;
-        -webkit-flex: 0;
-        min-width:54px;
+  #page3{
+    .button-bar{
+      &.jl_approvelist{
+        .button{
+          padding: 2px 0px 1px;
+        }
+        :nth-child(1){
+          flex:0;
+          -webkit-flex: 0;
+          min-width:54px;
+        }
       }
     }
   }

@@ -156,14 +156,14 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
         $scope.MPlaneLevel = MPlaneLevel;
         $scope.MHotelLevel = MHotelLevel;
         if (policy) {   //判断是否设置差旅标准
-            var show = $ionicPopup.alert({
+            $ionicPopup.alert({
                 title: '差旅标准',
                 scope: $scope,
                 cssClass:'policyPopup',
                 template: require('./policyPopupTemplate.html')
             })
         } else {
-            var show = $ionicPopup.alert({   //定义show的原因是避免页面加载就执行
+            $ionicPopup.alert({   //定义show的原因是避免页面加载就执行
                 title: '提示',
                 template: '暂未设置差旅标准,请设置后查看'
             })

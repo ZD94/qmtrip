@@ -5,7 +5,8 @@ import { Company} from 'api/_types/company';
 import { Types, Values } from 'common/model';
 import { Table, Create, Field, ResolveRef, Reference, TableIndex } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
-import {PaginateInterface} from "../../common/model/interface";
+import {PaginateInterface} from "common/model/interface";
+
 declare var API: any;
 
 export enum EPlanStatus {

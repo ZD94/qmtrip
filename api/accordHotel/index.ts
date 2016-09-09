@@ -2,17 +2,11 @@
  * Created by wyl on 15-12-12.
  */
 'use strict';
-var sequelize = require("common/model").DB;
-var DBM = sequelize.models;
-import _ = require('lodash');
-var API = require("common/api");
-let L = require("common/language");
-import {validateApi, requireParams, clientExport} from 'common/api/helper';
-import {requirePermit, conditionDecorator, condition} from "../_decorator";
-import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_types/staff";
-import types = require("api/_types/accordHotel");
+import {requireParams, clientExport} from 'common/api/helper';
+import {conditionDecorator, condition} from "../_decorator";
+import {Staff} from "api/_types/staff";
 import { AccordHotel } from 'api/_types/accordHotel';
-import { Models, EAccountType } from 'api/_types';
+import { Models } from 'api/_types';
 import {FindResult} from "common/model/interface";
 
 const accordHotelCols = AccordHotel['$fieldnames'];
@@ -74,7 +68,6 @@ class AccordHotelModule{
     ])
     static async updateAccordHotel(params) : Promise<AccordHotel>{
         var id = params.id;
-        var staff = await Staff.getCurrent();
 
         var ah = await Models.accordHotel.get(id);
         for(var key in params){
@@ -141,7 +134,6 @@ class AccordHotelModule{
     ])
     static async getAccordHotels(params): Promise<FindResult>{
         var staff = await Staff.getCurrent();
-        let companyId = params.companyId;
 
         var options: any = {
             // where:  _.pick(params, Object.keys(DBM.AccordHotel.attributes))

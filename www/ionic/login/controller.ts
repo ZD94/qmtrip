@@ -3,7 +3,6 @@ var Cookie = require('tiny-cookie');
 var msgbox = require('msgbox');
 var API = require('common/api');
 import validator = require('validator');
-import { Staff } from "api/_types/staff";
 
 API.require('auth');
 
@@ -84,7 +83,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
 
             window.location.href = backUrl;
         } catch (err) {
-            var str = err.msg;
+            //var str = err.msg;
             /*if(err.code == -28 && err.msg == "您的账号还未激活"){
                 $scope.unactivated = true;
             }else */
@@ -98,7 +97,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
         }
 
         function showEmailPopup(){
-            var nshow = $ionicPopup.show({
+            $ionicPopup.show({
                 title:'邮箱未激活',
                 cssClass:'showAlert',
                 template: '<div class="popupDiv"><span>请激活后再进行登录</span><br><span>邮箱：'+$scope.form.account+'</span></div>',
@@ -132,7 +131,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
         }
 
         function showSendEmailSuccess(){
-            var nshow = $ionicPopup.show({
+            $ionicPopup.show({
                 template: '<div class="popupDiv"><p>邮箱：{{form.account}}</p><br><h2><i class="ion-checkmark-circled"></i>激活邮件发送成功！</h2><br><span>请点击邮件中的链接完成激活，即可点击下方立即登录按钮进入系统，链接有效期24个小时</span></div>',
                 cssClass:'showAlert',
                 scope: $scope,
@@ -149,7 +148,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
         }
 
         function showMobilePopup(){
-            var nshow = $ionicPopup.show({
+            $ionicPopup.show({
                 title: '手机未激活',
                 template: '<div class="popupDiv"><span>请获取验证码激活</span><br><h2>手机号：'+$scope.form.account+'</h2>' +
                 '<div class="item item-input"> <input type="text" placeholder="请输入验证码" ng-model="form.msgCode"> ' +
@@ -187,7 +186,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
         }
 
         function showCheckMobileSuccess(){
-            var nshow = $ionicPopup.show({
+            $ionicPopup.show({
                 title: '激活成功！',
                 template: '<span>手机号：'+$scope.form.account+'</span>',
                 scope: $scope,
@@ -255,6 +254,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
 }
 
 export async function CompanyRegisterController ($scope, $stateParams){
+
     API.require("checkcode");
     API.require("auth");
     await API.onload();
@@ -266,7 +266,6 @@ export async function CompanyRegisterController ($scope, $stateParams){
         name:'',
         userName:''
     };
-
     $scope.showCount = false;
     $scope.beginCountDown = function(){
         $scope.showCount = true;
@@ -363,7 +362,7 @@ export async function TestController($scope) {
                 .then(function(content) {
                     // new QRCode(document.getElementById("qrcode"), content);
                     var qrcode = require('arale-qrcode');
-                    var browser = navigator.appName;
+                    //var browser = navigator.appName;
                     var b_version = navigator.appVersion;
                     var version = b_version.split(";");
                     if (version.length > 1) {
@@ -654,7 +653,7 @@ export async function InvitedStaffOneController ($scope, $stateParams, $storage 
                 $scope.comoany = result.company;
                 if(auth_data && auth_data.user_id && $scope.inviter && auth_data.user_id == $scope.inviter.id){
                     //显示遮罩层
-                    var show = $ionicPopup.show({
+                    $ionicPopup.show({
                         template: '<p>请使用浏览器分享功能<br>将页面分享给好友</p>',
                         cssClass: 'share_alert'
                     })

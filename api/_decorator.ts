@@ -1,20 +1,20 @@
 import { getSession } from '../common/model/index';
 import { Staff, EStaffRole } from './_types/staff';
 import { AgencyUser } from './_types/agency';
-import {EAccountType} from "./_types/index";
+import {EAccountType} from "./_types";
 /**
  * Created by wlh on 16/5/16.
  */
 const API = require("common/api");
 const _ = require("lodash");
-const L = require("common/language");
+import L from 'common/language';
 const Models = require("api/_types").Models;
 
 export function requirePermit(permits: string| string[], type?: number) {
     return function (target, key, desc) {
         let fn = desc.value;
         desc.value = async function (...args) {
-            let context = Zone.current.get('context');
+            //let context = Zone.current.get('context');
             let session = getSession();
             let account = Models.account.get(session.accountId);
             if(!account)

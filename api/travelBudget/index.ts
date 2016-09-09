@@ -4,11 +4,11 @@
 import { clientExport } from 'common/api/helper';
 import {Models } from 'api/_types'
 import {ETripType, EInvoiceType} from "../_types/tripPlan";
-import {EHotelLevel, EPlaneLevel, ETrainLevel, MHotelLevel, MPlaneLevel, MTrainLevel} from "../_types/travelPolicy";
+import {EPlaneLevel, ETrainLevel, MTrainLevel} from "../_types/travelPolicy";
 import {Staff} from "../_types/staff";
 const API = require("common/api");
 const validate = require("common/validate");
-const L = require("common/language");
+import L from 'common/language';
 const moment = require('moment');
 const cache = require("common/cache");
 const utils = require("common/utils");
@@ -17,14 +17,14 @@ import {ITicket, TravelBudgeItem, TRAFFIC} from "api/_types/travelbudget";
 import {
     TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
 } from "./strategy/index";
-import {loadDefaultPrefer} from "./prefer/index";
+import {loadDefaultPrefer} from "./prefer";
 
-const defaultPrice = {
-    "5": 500,
-    "4": 450,
-    "3": 400,
-    "2": 350
-}
+// const defaultPrice = {
+//     "5": 500,
+//     "4": 450,
+//     "3": 400,
+//     "2": 350
+// }
 
 export interface BudgetOptions{
     originPlace: string,
@@ -381,7 +381,7 @@ export default class ApiTravelBudget {
             leaveDate = moment(leaveDate).format("YYYY-MM-DD");
         }
 
-        let companyPolicy = staff.company.budgetPolicy;
+        //let companyPolicy = staff.company.budgetPolicy;
         let m_originCity = await API.place.getCityInfo({cityCode: originPlace.id || originPlace});
         let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
 
@@ -451,7 +451,7 @@ export default class ApiTravelBudget {
     static async reportBudgetError(params: { budgetId: string}) {
         let {accountId} = Zone.current.get('session');
         let {budgetId} = params;
-        let staff = await Staff.getCurrent();
+        //let staff = await Staff.getCurrent();
         let content = await ApiTravelBudget.getBudgetInfo({id: budgetId, accountId: accountId});
         let budgets = content.budgets;
         let ps = budgets.map( async (budget): Promise<any> => {
