@@ -77,34 +77,50 @@ let ddTalkMsgHandle = {
         let isvApi = new ISVApi(config.suiteid, suiteToken, corpid, permanentCode);
         let authInfo: any = await isvApi.getCorpAuthInfo();
         let authUserInfo = authInfo.auth_user_info;
-        let authCorpInfo = authInfo.auth_corp_info;
+        // let authCorpInfo = authInfo.auth_corp_info;
 
         let corpAccessToken = await isvApi.getCorpAccessToken();
         let corpApi = new CorpApi(corpAccessToken);
         let userInfo: any = await corpApi.getUser(authUserInfo.userId);
-        console.info(userInfo);
 
-        //创建企业
-        let company = Company.create({name: corp_name});
-        company = await company.save();
+        let corps = await Models.ddtalkCorp.find({where : {corpId: corpid}});
+        if (corps && corps.length) {
+            let corp = corps[0];
+            let company = await corp.getCompany(corp['company_id']);
+            company.status = 1;
+            company = await company.save();
 
-        //钉钉关联企业信息
-        let obj = {corpId: corpid, permanentCode: permanentCode, companyId: company.id, isSuiteRelieve: false}
-        let ddtalkCorp = Models.ddtalkCorp.create(obj);
-        await ddtalkCorp.save();
-        //管理员信息
-        let staff = Staff.create({
-            name: userInfo.name,
-            companyId: company.id,
-        })
-        staff = await staff.save();
-        let _ddtalkUser = {
-            id: staff.id,
-            dingId: userInfo.dingId,
-            userId: userInfo.userid,
-            isAdmin: userInfo.isAdmin}
-        let ddtalkUser = Models.ddtalkUser.create(_ddtalkUser);
-        await ddtalkUser.save();
+            corp.isSuiteRelieve = false;
+            corp.permanentCode = permanentCode;
+            corp = await corp.save();
+        } else {
+            //创建企业
+            let company = Company.create({name: corp_name});
+            company = await company.save();
+
+            //钉钉关联企业信息
+            let obj = {
+                corpId: corpid,
+                permanentCode: permanentCode,
+                companyId: company.id,
+                isSuiteRelieve: false}
+            let ddtalkCorp = Models.ddtalkCorp.create(obj);
+            await ddtalkCorp.save();
+            //管理员信息
+            let staff = Staff.create({
+                name: userInfo.name,
+                companyId: company.id,
+                status: 1
+            })
+            staff = await staff.save();
+            let _ddtalkUser = {
+                id: staff.id,
+                dingId: userInfo.dingId,
+                userId: userInfo.userid,
+                isAdmin: userInfo.isAdmin}
+            let ddtalkUser = Models.ddtalkUser.create(_ddtalkUser);
+            await ddtalkUser.save();
+        }
     },
 
     /* * * * * 授权变更* * * * * * */
@@ -114,13 +130,23 @@ let ddTalkMsgHandle = {
 
     /* * * * 解除授权信息 * * * */
     suite_relieve: async function(msg) {
-        console.info('解除授权', msg);
-        return msg;
+        let corpId = msg.AuthCorpId;
+        let corps = await Models.ddtalkCorp.find({where: {corpId: corpId}});
+        if (corps && corps.length) {
+            let corp = corps[0];
+            corp.isSuiteRelieve = true;
+            corp.permanentCode = null;
+            corp = await corp.save()
+
+            //禁用企业
+            let company = await corp.getCompany(corp['company_id']);
+            company.status = -1;
+            await company.save();
+        }
     },
 
     /* * * 保存授权信息 * */
     suite_ticket: async function(msg) {
-        console.info("suite_ticket===>", msg)
         let ticket = msg.SuiteTicket;
         await cache.write(CACHE_KEY, JSON.stringify({ticket: ticket, timestamp: msg.TimeStamp}));
         return msg;
