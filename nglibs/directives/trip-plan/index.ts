@@ -88,7 +88,8 @@ angular
                 title: '@',
                 budget: '@',
                 showUploader: '@',
-                item: '='
+                item: '=',
+                remark: '@'
             },
             controller: function($scope, $ionicPopup) {
                 //设置上传路径

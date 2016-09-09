@@ -54,7 +54,7 @@
                         </div>
                         <div class="right-div">
                             <p>实际节省(元)</p>
-                            <h2 class="ng-binding" style="text-align: center;">{{en.savedMoney || 0}}</h2>
+                            <h2 class="ng-binding" style="text-align: center;">{{en.isSpecialApprove? 0 : (en.savedMoney || 0)}}</h2>
                         </div>
                     </ion-item>
                 </ion-list>

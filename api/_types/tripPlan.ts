@@ -42,6 +42,7 @@ export enum ETripType {
     BACK_TRIP = 1,
     HOTEL = 2,
     SUBSIDY = 3,
+    SPECIAL_APPROVE = 4
 }
 
 export enum EInvoiceType {
@@ -49,6 +50,7 @@ export enum EInvoiceType {
     PLANE = 1,
     HOTEL = 2,
     SUBSIDY = 3,
+    SPECIAL_APPROVE = 4
 }
 
 export enum  EAuditStatus {
@@ -136,6 +138,14 @@ export class TripPlan extends ModelObject {
     @Field({type: Types.BOOLEAN})
     get isNeedHotel(): boolean { return false; }
     set isNeedHotel(val: boolean) {}
+
+    @Field({type: Types.BOOLEAN})
+    get isSpecialApprove(): boolean { return false; }
+    set isSpecialApprove(val: boolean) {}
+
+    @Field({type: Types.TEXT})
+    get specialApproveRemark(): string { return ''; }
+    set specialApproveRemark(val: string) {}
 
     @Field({ type: Types.JSONB})
     get query() : any { return null};
@@ -540,6 +550,14 @@ export class TripApprove extends ModelObject{
     @Field({type: Types.TEXT})
     get approvedUsers(): string { return ''; }
     set approvedUsers(val: string) {}
+
+    @Field({type: Types.BOOLEAN})
+    get isSpecialApprove(): boolean { return false; }
+    set isSpecialApprove(val: boolean) {}
+
+    @Field({type: Types.TEXT})
+    get specialApproveRemark(): string { return ''; }
+    set specialApproveRemark(val: string) {}
 
     @Field({type: Types.DATE})
     get startAt(): Date { return null; }

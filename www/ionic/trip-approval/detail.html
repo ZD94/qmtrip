@@ -40,7 +40,7 @@
 
                 <div class="spacer" style="width: 285px; height: 17px;"></div>
 
-                <div>
+                <div ng-if="!tripApprove.isSpecialApprove">
                     <ion-item class="item-divider"><span>交通</span><span class="spanRight">{{trafficBudget}}元</span></ion-item>
                     <ion-item ng-repeat="item in traffic">
                         <span>{{item.startTime | date: 'yyyy-MM-dd'}}</span>
@@ -83,7 +83,14 @@
                             {{item.price / item.duringDays | currency: ''}}元/天
                         </span>
                     </ion-item>
+                </div>
 
+                <div ng-if="tripApprove.isSpecialApprove">
+                    <ion-item class="item-divider"><span>特别审批</span></ion-item>
+                    <ion-item>
+                        {{tripApprove.specialApproveRemark}}<br>
+                        {{tripApprove.budget| currency: ''}}元
+                    </ion-item>
                 </div>
 
             </ion-scroll>

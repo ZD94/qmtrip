@@ -8,6 +8,7 @@ import { Models } from 'api/_types';
 import {
     TripDetail, EPlanStatus, ETripType, EInvoiceType, MTxPlaneLevel
 } from "api/_types/tripPlan";
+import trim = require("lodash/trim");
 var msgbox = require('msgbox');
 
 
@@ -312,6 +313,63 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
         }
     }
 
+    $scope.specialApprove = async function() {
+        API.require("travelBudget");
+        await API.onload();
+
+        let trip = $scope.trip;
+
+        if(!trip.place || !trip.place.id) {
+            $scope.showErrorMsg('请填写出差目的地！');
+            return false;
+        }
+
+        if(!trip.reasonName) {
+            $scope.showErrorMsg('请填写出差事由！');
+            return false;
+        }
+
+        if(!trip.traffic && ! trip.hotel) {
+            $scope.showErrorMsg('请选择交通或者住宿！');
+            return false;
+        }
+
+        if(trip.traffic && (!trip.fromPlace || !trip.fromPlace.id)) {
+            $scope.showErrorMsg('请选择出发地！');
+            return false;
+        }
+
+        let params = {
+            originPlace: trip.fromPlace? trip.fromPlace.id : '',
+            destinationPlace: trip.place ? trip.place.id : '',
+            leaveDate: moment(trip.beginDate).format('YYYY-MM-DD'),
+            goBackDate: moment(trip.endDate).format('YYYY-MM-DD'),
+            latestArrivalTime: moment(trip.beginDate).format('HH:mm'),
+            // leaveTime: moment(trip.beginDate).format('HH:mm'),
+            // goBackTime: moment(trip.endDate).format('HH:mm'),
+            earliestGoBackTime: moment(trip.endDate).format('HH:mm'),
+            isNeedTraffic: trip.traffic,
+            isRoundTrip: trip.round,
+            isNeedHotel: trip.hotel,
+            businessDistrict: trip.hotelPlace,
+            hotelName: trip.hotelName,
+        };
+
+        if(params.originPlace == params.destinationPlace){
+            msgbox.log("出差地点和出发地不能相同");
+            return false;
+        }
+
+        try {
+            let budget = await API.travelBudget.getTravelPolicyBudget(params);
+            $loading.end();
+            window.location.href = "#/trip/special-approve?params="+JSON.stringify(params);
+        } catch(err) {
+            $loading.end();
+            alert(err.msg || err);
+        }
+    }
+
     $scope.checkDate = function(isStartTime?: boolean) {
         let beginDate = trip.beginDate;
         let endDate = trip.endDate;
@@ -441,6 +499,76 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     }
 }
 
+export async function SpecialApproveController($scope, $storage, Models, $stateParams, $ionicLoading){
+    require('./trip.scss');
+    require('./budget.scss');
+    API.require("tripPlan");
+    API.require("travelBudget");
+    await API.onload();
+
+    var query = JSON.parse($stateParams.params);
+    let trip = $storage.local.get("trip");
+    trip.beginDate = query.leaveDate;
+    trip.endDate  = query.goBackDate;
+    // trip.createAt = new Date(result.createAt);
+
+    if(query.originPlace) {
+        let originPlace = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace});
+        trip.originPlaceName = originPlace.name;
+    }
+    let destination = await API.place.getCityInfo({cityCode: query.destinationPlace.id || query.destinationPlace});
+    trip.destinationPlaceName = destination.name;
+    $scope.trip = trip;
+    let totalPrice: number = 0;
+
+    $scope.totalPrice = totalPrice;
+
+    $scope.staffSelector = {
+        query: async function(keyword) {
+            let staff = await Staff.getCurrent();
+            let staffs = await staff.company.getStaffs({where: {id: {$ne: staff.id}}});
+            return staffs;
+        },
+        display: (staff)=>staff.name
+    };
+
+    $scope.saveSpecialTripPlan = async function() {
+        let trip = $scope.trip;
+
+        if(!trip.auditUser) {
+            $scope.showErrorMsg('请选择审核人！');
+            return false;
+        }
+        if(!trip.specialApproveRemark) {
+            $scope.showErrorMsg('请输入审批说明！');
+            return false;
+        }
+        if(!trip.budget) {
+            $scope.showErrorMsg('请输入预算金额！');
+            return false;
+        }
+        var re = /^[0-9]+.?[0-9]*$/;
+        if(trip.budget && !re.test(trip.budget)){
+            msgbox.log("预算金额必须为数字");
+            return false;
+        }
+
+        await $ionicLoading.show({
+            template: "保存中...",
+            hideOnStateChange: true
+        });
+
+        try {
+            let tripApprove = await API.tripPlan.saveSpecialTripApprove({query: query, title: trip.reason||trip.reasonName, approveUserId: trip.auditUser.id, budget: trip.budget, specialApproveRemark: trip.specialApproveRemark});
+            window.location.href = '#/trip/committed?id='+tripApprove.id;
+        } catch(err) {
+            alert(err.msg || err);
+        } finally {
+            $ionicLoading.hide();
+        }
+    }
+}
+
 export async function CommittedController($scope, $stateParams, Models){
     let id = $stateParams.id;
     let tripApprove = await Models.tripApprove.get(id);
@@ -564,6 +692,8 @@ export async function ListDetailController($location, $scope , Models, $statePar
     let hotelTotalBudget: number = 0;
     let subsidyBudgets = [];    //补助
     let subsidyTotalBudget: number = 0;
+    let specialApproveBudgets = [];    //特别审批
+    let specialApproveTotalBudget: number = 0;
 
     budgets.forEach( (budget) => {
         switch(budget.type) {
@@ -579,6 +709,10 @@ export async function ListDetailController($location, $scope , Models, $statePar
             case ETripType.SUBSIDY:
                 subsidyBudgets.push(budget);
                 subsidyTotalBudget = countBudget(subsidyTotalBudget, budget.budget);
+                break;
+            case ETripType.SPECIAL_APPROVE:
+                specialApproveBudgets.push(budget);
+                specialApproveTotalBudget = countBudget(specialApproveTotalBudget, budget.budget);
                 break;
         }
     });
@@ -607,6 +741,8 @@ export async function ListDetailController($location, $scope , Models, $statePar
     $scope.hotelTotalBudget = hotelTotalBudget;
     $scope.subsidyBudgets = subsidyBudgets;
     $scope.subsidyTotalBudget = subsidyTotalBudget;
+    $scope.specialApproveBudgets = specialApproveBudgets;
+    $scope.specialApproveTotalBudget = specialApproveTotalBudget;
 
     $scope.showAlterDialog = function () {
         $scope.reject = {reason: ''};

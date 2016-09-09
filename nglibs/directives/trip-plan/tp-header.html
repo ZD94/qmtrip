@@ -6,10 +6,14 @@
             总预算:<span style="font-size: 20px;font-weight: bold;">{{trip.budget == -1 ? '暂无预算' : (trip.budget| currency: '')}}</span>
             {{trip.budget == -1 ? '' : '元'}}
         </p>
-        <p style="text-align: center" ng-if="trip.status == EPlanStatus.COMPLETE">
-            <span ng-show="trip.budget-trip.expenditure >= 0">节省:<span style="font-size: 20px;font-weight: bold;">{{trip.budget == -1 ? '暂无预算' : (trip.budget-trip.expenditure)}}</span></span>
-            <span ng-hide="trip.budget-trip.expenditure >= 0">超支:<span style="font-size: 20px;font-weight: bold;">{{trip.budget == -1 ? '暂无预算' : (trip.expenditure-trip.budget)}}</span></span>
+        <p style="text-align: center" ng-if="trip.status == EPlanStatus.COMPLETE && !trip.isSpecialApprove">
+            <span ng-show="trip.budget-trip.expenditure >= 0">节省:　<span style="font-size: 20px;font-weight: bold;">{{trip.budget == -1 ? '暂无预算' : (trip.budget-trip.expenditure)}}</span></span>
+            <span ng-hide="trip.budget-trip.expenditure >= 0">超支:　<span style="font-size: 20px;font-weight: bold;">{{trip.budget == -1 ? '暂无预算' : (trip.expenditure-trip.budget)}}</span></span>
             {{trip.budget == -1 ? '' : '元'}}
+        </p>
+        <p style="text-align: center" ng-if="trip.status == EPlanStatus.COMPLETE && trip.isSpecialApprove">
+            <span>节省:　<span style="font-size: 20px;font-weight: bold;">0</span></span>
+            元
         </p>
         <div class="row" ng-if="trip.status == EPlanStatus.COMPLETE">
             <div class="jingli_divider"></div>
