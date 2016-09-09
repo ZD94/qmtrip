@@ -212,6 +212,9 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
         endDate: moment().add(1, 'year').toDate(),
         timepicker: true
     };
+    $scope.$watch('trip.beginDate', function(n, o){
+        $scope.endDateSelector.beginDate = $scope.trip.beginDate;
+    })
     $scope.nextStep = async function() {
         if ($scope.currentTpSts.length && (!$scope.subsidy || !$scope.subsidy.template)) {
             $scope.showErrorMsg('请选择补助信息');
