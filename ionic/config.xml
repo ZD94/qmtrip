@@ -11,6 +11,9 @@
   <access origin="*"/>
   <access origin="cdvfile://*"/>
   <allow-intent href="cdvfile://*"/>
+  <allow-intent href="sms:*" />
+  <allow-intent href="tel:*" />
+  <allow-intent href="geo:*" />
   <preference name="webviewbounce" value="false"/>
   <preference name="UIWebViewBounce" value="false"/>
   <preference name="DisallowOverscroll" value="true"/>
