@@ -2,7 +2,7 @@
   {
     "name": "arrivalTime",
     "options": {
-      "score": -100,
+      "score": -20000,
       "begin": "",
       "end": "<%=leaveDate%> <%=latestArrivalTime%>"
     }
@@ -10,7 +10,7 @@
   {
     "name": "departTime",
     "options": {
-      "score": -100,
+      "score": -20000,
       "begin": "<%=leaveDate%> <%=earliestLeaveTime%>",
       "end": ""
     }
@@ -18,7 +18,7 @@
   {
     "name": "cabin",
     "options": {
-      "score": 500
+      "score": 10000
     }
   },
   {
@@ -26,7 +26,7 @@
     "options": {
       "selectTrainDuration": 360,
       "selectFlightDuration": 210,
-      "score": 500,
+      "score": 10000,
       "commonTrainScore": -1000
     }
   },
