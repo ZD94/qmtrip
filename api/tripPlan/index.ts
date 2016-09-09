@@ -1300,8 +1300,8 @@ class TripPlanModule {
 
         let tripPlan = TripPlan.create(tripApprove);
         tripPlan.auditUser = staff.id;
-        tripPlan.startAt = tripApprove.startAt;
-        tripPlan.backAt = tripApprove.backAt;
+        tripPlan.startAt = moment(tripApprove.startAt["value"]).format(formatStr);
+        tripPlan.backAt = moment(tripApprove.backAt["value"]).format(formatStr);
         tripPlan.id = tripApprove.id;
         tripPlan.project = tripApprove.project;
         tripPlan.account = tripApprove.account;

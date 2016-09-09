@@ -504,8 +504,6 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
     await API.onload();
 
     var query = JSON.parse($stateParams.params);
-    console.info(query);
-    console.info("queryqueryqueryquery");
     let trip = $storage.local.get("trip");
     trip.beginDate = query.leaveDate;
     trip.endDate  = query.goBackDate;

@@ -57,7 +57,11 @@
                             </div>
                         </td>
 
-                        <td ng-if="[0, 1, 2, 3].indexOf(tripDetail.type) < 0" align="center">未知类型</td>
+                        <td ng-if="tripDetail.type == 4" align="center">
+                            特别审批
+                        </td>
+
+                        <td ng-if="[0, 1, 2, 3, 4].indexOf(tripDetail.type) < 0" align="center">未知类型</td>
 
                         <td width="135" align="center">
                             <span ng-if="tripDetail.budget != -1">¥{{tripDetail.budget| currency: ''}}</span>
