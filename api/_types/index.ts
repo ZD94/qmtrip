@@ -11,6 +11,7 @@ import {Seed} from "./seed";
 import { ModelInterface } from 'common/model/interface';
 import { ModelDelegate } from 'common/model/delegate';
 import {TravelBudgetLog} from "./travelbudget";
+import {DDTalkCorp, DDTalkUser} from "./ddtalk";
 
 
 export enum EGender {
@@ -51,6 +52,9 @@ export interface ModelsInterface {
     account: ModelInterface<Account>;
     token: ModelInterface<Token>;
     accountOpenid: ModelInterface<AccountOpenid>;
+
+    ddtalkCorp: ModelInterface<DDTalkCorp>;
+    ddtalkUser: ModelInterface<DDTalkUser>;
 }
 
 export var Models: ModelsInterface = {
@@ -80,6 +84,10 @@ export var Models: ModelsInterface = {
     account: new ModelDelegate<Account>(),
     token: new ModelDelegate<Token>(),
     accountOpenid: new ModelDelegate<AccountOpenid>(),
+
+    ddtalkCorp: new ModelDelegate<DDTalkCorp>(),
+    ddtalkUser: new ModelDelegate<DDTalkUser>(),
+
 };
 
 export function initModels(models: ModelsInterface){
