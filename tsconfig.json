@@ -16,7 +16,10 @@
     }
   },
   "compilerOptionsNotUsing": {
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "noUnusedLocals": true
   },
   "exclude": [
     "node_modules",
