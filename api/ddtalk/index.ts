@@ -18,7 +18,6 @@ import request = require('request');
 import ISVApi = require("./lib/isvApi");
 import CorpApi = require("./lib/corpApi");
 import {reqProxy} from "./lib/reqProxy";
-import {DDTalkCorp, DDTalkUser} from "api/_types/ddtalk";
 import {Company} from "api/_types/company";
 import {Staff} from "api/_types/staff";
 import {Models} from "../_types/index";
