@@ -23,7 +23,7 @@
             <br/>
             <span style="font-weight: 100">实际</span>
         </div>
-        <div class="col">
+        <div class="col" ng-if="!trip.isSpecialApprove">
             <span ng-if="trip.budget - trip.expenditure >= 0">
                 <span style="color: green;">{{trip.budget - trip.expenditure | currency: ''}}元</span>
                 <br/>
@@ -33,6 +33,13 @@
                 <span style="color: red;">{{trip.expenditure - trip.budget| currency: ''}}元</span>
                 <br/>
                 <span style="font-weight: 100">超支</span>
+            </span>
+        </div>
+        <div class="col" ng-if="trip.isSpecialApprove">
+            <span>
+                <span style="color: green;">0元</span>
+                <br/>
+                <span style="font-weight: 100">节省</span>
             </span>
         </div>
     </div>

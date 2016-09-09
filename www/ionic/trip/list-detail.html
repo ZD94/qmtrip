@@ -28,7 +28,14 @@
                                     title="{{$index == 0? '补助': ''}}"
                                     budget="{{subsidyTotalBudget | currency: ''}}元"
                                     item="budget">
-
+                    </tp-detail-item>
+                    <!--特别审批-->
+                    <tp-detail-item ng-repeat="budget in specialApproveBudgets"
+                                    show-uploader="true"
+                                    title="{{$index == 0? '特别审批': ''}}"
+                                    budget="{{specialApproveTotalBudget | currency: ''}}元"
+                                    remark="{{tripDetail.specialApproveRemark}}"
+                                    item="budget">
                     </tp-detail-item>
                 </ion-list>
             </ion-scroll>

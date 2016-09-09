@@ -272,8 +272,8 @@ export async function RecordDetailController($scope, Models, $stateParams, $ioni
     $scope.isHasPermissionApprove = isHasPermissionApprove;
 
     let tripDetails = await tripPlan.getTripDetails();
-    let traffic = [], hotel = [], subsidys = [];
-    let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;
+    let traffic = [], hotel = [], subsidys = [], specialApproves = [];
+    let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0, specialApproveBudget = 0;
     let subsidyDays:number = moment(tripPlan.backAt).diff(moment(tripPlan.startAt), 'days');
     let totalBudget: number = 0;
     totalBudget = tripPlan.budget as number;
@@ -291,6 +291,10 @@ export async function RecordDetailController($scope, Models, $stateParams, $ioni
                 hotel.push(detail);
                 hotelBudget += detail.budget;
                 break;
+            case ETripType.SPECIAL_APPROVE:
+                specialApproves.push(detail);
+                specialApproveBudget += detail.budget;
+                break;
             default:
                 subsidys.push(detail);
                 subsidyBudget += detail.budget; break;
@@ -301,9 +305,11 @@ export async function RecordDetailController($scope, Models, $stateParams, $ioni
     $scope.traffic = traffic;
     $scope.hotel = hotel;
     $scope.subsidys = subsidys;
+    $scope.specialApproves = specialApproves;
     $scope.trafficBudget = trafficBudget;
     $scope.hotelBudget = hotelBudget;
     $scope.subsidyBudget = subsidyBudget;
+    $scope.specialApproveBudget = specialApproveBudget;
     $scope.subsidyDays = subsidyDays;
     $scope.approveResult = EAuditStatus;
     $scope.EPlanStatus = EPlanStatus;

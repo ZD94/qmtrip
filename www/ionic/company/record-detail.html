@@ -35,6 +35,13 @@
                             title="补助"
                             budget="{{subsidyBudget| currency: ''}}元">
             </tp-detail-item>
+
+            <tp-detail-item ng-repeat="s in specialApproves track by s.id"
+                            item="s"
+                            title="特别审批"
+                            remark="{{tripPlan.specialApproveRemark}}"
+                            budget="{{specialApproveBudget| currency: ''}}元">
+            </tp-detail-item>
         </ion-list>
     </ion-content>
 </ion-view>

@@ -44,6 +44,14 @@
             </span>
         </div>
 
+        <div ng-if="item.type == ETripType.SPECIAL_APPROVE">
+            <span>{{remark}}</span>
+            <br/>
+            <span ng-if="item.budget > 0">
+                {{item.budget | currency: ''}}元
+            </span>
+        </div>
+
         <div ng-if="item.type != ETripType.SUBSIDY" class="item-note detail_btn">
             <div ng-if="item.status == EPlanStatus.WAIT_UPLOAD">
                 <div class="uploadbtns button-small botton-outline button-positive"
