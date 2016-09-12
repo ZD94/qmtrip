@@ -354,7 +354,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         }
 
         try {
-            let budget = await API.travelBudget.getTravelPolicyBudget(params);
             $loading.end();
             window.location.href = "#/trip/special-approve?params="+JSON.stringify(params);
         } catch(err) {
