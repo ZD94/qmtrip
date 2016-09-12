@@ -1,6 +1,6 @@
 import { EApproveStatus, EApproveResult2Text } from 'api/_types/tripPlan';
 export async function ApproveProgressController ($scope, Models, $stateParams){
-    require('./approveProgress.scss');
+    require('./approve-progress.scss');
     let approveId = $stateParams.approveId;
     let tripApprove = await Models.tripApprove.get(approveId);
     $scope.tripApprove = tripApprove;

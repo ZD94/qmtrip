@@ -2,7 +2,7 @@ import { Staff } from 'api/_types/staff/staff';
 var msgbox = require('msgbox');
 
 export async function EditPwdController($scope,Models,$ionicHistory,$storage,$ionicPopup) {
-    require('./editMobile.scss');
+    require('./edit-mobile.scss');
     await API.onload();
     var staff = await Staff.getCurrent();
     $scope.form = {

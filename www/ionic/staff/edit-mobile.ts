@@ -2,7 +2,7 @@ import { Staff } from 'api/_types/staff/staff';
 var msgbox = require('msgbox');
 
 export async function EditMobileController($scope,Models,$ionicHistory) {
-    require('./editMobile.scss');
+    require('./edit-mobile.scss');
     await API.onload();
     var staff = await Staff.getCurrent();
     $scope.form = {

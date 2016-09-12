@@ -1,6 +1,6 @@
 import { Staff } from 'api/_types/staff/staff';
 export async function StaffInfoController($scope, Models) {
-    require('./staffInfo.scss');
+    require('./staff-info.scss');
     var staff = await Staff.getCurrent();
     $scope.staff = staff;
     $scope.company = await staff.company;

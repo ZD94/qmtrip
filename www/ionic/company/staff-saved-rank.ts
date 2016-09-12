@@ -2,7 +2,7 @@ import moment = require('moment');
 import UnitOfTime = moment.UnitOfTime;
 
 export async function StaffSavedRankController($scope) {
-    require('./staffSavedRank.scss');
+    require('./staff-saved-rank.scss');
     API.require('tripPlan');
     await API.onload();
     $scope.isMonth = true;

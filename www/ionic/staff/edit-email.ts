@@ -3,7 +3,7 @@ import { Staff } from 'api/_types/staff/staff';
 var msgbox = require('msgbox');
 
 export async function EditEmailController($scope, Models, $ionicHistory, $ionicPopup) {
-    require('./editMobile.scss');
+    require('./edit-mobile.scss');
     await API.onload();
     var staff = await Staff.getCurrent();
     $scope.form = {
@@ -31,9 +31,9 @@ export async function EditEmailController($scope, Models, $ionicHistory, $ionicP
                         template:'为保障您的权益和能够及时收到通知消息，请尽快到邮箱进行激活！',
                         okText:'确定'
                     }).then(function(res){
-                        window.location.href = "index.html#/staff/staffInfo";
+                        window.location.href = "index.html#/staff/staff-info";
                     })
-                    // window.location.href = "index.html#/staff/editEmailSuccess";
+                    // window.location.href = "index.html#/staff/edit-email-success";
                 }
             })
             .catch(function(err){

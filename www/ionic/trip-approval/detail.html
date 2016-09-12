@@ -7,7 +7,7 @@
                         <span ng-if="tripApprove.status != EApproveStatus.WAIT_APPROVE">{{APPROVE_TEXT[tripApprove.status]}}</span>
                         <span ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE">等待{{tripApprove.approveUser.name}}审批</span>
                         <span ng-show="tripApprove.status==EApproveStatus.REJECT">{{tripApprove.approveRemark}}</span>
-                        <a class="button button-small button-calm" ng-href="#/trip-approval/approveProgress?approveId={{approveId}}">审批进度</a>
+                        <a class="button button-small button-calm" ng-href="#/trip-approval/approve-progress?approveId={{approveId}}">审批进度</a>
                     </div>
                 </div>
 

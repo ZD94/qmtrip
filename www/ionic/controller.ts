@@ -176,6 +176,6 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
     }
 
     $scope.goMyCenter = function() {
-        $location.path('/staff/staffInfo');
+        $location.path('/staff/staff-info');
     }
 }
