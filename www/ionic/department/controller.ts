@@ -2,7 +2,7 @@ import { Department } from 'api/_types/department';
 import { Staff } from 'api/_types/staff/staff';
 var msgbox = require('msgbox');
 
-export async function DepartmentController($scope, Models, $ionicPopup, $ionicListDelegate) {
+export async function IndexController($scope, Models, $ionicPopup, $ionicListDelegate) {
     $scope.showDelete = false;
     var staff = await Staff.getCurrent();
     async function loadDepartment(){
