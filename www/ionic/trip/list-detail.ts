@@ -1,4 +1,4 @@
-import { ETripType, TripDetail, EPlanStatus } from '../../../api/_types/tripPlan';
+import { ETripType, TripDetail, EPlanStatus } from 'api/_types/tripPlan';
 export async function ListDetailController($location, $scope , Models, $stateParams, $storage, $ionicPopup, wxApi){
     let id = $stateParams.tripid;
     if (!id) {

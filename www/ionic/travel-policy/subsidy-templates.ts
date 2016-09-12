@@ -1,5 +1,5 @@
 
-import { SubsidyTemplate } from '../../../api/_types/travelPolicy';
+import { SubsidyTemplate } from 'api/_types/travelPolicy';
 var msgbox = require('msgbox');
 
 export async function SubsidyTemplatesController($scope, Models, $ionicPopup) {

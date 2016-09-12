@@ -1,5 +1,5 @@
-import { Staff } from '../../../api/_types/staff/staff';
-import { TravelPolicy, EPlaneLevel, ETrainLevel, EHotelLevel } from '../../../api/_types/travelPolicy';
+import { Staff } from 'api/_types/staff/staff';
+import { TravelPolicy, EPlaneLevel, ETrainLevel, EHotelLevel } from 'api/_types/travelPolicy';
 import { SubsidyTemplatesController } from './subsidy-templates';
 var msgbox = require('msgbox');
 

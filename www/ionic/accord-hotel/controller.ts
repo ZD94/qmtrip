@@ -1,4 +1,4 @@
-import { Staff } from '../../../api/_types/staff/staff';
+import { Staff } from 'api/_types/staff/staff';
 
 export async function IndexController($scope, Models, $location) {
     require('./accord-hotel.scss');

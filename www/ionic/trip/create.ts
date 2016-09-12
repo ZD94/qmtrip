@@ -1,5 +1,5 @@
 import moment = require('moment');
-import { Staff } from '../../../api/_types/staff/staff';
+import { Staff } from 'api/_types/staff/staff';
 
 var msgbox = require('msgbox');
 

@@ -1,5 +1,5 @@
-import { Staff } from '../../../api/_types/staff/staff';
-import { TravelPolicy } from '../../../api/_types/travelPolicy';
+import { Staff } from 'api/_types/staff/staff';
+import { TravelPolicy } from 'api/_types/travelPolicy';
 var msgbox = require('msgbox');
 
 export async function CompanyFirstController ($scope, Models, $stateParams){

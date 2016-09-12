@@ -1,4 +1,4 @@
-import { ETripType, EInvoiceType } from '../../../api/_types/tripPlan';
+import { ETripType, EInvoiceType } from 'api/_types/tripPlan';
 import moment = require('moment');
 export async function DetailController($scope, $stateParams, Models, $location){
     require('./trip.scss');

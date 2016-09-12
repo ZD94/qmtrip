@@ -1,10 +1,10 @@
 import {
     EInvoiceType, EApproveStatus, MTxPlaneLevel, EApproveResult, ETripType,
     EApproveStatus2Text
-} from '../../../api/_types/tripPlan';
-import { Staff } from '../../../api/_types/staff/staff';
+} from 'api/_types/tripPlan';
+import { Staff } from 'api/_types/staff/staff';
 import moment = require('moment');
-import { MTrainLevel, MHotelLevel, MPlaneLevel } from '../../../api/_types/travelPolicy';
+import { MTrainLevel, MHotelLevel, MPlaneLevel } from 'api/_types/travelPolicy';
 export async function DetailController($scope, Models, $stateParams, $ionicPopup, $loading, $storage, ngModalDlg){
     require('./trip-approval.scss');
     let approveId = $stateParams.approveId;
