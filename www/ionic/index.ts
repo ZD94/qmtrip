@@ -136,7 +136,6 @@ function initUpdater($ionicPlatform, $ionicPopup) {
     })
 }
 
-require("angular-chart.js")
 require('nglibs');
 var ngapp = require('ngapp');
 ngapp.depend('ionic');
