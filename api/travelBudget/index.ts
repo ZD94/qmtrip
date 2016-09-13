@@ -310,7 +310,8 @@ export default class ApiTravelBudget {
         }
         let budgetConfig = staff.company.budgetConfig;
         if (budgetConfig && budgetConfig.hotel) {
-            qs.prefers = budgetConfig.hotel;
+            let compiled = _.template(JSON.stringify(budgetConfig.hotel));
+            qs.prefers = JSON.parse(compiled(query));
         } else {
             qs.prefers = loadDefaultPrefer(query, 'hotel');
         }
@@ -417,7 +418,8 @@ export default class ApiTravelBudget {
         }
         let qs: any = {};
         if (preferConfig && preferConfig.traffic) {
-            qs.prefers = preferConfig.traffic;
+            let compiled = _.template(JSON.stringify(preferConfig.traffic));
+            qs.prefers = JSON.parse(compiled(params));
         } else {
             qs.prefers = loadDefaultPrefer(params);
         }
