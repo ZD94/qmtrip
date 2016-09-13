@@ -3,8 +3,8 @@ import moment = require('moment');
 import { Staff } from 'api/_types/staff/staff';
 import { EPlanStatus } from 'api/_types/tripPlan';
 
-export async function RecordController($scope, $stateParams) {
-    require('./company.scss')
+export default async function ListAllController($scope, $stateParams) {
+    require('../statistics/statistics.scss')
     let keyword = $stateParams.keyword || '';
     let type = $stateParams.type || null;
     let staff = await Staff.getCurrent();
@@ -37,7 +37,7 @@ export async function RecordController($scope, $stateParams) {
 
     $scope.enterDetail = function(trip){
         if (!trip) return;
-        window.location.href = `#/company/record-detail?tripid=${trip.id}`;
+        window.location.href = `#/trip/detail?tripid=${trip.id}`;
     };
 
     async function searchTripPlans(newVal?: string, oldVal?: string) {

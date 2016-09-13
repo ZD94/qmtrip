@@ -1,20 +1,63 @@
-import { ETripType, EInvoiceType } from 'api/_types/tripPlan';
 import moment = require('moment');
-export async function DetailController($scope, $stateParams, Models, $location){
-    require('./trip.scss');
-    let id = $stateParams.id;
-    if (!id) {
-        $location.path("/");
-        return;
-    }
-    let tripPlan = await Models.tripPlan.get(id);
-    let budgets: any[] = await Models.tripDetail.find({where: {tripPlanId: id}});
-    $scope.createdAt = moment(tripPlan.createAt).toDate();
-    $scope.startAt = moment(tripPlan.startAt).toDate();
-    $scope.backAt = moment(tripPlan.backAt).toDate();
+import { Staff } from 'api/_types/staff/staff';
+import { ETripType, EAuditStatus, EPlanStatus } from 'api/_types/tripPlan';
 
-    $scope.trip = tripPlan.target;
-    $scope.budgets = budgets;
-    $scope.EInvoiceType = EInvoiceType;
-    $scope.ETripType = ETripType;
+export default async function DetailController($scope, Models, $stateParams, $ionicPopup, $ionicLoading){
+    require('../trip-approval/trip-approval.scss');
+    let tripId = $stateParams.tripid;
+    let tripPlan = await Models.tripPlan.get(tripId);
+
+    $scope.tripPlan = tripPlan;
+    let staff = tripPlan.account; //await Models.staff.get(tripPlan.accountId);
+    $scope.staff = staff;
+
+    //判断有无审批权限
+    let isHasPermissionApprove = false;
+    let curStaff = await Staff.getCurrent();
+    if(curStaff.id == tripPlan.auditUser) { isHasPermissionApprove = true;}
+    $scope.isHasPermissionApprove = isHasPermissionApprove;
+
+    let tripDetails = await tripPlan.getTripDetails();
+    let traffic = [], hotel = [], subsidys = [], specialApproves = [];
+    let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0, specialApproveBudget = 0;
+    let subsidyDays:number = moment(tripPlan.backAt).diff(moment(tripPlan.startAt), 'days');
+    let totalBudget: number = 0;
+    totalBudget = tripPlan.budget as number;
+    tripDetails.forEach(function(detail) {
+        switch (detail.type) {
+            case ETripType.OUT_TRIP:
+                traffic.push(detail);
+                trafficBudget += detail.budget;
+                break;
+            case ETripType.BACK_TRIP:
+                traffic.push(detail);
+                trafficBudget += detail.budget;
+                break;
+            case ETripType.HOTEL:
+                hotel.push(detail);
+                hotelBudget += detail.budget;
+                break;
+            case ETripType.SPECIAL_APPROVE:
+                specialApproves.push(detail);
+                specialApproveBudget += detail.budget;
+                break;
+            default:
+                subsidys.push(detail);
+                subsidyBudget += detail.budget; break;
+        }
+    })
+
+    $scope.totalBudget = totalBudget;
+    $scope.traffic = traffic;
+    $scope.hotel = hotel;
+    $scope.subsidys = subsidys;
+    $scope.specialApproves = specialApproves;
+    $scope.trafficBudget = trafficBudget;
+    $scope.hotelBudget = hotelBudget;
+    $scope.subsidyBudget = subsidyBudget;
+    $scope.specialApproveBudget = specialApproveBudget;
+    $scope.subsidyDays = subsidyDays;
+    $scope.approveResult = EAuditStatus;
+    $scope.EPlanStatus = EPlanStatus;
+
 }

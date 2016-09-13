@@ -1,7 +1,7 @@
 
 import moment = require('moment');
 
-export async function BudgetStatisticsController($scope, $stateParams, Models) {
+export default async function BudgetController($scope, $stateParams, Models) {
     require('./statistics.scss');
     API.require('tripPlan');
     await API.onload();
@@ -76,7 +76,7 @@ export async function BudgetStatisticsController($scope, $stateParams, Models) {
     }
 
     $scope.goToStaffRecords = function(name) {
-        window.location.href = `#/company/record?type=${$scope.monthSelection.type}&keyword=${name}`;
+        window.location.href = `#/trip/list-all?type=${$scope.monthSelection.type}&keyword=${name}`;
     };
 
     $scope.searchStatistics = searchStatistics;

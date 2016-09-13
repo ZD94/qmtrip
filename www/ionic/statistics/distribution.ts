@@ -1,8 +1,8 @@
 import { Staff } from 'api/_types/staff/staff';
 import { EPlanStatus } from 'api/_types/tripPlan';
 
-export async function DistributionController($scope, Models) {
-    require('./trip-approval.scss');
+export default async function DistributionController($scope, Models) {
+    require('../trip-approval/trip-approval.scss');
     API.require("place");
     await API.onload();
 

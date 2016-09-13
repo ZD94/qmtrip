@@ -1,7 +1,7 @@
 import moment = require('moment');
 import UnitOfTime = moment.UnitOfTime;
 
-export async function StaffSavedRankController($scope) {
+export default async function StaffSavedRankController($scope) {
     require('./staff-saved-rank.scss');
     API.require('tripPlan');
     await API.onload();

@@ -2,8 +2,8 @@ import { Staff, EStaffRole, EStaffStatus } from 'api/_types/staff/staff';
 import { ACCOUNT_STATUS } from 'api/_types/auth/account';
 var msgbox = require('msgbox');
 
-export async function StaffsController($scope, Models, $ionicPopup) {
-    require('./company.scss');
+export default async function ListController($scope, Models, $ionicPopup) {
+    require('./list.scss');
     var staff = await Staff.getCurrent();
     $scope.currentStaff = staff;
     $scope.staffs = [];

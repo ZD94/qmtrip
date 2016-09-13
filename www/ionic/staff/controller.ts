@@ -1,6 +1,5 @@
 'use strict';
 
-export * from './index';
 export * from './staff-info';
 export * from './edit-mobile';
 export * from './edit-email';
