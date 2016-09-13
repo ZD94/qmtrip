@@ -936,8 +936,8 @@ class TripPlanModule {
         let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, tripDetailId: tripDetail.id, userId: user.id, remark: `${templateValue.tripType}票据审核${logResult}`});
         log.save();
 
-        //如果出差已经完成,并且有节省反积分,增加员工积分
-        if (tripPlan.status == EPlanStatus.COMPLETE && tripPlan.score > 0) {
+        //如果出差已经完成,并且有节省反积分,并且非特别审批，增加员工积分
+        if (tripPlan.status == EPlanStatus.COMPLETE && tripPlan.score > 0 && !tripPlan.isSpecialApprove) {
             let pc = Models.pointChange.create({
                 currentPoints: staff.balancePoints, status: 1,
                 staff: staff, company: staff.company,
@@ -1416,7 +1416,7 @@ class TripPlanModule {
             limit = 10;
         }
         let sql = `select account_id, sum(budget) - sum(expenditure) as save from trip_plan.trip_plans 
-        where deleted_at is null and status = ${EPlanStatus.COMPLETE} AND company_id = '${companyId}'`;
+        where deleted_at is null and status = ${EPlanStatus.COMPLETE} AND company_id = '${companyId}' and is_special_approve = false`;
         if(params.staffId)
             sql += ` and account_id = '${params.staffId}'`;
         if(params.startTime)
