@@ -1,6 +1,6 @@
 import moment = require("moment");
 
-export async function BudgetController($scope, $ionicModal, ngModalDlg) {
+export default async function IndexController($scope, $ionicModal, ngModalDlg) {
     require('./statistics.scss');
     API.require("tripPlan");
     await API.onload();

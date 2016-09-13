@@ -4,7 +4,7 @@ import validator = require('validator');
 
 var msgbox = require('msgbox');
 
-export async function StaffdetailController($scope, $storage, $stateParams, Models, $ionicHistory, $ionicPopup) {
+export default async function EditController($scope, $storage, $stateParams, Models, $ionicHistory, $ionicPopup) {
     let staff;
     let preRole;
     var currentstaff = await Staff.getCurrent();

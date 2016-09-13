@@ -2,7 +2,7 @@
     <ion-content padding="true" class="has-header">
         <form class="list">
             <div class="button-bar">
-                <!--<a href="#/company/staffdetail" id="page27-button83" class="button button-positive  button-block">添加员工</a>-->
+                <!--<a href="#/staff/edit" id="page27-button83" class="button button-positive  button-block">添加员工</a>-->
                 <a href="#/company/staff-invited" id="page27-button83" class="button button-positive  button-block">邀请员工</a>
             </div>
             <label class="item item-input">
@@ -12,7 +12,7 @@
         </form>
         <ion-list>
             <ion-item class="item-avatar staffList" ng-repeat="staff in staffs">
-                <a ng-href="#/company/staffdetail?staffId={{staff.staff.id}}">
+                <a ng-href="#/staff/edit?staffId={{staff.staff.id}}">
                     <h2>{{staff.staff.name}}<i class="icon ion-android-contact icon-accessory" ng-if="staff.role == '创建者'"></i></h2>
                     <p>{{staff.travelPolicy.name}}</p>
                 </a>

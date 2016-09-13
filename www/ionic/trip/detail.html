@@ -1,47 +1,47 @@
-<ion-view title="行程详情页" id="page20">
-    <ion-content padding="false" scroll="false" class="has-header">
-        <div class="flex-c10">
-            <ion-scroll>
-                <div id="page20-markdown7" style="color:#000000;text-align:right;">
-                    <p style="color: #fff;">{{createdAt | date: 'yyyy-MM-dd HH:mm'}}</p>
-                </div>
-                <ion-list class="jl_projectinfo">
-                    <ion-item class="project_tit">{{trip.title}}</ion-item>
-                    <ion-item class="project_cont">
-                        <p ng-if="startAt">{{startAt | date: 'yyyy-MM-dd'}}至 {{backAt | date: 'yyyy-MM-dd'}}</p>
-                        <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{trip.budget == -1 ? '暂无预算' : (trip.budget | currency: '')}}</span>{{trip.budget
-                            == -1 ? '' : '元'}}</p>
-                    </ion-item>
-                </ion-list>
-                <div class="spacer" style="width: 285px; height: 17px;"></div>
-                <ion-list>
-                    <div ng-repeat="budget in budgets">
-                        <ion-item class="item-divider">
-                            <span ng-if='budget.type == ETripType.OUT_TRIP'>去程交通</span>
-                            <span ng-if='budget.type == ETripType.BACK_TRIP'>回程交通</span>
-                            <span ng-if='budget.type == ETripType.HOTEL'>住宿</span>
-                            <span ng-if='budget.type == ETripType.SUBSIDY'>其他补助</span>
-                            <span style="margin-left: 120px;">{{budget.budget == -1 ? '暂无预算' : (budget.budget| currency: '')}}</span>{{budget.budget
-                            == -1 ? '' : '元'}}
-                        </ion-item>
-                        <ion-item>
-                            <span ng-if='budget.type == ETripType.OUT_TRIP'>{{startAt | date: 'yyyy-MM-dd'}}</span>
-                            <span ng-if='budget.type == ETripType.BACK_TRIP'>{{backAt | date: 'yyyy-MM-dd'}}</span>
-                            <span ng-if='budget.type == ETripType.HOTEL'>
-                                {{startAt | date: 'yyyy-MM-dd'}}至{{backAt | date: 'yyyy-MM-dd'}}
-                            </span>
-                            <span ng-if='budget.type == ETripType.SUBSIDY'>
-                                {{startAt | date: 'yyyy-MM-dd'}}至{{backAt | date: 'yyyy-MM-dd'}}
-                            </span>
-                            <br>{{budget.budget == -1 ? '暂无预算' : (budget.budget| currency: '')+'元'}}
-                        </ion-item>
-                    </div>
-                </ion-list>
-            </ion-scroll>
-            <div>
-                <a href="#/trip-approval/pending" id="page20-button60" class="button button-positive"
-                   no-back>进入审批单列表</a>
-            </div>
-        </div>
+<ion-view title="待审批详情" id="page7">
+    <ion-content padding="true" class="has-header">
+        <tp-status-bar status="tripPlan.status" reason="trip.auditRemark"></tp-status-bar>
+        <ion-list>
+            <ion-item class="item-thumbnail-left opactic">
+                <div class="staff_portrait" ng-click="showTravelPolicy(staff.id)">{{staff.name.substring(staff.name.length-2,staff.name.length)}}</div>
+                <span class="op_mult">{{staff.name}}&nbsp;&nbsp;{{staff.mobile}}</span>
+                <br>{{staff.email}}
+                <p align="right" style="margin-top: 5px">
+                    <a class="button button-small button-outline" ng-click="showTravelPolicy(staff.id)" style="border: 1px solid #fff;color: #fff;">差旅标准</a>
+                    <a class="button button-small" href="tel:{{staff.mobile}}">打电话</a>
+                </p>
+            </ion-item>
+        </ion-list>
+
+        <div class="spacer" style="width: 285px; height: 17px;"></div>
+        <tp-header trip="tripPlan"></tp-header>
+
+        <div class="spacer" style="width: 285px; height: 17px;"></div>
+        <ion-list>
+
+            <tp-detail-item ng-repeat="t in traffic track by t.id"
+                            item="t" title="{{$index == 0 ? '交通': ''}}"
+                            budget="{{trafficBudget| currency: ''}}元">
+            </tp-detail-item>
+
+            <tp-detail-item ng-repeat="h in hotel track by h.id"
+                            item="h"
+                            title="{{$index == 0 ? '住宿': ''}}"
+                            budget="{{hotelBudget | currency: ''}}元">
+            </tp-detail-item>
+
+            <tp-detail-item ng-repeat="s in subsidys track by s.id"
+                            item="s"
+                            title="补助"
+                            budget="{{subsidyBudget| currency: ''}}元">
+            </tp-detail-item>
+
+            <tp-detail-item ng-repeat="s in specialApproves track by s.id"
+                            item="s"
+                            title="特别审批"
+                            remark="{{tripPlan.specialApproveRemark}}"
+                            budget="{{specialApproveBudget| currency: ''}}元">
+            </tp-detail-item>
+        </ion-list>
     </ion-content>
 </ion-view>

@@ -46,14 +46,14 @@ var adminMenus = [
         id: 1056,
         icon: 'stats-bars',
         title: '差旅统计',
-        link: 'company/budget',
+        link: 'statistics/',
         badgeNum: 0
     },
     {
         id: 1057,
         icon: 'person-stalker',
         title: '员工管理',
-        link: 'company/staffs',
+        link: 'staff/list',
         badgeNum: 0
     },
     {
