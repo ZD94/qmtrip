@@ -128,6 +128,8 @@
                             <div ng-show="showReason" ng-repeat="reason in x.reasons">{{reason}}</div>
                         </td>
                         <td style="color:#1e90ff;cursor:pointer" ng-click="showMap(x.longitude,x.latitude)">查看地图</td>
+                        <td>{{x.longitude}}</td>
+                        <td>{{x.latitude}}</td>
                     </tr>
                 </table>
                 <table  class="table-bordered text-center " ng-if="showScoreData">
