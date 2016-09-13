@@ -5,7 +5,7 @@
 'use strict';
 
 import angular = require("angular");
-import {EPlanStatus, EInvoiceType, ETripType, MTxPlaneLevel} from 'api/_types/tripPlan';
+import {EPlanStatus, EApproveStatus, EInvoiceType, ETripType, MTxPlaneLevel} from 'api/_types/tripPlan';
 import moment = require("moment");
 require("./trip-plan.scss");
 
@@ -142,7 +142,8 @@ angular
                 }
             }
         }
-    }]).directive('invoiceImgItem', [function($storage) {
+    }])
+    .directive('invoiceImgItem', [function() {
     return  {
         restrict: 'AE',
         template: require('./invoice-img-item.html'),
@@ -160,3 +161,23 @@ angular
         }
     }
 }])
+    .directive('tripApprove', function(){
+        return {
+            restrict: 'AE',
+            template: require('./trip-approve.html'),
+            replace: true,
+            transclude: false,
+            scope: {
+                tripApprove: '=data',
+                showHeaderTxt: '@showHeader', //是否显示提交人信息
+                showDetailStatus: '@',  //是否显示详细状态,如果为false,则只显示[审批通过,审批未通过,待审批]
+                click: '='
+            },
+            controller: function($scope) {
+                $scope.EApproveStatus = EApproveStatus;
+                $scope.showHeader = $scope.showHeaderTxt != 'false';
+                $scope.showDetailStatus = Boolean($scope.showDetailStatus);
+                $scope.click = $scope.click || function(trip) { console.info('click me...');}
+            }
+        }
+    })
