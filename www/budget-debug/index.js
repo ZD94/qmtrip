@@ -52,7 +52,7 @@ app.controller('debug',function($scope, $http, $location){
   $scope.hideScoreDetail = true;
   $scope.hideCalResult = true;
   $scope.showReason = false;
-  //表格的排序
+  //表格的排序117.213983,39.121397
   $scope.orderBealoon = false;
   $scope.order = 'scope';
   var lastNum = 15;
@@ -65,15 +65,13 @@ app.controller('debug',function($scope, $http, $location){
          for(let i=0;i<response.length;i++){
            let arr = response[i].markedData;
               for(let j=0;j<arr.length;j++){
-                let dep = arr[j].departDateTime;
-                let arrival = arr[j].arrivalDateTime;
-                dep = new Date(dep);
-                arrival = new Date(arrival);
-                arr[j].departDateTime = dep.getTime();
-                arr[j].arrivalDateTime = arrival.getTime();
+                    let dep = arr[j].departDateTime;
+                    let arrival = arr[j].arrivalDateTime;
+                    arr[j].departDateTime = new Date(dep);
+                    arr[j].arrivalDateTime = new Date(arrival);
+                    arr[j].price = Number(arr[j].price);
               }
          }
-         console.log(response);
         $scope.originDatas = response;
     });
   }
@@ -128,11 +126,10 @@ app.controller('debug',function($scope, $http, $location){
   $scope.showMap = function(lon,lat){
       let mapKey = "rYaQkpPjbkxa0sAfIBHP13CGLrgVjzVG";
       let zoom=15;
-      let minX = lon-5;
-      let maxX = lon+5;
-      let minY = lat-5;
-      let maxY = lat+5;
-      let mapUrl = "http://api.map.baidu.com/staticimage/v2?ak="+mapKey+"&width=1024&height=1000&center="+lon+","+lat+"&bbox="+minX+","+minY+";"+maxX+","+maxY+"&markers="+lon+","+lat+"&zoom="+zoom+"&markerStyles=l,A,0xFFFF00";
+      lon = lon+0.007536;
+      lat = lat+0.005636;
+      //+"&bbox="+minX+","+minY+";"+maxX+","+maxY
+      let mapUrl = "http://api.map.baidu.com/staticimage/v2?ak="+mapKey+"&width=1000&height=1000&center="+lon+","+lat+"&markers="+lon+","+lat+"&zoom="+zoom+"&markerStyles=l,A,0xFFFF00";
       window.open(mapUrl);
   }
 
