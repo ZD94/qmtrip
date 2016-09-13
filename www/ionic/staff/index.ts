@@ -1,6 +1,7 @@
 import { Staff, EStaffRole } from 'api/_types/staff/staff';
 import { EPlanStatus, EAuditStatus } from 'api/_types/tripPlan';
-export async function IndexController($scope, Models) {
+
+export default async function IndexController($scope, Models) {
     require('./index.scss');
     API.require('tripPlan');
     /*******************判断是否为第一次的登录  史聪************************/
