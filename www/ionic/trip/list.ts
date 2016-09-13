@@ -1,5 +1,5 @@
-import { EPlanStatus } from '../../../api/_types/tripPlan';
-import { Staff } from '../../../api/_types/staff/staff';
+import { EPlanStatus } from 'api/_types/tripPlan';
+import { Staff } from 'api/_types/staff/staff';
 export async function ListController($scope , $stateParams, Models){
     var staff = await Staff.getCurrent();
     let statusTxt = {};

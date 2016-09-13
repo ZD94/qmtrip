@@ -1,6 +1,6 @@
-import { ETripType, EInvoiceType, MTxPlaneLevel } from '../../../api/_types/tripPlan';
+import { ETripType, EInvoiceType, MTxPlaneLevel } from 'api/_types/tripPlan';
 import moment = require('moment');
-import { Staff } from '../../../api/_types/staff/staff';
+import { Staff } from 'api/_types/staff/staff';
 export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading){
     require('./trip.scss');
     require('./budget.scss');

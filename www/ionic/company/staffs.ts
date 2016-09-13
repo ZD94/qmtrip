@@ -1,5 +1,5 @@
-import { Staff, EStaffRole, EStaffStatus } from '../../../api/_types/staff/staff';
-import { ACCOUNT_STATUS } from '../../../api/_types/auth/account';
+import { Staff, EStaffRole, EStaffStatus } from 'api/_types/staff/staff';
+import { ACCOUNT_STATUS } from 'api/_types/auth/account';
 var msgbox = require('msgbox');
 
 export async function StaffsController($scope, Models, $ionicPopup) {

@@ -1,10 +1,12 @@
-import { Staff } from '../../../api/_types/staff/staff';
-import { MHotelLevel, MPlaneLevel, MTrainLevel } from '../../../api/_types/travelPolicy';
+import { Staff } from 'api/_types/staff/staff';
+import { MHotelLevel, MPlaneLevel, MTrainLevel } from 'api/_types/travelPolicy';
 
 var msgbox = require('msgbox');
 
-export async function TravelpolicyController($scope, Models, $location, $ionicPopup, $ionicHistory) {
-    require('./travelpolicy.scss');
+export * from './editpolicy';
+
+export async function IndexController($scope, Models, $location, $ionicPopup, $ionicHistory) {
+    require('./index.scss');
     var staff = await Staff.getCurrent();
     var company = await staff.company;
     var travelPolicies = await company.getTravelPolicies();
@@ -27,7 +29,7 @@ export async function TravelpolicyController($scope, Models, $location, $ionicPo
     }))
     $scope.editpolicy = async function (id) {
         // var travelpolicy = await Models.travelPolicy.get(id);
-        $location.path('/company/editpolicy').search({'policyId': id}).replace();
+        $location.path('/travel-policy/editpolicy').search({'policyId': id}).replace();
     }
 
     $scope.setDefault = async function(){

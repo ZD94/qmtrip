@@ -1,7 +1,7 @@
-import { Staff } from '../../../api/_types/staff/staff';
+import { Staff } from 'api/_types/staff/staff';
 
-export async function AccordhotelController($scope, Models, $location) {
-    require('./accordhotel.scss');
+export async function IndexController($scope, Models, $location) {
+    require('./accord-hotel.scss');
     var staff = await Staff.getCurrent();
     var company = await staff.company;
     var accordHotels = await Models.accordHotel.find({where: {companyId: company.id}});

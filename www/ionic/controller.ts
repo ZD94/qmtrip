@@ -60,21 +60,21 @@ var adminMenus = [
         id: 1058,
         icon: 'ios-box',
         title: '部门管理',
-        link: 'company/department',
+        link: 'department/',
         badgeNum: 0
     },
     {
         id: 1059,
         icon: 'android-list',
         title: '差旅标准',
-        link: 'company/travelpolicy',
+        link: 'travel-policy/',
         badgeNum: 0
     },
     {
         id: 1060,
         icon: 'pricetags',
         title: '协议酒店',
-        link: 'company/accordhotel',
+        link: 'accord-hotel/',
         badgeNum: 0
     },
 ];

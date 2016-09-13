@@ -1,4 +1,4 @@
-import { ETripType, EPlanStatus, EInvoiceType } from '../../../api/_types/tripPlan';
+import { ETripType, EPlanStatus, EInvoiceType } from 'api/_types/tripPlan';
 export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup){
     //////绑定上传url
     let authDataStr = window['getAuthDataStr']();
