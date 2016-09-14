@@ -23,7 +23,7 @@ export function reqProxy(url, options) {
             if (typeof data == 'string') {
                 data = JSON.parse(data);
             }
-            console.log(name, '==>', data)
+            console.log(name, '==>', JSON.stringify(data))
             if (err) return reject(err);
             if (body.errcode) return reject(data);
             return resolve(data);
