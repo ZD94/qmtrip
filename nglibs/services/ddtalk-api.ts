@@ -56,6 +56,7 @@ class DDTalkApi {
                 })
                 .catch( (err) => {
                     console.error(err);
+                    return null;
                 })
             return this.$promise;
         }
