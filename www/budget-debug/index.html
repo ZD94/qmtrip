@@ -82,6 +82,8 @@
                 <select ng-model="prefer" ng-change="change()">
                     <option ng-repeat="x in prefers" value="{{x.value}}">{{x.title}}</option>
                 </select>
+                <input type="button" value="复制数据" data-toggle="modal" data-target="#copymodal">
+                <input type="button" value="粘贴" ng-click="paste()">
             </td>
         </tr>
         <tr>
@@ -128,8 +130,6 @@
                             <div ng-show="showReason" ng-repeat="reason in x.reasons">{{reason}}</div>
                         </td>
                         <td style="color:#1e90ff;cursor:pointer" ng-click="showMap(x.longitude,x.latitude)">查看地图</td>
-                        <td>{{x.longitude}}</td>
-                        <td>{{x.latitude}}</td>
                     </tr>
                 </table>
                 <table  class="table-bordered text-center " ng-if="showScoreData">
@@ -176,6 +176,25 @@
         </tr>
     </tbody>
 </table>
+<!--复制粘贴的模态弹出框-->
+<div class="modal" id="copymodal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">复制的数据</h4>
+            </div>
+            <div class="modal-body">
+                <textarea style="width: 100%;height: 500px;">{{ori_prefers}}</textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" ng-click="copy()" class="btn btn-primary" data-dismiss="modal">确认复制</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!--复制粘贴的模态弹出框-->
 <script src="./index.js"></script>
 </body>
 </html>

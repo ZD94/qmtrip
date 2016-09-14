@@ -4,6 +4,7 @@
 'use strict';
 
 var app = angular.module('debugModule',[]);
+
 app.controller('debug',function($scope, $http, $location){
   var url = $location.search();
   var p;
@@ -52,11 +53,13 @@ app.controller('debug',function($scope, $http, $location){
   $scope.hideScoreDetail = true;
   $scope.hideCalResult = true;
   $scope.showReason = false;
-  //表格的排序117.213983,39.121397
+  //表格的排序
   $scope.orderBealoon = false;
   $scope.order = 'scope';
   var lastNum = 15;
   var orderBooleanlast;
+    //复制粘贴的功能
+  var copyTemp = '';
 
   //拿到原始数据
   if(url.key){
@@ -75,14 +78,17 @@ app.controller('debug',function($scope, $http, $location){
         $scope.originDatas = response;
     });
   }
+
+
+  //动态加载clipboard
   // function loadJScript(){
   //   var script = document.createElement("script");
   //   script.type = "text/javascript";
-  //   script.src = "http://api.map.baidu.com/api?v=2.0&ak=rYaQkpPjbkxa0sAfIBHP13CGLrgVjzVG&callback=init";
+  //   script.src = "//cdn.bootcss.com/clipboard.js/1.5.12/clipboard.min.js";
   //   document.body.appendChild(script);
   // }
-  //
-  // window.onload = loadJScript;
+
+  //window.onload = loadJScript;
 
   //计算出结果
   $scope.getBudget = function(){
@@ -95,9 +101,7 @@ app.controller('debug',function($scope, $http, $location){
     $http.post('/api/budgets?key='+url.key,{originData: originData, query: query, policy: policy, prefers: prefers, type: type})
         .success(function(datas){
             $scope.result = datas;
-            console.log(datas);
             $scope.originData.markedData = datas.markedScoreData;
-            console.log($scope.originData.markedData);
         })
   };
   $scope.change = function(){
@@ -106,7 +110,6 @@ app.controller('debug',function($scope, $http, $location){
 
     ori.push(JSON.parse(single));
     $scope.ori_prefers = ori;
-    console.log(ori);
   };
   $scope.changeOrigin = function(){
     $scope.ori_prefers = $scope.originData.prefers;
@@ -143,5 +146,12 @@ app.controller('debug',function($scope, $http, $location){
       }
       $scope.order = orderStr;
       lastNum = num;
+  }
+
+  $scope.copy = function(){
+    copyTemp = $scope.ori_prefers;
+  }
+  $scope.paste = function(){
+      $scope.ori_prefers = copyTemp;
   }
 });
