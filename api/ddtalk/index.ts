@@ -10,8 +10,8 @@ import cache = require("common/cache");
 const config ={
     token: 'jingli2016',
     encodingAESKey: '8nf2df6n0hiifsgg521mmjl6euyxoy3y6d9d3mt1laq',
-    suiteid: 'suite3run9ntilukajkvp', //这里的suiteid===suiteKey, 第一次验证没有不用填
-    secret: '9Nlv2n0tUm-7ODThlYYboF4RZLTtgnsPvASUOAkOSEZTei4jY-sJrWw8uiP6qDWq',
+    suiteid: 'suitezutlhpvgyvgakcdo', //这里的suiteid===suiteKey, 第一次验证没有不用填
+    secret: 'pV--T2FZj-3QCjJzcQd5OnzDBAe6rRKRQGEmc8iVCvdtc2FUOS5icq1gVfkbqiTx',
 }
 
 import request = require('request');
@@ -29,16 +29,21 @@ async function _getSuiteToken() {
     if (typeof ticketObj == 'string') {
         ticketObj = JSON.parse(ticketObj);
     }
-    if (!ticketObj || !ticketObj.ticket) {
+    if (!ticketObj || !ticketObj.ticket ) {
         throw new Error(`还没有ticket`);
     }
     let ticket = ticketObj.ticket;
-    console.info(ticket);
     if (!ticket) {
         throw new Error('不存在ticket');
     }
+    let key = `ddtalk:suite_access_token:${config.suiteid}`;
+    let d = cache.read(key)
+    if (d && d.expire_at > Date.now()) {
+        return d;
+    }
+
     let url = `https://oapi.dingtalk.com/service/get_suite_token`;
-    return reqProxy(url, {
+    let ret: any = await reqProxy(url, {
         name: '获取套件Token',
         body: {
             suite_key: config.suiteid,
@@ -46,6 +51,9 @@ async function _getSuiteToken() {
             suite_ticket: ticket
         }
     })
+    d = {suite_access_token: ret.suite_access_token, expire_at: (ret.expires_in - 30) * 1000 + Date.now() };
+    cache.write(key, JSON.stringify(d))
+    return d;
 }
 
 async function _getPermanentCode(suiteToken, tmpAuthCode) {
@@ -79,7 +87,7 @@ let ddTalkMsgHandle = {
         // let authCorpInfo = authInfo.auth_corp_info;
 
         let corpAccessToken = await isvApi.getCorpAccessToken();
-        let corpApi = new CorpApi(corpAccessToken);
+        let corpApi = new CorpApi(corpid, corpAccessToken);
         let userInfo: any = await corpApi.getUser(authUserInfo.userId);
 
         let corps = await Models.ddtalkCorp.find({where : {corpId: corpid}});
@@ -120,6 +128,7 @@ let ddTalkMsgHandle = {
             let ddtalkUser = Models.ddtalkUser.create(_ddtalkUser);
             await ddtalkUser.save();
         }
+        await isvApi.activeSuite();
     },
 
     /* * * * * 授权变更* * * * * * */
@@ -163,10 +172,81 @@ class DDTalk {
                 })
                 .catch((err) => {
                     console.error(err.stack);
-                    res.reply();
+                    next(err);
                 });
         }));
+
+        app.get("/ddtalk/js-api-config", function(req, res, next) {
+            let corpid = req.query.corpid;
+            let url = req.query.url;
+            let timestamp = Math.floor(Date.now() / 1000);
+            let noncestr = getRndStr(6);
+            let agentid = '40756443';
+            let fn: any = async ()=> {
+                //查询企业永久授权码
+                let corps = await Models.ddtalkCorp.find({ where: {corpId: corpid}, limit: 1});
+                if (corps && corps.length) {
+                    let corp = corps[0];
+                    if (corp.isSuiteRelieve) {
+                        let err = new Error(`企业还未授权或者已取消授权`);
+                        throw err;
+                    }
+                    let tokenObj = await _getSuiteToken();
+                    let suiteToken = tokenObj['suite_access_token']
+                    let isvApi = new ISVApi(config.suiteid, suiteToken, corpid, corp.permanentCode);
+                    let corpApi = await isvApi.getCorpApi();
+                    let ticketObj = await corpApi.getTicket();    //获取到了ticket
+                    let arr = [];
+                    arr.push('noncestr='+noncestr)
+                    arr.push('jsapi_ticket='+ticketObj.ticket);
+                    arr.push('url='+url);
+                    arr.push('timestamp='+timestamp)
+                    arr.sort()
+                    let originStr = arr.join('&');
+                    console.info(originStr)
+                    let signature = require("crypto").createHash('sha1').update(originStr, 'utf8').digest('hex');
+                    return {
+                        agentId: agentid, // 必填，微应用ID
+                        corpId: corpid,//必填，企业ID
+                        timeStamp: timestamp, // 必填，生成签名的时间戳
+                        nonceStr: noncestr, // 必填，生成签名的随机串
+                        signature: signature, // 必填，签名
+                        jsApiList : [
+                            'runtime.info',
+                            'biz.contact.choose',
+                            'device.notification.confirm',
+                            'device.notification.alert',
+                            'device.notification.prompt',
+                            'biz.ding.post',
+                            'biz.util.openLink',
+                            'biz.user.get',
+                            'runtime.permission.requestAuthCode',
+                            'device.base.getInterface',
+                            'device.base.getUUID',
+                            'biz.util.scan',
+                        ] // 必填，需要使用的jsapi列表，注意：不要带dd。
+                    }
+                    // return ticketObj;
+                }
+                throw new Error(`企业不存在`)
+            }
+
+            fn().then( (ret)=> {
+                res.json(ret)
+            }).catch((err) => {
+                console.info(err.stack);
+                next(err)
+            });
+        })
     }
+}
+
+function getRndStr(length) : string {
+    let ret = '';
+    for(var i=0, ii=length; i<ii; i++) {
+        ret += Math.ceil(Math.random() * 9);
+    }
+    return ret;
 }
 
 export= DDTalk
