@@ -3,26 +3,27 @@
  */
 
 'use strict';
-import MemoryCache = require("./memoryCache");
-import {CorpAccessToken, CorpAccessTokenCache} from "./interface";
+import RedisCache = require("./redisCache");
+import {CorpAccessToken, DDTalkCache} from "./interface";
 import {reqProxy} from "./reqProxy";
+import CorpApi = require("./corpApi");
 
 class ISVApi {
 
-    constructor(public suiteKey: string, public suiteToken: string, public corpid: string, public permanent_code: string, public corpTokenCache?: CorpAccessTokenCache) {
+    constructor(public suiteKey: string, public suiteToken: string, public corpid: string, public permanent_code: string, public corpTokenCache?: DDTalkCache) {
         //生成默认缓存对象
         if (!corpTokenCache) {
-            this.corpTokenCache = new MemoryCache();
+            this.corpTokenCache = new RedisCache();
         }
     }
 
     async getCorpAccessToken() :Promise<CorpAccessToken> {
-        let cacheKey = this.corpid
+        let cacheKey = `${this.corpid}:access_token`;
         let corpAccessToken = await this.corpTokenCache.get(cacheKey);
         if (corpAccessToken) {
             //失效时间为创建时间+有效期+ 10秒
             if (Date.now() >= (corpAccessToken.expires_in * 1000 + corpAccessToken.create_at + 10 * 1000) ) {
-                await this.corpTokenCache.remove(cacheKey);
+                // await this.corpTokenCache.remove(cacheKey);
                 corpAccessToken = null;
             }
         }
@@ -35,6 +36,7 @@ class ISVApi {
                 permanent_code: this.permanent_code,
             }
         });
+        if (ret.errcode) throw new Error(ret);
         corpAccessToken = {
             expires_in: ret.expires_in,
             access_token: ret.access_token,
@@ -67,6 +69,13 @@ class ISVApi {
                 permanent_code: this.permanent_code
             }
         })
+    }
+
+    async getCorpApi() : Promise<CorpApi> {
+        let self = this;
+        let corpAccessToken = await self.getCorpAccessToken();
+        console.info("corpAccessToken===>", corpAccessToken)
+        return new CorpApi(self.corpid, corpAccessToken);
     }
 }
 
