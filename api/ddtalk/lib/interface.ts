@@ -10,8 +10,8 @@ export interface CorpAccessToken {
     create_at: number;
 }
 
-export interface CorpAccessTokenCache {
-    set(key, data: CorpAccessToken): Promise<any>;
-    get(key): Promise<CorpAccessToken>;
+export interface DDTalkCache {
+    set(key, data: any): Promise<any>;
+    get(key): Promise<any>;
     remove(key): Promise<any>;
 }
