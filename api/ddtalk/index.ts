@@ -184,7 +184,6 @@ let ddTalkMsgHandle = {
             arr.push('timestamp='+timestamp)
             arr.sort()
             let originStr = arr.join('&');
-            console.info(originStr)
             let signature = require("crypto").createHash('sha1').update(originStr, 'utf8').digest('hex');
             return {
                 agentId: agentid, // 必填，微应用ID
