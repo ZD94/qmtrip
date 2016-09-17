@@ -41,24 +41,39 @@ class DDTalkApi {
             var url = window.location.href.split('#')[0];
             var cfg = await API.ddtalk.getJSAPIConfig({
                 url: url,
-                orgid: '',
-                agentid: ''
+                orgid: 'ding3563b7093185eb9135c2f4657eb6378f',
+                agentid: '40756443'
             });
+            cfg.jsApiList = [
+                'runtime.info',
+                'biz.contact.choose',
+                'device.notification.confirm',
+                'device.notification.alert',
+                'device.notification.prompt',
+                'biz.ding.post',
+                'biz.util.openLink',
+                'biz.user.get',
+                'runtime.permission.requestAuthCode',
+                'device.base.getInterface',
+                'device.base.getUUID',
+                'biz.util.scan',
+            ] // 必填，需要使用的jsapi列表，注意：不要带dd。
             await ddtalkLoad;
             return new Promise(function(resolve, reject) {
                 dd.error(reject);
                 dd.ready(resolve);
                 dd.config(cfg);
             })
-            this.$promise = doResolve()
-                .then( ()=> {
-                    this.$resolved = true;
-                })
-                .catch( (err) => {
-                    console.error(err);
-                    return null;
-                })
-            return this.$promise;
         }
+
+        this.$promise = doResolve()
+            .then( ()=> {
+                this.$resolved = true;
+            })
+            .catch( (err) => {
+                console.error(err);
+                return null;
+            })
+        return this.$promise;
     }
 }

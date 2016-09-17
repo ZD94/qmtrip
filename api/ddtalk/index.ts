@@ -158,6 +158,43 @@ let ddTalkMsgHandle = {
         let ticket = msg.SuiteTicket;
         await cache.write(CACHE_KEY, JSON.stringify({ticket: ticket, timestamp: msg.TimeStamp}));
         return msg;
+    },
+
+    getJSDKParams: async function(params) {
+        let {orgid, agentid, url} = params;
+        let timestamp = Math.floor(Date.now() / 1000);
+        let noncestr = getRndStr(6);
+        //查询企业永久授权码
+        let corps = await Models.ddtalkCorp.find({ where: {corpId: orgid}, limit: 1});
+        if (corps && corps.length) {
+            let corp = corps[0];
+            if (corp.isSuiteRelieve) {
+                let err = new Error(`企业还未授权或者已取消授权`);
+                throw err;
+            }
+            let tokenObj = await _getSuiteToken();
+            let suiteToken = tokenObj['suite_access_token']
+            let isvApi = new ISVApi(config.suiteid, suiteToken, orgid, corp.permanentCode);
+            let corpApi = await isvApi.getCorpApi();
+            let ticketObj = await corpApi.getTicket();    //获取到了ticket
+            let arr = [];
+            arr.push('noncestr='+noncestr)
+            arr.push('jsapi_ticket='+ticketObj.ticket);
+            arr.push('url='+url);
+            arr.push('timestamp='+timestamp)
+            arr.sort()
+            let originStr = arr.join('&');
+            console.info(originStr)
+            let signature = require("crypto").createHash('sha1').update(originStr, 'utf8').digest('hex');
+            return {
+                agentId: agentid, // 必填，微应用ID
+                corpId: orgid,//必填，企业ID
+                timeStamp: timestamp, // 必填，生成签名的时间戳
+                nonceStr: noncestr, // 必填，生成签名的随机串
+                signature: signature, // 必填，签名
+            }
+        }
+        throw new Error(`企业不存在`)
     }
 }
 
