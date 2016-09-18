@@ -56,7 +56,7 @@ export class DDTalkUser extends ModelObject {
     @Field({ type: Types.UUID})
     get id():string { return Values.UUIDV1()}
     set id(id: string) {}
-
+    
     @Field({ type: Types.STRING(50)})
     get ddUserId() : string { return null};
     set ddUserId(userId: string) {}
@@ -68,4 +68,12 @@ export class DDTalkUser extends ModelObject {
     @Field({type: Types.BOOLEAN})
     get isAdmin() { return false}
     set isAdmin(isAdmin: boolean) {}
+
+    @Field({type: Types.TEXT})
+    get avatar() : string { return null}
+    set avatar(avatar: string) {}
+
+    @Field({type: Types.STRING(50)})
+    get name(): string { return null};
+    set name(name: string) {}
 }
