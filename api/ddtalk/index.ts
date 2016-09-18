@@ -11,7 +11,7 @@ import cache = require("common/cache");
 const config ={
     token: 'jingli2016',
     encodingAESKey: '8nf2df6n0hiifsgg521mmjl6euyxoy3y6d9d3mt1laq',
-    suiteid: 'suitezutlhpvgyvgakcdo', //这里的suiteid===suiteKey, 第一次验证没有不用填
+    suiteid: 'suitezutlhpvgyvgakcdo',
     secret: 'pV--T2FZj-3QCjJzcQd5OnzDBAe6rRKRQGEmc8iVCvdtc2FUOS5icq1gVfkbqiTx',
 }
 
@@ -98,7 +98,6 @@ let ddTalkMsgHandle = {
             let company = await corp.getCompany(corp['company_id']);
             company.status = 1;
             company = await company.save();
-
             corp.isSuiteRelieve = false;
             corp.permanentCode = permanentCode;
             corp = await corp.save();
@@ -112,7 +111,9 @@ let ddTalkMsgHandle = {
                 corpId: corpid,
                 permanentCode: permanentCode,
                 companyId: company.id,
-                isSuiteRelieve: false}
+                isSuiteRelieve: false
+            }
+
             let ddtalkCorp = Models.ddtalkCorp.create(obj);
             await ddtalkCorp.save();
             //管理员信息
@@ -135,8 +136,35 @@ let ddTalkMsgHandle = {
             }
             let ddtalkUser = Models.ddtalkUser.create(_ddtalkUser);
             await ddtalkUser.save();
+
+            try {
+                let departments = await corpApi.getDepartments();
+                for(let d of departments) {
+                    // console.info(`导入department:`, d.name)
+                    let _d = Models.department.create({name: d.name});
+                    _d = await _d.save();
+
+                    let users = await corpApi.getUserListByDepartment(d.id);
+                    for(let u of users) {
+                        let dingUsers = await Models.ddtalkUser.find({ where: {ddUserId: u.userid}})
+                        if (dingUsers && dingUsers.length) {
+                            continue;
+                        }
+
+                        let _staff = Models.staff.create({name: u.name})
+                        _staff.department = _d;
+                        _staff = await _staff.save();
+                        // console.info(`导入user:`, u.name);
+                        let dingUser = Models.ddtalkUser.create({id: _staff.id, avatar: u.avatar, dingId: u.dingId, isAdmin: u.isAdmin, name: u.name, ddUserId: u.userid});
+                        await dingUser.save();
+                    }
+                }
+            } catch(err) {
+                console.error("导入用户错误", err)
+                throw err;
+            }
+
         }
-        console.info("激活账号....")
         await isvApi.activeSuite();
     },
 
@@ -175,10 +203,10 @@ let ddTalkMsgHandle = {
 class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
-        app.post("/ddtalk/isv/receive", dingSuiteCallback(config, function(msg, req, res, next) {
+        app.post("/ddtalk/isv/receive", dingSuiteCallback(config, function (msg, req, res, next) {
             console.info(msg)
             return ddTalkMsgHandle[msg.EventType](msg)
-                .then( (ret) => {
+                .then((ret) => {
                     res.reply();
                 })
                 .catch((err) => {
@@ -186,68 +214,6 @@ class DDTalk {
                     next(err);
                 });
         }));
-
-        app.get("/ddtalk/js-api-config", function(req, res, next) {
-            let corpid = req.query.corpid;
-            let url = req.query.url;
-            let timestamp = Math.floor(Date.now() / 1000);
-            let noncestr = getRndStr(6);
-            let agentid = '40756443';
-            let fn: any = async ()=> {
-                //查询企业永久授权码
-                let corps = await Models.ddtalkCorp.find({ where: {corpId: corpid}, limit: 1});
-                if (corps && corps.length) {
-                    let corp = corps[0];
-                    if (corp.isSuiteRelieve) {
-                        let err = new Error(`企业还未授权或者已取消授权`);
-                        throw err;
-                    }
-                    let tokenObj = await _getSuiteToken();
-                    let suiteToken = tokenObj['suite_access_token']
-                    let isvApi = new ISVApi(config.suiteid, suiteToken, corpid, corp.permanentCode);
-                    let corpApi = await isvApi.getCorpApi();
-                    let ticketObj = await corpApi.getTicket();    //获取到了ticket
-                    let arr = [];
-                    arr.push('noncestr='+noncestr)
-                    arr.push('jsapi_ticket='+ticketObj.ticket);
-                    arr.push('url='+url);
-                    arr.push('timestamp='+timestamp)
-                    arr.sort()
-                    let originStr = arr.join('&');
-                    let signature = require("crypto").createHash('sha1').update(originStr, 'utf8').digest('hex');
-                    return {
-                        agentId: agentid, // 必填，微应用ID
-                        corpId: corpid,//必填，企业ID
-                        timeStamp: timestamp, // 必填，生成签名的时间戳
-                        nonceStr: noncestr, // 必填，生成签名的随机串
-                        signature: signature, // 必填，签名
-                        jsApiList : [
-                            'runtime.info',
-                            'biz.contact.choose',
-                            'device.notification.confirm',
-                            'device.notification.alert',
-                            'device.notification.prompt',
-                            'biz.ding.post',
-                            'biz.util.openLink',
-                            'biz.user.get',
-                            'runtime.permission.requestAuthCode',
-                            'device.base.getInterface',
-                            'device.base.getUUID',
-                            'biz.util.scan',
-                        ] // 必填，需要使用的jsapi列表，注意：不要带dd。
-                    }
-                    // return ticketObj;
-                }
-                throw new Error(`企业不存在`)
-            }
-
-            fn().then( (ret)=> {
-                res.json(ret)
-            }).catch((err) => {
-                console.info(err.stack);
-                next(err)
-            });
-        })
     }
 
     @clientExport
@@ -257,7 +223,6 @@ class DDTalk {
         let noncestr = getRndStr(6);
         //查询企业永久授权码
         let corps = await Models.ddtalkCorp.find({ where: {corpId: orgid}, limit: 1});
-        console.info(corps)
         if (corps && corps.length) {
             let corp = corps[0];
             if (corp.isSuiteRelieve) {

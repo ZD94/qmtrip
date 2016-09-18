@@ -6,6 +6,7 @@
 import {CorpAccessToken} from "./interface";
 import {reqProxy} from "./reqProxy";
 import RedisCache = require('./redisCache');
+import {DdTalkDepartment} from "./type";
 
 interface CorpTicket {
     ticket: string;
@@ -76,6 +77,35 @@ class CorpApi {
             if (ret.errrcode) throw new Error(ret);
             return {userId: ret.userid, deviceId: ret.deviceId, isSys: ret.is_sys, sysLevel: ret.sys_level}
         })
+    }
+
+    async getDepartments() :Promise<Array<DdTalkDepartment>> {
+        let url = `https://oapi.dingtalk.com/department/list?access_token=${this.accessToken.access_token}`;
+        return reqProxy(url, {
+            method: 'GET',
+            lang: 'zh_CN',
+        }).then( async (ret: any) => {
+            if (ret.errcode) throw new Error(JSON.stringify(ret));
+            return ret.department;
+        })
+    }
+
+    async getUserListByDepartment(departmentId): Promise<Array<any>> {
+        let url = `https://oapi.dingtalk.com/user/list?access_token=${this.accessToken.access_token}&department_id=${departmentId}`;
+        let hasMore = true;
+        let users: Array<any> = [];
+        while(hasMore) {
+            let result: any = await reqProxy(url, {
+                method: 'GET',
+                lang: 'zh_cn'
+            })
+            if (result.errcode) throw new Error(JSON.stringify(result));
+            hasMore = result.hasMore;
+            result.userlist.forEach( (u) => {
+                users.push(u);
+            })
+        }
+        return users;
     }
 }
 
