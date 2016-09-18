@@ -39,10 +39,16 @@ class DDTalkApi {
             API.require('ddtalk');
             await API.onload();
             var url = window.location.href.split('#')[0];
+            //从地址栏中获取corpid
+            let reg = /corpid=(\w+)/;
+            let groups = reg.exec(url);
+            let orgid = '';
+            if (groups && groups.length) {
+                orgid = groups[1];
+            }
             var cfg = await API.ddtalk.getJSAPIConfig({
                 url: url,
-                orgid: 'ding3563b7093185eb9135c2f4657eb6378f',
-                agentid: '40756443'
+                orgid: orgid,
             });
             cfg.jsApiList = [
                 'runtime.info',
@@ -61,8 +67,8 @@ class DDTalkApi {
             await ddtalkLoad;
             return new Promise(function(resolve, reject) {
                 dd.error(reject);
-                dd.ready(resolve);
                 dd.config(cfg);
+                dd.ready(resolve);
             })
         }
 

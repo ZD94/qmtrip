@@ -3,6 +3,7 @@ import './storage';
 import './loading';
 import './wx-api';
 import './modal-dlg';
+import './ddtalk-api'
 
 import './AirCompany';
 import './Airport';
