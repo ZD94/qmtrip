@@ -210,7 +210,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         $scope.endDateSelector.beginDate = $scope.trip.beginDate;
     })
     $scope.nextStep = async function() {
-        if ($scope.currentTpSts.length && (!$scope.subsidy || !$scope.subsidy.template)) {
+        if ($scope.currentTpSts && $scope.currentTpSts.length && (!$scope.subsidy || !$scope.subsidy.template)) {
             $scope.showErrorMsg('请选择补助信息');
             return false;
         }
