@@ -311,7 +311,7 @@ function loadMonths($scope, $element) {
             $scope.month_2col = true;
         fixMonths($scope);
     });
-
+    let fromStatistic = $scope.options.fromStatistic;
     $scope.months = [];
     function loadNextMonth() {
         let date;
@@ -320,18 +320,24 @@ function loadMonths($scope, $element) {
         }else{
             let last = $scope.months[$scope.months.length - 1];
             date = moment({year: last.year, month: last.month - 1, day: 1});
-            date = date.add(1, 'month');
+            //shicong
+            if(fromStatistic){
+                date = date.subtract(1, 'month');
+            }else{
+                date = date.add(1, 'month');
+            }
         }
         let caldata = getMonth(date.year(), date.month() + 1);
         $scope.months.push(caldata);
     }
+    loadNextMonth();
+    loadNextMonth();
 
-    loadNextMonth();
-    loadNextMonth();
     $scope.loadNextMonth = function() {
         loadNextMonth();
         loadNextMonth();
         fixMonths($scope);
         //$scope.$broadcast('scroll.infiniteScrollComplete');
     }
+
 }
