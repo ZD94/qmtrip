@@ -24,8 +24,7 @@ class RedisCache implements DDTalkCache {
     }
 
     remove(key: string) : Promise<any> {
-        key = `${this._prefix}:${key}`
-        throw new Error('not support!')
+        return this.set(key, '');
     }
 }
 

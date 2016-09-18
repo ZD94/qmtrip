@@ -46,6 +46,11 @@ class ISVApi {
         await this.corpTokenCache.set(cacheKey, corpAccessToken);
         return corpAccessToken;
     }
+    
+    async removeCorpAccessToken() :Promise<any> {
+        let cacheKey = `${this.corpid}:access_token`;
+        this.corpTokenCache.remove(cacheKey);
+    }
 
     async getCorpAuthInfo() {
         let url = `https://oapi.dingtalk.com/service/get_auth_info?suite_access_token=${this.suiteToken}`;

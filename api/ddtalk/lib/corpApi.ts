@@ -67,7 +67,7 @@ class CorpApi {
         })
     }
 
-    async getUserInfoByOAuth(code) : any {
+    async getUserInfoByOAuth(code) : Promise<any> {
         let url = `https://oapi.dingtalk.com/user/getuserinfo?access_token=${this.accessToken.access_token}&code=${code}`;
         return reqProxy(url, {
             name: '通过code换取用户信息',

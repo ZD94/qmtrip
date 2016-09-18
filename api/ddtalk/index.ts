@@ -120,11 +120,17 @@ let ddTalkMsgHandle = {
                 status: 1
             })
             staff = await staff.save();
+            company.createUser = staff.id;
+            await company.save();
+
             let _ddtalkUser = {
                 id: staff.id,
                 dingId: userInfo.dingId,
-                userId: userInfo.userid,
-                isAdmin: userInfo.isAdmin}
+                ddUserId: userInfo.userid,
+                isAdmin: userInfo.isAdmin,
+                name: userInfo.name,
+                avatar: userInfo.avatar,
+            }
             let ddtalkUser = Models.ddtalkUser.create(_ddtalkUser);
             await ddtalkUser.save();
         }
@@ -150,6 +156,8 @@ let ddTalkMsgHandle = {
             let company = await corp.getCompany(corp['company_id']);
             company.status = -1;
             await company.save();
+            let isvApi = new ISVApi(config.suiteid, '', corpId, '');
+            await isvApi.removeCorpAccessToken();
         }
     },
 
@@ -194,7 +202,29 @@ let ddTalkMsgHandle = {
             }
         }
         throw new Error(`企业不存在`)
-    }
+    },
+    async loginByDdTalkCode(params) : Promise<any> {
+        let {corpid, agentid, code} = params;
+        let corps = await Models.ddtalkCorp.find({ where: {corpId: corpid}, limit: 1});
+        if (corps && corps.length) {
+            let corp = corps[0];
+            if (corp.isSuiteRelieve) {
+                let err = new Error(`企业还未授权或者已取消授权`);
+                throw err;
+            }
+            let tokenObj = await _getSuiteToken();
+            let suiteToken = tokenObj['suite_access_token']
+            let isvApi = new ISVApi(config.suiteid, suiteToken, corpid, corp.permanentCode);
+            let corpApi = await isvApi.getCorpApi();
+            let dingTalkUser = await corpApi.getUserInfoByOAuth(code);
+            //查找是否已经绑定账号
+            let ddtalkUser = await Models.ddtalkUser.find( { where: {ddUserId: dingTalkUser.userid}});
+            if (ddtalkUser) {
+                //自动登录
+            }
+            throw new Error(`{"code":-1, "msg": "用户还未绑定账户"}`);
+        }
+    },
 }
 
 class DDTalk {
@@ -239,7 +269,6 @@ class DDTalk {
                     arr.push('timestamp='+timestamp)
                     arr.sort()
                     let originStr = arr.join('&');
-                    console.info(originStr)
                     let signature = require("crypto").createHash('sha1').update(originStr, 'utf8').digest('hex');
                     return {
                         agentId: agentid, // 必填，微应用ID
