@@ -116,7 +116,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
     })
 
     $scope.calcTripDuration = function(){
-        return moment(trip.endDate).diff(trip.beginDate, 'days') || 1;
+        return moment(trip.endDate).startOf('day').diff(moment(trip.beginDate).startOf('day'), 'days') || 1;
     };
     $scope.incTripDuration = function(){
         trip.endDate = moment(trip.endDate).add(1, 'days').toDate();
