@@ -338,12 +338,13 @@ class TripPlanModule {
         };
         if(!nextApprove){
             //给员工自己发送通知
-            API.notify.submitNotify({
+            await API.notify.submitNotify({
                 key: 'qm_notify_self_traveludget',
                 email: staff.email,
                 values: values,
                 openid: openid,
             });
+            await API.ddtalk.sendTextMsg({accountId: staff.id, text: '出差申请已通过审核'})
         }
 
         if(company.isApproveOpen) {
@@ -383,13 +384,14 @@ class TripPlanModule {
                 approve_values.budget = tripApprove.budget;
                 // approve_values.autoApproveTime = moment(tripApprove.autoApproveTime["value"]).format(timeFormat)
             }
-            API.notify.submitNotify({
+            await API.notify.submitNotify({
                 key: 'qm_notify_new_travelbudget',
                 email: approveUser.email,
                 values: approve_values,
                 mobile: approveUser.mobile,
                 openid: openId,
-            })
+            });
+            await API.ddtalk.sendTextMsg({accountId: staff.id, text: '有新的出差申请需要您审批'})
         } else {
             let admins = await Models.staff.find({ where: {companyId: tripApprove['companyId'], roleId: [EStaffRole.OWNER,
                 EStaffRole.ADMIN], staffStatus: EStaffStatus.ON_JOB, id: {$ne: staff.id}}}); //获取激活状态的管理员
@@ -651,6 +653,7 @@ class TripPlanModule {
                 emailReason: params.auditRemark
             };
             await API.notify.submitNotify({email: user.email, key: tplName, values: self_values, mobile: user.mobile, openid: openId});
+            await API.ddtalk.sendTextMsg({ accountId: user.id, text: '您的预算已成功生成'});
         }
 
         return true;
@@ -932,7 +935,8 @@ class TripPlanModule {
             templateValue.auditTime = utils.now();
 
             let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
-            API.notify.submitNotify({key: templateName, values: templateValue, email: staff.email, openid: openId});
+            await API.notify.submitNotify({key: templateName, values: templateValue, email: staff.email, openid: openId});
+            await API.ddtalk.sendTextMsg({accountId: staff.id, text: '票据已审批通过'})
         }
 
         let user = await AgencyUser.getCurrent();

@@ -107,6 +107,16 @@ class CorpApi {
         }
         return users;
     }
+
+    async sendTextMsg(msg) {
+        let url = `https://oapi.dingtalk.com/message/send?access_token=${this.accessToken.access_token}`;
+        console.info(msg)
+        let result = await reqProxy(url, {
+            method: 'POST',
+            body: msg,
+        })
+        return result;
+    }
 }
 
 export= CorpApi

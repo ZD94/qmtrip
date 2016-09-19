@@ -1,0 +1,9 @@
+{
+  "msgtype": "link",
+  "link": {
+    "messageUrl": "<%=url%>",
+    "picUrl":"<%=picurl%>",
+    "title": "<%=title%>",
+    "text": "<%=content%>"
+  }
+}

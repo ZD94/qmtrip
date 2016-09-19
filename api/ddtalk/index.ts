@@ -20,9 +20,11 @@ import ISVApi = require("./lib/isvApi");
 import CorpApi = require("./lib/corpApi");
 import {reqProxy} from "./lib/reqProxy";
 import {Company} from "api/_types/company";
-import {Staff} from "api/_types/staff";
+import {Staff, EStaffRole} from "api/_types/staff";
 import {Models} from "../_types/index";
 import {clientExport} from "../../common/api/helper";
+import {TravelPolicy, EPlaneLevel, ETrainLevel, EHotelLevel} from "../_types/travelPolicy";
+import {get_msg} from "./lib/msg-template/index";
 
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 
@@ -86,7 +88,6 @@ let ddTalkMsgHandle = {
         let isvApi = new ISVApi(config.suiteid, suiteToken, corpid, permanentCode);
         let authInfo: any = await isvApi.getCorpAuthInfo();
         let authUserInfo = authInfo.auth_user_info;
-        // let authCorpInfo = authInfo.auth_corp_info;
 
         let corpAccessToken = await isvApi.getCorpAccessToken();
         let corpApi = new CorpApi(corpid, corpAccessToken);
@@ -106,23 +107,34 @@ let ddTalkMsgHandle = {
             let company = Company.create({name: corp_name});
             company = await company.save();
 
+            //创建默认差旅标准
+            let travelPolicy = await TravelPolicy.create({name: '默认标准', planeLevel: EPlaneLevel.ECONOMY,
+                trainLevel: ETrainLevel.SECOND_CLASS, hotelLevel: EHotelLevel.THREE_STAR, subsidy: 0, isDefault: true});
+            travelPolicy.company = company;
+            travelPolicy = await travelPolicy.save();
+
             //钉钉关联企业信息
             let obj = {
+                id: company.id,
                 corpId: corpid,
                 permanentCode: permanentCode,
                 companyId: company.id,
-                isSuiteRelieve: false
+                isSuiteRelieve: false,
             }
-
             let ddtalkCorp = Models.ddtalkCorp.create(obj);
             await ddtalkCorp.save();
+
             //管理员信息
             let staff = Staff.create({
                 name: userInfo.name,
-                companyId: company.id,
-                status: 1
+                status: 1,
+                roleId: EStaffRole.OWNER,
+                travelPolicyId: travelPolicy.id
             })
+            staff.company = company;
             staff = await staff.save();
+
+            //更新公司信息
             company.createUser = staff.id;
             await company.save();
 
@@ -152,7 +164,7 @@ let ddTalkMsgHandle = {
                             continue;
                         }
 
-                        let _staff = Models.staff.create({name: u.name})
+                        let _staff = Models.staff.create({name: u.name, travelPolicyId: travelPolicy.id})
                         _staff.company = company;
                         _staff.department = _d;
                         _staff = await _staff.save();
@@ -281,6 +293,30 @@ class DDTalk {
         } else {
             throw new Error(`企业不存在`)
         }
+    }
+
+    static async sendTextMsg(params): Promise<any> {
+        let {accountId, text} = params;
+        text = text || '您有一条新消息'
+        let staff = await Models.staff.get(accountId);
+        let company = staff.company;
+        let corp = await Models.ddtalkCorp.get(company.id);
+        let ddtalkUser = await Models.ddtalkUser.get(staff.id);
+        if (corp && ddtalkUser) {
+            let tokenObj = await _getSuiteToken();
+            let isvApi = new ISVApi(config.suiteid, tokenObj['suite_access_token'], corp.corpId, corp.permanentCode);
+            let corpApi = await isvApi.getCorpApi();
+            let msg= await get_msg({
+                touser: ddtalkUser.ddUserId,
+                content: text,
+                agentid: '40756443'
+            }, 'text');
+
+            let ret = await corpApi.sendTextMsg(msg);
+            return ret;
+        }
+        console.warn(`企业不存在或者不是从钉钉导入`);
+        return null;
     }
 }
 
