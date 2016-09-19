@@ -142,6 +142,7 @@ let ddTalkMsgHandle = {
                 for(let d of departments) {
                     // console.info(`导入department:`, d.name)
                     let _d = Models.department.create({name: d.name});
+                    _d.company = company;
                     _d = await _d.save();
 
                     let users = await corpApi.getUserListByDepartment(d.id);
@@ -152,6 +153,7 @@ let ddTalkMsgHandle = {
                         }
 
                         let _staff = Models.staff.create({name: u.name})
+                        _staff.company = company;
                         _staff.department = _d;
                         _staff = await _staff.save();
                         // console.info(`导入user:`, u.name);
@@ -163,7 +165,6 @@ let ddTalkMsgHandle = {
                 console.error("导入用户错误", err)
                 throw err;
             }
-
         }
         await isvApi.activeSuite();
     },
