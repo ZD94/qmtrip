@@ -49,7 +49,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
     if (isDingTalk()) {
         try {
             let url = window.location.href;
-            let reg = /corpid=(\w+)/;
+            let reg = /\/dd\/(\w+)/;
             let groups = reg.exec(url);
             let corpid = ''
             if (groups && groups.length) {

@@ -40,7 +40,7 @@ class DDTalkApi {
             await API.onload();
             var url = window.location.href.split('#')[0];
             //从地址栏中获取corpid
-            let reg = /corpid=(\w+)/;
+            let reg = /\/dd\/(\w+)/;
             let groups = reg.exec(url);
             let orgid = '';
             if (groups && groups.length) {
