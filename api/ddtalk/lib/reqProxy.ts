@@ -9,8 +9,9 @@ export function reqProxy(url, options) {
     return new Promise( (resolve, reject) => {
         let method = options.method || 'POST';
         let qs = options.qs || {};
-        let body = options.body || {};
+        let body: any = options.body || {};
         let name = options.name || '未知';
+        body = JSON.stringify(body)
         request({
             uri: url,
             headers: {
@@ -18,7 +19,7 @@ export function reqProxy(url, options) {
             },
             method: method,
             qs: qs,
-            body: JSON.stringify(body),
+            body: body,
         }, (err, resp, data: any) => {
             if (typeof data == 'string') {
                 data = JSON.parse(data);
