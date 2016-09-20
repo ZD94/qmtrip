@@ -34,7 +34,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
     require("./login.scss");
     //微信中自动登录
     let href = window.location.href;
-    if(browserspec.is_wechat && /.*jingli365\.com/.test(window.location.host) && !$stateParams.wxauthcode && !/.*backurl\=.*/.test(href)) {
+    if(browserspec.is_wechat && window.location.host != 't.jingli365.com' && /.*jingli365\.com/.test(window.location.host) && !$stateParams.wxauthcode && !/.*backurl\=.*/.test(href)) {
         await API.onload();
 
         let url = await API.auth.getWeChatLoginUrl({redirectUrl: href});
