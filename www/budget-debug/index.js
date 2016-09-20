@@ -133,13 +133,26 @@ app.controller('debug',function($scope, $http, $location){
     var policy = JSON.stringify($scope.policy);
     let originServer = $scope.originServer;
     let originServerUrl = originServer.url+'?key='+url.key;
-    $http.post(originServerUrl,{originData: originData, query: query, policy: policy, prefers: prefers, type: type})
-        .success(function(datas){
-            console.log('进入');
-            $scope.result = datas;
-            $scope.originData.markedData = datas.markedScoreData;
-            console.log('出来');
-        })
+    $.post(originServerUrl, {originData: originData, query: query, policy: policy, prefers: prefers, type: type}, function(datas) {
+        $scope.result = datas;
+        $scope.originData.markedData = datas.markedScoreData;
+    }, "json")
+    // $http.post(originServerUrl,{originData: originData, query: query, policy: policy, prefers: prefers, type: type})
+    //     .success(function(datas){
+    //         console.log('进入');
+    //         $scope.result = datas;
+    //         $scope.originData.markedData = datas.markedScoreData;
+    //         console.log('出来');
+    //     })
+    //   $http({
+    //       method: 'POST',
+    //       url: originServerUrl,
+    //       data: {originData: originData, query: query, policy: policy, prefers: prefers, type: type}}).then(
+    //           function(res){
+    //               console.log(res);
+    //           },function(){}
+    //   )
+
   };
   $scope.change = function(){
     var single = $scope.prefer;    //string
