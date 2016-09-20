@@ -87,6 +87,7 @@ let ddTalkMsgHandle = {
 
         let isvApi = new ISVApi(config.suiteid, suiteToken, corpid, permanentCode);
         let authInfo: any = await isvApi.getCorpAuthInfo();
+        console.info(authInfo)
         let authUserInfo = authInfo.auth_user_info;
 
         let corpAccessToken = await isvApi.getCorpAccessToken();
@@ -309,7 +310,7 @@ class DDTalk {
             let msg= await get_msg({
                 touser: ddtalkUser.ddUserId,
                 content: text,
-                agentid: '40756443'
+                agentid: '41551318'
             }, 'text');
 
             let ret = await corpApi.sendTextMsg(msg);

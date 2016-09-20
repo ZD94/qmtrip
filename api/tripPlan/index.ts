@@ -344,7 +344,7 @@ class TripPlanModule {
                 values: values,
                 openid: openid,
             });
-            await API.ddtalk.sendTextMsg({accountId: staff.id, text: '出差申请已通过审核'})
+            await API.ddtalk.sendTextMsg({accountId: staff.id, text: `您的出差申请已经生成`})
         }
 
         if(company.isApproveOpen) {
@@ -391,7 +391,7 @@ class TripPlanModule {
                 mobile: approveUser.mobile,
                 openid: openId,
             });
-            await API.ddtalk.sendTextMsg({accountId: staff.id, text: '有新的出差申请需要您审批'})
+            await API.ddtalk.sendTextMsg({accountId: approveUser.id, text: '有新的出差申请需要您审批'})
         } else {
             let admins = await Models.staff.find({ where: {companyId: tripApprove['companyId'], roleId: [EStaffRole.OWNER,
                 EStaffRole.ADMIN], staffStatus: EStaffStatus.ON_JOB, id: {$ne: staff.id}}}); //获取激活状态的管理员
