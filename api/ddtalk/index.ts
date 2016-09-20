@@ -25,6 +25,7 @@ import {Models} from "../_types/index";
 import {clientExport} from "../../common/api/helper";
 import {TravelPolicy, EPlaneLevel, ETrainLevel, EHotelLevel} from "../_types/travelPolicy";
 import {get_msg} from "./lib/msg-template/index";
+import {md5} from "../../common/utils";
 
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 
@@ -87,13 +88,12 @@ let ddTalkMsgHandle = {
 
         let isvApi = new ISVApi(config.suiteid, suiteToken, corpid, permanentCode);
         let authInfo: any = await isvApi.getCorpAuthInfo();
-        console.info(authInfo)
         let authUserInfo = authInfo.auth_user_info;
 
         let corpAccessToken = await isvApi.getCorpAccessToken();
         let corpApi = new CorpApi(corpid, corpAccessToken);
         let userInfo: any = await corpApi.getUser(authUserInfo.userId);
-
+        const DEFAULT_PWD = '000000';
         let corps = await Models.ddtalkCorp.find({where : {corpId: corpid}});
         if (corps && corps.length) {
             let corp = corps[0];
@@ -132,6 +132,7 @@ let ddTalkMsgHandle = {
                 roleId: EStaffRole.OWNER,
                 travelPolicyId: travelPolicy.id
             })
+            staff.pwd = md5(DEFAULT_PWD);
             staff.company = company;
             staff = await staff.save();
 
@@ -168,6 +169,7 @@ let ddTalkMsgHandle = {
                         let _staff = Models.staff.create({name: u.name, travelPolicyId: travelPolicy.id})
                         _staff.company = company;
                         _staff.department = _d;
+                        _staff.pwd = md5(DEFAULT_PWD);
                         _staff = await _staff.save();
                         // console.info(`导入user:`, u.name);
                         let dingUser = Models.ddtalkUser.create({id: _staff.id, avatar: u.avatar, dingId: u.dingId, isAdmin: u.isAdmin, name: u.name, ddUserId: u.userid});
