@@ -49,12 +49,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
     if (isDingTalk()) {
         try {
             let url = window.location.href;
-            let reg = /\/dd\/(\w+)/;
-            let groups = reg.exec(url);
-            let corpid = ''
-            if (groups && groups.length) {
-                corpid = groups[1]
-            }
+            var corpid = window['ddtalk'].getCorpid();
 
             let ddtalkAuthCode = await new Promise((resolve, reject) => {
                 dd.runtime.permission.requestAuthCode({

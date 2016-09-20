@@ -101,11 +101,8 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
         });
     };
 
+    $scope.isShowLogout = !/dingtalk/i.test(window.navigator.userAgent);
     $scope.logout = async function () {
-        if (/dingtalk/i.test(window.navigator.userAgent)) {
-            return $scope.showErrorMsg('钉钉中无法退出');
-        }
-
         await API.onload();
         var browserspec = require('browserspec');
         if (browserspec.is_wechat) {

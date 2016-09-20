@@ -37,7 +37,7 @@
                             切换为{{isAdminMenus?'员工':'管理'}}
                         </button>
                     </div>
-                    <div class="button-bar">
+                    <div class="button-bar" ng-if="isShowLogout">
                         <button id="menu-button22" class="button button-light  button-block icon ion-android-notifications">
                             通知
                             <span class="badge" style="color:red;font-size: 30px;" ng-if="Menu.notie == true">·</span>
