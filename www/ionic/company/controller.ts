@@ -1231,7 +1231,7 @@ export async function StaffInvitedController($scope, Models, $ionicHistory, $ion
         //     title:'邀请加入企业',
         //     desc:'公司邀请你加入',
         //     link:$scope.invitedLink,
-        //     imgUrl:'http://t.jingli365.com/ionic/images/logo.png',
+        //     imgUrl:'https://t.jingli365.com/ionic/images/logo.png',
         //     success: function () {
         //         // 用户确认分享后执行的回调函数
         //     },
@@ -1272,7 +1272,7 @@ export async function StaffInvitedController($scope, Models, $ionicHistory, $ion
                 title: staff.name +'邀请您注册鲸力商旅',
                 desc:'加入'+staff.company.name+',共同开启智能商旅!',
                 link: $scope.invitedLink.goInvitedLink,
-                imgUrl:'http://t.jingli365.com/ionic/images/logo.png',
+                imgUrl:'https://t.jingli365.com/ionic/images/logo.png',
                 type: '', // 分享类型,music、video或link，不填默认为link
                 dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
                 success: function () {
