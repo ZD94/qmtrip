@@ -46,6 +46,7 @@ gulplib.bundle_lib('calendar', {require: ['lunar-calendar', "calendar"]});
 gulplib.bundle_lib('msgbox', {require: ['notie', 'msgbox']});
 gulplib.bundle_lib('nglibs', {require: ['nglibs', 'api/_types', 'api/_types/**/*', 'common/model/client:common/model']});
 gulplib.bundle_lib('ngapp', {require: ['common/client/ngapp/index.ts:ngapp', 'browserspec']});
+gulplib.bundle_lib('w3libs', {require: ['www/libs']});
 
 //gulplib.angular_app('staff');
 //gulplib.angular_app('corp');
@@ -60,7 +61,7 @@ gulplib.dist(function () {
     var filter = require('gulp-filter');
     var dist_all = [
         gulp.src([gulplib.public_dir + '/**/*'])
-            .pipe(filter(['**', '!**/controller.[jt]s', '!**/*.less', '!**/*.scss', '!**/*.map']))
+            .pipe(filter(['**', '!**/*.ts', '!**/*.less', '!**/*.scss', '!**/*.map']))
             .pipe(gulp.dest('dist/' + gulplib.public_dir)),
         gulp.src('api/**/*')
             .pipe(gulp.dest('dist/api')),

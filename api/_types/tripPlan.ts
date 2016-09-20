@@ -29,6 +29,14 @@ export enum EApproveStatus {
     PASS = 1 //审批通过
 }
 
+export const EApproveStatus2Text: {[index: number]: string} = {
+    [EApproveStatus.CANCEL]: '已撤销',
+    [EApproveStatus.NO_BUDGET]: '没有预算',
+    [EApproveStatus.PASS]: '审批通过',
+    [EApproveStatus.REJECT]: '审批驳回',
+    [EApproveStatus.WAIT_APPROVE]: '等待审批',
+};
+
 export enum EApproveResult {
     NULL = -1,
     WAIT_APPROVE = 0, //等待审批
@@ -37,11 +45,19 @@ export enum EApproveResult {
     REJECT = 3 //驳回
 }
 
+export const EApproveResult2Text: {[index: number]: string} = {
+    [EApproveResult.AUTO_APPROVE]: '自动通过',
+    [EApproveResult.PASS]: '审批通过',
+    [EApproveResult.REJECT]: '审批驳回',
+    [EApproveResult.WAIT_APPROVE]: '提交审批',
+};
+
 export enum ETripType {
     OUT_TRIP = 0, //去程
     BACK_TRIP = 1,
     HOTEL = 2,
     SUBSIDY = 3,
+    SPECIAL_APPROVE = 4
 }
 
 export enum EInvoiceType {
@@ -49,6 +65,7 @@ export enum EInvoiceType {
     PLANE = 1,
     HOTEL = 2,
     SUBSIDY = 3,
+    SPECIAL_APPROVE = 4
 }
 
 export enum  EAuditStatus {
@@ -136,6 +153,14 @@ export class TripPlan extends ModelObject {
     @Field({type: Types.BOOLEAN})
     get isNeedHotel(): boolean { return false; }
     set isNeedHotel(val: boolean) {}
+
+    @Field({type: Types.BOOLEAN})
+    get isSpecialApprove(): boolean { return false; }
+    set isSpecialApprove(val: boolean) {}
+
+    @Field({type: Types.TEXT})
+    get specialApproveRemark(): string { return ''; }
+    set specialApproveRemark(val: string) {}
 
     @Field({ type: Types.JSONB})
     get query() : any { return null};
@@ -540,6 +565,14 @@ export class TripApprove extends ModelObject{
     @Field({type: Types.TEXT})
     get approvedUsers(): string { return ''; }
     set approvedUsers(val: string) {}
+
+    @Field({type: Types.BOOLEAN})
+    get isSpecialApprove(): boolean { return false; }
+    set isSpecialApprove(val: boolean) {}
+
+    @Field({type: Types.TEXT})
+    get specialApproveRemark(): string { return ''; }
+    set specialApproveRemark(val: string) {}
 
     @Field({type: Types.DATE})
     get startAt(): Date { return null; }

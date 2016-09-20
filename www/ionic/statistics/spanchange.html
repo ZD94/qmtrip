@@ -1,0 +1,37 @@
+<ion-modal-view class="spanChange">
+    <ion-header-bar>
+        <h1 class="title"></h1>
+        <button class="button button-positive" style="float: right" ng-click="modal.hide()">取消</button>
+    </ion-header-bar>
+    <ion-content>
+        <ion-list>
+            <ion-item ng-click="changespan('week')">
+                周
+                <span style="float: right" ng-class="{true:'ion-checkmark-round'}[isweek]"></span>
+            </ion-item>
+            <ion-item ng-click="changespan('month')">
+                月
+                <span style="float: right" ng-class="{true:'ion-checkmark-round'}[ismonth]"></span>
+            </ion-item>
+            <ion-item ng-click="changespan('quarter')">
+                <span style="float: right" ng-class="{true:'ion-checkmark-round'}[isquarter]"></span>
+                季
+            </ion-item>
+            <ion-item ng-click="changespan('year')">
+                <span style="float: right" ng-class="{true:'ion-checkmark-round'}[isyear]"></span>
+                年
+            </ion-item>
+        </ion-list>
+        <ion-toggle toggle-class="toggle-positive" ng-model="selfdefine">自定义</ion-toggle>
+        <div ng-if="selfdefine" class="selfDefine" ng-click="selfDefineFun()">
+            <div>
+                <div class="self-time-title">开始日期</div>
+                <div class="self-time-value">{{beginTime|date:'yyyy-MM-dd'}}</div>
+            </div>
+            <div>
+                <div class="self-time-title">结束日期</div>
+                <div class="self-time-value">{{endTime|date:'yyyy-MM-dd'}}</div>
+            </div>
+        </div>
+    </ion-content>
+</ion-modal-view>

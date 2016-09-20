@@ -15,7 +15,7 @@ let scheduler = require('common/scheduler');
 import _ = require('lodash');
 import {requireParams, clientExport} from 'common/api/helper';
 import {
-    Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus,
+    Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus,EInvoiceType,
     TripApprove, EApproveStatus, EApproveResult
 } from "api/_types/tripPlan";
 import {Models} from "api/_types";
@@ -548,7 +548,7 @@ class TripPlanModule {
         if(isNextApprove && !params.nextApproveUserId)
             throw new Error("审批人不能为空");
 
-        if (!budgetId){
+        if (!tripApprove.isSpecialApprove && !budgetId){
             throw new Error(`预算信息已失效请重新生成`);
         }else if(approveResult != EApproveResult.PASS && approveResult != EApproveResult.REJECT) {
             throw L.ERR.PERMISSION_DENY(); //只能审批待审批的出差记录
@@ -558,19 +558,21 @@ class TripPlanModule {
             throw L.ERR.PERMISSION_DENY();
         }
 
-        let budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
-        if (!budgetInfo || !budgetInfo.budgets)
-            throw new Error(`预算信息已失效请重新生成`);
-        let finalBudget = 0;
-        budgetInfo.budgets.forEach((v) => {
-            if (v.price <= 0) {
-                finalBudget = -1;
-                return;
-            }
-            finalBudget += Number(v.price);
-        });
-        tripApprove.budget = finalBudget;
-        tripApprove.budgetInfo = budgetInfo.budgets;
+        if(!tripApprove.isSpecialApprove){
+            let budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
+            if (!budgetInfo || !budgetInfo.budgets)
+                throw new Error(`预算信息已失效请重新生成`);
+            let finalBudget = 0;
+            budgetInfo.budgets.forEach((v) => {
+                if (v.price <= 0) {
+                    finalBudget = -1;
+                    return;
+                }
+                finalBudget += Number(v.price);
+            });
+            tripApprove.budget = finalBudget;
+            tripApprove.budgetInfo = budgetInfo.budgets;
+        }
 
         let tripPlan: TripPlan;
         let notifyRemark = '';
@@ -804,7 +806,7 @@ class TripPlanModule {
             let auditValues = {auditUserName: user.name, companyName: company.name, staffName: staff.name, projectName: tripPlan.title, goTrafficBudget: go,
                 backTrafficBudget: back, hotelBudget: hotel, otherBudget: others, totalBudget: tripPlan.budget, url: auditUrl, detailUrl: auditUrl,
                 approveUser: user.name, tripPlanNo: tripPlan.planNo,
-                content: `企业 ${company.name} 员工 ${user.name}${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差计划票据已提交，预算：￥${tripPlan.budget}，等待您审核！`,
+                content: `企业 ${company.name} 员工 ${staff.name}${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差计划票据已提交，预算：￥${tripPlan.budget}，等待您审核！`,
                 createdAt: utils.now(),
             };
 
@@ -934,8 +936,8 @@ class TripPlanModule {
         let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, tripDetailId: tripDetail.id, userId: user.id, remark: `${templateValue.tripType}票据审核${logResult}`});
         log.save();
 
-        //如果出差已经完成,并且有节省反积分,增加员工积分
-        if (tripPlan.status == EPlanStatus.COMPLETE && tripPlan.score > 0) {
+        //如果出差已经完成,并且有节省反积分,并且非特别审批，增加员工积分
+        if (tripPlan.status == EPlanStatus.COMPLETE && tripPlan.score > 0 && !tripPlan.isSpecialApprove) {
             let pc = Models.pointChange.create({
                 currentPoints: staff.balancePoints, status: 1,
                 staff: staff, company: staff.company,
@@ -1129,9 +1131,13 @@ class TripPlanModule {
         let planSql = `${completeSql}  and status in (${EPlanStatus.WAIT_UPLOAD}, ${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDITING}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.COMPLETE})`;
         completeSql += ` and status=${EPlanStatus.COMPLETE}`;
 
+        let savedMoneyCompleteSql = completeSql + ' and is_special_approve = false';
+
+        let savedMoneyComplete = `${selectSql} ${savedMoneyCompleteSql};`;
         let complete = `${selectSql} ${completeSql};`;
         let plan = `${selectSql} ${planSql};`;
 
+        let savedMoneyCompleteInfo = await sequelize.query(savedMoneyComplete);
         let completeInfo = await sequelize.query(complete);
         let planInfo = await sequelize.query(plan);
 
@@ -1149,6 +1155,10 @@ class TripPlanModule {
             ret.completeTripNum = Number(c.tripNum);
             ret.completeBudget = Number(c.budget);
             ret.expenditure = Number(c.expenditure);
+            // ret.savedMoney = Number(c.savedMoney);
+        }
+        if(savedMoneyCompleteInfo && savedMoneyCompleteInfo.length > 0 && savedMoneyCompleteInfo[0].length > 0) {
+            let c = savedMoneyCompleteInfo[0][0];
             ret.savedMoney = Number(c.savedMoney);
         }
 
@@ -1171,6 +1181,7 @@ class TripPlanModule {
         let staff = await Staff.getCurrent();
         let company =staff.company;
         let completeSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status=${EPlanStatus.COMPLETE} and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
+        let savedMoneyCompleteSql = '';
         let planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
 
         let type = params.type;
@@ -1190,17 +1201,22 @@ class TripPlanModule {
                 completeSql += ` and ${selectKey} in (${selectStr})`;
                 planSql += ` and ${selectKey} in (${selectStr})`;
             }
+            savedMoneyCompleteSql = completeSql + ' and is_special_approve = false';
             completeSql += ` group by ${selectKey};`;
+            savedMoneyCompleteSql += ` group by ${selectKey};`;
             planSql += ` group by ${selectKey};`;
         }
 
-        let selectSql = `select ${selectKey}, count(1) as "tripNum", sum(budget) as budget, sum(expenditure) as expenditure, sum(budget-expenditure) as "savedMoney"`;
+        let selectSql = `select ${selectKey}, count(1) as "tripNum", sum(budget) as budget, sum(expenditure) as expenditure`;
+        let savedMoneySelectSql = `select ${selectKey}, sum(budget-expenditure) as "savedMoney"`;
         let complete =  `${selectSql} ${completeSql}`;
+        let savedMoneyComplete =  `${savedMoneySelectSql} ${savedMoneyCompleteSql}`;
         let plan = `${selectSql} ${planSql}`;
 
         if(type == 'D') {
             selectKey = 'departmentId';
             completeSql = `from department.departments as d, staff.staffs as s, trip_plan.trip_plans as p where d.deleted_at is null and s.deleted_at is null and p.deleted_at is null and p.company_id='${company.id}' and d.id=s.department_id and p.account_id=s.id and p.start_at>'${params.startTime}' and p.start_at<'${params.endTime}'`;
+            savedMoneyCompleteSql = '';
             planSql = `${completeSql} and p.status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE})`;
             completeSql += ` and p.status=${EPlanStatus.COMPLETE}`;
             if(params.keyWord) {
@@ -1215,13 +1231,16 @@ class TripPlanModule {
                 completeSql += ` and d.id in (${deptStr})`;
                 planSql += ` and d.id in (${deptStr})`;
             }
-
+            savedMoneyCompleteSql = completeSql + ' and is_special_approve = false';
             selectSql = `select d.id as "departmentId", count(p.id) as "tripNum",sum(p.budget) as budget, sum(p.expenditure) as expenditure, sum(p.budget-p.expenditure) as "savedMoney"`;
+            savedMoneySelectSql = `select d.id as "departmentId", sum(p.budget-p.expenditure) as "savedMoney"`;
             complete = `${selectSql} ${completeSql} group by d.id;`;
+            savedMoneyComplete = `${savedMoneySelectSql} ${savedMoneyCompleteSql} group by d.id;`;
             plan = `${selectSql} ${planSql} group by d.id;`;
         }
 
         let completeInfo = await sequelize.query(complete);
+        let savedMoneyCompleteInfo = await sequelize.query(savedMoneyComplete);
         let planInfo = await sequelize.query(plan);
 
         let result = {};
@@ -1232,8 +1251,17 @@ class TripPlanModule {
                     completeTripNum: Number(ret.tripNum),
                     completeBudget: Number(ret.budget),
                     expenditure: Number(ret.expenditure),
-                    savedMoney: Number(ret.savedMoney)
+                    // savedMoney: Number(ret.savedMoney)
                 };
+            });
+        }
+        if(savedMoneyCompleteInfo && savedMoneyCompleteInfo.length > 0 && savedMoneyCompleteInfo[0].length > 0) {
+            savedMoneyCompleteInfo[0].map((ret) => {
+                let key = ret[selectKey];
+                if(!result[key]){
+                    result[key] = {};
+                }
+                result[key].savedMoney = Number(ret.savedMoney);
             });
         }
 
@@ -1272,8 +1300,8 @@ class TripPlanModule {
 
         let tripPlan = TripPlan.create(tripApprove);
         tripPlan.auditUser = staff.id;
-        tripPlan.startAt = moment(tripApprove.startAt).format(formatStr);
-        tripPlan.backAt = moment(tripApprove.backAt).format(formatStr);
+        tripPlan.startAt = moment(tripApprove.startAt["value"]).format(formatStr);
+        tripPlan.backAt = moment(tripApprove.backAt["value"]).format(formatStr);
         tripPlan.id = tripApprove.id;
         tripPlan.project = tripApprove.project;
         tripPlan.account = tripApprove.account;
@@ -1281,74 +1309,99 @@ class TripPlanModule {
         tripPlan.status = EPlanStatus.WAIT_UPLOAD;
         tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo'); //获取出差计划单号
 
-        let budgets = tripApprove.budgetInfo;
+
         let query = tripApprove.query;
         if(typeof query == 'string') query = JSON.parse(query);
 
-        let tripDetails: TripDetail[] = budgets.map(function (budget) {
-            let tripType = budget.tripType;
-            let price = Number(budget.price);
-            let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: price});
+        let tripDetails: TripDetail[] = [];
+        if(!tripApprove.isSpecialApprove){
+            let budgets = tripApprove.budgetInfo;
+            tripDetails = budgets.map(function (budget) {
+                let tripType = budget.tripType;
+                let price = Number(budget.price);
+                let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: price});
+                detail.accountId = account.id;
+                detail.isCommit = false;
+                detail.status = EPlanStatus.WAIT_UPLOAD;
+                detail.tripPlan = tripPlan;
+                switch(tripType) {
+                    case ETripType.OUT_TRIP:
+                        detail.deptCityCode = query.originPlace;
+                        detail.arrivalCityCode = query.destinationPlace;
+                        detail.deptCity = tripPlan.deptCity;
+                        detail.arrivalCity = tripPlan.arrivalCity;
+                        detail.startTime = query.leaveDate;
+                        detail.endTime = query.goBackDate;
+                        detail.cabinClass = budget.cabinClass;
+                        detail.fullPrice = budget.fullPrice;
+                        tripPlan.isNeedTraffic = true;
+                        break;
+                    case ETripType.BACK_TRIP:
+                        detail.deptCityCode = query.destinationPlace;
+                        detail.arrivalCityCode = query.originPlace;
+                        detail.deptCity = tripPlan.arrivalCity;
+                        detail.arrivalCity = tripPlan.deptCity;
+                        detail.startTime = query.goBackDate;
+                        detail.endTime = query.leaveDate;
+                        detail.cabinClass = budget.cabinClass;
+                        detail.fullPrice = budget.fullPrice;
+                        tripPlan.isNeedTraffic = true;
+                        break;
+                    case ETripType.HOTEL:
+                        detail.type = ETripType.HOTEL;
+                        detail.cityCode = query.destinationPlace;
+                        detail.city = tripPlan.arrivalCity;
+                        detail.hotelCode = query.businessDistrict;
+                        detail.hotelName = query.hotelName;
+                        detail.startTime = query.checkInDate || query.leaveDate;
+                        detail.endTime = query.checkOutDate || query.goBackDate;
+                        tripPlan.isNeedHotel = true;
+                        break;
+                    case ETripType.SUBSIDY:
+                        detail.type = ETripType.SUBSIDY;
+                        detail.deptCityCode = query.originPlace;
+                        detail.arrivalCityCode = query.destinationPlace;
+                        detail.deptCity = tripPlan.deptCity;
+                        detail.arrivalCity = tripPlan.arrivalCity;
+                        detail.startTime = query.leaveDate || query.checkInDate;
+                        detail.endTime = query.goBackDate || query.checkOutDate;
+                        detail.expenditure = price;
+                        detail.status = EPlanStatus.COMPLETE;
+                        break;
+                    default:
+                        detail.type = ETripType.SUBSIDY;
+                        detail.startTime = query.leaveDate;
+                        detail.endTime = query.goBackDate;
+                        break;
+                }
+                return detail;
+            });
+        }else{
+            let detail = Models.tripDetail.create({type: ETripType.SPECIAL_APPROVE, invoiceType: EInvoiceType.SPECIAL_APPROVE, budget: tripApprove.budget});
             detail.accountId = account.id;
             detail.isCommit = false;
             detail.status = EPlanStatus.WAIT_UPLOAD;
             detail.tripPlan = tripPlan;
-            switch(tripType) {
-                case ETripType.OUT_TRIP:
-                    detail.deptCityCode = query.originPlace;
-                    detail.arrivalCityCode = query.destinationPlace;
-                    detail.deptCity = tripPlan.deptCity;
-                    detail.arrivalCity = tripPlan.arrivalCity;
-                    detail.startTime = query.leaveDate;
-                    detail.endTime = query.goBackDate;
-                    detail.cabinClass = budget.cabinClass;
-                    detail.fullPrice = budget.fullPrice;
-                    tripPlan.isNeedTraffic = true;
-                    break;
-                case ETripType.BACK_TRIP:
-                    detail.deptCityCode = query.destinationPlace;
-                    detail.arrivalCityCode = query.originPlace;
-                    detail.deptCity = tripPlan.arrivalCity;
-                    detail.arrivalCity = tripPlan.deptCity;
-                    detail.startTime = query.goBackDate;
-                    detail.endTime = query.leaveDate;
-                    detail.cabinClass = budget.cabinClass;
-                    detail.fullPrice = budget.fullPrice;
-                    tripPlan.isNeedTraffic = true;
-                    break;
-                case ETripType.HOTEL:
-                    detail.type = ETripType.HOTEL;
-                    detail.cityCode = query.destinationPlace;
-                    detail.city = tripPlan.arrivalCity;
-                    detail.hotelCode = query.businessDistrict;
-                    detail.hotelName = query.hotelName;
-                    detail.startTime = query.checkInDate || query.leaveDate;
-                    detail.endTime = query.checkOutDate || query.goBackDate;
-                    tripPlan.isNeedHotel = true;
-                    break;
-                case ETripType.SUBSIDY:
-                    detail.type = ETripType.SUBSIDY;
-                    detail.deptCityCode = query.originPlace;
-                    detail.arrivalCityCode = query.destinationPlace;
-                    detail.deptCity = tripPlan.deptCity;
-                    detail.arrivalCity = tripPlan.arrivalCity;
-                    detail.startTime = query.leaveDate || query.checkInDate;
-                    detail.endTime = query.goBackDate || query.checkOutDate;
-                    detail.expenditure = price;
-                    detail.status = EPlanStatus.COMPLETE;
-                    break;
-                default:
-                    detail.type = ETripType.SUBSIDY;
-                    detail.startTime = query.leaveDate;
-                    detail.endTime = query.goBackDate;
-                    break;
+            detail.cityCode = query.destinationPlace;
+            detail.city = tripPlan.arrivalCity;
+            detail.deptCityCode = query.originPlace;
+            detail.arrivalCityCode = query.destinationPlace;
+            detail.deptCity = tripPlan.deptCity;
+            detail.arrivalCity = tripPlan.arrivalCity;
+            if(query.hotelName){
+                detail.hotelCode = query.businessDistrict;
+                detail.hotelName = query.hotelName;
             }
-            return detail;
-        });
+            detail.startTime = query.checkInDate || query.leaveDate;
+            detail.endTime = query.checkOutDate || query.goBackDate;
+            tripDetails.push(detail);
+        }
 
         let log = TripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id, remark: `出差审批通过，生成出差记录`});
         await Promise.all([tripPlan.save(), log.save()]);
-        await Promise.all(tripDetails.map((d) => d.save()));
+        if(tripDetails && tripDetails.length > 0){
+            await Promise.all(tripDetails.map((d) => d.save()));
+        }
 
         return tripPlan;
     }
@@ -1363,7 +1416,7 @@ class TripPlanModule {
             limit = 10;
         }
         let sql = `select account_id, sum(budget) - sum(expenditure) as save from trip_plan.trip_plans 
-        where deleted_at is null and status = ${EPlanStatus.COMPLETE} AND company_id = '${companyId}'`;
+        where deleted_at is null and status = ${EPlanStatus.COMPLETE} AND company_id = '${companyId}' and is_special_approve = false`;
         if(params.staffId)
             sql += ` and account_id = '${params.staffId}'`;
         if(params.startTime)
@@ -1553,6 +1606,77 @@ class TripPlanModule {
             }
         }
 
+        await Promise.all([tripApprove.save(), tripPlanLog.save()]);
+
+        TripPlanModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
+
+        return tripApprove;
+    }
+
+    @clientExport
+    @requireParams(['query', 'title', 'budget', 'specialApproveRemark'], ['description', 'remark', 'approveUserId'])
+    static async saveSpecialTripApprove(params) {
+        let staff = await Staff.getCurrent();
+        let company = staff.company;
+
+        if(company.isApproveOpen && !params.approveUserId) { //企业开启审核功能后，审核人不能为空
+            throw {code: -2, msg: '审批人不能为空'};
+        }
+
+        let query = params.query;
+        let project = await getProjectByName({companyId: company.id, name: params.title, userId: staff.id, isCreate: true});
+        let tripApprove =  TripApprove.create(params);
+        tripApprove.isSpecialApprove = true;
+
+        if(params.approveUserId) {
+            let approveUser = await Models.staff.get(params.approveUserId);
+            if(!approveUser)
+                throw {code: -3, msg: '审批人不存在'}
+            if(tripApprove.approveUser && tripApprove['approveUser'].id == staff.id)
+                throw {code: -4, msg: '审批人不能是自己'};
+            tripApprove.approveUser = approveUser;
+        }
+
+        tripApprove.status = EApproveStatus.WAIT_APPROVE;
+        tripApprove.account = staff;
+        tripApprove['companyId'] = company.id;
+        tripApprove.project = project;
+        tripApprove.startAt = query.leaveDate;
+        tripApprove.backAt = query.goBackDate;
+        tripApprove.query = JSON.stringify(query);
+
+        let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace.id|| query.destinationPlace}) || {name: null};
+
+        if(query.originPlace) {
+            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace}) || {name: null};
+            tripApprove.deptCityCode = deptInfo.id;
+            tripApprove.deptCity = deptInfo.name;
+        }
+
+        tripApprove.arrivalCityCode = arrivalInfo.id;
+        tripApprove.arrivalCity = arrivalInfo.name;
+        tripApprove.isNeedTraffic = query.isNeedTraffic;
+        tripApprove.isNeedHotel = query.isNeedHotel;
+        tripApprove.isRoundTrip = query.isRoundTrip;
+
+        let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, approveStatus: EApproveResult.WAIT_APPROVE, remark: '特别审批提交审批单，等待审批'});
+
+        //如果出差计划是待审批状态，增加自动审批时间
+        if(tripApprove.status == EApproveStatus.WAIT_APPROVE) {
+            var days = moment(tripApprove.startAt).diff(moment(), 'days');
+            let format = 'YYYY-MM-DD HH:mm:ss';
+            if (days <= 0) {
+                tripApprove.autoApproveTime = moment(tripApprove.createdAt).add(1, 'hours').format(format);
+            } else {
+                //出发前一天18点
+                let autoApproveTime = moment(tripApprove.startAt).subtract(6, 'hours').format(format);
+                //当天18点以后申请的出差计划，一个小时后自动审批
+                if(moment(autoApproveTime).diff(moment()) <= 0) {
+                    autoApproveTime = moment(tripApprove.createdAt).add(1, 'hours').format(format);
+                }
+                tripApprove.autoApproveTime = autoApproveTime;
+            }
+        }
         await Promise.all([tripApprove.save(), tripPlanLog.save()]);
 
         TripPlanModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});

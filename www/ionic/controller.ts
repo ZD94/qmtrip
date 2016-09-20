@@ -46,35 +46,35 @@ var adminMenus = [
         id: 1056,
         icon: 'stats-bars',
         title: '差旅统计',
-        link: 'company/budget',
+        link: 'statistics/',
         badgeNum: 0
     },
     {
         id: 1057,
         icon: 'person-stalker',
         title: '员工管理',
-        link: 'company/staffs',
+        link: 'staff/list',
         badgeNum: 0
     },
     {
         id: 1058,
         icon: 'ios-box',
         title: '部门管理',
-        link: 'company/department',
+        link: 'department/',
         badgeNum: 0
     },
     {
         id: 1059,
         icon: 'android-list',
         title: '差旅标准',
-        link: 'company/travelpolicy',
+        link: 'travel-policy/',
         badgeNum: 0
     },
     {
         id: 1060,
         icon: 'pricetags',
         title: '协议酒店',
-        link: 'company/accordhotel',
+        link: 'accord-hotel/',
         badgeNum: 0
     },
 ];
@@ -176,6 +176,6 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
     }
 
     $scope.goMyCenter = function() {
-        $location.path('/staff/staffInfo');
+        $location.path('/staff/staff-info');
     }
 }

@@ -9,5 +9,4 @@ import './icon';
 import './uploader';
 import './progressBar';
 import './baidu-map';
-import './trip-plan';
 import './fake-input';

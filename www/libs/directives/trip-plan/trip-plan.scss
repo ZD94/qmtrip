@@ -1,0 +1,107 @@
+$color-red: #fe2851;
+$color-blue: #28a7e1;
+.staff_info{
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 5;
+  font-size: 14px;
+  height: 40px;
+  width: 50px;
+  &.opactic{
+    padding-top: 20px;
+  }
+  h2{
+    line-height: 60px;
+    font-size: 12px;
+    color: #9b9b9b;
+    text-align: center;
+  }
+  .staff_portrait{
+    position:absolute;
+    top: -20px;
+    right: 0px;
+    font-size: 18px;
+    width: 50px;
+    height: 50px;
+    line-height: 48px;
+    text-align: center;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    color: #fff;
+    background: rgb(36,149,218);
+    transform: scale(.5);
+  }
+}
+.spanRight{
+  float: right;
+  color: $color-blue;
+}
+.col{
+  text-align: center;
+}
+
+.po_r{
+  position: relative;
+  border-top: 0;
+}
+
+.detail_btn{
+  .button-small{
+    margin-left: 10px;
+  }
+}
+
+//行程详情样式调整
+.trip-card{
+  border-radius: 0;
+  padding-top: 0;
+  .card-header{
+    padding: 4px 16px;
+    font-size: 12px;
+    font-weight: normal;
+    color: #9b9b9b;
+    line-height: 22px;
+    background: #dadada;
+    &.special{
+      background: #f5a623;
+      color: #fff;
+    }
+    .item-note{
+      color: #fff;
+      font-size: 12px;
+    }
+  }
+  .card-footer{
+    font-size: 14px;
+    border-top: 1px solid #ddd;
+    padding: 5px 10px;
+    margin-top: 5px;
+    color: #9b9b9b;
+    .color-red{
+      color: $color-red;
+    }
+  }
+  .item{
+    padding: 16px 16px 0;
+    .item{
+      padding: 0;
+      p{
+        margin: 0;
+        font-size: 14px;
+        color: #4a4a4a;
+        font-weight: bold;
+        .icon{
+          font-size: 14px;
+          color: #9b9b9b;
+        }
+        &:last-child{
+          font-size: 12px;
+          font-weight: normal;
+          color: #9b9b9b;
+        }
+      }
+    }
+  }
+}
