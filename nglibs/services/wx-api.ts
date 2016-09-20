@@ -6,7 +6,7 @@ var dyload = require('dyload');
 var browserspec = require('browserspec');
 var wxload;
 if(browserspec.is_wechat) {
-    wxload = dyload("http://res.wx.qq.com/open/js/jweixin-1.0.0.js");
+    wxload = dyload("//res.wx.qq.com/open/js/jweixin-1.0.0.js");
 }
 
 angular

@@ -1,5 +1,5 @@
 {
-  "update": "http://pk.jingli.tech:4002/",
-  "api": "http://pk.jingli.tech:4002/API",
+  "update": "https://pk.jingli.tech:4002/",
+  "api": "https://pk.jingli.tech:4002/API",
   "debug": false
 }
