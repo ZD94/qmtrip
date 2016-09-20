@@ -499,7 +499,7 @@ class ApiTravelBudget {
                 .catch(next);
         })
 
-        app.post('/api/budgets', _auth_middleware, async function(req, res, next) {
+        app.post('/api/budgets', _auth_middleware, function(req, res, next) {
             let {query, prefers, policy, originData, type} = req.body;
             let qs = {
                 policy: policy,
@@ -507,15 +507,16 @@ class ApiTravelBudget {
                 query: JSON.parse(query),
             }
 
-            try {
-                let factory = (type == 1) ? TrafficBudgetStrategyFactory : HotelBudgetStrategyFactory;
-                let strategy = await factory.getStrategy(qs, {isRecord: false});
-                let result = await strategy.getResult(JSON.parse(originData), true);
-                res.header('Access-Control-Allow-Origin', '*');
-                res.json(result);
-            } catch(err) {
-                next(err);
-            }
+            let factory = (type == 1) ? TrafficBudgetStrategyFactory : HotelBudgetStrategyFactory;
+            factory.getStrategy(qs, {isRecord: false})
+                .then( (strategy) => {
+                    return strategy.getResult(JSON.parse(originData), true);
+                })
+                .then( (result) => {
+                    res.header('Access-Control-Allow-Origin', '*');
+                    res.json(result);
+                })
+                .catch(next)
         })
     }
 }
