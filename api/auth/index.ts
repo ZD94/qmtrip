@@ -1481,6 +1481,8 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         return true;
     }
 
+    static makeAuthenticateSign = makeAuthenticateSign
+
     static __initHttpApp (app: any) {
 
         //二维码自动登录

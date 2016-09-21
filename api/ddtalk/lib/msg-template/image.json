@@ -1,0 +1,6 @@
+{
+  "msgtype": "image",
+  "image": {
+    "media_id": "<%=media_id%>"
+  }
+}

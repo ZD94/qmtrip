@@ -1,0 +1,7 @@
+{
+  "msgtype": "voice",
+  "voice": {
+    "media_id": "<%=media_id%>",
+    "duration": "<%=duration%>"
+  }
+}

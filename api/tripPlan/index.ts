@@ -337,13 +337,23 @@ class TripPlanModule {
             detailUrl: self_url
         };
         if(!nextApprove){
-            //给员工自己发送通知
-            API.notify.submitNotify({
-                key: 'qm_notify_self_traveludget',
-                email: staff.email,
-                values: values,
-                openid: openid,
-            });
+            try {
+                //给员工自己发送通知
+                await API.notify.submitNotify({
+                    key: 'qm_notify_self_traveludget',
+                    email: staff.email,
+                    values: values,
+                    openid: openid,
+                });
+            } catch(err) {
+                console.error(`发送通知失败`, err);
+            }
+
+            try {
+                await API.ddtalk.sendTextMsg({accountId: staff.id, text: `您的出差申请已经生成`})
+            } catch(err) {
+                console.error(`发送钉钉消息失败`, err)
+            }
         }
 
         if(company.isApproveOpen) {
@@ -351,7 +361,12 @@ class TripPlanModule {
             let approveUser = tripApprove.approveUser;
             let approve_url = `${config.host}/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
             let approve_values = utils.clone(values);
-            let shortUrl = await API.wechat.shorturl({longurl: approve_url});
+            let shortUrl = approve_url
+            try {
+                shortUrl = await API.wechat.shorturl({longurl: approve_url});
+            } catch(err) {
+                console.warn(`转换短链接失败`, err);
+            }
             let openId = await API.auth.getOpenIdByAccount({accountId: approveUser.id});
             approve_values.managerName = approveUser.name;
             approve_values.username = staff.name;
@@ -383,13 +398,23 @@ class TripPlanModule {
                 approve_values.budget = tripApprove.budget;
                 // approve_values.autoApproveTime = moment(tripApprove.autoApproveTime["value"]).format(timeFormat)
             }
-            API.notify.submitNotify({
-                key: 'qm_notify_new_travelbudget',
-                email: approveUser.email,
-                values: approve_values,
-                mobile: approveUser.mobile,
-                openid: openId,
-            })
+            try {
+                await API.notify.submitNotify({
+                    key: 'qm_notify_new_travelbudget',
+                    email: approveUser.email,
+                    values: approve_values,
+                    mobile: approveUser.mobile,
+                    openid: openId,
+                });
+            } catch(err) {
+                console.error('发送通知失败', err)
+            }
+
+            try {
+                await API.ddtalk.sendTextMsg({accountId: approveUser.id, text: '有新的出差申请需要您审批'})
+            } catch(err) {
+                console.error(`发送钉钉通知失败`, err)
+            }
         } else {
             let admins = await Models.staff.find({ where: {companyId: tripApprove['companyId'], roleId: [EStaffRole.OWNER,
                 EStaffRole.ADMIN], staffStatus: EStaffStatus.ON_JOB, id: {$ne: staff.id}}}); //获取激活状态的管理员
@@ -651,6 +676,7 @@ class TripPlanModule {
                 emailReason: params.auditRemark
             };
             await API.notify.submitNotify({email: user.email, key: tplName, values: self_values, mobile: user.mobile, openid: openId});
+            await API.ddtalk.sendTextMsg({ accountId: user.id, text: '您的预算已成功生成'});
         }
 
         return true;
@@ -932,7 +958,8 @@ class TripPlanModule {
             templateValue.auditTime = utils.now();
 
             let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
-            API.notify.submitNotify({key: templateName, values: templateValue, email: staff.email, openid: openId});
+            await API.notify.submitNotify({key: templateName, values: templateValue, email: staff.email, openid: openId});
+            await API.ddtalk.sendTextMsg({accountId: staff.id, text: '票据已审批通过'})
         }
 
         let user = await AgencyUser.getCurrent();
