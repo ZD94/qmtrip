@@ -210,6 +210,7 @@ export default class ApiTravelBudget {
                         budget.hasFirstDaySubsidy = subsidy.hasFirstDaySubsidy;
                         budget.hasLastDaySubsidy = subsidy.hasLastDaySubsidy;
                         budget.tripType = ETripType.SUBSIDY;
+                        budget.type = EInvoiceType.SUBSIDY;
                         budget.price = subsidy.template.target.subsidyMoney * days;
                         budget.template = {id: subsidy.template.target.id, name: subsidy.template.target.name}
                         budgets.push(budget);
