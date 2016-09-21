@@ -42,7 +42,7 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
     $scope.ismonth = true;
     $scope.isquarter = false;
     $scope.isyear = false;
-    $scope.changespan = function(span){
+    $scope.changespan = async function(span){
         if(lastClick){
             let last = 'is' + lastClick;
             $scope[last] = false;
@@ -55,6 +55,7 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
         $scope.monthSelection = spanSelection;
         lastClick = span;
         $scope.modal.hide();
+        await searchData();
     }
     //改写monthChange函数 改变时间
 
@@ -62,6 +63,7 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
         let optionFun = isAdd ? 'add' : 'subtract';
         let querySpan = moment( $scope.monthSelection.month)[optionFun](1, span_depend);
         $scope.monthSelection = getSpanSelection(span_depend,querySpan);
+
         await searchData();
     };
     function getSpanSelection(span_depend,querySpan = moment()){
@@ -74,12 +76,11 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
     }
     //自定义选择日期
     $scope.selfdefine = false;
-    $scope.beginTime = moment().startOf('month').toDate();
-    $scope.endTime = moment().endOf('month').toDate();
+
     $scope.selfDefineFun = async function(){
         let value = {
-            begin:$scope.monthSelection.startTime,
-            end:$scope.monthSelection.endTime
+            begin:moment().startOf('month').subtract(12,'month').toDate(),
+            end:moment().endOf('month').toDate()
         }
         value = await ngModalDlg.selectDateSpan($scope, {
             beginDate:value.begin,
@@ -95,10 +96,7 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
             endTime: moment(value.end).toDate()
         };
         $scope.monthSelection = selfSelection;
-        if(value){
-            $scope.beginTime = value.begin;
-            $scope.endTime = value.end;
-        }
         $scope.modal.hide();
+        await searchData();
     }
 }

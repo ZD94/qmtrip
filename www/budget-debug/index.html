@@ -41,6 +41,13 @@
 <table class="table table-bordered">
     <tbody>
         <tr>
+            <th>选择数据来源</th>
+            <td>
+                <select ng-model="originServer" ng-options="x.name for x in originServers" ng-change="changeServer()">
+                </select>
+            </td>
+        </tr>
+        <tr>
             <th>选择原始数据</th>
             <td>
                 <select ng-model="originData" ng-options="x.title for x in originDatas" ng-change="changeOrigin()">

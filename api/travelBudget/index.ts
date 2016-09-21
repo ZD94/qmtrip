@@ -494,6 +494,7 @@ export default class ApiTravelBudget {
                     let datas = travelBudgetLogs.map( (v)=> {
                         return v.target;
                     });
+                    res.header('Access-Control-Allow-Origin', '*');
                     res.json(datas);
                 })
                 .catch(next);
@@ -511,6 +512,7 @@ export default class ApiTravelBudget {
                 let factory = (type == 1) ? TrafficBudgetStrategyFactory : HotelBudgetStrategyFactory;
                 let strategy = await factory.getStrategy(qs, {isRecord: false});
                 let result = await strategy.getResult(JSON.parse(originData), true);
+                res.header('Access-Control-Allow-Origin', '*');
                 res.json(result);
             } catch(err) {
                 next(err);

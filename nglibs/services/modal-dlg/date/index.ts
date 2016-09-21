@@ -278,6 +278,7 @@ export function selectDateSpanController($scope, $element, $ionicPopup) {
     $scope.$watch('selected.day', function(n, o) {
         $scope.dayOptions.selected = $scope.selected.day;
     });
+
 }
 
 
@@ -311,8 +312,18 @@ function loadMonths($scope, $element) {
             $scope.month_2col = true;
         fixMonths($scope);
     });
-    let fromStatistic = $scope.options.fromStatistic;
     $scope.months = [];
+    //shicong
+    let fromStatistic = $scope.options.fromStatistic;
+    function loadBeforeYear(){
+        let year = moment().year()-1;
+        let month = moment().month();
+        let calResult = getMonth(year, month+1);
+        $scope.months.push(calResult);
+    }
+    if(fromStatistic){
+        loadBeforeYear();
+    }
     function loadNextMonth() {
         let date;
         if($scope.months.length == 0){
@@ -320,12 +331,7 @@ function loadMonths($scope, $element) {
         }else{
             let last = $scope.months[$scope.months.length - 1];
             date = moment({year: last.year, month: last.month - 1, day: 1});
-            //shicong
-            if(fromStatistic){
-                date = date.subtract(1, 'month');
-            }else{
-                date = date.add(1, 'month');
-            }
+            date = date.add(1, 'month');
         }
         let caldata = getMonth(date.year(), date.month() + 1);
         $scope.months.push(caldata);

@@ -1,5 +1,6 @@
 <ion-list class="jl_projectinfo">
-    <ion-item class="project_tit">{{trip.title}}</ion-item>
+    <ion-item class="project_tit">{{trip.title}}
+        <span class="tit_special" ng-if="trip.isSpecialApprove">特殊审批</span></ion-item>
     <ion-item class="project_cont">
         <p ng-if="trip && trip.startAt">{{trip.startAt | date: 'yyyy-MM-dd'}} 至 {{trip.backAt | date: 'yyyy-MM-dd'}}</p>
         <p style="text-align: center" ng-if="trip.status != EPlanStatus.COMPLETE">

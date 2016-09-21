@@ -68,8 +68,8 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         }
     }
 
-    let traffic = [], hotel = [], subsidy = [];
-    let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;
+    let traffic = [], hotel = [], subsidy = [], specialApprove = [];
+    let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0, specialApproveBudget = 0;
     let subsidyDays:number = moment(tripApprove.backAt).diff(moment(tripApprove.startAt), 'days');
     tripApprove.budgetInfo.map((budget) => {
         budget.startTime = tripApprove.startAt;
@@ -108,11 +108,27 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
                 break;
         }
     });
+    if(tripApprove.isSpecialApprove){
+        // specialApprove.push(budget);
+        // specialApproveBudget = countBudget(specialApproveBudget, budget.budget);
+    }
+    function countBudget(originBudget, increment) {
+        if (originBudget == -1) {
+            return originBudget;
+        }
+        if (increment == -1) {
+            return increment;
+        }
+        return originBudget + increment;
+    }
 
     $scope.tripApprove = tripApprove;
     $scope.traffic = traffic;
     $scope.hotel = hotel;
     $scope.subsidy = subsidy;
+    $scope.specialApprove = specialApprove;
+    console.info(subsidy);
+    $scope.specialApproveBudgets = specialApproveBudget;
     $scope.trafficBudget = trafficBudget;
     $scope.hotelBudget = hotelBudget;
     $scope.subsidyBudget = subsidyBudget;
