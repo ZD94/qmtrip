@@ -53,6 +53,10 @@ body {
     background-color: transparent !important;
     ion-view {
       @include app-background;
+      //全局content内item边框颜色
+      .opactic,.jl_projectinfo .item{
+        border-color: rgba(255,255,255,.3);
+      }
     }
   }
 }

@@ -7,6 +7,8 @@
 import angular = require("angular");
 import {EPlanStatus, EApproveStatus, EInvoiceType, ETripType, MTxPlaneLevel} from 'api/_types/tripPlan';
 import moment = require("moment");
+import {Staff} from "api/_types/staff/staff";
+import {MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
 require("./trip-plan.scss");
 
 let statusTxt = {};
@@ -161,23 +163,45 @@ angular
         }
     }
 }])
-    .directive('tripApprove', function(){
+    .directive('tpStaffDetail', function() {
         return {
             restrict: 'AE',
-            template: require('./trip-approve.html'),
-            replace: true,
+            template: require('./tp-staff-detail.html'),
             transclude: false,
+            replace: true,
             scope: {
-                tripApprove: '=data',
-                showHeaderTxt: '@showHeader', //是否显示提交人信息
-                showDetailStatus: '@',  //是否显示详细状态,如果为false,则只显示[审批通过,审批未通过,待审批]
-                click: '='
+                staff : '='
             },
-            controller: function($scope) {
-                $scope.EApproveStatus = EApproveStatus;
-                $scope.showHeader = $scope.showHeaderTxt != 'false';
-                $scope.showDetailStatus = Boolean($scope.showDetailStatus);
-                $scope.click = $scope.click || function(trip) { console.info('click me...');}
+            controller: function($scope, Models, $ionicPopup) {
+                $scope.showTravelPolicy = async function (staffId?: string) {
+                    let pStaff = await Staff.getCurrent();
+
+                    if(staffId)
+                        pStaff = await Models.staff.get(staffId);
+
+                    if (!pStaff)
+                        return;
+
+                    var policy = await pStaff.getTravelPolicy();
+                    $scope.policy = policy;
+                    $scope.subsidies = await policy.getSubsidyTemplates();
+                    $scope.MTrainLevel = MTrainLevel;
+                    $scope.MPlaneLevel = MPlaneLevel;
+                    $scope.MHotelLevel = MHotelLevel;
+                    if (policy) {   //判断是否设置差旅标准
+                        $ionicPopup.alert({
+                            title: '差旅标准',
+                            scope: $scope,
+                            cssClass:'policyPopup',
+                            template: require('./policyPopupTemplate.html')
+                        })
+                    } else {
+                        $ionicPopup.alert({   //定义show的原因是避免页面加载就执行
+                            title: '提示',
+                            template: '暂未设置差旅标准,请设置后查看'
+                        })
+                    }
+                };
             }
         }
     })
