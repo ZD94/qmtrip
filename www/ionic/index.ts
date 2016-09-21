@@ -136,11 +136,6 @@ function initUpdater($ionicPlatform, $ionicPopup) {
     })
 }
 
-if (/dingtalk/i.test(window.navigator.userAgent)) {
-    var dyload = require("dyload");
-    dyload('script/dd.js?v=160920');
-}
-
 require("angular-chart.js")
 require('nglibs');
 var ngapp = require('ngapp');

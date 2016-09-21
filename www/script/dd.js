@@ -29,8 +29,8 @@
   }
   var ddtalk = {};
   ddtalk.getCorpid = function() {
-    var corpid = cache.get(key);
-    return corpid;
+    var _corpid = cache.get(key);
+    return _corpid;
   }
   g.ddtalk = ddtalk;
 })(window);
