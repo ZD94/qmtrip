@@ -42,7 +42,7 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
     $scope.ismonth = true;
     $scope.isquarter = false;
     $scope.isyear = false;
-    $scope.changespan = function(span){
+    $scope.changespan = async function(span){
         if(lastClick){
             let last = 'is' + lastClick;
             $scope[last] = false;
@@ -54,8 +54,8 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
         span_depend = span;
         $scope.monthSelection = spanSelection;
         lastClick = span;
-
         $scope.modal.hide();
+        await searchData();
     }
     //改写monthChange函数 改变时间
 
@@ -85,7 +85,7 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
         value = await ngModalDlg.selectDateSpan($scope, {
             beginDate:value.begin,
             endDate: value.end,
-            timepicker: false,
+            timepicker: true,
             title: '选择开始时间',
             titleEnd: '选择结束时间',
             fromStatistic: true
@@ -96,7 +96,7 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
             endTime: moment(value.end).toDate()
         };
         $scope.monthSelection = selfSelection;
-
         $scope.modal.hide();
+        await searchData();
     }
 }
