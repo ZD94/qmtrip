@@ -30,7 +30,6 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     }
     $scope.isHasPermissionApprove = isHasPermissionApprove;
     $scope.isSelf = isSelf;
-    console.info(tripApprove);
 
     let totalBudget: number = 0;
 
@@ -127,7 +126,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     $scope.hotel = hotel;
     $scope.subsidy = subsidy;
     $scope.specialApprove = specialApprove;
-    console.info(subsidy);
+    console.info(isHasPermissionApprove);
     $scope.specialApproveBudgets = specialApproveBudget;
     $scope.trafficBudget = trafficBudget;
     $scope.hotelBudget = hotelBudget;
@@ -230,7 +229,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
             display: (staff)=>staff.name
         };
         var value = await ngModalDlg.selectMode($scope,$scope.staffSelector);
-        if(value){
+        if(value.agree){
             $scope.isNextApprove = value.isNextApprove;
             approve(value.result);
             $scope.isHasPermissionApprove = false;
