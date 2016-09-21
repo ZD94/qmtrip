@@ -154,6 +154,8 @@ export default class ApiTravelBudget {
                             leaveDate: leaveDate,
                             earliestLeaveTime: earliestLeaveTime,
                             latestArrivalTime: latestArrivalTime,
+                            goBackDate: goBackDate,
+                            earliestGoBackTime: earliestGoBackTime
                         });
                         budget.tripType = ETripType.OUT_TRIP;
                         budgets.push(budget);
@@ -170,6 +172,8 @@ export default class ApiTravelBudget {
                             leaveDate: goBackDate,
                             earliestLeaveTime: earliestGoBackTime,
                             latestArrivalTime: latestGoBackTime,
+                            goBackDate: goBackDate,
+                            earliestGoBackTime: earliestGoBackTime
                         }
                         let budget = await ApiTravelBudget.getTrafficBudget(_params);
                         budget.tripType = ETripType.BACK_TRIP;
@@ -336,7 +340,7 @@ export default class ApiTravelBudget {
      */
     @clientExport
     static async getTrafficBudget(params: {originPlace: any, destinationPlace: any,
-        leaveDate: Date | string, earliestLeaveTime?: string, latestArrivalTime?: string}) : Promise<TravelBudgeItem> {
+        leaveDate: Date | string, goBackDate?: Date | string, earliestLeaveTime?: string, earliestGoBackTime?: string, latestArrivalTime?: string}) : Promise<TravelBudgeItem> {
         let {originPlace, destinationPlace, leaveDate, earliestLeaveTime, latestArrivalTime} = params;
 
         if (!destinationPlace) {

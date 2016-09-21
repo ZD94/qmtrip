@@ -27,7 +27,7 @@ class TrainPricePrefer extends AbstractPrefer<IFinalTicket> {
             if (v.type == TRAFFIC.TRAIN) {
                 var addScore = v.price/v.duration*1000;
                 v.score += addScore;
-                v.reasons.push(`火车价格打分 +${addScore}`)
+                v.reasons.push(`火车价格打分 ${addScore}`)
             }
             return v;
         })

@@ -53,7 +53,7 @@ class PlanePricePrefer extends AbstractPrefer<IFinalTicket> {
                 }
                 var addScore = self.score * a;
                 v.score += addScore;
-                v.reasons.push(`飞机价格偏好以下价格 +${addScore}`)
+                v.reasons.push(`飞机价格偏好以下价格 ${addScore}`)
             }else{
                 var a = 1 - Math.pow((maxPrice - v.price)/(maxPrice - midPrice), 2);
                 if(this.type && this.type == "line"){
@@ -61,7 +61,7 @@ class PlanePricePrefer extends AbstractPrefer<IFinalTicket> {
                 }
                 var addScore = self.score * a;
                 v.score += addScore;
-                v.reasons.push(`飞机价格偏好以上价格 +${addScore}`)
+                v.reasons.push(`飞机价格偏好以上价格 ${addScore}`)
             }
             return v;
         })

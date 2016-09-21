@@ -60,11 +60,11 @@ class RunningTimePrefer extends AbstractPrefer<IFinalTicket> {
             if (v.type == TRAFFIC.TRAIN) {
                 var addScore = self.trainScore - Math.ceil(v.duration - trains[0].duration)*self.trainScoreInterval;
                 v.score += addScore;
-                v.reasons.push(`火车运行时长 +${addScore}`)
+                v.reasons.push(`火车运行时长 ${addScore}`)
             }else{
                 var addScore = self.planeScore - Math.ceil(v.duration - flights[0].duration)*self.planeScoreInterval;
                 v.score += addScore;
-                v.reasons.push(`飞机运行时长 +${addScore}`)
+                v.reasons.push(`飞机运行时长 ${addScore}`)
             }
             return v;
         })
