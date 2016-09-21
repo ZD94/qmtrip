@@ -40,6 +40,10 @@ export class DDTalkCorp extends ModelObject {
     @Field({type: Types.BOOLEAN})
     get isSuiteRelieve() : boolean { return false};
     set isSuiteRelieve(val: boolean) {}
+
+    @Field({type: Types.STRING(20)})
+    get agentid(): string {return ''}
+    set agentid(id: string) {}
 }
 
 

@@ -1,0 +1,1 @@
+alter table ddtalk.corps add agentid varchar(20);

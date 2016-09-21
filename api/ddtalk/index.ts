@@ -13,6 +13,7 @@ const config ={
     encodingAESKey: '8nf2df6n0hiifsgg521mmjl6euyxoy3y6d9d3mt1laq',
     suiteid: 'suitezutlhpvgyvgakcdo',
     secret: 'pV--T2FZj-3QCjJzcQd5OnzDBAe6rRKRQGEmc8iVCvdtc2FUOS5icq1gVfkbqiTx',
+    appid: '2156',
 }
 
 import request = require('request');
@@ -90,6 +91,16 @@ let ddTalkMsgHandle = {
         let authInfo: any = await isvApi.getCorpAuthInfo();
         let authUserInfo = authInfo.auth_user_info;
 
+        //agentID每次都会变,所以每次授权都要获取
+        let agents = authInfo.auth_info.agent || [];
+        let agentid = '';
+        for(let agent of agents) {
+            if (agent['appid'] == config.appid) {
+                agentid = agent['agentid'];
+                break;
+            }
+        }
+
         let corpAccessToken = await isvApi.getCorpAccessToken();
         let corpApi = new CorpApi(corpid, corpAccessToken);
         let userInfo: any = await corpApi.getUser(authUserInfo.userId);
@@ -102,6 +113,7 @@ let ddTalkMsgHandle = {
             company = await company.save();
             corp.isSuiteRelieve = false;
             corp.permanentCode = permanentCode;
+            corp.agentid = agentid;
             corp = await corp.save();
         } else {
             //创建企业
@@ -312,7 +324,7 @@ class DDTalk {
             let msg= await get_msg({
                 touser: ddtalkUser.ddUserId,
                 content: text,
-                agentid: '41551318'
+                agentid: corp.agentid,
             }, 'text');
 
             let ret = await corpApi.sendTextMsg(msg);
