@@ -41,6 +41,7 @@ export async function StaffInfoController($scope,Models) {
 }
 
 export async function EditMobileController($scope,Models,$ionicHistory) {
+    $scope.isDingtalk = /dingtalk/i.test(window.navigator.userAgent);
     require('./editMobile.scss');
     await API.onload();
     var staff = await Staff.getCurrent();
@@ -110,6 +111,7 @@ export async function EditMobileController($scope,Models,$ionicHistory) {
 }
 
 export async function EditEmailController($scope,Models,$ionicHistory,$ionicPopup) {
+    $scope.isDingtalk = /dingtalk/i.test(window.navigator.userAgent);
     require('./editMobile.scss');
     await API.onload();
     var staff = await Staff.getCurrent();
@@ -154,6 +156,7 @@ export async function EditEmailSuccessController($scope,Models,$ionicHistory) {
 }
 
 export async function EditPwdController($scope,Models,$ionicHistory,$storage,$ionicPopup) {
+    $scope.isDingtalk = /dingtalk/i.test(window.navigator.userAgent);
     require('./editMobile.scss');
     await API.onload();
     var staff = await Staff.getCurrent();
