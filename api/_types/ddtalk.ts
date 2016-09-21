@@ -56,7 +56,7 @@ export class DDTalkUser extends ModelObject {
     @Field({ type: Types.UUID})
     get id():string { return Values.UUIDV1()}
     set id(id: string) {}
-    
+
     @Field({ type: Types.STRING(50)})
     get ddUserId() : string { return null};
     set ddUserId(userId: string) {}
