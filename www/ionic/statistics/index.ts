@@ -8,8 +8,6 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
 
     let monthSelection = getSpanSelection('month');
     $scope.monthSelection = monthSelection;
-    $scope.beginTime = $scope.monthSelection.startTime;
-    $scope.endTime = $scope.monthSelection.endTime;
 
     $scope.saveMoneyChart = {};
     $scope.saveMoneyChart.labels = ["本月节省", "本月支出"];
@@ -56,8 +54,7 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
         span_depend = span;
         $scope.monthSelection = spanSelection;
         lastClick = span;
-        $scope.beginTime = $scope.monthSelection.startTime;
-        $scope.endTime = $scope.monthSelection.endTime;
+
         $scope.modal.hide();
     }
     //改写monthChange函数 改变时间
@@ -66,8 +63,7 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
         let optionFun = isAdd ? 'add' : 'subtract';
         let querySpan = moment( $scope.monthSelection.month)[optionFun](1, span_depend);
         $scope.monthSelection = getSpanSelection(span_depend,querySpan);
-        $scope.beginTime = $scope.monthSelection.startTime;
-        $scope.endTime = $scope.monthSelection.endTime;
+
         await searchData();
     };
     function getSpanSelection(span_depend,querySpan = moment()){
@@ -82,8 +78,6 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
     $scope.selfdefine = false;
 
     $scope.selfDefineFun = async function(){
-
-
         let value = {
             begin:moment().startOf('month').subtract(12,'month').toDate(),
             end:moment().endOf('month').toDate()
@@ -91,7 +85,7 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
         value = await ngModalDlg.selectDateSpan($scope, {
             beginDate:value.begin,
             endDate: value.end,
-            timepicker: true,
+            timepicker: false,
             title: '选择开始时间',
             titleEnd: '选择结束时间',
             fromStatistic: true
@@ -102,10 +96,7 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
             endTime: moment(value.end).toDate()
         };
         $scope.monthSelection = selfSelection;
-        if(value){
-            $scope.beginTime = value.begin;
-            $scope.endTime = value.end;
-        }
+
         $scope.modal.hide();
     }
 }

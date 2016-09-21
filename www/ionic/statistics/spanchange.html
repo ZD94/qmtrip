@@ -26,11 +26,11 @@
         <div ng-if="selfdefine" class="selfDefine" ng-click="selfDefineFun()">
             <div>
                 <div class="self-time-title">开始日期</div>
-                <div class="self-time-value">{{beginTime|date:'yyyy-MM-dd'}}</div>
+                <div class="self-time-value">{{monthSelection.startTime | date:'yyyy.MM.dd'}}</div>
             </div>
             <div>
                 <div class="self-time-title">结束日期</div>
-                <div class="self-time-value">{{endTime|date:'yyyy-MM-dd'}}</div>
+                <div class="self-time-value">{{monthSelection.endTime | date:'yyyy.MM.dd'}}</div>
             </div>
         </div>
     </ion-content>
