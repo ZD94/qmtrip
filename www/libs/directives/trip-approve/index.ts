@@ -30,7 +30,7 @@ angular
                     $ionicPopup.show({
                         title: '关于特别审批',
                         cssClass: 'aboutSpecial',
-                        template: require('./about-special.html'),
+                        template: require('../trip-plan/about-special.html'),
                         scope: $scope,
                         buttons: [
                             {
