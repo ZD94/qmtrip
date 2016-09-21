@@ -65,6 +65,7 @@ app.controller('debug',function($scope, $http, $location){
   if(url.key){
     $http.get('/api/budgets?p='+p+'&pz='+pz+'&key='+url.key)
         .success(function(response){
+            console.log(response);
          for(let i=0;i<response.length;i++){
            let arr = response[i].markedData;
               for(let j=0;j<arr.length;j++){
@@ -79,6 +80,37 @@ app.controller('debug',function($scope, $http, $location){
     });
   }
 
+  //更改服务器
+    $scope.originServer = {name:'默认',url:'/api/budgets'};
+    $scope.originServers = [
+        {name:'默认',url:'/api/budgets'},
+        {name:'测试',url:'//t.jingli365.com/api/budgets'},
+        {name:'本地',url:'//l.jingli365.com/api/budgets'},
+        {name:'正式',url:'//j.jingli365.com/api/budgets'}
+        ]
+    $scope.changeServer = function(){
+        let originServer = $scope.originServer;
+        let originServerUrl = originServer.url+'?p='+p+'&pz='+pz+'&key='+url.key;
+        $http.get(originServerUrl).success(function(response){
+            console.log(response);
+
+
+            let responseArr = response;
+            for(let i=0;i<responseArr.length;i++) {
+                let arr = responseArr[i].markedData;
+                for (let j = 0; j < arr.length; j++) {
+                    let dep = arr[j].departDateTime;
+                    let arrival = arr[j].arrivalDateTime;
+                    arr[j].departDateTime = new Date(dep);
+                    arr[j].arrivalDateTime = new Date(arrival);
+                    arr[j].price = Number(arr[j].price);
+                }
+            }
+            $scope.originDatas = responseArr;
+
+
+        })
+    }
 
   //动态加载clipboard
   // function loadJScript(){
@@ -97,12 +129,30 @@ app.controller('debug',function($scope, $http, $location){
     var query = JSON.stringify(origin.query);
     var type = JSON.stringify(origin.type);
     var prefers = JSON.stringify($scope.ori_prefers);
+      console.log(prefers);
     var policy = JSON.stringify($scope.policy);
-    $http.post('/api/budgets?key='+url.key,{originData: originData, query: query, policy: policy, prefers: prefers, type: type})
-        .success(function(datas){
-            $scope.result = datas;
-            $scope.originData.markedData = datas.markedScoreData;
-        })
+    let originServer = $scope.originServer;
+    let originServerUrl = originServer.url+'?key='+url.key;
+    $.post(originServerUrl, {originData: originData, query: query, policy: policy, prefers: prefers, type: type}, function(datas) {
+        $scope.result = datas;
+        $scope.originData.markedData = datas.markedScoreData;
+    }, "json")
+    // $http.post(originServerUrl,{originData: originData, query: query, policy: policy, prefers: prefers, type: type})
+    //     .success(function(datas){
+    //         console.log('进入');
+    //         $scope.result = datas;
+    //         $scope.originData.markedData = datas.markedScoreData;
+    //         console.log('出来');
+    //     })
+    //   $http({
+    //       method: 'POST',
+    //       url: originServerUrl,
+    //       data: {originData: originData, query: query, policy: policy, prefers: prefers, type: type}}).then(
+    //           function(res){
+    //               console.log(res);
+    //           },function(){}
+    //   )
+
   };
   $scope.change = function(){
     var single = $scope.prefer;    //string
@@ -112,13 +162,15 @@ app.controller('debug',function($scope, $http, $location){
     $scope.ori_prefers = ori;
   };
   $scope.changeOrigin = function(){
-    $scope.ori_prefers = $scope.originData.prefers;
-    var arr = $scope.originData.markedData;
-    var flag = arr[0].type;
-    if(flag!==0 && flag!=1){
-      $scope.ishotel = true;
-    }else{
-      $scope.ishotel = false;
+    if($scope.originData){
+        $scope.ori_prefers = $scope.originData.prefers;
+        var arr = $scope.originData.markedData;
+        var flag = arr[0].type;
+        if(flag!==0 && flag!=1){
+          $scope.ishotel = true;
+        }else{
+          $scope.ishotel = false;
+        }
     }
   }
   $scope.delete = function(index){

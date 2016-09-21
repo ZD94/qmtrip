@@ -8,6 +8,8 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
 
     let monthSelection = getSpanSelection('month');
     $scope.monthSelection = monthSelection;
+    $scope.beginTime = $scope.monthSelection.startTime;
+    $scope.endTime = $scope.monthSelection.endTime;
 
     $scope.saveMoneyChart = {};
     $scope.saveMoneyChart.labels = ["本月节省", "本月支出"];
@@ -54,6 +56,8 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
         span_depend = span;
         $scope.monthSelection = spanSelection;
         lastClick = span;
+        $scope.beginTime = $scope.monthSelection.startTime;
+        $scope.endTime = $scope.monthSelection.endTime;
         $scope.modal.hide();
     }
     //改写monthChange函数 改变时间
@@ -62,6 +66,8 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
         let optionFun = isAdd ? 'add' : 'subtract';
         let querySpan = moment( $scope.monthSelection.month)[optionFun](1, span_depend);
         $scope.monthSelection = getSpanSelection(span_depend,querySpan);
+        $scope.beginTime = $scope.monthSelection.startTime;
+        $scope.endTime = $scope.monthSelection.endTime;
         await searchData();
     };
     function getSpanSelection(span_depend,querySpan = moment()){
@@ -74,12 +80,13 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
     }
     //自定义选择日期
     $scope.selfdefine = false;
-    $scope.beginTime = moment().startOf('month').toDate();
-    $scope.endTime = moment().endOf('month').toDate();
+
     $scope.selfDefineFun = async function(){
+
+
         let value = {
-            begin:$scope.monthSelection.startTime,
-            end:$scope.monthSelection.endTime
+            begin:moment().startOf('month').subtract(12,'month').toDate(),
+            end:moment().endOf('month').toDate()
         }
         value = await ngModalDlg.selectDateSpan($scope, {
             beginDate:value.begin,
