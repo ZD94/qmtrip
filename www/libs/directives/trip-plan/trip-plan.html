@@ -1,7 +1,7 @@
 <div class="list card trip-card" ng-click="click(trip)">
     <div class="card-header item-divider" ng-class="{special:trip.isSpecialApprove}">
         {{trip.startAt | date: 'yyyy-MM-dd'}} 至 {{trip.backAt | date: 'yyyy-MM-dd'}}
-        <span class="item-note" ng-if="trip.isSpecialApprove">
+        <span class="item-note" ng-if="trip.isSpecialApprove" ng-click="aboutSpecial();$event.stopPropagation();">
             <i class="icon ion-information-circled"></i>特别审批
         </span>
     </div>

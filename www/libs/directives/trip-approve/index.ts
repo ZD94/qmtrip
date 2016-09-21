@@ -21,11 +21,25 @@ angular
                 showDetailStatus: '@',  //是否显示详细状态,如果为false,则只显示[审批通过,审批未通过,待审批]
                 click: '='
             },
-            controller: function($scope) {
+            controller: function($scope, $ionicPopup) {
                 $scope.EApproveStatus = EApproveStatus;
                 $scope.showHeader = $scope.showHeaderTxt != 'false';
                 $scope.showDetailStatus = Boolean($scope.showDetailStatus);
                 $scope.click = $scope.click || function(trip) { console.info('click me...');}
+                $scope.aboutSpecial = function(){
+                    $ionicPopup.show({
+                        title: '关于特别审批',
+                        cssClass: 'aboutSpecial',
+                        template: require('./about-special.html'),
+                        scope: $scope,
+                        buttons: [
+                            {
+                                text: '返回',
+                                type: 'button-positive'
+                            }
+                        ]
+                    })
+                }
             }
         }
     })
