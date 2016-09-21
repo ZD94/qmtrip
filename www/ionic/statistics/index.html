@@ -1,11 +1,8 @@
 <ion-view title="差旅统计-本月预算" id="page24">
     <ion-content padding="false" class="has-header" scroll="false">
         <div class="flex-c01">
-            <div class="item item-input date_selected">
-                <i class="icon ion-chevron-left icon-timeSpan" ng-click="monthChange()"></i>
-                <!--<span class="data_show" ng-click="spanChange()">{{monthSelection.showStr}}</span>-->
-                <span class="data_show" ng-click="showmadel()">{{monthSelection.startTime | date:'yyyy.MM.dd'}}-{{monthSelection.endTime | date:'yyyy.MM.dd'}}</span>
-                <i class="icon ion-chevron-right icon-timeSpan" ng-click="monthChange(true)"></i>
+            <div class="item item-input date_selected" spanchange>
+
             </div>
             <!--<label class="item item-input item-select">-->
             <!--<span class="input-label">当前统计</span>-->

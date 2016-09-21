@@ -187,6 +187,8 @@ function calendarController($scope, $element, value){
     if($scope.options.timepicker) {
         $scope.timeScale = timeScale;
         $scope.timeMax = 24 * 60 / timeScale;
+    }else{
+        $scope.timeScale = 10;
     }
 
     $scope.valid = {
