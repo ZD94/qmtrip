@@ -27,6 +27,7 @@ function agency_TLDAlert(msg) {
 }
 
 require('nglibs');
+require('www/libs');
 
 var ngapp = require('ngapp');
 ngapp.depend('ionic');

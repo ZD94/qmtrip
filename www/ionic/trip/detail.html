@@ -1,18 +1,8 @@
 <ion-view title="待审批详情" id="page7">
     <ion-content padding="true" class="has-header">
         <tp-status-bar status="tripPlan.status" reason="trip.auditRemark"></tp-status-bar>
-        <ion-list>
-            <ion-item class="item-thumbnail-left opactic">
-                <div class="staff_portrait" ng-click="showTravelPolicy(staff.id)">{{staff.name.substring(staff.name.length-2,staff.name.length)}}</div>
-                <span class="op_mult">{{staff.name}}&nbsp;&nbsp;{{staff.mobile}}</span>
-                <br>{{staff.email}}
-                <p align="right" style="margin-top: 5px">
-                    <a class="button button-small button-outline" ng-click="showTravelPolicy(staff.id)" style="border: 1px solid #fff;color: #fff;">差旅标准</a>
-                    <a class="button button-small" href="tel:{{staff.mobile}}">打电话</a>
-                </p>
-            </ion-item>
-        </ion-list>
 
+        <tp-staff-detail staff="staff"></tp-staff-detail>
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <tp-header trip="tripPlan"></tp-header>
 

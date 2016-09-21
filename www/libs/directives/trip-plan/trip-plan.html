@@ -7,12 +7,11 @@
     </div>
     <div class="item item-body">
         <ion-list>
-            <ion-item class="item-thumbnail-left" ng-if="showHeader">
+            <div class="staff_info" ng-if="showHeader">
                 <div class="staff_portrait">{{trip.account.name | limitTo: -2}}</div>
-                <h2 style="margin-top: 0;">{{trip.account.name}}<br>{{trip.account.mobile}}</h2>
-                <p></p>
-            </ion-item>
-            <ion-item>
+                <h2 style="margin-top: 0;">{{trip.account.name}}</h2>
+            </div>
+            <ion-item class="po_r">
                 <p><i class="icon ion-plane"></i> &nbsp;&nbsp;{{trip.deptCity}} 到 {{trip.arrivalCity}}</p>
                 <p><i class="icon ion-star"></i> &nbsp;&nbsp;出差事由：{{trip.title}}</p>
             </ion-item>

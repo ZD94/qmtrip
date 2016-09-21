@@ -2,30 +2,6 @@
     <ion-content padding="true" class="has-header">
         <form class="list">
             <div class="item item-input">
-                <span class="input-label">出差日期</span>
-                <fake-input value="{{trip.beginDate|date:'yyyy-MM-dd HH:mm'}}" placeholder="请选择出差日期" ng-click="selectDatespan()">
-                </fake-input>
-            </div>
-            <div class="item item-input">
-                <span class="input-label">结束日期</span>
-                <ng-selector-date
-                        ng-model="trip.endDate"
-                        dlg-options="endDateSelector"
-                        dlg-title="请选择结束日期"
-                        class="fake-input"
-                ></ng-selector-date>
-            </div>
-            <div class="item item-input">
-                <span class="input-label">出差地点</span>
-                <ng-selector-list
-                        ng-model="trip.place"
-                        dlg-options="placeSelector"
-                        dlg-title="请选择出差地点"
-                        dlg-placeholder="请输入城市名或首字母缩写"
-                        class="fake-input"
-                ></ng-selector-list>
-            </div>
-            <div class="item item-input">
                 <span class="input-label">出差事由</span>
                 <ng-selector-list
                         ng-model="trip.reasonName"
@@ -35,19 +11,43 @@
                         class="fake-input"
                 ></ng-selector-list>
             </div>
+            <div class="item item-input">
+                <span class="input-label">出发地</span>
+                <ng-selector-list
+                        ng-model="trip.fromPlace"
+                        dlg-options="fromPlaceSelector"
+                        dlg-title="出发地选择"
+                        dlg-placeholder="请输入城市名或首字母缩写"
+                        class="fake-input"
+                ></ng-selector-list>
+            </div>
+            <div class="item item-input">
+                <span class="input-label">目的地</span>
+                <ng-selector-list
+                        ng-model="trip.place"
+                        dlg-options="placeSelector"
+                        dlg-title="请选择出差地点"
+                        dlg-placeholder="请输入城市名或首字母缩写"
+                        class="fake-input"
+                ></ng-selector-list>
+            </div>
+            <div class="item item-input">
+                <span class="input-label">最晚何时到达</span>
+                <fake-input value="{{trip.beginDate|date:'yyyy-MM-dd HH:mm'}}" placeholder="请选择出差日期" ng-click="selectDatespan()">
+                </fake-input>
+            </div>
+            <div class="item item-input">
+                <span class="input-label">最早何时离开</span>
+                <ng-selector-date
+                        ng-model="trip.endDate"
+                        dlg-options="endDateSelector"
+                        dlg-title="请选择结束日期"
+                        class="fake-input"
+                ></ng-selector-date>
+            </div>
             <div class="spacer" style="width: 300px; height: 9px;"></div>
             <ion-toggle toggle-class="toggle-positive" ng-model="trip.traffic">交通</ion-toggle>
             <div ng-if="trip.traffic">
-                <div class="item item-input" ng-if="trip.traffic">
-                    <span class="input-label">出发地</span>
-                    <ng-selector-list
-                            ng-model="trip.fromPlace"
-                            dlg-options="fromPlaceSelector"
-                            dlg-title="出发地选择"
-                            dlg-placeholder="请输入城市名或首字母缩写"
-                            class="fake-input"
-                    ></ng-selector-list>
-                </div>
                 <ion-toggle toggle-class="toggle-positive" ng-model="trip.round">返程</ion-toggle>
             </div>
             <div class="spacer" style="width: 300px; height: 9px;"></div>
