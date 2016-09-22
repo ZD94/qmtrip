@@ -139,6 +139,7 @@ let ddTalkMsgHandle = {
                 permanentCode: permanentCode,
                 companyId: company.id,
                 isSuiteRelieve: false,
+                agentid: agentid
             }
             let ddtalkCorp = Models.ddtalkCorp.create(obj);
             await ddtalkCorp.save();
