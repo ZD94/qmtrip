@@ -648,7 +648,11 @@ class TripPlanModule {
             if(!user) user = await Models.staff.get(tripApprove['accountId']);
 
             let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
-            self_url = await API.wechat.shorturl({longurl: self_url});
+            try {
+                self_url = await API.wechat.shorturl({longurl: self_url});
+            } catch(err) {
+                console.error(err);
+            }
             let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
 
             let self_values = {
