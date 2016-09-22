@@ -303,7 +303,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
     }
 }
 
-export default async function SwitchConfigController($scope, $location, $window){
+export async function SwitchConfigController($scope, $location, $window){
     var config = require('config');
     await config.$ready;
     if(!config.$config || !config.$config.configs){
