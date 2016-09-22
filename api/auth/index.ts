@@ -33,7 +33,7 @@ var ACCOUNT_TYPE = {
  * @class API.auth 认证类
  * @constructor
  */
-class ApiAuth {
+export default class ApiAuth {
 
     static __public: boolean = true;
 
@@ -1659,7 +1659,7 @@ async function _sendActiveEmail(accountId) {
 
 
 //生成登录凭证
-function makeAuthenticateSign(accountId, os?: string) {
+export function makeAuthenticateSign(accountId, os?: string) {
     if (!os) {
         os = 'web';
     }
@@ -1690,5 +1690,3 @@ function makeAuthenticateSign(accountId, os?: string) {
             }
         });
 }
-
-export = ApiAuth;
