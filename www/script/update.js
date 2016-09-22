@@ -18,15 +18,24 @@ function onUpdate(appLoader) {
     function onProgress(ev) {
         progress.css('width', (ev.percentage * 100) + '%');
     }
+    function onError(err){
+        msg.text(err);
+        alert(err);
+        location.reload();
+    }
 
     return appLoader.download(onProgress)
         .then(function () {
-            return appLoader.update();
+            appLoader.newManifest.root = appLoader.cache.localUrl;
+            return appLoader.update(false);
+        })
+        .then(function(success){
+            if(!success){
+                onError('更新出错!');
+            }
         })
         .catch(function (err) {
-            msg.text('下载出错: ', err);
-            alert(err);
-            location.reload();
+            onError('下载出错: '+err);
         });
 }
 

@@ -11,6 +11,15 @@
       height: 36px;
       line-height: 36px;
       margin: 0 auto;
+      white-space: nowrap;
+      .config-name{
+        font-size: 12px;
+        line-height: 12px;
+        min-width: 30px;
+        min-height: 13px;
+        padding: 2px;
+        margin: 0px;
+      }
     }
     .logo_text{
       background: url(ionic/images/logo_text.png) center no-repeat;

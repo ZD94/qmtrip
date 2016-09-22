@@ -37,6 +37,10 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
     }
 
     $scope.check_login = async function ():Promise<any> {
+        if($scope.form.account == 'switchconfig@jingli.tech'){
+            location.href = '#/login/switch-config';
+            return;
+        }
         try {
             await API.onload();
             var data = await API.auth.login($scope.form);
@@ -226,4 +230,18 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
             msgbox.log(err.msg || err);
         }
     }*/
+
+    var config = require('config');
+    await config.$ready;
+    $scope.configName = config.name;
+    $scope.showConfigName = function(){
+        if(location.host == 'j.jingli365.com')
+            return false;
+        if(config.api.substr(0, 4) == 'http'){
+            var url = new URL(config.api);
+            if(url.host == 'j.jingli365.com')
+                return false;
+        }
+        return true;
+    }
 }
