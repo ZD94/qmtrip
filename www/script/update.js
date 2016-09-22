@@ -26,13 +26,16 @@ function onUpdate(appLoader) {
 
     return appLoader.download(onProgress)
         .then(function () {
-            appLoader.newManifest.root = appLoader.cache.localUrl;
             return appLoader.update(false);
         })
         .then(function(success){
             if(!success){
                 onError('更新出错!');
+                return;
             }
+            window.Manifest.root = appLoader.newManifest.root;
+            window.Manifest.files = appLoader.newManifest.files;
+            location.reload();
         })
         .catch(function (err) {
             onError('下载出错: '+err);
