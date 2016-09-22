@@ -53,16 +53,15 @@ class RunningTimePrefer extends AbstractPrefer<IFinalTicket> {
                 return v1.duration - v2.duration;
             });
         }
-
         tickets = tickets.map( (v) => {
             if (!v.score) v.score = 0;
             if (!v.reasons) v.reasons = [];
             if (v.type == TRAFFIC.TRAIN) {
-                var addScore = self.trainScore - Math.ceil(v.duration - trains[0].duration)*self.trainScoreInterval;
+                var addScore = self.trainScore - (v.duration - trains[0].duration)*self.trainScoreInterval;
                 v.score += addScore;
                 v.reasons.push(`火车运行时长 ${addScore}`)
             }else{
-                var addScore = self.planeScore - Math.ceil(v.duration - flights[0].duration)*self.planeScoreInterval;
+                var addScore = self.planeScore - (v.duration - flights[0].duration)*self.planeScoreInterval;
                 v.score += addScore;
                 v.reasons.push(`飞机运行时长 ${addScore}`)
             }

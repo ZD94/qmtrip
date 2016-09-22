@@ -29,7 +29,7 @@ class PlanePricePrefer extends AbstractPrefer<IFinalTicket> {
         let minPrice = 0;
 
         tickets.forEach( (v) => {
-            if (this.cabins.indexOf(v.cabin) >= 0){
+            if (self.cabins.indexOf(v.cabin) >= 0){
                 targetTickets.push(v);
             }
         })
@@ -46,22 +46,24 @@ class PlanePricePrefer extends AbstractPrefer<IFinalTicket> {
         tickets = tickets.map( (v) => {
             if (!v.score) v.score = 0;
             if (!v.reasons) v.reasons = [];
-            if (v.price <= midPrice) {
-                var a = 1 - Math.pow((v.price-minPrice)/(midPrice-minPrice), 2);
-                if(this.type && this.type == "line"){
-                    a = (v.price-minPrice)/(midPrice-minPrice);
+            if (self.cabins.indexOf(v.cabin) >= 0){
+                if (v.price <= midPrice) {
+                    var a = 1 - Math.pow((v.price-minPrice)/(midPrice-minPrice), 2);
+                    if(this.type && this.type == "line"){
+                        a = (v.price-minPrice)/(midPrice-minPrice);
+                    }
+                    var addScore = self.score * a;
+                    v.score += addScore;
+                    v.reasons.push(`价格偏好以下价格 ${addScore}`)
+                }else{
+                    var a = 1 - Math.pow((maxPrice - v.price)/(maxPrice - midPrice), 2);
+                    if(this.type && this.type == "line"){
+                        a = (maxPrice - v.price)/(maxPrice - midPrice);
+                    }
+                    var addScore = self.score * a;
+                    v.score += addScore;
+                    v.reasons.push(`价格偏好以上价格 ${addScore}`)
                 }
-                var addScore = self.score * a;
-                v.score += addScore;
-                v.reasons.push(`飞机价格偏好以下价格 ${addScore}`)
-            }else{
-                var a = 1 - Math.pow((maxPrice - v.price)/(maxPrice - midPrice), 2);
-                if(this.type && this.type == "line"){
-                    a = (maxPrice - v.price)/(maxPrice - midPrice);
-                }
-                var addScore = self.score * a;
-                v.score += addScore;
-                v.reasons.push(`飞机价格偏好以上价格 ${addScore}`)
             }
             return v;
         })

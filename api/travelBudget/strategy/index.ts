@@ -31,7 +31,7 @@ function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
                     price: cabin.price,
                     remainNum: cabin.remainNum,
                     bookUrl: agents[j].bookUrl,
-                    duration: tickets[i].duration,
+                    duration: tickets[i].duration || ((new Date(tickets[i].arrivalDateTime).valueOf() - new Date(tickets[i].departDateTime).valueOf())/(60*1000)),
                     type: tickets[i].type,
                 } as IFinalTicket
                 _tickets.push(_ticket);
