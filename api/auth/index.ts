@@ -633,7 +633,11 @@ class ApiAuth {
             vals.url = C.host + "/index.html#/login/first-set-pwd?" + url;
             key = 'qm_first_set_pwd';
             _mobile = account.mobile;
-            vals.url = await API.wechat.shorturl({longurl: vals.url});
+            try {
+                vals.url = await API.wechat.shorturl({longurl: vals.url});
+            } catch(err) {
+                console.error(err);
+            }
         } else {
             vals.url = C.host + "/index.html#/login/reset-pwd?" + url;
             key = 'qm_reset_pwd_email';
@@ -1317,7 +1321,12 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
             throw {code: -1, msg: "跳转链接不存在"};
         }
 
-        var shortUrl = await API.wechat.shorturl({longurl: backUrl});
+        var shortUrl = backUrl;
+        try {
+            shortUrl = await API.wechat.shorturl({longurl: backUrl});
+        } catch(err) {
+            console.error(err);
+        }
         backUrl = encodeURIComponent(shortUrl);
         var account = await Models.account.get(accountId);
 
@@ -1463,8 +1472,8 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     static async getWeChatLoginUrl(params: {redirectUrl: string}) {
         let redirectUrl = encodeURIComponent(params.redirectUrl);
         let backUrl = C.host + "/auth/get-wx-code?redirect_url=" + redirectUrl;
-        // backUrl = "http://t.jingli365.com/auth/wx-login?redirect_url=" + redirectUrl; //微信公众号测使用
-        // backUrl = "http://t.jingli365.com/auth/get-wx-code?redirect_url=" + redirectUrl; //微信公众号测使用
+        // backUrl = "https://t.jingli365.com/auth/wx-login?redirect_url=" + redirectUrl; //微信公众号测使用
+        // backUrl = "https://t.jingli365.com/auth/get-wx-code?redirect_url=" + redirectUrl; //微信公众号测使用
         return API.wechat.getOAuthUrl({backUrl: backUrl});
     }
 
@@ -1480,6 +1489,8 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         await Promise.all(openIds.map((openId) => openId.destroy()));
         return true;
     }
+
+    static makeAuthenticateSign = makeAuthenticateSign
 
     static __initHttpApp (app: any) {
 
@@ -1630,7 +1641,11 @@ async function _sendActiveEmail(accountId) {
             var activeToken = utils.getRndStr(6);
             var sign = makeActiveSign(activeToken, account.id, expireAt);
             var url = C.host + "/index.html#/login/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt+"&email="+account.email;
-            url = await API.wechat.shorturl({longurl: url});
+            try {
+                url = await API.wechat.shorturl({longurl: url});
+            } catch(err) {
+                console.error(err);
+            }
             //发送激活邮件
             var vals = {
                 name: account.email,

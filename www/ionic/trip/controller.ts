@@ -116,7 +116,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
     })
 
     $scope.calcTripDuration = function(){
-        return moment(trip.endDate).diff(trip.beginDate, 'days') || 1;
+        return moment(trip.endDate).startOf('day').diff(moment(trip.beginDate).startOf('day'), 'days') || 1;
     };
     $scope.incTripDuration = function(){
         trip.endDate = moment(trip.endDate).add(1, 'days').toDate();
@@ -214,7 +214,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
         timepicker: true
     };
     $scope.nextStep = async function() {
-        if ($scope.currentTpSts.length && (!$scope.subsidy || !$scope.subsidy.template)) {
+        if ($scope.currentTpSts && $scope.currentTpSts.length && (!$scope.subsidy || !$scope.subsidy.template)) {
             $scope.showErrorMsg('请选择补助信息');
             return false;
         }
@@ -514,9 +514,9 @@ export async function ListController($scope , $stateParams, Models){
             } catch(err) {
                 alert("获取数据时,发生异常");
                 return;
+            } finally {
+                $scope.$broadcast('scroll.infiniteScrollComplete');
             }
-            loadTripPlan(pager);
-            $scope.$broadcast('scroll.infiniteScrollComplete');
         }
     }
 

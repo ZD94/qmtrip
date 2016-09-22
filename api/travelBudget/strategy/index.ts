@@ -88,7 +88,7 @@ abstract class AbstractHotelStrategy {
 
     abstract async customMarkedScoreData(hotels: IFinalHotel[]) :Promise<IFinalHotel[]>;
 
-    async getResult(hotels: IHotel[]): Promise<TravelBudgeItem> {
+    async getResult(hotels: IHotel[], isRetMarkedData?: boolean): Promise<TravelBudgeItem> {
         let _hotels = formatHotel(hotels);
         if (!_hotels || !_hotels.length) {
             const defaultPrice = {
@@ -115,7 +115,9 @@ abstract class AbstractHotelStrategy {
             latitude: ret.latitude,
             longitude: ret.longitude,
         }
-
+        if (isRetMarkedData) {
+            result.markedScoreData = _hotels;
+        }
         if (this.isRecord) {
             let travelBudgetLog = await Models.travelBudgetLog.create({});
             travelBudgetLog.title = `[住宿]${this.qs.query.city.name}-(${this.qs.query.checkInDate})`
@@ -193,7 +195,7 @@ abstract class AbstractTicketStrategy {
 
     abstract async customerMarkedScoreData(tickets: IFinalTicket[]): Promise<IFinalTicket[]>;
 
-    async getResult(tickets: ITicket[]) :Promise<TravelBudgeItem> {
+    async getResult(tickets: ITicket[], isRetMarkedData?: boolean) :Promise<TravelBudgeItem> {
         let _tickets = formatTicketData(tickets);
         if (!_tickets || !_tickets.length) {
             return {
@@ -218,7 +220,9 @@ abstract class AbstractTicketStrategy {
             departDateTime: ret.departDateTime,
             arrivalDateTime: ret.arrivalDateTime,
         } as TravelBudgeItem;
-
+        if (isRetMarkedData) {
+            result.markedScoreData = _tickets;
+        }
         if (this.isRecord) {
             let travelBudgetLog = await Models.travelBudgetLog.create({});
             travelBudgetLog.title = `[交通]${this.qs.query.originPlace.name}-${this.qs.query.destination.name}(${this.qs.query.leaveDate})`

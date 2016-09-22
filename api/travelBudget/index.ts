@@ -310,7 +310,8 @@ class ApiTravelBudget {
         }
         let budgetConfig = staff.company.budgetConfig;
         if (budgetConfig && budgetConfig.hotel) {
-            qs.prefers = budgetConfig.hotel;
+            let compiled = _.template(JSON.stringify(budgetConfig.hotel));
+            qs.prefers = JSON.parse(compiled(query));
         } else {
             qs.prefers = loadDefaultPrefer(query, 'hotel');
         }
@@ -417,7 +418,8 @@ class ApiTravelBudget {
         }
         let qs: any = {};
         if (preferConfig && preferConfig.traffic) {
-            qs.prefers = preferConfig.traffic;
+            let compiled = _.template(JSON.stringify(preferConfig.traffic));
+            qs.prefers = JSON.parse(compiled(params));
         } else {
             qs.prefers = loadDefaultPrefer(params);
         }
@@ -491,12 +493,13 @@ class ApiTravelBudget {
                     let datas = travelBudgetLogs.map( (v)=> {
                         return v.target;
                     });
+                    res.header('Access-Control-Allow-Origin', '*');
                     res.json(datas);
                 })
                 .catch(next);
         })
 
-        app.post('/api/budgets', _auth_middleware, async function(req, res, next) {
+        app.post('/api/budgets', _auth_middleware, function(req, res, next) {
             let {query, prefers, policy, originData, type} = req.body;
             let qs = {
                 policy: policy,
@@ -504,14 +507,16 @@ class ApiTravelBudget {
                 query: JSON.parse(query),
             }
 
-            try {
-                let factory = (type == 1) ? TrafficBudgetStrategyFactory : HotelBudgetStrategyFactory;
-                let strategy = await factory.getStrategy(qs, {isRecord: false});
-                let result = await strategy.getResult(JSON.parse(originData));
-                res.json(result);
-            } catch(err) {
-                next(err);
-            }
+            let factory = (type == 1) ? TrafficBudgetStrategyFactory : HotelBudgetStrategyFactory;
+            factory.getStrategy(qs, {isRecord: false})
+                .then( (strategy) => {
+                    return strategy.getResult(JSON.parse(originData), true);
+                })
+                .then( (result) => {
+                    res.header('Access-Control-Allow-Origin', '*');
+                    res.json(result);
+                })
+                .catch(next)
         })
     }
 }

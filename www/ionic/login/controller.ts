@@ -3,8 +3,7 @@ var Cookie = require('tiny-cookie');
 var msgbox = require('msgbox');
 var API = require('common/api');
 import validator = require('validator');
-import { Staff } from "api/_types/staff";
-
+declare var dd;
 API.require('auth');
 
 export function StorageSetController($scope, $stateParams, $storage) {
@@ -27,23 +26,54 @@ export function StorageSetController($scope, $stateParams, $storage) {
     window.location.href = back_url;
 }
 
-export async function IndexController($scope, $stateParams, $storage, $sce, $loading, $ionicPopup) {
+export async function IndexController($scope, $stateParams, $storage, $sce, $loading, $ionicPopup, ddtalkApi) {
     $loading.start();
 
     var browserspec = require('browserspec');
     var backUrl = $stateParams.backurl || "#";
     require("./login.scss");
+    function isDingTalk () {
+        var ua = navigator.userAgent;
+        return /dingtalk/i.test(ua);
+    }
     //微信中自动登录
     let href = window.location.href;
-    if(browserspec.is_wechat && /.*jingli365\.com/.test(window.location.host) && !$stateParams.wxauthcode && !/.*backurl\=.*/.test(href)) {
+    if(browserspec.is_wechat && window.location.host != 't.jingli365.com' && /.*jingli365\.com/.test(window.location.host) && !$stateParams.wxauthcode && !/.*backurl\=.*/.test(href)) {
         await API.onload();
 
         let url = await API.auth.getWeChatLoginUrl({redirectUrl: href});
         window.location.href = url;
         return;
-    }else{
-        $loading.end();
     }
+
+    if (isDingTalk()) {
+        try {
+            let url = window.location.href;
+            var corpid = window['ddtalk'].getCorpid();
+
+            let ddtalkAuthCode = await new Promise((resolve, reject) => {
+                dd.runtime.permission.requestAuthCode({
+                    corpId: corpid,
+                    onSuccess: function(result) {
+                        resolve(result.code);
+                    },
+                    onFail : function(err) {
+                        reject(err);
+                    }
+                })
+            });
+            //通过code换取用户基本信息
+            let data = await API.ddtalk.loginByDdTalkCode({corpid: corpid, code: ddtalkAuthCode});
+            $storage.local.set('auth_data', data);
+            await API.onload();
+            window.location.href = backUrl;
+            return;
+        } catch(err) {
+            console.error(err);
+            alert(JSON.stringify(err))
+        }
+    }
+    $loading.end();
 
     $scope.form = {
         email: Cookie.get("email") || '',
@@ -258,6 +288,7 @@ export async function CompanyRegisterController ($scope, $stateParams){
     API.require("checkcode");
     API.require("auth");
     await API.onload();
+    require("./company-register.scss");
     $scope.form = {
         mobile:'',
         msgCode:'',
@@ -356,7 +387,7 @@ export async function CompanyWelcomeController ($scope, $stateParams){
 
 export async function TestController($scope) {
     $scope.initscan = function(){
-        var backUrl = "http://"+window.location.host+"/index.html#/trip/create";
+        var backUrl = "https://"+window.location.host+"/index.html#/trip/create";
         API.onload(function() {
             API.auth.getQRCodeUrl({backUrl: backUrl, accountId: "c3d5f7c0-32e8-11e6-9af9-0710d114e84c", email: "yali.wang@jingli.tech"})
                 .then(function(content) {

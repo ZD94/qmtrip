@@ -7,7 +7,7 @@
   "cluster": false,
   "port": 4002,
   "apiPort": 4102,
-  "host": "http://${{hostname}}:${{port}}",
+  "host": "//${{hostname}}:${{port}}",
   "socket_file": null,
   "pid_file": "${{ROOT_DIR}}/tmp/server.pid",
 
@@ -30,7 +30,7 @@
     "url": "redis://localhost:6379"
   },
   "hosts": {
-    "main":{"addr":"api.local.jingli.tech", "port":4101, "www":"http://${{hosts.main.addr}}:80"}
+    "main":{"addr":"api.local.jingli.tech", "port":4101, "www":"https://${{hosts.main.addr}}:80"}
   },
   "upload":{
     "tmpDir": "${{ROOT_DIR}}/tmp/upload",
