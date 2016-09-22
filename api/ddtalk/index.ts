@@ -79,6 +79,12 @@ async function _getPermanentCode(suiteToken, tmpAuthCode) {
 let ddTalkMsgHandle = {
     /* * * * 临时授权码* * * * */
     tmp_auth_code: async function(msg) {
+        const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
+        let isExist = await cache.read(TMP_CODE_KEY);
+        if (isExist) {
+            return;
+        }
+        await cache.write(TMP_CODE_KEY, true, 60 * 2);
         let tokenObj = await _getSuiteToken();
         let suiteToken = tokenObj['suite_access_token']
         let permanentAuthMsg: any = await _getPermanentCode(suiteToken, msg.AuthCode);
