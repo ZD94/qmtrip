@@ -641,7 +641,7 @@ class TripPlanModule {
 
         if(isNextApprove){
             await TripPlanModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: true});
-        }else{
+        }else if(approveResult == EApproveResult.PASS){
             //发送审核结果邮件
             let self_url = config.host + '/index.html#/trip/list-detail?tripid=' + tripApprove.id;
             let user = tripApprove.account;
