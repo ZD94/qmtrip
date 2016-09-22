@@ -5,22 +5,18 @@
 'use strict';
 import {IFinalTicket, TRAFFIC} from "api/_types/travelbudget";
 import {AbstractPrefer} from "./index";
-//廉价供应商
+//只允许乘坐供应商
 
-// const CHEAP_SUPPLIERS = ['春秋航空', '中国联合航空', '吉祥航空', '西部航空', '成都航空', '九元航空', '幸福航空'];
-const CHEAP_SUPPLIERS = ["9C", "KN", "HO", "PN", "EU", "AQ", "JR"];
-class CheapSupplierPrefer extends AbstractPrefer<IFinalTicket> {
+// const CHEAP_SUPPLIERS = ['中国北方航空公司', '大新华航空公司', '上海航空公司'];
+class PermitOnlySupplierPrefer extends AbstractPrefer<IFinalTicket> {
 
     private score: number;
-    private cheapSuppliers: string[];
+    private permitSuppliers: string[];
 
     constructor(name, options) {
         super(name, options);
         if (!this.score) {
             this.score = 0;
-        }
-        if (!(this.cheapSuppliers.length)) {
-            this.cheapSuppliers = CHEAP_SUPPLIERS;
         }
     }
 
@@ -34,9 +30,9 @@ class CheapSupplierPrefer extends AbstractPrefer<IFinalTicket> {
             if(v.type == TRAFFIC.FLIGHT && v.No && v.No.length > 2){
                 supplier = v.No.substr(0,2);
             }
-            if (v.type == TRAFFIC.FLIGHT && supplier.length > 0 && self.cheapSuppliers.indexOf(supplier) >= 0) {
+            if (v.type == TRAFFIC.FLIGHT && supplier.length > 0 && self.permitSuppliers.indexOf(supplier) < 0) {
                 v['score'] += self.score;
-                v['reasons'].push(`不允许乘坐廉价供应商 ${self.score}`)
+                v['reasons'].push(`不允许乘坐的供应商 ${self.score}`)
             }
             return v;
         });
@@ -44,4 +40,4 @@ class CheapSupplierPrefer extends AbstractPrefer<IFinalTicket> {
     }
 }
 
-export= CheapSupplierPrefer
+export= PermitOnlySupplierPrefer

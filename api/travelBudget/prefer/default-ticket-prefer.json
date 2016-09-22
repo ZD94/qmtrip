@@ -34,7 +34,22 @@
   {
     "name": "cheapSupplier",
     "options": {
-      "score": -100
+      "score": -100000,
+      "cheapSuppliers": ["9C", "KN", "HO", "PN", "EU", "AQ", "JR"]
+    }
+  },
+  {
+    "name": "permitOnlySupplier",
+    "options": {
+      "score": -100000,
+      "permitSuppliers": ["CJ", "CN", "FM"]
+    }
+  },
+  {
+    "name": "priorSupplier",
+    "options": {
+      "score": 5000,
+      "priorSuppliers": ["CJ", "CN", "FM"]
     }
   },
   {

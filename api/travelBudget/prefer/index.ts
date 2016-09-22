@@ -50,10 +50,10 @@ export var hotelPrefers = {
 
 export var ticketPrefers = {
     arrivalTime: require('./ticket-arrivaltime'),
-    cheapSupplier: require('./ticket-cheapsupplier'),
     selectTraffic: require('./ticket-selectTrafficByTime'),
     departTime: require('./ticket-departtime'),
     trafficPrefer: require('./ticket-trafficprefer'),
+    cheapSupplier: require('./ticket-cheapsupplier'),
     cabin: require('./ticket-cabin'),
     runningTimePrefer: require('./ticket-runningTimePrefer'),
     departStandardTimePrefer: require('./ticket-departStandardTimePrefer'),
@@ -62,5 +62,7 @@ export var ticketPrefers = {
     latestArrivalTimePrefer: require('./ticket-latestArrivalTimePrefer'),
     earliestGoBackTimePrefer: require('./ticket-earliestGoBackTimePrefer'),
     trainPricePrefer: require('./ticket-trainPricePrefer'),
-    planePricePrefer: require('./ticket-planePricePrefer')
+    planePricePrefer: require('./ticket-planePricePrefer'),
+    permitOnlySupplier: require('./ticket-permitOnlySupplier'),
+    priorSupplier: require('./ticket-priorSupplier')
 }
