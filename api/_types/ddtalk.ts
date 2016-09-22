@@ -80,4 +80,8 @@ export class DDTalkUser extends ModelObject {
     @Field({type: Types.STRING(50)})
     get name(): string { return null};
     set name(name: string) {}
+
+    @Field({type: Types.STRING(50)})
+    get corpid(): string { return null}
+    set corpid(corpid: string) {}
 }

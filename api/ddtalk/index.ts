@@ -65,6 +65,7 @@ async function _getSuiteToken() {
 async function _getPermanentCode(suiteToken, tmpAuthCode) {
     let url = 'https://oapi.dingtalk.com/service/get_permanent_code';
     return reqProxy(url, {
+        name: '获取永久授权码',
         qs: {
             suite_access_token: suiteToken,
         },
@@ -100,7 +101,6 @@ let ddTalkMsgHandle = {
                 break;
             }
         }
-
         let corpAccessToken = await isvApi.getCorpAccessToken();
         let corpApi = new CorpApi(corpid, corpAccessToken);
         let userInfo: any = await corpApi.getUser(authUserInfo.userId);
@@ -159,6 +159,7 @@ let ddTalkMsgHandle = {
                 isAdmin: userInfo.isAdmin,
                 name: userInfo.name,
                 avatar: userInfo.avatar,
+                corpid: corpid,
             }
             let ddtalkUser = Models.ddtalkUser.create(_ddtalkUser);
             await ddtalkUser.save();
@@ -173,9 +174,14 @@ let ddTalkMsgHandle = {
 
                     let users = await corpApi.getUserListByDepartment(d.id);
                     for(let u of users) {
-                        let dingUsers = await Models.ddtalkUser.find({ where: {ddUserId: u.userid}})
+                        let dingUsers = await Models.ddtalkUser.find({ where: {corpid: corpid, ddUserId: u.userid}})
                         if (dingUsers && dingUsers.length) {
-                            continue;
+                            //查看是否是同一个公司
+                            let dingUser = dingUsers[0];
+                            let s = await Models.staff.get(dingUser.id);
+                            if (company.id == s.company.id) {
+                                continue;
+                            }
                         }
 
                         let _staff = Models.staff.create({name: u.name, travelPolicyId: travelPolicy.id})
@@ -184,7 +190,8 @@ let ddTalkMsgHandle = {
                         _staff.pwd = md5(DEFAULT_PWD);
                         _staff = await _staff.save();
                         // console.info(`导入user:`, u.name);
-                        let dingUser = Models.ddtalkUser.create({id: _staff.id, avatar: u.avatar, dingId: u.dingId, isAdmin: u.isAdmin, name: u.name, ddUserId: u.userid});
+                        let dingUser = Models.ddtalkUser.create({id: _staff.id, avatar: u.avatar, dingId: u.dingId,
+                            isAdmin: u.isAdmin, name: u.name, ddUserId: u.userid, corpid: corpid});
                         await dingUser.save();
                     }
                 }
@@ -297,7 +304,7 @@ class DDTalk {
             let corpApi = await isvApi.getCorpApi();
             let dingTalkUser = await corpApi.getUserInfoByOAuth(code);
             //查找是否已经绑定账号
-            let ddtalkUsers = await Models.ddtalkUser.find( { where: {ddUserId: dingTalkUser.userId}});
+            let ddtalkUsers = await Models.ddtalkUser.find( { where: {corpid: corpid, ddUserId: dingTalkUser.userId}});
             if (ddtalkUsers && ddtalkUsers.length) {
                 let ddtalkUser = ddtalkUsers[0]
                 // //自动登录

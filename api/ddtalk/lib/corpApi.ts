@@ -82,6 +82,7 @@ class CorpApi {
     async getDepartments() :Promise<Array<DdTalkDepartment>> {
         let url = `https://oapi.dingtalk.com/department/list?access_token=${this.accessToken.access_token}`;
         return reqProxy(url, {
+            name: '获取部门列表',
             method: 'GET',
             lang: 'zh_CN',
         }).then( async (ret: any) => {
@@ -97,7 +98,8 @@ class CorpApi {
         while(hasMore) {
             let result: any = await reqProxy(url, {
                 method: 'GET',
-                lang: 'zh_cn'
+                lang: 'zh_cn',
+                name: '通过部门获取用户列表',
             })
             if (result.errcode) throw new Error(JSON.stringify(result));
             hasMore = result.hasMore;
@@ -112,6 +114,7 @@ class CorpApi {
         let url = `https://oapi.dingtalk.com/message/send?access_token=${this.accessToken.access_token}`;
         console.info(msg)
         let result = await reqProxy(url, {
+            name: '发送消息',
             method: 'POST',
             body: msg,
         })

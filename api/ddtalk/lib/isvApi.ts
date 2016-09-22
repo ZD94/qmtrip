@@ -79,7 +79,6 @@ class ISVApi {
     async getCorpApi() : Promise<CorpApi> {
         let self = this;
         let corpAccessToken = await self.getCorpAccessToken();
-        console.info("corpAccessToken===>", corpAccessToken)
         return new CorpApi(self.corpid, corpAccessToken);
     }
 }
