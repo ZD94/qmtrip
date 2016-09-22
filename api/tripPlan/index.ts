@@ -350,7 +350,7 @@ class TripPlanModule {
             }
 
             try {
-                await API.ddtalk.sendTextMsg({accountId: staff.id, text: `您的出差申请已经生成`})
+                await API.ddtalk.sendLinkMsg({accountId: staff.id, text: `您的出差申请已经生成`, url: self_url})
             } catch(err) {
                 console.error(`发送钉钉消息失败`, err)
             }
@@ -411,7 +411,7 @@ class TripPlanModule {
             }
 
             try {
-                await API.ddtalk.sendTextMsg({accountId: approveUser.id, text: '有新的出差申请需要您审批'})
+                await API.ddtalk.sendLinkMsg({accountId: approveUser.id, text: '有新的出差申请需要您审批', url: shortUrl})
             } catch(err) {
                 console.error(`发送钉钉通知失败`, err)
             }
@@ -680,7 +680,7 @@ class TripPlanModule {
                 emailReason: params.auditRemark
             };
             await API.notify.submitNotify({email: user.email, key: tplName, values: self_values, mobile: user.mobile, openid: openId});
-            await API.ddtalk.sendTextMsg({ accountId: user.id, text: '您的预算已成功生成'});
+            await API.ddtalk.sendLinkMsg({ accountId: user.id, text: '您的预算已成功生成', url: self_url});
         }
 
         return true;
@@ -963,7 +963,7 @@ class TripPlanModule {
 
             let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
             await API.notify.submitNotify({key: templateName, values: templateValue, email: staff.email, openid: openId});
-            await API.ddtalk.sendTextMsg({accountId: staff.id, text: '票据已审批通过'})
+            await API.ddtalk.sendLinkMsg({accountId: staff.id, text: '票据已审批通过', url: self_url})
         }
 
         let user = await AgencyUser.getCurrent();

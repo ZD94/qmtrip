@@ -110,9 +110,8 @@ class CorpApi {
         return users;
     }
 
-    async sendTextMsg(msg) {
+    async sendNotifyMsg(msg) {
         let url = `https://oapi.dingtalk.com/message/send?access_token=${this.accessToken.access_token}`;
-        console.info(msg)
         let result = await reqProxy(url, {
             name: '发送消息',
             method: 'POST',

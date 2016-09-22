@@ -324,9 +324,11 @@ class DDTalk {
         }
     }
 
-    static async sendTextMsg(params): Promise<any> {
-        let {accountId, text} = params;
+    static async sendLinkMsg(params): Promise<any> {
+        let {accountId, text, url, picurl} = params;
         text = text || '您有一条新消息'
+        url = url || '#';
+        picurl = picurl || '';
         let staff = await Models.staff.get(accountId);
         let company = staff.company;
         let corp = await Models.ddtalkCorp.get(company.id);
@@ -339,9 +341,12 @@ class DDTalk {
                 touser: ddtalkUser.ddUserId,
                 content: text,
                 agentid: corp.agentid,
-            }, 'text');
+                picurl: picurl,
+                title: '鲸力智享',
+                url: url,
+            }, 'link');
 
-            let ret = await corpApi.sendTextMsg(msg);
+            let ret = await corpApi.sendNotifyMsg(msg);
             return ret;
         }
         console.warn(`企业不存在或者不是从钉钉导入`);
