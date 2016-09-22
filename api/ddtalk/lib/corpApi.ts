@@ -8,12 +8,12 @@ import {reqProxy} from "./reqProxy";
 import RedisCache = require('./redisCache');
 import {DdTalkDepartment} from "./type";
 
-interface CorpTicket {
+export interface CorpTicket {
     ticket: string;
     expire_at: number;
 }
 
-class CorpApi {
+export default class CorpApi {
 
     private cache: RedisCache;
 
@@ -121,4 +121,3 @@ class CorpApi {
     }
 }
 
-export= CorpApi

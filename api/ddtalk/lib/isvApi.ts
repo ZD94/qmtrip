@@ -6,9 +6,9 @@
 import RedisCache = require("./redisCache");
 import {CorpAccessToken, DDTalkCache} from "./interface";
 import {reqProxy} from "./reqProxy";
-import CorpApi = require("./corpApi");
+import CorpApi from "./corpApi";
 
-class ISVApi {
+export default class ISVApi {
 
     constructor(public suiteKey: string, public suiteToken: string, public corpid: string, public permanent_code: string, public corpTokenCache?: DDTalkCache) {
         //生成默认缓存对象
@@ -83,4 +83,3 @@ class ISVApi {
     }
 }
 
-export= ISVApi
