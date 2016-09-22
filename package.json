@@ -25,6 +25,7 @@
     "connect-timeout": "^1.7.0",
     "cookie-parser": "^1.4.3",
     "core-decorators": "^0.12.3",
+    "dingtalk_suite_callback": "0.0.3",
     "dnode": "^1.2.2",
     "exif-js": "exif-js/exif-js",
     "express": "^4.14.0",

@@ -142,6 +142,9 @@ class ClientModels implements ModelsInterface {
     accountOpenid: ModelRemote<AccountOpenid>;
     travelBudgetLog: ModelRemote<TravelBudgetLog>;
 
+    ddtalkCorp: ModelRemote<DDTalkCorp>;
+    ddtalkUser: ModelRemote<DDTalkUser>;
+
     constructor($cacheFactory: ng.ICacheFactoryService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
         this.credential = createService<Credential>(Services.credential, $cacheFactory);
@@ -180,5 +183,6 @@ class ClientModels implements ModelsInterface {
 
 import './menu';
 import './place';
-import {TravelBudgetLog} from "../../api/_types/travelbudget";
+import {TravelBudgetLog} from "api/_types/travelbudget";
+import {DDTalkCorp, DDTalkUser} from "api/_types/ddtalk";
 

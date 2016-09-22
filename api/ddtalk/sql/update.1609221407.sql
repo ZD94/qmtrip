@@ -1,0 +1,1 @@
+alter table ddtalk.users add corpid varchar(50);

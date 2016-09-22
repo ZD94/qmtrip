@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>钉钉测试</title>
+    <script src="https://g.alicdn.com/ilw/ding/0.9.2/scripts/dingtalk.js"></script>
+    <script src="//cdn.bootcss.com/jquery/3.0.0-rc1/jquery.min.js"></script>
+    <script>
+        var corpid = 'ding3563b7093185eb9135c2f4657eb6378f'
+
+        function done() {
+            alert("执行done...")
+            dd.ready(function() {
+                alert("执行ready===>")
+                dd.runtime.info({
+                    onSuccess: function(result) {
+                        alert(JSON.stringify(result))
+                    },
+                    onFail : function(err) {
+                        console.info(err)
+                    }
+
+                });
+
+                console.info(window.location.href);
+                dd.runtime.permission.requestAuthCode({
+                    corpId: corpid,
+                    onSuccess: function(result) {
+                        alert(JSON.stringify(result));
+                    },
+                    onFail : function(err) {
+                        alert(JSON.stringify(err))
+                        console.error(err)
+                    }
+                })
+
+
+
+//                dd.device.base.getInterface({
+//                    onSuccess : function(data) {
+//                        alert("介入信息", data)
+//                    },
+//                    onFail : function(err) {
+//                        console.info(err)
+//
+//                    }
+//                });
+//
+                dd.device.base.getUUID({
+                    onSuccess : function(data) {
+                       alert(JSON.stringify(data))
+                    },
+                    onFail : function(err) {
+                        console.info(err)
+
+                    }
+                });
+
+                dd.biz.util.scan({
+                    type: 'qrCode',//type为qrCode或者barCode
+                    onSuccess: function(data) {
+                        alert("扫码成功", data)
+                    },
+                    onFail : function(err) {
+                        console.info(err)
+                    }
+                })
+//
+//                dd.biz.user.get({
+//                    onSuccess: function (info) {
+//                        alert(JSON.stringify(info));
+//                    },
+//                    onFail: function (err) {
+//                        alert(JSON.stringify(err))
+//                    }
+//                });
+            })
+
+            dd.error(function(err) {
+                alert(JSON.stringify(err))
+            })
+        }
+
+        var url = window.location.href
+        $.get('/ddtalk/js-api-config', {url: url, corpid: corpid}, function(result) {
+            alert(url)
+            alert(JSON.stringify(result));
+            dd.config(result);
+            done();
+        }, "json")
+
+//
+//        dd.ready(function() {
+//            dd.biz.navigation.setTitle({
+//                title: '钉钉demo',
+//                onSuccess: function(data) {
+//                },
+//                onFail: function(err) {
+//                    log.e(JSON.stringify(err));
+//                }
+//            });
+//
+//            dd.runtime.info({
+//                onSuccess : function(info) {
+//                    logger.e('runtime info: ' + JSON.stringify(info));
+//                },
+//                onFail : function(err) {
+//                    logger.e('fail: ' + JSON.stringify(err));
+//                }
+//            });
+//            dd.ui.pullToRefresh.enable({
+//                onSuccess: function() {
+//                },
+//                onFail: function() {
+//                }
+//            })
+//
+//            dd.biz.navigation.setMenu({
+//                backgroundColor : "#ADD8E6",
+//                items : [
+//                    {
+//                        id:"此处可以设置帮助",//字符串
+//                        // "iconId":"file",//字符串，图标命名
+//                        text:"帮助"
+//                    }
+//                    ,
+//                    {
+//                        "id":"2",
+//                        "iconId":"photo",
+//                        "text":"我们"
+//                    }
+//                    ,
+//                    {
+//                        "id":"3",
+//                        "iconId":"file",
+//                        "text":"你们"
+//                    }
+//                    ,
+//                    {
+//                        "id":"4",
+//                        "iconId":"time",
+//                        "text":"他们"
+//                    }
+//                ],
+//                onSuccess: function(data) {
+//                    alert(JSON.stringify(data));
+//
+//                },
+//                onFail: function(err) {
+//                    alert(JSON.stringify(err));
+//                }
+//            });
+//
+//
+//            dd.runtime.permission.requestAuthCode({
+//                corpId : corpid,
+//                onSuccess : function(info) {
+//                    $.ajax({
+//                        url : 'userinfo?code=' + info.code + '&corpid='
+//                        + _corpid,
+//                        type : 'GET',
+//                        success : function(data, status, xhr) {
+//                            var info = JSON.parse(data);
+//
+//                            document.getElementById("userName").innerHTML = info.name;
+//                            document.getElementById("userId").innerHTML = info.userid;
+//
+//                        },
+//                        error : function(xhr, errorType, error) {
+//                            logger.e("yinyien:" + _config.corpId);
+//                            alert(errorType + ', ' + error);
+//                        }
+//                    });
+//
+//                },
+//                onFail : function(err) {
+//                    alert('fail: ' + JSON.stringify(err));
+//                }
+//            });
+//        });
+//
+//        dd.error(function(err) {
+//            alert('dd error: ' + JSON.stringify(err));
+//        });
+
+    </script>
+</head>
+<body>
+测试页面
+</body>
+</html>

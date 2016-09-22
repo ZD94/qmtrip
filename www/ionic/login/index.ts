@@ -1,10 +1,15 @@
 var msgbox = require('msgbox');
 
-export async function IndexController($scope, $stateParams, $storage, $sce, $loading, $ionicPopup, $cookies) {
+declare var dd;
+export async function IndexController($scope, $stateParams, $storage, $sce, $loading, $ionicPopup, $cookies, ddtalkApi) {
     $loading.start();
 
     var browserspec = require('browserspec');
     var backUrl = $stateParams.backurl || "#";
+    function isDingTalk () {
+        var ua = navigator.userAgent;
+        return /dingtalk/i.test(ua);
+    }
     require("./login.scss");
     //微信中自动登录
     let href = window.location.href;
@@ -14,6 +19,32 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
         let url = await API.auth.getWeChatLoginUrl({redirectUrl: href});
         window.location.href = url;
         return;
+    } else if (isDingTalk()) {
+        try {
+            let url = window.location.href;
+            var corpid = window['ddtalk'].getCorpid();
+
+            let ddtalkAuthCode = await new Promise((resolve, reject) => {
+                dd.runtime.permission.requestAuthCode({
+                    corpId: corpid,
+                    onSuccess: function(result) {
+                        resolve(result.code);
+                    },
+                    onFail : function(err) {
+                        reject(err);
+                    }
+                })
+            });
+            //通过code换取用户基本信息
+            let data = await API.ddtalk.loginByDdTalkCode({corpid: corpid, code: ddtalkAuthCode});
+            $storage.local.set('auth_data', data);
+            await API.onload();
+            window.location.href = backUrl;
+            return;
+        } catch(err) {
+            console.error(err);
+            alert(JSON.stringify(err))
+        }
     }else{
         $loading.end();
     }

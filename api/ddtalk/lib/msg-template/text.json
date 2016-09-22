@@ -1,0 +1,6 @@
+{
+  "msgtype": "text",
+  "text": {
+    "content": "<%=content%>"
+  }
+}

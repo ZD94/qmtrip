@@ -12,6 +12,7 @@ import {Account, Token, AccountOpenid} from 'api/_types/auth';
 import { Seed } from 'api/_types/seed';
 import { createServerService } from 'common/model/sequelize';
 import {TravelBudgetLog} from "api/_types/travelbudget";
+import {DDTalkCorp, DDTalkUser} from "api/_types/ddtalk";
 
 initModels({
     staff: createServerService<Staff>(Staff),
@@ -36,4 +37,7 @@ initModels({
     token: createServerService<Token>(Token),
     accountOpenid: createServerService<AccountOpenid>(AccountOpenid),
     travelBudgetLog: createServerService<TravelBudgetLog>(TravelBudgetLog),
+
+    ddtalkCorp: createServerService<DDTalkCorp>(DDTalkCorp),
+    ddtalkUser: createServerService<DDTalkUser>(DDTalkUser),
 });
