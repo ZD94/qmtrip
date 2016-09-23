@@ -680,7 +680,7 @@ class TripPlanModule {
                 emailReason: params.auditRemark
             };
             await API.notify.submitNotify({email: user.email, key: tplName, values: self_values, mobile: user.mobile, openid: openId});
-            await API.ddtalk.sendLinkMsg({ accountId: user.id, text: '您的预算已成功生成', url: self_url});
+            await API.ddtalk.sendLinkMsg({ accountId: user.id, text: '您的预算已经审批通过', url: self_url});
         }
 
         return true;
