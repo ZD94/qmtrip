@@ -2,6 +2,15 @@ var msgbox = require('msgbox');
 
 declare var dd;
 export async function IndexController($scope, $stateParams, $storage, $sce, $loading, $ionicPopup, $cookies, ddtalkApi) {
+    //记录登录信息
+    function recordAuthData(data) {
+        $storage.local.set('auth_data', data);
+        Cookie.set("user_id", data.user_id, {expires: 30});
+        Cookie.set("token_sign", data.token_sign, {expires: 30});
+        Cookie.set("timestamp", data.timestamp, {expires: 30});
+        Cookie.set("token_id", data.token_id, {expires: 30});
+    }
+
     $loading.start();
 
     var browserspec = require('browserspec');
@@ -37,7 +46,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
             });
             //通过code换取用户基本信息
             let data = await API.ddtalk.loginByDdTalkCode({corpid: corpid, code: ddtalkAuthCode});
-            $storage.local.set('auth_data', data);
+            recordAuthData(data);
             await API.onload();
             window.location.href = backUrl;
             return;
