@@ -31,6 +31,7 @@
                 </div>
                 <ion-list>
                     <div>
+                        <div class="item-divider item">{{trip.originPlaceName}} - {{trip.destinationPlaceName}}</div>
                         <div class="item item-input">
                             <span class="input-label">审批说明</span>
                             <input type="text" placeholder="请输入特别审批说明供审批人进行决策" ng-model="trip.specialApproveRemark">
@@ -41,6 +42,7 @@
                         </div>
                     </div>
                 </ion-list>
+                <p class="explanation">说明：<br>审批说明主要填写原因和可能的超标项，例如：”因为特殊原因，需要陪同客户一起出行，航班和酒店都会超标。航班为CA1231，酒店为喜来登酒店，5星级。”</p>
             </ion-scroll>
 
             <div class="button-bar">

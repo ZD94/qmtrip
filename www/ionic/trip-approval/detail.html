@@ -15,8 +15,8 @@
                 <div ng-if="tripApprove.isSpecialApprove">
                     <ion-item class="item-divider"><span>特别审批</span></ion-item>
                     <ion-item>
-                        {{tripApprove.specialApproveRemark}}<br>
-                        {{tripApprove.budget| currency: ''}}元
+                        <p style="white-space: initial;">{{tripApprove.specialApproveRemark}}</p>
+                        <span>{{tripApprove.budget| currency: ''}}元</span>
                     </ion-item>
                 </div>
 

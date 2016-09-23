@@ -73,8 +73,9 @@
             </div>
             <div class="spacer" style="width: 300px; height: 9px;"></div>
             <div class="item item-input item-icon-right" ng-click="selectSubsidyTemplate()" ng-if="currentTpSts && currentTpSts.length">
-                <span class="input-label">出差补助选择</span>
+                <span class="input-label">出差补助</span>
                 <i class="icon ion-chevron-right"></i>
+                <span class="item-note">{{select_subsidy.name}}<i ng-if="subsidy.template">({{select_subsidy.subsidyMoney}}元/天)</i></span>
             </div>
 
             <div>
