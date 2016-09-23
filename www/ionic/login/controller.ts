@@ -27,6 +27,15 @@ export function StorageSetController($scope, $stateParams, $storage) {
 }
 
 export async function IndexController($scope, $stateParams, $storage, $sce, $loading, $ionicPopup, ddtalkApi) {
+    //记录登录信息
+    function recordAuthData(data) {
+        $storage.local.set('auth_data', data);
+        Cookie.set("user_id", data.user_id, {expires: 30});
+        Cookie.set("token_sign", data.token_sign, {expires: 30});
+        Cookie.set("timestamp", data.timestamp, {expires: 30});
+        Cookie.set("token_id", data.token_id, {expires: 30});
+    }
+
     $loading.start();
 
     var browserspec = require('browserspec');
@@ -64,7 +73,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
             });
             //通过code换取用户基本信息
             let data = await API.ddtalk.loginByDdTalkCode({corpid: corpid, code: ddtalkAuthCode});
-            $storage.local.set('auth_data', data);
+            recordAuthData(data);
             await API.onload();
             window.location.href = backUrl;
             return;
@@ -102,12 +111,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
             await API.onload();
             var data = await API.auth.login($scope.form);
 
-            $storage.local.set('auth_data', data);
-            //服务器端无法读取storage
-            Cookie.set("user_id", data.user_id, {expires: 30});
-            Cookie.set("token_sign", data.token_sign, {expires: 30});
-            Cookie.set("timestamp", data.timestamp, {expires: 30});
-            Cookie.set("token_id", data.token_id, {expires: 30});
+            recordAuthData(data);
             API.reload_all_modules();
 
             if(browserspec.is_wechat && $stateParams.wxauthcode) {
