@@ -328,7 +328,7 @@ class DDTalk {
         let {accountId, text, url, picurl} = params;
         text = text || '您有一条新消息'
         url = url || '#';
-        picurl = picurl || '';
+        picurl = picurl || 'http://j.jingli365.com/ionic/images/dingtalk-shareicon.png';
         let staff = await Models.staff.get(accountId);
         let company = staff.company;
         let corp = await Models.ddtalkCorp.get(company.id);
