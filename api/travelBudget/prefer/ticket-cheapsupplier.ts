@@ -19,7 +19,7 @@ class CheapSupplierPrefer extends AbstractPrefer<IFinalTicket> {
         if (!this.score) {
             this.score = 0;
         }
-        if (!(this.cheapSuppliers.length)) {
+        if (!this.cheapSuppliers || !(this.cheapSuppliers.length)) {
             this.cheapSuppliers = CHEAP_SUPPLIERS;
         }
     }
