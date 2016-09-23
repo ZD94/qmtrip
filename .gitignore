@@ -27,3 +27,5 @@ tools
 ionic/resources/android
 ionic/resources/ios
 *.bak
+ts-node/*
+ts-node/

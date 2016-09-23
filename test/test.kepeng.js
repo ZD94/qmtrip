@@ -7,7 +7,8 @@ require('app-module-path').addPath(path.join(__dirname, '..'));
 
 require.extensions[".ts"] = function(){};
 
-run('./kepeng/template.test');
+run('./kepeng/esprima.test');
+//run('./kepeng/template.test');
 //run('./kepeng/class.test');
 //run('./kepeng/zone.test.js');
 //run('./kepeng/zone-stack.test.js');
@@ -18,7 +19,7 @@ run('./kepeng/template.test');
 function run(name){
     var file = require.resolve(name);
     if(/\.ts$/.test(file)){
-        require('common/typescript').install(true);
+        require('common/node_ts').install(true);
     }
     var func = require(name);
     if(typeof func !== 'function')

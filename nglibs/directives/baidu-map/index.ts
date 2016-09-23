@@ -5,7 +5,7 @@ import { loader } from './baiduScriptLoader';
 import { divStyle, labelStyle } from './style/offline';
 import { createInstance, redrawMarkers } from './map';
 
-declare var BMap;
+//declare var BMap;
 
 angular
     .module('nglibs')
@@ -19,10 +19,8 @@ angular
                     onMapLoaded: '&'
                 },
                 controller: function($scope, $element){
-                    var opts = angular.extend({}, defaultOpts, $scope['options']);
-                    var offlineOpts = angular.extend({}, defaultOfflineOpts, $scope['offline']);
-
-
+                    //var opts = angular.extend({}, defaultOpts, $scope['options']);
+                    //var offlineOpts = angular.extend({}, defaultOfflineOpts, $scope['offline']);
                 },
                 link: function($scope, $element, attrs) {
                     var opts = angular.extend({}, defaultOpts, $scope['options']);

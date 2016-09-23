@@ -10,7 +10,7 @@ var gulplib = require('./common/gulplib');
 
 var argv = require('yargs')
     .alias('a', 'appconfig')
-    .default('appconfig', 'j')
+    .default('appconfig', 'test')
     .argv;
 
 gulplib.public_dir = 'www';
@@ -44,8 +44,9 @@ gulplib.bundle_lib('preload', {ex: true, require:[
 gulplib.bundle_lib('api', {require: ['common/client/api:common/api', 'common/api/helper', 'common/language']});
 gulplib.bundle_lib('calendar', {require: ['lunar-calendar', "calendar"]});
 gulplib.bundle_lib('msgbox', {require: ['notie', 'msgbox']});
-gulplib.bundle_lib('nglibs', {require: ['nglibs', 'api/_types', 'api/_types/*', 'common/model/client:common/model']});
+gulplib.bundle_lib('nglibs', {require: ['nglibs', 'api/_types', 'api/_types/**/*', 'common/model/client:common/model']});
 gulplib.bundle_lib('ngapp', {require: ['common/client/ngapp/index.ts:ngapp', 'browserspec']});
+gulplib.bundle_lib('w3libs', {require: ['www/libs']});
 
 //gulplib.angular_app('staff');
 //gulplib.angular_app('corp');
@@ -60,7 +61,7 @@ gulplib.dist(function () {
     var filter = require('gulp-filter');
     var dist_all = [
         gulp.src([gulplib.public_dir + '/**/*'])
-            .pipe(filter(['**', '!**/controller.[jt]s', '!**/*.less', '!**/*.scss', '!**/*.map']))
+            .pipe(filter(['**', '!**/*.ts', '!**/*.less', '!**/*.scss', '!**/*.map']))
             .pipe(gulp.dest('dist/' + gulplib.public_dir)),
         gulp.src('api/**/*')
             .pipe(gulp.dest('dist/api')),
@@ -92,6 +93,17 @@ gulplib.final('qmtrip');
 
 function ionic_files() {
     var filter = require('gulp-filter');
+    var filters = [
+        '**/*.+(js|css|html|json|woff|png|jpg|map)',
+        '!**/controller.[jt]s',
+        '!**/*.ts',
+        '!**/*.less',
+        '!**/*.scss',
+    ];
+    if(!argv.skipuglify){
+        filters.push('!**/*.map');
+        filters.push('!**/bundle.+(bootstrap|sourcemap|swiper|ws).js');
+    }
     return gulp
         .src([
             gulplib.public_dir + '/index.html',
@@ -101,15 +113,7 @@ function ionic_files() {
             gulplib.public_dir + '/fonts/+(ionic|fontawesome)/*.woff',
             gulplib.public_dir + '/fonts/font-awesome.css',
         ], { base: gulplib.public_dir })
-        .pipe(filter([
-            '**/*.+(js|css|html|json|woff|png|jpg)',
-            '!**/controller.[jt]s',
-            '!**/*.ts',
-            '!**/*.less',
-            '!**/*.scss',
-            '!**/*.map',
-            '!**/bundle.+(bootstrap|sourcemap|swiper|ws).js',
-        ]));
+        .pipe(filter(filters));
 }
 var through2 = require('through2');
 function genManifest() {
@@ -156,7 +160,7 @@ gulp.task('ionic.www.clean', function () {
     var del = require('del');
     return del('ionic/www');
 });
-gulp.task('ionic.www.files', ['post.manifest', 'ionic.www.clean'], function () {
+gulp.task('ionic.www.files', ['manifest', 'ionic.www.clean'], function () {
     var filter = require('gulp-filter');
     return ionic_files()
         .pipe(gulp.dest('ionic/www'));
@@ -180,44 +184,64 @@ gulp.task('ionic.www.config', ['ionic.www.files'], function (done) {
 
 gulp.task('ionic.www', ['ionic.www.files', 'ionic.www.extra', 'ionic.www.config']);
 
+function exec_child(cmd, cb){
+    var spawn = require('child_process').spawn;
+    var args = cmd.split(' ').filter(function(arg){ return arg.length > 0; });
+    var exefile = args[0];
+    args = args.slice(1);
+    try{
+        console.log('spawn', exefile, args);
+        var child = spawn(exefile, args, {stdio: ['ignore', process.stdout, process.stderr]});
+        child.on('close', function(code, signal){
+            cb();
+        });
+    }catch(err){
+        cb(err);
+    }
+}
+gulp.task('ionic.build', ['ionic.www'], function (done) {
+    process.chdir('ionic');
+    exec_child('ionic resources', function(err) {
+        console.log('ionic build ios android --device --buildConfig build.json');
+        exec_child('ionic build ios android --device --buildConfig build.json', function (err) {
+            process.chdir('..');
+            try{
+                fs.unlinkSync('ionic/app/jingli365.ipa')
+            }catch(e){}
+            try{
+                fs.renameSync('ionic/platforms/ios/build/device/鲸力商旅.ipa', 'ionic/app/jingli365.ipa');
+            }catch(e){}
+            try{
+            fs.unlinkSync('ionic/app/jingli365.apk');
+            }catch(e){}
+            try{
+            fs.renameSync('ionic/platforms/android/build/outputs/apk/android-armv7-debug.apk', 'ionic/app/jingli365.apk');
+            }catch(e){}
+            done();
+        })
+    });
+});
+
 gulp.task('ionic.ios', ['ionic.www'], function (done) {
     var exec = require('child_process').exec;
     process.chdir('ionic');
-    var child_res = exec('ionic resources', function (err) {
-        if (err) {
-            console.error(err);
-        }
-        var child_emu = exec('ionic emulate ios --target="iPhone-6s, 9.3"', function (err) {
-            if (err) {
-                console.error(err);
-            }
+    exec_child('ionic resources', function(err) {
+        exec_child('ionic emulate ios --target="iPhone-6s, 9.3"', function (err) {
+            process.chdir('..');
             done();
         });
-        child_emu.stdout.pipe(process.stdout);
-        child_emu.stderr.pipe(process.stderr);
     });
-    child_res.stdout.pipe(process.stdout);
-    child_res.stderr.pipe(process.stderr);
 });
 
 gulp.task('ionic.android', ['ionic.www'], function (done) {
     var exec = require('child_process').exec;
     process.chdir('ionic');
-    var child_res = exec('ionic resources', function (err) {
-        if (err) {
-            console.error(err);
-        }
-        var child_emu = exec('ionic emulate android', function (err) {
-            if (err) {
-                console.error(err);
-            }
+    exec_child('ionic resources', function(err) {
+        exec_child('ionic emulate android', function (err) {
+            process.chdir('..');
             done();
         });
-        child_emu.stdout.pipe(process.stdout);
-        child_emu.stderr.pipe(process.stderr);
     });
-    child_res.stdout.pipe(process.stdout);
-    child_res.stderr.pipe(process.stderr);
 });
 
 function eslintformater(results, config) {

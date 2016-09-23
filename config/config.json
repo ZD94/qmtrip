@@ -18,7 +18,11 @@
     "mods": {
       "sequelize": { "prefix": "${{appName}}_sql_", "console": false },
       "sqlinit": { "prefix": "${{appName}}_sql_", "console": false },
-      "http": { "console": false }
+      "http": {
+        "mods": {
+          "access": { "console": false }
+        }
+      }
     }
   },
   "postgres":{

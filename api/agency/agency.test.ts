@@ -90,7 +90,6 @@ describe("api/agency", function() {
             });
 
             it("#updateAgency should be ok", function(done) {
-                var self = {accountId: agencyUserId};
                 API.agency.updateAgency({id: agencyId, status: '0', remark: '代理商更新测试', wrongParams: 'wrongParams'}, function(err, ret) {
                     assert.equal(ret.target.status, 0);
                     done(err);

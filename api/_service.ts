@@ -1,20 +1,18 @@
 
-import _ = require('lodash');
-
 import { initModels } from 'api/_types';
 
 import { Staff, Credential, PointChange, InvitedLink } from 'api/_types/staff';
-import { Company, MoneyChange } from './_types/company';
-import { Department } from './_types/department';
-import { TravelPolicy, SubsidyTemplate } from './_types/travelPolicy';
-import { AccordHotel } from './_types/accordHotel';
-import { Agency, AgencyUser } from './_types/agency';
-import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove} from './_types/tripPlan';
-import {Account, Token, AccountOpenid} from './_types/auth';
-import { Seed } from './_types/seed';
+import { Company, MoneyChange } from 'api/_types/company';
+import { Department } from 'api/_types/department';
+import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
+import { AccordHotel } from 'api/_types/accordHotel';
+import { Agency, AgencyUser } from 'api/_types/agency';
+import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove} from 'api/_types/tripPlan';
+import {Account, Token, AccountOpenid} from 'api/_types/auth';
+import { Seed } from 'api/_types/seed';
 import { createServerService } from 'common/model/sequelize';
-import {TravelBudgetLog} from "./_types/travelbudget";
-import {DDTalkCorp, DDTalkUser} from "./_types/ddtalk";
+import {TravelBudgetLog} from "api/_types/travelbudget";
+import {DDTalkCorp, DDTalkUser} from "api/_types/ddtalk";
 
 initModels({
     staff: createServerService<Staff>(Staff),

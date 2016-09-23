@@ -3,7 +3,6 @@
  */
 'use strict';
 var nodeXlsx = require("node-xlsx");
-var uuid = require("node-uuid");
 var moment = require("moment");
 var crypto = require("crypto");
 var sequelize = require("common/model").DB;
@@ -14,20 +13,16 @@ var API = require("common/api");
 var validate = require("common/validate");
 
 import _ = require('lodash');
-import L = require("common/language");
+import L from 'common/language';
 import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
-import {validateApi, requireParams, clientExport} from 'common/api/helper';
+import {requireParams, clientExport} from 'common/api/helper';
 import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus } from "api/_types/staff";
 import { EAgencyUserRole, AgencyUser } from "api/_types/agency";
 import { Models, EAccountType } from 'api/_types';
-import promise = require("../../common/test/api/promise/index");
 import {conditionDecorator, condition} from "../_decorator";
 import {FindResult} from "common/model/interface";
 
-const staffCols = Staff['$fieldnames'];
-const papersCols = Credential['$fieldnames'];
-const pointChangeCols = PointChange['$fieldnames'];
 const invitedLinkCols = InvitedLink['$fieldnames'];
 
 const staffAllCols = Staff['$getAllFieldNames']();
@@ -929,7 +924,6 @@ class StaffModule{
     @clientExport
     @requireParams(['addObj'])
     static importExcelAction(params: {addObj: Array<string>}){
-        let { accountId } = Zone.current.get("session");
         var data = params.addObj;
         var noAddObj = [];
         var addObj = [];
@@ -1278,7 +1272,7 @@ class StaffModule{
     }
 
     static deleteAllStaffByTest(params){
-        var companyId = params.companyId;
+        //var companyId = params.companyId;
         var mobile = params.mobile;
         var email = params.email;
         delete params.mobile;
@@ -1424,7 +1418,6 @@ class StaffModule{
         invitedLink.expiresTime = moment().add(24, 'h');
         var linkToken = utils.getRndStr(6);
         invitedLink.linkToken = linkToken;
-        var timeStr = utils.now();
         var oneDay = 24 * 60 * 60 * 1000
         var timestamp = Date.now() + oneDay;  //失效时间2天
         var sign = makeLinkSign(linkToken, invitedLink.id, timestamp);

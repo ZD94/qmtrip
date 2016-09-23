@@ -1,0 +1,25 @@
+<ion-list class="jl_projectinfo">
+    <ion-item class="project_tit">{{trip.title}}
+        <span class="tit_special" ng-if="trip.isSpecialApprove">特殊审批</span></ion-item>
+    <ion-item class="project_cont">
+        <p ng-if="trip && trip.startAt">{{trip.startAt | date: 'yyyy-MM-dd'}} 至 {{trip.backAt | date: 'yyyy-MM-dd'}}</p>
+        <p style="text-align: center" ng-if="trip.status != EPlanStatus.COMPLETE">
+            总预算:<span style="font-size: 20px;font-weight: bold;">{{trip.budget == -1 ? '暂无预算' : (trip.budget| currency: '')}}</span>
+            {{trip.budget == -1 ? '' : '元'}}
+        </p>
+        <p style="text-align: center" ng-if="trip.status == EPlanStatus.COMPLETE && !trip.isSpecialApprove">
+            <span ng-show="trip.budget-trip.expenditure >= 0">节省:　<span style="font-size: 20px;font-weight: bold;">{{trip.budget == -1 ? '暂无预算' : (trip.budget-trip.expenditure)}}</span></span>
+            <span ng-hide="trip.budget-trip.expenditure >= 0">超支:　<span style="font-size: 20px;font-weight: bold;">{{trip.budget == -1 ? '暂无预算' : (trip.expenditure-trip.budget)}}</span></span>
+            {{trip.budget == -1 ? '' : '元'}}
+        </p>
+        <p style="text-align: center" ng-if="trip.status == EPlanStatus.COMPLETE && trip.isSpecialApprove">
+            <span>节省:　<span style="font-size: 20px;font-weight: bold;">0</span></span>
+            元
+        </p>
+        <div class="row" ng-if="trip.status == EPlanStatus.COMPLETE">
+            <div class="jingli_divider"></div>
+            <span class="col"><span class="price">{{trip.budget}}元</span><br/>预算</span>
+            <span class="col"><span class="price">{{trip.expenditure}}元</span><br/>实际</span>
+        </div>
+    </ion-item>
+</ion-list>

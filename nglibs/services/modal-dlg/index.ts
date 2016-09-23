@@ -15,7 +15,7 @@ interface DialogOptions{
 }
 @ngService('ngModalDlg')
 class ngModalDlg {
-    constructor(private $ionicModal, private $ionicPopup, private $injector) {
+    constructor(private $ionicModal, private $injector) {
         require('./modal-dialog.scss');
     }
 

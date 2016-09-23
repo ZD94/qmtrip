@@ -1,0 +1,28 @@
+{
+  "ios": {
+    "debug": {
+      "codeSignIdentity": "iPhone Developer: Ke Peng (URXH6TD5BA)",
+      "provisioningProfile": "1c1035fa-d74e-44c4-ad57-13f57bcbd438"
+    },
+    "release": {
+      "codeSignIdentity": "iPhone Distribution: Whale Share Technology co.,Ltd (7PJAND92U6)",
+      "provisioningProfile": "1c1035fa-d74e-44c4-ad57-13f57bcbd438"
+    }
+  },
+  "android": {
+    "debug": {
+      "keystore": "./cert/jingli365.keystore",
+      "storePassword": "Jingli2016",
+      "alias": "jingli365",
+      "password" : "Jingli2016",
+      "keystoreType": ""
+    },
+    "release": {
+      "keystore": "./cert/jingli365.keystore",
+      "storePassword": "Jingli2016",
+      "alias": "jingli365",
+      "password" : "Jingli2016",
+      "keystoreType": ""
+    }
+  }
+}

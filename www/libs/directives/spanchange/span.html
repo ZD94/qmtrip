@@ -1,0 +1,5 @@
+<i class="icon ion-chevron-left icon-timeSpan" ng-click="monthChange()"></i>
+    <span class="data_show" ng-click="showmadel()">
+        {{monthSelection.startTime | date:'yyyy.MM.dd'}}-{{monthSelection.endTime | date:'yyyy.MM.dd'}}
+    </span>
+<i class="icon ion-chevron-right icon-timeSpan" ng-click="monthChange(true)"></i>

@@ -13,7 +13,7 @@
                 <i class="icon ion-android-done"></i>
                 <span class="input-label">同意并转给</span>
                 <ng-selector-list
-                                  ng-model="tripApprove.approveUser"
+                                  ng-model="chooseApprove.approveUser"
                                   dlg-options="staffSelector"
                                   dlg-title="选择审批人"
                                   dlg-placeholder="请选择审批人"
@@ -23,7 +23,7 @@
         </ion-list>
 
         <div class="button-bar">
-            <a ng-click="modal.hide()" class="button button-outline button-positive  button-block">取消</a>
+            <a ng-click="cancel()" class="button button-outline button-positive  button-block">取消</a>
             <a ng-click="confirmApprove();" class="button button-positive  button-block">确认</a>
         </div>
     </ion-content>
