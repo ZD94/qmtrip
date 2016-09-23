@@ -93,6 +93,17 @@ gulplib.final('qmtrip');
 
 function ionic_files() {
     var filter = require('gulp-filter');
+    var filters = [
+        '**/*.+(js|css|html|json|woff|png|jpg|map)',
+        '!**/controller.[jt]s',
+        '!**/*.ts',
+        '!**/*.less',
+        '!**/*.scss',
+    ];
+    if(!argv.skipuglify){
+        filters.push('!**/*.map');
+        filters.push('!**/bundle.+(bootstrap|sourcemap|swiper|ws).js');
+    }
     return gulp
         .src([
             gulplib.public_dir + '/index.html',
@@ -102,15 +113,7 @@ function ionic_files() {
             gulplib.public_dir + '/fonts/+(ionic|fontawesome)/*.woff',
             gulplib.public_dir + '/fonts/font-awesome.css',
         ], { base: gulplib.public_dir })
-        .pipe(filter([
-            '**/*.+(js|css|html|json|woff|png|jpg)',
-            '!**/controller.[jt]s',
-            '!**/*.ts',
-            '!**/*.less',
-            '!**/*.scss',
-            '!**/*.map',
-            '!**/bundle.+(bootstrap|sourcemap|swiper|ws).js',
-        ]));
+        .pipe(filter(filters));
 }
 var through2 = require('through2');
 function genManifest() {
