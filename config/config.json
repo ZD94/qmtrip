@@ -30,7 +30,7 @@
     "url": "redis://localhost:6379"
   },
   "hosts": {
-    "main":{"addr":"api.local.jingli.tech", "port":4101, "www":"https://${{hosts.main.addr}}:80"}
+    "main":{"addr":"api.local.jingli.tech", "port":4101, "www":"https://${{hosts.main.addr}}"}
   },
   "upload":{
     "tmpDir": "${{ROOT_DIR}}/tmp/upload",
