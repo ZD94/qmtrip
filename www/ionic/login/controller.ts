@@ -94,6 +94,10 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
     }
 
     $scope.check_login = async function ():Promise<any> {
+        if($scope.form.account == 'switchconfig@jingli.tech'){
+            location.href = '#/login/switch-config';
+            return;
+        }
         try {
             await API.onload();
             var data = await API.auth.login($scope.form);
@@ -282,6 +286,46 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
             msgbox.log(err.msg || err);
         }
     }*/
+
+
+    var config = require('config');
+    await config.$ready;
+    $scope.configName = config.name;
+    $scope.showConfigName = function(){
+        if(location.host == 'j.jingli365.com')
+            return false;
+        if(config.api.substr(0, 4) == 'http'){
+            var url = new URL(config.api);
+            if(url.host == 'j.jingli365.com')
+                return false;
+        }
+        return true;
+    }
+}
+
+export async function SwitchConfigController($scope, $location, $window){
+    var config = require('config');
+    await config.$ready;
+    if(!config.$config || !config.$config.configs){
+        msgbox.alert('该版本还不支持选择配置');
+        $location.path('/login/');
+        $window.location.reload();
+    }
+    $scope.configs = config.$config.configs;
+    console.log($scope.configs);
+    $scope.selected = {
+        config: undefined
+    };
+    $scope.switchConfig = function(){
+        if(!$scope.selected.config)
+            return;
+        for (var k in $scope.selected.config) {
+            config.$config[k] = $scope.selected.config[k];
+        }
+        localStorage.setItem('config.json', JSON.stringify(config.$config));
+        $location.path('/login/');
+        $window.location.reload();
+    }
 }
 
 export async function CompanyRegisterController ($scope, $stateParams){

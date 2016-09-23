@@ -2,9 +2,15 @@
     <ion-content padding="true">
         <form class="list" ng-submit="check_login()">
             <div class="logo_title">
-                <div class="logo">鲸力商旅</div>
+                <div class="logo">
+                    鲸力商旅
+                    <a ng-if="showConfigName()" href="#/login/switch-config" class="button button-outline button-light config-name">
+                        {{configName}}
+                    </a>
+                </div>
                 <div class="logo_text"></div>
             </div>
+
             <div class="spacer" style="height: 40px;"></div>
             <ion-list>
                 <label class="item item-input">
