@@ -94,7 +94,7 @@ gulplib.final('qmtrip');
 function ionic_files() {
     var filter = require('gulp-filter');
     var filters = [
-        '**/*.+(js|css|html|json|woff|png|jpg|map)',
+        '**/*.+(js|css|html|json|woff|png|jpg|gif|map)',
         '!**/controller.[jt]s',
         '!**/*.ts',
         '!**/*.less',
