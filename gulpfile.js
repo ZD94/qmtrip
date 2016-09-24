@@ -16,7 +16,7 @@ var argv = require('yargs')
 gulplib.public_dir = 'www';
 
 gulplib.bundle_lib('browserify', {ex: true, require:[
-        'buffer', 'querystring', 'string_decoder', //'is-buffer',
+        'buffer', 'querystring', 'string_decoder', 'is-buffer',
         'http', 'https', 'url',
         'util', '_process:process', 'events', 'stream', 'zlib', 'inherits',
 ]});
@@ -39,7 +39,7 @@ gulplib.bundle_lib('sourcemap', {ex: true, require: ['source-map-support']})
 
 gulplib.bundle_lib('preload', {ex: true, require:[
     'dyload', 'babel-polyfill', 'bluebird', 'common/ts_helper', 'common/zone', 'path',
-    'common/client/config:common/config',
+    'common/client/config:config',
 ]});
 gulplib.bundle_lib('api', {require: ['common/client/api:common/api', 'common/api/helper', 'common/language']});
 gulplib.bundle_lib('calendar', {require: ['lunar-calendar', "calendar"]});
