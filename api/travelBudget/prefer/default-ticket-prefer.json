@@ -1,30 +1,5 @@
 [
   {
-    "name": "arrivalTime",
-    "options": {
-      "score": -20000,
-      "begin": "",
-      "end": "<%=leaveDate%> <%=latestArrivalTime%>"
-    }
-  },
-  {
-    "name": "departTime",
-    "options": {
-      "score": -20000,
-      "begin": "<%=leaveDate%> <%=earliestLeaveTime%>",
-      "end": ""
-    }
-  },
-  {
-    "name": "selectTraffic",
-    "options": {
-      "selectTrainDuration": 360,
-      "selectFlightDuration": 210,
-      "score": 10000,
-      "commonTrainScore": -1000
-    }
-  },
-  {
     "name": "preferAgent",
     "options": {
       "expectedAgents": ["ctrip", "携程", "同城", "南航", "中航", "中国航空公司"],
