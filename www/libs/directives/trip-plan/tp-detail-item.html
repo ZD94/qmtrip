@@ -1,6 +1,10 @@
 <div>
-    <ion-item class="item-divider" ng-if="title">
+    <ion-item class="item-divider" ng-if="title && item.type != ETripType.SPECIAL_APPROVE">
         <span>{{title}}</span>
+        <span class="spanRight">{{budget}}</span>
+    </ion-item>
+    <ion-item class="item-divider" ng-if="title && item.type == ETripType.SPECIAL_APPROVE">
+        <span>{{item.deptCity}} - {{item.arrivalCity}}</span>
         <span class="spanRight">{{budget}}</span>
     </ion-item>
 
