@@ -115,3 +115,13 @@ ion-side-menu {
     }
   }
 }
+
+.platform-ios.platform-cordova {
+  &:not(.fullscreen) {
+    .toplevel-side-menu{
+      ion-side-menu {
+        margin-top: 20px;
+      }
+    }
+  }
+}
