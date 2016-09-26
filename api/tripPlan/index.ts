@@ -638,44 +638,81 @@ class TripPlanModule {
 
         if(isNextApprove){
             await TripPlanModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: true});
-        }else if(approveResult == EApproveResult.PASS){
+        }else{
             //发送审核结果邮件
             let self_url = config.host + '/index.html#/trip/list-detail?tripid=' + tripApprove.id;
             let user = tripApprove.account;
             if(!user) user = await Models.staff.get(tripApprove['accountId']);
-
-            let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
+            let go = {},back = {},hotel = {},others = {};
+            let self_values = {};
             try {
                 self_url = await API.wechat.shorturl({longurl: self_url});
             } catch(err) {
                 console.error(err);
             }
             let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
+            if(approveResult == EApproveResult.PASS){
+                let data = await TripPlanModule.getPlanEmailDetails(tripPlan);
+                go = data.go;
+                back = data.back;
+                hotel = data.hotel;
+                others = data.others;
+                self_values = {
+                    username: user.name,
+                    planNo: tripPlan.planNo,
+                    approveTime: utils.now(),
+                    approveUser: staff.name,
+                    projectName: tripPlan.title,
+                    goTrafficBudget: go,
+                    backTrafficBudget: back,
+                    hotelBudget: hotel,
+                    otherBudget: others,
+                    totalBudget: '￥' + tripPlan.budget,
+                    url: self_url,
+                    detailUrl: self_url,
+                    time: moment(tripPlan.startAt["value"]).format('YYYY-MM-DD'),
+                    destination: tripPlan.arrivalCity,
+                    staffName: user.name,
+                    startTime: moment(tripPlan.startAt["value"]).format('YYYY-MM-DD'),
+                    arrivalCity: tripPlan.arrivalCity,
+                    budget: tripPlan.budget,
+                    tripPlanNo: tripPlan.planNo,
+                    approveResult: approveResult,
+                    reason: approveResult,
+                    emailReason: params.approveRemark
+                };
+            }else if(approveResult == EApproveResult.REJECT){
+                let details = await TripPlanModule.getDetailsFromApprove({approveId: tripApprove.id});
+                let data = await TripPlanModule.getEmailInfoFromDetails(details);
+                go = data.go;
+                back = data.back;
+                hotel = data.hotel;
+                others = data.others;
+                self_values = {
+                    username: user.name,
+                    planNo: "",
+                    approveTime: utils.now(),
+                    approveUser: staff.name,
+                    projectName: tripApprove.title,
+                    goTrafficBudget: go,
+                    backTrafficBudget: back,
+                    hotelBudget: hotel,
+                    otherBudget: others,
+                    totalBudget: '￥' + tripApprove.budget,
+                    url: self_url,
+                    detailUrl: self_url,
+                    time: moment(tripApprove.startAt["value"]).format('YYYY-MM-DD'),
+                    destination: tripApprove.arrivalCity,
+                    staffName: user.name,
+                    startTime: moment(tripApprove.startAt["value"]).format('YYYY-MM-DD'),
+                    arrivalCity: tripApprove.arrivalCity,
+                    budget: tripApprove.budget,
+                    approveResult: approveResult,
+                    reason: approveResult,
+                    emailReason: params.approveRemark
+                };
+            }
 
-            let self_values = {
-                username: user.name,
-                planNo: tripPlan.planNo,
-                approveTime: utils.now(),
-                approveUser: staff.name,
-                projectName: tripPlan.title,
-                goTrafficBudget: go,
-                backTrafficBudget: back,
-                hotelBudget: hotel,
-                otherBudget: others,
-                totalBudget: '￥' + tripPlan.budget,
-                url: self_url,
-                detailUrl: self_url,
-                time: moment(tripPlan.startAt["value"]).format('YYYY-MM-DD'),
-                destination: tripPlan.arrivalCity,
-                staffName: user.name,
-                startTime: moment(tripPlan.startAt["value"]).format('YYYY-MM-DD'),
-                arrivalCity: tripPlan.arrivalCity,
-                budget: tripPlan.budget,
-                tripPlanNo: tripPlan.planNo,
-                approveResult: approveResult,
-                reason: approveResult,
-                emailReason: params.auditRemark
-            };
             await API.notify.submitNotify({email: user.email, key: tplName, values: self_values, mobile: user.mobile, openid: openId});
             await API.ddtalk.sendLinkMsg({ accountId: user.id, text: '您的预算已经审批通过', url: self_url});
         }
