@@ -1,4 +1,6 @@
 import { ETripType, EPlanStatus, EInvoiceType } from 'api/_types/tripPlan';
+import * as path from 'path';
+
 export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup){
     //////绑定上传url
     let authDataStr = window['getAuthDataStr']();
@@ -13,6 +15,8 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     })
     //END
 
+    var config = require('config');
+    await config.$ready;
     var invoice = await Models.tripDetail.get($stateParams.detailId);
     $scope.invoice = invoice;
     $scope.EInvoiceType = EInvoiceType;
@@ -24,7 +28,9 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
             latestInvoice = JSON.parse(latestInvoice);
         }
         for(let i of latestInvoice){
-            invoiceImgs.push('/trip-detail/'+$stateParams.detailId+'/invoice/'+i);
+            let img = path.join(config.update, 'trip-detail', $stateParams.detailId, 'invoice', i);
+            img = path.normalize(img);
+            invoiceImgs.push(img);
         }
         $scope.invoiceImgs = invoiceImgs;
     })
