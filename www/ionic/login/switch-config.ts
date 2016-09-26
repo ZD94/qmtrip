@@ -1,13 +1,13 @@
 
 var msgbox = require('msgbox');
 
-export default async function SwitchConfigController($scope, $location, $window){
+export default async function SwitchConfigController($scope, $rootScope, $location, $window, $timeout){
     var config = require('config');
     await config.$ready;
     if(!config.$config || !config.$config.configs){
-        msgbox.alert('该版本还不支持选择配置');
-        $location.path('/login/');
-        $window.location.reload();
+        $window.alert('该版本还不支持选择配置');
+        $window.history.back();
+        return;
     }
     $scope.configs = config.$config.configs;
     console.log($scope.configs);
@@ -21,7 +21,9 @@ export default async function SwitchConfigController($scope, $location, $window)
             config.$config[k] = $scope.selected.config[k];
         }
         localStorage.setItem('config.json', JSON.stringify(config.$config));
-        $location.path('/login/');
-        $window.location.reload();
+        $rootScope.$on('$locationChangeSuccess', function(){
+            $window.location.reload();
+        })
+        $window.history.back();
     }
 }
