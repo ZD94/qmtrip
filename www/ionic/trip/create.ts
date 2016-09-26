@@ -13,7 +13,7 @@ var defaultTrip = {
 
     traffic: true,
     fromPlace: undefined,
-    round: false,
+    round: true,
 
     hotel: false,
     hotelPlace: undefined
