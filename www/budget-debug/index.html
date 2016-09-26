@@ -149,12 +149,12 @@
                         <td ng-click="changeOrder('arrivalDateTime',false,12)">结束时间</td>
                         <td ng-click="changeOrder('cabin',false,13)">舱位/座次</td>
                         <td ng-click="changeOrder('price',false,14)">价格</td>
-                        <td ng-click="changeOrder('agent',false,15)">分数</td>
+                        <td ng-click="changeOrder('score',false,15)">分数</td>
                         <td>打分详情--
                             <span style="color:blue;cursor: pointer" ng-show="!showReason" ng-click="showReason = !showReason">显示</span>
                             <span style="color:blue;cursor: pointer" ng-show="showReason" ng-click="showReason = !showReason">隐藏</span>
                         </td>
-                        <td ng-click="changeOrder('score',false,17)">供应商</td>
+                        <td ng-click="changeOrder('agent',false,17)">供应商</td>
                     </tr>
                     <tr ng-repeat="x in originData.markedData | orderBy:order:orderBealoon" ng-show="!ishotel">
                         <!--航班的数据-->
