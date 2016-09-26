@@ -48,7 +48,7 @@ class PlanePricePrefer extends AbstractPrefer<IFinalTicket> {
             if (!v.reasons) v.reasons = [];
             if (self.cabins.indexOf(v.cabin) >= 0){
                 if (v.price <= midPrice) {
-                    var a = 1 - Math.pow((v.price-minPrice)/(midPrice-minPrice), 2);
+                    var a = 1 - Math.pow((1 - (v.price-minPrice)/(midPrice-minPrice)),3);
                     if(this.type && this.type == "line"){
                         a = (v.price-minPrice)/(midPrice-minPrice);
                     }
@@ -56,7 +56,7 @@ class PlanePricePrefer extends AbstractPrefer<IFinalTicket> {
                     v.score += addScore;
                     v.reasons.push(`价格偏好以下价格 ${addScore}`)
                 }else{
-                    var a = 1 - Math.pow((maxPrice - v.price)/(maxPrice - midPrice), 2);
+                    var a = 1 - Math.pow((1 - (maxPrice - v.price)/(maxPrice - midPrice)),3);
                     if(this.type && this.type == "line"){
                         a = (maxPrice - v.price)/(maxPrice - midPrice);
                     }
