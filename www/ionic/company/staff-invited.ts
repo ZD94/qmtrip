@@ -2,6 +2,7 @@ import { Staff } from 'api/_types/staff/staff';
 import moment = require('moment');
 import { InvitedLink } from 'api/_types/staff/invited-link';
 var browserspec = require('browserspec');
+var printf = require('printf');
 
 declare var ionic:any;
 
