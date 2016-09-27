@@ -7,7 +7,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
     }
     //////绑定上传
     let authDataStr = window['getAuthDataStr']();
-    $scope.uploadUrl = '/upload/ajax-upload-file?type=image&'+authDataStr;
+    $scope.uploadUrl = '/upload/ajax-upload-file?type=image&auth='+authDataStr;
     ///// END
 
     require('./trip.scss');

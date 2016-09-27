@@ -1,21 +1,33 @@
+import L from 'common/language';
+import { signToken } from 'api/_types/auth/auth-cert';
+import { getSession } from 'common/model';
 require("ionic");
 
-var Cookie = require('tiny-cookie');
 var API = require('common/api');
 API.onlogin(function(){
     var backurl = window.location.href;
     backurl = encodeURIComponent(backurl);
-    window.location.href = '/agency.html#/login/login?backurl='+backurl;
+    window.location.href = '#/login/login?backurl='+backurl;
 });
 API.authenticate = function(remote, callback){
-    var agent_id = Cookie.get('agent_id');
-    var token_id = Cookie.get('agent_token_id');
-    var token_sign = Cookie.get('agent_token_sign');
-    var timestamp = Cookie.get("agent_token_timestamp");
-    remote.authenticate({ accountid: agent_id, tokenid: token_id, tokensign: token_sign, timestamp: timestamp },
-        function(err, remote) {
-            if (!err) window['current_agent_id'] = agent_id;
-            callback(err, remote);
+    var datastr = localStorage.getItem('agency_auth_data');
+    var data = JSON.parse(datastr);
+    if(!data || !data.accountId || !data.tokenId || !data.token) {
+        return callback(L.ERR.NEED_LOGIN, remote);
+    }
+    var now = new Date();
+    var sign = signToken(data.accountId, data.tokenId, data.token, now);
+    remote.authenticate({
+            tokenId: data.tokenId,
+            timestamp: now,
+            sign: sign,
+        },
+        function(err, res) {
+            if(!err) {
+                var session = getSession();
+                session.agencyUserId = data.accountId;
+            }
+            callback(err, res);
         });
 };
 

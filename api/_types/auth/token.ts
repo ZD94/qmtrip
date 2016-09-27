@@ -2,13 +2,13 @@
 import { Table, Field } from 'common/model/common';
 import { Models } from 'api/_types';
 import { ModelObject } from 'common/model/object';
-import { Types } from 'common/model';
+import { Types, Values } from 'common/model';
 
 
 @Table(Models.token, "auth.")
 export class Token extends ModelObject{
     @Field({type: Types.UUID})
-    get id() { return null};
+    get id() { return Values.UUIDV1(); };
     set id(id: string) {}
 
     @Field({type: Types.UUID})
@@ -20,12 +20,12 @@ export class Token extends ModelObject{
     set token(token: string) {}
 
     @Field({type: Types.DATE})
-    get refreshAt() { return null};
-    set refreshAt(refreshDate) {}
+    get refreshAt(): Date { return null};
+    set refreshAt(refreshDate: Date) {}
 
     @Field({type: Types.DATE})
-    get expireAt() { return null;}
-    set expireAt(expireAt) {}
+    get expireAt(): Date { return null;}
+    set expireAt(expireAt: Date) {}
 
     @Field({type: Types.STRING})
     get os() { return null;}

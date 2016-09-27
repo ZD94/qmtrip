@@ -2,8 +2,24 @@
  * Created by seven on 16/7/4.
  */
 "use strict";
+import { signToken, genAuthString } from '../../../api/_types/auth/auth-cert';
 
 var msgbox = require('msgbox');
+
+function getAuthDataStr(): string {
+    var datastr = localStorage.getItem('agency_auth_data');
+    var data = JSON.parse(datastr);
+    if(!data || !data.accountId || !data.tokenId || !data.token) {
+        return '';
+    }
+    if(!data || !data.accountId || !data.tokenId || !data.token) {
+        return '';
+    }
+    var tokenId = data.tokenId;
+    var timestamp = new Date();
+    var sign = signToken(data.accountId, data.tokenId, data.token, timestamp);
+    return genAuthString({tokenId, timestamp, sign});
+}
 
 /*
  出差单列表
@@ -41,6 +57,7 @@ export async function TravelListController($scope, Models, $stateParams){
                 $scope.tripPlans = tripPlans;
             })
             .catch(function(err){
+                console.log(err.stack);
                 msgbox.log(err.msg ||err);
             }).done();
     }
@@ -123,6 +140,7 @@ export async function TravelDetailController($scope, $stateParams, $location, $a
                     })
             })
             .catch(function(err){
+                console.log(err.stack);
                 msgbox.log(err.msg ||err);
             }).done();
     }
@@ -145,6 +163,7 @@ export async function TravelDetailController($scope, $stateParams, $location, $a
                 return tripDetail;
             })
             .catch(function(err){
+                console.log(err.stack);
                 msgbox.log(err.msg ||err);
             });
     }
@@ -155,8 +174,10 @@ export async function TravelDetailController($scope, $stateParams, $location, $a
             if(typeof latestInvoice =='string') {
                 latestInvoice = JSON.parse(latestInvoice);
             }
+            let authstr = getAuthDataStr();
             for(let i of latestInvoice){
-                invoiceImgs.push('/trip-detail/'+$scope.curTripDetail.id+'/invoice/'+i);
+                let img = '/trip-detail/'+$scope.curTripDetail.id+'/invoice/'+i+'?authstr='+authstr;
+                invoiceImgs.push(img);
             }
         }
         $scope.curTripDetailInoviceImgs = invoiceImgs;
@@ -166,7 +187,6 @@ export async function TravelDetailController($scope, $stateParams, $location, $a
         $scope.showLoading = false;
         $scope.$apply();
     })
-
 
     $scope.closePassFailDialog = function () {
         $scope.showInvoicePassFailDialog = false;

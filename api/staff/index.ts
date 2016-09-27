@@ -276,7 +276,7 @@ class StaffModule{
                 username: updateStaff.name,
                 mobile: updateStaff.mobile,
                 travelPolicy: tp ? tp.name: '',
-                time: utils.now(),
+                time: new Date(),
                 companyName: updateStaff.company.name,
                 department: upDept ? upDept.name : (defaultDept ? defaultDept.name : "我的企业"),
                 permission: updateStaff.roleId == EStaffRole.ADMIN ? "管理员" : (updateStaff.roleId == EStaffRole.OWNER ? "创建者" : "普通员工"),

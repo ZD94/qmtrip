@@ -30,7 +30,7 @@ feedback.sendFeedback = function(data){
     return feedbacktModel.create(data)
         .then(function(result){
             var vals = {
-                time: utils.now(),
+                time: new Date(),
                 content: content,
                 companyName: companyName,
                 username: data.userName || "匿名"

@@ -59,16 +59,7 @@ server.api_config = config.api;
 
 
 server.on('init.api', function(API){
-    API.registerAuthWeb(function(params){
-        var self = this;
-        return API.auth.authentication({user_id:params.accountid, token_id:params.tokenid, token_sign:params.tokensign, timestamp:params.timestamp})
-            .then(function(res){
-                if (!res) {
-                    return false;
-                }
-                return {userid: params.accountid, tokenid: params.tokenid};
-            });
-    });
+    API.registerAuthWeb(API.auth.authentication);
 });
 server.on('init.http', function(server){
     if(config.debug){
