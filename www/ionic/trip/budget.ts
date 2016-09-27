@@ -30,7 +30,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     budgets.map(function(budget){
         if(budget.fullPrice && budget.price > 0 && budget.price < budget.fullPrice){
             budget.discount = ((budget.price/budget.fullPrice)*10).toFixed(1)+'折';
-        }else if(budget.price > budget.fullPrice){
+        }else if(budget.price > budget.fullPrice && budget.cabinClass == "Economy"){
             budget.discount = '全价';
         }
         if (budget.tripType == ETripType.HOTEL) {

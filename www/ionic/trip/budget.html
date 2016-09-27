@@ -50,7 +50,7 @@
                             {{trip.originPlaceName}}
                             <br/> {{budget.type == EInvoiceType.TRAIN ? budget.cabinClass : (MTxPlaneLevel[budget.cabinClass ]? MTxPlaneLevel[budget.cabinClass] : "")}}
                             <br/>{{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')+'元'}}
-                            <br/><span ng-if="budget.discount">折扣：{{budget.discount}}</span>
+                            <br/><span ng-if="budget.discount && budget.cabinClass == 'Economy'">折扣：{{budget.discount}}</span>
                         </ion-item>
 
                         <ion-item ng-if="budget.tripType == ETripType.HOTEL">
@@ -77,7 +77,7 @@
                             <br/> {{budget.type == EInvoiceType.TRAIN ? budget.cabinClass : (MTxPlaneLevel[budget.cabinClass ]? MTxPlaneLevel[budget.cabinClass] : "")}}
                             <!--{{MTxPlaneLevel[budget.cabinClass]?MTxPlaneLevel[budget.cabinClass]:""}}-->
                             <br/>{{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')+'元'}}
-                            <br/><span ng-if="budget.discount">折扣：{{budget.discount}}</span>
+                            <br/><span ng-if="budget.discount  && budget.cabinClass == 'Economy'">折扣：{{budget.discount}}</span>
                         </ion-item>
                     </div>
                 </ion-list>
