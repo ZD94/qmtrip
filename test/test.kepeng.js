@@ -7,11 +7,12 @@ require('app-module-path').addPath(path.join(__dirname, '..'));
 
 require.extensions[".ts"] = function(){};
 
-run('./kepeng/esprima.test');
+//run('./kepeng/esprima.test');
 //run('./kepeng/template.test');
 //run('./kepeng/class.test');
 //run('./kepeng/zone.test.js');
 //run('./kepeng/zone-stack.test.js');
+run('./kepeng/sqltype.test');
 //run('./kepeng/model.test');
 //run('./kepeng/model-cluster.test');
 //run('./kepeng/scrub.test.js');

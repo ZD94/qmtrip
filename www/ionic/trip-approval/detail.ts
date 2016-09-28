@@ -219,16 +219,11 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
 
 
     $scope.confirmButton = async function() {
-        $scope.staffSelector = {
-            query: async function(keyword) {
-                let staff = await Staff.getCurrent();
-                //let approveStaffId = $scope.tripApprove.account.id;
-                let staffs = await staff.company.getStaffs({where: {id: {$ne: staff.id}}});
-                return staffs;
-            },
-            display: (staff)=>staff.name
-        };
-        var value = await ngModalDlg.selectMode($scope,$scope.staffSelector);
+        var value = await ngModalDlg.createDialog({
+            parent: $scope,
+            template: require('./confirm.html'),
+            controller:selectModeController
+        });
         if(value.agree){
             $scope.isNextApprove = value.isNextApprove;
             approve(value.result);
@@ -290,4 +285,39 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         window.location.href="#/trip/create";
     };
 
+}
+
+export async function selectModeController ($scope){
+    $scope.isNextApprove = false;
+    $scope.chooseApprove = {
+        approveUser: ''
+    };
+    $scope.staffSelector = {
+        title: '同意出差',
+        query: async function(keyword) {
+            let staff = await Staff.getCurrent();
+            //let approveStaffId = $scope.tripApprove.account.id;
+            let staffs = await staff.company.getStaffs();
+            return staffs;
+        },
+        display: (staff)=>staff.name
+    };
+    $scope.chooseOption = function(isNextApprove) {
+        $scope.isNextApprove = isNextApprove;
+    };
+    $scope.confirmApprove = async function () {
+        var opt = {
+            result: EApproveResult.PASS,
+            isNextApprove: $scope.isNextApprove,
+            agree: true
+        }
+        $scope.tripApprove.approveUser = $scope.chooseApprove.approveUser;
+        $scope.confirmModal(opt);
+    }
+    $scope.cancel = async function() {
+        var opt ={
+            agree: false
+        }
+        $scope.confirmModal(opt);
+    }
 }

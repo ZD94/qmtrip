@@ -42,7 +42,7 @@ require('api/_types/staff');
 async function main(){
     await API.init('api', config);
     
-    await model.databaseSync({force: true, logging: false});
+    await model.databaseSync({force: false, logging: false});
     
     var company = Company.create({});
     var staff = Staff.create({name:'test'});

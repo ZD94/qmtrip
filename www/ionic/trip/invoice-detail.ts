@@ -4,7 +4,7 @@ import * as path from 'path';
 export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup){
     //////绑定上传url
     let authDataStr = window['getAuthDataStr']();
-    $scope.uploadUrl = '/upload/ajax-upload-file?type=image&'+authDataStr;
+    $scope.uploadUrl = '/upload/ajax-upload-file?type=image&auth='+authDataStr;
     ///// END
     
     //////////////显示票据之前先显示loading图
@@ -27,9 +27,11 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         if(typeof latestInvoice =='string') {
             latestInvoice = JSON.parse(latestInvoice);
         }
+        let authDataStr = window['getAuthDataStr']();
         for(let i of latestInvoice){
             let img = path.join(config.update, 'trip-detail', $stateParams.detailId, 'invoice', i);
             img = path.normalize(img);
+            img = img+'?authstr='+authDataStr;
             invoiceImgs.push(img);
         }
         $scope.invoiceImgs = invoiceImgs;

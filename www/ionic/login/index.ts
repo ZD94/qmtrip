@@ -33,7 +33,6 @@ export class IndexController {
                 private $sce,
                 private $loading,
                 private $ionicPopup,
-                private $cookies,
                 private ddtalkApi
     ) {
         $scope.vm = this;
@@ -45,8 +44,7 @@ export class IndexController {
         //微信中自动登录
         let href = window.location.href;
         if(browserspec.is_wechat
-            && window.location.host != 't.jingli365.com'
-            && /.*jingli365\.com/.test(window.location.host)
+            && /^[tj]\.jingli365\.com$/.test(window.location.host)
             && !$stateParams.wxauthcode && !/.*backurl\=.*/.test(href)
         ) {
             this.autoLoginForWechat();
@@ -58,8 +56,8 @@ export class IndexController {
             $loading.end();
         }
 
-        this.account = $cookies.get("email") || '';
-        this.pwd = $cookies.get("pwd") || '';
+        this.account = $storage.local.get("last_login_user") || '';
+        this.pwd = '';
         $scope.$watchGroup(['vm.account', 'vm.pwd'], ()=>{
             this.check_passed = this.account && this.pwd
                 && (this.account.length > 0 && this.pwd.length > 5);
@@ -80,6 +78,7 @@ export class IndexController {
             await API.onload();
             var data = await API.auth.login({account:this.account, pwd:this.pwd});
 
+            this.$storage.local.set("last_login_user", this.account);
             this.recordAuthData(data);
             API.reload_all_modules();
 
@@ -113,11 +112,6 @@ export class IndexController {
     //记录登录信息
     recordAuthData(data) {
         this.$storage.local.set('auth_data', data);
-        var expires = new Date(Date.now() + 30 * 24 * 3600 * 1000);
-        this.$cookies.put("user_id", data.user_id, {expires});
-        this.$cookies.put("token_sign", data.token_sign, {expires});
-        this.$cookies.put("timestamp", data.timestamp, {expires});
-        this.$cookies.put("token_id", data.token_id, {expires});
     }
 
     beginCountDown() {
