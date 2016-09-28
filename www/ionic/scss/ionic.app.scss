@@ -224,3 +224,12 @@ ion-content {
 .item-small{
   font-size:$font-size-small;
 }
+
+
+//筛选buttonbar
+.sub-button-bar{
+  &.button-bar .button{
+    border: none;
+    padding: 0 8px;
+  }
+}

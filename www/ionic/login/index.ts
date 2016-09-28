@@ -44,8 +44,7 @@ export class IndexController {
         //微信中自动登录
         let href = window.location.href;
         if(browserspec.is_wechat
-            && window.location.host != 't.jingli365.com'
-            && /.*jingli365\.com/.test(window.location.host)
+            && /^[tj]\.jingli365\.com$/.test(window.location.host)
             && !$stateParams.wxauthcode && !/.*backurl\=.*/.test(href)
         ) {
             this.autoLoginForWechat();

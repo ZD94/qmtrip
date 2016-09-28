@@ -39,7 +39,7 @@ export async function PendingController($scope, $stateParams){
 
     $scope.changeTo = async function(filter) {
         $scope.tripApproves = [];
-        if (['WAIT_APPROVE', 'ALL', 'APPROVE_FAIL'].indexOf(filter) >= 0) {
+        if (['WAIT_APPROVE', 'ALL', 'APPROVE_FAIL', 'APPROVE_SUCCESS'].indexOf(filter) >= 0) {
             $scope.filter = filter;
         }
         let status: any = {$ne: EApproveStatus.CANCEL};
@@ -47,6 +47,7 @@ export async function PendingController($scope, $stateParams){
             case 'ALL': status = {$ne: EApproveStatus.CANCEL};break;
             case 'WAIT_APPROVE': status = EApproveStatus.WAIT_APPROVE; break;
             case 'APPROVE_FAIL': status = EApproveStatus.REJECT; break;
+            case 'APPROVE_SUCCESS': status = EApproveStatus.PASS; break;
         }
         let where: any = {status: status};
         Pager = await staff.getTripApproves({ where: where, limit: PAGE_SIZE}); //获取待审批出差计划列表

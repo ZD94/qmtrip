@@ -33,7 +33,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
 
     let totalBudget: number = 0;
 
-    if (tripApprove.status == EApproveStatus.WAIT_APPROVE && tripApprove.query && isHasPermissionApprove) {
+    if (tripApprove.status == EApproveStatus.WAIT_APPROVE && tripApprove.query && isHasPermissionApprove && !tripApprove.isSpecialApprove) {
         $loading.reset();
         $loading.start({
             template: '预算计算中...'
