@@ -6,6 +6,7 @@ import { Staff } from 'api/_types/staff/staff';
 import { Models } from 'api/_types/index';
 import { requireParams } from '../../common/api/helper';
 var C = require("config");
+var API = require("common/api");
 
 export function __initHttpApp(app: any) {
     //微信自动登录
