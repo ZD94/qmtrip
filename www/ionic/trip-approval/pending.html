@@ -4,6 +4,7 @@
             <a ng-click="changeTo('ALL')" class="button button-small" ng-class="filter == 'ALL' ? 'active': ''">全部</a>
             <a ng-click="changeTo('WAIT_APPROVE')" class="button button-small" ng-class="filter == 'WAIT_APPROVE' ? 'active': ''">待审批</a>
             <a ng-click="changeTo('APPROVE_FAIL')" class="button button-small" ng-class="filter == 'APPROVE_FAIL' ? 'active': ''">已驳回</a>
+            <a ng-click="changeTo('APPROVE_SUCCESS')" class="button button-small" ng-class="filter == 'APPROVE_SUCCESS' ? 'active': ''">已通过</a>
         </div>
 
         <!--<div class="list card" ng-repeat="approve in tripApproves track by $index" ng-click="enterDetail(approve.id)">-->
