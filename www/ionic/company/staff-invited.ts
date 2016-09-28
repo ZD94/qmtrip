@@ -3,6 +3,7 @@ import moment = require('moment');
 import { InvitedLink } from 'api/_types/staff/invited-link';
 var browserspec = require('browserspec');
 
+import printf = require('printf');
 declare var ionic:any;
 
 export async function StaffInvitedController($scope, Models, $ionicHistory, $ionicPopup, ClosePopupService, wxApi){
