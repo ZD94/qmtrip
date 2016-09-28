@@ -1214,15 +1214,15 @@ class TripPlanModule {
             completeSql += ` and account_id='${staff.id}'`;
 
         let planSql = `${completeSql}  and status in (${EPlanStatus.WAIT_UPLOAD}, ${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDITING}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.COMPLETE})`;
-        completeSql += ` and status=${EPlanStatus.COMPLETE}`;
+        completeSql += ` and status=${EPlanStatus.COMPLETE}  and is_special_approve = false`;
 
-        let savedMoneyCompleteSql = completeSql + ' and is_special_approve = false';
+        // let savedMoneyCompleteSql = completeSql + ' and is_special_approve = false';
 
-        let savedMoneyComplete = `${selectSql} ${savedMoneyCompleteSql};`;
+        // let savedMoneyComplete = `${selectSql} ${savedMoneyCompleteSql};`;
         let complete = `${selectSql} ${completeSql};`;
         let plan = `${selectSql} ${planSql};`;
 
-        let savedMoneyCompleteInfo = await sequelize.query(savedMoneyComplete);
+        // let savedMoneyCompleteInfo = await sequelize.query(savedMoneyComplete);
         let completeInfo = await sequelize.query(complete);
         let planInfo = await sequelize.query(plan);
 
@@ -1240,12 +1240,12 @@ class TripPlanModule {
             ret.completeTripNum = Number(c.tripNum);
             ret.completeBudget = Number(c.budget);
             ret.expenditure = Number(c.expenditure);
-            // ret.savedMoney = Number(c.savedMoney);
-        }
-        if(savedMoneyCompleteInfo && savedMoneyCompleteInfo.length > 0 && savedMoneyCompleteInfo[0].length > 0) {
-            let c = savedMoneyCompleteInfo[0][0];
             ret.savedMoney = Number(c.savedMoney);
         }
+        /*if(savedMoneyCompleteInfo && savedMoneyCompleteInfo.length > 0 && savedMoneyCompleteInfo[0].length > 0) {
+            let c = savedMoneyCompleteInfo[0][0];
+            ret.savedMoney = Number(c.savedMoney);
+        }*/
 
         if(planInfo && planInfo.length > 0 && planInfo[0].length > 0) {
             let p = planInfo[0][0];
