@@ -462,7 +462,11 @@ export class TripDetail extends ModelObject{
         return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
     }
 
-    auditPlanInvoice(params: {auditResult: EAuditStatus, reason?: string, expenditure?: number}): Promise<boolean> {
+    async auditPlanInvoice(params: {auditResult: EAuditStatus, reason?: string, expenditure?: number}): Promise<boolean> {
+        if(!this.isLocal){
+            API.require('tripPlan');
+            await API.onload();
+        }
         params['id'] = this.id;
         return API.tripPlan.auditPlanInvoice(params);
     }

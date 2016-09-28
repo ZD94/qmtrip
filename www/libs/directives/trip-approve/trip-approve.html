@@ -18,8 +18,8 @@
         </ion-list>
         <div class="card-footer" ng-if="tripApprove.status != EApproveStatus.COMPLETE">
             <span ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE">等待审批</span>
-            <span ng-if="tripApprove.status != EApproveStatus.APPROVE_NOT_PASS && tripApprove.status != EApproveStatus.WAIT_APPROVE">审批通过</span>
-            <span ng-if="tripApprove.status == EApproveStatus.APPROVE_NOT_PASS" class="color-red">审批驳回</span>
+            <span ng-if="tripApprove.status != EApproveStatus.REJECT && tripApprove.status != EApproveStatus.WAIT_APPROVE">审批通过</span>
+            <span ng-if="tripApprove.status == EApproveStatus.REJECT" class="color-red">审批驳回</span>
             <span class="spanRight">{{tripApprove.budget | currency: ''}}元</span>
         </div>
     </div>
