@@ -13,7 +13,6 @@ function getAuthData(): LoginResponse {
     }
 }
 
-console.log('before');
 window['getAuthDataStr'] = function(): string {
     let data = getAuthData();
     if(!data || !data.accountId || !data.tokenId || !data.token) {
@@ -24,7 +23,6 @@ window['getAuthDataStr'] = function(): string {
     var sign = signToken(data.accountId, data.tokenId, data.token, timestamp);
     return genAuthString({tokenId, timestamp, sign});
 }
-console.log('after');
 
 function apiAuth(remote, callback) {
     var data = getAuthData();
