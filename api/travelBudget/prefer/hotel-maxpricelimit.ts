@@ -24,7 +24,7 @@ class MaxPriceLimitPrefer extends AbstractPrefer<IFinalHotel> {
             if (!v.score) v.score = 0;
             if (!v.reasons) v.reasons=[];
 
-            if (v.price > self.maxPrice) {
+            if (!v.outPriceRange && v.price > self.maxPrice) {
                 v.score += self.score;
                 v.reasons.push(`超过限价${self.maxPrice} -${self.score}`);
             }
