@@ -16,7 +16,7 @@ import _ = require('lodash');
 import {requireParams, clientExport} from 'common/api/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus,EInvoiceType,
-    TripApprove, EApproveStatus, EApproveResult
+    TripApprove, EApproveStatus, EApproveResult,EApproveResult2Text
 } from "api/_types/tripPlan";
 import {Models} from "api/_types";
 import {FindResult} from "common/model/interface";
@@ -677,7 +677,7 @@ class TripPlanModule {
                 self_values = {
                     username: user.name,
                     planNo: tripPlan.planNo,
-                    approveTime: new Date(),
+                    approveTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
                     approveUser: staff.name,
                     projectName: tripPlan.title,
                     goTrafficBudget: go,
@@ -694,7 +694,7 @@ class TripPlanModule {
                     arrivalCity: tripPlan.arrivalCity,
                     budget: tripPlan.budget,
                     tripPlanNo: tripPlan.planNo,
-                    approveResult: approveResult,
+                    approveResult: EApproveResult2Text[approveResult],
                     reason: approveResult,
                     emailReason: params.approveRemark
                 };
@@ -724,7 +724,7 @@ class TripPlanModule {
                     startTime: moment(tripApprove.startAt["value"]).format('YYYY-MM-DD'),
                     arrivalCity: tripApprove.arrivalCity,
                     budget: tripApprove.budget,
-                    approveResult: approveResult,
+                    approveResult: EApproveResult2Text[approveResult],
                     reason: approveResult,
                     emailReason: params.approveRemark
                 };
