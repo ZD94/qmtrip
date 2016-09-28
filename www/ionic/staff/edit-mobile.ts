@@ -4,6 +4,7 @@ var msgbox = require('msgbox');
 export async function EditMobileController($scope,Models,$ionicHistory) {
     $scope.isDingtalk = /dingtalk/i.test(window.navigator.userAgent);
     require('./edit-mobile.scss');
+    API.require('checkcode');
     await API.onload();
     var staff = await Staff.getCurrent();
     $scope.form = {
