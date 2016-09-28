@@ -171,9 +171,6 @@ class TripPlanModule {
 
         await Promise.all([tripPlan.save(), tripPlanLog.save()]);
         await Promise.all(tripDetails.map((d) => d.save()));
-        // if (tripPlan.budget > 0 || tripPlan.status === EPlanStatus.WAIT_APPROVE) {
-        //     await TripPlanModule.sendTripPlanNotice(tripPlan, staff.id);
-        // }
         return tripPlan;
     }
 

@@ -1422,10 +1422,10 @@ class StaffModule{
         var timestamp = Date.now() + oneDay;  //失效时间2天
         var sign = makeLinkSign(linkToken, invitedLink.id, timestamp);
         var url = goInvitedLink + "?linkId="+invitedLink.id+"&timestamp="+timestamp+"&sign="+sign;
-        try{
+        try {
             url = await API.wechat.shorturl({longurl: url});
-        }catch(err){
-            console.error(err);
+        } catch(err) {
+            console.warn('生成短连接错误', err)
         }
         invitedLink.goInvitedLink = url;
         return  invitedLink.save();
