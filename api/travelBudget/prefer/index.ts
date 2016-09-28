@@ -46,7 +46,7 @@ export var hotelPrefers = {
     represent: require('./hotel-represent'),
     maxPriceLimit: require('./hotel-maxPriceLimit'),
     price: require('./hotel-price'),
-    priceRange: require('./hotel-priceRange')
+    priceRange: require('./hotel-pricerange')
 }
 
 export var ticketPrefers = {
