@@ -91,12 +91,11 @@ export class IndexController {
             }
         }
     }
-    async autoLoginForWechat(): Promise<any>{
+    async autoLoginForWechat(){
         await API.onload();
         if(!this.$stateParams.wxauthcode){
             let url = await API.auth.getWeChatLoginUrl({redirectUrl: window.location.href});
             window.location.href = url;
-            return;
         }else{
             var data = await API.auth.authWeChatLogin({code: this.$stateParams.wxauthcode});
             if(data){
