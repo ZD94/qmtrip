@@ -31,7 +31,7 @@ class RepresentPrefer extends AbstractPrefer<IFinalHotel> {
             if (!v.reasons) v.reasons = [];
             let representHotels = REFERENCE_HOTELS_PRICE[""+v.star] || [];
             representHotels.forEach( (keyword) => {
-                if (v.name.indexOf(keyword) >=0 ){
+                if (!v.outPriceRange && v.name.indexOf(keyword) >=0 ){
                     v.score += self.score;
                     v.reasons.push(`匹配${keyword}为代表性酒店+${self.score}`);
                     return;

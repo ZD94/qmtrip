@@ -25,7 +25,7 @@ class BlackListPrefer extends AbstractPrefer<IFinalHotel> {
             if (!hotel.score) hotel.score = 0;
             if (!hotel.reasons) hotel.reasons=[];
 
-            if (BLACKLIST_HOTEL_AGENTS.indexOf(hotel.agent) >= 0) {
+            if (!hotel.outPriceRange && BLACKLIST_HOTEL_AGENTS.indexOf(hotel.agent) >= 0) {
                 hotel.score += self.score;
                 hotel.reasons.push(`供应商黑名单+${self.score}`);
             }

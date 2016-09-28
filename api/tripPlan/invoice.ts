@@ -32,7 +32,7 @@ async function checkInvoicePermission(userId, tripDetailId){
         var agencyUser = await Models.agencyUser.get(userId);
         if(!agencyUser)
             return false;
-        var needAgency = await tripDetailId.tripPlan.account.company.getAgency();
+        var needAgency = await tripDetail.tripPlan.account.company.getAgency();
         if(agencyUser.agency.id == needAgency.id)
             return true;
     }
