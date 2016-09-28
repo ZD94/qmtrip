@@ -30,7 +30,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     budgets.map(function(budget){
         if(budget.fullPrice && budget.price > 0 && budget.price < budget.fullPrice){
             budget.discount = ((budget.price/budget.fullPrice)*10).toFixed(1)+'折';
-        }else if(budget.price > budget.fullPrice){
+        }else if(budget.price > budget.fullPrice && budget.cabinClass == "Economy"){
             budget.discount = '全价';
         }
         if (budget.tripType == ETripType.HOTEL) {
@@ -69,7 +69,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     $scope.staffSelector = {
         query: async function(keyword) {
             let staff = await Staff.getCurrent();
-            let staffs = await staff.company.getStaffs({where: {id: {$ne: staff.id}}});
+            let staffs = await staff.company.getStaffs();
             return staffs;
         },
         display: (staff)=>staff.name

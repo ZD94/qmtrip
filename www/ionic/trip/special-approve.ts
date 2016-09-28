@@ -28,7 +28,7 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
     $scope.staffSelector = {
         query: async function(keyword) {
             let staff = await Staff.getCurrent();
-            let staffs = await staff.company.getStaffs({where: {id: {$ne: staff.id}}});
+            let staffs = await staff.company.getStaffs();
             return staffs;
         },
         display: (staff)=>staff.name

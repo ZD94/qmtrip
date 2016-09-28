@@ -1,53 +1,47 @@
 
 import L from 'common/language';
 import { getSession } from 'common/model';
+import { signToken, LoginResponse, genAuthString } from '../../api/_types/auth/auth-cert';
 require('ionic');
 
-function getAuthData() {
-    return localStorage.getItem('auth_data');
+function getAuthData(): LoginResponse {
+    var data = localStorage.getItem('auth_data');
+    try{
+        return JSON.parse(data);
+    }catch(e){
+        return null;
+    }
 }
 
-window['getAuthDataStr'] = function() {
-    let authData: any = getAuthData();
-    if(typeof authData == 'string') {
-        authData = JSON.parse(authData);
+window['getAuthDataStr'] = function(): string {
+    let data = getAuthData();
+    if(!data || !data.accountId || !data.tokenId || !data.token) {
+        return '';
     }
-    let strs: any = [];
-    for(var k in authData) {
-        strs.push(k + '=' + authData[k]);
-    }
-    strs = strs.join("&");
-    return strs;
+    var tokenId = data.tokenId;
+    var timestamp = new Date();
+    var sign = signToken(data.accountId, data.tokenId, data.token, timestamp);
+    return genAuthString({tokenId, timestamp, sign});
 }
 
 function apiAuth(remote, callback) {
-    var datastr = getAuthData();
-    if(!datastr) {
+    var data = getAuthData();
+    if(!data || !data.accountId || !data.tokenId || !data.token) {
         return callback(L.ERR.NEED_LOGIN, remote);
     }
-    var data;
-    try {
-        data = JSON.parse(datastr);
-    } catch(e) {
-        return callback(e, remote);
-    }
+    var now = new Date();
+    var sign = signToken(data.accountId, data.tokenId, data.token, now);
     remote.authenticate({
-            accountid: data.user_id,
-            tokenid: data.token_id,
-            timestamp: data.timestamp,
-            tokensign: data.token_sign
+            tokenId: data.tokenId,
+            timestamp: now,
+            sign: sign,
         },
-        function(err, handle) {
+        function(err, res) {
             if(!err) {
                 var session = getSession();
-                session.accountId = data.user_id;
-                session.token = {
-                    id: data.token_id,
-                    sign: data.token_sign,
-                    timestamp: data.timestamp
-                };
+                session.accountId = data.accountId;
             }
-            callback(err, handle);
+            callback(err, res);
         });
 }
 

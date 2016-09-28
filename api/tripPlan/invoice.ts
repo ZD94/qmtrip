@@ -4,6 +4,7 @@
 'use strict';
 import { Models, EAccountType } from '../_types/index';
 import { EStaffRole } from '../_types/staff';
+import { parseAuthString } from '../_types/auth/auth-cert';
 var API = require("common/api");
 let Logger = require('common/logger');
 let logger = new Logger("tripPlan.invoice");
@@ -40,16 +41,8 @@ async function checkInvoicePermission(userId, tripDetailId){
 async function agentGetTripplanDetailInvoice(req, res, next){
     try{
         req.clearTimeout();
-        var userId = req.cookies.user_id || req.cookies.agent_id;
-        var token_id = req.cookies.token_id || req.cookies.agent_token_id;
-        var token_sign = req.cookies.token_sign || req.cookies.agent_token_sign;
-        var timestamp = req.cookies.timestamp || req.cookies.agent_token_timestamp;
-        var result = await API.auth.authentication({
-            user_id: userId,
-            token_id: token_id,
-            token_sign: token_sign,
-            timestamp: timestamp
-        });
+        var authReq = parseAuthString(req.query.authstr);
+        var result = await API.auth.authentication(authReq);
         if(!result) {
             console.log('auth failed', JSON.stringify(req.cookies));
             res.sendStatus(403);
@@ -65,7 +58,7 @@ async function agentGetTripplanDetailInvoice(req, res, next){
             res.sendStatus(404);
             return;
         }
-        if(!checkInvoicePermission(userId, tripDetailId)){
+        if(!checkInvoicePermission(result.accountId, tripDetailId)){
             res.sendStatus(403);
             return;
         }

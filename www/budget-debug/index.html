@@ -56,6 +56,21 @@
             </td>
         </tr>
         <tr>
+            <th>预算结果</th>
+            <td>
+                <a ng-show="hideCalResult" ng-click="hideCalResult = !hideCalResult">隐藏</a>
+                <a ng-hide="hideCalResult" ng-click="hideCalResult = !hideCalResult">显示</a>
+                <div placeholder="预算结果" rows="4" cols="80" ng-if="hideCalResult">
+                    <table class="table-bordered">
+                        <tr ng-repeat="(x,y) in result" ng-hide="$last">
+                            <td>{{x}}</td>
+                            <td>{{y}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+        <tr>
             <th>使用策略</th>
             <td>
                 <select ng-model="policy">
@@ -91,18 +106,6 @@
                 </select>
                 <input type="button" value="复制数据" data-toggle="modal" data-target="#copymodal">
                 <input type="button" value="粘贴" ng-click="paste()">
-            </td>
-        </tr>
-        <tr>
-            <th>预算结果</th>
-            <td>
-                <a ng-show="hideCalResult" ng-click="hideCalResult = !hideCalResult">隐藏</a>
-                <a ng-hide="hideCalResult" ng-click="hideCalResult = !hideCalResult">显示</a>
-                <div placeholder="预算结果" rows="4" cols="80" ng-if="hideCalResult">
-                    <div ng-repeat="(x,y) in result" ng-hide="$last">
-                        {{x}}-------------------{{y}}
-                    </div>
-                </div>
             </td>
         </tr>
         <tr>
