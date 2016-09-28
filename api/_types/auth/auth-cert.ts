@@ -15,7 +15,7 @@ export class LoginResponse {
     constructor(
         public accountId: string,
         public tokenId: string,
-        public token: string,
+        public token: string
     ) {}
 }
 
@@ -31,7 +31,7 @@ export class AuthRequest {
 @regApiType('API.')
 export class AuthResponse {
     constructor(
-        public accountId: string,
+        public accountId: string
     ) {}
 }
 

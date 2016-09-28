@@ -1,5 +1,17 @@
 [
   {
+    "name": "priceRange",
+    "options": {
+      "score": -1000000,
+      "range": {
+        "5": [450, 2300],
+        "4": [280, 1000],
+        "3": [180, 600],
+        "2": [120, 380]
+      }
+    }
+  },
+  {
     "name":"starMatch",
     "options": {
       "expectStar": "<%=star%>",

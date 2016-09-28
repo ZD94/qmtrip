@@ -25,7 +25,7 @@ class StarMatchPrefer extends AbstractPrefer<IFinalHotel> {
             if (!v.score) v.score = 0;
             if (!v.reasons) v.reasons = [];
 
-            if (v.star == self.expectStar) {
+            if (!v.outPriceRange && v.star == self.expectStar) {
                 v.score += self.score;
                 v.reasons.push(`符合星级标准+${self.score}`);
             }

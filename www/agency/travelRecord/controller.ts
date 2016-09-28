@@ -2,7 +2,7 @@
  * Created by seven on 16/7/4.
  */
 "use strict";
-import { signToken, genAuthString } from '../../../api/_types/auth/auth-cert';
+import { signToken, genAuthString } from 'api/_types/auth/auth-cert';
 
 var msgbox = require('msgbox');
 
