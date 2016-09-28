@@ -81,6 +81,8 @@ export interface IHotel {
     longitude: string;
     agents: Array<IHotelAgent>;
     star: string| number;
+    checkInDate: string;
+    checkOutDate: string;
 }
 
 export interface IFinalHotel {
@@ -92,7 +94,10 @@ export interface IFinalHotel {
     price: number;
     bookUrl?: string;
     score?: number;
-    reasons?: string[]
+    reasons?: string[];
+    checkInDate: string;
+    checkOutDate: string;
+    outPriceRange: boolean;
 }
 
 //记录预算分析数据及结果
