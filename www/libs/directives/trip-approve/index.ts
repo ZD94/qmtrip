@@ -87,7 +87,14 @@ angular
                 $scope.ETripType = ETripType;
                 $scope.MTxPlaneLevel = MTxPlaneLevel;
                 $scope.days = moment($scope.item.endTime).diff(moment($scope.item.startTime), 'days');
-                $scope.subsidyDays = moment($scope.item.endTime).diff(moment($scope.item.startTime), 'days') + 1;
+
+                $scope.subsidyDays = moment($scope.item.endDate).diff(moment($scope.item.fromDate), 'days')+1;
+                if (!$scope.item.hasFirstDaySubsidy) {
+                    $scope.subsidyDays = $scope.subsidyDays - 1;
+                }
+                if (!$scope.item.hasLastDaySubsidy) {
+                    $scope.subsidyDays = $scope.subsidyDays - 1;
+                }
             }
         }
     })

@@ -44,7 +44,7 @@
             <span>{{item.startTime | date: 'MM/dd'}}至{{item.endTime | date: 'MM/dd'}},共{{subsidyDays}}天</span>
             <br/>
             <span ng-if="item.budget > 0">
-                {{item.budget / (days+1) | currency: ''}}元/天
+                {{item.budget / (subsidyDays) | currency: ''}}元/天
             </span>
         </div>
 

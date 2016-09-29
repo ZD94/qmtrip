@@ -704,7 +704,7 @@ class TripPlanModule {
                 others = data.others;
                 self_values = {
                     username: user.name,
-                    planNo: "",
+                    planNo: "无",
                     approveTime: new Date(),
                     approveUser: staff.name,
                     projectName: tripApprove.title,
