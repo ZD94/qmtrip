@@ -13,6 +13,7 @@ import { Seed } from 'api/_types/seed';
 import { createServerService } from 'common/model/sequelize';
 import {TravelBudgetLog} from "api/_types/travelbudget";
 import {DDTalkCorp, DDTalkUser} from "api/_types/ddtalk";
+import {CoinAccount, CoinAccountChange} from "./_types/coin";
 
 initModels({
     staff: createServerService<Staff>(Staff),
@@ -40,4 +41,7 @@ initModels({
 
     ddtalkCorp: createServerService<DDTalkCorp>(DDTalkCorp),
     ddtalkUser: createServerService<DDTalkUser>(DDTalkUser),
+    
+    coinAccount: createServerService<CoinAccount>(CoinAccount),
+    coinAccountChange: createServerService<CoinAccountChange>(CoinAccountChange),
 });

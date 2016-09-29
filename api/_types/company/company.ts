@@ -135,6 +135,10 @@ export class Company extends ModelObject{
         return Models.agency.get(id);
     }
 
+    @ResolveRef({ type: Types.UUID}, Models.coinAccount)
+    get coinAccount(): CoinAccount { return null};
+    set coinAccount(coinAccount: CoinAccount) {}
+
     getStaffs(options?: any): Promise<Staff[]> {
         if(!options) {options = {where: {}}};
         if(!options.where) {options.where = {}};
