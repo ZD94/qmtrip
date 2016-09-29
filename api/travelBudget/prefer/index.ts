@@ -41,10 +41,10 @@ export function loadDefaultPrefer(qs: any, type?: string) {
 }
 
 export var hotelPrefers = {
-    starMatch: require('./hotel-starMatch'),
+    starMatch: require('./hotel-star-match'),
     blackList: require('./hotel-blacklist'),
     represent: require('./hotel-represent'),
-    maxPriceLimit: require('./hotel-maxPriceLimit'),
+    maxPriceLimit: require('./hotel-max-price-limit'),
     price: require('./hotel-price'),
     priceRange: require('./hotel-pricerange')
 }
