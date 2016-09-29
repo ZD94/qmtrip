@@ -7,9 +7,10 @@ import {TravelPolicy} from "api/_types/travelPolicy";
 import { Types, Values } from 'common/model';
 import { Department } from 'api/_types/department';
 import { TripPlan } from "api/_types/tripPlan";
-import { Table, Create, Field, Reference } from 'common/model/common';
+import {Table, Create, Field, Reference, ResolveRef} from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import { MoneyChange } from './money-change';
+import {CoinAccount} from "../coin";
 declare var API: any;
 
 export enum ECompanyStatus {
