@@ -6,6 +6,7 @@ import { Staff } from 'api/_types/staff/staff';
 import { Models } from 'api/_types/index';
 import { requireParams } from '../../common/api/helper';
 var C = require("config");
+var API = require("common/api");
 
 export function __initHttpApp(app: any) {
     //微信自动登录
@@ -22,7 +23,7 @@ export function __initHttpApp(app: any) {
         let query = req.query;
         let redirect_url = query.redirect_url;
         //如果是登录页，直接跳转
-        if(/^http\:\/\/\w*\.jingli365\.com\/(index\.html)?\#\/login\/(index)?/.test(redirect_url)) {
+        if(/^https?\:\/\/\w*\.jingli365\.com\/(index\.html)?\#\/login\/(index)?/.test(redirect_url)) {
             redirect_url += redirect_url.indexOf('?') > 0 ? '&' : '?';
             redirect_url += 'wxauthcode=' + query.code + '&wxauthstate=' + query.state;
             res.redirect(redirect_url);

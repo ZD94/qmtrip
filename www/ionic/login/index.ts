@@ -1,5 +1,6 @@
 import { autobind } from 'core-decorators';
 import IScope = angular.IScope;
+import { LoginResponse } from 'api/_types/auth/auth-cert';
 var msgbox = require('msgbox');
 var config = require('config');
 var browserspec = require('browserspec');
@@ -36,7 +37,6 @@ export class IndexController {
                 private ddtalkApi
     ) {
         $scope.vm = this;
-        $loading.start();
 
         this.backUrl = $stateParams.backurl || "#";
 
@@ -44,17 +44,14 @@ export class IndexController {
         //微信中自动登录
         let href = window.location.href;
         if(browserspec.is_wechat
-            && window.location.host != 't.jingli365.com'
-            && /.*jingli365\.com/.test(window.location.host)
-            && !$stateParams.wxauthcode && !/.*backurl\=.*/.test(href)
+            && /^[tj]\.jingli365\.com$/.test(window.location.host)
+            //&& !/.*backurl\=.*/.test(href)
         ) {
             this.autoLoginForWechat();
             return;
         } else if(isDingTalk()) {
             this.autoLoginForDingtalk();
             return;
-        } else {
-            $loading.end();
         }
 
         this.account = $storage.local.get("last_login_user") || '';
@@ -78,18 +75,8 @@ export class IndexController {
         try {
             await API.onload();
             var data = await API.auth.login({account:this.account, pwd:this.pwd});
-
             this.$storage.local.set("last_login_user", this.account);
-            this.recordAuthData(data);
-            API.reload_all_modules();
-
-            if(browserspec.is_wechat && this.$stateParams.wxauthcode) {
-                //保存accountId和openId关联
-                await API.onload();
-                await API.auth.saveOrUpdateOpenId({code: this.$stateParams.wxauthcode});
-            }
-
-            window.location.href = this.backUrl;
+            this.saveAndGoBackUrl(data);
         } catch(err) {
             //var str = err.msg;
             /*if(err.code == -28 && err.msg == "您的账号还未激活"){
@@ -104,15 +91,30 @@ export class IndexController {
             }
         }
     }
-    async autoLoginForWechat(): Promise<any>{
+    async autoLoginForWechat(){
         await API.onload();
-        let url = await API.auth.getWeChatLoginUrl({redirectUrl: window.location.href});
-        window.location.href = url;
+        if(!this.$stateParams.wxauthcode){
+            let url = await API.auth.getWeChatLoginUrl({redirectUrl: window.location.href});
+            window.location.href = url;
+        }else{
+            var data = await API.auth.authWeChatLogin({code: this.$stateParams.wxauthcode});
+            if(data){
+                this.saveAndGoBackUrl(data);
+            }
+        }
     }
 
-    //记录登录信息
-    recordAuthData(data) {
+    async saveAndGoBackUrl(data: LoginResponse){
         this.$storage.local.set('auth_data', data);
+        API.reload_all_modules();
+
+        //保存accountId和openId关联
+        if(browserspec.is_wechat && this.$stateParams.wxauthcode) {
+            await API.onload();
+            await API.auth.saveOrUpdateOpenId({code: this.$stateParams.wxauthcode});
+        }
+
+        window.location.href = this.backUrl;
     }
 
     beginCountDown() {
@@ -164,9 +166,7 @@ export class IndexController {
                 });
             //通过code换取用户基本信息
             let data = await API.ddtalk.loginByDdTalkCode({corpid: corpid, code: ddtalkAuthCode});
-            this.recordAuthData(data);
-            await API.onload();
-            window.location.href = this.backUrl;
+            this.saveAndGoBackUrl(data);
             return;
         } catch(err) {
             console.error(err);

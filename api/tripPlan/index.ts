@@ -16,7 +16,7 @@ import _ = require('lodash');
 import {requireParams, clientExport} from 'common/api/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus,EInvoiceType,
-    TripApprove, EApproveStatus, EApproveResult
+    TripApprove, EApproveStatus, EApproveResult,EApproveResult2Text
 } from "api/_types/tripPlan";
 import {Models} from "api/_types";
 import {FindResult} from "common/model/interface";
@@ -674,7 +674,7 @@ class TripPlanModule {
                 self_values = {
                     username: user.name,
                     planNo: tripPlan.planNo,
-                    approveTime: new Date(),
+                    approveTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
                     approveUser: staff.name,
                     projectName: tripPlan.title,
                     goTrafficBudget: go,
@@ -691,7 +691,7 @@ class TripPlanModule {
                     arrivalCity: tripPlan.arrivalCity,
                     budget: tripPlan.budget,
                     tripPlanNo: tripPlan.planNo,
-                    approveResult: approveResult,
+                    approveResult: EApproveResult2Text[approveResult],
                     reason: approveResult,
                     emailReason: params.approveRemark
                 };
@@ -721,7 +721,7 @@ class TripPlanModule {
                     startTime: moment(tripApprove.startAt["value"]).format('YYYY-MM-DD'),
                     arrivalCity: tripApprove.arrivalCity,
                     budget: tripApprove.budget,
-                    approveResult: approveResult,
+                    approveResult: EApproveResult2Text[approveResult],
                     reason: approveResult,
                     emailReason: params.approveRemark
                 };
@@ -884,7 +884,7 @@ class TripPlanModule {
             let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
             let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
             let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
-            let auditValues = {auditUserName: user.name, companyName: company.name, staffName: staff.name, projectName: tripPlan.title, goTrafficBudget: go,
+            let auditValues = {username: user.name, time:tripPlan.createdAt, auditUserName: user.name, companyName: company.name, staffName: staff.name, projectName: tripPlan.title, goTrafficBudget: go,
                 backTrafficBudget: back, hotelBudget: hotel, otherBudget: others, totalBudget: tripPlan.budget, url: auditUrl, detailUrl: auditUrl,
                 approveUser: user.name, tripPlanNo: tripPlan.planNo,
                 content: `企业 ${company.name} 员工 ${staff.name}${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差计划票据已提交，预算：￥${tripPlan.budget}，等待您审核！`,
@@ -1211,15 +1211,15 @@ class TripPlanModule {
             completeSql += ` and account_id='${staff.id}'`;
 
         let planSql = `${completeSql}  and status in (${EPlanStatus.WAIT_UPLOAD}, ${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDITING}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.COMPLETE})`;
-        completeSql += ` and status=${EPlanStatus.COMPLETE}`;
+        completeSql += ` and status=${EPlanStatus.COMPLETE}  and is_special_approve = false`;
 
-        let savedMoneyCompleteSql = completeSql + ' and is_special_approve = false';
+        // let savedMoneyCompleteSql = completeSql + ' and is_special_approve = false';
 
-        let savedMoneyComplete = `${selectSql} ${savedMoneyCompleteSql};`;
+        // let savedMoneyComplete = `${selectSql} ${savedMoneyCompleteSql};`;
         let complete = `${selectSql} ${completeSql};`;
         let plan = `${selectSql} ${planSql};`;
 
-        let savedMoneyCompleteInfo = await sequelize.query(savedMoneyComplete);
+        // let savedMoneyCompleteInfo = await sequelize.query(savedMoneyComplete);
         let completeInfo = await sequelize.query(complete);
         let planInfo = await sequelize.query(plan);
 
@@ -1237,12 +1237,12 @@ class TripPlanModule {
             ret.completeTripNum = Number(c.tripNum);
             ret.completeBudget = Number(c.budget);
             ret.expenditure = Number(c.expenditure);
-            // ret.savedMoney = Number(c.savedMoney);
-        }
-        if(savedMoneyCompleteInfo && savedMoneyCompleteInfo.length > 0 && savedMoneyCompleteInfo[0].length > 0) {
-            let c = savedMoneyCompleteInfo[0][0];
             ret.savedMoney = Number(c.savedMoney);
         }
+        /*if(savedMoneyCompleteInfo && savedMoneyCompleteInfo.length > 0 && savedMoneyCompleteInfo[0].length > 0) {
+            let c = savedMoneyCompleteInfo[0][0];
+            ret.savedMoney = Number(c.savedMoney);
+        }*/
 
         if(planInfo && planInfo.length > 0 && planInfo[0].length > 0) {
             let p = planInfo[0][0];

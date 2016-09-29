@@ -1,7 +1,7 @@
 
 import L from 'common/language';
 import { getSession } from 'common/model';
-import { signToken, LoginResponse, genAuthString } from '../../api/_types/auth/auth-cert';
+import { signToken, LoginResponse, genAuthString } from 'api/_types/auth/auth-cert';
 require('ionic');
 
 function getAuthData(): LoginResponse {
@@ -75,7 +75,7 @@ function initAPI($window, $location, $ionicPopup){
 
         var API = require('common/api');
         var browserspec = require('browserspec');
-        if(browserspec.is_wechat && /^[tj]\.jingli365\.com$/.test($location.host()) && $location.host()!='t.jingli365.com') {
+        if(browserspec.is_wechat && /^[tj]\.jingli365\.com$/.test($location.host())) {
             let args = $location.search();
             if(!args.wxauthcode || !args.wxauthstate) {
                 await API.onload();
