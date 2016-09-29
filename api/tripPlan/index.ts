@@ -1214,38 +1214,39 @@ class TripPlanModule {
             completeSql += ` and account_id='${staff.id}'`;
 
         let planSql = `${completeSql}  and status in (${EPlanStatus.WAIT_UPLOAD}, ${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDITING}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.COMPLETE})`;
-        completeSql += ` and status=${EPlanStatus.COMPLETE}  and is_special_approve = false`;
+        completeSql += ` and status=${EPlanStatus.COMPLETE}`;
 
-        // let savedMoneyCompleteSql = completeSql + ' and is_special_approve = false';
+        let savedMoneyCompleteSql = completeSql + ' and is_special_approve = false';
 
-        // let savedMoneyComplete = `${selectSql} ${savedMoneyCompleteSql};`;
+        let savedMoneyComplete = `${selectSql} ${savedMoneyCompleteSql};`;
         let complete = `${selectSql} ${completeSql};`;
         let plan = `${selectSql} ${planSql};`;
 
-        // let savedMoneyCompleteInfo = await sequelize.query(savedMoneyComplete);
+        let savedMoneyCompleteInfo = await sequelize.query(savedMoneyComplete);
         let completeInfo = await sequelize.query(complete);
         let planInfo = await sequelize.query(plan);
 
         let ret = {
-            planTripNum: 0,
-            completeTripNum: 0,
-            planBudget: 0,
-            completeBudget: 0,
-            expenditure: 0,
-            savedMoney: 0
+            planTripNum: 0,//计划出差人数(次)
+            completeTripNum: 0,//已完成出差人数(次)
+            planBudget: 0,//计划支出(元)
+            completeBudget: 0,//动态预算(元)
+            expenditure: 0,//累计支出(元)
+            actualExpenditure: 0,//动态预算实际支出(元)
+            savedMoney: 0//节省
         };
 
         if(completeInfo && completeInfo.length > 0 && completeInfo[0].length > 0) {
             let c = completeInfo[0][0];
             ret.completeTripNum = Number(c.tripNum);
-            ret.completeBudget = Number(c.budget);
             ret.expenditure = Number(c.expenditure);
-            ret.savedMoney = Number(c.savedMoney);
         }
-        /*if(savedMoneyCompleteInfo && savedMoneyCompleteInfo.length > 0 && savedMoneyCompleteInfo[0].length > 0) {
+        if(savedMoneyCompleteInfo && savedMoneyCompleteInfo.length > 0 && savedMoneyCompleteInfo[0].length > 0) {
             let c = savedMoneyCompleteInfo[0][0];
+            ret.completeBudget = Number(c.budget);
             ret.savedMoney = Number(c.savedMoney);
-        }*/
+            ret.actualExpenditure = Number(c.expenditure);
+        }
 
         if(planInfo && planInfo.length > 0 && planInfo[0].length > 0) {
             let p = planInfo[0][0];
