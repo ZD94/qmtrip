@@ -13,18 +13,14 @@ angular
         return {
             restrict: 'AE',
             template: require('./span.html'),
-            controller:function($scope, $ionicModal, ngModalDlg){
+            scope:{
+                monthSelection:'=ngModel'
+            },
+            controller:function($scope, $ionicModal, ngModalDlg, $stateParams, Models){
                 require('./spanchange.scss');
-
                 let formatStr = 'YYYY-MM-DD HH:mm:ss';
-
                 let monthSelection = getSpanSelection('month');
                 $scope.monthSelection = monthSelection;
-
-
-
-
-
                 async function searchData() {
                     let month = $scope.monthSelection;
                     let startTime = moment(month.startTime).format(formatStr);
@@ -42,7 +38,9 @@ angular
                     scope: $scope,
                     animation: 'slide-in-up'
                 })
-
+                //判断进入的页面
+                let type = $stateParams.type;
+                console.log(type);
                 //更改时间间隔
                 var span_depend = 'month';
                 let lastClick = 'month';
@@ -84,7 +82,6 @@ angular
                 }
                 //自定义选择日期
                 $scope.selfdefine = false;
-
                 $scope.selfDefineFun = async function(){
                     let value = {
                         begin:moment().startOf('month').subtract(12,'month').toDate(),
@@ -108,6 +105,16 @@ angular
                     await searchData();
                 }
 
+
+                //其他的页面  按员工 按项目 按部门
+                async function initData() {
+                    let ret = await API.tripPlan.statisticBudgetsInfo($scope.monthSelection);
+                    ret = await Promise.all(ret.map(async (s) => {
+                        s.keyInfo = await Models[$scope.modelName].get(s.typeKey);
+                        return s;
+                    }));
+                    $scope.statisticData = ret;
+                }
             }
         }
     })
