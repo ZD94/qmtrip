@@ -396,7 +396,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     $scope.staffSelector = {
         query: async function(keyword) {
             let staff = await Staff.getCurrent();
-            let staffs = await staff.company.getStaffs({where: {id: {$ne: staff.id}}});
+            let staffs = await staff.company.getStaffs();
             return staffs;
         },
         display: (staff)=>staff.name
