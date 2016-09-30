@@ -6,7 +6,7 @@ export default async function BudgetController($scope, $stateParams, Models) {
     API.require('tripPlan');
     await API.onload();
     let type = $stateParams.type;
-
+    console.log('进入控制器：'+type);
     let formatStr = 'YYYY-MM-DD HH:mm:ss';
     let monthSelection = {
         type: type,

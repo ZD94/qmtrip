@@ -31,7 +31,7 @@ class PriceRangePrefer extends AbstractPrefer<IFinalHotel> {
             let d2 = moment(v.checkOutDate);
             let days = d2.diff(d1,"days");
             let oneDayPrice = v.price/days;
-            if (oneDayPrice < self.range[v.star][0] || oneDayPrice > self.range[v.star][1]) {
+            if (self.range && v.star && self.range[v.star] && self.range[v.star][0] && self.range[v.star][1] && oneDayPrice < self.range[v.star][0] || oneDayPrice > self.range[v.star][1]) {
                 v.outPriceRange = true;
                 v['score'] += self.score;
                 v['reasons'].push(`价格在价格区间以外 ${self.score}`)
