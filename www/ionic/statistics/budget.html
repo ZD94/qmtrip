@@ -1,9 +1,11 @@
 <ion-view title="出差统计-本月预算" id="page24">
     <ion-content padding="false" class="has-header" scroll="false">
         <div class="flex-c01">
-            <spanchange class="item item-input date_selected" ng-model="monthSelection">
-
-            </spanchange>
+            <div class="item item-input date_selected">
+                <i class="icon ion-chevron-left" ng-click="monthChange()"></i>
+                <span class="data_show">{{monthSelection.showStr}}</span>
+                <i class="icon ion-chevron-right" ng-click="monthChange(true)"></i>
+            </div>
             <!--<div class="item item-input date_selected">-->
                 <!--<i class="icon ion-chevron-left" ng-click="monthChange()"></i>-->
                 <!--<span class="data_show">{{monthSelection.showStr}}</span>-->
