@@ -1,0 +1,1 @@
+alter table staff.staffs add coin_account_id uuid;

@@ -7,9 +7,10 @@ import {TravelPolicy} from "api/_types/travelPolicy";
 import { Types, Values } from 'common/model';
 import { Department } from 'api/_types/department';
 import { TripPlan } from "api/_types/tripPlan";
-import { Table, Create, Field, Reference } from 'common/model/common';
+import {Table, Create, Field, Reference, ResolveRef} from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import { MoneyChange } from './money-change';
+import {CoinAccount} from "../coin";
 declare var API: any;
 
 export enum ECompanyStatus {
@@ -135,6 +136,14 @@ export class Company extends ModelObject{
         return Models.agency.get(id);
     }
 
+    @ResolveRef({ type: Types.UUID}, Models.coinAccount)
+    get coinAccount(): CoinAccount { return null};
+    set coinAccount(coinAccount: CoinAccount) {}
+
+    @Field({type: Types.NUMERIC(10,2)})
+    get points2coinRate(): number { return 0.5};
+    set points2coinRate(rate: number) {}
+    
     getStaffs(options?: any): Promise<Staff[]> {
         if(!options) {options = {where: {}}};
         if(!options.where) {options.where = {}};

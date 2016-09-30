@@ -9,6 +9,7 @@ import { getSession } from 'common/model';
 import { TableExtends, Table, Create, Field, ResolveRef, Reference, RemoteCall } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import {PaginateInterface} from "common/model/interface";
+import {CoinAccount} from "../coin";
 
 declare var API: any;
 
@@ -105,6 +106,11 @@ export class Staff extends ModelObject implements Account {
     getTravelPolicy(id?:string): Promise<TravelPolicy> {
         return Models.travelPolicy.get(id);
     }
+
+    @ResolveRef({ type: Types.UUID}, Models.coinAccount)
+    get coinAccount(): CoinAccount { return null};
+    set coinAccount(coinAccount: CoinAccount) {}
+
     setTravelPolicy(val: TravelPolicy) {}
 
     getTripPlans(options: {where?: any, limit?: number}): Promise<PaginateInterface<TripPlan>> {
