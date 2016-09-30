@@ -355,7 +355,7 @@ class TripPlanModule {
             //给审核人发审核邮件
             let approveUser = tripApprove.approveUser;
             let approve_url = `${config.host}/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
-            let approve_values = utils.clone(values);
+            let approve_values = clone(values);
             let shortUrl = approve_url
             try {
                 shortUrl = await API.wechat.shorturl({longurl: approve_url});
@@ -415,7 +415,7 @@ class TripPlanModule {
                 EStaffRole.ADMIN], staffStatus: EStaffStatus.ON_JOB, id: {$ne: staff.id}}}); //获取激活状态的管理员
             //给所有的管理员发送邮件
             await Promise.all(admins.map(function(s) {
-                let vals: any = utils.clone(values);
+                let vals: any = clone(values);
                 vals.managerName = s.name;
                 vals.email = staff.email;
                 vals.projectName = tripApprove.title;
@@ -660,7 +660,7 @@ class TripPlanModule {
                 self_values = {
                     username: user.name,
                     planNo: tripPlan.planNo,
-                    approveTime: utils.now(),
+                    approveTime: new Date(),
                     approveUser: staff.name,
                     projectName: tripPlan.title,
                     goTrafficBudget: go,
@@ -691,7 +691,7 @@ class TripPlanModule {
                 self_values = {
                     username: user.name,
                     planNo: "",
-                    approveTime: utils.now(),
+                    approveTime: new Date(),
                     approveUser: staff.name,
                     projectName: tripApprove.title,
                     goTrafficBudget: go,
@@ -779,7 +779,7 @@ class TripPlanModule {
             invoiceJson = JSON.parse(invoiceJson);
         }
 
-        invoiceJson.push({times: times, pictureFileId: JSON.stringify(params.pictureFileId), created_at: utils.now(), status: EPlanStatus.WAIT_COMMIT, remark: '', approve_at: ''});
+        invoiceJson.push({times: times, pictureFileId: JSON.stringify(params.pictureFileId), created_at: new Date(), status: EPlanStatus.WAIT_COMMIT, remark: '', approve_at: ''});
         if(typeof params.pictureFileId =='string') {
             // tripDetail.newInvoice = params.pictureFileId;
             tripDetail.latestInvoice = JSON.stringify([params.pictureFileId]);
@@ -874,7 +874,7 @@ class TripPlanModule {
                 backTrafficBudget: back, hotelBudget: hotel, otherBudget: others, totalBudget: tripPlan.budget, url: auditUrl, detailUrl: auditUrl,
                 approveUser: user.name, tripPlanNo: tripPlan.planNo,
                 content: `企业 ${company.name} 员工 ${staff.name}${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差计划票据已提交，预算：￥${tripPlan.budget}，等待您审核！`,
-                createdAt: utils.now(),
+                createdAt: new Date(),
             };
 
             API.notify.submitNotify({
@@ -993,7 +993,7 @@ class TripPlanModule {
             templateValue.detailUrl = self_url;
             templateValue.url = self_url;
             templateValue.auditUser = '鲸力智享';
-            templateValue.auditTime = utils.now();
+            templateValue.auditTime = new Date();
 
             let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
             await API.notify.submitNotify({key: templateName, values: templateValue, email: staff.email, openid: openId});
@@ -1583,23 +1583,6 @@ class TripPlanModule {
     }
 
     @clientExport
-    static async getIpPosition(params){
-        var stream = Zone.current.get("stream");
-        //select * from place.cities where '辽宁省大连市' like concat(concat('%',name), '%') and type = 2
-        //select * from place.cities where '辽宁省大连市' ~ name and type = 2
-        var position = "";
-        try{
-            position = utils.searchIpAddress(stream.remoteAddress);
-            // position = utils.searchIpAddress("202.103.102.10");
-        }catch(e){
-            throw L.ERR.INVALID_ARGUMENT("IP");
-        }
-        var result = await API.place.getCityByIpPosition(position);
-
-        return result;
-    }
-
-    @clientExport
     @requireParams(['budgetId', 'title'], ['description', 'remark', 'approveUserId'])
     static async saveTripApprove(params) {
         let staff = await Staff.getCurrent();
@@ -1793,7 +1776,7 @@ class TripPlanModule {
         let taskId = "authApproveTrainPlan";
         logger.info('run task ' + taskId);
         scheduler('*/5 * * * *', taskId, async function() {
-            let tripApproves = await Models.tripApprove.find({where: {autoApproveTime: {$lte: utils.now()}, status: EApproveStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
+            let tripApproves = await Models.tripApprove.find({where: {autoApproveTime: {$lte: new Date()}, status: EApproveStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
             tripApproves.map(async (approve) => {
                 approve.status = EApproveStatus.PASS;
                 await approve.save();
@@ -1817,11 +1800,15 @@ async function getProjectByName(params) {
         await project.save();
         return project;
     }else if(params.isCreate === true){
-        let p = {name: params.name, createUser: params.userId, code: '', companyId: params.companyId, createdAt: utils.now()};
+        let p = {name: params.name, createUser: params.userId, code: '', companyId: params.companyId, createdAt: new Date()};
         return Models.project.create(p).save();
     }
 }
 
 TripPlanModule._scheduleTask();
+
+function clone(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
 
 export = TripPlanModule;
