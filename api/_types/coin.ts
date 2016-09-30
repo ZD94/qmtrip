@@ -30,22 +30,27 @@ export class CoinAccount extends ModelObject {
     get id(): string { return Values.UUIDV1()}
     set id(id: string) {}
 
+    //总收入
     @Field({type: Types.BIGINT})
     get income() :number { return 0}
     set income(income: number) {}
 
+    //消费掉的
     @Field({type: Types.BIGINT})
     get consume(): number { return 0}
     set consume(consume: number) {}
 
+    //锁定金额
     @Field({ type: Types.BIGINT})
     get locks(): number { return 0}
     set locks(coins) {}
 
+    //是否允许超支
     @Field({ type: Types.BOOLEAN})
     get isAllowOverCost(): boolean { return false}
     set isAllowOverCost(bool: boolean) {}
-    
+
+    //可用余额
     get balance(): number { return this.income - this.consume - this.locks }
     
     async findChanges(options: any) : Promise<PaginateInterface<CoinAccountChange>> {
