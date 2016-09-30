@@ -1196,19 +1196,25 @@ class TripPlanModule {
 
     @clientExport
     @requireParams([], ['startTime', 'endTime', 'isStaff'])
-    static async statisticTripBudget(params: {startTime?: string, endTime?: string, isStaff?: boolean}) {
+    static async statisticTripBudget(params: {startTime?: Date, endTime?: Date, isStaff?: boolean}) {
         let staff = await Staff.getCurrent();
         let companyId = staff.company.id;
+        let formatStr = 'YYYY-MM-DD HH:mm:ss';
 
         let selectSql = `select count(id) as "tripNum", sum(budget) as budget, sum(expenditure) as expenditure, sum(budget-expenditure) as "savedMoney" from`;
         let completeSql = `trip_plan.trip_plans where deleted_at is null and company_id='${companyId}'`;
 
-        if(params.startTime)
-            completeSql += ` and start_at>='${params.startTime}'`;
-        if(params.endTime)
-            completeSql += ` and start_at<='${params.endTime}'`;
-        if(params.isStaff)
+        if(params.startTime){
+            let startTime = moment(params.startTime).format(formatStr);
+            completeSql += ` and start_at>='${startTime}'`;
+        }
+        if(params.endTime){
+            let endTime = moment(params.endTime).format(formatStr);
+            completeSql += ` and start_at<='${endTime}'`;
+        }
+        if(params.isStaff){
             completeSql += ` and account_id='${staff.id}'`;
+        }
 
         let planSql = `${completeSql}  and status in (${EPlanStatus.WAIT_UPLOAD}, ${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDITING}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.COMPLETE})`;
         completeSql += ` and status=${EPlanStatus.COMPLETE}`;

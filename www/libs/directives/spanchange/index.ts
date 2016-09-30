@@ -14,107 +14,77 @@ angular
             restrict: 'AE',
             template: require('./span.html'),
             scope:{
-                monthSelection:'=ngModel'
+                span:'=ngModel'
             },
-            controller:function($scope, $ionicModal, ngModalDlg, $stateParams, Models){
+            controller:function($scope, $ionicModal, ngModalDlg, $stateParams) {
                 require('./spanchange.scss');
-                let formatStr = 'YYYY-MM-DD HH:mm:ss';
-                let monthSelection = getSpanSelection('month');
-                $scope.monthSelection = monthSelection;
-                async function searchData() {
-                    let month = $scope.monthSelection;
-                    let startTime = moment(month.startTime).format(formatStr);
-                    let endTime = moment(month.endTime).format(formatStr);
-                    let statistic = await API.tripPlan.statisticTripBudget({startTime: startTime, endTime: endTime});
-                    $scope.statistic = statistic;
-                    $scope.saveMoneyChart.data = [statistic.savedMoney || 0, statistic.expenditure || 1];
-                }
-                //新添加的----------------------------------------------shicong
-                //摸态框的调用
-                $scope.showmadel = function(){
-                    $scope.modal.show();
-                }
-                $scope.modal = $ionicModal.fromTemplate(require('./spanchange.html'), {
-                    scope: $scope,
-                    animation: 'slide-in-up'
-                })
-                //判断进入的页面
-                let type = $stateParams.type;
-                console.log(type);
-                //更改时间间隔
-                var span_depend = 'month';
-                let lastClick = 'month';
-                $scope.isweek = false;
-                $scope.ismonth = true;
-                $scope.isquarter = false;
-                $scope.isyear = false;
-                $scope.changespan = async function(span){
-                    if(lastClick){
-                        let last = 'is' + lastClick;
-                        $scope[last] = false;
-                    }
-                    let nowClick = 'is' + span;
-                    $scope[nowClick] = true;
-
-                    let spanSelection = getSpanSelection(span);
-                    span_depend = span;
-                    $scope.monthSelection = spanSelection;
-                    lastClick = span;
-                    $scope.modal.hide();
-                    await searchData();
-                }
-                //改写monthChange函数 改变时间
-
-                $scope.monthChange = async function(isAdd?: boolean) {
-                    let optionFun = isAdd ? 'add' : 'subtract';
-                    let querySpan = moment( $scope.monthSelection.month)[optionFun](1, span_depend);
-                    $scope.monthSelection = getSpanSelection(span_depend,querySpan);
-
-                    await searchData();
+                let span = $scope.span;
+                $scope.interval = calculateInterval(span);
+                $scope.monthChange = function (x: number) {
+                    $scope.span.startTime = moment($scope.span.startTime).add(x, $scope.interval).toDate();
+                    $scope.span.endTime = moment($scope.span.endTime).add(x, $scope.interval).toDate();
+                    console.log('change', $scope.span);
                 };
-                function getSpanSelection(span_depend,querySpan = moment()){
-                    let spanSelections = {
-                        month: querySpan.format('YYYY-MM-DD'),
-                        startTime: querySpan.startOf(span_depend).toDate(),
-                        endTime: querySpan.endOf(span_depend).toDate()
-                    }
-                    return spanSelections;
-                }
-                //自定义选择日期
-                $scope.selfdefine = false;
-                $scope.selfDefineFun = async function(){
-                    let value = {
-                        begin:moment().startOf('month').subtract(12,'month').toDate(),
-                        end:moment().endOf('month').toDate()
-                    }
-                    value = await ngModalDlg.selectDateSpan($scope, {
-                        beginDate:value.begin,
-                        endDate: value.end,
-                        timepicker: false,
-                        title: '选择开始时间',
-                        titleEnd: '选择结束时间',
-                        fromStatistic: true
-                    }, value);
-                    let selfSelection = {
-                        month: moment().format('YYYY-MM'),
-                        startTime: moment(value.begin).toDate(),
-                        endTime: moment(value.end).toDate()
-                    };
-                    $scope.monthSelection = selfSelection;
-                    $scope.modal.hide();
-                    await searchData();
-                }
-
-
-                //其他的页面  按员工 按项目 按部门
-                async function initData() {
-                    let ret = await API.tripPlan.statisticBudgetsInfo($scope.monthSelection);
-                    ret = await Promise.all(ret.map(async (s) => {
-                        s.keyInfo = await Models[$scope.modelName].get(s.typeKey);
-                        return s;
-                    }));
-                    $scope.statisticData = ret;
+                $scope.showmadel = async function () {
+                    let ret = await ngModalDlg.createDialog({
+                        parent: $scope,
+                        scope: {span, interval: $scope.interval},
+                        template: require('./spanchange.html'),
+                        controller: SpanChangeController,
+                    });
+                    $scope.span = ret.span;
+                    $scope.interval = ret.interval;
                 }
             }
         }
+    });
+
+function calculateInterval(span:{startTime:Date, endTime:Date}){
+    let end = moment(span.endTime);
+    if(moment(span.startTime).add(1, 'years').isSame(end))
+        return 'years';
+    if(moment(span.startTime).add(1, 'quarters').isSame(end))
+        return 'quarters';
+    if(moment(span.startTime).add(1, 'months').isSame(end))
+        return 'months';
+    if(moment(span.startTime).add(1, 'weeks').isSame(end))
+        return 'weeks';
+    return 'other';
+}
+
+const intervals = {
+    weeks:'周',
+    months:'M',
+    quarters:'Q',
+    years:'Y',
+};
+function SpanChangeController($scope, ngModalDlg){
+    $scope.intervals = intervals;
+    $scope.$watch('interval', function(n, o){
+        if(n != o){
+            if(n !== 'other'){
+                let start = moment($scope.span.startTime).startOf($scope.interval);
+                $scope.span.startTime = start.toDate();
+                $scope.span.endTime = start.add(1, $scope.interval).toDate();
+            }
+        }
     })
+
+    $scope.selfDefineFun = async function(){
+        let value = {
+            begin: $scope.span.startTime,
+            end: $scope.span.endTime
+        }
+        value = await ngModalDlg.selectDateSpan($scope, {
+            beginDate:value.begin,
+            endDate: value.end,
+            timepicker: false,
+            title: '选择开始时间',
+            titleEnd: '选择结束时间',
+            fromStatistic: true
+        }, value);
+        $scope.span.startTime = value.begin;
+        $scope.span.endTime = value.end;
+    };
+    console.log('指令t', $scope.span);
+}

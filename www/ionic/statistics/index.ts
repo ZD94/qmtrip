@@ -3,23 +3,33 @@ import moment = require("moment");
 export default async function IndexController($scope, $ionicModal, ngModalDlg) {
     require('./statistics.scss');
     API.require("tripPlan");
-    await API.onload();
-
+    var now = moment();
+    var data = $scope.data = {
+        monthSelection: {
+            startTime: now.startOf('month').toDate(),
+            endTime: now.add(1, 'month').startOf('month').toDate(),
+        }
+    };
+    $scope.statistic = {};
 
     $scope.saveMoneyChart = {};
     $scope.saveMoneyChart.labels = ["本月节省", "本月支出"];
     $scope.saveMoneyChart.options = {cutoutPercentage: 70};
     $scope.saveMoneyChart.dataset = {backgroundColor: ['#4A90E2', '#B9C9DB'], borderWidth: [1, 1]};
-    //第一次进入的时候执行一遍
-    let formatStr = 'YYYY-MM-DD HH:mm:ss';
-    async function searchFirstData() {
-        let month = $scope.monthSelection;
-        let startTime = moment().startOf('month').format(formatStr);
-        let endTime = moment().endOf('month').format(formatStr);
-        let statistic = await API.tripPlan.statisticTripBudget({startTime: startTime, endTime: endTime});
-        $scope.statistic = statistic;
-        $scope.saveMoneyChart.data = [statistic.savedMoney || 0, statistic.expenditure || 1];
-    }
 
-    await searchFirstData();
+    async function searchData() {
+        await API.onload();
+        $scope.statistic = await API.tripPlan.statisticTripBudget(data.monthSelection);
+        $scope.saveMoneyChart.data = [$scope.statistic.savedMoney || 0, $scope.statistic.expenditure || 1];
+        $scope.$applyAsync();
+    }
+    console.log('in')
+    console.log('外层控制器', data.monthSelection);
+    $scope.$watch('data.monthSelection',function (o,n) {
+        if(o!=n){
+            console.log(data.monthSelection);
+        }
+        searchData();
+    },true);
+
 }
