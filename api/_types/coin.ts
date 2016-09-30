@@ -7,6 +7,7 @@ import {ModelObject} from "common/model/object";
 import {Table, Field, Create} from "common/model/common";
 import {Models} from "./index";
 import {Types, Values} from "common/model/index";
+import {PaginateInterface} from "common/model/interface";
 
 enum COIN_CHANGE_TYPE {
     INCOME = 1,
@@ -47,7 +48,7 @@ export class CoinAccount extends ModelObject {
     
     get balance(): number { return this.income - this.consume - this.locks }
     
-    async findChanges(options: any) {
+    async findChanges(options: any) : Promise<PaginateInterface<CoinAccountChange>> {
         if (!options) {
             options = {}
         }
@@ -67,7 +68,7 @@ export class CoinAccount extends ModelObject {
         return await self.save();
     }
 
-    async costCoin(coins: number, remark?: string) {
+    async costCoin(coins: number, remark?: string) : Promise<CoinAccount>{
         let self = this;
         let balance = self.balance;
 
@@ -81,7 +82,7 @@ export class CoinAccount extends ModelObject {
         return await self.save();
     }
 
-    async lockCoin(coins: number, remark?: string) {
+    async lockCoin(coins: number, remark?: string) :Promise<CoinAccount>{
         let self = this;
         let log = await Models.coinAccountChange.create({type: COIN_CHANGE_TYPE.LOCK, coinAccountId: self.id, coins: coins, remark: remark});
         log = await log.save();
@@ -89,7 +90,7 @@ export class CoinAccount extends ModelObject {
         return self.save();
     }
 
-    async freeCoin(coins: number, remark?: string) {
+    async freeCoin(coins: number, remark?: string) :Promise<CoinAccount> {
         let self = this;
         if (self.locks < coins) {
             throw new Error('解锁金额大于锁定金额');

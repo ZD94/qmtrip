@@ -140,6 +140,10 @@ export class Company extends ModelObject{
     get coinAccount(): CoinAccount { return null};
     set coinAccount(coinAccount: CoinAccount) {}
 
+    @Field({type: Types.NUMERIC(10,2)})
+    get points2coinRate(): number { return 0.5};
+    set points2coinRate(rate: number) {}
+    
     getStaffs(options?: any): Promise<Staff[]> {
         if(!options) {options = {where: {}}};
         if(!options.where) {options.where = {}};
