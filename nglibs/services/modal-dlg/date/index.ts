@@ -187,6 +187,8 @@ function calendarController($scope, $element, value){
     if($scope.options.timepicker) {
         $scope.timeScale = timeScale;
         $scope.timeMax = 24 * 60 / timeScale;
+    }else{
+        $scope.timeScale = 10;
     }
 
     $scope.valid = {
@@ -278,6 +280,7 @@ export function selectDateSpanController($scope, $element, $ionicPopup) {
     $scope.$watch('selected.day', function(n, o) {
         $scope.dayOptions.selected = $scope.selected.day;
     });
+
 }
 
 
@@ -311,8 +314,18 @@ function loadMonths($scope, $element) {
             $scope.month_2col = true;
         fixMonths($scope);
     });
-
     $scope.months = [];
+    //shicong
+    let fromStatistic = $scope.options.fromStatistic;
+    function loadBeforeYear(){
+        let year = moment().year()-1;
+        let month = moment().month();
+        let calResult = getMonth(year, month+1);
+        $scope.months.push(calResult);
+    }
+    if(fromStatistic){
+        loadBeforeYear();
+    }
     function loadNextMonth() {
         let date;
         if($scope.months.length == 0){
@@ -325,13 +338,14 @@ function loadMonths($scope, $element) {
         let caldata = getMonth(date.year(), date.month() + 1);
         $scope.months.push(caldata);
     }
+    loadNextMonth();
+    loadNextMonth();
 
-    loadNextMonth();
-    loadNextMonth();
     $scope.loadNextMonth = function() {
         loadNextMonth();
         loadNextMonth();
         fixMonths($scope);
         //$scope.$broadcast('scroll.infiniteScrollComplete');
     }
+
 }

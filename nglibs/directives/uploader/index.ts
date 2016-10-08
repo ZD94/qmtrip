@@ -1,6 +1,7 @@
 "use strict";
 
 import angular = require('angular');
+import * as path from 'path';
 import { wechatUploaderController } from './uploader-wechat';
 import { showPreviewDialog } from './preview-dialog';
 
@@ -37,14 +38,22 @@ function ngUploader($loading, wxApi): any {
             }
             return require('./uploader-std.html');
         },
-        controller: function($scope, $element, $transclude, $injector, FileUploader, ngModalDlg){
+        controller: function($scope, $element, $transclude, $injector, $location, FileUploader, ngModalDlg){
             $element.css('position', 'relative');
             $transclude($scope, function(clone) { $element.append(clone); });
+            var upload_url = $scope.url || '/upload/ajax-upload-file?type=image';
             var uploader = $scope.uploader = new FileUploader({
-                url: $scope.url || '/upload/ajax-upload-file?type=image',
+                url: upload_url,
                 alias: $scope.name || 'tmpFile',
                 autoUpload: false
             });
+            if(!upload_url.match(/^https?:\/\//)){
+                var config = require('config');
+                config.$ready.then(()=>{
+                    upload_url = path.normalize(path.join(config.update, upload_url));
+                    $scope.uploader.url = upload_url;
+                })
+            }
             var fileIds = [];
             uploader.onAfterAddingAll = async function(files) {
                 var urls = files.map((file)=>file._file)

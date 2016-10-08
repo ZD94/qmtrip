@@ -6,6 +6,7 @@
     "outDir": "tmp/tsreq",
     "noEmitHelpers": true,
     "sourceMap": true,
+    "declaration": true,
     "experimentalDecorators": true,
     "noImplicitUseStrict": false,
     "allowSyntheticDefaultImports": true,
@@ -15,8 +16,10 @@
     }
   },
   "compilerOptionsNotUsing": {
-    "declaration": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "noUnusedLocals": true
   },
   "exclude": [
     "node_modules",

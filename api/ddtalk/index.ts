@@ -17,8 +17,8 @@ const config ={
 }
 
 import request = require('request');
-import ISVApi = require("./lib/isvApi");
-import CorpApi = require("./lib/corpApi");
+import ISVApi from "./lib/isvApi";
+import CorpApi from "./lib/corpApi";
 import {reqProxy} from "./lib/reqProxy";
 import {Company} from "api/_types/company";
 import {Staff, EStaffRole} from "api/_types/staff";

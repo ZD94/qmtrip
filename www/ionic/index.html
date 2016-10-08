@@ -1,13 +1,11 @@
-﻿<ion-side-menus enable-menu-with-back-views="false">
+﻿<ion-side-menus enable-menu-with-back-views="false" class="toplevel-side-menu">
     <ion-side-menu side="left" expose-aside-when="large">
-        <!--
-        <ion-header-bar class="bar-stable">
-           <div class="title">菜单</div>
-        </ion-header-bar>
-        -->
+        <!--<ion-header-bar class="bar-stable">-->
+           <!--<div class="title">菜单</div>-->
+        <!--</ion-header-bar>-->
         <ion-content padding="false" scroll="false" class="side-menu-left">
             <div class="flex-c010">
-                <a ng-href="#/staff/staffInfo" menu-close>
+                <a ng-href="#/staff/staff-info" menu-close>
                     <ion-item class="item-thumbnail-left menu-button">
                         <div class="menu-portrait">
                             {{currentStaff.name.substring(currentStaff.name.length-2,currentStaff.name.length)}}

@@ -1,10 +1,7 @@
-///<reference path="popup/index.ts"/>
-
 import { ngService } from '../../index';
 import { selectFromListController } from './list';
 import { selectMapPointController } from './map';
 import { selectDateController, selectDateSpanController } from './date';
-import { selectModeController } from "./popup";
 
 interface DialogOptions{
     scope: any;
@@ -15,7 +12,7 @@ interface DialogOptions{
 }
 @ngService('ngModalDlg')
 class ngModalDlg {
-    constructor(private $ionicModal, private $ionicPopup, private $injector) {
+    constructor(private $ionicModal, private $injector) {
         require('./modal-dialog.scss');
     }
 
@@ -97,14 +94,6 @@ class ngModalDlg {
             template: require('./date/datespan-dialog.html'),
             controller: selectDateSpanController
         });
-    }
-    selectMode($scope, options) {
-        return this.createDialog({
-            parent: $scope,
-            scope: {options},
-            template: require('./popup/confirm.html'),
-            controller:selectModeController
-        })
     }
 }
 

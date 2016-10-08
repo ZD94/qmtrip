@@ -41,18 +41,29 @@ export function loadDefaultPrefer(qs: any, type?: string) {
 }
 
 export var hotelPrefers = {
-    starMatch: require('./hotel-starMatch'),
+    starMatch: require('./hotel-star-match'),
     blackList: require('./hotel-blacklist'),
     represent: require('./hotel-represent'),
-    maxPriceLimit: require('./hotel-maxPriceLimit'),
+    maxPriceLimit: require('./hotel-max-price-limit'),
     price: require('./hotel-price'),
+    priceRange: require('./hotel-pricerange')
 }
 
 export var ticketPrefers = {
     arrivalTime: require('./ticket-arrivaltime'),
-    cheapSupplier: require('./ticket-cheapsupplier'),
     selectTraffic: require('./ticket-selectTrafficByTime'),
-    cabin: require('./ticket-cabin'),
     departTime: require('./ticket-departtime'),
     trafficPrefer: require('./ticket-trafficprefer'),
+    cheapSupplier: require('./ticket-cheapsupplier'),
+    cabin: require('./ticket-cabin'),
+    runningTimePrefer: require('./ticket-runningTimePrefer'),
+    departStandardTimePrefer: require('./ticket-departStandardTimePrefer'),
+    arriveStandardTimePrefer: require('./ticket-arriveStandardTimePrefer'),
+    trainDurationPrefer: require('./ticket-trainDurationPrefer'),
+    latestArrivalTimePrefer: require('./ticket-latestArrivalTimePrefer'),
+    earliestGoBackTimePrefer: require('./ticket-earliestGoBackTimePrefer'),
+    trainPricePrefer: require('./ticket-trainPricePrefer'),
+    planePricePrefer: require('./ticket-planePricePrefer'),
+    permitOnlySupplier: require('./ticket-permitOnlySupplier'),
+    priorSupplier: require('./ticket-priorSupplier')
 }

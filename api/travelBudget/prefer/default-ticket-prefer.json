@@ -1,36 +1,5 @@
 [
   {
-    "name": "arrivalTime",
-    "options": {
-      "score": -20000,
-      "begin": "",
-      "end": "<%=leaveDate%> <%=latestArrivalTime%>"
-    }
-  },
-  {
-    "name": "departTime",
-    "options": {
-      "score": -20000,
-      "begin": "<%=leaveDate%> <%=earliestLeaveTime%>",
-      "end": ""
-    }
-  },
-  {
-    "name": "cabin",
-    "options": {
-      "score": 10000
-    }
-  },
-  {
-    "name": "selectTraffic",
-    "options": {
-      "selectTrainDuration": 360,
-      "selectFlightDuration": 210,
-      "score": 10000,
-      "commonTrainScore": -1000
-    }
-  },
-  {
     "name": "preferAgent",
     "options": {
       "expectedAgents": ["ctrip", "携程", "同城", "南航", "中航", "中国航空公司"],
@@ -40,7 +9,91 @@
   {
     "name": "cheapSupplier",
     "options": {
-      "score": -100
+      "score": -100000,
+      "cheapSuppliers": ["9C", "KN", "HO", "PN", "EU", "AQ", "JR"]
+    }
+  },
+  {
+    "name": "permitOnlySupplier",
+    "options": {
+      "score": -100000,
+      "permitSuppliers": ["CJ", "CN", "FM"]
+    }
+  },
+  {
+    "name": "priorSupplier",
+    "options": {
+      "score": 5000,
+      "priorSuppliers": ["CJ", "CN", "FM"]
+    }
+  },
+  {
+    "name": "cabin",
+    "options": {
+      "score": 100000
+    }
+  },
+  {
+    "name": "runningTimePrefer",
+    "options": {
+      "trainScore": 250,
+      "planeScore": 500,
+      "trainScoreInterval": 5,
+      "planeScoreInterval": 5
+    }
+  },
+  {
+    "name": "departStandardTimePrefer",
+    "options": {
+      "score": 500,
+      "scoreInterval": -3,
+      "begin": "<%=leaveDate%> 8:00",
+      "end": "<%=leaveDate%> 16:00"
+    }
+  },
+  {
+    "name": "arriveStandardTimePrefer",
+    "options": {
+      "score": 500,
+      "scoreInterval": -3,
+      "begin": "<%=leaveDate%> 9:00",
+      "end": "<%=leaveDate%> 19:00"
+    }
+  },
+  {
+    "name": "trainDurationPrefer",
+    "options": {
+      "trainDuration": 360,
+      "score": 100000
+    }
+  },
+  {
+    "name": "earliestGoBackTimePrefer",
+    "options": {
+      "score": 100000,
+      "earliestGoBackTime": "<%=goBackDate%> <%=earliestGoBackTime%>"
+    }
+  },
+  {
+    "name": "latestArrivalTimePrefer",
+    "options": {
+      "score": 100000,
+      "latestArrivalTime": "<%=leaveDate%> <%=latestArrivalTime%>"
+    }
+  },
+  {
+    "name": "trainPricePrefer",
+    "options": {
+      "score": 1000
+    }
+  },
+  {
+    "name": "planePricePrefer",
+    "options": {
+      "score": 10000,
+      "percent": 0.2,
+      "cabins": ["Economy","PremiumEconomy","Business","First"],
+      "type": "square"
     }
   }
 ]

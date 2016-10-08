@@ -2,12 +2,7 @@
  * Created by by wyl on 15-12-16.
  */
 'use strict';
-var moment = require("moment");
-var formidable = require('formidable');
 var config = require('config');
-var fs = require('fs');
-var path = require('path');
-import crypto = require("crypto");
 var API = require("common/api");
 var requestProxy = require('express-request-proxy');
 

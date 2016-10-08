@@ -3,11 +3,11 @@
  */
 
 'use strict';
-import {ITicket, IFinalTicket, TRAFFIC, TravelBudgeItem, IHotel, IFinalHotel} from "api/_types/travelbudget";
+import {ITicket, IFinalTicket, TravelBudgeItem, IHotel, IFinalHotel} from "api/_types/travelbudget";
 import {ticketPrefers, hotelPrefers} from '../prefer'
 import {EInvoiceType} from "api/_types/tripPlan";
 import {IPrefer} from '../prefer'
-import {Models} from "../../_types/index";
+import {Models} from "api/_types/index";
 
 function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
     let _tickets : IFinalTicket[] = [];
@@ -31,7 +31,7 @@ function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
                     price: cabin.price,
                     remainNum: cabin.remainNum,
                     bookUrl: agents[j].bookUrl,
-                    duration: tickets[i].duration,
+                    duration: tickets[i].duration || ((new Date(tickets[i].arrivalDateTime).valueOf() - new Date(tickets[i].departDateTime).valueOf())/(60*1000)),
                     type: tickets[i].type,
                 } as IFinalTicket
                 _tickets.push(_ticket);
@@ -54,14 +54,17 @@ function formatHotel(hotels: IHotel[]) : IFinalHotel[] {
                 star: hotel.star,
                 price: agents[j].price,
                 bookUrl: agents[j].bookUrl,
-                agent: agents[j].name
+                agent: agents[j].name,
+                checkInDate: hotel.checkInDate,
+                checkOutDate: hotel.checkOutDate,
+                outPriceRange: false
             } as IFinalHotel)
         }
     }
     return _hotels;
 }
 
-abstract class AbstractHotelStrategy {
+export abstract class AbstractHotelStrategy {
     private prefers: IPrefer<IFinalHotel>[];
     private isRecord: boolean;
 
@@ -166,7 +169,7 @@ export class HighPriceHotelStrategy extends AbstractHotelStrategy {
     }
 }
 
-abstract class AbstractTicketStrategy {
+export abstract class AbstractTicketStrategy {
     private prefers: IPrefer<IFinalTicket>[];
     private isRecord: boolean;
 
@@ -177,7 +180,6 @@ abstract class AbstractTicketStrategy {
             this.isRecord = false;
         }
 
-        let d = new Date();
         this.prefers = [];
     }
 
@@ -294,7 +296,7 @@ export class TrafficBudgetStrategyFactory {
 
 export class HotelBudgetStrategyFactory {
     static async getStrategy(qs, options) {
-        let policy = qs.policy;
+        //let policy = qs.policy;
         let prefers = qs.prefers;
         let strategy = new CommonHotelStrategy(qs, options);
         for(let p of prefers) {

@@ -8,7 +8,6 @@ import assert = require("assert");
 import {Models} from 'api/_types';
 import {getSession} from 'common/model';
 import {EInvoiceType, ETripType} from 'api/_types/tripPlan'
-import async = Q.async;
 
 var agencyId = "";
 var agencyUserId = "";
@@ -16,7 +15,6 @@ var companyId = "";
 var staffId = "";
 var tripPlanId = "";
 var tripDetailId = '';
-let tripPlanIds = [];
 
 describe("api/tripPlan", function() {
     var agencyDefault = {email: "tripPlanAgency.test@jingli.tech", userName: "白菜帮九袋长老", name: '白菜帮', mobile: "15269866803", title: '计划单测试用代理商'};
@@ -98,7 +96,7 @@ describe("api/tripPlan", function() {
     }
     describe("saveTripPlan", function(){
         it("#saveTripPlan should be ok", function(done){
-            let budgetId = 'cache:budgets:ed4e1520-2234-11e6-89a0-43b37ebb0409:1464756130662p4xkW3';
+            //let budgetId = 'cache:budgets:ed4e1520-2234-11e6-89a0-43b37ebb0409:1464756130662p4xkW3';
             API.tripPlan.saveTripPlan({budgetId: '146416455072613g0yw', title: '新增出差计划测试'})
                 .then(function(ret) {
                     console.info("saveTripPlan success...");

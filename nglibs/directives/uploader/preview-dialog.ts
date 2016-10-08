@@ -17,7 +17,7 @@ export function showPreviewDialog($scope, ngModalDlg, files, title): Promise<any
 }
 
 async function previewImageController($scope, $element){
-    dyload('/script/libs/bundle.img.js')
+    dyload('script/libs/bundle.img.js')
     var files = $scope.files;
 
     var $el = $element.find(".preview_img");
@@ -94,7 +94,7 @@ async function loadFileImage(url){
 }
 
 async function getOrient(img): Promise<number>{
-    await dyload('/script/libs/bundle.img.js');
+    await dyload('script/libs/bundle.img.js');
     var EXIF = require("exif-js");
     return new Promise<number>(function(resolve, reject) {
         EXIF.getData(img, function() {
@@ -110,7 +110,7 @@ async function image2Canvas(img): Promise<HTMLCanvasElement>{
         orient = await getOrient(img);
     }
     if(orient != 1) {
-        await dyload('/script/libs/bundle.img.js');
+        await dyload('script/libs/bundle.img.js');
         let exifOrient = require("exif-orient");
         let exifOrientAsync = Promise.promisify<HTMLCanvasElement, HTMLImageElement, number>(exifOrient);
         return exifOrientAsync(img, orient);

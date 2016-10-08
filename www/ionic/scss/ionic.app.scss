@@ -18,7 +18,9 @@ $dark:                            #444 !default;
 // The path for our ionicons font files, relative to the built CSS in www/css
 $ionicons-font-path: "../../fonts/ionic" !default;
 $menu-side-shadow: none;
-
+/*****媒体查询start******/
+$modal-inset-mode-break-point: 767px;
+/*****媒体查询end******/
 $popup-background-color: white;
 $popup-border-radius: 5px;
 $z-index-popup: 100;
@@ -31,7 +33,7 @@ html {
   height: 100%;
 }
 
-.overflow-scroll {
+.overflow-scroll , .overflow-scroll.scroll-y {
   overflow-y: auto;
 }
 
@@ -53,6 +55,10 @@ body {
     background-color: transparent !important;
     ion-view {
       @include app-background;
+      //全局content内item边框颜色
+      .opactic,.jl_projectinfo .item{
+        border-color: rgba(255,255,255,.3);
+      }
     }
   }
 }
@@ -217,4 +223,22 @@ ion-content {
 //item-small
 .item-small{
   font-size:$font-size-small;
+}
+
+
+//筛选buttonbar
+.sub-button-bar{
+  &.button-bar .button{
+    border: none;
+    padding: 0 8px;
+  }
+}
+
+textarea {
+  background-color: lighten($dark, 72%);
+  padding: 10px;
+  resize: none;
+}
+.item-input textarea{
+  width: 60%;
 }

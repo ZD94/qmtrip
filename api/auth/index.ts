@@ -2,42 +2,29 @@
  * @module auth
  */
 "use strict";
-import {requireParams, clientExport} from "../../common/api/helper";
+import { requireParams, clientExport } from "../../common/api/helper";
 import { Models, EAccountType } from "api/_types";
-import {AuthCert, Token, Account, AccountOpenid, ACCOUNT_STATUS} from "api/_types/auth";
-import {Staff, EInvitedLinkStatus} from "api/_types/staff";
+import { Account, ACCOUNT_STATUS } from "api/_types/auth";
+import { Staff, EInvitedLinkStatus } from "api/_types/staff";
 import validator = require('validator');
-import _ = require('lodash');
-import { getSession } from 'common/model';
+import L from 'common/language';
+import cache = require("common/cache");
+import * as authentication from './authentication';
+import * as wechat from './wechat';
 
-var sequelize = require("common/model").DB;
-var DBM = sequelize.models;
 var uuid = require("node-uuid");
-var L = require("common/language");
 var C = require("config");
-var QRCODE_LOGIN_URL = '/auth/qrcode-login';
+let msgConfig = C.message;
 var moment = require("moment");
 var API = require("common/api");
 var utils = require("common/utils");
-var Logger = require("common/logger");
-var logger = new Logger('auth');
-import cache = require("common/cache");
-let msgConfig = C.message;
 var accountCols = Account['$fieldnames'];
-
-
-
-
-var ACCOUNT_TYPE = {
-    COMPANY_STAFF: 1,
-    AGENT_STAFF: 2
-}
 
 /**
  * @class API.auth 认证类
  * @constructor
  */
-class ApiAuth {
+export default class ApiAuth {
 
     static __public: boolean = true;
 
@@ -47,41 +34,41 @@ class ApiAuth {
      * @returns {{accountId: null, sign: any, expireAt: number}}//为下一步重置密码生成验证凭证
      */
     @clientExport
-    @requireParams(['mobile', 'msgCode','msgTicket'])
-    static async validateMsgCheckCode(params:{mobile: string, msgCode: string, msgTicket: string}){
+    @requireParams(['mobile', 'msgCode', 'msgTicket'])
+    static async validateMsgCheckCode(params: {mobile: string, msgCode: string, msgTicket: string}) {
         var mobile = params.mobile;
         var msgCode = params.msgCode;
         var msgTicket = params.msgTicket;
 
-        if (!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
+        if(!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
             throw L.ERR.MOBILE_NOT_CORRECT();
         }
 
         var accounts = await Models.account.find({where: {mobile: mobile}});
         var account = Account.create();
-        if(accounts && accounts.length > 0){
+        if(accounts && accounts.length > 0) {
             account = accounts[0];
-        }else{
+        } else {
             throw L.ERR.ACCOUNT_NOT_EXIST();
         }
 
-        if (!msgCode || !msgTicket) {
+        if(!msgCode || !msgTicket) {
             throw L.ERR.CODE_ERROR();
         }
 
-        var result =  await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
-        if(result){
+        var result = await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
+        if(result) {
             var checkcodeToken = utils.getRndStr(6);
             account.checkcodeToken = checkcodeToken;
             account.isValidateMobile = true;
-            if(account.status == ACCOUNT_STATUS.NOT_ACTIVE){
+            if(account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
                 account.status = ACCOUNT_STATUS.ACTIVE;
             }
             await account.save();
-            var expireAt = Date.now() +20 * 60 * 1000;//失效时间20分钟
+            var expireAt = Date.now() + 20 * 60 * 1000;//失效时间20分钟
             var sign = makeActiveSign(checkcodeToken, account.id, expireAt);
             return {accountId: account.id, sign: sign, expireAt: expireAt};
-        }else{
+        } else {
             throw L.ERR.CODE_ERROR();
         }
     }
@@ -97,31 +84,31 @@ class ApiAuth {
      * @return {Promise}
      */
     @clientExport
-    static async resetPwdByMobile (params: {accountId: string, sign: string, timestamp: number, pwd: string}){
+    static async resetPwdByMobile(params: {accountId: string, sign: string, timestamp: number, pwd: string}) {
         var accountId = params.accountId;
         var sign = params.sign;
         var timestamp = params.timestamp;
         var pwd = params.pwd;
 
-        if (!Boolean(timestamp) || timestamp < Date.now()) {
+        if(!Boolean(timestamp) || timestamp < Date.now()) {
             throw L.ERR.TIMESTAMP_TIMEOUT();
         }
 
-        if (!accountId) {
+        if(!accountId) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
         }
 
-        if (!sign) {
+        if(!sign) {
             throw L.ERR.SIGN_ERROR();
         }
 
-        if (!pwd) {
+        if(!pwd) {
             throw L.ERR.PWD_EMPTY();
         }
 
         var account = await Models.account.get(accountId);
         var _sign = makeActiveSign(account.checkcodeToken, accountId, timestamp);
-        if (_sign.toLowerCase() != sign.toLowerCase()) {
+        if(_sign.toLowerCase() != sign.toLowerCase()) {
             throw L.ERR.SIGN_ERROR();
         }
         pwd = utils.md5(pwd);
@@ -144,37 +131,37 @@ class ApiAuth {
      * @return {Promise} true|error
      */
     @clientExport
-    static async resetPwdByEmail (params: {accountId: string, sign: string, timestamp: number, pwd: string}) {
+    static async resetPwdByEmail(params: {accountId: string, sign: string, timestamp: number, pwd: string}) {
 
         var accountId = params.accountId;
         var sign = params.sign;
         var timestamp = params.timestamp;
         var pwd = params.pwd;
 
-        if (!Boolean(timestamp) || timestamp < Date.now()) {
+        if(!Boolean(timestamp) || timestamp < Date.now()) {
             throw L.ERR.TIMESTAMP_TIMEOUT();
         }
 
-        if (!accountId) {
+        if(!accountId) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
         }
 
-        if (!sign) {
+        if(!sign) {
             throw L.ERR.SIGN_ERROR();
         }
 
-        if (!pwd) {
+        if(!pwd) {
             throw L.ERR.PWD_EMPTY();
         }
 
         var account = await Models.account.get(accountId);
 
         var _sign = makeActiveSign(account.pwdToken, accountId, timestamp);
-        if (_sign.toLowerCase() != sign.toLowerCase()) {
+        if(_sign.toLowerCase() != sign.toLowerCase()) {
             throw L.ERR.SIGN_ERROR();
         }
         account.pwd = utils.md5(pwd);
-        if(account.status == ACCOUNT_STATUS.NOT_ACTIVE){
+        if(account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
             account.status = ACCOUNT_STATUS.ACTIVE;
         }
         account.isValidateEmail = true;
@@ -189,17 +176,17 @@ class ApiAuth {
      * @returns {boolean}
      */
     @clientExport
-    static async reSendActiveLink (params:{email:string, accountId?: string}):Promise<boolean> {
+    static async reSendActiveLink(params: {email: string, accountId?: string}): Promise<boolean> {
         var mobileOrEmail = params.email;
         var accountId = params.accountId;
         var account = Account.create();
-        if(accountId){
+        if(accountId) {
             account = await Models.account.get(accountId);
-        }else{
-            var accounts = await Models.account.find({where : {$or : [{email: mobileOrEmail}, {mobile: mobileOrEmail}]}});
-            if(accounts && accounts.length>0){
+        } else {
+            var accounts = await Models.account.find({where: {$or: [{email: mobileOrEmail}, {mobile: mobileOrEmail}]}});
+            if(accounts && accounts.length > 0) {
                 account = accounts[0];
-            }else{
+            } else {
                 throw L.ERR.ACCOUNT_NOT_EXIST();
             }
         }
@@ -225,31 +212,31 @@ class ApiAuth {
      * @public
      */
     @clientExport
-    static async activeByEmail (data: {sign: string, accountId: string, timestamp: number}) : Promise<any> {
+    static async activeByEmail(data: {sign: string, accountId: string, timestamp: number}): Promise<any> {
         var sign = data.sign;
         var accountId = data.accountId;
         var timestamp = data.timestamp;
         var account = await Models.account.get(accountId);
 
-        if(account.isValidateEmail){
+        if(account.isValidateEmail) {
             throw {code: -1, msg: "您的邮箱已激活"};
         }
         //失效了
         var nowTime = Date.now();
-        if (timestamp<0 || nowTime - timestamp > 0) {
+        if(timestamp < 0 || nowTime - timestamp > 0) {
             throw L.ERR.ACTIVE_URL_INVALID();
         }
 
-        if(!account){
+        if(!account) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
         }
 
         var needSign = makeActiveSign(account.activeToken, accountId, timestamp)
-        if (sign.toLowerCase() != needSign.toLowerCase()) {
+        if(sign.toLowerCase() != needSign.toLowerCase()) {
             throw L.ERR.ACTIVE_URL_INVALID();
         }
 
-        if(account.status == ACCOUNT_STATUS.NOT_ACTIVE){
+        if(account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
             account.status = ACCOUNT_STATUS.ACTIVE;
         }
         account.activeToken = null;
@@ -264,37 +251,37 @@ class ApiAuth {
      * @returns {Account}
      */
     @clientExport
-    @requireParams(['mobile','msgCode','msgTicket'])
-    static async activeByMobile (data: {mobile: string, msgCode: string, msgTicket: number}) : Promise<any> {
+    @requireParams(['mobile', 'msgCode', 'msgTicket'])
+    static async activeByMobile(data: {mobile: string, msgCode: string, msgTicket: number}): Promise<any> {
         var mobile = data.mobile;
         var msgCode = data.msgCode;
         var msgTicket = data.msgTicket;
 
-        if (!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
+        if(!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
             throw L.ERR.MOBILE_NOT_CORRECT();
         }
 
-        if (!msgCode || !msgTicket) {
+        if(!msgCode || !msgTicket) {
             throw L.ERR.CODE_ERROR();
         }
-        var accounts = await Models.account.find({where : {mobile: mobile}});
+        var accounts = await Models.account.find({where: {mobile: mobile}});
         var account = Account.create();
-        if(accounts && accounts.length>0){
+        if(accounts && accounts.length > 0) {
             account = accounts[0];
         }
-        if(!account){
+        if(!account) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
         }
 
         var ckeckMsgCode = await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
 
-        if(ckeckMsgCode){
-            if(account.status == ACCOUNT_STATUS.NOT_ACTIVE){
+        if(ckeckMsgCode) {
+            if(account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
                 account.status = ACCOUNT_STATUS.ACTIVE;
             }
             account.isValidateMobile = true;
             account = await account.save()
-        }else{
+        } else {
             throw {code: -1, msg: "短信验证码错误"};
         }
         return account;
@@ -309,27 +296,27 @@ class ApiAuth {
      * @returns {{inviter: Staff, company: Company}}
      */
     @clientExport
-    static async checkInvitedLink (data: {sign: string, linkId: string, timestamp: number}) : Promise<any> {
+    static async checkInvitedLink(data: {sign: string, linkId: string, timestamp: number}): Promise<any> {
         var sign = data.sign;
         var linkId = data.linkId;
         var timestamp = data.timestamp;
         var nowTime = Date.now();
 
         //失效了
-        if (timestamp<0 || nowTime - timestamp > 0) {
+        if(timestamp < 0 || nowTime - timestamp > 0) {
             throw L.ERR.INVITED_URL_INVALID();
         }
 
         var il = await Models.invitedLink.get(linkId);
-        if(!il){
+        if(!il) {
             throw L.ERR.INVITED_URL_INVALID();
         }
-        if (il.status !== EInvitedLinkStatus.ACTIVE) {
+        if(il.status !== EInvitedLinkStatus.ACTIVE) {
             throw L.ERR.INVITED_URL_FORBIDDEN();
         }
 
         var needSign = makeLinkSign(il.linkToken, linkId, timestamp);
-        if (sign.toLowerCase() != needSign.toLowerCase()) {
+        if(sign.toLowerCase() != needSign.toLowerCase()) {
             throw L.ERR.INVITED_URL_INVALID();
         }
         var inviter = await Models.staff.get(il["staffId"]);
@@ -343,8 +330,8 @@ class ApiAuth {
      * @returns {Company}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'companyId','msgCode','msgTicket', 'pwd'])
-    static async invitedStaffRegister (data) : Promise<any> {
+    @requireParams(['mobile', 'name', 'companyId', 'msgCode', 'msgTicket', 'pwd'])
+    static async invitedStaffRegister(data): Promise<any> {
         var msgCode = data.msgCode;
         var msgTicket = data.msgTicket;
         var mobile = data.mobile;
@@ -352,27 +339,33 @@ class ApiAuth {
         var pwd = data.pwd;
         var companyId = data.companyId;
 
-        if (!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
+        if(!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
             throw L.ERR.MOBILE_NOT_CORRECT();
         }
 
-        if (!msgCode || !msgTicket) {
+        if(!msgCode || !msgTicket) {
             throw {code: -1, msg: "短信验证码错误"};
         }
         var ckeckMsgCode = await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
 
-        if(ckeckMsgCode){
+        if(ckeckMsgCode) {
             var company = await Models.company.get(companyId);
             var defaultDeptment = await company.getDefaultDepartment();
             var defaultTravelPolicy = await company.getDefaultTravelPolicy();
-            var staff = Staff.create({mobile: mobile, name: name, pwd: utils.md5(pwd), status: ACCOUNT_STATUS.ACTIVE, isValidateMobile: true})
+            var staff = Staff.create({
+                mobile: mobile,
+                name: name,
+                pwd: utils.md5(pwd),
+                status: ACCOUNT_STATUS.ACTIVE,
+                isValidateMobile: true
+            })
             staff.company = company;
-            if (defaultDeptment) {
+            if(defaultDeptment) {
                 staff.department = defaultDeptment;
             }
             staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
             staff = await staff.save();
-        }else{
+        } else {
             throw {code: -1, msg: "短信验证码错误"};
         }
         return staff.company;
@@ -385,45 +378,45 @@ class ApiAuth {
      * @returns {boolean}
      */
     @clientExport
-    static async checkEmailAndMobile (data: {email?: string, mobile?: string}) {
-        if (data.email && !validator.isEmail(data.email)) {
+    static async checkEmailAndMobile(data: {email?: string, mobile?: string}) {
+        if(data.email && !validator.isEmail(data.email)) {
             throw L.ERR.INVALID_FORMAT('email');
         }
 
-        if (data.mobile && !validator.isMobilePhone(data.mobile, 'zh-CN')) {
+        if(data.mobile && !validator.isMobilePhone(data.mobile, 'zh-CN')) {
             throw L.ERR.MOBILE_NOT_CORRECT();
         }
 
 
         var mobile = data.mobile;
 
-        var staff = await Staff.getCurrent();
+        //var staff = await Staff.getCurrent();
 
-        var type = ACCOUNT_TYPE.COMPANY_STAFF;
+        var type = EAccountType.STAFF;
         //查询邮箱是否已经注册
-        if(data.email){
+        if(data.email) {
             var account1 = await Models.account.find({where: {email: data.email, type: type}, paranoid: false});
-            if (account1 && account1.length>0) {
+            if(account1 && account1.length > 0) {
                 throw L.ERR.EMAIL_HAS_REGISTRY();
             }
             /*if(staff){
-                if(data.email && staff && staff.company["domainName"] && data.email.indexOf(staff.company["domainName"]) == -1){
-                    throw L.ERR.EMAIL_SUFFIX_INVALID();
-                }
-            }else{
-                let domain = data.email.match(/.*\@(.*)/)[1]; //企业域名
+             if(data.email && staff && staff.company["domainName"] && data.email.indexOf(staff.company["domainName"]) == -1){
+             throw L.ERR.EMAIL_SUFFIX_INVALID();
+             }
+             }else{
+             let domain = data.email.match(/.*\@(.*)/)[1]; //企业域名
 
-                let companies = await Models.company.find({where: {domain_name: domain}});
+             let companies = await Models.company.find({where: {domain_name: domain}});
 
-                if(companies && (companies.length > 0 || companies.total > 0)) {
-                    throw L.ERR.DOMAIN_HAS_EXIST();
-                }
-            }*/
+             if(companies && (companies.length > 0 || companies.total > 0)) {
+             throw L.ERR.DOMAIN_HAS_EXIST();
+             }
+             }*/
         }
 
-        if(data.mobile){
+        if(data.mobile) {
             var account2 = await Models.account.find({where: {mobile: mobile, type: type}, paranoid: false});
-            if (account2 && account2.length>0) {
+            if(account2 && account2.length > 0) {
                 throw L.ERR.MOBILE_HAS_REGISTRY();
             }
         }
@@ -442,41 +435,36 @@ class ApiAuth {
      * @return {Promise}
      */
     @clientExport
-    static resetPwdByOldPwd (params: {oldPwd: string, newPwd: string}) : Promise<boolean>{
+    static async resetPwdByOldPwd(params: {oldPwd: string, newPwd: string}): Promise<boolean> {
         let session = Zone.current.get("session");
         let oldPwd = params.oldPwd;
         let newPwd = params.newPwd;
         let accountId = session["accountId"];
 
-        if (!accountId) {
+        if(!accountId) {
             throw L.ERR.NEED_LOGIN();
         }
-
-        if (!oldPwd || !newPwd) {
+        if(!oldPwd || !newPwd) {
             throw L.ERR.PWD_EMPTY();
         }
-
-        if (oldPwd == newPwd) {
+        if(oldPwd == newPwd) {
             throw {code: -1, msg: "新旧密码不能一致"};
         }
 
-        return DBM.Account.findById(accountId)
-            .then(function(account) {
-                if (!account) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST();
-                }
+        var account = await Models.account.get(accountId);
+        if(!account) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
 
-                var pwd = utils.md5(oldPwd);
-                if (account.pwd != pwd) {
-                    throw L.ERR.PWD_ERROR();
-                }
-                newPwd = newPwd.replace(/\s/g, "");
-                pwd = utils.md5(newPwd);
-                return DBM.Account.update({pwd: pwd}, {where: {id: account.id}});
-            })
-            .then(function() {
-                return true;
-            });
+        var pwd = utils.md5(oldPwd);
+        if(account.pwd != pwd) {
+            throw L.ERR.PWD_ERROR();
+        }
+        newPwd = newPwd.replace(/\s/g, "");
+        pwd = utils.md5(newPwd);
+        account.pwd = pwd;
+        await account.save();
+        return true;
     };
 
 
@@ -486,9 +474,9 @@ class ApiAuth {
      * @returns {Promise<TResult>|Promise<U>}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'userName', 'pwd', 'msgCode','msgTicket'], [ 'email', 'agencyId', 'remark', 'description'])
-    static async registerCompany(params:{name: string, userName: string, email?: string, mobile: string, pwd: string,
-        msgCode: string, msgTicket: string, agencyId?: string}){
+    @requireParams(['mobile', 'name', 'userName', 'pwd', 'msgCode', 'msgTicket'], ['email', 'agencyId', 'remark', 'description'])
+    static async registerCompany(params: {name: string, userName: string, email?: string, mobile: string, pwd: string,
+        msgCode: string, msgTicket: string, agencyId?: string}) {
         var companyName = params.name;
         var name = params.userName;
         var email = params.email;
@@ -497,36 +485,43 @@ class ApiAuth {
         var msgTicket = params.msgTicket;
         var pwd = params.pwd;
 
-        if (!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
+        if(!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
             throw L.ERR.MOBILE_NOT_CORRECT();
         }
 
         /*if (!email || !validator.isEmail(email)) {
-            throw L.ERR.EMAIL_FORMAT_INVALID();
-        }*/
+         throw L.ERR.EMAIL_FORMAT_INVALID();
+         }*/
 
-        if (!msgCode || !msgTicket) {
+        if(!msgCode || !msgTicket) {
             throw {code: -1, msg: "短信验证码错误"};
         }
 
-        if (!name) {
+        if(!name) {
             throw {code: -1, msg: "联系人姓名为空"};
         }
 
-        if (!companyName) {
+        if(!companyName) {
             throw {code: -1, msg: "公司名称为空"};
         }
 
-        if (!pwd) {
+        if(!pwd) {
             throw {code: -1, msg: "密码为空"};
         }
 
         await API.auth.checkEmailAndMobile({email: email, mobile: mobile});
         await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
-        var company = await API.company.registerCompany({mobile:mobile, email: email,name: companyName,userName: name, pwd: pwd, status: ACCOUNT_STATUS.ACTIVE, isValidateMobile: true});
+        var company = await API.company.registerCompany({
+            mobile: mobile,
+            email: email,
+            name: companyName,
+            userName: name,
+            pwd: pwd,
+            status: ACCOUNT_STATUS.ACTIVE,
+            isValidateMobile: true
+        });
         return company;
     }
-
 
 
     /**
@@ -541,7 +536,7 @@ class ApiAuth {
      * @return {Promise}
      */
     @clientExport
-    static checkResetPwdUrlValid (params: {sign: string, timestamp: number, accountId: string}) {
+    static checkResetPwdUrlValid(params: {sign: string, timestamp: number, accountId: string}) {
 
         var accountId = params.accountId;
         var sign = params.sign;
@@ -549,26 +544,26 @@ class ApiAuth {
 
         return Promise.resolve()
             .then(function() {
-                if (!accountId) {
+                if(!accountId) {
                     throw L.ERR.ACCOUNT_NOT_EXIST();
                 }
 
-                if (!sign) {
+                if(!sign) {
                     throw L.ERR.SIGN_ERROR();
                 }
 
-                if (!Boolean(timestamp) || timestamp < Date.now()) {
+                if(!Boolean(timestamp) || timestamp < Date.now()) {
                     throw L.ERR.TIMESTAMP_TIMEOUT();
                 }
 
                 return Models.account.get(accountId)
                     .then(function(account) {
-                        if (!account) {
+                        if(!account) {
                             throw L.ERR.ACCOUNT_NOT_EXIST();
                         }
 
                         var sysSign = makeActiveSign(account.pwdToken, account.id, timestamp);
-                        if (sysSign.toLowerCase() != sign.toLowerCase()) {
+                        if(sysSign.toLowerCase() != sign.toLowerCase()) {
                             throw L.ERR.SIGN_ERROR();
                         }
                         return true;
@@ -587,52 +582,53 @@ class ApiAuth {
      * @returns {Promise} true|error
      */
     @clientExport
-    static async sendResetPwdEmail (params: {email: string, mobile?: string, type?: Number, isFirstSet?: boolean, companyName?: string}) : Promise<boolean> {
+    static async sendResetPwdEmail(params: {email: string, mobile?: string, type?: Number, isFirstSet?: boolean, companyName?: string}): Promise<boolean> {
         var email = params.email;
         var mobile = params.mobile;
         var isFirstSet = params.isFirstSet;
         var type = params.type || 1;
         var companyName = params.companyName || '';
 
-        if (!email) {
+        if(!email) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
         }
 
-        if (!mobile) {
+        if(!mobile) {
             throw L.ERR.MOBILE_EMPTY();
         }
-        var acc = await DBM.Account.findOne({where: {email: email, type: type}});
-        if (!acc) {
+        var accounts = await Models.account.find({where:{email: email, type: type}, limit:1});
+        if(accounts.total == 0)
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        var acc = accounts[0];
+        if(!acc) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
         }
         //生成设置密码token
         var pwdToken = utils.getRndStr(6);
-        var [affect, rows] = await DBM.Account.update({pwdToken: pwdToken}, {where: {id: acc.id}, returning: true});
-        var account = rows[0];
+        acc.pwdToken = pwdToken;
+        await acc.save();
 
-        var staff = await Models.staff.get(account.id);
-        account = account.toJSON();
+        var staff = await Models.staff.get(acc.id);
+        //var account = acc.toJSON();
 
-        var timeStr = utils.now();
         var oneDay = 24 * 60 * 60 * 1000
         var timestamp = Date.now() + 2 * oneDay;  //失效时间2天
-        var sign = makeActiveSign(account.pwdToken, account.id, timestamp);
-        var url = "accountId="+account.id+"&timestamp="+timestamp+"&sign="+sign+"&email="+account.email;
-        var templateName;
+        var sign = makeActiveSign(acc.pwdToken, acc.id, timestamp);
+        var url = "accountId=" + acc.id + "&timestamp=" + timestamp + "&sign=" + sign + "&email=" + acc.email;
 
         var vals: any = {
-            name: staff.name || account.mobile,
-            username: account.email,
-            time: timeStr,
+            name: staff.name || acc.mobile,
+            username: acc.email,
+            time: new Date(),
             companyName: companyName
         };
         let _mobile;    //如果_mobile存在,将发短信通知
         let key;
-        if (isFirstSet) {
+        if(isFirstSet) {
             //发邮件
             vals.url = C.host + "/index.html#/login/first-set-pwd?" + url;
             key = 'qm_first_set_pwd';
-            _mobile = account.mobile;
+            _mobile = acc.mobile;
             try {
                 vals.url = await API.wechat.shorturl({longurl: vals.url});
             } catch(err) {
@@ -645,26 +641,26 @@ class ApiAuth {
         return API.notify.submitNotify({
             key: key,
             values: vals,
-            email: account.email,
+            email: acc.email,
             mobile: _mobile,
         });
     }
 
-    static sendActivateEmail(params:{email:string; companyName?:string}):Promise<boolean> {
+    static sendActivateEmail(params: {email: string; companyName?: string}): Promise<boolean> {
         let email = params.email;
         let companyName = params.companyName;
-        let data:any = {
+        let data: any = {
             email: email,
             companyName: companyName,
             isFirstSet: true
         };
-        return  ApiAuth.sendResetPwdEmail(data);
+        return ApiAuth.sendResetPwdEmail(data);
     }
 
 
     @clientExport
-    static getAccountStatus(params:{}):Promise<any> {
-        let args:any = {attributes: ["status"]};
+    static getAccountStatus(params: {}): Promise<any> {
+        let args: any = {attributes: ["status"]};
         return Models.account.find(args);
     }
 
@@ -677,26 +673,21 @@ class ApiAuth {
      * @param {UUID} data.accountId 账号ID
      * @return {Promise}
      */
-    static active (data: {accountId: string}) {
+    static async active(data: {accountId: string}) {
 
         var accountId = data.accountId;
-        return DBM.Account.findOne({where: {id: accountId}})
-            .then(function(account) {
-                if (!account) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST();
-                }
-
-                account.status = 1;
-                return account.save()
-            })
-            .then(function(account) {
-                return {
-                    id: account.id,
-                    mobile: account.mobile,
-                    email: account.email,
-                    status: account.status
-                };
-            });
+        var account = await Models.account.get(accountId);
+        if(!account) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+        account.status = 1;
+        await account.save()
+        return {
+            id: account.id,
+            mobile: account.mobile,
+            email: account.email,
+            status: account.status
+        };
     };
 
     /**
@@ -707,20 +698,22 @@ class ApiAuth {
      * @return {Promise}
      * @public
      */
-    static remove (data: {accountId: string, email: string, mobile?: string, type?: Number}) {
+    static async remove(data: {accountId: string, email: string, mobile?: string, type?: Number}) {
 
         var accountId = data.accountId;
         var email = data.email;
         var mobile = data.mobile;
         var type = data.type || 1;
         var where: any = {$or: [{id: accountId}, {email: email}, {mobile: mobile}]};
-        if(!accountId){
+        if(!accountId) {
             where.type = type;
         }
-        return DBM.Account.destroy({where: where})
-            .then(function() {
-                return true;
-            });
+        var accounts = await Models.account.find({where});
+        do{
+            for(let i=0; i<accounts.length; i++){
+                accounts[i].destroy();
+            }
+        }while(await accounts.nextPage());
     }
 
 
@@ -741,170 +734,87 @@ class ApiAuth {
      */
     @clientExport
     @requireParams(["email"], accountCols)
-static async newAccount (data: {email: string, mobile?: string, pwd?: string, type?: Number, status?: Number, companyName?: string, id?: string}) {
-    if (!data) {
-        throw L.ERR.DATA_NOT_EXIST();
-    }
-
-    if (!data.email) {
-        throw L.ERR.EMAIL_EMPTY();
-    }
-
-    if (!validator.isEmail(data.email)) {
-        throw L.ERR.INVALID_FORMAT('email');
-    }
-
-    if (data.mobile && !validator.isMobilePhone(data.mobile, 'zh-CN')) {
-        throw L.ERR.MOBILE_NOT_CORRECT();
-    }
-
-    if (data.pwd) {
-        var pwd = data.pwd;
-        var password = data.pwd.toString();
-        pwd = utils.md5(password);
-        //throw L.ERR.PASSWORD_EMPTY();
-    }
-
-
-    var mobile = data.mobile;
-    var companyName = data.companyName || '';
-
-    var staff = await Staff.getCurrent();
-    if(data.email && staff && staff.company["domainName"] && data.email.indexOf(staff.company["domainName"]) == -1){
-        throw L.ERR.INVALID_ARGUMENT('email');
-    }
-
-    var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
-    //查询邮箱是否已经注册
-    var account1 = await Models.account.find({where: {email: data.email, type: type}});
-    if (account1 && account1.length>0) {
-        throw L.ERR.EMAIL_HAS_REGISTRY();
-    }
-
-    if(data.mobile){
-        var account2 = await Models.account.find({where: {mobile: mobile, type: type}});
-        if (account2 && account2.length>0) {
-            throw L.ERR.MOBILE_HAS_REGISTRY();
-        }
-    }
-
-    var status = data.status? data.status: ACCOUNT_STATUS.NOT_ACTIVE;
-    var id = data.id?data.id:uuid.v1();
-    var accountObj = Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status, type: type});
-    var account = await accountObj.save();
-
-    if (!account.pwd) {
-        return ApiAuth.sendResetPwdEmail({email: account.email, type: 1, isFirstSet: true, companyName: companyName})
-            .then(function() {
-                return account;
-            })
-    }
-
-    if (account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
-        return _sendActiveEmail(account.id)
-            .then(function(){
-                return account;
-            })
-    }
-}
-
-
-
-
-    /**
-     * @method login
-     *
-     * 登录
-     *
-     * @param {Object} data 参数
-     * @param {String} data.account 登录账号,邮箱或者手机号
-     * @param {String} data.pwd 密码
-     * @param {Integer} data.type 1.企业员工 2.代理商员工 默认是企业员工
-     * @param {String} data.mobile 手机号(可选,如果email提供则优先使用email)
-     * @return {Promise} {code:0, msg: "ok", data: {user_id: "账号ID", token_sign: "签名", token_id: "TOKEN_ID", timestamp:"时间戳"}
-     * @public
-     */
-    @clientExport
-    static login (data: {account?: string, pwd: string, type?: Number, email?: string}) :Promise<AuthCert>{
-
-        if (!data) {
+    static async newAccount(data: {email: string, mobile?: string, pwd?: string, type?: Number, status?: Number, companyName?: string, id?: string}) {
+        if(!data) {
             throw L.ERR.DATA_NOT_EXIST();
         }
-        //兼容原有调用方式
-        if (!data.account && data.email) {
-            data.account = data.email;
+
+        if(!data.email) {
+            throw L.ERR.EMAIL_EMPTY();
         }
 
-        if (!data.account) {
-            throw new Error(`登录账号不能为空`);
+        if(!validator.isEmail(data.email)) {
+            throw L.ERR.INVALID_FORMAT('email');
         }
 
-        if (!validator.isEmail(data.account) && !validator.isMobilePhone(data.account, 'zh-CN')) {
-            throw new Error(`登录账号格式不正确`);
+        if(data.mobile && !validator.isMobilePhone(data.mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
         }
 
-        if (!data.pwd) {
-            throw L.ERR.PWD_EMPTY();
+        if(data.pwd) {
+            var pwd = data.pwd;
+            var password = data.pwd.toString();
+            pwd = utils.md5(password);
+            //throw L.ERR.PASSWORD_EMPTY();
         }
 
-        var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
-        var account = data.account.toLowerCase();
-        return DBM.Account.findOne({where: {$or : [{email: account}, {mobile: account}], type: type}})
-            .then(function (loginAccount) {
-                var pwd = utils.md5(data.pwd);
-                //第一步验证账号是否存在
-                if (!loginAccount) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST()
-                }
-                //第二步验证密码是否正确
-                if (loginAccount.pwd && loginAccount.pwd != pwd) {
-                    throw L.ERR.PASSWORD_NOT_MATCH()
-                }
-                //第三步查看是邮箱登录或手机号登录 查看有限干活手机号是否已验证
-                if (loginAccount.mobile == account && !loginAccount.isValidateMobile) {
-                    throw L.ERR.NO_VALIDATE_MOBILE();
-                }
-                if (loginAccount.email == account && !loginAccount.isValidateEmail) {
-                    throw L.ERR.NO_VALIDATE_EMAIL();
-                }
 
-                //第四步查看账号是否激活
-                /*if (!loginAccount.pwd && loginAccount.status == ACCOUNT_STATUS.NOT_ACTIVE) {
-                    throw L.ERR.ACCOUNT_NOT_ACTIVE();
-                }
+        var mobile = data.mobile;
+        var companyName = data.companyName || '';
 
-                if (loginAccount.status == ACCOUNT_STATUS.NOT_ACTIVE) {
-                    throw L.ERR.ACCOUNT_NOT_ACTIVE();
-                }*/
+        var staff = await Staff.getCurrent();
+        if(data.email && staff && staff.company["domainName"] && data.email.indexOf(staff.company["domainName"]) == -1) {
+            throw L.ERR.INVALID_ARGUMENT('email');
+        }
 
-                //第五步查看账号是否禁用
-                if (loginAccount.status == ACCOUNT_STATUS.FORBIDDEN) {
-                    throw L.ERR.ACCOUNT_FORBIDDEN();
-                }
+        var type = data.type || EAccountType.STAFF;
+        //查询邮箱是否已经注册
+        var account1 = await Models.account.find({where: {email: data.email, type: type}});
+        if(account1 && account1.length > 0) {
+            throw L.ERR.EMAIL_HAS_REGISTRY();
+        }
 
-                return makeAuthenticateSign(loginAccount.id)
-                    .then(function(ret) {
-                        //判断是否首次登录
-                        if (loginAccount.isFirstLogin) {
-                            loginAccount.isFirstLogin = false;
-                            return loginAccount.save()
-                                .then(function() {
-                                    ret.is_first_login = true;
-                                    return ret;
-                                })
-                        }
+        if(data.mobile) {
+            var account2 = await Models.account.find({where: {mobile: mobile, type: type}});
+            if(account2 && account2.length > 0) {
+                throw L.ERR.MOBILE_HAS_REGISTRY();
+            }
+        }
 
-                        ret.is_first_login = false;
-                        return ret;
-                    });
+        var status = data.status ? data.status : ACCOUNT_STATUS.NOT_ACTIVE;
+        var id = data.id ? data.id : uuid.v1();
+        var accountObj = Account.create({
+            id: id,
+            mobile: mobile,
+            email: data.email,
+            pwd: pwd,
+            status: status,
+            type: type
+        });
+        var account = await accountObj.save();
+
+        if(!account.pwd) {
+            return ApiAuth.sendResetPwdEmail({
+                email: account.email,
+                type: 1,
+                isFirstSet: true,
+                companyName: companyName
             })
-            .then(function(ret) {
-                return new AuthCert(ret);
-            })
+                .then(function() {
+                    return account;
+                })
+        }
 
+        if(account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
+            return _sendActiveEmail(account.id)
+                .then(function() {
+                    return account;
+                })
+        }
     }
 
-    async checkBlackDomain (params:{domain:string}):Promise<boolean> {
+
+    async checkBlackDomain(params: {domain: string}): Promise<boolean> {
         return Promise.resolve(false);
         // var domain = params.domain;
         // return Promise.all([
@@ -933,8 +843,8 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      * @param params
      */
     @clientExport
-    @requireParams(['type', 'companyName','userName','mobile', 'email', 'qq'])
-    static async sendPartnerEmail(params){
+    @requireParams(['type', 'companyName', 'userName', 'mobile', 'email', 'qq'])
+    static async sendPartnerEmail(params) {
         if(!msgConfig.is_send_email) {
             return;
         }
@@ -956,45 +866,6 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
 
 
     /**
-     * @method authenticate
-     *
-     * 认证登录凭证是否有效
-     *
-     * @param {Object} params
-     * @param {UUID} params.userId
-     * @param {UUID} params.tokenId
-     * @param {Number} params.timestamp
-     * @param {String} params.tokenSign
-     * @return {Promise} {code:0, msg: "Ok"}
-     */
-    static authentication (params: {userId?: string, user_id?: string, tokenId?: string,
-        token_id?: string, timestamp: number, tokenSign?: string, token_sign?: string}) : Promise<boolean> {
-
-        if ((!params.userId && !params.user_id) || (!params.tokenId && !params.token_id)
-            || !Boolean(params.timestamp) || (!params.tokenSign && !params.token_sign)) {
-            return Promise.resolve(false);
-        }
-        var userId = params.userId || params.user_id;
-        var tokenId = params.tokenId || params.token_id;
-        var timestamp = params.timestamp;
-        var tokenSign = params.tokenSign || params.token_sign;
-
-        return Models.token.get(tokenId)
-            .then(function(m) {
-                if (!m) {
-                    return false;
-                }
-
-                var sign = getTokenSign(userId, tokenId, m.token, timestamp);
-                if (sign != tokenSign) {
-                    return false;
-                }
-
-                return true;
-            });
-    };
-
-    /**
      * @method bindMobile
      *
      * 绑定手机号
@@ -1006,7 +877,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      * @param {String} data.pwd 登录密码
      * @return {Promise} true||error;
      */
-    static bindMobile (data: {accountId: string, mobile: string, code: string, pwd: string}) {
+    static bindMobile(data: {accountId: string, mobile: string, code: string, pwd: string}) {
 
         throw L.ERR.NOT_IMPLEMENTED();
     };
@@ -1017,7 +888,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      * @returns {Promise<Account>}
      */
     @clientExport
-    static async createAccount (params) : Promise<Account>{
+    static async createAccount(params): Promise<Account> {
         var acc = Account.create(params);
         return acc;
     }
@@ -1029,10 +900,10 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      */
     @clientExport
     @requireParams(["id"])
-    static async getAccount (params) {
+    static async getAccount(params) {
         var id = params.id;
         var options: any = {};
-        options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt","loginFailTimes","lastLoginAt","lastLoginIp","activeToken","pwdToken","oldQrcodeToken","qrcodeToken","type","isFirstLogin","isValidateEmail","isValidateMobile"];
+        options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt", "loginFailTimes", "lastLoginAt", "lastLoginIp", "activeToken", "pwdToken", "oldQrcodeToken", "qrcodeToken", "type", "isFirstLogin", "isValidateEmail", "isValidateMobile"];
         var acc = await Models.account.get(id, options);
         return acc;
     }
@@ -1043,19 +914,19 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      * @returns {*}
      */
     @clientExport
-    static async getAccounts (params: {where: any, order?: any, attributes?: any, $or?: any, paranoid?: boolean}) {
-        if (!params.where) {
+    static async getAccounts(params: {where: any, order?: any, attributes?: any, $or?: any, paranoid?: boolean}) {
+        if(!params.where) {
             params.where = {};
         }
         var options: any = {
-            where:  params.where
+            where: params.where
         };
-        if(params.attributes){
+        if(params.attributes) {
             options.attributes = params.attributes;
-        }else{
-            options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt","loginFailTimes","lastLoginAt","lastLoginIp","activeToken","pwdToken","oldQrcodeToken","qrcodeToken","type","isFirstLogin"];
+        } else {
+            options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt", "loginFailTimes", "lastLoginAt", "lastLoginIp", "activeToken", "pwdToken", "oldQrcodeToken", "qrcodeToken", "type", "isFirstLogin"];
         }
-        if(params.order){
+        if(params.order) {
             options.order = params.order || "createdAt desc";
         }
         if(params.$or) {
@@ -1064,7 +935,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
 
         options.paranoid = params.paranoid;
         let paginate = await Models.account.find(options);
-        let ids =  paginate.map(function(t){
+        let ids = paginate.map(function(t) {
             return t.id;
         })
         return {ids: ids, count: paginate['total']};
@@ -1079,37 +950,36 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      */
     @clientExport
     @requireParams(["id"], accountCols)
-    static async updateAccount(params){
+    static async updateAccount(params) {
         var id = params.id;
-        var old_email;
         var accobj = await Models.account.get(id);
         var staff = await Staff.getCurrent();
-        if(params.email && staff && staff.company["domainName"] && params.email.indexOf(staff.company["domainName"]) == -1){
+        if(params.email && staff && staff.company["domainName"] && params.email.indexOf(staff.company["domainName"]) == -1) {
             throw L.ERR.INVALID_ARGUMENT('email');
         }
 
-        if(params.email && accobj["status"] != 0 && accobj.email != params.email){
+        if(params.email && accobj["status"] != 0 && accobj.email != params.email) {
             // throw {code: -2, msg: "该账号不允许修改邮箱"};
             throw L.ERR.NOTALLOWED_MODIFY_EMAIL();
         }
 
 
-        for(var key in params){
+        for(var key in params) {
             accobj[key] = params[key];
         }
         var newAcc = await accobj.save();
         return newAcc;
 
         /*if(accobj.email == newAcc.email){
-            return newAcc;
-        }
+         return newAcc;
+         }
 
-        var staff = await Models.staff.get(id);
-        var companyName = (staff && staff.company) ? staff.company.name : "";
-        return ApiAuth.sendResetPwdEmail({companyName: companyName, email: newAcc.email, type: 1, isFirstSet: true})
-            .then(function() {
-                return newAcc;
-            });*/
+         var staff = await Models.staff.get(id);
+         var companyName = (staff && staff.company) ? staff.company.name : "";
+         return ApiAuth.sendResetPwdEmail({companyName: companyName, email: newAcc.email, type: 1, isFirstSet: true})
+         .then(function() {
+         return newAcc;
+         });*/
     }
 
     /**
@@ -1121,25 +991,8 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     // @requireParams(["id"])
     static async deleteAccount(params): Promise<any> {
         /*let deleteAcc = await Models.account.get(params.id);
-        await deleteAcc.destroy();*/
+         await deleteAcc.destroy();*/
         return true;
-    }
-
-    /**
-     * 根据条件查询一条账户信息
-     * @param params
-     * @returns {*}
-     */
-    static findOneAcc (params: any) {
-
-        var options: any = {};
-        options.where = params;
-        return DBM.Account.findOne(options)
-            .then(function(obj){
-                if(!obj)
-                    throw L.ERR.NOT_FOUND();
-                return obj;
-            });
     }
 
     /**
@@ -1147,13 +1000,10 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      * @param params
      * @returns {*}
      */
-    static checkAccExist (params: any) {
-
-        var options: any = {};
-        options.where = params;
-        return DBM.Account.findOne(options);
+    static async checkAccExist(params: any) {
+        var accounts = await Models.account.find(params);
+        return accounts.total > 0;
     };
-
 
 
     /**
@@ -1166,187 +1016,26 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      * @return {Promise} true||error
      */
     @clientExport
-    static sendActiveEmail (params: {email: string}) {
+    static async sendActiveEmail(params: {email: string}) {
 
         var email = params.email;
-        if (!email) {
+        if(!email) {
             throw L.ERR.EMAIL_EMPTY();
         }
 
-        if (!validator.isEmail(email)) {
+        if(!validator.isEmail(email)) {
             throw L.ERR.EMAIL_FORMAT_INVALID();
         }
 
-        return DBM.Account.findOne({where: {email: email}})
-            .then(function(account) {
-                if (!account) {
-                    throw L.ERR.EMAIL_NOT_REGISTRY();
-                }
-                return _sendActiveEmail(account.id);
-            })
-            .then(function() {
-                return true;
-            });
-    }
-
-    /**
-     * 退出登录
-     * @param {Object} params
-     * @param {UUID} params.accountId
-     * @param {UUID} params.tokenId
-     * @return {Promise}
-     */
-    @clientExport
-    static logout (params: {}) : Promise<boolean> {
-        let session = Zone.current.get("session");
-        var accountId = session["accountId"];
-        var tokenId = session["tokenId"];
-        if (accountId && tokenId) {
-            return Models.token.get(tokenId)
-                .then(function(token) {
-                    if (token) return token.destroy()
-                    return true;
-                })
-                .then(function() {
-                    return true;
-                })
-            // Models.token.destroy()
-            // return DBM.Token.destroy({where: {accountId: accountId, id: tokenId}})
-            //     .then(function() {
-            //         return true;
-            //     })
+        var accounts = await Models.account.find({where:{email: email}, limit: 1});
+        if(accounts.total == 0)
+            throw L.ERR.EMAIL_NOT_REGISTRY();
+        var account = accounts[0];
+        if(!account) {
+            throw L.ERR.EMAIL_NOT_REGISTRY();
         }
-        return Promise.resolve(true);
-    };
-
-
-    /**
-     * 二维码扫描登录接口
-     *
-     * @param {Object} params 参数
-     * @param {UUID} params.accountId 账号ID
-     * @param {String} params.sign签名信息
-     * @param {String} params.timestamp 失效时间戳
-     * @return {Promise}
-     */
-    static qrCodeLogin (params: {accountId: string, sign: string, timestamp: number, backUrl?: string}) {
-
-        var accountId = params.accountId;
-        var sign = params.sign;
-        var timestamp = params.timestamp;
-        //var backUrl = params.backUrl;   //登录后返回地址
-        return Promise.resolve()
-            .then(function() {
-                if (!params) {
-                    throw L.ERR.DATA_FORMAT_ERROR();
-                }
-
-                if (!accountId) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST();
-                }
-
-                if (!sign) {
-                    throw L.ERR.SIGN_ERROR();
-                }
-
-                if (!Boolean(timestamp)) {
-                    throw L.ERR.TIMESTAMP_TIMEOUT();
-                }
-
-                if (timestamp < Date.now()) {
-                    throw L.ERR.TIMESTAMP_TIMEOUT();
-                }
-
-                return DBM.Account.findById(accountId)
-            })
-            .then(function(account) {
-                if (!account) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST();
-                }
-
-                if (!account.qrcodeToken) {
-                    throw L.ERR.SIGN_ERROR();
-                }
-
-                var data = {
-                    key: account.qrcodeToken,
-                    timestamp: timestamp,
-                    accountId: account.id
-                };
-                var sysSign = cryptoData(data);
-                var signCmpResult = false;
-                //优先使用新签名判断
-                if (sysSign.toLowerCase() == sign.toLowerCase() ) {
-                    signCmpResult = true;
-                }
-                //新签名不正确,使用旧签名判断
-                if (!signCmpResult && account.oldQrcodeToken) {
-                    data = {
-                        key: account.oldQrcodeToken,
-                        timestamp: timestamp,
-                        accountId: account.id
-                    };
-                    sysSign = cryptoData(data);
-                    if (sysSign.toLowerCase() == sign.toLowerCase()) {
-                        signCmpResult = true;
-                    }
-                }
-
-                if (!signCmpResult) {
-                    throw L.ERR.SIGN_ERROR();
-                }
-
-                return makeAuthenticateSign(account.id);
-            });
-    }
-
-    /**
-     * 获取二维码中展示链接
-     *
-     * @param {Object} params 参数
-     * @param {String} params.accountId 账号ID
-     * @param {String} params.backUrl
-     */
-    @clientExport
-    static async getQRCodeUrl (params: {backUrl: string}) : Promise<string> {
-        let session = Zone.current.get("session");
-        var accountId = session["accountId"];
-        var backUrl = params.backUrl;
-
-        if (!Boolean(accountId)) {
-            throw L.ERR.ACCOUNT_NOT_EXIST();
-        }
-
-        if (!Boolean(backUrl)) {
-            throw {code: -1, msg: "跳转链接不存在"};
-        }
-
-        var shortUrl = backUrl;
-        try {
-            shortUrl = await API.wechat.shorturl({longurl: backUrl});
-        } catch(err) {
-            console.error(err);
-        }
-        backUrl = encodeURIComponent(shortUrl);
-        var account = await Models.account.get(accountId);
-
-        if (!account) {
-            throw L.ERR.ACCOUNT_NOT_EXIST();
-        }
-
-        var qrcodeToken = utils.getRndStr(8);
-        account.oldQrcodeToken = account.qrcodeToken;
-        account.qrcodeToken = qrcodeToken;
-
-        account = await account.save();
-
-        var timestamp = Date.now() + 1000 * 60 * 5;
-        var data = {accountId: account.id, timestamp: timestamp, key: account.qrcodeToken};
-        var sign = cryptoData(data);
-        var urlParams = {accountId: account.id, timestamp: timestamp, sign: sign, backUrl: backUrl};
-        urlParams = combineData(urlParams);
-        console.info(C.host + QRCODE_LOGIN_URL +"?"+urlParams);
-        return C.host + QRCODE_LOGIN_URL +"?"+urlParams;
+        await _sendActiveEmail(account.id);
+        return true;
     }
 
     /**
@@ -1360,200 +1049,33 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      * @reutnr {Promise} true 使用 false未使用
      */
     @clientExport
-    static isEmailUsed (params: {email: string, type?: Number}) :Promise<boolean> {
+    static async isEmailUsed(params: {email: string, type?: Number}): Promise<boolean> {
         var email = params.email;
         var type = params.type;
 
-        return Promise.resolve()
-            .then(function() {
-                if (!validator.isEmail(email)) {
-                    throw L.ERR.EMAIL_FORMAT_INVALID();
-                }
-
-                if (type !== 1 && type !== 2) {
-                    type = 1;
-                }
-
-                return DBM.Account.findOne({where: {email: email, type: type}})
-            })
-            .then(function(account) {
-                if (account) {
-                    return true;
-                }
-                return false;
-            })
-    }
-
-    /**
-     * 保存openId关联的accountId
-     * @type {saveOrUpdateOpenId}
-     */
-    @clientExport
-    static async saveOrUpdateOpenId(params) {
-        let {code} = params;
-        let val = await cache.read(`wechat:${code}`);
-        let openid = val ? val.openid : '';
-        if(!openid)
-            return;
-        let staff = await Staff.getCurrent();
-        let list = await Models.accountOpenid.find({where: {openId: openid}});
-
-        if(list && list.length > 0) {
-            await Promise.all(list.map((op) => op.destroy()));
+        if(!validator.isEmail(email)) {
+            throw L.ERR.EMAIL_FORMAT_INVALID();
         }
 
-        let obj = AccountOpenid.create({openId: openid, accountId: staff.id});
-        return obj.save();
-    }
-
-    /**
-     * 获取数据库中openId关联的accountId
-     * @type {getAccountIdByOpenId}
-     */
-    @requireParams(["openId"])
-    static async getAccountIdByOpenId(params: {openId: string}): Promise<string> {
-        let list = await Models.accountOpenid.find({where: {openId: params.openId}});
-
-        if(!list || list.length <= 0) {
-            return null;
+        if(type !== 1 && type !== 2) {
+            type = 1;
         }
 
-        let obj = list[0];
-        return obj.accountId;
-    }
-
-    /**
-     * 获取数据库中accountId关联的openId
-     * @type {getOpenIdByAccount}
-     */
-    @requireParams(["openId"])
-    static async getOpenIdByAccount(params: {accountId: string}): Promise<string> {
-        let list = await Models.accountOpenid.find({where: {accountId: params.accountId}});
-
-        if(!list || list.length <= 0) {
-            return null;
-        }
-
-        let obj = list[0];
-        return obj.openId;
+        var accounts = await Models.account.find({where:{email: email, type: type}, limit: 1});
+        return accounts.total > 0;
     }
 
     @requireParams(["id"])
-    static judgeRoleById(params: {id: string}){
-        return DBM.Account.findById(params.id)
-            .then(function(account) {
-                if (!account) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST();
-                }
-                if(account.type == 1){
-                    return EAccountType.STAFF;
-                }else{
-                    return EAccountType.AGENCY;
-                }
-            })
-    }
-
-
-    @clientExport
-    static async authWeChatLogin(params: {code: string}):
-    Promise<{token_id: string, user_id: string, timestamp: string, token_sign: string} | boolean> {
-        let openid = await API.wechat.requestOpenIdByCode({code: params.code}); //获取微信openId;
-        await cache.write(`wechat:${params.code}`, JSON.stringify({openid: openid}));
-        let accountId = await ApiAuth.getAccountIdByOpenId({openId: openid});
-
-        if(!accountId) {
-            return false;
+    static async judgeRoleById(params: {id: string}) {
+        var account = await Models.account.get(params.id);
+        if(!account) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
         }
-
-        return makeAuthenticateSign(accountId, 'weChat');
-    }
-    
-    @clientExport
-    static async getWeChatLoginUrl(params: {redirectUrl: string}) {
-        let redirectUrl = encodeURIComponent(params.redirectUrl);
-        let backUrl = C.host + "/auth/get-wx-code?redirect_url=" + redirectUrl;
-        // backUrl = "https://t.jingli365.com/auth/wx-login?redirect_url=" + redirectUrl; //微信公众号测使用
-        // backUrl = "https://t.jingli365.com/auth/get-wx-code?redirect_url=" + redirectUrl; //微信公众号测使用
-        return API.wechat.getOAuthUrl({backUrl: backUrl});
-    }
-
-    @clientExport
-    static async destroyWechatOpenId(params: {}): Promise<boolean> {
-        let staff = await Staff.getCurrent();
-        let openIds = await Models.accountOpenid.find({where: {accountId: staff.id}});
-        
-        if(!openIds || openIds.length <= 0) {
-            return false;
+        if(account.type == 1) {
+            return EAccountType.STAFF;
+        } else {
+            return EAccountType.AGENCY;
         }
-        
-        await Promise.all(openIds.map((openId) => openId.destroy()));
-        return true;
-    }
-
-    static makeAuthenticateSign = makeAuthenticateSign
-
-    static __initHttpApp (app: any) {
-
-        //二维码自动登录
-        app.all("/auth/qrcode-login", function(req, res, next) {
-            var storageSetUrl = C.host + "/index.html#/login/storageSet";
-            var accountId = req.query.accountId;
-            var timestamp = req.query.timestamp;
-            var sign = req.query.sign;
-            var backUrl = req.query.backUrl;
-
-            ApiAuth.qrCodeLogin({accountId: accountId, sign: sign, timestamp: timestamp, backUrl: backUrl})
-                .then(function(result) {
-                    res.cookie("token_id", result.token_id);
-                    res.cookie("user_id", result.user_id);
-                    res.cookie("timestamp", result.timestamp);
-                    res.cookie("token_sign", result.token_sign);
-                    res.redirect(storageSetUrl+"?token_id="+result.token_id+"&user_id="+result.user_id+"&timestamp="+result.timestamp+"&token_sign="+result.token_sign+"&back_url="+backUrl);
-                })
-                .catch(function(err) {
-                    console.info(err);
-                    res.send("链接已经失效或者不存在");
-                })
-        });
-
-        //微信自动登录
-        app.all("/auth/wx-login", async function(req, res, next) {
-            let query = req.query;
-            let redirect_url = query.redirect_url;
-            redirect_url += redirect_url.indexOf('?') > 0 ? '&' : '?';
-            redirect_url += 'wxauthcode=' + query.code + '&wxauthstate=' + query.state;
-            res.redirect(redirect_url);
-        });
-
-        //获取微信code
-        app.all("/auth/get-wx-code", async function(req, res, next) {
-            let query = req.query;
-            let redirect_url = query.redirect_url;
-            let openid = ''
-            //如果是登录页，直接跳转
-            if(/^https?\:\/\/\w*\.jingli365\.com\/(index\.html)?\#\/login\/(index)?/.test(redirect_url)){
-                redirect_url += redirect_url.indexOf('?') > 0 ? '&' : '?';
-                redirect_url += 'wxauthcode=' + query.code + '&wxauthstate=' + query.state;
-                res.redirect(redirect_url);
-            }else {
-                redirect_url = encodeURIComponent(redirect_url);
-                if (!query.code) {
-                    return res.redirect('/#/login/index');
-                }
-                let tokenSign = await API.auth.authWeChatLogin({code: query.code});
-                let url = `${C.host}/index.html#/login/storageSet`;
-                if(!tokenSign) {
-                    url = `${C.host}/#/login/?backurl=${redirect_url}&wxauthcode=${query.code}&wxauthstate=${query.state}`;
-                    // url = `http://t.jingli365.com/#/login/?backurl=${redirect_url}&wxauthcode=${query.code}&wxauthstate=${query.state}`;
-                }else {
-                    // url = "http://t.jingli365.com/index.html#/login/storageSet";
-                    url += "?token_id=" + tokenSign.token_id + "&user_id=" + tokenSign.user_id + "&timestamp=" + tokenSign.timestamp
-                        + "&token_sign=" + tokenSign.token_sign + "&back_url=" + redirect_url;
-                }
-
-                res.redirect(url);
-            }
-        })
     }
 
     /**
@@ -1562,25 +1084,25 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      * @returns {boolean}
      */
     @clientExport
-    static async registerCheckEmailMobile (data: {email?: string, mobile?: string}) {
-        if (data.email && !validator.isEmail(data.email)) {
+    static async registerCheckEmailMobile(data: {email?: string, mobile?: string}) {
+        if(data.email && !validator.isEmail(data.email)) {
             throw L.ERR.INVALID_FORMAT('email');
         }
 
-        if (data.mobile && !validator.isMobilePhone(data.mobile, 'zh-CN')) {
+        if(data.mobile && !validator.isMobilePhone(data.mobile, 'zh-CN')) {
             throw L.ERR.MOBILE_NOT_CORRECT();
         }
         //查询邮箱是否已经注册
-        if(data.email){
+        if(data.email) {
             var account1 = await Models.account.find({where: {email: data.email}, paranoid: false});
-            if (account1 && account1.total>0) {
+            if(account1 && account1.total > 0) {
                 throw L.ERR.EMAIL_HAS_REGISTRY();
             }
         }
 
-        if(data.mobile){
+        if(data.mobile) {
             var account2 = await Models.account.find({where: {mobile: data.mobile}, paranoid: false});
-            if (account2 && account2.total>0) {
+            if(account2 && account2.total > 0) {
                 throw L.ERR.MOBILE_HAS_REGISTRY();
             }
         }
@@ -1588,37 +1110,34 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         return true;
     }
 
-}
 
-//拼接字符串
-function combineData(obj) {
-    if (typeof obj != 'object') {
-        throw new Error("combineStr params must be object");
+    static __initHttpApp(app: any) {
+        wechat.__initHttpApp(app);
     }
 
-    var strs:any = [];
-    for(var key in obj) {
-        strs.push(key+"="+obj[key]);
-    }
-    strs.sort();
-    strs = strs.join("&");
-    return strs;
-}
 
-//加密对象
-function cryptoData(obj) {
-    if (typeof obj == 'string') {
-        return utils.md5(obj);
-    }
+    @clientExport
+    static authWeChatLogin = wechat.authWeChatLogin;
+    @clientExport
+    static getWeChatLoginUrl = wechat.getWeChatLoginUrl;
+    @clientExport
+    static saveOrUpdateOpenId = wechat.saveOrUpdateOpenId;
+    @clientExport
+    static destroyWechatOpenId = wechat.destroyWechatOpenId;
 
-    var strs = combineData(obj);
-    return utils.md5(strs);
-}
+    @requireParams(["openId"])
+    static getAccountIdByOpenId = wechat.getAccountIdByOpenId;
+    @requireParams(["openId"])
+    static getOpenIdByAccount = wechat.getOpenIdByAccount;
 
 
-function getTokenSign(accountId, tokenId, token, timestamp) {
-    var originStr = accountId+tokenId+token+timestamp;
-    return utils.md5(originStr);
+    @clientExport
+    static login = authentication.login;
+    @clientExport
+    static logout = authentication.logout;
+
+    static authentication = authentication.checkTokenAuth;
+
 }
 
 //生成激活链接参数
@@ -1634,68 +1153,31 @@ function makeLinkSign(linkToken, invitedLinkId, timestamp) {
 }
 
 async function _sendActiveEmail(accountId) {
-    return Models.account.get(accountId)
-        .then(async function(account) {
-            //生成激活码
-            var expireAt = Date.now() + 24 * 60 * 60 * 1000;//失效时间一天
-            var activeToken = utils.getRndStr(6);
-            var sign = makeActiveSign(activeToken, account.id, expireAt);
-            var url = C.host + "/index.html#/login/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt+"&email="+account.email;
-            try {
-                url = await API.wechat.shorturl({longurl: url});
-            } catch(err) {
-                console.error(err);
-            }
-            //发送激活邮件
-            var vals = {
-                name: account.email,
-                username: account.email,
-                url: url
-            };
-            return API.notify.submitNotify({
-                key: 'qm_active',
-                values: vals,
-                email: account.email,
-            })
-            .then(function(ret) {
-                account.activeToken = activeToken;
-                return DBM.Account.update({activeToken: activeToken}, {where: {id: accountId}, returning: true});
-            })
-        })
-}
-
-
-//生成登录凭证
-function makeAuthenticateSign(accountId, os?: string) {
-    if (!os) {
-        os = 'web';
+    var account = await Models.account.get(accountId)
+    //生成激活码
+    var expireAt = Date.now() + 24 * 60 * 60 * 1000;//失效时间一天
+    var activeToken = utils.getRndStr(6);
+    var sign = makeActiveSign(activeToken, account.id, expireAt);
+    var url = C.host + "/index.html#/login/active?accountId=" + account.id + "&sign=" + sign + "&timestamp=" + expireAt + "&email=" + account.email;
+    try {
+        url = await API.wechat.shorturl({longurl: url});
+    } catch(err) {
+        console.error(err);
     }
-
-    return DBM.Token.findOne({where:{accountId: accountId, os: os}})
-        .then(function(m) {
-            var refreshAt = moment().format("YYYY-MM-DD HH:mm:ss");
-            var expireAt = moment().add(2, "hours").format("YYYY-MM-DD HH:mm:ss");
-            if (m) {
-                m.refreshAt = refreshAt;
-                m.expireAt = expireAt;
-                return m.save();
-            } else {
-                m = DBM.Token.build({id: uuid.v1(), accountId: accountId, token: utils.getRndStr(10), refreshAt: refreshAt, expireAt: expireAt});
-                return m.save();
-            }
+    //发送激活邮件
+    var vals = {
+        name: account.email,
+        username: account.email,
+        url: url
+    };
+    account.activeToken = activeToken;
+    await Promise.all([
+        account.save(),
+        API.notify.submitNotify({
+            key: 'qm_active',
+            values: vals,
+            email: account.email,
         })
-        .then(function(m) {
-            var tokenId = m.id;
-            var token = m.token;
-            var timestamp = new Date(m.expireAt).valueOf();
-            var tokenSign = getTokenSign(accountId, tokenId, token, timestamp);
-            return {
-                token_id: tokenId,
-                user_id: accountId,
-                token_sign: tokenSign,
-                timestamp: timestamp
-            }
-        });
+    ]);
 }
 
-export = ApiAuth;

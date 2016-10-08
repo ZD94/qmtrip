@@ -28,7 +28,7 @@ class CabinPrefer extends AbstractPrefer<IFinalTicket> {
             if (!v.reasons) v.reasons = [];
             if (this.expectCabins.indexOf(v.cabin) >= 0) {
                 v['score'] += self.score;
-                v.reasons.push(`座次符合规定:+${self.score}`)
+                v.reasons.push(`座次符合规定: ${self.score}`)
             }
             return v;
         });

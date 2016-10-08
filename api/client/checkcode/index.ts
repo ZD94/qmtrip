@@ -8,14 +8,14 @@
 
 const API = require("common/api");
 
-interface MsgCheckCode {
+export interface MsgCheckCode {
     ticket: string
     code?: string
     type?: number
     mobile: string
 }
 
-interface PicCheckCode {
+export interface PicCheckCode {
     ticket: string
     code?: string
     type?: number
@@ -25,7 +25,7 @@ interface PicCheckCode {
     captcha?: string
 }
 
-class ApiCheckCode {
+export default class ApiCheckCode {
     static __public: boolean = true;
 
     /**
@@ -150,4 +150,4 @@ class ApiCheckCode {
     }
 }
 
-export= ApiCheckCode;
+//export= ApiCheckCode;

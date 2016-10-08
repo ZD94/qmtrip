@@ -4,7 +4,6 @@
 
 'use strict';
 import {IFinalTicket} from "api/_types/travelbudget";
-import moment = require("moment");
 import {AbstractPrefer} from "./index";
 
 class DepartTimePrefer extends AbstractPrefer<IFinalTicket> {

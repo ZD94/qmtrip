@@ -4,11 +4,11 @@
 import { clientExport } from 'common/api/helper';
 import {Models } from 'api/_types'
 import {ETripType, EInvoiceType} from "../_types/tripPlan";
-import {EHotelLevel, EPlaneLevel, ETrainLevel, MHotelLevel, MPlaneLevel, MTrainLevel} from "../_types/travelPolicy";
+import {EPlaneLevel, ETrainLevel, MTrainLevel} from "../_types/travelPolicy";
 import {Staff} from "../_types/staff";
 const API = require("common/api");
 const validate = require("common/validate");
-const L = require("common/language");
+import L from 'common/language';
 const moment = require('moment');
 const cache = require("common/cache");
 const utils = require("common/utils");
@@ -17,16 +17,16 @@ import {ITicket, TravelBudgeItem, TRAFFIC} from "api/_types/travelbudget";
 import {
     TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
 } from "./strategy/index";
-import {loadDefaultPrefer} from "./prefer/index";
+import {loadDefaultPrefer} from "./prefer";
 
-const defaultPrice = {
-    "5": 500,
-    "4": 450,
-    "3": 400,
-    "2": 350
-}
+// const defaultPrice = {
+//     "5": 500,
+//     "4": 450,
+//     "3": 400,
+//     "2": 350
+// }
 
-interface BudgetOptions{
+export interface BudgetOptions{
     originPlace: string,
     destinationPlace: string,
     isNeedHotel: boolean,
@@ -46,7 +46,7 @@ interface BudgetOptions{
 }
 
 
-class ApiTravelBudget {
+export default class ApiTravelBudget {
 
     @clientExport
     static getBudgetInfo(params: {id: string, accountId? : string}) {
@@ -154,6 +154,8 @@ class ApiTravelBudget {
                             leaveDate: leaveDate,
                             earliestLeaveTime: earliestLeaveTime,
                             latestArrivalTime: latestArrivalTime,
+                            goBackDate: goBackDate,
+                            earliestGoBackTime: earliestGoBackTime
                         });
                         budget.tripType = ETripType.OUT_TRIP;
                         budgets.push(budget);
@@ -170,6 +172,8 @@ class ApiTravelBudget {
                             leaveDate: goBackDate,
                             earliestLeaveTime: earliestGoBackTime,
                             latestArrivalTime: latestGoBackTime,
+                            goBackDate: goBackDate,
+                            earliestGoBackTime: earliestGoBackTime
                         }
                         let budget = await ApiTravelBudget.getTrafficBudget(_params);
                         budget.tripType = ETripType.BACK_TRIP;
@@ -210,6 +214,7 @@ class ApiTravelBudget {
                         budget.hasFirstDaySubsidy = subsidy.hasFirstDaySubsidy;
                         budget.hasLastDaySubsidy = subsidy.hasLastDaySubsidy;
                         budget.tripType = ETripType.SUBSIDY;
+                        budget.type = EInvoiceType.SUBSIDY;
                         budget.price = subsidy.template.target.subsidyMoney * days;
                         budget.template = {id: subsidy.template.target.id, name: subsidy.template.target.name}
                         budgets.push(budget);
@@ -335,7 +340,7 @@ class ApiTravelBudget {
      */
     @clientExport
     static async getTrafficBudget(params: {originPlace: any, destinationPlace: any,
-        leaveDate: Date | string, earliestLeaveTime?: string, latestArrivalTime?: string}) : Promise<TravelBudgeItem> {
+        leaveDate: Date | string, goBackDate?: Date | string, earliestLeaveTime?: string, earliestGoBackTime?: string, latestArrivalTime?: string}) : Promise<TravelBudgeItem> {
         let {originPlace, destinationPlace, leaveDate, earliestLeaveTime, latestArrivalTime} = params;
 
         if (!destinationPlace) {
@@ -382,7 +387,7 @@ class ApiTravelBudget {
             leaveDate = moment(leaveDate).format("YYYY-MM-DD");
         }
 
-        let companyPolicy = staff.company.budgetPolicy;
+        //let companyPolicy = staff.company.budgetPolicy;
         let m_originCity = await API.place.getCityInfo({cityCode: originPlace.id || originPlace});
         let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
 
@@ -453,7 +458,7 @@ class ApiTravelBudget {
     static async reportBudgetError(params: { budgetId: string}) {
         let {accountId} = Zone.current.get('session');
         let {budgetId} = params;
-        let staff = await Staff.getCurrent();
+        //let staff = await Staff.getCurrent();
         let content = await ApiTravelBudget.getBudgetInfo({id: budgetId, accountId: accountId});
         let budgets = content.budgets;
         let ps = budgets.map( async (budget): Promise<any> => {
@@ -520,5 +525,3 @@ class ApiTravelBudget {
         })
     }
 }
-
-export= ApiTravelBudget;

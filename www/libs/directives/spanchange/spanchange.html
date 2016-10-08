@@ -1,0 +1,22 @@
+<ion-modal-view class="spanChange">
+    <ion-header-bar>
+        <h1 class="title"></h1>
+        <button class="button" style="" ng-click="modal.hide()">取消</button>
+    </ion-header-bar>
+    <ion-content>
+        <ion-list>
+            <ion-radio ng-repeat="(key,name) in intervals" ng-model="interval" ng-value="key" ng-checked="interval == key">{{name}}</ion-radio>
+        </ion-list>
+        <ion-toggle toggle-class="toggle-positive" ng-model="interval" ng-value="other">自定义</ion-toggle>
+        <div ng-if="interval=='other'" class="selfDefine" ng-click="selfDefineFun()">
+            <div>
+                <div class="self-time-title">开始日期</div>
+                <div class="self-time-value">{{span.startTime | date:'yyyy.MM.dd'}}</div>
+            </div>
+            <div>
+                <div class="self-time-title">结束日期</div>
+                <div class="self-time-value">{{span.endTime | date:'yyyy.MM.dd'}}</div>
+            </div>
+        </div>
+    </ion-content>
+</ion-modal-view>

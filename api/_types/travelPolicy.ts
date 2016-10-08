@@ -5,8 +5,6 @@ import { Types, Values } from 'common/model';
 import { Table, Create, Field, ResolveRef } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 
-declare var API: any;
-
 export var  MTrainLevel  = {
     1: "商务座/高级软卧",
     2: "一等座/软卧",
