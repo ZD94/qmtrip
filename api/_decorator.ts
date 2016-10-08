@@ -220,7 +220,6 @@ export var condition = {
         return async function(fn, self, args) {
             let id = _.get(args, idpath);
             let staff = await Staff.getCurrent();
-            console.info(staff)
             let other = await Models.staff.get(id);
             return id && staff && other && staff["companyId"] == other["companyId"];
         }
