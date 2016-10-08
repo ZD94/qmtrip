@@ -12,6 +12,7 @@ import { ModelInterface } from 'common/model/interface';
 import { ModelDelegate } from 'common/model/delegate';
 import {TravelBudgetLog} from "./travelbudget";
 import {DDTalkCorp, DDTalkUser} from "./ddtalk";
+import {CoinAccountChange, CoinAccount} from "./coin";
 
 
 export enum EGender {
@@ -55,6 +56,9 @@ export interface ModelsInterface {
 
     ddtalkCorp: ModelInterface<DDTalkCorp>;
     ddtalkUser: ModelInterface<DDTalkUser>;
+
+    coinAccount: ModelInterface<CoinAccount>;
+    coinAccountChange: ModelInterface<CoinAccountChange>;
 }
 
 export var Models: ModelsInterface = {
@@ -88,6 +92,8 @@ export var Models: ModelsInterface = {
     ddtalkCorp: new ModelDelegate<DDTalkCorp>(),
     ddtalkUser: new ModelDelegate<DDTalkUser>(),
 
+    coinAccount: new ModelDelegate<CoinAccount>(),
+    coinAccountChange: new ModelDelegate<CoinAccountChange>(),
 };
 
 export function initModels(models: ModelsInterface){

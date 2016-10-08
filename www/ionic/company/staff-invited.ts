@@ -73,11 +73,11 @@ export async function StaffInvitedController($scope, Models, $ionicHistory, $ion
                 cssClass: 'share_alert'
             })
             ClosePopupService.register(show);
-            wx.onMenuShareAppMessage({
+            var WxConfig={
                 title: staff.name +'邀请您注册鲸力商旅',
                 desc:'加入'+staff.company.name+',共同开启智能商旅!',
                 link: $scope.invitedLink.goInvitedLink,
-                imgUrl:'https://t.jingli365.com/ionic/images/logo.png',
+                imgUrl: 'https://t.jingli365.com/ionic/images/logo.png',
                 type: '', // 分享类型,music、video或link，不填默认为link
                 dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
                 success: function () {
@@ -88,7 +88,14 @@ export async function StaffInvitedController($scope, Models, $ionicHistory, $ion
                     // 用户取消分享后执行的回调函数
                     show.close();
                 }
-            });
+            };
+            wx.onMenuShareAppMessage(WxConfig);
+            wx.onMenuShareQQ(WxConfig);
+            let openConfig = _.clone(WxConfig);
+            openConfig.link = 'https://jingli365.com';
+            wx.onMenuShareTimeline(WxConfig);
+            wx.onMenuShareWeibo(WxConfig);
+            wx.onMenuShareQZone(WxConfig);
         }
     }
 }

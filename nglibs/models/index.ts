@@ -17,6 +17,9 @@ import { Agency, AgencyUser } from 'api/_types/agency';
 import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove} from 'api/_types/tripPlan';
 import {Account, Token, AccountOpenid} from 'api/_types/auth';
 import { Seed } from 'api/_types/seed';
+import {TravelBudgetLog} from "api/_types/travelbudget";
+import {DDTalkCorp, DDTalkUser} from "api/_types/ddtalk";
+import {CoinAccount, CoinAccountChange} from "api/_types/coin";
 
 const API = require('common/api');
 
@@ -97,7 +100,10 @@ var Services = {
     seed: { type: Seed, modname: 'seeds',
         funcs: []
     },
-    token: { type: Token, modname: 'token', funcs: []}
+    token: { type: Token, modname: 'token', funcs: []},
+    //鲸币账户
+    coinAccount: { type: CoinAccount, modname: 'coin', funcs: ['clientStaffCoinAccount']},
+    coinAccountChange: { type: CoinAccountChange, modname: 'coin', funcs: []}
 };
 
 function throwNotImplemented(){
@@ -145,6 +151,9 @@ class ClientModels implements ModelsInterface {
     ddtalkCorp: ModelRemote<DDTalkCorp>;
     ddtalkUser: ModelRemote<DDTalkUser>;
 
+    coinAccount: ModelRemote<CoinAccount>;
+    coinAccountChange: ModelRemote<CoinAccountChange>;
+
     constructor($cacheFactory: ng.ICacheFactoryService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
         this.credential = createService<Credential>(Services.credential, $cacheFactory);
@@ -166,6 +175,8 @@ class ClientModels implements ModelsInterface {
         this.account = createService<Account>(Services.account, $cacheFactory);
         this.token = createService<Token>(Services.token, $cacheFactory);
         this.seed = createService<Seed>(Services.seed, $cacheFactory);
+        this.coinAccount = createService<CoinAccount>(Services.coinAccount, $cacheFactory);
+        this.coinAccountChange = createService<CoinAccountChange>(Services.coinAccountChange, $cacheFactory);
         initModels(this);
 
         API.on('beforeConnect', this.clearCache.bind(this));
@@ -183,6 +194,4 @@ class ClientModels implements ModelsInterface {
 
 import './menu';
 import './place';
-import {TravelBudgetLog} from "api/_types/travelbudget";
-import {DDTalkCorp, DDTalkUser} from "api/_types/ddtalk";
 
