@@ -950,7 +950,12 @@ class TripPlanModule {
             templateName = 'qm_notify_invoice_one_pass';
             let detailSavedM = tripDetail.budget - tripDetail.expenditure;
             detailSavedM = detailSavedM > 0 ? detailSavedM : 0;
-            templateValue.invoiceDetail += '，实际花费：' + tripDetail.expenditure + '元，节省：' + detailSavedM + '元';
+
+            if(tripPlan.isSpecialApprove){
+                templateValue.invoiceDetail += '，实际花费：' + tripDetail.expenditure + '元';
+            }else{
+                templateValue.invoiceDetail += '，实际花费：' + tripDetail.expenditure + '元，节省：' + detailSavedM + '元';
+            }
         } else if(audit == EAuditStatus.INVOICE_NOT_PASS) {
             logResult = '未通过';
             isNotify = true;

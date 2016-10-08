@@ -10,6 +10,7 @@ import { TripPlan } from "api/_types/tripPlan";
 import { Table, Create, Field, Reference } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import { MoneyChange } from './money-change';
+import {PaginateInterface} from "common/model/interface";
 declare var API: any;
 
 export enum ECompanyStatus {
@@ -172,7 +173,7 @@ export class Company extends ModelObject{
         }
     }
 
-    getTripPlans(options?: any): Promise<TripPlan[]> {
+    getTripPlans(options?: any): Promise<PaginateInterface<TripPlan> > {
         if(!options) {options = {where: {}}};
         if(!options.where) {options.where = {};}
         options.where.companyId = this.id;
