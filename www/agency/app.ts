@@ -25,7 +25,7 @@ API.authenticate = function(remote, callback){
         function(err, res) {
             if(!err) {
                 var session = getSession();
-                session.agencyUserId = data.accountId;
+                session.accountId = data.accountId;
             }
             callback(err, res);
         });
