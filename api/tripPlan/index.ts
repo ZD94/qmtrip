@@ -997,7 +997,11 @@ class TripPlanModule {
         }
         if(isNotify) {
             if(tripPlan.status == EPlanStatus.COMPLETE) {
-                templateValue.invoiceDetail = `${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差票据，预算：${tripPlan.budget}元，实际花费：${tripPlan.expenditure}元，节省：${savedMoney}元`;
+                if(tripPlan.isSpecialApprove){
+                    templateValue.invoiceDetail = `${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差票据，预算：${tripPlan.budget}元，实际花费：${tripPlan.expenditure}元`;
+                }else{
+                    templateValue.invoiceDetail = `${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差票据，预算：${tripPlan.budget}元，实际花费：${tripPlan.expenditure}元，节省：${savedMoney}元`;
+                }
             }
 
             let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
