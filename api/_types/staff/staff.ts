@@ -107,9 +107,9 @@ export class Staff extends ModelObject implements Account {
         return Models.travelPolicy.get(id);
     }
 
-    @ResolveRef({ type: Types.UUID}, Models.coinAccount)
-    get coinAccount(): CoinAccount { return null};
-    set coinAccount(coinAccount: CoinAccount) {}
+    // @ResolveRef({ type: Types.UUID}, Models.coinAccount)
+    // get coinAccount(): CoinAccount { return null};
+    // set coinAccount(coinAccount: CoinAccount) {}
 
     setTravelPolicy(val: TravelPolicy) {}
 
