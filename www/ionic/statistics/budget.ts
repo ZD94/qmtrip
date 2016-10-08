@@ -4,32 +4,48 @@ import moment = require('moment');
 export default async function BudgetController($scope, $stateParams, Models) {
     require('./statistics.scss');
     API.require('tripPlan');
-    await API.onload();
-    let type = $stateParams.type;
-    console.log('进入控制器：'+type);
-    let formatStr = 'YYYY-MM-DD HH:mm:ss';
-    let monthSelection = {
-        type: type,
-        month: moment().format('YYYY-MM'),
-        startTime: moment().startOf('month').format(formatStr),
-        endTime: moment().endOf('month').format(formatStr),
-        showStr: `${moment().startOf('month').format('YYYY.MM.DD')}-${moment().endOf('month').format('YYYY.MM.DD')}`
-    };
-    $scope.monthSelection = monthSelection;
 
-    $scope.monthChange = async function(isAdd?: boolean) {
-        let optionFun = isAdd ? 'add' : 'subtract';
-        let queryMonth = moment( $scope.monthSelection.month)[optionFun](1, 'month');
-        let monthSelection = {
-            type: $scope.monthSelection.type,
-            month: queryMonth.format('YYYY-MM'),
-            startTime: queryMonth.startOf('month').format(formatStr),
-            endTime: queryMonth.endOf('month').format(formatStr),
-            showStr: `${queryMonth.startOf('month').format('YYYY.MM.DD')}-${queryMonth.endOf('month').format('YYYY.MM.DD')}`
-        };
-        $scope.monthSelection = monthSelection;
-        await initData();
+    let type = $stateParams.type;
+    let formatStr = 'YYYY-MM-DD HH:mm:ss';
+    // let monthSelection = {
+    //     type: type,
+    //     month: moment().format('YYYY-MM'),
+    //     startTime: moment().startOf('month').format(formatStr),
+    //     endTime: moment().endOf('month').format(formatStr),
+    //     showStr: `${moment().startOf('month').format('YYYY.MM.DD')}-${moment().endOf('month').format('YYYY.MM.DD')}`
+    // };
+    // $scope.monthSelection = monthSelection;
+    //
+    // $scope.monthChange = async function(isAdd?: boolean) {
+    //     let optionFun = isAdd ? 'add' : 'subtract';
+    //     let queryMonth = moment( $scope.monthSelection.month)[optionFun](1, 'month');
+    //     let monthSelection = {
+    //         type: $scope.monthSelection.type,
+    //         month: queryMonth.format('YYYY-MM'),
+    //         startTime: queryMonth.startOf('month').format(formatStr),
+    //         endTime: queryMonth.endOf('month').format(formatStr),
+    //         showStr: `${queryMonth.startOf('month').format('YYYY.MM.DD')}-${queryMonth.endOf('month').format('YYYY.MM.DD')}`
+    //     };
+    //     $scope.monthSelection = monthSelection;
+    //     await initData();
+    // };
+    //修改日历指令
+    var now = moment();
+    var data = $scope.data = {
+        monthSelection: {
+            type: type,
+            startTime: now.startOf('month').toDate(),
+            endTime: now.add(1, 'month').startOf('month').toDate(),
+        }
     };
+
+    $scope.$watch('data.monthSelection',function (o,n) {
+        // if(o!=n){
+        //     console.log(data.monthSelection);
+        // }
+        initData();
+    },true);
+
 
     await searchStatistics(type);
 
@@ -62,12 +78,20 @@ export default async function BudgetController($scope, $stateParams, Models) {
         $scope.isDActive = isDActive;
         $scope.modelName = modelName;
         $scope.placeholder = placeholder;
-        $scope.monthSelection.type = type;
+        $scope.data.monthSelection.type = type;
         await initData();
     }
 
     async function initData() {
-        let ret = await API.tripPlan.statisticBudgetsInfo($scope.monthSelection);
+        await API.onload();
+        let startTime = moment($scope.data.monthSelection.startTime).format(formatStr);
+        let endTime = moment($scope.data.monthSelection.endTime).format(formatStr);
+        let obj = {
+            type: $scope.data.monthSelection.type,
+            startTime: startTime,
+            endTime: endTime,
+        }
+        let ret = await API.tripPlan.statisticBudgetsInfo(obj);
         ret = await Promise.all(ret.map(async (s) => {
             s.keyInfo = await Models[$scope.modelName].get(s.typeKey);
             return s;
@@ -76,7 +100,7 @@ export default async function BudgetController($scope, $stateParams, Models) {
     }
 
     $scope.goToStaffRecords = function(name) {
-        window.location.href = `#/trip/list-all?type=${$scope.monthSelection.type}&keyword=${name}`;
+        window.location.href = `#/trip/list-all?type=${$scope.data.monthSelection.type}&keyword=${name}`;
     };
 
     $scope.searchStatistics = searchStatistics;
