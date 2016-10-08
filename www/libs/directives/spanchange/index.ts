@@ -54,9 +54,9 @@ function calculateInterval(span:{startTime:Date, endTime:Date}){
 
 const intervals = {
     weeks:'周',
-    months:'M',
-    quarters:'Q',
-    years:'Y',
+    months:'月',
+    quarters:'季',
+    years:'年',
 };
 function SpanChangeController($scope, ngModalDlg){
     $scope.intervals = intervals;
