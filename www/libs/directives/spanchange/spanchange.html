@@ -5,7 +5,7 @@
     </ion-header-bar>
     <ion-content>
         <ion-list>
-            <ion-radio ng-repeat="(key,name) in intervals" ng-model="interval" ng-value="key" ng-checked="interval == key">{{name}}</ion-radio>
+            <ion-radio ng-repeat="(key,name) in intervals" ng-model="interval" ng-value="key" ng-checked="interval == key" ng-click="$scope.intervals = intervals;">{{name}}</ion-radio>
         </ion-list>
         <ion-toggle toggle-class="toggle-positive" ng-model="interval" ng-value="other">自定义</ion-toggle>
         <div ng-if="interval=='other'" class="selfDefine" ng-click="selfDefineFun()">

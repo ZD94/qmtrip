@@ -23,7 +23,6 @@ angular
                 $scope.monthChange = function (x: number) {
                     $scope.span.startTime = moment($scope.span.startTime).add(x, $scope.interval).toDate();
                     $scope.span.endTime = moment($scope.span.endTime).add(x, $scope.interval).toDate();
-                    console.log('change', $scope.span);
                 };
                 $scope.showmadel = async function () {
                     let ret = await ngModalDlg.createDialog({
@@ -32,8 +31,8 @@ angular
                         template: require('./spanchange.html'),
                         controller: SpanChangeController,
                     });
-                    $scope.span = ret.span;
-                    $scope.interval = ret.interval;
+                    //$scope.span = ret.span;
+                    //$scope.interval = ret.interval;
                 }
             }
         }
@@ -54,13 +53,13 @@ function calculateInterval(span:{startTime:Date, endTime:Date}){
 
 const intervals = {
     weeks:'周',
-    months:'M',
-    quarters:'Q',
-    years:'Y',
+    months:'月',
+    quarters:'季',
+    years:'年',
 };
 function SpanChangeController($scope, ngModalDlg){
     $scope.intervals = intervals;
-    $scope.$watch('interval', function(n, o){
+    $scope.$watch('interval', function(o, n){
         if(n != o){
             if(n !== 'other'){
                 let start = moment($scope.span.startTime).startOf($scope.interval);
@@ -86,5 +85,4 @@ function SpanChangeController($scope, ngModalDlg){
         $scope.span.startTime = value.begin;
         $scope.span.endTime = value.end;
     };
-    console.log('指令t', $scope.span);
 }

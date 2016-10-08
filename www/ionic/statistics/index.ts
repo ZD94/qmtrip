@@ -23,12 +23,11 @@ export default async function IndexController($scope, $ionicModal, ngModalDlg) {
         $scope.saveMoneyChart.data = [$scope.statistic.savedMoney || 0, $scope.statistic.expenditure || 1];
         $scope.$applyAsync();
     }
-    console.log('in')
-    console.log('外层控制器', data.monthSelection);
+
     $scope.$watch('data.monthSelection',function (o,n) {
-        if(o!=n){
-            console.log(data.monthSelection);
-        }
+        // if(o!=n){
+        //     console.log(data.monthSelection);
+        // }
         searchData();
     },true);
 
