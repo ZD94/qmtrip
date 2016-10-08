@@ -10,7 +10,7 @@ import { TripPlan } from "api/_types/tripPlan";
 import {Table, Create, Field, Reference, ResolveRef} from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import { MoneyChange } from './money-change';
-import {CoinAccount} from "../coin";
+import {CoinAccount} from "api/_types/coin";
 declare var API: any;
 
 export enum ECompanyStatus {

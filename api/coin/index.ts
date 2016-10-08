@@ -7,10 +7,10 @@ import {ICompanyChargeParam, IStaffPoint2CoinParam, IStaffCostCoinParam} from ".
 import {Models} from "../_types/index";
 import {requireParams, clientExport} from "../../common/api/helper";
 import {Staff} from "../_types/staff/staff";
-import {CoinAccount} from "../_types/coin";
+import {CoinAccount} from "api/_types/coin";
 
 
-export class CoinModule {
+class CoinModule {
 
     @requireParams(["companyId", "coin"], ['remark'])
     static async companyCharge(params: ICompanyChargeParam) :Promise<CoinAccount>{
@@ -97,3 +97,5 @@ function getOrderNo() : string {
     var str = `${d.getFullYear()}${d.getMonth()+1}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}-${rnd}`;
     return str;
 }
+
+export=CoinModule
