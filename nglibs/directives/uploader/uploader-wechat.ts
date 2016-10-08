@@ -30,6 +30,7 @@ export function wechatUploaderController($scope, $element, $loading, ngModalDlg)
         if(!blobs)
             return;
         try{
+            /*
             var p = files.map(async function(f){
                 var res:any = await wxUploadImage({
                     localId: f, // 需要上传的图片的本地ID，由chooseImage接口获得
@@ -38,6 +39,15 @@ export function wechatUploaderController($scope, $element, $loading, ngModalDlg)
                 return res.serverId;
             })
             var serverIds = await Promise.all(p);
+            */
+            var serverIds = [];
+            for(let f of files){
+                var res:any = await wxUploadImage({
+                    localId: f, // 需要上传的图片的本地ID，由chooseImage接口获得
+                    isShowProgressTips: 1, // 默认为1，显示进度提示
+                });
+                serverIds.push(res.serverId);
+            }
             $loading.start();
             var fileIds = await API.wechat.mediaId2key({mediaIds: serverIds});
 
