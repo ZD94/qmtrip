@@ -16,24 +16,28 @@ angular
             scope:{
                 span:'=ngModel'
             },
-            controller:function($scope, $ionicModal, ngModalDlg, $stateParams) {
+            controller:function($scope, $ionicModal, ngModalDlg) {
                 require('./spanchange.scss');
                 let span = $scope.span;
-                $scope.interval = calculateInterval(span);
+                $scope.spacing = {
+                    interval:''
+                };
+                $scope.spacing.interval = calculateInterval(span);
                 $scope.monthChange = function (x: number) {
-                    $scope.span.startTime = moment($scope.span.startTime).add(x, $scope.interval).toDate();
-                    $scope.span.endTime = moment($scope.span.endTime).add(x, $scope.interval).toDate();
+                    $scope.span.startTime = moment($scope.span.startTime).add(x, $scope.spacing.interval).toDate();
+                    $scope.span.endTime = moment($scope.span.endTime).add(x, $scope.spacing.interval).toDate();
                     console.log('change', $scope.span);
                 };
                 $scope.showmadel = async function () {
                     let ret = await ngModalDlg.createDialog({
                         parent: $scope,
-                        scope: {span, interval: $scope.interval},
+                        scope: {span, interval: $scope.spacing.interval},
                         template: require('./spanchange.html'),
                         controller: SpanChangeController,
                     });
                     $scope.span = ret.span;
                     $scope.interval = ret.interval;
+
                 }
             }
         }
@@ -60,24 +64,28 @@ const intervals = {
 };
 function SpanChangeController($scope, ngModalDlg){
     $scope.intervals = intervals;
-    $scope.$watch('interval', function(n, o){
+    $scope.$watch('spacing.interval', function(o, n){
         if(n != o){
             if(n !== 'other'){
-                let start = moment($scope.span.startTime).startOf($scope.interval);
+                let start = moment($scope.span.startTime).startOf($scope.spacing.interval);
                 $scope.span.startTime = start.toDate();
-                $scope.span.endTime = start.add(1, $scope.interval).toDate();
+                $scope.span.endTime = start.add(1, $scope.spacing.interval).toDate();
             }
         }
     })
-
-    $scope.selfDefineFun = async function(){
+    $scope.changeSpan = function(key,modal){
+        console.log(key);
+        $scope.spacing.interval = key;
+        modal.hide();
+    }
+    $scope.selfDefineFun = async function(modal){
         let value = {
             begin: $scope.span.startTime,
             end: $scope.span.endTime
         }
         value = await ngModalDlg.selectDateSpan($scope, {
-            beginDate:value.begin,
-            endDate: value.end,
+            beginDate:moment().add(-1,'years').startOf('months').toDate(),
+            endDate: moment().endOf('months').toDate(),
             timepicker: false,
             title: '选择开始时间',
             titleEnd: '选择结束时间',
@@ -85,6 +93,7 @@ function SpanChangeController($scope, ngModalDlg){
         }, value);
         $scope.span.startTime = value.begin;
         $scope.span.endTime = value.end;
+        modal.hide();
     };
     console.log('指令t', $scope.span);
 }
