@@ -233,3 +233,12 @@ ion-content {
     padding: 0 8px;
   }
 }
+
+textarea {
+  background-color: lighten($dark, 72%);
+  padding: 10px;
+  resize: none;
+}
+.item-input textarea{
+  width: 60%;
+}
