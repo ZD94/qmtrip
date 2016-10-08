@@ -1,0 +1,1 @@
+alter table company.companies rename point2coin_rate to points_2_coin_rate;
