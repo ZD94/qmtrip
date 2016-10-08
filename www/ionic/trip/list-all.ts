@@ -80,15 +80,14 @@ export default async function ListAllController($scope, $stateParams) {
         loadTripPlans(pager);
 
         $scope.vm = {
-            isHasNextPage:true,
+            isHasNextPage:pager.hasNextPage(),
             nextPage : async function() {
-                try {
-                    pager = await $scope.pager['nextPage']();
-                } catch(err) {
-                    this.isHasNextPage = false;
+                if(!pager.hasNextPage()){
+                    $scope.vm.isHasNextPage = false;
                     return;
                 }
-                $scope.pager = pager;
+                await pager.nextPage();
+                $scope.vm.isHasNextPage = pager.hasNextPage();
                 loadTripPlans(pager);
                 $scope.$broadcast('scroll.infiniteScrollComplete');
             }
