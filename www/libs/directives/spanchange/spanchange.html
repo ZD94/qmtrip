@@ -5,10 +5,10 @@
     </ion-header-bar>
     <ion-content>
         <ion-list>
-            <ion-radio ng-repeat="(key,name) in intervals" ng-model="interval" ng-value="key" ng-checked="interval == key">{{name}}</ion-radio>
+            <ion-radio ng-repeat="(key,name) in intervals" ng-model="spacing.interval" ng-click="changeSpan(key,modal)" ng-value="key">{{name}}</ion-radio>
         </ion-list>
-        <ion-toggle toggle-class="toggle-positive" ng-model="interval" ng-value="other">自定义</ion-toggle>
-        <div ng-if="interval=='other'" class="selfDefine" ng-click="selfDefineFun()">
+        <ion-toggle toggle-class="toggle-positive" ng-model="selfDefine">自定义</ion-toggle>
+        <div ng-if="selfDefine" class="selfDefine" ng-click="selfDefineFun(modal)">
             <div>
                 <div class="self-time-title">开始日期</div>
                 <div class="self-time-value">{{span.startTime | date:'yyyy.MM.dd'}}</div>
