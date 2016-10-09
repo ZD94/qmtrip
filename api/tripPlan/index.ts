@@ -1142,9 +1142,10 @@ class TripPlanModule {
      * @param params
      * @returns {boolean}
      */
+    @clientExport
     @requireParams(['id'])
     @modelNotNull('tripPlan')
-    static async cancelTripPlan(params: {id: string}): Promise<boolean> {
+    static async cancelTripPlan(params: {id: string, remark: string}): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
         if( tripPlan.status != EPlanStatus.NO_BUDGET && tripPlan.status != EPlanStatus.WAIT_UPLOAD) {
             throw {code: -2, msg: "出差记录状态不正确！"};
@@ -1158,9 +1159,10 @@ class TripPlanModule {
             }));
         }
         tripPlan.status = EPlanStatus.CANCEL;
-        /*let staff = await Staff.getCurrent();
-        let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id, remark: `撤销出差计划`});
-        await Promise.all([tripPlan.save(), log.save()]);*/
+        tripPlan.cancelRemark = params.remark || "";
+        let staff = await Staff.getCurrent();
+        let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id, remark: `撤销行程`});
+        await Promise.all([tripPlan.save(), log.save()]);
         await tripPlan.save();
         return true;
     }
@@ -1173,18 +1175,15 @@ class TripPlanModule {
     @clientExport
     @requireParams(['id'])
     @modelNotNull('tripPlan')
-    static async cancelTripApprove(params: {id: string}): Promise<boolean> {
+    static async cancelTripApprove(params: {id: string, remark: string}): Promise<boolean> {
         let tripApprove = await Models.tripApprove.get(params.id);
-        if( tripApprove.status != EApproveStatus.WAIT_APPROVE && tripApprove.status != EApproveStatus.PASS) {
-            throw {code: -2, msg: "出差请示状态不正确！"};
-        }
-
-        if(tripApprove.status == EApproveStatus.PASS){
-            await TripPlanModule.cancelTripPlan(params);
+        if( tripApprove.status != EApproveStatus.WAIT_APPROVE && tripApprove.approvedUsers && tripApprove.approvedUsers.indexOf(",") != -1 ) {
+            throw {code: -2, msg: "审批单状态不正确，该审批单不能撤销！"};
         }
         tripApprove.status = EApproveStatus.CANCEL;
+        tripApprove.cancelRemark = params.remark || "";
         let staff = await Staff.getCurrent();
-        let log = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, remark: `撤销出差审批单`});
+        let log = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, remark: `撤销行程审批单`});
         await Promise.all([tripApprove.save(), log.save()]);
         return true;
     }

@@ -63,6 +63,7 @@
       }
     ]
   },
+  "system_notice_emails": ["shuang.cao@jingli.tech","xiaochen.li@jingli.tech"],
   "default_agency": {
     "name": "系统默认代理商",
     "email": "agency.agency@jingli.tech",
