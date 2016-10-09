@@ -284,7 +284,7 @@ export class TripPlan extends ModelObject {
         return Models.tripDetail.find({ where: {tripPlanId: this.id, type: ETripType.HOTEL}});
     }
     
-    getTripDetails(options: {where?: any, limit?: number}): Promise<TripDetail[]> {
+    getTripDetails(options: {where?: any, limit?: number, order?: any}): Promise<TripDetail[]> {
         if(!options) {
             options = {where: {}};
         }
