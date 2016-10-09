@@ -35,7 +35,7 @@ export default async function BudgetController($scope, $stateParams, Models) {
         monthSelection: {
             type: type,
             startTime: now.startOf('month').toDate(),
-            endTime: now.add(1, 'month').startOf('month').toDate(),
+            endTime: now.startOf('month').add(1, 'month').subtract(1, 'days').toDate(),
         }
     };
 
@@ -100,7 +100,9 @@ export default async function BudgetController($scope, $stateParams, Models) {
     }
 
     $scope.goToStaffRecords = function(name) {
-        window.location.href = `#/trip/list-all?type=${$scope.data.monthSelection.type}&keyword=${name}`;
+        let sTime = moment($scope.data.monthSelection.startTime).format();
+        let eTime = moment($scope.data.monthSelection.endTime).format();
+        window.location.href = `#/trip/list-all?type=${$scope.data.monthSelection.type}&keyword=${name}&sTime=${sTime}&eTime=${eTime}`;
     };
 
     $scope.searchStatistics = searchStatistics;

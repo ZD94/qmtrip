@@ -7,7 +7,7 @@ export default async function IndexController($scope) {
     var data = $scope.data = {
         monthSelection: {
             startTime: now.startOf('month').toDate(),
-            endTime: now.add(1, 'month').startOf('month').toDate(),
+            endTime: now.startOf('month').add(1, 'months').subtract(1, 'days').toDate(),
         }
     };
     $scope.statistic = {};

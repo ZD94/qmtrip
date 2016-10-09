@@ -7,33 +7,26 @@ export default async function ListAllController($scope, $stateParams) {
     require('../statistics/statistics.scss')
     let keyword = $stateParams.keyword || '';
     let type = $stateParams.type || null;
+    let sTime = $stateParams.sTime;
+    let eTime = $stateParams.eTime;
+
+    let formatStr = 'YYYY-MM-DD HH:mm:ss';
+    //修改日历指令
+    var data = $scope.data = {
+        monthSelection: {
+            keyWord: keyword,
+            startTime: moment(sTime).toDate(),
+            endTime: moment(eTime).toDate(),
+        }
+    };
     let staff = await Staff.getCurrent();
     let company = staff.company;
     $scope.EPlanStatus = EPlanStatus;
+    $scope.$watch('data.monthSelection',function (o,n) {
+        searchTripPlans();
+    },true);
 
-    let formatStr = 'YYYY-MM-DD HH:mm:ss';
-    let monthSelection = {
-        keyWord: keyword,
-        month: moment().format('YYYY-MM'),
-        startTime: moment().startOf('month').format(formatStr),
-        endTime: moment().endOf('month').format(formatStr),
-        showStr: `${moment().startOf('month').format('YYYY.MM.DD')}-${moment().endOf('month').format('YYYY.MM.DD')}`
-    };
-    $scope.monthSelection = monthSelection;
 
-    $scope.monthChange = async function(isAdd?: boolean) {
-        let optionFun = isAdd ? 'add' : 'subtract';
-        let queryMonth = moment( $scope.monthSelection.month)[optionFun](1, 'month');
-        let monthSelection = {
-            keyWord: $scope.monthSelection.keyWord,
-            month: queryMonth.format('YYYY-MM'),
-            startTime: queryMonth.startOf('month').format(formatStr),
-            endTime: queryMonth.endOf('month').format(formatStr),
-            showStr: `${queryMonth.startOf('month').format('YYYY.MM.DD')}-${queryMonth.endOf('month').format('YYYY.MM.DD')}`
-        };
-        $scope.monthSelection = monthSelection;
-        await searchTripPlans();
-    };
 
     $scope.enterDetail = function(trip){
         if (!trip) return;
@@ -41,7 +34,16 @@ export default async function ListAllController($scope, $stateParams) {
     };
 
     async function searchTripPlans(newVal?: string, oldVal?: string) {
-        let monthSelection = $scope.monthSelection;
+        let startTime = moment($scope.data.monthSelection.startTime).format(formatStr);
+        let endTime = moment($scope.data.monthSelection.endTime).format(formatStr);
+        let monthSelection = {
+            keyWord: $scope.data.monthSelection.keyWord,
+            startTime: startTime,
+            endTime: endTime
+        }
+
+
+
         let keyWord = monthSelection.keyWord;
         let status = [EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.AUDITING, EPlanStatus.COMPLETE, EPlanStatus.NO_BUDGET, EPlanStatus.WAIT_COMMIT, EPlanStatus.WAIT_UPLOAD];
         $scope.tripPlans = [];
@@ -101,5 +103,5 @@ export default async function ListAllController($scope, $stateParams) {
 
     }
 
-    $scope.$watch("monthSelection.keyWord", searchTripPlans);
+    $scope.$watch("data.monthSelection.keyWord", searchTripPlans);
 }
