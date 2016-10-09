@@ -1137,7 +1137,11 @@ class TripPlanModule {
         return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}
     }
 
-    @clientExport
+    /**
+     * 撤销tripPlan
+     * @param params
+     * @returns {boolean}
+     */
     @requireParams(['id'])
     @modelNotNull('tripPlan')
     static async cancelTripPlan(params: {id: string}): Promise<boolean> {
@@ -1154,9 +1158,34 @@ class TripPlanModule {
             }));
         }
         tripPlan.status = EPlanStatus.CANCEL;
-        let staff = await Staff.getCurrent();
+        /*let staff = await Staff.getCurrent();
         let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id, remark: `撤销出差计划`});
-        await Promise.all([tripPlan.save(), log.save()]);
+        await Promise.all([tripPlan.save(), log.save()]);*/
+        await tripPlan.save();
+        return true;
+    }
+
+    /**
+     * 撤销tripApprove
+     * @param params
+     * @returns {boolean}
+     */
+    @clientExport
+    @requireParams(['id'])
+    @modelNotNull('tripPlan')
+    static async cancelTripApprove(params: {id: string}): Promise<boolean> {
+        let tripApprove = await Models.tripApprove.get(params.id);
+        if( tripApprove.status != EApproveStatus.WAIT_APPROVE && tripApprove.status != EApproveStatus.PASS) {
+            throw {code: -2, msg: "出差请示状态不正确！"};
+        }
+
+        if(tripApprove.status == EApproveStatus.PASS){
+            await TripPlanModule.cancelTripPlan(params);
+        }
+        tripApprove.status = EApproveStatus.CANCEL;
+        let staff = await Staff.getCurrent();
+        let log = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, remark: `撤销出差审批单`});
+        await Promise.all([tripApprove.save(), log.save()]);
         return true;
     }
 

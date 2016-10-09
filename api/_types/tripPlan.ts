@@ -304,7 +304,7 @@ export class TripPlan extends ModelObject {
     }
 
     cancel(): Promise<boolean> {
-        return API.tripPlan.cancelTripPlan({id: this.id});
+        return API.tripPlan.cancelTripApprove({id: this.id});
     }
 
     /**
