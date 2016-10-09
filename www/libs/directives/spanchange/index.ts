@@ -34,9 +34,6 @@ angular
                         template: require('./spanchange.html'),
                         controller: SpanChangeController,
                     });
-                    //$scope.span = ret.span;
-                    //$scope.interval = ret.interval;
-
                 }
             }
         }
@@ -44,13 +41,13 @@ angular
 
 function calculateInterval(span:{startTime:Date, endTime:Date}){
     let end = moment(span.endTime);
-    if(moment(span.startTime).add(1, 'years').isSame(end))
+    if(moment(span.startTime).add(1, 'years').subtract(1, 'days').isSame(end))
         return 'years';
-    if(moment(span.startTime).add(1, 'quarters').isSame(end))
+    if(moment(span.startTime).add(1, 'quarters').subtract(1, 'days').isSame(end))
         return 'quarters';
-    if(moment(span.startTime).add(1, 'months').isSame(end))
+    if(moment(span.startTime).add(1, 'months').subtract(1, 'days').isSame(end))
         return 'months';
-    if(moment(span.startTime).add(1, 'weeks').isSame(end))
+    if(moment(span.startTime).add(1, 'weeks').subtract(1, 'days').isSame(end))
         return 'weeks';
     return 'other';
 }
@@ -68,7 +65,7 @@ function SpanChangeController($scope, ngModalDlg){
             if(n !== 'other'){
                 let start = moment($scope.span.startTime).startOf($scope.spacing.interval);
                 $scope.span.startTime = start.toDate();
-                $scope.span.endTime = start.add(1, $scope.spacing.interval).toDate();
+                $scope.span.endTime = start.add(1, $scope.spacing.interval).add(-1,'days').toDate();
             }
         }
     })

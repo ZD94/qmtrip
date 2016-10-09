@@ -162,6 +162,10 @@ export class TripPlan extends ModelObject {
     get specialApproveRemark(): string { return ''; }
     set specialApproveRemark(val: string) {}
 
+    @Field({type: Types.TEXT})
+    get cancelRemark(): string { return ''; }
+    set cancelRemark(val: string) {}
+
     @Field({ type: Types.JSONB})
     get query() : any { return null};
     set query(obj: any) {}
@@ -578,6 +582,10 @@ export class TripApprove extends ModelObject{
     get specialApproveRemark(): string { return ''; }
     set specialApproveRemark(val: string) {}
 
+    @Field({type: Types.TEXT})
+    get cancelRemark(): string { return ''; }
+    set cancelRemark(val: string) {}
+
     @Field({type: Types.DATE})
     get startAt(): Date { return null; }
     set startAt(val: Date) {}
@@ -638,5 +646,9 @@ export class TripApprove extends ModelObject{
         options.where.approveStatus = {$ne: EApproveResult.NULL};
         options.order = [['created_at', 'desc']];
         return Models.tripPlanLog.find(options);
+    }
+
+    cancel(): Promise<boolean> {
+        return API.tripPlan.cancelTripApprove({id: this.id});
     }
 }
