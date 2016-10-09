@@ -950,7 +950,12 @@ class TripPlanModule {
             templateName = 'qm_notify_invoice_one_pass';
             let detailSavedM = tripDetail.budget - tripDetail.expenditure;
             detailSavedM = detailSavedM > 0 ? detailSavedM : 0;
-            templateValue.invoiceDetail += '，实际花费：' + tripDetail.expenditure + '元，节省：' + detailSavedM + '元';
+
+            if(tripPlan.isSpecialApprove){
+                templateValue.invoiceDetail += '，实际花费：' + tripDetail.expenditure + '元';
+            }else{
+                templateValue.invoiceDetail += '，实际花费：' + tripDetail.expenditure + '元，节省：' + detailSavedM + '元';
+            }
         } else if(audit == EAuditStatus.INVOICE_NOT_PASS) {
             logResult = '未通过';
             isNotify = true;
@@ -992,7 +997,11 @@ class TripPlanModule {
         }
         if(isNotify) {
             if(tripPlan.status == EPlanStatus.COMPLETE) {
-                templateValue.invoiceDetail = `${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差票据，预算：${tripPlan.budget}元，实际花费：${tripPlan.expenditure}元，节省：${savedMoney}元`;
+                if(tripPlan.isSpecialApprove){
+                    templateValue.invoiceDetail = `${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差票据，预算：${tripPlan.budget}元，实际花费：${tripPlan.expenditure}元`;
+                }else{
+                    templateValue.invoiceDetail = `${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差票据，预算：${tripPlan.budget}元，实际花费：${tripPlan.expenditure}元，节省：${savedMoney}元`;
+                }
             }
 
             let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);

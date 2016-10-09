@@ -11,6 +11,7 @@ import {Table, Create, Field, Reference, ResolveRef} from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import { MoneyChange } from './money-change';
 import {CoinAccount} from "api/_types/coin";
+import {PaginateInterface} from "common/model/interface";
 declare var API: any;
 
 export enum ECompanyStatus {
@@ -181,7 +182,7 @@ export class Company extends ModelObject{
         }
     }
 
-    getTripPlans(options?: any): Promise<TripPlan[]> {
+    getTripPlans(options?: any): Promise<PaginateInterface<TripPlan> > {
         if(!options) {options = {where: {}}};
         if(!options.where) {options.where = {};}
         options.where.companyId = this.id;
