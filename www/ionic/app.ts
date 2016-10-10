@@ -2,6 +2,7 @@
 import L from 'common/language';
 import { getSession } from 'common/model';
 import { signToken, LoginResponse, genAuthString } from 'api/_types/auth/auth-cert';
+import initJPush from './jpush';
 require('ionic');
 
 function getAuthData(): LoginResponse {
@@ -152,4 +153,5 @@ app.run(initKeyboard);
 app.run(initStatusBar);
 if(window.cordova) {
     app.run(initUpdater);
+    app.run(initJPush);
 }
