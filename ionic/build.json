@@ -2,11 +2,11 @@
   "ios": {
     "debug": {
       "codeSignIdentity": "iPhone Developer: Ke Peng (URXH6TD5BA)",
-      "provisioningProfile": "1c1035fa-d74e-44c4-ad57-13f57bcbd438"
+      "provisioningProfile": "667d829d-b886-4436-93c0-6346078a5ca7"
     },
     "release": {
       "codeSignIdentity": "iPhone Distribution: Whale Share Technology co.,Ltd (7PJAND92U6)",
-      "provisioningProfile": "1c1035fa-d74e-44c4-ad57-13f57bcbd438"
+      "provisioningProfile": "dc0fce47-b7a5-40f7-af56-eddcb5d8db95"
     }
   },
   "android": {
