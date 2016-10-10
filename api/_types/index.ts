@@ -5,7 +5,7 @@ import { TravelPolicy, SubsidyTemplate } from './travelPolicy';
 import { Department } from './department';
 import { AccordHotel } from './accordHotel';
 import { Agency, AgencyUser } from './agency';
-import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove} from './tripPlan';
+import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCode} from './tripPlan';
 import {Account, Token, AccountOpenid} from './auth';
 import {Seed} from "./seed";
 import { ModelInterface } from 'common/model/interface';
@@ -49,6 +49,7 @@ export interface ModelsInterface {
     project: ModelInterface<Project>;
     tripApprove: ModelInterface<TripApprove>;
     travelBudgetLog: ModelInterface<TravelBudgetLog>;
+    financeCheckCode: ModelInterface<FinanceCheckCode>;
 
     account: ModelInterface<Account>;
     token: ModelInterface<Token>;
@@ -88,6 +89,7 @@ export var Models: ModelsInterface = {
     account: new ModelDelegate<Account>(),
     token: new ModelDelegate<Token>(),
     accountOpenid: new ModelDelegate<AccountOpenid>(),
+    financeCheckCode: new ModelDelegate<FinanceCheckCode>(),
 
     ddtalkCorp: new ModelDelegate<DDTalkCorp>(),
     ddtalkUser: new ModelDelegate<DDTalkUser>(),

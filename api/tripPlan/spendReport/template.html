@@ -359,7 +359,6 @@
 		-webkit-transform: scale(0.75);
 		transform-origin: 0 0;
 		-webkit-transform-origin:0 0 ;
-		border:1pt solid red;
 	}
 	.content h1 {
 		font-size: 12pt;
@@ -512,7 +511,7 @@
 <body>
 <div class="content">
 	<h1>差旅费用报销单</h1>
-	<p class="date">日期：2016年10月25日</p>
+	<p class="date">日期：<%=data.createAt%></p>
 	<table class="first-table table table-bordered">
 		<tr>
 			<td>

@@ -670,3 +670,37 @@ export class TripApprove extends ModelObject{
         return API.tripPlan.cancelTripApprove(obj);
     }
 }
+
+@Table(Models.financeCheckCode, 'tripPlan.')
+export class FinanceCheckCode extends ModelObject {
+    constructor(target: Object) {
+        super(target);
+    }
+    
+    @Create()
+    static create(obj?: Object): TripApprove { return null; }
+    
+    @Field({type: Types.UUID})
+    get id() :string {return Values.UUIDV1()}
+    set id(id: string) {}
+    
+    @Field({type: Types.UUID})
+    get tripPlanId(): string { return null};
+    set tripPlanId(id: string) {}
+    
+    @Field({type: Types.STRING(50)})
+    get code(): string {return getRndCode(6);}
+    set code(code: string) {}
+    
+    @Field({type: Types.BOOLEAN})
+    get isValid() : boolean { return true}
+    set isValid(b: boolean) {}
+}
+
+function getRndCode(length) {
+    let ret = ''
+    for(let i=0; i < length; i++) {
+        ret += Math.floor(Math.random() * 10);
+    }
+    return ret;
+}

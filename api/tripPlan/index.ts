@@ -16,8 +16,8 @@ let systemNoticeEmails = require('config/config').system_notice_emails;
 import _ = require('lodash');
 import {requireParams, clientExport} from 'common/api/helper';
 import {
-    Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus,EInvoiceType,
-    TripApprove, EApproveStatus, EApproveResult,EApproveResult2Text
+    Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
+    TripApprove, EApproveStatus, EApproveResult, EApproveResult2Text, MTxPlaneLevel
 } from "api/_types/tripPlan";
 import {Models} from "api/_types";
 import {FindResult} from "common/model/interface";
@@ -1923,65 +1923,114 @@ class TripPlanModule {
     @clientExport
     @requireParams(["tripPlanId"])
     static async makeSpendReport(params: {tripPlanId: string}) {
+        var money2hanzi = require("money2hanzi");
         let {tripPlanId} = params;
         let tripPlan = await Models.tripPlan.get(tripPlanId);
-        // if (!tripPlan || tripPlan.status != EPlanStatus.COMPLETE) {
-        //     throw new Error(`行程不存在或者还未结束`);
-        // }
+        if (!tripPlan || tripPlan.status != EPlanStatus.COMPLETE) {
+            // throw L.ERR.TRIP_PLAN_STATUS_ERR();
+        }
         let title = moment(tripPlan.startAt).format('MM.DD') + '-'+ moment(tripPlan.backAt).format("MM.DD") + tripPlan.deptCity + "到" + tripPlan.arrivalCity + '报销单'
         let staff = await Staff.getCurrent()
-        let tripDetails = await tripPlan.getTripDetails({where: {}, order: [["created_at", "asc"]]})
-        var config = {
+        let tripDetails = await tripPlan.getTripDetails({where: {}, order: [["created_at", "asc"]]});
+        let tripApprove = await Models.tripApprove.get(tripPlanId);
+        let approveUsers: Array<any> = tripApprove.approvedUsers.split(/,/g)
+            .filter((v)=> {
+                return !!v;
+            }).map( async (userId) => {
+                if (userId) {
+                    let staff =  await Models.staff.get(userId)
+                    return staff.name;
+                }
+                return '';
+            })
+        approveUsers = await Promise.all(approveUsers)
+        let invoices = tripDetails.map ( (v) => {
+
+            if (typeof v.invoice == 'string') {
+                v.invoice = JSON.parse(v.invoice)
+            }
+            if (v.type == ETripType.OUT_TRIP || v.type == ETripType.BACK_TRIP) {
+                let trafficType;
+                let trafficInfo;
+                let type;
+                type = '交通'
+                trafficType = v.type == ETripType.OUT_TRIP ? 'GO': 'BACK';
+                trafficInfo = v.invoiceType == EInvoiceType.TRAIN ? '火车': '飞机';
+                trafficInfo += v.invoiceType == EInvoiceType.PLANE ? MTxPlaneLevel[v.cabinClass] : v.cabinClass;
+                return {
+                    type: type,
+                    date: moment(v.startTime).format('YYYY.MM.DD'),
+                    invoiceInfo: `${type}费`,
+                    quantity: v.invoice.length,
+                    money: v.expenditure,
+                    departCity: v.deptCity,
+                    arrivalCity: v.arrivalCity,
+                    remark: `${v.deptCity}-${v.arrivalCity}`,
+                    trafficType: `${trafficType}`,
+                    trafficInfo: `${trafficInfo}`
+                }
+            }
+            if (v.type == ETripType.HOTEL) {
+                return {
+                    "type": "住宿",
+                    "date": moment(v.startTime).format('YYYY.MM.DD'),
+                    "invoiceInfo": "住宿费",
+                    "quantity": v.invoice.length,
+                    "money": v.expenditure,
+                    "remark": `${moment(v.startTime).format('YYYY.MM.DD')}-${moment(v.endTime).format('YYYY.MM.DD')} ${v.city} 共${moment(v.endTime).diff(v.startTime, 'days')}日`,
+                    "duration": `${moment(v.endTime).diff(v.startTime, 'days')}`
+                }
+            }
+            if (v.type == ETripType.SUBSIDY) {
+                return {
+                    "type": '补助',
+                    "date": moment(v.startTime).format('YYYY.MM.DD'),
+                    "invoiceInfo": "补助费",
+                    quantity: 0,
+                    money: v.expenditure,
+                    remark: '补助费'
+                }
+            }
+            if (v.type == ETripType.SPECIAL_APPROVE) {
+                return {
+                    "type": '出差费用',
+                    "date": moment(v.startTime).format('YYYY.MM.DD'),
+                    "invoiceInfo": "出差费",
+                    quantity: v.invoice.length,
+                    money: v.expenditure,
+                    remark: '特别审批出差费用'
+                }
+            }
+        })
+        let financeCheckCode = Models.financeCheckCode.create({tripPlanId: tripPlanId, isValid: true});
+        financeCheckCode = await financeCheckCode.save();
+        let content: any = [
+            `出差人:${staff.name}`,
+            `出差日期:${moment(tripPlan.startAt).format('YYYY.MM.DD')}-${moment(tripPlan.backAt).format('YYYY.MM.DD')}`,
+            `出差预算:${tripPlan.budget}`,
+            `实际支出:${tripPlan.expenditure}`,
+            `出差记录编号:${tripPlan.planNo}`,
+            `校验地址: ${config.host}#/trip/finance-view?id=${tripPlan.id}&code=${financeCheckCode.code}`
+        ]
+
+        let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')})
+        var data = {
             "submitter": staff.name,  //提交人
             "department": staff.department.name,  //部门
-            "budgetMoney": tripPlan.budget || '0', //预算总金额
+            "budgetMoney": tripPlan.budget || 0, //预算总金额
             "totalMoney": tripPlan.expenditure || 0,  //实际花费
-            "totalMoneyHZ": "叁千捌佰陆拾肆元五角整",  //汉子大写金额
+            "totalMoneyHZ": money2hanzi.toHanzi(<number>tripPlan.expenditure),  //汉子大写金额
             "invoiceQuantity": tripDetails.length, //票据数量
-            "createAt": moment().format('YYYY年MM月DD HH:mm'), //生成时间
+            "createAt": moment().format('YYYY年MM月DD日HH:mm'), //生成时间
             "departDate": moment(tripPlan.startAt).format('YYYY.MM.DD'), //出差起始时间
             "backDate": moment(tripPlan.backAt).format('YYYY.MM.DD'), //出差返回时间
             "reason": tripPlan.project.name, //出差事由
-            "approveUsers": ["彭科", "王鹏", "曹爽"], //本次出差审批人
-            "qrcode": "data:image/png;base64,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",
-            "invoices": [ //全部票据
-                {
-                    "type": "交通",
-                    "date": "2016-09-15",
-                    "invoiceInfo": "交通费",
-                    "quantity": 1,
-                    "money": 710.00,
-                    "departCity": "北京",
-                    "arrivalCity": "上海",
-                    "remark": "北京至上海",
-                    "trafficType": "GO",
-                    "trafficInfo": "高铁一等座"
-                },
-                {
-                    "type": "住宿",
-                    "date": "2016-09-25",
-                    "invoiceInfo": "住宿费",
-                    "quantity": 1,
-                    "money": 200.00,
-                    "remark": "2016.09.21-2016.09.25 上海 共5日",
-                    "duration": "5"
-                },
-                {
-                    "type": "交通",
-                    "date": "2016-08-25",
-                    "invoiceInfo": "交通费",
-                    "quantity": 1,
-                    "money": 1000,
-                    "departCity": "上海",
-                    "arrivalCity": "北京",
-                    "remark": "上海至北京",
-                    "trafficType": "BACK",
-                    "trafficInfo": "飞机经济舱"
-                }
-            ]
+            "approveUsers": approveUsers, //本次出差审批人
+            "qrcode": `data:image/png;base64,${qrcodeCxt}`,
+            "invoices": invoices
         }
 
-        let cxt = await makeSpendReport(config);
+        let cxt = await makeSpendReport(data);
         try {
             await API.notify.submitNotify({
                 key: 'qm_spend_report',

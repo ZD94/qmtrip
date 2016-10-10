@@ -17,11 +17,11 @@ function compile(templatePath, data) {
     })
 }
 
-function getTemplateFromFile(filePath) {
+function getTemplateFromFile(filePath) :Promise<string> {
   return new Promise( (resolve, reject) => {
     fs.readFile(filePath, function(err, bfs) {
       if (err) return reject(err);
-      let data = bfs.toString("utf8");
+      let data: string = bfs.toString("utf8");
       resolve(data);
     })
   });
