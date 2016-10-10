@@ -1924,16 +1924,19 @@ class TripPlanModule {
     @requireParams(["tripPlanId"])
     static async makeSpendReport(params: {tripPlanId: string}) {
         var money2hanzi = require("money2hanzi");
+        let staff = await Staff.getCurrent()
         let {tripPlanId} = params;
         let tripPlan = await Models.tripPlan.get(tripPlanId);
+        if (tripPlan.account.id != staff.id) {
+            throw L.ERR.PERMISSION_DENY();
+        }
         if (!tripPlan || tripPlan.status != EPlanStatus.COMPLETE) {
-            // throw L.ERR.TRIP_PLAN_STATUS_ERR();
+            throw L.ERR.TRIP_PLAN_STATUS_ERR();
         }
         let title = moment(tripPlan.startAt).format('MM.DD') + '-'+ moment(tripPlan.backAt).format("MM.DD") + tripPlan.deptCity + "到" + tripPlan.arrivalCity + '报销单'
-        let staff = await Staff.getCurrent()
         let tripDetails = await tripPlan.getTripDetails({where: {}, order: [["created_at", "asc"]]});
         let tripApprove = await Models.tripApprove.get(tripPlanId);
-        let approveUsers: Array<any> = tripApprove.approvedUsers.split(/,/g)
+        let approveUsers: Array<any> = (tripApprove && tripApprove.approvedUsers ? tripApprove.approvedUsers:'').split(/,/g)
             .filter((v)=> {
                 return !!v;
             }).map( async (userId) => {
