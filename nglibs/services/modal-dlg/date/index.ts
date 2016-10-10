@@ -178,10 +178,10 @@ function parseDateSelect(date: Date, timeScale: number): DateSelect{
     };
 }
 
-function calendarController($scope, $element, value){
+function calendarController($scope, $element, value, $ionicScrollDelegate){
     initLunarCalendar();
 
-    loadMonths($scope, $element);
+    loadMonths($scope, $element, $ionicScrollDelegate);
 
     let timeScale = $scope.options.timeScale || 10;
     if($scope.options.timepicker) {
@@ -208,8 +208,8 @@ function calendarController($scope, $element, value){
     $scope.dayOptions.today = moment().startOf('day').valueOf();
 }
 
-export function selectDateController($scope, $element, $ionicPopup) {
-    calendarController($scope, $element, $scope.value);
+export function selectDateController($scope, $element, $ionicPopup, $ionicScrollDelegate) {
+    calendarController($scope, $element, $scope.value, $ionicScrollDelegate);
 
     $scope.confirm = async function(day) {
         if(day.timestamp < $scope.valid.begin || $scope.valid.end < day.timestamp)
@@ -230,8 +230,8 @@ export function selectDateController($scope, $element, $ionicPopup) {
     });
 }
 
-export function selectDateSpanController($scope, $element, $ionicPopup) {
-    calendarController($scope, $element, $scope.value.begin);
+export function selectDateSpanController($scope, $element, $ionicPopup, $ionicScrollDelegate) {
+    calendarController($scope, $element, $scope.value.begin, $ionicScrollDelegate);
 
     $scope.result = {
         begin: $scope.selected,
@@ -305,7 +305,7 @@ function fixMonths($scope) {
     }
     $scope.$broadcast('scroll.infiniteScrollComplete');
 }
-function loadMonths($scope, $element) {
+function loadMonths($scope, $element, $ionicScrollDelegate) {
     $scope.weekDayNames = weekDayNames;
 
     $scope.month_2col = false;
@@ -315,7 +315,7 @@ function loadMonths($scope, $element) {
         fixMonths($scope);
     });
     $scope.months = [];
-    //shicong
+    //差旅统计 自定义日历
     let fromStatistic = $scope.options.fromStatistic;
     function loadBeforeYear(){
         let year = moment().year()-1;
@@ -323,8 +323,14 @@ function loadMonths($scope, $element) {
         let calResult = getMonth(year, month+1);
         $scope.months.push(calResult);
     }
+    $scope.inf = true;
     if(fromStatistic){
+        $scope.inf = false;
         loadBeforeYear();
+        for(let i = 0;i < 10;i++){
+            loadNextMonth();
+        }
+        $ionicScrollDelegate.scrollBottom();
     }
     function loadNextMonth() {
         let date;
