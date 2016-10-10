@@ -20,10 +20,33 @@
     "cordova-plugin-statusbar",
     "ionic-plugin-keyboard",
     "cordova-plugin-file",
-    "cordova-plugin-file-transfer"
+    "cordova-plugin-compat",
+    "cordova-plugin-file-transfer",
+    "cordova-plugin-crosswalk-webview",
+    "cordova-plugin-camera",
+    {
+      "id": "jpush-phonegap-plugin",
+      "locator": "jpush-phonegap-plugin",
+      "variables": {
+        "API_KEY": "f57e4e7c0c9b2d2c4c50741d"
+      }
+    }
   ],
   "cordovaPlatforms": [
-    "ios",
-    "android"
+    {
+      "platform": "android",
+      "version": "",
+      "locator": "android"
+    },
+    {
+      "platform": "browser",
+      "version": "",
+      "locator": "browser"
+    },
+    {
+      "platform": "ios",
+      "version": "",
+      "locator": "ios"
+    }
   ]
 }
