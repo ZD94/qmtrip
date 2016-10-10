@@ -307,8 +307,17 @@ export class TripPlan extends ModelObject {
         return API.tripPlan.commitTripPlan({id: this.id});
     }
 
-    cancel(): Promise<boolean> {
-        return API.tripPlan.cancelTripPlan({id: this.id});
+    async cancel(params: {remark: string}): Promise<boolean> {
+        if(!this.isLocal){
+            API.require('tripPlan');
+            await API.onload();
+        }
+        var obj : any= {};
+        obj.id = this.id;
+        if(params.remark){
+            obj.remark = params.remark;
+        }
+        return API.tripPlan.cancelTripPlan(obj);
     }
 
     /**
@@ -648,7 +657,16 @@ export class TripApprove extends ModelObject{
         return Models.tripPlanLog.find(options);
     }
 
-    cancel(): Promise<boolean> {
-        return API.tripPlan.cancelTripApprove({id: this.id});
+    async cancel(params: {remark?: string}): Promise<boolean> {
+        if(!this.isLocal){
+            API.require('tripPlan');
+            await API.onload();
+        }
+        var obj : any= {};
+        obj.id = this.id;
+        if(params.remark){
+            obj.remark = params.remark;
+        }
+        return API.tripPlan.cancelTripApprove(obj);
     }
 }

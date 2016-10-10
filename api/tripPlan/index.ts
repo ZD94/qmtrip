@@ -1221,8 +1221,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['id'])
-    @modelNotNull('tripPlan')
-    static async cancelTripPlan(params: {id: string, remark: string}): Promise<boolean> {
+    static async cancelTripPlan(params: {id: string, remark?: string}): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
         if( tripPlan.status != EPlanStatus.NO_BUDGET && tripPlan.status != EPlanStatus.WAIT_UPLOAD) {
             throw {code: -2, msg: "出差记录状态不正确！"};
@@ -1251,8 +1250,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['id'])
-    @modelNotNull('tripPlan')
-    static async cancelTripApprove(params: {id: string, remark: string}): Promise<boolean> {
+    static async cancelTripApprove(params: {id: string, remark?: string}): Promise<boolean> {
         let tripApprove = await Models.tripApprove.get(params.id);
         if( tripApprove.status != EApproveStatus.WAIT_APPROVE && tripApprove.approvedUsers && tripApprove.approvedUsers.indexOf(",") != -1 ) {
             throw {code: -2, msg: "审批单状态不正确，该审批单不能撤销！"};
