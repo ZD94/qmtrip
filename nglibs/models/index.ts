@@ -14,7 +14,7 @@ import { Department } from 'api/_types/department';
 import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
 import { AccordHotel } from 'api/_types/accordHotel';
 import { Agency, AgencyUser } from 'api/_types/agency';
-import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove} from 'api/_types/tripPlan';
+import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCode} from 'api/_types/tripPlan';
 import {Account, Token, AccountOpenid} from 'api/_types/auth';
 import { Seed } from 'api/_types/seed';
 import {TravelBudgetLog} from "api/_types/travelbudget";
@@ -103,7 +103,9 @@ var Services = {
     token: { type: Token, modname: 'token', funcs: []},
     //鲸币账户
     coinAccount: { type: CoinAccount, modname: 'coin', funcs: ['clientStaffCoinAccount']},
-    coinAccountChange: { type: CoinAccountChange, modname: 'coin', funcs: []}
+    coinAccountChange: { type: CoinAccountChange, modname: 'coin', funcs: []},
+
+    financeCheckCode: { type: FinanceCheckCode, modname: 'tripPlan', funcs: []}
 };
 
 function throwNotImplemented(){
@@ -147,7 +149,8 @@ class ClientModels implements ModelsInterface {
     token: ModelRemote<Token>;
     accountOpenid: ModelRemote<AccountOpenid>;
     travelBudgetLog: ModelRemote<TravelBudgetLog>;
-
+    financeCheckCode: ModelRemote<FinanceCheckCode>;
+    
     ddtalkCorp: ModelRemote<DDTalkCorp>;
     ddtalkUser: ModelRemote<DDTalkUser>;
 
