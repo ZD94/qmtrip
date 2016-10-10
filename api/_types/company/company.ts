@@ -128,6 +128,10 @@ export class Company extends ModelObject{
     get budgetPolicy(): string { return 'default'; }
     set budgetPolicy(policy:string){}
 
+    @Field({type: Types.STRING(50)})
+    get getNoticeEmail(): string { return  null; }
+    set getNoticeEmail(val:string){}
+
     @Field({type: Types.JSONB})
     get budgetConfig(): any { return {}};
     set budgetConfig(conf: any) {}

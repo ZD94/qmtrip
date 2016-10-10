@@ -12,6 +12,7 @@ let logger = new Logger("tripPlan");
 let config = require("../../config");
 let moment = require("moment");
 let scheduler = require('common/scheduler');
+let systemNoticeEmails = require('config/config').system_notice_emails;
 import _ = require('lodash');
 import {requireParams, clientExport} from 'common/api/helper';
 import {
@@ -27,6 +28,7 @@ import {AgencyUser} from "../_types/agency";
 import {makeSpendReport} from './spendReport';
 import fs = require("fs");
 var libqqwry = require('lib-qqwry');
+
 
 
 /**
@@ -446,6 +448,78 @@ class TripPlanModule {
         return true;
     }
 
+    static async sendTripApproveNoticeToSystem(params: {approveId: string}) {
+        let tripApprove = await Models.tripApprove.get(params.approveId);
+        let staff = tripApprove.account;
+        let company = staff.company;
+
+        let details = await TripPlanModule.getDetailsFromApprove({approveId: tripApprove.id});
+        let {go, back, hotel, others} = await TripPlanModule.getEmailInfoFromDetails(details);
+        let timeFormat = 'YYYY-MM-DD HH:mm:ss';
+
+        let values: any = {
+            time: moment(tripApprove.createdAt["value"]).format(timeFormat),
+            projectName: tripApprove.title,
+            goTrafficBudget: go,
+            backTrafficBudget: back,
+            hotelBudget: hotel,
+            otherBudget: others,
+            totalBudget: '￥' + tripApprove.budget,
+            userName : staff.name,
+            email : staff.email
+        };
+
+        try {
+            await Promise.all(systemNoticeEmails.map(function(s) {
+                values.name = s.name;
+                return API.notify.submitNotify({
+                    key: 'qm_notify_system_new_travelbudget',
+                    email: s.email,
+                    values: values
+                })
+            }));
+        } catch(err) {
+            console.error('发送系统通知失败', err)
+        }
+        return true;
+    }
+
+    static async sendApprovePassNoticeToCompany(params: {approveId: string}) {
+        let tripApprove = await Models.tripApprove.get(params.approveId);
+        let staff = tripApprove.account;
+        let company = staff.company;
+        let approveUser = tripApprove.approveUser;
+
+        let details = await TripPlanModule.getDetailsFromApprove({approveId: tripApprove.id});
+        let {go, back, hotel, others} = await TripPlanModule.getEmailInfoFromDetails(details);
+        let timeFormat = 'YYYY-MM-DD HH:mm:ss';
+
+        let values: any = {
+            projectName: tripApprove.title,
+            goTrafficBudget: go,
+            backTrafficBudget: back,
+            hotelBudget: hotel,
+            otherBudget: others,
+            totalBudget: '￥' + tripApprove.budget,
+            userName : staff.name || "",
+            approveTime: moment(new Date()).format(timeFormat),
+            approveUser : approveUser.name || ""
+        };
+
+        try {
+            if(company.getNoticeEmail){
+                await API.notify.submitNotify({
+                    key: 'qm_notify_company_approve_pass',
+                    email: company.getNoticeEmail,
+                    values: values
+                })
+            }
+        } catch(err) {
+            console.error('发送行政通知失败', err)
+        }
+        return true;
+    }
+
 
     /**
      * 获取计划单/预算单信息
@@ -697,6 +771,7 @@ class TripPlanModule {
                     reason: approveResult,
                     emailReason: params.approveRemark
                 };
+                await TripPlanModule.sendApprovePassNoticeToCompany({approveId: tripApprove.id});
             }else if(approveResult == EApproveResult.REJECT){
                 let details = await TripPlanModule.getDetailsFromApprove({approveId: tripApprove.id});
                 let data = await TripPlanModule.getEmailInfoFromDetails(details);
@@ -1736,7 +1811,8 @@ class TripPlanModule {
 
         await Promise.all([tripApprove.save(), tripPlanLog.save()]);
 
-        TripPlanModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
+        await TripPlanModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
+        await TripPlanModule.sendTripApproveNoticeToSystem({approveId: tripApprove.id});
 
         return tripApprove;
     }
