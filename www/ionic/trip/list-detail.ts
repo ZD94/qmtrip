@@ -132,4 +132,25 @@ export async function ListDetailController($location, $scope , Models, $statePar
     $scope.checkInvoice = function(detailId){
         window.location.href="#/trip/invoice-detail?detailId="+detailId;
     }
+
+    $scope.hasMakeSpendRecorder = false;    //防止一直生成
+    $scope.makeSpendReport = async function() {
+        $scope.hasMakeSpendRecorder = true;
+        API.require('tripPlan');
+        await API.onload();
+        try {
+            await API.tripPlan.makeSpendReport({tripPlanId: id});
+        } catch(err) {
+            $ionicPopup.alert({
+                title:'操作失败',
+                template:'报销单生成失败,请稍后重试'
+            });
+            $scope.hasMakeSpendRecorder = false;
+        }
+
+        $ionicPopup.alert({
+            title:'操作成功',
+            template:'报销单已发送到您的邮箱'
+        });
+    }
 }

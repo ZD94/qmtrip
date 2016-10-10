@@ -46,6 +46,7 @@
                 <a ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS" ng-click="cancelTripPlan()" id="page20-button61" class="button button-cancel" no-back>撤销</a>
                 <a ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS" ng-click="createTripPlan()" id="page20-button62" class="button button-positive" no-back>再次生成</a>
                 <a ng-if="tripDetail.status == EPlanStatus.WAIT_APPROVE" ng-click="cancelTripPlan()" id="page20-button63" class="button button-cancel" no-back>撤销</a>
+                <a ng-if="tripDetail.status == EPlanStatus.COMPLETE && !hasMakeSpendRecorder" class="button button-positive" no-back ng-click="makeSpendReport()">生成报销单</a>
             </div>
         </div>
     </ion-content>
