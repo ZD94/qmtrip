@@ -50,7 +50,8 @@ angular
             replace: true,
             transclude: false,
             scope: {
-                tripApprove: '=approve'
+                tripApprove: '=approve',
+                cancel: '=cancel',
             },
             controller: function($scope) {
                 $scope.EApproveStatus = EApproveStatus;

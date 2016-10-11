@@ -2,7 +2,7 @@
     <ion-content ng-hide="isConfirm" padding="false" scroll="false" class="has-header">
         <div class="flex-c10">
             <ion-scroll>
-                <ta-status-bar approve="tripApprove"></ta-status-bar>
+                <ta-status-bar approve="tripApprove" cancel="cancel.reason"></ta-status-bar>
 
                 <ion-list ng-if="!isSelf">
                     <tp-staff-detail staff="staff"></tp-staff-detail>
@@ -52,6 +52,9 @@
                 </div>
                 <div class="button-bar" ng-if="tripApprove.status == EApproveStatus.REJECT && !isHasPermissionApprove">
                     <a ng-click="reCommitTripApprove()" class="button button-positive  button-block">重新提交</a>
+                </div>
+                <div class="button-bar" ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE && !isHasPermissionApprove">
+                    <a ng-click="cancelTripApprove()" class="button button-positive  button-block">撤销审批</a>
                 </div>
             </div>
 

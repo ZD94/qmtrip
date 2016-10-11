@@ -24,6 +24,12 @@ export default async function IndexController($scope) {
         $scope.$applyAsync();
     }
 
+    $scope.staffTripRecord = function(){
+        let sTime = moment($scope.data.monthSelection.startTime).format();
+        let eTime = moment($scope.data.monthSelection.endTime).format();
+        window.location.href = `#/trip/list-all?sTime=${sTime}&eTime=${eTime}`
+    }
+
     $scope.$watch('data.monthSelection',function (o,n) {
         // if(o!=n){
         //     console.log(data.monthSelection);

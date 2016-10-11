@@ -112,8 +112,11 @@ export async function ListDetailController($location, $scope , Models, $statePar
     };
 
     $scope.cancelTripPlan = function() {
+        $scope.cancel = {reason: ''};
+        let ioTemplate = '<input type="text" ng-model="cancel.reason" placeholder="请输入撤销原因" style="border: 1px solid #ccc;padding-left: 10px;">';
         $ionicPopup.show({
-            title: '确认撤销该出差计划？',
+            template: ioTemplate,
+            title: '填写撤销原因',
             scope: $scope,
             buttons: [{
                 text: '取消'
@@ -121,8 +124,13 @@ export async function ListDetailController($location, $scope , Models, $statePar
                 text: '确认',
                 type: 'button-positive',
                 onTap: async function (e) {
-                    let tripPlan = $scope.tripDetail;
-                    await tripPlan.cancel();
+                    if(!$scope.cancel.reason){
+                        e.preventDefault();
+                    }else{
+                        let remark = $scope.cancel.reason;
+                        let tripPlan = $scope.tripDetail;
+                        await tripPlan.cancel({remark: remark})
+                    }
                     $scope.showErrorMsg('撤销成功');
                 }
             }]

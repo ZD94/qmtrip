@@ -66,7 +66,8 @@ angular
             replace: true,
             scope: {
                 status: '=',
-                reason: '='
+                reason: '=',
+                cancel: '=cancel',
             },
             controller: function($scope) {
                 //根据status转换成合适状态
@@ -74,8 +75,13 @@ angular
                 //     $scope.text = $scope.reason ? `审核未通过,备注:${$scope.reason}` : '审核未通过';
                 //     return;
                 // }
+                $scope.isCancel = false;
                 $scope.$watch('status', function(newVal, oldVal) {
+                    if($scope.status == EPlanStatus.CANCEL){
+                        $scope.isCancel = true;
+                    }
                     $scope.text = statusTxt[newVal];
+
                 });
                 $scope.text = statusTxt[$scope.status] || '等待审批';
             }
