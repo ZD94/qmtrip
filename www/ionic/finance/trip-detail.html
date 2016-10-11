@@ -9,7 +9,7 @@
                 <ion-list>
                     <!--交通条目-->
                     <tp-detail-item ng-repeat="budget in trafficBudgets track by $index"
-                                    show-uploader="true"
+                                    show-uploader="false"
                                     title="{{$index == 0? '交通': ''}}"
                                     budget="{{trafficTotalBudget | currency: ''}}元"
                                     item="budget">
@@ -17,21 +17,22 @@
 
                     <!--住宿条目-->
                     <tp-detail-item ng-repeat="budget in hotelBudgets"
-                                    show-uploader="true"
+                                    show-uploader="false"
                                     title="{{$index == 0? '住宿': ''}}"
                                     budget="{{hotelTotalBudget | currency: ''}}元"
                                     item="budget">
                     </tp-detail-item>
+
                     <!--补助-->
                     <tp-detail-item ng-repeat="budget in subsidyBudgets"
-                                    show-uploader="true"
+                                    show-uploader="false"
                                     title="{{$index == 0? '补助': ''}}"
                                     budget="{{subsidyTotalBudget | currency: ''}}元"
                                     item="budget">
                     </tp-detail-item>
                     <!--特别审批-->
                     <tp-detail-item ng-repeat="budget in specialApproveBudgets"
-                                    show-uploader="true"
+                                    show-uploader="false"
                                     title="{{$index == 0? '特别审批': ''}}"
                                     budget="{{specialApproveTotalBudget | currency: ''}}元"
                                     remark="{{tripDetail.specialApproveRemark}}"

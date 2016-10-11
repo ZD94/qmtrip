@@ -52,8 +52,8 @@ function initAPI($window, $location, $ionicPopup){
     API.authenticate = apiAuth;
     API.onlogin(gotoLogin);
 
-    if(/^\/login\//.test($location.path()))
-        return;
+    if(/^\/login\//.test($location.path())) return;
+    if(/^\/finance\//.test($location.path())) return;
     var datastr = getAuthData();
     if(!datastr) {
         gotoLogin(true);
@@ -142,6 +142,7 @@ ngapp.root('ionic', '/staff/index');
 ngapp.useRoutePolicy(ngapp.RoutePolicy.None);
 ngapp.routeAddSingle('login');
 ngapp.routeAddSingle('guide');
+ngapp.routeAddSingle('finance');
 ngapp.routePushEmbed('');
 ngapp.routePopEmbed();
 var app = ngapp.create('qm.ionic');
