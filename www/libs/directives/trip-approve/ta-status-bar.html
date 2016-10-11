@@ -6,4 +6,7 @@
         <a class="button button-small button-calm"
            ng-href="#/trip-approval/approve-progress?approveId={{tripApprove.id}}">审批进度</a>
     </div>
+    <div class="item opactic" ng-if="tripApprove.status == EApproveStatus.CANCEL">
+        <span>{{cancel}}</span>
+    </div>
 </div>

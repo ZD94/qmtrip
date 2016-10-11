@@ -285,6 +285,29 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         window.location.href="#/trip/create";
     };
 
+    $scope.cancelTripApprove = async function(){
+        $scope.cancel = {reason: ''};
+        let ioTemplate = '<input type="text" ng-model="cancel.reason" placeholder="请输入撤销原因" style="border: 1px solid #ccc;padding-left: 10px;">';
+        $ionicPopup.show({
+            template: ioTemplate,
+            title: '填写撤销原因',
+            scope: $scope,
+            buttons: [{
+                text: '取消'
+            },{
+                text: '确认',
+                type: 'button-positive',
+                onTap: async function(e){
+                    if(!$scope.cancel.reason){
+                        e.preventDefault();
+                    }else{
+                        let remark = $scope.cancel.reason;
+                        await tripApprove.cancel({remark: remark})
+                    }
+                }
+            }]
+        })
+    }
 }
 
 export async function selectModeController ($scope){
