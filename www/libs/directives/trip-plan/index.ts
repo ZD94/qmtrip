@@ -40,7 +40,6 @@ angular
                 $scope.EPlanStatus = EPlanStatus;
                 $scope.showHeader = Boolean($scope.showHeader);
                 $scope.showDetailStatus = Boolean($scope.showDetailStatus);
-                $scope.click = $scope.click || function(trip) { console.info('click me...');}
                 $scope.aboutSpecial = function(){
                     $ionicPopup.show({
                         title: '关于特别审批',
@@ -122,10 +121,11 @@ angular
                 $scope.EPlanStatus = EPlanStatus;
                 $scope.ETripType = ETripType;
                 $scope.MTxPlaneLevel = MTxPlaneLevel;
+                $scope.isShowUploader = true;
                 if ($scope.showUploader == 'false' || !$scope.showUploader) {
-                    $scope.showUploader = false;
+                    $scope.isShowUploader = false;
                 } else {
-                    $scope.showUploader = true;
+                    $scope.isShowUploader = true;
                 }
                 $scope.days = moment($scope.item.endTime).diff(moment($scope.item.startTime), 'days');
                 $scope.subsidyDays = moment($scope.item.endTime).diff(moment($scope.item.startTime), 'days') + 1;
