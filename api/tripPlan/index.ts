@@ -2013,7 +2013,7 @@ class TripPlanModule {
             `出差预算:${tripPlan.budget}`,
             `实际支出:${tripPlan.expenditure}`,
             `出差记录编号:${tripPlan.planNo}`,
-            `校验地址: ${config.host}#/trip/finance-view?id=${tripPlan.id}&code=${financeCheckCode.code}`
+            `校验地址: ${config.host}#/finance/trip-detail?id=${tripPlan.id}&code=${financeCheckCode.code}`
         ]
 
         let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')})
@@ -2052,7 +2052,7 @@ class TripPlanModule {
         }
         return true;
     }
-    
+
     static __initHttpApp = require('./invoice');
 
     static _scheduleTask () {
