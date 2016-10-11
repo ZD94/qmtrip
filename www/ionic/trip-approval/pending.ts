@@ -42,9 +42,12 @@ export async function PendingController($scope, $stateParams){
         if (['WAIT_APPROVE', 'ALL', 'APPROVE_FAIL', 'APPROVE_SUCCESS'].indexOf(filter) >= 0) {
             $scope.filter = filter;
         }
-        let status: any = {$ne: EApproveStatus.CANCEL};
+        //let status: any = {$ne: EApproveStatus.CANCEL};
+        let EApproveStatusArray = [EApproveStatus.CANCEL, EApproveStatus.NO_BUDGET, EApproveStatus.REJECT, EApproveStatus.WAIT_APPROVE, EApproveStatus.PASS]
+        let status: any = {$any: EApproveStatusArray};
         switch(filter) {
-            case 'ALL': status = {$ne: EApproveStatus.CANCEL};break;
+            //case 'ALL': status = {$ne: EApproveStatus.CANCEL};break;
+            case 'ALL': status = {$any: EApproveStatusArray};break;
             case 'WAIT_APPROVE': status = EApproveStatus.WAIT_APPROVE; break;
             case 'APPROVE_FAIL': status = EApproveStatus.REJECT; break;
             case 'APPROVE_SUCCESS': status = EApproveStatus.PASS; break;
