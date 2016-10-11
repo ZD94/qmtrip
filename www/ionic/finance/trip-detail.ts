@@ -15,8 +15,6 @@ export async function TripDetailController($scope, $stateParams) {
 
     let tripPlan = await API.finance.getTripPlan({tripPlanId: tripPlanId, code: code});
     let tripDetails = await API.finance.getTripDetails({tripPlanId: tripPlanId, code: code})
-
-    console.info(tripPlan);
     $scope.tripDetail = tripPlan;
 
     let trafficBudgets = [];
