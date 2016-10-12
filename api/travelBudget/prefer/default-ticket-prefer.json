@@ -1,30 +1,17 @@
 [
   {
-    "name": "preferAgent",
-    "options": {
-      "expectedAgents": ["ctrip", "携程", "同城", "南航", "中航", "中国航空公司"],
-      "score": 100
-    }
-  },
-  {
     "name": "cheapSupplier",
     "options": {
       "score": -100000,
-      "cheapSuppliers": ["9C", "KN", "HO", "PN", "EU", "AQ", "JR"]
-    }
-  },
-  {
-    "name": "permitOnlySupplier",
-    "options": {
-      "score": -100000,
-      "permitSuppliers": []
-    }
-  },
-  {
-    "name": "priorSupplier",
-    "options": {
-      "score": 5000,
-      "priorSuppliers": ["CJ", "CN", "FM"]
+      "cheapSuppliers": [
+        "9C",
+        "KN",
+        "HO",
+        "PN",
+        "EU",
+        "AQ",
+        "JR"
+      ]
     }
   },
   {
@@ -36,35 +23,35 @@
   {
     "name": "runningTimePrefer",
     "options": {
-      "trainScore": 250,
       "planeScore": 500,
-      "trainScoreInterval": 5,
-      "planeScoreInterval": 5
+      "trainScore": 250,
+      "planeScoreInterval": 5,
+      "trainScoreInterval": 5
     }
   },
   {
     "name": "departStandardTimePrefer",
     "options": {
-      "score": 500,
-      "scoreInterval": -3,
+      "end": "<%=leaveDate%> 16:00",
       "begin": "<%=leaveDate%> 8:00",
-      "end": "<%=leaveDate%> 16:00"
+      "score": 500,
+      "scoreInterval": -3
     }
   },
   {
     "name": "arriveStandardTimePrefer",
     "options": {
-      "score": 500,
-      "scoreInterval": -3,
+      "end": "<%=leaveDate%> 19:00",
       "begin": "<%=leaveDate%> 9:00",
-      "end": "<%=leaveDate%> 19:00"
+      "score": 500,
+      "scoreInterval": -3
     }
   },
   {
     "name": "trainDurationPrefer",
     "options": {
-      "trainDuration": 360,
-      "score": 100000
+      "score": 100000,
+      "trainDuration": 360
     }
   },
   {
@@ -90,10 +77,15 @@
   {
     "name": "planePricePrefer",
     "options": {
+      "type": "square",
       "score": 10000,
-      "percent": 0.2,
-      "cabins": ["Economy","PremiumEconomy","Business","First"],
-      "type": "square"
+      "cabins": [
+        "Economy",
+        "PremiumEconomy",
+        "Business",
+        "First"
+      ],
+      "percent": 0.2
     }
   }
 ]
