@@ -33,6 +33,19 @@ class FinanceModule {
         let tripPlan = await Models.tripPlan.get(tripPlanId);
         return tripPlan.getTripDetails({order: [["created_at", "asc"]]});
     }
+
+    @clientExport
+    @requireParams(['tripPlanId', 'code'])
+    static async getTripPlanStaff(params: {tripPlanId: string, code: string}) :Promise<any> {
+        let {tripPlanId, code} = params;
+        if (!isValidCode(tripPlanId, code)) {
+            throw L.ERR.PERMISSION_DENY();
+        }
+        let tripPlan = await Models.tripPlan.get(tripPlanId);
+        let staff = await Models.staff.get(tripPlan.account.id);
+        return {id: staff.id, name: staff.name, mobile: staff.mobile, email: staff.email};
+    }
+
 }
 
 async function isValidCode(tripPlanId, code) {
