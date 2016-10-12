@@ -7,6 +7,7 @@ import {ETripType} from "api/_types/tripPlan";
 
 
 export async function TripDetailController($scope, $stateParams) {
+    require('./style.scss');
     let tripPlanId = $stateParams.id;
     let code = $stateParams.code;
 
@@ -15,7 +16,9 @@ export async function TripDetailController($scope, $stateParams) {
 
     let tripPlan = await API.finance.getTripPlan({tripPlanId: tripPlanId, code: code});
     let tripDetails = await API.finance.getTripDetails({tripPlanId: tripPlanId, code: code})
+    let staff = await API.finance.getTripPlanStaff({tripPlanId: tripPlanId, code: code});
     $scope.tripDetail = tripPlan;
+    $scope.staff = staff;
 
     let trafficBudgets = [];
     let hotelBudgets = [];
