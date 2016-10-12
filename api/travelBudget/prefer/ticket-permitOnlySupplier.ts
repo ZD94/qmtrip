@@ -23,6 +23,7 @@ class PermitOnlySupplierPrefer extends AbstractPrefer<IFinalTicket> {
     async markScoreProcess(tickets:IFinalTicket[]):Promise<IFinalTicket[]> {
         if (!tickets.length) return tickets;
         let self = this;
+        if (!self.permitSuppliers || !self.permitSuppliers.length) return tickets;  //如果没有设置,默认不做处理
         tickets = tickets.map( (v) => {
             if (!v['score']) v['score'] = 0;
             if (!v['reasons']) v['reasons'] = [];
