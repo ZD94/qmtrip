@@ -1241,7 +1241,7 @@ class TripPlanModule {
      * @returns {boolean}
      */
     @clientExport
-    @requireParams(['id'])
+    @requireParams(['id'],['remark'])
     static async cancelTripPlan(params: {id: string, remark?: string}): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
         if( tripPlan.status != EPlanStatus.NO_BUDGET && tripPlan.status != EPlanStatus.WAIT_UPLOAD) {
@@ -1270,7 +1270,7 @@ class TripPlanModule {
      * @returns {boolean}
      */
     @clientExport
-    @requireParams(['id'])
+    @requireParams(['id'],['remark'])
     static async cancelTripApprove(params: {id: string, remark?: string}): Promise<boolean> {
         let tripApprove = await Models.tripApprove.get(params.id);
         if( tripApprove.status != EApproveStatus.WAIT_APPROVE && tripApprove.approvedUsers && tripApprove.approvedUsers.indexOf(",") != -1 ) {
