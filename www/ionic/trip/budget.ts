@@ -16,6 +16,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     let query = result.query;
     trip.beginDate = query.leaveDate;
     trip.endDate  = query.goBackDate;
+    trip.hotelName = query.hotelName;
     trip.createAt = new Date(result.createAt);
 
     if(query.originPlace) {
