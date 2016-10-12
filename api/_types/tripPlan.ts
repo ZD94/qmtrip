@@ -314,7 +314,7 @@ export class TripPlan extends ModelObject {
         }
         var obj : any= {};
         obj.id = this.id;
-        if(params.remark){
+        if(params && params.remark){
             obj.remark = params.remark;
         }
         return API.tripPlan.cancelTripPlan(obj);
@@ -664,7 +664,7 @@ export class TripApprove extends ModelObject{
         }
         var obj : any= {};
         obj.id = this.id;
-        if(params.remark){
+        if(params && params.remark){
             obj.remark = params.remark;
         }
         return API.tripPlan.cancelTripApprove(obj);
