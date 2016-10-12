@@ -432,17 +432,21 @@ class TripPlanModule {
             let admins = await Models.staff.find({ where: {companyId: tripApprove['companyId'], roleId: [EStaffRole.OWNER,
                 EStaffRole.ADMIN], staffStatus: EStaffStatus.ON_JOB, id: {$ne: staff.id}}}); //获取激活状态的管理员
             //给所有的管理员发送邮件
-            await Promise.all(admins.map(function(s) {
+            await Promise.all(admins.map(async function(s) {
                 let vals: any = _.cloneDeep(values);
                 vals.managerName = s.name;
                 vals.email = staff.email;
                 vals.projectName = tripApprove.title;
                 vals.username = s.name;
-                return API.notify.submitNotify({
-                    key: 'qm_notify_new_travelbudget',
-                    email: s.email,
-                    values: vals
-                })
+                try {
+                    await API.notify.submitNotify({
+                        key: 'qm_notify_new_travelbudget',
+                        email: s.email,
+                        values: vals
+                    });
+                } catch(err) {
+                    console.error(err);
+                }
             }));
         }
         return true;
@@ -470,13 +474,17 @@ class TripPlanModule {
         };
 
         try {
-            await Promise.all(systemNoticeEmails.map(function(s) {
+            await Promise.all(systemNoticeEmails.map(async function(s) {
                 values.name = s.name;
-                return API.notify.submitNotify({
-                    key: 'qm_notify_system_new_travelbudget',
-                    email: s.email,
-                    values: values
-                })
+                try {
+                    await API.notify.submitNotify({
+                        key: 'qm_notify_system_new_travelbudget',
+                        email: s.email,
+                        values: values
+                    })
+                } catch(err) {
+                    console.error(err);
+                }
             }));
         } catch(err) {
             console.error('发送系统通知失败', err)
@@ -803,9 +811,12 @@ class TripPlanModule {
                     emailReason: params.approveRemark
                 };
             }
-
-            await API.notify.submitNotify({email: user.email, key: tplName, values: self_values, mobile: user.mobile, openid: openId});
-            await API.ddtalk.sendLinkMsg({ accountId: user.id, text: '您的预算已经审批通过', url: self_url});
+            try {
+                await API.notify.submitNotify({email: user.email, key: tplName, values: self_values, mobile: user.mobile, openid: openId});
+            } catch(err) { console.error(err);}
+            try {
+                await API.ddtalk.sendLinkMsg({ accountId: user.id, text: '您的预算已经审批通过', url: self_url});
+            } catch(err) { console.error(err);}
         }
 
         return true;
@@ -967,13 +978,15 @@ class TripPlanModule {
                 content: `企业 ${company.name} 员工 ${staff.name}${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差计划票据已提交，预算：￥${tripPlan.budget}，等待您审核！`,
                 createdAt: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             };
+            try {
+                await API.notify.submitNotify({
+                    key: 'qm_notify_agency_budget',
+                    values: auditValues,
+                    email: default_agency.manager_email,
+                    openid: openId,
+                })
+            } catch(err) { console.error(err);}
 
-            API.notify.submitNotify({
-                key: 'qm_notify_agency_budget',
-                values: auditValues,
-                email: default_agency.manager_email,
-                openid: openId,
-            })
         }
         return true;
     }
@@ -1096,8 +1109,16 @@ class TripPlanModule {
             templateValue.auditTime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
 
             let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
-            await API.notify.submitNotify({key: templateName, values: templateValue, email: staff.email, openid: openId});
-            await API.ddtalk.sendLinkMsg({accountId: staff.id, text: '票据已审批通过', url: self_url})
+            try {
+                await API.notify.submitNotify({key: templateName, values: templateValue, email: staff.email, openid: openId});
+            } catch(err) {
+                console.error(`发送通知失败:`, err);
+            }
+            try {
+                await API.ddtalk.sendLinkMsg({accountId: staff.id, text: '票据已审批通过', url: self_url})
+            } catch(err) {
+                console.error(`发送钉钉通知失败`, err);
+            }
         }
 
         let user = await AgencyUser.getCurrent();
@@ -1750,7 +1771,13 @@ class TripPlanModule {
 
         let {budgets, query} = budgetInfo;
         let totalBudget = 0;
-        budgets.map((b) => {totalBudget += Number(b.price);});
+        budgets.forEach((b) => {totalBudget += Number(b.price);});
+        budgets = budgets.map( (v) => {
+            if (v.type == ETripType.HOTEL) {
+                v.placeName = budgetInfo.query.hotelName;
+            }
+            return v;
+        });
         let project = await getProjectByName({companyId: company.id, name: params.title, userId: staff.id, isCreate: true});
         let tripApprove =  TripApprove.create(params);
 
