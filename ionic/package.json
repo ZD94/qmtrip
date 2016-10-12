@@ -10,6 +10,7 @@
     "gulp-rename": "^1.2.0"
   },
   "devDependencies": {
+    "cordova-build-increment": "^0.1.0",
     "shelljs": "^0.3.0"
   },
   "cordovaPlugins": [
