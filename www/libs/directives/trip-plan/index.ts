@@ -67,7 +67,7 @@ angular
             scope: {
                 status: '=',
                 reason: '=',
-                cancel: '=cancel',
+                tripDetail: '=detail',
             },
             controller: function($scope) {
                 //根据status转换成合适状态

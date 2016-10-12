@@ -51,7 +51,6 @@ angular
             transclude: false,
             scope: {
                 tripApprove: '=approve',
-                cancel: '=cancel',
             },
             controller: function($scope) {
                 $scope.EApproveStatus = EApproveStatus;

@@ -67,9 +67,9 @@ export async function ListController($scope , $stateParams, Models){
             $scope.filter = filter;
         }
 
-        let PlanStatus: any = {$notIn: [EPlanStatus.COMPLETE, EPlanStatus.NO_BUDGET, EPlanStatus.CANCEL]};
+        let PlanStatus: any = {$notIn: [EPlanStatus.COMPLETE, EPlanStatus.NO_BUDGET]};
         switch(filter) {
-            case 'ALL': PlanStatus = {$notIn: [EPlanStatus.COMPLETE, EPlanStatus.NO_BUDGET, EPlanStatus.CANCEL]};break;
+            case 'ALL': PlanStatus = {$notIn: [EPlanStatus.COMPLETE, EPlanStatus.NO_BUDGET]};break;
             case 'WAIT_UPLOAD': PlanStatus = {$in: [EPlanStatus.WAIT_UPLOAD, EPlanStatus.WAIT_COMMIT]}; break;
             case 'AUDITING': PlanStatus = EPlanStatus.AUDITING; break;
             case 'TRIP_FAIL': PlanStatus = EPlanStatus.AUDIT_NOT_PASS; break;
