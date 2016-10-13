@@ -315,7 +315,7 @@ class DDTalk {
             if (ddtalkUsers && ddtalkUsers.length) {
                 let ddtalkUser = ddtalkUsers[0]
                 // //自动登录
-                let ret = await API.auth.makeAuthenticateSign(ddtalkUser.id, 'ddtalk');
+                let ret = await API.auth.makeAuthenticateToken(ddtalkUser.id, 'ddtalk');
                 return ret;
             }
             throw new Error(`{"code":-1, "msg": "用户还未绑定账户"}`);
