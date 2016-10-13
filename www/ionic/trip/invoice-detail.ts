@@ -1,9 +1,8 @@
 import { ETripType, EPlanStatus, EInvoiceType } from 'api/_types/tripPlan';
 import * as path from 'path';
 
-export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate){
+export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup){
     //////绑定上传url
-    require("./invoice-detail.scss");
     let authDataStr = window['getAuthDataStr']();
     $scope.uploadUrl = '/upload/ajax-upload-file?type=image&auth='+authDataStr;
     ///// END
@@ -36,7 +35,6 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
             invoiceImgs.push(img);
         }
         $scope.invoiceImgs = invoiceImgs;
-        $ionicSlideBoxDelegate.update();
     })
 
     let statusTxt = {};

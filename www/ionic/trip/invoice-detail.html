@@ -1,9 +1,13 @@
 <ion-view title="票据详情页" id="page20">
-    <ion-content padding="false" class="has-header" scroll="false">
-        <div class="list invoice-info">
-            <div class="item">{{statustext[invoice.status]}}<span>1张票据</span><span>5条记录</span></div>
-            <div class="item">
-                <div>
+    <ion-content padding="true" class="has-header">
+        <div class="list card">
+            <div class="item ">
+                <div style="float: left;;height: 30px;width: 30px;">
+                    <i ng-if='invoice.invoiceType == EInvoiceType.PLANE' class="icon ion-plane"></i>
+                    <i ng-if='invoice.invoiceType == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
+                    <i ng-if='invoice.invoiceType == EInvoiceType.HOTEL' class="icon ion-home"></i>
+                </div>
+                <div style="float: left;">
                     <span ng-if="invoice.invoiceType == EInvoiceType.HOTEL">
                         <b>{{invoice.city}}</b>
                         <b ng-if="invoice.hotelName"> - {{invoice.hotelName}}</b>
@@ -15,81 +19,16 @@
                     <br/>
                     <span>{{invoice.createdAt | date: 'yyyy-MM-dd'}}</span>
                 </div>
+                <span class="item-note">{{statustext[invoice.status]}}</span>
             </div>
 
+            <div class="item item-image" ng-repeat="invoiceImg in invoiceImgs track by $index">
+                <!--<img src="ionic/images/loading.gif" ng-show="showLoading" style="width: 100px; height: 100px;">-->
+                <!--<img ng-src="{{invoiceImg}}" ng-hide="showLoading" id="previewInvoiceImg" style="width: 100%;">-->
+                <!--<img ng-src="{{invoiceImg}}" id="previewInvoiceImg" style="width: 100%;">-->
+                <invoice-img-item imgurl="invoiceImg" loadingurl="ionic/images/loading.gif"></invoice-img-item>
+            </div>
         </div>
-        <ion-slide-box class="item item-image" show-pager="true">
-            <!--<ion-slide ng-repeat="invoiceImg in invoiceImgs track by $index">-->
-            <!--<invoice-img-item imgurl="invoiceImg"-->
-            <!--loadingurl="ionic/images/loading.gif"-->
-            <!--&gt;-->
-            <!--</invoice-img-item>-->
-            <!--</ion-slide>-->
-            <ion-slide  class="invoice-form">
-                <div class="invoice-img">
-                    <span>票据</span>
-                    <div>
-                        <img src="../../ionic/images/logo_write10.png">
-                    </div>
-                </div>
-                <div class="invoice-item">
-                    <span>金额</span>
-                    <div>
-                        <h3>930</h3>
-                    </div>
-                </div>
-                <div class="invoice-item">
-                    <span>类型</span>
-                    <div>
-                        <h3>类型</h3>
-                    </div>
-                </div>
-                <div class="invoice-item">
-                    <span>时间</span>
-                    <div>
-                        <h3>2016-05-23</h3>
-                    </div>
-                </div>
-                <div class="invoice-item">
-                    <span>备注</span>
-                    <div>
-                        <p>按下阿斯顿所发生的</p>
-                    </div>
-                </div>
-            </ion-slide>
-            <ion-slide  class="invoice-form">
-                <div class="invoice-img">
-                    <span>票据</span>
-                    <div>
-                        <img src="../../ionic/images/logo_write10.png">
-                    </div>
-                </div>
-                <div class="invoice-item">
-                    <span>金额</span>
-                    <div>
-                        <h3>930</h3>
-                    </div>
-                </div>
-                <div class="invoice-item">
-                    <span>类型</span>
-                    <div>
-                        <h3>类型</h3>
-                    </div>
-                </div>
-                <div class="invoice-item">
-                    <span>时间</span>
-                    <div>
-                        <h3>2016-05-23</h3>
-                    </div>
-                </div>
-                <div class="invoice-item">
-                    <span>备注</span>
-                    <div>
-                        <p>按下阿斯顿所发生的</p>
-                    </div>
-                </div>
-            </ion-slide>
-        </ion-slide-box>
     </ion-content>
     <div class="bar bar-footer bar-positive" ng-if="invoice.status == EPlanStatus.WAIT_COMMIT || invoice.status == EPlanStatus.AUDIT_NOT_PASS">
         <div class="button button-full button-positive" style="margin-top: 0;width: 100%;font-size: 20px;" ng-uploader accept="image/*" title="invoicefuc.title" done="invoicefuc.done" url="uploadUrl">重新上传</div>
