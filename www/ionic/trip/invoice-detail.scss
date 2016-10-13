@@ -1,0 +1,80 @@
+.list{
+  &.invoice-info{
+    background: none;
+    margin: 10px;
+    .item, .item-divider{
+      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.5);
+      color: #fff;
+      &:first-child{
+        padding: 4px 16px;
+        span{
+          float: right;
+        }
+      }
+    }
+  }
+}
+.item-image{
+  background: none;
+  border: none;
+  .slider-slides{
+    margin-top: 30px;
+    .invoice-form{
+      background: #fff;
+      background-clip: content-box;
+      padding: 0 10px;
+      .invoice-img{
+        overflow: hidden;
+        line-height: 80px;
+        padding: 10px;
+        span{
+          float: left;
+        }
+        & > div{
+          width: 80%;
+          float: right;
+          text-align: right;
+          padding-bottom: 10px;
+          border-bottom: 1px solid #ccc;
+          img{
+            width: 80px;
+            height: 80px;
+            background: #000;
+          }
+        }
+      }
+      .invoice-item{
+        overflow: hidden;
+        line-height: 32px;
+        padding: 10px 10px 10px;
+        &:last-child{
+          & > div{
+            border-bottom: none;
+            p{
+              height: 50px;
+            }
+          }
+        }
+        span{
+          float: left;
+        }
+        & > div{
+          width: 80%;
+          float: right;
+          text-align: right;
+          padding-bottom: 10px;
+          border-bottom: 1px solid #ccc;
+          h3{
+            height: 24px;
+          }
+        }
+      }
+    }
+  }
+  .slider-pager{
+    bottom: auto;
+    top: 0;
+  }
+
+}
