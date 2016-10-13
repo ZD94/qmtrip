@@ -38,7 +38,7 @@ function ngUploader($loading, wxApi): any {
             }
             return require('./uploader-std.html');
         },
-        controller: function($scope, $element, $transclude, $injector, $location, FileUploader, ngModalDlg){
+        controller: function($scope, $element, $transclude, $injector, $location, FileUploader, ngModalDlg, $ionicPopup, $interval){
             $element.css('position', 'relative');
             $transclude($scope, function(clone) { $element.append(clone); });
             var upload_url = $scope.url || '/upload/ajax-upload-file?type=image';
@@ -55,6 +55,7 @@ function ngUploader($loading, wxApi): any {
                 })
             }
             var fileIds = [];
+            var progressPopup;
             uploader.onAfterAddingAll = async function(files) {
                 var urls = files.map((file)=>file._file)
                 var blobs = await showPreviewDialog($scope, ngModalDlg, urls, $scope.title)
@@ -65,7 +66,19 @@ function ngUploader($loading, wxApi): any {
                 //for(let i=0; i<blobs.length; i++){
                 //    uploader.queue[i]._file = blobs[i];
                 //}
-                $loading.start();
+                //$loading.start();
+                $interval(function(){
+                    if(uploader.progress){
+                        $scope.progress = uploader.progress;
+                    }
+                },50)
+
+                let template = `<progress max="100" value={{progress}}></progress>`;
+                progressPopup = $ionicPopup.show({
+                    template: template,
+                    scope: $scope,
+                });
+
                 fileIds = [];
                 uploader.uploadAll();
             };
@@ -90,7 +103,8 @@ function ngUploader($loading, wxApi): any {
                 }
                 $scope.done()(obj);
                 uploader.clearQueue();
-                $loading.end();
+                progressPopup.close();
+                //$loading.end();
             };
 
             if(use_wxChooseImage) {
