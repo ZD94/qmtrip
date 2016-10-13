@@ -288,7 +288,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
                 clearInterval(timer);
                 isShowDone = true;
                 if (budget) {
-                    cb();
+                    return cb();
                 }
             }
             $loading.reset();
