@@ -1137,7 +1137,7 @@ export default class ApiAuth {
     static logout = authentication.logout;
 
     static authentication = authentication.checkTokenAuth;
-
+    static makeAuthenticateToken = authentication.makeAuthenticateToken;
 }
 
 //生成激活链接参数
