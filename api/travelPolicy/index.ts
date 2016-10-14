@@ -123,9 +123,7 @@ class TravelPolicyModule{
     @clientExport
     @requireParams(["id"], ["companyId"])
     @conditionDecorator([
-        {if: condition.isTravelPolicyAdminOrOwner("0.id")},
         {if: condition.isTravelPolicyCompany("0.id")},
-        {if: condition.isSelfTravelPolicy("0.id")},
         {if: condition.isTravelPolicyAgency("0.id")}
     ])
     static async getTravelPolicy(params: {id: string, companyId?: string}) : Promise<TravelPolicy>{
@@ -336,8 +334,7 @@ class TravelPolicyModule{
     @clientExport
     @requireParams(["where.travelPolicyId"],['attributes','where.name', 'where.subsudyMoney'])
     @conditionDecorator([
-        {if: condition.isTravelPolicyAdminOrOwner("0.where.travelPolicyId")},
-        {if: condition.isSelfTravelPolicy("0.where.travelPolicyId")}
+        {if: condition.isTravelPolicyCompany("0.where.travelPolicyId")}
     ])
     static async getSubsidyTemplates(params): Promise<FindResult>{
         var options: any = {
