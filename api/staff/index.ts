@@ -118,7 +118,7 @@ class StaffModule{
         let id = params.id;
 
         await API.auth.checkEmailAndMobile({mobile: mobile});
-        var account = await DBM.Account.findById(id);
+        var account = await Models.account.get(id);
 
         if (!account) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
@@ -155,7 +155,7 @@ class StaffModule{
         let id = params.id;
 
         await API.auth.checkEmailAndMobile({email: email});
-        var account = await DBM.Account.findById(id);
+        var account = await Models.account.get(id);
 
         if (!account) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
@@ -185,7 +185,7 @@ class StaffModule{
         let newPwd = params.newPwd;
         let id = params.id;
 
-        var account = await DBM.Account.findById(id);
+        var account = await Models.account.get(id);
 
         if (!account) {
             throw L.ERR.ACCOUNT_NOT_EXIST();

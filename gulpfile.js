@@ -201,25 +201,31 @@ function exec_child(cmd, cb){
 }
 gulp.task('ionic.build', ['ionic.www'], function (done) {
     process.chdir('ionic');
-    exec_child('ionic resources', function(err) {
-        console.log('ionic build ios android --device --buildConfig build.json');
-        exec_child('ionic build ios android --device --buildConfig build.json', function (err) {
+    //exec_child('ionic resources', function(err) {
+        console.log('ionic build ios android --device --release --inc-version --buildConfig build.json');
+        exec_child('ionic build ios android --device --release --inc-version --buildConfig build.json', function (err) {
             process.chdir('..');
             try{
                 fs.unlinkSync('ionic/app/jingli365.ipa')
             }catch(e){}
             try{
+                fs.unlinkSync('ionic/app/jingli365.apk');
+            }catch(e){}
+            try{
+                fs.unlinkSync('ionic/app/jingli365.x86.apk');
+            }catch(e){}
+            try{
                 fs.renameSync('ionic/platforms/ios/build/device/鲸力商旅.ipa', 'ionic/app/jingli365.ipa');
             }catch(e){}
             try{
-            fs.unlinkSync('ionic/app/jingli365.apk');
+                fs.renameSync('ionic/platforms/android/build/outputs/apk/android-armv7-release.apk', 'ionic/app/jingli365.apk');
             }catch(e){}
             try{
-            fs.renameSync('ionic/platforms/android/build/outputs/apk/android-armv7-debug.apk', 'ionic/app/jingli365.apk');
+                fs.renameSync('ionic/platforms/android/build/outputs/apk/android-x86-release.apk', 'ionic/app/jingli365.x86.apk');
             }catch(e){}
             done();
-        })
-    });
+        });
+    //});
 });
 
 gulp.task('ionic.ios', ['ionic.www'], function (done) {

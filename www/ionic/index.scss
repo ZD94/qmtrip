@@ -120,7 +120,8 @@ ion-side-menu {
   &:not(.fullscreen) {
     .toplevel-side-menu{
       ion-side-menu {
-        margin-top: 20px;
+        min-height: initial;
+        top: 20px;
       }
     }
   }
