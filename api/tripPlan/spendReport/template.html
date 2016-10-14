@@ -348,13 +348,14 @@
 
 	.content {
 		width: 210mm;
-		height:295mm;
+		height:285mm;
 		color: #454545;
 		padding:15mm 14mm 15mm 17mm;
 		text-align: center;
 		font-size: 9pt;
 		font-family: 'KaiTi','sans-serif',  'Arial', 'STKaiti';
 		margin:0 auto;
+		position:relative;
 		transform: scale(0.75);
 		-webkit-transform: scale(0.75);
 		transform-origin: 0 0;
@@ -416,7 +417,7 @@
 	}
 	.content .content-middle .detail {
 		float: left;
-		width: 95mm;
+		width: 90mm;
 	}
 	.content .content-middle .detail div.container {
 		width: 100%;
@@ -431,12 +432,12 @@
 		padding-right: 0pt;
 	}
 	.content .content-middle .explain {
-		width: 80mm;
+		width: 85mm;
 		float: right;
 		margin-right: 9pt;
 	}
 	.content .content-middle .explain h3 {
-		padding-left: 60pt;
+		padding-left: 75pt;
 	}
 	.content .content-middle .explain .qrcode {
 		float: left;
@@ -464,8 +465,11 @@
 		border: 2px solid #8cb8e1;
 		width: 170mm;
 		/*height: 130mm;*/
-		margin: 25mm auto 0mm;
+		margin: 0mm auto 0mm;
 		padding-bottom: 20mm;
+		position:absolute;
+		top:55%;
+		left:10%;
 	}
 	.content .ticket .ticket-title {
 		font-size: 12pt;
@@ -685,7 +689,7 @@
 		<div class="explain">
 			<h3>超支说明</h3>
 			<div class="qrcode">
-				<img src="<%=data.qrcode%>" width="60pt">
+				<img src="<%=data.qrcode%>" width="80pt">
 				<div style="font-size:7pt">查看预算详情</div>
 			</div>
 			<div class="explain-text">				
