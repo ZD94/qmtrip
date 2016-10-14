@@ -1960,6 +1960,9 @@ class TripPlanModule {
         if (!tripPlan || tripPlan.status != EPlanStatus.COMPLETE) {
             throw L.ERR.TRIP_PLAN_STATUS_ERR();
         }
+        if (!staff.email) {
+            throw L.ERR.EMAIL_EMPTY();
+        }
         let title = moment(tripPlan.startAt).format('MM.DD') + '-'+ moment(tripPlan.backAt).format("MM.DD") + tripPlan.deptCity + "到" + tripPlan.arrivalCity + '报销单'
         let tripDetails = await tripPlan.getTripDetails({where: {}, order: [["created_at", "asc"]]});
         let tripApprove = await Models.tripApprove.get(tripPlanId);
