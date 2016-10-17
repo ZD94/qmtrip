@@ -150,8 +150,8 @@ export async function ListDetailController($location, $scope , Models, $statePar
             await API.tripPlan.makeSpendReport({tripPlanId: id});
         } catch(err) {
             $ionicPopup.alert({
-                title:'操作失败',
-                template:'报销单生成失败,请稍后重试'
+                title:'报销单生成失败',
+                template: err.msg || '报销单生成失败,请稍后重试'
             });
             $scope.hasMakeSpendRecorder = false;
         }
