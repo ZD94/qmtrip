@@ -147,18 +147,25 @@ export async function ListDetailController($location, $scope , Models, $statePar
         API.require('tripPlan');
         await API.onload();
         try {
-            await API.tripPlan.makeSpendReport({tripPlanId: id});
+            let ret = await API.tripPlan.makeSpendReport({tripPlanId: id});
+            $ionicPopup.alert({
+                title:'操作成功',
+                template:'报销单已发送到您的邮箱'
+            });
         } catch(err) {
+            if (err.code == -26) {
+                await $ionicPopup.alert({
+                    title: "邮箱未完成绑定",
+                    template: "您还未绑定邮箱或邮箱未激活，请完成后再生成报销单",
+                    okText: '前往设置'
+                });
+                window.location.href = '#/staff/staff-info';
+            }
             $ionicPopup.alert({
                 title:'报销单生成失败',
                 template: err.msg || '报销单生成失败,请稍后重试'
             });
             $scope.hasMakeSpendRecorder = false;
         }
-
-        $ionicPopup.alert({
-            title:'操作成功',
-            template:'报销单已发送到您的邮箱'
-        });
     }
 }
