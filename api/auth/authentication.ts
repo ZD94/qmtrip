@@ -21,7 +21,7 @@ export async function makeAuthenticateToken(accountId, os?: string): Promise<Log
         token = Models.token.create({token: utils.getRndStr(10), accountId, os});
     }
     token.refreshAt = new Date();
-    token.expireAt = moment().add(2, "hours").toDate();
+    token.expireAt = moment().add(7, "days").toDate();
     await token.save();
     return {accountId: token.accountId, tokenId: token.id, token: token.token};
 }
@@ -62,7 +62,7 @@ export async function checkTokenAuth(params: AuthRequest): Promise<AuthResponse|
     if(sign != tokenSign) {
         return null;
     }
-    token.expireAt = moment().add(2, "hours").toDate();
+    token.expireAt = moment().add(7, "days").toDate();
     await token.save();
     return {accountId: token.accountId};
 };
