@@ -34,8 +34,8 @@ angular
                         template: require('./spanchange.html'),
                         controller: SpanChangeController,
                     });
-                    $scope.span = ret.span;
-                    $scope.interval = ret.interval;
+                    //$scope.span = ret.span;
+                    //$scope.interval = ret.interval;
                 }
             }
         }
@@ -67,12 +67,11 @@ function SpanChangeController($scope, ngModalDlg){
             if(n !== 'other'){
                 let start = moment($scope.span.startTime).startOf($scope.spacing.interval);
                 $scope.span.startTime = start.toDate();
-                $scope.span.endTime = start.add(1, $scope.spacing.interval).toDate();
+                $scope.span.endTime = start.add(1, $scope.spacing.interval).subtract(1, 'days').toDate();
             }
         }
     })
     $scope.changeSpan = function(key,modal){
-        console.log(key);
         $scope.spacing.interval = key;
         modal.hide();
     }
