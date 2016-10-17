@@ -21,7 +21,7 @@
 		padding:15mm 14mm 5mm 17mm;
 		text-align: center;
 		font-size: 9pt;
-		font-family: 'KaiTi','sans-serif',  'Arial', 'STKaiti';
+		font-family: 'AR PL UKai CN', 'KaiTi','sans-serif',  'Arial', 'STKaiti';
 		margin:0 auto;
 		position:relative;
 	}
@@ -248,9 +248,9 @@
 			%>		
 			<tr style="border-top:1px dashed #222222">
 				<td><%=invoice.type%></td>
-				<td><%=invoice.date%></td>
+				<td><%=(invoice.type=== '补助' ? '-': invoice.date)%></td>
 				<td><%=invoice.invoiceInfo%></td>
-				<td><%=invoice.quantity%>张</td>
+				<td><%=(invoice.type=== '补助' ? '-': invoice.quantity+'张')%></td>
 				<td><%=invoice.money%></td>
 				<td><%=invoice.remark%></td>
 			</tr>
@@ -389,15 +389,19 @@
 					var invoices = data.invoices;
 					var index=1;
 					_.forEach(invoices,function(invoice){
-				%>
-					<tr>
-						<td><%=index%></td>
-						<td><%=invoice.invoiceInfo%></td>
-						<td><%=invoice.money%></td>
-						<td><%=invoice.date%></td>
-					</tr>
-				<%	
-					index++;	
+				    if (invoice.type == '补助') {
+						//not do anything
+					} else {
+						%>
+							<tr>
+								<td><%=index%></td>
+								<td><%=invoice.invoiceInfo%></td>
+								<td><%=invoice.money%></td>
+								<td><%=invoice.date%></td>
+							</tr>
+						<%
+							index++;
+						}
 					})					
 				%>
 			</tbody>
