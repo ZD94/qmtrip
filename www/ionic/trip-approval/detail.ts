@@ -17,18 +17,23 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     $scope.EApproveStatus = EApproveStatus;
     $scope.MTxPlaneLevel = MTxPlaneLevel;
     $scope.EApproveResult = EApproveResult;
-
     //判断有无审批权限
     let isHasPermissionApprove = false;
+    //是否已经审批
+    let isHasApprove = false;
     let isSelf = false;
     let curStaff = await Staff.getCurrent();
     if(tripApprove.approveUser && curStaff.id == tripApprove.approveUser.id) {
         isHasPermissionApprove = true;
     }
+    if(tripApprove.approveUsers){
+        isHasApprove = true;
+    }
     if(curStaff.id == tripApprove.accountId){
         isSelf = true;
     }
     $scope.isHasPermissionApprove = isHasPermissionApprove;
+    $scope.isHasApprove = isHasApprove;
     $scope.isSelf = isSelf;
 
     let totalBudget: number = 0;
@@ -228,6 +233,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
             $scope.isNextApprove = value.isNextApprove;
             approve(value.result);
             $scope.isHasPermissionApprove = false;
+            $scope.isHasApprove = true;
         }
         // $scope.isConfirm = true;
         // $scope.isNextApprove = false;

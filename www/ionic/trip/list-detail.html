@@ -41,7 +41,7 @@
             </ion-scroll>
 
             <div ng-if="tripDetail && tripDetail.status != undefined" class="button-bar">
-                <a ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD" ng-click="cancelTripPlan()" class="button button-positive">撤销</a>
+                <a ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD" ng-click="cancelTripPlan()" class="button button-positive">撤销行程</a>
                 <a ng-if="tripDetail.status == EPlanStatus.WAIT_COMMIT" ng-click="showAlterDialog()" id="page20-button60" class="button button-positive" no-back>提交审核</a>
                 <a ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD" class="button button-stable">提交审核</a>
                 <!--<a ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS" ng-click="cancelTripPlan()" id="page20-button61" class="button button-cancel" no-back>撤销</a>-->
