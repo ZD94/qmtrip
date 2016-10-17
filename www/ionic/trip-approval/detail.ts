@@ -26,7 +26,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     if(tripApprove.approveUser && curStaff.id == tripApprove.approveUser.id) {
         isHasPermissionApprove = true;
     }
-    if(tripApprove.approveUsers){
+    if(tripApprove.approvedUsers){
         isHasApprove = true;
     }
     if(curStaff.id == tripApprove.accountId){
