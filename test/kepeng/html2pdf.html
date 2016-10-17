@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>差率费用报销单</title>
+<!--
+    <link href="http//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+-->
+     <link rel="stylesheet" href="../../node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+    <!--
+          <style>
+              * {
+                  margin:0px;
+                  padding: 0px
+              }
+              table {
+                  border-spacing: 0;
+                  border-collapse: collapse;
+              }
+              .table {
+                  border-collapse: collapse !important;
+              }
+              .table-bordered th,
+              .table-bordered td {
+                  border: 1px solid #ddd;
+              }
+              table {
+                  background-color: transparent;
+              }
+              .table {
+                  width: 100%;
+                  max-width: 100%;
+                  margin-bottom: 20px;
+              }
+              .table > thead > tr > th,
+              .table > tbody > tr > th,
+              .table > tfoot > tr > th,
+              .table > thead > tr > td,
+              .table > tbody > tr > td,
+              .table > tfoot > tr > td {
+                  padding: 8px;
+                  line-height: 1.42857143;
+                  vertical-align: top;
+                  border-top: 1px solid #ddd;
+              }
+              .table > thead > tr > th {
+                  vertical-align: bottom;
+                  border-bottom: 2px solid #ddd;
+              }
+              .table > caption + thead > tr:first-child > th,
+              .table > colgroup + thead > tr:first-child > th,
+              .table > thead:first-child > tr:first-child > th,
+              .table > caption + thead > tr:first-child > td,
+              .table > colgroup + thead > tr:first-child > td,
+              .table > thead:first-child > tr:first-child > td {
+                  border-top: 0;
+              }
+              .table > tbody + tbody {
+                  border-top: 2px solid #ddd;
+              }
+              .table .table {
+                  background-color: #fff;
+              }
+              .table-condensed > thead > tr > th,
+              .table-condensed > tbody > tr > th,
+              .table-condensed > tfoot > tr > th,
+              .table-condensed > thead > tr > td,
+              .table-condensed > tbody > tr > td,
+              .table-condensed > tfoot > tr > td {
+                  padding: 5px;
+              }
+              .table-bordered {
+                  border: 1px solid #ddd;
+              }
+              .table-bordered > thead > tr > th,
+              .table-bordered > tbody > tr > th,
+              .table-bordered > tfoot > tr > th,
+              .table-bordered > thead > tr > td,
+              .table-bordered > tbody > tr > td,
+              .table-bordered > tfoot > tr > td {
+                  border: 1px solid #ddd;
+              }
+              .table-bordered > thead > tr > th,
+              .table-bordered > thead > tr > td {
+                  border-bottom-width: 2px;
+              }
+              .table-striped > tbody > tr:nth-of-type(odd) {
+                  background-color: #f9f9f9;
+              }
+              .table-hover > tbody > tr:hover {
+                  background-color: #f5f5f5;
+              }
+              table col[class*="col-"] {
+                  position: static;
+                  display: table-column;
+                  float: none;
+              }
+              table td[class*="col-"],
+              table th[class*="col-"] {
+                  position: static;
+                  display: table-cell;
+                  float: none;
+              }
+              .table > thead > tr > td.active,
+              .table > tbody > tr > td.active,
+              .table > tfoot > tr > td.active,
+              .table > thead > tr > th.active,
+              .table > tbody > tr > th.active,
+              .table > tfoot > tr > th.active,
+              .table > thead > tr.active > td,
+              .table > tbody > tr.active > td,
+              .table > tfoot > tr.active > td,
+              .table > thead > tr.active > th,
+              .table > tbody > tr.active > th,
+              .table > tfoot > tr.active > th {
+                  background-color: #f5f5f5;
+              }
+              .table-hover > tbody > tr > td.active:hover,
+              .table-hover > tbody > tr > th.active:hover,
+              .table-hover > tbody > tr.active:hover > td,
+              .table-hover > tbody > tr:hover > .active,
+              .table-hover > tbody > tr.active:hover > th {
+                  background-color: #e8e8e8;
+              }
+              .table > thead > tr > td.success,
+              .table > tbody > tr > td.success,
+              .table > tfoot > tr > td.success,
+              .table > thead > tr > th.success,
+              .table > tbody > tr > th.success,
+              .table > tfoot > tr > th.success,
+              .table > thead > tr.success > td,
+              .table > tbody > tr.success > td,
+              .table > tfoot > tr.success > td,
+              .table > thead > tr.success > th,
+              .table > tbody > tr.success > th,
+              .table > tfoot > tr.success > th {
+                  background-color: #dff0d8;
+              }
+              .table-hover > tbody > tr > td.success:hover,
+              .table-hover > tbody > tr > th.success:hover,
+              .table-hover > tbody > tr.success:hover > td,
+              .table-hover > tbody > tr:hover > .success,
+              .table-hover > tbody > tr.success:hover > th {
+                  background-color: #d0e9c6;
+              }
+              .table > thead > tr > td.info,
+              .table > tbody > tr > td.info,
+              .table > tfoot > tr > td.info,
+              .table > thead > tr > th.info,
+              .table > tbody > tr > th.info,
+              .table > tfoot > tr > th.info,
+              .table > thead > tr.info > td,
+              .table > tbody > tr.info > td,
+              .table > tfoot > tr.info > td,
+              .table > thead > tr.info > th,
+              .table > tbody > tr.info > th,
+              .table > tfoot > tr.info > th {
+                  background-color: #d9edf7;
+              }
+              .table-hover > tbody > tr > td.info:hover,
+              .table-hover > tbody > tr > th.info:hover,
+              .table-hover > tbody > tr.info:hover > td,
+              .table-hover > tbody > tr:hover > .info,
+              .table-hover > tbody > tr.info:hover > th {
+                  background-color: #c4e3f3;
+              }
+              .table > thead > tr > td.warning,
+              .table > tbody > tr > td.warning,
+              .table > tfoot > tr > td.warning,
+              .table > thead > tr > th.warning,
+              .table > tbody > tr > th.warning,
+              .table > tfoot > tr > th.warning,
+              .table > thead > tr.warning > td,
+              .table > tbody > tr.warning > td,
+              .table > tfoot > tr.warning > td,
+              .table > thead > tr.warning > th,
+              .table > tbody > tr.warning > th,
+              .table > tfoot > tr.warning > th {
+                  background-color: #fcf8e3;
+              }
+              .table-hover > tbody > tr > td.warning:hover,
+              .table-hover > tbody > tr > th.warning:hover,
+              .table-hover > tbody > tr.warning:hover > td,
+              .table-hover > tbody > tr:hover > .warning,
+              .table-hover > tbody > tr.warning:hover > th {
+                  background-color: #faf2cc;
+              }
+              .table > thead > tr > td.danger,
+              .table > tbody > tr > td.danger,
+              .table > tfoot > tr > td.danger,
+              .table > thead > tr > th.danger,
+              .table > tbody > tr > th.danger,
+              .table > tfoot > tr > th.danger,
+              .table > thead > tr.danger > td,
+              .table > tbody > tr.danger > td,
+              .table > tfoot > tr.danger > td,
+              .table > thead > tr.danger > th,
+              .table > tbody > tr.danger > th,
+              .table > tfoot > tr.danger > th {
+                  background-color: #f2dede;
+              }
+              .table-hover > tbody > tr > td.danger:hover,
+              .table-hover > tbody > tr > th.danger:hover,
+              .table-hover > tbody > tr.danger:hover > td,
+              .table-hover > tbody > tr:hover > .danger,
+              .table-hover > tbody > tr.danger:hover > th {
+                  background-color: #ebcccc;
+              }
+              .table-responsive {
+                  min-height: .01%;
+                  overflow-x: auto;
+              }
+              @media screen and (max-width: 767px) {
+                  .table-responsive {
+                      width: 100%;
+                      margin-bottom: 15px;
+                      overflow-y: hidden;
+                      -ms-overflow-style: -ms-autohiding-scrollbar;
+                      border: 1px solid #ddd;
+                  }
+                  .table-responsive > .table {
+                      margin-bottom: 0;
+                  }
+                  .table-responsive > .table > thead > tr > th,
+                  .table-responsive > .table > tbody > tr > th,
+                  .table-responsive > .table > tfoot > tr > th,
+                  .table-responsive > .table > thead > tr > td,
+                  .table-responsive > .table > tbody > tr > td,
+                  .table-responsive > .table > tfoot > tr > td {
+                      white-space: nowrap;
+                  }
+                  .table-responsive > .table-bordered {
+                      border: 0;
+                  }
+                  .table-responsive > .table-bordered > thead > tr > th:first-child,
+                  .table-responsive > .table-bordered > tbody > tr > th:first-child,
+                  .table-responsive > .table-bordered > tfoot > tr > th:first-child,
+                  .table-responsive > .table-bordered > thead > tr > td:first-child,
+                  .table-responsive > .table-bordered > tbody > tr > td:first-child,
+                  .table-responsive > .table-bordered > tfoot > tr > td:first-child {
+                      border-left: 0;
+                  }
+                  .table-responsive > .table-bordered > thead > tr > th:last-child,
+                  .table-responsive > .table-bordered > tbody > tr > th:last-child,
+                  .table-responsive > .table-bordered > tfoot > tr > th:last-child,
+                  .table-responsive > .table-bordered > thead > tr > td:last-child,
+                  .table-responsive > .table-bordered > tbody > tr > td:last-child,
+                  .table-responsive > .table-bordered > tfoot > tr > td:last-child {
+                      border-right: 0;
+                  }
+                  .table-responsive > .table-bordered > tbody > tr:last-child > th,
+                  .table-responsive > .table-bordered > tfoot > tr:last-child > th,
+                  .table-responsive > .table-bordered > tbody > tr:last-child > td,
+                  .table-responsive > .table-bordered > tfoot > tr:last-child > td {
+                      border-bottom: 0;
+                  }
+              }
+              .table-bordered th,
+              .table-bordered td {
+                  border: 1px solid #ddd;
+              }
+              .table-bordered {
+                  border: 1px solid #ddd;
+              }
+              .table-bordered > thead > tr > th,
+              .table-bordered > tbody > tr > th,
+              .table-bordered > tfoot > tr > th,
+              .table-bordered > thead > tr > td,
+              .table-bordered > tbody > tr > td,
+              .table-bordered > tfoot > tr > td {
+                  border: 1px solid #ddd;
+              }
+              .table-bordered > thead > tr > th,
+              .table-bordered > thead > tr > td {
+                  border-bottom-width: 2px;
+              }
+          </style>
+          <style>
+
+              .container:before,
+              .container:after,
+              .container-fluid:before,
+              .container-fluid:after,
+              .row:before,
+              .row:after{
+                  display: table;
+                  content: " ";
+              }
+              .container:after,
+              .row:after{
+                  clear:both;
+              }
+              .container {
+                  padding-right: 15px;
+                  padding-left: 15px;
+                  margin-right: auto;
+                  margin-left: auto;
+              }
+
+              .row {
+                  margin-right: -15px;
+                  margin-left: -15px;
+              }
+              .col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
+                  position: relative;
+                  min-height: 1px;
+                  padding-right: 15px;
+                  padding-left: 15px;
+              }
+              .col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12 {
+                  float: left;
+              }
+              .col-xs-12 {
+                  width: 100%;
+              }
+              .col-xs-11 {
+                  width: 91.66666667%;
+              }
+              .col-xs-10 {
+                  width: 83.33333333%;
+              }
+              .col-xs-9 {
+                  width: 75%;
+              }
+              .col-xs-8 {
+                  width: 66.66666667%;
+              }
+              .col-xs-7 {
+                  width: 58.33333333%;
+              }
+              .col-xs-6 {
+                  width: 50%;
+              }
+              .col-xs-5 {
+                  width: 41.66666667%;
+              }
+              .col-xs-4 {
+                  width: 33.33333333%;
+              }
+              .col-xs-3 {
+                  width: 25%;
+              }
+              .col-xs-2 {
+                  width: 16.66666667%;
+              }
+              .col-xs-1 {
+                  width: 8.33333333%;
+              }
+          </style>
+          -->
+    <style>
+        html {
+            transform: scale(0.75);
+            -webkit-transform: scale(0.75);
+            transform-origin: 0 0;
+            -webkit-transform-origin: 0 0;
+            height: 0;
+        }
+    </style>
+    <style>
+        .content {
+            width: 210mm;
+            height: 287mm;
+            color: #454545;
+            padding: 15mm 14mm 5mm 17mm;
+            text-align: center;
+            font-size: 9pt;
+            font-family: 'KaiTi', 'sans-serif', 'Arial', 'STKaiti';
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .content h1 {
+            font-size: 12pt;
+        }
+
+        .content p.date {
+            text-align: right;
+        }
+
+        .content table {
+            margin: 0 auto;
+        }
+
+        .content table.first-table {
+            width: 178mm;
+            border-left: none;
+            border-right: none;
+        }
+
+        .content table.first-table tr {
+            height: 18pt;
+            border-left: none;
+            border-right: none;
+        }
+
+        .content table.first-table tr td:first-child {
+            border-left: none;
+        }
+
+        .content table.first-table tr td:last-child {
+            border-right: none;
+        }
+
+        .content table.first-table tr td span:nth-child(1) {
+            float: left;
+        }
+
+        .content table.first-table tr td span:nth-child(2) {
+            float: right;
+        }
+
+        .content table.second-table {
+            width: 178mm;
+            text-align: left;
+        }
+
+        .content table.second-table tbody > tr > td {
+            border-top: none;
+        }
+
+        .content table.second-table tr {
+            height: 12pt;
+        }
+
+        .content table.second-table tr.total {
+            border-top: 2pt solid #222222;
+            border-bottom: 2pt solid #222222;
+            font-weight: bold;
+        }
+
+        .content .content-middle {
+            overflow: hidden;
+        }
+
+        .content .content-middle h3 {
+            text-align: left;
+            font-size: 10pt;
+            padding-left: 12pt;
+        }
+
+        .content .content-middle .detail {
+            float: left;
+            width: 90mm;
+        }
+
+        .content .content-middle .detail div.container {
+            width: 100%;
+        }
+
+        .content .content-middle .detail div.container .col-xs-6 span:nth-child(1) {
+            float: left;
+        }
+
+        .content .content-middle .detail div.container .col-xs-6 span:nth-child(2) {
+            float: right;
+        }
+
+        .content .content-middle .detail div.container .col-xs-6:nth-child(1) {
+            padding-right: 0pt;
+        }
+
+        .content .content-middle .explain {
+            width: 85mm;
+            float: right;
+            margin-right: 9pt;
+        }
+
+        .content .content-middle .explain h3 {
+            padding-left: 75pt;
+        }
+
+        .content .content-middle .explain .qrcode {
+            float: left;
+        }
+
+        .content .content-middle .explain .explain-text {
+            float: right;
+            width: 58mm;
+        }
+
+        .content .content-middle .explain .explain-text div {
+            border-bottom: 1pt solid #cdcdcd;
+            height: 18pt;
+        }
+
+        .content .content-middle .sign {
+            clear: both;
+            padding-top: 20px;
+            font-weight: bold;
+        }
+
+        .content .content-middle .sign .col-xs-3 {
+            padding-left: 0px;
+            padding-right: 0px;
+            margin-right: 0px;
+            margin-left: 0px;
+        }
+
+        .content .ticket {
+            border: 2px solid #8cb8e1;
+            width: 170mm;
+            /*height: 130mm;*/
+            margin: 0mm auto 0mm;
+            padding-bottom: 20mm;
+            position: absolute;
+            top: 55%;
+            left: 10%;
+        }
+
+        .content .ticket .ticket-title {
+            font-size: 12pt;
+            font-weight: bold;
+            text-align: left;
+            margin-top: 20pt;
+            margin-bottom: 30mm;
+            text-indent: 4pt;
+        }
+
+        .content .ticket table {
+            width: 260pt;
+        }
+
+        .content .ticket table thead {
+            background-color: #d9d9d9;
+            border-top: 1pt solid #222222;
+        }
+
+        .content .ticket table tbody tr > td {
+            border-top: none;
+        }
+
+        .content .ticket table tbody tr {
+            border-top: 1pt dashed #222222;
+        }
+
+        .content .ticket table tbody tr:last-child {
+            border-bottom: 1pt solid #222222;
+        }
+
+        .content .ticket .ticket-inform {
+            color: #b4b4b4;
+            margin-top: 40mm;
+        }
+
+        * {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            /* box-sizing: border-box; */
+        }
+
+        h2, .h2, h3, .h3 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin: 0 0 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <h1>差旅费用报销单</h1>
+    <p class="date">日期：2016-10-15 12:00:00</p>
+    <table class="first-table table table-bordered">
+        <tr>
+            <td>
+                <span>提交人</span><span>李晓晨</span>
+            </td>
+            <td>
+                <span>部门</span><span>董事会</span>
+            </td>
+            <td>
+                <span>金额</span><span>3865.4</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span>出差日期</span><span>2016-09-21-2016-09-25</span>
+            </td>
+            <td>
+                <span>出差路线</span>
+
+                <span>北京-上海-北京</span>
+
+
+            </td>
+            <td>
+                <span>项目编号/事由</span><span>阿里巴巴商务洽谈</span>
+            </td>
+        </tr>
+    </table>
+    <table class="table second-table">
+        <thead>
+        <tr>
+            <th>类型</th>
+            <th>发票日期</th>
+            <th>明细</th>
+            <th>数量</th>
+            <th>金额</th>
+            <th>费用说明</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr style="border-top:1px dashed #222222">
+            <td>交通</td>
+            <td>2016-09-15</td>
+            <td>交通费</td>
+            <td>1张</td>
+            <td>710</td>
+            <td>北京至上海</td>
+        </tr>
+
+        <tr style="border-top:1px dashed #222222">
+            <td>住宿</td>
+            <td>2016-09-25</td>
+            <td>住宿费</td>
+            <td>1张</td>
+            <td>200</td>
+            <td>2016.09.21-2016.09.25 上海 共5日</td>
+        </tr>
+
+        <tr style="border-top:1px dashed #222222">
+            <td>交通</td>
+            <td>2016-08-25</td>
+            <td>交通费</td>
+            <td>1张</td>
+            <td>1000</td>
+            <td>上海至北京</td>
+        </tr>
+
+        <tr class="total">
+            <td colspan="3">合计人民币(大写:)叁千捌佰陆拾肆元五角整</td>
+            <td colspan="2">4张</td>
+            <td>3865.4元</td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="content-middle">
+        <div class="detail">
+            <h3>预算详情</h3>
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-xs-6">
+                        <span>去程(高铁一等座)</span><span>710</span>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <span>返程(飞机经济舱)</span><span>1000</span>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-xs-6">
+
+                        <span>住宿(5天)</span>
+                        <span style="float:right">
+							200
+						</span>
+
+                    </div>
+                    <div class="col-xs-6">
+                        <span>总预算</span><span>4000.2</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-6">
+                        <span>实际支出</span><span>3865.4</span>
+                    </div>
+                    <div class="col-xs-6">
+                        <span>节省</span><span>134.8</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <span>审批人:</span>
+
+
+                        <span>彭科、王鹏、曹爽</span>
+
+
+                    </div>
+                    <div class="col-xs-6"></div>
+                </div>
+            </div>
+        </div>
+        <div class="explain">
+            <h3>超支说明</h3>
+            <div class="qrcode">
+                <img src="data:image/png;base64,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"
+                     width="60pt">
+                <div style="font-size:7pt">查看预算详情</div>
+            </div>
+            <div class="explain-text">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+        <div class="sign">
+            <div class="row" style="padding-left:15px">
+                <div class="col-xs-3">总经理:____________</div>
+                <div class="col-xs-3">审批人:_____________</div>
+                <div class="col-xs-3">财务审核:_____________</div>
+                <div class="col-xs-3">提交人签字:____________</div>
+            </div>
+        </div>
+    </div>
+    <div class="ticket">
+        <p class="ticket-title">
+            在此区域贴票
+        </p>
+        <table class="table">
+            <thead>
+            <tr>
+                <td>序号</td>
+                <td>类别</td>
+                <td>金额</td>
+                <td>发票日期</td>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr>
+                <td>1</td>
+                <td>交通费</td>
+                <td>710</td>
+                <td>2016-09-15</td>
+            </tr>
+
+            <tr>
+                <td>2</td>
+                <td>住宿费</td>
+                <td>200</td>
+                <td>2016-09-25</td>
+            </tr>
+
+            <tr>
+                <td>3</td>
+                <td>交通费</td>
+                <td>1000</td>
+                <td>2016-08-25</td>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

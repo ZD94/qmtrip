@@ -2063,7 +2063,7 @@ class TripPlanModule {
             "invoices": invoices
         }
 
-        let cxt = await makeSpendReport(data);
+        let buf = await makeSpendReport(data);
         try {
             await API.notify.submitNotify({
                 key: 'qm_spend_report',
@@ -2072,7 +2072,7 @@ class TripPlanModule {
                     title: title,
                     attachments: [{
                         filename: title + '.pdf',
-                        content: cxt,
+                        content: buf.toString("base64"),
                         encoding: 'base64'
                     }]
                 },
