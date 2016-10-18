@@ -14,11 +14,15 @@
 		}
 	</style>
 	<style>
+	body {
+		font-family: 'AR PL UKai CN', 'KaiTi','sans-serif',  'Arial', 'STKaiti';
+		width: 210mm;
+	}
 	.content {
 		width: 210mm;
 		height:287mm;
 		color: #454545;
-		padding:15mm 14mm 5mm 17mm;
+		padding:10mm 14mm 5mm 17mm;
 		text-align: center;
 		font-size: 9pt;
 		font-family: 'AR PL UKai CN', 'KaiTi','sans-serif',  'Arial', 'STKaiti';
@@ -67,8 +71,8 @@
 		height: 12pt;
 	}
 	.content table.second-table tr.total {
-		border-top: 2pt solid #222222;
-		border-bottom: 2pt solid #222222;
+		border-top: 2pt solid #000000;
+		border-bottom: 2pt solid #000000;
 		font-weight: bold;
 	}
 	.content .content-middle {
@@ -148,16 +152,16 @@
 	}
 	.content .ticket table thead {
 		background-color: #d9d9d9;
-		border-top: 1pt solid #222222;
+		border-top: 1pt solid #000000;
 	}
 	.content .ticket table tbody tr > td {
 		border-top: none;
 	}
 	.content .ticket table tbody tr {
-		border-top: 1pt dashed #222222;
+		border-top: 1pt dashed #000000;
 	}
 	.content .ticket table tbody tr:last-child {
-		border-bottom: 1pt solid #222222;
+		border-bottom: 1pt solid #000000;
 	}
 	.content .ticket .ticket-inform {
 		color: #b4b4b4;
@@ -246,7 +250,7 @@
 				var invoices = data.invoices;
 				_.forEach(invoices,function(invoice){
 			%>		
-			<tr style="border-top:1px dashed #222222">
+			<tr style="border-top:1px dashed #000000">
 				<td><%=invoice.type%></td>
 				<td><%=(invoice.type=== '补助' ? '-': invoice.date)%></td>
 				<td><%=invoice.invoiceInfo%></td>
