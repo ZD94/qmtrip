@@ -2048,13 +2048,21 @@ class TripPlanModule {
         ]
 
         let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')})
+        var invoiceQuantity = tripDetails
+            .map( (v) => {
+                return (v.invoice && v.invoice.length) || 0;
+            })
+            .reduce(function(previousValue, currentValue) {
+                return previousValue + currentValue;
+            });
+
         var data = {
             "submitter": staff.name,  //提交人
             "department": staff.department.name,  //部门
             "budgetMoney": tripPlan.budget || 0, //预算总金额
             "totalMoney": tripPlan.expenditure || 0,  //实际花费
             "totalMoneyHZ": money2hanzi.toHanzi(<number>tripPlan.expenditure),  //汉子大写金额
-            "invoiceQuantity": tripDetails.length, //票据数量
+            "invoiceQuantity": invoiceQuantity, //票据数量
             "createAt": moment().format('YYYY年MM月DD日HH:mm'), //生成时间
             "departDate": moment(tripPlan.startAt).format('YYYY.MM.DD'), //出差起始时间
             "backDate": moment(tripPlan.backAt).format('YYYY.MM.DD'), //出差返回时间
