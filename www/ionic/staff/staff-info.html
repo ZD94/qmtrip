@@ -15,10 +15,20 @@
                 <span class="item-note">{{staff.email || '请绑定邮箱并验证'}}</span>
                 <i class="icon ion-chevron-right"></i>
             </a>
+            <div class="item item-icon-right avatars">
+                头像
+                <div class="item-note" ng-uploader accept="image/*" url="uploadUrl" done="invoicefuc.done">
+                    <img class="avatar-img" ng-src="/attachments/{{staff.avatar}}" ng-if="staff.avatar != null">
+                    <span ng-if="staff.avatar == null" class="avatar-text">{{staff.name | limitTo:1}}</span>
+                </div>
+
+                <i class="icon ion-chevron-right"></i>
+            </div>
             <div class="spacer" style="height: 10px;"></div>
             <div class="item">
                 企业
                 <span class="item-note">{{company.name}}</span>
+                <input type="file">
             </div>
             <div class="item">
                 权限

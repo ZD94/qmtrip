@@ -7,8 +7,11 @@
             <div class="flex-c010">
                 <a ng-href="#/staff/staff-info" menu-close>
                     <ion-item class="item-thumbnail-left menu-button">
-                        <div class="menu-portrait">
+                        <div class="menu-portrait" ng-if="currentStaff.avatar == null">
                             {{currentStaff.name.substring(currentStaff.name.length-2,currentStaff.name.length)}}
+                        </div>
+                        <div class="menu-portrait menu-avatar" ng-if="currentStaff.avatar != null">
+                            <img ng-src="/attachments/{{currentStaff.avatar}}">
                         </div>
                         <h2>{{currentStaff.name}}<i class="button button-small button-stable"
                                                     ng-click="$event.stopPropagation();$event.preventDefault(); showTravelPolicy()">差旅标准</i></h2>
