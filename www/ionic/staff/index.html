@@ -4,7 +4,10 @@
             <div class="card">
                 <a href="#/staff/staff-info">
                     <div class="item-thumbnail-left">
-                        <div class="avatar">{{staff.name}}</div>
+                        <div class="avatar" ng-if="staff.avatar == null">{{staff.name}}</div>
+                        <div class="avatar" ng-if="staff.avatar != null">
+                            <img ng-src="/attachments/{{staff.avatar}}">
+                        </div>
                         <h2>{{staff.name}}<span class="badge badge-calm" ng-if="staff.roleId == EStaffRole.ADMIN">管理员</span>
                             <span class="badge badge-energized" ng-if="staff.roleId == EStaffRole.OWNER">创建者</span></h2>
                         <p>{{staff.mobile}}</p>
