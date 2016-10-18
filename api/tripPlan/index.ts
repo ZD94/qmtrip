@@ -1105,7 +1105,7 @@ class TripPlanModule {
             templateValue.otherBudget = others;
             templateValue.detailUrl = self_url;
             templateValue.url = self_url;
-            templateValue.auditUser = '鲸力智享';
+            templateValue.auditUser = '鲸力商旅';
             templateValue.auditTime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
 
             let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
@@ -2040,6 +2040,7 @@ class TripPlanModule {
         let content: any = [
             `出差人:${staff.name}`,
             `出差日期:${moment(tripPlan.startAt).format('YYYY.MM.DD')}-${moment(tripPlan.backAt).format('YYYY.MM.DD')}`,
+            `出差路线:${tripPlan.deptCity}-${tripPlan.arrivalCity}${tripPlan.isRoundTrip ? '-' + tripPlan.deptCity: ''}`,
             `出差预算:${tripPlan.budget}`,
             `实际支出:${tripPlan.expenditure}`,
             `出差记录编号:${tripPlan.planNo}`,

@@ -342,7 +342,7 @@ class DDTalk {
                 content: text,
                 agentid: corp.agentid,
                 picurl: picurl,
-                title: '鲸力智享',
+                title: '鲸力商旅',
                 url: url,
             }, 'link');
 

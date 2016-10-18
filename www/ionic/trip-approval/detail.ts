@@ -32,6 +32,9 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     if(curStaff.id == tripApprove.accountId){
         isSelf = true;
     }
+    $scope.$watch('tripApprove.approvedUsers', function(){
+        if(tripApprove.approvedUsers) $scope.isHasApprove = true;
+    })
     $scope.isHasPermissionApprove = isHasPermissionApprove;
     $scope.isHasApprove = isHasApprove;
     $scope.isSelf = isSelf;
