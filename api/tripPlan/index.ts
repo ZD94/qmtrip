@@ -1105,7 +1105,7 @@ class TripPlanModule {
             templateValue.otherBudget = others;
             templateValue.detailUrl = self_url;
             templateValue.url = self_url;
-            templateValue.auditUser = '鲸力智享';
+            templateValue.auditUser = '鲸力商旅';
             templateValue.auditTime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
 
             let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
