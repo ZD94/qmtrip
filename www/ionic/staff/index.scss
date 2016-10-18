@@ -22,6 +22,11 @@ $color:#4a4a4a;
       border-radius: 50%;
       color: #fff;
       background: rgb(36,149,218);
+      overflow: hidden;
+      img{
+        width: 64px;
+        height: 64px;
+      }
     }
     h2{
       font-size: 18px;
