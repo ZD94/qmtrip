@@ -38,9 +38,16 @@ function ngUploader($loading, wxApi): any {
             }
             return require('./uploader-std.html');
         },
+        compile:function compile(tElement, tAttrs, transclude){
+            return function(scope, element, attrs, ctrl,transclude){
+                transclude(function(clone){
+                    element.append(clone)
+                })
+            }
+
+        },
         controller: function($scope, $element, $transclude, $injector, $location, FileUploader, ngModalDlg, $ionicPopup, $interval){
             $element.css('position', 'relative');
-            $transclude($scope, function(clone) { $element.append(clone); });
             var upload_url = $scope.url || '/upload/ajax-upload-file?type=image';
             var uploader = $scope.uploader = new FileUploader({
                 url: upload_url,

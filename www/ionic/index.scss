@@ -69,6 +69,14 @@ ion-side-menu {
       border-radius: 50%;
       color: #fff;
       background: rgb(36,149,218);
+      &.menu-avatar{
+        background: none;
+        img{
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+        }
+      }
     }
     h2{
       font-size: 18px;
