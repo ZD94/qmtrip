@@ -53,8 +53,8 @@
                 <div class="button-bar" ng-if="tripApprove.status == EApproveStatus.REJECT && !isHasPermissionApprove">
                     <a ng-click="reCommitTripApprove()" class="button button-positive  button-block">重新提交</a>
                 </div>
-                <div class="button-bar" ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE && !isHasPermissionApprove">
-                    <a ng-click="cancelTripApprove()" class="button button-positive  button-block">撤销审批</a>
+                <div class="button-bar" ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE && !isHasPermissionApprove && !isHasApprove">
+                    <a ng-click="cancelTripApprove()" class="button button-positive  button-block">撤销行程</a>
                 </div>
             </div>
 

@@ -315,27 +315,16 @@ function loadMonths($scope, $element, $ionicScrollDelegate) {
         fixMonths($scope);
     });
     $scope.months = [];
-    //差旅统计 自定义日历
-    let fromStatistic = $scope.options.fromStatistic;
-    function loadBeforeYear(){
-        let year = moment().year()-1;
-        let month = moment().month();
-        let calResult = getMonth(year, month+1);
-        $scope.months.push(calResult);
-    }
-    $scope.inf = true;
-    if(fromStatistic){
-        $scope.inf = false;
-        loadBeforeYear();
-        for(let i = 0;i < 10;i++){
-            loadNextMonth();
-        }
-        $ionicScrollDelegate.scrollBottom();
-    }
+    let toBottom = $scope.options.toBottom;
+    let loadMonthNum = $scope.options.loadMonthNum;
+    let begin = $scope.options.beginDate;
+    let end = $scope.options.endDate;
+    let diff;
+
     function loadNextMonth() {
         let date;
         if($scope.months.length == 0){
-            date = moment().startOf('month');
+            date = moment(begin).startOf('month');
         }else{
             let last = $scope.months[$scope.months.length - 1];
             date = moment({year: last.year, month: last.month - 1, day: 1});
@@ -344,8 +333,20 @@ function loadMonths($scope, $element, $ionicScrollDelegate) {
         let caldata = getMonth(date.year(), date.month() + 1);
         $scope.months.push(caldata);
     }
-    loadNextMonth();
-    loadNextMonth();
+
+    if(loadMonthNum && typeof loadMonthNum == 'number'){
+        diff = loadMonthNum
+    }else{
+        diff = moment(end).diff(moment(begin), 'months') + 1;
+    }
+    for(let i = 0;i<diff;i++){
+        loadNextMonth();
+    }
+    if(toBottom){
+        $ionicScrollDelegate.scrollBottom();
+    }
+
+    //loadNextMonth();
 
     $scope.loadNextMonth = function() {
         loadNextMonth();

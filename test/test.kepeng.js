@@ -10,12 +10,13 @@ require.extensions[".ts"] = function(){};
 //run('./kepeng/esprima.test');
 //run('./kepeng/template.test');
 //run('./kepeng/class.test');
-//run('./kepeng/zone.test.js');
-//run('./kepeng/zone-stack.test.js');
-run('./kepeng/sqltype.test');
+//run('./kepeng/zone.test');
+//run('./kepeng/zone-stack.test');
+//run('./kepeng/sqltype.test');
 //run('./kepeng/model.test');
 //run('./kepeng/model-cluster.test');
-//run('./kepeng/scrub.test.js');
+run('./kepeng/scrub.test');
+//run('./kepeng/html2pdf.test');
 
 function run(name){
     var file = require.resolve(name);

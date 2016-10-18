@@ -81,7 +81,7 @@ function ngUploader($loading, wxApi): any {
                     }
                 },50)
 
-                let template = `<progress max="100" value={{progress}}></progress>`;
+                let template = `<p style="text-align: center">{{progress}}%</p><progress max="100" value={{progress}}></progress>`;
                 progressPopup = $ionicPopup.show({
                     template: template,
                     scope: $scope,

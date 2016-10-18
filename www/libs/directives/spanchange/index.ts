@@ -81,15 +81,17 @@ function SpanChangeController($scope, ngModalDlg){
             end: moment().endOf('months').toDate()
         }
         value = await ngModalDlg.selectDateSpan($scope, {
-            beginDate:moment().add(-1,'years').startOf('months').toDate(),
-            endDate: moment().endOf('months').toDate(),
+            beginDate:value.begin,
+            endDate: value.end,
             timepicker: false,
             title: '选择开始时间',
             titleEnd: '选择结束时间',
-            fromStatistic: true
+            toBottom: true
         }, value);
-        $scope.span.startTime = value.begin;
-        $scope.span.endTime = value.end;
+        if(value){
+            $scope.span.startTime = value.begin;
+            $scope.span.endTime = value.end;
+        }
         modal.hide();
     };
 }

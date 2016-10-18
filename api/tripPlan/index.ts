@@ -339,7 +339,7 @@ class TripPlanModule {
         let openid = await API.auth.getOpenIdByAccount({accountId: staff.id});
         let values: any = {
             staffName: staff.name,
-            time: moment(tripApprove.createdAt["value"]).format(timeFormat),
+            time: moment(tripApprove.createdAt).format(timeFormat),
             projectName: tripApprove.title,
             goTrafficBudget: go,
             backTrafficBudget: back,
@@ -388,15 +388,15 @@ class TripPlanModule {
             approve_values.detailUrl = shortUrl;
             approve_values.name = staff.name;
             approve_values.destination = tripApprove.arrivalCity;
-            approve_values.startDate = moment(tripApprove.startAt["value"]).format('YYYY.MM.DD');
+            approve_values.startDate = moment(tripApprove.startAt).format('YYYY.MM.DD');
             if (openId) {
                 approve_values.approveUser = approveUser.name;
-                approve_values.content = `员工${staff.name}${moment(tripApprove.startAt["value"]).format('YYYY-MM-DD')}到${tripApprove.arrivalCity}的出差计划已经发送给您，预算：￥${tripApprove.budget}，等待您审批！`;
-                approve_values.autoApproveTime = moment(tripApprove.autoApproveTime["value"]).format(timeFormat);
+                approve_values.content = `员工${staff.name}${moment(tripApprove.startAt).format('YYYY-MM-DD')}到${tripApprove.arrivalCity}的出差计划已经发送给您，预算：￥${tripApprove.budget}，等待您审批！`;
+                approve_values.autoApproveTime = moment(tripApprove.autoApproveTime).format(timeFormat);
                 approve_values.staffName = staff.name;
-                approve_values.startDate = moment(tripApprove.startAt["value"]).format('YYYY.MM.DD');
-                approve_values.endDate = moment(tripApprove.backAt["value"]).format('YYYY.MM.DD');
-                approve_values.createdAt = moment(tripApprove.createdAt["value"]).format(timeFormat);
+                approve_values.startDate = moment(tripApprove.startAt).format('YYYY.MM.DD');
+                approve_values.endDate = moment(tripApprove.backAt).format('YYYY.MM.DD');
+                approve_values.createdAt = moment(tripApprove.createdAt).format(timeFormat);
                 let travelLine = "";
                 if(!tripApprove.deptCity) {
                     travelLine = tripApprove.arrivalCity;
@@ -409,7 +409,7 @@ class TripPlanModule {
                 approve_values.travelLine = travelLine;
                 approve_values.reason= tripApprove.title;
                 approve_values.budget = tripApprove.budget;
-                // approve_values.autoApproveTime = moment(tripApprove.autoApproveTime["value"]).format(timeFormat)
+                // approve_values.autoApproveTime = moment(tripApprove.autoApproveTime).format(timeFormat)
             }
             try {
                 await API.notify.submitNotify({
@@ -462,7 +462,7 @@ class TripPlanModule {
         let timeFormat = 'YYYY-MM-DD HH:mm:ss';
 
         let values: any = {
-            time: moment(tripApprove.createdAt["value"]).format(timeFormat),
+            time: moment(tripApprove.createdAt).format(timeFormat),
             projectName: tripApprove.title,
             goTrafficBudget: go,
             backTrafficBudget: back,
@@ -768,10 +768,10 @@ class TripPlanModule {
                     totalBudget: '￥' + tripPlan.budget,
                     url: self_url,
                     detailUrl: self_url,
-                    time: moment(tripPlan.startAt["value"]).format('YYYY-MM-DD'),
+                    time: moment(tripPlan.startAt).format('YYYY-MM-DD'),
                     destination: tripPlan.arrivalCity,
                     staffName: user.name,
-                    startTime: moment(tripPlan.startAt["value"]).format('YYYY-MM-DD'),
+                    startTime: moment(tripPlan.startAt).format('YYYY-MM-DD'),
                     arrivalCity: tripPlan.arrivalCity,
                     budget: tripPlan.budget,
                     tripPlanNo: tripPlan.planNo,
@@ -800,10 +800,10 @@ class TripPlanModule {
                     totalBudget: '￥' + tripApprove.budget,
                     url: self_url,
                     detailUrl: self_url,
-                    time: moment(tripApprove.startAt["value"]).format('YYYY-MM-DD'),
+                    time: moment(tripApprove.startAt).format('YYYY-MM-DD'),
                     destination: tripApprove.arrivalCity,
                     staffName: user.name,
-                    startTime: moment(tripApprove.startAt["value"]).format('YYYY-MM-DD'),
+                    startTime: moment(tripApprove.startAt).format('YYYY-MM-DD'),
                     arrivalCity: tripApprove.arrivalCity,
                     budget: tripApprove.budget,
                     approveResult: EApproveResult2Text[approveResult],
@@ -1522,8 +1522,8 @@ class TripPlanModule {
 
         let tripPlan = TripPlan.create(tripApprove);
         tripPlan.auditUser = staff.id;
-        tripPlan.startAt = moment(tripApprove.startAt["value"]).format(formatStr);
-        tripPlan.backAt = moment(tripApprove.backAt["value"]).format(formatStr);
+        tripPlan.startAt = moment(tripApprove.startAt).format(formatStr);
+        tripPlan.backAt = moment(tripApprove.backAt).format(formatStr);
         tripPlan.id = tripApprove.id;
         tripPlan.project = tripApprove.project;
         tripPlan.account = tripApprove.account;
@@ -2063,7 +2063,7 @@ class TripPlanModule {
             "invoices": invoices
         }
 
-        let cxt = await makeSpendReport(data);
+        let buf = await makeSpendReport(data);
         try {
             await API.notify.submitNotify({
                 key: 'qm_spend_report',
@@ -2072,7 +2072,7 @@ class TripPlanModule {
                     title: title,
                     attachments: [{
                         filename: title + '.pdf',
-                        content: cxt,
+                        content: buf.toString("base64"),
                         encoding: 'base64'
                     }]
                 },

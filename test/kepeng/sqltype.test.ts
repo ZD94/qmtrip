@@ -12,7 +12,7 @@ Promise.config({longStackTraces: true});
 var uuid = require('uuid');
 var path = require('path');
 var config = {
-    "postgres": "postgres://clear:ste461@localhost:5432/test",
+    "postgres": "postgres://times:time0418@local.jingli.tech:5432/times?ssl=true",
     "remotes": []
 };
 
