@@ -7,7 +7,10 @@ import { Department } from 'api/_types/department';
 import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
 import { AccordHotel } from 'api/_types/accordHotel';
 import { Agency, AgencyUser } from 'api/_types/agency';
-import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCode} from 'api/_types/tripPlan';
+import {
+    TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCode,
+    TripDetailInvoice, TripDetailTraffic, TripDetailHotel
+} from 'api/_types/tripPlan';
 import {Account, Token, AccountOpenid} from 'api/_types/auth';
 import { Seed } from 'api/_types/seed';
 import { createServerService } from 'common/model/sequelize';
@@ -29,6 +32,9 @@ initModels({
     agencyUser: createServerService<AgencyUser>(AgencyUser),
     tripPlan: createServerService<TripPlan>(TripPlan),
     tripDetail: createServerService<TripDetail>(TripDetail),
+    tripDetailInvoice: createServerService<TripDetailInvoice>(TripDetailInvoice),
+    tripDetailTraffic: createServerService<TripDetailTraffic>(TripDetailTraffic),
+    tripDetailHotel: createServerService<TripDetailHotel>(TripDetailHotel),
     tripPlanLog: createServerService<TripPlanLog>(TripPlanLog),
     moneyChange: createServerService<MoneyChange>(MoneyChange),
     project: createServerService<Project>(Project),
