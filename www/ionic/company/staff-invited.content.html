@@ -42,5 +42,9 @@
             <i class="fa fa-envelope-o"></i>
             <span>通过短信发送</span>
         </a>
+        <a class="button button-outline button-calm" ng-href="sms:?body={{staff.name}}邀请您注册鲸力商旅,详情 {{encodeLink}}" ng-if="!isAndroid&&!isIos">
+            <i class="fa fa-envelope-o"></i>
+            <span>通过短信发送</span>
+        </a>
     </div>
 </div>
