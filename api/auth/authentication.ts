@@ -91,11 +91,11 @@ export async function login(data: {account?: string, pwd: string, type?: Number,
     }
 
     if(!data.account) {
-        throw new Error(`登录账号不能为空`);
+        throw L.ERR.USERNAME_EMPTY();
     }
 
     if(!validator.isEmail(data.account) && !validator.isMobilePhone(data.account, 'zh-CN')) {
-        throw new Error(`登录账号格式不正确`);
+        throw L.ERR.USERNAME_ERR_FORMAT();
     }
 
     if(!data.pwd) {
