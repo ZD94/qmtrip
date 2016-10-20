@@ -72,7 +72,8 @@ angular
             scope: {
                 value: '=ngModel',
                 title: '@dlgTitle',
-                options: '=dlgOptions'
+                options: '=dlgOptions',
+                filters: '@dateFilter'  //日期返回格式filter  字符串即可
             },
             controller: function($scope, ngModalDlg) {
                 $scope.showSelectorDlg = async function() {
@@ -81,6 +82,7 @@ angular
                     if(!confirmed)
                         return;
                     $scope.value = confirmed;
+                    $scope.datefilter = $scope.filters || 'yyyy-MM-dd HH:mm';
                     if($scope.options.done && typeof $scope.options.done == 'function') {
                         return $scope.options.done($scope.value);
                     }
