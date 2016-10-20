@@ -160,6 +160,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
                     okText: '前往设置'
                 });
                 window.location.href = '#/staff/staff-info';
+                return false;
             }
             $ionicPopup.alert({
                 title:'报销单生成失败',

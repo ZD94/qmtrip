@@ -37,7 +37,7 @@ function html2pdf(html, base): Promise<Buffer> {
             "footer": {
                 "height": "10mm",
                 "contents": {
-                    first: '<p style="font-size: 6pt; color: #b4b4b4; text-align: center;">请将序号纸的票据按顺序贴于底层(例如) 便于财务快速审核、加快报销速度。</p>', // fallback value
+                    first: '<p style="font-size: 9pt; color: #b4b4b4; text-align: center;">请将序号纸的票据按顺序贴于底层,便于财务快速审核、加快报销速度。</p>', // fallback value
                 }
             },
         }).toBuffer(function(err, buf) {
