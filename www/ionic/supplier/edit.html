@@ -1,0 +1,27 @@
+<ion-view title="供应商" id="page1" style="background-color:#E8E7E9;">
+    <ion-content padding="true" class="has-header">
+        <form class="list">
+            <div class="item item-input">
+                <span class="input-label">供应商名称</span>
+                <input type="text" placeholder="" ng-model="supplier.name">
+            </div>
+            <div class="item item-input">
+                <span class="input-label">交通预定地址</span>
+                <input type="text" placeholder="" ng-model="supplier.trafficBookLink">
+            </div>
+            <div class="item item-input">
+                <span class="input-label">酒店预订地址</span>
+                <input type="text" placeholder="" ng-model="supplier.hotelBookLink">
+            </div>
+            <div class="item item-input">
+                <span class="input-label">LOGO</span>
+                <input type="text" placeholder="" ng-model="supplier.logo">
+            </div>
+            <div class="spacer" style="width: 300px; height: 9px;"></div>
+            <div>
+                <a class="button button-positive  button-block" ng-click="saveSupplier()">保存</a>
+                <a ng-if="supplier.id" class="button button-assertive  button-block" ng-click="deleteSupplier(supplier)">删除</a>
+            </div>
+        </form>
+    </ion-content>
+</ion-view>
