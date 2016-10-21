@@ -20,7 +20,10 @@ export default async function IndexController($scope) {
     async function searchData() {
         await API.onload();
         $scope.statistic = await API.tripPlan.statisticTripBudget(data.monthSelection);
-        $scope.saveMoneyChart.data = [$scope.statistic.savedMoney || 0, $scope.statistic.completeBudget || 1];
+        $scope.saveMoneyChart.data = [
+            $scope.statistic.savedMoney || 0,
+            ($scope.statistic.completeBudget || 1)-($scope.statistic.savedMoney || 0)
+        ];
         $scope.$applyAsync();
     }
 
