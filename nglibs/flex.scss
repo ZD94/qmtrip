@@ -78,6 +78,11 @@
   @include flex-nth(none);
   @include flex-last(none);
 }
+.flex-10x{
+  @include flex-row();
+  @include flex-nth(1);
+  @include flex-default(none);
+}
 .flex-c111{
   @include flex-col();
   @include flex-default(1);

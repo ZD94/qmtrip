@@ -1,0 +1,29 @@
+.bottom-bar{
+  .list{
+    margin-bottom: 0px;
+    padding-top: 0px;
+    i.ion-arrow-up-b{
+      position: absolute;
+      right: 16px;
+      top: 12px;
+      z-index: -100;
+      font-size: 22px;
+    }
+  }
+  .item-input > .fake-input{
+    padding-right: 0px;
+  }
+  fake-input>span{
+    height: 34px;
+  }
+  .status-bar{
+    font-size:14px;
+    margin:0px;
+  }
+  button{
+    font-size:14px;
+    width:100px;
+    float:right;
+    border-radius: 0px;
+  }
+}
