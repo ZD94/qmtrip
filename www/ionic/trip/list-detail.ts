@@ -6,6 +6,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
         $location.path("/");
         return;
     }
+    //底部的按钮
     let bottomStyle = {
         status:{
             text:'',
@@ -24,7 +25,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
             backgroundColor:'#ffffff',
             display:false,
             border:'none',
-        }
+        },
     }
 
     $scope.bottomStyle = bottomStyle;
@@ -205,7 +206,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
             $scope.hasMakeSpendRecorder = false;
         }
     }
-    
+
     $scope.leftClick = $scope.cancelTripPlan;
     $scope.$watch('hasMakeSpendRecorder',function(n, o){
         if(n) $scope.bottomStyle.right.display = false;

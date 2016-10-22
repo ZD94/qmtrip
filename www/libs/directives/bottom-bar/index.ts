@@ -15,10 +15,14 @@ angular
             scope:{
                 bottomStyle:'=',
                 rightClick:'&',
-                leftClick:'&'
+                leftClick:'&',
+                staffSelector:'=',
+                trip:'='
             },
             controller:function($scope) {
                 require('./bottom-bar.scss');
+                console.info($scope.trip);
+                console.info($scope);
             }
         }
     })
