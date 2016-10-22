@@ -50,7 +50,7 @@ export async function EditController($scope, Models, $storage, $stateParams, $io
     };
 
     $scope.saveAccordHotel = async function () {
-        if(!$scope.accordHotel.cityName || !$scope.accordHotel.cityName){
+        if(!$scope.accordHotel.cityName || !$scope.accordHotel.cityCode){
             msgbox.log("出差地点不能为空");
             return false;
         }
@@ -68,7 +68,7 @@ export async function EditController($scope, Models, $storage, $stateParams, $io
         $ionicHistory.goBack(-1);
     }
 
-    $scope.deleteAccordHotel = async function (accordHotel, index) {
+    $scope.deleteAccordHotel = async function (accordHotel) {
         $ionicPopup.show({
             title:'确定要删除该协议酒店吗?',
             scope: $scope,

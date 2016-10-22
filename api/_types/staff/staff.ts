@@ -1,5 +1,6 @@
 import {Models, EGender, EAccountType} from 'api/_types';
 import { Company } from 'api/_types/company';
+import { StaffSupplierInfo } from 'api/_types/staff';
 import {TripPlan, TripApprove} from 'api/_types/tripPlan';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Department } from 'api/_types/department';
@@ -176,6 +177,16 @@ export class Staff extends ModelObject implements Account {
         }
         params.id = this.id;
         return API.staff.modifyPwd(params);
+    }
+
+    async getOneStaffSupplierInfo(params: {supplierId: string}): Promise<StaffSupplierInfo> {
+        var options: any = {};
+        options.where = {staffId: this.id, supplierId: params.supplierId};
+        var staffInfos = await Models.staffSupplierInfo.find(options);
+        if(staffInfos && staffInfos.length > 0){
+            return staffInfos[0];
+        }
+        return null;
     }
 
     @RemoteCall()

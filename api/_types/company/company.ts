@@ -1,7 +1,7 @@
 'use strict';
 
 import { Models } from 'api/_types';
-import {Staff} from 'api/_types/staff';
+import {Staff } from 'api/_types/staff';
 import {Agency} from 'api/_types/agency';
 import {TravelPolicy} from "api/_types/travelPolicy";
 import { Types, Values } from 'common/model';
@@ -10,6 +10,7 @@ import { TripPlan } from "api/_types/tripPlan";
 import {Table, Create, Field, Reference, ResolveRef} from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import { MoneyChange } from './money-change';
+import { Supplier } from './supplier';
 import {CoinAccount} from "api/_types/coin";
 import {PaginateInterface} from "common/model/interface";
 declare var API: any;
@@ -148,7 +149,15 @@ export class Company extends ModelObject{
     @Field({type: Types.NUMERIC(10,2)})
     get points2coinRate(): number { return 0.5};
     set points2coinRate(rate: number) {}
-    
+
+    @Field({type: Types.JSONB})
+    get appointedPubilcSuppliers(): any { return []};
+    set appointedPubilcSuppliers(val: any) {}
+
+    @Field({type: Types.BOOLEAN})
+    get isAppointSupplier(): boolean { return false; }
+    set isAppointSupplier(val: boolean) {}
+
     getStaffs(options?: any): Promise<Staff[]> {
         if(!options) {options = {where: {}}};
         if(!options.where) {options.where = {}};
@@ -216,5 +225,12 @@ export class Company extends ModelObject{
         }
         
         return API.tripPlan.statisticTripPlanOfMonth(params);
+    }
+
+    async getCompanySuppliers(options?: any): Promise<Supplier[]> {
+        if(!options) { options = {}};
+        if(!options.where) { options.where = {}};
+        options.where.companyId = this.id;
+        return Models.supplier.find(options);
     }
 }

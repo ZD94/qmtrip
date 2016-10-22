@@ -8,8 +8,8 @@ import { ModelObjInterface } from 'common/model/interface';
 import { ModelCached } from 'common/model/cached';
 import { ModelRemote } from 'common/model/remote';
 import { ngService } from '../index';
-import { Staff, Credential, PointChange, InvitedLink } from 'api/_types/staff';
-import { Company, MoneyChange } from 'api/_types/company';
+import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from 'api/_types/staff';
+import { Company, MoneyChange, Supplier } from 'api/_types/company';
 import { Department } from 'api/_types/department';
 import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
 import { AccordHotel } from 'api/_types/accordHotel';
@@ -53,11 +53,17 @@ var Services = {
     invitedLink: { type: InvitedLink, modname: 'staff',
         funcs: ['getInvitedLink', 'getInvitedLinks', 'createInvitedLink', 'updateInvitedLink']
     },
+    staffSupplierInfo: { type: StaffSupplierInfo, modname: 'staff',
+        funcs: ['getStaffSupplierInfo', 'getStaffSupplierInfos', 'createStaffSupplierInfo', 'updateStaffSupplierInfo']
+    },
     company: { type: Company, modname: 'company',
         funcs: ['getCompany', 'listCompany', 'registerCompany', 'updateCompany', 'deleteCompany']
     },
     moneyChange: { type: MoneyChange, modname: 'company',
         funcs: ['getMoneyChange', 'listMoneyChange', 'saveMoneyChange']
+    },
+    supplier: { type: Supplier, modname: 'company',
+        funcs: ['getSupplier', 'getSuppliers', 'createSupplier', 'updateSupplier', 'deleteSupplier']
     },
     department: { type: Department, modname: 'department',
         funcs: ['getDepartment', 'getDepartments', 'createDepartment', 'updateDepartment', 'deleteDepartment']
@@ -136,7 +142,9 @@ class ClientModels implements ModelsInterface {
     credential: ModelRemote<Credential>;
     pointChange:ModelRemote<PointChange>;
     invitedLink:ModelRemote<InvitedLink>;
+    staffSupplierInfo:ModelRemote<StaffSupplierInfo>;
     company: ModelRemote<Company>;
+    supplier: ModelRemote<Supplier>;
     department: ModelRemote<Department>;
     travelPolicy: ModelRemote<TravelPolicy>;
     subsidyTemplate: ModelRemote<SubsidyTemplate>;
@@ -173,7 +181,9 @@ class ClientModels implements ModelsInterface {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
         this.credential = createService<Credential>(Services.credential, $cacheFactory);
         this.pointChange = createService<PointChange>(Services.pointChange, $cacheFactory);
+        this.supplier = createService<Supplier>(Services.supplier, $cacheFactory);
         this.invitedLink = createService<InvitedLink>(Services.invitedLink, $cacheFactory);
+        this.staffSupplierInfo = createService<StaffSupplierInfo>(Services.staffSupplierInfo, $cacheFactory);
         this.company = createService<Company>(Services.company, $cacheFactory);
         this.department = createService<Department>(Services.department, $cacheFactory);
         this.travelPolicy = createService<TravelPolicy>(Services.travelPolicy, $cacheFactory);

@@ -1,6 +1,6 @@
 
-import { Company, MoneyChange } from "./company";
-import { Staff, Credential, PointChange, InvitedLink } from "./staff";
+import { Company, MoneyChange, Supplier } from "./company";
+import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from "./staff";
 import { TravelPolicy, SubsidyTemplate } from './travelPolicy';
 import { Department } from './department';
 import { AccordHotel } from './accordHotel';
@@ -34,10 +34,12 @@ export interface ModelsInterface {
     credential: ModelInterface<Credential>;
     pointChange: ModelInterface<PointChange>;
     invitedLink: ModelInterface<InvitedLink>;
+    staffSupplierInfo: ModelInterface<StaffSupplierInfo>;
 
     company: ModelInterface<Company>;
     moneyChange: ModelInterface<MoneyChange>;
-    
+    supplier: ModelInterface<Supplier>;
+
     department: ModelInterface<Department>;
     travelPolicy: ModelInterface<TravelPolicy>;
     subsidyTemplate: ModelInterface<SubsidyTemplate>;
@@ -77,10 +79,12 @@ export var Models: ModelsInterface = {
     credential: new ModelDelegate<Credential>(),
     pointChange: new ModelDelegate<PointChange>(),
     invitedLink: new ModelDelegate<InvitedLink>(),
+    staffSupplierInfo: new ModelDelegate<StaffSupplierInfo>(),
 
     company: new ModelDelegate<Company>(),
     moneyChange: new ModelDelegate<MoneyChange>(),
-    
+    supplier: new ModelDelegate<Supplier>(),
+
     department: new ModelDelegate<Department>(),
     travelPolicy: new ModelDelegate<TravelPolicy>(),
     subsidyTemplate: new ModelDelegate<SubsidyTemplate>(),
