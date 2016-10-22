@@ -77,6 +77,13 @@ var adminMenus = [
         link: 'accord-hotel/',
         badgeNum: 0
     },
+    {
+        id: 1061,
+        icon: 'pricetags',
+        title: '供应商管理',
+        link: 'supplier/',
+        badgeNum: 0
+    },
 ];
 
 export async function IndexController($scope, Menu, $ionicPopup, Models, $storage, $window, $location, $ionicHistory, $ionicSideMenuDelegate) {

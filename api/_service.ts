@@ -1,8 +1,8 @@
 
 import { initModels } from 'api/_types';
 
-import { Staff, Credential, PointChange, InvitedLink } from 'api/_types/staff';
-import { Company, MoneyChange } from 'api/_types/company';
+import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from 'api/_types/staff';
+import { Company, MoneyChange, Supplier } from 'api/_types/company';
 import { Department } from 'api/_types/department';
 import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
 import { AccordHotel } from 'api/_types/accordHotel';
@@ -20,7 +20,9 @@ initModels({
     credential: createServerService<Credential>(Credential),
     pointChange: createServerService<PointChange>(PointChange),
     invitedLink: createServerService<InvitedLink>(InvitedLink),
+    staffSupplierInfo: createServerService<StaffSupplierInfo>(StaffSupplierInfo),
     company: createServerService<Company>(Company),
+    supplier: createServerService<Supplier>(Supplier),
     department: createServerService<Department>(Department),
     travelPolicy: createServerService<TravelPolicy>(TravelPolicy),
     subsidyTemplate: createServerService<SubsidyTemplate>(SubsidyTemplate),

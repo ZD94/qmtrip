@@ -11,13 +11,15 @@ let logger = new Logger('company');
 
 import {requireParams, clientExport} from "common/api/helper";
 import {Models} from "api/_types";
-import {Company, MoneyChange} from 'api/_types/company';
+import {Company, MoneyChange, Supplier} from 'api/_types/company';
 import {Staff, EStaffRole} from "api/_types/staff";
 import {Agency, AgencyUser, EAgencyUserRole} from "api/_types/agency";
 import {Department} from "api/_types/department";
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import {md5} from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
+
+const supplierCols = Supplier['$fieldnames'];
 
 class CompanyModule {
     /**
@@ -356,6 +358,131 @@ class CompanyModule {
                 return true;
             })
     }
+
+    /*************************************供应商begin***************************************/
+    /**
+     * 创建供应商
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["name", "companyId"], supplierCols)
+    @conditionDecorator([
+        {if: condition.isCompanyAdminOrOwner("0.companyId")}
+    ])
+    static async createSupplier (params) : Promise<Supplier>{
+        var supplier = Supplier.create(params);
+        return supplier.save();
+    }
+
+
+    /**
+     * 删除供应商
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    @conditionDecorator([
+        {if: condition.isSupplierAdminOrOwner("0.id")}
+    ])
+    static async deleteSupplier(params) : Promise<any>{
+        var id = params.id;
+        var st_delete = await Models.supplier.get(id);
+
+        await st_delete.destroy();
+        return true;
+    }
+
+
+    /**
+     * 更新供应商
+     * @param id
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"], supplierCols)
+    @conditionDecorator([
+        {if: condition.isSupplierAdminOrOwner("0.id")}
+    ])
+    static async updateSupplier(params) : Promise<Supplier>{
+        var id = params.id;
+
+        var sp = await Models.supplier.get(id);
+        for(var key in params){
+            sp[key] = params[key];
+        }
+        return sp.save();
+    }
+
+    /**
+     * 根据id查询供应商
+     * @param {String} params.id
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    static async getSupplier(params: {id: string}) : Promise<Supplier>{
+        let id = params.id;
+        var ah = await Models.supplier.get(id);
+
+        return ah;
+    };
+
+
+    /**
+     * 根据属性查找属于企业的供应商
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    static async getSuppliers(params): Promise<FindResult>{
+        var options: any = {
+            where: params.where
+        };
+        if(params.columns){
+            options.attributes = params.columns;
+        }
+        options.order = params.order || [['created_at', 'desc']];
+        if(params.$or) {
+            options.where.$or = params.$or;
+        }
+
+        let paginate = await Models.supplier.find(options);
+        let ids =  paginate.map(function(s){
+            return s.id;
+        })
+        return {ids: ids, count: paginate['total']};
+    }
+
+    /**
+     * 查找系统公共供应商
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    static async getPublicSuppliers(params): Promise<FindResult>{
+        var options: any = {
+            where: params.where
+        };
+        if(params.columns){
+            options.attributes = params.columns;
+        }
+        options.order = params.order || [['created_at', 'desc']];
+        if(params.$or) {
+            options.where.$or = params.$or;
+        }
+
+        options.where.companyId = null;//查询companyId为空的公共供应商
+        let paginate = await Models.supplier.find(options);
+        let ids =  paginate.map(function(s){
+            return s.id;
+        })
+        return {ids: ids, count: paginate['total']};
+    }
+    /*************************************供应商end***************************************/
+
 }
 
 export = CompanyModule;

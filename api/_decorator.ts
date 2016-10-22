@@ -247,6 +247,22 @@ export var condition = {
             }
         }
     },
+    isSupplierAdminOrOwner: function(idpath: string) {
+        return async function (fn ,self, args) {
+            let id = _.get(args, idpath);
+            let staff = await Staff.getCurrent();
+            let sp = await Models.supplier.get(id);
+            return id && staff && sp && sp["companyId"] == staff["companyId"] && (staff["roleId"] == EStaffRole.ADMIN || staff["roleId"] == EStaffRole.OWNER);
+        }
+    },
+    isStaffSupplierInfoOwner: function(idpath: string) {
+        return async function (fn ,self, args) {
+            let id = _.get(args, idpath);
+            let staff = await Staff.getCurrent();
+            let sp = await Models.staffSupplierInfo.get(id);
+            return id && staff && sp && sp["staffId"] == staff["id"];
+        }
+    },
     isAccordHotelAdminOrOwner: function(idpath: string) {
         return async function (fn ,self, args) {
             let id = _.get(args, idpath);

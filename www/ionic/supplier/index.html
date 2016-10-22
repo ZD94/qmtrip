@@ -1,0 +1,13 @@
+<ion-view title="供应商" id="page30">
+    <ion-content padding="true" class="has-header">
+        <a href="#/supplier/edit" id="page30-button89" class="button button-positive  button-block">新增供应商</a>
+        <div class="list card accordlist" ng-repeat="ah in suppliers" ng-click="editSupplier(ah.id)">
+            <div class="item item-body">
+                <div id="page30-markdown21" style="color:#000000;">
+                    <p>名称：{{ah.name}}</p>
+                    <ion-toggle toggle-class="toggle-positive" ng-checked="ah.isInUse" ng-model="ah.isInUse" ></ion-toggle>
+                </div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

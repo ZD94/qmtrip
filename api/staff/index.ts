@@ -17,14 +17,14 @@ import L from 'common/language';
 import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {requireParams, clientExport} from 'common/api/helper';
-import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus } from "api/_types/staff";
+import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo } from "api/_types/staff";
 import { EAgencyUserRole, AgencyUser } from "api/_types/agency";
 import { Models, EAccountType } from 'api/_types';
 import {conditionDecorator, condition} from "../_decorator";
 import {FindResult} from "common/model/interface";
 
 const invitedLinkCols = InvitedLink['$fieldnames'];
-
+const staffSupplierInfoCols = InvitedLink['$fieldnames'];
 const staffAllCols = Staff['$getAllFieldNames']();
 
 const goInvitedLink = config.host + "/index.html#/login/invited-staff-one";
@@ -1410,6 +1410,7 @@ class StaffModule{
     }
     /***********************证件信息end***********************/
 
+    /*************************************邀请链接begin***************************************/
     @clientExport
     static async createInvitedLink(params): Promise<InvitedLink>{
         var staff = await Staff.getCurrent();
@@ -1471,6 +1472,103 @@ class StaffModule{
         let paginate = await Models.invitedLink.find(params);
         return {ids: paginate.map((s)=> {return s.id;}), count: paginate['total']};
     }
+    /*************************************邀请链接end***************************************/
+
+    /*************************************员工供应商网站信息begin***************************************/
+    /**
+     * 创建员工供应商网站信息
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["staffId", "supplierId", "loginInfo"], staffSupplierInfoCols)
+    static async createStaffSupplierInfo (params) : Promise<StaffSupplierInfo>{
+        let staff = await Staff.getCurrent();
+        params.staffId = staff.id;
+        var staffSupplierInfo = StaffSupplierInfo.create(params);
+        return staffSupplierInfo.save();
+    }
+
+
+    /**
+     * 删除员工供应商网站信息
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    @conditionDecorator([
+        {if: condition.isStaffSupplierInfoOwner("0.id")}
+    ])
+    static async deleteStaffSupplierInfo(params) : Promise<any>{
+        var id = params.id;
+        var st_delete = await Models.staffSupplierInfo.get(id);
+
+        await st_delete.destroy();
+        return true;
+    }
+
+
+    /**
+     * 更新员工供应商网站信息
+     * @param id
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"], staffSupplierInfoCols)
+    @conditionDecorator([
+        {if: condition.isStaffSupplierInfoOwner("0.id")}
+    ])
+    static async updateSupplier(params) : Promise<StaffSupplierInfo>{
+        var id = params.id;
+        var sp = await Models.staffSupplierInfo.get(id);
+        for(var key in params){
+            sp[key] = params[key];
+        }
+        return sp.save();
+    }
+
+    /**
+     * 根据id查询员工供应商网站信息
+     * @param {String} params.id
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    static async getSupplier(params: {id: string}) : Promise<StaffSupplierInfo>{
+        let id = params.id;
+        var ah = await Models.staffSupplierInfo.get(id);
+
+        return ah;
+    };
+
+
+    /**
+     * 根据属性查找员工供应商网站信息
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    static async getSuppliers(params): Promise<FindResult>{
+        var options: any = {
+            where: params.where
+        };
+        if(params.columns){
+            options.attributes = params.columns;
+        }
+        options.order = params.order || [['created_at', 'desc']];
+        if(params.$or) {
+            options.where.$or = params.$or;
+        }
+
+        let paginate = await Models.staffSupplierInfo.find(options);
+        let ids =  paginate.map(function(s){
+            return s.id;
+        })
+        return {ids: ids, count: paginate['total']};
+    }
+    /*************************************员工供应商网站信息end***************************************/
 
 }
 
