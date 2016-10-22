@@ -5,7 +5,7 @@ import L from 'common/language';
 
 import { ModelsInterface, initModels } from 'api/_types';
 import { ModelObjInterface } from 'common/model/interface';
-import { ModelCached } from '../../common/model/cached';
+import { ModelCached } from 'common/model/cached';
 import { ModelRemote } from 'common/model/remote';
 import { ngService } from '../index';
 import { Staff, Credential, PointChange, InvitedLink } from 'api/_types/staff';
@@ -20,6 +20,7 @@ import { Seed } from 'api/_types/seed';
 import {TravelBudgetLog} from "api/_types/travelbudget";
 import {DDTalkCorp, DDTalkUser} from "api/_types/ddtalk";
 import {CoinAccount, CoinAccountChange} from "api/_types/coin";
+import {TripDetailInvoice, TripDetailHotel, TripDetailTraffic, TripDetailSubsidy, TripDetailSpecial} from "api/_types/tripPlan";
 
 const API = require('common/api');
 
@@ -105,7 +106,12 @@ var Services = {
     coinAccount: { type: CoinAccount, modname: 'coin', funcs: ['clientStaffCoinAccount']},
     coinAccountChange: { type: CoinAccountChange, modname: 'coin', funcs: []},
 
-    financeCheckCode: { type: FinanceCheckCode, modname: 'tripPlan', funcs: []}
+    financeCheckCode: { type: FinanceCheckCode, modname: 'tripPlan', funcs: ['getTripDetail']},
+    tripDetailInvoice: { type: TripDetailInvoice, modname: 'tripPlan', funcs: ['getTripDetail']},
+    tripDetailTraffic: { type: TripDetailTraffic, modname: 'tripPlan', funcs: ['getTripDetailTraffic']},
+    tripDetailHotel: { type: TripDetailHotel, modname: 'tripPlan', funcs: ['getTripDetailHotel']},
+    tripDetailSubsidy: { type: TripDetailSubsidy, modname: 'tripPlan', funcs: ['getTripDetailSubsidy']},
+    tripDetailSpecial: { type: TripDetailSpecial, modname: 'tripPlan', funcs: ['getTripDetailSpecial']},
 };
 
 function throwNotImplemented(){
@@ -139,6 +145,12 @@ class ClientModels implements ModelsInterface {
     agencyUser: ModelRemote<AgencyUser>;
     tripPlan: ModelRemote<TripPlan>;
     tripDetail: ModelRemote<TripDetail>;
+    tripDetailTraffic: ModelRemote<TripDetailTraffic>;
+    tripDetailHotel: ModelRemote<TripDetailHotel>;
+    tripDetailSubsidy: ModelRemote<TripDetailSubsidy>;
+    tripDetailInvoice: ModelRemote<TripDetailInvoice>;
+    tripDetailSpecial: ModelRemote<TripDetailSpecial>;
+
     tripPlanLog: ModelRemote<TripPlanLog>;
     moneyChange: ModelRemote<MoneyChange>;
     project: ModelRemote<Project>;
@@ -180,6 +192,11 @@ class ClientModels implements ModelsInterface {
         this.seed = createService<Seed>(Services.seed, $cacheFactory);
         this.coinAccount = createService<CoinAccount>(Services.coinAccount, $cacheFactory);
         this.coinAccountChange = createService<CoinAccountChange>(Services.coinAccountChange, $cacheFactory);
+        this.tripDetailInvoice = createService<TripDetailInvoice>(Services.tripDetailInvoice, $cacheFactory);
+        this.tripDetailTraffic = createService<TripDetailTraffic>(Services.tripDetailTraffic, $cacheFactory);
+        this.tripDetailHotel = createService<TripDetailHotel>(Services.tripDetailHotel, $cacheFactory);
+        this.tripDetailSubsidy = createService<TripDetailSubsidy>(Services.tripDetailSubsidy, $cacheFactory);
+        this.tripDetailSpecial = createService<TripDetailSpecial>(Services.tripDetailSpecial, $cacheFactory);
         initModels(this);
 
         API.on('beforeConnect', this.clearCache.bind(this));
@@ -197,4 +214,3 @@ class ClientModels implements ModelsInterface {
 
 import './menu';
 import './place';
-

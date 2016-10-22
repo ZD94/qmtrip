@@ -9,17 +9,9 @@ import {EPlanStatus, ETripType, TripPlan} from "./tripPlan";
 import {Field, Table, TableExtends} from "common/model/common";
 import {Models} from "../index";
 import {TripDetail} from "./tripDetail";
+import {ECabin} from "./index";
 
-
-enum ECabin {
-    PLANE_FIRST = 1,
-    PLANE_BUSINESS = 2,
-    PLANE_ECONOMY = 4,
-    TRAIN_FIRST = 11,
-    TRAIN_SECOND = 12,
-}
-
-@TableExtends(TripDetail, 'tripDetailInfo', 'type', 1)
+@TableExtends(TripDetail, 'tripDetailInfo', 'type', [ETripType.OUT_TRIP, ETripType.BACK_TRIP])
 @Table(Models.tripDetailTraffic, "tripPlan.")
 export class TripDetailTraffic extends ModelObject implements TripDetail {
     constructor(target) {
@@ -64,8 +56,8 @@ export class TripDetailTraffic extends ModelObject implements TripDetail {
     tripPlan:TripPlan;
 }
 
-@TableExtends(TripDetail, 'tripDetailInfo', 'type', 2)
-@Table(Models.tripDetailHotel, 'tripPlanrs.')
+@TableExtends(TripDetail, 'tripDetailInfo', 'type', ETripType.HOTEL)
+@Table(Models.tripDetailHotel, 'tripPlan.')
 export class TripDetailHotel extends ModelObject implements TripDetail {
     constructor(target) {
         super(target);
@@ -107,7 +99,7 @@ export class TripDetailHotel extends ModelObject implements TripDetail {
     tripPlan:TripPlan;
 }
 
-@TableExtends(TripDetail, 'tripDetailInfo', 'type', 3)
+@TableExtends(TripDetail, 'tripDetailInfo', 'type', ETripType.SUBSIDY)
 @Table(Models.tripDetailSubsidy, 'tripPlan.')
 export class TripDetailSubsidy extends ModelObject implements TripDetail {
     constructor(target) {
@@ -119,16 +111,20 @@ export class TripDetailSubsidy extends ModelObject implements TripDetail {
     set id(id: string) {}
 
     @Field({type: Types.BOOLEAN})
-    get isIncFirstDay(): boolean { return true}
-    set isIncFirstDay(b: boolean) {}
+    get hasFirstDaySubsidy() { return true}
+    set hasFirstDaySubsidy(b: boolean) {}
 
     @Field({type: Types.BOOLEAN})
-    get isIncLastDay(): boolean { return true}
-    set isIncLastDay(b: boolean) {}
+    get hasLastDaySubsidy() { return true}
+    set hasLastDaySubsidy(b: boolean) {}
 
-    @Field({type: Types.INTEGER})
-    get days() {return 1}
-    set days(d: number) {}
+    @Field({type: Types.DATE})
+    get startDateTime(): Date {return null}
+    set startDateTime(d: Date) {}
+
+    @Field({type: Types.DATE})
+    get endDateTime(): Date { return null}
+    set endDateTime(d: Date) {}
 
     @Field({type: Types.NUMERIC(15,2)})
     get subsidyMoney() { return 0}
@@ -137,6 +133,46 @@ export class TripDetailSubsidy extends ModelObject implements TripDetail {
     @Field({type: Types.UUID})
     get subsidyTemplateId() :string {return null}
     set subsidyTemplateId(id: string) {}
+
+    tripPlanId:string;
+    accountId:string;
+    type:ETripType;
+    status:EPlanStatus;
+    auditRemark:string;
+    auditUser:string;
+    remark:string;
+    budget: number;
+    expenditure:number;
+    tripPlan:TripPlan;
+}
+
+@TableExtends(TripDetail, 'tripDetailInfo', 'type', ETripType.SPECIAL_APPROVE)
+@Table(Models.tripDetailSpecial, 'tripPlan.')
+export class TripDetailSpecial extends ModelObject implements TripDetail {
+    
+    constructor(target) {
+        super(target);
+    }
+    
+    @Field({type: Types.UUID})
+    get id() : string { return Values.UUIDV1()}
+    set id(id: string) {} 
+    
+    @Field({type: Types.STRING(50)})
+    get deptCity() { return null}
+    set deptCity(city: string) {}
+    
+    @Field({type: Types.STRING(50)})
+    get arrivalCity() {return null}
+    set arrivalCity(city: string) {}
+    
+    @Field({type: Types.DATE})
+    get deptDateTime() :Date { return null}
+    set deptDateTime(d: Date) {}
+    
+    @Field({type: Types.DATE})
+    get arrivalDateTime(): Date {return null}
+    set arrivalDateTime(d: Date) {}
 
     tripPlanId:string;
     accountId:string;

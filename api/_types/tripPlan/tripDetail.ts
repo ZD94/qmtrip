@@ -8,6 +8,7 @@ import {Values, Types} from "common/model/index";
 import {EPlanStatus, ETripType, TripPlan} from "./tripPlan";
 import {Field, Create, ResolveRef, Table} from "common/model/common";
 import {Models} from "../index";
+import {EInvoiceFeeTypes} from "./index";
 
 
 @Table(Models.tripDetail, 'tripPlan.')
@@ -139,6 +140,11 @@ export class TripDetail extends ModelObject{
     get tripPlan(): TripPlan { return null; }
     set tripPlan(val: TripPlan) {}
 
+    // getInvoices() :Promise<PaginateInterface<TripDetailInvoice>> {
+    //     let self = this;
+    //     return Models.tripDetailInvoice.find({where: {tripDetailId: self.id}});
+    // }
+
     // editBudget(params: {budget: number}): Promise<boolean> {
     //     //    f3ac3f50-2c70-11e6-bb82-8dd809b99199
     //     return API.tripPlan.editTripDetailBudget({id: this.id, budget: params.budget});
@@ -156,4 +162,60 @@ export class TripDetail extends ModelObject{
     //     params['id'] = this.id;
     //     return API.tripPlan.auditPlanInvoice(params);
     // }
+}
+
+
+
+@Table(Models.tripDetailInvoice, "tripPlan.")
+export class TripDetailInvoice extends ModelObject {
+    constructor(target) {
+        super(target)
+    }
+    @Create()
+    static create(obj?: Object): TripDetailInvoice { return null; }
+
+    @Field({type: Types.UUID})
+    get id() { return null}
+    set id(id: string) {}
+
+    @Field({type: Types.UUID})
+    get tripDetailId() { return null}
+    set tripDetailId(tripDetailId: string) {}
+
+    @Field({type: Types.TEXT})
+    get pictureFileId() { return null}
+    set pictureFileId(pictureFileId: string) {}
+
+    //票据类型
+    @Field({type: Types.INTEGER})
+    get type() :EInvoiceFeeTypes { return null}
+    set type(type: EInvoiceFeeTypes) {}
+
+    //金额
+    @Field({type: Types.NUMERIC(15, 2)})
+    get totalMoney() { return 0}
+    set totalMoney(totalMoney: number) {}
+
+    //用户提交时备注
+    @Field({type: Types.TEXT})
+    get remark() { return null}
+    set remark(remark: string) {}
+
+    //审核状态
+    @Field({type: Types.INTEGER})
+    get status() { return 0}
+    set status(status: number) {}
+
+    //审核失败时备注
+    @Field({type: Types.TEXT})
+    get auditRemark(): string { return null }
+    set auditRemark(auditRemark: string) {}
+
+    @Field({type: Types.INTEGER})
+    get times(): number { return 0}
+    set times(times: number) {}
+
+    @Field({type: Types.DATE})
+    get approveAt(): Date { return null}
+    set approveAt(approveAt: Date) {}
 }

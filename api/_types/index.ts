@@ -16,7 +16,7 @@ import { ModelDelegate } from 'common/model/delegate';
 import {TravelBudgetLog} from "./travelbudget";
 import {DDTalkCorp, DDTalkUser} from "./ddtalk";
 import {CoinAccountChange, CoinAccount} from "./coin";
-import {TripDetailSubsidy} from "./tripPlan/tripDetailInfo";
+import {TripDetailSubsidy, TripDetailSpecial} from "./tripPlan/tripDetailInfo";
 
 
 export enum EGender {
@@ -53,6 +53,8 @@ export interface ModelsInterface {
     tripDetailTraffic: ModelInterface<TripDetailTraffic>;
     tripDetailHotel: ModelInterface<TripDetailHotel>;
     tripDetailSubsidy: ModelInterface<TripDetailSubsidy>;
+    tripDetailSpecial: ModelInterface<TripDetailSpecial>;
+
     tripPlanLog: ModelInterface<TripPlanLog>;
     project: ModelInterface<Project>;
     tripApprove: ModelInterface<TripApprove>;
@@ -94,6 +96,7 @@ export var Models: ModelsInterface = {
     tripDetailTraffic: new ModelDelegate<TripDetailTraffic>(),
     tripDetailHotel: new ModelDelegate<TripDetailHotel>(),
     tripDetailSubsidy: new ModelDelegate<TripDetailSubsidy>(),
+    tripDetailSpecial: new ModelDelegate<TripDetailSpecial>(),
     
     tripPlanLog: new ModelDelegate<TripPlanLog>(),
     project: new ModelDelegate<Project>(),

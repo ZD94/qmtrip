@@ -289,7 +289,7 @@ export class TripPlan extends ModelObject {
         return Models.tripDetail.find({ where: {tripPlanId: this.id, type: ETripType.HOTEL}});
     }
 
-    getTripDetails(options: {where?: any, limit?: number, order?: any}): Promise<PaginateInterface<TripDetail>> {
+    async getTripDetails(options: {where?: any, limit?: number, order?: any}): Promise<PaginateInterface<TripDetail>> {
         if(!options) {
             options = {where: {}};
         }
@@ -550,59 +550,6 @@ export class FinanceCheckCode extends ModelObject {
     @Field({type: Types.BOOLEAN})
     get isValid() : boolean { return true}
     set isValid(b: boolean) {}
-}
-
-export enum EInvoiceFeeTypes {
-    PLANET_TICKET = 1,
-    TRAIN_TICKET = 2,
-    CANCEL_TRAIN_TICKET = 3,
-    CANCEL_PLANET_TICKET = 4
-}
-
-@Table(Models.tripDetailInvoice, "tripPlan.")
-export class TripDetailInvoice extends ModelObject {
-    constructor(target) {
-        super(target)
-    }
-    @Create()
-    static create(obj?: Object): TripApprove { return null; }
-
-    @Field({type: Types.UUID})
-    get id() { return null}
-    set id(id: string) {}
-
-    @Field({type: Types.UUID})
-    get tripDetailId() { return null}
-    set tripDetailId(tripDetailId: string) {}
-
-    @Field({type: Types.TEXT})
-    get invoice() { return null}
-    set invoice(invoice: string) {}
-
-    //票据类型
-    @Field({type: Types.INTEGER})
-    get type() :EInvoiceFeeTypes { return null}
-    set type(type: EInvoiceFeeTypes) {}
-
-    //金额
-    @Field({type: Types.NUMERIC(15, 2)})
-    get totalMoney() { return 0}
-    set totalMoney(totalMoney: number) {}
-
-    //用户提交时备注
-    @Field({type: Types.TEXT})
-    get remark() { return null}
-    set remark(remark: string) {}
-
-    //审核状态
-    @Field({type: Types.INTEGER})
-    get status() { return 0}
-    set status(status: number) {}
-
-    //审核失败时备注
-    @Field({type: Types.TEXT})
-    get auditRemark(): string { return null }
-    set auditRemark(auditRemark: string) {}
 }
 
 function getRndCode(length) {
