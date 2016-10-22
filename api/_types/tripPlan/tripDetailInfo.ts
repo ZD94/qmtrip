@@ -11,7 +11,8 @@ import {Models} from "../index";
 import {TripDetail} from "./tripDetail";
 import {ECabin} from "./index";
 
-@TableExtends(TripDetail, 'tripDetailInfo', 'type', [ETripType.OUT_TRIP, ETripType.BACK_TRIP])
+
+// @TableExtends(TripDetail, 'tripDetailInfo', 'type', [ETripType.OUT_TRIP, ETripType.BACK_TRIP])
 @Table(Models.tripDetailTraffic, "tripPlan.")
 export class TripDetailTraffic extends ModelObject implements TripDetail {
     constructor(target) {
@@ -54,9 +55,13 @@ export class TripDetailTraffic extends ModelObject implements TripDetail {
     budget: number;
     expenditure:number;
     tripPlan:TripPlan;
+
+    uploadInvoice(params): Promise<boolean> {
+        return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
+    }
 }
 
-@TableExtends(TripDetail, 'tripDetailInfo', 'type', ETripType.HOTEL)
+// @TableExtends(TripDetail, 'tripDetailInfo', 'type', ETripType.HOTEL)
 @Table(Models.tripDetailHotel, 'tripPlan.')
 export class TripDetailHotel extends ModelObject implements TripDetail {
     constructor(target) {
@@ -97,9 +102,12 @@ export class TripDetailHotel extends ModelObject implements TripDetail {
     budget: number;
     expenditure:number;
     tripPlan:TripPlan;
+    uploadInvoice(params): Promise<boolean> {
+        return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
+    }
 }
 
-@TableExtends(TripDetail, 'tripDetailInfo', 'type', ETripType.SUBSIDY)
+// @TableExtends(TripDetail, 'tripDetailInfo', 'type', ETripType.SUBSIDY)
 @Table(Models.tripDetailSubsidy, 'tripPlan.')
 export class TripDetailSubsidy extends ModelObject implements TripDetail {
     constructor(target) {
@@ -144,6 +152,10 @@ export class TripDetailSubsidy extends ModelObject implements TripDetail {
     budget: number;
     expenditure:number;
     tripPlan:TripPlan;
+
+    uploadInvoice(params): Promise<boolean> {
+        return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
+    }
 }
 
 @TableExtends(TripDetail, 'tripDetailInfo', 'type', ETripType.SPECIAL_APPROVE)
@@ -184,4 +196,8 @@ export class TripDetailSpecial extends ModelObject implements TripDetail {
     budget: number;
     expenditure:number;
     tripPlan:TripPlan;
+
+    uploadInvoice(params): Promise<boolean> {
+        return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
+    }
 }

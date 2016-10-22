@@ -150,9 +150,9 @@ export class TripDetail extends ModelObject{
     //     return API.tripPlan.editTripDetailBudget({id: this.id, budget: params.budget});
     // }
     //
-    // uploadInvoice(params): Promise<boolean> {
-    //     return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
-    // }
+    uploadInvoice(params): Promise<boolean> {
+        return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
+    }
     //
     // async auditPlanInvoice(params: {auditResult: EAuditStatus, reason?: string, expenditure?: number}): Promise<boolean> {
     //     if(!this.isLocal){
@@ -175,7 +175,7 @@ export class TripDetailInvoice extends ModelObject {
     static create(obj?: Object): TripDetailInvoice { return null; }
 
     @Field({type: Types.UUID})
-    get id() { return null}
+    get id() { return Values.UUIDV1()}
     set id(id: string) {}
 
     @Field({type: Types.UUID})
