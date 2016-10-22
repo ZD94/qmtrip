@@ -2,7 +2,7 @@
     <ion-content padding="false" scroll="false" class="has-header">
         <div class="flex-c10">
             <ion-scroll>
-                <tp-status-bar detail="tripDetail" status="tripDetail.status" reason="tripDetail.reason"></tp-status-bar>
+                <!--<tp-status-bar detail="tripDetail" status="tripDetail.status" reason="tripDetail.reason"></tp-status-bar>-->
                 <tp-header trip="tripDetail"></tp-header>
                 <div class="spacer" style="width: 285px; height: 17px;"></div>
                 <div class="button-bar"></div>
@@ -40,14 +40,16 @@
                 </ion-list>
             </ion-scroll>
 
-            <div ng-if="tripDetail && tripDetail.status != undefined" class="button-bar">
-                <a ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD" ng-click="cancelTripPlan()" class="button button-positive">撤销行程</a>
-                <a ng-if="tripDetail.status == EPlanStatus.WAIT_COMMIT" ng-click="showAlterDialog()" id="page20-button60" class="button button-positive" no-back>提交审核</a>
-                <a ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD" class="button button-stable">提交审核</a>
-                <!--<a ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS" ng-click="cancelTripPlan()" id="page20-button61" class="button button-cancel" no-back>撤销</a>-->
-                <!--<a ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS" ng-click="createTripPlan()" id="page20-button62" class="button button-positive" no-back>再次生成</a>-->
-                <!--<a ng-if="tripDetail.status == EPlanStatus.WAIT_APPROVE" ng-click="cancelTripPlan()" id="page20-button63" class="button button-cancel" no-back>撤销</a>-->
-                <a ng-if="tripDetail.status == EPlanStatus.COMPLETE && !hasMakeSpendRecorder" class="button button-positive" no-back ng-click="makeSpendReport()">生成报销单</a>
+            <div ng-if="tripDetail && tripDetail.status != undefined">
+                <!--<a ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD" ng-click="cancelTripPlan()" class="button button-positive">撤销行程</a>-->
+                <!--<a ng-if="tripDetail.status == EPlanStatus.WAIT_COMMIT" ng-click="showAlterDialog()" id="page20-button60" class="button button-positive" no-back>提交审核</a>-->
+                <!--<a ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD" class="button button-stable">提交审核</a>-->
+                <!--<a ng-if="tripDetail.status == EPlanStatus.COMPLETE && !hasMakeSpendRecorder" class="button button-positive" no-back ng-click="makeSpendReport()">生成报销单</a>-->
+                <bottom-bar bottom-style="bottomStyle"
+                            current-progress=""
+                            left-click="leftClick()"
+                            right-click="rightClick()"
+                ></bottom-bar>
             </div>
         </div>
     </ion-content>
