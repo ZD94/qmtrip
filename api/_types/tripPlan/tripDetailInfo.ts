@@ -5,7 +5,7 @@
 'use strict';
 import {ModelObject} from "common/model/object";
 import {Values, Types} from "common/model/index";
-import {EPlanStatus, ETripType, TripPlan} from "./tripPlan";
+import {EPlanStatus, ETripType, TripPlan, EInvoiceType} from "./tripPlan";
 import {Field, Table, TableExtends} from "common/model/common";
 import {Models} from "../index";
 import {TripDetail} from "./tripDetail";
@@ -36,6 +36,10 @@ export class TripDetailTraffic extends ModelObject implements TripDetail {
     @Field({type: Types.INTEGER})
     get cabin() :ECabin {return null}
     set cabin(cabin: ECabin) {}
+
+    @Field({type: Types.INTEGER})
+    get invoiceType() :EInvoiceType{ return null}
+    set invoiceType(type: EInvoiceType) {}
 
     @Field({type: Types.STRING(10)})
     get deptCity() :string {return null}
