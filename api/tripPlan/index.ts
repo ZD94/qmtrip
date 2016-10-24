@@ -20,15 +20,14 @@ import {
     TripApprove, EApproveStatus, EApproveResult, EApproveResult2Text, MTxPlaneLevel, getECabinByName, getNameByECabin
 } from "api/_types/tripPlan";
 import {Models} from "api/_types";
-import {FindResult} from "common/model/interface";
+import {FindResult, PaginateInterface} from "common/model/interface";
 import {Staff, EStaffRole, EStaffStatus} from "api/_types/staff";
 import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import {getSession} from "common/model";
 import {AgencyUser} from "../_types/agency";
 import {makeSpendReport} from './spendReport';
 import fs = require("fs");
-import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy} from "../_types/tripPlan";
-import {TripDetailSpecial} from "../_types/tripPlan/tripDetailInfo";
+import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice} from "../_types/tripPlan";
 var libqqwry = require('lib-qqwry');
 
 
@@ -986,63 +985,74 @@ class TripPlanModule {
         /*******************************************发送通知消息**********************************************/
         let staff = await Models.staff.get(tripPlan['accountId']);
 
-        // switch (tripDetail.type) {
-        //     case ETripType.OUT_TRIP:
-        //         tripDetail = <TripDetailTraffic>tripDetail;
-        //         templateValue.tripType = '去程';
-        //         templateValue.invoiceDetail = `${moment(tripDetail.deptDateTime).format('YYYY-MM-DD')} 由 ${tripDetail.deptCity} 到 ${tripDetail.arrivalCity}， 去程发票， 预算：${tripDetail.budget}元`;
-        //         break;
-        //     case ETripType.BACK_TRIP:
-        //         tripDetail = <TripDetailTraffic>tripDetail;
-        //         templateValue.tripType = '回程';
-        //         templateValue.invoiceDetail = `${moment(tripDetail.deptDateTime).format('YYYY-MM-DD')} 由 ${tripDetail.deptCity} 到 ${tripDetail.arrivalCity}， 回程发票， 预算：${tripDetail.budget}元`;
-        //         break;
-        //     case ETripType.HOTEL:
-        //         tripDetail = <TripDetailHotel>tripDetail;
-        //         templateValue.tripType = '酒店';
-        //         templateValue.invoiceDetail = `${moment(tripDetail.checkInDate).format('YYYY.MM.DD')} - ${moment(tripDetail.checkOutDate).format('YYYY.MM.DD')}， ${tripDetail.city}`;
-        //         if(tripDetail.placeName) {
-        //             templateValue.invoiceDetail += tripDetail.placeName;
-        //         }
-        //         templateValue.invoiceDetail += `，酒店发票，预算：￥{tripDetail.budget}元`;
-        //         break;
-        //     default: templateValue.tripType = ''; break;
-        // }
-        // if(isNotify) {
-        //     if(tripPlan.status == EPlanStatus.COMPLETE) {
-        //         if(tripPlan.isSpecialApprove){
-        //             templateValue.invoiceDetail = `${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差票据，预算：${tripPlan.budget}元，实际花费：${tripPlan.expenditure}元`;
-        //         }else{
-        //             templateValue.invoiceDetail = `${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差票据，预算：${tripPlan.budget}元，实际花费：${tripPlan.expenditure}元，节省：${savedMoney}元`;
-        //         }
-        //     }
-        //
-        //     let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
-        //     let self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
-        //
-        //     templateValue.ticket = templateValue.tripType;
-        //     templateValue.username = staff.name;
-        //     templateValue.goTrafficBudget = go;
-        //     templateValue.backTrafficBudget = back;
-        //     templateValue.hotelBudget = hotel;
-        //     templateValue.otherBudget = others;
-        //     templateValue.detailUrl = self_url;
-        //     templateValue.url = self_url;
-        //     templateValue.auditUser = '鲸力商旅';
-        //     templateValue.auditTime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
-        //
-        //     let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
-        //     try {
-        //         await API.notify.submitNotify({key: templateName, values: templateValue, email: staff.email, openid: openId});
-        //     } catch(err) {
-        //         console.error(`发送通知失败:`, err);
-        //     }
-        //     try {
-        //         await API.ddtalk.sendLinkMsg({accountId: staff.id, text: '票据已审批通过', url: self_url})
-        //     } catch(err) {
-        //         console.error(`发送钉钉通知失败`, err);
-        //     }
-        // }
+        switch (tripDetail.type) {
+            case ETripType.OUT_TRIP:
+                let d1 = <TripDetailTraffic>tripDetail;
+                templateValue.tripType = '去程';
+                templateValue.invoiceDetail = `${moment(d1.deptDateTime).format('YYYY-MM-DD')} 由 ${d1.deptCity} 到 ${d1.arrivalCity}， 去程发票， 预算：${d1.budget}元`;
+                break;
+            case ETripType.BACK_TRIP:
+                let d2 = <TripDetailTraffic>tripDetail;
+                templateValue.tripType = '回程';
+                templateValue.invoiceDetail = `${moment(d2.deptDateTime).format('YYYY-MM-DD')} 由 ${d2.deptCity} 到 ${d2.arrivalCity}， 回程发票， 预算：${d2.budget}元`;
+                break;
+            case ETripType.HOTEL:
+                let d3 = <TripDetailHotel>tripDetail;
+                templateValue.tripType = '酒店';
+                templateValue.invoiceDetail = `${moment(d3.checkInDate).format('YYYY.MM.DD')} - ${moment(d3.checkOutDate).format('YYYY.MM.DD')}， ${d3.city}`;
+                if(d3.placeName) {
+                    templateValue.invoiceDetail += d3.placeName;
+                }
+                templateValue.invoiceDetail += `，酒店发票，预算：${d3.budget}元`;
+                break;
+            case ETripType.SUBSIDY:
+                let d4 = <TripDetailSubsidy>tripDetail;
+                templateValue.tripType = '补助';
+                templateValue.invoiceDetail = `补助发票，预算：${d4.budget}元`;
+                break;
+            case ETripType.SPECIAL_APPROVE:
+                let d5 = <TripDetailSpecial>tripDetail;
+                templateValue.tripType = '特殊审批'
+                templateValue.invoiceDetail = `特殊审批发票,预算 ${d5.budget}元`
+                break;
+            default:
+                templateValue.tripType = ''; break;
+        }
+        if(isNotify) {
+            if(tripPlan.status == EPlanStatus.COMPLETE) {
+                if(tripPlan.isSpecialApprove){
+                    templateValue.invoiceDetail = `${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差票据，预算：${tripPlan.budget}元，实际花费：${tripPlan.expenditure}元`;
+                }else{
+                    templateValue.invoiceDetail = `${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差票据，预算：${tripPlan.budget}元，实际花费：${tripPlan.expenditure}元，节省：${savedMoney}元`;
+                }
+            }
+
+            let {go, back, hotel, subsidy} = await TripPlanModule.getPlanEmailDetails(tripPlan);
+            let self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
+
+            templateValue.ticket = templateValue.tripType;
+            templateValue.username = staff.name;
+            templateValue.goTrafficBudget = go;
+            templateValue.backTrafficBudget = back;
+            templateValue.hotelBudget = hotel;
+            templateValue.otherBudget = subsidy;
+            templateValue.detailUrl = self_url;
+            templateValue.url = self_url;
+            templateValue.auditUser = '鲸力商旅';
+            templateValue.auditTime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+
+            let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
+            try {
+                await API.notify.submitNotify({key: templateName, values: templateValue, email: staff.email, openid: openId});
+            } catch(err) {
+                console.error(`发送通知失败:`, err);
+            }
+            try {
+                await API.ddtalk.sendLinkMsg({accountId: staff.id, text: '票据已审批通过', url: self_url})
+            } catch(err) {
+                console.error(`发送钉钉通知失败`, err);
+            }
+        }
 
         let user = await AgencyUser.getCurrent();
         let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, tripDetailId: tripDetail.id, userId: user.id, remark: `${templateValue.tripType}票据审核${logResult}`});
@@ -2003,6 +2013,29 @@ class TripPlanModule {
             console.error(err.stack);
         }
         return true;
+    }
+
+    @clientExport
+    static async getTripDetailInvoices(options: {where: any, limit?: any, order?: any}) :Promise<FindResult>{
+        if (!options  || !options.where) throw new Error('查询条件不能为空');
+        let where = options.where;
+        if (!where.tripDetailId) throw new Error('查询条件错误');
+        let qs: any = {
+            where: {tripDetailId: options.where.tripDetailId},
+        }
+        if (options.limit) qs.limit = options.limit;
+        if (options.order) qs.order = options.order;
+        let invoices = await Models.tripDetailInvoice.find(qs);
+        let ids = invoices.map( (v) => {
+            return v.id;
+        });
+        return {ids: ids, count: invoices.length};
+    }
+
+    @clientExport
+    @requireParams(['id'])
+    static async getTripDetailInvoice(params: {id: string}):Promise<TripDetailInvoice> {
+        return Models.tripDetailInvoice.get(params.id);
     }
 
     static __initHttpApp = require('./invoice');
