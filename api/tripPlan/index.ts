@@ -788,7 +788,7 @@ class TripPlanModule {
             throw {code: -3, msg: '该出差计划不能上传票据，请检查出差计划状态'};
         }
 
-        let tripPlan = tripDetail.tripPlan;
+        let tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
 
         if(tripPlan.status != EPlanStatus.WAIT_UPLOAD && tripDetail.status != EPlanStatus.WAIT_COMMIT && tripDetail.status != EPlanStatus.AUDIT_NOT_PASS) {
             throw {code: -3, msg: '该出差计划不能上传票据，请检查出差计划状态'};
@@ -832,84 +832,84 @@ class TripPlanModule {
         return true;
     }
 
-    // /**
-    //  * 提交计划单
-    //  * @param params
-    //  * @returns {*}
-    //  */
-    // @clientExport
-    // @requireParams(['id'])
-    // @modelNotNull('tripPlan')
-    // @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
-    // static async commitTripPlan(params: {id: string}): Promise<boolean> {
-    //     let tripPlan = await Models.tripPlan.get(params.id);
-    //
-    //     if(tripPlan.status != EPlanStatus.WAIT_COMMIT) {
-    //         throw {code: -2, msg: "该出差计划不能提交，请检查状态"};
-    //     }
-    //
-    //     let tripDetails = await tripPlan.getTripDetails({where: {}});
-    //     tripPlan.status = EPlanStatus.AUDITING;
-    //     tripPlan.isCommit = true;
-    //
-    //     if(tripDetails && tripDetails.length > 0) {
-    //         tripDetails.map(function (detail) {
-    //             if (detail.type == ETripType.SUBSIDY) {
-    //                 return;
-    //             }
-    //             if (detail.status == EPlanStatus.WAIT_COMMIT) {
-    //                 // detail.isCommit = true;
-    //                 detail.status = EPlanStatus.AUDITING;
-    //             }
-    //         })
-    //     }
-    //
-    //     let staff = await Staff.getCurrent();
-    //     let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id, remark: `提交票据`});
-    //
-    //     await Promise.all(tripDetails.map((detail) => detail.save()));
-    //     await Promise.all([tripPlan.save(), log.save()]);
-    //
-    //     let default_agency = config.default_agency;
-    //     if(default_agency && default_agency.manager_email) {
-    //         let auditEmail = default_agency.manager_email;
-    //         let accounts = await Models.account.find({where: {email: auditEmail}});
-    //
-    //         if(!accounts || accounts.length <= 0) {
-    //             return true;
-    //         }
-    //
-    //         let user:any = await Models.agencyUser.get(accounts[0].id);
-    //         if(!user) {
-    //             user = await Models.staff.get(accounts[0].id);
-    //         }
-    //         let staff = tripPlan.account;
-    //         if(!staff) {
-    //             staff = await Models.staff.get(tripPlan['accountId']);
-    //         }
-    //
-    //         let company = await tripPlan.getCompany();
-    //         let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
-    //         let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
-    //         let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
-    //         let auditValues = {username: user.name, time:tripPlan.createdAt, auditUserName: user.name, companyName: company.name, staffName: staff.name, projectName: tripPlan.title, goTrafficBudget: go,
-    //             backTrafficBudget: back, hotelBudget: hotel, otherBudget: others, totalBudget: tripPlan.budget, url: auditUrl, detailUrl: auditUrl,
-    //             approveUser: user.name, tripPlanNo: tripPlan.planNo,
-    //             content: `企业 ${company.name} 员工 ${staff.name}${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差计划票据已提交，预算：￥${tripPlan.budget}，等待您审核！`,
-    //             createdAt: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-    //         };
-    //         try {
-    //             await API.notify.submitNotify({
-    //                 key: 'qm_notify_agency_budget',
-    //                 values: auditValues,
-    //                 email: default_agency.manager_email,
-    //                 openid: openId,
-    //             })
-    //         } catch(err) { console.error(err);}
-    //
-    //     }
-    //     return true;
-    // }
+    /**
+     * 提交计划单
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(['id'])
+    @modelNotNull('tripPlan')
+    @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
+    static async commitTripPlan(params: {id: string}): Promise<boolean> {
+        let tripPlan = await Models.tripPlan.get(params.id);
+
+        if(tripPlan.status != EPlanStatus.WAIT_COMMIT) {
+            throw {code: -2, msg: "该出差计划不能提交，请检查状态"};
+        }
+
+        let tripDetails = await tripPlan.getTripDetails({where: {}});
+        tripPlan.status = EPlanStatus.AUDITING;
+        tripPlan.isCommit = true;
+
+        if(tripDetails && tripDetails.length > 0) {
+            tripDetails.map(function (detail) {
+                if (detail.type == ETripType.SUBSIDY) {
+                    return;
+                }
+                if (detail.status == EPlanStatus.WAIT_COMMIT) {
+                    // detail.isCommit = true;
+                    detail.status = EPlanStatus.AUDITING;
+                }
+            })
+        }
+
+        let staff = await Staff.getCurrent();
+        let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id, remark: `提交票据`});
+
+        await Promise.all(tripDetails.map((detail) => detail.save()));
+        await Promise.all([tripPlan.save(), log.save()]);
+
+        let default_agency = config.default_agency;
+        if(default_agency && default_agency.manager_email) {
+            let auditEmail = default_agency.manager_email;
+            let accounts = await Models.account.find({where: {email: auditEmail}});
+
+            if(!accounts || accounts.length <= 0) {
+                return true;
+            }
+
+            let user:any = await Models.agencyUser.get(accounts[0].id);
+            if(!user) {
+                user = await Models.staff.get(accounts[0].id);
+            }
+            let staff = tripPlan.account;
+            if(!staff) {
+                staff = await Models.staff.get(tripPlan['accountId']);
+            }
+
+            let company = await tripPlan.getCompany();
+            let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
+            let {go, back, hotel, subsidy} = await TripPlanModule.getPlanEmailDetails(tripPlan);
+            let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
+            let auditValues = {username: user.name, time:tripPlan.createdAt, auditUserName: user.name, companyName: company.name, staffName: staff.name, projectName: tripPlan.title, goTrafficBudget: go,
+                backTrafficBudget: back, hotelBudget: hotel, otherBudget: subsidy, totalBudget: tripPlan.budget, url: auditUrl, detailUrl: auditUrl,
+                approveUser: user.name, tripPlanNo: tripPlan.planNo,
+                content: `企业 ${company.name} 员工 ${staff.name}${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差计划票据已提交，预算：￥${tripPlan.budget}，等待您审核！`,
+                createdAt: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            };
+            try {
+                await API.notify.submitNotify({
+                    key: 'qm_notify_agency_budget',
+                    values: auditValues,
+                    email: default_agency.manager_email,
+                    openid: openId,
+                })
+            } catch(err) { console.error(err);}
+
+        }
+        return true;
+    }
 
     /**
      * 审核出差票据
@@ -1963,7 +1963,7 @@ class TripPlanModule {
         let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')})
         var invoiceQuantity = _tripDetails
             .map( (v) => {
-                return v.quantity || 0;
+                return v['quantity'] || 0;
             })
             .reduce(function(previousValue, currentValue) {
                 return previousValue + currentValue;
