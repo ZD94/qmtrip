@@ -5,11 +5,12 @@
 'use strict';
 import {ModelObject} from "common/model/object";
 import {Values, Types} from "common/model/index";
-import {EPlanStatus, ETripType, TripPlan, EInvoiceType} from "./tripPlan";
+import {EPlanStatus, ETripType, TripPlan, EInvoiceType, EAuditStatus} from "./tripPlan";
 import {Field, Table, TableExtends} from "common/model/common";
 import {Models} from "../index";
-import {TripDetail} from "./tripDetail";
+import {TripDetail, TripDetailInvoice} from "./tripDetail";
 import {ECabin} from "./index";
+import {PaginateInterface} from "common/model/interface";
 
 
 @TableExtends(TripDetail, 'tripDetailInfo', 'type', [ETripType.OUT_TRIP, ETripType.BACK_TRIP])
@@ -63,6 +64,20 @@ export class TripDetailTraffic extends ModelObject implements TripDetail {
     uploadInvoice(params): Promise<boolean> {
         return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
     }
+
+    getInvoices() :Promise<PaginateInterface<TripDetailInvoice>> {
+        let self = this;
+        return Models.tripDetailInvoice.find({where: {tripDetailId: self.id}});
+    }
+
+    async auditPlanInvoice(params: {auditResult: EAuditStatus, reason?: string, expenditure?: number}): Promise<boolean> {
+        if(!this.isLocal){
+            API.require('tripPlan');
+            await API.onload();
+        }
+        params['id'] = this.id;
+        return API.tripPlan.auditPlanInvoice(params);
+    }
 }
 
 @TableExtends(TripDetail, 'tripDetailInfo', 'type', ETripType.HOTEL)
@@ -108,6 +123,20 @@ export class TripDetailHotel extends ModelObject implements TripDetail {
     tripPlan:TripPlan;
     uploadInvoice(params): Promise<boolean> {
         return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
+    }
+
+    getInvoices() :Promise<PaginateInterface<TripDetailInvoice>> {
+        let self = this;
+        return Models.tripDetailInvoice.find({where: {tripDetailId: self.id}});
+    }
+
+    async auditPlanInvoice(params: {auditResult: EAuditStatus, reason?: string, expenditure?: number}): Promise<boolean> {
+        if(!this.isLocal){
+            API.require('tripPlan');
+            await API.onload();
+        }
+        params['id'] = this.id;
+        return API.tripPlan.auditPlanInvoice(params);
     }
 }
 
@@ -160,6 +189,20 @@ export class TripDetailSubsidy extends ModelObject implements TripDetail {
     uploadInvoice(params): Promise<boolean> {
         return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
     }
+
+    getInvoices() :Promise<PaginateInterface<TripDetailInvoice>> {
+        let self = this;
+        return Models.tripDetailInvoice.find({where: {tripDetailId: self.id}});
+    }
+
+    async auditPlanInvoice(params: {auditResult: EAuditStatus, reason?: string, expenditure?: number}): Promise<boolean> {
+        if(!this.isLocal){
+            API.require('tripPlan');
+            await API.onload();
+        }
+        params['id'] = this.id;
+        return API.tripPlan.auditPlanInvoice(params);
+    }
 }
 
 @TableExtends(TripDetail, 'tripDetailInfo', 'type', ETripType.SPECIAL_APPROVE)
@@ -203,5 +246,19 @@ export class TripDetailSpecial extends ModelObject implements TripDetail {
 
     uploadInvoice(params): Promise<boolean> {
         return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
+    }
+
+    getInvoices() :Promise<PaginateInterface<TripDetailInvoice>> {
+        let self = this;
+        return Models.tripDetailInvoice.find({where: {tripDetailId: self.id}});
+    }
+
+    async auditPlanInvoice(params: {auditResult: EAuditStatus, reason?: string, expenditure?: number}): Promise<boolean> {
+        if(!this.isLocal){
+            API.require('tripPlan');
+            await API.onload();
+        }
+        params['id'] = this.id;
+        return API.tripPlan.auditPlanInvoice(params);
     }
 }
