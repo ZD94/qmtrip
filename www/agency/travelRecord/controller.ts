@@ -3,6 +3,7 @@
  */
 "use strict";
 import { signToken, genAuthString } from 'api/_types/auth/auth-cert';
+import {ETripType} from "../../../api/_types/tripPlan/tripPlan";
 
 var msgbox = require('msgbox');
 
@@ -128,12 +129,12 @@ export async function TravelDetailController($scope, $stateParams, $location, $a
                     .then(function (tripDetails) {
                         //对出差单进行排序,按照类型
                         tripDetails.sort(function (v1, v2) {
-                            if (v1.type == 0) return -1;
-                            if (v2.type == 0) return 1;
-                            if (v1.type == 2) return -1;
-                            if (v2.type == 2) return 1;
-                            if (v1.type == 1) return -1;
-                            if (v2.type == 1) return 1;
+                            if (v1.type == ETripType.OUT_TRIP) return -1;
+                            if (v2.type == ETripType.OUT_TRIP) return 1;
+                            if (v1.type == ETripType.HOTEL) return -1;
+                            if (v2.type == ETripType.HOTEL) return 1;
+                            if (v1.type == ETripType.BACK_TRIP) return -1;
+                            if (v2.type == ETripType.BACK_TRIP) return 1;
                             return v1.type - v2.type;
                         });
                         $scope.tripDetails = tripDetails;
@@ -153,12 +154,19 @@ export async function TravelDetailController($scope, $stateParams, $location, $a
         $scope.curTripDetailInoviceImg = '/agency/images/jingli_loading.gif';
         await Models.tripDetail.get(tripDetailId)
             .then(async function (tripDetail) {
-                if (tripDetail.invoice && typeof tripDetail.invoice == 'string') {
-                    tripDetail.invoice = JSON.parse(tripDetail.invoice);
-                }
-                if (tripDetail.latestInvoice && typeof tripDetail.latestInvoice == 'string') {
-                    tripDetail.latestInvoice = JSON.parse(tripDetail.latestInvoice);
-                }
+                let tripDetailInvoices = await tripDetail.getInvoices()
+                console.info(tripDetailInvoices)
+                let pictures = tripDetailInvoices.map( (tripDetailInvoice) => {
+                    return tripDetailInvoice.pictureFileId;
+                })
+                // if (tripDetail.invoice && typeof tripDetail.invoice == 'string') {
+                //     tripDetail.invoice = JSON.parse(tripDetail.invoice);
+                // }
+                // if (tripDetail.latestInvoice && typeof tripDetail.latestInvoice == 'string') {
+                //     tripDetail.latestInvoice = JSON.parse(tripDetail.latestInvoice);
+                // }
+                tripDetail['invoice'] = pictures;
+                tripDetail['latestInvoice'] = pictures;
                 $scope.curTripDetail = tripDetail;
                 return tripDetail;
             })
