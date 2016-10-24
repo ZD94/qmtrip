@@ -2038,6 +2038,56 @@ class TripPlanModule {
         return Models.tripDetailInvoice.get(params.id);
     }
 
+    @clientExport
+    static async saveTripDetailInvoice(params) :Promise<TripDetailInvoice> {
+        let {id, tripDetailId, totalMoney} = params;
+        let oldMoney = 0;
+        let newMoney = 0;
+        if (totalMoney) {
+            newMoney = totalMoney;
+        }
+        if (newMoney <0 ) {
+            throw L.ERR.MONEY_FORMAT_ERROR();
+        }
+        let tripDetailInvoice: TripDetailInvoice;
+        if (id) {
+            let oldTripDetailInvoice = await Models.tripDetailInvoice.get(id);
+            if (oldTripDetailInvoice.totalMoney) {
+                oldMoney = oldTripDetailInvoice.totalMoney;
+            }
+            tripDetailInvoice = await Models.tripDetailInvoice.update(params);
+        } else {
+            tripDetailInvoice = Models.tripDetailInvoice.create(params);
+            tripDetailInvoice = await tripDetailInvoice.save();
+        }
+
+        //判断是否需要更新实际金额
+        if (oldMoney != newMoney) {
+            let tripDetail = await Models.tripDetail.get(tripDetailId);
+            if (!tripDetail.expenditure) tripDetail.expenditure = 0;
+            tripDetail.expenditure = tripDetail.expenditure - oldMoney + newMoney;
+            await tripDetail.save();
+        }
+        return tripDetailInvoice;
+    }
+
+    @clientExport
+    @requireParams(['id'])
+    static async deleteTripDetailInvoice(params):Promise<boolean> {
+        let {id } = params;
+        let tripDetailInvoice = await Models.tripDetailInvoice.get(id);
+        let totalMoney = tripDetailInvoice.totalMoney;
+
+        if (totalMoney > 0 ) {
+            let tripDetail = await Models.tripDetail.get(tripDetailInvoice.tripDetailId);
+            if (!tripDetail.expenditure) tripDetail.expenditure = 0;
+            tripDetail.expenditure = tripDetail.expenditure - totalMoney;
+            await tripDetail.save();
+        }
+        await tripDetailInvoice.destroy();
+        return true;
+    }
+
     static __initHttpApp = require('./invoice');
 
     static _scheduleTask () {
