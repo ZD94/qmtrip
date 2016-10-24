@@ -135,7 +135,6 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     $scope.$watch('trip.auditUser',function(n, o){
         if(n){
             $scope.bottomStyle.right.backgroundColor = "#28A7E1";
-            console.info('进来了');
         }
     })
 }

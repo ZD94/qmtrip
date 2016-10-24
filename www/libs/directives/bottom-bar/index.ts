@@ -17,12 +17,15 @@ angular
                 rightClick:'&',
                 leftClick:'&',
                 staffSelector:'=',
-                trip:'='
+                trip:'=',
+                approveId:'=',
             },
             controller:function($scope) {
                 require('./bottom-bar.scss');
-                console.info($scope.trip);
-                console.info($scope);
+                $scope.approveDetail = function(){
+                    let approveId = $scope.approveId;
+                    window.location.href = `#/trip-approval/approve-progress?approveId=${approveId}`
+                }
             }
         }
     })
