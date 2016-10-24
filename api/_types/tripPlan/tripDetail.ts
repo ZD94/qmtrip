@@ -5,10 +5,11 @@
 'use strict';
 import {ModelObject} from "common/model/object";
 import {Values, Types} from "common/model/index";
-import {EPlanStatus, ETripType, TripPlan} from "./tripPlan";
+import {EPlanStatus, ETripType, TripPlan, EAuditStatus} from "./tripPlan";
 import {Field, Create, ResolveRef, Table} from "common/model/common";
 import {Models} from "../index";
 import {EInvoiceFeeTypes} from "./index";
+import {PaginateInterface} from "common/model/interface";
 
 
 @Table(Models.tripDetail, 'tripPlan.')
@@ -40,50 +41,6 @@ export class TripDetail extends ModelObject{
     get status(): EPlanStatus { return 0; }
     set status(val: EPlanStatus) {}
 
-    // @Field({type: Types.STRING})
-    // get deptCity(): string { return ''; }
-    // set deptCity(val: string) {}
-    //
-    // @Field({type: Types.STRING})
-    // get arrivalCity(): string { return ''; }
-    // set arrivalCity(val: string) {}
-    //
-    // @Field({type: Types.STRING})
-    // get deptCityCode(): string { return ''; }
-    // set deptCityCode(val: string) {}
-    //
-    // @Field({type: Types.STRING})
-    // get arrivalCityCode(): string { return ''; }
-    // set arrivalCityCode(val: string) {}
-    //
-    // @Field({type: Types.STRING})
-    // get city(): string { return ''; }
-    // set city(val: string) {}
-    //
-    // @Field({type: Types.STRING})
-    // get cityCode(): string { return ''; }
-    // set cityCode(val: string) {}
-    //
-    // @Field({type: Types.STRING})
-    // get hotelCode(): string { return ''; }
-    // set hotelCode(val: string) {}
-    //
-    // @Field({type: Types.STRING})
-    // get hotelName(): string { return ''; }
-    // set hotelName(val: string) {}
-    //
-    // @Field({type: Types.JSONB})
-    // get invoice(): any { return []; }
-    // set invoice(val: any) {}
-    //
-    // @Field({type: Types.JSONB})
-    // get latestInvoice(): any { return []; }
-    // set latestInvoice(val: any) {}
-    //
-    // @Field({type: Types.STRING})
-    // get newInvoice(): string { return ''; }
-    // set newInvoice(val: string) {}
-
     @Field({type: Types.STRING})
     get auditRemark(): string { return ''; }
     set auditRemark(val: string) {}
@@ -96,26 +53,6 @@ export class TripDetail extends ModelObject{
     get remark(): string { return null; }
     set remark(val: string) {}
 
-    // @Field({type: Types.BOOLEAN})
-    // get isCommit(): boolean { return false; }
-    // set isCommit(val: boolean) {}
-
-    // @Field({type: Types.DATE})
-    // get startTime(): Date { return null; }
-    // set startTime(val: Date) {}
-    //
-    // @Field({type: Types.DATE})
-    // get endTime(): Date { return null; }
-    // set endTime(val: Date) {}
-    //
-    // @Field({type: Types.DATE})
-    // get latestArriveTime(): Date { return null; }
-    // set latestArriveTime(val: Date) {}
-
-    // @Field({type: Types.DATE})
-    // get commitTime(): Date { return null; }
-    // set commitTime(val: Date) {}
-
     @Field({type: Types.DOUBLE})
     get budget(): number { return 0; }
     set budget(val: number) {}
@@ -124,26 +61,14 @@ export class TripDetail extends ModelObject{
     get expenditure(): number { return 0; }
     set expenditure(val: number) {}
 
-    // @Field({type: Types.INTEGER})
-    // get invoiceType(): EInvoiceType { return 0; }
-    // set invoiceType(val: EInvoiceType) {}
-
-    // @Field({type: Types.STRING})
-    // get cabinClass(): string { return ''; }
-    // set cabinClass(val: string) {}
-    //
-    // @Field({type: Types.DOUBLE})
-    // get fullPrice(): number { return null; }
-    // set fullPrice(val: number) {}
-
     @ResolveRef({type: Types.UUID}, Models.tripPlan)
     get tripPlan(): TripPlan { return null; }
     set tripPlan(val: TripPlan) {}
 
-    // getInvoices() :Promise<PaginateInterface<TripDetailInvoice>> {
-    //     let self = this;
-    //     return Models.tripDetailInvoice.find({where: {tripDetailId: self.id}});
-    // }
+    getInvoices() :Promise<PaginateInterface<TripDetailInvoice>> {
+        let self = this;
+        return Models.tripDetailInvoice.find({where: {tripDetailId: self.id}});
+    }
 
     // editBudget(params: {budget: number}): Promise<boolean> {
     //     //    f3ac3f50-2c70-11e6-bb82-8dd809b99199
@@ -153,15 +78,15 @@ export class TripDetail extends ModelObject{
     uploadInvoice(params): Promise<boolean> {
         return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
     }
-    //
-    // async auditPlanInvoice(params: {auditResult: EAuditStatus, reason?: string, expenditure?: number}): Promise<boolean> {
-    //     if(!this.isLocal){
-    //         API.require('tripPlan');
-    //         await API.onload();
-    //     }
-    //     params['id'] = this.id;
-    //     return API.tripPlan.auditPlanInvoice(params);
-    // }
+
+    async auditPlanInvoice(params: {auditResult: EAuditStatus, reason?: string, expenditure?: number}): Promise<boolean> {
+        if(!this.isLocal){
+            API.require('tripPlan');
+            await API.onload();
+        }
+        params['id'] = this.id;
+        return API.tripPlan.auditPlanInvoice(params);
+    }
 }
 
 
