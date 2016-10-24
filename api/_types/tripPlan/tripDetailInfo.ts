@@ -12,7 +12,7 @@ import {TripDetail} from "./tripDetail";
 import {ECabin} from "./index";
 
 
-// @TableExtends(TripDetail, 'tripDetailInfo', 'type', [ETripType.OUT_TRIP, ETripType.BACK_TRIP])
+@TableExtends(TripDetail, 'tripDetailInfo', 'type', [ETripType.OUT_TRIP, ETripType.BACK_TRIP])
 @Table(Models.tripDetailTraffic, "tripPlan.")
 export class TripDetailTraffic extends ModelObject implements TripDetail {
     constructor(target) {
@@ -65,7 +65,7 @@ export class TripDetailTraffic extends ModelObject implements TripDetail {
     }
 }
 
-// @TableExtends(TripDetail, 'tripDetailInfo', 'type', ETripType.HOTEL)
+@TableExtends(TripDetail, 'tripDetailInfo', 'type', ETripType.HOTEL)
 @Table(Models.tripDetailHotel, 'tripPlan.')
 export class TripDetailHotel extends ModelObject implements TripDetail {
     constructor(target) {
@@ -111,7 +111,7 @@ export class TripDetailHotel extends ModelObject implements TripDetail {
     }
 }
 
-// @TableExtends(TripDetail, 'tripDetailInfo', 'type', ETripType.SUBSIDY)
+@TableExtends(TripDetail, 'tripDetailInfo', 'type', ETripType.SUBSIDY)
 @Table(Models.tripDetailSubsidy, 'tripPlan.')
 export class TripDetailSubsidy extends ModelObject implements TripDetail {
     constructor(target) {

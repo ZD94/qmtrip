@@ -58,7 +58,7 @@ class TripPlanModule {
     static async getPlanEmailDetails(tripPlan: TripPlan): Promise<{go: string, back: string, hotel: string, subsidy: string, special?: string }> {
         let go = '无', back = '无', hotelStr = '无', subsidyStr = '无', specialStr = '无';
 
-        let tripDetails = (await Models.tripDetail.find({where: {tripPlanId: tripPlan.id}})) || [];
+        let tripDetails = (await Models.tripDetail.find({where: {tripPlanId: tripPlan.id}}));
         tripDetails.forEach( (tripDetail) => {
             switch (tripDetail.type) {
                 case ETripType.OUT_TRIP:
@@ -102,43 +102,48 @@ class TripPlanModule {
 
     static async getEmailInfoFromDetails(details: TripDetail[]): Promise<{go: string, back: string, hotel: string, subsidy: string, special?: string}> {
         let goStr = '无', backStr = '无', hotelStr = '无', subsidyStr = '无', specialStr = '无';
-
-        details.map((d) => {
+        let ps = details.map(async (d) => {
             switch (d.type) {
                 case ETripType.OUT_TRIP:
                     let d1: TripDetailTraffic = <TripDetailTraffic>d;
-                    // d = <TripDetailTraffic>d;
-                    goStr = `${moment(d1.deptDateTime).format('YYYY-MM-DD')}, ${d1.deptCity} 到 ${d1.arrivalCity}`;
+                    var deptCity = await API.place.getCityInfo({cityCode: d1.deptCity});
+                    var arrivalCity = await API.place.getCityInfo({cityCode: d1.arrivalCity})
+                    goStr = `${moment(d1.deptDateTime).format('YYYY-MM-DD')}, ${deptCity.name} 到 ${arrivalCity.name}`;
                     // if (d.latestArriveTime)
                     //     goStr += `, 最晚${moment(d.latestArriveTime).format('HH:mm')}到达`;
-                    goStr += `, 动态预算￥${d.budget}`;
+                    goStr += `, 动态预算￥${d1.budget}`;
                     break;
                 case ETripType.BACK_TRIP:
                     let d2: TripDetailTraffic = <TripDetailTraffic>d;
-                    backStr = `${moment(d2.deptDateTime).format('YYYY-MM-DD')}, ${d2.deptCity} 到 ${d2.arrivalCity}`;
+                    var deptCity = await API.place.getCityInfo({cityCode: d2.deptCity});
+                    var arrivalCity = await API.place.getCityInfo({cityCode: d2.arrivalCity})
+                    backStr = `${moment(d2.deptDateTime).format('YYYY-MM-DD')}, ${deptCity.name} 到 ${arrivalCity.name}`;
                     // if (d.latestArriveTime)
                     //     backStr += `, 最晚${moment(d.latestArriveTime).format('HH:mm')}到达`;
-                    backStr += `, 动态预算￥${d.budget}`;
+                    backStr += `, 动态预算￥${d2.budget}`;
                     break;
                 case ETripType.HOTEL:
                     let d3: TripDetailHotel = <TripDetailHotel>d;
-                    hotelStr = `${moment(d3.checkInDate).format('YYYY-MM-DD')} 至 ${moment(d3.checkOutDate).format('YYYY-MM-DD')}, ${d3.city}`;
+                    var city = await API.place.getCityInfo({cityCode: d3.city});
+                    hotelStr = `${moment(d3.checkInDate).format('YYYY-MM-DD')} 至 ${moment(d3.checkOutDate).format('YYYY-MM-DD')}, ${city.name}`;
                     if(d3.placeName) {
                         hotelStr += `, ${d3.placeName}`;
                     }
-                    hotelStr += `, 动态预算￥${d.budget}`;
+                    hotelStr += `, 动态预算￥${d3.budget}`;
                     break;
                 case ETripType.SUBSIDY:
-                    subsidyStr = `￥${d.budget}`;
+                    let d4 = <TripDetailSubsidy>d;
+                    subsidyStr = `￥${d4.budget}`;
                     break;
                 case ETripType.SPECIAL_APPROVE:
-                    specialStr = `￥${d.budget}`;
+                    let d5 = <TripDetailSpecial>d;
+                    specialStr = `￥${d5.budget}`;
                     break;
                 default:
                     throw new Error('not support tripdetail Type')
             }
         });
-
+        await Promise.all(ps);
         return {go: goStr, back: backStr, hotel: hotelStr, subsidy: subsidyStr, special: specialStr};
     }
 
@@ -147,48 +152,34 @@ class TripPlanModule {
         let account = approve.account;
         let budgets = approve.budgetInfo;
         let query = approve.query;
-        return budgets.map(function (budget) {
+        return budgets.map(function (budget: any) {
+            if (typeof budget == 'string') {
+                budget = JSON.parse(budget);
+            }
             let tripType = budget.tripType;
             let price = Number(budget.price);
-            let data: any = {
-                type: tripType,
-                budget: price,
-                accountId: account.id,
-                tripPlanId: approve.id,
-            }
             let detail;
-
-            // let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: price});
-            // detail.accountId = account.id;
-            // detail.isCommit = false;
-            // detail.tripPlanId = approve.id;
+            let data = {}
             switch(tripType) {
                 case ETripType.OUT_TRIP:
                     detail = Models.tripDetailTraffic.create(data);
-                    // detail.deptCityCode = approve.deptCityCode;
-                    // detail.arrivalCityCode = approve.arrivalCityCode;
                     detail.deptCity = approve.deptCityCode;
                     detail.arrivalCity = approve.arrivalCityCode;
                     detail.deptDateTime = approve.startAt;
                     detail.arrivalDateTime = approve.backAt;
                     detail.cabin = budget.cabinClass;
-                    // detail.fullPrice = budget.fullPrice;
                     break;
                 case ETripType.BACK_TRIP:
                     detail = Models.tripDetailTraffic.create(data);
-                    // detail.deptCityCode = approve.arrivalCityCode;
-                    // detail.arrivalCityCode = approve.deptCityCode;
                     detail.deptCity = approve.arrivalCityCode;
                     detail.arrivalCity = approve.deptCityCode;
                     detail.deptDateTime = approve.backAt;
                     detail.arrivalDateTime = approve.backAt;
                     detail.cabin = budget.cabinClass;
-                    // detail.fullPrice = budget.fullPrice;
                     break;
                 case ETripType.HOTEL:
                     detail = Models.tripDetailHotel.create(data);
                     detail.type = ETripType.HOTEL;
-                    // detail.cityCode = approve.arrivalCityCode;
                     detail.city = approve.arrivalCity;
                     detail.position = query.businessDistrict;
                     detail.placeName = query.hotelName;
@@ -198,8 +189,6 @@ class TripPlanModule {
                 case ETripType.SUBSIDY:
                     detail = Models.tripDetailSubsidy.create(data);
                     detail.type = ETripType.SUBSIDY;
-                    // detail.deptCityCode = approve.deptCityCode;
-                    // detail.arrivalCityCode = approve.arrivalCityCode;
                     detail.deptCity = approve.deptCityCode;
                     detail.arrivalCity = approve.arrivalCityCode;
                     detail.startDateTime = approve.startAt
@@ -211,13 +200,20 @@ class TripPlanModule {
                     detail.expenditure = price;
                     detail.status = EPlanStatus.COMPLETE;
                     break;
+                case ETripType.SPECIAL_APPROVE:
+                    detail = Models.tripDetailSpecial.create(data);
+                    detail.type = ETripType.SPECIAL_APPROVE;
+                    detail.deptCity = approve.deptCityCode;
+                    detail.arrivalCity = approve.arrivalCity;
+                    detail.startDateTime = approve.startAt;
+                    detail.endDateTime = approve.backAt;
                 default:
-                    throw new Error("not support tripdetail type!");
-                    // detail.type = ETripType.SUBSIDY;
-                    // detail.startTime = approve.startAt;
-                    // detail.endTime = approve.backAt;
-                    // break;
+                    throw new Error("not support tripDetail type!");
             }
+            detail.type = tripType;
+            detail.budget = price;
+            detail.accountId = account.id;
+            detail.tripPlanId = approve.id;
             return detail;
         });
     }
@@ -1471,11 +1467,6 @@ class TripPlanModule {
                 let price = Number(budget.price);
                 let detail;
                 let data: any = {
-                    type: tripType,
-                    budget: price,
-                    accountId: account.id,
-                    status: EPlanStatus.WAIT_UPLOAD,
-                    tripPlanId: tripPlan.id,
                 }
                 switch(tripType) {
                     case ETripType.OUT_TRIP:
@@ -1517,6 +1508,11 @@ class TripPlanModule {
                     default:
                         throw new Error("not support tripDetail type!");
                 }
+                detail.type = tripType;
+                detail.budget = price;
+                detail.accountId= account.id;
+                detail.status = EPlanStatus.WAIT_UPLOAD;
+                detail.tripPlanId = tripPlan.id;
                 return detail;
             });
         }else{
@@ -1531,7 +1527,6 @@ class TripPlanModule {
             tripDetails.push(detail);
         }
 
-        console.info(tripDetails);
         if(tripDetails && tripDetails.length > 0){
             let ps = tripDetails.map((d) => {
                 return d.save()
