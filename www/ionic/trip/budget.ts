@@ -5,6 +5,34 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     require('./trip.scss');
     require('./budget.scss');
     API.require("tripPlan");
+    //底部的按钮
+    let bottomStyle = {
+        status:{
+            text:'',
+            cancel:'',
+        },
+        right:{
+            color:'#ffffff',
+            backgroundColor:'#D8D8D8',
+            display:true,
+            text:'提交审批',
+        },
+        left:{
+            display:false,
+        },
+        isSelect:true,
+    }
+    $scope.bottomStyle = bottomStyle;
+
+    $scope.staffSelector = {
+        query: async function(keyword) {
+            let staff = await Staff.getCurrent();
+            let staffs = await staff.company.getStaffs();
+            return staffs;
+        },
+        display: (staff)=>staff.name
+    };
+
     await API.onload();
 
     var id = $stateParams.id;
@@ -67,14 +95,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     API.require("tripPlan");
     await API.onload();
 
-    $scope.staffSelector = {
-        query: async function(keyword) {
-            let staff = await Staff.getCurrent();
-            let staffs = await staff.company.getStaffs();
-            return staffs;
-        },
-        display: (staff)=>staff.name
-    };
+
 
     $scope.saveTripPlan = async function() {
         let trip = $scope.trip;
@@ -99,7 +120,6 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
             $ionicLoading.hide();
         }
     }
-
     //我要报错
     $scope.reportBudgetError = function() {
         let id = $stateParams.id;
@@ -111,4 +131,10 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
                 alert(err.msg ||err);
             })
     }
+    $scope.rightClick = $scope.saveTripPlan;
+    $scope.$watch('trip.auditUser',function(n, o){
+        if(n){
+            $scope.bottomStyle.right.backgroundColor = "#28A7E1";
+        }
+    })
 }

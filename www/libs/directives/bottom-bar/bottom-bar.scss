@@ -1,12 +1,42 @@
 .bottom-bar{
+  .list{
+    margin-bottom: 0px;
+    padding-top: 0px;
+    i.ion-arrow-up-b{
+      position: absolute;
+      right: 16px;
+      top: 12px;
+      z-index: -100;
+      font-size: 22px;
+    }
+  }
+  .item-input > .fake-input{
+    padding-right: 0px;
+  }
+  fake-input>span{
+    height: 34px;
+  }
   .status-bar{
     font-size:14px;
     margin:0px;
+    height: 47px;
   }
   button{
     font-size:14px;
     width:100px;
     float:right;
     border-radius: 0px;
+  }
+  .status-bar-detail{
+    padding-top: 5px;
+    div.list:nth-child(2){
+      font-size: 12px;
+      line-height: 9px;
+      color:#d8d8d8;
+      transform: scale(0.9);
+      -webkit-transform: scale(0.9);
+      transform-origin: 0 0;
+      -webkit-transform-origin:0 0 ;
+    }
   }
 }

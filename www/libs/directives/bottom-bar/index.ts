@@ -15,10 +15,17 @@ angular
             scope:{
                 bottomStyle:'=',
                 rightClick:'&',
-                leftClick:'&'
+                leftClick:'&',
+                staffSelector:'=',
+                trip:'=',
+                approveId:'=',
             },
             controller:function($scope) {
                 require('./bottom-bar.scss');
+                $scope.approveDetail = function(){
+                    let approveId = $scope.approveId;
+                    window.location.href = `#/trip-approval/approve-progress?approveId=${approveId}`
+                }
             }
         }
     })
