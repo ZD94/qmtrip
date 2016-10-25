@@ -277,7 +277,7 @@
 						var invoices = data.invoices;
 						_.forEach(invoices,function(invoice){
 							if(invoice.type == '交通' && invoice.trafficType =='GO'){
-								var goMoney = invoice.money
+								var goMoney = invoice.budget
 								var goTrafficInfo = invoice.trafficInfo
 					%>
 					<div class="col-xs-6">
@@ -286,7 +286,7 @@
 					<%
 							}
 						    if(invoice.type == '交通' && invoice.trafficType =='BACK'){
-								var backMoney = invoice.money
+								var backMoney = invoice.budget
 								var backTrafficInfo = invoice.trafficInfo						    	
 					%>
 					<div class="col-xs-6">
@@ -304,7 +304,7 @@
 						var flag = false;
 						_.forEach(invoices,function(invoice){
 							if(invoice.type == '住宿'){
-								var stayMoney = invoice.money
+								var stayMoney = invoice.budget
 								var stayTime = invoice.duration
 								flag = true;
 					%>
