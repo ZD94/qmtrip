@@ -1,0 +1,33 @@
+<div class="bottom-bar flex-10x">
+    <div class="status-bar item" ng-if="!bottomStyle.isSelect && !bottomStyle.approveDetail">
+        <div class="list">{{bottomStyle.status.text}}<span>&nbsp;{{bottomStyle.status.cancel}}</span></div>
+    </div>
+    <!--查看审批详情-->
+    <div class="status-bar item status-bar-detail" ng-if="!bottomStyle.isSelect && bottomStyle.approveDetail"
+         ng-click="approveDetail()">
+        <div class="list">{{bottomStyle.status.text}}<span>&nbsp;{{bottomStyle.status.cancel}}
+        {{bottomStyle.status.reject}}
+        </span></div>
+        <div class="list">查看审批详情</div>
+    </div>
+    <!--选择审批人-->
+    <form class="list"  ng-if="bottomStyle.isSelect">
+        <div class="item item-input status-bar">
+            <span class="input-label">选择审批人</span>
+            <ng-selector-list
+                    ng-model="trip.auditUser"
+                    dlg-options="staffSelector"
+                    dlg-title=""
+                    dlg-placeholder="请选择审批人"
+                    class="fake-input"
+            ></ng-selector-list>
+            <i class="icon ion-arrow-up-b"></i>
+        </div>
+    </form>
+    <button class="button button_left" ng-if="bottomStyle.left.display" ng-click="leftClick()"
+            style='color:{{bottomStyle.left.color}};background-color: {{bottomStyle.left.backgroundColor}};border:{{bottomStyle.left.border}}'>
+    {{bottomStyle.left.text}}</button>
+    <button class="button button_right" ng-if="bottomStyle.right.display" ng-click="rightClick()"
+            style='color:{{bottomStyle.right.color}};background-color: {{bottomStyle.right.backgroundColor}}'>
+    {{bottomStyle.right.text}}</button>
+</div>

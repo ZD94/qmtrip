@@ -53,8 +53,11 @@ async function agentGetTripplanDetailInvoice(req, res, next){
         var fileId = req.params.fileId;
 
         var tripDetail = await Models.tripDetail.get(tripDetailId);
-        var invoices = JSON.parse(tripDetail.latestInvoice);
-        if(invoices.indexOf(fileId) < 0){
+        var invoices = await Models.tripDetailInvoice.find({where: {tripDetailId: tripDetail.id}});
+        let pictures = invoices.map( (invoice) => {
+            return invoice.pictureFileId
+        })
+        if(pictures.indexOf(fileId) < 0){
             res.sendStatus(404);
             return;
         }

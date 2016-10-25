@@ -233,4 +233,23 @@ export class Company extends ModelObject{
         options.where.companyId = this.id;
         return Models.supplier.find(options);
     }
+
+    async getAppointedSuppliers(options?: any): Promise<Supplier[]> {
+        if(!options) { options = {}};
+        if(!options.where) { options.where = {}};
+        options.where.companyId = this.id;
+        options.where.isInUse = true;
+        var suppliers = await Models.supplier.find(options);
+        var company = await Models.company.get(this.id);
+        if(company && company.appointedPubilcSuppliers && company.appointedPubilcSuppliers.length > 0 ){
+            company.appointedPubilcSuppliers.map(async function(s){
+                var su = await Models.supplier.get(s);
+                if(su && su.isInUse){
+                    suppliers.push(su);
+                }
+            })
+        }
+
+        return suppliers;
+    }
 }

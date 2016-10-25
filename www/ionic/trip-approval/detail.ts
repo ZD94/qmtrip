@@ -9,6 +9,32 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     require('./trip-approval.scss');
     let approveId = $stateParams.approveId;
     $scope.approveId =approveId;
+    $scope.testsc = 'shicong';
+    //底部的按钮
+    let bottomStyle = {
+        status:{
+            text:'',
+            cancel:'',
+            reject:'',
+        },
+        right:{
+            color:'#ffffff',
+            backgroundColor:'#28A7E1',
+            display:false,
+            text:'同意',
+        },
+        left:{
+            color:'#ffffff',
+            text:'驳回',
+            backgroundColor:'#D0021B',
+            display:false,
+            border:'none',
+        },
+        approveDetail: true,
+    }
+    $scope.bottomStyle = bottomStyle;
+
+
     let tripApprove = await Models.tripApprove.get(approveId);
     $scope.staff = tripApprove.account;
     $scope.isConfirm = false;
@@ -32,6 +58,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     if(curStaff.id == tripApprove.accountId){
         isSelf = true;
     }
+    //转给别人审批的时候 禁止撤销行程
     $scope.$watch('tripApprove.approvedUsers', function(){
         if(tripApprove.approvedUsers) $scope.isHasApprove = true;
     })
@@ -294,6 +321,10 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         window.location.href="#/trip/create";
     };
 
+    $scope.checkTrip = async function(){
+        window.location.href = `#/trip/list-detail?tripid=${approveId}`;
+    }
+
     $scope.cancelTripApprove = async function(){
         $scope.cancel = {reason: ''};
         let ioTemplate = '<input type="text" ng-model="cancel.reason" placeholder="请输入撤销原因" style="border: 1px solid #ccc;padding-left: 10px;">';
@@ -317,6 +348,61 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
             }]
         })
     }
+
+    $scope.$watch('tripApprove.status',function(n, o){
+        $scope.bottomStyle = {
+            status:{
+                text:$scope.APPROVE_TEXT[tripApprove.status],
+                cancel:'',
+                reject:'',
+            },
+            right:{
+                color:'#ffffff',
+                backgroundColor:'#28A7E1',
+                display:false,
+                text:'同意',
+            },
+            left:{
+                color:'#ffffff',
+                text:'驳回',
+                backgroundColor:'#D0021B',
+                display:false,
+                border:'none',
+            },
+            approveDetail: true,
+        }
+
+        if(tripApprove.status == EApproveStatus.WAIT_APPROVE && isHasPermissionApprove){
+            $scope.bottomStyle.left.display = true;
+            $scope.bottomStyle.right.display = true;
+            $scope.bottomStyle.status.text = `等待${tripApprove.approveUser.name}审批`;
+            $scope.leftClick = $scope.showReasonDialog;
+            $scope.rightClick = $scope.confirmButton;
+        }else if(tripApprove.status == EApproveStatus.REJECT && !isHasPermissionApprove){
+            $scope.bottomStyle.right.display = true;
+            $scope.bottomStyle.right.backgroundColor = '#D0021B';
+            $scope.bottomStyle.right.text = '重新提交';
+
+            $scope.rightClick = $scope.reCommitTripApprove
+        }else if(tripApprove.status == EApproveStatus.REJECT){
+            $scope.bottomStyle.status.reject = tripApprove.approveRemark;
+        }else if(tripApprove.status == EApproveStatus.WAIT_APPROVE && !isHasPermissionApprove && !isHasApprove) {
+            $scope.bottomStyle.status.text = `等待${tripApprove.approveUser.name}审批`;
+            $scope.bottomStyle.right.display = true;
+            $scope.bottomStyle.right.backgroundColor = '#ffffff';
+            $scope.bottomStyle.right.text = '撤销行程';
+            $scope.bottomStyle.right.color = '#28A7E1';
+
+
+            $scope.rightClick = $scope.cancelTripApprove;
+        }else if(tripApprove.status == EApproveStatus.PASS){
+            $scope.bottomStyle.right.display = true;
+            $scope.bottomStyle.right.text = '查看行程';
+            $scope.rightClick = $scope.checkTrip;
+        }else if(tripApprove.status == EApproveStatus.CANCEL){
+            $scope.bottomStyle.status.cancel = tripApprove.cancelRemark
+        }
+    })
 }
 
 export async function selectModeController ($scope){

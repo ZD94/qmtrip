@@ -5,10 +5,14 @@
 'use strict';
 
 import angular = require("angular");
-import {EPlanStatus, EApproveStatus, EInvoiceType, ETripType, MTxPlaneLevel} from 'api/_types/tripPlan';
+import {
+    EPlanStatus, EApproveStatus, EInvoiceType, ETripType, MTxPlaneLevel,
+    getNameByECabin
+} from 'api/_types/tripPlan';
 import moment = require("moment");
 import {Staff} from "api/_types/staff/staff";
 import {MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
+import {TripDetailTraffic, TripDetailSubsidy, TripDetailHotel} from "api/_types/tripPlan";
 require("./trip-plan.scss");
 
 let statusTxt = {};
@@ -112,7 +116,7 @@ angular
                 item: '=',
                 remark: '@'
             },
-            controller: function($scope, $ionicPopup) {
+            controller: async function($scope, $ionicPopup) {
                 //设置上传路径
                 let auth_data: any = $storage.local.get("auth_data");
                 let url = '/upload/ajax-upload-file?type=image';
@@ -133,8 +137,23 @@ angular
                 } else {
                     $scope.isShowUploader = true;
                 }
-                $scope.days = moment($scope.item.endTime).diff(moment($scope.item.startTime), 'days');
-                $scope.subsidyDays = moment($scope.item.endTime).diff(moment($scope.item.startTime), 'days') + 1;
+                $scope.days = 1;
+                $scope.subsidyDays = 1;
+                console.info($scope.item)
+                if ($scope.item instanceof TripDetailHotel) {
+                    $scope.days = moment($scope.item.checkOutDate).diff(moment($scope.item.checkInDate), 'days');
+                } else if ($scope.item instanceof TripDetailSubsidy) {
+                    $scope.subsidyDays = moment($scope.item.endDateTime).diff(moment($scope.item.startDateTime), 'days') + 1;
+                } else if ($scope.item instanceof TripDetailTraffic) {
+                    API.require("place")
+                    await API.onload();
+                    let deptCity = await API.place.getCityInfo({cityCode: $scope.item.deptCity});
+                    let arrivalCity = await API.place.getCityInfo({cityCode: $scope.item.arrivalCity});
+
+                    $scope.item.deptCity = deptCity ? deptCity.name: '未知';
+                    $scope.item.arrivalCity = arrivalCity ? arrivalCity.name : '未知';
+                    $scope.item.cabin = getNameByECabin($scope.item.cabin);
+                }
                 if ($scope.item.hasFirstDaySubsidy === false) {
                     $scope.subsidyDays -= 1;
                 }
