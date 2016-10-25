@@ -498,8 +498,7 @@ class TripPlanModule {
     @requireParams(['id'])
     // @modelNotNull('tripDetail')
     static async getTripDetail(params: {id: string}): Promise<TripDetail> {
-        let item = await Models.tripDetail.get(params.id);
-        return item;
+        return Models.tripDetail.get(params.id, {notRetChild: true});
     }
 
     @clientExport
@@ -551,11 +550,14 @@ class TripPlanModule {
     @requireParams(['where.tripPlanId'], ['where.type', 'where.status', 'where.id'])
     @clientExport
     static async getTripDetails(options: {where: any, offset?: number, limit?: number}): Promise<FindResult> {
-            let details = await Models.tripDetail.find(options);
-            let ids = details.map(function (d) {
-                return d.id;
-            });
-            return {ids: ids, count: details['total']};
+        let details = await Models.tripDetail.find(options);
+        console.info("details==========>", details)
+        let ids = details.map(function (d) {
+            return d.id;
+        });
+        let ret = {ids: ids, count: details['total']};
+        console.info("ret============>", ret)
+        return ret;
     }
 
     /**
