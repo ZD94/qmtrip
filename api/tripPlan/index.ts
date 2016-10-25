@@ -551,13 +551,10 @@ class TripPlanModule {
     @clientExport
     static async getTripDetails(options: {where: any, offset?: number, limit?: number}): Promise<FindResult> {
         let details = await Models.tripDetail.find(options);
-        console.info("details==========>", details)
         let ids = details.map(function (d) {
             return d.id;
         });
-        let ret = {ids: ids, count: details['total']};
-        console.info("ret============>", ret)
-        return ret;
+        return {ids: ids, count: details['total']};
     }
 
     /**
