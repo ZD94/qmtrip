@@ -8,9 +8,10 @@
                 <div class="button-bar"></div>
                 <ion-list>
                     <!--交通条目-->
+                    <!--title="{{$index == 0? '交通': ''}}"-->
                     <tp-detail-item ng-repeat="budget in trafficBudgets track by $index"
                                     show-uploader="true"
-                                    title="{{$index == 0? '交通': ''}}"
+                                    title="交通"
                                     budget="{{trafficTotalBudget | currency: ''}}元"
                                     item="budget">
                     </tp-detail-item>
@@ -25,7 +26,7 @@
                     <!--补助-->
                     <tp-detail-item ng-repeat="budget in subsidyBudgets"
                                     show-uploader="true"
-                                    title="{{$index == 0? '补助': ''}}"
+                                    title="{{$index == 0? '公司补助': ''}}"
                                     budget="{{subsidyTotalBudget | currency: ''}}元"
                                     item="budget">
                     </tp-detail-item>
