@@ -1,7 +1,8 @@
 import { ETripType, EPlanStatus, EInvoiceType } from 'api/_types/tripPlan';
 import * as path from 'path';
+import moment = require('moment');
 
-export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate){
+export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate, ngModalDlg){
     //////绑定上传url
     require("./invoice-detail.scss");
     let authDataStr = window['getAuthDataStr']();
@@ -15,11 +16,28 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         $scope.$apply();
     })
     //END
-
+    //date选择
+    $scope.selectDate = async function(){
+        let value = await ngModalDlg.selectDate($scope, {
+            beginDate: new Date(),
+            endDate: moment().add(1, 'year').toDate(),
+            timepicker: false,
+            title: '选择开始时间',
+            titleEnd: '选择结束时间'
+        })
+        
+    }
+    $scope.select_menu = true;
     var config = require('config');
     await config.$ready;
     var invoice = await Models.tripDetail.get($stateParams.detailId);
     $scope.invoice = invoice;
+    $scope.invoiceJSON = JSON.parse(invoice.invoice);
+    $scope.dateOptions = {
+        beginDate: invoice.createdAt,
+        endDate: new Date(),
+        timepicker: false
+    }
     $scope.EInvoiceType = EInvoiceType;
 
     $scope.$watch('invoice.latestInvoice', function(n, o){
@@ -86,5 +104,10 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     $scope.backtodetail = function(){
         var tripPlan = invoice.tripPlan;
         window.location.href = "#/trip/list-detail?tripid="+tripPlan.id;
+    }
+    console.info($scope.invoice);
+    
+    $scope.manual = function(){
+        $scope.select_menu = false;
     }
 }
