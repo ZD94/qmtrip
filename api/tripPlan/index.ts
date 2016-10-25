@@ -927,7 +927,7 @@ class TripPlanModule {
         }
 
         let audit = params.auditResult;
-        let tripPlan = tripDetail.tripPlan;
+        let tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
         let templateValue: any = {invoiceDetail: '无', projectName: tripPlan.title, totalBudget: '￥' + tripPlan.budget, time: moment(tripPlan.startAt).format('YYYY-MM-DD')};
         let templateName: any = '';
         let isNotify = false;
@@ -987,18 +987,23 @@ class TripPlanModule {
         switch (tripDetail.type) {
             case ETripType.OUT_TRIP:
                 let d1 = <TripDetailTraffic>tripDetail;
+                var deptCity = await API.place.getCityInfo({cityCode: d1.deptCity});
+                var arrivalCity = await API.place.getCityInfo({cityCode: d1.arrivalCity});
                 templateValue.tripType = '去程';
-                templateValue.invoiceDetail = `${moment(d1.deptDateTime).format('YYYY-MM-DD')} 由 ${d1.deptCity} 到 ${d1.arrivalCity}， 去程发票， 预算：${d1.budget}元`;
+                templateValue.invoiceDetail = `${moment(d1.deptDateTime).format('YYYY-MM-DD')} 由 ${deptCity.name} 到 ${arrivalCity.name}， 去程发票， 预算：${d1.budget}元`;
                 break;
             case ETripType.BACK_TRIP:
                 let d2 = <TripDetailTraffic>tripDetail;
+                var deptCity = await API.place.getCityInfo({cityCode: d2.deptCity});
+                var arrivalCity = await API.place.getCityInfo({cityCode: d2.arrivalCity});
                 templateValue.tripType = '回程';
-                templateValue.invoiceDetail = `${moment(d2.deptDateTime).format('YYYY-MM-DD')} 由 ${d2.deptCity} 到 ${d2.arrivalCity}， 回程发票， 预算：${d2.budget}元`;
+                templateValue.invoiceDetail = `${moment(d2.deptDateTime).format('YYYY-MM-DD')} 由 ${deptCity.name} 到 ${arrivalCity.name}， 回程发票， 预算：${d2.budget}元`;
                 break;
             case ETripType.HOTEL:
                 let d3 = <TripDetailHotel>tripDetail;
+                var city = await API.place.getCityInfo({cityCode: d3.city});
                 templateValue.tripType = '酒店';
-                templateValue.invoiceDetail = `${moment(d3.checkInDate).format('YYYY.MM.DD')} - ${moment(d3.checkOutDate).format('YYYY.MM.DD')}， ${d3.city}`;
+                templateValue.invoiceDetail = `${moment(d3.checkInDate).format('YYYY.MM.DD')} - ${moment(d3.checkOutDate).format('YYYY.MM.DD')}， ${city.name}`;
                 if(d3.placeName) {
                     templateValue.invoiceDetail += d3.placeName;
                 }
