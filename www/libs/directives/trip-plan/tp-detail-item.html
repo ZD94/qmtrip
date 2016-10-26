@@ -1,16 +1,15 @@
-<div>
+<div class="tp-detail-item">
     <ion-item class="item-divider" ng-if="title && item.type != ETripType.SPECIAL_APPROVE">
         <span>{{title}}</span>
-        <span class="spanRight">{{budget}}</span>
     </ion-item>
     <ion-item class="item-divider" ng-if="title && item.type == ETripType.SPECIAL_APPROVE">
         <span>{{item.deptCity}} - {{item.arrivalCity}}</span>
-        <span class="spanRight">{{budget}}</span>
     </ion-item>
 
-    <ion-item>
+    <ion-item class="item-divider" style="background-color:#fff">
         <div ng-if="item.type == ETripType.OUT_TRIP || item.type == ETripType.BACK_TRIP">
-            <span>{{item.deptDateTime | date: 'yyyy-MM-dd'}}</span>
+            <span style="font-size: 12px">{{item.deptDateTime | date: 'MM-dd'}}</span>
+            <span class="spanRight">{{item.budget| currency: ''}}元</span>
             <br>
             {{item.deptCity}}
             &nbsp;
@@ -20,65 +19,84 @@
             <i ng-if='item.invoiceType == EInvoiceType.OTHER'>-</i>
             &nbsp;
             {{item.arrivalCity}}
-            <br/>
-            <span ng-if="item.cabin">
-                {{MTxPlaneLevel[item.cabin] ? MTxPlaneLevel[item.cabin] : item.cabin}}<br/>
-            </span>
-            {{item.budget == -1 ? '暂无预算' : (item.budget| currency: '')+'元'}}<br/>
-            <span ng-if="item.fullPrice  && item.cabinClass == 'Economy'">
-                折扣：{{item.fullPrice > item.budget ? ((item.budget/item.fullPrice)*10).toFixed(1)+'折' : '全价'}}<br/>
+            <span class="spanRight right-budget">
+                <span ng-if="item.cabin">
+                    {{MTxPlaneLevel[item.cabin] ? MTxPlaneLevel[item.cabin] : item.cabin}}<br/>
+                </span>
+                <!--{{item.budget == -1 ? '暂无预算' : (item.budget| currency: '')+'元'}}<br/>-->
+                <span ng-if="item.fullPrice  && item.cabinClass == 'Economy'">
+                    {{item.fullPrice > item.budget ? ((item.budget/item.fullPrice)*10).toFixed(1)+'折' : '全价'}}
+                </span>
             </span>
         </div>
 
         <div ng-if="item.type == ETripType.HOTEL">
-            <span>{{item.checkInDate | date: 'MM/dd'}}至{{item.checkOutDate | date: 'MM/dd'}},共{{days || 1}}天</span>
+            <span style="font-size: 12px">{{item.checkInDate | date: 'MM-dd'}}至{{item.checkOutDate | date: 'MM-dd'}}(共{{days || 1}}天)</span>
+            <span class="spanRight">{{budget}}</span>
             <br/>
             <i class="icon ion-home"></i>{{item.city}}<span ng-if="item.placeName">&nbsp;{{item.placeName}}附近</span>
-            <br/>
-            <span ng-if="item.budget > 0">
-                {{item.budget / days | currency: ''}}元/晚
+            <span class="spanRight right-budget" ng-if="item.budget > 0">
+                {{item.budget / days | currency: ''}}元/天
             </span>
         </div>
 
         <div ng-if="item.type == ETripType.SUBSIDY">
-            <span>{{item.startDateTime | date: 'MM/dd'}}至{{item.endDateTime | date: 'MM/dd'}},共{{subsidyDays}}天</span>
+            <span style="font-size: 12px">{{item.startDateTime | date: 'MM-dd'}}至{{item.endDateTime | date: 'MM-dd'}}(共{{subsidyDays}}天)</span>
+            <span class="spanRight">{{budget}}</span>
             <br/>
-            <span ng-if="item.budget > 0">
+            <span class="spanRight right-budget" ng-if="item.budget > 0">
                 {{item.budget / (subsidyDays) | currency: ''}}元/天
             </span>
         </div>
 
         <div ng-if="item.type == ETripType.SPECIAL_APPROVE">
             <span>{{remark}}</span>
+            <span class="spanRight">{{budget}}</span>
             <br/>
-            <span ng-if="item.budget > 0">
+            <span class="spanRight right-budget" ng-if="item.budget > 0">
                 {{item.budget | currency: ''}}元
             </span>
         </div>
-
+    </ion-item>
+    <ion-item class="trip-buttons">
         <div ng-if="item.type != ETripType.SUBSIDY" class="item-note detail_btn">
             <div ng-if="item.status == EPlanStatus.WAIT_UPLOAD">
-                <div class="uploadbtns button-small botton-outline button-positive"
+                <div class="trip_btn button-small botton-outline button-positive"
                      ng-uploader accept="image/*" title="item.title" done="item.done" url="uploadUrl"
                      ng-if="isShowUploader">
                     上传票据
                 </div>
+                <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve()">
+                    预订
+                </a>
+                <a class="trip_btn button-small botton-outline">
+                    管理票据
+                </a>
                 <div ng-if="!isShowUploader">等待上传票据</div>
             </div>
 
             <div ng-if="item.status == EPlanStatus.WAIT_COMMIT">
                 <div ng-if="isShowUploader">
-                    <div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="item.title" done="item.done" url="uploadUrl">
-                        重新上传
-                    </div>
-                    <a class="button button-small button-outline button-positive" ng-click="viewInvoice(item.id)">查看票据</a>
+                    <!--<div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="item.title" done="item.done" url="uploadUrl">-->
+                        <!--重新上传-->
+                    <!--</div>-->
+                    <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve()">
+                        预订
+                    </a>
+                    <a class="trip_btn button-small botton-outline">
+                        管理票据
+                    </a>
+                    <a class="trip_btn button button-small button-outline" ng-click="viewInvoice(item.id)">查看票据</a>
                 </div>
                 <div ng-if="!isShowUploader">等待提交</div>
             </div>
 
             <div ng-if="item.status == EPlanStatus.AUDITING">
-                <a class="button button-small button-outline button-positive"
+                <a class="trip_btn button button button-small button-outline"
                    ng-click="viewInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
+                <a class="trip_btn button-small botton-outline">
+                    管理票据
+                </a>
                 <span ng-if="!isShowUploader">票据审核中</span>
             </div>
 
@@ -87,28 +105,37 @@
             </div>
 
             <div ng-if="item.status == EPlanStatus.COMPLETE">
-                <a class="button button-small button-outline button-positive"
+                <a class="trip_btn button button-small button-outline button-positive"
                    ng-click="viewInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
+                <a class="trip_btn button-small botton-outline">
+                    管理票据
+                </a>
                 <span ng-if="!isShowUploader">已通过</span>
             </div>
 
             <div ng-if="item.status == EPlanStatus.AUDIT_NOT_PASS">
-                <div class="uploadbtns button-small botton-outline button-positive"
-                     ng-uploader accept="image/*"
-                     title="item.title"
-                     done="item.done"
-                     url="uploadUrl">
-                     重新上传
-                </div>
-                <a class="button button-small button-outline button-positive"
+                <!--<div class="uploadbtns button-small botton-outline button-positive"-->
+                     <!--ng-uploader accept="image/*"-->
+                     <!--title="item.title"-->
+                     <!--done="item.done"-->
+                     <!--url="uploadUrl">-->
+                     <!--重新上传-->
+                <!--</div>-->
+                <a class="trip_btn button button-small button-outline"
                    ng-click="viewInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
+                <a class="trip_btn button-small botton-outline">
+                    管理票据
+                </a>
             </div>
 
             <div ng-if="item.status == EPlanStatus.NO_BUDGET">
-                <a class="button button-small button-outline button-positive"
+                <a class="trip_btn button button-small button-outline button-positive"
                    ng-click="viewInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
                 <span ng-if="!isShowUploader">暂无预算</span>
             </div>
+        </div>
+        <div ng-if="item.type == ETripType.SUBSIDY">
+            <span class="spanRight subsidy-inform" style="">公司补助作为福利无需提供票据</span>
         </div>
     </ion-item>
 </div>

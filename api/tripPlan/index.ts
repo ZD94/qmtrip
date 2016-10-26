@@ -1889,7 +1889,8 @@ class TripPlanModule {
             throw L.ERR.EMAIL_EMPTY();
         }
         let title = moment(tripPlan.startAt).format('MM.DD') + '-'+ moment(tripPlan.backAt).format("MM.DD") + tripPlan.deptCity + "到" + tripPlan.arrivalCity + '报销单'
-        let tripDetails = await tripPlan.getTripDetails({where: {}, order: [["created_at", "asc"]]});
+        let tripDetails = await Models.tripDetail.find({where: {tripPlanId: tripPlanId}, order: [["created_at", "asc"]]})
+        // let tripDetails = await tripPlan.getTripDetails({where: {}, order: [["created_at", "asc"]]});
         let tripApprove = await Models.tripApprove.get(tripPlanId);
         let approveUsers: Array<any> = (tripApprove && tripApprove.approvedUsers ? tripApprove.approvedUsers:'').split(/,/g)
             .filter((v)=> {
@@ -1902,8 +1903,7 @@ class TripPlanModule {
                 return '';
             })
         approveUsers = await Promise.all(approveUsers)
-        let _tripDetails = tripDetails.map (async (v) => {
-            
+        let _tripDetails = tripDetails.map (async (v) :Promise<any> => {
             let tripDetailInvoices = await Models.tripDetailInvoice.find({where: {tripDetailId: v.id}});
             if (v.type == ETripType.OUT_TRIP || v.type == ETripType.BACK_TRIP) {
                 let v1 = <TripDetailTraffic>v;
@@ -1914,28 +1914,33 @@ class TripPlanModule {
                 trafficType = v1.type == ETripType.OUT_TRIP ? 'GO': 'BACK';
                 trafficInfo = v1.invoiceType == EInvoiceType.TRAIN ? '火车': '飞机';
                 trafficInfo += v1.invoiceType == EInvoiceType.PLANE ? getNameByECabin(v1.cabin) : v1.cabin;
+                let deptCity = await API.place.getCityInfo({cityCode: v1.deptCity});
+                let arrivalCity = await API.place.getCityInfo({cityCode: v1.arrivalCity});
                 return {
                     type: type,
                     date: moment(v1.deptDateTime).format('YYYY.MM.DD'),
                     invoiceInfo: `${type}费`,
                     quantity: tripDetailInvoices.length,
                     money: v1.expenditure,
-                    departCity: v1.deptCity,
-                    arrivalCity: v1.arrivalCity,
-                    remark: `${v1.deptCity}-${v1.arrivalCity}`,
+                    budget: v1.budget,
+                    departCity: deptCity.name,
+                    arrivalCity: arrivalCity.name,
+                    remark: `${deptCity.name}-${arrivalCity.name}`,
                     trafficType: `${trafficType}`,
                     trafficInfo: `${trafficInfo}`
                 }
             }
             if (v.type == ETripType.HOTEL) {
                 let v1 = <TripDetailHotel>v;
+                let city = await API.place.getCityInfo({cityCode: v1.city})
                 return {
                     "type": "住宿",
                     "date": moment(v1.checkInDate).format('YYYY.MM.DD'),
                     "invoiceInfo": "住宿费",
                     "quantity": tripDetailInvoices.length,
-                    "money": v.expenditure,
-                    "remark": `${moment(v1.checkInDate).format('YYYY.MM.DD')}-${moment(v1.checkOutDate).format('YYYY.MM.DD')} ${v1.city} 共${moment(v1.checkOutDate).diff(v1.checkInDate, 'days')}日`,
+                    "money": v1.expenditure,
+                    budget: v1.budget,
+                    "remark": `${moment(v1.checkInDate).format('YYYY.MM.DD')}-${moment(v1.checkOutDate).format('YYYY.MM.DD')} ${city.name} 共${moment(v1.checkOutDate).diff(v1.checkInDate, 'days')}日`,
                     "duration": `${moment(v1.checkOutDate).diff(v1.checkInDate, 'days')}`
                 }
             }
@@ -1946,7 +1951,8 @@ class TripPlanModule {
                     "date": moment(v1.startDateTime).format('YYYY.MM.DD'),
                     "invoiceInfo": "补助费",
                     quantity: 0,
-                    money: v.expenditure,
+                    money: v1.expenditure,
+                    budget: v1.budget,
                     remark: '补助费'
                 }
             }
@@ -1958,6 +1964,7 @@ class TripPlanModule {
                     "invoiceInfo": "出差费",
                     quantity: tripDetailInvoices.length,
                     money: v1.expenditure,
+                    budget: v1.budget,
                     remark: '特别审批出差费用'
                 }
             }
@@ -1975,6 +1982,7 @@ class TripPlanModule {
         ]
         
         let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')})
+        _tripDetails = await Promise.all(_tripDetails);
         var invoiceQuantity = _tripDetails
             .map( (v) => {
                 return v['quantity'] || 0;

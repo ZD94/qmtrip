@@ -163,7 +163,9 @@ angular
                 $scope.viewInvoice = function(id) {
                     window.location.href="#/trip/invoice-detail?detailId="+id;
                 }
-
+                $scope.reserve = function(){
+                    window.location.href="#/trip/reserve"
+                }
                 $scope.item.done = async function(ret) {
                     API.require('tripPlan');
                     await API.onload();
