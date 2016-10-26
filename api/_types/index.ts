@@ -5,7 +5,10 @@ import { TravelPolicy, SubsidyTemplate } from './travelPolicy';
 import { Department } from './department';
 import { AccordHotel } from './accordHotel';
 import { Agency, AgencyUser } from './agency';
-import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCode} from './tripPlan';
+import {
+    TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCode, TripDetailInvoice,
+    TripDetailHotel, TripDetailTraffic
+} from './tripPlan';
 import {Account, Token, AccountOpenid} from './auth';
 import {Seed} from "./seed";
 import { ModelInterface } from 'common/model/interface';
@@ -13,6 +16,7 @@ import { ModelDelegate } from 'common/model/delegate';
 import {TravelBudgetLog} from "./travelbudget";
 import {DDTalkCorp, DDTalkUser} from "./ddtalk";
 import {CoinAccountChange, CoinAccount} from "./coin";
+import {TripDetailSubsidy, TripDetailSpecial} from "./tripPlan/tripDetailInfo";
 
 
 export enum EGender {
@@ -47,6 +51,12 @@ export interface ModelsInterface {
     seed: ModelInterface<Seed>;
     tripPlan: ModelInterface<TripPlan>;
     tripDetail: ModelInterface<TripDetail>;
+    tripDetailInvoice: ModelInterface<TripDetailInvoice>;
+    tripDetailTraffic: ModelInterface<TripDetailTraffic>;
+    tripDetailHotel: ModelInterface<TripDetailHotel>;
+    tripDetailSubsidy: ModelInterface<TripDetailSubsidy>;
+    tripDetailSpecial: ModelInterface<TripDetailSpecial>;
+
     tripPlanLog: ModelInterface<TripPlanLog>;
     project: ModelInterface<Project>;
     tripApprove: ModelInterface<TripApprove>;
@@ -86,6 +96,12 @@ export var Models: ModelsInterface = {
     seed: new ModelDelegate<Seed>(),
     tripPlan: new ModelDelegate<TripPlan>(),
     tripDetail: new ModelDelegate<TripDetail>(),
+    tripDetailInvoice: new ModelDelegate<TripDetailInvoice>(),
+    tripDetailTraffic: new ModelDelegate<TripDetailTraffic>(),
+    tripDetailHotel: new ModelDelegate<TripDetailHotel>(),
+    tripDetailSubsidy: new ModelDelegate<TripDetailSubsidy>(),
+    tripDetailSpecial: new ModelDelegate<TripDetailSpecial>(),
+    
     tripPlanLog: new ModelDelegate<TripPlanLog>(),
     project: new ModelDelegate<Project>(),
     tripApprove: new ModelDelegate<TripApprove>(),
