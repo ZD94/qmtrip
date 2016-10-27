@@ -179,7 +179,7 @@ class TripPlanModule {
                 case ETripType.HOTEL:
                     detail = Models.tripDetailHotel.create(data);
                     detail.type = ETripType.HOTEL;
-                    detail.city = approve.arrivalCity;
+                    detail.city = approve.arrivalCityCode;
                     detail.position = query.businessDistrict;
                     detail.placeName = query.hotelName;
                     detail.checkInDate = query.checkInDate || approve.startAt;
