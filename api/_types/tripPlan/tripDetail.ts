@@ -60,10 +60,10 @@ export class TripDetail extends ModelObject{
     @Field({type: Types.DOUBLE})
     get expenditure(): number { return 0; }
     set expenditure(val: number) {}
-
-    @Field({type: Types.INTEGER})
-    get payType(): EPayType { return EPayType.PERSONAL_PAY}
-    set payType(payType: EPayType) {}
+    
+    @Field({type: Types.NUMERIC(15, 2)})
+    get personalExpenditure() : number { return 0}
+    set personalExpenditure(expenditure: number) {}
     
     @ResolveRef({type: Types.UUID}, Models.tripPlan)
     get tripPlan(): TripPlan { return null; }
@@ -120,6 +120,14 @@ export class TripDetailInvoice extends ModelObject {
     get type() :EInvoiceFeeTypes { return null}
     set type(type: EInvoiceFeeTypes) {}
 
+    @Field({type: Types.INTEGER})
+    get payType() :EPayType { return EPayType.PERSONAL_PAY }
+    set payType(payType: EPayType) {}
+
+    @Field({type: Types.DATE})
+    get invoiceDateTime() :Date { return null}
+    set invoiceDateTime(invoiceDate: Date) {}
+    
     //金额
     @Field({type: Types.NUMERIC(15, 2)})
     get totalMoney() { return 0}
