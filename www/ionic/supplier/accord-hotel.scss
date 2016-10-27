@@ -5,3 +5,92 @@
     }
   }
 }
+
+.supplier{
+  .assignSupplier{
+    margin-bottom: 10px;
+    div.item{
+      height: 52px;
+      label{
+        margin-top: -12px;
+      }
+    }
+  }
+  .supplier-text{
+    text-align: left;
+    color:#fff;
+    padding-left: 14px;
+    padding-right: 14px;
+    background-color: transparent;
+    margin-bottom: 20px;
+  }
+  .pull-right{
+    float: right;
+  }
+  .pull-left{
+    float: left;
+  }
+  .supplier-title{
+    color: #616161;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+  .self-define{
+    margin-bottom: 10px;
+    .self-detail{
+      line-height: 35px;
+      background-color: #fff;
+      .logo{
+        width:30px;
+        height:30px;
+        background-color: #d8d8d8;
+        border-radius: 3px;
+        margin-top: 2px;
+      }
+      .self-name{
+        margin-left: 18px;
+      }
+    }
+    .add-supplier{
+      color: #28a7e1;
+      font-size: 16px;
+      i{
+        font-size: 20px;
+      }
+    }
+  }
+  .recommend-supplier{
+    div.item{
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+    div.ctrip-shang-lv{
+      background: url(ionic/images/supplier.png) no-repeat;
+      background-position: 15px 10px;
+      background-color: #fff;
+    }
+  }
+}
+.add-supplier{
+  .input-label{
+    width:120px;
+  }
+  .item-logo{
+    padding:6px 0 5px 16px;
+    height:47px;
+    position: relative;
+    .logo{
+      position: absolute;
+      width:30px;
+      height:30px;
+      background-color: #d8d8d8;
+      border-radius: 3px;
+      top:8px;
+      right:50px;
+    }
+    i{
+      font-size: 20px;
+      color: #28a7e1;
+    }
+  }
+}

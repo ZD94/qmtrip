@@ -4,6 +4,7 @@ import { Supplier } from 'api/_types/company/supplier';
 var msgbox = require('msgbox');
 
 export async function EditController($scope, Models, $stateParams, $ionicHistory, $ionicPopup) {
+    require('./accord-hotel.scss');
     var staff = await Staff.getCurrent();
     var supplier;
     if ($stateParams.supplierId) {
