@@ -9,7 +9,7 @@ import {EPlanStatus, ETripType, TripPlan, EInvoiceType, EAuditStatus} from "./tr
 import {Field, Table, TableExtends} from "common/model/common";
 import {Models} from "../index";
 import {TripDetail, TripDetailInvoice} from "./tripDetail";
-import {ECabin} from "./index";
+import {ECabin, EPayType} from "./index";
 import {PaginateInterface} from "common/model/interface";
 
 
@@ -60,6 +60,7 @@ export class TripDetailTraffic extends ModelObject implements TripDetail {
     budget: number;
     expenditure:number;
     tripPlan:TripPlan;
+    payType: EPayType;
 
     uploadInvoice(params): Promise<boolean> {
         return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
@@ -121,6 +122,8 @@ export class TripDetailHotel extends ModelObject implements TripDetail {
     budget: number;
     expenditure:number;
     tripPlan:TripPlan;
+    payType: EPayType;
+
     uploadInvoice(params): Promise<boolean> {
         return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
     }
@@ -185,6 +188,8 @@ export class TripDetailSubsidy extends ModelObject implements TripDetail {
     budget: number;
     expenditure:number;
     tripPlan:TripPlan;
+    payType: EPayType;
+
 
     uploadInvoice(params): Promise<boolean> {
         return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
@@ -243,6 +248,8 @@ export class TripDetailSpecial extends ModelObject implements TripDetail {
     budget: number;
     expenditure:number;
     tripPlan:TripPlan;
+    payType: EPayType;
+
 
     uploadInvoice(params): Promise<boolean> {
         return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
