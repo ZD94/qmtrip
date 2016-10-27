@@ -54,6 +54,11 @@ export enum EInvoiceFeeTypes {
     CANCEL_PLANET_TICKET = 4
 }
 
+export enum EPayType {
+    PERSONAL_PAY = 1,
+    COMPANY_PAY = 2,
+}
+
 export * from './tripPlan'
 export * from './tripDetail'
 export * from './tripDetailInfo'
