@@ -1,11 +1,55 @@
-<ion-view title="供应商" id="page30">
+<ion-view title="预订供应商管理" class="supplier">
     <ion-content padding="true" class="has-header">
-        <a href="#/supplier/edit" id="page30-button89" class="button button-positive  button-block">新增供应商</a>
-        <div class="list card accordlist" ng-repeat="ah in suppliers" ng-click="editSupplier(ah.id)">
-            <div class="item item-body">
-                <div id="page30-markdown21" style="color:#000000;">
-                    <p>名称：{{ah.name}}</p>
-                    <ion-toggle toggle-class="toggle-positive" ng-checked="ah.isInUse" ng-model="ah.isInUse" ></ion-toggle>
+        <!--<ion-toggle class="showSupplier" toggle-class="toggle-track" ng-model="showSupplier">指定商旅供应商</ion-toggle>-->
+        <div class="list assignSupplier">
+            <div class="item">
+                指定商旅供应商
+                <label class="toggle pull-right" ng-click="toggleAssignSupplier(assignSupplier)">
+                    <input type="checkbox" ng-checked="assignSupplier" ng-model="assignSupplier">
+                    <div class="track">
+                        <div class="handle"></div>
+                    </div>
+                </label>
+            </div>
+        </div>
+        <div class="supplier-text">
+            <p>开启指定商旅供应商功能，员工在出差审批通过后可以通过指定商旅供应商进行出行预订，预订完成后可以导入部分供应商订单获取实时出行数据。关闭该功能，员工可以任意渠道预订。</p>
+        </div>
+        <div>
+            <div class="list self-define">
+                <div class="item item-divider supplier-title">
+                    自定义供应商
+                    <span class="pull-right">管理列表</span>
+                </div>
+                <div class="item item-divider self-detail" ng-repeat="ah in suppliers">
+                    <div ng-click="editSupplier(ah.id)" class="pull-left" style="width:180px">
+                        <div class="logo pull-left"></div>
+                        <span class="self-name">{{ah.name}}</span>
+                    </div>
+                    <label class="toggle pull-right" ng-click="saveSupplierStatus(ah)">
+                        <input type="checkbox" ng-checked="ah.isInUse" ng-model="ah.isInUse">
+                        <div class="track">
+                            <div class="handle"></div>
+                        </div>
+                    </label>
+                </div>
+                <div class="item item-icon-left item-icon-right add-supplier" ng-click="addSupplier()">
+                    <i class="icon ion-plus-round"></i>
+                    添加供应商
+                    <i class="icon ion-chevron-right" style="color:#545454"></i>
+                </div>
+            </div>
+            <div class="list recommend-supplier">
+                <div class="item item-divider supplier-title">
+                    推荐供应商(支持订单关联)
+                </div>
+                <div class="item" ng-repeat="publicSupplier in publicSuppliers" ng-class="{'ctrip-shang-lv':publicSupplier.name == '携程商旅'}">
+                    <label class="toggle pull-right" ng-click="savePublicSupplierStatus(publicSupplier)">
+                        <input type="checkbox" ng-model="publicSupplier.isInUse" ng-checked="publicSupplier.isInUse">
+                        <div class="track">
+                            <div class="handle"></div>
+                        </div>
+                    </label>
                 </div>
             </div>
         </div>

@@ -8,7 +8,7 @@ import {Values, Types} from "common/model/index";
 import {EPlanStatus, ETripType, TripPlan, EAuditStatus} from "./tripPlan";
 import {Field, Create, ResolveRef, Table} from "common/model/common";
 import {Models} from "../index";
-import {EInvoiceFeeTypes} from "./index";
+import {EInvoiceFeeTypes, EPayType} from "./index";
 import {PaginateInterface} from "common/model/interface";
 
 
@@ -61,6 +61,10 @@ export class TripDetail extends ModelObject{
     get expenditure(): number { return 0; }
     set expenditure(val: number) {}
 
+    @Field({type: Types.INTEGER})
+    get payType(): EPayType { return EPayType.PERSONAL_PAY}
+    set payType(payType: EPayType) {}
+    
     @ResolveRef({type: Types.UUID}, Models.tripPlan)
     get tripPlan(): TripPlan { return null; }
     set tripPlan(val: TripPlan) {}
