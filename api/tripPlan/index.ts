@@ -2074,7 +2074,7 @@ class TripPlanModule {
         tripDetailInvoice = await tripDetailInvoice.save();
         let tripDetail = await Models.tripDetail.get(tripDetailInvoice.tripDetailId);
         if (!tripDetail.expenditure) tripDetail.expenditure = 0;
-        tripDetail.expenditure += tripDetailInvoice.totalMoney || 0;
+        tripDetail.expenditure += Number(tripDetailInvoice.totalMoney) || 0;
         await tripDetail.save();
         return tripDetailInvoice;
     }
@@ -2086,7 +2086,7 @@ class TripPlanModule {
         let oldMoney = 0;
         let newMoney = 0;
         if (totalMoney) {
-            newMoney = <number>totalMoney;
+            newMoney = Number(totalMoney);
         }
         if (newMoney <0 ) {
             throw L.ERR.MONEY_FORMAT_ERROR();
