@@ -8,9 +8,22 @@
       color: #fff;
       &:first-child{
         padding: 4px 16px;
+        overflow: hidden;
         span{
           float: right;
         }
+      }
+      & > div{
+        span:last-child{
+          font-size: 22px;
+        }
+      }
+      .detail_info{
+        float: left;
+      }
+      .total_price{
+        float: right;
+        text-align: right;
       }
     }
   }
@@ -22,6 +35,7 @@
     margin-top: 30px;
     .slider-slide{
       padding: 0 10px;
+      height: 375px;
     }
     .invoice-form{
       background: #fff;
@@ -44,6 +58,7 @@
           font-size: 24px;
           input{
             text-align: right;
+            width: 100%;
           }
         }
         img{
@@ -117,6 +132,15 @@
         position: absolute;
         left: 0;
         bottom: 0;
+        .button{
+          border-color: #ccc;
+          &:first-child{
+            border-radius: 0 0 0 4px;
+          }
+          &:last-child{
+            border-radius: 0 0 4px 0;
+          }
+        }
       }
       textarea{
         width: 85%;

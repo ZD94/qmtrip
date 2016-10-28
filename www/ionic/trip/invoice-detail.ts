@@ -3,6 +3,7 @@ import * as path from 'path';
 import moment = require('moment');
 import {Model} from "sequelize";
 var API = require('common/api');
+var msgbox = require('msgbox');
 
 export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate, ngModalDlg){
     //////绑定上传url
@@ -12,11 +13,11 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     ///// END
     
     //////////////显示票据之前先显示loading图
-    $scope.showLoading = true;
-    angular.element("#previewInvoiceImg").bind("load", function() {
-        $scope.showLoading = false;
-        $scope.$apply();
-    })
+    // $scope.showLoading = true;
+    // angular.element("#previewInvoiceImg").bind("load", function() {
+    //     $scope.showLoading = false;
+    //     $scope.$apply();
+    // })
     //END
     //date选择
     $scope.selectDate = async function(){
@@ -32,10 +33,11 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     var config = require('config');
     await config.$ready;
     var tripDetail = await Models.tripDetail.get($stateParams.detailId);
-    var invoices = await tripDetail.getInvoices();
-    if(tripDetail.invoiceType == EInvoiceType.HOTEL){
+    var invoices = $scope.invoices = await tripDetail.getInvoices();
+    if(tripDetail.type == EInvoiceType.HOTEL){
         tripDetail.h_city = await API.place.getCityInfo({cityCode: tripDetail.city})
     }else{
+
         tripDetail.a_city = await API.place.getCityInfo({cityCode: tripDetail.arrivalCity});
         tripDetail.d_city = await API.place.getCityInfo({cityCode: tripDetail.deptCity});
     }
@@ -43,30 +45,46 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     console.info(tripDetail);
     console.info(invoices);
     $scope.tripDetail = tripDetail;
-    $scope.invoices = invoices;
+    // $scope.invoices = invoices;
     $scope.dateOptions = {
         beginDate: tripDetail.createdAt,
         endDate: new Date(),
         timepicker: false
     }
     $scope.EInvoiceType = EInvoiceType;
-
-    $scope.$watch('invoice.latestInvoice', function(n, o){
-        var invoiceImgs = [];
-        // var latestInvoice = $scope.invoice.latestInvoice;
-        // if(typeof latestInvoice =='string') {
-        //     latestInvoice = JSON.parse(latestInvoice);
-        // }
-        // let authDataStr = window['getAuthDataStr']();
-        // for(let i of latestInvoice){
-        //     let img = path.join(config.update, 'trip-detail', $stateParams.detailId, 'invoice', i);
-        //     img = path.normalize(img);
-        //     img = img+'?authstr='+authDataStr;
-        //     invoiceImgs.push(img);
-        // }
-        $scope.invoiceImgs = invoiceImgs;
+    $scope.$watch('invoices',function(n,o){
+        $scope.invoices.map(function(invoice){
+            // if(typeof invoice.pictureFileId =='string') {
+            //     invoice.pictureFileId = JSON.parse(invoice.pictureFileId);
+            // }
+            if(invoice.pictureFileId != null){
+                let img = path.join(config.update, 'trip-detail', $stateParams.detailId, 'invoice', invoice.pictureFileId);
+                img = path.normalize(img);
+                img = img+'?authstr='+authDataStr;
+                invoice.imgUrl = img;
+            }else{
+                invoice.imgUrl = 'ionic/images/logo_write10.png';
+            }
+            return invoice;
+        })
         $ionicSlideBoxDelegate.update();
     })
+    // $scope.$watch('invoice.latestInvoice', function(n, o){
+    //     var invoiceImgs = [];
+    //     var latestInvoice = $scope.invoice.latestInvoice;
+    //     if(typeof latestInvoice =='string') {
+    //         latestInvoice = JSON.parse(latestInvoice);
+    //     }
+    //     let authDataStr = window['getAuthDataStr']();
+    //     for(let i of latestInvoice){
+    //         let img = path.join(config.update, 'trip-detail', $stateParams.detailId, 'invoice', i);
+    //         img = path.normalize(img);
+    //         img = img+'?authstr='+authDataStr;
+    //         invoiceImgs.push(img);
+    //     }
+    //     $scope.invoiceImgs = invoiceImgs;
+    //     $ionicSlideBoxDelegate.update();
+    // })
 
     let statusTxt = {};
     statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
@@ -117,7 +135,42 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         var tripPlan = tripDetail.tripPlan;
         window.location.href = "#/trip/list-detail?tripid="+tripPlan.id;
     }
-    
+    //start 修改票据button事件
+    $scope.editInvoice = false;
+    $scope.editNow = function(){
+        $scope.editInvoice = true;
+    };
+    $scope.deleteInvoice = async function(invoice,$index){
+        $ionicPopup.show({
+            title:'是否删除',
+            scope: $scope,
+            buttons:[
+                {text:'取消'},
+                {
+                    text:'确定',
+                    type: 'button-positive',
+                    onTap: async function(){
+                        invoice.destroy();
+                        $scope.tripDetail = await Models.tripDetail.get($stateParams.detailId);
+                        $scope.invoices = await tripDetail.getInvoices();
+                        $ionicSlideBoxDelegate.update();
+                    }
+                }
+            ]
+        })
+    }
+    $scope.saveChanges = async function(invoice){
+        invoice.save();
+        // $scope.tripDetail = await Models.tripDetail.get($stateParams.detailId);
+        // $scope.invoices = await tripDetail.getInvoices();
+        $scope.editInvoice = false;
+    }
+    $scope.cancelChanges = function(){
+        $scope.editInvoice = false;
+    }
+    //end 修改票据button事件
+
+    //start 创建新票据button事件
     $scope.manual = function(){
         $scope.select_menu = false;
     }
@@ -137,11 +190,41 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         newInvoice.type = $scope.newInvoice.type;
         newInvoice.invoiceDateTime = $scope.newInvoice.invoiceDateTime;
         newInvoice.pictureFileId = $scope.fileId;
+        if(newInvoice.totalMoney == null){
+            msgbox.log('请输入金额');
+            return;
+        }
+        if(newInvoice.payType == null){
+            msgbox.log('支付方式');
+            return;
+        }
+        if(newInvoice.type == null){
+            msgbox.log('票据类型');
+            return;
+        }
+        if(newInvoice.invoiceDateTime == null){
+            msgbox.log('请输入时间');
+            return;
+        }
+        if(newInvoice.payType == null){
+            msgbox.log('请输入金额');
+            return;
+        }
         newInvoice.save();
         console.info(newInvoice);
-        var tripDetail = await Models.tripDetail.get($stateParams.detailId);
-        var invoices = await tripDetail.getInvoices();
-        $scope.tripDetail = tripDetail;
-        $scope.invoices = invoices;
+        $scope.tripDetail = await Models.tripDetail.get($stateParams.detailId);
+        $scope.invoices = await tripDetail.getInvoices();
+        $scope.select_menu = true;
+        $scope.newInvoice = {
+            totalMoney: '',
+            invoiceDateTime: undefined,
+            remark: '',
+            payType: '',
+            type: ''
+        }
     }
+    $scope.backToChooese = function(){
+        $scope.select_menu = true;
+    }
+    //end 创建新票据button事件
 }

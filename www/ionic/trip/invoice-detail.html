@@ -3,32 +3,31 @@
         <div class="list invoice-info">
             <div class="item">{{statustext[tripDetail.status]}}<span>1张票据</span><span>5条记录</span></div>
             <div class="item">
-                <div>
-                    <span ng-if="tripDetail.invoiceType == EInvoiceType.HOTEL">
+                <div class="detail_info">
+                    <span ng-if="tripDetail.type == EInvoiceType.HOTEL">
                         <b>{{tripDetail.h_city.name}}</b>
                         <b ng-if="tripDetail.hotelName"> - {{invoice.hotelName}}</b>
                     </span>
-                    <span ng-if="tripDetail.invoiceType != EInvoiceType.HOTEL">
+                    <span ng-if="tripDetail.type != EInvoiceType.HOTEL">
                         <b>{{tripDetail.d_city.name}}</b>-
                         <b>{{tripDetail.a_city.name}}</b>
                     </span>
                     <br/>
                     <span>{{tripDetail.createdAt | date: 'yyyy-MM-dd'}}</span>
                 </div>
+                <div class="total_price">
+                    <span>支付</span>
+                    <br/>
+                    <span>{{tripDetail.expenditure}}</span>
+                </div>
             </div>
 
         </div>
         <ion-slide-box class="item item-image" show-pager="true">
-            <!--<ion-slide ng-repeat="invoiceImg in invoiceImgs track by $index">-->
-            <!--<invoice-img-item imgurl="invoiceImg"-->
-            <!--loadingurl="ionic/images/loading.gif"-->
-            <!--&gt;-->
-            <!--</invoice-img-item>-->
-            <!--</ion-slide>-->
-            <ion-slide  ng-repeat="invoice in invoices">
-                <div class="invoice-form">
+            <ion-slide  ng-repeat="invoice in invoices track by $index">
+                <div class="invoice-form" ng-if="!editInvoice">
                     <div class="invoice-img">
-                        <img src="../../ionic/images/logo_write10.png">
+                        <img ng-src="{{invoice.imgUrl}}">
                         <div>
                             <span class="item-tit">金额</span>
                             <h3>{{invoice.totalMoney}}</h3>
@@ -53,7 +52,7 @@
                     <div class="invoice-item">
                         <div>
                             <span class="item-tit">时间</span>
-                            <h3>{{invoice.invoiceDateTime}}</h3>
+                            <h3>{{invoice.invoiceDateTime | date: 'yyyy-MM-dd'}}</h3>
                         </div>
                     </div>
                     <div class="invoice-item">
@@ -62,57 +61,66 @@
                             <p>{{invoice.remark}}</p>
                         </div>
                     </div>
-                </div>
-
-            </ion-slide>
-            <ion-slide  class="invoice-form invoice-edit"> <!--这一页是已传图片,需要修改-->
-                <div class="invoice-img">
-                    <div class="invoice-img-min" ng-uploader="" accept="image/*" url="uploadUrl" done="invoicefuc.done">
-                        <img src="../../ionic/images/logo_write10.png">
-                        <a class="button button-positive">点击重传</a>
-                    </div>
-                    <div>
-                        <span class="item-tit">金额</span>
-                        <h3>930</h3>
+                    <div class="button-bar">
+                        <a class="button button-outline button-calm" ng-click="deleteInvoice(invoice)">删除</a>
+                        <a class="button button-outline button-calm" ng-click="editNow()">修改</a>
                     </div>
                 </div>
-                <div class="invoice-item">
-                    <span class="item-tit">金额</span>
-                    <div>
-                        <!--<h3>930</h3>-->
-                        <h3><input type="number" value="930"></h3><!-- 这里要加一个判断,是否是编辑模式,,-->
+                <div class="invoice-form invoice-edit" ng-if="editInvoice">
+                    <div class="invoice-img">
+                        <div class="invoice-img-min" ng-uploader="" accept="image/*" url="uploadUrl" done="invoicefuc.done">
+                            <img ng-src="{{invoice.imgUrl}}">
+                            <a class="button button-positive">点击重传</a>
+                        </div>
+                        <div>
+                            <span class="item-tit">金额</span>
+                            <h3><input type="text" oninput="if(value.length>5)value=value.slice(0,5)" ng-model="invoice.totalMoney"></h3>
+                        </div>
                     </div>
-                </div>
-                <div class="invoice-item">
-                    <span class="item-tit">类型</span>
-                    <div class="item-select">
-                        <!--<h3>类型</h3>-->
-                        <h3>
-                            <select>
-                                <option value="">飞机</option>
-                                <option value="">火车</option>
-                            </select>
-                        </h3>
+                    <div class="invoice-item">
+                        <span class="item-tit">支付方式</span>
+                        <div class="item-select">
+                            <h3>
+                                <select ng-model="invoice.payType">
+                                    <option value="1" ng-selected="invoice.payType == 1">个人支付</option>
+                                    <option value="2" ng-selected="invoice.payType == 2">公司支付</option>
+                                </select>
+                            </h3><!-- 这里要加一个判断,是否是编辑模式,,-->
+                        </div>
                     </div>
-                </div>
-                <div class="invoice-item">
-                    <span class="item-tit">时间</span>
-                    <div>
-                        <!--<h3>2016-05-23</h3>-->
-                        <h3>
-                            <ng-selector-date ng-model="invoiceJSON[0].created_at"
-                                              dlg-title="请选择出差日期"
-                                              dlg-options="dateOptions"
-                                              date-filter="yyyy-MM-dd">
-                            </ng-selector-date>
-                        </h3>
+                    <div class="invoice-item">
+                        <span class="item-tit">类型</span>
+                        <div class="item-select">
+                            <!--<h3>类型</h3>-->
+                            <h3>
+                                <select ng-model="invoice.type">
+                                    <option value="1" ng-selected="invoice.type == 1">机票</option>
+                                    <option value="2" ng-selected="invoice.type == 2">火车票</option>
+                                    <option value="3" ng-selected="invoice.type == 3">火车退票费</option>
+                                    <option value="4" ng-selected="invoice.type == 4">机票退票费</option>
+                                </select>
+                            </h3>
+                        </div>
                     </div>
-                </div>
-                <div class="invoice-item">
-                    <span class="item-tit">备注</span>
-                    <div>
-                        <p>按下阿斯顿所发生的</p>
-                        <textarea ng-model="invoice.invoice[0].remark"></textarea>
+                    <div class="invoice-item">
+                        <span class="item-tit">时间</span>
+                        <div>
+                            <h3>
+                                <ng-selector-date ng-model="invoice.invoiceDateTime"
+                                                  dlg-title="请选择出差日期"
+                                                  dlg-options="dateOptions"
+                                                  date-filter="yyyy-MM-dd">
+                                </ng-selector-date>
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="invoice-item">
+                        <span class="item-tit">备注</span>
+                        <textarea ng-model="invoice.remark"></textarea>
+                    </div>
+                    <div class="button-bar">
+                        <a class="button button-outline button-calm" ng-click="cancelChanges()">取消</a>
+                        <a class="button button-outline button-calm" ng-click="saveChanges(invoice)">确认</a>
                     </div>
                 </div>
             </ion-slide>
@@ -135,7 +143,6 @@
                     <div class="invoice-item">
                         <span class="item-tit">支付方式</span>
                         <div class="item-select">
-                            <!--<h3>930</h3>-->
                             <h3>
                                 <select ng-model="newInvoice.payType">
                                     <option value="1" ng-selected="newInvoice.payType == 1">个人支付</option>
@@ -176,11 +183,10 @@
                         <textarea ng-model="newInvoice.remark"></textarea>
                     </div>
                     <div class="button-bar">
-                        <a class="button button-outline button-calm">取消</a>
+                        <a class="button button-outline button-calm" ng-click="backToChooese()">取消</a>
                         <a class="button button-outline button-calm" ng-click="createInvoice()">确认</a>
                     </div>
                 </div>
-
             </ion-slide>
         </ion-slide-box>
     </ion-content>
