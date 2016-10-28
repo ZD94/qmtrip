@@ -338,7 +338,7 @@ export class TripPlan extends ModelObject {
         return Models.tripPlanLog.find(options);
     }
 
-    async getOddBudget(){
+    async getOddBudget() {
         if(!this.isLocal){
             API.require('tripPlan');
             await API.onload();

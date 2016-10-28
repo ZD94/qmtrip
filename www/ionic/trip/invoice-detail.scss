@@ -20,34 +20,50 @@
   border: none;
   .slider-slides{
     margin-top: 30px;
+    .slider-slide{
+      padding: 0 10px;
+    }
     .invoice-form{
       background: #fff;
-      background-clip: content-box;
       padding: 0 10px;
+      height: 375px;
+      position: relative;
+      border-radius: 5px;
       .invoice-img{
         overflow: hidden;
         line-height: 80px;
         padding: 10px;
+        text-align: left;
         span{
           float: left;
+          font-weight: bold;
+        }
+        h3{
+          margin-top: 24px;
+          padding-left: 5px;
+          font-size: 24px;
+          input{
+            text-align: right;
+          }
+        }
+        img{
+          width: 80px;
+          height: 80px;
+          background: #000;
         }
         & > div{
-          width: 80%;
+          width: 50%;
           float: right;
           text-align: right;
-          padding-bottom: 10px;
+          padding-bottom: 20px;
+          height: 80px;
           border-bottom: 1px solid #ccc;
-          img{
-            width: 80px;
-            height: 80px;
-            background: #000;
-          }
         }
       }
       .invoice-item{
         overflow: hidden;
         line-height: 32px;
-        padding: 10px 10px 10px;
+        padding: 5px 10px;
         &:last-child{
           & > div{
             border-bottom: none;
@@ -56,17 +72,83 @@
             }
           }
         }
-        span{
+        .item-tit{
           float: left;
+          font-weight: bold;
         }
         & > div{
-          width: 80%;
-          float: right;
           text-align: right;
           padding-bottom: 10px;
           border-bottom: 1px solid #ccc;
           h3{
             height: 24px;
+            line-height: 24px;
+            overflow: visible;
+            input{
+              float: right;
+              text-align: right;
+              font-size: 22px;
+              padding: 0;
+              height: 24px;
+            }
+          }
+        }
+      }
+      &.invoice-edit{
+        .invoice-img-min{
+          float: left;
+          border: 0;
+          height: 80px;
+          width: 80px;
+          .button{
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            border-radius: 0;
+            width: 100%;
+            min-height: 28px;
+            font-size: 16px;
+            padding: 0;
+            line-height: 30px;
+          }
+        }
+      }
+      .button-bar{
+        position: absolute;
+        left: 0;
+        bottom: 0;
+      }
+      textarea{
+        width: 85%;
+        float: right;
+        background: #fff;
+        border: 1px solid #ccc;
+      }
+    }
+    .chooseFun{
+      background: #fff;
+      padding: 0 10px;
+      background-clip: content-box;
+      height: 375px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &.noflex{
+        display: block;
+      }
+      .chooseBtn{
+        width: 214px;
+        height: 150px;
+        display: flex;
+        flex-direction: column;
+        .button{
+          width: 100%;
+          height: 64px;
+          line-height: 64px;
+          font-size: 20px;
+          flex:none;
+          &:last-child{
+            margin-top: 20px;
           }
         }
       }
@@ -76,5 +158,7 @@
     bottom: auto;
     top: 0;
   }
-
+  .slider-pager-page{
+    color: #fff;
+  }
 }

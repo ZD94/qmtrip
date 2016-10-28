@@ -222,6 +222,7 @@ export function selectDateController($scope, $element, $ionicPopup, $ionicScroll
                 return;
             }
         }
+        updateSelectedDate($scope.selected, $scope.timeScale);
         $scope.confirmModal($scope.selected.date);
     }
 
@@ -320,7 +321,7 @@ function loadMonths($scope, $element, $ionicScrollDelegate) {
     let begin = $scope.options.beginDate;
     let end = $scope.options.endDate;
     let diff;
-
+    console.info(begin)
     function loadNextMonth() {
         let date;
         if($scope.months.length == 0){

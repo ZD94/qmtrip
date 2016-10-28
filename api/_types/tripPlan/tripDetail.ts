@@ -91,7 +91,6 @@ export class TripDetail extends ModelObject{
         params['id'] = this.id;
         return API.tripPlan.auditPlanInvoice(params);
     }
-    
 }
 
 

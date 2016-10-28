@@ -58,12 +58,12 @@ class TripPlanModule {
         let go = '', back = '', hotelStr = '', subsidyStr = '', specialStr = '';
 
         let tripDetails = (await Models.tripDetail.find({where: {tripPlanId: tripPlan.id}}));
-        tripDetails.forEach( (tripDetail) => {
+        let ps = tripDetails.map( async (tripDetail) => {
             switch (tripDetail.type) {
                 case ETripType.OUT_TRIP:
                     let g = <TripDetailTraffic>tripDetail;
-                    var deptCity = API.place.getCityInfo({cityCode: g.deptCity})
-                    var arrivalCity = API.place.getCityInfo({cityCode: g.arrivalCity});
+                    var deptCity = await API.place.getCityInfo({cityCode: g.deptCity})
+                    var arrivalCity = await API.place.getCityInfo({cityCode: g.arrivalCity});
                     go += moment(g.deptDateTime).format('YYYY-MM-DD') + ', ' + deptCity.name + ' 到 ' + arrivalCity.name;
                     // if (g.latestArriveTime)
                     //     go += ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达';
@@ -71,8 +71,8 @@ class TripPlanModule {
                     break;
                 case ETripType.BACK_TRIP:
                     let b = <TripDetailTraffic>tripDetail;
-                    var deptCity = API.place.getCityInfo({cityCode: b.deptCity})
-                    var arrivalCity = API.place.getCityInfo({cityCode: b.arrivalCity});
+                    var deptCity = await API.place.getCityInfo({cityCode: b.deptCity})
+                    var arrivalCity = await API.place.getCityInfo({cityCode: b.arrivalCity});
                     back += moment(b.deptDateTime).format('YYYY-MM-DD') + ', ' + deptCity.name + ' 到 ' + arrivalCity.name;
                     // if (b.latestArriveTime)
                     //     back += ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达';
@@ -80,7 +80,7 @@ class TripPlanModule {
                     break;
                 case ETripType.HOTEL:
                     let h = <TripDetailHotel>tripDetail;
-                    var city = API.place.getCityInfo({cityCode: h.city});
+                    var city = await API.place.getCityInfo({cityCode: h.city});
                     hotelStr = moment(h.checkInDate).format('YYYY-MM-DD') + ' 至 ' + moment(h.checkOutDate).format('YYYY-MM-DD') +
                         ', ' + city.name + ',';
                     if(h.placeName) {
@@ -100,7 +100,7 @@ class TripPlanModule {
                     throw new Error('not support tripdetail Type')
             }
         })
-
+        await (Promise.all(ps));
         return {go: go, back: back, hotel: hotelStr, subsidy: subsidyStr, special: specialStr};
     }
 
@@ -2068,6 +2068,7 @@ class TripPlanModule {
     }
 
     @clientExport
+    @requireParams(['tripDetailId', 'totalMoney', 'payType', 'invoiceDateTime', 'type'], ['remark', 'id'])
     static async saveTripDetailInvoice(params) :Promise<TripDetailInvoice> {
         let {id, tripDetailId, totalMoney} = params;
         let oldMoney = 0;
@@ -2081,11 +2082,14 @@ class TripPlanModule {
         let tripDetailInvoice: TripDetailInvoice;
         if (id) {
             let oldTripDetailInvoice = await Models.tripDetailInvoice.get(id);
-            if (oldTripDetailInvoice.totalMoney) {
-                oldMoney = oldTripDetailInvoice.totalMoney;
+            if (oldTripDetailInvoice) {
+                if (oldTripDetailInvoice.totalMoney) {
+                    oldMoney = oldTripDetailInvoice.totalMoney;
+                }
+                tripDetailInvoice = await Models.tripDetailInvoice.update(params);
             }
-            tripDetailInvoice = await Models.tripDetailInvoice.update(params);
-        } else {
+        }
+        if (!tripDetailInvoice) {
             tripDetailInvoice = Models.tripDetailInvoice.create(params);
             tripDetailInvoice = await tripDetailInvoice.save();
         }
