@@ -1,0 +1,13 @@
+<ion-view title="绑定供应商" id="page27">
+    <ion-content padding="true" class="has-header">
+        <ion-list>
+            <ion-item class="item-avatar" ng-repeat="su in suppliers">
+                <a ng-href="#/staff/bind-others?supplierId={{su.id}}">
+                    <h2>{{su.name}}</h2>
+                    <p>{{su.logo}}</p>
+                    <p>{{su.isBind? "已绑定": "未绑定"}}</p>
+                </a>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>
