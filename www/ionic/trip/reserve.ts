@@ -11,8 +11,14 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     require('./reserve.scss');
 
     var budget = await Models.tripDetail.get($stateParams.detailId);
+    let tripPlanId = budget.tripPlanId;
+    let tripPlan = await Models.tripPlan.get(tripPlanId);
+    let getOddBudget = await tripPlan.getOddBudget();
+    $scope.getOddBudget = getOddBudget;
+
     API.require("place")
     await API.onload();
+
     $scope.budget = budget;
     switch(budget.type) {
         case ETripType.BACK_TRIP:

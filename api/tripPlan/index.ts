@@ -515,7 +515,7 @@ class TripPlanModule {
         details.forEach(function(item, i){
             oddBudget = oddBudget - item.expenditure;
         })
-        await oddBudget;
+        return oddBudget;
     }
 
     @clientExport
