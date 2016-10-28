@@ -5,7 +5,7 @@
     i.ion-arrow-up-b{
       position: absolute;
       right: 16px;
-      top: 12px;
+      top: 14px;
       z-index: -100;
       font-size: 22px;
     }
@@ -18,8 +18,9 @@
   }
   .status-bar{
     font-size:14px;
+    padding-top: 14px;
     margin:0px;
-    height: 47px;
+    height: 50px;
   }
   button{
     font-size:14px;
@@ -28,7 +29,7 @@
     border-radius: 0px;
   }
   .status-bar-detail{
-    padding-top: 5px;
+    padding-top: 8px;
     div.list:nth-child(2){
       font-size: 12px;
       line-height: 9px;
