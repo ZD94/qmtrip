@@ -2156,9 +2156,3 @@ async function getProjectByName(params) {
 TripPlanModule._scheduleTask();
 
 export = TripPlanModule;
-
-setTimeout(async function() {
-    console.info("开始定时执行:")
-    let tripDetails = await Models.tripDetail.find({where: {tripPlanId: 'acb1f320-9cd1-11e6-837a-292605f15930'}});
-    console.info("最终查询结果:", tripDetails);
-}, 2000)
