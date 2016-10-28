@@ -189,6 +189,10 @@ export class Staff extends ModelObject implements Account {
         return null;
     }
 
+    async checkStaffSupplierInfo(params: {supplierId: string, userName: string, pwd: string}): Promise<boolean> {
+        return true;
+    }
+
     @RemoteCall()
     async testServerFunc(){
         console.log('testServerFunc');
