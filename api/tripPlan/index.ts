@@ -2070,6 +2070,7 @@ class TripPlanModule {
     }
 
     @clientExport
+    @requireParams(['tripDetailId', 'totalMoney', 'payType', 'invoiceDateTime', 'type'], ['remark', 'id'])
     static async saveTripDetailInvoice(params) :Promise<TripDetailInvoice> {
         let {id, tripDetailId, totalMoney} = params;
         let oldMoney = 0;
@@ -2083,11 +2084,14 @@ class TripPlanModule {
         let tripDetailInvoice: TripDetailInvoice;
         if (id) {
             let oldTripDetailInvoice = await Models.tripDetailInvoice.get(id);
-            if (oldTripDetailInvoice.totalMoney) {
-                oldMoney = oldTripDetailInvoice.totalMoney;
+            if (oldTripDetailInvoice) {
+                if (oldTripDetailInvoice.totalMoney) {
+                    oldMoney = oldTripDetailInvoice.totalMoney;
+                }
+                tripDetailInvoice = await Models.tripDetailInvoice.update(params);
             }
-            tripDetailInvoice = await Models.tripDetailInvoice.update(params);
-        } else {
+        }
+        if (!tripDetailInvoice) {
             tripDetailInvoice = Models.tripDetailInvoice.create(params);
             tripDetailInvoice = await tripDetailInvoice.save();
         }
