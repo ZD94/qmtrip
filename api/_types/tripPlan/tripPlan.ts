@@ -337,6 +337,14 @@ export class TripPlan extends ModelObject {
         options.where.tripPlanId = this.id;
         return Models.tripPlanLog.find(options);
     }
+
+    async getOddBudget(){
+        if(!this.isLocal){
+            API.require('tripPlan');
+            await API.onload();
+        }
+        return API.tripPlan.getOddBudget({id: this.id});
+    }
 }
 
 

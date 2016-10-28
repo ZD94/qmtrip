@@ -509,11 +509,9 @@ class TripPlanModule {
     @clientExport
     @requireParams(['id'])
     static async getOddBudget(params: {id: string}){
-        var tripDetail = await Models.tripDetail.get(params.id);
-        var tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
+        var tripPlan = await Models.tripPlan.get(params.id);
         var oddBudget = tripPlan.budget;
-        //更新TripPlan状态
-        var details = await Models.tripDetail.find({where: {tripPlanId: tripPlan.id, id: {$ne: tripDetail.id}}});
+        var details = await Models.tripDetail.find({where: {tripPlanId: tripPlan.id}});
         details.forEach(function(item, i){
             oddBudget = oddBudget - item.expenditure;
         })
