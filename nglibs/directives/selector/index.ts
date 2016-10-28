@@ -76,13 +76,13 @@ angular
                 filters: '@dateFilter'  //日期返回格式filter  字符串即可
             },
             controller: function($scope, ngModalDlg) {
+                $scope.datefilter = $scope.filters || 'yyyy-MM-dd HH:mm';
                 $scope.showSelectorDlg = async function() {
                     $scope.options.title = $scope.title;
                     var confirmed = await ngModalDlg.selectDate($scope, $scope.options, $scope.value)
                     if(!confirmed)
                         return;
                     $scope.value = confirmed;
-                    $scope.datefilter = $scope.filters || 'yyyy-MM-dd HH:mm';
                     if($scope.options.done && typeof $scope.options.done == 'function') {
                         return $scope.options.done($scope.value);
                     }
