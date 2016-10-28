@@ -2068,9 +2068,16 @@ class TripPlanModule {
     }
 
     @clientExport
-    @requireParams(['id'], ['tripDetailId', 'totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark', 'id'])
+    @requireParams(['id', 'tripDetailId', 'totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark'])
     static async saveTripDetailInvoice(params) :Promise<TripDetailInvoice> {
-        let {id, tripDetailId, totalMoney} = params;
+        tripDetailInvoice = Models.tripDetailInvoice.create(params);
+        return tripDetailInvoice = await tripDetailInvoice.save();
+    }
+
+    @clientExport
+    @requireParams(["id"], ['totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark'])
+    static async updateTripDetailInvoice(params) :Promise<TripDetailInvoice> {
+        let {id, totalMoney} = params;
         let oldMoney = 0;
         let newMoney = 0;
         if (totalMoney) {
@@ -2079,24 +2086,15 @@ class TripPlanModule {
         if (newMoney <0 ) {
             throw L.ERR.MONEY_FORMAT_ERROR();
         }
-        let tripDetailInvoice: TripDetailInvoice;
-        if (id) {
-            let oldTripDetailInvoice = await Models.tripDetailInvoice.get(id);
-            if (oldTripDetailInvoice) {
-                if (oldTripDetailInvoice.totalMoney) {
-                    oldMoney = oldTripDetailInvoice.totalMoney;
-                }
-                tripDetailInvoice = await Models.tripDetailInvoice.update(params);
-            }
+        let tripDetailInvoice = await Models.tripDetailInvoice.get(id);
+        if (tripDetailInvoice.totalMoney) {
+            oldMoney = tripDetailInvoice.totalMoney;
         }
-        if (!tripDetailInvoice) {
-            tripDetailInvoice = Models.tripDetailInvoice.create(params);
-            tripDetailInvoice = await tripDetailInvoice.save();
-        }
+        tripDetailInvoice = await Models.tripDetailInvoice.update(params);
 
         //判断是否需要更新实际金额
         if (oldMoney != newMoney) {
-            let tripDetail = await Models.tripDetail.get(tripDetailId);
+            let tripDetail = await Models.tripDetail.get(tripDetailInvoice.tripDetailId);
             if (!tripDetail.expenditure) tripDetail.expenditure = 0;
             tripDetail.expenditure = tripDetail.expenditure - oldMoney + newMoney;
             await tripDetail.save();

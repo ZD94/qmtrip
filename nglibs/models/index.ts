@@ -113,7 +113,7 @@ var Services = {
     coinAccountChange: { type: CoinAccountChange, modname: 'coin', funcs: []},
 
     financeCheckCode: { type: FinanceCheckCode, modname: 'tripPlan', funcs: ['getTripDetail']},
-    tripDetailInvoice: { type: TripDetailInvoice, modname: 'tripPlan', funcs: ['getTripDetailInvoice', 'getTripDetailInvoices', 'saveTripDetailInvoice', 'saveTripDetailInvoice', 'deleteTripDetailInvoice']},
+    tripDetailInvoice: { type: TripDetailInvoice, modname: 'tripPlan', funcs: ['getTripDetailInvoice', 'getTripDetailInvoices', 'saveTripDetailInvoice', 'updateTripDetailInvoice', 'deleteTripDetailInvoice']},
     tripDetailTraffic: { type: TripDetailTraffic, modname: 'tripPlan', funcs: ['getTripDetailTraffic']},
     tripDetailHotel: { type: TripDetailHotel, modname: 'tripPlan', funcs: ['getTripDetailHotel']},
     tripDetailSubsidy: { type: TripDetailSubsidy, modname: 'tripPlan', funcs: ['getTripDetailSubsidy']},
