@@ -1,6 +1,8 @@
-import { ETripType, EPlanStatus, EInvoiceType } from 'api/_types/tripPlan';
+import {ETripType, EPlanStatus, EInvoiceType, EInvoiceFeeTypes, EPayType} from 'api/_types/tripPlan';
 import * as path from 'path';
 import moment = require('moment');
+import {Model} from "sequelize";
+var API = require('common/api');
 
 export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate, ngModalDlg){
     //////绑定上传url
@@ -25,16 +27,25 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
             title: '选择开始时间',
             titleEnd: '选择结束时间'
         })
-        
     }
     $scope.select_menu = true;
     var config = require('config');
     await config.$ready;
-    var invoice = await Models.tripDetail.get($stateParams.detailId);
-    $scope.invoice = invoice;
-    $scope.invoiceJSON = JSON.parse(invoice.invoice);
+    var tripDetail = await Models.tripDetail.get($stateParams.detailId);
+    var invoices = await tripDetail.getInvoices();
+    if(tripDetail.invoiceType == EInvoiceType.HOTEL){
+        tripDetail.h_city = await API.place.getCityInfo({cityCode: tripDetail.city})
+    }else{
+        tripDetail.a_city = await API.place.getCityInfo({cityCode: tripDetail.arrivalCity});
+        tripDetail.d_city = await API.place.getCityInfo({cityCode: tripDetail.deptCity});
+    }
+
+    console.info(tripDetail);
+    console.info(invoices);
+    $scope.tripDetail = tripDetail;
+    $scope.invoices = invoices;
     $scope.dateOptions = {
-        beginDate: invoice.createdAt,
+        beginDate: tripDetail.createdAt,
         endDate: new Date(),
         timepicker: false
     }
@@ -42,17 +53,17 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
 
     $scope.$watch('invoice.latestInvoice', function(n, o){
         var invoiceImgs = [];
-        var latestInvoice = $scope.invoice.latestInvoice;
-        if(typeof latestInvoice =='string') {
-            latestInvoice = JSON.parse(latestInvoice);
-        }
-        let authDataStr = window['getAuthDataStr']();
-        for(let i of latestInvoice){
-            let img = path.join(config.update, 'trip-detail', $stateParams.detailId, 'invoice', i);
-            img = path.normalize(img);
-            img = img+'?authstr='+authDataStr;
-            invoiceImgs.push(img);
-        }
+        // var latestInvoice = $scope.invoice.latestInvoice;
+        // if(typeof latestInvoice =='string') {
+        //     latestInvoice = JSON.parse(latestInvoice);
+        // }
+        // let authDataStr = window['getAuthDataStr']();
+        // for(let i of latestInvoice){
+        //     let img = path.join(config.update, 'trip-detail', $stateParams.detailId, 'invoice', i);
+        //     img = path.normalize(img);
+        //     img = img+'?authstr='+authDataStr;
+        //     invoiceImgs.push(img);
+        // }
         $scope.invoiceImgs = invoiceImgs;
         $ionicSlideBoxDelegate.update();
     })
@@ -66,13 +77,13 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     $scope.statustext = statusTxt;
     $scope.EPlanStatus = EPlanStatus;
     let title;
-    if (invoice.type == ETripType.OUT_TRIP) {
+    if (tripDetail.type == ETripType.OUT_TRIP) {
         title = '去程交通';
     }
-    if (invoice.type == ETripType.BACK_TRIP) {
+    if (tripDetail.type == ETripType.BACK_TRIP) {
         title = '回程交通';
     }
-    if (invoice.type == ETripType.HOTEL) {
+    if (tripDetail.type == ETripType.HOTEL) {
         title = '住宿';
     }
     $scope.invoicefuc = {title:'上传'+title + '发票',done:function(response){
@@ -85,7 +96,8 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
             return;
         }
         var fileId = response.fileId;
-        uploadInvoice(invoice, fileId,async function (err, result) {
+        $scope.fileId = fileId;
+        uploadInvoice(tripDetail, fileId,async function (err, result) {
             if (err) {
                 alert(err.msg ? err.msg : err);
                 return;
@@ -102,12 +114,34 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     }
 
     $scope.backtodetail = function(){
-        var tripPlan = invoice.tripPlan;
+        var tripPlan = tripDetail.tripPlan;
         window.location.href = "#/trip/list-detail?tripid="+tripPlan.id;
     }
-    console.info($scope.invoice);
     
     $scope.manual = function(){
         $scope.select_menu = false;
+    }
+    $scope.newInvoice = {
+        totalMoney: '',
+        invoiceDateTime: undefined,
+        remark: '',
+        payType: '',
+        type: ''
+    }
+    $scope.createInvoice = async function(){
+        var newInvoice = Models.tripDetailInvoice.create({tripDetailId: tripDetail.id});
+        console.info($scope.newInvoice);
+        newInvoice.totalMoney = $scope.newInvoice.totalMoney;
+        newInvoice.payType = $scope.newInvoice.payType;
+        newInvoice.remark = $scope.newInvoice.remark;
+        newInvoice.type = $scope.newInvoice.type;
+        newInvoice.invoiceDateTime = $scope.newInvoice.invoiceDateTime;
+        newInvoice.pictureFileId = $scope.fileId;
+        newInvoice.save();
+        console.info(newInvoice);
+        var tripDetail = await Models.tripDetail.get($stateParams.detailId);
+        var invoices = await tripDetail.getInvoices();
+        $scope.tripDetail = tripDetail;
+        $scope.invoices = invoices;
     }
 }

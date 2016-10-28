@@ -69,7 +69,7 @@
                 <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve()">
                     预订
                 </a>
-                <a class="trip_btn button-small botton-outline">
+                <a class="trip_btn button-small botton-outline" ng-click="viewInvoice(item.id)">
                     管理票据
                 </a>
                 <div ng-if="!isShowUploader">等待上传票据</div>
@@ -83,7 +83,7 @@
                     <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve()">
                         预订
                     </a>
-                    <a class="trip_btn button-small botton-outline">
+                    <a class="trip_btn button-small botton-outline" ng-click="viewInvoice(item.id)">
                         管理票据
                     </a>
                     <a class="trip_btn button button-small button-outline" ng-click="viewInvoice(item.id)">查看票据</a>
@@ -107,7 +107,7 @@
             <div ng-if="item.status == EPlanStatus.COMPLETE">
                 <a class="trip_btn button button-small button-outline button-positive"
                    ng-click="viewInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
-                <a class="trip_btn button-small botton-outline">
+                <a class="trip_btn button-small botton-outline" ng-click="viewInvoice(item.id)">
                     管理票据
                 </a>
                 <span ng-if="!isShowUploader">已通过</span>
