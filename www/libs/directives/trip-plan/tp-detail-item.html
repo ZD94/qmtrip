@@ -66,7 +66,7 @@
                      ng-if="isShowUploader">
                     上传票据
                 </div>
-                <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve()">
+                <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve(item.id)">
                     预订
                 </a>
                 <a class="trip_btn button-small botton-outline">
@@ -80,7 +80,7 @@
                     <!--<div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="item.title" done="item.done" url="uploadUrl">-->
                         <!--重新上传-->
                     <!--</div>-->
-                    <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve()">
+                    <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve(item.id)">
                         预订
                     </a>
                     <a class="trip_btn button-small botton-outline">
