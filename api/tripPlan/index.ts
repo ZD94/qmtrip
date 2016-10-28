@@ -2086,7 +2086,7 @@ class TripPlanModule {
         let oldMoney = 0;
         let newMoney = 0;
         if (totalMoney) {
-            newMoney = totalMoney;
+            newMoney = <number>totalMoney;
         }
         if (newMoney <0 ) {
             throw L.ERR.MONEY_FORMAT_ERROR();
