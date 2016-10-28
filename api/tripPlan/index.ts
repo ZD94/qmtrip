@@ -2090,13 +2090,21 @@ class TripPlanModule {
         if (tripDetailInvoice.totalMoney) {
             oldMoney = tripDetailInvoice.totalMoney;
         }
-        tripDetailInvoice = await Models.tripDetailInvoice.update(params);
+        for(let key in params) {
+            tripDetailInvoice[key] = params[key];
+        }
+        tripDetailInvoice = await tripDetailInvoice.save()
 
         //判断是否需要更新实际金额
         if (oldMoney != newMoney) {
+            console.info(tripDetailInvoice.tripDetailId);
             let tripDetail = await Models.tripDetail.get(tripDetailInvoice.tripDetailId);
+            console.info(tripDetail)
             if (!tripDetail.expenditure) tripDetail.expenditure = 0;
             tripDetail.expenditure = tripDetail.expenditure - oldMoney + newMoney;
+            if (tripDetail.expenditure < 0 ) {
+                tripDetail.expenditure = 0;
+            }
             await tripDetail.save();
         }
         return tripDetailInvoice;
