@@ -1520,7 +1520,7 @@ class StaffModule{
     @conditionDecorator([
         {if: condition.isStaffSupplierInfoOwner("0.id")}
     ])
-    static async updateSupplier(params) : Promise<StaffSupplierInfo>{
+    static async updateStaffSupplierInfo(params) : Promise<StaffSupplierInfo>{
         var id = params.id;
         var sp = await Models.staffSupplierInfo.get(id);
         for(var key in params){
@@ -1536,7 +1536,7 @@ class StaffModule{
      */
     @clientExport
     @requireParams(["id"])
-    static async getSupplier(params: {id: string}) : Promise<StaffSupplierInfo>{
+    static async getStaffSupplierInfo(params: {id: string}) : Promise<StaffSupplierInfo>{
         let id = params.id;
         var ah = await Models.staffSupplierInfo.get(id);
 
@@ -1550,7 +1550,7 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    static async getSuppliers(params): Promise<FindResult>{
+    static async getStaffSupplierInfos(params): Promise<FindResult>{
         var options: any = {
             where: params.where
         };
