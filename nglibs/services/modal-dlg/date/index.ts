@@ -163,6 +163,9 @@ interface DateSelect {
 }
 
 function updateSelectedDate(day: DateSelect, timeScale: number){
+    if(!day.time){
+        day.time = 0;
+    }
     day.date = moment(
         day.day
         + day.time * timeScale * 60 * 1000

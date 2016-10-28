@@ -2068,7 +2068,7 @@ class TripPlanModule {
     }
 
     @clientExport
-    @requireParams(['id', 'tripDetailId', 'totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark'])
+    @requireParams(['tripDetailId', 'totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark'], ['id'])
     static async saveTripDetailInvoice(params) :Promise<TripDetailInvoice> {
         let tripDetailInvoice = Models.tripDetailInvoice.create(params);
         return await tripDetailInvoice.save();
@@ -2097,9 +2097,7 @@ class TripPlanModule {
 
         //判断是否需要更新实际金额
         if (oldMoney != newMoney) {
-            console.info(tripDetailInvoice.tripDetailId);
             let tripDetail = await Models.tripDetail.get(tripDetailInvoice.tripDetailId);
-            console.info(tripDetail)
             if (!tripDetail.expenditure) tripDetail.expenditure = 0;
             tripDetail.expenditure = tripDetail.expenditure - oldMoney + newMoney;
             if (tripDetail.expenditure < 0 ) {
