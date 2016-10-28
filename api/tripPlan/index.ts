@@ -503,6 +503,20 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['id'])
+    static async getOddBudget(params: {id: string}){
+        var tripDetail = await Models.tripDetail.get(params.id);
+        var tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
+        var oddBudget = tripPlan.budget;
+        //更新TripPlan状态
+        var details = await Models.tripDetail.find({where: {tripPlanId: tripPlan.id, id: {$ne: tripDetail.id}}});
+        details.forEach(function(item, i){
+            oddBudget = oddBudget - item.expenditure;
+        })
+        await oddBudget;
+    }
+
+    @clientExport
+    @requireParams(['id'])
     static async getTripDetailTraffic(params: {id: string}):Promise<TripDetailTraffic> {
         return Models.tripDetailTraffic.get(params.id);
     }

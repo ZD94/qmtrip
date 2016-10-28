@@ -91,6 +91,13 @@ export class TripDetail extends ModelObject{
         params['id'] = this.id;
         return API.tripPlan.auditPlanInvoice(params);
     }
+    async getOddBudget(){
+        if(!this.isLocal){
+            API.require('tripPlan');
+            await API.onload();
+        }
+        return API.tripPlan.getOddBudget({id: this.id});
+    }
 }
 
 
