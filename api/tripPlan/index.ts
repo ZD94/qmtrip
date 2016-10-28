@@ -2068,7 +2068,7 @@ class TripPlanModule {
     }
 
     @clientExport
-    @requireParams(['tripDetailId', 'totalMoney', 'payType', 'invoiceDateTime', 'type'], ['remark', 'id'])
+    @requireParams(['id'], ['tripDetailId', 'totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark', 'id'])
     static async saveTripDetailInvoice(params) :Promise<TripDetailInvoice> {
         let {id, tripDetailId, totalMoney} = params;
         let oldMoney = 0;
