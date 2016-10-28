@@ -112,7 +112,7 @@ export class TripDetailInvoice extends ModelObject {
     set tripDetailId(tripDetailId: string) {}
 
     @Field({type: Types.TEXT})
-    get pictureFileId() { return null}
+    get pictureFileId() : string { return null}
     set pictureFileId(pictureFileId: string) {}
 
     //票据类型

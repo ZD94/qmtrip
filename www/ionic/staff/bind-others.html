@@ -1,0 +1,22 @@
+<ion-view title="账户绑定">
+    <ion-content padding="true" class="has-header">
+        <div class="editInfo">
+            <div class="list">
+                <div class="spacer" style="height: 10px;"></div>
+                <div class="item item-input">
+                    <label class="item-input">
+                        <span class="input-label">用户名</span>
+                        <input type="password" placeholder="输入用户名" ng-model="form.newPwd">
+                    </label>
+                </div>
+                <div class="item item-input-inset">
+                    <label class="item-input">
+                        <span class="input-label">密&nbsp;码</span>
+                        <input type="password" placeholder="输入密码" ng-model="form.confirmPwd">
+                    </label>
+                </div>
+            </div>
+            <a class="button button-block button-calm" ng-click="save()" no-back>保存</a>
+        </div>
+    </ion-content>
+</ion-view>
