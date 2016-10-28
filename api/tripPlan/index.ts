@@ -55,29 +55,34 @@ class TripPlanModule {
      * @returns {{go: string, back: string, hotel: string}}
      */
     static async getPlanEmailDetails(tripPlan: TripPlan): Promise<{go: string, back: string, hotel: string, subsidy: string, special?: string }> {
-        let go = '无', back = '无', hotelStr = '无', subsidyStr = '无', specialStr = '无';
+        let go = '', back = '', hotelStr = '', subsidyStr = '', specialStr = '';
 
         let tripDetails = (await Models.tripDetail.find({where: {tripPlanId: tripPlan.id}}));
         tripDetails.forEach( (tripDetail) => {
             switch (tripDetail.type) {
                 case ETripType.OUT_TRIP:
                     let g = <TripDetailTraffic>tripDetail;
-                    go += moment(g.deptDateTime).format('YYYY-MM-DD') + ', ' + g.deptCity + ' 到 ' + g.arrivalCity;
+                    var deptCity = API.place.getCityInfo({cityCode: g.deptCity})
+                    var arrivalCity = API.place.getCityInfo({cityCode: g.arrivalCity});
+                    go += moment(g.deptDateTime).format('YYYY-MM-DD') + ', ' + deptCity.name + ' 到 ' + arrivalCity.name;
                     // if (g.latestArriveTime)
                     //     go += ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达';
                     go += ', 动态预算￥' + g.budget;
                     break;
                 case ETripType.BACK_TRIP:
                     let b = <TripDetailTraffic>tripDetail;
-                    back += moment(b.deptDateTime).format('YYYY-MM-DD') + ', ' + b.deptCity + ' 到 ' + b.arrivalCity;
+                    var deptCity = API.place.getCityInfo({cityCode: b.deptCity})
+                    var arrivalCity = API.place.getCityInfo({cityCode: b.arrivalCity});
+                    back += moment(b.deptDateTime).format('YYYY-MM-DD') + ', ' + deptCity.name + ' 到 ' + arrivalCity.name;
                     // if (b.latestArriveTime)
                     //     back += ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达';
                     back += ', 动态预算￥' + b.budget;
                     break;
                 case ETripType.HOTEL:
                     let h = <TripDetailHotel>tripDetail;
+                    var city = API.place.getCityInfo({cityCode: h.city});
                     hotelStr = moment(h.checkInDate).format('YYYY-MM-DD') + ' 至 ' + moment(h.checkOutDate).format('YYYY-MM-DD') +
-                        ', ' + h.city + ',';
+                        ', ' + city.name + ',';
                     if(h.placeName) {
                         hotelStr += h.placeName + ',';
                     }
@@ -100,7 +105,7 @@ class TripPlanModule {
     }
 
     static async getEmailInfoFromDetails(details: TripDetail[]): Promise<{go: string, back: string, hotel: string, subsidy: string, special?: string}> {
-        let goStr = '无', backStr = '无', hotelStr = '无', subsidyStr = '无', specialStr = '无';
+        let goStr = '', backStr = '', hotelStr = '', subsidyStr = '', specialStr = '';
         let ps = details.map(async (d) => {
             switch (d.type) {
                 case ETripType.OUT_TRIP:
