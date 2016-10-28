@@ -11,20 +11,20 @@
       color: #525252;
     }
     &.ctrip_business{
-      background-position: 10px 5px;
+      background-position: 22px 5px;
       //background-size: 36px auto;
     }
     &.ctrip{
-      background-position: 10px -45px;
+      background-position: -5px -45px;
     }
     &.qunar{
-      background-position: 10px -95px;
+      background-position: 3px -95px;
     }
     &.tong-cheng{
-      background-position: 10px -145px;
+      background-position: 22px -145px;
     }
     &.air-china{
-      background-position: 10px -195px;
+      background-position: 22px -195px;
     }
     &.item-icon-right{
       background-color: #fff;
@@ -61,7 +61,7 @@
     }
   }
   .reserve-content{
-    height:350px;
+    height:370px;
     padding-top: 22px;
     color: #606060;
     font-size: 14px;
@@ -88,10 +88,49 @@
     div.supplier{
       height:50px;
       background: url(ionic/images/supplier.png) no-repeat;
+      margin-bottom: 20px;
+    }
+    div.supplier.ctrip_business{
       background-position: center 0px;
+    }
+    div.supplier.ctrip{
+      background-position: center -50px;
+    }
+    div.supplier.qunar{
+      background-position: center -100px;
+    }
+    div.supplier.tong_cheng{
+      background-position: center -150px;
+    }
+    div.supplier.air_china{
+      background-position: center -200px;
     }
     div.load{
       height:20px;
+      div{
+        width: 74px;
+        height: 16px;
+        margin:0 auto;
+        div{
+          float: left;
+          height:14px;
+          width:14px;
+          border-radius: 7px;
+          margin-right: 12px;
+        }
+        div:last-child{
+          margin-right: 0px;
+        }
+        div.dark{
+          background-color: #333333;
+        }
+        //div.middle{
+        //  background-color: #7f7f7f;
+        //}
+        div.light{
+          background-color: #cccccc;
+        }
+      }
     }
     p.tip{
       text-align: left;

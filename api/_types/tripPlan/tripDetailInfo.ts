@@ -142,6 +142,7 @@ export class TripDetailHotel extends ModelObject implements TripDetail {
         params['id'] = this.id;
         return API.tripPlan.auditPlanInvoice(params);
     }
+
 }
 
 @TableExtends(TripDetail, 'tripDetailInfo', 'type', ETripType.SUBSIDY)
