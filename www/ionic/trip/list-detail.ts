@@ -1,4 +1,5 @@
 import { ETripType, TripDetail, EPlanStatus } from 'api/_types/tripPlan';
+import moment = require('moment');
 export async function ListDetailController($location, $scope , Models, $stateParams, $storage, $ionicPopup, wxApi){
     let id = $stateParams.tripid;
 
@@ -211,6 +212,8 @@ export async function ListDetailController($location, $scope , Models, $statePar
     $scope.$watch('hasMakeSpendRecorder',function(n, o){
         if(n) $scope.bottomStyle.right.display = false;
     })
+    //对于当前日期及行程出发日期的判断
+    let isBeforeStartTime = moment().isBefore(tripPlan.startAt);
     $scope.$watch('tripDetail.status',function(newVal, oldVal){
         // if($scope.status == EPlanStatus.CANCEL){
         //     $scope.isCancel = true;
@@ -244,9 +247,15 @@ export async function ListDetailController($location, $scope , Models, $statePar
             $scope.bottomStyle.left.display = true;
             $scope.bottomStyle.right.backgroundColor = '#D8D8D8';
             $scope.bottomStyle.left.border = '1px solid #D8D8D8';
+            if(!isBeforeStartTime){
+                $scope.bottomStyle.status.text = '待传票据';
+            }
         }else if(newVal == EPlanStatus.WAIT_COMMIT){
             $scope.bottomStyle.right.display = true;
             $scope.rightClick = $scope.showAlterDialog;
+            if(!isBeforeStartTime){
+                $scope.bottomStyle.status.text = '待传票据';
+            }
         }else if(newVal == EPlanStatus.AUDIT_NOT_PASS){
             $scope.bottomStyle.right.display = true;
             $scope.bottomStyle.right.backgroundColor = '#D8D8D8';
