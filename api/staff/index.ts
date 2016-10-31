@@ -24,7 +24,7 @@ import {conditionDecorator, condition} from "../_decorator";
 import {FindResult} from "common/model/interface";
 
 const invitedLinkCols = InvitedLink['$fieldnames'];
-const staffSupplierInfoCols = InvitedLink['$fieldnames'];
+const staffSupplierInfoCols = StaffSupplierInfo['$fieldnames'];
 const staffAllCols = Staff['$getAllFieldNames']();
 
 const goInvitedLink = config.host + "/index.html#/login/invited-staff-one";
@@ -1521,6 +1521,8 @@ class StaffModule{
         {if: condition.isStaffSupplierInfoOwner("0.id")}
     ])
     static async updateStaffSupplierInfo(params) : Promise<StaffSupplierInfo>{
+        console.info("====================lllllllllllluuuuuuuuuuu");
+        console.info(params,"====================lllllllllllluuuuuuuuuuu");
         var id = params.id;
         var sp = await Models.staffSupplierInfo.get(id);
         for(var key in params){
