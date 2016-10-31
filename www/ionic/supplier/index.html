@@ -23,7 +23,9 @@
                 </div>
                 <div class="item item-divider self-detail" ng-repeat="ah in suppliers">
                     <div ng-click="editSupplier(ah.id)" class="pull-left" style="width:180px">
-                        <div class="logo pull-left"></div>
+                        <div class="logo pull-left">
+                            <img class="avatar-img" ng-src="/attachments/{{ah.logo}}" ng-if="ah.logo">
+                        </div>
                         <span class="self-name">{{ah.name}}</span>
                     </div>
                     <label class="toggle pull-right" ng-click="saveSupplierStatus(ah)">

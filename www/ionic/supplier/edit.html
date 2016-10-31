@@ -3,7 +3,7 @@
         <form class="list">
             <div class="item item-input">
                 <span class="input-label">供应商名称</span>
-                <input type="text" placeholder="最多6个汉子" ng-model="supplier.name">
+                <input type="text" placeholder="最多6个汉字" ng-model="supplier.name">
             </div>
             <div class="item item-input">
                 <span class="input-label">交通预定地址</span>
@@ -13,10 +13,11 @@
                 <span class="input-label">酒店预订地址</span>
                 <input type="text" placeholder="输入URL，以http开头" ng-model="supplier.hotelBookLink">
             </div>
-            <div class="item item-logo item-icon-right">
+            <div class="item item-logo item-icon-right" ng-uploader accept="image/*" url="uploadUrl" done="done">
                 <span class="input-label">LOGO</span>
-                <div class="logo"></div>
-                <!--<input type="text" placeholder="" ng-model="supplier.logo">-->
+                <div class="logo">
+                    <img class="avatar-img" ng-src="/attachments/{{supplier.logo}}" ng-if="supplier.logo">
+                </div>
                 <i class="icon ion-chevron-right" style="color:#545454"></i>
             </div>
             <div class="spacer" style="width: 300px; height: 9px;"></div>
