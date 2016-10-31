@@ -392,10 +392,8 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
             $scope.bottomStyle.right.backgroundColor = '#ffffff';
             $scope.bottomStyle.right.text = '撤销行程';
             $scope.bottomStyle.right.color = '#28A7E1';
-
-
             $scope.rightClick = $scope.cancelTripApprove;
-        }else if(tripApprove.status == EApproveStatus.PASS){
+        }else if(tripApprove.status == EApproveStatus.PASS && !isHasPermissionApprove){
             $scope.bottomStyle.right.display = true;
             $scope.bottomStyle.right.text = '查看行程';
             $scope.rightClick = $scope.checkTrip;
