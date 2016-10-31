@@ -5,6 +5,7 @@ var msgbox = require('msgbox');
 
 export async function EditController($scope, Models, $stateParams, $ionicHistory, $ionicPopup) {
     require('./accord-hotel.scss');
+    $scope.uploadUrl = '/upload/ajax-upload-file?type=avatar';
     var staff = await Staff.getCurrent();
     var supplier;
     if ($stateParams.supplierId) {
@@ -15,11 +16,36 @@ export async function EditController($scope, Models, $stateParams, $ionicHistory
     }
     $scope.supplier = supplier;
 
+    //供应商的自定义头像
+    $scope.done = async function(ret){
+        if(ret.ret != 0){
+            console.error(ret.errMsg);
+            $ionicPopup.alert({
+                title: '错误',
+                template: ret.errMsg
+            });
+            return;
+        }
+        var fileId = ret.fileId;
+        supplier.logo = fileId[0];
+        $scope.logoToggle = true;
+    }
+
     $scope.saveSupplier = async function () {
-        if(!$scope.supplier.name){
+        let supplierName = $scope.supplier.name;
+        if(!supplierName){
             msgbox.log("供应商名称不能为空");
             return false;
         }
+        if(!$scope.supplier.trafficBookLink){
+            msgbox.log("交通预订地址不能为空");
+            return false;
+        }
+        if(!$scope.supplier.hotelBookLink){
+            msgbox.log("酒店预订地址不能为空");
+            return false;
+        }
+
         $scope.supplier.company = staff.company;
         await $scope.supplier.save();
         $ionicHistory.goBack(-1);

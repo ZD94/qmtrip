@@ -11,14 +11,22 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     let authDataStr = window['getAuthDataStr']();
     $scope.uploadUrl = '/upload/ajax-upload-file?type=image&auth='+authDataStr;
     ///// END
-    
-    //////////////显示票据之前先显示loading图
-    // $scope.showLoading = true;
-    // angular.element("#previewInvoiceImg").bind("load", function() {
-    //     $scope.showLoading = false;
-    //     $scope.$apply();
-    // })
-    //END
+
+    function formatInvoice(invoices) {
+        if (!invoices) invoices = [];
+        return invoices.map(function(invoice){
+            if(invoice.pictureFileId != null){
+                let img = path.join(config.update, 'trip-detail', $stateParams.detailId, 'invoice', invoice.pictureFileId);
+                img = path.normalize(img);
+                img = img+'?authstr='+authDataStr;
+                invoice.imgUrl = img;
+            }else{
+                invoice.imgUrl = 'ionic/images/logo_write10.png';
+            }
+            return invoice;
+        })
+    }
+
     //date选择
     $scope.selectDate = async function(){
         let value = await ngModalDlg.selectDate($scope, {
@@ -33,17 +41,16 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     var config = require('config');
     await config.$ready;
     var tripDetail = await Models.tripDetail.get($stateParams.detailId);
-    var invoices = $scope.invoices = await tripDetail.getInvoices();
+    var invoices = await tripDetail.getInvoices();
+    $scope.invoices = formatInvoice(invoices);
+    $ionicSlideBoxDelegate.update();
     if(tripDetail.type == EInvoiceType.HOTEL){
         tripDetail.h_city = await API.place.getCityInfo({cityCode: tripDetail.city})
     }else{
-
         tripDetail.a_city = await API.place.getCityInfo({cityCode: tripDetail.arrivalCity});
         tripDetail.d_city = await API.place.getCityInfo({cityCode: tripDetail.deptCity});
     }
 
-    console.info(tripDetail);
-    console.info(invoices);
     $scope.tripDetail = tripDetail;
     // $scope.invoices = invoices;
     $scope.dateOptions = {
@@ -52,39 +59,6 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         timepicker: false
     }
     $scope.EInvoiceType = EInvoiceType;
-    $scope.$watch('invoices',function(n,o){
-        $scope.invoices.map(function(invoice){
-            // if(typeof invoice.pictureFileId =='string') {
-            //     invoice.pictureFileId = JSON.parse(invoice.pictureFileId);
-            // }
-            if(invoice.pictureFileId != null){
-                let img = path.join(config.update, 'trip-detail', $stateParams.detailId, 'invoice', invoice.pictureFileId);
-                img = path.normalize(img);
-                img = img+'?authstr='+authDataStr;
-                invoice.imgUrl = img;
-            }else{
-                invoice.imgUrl = 'ionic/images/logo_write10.png';
-            }
-            return invoice;
-        })
-        $ionicSlideBoxDelegate.update();
-    })
-    // $scope.$watch('invoice.latestInvoice', function(n, o){
-    //     var invoiceImgs = [];
-    //     var latestInvoice = $scope.invoice.latestInvoice;
-    //     if(typeof latestInvoice =='string') {
-    //         latestInvoice = JSON.parse(latestInvoice);
-    //     }
-    //     let authDataStr = window['getAuthDataStr']();
-    //     for(let i of latestInvoice){
-    //         let img = path.join(config.update, 'trip-detail', $stateParams.detailId, 'invoice', i);
-    //         img = path.normalize(img);
-    //         img = img+'?authstr='+authDataStr;
-    //         invoiceImgs.push(img);
-    //     }
-    //     $scope.invoiceImgs = invoiceImgs;
-    //     $ionicSlideBoxDelegate.update();
-    // })
 
     let statusTxt = {};
     statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
@@ -152,7 +126,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
                     onTap: async function(){
                         invoice.destroy();
                         $scope.tripDetail = await Models.tripDetail.get($stateParams.detailId);
-                        $scope.invoices = await tripDetail.getInvoices();
+                        $scope.invoices = formatInvoice(await tripDetail.getInvoices());
                         $ionicSlideBoxDelegate.update();
                     }
                 }
@@ -161,14 +135,11 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     }
     $scope.saveChanges = async function(invoice){
         invoice.save();
-        // $scope.tripDetail = await Models.tripDetail.get($stateParams.detailId);
-        // $scope.invoices = await tripDetail.getInvoices();
         $scope.editInvoice = false;
     }
     $scope.cancelChanges = function(){
         $scope.editInvoice = false;
     }
-    //end 修改票据button事件
 
     //start 创建新票据button事件
     $scope.manual = function(){
@@ -183,7 +154,6 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     }
     $scope.createInvoice = async function(){
         var newInvoice = Models.tripDetailInvoice.create({tripDetailId: tripDetail.id});
-        console.info($scope.newInvoice);
         newInvoice.totalMoney = $scope.newInvoice.totalMoney;
         newInvoice.payType = $scope.newInvoice.payType;
         newInvoice.remark = $scope.newInvoice.remark;
@@ -211,9 +181,9 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
             return;
         }
         newInvoice.save();
-        console.info(newInvoice);
         $scope.tripDetail = await Models.tripDetail.get($stateParams.detailId);
-        $scope.invoices = await tripDetail.getInvoices();
+        $scope.invoices = formatInvoice(await tripDetail.getInvoices());
+        $ionicSlideBoxDelegate.update();
         $scope.select_menu = true;
         $scope.newInvoice = {
             totalMoney: '',

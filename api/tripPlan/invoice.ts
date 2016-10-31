@@ -17,22 +17,22 @@ module.exports = function(app){
 
 async function checkInvoicePermission(userId, tripDetailId){
     var tripDetail = await Models.tripDetail.get(tripDetailId);
-    tripDetail.tripPlan.account.company
+    var tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
     var account = await Models.account.get(userId);
     if(account.type == EAccountType.STAFF){
         var staff = await Models.staff.get(userId);
         if(!staff)
             return false;
-        if(staff.id == tripDetail.tripPlan.account.id)
+        if(staff.id == tripPlan.account.id)
             return true;
-        if(staff.company.id == tripDetail.tripPlan.account.company.id &&
+        if(staff.company.id == tripPlan.account.company.id &&
             (staff.roleId == EStaffRole.ADMIN || staff.roleId == EStaffRole.OWNER))
             return true;
     } else if(account.type == EAccountType.AGENCY){
         var agencyUser = await Models.agencyUser.get(userId);
         if(!agencyUser)
             return false;
-        var needAgency = await tripDetail.tripPlan.account.company.getAgency();
+        var needAgency = await tripPlan.account.company.getAgency();
         if(agencyUser.agency.id == needAgency.id)
             return true;
     }
