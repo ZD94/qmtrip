@@ -1506,6 +1506,7 @@ class TripPlanModule {
                         data.deptDateTime = query.leaveDate;
                         data.arrivalDateTime = query.goBackDate;
                         data.cabin = getECabinByName(budget.cabinClass);
+                        data.invoiceType = budget.type;
                         detail = Models.tripDetailTraffic.create(data);
                         tripPlan.isNeedTraffic = true;
                         break;
@@ -1515,6 +1516,7 @@ class TripPlanModule {
                         data.deptDateTime = query.goBackDate;
                         data.arrivalDateTime = null;
                         data.cabin = getECabinByName(budget.cabinClass);
+                        data.invoiceType = budget.type;
                         detail = Models.tripDetailTraffic.create(data);
                         tripPlan.isNeedTraffic = true;
                         break;
