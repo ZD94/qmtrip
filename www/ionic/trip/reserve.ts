@@ -1,7 +1,20 @@
 import { ETripType, TripDetail, EPlanStatus } from 'api/_types/tripPlan';
+import { Staff } from 'api/_types/staff/staff';
 
-export async function ReserveController($scope, $stateParams){
+export async function ReserveController($scope, Models, $stateParams){
     require('./reserve.scss');
+    var suppliers = [];
+    var currentStaff = await Staff.getCurrent();
+    var currentCompany = currentStaff.company;
+    if(currentCompany.isAppointSupplier){
+        suppliers = await currentCompany.getAppointedSuppliers();
+        $scope.suppliers = suppliers;
+    }
+    if(suppliers.length == 0){
+        //公共的供应商
+        suppliers = await Models.supplier.find({where:{companyId: null}});
+        $scope.suppliers = suppliers;
+    }
     $scope.redirect = function(supplier){
         window.location.href="#/trip/reserve-redirect?detailId="+$stateParams.detailId+"&supplier="+supplier
     }
@@ -15,6 +28,8 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     let tripPlan = await Models.tripPlan.get(tripPlanId);
     let getOddBudget = await tripPlan.getOddBudget();
     $scope.getOddBudget = getOddBudget;
+    var supplier = await Models.supplier.get($stateParams.supplier);
+    $scope.supplier = supplier;
 
     API.require("place")
     await API.onload();
@@ -36,7 +51,7 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
             break;
     }
     //供应商的logo
-    switch($stateParams.supplier){
+    /*switch($stateParams.supplier){
         case 'ctrip_business':
             $scope.ctrip_business = true;
             break;
@@ -52,7 +67,7 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
         case 'air_china':
             $scope.air_china = true;
             break;
-    }
+    }*/
 
 
     //下面三个小圆点的轮播
@@ -71,7 +86,8 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
             $scope.load_third = false;
         }
     },200)
-    // setTimeout(function(){
-    //     window.location.href="http://ct.ctrip.com/";
-    // },3000)
+    setTimeout(function(){
+        // window.location.href="http://ct.ctrip.com/";
+        window.location.href = supplier.trafficBookLink;
+    },3000)
 }
