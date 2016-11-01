@@ -1,7 +1,7 @@
 import { Staff } from 'api/_types/staff/staff';
 import { EPlanStatus } from 'api/_types/tripPlan';
 
-export default async function DistributionController($scope, Models) {
+export default async function DistributionController($scope, Models, City) {
     require('./statistics.scss');
     API.require("place");
     await API.onload();
@@ -33,7 +33,7 @@ export default async function DistributionController($scope, Models) {
             attributes: ["title", "account_id", "arrival_city_code"] , order: ["arrival_city_code"]});
 
         staffTrips = await Promise.all(staffTrips.map(async (v) => {
-            let city = await API.place.getCityInfo({cityCode: v.arrivalCityCode});
+            let city = await City.getCity(v.arrivalCityCode);
             let staff = v.account;
             return {name: staff.name, mobile: staff.mobile, reason: v.title, longitude: city.longitude, latitude: city.latitude, cityName: city.name};
         }));

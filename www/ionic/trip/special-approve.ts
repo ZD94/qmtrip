@@ -1,7 +1,7 @@
 import { Staff } from 'api/_types/staff/staff';
 var msgbox = require('msgbox');
 
-export async function SpecialApproveController($scope, $storage, Models, $stateParams, $ionicLoading){
+export async function SpecialApproveController($scope, $storage, Models, $stateParams, $ionicLoading, City){
     require('./trip.scss');
     require('./budget.scss');
     API.require("tripPlan");
@@ -15,10 +15,10 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
     // trip.createAt = new Date(result.createAt);
 
     if(query.originPlace) {
-        let originPlace = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace});
+        let originPlace = await City.getCity(query.originPlace.id || query.originPlace);
         trip.originPlaceName = originPlace.name;
     }
-    let destination = await API.place.getCityInfo({cityCode: query.destinationPlace.id || query.destinationPlace});
+    let destination = await City.getCity(query.destinationPlace.id || query.destinationPlace);
     trip.destinationPlaceName = destination.name;
     $scope.trip = trip;
     let totalPrice: number = 0;

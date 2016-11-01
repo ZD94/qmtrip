@@ -7,7 +7,7 @@ export async function ReserveController($scope, $stateParams){
     }
 }
 
-export async function ReserveRedirectController($scope, Models, $stateParams, $interval, $timeout){
+export async function ReserveRedirectController($scope, Models, $stateParams, $interval, $timeout, City){
     require('./reserve.scss');
 
     var budget = await Models.tripDetail.get($stateParams.detailId);
@@ -24,8 +24,8 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     switch(budget.type) {
         case ETripType.BACK_TRIP:
         case ETripType.OUT_TRIP:
-            let deptCity = await API.place.getCityInfo({cityCode: $scope.budget.deptCity});
-            let arrivalCity = await API.place.getCityInfo({cityCode: $scope.budget.arrivalCity});
+            let deptCity = await City.getCity($scope.budget.deptCity);
+            let arrivalCity = await City.getCity($scope.budget.arrivalCity);
             $scope.deptCity = deptCity.name;
             $scope.arrivalCity = arrivalCity.name;
             $scope.reserveType = 'travel'
