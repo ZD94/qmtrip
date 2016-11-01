@@ -7,7 +7,7 @@ export async function ReserveController($scope, $stateParams){
     }
 }
 
-export async function ReserveRedirectController($scope, Models, $stateParams, $interval){
+export async function ReserveRedirectController($scope, Models, $stateParams, $interval, $timeout){
     require('./reserve.scss');
 
     var budget = await Models.tripDetail.get($stateParams.detailId);
@@ -18,6 +18,7 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
 
     API.require("place")
     await API.onload();
+    let reDirectUrl = '#';
 
     $scope.budget = budget;
     switch(budget.type) {
@@ -39,15 +40,19 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     switch($stateParams.supplier){
         case 'ctrip_business':
             $scope.ctrip_business = true;
+            reDirectUrl = '//ct.ctrip.com/';
             break;
         case 'ctrip':
             $scope.ctrip = true;
+            reDirectUrl = '//accounts.ctrip.com/member/login.aspx?BackUrl=http%3A%2F%2Fwww.ctrip.com%2F&responsemethod=get';
             break;
         case 'qunar':
             $scope.qunar = true;
+            reDirectUrl = '//user.qunar.com/passport/login.jsp';
             break;
         case 'tong_cheng':
             $scope.tong_cheng = true;
+            reDirectUrl = '//passport.ly.com/?pageurl=http%3A%2F%2Fwww.ly.com%2F';
             break;
         case 'air_china':
             $scope.air_china = true;
@@ -71,7 +76,7 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
             $scope.load_third = false;
         }
     },200)
-    // setTimeout(function(){
-    //     window.location.href="http://ct.ctrip.com/";
-    // },3000)
+    $timeout(function(){
+        window.location.href=reDirectUrl;
+    },5000)
 }
