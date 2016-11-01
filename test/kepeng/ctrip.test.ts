@@ -1,20 +1,37 @@
 
 import * as os from 'os';
 import * as path from 'path';
+import { CookieJar } from 'request';
 import * as fs from 'fs';
 import requestPromise = require('request-promise');
-import { CookieJar } from 'request';
 import request = require('request');
+import { getSupplier } from 'api/suppliers';
+var iconv = require('iconv-lite');
 
-//requestPromise.debug = true;
 
 var account = '15210594467';
 var password = '123456lf';
 // var account = '13911795755';
 // var password = 'lsd920';
 
-require('request-debug')(requestPromise)
+//requestPromise.debug = true;
+//require('request-debug')(requestPromise)
 
+export default async function main() {
+    let client = getSupplier('ct_ctrip_com');
+    try{
+        await client.login({username:account, password});
+        let list = await client.getOrderList();
+        console.log(JSON.stringify(list, null, ' '));
+    }catch(e){
+        if(e.response){
+            fs.writeFileSync('err.response.html', e.response.body, 'binary');
+        }
+        console.error(e);
+    }
+}
+
+/*
 
 class WebRobotClient{
     cookieJar: CookieJar;
@@ -46,7 +63,7 @@ class WebRobotClient{
     async downloadImage(uri: string): Promise<string>{
         var tmpfile = path.join(os.tmpdir(), Date.now()+'_'+Math.random()+'.gif');
         return new Promise<string>(function(resolve, reject){
-            this.request_.get({
+            this.client_orig.get({
                 uri: uri
             })
                 .pipe(fs.createWriteStream(tmpfile))
@@ -61,66 +78,65 @@ class WebRobotClient{
 
     async login(username:string, password: string){
         var res = await this.request.get({
-            uri: 'http://ct.ctrip.com/m/',
+            uri: 'http://ct.ctrip.com/',
         });
 
-        let sToken = this.getCookie('sToken');
-        console.log(sToken);
+        let m = res.body.match(/<input\s+type=\"hidden\"\s+name=\"p1\"\s+value=\"([a-z0-9]+)\"\s+\/>/i);
+        if(!m)
+            throw new Error('login can not fetch p1.');
+        let p1 = m[1];
+        console.log(p1);
+
         res = await this.request.post({
-            uri: 'https://www.corporatetravel.ctrip.com/m/Account/ValidateMember?'+Math.random(),
-            json: true,
+            uri: 'https://www.corporatetravel.ctrip.com/crptravel/login?lang=zh-cn',
             form: {
-                account: username,
-                password,
-                sToken,
+                loginname: username,
+                passwd: password,
+                needVCode: 'F',
+                vcode: '',
+                backurl: 'http://ct.ctrip.com/corptravel/zh-cn',
+                p1,
             },
             headers: {
-                'Referer': 'http://ct.ctrip.com/m/',
+                'Referer': 'http://ct.ctrip.com/',
             },
         })
         console.log(res.body);
-
-        if(!res.body.Result){
-            if(res.body.ErrorCode == '2'){ //需要验证码
-                let codegif = await this.downloadImage('http://ct.ctrip.com/m/Account/GetCaptcha?'+Math.random());
-                console.log('GetCaptcha:', codegif);
-            }
-            throw new Error('login error');
-        }
     }
 
     async orderList(){
 
         let token = this.getCookie('token');
         let res = await this.request.post({
-            uri: 'http://ct.ctrip.com/m/Order/WillTravelOrders?'+Math.random(),
-            json: true,
+            uri: 'http://ct.ctrip.com/My/zh-cn/AllOrder/GetAllCorpOrder',
             headers: {
-                'Referer': 'http://ct.ctrip.com/m/Main/MyOrder',
+                'Referer': 'http://ct.ctrip.com/My/zh-cn/allOrder',
             },
-            body: {
-                token,
-            }
+            form: {
+                ed: '',
+                isnext: 0,
+                isprev: 0,
+                name: '',
+                op: 'SelectOrder',
+                orderid: '',
+                pageCount: 10,
+                pageNum: 1,
+                ped: '',
+                precount: 0,
+                sd: '',
+                so: 3,
+                st: 1,
+            },
+            encoding: null,
         })
-        let list = JSON.stringify(res.body, null, ' ');
-        fs.writeFileSync('orderlist.json', list, 'utf-8');
-        console.log(list);
+        let body = iconv.decode(res.body, 'gbk');
+        fs.writeFileSync('orderlist.json', body, 'utf-8');
+        //console.log(body);
+        return JSON.parse(body);
     }
 
 }
-
-export default async function main() {
-    let client = new WebRobotClient('http://ct.ctrip.com');
-    try{
-        await client.login(account, password);
-        await client.orderList();
-    }catch(e){
-        if(e.response){
-            fs.writeFileSync('err.response.html', e.response.body, 'binary');
-        }
-        console.error(e);
-    }
-}
+*/
 
 /*
 

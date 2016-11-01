@@ -68,7 +68,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
     let specialApproveBudgets = [];    //特别审批
     let specialApproveTotalBudget: number = 0;
 
-    await budgets.forEach( async function(budget){
+    budgets.forEach( async function(budget){
         var invoice = await budget.getInvoices();
         if(invoice.length){
             hasInvoice = true;

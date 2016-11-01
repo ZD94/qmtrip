@@ -1,7 +1,7 @@
 import { ETripType, EInvoiceType, MTxPlaneLevel } from 'api/_types/tripPlan';
 import moment = require('moment');
 import { Staff } from 'api/_types/staff/staff';
-export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading){
+export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading, City){
     require('./trip.scss');
     require('./budget.scss');
     API.require("tripPlan");
@@ -48,10 +48,10 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     trip.createAt = new Date(result.createAt);
 
     if(query.originPlace) {
-        let originPlace = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace});
+        let originPlace = await City.getCity(query.originPlace.id || query.originPlace);
         trip.originPlaceName = originPlace.name;
     }
-    let destination = await API.place.getCityInfo({cityCode: query.destinationPlace.id || query.destinationPlace});
+    let destination = await City.getCity(query.destinationPlace.id || query.destinationPlace);
     trip.destinationPlaceName = destination.name;
     $scope.trip = trip;
     //补助,现在是0,后续可能会直接加入到预算中
