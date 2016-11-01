@@ -14,6 +14,16 @@ module.exports = function(app) {
         cache: false,
         timeout: 180000,
     }));
+    app.get("/attachment/temp/:id", function(req, res, next) {
+        let id = req.params.id;
+        return requestProxy({
+            url: config.hosts.main.www + '/attachment/temp/' + id ,
+            reqAsBuffer: true,
+            cache: false,
+            timeout: 180000,
+        })(req, res, next);
+    });
+
     app.get("/attachments/:id", getPublicFile);
     //app.post('/upload/ajax-upload-file', uploadActionFile);
     //app.get('/download/excle-file/:fileName', downloadExcle);
