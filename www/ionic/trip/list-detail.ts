@@ -1,5 +1,6 @@
 import { ETripType, TripDetail, EPlanStatus } from 'api/_types/tripPlan';
 import moment = require('moment');
+import async = Q.async;
 export async function ListDetailController($location, $scope , Models, $stateParams, $storage, $ionicPopup, wxApi){
     let id = $stateParams.tripid;
 
@@ -54,8 +55,8 @@ export async function ListDetailController($location, $scope , Models, $statePar
     statusTxt[EPlanStatus.COMPLETE] = "已完成";
     // statusTxt[EPlanStatus.APPROVE_NOT_PASS] = '审核未通过';
     statusTxt[EPlanStatus.CANCEL] = "已撤销";
-    // $scope.EInvoiceType = EInvoiceType;
-    // $scope.EPlanStatus = EPlanStatus;
+    // 是否已经上传至少一张票据
+    let hasInvoice = false;
 
     //分类计算
     let trafficBudgets = [];     //交通
@@ -67,7 +68,12 @@ export async function ListDetailController($location, $scope , Models, $statePar
     let specialApproveBudgets = [];    //特别审批
     let specialApproveTotalBudget: number = 0;
 
-    budgets.forEach( (budget) => {
+    await budgets.forEach( async function(budget){
+        var invoice = await budget.getInvoices();
+        if(invoice.length){
+            hasInvoice = true;
+            $scope.bottomStyle.left.display = false;
+        }
         switch(budget.type) {
             case ETripType.BACK_TRIP:
             case ETripType.OUT_TRIP:
@@ -215,9 +221,6 @@ export async function ListDetailController($location, $scope , Models, $statePar
     //对于当前日期及行程出发日期的判断
     let isBeforeStartTime = moment().isBefore(tripPlan.startAt);
     $scope.$watch('tripDetail.status',function(newVal, oldVal){
-        // if($scope.status == EPlanStatus.CANCEL){
-        //     $scope.isCancel = true;
-        // }
         $scope.bottomStyle = {
             status:{
                 text:'',
@@ -244,9 +247,11 @@ export async function ListDetailController($location, $scope , Models, $statePar
         $scope.bottomStyle.status.text = statusTxt[newVal];
         if(newVal == EPlanStatus.WAIT_UPLOAD){
             $scope.bottomStyle.right.display = true;
-            $scope.bottomStyle.left.display = true;
             $scope.bottomStyle.right.backgroundColor = '#D8D8D8';
-            $scope.bottomStyle.left.border = '1px solid #D8D8D8';
+            if(!hasInvoice){
+                $scope.bottomStyle.left.display = true;
+                $scope.bottomStyle.left.border = '1px solid #D8D8D8';
+            }
             if(!isBeforeStartTime){
                 $scope.bottomStyle.status.text = '待传票据';
             }
