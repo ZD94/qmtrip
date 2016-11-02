@@ -23,20 +23,11 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
             }else{
                 invoice.imgUrl = 'ionic/images/logo_write10.png';
             }
+            invoice.edit = false;
             return invoice;
         })
     }
 
-    //date选择
-    $scope.selectDate = async function(){
-        let value = await ngModalDlg.selectDate($scope, {
-            beginDate: new Date(),
-            endDate: moment().add(1, 'year').toDate(),
-            timepicker: false,
-            title: '选择开始时间',
-            titleEnd: '选择结束时间'
-        })
-    }
     $scope.select_menu = true;
     var config = require('config');
     await config.$ready;
@@ -52,11 +43,14 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     }
 
     $scope.tripDetail = tripDetail;
+    console.info(tripDetail);
     // $scope.invoices = invoices;
     $scope.dateOptions = {
-        beginDate: tripDetail.createdAt,
+        beginDate: moment().add(-1,'years').startOf('months').toDate(),
         endDate: new Date(),
-        timepicker: false
+        timepicker: false,
+        title: '选择开始时间',
+        toBottom: true
     }
     $scope.EInvoiceType = EInvoiceType;
 
@@ -78,26 +72,31 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     if (tripDetail.type == ETripType.HOTEL) {
         title = '住宿';
     }
-    $scope.invoicefuc = {title:'上传'+title + '发票',done:function(response){
-        if(response.ret != 0){
-            console.error(response.errMsg);
-            $ionicPopup.alert({
-                title: '错误',
-                template: response.errMsg
-            });
-            return;
-        }
-        var fileId = response.fileId;
-        $scope.fileId = fileId;
-        uploadInvoice(tripDetail, fileId,async function (err, result) {
-            if (err) {
-                alert(err.msg ? err.msg : err);
+    $scope.invoicefuc = {
+        title:'上传'+title + '发票',
+        done: async function(response){
+            if(response.ret != 0){
+                console.error(response.errMsg);
+                $ionicPopup.alert({
+                    title: '错误',
+                    template: response.errMsg
+                });
                 return;
             }
-            var newdetail = await Models.tripDetail.get($stateParams.detailId);
-            $scope.invoice = newdetail;
-        });
-    }}
+            var fileId = response.fileId;
+            $scope.fileId = fileId;
+            console.info(response);
+
+            // uploadInvoice(tripDetail, fileId,async function (err, result) {
+            //     if (err) {
+            //         alert(err.msg ? err.msg : err);
+            //         return;
+            //     }
+            //     var newdetail = await Models.tripDetail.get($stateParams.detailId);
+            //     $scope.invoice = newdetail;
+            // });
+        }
+    }
 
     function uploadInvoice(tripDetail, picture, callback) {
         tripDetail.uploadInvoice({
@@ -109,10 +108,38 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         var tripPlan = tripDetail.tripPlan;
         window.location.href = "#/trip/list-detail?tripid="+tripPlan.id;
     }
+
+    // $scope.slideChange = function($index){
+    //     $ionicPopup.show({
+    //         title:'提示',
+    //         template: '确定不保存就离开吗?',
+    //         scope: $scope,
+    //         buttons:[
+    //             {
+    //                 text:'取消',
+    //                 onTap: function(){
+    //                     console.info('取消')
+    //                     $scope.currentSlide = 0;
+    //                     console.info($scope.currentSlide);
+    //                     $ionicSlideBoxDelegate.slide(2);
+    //                 }
+    //             },
+    //             {
+    //                 text:'确定',
+    //                 type: 'button-positive',
+    //                 onTap: function(){
+    //                     console.info('确定')
+    //                 }
+    //             }
+    //         ]
+    //     })
+    // }
     //start 修改票据button事件
     $scope.editInvoice = false;
-    $scope.editNow = function(){
-        $scope.editInvoice = true;
+    $scope.editNow = function(invoice){
+        invoice.edit = true;
+        $ionicSlideBoxDelegate.enableSlide(false);
+        // $scope.editInvoice = true;
     };
     $scope.deleteInvoice = async function(invoice,$index){
         $ionicPopup.show({
@@ -134,11 +161,14 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         })
     }
     $scope.saveChanges = async function(invoice){
+        invoice.edit = false;
         invoice.save();
-        $scope.editInvoice = false;
+        $ionicSlideBoxDelegate.enableSlide(true);
+        // $scope.editInvoice = false;
     }
-    $scope.cancelChanges = function(){
-        $scope.editInvoice = false;
+    $scope.cancelChanges = function(invoice){
+        invoice.edit = false;
+        $ionicSlideBoxDelegate.enableSlide(true);
     }
 
     //start 创建新票据button事件
