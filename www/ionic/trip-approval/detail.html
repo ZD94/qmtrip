@@ -25,7 +25,7 @@
                 <div ng-if="!tripApprove.isSpecialApprove">
                     <!--交通-->
                     <ta-detail-item ng-repeat="t in traffic track by t.id"
-                                    item="t" title="{{$index == 0 ? '交通': ''}}"
+                                    item="t" title="交通"
                                     budget="{{trafficBudget| currency: ''}}元">
                     </ta-detail-item>
                     <!--酒店-->
@@ -46,48 +46,12 @@
             </ion-scroll>
 
             <div>
-                <!--<div class="button-bar" ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE && isHasPermissionApprove">-->
-                    <!--<a ng-click="showReasonDialog()" class="button button-assertive  button-block">驳回</a>-->
-                    <!--<a ng-click="confirmButton()" class="button button-positive  button-block">同意</a>-->
-                <!--</div>-->
-                <!--<div class="button-bar" ng-if="tripApprove.status == EApproveStatus.REJECT && !isHasPermissionApprove">-->
-                    <!--<a ng-click="reCommitTripApprove()" class="button button-positive  button-block">重新提交</a>-->
-                <!--</div>-->
-                <!--<div class="button-bar" ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE && !isHasPermissionApprove && !isHasApprove">-->
-                    <!--<a ng-click="cancelTripApprove()" class="button button-positive  button-block">撤销行程</a>-->
-                <!--</div>-->
                 <bottom-bar bottom-style="bottomStyle"
                             left-click="leftClick()"
                             right-click="rightClick()"
                             approve-id="approveId"
                 ></bottom-bar>
             </div>
-
-
         </div>
     </ion-content>
-
-    <!--<ion-content ng-show="isConfirm" padding="false" scroll="false" class="has-header">-->
-        <!--<div class="flex-c10">-->
-            <!--<ion-list show-delete="false">-->
-                <!--<ion-item ng-click="chooseOption(false)" ng-class="{true: '', false: 'item-option-selected'}[isNextApprove]">直接同意</ion-item>-->
-                <!--<ion-item ng-click="chooseOption(true)" ng-class="{true: 'item-option-selected', false: ''}[isNextApprove]" style="border-top: 1px #387ef5 solid">-->
-                    <!--<span class="input-label">同意并转给</span>-->
-                    <!--<ng-selector-list style="float: right;"-->
-                                      <!--ng-model="tripApprove.approveUser"-->
-                                      <!--dlg-options="staffSelector"-->
-                                      <!--dlg-title="选择审批人"-->
-                                      <!--dlg-placeholder="请选择审批人"-->
-                                      <!--class="fake-input">-->
-                    <!--</ng-selector-list>-->
-                <!--</ion-item>-->
-            <!--</ion-list>-->
-
-            <!--<div class="button-bar">-->
-                <!--<a ng-click="cancelConfirm()" class="button button-assertive  button-block">取消</a>-->
-                <!--<a ng-click="confirmApprove()" class="button button-positive  button-block">确认</a>-->
-            <!--</div>-->
-        <!--</div>-->
-
-    <!--</ion-content>-->
 </ion-view>

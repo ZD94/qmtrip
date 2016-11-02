@@ -72,7 +72,7 @@
                 <a class="trip_btn button-small botton-outline" ng-click="viewInvoice(item.id)">
                     添加票据
                 </a>
-                <div ng-if="!isShowUploader">等待上传票据</div>
+                <div style="margin-top: 8px" ng-if="!isShowUploader">等待上传票据</div>
             </div>
 
             <div ng-if="item.status == EPlanStatus.WAIT_COMMIT">
@@ -88,7 +88,7 @@
                     </a>
                     <a class="trip_btn button button-small button-outline" ng-click="viewInvoice(item.id)">添加票据</a>
                 </div>
-                <div ng-if="!isShowUploader">等待提交</div>
+                <div style="margin-top: 8px" ng-if="!isShowUploader">等待提交</div>
             </div>
 
             <div ng-if="item.status == EPlanStatus.AUDITING">
@@ -106,7 +106,7 @@
                 <a class="trip_btn button-small botton-outline" ng-click="viewInvoice(item.id)">
                     修改票据
                 </a>
-                <span ng-if="!isShowUploader">已通过</span>
+                <span style="margin-top: 8px" ng-if="!isShowUploader">已通过</span>
             </div>
 
             <div ng-if="item.status == EPlanStatus.AUDIT_NOT_PASS">
@@ -124,7 +124,7 @@
             <div ng-if="item.status == EPlanStatus.NO_BUDGET">
                 <a class="trip_btn button button-small button-outline button-positive"
                    ng-click="viewInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
-                <span ng-if="!isShowUploader">暂无预算</span>
+                <span style="margin-top: 8px" ng-if="!isShowUploader">暂无预算</span>
             </div>
         </div>
         <div ng-if="item.type == ETripType.SUBSIDY">
