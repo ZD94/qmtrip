@@ -9,8 +9,9 @@ import { Account } from 'api/_types/auth';
 import { getSession } from 'common/model';
 import { TableExtends, Table, Create, Field, ResolveRef, Reference, RemoteCall } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
-import {PaginateInterface} from "common/model/interface";
-import {CoinAccount} from "api/_types/coin";
+import {PaginateInterface} from 'common/model/interface';
+import {CoinAccount} from 'api/_types/coin';
+import {getSupplier,SupplierOrder} from 'libs/suppliers';
 
 declare var API: any;
 
@@ -187,6 +188,30 @@ export class Staff extends ModelObject implements Account {
             return staffInfos[0];
         }
         return null;
+    }
+
+    @RemoteCall()
+    async getOrders(params: {supplierId: string}): Promise<SupplierOrder[]> {
+        let supplier = await Models.supplier.get(params.supplierId);
+        let client = getSupplier("ct_ctrip_com");
+        let staffSupplierInfo = await this.getOneStaffSupplierInfo({supplierId: params.supplierId});
+        let loginInfo = JSON.parse(staffSupplierInfo.loginInfo);
+        try{
+            await client.login({username: loginInfo.userName, password: loginInfo.pwd});
+            let list = await client.getOrderList();
+            console.info(JSON.stringify(list, null, ' '));
+            return list;
+        }catch(e){
+            console.error(e);
+        }
+    }
+
+    async relateOrders(params: {detailId: string,orderIds: string[]}): Promise<SupplierOrder[]> {
+        if(!this.isLocal){
+            API.require('tripPlan');
+            await API.onload();
+        }
+        return API.tripPlan.relateOrders(params);
     }
 
     async checkStaffSupplierInfo(params: {supplierId: string, userName: string, pwd: string}): Promise<boolean> {
