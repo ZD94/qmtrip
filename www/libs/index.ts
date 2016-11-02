@@ -1,2 +1,3 @@
 
 import './directives';
+import './services';

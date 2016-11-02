@@ -61,16 +61,16 @@
     <ion-item class="trip-buttons">
         <div ng-if="item.type != ETripType.SUBSIDY" class="item-note detail_btn">
             <div ng-if="item.status == EPlanStatus.WAIT_UPLOAD">
-                <div class="trip_btn button-small botton-outline button-positive"
-                     ng-uploader accept="image/*" title="item.title" done="item.done" url="uploadUrl"
-                     ng-if="isShowUploader">
-                    上传票据
-                </div>
-                <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve(item.id)">
+                <!--<div class="trip_btn button-small botton-outline button-positive"-->
+                     <!--ng-uploader accept="image/*" title="item.title" done="item.done" url="uploadUrl"-->
+                     <!--ng-if="isShowUploader">-->
+                    <!--上传票据-->
+                <!--</div>-->
+                <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve(item.id)" ng-if="isBeforeStartTime">
                     预订
                 </a>
                 <a class="trip_btn button-small botton-outline" ng-click="viewInvoice(item.id)">
-                    管理票据
+                    添加票据
                 </a>
                 <div ng-if="!isShowUploader">等待上传票据</div>
             </div>
@@ -80,13 +80,13 @@
                     <!--<div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="item.title" done="item.done" url="uploadUrl">-->
                         <!--重新上传-->
                     <!--</div>-->
-                    <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve(item.id)">
-                        预订
+                    <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve(item.id)" ng-if="isBeforeStartTime">
+                        退/改签
                     </a>
                     <a class="trip_btn button-small botton-outline" ng-click="viewInvoice(item.id)">
-                        管理票据
+                        查看票据
                     </a>
-                    <a class="trip_btn button button-small button-outline" ng-click="viewInvoice(item.id)">查看票据</a>
+                    <a class="trip_btn button button-small button-outline" ng-click="viewInvoice(item.id)">添加票据</a>
                 </div>
                 <div ng-if="!isShowUploader">等待提交</div>
             </div>
@@ -94,21 +94,17 @@
             <div ng-if="item.status == EPlanStatus.AUDITING">
                 <a class="trip_btn button button button-small button-outline"
                    ng-click="viewInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
-                <a class="trip_btn button-small botton-outline">
-                    管理票据
-                </a>
+                <!--<a class="trip_btn button-small botton-outline">-->
+                    <!--管理票据-->
+                <!--</a>-->
                 <span ng-if="!isShowUploader">票据审核中</span>
-            </div>
-
-            <div ng-if="item.status == EPlanStatus.WAIT_APPROVE">
-                待审批
             </div>
 
             <div ng-if="item.status == EPlanStatus.COMPLETE">
                 <a class="trip_btn button button-small button-outline button-positive"
                    ng-click="viewInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
                 <a class="trip_btn button-small botton-outline" ng-click="viewInvoice(item.id)">
-                    管理票据
+                    修改票据
                 </a>
                 <span ng-if="!isShowUploader">已通过</span>
             </div>
@@ -123,9 +119,6 @@
                 <!--</div>-->
                 <a class="trip_btn button button-small button-outline"
                    ng-click="viewInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
-                <a class="trip_btn button-small botton-outline">
-                    管理票据
-                </a>
             </div>
 
             <div ng-if="item.status == EPlanStatus.NO_BUDGET">

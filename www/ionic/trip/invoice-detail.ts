@@ -5,7 +5,7 @@ import {Model} from "sequelize";
 var API = require('common/api');
 var msgbox = require('msgbox');
 
-export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate, ngModalDlg){
+export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate, ngModalDlg, City){
     //////绑定上传url
     require("./invoice-detail.scss");
     let authDataStr = window['getAuthDataStr']();
@@ -36,10 +36,10 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     $scope.invoices = formatInvoice(invoices);
     $ionicSlideBoxDelegate.update();
     if(tripDetail.type == EInvoiceType.HOTEL){
-        tripDetail.h_city = await API.place.getCityInfo({cityCode: tripDetail.city})
+        tripDetail.h_city = await City.getCity(tripDetail.city);
     }else{
-        tripDetail.a_city = await API.place.getCityInfo({cityCode: tripDetail.arrivalCity});
-        tripDetail.d_city = await API.place.getCityInfo({cityCode: tripDetail.deptCity});
+        tripDetail.a_city = await City.getCity(tripDetail.arrivalCity);
+        tripDetail.d_city = await City.getCity(tripDetail.deptCity);
     }
 
     $scope.tripDetail = tripDetail;

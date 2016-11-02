@@ -15,13 +15,14 @@ require.extensions[".ts"] = function(){};
 //run('./kepeng/sqltype.test');
 //run('./kepeng/model.test');
 //run('./kepeng/model-cluster.test');
-run('./kepeng/scrub.test');
+//run('./kepeng/scrub.test');
 //run('./kepeng/html2pdf.test');
+run('./kepeng/ctrip.test');
 
 function run(name){
     var file = require.resolve(name);
     if(/\.ts$/.test(file)){
-        require('common/node_ts').install(true);
+        require('common/node_ts').install(false);
     }
     var func = require(name);
     if(typeof func !== 'function')

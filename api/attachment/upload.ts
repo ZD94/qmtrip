@@ -14,6 +14,16 @@ module.exports = function(app) {
         cache: false,
         timeout: 180000,
     }));
+    app.get("/attachment/temp/:id", function(req, res, next) {
+        let id = req.params.id;
+        return requestProxy({
+            url: config.hosts.main.www + '/attachment/temp/' + id ,
+            reqAsBuffer: true,
+            cache: false,
+            timeout: 180000,
+        })(req, res, next);
+    });
+
     app.get("/attachments/:id", getPublicFile);
     //app.post('/upload/ajax-upload-file', uploadActionFile);
     //app.get('/download/excle-file/:fileName', downloadExcle);
@@ -35,36 +45,3 @@ async function getPublicFile(req, res, next) {
     res.set("Content-Type", cacheFile.type);
     return res.sendFile(cacheFile.file);
 }
-
-/*
-function downloadExcle(req, res, next) {
-    req.clearTimeout();
-    var fileName = req.params.fileName;
-    var filePath = config.upload.tmpDir + "/" + fileName;
-    if(fileName.indexOf('template') != -1) {
-        filePath = config.template.file + "/" + fileName;
-    }
-    fs.exists(filePath, function(exists) {
-        if(!exists) {
-            res.send("文件不存在");
-        }
-    });
-    fs.readFile(filePath, function(err, data) {
-        res.writeHead(200, {
-            'Content-Type': "application/vnd.ms-excel",
-            'Content-Disposition': 'attachment; filename="' + fileName + '"'
-        });
-        res.write(data);
-        res.end();
-        if(fileName.indexOf('template') == -1) {
-            fs.exists(filePath, function(exists) {
-                if(exists) {
-                    fs.unlink(filePath);
-                    console.log("删除临时文件");
-                }
-            });
-        }
-    })
-}
-*/
-

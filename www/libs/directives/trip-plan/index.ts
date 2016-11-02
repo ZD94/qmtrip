@@ -116,7 +116,7 @@ angular
                 item: '=',
                 remark: '@'
             },
-            controller: async function($scope, $ionicPopup) {
+            controller: async function($scope, $ionicPopup, $stateParams, Models, City) {
                 //设置上传路径
                 let auth_data: any = $storage.local.get("auth_data");
                 let url = '/upload/ajax-upload-file?type=image';
@@ -139,16 +139,13 @@ angular
                 }
                 $scope.days = 1;
                 $scope.subsidyDays = 1;
-                console.info($scope.item)
                 if ($scope.item instanceof TripDetailHotel) {
                     $scope.days = moment($scope.item.checkOutDate).diff(moment($scope.item.checkInDate), 'days');
                 } else if ($scope.item instanceof TripDetailSubsidy) {
                     $scope.subsidyDays = moment($scope.item.endDateTime).diff(moment($scope.item.startDateTime), 'days') + 1;
                 } else if ($scope.item instanceof TripDetailTraffic) {
-                    API.require("place")
-                    await API.onload();
-                    let deptCity = await API.place.getCityInfo({cityCode: $scope.item.deptCity});
-                    let arrivalCity = await API.place.getCityInfo({cityCode: $scope.item.arrivalCity});
+                    let deptCity = await City.getCity($scope.item.deptCity);
+                    let arrivalCity = await City.getCity($scope.item.arrivalCity);
 
                     $scope.item.deptCity = deptCity ? deptCity.name: '未知';
                     $scope.item.arrivalCity = arrivalCity ? arrivalCity.name : '未知';
@@ -166,6 +163,11 @@ angular
                 $scope.reserve = function(id){
                     window.location.href="#/trip/reserve?detailId="+id;
                 }
+                //对于当前日期及行程出发日期的判断
+                let tripPlanId = $stateParams.tripid;
+                let tripPlan = await Models.tripPlan.get(tripPlanId);
+                let isBeforeStartTime = moment().isBefore(tripPlan.startAt);
+                $scope.isBeforeStartTime = isBeforeStartTime;
                 $scope.item.done = async function(ret) {
                     API.require('tripPlan');
                     await API.onload();

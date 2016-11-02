@@ -184,6 +184,16 @@ class ApiPlace {
                 return new AirCompany(airCompany)
             })
     }
+
+    /**
+     * 获取全部城市信息
+     * @param params
+     * @returns {any}
+     */
+    static getAllCities(params: {type: number}) :Promise<Place> {
+        if (!params || !params.type) params.type = 2;
+        return API.place.getAllCities(params);
+    }
 }
 
 export= ApiPlace

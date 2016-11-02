@@ -64,7 +64,7 @@ export default async function main(){
 
     //console.log(Sequelize.Instance.prototype);
     //console.log(agency.__proto__);
-    console.log(Sequelize.Instance.prototype === token.target.__proto__.__proto__);
+    console.log(Sequelize.Instance['prototype'] === token.target.__proto__.__proto__);
 
     var json = scrubber.scrub.call(tmp, token);
 
