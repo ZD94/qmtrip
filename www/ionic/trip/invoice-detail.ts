@@ -1,11 +1,12 @@
 import {ETripType, EPlanStatus, EInvoiceType, EInvoiceFeeTypes, EPayType} from 'api/_types/tripPlan';
 import * as path from 'path';
+import {ImgTemplateController} from './img-template';
 import moment = require('moment');
 import {Model} from "sequelize";
 var API = require('common/api');
 var msgbox = require('msgbox');
 
-export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate, ngModalDlg, City){
+export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate, ngModalDlg, City, $ionicModal){
     //////绑定上传url
     require("./invoice-detail.scss");
     let authDataStr = window['getAuthDataStr']();
@@ -21,7 +22,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
                 img = img+'?authstr='+authDataStr;
                 invoice.imgUrl = img;
             }else{
-                invoice.imgUrl = 'ionic/images/logo_write10.png';
+                invoice.imgUrl = 'ionic/images/add_img.png';
             }
             invoice.edit = false;
             return invoice;
@@ -90,14 +91,6 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
             $scope.previewUrl = previewUrl;
             console.info(previewUrl);
             $scope.$apply();
-            // uploadInvoice(tripDetail, fileId,async function (err, result) {
-            //     if (err) {
-            //         alert(err.msg ? err.msg : err);
-            //         return;
-            //     }
-            //     var newdetail = await Models.tripDetail.get($stateParams.detailId);
-            //     $scope.invoice = newdetail;
-            // });
         }
     }
 
@@ -111,32 +104,26 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         var tripPlan = tripDetail.tripPlan;
         window.location.href = "#/trip/list-detail?tripid="+tripPlan.id;
     }
+    //查看票据
+    $scope.imgView = async function(imgUrl){
+        // $ionicModal.fromTemplateUrl('ionic/trip/img-template.html', {
+        //     scope: $scope,
+        //     animation: 'fade-in'
+        // }).then(function(result){
+        //     $scope.imgUrl = imgUrl;
+        //     $scope.imgModal = result;
+        //     $scope.imgModal.show();
+        // })
+        let imgView = await ngModalDlg.createDialog({
+            parent: $scope,
+            scope: {imgUrl},
+            animation: 'fade-in',
+            template: require('./img-template.html'),
+            controller: ImgTemplateController
+        })
+        console.info(imgView)
+    }
 
-    // $scope.slideChange = function($index){
-    //     $ionicPopup.show({
-    //         title:'提示',
-    //         template: '确定不保存就离开吗?',
-    //         scope: $scope,
-    //         buttons:[
-    //             {
-    //                 text:'取消',
-    //                 onTap: function(){
-    //                     console.info('取消')
-    //                     $scope.currentSlide = 0;
-    //                     console.info($scope.currentSlide);
-    //                     $ionicSlideBoxDelegate.slide(2);
-    //                 }
-    //             },
-    //             {
-    //                 text:'确定',
-    //                 type: 'button-positive',
-    //                 onTap: function(){
-    //                     console.info('确定')
-    //                 }
-    //             }
-    //         ]
-    //     })
-    // }
     //start 修改票据button事件
     $scope.editInvoice = false;
     $scope.editNow = function(invoice){
@@ -176,6 +163,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     }
     $scope.cancelChanges = function(invoice){
         invoice.edit = false;
+        $scope.previewUrl = null;
         $ionicSlideBoxDelegate.enableSlide(true);
     }
 
@@ -228,6 +216,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         $scope.invoices = formatInvoice(await tripDetail.getInvoices());
         $ionicSlideBoxDelegate.update();
         $scope.select_menu = true;
+        $scope.previewUrl = null;
         $scope.newInvoice = {
             totalMoney: '',
             invoiceDateTime: undefined,
@@ -237,6 +226,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         }
     }
     $scope.backToChooese = function(){
+        $scope.previewUrl = null;
         $scope.select_menu = true;
     }
     //end 创建新票据button事件
