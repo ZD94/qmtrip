@@ -29,7 +29,7 @@
             <ion-slide  ng-repeat="invoice in invoices track by $index">
                 <div class="invoice-form" ng-if="!invoice.edit">
                     <div class="invoice-img">
-                        <img ng-src="{{invoice.imgUrl}}">
+                        <img ng-src="{{invoice.imgUrl}}" ng-click="imgView(invoice.imgUrl)">
                         <div>
                             <span class="item-tit">金额</span>
                             <h3>{{invoice.totalMoney}}</h3>
@@ -136,8 +136,9 @@
                 <div class="addInvoice invoice-form invoice-edit" ng-if="!select_menu">
                     <div class="invoice-img">
                         <div class="invoice-img-min" ng-uploader="" accept="image/*" url="uploadUrl" done="invoicefuc.done">
-                            <img src="../../ionic/images/logo_write10.png">
-                            <a class="button button-positive">点击上传</a>
+                            <img ng-if="previewUrl" ng-src="{{previewUrl}}">
+                            <img ng-if="!previewUrl" src="ionic/images/add_img.png">
+                            <a ng-if="previewUrl" class="button button-positive">点击重传</a>
                         </div>
                         <div>
                             <span class="item-tit">金额</span>

@@ -28,6 +28,29 @@ $z-index-popup: 100;
 // Include all of Ionic
 @import "../../../common/vendor/ionic/scss/ionic";
 
+// fade in from opacity, used for modals
+// -------------------------------
+
+.fade-in {
+  opacity: 0;
+}
+.fade-in.ng-enter,
+.fade-in > .ng-enter {
+  -webkit-transition: all cubic-bezier(.1, .7, .1, 1) 400ms;
+  transition: all cubic-bezier(.1, .7, .1, 1) 400ms;
+}
+.fade-in.ng-enter-active,
+.fade-in > .ng-enter-active {
+  opacity: 1;
+}
+
+.fade-in.ng-leave,
+.fade-in > .ng-leave {
+  -webkit-transition: all ease-in-out 250ms;
+  transition: all ease-in-out 250ms;
+}
+
+
 html {
   width: 100%;
   height: 100%;

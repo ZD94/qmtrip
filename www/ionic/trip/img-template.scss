@@ -1,0 +1,15 @@
+.imgPreview{
+  background: none;
+  opacity: 0;
+  .scroll-content{
+    display: flex;
+    align-items: center;
+    .scroll{
+      padding: 10px;
+      width: 100%;
+    }
+    canvas{
+      width: 100%;
+    }
+  }
+}

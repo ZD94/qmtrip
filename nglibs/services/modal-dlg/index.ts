@@ -7,6 +7,7 @@ interface DialogOptions{
     scope: any;
     parent: any;
     template: string;
+    animation?: string;
     controller: Function
     notHideOnConfiom?: boolean
 }
@@ -17,11 +18,11 @@ class ngModalDlg {
     }
 
     createDialog(options: DialogOptions) {
-        var {scope, parent, template, controller, notHideOnConfiom} = options;
+        var {scope, parent, template, controller, notHideOnConfiom , animation} = options;
         return new Promise((resolve, reject) => {
             let modal = this.$ionicModal.fromTemplate(template, {
                 scope: parent,
-                animation: 'slide-in-up',
+                animation: animation || 'slide-in-up',
                 focusFirstInput: false
             });
             let $scope = modal.scope;

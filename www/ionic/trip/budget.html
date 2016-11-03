@@ -19,10 +19,16 @@
                 <!--</form>-->
 
                 <ion-list class="jl_projectinfo">
-                    <ion-item class="project_tit">{{trip.reason || trip.reasonName}}</ion-item>
+                    <ion-item class="project_tit">{{trip.beginDate| date: 'MM-dd'}} 至 {{trip.endDate | date: 'MM-dd'}}
+                        <span style="padding-left: 13px">{{trip.destinationPlaceName}} - {{trip.originPlaceName}}</span>
+                    </ion-item>
                     <ion-item class="project_cont">
-                        <p ng-if="trip && trip.beginDate">{{trip.beginDate| date: 'yyyy-MM-dd'}} 至 {{trip.endDate | date: 'yyyy-MM-dd'}}</p>
-                        <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{totalPrice == -1 ? '暂无预算' : (totalPrice| currency: '')}}</span>{{totalPrice == -1 ? '' : '元'}}</p>
+                        <p ng-if="trip && trip.beginDate"><i class="fa fa-flag-o">
+                            </i>&nbsp;{{trip.reason || trip.reasonName}}</p>
+                        <p class="totalBudget"  style="text-align: center">
+                            <span>总预算&nbsp;<i class="icon ion-help-circled"></i></span>
+                            <span>{{totalPrice == -1 ? '暂无预算' : (totalPrice| currency_int)}}</span>{{totalPrice == -1 ? '' : '元'}}
+                        </p>
                     </ion-item>
                 </ion-list>
 
@@ -30,54 +36,63 @@
                     <a ng-click="reportBudgetError()" >预算不合理?我要报错</a>
                 </div>
                 <ion-list>
-                    <div ng-repeat="budget in budgets">
+                    <div ng-repeat="budget in budgets" class="ta-detail-item">
                         <ion-item class="item-divider">
                             <span ng-if='budget.tripType == ETripType.OUT_TRIP'>去程交通</span>
                             <span ng-if='budget.tripType == ETripType.BACK_TRIP'>回程交通</span>
                             <span ng-if='budget.tripType == ETripType.HOTEL'>住宿</span>
                             <span ng-if='budget.tripType == ETripType.SUBSIDY'>补助</span>
-                            <span style="float: right">{{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')}}{{budget.price == -1 ? '' : '元'}}</span>
+                            <!--<span style="float: right">{{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')}}{{budget.price == -1 ? '' : '元'}}</span>-->
                         </ion-item>
+                        <ion-item>
+                            <div ng-if="budget.tripType == ETripType.BACK_TRIP">
+                                <span>{{trip.endDate | date: 'MM-dd'}}</span>
+                                <span class="spanRight">{{budget.price == -1 ? '暂无预算' : (budget.price| currency_int)+'元'}}</span>
+                                <br/>
+                                {{trip.destinationPlaceName}}
+                                &nbsp;
+                                <i ng-if='budget.type == EInvoiceType.PLANE' class="icon ion-plane"></i>
+                                <i ng-if='budget.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
+                                <i ng-if='budget.type == EInvoiceType.HOTEL' class="icon ion-home"></i>
+                                &nbsp;
+                                {{trip.originPlaceName}}
+                                <span class="spanRight right-budget">
+                                    <span>{{budget.type == EInvoiceType.TRAIN ? budget.cabinClass : (MTxPlaneLevel[budget.cabinClass ]? MTxPlaneLevel[budget.cabinClass] : "")}}</span>
+                                    <span ng-if="budget.discount && budget.cabinClass == 'Economy'">{{budget.discount}}</span>
+                                </span>
+                            </div>
 
-                        <ion-item ng-if="budget.tripType == ETripType.BACK_TRIP">
-                            <span>{{trip.endDate | date: 'MM-dd'}}</span>
-                            {{trip.destinationPlaceName}}
-                            &nbsp;
-                            <i ng-if='budget.type == EInvoiceType.PLANE' class="icon ion-plane"></i>
-                            <i ng-if='budget.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
-                            <i ng-if='budget.type == EInvoiceType.HOTEL' class="icon ion-home"></i>
-                            &nbsp;
-                            {{trip.originPlaceName}}
-                            <br/> {{budget.type == EInvoiceType.TRAIN ? budget.cabinClass : (MTxPlaneLevel[budget.cabinClass ]? MTxPlaneLevel[budget.cabinClass] : "")}}
-                            <br/>{{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')+'元'}}
-                            <br/><span ng-if="budget.discount && budget.cabinClass == 'Economy'">折扣：{{budget.discount}}</span>
-                        </ion-item>
+                            <div ng-if="budget.tripType == ETripType.HOTEL">
+                                <span>{{trip.beginDate | date: 'MM-dd'}}至{{trip.endDate | date: 'MM-dd'}}(共{{budget.duringDays}}天)</span>
+                                <span class="spanRight">{{budget.price| currency_int}}元</span>
+                                <br/>
+                                {{trip.destinationPlaceName}}<span ng-if="trip.hotelName">&nbsp;{{trip.hotelName}}附近</span>
+                                <span class="spanRight right-budget">{{budget.price == -1 ? '暂无预算' : (budget.price /budget.duringDays| currency_int)+'元/天'}}</span>
+                            </div>
 
-                        <ion-item ng-if="budget.tripType == ETripType.HOTEL">
-                            <span>{{trip.beginDate | date: 'MM-dd'}}至{{trip.endDate | date: 'MM-dd'}} 共{{budget.duringDays}}天</span>
-                            <br/>
-                            {{trip.destinationPlaceName}}<span ng-if="trip.hotelName">&nbsp;{{trip.hotelName}}附近</span>
-                            <br>{{budget.price == -1 ? '暂无预算' : (budget.price /budget.duringDays | currency: '')+'元/天'}}
-                        </ion-item>
+                            <div ng-if="budget.tripType == ETripType.SUBSIDY">
+                                <span>{{trip.beginDate | date: 'MM-dd'}}至{{trip.endDate | date: 'MM-dd'}}(共{{budget.duringDays}}天)</span>
+                                <span class="spanRight">{{budget.price| currency_int}}元</span>
+                                <br/>
+                                <span class="spanRight right-budget">{{budget.price == -1 ? '暂无预算' : (budget.price/ budget.duringDays| currency_int)+'元/天'}}</span>
+                            </div>
 
-                        <ion-item ng-if="budget.tripType == ETripType.SUBSIDY">
-                            <span>{{trip.beginDate | date: 'MM-dd'}}至{{trip.endDate | date: 'MM-dd'}} 共{{budget.duringDays}}天</span>
-                            <br/>
-                            {{budget.price == -1 ? '暂无预算' : (budget.price/ budget.duringDays| currency: '')+'元/天'}}
-                        </ion-item>
-
-                        <ion-item ng-if="budget.tripType == ETripType.OUT_TRIP">
-                            <span>{{trip.beginDate | date: 'MM-dd'}}</span>
-                            {{trip.originPlaceName}}
-                            &nbsp;
-                            <i ng-if='budget.type == EInvoiceType.PLANE' class="icon ion-plane"></i>
-                            <i ng-if='budget.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
-                            &nbsp;
-                            {{trip.destinationPlaceName}}
-                            <br/> {{budget.type == EInvoiceType.TRAIN ? budget.cabinClass : (MTxPlaneLevel[budget.cabinClass ]? MTxPlaneLevel[budget.cabinClass] : "")}}
-                            <!--{{MTxPlaneLevel[budget.cabinClass]?MTxPlaneLevel[budget.cabinClass]:""}}-->
-                            <br/>{{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')+'元'}}
-                            <br/><span ng-if="budget.discount  && budget.cabinClass == 'Economy'">折扣：{{budget.discount}}</span>
+                            <div ng-if="budget.tripType == ETripType.OUT_TRIP">
+                                <span>{{trip.beginDate | date: 'MM-dd'}}</span>
+                                <span class="spanRight">{{budget.price == -1 ? '暂无预算' : (budget.price| currency_int)+'元'}}</span>
+                                <br/>
+                                {{trip.originPlaceName}}
+                                &nbsp;
+                                <i ng-if='budget.type == EInvoiceType.PLANE' class="icon ion-plane"></i>
+                                <i ng-if='budget.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
+                                &nbsp;
+                                {{trip.destinationPlaceName}}
+                                <span class="spanRight right-budget">
+                                    <span>{{budget.type == EInvoiceType.TRAIN ? budget.cabinClass : (MTxPlaneLevel[budget.cabinClass ]? MTxPlaneLevel[budget.cabinClass] : "")}}</span>
+                                    <!--{{MTxPlaneLevel[budget.cabinClass]?MTxPlaneLevel[budget.cabinClass]:""}}-->
+                                    <span ng-if="budget.discount  && budget.cabinClass == 'Economy'">{{budget.discount}}</span>
+                                </span>
+                            </div>
                         </ion-item>
                     </div>
                 </ion-list>

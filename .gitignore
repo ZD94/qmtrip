@@ -8,6 +8,7 @@ node_modules
 /www/script/libs
 /www/attachments
 /doc
+/www/upload
 /config/config.local.json
 /public/*/css/*.css
 /public/*/scss/*.css
