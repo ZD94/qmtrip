@@ -17,7 +17,8 @@ import _ = require('lodash');
 import {requireParams, clientExport} from 'common/api/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
-    TripApprove, EApproveStatus, EApproveResult, EApproveResult2Text, MTxPlaneLevel, getECabinByName, getNameByECabin
+    TripApprove, EApproveStatus, EApproveResult, EApproveResult2Text, MTxPlaneLevel, getECabinByName, getNameByECabin,
+    EPayType
 } from "api/_types/tripPlan";
 import {Models} from "api/_types";
 import {FindResult, PaginateInterface} from "common/model/interface";
@@ -792,60 +793,6 @@ class TripPlanModule {
     //     return true;
     // }
 
-    @clientExport
-    @requireParams(['tripDetailId', 'pictureFileId'])
-    @modelNotNull('tripDetail', 'tripDetailId')
-    static async uploadInvoice(params): Promise<boolean> {
-        let staff = await Staff.getCurrent();
-        let tripDetail = await Models.tripDetail.get(params.tripDetailId);
-
-        if (tripDetail.status != EPlanStatus.WAIT_UPLOAD && tripDetail.status != EPlanStatus.WAIT_COMMIT && tripDetail.status != EPlanStatus.AUDIT_NOT_PASS) {
-            throw {code: -3, msg: '该出差计划不能上传票据，请检查出差计划状态'};
-        }
-
-        let tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
-
-        if(tripPlan.status != EPlanStatus.WAIT_UPLOAD && tripDetail.status != EPlanStatus.WAIT_COMMIT && tripDetail.status != EPlanStatus.AUDIT_NOT_PASS) {
-            throw {code: -3, msg: '该出差计划不能上传票据，请检查出差计划状态'};
-        }
-
-        if (!_.isArray(params.pictureFileId)) {
-            params.pictureFileId = [params.pictureFileId];
-        }
-        //插入所有票据记录
-        let ps = params.pictureFileId.map( (fileid) => {
-            let tripDetailInvoice = Models.tripDetailInvoice.create({
-                type: params.type,
-                pictureFileId: fileid,
-                tripDetailId: params.tripDetailId,
-                totalMoney: params.budgetMoney,
-                remark: params.remark,
-            });
-            return tripDetailInvoice.save();
-        });
-        await Promise.all(ps);
-
-        tripDetail.status = EPlanStatus.WAIT_COMMIT;
-        await tripDetail.save();
-        //更新TripPlan状态
-        var details = await Models.tripDetail.find({where: {tripPlanId: tripPlan.id, status: EPlanStatus.WAIT_UPLOAD,
-            id: {$ne: tripDetail.id}, type: [ETripType.BACK_TRIP, ETripType.HOTEL, ETripType.OUT_TRIP]}});
-        if(!details || details.length == 0) {
-            tripPlan.status = EPlanStatus.WAIT_COMMIT;
-        }
-        await tripPlan.save();
-        //日志
-        let tripType = '';
-        switch (tripDetail.type) {
-            case ETripType.OUT_TRIP: tripType = '去程'; break;
-            case ETripType.BACK_TRIP: tripType = '回程'; break;
-            case ETripType.HOTEL: tripType = '酒店'; break;
-            default: break;
-        }
-        let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, tripDetailId: tripDetail.id, userId: staff.id, remark: `上传${tripType}发票`});
-        await log.save();
-        return true;
-    }
 
     /**
      * 提交计划单
@@ -2075,11 +2022,14 @@ class TripPlanModule {
         let tripDetailInvoice = Models.tripDetailInvoice.create(params);
         tripDetailInvoice = await tripDetailInvoice.save();
         let tripDetail = await Models.tripDetail.get(tripDetailInvoice.tripDetailId);
-        if (!tripDetail.expenditure) tripDetail.expenditure = 0;
-        tripDetail.expenditure += Number(tripDetailInvoice.totalMoney) || 0;
-        await tripDetail.save();
+        if (!tripDetail.expenditure) {
+            tripDetail.expenditure = 0;
+        }
+        await updateTripDetailExpenditure(tripDetail);
         return tripDetailInvoice;
     }
+
+
 
     @clientExport
     @requireParams(["id"], ['totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark', 'pictureFileId'])
@@ -2102,16 +2052,8 @@ class TripPlanModule {
         }
         tripDetailInvoice = await tripDetailInvoice.save()
 
-        //判断是否需要更新实际金额
-        if (oldMoney != newMoney) {
-            let tripDetail = await Models.tripDetail.get(tripDetailInvoice.tripDetailId);
-            if (!tripDetail.expenditure) tripDetail.expenditure = 0;
-            tripDetail.expenditure = tripDetail.expenditure - oldMoney + newMoney;
-            if (tripDetail.expenditure < 0 ) {
-                tripDetail.expenditure = 0;
-            }
-            await tripDetail.save();
-        }
+        let tripDetail = await Models.tripDetail.get(tripDetailInvoice.tripDetailId);
+        await updateTripDetailExpenditure(tripDetail);
         return tripDetailInvoice;
     }
 
@@ -2164,6 +2106,22 @@ async function getProjectByName(params) {
         let p = {name: params.name, createUser: params.userId, code: '', companyId: params.companyId};
         return Models.project.create(p).save();
     }
+}
+
+async function updateTripDetailExpenditure(tripDetail: TripDetail) {
+    //重新计算所有花费
+    let invoices = await Models.tripDetailInvoice.find({ where: {tripDetailId: tripDetail.id}});
+    let expenditure = 0;
+    let personalExpenditure = 0;
+    invoices.forEach( (v: TripDetailInvoice) => {
+        expenditure = Number(v.totalMoney);
+        if (v.payType == EPayType.PERSONAL_PAY) {
+            personalExpenditure = Number(v.totalMoney);
+        }
+    });
+    tripDetail.personalExpenditure = personalExpenditure;
+    tripDetail.expenditure = expenditure;
+    return tripDetail.save()
 }
 
 TripPlanModule._scheduleTask();
