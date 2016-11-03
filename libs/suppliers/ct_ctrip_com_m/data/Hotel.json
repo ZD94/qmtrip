@@ -1,0 +1,63 @@
+{
+  "Result": true,
+  "Response": {
+    "OrderDetailBase": {
+      "HotelName": "尚合公寓（深圳科技园店）",
+      "HotelDate": [
+        "2016-10-24",
+        "2016-10-25",
+        "(1晚)"
+      ],
+      "HotelRoomInfo": [
+        "行政大床房(内宾)",
+        1,
+        "无早"
+      ],
+      "HotelAddress": "华润城大冲新城花园-1栋805室",
+      "HotelTel": "0755-26605629",
+      "author": [
+        "宋亚军"
+      ],
+      "contact": {
+        "tel": "13911795755",
+        "email": "xiaochen_li@stratopgroup.com"
+      },
+      "Passenger": [
+        "李晓辰"
+      ],
+      "invoice": [],
+      "pay": "公司账户支付",
+      "AssureType": "无需担保",
+      "HotelSite": [
+        22.542092474378,
+        113.95299549455,
+        0
+      ],
+      "arriveTime": "23:59之前",
+      "HotelType": "M",
+      "isAmadeus": false,
+      "money": {
+        "aroundMoney": 226,
+        "aroundCurrency": "CNY",
+        "currency": "CNY",
+        "payType": 4,
+        "total": 226,
+        "room": [
+          {
+            "day": "2016-10-24",
+            "price": 226,
+            "breakfast": "无早",
+            "cashback": 0
+          }
+        ]
+      },
+      "OrderDate": "2016-10-22 12:31",
+      "OrderStatus": "已成交",
+      "Cost": [],
+      "CorpPayType": "public"
+    }
+  },
+  "LS": "4",
+  "OV": "15",
+  "Ver": "(function (a) { a.Map = { a: 4.000006, b: { zepto: 8403, wvjb: 8403, Frame: 8403, BookCommon: 8403, HomeCommon: 8403}} })(window);\n"
+}

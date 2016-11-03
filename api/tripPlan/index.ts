@@ -2002,7 +2002,11 @@ class TripPlanModule {
             where: {tripDetailId: options.where.tripDetailId},
         }
         if (options.limit) qs.limit = options.limit;
-        if (options.order) qs.order = options.order;
+        if (options.order) {
+            qs.order = options.order;
+        } else {
+            qs.order = [['created_at', 'asc']];
+        }
         let invoices = await Models.tripDetailInvoice.find(qs);
         let ids = invoices.map( (v) => {
             return v.id;
@@ -2152,9 +2156,9 @@ async function updateTripDetailExpenditure(tripDetail: TripDetail) {
     let expenditure = 0;
     let personalExpenditure = 0;
     invoices.forEach( (v: TripDetailInvoice) => {
-        expenditure = Number(v.totalMoney);
+        expenditure += Number(v.totalMoney);
         if (v.payType == EPayType.PERSONAL_PAY) {
-            personalExpenditure = Number(v.totalMoney);
+            personalExpenditure += Number(v.totalMoney);
         }
     });
     tripDetail.personalExpenditure = personalExpenditure;

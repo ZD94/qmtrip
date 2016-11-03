@@ -38,7 +38,7 @@
   },
   "upload":{
     "tmpDir": "${{ROOT_DIR}}/tmp/upload",
-    "publicDir": "${{ROOT_DIR}}/www/upload",
+    "publicDir": "${{ROOT_DIR}}/www/attachments",
     "privateDir": "${{ROOT_DIR}}/tmp/files"
   },
   "template":{

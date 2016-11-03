@@ -65,6 +65,12 @@ export enum ESourceType {
     RELATE_ORDER = 2
 }
 
+export enum EInvoiceStatus {
+    WAIT_AUDIT = 0,
+    AUDIT_PASS = 1,
+    AUDIT_FAIL = -1,
+}
+
 export * from './tripPlan'
 export * from './tripDetail'
 export * from './tripDetailInfo'
