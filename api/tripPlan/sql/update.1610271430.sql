@@ -2,7 +2,7 @@
 CREATE OR REPLACE FUNCTION trip_plan.handle_old_trip_detail_161027()
   RETURNS void AS
 $BODY$
-    DECLARE trip_detail_cursor CURSOR FOR SELECT * FROM trip_plan.trip_details;
+    DECLARE trip_detail_cursor CURSOR FOR SELECT * FROM trip_plan.trip_details ORDER BY trip_plan_id;
     DECLARE _cabin_int integer default 0;
     DECLARE _subsidy jsonb;
     DECLARE _has_first_day_subsidy boolean default true;
@@ -125,7 +125,7 @@ BEGIN
 	     END IF;
 	 END IF;
 
-         MOVE trip_detail_cursor;
+         --MOVE trip_detail_cursor;
     END LOOP;
 END$BODY$
   LANGUAGE plpgsql VOLATILE
