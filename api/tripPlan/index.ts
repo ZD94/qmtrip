@@ -18,7 +18,7 @@ import {requireParams, clientExport} from 'common/api/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
     TripApprove, EApproveStatus, EApproveResult, EApproveResult2Text, MTxPlaneLevel, getECabinByName, getNameByECabin,
-    EPayType, ESourceType, EInvoiceFeeTypes
+    EPayType, ESourceType, EInvoiceFeeTypes, EInvoiceStatus
 } from "api/_types/tripPlan";
 import {Models} from "api/_types";
 import {FindResult, PaginateInterface} from "common/model/interface";
@@ -2068,8 +2068,8 @@ class TripPlanModule {
             invoice.totalMoney = o.price;
             invoice.payType = o.parType;
             invoice.remark = o.desc;
-            invoice.type = o.orderType || EInvoiceFeeTypes.HOTEL;
-            invoice.status = 1;
+            invoice.type = o.orderType;
+            invoice.status = EInvoiceStatus.AUDIT_PASS;
             let iv =  await TripPlanModule.saveTripDetailInvoice(invoice);
             result.success.push({desc: o.desc, remark: '关联成功'});
             return o.id;
