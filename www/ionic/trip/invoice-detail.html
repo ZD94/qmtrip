@@ -23,9 +23,11 @@
             </div>
 
         </div>
-        <ion-slide-box class="item item-image" show-pager="true">
+        <ion-slide-box class="item item-image"
+                       show-pager="true"
+                       active-slide="0">
             <ion-slide  ng-repeat="invoice in invoices track by $index">
-                <div class="invoice-form" ng-if="!editInvoice">
+                <div class="invoice-form" ng-if="!invoice.edit">
                     <div class="invoice-img">
                         <img ng-src="{{invoice.imgUrl}}">
                         <div>
@@ -63,13 +65,14 @@
                     </div>
                     <div class="button-bar">
                         <a class="button button-outline button-calm" ng-click="deleteInvoice(invoice)">删除</a>
-                        <a class="button button-outline button-calm" ng-click="editNow()">修改</a>
+                        <a class="button button-outline button-calm" ng-click="editNow(invoice)">修改</a>
                     </div>
                 </div>
-                <div class="invoice-form invoice-edit" ng-if="editInvoice">
+                <div class="invoice-form invoice-edit" ng-if="invoice.edit">
                     <div class="invoice-img">
                         <div class="invoice-img-min" ng-uploader="" accept="image/*" url="uploadUrl" done="invoicefuc.done">
-                            <img ng-src="{{invoice.imgUrl}}">
+                            <img ng-if="previewUrl" ng-src="{{previewUrl}}">
+                            <img ng-if="!previewUrl" ng-src="{{invoice.imgUrl}}">
                             <a class="button button-positive">点击重传</a>
                         </div>
                         <div>
@@ -119,7 +122,7 @@
                         <textarea ng-model="invoice.remark"></textarea>
                     </div>
                     <div class="button-bar">
-                        <a class="button button-outline button-calm" ng-click="cancelChanges()">取消</a>
+                        <a class="button button-outline button-calm" ng-click="cancelChanges(invoice)">取消</a>
                         <a class="button button-outline button-calm" ng-click="saveChanges(invoice)">确认</a>
                     </div>
                 </div>

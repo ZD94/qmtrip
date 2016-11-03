@@ -27,7 +27,6 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
             return invoice;
         })
     }
-
     $scope.select_menu = true;
     var config = require('config');
     await config.$ready;
@@ -75,6 +74,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     $scope.invoicefuc = {
         title:'上传'+title + '发票',
         done: async function(response){
+            console.info(response);
             if(response.ret != 0){
                 console.error(response.errMsg);
                 $ionicPopup.alert({
@@ -83,10 +83,13 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
                 });
                 return;
             }
-            var fileId = response.fileId;
+            var fileId = (response.fileId && response.fileId.length) ? response.fileId[0] : '';
             $scope.fileId = fileId;
-            console.info(response);
-
+            let tempFile = response.tempFiles[fileId];
+            let previewUrl = 'attachment/temp/'+fileId+'?expireTime='+tempFile.expireTime+'&sign='+tempFile.sign;
+            $scope.previewUrl = previewUrl;
+            console.info(previewUrl);
+            $scope.$apply();
             // uploadInvoice(tripDetail, fileId,async function (err, result) {
             //     if (err) {
             //         alert(err.msg ? err.msg : err);
@@ -162,7 +165,12 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     }
     $scope.saveChanges = async function(invoice){
         invoice.edit = false;
-        invoice.save();
+        invoice.pictureFileId = $scope.fileId;
+        await invoice.save();
+        $scope.previewUrl = null;
+        let tripDetail = await Models.tripDetail.get($stateParams.detailId);
+        let invoices = await tripDetail.getInvoices();
+        $scope.invoices = formatInvoice(invoices);
         $ionicSlideBoxDelegate.enableSlide(true);
         // $scope.editInvoice = false;
     }

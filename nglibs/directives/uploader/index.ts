@@ -62,6 +62,7 @@ function ngUploader($loading, wxApi): any {
                 })
             }
             var fileIds = [];
+            var tempFiles = {};
             var progressPopup;
             var interval;
             uploader.onAfterAddingAll = async function(files) {
@@ -92,6 +93,7 @@ function ngUploader($loading, wxApi): any {
             };
             uploader.onSuccessItem  = function (file, response, status, headers) {
                 fileIds.push(response.fileId);
+                tempFiles[response.fileId] = response;
                 uploader.removeFromQueue(file);
             };
             uploader.onErrorItem  = function (file, response, status, headers) {
@@ -102,7 +104,8 @@ function ngUploader($loading, wxApi): any {
                 var obj = {
                     ret: 0,
                     errMsg: '',
-                    fileId: fileIds
+                    fileId: fileIds,
+                    tempFiles:tempFiles
                 };
                 if(uploader.queue.length > 0){
                     //msgbox.log('文件上传不成功:<br>'+uploader.queue.map((file)=>file.url).join('<br>'));
