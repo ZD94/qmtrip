@@ -183,6 +183,11 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     $scope.manual = function(){
         $scope.select_menu = false;
     }
+
+    $scope.linkOthers = function(){
+        window.location.href = "#/trip/select-supplier?detailId="+$stateParams.detailId;
+    }
+
     $scope.newInvoice = {
         totalMoney: '',
         invoiceDateTime: undefined,

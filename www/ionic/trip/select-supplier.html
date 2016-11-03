@@ -1,0 +1,11 @@
+<ion-view title="关联订单">
+    <ion-content padding="true" class="reserve">
+        <div class="list"  ng-repeat="supplier in suppliers">
+            <div class="item item-icon-right ctrip_business" ng-click="queryOrders(supplier.id)">
+                <img class="" ng-src="/attachments/{{supplier.logo}}" ng-if="supplier.logo">
+                {{supplier.name}}
+                <i class="icon ion-chevron-right"></i>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

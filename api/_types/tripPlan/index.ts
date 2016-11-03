@@ -47,7 +47,7 @@ export function getNameByECabin(key: ECabin) {
     return r;
 }
 
-export enum EInvoiceFeeTypes {
+export enum  EInvoiceFeeTypes {
     PLANET_TICKET = 1,
     TRAIN_TICKET = 2,
     CANCEL_TRAIN_TICKET = 3,
@@ -57,6 +57,11 @@ export enum EInvoiceFeeTypes {
 export enum EPayType {
     PERSONAL_PAY = 1,
     COMPANY_PAY = 2,
+}
+
+export enum ESourceType {
+    MANUALLY_ADD = 1,
+    RELATE_ORDER = 2
 }
 
 export * from './tripPlan'

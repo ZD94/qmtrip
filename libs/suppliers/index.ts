@@ -1,11 +1,13 @@
 
-import { WebRobot } from 'api/web_robot/index';
+import { WebRobot } from '../web_robot/index';
+import { EPayType } from 'api/_types/tripPlan';
 
 export interface SupplierOrder{
     id: string;
     price: number;
     date: Date;
     desc: string;
+    parType: EPayType;
 }
 
 export abstract class SupplierWebRobot extends WebRobot{

@@ -8,7 +8,7 @@ import {Values, Types} from "common/model/index";
 import {EPlanStatus, ETripType, TripPlan, EAuditStatus} from "./tripPlan";
 import {Field, Create, ResolveRef, Table} from "common/model/common";
 import {Models} from "../index";
-import {EInvoiceFeeTypes, EPayType} from "./index";
+import {EInvoiceFeeTypes, EPayType, ESourceType} from "./index";
 import {PaginateInterface} from "common/model/interface";
 
 
@@ -110,6 +110,18 @@ export class TripDetailInvoice extends ModelObject {
     @Field({type: Types.UUID})
     get tripDetailId() { return null}
     set tripDetailId(tripDetailId: string) {}
+
+    @Field({type: Types.UUID})
+    get accountId() { return null}
+    set accountId(accountId: string) {}
+
+    @Field({type: Types.UUID})
+    get orderId() { return null}
+    set orderId(orderId: string) {}
+
+    @Field({type: Types.INTEGER})
+    get sourceType() :ESourceType { return ESourceType.MANUALLY_ADD }
+    set sourceType(payType: ESourceType) {}
 
     @Field({type: Types.TEXT})
     get pictureFileId() : string { return null}
