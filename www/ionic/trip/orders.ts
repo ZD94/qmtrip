@@ -22,9 +22,9 @@ export async function OrdersController($scope,Models, $stateParams, $ionicPopup)
         console.info(selectId);
         var result = await currentStaff.relateOrders({detailId: $stateParams.detailId, orderIds: selectId, supplierId: $stateParams.supplierId});
         $scope.result = result;
-        if(result.failed.size == 0){
+        if(result.failed.length == 0){
             msgbox.log("绑定成功");
-            // window.location.href = "#/trip/list-detail?tripid=" + tripDetail.tripPlanId;
+            window.location.href = "#/trip/list-detail?tripid=" + tripDetail.tripPlanId;
         }else{
             $ionicPopup.alert({
                 title: '提示',
