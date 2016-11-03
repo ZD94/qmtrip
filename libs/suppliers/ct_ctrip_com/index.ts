@@ -76,6 +76,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                     id: 'ct_ctrip_com_'+item.OrderID,
                     price: item.Price,
                     date: new Date(item.StrJourneyDate.split('<br/>')[0]),
+                    persons: [],
                     desc: item.JourneyName || item.ProductName,
                     parType: item.CorpPayType == 'pub' ? EPayType.COMPANY_PAY : EPayType.PERSONAL_PAY
                 });

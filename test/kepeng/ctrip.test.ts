@@ -5,20 +5,30 @@ import { CookieJar } from 'request';
 import * as fs from 'fs';
 import requestPromise = require('request-promise');
 import request = require('request');
-import { getSupplier } from 'api/suppliers';
+import { getSupplier } from 'libs/suppliers';
 var iconv = require('iconv-lite');
 
+var account;
+var password;
 
-var account = '15210594467';
-var password = '123456lf';
-// var account = '13911795755';
-// var password = 'lsd920';
+var use = 1;
+
+switch(use){
+    case 0:
+        account = '15210594467';
+        password = '123456lf';
+        break;
+    case 1:
+        account = '13911795755'
+        password = 'lsd920';
+        break;
+}
 
 //requestPromise.debug = true;
 //require('request-debug')(requestPromise)
 
 export default async function main() {
-    let client = getSupplier('ct_ctrip_com');
+    let client = getSupplier('ct_ctrip_com_m');
     try{
         await client.login({username:account, password});
         let list = await client.getOrderList();

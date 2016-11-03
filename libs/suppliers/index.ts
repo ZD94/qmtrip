@@ -6,6 +6,7 @@ export interface SupplierOrder{
     id: string;
     price: number;
     date: Date;
+    persons: string[];
     desc: string;
     parType: EPayType;
 }
@@ -30,6 +31,7 @@ let suppliers: {
 function initSuppliers(){
     suppliers = {
         ct_ctrip_com: require('./ct_ctrip_com'),
+        ct_ctrip_com_m: require('./ct_ctrip_com_m'),
     }
 }
 
