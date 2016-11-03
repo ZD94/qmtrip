@@ -2063,14 +2063,9 @@ class TripPlanModule {
         let {id } = params;
         let tripDetailInvoice = await Models.tripDetailInvoice.get(id);
         let totalMoney = tripDetailInvoice.totalMoney;
-
-        if (totalMoney > 0 ) {
-            let tripDetail = await Models.tripDetail.get(tripDetailInvoice.tripDetailId);
-            if (!tripDetail.expenditure) tripDetail.expenditure = 0;
-            tripDetail.expenditure = tripDetail.expenditure - totalMoney;
-            await tripDetail.save();
-        }
         await tripDetailInvoice.destroy();
+        let tripDetail = await Models.tripDetail.get(tripDetailInvoice.id);
+        await updateTripDetailExpenditure(tripDetail);
         return true;
     }
 
