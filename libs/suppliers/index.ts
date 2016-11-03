@@ -1,13 +1,16 @@
 
 import { WebRobot } from '../web_robot/index';
-import { EPayType } from 'api/_types/tripPlan';
+import { EPayType, EInvoiceFeeTypes } from 'api/_types/tripPlan';
 
 export interface SupplierOrder{
     id: string;
     price: number;
     date: Date;
+    persons: string[];
     desc: string;
+    orderType: EInvoiceFeeTypes;
     parType: EPayType;
+    flightNumber?: string;
 }
 
 export abstract class SupplierWebRobot extends WebRobot{
@@ -30,6 +33,7 @@ let suppliers: {
 function initSuppliers(){
     suppliers = {
         ct_ctrip_com: require('./ct_ctrip_com'),
+        ct_ctrip_com_m: require('./ct_ctrip_com_m'),
     }
 }
 

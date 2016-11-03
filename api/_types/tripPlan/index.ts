@@ -51,7 +51,8 @@ export enum  EInvoiceFeeTypes {
     PLANET_TICKET = 1,
     TRAIN_TICKET = 2,
     CANCEL_TRAIN_TICKET = 3,
-    CANCEL_PLANET_TICKET = 4
+    CANCEL_PLANET_TICKET = 4,
+    HOTEL = 5
 }
 
 export enum EPayType {
@@ -62,6 +63,12 @@ export enum EPayType {
 export enum ESourceType {
     MANUALLY_ADD = 1,
     RELATE_ORDER = 2
+}
+
+export enum EInvoiceStatus {
+    WAIT_AUDIT = 0,
+    AUDIT_PASS = 1,
+    AUDIT_FAIL = -1,
 }
 
 export * from './tripPlan'

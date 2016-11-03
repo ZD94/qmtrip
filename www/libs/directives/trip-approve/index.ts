@@ -6,7 +6,6 @@
 import angular = require("angular");
 import moment = require('moment');
 import {EApproveStatus, EApproveStatus2Text, EInvoiceType, ETripType, MTxPlaneLevel} from "api/_types/tripPlan";
-require("./trip-approve.scss");
 angular
     .module('nglibs')
     .directive('tripApprove', function(){

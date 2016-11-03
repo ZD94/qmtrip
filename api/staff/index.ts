@@ -1521,8 +1521,6 @@ class StaffModule{
         {if: condition.isStaffSupplierInfoOwner("0.id")}
     ])
     static async updateStaffSupplierInfo(params) : Promise<StaffSupplierInfo>{
-        console.info("====================lllllllllllluuuuuuuuuuu");
-        console.info(params,"====================lllllllllllluuuuuuuuuuu");
         var id = params.id;
         var sp = await Models.staffSupplierInfo.get(id);
         for(var key in params){

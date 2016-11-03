@@ -3,7 +3,6 @@
         <ion-list>
             <ion-item>
                 <img class="" ng-src="/attachments/{{supplier.logo}}" ng-if="supplier.logo">
-                <input type="button" value="确认" ng-click="selectOrders()">
             </ion-item>
             <ion-checkbox ng-repeat="order in orders"
                           ng-model="order.checked"
@@ -11,8 +10,13 @@
                 <p>{{order.date | date: 'yyyy-MM-dd HH:mm'}}</p>
                 <h2>{{order.desc}}</h2>
                 <p>{{order.price | currency: ''}}元</p>
-                <p>{{order.parType==EPayType.COMPANY_PAY?"公司账户支付":"个人账户支付"}}</p>
+                <p>{{order.orderType == EInvoiceFeeTypes.HOTEL ? '入住人' : '出行人'}}：{{order.persons.join()}}</p>
+                <p ng-if="order.orderType == EInvoiceFeeTypes.PLANET_TICKET">航班号：{{order.flightNumber}}</p>
+                <p>{{order.parType == EPayType.COMPANY_PAY ? "公司账户支付" : "个人账户支付"}}</p>
             </ion-checkbox>
         </ion-list>
+        <div>
+            <a id="page1-button26" class="button button-positive  button-block" ng-click="selectOrders()">完成</a>
+        </div>
     </ion-content>
 </ion-view>

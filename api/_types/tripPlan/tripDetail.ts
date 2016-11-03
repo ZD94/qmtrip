@@ -8,7 +8,7 @@ import {Values, Types} from "common/model/index";
 import {EPlanStatus, ETripType, TripPlan, EAuditStatus} from "./tripPlan";
 import {Field, Create, ResolveRef, Table} from "common/model/common";
 import {Models} from "../index";
-import {EInvoiceFeeTypes, EPayType, ESourceType} from "./index";
+import {EInvoiceFeeTypes, EPayType, ESourceType, EInvoiceStatus} from "./index";
 import {PaginateInterface} from "common/model/interface";
 
 
@@ -152,8 +152,8 @@ export class TripDetailInvoice extends ModelObject {
 
     //审核状态
     @Field({type: Types.INTEGER})
-    get status() { return 0}
-    set status(status: number) {}
+    get status() : EInvoiceStatus { return EInvoiceStatus.WAIT_AUDIT}
+    set status(status: EInvoiceStatus) {}
 
     //审核失败时备注
     @Field({type: Types.TEXT})

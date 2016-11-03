@@ -43,6 +43,11 @@ export class Supplier extends ModelObject{
     get isInUse(): boolean { return true; }
     set isInUse(val: boolean) {}
 
+    // 拉取关联订单使用的供应商key
+    @Field({type: Types.STRING})
+    get supplierKey(): string { return null; }
+    set supplierKey(val: string) {}
+
     //所属企业
     @ResolveRef({type: Types.UUID}, Models.company)
     get company(): Company { return null; }
