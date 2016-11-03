@@ -193,7 +193,7 @@ export class Staff extends ModelObject implements Account {
     @RemoteCall()
     async getOrders(params: {supplierId: string}): Promise<SupplierOrder[]> {
         let supplier = await Models.supplier.get(params.supplierId);
-        let client = getSupplier("ct_ctrip_com");
+        let client = getSupplier("ct_ctrip_com_m");
         let staffSupplierInfo = await this.getOneStaffSupplierInfo({supplierId: params.supplierId});
         let loginInfo = JSON.parse(staffSupplierInfo.loginInfo);
         try{
@@ -206,7 +206,7 @@ export class Staff extends ModelObject implements Account {
         }
     }
 
-    async relateOrders(params: {detailId: string,orderIds: string[]}): Promise<SupplierOrder[]> {
+    async relateOrders(params: {detailId: string, supplierId: string, orderIds: string[]}): Promise<any> {
         if(!this.isLocal){
             API.require('tripPlan');
             await API.onload();

@@ -1,7 +1,12 @@
 
 import { SupplierWebRobot, SupplierOrder } from '../index';
-import { EPayType } from 'api/_types/tripPlan';
+import { EPayType, EInvoiceFeeTypes } from 'api/_types/tripPlan';
 
+var MOrderType = {
+    "F": EInvoiceFeeTypes.PLANET_TICKET,
+    "H": EInvoiceFeeTypes.HOTEL,
+    "T": EInvoiceFeeTypes.TRAIN_TICKET
+}
 var iconv = require('iconv-lite');
 
 export default class SupplierCtripCT extends SupplierWebRobot{
@@ -78,6 +83,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                     date: new Date(item.StrJourneyDate.split('<br/>')[0]),
                     persons: [],
                     desc: item.JourneyName || item.ProductName,
+                    orderType: MOrderType[item.OrderType],
                     parType: item.CorpPayType == 'pub' ? EPayType.COMPANY_PAY : EPayType.PERSONAL_PAY
                 });
             }

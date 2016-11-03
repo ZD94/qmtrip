@@ -18,7 +18,7 @@ import {requireParams, clientExport} from 'common/api/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
     TripApprove, EApproveStatus, EApproveResult, EApproveResult2Text, MTxPlaneLevel, getECabinByName, getNameByECabin,
-    EPayType
+    EPayType, ESourceType, EInvoiceFeeTypes
 } from "api/_types/tripPlan";
 import {Models} from "api/_types";
 import {FindResult, PaginateInterface} from "common/model/interface";
@@ -2017,7 +2017,7 @@ class TripPlanModule {
     }
 
     @clientExport
-    @requireParams(['tripDetailId', 'totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark'], ['id', 'pictureFileId'])
+    @requireParams(['tripDetailId', 'totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark'], ['id', 'pictureFileId', 'accountId', 'orderId', 'sourceType','status'])
     static async saveTripDetailInvoice(params) :Promise<TripDetailInvoice> {
         let tripDetailInvoice = Models.tripDetailInvoice.create(params);
         tripDetailInvoice = await tripDetailInvoice.save();
@@ -2030,6 +2030,49 @@ class TripPlanModule {
     }
 
 
+
+    @clientExport
+    @requireParams(['detailId', 'orderIds', 'supplierId'])
+    static async relateOrders(params) :Promise<any> {
+        let result = {success: [], failed: []};
+        let currentStaff = await Staff.getCurrent();
+        let orders = await currentStaff.getOrders({supplierId: params.supplierId});
+        let Morders: any = {};
+        orders.forEach(async function(o){
+            Morders[o.id] = o;
+        })
+        let orderIds = params.orderIds;
+        let ps = orderIds.map(async function(id){
+            let o = Morders[id];
+            let detailInvoice = await Models.tripDetailInvoice.find({where: {orderId: id, accountId: currentStaff.id, sourceType: ESourceType.RELATE_ORDER}});
+            if(detailInvoice && detailInvoice.length > 0){
+                result.failed.push({desc: o.desc, remark: '该订单已被关联过'});
+                return o.id;
+                // throw L.ERR.ORDER_HAS_RELATED();
+            }
+
+            /*if(o.persons.indexOf(currentStaff.name) < 0){
+                result.failed.push({desc: o.desc, reason: '只能关联自己的订单'});
+                // throw L.ERR.ORDER_NOT_YOURS();
+            }*/
+            let invoice: any = {};
+            invoice.accountId = currentStaff.id;
+            invoice.orderId = o.id;
+            invoice.sourceType = ESourceType.RELATE_ORDER;
+            invoice.tripDetailId = params.detailId;
+            invoice.invoiceDateTime = o.date;
+            invoice.totalMoney = o.price;
+            invoice.payType = o.parType;
+            invoice.remark = o.desc;
+            invoice.type = o.orderType || EInvoiceFeeTypes.HOTEL;
+            invoice.status = 1;
+            let iv =  await TripPlanModule.saveTripDetailInvoice(invoice);
+            result.success.push({desc: o.desc, remark: '关联成功'});
+            return o.id;
+        })
+        await Promise.all(ps);
+        return result;
+    }
 
     @clientExport
     @requireParams(["id"], ['totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark', 'pictureFileId'])

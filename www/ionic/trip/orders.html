@@ -9,8 +9,9 @@
                           ng-model="order.checked"
                           ng-checked="order.checked">
                 <p>{{order.date | date: 'yyyy-MM-dd HH:mm'}}</p>
-                <h2>{{order.desc}}</h2>
+                <h2>{{order.desc}}——{{order.orderType}}</h2>
                 <p>{{order.price | currency: ''}}元</p>
+                <p>{{order.orderType == EInvoiceFeeTypes.HOTEL ? '入住人' : '出行人'}}：{{order.persons.join()}}</p>
                 <p>{{order.parType==EPayType.COMPANY_PAY?"公司账户支付":"个人账户支付"}}</p>
             </ion-checkbox>
         </ion-list>

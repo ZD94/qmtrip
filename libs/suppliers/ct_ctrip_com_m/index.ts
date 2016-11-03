@@ -1,8 +1,13 @@
 
 import _ = require('lodash');
 import { SupplierWebRobot, SupplierOrder } from '../index';
-import { EPayType } from '../../../api/_types/tripPlan/index';
+import { EPayType, EInvoiceFeeTypes } from '../../../api/_types/tripPlan/index';
 
+var MOrderType = {
+    F: EInvoiceFeeTypes.PLANET_TICKET,
+    H: EInvoiceFeeTypes.HOTEL,
+    T: EInvoiceFeeTypes.TRAIN_TICKET
+}
 var iconv = require('iconv-lite');
 
 export default class SupplierCtripCT extends SupplierWebRobot{
@@ -66,6 +71,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                 date: new Date(item.Time[0]),
                 persons: order.Passenger.map((p)=>p.name),
                 parType: item.Pay == '公司账户支付' ? EPayType.COMPANY_PAY : EPayType.PERSONAL_PAY,
+                orderType: MOrderType[item.OrderType],
                 desc: item.Name
             };
         }));
@@ -93,6 +99,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                 date: new Date(item.Time[0]),
                 persons: order.Passenger,
                 parType: item.pay == '公司账户支付' ? EPayType.COMPANY_PAY : EPayType.PERSONAL_PAY,
+                orderType: MOrderType[item.OrderType],
                 desc: item.Name
             };
         }));

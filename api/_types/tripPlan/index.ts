@@ -51,7 +51,8 @@ export enum  EInvoiceFeeTypes {
     PLANET_TICKET = 1,
     TRAIN_TICKET = 2,
     CANCEL_TRAIN_TICKET = 3,
-    CANCEL_PLANET_TICKET = 4
+    CANCEL_PLANET_TICKET = 4,
+    HOTEL = 5
 }
 
 export enum EPayType {

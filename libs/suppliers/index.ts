@@ -1,6 +1,6 @@
 
 import { WebRobot } from '../web_robot/index';
-import { EPayType } from 'api/_types/tripPlan';
+import { EPayType, EInvoiceFeeTypes } from 'api/_types/tripPlan';
 
 export interface SupplierOrder{
     id: string;
@@ -8,6 +8,7 @@ export interface SupplierOrder{
     date: Date;
     persons: string[];
     desc: string;
+    orderType: EInvoiceFeeTypes;
     parType: EPayType;
 }
 
