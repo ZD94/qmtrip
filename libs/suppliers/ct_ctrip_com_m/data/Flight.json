@@ -1,0 +1,94 @@
+{
+  "Result": true,
+  "Response": {
+    "OrderDetailBase": {
+      "Domestic": [
+        {
+          "key": "HU7702",
+          "airline": "HU",
+          "FlightType": "海南航空HU7702",
+          "FlightDepartDate": "2016-10-25",
+          "FlightRoute": "深圳-北京",
+          "FlightDepart": "宝安机场T3",
+          "FlightDepartTime": "22:15",
+          "FlightArrive": "首都机场T1",
+          "FlightArriveTime": "01:20",
+          "IsSubscription": false,
+          "FlightCab": "经济舱",
+          "price": 710,
+          "fpayDetail": [
+            50,
+            0
+          ],
+          "priceTitle": [
+            "机票价"
+          ],
+          "IsContract": false,
+          "Package": false
+        }
+      ],
+      "Author": [
+        "宋亚军"
+      ],
+      "Passenger": [
+        {
+          "key": "李晓辰",
+          "name": "李晓辰",
+          "cardNumber": "460103198003250619",
+          "cardType": "身份证",
+          "TicketType": [
+            ""
+          ],
+          "TicketStatus": [
+            0
+          ]
+        }
+      ],
+      "Deliver": "不需要报销凭证",
+      "contact": {
+        "tel": "13911795755"
+      },
+      "DeliverAddress": "",
+      "Pay": "公司账户支付",
+      "FlightRC": [
+        {
+          "Title": "机票低价RC",
+          "Content": "起飞和到达时间不合适"
+        }
+      ],
+      "cabMessage": [
+        {
+          "title": {},
+          "tgq": {
+            "title": "退改签说明",
+            "content": {
+              "更改条件": [
+                "航班起飞前4小时以外（含）每次收取票面价30%变更费，4小时以内（不含）及起飞后，每次收取票面价50%变更费。改期费与升舱费同时发生时，需同时收取。"
+              ],
+              "退票条件": [
+                "航班起飞前4小时以外（含）收取票面价50%退票费，4小时以内（不含）及起飞后，不得退票。"
+              ],
+              "签转条件": [
+                "不得签转"
+              ]
+            }
+          },
+          "other": {}
+        }
+      ],
+      "money": {
+        "currency": "CNY",
+        "total": 760
+      },
+      "increase": "因国家税收制度调整，5月1日之后退票，只提供退款凭证，不再提供退票费发票。如需报销凭证，请致电携程商旅专线。",
+      "invoice": [],
+      "OrderDate": "2016-10-21 18:43",
+      "OrderStatus": "已成交",
+      "Cost": [],
+      "CorpPayType": "public"
+    }
+  },
+  "LS": "4",
+  "OV": "15",
+  "Ver": "(function (a) { a.Map = { a: 4.000006, b: { zepto: 8403, wvjb: 8403, Frame: 8403, BookCommon: 8403, HomeCommon: 8403}} })(window);\n"
+}
