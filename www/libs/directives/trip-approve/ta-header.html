@@ -1,10 +1,13 @@
 <ion-list class="jl_projectinfo">
-    <ion-item class="project_tit">{{tripApprove.title}}
+    <ion-item class="project_tit">{{tripApprove.startAt | date: 'MM-dd'}}&nbsp;至&nbsp;{{tripApprove.backAt | date: 'MM-dd'}}
+        <span style="padding-left: 13px">{{tripApprove.deptCity}} - {{tripApprove.arrivalCity}}</span>
         <span class="tit_special" ng-if="tripApprove.isSpecialApprove">特别审批</span></ion-item>
     <ion-item class="project_cont">
-        <p ng-if="tripApprove && tripApprove.startAt">{{tripApprove.startAt | date: 'yyyy-MM-dd'}} 至 {{tripApprove.backAt | date: 'yyyy-MM-dd'}}</p>
-        <p style="text-align: center">
-            总预算:<span style="font-size: 20px;font-weight: bold;">{{tripApprove.budget == -1 ? '暂无预算' : (tripApprove.budget| currency: '')}}</span>
+        <p ng-if="tripApprove && tripApprove.startAt">
+            <i class="fa fa-flag-o"></i>&nbsp;{{tripApprove.title}}</p>
+        <p class="totalBudget" style="text-align: center">
+            <span>总预算&nbsp;<i class="icon ion-help-circled"></i></span>
+            <span>{{tripApprove.budget == -1 ? '暂无预算' : (tripApprove.budget | currency_int)}}</span>
             {{tripApprove.budget == -1 ? '' : '元'}}
         </p>
     </ion-item>

@@ -6,7 +6,7 @@
     <ion-item class="item-divider" style="background-color:#fff">
         <div ng-if="item.tripType == ETripType.OUT_TRIP || item.tripType == ETripType.BACK_TRIP">
             <span style="font-size: 12px">{{item.startTime | date: 'MM-dd'}}</span>
-            <span class="spanRight">{{item.price| currency: ''}}元</span>
+            <span class="spanRight">{{item.price | currency_int}}元</span>
             <br>
             {{item.deptCity}}
             &nbsp;
@@ -29,20 +29,20 @@
 
         <div ng-if="item.tripType == ETripType.HOTEL">
             <span>{{item.startTime | date: 'MM-dd'}}至{{item.endTime | date: 'MM-dd'}}(共{{days || 1}}天)</span>
-            <span class="spanRight">{{budget}}</span>
+            <span class="spanRight">{{budget | currency_int}}元</span>
             <br/>
             <i class="icon ion-home"></i>{{item.city}}<span ng-if="item.placeName">&nbsp;{{item.placeName}}附近</span>
             <span class="spanRight right-budget" ng-if="item.price > 0">
-                {{item.price / days | currency: ''}}元/天
+                {{item.price / days | currency_int}}元/天
             </span>
         </div>
 
         <div ng-if="item.tripType != ETripType.HOTEL && item.tripType != ETripType.OUT_TRIP && item.tripType != ETripType.BACK_TRIP">
             <span>{{item.startTime | date: 'MM-dd'}}至{{item.endTime | date: 'MM-dd'}}(共{{subsidyDays}}天)</span>
-            <span class="spanRight">{{budget}}</span>
+            <span class="spanRight">{{budget | currency_int}}元</span>
             <br/>
             <span class="spanRight right-budget" ng-if="item.price > 0">
-                {{item.price / (subsidyDays) | currency: ''}}元/天
+                {{item.price / (subsidyDays) | currency_int}}元/天
             </span>
         </div>
 
