@@ -58,15 +58,18 @@ export async function ListDetailController($location, $scope , Models, $statePar
     // 是否已经上传至少一张票据
     let hasInvoice = false;
 
+    $scope.totalBudgetObj = {
+        trafficTotalBudget: 0,
+        hotelTotalBudget: 0,
+        subsidyTotalBudget: 0,
+        specialApproveTotalBudget: 0,
+    }
+
     //分类计算
     let trafficBudgets = [];     //交通
-    let trafficTotalBudget: number = 0;
     let hotelBudgets = [];      //住宿
-    let hotelTotalBudget: number = 0;
     let subsidyBudgets = [];    //补助
-    let subsidyTotalBudget: number = 0;
     let specialApproveBudgets = [];    //特别审批
-    let specialApproveTotalBudget: number = 0;
 
     budgets.forEach( async function(budget){
         var invoice = await budget.getInvoices();
@@ -78,23 +81,22 @@ export async function ListDetailController($location, $scope , Models, $statePar
             case ETripType.BACK_TRIP:
             case ETripType.OUT_TRIP:
                 trafficBudgets.push(budget);
-                trafficTotalBudget = countBudget(trafficTotalBudget, budget.budget);
+                $scope.totalBudgetObj.trafficTotalBudget = countBudget($scope.totalBudgetObj.trafficTotalBudget, budget.budget);
                 break;
             case ETripType.HOTEL:
                 hotelBudgets.push(budget);
-                hotelTotalBudget = countBudget(hotelTotalBudget, budget.budget);
+                $scope.totalBudgetObj.hotelTotalBudget = countBudget($scope.totalBudgetObj.hotelTotalBudget, budget.budget);
                 break;
             case ETripType.SUBSIDY:
                 subsidyBudgets.push(budget);
-                subsidyTotalBudget = countBudget(subsidyTotalBudget, budget.budget);
+                $scope.totalBudgetObj.subsidyTotalBudget = countBudget($scope.totalBudgetObj.subsidyTotalBudget, budget.budget);
                 break;
             case ETripType.SPECIAL_APPROVE:
                 specialApproveBudgets.push(budget);
-                specialApproveTotalBudget = countBudget(specialApproveTotalBudget, budget.budget);
+                $scope.totalBudgetObj.specialApproveTotalBudget = countBudget($scope.totalBudgetObj.specialApproveTotalBudget, budget.budget);
                 break;
         }
     });
-    
     $scope.budgets = budgets;
 
     function countBudget(originBudget, increment) {
@@ -114,13 +116,9 @@ export async function ListDetailController($location, $scope , Models, $statePar
     subsidyBudgets.sort();
 
     $scope.trafficBudgets = trafficBudgets;
-    $scope.trafficTotalBudget = trafficTotalBudget;
     $scope.hotelBudgets = hotelBudgets;
-    $scope.hotelTotalBudget = hotelTotalBudget;
     $scope.subsidyBudgets = subsidyBudgets;
-    $scope.subsidyTotalBudget = subsidyTotalBudget;
     $scope.specialApproveBudgets = specialApproveBudgets;
-    $scope.specialApproveTotalBudget = specialApproveTotalBudget;
 
     $scope.showAlterDialog = function () {
         $scope.reject = {reason: ''};

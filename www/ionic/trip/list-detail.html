@@ -12,7 +12,7 @@
                     <tp-detail-item ng-repeat="budget in trafficBudgets track by $index"
                                     show-uploader="true"
                                     title="交通"
-                                    budget="{{trafficTotalBudget | currency: ''}}元"
+                                    budget="{{totalBudgetObj.trafficTotalBudget | currency: ''}}元"
                                     item="budget">
                     </tp-detail-item>
 
@@ -20,21 +20,21 @@
                     <tp-detail-item ng-repeat="budget in hotelBudgets"
                                     show-uploader="true"
                                     title="{{$index == 0? '住宿': ''}}"
-                                    budget="{{hotelTotalBudget | currency: ''}}元"
+                                    budget="{{totalBudgetObj.hotelTotalBudget | currency: ''}}元"
                                     item="budget">
                     </tp-detail-item>
                     <!--补助-->
                     <tp-detail-item ng-repeat="budget in subsidyBudgets"
                                     show-uploader="true"
                                     title="{{$index == 0? '公司补助': ''}}"
-                                    budget="{{subsidyTotalBudget | currency: ''}}元"
+                                    budget="{{totalBudgetObj.subsidyTotalBudget | currency: ''}}元"
                                     item="budget">
                     </tp-detail-item>
                     <!--特别审批-->
                     <tp-detail-item ng-repeat="budget in specialApproveBudgets"
                                     show-uploader="true"
                                     title="{{$index == 0? '特别审批': ''}}"
-                                    budget="{{specialApproveTotalBudget | currency: ''}}元"
+                                    budget="{{totalBudgetObj.specialApproveTotalBudget | currency: ''}}元"
                                     remark="{{tripDetail.specialApproveRemark}}"
                                     item="budget">
                     </tp-detail-item>
