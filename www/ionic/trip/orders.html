@@ -3,7 +3,6 @@
         <ion-list>
             <ion-item>
                 <img class="" ng-src="/attachments/{{supplier.logo}}" ng-if="supplier.logo">
-                <input type="button" value="确认" ng-click="selectOrders()">
             </ion-item>
             <ion-checkbox ng-repeat="order in orders"
                           ng-model="order.checked"
@@ -16,5 +15,8 @@
                 <p>{{order.parType == EPayType.COMPANY_PAY ? "公司账户支付" : "个人账户支付"}}</p>
             </ion-checkbox>
         </ion-list>
+        <div>
+            <a id="page1-button26" class="button button-positive  button-block" ng-click="selectOrders()">完成</a>
+        </div>
     </ion-content>
 </ion-view>

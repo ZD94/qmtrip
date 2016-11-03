@@ -12,6 +12,7 @@ import { ModelObject } from 'common/model/object';
 import {PaginateInterface} from 'common/model/interface';
 import {CoinAccount} from 'api/_types/coin';
 import {getSupplier,SupplierOrder} from 'libs/suppliers';
+import L from 'common/language';
 
 declare var API: any;
 
@@ -191,10 +192,13 @@ export class Staff extends ModelObject implements Account {
     }
 
     @RemoteCall()
-    async getOrders(params: {supplierId: string}): Promise<SupplierOrder[]> {
+    async getOrders(params: {supplierId: string, type?: string}): Promise<SupplierOrder[]> {
         let supplier = await Models.supplier.get(params.supplierId);
-        let client = getSupplier("ct_ctrip_com_m");
+        let client = getSupplier(supplier.supplierKey);
         let staffSupplierInfo = await this.getOneStaffSupplierInfo({supplierId: params.supplierId});
+        if(!staffSupplierInfo){
+            throw L.ERR.HAS_NOT_BIND();
+        }
         let loginInfo = JSON.parse(staffSupplierInfo.loginInfo);
         try{
             await client.login({username: loginInfo.userName, password: loginInfo.pwd});
@@ -202,7 +206,7 @@ export class Staff extends ModelObject implements Account {
             console.info(JSON.stringify(list, null, ' '));
             return list;
         }catch(e){
-            console.error(e);
+            throw L.ERR.BIND_ACCOUNT_ERR();
         }
     }
 
@@ -214,8 +218,16 @@ export class Staff extends ModelObject implements Account {
         return API.tripPlan.relateOrders(params);
     }
 
+    @RemoteCall()
     async checkStaffSupplierInfo(params: {supplierId: string, userName: string, pwd: string}): Promise<boolean> {
-        return true;
+        let supplier = await Models.supplier.get(params.supplierId);
+        let client = getSupplier(supplier.supplierKey);
+        try{
+            await client.login({username: params.userName, password: params.pwd});
+            return true;
+        }catch(e){
+            return false;
+        }
     }
 
     @RemoteCall()
