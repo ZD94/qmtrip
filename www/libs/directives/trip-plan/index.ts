@@ -118,6 +118,7 @@ angular
             },
             controller: async function($scope, $ionicPopup, $stateParams, Models, City) {
                 //设置上传路径
+                console.log($scope.budget);
                 let auth_data: any = $storage.local.get("auth_data");
                 let url = '/upload/ajax-upload-file?type=image';
                 if (typeof auth_data == 'string') {

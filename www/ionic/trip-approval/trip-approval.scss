@@ -1,15 +1,43 @@
 .jl_projectinfo {
   .list {
     .item{
+      margin:0px;
+      font-size: 14px;
       background: rgba(256, 256, 256, .3);
       &.project_tit{
         color: #fff;
-        font-weight: bold;
       }
       &.project_cont{
         color: #fff;
+        border-top: none;
+        padding: 0px;
         p{
           color: #fff;
+          font-size: 14px;
+        }
+        p:first-child{
+          height: 30px;
+          line-height: 30px;
+          padding-left: 18px;
+        }
+        p.totalBudget{
+          border-top: 1px solid rgba(256, 256, 256, .3);
+          line-height: 46px;
+          height:46px;
+          span:first-child{
+            font-size: 14px;
+            line-height: 36px;
+            vertical-align: 20%;
+            i{
+              color: #fff;
+            }
+          }
+          span:last-child{
+            padding-left: 24px;
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 1px;
+          }
         }
       }
     }
@@ -112,5 +140,53 @@
   padding-right: 10px;
   fake-input span{
     text-align: right;
+  }
+}
+
+
+.ta-detail-item{
+  margin-bottom: 15px;
+  ion-item:first-child{
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+  ion-item:last-child{
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+  .right-budget{
+    background-color: #f39800;
+    color:#ffffff;
+    font-size: 12px;
+    border-radius: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .trip-buttons{
+    padding-top: 0px;
+    padding-bottom: 0px;
+    height:36px;
+    .subsidy-inform{
+      font-size: 12px;
+      color: #a5a5a5;
+      line-height: 36px;
+    }
+    .trip_btn{
+      height:22px;
+      line-height:20px;
+      min-height:22px;
+      width: 68px;
+      border: 1px solid #a5a5a5;
+      color: #a5a5a5;
+      float: right;
+      border-radius: 3px;
+      padding:0px;
+      text-align: center;
+      margin-top: 7px;
+      &.button-positive{
+        color: #43b2e5;
+        border-color: #43b2e5;
+      }
+    }
   }
 }
