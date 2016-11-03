@@ -542,7 +542,7 @@ class TripPlanModule {
     static async getTripDetailSpecial(params: {id: string}) :Promise<TripDetailSpecial> {
         return Models.tripDetailSpecial.get(params.id);
     }
-    
+
     /**
      * 更新消费详情
      * @param params
@@ -805,32 +805,27 @@ class TripPlanModule {
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
     static async commitTripPlan(params: {id: string}): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
-
         if(tripPlan.status != EPlanStatus.WAIT_COMMIT) {
             throw {code: -2, msg: "该出差计划不能提交，请检查状态"};
         }
 
         let tripDetails = await tripPlan.getTripDetails({where: {}});
-        tripPlan.status = EPlanStatus.AUDITING;
-        tripPlan.isCommit = true;
-
         if(tripDetails && tripDetails.length > 0) {
-            tripDetails.map(function (detail) {
+            let tripDetailPromise = tripDetails.map(async function (detail) {
                 if (detail.type == ETripType.SUBSIDY) {
-                    return;
+                    return detail;
                 }
-                if (detail.status == EPlanStatus.WAIT_COMMIT) {
-                    // detail.isCommit = true;
-                    detail.status = EPlanStatus.AUDITING;
-                }
-            })
+                return tryUpdateTripDetailStatus(detail, EPlanStatus.AUDITING);
+            });
+            await (Promise.all(tripDetailPromise));
         }
-
+        //记录日志
         let staff = await Staff.getCurrent();
         let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id, remark: `提交票据`});
-
-        await Promise.all(tripDetails.map((detail) => detail.save()));
-        await Promise.all([tripPlan.save(), log.save()]);
+        await log.save();
+        //更改状态
+        tripPlan.isCommit = true;
+        tripPlan = await tryUpdateTripPlanStatus(tripPlan, EPlanStatus.AUDITING)
 
         let default_agency = config.default_agency;
         if(default_agency && default_agency.manager_email) {
@@ -892,7 +887,11 @@ class TripPlanModule {
 
         let audit = params.auditResult;
         let tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
-        let templateValue: any = {invoiceDetail: '无', projectName: tripPlan.title, totalBudget: '￥' + tripPlan.budget, time: moment(tripPlan.startAt).format('YYYY-MM-DD')};
+        let templateValue: any = {
+            invoiceDetail: '无',
+            projectName: tripPlan.title,
+            totalBudget: '￥' + tripPlan.budget,
+            time: moment(tripPlan.startAt).format('YYYY-MM-DD')};
         let templateName: any = '';
         let isNotify = false;
         let savedMoney = 0;
@@ -911,6 +910,7 @@ class TripPlanModule {
                 details.forEach( (detail) => {
                     expenditure += Number(detail.expenditure);
                 });
+
                 tripPlan.expenditure = expenditure;
                 tripPlan.status = EPlanStatus.COMPLETE;
                 tripPlan.auditStatus = EAuditStatus.INVOICE_PASS;
@@ -1149,7 +1149,7 @@ class TripPlanModule {
         if( tripPlan.status != EPlanStatus.NO_BUDGET && tripPlan.status != EPlanStatus.WAIT_UPLOAD) {
             throw {code: -2, msg: "出差记录状态不正确！"};
         }
-        
+
         let tripDetails = await tripPlan.getTripDetails({});
         if(tripDetails && tripDetails.length > 0) {
             await Promise.all(tripDetails.map((d) => {
@@ -1803,7 +1803,7 @@ class TripPlanModule {
 
         return tripApprove;
     }
-    
+
     @clientExport
     @requireParams(['id'])
     static async getTripApprove(params: {id: string}): Promise<TripApprove> {
@@ -1814,12 +1814,12 @@ class TripPlanModule {
             throw L.ERR.PERMISSION_DENY();
         return approve;
     }
-    
+
     @clientExport
     static updateTripApprove(params): Promise<TripApprove> {
         return Models.tripApprove.update(params);
     }
-    
+
     @clientExport
     static async getTripApproves(options: any): Promise<FindResult> {
         //let staff = await Staff.getCurrent();
@@ -1946,7 +1946,7 @@ class TripPlanModule {
             `出差记录编号:${tripPlan.planNo}`,
             `校验地址: ${config.host}#/finance/trip-detail?id=${tripPlan.id}&code=${financeCheckCode.code}`
         ]
-        
+
         let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')})
         _tripDetails = await Promise.all(_tripDetails);
         var invoiceQuantity = _tripDetails
@@ -1956,7 +1956,7 @@ class TripPlanModule {
             .reduce(function(previousValue, currentValue) {
                 return previousValue + currentValue;
             });
-        
+
         var data = {
             "submitter": staff.name,  //提交人
             "department": staff.department.name,  //部门
@@ -1972,7 +1972,7 @@ class TripPlanModule {
             "qrcode": `data:image/png;base64,${qrcodeCxt}`,
             "invoices": _tripDetails
         }
-        
+
         let buf = await makeSpendReport(data);
         try {
             await API.notify.submitNotify({
@@ -2030,9 +2030,9 @@ class TripPlanModule {
             tripDetail.expenditure = 0;
         }
         await updateTripDetailExpenditure(tripDetail);
+        await tryUpdateTripDetailStatus(tripDetail, EPlanStatus.WAIT_COMMIT);
         return tripDetailInvoice;
     }
-
 
 
     @clientExport
@@ -2101,6 +2101,7 @@ class TripPlanModule {
 
         let tripDetail = await Models.tripDetail.get(tripDetailInvoice.tripDetailId);
         await updateTripDetailExpenditure(tripDetail);
+        await tryUpdateTripDetailStatus(tripDetail, EPlanStatus.WAIT_COMMIT);
         return tripDetailInvoice;
     }
 
@@ -2113,6 +2114,12 @@ class TripPlanModule {
         await tripDetailInvoice.destroy();
         let tripDetail = await Models.tripDetail.get(tripDetailInvoice.id);
         await updateTripDetailExpenditure(tripDetail);
+        let invoices = await tripDetail.getInvoices();
+        if (invoices && invoices.length) {
+            await tryUpdateTripDetailStatus(tripDetail, EPlanStatus.WAIT_COMMIT);
+        } else {
+            await tryUpdateTripDetailStatus(tripDetail, EPlanStatus.WAIT_UPLOAD);
+        }
         return true;
     }
 
@@ -2164,6 +2171,76 @@ async function updateTripDetailExpenditure(tripDetail: TripDetail) {
     tripDetail.personalExpenditure = personalExpenditure;
     tripDetail.expenditure = expenditure;
     return tripDetail.save()
+}
+
+//尝试修改tripDetail状态
+async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: EPlanStatus) :Promise<TripDetail> {
+    if ([ETripType.SUBSIDY].indexOf(tripDetail.type) >= 0 ) {
+        tripDetail.status = status;
+    } else {
+        switch(status) {
+            case EPlanStatus.WAIT_UPLOAD:
+                tripDetail.status = status;
+                break;
+            case EPlanStatus.WAIT_COMMIT:
+                //如果票据不为空,则设置状态为可提交状态
+                let invoices = await Models.tripDetailInvoice.find({where: {tripDetailId: tripDetail.id}});
+                if (invoices && invoices.length) {
+                    tripDetail.status = EPlanStatus.WAIT_COMMIT;
+                }
+                break;
+            case EPlanStatus.AUDITING:
+                if ([ EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.WAIT_COMMIT].indexOf(tripDetail.status) >= 0) {
+                    tripDetail.status = status;
+                }
+                break;
+            case EPlanStatus.COMPLETE:
+                if (EPlanStatus.AUDITING == tripDetail.status) {
+                    tripDetail.status = status;
+                }
+                break;
+        }
+    }
+
+    //更改行程详情状态
+    tripDetail = await tripDetail.save()
+    //尝试更改行程状态
+    let tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
+    try {
+        let ret = await tryUpdateTripPlanStatus(tripPlan, status);
+        // console.info(ret);
+    } catch(err) {
+        console.error(err);
+    }
+    console.info('为啥没有执行呢....')
+    return tripDetail;
+}
+
+//尝试修改tripPlan状态
+async function tryUpdateTripPlanStatus(tripPlan: TripPlan, status: EPlanStatus) :Promise<TripPlan>{
+    let cannotStatus = {};
+    //变tripPlan状态需要tripDetail不能包含状态
+    cannotStatus[EPlanStatus.WAIT_UPLOAD] = [];
+    cannotStatus[EPlanStatus.WAIT_COMMIT] = _.concat([EPlanStatus.WAIT_UPLOAD],  cannotStatus[EPlanStatus.WAIT_UPLOAD]);
+    cannotStatus[EPlanStatus.AUDITING] = _.concat([EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.WAIT_COMMIT], cannotStatus[EPlanStatus.WAIT_COMMIT]);
+    cannotStatus[EPlanStatus.COMPLETE] = _.concat([EPlanStatus.AUDITING], cannotStatus[EPlanStatus.AUDITING]);
+    //变tripPlan状态,只关注出发交通,返回交通,住宿,特殊审批类型
+    let preTripTypeNeeds = [ETripType.BACK_TRIP, ETripType.OUT_TRIP, ETripType.HOTEL, ETripType.SPECIAL_APPROVE];
+
+    //更新行程状态
+    let tripDetails = await Models.tripDetail.find({
+        where: {
+            tripPlanId: tripPlan.id,
+            type: {$in: preTripTypeNeeds},
+            status: {$in: cannotStatus[status]},    //无预算, 等待上传
+        }
+    });
+
+    if (!tripDetails || !tripDetails.length) {
+        tripPlan.status = status;
+        await tripPlan.save();
+    }
+    return tripPlan;
 }
 
 TripPlanModule._scheduleTask();
