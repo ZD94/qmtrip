@@ -10,7 +10,7 @@ export interface SupplierOrder{
     desc: string;
     orderType: EInvoiceFeeTypes;
     parType: EPayType;
-    number?: EInvoiceFeeTypes;
+    flightNumber?: string;
 }
 
 export abstract class SupplierWebRobot extends WebRobot{
