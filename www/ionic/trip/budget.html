@@ -97,11 +97,25 @@
                     </div>
                 </ion-list>
             </ion-scroll>
-            <bottom-bar bottom-style="bottomStyle"
-                        right-click="rightClick()"
-                        staff-selector="staffSelector"
-                        trip="trip"
-            ></bottom-bar>
+            <div class="bottom-bar-budget">
+                <bottom-bar>
+                    <form class="list">
+                        <div class="item item-input status-bar status-bar-input">
+                            <span class="input-label">选择审批人</span>
+                            <ng-selector-list
+                                    ng-model="trip.auditUser"
+                                    dlg-options="staffSelector"
+                                    dlg-title=""
+                                    dlg-placeholder="请选择审批人"
+                                    class="fake-input"
+                            ></ng-selector-list>
+                            <i class="icon ion-arrow-up-b"></i>
+                        </div>
+                    </form>
+                    <button class="button button_right" ng-class="{true: 'hasAuditUser',false: ''}[bottomBottomClicked]" ng-click="saveTripPlan()">
+                        提交审批</button>
+                </bottom-bar>
+            </div>
         </div>
     </ion-content>
 </ion-view>

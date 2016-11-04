@@ -41,15 +41,64 @@
                 </ion-list>
             </ion-scroll>
 
-            <div ng-if="tripDetail && tripDetail.status != undefined">
+            <div ng-if="tripDetail && tripDetail.status != undefined" class="bottom-bar-trip">
+                <bottom-bar ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD">
+                    <!--<div class="status-bar item" ng-if="!bottomStyle.isSelect && !bottomStyle.approveDetail">-->
+                    <div class="status-bar item">
+                        <div class="list">预订/传票据</div>
+                    </div>
+                    <button class="button button_left" ng-click="cancelTripPlan()" style='color:#28A7E1;background-color:#ffffff;'>
+                        撤销行程
+                    </button>
+                    <button class="button button_right" style='color:#ffffff;background-color: #D8D8D8'>
+                        提交审核
+                    </button>
+                </bottom-bar>
+
+                <bottom-bar ng-if="tripDetail.status == EPlanStatus.WAIT_COMMIT">
+                    <div class="status-bar item">
+                        <div class="list">待提交</div>
+                    </div>
+                    <button class="button button_right" ng-click="showAlterDialog()" style='color:#ffffff;background-color: #28A7E1'>
+                        提交审核
+                    </button>
+                </bottom-bar>
+
+                <bottom-bar ng-if="tripDetail.status == EPlanStatus.AUDITING">
+                    <div class="status-bar item">
+                        <div class="list">票据审核中</div>
+                    </div>
+                </bottom-bar>
+
+                <bottom-bar ng-if="tripDetail.status == EPlanStatus.AUDIT_NOT_PASS">
+                    <div class="status-bar item">
+                        <div class="list">审核失败</div>
+                    </div>
+                    <button class="button button_right" ng-click="showAlterDialog()" style='color:#ffffff;background-color: #D8D8D8'>
+                        提交审核
+                    </button>
+                </bottom-bar>
+
+                <bottom-bar ng-if="tripDetail.status == EPlanStatus.COMPLETE">
+                    <div class="status-bar item">
+                        <div class="list">已完成</div>
+                    </div>
+                    <button class="button button_right" ng-click="makeSpendReport()" style='color:#ffffff;background-color: #28A7E1'>
+                        生成报销单
+                    </button>
+                </bottom-bar>
+
+                <bottom-bar ng-if="tripDetail.status == EPlanStatus.CANCEL">
+                    <div class="status-bar item">
+                        <div class="list">已撤销<span>{{tripDetail.cancelRemark}}</span></div>
+                    </div>
+                </bottom-bar>
+
                 <!--<a ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD" ng-click="cancelTripPlan()" class="button button-positive">撤销行程</a>-->
                 <!--<a ng-if="tripDetail.status == EPlanStatus.WAIT_COMMIT" ng-click="showAlterDialog()" id="page20-button60" class="button button-positive" no-back>提交审核</a>-->
                 <!--<a ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD" class="button button-stable">提交审核</a>-->
                 <!--<a ng-if="tripDetail.status == EPlanStatus.COMPLETE && !hasMakeSpendRecorder" class="button button-positive" no-back ng-click="makeSpendReport()">生成报销单</a>-->
-                <bottom-bar bottom-style="bottomStyle"
-                            left-click="leftClick()"
-                            right-click="rightClick()"
-                ></bottom-bar>
+
             </div>
         </div>
     </ion-content>
