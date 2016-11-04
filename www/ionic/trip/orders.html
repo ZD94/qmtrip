@@ -13,7 +13,8 @@
                 <h2>{{order.desc}}</h2>
                 <p>{{order.price | currency: ''}}元</p>
                 <p>{{order.orderType == EInvoiceFeeTypes.HOTEL ? '入住人' : '出行人'}}：{{order.persons.join()}}</p>
-                <p ng-if="order.orderType == EInvoiceFeeTypes.PLANET_TICKET">航班号：{{order.flightNumber}}</p>
+                <p ng-if="order.orderType == EInvoiceFeeTypes.PLANET_TICKET">航班号：{{order.number}}</p>
+                <p ng-if="order.orderType == EInvoiceFeeTypes.TRAIN_TICKET">车次：{{order.number}}</p>
                 <p>{{order.parType == EPayType.COMPANY_PAY ? "公司账户支付" : "个人账户支付"}}</p>
             </ion-checkbox>
         </ion-list>
