@@ -68,7 +68,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                 persons: order.Passenger.map((p)=>p.name),
                 parType: order.Pay == '公司账户支付' ? EPayType.COMPANY_PAY : EPayType.PERSONAL_PAY,
                 orderType: EInvoiceFeeTypes.PLANET_TICKET,
-                flightNumber: order.Domestic[0].key,
+                number: order.Domestic[0].key,
                 desc: item.Name
             };
         }));
@@ -124,6 +124,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                 persons: order.Passenger.map((p)=>p.name),
                 parType: order.Pay == '公司账户支付' ? EPayType.COMPANY_PAY : EPayType.PERSONAL_PAY,
                 orderType: EInvoiceFeeTypes.TRAIN_TICKET,
+                number: order.Train.name,
                 desc: item.Name
             };
         }));
