@@ -192,7 +192,7 @@ export class Staff extends ModelObject implements Account {
     }
 
     @RemoteCall()
-    async getOrders(params: {supplierId: string, type?: string}): Promise<SupplierOrder[]> {
+    async getOrders(params: {supplierId: string}): Promise<SupplierOrder[]> {
         let supplier = await Models.supplier.get(params.supplierId);
         let client = getSupplier(supplier.supplierKey);
         let staffSupplierInfo = await this.getOneStaffSupplierInfo({supplierId: params.supplierId});
@@ -203,32 +203,28 @@ export class Staff extends ModelObject implements Account {
         try{
             await client.login({username: loginInfo.userName, password: loginInfo.pwd});
             let list = await client.getOrderList();
+
             //过滤掉不是本人的订单
             /*list = list.filter((item: any)=>{
                 return item.persons.indexOf(this.name) >= 0;
             })*/
-            if(params.type){
-                let alreadyBindIds = [];
-                let invoices = await Models.tripDetailInvoice.find({where: {accountId: this.id, sourceType: ESourceType.RELATE_ORDER}});
-                if(invoices && invoices.length > 0){
-                    invoices.forEach(function(item){
-                        alreadyBindIds.push(item.orderId);
-                    })
-                }
 
-                if(params.type == "alreadyBind"){
-                    list = list.filter((item: any)=>{
-                        return alreadyBindIds.indexOf(item.id) >= 0;
-                     })
-                }
-                
-                if(params.type == "notBind"){
-                    list = list.filter((item: any)=>{
-                        return alreadyBindIds.indexOf(item.id) < 0;
-                     })
-                }
-
+            let alreadyBindIds = [];
+            let invoices = await Models.tripDetailInvoice.find({where: {accountId: this.id, sourceType: ESourceType.RELATE_ORDER}});
+            if(invoices && invoices.length > 0){
+                invoices.forEach(function(item){
+                    alreadyBindIds.push(item.orderId);
+                })
             }
+            list = list.map(function(l){
+                if(alreadyBindIds.indexOf(l.id) >= 0){
+                    l["isBind"] = true;
+                }else{
+                    l["isBind"] = false;
+                }
+                return l;
+            })
+
             console.info(JSON.stringify(list, null, ' '));
             return list;
         }catch(e){

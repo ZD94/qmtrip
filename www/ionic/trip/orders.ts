@@ -6,15 +6,28 @@ export async function OrdersController($scope,Models, $stateParams, $ionicPopup)
     var currentStaff = await Staff.getCurrent();
     var supplier = await Models.supplier.get($stateParams.supplierId);
     var tripDetail = await Models.tripDetail.get($stateParams.detailId);
+    var orders = await currentStaff.getOrders({supplierId: $stateParams.supplierId});
 
     $scope.supplier = supplier;
     $scope.EPayType = EPayType;
     $scope.EInvoiceFeeTypes = EInvoiceFeeTypes;
 
     $scope.getOrders = async function(type){
-        var orders = await currentStaff.getOrders({supplierId: $stateParams.supplierId, type: type});
-        $scope.orders = orders;
+        if(type == "alreadyBind"){
+            var alreadyBindList  = orders.filter((item: any)=>{
+                return item.isBind;
+            })
+            $scope.orders = alreadyBindList;
+        }
+
+        if(type == "notBind"){
+            var notBindList  = orders.filter((item: any)=>{
+                return !item.isBind;
+            })
+            $scope.orders = notBindList;
+        }
     }
+
     $scope.getOrders("notBind");
 
     $scope.selectOrders = async function(){
@@ -24,7 +37,6 @@ export async function OrdersController($scope,Models, $stateParams, $ionicPopup)
                 selectId.push(item.id);
             }
         })
-        console.info(selectId);
         var result = await currentStaff.relateOrders({detailId: $stateParams.detailId, orderIds: selectId, supplierId: $stateParams.supplierId});
         $scope.result = result;
         if(result.failed.length == 0){
