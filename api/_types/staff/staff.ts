@@ -1,7 +1,7 @@
 import {Models, EGender, EAccountType} from 'api/_types';
 import { Company } from 'api/_types/company';
 import { StaffSupplierInfo } from 'api/_types/staff';
-import {TripPlan, TripApprove} from 'api/_types/tripPlan';
+import {TripPlan, TripApprove, ESourceType} from 'api/_types/tripPlan';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Department } from 'api/_types/department';
 import { Types, Values } from 'common/model';
@@ -192,7 +192,7 @@ export class Staff extends ModelObject implements Account {
     }
 
     @RemoteCall()
-    async getOrders(params: {supplierId: string, type?: string}): Promise<SupplierOrder[]> {
+    async getOrders(params: {supplierId: string}): Promise<SupplierOrder[]> {
         let supplier = await Models.supplier.get(params.supplierId);
         let client = getSupplier(supplier.supplierKey);
         let staffSupplierInfo = await this.getOneStaffSupplierInfo({supplierId: params.supplierId});
@@ -203,6 +203,28 @@ export class Staff extends ModelObject implements Account {
         try{
             await client.login({username: loginInfo.userName, password: loginInfo.pwd});
             let list = await client.getOrderList();
+
+            //过滤掉不是本人的订单
+            /*list = list.filter((item: any)=>{
+                return item.persons.indexOf(this.name) >= 0;
+            })*/
+
+            let alreadyBindIds = [];
+            let invoices = await Models.tripDetailInvoice.find({where: {accountId: this.id, sourceType: ESourceType.RELATE_ORDER}});
+            if(invoices && invoices.length > 0){
+                invoices.forEach(function(item){
+                    alreadyBindIds.push(item.orderId);
+                })
+            }
+            list = list.map(function(l){
+                if(alreadyBindIds.indexOf(l.id) >= 0){
+                    l["isBind"] = true;
+                }else{
+                    l["isBind"] = false;
+                }
+                return l;
+            })
+
             console.info(JSON.stringify(list, null, ' '));
             return list;
         }catch(e){

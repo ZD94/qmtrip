@@ -49,6 +49,7 @@
                             <h3 ng-if="invoice.type == 2">火车票</h3>
                             <h3 ng-if="invoice.type == 3">火车退票费</h3>
                             <h3 ng-if="invoice.type == 4">机票退票费</h3>
+                            <h3 ng-if="invoice.type == 5">酒店</h3>
                         </div>
                     </div>
                     <div class="invoice-item">
@@ -70,7 +71,7 @@
                 </div>
                 <div class="invoice-form invoice-edit" ng-if="invoice.edit">
                     <div class="invoice-img">
-                        <div class="invoice-img-min" ng-uploader="" accept="image/*" url="uploadUrl" done="invoicefuc.done">
+                        <div class="invoice-img-min" ng-uploader="" accept="image/png, image/jpeg, image/gif" url="uploadUrl" done="invoicefuc.done">
                             <img ng-if="previewUrl" ng-src="{{previewUrl}}">
                             <img ng-if="!previewUrl" ng-src="{{invoice.imgUrl}}">
                             <a class="button button-positive">点击重传</a>
@@ -134,7 +135,7 @@
                 </div>
                 <div class="addInvoice invoice-form invoice-edit" ng-if="!select_menu">
                     <div class="invoice-img">
-                        <div class="invoice-img-min" ng-uploader="" accept="image/*" url="uploadUrl" done="invoicefuc.done">
+                        <div class="invoice-img-min" ng-uploader="" accept="image/png, image/jpeg, image/gif" url="uploadUrl" done="invoicefuc.done">
                             <img ng-if="previewUrl" ng-src="{{previewUrl}}">
                             <img ng-if="!previewUrl" src="ionic/images/add_img.png">
                             <a ng-if="previewUrl" class="button button-positive">点击重传</a>
@@ -195,7 +196,7 @@
         </ion-slide-box>
     </ion-content>
     <div class="bar bar-footer bar-positive" ng-if="invoice.status == EPlanStatus.WAIT_COMMIT || invoice.status == EPlanStatus.AUDIT_NOT_PASS">
-        <div class="button button-full button-positive" style="margin-top: 0;width: 100%;font-size: 20px;" ng-uploader accept="image/*" title="invoicefuc.title" done="invoicefuc.done" url="uploadUrl">重新上传</div>
+        <div class="button button-full button-positive" style="margin-top: 0;width: 100%;font-size: 20px;" ng-uploader accept="image/png, image/jpeg, image/gif" title="invoicefuc.title" done="invoicefuc.done" url="uploadUrl">重新上传</div>
     </div>
     <div class="bar bar-footer bar-positive" ng-if="invoice.status == EPlanStatus.AUDITING || invoice.status == EPlanStatus.COMPLETE">
         <div class="button button-full button-positive" style="margin-top: 0;width: 100%;font-size: 20px;" ng-click="backtodetail()">返回详情</div>

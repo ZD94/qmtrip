@@ -4,13 +4,31 @@ var msgbox = require('msgbox');
 
 export async function OrdersController($scope,Models, $stateParams, $ionicPopup){
     var currentStaff = await Staff.getCurrent();
-    var orders = await currentStaff.getOrders({supplierId: $stateParams.supplierId});
     var supplier = await Models.supplier.get($stateParams.supplierId);
     var tripDetail = await Models.tripDetail.get($stateParams.detailId);
-    $scope.orders = orders;
+    var orders = await currentStaff.getOrders({supplierId: $stateParams.supplierId});
+
     $scope.supplier = supplier;
     $scope.EPayType = EPayType;
     $scope.EInvoiceFeeTypes = EInvoiceFeeTypes;
+
+    $scope.getOrders = async function(type){
+        if(type == "alreadyBind"){
+            var alreadyBindList  = orders.filter((item: any)=>{
+                return item.isBind;
+            })
+            $scope.orders = alreadyBindList;
+        }
+
+        if(type == "notBind"){
+            var notBindList  = orders.filter((item: any)=>{
+                return !item.isBind;
+            })
+            $scope.orders = notBindList;
+        }
+    }
+
+    $scope.getOrders("notBind");
 
     $scope.selectOrders = async function(){
         var selectId = [];
@@ -19,12 +37,11 @@ export async function OrdersController($scope,Models, $stateParams, $ionicPopup)
                 selectId.push(item.id);
             }
         })
-        console.info(selectId);
         var result = await currentStaff.relateOrders({detailId: $stateParams.detailId, orderIds: selectId, supplierId: $stateParams.supplierId});
         $scope.result = result;
-        if(result.failed.size == 0){
+        if(result.failed.length == 0){
             msgbox.log("绑定成功");
-            // window.location.href = "#/trip/list-detail?tripid=" + tripDetail.tripPlanId;
+            window.location.href = "#/trip/list-detail?tripid=" + tripDetail.tripPlanId;
         }else{
             $ionicPopup.alert({
                 title: '提示',
