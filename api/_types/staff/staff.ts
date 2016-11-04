@@ -1,7 +1,7 @@
 import {Models, EGender, EAccountType} from 'api/_types';
 import { Company } from 'api/_types/company';
 import { StaffSupplierInfo } from 'api/_types/staff';
-import {TripPlan, TripApprove} from 'api/_types/tripPlan';
+import {TripPlan, TripApprove, ESourceType} from 'api/_types/tripPlan';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Department } from 'api/_types/department';
 import { Types, Values } from 'common/model';
@@ -203,6 +203,32 @@ export class Staff extends ModelObject implements Account {
         try{
             await client.login({username: loginInfo.userName, password: loginInfo.pwd});
             let list = await client.getOrderList();
+            //过滤掉不是本人的订单
+            /*list = list.filter((item: any)=>{
+                return item.persons.indexOf(this.name) >= 0;
+            })*/
+            if(params.type){
+                let alreadyBindIds = [];
+                let invoices = await Models.tripDetailInvoice.find({where: {accountId: this.id, sourceType: ESourceType.RELATE_ORDER}});
+                if(invoices && invoices.length > 0){
+                    invoices.forEach(function(item){
+                        alreadyBindIds.push(item.orderId);
+                    })
+                }
+
+                if(params.type == "alreadyBind"){
+                    list = list.filter((item: any)=>{
+                        return alreadyBindIds.indexOf(item.id) >= 0;
+                     })
+                }
+                
+                if(params.type == "notBind"){
+                    list = list.filter((item: any)=>{
+                        return alreadyBindIds.indexOf(item.id) < 0;
+                     })
+                }
+
+            }
             console.info(JSON.stringify(list, null, ' '));
             return list;
         }catch(e){

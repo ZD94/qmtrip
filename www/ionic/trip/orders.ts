@@ -4,13 +4,18 @@ var msgbox = require('msgbox');
 
 export async function OrdersController($scope,Models, $stateParams, $ionicPopup){
     var currentStaff = await Staff.getCurrent();
-    var orders = await currentStaff.getOrders({supplierId: $stateParams.supplierId});
     var supplier = await Models.supplier.get($stateParams.supplierId);
     var tripDetail = await Models.tripDetail.get($stateParams.detailId);
-    $scope.orders = orders;
+
     $scope.supplier = supplier;
     $scope.EPayType = EPayType;
     $scope.EInvoiceFeeTypes = EInvoiceFeeTypes;
+
+    $scope.getOrders = async function(type){
+        var orders = await currentStaff.getOrders({supplierId: $stateParams.supplierId, type: type});
+        $scope.orders = orders;
+    }
+    $scope.getOrders("notBind");
 
     $scope.selectOrders = async function(){
         var selectId = [];

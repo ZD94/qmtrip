@@ -3,6 +3,8 @@
         <ion-list>
             <ion-item>
                 <img class="" ng-src="/attachments/{{supplier.logo}}" ng-if="supplier.logo">
+                <input type="button" value="已绑定" ng-click="getOrders('alreadyBind')">
+                <input type="button" value="未绑定" ng-click="getOrders('notBind')">
             </ion-item>
             <ion-checkbox ng-repeat="order in orders"
                           ng-model="order.checked"
