@@ -1,0 +1,63 @@
+{
+  "Result": true,
+  "Response": {
+    "OrderDetailBase": {
+      "Sdate": "",
+      "CancelPrice": 0,
+      "Train": {
+        "name": "1135",
+        "time": [
+          "09:50",
+          "10:38"
+        ],
+        "startStation": [
+          "北京西",
+          0
+        ],
+        "terminalStation": [
+          "廊坊北",
+          0
+        ],
+        "seat": {
+          "yz": 10.5
+        },
+        "sdate": "2016-11-18"
+      },
+      "contact": {
+        "tel": "13911795755",
+        "email": "xiaochen_li@stratopgroup.com"
+      },
+      "Passenger": [
+        {
+          "key": "t_490498",
+          "name": "李晓辰",
+          "cardNumber": "460103198003250619",
+          "cardType": "身份证",
+          "TicketType": [
+            "14车厢005号"
+          ]
+        }
+      ],
+      "Pay": "支付宝钱包",
+      "changeStatus": 1,
+      "TicketNumber": "EC92486410",
+      "money": {
+        "currency": "CNY",
+        "total": 30.5,
+        "ticket": 10.5,
+        "payType": -1,
+        "serPrice": [
+          1,
+          20.0000
+        ]
+      },
+      "OrderDate": "2016-11-03",
+      "OrderStatus": "已购票",
+      "Cost": [],
+      "CorpPayType": "public"
+    }
+  },
+  "LS": "4",
+  "OV": "15",
+  "Ver": "(function (a) { a.Map = { a: 4.000006, b: { zepto: 8403, wvjb: 8403, Frame: 8403, BookCommon: 8403, HomeCommon: 8403}} })(window);\n"
+}
