@@ -236,7 +236,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         if(value.agree){
             $scope.isNextApprove = value.isNextApprove;
             approve(value.result);
-            $scope.isHasPermissionApprove = false;
+            //$scope.isHasPermissionApprove = false;
             $scope.isHasApprove = true;
         }
         // $scope.isConfirm = true;
