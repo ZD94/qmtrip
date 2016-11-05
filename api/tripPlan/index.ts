@@ -1870,7 +1870,7 @@ class TripPlanModule {
             })
         approveUsers = await Promise.all(approveUsers)
         let _tripDetails = tripDetails.map (async (v) :Promise<any> => {
-            let tripDetailInvoices = await Models.tripDetailInvoice.find({where: {tripDetailId: v.id}});
+            let tripDetailInvoices = await Models.tripDetailInvoice.find({where: {tripDetailId: v.id, payType: {$ne: EPayType.COMPANY_PAY}}});
             if (v.type == ETripType.OUT_TRIP || v.type == ETripType.BACK_TRIP) {
                 let v1 = <TripDetailTraffic>v;
                 let trafficType;
@@ -1970,7 +1970,7 @@ class TripPlanModule {
             "department": staff.department.name,  //部门
             "budgetMoney": tripPlan.budget || 0, //预算总金额
             "totalMoney": _personalExpenditure || 0,  //实际花费
-            "totalMoneyHZ": money2hanzi.toHanzi(_personalExpenditure),  //汉子大写金额
+            "totalMoneyHZ": money2hanzi.toHanzi(_personalExpenditure),  //汉字大写金额
             "invoiceQuantity": invoiceQuantity, //票据数量
             "createAt": moment().format('YYYY年MM月DD日HH:mm'), //生成时间
             "departDate": moment(tripPlan.startAt).format('YYYY.MM.DD'), //出差起始时间
