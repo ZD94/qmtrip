@@ -34,12 +34,12 @@
                         <div class="item-divider item">{{trip.originPlaceName}} - {{trip.destinationPlaceName}}</div>
                         <div class="item item-input">
                             <span class="input-label">审批说明</span>
-                            <textarea type="text"
+                            <input type="text"
                                    placeholder="请输入说明供审批人进行决策"
                                    ng-model="trip.specialApproveRemark"
                                    onpropertychange="this.style.height=this.scrollHeight+'px';"
                                    oninput="$(this).innerHeight(this.scrollHeight)">
-                            </textarea>
+                            </input>
                         </div>
                         <div class="item item-input">
                             <span class="input-label">预算金额</span>

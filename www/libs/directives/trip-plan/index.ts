@@ -114,7 +114,8 @@ angular
                 budget: '@',
                 showUploader: '@',
                 item: '=',
-                remark: '@'
+                remark: '@',
+                isBeforeStartTime: '=',
             },
             controller: async function($scope, $ionicPopup, $stateParams, Models, City) {
                 //设置上传路径
@@ -163,11 +164,6 @@ angular
                 $scope.reserve = function(id){
                     window.location.href="#/trip/reserve?detailId="+id;
                 }
-                //对于当前日期及行程出发日期的判断
-                let tripPlanId = $stateParams.tripid;
-                let tripPlan = await Models.tripPlan.get(tripPlanId);
-                let isBeforeStartTime = moment().isBefore(tripPlan.startAt);
-                $scope.isBeforeStartTime = isBeforeStartTime;
                 $scope.item.done = async function(ret) {
                     API.require('tripPlan');
                     await API.onload();
