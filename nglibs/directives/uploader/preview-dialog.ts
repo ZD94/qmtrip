@@ -54,7 +54,9 @@ async function previewImageController($scope, $element){
             .map(function(canvas) {
                 return new Promise(function(resolve) {
                     //require('blueimp-canvas-to-blob');
-                    //canvas.toBlob(resolve);
+                    //canvas.toBlob(function(blob){
+                    //    resolve(blob);
+                    //});
                     resolve($scope.files);
                 });
             }))
@@ -82,6 +84,7 @@ function loadImage(url): Promise<HTMLImageElement>{
             resolve(img);
         };
         img.onerror = reject;
+        //img.crossOrigin = 'anonymous';
         img.src = url;
     })
 }
