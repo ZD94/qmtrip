@@ -1,6 +1,5 @@
 import { ETripType, TripDetail, EPlanStatus } from 'api/_types/tripPlan';
 import moment = require('moment');
-import async = Q.async;
 export async function ListDetailController($location, $scope , Models, $stateParams, $storage, $ionicPopup, wxApi){
     let id = $stateParams.tripid;
 
@@ -8,30 +7,6 @@ export async function ListDetailController($location, $scope , Models, $statePar
         $location.path("/");
         return;
     }
-    //底部的按钮
-    let bottomStyle = {
-        status:{
-            text:'',
-            cancel:'',
-        },
-        right:{
-            color:'#ffffff',
-            backgroundColor:'#28A7E1',
-            display:false,
-            text:'提交审核',
-
-        },
-        left:{
-            color:'#28A7E1',
-            text:'撤销行程',
-            backgroundColor:'#ffffff',
-            display:false,
-            border:'none',
-        },
-    }
-
-    $scope.bottomStyle = bottomStyle;
-
     //////绑定上传
     let authDataStr = window['getAuthDataStr']();
     $scope.uploadUrl = '/upload/ajax-upload-file?type=image&auth='+authDataStr;
@@ -44,19 +19,11 @@ export async function ListDetailController($location, $scope , Models, $statePar
     let budgets: TripDetail[] = await tripPlan.getTripDetails();
     $scope.EPlanStatus = EPlanStatus;
 
-
-
-    let statusTxt = {};
-    statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "审核失败";
-    statusTxt[EPlanStatus.NO_BUDGET] = "没有预算";
-    statusTxt[EPlanStatus.WAIT_UPLOAD] = "预订/传票据";
-    statusTxt[EPlanStatus.WAIT_COMMIT] = "待提交";
-    statusTxt[EPlanStatus.AUDITING] = "票据审核中";
-    statusTxt[EPlanStatus.COMPLETE] = "已完成";
-    // statusTxt[EPlanStatus.APPROVE_NOT_PASS] = '审核未通过';
-    statusTxt[EPlanStatus.CANCEL] = "已撤销";
     // 是否已经上传至少一张票据
-    let hasInvoice = false;
+    $scope.hasInvoice = false;
+    //对于当前日期及行程出发日期的判断
+    let isBeforeStartTime = moment().isBefore(tripPlan.startAt);
+    $scope.isBeforeStartTime = isBeforeStartTime;
 
     $scope.totalBudgetObj = {
         trafficTotalBudget: 0,
@@ -73,9 +40,13 @@ export async function ListDetailController($location, $scope , Models, $statePar
 
     budgets.forEach( async function(budget){
         var invoice = await budget.getInvoices();
-        if(invoice.length){
-            hasInvoice = true;
-            $scope.bottomStyle.left.display = false;
+        if(invoice.length>0){
+            $scope.hasInvoice = true;
+        }else{
+            $scope.$watch('invoice.length',function(n, o){
+                if(n== o)  return;
+                $scope.hasInvoice = true;
+            })
         }
         switch(budget.type) {
             case ETripType.BACK_TRIP:
@@ -211,63 +182,4 @@ export async function ListDetailController($location, $scope , Models, $statePar
             $scope.hasMakeSpendRecorder = false;
         }
     }
-
-    $scope.leftClick = $scope.cancelTripPlan;
-    $scope.$watch('hasMakeSpendRecorder',function(n, o){
-        if(n) $scope.bottomStyle.right.display = false;
-    })
-    //对于当前日期及行程出发日期的判断
-    let isBeforeStartTime = moment().isBefore(tripPlan.startAt);
-    $scope.$watch('tripDetail.status',function(newVal, oldVal){
-        $scope.bottomStyle = {
-            status:{
-                text:'',
-                cancel:'',
-            },
-            right:{
-                color:'#ffffff',
-                backgroundColor:'#28A7E1',
-                display:false,
-                text:'提交审核',
-            },
-            left:{
-                color:'#28A7E1',
-                text:'撤销行程',
-                backgroundColor:'#ffffff',
-                display:false,
-                border:'none',
-            }
-        };
-        $scope.rightClick = function(){
-            console.log('default');
-        };
-
-        $scope.bottomStyle.status.text = statusTxt[newVal];
-        if(newVal == EPlanStatus.WAIT_UPLOAD){
-            $scope.bottomStyle.right.display = true;
-            $scope.bottomStyle.right.backgroundColor = '#D8D8D8';
-            if(!hasInvoice){
-                $scope.bottomStyle.left.display = true;
-                $scope.bottomStyle.left.border = '1px solid #D8D8D8';
-            }
-            if(!isBeforeStartTime){
-                $scope.bottomStyle.status.text = '待传票据';
-            }
-        }else if(newVal == EPlanStatus.WAIT_COMMIT){
-            $scope.bottomStyle.right.display = true;
-            $scope.rightClick = $scope.showAlterDialog;
-            if(!isBeforeStartTime){
-                $scope.bottomStyle.status.text = '待传票据';
-            }
-        }else if(newVal == EPlanStatus.AUDIT_NOT_PASS){
-            $scope.bottomStyle.right.display = true;
-            $scope.bottomStyle.right.backgroundColor = '#D8D8D8';
-        }else if(newVal == EPlanStatus.COMPLETE){
-            $scope.bottomStyle.right.display = true;
-            $scope.bottomStyle.right.text = '生成报销单';
-            $scope.rightClick = $scope.makeSpendReport;
-        }else if(newVal == EPlanStatus.CANCEL){
-            $scope.bottomStyle.status.cancel = $scope.tripDetail.cancelRemark;
-        }
-    })
 }

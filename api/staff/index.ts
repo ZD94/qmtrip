@@ -225,7 +225,7 @@ class StaffModule{
                 throw L.ERR.EMAIL_SUFFIX_INVALID();
             }*/
 
-            if(updateStaff.status != 0){
+            if(updateStaff.staffStatus != 0){
                 throw L.ERR.NOTALLOWED_MODIFY_EMAIL();
             }
 
@@ -369,7 +369,7 @@ class StaffModule{
     @clientExport
     @requireParams(["departmentId"])
     static getCountByDepartment(params: {departmentId: string}){
-        return DBM.Staff.count({where: {departmentId: params.departmentId, status: {$gte: EStaffStatus.ON_JOB}}})
+        return DBM.Staff.count({where: {departmentId: params.departmentId, staffStatus: {$gte: EStaffStatus.ON_JOB}}})
     }
 
 
@@ -379,7 +379,7 @@ class StaffModule{
      * @param options options.perPage 每页条数 options.page当前页
      */
     @clientExport
-    @requireParams(["companyId"], ["name","status","roleId","departmentId","travelPolicyId","columns","order","$or", "options"])
+    @requireParams(["companyId"], ["name","staffStatus","roleId","departmentId","travelPolicyId","columns","order","$or", "options"])
     @conditionDecorator([
         {if: condition.isCompanyAdminOrOwner("0.companyId")},
         {if: condition.isCompanyAgency("0.companyId")}
@@ -406,7 +406,7 @@ class StaffModule{
         if (!options.order) {
             options.order = [["id", "desc"]]
         }
-        params.status = {$ne: EStaffStatus.DELETE};//只查询在职人员
+        params.staffStatus = {$ne: EStaffStatus.DELETE};//只查询在职人员
         options.limit = limit;
         options.offset = offset;
         options.where = params;
@@ -1019,9 +1019,9 @@ class StaffModule{
         var start = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
         var end = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
         return Promise.all([
-                DBM.Staff.count({where: {companyId: companyId, status: {$gte: 0}}}),
+                DBM.Staff.count({where: {companyId: companyId, staffStatus: {$gte: 0}}}),
                 DBM.Staff.count({where: {companyId: companyId, createdAt: {$gte: start, $lte: end}}}),
-                DBM.Staff.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, status: {$lt: 0} }})
+                DBM.Staff.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, staffStatus: {$lt: 0} }})
             ])
             .spread(function(all, inNum, outNum){
                 var sta = {
@@ -1162,7 +1162,7 @@ class StaffModule{
             let staff = await Models.staff.get(user_id);
             if(staff){
                 companyId = staff["companyId"];
-                return DBM.Staff.count({where: {companyId: companyId, status:{$ne: EStaffStatus.DELETE}}})
+                return DBM.Staff.count({where: {companyId: companyId, staffStatus:{$ne: EStaffStatus.DELETE}}})
                     .then(function(all){
                         return all || 1;
                     });
@@ -1172,7 +1172,7 @@ class StaffModule{
         }else{
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
             if(result){
-                return DBM.Staff.count({where: {companyId: companyId, status:{$ne: EStaffStatus.DELETE}}})
+                return DBM.Staff.count({where: {companyId: companyId, staffStatus:{$ne: EStaffStatus.DELETE}}})
                     .then(function(all){
                         return all || 1;
                     });

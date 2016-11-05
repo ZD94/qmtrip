@@ -7,6 +7,8 @@ export async function ReserveController($scope, Models, $stateParams){
     var currentStaff = await Staff.getCurrent();
     var currentCompany = currentStaff.company;
     if(currentCompany.isAppointSupplier){
+        console.log(currentCompany.isAppointSupplier);
+        console.log('asdf');
         suppliers = await currentCompany.getAppointedSuppliers();
         $scope.suppliers = suppliers;
     }

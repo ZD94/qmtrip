@@ -131,10 +131,11 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
                 alert(err.msg ||err);
             })
     }
-    $scope.rightClick = $scope.saveTripPlan;
+
+    $scope.bottomBottomClicked = false;
     $scope.$watch('trip.auditUser',function(n, o){
-        if(n){
-            $scope.bottomStyle.right.backgroundColor = "#28A7E1";
+        if(n!= o){
+            $scope.bottomBottomClicked = true;
         }
     })
 }

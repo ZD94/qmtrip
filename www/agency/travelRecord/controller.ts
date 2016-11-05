@@ -4,6 +4,8 @@
 "use strict";
 import { signToken, genAuthString } from 'api/_types/auth/auth-cert';
 import {ETripType} from "../../../api/_types/tripPlan/tripPlan";
+import {TripDetailTraffic, TripDetailHotel} from "api/_types/tripPlan/tripDetailInfo";
+import {TripDetail} from "api/_types/tripPlan/tripDetail";
 
 var msgbox = require('msgbox');
 
@@ -106,7 +108,7 @@ export async function TravelListController($scope, Models, $stateParams){
  * @param $scope
  * @constructor
  */
-export async function TravelDetailController($scope, $stateParams, $location, $anchorScroll, Models){
+export async function TravelDetailController($scope, $stateParams, $location, $anchorScroll, Models, City){
     $("title").html("出差单明细");
     var orderId = $stateParams.orderId;
     $scope.showInvoiceFailDialog = false;
@@ -120,32 +122,44 @@ export async function TravelDetailController($scope, $stateParams, $location, $a
         $scope.failReason = reason;
     }
 
-    $scope.init = function () {
-        Models.tripPlan.get(orderId)
-            .then(function (tripPlan) {
-                $scope.tripPlan = tripPlan;
-                //获取出差预算列表
-                return tripPlan.getTripDetails({where: {}})
-                    .then(function (tripDetails) {
-                        //对出差单进行排序,按照类型
-                        tripDetails.sort(function (v1, v2) {
-                            if (v1.type == ETripType.OUT_TRIP) return -1;
-                            if (v2.type == ETripType.OUT_TRIP) return 1;
-                            if (v1.type == ETripType.HOTEL) return -1;
-                            if (v2.type == ETripType.HOTEL) return 1;
-                            if (v1.type == ETripType.BACK_TRIP) return -1;
-                            if (v2.type == ETripType.BACK_TRIP) return 1;
-                            return v1.type - v2.type;
-                        });
-                        $scope.tripDetails = tripDetails;
-                    })
-            })
-            .catch(function(err){
-                console.log(err.stack);
-                msgbox.log(err.msg ||err);
-            }).done();
+    $scope.init = async function () {
+        let tripPlan = await Models.tripPlan.get(orderId);
+
+        $scope.tripPlan = tripPlan;
+        //获取出差预算列表
+        let tripDetails = await tripPlan.getTripDetails({where: {}});
+
+        //对出差单进行排序,按照类型
+        tripDetails.sort(function (v1, v2) {
+            if (v1.type == ETripType.OUT_TRIP) return -1;
+            if (v2.type == ETripType.OUT_TRIP) return 1;
+            if (v1.type == ETripType.HOTEL) return -1;
+            if (v2.type == ETripType.HOTEL) return 1;
+            if (v1.type == ETripType.BACK_TRIP) return -1;
+            if (v2.type == ETripType.BACK_TRIP) return 1;
+            return v1.type - v2.type;
+        });
+        
+        let ps = tripDetails.map( async (v: TripDetail) => {
+            if (v instanceof TripDetailTraffic) {
+                let deptCity = await City.getCity(v.deptCity);
+                console.info(deptCity)
+                let arrivalCity = await City.getCity(v.arrivalCity);
+                v['deptCityName'] = deptCity.name;
+                v['arrivalCityName'] = arrivalCity.name;
+                return v;
+            }
+            if (v instanceof TripDetailHotel) {
+                let city = await City.getCity(v.city);
+                v['cityName'] = city.name;
+                return v;
+            }
+            return v;
+        });
+        tripDetails = await Promise.all(ps);
+        $scope.tripDetails = tripDetails;
     }
-    $scope.init();
+    await $scope.init();
     $scope.showLoading = false;
     //默认不显示审批对话框
     $scope.showInvoice = async function (tripDetailId) {
@@ -155,7 +169,6 @@ export async function TravelDetailController($scope, $stateParams, $location, $a
         await Models.tripDetail.get(tripDetailId)
             .then(async function (tripDetail) {
                 let tripDetailInvoices = await tripDetail.getInvoices()
-                console.info(tripDetailInvoices)
                 let pictures = tripDetailInvoices.map( (tripDetailInvoice) => {
                     return tripDetailInvoice.pictureFileId;
                 })
@@ -168,6 +181,7 @@ export async function TravelDetailController($scope, $stateParams, $location, $a
                 tripDetail['invoice'] = pictures;
                 tripDetail['latestInvoice'] = pictures;
                 $scope.curTripDetail = tripDetail;
+                $scope.expenditure = tripDetail.expenditure;
                 return tripDetail;
             })
             .catch(function(err){

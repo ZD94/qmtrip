@@ -45,12 +45,43 @@
 
             </ion-scroll>
 
-            <div>
-                <bottom-bar bottom-style="bottomStyle"
-                            left-click="leftClick()"
-                            right-click="rightClick()"
-                            approve-id="approveId"
-                ></bottom-bar>
+            <div class="bottom-bar-approval">
+                <bottom-bar ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE">
+                    <div class="status-bar item status-bar-detail" ng-click="approveDetail()">
+                        <div class="list">等待{{tripApprove.approveUser.name}}审批</div>
+                        <div class="list">查看审批详情</div>
+                    </div>
+                    <button class="button button_left" ng-if="isHasPermissionApprove" ng-click="showReasonDialog()" style='color:#ffffff;background-color: #D0021B;'>驳回
+                    </button>
+                    <button class="button button_right" ng-if="isHasPermissionApprove" ng-click="confirmButton()" style='color:#ffffff;background-color: #28A7E1'>同意
+                    </button>
+                    <button class="button button_right" ng-if="!isHasApprove && !isHasPermissionApprove"
+                            ng-click="cancelTripApprove()" style='color:#28A7E1;background-color: #ffffff'>撤销行程
+                    </button>
+                </bottom-bar>
+                <bottom-bar ng-if="tripApprove.status == EApproveStatus.REJECT">
+                    <div class="status-bar item status-bar-detail" ng-click="approveDetail()">
+                        <div class="list"><span style="color: red">审批驳回</span><span>&nbsp;{{tripApprove.approveRemark}}</span></div>
+                        <div class="list">查看审批详情</div>
+                    </div>
+                    <button class="button button_right" ng-click="reCommitTripApprove()" ng-if="!isHasPermissionApprove"
+                            style='color:#ffffff;background-color: #D0021B'>重新提交
+                    </button>
+                </bottom-bar>
+                <bottom-bar ng-if="tripApprove.status == EApproveStatus.PASS">
+                    <div class="status-bar item status-bar-detail" ng-click="approveDetail()">
+                        <div class="list">审批通过</div>
+                        <div class="list">查看审批详情</div>
+                    </div>
+                    <button ng-if="!isHasPermissionApprove" class="button button_right" ng-click="checkTrip()" style='color:#ffffff;background-color: #28A7E1'>查看行程
+                    </button>
+                </bottom-bar>
+                <bottom-bar ng-if="tripApprove.status == EApproveStatus.CANCEL">
+                    <div class="status-bar item status-bar-detail" ng-click="approveDetail()">
+                        <div class="list">已撤销<span>&nbsp;{{tripApprove.cancelRemark}}</span></div>
+                        <div class="list">查看审批详情</div>
+                    </div>
+                </bottom-bar>
             </div>
         </div>
     </ion-content>

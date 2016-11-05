@@ -12,8 +12,6 @@ angular
         return{
             restrict: 'AE',
             template: require('./bottom-bar.html'),
-            transclude: true,
-            replace: true,
             scope:{
                 bottomStyle:'=',
                 rightClick:'&',
@@ -23,7 +21,11 @@ angular
                 approveId:'=',
             },
             controller:function($scope) {
-
+                require('./bottom-bar.scss');
+                $scope.approveDetail = function(){
+                    let approveId = $scope.approveId;
+                    window.location.href = `#/trip-approval/approve-progress?approveId=${approveId}`
+                }
             }
         }
     })

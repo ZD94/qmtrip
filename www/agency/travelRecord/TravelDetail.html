@@ -26,28 +26,29 @@
                         <th width="135" height="40">实际支出</th>
                         <th width="135" height="40">出差票据</th>
                     </tr>
-
                     <tr ng-repeat="tripDetail in tripDetails">
+
                         <td ng-if="tripDetail.type == 0">
                             <div class="icon web-icon-font3" style="color: #CF2520;">&#xe90e;</div>
-                            <div class="startplace">{{tripDetail.deptCity}}</div>
-                            <div class="description">{{tripDetail.startTime | date: 'yyyy-MM-dd'}}<span ng-if="tripDetail.latestArriveTime!=undefined && tripDetail.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{tripDetail.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
-                            <div class="endplace">{{tripDetail.arrivalCity}}</div>
+                            <div class="startplace">{{tripDetail.deptCityName}}</div>
+                            <div class="description">{{tripDetail.startTime | date: 'yyyy-MM-dd'}}
+                                <span ng-if="tripDetail.latestArriveTime!=undefined && tripDetail.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{tripDetail.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
+                            <div class="endplace">{{tripDetail.arrivalCityName}}</div>
                         </td>
 
                         <td ng-if="tripDetail.type == 2">
                             <div class="icon web-icon-font3" style="color: #5248C8;">&#xe914;</div>
                             <div class="hoteldescription">
-                                <p>入住地：{{tripDetail.city}}&nbsp;附近</p>
+                                <p>入住地：{{tripDetail.cityName}}&nbsp;<i ng-if="tripDetail.placeName">{{tripDetail.placeName}}附近</i></p>
                                 <p>入住日期：{{tripDetail.startTime | date: 'yyyy-MM-dd'}}&nbsp;&nbsp;&nbsp;&nbsp;退房日期：{{tripDetail.endTime | date: 'yyyy-MM-dd'}}</p>
                             </div>
                         </td>
 
                         <td ng-if="tripDetail.type == 1">
                             <div class="icon web-icon-font3" style="color: #CF2520;">&#xe90e;</div>
-                            <div class="startplace">{{tripDetail.deptCity}}</div>
+                            <div class="startplace">{{tripDetail.deptCityName}}</div>
                             <div class="description">{{tripDetail.startTime | date: 'yyyy-MM-dd'}}<span ng-if="tripDetail.latestArriveTime!=undefined && tripDetail.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{tripDetail.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
-                            <div class="endplace">{{tripDetail.arrivalCity}}</div>
+                            <div class="endplace">{{tripDetail.arrivalCityName}}</div>
                         </td>
 
                         <td ng-if="tripDetail.type == 3">

@@ -64,7 +64,7 @@ function ngUploader($loading, wxApi): any {
             var fileIds = [];
             var tempFiles = {};
             var progressPopup;
-            var interval;
+
             uploader.onAfterAddingAll = async function(files) {
                 var urls = files.map((file)=>file._file)
                 var blobs = await showPreviewDialog($scope, ngModalDlg, urls, $scope.title)
@@ -76,12 +76,6 @@ function ngUploader($loading, wxApi): any {
                 //    uploader.queue[i]._file = blobs[i];
                 //}
                 //$loading.start();
-                interval = $interval(function(){
-                    if(uploader.progress){
-                        $scope.progress = uploader.progress;
-                    }
-                },50)
-
                 let template = `<p style="text-align: center">{{progress}}%</p><progress max="100" value={{progress}}></progress>`;
                 progressPopup = $ionicPopup.show({
                     template: template,
@@ -91,6 +85,11 @@ function ngUploader($loading, wxApi): any {
                 fileIds = [];
                 uploader.uploadAll();
             };
+
+            uploader.onProgressItem = function(file, progress){
+                $scope.progress = progress;
+            }
+
             uploader.onSuccessItem  = function (file, response, status, headers) {
                 fileIds.push(response.fileId);
                 tempFiles[response.fileId] = response;
@@ -115,10 +114,6 @@ function ngUploader($loading, wxApi): any {
                 $scope.done()(obj);
                 uploader.clearQueue();
                 progressPopup.close();
-                if (angular.isDefined(interval)) {
-                    $interval.cancel(interval);
-                    interval = undefined;
-                }
                 //$loading.end();
             };
 
