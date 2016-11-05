@@ -14,11 +14,12 @@
 
                 <div ng-if="tripApprove.isSpecialApprove">
                     <ion-item class="item-divider">
-                        <span>{{tripApprove.deptCity}} - {{tripApprove.arrivalCity}}</span>
+                        <!--<span>{{tripApprove.deptCity}} - {{tripApprove.arrivalCity}}</span>-->
+                        <span>特别说明</span>
                     </ion-item>
                     <ion-item>
                         <p style="white-space: initial;">{{tripApprove.specialApproveRemark}}</p>
-                        <span>{{tripApprove.budget| currency: ''}}元</span>
+                        <span>{{tripApprove.budget| currency_int}}元</span>
                     </ion-item>
                 </div>
 

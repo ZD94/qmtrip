@@ -162,6 +162,56 @@ $color-blue: #28a7e1;
       padding-left: 5px;
       padding-right: 5px;
     }
+    .actual-cost{
+      display: inline-block;
+      width:95px;
+      span:first-child{
+        color: #b6b6b6;
+        text-align: left;
+        font-size: 12px;
+      }
+      span:nth-child(2){
+        color:#f49e0e;
+        float: right;
+        font-size: 16px;
+      }
+    }
+    .spanRight-cost{
+      font-size: 12px;
+      color:#fff;
+      border-radius: 3px;
+      border:1px solid #fff;
+      line-height: 16px;
+    }
+    .spanRight-cost span:nth-child(1){
+      padding:1px 2px 1px 2px;
+    }
+    .spanRight-cost span:nth-child(2){
+      display: inline-block;
+      min-width: 14px;
+      text-align: right;
+      padding-right: 2px;
+    }
+    .spanRight-cost.company-cost{
+      border-color: #28a7e1;
+      margin-right: 8px;
+      span:first-child{
+        background-color: #28a7e1;
+      }
+      span:nth-child(2){
+        color:#28a7e1;
+      }
+    }
+    .spanRight-cost.personal-cost{
+      border-color: #ff5b12;
+      span:first-child{
+        background-color: #ff5b12;
+      }
+      span:nth-child(2){
+        color:#ff5b12;
+      }
+    }
+
     .trip-buttons{
       padding-top: 0px;
       padding-bottom: 0px;
