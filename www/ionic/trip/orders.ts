@@ -3,6 +3,7 @@ import { EPayType, EInvoiceFeeTypes } from 'api/_types/tripPlan';
 var msgbox = require('msgbox');
 
 export async function OrdersController($scope,Models, $stateParams, $ionicPopup){
+    require('./orders.scss');
     var currentStaff = await Staff.getCurrent();
     var supplier = await Models.supplier.get($stateParams.supplierId);
     var tripDetail = await Models.tripDetail.get($stateParams.detailId);
@@ -11,12 +12,14 @@ export async function OrdersController($scope,Models, $stateParams, $ionicPopup)
     $scope.supplier = supplier;
     $scope.EPayType = EPayType;
     $scope.EInvoiceFeeTypes = EInvoiceFeeTypes;
-
+    $scope.orderBinded = false;
+    console.info(orders);
     $scope.getOrders = async function(type){
         if(type == "alreadyBind"){
             var alreadyBindList  = orders.filter((item: any)=>{
                 return item.isBind;
             })
+            $scope.orderBinded = true;
             $scope.orders = alreadyBindList;
         }
 
@@ -24,6 +27,7 @@ export async function OrdersController($scope,Models, $stateParams, $ionicPopup)
             var notBindList  = orders.filter((item: any)=>{
                 return !item.isBind;
             })
+            $scope.orderBinded = false;
             $scope.orders = notBindList;
         }
     }

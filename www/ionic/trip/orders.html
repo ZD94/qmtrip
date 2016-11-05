@@ -1,25 +1,70 @@
 <ion-view title="关联订单">
-    <ion-content padding="true" class="reserve">
-        <ion-list>
-            <ion-item>
-                <img class="" ng-src="/attachments/{{supplier.logo}}" ng-if="supplier.logo">
-                <input type="button" value="已关联" ng-click="getOrders('alreadyBind')">
-                <input type="button" value="未关联" ng-click="getOrders('notBind')">
-            </ion-item>
-            <ion-checkbox ng-repeat="order in orders"
-                          ng-model="order.checked"
-                          ng-checked="order.checked">
-                <p>{{order.date | date: 'yyyy-MM-dd HH:mm'}}</p>
-                <h2>{{order.desc}}</h2>
-                <p>{{order.price | currency: ''}}元</p>
-                <p>{{order.orderType == EInvoiceFeeTypes.HOTEL ? '入住人' : '出行人'}}：{{order.persons.join()}}</p>
-                <p ng-if="order.orderType == EInvoiceFeeTypes.PLANET_TICKET">航班号：{{order.number}}</p>
-                <p ng-if="order.orderType == EInvoiceFeeTypes.TRAIN_TICKET">车次：{{order.number}}</p>
-                <p>{{order.parType == EPayType.COMPANY_PAY ? "公司账户支付" : "个人账户支付"}}</p>
-            </ion-checkbox>
-        </ion-list>
-        <div>
-            <a id="page1-button26" class="button button-positive  button-block" ng-click="selectOrders()">完成</a>
+    <ion-content padding="false" scroll="false" class="ordersFromSupplier">
+        <div class="flex-c10">
+            <ion-scroll>
+                <div class="explanation">
+                    说明:
+                    <br/>
+                    每个携程商旅的订单只允许和一个出差记录进行关联，如需修改请到出差记录中删除关联订单的记录，再重新回到此页面进行关联。已经完成审核的记录中，关联订单无法删除。
+                </div>
+                <ion-list>
+                    <ion-item>
+                        <img class="" ng-src="/attachments/{{supplier.logo}}" ng-if="supplier.logo">
+                        <div class="button-bar">
+                            <a class="button button-small button-positive"
+                               ng-class="{'button-outline':!orderBinded}" ng-click="getOrders('alreadyBind')">已关联</a>
+                            <a class="button button-small button-positive"
+                               ng-class="{'button-outline':orderBinded}"
+                               ng-click="getOrders('notBind')">未关联</a>
+                        </div>
+                    </ion-item>
+                    <ion-checkbox ng-repeat="order in orders"
+                                  ng-model="order.checked"
+                                  ng-checked="order.checked"
+                                  ng-if="!orderBinded"
+                    >
+                        <p>{{order.date | date: 'yyyy-MM-dd'}}</p>
+                        <div class="order-detail">
+                            <p>{{order.desc}}
+                                <span ng-if="order.orderType == EInvoiceFeeTypes.PLANET_TICKET"> {{order.number}}</span>
+                                <span ng-if="order.orderType == EInvoiceFeeTypes.TRAIN_TICKET"> {{order.number}}</span>
+                                <span class="order_price">{{order.price | currency_int: ''}}元</span></p>
+                            <p>
+                        <span class="people">
+                            {{order.orderType == EInvoiceFeeTypes.HOTEL ? '入住人' : '出行人'}}：{{order.persons.join()}}
+                        </span>
+                        <span class="pay-func company-pay" ng-if="order.parType == EPayType.COMPANY_PAY">
+                            公司账户支付
+                        </span>
+                        <span class="pay-func personal-pay" ng-if="order.parType == EPayType.PERSONAL_PAY">
+                            个人账户支付
+                        </span>
+                            </p>
+                        </div>
+                    </ion-checkbox>
+                    <div ng-repeat="order in orders"
+                         ng-model="order.checked"
+                         ng-checked="order.checked"
+                         ng-if="orderBinded"
+                         class="item"
+                    >
+                        <p>{{order.date | date: 'yyyy-MM-dd HH:mm'}}</p>
+                        <h2>{{order.desc}}</h2>
+                        <p>{{order.price | currency: ''}}元</p>
+                        <p>{{order.orderType == EInvoiceFeeTypes.HOTEL ? '入住人' : '出行人'}}：{{order.persons.join()}}</p>
+                        <p ng-if="order.orderType == EInvoiceFeeTypes.PLANET_TICKET">航班号：{{order.number}}</p>
+                        <p ng-if="order.orderType == EInvoiceFeeTypes.TRAIN_TICKET">车次：{{order.number}}</p>
+                        <p>{{order.parType == EPayType.COMPANY_PAY ? "公司账户支付" : "个人账户支付"}}</p>
+                    </div>
+                </ion-list>
+            </ion-scroll>
+            <div>
+                <a id="page1-button26"
+                   class="button button-positive button-full"
+                   ng-click="selectOrders()"
+                   style="margin: 0;"
+                >完成</a>
+            </div>
         </div>
     </ion-content>
 </ion-view>
