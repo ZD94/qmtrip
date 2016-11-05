@@ -46,9 +46,6 @@ service.mediaId2key = function(params) {
                 return oneMediaId2key(id, self.accountId);
             });
             return Promise.all(ps)
-                .then(function(fileIds){
-                    return fileIds;
-                })
         }else{
             throw {code: -2, msg: "参数mediaIds格式不正确"};
         }
@@ -60,13 +57,6 @@ function oneMediaId2key(id, accountId){
         .then(function(content) {
             return API.attachments.saveAttachment({contentType: "image/png", content: content, isPublic: false});
         })
-        .then(function(fileId) {
-            return API.attachment.bindOwner({fileId: fileId, accountId: accountId})
-                .then(function() {
-                    return fileId;
-                });
-        })
-
 }
 
 module.exports = service;
