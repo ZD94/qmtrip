@@ -1933,10 +1933,11 @@ class TripPlanModule {
         })
         let financeCheckCode = Models.financeCheckCode.create({tripPlanId: tripPlanId, isValid: true});
         financeCheckCode = await financeCheckCode.save();
+        let roundLine = `${tripPlan.deptCity}-${tripPlan.arrivalCity}${tripPlan.isRoundTrip ? '-' + tripPlan.deptCity: ''}`;
         let content: any = [
             `出差人:${staff.name}`,
             `出差日期:${moment(tripPlan.startAt).format('YYYY.MM.DD')}-${moment(tripPlan.backAt).format('YYYY.MM.DD')}`,
-            `出差路线:${tripPlan.deptCity}-${tripPlan.arrivalCity}${tripPlan.isRoundTrip ? '-' + tripPlan.deptCity: ''}`,
+            `出差路线: ${roundLine}`,
             `出差预算:${tripPlan.budget}`,
             `实际支出:${tripPlan.expenditure}`,
             `出差记录编号:${tripPlan.planNo}`,
@@ -1978,7 +1979,8 @@ class TripPlanModule {
             "reason": tripPlan.project.name, //出差事由
             "approveUsers": approveUsers, //本次出差审批人
             "qrcode": `data:image/png;base64,${qrcodeCxt}`,
-            "invoices": _tripDetails
+            "invoices": _tripDetails,
+            "roundLine": roundLine,
         }
 
         let buf = await makeSpendReport(data);
@@ -2064,9 +2066,9 @@ class TripPlanModule {
             }
 
             /*if(o.persons.indexOf(currentStaff.name) < 0){
-                result.failed.push({desc: o.desc, reason: '只能关联自己的订单'});
-                // throw L.ERR.ORDER_NOT_YOURS();
-            }*/
+             result.failed.push({desc: o.desc, reason: '只能关联自己的订单'});
+             // throw L.ERR.ORDER_NOT_YOURS();
+             }*/
             let invoice: any = {};
             invoice.accountId = currentStaff.id;
             invoice.orderId = o.id;
