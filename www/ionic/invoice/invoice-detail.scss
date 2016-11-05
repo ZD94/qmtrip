@@ -79,12 +79,10 @@
         overflow: hidden;
         line-height: 32px;
         padding: 5px 10px;
-        &:last-child{
-          & > div{
-            border-bottom: none;
-            p{
-              height: 50px;
-            }
+        .invoice_desc{
+          border-bottom: none;
+          p{
+            height: 50px;
           }
         }
         .item-tit{
@@ -125,6 +123,43 @@
             font-size: 16px;
             padding: 0;
             line-height: 30px;
+          }
+        }
+      }
+      &.from-supplier{
+        .invoice-img{
+          overflow: hidden;
+          line-height: 40px;
+          padding: 10px;
+          text-align: left;
+          span{
+            float: left;
+            font-weight: bold;
+          }
+          h3{
+            padding-left: 5px;
+            font-size: 24px;
+            margin-top: 0;
+          }
+          //img{
+          //  width: 80px;
+          //  height: 80px;
+          //  border: 1px dashed #ccc;
+          //}
+          .supplier_logo{
+            background: url("ionic/images/supplier.png") -20px 0 no-repeat;
+            width: 95px;
+            height: 30px;
+            float: left;
+            border: none;
+          }
+          & > div{
+            width: 50%;
+            float: right;
+            text-align: right;
+            padding-bottom: 20px;
+            height: 40px;
+            border-bottom: 1px solid #ccc;
           }
         }
       }

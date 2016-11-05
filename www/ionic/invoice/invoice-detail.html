@@ -27,7 +27,7 @@
                        show-pager="true"
                        active-slide="0">
             <ion-slide  ng-repeat="invoice in invoices track by $index">
-                <div class="invoice-form" ng-if="!invoice.edit">
+                <div class="invoice-form" ng-if="invoice.sourceType == '1' && !invoice.edit">
                     <div class="invoice-img">
                         <img ng-src="{{invoice.imgUrl}}" ng-click="imgView(invoice.imgUrl)">
                         <div>
@@ -59,7 +59,7 @@
                         </div>
                     </div>
                     <div class="invoice-item">
-                        <div>
+                        <div class="invoice_desc">
                             <span class="item-tit">备注</span>
                             <p>{{invoice.remark}}</p>
                         </div>
@@ -69,7 +69,7 @@
                         <a class="button button-outline button-calm" ng-click="editNow(invoice)">修改</a>
                     </div>
                 </div>
-                <div class="invoice-form invoice-edit" ng-if="invoice.edit">
+                <div class="invoice-form invoice-edit" ng-if="invoice.sourceType == '1' && invoice.edit">
                     <div class="invoice-img">
                         <div class="invoice-img-min" ng-uploader="" accept="image/png, image/jpeg, image/gif" url="uploadUrl" done="invoicefuc.done">
                             <img ng-if="previewUrl" ng-src="{{previewUrl}}">
@@ -125,6 +125,48 @@
                     <div class="button-bar">
                         <a class="button button-outline button-calm" ng-click="cancelChanges(invoice)">取消</a>
                         <a class="button button-outline button-calm" ng-click="saveChanges(invoice)">确认</a>
+                    </div>
+                </div>
+                <div class="invoice-form from-supplier" ng-if="invoice.sourceType == '2' && !invoice.edit">
+                    <div class="invoice-img">
+                        <!--<img ng-src="{{invoice.imgUrl}}">-->
+                        <div class="supplier_logo"></div>
+                        <div>
+                            <span class="item-tit">金额</span>
+                            <h3>{{invoice.totalMoney}}</h3>
+                        </div>
+                    </div>
+                    <div class="invoice-item">
+                        <div>
+                            <span class="item-tit">支付方式</span>
+                            <h3 ng-if="invoice.payType == 1">个人支付</h3>
+                            <h3 ng-if="invoice.payType == 2">公司支付</h3>
+                        </div>
+                    </div>
+                    <div class="invoice-item">
+                        <div>
+                            <span class="item-tit">类型</span>
+                            <h3 ng-if="invoice.type == 1">机票</h3>
+                            <h3 ng-if="invoice.type == 2">火车票</h3>
+                            <h3 ng-if="invoice.type == 3">火车退票费</h3>
+                            <h3 ng-if="invoice.type == 4">机票退票费</h3>
+                            <h3 ng-if="invoice.type == 5">酒店</h3>
+                        </div>
+                    </div>
+                    <div class="invoice-item">
+                        <div>
+                            <span class="item-tit">时间</span>
+                            <h3>{{invoice.invoiceDateTime | date: 'yyyy-MM-dd'}}</h3>
+                        </div>
+                    </div>
+                    <div class="invoice-item">
+                        <div class="invoice_desc">
+                            <span class="item-tit">备注</span>
+                            <p>{{invoice.remark}}</p>
+                        </div>
+                    </div>
+                    <div class="button-bar">
+                        <a class="button button-outline button-calm" ng-click="">解除绑定</a>
                     </div>
                 </div>
             </ion-slide>

@@ -159,7 +159,7 @@ angular
                     $scope.subsidyDays -= 1;
                 }
                 $scope.viewInvoice = function(id) {
-                    window.location.href="#/trip/invoice-detail?detailId="+id;
+                    window.location.href="#/invoice/invoice-detail?detailId="+id;
                 }
                 $scope.reserve = function(id){
                     window.location.href="#/trip/reserve?detailId="+id;

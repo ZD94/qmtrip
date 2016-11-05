@@ -151,7 +151,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
     };
     
     $scope.checkInvoice = function(detailId){
-        window.location.href="#/trip/invoice-detail?detailId="+detailId;
+        window.location.href="#/invoice/invoice-detail?detailId="+detailId;
     }
 
     $scope.hasMakeSpendRecorder = false;    //防止一直生成
