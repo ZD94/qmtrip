@@ -1887,8 +1887,7 @@ class TripPlanModule {
                     date: moment(v1.deptDateTime).format('YYYY.MM.DD'),
                     invoiceInfo: `${type}费`,
                     quantity: tripDetailInvoices.length,
-                    money: v1.expenditure,
-                    budget: v1.budget,
+                    money: v1.personalExpenditure,
                     departCity: deptCity.name,
                     arrivalCity: arrivalCity.name,
                     remark: `${deptCity.name}-${arrivalCity.name}`,
@@ -1904,8 +1903,7 @@ class TripPlanModule {
                     "date": moment(v1.checkInDate).format('YYYY.MM.DD'),
                     "invoiceInfo": "住宿费",
                     "quantity": tripDetailInvoices.length,
-                    "money": v1.expenditure,
-                    budget: v1.budget,
+                    "money": v1.personalExpenditure,
                     "remark": `${moment(v1.checkInDate).format('YYYY.MM.DD')}-${moment(v1.checkOutDate).format('YYYY.MM.DD')} ${city.name} 共${moment(v1.checkOutDate).diff(v1.checkInDate, 'days')}日`,
                     "duration": `${moment(v1.checkOutDate).diff(v1.checkInDate, 'days')}`
                 }
@@ -1917,8 +1915,7 @@ class TripPlanModule {
                     "date": moment(v1.startDateTime).format('YYYY.MM.DD'),
                     "invoiceInfo": "补助费",
                     quantity: 0,
-                    money: v1.expenditure,
-                    budget: v1.budget,
+                    money: v1.personalExpenditure,
                     remark: '补助费'
                 }
             }
@@ -1929,8 +1926,7 @@ class TripPlanModule {
                     "date": moment(v1.deptDateTime).format('YYYY.MM.DD'),
                     "invoiceInfo": "出差费",
                     quantity: tripDetailInvoices.length,
-                    money: v1.expenditure,
-                    budget: v1.budget,
+                    money: v1.personalExpenditure,
                     remark: '特别审批出差费用'
                 }
             }
@@ -1949,6 +1945,9 @@ class TripPlanModule {
 
         let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')})
         _tripDetails = await Promise.all(_tripDetails);
+        _tripDetails = _tripDetails.filter( (v) => {
+            return v['money'] > 0;
+        });
         var invoiceQuantity = _tripDetails
             .map( (v) => {
                 return v['quantity'] || 0;
@@ -1957,12 +1956,21 @@ class TripPlanModule {
                 return previousValue + currentValue;
             });
 
+        //计算用户总花费
+        let _personalExpenditure = _tripDetails
+            .map( (v) => {
+                return v['money'];
+            })
+            .reduce((prev, cur) => {
+                return Number(prev) + Number(cur)
+            });
+
         var data = {
             "submitter": staff.name,  //提交人
             "department": staff.department.name,  //部门
             "budgetMoney": tripPlan.budget || 0, //预算总金额
-            "totalMoney": tripPlan.expenditure || 0,  //实际花费
-            "totalMoneyHZ": money2hanzi.toHanzi(<number>tripPlan.expenditure),  //汉子大写金额
+            "totalMoney": _personalExpenditure || 0,  //实际花费
+            "totalMoneyHZ": money2hanzi.toHanzi(_personalExpenditure),  //汉子大写金额
             "invoiceQuantity": invoiceQuantity, //票据数量
             "createAt": moment().format('YYYY年MM月DD日HH:mm'), //生成时间
             "departDate": moment(tripPlan.startAt).format('YYYY.MM.DD'), //出差起始时间
@@ -2206,13 +2214,8 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: EPlanSt
     tripDetail = await tripDetail.save()
     //尝试更改行程状态
     let tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
-    try {
-        let ret = await tryUpdateTripPlanStatus(tripPlan, status);
-        // console.info(ret);
-    } catch(err) {
-        console.error(err);
-    }
-    console.info('为啥没有执行呢....')
+    await tryUpdateTripPlanStatus(tripPlan, status);
+
     return tripDetail;
 }
 
