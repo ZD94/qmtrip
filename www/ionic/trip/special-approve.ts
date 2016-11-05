@@ -24,6 +24,13 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
     let totalPrice: number = 0;
 
     $scope.totalPrice = totalPrice;
+    //下方的提交按钮，当选择完审批人之后变颜色
+    $scope.bottomBottomClicked = false;
+    $scope.$watch('trip.auditUser',function(n, o){
+        if(n!= o){
+            $scope.bottomBottomClicked = true;
+        }
+    })
 
     $scope.staffSelector = {
         query: async function(keyword) {

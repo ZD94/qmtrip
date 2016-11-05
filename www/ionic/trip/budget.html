@@ -20,7 +20,7 @@
 
                 <ion-list class="jl_projectinfo">
                     <ion-item class="project_tit">{{trip.beginDate| date: 'MM-dd'}} 至 {{trip.endDate | date: 'MM-dd'}}
-                        <span style="padding-left: 13px">{{trip.destinationPlaceName}} - {{trip.originPlaceName}}</span>
+                        <span style="padding-left: 13px">{{trip.originPlaceName}} - {{trip.destinationPlaceName}}</span>
                     </ion-item>
                     <ion-item class="project_cont">
                         <p ng-if="trip && trip.beginDate"><i class="fa fa-flag-o">

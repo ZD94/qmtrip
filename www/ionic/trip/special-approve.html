@@ -5,24 +5,18 @@
                 <div id="page16-markdown4" style="color:#000000;text-align:right;">
                     <p style="color: #fff;">{{trip.createAt| date: 'yyyy-MM-dd HH:mm:ss'}}</p>
                 </div>
-                <form class="list">
-                    <div class="item item-input">
-                        <span class="input-label">选择审批人</span>
-                        <ng-selector-list
-                                ng-model="trip.auditUser"
-                                dlg-options="staffSelector"
-                                dlg-title="选择审批人"
-                                dlg-placeholder="请选择审批人"
-                                class="fake-input"
-                        ></ng-selector-list>
-                    </div>
-                </form>
 
                 <ion-list class="jl_projectinfo">
-                    <ion-item class="project_tit">{{trip.reason || trip.reasonName}}</ion-item>
+                    <ion-item class="project_tit">{{trip.beginDate| date: 'MM-dd'}} 至 {{trip.endDate | date: 'MM-dd'}}
+                        <span style="padding-left: 13px">{{trip.originPlaceName}} - {{trip.destinationPlaceName}}</span>
+                    </ion-item>
                     <ion-item class="project_cont">
-                        <p ng-if="trip && trip.beginDate">{{trip.beginDate| date: 'yyyy-MM-dd'}} 至 {{trip.endDate | date: 'yyyy-MM-dd'}}</p>
-                        <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{totalPrice == -1 ? '暂无预算' : (totalPrice| currency: '')}}</span>{{totalPrice == -1 ? '' : '元'}}</p>
+                        <p ng-if="trip && trip.beginDate"><i class="fa fa-flag-o">
+                        </i>&nbsp;{{trip.reason || trip.reasonName}}</p>
+                        <p class="totalBudget"  style="text-align: center">
+                            <span>总预算&nbsp;<i class="icon ion-help-circled"></i></span>
+                            <span>{{totalPrice == -1 ? '暂无预算' : (totalPrice| currency_int)}}</span>{{totalPrice == -1 ? '' : '元'}}
+                        </p>
                     </ion-item>
                 </ion-list>
 
@@ -31,7 +25,7 @@
                 </div>
                 <ion-list>
                     <div>
-                        <div class="item-divider item">{{trip.originPlaceName}} - {{trip.destinationPlaceName}}</div>
+                        <div class="item-divider item">审批说明</div>
                         <div class="item item-input">
                             <span class="input-label">审批说明</span>
                             <input type="text"
@@ -50,8 +44,24 @@
                 <p class="explanation">说明：<br>审批说明主要填写原因和可能的超标项，例如：”因为特殊原因，需要陪同客户一起出行，航班和酒店都会超标。航班为CA1231，酒店为喜来登酒店，5星级。”</p>
             </ion-scroll>
 
-            <div class="button-bar">
-                <a ng-click="saveSpecialTripPlan()" id="page16-button56" class="button button-positive">预算提交审批</a>
+            <div class="bottom-bar-budget">
+                <bottom-bar>
+                    <form class="list">
+                        <div class="item item-input status-bar status-bar-input">
+                            <span class="input-label">选择审批人</span>
+                            <ng-selector-list
+                                    ng-model="trip.auditUser"
+                                    dlg-options="staffSelector"
+                                    dlg-title=""
+                                    dlg-placeholder="请选择审批人"
+                                    class="fake-input"
+                            ></ng-selector-list>
+                            <i class="icon ion-arrow-up-b"></i>
+                        </div>
+                    </form>
+                    <button class="button button_right" ng-class="{true: 'hasAuditUser',false: ''}[bottomBottomClicked]" ng-click="saveSpecialTripPlan()">
+                        提交审批</button>
+                </bottom-bar>
             </div>
         </div>
     </ion-content>

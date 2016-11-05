@@ -14,171 +14,184 @@
 		}
 	</style>
 	<style>
-	body {
-		font-family: 'AR PL UKai CN', 'KaiTi','sans-serif',  'Arial', 'STKaiti';
-		width: 210mm;
-	}
-	.content {
-		width: 210mm;
-		height:287mm;
-		color: #454545;
-		padding:10mm 14mm 5mm 17mm;
-		text-align: center;
-		font-size: 9pt;
-		font-family: 'AR PL UKai CN', 'KaiTi','sans-serif',  'Arial', 'STKaiti';
-		margin:0 auto;
-		position:relative;
-	}
-	.content h1 {
-		font-size: 12pt;
-	}
-	.content p.date {
-		text-align: right;
-	}
-	.content table {
-		margin: 0 auto;
-	}
-	.content table.first-table {
-		width: 178mm;
-		border-left: none;
-		border-right: none;
-	}
-	.content table.first-table tr {
-		height: 18pt;
-		border-left: none;
-		border-right: none;
-	}
-	.content table.first-table tr td:first-child{
-		border-left: none;
-	}
-	.content table.first-table tr td:last-child{
-		border-right: none;
-	}
-	.content table.first-table tr td span:nth-child(1) {
-		float: left;
-	}
-	.content table.first-table tr td span:nth-child(2) {
-		float: right;
-	}
-	.content table.second-table {
-		width: 178mm;
-		text-align: left;
-	}
-	.content table.second-table tbody > tr > td {
-		border-top: none;
-	}
-	.content table.second-table tr {
-		height: 12pt;
-	}
-	.content table.second-table tr.total {
-		border-top: 2pt solid #000000;
-		border-bottom: 2pt solid #000000;
-		font-weight: bold;
-	}
-	.content .content-middle {
-		overflow: hidden;
-	}
-	.content .content-middle h3 {
-		text-align: left;
-		font-size: 10pt;
-		padding-left: 12pt;
-	}
-	.content .content-middle .detail {
-		float: left;
-		width: 90mm;
-	}
-	.content .content-middle .detail div.container {
-		width: 100%;
-	}
-	.content .content-middle .detail div.container .col-xs-6 span:nth-child(1) {
-		float: left;
-	}
-	.content .content-middle .detail div.container .col-xs-6 span:nth-child(2) {
-		float: right;
-	}
-	.content .content-middle .detail div.container .col-xs-6:nth-child(1) {
-		padding-right: 0pt;
-	}
-	.content .content-middle .explain {
-		width: 85mm;
-		float: right;
-		margin-right: 9pt;
-	}
-	.content .content-middle .explain h3 {
-		padding-left: 75pt;
-	}
-	.content .content-middle .explain .qrcode {
-		float: left;
-	}
-	.content .content-middle .explain .explain-text {
-		float: right;
-		width: 58mm;
-	}
-	.content .content-middle .explain .explain-text div {
-		border-bottom: 1pt solid #222;
-		height: 18pt;
-	}
-	.content .content-middle .sign {
-		clear: both;
-		padding-top: 20px;
-		font-weight: bold;
-	}
-	.content .content-middle .sign .col-xs-3 {
-		padding-left: 0px;
-		padding-right: 0px;
-		margin-right: 0px;
-		margin-left: 0px;
-	}
-	.content .ticket {
-		border: 2px solid #8cb8e1;
-		width: 170mm;
-		/*height: 130mm;*/
-		margin: 0mm auto 0mm;
-		padding-bottom: 20mm;
-		position:absolute;
-		top:55%;
-		left:10%;
-	}
-	.content .ticket .ticket-title {
-		font-size: 12pt;
-		font-weight: bold;
-		text-align: left;
-		margin-top: 20pt;
-		margin-bottom: 30mm;
-		text-indent: 4pt;
-	}
-	.content .ticket table {
-		width: 260pt;
-	}
-	.content .ticket table thead {
-		background-color: #d9d9d9;
-		border-top: 1pt solid #000000;
-	}
-	.content .ticket table tbody tr > td {
-		border-top: none;
-	}
-	.content .ticket table tbody tr {
-		border-top: 1pt dashed #000000;
-	}
-	.content .ticket table tbody tr:last-child {
-		border-bottom: 1pt solid #000000;
-	}
-	.content .ticket .ticket-inform {
-		color: #b4b4b4;
-		margin-top: 40mm;
-	}
-	* {
-		-webkit-box-sizing: border-box;
-		-moz-box-sizing: border-box;
-		/* box-sizing: border-box; */
-	}
-	h2, .h2, h3, .h3 {
-		margin-top: 20px;
-		margin-bottom: 10px;
-	}
-	p {
-		margin: 0 0 10px;
-	}
+		body {
+			font-family: 'AR PL UKai CN', 'KaiTi','sans-serif',  'Arial', 'STKaiti';
+			width: 210mm;
+		}
+		.content {
+			width: 210mm;
+			height:287mm;
+			color: #454545;
+			padding:10mm 14mm 5mm 17mm;
+			text-align: center;
+			font-size: 9pt;
+			font-family: 'AR PL UKai CN', 'KaiTi','sans-serif',  'Arial', 'STKaiti';
+			margin:0 auto;
+			position:relative;
+		}
+		.content h1 {
+			font-size: 12pt;
+		}
+		.content p.date {
+			text-align: right;
+		}
+		.content table {
+			margin: 0 auto;
+		}
+		.content table.first-table {
+			width: 178mm;
+			border-left: none;
+			border-right: none;
+		}
+		.content table.first-table tr {
+			height: 18pt;
+			border-left: none;
+			border-right: none;
+		}
+		.content table.first-table tr td:first-child{
+			border-left: none;
+		}
+		.content table.first-table tr td:last-child{
+			border-right: none;
+		}
+		.content table.first-table tr td span:nth-child(1) {
+			float: left;
+		}
+		.content table.first-table tr td span:nth-child(2) {
+			float: right;
+		}
+		.content table.second-table {
+			width: 178mm;
+			text-align: left;
+		}
+		.content table.second-table tbody > tr > td {
+			border-top: none;
+		}
+		.content table.second-table tr {
+			height: 12pt;
+		}
+		.content table.second-table tr.total {
+			border-top: 2pt solid #000000;
+			border-bottom: 2pt solid #000000;
+			font-weight: bold;
+		}
+		.content .content-middle {
+			overflow: hidden;
+		}
+		.content .content-middle h3 {
+			text-align: left;
+			font-size: 12pt;
+			padding-left: 12pt;
+		}
+		.content .content-middle .detail {
+			float: right;
+			width: 40mm;
+			margin-top: 14pt
+		}
+		.content .content-middle .detail p{
+			text-align: left;
+			font-size: 12pt;
+			margin-bottom: 0px;
+		}
+		.content .content-middle .detail p:first-child{
+			margin-bottom: 9pt;
+		}
+		/*	.content .content-middle .detail div.container {
+                width: 100%;
+            }
+            .content .content-middle .detail div.container .col-xs-6 span:nth-child(1) {
+                float: left;
+            }
+            .content .content-middle .detail div.container .col-xs-6 span:nth-child(2) {
+                float: right;
+            }
+            .content .content-middle .detail div.container .col-xs-6:nth-child(1) {
+                padding-right: 0pt;
+            }*/
+		.content .content-middle .explain {
+			width: 120mm;
+			float: left;
+			margin-right: 9pt;
+		}
+		.content .content-middle .explain h3 {
+			padding-left: 0pt;
+			margin-top: 14pt;
+		}
+		.content .content-middle .explain .qrcode {
+			float: left;
+			margin-top: 14pt;
+		}
+		.content .content-middle .explain .explain-text {
+			float: right;
+			width: 85mm;
+		}
+		.content .content-middle .explain .explain-text div {
+			border-bottom: 1pt solid #222;
+			height: 18pt;
+		}
+		.content .content-middle .sign {
+			clear: both;
+			/*width: 40mm;*/
+			/*float: right;*/
+			padding-top: 20px;
+			font-weight: bold;
+		}
+		.content .content-middle .sign .col-xs-3 {
+			padding-left: 0px;
+			padding-right: 0px;
+			margin-right: 0px;
+			margin-left: 0px;
+		}
+		.content .ticket {
+			border: 2px solid #8cb8e1;
+			width: 170mm;
+			/*height: 130mm;*/
+			margin: 0mm auto 0mm;
+			padding-bottom: 20mm;
+			position:absolute;
+			top:55%;
+			left:10%;
+		}
+		.content .ticket .ticket-title {
+			font-size: 12pt;
+			font-weight: bold;
+			text-align: left;
+			margin-top: 20pt;
+			margin-bottom: 30mm;
+			text-indent: 4pt;
+		}
+		.content .ticket table {
+			width: 260pt;
+		}
+		.content .ticket table thead {
+			background-color: #d9d9d9;
+			border-top: 1pt solid #000000;
+		}
+		.content .ticket table tbody tr > td {
+			border-top: none;
+		}
+		.content .ticket table tbody tr {
+			border-top: 1pt dashed #000000;
+		}
+		.content .ticket table tbody tr:last-child {
+			border-bottom: 1pt solid #000000;
+		}
+		.content .ticket .ticket-inform {
+			color: #b4b4b4;
+			margin-top: 40mm;
+		}
+		* {
+			-webkit-box-sizing: border-box;
+			-moz-box-sizing: border-box;
+			/* box-sizing: border-box; */
+		}
+		h2, .h2, h3, .h3 {
+			margin-top: 20px;
+			margin-bottom: 10px;
+		}
+		p {
+			margin: 0 0 10px;
+		}
 	</style>
 </head>
 <body>
@@ -269,102 +282,24 @@
 		</tbody>
 	</table>
 	<div class="content-middle">
-		<div class="detail">
-			<h3>预算详情</h3>
-			<div class="container">					
-				<div class="row">
-					<%
-						var invoices = data.invoices;
-						_.forEach(invoices,function(invoice){
-							if(invoice.type == '交通' && invoice.trafficType =='GO'){
-								var goMoney = invoice.budget
-								var goTrafficInfo = invoice.trafficInfo
-					%>
-					<div class="col-xs-6">
-						<span>去程(<%= goTrafficInfo%>)</span><span><%= goMoney%></span>
-					</div>
-					<%
-							}
-						    if(invoice.type == '交通' && invoice.trafficType =='BACK'){
-								var backMoney = invoice.budget
-								var backTrafficInfo = invoice.trafficInfo						    	
-					%>
-					<div class="col-xs-6">
-						<span>返程(<%= backTrafficInfo%>)</span><span><%= backMoney%></span>
-					</div>
-					<%
-							}
-						})
-					%>
-				</div>
-				<div class="row">
-					<div class="col-xs-6">							
-					<%
-						var invoices = data.invoices;
-						var flag = false;
-						_.forEach(invoices,function(invoice){
-							if(invoice.type == '住宿'){
-								var stayMoney = invoice.budget
-								var stayTime = invoice.duration
-								flag = true;
-					%>
-						<span>住宿(<%= stayTime%>天)</span>
-						<span style="float:right">	
-							<%=stayMoney%>
-						</span>
-					<%	
-							}
-						})
-						if(!flag){
-					%>
-						<span>住宿</span>
-						<span>无</span>					
-					<%	
-						}
-					%>		
-					</div>				
-					<div class="col-xs-6">
-						<span>总预算</span><span><%=data.budgetMoney%></span>
-					</div>
-				</div>
-				
-				<div class="row">
-					<div class="col-xs-6">
-						<span>实际支出</span><span><%=data.totalMoney%></span>
-					</div>
-					<div class="col-xs-6">
-						<span>节省</span><span><%=_.round((data.budgetMoney-data.totalMoney),1)%></span>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-6">
-						<span>审批人:</span>
-						
-						<%
-							var approveUsers = _(data.approveUsers)
-								.map( approveUser => approveUser)
-								.join("、");
-						%>
-						<span><%=approveUsers%></span>
-						<%	
-						%>
-						
-					</div>
-					<div class="col-xs-6"></div>
-				</div>
-			</div>
-		</div>
 		<div class="explain">
-			<h3>超支说明</h3>
 			<div class="qrcode">
-				<img src="<%=data.qrcode%>" width="80pt">
+				<img src="<%=data.qrcode%>" width="100pt">
 				<div style="font-size:7pt">查看预算详情</div>
 			</div>
-			<div class="explain-text">				
+
+			<div class="explain-text">
+				<h3>超支说明</h3>
 				<div></div>
 				<div></div>
 				<div></div>
 			</div>
+		</div>
+		<div class="detail">
+			<p>预算审批人</p>
+			<%_.forEach(data.approveUsers, function(user) {%>
+				<p><%=user%></p>
+			<%})%>
 		</div>
 		<div class="sign">
 			<div class="row"  style="padding-left:15px">
