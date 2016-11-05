@@ -2,7 +2,7 @@
 var dyload = require('dyload');
 
 function isWeixinFile(url){
-    var o = new URL(url);
+    var o = new URL(url, location.href);
     var protocol = o.protocol.toLocaleLowerCase();
     return protocol === 'wxlocalresource:' || protocol === 'weixin:';
 }
@@ -53,11 +53,11 @@ async function previewImageController($scope, $element){
         var results = Promise.all($scope.canvases
             .map(function(canvas) {
                 return new Promise(function(resolve) {
-                    //require('blueimp-canvas-to-blob');
-                    //canvas.toBlob(function(blob){
-                    //    resolve(blob);
-                    //});
-                    resolve($scope.files);
+                    require('blueimp-canvas-to-blob');
+                    canvas.toBlob(function(blob){
+                        resolve(blob);
+                    });
+                    //resolve($scope.files);
                 });
             }))
             .catch(function(e) {
@@ -90,7 +90,7 @@ function loadImage(url): Promise<HTMLImageElement>{
 }
 
 async function loadFileImage(url){
-    if(typeof url !== 'string' || !isWeixinFile(url)){
+    if(typeof url !== 'string'){
         url = await loadFile(url);
     }
     return loadImage(url);

@@ -72,9 +72,9 @@ function ngUploader($loading, wxApi): any {
                     uploader.clearQueue();
                     return;
                 }
-                //for(let i=0; i<blobs.length; i++){
-                //    uploader.queue[i]._file = blobs[i];
-                //}
+                for(let i=0; i<blobs.length; i++){
+                    uploader.queue[i]._file = blobs[i];
+                }
                 //$loading.start();
                 let template = `<p style="text-align: center">{{progress}}%</p><progress max="100" value={{progress}}></progress>`;
                 progressPopup = $ionicPopup.show({
