@@ -17,6 +17,6 @@ export async function BindSuppliersController($scope, Models){
     }
     $scope.suppliers = suppliers;
     $scope.bindSupplier = function (id) {
-        window.location.href = `#/staff/bind-others?supplierId=${{id}}`;
+        window.location.href = `#/staff/bind-others?supplierId=${id}`;
     }
 }
