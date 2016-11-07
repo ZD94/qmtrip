@@ -58,7 +58,10 @@ class TripPlanModule {
     static async getPlanEmailDetails(tripPlan: TripPlan): Promise<{go: string, back: string, hotel: string, subsidy: string, special?: string }> {
         let go = '', back = '', hotelStr = '', subsidyStr = '', specialStr = '';
 
-        let tripDetails = (await Models.tripDetail.find({where: {tripPlanId: tripPlan.id}}));
+        let tripDetails = await Models.tripDetail.find({
+            where: {tripPlanId: tripPlan.id},
+            order: [['created_at', 'asc']]
+        });
         let ps = tripDetails.map( async (tripDetail) => {
             switch (tripDetail.type) {
                 case ETripType.OUT_TRIP:
@@ -512,7 +515,10 @@ class TripPlanModule {
     static async getOddBudget(params: {id: string}){
         var tripPlan = await Models.tripPlan.get(params.id);
         var oddBudget = tripPlan.budget;
-        var details = await Models.tripDetail.find({where: {tripPlanId: tripPlan.id}});
+        var details = await Models.tripDetail.find({
+            where: {tripPlanId: tripPlan.id},
+            order: [['created_at', 'asc']]
+        });
         details.forEach(function(item, i){
             oddBudget = oddBudget - item.expenditure;
         })
@@ -1857,7 +1863,10 @@ class TripPlanModule {
             throw L.ERR.EMAIL_EMPTY();
         }
         let title = moment(tripPlan.startAt).format('MM.DD') + '-'+ moment(tripPlan.backAt).format("MM.DD") + tripPlan.deptCity + "到" + tripPlan.arrivalCity + '报销单'
-        let tripDetails = await Models.tripDetail.find({where: {tripPlanId: tripPlanId}, order: [["created_at", "asc"]]})
+        let tripDetails = await Models.tripDetail.find({
+            where: {tripPlanId: tripPlanId}, 
+            order: [["created_at", "asc"]]
+        })
         // let tripDetails = await tripPlan.getTripDetails({where: {}, order: [["created_at", "asc"]]});
         let tripApprove = await Models.tripApprove.get(tripPlanId);
         let approveUsers: Array<any> = (tripApprove && tripApprove.approvedUsers ? tripApprove.approvedUsers:'').split(/,/g)
@@ -2244,7 +2253,8 @@ async function tryUpdateTripPlanStatus(tripPlan: TripPlan, status: EPlanStatus) 
             tripPlanId: tripPlan.id,
             type: {$in: preTripTypeNeeds},
             status: {$in: cannotStatus[status]},    //无预算, 等待上传
-        }
+        },
+        order: [['created_at', 'asc']]
     });
 
     if (!tripDetails || !tripDetails.length) {
