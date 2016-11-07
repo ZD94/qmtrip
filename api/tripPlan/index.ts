@@ -1484,6 +1484,8 @@ class TripPlanModule {
                         data.startDateTime = query.leaveDate;
                         data.endDateTime = query.goBackDate;
                         detail = Models.tripDetailSubsidy.create(data);
+                        detail.expenditure = price;
+                        detail.status = EPlanStatus.COMPLETE;
                         break;
                     default:
                         throw new Error("not support tripDetail type!");
