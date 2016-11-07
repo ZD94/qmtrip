@@ -13,6 +13,7 @@ import { MoneyChange } from './money-change';
 import { Supplier } from './supplier';
 import {CoinAccount} from "api/_types/coin";
 import {PaginateInterface} from "common/model/interface";
+import promise = require("../../../common/test/api/promise/index");
 declare var API: any;
 
 export enum ECompanyStatus {
@@ -242,12 +243,14 @@ export class Company extends ModelObject{
         var suppliers = await Models.supplier.find(options);
         var company = await Models.company.get(this.id);
         if(company && company.appointedPubilcSuppliers && company.appointedPubilcSuppliers.length > 0 ){
-            JSON.parse(company.appointedPubilcSuppliers).map(async function(s){
+            var ps = JSON.parse(company.appointedPubilcSuppliers).map(async function(s){
                 var su = await Models.supplier.get(s);
-                if(su && su.isInUse){
+                if(su){
                     suppliers.push(su);
                 }
             })
+
+            await Promise.all(ps);
         }
 
         return suppliers;
