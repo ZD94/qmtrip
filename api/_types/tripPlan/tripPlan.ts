@@ -296,6 +296,9 @@ export class TripPlan extends ModelObject {
         if(!options.where) {
             options.where = {};
         }
+        if (!options.order) {
+            options.order = [['created_at', 'asc']]
+        }
         options.where.tripPlanId = this.id;
         return Models.tripDetail.find(options);
     }
