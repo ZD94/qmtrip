@@ -140,18 +140,18 @@ angular
                 }
                 $scope.days = 1;
                 $scope.subsidyDays = 1;
-                if ($scope.item instanceof TripDetailHotel) {
+                if ($scope.item.type == ETripType.HOTEL) {
                     $scope.days = moment($scope.item.checkOutDate).diff(moment($scope.item.checkInDate), 'days');
-                } else if ($scope.item instanceof TripDetailSubsidy) {
+                } else if ($scope.item.type == ETripType.SUBSIDY) {
                     $scope.subsidyDays = moment($scope.item.endDateTime).diff(moment($scope.item.startDateTime), 'days') + 1;
-                } else if ($scope.item instanceof TripDetailTraffic) {
+                } else if ([ETripType.OUT_TRIP, ETripType.BACK_TRIP].indexOf($scope.item.type) >= 0) {
                     let deptCity = await City.getCity($scope.item.deptCity);
                     let arrivalCity = await City.getCity($scope.item.arrivalCity);
-
                     $scope.item.deptCity = deptCity ? deptCity.name: '未知';
                     $scope.item.arrivalCity = arrivalCity ? arrivalCity.name : '未知';
                     $scope.item.cabin = getNameByECabin($scope.item.cabin);
                 }
+
                 if ($scope.item.hasFirstDaySubsidy === false) {
                     $scope.subsidyDays -= 1;
                 }
@@ -165,8 +165,6 @@ angular
                     window.location.href="#/trip/reserve?detailId="+id;
                 }
                 $scope.item.done = async function(ret) {
-                    API.require('tripPlan');
-                    await API.onload();
                     try {
                         if(ret.ret != 0)
                             throw new Error(ret.errMsg);

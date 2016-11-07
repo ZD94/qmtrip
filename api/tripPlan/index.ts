@@ -1934,17 +1934,6 @@ class TripPlanModule {
         let financeCheckCode = Models.financeCheckCode.create({tripPlanId: tripPlanId, isValid: true});
         financeCheckCode = await financeCheckCode.save();
         let roundLine = `${tripPlan.deptCity}-${tripPlan.arrivalCity}${tripPlan.isRoundTrip ? '-' + tripPlan.deptCity: ''}`;
-        let content: any = [
-            `出差人:${staff.name}`,
-            `出差日期:${moment(tripPlan.startAt).format('YYYY.MM.DD')}-${moment(tripPlan.backAt).format('YYYY.MM.DD')}`,
-            `出差路线: ${roundLine}`,
-            `出差预算:${tripPlan.budget}`,
-            `实际支出:${tripPlan.expenditure}`,
-            `出差记录编号:${tripPlan.planNo}`,
-            `校验地址: ${config.host}#/finance/trip-detail?id=${tripPlan.id}&code=${financeCheckCode.code}`
-        ]
-
-        let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')})
         _tripDetails = await Promise.all(_tripDetails);
         _tripDetails = _tripDetails.filter( (v) => {
             return v['money'] > 0;
@@ -1965,6 +1954,19 @@ class TripPlanModule {
             .reduce((prev, cur) => {
                 return Number(prev) + Number(cur)
             });
+
+        let content: any = [
+            `出差人:${staff.name}`,
+            `出差日期:${moment(tripPlan.startAt).format('YYYY.MM.DD')}-${moment(tripPlan.backAt).format('YYYY.MM.DD')}`,
+            `出差路线: ${roundLine}`,
+            `出差预算:${tripPlan.budget}`,
+            `实际支出:${_personalExpenditure}个人支付, ${(Number(tripPlan.expenditure)-_personalExpenditure).toFixed(2)}公司支付`,
+            `出差记录编号:${tripPlan.planNo}`,
+            `校验地址: ${config.host}#/finance/trip-detail?id=${tripPlan.id}&code=${financeCheckCode.code}`
+        ]
+
+        let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')})
+
 
         var data = {
             "submitter": staff.name,  //提交人
