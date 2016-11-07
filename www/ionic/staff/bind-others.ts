@@ -2,7 +2,7 @@ import {StaffSupplierInfo} from "api/_types/staff/staff-supplier-info";
 import { Staff } from 'api/_types/staff/staff';
 var msgbox = require('msgbox');
 
-export async function BindOthersController($scope, $stateParams, Models, $ionicHistory){
+export async function BindOthersController($scope, $stateParams, Models, $ionicHistory, $ionicPopup){
     $scope.form = {userName:'', pwd: ''};
 
     var staffSupplierInfo;
@@ -26,10 +26,8 @@ export async function BindOthersController($scope, $stateParams, Models, $ionicH
     }
 
     $scope.save = async function(){
-
         var checkoutResult = await staff.checkStaffSupplierInfo({supplierId: supplierId, userName: $scope.form.userName, pwd: $scope.form.pwd});
         if(checkoutResult){
-
            staffSupplierInfo.loginInfo = JSON.stringify($scope.form);
            staffSupplierInfo.supplier = supplier;
            staffSupplierInfo.staff = staff;
@@ -39,5 +37,24 @@ export async function BindOthersController($scope, $stateParams, Models, $ionicH
        }else{
            msgbox.log("验证失败");
        }
+    }
+    $scope.delete = async function(){
+        $ionicPopup.show({
+            title: '确定要解除绑定吗?',
+            buttons: [
+                {
+                    text: '取消'
+                },
+                {
+                    text: '确定',
+                    type: 'button-positive',
+                    onTap: async function(){
+                        await staffSupplierInfo.destroy();
+                        msgbox.log('解绑成功');
+                        $ionicHistory.goBack(-1);
+                    }
+                }
+            ]
+        })
     }
 }
