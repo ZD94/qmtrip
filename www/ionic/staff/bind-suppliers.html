@@ -1,11 +1,9 @@
 <ion-view title="绑定供应商" id="page27">
     <ion-content padding="true" class="has-header">
         <ion-list>
-            <ion-item class="item" ng-repeat="su in suppliers">
-                <a ng-href="#/staff/bind-others?supplierId={{su.id}}">
-                    <img class="avatar-img" ng-src="/attachments/{{su.logo}}" ng-if="su.logo">
-                    <span class="item-note">{{su.isBind? "已绑定": "未绑定"}}</span>
-                </a>
+            <ion-item class="item" ng-repeat="su in suppliers" ng-click="bindSupplier(su.id)">
+                <img class="avatar-img" ng-src="/attachments/{{su.logo}}" ng-if="su.logo">
+                <span class="item-note">{{su.isBind? "已绑定": "未绑定"}}</span>
             </ion-item>
         </ion-list>
     </ion-content>
