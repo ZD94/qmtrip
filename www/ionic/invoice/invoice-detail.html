@@ -1,22 +1,32 @@
 <ion-view title="票据详情页" id="page20">
     <ion-content padding="false" class="has-header" scroll="false">
         <div class="list invoice-info">
-            <div class="item">{{statustext[tripDetail.status]}}<span>1张票据</span><span>5条记录</span></div>
-            <div class="item">
-                <div class="detail_info">
-                    <span ng-if="tripDetail.type == EInvoiceType.HOTEL">
-                        <b>{{tripDetail.h_city.name}}</b>
-                        <b ng-if="tripDetail.hotelName"> - {{invoice.hotelName}}</b>
-                    </span>
-                    <span ng-if="tripDetail.type != EInvoiceType.HOTEL">
-                        <b>{{tripDetail.d_city.name}}</b>-
-                        <b>{{tripDetail.a_city.name}}</b>
-                    </span>
+            <div class="item item_line">{{statustext[tripDetail.status]}}<span class="item-note">1张票据</span></div>
+            <div class="item item_line">
+                <span>{{tripDetail.createdAt | date: 'yyyy-MM-dd'}}</span>
+                <span ng-if="tripDetail.type == EInvoiceType.HOTEL">
+                    <b>{{tripDetail.h_city.name}}</b>
+                    <b ng-if="tripDetail.hotelName"> - {{invoice.hotelName}}</b>
+                </span>
+                <span ng-if="tripDetail.type != EInvoiceType.HOTEL">
+                    <b>{{tripDetail.d_city.name}}</b>-
+                    <b>{{tripDetail.a_city.name}}</b>
+                </span>
+            </div>
+            <div class="item money_info">
+                <div class="expenditure_pay">
+                    <span>实际支出</span>
                     <br/>
-                    <span>{{tripDetail.createdAt | date: 'yyyy-MM-dd'}}</span>
+                    <span>{{tripDetail.expenditure}}</span>
+                </div>=
+                <div class="company_pay">
+                    <span>公司支付</span>
+                    <br/>
+                    <span>{{tripDetail.expenditure}}</span>
                 </div>
-                <div class="total_price">
-                    <span>支付</span>
+                +
+                <div class="personal_pay">
+                    <span>个人支付</span>
                     <br/>
                     <span>{{tripDetail.expenditure}}</span>
                 </div>
