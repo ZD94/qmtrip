@@ -53,7 +53,10 @@
                          class="item"
                     >
                         <p>{{order.date | date: 'yyyy-MM-dd'}}</p>
-                        <p>{{order.desc}}
+                        <p>
+                            <span ng-if="order.orderType == EInvoiceFeeTypes.PLANET_TICKET"> {{order.starCityName}}<i class="icon ion-plane"></i>{{order.endCityName}}</span>
+                            <span ng-if="order.orderType == EInvoiceFeeTypes.TRAIN_TICKET"> {{order.starCityName}}<i class="icon ion-android-train"></i>{{order.endCityName}}</span>
+                            <span ng-if="order.orderType == EInvoiceFeeTypes.HOTEL"> <i class="icon ion-home"></i>{{order.desc}}</span>
                             <span ng-if="order.orderType == EInvoiceFeeTypes.PLANET_TICKET"> {{order.number}}</span>
                             <span ng-if="order.orderType == EInvoiceFeeTypes.TRAIN_TICKET"> {{order.number}}</span>
                             <span class="order_price">{{order.price | currency_int: ''}}元</span>

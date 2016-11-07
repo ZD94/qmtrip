@@ -2069,10 +2069,11 @@ class TripPlanModule {
                 // throw L.ERR.ORDER_HAS_RELATED();
             }
 
-            /*if(o.persons.indexOf(currentStaff.name) < 0){
-             result.failed.push({desc: o.desc, reason: '只能关联自己的订单'});
+            if(o.persons.indexOf(currentStaff.name) < 0){
+                result.failed.push({desc: o.desc, remark: '只能关联自己的订单'});
+                return o.id;
              // throw L.ERR.ORDER_NOT_YOURS();
-             }*/
+             }
             let invoice: any = {};
             invoice.accountId = currentStaff.id;
             invoice.orderId = o.id;
