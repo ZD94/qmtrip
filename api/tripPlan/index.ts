@@ -2125,9 +2125,9 @@ class TripPlanModule {
     static async deleteTripDetailInvoice(params):Promise<boolean> {
         let {id } = params;
         let tripDetailInvoice = await Models.tripDetailInvoice.get(id);
-        let totalMoney = tripDetailInvoice.totalMoney;
+        let tripDetailId = tripDetailInvoice.tripDetailId;
         await tripDetailInvoice.destroy();
-        let tripDetail = await Models.tripDetail.get(tripDetailInvoice.id);
+        let tripDetail = await Models.tripDetail.get(tripDetailId);
         await updateTripDetailExpenditure(tripDetail);
         let invoices = await tripDetail.getInvoices();
         if (invoices && invoices.length) {
