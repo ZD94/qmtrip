@@ -1,5 +1,6 @@
 
 declare var wx;
+
 var API = require('common/api');
 var dyload = require('dyload');
 
@@ -9,25 +10,26 @@ if(browserspec.is_wechat) {
     wxload = dyload("//res.wx.qq.com/open/js/jweixin-1.0.0.js");
 }
 
-angular
-    .module('nglibs')
-    .factory('wxApi', function(){
-        if(!browserspec.is_wechat) {
-            return {
-                $resolve: function(){
-                    return Promise.resolve();
-                }
-            };
-        }
-        return new WechatApi();
-    });
 
-class WechatApi{
-    $promise: Promise<any>;
+function wxFunction(funcname) {
+    return function(option){
+        return new Promise<any>(function(resolve, reject) {
+            option.success = resolve;
+            option.fail = reject;
+            wx[funcname](option);
+        })
+    }
+}
+
+var wxChooseImage = wxFunction('chooseImage');
+var wxUploadImage = wxFunction('uploadImage');
+
+export class WechatApi {
+    $$promise: Promise<any>;
     $resolved = false;
     $resolve() : Promise<any> {
-        if(this.$promise != undefined)
-            return this.$promise;
+        if(this.$$promise != undefined)
+            return this.$$promise;
         async function doResolve(){
             API.require('wechat');
             await API.onload();
@@ -52,14 +54,25 @@ class WechatApi{
                 wx.config(cfg);
             });
         }
-        this.$promise = doResolve()
+        this.$$promise = doResolve()
             .then(()=>{
                 this.$resolved = true;
             })
             .catch((e)=>{
                 return null;
-                //this.$promise = undefined;
+                //this.$$promise = undefined;
             });
-        return this.$promise;
+        return this.$$promise;
+    }
+    async chooseImage(options?: {count?:number; sizeType?:string[]; sourceType?:string[]}): Promise<string[]>{
+        let ret = await wxChooseImage(options||{});
+        return ret.localIds as string[];
+    }
+    async uploadImage(options?: {localId:string; isShowProgressTips?:number}): Promise<string>{
+        let ret = await wxUploadImage(options||{});
+        return ret.serverId;
+    }
+    setupSharePrivate(options:{title:string; desc:string; link:string; imgUrl:string; type?:string; dataUrl?:string}){
+        
     }
 }

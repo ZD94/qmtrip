@@ -4,6 +4,7 @@ import { InvitedLink } from 'api/_types/staff/invited-link';
 var browserspec = require('browserspec');
 var printf = require('printf');
 
+declare var wx:any;
 declare var ionic:any;
 
 export async function StaffInvitedController($scope, Models, $ionicHistory, $ionicPopup, ClosePopupService, wxApi){
