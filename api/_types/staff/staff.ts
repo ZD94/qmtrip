@@ -205,9 +205,9 @@ export class Staff extends ModelObject implements Account {
             let list = await client.getOrderList();
 
             //过滤掉不是本人的订单
-            /*list = list.filter((item: any)=>{
+            list = list.filter((item: any)=>{
                 return item.persons.indexOf(this.name) >= 0;
-            })*/
+            })
 
             let alreadyBindIds = [];
             let invoices = await Models.tripDetailInvoice.find({where: {accountId: this.id, sourceType: ESourceType.RELATE_ORDER}});
