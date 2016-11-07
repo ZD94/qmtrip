@@ -64,7 +64,7 @@
                             <p>{{invoice.remark}}</p>
                         </div>
                     </div>
-                    <div class="button-bar">
+                    <div class="button-bar" ng-if="[EPlanStatus.AUDIT_NOT_PASS,EPlanStatus.WAIT_UPLOAD,EPlanStatus.WAIT_COMMIT].indexOf(tripDetail.status) >= 0">
                         <a class="button button-outline button-calm" ng-click="deleteInvoice(invoice)">删除</a>
                         <a class="button button-outline button-calm" ng-click="editNow(invoice)">修改</a>
                     </div>
@@ -165,12 +165,13 @@
                             <p>{{invoice.remark}}</p>
                         </div>
                     </div>
-                    <div class="button-bar">
-                        <a class="button button-outline button-calm" ng-click="">解除绑定</a>
+                    <div class="button-bar"
+                         ng-if="[EPlanStatus.AUDIT_NOT_PASS,EPlanStatus.WAIT_UPLOAD,EPlanStatus.WAIT_COMMIT].indexOf(tripDetail.status) >= 0">
+                        <a class="button button-outline button-calm" ng-click="deleteInvoice(invoice)">解除绑定</a>
                     </div>
                 </div>
             </ion-slide>
-            <ion-slide ng-class="{'noflex':!select_menu,'chooseFun':select_menu}">
+            <ion-slide ng-class="{'noflex':!select_menu,'chooseFun':select_menu}" ng-if="[EPlanStatus.AUDIT_NOT_PASS,EPlanStatus.WAIT_UPLOAD,EPlanStatus.WAIT_COMMIT].indexOf(tripDetail.status) >= 0">
                 <div ng-if="select_menu" class="chooseBtn" ng-class="{'invoice-form':!select_menu}">
                     <a class="button button-calm" ng-click="linkOthers()">关联订单</a>
                     <a class="button button-calm button-outline" ng-click="manual()">手动添加</a>

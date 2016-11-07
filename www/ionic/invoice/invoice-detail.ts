@@ -1,4 +1,4 @@
-import {ETripType, EPlanStatus, EInvoiceType, EInvoiceFeeTypes, EPayType} from 'api/_types/tripPlan';
+import {ETripType, EPlanStatus, EInvoiceType, EInvoiceFeeTypes, EPayType, EInvoiceStatus} from 'api/_types/tripPlan';
 import * as path from 'path';
 import {ImgTemplateController} from './img-template';
 import moment = require('moment');
@@ -28,6 +28,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
             return invoice;
         })
     }
+    $scope.EInvoiceStatus = EInvoiceStatus;
     $scope.select_menu = true;
     var config = require('config');
     await config.$ready;
