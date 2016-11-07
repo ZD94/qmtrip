@@ -129,8 +129,8 @@
                 </div>
                 <div class="invoice-form from-supplier" ng-if="invoice.sourceType == '2' && !invoice.edit">
                     <div class="invoice-img">
-                        <!--<img ng-src="{{invoice.imgUrl}}">-->
-                        <div class="supplier_logo"></div>
+                        <img ng-src="/attachments/{{invoice.supplier.logo}}">
+                        <!--<div class="supplier_logo"></div>-->
                         <div>
                             <span class="item-tit">金额</span>
                             <h3>{{invoice.totalMoney}}</h3>
@@ -165,9 +165,8 @@
                             <p>{{invoice.remark}}</p>
                         </div>
                     </div>
-                    <div class="button-bar"
-                         ng-if="[EPlanStatus.AUDIT_NOT_PASS,EPlanStatus.WAIT_UPLOAD,EPlanStatus.WAIT_COMMIT].indexOf(tripDetail.status) >= 0">
-                        <a class="button button-outline button-calm" ng-click="deleteInvoice(invoice)">解除绑定</a>
+                    <div class="button-bar" ng-if="[EPlanStatus.AUDIT_NOT_PASS,EPlanStatus.WAIT_UPLOAD,EPlanStatus.WAIT_COMMIT].indexOf(tripDetail.status) >= 0">
+                        <a class="button button-outline button-calm" ng-click="unBind(invoice)">解除绑定</a>
                     </div>
                 </div>
             </ion-slide>

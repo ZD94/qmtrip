@@ -24,12 +24,26 @@
     "cordova-plugin-compat",
     "cordova-plugin-file-transfer",
     "cordova-plugin-crosswalk-webview",
-    "cordova-plugin-camera",
+    {
+      "id": "cordova-plugin-camera",
+      "locator": "cordova-plugin-camera",
+      "variables": {
+        "CAMERA_USAGE_DESCRIPTION": "上传票据",
+        "PHOTOLIBRARY_USAGE_DESCRIPTION": "上传票据"
+      }
+    },
     {
       "id": "jpush-phonegap-plugin",
       "locator": "jpush-phonegap-plugin",
       "variables": {
         "API_KEY": "f57e4e7c0c9b2d2c4c50741d"
+      }
+    },
+    {
+      "id": "cordova-plugin-wechat",
+      "locator": "cordova-plugin-wechat",
+      "variables": {
+        "WECHATAPPID": "wx07ff1810fe913d17"
       }
     }
   ],

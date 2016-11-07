@@ -105,6 +105,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         var tripPlan = tripDetail.tripPlan;
         window.location.href = "#/trip/list-detail?tripid="+tripPlan.id;
     }
+
     //查看票据
     $scope.imgView = async function(imgUrl){
         // $ionicModal.fromTemplateUrl('ionic/trip/img-template.html', {
@@ -135,6 +136,26 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     $scope.deleteInvoice = async function(invoice,$index){
         $ionicPopup.show({
             title:'是否删除',
+            scope: $scope,
+            buttons:[
+                {text:'取消'},
+                {
+                    text:'确定',
+                    type: 'button-positive',
+                    onTap: async function(){
+                        invoice.destroy();
+                        $scope.tripDetail = await Models.tripDetail.get($stateParams.detailId);
+                        $scope.invoices = formatInvoice(await tripDetail.getInvoices());
+                        $ionicSlideBoxDelegate.update();
+                    }
+                }
+            ]
+        })
+    }
+
+    $scope.unBind = async function(invoice){
+        $ionicPopup.show({
+            title:'是否解除绑定',
             scope: $scope,
             buttons:[
                 {text:'取消'},

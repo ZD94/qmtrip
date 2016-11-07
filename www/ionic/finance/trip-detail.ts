@@ -4,9 +4,13 @@
 
 'use strict';
 import {ETripType} from "api/_types/tripPlan";
+import {
+    TripDetailTraffic, TripDetailHotel, TripDetailSubsidy,
+    TripDetailSpecial
+} from "../../../api/_types/tripPlan/tripDetailInfo";
 
 
-export async function TripDetailController($scope, $stateParams) {
+export async function TripDetailController($scope, $stateParams, Models) {
     require('./style.scss');
     let tripPlanId = $stateParams.id;
     let code = $stateParams.code;
@@ -29,12 +33,41 @@ export async function TripDetailController($scope, $stateParams) {
     let subsidyTotalBudget = 0;
     let specialApproveTotalBudget = 0;
 
+    let _tripDetails = [];
     for(let key in tripDetails) {
         if (!/^\d+$/.test(key)) {
             continue;
         }
-        let item = tripDetails[key]
-        if (item.type == ETripType.BACK_TRIP || item.type == ETripType.OUT_TRIP) {
+        let _detail = tripDetails[key];
+        let detail = await API.finance.getTripDetail({tripPlanId: tripPlanId, code: code, tripDetailId: _detail.id});
+        if (_detail instanceof TripDetailTraffic) {
+            detail['deptCity'] = _detail.deptCity;
+            detail['deptDateTime'] = _detail.deptDateTime;
+            detail['arrivalCity'] = _detail.arrivalCity;
+            detail['arrivalDateTime'] = _detail.arrivalDateTime;
+            detail['cabin'] = _detail.cabin;
+            detail['invoiceType'] = _detail.invoiceType;
+        } else if (_detail instanceof TripDetailHotel) {
+            detail['checkInDate'] = _detail.checkInDate;
+            detail['checkOutDate'] = _detail.checkOutDate;
+            detail['city'] = _detail['city'];
+        } else if (_detail instanceof TripDetailSubsidy) {
+            detail['hasFirstDaySubsidy'] = _detail.hasFirstDaySubsidy;
+            detail['lasLastDaySubsidy'] = _detail.hasLastDaySubsidy;
+            detail['startDateTime'] = _detail.startDateTime;
+            detail['endDateTime'] = _detail.endDateTime;
+            detail['subsidyMoney'] = _detail.subsidyMoney;
+        } else if (_detail instanceof TripDetailSpecial) {
+            detail['deptDateTime'] = _detail.deptDateTime;
+            detail['deptCity'] = _detail.deptCity;
+            detail['arrivalCity'] = _detail.arrivalCity;
+            detail['arrivalDateTime'] = _detail.arrivalDateTime;
+        }
+        _tripDetails.push(detail);
+    }
+
+    _tripDetails.forEach( (item) => {
+        if ([ETripType.BACK_TRIP, ETripType.OUT_TRIP].indexOf(item.type) >= 0) {
             trafficBudgets.push(item);
             trafficTotalBudget += item.expenditure;
         }
@@ -44,13 +77,14 @@ export async function TripDetailController($scope, $stateParams) {
         }
         if (item.type == ETripType.SUBSIDY) {
             subsidyBudgets.push(item);
-            subsidyTotalBudget += item.expenditure;
+            subsidyTotalBudget += item.expenditure || item.budget;
         }
         if (item.type == ETripType.SPECIAL_APPROVE) {
             specialApproveBudgets.push(item);
             specialApproveTotalBudget += item.expenditure;
         }
-    }
+    })
+
     $scope.trafficBudgets = trafficBudgets;
     $scope.hotelBudgets = hotelBudgets;
     $scope.subsidyBudgets = subsidyBudgets;

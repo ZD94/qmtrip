@@ -1484,6 +1484,8 @@ class TripPlanModule {
                         data.startDateTime = query.leaveDate;
                         data.endDateTime = query.goBackDate;
                         detail = Models.tripDetailSubsidy.create(data);
+                        detail.expenditure = price;
+                        detail.status = EPlanStatus.COMPLETE;
                         break;
                     default:
                         throw new Error("not support tripDetail type!");
@@ -1933,17 +1935,7 @@ class TripPlanModule {
         })
         let financeCheckCode = Models.financeCheckCode.create({tripPlanId: tripPlanId, isValid: true});
         financeCheckCode = await financeCheckCode.save();
-        let content: any = [
-            `出差人:${staff.name}`,
-            `出差日期:${moment(tripPlan.startAt).format('YYYY.MM.DD')}-${moment(tripPlan.backAt).format('YYYY.MM.DD')}`,
-            `出差路线:${tripPlan.deptCity}-${tripPlan.arrivalCity}${tripPlan.isRoundTrip ? '-' + tripPlan.deptCity: ''}`,
-            `出差预算:${tripPlan.budget}`,
-            `实际支出:${tripPlan.expenditure}`,
-            `出差记录编号:${tripPlan.planNo}`,
-            `校验地址: ${config.host}#/finance/trip-detail?id=${tripPlan.id}&code=${financeCheckCode.code}`
-        ]
-
-        let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')})
+        let roundLine = `${tripPlan.deptCity}-${tripPlan.arrivalCity}${tripPlan.isRoundTrip ? '-' + tripPlan.deptCity: ''}`;
         _tripDetails = await Promise.all(_tripDetails);
         _tripDetails = _tripDetails.filter( (v) => {
             return v['money'] > 0;
@@ -1965,6 +1957,19 @@ class TripPlanModule {
                 return Number(prev) + Number(cur)
             });
 
+        let content: any = [
+            `出差人:${staff.name}`,
+            `出差日期:${moment(tripPlan.startAt).format('YYYY.MM.DD')}-${moment(tripPlan.backAt).format('YYYY.MM.DD')}`,
+            `出差路线: ${roundLine}`,
+            `出差预算:${tripPlan.budget}`,
+            `实际支出:${_personalExpenditure}个人支付, ${(Number(tripPlan.expenditure)-_personalExpenditure).toFixed(2)}公司支付`,
+            `出差记录编号:${tripPlan.planNo}`,
+            `校验地址: ${config.host}#/finance/trip-detail?id=${tripPlan.id}&code=${financeCheckCode.code}`
+        ]
+
+        let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')})
+
+
         var data = {
             "submitter": staff.name,  //提交人
             "department": staff.department.name,  //部门
@@ -1978,7 +1983,8 @@ class TripPlanModule {
             "reason": tripPlan.project.name, //出差事由
             "approveUsers": approveUsers, //本次出差审批人
             "qrcode": `data:image/png;base64,${qrcodeCxt}`,
-            "invoices": _tripDetails
+            "invoices": _tripDetails,
+            "roundLine": roundLine,
         }
 
         let buf = await makeSpendReport(data);
@@ -2029,7 +2035,7 @@ class TripPlanModule {
     }
 
     @clientExport
-    @requireParams(['tripDetailId', 'totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark'], ['id', 'pictureFileId', 'accountId', 'orderId', 'sourceType','status'])
+    @requireParams(['tripDetailId', 'totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark'], ['id', 'pictureFileId', 'accountId', 'orderId', 'sourceType','status', 'supplierId'])
     static async saveTripDetailInvoice(params) :Promise<TripDetailInvoice> {
         let tripDetailInvoice = Models.tripDetailInvoice.create(params);
         tripDetailInvoice = await tripDetailInvoice.save();
@@ -2064,9 +2070,9 @@ class TripPlanModule {
             }
 
             /*if(o.persons.indexOf(currentStaff.name) < 0){
-                result.failed.push({desc: o.desc, reason: '只能关联自己的订单'});
-                // throw L.ERR.ORDER_NOT_YOURS();
-            }*/
+             result.failed.push({desc: o.desc, reason: '只能关联自己的订单'});
+             // throw L.ERR.ORDER_NOT_YOURS();
+             }*/
             let invoice: any = {};
             invoice.accountId = currentStaff.id;
             invoice.orderId = o.id;
@@ -2078,6 +2084,7 @@ class TripPlanModule {
             invoice.remark = o.desc;
             invoice.type = o.orderType;
             invoice.status = EInvoiceStatus.AUDIT_PASS;
+            invoice.supplierId = params.supplierId;
             let iv =  await TripPlanModule.saveTripDetailInvoice(invoice);
             result.success.push({desc: o.desc, remark: '关联成功'});
             return o.id;

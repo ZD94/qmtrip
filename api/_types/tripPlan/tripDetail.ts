@@ -6,6 +6,7 @@
 import {ModelObject} from "common/model/object";
 import {Values, Types} from "common/model/index";
 import {EPlanStatus, ETripType, TripPlan, EAuditStatus} from "./tripPlan";
+import {Supplier} from "api/_types/company";
 import {Field, Create, ResolveRef, Table} from "common/model/common";
 import {Models} from "../index";
 import {EInvoiceFeeTypes, EPayType, ESourceType, EInvoiceStatus} from "./index";
@@ -114,6 +115,10 @@ export class TripDetailInvoice extends ModelObject {
     @Field({type: Types.UUID})
     get accountId() { return null}
     set accountId(accountId: string) {}
+
+    @ResolveRef({type: Types.UUID}, Models.supplier)
+    get supplier(): Supplier { return null; }
+    set supplier(val: Supplier) {}
 
     @Field({type: Types.UUID})
     get orderId() { return null}

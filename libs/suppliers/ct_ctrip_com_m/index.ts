@@ -69,7 +69,9 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                 parType: order.Pay == '公司账户支付' ? EPayType.COMPANY_PAY : EPayType.PERSONAL_PAY,
                 orderType: EInvoiceFeeTypes.PLANET_TICKET,
                 number: order.Domestic[0].key,
-                desc: item.Name
+                desc: item.Name,
+                starCityName: order.Domestic[0].FlightRoute.indexOf('-')>=0 ? order.Domestic[0].FlightRoute.split('-')[0]: null,
+                endCityName:  order.Domestic[0].FlightRoute.indexOf('-')>=0 ? order.Domestic[0].FlightRoute.split('-')[1]: null
             };
         }));
         return ret.filter((item)=>item);
@@ -125,7 +127,9 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                 parType: order.Pay == '公司账户支付' ? EPayType.COMPANY_PAY : EPayType.PERSONAL_PAY,
                 orderType: EInvoiceFeeTypes.TRAIN_TICKET,
                 number: order.Train.name,
-                desc: item.Name
+                desc: item.Name,
+                starCityName: item.Name.indexOf('-')>=0 ? item.Name.split('-')[0]: null,
+                endCityName:  item.Name.indexOf('-')>=0 ? item.Name.split('-')[1]: null
             };
         }));
         return ret.filter((item)=>item);

@@ -216,31 +216,7 @@
 			</td>
 			<td>
 				<span>出差路线</span>
-				<%
-					var invoices = data.invoices;
-					var begin = end = false;
-					var departCity = '';
-					var arrivalCity = '';
-					var arrivalCity_last = '';
-					_.forEach(invoices,function(invoice){
-						if(invoice.type == '交通' && invoice.trafficType =='GO'){
-							departCity = invoice.departCity;
-							arrivalCity = invoice.arrivalCity;
-							begin = true;
-						}
-						if(invoice.type == '交通' && invoice.trafficType =='BACK'){
-							arrivalCityLast = invoice.arrivalCity;
-							end = true;
-						}
-					})
-					if(begin && end){
-				%>
-					<span><%= departCity%>-<%= arrivalCity%>-<%= arrivalCityLast%></span>
-				<%
-					}
-				%>
-
-				
+					<span><%=data.roundLine%></span>
 			</td>
 			<td>
 				<span>项目编号/事由</span><span><%=data.reason%></span>
