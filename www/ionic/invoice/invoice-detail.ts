@@ -13,6 +13,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     $scope.uploadUrl = '/upload/ajax-upload-file?type=image&auth='+authDataStr;
     ///// END
 
+    $scope.EPlanStatus = EPlanStatus;
     function formatInvoice(invoices) {
         if (!invoices) invoices = [];
         return invoices.map(function(invoice){
@@ -62,7 +63,6 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     statusTxt[EPlanStatus.AUDITING] = "已提交待审核";
     statusTxt[EPlanStatus.COMPLETE] = "已完成";
     $scope.statustext = statusTxt;
-    $scope.EPlanStatus = EPlanStatus;
     let title;
     if (tripDetail.type == ETripType.OUT_TRIP) {
         title = '去程交通';
