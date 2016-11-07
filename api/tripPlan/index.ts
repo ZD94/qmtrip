@@ -2029,7 +2029,7 @@ class TripPlanModule {
     }
 
     @clientExport
-    @requireParams(['tripDetailId', 'totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark'], ['id', 'pictureFileId', 'accountId', 'orderId', 'sourceType','status'])
+    @requireParams(['tripDetailId', 'totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark'], ['id', 'pictureFileId', 'accountId', 'orderId', 'sourceType','status', 'supplierId'])
     static async saveTripDetailInvoice(params) :Promise<TripDetailInvoice> {
         let tripDetailInvoice = Models.tripDetailInvoice.create(params);
         tripDetailInvoice = await tripDetailInvoice.save();
@@ -2078,6 +2078,7 @@ class TripPlanModule {
             invoice.remark = o.desc;
             invoice.type = o.orderType;
             invoice.status = EInvoiceStatus.AUDIT_PASS;
+            invoice.supplierId = params.supplierId;
             let iv =  await TripPlanModule.saveTripDetailInvoice(invoice);
             result.success.push({desc: o.desc, remark: '关联成功'});
             return o.id;

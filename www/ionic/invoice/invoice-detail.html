@@ -129,7 +129,7 @@
                 </div>
                 <div class="invoice-form from-supplier" ng-if="invoice.sourceType == '2' && !invoice.edit">
                     <div class="invoice-img">
-                        <!--<img ng-src="{{invoice.imgUrl}}">-->
+                        <img ng-src="/attachments/{{invoice.supplier.logo}}">
                         <div class="supplier_logo"></div>
                         <div>
                             <span class="item-tit">金额</span>
@@ -166,7 +166,7 @@
                         </div>
                     </div>
                     <div class="button-bar">
-                        <a class="button button-outline button-calm" ng-click="">解除绑定</a>
+                        <a class="button button-outline button-calm" ng-click="unBind(invoice)">解除绑定</a>
                     </div>
                 </div>
             </ion-slide>

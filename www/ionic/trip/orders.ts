@@ -13,7 +13,6 @@ export async function OrdersController($scope,Models, $stateParams, $ionicPopup)
     $scope.EPayType = EPayType;
     $scope.EInvoiceFeeTypes = EInvoiceFeeTypes;
     $scope.orderBinded = false;
-    console.info(orders);
     $scope.getOrders = async function(type){
         if(type == "alreadyBind"){
             var alreadyBindList  = orders.filter((item: any)=>{
