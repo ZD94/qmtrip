@@ -12,10 +12,10 @@
                         <img class="" ng-src="/attachments/{{supplier.logo}}" ng-if="supplier.logo">
                         <div class="button-bar">
                             <a class="button button-small button-positive"
-                               ng-class="{'button-outline':!orderBinded}" ng-click="getOrders('alreadyBind')">已关联</a>
-                            <a class="button button-small button-positive"
                                ng-class="{'button-outline':orderBinded}"
                                ng-click="getOrders('notBind')">未关联</a>
+                            <a class="button button-small button-positive"
+                               ng-class="{'button-outline':!orderBinded}" ng-click="getOrders('alreadyBind')">已关联</a>
                         </div>
                     </ion-item>
                     <ion-checkbox ng-repeat="order in orders"
