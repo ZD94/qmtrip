@@ -242,7 +242,7 @@ export class Company extends ModelObject{
         var suppliers = await Models.supplier.find(options);
         var company = await Models.company.get(this.id);
         if(company && company.appointedPubilcSuppliers && company.appointedPubilcSuppliers.length > 0 ){
-            company.appointedPubilcSuppliers.map(async function(s){
+            JSON.parse(company.appointedPubilcSuppliers).map(async function(s){
                 var su = await Models.supplier.get(s);
                 if(su && su.isInUse){
                     suppliers.push(su);

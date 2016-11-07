@@ -54,7 +54,7 @@ var Services = {
         funcs: ['getInvitedLink', 'getInvitedLinks', 'createInvitedLink', 'updateInvitedLink']
     },
     staffSupplierInfo: { type: StaffSupplierInfo, modname: 'staff',
-        funcs: ['getStaffSupplierInfo', 'getStaffSupplierInfos', 'createStaffSupplierInfo', 'updateStaffSupplierInfo']
+        funcs: ['getStaffSupplierInfo', 'getStaffSupplierInfos', 'createStaffSupplierInfo', 'updateStaffSupplierInfo', 'deleteStaffSupplierInfo']
     },
     company: { type: Company, modname: 'company',
         funcs: ['getCompany', 'listCompany', 'registerCompany', 'updateCompany', 'deleteCompany']
