@@ -43,7 +43,7 @@ export async function OrdersController($scope,Models, $stateParams, $ionicPopup)
         var result = await currentStaff.relateOrders({detailId: $stateParams.detailId, orderIds: selectId, supplierId: $stateParams.supplierId});
         $scope.result = result;
         if(result.failed.length == 0){
-            msgbox.log("绑定成功");
+            msgbox.log("关联成功");
             window.location.href = "#/trip/list-detail?tripid=" + tripDetail.tripPlanId;
         }else{
             $ionicPopup.alert({
