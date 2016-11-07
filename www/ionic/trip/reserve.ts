@@ -13,12 +13,11 @@ export async function ReserveController($scope, Models, $stateParams){
         $scope.suppliers = suppliers;
     }
     if(suppliers.length == 0){
-        //公共的供应商
-        suppliers = await Models.supplier.find({where:{companyId: null}});
-        $scope.suppliers = suppliers;
+        //直接跳转携程
+        window.location.href="#/trip/reserve-redirect?detailId="+$stateParams.detailId;
     }
     $scope.redirect = function(supplier){
-        window.location.href="#/trip/reserve-redirect?detailId="+$stateParams.detailId+"&supplier="+supplier
+        window.location.href="#/trip/reserve-redirect?detailId="+$stateParams.detailId+"&supplier="+supplier;
     }
 }
 
@@ -99,6 +98,18 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     },3000)*/
     $timeout(function(){
         // window.location.href=reDirectUrl;
-        window.location.href = supplier.trafficBookLink;
+        if($stateParams.supplier){
+            if($scope.reserveType == "travel"){
+                window.location.href = supplier.trafficBookLink;
+            }else if($scope.reserveType == "hotel"){
+                window.location.href = supplier.hotelBookLink;
+            }
+        }else{
+            if($scope.reserveType == "travel"){
+                window.location.href = "http://m.ctrip.com/html5/flight/matrix.html";
+            }else if($scope.reserveType == "hotel"){
+                window.location.href = "http://m.ctrip.com/webapp/hotel/";
+            }
+        }
     },5000)
 }
