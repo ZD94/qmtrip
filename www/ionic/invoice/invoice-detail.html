@@ -22,13 +22,13 @@
                 <div class="company_pay">
                     <span>公司支付</span>
                     <br/>
-                    <span>{{tripDetail.expenditure}}</span>
+                    <span>{{tripDetail.expenditure - tripDetail.personalExpenditure}}</span>
                 </div>
                 +
                 <div class="personal_pay">
                     <span>个人支付</span>
                     <br/>
-                    <span>{{tripDetail.expenditure}}</span>
+                    <span>{{tripDetail.personalExpenditure | currency_int}}</span>
                 </div>
             </div>
 

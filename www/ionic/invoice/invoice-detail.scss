@@ -139,7 +139,7 @@
       &.from-supplier{
         .invoice-img{
           overflow: hidden;
-          line-height: 40px;
+          line-height: 80px;
           padding: 10px;
           text-align: left;
           span{
@@ -149,7 +149,6 @@
           h3{
             padding-left: 5px;
             font-size: 24px;
-            margin-top: 0;
             line-height: 34px;
           }
           img{
@@ -169,7 +168,7 @@
             float: right;
             text-align: right;
             padding-bottom: 20px;
-            height: 40px;
+            height: 80px;
             border-bottom: 1px solid #ccc;
           }
         }
