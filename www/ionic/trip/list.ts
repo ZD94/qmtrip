@@ -33,7 +33,7 @@ export async function ListController($scope , $stateParams, Models){
     }
     let pager = await staff.getTripPlans({
         limit: 5,
-        where: where
+        where: where,
     });
     // loadTripPlan(pager);
     var vm = {

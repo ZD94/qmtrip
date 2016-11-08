@@ -8,7 +8,7 @@
             <a ng-click="changeTo('TRIP_SUCCESS')" class="button button-small" ng-class="filter == 'TRIP_SUCCESS' ? 'active': ''">已完成</a>
         </div>
 
-        <trip-plan ng-repeat="trip in tripPlans track by $index" show-detail-status="true" data="trip" click="enterdetail"></trip-plan>
+        <trip-plan ng-repeat="trip in (tripPlans | orderBy: startAt:reserve) track by $index" show-detail-status="true" data="trip" click="enterdetail"></trip-plan>
         <div id="page13-markdown3">
             <div ng-if="!vm.hasNextPage()" class="getMoreOrNoMore">没有更多记录了</div>
         </div>
