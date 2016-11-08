@@ -88,8 +88,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
             var fileId = (response.fileId && response.fileId.length) ? response.fileId[0] : '';
             $scope.fileId = fileId;
             let tempFile = response.tempFiles[fileId];
-            let previewUrl = path.join(config.update,'attachment/temp/',fileId,'?expireTime=',tempFile.expireTime,'&sign=',tempFile.sign);
-            previewUrl = path.normalize(previewUrl);
+            let previewUrl = path.join(config.update,'attachment/temp',fileId)+'?expireTime='+tempFile.expireTime+'&sign='+tempFile.sign;
             $scope.previewUrl = previewUrl;
             $scope.$apply();
         }

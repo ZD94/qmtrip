@@ -95,7 +95,7 @@ export function getImageUrl(id){
     return imgUrl;
 }
 
-export async function IndexController($scope, Menu, $ionicPopup, Models, $storage, $window, $location, $ionicHistory, $ionicSideMenuDelegate, avatarUrl) {
+export async function IndexController($scope, Menu, $ionicPopup, Models, $storage, $window, $location, $ionicHistory, $ionicSideMenuDelegate) {
     require('./index.scss');
     $scope.ionicGoBack = function () {
         let viewHistory = $ionicHistory.viewHistory();
