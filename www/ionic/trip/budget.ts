@@ -125,7 +125,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
                         text: '个人中心',
                         type: 'button-calm button-outline',
                         onTap:function(){
-                            window.location.href = '#/staff/index.html'
+                            window.location.href = '#/staff/index'
                         }
                     },
                     {
