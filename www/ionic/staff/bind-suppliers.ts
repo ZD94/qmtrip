@@ -44,7 +44,7 @@ export async function BindSuppliersController($scope, Models, ngModalDlg){
             msgbox.log("绑定成功");
         }else if(bind == 'unbind'){
             ifBind();
-            msgbox.log("绑定成功");
+            msgbox.log("解绑成功");
         }
         // window.location.href = `#/staff/bind-others?supplierId=${id}`;
     }
