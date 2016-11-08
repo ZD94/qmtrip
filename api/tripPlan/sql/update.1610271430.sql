@@ -55,6 +55,7 @@ BEGIN
 			  _cabin_int = 16;
 	              END IF;
 
+              UPDATE trip_plan.trip_details SET personal_expenditure = expenditure WHERE id = R.id;
 	              INSERT INTO trip_plan.trip_detail_traffics (id , dept_city, arrival_city, dept_date_time, arrival_date_time, cabin, invoice_type, created_at, updated_at, deleted_at)
 		      VALUES (R.id, R.dept_city_code, R.arrival_city_code, R.start_time, R.end_time, _cabin_int, R.invoice_type, R.created_at, R.updated_at, R.deleted_at);
 	       END IF;
@@ -64,15 +65,18 @@ BEGIN
 	 IF (R.type = 2 ) THEN
              -- RAISE NOTICE '住宿';
               IF NOT EXISTS( SELECT id FROM trip_plan.trip_detail_hotels WHERE id = R.id ) THEN
+                    UPDATE trip_plan.trip_details SET personal_expenditure = expenditure WHERE id = R.id;
                      INSERT INTO trip_plan.trip_detail_hotels( id, city, check_in_date, check_out_date, place_name, position, created_at, updated_at,deleted_at )
-		      VALUES ( R.id, R.city_code, R.start_time, R.end_time, R.hotel_name, R.hotel_code, R.created_at, R.updated_at, R.deleted_at);
+		            VALUES ( R.id, R.city_code, R.start_time, R.end_time, R.hotel_name, R.hotel_code, R.created_at, R.updated_at, R.deleted_at);
               END IF;
          END IF;
 
 	 IF (R.type = 3 ) THEN
 	     --RAISE NOTICE '补助';
 	     --RAISE NOTICE '补助是否存在判断 ==> %， % ', NOT EXISTS ( SELECT id FROM trip_plan.trip_detail_subsidies WHERE id = R.id ), R.id;
+
 	     IF NOT EXISTS ( SELECT id FROM trip_plan.trip_detail_subsidies WHERE id = R.id ) THEN
+	        UPDATE trip_plan.trip_details SET personal_expenditure = expenditure WHERE id = R.id;
 	        select regexp_replace(regexp_replace(replace(query::text, '\', ''), '^"', ''), '"$', '')::jsonb->>'subsidy'
 		from trip_plan.trip_plans where id = R.trip_plan_id INTO _subsidy;
 		IF _subsidy is NOT NULL THEN
@@ -118,6 +122,7 @@ BEGIN
 	 END IF;
 
 	 IF (R.type = 4 ) THEN
+	        UPDATE trip_plan.trip_details SET personal_expenditure = expenditure WHERE id = R.id;
 	    -- RAISE NOTICE '特殊审批';
              IF NOT EXISTS ( SELECT id FROM trip_plan.trip_detail_specials WHERE id = R.id ) THEN
 	         INSERT INTO trip_plan.trip_detail_specials (id, dept_city, arrival_city, dept_date_time, arrival_date_time, created_at, updated_at, deleted_at)

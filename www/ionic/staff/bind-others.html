@@ -17,7 +17,7 @@
                 </div>
             </div>
             <a class="button button-block button-calm" ng-click="save()" no-back>保存</a>
-            <a class="button button-block button-assertive" ng-click="delete()" no-back>解除绑定</a>
+            <a class="button button-block button-assertive" ng-click="delete()" ng-if="alreadyBind.length > 0" no-back>解除绑定</a>
         </div>
     </ion-content>
 </ion-view>

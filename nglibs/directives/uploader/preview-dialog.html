@@ -5,9 +5,14 @@
     </ion-header-bar>
     <ion-content padding="false" scroll="false" class="has-header">
         <form class="flex-c10 list">
-            <ion-scroll>
-                <div class="preview_img"></div>
-            </ion-scroll>
+            <div style="position: relative;">
+                <div ng-if="editable" style="position: absolute; top: 0; bottom: 0; width: 100%;">
+                    <pic-editor image-src="files[0]" canvas-width="width" canvas-height="height"></pic-editor>
+                </div>
+                <ion-scroll ng-if="!editable" style="position: absolute; top: 0; bottom: 0; width: 100%;">
+                    <pic-view image-src="file" ng-repeat="file in files"></pic-view>
+                </ion-scroll>
+            </div>
             <div>
                 <a class="button button-positive button-block preview_btn" ng-click="confirm()">确定</a>
             </div>

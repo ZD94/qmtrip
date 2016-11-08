@@ -14,7 +14,7 @@ angular
 function ngUploader($loading, wxApi): any {
     require('./uploader.scss');
     var browserspec = require('browserspec');
-    if(browserspec.is_wechat){//} && /^(www\.)?jingli365\.com$/.test(window.location.host)){
+    if(browserspec.is_wechat){ //} && /^(www\.)?jingli365\.com$/.test(window.location.host)){
         if(wxApi.$resolved){
             use_wxChooseImage = true;
         }else{
@@ -27,6 +27,10 @@ function ngUploader($loading, wxApi): any {
         scope:{
             title: '<',
             done: '&',
+
+            editable: '<edit',
+            width: '<',
+            height: '<',
 
             name: '<',
             accept: '@',
@@ -67,13 +71,20 @@ function ngUploader($loading, wxApi): any {
 
             uploader.onAfterAddingAll = async function(files) {
                 var urls = files.map((file)=>file._file)
-                var blobs = await showPreviewDialog($scope, ngModalDlg, urls, $scope.title)
+                var blobs = await showPreviewDialog($scope, ngModalDlg, {
+                    files: urls,
+                    title: $scope.title,
+                    editable: $scope.editable,
+                    width: $scope.width,
+                    height: $scope.height,
+                });
                 if(!blobs) {
                     uploader.clearQueue();
                     return;
                 }
                 for(let i=0; i<blobs.length; i++){
-                    uploader.queue[i]._file = blobs[i];
+                    if(!(blobs[i] instanceof File))
+                        uploader.queue[i]._file = blobs[i];
                 }
                 //$loading.start();
                 let template = `<p style="text-align: center">{{progress}}%</p><progress max="100" value={{progress}}></progress>`;

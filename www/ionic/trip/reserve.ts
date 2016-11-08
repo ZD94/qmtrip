@@ -112,10 +112,7 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
             $scope.load_third = false;
         }
     },200)
-    /*setTimeout(function(){
-        // window.location.href="http://ct.ctrip.com/";
-        window.location.href = supplier.trafficBookLink;
-    },3000)*/
+
     $timeout(function(){
         if($scope.reserveType == "travel"){
             window.location.href = supplier.trafficBookLink;

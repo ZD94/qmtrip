@@ -10,7 +10,7 @@ export async function BindOthersController($scope, $stateParams, Models, $ionicH
     var staff = await Staff.getCurrent();
     var supplier = await Models.supplier.get(supplierId);
     var alreadyBind = await Models.staffSupplierInfo.find({where: {supplierId: supplierId, staffId: staff.id}});
-
+    $scope.alreadyBind = alreadyBind;
     if(alreadyBind && alreadyBind.length>0){
 
         staffSupplierInfo = alreadyBind[0];
@@ -51,7 +51,7 @@ export async function BindOthersController($scope, $stateParams, Models, $ionicH
                     onTap: async function(){
                         await staffSupplierInfo.destroy();
                         msgbox.log('解绑成功');
-                        $ionicHistory.goBack(-1);
+                        window.location.href='#/staff/bind-suppliers'
                     }
                 }
             ]
