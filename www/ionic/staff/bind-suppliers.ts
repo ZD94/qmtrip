@@ -15,28 +15,37 @@ export function selectSuppliers($scope, id, ngModalDlg){
 
 export async function BindSuppliersController($scope, Models, ngModalDlg){
     var staff = await Staff.getCurrent();
-    var alreadyBinds = await Models.staffSupplierInfo.find({where: {staffId: staff.id}});
-    var suppliers = await Models.supplier.find({where: {companyId: null, type: ESupplierType.SYSTEM_CAN_IMPORT}});
-    if(alreadyBinds && alreadyBinds.length > 0){
-        suppliers.map(function(s){
-            alreadyBinds.forEach(function(item){
-                if(s.id == item.supplier.id){
-                    s["isBind"] = true;
-                }else{
-                    s["isBind"] = false;
-                }
+    async function ifBind(){
+        var alreadyBinds = await Models.staffSupplierInfo.find({where: {staffId: staff.id}});
+        var suppliers = await Models.supplier.find({where: {companyId: null, type: ESupplierType.SYSTEM_CAN_IMPORT}});
+        if(alreadyBinds && alreadyBinds.length > 0){
+            suppliers.map(function(s){
+                alreadyBinds.forEach(function(item){
+                    if(s.id == item.supplier.id){
+                        s["isBind"] = true;
+                    }else{
+                        s["isBind"] = false;
+                    }
+                })
+                return s;
             })
-            return s;
-        })
-    }else{
-        suppliers.map(function(s){
-            s["isBind"] = false;
-        })
+        }else{
+            suppliers.map(function(s){
+                s["isBind"] = false;
+            })
+        }
+        $scope.suppliers = suppliers;
     }
-    $scope.suppliers = suppliers;
+    ifBind();
     $scope.bindSupplier = async function (id) {
         let bind = await selectSuppliers($scope,{id:id}, ngModalDlg)
-        console.info(bind);
+        if(bind == 'bind'){
+            ifBind();
+            msgbox.log("绑定成功");
+        }else if(bind == 'unbind'){
+            ifBind();
+            msgbox.log("绑定成功");
+        }
         // window.location.href = `#/staff/bind-others?supplierId=${id}`;
     }
 }
@@ -47,7 +56,7 @@ export async function bindSupplierController($scope, Models, $ionicPopup){
     $scope.form = {userName:'', pwd: ''};
 
     var staffSupplierInfo;
-    var supplierId = $scope.supplierId;
+    var supplierId = $scope.id.id;
     var staff = await Staff.getCurrent();
     var supplier = await Models.supplier.get(supplierId);
     var alreadyBind = await Models.staffSupplierInfo.find({where: {supplierId: supplierId, staffId: staff.id}});
@@ -73,8 +82,8 @@ export async function bindSupplierController($scope, Models, $ionicPopup){
             staffSupplierInfo.supplier = supplier;
             staffSupplierInfo.staff = staff;
             await staffSupplierInfo.save();
-            msgbox.log("绑定成功");
-            $scope.modal.hide();
+            let bind = 'bind';
+            $scope.confirmModal(bind);
         }else{
             msgbox.log("验证失败");
         }
@@ -91,8 +100,8 @@ export async function bindSupplierController($scope, Models, $ionicPopup){
                     type: 'button-positive',
                     onTap: async function(){
                         await staffSupplierInfo.destroy();
-                        msgbox.log('解绑成功');
-                        $scope.modal.hide();
+                        let bind = 'unbind';
+                        $scope.confirmModal(bind);
                     }
                 }
             ]

@@ -36,7 +36,7 @@ export function ngService(name: string) {
     };
 }
 
+import './models';
 import './services';
 import './directives';
 import './filters';
-import './models';
