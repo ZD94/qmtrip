@@ -127,6 +127,7 @@ export class Staff extends ModelObject implements Account {
             options.where = {}
         }
         options.where.accountId = this.id;
+        options['order'] = [['startAt', 'desc']];
         return Models.tripPlan.find(options);
     }
 
