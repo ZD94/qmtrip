@@ -48,11 +48,15 @@ export function getNameByECabin(key: ECabin) {
 }
 
 export enum  EInvoiceFeeTypes {
-    PLANET_TICKET = 1,
-    TRAIN_TICKET = 2,
-    CANCEL_TRAIN_TICKET = 3,
-    CANCEL_PLANET_TICKET = 4,
-    HOTEL = 5
+    PLANE_TICKET = 1,
+    TRAIN_TICKET = 2, 
+    TICKET_CHANGE_FEE = 3,
+    CANCEL_TICKET_FEE = 4,
+    HOTEL = 5,
+    INSURANCE = 6,
+    EXPRESS = 7,
+    ORDER_TICKET_FEE = 8,
+    OTHER = 99,
 }
 
 export enum EPayType {

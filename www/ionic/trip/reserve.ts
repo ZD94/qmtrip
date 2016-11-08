@@ -14,28 +14,27 @@ export async function ReserveController($scope, Models, $stateParams){
         compnySuppliers  = suppliers.filter((item: any)=>{
             return item.companyId == currentCompany.id && item.type == ESupplierType.COMPANY_CUSTOM;
         })
-        $scope.compnySuppliers = compnySuppliers;
         canImportSuppliers  = suppliers.filter((item: any)=>{
             return item.type == ESupplierType.SYSTEM_CAN_IMPORT;
         })
-        $scope.canImportSuppliers = canImportSuppliers;
         canNotImportSuppliers  = suppliers.filter((item: any)=>{
             return item.type == ESupplierType.SYSTEM_CAN_NOT_IMPORT;
         })
-        $scope.canNotImportSuppliers = canNotImportSuppliers;
     }else{
         compnySuppliers = await currentCompany.getCompanySuppliers();
-        $scope.compnySuppliers = compnySuppliers;
         //公共的供应商
         canImportSuppliers = await Models.supplier.find({where:{companyId: null, type: ESupplierType.SYSTEM_CAN_IMPORT}});
         canNotImportSuppliers = await Models.supplier.find({where:{companyId: null, type: ESupplierType.SYSTEM_CAN_NOT_IMPORT}});
-        $scope.canImportSuppliers = canImportSuppliers;
-        $scope.canNotImportSuppliers = canNotImportSuppliers;
     }
     if(!currentCompany.isAppointSupplier && compnySuppliers.length == 0 && canImportSuppliers.length == 0 && canNotImportSuppliers.length == 0){
-        //特殊情况 企业显示推荐服务商关闭 且个供应商列表开关均关闭 显示推荐的不支持导入列表
+        //特殊情况 企业显示推荐服务商关闭 且个供应商列表开关均关闭 显示推荐列表
+        canImportSuppliers = await Models.supplier.find({where:{companyId: null, type: ESupplierType.SYSTEM_CAN_IMPORT}});
         canNotImportSuppliers = await Models.supplier.find({where: {companyId: null, type: ESupplierType.SYSTEM_CAN_NOT_IMPORT}});
     }
+    $scope.compnySuppliers = compnySuppliers;
+    $scope.canImportSuppliers = canImportSuppliers;
+    $scope.canNotImportSuppliers = canNotImportSuppliers;
+
     $scope.redirect = function(supplier){
         window.location.href="#/trip/reserve-redirect?detailId="+$stateParams.detailId+"&supplier="+supplier;
     }

@@ -205,7 +205,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             timepicker: true,
             title: '选择开始时间',
             titleEnd: '选择结束时间',
-            loadMonthNum: 2,
         }, value);
         if(value){
             $scope.trip.beginDate = value.begin;
@@ -218,7 +217,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         beginDate: $scope.trip.beginDate,
         endDate: moment().add(1, 'year').toDate(),
         timepicker: true,
-        loadMonthNum: 2,
     };
     $scope.$watch('trip.beginDate', function(n, o){
         $scope.endDateSelector.beginDate = $scope.trip.beginDate;

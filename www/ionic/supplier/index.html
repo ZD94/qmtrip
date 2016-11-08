@@ -12,14 +12,15 @@
                 </label>
             </div>
         </div>
-        <div class="supplier-text">
-            <p>开启指定商旅供应商功能，员工在出差审批通过后可以通过指定商旅供应商进行出行预订，预订完成后可以导入部分供应商订单获取实时出行数据。关闭该功能，员工可以任意渠道预订。</p>
-        </div>
+        <p class="supplier-text">
+            说明：<br>
+            开启指定商旅供应商功能，员工在出差审批通过后可以通过指定商旅供应商进行出行预订，预订完成后可以导入部分供应商订单获取实时出行数据。关闭该功能，员工可以任意渠道预订。
+        </p>
         <div>
             <div class="list self-define">
                 <div class="item item-divider supplier-title">
-                    自定义供应商
-                    <span class="pull-right">管理列表</span>
+                    专属服务商
+                    <span class="pull-right">不支持订单关联</span>
                 </div>
                 <div class="item item-divider self-detail" ng-repeat="ah in suppliers">
                     <div ng-click="editSupplier(ah.id)" class="pull-left" style="width:180px">
@@ -43,7 +44,8 @@
             </div>
             <div class="list recommend-supplier">
                 <div class="item item-divider supplier-title">
-                    推荐供应商(支持订单关联)
+                    推荐供应商
+                    <span class="pull-right">支持订单关联</span>
                 </div>
                 <div class="item" ng-repeat="c in canImportList">
                     <img class="avatar-img" ng-src="/attachments/{{c.logo}}" ng-if="c.logo">
@@ -58,7 +60,8 @@
 
             <div class="list recommend-supplier">
                 <div class="item item-divider supplier-title">
-                    推荐供应商(不支持订单关联)
+                    推荐供应商
+                    <span class="pull-right">不支持订单关联</span>
                 </div>
                 <div class="item" ng-repeat="n in canNotImportList">
                     <img class="avatar-img" ng-src="/attachments/{{n.logo}}" ng-if="n.logo">

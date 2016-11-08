@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION trip_plan.handle_old_invioces_161028()
 
   RETURNS void AS
 $BODY$
-	DECLARE trip_detail_cursor CURSOR FOR SELECT id, regexp_replace(regexp_replace(replace(invoice::text, '\', ''), '"\[', '[', 'g'), '\]"', ']', 'g')::jsonb as invoices FROM trip_plan.trip_details;
+	DECLARE trip_detail_cursor CURSOR FOR SELECT id, expenditure, regexp_replace(regexp_replace(replace(invoice::text, '\', ''), '"\[', '[', 'g'), '\]"', ']', 'g')::jsonb as invoices FROM trip_plan.trip_details;
 	DEClARE _picture_file_id uuid;
 	DECLARE _created_at timestamp;
 	DECLARE _approve_at timestamp;
@@ -43,8 +43,8 @@ BEGIN
 		    IF _invoice->>'approve_at' IS NOT NULL AND _invoice->>'approve_at' != '' THEN
 		    _approve_at = _invoice->>'approve_at';
 		    END IF;
-		    INSERT INTO trip_plan.trip_detail_invoices (id, trip_detail_id, times, updated_at, created_at, approve_at, picture_file_id, pay_type)
-		    VALUES ( R.id, R.id, _times, now(), _created_at, _approve_at, _picture_file_id::uuid, 1);
+		    INSERT INTO trip_plan.trip_detail_invoices (id, trip_detail_id, times, updated_at, created_at, approve_at, picture_file_id, pay_type, total_money)
+		    VALUES ( R.id, R.id, _times, now(), _created_at, _approve_at, _picture_file_id::uuid, 1, R.expenditure);
 
 		END IF;
         END IF;

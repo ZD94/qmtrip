@@ -13,7 +13,7 @@
                 <span class="input-label">酒店预订地址</span>
                 <input type="text" placeholder="输入URL，以http开头" ng-model="supplier.hotelBookLink">
             </div>
-            <div class="item item-logo item-icon-right" ng-uploader accept="image/png, image/jpeg, image/gif" url="uploadUrl" done="done">
+            <div class="item item-logo item-icon-right" ng-uploader accept="image/png, image/jpeg, image/gif" url="uploadUrl" edit="true" width="200" height="60" done="done">
                 <span class="input-label">LOGO</span>
                 <div class="logo">
                     <img class="avatar-img" ng-src="/attachments/{{supplier.logo}}" ng-if="supplier.logo">

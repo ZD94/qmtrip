@@ -86,7 +86,6 @@ function SpanChangeController($scope, ngModalDlg){
             timepicker: false,
             title: '选择开始时间',
             titleEnd: '选择结束时间',
-            toBottom: true
         }, value);
         if(value){
             $scope.span.startTime = value.begin;
