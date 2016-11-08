@@ -17,23 +17,19 @@ export async function BindSuppliersController($scope, Models, ngModalDlg){
     var staff = await Staff.getCurrent();
     async function ifBind(){
         var alreadyBinds = await Models.staffSupplierInfo.find({where: {staffId: staff.id}});
+        var alreadyBindIds = [];
         var suppliers = await Models.supplier.find({where: {companyId: null, type: ESupplierType.SYSTEM_CAN_IMPORT}});
-        if(alreadyBinds && alreadyBinds.length > 0){
-            suppliers.map(function(s){
-                alreadyBinds.forEach(function(item){
-                    if(s.id == item.supplier.id){
-                        s["isBind"] = true;
-                    }else{
-                        s["isBind"] = false;
-                    }
-                })
-                return s;
-            })
-        }else{
-            suppliers.map(function(s){
+        alreadyBinds.forEach(function(item){
+            alreadyBindIds.push(item.supplier.id)
+        })
+        suppliers = suppliers.map(function(s){
+            if(alreadyBindIds.indexOf(s.id) >= 0){
+                s["isBind"] = true;
+            }else{
                 s["isBind"] = false;
-            })
-        }
+            }
+            return s;
+        })
         $scope.suppliers = suppliers;
     }
     ifBind();
