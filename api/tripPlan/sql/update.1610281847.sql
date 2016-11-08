@@ -44,7 +44,7 @@ BEGIN
 		    _approve_at = _invoice->>'approve_at';
 		    END IF;
 		    INSERT INTO trip_plan.trip_detail_invoices (id, trip_detail_id, times, updated_at, created_at, approve_at, picture_file_id, pay_type)
-		    VALUES ( R.id, R.id, _times, now(), _created_at, _approve_at, _picture_file_id::uuid, 2);
+		    VALUES ( R.id, R.id, _times, now(), _created_at, _approve_at, _picture_file_id::uuid, 1);
 
 		END IF;
         END IF;
