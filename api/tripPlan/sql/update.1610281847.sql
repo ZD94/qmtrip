@@ -43,8 +43,8 @@ BEGIN
 		    IF _invoice->>'approve_at' IS NOT NULL AND _invoice->>'approve_at' != '' THEN
 		    _approve_at = _invoice->>'approve_at';
 		    END IF;
-		    INSERT INTO trip_plan.trip_detail_invoices (id, trip_detail_id, times, updated_at, created_at, approve_at, picture_file_id)
-		    VALUES ( R.id, R.id, _times, now(), _created_at, _approve_at, _picture_file_id::uuid);
+		    INSERT INTO trip_plan.trip_detail_invoices (id, trip_detail_id, times, updated_at, created_at, approve_at, picture_file_id, pay_type)
+		    VALUES ( R.id, R.id, _times, now(), _created_at, _approve_at, _picture_file_id::uuid, 2);
 
 		END IF;
         END IF;
