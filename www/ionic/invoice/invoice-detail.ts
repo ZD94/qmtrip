@@ -44,8 +44,6 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     }
 
     $scope.tripDetail = tripDetail;
-    console.info(tripDetail);
-    // $scope.invoices = invoices;
     $scope.dateOptions = {
         beginDate: moment().add(-1,'years').startOf('months').toDate(),
         endDate: new Date(),
@@ -76,9 +74,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     $scope.invoicefuc = {
         title:'上传'+title + '发票',
         done: async function(response){
-            console.info(response);
             if(response.ret != 0){
-                console.error(response.errMsg);
                 $ionicPopup.alert({
                     title: '错误',
                     template: response.errMsg
@@ -90,7 +86,6 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
             let tempFile = response.tempFiles[fileId];
             let previewUrl = 'attachment/temp/'+fileId+'?expireTime='+tempFile.expireTime+'&sign='+tempFile.sign;
             $scope.previewUrl = previewUrl;
-            console.info(previewUrl);
             $scope.$apply();
         }
     }
@@ -123,7 +118,6 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
             template: require('./img-template.html'),
             controller: ImgTemplateController
         })
-        console.info(imgView)
     }
 
     //start 修改票据button事件
