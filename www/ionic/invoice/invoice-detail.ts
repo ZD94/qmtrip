@@ -51,7 +51,6 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         endDate: new Date(),
         timepicker: false,
         title: '选择开始时间',
-        toBottom: true
     }
     $scope.EInvoiceType = EInvoiceType;
 
