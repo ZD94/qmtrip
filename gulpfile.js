@@ -18,7 +18,7 @@ gulplib.public_dir = 'www';
 gulplib.bundle_lib('browserify', {ex: true, require:[
         'buffer', 'querystring', 'string_decoder', 'is-buffer',
         'http', 'https', 'url',
-        'util', '_process:process', 'events', 'stream', 'zlib', 'inherits','crypto'
+        'util', '_process:process', 'events', 'stream', 'zlib', 'inherits',
 ]});
 gulplib.bundle_lib('update', 'cordova-app-loader/bootstrap.js', {ex: true, require: [
     'cordova-app-loader', 'cordova-promise-fs', 'common/client/updater'

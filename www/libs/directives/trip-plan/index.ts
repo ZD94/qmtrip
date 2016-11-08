@@ -140,6 +140,7 @@ angular
                 }
                 $scope.days = 1;
                 $scope.subsidyDays = 1;
+
                 if ($scope.item.type == ETripType.HOTEL) {
                     $scope.days = moment($scope.item.checkOutDate).diff(moment($scope.item.checkInDate), 'days');
                 } else if ($scope.item.type == ETripType.SUBSIDY) {

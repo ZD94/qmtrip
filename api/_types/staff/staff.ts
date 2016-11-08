@@ -11,10 +11,13 @@ import { TableExtends, Table, Create, Field, ResolveRef, Reference, RemoteCall }
 import { ModelObject } from 'common/model/object';
 import {PaginateInterface} from 'common/model/interface';
 import {CoinAccount} from 'api/_types/coin';
-import {getSupplier,SupplierOrder} from 'libs/suppliers';
+import {SupplierOrder} from 'libs/suppliers/interface';
+import {SupplierGetter} from 'libs/suppliers';
 import L from 'common/language';
 
 declare var API: any;
+
+let getSupplier: SupplierGetter;
 
 export enum EStaffStatus {
     FORBIDDEN = 0,
@@ -194,6 +197,9 @@ export class Staff extends ModelObject implements Account {
     @RemoteCall()
     async getOrders(params: {supplierId: string}): Promise<SupplierOrder[]> {
         let supplier = await Models.supplier.get(params.supplierId);
+        if(!getSupplier){
+            getSupplier = require('lib/suppliers').getSupplier;
+        }
         let client = getSupplier(supplier.supplierKey);
         let staffSupplierInfo = await this.getOneStaffSupplierInfo({supplierId: params.supplierId});
         if(!staffSupplierInfo){
@@ -243,6 +249,9 @@ export class Staff extends ModelObject implements Account {
     @RemoteCall()
     async checkStaffSupplierInfo(params: {supplierId: string, userName: string, pwd: string}): Promise<boolean> {
         let supplier = await Models.supplier.get(params.supplierId);
+        if(!getSupplier){
+            getSupplier = require('lib/suppliers').getSupplier;
+        }
         let client = getSupplier(supplier.supplierKey);
         try{
             await client.login({username: params.userName, password: params.pwd});
