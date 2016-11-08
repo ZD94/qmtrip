@@ -3,7 +3,7 @@ import moment = require('moment');
 import { Staff } from 'api/_types/staff/staff';
 import { CommittedController } from './committed';
 
-export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading, City, ngModalDlg){
+export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup){
     require('./trip.scss');
     require('./budget.scss');
     API.require("tripPlan");
@@ -115,12 +115,28 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         try {
             //let staff = await Staff.getCurrent();
             let tripApprove = await API.tripPlan.saveTripApprove({budgetId: id, title: trip.reason||trip.reasonName, approveUserId: trip.auditUser.id});
-            let approveId = tripApprove.id
-            let committed = ngModalDlg.createDialog({
-                parent:$scope,
-                scope: {approveId},
-                template: require('./committed.html'),
-                controller: CommittedController
+            let approveId = tripApprove.id;
+            $ionicPopup.show({
+                title: '出差申请已提交',
+                cssClass: 'popup_attention',
+                scope: $scope,
+                template: `<p>您的出差申请已提交${trip.auditUser.name}审批。当前预算仅为参考，请以最终审批预算为准！</p>`,
+                buttons: [
+                    {
+                        text: '个人中心',
+                        type: 'button-calm button-outline',
+                        onTap:function(){
+                            window.location.href = '#/staff/index.html'
+                        }
+                    },
+                    {
+                        text: '查看审批单',
+                        type: ' button-calm',
+                        onTap: function(){
+                            window.location.href = `#/trip-approval/detail?approveId=${approveId}`
+                        }
+                    }
+                ]
             })
         } catch(err) {
             alert(err.msg || err);
