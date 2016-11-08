@@ -1,6 +1,7 @@
 import { Staff, EStaffRole } from 'api/_types/staff/staff';
 import { EPlanStatus, EAuditStatus } from 'api/_types/tripPlan';
-
+import {getImageUrl} from '../controller';
+var config = require('config');
 export default async function IndexController($scope, Models) {
     require('./index.scss');
     API.require('tripPlan');
@@ -19,4 +20,6 @@ export default async function IndexController($scope, Models) {
     $scope.EStaffRole = EStaffRole;
     $scope.EPlanStatus = EPlanStatus;
     $scope.EAuditStatus = EAuditStatus;
+    await config.$ready;
+    $scope.getImageUrl = getImageUrl;
 }

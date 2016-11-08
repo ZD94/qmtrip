@@ -1,6 +1,8 @@
 "use strict";
 import {Staff, EStaffRole} from 'api/_types/staff';
 import {MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
+import * as path from 'path';
+
 var API = require('common/api');
 
 var staffMenus = [
@@ -86,7 +88,14 @@ var adminMenus = [
     },
 ];
 
-export async function IndexController($scope, Menu, $ionicPopup, Models, $storage, $window, $location, $ionicHistory, $ionicSideMenuDelegate) {
+var config = require('config');
+
+export function getImageUrl(id){
+    let imgUrl = path.join(config.update,'/attachments/',id);
+    return imgUrl;
+}
+
+export async function IndexController($scope, Menu, $ionicPopup, Models, $storage, $window, $location, $ionicHistory, $ionicSideMenuDelegate, avatarUrl) {
     require('./index.scss');
     $scope.ionicGoBack = function () {
         let viewHistory = $ionicHistory.viewHistory();
@@ -124,7 +133,7 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
 
     $scope.Menu = Menu;
     $scope.tripPlanSave = 0;
-
+    
     var staff = await Staff.getCurrent();
 
     function setupMenu(menuItems){
@@ -178,7 +187,7 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
             })
         }
     };
-
+    
     $scope.currentStaff = staff;
     if (staff) {
         $scope.tripPlanSave = await staff.getTripPlanSave();
@@ -187,4 +196,7 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
     $scope.goMyCenter = function() {
         $location.path('/staff/staff-info');
     }
+
+    await config.$ready;
+    $scope.getImageUrl = getImageUrl;
 }

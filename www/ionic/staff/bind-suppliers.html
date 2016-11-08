@@ -2,7 +2,7 @@
     <ion-content padding="true" class="has-header">
         <ion-list>
             <ion-item class="item" ng-repeat="su in suppliers" ng-click="bindSupplier(su.id)">
-                <img class="avatar-img" ng-src="/attachments/{{su.logo}}" ng-if="su.logo">
+                <img class="avatar-img" ng-src="{{getImageUrl(su.logo)}}" ng-if="su.logo">
                 <span class="item-note">{{su.isBind? "已绑定": "未绑定"}}</span>
             </ion-item>
         </ion-list>

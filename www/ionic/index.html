@@ -11,7 +11,7 @@
                             {{currentStaff.name.substring(currentStaff.name.length-2,currentStaff.name.length)}}
                         </div>
                         <div class="menu-portrait menu-avatar" ng-if="currentStaff.avatar">
-                            <img ng-src="/attachments/{{currentStaff.avatar}}">
+                            <img ng-src="{{getImageUrl(currentStaff.avatar)}}">
                         </div>
                         <h2>{{currentStaff.name}}<i class="button button-small button-stable"
                                                     ng-click="$event.stopPropagation();$event.preventDefault(); showTravelPolicy()">差旅标准</i></h2>

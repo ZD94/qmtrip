@@ -6,7 +6,7 @@
                     <div class="item-thumbnail-left">
                         <div class="avatar" ng-if="!staff.avatar">{{staff.name}}</div>
                         <div class="avatar" ng-if="staff.avatar">
-                            <img ng-src="/attachments/{{staff.avatar}}">
+                            <img ng-src="{{getImageUrl(staff.avatar)}}">
                         </div>
                         <h2>{{staff.name}}<span class="badge badge-calm" ng-if="staff.roleId == EStaffRole.ADMIN">管理员</span>
                             <span class="badge badge-energized" ng-if="staff.roleId == EStaffRole.OWNER">创建者</span></h2>
