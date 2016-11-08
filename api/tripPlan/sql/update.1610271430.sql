@@ -76,7 +76,6 @@ BEGIN
 	     --RAISE NOTICE '补助是否存在判断 ==> %， % ', NOT EXISTS ( SELECT id FROM trip_plan.trip_detail_subsidies WHERE id = R.id ), R.id;
 
 	     IF NOT EXISTS ( SELECT id FROM trip_plan.trip_detail_subsidies WHERE id = R.id ) THEN
-	        UPDATE trip_plan.trip_details SET personal_expenditure = expenditure WHERE id = R.id;
 	        select regexp_replace(regexp_replace(replace(query::text, '\', ''), '^"', ''), '"$', '')::jsonb->>'subsidy'
 		from trip_plan.trip_plans where id = R.trip_plan_id INTO _subsidy;
 		IF _subsidy is NOT NULL THEN
