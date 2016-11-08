@@ -9,7 +9,6 @@
     <ion-item class="item-divider" style="background-color:#fff">
         <div ng-if="item.type == ETripType.OUT_TRIP || item.type == ETripType.BACK_TRIP">
             <span style="font-size: 12px">{{item.deptDateTime | date: 'MM-dd'}}</span>
-            <!--<span class="spanRight">{{item.budget| currency: ''}}元</span>-->
             <span class="spanRight actual-cost">
                 <span>实际:</span>
                 <span>{{item.expenditure | currency_int}}元</span>
@@ -32,20 +31,11 @@
                 <span>公司</span>
                 <span>{{item.expenditure - item.personalExpenditure | currency_int}}</span>
             </span>
-            <!--<span class="spanRight right-budget">-->
-                <!--<span ng-if="item.cabin">-->
-                    <!--{{MTxPlaneLevel[item.cabin] ? MTxPlaneLevel[item.cabin] : item.cabin}}<br/>-->
-                <!--</span>-->
-                <!--&lt;!&ndash;{{item.budget == -1 ? '暂无预算' : (item.budget| currency: '')+'元'}}<br/>&ndash;&gt;-->
-                <!--<span ng-if="item.fullPrice  && item.cabinClass == 'Economy'">-->
-                    <!--{{item.fullPrice > item.budget ? ((item.budget/item.fullPrice)*10).toFixed(1)+'折' : '全价'}}-->
-                <!--</span>-->
-            <!--</span>-->
+
         </div>
 
         <div ng-if="item.type == ETripType.HOTEL">
             <span style="font-size: 12px">{{item.checkInDate | date: 'MM-dd'}}至{{item.checkOutDate | date: 'MM-dd'}}(共{{days || 1}}天)</span>
-            <!--<span class="spanRight">{{budget}}</span>-->
             <span class="spanRight actual-cost">
                 <span>实际:</span>
                 <span>{{item.expenditure | currency_int}}元</span>
@@ -61,30 +51,25 @@
                 <span>公司</span>
                 <span>{{item.expenditure - item.personalExpenditure | currency_int}}</span>
             </span>
-            <!--<span class="spanRight right-budget" ng-if="item.budget > 0">-->
-                <!--{{item.budget / days | currency: ''}}元/天-->
-            <!--</span>-->
+
         </div>
 
         <div ng-if="item.type == ETripType.SUBSIDY">
             <span style="font-size: 12px">{{item.startDateTime | date: 'MM-dd'}}至{{item.endDateTime | date: 'MM-dd'}}(共{{subsidyDays}}天)</span>
-            <!--<span class="spanRight">{{budget}}</span>-->
             <span class="spanRight actual-cost">
                 <span>实际:</span>
-                <span>{{budget | currency_int}}元</span>
+                <span>{{item.expenditure | currency_int}}元</span>
             </span>
 
             <br/>
-            <!--<span class="spanRight right-budget" ng-if="item.budget > 0">-->
-                <!--{{item.budget / (subsidyDays) | currency: ''}}元/天-->
-            <!--</span>-->
+
             <span class="spanRight spanRight-cost personal-cost">
                 <span>个人</span>
-                <span>0</span>
+                <span>{{item.personalExpenditure }}</span>
             </span>
             <span class="spanRight spanRight-cost company-cost">
                 <span>公司</span>
-                <span>{{budget | currency_int}}</span>
+                <span>{{item.expenditure - item.personalExpenditure | currency_int}}</span>
             </span>
         </div>
 
@@ -93,7 +78,7 @@
             <p>
                 <span class="spanRight actual-cost">
                     <span>实际:</span>
-                    <span>{{budget | currency_int}}元</span>
+                    <span>{{item.expenditure | currency_int}}元</span>
                 </span>
             </p>
             <p>
@@ -111,11 +96,6 @@
     <ion-item class="trip-buttons">
         <div ng-if="item.type != ETripType.SUBSIDY" class="item-note detail_btn">
             <div ng-if="item.status == EPlanStatus.WAIT_UPLOAD">
-                <!--<div class="trip_btn button-small botton-outline button-positive"-->
-                     <!--ng-uploader accept="image/png, image/jpeg, image/gif" title="item.title" done="item.done" url="uploadUrl"-->
-                     <!--ng-if="isShowUploader">-->
-                    <!--上传票据-->
-                <!--</div>-->
                 <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve(item.id)" ng-if="isBeforeStartTime">
                     预订
                 </a>
@@ -127,9 +107,6 @@
 
             <div ng-if="item.status == EPlanStatus.WAIT_COMMIT">
                 <div ng-if="isShowUploader">
-                    <!--<div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/png, image/jpeg, image/gif" title="item.title" done="item.done" url="uploadUrl">-->
-                        <!--重新上传-->
-                    <!--</div>-->
                     <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve(item.id)" ng-if="isBeforeStartTime">
                         退/改签
                     </a>
@@ -144,9 +121,6 @@
             <div ng-if="item.status == EPlanStatus.AUDITING">
                 <a class="trip_btn button button button-small button-outline"
                    ng-click="viewInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
-                <!--<a class="trip_btn button-small botton-outline">-->
-                    <!--管理票据-->
-                <!--</a>-->
                 <span ng-if="!isShowUploader">票据审核中</span>
             </div>
 
@@ -157,13 +131,6 @@
             </div>
 
             <div ng-if="item.status == EPlanStatus.AUDIT_NOT_PASS">
-                <!--<div class="uploadbtns button-small botton-outline button-positive"-->
-                     <!--ng-uploader accept="image/png, image/jpeg, image/gif"-->
-                     <!--title="item.title"-->
-                     <!--done="item.done"-->
-                     <!--url="uploadUrl">-->
-                     <!--重新上传-->
-                <!--</div>-->
                 <a class="trip_btn button button-small button-outline"
                    ng-click="viewInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
                 <a class="trip_btn button-small botton-outline" ng-click="viewInvoice(item.id)">
