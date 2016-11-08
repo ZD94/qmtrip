@@ -30,7 +30,7 @@
                     </div>
                 </div>
                 <ion-infinite-scroll
-                        ng-if="months.length < 12"
+                        ng-if="hasMoreMonths"
                         on-infinite="loadNextMonth()">
                 </ion-infinite-scroll>
                 <!--ng-if="months.length < 12"-->
