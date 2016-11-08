@@ -11,7 +11,7 @@ var iconv = require('iconv-lite');
 var account;
 var password;
 
-var use = 1;
+var use = 3;
 
 switch(use){
     case 0:
@@ -19,8 +19,16 @@ switch(use){
         password = '123456lf';
         break;
     case 1:
-        account = '13911795755'
+        account = '13911795755';
         password = 'lsd920';
+        break;
+    case 2:
+        account = '18611107043';
+        password = 'liu123456';
+        break;
+    case 3:
+        account = '15201642367';
+        password = 'stratop123';
         break;
 }
 
