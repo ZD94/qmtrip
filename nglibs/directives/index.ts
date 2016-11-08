@@ -6,6 +6,7 @@ import './erasable';
 import './select';
 import './selector';
 import './icon';
+import './picview';
 import './uploader';
 import './progressBar';
 import './baidu-map';
