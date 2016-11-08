@@ -51,18 +51,22 @@
                     <div class="invoice-item">
                         <div>
                             <span class="item-tit">支付方式</span>
-                            <h3 ng-if="invoice.payType == 1">个人支付</h3>
-                            <h3 ng-if="invoice.payType == 2">公司支付</h3>
+                            <h3 ng-if="invoice.payType == EPayType.PERSONAL_PAY">个人支付</h3>
+                            <h3 ng-if="invoice.payType == EPayType.COMPANY_PAY">公司支付</h3>
                         </div>
                     </div>
                     <div class="invoice-item">
                         <div>
                             <span class="item-tit">类型</span>
-                            <h3 ng-if="invoice.type == 1">机票</h3>
-                            <h3 ng-if="invoice.type == 2">火车票</h3>
-                            <h3 ng-if="invoice.type == 3">火车退票费</h3>
-                            <h3 ng-if="invoice.type == 4">机票退票费</h3>
-                            <h3 ng-if="invoice.type == 5">酒店</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.PLANE_TICKET">机票行程单</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.TRAIN_TICKET">火车票</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.HOTEL">住宿费</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.ORDER_TICKET_FEE">订票费</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.CANCEL_TICKET_FEE">退票费</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.TICKET_CHANGE_FEE">改签费</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.EXPRESS">快递费</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.EXPRESS">保险费</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.OTHER">其他</h3>
                         </div>
                     </div>
                     <div class="invoice-item">
@@ -99,8 +103,8 @@
                         <div class="item-select">
                             <h3>
                                 <select ng-model="invoice.payType">
-                                    <option value="1" ng-selected="invoice.payType == 1">个人支付</option>
-                                    <option value="2" ng-selected="invoice.payType == 2">公司支付</option>
+                                    <option value="{{EPayType.PERSONAL_PAY}}" ng-selected="invoice.payType == EPayType.PERSONAL_PAY">个人支付</option>
+                                    <option value="{{EPayType.COMPANY_PAY}}" ng-selected="invoice.payType == EPayType.COMPANY_PAY">公司支付</option>
                                 </select>
                             </h3><!-- 这里要加一个判断,是否是编辑模式,,-->
                         </div>
@@ -111,11 +115,15 @@
                             <!--<h3>类型</h3>-->
                             <h3>
                                 <select ng-model="invoice.type">
-                                    <option value="1" ng-selected="invoice.type == 1">机票</option>
-                                    <option value="2" ng-selected="invoice.type == 2">火车票</option>
-                                    <option value="3" ng-selected="invoice.type == 3">火车退票费</option>
-                                    <option value="4" ng-selected="invoice.type == 4">机票退票费</option>
-                                    <option value="5" ng-selected="invoice.type == 5">酒店</option>
+                                    <option value="{{EInvoiceFeeTypes.PLANE_TICKET}}" ng-selected="invoice.type == EInvoiceFeeTypes.PLANE_TICKET">机票行程单</option>
+                                    <option value="{{EInvoiceFeeTypes.TRAIN_TICKET}}" ng-selected="invoice.type == EInvoiceFeeTypes.TRAIN_TICKET">火车票</option>
+                                    <option value="{{EInvoiceFeeTypes.HOTEL}}" ng-selected="invoice.type == EInvoiceFeeTypes.HOTEL">住宿费</option>
+                                    <option value="{{EInvoiceFeeTypes.ORDER_TICKET_FEE}}" ng-selected="invoice.type == EInvoiceFeeTypes.ORDER_TICKET_FEE">订票费</option>
+                                    <option value="{{EInvoiceFeeTypes.CANCEL_TICKET_FEE}}" ng-selected="invoice.type == EInvoiceFeeTypes.CANCEL_TICKET_FEE">退票费</option>
+                                    <option value="{{EInvoiceFeeTypes.TICKET_CHANGE_FEE}}" ng-selected="invoice.type == EInvoiceFeeTypes.TICKET_CHANGE_FEE">改签费</option>
+                                    <option value="{{EInvoiceFeeTypes.EXPRESS}}" ng-selected="invoice.type == EInvoiceFeeTypes.EXPRESS">快递费</option>
+                                    <option value="{{EInvoiceFeeTypes.INSURANCE}}" ng-selected="invoice.type == EInvoiceFeeTypes.EXPRESS">保险费</option>
+                                    <option value="{{EInvoiceFeeTypes.OTHER}}" ng-selected="invoice.type == EInvoiceFeeTypes.OTHER">其他</option>
                                 </select>
                             </h3>
                         </div>
@@ -153,18 +161,22 @@
                     <div class="invoice-item">
                         <div>
                             <span class="item-tit">支付方式</span>
-                            <h3 ng-if="invoice.payType == 1">个人支付</h3>
-                            <h3 ng-if="invoice.payType == 2">公司支付</h3>
+                            <h3 ng-if="invoice.payType == EPayType.PERSONAL_PAY">个人支付</h3>
+                            <h3 ng-if="invoice.payType == EPayType.COMPANY_PAY">公司支付</h3>
                         </div>
                     </div>
                     <div class="invoice-item">
                         <div>
                             <span class="item-tit">类型</span>
-                            <h3 ng-if="invoice.type == 1">机票</h3>
-                            <h3 ng-if="invoice.type == 2">火车票</h3>
-                            <h3 ng-if="invoice.type == 3">火车退票费</h3>
-                            <h3 ng-if="invoice.type == 4">机票退票费</h3>
-                            <h3 ng-if="invoice.type == 5">酒店</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.PLANE_TICKET">机票行程单</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.TRAIN_TICKET">火车票</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.HOTEL">住宿费</h3>
+                            <h3 ng-if= "invoice.type == EInvoiceFeeTypes.ORDER_TICKET_FEE">订票费</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.CANCEL_TICKET_FEE">退票费</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.TICKET_CHANGE_FEE">改签费</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.EXPRESS">快递费</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.EXPRESS">保险费</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.OTHER">其他</h3>
                         </div>
                     </div>
                     <div class="invoice-item">
@@ -206,8 +218,8 @@
                         <div class="item-select">
                             <h3>
                                 <select ng-model="newInvoice.payType">
-                                    <option value="1" ng-selected="newInvoice.payType == 1">个人支付</option>
-                                    <option value="2" ng-selected="newInvoice.payType == 2">公司支付</option>
+                                    <option value="{{EPayType.PERSONAL_PAY}}" ng-selected="newInvoice.payType == EPayType.PERSONAL_PAY">个人支付</option>
+                                    <option value="{{EPayType.COMPANY_PAY}}" ng-selected="newInvoice.payType == EPayType.COMPANY_PAY">公司支付</option>
                                 </select>
                             </h3><!-- 这里要加一个判断,是否是编辑模式,,-->
                         </div>
@@ -218,11 +230,15 @@
                             <!--<h3>类型</h3>-->
                             <h3>
                                 <select ng-model="newInvoice.type">
-                                    <option value="1" ng-selected="newInvoice.type == 1">机票</option>
-                                    <option value="2" ng-selected="newInvoice.type == 2">火车票</option>
-                                    <option value="3" ng-selected="newInvoice.type == 3">火车退票费</option>
-                                    <option value="4" ng-selected="newInvoice.type == 4">机票退票费</option>
-                                    <option value="5" ng-selected="newInvoice.type == 5">酒店</option>
+                                    <option value="{{EInvoiceFeeTypes.PLANE_TICKET}}" ng-selected="invoice.type == EInvoiceFeeTypes.PLANE_TICKET">机票行程单</option>
+                                    <option value="{{EInvoiceFeeTypes.TRAIN_TICKET}}" ng-selected="invoice.type == EInvoiceFeeTypes.TRAIN_TICKET">火车票</option>
+                                    <option value="{{EInvoiceFeeTypes.HOTEL}}" ng-selected="invoice.type == EInvoiceFeeTypes.HOTEL">住宿费</option>
+                                    <option value="{{EInvoiceFeeTypes.ORDER_TICKET_FEE}}" ng-selected="invoice.type == EInvoiceFeeTypes.ORDER_TICKET_FEE">订票费</option>
+                                    <option value="{{EInvoiceFeeTypes.CANCEL_TICKET_FEE}}" ng-selected="invoice.type == EInvoiceFeeTypes.CANCEL_TICKET_FEE">退票费</option>
+                                    <option value="{{EInvoiceFeeTypes.TICKET_CHANGE_FEE}}" ng-selected="invoice.type == EInvoiceFeeTypes.TICKET_CHANGE_FEE">改签费</option>
+                                    <option value="{{EInvoiceFeeTypes.EXPRESS}}" ng-selected="invoice.type == EInvoiceFeeTypes.EXPRESS">快递费</option>
+                                    <option value="{{EInvoiceFeeTypes.INSURANCE}}" ng-selected="invoice.type == EInvoiceFeeTypes.EXPRESS">保险费</option>
+                                    <option value="{{EInvoiceFeeTypes.OTHER}}" ng-selected="invoice.type == EInvoiceFeeTypes.OTHER">其他</option>
                                 </select>
                             </h3>
                         </div>

@@ -7,6 +7,10 @@ var API = require('common/api');
 var msgbox = require('msgbox');
 
 export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate, ngModalDlg, City, $ionicModal){
+
+    $scope.EInvoiceFeeTypes = EInvoiceFeeTypes;
+    $scope.EPayType = EPayType;
+    
     //////绑定上传url
     require("./invoice-detail.scss");
     let authDataStr = window['getAuthDataStr']();

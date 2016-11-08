@@ -3,7 +3,7 @@ import { SupplierWebRobot, SupplierOrder } from '../index';
 import { EPayType, EInvoiceFeeTypes } from 'api/_types/tripPlan';
 
 var MOrderType = {
-    "F": EInvoiceFeeTypes.PLANET_TICKET,
+    "F": EInvoiceFeeTypes.PLANE_TICKET,
     "H": EInvoiceFeeTypes.HOTEL,
     "T": EInvoiceFeeTypes.TRAIN_TICKET
 }
