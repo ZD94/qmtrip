@@ -1,10 +1,11 @@
 import {StaffSupplierInfo} from "api/_types/staff/staff-supplier-info";
 import { Staff } from 'api/_types/staff/staff';
+import { ESupplierType } from 'api/_types/company/supplier';
 
 export async function BindSuppliersController($scope, Models){
     var staff = await Staff.getCurrent();
     var alreadyBinds = await Models.staffSupplierInfo.find({where: {staffId: staff.id}});
-    var suppliers = await Models.supplier.find({where: {companyId: null}});
+    var suppliers = await Models.supplier.find({where: {companyId: null, type: ESupplierType.SYSTEM_CAN_IMPORT}});
     if(alreadyBinds && alreadyBinds.length > 0){
         suppliers.map(function(s){
             alreadyBinds.forEach(function(item){

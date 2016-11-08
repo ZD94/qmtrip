@@ -1,20 +1,40 @@
 import { ETripType, TripDetail, EPlanStatus } from 'api/_types/tripPlan';
 import { Staff } from 'api/_types/staff/staff';
+import { ESupplierType } from 'api/_types/company/supplier';
 
 export async function ReserveController($scope, Models, $stateParams){
     require('./reserve.scss');
-    var suppliers = [];
+    var compnySuppliers = [];
+    var canImportSuppliers = [];
+    var canNotImportSuppliers = [];
     var currentStaff = await Staff.getCurrent();
     var currentCompany = currentStaff.company;
-    if(currentCompany.isAppointSupplier){
-        console.log(currentCompany.isAppointSupplier);
-        console.log('asdf');
-        suppliers = await currentCompany.getAppointedSuppliers();
-        $scope.suppliers = suppliers;
+    if(!currentCompany.isAppointSupplier){
+        var suppliers = await currentCompany.getAppointedSuppliers();
+        compnySuppliers  = suppliers.filter((item: any)=>{
+            return item.companyId == currentCompany.id && item.type == ESupplierType.COMPANY_CUSTOM;
+        })
+        $scope.compnySuppliers = compnySuppliers;
+        canImportSuppliers  = suppliers.filter((item: any)=>{
+            return item.type == ESupplierType.SYSTEM_CAN_IMPORT;
+        })
+        $scope.canImportSuppliers = canImportSuppliers;
+        canNotImportSuppliers  = suppliers.filter((item: any)=>{
+            return item.type == ESupplierType.SYSTEM_CAN_NOT_IMPORT;
+        })
+        $scope.canNotImportSuppliers = canNotImportSuppliers;
+    }else{
+        compnySuppliers = await currentCompany.getCompanySuppliers();
+        $scope.compnySuppliers = compnySuppliers;
+        //公共的供应商
+        canImportSuppliers = await Models.supplier.find({where:{companyId: null, type: ESupplierType.SYSTEM_CAN_IMPORT}});
+        canNotImportSuppliers = await Models.supplier.find({where:{companyId: null, type: ESupplierType.SYSTEM_CAN_NOT_IMPORT}});
+        $scope.canImportSuppliers = canImportSuppliers;
+        $scope.canNotImportSuppliers = canNotImportSuppliers;
     }
-    if(suppliers.length == 0){
-        //直接跳转携程
-        window.location.href="#/trip/reserve-redirect?detailId="+$stateParams.detailId;
+    if(!currentCompany.isAppointSupplier && compnySuppliers.length == 0 && canImportSuppliers.length == 0 && canNotImportSuppliers.length == 0){
+        //特殊情况 企业显示推荐服务商关闭 且个供应商列表开关均关闭 显示推荐的不支持导入列表
+        canNotImportSuppliers = await Models.supplier.find({where: {companyId: null, type: ESupplierType.SYSTEM_CAN_NOT_IMPORT}});
     }
     $scope.redirect = function(supplier){
         window.location.href="#/trip/reserve-redirect?detailId="+$stateParams.detailId+"&supplier="+supplier;
@@ -97,19 +117,10 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
         window.location.href = supplier.trafficBookLink;
     },3000)*/
     $timeout(function(){
-        // window.location.href=reDirectUrl;
-        if($stateParams.supplier){
-            if($scope.reserveType == "travel"){
-                window.location.href = supplier.trafficBookLink;
-            }else if($scope.reserveType == "hotel"){
-                window.location.href = supplier.hotelBookLink;
-            }
-        }else{
-            if($scope.reserveType == "travel"){
-                window.location.href = "http://m.ctrip.com/html5/flight/matrix.html";
-            }else if($scope.reserveType == "hotel"){
-                window.location.href = "http://m.ctrip.com/webapp/hotel/";
-            }
+        if($scope.reserveType == "travel"){
+            window.location.href = supplier.trafficBookLink;
+        }else if($scope.reserveType == "hotel"){
+            window.location.href = supplier.hotelBookLink;
         }
     },5000)
 }
