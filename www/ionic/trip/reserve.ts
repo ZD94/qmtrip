@@ -27,7 +27,8 @@ export async function ReserveController($scope, Models, $stateParams){
         canNotImportSuppliers = await Models.supplier.find({where:{companyId: null, type: ESupplierType.SYSTEM_CAN_NOT_IMPORT}});
     }
     if(!currentCompany.isAppointSupplier && compnySuppliers.length == 0 && canImportSuppliers.length == 0 && canNotImportSuppliers.length == 0){
-        //特殊情况 企业显示推荐服务商关闭 且个供应商列表开关均关闭 显示推荐的不支持导入列表
+        //特殊情况 企业显示推荐服务商关闭 且个供应商列表开关均关闭 显示推荐列表
+        canImportSuppliers = await Models.supplier.find({where:{companyId: null, type: ESupplierType.SYSTEM_CAN_IMPORT}});
         canNotImportSuppliers = await Models.supplier.find({where: {companyId: null, type: ESupplierType.SYSTEM_CAN_NOT_IMPORT}});
     }
     $scope.compnySuppliers = compnySuppliers;
