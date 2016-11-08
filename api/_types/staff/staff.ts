@@ -199,7 +199,7 @@ export class Staff extends ModelObject implements Account {
     async getOrders(params: {supplierId: string}): Promise<SupplierOrder[]> {
         let supplier = await Models.supplier.get(params.supplierId);
         if(!getSupplier){
-            getSupplier = require('lib/suppliers').getSupplier;
+            getSupplier = require('libs/suppliers').getSupplier;
         }
         let client = getSupplier(supplier.supplierKey);
         let staffSupplierInfo = await this.getOneStaffSupplierInfo({supplierId: params.supplierId});
@@ -251,7 +251,7 @@ export class Staff extends ModelObject implements Account {
     async checkStaffSupplierInfo(params: {supplierId: string, userName: string, pwd: string}): Promise<boolean> {
         let supplier = await Models.supplier.get(params.supplierId);
         if(!getSupplier){
-            getSupplier = require('lib/suppliers').getSupplier;
+            getSupplier = require('libs/suppliers').getSupplier;
         }
         let client = getSupplier(supplier.supplierKey);
         try{
