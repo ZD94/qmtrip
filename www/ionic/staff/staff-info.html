@@ -17,9 +17,9 @@
             </a>
             <div class="item item-icon-right avatars">
                 头像
-                <div class="item-note" ng-uploader accept="image/png, image/jpeg, image/gif" url="uploadUrl" done="invoicefuc.done">
-                    <img class="avatar-img" ng-src="/attachments/{{staff.avatar}}" ng-if="staff.avatar != null">
-                    <span ng-if="staff.avatar == null" class="avatar-text">{{staff.name | limitTo:1}}</span>
+                <div class="item-note" ng-uploader accept="image/png, image/jpeg, image/gif" url="uploadUrl" edit="true" width="160" height="160" done="invoicefuc.done">
+                    <img class="avatar-img" ng-src="/attachments/{{staff.avatar}}" ng-if="staff.avatar">
+                    <span ng-if="!staff.avatar" class="avatar-text">{{staff.name | limitTo:1}}</span>
                 </div>
 
                 <i class="icon ion-chevron-right"></i>

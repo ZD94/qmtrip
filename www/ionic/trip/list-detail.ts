@@ -80,12 +80,6 @@ export async function ListDetailController($location, $scope , Models, $statePar
         return originBudget + increment;
     }
 
-    trafficBudgets.sort((v1, v2) => {
-        return v1.type - v2.type;
-    });
-    hotelBudgets.sort();
-    subsidyBudgets.sort();
-
     $scope.trafficBudgets = trafficBudgets;
     $scope.hotelBudgets = hotelBudgets;
     $scope.subsidyBudgets = subsidyBudgets;
