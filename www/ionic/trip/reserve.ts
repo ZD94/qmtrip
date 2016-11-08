@@ -92,24 +92,21 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
             $scope.load_third = false;
         }
     },200)
-    /*setTimeout(function(){
-        // window.location.href="http://ct.ctrip.com/";
-        window.location.href = supplier.trafficBookLink;
-    },3000)*/
-    $timeout(function(){
-        // window.location.href=reDirectUrl;
-        if($stateParams.supplier){
-            if($scope.reserveType == "travel"){
-                window.location.href = supplier.trafficBookLink;
-            }else if($scope.reserveType == "hotel"){
-                window.location.href = supplier.hotelBookLink;
-            }
-        }else{
-            if($scope.reserveType == "travel"){
-                window.location.href = "http://m.ctrip.com/html5/flight/matrix.html";
-            }else if($scope.reserveType == "hotel"){
-                window.location.href = "http://m.ctrip.com/webapp/hotel/";
-            }
-        }
-    },5000)
+
+    // $timeout(function(){
+    //     // window.location.href=reDirectUrl;
+    //     if($stateParams.supplier){
+    //         if($scope.reserveType == "travel"){
+    //             window.location.href = supplier.trafficBookLink;
+    //         }else if($scope.reserveType == "hotel"){
+    //             window.location.href = supplier.hotelBookLink;
+    //         }
+    //     }else{
+    //         if($scope.reserveType == "travel"){
+    //             window.location.href = "http://m.ctrip.com/html5/flight/matrix.html";
+    //         }else if($scope.reserveType == "hotel"){
+    //             window.location.href = "http://m.ctrip.com/webapp/hotel/";
+    //         }
+    //     }
+    // },5000)
 }

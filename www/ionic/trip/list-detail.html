@@ -38,7 +38,8 @@
                                     title="{{$index == 0? '特别审批': ''}}"
                                     budget="{{totalBudgetObj.specialApproveTotalBudget | currency: ''}}元"
                                     remark="{{tripDetail.specialApproveRemark}}"
-                                    item="budget">
+                                    item="budget"
+                                    is-before-start-time="isBeforeStartTime">
                     </tp-detail-item>
                 </ion-list>
             </ion-scroll>
@@ -94,14 +95,9 @@
 
                 <bottom-bar ng-if="tripDetail.status == EPlanStatus.CANCEL">
                     <div class="status-bar item">
-                        <div class="list">已撤销<span>{{tripDetail.cancelRemark}}</span></div>
+                        <div class="list">已撤销<span>&nbsp;{{tripDetail.cancelRemark}}</span></div>
                     </div>
                 </bottom-bar>
-
-                <!--<a ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD" ng-click="cancelTripPlan()" class="button button-positive">撤销行程</a>-->
-                <!--<a ng-if="tripDetail.status == EPlanStatus.WAIT_COMMIT" ng-click="showAlterDialog()" id="page20-button60" class="button button-positive" no-back>提交审核</a>-->
-                <!--<a ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD" class="button button-stable">提交审核</a>-->
-                <!--<a ng-if="tripDetail.status == EPlanStatus.COMPLETE && !hasMakeSpendRecorder" class="button button-positive" no-back ng-click="makeSpendReport()">生成报销单</a>-->
 
             </div>
         </div>
