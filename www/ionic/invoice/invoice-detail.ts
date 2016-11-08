@@ -36,7 +36,6 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     var tripDetail = await Models.tripDetail.get($stateParams.detailId);
     var invoices = await tripDetail.getInvoices();
     $scope.invoices = formatInvoice(invoices);
-    $ionicSlideBoxDelegate.update();
     if(tripDetail.type == EInvoiceType.HOTEL){
         tripDetail.h_city = await City.getCity(tripDetail.city);
     }else{
@@ -45,6 +44,8 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     }
 
     $scope.tripDetail = tripDetail;
+    $ionicSlideBoxDelegate.update();
+
     console.info(tripDetail);
     // $scope.invoices = invoices;
     $scope.dateOptions = {
