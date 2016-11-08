@@ -1,21 +1,20 @@
 <ion-view title="立即预订">
     <ion-content padding="true" class="reserve">
-        <div class="list">
+        <div class="list" ng-if="compnySuppliers.length>0">
             <div class="item item-divider">
-                <p class="text" ng-if="compnySuppliers.length>0">企业专属服务商<span>不支持订单导入</span></p>
+                <p class="text">企业专属服务商<span>不支持订单导入</span></p>
             </div>
             <div class="item item-icon-right item-body" ng-repeat="supplier in compnySuppliers track by $index"
                  ng-if="compnySuppliers.length>0" ng-click="redirect(supplier.id)">
-                <img class="avatar-img" ng-src="/attachments/{{supplier.logo}}" ng-if="supplier.logo" width="30px" height="30px">
-                <div class="not-has-logo" ng-if="!supplier.logo"></div>
+                <img class="avatar-img" ng-src="/attachments/{{supplier.logo}}" ng-if="supplier.logo" width="100px" height="30px">
                 <span class="supplier-name">{{supplier.name}}</span>
                 <i class="icon ion-chevron-right"></i>
             </div>
         </div>
 
-        <div class="list">
+        <div class="list" ng-if="canImportSuppliers.length>0">
             <div class="item item-divider">
-                <p class="text" ng-if="canImportSuppliers.length>0">推荐服务商<span>支持订单导入</span></p>
+                <p class="text">推荐服务商<span>支持订单导入</span></p>
             </div>
             <div class="item item-icon-right item-body" ng-repeat="c in canImportSuppliers track by $index"
                  ng-if="canImportSuppliers.length>0" ng-click="redirect(c.id)">
@@ -24,9 +23,9 @@
             </div>
         </div>
 
-        <div class="list">
+        <div class="list" ng-if="canNotImportSuppliers.length>0">
             <div class="item item-divider">
-                <p class="text" ng-if="canNotImportSuppliers.length>0">优质服务商<span>不支持订单导入</span></p>
+                <p class="text">优质服务商<span>不支持订单导入</span></p>
             </div>
             <div class="item item-icon-right item-body" ng-repeat="n in canNotImportSuppliers track by $index"
                  ng-if="canNotImportSuppliers.length>0" ng-click="redirect(n.id)">

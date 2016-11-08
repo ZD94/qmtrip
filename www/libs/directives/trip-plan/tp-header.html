@@ -8,7 +8,7 @@
             <i class="fa fa-flag-o"></i>&nbsp;{{trip.title}}</p>
         <div class="budget-info" ng-if="trip.status != EPlanStatus.COMPLETE">
             <div class="budget-progress">
-                <div></div>
+                <div style="text-align: center">{{(1-(trip.expenditure/trip.budget))*100 | currency_int}}%</div>
             </div>
             <div class="budget-info-right list">
                 <div class="budget row item">
