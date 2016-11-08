@@ -3,7 +3,7 @@
         <!--<ion-toggle class="showSupplier" toggle-class="toggle-track" ng-model="showSupplier">指定商旅供应商</ion-toggle>-->
         <div class="list assignSupplier">
             <div class="item">
-                指定商旅供应商
+                是否显示系统推荐服务商
                 <label class="toggle pull-right" ng-click="toggleAssignSupplier(assignSupplier)">
                     <input type="checkbox" ng-checked="assignSupplier" ng-model="assignSupplier">
                     <div class="track">
@@ -45,10 +45,25 @@
                 <div class="item item-divider supplier-title">
                     推荐供应商(支持订单关联)
                 </div>
-                <div class="item" ng-repeat="publicSupplier in publicSuppliers">
-                    <img class="avatar-img" ng-src="/attachments/{{publicSupplier.logo}}" ng-if="publicSupplier.logo">
-                    <label class="toggle pull-right" ng-click="savePublicSupplierStatus(publicSupplier)">
-                        <input type="checkbox" ng-model="publicSupplier.isInUse" ng-checked="publicSupplier.isInUse">
+                <div class="item" ng-repeat="c in canImportList">
+                    <img class="avatar-img" ng-src="/attachments/{{c.logo}}" ng-if="c.logo">
+                    <label class="toggle pull-right" ng-click="savePublicSupplierStatus(c)">
+                        <input type="checkbox" ng-model="c.isPointed" ng-checked="c.isPointed">
+                        <div class="track">
+                            <div class="handle"></div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="list recommend-supplier">
+                <div class="item item-divider supplier-title">
+                    推荐供应商(不支持订单关联)
+                </div>
+                <div class="item" ng-repeat="n in canNotImportList">
+                    <img class="avatar-img" ng-src="/attachments/{{n.logo}}" ng-if="n.logo">
+                    <label class="toggle pull-right" ng-click="savePublicSupplierStatus(n)">
+                        <input type="checkbox" ng-model="n.isPointed" ng-checked="n.isPointed">
                         <div class="track">
                             <div class="handle"></div>
                         </div>

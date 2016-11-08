@@ -1,0 +1,1 @@
+alter table company.suppliers add type integer default 1;

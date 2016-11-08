@@ -1,24 +1,25 @@
 <ion-view title="立即预订">
     <ion-content padding="true" class="reserve">
-        <p class="text">企业指定账户(支持订单导入)</p>
-        <div class="list"  ng-repeat="supplier in suppliers">
+        <p class="text" ng-if="compnySuppliers.length>0">企业专属服务商(不支持订单导入)</p>
+        <div class="list"  ng-repeat="supplier in compnySuppliers track by $index" ng-if="compnySuppliers.length>0">
             <div class="item item-icon-right ctrip_business" ng-click="redirect(supplier.id)">
                 <img class="avatar-img" ng-src="/attachments/{{supplier.logo}}" ng-if="supplier.logo">
                 <i class="icon ion-chevron-right"></i>
             </div>
         </div>
-        <p class="text">其他预订(暂不支持订单导入)</p>
-        <div class="list">
-            <div class="item item-icon-right ctrip" ng-click="redirect('ctrip')">
+
+        <p class="text" ng-if="canImportSuppliers.length>0">推荐服务商(支持订单导入)</p>
+        <div class="list"  ng-repeat="c in canImportSuppliers track by $index" ng-if="canImportSuppliers.length>0">
+            <div class="item item-icon-right ctrip_business" ng-click="redirect(c.id)">
+                <img class="avatar-img" ng-src="/attachments/{{c.logo}}" ng-if="c.logo">
                 <i class="icon ion-chevron-right"></i>
             </div>
-            <div class="item item-icon-right qunar" ng-click="redirect('qunar')">
-                <i class="icon ion-chevron-right"></i>
-            </div>
-            <div class="item item-icon-right tong-cheng" ng-click="redirect('tong_cheng')">
-                <i class="icon ion-chevron-right"></i>
-            </div>
-            <div class="item item-icon-right air-china" ng-click="redirect('air_china')">
+        </div>
+
+        <p class="text" ng-if="canNotImportSuppliers.length>0">优质供应商(不支持订单导入)</p>
+        <div class="list"  ng-repeat="n in canNotImportSuppliers track by $index" ng-if="canNotImportSuppliers.length>0">
+            <div class="item item-icon-right ctrip_business" ng-click="redirect(n.id)">
+                <img class="avatar-img" ng-src="/attachments/{{n.logo}}" ng-if="n.logo">
                 <i class="icon ion-chevron-right"></i>
             </div>
         </div>

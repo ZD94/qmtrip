@@ -5,7 +5,11 @@ import { Types, Values } from 'common/model';
 import {Table, Create, Field, Reference, ResolveRef} from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import { Company } from 'api/_types/company';
-
+export enum ESupplierType {
+    COMPANY_CUSTOM = 1,
+    SYSTEM_CAN_IMPORT = 2,
+    SYSTEM_CAN_NOT_IMPORT = 3
+}
 @Table(Models.supplier, 'company.')
 export class Supplier extends ModelObject{
     constructor(target: Object) {
@@ -17,6 +21,11 @@ export class Supplier extends ModelObject{
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
+
+    //类型
+    @Field({type: Types.INTEGER})
+    get type(): ESupplierType { return ESupplierType.COMPANY_CUSTOM; }
+    set type(val: ESupplierType) {}
 
     // 供应商名称
     @Field({type: Types.STRING})
