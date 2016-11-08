@@ -1,0 +1,23 @@
+<ion-modal-view>
+    <ion-content padding="true" class="has-header">
+        <div class="editInfo">
+            <div class="list">
+                <div class="spacer" style="height: 10px;"></div>
+                <div >
+                    <label class="item item-input">
+                        <span class="input-label">用户名</span>
+                        <input type="text" placeholder="输入用户名" ng-model="form.userName">
+                    </label>
+                </div>
+                <div>
+                    <label class="item item-input">
+                        <span class="input-label">密&nbsp;码</span>
+                        <input type="password" placeholder="输入密码" ng-model="form.pwd">
+                    </label>
+                </div>
+            </div>
+            <a class="button button-block button-calm" ng-click="save()" no-back>保存</a>
+            <a class="button button-block button-assertive" ng-click="delete()" ng-if="alreadyBind.length > 0" no-back>解除绑定</a>
+        </div>
+    </ion-content>
+</ion-modal-view>
