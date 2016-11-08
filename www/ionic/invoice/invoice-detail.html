@@ -1,7 +1,7 @@
 <ion-view title="票据详情页" id="page20">
     <ion-content padding="false" class="has-header" scroll="false">
         <div class="list invoice-info">
-            <div class="item item_line">{{statustext[tripDetail.status]}}<span class="item-note">1张票据</span></div>
+            <div class="item item_line">{{statustext[tripDetail.status]}}<span class="item-note">{{invoices.length}}张票据</span></div>
             <div class="item item_line">
                 <span>{{tripDetail.createdAt | date: 'yyyy-MM-dd'}}</span>
                 <span ng-if="tripDetail.type == EInvoiceType.HOTEL">
@@ -112,6 +112,7 @@
                                     <option value="2" ng-selected="invoice.type == 2">火车票</option>
                                     <option value="3" ng-selected="invoice.type == 3">火车退票费</option>
                                     <option value="4" ng-selected="invoice.type == 4">机票退票费</option>
+                                    <option value="5" ng-selected="invoice.type == 5">酒店</option>
                                 </select>
                             </h3>
                         </div>

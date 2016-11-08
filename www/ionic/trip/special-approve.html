@@ -15,7 +15,7 @@
                         </i>&nbsp;{{trip.reason || trip.reasonName}}</p>
                         <p class="totalBudget"  style="text-align: center">
                             <span>总预算&nbsp;<i class="icon ion-help-circled"></i></span>
-                            <span>{{totalPrice == -1 ? '暂无预算' : (totalPrice| currency_int)}}</span>{{totalPrice == -1 ? '' : '元'}}
+                            <span>{{trip.budget ? (trip.budget| currency_int) : 0}}</span>元
                         </p>
                     </ion-item>
                 </ion-list>

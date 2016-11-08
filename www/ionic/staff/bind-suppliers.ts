@@ -10,9 +10,15 @@ export async function BindSuppliersController($scope, Models){
             alreadyBinds.forEach(function(item){
                 if(s.id == item.supplier.id){
                     s["isBind"] = true;
+                }else{
+                    s["isBind"] = false;
                 }
             })
             return s;
+        })
+    }else{
+        suppliers.map(function(s){
+            s["isBind"] = false;
         })
     }
     $scope.suppliers = suppliers;

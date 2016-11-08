@@ -13,6 +13,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     $scope.uploadUrl = '/upload/ajax-upload-file?type=image&auth='+authDataStr;
     ///// END
 
+    $scope.EPlanStatus = EPlanStatus;
     function formatInvoice(invoices) {
         if (!invoices) invoices = [];
         return invoices.map(function(invoice){
@@ -35,7 +36,6 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     var tripDetail = await Models.tripDetail.get($stateParams.detailId);
     var invoices = await tripDetail.getInvoices();
     $scope.invoices = formatInvoice(invoices);
-    $ionicSlideBoxDelegate.update();
     if(tripDetail.type == EInvoiceType.HOTEL){
         tripDetail.h_city = await City.getCity(tripDetail.city);
     }else{
@@ -44,6 +44,8 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     }
 
     $scope.tripDetail = tripDetail;
+    $ionicSlideBoxDelegate.update();
+
     $scope.dateOptions = {
         beginDate: moment().add(-1,'years').startOf('months').toDate(),
         endDate: new Date(),
@@ -60,7 +62,6 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     statusTxt[EPlanStatus.AUDITING] = "已提交待审核";
     statusTxt[EPlanStatus.COMPLETE] = "已完成";
     $scope.statustext = statusTxt;
-    $scope.EPlanStatus = EPlanStatus;
     let title;
     if (tripDetail.type == ETripType.OUT_TRIP) {
         title = '去程交通';
