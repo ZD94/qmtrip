@@ -1,19 +1,7 @@
 
 import { WebRobot } from '../web_robot/index';
-import { EPayType, EInvoiceFeeTypes } from 'api/_types/tripPlan';
-
-export interface SupplierOrder{
-    id: string;
-    price: number;
-    date: Date;
-    persons: string[];
-    desc: string;
-    orderType: EInvoiceFeeTypes;
-    parType: EPayType;
-    number?: string;
-    starCityName?: string;
-    endCityName?: string;
-}
+import { SupplierOrder } from './interface';
+export { SupplierOrder } from './interface';
 
 export abstract class SupplierWebRobot extends WebRobot{
     constructor(origin: string){
@@ -46,3 +34,4 @@ export function getSupplier(id): SupplierWebRobot {
     return new suppliers[id]();
 }
 
+export type SupplierGetter = typeof getSupplier;
