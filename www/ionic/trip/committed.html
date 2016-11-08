@@ -1,5 +1,9 @@
-<ion-view title="提交成功" id="page10">
-    <ion-content padding="true" class="has-header">
+<ion-modal-view>
+    <ion-header-bar class="bar-stable">
+        <a class="button icon-left ion-chevron-left button-clear button-dark" ng-click="goBack()"> 返回</a>
+        <h1 class="title">提交成功</h1>
+    </ion-header-bar>
+    <ion-content padding="true" class="has-header committed">
         <form class="list">
             <label class="item item-input">
                 <span class="input-label">出差审批已提交!</span>
@@ -15,4 +19,4 @@
         </div>
         <button ng-click="goToDetail()" id="page10-button57" class="button button-positive  button-block" no-back>查看审批单</button>
     </ion-content>
-</ion-view>
+</ion-modal-view>

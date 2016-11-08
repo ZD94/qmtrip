@@ -1,7 +1,9 @@
 import { ETripType, EInvoiceType, MTxPlaneLevel } from 'api/_types/tripPlan';
 import moment = require('moment');
 import { Staff } from 'api/_types/staff/staff';
-export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading, City){
+import { CommittedController } from './committed';
+
+export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading, City, ngModalDlg){
     require('./trip.scss');
     require('./budget.scss');
     API.require("tripPlan");
@@ -113,7 +115,13 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         try {
             //let staff = await Staff.getCurrent();
             let tripApprove = await API.tripPlan.saveTripApprove({budgetId: id, title: trip.reason||trip.reasonName, approveUserId: trip.auditUser.id});
-            window.location.href = '#/trip/committed?id='+tripApprove.id;
+            let approveId = tripApprove.id
+            let committed = ngModalDlg.createDialog({
+                parent:$scope,
+                scope: {approveId},
+                template: require('./committed.html'),
+                controller: CommittedController
+            })
         } catch(err) {
             alert(err.msg || err);
         } finally {
