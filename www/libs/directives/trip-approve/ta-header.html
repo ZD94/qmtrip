@@ -7,7 +7,7 @@
         <p ng-if="tripApprove && tripApprove.startAt">
             <i class="fa fa-flag-o"></i>&nbsp;{{tripApprove.title}}</p>
         <p class="totalBudget" style="text-align: center">
-            <span>总预算&nbsp;<i class="icon ion-help-circled"></i></span>
+            <span>总预算&nbsp;</span>
             <span>{{tripApprove.budget == -1 ? '暂无预算' : (tripApprove.budget | currency_int)}}</span>
             {{tripApprove.budget == -1 ? '' : '元'}}
         </p>

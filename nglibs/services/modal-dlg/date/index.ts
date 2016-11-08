@@ -65,7 +65,12 @@ interface MonthData {
     days: DayData[];
 }
 
+let monthCache = [];
+
 function getMonth(year, month): MonthData {
+    let key = year+'-'+month;
+    if(monthCache[key])
+        return monthCache[key];
     let ret = {year, month, days: []};
     let caldata = LunarCalendar.calendar(year, month, true);
     //if(caldata.monthData[caldata.monthData.length-7].month != month){
@@ -97,6 +102,7 @@ function getMonth(year, month): MonthData {
             term: day.term,
         }
     });
+    monthCache[key] = ret;
     return ret;
 }
 
@@ -319,36 +325,36 @@ function loadMonths($scope, $element, $ionicScrollDelegate) {
         fixMonths($scope);
     });
     $scope.months = [];
-    let toBottom = $scope.options.toBottom;
-    let loadMonthNum = $scope.options.loadMonthNum;
-    let begin = $scope.options.beginDate;
-    let end = $scope.options.endDate;
-    let diff;
-    console.info(begin)
+
+    let begin = moment($scope.options.beginDate).startOf('month');
+    let valDate: any = $scope.value || new Date();
+    if(valDate.begin)
+        valDate = valDate.begin;
+    let end = moment(valDate).startOf('month');
+    if(begin.diff(end) > 0)
+        end = begin;
+
+    for(let m = begin.clone(); m.diff(end) <= 0; m.add(1, 'month')){
+        let caldata = getMonth(m.year(), m.month() + 1);
+        $scope.months.push(caldata);
+    }
+    if($scope.months.length % 2 == 1){
+        loadNextMonth();
+    }
+
     function loadNextMonth() {
-        let date;
-        if($scope.months.length == 0){
-            date = moment(begin).startOf('month');
-        }else{
-            let last = $scope.months[$scope.months.length - 1];
-            date = moment({year: last.year, month: last.month - 1, day: 1});
-            date = date.add(1, 'month');
-        }
+        let last = $scope.months[$scope.months.length - 1];
+        let date = moment({year: last.year, month: last.month - 1, day: 1});
+        date.add(1, 'month');
         let caldata = getMonth(date.year(), date.month() + 1);
         $scope.months.push(caldata);
     }
 
-    if(loadMonthNum && typeof loadMonthNum == 'number'){
-        diff = loadMonthNum
-    }else{
-        diff = moment(end).diff(moment(begin), 'months') + 1;
-    }
-    for(let i = 0;i<diff;i++){
-        loadNextMonth();
-    }
-    if(toBottom){
-        $ionicScrollDelegate.scrollBottom();
-    }
+    let unregShow = $scope.$on('modal.shown', function(){
+        let pos = $element.find('.selected').parents('.week-7col').parent().position();
+        $ionicScrollDelegate.scrollTo(0, pos.top);
+        unregShow();
+    })
 
     //loadNextMonth();
 
