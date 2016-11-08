@@ -342,12 +342,20 @@ function loadMonths($scope, $element, $ionicScrollDelegate) {
         loadNextMonth();
     }
 
+    function hasMoreMonths(){
+        let last = $scope.months[$scope.months.length - 1];
+        let date = moment({year: last.year, month: last.month - 1, day: 1});
+        return date.diff($scope.options.endDate) < 0;
+    }
+    $scope.hasMoreMonths = hasMoreMonths();
+
     function loadNextMonth() {
         let last = $scope.months[$scope.months.length - 1];
         let date = moment({year: last.year, month: last.month - 1, day: 1});
         date.add(1, 'month');
         let caldata = getMonth(date.year(), date.month() + 1);
         $scope.months.push(caldata);
+        $scope.hasMoreMonths = hasMoreMonths();
     }
 
     let unregShow = $scope.$on('modal.shown', function(){
