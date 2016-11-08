@@ -10,6 +10,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     let approveId = $stateParams.approveId;
     $scope.approveId =approveId;
     let tripApprove = await Models.tripApprove.get(approveId);
+    $scope.tripApprove = tripApprove;
     $scope.staff = tripApprove.account;
     $scope.isConfirm = false;
     $scope.APPROVE_TEXT = EApproveStatus2Text;
@@ -130,7 +131,6 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         return originBudget + increment;
     }
 
-    $scope.tripApprove = tripApprove;
     $scope.traffic = traffic;
     $scope.hotel = hotel;
     $scope.subsidy = subsidy;

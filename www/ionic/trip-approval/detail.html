@@ -46,7 +46,7 @@
 
             </ion-scroll>
 
-            <div class="bottom-bar-approval">
+            <div class="bottom-bar-approval" ng-if="tripApprove">
                 <bottom-bar ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE">
                     <div class="status-bar item status-bar-detail" ng-click="approveDetail()">
                         <div class="list">等待{{tripApprove.approveUser.name}}审批</div>
