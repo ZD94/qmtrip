@@ -3,7 +3,10 @@
         <div class="list invoice-info">
             <div class="item item_line">{{statustext[tripDetail.status]}}<span class="item-note">{{invoices.length}}张票据</span></div>
             <div class="item item_line">
-                <span>{{tripDetail.createdAt | date: 'yyyy-MM-dd'}}</span>
+                <span ng-if="tripDetail.type != EInvoiceType.HOTEL">{{tripDetail.deptDateTime | date: 'MM.dd'}}</span>
+                <span ng-if="tripDetail.type == EInvoiceType.HOTEL">
+                    {{tripDetail.checkInDate | date: 'MM.dd'}} - {{tripDetail.checkOutDate | date: 'MM.dd'}}
+                </span>
                 <span ng-if="tripDetail.type == EInvoiceType.HOTEL">
                     <b>{{tripDetail.h_city.name}}</b>
                     <b ng-if="tripDetail.hotelName"> - {{invoice.hotelName}}</b>
