@@ -47,6 +47,12 @@ export async function EditController($scope, Models, $stateParams, $ionicHistory
             msgbox.log("酒店预订地址不能为空");
             return false;
         }
+        // let isTrafficUrl = await validator.isURL($scope.supplier.trafficBookLink);
+        // let isHotelURl = await validator.isURL($scope.supplier.hotelBookLink)
+        // if(!isTrafficUrl || !isHotelURl){
+        //     msgbox.log("请输入正确的URL地址");
+        //     return false;
+        // }
 
         $scope.supplier.company = staff.company;
         await $scope.supplier.save();
