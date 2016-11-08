@@ -13,11 +13,12 @@ interface DialogOptions{
 }
 @ngService('ngModalDlg')
 class ngModalDlg {
-    constructor(private $ionicModal, private $injector) {
+    constructor(private $ionicModal, private $injector, private $loading) {
         require('./modal-dialog.scss');
     }
 
     createDialog(options: DialogOptions) {
+        let self = this;
         var {scope, parent, template, controller, notHideOnConfiom , animation} = options;
         return new Promise((resolve, reject) => {
             let modal = this.$ionicModal.fromTemplate(template, {
@@ -33,6 +34,12 @@ class ngModalDlg {
             let confirmed = false;
             //$scope.$on('$destroy', function() {
             //});
+            let deregState = parent.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
+                event.preventDefault();
+                modal.hide();
+                self.$loading.end();
+            })
+
             let deregHidden = parent.$on('modal.hidden', function(event, from) {
                 if(from != modal)
                     return;
@@ -46,6 +53,7 @@ class ngModalDlg {
                 $scope.$destroy();
                 deregHidden();
                 deregRemove();
+                deregState();
             });
 
             $scope.confirmModal = function(value) {
@@ -57,7 +65,7 @@ class ngModalDlg {
                 resolve(value);
             }
             modal.show();
-            this.$injector.invoke(controller, this, {$scope, $element: modal.$el.find('ion-modal-view')});
+            self.$injector.invoke(controller, self, {$scope, $element: modal.$el.find('ion-modal-view')});
         });
     }
 
