@@ -2195,7 +2195,23 @@ async function updateTripDetailExpenditure(tripDetail: TripDetail) {
     });
     tripDetail.personalExpenditure = personalExpenditure;
     tripDetail.expenditure = expenditure;
-    return tripDetail.save()
+    tripDetail = await tripDetail.save();
+    let tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
+    await updateTripPlanExpenditure(tripPlan)
+    return tripDetail;
+}
+
+async function updateTripPlanExpenditure(tripPlan: TripPlan) {
+    let tripDetails = await Models.tripDetail.find({where: {tripPlanId: tripPlan.id}});
+    let expenditure = 0;
+    let personalExpenditure = 0;
+    tripDetails.forEach( (v) => {
+        expenditure += Number(v.expenditure);
+        personalExpenditure += Number(v.personalExpenditure);
+    });
+    tripPlan.expenditure = expenditure;
+    tripPlan.personalExpenditure = personalExpenditure;
+    return tripPlan.save();
 }
 
 //尝试修改tripDetail状态

@@ -1,0 +1,1 @@
+alter table trip_plan.trip_plans add personal_expenditure numeric(15,2);

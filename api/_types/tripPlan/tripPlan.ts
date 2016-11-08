@@ -215,6 +215,10 @@ export class TripPlan extends ModelObject {
     get expenditure(): number { return 0; }
     set expenditure(val: number) {}
 
+    @Field({type: Types.NUMERIC(15,2)})
+    get personalExpenditure():number { return 0}
+    set personalExpenditure(val: number) {}
+
     @Field({type: Types.JSONB})
     get expendInfo(): Object { return null; }
     set expendInfo(val: Object) {}
