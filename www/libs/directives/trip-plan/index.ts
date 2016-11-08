@@ -142,6 +142,8 @@ angular
                 $scope.subsidyDays = 1;
 
                 if ($scope.item.type == ETripType.HOTEL) {
+                    let city = await City.getCity($scope.item.city);
+                    $scope.item.city = city.name || $scope.item.city;
                     $scope.days = moment($scope.item.checkOutDate).diff(moment($scope.item.checkInDate), 'days');
                 } else if ($scope.item.type == ETripType.SUBSIDY) {
                     $scope.subsidyDays = moment($scope.item.endDateTime).diff(moment($scope.item.startDateTime), 'days') + 1;
