@@ -2,6 +2,8 @@ import { Staff } from 'api/_types/staff/staff';
 import { Supplier } from 'api/_types/company/supplier';
 
 var msgbox = require('msgbox');
+var validator = require('validator');
+//isURL
 
 export async function EditController($scope, Models, $stateParams, $ionicHistory, $ionicPopup) {
     require('./accord-hotel.scss');

@@ -14,27 +14,27 @@
                 <div class="budget row item">
                     <div class="col">
                         <p>预算余额</p>
-                        <p>{{trip.budget - trip.expenditure}}</p>
+                        <p>{{(trip.budget - trip.expenditure) | currency_int}}</p>
                     </div>
                     <div class="col">
                         <p>总预算</p>
-                        <p>{{trip.budget}}</p>
+                        <p>{{trip.budget | currency_int}}</p>
                     </div>
                 </div>
                 <div class="cost row item">
                     <div class="col">
                         <p>实际支出</p>
-                        <p>{{trip.expenditure}}</p>
+                        <p>{{trip.expenditure | currency_int}}</p>
                     </div>
                     <span>=</span>
                     <div class="col">
                         <p>公司支付</p>
-                        <p>{{trip.expenditure - trip.personalExpenditure}}</p>
+                        <p>{{(trip.expenditure - trip.personalExpenditure) | currency_int}}</p>
                     </div>
                     <span>+</span>
                     <div class="col">
                         <p>个人支付</p>
-                        <p>{{trip.personalExpenditure}}</p>
+                        <p>{{trip.personalExpenditure | currency_int}}</p>
                     </div>
                 </div>
             </div>

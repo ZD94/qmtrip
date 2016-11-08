@@ -16,16 +16,20 @@
       }
     }
   }
-  .supplier-text{
-    text-align: left;
+  p.supplier-text{
+    padding:10px;
     color:#fff;
-    padding-left: 14px;
-    padding-right: 14px;
-    background-color: transparent;
+    background: rgba(0,0,0, .6);
     margin-bottom: 20px;
   }
-  .pull-right{
+  img{
+    width: 100px;
+    height: 30px;
+  }
+  span.pull-right{
     float: right;
+    color: #a7a7a7;
+    font-size: 12px;
   }
   .pull-left{
     float: left;
@@ -41,15 +45,12 @@
       line-height: 35px;
       background-color: #fff;
       .logo{
-        width:30px;
-        height:30px;
+        width: 100px;
+        height: 30px;
         background-color: #d8d8d8;
         border-radius: 3px;
         margin-top: 2px;
-        img{
-          width:30px;
-          height:30px;
-        }
+
       }
       .self-name{
         margin-left: 18px;
@@ -85,14 +86,14 @@
     position: relative;
     .logo{
       position: absolute;
-      width:30px;
+      width:100px;
       height:30px;
       background-color: #d8d8d8;
       border-radius: 3px;
       top:8px;
       right:50px;
       img{
-        width:30px;
+        width:100px;
         height:30px;
       }
     }

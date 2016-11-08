@@ -1,34 +1,48 @@
 .reserve{
-  p.text{
-    color:#fff;
-    font-size: 14px;
+  div.item-divider{
+    p{
+      color: #636363;
+      font-weight: bold;
+      span{
+        color: #a7a7a7;
+        font-size: 12px;
+        float: right;
+        font-weight: normal;
+      }
+    }
   }
-  div.item{
-    height:54px;
-    background: url(ionic/images/supplier.png) no-repeat;
+  div.item-body{
+    //height: 42px;
+    padding: 8px;
     i.ion-chevron-right{
       font-size: 20px;
       color: #525252;
     }
-    &.ctrip_business{
-      background-position: 0px 8px;
-      //background-size: 36px auto;
-    }
-    &.ctrip{
-      background-position: -6px -40px;
-    }
-    &.qunar{
-      background-position: 0px -88px;
-    }
-    &.tong-cheng{
-      background-position: 0px -140px;
-    }
-    &.air-china{
-      background-position: -1px -190px;
-    }
     &.item-icon-right{
       background-color: #fff;
     }
+    img{
+      margin-top: 5px;
+      margin-left: 5px;
+    }
+    .not-has-logo{
+      width: 30px;
+      height: 30px;
+      margin-top: 5px;
+      margin-left: 5px;
+    }
+    .supplier-name{
+      vertical-align: 40%;
+      padding-left: 10px;
+      color:#000;
+    }
+  }
+
+  p.introduction{
+    margin: 10px 0px;
+    background-color: rgba(0,0,0, .6);
+    color: #fff;
+    padding: 10px;
   }
 }
 
