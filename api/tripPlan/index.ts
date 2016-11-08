@@ -680,7 +680,12 @@ class TripPlanModule {
             await TripPlanModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: true});
         }else{
             //发送审核结果邮件
-            let self_url = config.host + '/index.html#/trip/list-detail?tripid=' + tripApprove.id;
+            let self_url;
+            if (tripApprove.status == EApproveStatus.PASS) {
+                self_url = config.host + '/index.html#/trip/list-detail?tripid=' + tripApprove.id;
+            } else {
+                self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
+            }
             let user = tripApprove.account;
             if(!user) user = await Models.staff.get(tripApprove['accountId']);
             let go = {},back = {},hotel = {},subsidy = {};
