@@ -99,7 +99,7 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     $scope.load_one = true;
     $scope.load_two = false;
     $scope.load_third = false;
-    $interval(function(){
+    let interval = $interval(function(){
         if($scope.load_one){
             $scope.load_one = false;
             $scope.load_two = true;
@@ -117,6 +117,11 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
             window.location.href = supplier.trafficBookLink;
         }else if($scope.reserveType == "hotel"){
             window.location.href = supplier.hotelBookLink;
+        }
+
+        if(angular.isDefined(interval)){
+            $interval.cancel(interval);
+            interval = undefined;
         }
     },5000)
 }
