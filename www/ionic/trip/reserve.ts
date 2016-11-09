@@ -21,7 +21,7 @@ export async function ReserveController($scope, Models, $stateParams){
             return item.type == ESupplierType.SYSTEM_CAN_NOT_IMPORT;
         })
     }else{
-        compnySuppliers = await currentCompany.getCompanySuppliers();
+        compnySuppliers = await currentCompany.getCompanySuppliers({where: {isInUse: true, type: ESupplierType.COMPANY_CUSTOM}});
         //公共的供应商
         canImportSuppliers = await Models.supplier.find({where:{companyId: null, type: ESupplierType.SYSTEM_CAN_IMPORT}});
         canNotImportSuppliers = await Models.supplier.find({where:{companyId: null, type: ESupplierType.SYSTEM_CAN_NOT_IMPORT}});
