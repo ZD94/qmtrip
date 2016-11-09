@@ -9,7 +9,7 @@
                 </div>
                 <ion-list>
                     <ion-item>
-                        <img class="" ng-src="/attachments/{{supplier.logo}}" ng-if="supplier.logo">
+                        <img class="supplier-logo" ng-src="{{getImageUrl(supplier.logo)}}" ng-if="supplier.logo">
                         <div class="button-bar">
                             <a class="button button-small button-positive"
                                ng-class="{'button-outline':orderBinded}"

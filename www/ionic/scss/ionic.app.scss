@@ -30,7 +30,11 @@ $z-index-popup: 100;
 
 // fade in from opacity, used for modals
 // -------------------------------
-
+//公用供应商logo
+.supplier-logo{
+  width: 100px;
+  height: 30px;
+}
 .fade-in {
   opacity: 0;
 }
