@@ -1,4 +1,7 @@
-import {ETripType, EPlanStatus, EInvoiceType, EInvoiceFeeTypes, EPayType, EInvoiceStatus} from 'api/_types/tripPlan';
+import {
+    ETripType, EPlanStatus, EInvoiceType, EInvoiceFeeTypes, EPayType, EInvoiceStatus,
+    InvoiceFeeTypeNames, PayTypeNames
+} from 'api/_types/tripPlan';
 import * as path from 'path';
 import {ImgTemplateController} from './img-template';
 import moment = require('moment');
@@ -9,7 +12,10 @@ var msgbox = require('msgbox');
 export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate, ngModalDlg, City, $ionicModal){
 
     $scope.EInvoiceFeeTypes = EInvoiceFeeTypes;
+    $scope.InvoiceFeeTypeNames = InvoiceFeeTypeNames;
     $scope.EPayType = EPayType;
+    $scope.PayTypeNames = PayTypeNames;
+    $scope.parseInt = parseInt;
     
     //////绑定上传url
     require("./invoice-detail.scss");
@@ -27,7 +33,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
                 img = img+'?authstr='+authDataStr;
                 invoice.imgUrl = img;
             }else{
-                invoice.imgUrl = 'ionic/images/add_img.png';
+                invoice.imgUrl = 'ionic/images/invoiceEmpty.png';
             }
             invoice.edit = false;
             return invoice;
@@ -46,10 +52,16 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         tripDetail.a_city = await City.getCity(tripDetail.arrivalCity);
         tripDetail.d_city = await City.getCity(tripDetail.deptCity);
     }
-
+    let initPager = 0;
+    let addNew = $stateParams.method;
+    if(addNew == 'add'){
+        initPager = invoices.length;
+        console.info(initPager);
+    }
+    $scope.initPager = initPager;
     $scope.tripDetail = tripDetail;
     $ionicSlideBoxDelegate.update();
-
+    console.info(invoices);
     $scope.dateOptions = {
         beginDate: moment().add(-1,'years').startOf('months').toDate(),
         endDate: new Date(),

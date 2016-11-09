@@ -58,11 +58,24 @@ export enum  EInvoiceFeeTypes {
     ORDER_TICKET_FEE = 8,
     OTHER = 99,
 }
+export var InvoiceFeeTypeNames = [];
+InvoiceFeeTypeNames[EInvoiceFeeTypes.PLANE_TICKET] = '机票行程单';
+InvoiceFeeTypeNames[EInvoiceFeeTypes.TRAIN_TICKET] = '火车票';
+InvoiceFeeTypeNames[EInvoiceFeeTypes.TICKET_CHANGE_FEE] = '改签费';
+InvoiceFeeTypeNames[EInvoiceFeeTypes.CANCEL_TICKET_FEE] = '退票费';
+InvoiceFeeTypeNames[EInvoiceFeeTypes.HOTEL] = '住宿费';
+InvoiceFeeTypeNames[EInvoiceFeeTypes.INSURANCE] = '保险费';
+InvoiceFeeTypeNames[EInvoiceFeeTypes.EXPRESS] = '快递费';
+InvoiceFeeTypeNames[EInvoiceFeeTypes.ORDER_TICKET_FEE] = '订票费';
+InvoiceFeeTypeNames[EInvoiceFeeTypes.OTHER] = '其他';
 
 export enum EPayType {
     PERSONAL_PAY = 1,
     COMPANY_PAY = 2,
 }
+export var PayTypeNames = [];
+PayTypeNames[EPayType.PERSONAL_PAY] = '个人支付';
+PayTypeNames[EPayType.COMPANY_PAY] = '公司支付';
 
 export enum ESourceType {
     MANUALLY_ADD = 1,

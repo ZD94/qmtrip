@@ -39,7 +39,7 @@
         </div>
         <ion-slide-box class="item item-image"
                        show-pager="true"
-                       active-slide="0">
+                       active-slide="initPager">
             <ion-slide  ng-repeat="invoice in invoices track by $index">
                 <div class="invoice-form" ng-if="invoice.sourceType == '1' && !invoice.edit">
                     <div class="invoice-img">
@@ -66,7 +66,7 @@
                             <h3 ng-if="invoice.type == EInvoiceFeeTypes.CANCEL_TICKET_FEE">退票费</h3>
                             <h3 ng-if="invoice.type == EInvoiceFeeTypes.TICKET_CHANGE_FEE">改签费</h3>
                             <h3 ng-if="invoice.type == EInvoiceFeeTypes.EXPRESS">快递费</h3>
-                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.EXPRESS">保险费</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.INSURANCE">保险费</h3>
                             <h3 ng-if="invoice.type == EInvoiceFeeTypes.OTHER">其他</h3>
                         </div>
                     </div>
@@ -92,7 +92,7 @@
                         <div class="invoice-img-min" ng-uploader="" accept="image/png, image/jpeg, image/gif" url="uploadUrl" done="invoicefuc.done">
                             <img ng-if="previewUrl" ng-src="{{previewUrl}}">
                             <img ng-if="!previewUrl" ng-src="{{invoice.imgUrl}}">
-                            <a class="button button-positive">点击重传</a>
+                            <a class="button button-positive">点击上传</a>
                         </div>
                         <div>
                             <span class="item-tit">金额</span>
@@ -103,9 +103,9 @@
                         <span class="item-tit">支付方式</span>
                         <div class="item-select">
                             <h3>
-                                <select ng-model="invoice.payType">
-                                    <option value="{{EPayType.PERSONAL_PAY}}" ng-selected="invoice.payType == EPayType.PERSONAL_PAY">个人支付</option>
-                                    <option value="{{EPayType.COMPANY_PAY}}" ng-selected="invoice.payType == EPayType.COMPANY_PAY">公司支付</option>
+                                <select ng-model="invoice.payType"
+                                        ng-options="parseInt(key) as value for (key,value) in PayTypeNames"
+                                >
                                 </select>
                             </h3><!-- 这里要加一个判断,是否是编辑模式,,-->
                         </div>
@@ -115,16 +115,9 @@
                         <div class="item-select">
                             <!--<h3>类型</h3>-->
                             <h3>
-                                <select ng-model="invoice.type">
-                                    <option value="{{EInvoiceFeeTypes.PLANE_TICKET}}" ng-selected="invoice.type == EInvoiceFeeTypes.PLANE_TICKET">机票行程单</option>
-                                    <option value="{{EInvoiceFeeTypes.TRAIN_TICKET}}" ng-selected="invoice.type == EInvoiceFeeTypes.TRAIN_TICKET">火车票</option>
-                                    <option value="{{EInvoiceFeeTypes.HOTEL}}" ng-selected="invoice.type == EInvoiceFeeTypes.HOTEL">住宿费</option>
-                                    <option value="{{EInvoiceFeeTypes.ORDER_TICKET_FEE}}" ng-selected="invoice.type == EInvoiceFeeTypes.ORDER_TICKET_FEE">订票费</option>
-                                    <option value="{{EInvoiceFeeTypes.CANCEL_TICKET_FEE}}" ng-selected="invoice.type == EInvoiceFeeTypes.CANCEL_TICKET_FEE">退票费</option>
-                                    <option value="{{EInvoiceFeeTypes.TICKET_CHANGE_FEE}}" ng-selected="invoice.type == EInvoiceFeeTypes.TICKET_CHANGE_FEE">改签费</option>
-                                    <option value="{{EInvoiceFeeTypes.EXPRESS}}" ng-selected="invoice.type == EInvoiceFeeTypes.EXPRESS">快递费</option>
-                                    <option value="{{EInvoiceFeeTypes.INSURANCE}}" ng-selected="invoice.type == EInvoiceFeeTypes.EXPRESS">保险费</option>
-                                    <option value="{{EInvoiceFeeTypes.OTHER}}" ng-selected="invoice.type == EInvoiceFeeTypes.OTHER">其他</option>
+                                <select ng-model="invoice.type"
+                                        ng-options="parseInt(key) as value for (key,value) in InvoiceFeeTypeNames"
+                                >
                                 </select>
                             </h3>
                         </div>
@@ -172,11 +165,11 @@
                             <h3 ng-if="invoice.type == EInvoiceFeeTypes.PLANE_TICKET">机票行程单</h3>
                             <h3 ng-if="invoice.type == EInvoiceFeeTypes.TRAIN_TICKET">火车票</h3>
                             <h3 ng-if="invoice.type == EInvoiceFeeTypes.HOTEL">住宿费</h3>
-                            <h3 ng-if= "invoice.type == EInvoiceFeeTypes.ORDER_TICKET_FEE">订票费</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.ORDER_TICKET_FEE">订票费</h3>
                             <h3 ng-if="invoice.type == EInvoiceFeeTypes.CANCEL_TICKET_FEE">退票费</h3>
                             <h3 ng-if="invoice.type == EInvoiceFeeTypes.TICKET_CHANGE_FEE">改签费</h3>
                             <h3 ng-if="invoice.type == EInvoiceFeeTypes.EXPRESS">快递费</h3>
-                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.EXPRESS">保险费</h3>
+                            <h3 ng-if="invoice.type == EInvoiceFeeTypes.INSURANCE">保险费</h3>
                             <h3 ng-if="invoice.type == EInvoiceFeeTypes.OTHER">其他</h3>
                         </div>
                     </div>
@@ -208,8 +201,8 @@
                     <div class="invoice-img">
                         <div class="invoice-img-min" ng-uploader="" accept="image/png, image/jpeg, image/gif" url="uploadUrl" done="invoicefuc.done">
                             <img ng-if="previewUrl" ng-src="{{previewUrl}}">
-                            <img ng-if="!previewUrl" src="ionic/images/add_img.png">
-                            <a ng-if="previewUrl" class="button button-positive">点击重传</a>
+                            <img ng-if="!previewUrl" src="ionic/images/invoiceEmpty.png">
+                            <a class="button button-positive">点击上传</a>
                         </div>
                         <div>
                             <span class="item-tit">金额</span>
@@ -240,7 +233,7 @@
                                     <option value="{{EInvoiceFeeTypes.CANCEL_TICKET_FEE}}" ng-selected="invoice.type == EInvoiceFeeTypes.CANCEL_TICKET_FEE">退票费</option>
                                     <option value="{{EInvoiceFeeTypes.TICKET_CHANGE_FEE}}" ng-selected="invoice.type == EInvoiceFeeTypes.TICKET_CHANGE_FEE">改签费</option>
                                     <option value="{{EInvoiceFeeTypes.EXPRESS}}" ng-selected="invoice.type == EInvoiceFeeTypes.EXPRESS">快递费</option>
-                                    <option value="{{EInvoiceFeeTypes.INSURANCE}}" ng-selected="invoice.type == EInvoiceFeeTypes.EXPRESS">保险费</option>
+                                    <option value="{{EInvoiceFeeTypes.INSURANCE}}" ng-selected="invoice.type == EInvoiceFeeTypes.INSURANCE">保险费</option>
                                     <option value="{{EInvoiceFeeTypes.OTHER}}" ng-selected="invoice.type == EInvoiceFeeTypes.OTHER">其他</option>
                                 </select>
                             </h3>
