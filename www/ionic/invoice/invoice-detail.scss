@@ -1,7 +1,12 @@
+.invoices{
+  display: flex;
+  flex-direction: column;
+}
 .list{
   &.invoice-info{
     background: none;
     margin: 10px;
+    flex: 0;
     .item, .item-divider{
       border-color: rgba(255, 255, 255, 0.1);
       background: rgba(255, 255, 255, 0.3);
@@ -22,6 +27,7 @@
       &.money_info{
         display: flex;
         align-items: center;
+        padding: 5px 10px;
         & > div{
           flex: 1;
           text-align: center;
@@ -41,16 +47,18 @@
 .item-image{
   background: none;
   border: none;
+  flex: 1;
   .slider-slides{
-    margin-top: 30px;
+    padding-top: 30px;
+    padding-bottom: 20px;
     .slider-slide{
       padding: 0 10px;
-      height: 375px;
+      height: 100%;
     }
     .invoice-form{
       background: #fff;
       padding: 0 10px;
-      height: 375px;
+      height: 100%;
       position: relative;
       border-radius: 5px;
       .invoice-img{
@@ -198,7 +206,7 @@
       background: #fff;
       padding: 0 10px;
       border-radius: 5px;
-      height: 375px;
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
