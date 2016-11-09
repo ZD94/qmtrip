@@ -25,7 +25,7 @@
                 <div class="item item-divider self-detail" ng-repeat="ah in suppliers">
                     <div ng-click="editSupplier(ah.id)" class="pull-left" style="width:180px">
                         <div class="logo pull-left">
-                            <img class="avatar-img" ng-src="/attachments/{{ah.logo}}" ng-if="ah.logo">
+                            <img class="avatar-img" ng-src="{{getImageUrl(ah.logo)}}" ng-if="ah.logo">
                         </div>
                         <span class="self-name">{{ah.name}}</span>
                     </div>
@@ -48,7 +48,7 @@
                     <span class="pull-right">支持订单关联</span>
                 </div>
                 <div class="item" ng-repeat="c in canImportList">
-                    <img class="avatar-img" ng-src="/attachments/{{c.logo}}" ng-if="c.logo">
+                    <img class="avatar-img" ng-src="{{getImageUrl(c.logo)}}" ng-if="c.logo">
                     <label class="toggle pull-right" ng-click="savePublicSupplierStatus(c)">
                         <input type="checkbox" ng-model="c.isPointed" ng-checked="c.isPointed">
                         <div class="track">
@@ -64,7 +64,7 @@
                     <span class="pull-right">不支持订单关联</span>
                 </div>
                 <div class="item" ng-repeat="n in canNotImportList">
-                    <img class="avatar-img" ng-src="/attachments/{{n.logo}}" ng-if="n.logo">
+                    <img class="avatar-img" ng-src="{{getImageUrl(n.logo)}}" ng-if="n.logo">
                     <label class="toggle pull-right" ng-click="savePublicSupplierStatus(n)">
                         <input type="checkbox" ng-model="n.isPointed" ng-checked="n.isPointed">
                         <div class="track">

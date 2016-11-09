@@ -6,7 +6,7 @@
             </div>
             <div class="item item-icon-right item-body" ng-repeat="supplier in compnySuppliers track by $index"
                  ng-if="compnySuppliers.length>0" ng-click="redirect(supplier.id)">
-                <img class="avatar-img" ng-src="/attachments/{{supplier.logo}}" ng-if="supplier.logo" width="100px" height="30px">
+                <img class="avatar-img" ng-src="{{getImageUrl(supplier.logo)}}" ng-if="supplier.logo" width="100px" height="30px">
                 <span class="supplier-name">{{supplier.name}}</span>
                 <i class="icon ion-chevron-right"></i>
             </div>
@@ -18,7 +18,7 @@
             </div>
             <div class="item item-icon-right item-body" ng-repeat="c in canImportSuppliers track by $index"
                  ng-if="canImportSuppliers.length>0" ng-click="redirect(c.id)">
-                <img class="avatar-img" ng-src="/attachments/{{c.logo}}" ng-if="c.logo" width="100" height="30">
+                <img class="avatar-img" ng-src="{{getImageUrl(c.logo)}}" ng-if="c.logo" width="100" height="30">
                 <i class="icon ion-chevron-right"></i>
             </div>
         </div>
@@ -29,7 +29,7 @@
             </div>
             <div class="item item-icon-right item-body" ng-repeat="n in canNotImportSuppliers track by $index"
                  ng-if="canNotImportSuppliers.length>0" ng-click="redirect(n.id)">
-                <img class="avatar-img" ng-src="/attachments/{{n.logo}}" ng-if="n.logo" width="100" height="30">
+                <img class="avatar-img" ng-src="{{getImageUrl(n.logo)}}" ng-if="n.logo" width="100" height="30">
                 <i class="icon ion-chevron-right"></i>
             </div>
         </div>
