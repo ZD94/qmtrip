@@ -1,7 +1,9 @@
 <ion-view title="票据详情页" id="page20">
     <ion-content padding="false" class="has-header" scroll="false">
         <div class="list invoice-info">
-            <div class="item item_line">{{statustext[tripDetail.status]}}<span class="item-note">{{invoices.length}}张票据</span></div>
+            <div class="item item_line">{{statustext[tripDetail.status]}}
+                <span class="item-note">{{invoices.length}}张票据</span>
+            </div>
             <div class="item item_line">
                 <span ng-if="tripDetail.type != EInvoiceType.HOTEL">{{tripDetail.deptDateTime | date: 'MM.dd'}}</span>
                 <span ng-if="tripDetail.type == EInvoiceType.HOTEL">
@@ -34,7 +36,6 @@
                     <span>{{tripDetail.personalExpenditure | currency_int}}</span>
                 </div>
             </div>
-
         </div>
         <ion-slide-box class="item item-image"
                        show-pager="true"
@@ -151,7 +152,7 @@
                 </div>
                 <div class="invoice-form from-supplier" ng-if="invoice.sourceType == '2' && !invoice.edit">
                     <div class="invoice-img">
-                        <img ng-src="/attachments/{{invoice.supplier.logo}}">
+                        <img ng-src="{{getImageUrl(invoice.supplier.logo)}}">
                         <!--<div class="supplier_logo"></div>-->
                         <div>
                             <span class="item-tit">金额</span>

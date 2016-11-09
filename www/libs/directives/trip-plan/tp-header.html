@@ -4,11 +4,26 @@
         <span class="tit_special" ng-if="trip.isSpecialApprove">特别审批</span>
     </ion-item>
     <ion-item class="project_cont">
-        <p ng-if="trip && trip.startAt">
+        <p class="project_title" ng-if="trip && trip.startAt">
             <i class="fa fa-flag-o"></i>&nbsp;{{trip.title}}</p>
         <div class="budget-info" ng-if="trip.status != EPlanStatus.COMPLETE">
             <div class="budget-progress">
-                <div style="text-align: center">{{(1-(trip.expenditure/trip.budget))*100 | currency_int}}%</div>
+                <!--<div style="text-align: center">{{(1-(trip.expenditure/trip.budget))*100 | currency_int}}%</div>-->
+                <div>
+                    <div style="height:{{(trip.expenditure/trip.budget)*100 | currency_int}}%;max-height: 100%">
+                        <p ng-if="(trip.expenditure/trip.budget)>=0.5 && (trip.expenditure/trip.budget)<1">
+                            {{(1-(trip.expenditure/trip.budget))*100 | currency_int}}%
+                        </p>
+                        <p ng-if="(trip.expenditure/trip.budget)>1">
+                            0%
+                        </p>
+                    </div>
+                    <div style="height:{{(1-(trip.expenditure/trip.budget))*100 | currency_int}}%;min-height: 0px">
+                        <span ng-if="(trip.expenditure/trip.budget)<0.5">
+                            {{(1-(trip.expenditure/trip.budget))*100 | currency_int}}%
+                        </span>
+                    </div>
+                </div>
             </div>
             <div class="budget-info-right list">
                 <div class="budget row item">
