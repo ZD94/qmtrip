@@ -190,7 +190,7 @@
                     </div>
                 </div>
             </ion-slide>
-            <ion-slide class="choose" ng-if="[EPlanStatus.AUDIT_NOT_PASS,EPlanStatus.WAIT_UPLOAD,EPlanStatus.WAIT_COMMIT].indexOf(tripDetail.status) >= 0">
+            <ion-slide class="choose" ng-if="showChooseFunc">
                 <div class="chooseFun" ng-if="select_menu">
                     <div class="chooseBtn">
                         <a class="button button-calm" ng-click="linkOthers()">关联订单</a>
