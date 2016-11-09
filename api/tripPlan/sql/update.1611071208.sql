@@ -1,1 +1,1 @@
-alter table trip_plan.trip_detail_invoices add supplier_id uuid;
+--alter table trip_plan.trip_detail_invoices add supplier_id uuid;
