@@ -71,29 +71,6 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
         case ETripType.SPECIAL_APPROVE:
             break;
     }
-    //供应商的logo
-    /*switch($stateParams.supplier){
-        case 'ctrip_business':
-            $scope.ctrip_business = true;
-            reDirectUrl = '//ct.ctrip.com/';
-            break;
-        case 'ctrip':
-            $scope.ctrip = true;
-            reDirectUrl = '//accounts.ctrip.com/member/login.aspx?BackUrl=http%3A%2F%2Fwww.ctrip.com%2F&responsemethod=get';
-            break;
-        case 'qunar':
-            $scope.qunar = true;
-            reDirectUrl = '//user.qunar.com/passport/login.jsp';
-            break;
-        case 'tong_cheng':
-            $scope.tong_cheng = true;
-            reDirectUrl = '//passport.ly.com/?pageurl=http%3A%2F%2Fwww.ly.com%2F';
-            break;
-        case 'air_china':
-            $scope.air_china = true;
-            break;
-    }*/
-
 
     //下面三个小圆点的轮播
     $scope.load_one = true;
@@ -112,7 +89,7 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
         }
     },200)
 
-    $timeout(function(){
+    let timeout = $timeout(function(){
         if($scope.reserveType == "travel"){
             window.location.href = supplier.trafficBookLink;
         }else if($scope.reserveType == "hotel"){
@@ -124,4 +101,9 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
             interval = undefined;
         }
     },5000)
+
+    $scope.$on('$destroy', function(){
+        $timeout.cancel(timeout);
+        timeout = undefined;
+    })
 }
