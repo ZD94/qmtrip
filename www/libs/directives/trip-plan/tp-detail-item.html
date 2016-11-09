@@ -110,7 +110,7 @@
                     <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve(item.id)" ng-if="isBeforeStartTime">
                         退/改签
                     </a>
-                    <a class="trip_btn button-small botton-outline" ng-click="viewInvoice(item.id)">
+                    <a class="trip_btn button-small botton-outline" ng-click="searchInvoice(item.id)">
                         查看票据
                     </a>
                     <a class="trip_btn button button-small button-outline" ng-click="viewInvoice(item.id)">添加票据</a>
@@ -120,19 +120,19 @@
 
             <div ng-if="item.status == EPlanStatus.AUDITING">
                 <a class="trip_btn button button button-small button-outline"
-                   ng-click="viewInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
+                   ng-click="searchInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
                 <span ng-if="!isShowUploader">票据审核中</span>
             </div>
 
             <div ng-if="item.status == EPlanStatus.COMPLETE">
                 <a class="trip_btn button button-small button-outline"
-                   ng-click="viewInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
+                   ng-click="searchInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
                 <span style="margin-top: 8px" ng-if="!isShowUploader">已通过</span>
             </div>
 
             <div ng-if="item.status == EPlanStatus.AUDIT_NOT_PASS">
                 <a class="trip_btn button button-small button-outline"
-                   ng-click="viewInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
+                   ng-click="searchInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
                 <a class="trip_btn button-small botton-outline" ng-click="viewInvoice(item.id)">
                     修改票据
                 </a>
@@ -140,7 +140,7 @@
 
             <div ng-if="item.status == EPlanStatus.NO_BUDGET">
                 <a class="trip_btn button button-small button-outline button-positive"
-                   ng-click="viewInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
+                   ng-click="searchInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
                 <span style="margin-top: 8px" ng-if="!isShowUploader">暂无预算</span>
             </div>
         </div>
