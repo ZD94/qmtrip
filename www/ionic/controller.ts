@@ -81,8 +81,8 @@ var adminMenus = [
     },
     {
         id: 1061,
-        icon: 'pricetags',
-        title: '供应商管理',
+        icon: 'ios-cart',
+        title: '预订服务商',
         link: 'supplier/',
         badgeNum: 0
     },

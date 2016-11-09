@@ -9,7 +9,8 @@ import {Model} from "sequelize";
 var API = require('common/api');
 var msgbox = require('msgbox');
 
-export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate, ngModalDlg, City, $ionicModal){
+export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate, ngModalDlg, City, $ionicModal, $timeout){
+    let typeArray = [EPlanStatus.AUDIT_NOT_PASS,EPlanStatus.WAIT_UPLOAD,EPlanStatus.WAIT_COMMIT]
 
     $scope.EInvoiceFeeTypes = EInvoiceFeeTypes;
     $scope.InvoiceFeeTypeNames = InvoiceFeeTypeNames;
@@ -52,16 +53,26 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         tripDetail.a_city = await City.getCity(tripDetail.arrivalCity);
         tripDetail.d_city = await City.getCity(tripDetail.deptCity);
     }
+    $scope.tripDetail = tripDetail;
+    let showChooseFunc = typeArray.indexOf(tripDetail.status) >= 0
+    $scope.showChooseFunc = showChooseFunc;
     let initPager = 0;
     let addNew = $stateParams.method;
-    if(addNew == 'add'){
-        initPager = invoices.length;
-        console.info(initPager);
-    }
-    $scope.initPager = initPager;
-    $scope.tripDetail = tripDetail;
+
+
     $ionicSlideBoxDelegate.update();
-    console.info(invoices);
+
+    $timeout(function () {
+        if(addNew == 'add'){
+            initPager = invoices.length;
+            console.info(initPager);
+            // $ionicSlideBoxDelegate.slide(initPager)
+            $scope.initPager = initPager;
+        }
+    },100)
+
+    // $scope.initPager = initPager;
+
     $scope.dateOptions = {
         beginDate: moment().add(-1,'years').startOf('months').toDate(),
         endDate: new Date(),

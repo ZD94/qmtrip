@@ -14,7 +14,7 @@
         </div>
         <p class="supplier-text">
             说明：<br>
-            开启指定商旅供应商功能，员工在出差审批通过后可以通过指定商旅供应商进行出行预订，预订完成后可以导入部分供应商订单获取实时出行数据。关闭该功能，员工可以任意渠道预订。
+            开启显示系统推荐服务商功能，员工可在预订时选择下列列表中的专属服务商以及所有推荐服务商和其他服务商，关闭显示系统推荐服务商，则只显示列表中开启的服务商。
         </p>
         <div>
             <div class="list self-define">
@@ -44,7 +44,7 @@
             </div>
             <div class="list recommend-supplier">
                 <div class="item item-divider supplier-title">
-                    推荐供应商
+                    推荐服务商
                     <span class="pull-right">支持订单关联</span>
                 </div>
                 <div class="item" ng-repeat="c in canImportList">
@@ -60,7 +60,7 @@
 
             <div class="list recommend-supplier">
                 <div class="item item-divider supplier-title">
-                    推荐供应商
+                    其他服务商
                     <span class="pull-right">不支持订单关联</span>
                 </div>
                 <div class="item" ng-repeat="n in canNotImportList">
