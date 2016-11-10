@@ -49,10 +49,10 @@
     }
     .invoice-form{
       background: #fff;
-      padding: 0 10px;
-      height: 375px;
+      height: 100%;
       position: relative;
       border-radius: 5px;
+      overflow: hidden;
       .invoice-img{
         overflow: hidden;
         line-height: 80px;
@@ -92,7 +92,8 @@
         .invoice_desc{
           border-bottom: none;
           p{
-            height: 50px;
+            min-height: 50px;
+            white-space: normal;
           }
         }
         .item-tit{
@@ -174,9 +175,8 @@
         }
       }
       .button-bar{
-        position: absolute;
-        left: 0;
-        bottom: 0;
+        background: #fff;
+        border-radius: 0 0 5px 5px;
         .button{
           border-color: #ccc;
           &:first-child{
@@ -185,6 +185,15 @@
           &:last-child{
             border-radius: 0 0 4px 0;
           }
+        }
+      }
+      ion-scroll{
+        margin: 0 10px;
+        .scroll{
+          height: 100%;
+        }
+        .scroll-bar-v{
+          right: -4px;
         }
       }
       textarea{
