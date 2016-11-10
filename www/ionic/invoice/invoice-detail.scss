@@ -1,7 +1,12 @@
+.invoices{
+  display: flex;
+  flex-direction: column;
+}
 .list{
   &.invoice-info{
     background: none;
     margin: 10px;
+    flex: 0;
     .item, .item-divider{
       border-color: rgba(255, 255, 255, 0.1);
       background: rgba(255, 255, 255, 0.3);
@@ -22,6 +27,7 @@
       &.money_info{
         display: flex;
         align-items: center;
+        padding: 5px 10px;
         & > div{
           flex: 1;
           text-align: center;
@@ -41,18 +47,20 @@
 .item-image{
   background: none;
   border: none;
+  flex: 1;
   .slider-slides{
-    margin-top: 30px;
+    padding-top: 30px;
+    padding-bottom: 20px;
     .slider-slide{
       padding: 0 10px;
-      height: 375px;
+      height: 100%;
     }
     .invoice-form{
       background: #fff;
-      padding: 0 10px;
-      height: 375px;
+      height: 100%;
       position: relative;
       border-radius: 5px;
+      overflow: hidden;
       .invoice-img{
         overflow: hidden;
         line-height: 80px;
@@ -92,7 +100,8 @@
         .invoice_desc{
           border-bottom: none;
           p{
-            height: 50px;
+            min-height: 50px;
+            white-space: normal;
           }
         }
         .item-tit{
@@ -174,9 +183,8 @@
         }
       }
       .button-bar{
-        position: absolute;
-        left: 0;
-        bottom: 0;
+        background: #fff;
+        border-radius: 0 0 5px 5px;
         .button{
           border-color: #ccc;
           &:first-child{
@@ -185,6 +193,15 @@
           &:last-child{
             border-radius: 0 0 4px 0;
           }
+        }
+      }
+      ion-scroll{
+        margin: 0 10px;
+        .scroll{
+          height: 100%;
+        }
+        .scroll-bar-v{
+          right: -4px;
         }
       }
       textarea{
@@ -198,7 +215,7 @@
       background: #fff;
       padding: 0 10px;
       border-radius: 5px;
-      height: 375px;
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
