@@ -120,7 +120,7 @@ export class TripDetailInvoice extends ModelObject {
     get supplier(): Supplier { return null; }
     set supplier(val: Supplier) {}
 
-    @Field({type: Types.UUID})
+    @Field({type: Types.STRING})
     get orderId() { return null}
     set orderId(orderId: string) {}
 
