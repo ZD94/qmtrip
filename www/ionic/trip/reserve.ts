@@ -91,16 +91,16 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
 
     let timeout = $timeout(function(){
         if($scope.reserveType == "travel"){
-            window.location.href = supplier.trafficBookLink;
+            window.open(supplier.trafficBookLink, '_self');
         }else if($scope.reserveType == "hotel"){
-            window.location.href = supplier.hotelBookLink;
+            window.open(supplier.hotelBookLink, '_self');
         }
 
         if(angular.isDefined(interval)){
             $interval.cancel(interval);
             interval = undefined;
         }
-    },5000)
+    },3000)
 
     $scope.$on('$destroy', function(){
         $timeout.cancel(timeout);
