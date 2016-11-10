@@ -25,6 +25,13 @@
     "cordova-plugin-file-transfer",
     "cordova-plugin-crosswalk-webview",
     {
+      "id": "jpush-phonegap-plugin",
+      "locator": "jpush-phonegap-plugin",
+      "variables": {
+        "API_KEY": "f57e4e7c0c9b2d2c4c50741d"
+      }
+    },
+    {
       "id": "cordova-plugin-camera",
       "locator": "cordova-plugin-camera",
       "variables": {
@@ -33,19 +40,13 @@
       }
     },
     {
-      "id": "jpush-phonegap-plugin",
-      "locator": "jpush-phonegap-plugin",
-      "variables": {
-        "API_KEY": "f57e4e7c0c9b2d2c4c50741d"
-      }
-    },
-    {
       "id": "cordova-plugin-wechat",
       "locator": "cordova-plugin-wechat",
       "variables": {
         "WECHATAPPID": "wx07ff1810fe913d17"
       }
-    }
+    },
+    "cordova-plugin-inappbrowser"
   ],
   "cordovaPlatforms": [
     {

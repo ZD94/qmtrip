@@ -10,7 +10,7 @@ var gulplib = require('./common/gulplib');
 
 var argv = require('yargs')
     .alias('a', 'appconfig')
-    .default('appconfig', 'test')
+    .default('appconfig', 'release')
     .argv;
 
 gulplib.public_dir = 'www';
