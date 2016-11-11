@@ -126,6 +126,21 @@ function genManifest() {
             cb(null, file);
         }))
         .pipe(calManifest({load: []}))
+        .pipe(through2.obj(function (file, enc, cb) {
+            var manifest = JSON.parse(file.contents);
+            var filenames = Object.keys(manifest.files).sort();
+            var files = {};
+            filenames.forEach(function(name){
+                var f = manifest.files[name];
+                f.filename = f.filename.replace(/%5C/g, '/');
+                files[name.replace(/%5C/g, '/')] = f;
+            })
+            manifest.files = files;
+            //console.log(JSON.stringify(manifest, null, '  '));
+            file.contents = new Buffer(JSON.stringify(manifest, null, '  '), 'utf8');
+            //console.log(file.contents.toString());
+            cb(null, file);
+        }))
         .pipe(gulp.dest(gulplib.public_dir));
 }
 
