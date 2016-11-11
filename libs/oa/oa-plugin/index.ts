@@ -35,9 +35,9 @@ export interface regTripInvoiceAuditUpdateCbParam {
 
 export interface IOAPlugin {
     $createTripApproveFlow(params: createTripApproveParam): Promise<createTripApproveResult>;
-    $regTripApproveUpdateCb(params: regTripApproveUpdateCbParam) :Promise<boolean>;
+    $regTripApproveUpdateCb(params: regTripApproveUpdateCbParam);
     $createTripInvoiceAuditFlow(params: createTripInvoiceAuditFlowParam):Promise<createTripInvoiceAuditFlowResult>;
-    $regTripInvoiceAuditUpdateCb(params: regTripInvoiceAuditUpdateCbParam) :Promise<boolean>;
+    $regTripInvoiceAuditUpdateCb(params: regTripInvoiceAuditUpdateCbParam);
 }
 
 export abstract class AbstractOAPlugin implements IOAPlugin {
@@ -53,18 +53,16 @@ export abstract class AbstractOAPlugin implements IOAPlugin {
         return this.createTripApproveFlow(params);
     }
 
-    async $regTripApproveUpdateCb(fn: regTripApproveUpdateCbParam) :Promise<boolean> {
+    $regTripApproveUpdateCb(fn: regTripApproveUpdateCbParam) {
         this.tripApproveUpdateListeners.push(fn);
-        return true;
     }
 
     $createTripInvoiceAuditFlow(params: createTripInvoiceAuditFlowParam) :Promise<createTripInvoiceAuditFlowResult> {
         return this.createTripInvoiceAuditFlow(params);
     }
 
-    async $regTripInvoiceAuditUpdateCb(fn: regTripInvoiceAuditUpdateCbParam):Promise<boolean> {
+    $regTripInvoiceAuditUpdateCb(fn: regTripInvoiceAuditUpdateCbParam){
         this.tripInvoiceAuditUpdateListeners.push(fn);
-        return true;
     }
 
     async tripApproveUpdateNotify(result) {
