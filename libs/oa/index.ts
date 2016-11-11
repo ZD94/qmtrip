@@ -6,9 +6,9 @@
 
 import emitter = require('./emitter');
 
-import {QmPlugin, IOAPlugin} from './oa-plugin';
-import {AutoPlugin} from "./oa-plugin/auto";
-// import {DDTalkPlugin} from "./oa-plugin/ddtalk/index";
+import {QmPlugin, IOAPlugin} from './plugin';
+import {AutoPlugin} from "./plugin/auto";
+// import {DDTalkPlugin} from "./plugin/ddtalk/index";
 
 const EVENT = {
     NEW_TRAVEL_BUDGET: 'NEW_TRAVEL_BUDGET',
