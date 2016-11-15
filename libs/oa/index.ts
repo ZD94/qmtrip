@@ -4,13 +4,12 @@
 
 'use strict';
 
-import emitter = require('./emitter');
-
+import {emitter, OAEmitter} from './emitter';
 import {QmPlugin, IOAPlugin} from './plugin';
 import {AutoPlugin} from "./plugin/auto";
 // import {DDTalkPlugin} from "./plugin/ddtalk/index";
 
-const EVENT = {
+export const EVENT = {
     NEW_TRAVEL_BUDGET: 'NEW_TRAVEL_BUDGET',
     NEW_TRIP_APPROVE: 'NEW_TRIP_APPROVE',
     NEW_TRIP_INVOICE_AUDIT: 'NEW_TRIP_INVOICE_AUDIT',
@@ -22,6 +21,36 @@ let plugins = {
     auto: new AutoPlugin(),
     qm: new QmPlugin(),
     // ddtalk: new DDTalkPlugin(),
+}
+
+export function __initHttpApp(app) {
+    app.post('/oa/notify', function(req, res, next) {
+        let {oa, method} = req.query;
+        let data: any = req.body;
+        let key = data.key;
+        delete data.key;
+        //校验OA与系统通信的KEY
+        if (!key || key != 'jingli2016') {
+            res.send(403);
+            return;
+        }
+
+        if (!oa)  {
+            oa = 'qm';
+        }
+        //仅支持这两个回调
+        let availableFns = ['tripApproveUpdateNotify', 'tripInvoiceUpdateNotify'];
+        if (availableFns.indexOf(method) < 0) {
+            res.send(403);
+            return;
+        }
+        let fn = plugins[oa][method];
+        if ( fn && typeof fn == 'function') {
+            console.info('OA返回的数据===>', data)
+            fn.bind(plugins[oa])(null, data);
+        }
+        res.send('success');
+    });
 }
 
 function regPluginCallback() {
@@ -43,6 +72,7 @@ regPluginCallback();
 
 //新出差审批事件
 emitter.on(EVENT.NEW_TRIP_APPROVE, function(params) {
+    // console.info('接收到消息,新的申请到达===>', params);
     let oa = params.oa;
     if (!oa) {
         oa = 'qm';
@@ -65,4 +95,5 @@ emitter.on(EVENT.NEW_TRIP_INVOICE_AUDIT, function(err, params) {
     }
 });
 
-export {emitter}
+export {emitter, OAEmitter}
+export {plugins}

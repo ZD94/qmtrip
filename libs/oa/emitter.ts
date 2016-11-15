@@ -5,7 +5,10 @@
 'use strict';
 import {EventEmitter} from 'events';
 
-class OAEmitter extends EventEmitter {
+export class OAEmitter extends EventEmitter {
+    constructor() {
+        super();
+    }
 }
 
-export= (new OAEmitter());
+export var emitter = new OAEmitter()

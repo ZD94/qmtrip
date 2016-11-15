@@ -6,12 +6,13 @@
 import {EPlanStatus, EApproveStatus} from 'api/_types/tripPlan/tripPlan';
 
 export interface createTripApproveParam {
-    budgetNo: string;  //预算单号
+    approveNo: string;  //审核单号
     submitter: string;      //员工ID
+    approveUser?: string;    //审核人ID
 }
 
 export interface createTripApproveResult {
-    budgetNo: string;      //预算单号
+    approveNo: string;      //预算单号
     submitter: string;        //提交人
     outerId?: string;       //第三方ID
 }
@@ -65,18 +66,19 @@ export abstract class AbstractOAPlugin implements IOAPlugin {
         this.tripInvoiceAuditUpdateListeners.push(fn);
     }
 
-    async tripApproveUpdateNotify(result) {
+    async tripApproveUpdateNotify(err, result) {
         this.tripApproveUpdateListeners.forEach( (fn) => {
+            // console.info('通知各个函数===>:', fn);
             if (fn && typeof fn == 'function') {
-                fn(null, result);
+                fn(err, result);
             }
         })
     }
 
-    async tripInvoiceUpdateNotify(result) {
+    async tripInvoiceUpdateNotify(err, result) {
         this.tripInvoiceAuditUpdateListeners.forEach( (fn) => {
             if (fn && typeof fn == 'function') {
-                fn (null, result);
+                fn (err, result);
             }
         })
     }
