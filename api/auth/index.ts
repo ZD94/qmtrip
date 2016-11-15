@@ -638,6 +638,16 @@ export default class ApiAuth {
             vals.url = C.host + "/index.html#/login/reset-pwd?" + url;
             key = 'qm_reset_pwd_email';
         }
+
+        var options = {
+            key: key,
+            values: vals,
+            email: acc.email,
+            mobile: _mobile,
+        };
+        var link = vals.url;
+        await API.notice.recordNotice({optins: options, staffId: acc.id, link: link});
+
         return API.notify.submitNotify({
             key: key,
             values: vals,
@@ -1179,5 +1189,13 @@ async function _sendActiveEmail(accountId) {
             email: account.email,
         })
     ]);
+
+    var options = {
+        key: 'qm_active',
+        values: vals,
+        email: account.email,
+    };
+    var link = vals.url;
+    await API.notice.recordNotice({optins: options, staffId: account.id, link: link});
 }
 

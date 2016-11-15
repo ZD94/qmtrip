@@ -1,0 +1,20 @@
+<ion-view title="通知通告" id="page1" style="background-color:#E8E7E9;">
+    <ion-content padding="true" class="has-header">
+        <div class="list card accordlist">
+            <div class="item item-body">
+                <div id="page30-markdown21" style="color:#000000;">
+                    <p>主题：{{notice.theme}}</p>
+                </div>
+                <div id="page30-markdown22" style="color:#000000;">
+                    <p>内容：<span ng-bind-html="notice.content"></span></p>
+                </div>
+                <div id="page30-markdown23" style="color:#000000;">
+                    <p>时间：{{notice.createdAt | date : 'yyyy-MM-dd'}}</p>
+                </div>
+                <div id="page30-markdown24" style="color:#000000;">
+                    <a href="{{notice.link}}"><p>跳转链接：{{notice.link}}</p></a>
+                </div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

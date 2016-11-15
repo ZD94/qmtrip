@@ -1,0 +1,20 @@
+<ion-view title="通知通告" id="page30">
+    <ion-content padding="true" class="has-header">
+        <div class="list card accordlist" ng-repeat="notice in notices" ng-click="detail(notice.id)">
+            <div class="item item-body">
+                <div id="page30-markdown21" style="color:#000000;">
+                    <p>主题：{{notice.theme}}</p>
+                </div>
+                <!--<div id="page30-markdown22" style="color:#000000;">
+                    <p>内容：{{notice.content}}元/天</p>
+                </div>-->
+                <div id="page30-markdown23" style="color:#000000;">
+                    <p>时间：{{notice.createdAt | date : 'yyyy-MM-dd'}}</p>
+                </div>
+                <div id="page30-markdown24" style="color:#000000;">
+                    <p>状态：{{notice.isRead ? '已读' : '未读'}}</p>
+                </div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

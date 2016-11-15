@@ -280,14 +280,22 @@ export function approveInvoice(params){
                 return true;
             }
             return API.staff.increaseStaffPoint({id: staffId, accountId: user_id, increasePoint: ret.score, companyId: companyId})
-                .then(function(ret) {
+                .then(async function(ret) {
                     if (key) {
                         //发送通知给用户
-                        API.notify.submitNotify({
+                        await API.notify.submitNotify({
                             key: key,
                             email: staffEmail,
                             values: values,
                         });
+
+                        var options = {
+                            key: key,
+                            email: staffEmail,
+                            values: values,
+                        };
+                        var link = values.url;
+                        await API.notice.recordNotice({optins: options, staffId: staffId, link: link});
                     }
                     return ret;
                 })

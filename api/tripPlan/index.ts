@@ -261,6 +261,15 @@ class TripPlanModule {
                     values: values,
                     openid: openid,
                 });
+
+                let options2 = {
+                    key: 'qm_notify_self_traveludget',
+                    email: staff.email,
+                    values: values,
+                    openid: openid,
+                };
+                var link = options2.values.url;
+                await API.notice.recordNotice({optins: options2, staffId: staff.id, link: link});
             } catch(err) {
                 console.error(`发送通知失败`, err);
             }
@@ -322,6 +331,16 @@ class TripPlanModule {
                     mobile: approveUser.mobile,
                     openid: openId,
                 });
+
+                let options2 = {
+                    key: 'qm_notify_new_travelbudget',
+                    email: approveUser.email,
+                    values: approve_values,
+                    mobile: approveUser.mobile,
+                    openid: openId,
+                };
+                let link = options2.values.url;
+                await API.notice.recordNotice({optins: options2, staffId: approveUser.id, link: link});
             } catch(err) {
                 console.error('发送通知失败', err)
             }
@@ -347,6 +366,14 @@ class TripPlanModule {
                         email: s.email,
                         values: vals
                     });
+
+                    let options2 = {
+                        key: 'qm_notify_new_travelbudget',
+                        email: s.email,
+                        values: vals
+                    };
+                    var link = options2.values.url || "";
+                    await API.notice.recordNotice({optins: options2, staffId: s.id, link: link});
                 } catch(err) {
                     console.error(err);
                 }
@@ -385,6 +412,14 @@ class TripPlanModule {
                         email: s.email,
                         values: values
                     })
+
+                    let options2 = {
+                        key: 'qm_notify_system_new_travelbudget',
+                        email: s.email,
+                        values: values
+                    };
+                    var link = options2.values.url || "";
+                    await API.notice.recordNotice({optins: options2, staffId: s.id, link: link});
                 } catch(err) {
                     console.error(err);
                 }
@@ -689,7 +724,7 @@ class TripPlanModule {
             let user = tripApprove.account;
             if(!user) user = await Models.staff.get(tripApprove['accountId']);
             let go = {},back = {},hotel = {},subsidy = {};
-            let self_values = {};
+            let self_values: any = {};
             try {
                 self_url = await API.wechat.shorturl({longurl: self_url});
             } catch(err) {
@@ -760,6 +795,10 @@ class TripPlanModule {
             }
             try {
                 await API.notify.submitNotify({email: user.email, key: tplName, values: self_values, mobile: user.mobile, openid: openId});
+
+                let options2 = {email: user.email, key: tplName, values: self_values, mobile: user.mobile, openid: openId};
+                var link = options2.values.url || "";
+                await API.notice.recordNotice({optins: options2, staffId: user.id, link: link});
             } catch(err) { console.error(err);}
             try {
                 await API.ddtalk.sendLinkMsg({ accountId: user.id, text: '您的预算已经审批通过', url: self_url});
@@ -1023,6 +1062,10 @@ class TripPlanModule {
             let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
             try {
                 await API.notify.submitNotify({key: templateName, values: templateValue, email: staff.email, openid: openId});
+
+                let options2 = {key: templateName, values: templateValue, email: staff.email, openid: openId};
+                var link = options2.values.url || "";
+                await API.notice.recordNotice({optins: options2, staffId: staff.id, link: link});
             } catch(err) {
                 console.error(`发送通知失败:`, err);
             }
@@ -2015,6 +2058,21 @@ class TripPlanModule {
                     }]
                 },
             });
+
+            let options2 = {
+                key: 'qm_spend_report',
+                email: staff.email,
+                values: {
+                    title: title,
+                    attachments: [{
+                        filename: title + '.pdf',
+                        content: buf.toString("base64"),
+                        encoding: 'base64'
+                    }]
+                },
+            };
+            var link = options2.values["url"] || "" ;
+            await API.notice.recordNotice({optins: options2, staffId: staff.id, link: link});
         } catch(err) {
             console.error(err.stack);
         }

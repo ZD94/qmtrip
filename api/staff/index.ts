@@ -18,6 +18,7 @@ import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {requireParams, clientExport} from 'common/api/helper';
 import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo } from "api/_types/staff";
+import { Notice } from "api/_types/notice";
 import { EAgencyUserRole, AgencyUser } from "api/_types/agency";
 import { Models, EAccountType } from 'api/_types';
 import {conditionDecorator, condition} from "../_decorator";
@@ -283,12 +284,33 @@ class StaffModule{
                 staffStatus: updateStaff.staffStatus == 0 ? "禁用" : "启用"
             }
 
+            /*//得到通知内容
+             var {content, theme} = await API.notify.getSubmitNotifyContent({
+             key: 'staff_update',
+             values: vals,
+             email: updateStaff.email
+             });
+             var notice = Notice.create();
+             notice.theme = theme;
+             notice.content = content;
+             notice.staff = updateStaff;
+             notice.link = config.host + "/index.html#/staff/edit?staffId="+updateStaff.id;
+             await notice.save();*/
+
             //发送通知
-            API.notify.submitNotify({
+            await API.notify.submitNotify({
                 key: 'staff_update',
                 values: vals,
                 email: updateStaff.email
             });
+
+            var options = {
+                key: 'staff_update',
+                values: vals,
+                email: updateStaff.email
+            };
+            var link = config.host + "/index.html#/staff/edit?staffId="+updateStaff.id;
+            await API.notice.recordNotice({optins: options, staffId: updateStaff.id, link: link});
         }
         return updateStaff;
     }
