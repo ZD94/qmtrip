@@ -60,13 +60,13 @@ export async function getWeChatLoginUrl(params: {redirectUrl: string}) {
 
 export async function destroyWechatOpenId(params: {}): Promise<boolean> {
     let staff = await Staff.getCurrent();
-    let openIds = await Models.accountOpenid.find({where: {accountId: staff.id}});
+    let tokens = await Models.token.find({where: {accountId: staff.id, type:'wx_openid'}});
 
-    if(!openIds || openIds.length <= 0) {
+    if(!tokens || tokens.length <= 0) {
         return false;
     }
 
-    await Promise.all(openIds.map((openId) => openId.destroy()));
+    await Promise.all(tokens.map((token) => token.destroy()));
     return true;
 }
 
@@ -81,13 +81,13 @@ export async function saveOrUpdateOpenId(params) {
     if(!openid)
         return;
     let staff = await Staff.getCurrent();
-    let list = await Models.accountOpenid.find({where: {openId: openid}});
+    let list = await Models.token.find({where: {token: openid, type:'wx_openid'}});
 
     if(list && list.length > 0) {
         await Promise.all(list.map((op) => op.destroy()));
     }
 
-    let obj = Models.accountOpenid.create({openId: openid, accountId: staff.id});
+    let obj = Models.token.create({token: openid, accountId: staff.id, type:'wx_openid'});
     obj.save();
 }
 
@@ -97,7 +97,7 @@ export async function saveOrUpdateOpenId(params) {
  * @type {getAccountIdByOpenId}
  */
 export async function getAccountIdByOpenId(params: {openId: string}): Promise<string> {
-    let list = await Models.accountOpenid.find({where: {openId: params.openId}});
+    let list = await Models.token.find({where: {token: params.openId, type:'wx_openid'}});
 
     if(!list || list.length <= 0) {
         return null;
@@ -112,12 +112,12 @@ export async function getAccountIdByOpenId(params: {openId: string}): Promise<st
  * @type {getOpenIdByAccount}
  */
 export async function getOpenIdByAccount(params: {accountId: string}): Promise<string> {
-    let list = await Models.accountOpenid.find({where: {accountId: params.accountId}});
+    let list = await Models.token.find({where: {accountId: params.accountId, type:'wx_openid'}});
 
     if(!list || list.length <= 0) {
         return null;
     }
 
     let obj = list[0];
-    return obj.openId;
+    return obj.token;
 }

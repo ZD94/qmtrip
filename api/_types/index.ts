@@ -9,7 +9,7 @@ import {
     TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCode, TripDetailInvoice,
     TripDetailHotel, TripDetailTraffic
 } from './tripPlan';
-import {Account, Token, AccountOpenid} from './auth';
+import {Account, Token} from './auth';
 import {Seed} from "./seed";
 import { ModelInterface } from 'common/model/interface';
 import { ModelDelegate } from 'common/model/delegate';
@@ -65,7 +65,6 @@ export interface ModelsInterface {
 
     account: ModelInterface<Account>;
     token: ModelInterface<Token>;
-    accountOpenid: ModelInterface<AccountOpenid>;
 
     ddtalkCorp: ModelInterface<DDTalkCorp>;
     ddtalkUser: ModelInterface<DDTalkUser>;
@@ -108,7 +107,6 @@ export var Models: ModelsInterface = {
     travelBudgetLog: new ModelDelegate<TravelBudgetLog>(),
     account: new ModelDelegate<Account>(),
     token: new ModelDelegate<Token>(),
-    accountOpenid: new ModelDelegate<AccountOpenid>(),
     financeCheckCode: new ModelDelegate<FinanceCheckCode>(),
 
     ddtalkCorp: new ModelDelegate<DDTalkCorp>(),

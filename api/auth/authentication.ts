@@ -12,15 +12,15 @@ export async function makeAuthenticateToken(accountId, os?: string): Promise<Log
     if(!os) {
         os = 'web';
     }
+    let type = 'auth:'+os;
 
-    let tokens = await Models.token.find({where:{accountId, os}, limit: 1});
+    let tokens = await Models.token.find({where:{accountId, type}, limit: 1});
     let token: Token;
     if(tokens.total > 0) {
         token = tokens[0];
     } else {
-        token = Models.token.create({token: utils.getRndStr(10), accountId, os});
+        token = Models.token.create({token: utils.getRndStr(10), accountId, type});
     }
-    token.refreshAt = new Date();
     token.expireAt = moment().add(7, "days").toDate();
     await token.save();
     return {accountId: token.accountId, tokenId: token.id, token: token.token};
@@ -52,7 +52,7 @@ export async function checkTokenAuth(params: AuthRequest): Promise<AuthResponse|
     if(!token)
         return null;
     var now = new Date();
-    if(token.expireAt < now)
+    if(!token.expireAt || token.expireAt < now)
         return null;
     var sign_date = new Date(timestamp);
     if(Math.abs(now.getTime() - sign_date.getTime()) > 5 * 60 * 1000) //签名时间相差过大
