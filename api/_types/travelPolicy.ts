@@ -56,7 +56,7 @@ export class TravelPolicy extends ModelObject{
     get planeLevel(): EPlaneLevel {return null}
     set planeLevel(val: EPlaneLevel){}
 
-    @Field({type: Types.FLOAT})
+    @Field({type: Types.DOUBLE})
     get planeDiscount(): number{return null}
     set planeDiscount(planeDiscount: number){}
 
@@ -68,7 +68,7 @@ export class TravelPolicy extends ModelObject{
     get hotelLevel(): EHotelLevel {return null}
     set hotelLevel(val: EHotelLevel){}
 
-    @Field({type: Types.FLOAT})
+    @Field({type: Types.NUMERIC(15, 2)})
     get hotelPrice(): number {return null}
     set hotelPrice(hotelPrice: number){}
     
