@@ -15,7 +15,7 @@ import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
 import { AccordHotel } from 'api/_types/accordHotel';
 import { Agency, AgencyUser } from 'api/_types/agency';
 import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCode} from 'api/_types/tripPlan';
-import {Account, Token, AccountOpenid} from 'api/_types/auth';
+import {Account, Token} from 'api/_types/auth';
 import { Seed } from 'api/_types/seed';
 import {TravelBudgetLog} from "api/_types/travelbudget";
 import {DDTalkCorp, DDTalkUser} from "api/_types/ddtalk";
@@ -167,7 +167,6 @@ class ClientModels implements ModelsInterface {
     account: ModelRemote<Account>;
     seed: ModelRemote<Seed>;
     token: ModelRemote<Token>;
-    accountOpenid: ModelRemote<AccountOpenid>;
     travelBudgetLog: ModelRemote<TravelBudgetLog>;
     financeCheckCode: ModelRemote<FinanceCheckCode>;
     

@@ -6,24 +6,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     require('./trip.scss');
     require('./budget.scss');
     API.require("tripPlan");
-    //底部的按钮
-    let bottomStyle = {
-        status:{
-            text:'',
-            cancel:'',
-        },
-        right:{
-            color:'#ffffff',
-            backgroundColor:'#D8D8D8',
-            display:true,
-            text:'提交审批',
-        },
-        left:{
-            display:false,
-        },
-        isSelect:true,
-    }
-    $scope.bottomStyle = bottomStyle;
+
 
     $scope.staffSelector = {
         query: async function(keyword) {
@@ -95,7 +78,6 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     $scope.MTxPlaneLevel = MTxPlaneLevel;
     API.require("tripPlan");
     await API.onload();
-
 
 
     $scope.saveTripPlan = async function() {

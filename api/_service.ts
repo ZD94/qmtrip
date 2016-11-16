@@ -11,7 +11,7 @@ import {
     TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCode,
     TripDetailInvoice, TripDetailTraffic, TripDetailHotel
 } from 'api/_types/tripPlan';
-import {Account, Token, AccountOpenid} from 'api/_types/auth';
+import {Account, Token} from 'api/_types/auth';
 import { Seed } from 'api/_types/seed';
 import { createServerService } from 'common/model/sequelize';
 import {TravelBudgetLog} from "api/_types/travelbudget";
@@ -48,7 +48,6 @@ initModels({
     account: createServerService<Account>(Account),
     seed: createServerService<Seed>(Seed),
     token: createServerService<Token>(Token),
-    accountOpenid: createServerService<AccountOpenid>(AccountOpenid),
     travelBudgetLog: createServerService<TravelBudgetLog>(TravelBudgetLog),
     financeCheckCode: createServerService<FinanceCheckCode>(FinanceCheckCode),
 
