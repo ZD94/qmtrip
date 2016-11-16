@@ -1,0 +1,25 @@
+alter table trip_plan.trip_details drop column dept_city;
+alter table trip_plan.trip_details drop column arrival_city;
+alter table trip_plan.trip_details drop column dept_city_code;
+alter table trip_plan.trip_details drop column arrival_city_code;
+alter table trip_plan.trip_details drop column city;
+alter table trip_plan.trip_details drop column city_code;
+alter table trip_plan.trip_details drop column hotel_code;
+alter table trip_plan.trip_details drop column hotel_name;
+alter table trip_plan.trip_details drop column invoice;
+alter table trip_plan.trip_details drop column new_invoice;
+alter table trip_plan.trip_details drop column is_commit;
+alter table trip_plan.trip_details drop column start_time;
+alter table trip_plan.trip_details drop column end_time;
+alter table trip_plan.trip_details drop column latest_arrive_time;
+alter table trip_plan.trip_details drop column commit_time;
+alter table trip_plan.trip_details drop column invoice_type;
+alter table trip_plan.trip_details drop column cabin_class;
+alter table trip_plan.trip_details drop column latest_invoice;
+alter table trip_plan.trip_details drop column full_price;
+alter table trip_plan.trip_details drop column budget_info;
+alter table trip_plan.trip_details drop column trip_detail_info;
+alter table trip_plan.trip_detail_subsidies drop column days;
+
+alter table trip_plan.trip_plans drop column auto_approve_time;
+alter table trip_plan.trip_plans drop column budget_info;

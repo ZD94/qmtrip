@@ -43,7 +43,7 @@
       "id": "cordova-plugin-wechat",
       "locator": "cordova-plugin-wechat",
       "variables": {
-        "WECHATAPPID": "wx07ff1810fe913d17"
+        "WECHATAPPID": "wx5c88d539a0a283ed"
       }
     },
     "cordova-plugin-inappbrowser"

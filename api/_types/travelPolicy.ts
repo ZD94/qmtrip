@@ -68,6 +68,7 @@ export class TravelPolicy extends ModelObject{
     get hotelLevel(): EHotelLevel {return null}
     set hotelLevel(val: EHotelLevel){}
 
+
     @Field({type: Types.DOUBLE})
     get hotelPrice(): number {return null}
     set hotelPrice(hotelPrice: number){}

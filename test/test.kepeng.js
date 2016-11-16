@@ -5,7 +5,17 @@ var glob = require('glob');
 
 require('app-module-path').addPath(path.join(__dirname, '..'));
 
-require.extensions[".ts"] = function(){};
+require('common/node_ts').install(false);
+
+var Logger = require('common/logger');
+Logger.init({
+    path: path.join(__dirname, "../log"),
+    prefix: 'test_',
+    console: true,
+    mods: {
+        sequelize: {console: true}
+    }
+});
 
 //run('./kepeng/esprima.test');
 //run('./kepeng/template.test');
@@ -13,17 +23,13 @@ require.extensions[".ts"] = function(){};
 //run('./kepeng/zone.test');
 //run('./kepeng/zone-stack.test');
 //run('./kepeng/sqltype.test');
-//run('./kepeng/model.test');
+run('./kepeng/model.test');
 //run('./kepeng/model-cluster.test');
 //run('./kepeng/scrub.test');
 //run('./kepeng/html2pdf.test');
-run('./kepeng/ctrip.test');
+//run('./kepeng/ctrip.test');
 
 function run(name){
-    var file = require.resolve(name);
-    if(/\.ts$/.test(file)){
-        require('common/node_ts').install(false);
-    }
     var func = require(name);
     if(typeof func !== 'function')
         return;

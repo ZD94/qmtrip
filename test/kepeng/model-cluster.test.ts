@@ -17,13 +17,6 @@ var config = {
 };
 
 var Logger = require('common/logger');
-Logger.init({
-    path: path.join(__dirname, "log"),
-    console: true,
-    mods: {
-        sequelize: {console: true}
-    }
-});
 var logger = new Logger('test');
 
 var cluster = require('cluster');
