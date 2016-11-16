@@ -128,8 +128,8 @@ export class Supplier extends ModelObject{
             },
         })
 
-        if(res.body && res.body.fpairinfo && res.body.fpairinfo.length){
-            var arr = res.body.fpairinfo;
+        if(res.fpairinfo && res.fpairinfo.length){
+            var arr = res.fpairinfo;
             var code = arr[0].code;
             return code;
         }
@@ -151,8 +151,8 @@ export class Supplier extends ModelObject{
             },
         })
 
-        if(res.body && res.body.keywords && res.body.keywords.length){
-            var arr = res.body.keywords;
+        if(res.keywords && res.keywords.length){
+            var arr = res.keywords;
             var cityCode = arr[0].region['cid'];
             var cityPy = arr[0].region['cengname'];
             return cityPy + cityCode;
