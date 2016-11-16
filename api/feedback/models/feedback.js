@@ -13,7 +13,7 @@ module.exports = function (Db, DataType) {
         companyName      : {type: DataType.STRING(50),       field: "company_name"}, //企业名
         userId       : {type: DataType.UUID,        field: "user_id"}, //反馈人ID
         isAnonymity  : {type: DataType.BOOLEAN,    field: "is_anonymity", defaultValue: false}, //是否匿名
-        createdAt     : {type: "timestamp",         field: "created_at", defaultValue: now} //创建时间
+        createdAt     : {type: DataType.DATE,         field: "created_at", defaultValue: now} //创建时间
     }, {
         tableName : "feedback",
         timestamps: false,
