@@ -88,10 +88,30 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
             $scope.load_third = false;
         }
     },200)
+    if(window.cordova){
+        console.log(cordova);
+
+    }
+
 
     let timeout = $timeout(function(){
         if($scope.reserveType == "travel"){
-            window.open(supplier.trafficBookLink, '_self');
+            //window.open(supplier.trafficBookLink, '_self');
+            console.log("enter");
+            if(window.cordova){
+                let ctripCss = require('./ctrip.scss').tag;
+                let ctripJs = 'var a=4,b=5;console.log(a+b);var btn = document.getElementsByClassName("g_btn_s")[0];console.log(btn.innerHTML)';
+                console.log(ctripJs);
+                var ref = window.cordova.InAppBrowser.open('http://m.ctrip.com/webapp/train/','_blank','location=no,hardwareback=no');
+                ref.addEventListener('loadstop', function(){
+                    //ref.insertCSS({file: "ctrip.css"});
+                    //http://m.ctrip.com/html5/ctrip.css
+                    ref.insertCSS({code: ctripCss.innerHTML});
+                    ref.executeScript({code: ctripJs});
+                })
+            }else{
+                window.open(supplier.trafficBookLink, '_self');
+            }
         }else if($scope.reserveType == "hotel"){
             window.open(supplier.hotelBookLink, '_self');
         }
@@ -100,7 +120,7 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
             $interval.cancel(interval);
             interval = undefined;
         }
-    },3000)
+    },5000)
 
     $scope.$on('$destroy', function(){
         $timeout.cancel(timeout);
