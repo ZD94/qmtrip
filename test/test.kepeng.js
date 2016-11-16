@@ -9,7 +9,8 @@ require('common/node_ts').install(false);
 
 var Logger = require('common/logger');
 Logger.init({
-    path: path.join(__dirname, "log"),
+    path: path.join(__dirname, "../log"),
+    prefix: 'test_',
     console: true,
     mods: {
         sequelize: {console: true}
