@@ -83,8 +83,8 @@ export class Supplier extends ModelObject{
             await API.onload();
         }
         if(this.name.indexOf("携程") >= 0){
-            var fromCityCode = await API.company.supplierQueryFlightCityCode(options.fromCityName);
-            var toCityCode = await API.company.supplierQueryFlightCityCode(options.toCityName);
+            var fromCityCode = await this.queryFlightCityCode(options.fromCityName);
+            var toCityCode = await this.queryFlightCityCode(options.toCityName);
             var values = {fromCityCode: fromCityCode, toCityCode: toCityCode, departDate: options.leaveDate};
             var template = "http://m.ctrip.com/html5/flight/flight-list.html?triptype=1&dcode=<%=fromCityCode%>&acode=<%=toCityCode%>&ddate=<%=departDate%>";
             var temp = _.template(template);
@@ -102,7 +102,7 @@ export class Supplier extends ModelObject{
             await API.onload();
         }
         if(this.name.indexOf("携程") >= 0){
-            var cityInfo = await API.company.supplierQueryHotelCityCode(options.cityName);
+            var cityInfo = await this.queryHotelCityCode(options.cityName);
             var values = {cityInfo: cityInfo};
             var template = "http://m.ctrip.com/webapp/hotel/<%=cityInfo%>/?fr=index";
             var temp = _.template(template);
@@ -113,8 +113,9 @@ export class Supplier extends ModelObject{
         }
     }
 
-    /*@RemoteCall()
+    @RemoteCall()
     async queryFlightCityCode(cityName: string): Promise<string>{
+        var requestPromise = require('request-promise');
         var res = await requestPromise.post({
             json: true,
             uri: 'https://sec-m.ctrip.com/restapi/soa2/11783/Flight/Common/FlightSimilarNearAirportSearch/Query?_fxpcqlniredt=09031117210396050637',
@@ -137,6 +138,7 @@ export class Supplier extends ModelObject{
 
     @RemoteCall()
     async queryHotelCityCode(cityName: string): Promise<string>{
+        var requestPromise = require('request-promise');
         var res = await requestPromise.post({
             uri: 'http://m.ctrip.com/restapi/soa2/10932/hotel/static/destinationget?_fxpcqlniredt=09031117210396050637',
             json: true,
@@ -156,6 +158,6 @@ export class Supplier extends ModelObject{
             return cityPy + cityCode;
         }
         return "";
-    }*/
+    }
 
 }
