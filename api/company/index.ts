@@ -8,6 +8,7 @@ let C = require("config");
 let API = require("common/api");
 let Logger = require('common/logger');
 let logger = new Logger('company');
+import requestPromise = require('request-promise');
 
 import {requireParams, clientExport} from "common/api/helper";
 import {Models} from "api/_types";
@@ -481,6 +482,50 @@ class CompanyModule {
         })
         return {ids: ids, count: paginate['total']};
     }
+
+    static async supplierQueryFlightCityCode(cityName: string): Promise<string>{
+        var res = await requestPromise.post({
+            json: true,
+            uri: 'https://sec-m.ctrip.com/restapi/soa2/11783/Flight/Common/FlightSimilarNearAirportSearch/Query?_fxpcqlniredt=09031117210396050637',
+            form: {
+                head: {},
+                key: cityName,
+            },
+            headers: {
+                'Referer': 'http://m.ctrip.com/html5/flight/matrix.html',
+            },
+        })
+
+        if(res.body && res.body.fpairinfo && res.body.fpairinfo.length){
+            var arr = res.body.fpairinfo;
+            var code = arr[0].code;
+            return code;
+        }
+        return "";
+    }
+
+    static async supplierQueryHotelCityCode(cityName: string): Promise<string>{
+        var res = await requestPromise.post({
+            uri: 'http://m.ctrip.com/restapi/soa2/10932/hotel/static/destinationget?_fxpcqlniredt=09031117210396050637',
+            json: true,
+            form:{
+                head:{},
+                word: cityName,
+            },
+            headers: {
+                'Referer': 'http://m.ctrip.com/webapp/hotel/citylist',
+            },
+        })
+
+        if(res.body && res.body.keywords && res.body.keywords.length){
+            var arr = res.body.keywords;
+            var cityCode = arr[0].region['cid'];
+            var cityPy = arr[0].region['cengname'];
+            return cityPy + cityCode;
+        }
+        return "";
+    }
+
     /*************************************供应商end***************************************/
 
 }

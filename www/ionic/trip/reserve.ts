@@ -2,6 +2,8 @@ import { ETripType, TripDetail, EPlanStatus } from 'api/_types/tripPlan';
 import { Staff } from 'api/_types/staff/staff';
 import { ESupplierType } from 'api/_types/company/supplier';
 
+let moment = require("moment");
+
 export async function ReserveController($scope, Models, $stateParams){
     require('./reserve.scss');
     var compnySuppliers = [];
@@ -50,6 +52,15 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     $scope.getOddBudget = getOddBudget;
     var supplier = await Models.supplier.get($stateParams.supplier);
     $scope.supplier = supplier;
+
+
+    /*var airTicketLink = await supplier.getAirTicketReserveLink({fromCityName: budget.deptCity, toCityName: budget.arrivalCity, leaveDate: moment(budget.deptDateTime).format('YYYY-MM-DD') });
+    console.info(airTicketLink);
+    console.info("airTicketLink========");
+
+    var hotelLink = await supplier.getHotelReserveLink({cityName: budget.arrivalCity});
+    console.info(hotelLink);
+    console.info("hotelLink==========");*/
 
     API.require("place")
     await API.onload();
