@@ -481,6 +481,7 @@ class CompanyModule {
         })
         return {ids: ids, count: paginate['total']};
     }
+
     /*************************************供应商end***************************************/
 
 }
