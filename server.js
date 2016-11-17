@@ -61,6 +61,7 @@ server.api_config = config.api;
 server.on('init.api', function(API){
     API.registerAuthWeb(API.auth.authentication);
 });
+
 server.on('init.http', function(server){
     if(config.debug){
         var shoe = require('shoe');

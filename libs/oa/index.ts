@@ -10,7 +10,7 @@ import {AutoPlugin} from "./plugin/auto";
 // import {DDTalkPlugin} from "./plugin/ddtalk/index";
 
 export const EVENT = {
-    NEW_TRAVEL_BUDGET: 'NEW_TRAVEL_BUDGET',
+    // NEW_TRAVEL_BUDGET: 'NEW_TRAVEL_BUDGET',
     NEW_TRIP_APPROVE: 'NEW_TRIP_APPROVE',
     NEW_TRIP_INVOICE_AUDIT: 'NEW_TRIP_INVOICE_AUDIT',
     TRIP_APPROVE_UPDATE: 'TRIP_APPROVE_UPDATE',
@@ -46,7 +46,7 @@ export function __initHttpApp(app) {
         }
         let fn = plugins[oa][method];
         if ( fn && typeof fn == 'function') {
-            console.info('OA返回的数据===>', data)
+            // console.info('OA返回的数据===>', data)
             fn.bind(plugins[oa])(null, data);
         }
         res.send('success');
@@ -58,10 +58,18 @@ function regPluginCallback() {
         let plugin: IOAPlugin= plugins[key];
         //出差预算审核状态变动后通知
         plugin.$regTripApproveUpdateCb((err, result) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
             emitter.emit(EVENT.TRIP_APPROVE_UPDATE, result);
         })
         //票据审核状态变动后通知
         plugin.$regTripInvoiceAuditUpdateCb( (err, result) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
             emitter.emit(EVENT.TRIP_INVOICE_AUDIT_UPDATE, result);
         })
     }

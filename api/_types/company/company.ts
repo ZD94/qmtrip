@@ -159,6 +159,10 @@ export class Company extends ModelObject{
     get isAppointSupplier(): boolean { return false; }
     set isAppointSupplier(val: boolean) {}
 
+    @Field({type: Types.STRING(50)})
+    get oa() { return null}
+    set oa(oa: string) {}
+
     getStaffs(options?: any): Promise<Staff[]> {
         if(!options) {options = {where: {}}};
         if(!options.where) {options.where = {}};

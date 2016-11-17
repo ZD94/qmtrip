@@ -21,6 +21,7 @@ import {TravelBudgetLog} from "api/_types/travelbudget";
 import {DDTalkCorp, DDTalkUser} from "api/_types/ddtalk";
 import {CoinAccount, CoinAccountChange} from "api/_types/coin";
 import {TripDetailInvoice, TripDetailHotel, TripDetailTraffic, TripDetailSubsidy, TripDetailSpecial} from "api/_types/tripPlan";
+import {Approve} from "api/_types/approve";
 
 const API = require('common/api');
 
@@ -83,9 +84,10 @@ var Services = {
     agencyUser: { type: AgencyUser, modname: 'agency',
         funcs: ['getAgencyUser', 'listAgencyUser', 'createAgencyUser', 'updateAgencyUser', 'deleteAgencyUser']
     },
-    tripApprove: { type: TripApprove, modname: 'tripPlan',
+    tripApprove: { type: TripApprove, modname: 'tripApprove',
         funcs: ['getTripApprove', 'getTripApproves', 'saveTripApprove', 'updateTripApprove', 'deleteTripApprove']
     },
+    approve: { type: Approve, modname: 'approve', funcs: [null, null, 'submitApprove']},
     tripPlan: { type: TripPlan, modname: 'tripPlan',
         funcs: ['getTripPlan', 'listTripPlans', 'saveTripPlan', 'updateTripPlan', 'deleteTripPlan']
     },
@@ -163,6 +165,7 @@ class ClientModels implements ModelsInterface {
     moneyChange: ModelRemote<MoneyChange>;
     project: ModelRemote<Project>;
     tripApprove: ModelRemote<TripApprove>;
+    approve: ModelRemote<Approve>;
     //place: ModelRemote<Place>;
     account: ModelRemote<Account>;
     seed: ModelRemote<Seed>;
@@ -206,6 +209,7 @@ class ClientModels implements ModelsInterface {
         this.tripDetailHotel = createService<TripDetailHotel>(Services.tripDetailHotel, $cacheFactory);
         this.tripDetailSubsidy = createService<TripDetailSubsidy>(Services.tripDetailSubsidy, $cacheFactory);
         this.tripDetailSpecial = createService<TripDetailSpecial>(Services.tripDetailSpecial, $cacheFactory);
+        this.approve = createService<Approve>(Services.approve, $cacheFactory);
         initModels(this);
 
         API.on('beforeConnect', this.clearCache.bind(this));

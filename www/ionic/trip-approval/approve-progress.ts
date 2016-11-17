@@ -1,4 +1,4 @@
-import { EApproveStatus, EApproveResult2Text } from 'api/_types/tripPlan';
+import { QMEApproveStatus, EApproveResult2Text } from 'api/_types/tripPlan';
 export async function ApproveProgressController ($scope, Models, $stateParams){
     require('./approve-progress.scss');
     let approveId = $stateParams.approveId;
@@ -7,7 +7,7 @@ export async function ApproveProgressController ($scope, Models, $stateParams){
     $scope.$watch('tripApprove.status', function(n, o){
         getLogs ();
     });
-    $scope.EApproveStatus = EApproveStatus;
+    $scope.EApproveStatus = QMEApproveStatus;
     $scope.APPROVE_LOG_TEXT = EApproveResult2Text;
     async function getLogs (){
         let logs = await tripApprove.getApproveLogs();

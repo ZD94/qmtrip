@@ -18,6 +18,7 @@ import {TravelBudgetLog} from "api/_types/travelbudget";
 import {DDTalkCorp, DDTalkUser} from "api/_types/ddtalk";
 import {CoinAccount, CoinAccountChange} from "./_types/coin";
 import {TripDetailSubsidy, TripDetailSpecial} from "./_types/tripPlan/tripDetailInfo";
+import {Approve} from "./_types/approve/index";
 
 initModels({
     staff: createServerService<Staff>(Staff),
@@ -45,6 +46,7 @@ initModels({
     moneyChange: createServerService<MoneyChange>(MoneyChange),
     project: createServerService<Project>(Project),
     tripApprove: createServerService<TripApprove>(TripApprove),
+    approve: createServerService<Approve>(Approve),
     account: createServerService<Account>(Account),
     seed: createServerService<Seed>(Seed),
     token: createServerService<Token>(Token),

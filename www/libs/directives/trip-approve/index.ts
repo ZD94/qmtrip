@@ -5,7 +5,7 @@
 
 import angular = require("angular");
 import moment = require('moment');
-import {EApproveStatus, EApproveStatus2Text, EInvoiceType, ETripType, MTxPlaneLevel} from "api/_types/tripPlan";
+import {QMEApproveStatus, EApproveStatus2Text, EInvoiceType, ETripType, MTxPlaneLevel} from "api/_types/tripPlan";
 angular
     .module('nglibs')
     .directive('tripApprove', function(){
@@ -21,7 +21,7 @@ angular
                 click: '='
             },
             controller: function($scope, $ionicPopup) {
-                $scope.EApproveStatus = EApproveStatus;
+                $scope.EApproveStatus = QMEApproveStatus;
                 $scope.showHeader = $scope.showHeaderTxt != 'false';
                 $scope.showDetailStatus = Boolean($scope.showDetailStatus);
                 $scope.click = $scope.click || function(trip) { console.info('click me...');}
@@ -52,7 +52,7 @@ angular
                 tripApprove: '=approve',
             },
             controller: function($scope) {
-                $scope.EApproveStatus = EApproveStatus;
+                $scope.EApproveStatus = QMEApproveStatus;
                 $scope.APPROVE_TEXT = EApproveStatus2Text;
             }
         }

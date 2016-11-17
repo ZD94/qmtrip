@@ -3,7 +3,6 @@
  */
 
 'use strict';
-import {EPlanStatus, EApproveStatus} from 'api/_types/tripPlan/tripPlan';
 
 export interface createTripApproveParam {
     approveNo: string;  //审核单号

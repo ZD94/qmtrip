@@ -7,7 +7,8 @@ import {
     AbstractOAPlugin, createTripApproveParam, createTripApproveResult, regTripApproveUpdateCbParam,
     createTripInvoiceAuditFlowParam, createTripInvoiceAuditFlowResult, regTripInvoiceAuditUpdateCbParam
 } from "./index";
-import {EApproveStatus} from "api/_types/tripPlan/tripPlan";
+
+import {EApproveStatus} from "api/_types/approve";
 import {EInvoiceStatus} from "api/_types/tripPlan/index";
 
 export class AutoPlugin extends AbstractOAPlugin {
@@ -24,9 +25,9 @@ export class AutoPlugin extends AbstractOAPlugin {
 
         //1秒以后返回结果
         setTimeout(() => {
-            params['status'] = EApproveStatus.PASS;
+            params['status'] = EApproveStatus.SUCCESS;
             params['approveUser'] = '系统';
-            self.tripApproveUpdateNotify(params);
+            self.tripApproveUpdateNotify(null, params);
         }, 1000);
 
         return params as createTripApproveResult;
@@ -39,7 +40,7 @@ export class AutoPlugin extends AbstractOAPlugin {
         setTimeout(() => {
             params['status'] = EInvoiceStatus.AUDIT_PASS;
             params['auditUser'] = '系统';
-            self.tripInvoiceUpdateNotify(params);
+            self.tripInvoiceUpdateNotify(null, params);
         }, 1000);
         return params as createTripInvoiceAuditFlowResult;
     }

@@ -21,6 +21,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
 
     var id = $stateParams.id;
     API.require("travelBudget");
+    API.require("tripApprove");
     await API.onload();
     let result = await API.travelBudget.getBudgetInfo({id: id});
     let budgets = result.budgets;
@@ -95,7 +96,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
 
         try {
             //let staff = await Staff.getCurrent();
-            let tripApprove = await API.tripPlan.saveTripApprove({budgetId: id, title: trip.reason||trip.reasonName, approveUserId: trip.auditUser.id});
+            let tripApprove = await API.tripApprove.saveTripApprove({budgetId: id, title: trip.reason||trip.reasonName, approveUserId: trip.auditUser.id});
             let approveId = tripApprove.id;
             $ionicPopup.show({
                 title: '出差申请已提交',
@@ -143,4 +144,14 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
             $scope.bottomBottomClicked = true;
         }
     })
+
+    $scope.submitApprove = async function() {
+        console.info(Models);
+        API.require("approve");
+        await API.onload();
+        let approve = await API.approve.submitApprove({budgetId: id, approveUser: trip.auditUser});
+        // let approve = await Models.approve.save({budgetId: id});
+        console.info(approve);
+        console.info("finish...")
+    }
 }

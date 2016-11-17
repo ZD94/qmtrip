@@ -6,7 +6,7 @@
 
 import angular = require("angular");
 import {
-    EPlanStatus, EApproveStatus, EInvoiceType, ETripType, MTxPlaneLevel,
+    EPlanStatus, EInvoiceType, ETripType, MTxPlaneLevel,
     getNameByECabin
 } from 'api/_types/tripPlan';
 import moment = require("moment");
