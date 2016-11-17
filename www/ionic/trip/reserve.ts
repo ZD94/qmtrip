@@ -117,6 +117,31 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
 
     }
 
+    let ThemeableBrowserOption = {
+        toolbar: {
+            height: 44,
+            color: '#f0f0f0ff'
+        },
+        title: {
+            color: '#003264ff',
+            staticText: '鲸力商旅',
+        },
+        closeButton: {
+            wwwImage: 'ionic/images/close.png',
+            wwwImagePressed: 'ionic/images/close.png',
+            wwwImageDensity: 2,
+            align: 'left',
+            event: 'closePressed'
+        },
+        backButton: {
+            wwwImage: 'ionic/images/back.png',
+            wwwImagePressed: 'ionic/images/back.png',
+            wwwImageDensity: 2,
+            align: 'left',
+            event: 'backPressed'
+        },
+        backButtonCanClose: true,
+    }
 
     let timeout = $timeout(function(){
 
@@ -127,21 +152,21 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
             //console.log("enter");
             if(window.cordova){
                 //let ctripCss = require('./ctrip.scss').tag;
-                //let ctripJs = 'console.log(window)';
+                //let ctripJs = 'window.screenTop = 30;window.screenY = 50;window.moveTo(50,50);window.outerHeight = 300;console.log(window)';
                 //console.log(ctripJs);
-                let ref = window.cordova['InAppBrowser'].open(supplier.trafficBookLink,'_blank','location=yes');
-                ref.addEventListener('loadstop', function(){
+                let ref = cordova['ThemeableBrowser'].open(supplier.trafficBookLink,'_blank',ThemeableBrowserOption);
+               //ref.addEventListener('loadstop', function(){
                     //ref.insertCSS({file: "ctrip.css"});
                     //http://m.ctrip.com/html5/ctrip.css
                     //ref.insertCSS({code: ctripCss.innerHTML});
                     //ref.executeScript({code: ctripJs});
-                })
+                //})
             }else{
                 window.open(supplier.trafficBookLink, '_self');
             }
         }else if($scope.reserveType == "hotel"){
             if(window.cordova){
-                let ref = window.cordova['InAppBrowser'].open(supplier.hotelBookLink,'_blank','location=yes');
+                let ref = cordova['ThemeableBrowser'].open(supplier.hotelBookLink,'_blank',ThemeableBrowserOption);
             }else{
                 window.open(supplier.hotelBookLink, '_self');
             }
