@@ -103,3 +103,12 @@
   @include flex-nth(none);
   @include flex-last(none);
 }
+
+.fix-flex-height{   //需要子元素height100%的情况下,解决safri会出bug的问题
+  position: relative;
+  &> *{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+  }
+}
