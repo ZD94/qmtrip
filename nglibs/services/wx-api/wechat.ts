@@ -1,4 +1,4 @@
-
+import {observer} from './cordova';
 declare var wx;
 
 var API = require('common/api');
@@ -23,6 +23,8 @@ function wxFunction(funcname) {
 
 var wxChooseImage = wxFunction('chooseImage');
 var wxUploadImage = wxFunction('uploadImage');
+// var wxShareApp = wxFunction('onMenuShareAppMessage');
+// var wxShareTimeline = wxFunction('onMenuShareTimeline');
 
 export class WechatApi {
     $$promise: Promise<any>;
@@ -72,7 +74,34 @@ export class WechatApi {
         let ret = await wxUploadImage(options||{});
         return ret.serverId;
     }
-    setupSharePrivate(options:{title:string; desc:string; link:string; imgUrl:string; type?:string; dataUrl?:string}){
+    async setupSharePrivate(options:{title:string; desc:string; link:string; imgUrl:string; type?:string; dataUrl?:string;shareType?:string}){
+        // if(options.shareType == 'wechat'){
+        //     let app = await wx.onMenuAppMessage({
+        //         title: options.title,
+        //         desc: options.desc,
+        //         link: options.link,
+        //
+        //     },function(){
+        //         observer.tie(this.success);
+        //         this.success.publish('微信');
+        //     },function(reason){
+        //         observer.tie(this.failure);
+        //         this.success.publish('微信');
+        //     });
+        // }
         
+        // let weibo = await wx.onMenuShareQQ(options ||{});
+    }
+    success(sth){
+        alert(sth+'分享成功');
+    }
+    failure(err){
+        alert(err+'分享失败')
+    }
+    async setupSharePublic(options:{title:string; desc:string; link:string; imgUrl:string; type?:string; dataUrl?:string}){
+        let ret = await wx.wxShareTimeline(options ||{})
+    }
+    isInstalled() {
+        return false;
     }
 }
