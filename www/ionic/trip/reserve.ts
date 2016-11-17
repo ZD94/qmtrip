@@ -84,7 +84,7 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     }
 
     //判断是否是携程
-    if(supplier.name == '携程旅行' && $scope.reserveType == "travel"){
+    if(supplier.name == '携程旅行' && $scope.reserveType == "travel" && budget.invoiceType != 0){
         console.log('opopopopopopop');
         console.info({fromCityName: budget.deptCity, toCityName: budget.arrivalCity, leaveDate: moment(budget.deptDateTime).format('YYYY-MM-DD') })
         supplier.trafficBookLink = await supplier.getAirTicketReserveLink({fromCityName: budget.deptCity, toCityName: budget.arrivalCity, leaveDate: moment(budget.deptDateTime).format('YYYY-MM-DD') });
@@ -151,7 +151,7 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
             $interval.cancel(interval);
             interval = undefined;
         }
-    },5000)
+    },3000)
 
     $scope.$on('$destroy', function(){
         $timeout.cancel(timeout);
