@@ -239,6 +239,7 @@ class TripPlanModule {
 
         //给员工发送邮件
         let self_url = `${config.host}/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
+        let appMessageUrl = `#/trip-approval/detail?approveId=${tripApprove.id}`;
         let openid = await API.auth.getOpenIdByAccount({accountId: staff.id});
         let values: any = {
             staffName: staff.name,
@@ -250,6 +251,7 @@ class TripPlanModule {
             otherBudget: subsidy,
             totalBudget: '￥' + tripApprove.budget,
             url: self_url,
+            appMessageUrl: appMessageUrl,
             detailUrl: self_url
         };
         if(!nextApprove){
@@ -257,10 +259,10 @@ class TripPlanModule {
                 //给员工自己发送通知
                 await API.notify.submitNotify({
                     key: 'qm_notify_self_traveludget',
-                    email: staff.email,
-                    values: values,
-                    openid: openid,
+                    accountId: staff.id,
+                    values: values
                 });
+
             } catch(err) {
                 console.error(`发送通知失败`, err);
             }
@@ -276,6 +278,7 @@ class TripPlanModule {
             //给审核人发审核邮件
             let approveUser = tripApprove.approveUser;
             let approve_url = `${config.host}/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
+            let appMessageUrl = `#/trip-approval/detail?approveId=${tripApprove.id}`;
             let approve_values = _.cloneDeep(values);
             let shortUrl = approve_url
             try {
@@ -289,6 +292,7 @@ class TripPlanModule {
             approve_values.email = staff.email;
             approve_values.url = shortUrl;
             approve_values.detailUrl = shortUrl;
+            approve_values.appMessageUrl = appMessageUrl;
             approve_values.name = staff.name;
             approve_values.destination = tripApprove.arrivalCity;
             approve_values.startDate = moment(tripApprove.startAt).format('YYYY.MM.DD');
@@ -317,11 +321,10 @@ class TripPlanModule {
             try {
                 await API.notify.submitNotify({
                     key: 'qm_notify_new_travelbudget',
-                    email: approveUser.email,
-                    values: approve_values,
-                    mobile: approveUser.mobile,
-                    openid: openId,
+                    accountId: approveUser.id,
+                    values: approve_values
                 });
+
             } catch(err) {
                 console.error('发送通知失败', err)
             }
@@ -344,9 +347,10 @@ class TripPlanModule {
                 try {
                     await API.notify.submitNotify({
                         key: 'qm_notify_new_travelbudget',
-                        email: s.email,
+                        accountId: s.id,
                         values: vals
                     });
+
                 } catch(err) {
                     console.error(err);
                 }
@@ -360,37 +364,40 @@ class TripPlanModule {
         let staff = tripApprove.account;
         let company = staff.company;
 
-        let details = await TripPlanModule.getDetailsFromApprove({approveId: tripApprove.id});
-        let {go, back, hotel, subsidy} = await TripPlanModule.getEmailInfoFromDetails(details);
-        let timeFormat = 'YYYY-MM-DD HH:mm:ss';
+        if(company.name != "鲸力智享"){
+            let details = await TripPlanModule.getDetailsFromApprove({approveId: tripApprove.id});
+            let {go, back, hotel, subsidy} = await TripPlanModule.getEmailInfoFromDetails(details);
+            let timeFormat = 'YYYY-MM-DD HH:mm:ss';
 
-        let values: any = {
-            time: moment(tripApprove.createdAt).format(timeFormat),
-            projectName: tripApprove.title,
-            goTrafficBudget: go,
-            backTrafficBudget: back,
-            hotelBudget: hotel,
-            otherBudget: subsidy,
-            totalBudget: '￥' + tripApprove.budget,
-            userName : staff.name,
-            email : staff.email
-        };
+            let values: any = {
+                time: moment(tripApprove.createdAt).format(timeFormat),
+                projectName: tripApprove.title,
+                goTrafficBudget: go,
+                backTrafficBudget: back,
+                hotelBudget: hotel,
+                otherBudget: subsidy,
+                totalBudget: '￥' + tripApprove.budget,
+                userName : staff.name,
+                email : staff.email
+            };
 
-        try {
-            await Promise.all(systemNoticeEmails.map(async function(s) {
-                values.name = s.name;
-                try {
-                    await API.notify.submitNotify({
-                        key: 'qm_notify_system_new_travelbudget',
-                        email: s.email,
-                        values: values
-                    })
-                } catch(err) {
-                    console.error(err);
-                }
-            }));
-        } catch(err) {
-            console.error('发送系统通知失败', err)
+            try {
+                await Promise.all(systemNoticeEmails.map(async function(s) {
+                    values.name = s.name;
+                    try {
+                        await API.notify.submitNotify({
+                            key: 'qm_notify_system_new_travelbudget',
+                            email: s.email,
+                            values: values
+                        })
+
+                    } catch(err) {
+                        console.error(err);
+                    }
+                }));
+            } catch(err) {
+                console.error('发送系统通知失败', err)
+            }
         }
         return true;
     }
@@ -681,17 +688,21 @@ class TripPlanModule {
         }else{
             //发送审核结果邮件
             let self_url;
+            let appMessageUrl;
             if (tripApprove.status == EApproveStatus.PASS) {
                 self_url = config.host + '/index.html#/trip/list-detail?tripid=' + tripApprove.id;
+                appMessageUrl = '#/trip/list-detail?tripid=' + tripApprove.id;
             } else {
                 self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
+                appMessageUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
             }
             let user = tripApprove.account;
             if(!user) user = await Models.staff.get(tripApprove['accountId']);
             let go = {},back = {},hotel = {},subsidy = {};
-            let self_values = {};
+            let self_values: any = {};
             try {
                 self_url = await API.wechat.shorturl({longurl: self_url});
+                appMessageUrl = await API.wechat.shorturl({longurl: appMessageUrl});
             } catch(err) {
                 console.error(err);
             }
@@ -715,6 +726,7 @@ class TripPlanModule {
                     totalBudget: '￥' + tripPlan.budget,
                     url: self_url,
                     detailUrl: self_url,
+                    appMessageUrl: appMessageUrl,
                     time: moment(tripPlan.startAt).format('YYYY-MM-DD'),
                     destination: tripPlan.arrivalCity,
                     staffName: user.name,
@@ -747,6 +759,7 @@ class TripPlanModule {
                     totalBudget: '￥' + tripApprove.budget,
                     url: self_url,
                     detailUrl: self_url,
+                    appMessageUrl: appMessageUrl,
                     time: moment(tripApprove.startAt).format('YYYY-MM-DD'),
                     destination: tripApprove.arrivalCity,
                     staffName: user.name,
@@ -759,7 +772,8 @@ class TripPlanModule {
                 };
             }
             try {
-                await API.notify.submitNotify({email: user.email, key: tplName, values: self_values, mobile: user.mobile, openid: openId});
+                await API.notify.submitNotify({accountId: user.id, key: tplName, values: self_values});
+
             } catch(err) { console.error(err);}
             try {
                 await API.ddtalk.sendLinkMsg({ accountId: user.id, text: '您的预算已经审批通过', url: self_url});
@@ -858,10 +872,11 @@ class TripPlanModule {
 
             let company = await tripPlan.getCompany();
             let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
+            let appMessageUrl = `#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
             let {go, back, hotel, subsidy} = await TripPlanModule.getPlanEmailDetails(tripPlan);
             let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
             let auditValues = {username: user.name, time:tripPlan.createdAt, auditUserName: user.name, companyName: company.name, staffName: staff.name, projectName: tripPlan.title, goTrafficBudget: go,
-                backTrafficBudget: back, hotelBudget: hotel, otherBudget: subsidy, totalBudget: tripPlan.budget, url: auditUrl, detailUrl: auditUrl,
+                backTrafficBudget: back, hotelBudget: hotel, otherBudget: subsidy, totalBudget: tripPlan.budget, appMessageUrl: appMessageUrl, url: auditUrl, detailUrl: auditUrl,
                 approveUser: user.name, tripPlanNo: tripPlan.planNo,
                 content: `企业 ${company.name} 员工 ${staff.name}${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差计划票据已提交，预算：￥${tripPlan.budget}，等待您审核！`,
                 createdAt: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
@@ -870,8 +885,7 @@ class TripPlanModule {
                 await API.notify.submitNotify({
                     key: 'qm_notify_agency_budget',
                     values: auditValues,
-                    email: default_agency.manager_email,
-                    openid: openId,
+                    accountId: default_agency.id
                 })
             } catch(err) { console.error(err);}
 
@@ -1008,6 +1022,7 @@ class TripPlanModule {
 
             let {go, back, hotel, subsidy} = await TripPlanModule.getPlanEmailDetails(tripPlan);
             let self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
+            let appMessageUrl = `#/trip/list-detail?tripid=${tripPlan.id}`;
 
             templateValue.ticket = templateValue.tripType;
             templateValue.username = staff.name;
@@ -1017,12 +1032,14 @@ class TripPlanModule {
             templateValue.otherBudget = subsidy;
             templateValue.detailUrl = self_url;
             templateValue.url = self_url;
+            templateValue.appMessageUrl = appMessageUrl;
             templateValue.auditUser = '鲸力商旅';
             templateValue.auditTime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
 
             let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
             try {
-                await API.notify.submitNotify({key: templateName, values: templateValue, email: staff.email, openid: openId});
+                await API.notify.submitNotify({key: templateName, values: templateValue, accountId: staff.id});
+
             } catch(err) {
                 console.error(`发送通知失败:`, err);
             }
@@ -2005,7 +2022,7 @@ class TripPlanModule {
         try {
             await API.notify.submitNotify({
                 key: 'qm_spend_report',
-                email: staff.email,
+                accountId: staff.id,
                 values: {
                     title: title,
                     attachments: [{
@@ -2015,6 +2032,7 @@ class TripPlanModule {
                     }]
                 },
             });
+
         } catch(err) {
             console.error(err.stack);
         }

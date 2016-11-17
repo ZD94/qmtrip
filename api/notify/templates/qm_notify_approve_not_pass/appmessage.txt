@@ -1,0 +1,1 @@
+<%=account.name || '' %>,您好<br/>您的出差计划<%=planNo || '' %>审批未通过，原因：<%=emailReason || '' %>，<br/>审批人：<%=approveUser || '' %>，审批时间：<%=approveTime || '' %>

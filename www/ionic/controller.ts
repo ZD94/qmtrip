@@ -40,6 +40,13 @@ var staffMenus = [
         title: '出差请示',
         link: 'trip-approval/list',
         badgeNum: 0
+    },
+    {
+        id: 1056,
+        icon: 'paintbrush',
+        title: '通知通告',
+        link: 'notice/',
+        badgeNum: 0
     }
 ];
 
