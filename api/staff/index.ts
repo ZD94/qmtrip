@@ -274,43 +274,27 @@ class StaffModule{
             let upDept = await Models.department.get(updateStaff["departmentId"]);
 
             let vals  = {
-                username: updateStaff.name,
-                mobile: updateStaff.mobile,
                 travelPolicy: tp ? tp.name: '',
-                time: new Date(),
-                companyName: updateStaff.company.name,
-                department: upDept ? upDept.name : (defaultDept ? defaultDept.name : "我的企业"),
+                time: moment().format('YYYY-MM-DD:hh:mm:ss'),
+                appMessageUrl: '#/staff/edit?staffId='+updateStaff.id,
                 permission: updateStaff.roleId == EStaffRole.ADMIN ? "管理员" : (updateStaff.roleId == EStaffRole.OWNER ? "创建者" : "普通员工"),
-                staffStatus: updateStaff.staffStatus == 0 ? "禁用" : "启用"
             }
 
-            /*//得到通知内容
-             var {content, theme} = await API.notify.getSubmitNotifyContent({
-             key: 'staff_update',
-             values: vals,
-             email: updateStaff.email
-             });
-             var notice = Notice.create();
-             notice.theme = theme;
-             notice.content = content;
-             notice.staff = updateStaff;
-             notice.link = config.host + "/index.html#/staff/edit?staffId="+updateStaff.id;
-             await notice.save();*/
 
             //发送通知
             await API.notify.submitNotify({
                 key: 'staff_update',
                 values: vals,
-                email: updateStaff.email
+                accountId: updateStaff.id
             });
 
-            var options = {
+            /*var options = {
                 key: 'staff_update',
                 values: vals,
                 email: updateStaff.email
             };
             var link = config.host + "/index.html#/staff/edit?staffId="+updateStaff.id;
-            await API.notice.recordNotice({optins: options, staffId: updateStaff.id, link: link});
+            await API.notice.recordNotice({optins: options, staffId: updateStaff.id, link: link});*/
         }
         return updateStaff;
     }

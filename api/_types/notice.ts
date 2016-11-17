@@ -39,6 +39,10 @@ export class Notice extends ModelObject{
     get content(): string { return null; }
     set content(val: string) {}
 
+    @Field({type: Types.TEXT})
+    get description(): string { return null; }
+    set description(val: string) {}
+
     @Field({type: Types.STRING})
     get link(): string { return null; }
     set link(val: string) {}

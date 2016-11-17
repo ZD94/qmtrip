@@ -6,6 +6,8 @@
 require('app-module-path').addPath(__dirname);
 require('common/node_ts').install();
 
+
+
 Error.stackTraceLimit = 40;
 var zone = require('common/zone');
 
@@ -18,6 +20,8 @@ Promise.promisifyAll(require("redis"));
 Promise.promisifyAll(require("fs"));
 
 var config = require("./config");
+
+require("common/redis-client").init(config.redis.url);
 
 Promise.config({ warnings: false });
 if(config.debug) {

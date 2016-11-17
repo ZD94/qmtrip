@@ -1,0 +1,27 @@
+{
+  "template_id":"<%=templateId || '' %>",
+  "url":"<%=url || '' %>",
+  "topcolor":"#FF0000",
+  "data":{
+    "first": {
+      "value":"您提交的出差票据已审核通过",
+      "color":"#173177"
+    },
+    "keyword1":{
+      "value":"<%=invoiceDetail || '' %>",
+      "color":"#173177"
+    },
+    "keyword2":{
+      "value":"<%=auditUser || '' %>",
+      "color":"#173177"
+    },
+    "keyword3":{
+      "value":"<%=auditTime || '' %>",
+      "color":"#173177"
+    },
+    "remark":{
+      "value":"点击查看详情",
+      "color":"#173177"
+    }
+  }
+}

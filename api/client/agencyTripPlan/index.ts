@@ -234,6 +234,7 @@ export function approveInvoice(params){
             }
             orderTime = moment(orderTime).format('YYYY-MM-DD');
             let url = config.host + '/staff.html#/travelPlan/PlanDetail?tripPlanId=' + order.id;
+            let appMessageUrl = '#/travelPlan/PlanDetail?tripPlanId=' + order.id;
 
             let key;
             let values: any = {
@@ -246,6 +247,7 @@ export function approveInvoice(params){
                 hotelBudget: hotel,
                 totalBudget: '全麦预算￥'+order.budget,
                 url: url,
+                appMessageUrl: appMessageUrl,
                 detailUrl: url
             }
 
@@ -285,17 +287,10 @@ export function approveInvoice(params){
                         //发送通知给用户
                         await API.notify.submitNotify({
                             key: key,
-                            email: staffEmail,
-                            values: values,
+                            accountId: staffId,
+                            values: values
                         });
 
-                        var options = {
-                            key: key,
-                            email: staffEmail,
-                            values: values,
-                        };
-                        var link = values.url;
-                        await API.notice.recordNotice({optins: options, staffId: staffId, link: link});
                     }
                     return ret;
                 })

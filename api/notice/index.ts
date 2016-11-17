@@ -105,8 +105,6 @@ class NoticeModule{
             options.where.staffId = staff.id;//只允许查询员工自己的通知通告
         }
         let paginate = await Models.notice.find(options);
-        console.info(paginate);
-        console.info("===========");
         let ids =  paginate.map(function(t){
             return t.id;
         })

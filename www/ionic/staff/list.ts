@@ -29,13 +29,16 @@ export default async function ListController($scope, Models, $ionicPopup) {
     $scope.vm = vm;
     
     function loadStaffs(pager) {
-        pager.forEach(function(staff){
-            var obj = {staff: staff, role: ""};
-            if (obj.staff.roleId == EStaffRole.OWNER) {
-                obj.role = '创建者';
-            }
-            $scope.staffs.push(obj);
-        });
+        if(pager && pager.length>0){
+            pager.forEach(function(staff){
+                var obj = {staff: staff, role: ""};
+                if (obj.staff.roleId == EStaffRole.OWNER) {
+                    obj.role = '创建者';
+                }
+                $scope.staffs.push(obj);
+            });
+        }
+
     }
     /*$scope.staffs = staffs.map(function (staff) {
         var obj = {staff: staff, role: ""};
