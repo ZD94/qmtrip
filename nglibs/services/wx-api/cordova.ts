@@ -6,47 +6,6 @@ var dyload = require('dyload');
 var browserspec = require('browserspec');
 
 
-// function wxFunction(funcname) {
-//     return function (option?: any) {
-//         return new Promise(function (resolve, reject) {
-//             option.success = resolve;
-//             option.fail = reject;
-//             Wechat[funcname](option);
-//         })
-//     }
-// }
-
-// var auth = wxFunction('auth'); // 打开微信
-// var isInstalled = wxFunction('isInstalled'); //判断是否安装微信app
-// var share = wxFunction('share'); //分享到微信
-// var wxUploadImage = wxFunction('uploadImage');
-
-export var observer = {
-    tie:function(obj){
-        for(var i in this){
-            obj[i] = this[i];
-            obj.tieList = [];
-        }
-    },
-    addLisener:function(obj){
-        this.tieList[this.tieList.length] = obj;
-    },
-    removeLisener:function(obj){
-        for(var i=0;i<=this.tieList.length;i++){
-            if(this.tieList[i] == obj){
-                this.tieList[i].splice(i,1);
-            }
-        }
-    },
-    publish:function(sth){
-        for(var i= 0; i<=this.tieList.length;i++){
-            if(typeof this.tieList[i] === 'function'){
-                this.tieList[i](sth);
-            }
-        }
-    }
-}
-
 export class WechatCordovaApi {
     successCbs;
     cancelCbs;

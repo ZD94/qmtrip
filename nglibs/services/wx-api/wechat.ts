@@ -1,4 +1,5 @@
-import {observer} from './cordova';
+// import {observer} from './cordova';
+import reject = require("lodash/reject");
 declare var wx;
 
 var API = require('common/api');
@@ -9,7 +10,6 @@ var wxload;
 if(browserspec.is_wechat) {
     wxload = dyload("//res.wx.qq.com/open/js/jweixin-1.0.0.js");
 }
-
 
 function wxFunction(funcname) {
     return function(option){
@@ -23,10 +23,11 @@ function wxFunction(funcname) {
 
 var wxChooseImage = wxFunction('chooseImage');
 var wxUploadImage = wxFunction('uploadImage');
-// var wxShareApp = wxFunction('onMenuShareAppMessage');
-// var wxShareTimeline = wxFunction('onMenuShareTimeline');
 
 export class WechatApi {
+    constructor(private $rootScope: angular.IRootScopeService){
+
+    }
     $$promise: Promise<any>;
     $resolved = false;
     $resolve() : Promise<any> {
@@ -74,32 +75,71 @@ export class WechatApi {
         let ret = await wxUploadImage(options||{});
         return ret.serverId;
     }
-    async setupSharePrivate(options:{title:string; desc:string; link:string; imgUrl:string; type?:string; dataUrl?:string;shareType?:string}){
-        // if(options.shareType == 'wechat'){
-        //     let app = await wx.onMenuAppMessage({
-        //         title: options.title,
-        //         desc: options.desc,
-        //         link: options.link,
-        //
-        //     },function(){
-        //         observer.tie(this.success);
-        //         this.success.publish('微信');
-        //     },function(reason){
-        //         observer.tie(this.failure);
-        //         this.success.publish('微信');
-        //     });
-        // }
-        
-        // let weibo = await wx.onMenuShareQQ(options ||{});
-    }
-    success(sth){
-        alert(sth+'分享成功');
-    }
-    failure(err){
-        alert(err+'分享失败')
+    setupSharePrivate(options:{title:string; desc:string; link:string; imgUrl:string; type?:string; dataUrl?:string;}){
+        var _self = this;
+        wx.onMenuShareAppMessage({
+            title: options.title,
+            desc: options.desc,
+            link: options.link,
+            imgUrl: options.imgUrl,
+            success:function(){
+                _self.$rootScope.$broadcast('WechatShareSuccessed', 'App');
+            },
+            cancel:function(){
+                _self.$rootScope.$broadcast('WechatShareCanceled', 'App');
+            }
+        });
+        wx.onMenuShareQQ({
+            title: options.title,
+            desc: options.desc,
+            link: options.link,
+            imgUrl: options.imgUrl,
+            success:function(){
+                _self.$rootScope.$broadcast('WechatShareSuccessed', 'QQ');
+            },
+            cancel:function(){
+                _self.$rootScope.$broadcast('WechatShareCanceled', 'QQ');
+            }
+        });
     }
     async setupSharePublic(options:{title:string; desc:string; link:string; imgUrl:string; type?:string; dataUrl?:string}){
-        let ret = await wx.wxShareTimeline(options ||{})
+        var _self = this;
+        wx.wxShareTimeline({
+            title: options.title,
+            desc: options.desc,
+            link: options.link,
+            imgUrl: options.imgUrl,
+            success:function(){
+                _self.$rootScope.$broadcast('WechatShareSuccessed', 'Timeline');
+            },
+            cancel:function(){
+                _self.$rootScope.$broadcast('WechatShareCanceled', 'Timeline');
+            }
+        })
+        wx.onMenuShareWeibo({
+            title: options.title,
+            desc: options.desc,
+            link: options.link,
+            imgUrl: options.imgUrl,
+            success:function(){
+                _self.$rootScope.$broadcast('WechatShareSuccessed', 'Weibo');
+            },
+            cancel:function(){
+                _self.$rootScope.$broadcast('WechatShareCanceled', 'Weibo');
+            }
+        })
+        wx.onMenuShareQZone({
+            title: options.title,
+            desc: options.desc,
+            link: options.link,
+            imgUrl: options.imgUrl,
+            success:function(){
+                _self.$rootScope.$broadcast('WechatShareSuccessed', 'QZone');
+            },
+            cancel:function(){
+                _self.$rootScope.$broadcast('WechatShareCanceled', 'QZone');
+            }
+        })
     }
     isInstalled() {
         return false;
