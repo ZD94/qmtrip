@@ -79,7 +79,7 @@ export async function StaffInvitedController($scope, Models, $ionicHistory, $ion
                 title: staff.name +'邀请您注册鲸力商旅',
                 desc:'加入'+staff.company.name+',共同开启智能商旅!',
                 link: $scope.invitedLink.goInvitedLink,
-                imgUrl: 'https://t.jingli365.com/ionic/images/logo.png',
+                imgUrl: 'https://j.jingli365.com/ionic/images/logo.png',
                 type: '', // 分享类型,music、video或link，不填默认为link
                 dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
             };
@@ -105,7 +105,7 @@ export async function StaffInvitedController($scope, Models, $ionicHistory, $ion
                 var wxConfig = {
                     title: staff.name+'邀请您注册鲸力商旅',
                     desc: '加入'+staff.company.name+',共同开启智能商旅!',
-                    imgUrl: 'https://t.jingli365.com/ionic/images/logo.png',
+                    imgUrl: 'https://j.jingli365.com/ionic/images/logo.png',
                     mediaTagName: "TEST-TAG-001",
                     messageExt: "这是第三方带的测试字段",
                     messageAction: "<action>dotalist</action>",
