@@ -14,11 +14,11 @@ import { WechatApi } from './wechat';
 
 angular
     .module('nglibs')
-    .factory('wxApi', function($ionicPlatform): WxApi{
+    .factory('wxApi', function($ionicPlatform, $rootScope): WxApi{
         if(window.cordova) {
             return new WechatCordovaApi($ionicPlatform);
         }
-        if(!browserspec.is_wechat ||!window.cordova) {
+        if(!browserspec.is_wechat &&!window.cordova) {
             return {
                 $resolve: function(){
                     return Promise.resolve();
@@ -40,5 +40,8 @@ angular
                 }
             };
         }
-        return new WechatApi();
+        if(browserspec.is_wechat){
+            return new WechatApi($rootScope);
+        }
+
     });
