@@ -88,7 +88,7 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
         if($scope.reserveType == "travel" && budget.invoiceType != 0){
             supplier.trafficBookLink = await supplier.getAirTicketReserveLink({fromCityName: budget.deptCity, toCityName: budget.arrivalCity, leaveDate: moment(budget.deptDateTime).format('YYYY-MM-DD') });
         }else if($scope.reserveType == "travel" && budget.invoiceType == 0){
-            supplier.trafficBookLink = "//m.ctrip.com/webapp/train/";
+            supplier.trafficBookLink = "http://m.ctrip.com/webapp/train/";
         }else if($scope.reserveType == "hotel"){
             supplier.hotelBookLink = await supplier.getHotelReserveLink({cityName: budget.city});
         }
@@ -148,13 +148,25 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
 
         if($scope.reserveType == "travel"){
             if(window.cordova){
-                //let ctripJs = `document.get`;
+                // let ctripJs = `window.onload = function(){
+                //                var trains = document.getElementsByClassName('train-station')[0];
+                //                var from = trains.getElementsByClassName('from')[0];
+                //                var to = trains.getElementsByClassName('to')[0];
+                //                from.innerHTML = 'hahhah';
+                //                from.click();
+                //                console.log(from);
+                //                var search = document.getElementsByClassName('search_input')[0];
+                //                console.log(search);
+                //                search.value="tianjin"
+                //                //$(search).trigger('input');
+                //                }
+                //                `;
                 //console.log(ctripJs);
                 let ref = cordova['ThemeableBrowser'].open(supplier.trafficBookLink,'_blank',ThemeableBrowserOption);
-               //ref.addEventListener('loadstop', function(){
-
-                    //ref.executeScript({code: ctripJs});
-               //})
+               // ref.addEventListener('loadstop', function(){
+               //
+               //      ref.executeScript({code: ctripJs});
+               // })
             }else{
                 window.open(supplier.trafficBookLink, '_self');
             }
