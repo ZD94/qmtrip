@@ -1,6 +1,7 @@
 import { ETripType, TripDetail, EPlanStatus } from 'api/_types/tripPlan';
 import { Staff } from 'api/_types/staff/staff';
 import { ESupplierType } from 'api/_types/company/supplier';
+import * as path from 'path';
 
 let moment = require("moment");
 
@@ -116,6 +117,7 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
 
     }
 
+    let relpath = path.relative(window['bundle_url'], window['Manifest'].root);
     let ThemeableBrowserOption = {
         toolbar: {
             height: 44,
@@ -126,15 +128,15 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
             staticText: '鲸力商旅',
         },
         backButton: {
-            wwwImage: 'ionic/images/back.png',
-            wwwImagePressed: 'ionic/images/back.png',
+            wwwImage: relpath+'/ionic/images/back.png',
+            wwwImagePressed: relpath+'/ionic/images/back.png',
             wwwImageDensity: 2,
             align: 'left',
             event: 'backPressed'
         },
         closeButton: {
-            wwwImage: 'ionic/images/close.png',
-            wwwImagePressed: 'ionic/images/close.png',
+            wwwImage: relpath+'/ionic/images/close.png',
+            wwwImagePressed: relpath+'/ionic/images/close.png',
             wwwImageDensity: 2,
             align: 'left',
             event: 'closePressed'
