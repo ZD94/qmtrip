@@ -84,17 +84,16 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     }
 
     //判断是否是携程
-    if(supplier.name == '携程旅行' && $scope.reserveType == "travel" && budget.invoiceType != 0){
-        console.log('opopopopopopop');
-        console.info({fromCityName: budget.deptCity, toCityName: budget.arrivalCity, leaveDate: moment(budget.deptDateTime).format('YYYY-MM-DD') })
-        supplier.trafficBookLink = await supplier.getAirTicketReserveLink({fromCityName: budget.deptCity, toCityName: budget.arrivalCity, leaveDate: moment(budget.deptDateTime).format('YYYY-MM-DD') });
-        console.log(supplier.trafficBookLink)
+    if(supplier.name == '携程旅行'){
+        if($scope.reserveType == "travel" && budget.invoiceType != 0){
+            supplier.trafficBookLink = await supplier.getAirTicketReserveLink({fromCityName: budget.deptCity, toCityName: budget.arrivalCity, leaveDate: moment(budget.deptDateTime).format('YYYY-MM-DD') });
+        }else if($scope.reserveType == "travel" && budget.invoiceType == 0){
+            supplier.trafficBookLink = "//m.ctrip.com/webapp/train/";
+        }else if($scope.reserveType == "hotel"){
+            supplier.hotelBookLink = await supplier.getHotelReserveLink({cityName: budget.city});
+        }
     }
-    console.log({cityName: budget.city});
-    if(supplier.name == '携程旅行' && $scope.reserveType == "hotel"){
-        supplier.hotelBookLink = await supplier.getHotelReserveLink({cityName: budget.city});
-    }
-    console.log(supplier.hotelBookLink);
+
 
     //下面三个小圆点的轮播
     $scope.load_one = true;
@@ -126,19 +125,19 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
             color: '#003264ff',
             staticText: '鲸力商旅',
         },
-        closeButton: {
-            wwwImage: 'ionic/images/close.png',
-            wwwImagePressed: 'ionic/images/close.png',
-            wwwImageDensity: 2,
-            align: 'left',
-            event: 'closePressed'
-        },
         backButton: {
             wwwImage: 'ionic/images/back.png',
             wwwImagePressed: 'ionic/images/back.png',
             wwwImageDensity: 2,
             align: 'left',
             event: 'backPressed'
+        },
+        closeButton: {
+            wwwImage: 'ionic/images/close.png',
+            wwwImagePressed: 'ionic/images/close.png',
+            wwwImageDensity: 2,
+            align: 'left',
+            event: 'closePressed'
         },
         backButtonCanClose: true,
     }
@@ -148,19 +147,14 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
 
 
         if($scope.reserveType == "travel"){
-            //window.open(supplier.trafficBookLink, '_self');
-            //console.log("enter");
             if(window.cordova){
-                //let ctripCss = require('./ctrip.scss').tag;
-                //let ctripJs = 'window.screenTop = 30;window.screenY = 50;window.moveTo(50,50);window.outerHeight = 300;console.log(window)';
+                //let ctripJs = `document.get`;
                 //console.log(ctripJs);
                 let ref = cordova['ThemeableBrowser'].open(supplier.trafficBookLink,'_blank',ThemeableBrowserOption);
                //ref.addEventListener('loadstop', function(){
-                    //ref.insertCSS({file: "ctrip.css"});
-                    //http://m.ctrip.com/html5/ctrip.css
-                    //ref.insertCSS({code: ctripCss.innerHTML});
+
                     //ref.executeScript({code: ctripJs});
-                //})
+               //})
             }else{
                 window.open(supplier.trafficBookLink, '_self');
             }
