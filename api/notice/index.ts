@@ -116,7 +116,7 @@ class NoticeModule{
      * @param params
      * @returns {*}
      */
-    @clientExport
+    /*@clientExport
     @requireParams(["optins", "staffId", "link"])
     static async recordNotice(params): Promise<Notice>{
         //得到通知内容
@@ -127,7 +127,7 @@ class NoticeModule{
         notice.staff = await Models.staff.get(params.staffId);
         notice.link = params.link;
         return notice.save();
-    }
+    }*/
 
 }
 

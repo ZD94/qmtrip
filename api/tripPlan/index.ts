@@ -258,7 +258,7 @@ class TripPlanModule {
             try {
                 //给员工自己发送通知
                 await API.notify.submitNotify({
-                    key: 'qm_notify_self_traveludget',
+                    key: 'qm_notify_self_travelbudget',
                     accountId: staff.id,
                     values: values
                 });
@@ -384,6 +384,8 @@ class TripPlanModule {
             try {
                 await Promise.all(systemNoticeEmails.map(async function(s) {
                     values.name = s.name;
+                    console.info(s);
+                    console.info("系统通知============");
                     try {
                         await API.notify.submitNotify({
                             key: 'qm_notify_system_new_travelbudget',
