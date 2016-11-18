@@ -627,22 +627,25 @@ export default class ApiAuth {
         if(isFirstSet) {
             //发邮件
             vals.url = C.host + "/index.html#/login/first-set-pwd?" + url;
+            vals.appMessageUrl = "#/login/first-set-pwd?" + url;
             key = 'qm_first_set_pwd';
             _mobile = acc.mobile;
             try {
                 vals.url = await API.wechat.shorturl({longurl: vals.url});
+                vals.appMessageUrl = await API.wechat.shorturl({longurl: vals.appMessageUrl});
             } catch(err) {
                 console.error(err);
             }
         } else {
             vals.url = C.host + "/index.html#/login/reset-pwd?" + url;
+            vals.appMessageUrl = "#/login/reset-pwd?" + url;
             key = 'qm_reset_pwd_email';
         }
+
         return API.notify.submitNotify({
             key: key,
             values: vals,
-            email: acc.email,
-            mobile: _mobile,
+            accountId: acc.id
         });
     }
 
@@ -857,11 +860,11 @@ export default class ApiAuth {
             email: params.email,
             qq: params.qq
         }
-        return API.notify.submitNotify({
+        /*return API.notify.submitNotify({
             key: 'qm_www_tobe_partner',
             values: vals,
             email: email,
-        })
+        })*/
     }
 
 
@@ -1159,8 +1162,10 @@ async function _sendActiveEmail(accountId) {
     var activeToken = utils.getRndStr(6);
     var sign = makeActiveSign(activeToken, account.id, expireAt);
     var url = C.host + "/index.html#/login/active?accountId=" + account.id + "&sign=" + sign + "&timestamp=" + expireAt + "&email=" + account.email;
+    var appMessageUrl = "#/login/active?accountId=" + account.id + "&sign=" + sign + "&timestamp=" + expireAt + "&email=" + account.email;
     try {
         url = await API.wechat.shorturl({longurl: url});
+        appMessageUrl = await API.wechat.shorturl({longurl: appMessageUrl});
     } catch(err) {
         console.error(err);
     }
@@ -1168,7 +1173,8 @@ async function _sendActiveEmail(accountId) {
     var vals = {
         name: account.email,
         username: account.email,
-        url: url
+        url: url,
+        appMessageUrl: appMessageUrl
     };
     account.activeToken = activeToken;
     await Promise.all([
@@ -1176,8 +1182,9 @@ async function _sendActiveEmail(accountId) {
         API.notify.submitNotify({
             key: 'qm_active',
             values: vals,
-            email: account.email,
+            accountId: account.id,
         })
     ]);
+
 }
 

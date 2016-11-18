@@ -1,0 +1,1 @@
+ALTER TABLE notice.notices ADD COLUMN type integer DEFAULT 1;
