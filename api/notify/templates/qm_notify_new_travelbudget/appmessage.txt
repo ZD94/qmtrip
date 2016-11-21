@@ -1,1 +1,1 @@
-<%=managerName || '' %>，您好<br/>您企业员工<%=username || '' %>(<%=email || '' %>)在<%=time || '' %>生成了新的出差预算
+<%=username || '' %>申请一次新的出差<br/><%=startAt || '' %>-<%=backAt || '' %>   <%=deptCity || '' %>-<%=arrivalCity || '' %>  预算：<%=totalBudget || '' %>

@@ -1,1 +1,2 @@
-<%=account.name || '' %>,您好<br/>您的出差计划<%=planNo || '' %>已经审批通过<br/>审批人：<%=approveUser || '' %>，审批时间：<%=approveTime || '' %>
+<%=approveUser || '' %> 通过了您的出差请求
+<br/><%=startAt || '' %>-<%=backAt || '' %>   <%=deptCity || '' %>-<%=arrivalCity || '' %>  预算：<%=totalBudget || '' %>

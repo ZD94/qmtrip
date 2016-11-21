@@ -251,9 +251,13 @@ class TripPlanModule {
             otherBudget: subsidy,
             totalBudget: '￥' + tripApprove.budget,
             url: self_url,
+            detailUrl: self_url,
             appMessageUrl: appMessageUrl,
-            detailUrl: self_url
-        };
+            startAt: moment(tripApprove.startAt).format('MM.DD'),
+            backAt: moment(tripApprove.backAt).format('MM.DD'),
+            deptCity: tripApprove.deptCity,
+            arrivalCity: tripApprove.arrivalCity
+    };
         if(!nextApprove){
             try {
                 //给员工自己发送通知
@@ -738,7 +742,10 @@ class TripPlanModule {
                     tripPlanNo: tripPlan.planNo,
                     approveResult: EApproveResult2Text[approveResult],
                     reason: approveResult,
-                    emailReason: params.approveRemark
+                    emailReason: params.approveRemark,
+                    startAt: moment(tripPlan.startAt).format('MM.DD'),
+                    backAt: moment(tripPlan.backAt).format('MM.DD'),
+                    deptCity: tripPlan.deptCity,
                 };
                 await TripPlanModule.sendApprovePassNoticeToCompany({approveId: tripApprove.id});
             }else if(approveResult == EApproveResult.REJECT){
@@ -770,7 +777,10 @@ class TripPlanModule {
                     budget: tripApprove.budget,
                     approveResult: EApproveResult2Text[approveResult],
                     reason: approveResult,
-                    emailReason: params.approveRemark
+                    emailReason: params.approveRemark,
+                    startAt: moment(tripApprove.startAt).format('MM.DD'),
+                    backAt: moment(tripApprove.backAt).format('MM.DD'),
+                    deptCity: tripApprove.deptCity,
                 };
             }
             try {
