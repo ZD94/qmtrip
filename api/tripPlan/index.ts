@@ -903,14 +903,12 @@ class TripPlanModule {
         tripPlan.arrivalCityCode = query.destinationPlace;
         tripPlan.deptCity = deptCity.name;
         tripPlan.arrivalCity = arrivalCity.name;
-        tripPlan.startAt = query.leaveDate;
-        tripPlan.backAt = query.goBackDate;
+        tripPlan.startAt = moment(query.leaveDate).toDate();
+        tripPlan.backAt = moment(query.goBackDate).toDate();
         tripPlan.isNeedHotel = query.isNeedHotel;
         tripPlan.isNeedTraffic = query.isNeedTraffic;
         tripPlan.isRoundTrip = query.isRoundTrip;
         tripPlan.auditUser = tryObjId(approveUser);
-        tripPlan.startAt = moment(query.startAt).format(formatStr);
-        tripPlan.backAt = moment(query.backAt).format(formatStr);
         tripPlan.id = approve.id;
         tripPlan.project = await TripPlanModule.getProjectByName({name: approve.title});
         tripPlan.title = approve.title;
