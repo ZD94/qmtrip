@@ -912,7 +912,7 @@ class TripPlanModule {
         tripPlan.startAt = moment(query.startAt).format(formatStr);
         tripPlan.backAt = moment(query.backAt).format(formatStr);
         tripPlan.id = approve.id;
-        // tripPlan.project = null;
+        tripPlan.project = await TripPlanModule.getProjectByName({name: approve.title});
         tripPlan.account = account;
         tripPlan.status = EPlanStatus.WAIT_UPLOAD;
         tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo'); //获取出差计划单号
@@ -1133,7 +1133,7 @@ class TripPlanModule {
         }
         let title = moment(tripPlan.startAt).format('MM.DD') + '-'+ moment(tripPlan.backAt).format("MM.DD") + tripPlan.deptCity + "到" + tripPlan.arrivalCity + '报销单'
         let tripDetails = await Models.tripDetail.find({
-            where: {tripPlanId: tripPlanId}, 
+            where: {tripPlanId: tripPlanId},
             order: [["created_at", "asc"]]
         })
         // let tripDetails = await tripPlan.getTripDetails({where: {}, order: [["created_at", "asc"]]});
@@ -1436,6 +1436,20 @@ class TripPlanModule {
             });
         });
     }
+
+    static async getProjectByName(params) {
+        let projects = await Models.project.find({where: {name: params.name}});
+
+        if(projects && projects.length > 0) {
+            let project = projects[0];
+            project.weight += 1;
+            await project.save();
+            return project;
+        }else if(params.isCreate === true){
+            let p = {name: params.name, createUser: params.userId, code: '', companyId: params.companyId};
+            return Models.project.create(p).save();
+        }
+    }
 }
 
 
@@ -1537,6 +1551,8 @@ async function tryUpdateTripPlanStatus(tripPlan: TripPlan, status: EPlanStatus) 
     }
     return tripPlan;
 }
+
+
 
 TripPlanModule._scheduleTask();
 

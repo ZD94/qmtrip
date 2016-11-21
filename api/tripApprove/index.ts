@@ -534,7 +534,7 @@ class TripApproveModule {
             }
             return v;
         });
-        let project = await getProjectByName({companyId: company.id, name: params.title, userId: staff.id, isCreate: true});
+        let project = await API.tripPlan.getProjectByName({companyId: company.id, name: params.title, userId: staff.id, isCreate: true});
         let tripApprove =  TripApprove.create(params);
 
         if(params.approveUserId) {
@@ -612,7 +612,7 @@ class TripApproveModule {
         }
 
         let query = params.query;
-        let project = await getProjectByName({companyId: company.id, name: params.title, userId: staff.id, isCreate: true});
+        let project = await API.tripPlan.getProjectByName({companyId: company.id, name: params.title, userId: staff.id, isCreate: true});
         let tripApprove =  TripApprove.create(params);
         tripApprove.isSpecialApprove = true;
 
@@ -713,18 +713,6 @@ class TripApproveModule {
     }
 }
 
-async function getProjectByName(params) {
-    let projects = await Models.project.find({where: {name: params.name}});
 
-    if(projects && projects.length > 0) {
-        let project = projects[0];
-        project.weight += 1;
-        await project.save();
-        return project;
-    }else if(params.isCreate === true){
-        let p = {name: params.name, createUser: params.userId, code: '', companyId: params.companyId};
-        return Models.project.create(p).save();
-    }
-}
 
 export= TripApproveModule
