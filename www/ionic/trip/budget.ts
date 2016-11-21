@@ -1,17 +1,17 @@
 import { ETripType, EInvoiceType, MTxPlaneLevel } from 'api/_types/tripPlan';
 import moment = require('moment');
 import { Staff } from 'api/_types/staff/staff';
-import {EApproveType} from "../../../api/_types/approve/types";
+import {EApproveType, EApproveChannel} from "../../../api/_types/approve/types";
 
 export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup){
     require('./trip.scss');
     require('./budget.scss');
     API.require("tripPlan");
 
-
+    let staff = await Staff.getCurrent();
+    
     $scope.staffSelector = {
         query: async function(keyword) {
-            let staff = await Staff.getCurrent();
             let staffs = await staff.company.getStaffs();
             return staffs;
         },
@@ -81,7 +81,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     API.require("tripPlan");
     await API.onload();
 
-
+    $scope.showChooseApproveUser = (!staff.company.oa || staff.company.oa == EApproveChannel.QM)
     $scope.saveTripPlan = async function() {
         let trip = $scope.trip;
 
@@ -149,7 +149,45 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     $scope.submitApprove = async function() {
         API.require("approve");
         await API.onload();
-        let approve = await API.approve.submitApprove({budgetId: id, approveUser: trip.auditUser});
-        // if (approve.type == EApproveType.TRAVEL_BUDGET)
+        let approve = await API.approve.submitApprove({budgetId: id, approveUser: trip.auditUser, project: $scope.trip.reason});
+        if (staff.company.oa && staff.company.oa != EApproveChannel.QM) {
+            $ionicPopup.show({
+                title: '出差申请已提交',
+                cssClass: 'popup_attention',
+                scope: $scope,
+                template: `<p>您的出差申请已提交审批。当前预算仅为参考,请以最终审批预算为准!</p>`,
+                buttons: [{
+                    text: '个人中心',
+                    type: 'button-calm',
+                    onTap:function(){
+                        window.location.href = '#/staff/index'
+                    }
+                }]
+            });
+            return;
+        }
+
+        $ionicPopup.show({
+            title: '出差申请已提交',
+            cssClass: 'popup_attention',
+            scope: $scope,
+            template: `<p>您的出差申请已提交${trip.auditUser.name}审批。当前预算仅为参考，请以最终审批预算为准！</p>`,
+            buttons: [
+                {
+                    text: '个人中心',
+                    type: 'button-calm button-outline',
+                    onTap:function(){
+                        window.location.href = '#/staff/index'
+                    }
+                },
+                {
+                    text: '查看审批单',
+                    type: ' button-calm',
+                    onTap: function(){
+                        window.location.href = `#/trip-approval/detail?approveId=${approve.id}`
+                    }
+                }
+            ]
+        })
     }
 }
