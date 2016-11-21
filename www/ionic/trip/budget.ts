@@ -1,6 +1,7 @@
 import { ETripType, EInvoiceType, MTxPlaneLevel } from 'api/_types/tripPlan';
 import moment = require('moment');
 import { Staff } from 'api/_types/staff/staff';
+import {EApproveType} from "../../../api/_types/approve/types";
 
 export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup){
     require('./trip.scss');
@@ -146,12 +147,9 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     })
 
     $scope.submitApprove = async function() {
-        console.info(Models);
         API.require("approve");
         await API.onload();
         let approve = await API.approve.submitApprove({budgetId: id, approveUser: trip.auditUser});
-        // let approve = await Models.approve.save({budgetId: id});
-        console.info(approve);
-        console.info("finish...")
+        // if (approve.type == EApproveType.TRAVEL_BUDGET)
     }
 }

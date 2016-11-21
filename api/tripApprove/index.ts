@@ -19,6 +19,7 @@ import TripPlanModule = require("../tripPlan/index");
 let systemNoticeEmails = require('config/config').system_notice_emails;
 const L = require('common/language');
 var API = require('common/api');
+var config = require("config");
 
 class TripApproveModule {
 
@@ -265,7 +266,9 @@ class TripApproveModule {
         let tripApprove = await Models.tripApprove.get(params.approveId);
         let staff = tripApprove.account;
         let company = staff.company;
-        let approveUser = tripApprove.approveUser;
+        let approveUser = await Models.staff.get(tripApprove['approveUserId']);
+        // let approveUser = tripApprove.approveUser;
+        console.info(approveUser)
 
         let details = await TripApproveModule.getDetailsFromApprove({approveId: tripApprove.id});
         let {go, back, hotel, subsidy} = await TripPlanModule.getEmailInfoFromDetails(details);
@@ -316,15 +319,17 @@ class TripApproveModule {
         if(isNextApprove && !params.nextApproveUserId)
             throw new Error("审批人不能为空");
 
+        console.info(tripApprove);
         if (!tripApprove.isSpecialApprove && !budgetId){
             throw new Error(`预算信息已失效请重新生成`);
         }else if(approveResult != EApproveResult.PASS && approveResult != EApproveResult.REJECT) {
             throw L.ERR.PERMISSION_DENY(); //只能审批待审批的出差记录
         }else if(tripApprove.status != QMEApproveStatus.WAIT_APPROVE) {
             throw L.ERR.TRIP_PLAN_STATUS_ERR(); //只能审批待审批的出差记录
-        }else if(tripApprove.approveUser.id != staff.id) {
-            throw L.ERR.PERMISSION_DENY();
         }
+        // else if(tripApprove.approveUser.id != staff.id) {
+        //     throw L.ERR.PERMISSION_DENY();
+        // }
 
         if(!tripApprove.isSpecialApprove){
             let budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
@@ -472,12 +477,13 @@ class TripApproveModule {
             } catch(err) { console.error(err);}
         }
 
-        // //发送通知给监听程序
-        // plugins.qm.tripApproveUpdateNotify({
-        //     approveNo: tripApprove.id,
-        //     status: tripApprove.status,
-        //     approveUser: staff.id,
-        // });
+        //发送通知给监听程序
+        plugins.qm.tripApproveUpdateNotify(null, {
+            approveNo: tripApprove.id,
+            status: tripApprove.status,
+            approveUser: staff.id,
+            outerId: tripApprove.id,
+        });
 
         return true;
     }
@@ -586,12 +592,12 @@ class TripApproveModule {
 
         await Promise.all([tripApprove.save(), tripPlanLog.save()]);
 
-        emitter.emit(EVENT.NEW_TRIP_APPROVE, {
-            budgetId: tripApprove.id,
-            userId: staff.id,
-            approveUser: tripApprove.approveUser.id,
-            oa: 'qm',
-        });
+        // emitter.emit(EVENT.NEW_TRIP_APPROVE, {
+        //     budgetId: tripApprove.id,
+        //     userId: staff.id,
+        //     approveUser: tripApprove.approveUser.id,
+        //     oa: 'qm',
+        // });
         return tripApprove;
     }
 

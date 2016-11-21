@@ -8,7 +8,9 @@ import {Approve} from "../_types/approve/index";
 import {Staff} from "../_types/staff/staff";
 import {Models} from "../_types/index";
 import {emitter, EVENT} from "libs/oa";
-import {EApproveStatus} from "../_types/approve/types";
+import {EApproveStatus, EApproveChannel, EApproveType} from "../_types/approve/types";
+import {TripPlan} from "../_types/tripPlan/tripPlan";
+import TripPlanModule = require("../tripPlan/index");
 var API = require("common/api");
 
 class ApproveModule {
@@ -21,7 +23,7 @@ class ApproveModule {
 
         //获取预算详情
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: submitter.id});
-        let approve = Models.approve.create({submitter: submitter.id, data: budgetInfo});
+        let approve = Models.approve.create({submitter: submitter.id, data: budgetInfo, channel: EApproveChannel.QM});
         approve = await approve.save();
 
         //对接第三方OA
@@ -33,6 +35,37 @@ class ApproveModule {
         });
         return approve;
     }
+
+    static async createTripPlanByApprove(params) :Promise<TripPlan> {
+        let tripPlan = Models.tripPlan.create({});
+        return tripPlan;
+    }
 }
+
+//监听审批单变化
+emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result) {
+    let p = (async function(){
+        let {approveNo, submitter, outerId, status, approveUser} = result;
+        let approve = await Models.approve.get(approveNo);
+        if (approve.status == status) {
+            return;
+        }
+
+        approve.status = status;
+        approve.approveUser = approveUser;
+        approve.approveDateTime = new Date();
+        approve = await approve.save();
+
+        //预算审批完成
+        if (approve.type == EApproveType.TRAVEL_BUDGET && approve.status == EApproveStatus.SUCCESS) {
+            await API.tripPlan.saveTripPlanByApprove({tripApproveId: approve.id})
+        }
+    })();
+
+    //捕获事件中错误
+    p.catch((err) => {
+        console.error(err.stack);
+    });
+})
 
 export= ApproveModule;

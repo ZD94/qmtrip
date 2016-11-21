@@ -9,11 +9,11 @@ import {
 } from "../index";
 
 import TripPlanModule = require("api/tripPlan/index");
-import TripApproveModule = require("../../../../api/tripApprove/index");
+import TripApproveModule = require("api/tripApprove/index");
 import {Models} from "api/_types/index";
-import {QMEApproveStatus, EApproveResult, ETripType} from "../../../../api/_types/tripPlan/tripPlan";
+import {ETripType, TripApprove, QMEApproveStatus, EApproveResult} from "api/_types/tripPlan/tripPlan";
+const L = require("common/language");
 import moment = require("moment");
-const L = require('common/language');
 var API = require("common/api");
 
 //鲸力商旅OA对接实现
@@ -25,7 +25,6 @@ export class QmPlugin extends AbstractOAPlugin {
     //实现qm创建审批单流程
     async createTripApproveFlow(params:createTripApproveParam):Promise<createTripApproveResult> {
         let {approveNo, submitter, approveUser} = params;
-
         let tripApprove = await Models.tripApprove.create({approveUserId: approveUser, id: approveNo});
         let staff = await Models.staff.get(submitter);
         let company = staff.company;

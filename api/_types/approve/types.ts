@@ -21,3 +21,8 @@ export interface IApprove {
     approveDateTime: Date;  //审核时间
     title: string;       //审核单名称
 }
+
+export enum EApproveChannel {
+    QM = 1,
+    DING_TALK = 2,
+}

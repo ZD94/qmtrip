@@ -512,8 +512,12 @@ export class TripApprove extends ModelObject{
      * @param params
      * @returns {Promise<boolean>}
      */
-    approve(params: {auditResult: EAuditStatus, auditRemark?: string, budgetId?: string, id?: string}): Promise<boolean> {
+    async approve(params: {auditResult: EAuditStatus, auditRemark?: string, budgetId?: string, id?: string}): Promise<boolean> {
         params.id = this.id;
+        if (!this.isLocal) {
+            API.require("tripApprove");
+            await API.onload();
+        }
         return API.tripApprove.approveTripPlan(params);
     }
 

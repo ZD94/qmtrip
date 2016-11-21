@@ -7,7 +7,7 @@ import {ModelObject} from "common/model/object";
 import {Create, Table, Field, TableExtends} from "common/model/common";
 import {Models} from "../index";
 import {Values, Types} from "common/model/index";
-import {IApprove, EApproveStatus, EApproveType} from "./types";
+import {IApprove, EApproveStatus, EApproveType, EApproveChannel} from "./types";
 
 
 @Table(Models.approve, "approve.")
@@ -55,9 +55,17 @@ export class Approve extends ModelObject implements IApprove {
     get type() :EApproveType { return EApproveType.TRAVEL_BUDGET}
     set type(type: EApproveType) {}
 
+    @Field({type: Types.INTEGER})
+    get channel() :EApproveChannel { return EApproveChannel.QM}
+    set channel(channel: EApproveChannel) {}
+
     @Field({type: Types.JSONB})
     get data(): any {return null}
     set data(data: any) {}
+
+    @Field({type: Types.BOOLEAN})
+    get isSpecialApprove() :boolean {return false;}
+    set isSpecialApprove(isSpecialApprove: boolean) {}
 }
 
 export * from './types';
