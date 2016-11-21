@@ -29,7 +29,6 @@ export class AutoPlugin extends AbstractOAPlugin {
             params['approveUser'] = null;
             self.tripApproveUpdateNotify(null, params);
         });
-        
         return params as createTripApproveResult;
     }
 
