@@ -234,6 +234,7 @@ export function approveInvoice(params){
             }
             orderTime = moment(orderTime).format('YYYY-MM-DD');
             let url = config.host + '/staff.html#/travelPlan/PlanDetail?tripPlanId=' + order.id;
+            let appMessageUrl = '#/travelPlan/PlanDetail?tripPlanId=' + order.id;
 
             let key;
             let values: any = {
@@ -246,6 +247,7 @@ export function approveInvoice(params){
                 hotelBudget: hotel,
                 totalBudget: '全麦预算￥'+order.budget,
                 url: url,
+                appMessageUrl: appMessageUrl,
                 detailUrl: url
             }
 
@@ -280,14 +282,15 @@ export function approveInvoice(params){
                 return true;
             }
             return API.staff.increaseStaffPoint({id: staffId, accountId: user_id, increasePoint: ret.score, companyId: companyId})
-                .then(function(ret) {
+                .then(async function(ret) {
                     if (key) {
                         //发送通知给用户
-                        API.notify.submitNotify({
+                        await API.notify.submitNotify({
                             key: key,
-                            email: staffEmail,
-                            values: values,
+                            accountId: staffId,
+                            values: values
                         });
+
                     }
                     return ret;
                 })

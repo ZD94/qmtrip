@@ -6,6 +6,7 @@ var printf = require('printf');
 
 declare var wx:any;
 declare var ionic:any;
+declare var Wechat:any;
 
 export async function StaffInvitedController($scope, Models, $ionicHistory, $ionicPopup, ClosePopupService, wxApi){
     require('./staff-invited.scss');
@@ -67,7 +68,7 @@ export async function StaffInvitedController($scope, Models, $ionicHistory, $ion
     $scope.isAndroid = ionic.Platform.isAndroid();
     $scope.isIos =  ionic.Platform.isIOS();
     $scope.is_wechat = browserspec.is_wechat;
-    $scope.sendWx = function(){
+    $scope.sendWx = async function(){
         if(browserspec.is_wechat){
             var show = $ionicPopup.show({
                 template: '<p>请点击微信右上角菜单<br>将链接分享给好友</p>',
@@ -81,22 +82,37 @@ export async function StaffInvitedController($scope, Models, $ionicHistory, $ion
                 imgUrl: 'https://t.jingli365.com/ionic/images/logo.png',
                 type: '', // 分享类型,music、video或link，不填默认为link
                 dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
-                success: function () {
-                    // 用户确认分享后执行的回调函数
-                    show.close();
-                },
-                cancel: function () {
-                    // 用户取消分享后执行的回调函数
-                    show.close();
-                }
             };
-            wx.onMenuShareAppMessage(WxConfig);
-            wx.onMenuShareQQ(WxConfig);
+            console.info('wechat',$scope.invitedLink.goInvitedLink);
+            wxApi.setupSharePrivate(WxConfig);
+            $scope.$on('WechatShareSuccessed', function(event, type){
+                // 用户确认分享后执行的回调函数
+                show.close();
+                if(type == 'App'){
+                    
+                }
+            })
+            $scope.$on('WechatShareCanceled', function(event, type){
+                // 用户取消分享后执行的回调函数
+                show.close();
+            })
             let openConfig = _.clone(WxConfig);
             openConfig.link = 'https://jingli365.com';
-            wx.onMenuShareTimeline(WxConfig);
-            wx.onMenuShareWeibo(WxConfig);
-            wx.onMenuShareQZone(WxConfig);
+            wxApi.setupSharePublic(openConfig);
+        }else if(window.cordova){
+            let installed = await wxApi.isInstalled();
+            if(installed){
+                var wxConfig = {
+                    title: staff.name+'邀请您注册鲸力商旅',
+                    desc: '加入'+staff.company.name+',共同开启智能商旅!',
+                    imgUrl: 'https://t.jingli365.com/ionic/images/logo.png',
+                    mediaTagName: "TEST-TAG-001",
+                    messageExt: "这是第三方带的测试字段",
+                    messageAction: "<action>dotalist</action>",
+                    link: $scope.invitedLink.goInvitedLink
+                }
+                await wxApi.setupSharePrivate(wxConfig)
+            }
         }
     }
 }

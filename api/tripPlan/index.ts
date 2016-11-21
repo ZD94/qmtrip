@@ -136,8 +136,6 @@ class TripPlanModule {
         await Promise.all(ps);
         return {go: goStr, back: backStr, hotel: hotelStr, subsidy: subsidyStr, special: specialStr};
     }
-
-    
     /**
      * 获取计划单/预算单信息
      * @param params
@@ -300,7 +298,6 @@ class TripPlanModule {
         await tripDetail.destroy();
         return true;
     }
-    
 
     /**
      * 提交计划单
@@ -355,10 +352,11 @@ class TripPlanModule {
 
             let company = await tripPlan.getCompany();
             let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
+            let appMessageUrl = `#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
             let {go, back, hotel, subsidy} = await TripPlanModule.getPlanEmailDetails(tripPlan);
             let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
             let auditValues = {username: user.name, time:tripPlan.createdAt, auditUserName: user.name, companyName: company.name, staffName: staff.name, projectName: tripPlan.title, goTrafficBudget: go,
-                backTrafficBudget: back, hotelBudget: hotel, otherBudget: subsidy, totalBudget: tripPlan.budget, url: auditUrl, detailUrl: auditUrl,
+                backTrafficBudget: back, hotelBudget: hotel, otherBudget: subsidy, totalBudget: tripPlan.budget, appMessageUrl: appMessageUrl, url: auditUrl, detailUrl: auditUrl,
                 approveUser: user.name, tripPlanNo: tripPlan.planNo,
                 content: `企业 ${company.name} 员工 ${staff.name}${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差计划票据已提交，预算：￥${tripPlan.budget}，等待您审核！`,
                 createdAt: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
@@ -367,8 +365,7 @@ class TripPlanModule {
                 await API.notify.submitNotify({
                     key: 'qm_notify_agency_budget',
                     values: auditValues,
-                    email: default_agency.manager_email,
-                    openid: openId,
+                    accountId: default_agency.id
                 })
             } catch(err) { console.error(err);}
 
@@ -505,6 +502,7 @@ class TripPlanModule {
 
             let {go, back, hotel, subsidy} = await TripPlanModule.getPlanEmailDetails(tripPlan);
             let self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
+            let appMessageUrl = `#/trip/list-detail?tripid=${tripPlan.id}`;
 
             templateValue.ticket = templateValue.tripType;
             templateValue.username = staff.name;
@@ -514,12 +512,14 @@ class TripPlanModule {
             templateValue.otherBudget = subsidy;
             templateValue.detailUrl = self_url;
             templateValue.url = self_url;
+            templateValue.appMessageUrl = appMessageUrl;
             templateValue.auditUser = '鲸力商旅';
             templateValue.auditTime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
 
             let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
             try {
-                await API.notify.submitNotify({key: templateName, values: templateValue, email: staff.email, openid: openId});
+                await API.notify.submitNotify({key: templateName, values: templateValue, accountId: staff.id});
+
             } catch(err) {
                 console.error(`发送通知失败:`, err);
             }
@@ -1250,7 +1250,7 @@ class TripPlanModule {
         try {
             await API.notify.submitNotify({
                 key: 'qm_spend_report',
-                email: staff.email,
+                accountId: staff.id,
                 values: {
                     title: title,
                     attachments: [{
@@ -1260,6 +1260,7 @@ class TripPlanModule {
                     }]
                 },
             });
+
         } catch(err) {
             console.error(err.stack);
         }

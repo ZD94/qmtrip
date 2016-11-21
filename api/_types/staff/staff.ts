@@ -11,6 +11,7 @@ import { TableExtends, Table, Create, Field, ResolveRef, Reference, RemoteCall }
 import { ModelObject } from 'common/model/object';
 import {PaginateInterface} from 'common/model/interface';
 import {CoinAccount} from 'api/_types/coin';
+import {Notice} from 'api/_types/notice';
 import {SupplierOrder} from 'libs/suppliers/interface';
 import {SupplierGetter} from 'libs/suppliers';
 import L from 'common/language';
@@ -118,6 +119,15 @@ export class Staff extends ModelObject implements Account {
     set coinAccount(coinAccount: CoinAccount) {}
 
     setTravelPolicy(val: TravelPolicy) {}
+
+
+    async getSelfNotices(options?: any): Promise<Notice[]> {
+        if (!options) options = {where: {}};
+        if(!options.where) options.where = {};
+        options.where .staffId = this.id;
+        var notices = await Models.notice.find(options);
+        return notices;
+    }
 
     getTripPlans(options: {where?: any, limit?: number}): Promise<PaginateInterface<TripPlan>> {
         if (!options) {

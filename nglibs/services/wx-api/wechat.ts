@@ -1,4 +1,5 @@
-
+// import {observer} from './cordova';
+import reject = require("lodash/reject");
 declare var wx;
 
 var API = require('common/api');
@@ -9,7 +10,6 @@ var wxload;
 if(browserspec.is_wechat) {
     wxload = dyload("//res.wx.qq.com/open/js/jweixin-1.0.0.js");
 }
-
 
 function wxFunction(funcname) {
     return function(option){
@@ -25,6 +25,9 @@ var wxChooseImage = wxFunction('chooseImage');
 var wxUploadImage = wxFunction('uploadImage');
 
 export class WechatApi {
+    constructor(private $rootScope: angular.IRootScopeService){
+
+    }
     $$promise: Promise<any>;
     $resolved = false;
     $resolve() : Promise<any> {
@@ -72,7 +75,73 @@ export class WechatApi {
         let ret = await wxUploadImage(options||{});
         return ret.serverId;
     }
-    setupSharePrivate(options:{title:string; desc:string; link:string; imgUrl:string; type?:string; dataUrl?:string}){
-        
+    setupSharePrivate(options:{title:string; desc:string; link:string; imgUrl:string; type?:string; dataUrl?:string;}){
+        var _self = this;
+        wx.onMenuShareAppMessage({
+            title: options.title,
+            desc: options.desc,
+            link: options.link,
+            imgUrl: options.imgUrl,
+            success:function(){
+                _self.$rootScope.$broadcast('WechatShareSuccessed', 'App');
+            },
+            cancel:function(){
+                _self.$rootScope.$broadcast('WechatShareCanceled', 'App');
+            }
+        });
+        wx.onMenuShareQQ({
+            title: options.title,
+            desc: options.desc,
+            link: options.link,
+            imgUrl: options.imgUrl,
+            success:function(){
+                _self.$rootScope.$broadcast('WechatShareSuccessed', 'QQ');
+            },
+            cancel:function(){
+                _self.$rootScope.$broadcast('WechatShareCanceled', 'QQ');
+            }
+        });
+    }
+    async setupSharePublic(options:{title:string; desc:string; link:string; imgUrl:string; type?:string; dataUrl?:string}){
+        var _self = this;
+        wx.wxShareTimeline({
+            title: options.title,
+            desc: options.desc,
+            link: options.link,
+            imgUrl: options.imgUrl,
+            success:function(){
+                _self.$rootScope.$broadcast('WechatShareSuccessed', 'Timeline');
+            },
+            cancel:function(){
+                _self.$rootScope.$broadcast('WechatShareCanceled', 'Timeline');
+            }
+        })
+        wx.onMenuShareWeibo({
+            title: options.title,
+            desc: options.desc,
+            link: options.link,
+            imgUrl: options.imgUrl,
+            success:function(){
+                _self.$rootScope.$broadcast('WechatShareSuccessed', 'Weibo');
+            },
+            cancel:function(){
+                _self.$rootScope.$broadcast('WechatShareCanceled', 'Weibo');
+            }
+        })
+        wx.onMenuShareQZone({
+            title: options.title,
+            desc: options.desc,
+            link: options.link,
+            imgUrl: options.imgUrl,
+            success:function(){
+                _self.$rootScope.$broadcast('WechatShareSuccessed', 'QZone');
+            },
+            cancel:function(){
+                _self.$rootScope.$broadcast('WechatShareCanceled', 'QZone');
+            }
+        })
+    }
+    isInstalled() {
+        return false;
     }
 }

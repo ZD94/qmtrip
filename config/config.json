@@ -77,5 +77,18 @@
     "is_send_wechat": true,
     "is_send_email": true
   },
-  "score_ratio": 1
+  "score_ratio": 1,
+  "notify": {
+    "sendSms": true,
+    "sendEmail": true,
+    "sendWechat": true,
+    "templates": {
+      "qm_notify_new_travelbudget": "",
+      "qm_notify_approve_pass": "",
+      "qm_notify_approve_not_pass": "",
+      "qm_notify_agency_budget": "",
+      "qm_notify_invoice_one_pass": "",
+      "qm_notify_invoice_not_pass": ""
+    }
+  }
 }

@@ -6,6 +6,7 @@ import { Company, MoneyChange, Supplier } from 'api/_types/company';
 import { Department } from 'api/_types/department';
 import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
 import { AccordHotel } from 'api/_types/accordHotel';
+import { Notice } from 'api/_types/notice';
 import { Agency, AgencyUser } from 'api/_types/agency';
 import {
     TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCode,
@@ -32,6 +33,7 @@ initModels({
     travelPolicy: createServerService<TravelPolicy>(TravelPolicy),
     subsidyTemplate: createServerService<SubsidyTemplate>(SubsidyTemplate),
     accordHotel: createServerService<AccordHotel>(AccordHotel),
+    notice: createServerService<Notice>(Notice),
     agency: createServerService<Agency>(Agency),
     agencyUser: createServerService<AgencyUser>(AgencyUser),
     tripPlan: createServerService<TripPlan>(TripPlan),

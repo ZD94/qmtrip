@@ -1,0 +1,25 @@
+<table cellpadding="0" style="border-collapse:collapse; text-align:center; margin:0 auto; width: 75%;">
+    <tr style="background:#EFEFEF">
+        <td style="border:1px #999 solid; padding:5px; width:100px">项目名称:</td><td style="border:1px #999 solid; padding:5px; width:100px"><%=projectName || '' %></td>
+    </tr>
+    <tr style="background:#EFEFEF">
+        <td style="border:1px #999 solid; padding:5px; width:100px">去程交通:</td><td style="border:1px #999 solid; padding:5px; width:100px"><%=goTrafficBudget || '' %></td>
+    </tr>
+    <tr style="background:#EFEFEF">
+        <td style="border:1px #999 solid; padding:5px; width:100px">回程交通</td><td style="border:1px #999 solid; padding:5px; width:100px"><%=backTrafficBudget || '' %></td>
+    </tr>
+    <tr style="background:#EFEFEF">
+        <td style="border:1px #999 solid; padding:5px; width:100px">住宿：</td><td style="border:1px #999 solid; padding:5px; width:100px"><%=hotelBudget || '' %></td>
+    </tr>
+    <tr style="background:#EFEFEF">
+        <td style="border:1px #999 solid; padding:5px; width:100px">其他补助：</td><td style="border:1px #999 solid; padding:5px; width:100px"><%=otherBudget || '' %></td>
+    </tr>
+    <tr style="background:#EFEFEF">
+        <td colspan="2" style="border:1px #999 solid; padding:5px; width:100px" align="right">总预算：<%=totalBudget || '' %></td>
+    </tr>
+    <% if(typeof(score) !== 'undefined') { %>
+    <tr style="background:#EFEFEF">
+        <td colspan="2" style="border:1px #999 solid; padding:5px; width:100px" align="right">获取积分：<%=score || '' %></td>
+    </tr>
+    <% } %>
+</table>

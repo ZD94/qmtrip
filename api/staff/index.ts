@@ -18,6 +18,7 @@ import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {requireParams, clientExport} from 'common/api/helper';
 import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo } from "api/_types/staff";
+import { Notice } from "api/_types/notice";
 import { EAgencyUserRole, AgencyUser } from "api/_types/agency";
 import { Models, EAccountType } from 'api/_types';
 import {conditionDecorator, condition} from "../_decorator";
@@ -273,22 +274,27 @@ class StaffModule{
             let upDept = await Models.department.get(updateStaff["departmentId"]);
 
             let vals  = {
-                username: updateStaff.name,
-                mobile: updateStaff.mobile,
                 travelPolicy: tp ? tp.name: '',
-                time: new Date(),
-                companyName: updateStaff.company.name,
-                department: upDept ? upDept.name : (defaultDept ? defaultDept.name : "我的企业"),
+                time: moment().format('YYYY-MM-DD:hh:mm:ss'),
+                appMessageUrl: '#/staff/edit?staffId='+updateStaff.id,
                 permission: updateStaff.roleId == EStaffRole.ADMIN ? "管理员" : (updateStaff.roleId == EStaffRole.OWNER ? "创建者" : "普通员工"),
-                staffStatus: updateStaff.staffStatus == 0 ? "禁用" : "启用"
             }
 
+
             //发送通知
-            API.notify.submitNotify({
+            await API.notify.submitNotify({
+                key: 'staff_update',
+                values: vals,
+                accountId: updateStaff.id
+            });
+
+            /*var options = {
                 key: 'staff_update',
                 values: vals,
                 email: updateStaff.email
-            });
+            };
+            var link = config.host + "/index.html#/staff/edit?staffId="+updateStaff.id;
+            await API.notice.recordNotice({optins: options, staffId: updateStaff.id, link: link});*/
         }
         return updateStaff;
     }
