@@ -893,7 +893,6 @@ class TripPlanModule {
         if(typeof query == 'string') query = JSON.parse(query);
         let budgets: any = approve.data.budgets;
         if (typeof budgets == 'string') budgets = JSON.parse(budgets);
-        console.info("budgets====>", budgets)
 
         let deptCity = await API.place.getCityInfo({cityCode: query.originPlace});
         let arrivalCity = await API.place.getCityInfo({cityCode: query.destinationPlace});
@@ -921,11 +920,12 @@ class TripPlanModule {
         //计算总预算
         let totalBudget = budgets
             .map( (item) => {
-                return Number(item.v) || 0;
+                return Number(item.price) || 0;
             })
-            .reduce( (prev, cur) => {
-                return prev+cur;
-            });
+            .reduce( (total, cur) => {
+                return total + cur;
+            }, 0);
+
         tripPlan.budget = totalBudget;
 
         let log = TripPlanLog.create({tripPlanId: tripPlan.id, userId: approveUser.id, remark: `出差审批通过，生成出差记录`});
@@ -997,15 +997,12 @@ class TripPlanModule {
             return detail;
         });
 
-        console.info('预算详情==>', tripDetails);
-
         if(tripDetails && tripDetails.length > 0){
             let ps = tripDetails.map((d) => {
-                return d.save()
+                return d.save();
             });
             await Promise.all(ps);
         }
-
 
         return tripPlan;
     }
