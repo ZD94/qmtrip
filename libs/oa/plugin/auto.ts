@@ -20,13 +20,13 @@ export class AutoPlugin extends AbstractOAPlugin {
     async createTripApproveFlow(params:createTripApproveParam):Promise<createTripApproveResult> {
         let self = this;
         //生成外部ID
-        let outerId = 'OA' + Date.now() + Math.ceil(Math.random() * 100);
+        let outerId = 'auto' + Date.now() + Math.ceil(Math.random() * 100);
         params['outerId'] = outerId;
 
         //1秒以后返回结果
         setTimeout(() => {
             params['status'] = EApproveStatus.SUCCESS;
-            params['approveUser'] = '系统';
+            params['approveUser'] = null;
             self.tripApproveUpdateNotify(null, params);
         }, 1000);
 
@@ -35,11 +35,11 @@ export class AutoPlugin extends AbstractOAPlugin {
 
     async createTripInvoiceAuditFlow(params:createTripInvoiceAuditFlowParam):Promise<createTripInvoiceAuditFlowResult> {
         let self = this;
-        let outerId = 'OA' + Date.now() + Math.ceil(Math.random() * 100);
+        let outerId = 'auto' + Date.now() + Math.ceil(Math.random() * 100);
         params['outerId'] = outerId;
         setTimeout(() => {
             params['status'] = EInvoiceStatus.AUDIT_PASS;
-            params['auditUser'] = '系统';
+            params['auditUser'] = null;
             self.tripInvoiceUpdateNotify(null, params);
         }, 1000);
         return params as createTripInvoiceAuditFlowResult;

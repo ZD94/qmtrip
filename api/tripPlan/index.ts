@@ -898,7 +898,7 @@ class TripPlanModule {
         let arrivalCity = await API.place.getCityInfo({cityCode: query.destinationPlace});
 
         let tripPlan = TripPlan.create({});
-        tripPlan['companyId'] = approveUser.company.id;
+        tripPlan['companyId'] = account.company.id;
         tripPlan.deptCityCode = query.originPlace;
         tripPlan.arrivalCityCode = query.destinationPlace;
         tripPlan.deptCity = deptCity.name;
@@ -908,14 +908,16 @@ class TripPlanModule {
         tripPlan.isNeedHotel = query.isNeedHotel;
         tripPlan.isNeedTraffic = query.isNeedTraffic;
         tripPlan.isRoundTrip = query.isRoundTrip;
-        tripPlan.auditUser = approveUser.id;
+        tripPlan.auditUser = tryObjId(approveUser);
         tripPlan.startAt = moment(query.startAt).format(formatStr);
         tripPlan.backAt = moment(query.backAt).format(formatStr);
         tripPlan.id = approve.id;
         tripPlan.project = await TripPlanModule.getProjectByName({name: approve.title});
+        tripPlan.title = approve.title;
         tripPlan.account = account;
         tripPlan.status = EPlanStatus.WAIT_UPLOAD;
         tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo'); //获取出差计划单号
+        tripPlan.query = query;
 
         //计算总预算
         let totalBudget = budgets
@@ -928,7 +930,7 @@ class TripPlanModule {
 
         tripPlan.budget = totalBudget;
 
-        let log = TripPlanLog.create({tripPlanId: tripPlan.id, userId: approveUser.id, remark: `出差审批通过，生成出差记录`});
+        let log = TripPlanLog.create({tripPlanId: tripPlan.id, userId: tryObjId(approveUser), remark: `出差审批通过，生成出差记录`});
         await Promise.all([tripPlan.save(), log.save()]);
 
         let tripDetails: TripDetail[] = [];
@@ -1552,6 +1554,10 @@ async function tryUpdateTripPlanStatus(tripPlan: TripPlan, status: EPlanStatus) 
     return tripPlan;
 }
 
+function tryObjId(obj) {
+    if (obj && obj.id) return obj.id;
+    return null;
+}
 
 
 TripPlanModule._scheduleTask();

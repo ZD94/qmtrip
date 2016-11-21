@@ -25,4 +25,5 @@ export interface IApprove {
 export enum EApproveChannel {
     QM = 1,
     DING_TALK = 2,
+    AUTO = 3,
 }

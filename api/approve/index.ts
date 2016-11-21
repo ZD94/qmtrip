@@ -26,12 +26,19 @@ class ApproveModule {
         let approve = Models.approve.create({submitter: submitter.id, data: budgetInfo, channel: EApproveChannel.QM, title: project});
         approve = await approve.save();
 
+        let oas = {
+        }
+        oas[EApproveChannel.QM] = 'qm';
+        oas[EApproveChannel.AUTO] = 'auto';
+        oas[EApproveChannel.DING_TALK] = 'ddtalk';
+
         //对接第三方OA
         emitter.emit(EVENT.NEW_TRIP_APPROVE, {
             approveNo: approve.id,
             approveUser: submitter.id,
             submitter: submitter.id,
             status: EApproveStatus.WAIT_APPROVE,
+            oa: oas[submitter.company.oa] || 'qm'
         });
         return approve;
     }
