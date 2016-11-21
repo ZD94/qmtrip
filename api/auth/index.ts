@@ -11,6 +11,7 @@ import L from 'common/language';
 import cache = require("common/cache");
 import * as authentication from './authentication';
 import * as wechat from './wechat';
+import * as messagePush from './messagePush';
 
 var uuid = require("node-uuid");
 var C = require("config");
@@ -1141,6 +1142,14 @@ export default class ApiAuth {
 
     static authentication = authentication.checkTokenAuth;
     static makeAuthenticateToken = authentication.makeAuthenticateToken;
+
+    @clientExport
+    static saveOrUpdateEquipmentId = messagePush.saveOrUpdateEquipmentId;
+    @clientExport
+    static destroyEquipmentId = messagePush.destroyEquipmentId;
+
+    @requireParams(["equipmentId"])
+    static getEquipmentIdByAccount = messagePush.getEquipmentIdByAccount;
 }
 
 //生成激活链接参数
