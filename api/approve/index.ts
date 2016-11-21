@@ -27,7 +27,7 @@ class ApproveModule {
         //对接第三方OA
         emitter.emit(EVENT.NEW_TRIP_APPROVE, {
             approveNo: approve.id,
-            approveUser: approve.id,
+            approveUser: submitter.id,
             submitter: submitter.id,
             status: EApproveStatus.WAIT_APPROVE,
         });
