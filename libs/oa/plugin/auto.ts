@@ -24,12 +24,12 @@ export class AutoPlugin extends AbstractOAPlugin {
         params['outerId'] = outerId;
 
         //1秒以后返回结果
-        setTimeout(() => {
+        process.nextTick(function() {
             params['status'] = EApproveStatus.SUCCESS;
             params['approveUser'] = null;
             self.tripApproveUpdateNotify(null, params);
-        }, 1000);
-
+        });
+        
         return params as createTripApproveResult;
     }
 
@@ -37,11 +37,11 @@ export class AutoPlugin extends AbstractOAPlugin {
         let self = this;
         let outerId = 'auto' + Date.now() + Math.ceil(Math.random() * 100);
         params['outerId'] = outerId;
-        setTimeout(() => {
+        process.nextTick(function() {
             params['status'] = EInvoiceStatus.AUDIT_PASS;
             params['auditUser'] = null;
             self.tripInvoiceUpdateNotify(null, params);
-        }, 1000);
+        })
         return params as createTripInvoiceAuditFlowResult;
     }
 }
