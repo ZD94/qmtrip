@@ -16,14 +16,14 @@ var API = require("common/api");
 class ApproveModule {
 
     @clientExport
-    @requireParams(["budgetId"], ["approveUser"])
-    static async submitApprove(params: {budgetId: string}) :Promise<Approve>{
-        let {budgetId } = params;
+    @requireParams(["budgetId"], ["approveUser", "project"])
+    static async submitApprove(params: {budgetId: string, project?: string, approveUser?: string}) :Promise<Approve>{
+        let {budgetId, project} = params;
         let submitter = await Staff.getCurrent();
 
         //获取预算详情
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: submitter.id});
-        let approve = Models.approve.create({submitter: submitter.id, data: budgetInfo, channel: EApproveChannel.QM});
+        let approve = Models.approve.create({submitter: submitter.id, data: budgetInfo, channel: EApproveChannel.QM, title: project});
         approve = await approve.save();
 
         //对接第三方OA
@@ -54,6 +54,7 @@ emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result) {
         approve.status = status;
         approve.approveUser = approveUser;
         approve.approveDateTime = new Date();
+        approve.outerId = outerId;
         approve = await approve.save();
 
         //预算审批完成
