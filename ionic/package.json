@@ -1,5 +1,5 @@
 {
-  "name": "鲸力商旅",
+  "name": "jingli365",
   "version": "0.0.4",
   "description": "鲸力商旅是一款创新型的差旅控费神器，打破传统管理瓶颈，让员工主动节省差旅费。\n鲸力商旅目前是国内唯一提供“动态预算”的差旅管理系统。系统能够根据员工差旅标准和机票、酒店的实时价格自动计算预算花费。和传统人工填写出差预算相比，动态预算具有以下特点：\n1.更高效：无需人工查询，系统自动计算预算。\n2.更精准：不受人为因素影响，价格更公允。\n3.易于管理：预算全程可见，审批有据可循。\n鲸力商旅突破传统管理模式的束缚，为企业提供创新型的激励方案，不仅有效降低差旅费，更提高员工满意度。成为最佳雇主，全面提升企业竞争力。",
   "dependencies": {
@@ -39,6 +39,7 @@
         "PHOTOLIBRARY_USAGE_DESCRIPTION": "上传票据"
       }
     },
+    "cordova-plugin-inappbrowser",
     {
       "id": "cordova-plugin-wechat",
       "locator": "cordova-plugin-wechat",
@@ -46,7 +47,8 @@
         "WECHATAPPID": "wx5c88d539a0a283ed"
       }
     },
-    "cordova-plugin-inappbrowser"
+    "cordova-custom-config",
+    "cordova-plugin-themeablebrowser"
   ],
   "cordovaPlatforms": [
     {
