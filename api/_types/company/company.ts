@@ -14,6 +14,7 @@ import { Supplier } from './supplier';
 import {CoinAccount} from "api/_types/coin";
 import {PaginateInterface} from "common/model/interface";
 import promise = require("../../../common/test/api/promise/index");
+import {EApproveChannel} from "../approve/types";
 declare var API: any;
 
 export enum ECompanyStatus {
@@ -159,9 +160,9 @@ export class Company extends ModelObject{
     get isAppointSupplier(): boolean { return false; }
     set isAppointSupplier(val: boolean) {}
 
-    @Field({type: Types.STRING(50)})
-    get oa() { return null}
-    set oa(oa: string) {}
+    @Field({type: Types.INTEGER})
+    get oa() : EApproveChannel { return EApproveChannel.QM}
+    set oa(oa: EApproveChannel) {}
 
     getStaffs(options?: any): Promise<Staff[]> {
         if(!options) {options = {where: {}}};
