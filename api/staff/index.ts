@@ -276,7 +276,7 @@ class StaffModule{
             let vals  = {
                 travelPolicy: tp ? tp.name: '',
                 time: moment().format('YYYY-MM-DD:hh:mm:ss'),
-                appMessageUrl: '#/staff/edit?staffId='+updateStaff.id,
+                appMessageUrl: '#/staff/staff-info',
                 permission: updateStaff.roleId == EStaffRole.ADMIN ? "管理员" : (updateStaff.roleId == EStaffRole.OWNER ? "创建者" : "普通员工"),
             }
 

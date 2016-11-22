@@ -1,9 +1,9 @@
 <ion-view title="通知通告" id="page30">
     <ion-content padding="true" class="has-header">
-        <div class="list card accordlist" ng-repeat="notice in notices" ng-click="detail(notice)">
+        <div class="list card accordlist" ng-repeat="notice in notices track by $index" ng-click="detail(notice)">
             <div class="item item-body">
                 <div id="page30-markdown21" style="color:#000000;">
-                    <p>主题：{{notice.theme}}</p>
+                    <p ng-bind-html='notice.theme'></p>
                 </div>
                 <div id="page30-markdown22" style="color:#000000;">
                     <p ng-bind-html="notice.description"></p>

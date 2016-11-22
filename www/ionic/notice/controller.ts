@@ -39,10 +39,12 @@ export async function IndexController($scope, Models, $location) {
             notice.isRead = true;
             await notice.save();
         }
-        if(notice.content && notice.content.length > 0){
-            window.location.href = "#/notice/detail?noticeId=" + notice.id;
+        if(notice.content && notice.content.indexOf("skipLink@") == 0 ){
+            // console.info("直接跳转");
+            window.location.href = notice.content.substring(9);
         }else{
-            window.location.href = notice.link;
+            // console.info("跳转详情");
+            window.location.href = "#/notice/detail?noticeId=" + notice.id;
         }
 
     }

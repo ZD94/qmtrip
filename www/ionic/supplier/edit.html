@@ -16,7 +16,7 @@
             <div class="item item-logo item-icon-right" ng-uploader accept="image/png, image/jpeg, image/gif" url="uploadUrl" edit="true" width="200" height="60" done="done">
                 <span class="input-label">LOGO</span>
                 <div class="logo">
-                    <img class="avatar-img" ng-src="/attachments/{{supplier.logo}}" ng-if="supplier.logo">
+                    <img class="avatar-img" ng-src="{{getImageUrl(supplier.logo)}}" ng-if="supplier.logo">
                 </div>
                 <i class="icon ion-chevron-right" style="color:#545454"></i>
             </div>

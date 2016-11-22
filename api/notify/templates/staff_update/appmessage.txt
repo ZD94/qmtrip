@@ -1,1 +1,1 @@
-【<%=account.company.name || '' %>】在<%=time || '' %>更新了您的鲸力商旅账号信息<br/>
+手机号码变更为：<%=account.mobile || '' %><br/>邮箱变更为变更为：<%=account.email || '' %>

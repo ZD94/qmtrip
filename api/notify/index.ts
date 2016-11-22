@@ -143,14 +143,14 @@ class NotifyTemplate{
         content = includes['email_frame.html']({content: content});
         let attachments = data.attachments || [];
 
-        let filenames = ['logo.png', 'logo_text.png', 'qrcode.png'];
+        /*let filenames = ['logo.png', 'logo_text.png', 'qrcode.png'];
         filenames.forEach( (filename) => {
             attachments.push({
                 path: path.relative(process.cwd(), path.join(__dirname, `static/${filename}`)),
                 filename: filename,
                 cid: filename
             });
-        });
+        });*/
         /*redisClient.simplePublish("checkcode:msg", content)
             .catch((err)=>{
                 logger.error('simplePublish error:', err);
@@ -177,10 +177,15 @@ class NotifyTemplate{
         let content;
         let title = this.appmessage.title(data);
         let description = this.appmessage.text(data);
-        if(this.appmessage.html)
-            content = this.appmessage.html(data);
+        if(this.appmessage.html){
+            let context = Object.create(data);
+            context.include = function(incname){
+                return includes[incname](context);
+            };
+            content = this.appmessage.html(context);
+        }
 
-        var notice = Notice.create({theme: title, content: content, description: description, link: data.appMessageUrl});
+        var notice = Notice.create({theme: title, content: content, description: description});
         notice.staff = await Models.staff.get(to.accountId);
 
         await notice.save();
@@ -258,6 +263,9 @@ export async function __init() {
 //通知模块
 export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean> {
     let {accountId, key, values, email} = params;
+    let values_clone =  _.cloneDeep(values);
+    console.info(key);
+    console.info("=============================");
     let openId = await API.auth.getOpenIdByAccount({accountId: accountId});
     let account: any = {};
     if(!accountId){
@@ -270,13 +278,13 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
     }
 
     if (openId) {
-        values.templateId = config.notify.templates[key];
+        values_clone.templateId = config.notify.templates[key];
     }
     let tpl = templates[key];
     if(!tpl)
         return false;
-    values.account = account;
-    await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: accountId }, values);
+    values_clone.account = account;
+    await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: accountId }, values_clone);
     return true;
 }
 
