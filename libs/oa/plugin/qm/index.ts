@@ -55,7 +55,8 @@ export class QmPlugin extends AbstractOAPlugin {
         //         throw {code: -3, msg: '审批人不存在'}
         //     tripApprove.approveUser = approveUser;
         // }
-
+        tripApprove.isSpecialApprove = approve.isSpecialApprove;
+        tripApprove.specialApproveRemark = approve.specialApproveRemark;
         tripApprove.status = QMEApproveStatus.WAIT_APPROVE;
         tripApprove.account = staff;
         tripApprove['companyId'] = company.id;

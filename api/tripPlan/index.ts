@@ -987,6 +987,7 @@ class TripPlanModule {
                     data.deptDateTime = query.leaveDate;
                     data.arrivalDateTime = query.goBackDate;
                     detail = Models.tripDetailSpecial.create(data);
+                    break;
                 default:
                     throw new Error("not support tripDetail type!");
             }

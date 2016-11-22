@@ -9,7 +9,7 @@ import {Staff} from "../_types/staff/staff";
 import {Models} from "../_types/index";
 import {emitter, EVENT} from "libs/oa";
 import {EApproveStatus, EApproveChannel, EApproveType} from "../_types/approve/types";
-import {TripPlan} from "../_types/tripPlan/tripPlan";
+import {TripPlan, ETripType} from "../_types/tripPlan/tripPlan";
 import TripPlanModule = require("../tripPlan/index");
 var API = require("common/api");
 
@@ -23,7 +23,65 @@ class ApproveModule {
 
         //获取预算详情
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: submitter.id});
-        let approve = Models.approve.create({submitter: submitter.id, data: budgetInfo, channel: submitter.company.oa, title: project});
+        return ApproveModule._submitApprove({
+            submitter: submitter.id,
+            data: budgetInfo,
+            title: project,
+            channel: submitter.company.oa,
+            type: EApproveType.TRAVEL_BUDGET,
+        });
+    }
+
+    @clientExport
+    @requireParams(['query', 'budget'], ['project', 'specialApproveRemark'])
+    static async submitSpecialApprove(params: {query: any, budget: number, project?: string, specialApproveRemark?: string}):Promise<Approve> {
+        let {query, budget, project, specialApproveRemark} = params;
+        let submitter = await Staff.getCurrent();
+        let budgetInfo = {
+            query: query,
+            budgets: [
+                {
+                    startAt: query.leaveDate,
+                    backAt: query.goBackDate,
+                    price: budget,
+                    tripType: ETripType.SPECIAL_APPROVE,
+                    reason: specialApproveRemark,
+                }
+            ]
+        }
+        return ApproveModule._submitApprove({
+            submitter: submitter.id,
+            data: budgetInfo,
+            title: project,
+            channel: submitter.company.oa,
+            type: EApproveType.TRAVEL_BUDGET,
+            isSpecialApprove: true,
+            specialApproveRemark: specialApproveRemark,
+        });
+    }
+
+    static async _submitApprove(params: {
+        submitter: string,
+        data?: any,
+        approveUser?: string,
+        title?: string,
+        channel?: EApproveChannel,
+        type?: EApproveType,
+        isSpecialApprove?: boolean,
+        specialApproveRemark?: string,
+    }) {
+        let {submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark } = params;
+
+        let approve = Models.approve.create({
+            submitter: submitter,
+            data: data,
+            channel: channel,
+            title: title,
+            type: type,
+            approveUser: approveUser,
+            isSpecialApprove: isSpecialApprove,
+            specialApproveRemark: specialApproveRemark,
+        });
         approve = await approve.save();
 
         let oas = {
@@ -35,10 +93,10 @@ class ApproveModule {
         //对接第三方OA
         emitter.emit(EVENT.NEW_TRIP_APPROVE, {
             approveNo: approve.id,
-            approveUser: submitter.id,
-            submitter: submitter.id,
+            approveUser: submitter,
+            submitter: submitter,
             status: EApproveStatus.WAIT_APPROVE,
-            oa: oas[submitter.company.oa] || 'qm'
+            oa: oas[channel] || 'qm'
         });
         return approve;
     }

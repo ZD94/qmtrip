@@ -67,6 +67,10 @@ export class Approve extends ModelObject implements IApprove {
     get isSpecialApprove() :boolean {return false;}
     set isSpecialApprove(isSpecialApprove: boolean) {}
 
+    @Field({type: Types.TEXT})
+    get specialApproveRemark(): string { return null}
+    set specialApproveRemark(remark: string) {}
+
     @Field({type: Types.STRING(50)})
     get outerId(): string {return null}
     set outerId(outerId: string) {}

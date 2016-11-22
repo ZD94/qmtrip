@@ -80,9 +80,10 @@ class TripApproveModule {
                     detail = Models.tripDetailSpecial.create(data);
                     detail.type = ETripType.SPECIAL_APPROVE;
                     detail.deptCity = approve.deptCityCode;
-                    detail.arrivalCity = approve.arrivalCity;
+                    detail.arrivalCity = approve.arrivalCityCode;
                     detail.startDateTime = approve.startAt;
                     detail.endDateTime = approve.backAt;
+                    break;
                 default:
                     throw new Error("not support tripDetail type!");
             }
@@ -279,7 +280,7 @@ class TripApproveModule {
         let tripApprove = await Models.tripApprove.get(params.approveId);
         let staff = tripApprove.account;
         let company = staff.company;
-        let approveUser = tripApprove.approveUser;
+        let approveUser = await Models.staff.get(tripApprove['approveUserId']);
 
         let details = await TripApproveModule.getDetailsFromApprove({approveId: tripApprove.id});
         let {go, back, hotel, subsidy} = await TripPlanModule.getEmailInfoFromDetails(details);

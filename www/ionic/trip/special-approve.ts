@@ -68,7 +68,16 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
         });
 
         try {
-            let tripApprove = await API.tripPlan.saveSpecialTripApprove({query: query, title: trip.reason||trip.reasonName, approveUserId: trip.auditUser.id, budget: trip.budget, specialApproveRemark: trip.specialApproveRemark});
+            API.require('approve');
+            await API.onload();
+            let tripApprove = await API.approve.submitSpecialApprove({
+                query: query, 
+                project: trip.reason||trip.reasonName,
+                approveUser: trip.auditUser.id,
+                budget: trip.budget,
+                specialApproveRemark: trip.specialApproveRemark
+            });
+            
             let approveId = tripApprove.id;
             $ionicPopup.show({
                 title: '出差申请已提交',
