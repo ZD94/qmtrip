@@ -89,7 +89,7 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
         if($scope.reserveType == "travel" && budget.invoiceType != 0){
             supplier.trafficBookLink = await supplier.getAirTicketReserveLink({fromCityName: budget.deptCity, toCityName: budget.arrivalCity, leaveDate: moment(budget.deptDateTime).format('YYYY-MM-DD') });
         }else if($scope.reserveType == "travel" && budget.invoiceType == 0){
-            supplier.trafficBookLink = "http://m.ctrip.com/webapp/train/";
+            supplier.trafficBookLink = "http://m.ctrip.com/webapp/train/home/list";
         }else if($scope.reserveType == "hotel"){
             supplier.hotelBookLink = await supplier.getHotelReserveLink({cityName: budget.city});
         }
@@ -144,31 +144,47 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
         backButtonCanClose: true,
     }
 
+    let train_search_param = {
+                                "value":
+                                {
+                                    "privateCustomType":null,
+                                    "aStation":"",
+                                    "dStation":"",
+                                    "dDate":"1479830400000",
+                                    "setField":"aStation",
+                                    "dStationCityName":"",
+                                    "dStationCityId":1,
+                                    "aStationCityName":"",
+                                    "aStationCityId":4,
+                                    "isFirstToListPage":true
+                                },
+                                "timeout":"2017/11/22 10:13:02",
+                                "tag":null,
+                                "savedate":"2016/11/22 10:13:02",
+                                "oldvalue":{}
+                            }
+    train_search_param.value.aStation = train_search_param.value.aStationCityName = $scope.budget.arrivalCity;
+    train_search_param.value.dStation = train_search_param.value.dStationCityName = $scope.budget.deptCity;
+    train_search_param.value.dDate = moment($scope.budget.deptDateTime).toDate().getTime();
+    // console.log(train_search_param.value.dDate);
+    // console.log(moment($scope.budget.deptDateTime));
+
+    var train_search_param_str = JSON.stringify(train_search_param);
+    // console.log(JSON.stringify(train_search_param));
+
     let timeout = $timeout(function(){
 
 
 
         if($scope.reserveType == "travel"){
             if(window.cordova){
-                // let ctripJs = `window.onload = function(){
-                //                var trains = document.getElementsByClassName('train-station')[0];
-                //                var from = trains.getElementsByClassName('from')[0];
-                //                var to = trains.getElementsByClassName('to')[0];
-                //                from.innerHTML = 'hahhah';
-                //                from.click();
-                //                console.log(from);
-                //                var search = document.getElementsByClassName('search_input')[0];
-                //                console.log(search);
-                //                search.value="tianjin"
-                //                //$(search).trigger('input');
-                //                }
-                //                `;
+                let ctripJs = "localStorage.setItem('TRAIN_SEARCH_PARAM', \'"+train_search_param_str+"\');console.log('train_search_param');";
                 //console.log(ctripJs);
                 let ref = cordova['ThemeableBrowser'].open(supplier.trafficBookLink,'_blank',ThemeableBrowserOption);
-               // ref.addEventListener('loadstop', function(){
-               //
-               //      ref.executeScript({code: ctripJs});
-               // })
+                ref.addEventListener('loadstop', function(){
+
+                    ref.executeScript({code: ctripJs});
+                })
             }else{
                 window.open(supplier.trafficBookLink, '_self');
             }
@@ -179,15 +195,12 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
                 window.open(supplier.hotelBookLink, '_self');
             }
         }
-
-        if(angular.isDefined(interval)){
-            $interval.cancel(interval);
-            interval = undefined;
-        }
     },3000)
 
     $scope.$on('$destroy', function(){
         $timeout.cancel(timeout);
         timeout = undefined;
+        $interval.cancel(interval);
+        interval = undefined;
     })
 }
