@@ -1,2 +1,2 @@
 <%=approveUser || '' %> 拒绝了您的出差请求
-<br/><%=startAt || '' %>-<%=backAt || '' %>   <%=deptCity || '' %>-<%=arrivalCity || '' %>  预算：<%=totalBudget || '' %>
+<%=startAt || '' %>-<%=backAt || '' %>   <%=deptCity || '' %>-<%=arrivalCity || '' %>  预算：<%=totalBudget || '' %>

@@ -312,16 +312,14 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
 
 export async function pushAppMessage(params){
     return new Promise(function(resolve,reject){
-        client.push().setPlatform(["android"])
-            .setAudience(JPush.ALL)
+        client.push().setPlatform(JPush.ALL)
+            .setAudience(JPush.registration_id([params.jpushId]))
             .setNotification(params.content,JPush.android(params.content, params.title, 1, {'link':params.link}),
                 JPush.ios(params.content, params.title, 1, true, {'link':params.link}))
             .send(function(err, res) {
                 if (err) {
                     return  reject(err);
                 }
-                console.info(res)
-                console.info("res========================")
                 return resolve(res);
             })
     })
