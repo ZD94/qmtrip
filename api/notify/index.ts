@@ -211,8 +211,8 @@ class NotifyTemplate{
             link = data.appMessageUrl;
         }
         let jpushId = await API.auth.getJpushIdByAccount({accountId: to.accountId});
-        /*if(!jpushId)
-            return;*/
+        if(!jpushId)
+            return;
         return pushAppMessage({content: description, title: title, link: link, jpushId: jpushId});
     }
 }

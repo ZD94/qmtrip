@@ -34,11 +34,11 @@ function getRegistrationID(){
     jPushPlugin.getRegistrationID(onGetRegistrationID);
 }
 
-function onGetRegistrationID(data) {
+async function onGetRegistrationID(data) {
     try {
         console.log("JPushPlugin:registrationID is " + data);
         if(data.length != 0) {
-            API.auth.saveOrUpdateJpushId({jpushId: data});
+            await API.auth.saveOrUpdateJpushId({jpushId: data});
         }
         if (data.length == 0) {
             var t1 = window.setTimeout(getRegistrationID, 1000);
@@ -71,7 +71,7 @@ function onOpenNotification(event) {
             alertContent = event.aps.alert;
             link = event.link;
         }
-        alert("open Notification:" + alertContent);
+        // alert("open Notification:" + alertContent);
         if(link && link.length > 0){
             window.location.href = link;
         }
