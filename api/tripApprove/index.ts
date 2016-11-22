@@ -706,11 +706,6 @@ class TripApproveModule {
         await tripApprove.destroy();
         return true;
     }
-
-    //加载OA http
-    static __initHttpApp(app) {
-        __initHttpApp(app);
-    }
 }
 
 

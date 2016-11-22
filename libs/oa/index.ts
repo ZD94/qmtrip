@@ -23,36 +23,6 @@ let plugins = {
     // ddtalk: new DDTalkPlugin(),
 }
 
-export function __initHttpApp(app) {
-    app.post('/oa/notify', function(req, res, next) {
-        let {oa, method} = req.query;
-        let data: any = req.body;
-        let key = data.key;
-        delete data.key;
-        //校验OA与系统通信的KEY
-        if (!key || key != 'jingli2016') {
-            res.send(403);
-            return;
-        }
-
-        if (!oa)  {
-            oa = 'qm';
-        }
-        //仅支持这两个回调
-        let availableFns = ['tripApproveUpdateNotify', 'tripInvoiceUpdateNotify'];
-        if (availableFns.indexOf(method) < 0) {
-            res.send(403);
-            return;
-        }
-        let fn = plugins[oa][method];
-        if ( fn && typeof fn == 'function') {
-            // console.info('OA返回的数据===>', data)
-            fn.bind(plugins[oa])(null, data);
-        }
-        res.send('success');
-    });
-}
-
 function regPluginCallback() {
     for(let key in plugins) {
         let plugin: IOAPlugin= plugins[key];

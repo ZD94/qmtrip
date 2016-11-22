@@ -42,11 +42,6 @@ class ApproveModule {
         });
         return approve;
     }
-
-    static async createTripPlanByApprove(params) :Promise<TripPlan> {
-        let tripPlan = Models.tripPlan.create({});
-        return tripPlan;
-    }
 }
 
 //监听审批单变化
