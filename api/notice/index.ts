@@ -20,7 +20,7 @@ class NoticeModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["theme","content","link","staffId"], noticeCols)
+    @requireParams(["title","content","link","staffId"], noticeCols)
     @conditionDecorator([
         {if: condition.isSameCompany("0.staffId")}
     ])
@@ -120,9 +120,9 @@ class NoticeModule{
     @requireParams(["optins", "staffId", "link"])
     static async recordNotice(params): Promise<Notice>{
         //得到通知内容
-        var {content, theme} = await API.notify.getSubmitNotifyContent(params.optins);
+        var {content, title} = await API.notify.getSubmitNotifyContent(params.optins);
         var notice = Notice.create();
-        notice.theme = theme;
+        notice.title = title;
         notice.content = content;
         notice.staff = await Models.staff.get(params.staffId);
         notice.link = params.link;

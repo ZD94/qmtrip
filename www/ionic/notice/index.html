@@ -3,7 +3,7 @@
         <div class="list notice" ng-repeat="notice in notices track by $index" ng-click="detail(notice)">
             <div class="item item-body">
                 <div>
-                    <span>{{notice.theme}}</span>
+                    <span>{{notice.title}}</span>
                     <span ng-if="!notice.isRead" class="new_notice icon ion-record"></span>
                     <span class="item-note">{{notice.createdAt | date : 'yyyy-MM-dd'}}</span>
                 </div>
