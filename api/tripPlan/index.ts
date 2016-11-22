@@ -708,7 +708,6 @@ class TripPlanModule {
             let self_values: any = {};
             try {
                 self_url = await API.wechat.shorturl({longurl: self_url});
-                appMessageUrl = await API.wechat.shorturl({longurl: appMessageUrl});
             } catch(err) {
                 console.error(err);
             }
