@@ -190,7 +190,7 @@ class NotifyTemplate{
             content = this.appmessage.html(context);
         }
 
-        var notice = Notice.create({theme: title, content: content, description: description});
+        var notice = Notice.create({title: title, content: content, description: description});
         notice.staff = await Models.staff.get(to.accountId);
 
         await notice.save();
