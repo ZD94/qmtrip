@@ -2,13 +2,13 @@
     <ion-content padding="true" class="has-header">
         <div class="list notice" ng-repeat="notice in notices track by $index" ng-click="detail(notice)">
             <div class="item item-body">
-                <div>
+                <div class="notice_title">
                     <span>{{notice.title}}</span>
                     <span ng-if="!notice.isRead" class="new_notice icon ion-record"></span>
                     <span class="item-note">{{notice.createdAt | date : 'yyyy-MM-dd'}}</span>
                 </div>
-                <div id="page30-markdown22" style="color:#000000;">
-                    <p><pre>{{notice.description}}</pre></p>
+                <div>
+                    <div class="notice_desc">{{notice.description}}</div>
                 </div>
             </div>
         </div>
