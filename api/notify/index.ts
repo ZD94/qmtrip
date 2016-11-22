@@ -8,11 +8,6 @@ import Logger = require('common/logger');
 const logger = new Logger('qm:notify');
 import redisClient = require("common/redis-client");
 import {Models} from "api/_types";
-import { Notice } from 'api/_types/notice';
-let jpushParams = require('config/config').jpush_params;
-
-var JPush = require("jpush-sdk");
-var client = JPush.buildClient(jpushParams.appKey, jpushParams.masterSecret);
 
 const config = require('config');
 let API = require('common/api');
@@ -89,8 +84,7 @@ class NotifyTemplate{
             this.sendSms(to, data),
             this.sendWechat(to, data),
             this.sendEmail(to, data),
-            this.saveNotice(to, data),
-            this.pushMessage(to, data)
+            this.saveNotice(to, data)
         ]);
     }
 
@@ -148,14 +142,6 @@ class NotifyTemplate{
         content = includes['email_frame.html']({content: content});
         let attachments = data.attachments || [];
 
-        /*let filenames = ['logo.png', 'logo_text.png', 'qrcode.png'];
-        filenames.forEach( (filename) => {
-            attachments.push({
-                path: path.relative(process.cwd(), path.join(__dirname, `static/${filename}`)),
-                filename: filename,
-                cid: filename
-            });
-        });*/
         /*redisClient.simplePublish("checkcode:msg", content)
             .catch((err)=>{
                 logger.error('simplePublish error:', err);
@@ -190,30 +176,9 @@ class NotifyTemplate{
             content = this.appmessage.html(context);
         }
 
-        var notice = Notice.create({title: title, content: content, description: description});
-        notice.staff = await Models.staff.get(to.accountId);
 
-        await notice.save();
+        await API.notice.createNotice({title: title, content: content, description: description, staffId: to.accountId});
         logger.info('成功发送通知:', data.account.name, this.name);
-    }
-    async pushMessage(to: NotifyToAddress, data: any){
-        if(!to.accountId)
-            return;
-        if(!this.appmessage)
-            return;
-        if(!this.appmessage.title || !this.appmessage.text)
-            return;
-
-        let title = this.appmessage.title(data);
-        let description = this.appmessage.text(data);
-        let link = "";
-        if(data.appMessageUrl) {
-            link = data.appMessageUrl;
-        }
-        let jpushId = await API.auth.getJpushIdByAccount({accountId: to.accountId});
-        if(!jpushId)
-            return;
-        return pushAppMessage({content: description, title: title, link: link, jpushId: jpushId});
     }
 }
 
@@ -308,19 +273,4 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
     values_clone.account = account;
     await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: accountId }, values_clone);
     return true;
-}
-
-export async function pushAppMessage(params){
-    return new Promise(function(resolve,reject){
-        client.push().setPlatform(JPush.ALL)
-            .setAudience(JPush.registration_id([params.jpushId]))
-            .setNotification(params.content,JPush.android(params.content, params.title, 1, {'link':params.link}),
-                JPush.ios(params.content, params.title, 1, true, {'link':params.link}))
-            .send(function(err, res) {
-                if (err) {
-                    return  reject(err);
-                }
-                return resolve(res);
-            })
-    })
 }

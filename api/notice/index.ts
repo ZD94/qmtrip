@@ -26,7 +26,16 @@ class NoticeModule{
     ])
     static async createNotice (params) : Promise<Notice>{
         var notice = Notice.create(params);
-        return notice.save();
+        var result = await notice.save();
+        var jpushId = await API.auth.getJpushIdByAccount({accountId: params.staffId});
+        var link = "";
+        if(result.content.startsWith("skipLink@")) {
+            link = result.content.substring(9);
+        }
+        if(jpushId){
+            await API.jpush.pushAppMessage({content: result.description, title: result.title, link: link, jpushId: jpushId});
+        }
+        return result;
     }
 
 

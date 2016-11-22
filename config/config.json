@@ -90,9 +90,5 @@
       "qm_notify_invoice_one_pass": "",
       "qm_notify_invoice_not_pass": ""
     }
-  },
-  "jpush_params": {
-    "appKey": "f57e4e7c0c9b2d2c4c50741d",
-    "masterSecret": "25b313c1b0a2133f24dfbaed"
   }
 }
