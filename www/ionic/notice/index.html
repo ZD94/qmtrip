@@ -1,22 +1,18 @@
 <ion-view title="通知通告" id="page30">
     <ion-content padding="true" class="has-header">
-        <div class="list card accordlist" ng-repeat="notice in notices track by $index" ng-click="detail(notice)">
+        <div class="list notice" ng-repeat="notice in notices track by $index" ng-click="detail(notice)">
             <div class="item item-body">
-                <div id="page30-markdown21" style="color:#000000;">
-                    <p ng-bind-html='notice.theme'></p>
+                <div>
+                    <span>{{notice.theme}}</span>
+                    <span ng-if="!notice.isRead" class="new_notice icon ion-record"></span>
+                    <span class="item-note">{{notice.createdAt | date : 'yyyy-MM-dd'}}</span>
                 </div>
                 <div id="page30-markdown22" style="color:#000000;">
                     <p><pre>{{notice.description}}</pre></p>
                 </div>
-                <div id="page30-markdown23" style="color:#000000;">
-                    <p>时间：{{notice.createdAt | date : 'yyyy-MM-dd'}}</p>
-                </div>
-                <div id="page30-markdown24" style="color:#000000;">
-                    <p>状态：{{notice.isRead ? '已读' : '未读'}}</p>
-                </div>
             </div>
         </div>
-        <div id="page13-markdown3">
+        <div>
             <div ng-if="!vm.isHasNextPage" class="getMoreOrNoMore">没有更多记录了</div>
         </div>
         <ion-infinite-scroll ng-if="vm.isHasNextPage" on-infinite="vm.nextPage()"></ion-infinite-scroll>

@@ -2,7 +2,7 @@ import { ETripType, EInvoiceType, MTxPlaneLevel } from 'api/_types/tripPlan';
 import moment = require('moment');
 import { Staff } from 'api/_types/staff/staff';
 
-export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup){
+export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup, $ionicHistory){
     require('./trip.scss');
     require('./budget.scss');
     API.require("tripPlan");
@@ -107,6 +107,10 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
                         text: '个人中心',
                         type: 'button-calm button-outline',
                         onTap:function(){
+                            $ionicHistory.nextViewOptions({
+                                disableBack: true,
+                                expire: 300
+                            });
                             window.location.href = '#/staff/index'
                         }
                     },
@@ -114,6 +118,10 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
                         text: '查看审批单',
                         type: ' button-calm',
                         onTap: function(){
+                            $ionicHistory.nextViewOptions({
+                                disableBack: true,
+                                expire: 300
+                            });
                             window.location.href = `#/trip-approval/detail?approveId=${approveId}`
                         }
                     }

@@ -1,8 +1,11 @@
 
 declare var ionic:any;
 var jPushPlugin;
+var API = require('common/api');
 
 export default async function initJPush($ionicPlatform, $document){
+    API.require('auth');
+    await API.onload();
     $ionicPlatform.ready(function(){
         console.log('platform ready');
         if(!window.cordova || !window.plugins || !window.plugins['jPushPlugin'])
@@ -34,7 +37,9 @@ function getRegistrationID(){
 function onGetRegistrationID(data) {
     try {
         console.log("JPushPlugin:registrationID is " + data);
-
+        if(data.length != 0) {
+            API.auth.saveOrUpdateJpushId({jpushId: data});
+        }
         if (data.length == 0) {
             var t1 = window.setTimeout(getRegistrationID, 1000);
         }
