@@ -67,6 +67,9 @@ function onOpenNotification(event) {
             link = event.link;
         }
         alert("open Notification:" + alertContent+"##@@"+link);
+        if(link && link.length > 0){
+            window.location.href = link;
+        }
         console.log(event);
         console.log("###################");
     } catch (exception) {

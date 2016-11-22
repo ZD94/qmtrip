@@ -210,10 +210,10 @@ class NotifyTemplate{
         if(data.appMessageUrl) {
             link = data.appMessageUrl;
         }
-        let equipmentId = await API.auth.getEquipmentIdByAccount({accountId: to.accountId});
-        /*if(!equipmentId)
+        let jpushId = await API.auth.getJpushIdByAccount({accountId: to.accountId});
+        /*if(!jpushId)
             return;*/
-        return pushAppMessage({content: description, title: title, link: link, equipmentId: equipmentId});
+        return pushAppMessage({content: description, title: title, link: link, jpushId: jpushId});
     }
 }
 
@@ -315,7 +315,7 @@ export async function pushAppMessage(params){
         client.push().setPlatform(["android"])
             .setAudience(JPush.ALL)
             .setNotification(params.content,JPush.android(params.content, params.title, 1, {'link':params.link}),
-                JPush.ios(params.content, params.title, 1, {'link':params.link}))
+                JPush.ios(params.content, params.title, 1, true, {'link':params.link}))
             .send(function(err, res) {
                 if (err) {
                     return  reject(err);
