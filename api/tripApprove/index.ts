@@ -330,7 +330,6 @@ class TripApproveModule {
         if(isNextApprove && !params.nextApproveUserId)
             throw new Error("审批人不能为空");
 
-        console.info(tripApprove);
         if (!tripApprove.isSpecialApprove && !budgetId){
             throw new Error(`预算信息已失效请重新生成`);
         }else if(approveResult != EApproveResult.PASS && approveResult != EApproveResult.REJECT) {
@@ -341,11 +340,13 @@ class TripApproveModule {
         // else if(tripApprove.approveUser.id != staff.id) {
         //     throw L.ERR.PERMISSION_DENY();
         // }
+        let budgetInfo;
 
         if(!tripApprove.isSpecialApprove){
-            let budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
+            budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
             if (!budgetInfo || !budgetInfo.budgets)
                 throw new Error(`预算信息已失效请重新生成`);
+
             let finalBudget = 0;
             budgetInfo.budgets.forEach((v) => {
                 if (v.price <= 0) {
@@ -494,6 +495,7 @@ class TripApproveModule {
             status: tripApprove.status,
             approveUser: staff.id,
             outerId: tripApprove.id,
+            data: budgetInfo,
         });
 
         return true;
@@ -602,13 +604,6 @@ class TripApproveModule {
         }
 
         await Promise.all([tripApprove.save(), tripPlanLog.save()]);
-
-        // emitter.emit(EVENT.NEW_TRIP_APPROVE, {
-        //     budgetId: tripApprove.id,
-        //     userId: staff.id,
-        //     approveUser: tripApprove.approveUser.id,
-        //     oa: 'qm',
-        // });
         return tripApprove;
     }
 

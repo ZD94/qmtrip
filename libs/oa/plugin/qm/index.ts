@@ -46,7 +46,7 @@ export class QmPlugin extends AbstractOAPlugin {
             return v;
         });
 
-        // let project = await getProjectByName({companyId: company.id, name: params.title, userId: staff.id, isCreate: true});
+        let project = await API.tripPlan.getProjectByName({companyId: company.id, name: approve.title, userId: staff.id, isCreate: true});
         // let tripApprove =  TripApprove.create(params);
 
         // if(params.approveUserId) {
@@ -59,9 +59,10 @@ export class QmPlugin extends AbstractOAPlugin {
         tripApprove.status = QMEApproveStatus.WAIT_APPROVE;
         tripApprove.account = staff;
         tripApprove['companyId'] = company.id;
-        // tripApprove.project = project;
+        tripApprove.project = project;
+        tripApprove.title = approve.title;
         tripApprove.startAt = query.leaveDate;
-        tripApprove.backAt = query.goBackDate
+        tripApprove.backAt = query.goBackDate;
         tripApprove.query = JSON.stringify(query);
 
         let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace.id|| query.destinationPlace}) || {name: null};

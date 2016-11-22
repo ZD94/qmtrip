@@ -47,7 +47,7 @@ class ApproveModule {
 //监听审批单变化
 emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result) {
     let p = (async function(){
-        let {approveNo, submitter, outerId, status, approveUser} = result;
+        let {approveNo, submitter, outerId, status, approveUser, data} = result;
         let approve = await Models.approve.get(approveNo);
         if (approve.status == status) {
             return;
@@ -57,6 +57,9 @@ emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result) {
         approve.approveUser = approveUser;
         approve.approveDateTime = new Date();
         approve.outerId = outerId;
+        if (data) {
+            approve.data = data;
+        }
         approve = await approve.save();
 
         //预算审批完成
