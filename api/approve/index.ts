@@ -23,7 +23,7 @@ class ApproveModule {
 
         //获取预算详情
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: submitter.id});
-        let approve = Models.approve.create({submitter: submitter.id, data: budgetInfo, channel: EApproveChannel.QM, title: project});
+        let approve = Models.approve.create({submitter: submitter.id, data: budgetInfo, channel: submitter.company.oa, title: project});
         approve = await approve.save();
 
         let oas = {
