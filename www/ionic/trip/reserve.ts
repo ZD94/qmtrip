@@ -1,7 +1,7 @@
 import { ETripType, TripDetail, EPlanStatus } from 'api/_types/tripPlan';
 import { Staff } from 'api/_types/staff/staff';
 import { ESupplierType } from 'api/_types/company/supplier';
-import * as path from 'path';
+
 
 let moment = require("moment");
 
@@ -43,7 +43,7 @@ export async function ReserveController($scope, Models, $stateParams){
     }
 }
 
-export async function ReserveRedirectController($scope, Models, $stateParams, $interval, $timeout, City){
+export async function ReserveRedirectController($scope, Models, $stateParams, $interval, $timeout, City, inAppBrowser){
     require('./reserve.scss');
 
     var budget = await Models.tripDetail.get($stateParams.detailId);
@@ -54,14 +54,6 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     var supplier = await Models.supplier.get($stateParams.supplier);
     $scope.supplier = supplier;
 
-    // console.info({fromCityName: budget.deptCity, toCityName: budget.arrivalCity, leaveDate: moment(budget.deptDateTime).format('YYYY-MM-DD') });
-    // var airTicketLink = await supplier.getAirTicketReserveLink({fromCityName: budget.deptCity, toCityName: budget.arrivalCity, leaveDate: moment(budget.deptDateTime).format('YYYY-MM-DD') });
-    // console.info(airTicketLink);
-    // console.info("airTicketLink========");
-    //
-    // var hotelLink = await supplier.getHotelReserveLink({cityName: budget.arrivalCity});
-    // console.info(hotelLink);
-    // console.info("hotelLink==========");
 
     API.require("place")
     await API.onload();
@@ -85,11 +77,36 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     }
 
     //判断是否是携程
+    var linkJS: string = '';
     if(supplier.name == '携程旅行'){
         if($scope.reserveType == "travel" && budget.invoiceType != 0){
             supplier.trafficBookLink = await supplier.getAirTicketReserveLink({fromCityName: budget.deptCity, toCityName: budget.arrivalCity, leaveDate: moment(budget.deptDateTime).format('YYYY-MM-DD') });
         }else if($scope.reserveType == "travel" && budget.invoiceType == 0){
             supplier.trafficBookLink = "http://m.ctrip.com/webapp/train/home/list";
+            let train_search_param = {
+                                        "value":
+                                        {
+                                            "privateCustomType":null,
+                                            "aStation":"",
+                                            "dStation":"",
+                                            "dDate":"1479830400000",
+                                            "setField":"aStation",
+                                            "dStationCityName":"",
+                                            "dStationCityId":1,
+                                            "aStationCityName":"",
+                                            "aStationCityId":4,
+                                            "isFirstToListPage":true
+                                        },
+                                        "timeout":"2017/11/22 10:13:02",
+                                        "tag":null,
+                                        "savedate":"2016/11/22 10:13:02",
+                                        "oldvalue":{}
+                                    }
+            train_search_param.value.aStation = train_search_param.value.aStationCityName = $scope.budget.arrivalCity;
+            train_search_param.value.dStation = train_search_param.value.dStationCityName = $scope.budget.deptCity;
+            train_search_param.value.dDate = moment($scope.budget.deptDateTime).toDate().getTime();
+            var train_search_param_str = JSON.stringify(train_search_param);
+            linkJS = "localStorage.setItem('TRAIN_SEARCH_PARAM', \'"+train_search_param_str+"\');console.log('train_search_param');";
         }else if($scope.reserveType == "hotel"){
             supplier.hotelBookLink = await supplier.getHotelReserveLink({cityName: budget.city});
         }
@@ -112,89 +129,16 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
             $scope.load_third = false;
         }
     },200)
-    if(window.cordova){
-        console.log(cordova);
 
+    var url: string = '';
+    if($scope.reserveType == "travel"){
+        url = supplier.trafficBookLink;
+    }else{
+        url = supplier.hotelBookLink;
     }
-
-    let relpath = path.relative(window['bundle_url'], window['Manifest'].root);
-    let ThemeableBrowserOption = {
-        toolbar: {
-            height: 44,
-            color: '#f0f0f0ff'
-        },
-        title: {
-            color: '#003264ff',
-            staticText: '鲸力商旅',
-        },
-        backButton: {
-            wwwImage: relpath+'/ionic/images/back.png',
-            wwwImagePressed: relpath+'/ionic/images/back.png',
-            wwwImageDensity: 2,
-            align: 'left',
-            event: 'backPressed'
-        },
-        closeButton: {
-            wwwImage: relpath+'/ionic/images/close.png',
-            wwwImagePressed: relpath+'/ionic/images/close.png',
-            wwwImageDensity: 2,
-            align: 'left',
-            event: 'closePressed'
-        },
-        backButtonCanClose: true,
-    }
-
-    let train_search_param = {
-                                "value":
-                                {
-                                    "privateCustomType":null,
-                                    "aStation":"",
-                                    "dStation":"",
-                                    "dDate":"1479830400000",
-                                    "setField":"aStation",
-                                    "dStationCityName":"",
-                                    "dStationCityId":1,
-                                    "aStationCityName":"",
-                                    "aStationCityId":4,
-                                    "isFirstToListPage":true
-                                },
-                                "timeout":"2017/11/22 10:13:02",
-                                "tag":null,
-                                "savedate":"2016/11/22 10:13:02",
-                                "oldvalue":{}
-                            }
-    train_search_param.value.aStation = train_search_param.value.aStationCityName = $scope.budget.arrivalCity;
-    train_search_param.value.dStation = train_search_param.value.dStationCityName = $scope.budget.deptCity;
-    train_search_param.value.dDate = moment($scope.budget.deptDateTime).toDate().getTime();
-    // console.log(train_search_param.value.dDate);
-    // console.log(moment($scope.budget.deptDateTime));
-
-    var train_search_param_str = JSON.stringify(train_search_param);
-    // console.log(JSON.stringify(train_search_param));
 
     let timeout = $timeout(function(){
-
-
-
-        if($scope.reserveType == "travel"){
-            if(window.cordova){
-                let ctripJs = "localStorage.setItem('TRAIN_SEARCH_PARAM', \'"+train_search_param_str+"\');console.log('train_search_param');";
-                //console.log(ctripJs);
-                let ref = cordova['ThemeableBrowser'].open(supplier.trafficBookLink,'_blank',ThemeableBrowserOption);
-                ref.addEventListener('loadstop', function(){
-
-                    ref.executeScript({code: ctripJs});
-                })
-            }else{
-                window.open(supplier.trafficBookLink, '_self');
-            }
-        }else if($scope.reserveType == "hotel"){
-            if(window.cordova){
-                let ref = cordova['ThemeableBrowser'].open(supplier.hotelBookLink,'_blank',ThemeableBrowserOption);
-            }else{
-                window.open(supplier.hotelBookLink, '_self');
-            }
-        }
+        inAppBrowser.open(url, linkJS);
     },3000)
 
     $scope.$on('$destroy', function(){
