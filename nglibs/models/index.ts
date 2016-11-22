@@ -4,9 +4,9 @@ import ng = require('angular');
 import L from 'common/language';
 
 import { ModelsInterface, initModels } from 'api/_types';
-import { ModelObjInterface } from 'common/model/interface';
+import { ModelObjInterface, ModelInterface } from 'common/model/interface';
 import { ModelCached } from 'common/model/cached';
-import { ModelRemote } from 'common/model/remote';
+import { ModelRemoteOld, ModelRemote } from 'common/model/remote';
 import { ngService } from '../index';
 import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from 'api/_types/staff';
 import { Company, MoneyChange, Supplier } from 'api/_types/company';
@@ -136,56 +136,64 @@ function createService<T extends ModelObjInterface>(options: any, cacheFactory: 
     options.funcCreate = options.funcs[2] || throwNotImplemented;
     options.funcUpdate = options.funcs[3] || throwNotImplemented;
     options.funcDelete = options.funcs[4] || throwNotImplemented;
+    return new ModelRemoteOld<T>(options)
+}
+
+
+function createRemoteService<T extends ModelObjInterface>(options: any, cacheFactory: ng.ICacheFactoryService){
+    options.cache = cacheFactory(options.type.name);
+    options.resolve = resolverAPIModule('model');
     return new ModelRemote<T>(options)
 }
+
 
 @ngService('Models')
 class ClientModels implements ModelsInterface {
 
-    staff: ModelRemote<Staff>;
-    credential: ModelRemote<Credential>;
-    pointChange:ModelRemote<PointChange>;
-    invitedLink:ModelRemote<InvitedLink>;
-    staffSupplierInfo:ModelRemote<StaffSupplierInfo>;
-    company: ModelRemote<Company>;
-    supplier: ModelRemote<Supplier>;
-    department: ModelRemote<Department>;
-    travelPolicy: ModelRemote<TravelPolicy>;
-    subsidyTemplate: ModelRemote<SubsidyTemplate>;
-    accordHotel: ModelRemote<AccordHotel>;
-    notice: ModelRemote<Notice>;
-    agency: ModelRemote<Agency>;
-    agencyUser: ModelRemote<AgencyUser>;
-    tripPlan: ModelRemote<TripPlan>;
-    tripDetail: ModelRemote<TripDetail>;
-    tripDetailTraffic: ModelRemote<TripDetailTraffic>;
-    tripDetailHotel: ModelRemote<TripDetailHotel>;
-    tripDetailSubsidy: ModelRemote<TripDetailSubsidy>;
-    tripDetailInvoice: ModelRemote<TripDetailInvoice>;
-    tripDetailSpecial: ModelRemote<TripDetailSpecial>;
+    staff: ModelInterface<Staff>;
+    credential: ModelInterface<Credential>;
+    pointChange:ModelInterface<PointChange>;
+    invitedLink:ModelInterface<InvitedLink>;
+    staffSupplierInfo:ModelInterface<StaffSupplierInfo>;
+    company: ModelInterface<Company>;
+    supplier: ModelInterface<Supplier>;
+    department: ModelInterface<Department>;
+    travelPolicy: ModelInterface<TravelPolicy>;
+    subsidyTemplate: ModelInterface<SubsidyTemplate>;
+    accordHotel: ModelInterface<AccordHotel>;
+    notice: ModelInterface<Notice>;
+    agency: ModelInterface<Agency>;
+    agencyUser: ModelInterface<AgencyUser>;
+    tripPlan: ModelInterface<TripPlan>;
+    tripDetail: ModelInterface<TripDetail>;
+    tripDetailTraffic: ModelInterface<TripDetailTraffic>;
+    tripDetailHotel: ModelInterface<TripDetailHotel>;
+    tripDetailSubsidy: ModelInterface<TripDetailSubsidy>;
+    tripDetailInvoice: ModelInterface<TripDetailInvoice>;
+    tripDetailSpecial: ModelInterface<TripDetailSpecial>;
 
-    tripPlanLog: ModelRemote<TripPlanLog>;
-    moneyChange: ModelRemote<MoneyChange>;
-    project: ModelRemote<Project>;
-    tripApprove: ModelRemote<TripApprove>;
-    //place: ModelRemote<Place>;
-    account: ModelRemote<Account>;
-    seed: ModelRemote<Seed>;
-    token: ModelRemote<Token>;
-    travelBudgetLog: ModelRemote<TravelBudgetLog>;
-    financeCheckCode: ModelRemote<FinanceCheckCode>;
+    tripPlanLog: ModelInterface<TripPlanLog>;
+    moneyChange: ModelInterface<MoneyChange>;
+    project: ModelInterface<Project>;
+    tripApprove: ModelInterface<TripApprove>;
+    //place: ModelInterface<Place>;
+    account: ModelInterface<Account>;
+    seed: ModelInterface<Seed>;
+    token: ModelInterface<Token>;
+    travelBudgetLog: ModelInterface<TravelBudgetLog>;
+    financeCheckCode: ModelInterface<FinanceCheckCode>;
     
-    ddtalkCorp: ModelRemote<DDTalkCorp>;
-    ddtalkUser: ModelRemote<DDTalkUser>;
+    ddtalkCorp: ModelInterface<DDTalkCorp>;
+    ddtalkUser: ModelInterface<DDTalkUser>;
 
-    coinAccount: ModelRemote<CoinAccount>;
-    coinAccountChange: ModelRemote<CoinAccountChange>;
+    coinAccount: ModelInterface<CoinAccount>;
+    coinAccountChange: ModelInterface<CoinAccountChange>;
 
     constructor($cacheFactory: ng.ICacheFactoryService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
         this.credential = createService<Credential>(Services.credential, $cacheFactory);
         this.pointChange = createService<PointChange>(Services.pointChange, $cacheFactory);
-        this.supplier = createService<Supplier>(Services.supplier, $cacheFactory);
+        this.supplier = createRemoteService<Supplier>(Services.supplier, $cacheFactory);
         this.invitedLink = createService<InvitedLink>(Services.invitedLink, $cacheFactory);
         this.staffSupplierInfo = createService<StaffSupplierInfo>(Services.staffSupplierInfo, $cacheFactory);
         this.company = createService<Company>(Services.company, $cacheFactory);
