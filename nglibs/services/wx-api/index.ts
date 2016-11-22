@@ -18,30 +18,28 @@ angular
         if(window.cordova) {
             return new WechatCordovaApi($ionicPlatform);
         }
-        if(!browserspec.is_wechat &&!window.cordova) {
-            return {
-                $resolve: function(){
-                    return Promise.resolve();
-                },
-                chooseImage: async function(options?: {count?:number; sizeType?:string[]; sourceType?:string[]}): Promise<string[]>{
-                    return [];
-                },
-                uploadImage: async function(options?: {localId:string; isShowProgressTips?:number}): Promise<string>{
-                    return '';
-                },
-                setupSharePrivate:function(options:{title:string; desc:string; link:string; imgUrl:string; type?:string; dataUrl?:string;mediaTagName?:string; messageExt?:string; messageAction?:string;shareType?:string}, scene?:string[]){
-                    return '';
-                },
-                setupSharePublic: function(options:{title:string; desc:string; link:string; imgUrl:string; type?:string; dataUrl?:string}, scene?:string[]){
-                    return '';
-                },
-                isInstalled: function(){
-                    return false;
-                }
-            };
-        }
         if(browserspec.is_wechat){
             return new WechatApi($rootScope);
         }
+        return {
+            $resolve: function(){
+                return Promise.resolve();
+            },
+            chooseImage: async function(options?: {count?:number; sizeType?:string[]; sourceType?:string[]}): Promise<string[]>{
+                return [];
+            },
+            uploadImage: async function(options?: {localId:string; isShowProgressTips?:number}): Promise<string>{
+                return '';
+            },
+            setupSharePrivate:function(options:{title:string; desc:string; link:string; imgUrl:string; type?:string; dataUrl?:string;mediaTagName?:string; messageExt?:string; messageAction?:string;shareType?:string}, scene?:string[]){
+                return '';
+            },
+            setupSharePublic: function(options:{title:string; desc:string; link:string; imgUrl:string; type?:string; dataUrl?:string}, scene?:string[]){
+                return '';
+            },
+            isInstalled: function(){
+                return false;
+            }
+        };
 
     });

@@ -4,7 +4,7 @@ import './loading';
 import './wx-api';
 import './modal-dlg';
 import './ddtalk-api'
-
+import './ThemeableBrowser';
 import './AirCompany';
 import './Airport';
 import './closePopup';
