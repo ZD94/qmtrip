@@ -3,6 +3,7 @@ import { Staff } from 'api/_types/staff/staff';
 export * from './detail';
 
 export async function IndexController($scope, Models, $location) {
+    require('./notice.scss');
     $scope.notices = [];
     var staff = await Staff.getCurrent();
     var pager = await staff.getSelfNotices();
@@ -22,7 +23,7 @@ export async function IndexController($scope, Models, $location) {
             $scope.$broadcast('scroll.infiniteScrollComplete');
         }
     }
-
+    
     function loadStaffs(pager) {
         if(pager && pager.length>0){
             pager.forEach(function(notice){
@@ -39,7 +40,7 @@ export async function IndexController($scope, Models, $location) {
             notice.isRead = true;
             await notice.save();
         }
-        if(notice.content && notice.content.indexOf("skipLink@") == 0 ){
+        if(notice.content && notice.content.startsWith("skipLink@")){
             // console.info("直接跳转");
             window.location.href = notice.content.substring(9);
         }else{
