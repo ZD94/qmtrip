@@ -63,12 +63,20 @@ function onTagsWithAlias(event) {
 function onOpenNotification(event) {
     try {
         var alertContent;
+        var link;
         if (device.platform == "Android") {
             alertContent = event.alert;
+            link = event.extras.link;
         } else {
             alertContent = event.aps.alert;
+            link = event.link;
         }
-        alert("open Notification:" + alertContent);
+        alert("open Notification:" + alertContent+"##@@"+link);
+        if(link && link.length > 0){
+            window.location.href = link;
+        }
+        console.log(event);
+        console.log("###################");
     } catch (exception) {
         console.log("JPushPlugin:onOpenNotification" + exception);
     }

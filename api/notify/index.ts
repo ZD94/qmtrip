@@ -9,6 +9,10 @@ const logger = new Logger('qm:notify');
 import redisClient = require("common/redis-client");
 import {Models} from "api/_types";
 import { Notice } from 'api/_types/notice';
+let jpushParams = require('config/config').jpush_params;
+
+var JPush = require("jpush-sdk");
+var client = JPush.buildClient(jpushParams.appKey, jpushParams.masterSecret);
 
 const config = require('config');
 let API = require('common/api');
@@ -86,6 +90,7 @@ class NotifyTemplate{
             this.sendWechat(to, data),
             this.sendEmail(to, data),
             this.saveNotice(to, data),
+            this.pushMessage(to, data)
         ]);
     }
 
@@ -191,6 +196,25 @@ class NotifyTemplate{
         await notice.save();
         logger.info('成功发送通知:', data.account.name, this.name);
     }
+    async pushMessage(to: NotifyToAddress, data: any){
+        if(!to.accountId)
+            return;
+        if(!this.appmessage)
+            return;
+        if(!this.appmessage.title || !this.appmessage.text)
+            return;
+
+        let title = this.appmessage.title(data);
+        let description = this.appmessage.text(data);
+        let link = "";
+        if(data.appMessageUrl) {
+            link = data.appMessageUrl;
+        }
+        let jpushId = await API.auth.getJpushIdByAccount({accountId: to.accountId});
+        /*if(!jpushId)
+            return;*/
+        return pushAppMessage({content: description, title: title, link: link, jpushId: jpushId});
+    }
 }
 
 async function loadTemplate(name, dir) {
@@ -264,8 +288,6 @@ export async function __init() {
 export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean> {
     let {accountId, key, values, email} = params;
     let values_clone =  _.cloneDeep(values);
-    console.info(key);
-    console.info("=============================");
     let openId = await API.auth.getOpenIdByAccount({accountId: accountId});
     let account: any = {};
     if(!accountId){
@@ -288,22 +310,19 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
     return true;
 }
 
-//获取通知内容
-/*
-export async function getSubmitNotifyContent(params: ISubmitNotifyParam) : Promise<any> {
-    let {openid, mobile, email, key, values} = params;
-    if (openid) {
-        values.templateId = config.notify.templates[key];
-    }
-    let tpl = templates[key];
-    if(!tpl || !tpl.email || (!tpl.email.html && !tpl.email.text))
-        return "";
-    var content = "";
-    if(tpl.email.text){
-        content = tpl.email.text(values);
-    }
-    if(content == ""){
-        content = tpl.email.html(values);
-    }
-    return {content:content, theme:tpl.email.title(values)};
-}*/
+export async function pushAppMessage(params){
+    return new Promise(function(resolve,reject){
+        client.push().setPlatform(["android"])
+            .setAudience(JPush.ALL)
+            .setNotification(params.content,JPush.android(params.content, params.title, 1, {'link':params.link}),
+                JPush.ios(params.content, params.title, 1, true, {'link':params.link}))
+            .send(function(err, res) {
+                if (err) {
+                    return  reject(err);
+                }
+                console.info(res)
+                console.info("res========================")
+                return resolve(res);
+            })
+    })
+}

@@ -1144,12 +1144,13 @@ export default class ApiAuth {
     static makeAuthenticateToken = authentication.makeAuthenticateToken;
 
     @clientExport
-    static saveOrUpdateEquipmentId = messagePush.saveOrUpdateEquipmentId;
+    @requireParams(["jpushId"])
+    static saveOrUpdateJpushId = messagePush.saveOrUpdateJpushId;
     @clientExport
-    static destroyEquipmentId = messagePush.destroyEquipmentId;
+    static destroyJpushId = messagePush.destroyJpushId;
 
-    @requireParams(["equipmentId"])
-    static getEquipmentIdByAccount = messagePush.getEquipmentIdByAccount;
+    @requireParams(["accountId"])
+    static getJpushIdByAccount = messagePush.getJpushIdByAccount;
 }
 
 //生成激活链接参数
