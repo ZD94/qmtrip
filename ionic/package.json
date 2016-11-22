@@ -35,8 +35,8 @@
       "id": "cordova-plugin-camera",
       "locator": "cordova-plugin-camera",
       "variables": {
-        "CAMERA_USAGE_DESCRIPTION": "上传票据",
-        "PHOTOLIBRARY_USAGE_DESCRIPTION": "上传票据"
+        "CAMERA_USAGE_DESCRIPTION": "上传图片(头像/票据等)",
+        "PHOTOLIBRARY_USAGE_DESCRIPTION": "上传图片(头像/票据等)"
       }
     },
     "cordova-plugin-inappbrowser",
