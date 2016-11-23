@@ -40,13 +40,6 @@ var staffMenus = [
         title: '出差请示',
         link: 'trip-approval/list',
         badgeNum: 0
-    },
-    {
-        id: 1056,
-        icon: 'paintbrush',
-        title: '通知通告',
-        link: 'notice/',
-        badgeNum: 0
     }
 ];
 
@@ -142,16 +135,36 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
     $scope.tripPlanSave = 0;
     
     var staff = await Staff.getCurrent();
-
+    var noticePager = await staff.getSelfNotices();
     function setupMenu(menuItems){
         Menu.delall();
         for(let item of menuItems){
             Menu.add(item);
         }
     }
-
+    function ifNewNotice(Pager){
+        var num = 0;
+        Pager.map(function(notice){
+            if(!notice.isRead){
+                $scope.Menu.notie = true;
+            }else{
+                num++;
+                if(num == Pager.length){
+                    $scope.Menu.notie = false;
+                }
+            }
+        })
+    }
     setupMenu(staffMenus);
-
+    $scope.$watch(function() { return $ionicSideMenuDelegate.isOpen(); }, async function(isOpen) {
+        if (isOpen) {//Menu Open
+            noticePager = await staff.getSelfNotices();
+            ifNewNotice(noticePager);
+        }
+        else {
+            // Menu Closed
+        }
+    });
     $scope.isAdminMenus = false;
     $scope.isAdmin = false;
     if (staff && (staff.roleId == EStaffRole.OWNER || staff.roleId == EStaffRole.ADMIN)) {

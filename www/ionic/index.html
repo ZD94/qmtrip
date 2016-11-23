@@ -39,11 +39,11 @@
                         </button>
                     </div>
                     <div class="button-bar" ng-if="isShowLogout">
-                        <button id="menu-button22" class="button button-light  button-block icon ion-android-notifications">
+                        <a href="#notice/" menu-close="" class="button button-light  button-block icon ion-android-notifications">
                             通知
-                            <span class="badge" style="color:red;font-size: 30px;" ng-if="Menu.notie == true">·</span>
-                        </button>
-                        <a href="#login/" menu-close="" id="menu-button24" class="button button-light  button-block icon ion-android-exit" ng-click="logout()">
+                            <span class="icon ion-record new_notice" ng-if="Menu.notie == true"></span>
+                        </a>
+                        <a menu-close="" class="button button-light  button-block icon ion-android-exit" ng-click="logout()">
                             退出
                         </a>
                     </div>
