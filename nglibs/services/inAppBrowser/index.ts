@@ -7,9 +7,12 @@ import * as path from 'path';
 angular
     .module('nglibs')
     .factory('inAppBrowser', function(){
-        let inAppBrowser: boolean = false;
-        if(window.cordova){
-            inAppBrowser = true;
+        if(!window.cordova){
+            return {
+                open: function(url: string, linkJS?: string){
+                    window.open(url, '_self');
+                }
+            }
         }
         const relpath = path.relative(window['bundle_url'], window['Manifest'].root);
         console.log(relpath);
@@ -40,16 +43,12 @@ angular
         };
         return {
             open: function(url: string, linkJS?: string){
-                if(!inAppBrowser){
-                    window.open(url, '_self')
-                }else{
-                    let ref = cordova['ThemeableBrowser'].open(url,'_blank',ThemeableBrowserOption);
-                        if(linkJS){
-                            ref.addEventListener('loadstop', function(){
-                                ref.executeScript({code: linkJS});
-                            })
-                        }
-                };
+                let ref = cordova['ThemeableBrowser'].open(url,'_blank',ThemeableBrowserOption);
+                if(linkJS){
+                    ref.addEventListener('loadstop', function(){
+                        ref.executeScript({code: linkJS});
+                    })
+                }
             }
         }
     })

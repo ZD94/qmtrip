@@ -1,6 +1,7 @@
 
-import { SupplierWebRobot, SupplierOrder } from '../index';
-import { EPayType, EInvoiceFeeTypes } from 'api/_types/tripPlan';
+import {SupplierWebRobot, SupplierOrder} from "../index";
+import {EPayType, EInvoiceFeeTypes} from "api/_types/tripPlan";
+import L from 'common/language';
 
 var MOrderType = {
     "F": EInvoiceFeeTypes.PLANE_TICKET,
@@ -89,5 +90,13 @@ export default class SupplierCtripCT extends SupplierWebRobot{
             }
         }
         return ret;
+    }
+
+    async getAirTicketReserveLink(options):Promise<string> {
+        throw L.ERR.NOT_IMPLEMENTED();
+    }
+
+    async getHotelReserveLink(options):Promise<string> {
+        throw L.ERR.NOT_IMPLEMENTED();
     }
 }

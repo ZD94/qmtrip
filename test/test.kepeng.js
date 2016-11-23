@@ -23,11 +23,11 @@ Logger.init({
 //run('./kepeng/zone.test');
 //run('./kepeng/zone-stack.test');
 //run('./kepeng/sqltype.test');
-run('./kepeng/model.test');
+//run('./kepeng/model.test');
 //run('./kepeng/model-cluster.test');
 //run('./kepeng/scrub.test');
 //run('./kepeng/html2pdf.test');
-//run('./kepeng/ctrip.test');
+run('./kepeng/ctrip.test');
 
 function run(name){
     var func = require(name);

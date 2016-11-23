@@ -81,6 +81,8 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     if(supplier.name == '携程旅行'){
         if($scope.reserveType == "travel" && budget.invoiceType != 0){
             supplier.trafficBookLink = await supplier.getAirTicketReserveLink({fromCityName: budget.deptCity, toCityName: budget.arrivalCity, leaveDate: moment(budget.deptDateTime).format('YYYY-MM-DD') });
+            console.info(supplier.trafficBookLink);
+            console.info("============================")
         }else if($scope.reserveType == "travel" && budget.invoiceType == 0){
             supplier.trafficBookLink = "http://m.ctrip.com/webapp/train/home/list";
             let train_search_param = {

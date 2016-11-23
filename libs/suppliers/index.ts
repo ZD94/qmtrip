@@ -10,6 +10,8 @@ export abstract class SupplierWebRobot extends WebRobot{
 
     abstract login(authData: any): Promise<any>;
     abstract getOrderList(): Promise<SupplierOrder[]>;
+    abstract getAirTicketReserveLink(options): Promise<string>;
+    abstract getHotelReserveLink(options): Promise<string>;
 }
 
 interface SupplierWebRobotConstructor{
@@ -24,6 +26,7 @@ function initSuppliers(){
     suppliers = {
         ct_ctrip_com: require('./ct_ctrip_com'),
         ct_ctrip_com_m: require('./ct_ctrip_com_m'),
+        ctrip_com: require('./ctrip_com'),
     }
 }
 
