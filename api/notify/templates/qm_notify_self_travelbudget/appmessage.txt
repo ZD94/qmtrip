@@ -1,1 +1,2 @@
-<%=account.name || '' %>，您好，您在<%=time || '' %>生成了新的出差预算
+<%=account.name || '' %>您的预算已经生成
+<%=startAt || '' %>-<%=backAt || '' %>   <%=deptCity || '' %>-<%=arrivalCity || '' %>  预算：<%=totalBudget || '' %>
