@@ -7,7 +7,10 @@ import {Table, Create, Field, Reference, ResolveRef, RemoteCall} from 'common/mo
 import { ModelObject } from 'common/model/object';
 import { Company } from 'api/_types/company';
 import L from 'common/language';
+import {SupplierGetter} from 'libs/suppliers';
+
 var API = require("common/api");
+let getSupplier: SupplierGetter;
 
 export enum ESupplierType {
     COMPANY_CUSTOM = 1,
@@ -69,50 +72,37 @@ export class Supplier extends ModelObject{
 
     @RemoteCall()
     async getAirTicketReserveLink(options: {fromCityName: string, toCityName: string, leaveDate: string}): Promise<string> {
-        /*if(!this.isLocal){
-            API.require('place');
-            await API.onload();
+        if(!this.supplierKey){
+            return this.trafficBookLink;
         }
 
-        var fromCity = await API.place.getCityInfo({cityCode: options.originPlace});
-        var toCity = await API.place.getCityInfo({cityCode: options.destinationPlace});*/
+        if(!getSupplier){
+            getSupplier = require('libs/suppliers').getSupplier;
+        }
 
-        if(!this.isLocal){
-            API.require('company');
-            await API.onload();
+        let client = getSupplier(this.supplierKey);
+        if(!client || !client.getAirTicketReserveLink){
+            return this.trafficBookLink;
         }
-        if(this.name.indexOf("携程") >= 0){
-            var fromCityCode = await this.queryFlightCityCode(options.fromCityName);
-            var toCityCode = await this.queryFlightCityCode(options.toCityName);
-            var values = {fromCityCode: fromCityCode, toCityCode: toCityCode, departDate: options.leaveDate};
-            var template = "http://m.ctrip.com/html5/flight/flight-list.html?triptype=1&dcode=<%=fromCityCode%>&acode=<%=toCityCode%>&ddate=<%=departDate%>";
-            var temp = _.template(template);
-            var link = temp(values);
-            return link;
-        }else{
-            throw L.ERR.PERMISSION_DENY();
-        }
+        return client.getAirTicketReserveLink(options);
     }
     
     @RemoteCall()
     async getHotelReserveLink(options: {cityName: string}): Promise<string> {
-        if(!this.isLocal){
-            API.require('company');
-            await API.onload();
+        if(!this.supplierKey){
+            return this.hotelBookLink;
         }
-        if(this.name.indexOf("携程") >= 0){
-            var cityInfo = await this.queryHotelCityCode(options.cityName);
-            var values = {cityInfo: cityInfo};
-            var template = "http://m.ctrip.com/webapp/hotel/<%=cityInfo%>/?fr=index";
-            var temp = _.template(template);
-            var link = temp(values);
-            return link;
-        }else{
-            throw L.ERR.PERMISSION_DENY();
+        if(!getSupplier){
+            getSupplier = require('libs/suppliers').getSupplier;
         }
+        let client = getSupplier(this.supplierKey);
+        if(!client || !client.getHotelReserveLink){
+            return this.hotelBookLink;
+        }
+        return client.getHotelReserveLink(options);
     }
 
-    @RemoteCall()
+   /* @RemoteCall()
     async queryFlightCityCode(cityName: string): Promise<string>{
         var requestPromise = require('request-promise');
         var res = await requestPromise.post({
@@ -157,6 +147,6 @@ export class Supplier extends ModelObject{
             return cityPy + cityCode;
         }
         return "";
-    }
+    }*/
 
 }

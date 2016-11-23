@@ -82,9 +82,11 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
         case ETripType.SPECIAL_APPROVE:
             break;
     }
+
     let linkJS: string = '';
     let bookLinkArr = await supplier.changeCtripBookLink($scope.reserveType, $scope.arrivalCity, $scope.deptCity, moment(budget.deptDateTime).format('YYYY-MM-DD'));
     console.log(bookLinkArr)
+
     //下面三个小圆点的轮播
     $scope.load_one = true;
     $scope.load_two = false;
