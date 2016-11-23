@@ -13,3 +13,8 @@ export interface SupplierOrder{
     starCityName?: string;
     endCityName?: string;
 }
+
+export interface ReserveLink{
+    url: string;
+    jsCode: string;
+}

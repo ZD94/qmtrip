@@ -1,0 +1,1 @@
+update company.suppliers set supplier_key = 'ctrip_com' where id = 'c5e4a250-3860-11e6-8c75-2f18b7ddc8ef';

@@ -1,7 +1,8 @@
 
 import _ = require('lodash');
-import { SupplierWebRobot, SupplierOrder } from '../index';
+import { SupplierWebRobot, SupplierOrder , ReserveLink } from '../index';
 import { EPayType, EInvoiceFeeTypes } from '../../../api/_types/tripPlan/index';
+import L from 'common/language';
 
 var iconv = require('iconv-lite');
 
@@ -145,5 +146,17 @@ export default class SupplierCtripCT extends SupplierWebRobot{
             },
             body
         })
+    }
+
+    async getAirTicketReserveLink(options):Promise<ReserveLink> {
+        throw L.ERR.NOT_IMPLEMENTED();
+    }
+
+    async getHotelReserveLink(options):Promise<ReserveLink> {
+        throw L.ERR.NOT_IMPLEMENTED();
+    }
+
+    async getTrainTicketReserveLink(options):Promise<ReserveLink> {
+        throw L.ERR.NOT_IMPLEMENTED();
     }
 }

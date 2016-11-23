@@ -13,7 +13,7 @@ import { MoneyChange } from './money-change';
 import { Supplier } from './supplier';
 import {CoinAccount} from "api/_types/coin";
 import {PaginateInterface} from "common/model/interface";
-import promise = require("../../../common/test/api/promise/index");
+import promise = require("common/test/api/promise/index");
 import {EApproveChannel} from "../approve/types";
 declare var API: any;
 

@@ -13,6 +13,13 @@ ion-side-menu {
   .menu-button.icon:before {
     width: 28px;
   }
+  .new_notice.ion-record{
+    &:before{
+      font-size: 12px;
+      transform: scale(.5);
+      color: #D0011B;
+    }
+  }
 }
 
 .menu-button{

@@ -1,7 +1,7 @@
 
 import { WebRobot } from '../web_robot/index';
-import { SupplierOrder } from './interface';
-export { SupplierOrder } from './interface';
+import { SupplierOrder, ReserveLink } from './interface';
+export { SupplierOrder, ReserveLink } from './interface';
 
 export abstract class SupplierWebRobot extends WebRobot{
     constructor(origin: string){
@@ -10,6 +10,13 @@ export abstract class SupplierWebRobot extends WebRobot{
 
     abstract login(authData: any): Promise<any>;
     abstract getOrderList(): Promise<SupplierOrder[]>;
+    abstract getAirTicketReserveLink(options): Promise<ReserveLink>;
+    abstract getTrainTicketReserveLink(options): Promise<ReserveLink>;
+    abstract getHotelReserveLink(options): Promise<ReserveLink>;
+}
+
+interface ReserveLinkObject{
+    url: string
 }
 
 interface SupplierWebRobotConstructor{
@@ -24,6 +31,7 @@ function initSuppliers(){
     suppliers = {
         ct_ctrip_com: require('./ct_ctrip_com'),
         ct_ctrip_com_m: require('./ct_ctrip_com_m'),
+        ctrip_com: require('./ctrip_com'),
     }
 }
 
