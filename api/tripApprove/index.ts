@@ -20,6 +20,7 @@ let systemNoticeEmails = require('config/config').system_notice_emails;
 const L = require('common/language');
 var API = require('common/api');
 var config = require("config");
+import _ = require("lodash");
 
 class TripApproveModule {
 
