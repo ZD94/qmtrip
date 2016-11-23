@@ -3,6 +3,8 @@
  */
 
 'use strict';
+import {emitter} from "../emitter";
+import {EVENT} from "../index";
 
 export interface createTripApproveParam {
     approveNo: string;  //审核单号
@@ -35,51 +37,33 @@ export interface regTripInvoiceAuditUpdateCbParam {
 
 export interface IOAPlugin {
     $createTripApproveFlow(params: createTripApproveParam): Promise<createTripApproveResult>;
-    $regTripApproveUpdateCb(params: regTripApproveUpdateCbParam);
     $createTripInvoiceAuditFlow(params: createTripInvoiceAuditFlowParam):Promise<createTripInvoiceAuditFlowResult>;
-    $regTripInvoiceAuditUpdateCb(params: regTripInvoiceAuditUpdateCbParam);
 }
 
 export abstract class AbstractOAPlugin implements IOAPlugin {
-    tripApproveUpdateListeners;
-    tripInvoiceAuditUpdateListeners;
-
     constructor() {
-        this.tripApproveUpdateListeners = [];
-        this.tripInvoiceAuditUpdateListeners = [];
     }
 
     $createTripApproveFlow(params: createTripApproveParam): Promise<createTripApproveResult> {
         return this.createTripApproveFlow(params);
     }
 
-    $regTripApproveUpdateCb(fn: regTripApproveUpdateCbParam) {
-        this.tripApproveUpdateListeners.push(fn);
-    }
-
     $createTripInvoiceAuditFlow(params: createTripInvoiceAuditFlowParam) :Promise<createTripInvoiceAuditFlowResult> {
         return this.createTripInvoiceAuditFlow(params);
     }
 
-    $regTripInvoiceAuditUpdateCb(fn: regTripInvoiceAuditUpdateCbParam){
-        this.tripInvoiceAuditUpdateListeners.push(fn);
-    }
-
     async tripApproveUpdateNotify(err, result) {
-        this.tripApproveUpdateListeners.forEach( (fn) => {
-            // console.info('通知各个函数===>:', fn);
-            if (fn && typeof fn == 'function') {
-                fn(err, result);
-            }
-        })
+        if (err) {
+            return emitter.emit(EVENT.TRIP_APPROVE_UPDATE, err);
+        }
+        return emitter.emit(EVENT.TRIP_APPROVE_UPDATE, result);
     }
 
     async tripInvoiceUpdateNotify(err, result) {
-        this.tripInvoiceAuditUpdateListeners.forEach( (fn) => {
-            if (fn && typeof fn == 'function') {
-                fn (err, result);
-            }
-        })
+        if (err) {
+            return emitter.emit(EVENT.TRIP_INVOICE_AUDIT_UPDATE, err);
+        }
+        return emitter.emit(EVENT.TRIP_INVOICE_AUDIT_UPDATE, result);
     }
 
     abstract createTripApproveFlow(params:createTripApproveParam):Promise<createTripApproveResult>;

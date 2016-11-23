@@ -23,31 +23,6 @@ let plugins = {
     // ddtalk: new DDTalkPlugin(),
 }
 
-function regPluginCallback() {
-    for(let key in plugins) {
-        let plugin: IOAPlugin= plugins[key];
-        //出差预算审核状态变动后通知
-        plugin.$regTripApproveUpdateCb((err, result) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            emitter.emit(EVENT.TRIP_APPROVE_UPDATE, result);
-        })
-        //票据审核状态变动后通知
-        plugin.$regTripInvoiceAuditUpdateCb( (err, result) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            emitter.emit(EVENT.TRIP_INVOICE_AUDIT_UPDATE, result);
-        })
-    }
-}
-//注册回调函数
-regPluginCallback();
-
-
 //新出差审批事件
 emitter.on(EVENT.NEW_TRIP_APPROVE, function(params) {
     // console.info('接收到消息,新的申请到达===>', params);
