@@ -22,7 +22,7 @@ export enum EPlanStatus {
     COMPLETE = 4 //审核完，已完成状态
 }
 
-export enum EApproveStatus {
+export enum QMEApproveStatus {
     CANCEL = -3, //撤销状态
     NO_BUDGET = -2, //没有预算
     REJECT = -1, //审批驳回
@@ -31,11 +31,11 @@ export enum EApproveStatus {
 }
 
 export const EApproveStatus2Text: {[index: number]: string} = {
-    [EApproveStatus.CANCEL]: '已撤销',
-    [EApproveStatus.NO_BUDGET]: '没有预算',
-    [EApproveStatus.PASS]: '审批通过',
-    [EApproveStatus.REJECT]: '审批驳回',
-    [EApproveStatus.WAIT_APPROVE]: '等待审批',
+    [QMEApproveStatus.CANCEL]: '已撤销',
+    [QMEApproveStatus.NO_BUDGET]: '没有预算',
+    [QMEApproveStatus.PASS]: '审批通过',
+    [QMEApproveStatus.REJECT]: '审批驳回',
+    [QMEApproveStatus.WAIT_APPROVE]: '等待审批',
 };
 
 export enum EApproveResult {
@@ -430,8 +430,8 @@ export class TripApprove extends ModelObject{
     set description(val: string) {}
 
     @Field({type: Types.INTEGER})
-    get status(): EApproveStatus { return EApproveStatus.WAIT_APPROVE; }
-    set status(val: EApproveStatus) {}
+    get status(): QMEApproveStatus { return QMEApproveStatus.WAIT_APPROVE; }
+    set status(val: QMEApproveStatus) {}
 
     @Field({type: Types.STRING})
     get deptCity(): string { return ''; }
@@ -507,15 +507,18 @@ export class TripApprove extends ModelObject{
     }
     setCompany(val: Company) {}
 
-
     /**
      * 审批人审批出差计划
      * @param params
      * @returns {Promise<boolean>}
      */
-    approve(params: {auditResult: EAuditStatus, auditRemark?: string, budgetId?: string, id?: string}): Promise<boolean> {
+    async approve(params: {auditResult: EAuditStatus, auditRemark?: string, budgetId?: string, id?: string}): Promise<boolean> {
         params.id = this.id;
-        return API.tripPlan.approveTripPlan(params);
+        if (!this.isLocal) {
+            API.require("tripApprove");
+            await API.onload();
+        }
+        return API.tripApprove.approveTripPlan(params);
     }
 
     getApproveLogs(options?: any): Promise<PaginateInterface<TripPlanLog>> {
@@ -537,7 +540,7 @@ export class TripApprove extends ModelObject{
         if(params && params.remark){
             obj.remark = params.remark;
         }
-        return API.tripPlan.cancelTripApprove(obj);
+        return API.tripApprove.cancelTripApprove(obj);
     }
 }
 
@@ -548,7 +551,7 @@ export class FinanceCheckCode extends ModelObject {
     }
 
     @Create()
-    static create(obj?: Object): TripApprove { return null; }
+    static create(obj?: Object): FinanceCheckCode { return null; }
 
     @Field({type: Types.UUID})
     get id() :string {return Values.UUIDV1()}

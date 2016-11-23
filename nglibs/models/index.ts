@@ -4,9 +4,9 @@ import ng = require('angular');
 import L from 'common/language';
 
 import { ModelsInterface, initModels } from 'api/_types';
-import { ModelObjInterface, ModelInterface } from 'common/model/interface';
+import {ModelObjInterface, ModelInterface} from 'common/model/interface';
 import { ModelCached } from 'common/model/cached';
-import { ModelRemoteOld, ModelRemote } from 'common/model/remote';
+import {ModelRemote, ModelRemoteOld} from 'common/model/remote';
 import { ngService } from '../index';
 import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from 'api/_types/staff';
 import { Company, MoneyChange, Supplier } from 'api/_types/company';
@@ -22,6 +22,7 @@ import {TravelBudgetLog} from "api/_types/travelbudget";
 import {DDTalkCorp, DDTalkUser} from "api/_types/ddtalk";
 import {CoinAccount, CoinAccountChange} from "api/_types/coin";
 import {TripDetailInvoice, TripDetailHotel, TripDetailTraffic, TripDetailSubsidy, TripDetailSpecial} from "api/_types/tripPlan";
+import {Approve} from "api/_types/approve";
 
 const API = require('common/api');
 
@@ -87,9 +88,10 @@ var Services = {
     agencyUser: { type: AgencyUser, modname: 'agency',
         funcs: ['getAgencyUser', 'listAgencyUser', 'createAgencyUser', 'updateAgencyUser', 'deleteAgencyUser']
     },
-    tripApprove: { type: TripApprove, modname: 'tripPlan',
+    tripApprove: { type: TripApprove, modname: 'tripApprove',
         funcs: ['getTripApprove', 'getTripApproves', 'saveTripApprove', 'updateTripApprove', 'deleteTripApprove']
     },
+    approve: { type: Approve, modname: 'approve', funcs: [null, null, 'submitApprove']},
     tripPlan: { type: TripPlan, modname: 'tripPlan',
         funcs: ['getTripPlan', 'listTripPlans', 'saveTripPlan', 'updateTripPlan', 'deleteTripPlan']
     },
@@ -176,7 +178,8 @@ class ClientModels implements ModelsInterface {
     moneyChange: ModelInterface<MoneyChange>;
     project: ModelInterface<Project>;
     tripApprove: ModelInterface<TripApprove>;
-    //place: ModelInterface<Place>;
+    approve: ModelInterface<Approve>;
+    //place: ModelRemote<Place>;
     account: ModelInterface<Account>;
     seed: ModelInterface<Seed>;
     token: ModelInterface<Token>;
@@ -220,6 +223,7 @@ class ClientModels implements ModelsInterface {
         this.tripDetailHotel = createService<TripDetailHotel>(Services.tripDetailHotel, $cacheFactory);
         this.tripDetailSubsidy = createService<TripDetailSubsidy>(Services.tripDetailSubsidy, $cacheFactory);
         this.tripDetailSpecial = createService<TripDetailSpecial>(Services.tripDetailSpecial, $cacheFactory);
+        this.approve = createService<Approve>(Services.approve, $cacheFactory);
         initModels(this);
 
         API.on('beforeConnect', this.clearCache.bind(this));

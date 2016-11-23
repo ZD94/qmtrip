@@ -98,7 +98,11 @@
                 </ion-list>
             </ion-scroll>
             <div class="bottom-bar-budget">
-                <bottom-bar>
+                <bottom-bar ng-if="!showChooseApproveUser">
+                    <button class="button button_right" ng-click="submitApprove()">提交审批</button>
+                </bottom-bar>
+
+                <bottom-bar ng-if="showChooseApproveUser">
                     <form class="list">
                         <div class="item item-input status-bar status-bar-input">
                             <span class="input-label">选择审批人</span>
@@ -112,7 +116,7 @@
                             <i class="icon ion-arrow-up-b"></i>
                         </div>
                     </form>
-                    <button class="button button_right" ng-class="{true: 'hasAuditUser',false: ''}[bottomBottomClicked]" ng-click="saveTripPlan()">
+                    <button class="button button_right" ng-class="{true: 'hasAuditUser',false: ''}[bottomBottomClicked]" ng-click="submitApprove()">
                         提交审批</button>
                 </bottom-bar>
             </div>

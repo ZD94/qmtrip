@@ -18,6 +18,7 @@ import {TravelBudgetLog} from "./travelbudget";
 import {DDTalkCorp, DDTalkUser} from "./ddtalk";
 import {CoinAccountChange, CoinAccount} from "./coin";
 import {TripDetailSubsidy, TripDetailSpecial} from "./tripPlan/tripDetailInfo";
+import {Approve} from "./approve/index";
 
 
 export enum EGender {
@@ -62,6 +63,7 @@ export interface ModelsInterface {
     tripPlanLog: ModelInterface<TripPlanLog>;
     project: ModelInterface<Project>;
     tripApprove: ModelInterface<TripApprove>;
+    approve: ModelInterface<Approve>;
     travelBudgetLog: ModelInterface<TravelBudgetLog>;
     financeCheckCode: ModelInterface<FinanceCheckCode>;
 
@@ -107,6 +109,7 @@ export var Models: ModelsInterface = {
     tripPlanLog: new ModelDelegate<TripPlanLog>(),
     project: new ModelDelegate<Project>(),
     tripApprove: new ModelDelegate<TripApprove>(),
+    approve: new ModelDelegate<Approve>(),
     travelBudgetLog: new ModelDelegate<TravelBudgetLog>(),
     account: new ModelDelegate<Account>(),
     token: new ModelDelegate<Token>(),

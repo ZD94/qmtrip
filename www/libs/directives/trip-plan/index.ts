@@ -6,7 +6,7 @@
 
 import angular = require("angular");
 import {
-    EPlanStatus, EApproveStatus, EInvoiceType, ETripType, MTxPlaneLevel,
+    EPlanStatus, EInvoiceType, ETripType, MTxPlaneLevel,
     getNameByECabin
 } from 'api/_types/tripPlan';
 import moment = require("moment");
@@ -147,7 +147,7 @@ angular
                     $scope.days = moment($scope.item.checkOutDate).diff(moment($scope.item.checkInDate), 'days');
                 } else if ($scope.item.type == ETripType.SUBSIDY) {
                     $scope.subsidyDays = moment($scope.item.endDateTime).diff(moment($scope.item.startDateTime), 'days') + 1;
-                } else if ([ETripType.OUT_TRIP, ETripType.BACK_TRIP].indexOf($scope.item.type) >= 0) {
+                } else if ([ETripType.OUT_TRIP, ETripType.BACK_TRIP, ETripType.SPECIAL_APPROVE].indexOf($scope.item.type) >= 0) {
                     let deptCity = await City.getCity($scope.item.deptCity);
                     let arrivalCity = await City.getCity($scope.item.arrivalCity);
                     $scope.item.deptCity = deptCity ? deptCity.name: '未知';
