@@ -6,8 +6,8 @@ import { Types, Values } from 'common/model';
 import {Table, Create, Field, Reference, ResolveRef, RemoteCall} from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import { Company } from 'api/_types/company';
-import L from 'common/language';
 import {SupplierGetter} from 'libs/suppliers';
+import {ReserveLink} from 'libs/suppliers/interface';
 
 var API = require("common/api");
 let getSupplier: SupplierGetter;
@@ -71,9 +71,9 @@ export class Supplier extends ModelObject{
     set company(val: Company) {}
 
     @RemoteCall()
-    async getAirTicketReserveLink(options: {fromCityName: string, toCityName: string, leaveDate: string}): Promise<string> {
+    async getAirTicketReserveLink(options: {fromCityName: string, toCityName: string, leaveDate: string}): Promise<ReserveLink> {
         if(!this.supplierKey){
-            return this.trafficBookLink;
+            return {url: this.trafficBookLink, jsCode: ""};
         }
 
         if(!getSupplier){
@@ -82,71 +82,66 @@ export class Supplier extends ModelObject{
 
         let client = getSupplier(this.supplierKey);
         if(!client || !client.getAirTicketReserveLink){
-            return this.trafficBookLink;
+            return {url: this.trafficBookLink, jsCode: ""};
         }
         return client.getAirTicketReserveLink(options);
     }
     
     @RemoteCall()
-    async getHotelReserveLink(options: {cityName: string}): Promise<string> {
+    async getHotelReserveLink(options: {cityName: string}): Promise<ReserveLink> {
         if(!this.supplierKey){
-            return this.hotelBookLink;
+            return {url: this.hotelBookLink, jsCode: ""}
         }
         if(!getSupplier){
             getSupplier = require('libs/suppliers').getSupplier;
         }
         let client = getSupplier(this.supplierKey);
         if(!client || !client.getHotelReserveLink){
-            return this.hotelBookLink;
+            return {url: this.hotelBookLink, jsCode: ""}
         }
         return client.getHotelReserveLink(options);
     }
 
-   /* @RemoteCall()
-    async queryFlightCityCode(cityName: string): Promise<string>{
-        var requestPromise = require('request-promise');
-        var res = await requestPromise.post({
-            json: true,
-            uri: 'https://sec-m.ctrip.com/restapi/soa2/11783/Flight/Common/FlightSimilarNearAirportSearch/Query?_fxpcqlniredt=09031117210396050637',
-            form: {
-                head: {},
-                key: cityName,
-            },
-            headers: {
-                'Referer': 'http://m.ctrip.com/html5/flight/matrix.html',
-            },
-        })
-
-        if(res.fpairinfo && res.fpairinfo.length){
-            var arr = res.fpairinfo;
-            var code = arr[0].code;
-            return code;
-        }
-        return "";
-    }
 
     @RemoteCall()
-    async queryHotelCityCode(cityName: string): Promise<string>{
-        var requestPromise = require('request-promise');
-        var res = await requestPromise.post({
-            uri: 'http://m.ctrip.com/restapi/soa2/10932/hotel/static/destinationget?_fxpcqlniredt=09031117210396050637',
-            json: true,
-            form:{
-                head:{},
-                word: cityName,
-            },
-            headers: {
-                'Referer': 'http://m.ctrip.com/webapp/hotel/citylist',
-            },
-        })
-
-        if(res.keywords && res.keywords.length){
-            var arr = res.keywords;
-            var cityCode = arr[0].region['cid'];
-            var cityPy = arr[0].region['cengname'];
-            return cityPy + cityCode;
+    async getTrainTicketReserveLink(options: {fromCityName: string, toCityName: string, leaveDate: string}): Promise<ReserveLink> {
+        if(!this.supplierKey){
+            return {url: this.trafficBookLink, jsCode: ""};
         }
-        return "";
-    }*/
+
+        if(!getSupplier){
+            getSupplier = require('libs/suppliers').getSupplier;
+        }
+
+        let client = getSupplier(this.supplierKey);
+        if(!client || !client.getAirTicketReserveLink){
+            return {url: this.trafficBookLink, jsCode: ""};
+        }
+        return client.getTrainTicketReserveLink(options);
+    }
+
+
+    @RemoteCall()
+    async changeCtripBookLink(options: {reserveType: string, fromCityName?: string, toCityName?: string, leaveDate?: string, cityName?: string}): Promise<ReserveLink> {
+        let reserveType = options.reserveType;
+        let fromCityName = options.fromCityName;
+        let toCityName = options.toCityName;
+        let leaveDate = options.leaveDate;
+        let cityName = options.cityName;
+        if(reserveType == "travel_plane"){
+            let planeBookLink = await this.getAirTicketReserveLink({fromCityName: fromCityName, toCityName: toCityName, leaveDate: leaveDate});
+            return planeBookLink;
+        }
+
+        if(reserveType == "travel_train"){
+            let trainBookLink = await this.getTrainTicketReserveLink({fromCityName: fromCityName, toCityName: toCityName, leaveDate: leaveDate});
+            return trainBookLink;
+        }
+
+        if(reserveType == "hotel"){
+            let hotelBookLink = await this.getHotelReserveLink({cityName: cityName});
+            return hotelBookLink;
+        }
+    }
 
 }

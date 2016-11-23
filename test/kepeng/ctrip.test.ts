@@ -36,12 +36,13 @@ switch(use){
 //require('request-debug')(requestPromise)
 
 export default async function main() {
-    let client = getSupplier('ct_ctrip');
+    let client = getSupplier('ctrip_com');
     try{
         //await client.login({username:account, password});
         //let list = await client.getOrderList();
-        let url = await client.getAirTicketReserveLink({fromCityName: '昆明', toCityName: '上海', leaveDate: '2016-11-29'});
-        // let url = await client.getHotelReserveLink({cityName: '昆明'});
+        // let url = await client.getAirTicketReserveLink({fromCityName: '昆明', toCityName: '上海', leaveDate: '2016-11-29'});
+        // let url = await client.getTrainTicketReserveLink({fromCityName: '昆明', toCityName: '上海', leaveDate: '2016-11-29'});
+        let url = await client.getHotelReserveLink({cityName: '昆明'});
         console.log(url);
     }catch(e){
         if(e.response){

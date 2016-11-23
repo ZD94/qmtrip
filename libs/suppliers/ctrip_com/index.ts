@@ -1,7 +1,7 @@
 
 import _ = require('lodash');
-import { SupplierWebRobot, SupplierOrder } from '../index';
-import { EPayType, EInvoiceFeeTypes } from 'api/_types/tripPlan';
+import moment = require("moment");
+import { SupplierWebRobot, SupplierOrder, ReserveLink } from '../index';
 import L from 'common/language';
 
 var iconv = require('iconv-lite');
@@ -19,23 +19,59 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         throw L.ERR.NOT_IMPLEMENTED();
     }
 
-    async getAirTicketReserveLink(options):Promise<string> {
+    async getAirTicketReserveLink(options):Promise<ReserveLink> {
         var fromCityCode = await this.queryFlightCityCode(options.fromCityName);
         var toCityCode = await this.queryFlightCityCode(options.toCityName);
         var values = {fromCityCode: fromCityCode, toCityCode: toCityCode, departDate: options.leaveDate};
         var template = "http://m.ctrip.com/html5/flight/flight-list.html?triptype=1&dcode=<%=fromCityCode%>&acode=<%=toCityCode%>&ddate=<%=departDate%>";
         var temp = _.template(template);
         var link = temp(values);
-        return link;
+        return {url:link, jsCode: ""};
     }
 
-    async getHotelReserveLink(options):Promise<string> {
+    async getHotelReserveLink(options):Promise<ReserveLink> {
         var cityInfo = await this.queryHotelCityCode(options.cityName);
         var values = {cityInfo: cityInfo};
         var template = "http://m.ctrip.com/webapp/hotel/<%=cityInfo%>/?fr=index";
         var temp = _.template(template);
         var link = temp(values);
-        return link;
+        return {url:link, jsCode: ""};
+    }
+
+    async getTrainTicketReserveLink(options):Promise<ReserveLink> {
+        let trafficBookLink = "http://m.ctrip.com/webapp/train/home/list";
+        let param = {
+            "value":
+            {
+                "privateCustomType":null,
+                "aStation":"",
+                "dStation":"",
+                "dDate":0,
+                "setField":"aStation",
+                "dStationCityName":"",
+                "dStationCityId":1,
+                "aStationCityName":"",
+                "aStationCityId":1,
+                "isFirstToListPage":true
+            },
+            "timeout":"",
+            "tag":null,
+            "savedate":"",
+            "oldvalue":{}
+        }
+        param.value.aStation = param.value.aStationCityName = options.toCityName;
+        param.value.dStation = param.value.dStationCityName = options.fromCityName;
+        param.value.dDate = moment(options.leaveDate).toDate().getTime();
+        let aStationCityId = await this.queryHotelCityCode(options.toCityName);
+        let dStationCityId = await this.queryHotelCityCode(options.fromCityName);
+        param.value.dStationCityId = parseInt(dStationCityId);
+        param.value.aStationCityId = parseInt(aStationCityId);
+        param.savedate = moment().format("YYYY/MM/DD HH:mm:ss");
+        param.timeout = moment().add(1, 'years').format("YYYY/MM/DD HH:mm:ss")
+
+        var param_str = JSON.stringify(param);
+        var linkJS = "localStorage.setItem('TRAIN_SEARCH_PARAM', \'"+param_str+"\');console.log('train_search_param');";
+        return {url:trafficBookLink, jsCode: linkJS};
     }
 
     async queryFlightCityCode(cityName: string): Promise<string>{
