@@ -77,14 +77,15 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
             break;
         case ETripType.HOTEL:
             $scope.reserveType = 'hotel';
-            $scope.arrivalCity = budget.city;
             break;
         case ETripType.SPECIAL_APPROVE:
             break;
     }
 
+    let deptDateTime = moment(budget.deptDateTime).format('YYYY-MM-DD')
     let linkJS: string = '';
-    let CtripLink = await supplier.changeCtripBookLink($scope.reserveType, $scope.arrivalCity, $scope.deptCity, moment(budget.deptDateTime).format('YYYY-MM-DD'));
+    //let CtripLink = await supplier.changeCtripBookLink($scope.reserveType, $scope.arrivalCity, $scope.deptCity, moment(budget.deptDateTime).format('YYYY-MM-DD'));
+    let CtripLink = await supplier.changeCtripBookLink({reserveType: $scope.reserveType, fromCityName: $scope.deptCity, toCityName: $scope.arrivalCity, leaveDate: deptDateTime,cityName: budget.city});
     console.log(CtripLink);
 
     //下面三个小圆点的轮播

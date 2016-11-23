@@ -130,6 +130,7 @@ export class Supplier extends ModelObject{
         let cityName = options.cityName;
         if(reserveType == "travel_plane"){
             let planeBookLink = await this.getAirTicketReserveLink({fromCityName: fromCityName, toCityName: toCityName, leaveDate: leaveDate});
+            console.log(planeBookLink);
             return planeBookLink;
         }
 
