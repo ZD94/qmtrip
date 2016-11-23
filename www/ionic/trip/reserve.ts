@@ -84,8 +84,8 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     }
 
     let linkJS: string = '';
-    let bookLinkArr = await supplier.changeCtripBookLink($scope.reserveType, $scope.arrivalCity, $scope.deptCity, moment(budget.deptDateTime).format('YYYY-MM-DD'));
-    console.log(bookLinkArr)
+    let CtripLink = await supplier.changeCtripBookLink($scope.reserveType, $scope.arrivalCity, $scope.deptCity, moment(budget.deptDateTime).format('YYYY-MM-DD'));
+    console.log(CtripLink);
 
     //下面三个小圆点的轮播
     $scope.load_one = true;
@@ -110,9 +110,9 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     }else{
         url = supplier.hotelBookLink;
     }
-    if(bookLinkArr[0]){
-        url = bookLinkArr[0];
-        linkJS = bookLinkArr[1]
+    if(CtripLink.url){
+        url = CtripLink.url;
+        linkJS = CtripLink.jsCode;
     }
 
 
