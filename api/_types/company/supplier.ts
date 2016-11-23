@@ -7,7 +7,6 @@ import {Table, Create, Field, Reference, ResolveRef, RemoteCall} from 'common/mo
 import { ModelObject } from 'common/model/object';
 import { Company } from 'api/_types/company';
 import L from 'common/language';
-
 var API = require("common/api");
 
 export enum ESupplierType {

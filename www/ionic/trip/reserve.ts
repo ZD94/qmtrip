@@ -59,6 +59,8 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     await API.onload();
     let reDirectUrl = '#';
 
+
+
     $scope.budget = budget;
     switch(budget.type) {
         case ETripType.BACK_TRIP:
@@ -67,52 +69,22 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
             let arrivalCity = await City.getCity($scope.budget.arrivalCity);
             $scope.deptCity = deptCity.name;
             $scope.arrivalCity = arrivalCity.name;
-            $scope.reserveType = 'travel'
+            if(budget.invoiceType == 0){
+                $scope.reserveType = 'travel_train'
+            }else{
+                $scope.reserveType = 'travel_plane'
+            }
             break;
         case ETripType.HOTEL:
-            $scope.reserveType = 'hotel'
+            $scope.reserveType = 'hotel';
+            $scope.arrivalCity = budget.city;
             break;
         case ETripType.SPECIAL_APPROVE:
             break;
     }
-
-    //判断是否是携程
-    var linkJS: string = '';
-    if(supplier.name == '携程旅行'){
-        if($scope.reserveType == "travel" && budget.invoiceType != 0){
-            supplier.trafficBookLink = await supplier.getAirTicketReserveLink({fromCityName: budget.deptCity, toCityName: budget.arrivalCity, leaveDate: moment(budget.deptDateTime).format('YYYY-MM-DD') });
-        }else if($scope.reserveType == "travel" && budget.invoiceType == 0){
-            supplier.trafficBookLink = "http://m.ctrip.com/webapp/train/home/list";
-            let train_search_param = {
-                                        "value":
-                                        {
-                                            "privateCustomType":null,
-                                            "aStation":"",
-                                            "dStation":"",
-                                            "dDate":"1479830400000",
-                                            "setField":"aStation",
-                                            "dStationCityName":"",
-                                            "dStationCityId":1,
-                                            "aStationCityName":"",
-                                            "aStationCityId":4,
-                                            "isFirstToListPage":true
-                                        },
-                                        "timeout":"2017/11/22 10:13:02",
-                                        "tag":null,
-                                        "savedate":"2016/11/22 10:13:02",
-                                        "oldvalue":{}
-                                    }
-            train_search_param.value.aStation = train_search_param.value.aStationCityName = $scope.budget.arrivalCity;
-            train_search_param.value.dStation = train_search_param.value.dStationCityName = $scope.budget.deptCity;
-            train_search_param.value.dDate = moment($scope.budget.deptDateTime).toDate().getTime();
-            var train_search_param_str = JSON.stringify(train_search_param);
-            linkJS = "localStorage.setItem('TRAIN_SEARCH_PARAM', \'"+train_search_param_str+"\');console.log('train_search_param');";
-        }else if($scope.reserveType == "hotel"){
-            supplier.hotelBookLink = await supplier.getHotelReserveLink({cityName: budget.city});
-        }
-    }
-
-
+    let linkJS: string = '';
+    let bookLinkArr = await supplier.changeCtripBookLink($scope.reserveType, $scope.arrivalCity, $scope.deptCity, moment(budget.deptDateTime).format('YYYY-MM-DD'));
+    console.log(bookLinkArr)
     //下面三个小圆点的轮播
     $scope.load_one = true;
     $scope.load_two = false;
@@ -131,11 +103,16 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     },200)
 
     var url: string = '';
-    if($scope.reserveType == "travel"){
+    if($scope.reserveType == "travel_train" || $scope.reserveType == "travel_plane"){
         url = supplier.trafficBookLink;
     }else{
         url = supplier.hotelBookLink;
     }
+    if(bookLinkArr[0]){
+        url = bookLinkArr[0];
+        linkJS = bookLinkArr[1]
+    }
+
 
     let timeout = $timeout(function(){
         inAppBrowser.open(url, linkJS);
