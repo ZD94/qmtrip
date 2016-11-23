@@ -327,6 +327,7 @@ class TripApproveModule {
         let tripApprove = await Models.tripApprove.get(params.id);
         let approveResult = params.approveResult;
         let budgetId = params.budgetId;
+        let approveUser = await Models.staff.get(tripApprove['approveUserId']);
 
         if(isNextApprove && !params.nextApproveUserId)
             throw new Error("审批人不能为空");
@@ -337,7 +338,7 @@ class TripApproveModule {
             throw L.ERR.PERMISSION_DENY(); //只能审批待审批的出差记录
         }else if(tripApprove.status != QMEApproveStatus.WAIT_APPROVE) {
             throw L.ERR.TRIP_PLAN_STATUS_ERR(); //只能审批待审批的出差记录
-        }else if(tripApprove.approveUser.id != staff.id) {
+        }else if(approveUser.id != staff.id) {
             throw L.ERR.PERMISSION_DENY();
         }
 
