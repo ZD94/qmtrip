@@ -105,20 +105,20 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
         }
     },200)
 
-    var url: string = '';
-    if($scope.reserveType == "travel_train" || $scope.reserveType == "travel_plane"){
-        url = supplier.trafficBookLink;
-    }else{
-        url = supplier.hotelBookLink;
-    }
-    if(CtripLink.url){
-        url = CtripLink.url;
-        linkJS = CtripLink.jsCode;
-    }
+    // var url: string = '';
+    // if($scope.reserveType == "travel_train" || $scope.reserveType == "travel_plane"){
+    //     url = supplier.trafficBookLink;
+    // }else{
+    //     url = supplier.hotelBookLink;
+    // }
+    // if(CtripLink.url){
+    //     url = CtripLink.url;
+    //     linkJS = CtripLink.jsCode;
+    // }
 
 
     let timeout = $timeout(function(){
-        inAppBrowser.open(url, linkJS);
+        inAppBrowser.open(CtripLink.url, CtripLink.linkJS);
     },3000)
 
     $scope.$on('$destroy', function(){
