@@ -8,7 +8,6 @@ import Logger = require('common/logger');
 const logger = new Logger('qm:notify');
 import redisClient = require("common/redis-client");
 import {Models} from "api/_types";
-import { Notice } from 'api/_types/notice';
 
 const config = require('config');
 let API = require('common/api');
@@ -85,7 +84,7 @@ class NotifyTemplate{
             this.sendSms(to, data),
             this.sendWechat(to, data),
             this.sendEmail(to, data),
-            this.saveNotice(to, data),
+            this.saveNotice(to, data)
         ]);
     }
 
@@ -143,14 +142,6 @@ class NotifyTemplate{
         content = includes['email_frame.html']({content: content});
         let attachments = data.attachments || [];
 
-        /*let filenames = ['logo.png', 'logo_text.png', 'qrcode.png'];
-        filenames.forEach( (filename) => {
-            attachments.push({
-                path: path.relative(process.cwd(), path.join(__dirname, `static/${filename}`)),
-                filename: filename,
-                cid: filename
-            });
-        });*/
         /*redisClient.simplePublish("checkcode:msg", content)
             .catch((err)=>{
                 logger.error('simplePublish error:', err);
@@ -185,10 +176,8 @@ class NotifyTemplate{
             content = this.appmessage.html(context);
         }
 
-        var notice = Notice.create({theme: title, content: content, description: description});
-        notice.staff = await Models.staff.get(to.accountId);
 
-        await notice.save();
+        await API.notice.createNotice({title: title, content: content, description: description, staffId: to.accountId});
         logger.info('成功发送通知:', data.account.name, this.name);
     }
 }
@@ -264,8 +253,6 @@ export async function __init() {
 export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean> {
     let {accountId, key, values, email} = params;
     let values_clone =  _.cloneDeep(values);
-    console.info(key);
-    console.info("=============================");
     let openId = await API.auth.getOpenIdByAccount({accountId: accountId});
     let account: any = {};
     if(!accountId){
@@ -287,23 +274,3 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
     await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: accountId }, values_clone);
     return true;
 }
-
-//获取通知内容
-/*
-export async function getSubmitNotifyContent(params: ISubmitNotifyParam) : Promise<any> {
-    let {openid, mobile, email, key, values} = params;
-    if (openid) {
-        values.templateId = config.notify.templates[key];
-    }
-    let tpl = templates[key];
-    if(!tpl || !tpl.email || (!tpl.email.html && !tpl.email.text))
-        return "";
-    var content = "";
-    if(tpl.email.text){
-        content = tpl.email.text(values);
-    }
-    if(content == ""){
-        content = tpl.email.html(values);
-    }
-    return {content:content, theme:tpl.email.title(values)};
-}*/

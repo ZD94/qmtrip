@@ -20,13 +20,22 @@ class NoticeModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["theme","content","link","staffId"], noticeCols)
+    @requireParams(["title","content","link","staffId"], noticeCols)
     @conditionDecorator([
         {if: condition.isSameCompany("0.staffId")}
     ])
     static async createNotice (params) : Promise<Notice>{
         var notice = Notice.create(params);
-        return notice.save();
+        var result = await notice.save();
+        var jpushId = await API.auth.getJpushIdByAccount({accountId: params.staffId});
+        var link = "";
+        if(result.content.startsWith("skipLink@")) {
+            link = result.content.substring(9);
+        }
+        if(jpushId){
+            await API.jpush.pushAppMessage({content: result.description, title: result.title, link: link, jpushId: jpushId});
+        }
+        return result;
     }
 
 
@@ -120,9 +129,9 @@ class NoticeModule{
     @requireParams(["optins", "staffId", "link"])
     static async recordNotice(params): Promise<Notice>{
         //得到通知内容
-        var {content, theme} = await API.notify.getSubmitNotifyContent(params.optins);
+        var {content, title} = await API.notify.getSubmitNotifyContent(params.optins);
         var notice = Notice.create();
-        notice.theme = theme;
+        notice.title = title;
         notice.content = content;
         notice.staff = await Models.staff.get(params.staffId);
         notice.link = params.link;

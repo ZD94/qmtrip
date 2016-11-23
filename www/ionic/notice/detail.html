@@ -2,14 +2,12 @@
     <ion-content padding="true" class="has-header">
         <div class="list card accordlist">
             <div class="item item-body">
-                <div id="page30-markdown21" style="color:#000000;">
-                    <p>主题：{{notice.theme}}</p>
+                <div>
+                    <span>{{notice.title}}</span>
+                    <span class="item-note">{{notice.createdAt | date : 'yyyy-MM-dd'}}</span>
                 </div>
-                <div id="page30-markdown22" style="color:#000000;">
-                    <p>内容：<span ng-bind-html="notice.content"></span></p>
-                </div>
-                <div id="page30-markdown23" style="color:#000000;">
-                    <p>时间：{{notice.createdAt | date : 'yyyy-MM-dd'}}</p>
+                <div>
+                    <p ng-bind-html="notice.content"></p>
                 </div>
             </div>
         </div>

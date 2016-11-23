@@ -2,18 +2,64 @@
 import L from 'common/language';
 import { Models } from '../_types';
 import { clientExport } from 'common/api/helper';
+import { ModelInterface, PaginateInterface, ModelObjInterface } from '../../common/model/interface';
 
 
 export default class ModelForClient{
     @clientExport
-    static async call(modelType: string, method: string, id: string, args: any[]): Promise<any>{
-        var model = Models[modelType];
+    static async create<T extends ModelObjInterface>(modelType: string, obj: Object): Promise<T>{
+        let model = Models[modelType] as ModelInterface<T>;
         if(!model)
             throw L.ERR.INVALID_ARGUMENT('modelType');
-        var obj = await model.get(id);
+        return model.create(obj);
+    }
+    @clientExport
+    static async get<T extends ModelObjInterface>(modelType: string, id: string, options?: any): Promise<T>{
+        let model = Models[modelType] as ModelInterface<T>;
+        if(!model)
+            throw L.ERR.INVALID_ARGUMENT('modelType');
+        return model.get(id, options);
+    }
+    @clientExport
+    static async find<T extends ModelObjInterface>(modelType: string, options: any): Promise<PaginateInterface<T> >{
+        let model = Models[modelType] as ModelInterface<T>;
+        if(!model)
+            throw L.ERR.INVALID_ARGUMENT('modelType');
+        return model.find(options);
+    }
+    @clientExport
+    static async update<T extends ModelObjInterface>(modelType: string, id: string, props: any, options: any): Promise<T>{
+        let model = Models[modelType] as ModelInterface<T>;
+        if(!model)
+            throw L.ERR.INVALID_ARGUMENT('modelType');
+        let obj = await model.get(id);
         if(!obj)
             throw L.ERR.NOT_FOUND('id');
-        var func = obj[method];
+
+        for(let key in props){
+            obj[key] = props[key];
+        }
+        return obj.save();
+    }
+    @clientExport
+    static async destory(modelType: string, id: string, options: any): Promise<any>{
+        let model = Models[modelType] as ModelInterface<ModelObjInterface>;
+        if(!model)
+            throw L.ERR.INVALID_ARGUMENT('modelType');
+        let obj = await model.get(id);
+        if(!obj)
+            throw L.ERR.NOT_FOUND('id');
+        return obj.destroy();
+    }
+    @clientExport
+    static async call(modelType: string, method: string, id: string, args: any[]): Promise<any>{
+        let model = Models[modelType] as ModelInterface<any>;
+        if(!model)
+            throw L.ERR.INVALID_ARGUMENT('modelType');
+        let obj = await model.get(id);
+        if(!obj)
+            throw L.ERR.NOT_FOUND('id');
+        let func = obj[method];
         if(typeof func !== 'function')
             throw L.ERR.INVALID_ARGUMENT('method');
 

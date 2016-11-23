@@ -21,13 +21,8 @@ export class WechatCordovaApi {
     $resolve():Promise<any> {
         if (this.$$promise != undefined)
             return this.$$promise;
-        async function doResolve() {
-            await this.$ionicPlatform.ready();
-            return new Promise(function (resolve, reject) {
-            });
-        }
 
-        this.$$promise = doResolve()
+        this.$$promise = this.$ionicPlatform.ready()
             .then(()=> {
                 this.$resolved = true;
             })

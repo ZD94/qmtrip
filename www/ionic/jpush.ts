@@ -1,8 +1,11 @@
 
 declare var ionic:any;
 var jPushPlugin;
+var API = require('common/api');
 
 export default async function initJPush($ionicPlatform, $document){
+    API.require('auth');
+    await API.onload();
     $ionicPlatform.ready(function(){
         console.log('platform ready');
         if(!window.cordova || !window.plugins || !window.plugins['jPushPlugin'])
@@ -31,10 +34,12 @@ function getRegistrationID(){
     jPushPlugin.getRegistrationID(onGetRegistrationID);
 }
 
-function onGetRegistrationID(data) {
+async function onGetRegistrationID(data) {
     try {
         console.log("JPushPlugin:registrationID is " + data);
-
+        if(data.length != 0) {
+            await API.auth.saveOrUpdateJpushId({jpushId: data});
+        }
         if (data.length == 0) {
             var t1 = window.setTimeout(getRegistrationID, 1000);
         }
@@ -58,12 +63,18 @@ function onTagsWithAlias(event) {
 function onOpenNotification(event) {
     try {
         var alertContent;
+        var link;
         if (device.platform == "Android") {
             alertContent = event.alert;
+            link = event.extras.link;
         } else {
             alertContent = event.aps.alert;
+            link = event.link;
         }
-        alert("open Notification:" + alertContent);
+        // alert("open Notification:" + alertContent);
+        if(link && link.length > 0){
+            window.location.href = link;
+        }
     } catch (exception) {
         console.log("JPushPlugin:onOpenNotification" + exception);
     }

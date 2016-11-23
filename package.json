@@ -33,6 +33,7 @@
     "formidable": "^1.0.17",
     "html-pdf": "^2.1.0",
     "iconv-lite": "^0.4.13",
+    "jpush-sdk": "^3.2.8",
     "js-format": "^0.2.0",
     "lib-qqwry": "^1.0.0",
     "lodash": "^4.15.0",

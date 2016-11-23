@@ -313,11 +313,10 @@ class TripApproveModule {
     }
 
 
-    /**
-     * 企业管理员审批员工预算
-     * @param params
-     * @returns {boolean}
-     */
+    /* 企业管理员审批员工预算
+    * @param params
+    * @returns {boolean}
+    */
     @clientExport
     @requireParams(['id', 'approveResult', 'isNextApprove'], ['approveRemark', "budgetId", 'nextApproveUserId'])
     @modelNotNull('tripApprove')
@@ -335,19 +334,16 @@ class TripApproveModule {
             throw new Error(`预算信息已失效请重新生成`);
         }else if(approveResult != EApproveResult.PASS && approveResult != EApproveResult.REJECT) {
             throw L.ERR.PERMISSION_DENY(); //只能审批待审批的出差记录
-        }else if(tripApprove.status != QMEApproveStatus.WAIT_APPROVE) {
+        }else if(tripApprove.status != EApproveStatus.WAIT_APPROVE) {
             throw L.ERR.TRIP_PLAN_STATUS_ERR(); //只能审批待审批的出差记录
+        }else if(tripApprove.approveUser.id != staff.id) {
+            throw L.ERR.PERMISSION_DENY();
         }
-        // else if(tripApprove.approveUser.id != staff.id) {
-        //     throw L.ERR.PERMISSION_DENY();
-        // }
-        let budgetInfo;
 
         if(!tripApprove.isSpecialApprove){
-            budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
+            let budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
             if (!budgetInfo || !budgetInfo.budgets)
                 throw new Error(`预算信息已失效请重新生成`);
-
             let finalBudget = 0;
             budgetInfo.budgets.forEach((v) => {
                 if (v.price <= 0) {
@@ -360,7 +356,7 @@ class TripApproveModule {
             tripApprove.budgetInfo = budgetInfo.budgets;
         }
 
-        // let tripPlan: TripPlan;
+        let tripPlan: TripPlan;
         let notifyRemark = '';
         let tplName = '';
         let log = TripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id});
@@ -371,10 +367,10 @@ class TripApproveModule {
             log.approveStatus = EApproveResult.PASS;
             log.remark = `审批通过`;
             log.save();
-            tripApprove.status = QMEApproveStatus.PASS;
+            tripApprove.status = EApproveStatus.PASS;
             tripApprove.approveRemark = '审批通过';
             tripApprove.approvedUsers += `,${staff.id}`;
-            // tripPlan = await TripPlanModule.saveTripPlanByApprove({tripApproveId: params.id});
+            tripPlan = await TripPlanModule.saveTripPlanByApprove({tripApproveId: params.id});
         }else if(isNextApprove){ //指定下一级审批人
             log.approveStatus = EApproveResult.PASS;
             log.save();
@@ -393,24 +389,27 @@ class TripApproveModule {
             log.remark = approveRemark;
             log.save();
             tripApprove.approveRemark = approveRemark;
-            tripApprove.status = QMEApproveStatus.REJECT;
+            tripApprove.status = EApproveStatus.REJECT;
         }
         await tripApprove.save();
 
         if(isNextApprove){
-            await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: true});
-        } else {
+            await TripPlanModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: true});
+        }else{
             //发送审核结果邮件
             let self_url;
-            if (tripApprove.status == QMEApproveStatus.PASS) {
+            let appMessageUrl;
+            if (tripApprove.status == EApproveStatus.PASS) {
                 self_url = config.host + '/index.html#/trip/list-detail?tripid=' + tripApprove.id;
+                appMessageUrl = '#/trip/list-detail?tripid=' + tripApprove.id;
             } else {
                 self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
+                appMessageUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
             }
             let user = tripApprove.account;
             if(!user) user = await Models.staff.get(tripApprove['accountId']);
             let go = {},back = {},hotel = {},subsidy = {};
-            let self_values = {};
+            let self_values: any = {};
             try {
                 self_url = await API.wechat.shorturl({longurl: self_url});
             } catch(err) {
@@ -418,41 +417,42 @@ class TripApproveModule {
             }
             let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
             if(approveResult == EApproveResult.PASS){
-                let details = await TripApproveModule.getDetailsFromApprove({approveId: tripApprove.id});
-                let data = await TripPlanModule.getEmailInfoFromDetails(details);
-
-                // let data = await TripPlanModule.getEmailInfoFromDetails(tripPlan);
+                let data = await TripPlanModule.getPlanEmailDetails(tripPlan);
                 go = data.go;
                 back = data.back;
                 hotel = data.hotel;
                 subsidy = data.subsidy;
                 self_values = {
                     username: user.name,
-                    planNo: '',
+                    planNo: tripPlan.planNo,
                     approveTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
                     approveUser: staff.name,
-                    projectName: tripApprove.title,
+                    projectName: tripPlan.title,
                     goTrafficBudget: go,
                     backTrafficBudget: back,
                     hotelBudget: hotel,
                     otherBudget: subsidy,
-                    totalBudget: '￥' + tripApprove.budget,
+                    totalBudget: '￥' + tripPlan.budget,
                     url: self_url,
                     detailUrl: self_url,
-                    time: moment(tripApprove.startAt).format('YYYY-MM-DD'),
-                    destination: tripApprove.arrivalCity,
+                    appMessageUrl: appMessageUrl,
+                    time: moment(tripPlan.startAt).format('YYYY-MM-DD'),
+                    destination: tripPlan.arrivalCity,
                     staffName: user.name,
-                    startTime: moment(tripApprove.startAt).format('YYYY-MM-DD'),
-                    arrivalCity: tripApprove.arrivalCity,
-                    budget: tripApprove.budget,
-                    tripPlanNo: '',
+                    startTime: moment(tripPlan.startAt).format('YYYY-MM-DD'),
+                    arrivalCity: tripPlan.arrivalCity,
+                    budget: tripPlan.budget,
+                    tripPlanNo: tripPlan.planNo,
                     approveResult: EApproveResult2Text[approveResult],
                     reason: approveResult,
-                    emailReason: params.approveRemark
+                    emailReason: params.approveRemark,
+                    startAt: moment(tripPlan.startAt).format('MM.DD'),
+                    backAt: moment(tripPlan.backAt).format('MM.DD'),
+                    deptCity: tripPlan.deptCity,
                 };
-                await TripApproveModule.sendApprovePassNoticeToCompany({approveId: tripApprove.id});
+                await TripPlanModule.sendApprovePassNoticeToCompany({approveId: tripApprove.id});
             }else if(approveResult == EApproveResult.REJECT){
-                let details = await TripApproveModule.getDetailsFromApprove({approveId: tripApprove.id});
+                let details = await TripPlanModule.getDetailsFromApprove({approveId: tripApprove.id});
                 let data = await TripPlanModule.getEmailInfoFromDetails(details);
                 go = data.go;
                 back = data.back;
@@ -471,6 +471,7 @@ class TripApproveModule {
                     totalBudget: '￥' + tripApprove.budget,
                     url: self_url,
                     detailUrl: self_url,
+                    appMessageUrl: appMessageUrl,
                     time: moment(tripApprove.startAt).format('YYYY-MM-DD'),
                     destination: tripApprove.arrivalCity,
                     staffName: user.name,
@@ -479,14 +480,17 @@ class TripApproveModule {
                     budget: tripApprove.budget,
                     approveResult: EApproveResult2Text[approveResult],
                     reason: approveResult,
-                    emailReason: params.approveRemark
+                    emailReason: params.approveRemark,
+                    startAt: moment(tripApprove.startAt).format('MM.DD'),
+                    backAt: moment(tripApprove.backAt).format('MM.DD'),
+                    deptCity: tripApprove.deptCity,
                 };
             }
             try {
-                await API.notify.submitNotify({email: user.email, key: tplName, values: self_values, mobile: user.mobile, openid: openId});
+                await API.notify.submitNotify({accountId: user.id, key: tplName, values: self_values});
             } catch(err) { console.error(err);}
             try {
-                await API.ddtalk.sendLinkMsg({ accountId: user.id, text: '您的预算已经审批通过', url: self_url});
+                await API.ddtalk.sendLinkMsg({ accountId: user.id, text: '您的预算已审批完成', url: self_url});
             } catch(err) { console.error(err);}
         }
 
@@ -501,6 +505,7 @@ class TripApproveModule {
 
         return true;
     }
+
 
 
     /**

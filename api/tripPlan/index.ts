@@ -300,8 +300,7 @@ class TripPlanModule {
         return true;
     }
 
-    /**
-     * 提交计划单
+    /* 提交计划单
      * @param params
      * @returns {*}
      */

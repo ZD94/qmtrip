@@ -32,8 +32,8 @@ export class Notice extends ModelObject{
     set isRead(val: boolean) {}
 
     @Field({type: Types.STRING})
-    get theme(): string { return null; }
-    set theme(val: string) {}
+    get title(): string { return null; }
+    set title(val: string) {}
 
     @Field({type: Types.TEXT})
     get content(): string { return null; }

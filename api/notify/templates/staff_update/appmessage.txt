@@ -1,1 +1,2 @@
-手机号码变更为：<%=account.mobile || '' %><br/>邮箱变更为变更为：<%=account.email || '' %>
+手机号码变更为：<%=account.mobile || '' %>
+邮箱变更为变更为：<%=account.email || '' %>
