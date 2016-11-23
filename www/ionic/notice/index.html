@@ -1,7 +1,11 @@
 <ion-view title="通知通告" id="page30">
     <ion-content padding="true" class="has-header">
-        <div class="list notice" ng-repeat="notice in notices track by $index" ng-click="detail(notice)">
-            <div class="item item-body">
+        <ion-refresher
+                pulling-text="下拉刷新",
+                on-refresh="pagersDate.doRefresh()"
+        ></ion-refresher>
+        <div class="list notice">
+            <div class="item item-body" ng-repeat="notice in notices track by $index" ng-click="detail(notice)">
                 <div class="notice_title">
                     <span>{{notice.title}}</span>
                     <span ng-if="!notice.isRead" class="new_notice icon ion-record"></span>

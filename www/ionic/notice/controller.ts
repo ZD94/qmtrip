@@ -1,7 +1,7 @@
 import { Staff } from 'api/_types/staff/staff';
 
 export * from './detail';
-
+var msgbox = require('msgbox');
 export async function IndexController($scope, Models, $location) {
     require('./notice.scss');
     $scope.notices = [];
@@ -9,7 +9,7 @@ export async function IndexController($scope, Models, $location) {
     var pager = await staff.getSelfNotices();
     $scope.pager = pager;
     loadStaffs(pager);
-    var vm = {
+    var pagersDate = {
         isHasNextPage:true,
         nextPage : async function() {
             try {
@@ -21,6 +21,17 @@ export async function IndexController($scope, Models, $location) {
             $scope.pager = pager;
             loadStaffs(pager);
             $scope.$broadcast('scroll.infiniteScrollComplete');
+        },
+        doRefresh: async function(){
+            try{
+                pager = await staff.getSelfNotices();
+            } catch(err){
+                msgbox.log('刷新失败');
+                return
+            }
+            $scope.pager = pager;
+            loadStaffs(pager);
+            $scope.$broadcast('scroll.refreshComplete');
         }
     }
     
@@ -32,7 +43,7 @@ export async function IndexController($scope, Models, $location) {
         }
     }
 
-    $scope.vm = vm;
+    $scope.pagersDate = pagersDate;
 
     $scope.detail = async function (notice) {
         //标记已读

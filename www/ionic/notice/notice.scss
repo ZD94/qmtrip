@@ -2,6 +2,7 @@
   .item.item-body{
     border-radius: 5px;
     padding: 10px;
+    margin-bottom: 20px;
     .notice_title{
       margin-bottom: 10px;
       font-weight: bold;
@@ -27,5 +28,11 @@
       white-space: pre-line;
       font-size: 14px;
     }
+  }
+}
+.scroll-refresher .ionic-refresher-content{
+  color: #fff;
+  .spinner-ios{
+    stroke: #fff;
   }
 }
