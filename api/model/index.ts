@@ -2,7 +2,7 @@
 import L from 'common/language';
 import { Models } from '../_types';
 import { clientExport } from 'common/api/helper';
-import { ModelInterface, PaginateInterface, ModelObjInterface } from '../../common/model/interface';
+import { ModelInterface, PaginateInterface, ModelObjInterface, FindResult } from '../../common/model/interface';
 
 
 export default class ModelForClient{
@@ -21,11 +21,11 @@ export default class ModelForClient{
         return model.get(id, options);
     }
     @clientExport
-    static async find<T extends ModelObjInterface>(modelType: string, options: any): Promise<PaginateInterface<T> >{
+    static async find<T extends ModelObjInterface>(modelType: string, options: any): Promise<FindResult>{
         let model = Models[modelType] as ModelInterface<T>;
         if(!model)
             throw L.ERR.INVALID_ARGUMENT('modelType');
-        return model.find(options);
+        return model.$find(options);
     }
     @clientExport
     static async update<T extends ModelObjInterface>(modelType: string, id: string, props: any, options: any): Promise<T>{
