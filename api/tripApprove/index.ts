@@ -3,10 +3,10 @@
  */
 
 'use strict';
-import {clientExport, requireParams} from "../../common/api/helper";
+import {clientExport, requireParams} from "common/api/helper";
 import {modelNotNull} from "../_decorator";
 import {Models} from "../_types/index";
-import {FindResult} from "../../common/model/interface";
+import {FindResult} from "common/model/interface";
 import {
     QMEApproveStatus, EApproveResult, ETripType, EPlanStatus,
     TripPlan, TripPlanLog, EApproveResult2Text, TripApprove
@@ -334,14 +334,15 @@ class TripApproveModule {
             throw new Error(`预算信息已失效请重新生成`);
         }else if(approveResult != EApproveResult.PASS && approveResult != EApproveResult.REJECT) {
             throw L.ERR.PERMISSION_DENY(); //只能审批待审批的出差记录
-        }else if(tripApprove.status != EApproveStatus.WAIT_APPROVE) {
+        }else if(tripApprove.status != QMEApproveStatus.WAIT_APPROVE) {
             throw L.ERR.TRIP_PLAN_STATUS_ERR(); //只能审批待审批的出差记录
         }else if(tripApprove.approveUser.id != staff.id) {
             throw L.ERR.PERMISSION_DENY();
         }
 
+        let budgetInfo;
         if(!tripApprove.isSpecialApprove){
-            let budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
+            budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
             if (!budgetInfo || !budgetInfo.budgets)
                 throw new Error(`预算信息已失效请重新生成`);
             let finalBudget = 0;
@@ -367,7 +368,7 @@ class TripApproveModule {
             log.approveStatus = EApproveResult.PASS;
             log.remark = `审批通过`;
             log.save();
-            tripApprove.status = EApproveStatus.PASS;
+            tripApprove.status = QMEApproveStatus.PASS;
             tripApprove.approveRemark = '审批通过';
             tripApprove.approvedUsers += `,${staff.id}`;
             tripPlan = await TripPlanModule.saveTripPlanByApprove({tripApproveId: params.id});
@@ -389,17 +390,17 @@ class TripApproveModule {
             log.remark = approveRemark;
             log.save();
             tripApprove.approveRemark = approveRemark;
-            tripApprove.status = EApproveStatus.REJECT;
+            tripApprove.status = QMEApproveStatus.REJECT;
         }
         await tripApprove.save();
 
         if(isNextApprove){
-            await TripPlanModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: true});
+            await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: true});
         }else{
             //发送审核结果邮件
             let self_url;
             let appMessageUrl;
-            if (tripApprove.status == EApproveStatus.PASS) {
+            if (tripApprove.status == QMEApproveStatus.PASS) {
                 self_url = config.host + '/index.html#/trip/list-detail?tripid=' + tripApprove.id;
                 appMessageUrl = '#/trip/list-detail?tripid=' + tripApprove.id;
             } else {
@@ -450,9 +451,9 @@ class TripApproveModule {
                     backAt: moment(tripPlan.backAt).format('MM.DD'),
                     deptCity: tripPlan.deptCity,
                 };
-                await TripPlanModule.sendApprovePassNoticeToCompany({approveId: tripApprove.id});
+                await TripApproveModule.sendApprovePassNoticeToCompany({approveId: tripApprove.id});
             }else if(approveResult == EApproveResult.REJECT){
-                let details = await TripPlanModule.getDetailsFromApprove({approveId: tripApprove.id});
+                let details = await TripApproveModule.getDetailsFromApprove({approveId: tripApprove.id});
                 let data = await TripPlanModule.getEmailInfoFromDetails(details);
                 go = data.go;
                 back = data.back;
