@@ -147,16 +147,4 @@ export default class SupplierCtripCT extends SupplierWebRobot{
             body
         })
     }
-
-    async getAirTicketReserveLink(options):Promise<ReserveLink> {
-        throw L.ERR.NOT_IMPLEMENTED();
-    }
-
-    async getHotelReserveLink(options):Promise<ReserveLink> {
-        throw L.ERR.NOT_IMPLEMENTED();
-    }
-
-    async getTrainTicketReserveLink(options):Promise<ReserveLink> {
-        throw L.ERR.NOT_IMPLEMENTED();
-    }
 }

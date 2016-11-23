@@ -10,9 +10,15 @@ export abstract class SupplierWebRobot extends WebRobot{
 
     abstract login(authData: any): Promise<any>;
     abstract getOrderList(): Promise<SupplierOrder[]>;
-    abstract getAirTicketReserveLink(options): Promise<ReserveLink>;
-    abstract getTrainTicketReserveLink(options): Promise<ReserveLink>;
-    abstract getHotelReserveLink(options): Promise<ReserveLink>;
+    getAirTicketReserveLink(options): Promise<ReserveLink>{
+        return Promise.resolve(null);
+    }
+    getTrainTicketReserveLink(options): Promise<ReserveLink>{
+        return Promise.resolve(null);
+    }
+    getHotelReserveLink(options): Promise<ReserveLink>{
+        return Promise.resolve(null);
+    }
 }
 
 interface ReserveLinkObject{

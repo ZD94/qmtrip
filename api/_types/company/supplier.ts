@@ -79,12 +79,12 @@ export class Supplier extends ModelObject{
         if(!getSupplier){
             getSupplier = require('libs/suppliers').getSupplier;
         }
-
         let client = getSupplier(this.supplierKey);
-        if(!client || !client.getAirTicketReserveLink){
+        let result = await client.getAirTicketReserveLink(options);
+        if(!result){
             return {url: this.trafficBookLink, jsCode: ""};
         }
-        return client.getAirTicketReserveLink(options);
+        return result;
     }
     
     @RemoteCall()
@@ -95,11 +95,13 @@ export class Supplier extends ModelObject{
         if(!getSupplier){
             getSupplier = require('libs/suppliers').getSupplier;
         }
+
         let client = getSupplier(this.supplierKey);
-        if(!client || !client.getHotelReserveLink){
-            return {url: this.hotelBookLink, jsCode: ""}
+        let result = await client.getHotelReserveLink(options);
+        if(!result){
+            return {url: this.hotelBookLink, jsCode: ""};
         }
-        return client.getHotelReserveLink(options);
+        return result;
     }
 
 
@@ -114,10 +116,11 @@ export class Supplier extends ModelObject{
         }
 
         let client = getSupplier(this.supplierKey);
-        if(!client || !client.getAirTicketReserveLink){
+        let result = await client.getTrainTicketReserveLink(options);
+        if(!result){
             return {url: this.trafficBookLink, jsCode: ""};
         }
-        return client.getTrainTicketReserveLink(options);
+        return result;
     }
 
 
@@ -130,17 +133,19 @@ export class Supplier extends ModelObject{
         let cityName = options.cityName;
         if(reserveType == "travel_plane"){
             let planeBookLink = await this.getAirTicketReserveLink({fromCityName: fromCityName, toCityName: toCityName, leaveDate: leaveDate});
-            console.log(planeBookLink);
+            console.log('planeBookLink', planeBookLink);
             return planeBookLink;
         }
 
         if(reserveType == "travel_train"){
             let trainBookLink = await this.getTrainTicketReserveLink({fromCityName: fromCityName, toCityName: toCityName, leaveDate: leaveDate});
+            console.log('trainBookLink', trainBookLink);
             return trainBookLink;
         }
 
         if(reserveType == "hotel"){
             let hotelBookLink = await this.getHotelReserveLink({cityName: cityName});
+            console.log('hotelBookLink', hotelBookLink);
             return hotelBookLink;
         }
     }

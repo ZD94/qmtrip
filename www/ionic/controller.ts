@@ -91,6 +91,8 @@ var adminMenus = [
 var config = require('config');
 
 export function getImageUrl(id){
+    if(typeof id !== 'string' || typeof config.update !== 'string')
+        return null;
     let imgUrl = path.join(config.update,'/attachments/',id);
     return imgUrl;
 }
