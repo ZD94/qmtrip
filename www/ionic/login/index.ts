@@ -31,7 +31,6 @@ export class IndexController {
     constructor(private $scope: IndexScope,
                 private $stateParams,
                 private $storage,
-                private $sce,
                 private $loading,
                 private $ionicPopup,
                 private ddtalkApi
