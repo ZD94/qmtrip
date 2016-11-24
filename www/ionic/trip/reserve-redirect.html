@@ -5,7 +5,7 @@
         </div>
         <div class="reserve-content">
             <p>即将预订</p>
-            <div class="travel" ng-if="reserveType == 'travel'">
+            <div class="travel" ng-if="reserveType == 'travel_train' || reserveType == 'travel_plane'">
                 <p>{{budget.deptDateTime | date: 'yyyy年MM月dd日'}}</p>
                 <p>{{deptCity}} - {{arrivalCity}}</p>
             </div>
