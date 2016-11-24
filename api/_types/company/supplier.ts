@@ -3,7 +3,7 @@
 import _ = require('lodash');
 import { Models } from 'api/_types';
 import { Types, Values } from 'common/model';
-import {Table, Create, Field, Reference, ResolveRef, RemoteCall} from 'common/model/common';
+import {Table, Create, Field, Reference, ResolveRef, RemoteCall, LocalCall} from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import { Company } from 'api/_types/company';
 import {SupplierGetter} from 'libs/suppliers';
@@ -71,83 +71,57 @@ export class Supplier extends ModelObject{
     set company(val: Company) {}
 
     @RemoteCall()
-    async getAirTicketReserveLink(options: {fromCityName: string, toCityName: string, leaveDate: string}): Promise<ReserveLink> {
-        if(!this.supplierKey){
-            return {url: this.trafficBookLink, jsCode: ""};
+    async getBookLink(options: {reserveType: string, fromCity?: string, toCity?: string, leaveDate?: Date, city?: string}): Promise<ReserveLink> {
+        if(!this.isLocal){
+            API.require('place');
+            await API.onload();
         }
-
-        if(!getSupplier){
-            getSupplier = require('libs/suppliers').getSupplier;
-        }
-        let client = getSupplier(this.supplierKey);
-        let result = await client.getAirTicketReserveLink(options);
-        if(!result){
-            return {url: this.trafficBookLink, jsCode: ""};
-        }
-        return result;
-    }
-    
-    @RemoteCall()
-    async getHotelReserveLink(options: {cityName: string}): Promise<ReserveLink> {
-        if(!this.supplierKey){
-            return {url: this.hotelBookLink, jsCode: ""}
-        }
-        if(!getSupplier){
-            getSupplier = require('libs/suppliers').getSupplier;
-        }
-
-        let client = getSupplier(this.supplierKey);
-        let result = await client.getHotelReserveLink(options);
-        if(!result){
-            return {url: this.hotelBookLink, jsCode: ""};
-        }
-        return result;
-    }
-
-
-    @RemoteCall()
-    async getTrainTicketReserveLink(options: {fromCityName: string, toCityName: string, leaveDate: string}): Promise<ReserveLink> {
-        if(!this.supplierKey){
-            return {url: this.trafficBookLink, jsCode: ""};
-        }
-
-        if(!getSupplier){
-            getSupplier = require('libs/suppliers').getSupplier;
-        }
-
-        let client = getSupplier(this.supplierKey);
-        let result = await client.getTrainTicketReserveLink(options);
-        if(!result){
-            return {url: this.trafficBookLink, jsCode: ""};
-        }
-        return result;
-    }
-
-
-    @RemoteCall()
-    async getBookLink(options: {reserveType: string, fromCityName?: string, toCityName?: string, leaveDate?: string, cityName?: string}): Promise<ReserveLink> {
         let reserveType = options.reserveType;
-        let fromCityName = options.fromCityName;
-        let toCityName = options.toCityName;
-        let leaveDate = options.leaveDate;
-        let cityName = options.cityName;
-        if(reserveType == "travel_plane"){
-            let planeBookLink = await this.getAirTicketReserveLink({fromCityName: fromCityName, toCityName: toCityName, leaveDate: leaveDate});
-            console.log('planeBookLink', planeBookLink);
-            return planeBookLink;
+        let defaultBackUrl = "";
+
+        switch (reserveType){
+            case "travel_plane":
+            case "travel_train":
+                defaultBackUrl = this.trafficBookLink;
+                break;
+            case "hotel":
+                defaultBackUrl = this.hotelBookLink;
+                break;
         }
 
-        if(reserveType == "travel_train"){
-            let trainBookLink = await this.getTrainTicketReserveLink({fromCityName: fromCityName, toCityName: toCityName, leaveDate: leaveDate});
-            console.log('trainBookLink', trainBookLink);
-            return trainBookLink;
+        if(!this.supplierKey){
+            return {url: defaultBackUrl, jsCode: ""};
         }
 
-        if(reserveType == "hotel"){
-            let hotelBookLink = await this.getHotelReserveLink({cityName: cityName});
-            console.log('hotelBookLink', hotelBookLink);
-            return hotelBookLink;
+        if(options.fromCity) {
+            console.info(options.fromCity);
+            let cityObject = await API.place.getCityInfo({cityCode: options.fromCity});
+            options.fromCity = cityObject.name;
         }
+        if(options.toCity){
+            console.info(options.toCity);
+            let cityObject = await API.place.getCityInfo({cityCode: options.toCity});
+            options.toCity = cityObject.name;
+        }
+        if(options.city){
+            console.info(options.city);
+            let cityObject = await API.place.getCityInfo({cityCode: options.city});
+            options.city = cityObject.name;
+        }
+
+        if(!getSupplier){
+            getSupplier = require('libs/suppliers').getSupplier;
+        }
+
+        let client = getSupplier(this.supplierKey);
+
+        var bookLink = await client.getBookLink(options);
+
+        if(!bookLink || !bookLink.url){
+            return {url: defaultBackUrl, jsCode: ""};
+        }
+
+        return bookLink;
     }
 
 }

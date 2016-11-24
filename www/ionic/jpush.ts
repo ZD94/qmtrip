@@ -105,7 +105,7 @@ function onReceiveNotification(event) {
         } else {
             alertContent = event.aps.alert;
         }
-        alert(alertContent);
+        // alert(alertContent);
     } catch (exception) {
         console.log(exception)
     }

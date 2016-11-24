@@ -1,6 +1,7 @@
 import { ETripType, TripDetail, EPlanStatus } from 'api/_types/tripPlan';
 import { Staff } from 'api/_types/staff/staff';
 import { ESupplierType } from 'api/_types/company/supplier';
+import {TripDetailTraffic, TripDetailHotel} from "../../../api/_types/tripPlan/tripDetailInfo";
 
 
 let moment = require("moment");
@@ -47,6 +48,11 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     require('./reserve.scss');
 
     var budget = await Models.tripDetail.get($stateParams.detailId);
+    if (budget.type == ETripType.BACK_TRIP || budget.type == ETripType.OUT_TRIP) {
+        budget = <TripDetailTraffic>budget;
+    }else if(budget.type == ETripType.HOTEL){
+        budget = <TripDetailHotel>budget;
+    }
     let tripPlanId = budget.tripPlanId;
     let tripPlan = await Models.tripPlan.get(tripPlanId);
     let getOddBudget = await tripPlan.getOddBudget();
@@ -82,8 +88,9 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
             break;
     }
 
-    let deptDateTime = moment(budget.deptDateTime).format('YYYY-MM-DD')
-    let bookLink = await supplier.getBookLink({reserveType: $scope.reserveType, fromCityName: $scope.deptCity, toCityName: $scope.arrivalCity, leaveDate: deptDateTime,cityName: budget.city});
+    // let deptDateTime = moment(budget.deptDateTime).format('YYYY-MM-DD')
+    // let bookLink = await supplier.getBookLink({reserveType: $scope.reserveType, fromCityName: $scope.deptCity, toCityName: $scope.arrivalCity, leaveDate: deptDateTime,cityName: budget.city});
+    let bookLink = await budget.getBookLink({reserveType: $scope.reserveType, supplierId: supplier.id});
     console.log(bookLink);
 
     //下面三个小圆点的轮播
