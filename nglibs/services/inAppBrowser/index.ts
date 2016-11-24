@@ -19,7 +19,7 @@ angular
         const ThemeableBrowserOption = {
             toolbar: {
                 height: 44,
-                color: '#f0f0f0ff'
+                color: '#ffffff'
             },
             title: {
                 color: '#003264ff',
