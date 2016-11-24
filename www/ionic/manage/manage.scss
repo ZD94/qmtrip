@@ -1,0 +1,22 @@
+.manage-index{
+  .list{
+    .item{
+      i.ion-ios-arrow-right{
+        font-size: 24px;
+        color: #545454;
+      }
+    }
+  }
+  .new-icon{
+    display: inline-block;
+    width: 64px;
+    height: 28px;
+    background-color: #ff0000;
+    color: #ffffff;
+    font-size: 18px;
+    border-radius: 16px;
+    transform: scale(.5, .5);
+    line-height: 28px;
+    text-align: center;
+  }
+}
