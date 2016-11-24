@@ -1,4 +1,5 @@
 
+import {LoginResponse} from "api/_types/auth/auth-cert";
 declare var ionic:any;
 var jPushPlugin;
 var API = require('common/api');
@@ -8,6 +9,7 @@ export default async function initJPush($ionicPlatform, $document){
     await API.onload();
     $ionicPlatform.ready(function(){
         console.log('platform ready');
+        var jpushId = localStorage.getItem('jpushId');
         if(!window.cordova || !window.plugins || !window.plugins['jPushPlugin'])
             return;
         jPushPlugin = window.plugins['jPushPlugin'];
@@ -16,9 +18,14 @@ export default async function initJPush($ionicPlatform, $document){
         document.addEventListener("jpush.openNotification", onOpenNotification, false);
         document.addEventListener("jpush.receiveNotification", onReceiveNotification, false);
         document.addEventListener("jpush.receiveMessage", onReceiveMessage, false);
-
+        
         jPushPlugin.init();
-        getRegistrationID();
+
+        document.addEventListener('needJPushId',getRegistrationID, false);
+
+        if(!jpushId){
+            getRegistrationID();
+        }
         if (ionic.Platform.isIOS()) {
             jPushPlugin.setDebugModeFromIos();
             jPushPlugin.setApplicationIconBadgeNumber(0);
@@ -29,16 +36,26 @@ export default async function initJPush($ionicPlatform, $document){
     });
 }
 
+function getAuthData(): LoginResponse {
+    var data = localStorage.getItem('auth_data');
+    try{
+        return JSON.parse(data);
+    }catch(e){
+        return null;
+    }
+}
 
 function getRegistrationID(){
     jPushPlugin.getRegistrationID(onGetRegistrationID);
 }
 
 async function onGetRegistrationID(data) {
+    let authData = getAuthData();
     try {
         console.log("JPushPlugin:registrationID is " + data);
-        if(data.length != 0) {
+        if(data.length != 0 && authData) {
             await API.auth.saveOrUpdateJpushId({jpushId: data});
+            localStorage.setItem('jpushId',data)
         }
         if (data.length == 0) {
             var t1 = window.setTimeout(getRegistrationID, 1000);
