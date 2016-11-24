@@ -125,7 +125,7 @@ export class Supplier extends ModelObject{
 
 
     @RemoteCall()
-    async changeCtripBookLink(options: {reserveType: string, fromCityName?: string, toCityName?: string, leaveDate?: string, cityName?: string}): Promise<ReserveLink> {
+    async getBookLink(options: {reserveType: string, fromCityName?: string, toCityName?: string, leaveDate?: string, cityName?: string}): Promise<ReserveLink> {
         let reserveType = options.reserveType;
         let fromCityName = options.fromCityName;
         let toCityName = options.toCityName;
