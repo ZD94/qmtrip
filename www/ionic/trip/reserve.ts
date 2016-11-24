@@ -83,10 +83,8 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     }
 
     let deptDateTime = moment(budget.deptDateTime).format('YYYY-MM-DD')
-    let linkJS: string = '';
-    //let CtripLink = await supplier.changeCtripBookLink($scope.reserveType, $scope.arrivalCity, $scope.deptCity, moment(budget.deptDateTime).format('YYYY-MM-DD'));
-    let CtripLink = await supplier.changeCtripBookLink({reserveType: $scope.reserveType, fromCityName: $scope.deptCity, toCityName: $scope.arrivalCity, leaveDate: deptDateTime,cityName: budget.city});
-    console.log(CtripLink);
+    let bookLink = await supplier.getBookLink({reserveType: $scope.reserveType, fromCityName: $scope.deptCity, toCityName: $scope.arrivalCity, leaveDate: deptDateTime,cityName: budget.city});
+    console.log(bookLink);
 
     //下面三个小圆点的轮播
     $scope.load_one = true;
@@ -105,20 +103,8 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
         }
     },200)
 
-    // var url: string = '';
-    // if($scope.reserveType == "travel_train" || $scope.reserveType == "travel_plane"){
-    //     url = supplier.trafficBookLink;
-    // }else{
-    //     url = supplier.hotelBookLink;
-    // }
-    // if(CtripLink.url){
-    //     url = CtripLink.url;
-    //     linkJS = CtripLink.jsCode;
-    // }
-
-
     let timeout = $timeout(function(){
-        inAppBrowser.open(CtripLink.url, CtripLink.linkJS);
+        inAppBrowser.open(bookLink.url, bookLink.jsCode);
     },3000)
 
     $scope.$on('$destroy', function(){
