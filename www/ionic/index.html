@@ -13,7 +13,7 @@
                         <div class="menu-portrait menu-avatar" ng-if="currentStaff.avatar">
                             <img ng-src="{{getImageUrl(currentStaff.avatar)}}">
                         </div>
-                        <h2>{{currentStaff.name}}<i class="button button-small button-stable"
+                        <h2>{{currentStaff.name}}<i class="button button-dark button-small "
                                                     ng-click="$event.stopPropagation();$event.preventDefault(); showTravelPolicy()">差旅标准</i></h2>
                         <p>{{currentStaff.mobile || '暂未填写手机号'}}
                             <br>节省：{{tripPlanSave || 0}}元
@@ -24,7 +24,7 @@
                 <ion-scroll>
                     <ion-list class="side-menu-list">
                         <div class="side-menu-list-item" ng-repeat="menu in Menu.menus">
-                            <a ng-href="#{{menu.link}}" menu-close style="text-align:left;" class="button button-light menu-button button-block icon ion-{{menu.icon}}" ng-if="menu.title != ''">
+                            <a ng-href="#{{menu.link}}" menu-close style="text-align:left;" class="button button-dark menu-button button-block icon ion-{{menu.icon}}" ng-if="menu.title != ''">
                                 {{menu.title}}
                                 <span class="badge badge-assertive" ng-if="menu.badgenum !='0'">{{menu.badgenum}}</span>
                             </a>
@@ -34,16 +34,16 @@
                 </ion-scroll>
                 <div>
                     <div class="button-bar" ng-if="isAdmin">
-                        <button class="button button-light  button-block icon ion-shuffle" ng-click="toggleAdminMenu()">
+                        <button class="button button-light button-manage icon ion-android-settings" ng-click="toggleAdminMenu()">
                             切换为{{isAdminMenus?'员工':'管理'}}
                         </button>
                     </div>
                     <div class="button-bar" ng-if="isShowLogout">
-                        <a href="#notice/" menu-close="" class="button button-light  button-block icon ion-android-notifications">
+                        <a href="#notice/" menu-close="" class="button button-dark  button-block icon ion-android-notifications">
                             通知
                             <span class="icon ion-record new_notice" ng-if="Menu.notie == true"></span>
                         </a>
-                        <a menu-close="" class="button button-light  button-block icon ion-android-exit" ng-click="logout()">
+                        <a menu-close="" class="button button-dark  button-block icon ion-android-exit" ng-click="logout()">
                             退出
                         </a>
                     </div>

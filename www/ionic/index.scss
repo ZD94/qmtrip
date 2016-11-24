@@ -1,4 +1,5 @@
 .side-menu-left{
+  background-color: #444;
   .scroll,.list{
     height: 100%;
     .button-bar{
@@ -6,6 +7,10 @@
       bottom: 25px;
     }
   }
+  .button-manage{
+    background-color: #7a7a7a;
+    margin:0px 65px;
+   }
 }
 
 
@@ -23,6 +28,7 @@ ion-side-menu {
 }
 
 .menu-button{
+
   .badge{
     float: right;
     top: 10px;
@@ -59,6 +65,7 @@ ion-side-menu {
   &.menu-button{
     border-left: none;
     border-right: none;
+    background-color: transparent;
     .menu-portrait:first-child{
       position:absolute;
       top: 10px;
@@ -88,9 +95,14 @@ ion-side-menu {
     h2{
       font-size: 18px;
       line-height: 30px;
+      color:#fff;
       .button{
         float: right;
+        border-color: #fff;
       }
+    }
+    p{
+      color:#fff;
     }
   }
 }
