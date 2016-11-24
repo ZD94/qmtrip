@@ -26,6 +26,7 @@ export default async function initJPush($ionicPlatform, $document){
         if(!jpushId){
             getRegistrationID();
         }
+        document.addEventListener('resume', resetBadgeNumber, false);
         if (ionic.Platform.isIOS()) {
             jPushPlugin.setDebugModeFromIos();
             jPushPlugin.setApplicationIconBadgeNumber(0);
@@ -34,6 +35,14 @@ export default async function initJPush($ionicPlatform, $document){
             jPushPlugin.setStatisticsOpen(true);
         }
     });
+}
+
+function resetBadgeNumber(){
+    if (ionic.Platform.isIOS()) {
+        jPushPlugin.setApplicationIconBadgeNumber(0);
+    } else {
+        jPushPlugin.clearAllNotification();
+    }
 }
 
 function getAuthData(): LoginResponse {
