@@ -12,6 +12,10 @@
     margin:0px 65px;
     color:#fff;
    }
+  //.button.button-light:hover
+  .button.button-dark.active, .button.button-dark.activated{
+    border-color: transparent;
+  }
 }
 
 
@@ -67,6 +71,7 @@ ion-side-menu {
     border-left: none;
     border-right: none;
     background-color: transparent;
+    border-bottom-color: #545454;
     .menu-portrait:first-child{
       position:absolute;
       top: 10px;
