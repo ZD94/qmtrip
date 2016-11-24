@@ -1,2 +1,2 @@
 <%=username || '' %>申请一次新的出差
-<%=startAt || '' %>-<%=backAt || '' %>   <%=deptCity || '' %>-<%=arrivalCity || '' %>  预算：<%=totalBudget || '' %>
+<%=startAt || '' %>-<%=backAt || '' %>   <%=deptCity || '' %>-<%=arrivalCity || '' %>
