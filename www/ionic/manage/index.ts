@@ -4,5 +4,5 @@
 "use strict";
 
 export default async function IndexController($scope){
-    
+    require('./manage.scss');
 }
