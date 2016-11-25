@@ -16,6 +16,12 @@
   .button.button-dark.active, .button.button-dark.activated{
     border-color: transparent;
   }
+  .button-bar-menu-bottom{
+    a{
+      margin-bottom: 0px;
+      padding-bottom: 10px;
+    }
+  }
 }
 
 
