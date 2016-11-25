@@ -38,12 +38,12 @@
                             管理企业
                         </a>
                     </div>
-                    <div class="button-bar" ng-if="isShowLogout">
-                        <a href="#notice/" menu-close="" class="button button-dark  button-block icon ion-android-notifications-none" style="margin-bottom: 0px">
+                    <div class="button-bar button-bar-menu-bottom" ng-if="isShowLogout">
+                        <a href="#notice/" menu-close="" class="button button-dark  button-block icon ion-android-notifications-none">
                             消息
                             <span class="icon ion-record new_notice" ng-if="Menu.notie == true"></span>
                         </a>
-                        <a menu-close="" class="button button-dark  button-block icon  ion-android-exit" style="margin-bottom: 0px" ng-click="logout()">
+                        <a menu-close="" class="button button-dark  button-block icon  ion-android-exit" ng-click="logout()">
                             退出
                         </a>
                     </div>
