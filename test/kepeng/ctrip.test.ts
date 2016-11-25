@@ -42,7 +42,7 @@ export default async function main() {
         //let list = await client.getOrderList();
         // let url = await client.getAirTicketReserveLink({fromCityName: '昆明', toCityName: '上海', leaveDate: '2016-11-29'});
         // let url = await client.getTrainTicketReserveLink({fromCityName: '昆明', toCityName: '上海', leaveDate: '2016-11-29'});
-        let url = await client.getHotelReserveLink({cityName: '昆明'});
+        let url = await client.getBookLink({reserveType: 'hotel', city: '昆明'});
         console.log(url);
     }catch(e){
         if(e.response){
