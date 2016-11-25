@@ -27,6 +27,19 @@
 }
 
 @import "./date/date";
+.platform-cordova:not(.fullscreen){
+  .modal-popup{
+    .bar-header:not(.bar-subheader){
+      height: 44px;
+      & > *{
+        margin-top: 0;
+      }
+    }
+    .has-header{
+      top: 44px;
+    }
+  }
+}
 
 .modal-popup{
   top: 0;
@@ -34,12 +47,13 @@
   right: 0;
   bottom: 0;
   margin: auto;
-  min-height: 200px;
-  height: 200px;
+  min-height: 205px;
+  height: 205px;
   width: 250px;
   border-radius: 5px;
   .bar.bar-light{
     background: none;
+    height: 64px;
   }
   .item{
     padding: 7px;
