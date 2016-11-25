@@ -43,50 +43,50 @@ var staffMenus = [
     }
 ];
 
-var adminMenus = [
-    {
-        id: 1056,
-        icon: 'stats-bars',
-        title: '差旅统计',
-        link: 'statistics/',
-        badgeNum: 0
-    },
-    {
-        id: 1057,
-        icon: 'person-stalker',
-        title: '员工管理',
-        link: 'staff/list',
-        badgeNum: 0
-    },
-    {
-        id: 1058,
-        icon: 'ios-box',
-        title: '部门管理',
-        link: 'department/',
-        badgeNum: 0
-    },
-    {
-        id: 1059,
-        icon: 'android-list',
-        title: '差旅标准',
-        link: 'travel-policy/',
-        badgeNum: 0
-    },
-    {
-        id: 1060,
-        icon: 'pricetags',
-        title: '协议酒店',
-        link: 'accord-hotel/',
-        badgeNum: 0
-    },
-    {
-        id: 1061,
-        icon: 'ios-cart',
-        title: '预订服务商',
-        link: 'supplier/',
-        badgeNum: 0
-    },
-];
+// var adminMenus = [
+//     {
+//         id: 1056,
+//         icon: 'stats-bars',
+//         title: '差旅统计',
+//         link: 'statistics/',
+//         badgeNum: 0
+//     },
+//     {
+//         id: 1057,
+//         icon: 'person-stalker',
+//         title: '员工管理',
+//         link: 'staff/list',
+//         badgeNum: 0
+//     },
+//     {
+//         id: 1058,
+//         icon: 'ios-box',
+//         title: '部门管理',
+//         link: 'department/',
+//         badgeNum: 0
+//     },
+//     {
+//         id: 1059,
+//         icon: 'android-list',
+//         title: '差旅标准',
+//         link: 'travel-policy/',
+//         badgeNum: 0
+//     },
+//     {
+//         id: 1060,
+//         icon: 'pricetags',
+//         title: '协议酒店',
+//         link: 'accord-hotel/',
+//         badgeNum: 0
+//     },
+//     {
+//         id: 1061,
+//         icon: 'ios-cart',
+//         title: '预订服务商',
+//         link: 'supplier/',
+//         badgeNum: 0
+//     },
+// ];
 
 var config = require('config');
 
@@ -167,18 +167,21 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
             // Menu Closed
         }
     });
-    $scope.isAdminMenus = false;
-    $scope.isAdmin = false;
-    if (staff && (staff.roleId == EStaffRole.OWNER || staff.roleId == EStaffRole.ADMIN)) {
-        $scope.isAdmin = true;
-        $scope.toggleAdminMenu = function(){
-            $scope.isAdminMenus = !$scope.isAdminMenus;
-            if($scope.isAdminMenus)
-                setupMenu(adminMenus);
-            else
-                setupMenu(staffMenus);
-        }
-    }
+    // $scope.isAdminMenus = false;
+    // $scope.isAdmin = false;
+    // if (staff && (staff.roleId == EStaffRole.OWNER || staff.roleId == EStaffRole.ADMIN)) {
+    //     $scope.isAdmin = true;
+    //     $scope.toggleAdminMenu = function(){
+    //         $scope.isAdminMenus = !$scope.isAdminMenus;
+    //         if($scope.isAdminMenus)
+    //             setupMenu(adminMenus);
+    //         else
+    //             setupMenu(staffMenus);
+    //     }
+    // }
+    // $scope.toAdminMenu = function(){
+    //     window.location.href = '#/manage/index';
+    // }
 
     $scope.showTravelPolicy = async function (staffId?: string) {
         let pStaff = await Staff.getCurrent();

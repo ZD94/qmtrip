@@ -1,5 +1,6 @@
 import { Models } from 'api/_types/index';
 import { Staff } from 'api/_types/staff/staff';
+import { Token } from 'api/_types/auth/token';
 
 /**
  * 删除绑定的设备id
@@ -22,16 +23,22 @@ export async function destroyJpushId(params?: {}): Promise<boolean> {
  * 用户绑定设备id
  * @type {saveOrUpdateJpushId}
  */
-export async function saveOrUpdateJpushId(params) {
+export async function saveOrUpdateJpushId(params): Promise<Token>  {
     let staff = await Staff.getCurrent();
-    let list = await Models.token.find({where: {token: params.jpushId, type:'jpush_id'}});
+    let list = await Models.token.find({where: {token: params.jpushId, type:'jpush_id', accountId: {$ne: staff.id}}});
 
     if(list && list.length > 0) {
         await Promise.all(list.map((op) => op.destroy()));
     }
 
+    let selfList = await Models.token.find({where: {token: params.jpushId, type:'jpush_id', accountId: staff.id}});
+
+    if(selfList && selfList.length > 0) {
+        return selfList[0];
+    }
+
     let obj = Models.token.create({token: params.jpushId, accountId: staff.id, type:'jpush_id'});
-    await obj.save();
+    return obj.save();
 }
 
 
@@ -41,13 +48,15 @@ export async function saveOrUpdateJpushId(params) {
  * @param params
  * @returns {null}
  */
-export async function getJpushIdByAccount(params: {accountId: string}): Promise<string> {
+export async function getJpushIdByAccount(params: {accountId: string}): Promise<string[]> {
     let list = await Models.token.find({where: {accountId: params.accountId, type:'jpush_id'}});
 
     if(!list || list.length <= 0) {
         return null;
     }
-
-    let obj = list[0];
-    return obj.token;
+    var result = [];
+    list.forEach(function(item){
+        result.push(item.token);
+    })
+    return result;
 }
