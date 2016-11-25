@@ -41,6 +41,8 @@ function apiAuth(remote, callback) {
             if(!err) {
                 var session = getSession();
                 session.accountId = data.accountId;
+                let needJPushId = new Event('needJPushId');
+                document.dispatchEvent(needJPushId);
             }
             callback(err, res);
         });

@@ -19,9 +19,31 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         throw L.ERR.NOT_IMPLEMENTED();
     }
 
+    async getBookLink(options): Promise<ReserveLink>{
+        var reserveType = options.reserveType;
+        var bookLink: any = {};
+
+        if(reserveType == "travel_plane"){
+            bookLink = await this.getAirTicketReserveLink({fromCity: options.fromCity, toCity: options.toCity, leaveDate: options.leaveDate});
+        }
+
+        if(reserveType == "travel_train"){
+            bookLink = await this.getTrainTicketReserveLink({fromCity: options.fromCity, toCity: options.toCity, leaveDate: options.leaveDate});
+        }
+
+        if(reserveType == "hotel"){
+            bookLink = await this.getHotelReserveLink({city: options.city});
+        }
+
+        return bookLink;
+    }
+
     async getAirTicketReserveLink(options):Promise<ReserveLink> {
-        var fromCityCode = await this.queryFlightCityCode(options.fromCityName);
-        var toCityCode = await this.queryFlightCityCode(options.toCityName);
+        if(options.leaveDate){
+            options.leaveDate = moment(options.leaveDate).format('YYYY-MM-DD')
+        }
+        var fromCityCode = await this.queryFlightCityCode(options.fromCity);
+        var toCityCode = await this.queryFlightCityCode(options.toCity);
         var values = {fromCityCode: fromCityCode, toCityCode: toCityCode, departDate: options.leaveDate};
         var template = "http://m.ctrip.com/html5/flight/flight-list.html?triptype=1&dcode=<%=fromCityCode%>&acode=<%=toCityCode%>&ddate=<%=departDate%>";
         var temp = _.template(template);
@@ -30,7 +52,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
     }
 
     async getHotelReserveLink(options):Promise<ReserveLink> {
-        var cityInfo = await this.queryHotelCityCode(options.cityName);
+        var cityInfo = await this.queryHotelCityCode(options.city);
         var values = {cityInfo: cityInfo};
         var template = "http://m.ctrip.com/webapp/hotel/<%=cityInfo%>/?fr=index";
         var temp = _.template(template);
@@ -59,11 +81,11 @@ export default class SupplierCtripCT extends SupplierWebRobot{
             "savedate":"",
             "oldvalue":{}
         }
-        param.value.aStation = param.value.aStationCityName = options.toCityName;
-        param.value.dStation = param.value.dStationCityName = options.fromCityName;
-        param.value.dDate = moment(options.leaveDate).toDate().getTime();
-        let aStationCityId = await this.queryHotelCityCode(options.toCityName);
-        let dStationCityId = await this.queryHotelCityCode(options.fromCityName);
+        param.value.aStation = param.value.aStationCityName = options.toCity;
+        param.value.dStation = param.value.dStationCityName = options.fromCity;
+        param.value.dDate = options.leaveDate.getTime();
+        let aStationCityId = await this.queryHotelCityCode(options.toCity);
+        let dStationCityId = await this.queryHotelCityCode(options.fromCity);
         param.value.dStationCityId = parseInt(dStationCityId);
         param.value.aStationCityId = parseInt(aStationCityId);
         param.savedate = moment().format("YYYY/MM/DD HH:mm:ss");
@@ -74,13 +96,13 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         return {url:trafficBookLink, jsCode: linkJS};
     }
 
-    async queryFlightCityCode(cityName: string): Promise<string>{
+    async queryFlightCityCode(city: string): Promise<string>{
         var res = await this.client.post({
             json: true,
             uri: 'https://sec-m.ctrip.com/restapi/soa2/11783/Flight/Common/FlightSimilarNearAirportSearch/Query?_fxpcqlniredt=09031117210396050637',
             form: {
                 head: {},
-                key: cityName,
+                key: city,
             },
             headers: {
                 'Referer': 'http://m.ctrip.com/html5/flight/matrix.html',
@@ -94,14 +116,14 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         return "";
     }
 
-    async queryHotelCityCode(cityName: string): Promise<string>{
+    async queryHotelCityCode(city: string): Promise<string>{
         var requestPromise = require('request-promise');
         var res = await this.client.post({
             uri: 'http://m.ctrip.com/restapi/soa2/10932/hotel/static/destinationget?_fxpcqlniredt=09031117210396050637',
             json: true,
             form:{
                 head:{},
-                word: cityName,
+                word: city,
             },
             headers: {
                 'Referer': 'http://m.ctrip.com/webapp/hotel/citylist',

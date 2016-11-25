@@ -6,11 +6,12 @@
 import {ModelObject} from "common/model/object";
 import {Values, Types} from "common/model/index";
 import {EPlanStatus, ETripType, TripPlan, EInvoiceType, EAuditStatus} from "./tripPlan";
-import {Field, Table, TableExtends} from "common/model/common";
+import {Field, Table, TableExtends, RemoteCall} from "common/model/common";
 import {Models} from "../index";
 import {TripDetail, TripDetailInvoice} from "./tripDetail";
 import {ECabin, EPayType} from "./index";
 import {PaginateInterface} from "common/model/interface";
+import {ReserveLink} from 'libs/suppliers/interface';
 
 
 @TableExtends(TripDetail, 'tripDetailInfo', 'type', [ETripType.OUT_TRIP, ETripType.BACK_TRIP])
@@ -80,6 +81,12 @@ export class TripDetailTraffic extends ModelObject implements TripDetail {
         params['id'] = this.id;
         return API.tripPlan.auditPlanInvoice(params);
     }
+
+    @RemoteCall()
+    async getBookLink(params: {reserveType: string, supplierId: string}): Promise<ReserveLink> {
+        var supplier = await Models.supplier.get(params.supplierId);
+        return supplier.getBookLink({reserveType: params.reserveType, fromCity: this.deptCity, toCity: this.arrivalCity, leaveDate: this.deptDateTime})
+    }
 }
 
 @TableExtends(TripDetail, 'tripDetailInfo', 'type', ETripType.HOTEL)
@@ -141,6 +148,12 @@ export class TripDetailHotel extends ModelObject implements TripDetail {
         }
         params['id'] = this.id;
         return API.tripPlan.auditPlanInvoice(params);
+    }
+
+    @RemoteCall()
+    async getBookLink(params: {reserveType: string, supplierId: string}): Promise<ReserveLink> {
+        var supplier = await Models.supplier.get(params.supplierId);
+        return supplier.getBookLink({reserveType: params.reserveType, city: this.city});
     }
 
 }

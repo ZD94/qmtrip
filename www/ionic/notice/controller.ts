@@ -30,13 +30,21 @@ export async function IndexController($scope, Models, $location) {
                 return
             }
             $scope.pager = pager;
-            loadStaffs(pager);
+            reloadNotices(pager);
             $scope.$broadcast('scroll.refreshComplete');
         }
     }
     
     function loadStaffs(pager) {
         if(pager && pager.length>0){
+            pager.forEach(function(notice){
+                $scope.notices.push(notice);
+            });
+        }
+    }
+    function reloadNotices(pager){
+        if(pager && pager.length>0){
+            $scope.notices = [];
             pager.forEach(function(notice){
                 $scope.notices.push(notice);
             });

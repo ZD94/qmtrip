@@ -1,3 +1,4 @@
+import moment = require('moment');
 var msgbox = require('msgbox');
 
 export async function ForgetPwdController($scope,Models) {
@@ -8,11 +9,12 @@ export async function ForgetPwdController($scope,Models) {
         mobile:'',
         msgCode:''
     };
-
     $scope.showCount = false;
     $scope.beginCountDown = function(){
         $scope.showCount = true;
-        $scope.beginNum = 90;
+        let nowTime = new Date();
+        let newNow = moment(nowTime).add(90,'seconds');
+        $scope.beginNum = moment(newNow).diff(moment(),'seconds');
         var timer = setInterval(function() {
             if ($scope.beginNum <= 0) {
                 $scope.showCount = false;
@@ -20,7 +22,7 @@ export async function ForgetPwdController($scope,Models) {
                 $scope.$apply();
                 return;
             }
-            $scope.beginNum = $scope.beginNum - 1;
+            $scope.beginNum = moment(newNow).diff(moment(),'seconds');
             $scope.$apply();
         }, 1000);
     }
