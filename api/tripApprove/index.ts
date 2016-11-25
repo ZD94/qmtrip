@@ -504,6 +504,7 @@ class TripApproveModule {
             approveUser: staff.id,
             outerId: tripApprove.id,
             data: budgetInfo,
+            oa: 'qm'
         });
 
         return true;

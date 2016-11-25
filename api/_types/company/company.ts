@@ -7,14 +7,14 @@ import {TravelPolicy} from "api/_types/travelPolicy";
 import { Types, Values } from 'common/model';
 import { Department } from 'api/_types/department';
 import { TripPlan } from "api/_types/tripPlan";
-import {Table, Create, Field, Reference, ResolveRef} from 'common/model/common';
+import {Table, Create, Field, Reference, ResolveRef, RemoteCall} from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import { MoneyChange } from './money-change';
 import { Supplier } from './supplier';
 import {CoinAccount} from "api/_types/coin";
 import {PaginateInterface} from "common/model/interface";
 import promise = require("common/test/api/promise/index");
-import {EApproveChannel} from "../approve/types";
+import {EApproveChannel, EApproveStatus} from "../approve/types";
 declare var API: any;
 
 export enum ECompanyStatus {
@@ -254,10 +254,27 @@ export class Company extends ModelObject{
                     suppliers.push(su);
                 }
             })
-
             await Promise.all(ps);
         }
 
         return suppliers;
+    }
+
+    @RemoteCall()
+    async changeOA(params: {oa: EApproveChannel}) {
+        let {oa} = params;
+        let self = this;
+        if (this.oa == oa ) {
+            return this;
+        }
+        //查询是否有未完成的审批
+        let approves = await Models.approve.find({where: {status: EApproveStatus.WAIT_APPROVE, companyId: self.id}, limit: 200});
+        let ps = approves.map( (item) => {
+            item.status = EApproveStatus.FAIL;
+            return item.save();
+        })
+        await Promise.all(ps);
+        this.oa = oa;
+        return this.save();
     }
 }

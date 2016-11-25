@@ -27,6 +27,7 @@ export class AutoPlugin extends AbstractOAPlugin {
         process.nextTick(function() {
             params['status'] = EApproveStatus.SUCCESS;
             params['approveUser'] = null;
+            params['oa'] = 'auto';
             self.tripApproveUpdateNotify(null, params);
         });
         return params as createTripApproveResult;

@@ -75,6 +75,9 @@ export class Approve extends ModelObject implements IApprove {
     get outerId(): string {return null}
     set outerId(outerId: string) {}
 
+    @Field({type: Types.UUID})
+    get companyId(): string {return null}
+    set companyId(companyId: string) {}
 }
 
 export * from './types';

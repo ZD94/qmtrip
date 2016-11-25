@@ -13,6 +13,25 @@ import {TripPlan, ETripType} from "../_types/tripPlan/tripPlan";
 import TripPlanModule = require("../tripPlan/index");
 var API = require("common/api");
 
+
+
+function oaStr2Enum(str: string) :EApproveChannel{
+    let obj = {
+        'qm':       EApproveChannel.QM,
+        'auto':     EApproveChannel.AUTO,
+        'ddtalk':   EApproveChannel.DING_TALK
+    }
+    return obj[str];
+}
+
+function oaEnum2Str(e: EApproveChannel) {
+    let obj = {}
+    obj[EApproveChannel.QM] = 'qm';
+    obj[EApproveChannel.AUTO] = 'auto';
+    obj[EApproveChannel.DING_TALK] = 'ddtalk';
+    return obj[e];
+}
+
 class ApproveModule {
 
     @clientExport
@@ -72,6 +91,7 @@ class ApproveModule {
     }) {
         let {submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark } = params;
 
+        let staff = await Models.staff.get(submitter);
         let approve = Models.approve.create({
             submitter: submitter,
             data: data,
@@ -81,14 +101,9 @@ class ApproveModule {
             approveUser: approveUser,
             isSpecialApprove: isSpecialApprove,
             specialApproveRemark: specialApproveRemark,
+            companyId: staff.company.id,
         });
         approve = await approve.save();
-
-        let oas = {
-        }
-        oas[EApproveChannel.QM] = 'qm';
-        oas[EApproveChannel.AUTO] = 'auto';
-        oas[EApproveChannel.DING_TALK] = 'ddtalk';
 
         //对接第三方OA
         emitter.emit(EVENT.NEW_TRIP_APPROVE, {
@@ -96,7 +111,7 @@ class ApproveModule {
             approveUser: submitter,
             submitter: submitter,
             status: EApproveStatus.WAIT_APPROVE,
-            oa: oas[channel] || 'qm'
+            oa: oaEnum2Str(channel) || 'qm'
         });
         return approve;
     }
@@ -105,9 +120,15 @@ class ApproveModule {
 //监听审批单变化
 emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result) {
     let p = (async function(){
-        let {approveNo, submitter, outerId, status, approveUser, data} = result;
+        let {approveNo, submitter, outerId, status, approveUser, data, oa} = result;
         let approve = await Models.approve.get(approveNo);
         if (approve.status == status) {
+            return;
+        }
+
+        let company = await Models.company.get(approve['companyId']);
+        //OA流程已经切换,旧的处理渠道不再支持
+        if (company.oa != oaStr2Enum(oa)) {
             return;
         }
 
