@@ -47,13 +47,17 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     var tripDetail = await Models.tripDetail.get($stateParams.detailId);
     var invoices = await tripDetail.getInvoices();
     $scope.invoices = formatInvoice(invoices);
-    if(tripDetail.type == EInvoiceType.HOTEL){
-        tripDetail.h_city = await City.getCity(tripDetail.city);
-    }else{
-        tripDetail.a_city = await City.getCity(tripDetail.arrivalCity);
-        tripDetail.d_city = await City.getCity(tripDetail.deptCity);
+    async function getTripDetailCity(tripD){
+        if(tripD.type == EInvoiceType.HOTEL){
+            tripD.h_city = await City.getCity(tripD.city);
+        }else{
+            tripD.a_city = await City.getCity(tripD.arrivalCity);
+            tripD.d_city = await City.getCity(tripD.deptCity);
+        }
+        $scope.tripDetail = tripD;
     }
-    $scope.tripDetail = tripDetail;
+    getTripDetailCity(tripDetail);
+
     let showChooseFunc = typeArray.indexOf(tripDetail.status) >= 0
     $scope.showChooseFunc = showChooseFunc;
     let initPager = 0;
@@ -255,7 +259,8 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
             return;
         }
         newInvoice.save();
-        $scope.tripDetail = await Models.tripDetail.get($stateParams.detailId);
+        tripDetail = await Models.tripDetail.get($stateParams.detailId);
+        getTripDetailCity(tripDetail);
         $scope.invoices = formatInvoice(await tripDetail.getInvoices());
         $ionicSlideBoxDelegate.update();
         $scope.select_menu = true;
