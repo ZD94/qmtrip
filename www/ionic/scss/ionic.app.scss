@@ -154,6 +154,12 @@ ion-content {
   }
 }
 
+.platform-ios{
+  .pane, .view{
+    background-color: #444;
+  }
+}
+
 .platform-wechat {
   ion-side-menu-content {
     .has-header {
