@@ -1,6 +1,7 @@
 import { autobind } from 'core-decorators';
 import IScope = angular.IScope;
 import { LoginResponse } from 'api/_types/auth/auth-cert';
+import moment = require('moment');
 var msgbox = require('msgbox');
 var config = require('config');
 var browserspec = require('browserspec');
@@ -118,7 +119,9 @@ export class IndexController {
 
     beginCountDown() {
         this.showCount = true;
-        this.beginNum = 90;
+        let nowTime = new Date();
+        let newNow = moment(nowTime).add(90,'seconds');
+        this.beginNum = moment(newNow).diff(moment(),'seconds');
         var timer = setInterval(()=>{
             if(this.beginNum <= 0) {
                 this.showCount = false;
@@ -126,7 +129,7 @@ export class IndexController {
                 this.$scope.$apply();
                 return;
             }
-            this.beginNum = this.beginNum - 1;
+            this.beginNum = moment(newNow).diff(moment(),'seconds');
             this.$scope.$apply();
         }, 1000);
     }
