@@ -3,10 +3,11 @@
 import angular = require('angular');
 import * as path from 'path';
 
+declare var ionic;
 
 angular
     .module('nglibs')
-    .factory('inAppBrowser', function(){
+    .factory('inAppBrowser', function($ionicPlatform){
         if(!window.cordova){
             return {
                 open: function(url: string, linkJS?: string){
@@ -14,8 +15,14 @@ angular
                 }
             }
         }
-        const relpath = path.relative(window['bundle_url'], window['Manifest'].root);
-        console.log(relpath);
+        let backImage = 'ionic/images/back.png';
+        let closeImage = 'ionic/images/close.png';
+        if(!ionic.Platform.isAndroid()){
+            let relpath = path.relative(window['bundle_url'], window['Manifest'].root);
+            console.log(relpath);
+            backImage = relpath+'/'+backImage;
+            closeImage = relpath+'/'+closeImage;
+        }
         const ThemeableBrowserOption = {
             toolbar: {
                 height: 44,
@@ -26,15 +33,15 @@ angular
                 staticText: '鲸力商旅',
             },
             backButton: {
-                wwwImage: relpath+'/ionic/images/back.png',
-                wwwImagePressed: relpath+'/ionic/images/back.png',
+                wwwImage: backImage,
+                wwwImagePressed: backImage,
                 wwwImageDensity: 2,
                 align: 'left',
                 event: 'backPressed'
             },
             closeButton: {
-                wwwImage: relpath+'/ionic/images/close.png',
-                wwwImagePressed: relpath+'/ionic/images/close.png',
+                wwwImage: closeImage,
+                wwwImagePressed: closeImage,
                 wwwImageDensity: 2,
                 align: 'left',
                 event: 'closePressed'
