@@ -168,19 +168,16 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
         }
     });
     // $scope.isAdminMenus = false;
-    // $scope.isAdmin = false;
-    // if (staff && (staff.roleId == EStaffRole.OWNER || staff.roleId == EStaffRole.ADMIN)) {
-    //     $scope.isAdmin = true;
-    //     $scope.toggleAdminMenu = function(){
-    //         $scope.isAdminMenus = !$scope.isAdminMenus;
-    //         if($scope.isAdminMenus)
-    //             setupMenu(adminMenus);
-    //         else
-    //             setupMenu(staffMenus);
-    //     }
-    // }
-    // $scope.toAdminMenu = function(){
-    //     window.location.href = '#/manage/index';
+    $scope.isAdmin = false;
+    if (staff && (staff.roleId == EStaffRole.OWNER || staff.roleId == EStaffRole.ADMIN)) {
+        $scope.isAdmin = true;
+        // $scope.toggleAdminMenu = function(){
+        //     $scope.isAdminMenus = !$scope.isAdminMenus;
+        //     if($scope.isAdminMenus)
+        //         setupMenu(adminMenus);
+        //     else
+        //         setupMenu(staffMenus);
+    }
     // }
 
     $scope.showTravelPolicy = async function (staffId?: string) {

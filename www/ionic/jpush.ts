@@ -59,11 +59,13 @@ function getRegistrationID(){
 }
 
 async function onGetRegistrationID(data) {
+    API.require('auth');
+    await API.onload();
     let authData = getAuthData();
     try {
         console.log("JPushPlugin:registrationID is " + data);
         if(data.length != 0 && authData) {
-            await API.auth.saveOrUpdateJpushId({jpushId: data});
+            var a = await API.auth.saveOrUpdateJpushId({jpushId: data});
             localStorage.setItem('jpushId',data)
         }
         if (data.length == 0) {
