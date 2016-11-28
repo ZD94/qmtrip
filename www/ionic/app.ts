@@ -102,11 +102,17 @@ function initKeyboard($ionicPlatform) {
         }
     });
 }
-function initStatusBar($ionicPlatform) {
+function initStatusBar($ionicPlatform, $rootScope) {
     $ionicPlatform.ready(function() {
         if(window.StatusBar) {
             // org.apache.cordova.statusbar required
             StatusBar.styleDefault();
+            $rootScope.$on('$ionicSideMenuOpen', function(){
+                StatusBar.hide();
+            });
+            $rootScope.$on('$ionicSideMenuClose', function(){
+                StatusBar.show();
+            });
         }
     });
 }
