@@ -1,5 +1,10 @@
 <ion-view title="审批设置">
-    <ion-content padding="true" class="has-header">
-        <div class="item item-toggle toggle-large" toggle-class="toggle-positive"></div>
+    <ion-content padding="true" class="has-header approve-set">
+        <div class="list">
+            <ion-toggle toggle-class="toggle-positive" ng-model="approveFun.open">开启审批功能</ion-toggle>
+        </div>
+        <div class="list" ng-if="approveFun.open">
+            <ion-radio></ion-radio>
+        </div>
     </ion-content>
 </ion-view>
