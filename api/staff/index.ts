@@ -1285,7 +1285,7 @@ class StaffModule{
         delete params.email;
 
         return Promise.all([
-                API.auth.remove({email: email, mobile: mobile, type: 1}),
+                API.auth.removeByTest({email: email, mobile: mobile, type: 1}),
                 DBM.Staff.destroy({where: params})
             ])
             .spread(function(){

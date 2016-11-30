@@ -21,18 +21,10 @@ describe("api/auth/index.js", function() {
     });
 
     after(function(done) {
-        API.auth.remove({email: "test@test1231.com"}, function(err) {
+        API.auth.removeByTest({email: "test@test1231.com"}, function(err) {
             if (err) {
                 throw err;
             }
-            done();
-        })
-    })
-
-    it("#isEmailUsed should be ok", function(done) {
-        API.auth.isEmailUsed({email: "test@test1231.com", type: 1}, function(err, result) {
-            assert.equal(err, null);
-            assert.equal(result, true);
             done();
         })
     })
