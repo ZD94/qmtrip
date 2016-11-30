@@ -11,6 +11,7 @@ import {emitter, EVENT} from "libs/oa";
 import {EApproveStatus, EApproveChannel, EApproveType} from "../_types/approve/types";
 import {TripPlan, ETripType} from "../_types/tripPlan/tripPlan";
 import TripPlanModule = require("../tripPlan/index");
+import Config = require('config');
 var API = require("common/api");
 
 
@@ -114,6 +115,27 @@ class ApproveModule {
             oa: oaEnum2Str(channel) || 'qm'
         });
         return approve;
+    }
+
+    @clientExport
+    static async reportHimOA(params: {oaName: string, oaUrl?: string}) {
+        let {oaName, oaUrl} = params;
+        let staff = await Staff.getCurrent();
+        try {
+            let ret = await API.notify.submitNotify({
+                email: Config.reportHimOAReceive,
+                key: 'qm_report_him_oa',
+                values: {
+                    oaName: oaName,
+                    oaUrl: oaUrl,
+                    companyName: staff.company.name,
+                    name: staff.name,
+                    mobile: staff.mobile,
+                },
+            });
+        } catch( err) {
+            throw err;
+        }
     }
 }
 
