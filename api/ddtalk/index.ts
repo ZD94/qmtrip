@@ -6,7 +6,7 @@
 const API = require('common/api');
 let dingSuiteCallback = require("dingtalk_suite_callback");
 import fs = require("fs");
-import cache = require("common/cache");
+import cache from "common/cache";
 
 const config ={
     token: 'jingli2016',
@@ -30,6 +30,11 @@ import {md5} from "../../common/utils";
 
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 
+interface suiteTokenCached{
+    suite_access_token: string;
+    expire_at: number;
+}
+
 async function _getSuiteToken() {
     let ticketObj: any = await cache.read(CACHE_KEY);
     if (typeof ticketObj == 'string') {
@@ -43,7 +48,7 @@ async function _getSuiteToken() {
         throw new Error('不存在ticket');
     }
     let key = `ddtalk:suite_access_token:${config.suiteid}`;
-    let d = cache.read(key)
+    let d = await cache.readAs<suiteTokenCached>(key)
     if (d && d.expire_at > Date.now()) {
         return d;
     }

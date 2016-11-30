@@ -11,7 +11,7 @@ import {emitter, EVENT} from "libs/oa";
 import {EApproveStatus, EApproveChannel, EApproveType} from "../_types/approve/types";
 import {TripPlan, ETripType} from "../_types/tripPlan/tripPlan";
 import TripPlanModule = require("../tripPlan/index");
-import Config = require('config');
+let Config = require('config');
 var API = require("common/api");
 
 

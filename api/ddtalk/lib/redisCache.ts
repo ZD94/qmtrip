@@ -3,7 +3,7 @@ import {DDTalkCache} from "./interface";
  * Created by doiis on 16/9/12.
  */
 
-import cache = require("common/cache");
+import cache from "common/cache";
 
 class RedisCache implements DDTalkCache {
     private _prefix: string;
