@@ -109,7 +109,7 @@ class ApproveModule {
         //对接第三方OA
         emitter.emit(EVENT.NEW_TRIP_APPROVE, {
             approveNo: approve.id,
-            approveUser: submitter,
+            approveUser: approveUser,
             submitter: submitter,
             status: EApproveStatus.WAIT_APPROVE,
             oa: oaEnum2Str(channel) || 'qm'
