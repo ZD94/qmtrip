@@ -1,8 +1,11 @@
 .notice.list{
   .item.item-body{
     border-radius: 5px;
-    padding: 10px;
+    padding: 0px;
     margin-bottom: 20px;
+    .item-content{
+      padding: 10px;
+    }
     .notice_title{
       margin-bottom: 10px;
       font-weight: bold;

@@ -4,8 +4,8 @@
                 pulling-text="下拉刷新",
                 on-refresh="pagersDate.doRefresh()"
         ></ion-refresher>
-        <div class="list notice">
-            <div class="item item-body" ng-repeat="notice in notices track by $index" ng-click="detail(notice)">
+        <ion-list class="list notice">
+            <ion-item class="item item-body" ng-repeat="notice in notices track by $index" ng-click="detail(notice)">
                 <div class="notice_title">
                     <span>{{notice.title}}</span>
                     <span ng-if="!notice.isRead" class="new_notice icon ion-record"></span>
@@ -14,8 +14,9 @@
                 <div>
                     <div class="notice_desc">{{notice.description}}</div>
                 </div>
-            </div>
-        </div>
+                <ion-option-button class="button-assertive" ng-click="delete(notice, $index)"> 删除 </ion-option-button>
+            </ion-item>
+        </ion-list>
         <div>
             <div ng-if="!vm.isHasNextPage" class="getMoreOrNoMore">没有更多记录了</div>
         </div>
