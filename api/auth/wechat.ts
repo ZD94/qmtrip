@@ -1,5 +1,5 @@
 import { LoginResponse } from 'api/_types/auth/auth-cert';
-import cache = require("common/cache");
+import cache from "common/cache";
 import ApiAuth from './index';
 import { makeAuthenticateToken } from './authentication';
 import { Staff } from 'api/_types/staff/staff';
@@ -76,7 +76,7 @@ export async function destroyWechatOpenId(params: {}): Promise<boolean> {
  */
 export async function saveOrUpdateOpenId(params) {
     let {code} = params;
-    let val = await cache.read(`wechat:${code}`);
+    let val = await cache.readAs<{openid:string}>(`wechat:${code}`);
     let openid = val ? val.openid : '';
     if(!openid)
         return;

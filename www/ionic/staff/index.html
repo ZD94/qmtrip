@@ -4,7 +4,7 @@
             <div class="card">
                 <a href="#/staff/staff-info">
                     <div class="item-thumbnail-left">
-                        <div class="avatar" ng-if="!staff.avatar">{{staff.name}}</div>
+                        <div class="avatar" ng-if="!staff.avatar">{{staff.name.substring(staff.name.length-2,staff.name.length)}}</div>
                         <div class="avatar" ng-if="staff.avatar">
                             <img ng-src="{{getImageUrl(staff.avatar)}}">
                         </div>

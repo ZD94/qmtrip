@@ -5,6 +5,8 @@ import { signToken, LoginResponse, genAuthString } from 'api/_types/auth/auth-ce
 import initJPush from './jpush';
 require('ionic');
 
+declare var ionic;
+
 function getAuthData(): LoginResponse {
     var data = localStorage.getItem('auth_data');
     try{
@@ -102,11 +104,19 @@ function initKeyboard($ionicPlatform) {
         }
     });
 }
-function initStatusBar($ionicPlatform) {
+function initStatusBar($ionicPlatform, $rootScope) {
     $ionicPlatform.ready(function() {
         if(window.StatusBar) {
             // org.apache.cordova.statusbar required
             StatusBar.styleDefault();
+            if(ionic.Platform.isIOS()){
+                $rootScope.$on('$ionicSideMenuOpen', function(){
+                    StatusBar.hide();
+                });
+                $rootScope.$on('$ionicSideMenuClose', function(){
+                    StatusBar.show();
+                });
+            }
         }
     });
 }

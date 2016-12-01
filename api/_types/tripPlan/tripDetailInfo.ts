@@ -153,7 +153,7 @@ export class TripDetailHotel extends ModelObject implements TripDetail {
     @RemoteCall()
     async getBookLink(params: {reserveType: string, supplierId: string}): Promise<ReserveLink> {
         var supplier = await Models.supplier.get(params.supplierId);
-        return supplier.getBookLink({reserveType: params.reserveType, city: this.city});
+        return supplier.getBookLink({reserveType: params.reserveType, city: this.city, leaveDate: this.checkInDate});
     }
 
 }

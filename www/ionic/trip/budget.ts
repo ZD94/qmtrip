@@ -9,7 +9,8 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     API.require("tripPlan");
 
     let staff = await Staff.getCurrent();
-    
+    $scope.staff = staff;
+    $scope.EApproveChannel = EApproveChannel;
     $scope.staffSelector = {
         query: async function(keyword) {
             let staffs = await staff.company.getStaffs();
@@ -158,19 +159,28 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         API.require("approve");
         await API.onload();
         let approve = await API.approve.submitApprove({budgetId: id, approveUser: trip.auditUser, project: $scope.trip.reason});
-        if (staff.company.oa && staff.company.oa != EApproveChannel.QM) {
+        if (staff.company.oa && staff.company.oa == EApproveChannel.AUTO) {
             $ionicPopup.show({
-                title: '出差申请已提交',
+                title: '出差记录已生成',
                 cssClass: 'popup_attention',
                 scope: $scope,
-                template: `<p>您的出差申请已提交审批。当前预算仅为参考,请以最终审批预算为准!</p>`,
-                buttons: [{
-                    text: '个人中心',
-                    type: 'button-calm',
-                    onTap:function(){
-                        window.location.href = '#/staff/index'
+                template: `<p>点我的行程查看详情进行后续操作</p>`,
+                buttons: [
+                    {
+                        text: '个人中心',
+                        type: 'button-calm button-outline',
+                        onTap:function(){
+                            window.location.href = '#/staff/index'
+                        }
+                    },
+                    {
+                        text: '我的行程',
+                        type: 'button-calm',
+                        onTap: function(){
+                            window.location.href = `#/trip/list`;  ///我的行程缺少tripid无法跳转
+                        }
                     }
-                }]
+                ]
             });
             return;
         }

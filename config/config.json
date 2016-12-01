@@ -90,5 +90,6 @@
       "qm_notify_invoice_one_pass": "",
       "qm_notify_invoice_not_pass": ""
     }
-  }
+  },
+  "reportHimOAReceive": "peng.wang@jingli.tech"
 }

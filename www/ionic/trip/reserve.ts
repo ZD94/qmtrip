@@ -111,11 +111,6 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     },200)
 
     let timeout = $timeout(function(){
-        // bookLink.url = 'http://ct.ctrip.com/m/';
-        // bookLink.jsCode = `console.log("isme");var account = document.getElementById("account");account.value="13401101740";console.log("account.value");
-        //                     var password = document.getElementById("password");password.value="qwert12345";
-        //                     var login = document.getElementById("login");login.click()`;
-
         inAppBrowser.open(bookLink.url, bookLink.jsCode);
     },3000)
 

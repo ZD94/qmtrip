@@ -11,9 +11,8 @@ import {emitter, EVENT} from "libs/oa";
 import {EApproveStatus, EApproveChannel, EApproveType} from "../_types/approve/types";
 import {TripPlan, ETripType} from "../_types/tripPlan/tripPlan";
 import TripPlanModule = require("../tripPlan/index");
+let Config = require('config');
 var API = require("common/api");
-
-
 
 function oaStr2Enum(str: string) :EApproveChannel{
     let obj = {
@@ -108,12 +107,33 @@ class ApproveModule {
         //对接第三方OA
         emitter.emit(EVENT.NEW_TRIP_APPROVE, {
             approveNo: approve.id,
-            approveUser: submitter,
+            approveUser: approveUser,
             submitter: submitter,
             status: EApproveStatus.WAIT_APPROVE,
             oa: oaEnum2Str(channel) || 'qm'
         });
         return approve;
+    }
+
+    @clientExport
+    static async reportHimOA(params: {oaName: string, oaUrl?: string}) {
+        let {oaName, oaUrl} = params;
+        let staff = await Staff.getCurrent();
+        try {
+            let ret = await API.notify.submitNotify({
+                email: Config.reportHimOAReceive,
+                key: 'qm_report_him_oa',
+                values: {
+                    oaName: oaName,
+                    oaUrl: oaUrl,
+                    companyName: staff.company.name,
+                    name: staff.name,
+                    mobile: staff.mobile,
+                },
+            });
+        } catch( err) {
+            throw err;
+        }
     }
 }
 
