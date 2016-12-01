@@ -14,8 +14,6 @@ import TripPlanModule = require("../tripPlan/index");
 import Config = require('config');
 var API = require("common/api");
 
-
-
 function oaStr2Enum(str: string) :EApproveChannel{
     let obj = {
         'qm':       EApproveChannel.QM,
