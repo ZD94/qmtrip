@@ -38,6 +38,7 @@ export interface regTripInvoiceAuditUpdateCbParam {
 export interface IOAPlugin {
     $createTripApproveFlow(params: createTripApproveParam): Promise<createTripApproveResult>;
     $createTripInvoiceAuditFlow(params: createTripInvoiceAuditFlowParam):Promise<createTripInvoiceAuditFlowResult>;
+    tripApproveFail(params: {approveId: string, reason: string}): Promise<void>;
 }
 
 export abstract class AbstractOAPlugin implements IOAPlugin {
@@ -66,6 +67,9 @@ export abstract class AbstractOAPlugin implements IOAPlugin {
         return emitter.emit(EVENT.TRIP_INVOICE_AUDIT_UPDATE, result);
     }
 
+    async tripApproveFail(params: {approveId: string, reason?: string}) {
+    }
+    
     abstract createTripApproveFlow(params:createTripApproveParam):Promise<createTripApproveResult>;
     abstract createTripInvoiceAuditFlow(params:createTripInvoiceAuditFlowParam):Promise<createTripInvoiceAuditFlowResult>;
 }
