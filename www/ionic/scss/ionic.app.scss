@@ -275,3 +275,13 @@ textarea {
 .item-input textarea{
   width: 60%;
 }
+
+//全局透明黑底说明
+.explanation{
+  background: rgba(0,0,0,.6);
+  margin: 10px 0;
+  padding: 16px 10px;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 12px;
+}
