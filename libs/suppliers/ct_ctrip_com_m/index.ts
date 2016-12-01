@@ -3,6 +3,7 @@ import _ = require('lodash');
 import { SupplierWebRobot, SupplierOrder , ReserveLink } from '../index';
 import { EPayType, EInvoiceFeeTypes } from '../../../api/_types/tripPlan/index';
 import L from 'common/language';
+import moment = require("moment");
 
 var iconv = require('iconv-lite');
 
@@ -37,6 +38,156 @@ export default class SupplierCtripCT extends SupplierWebRobot{
             throw new Error('login error');
         }
     }
+
+    async getBookLink(options): Promise<ReserveLink>{
+        var reserveType = options.reserveType;
+        var bookLink: any = {};
+        if(reserveType == "travel_plane"){
+            bookLink = await this.getAirTicketReserveLink({fromCity: options.fromCity, toCity: options.toCity, leaveDate: options.leaveDate});
+        }
+        if(reserveType == "travel_train"){
+            bookLink = await this.getTrainTicketReserveLink({fromCity: options.fromCity, toCity: options.toCity, leaveDate: options.leaveDate});
+        }
+        if(reserveType == "hotel"){
+            bookLink = await this.getHotelReserveLink({city: options.city, leaveDate: options.leaveDate});
+        }
+        return bookLink;
+    }
+
+    async getAirTicketReserveLink(options):Promise<ReserveLink> {
+        let AirLink = "'"+"http://ct.ctrip.com/m/Book/Flight"+"'";
+        let fromCityCode = await this.queryFlightCityCode(options.fromCity);
+        let toCityCode = await this.queryFlightCityCode(options.toCity);
+        let fromCityinfo = await this.queryHotelCityCode(options.fromCity);
+        let fromCityNum = fromCityinfo.split(":")[1];
+        let fromCityChengName = fromCityinfo.split(":")[0];
+        let toCityinfo = await this.queryHotelCityCode(options.toCity);
+        let toCityNum = toCityinfo.split(":")[1];
+        let toCityChengName = toCityinfo.split(":")[0];
+        let DomesticFlights = {
+            "FlightSearch":
+            {
+                "depCity":[fromCityNum,options.fromCity,options.fromCity+","+fromCityCode+"|"+fromCityNum+"|"+fromCityChengName,"0","0"],
+                "arrCity":[toCityNum,options.toCity,options.toCity+","+toCityCode+"|"+toCityNum+"|"+toCityChengName,"0","0"],
+                "SType":"S",
+                "cityType":0,
+                "BType":"",
+                "CabType":"",
+                "FlightDate":{"sDate":moment(options.leaveDate).format("YYYY-MM-DD"),"eDate":""}
+            },
+            "domesitcCityHistory":[options.fromCity+","+fromCityCode+"|"+fromCityNum+"|"+fromCityChengName,options.toCity+","+toCityCode+"|"+toCityNum+"|"+toCityChengName],
+            "internationalCityHistory":""
+        }
+        let DomesticFlights_str = "'"+JSON.stringify(DomesticFlights)+"'";
+        let jsCode = await this.getJsCode({key: "'"+"DomesticFlights"+"'", url: AirLink, json: DomesticFlights_str});
+        return {url:"http://ct.ctrip.com/m/", jsCode: jsCode};
+    }
+
+    async getTrainTicketReserveLink(options):Promise<ReserveLink> {
+        let TrainLink = "'"+"http://ct.ctrip.com/m/Book/Train"+"'";
+        let fromCityinfo = await this.queryHotelCityCode(options.fromCity);
+        let fromCityNum = fromCityinfo.split(":")[1];
+        let fromCityChengName = fromCityinfo.split(":")[0];
+        let toCityinfo = await this.queryHotelCityCode(options.toCity);
+        let toCityNum = toCityinfo.split(":")[1];
+        let toCityChengName = toCityinfo.split(":")[0];
+        let train = {
+            "TrainSearch":{
+                "depCity":[fromCityChengName,options.fromCity,options.fromCity+",|"+fromCityChengName+"|"+fromCityChengName],
+                "arrCity":[toCityChengName,options.toCity,options.toCity+",|"+toCityChengName+"|"+toCityChengName],
+                "trainType":"",
+                "TrainDate":{"sDate":moment(options.leaveDate).format("YYYY-MM-DD")},
+            },
+            "domesitcCityHistory":[options.fromCity+",|"+fromCityNum+"|"+fromCityChengName,options.toCity+",|"+toCityNum+"|"+toCityChengName]
+        };
+        let train_str = "'"+JSON.stringify(train)+"'";
+        let jsCode = await this.getJsCode({key: "'"+"Train"+"'", url: TrainLink, json: train_str});
+        return {url:"http://ct.ctrip.com/m/", jsCode: jsCode};
+    }
+
+    async getHotelReserveLink(options):Promise<ReserveLink> {
+        let cityInfo = await this.queryHotelCityCode(options.city);
+        let cityNum = cityInfo.split(":")[1];
+        let cityChengName = cityInfo.split(":")[0];
+        let HotelLink = "'"+"http://ct.ctrip.com/m/Book/Hotel"+"'";
+        let domesticHotel = {
+            "HotelSearch":{
+                "City":[cityNum,options.city,options.city+"|"+cityNum+"|"+cityChengName,"0"],
+                "CityType":"0","BType":"",
+                "HotelDate":{"sDate":moment(options.leaveDate).format("YYYY-MM-DD"),"eDate":""},
+                "Htype":"M",
+                "choice":"0"},
+            "domesitcCityHistory":[options.city+"|"+cityNum+"|"+cityChengName]
+        }
+        let domesticHotel_str = "'"+JSON.stringify(domesticHotel)+"'";
+        let jsCode = await this.getJsCode({key: "'"+"DomesticHotel"+"'", url: HotelLink, json: domesticHotel_str});
+        return {url:"http://ct.ctrip.com/m/", jsCode: jsCode};
+    }
+
+    async getJsCode(options): Promise<string>{
+        var str = `
+                    var hasEnter = sessionStorage.getItem("hasEnter");
+                    localStorage.setItem(${options.key}, ${options.json});
+                    if(window.location.href == "http://ct.ctrip.com/m/"&&!hasEnter){
+                        var login = document.getElementById("login");
+                        if(login){
+                        }else{
+                            window.location.href = ${options.url};
+                        }
+                    }
+                    if(window.location.href == ${options.url}&&!hasEnter){
+                        var search = document.getElementById("btn_search");
+                        search.click();
+                        sessionStorage.setItem("hasEnter","true");
+                    }
+                  `;
+        return str;
+    }
+
+    async queryFlightCityCode(city: string): Promise<string>{
+        var res = await this.client.post({
+            json: true,
+            uri: 'https://sec-m.ctrip.com/restapi/soa2/11783/Flight/Common/FlightSimilarNearAirportSearch/Query?_fxpcqlniredt=09031117210396050637',
+            form: {
+                head: {},
+                key: city,
+            },
+            headers: {
+                'Referer': 'http://m.ctrip.com/html5/flight/matrix.html',
+            },
+        })
+        if(res.body && res.body.fpairinfo && res.body.fpairinfo.length){
+            var arr = res.body.fpairinfo;
+            var code = arr[0].code;
+            return code;
+        }
+        return "";
+    }
+
+    async queryHotelCityCode(city: string): Promise<string>{
+        var requestPromise = require('request-promise');
+        var res = await this.client.post({
+            uri: 'http://m.ctrip.com/restapi/soa2/10932/hotel/static/destinationget?_fxpcqlniredt=09031117210396050637',
+            json: true,
+            form:{
+                head:{},
+                word: city,
+            },
+            headers: {
+                'Referer': 'http://m.ctrip.com/webapp/hotel/citylist',
+            },
+        })
+
+        if(res.body && res.body.keywords && res.body.keywords.length){
+            var arr = res.body.keywords;
+            var cityCode = arr[0].region['cid'];
+            var cityPy = arr[0].region['cengname'];
+            return cityPy+":"+cityCode;
+        }
+        return "";
+    }
+
+
 
     async getOrderList(): Promise<SupplierOrder[]>{
         let all = await Promise.all([
