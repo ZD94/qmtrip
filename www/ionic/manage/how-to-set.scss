@@ -1,0 +1,39 @@
+.set-questions{
+  .item{
+    &.item-icon-right{
+      padding: 11px;
+      .icon{
+        font-size: 14px;
+      }
+    }
+    p{
+      white-space: normal;
+      margin: 10px 0;
+    }
+    .dingQrCode{
+      text-align: center;
+      img{
+        width: 220px;
+        height: 220px;
+        border:1px solid #979797;
+        padding: 5px;
+      }
+    }
+  }
+}
+.support-us{
+  ion-content{
+    padding: 10px;
+    background: url("ionic/images/background.jpg") no-repeat;
+    background-size: cover;
+    .item{
+      p{
+        white-space: normal;
+        margin: 10px 0;
+      }
+    }
+    .button.button-outline{
+      background: #fff;
+    }
+  }
+}

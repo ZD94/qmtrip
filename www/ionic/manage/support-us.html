@@ -1,0 +1,25 @@
+<ion-modal-view class="support-us">
+    <ion-header-bar class="bar-stable">
+        <h1 class="title"></h1>
+        <a class="button button-clear button-positive" ng-click="modal.hide()">关闭</a>
+    </ion-header-bar>
+    <ion-content>
+        <div class="list">
+            <div class="item">
+                <h3>Q：可以支持我们企业的OA么？</h3>
+                <p>
+                    A：我们非常希望我们的系统能够支持与更多的企业OA完成对接，由于资源有限所以我们会按照计划和排期逐步完成OA的对接。请在下表中填写您正在使用的OA系统的相关信息。如果您十分急需完成对接，请电话联系我们进行沟通，电话：010-58679523</p>
+            </div>
+        </div>
+        <div class="item item-input">
+            <span class="input-label">OA系统名称</span>
+            <input type="text" placeholder="请准确填写OA系统名称" ng-model="OA.name">
+        </div>
+        <div class="item item-input">
+            <span class="input-label">OA系统官网</span>
+            <input type="text" placeholder="请输入网址（选填）" ng-model="OA.url">
+        </div>
+        <a class="button button-block button-calm" ng-click="saveOAOptions()">保存</a>
+        <a href="tel:010-58679523" class="button button-block button-calm button-outline">联系我们: 010-58679523</a>
+    </ion-content>
+</ion-modal-view>

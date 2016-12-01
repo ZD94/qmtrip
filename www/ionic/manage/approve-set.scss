@@ -1,0 +1,66 @@
+.approve-set{
+  .list{
+    margin-bottom: 10px;
+    .item-toggle{
+      height: 44px;
+      padding: 10px 16px;
+      .toggle{
+        top: 5px;
+      }
+    }
+    &.approve-check{
+      font-size: 14px;
+      .other-part-title{
+        height: 24px;
+        line-height: 24px;
+        background: #f9f9f9;
+        border-radius: 5px 5px 0 0;
+        font-size: 14px;
+        padding-left: 16px;
+        color: #606060;
+      }
+      .no-other-set{
+        font-size: 16px;
+        height: 44px;
+        line-height: 44px;
+        text-align: center;
+        color: #ccc;
+        padding: 0;
+      }
+      .item{
+        height: 44px;
+        &.item-radio{
+          .item-content{
+            font-size: 14px;
+            padding: 12px 49px 10px 16px;
+          }
+          .simulate-check-icon{
+            position: absolute;
+            right: 0;
+            top: 0;
+            font-size: 22px;
+            height: 100%;
+            padding: 7px 15px;
+            color: #28A7E1;
+          }
+          input:checked+ .radio-content .item-content{
+            background: #fff;
+          }
+          .radio-icon{
+            padding: 5px 14px;
+            color: #28A7E1;
+          }
+        }
+        &.item-icon-left.item-icon-right{
+          padding: 11px 44px;
+          font-size: 14px;
+          color: #9b9b9b;
+          .icon{
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+
+}

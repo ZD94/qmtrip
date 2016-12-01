@@ -5,6 +5,7 @@ import {
 import { Staff } from 'api/_types/staff/staff';
 import moment = require('moment');
 import { MTrainLevel, MHotelLevel, MPlaneLevel } from 'api/_types/travelPolicy';
+import {EApproveChannel} from "api/_types/approve/types";
 export async function DetailController($scope, Models, $stateParams, $ionicPopup, $loading, $storage, ngModalDlg){
     require('./trip-approval.scss');
     let approveId = $stateParams.approveId;
@@ -18,6 +19,10 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     $scope.EApproveStatus = EApproveStatus;
     $scope.MTxPlaneLevel = MTxPlaneLevel;
     $scope.EApproveResult = EApproveResult;
+    let currentStaff = await Staff.getCurrent();
+    let company = currentStaff.company;
+    $scope.company = company;
+    $scope.EApproveChannel = EApproveChannel;
     //判断有无审批权限
     let isHasPermissionApprove = false;
     //是否已经审批
@@ -310,13 +315,19 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
                 text: '取消'
             },{
                 text: '确认',
-                type: 'button-positive',
+                type: 'button-calm',
                 onTap: async function(e){
                     if(!$scope.cancel.reason){
                         e.preventDefault();
                     }else{
                         let remark = $scope.cancel.reason;
-                        await tripApprove.cancel({remark: remark})
+                        await tripApprove.cancel({remark: remark});
+                        $ionicPopup.alert({
+                            title: '提交成功',
+                            template: '出差申请已撤销。通过第三方OA进行的审批进度因技术限制无法撤销,需要手动撤销或完成审批。',
+                            okText: '返回',
+                            okType: 'button-calm'
+                        })
                     }
                 }
             }]
