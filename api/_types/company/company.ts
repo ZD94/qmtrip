@@ -14,7 +14,9 @@ import { Supplier } from './supplier';
 import {CoinAccount} from "api/_types/coin";
 import {PaginateInterface} from "common/model/interface";
 import promise = require("common/test/api/promise/index");
-import {EApproveChannel, EApproveStatus} from "../approve/types";
+import {EApproveChannel, EApproveStatus, EApproveType} from "../approve/types";
+import {emitter} from "../../../libs/oa/emitter";
+import {EVENT} from "../../../libs/oa/index";
 declare var API: any;
 
 export enum ECompanyStatus {
@@ -270,6 +272,7 @@ export class Company extends ModelObject{
         //查询是否有未完成的审批
         let approves = await Models.approve.find({where: {status: EApproveStatus.WAIT_APPROVE, companyId: self.id}, limit: 200});
         let ps = approves.map( (item) => {
+            emitter.emit(EVENT.APPROVE_FAIL, {approveId: item.id, oa: oaEnum2Str(self.oa), type: EApproveType.TRAVEL_BUDGET, reason: '切换审批流,自动驳回'});
             item.status = EApproveStatus.FAIL;
             return item.save();
         })
@@ -277,4 +280,12 @@ export class Company extends ModelObject{
         this.oa = oa;
         return this.save();
     }
+}
+
+function oaEnum2Str(e: EApproveChannel) {
+    let obj = {}
+    obj[EApproveChannel.QM] = 'qm';
+    obj[EApproveChannel.AUTO] = 'auto';
+    obj[EApproveChannel.DING_TALK] = 'ddtalk';
+    return obj[e];
 }
