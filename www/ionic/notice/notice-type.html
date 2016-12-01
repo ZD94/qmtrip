@@ -1,0 +1,12 @@
+<ion-view title="通知通告" id="page30">
+    <ion-content padding="true" class="has-header">
+        <div class="list card" ng-repeat="t in noticeTypes" ng-click="goList(t.value)">
+            <div class="item item-body">
+                <div id="page30-markdown21" style="color:#000000;">
+                    <p>{{t.name}}</p>
+                    <p>未读信息{{t.unReadNum}}条</p>
+                </div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

@@ -13,7 +13,7 @@ import { Company, MoneyChange, Supplier } from 'api/_types/company';
 import { Department } from 'api/_types/department';
 import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
 import { AccordHotel } from 'api/_types/accordHotel';
-import { Notice } from 'api/_types/notice';
+import { Notice, NoticeAccount } from 'api/_types/notice';
 import { Agency, AgencyUser } from 'api/_types/agency';
 import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCode} from 'api/_types/tripPlan';
 import {Account, Token} from 'api/_types/auth';
@@ -81,6 +81,9 @@ var Services = {
     },
     notice: { type: Notice, modname: 'notice',
         funcs: ['getNotice', 'getNotices', 'createNotice', 'updateNotice', 'deleteNotice']
+    },
+    noticeAccount: { type: NoticeAccount, modname: 'notice',
+        funcs: ['getNoticeAccount', 'getNoticeAccounts', 'createNoticeAccount', 'updateNoticeAccount', 'deleteNoticeAccount']
     },
     agency: { type: Agency, modname: 'agency',
         funcs: ['getAgencyById', 'listAgency', 'registerAgency', 'updateAgency', 'deleteAgency']
@@ -164,6 +167,7 @@ class ClientModels implements ModelsInterface {
     subsidyTemplate: ModelInterface<SubsidyTemplate>;
     accordHotel: ModelInterface<AccordHotel>;
     notice: ModelInterface<Notice>;
+    noticeAccount: ModelInterface<NoticeAccount>;
     agency: ModelInterface<Agency>;
     agencyUser: ModelInterface<AgencyUser>;
     tripPlan: ModelInterface<TripPlan>;
@@ -205,6 +209,7 @@ class ClientModels implements ModelsInterface {
         this.subsidyTemplate = createService<SubsidyTemplate>(Services.subsidyTemplate, $cacheFactory);
         this.accordHotel = createService<AccordHotel>(Services.accordHotel, $cacheFactory);
         this.notice = createService<Notice>(Services.notice, $cacheFactory);
+        this.noticeAccount = createService<NoticeAccount>(Services.noticeAccount, $cacheFactory);
         this.agency = createService<Agency>(Services.agency, $cacheFactory);
         this.agencyUser = createService<AgencyUser>(Services.agencyUser, $cacheFactory);
         this.tripPlan = createService<TripPlan>(Services.tripPlan, $cacheFactory);

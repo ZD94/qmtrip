@@ -1,14 +1,17 @@
 import { Staff } from 'api/_types/staff/staff';
+import { NoticeAccount, ESendType } from 'api/_types/notice';
+import moment = require("moment");
 
 export * from './detail';
+export * from './notice-type';
 var msgbox = require('msgbox');
-export async function IndexController($scope, Models, $location) {
+export async function IndexController($scope, Models, $ionicPopup, $stateParams) {
     require('./notice.scss');
     $scope.notices = [];
     var staff = await Staff.getCurrent();
-    var pager = await staff.getSelfNotices();
+    var pager = await staff.getSelfNotices({where: {type: $stateParams.type}});
     $scope.pager = pager;
-    loadStaffs(pager);
+    await loadStaffs(pager);
     var pagersDate = {
         isHasNextPage:true,
         nextPage : async function() {
@@ -19,12 +22,12 @@ export async function IndexController($scope, Models, $location) {
                 return;
             }
             $scope.pager = pager;
-            loadStaffs(pager);
+            await loadStaffs(pager);
             $scope.$broadcast('scroll.infiniteScrollComplete');
         },
         doRefresh: async function(){
             try{
-                pager = await staff.getSelfNotices();
+                pager = await staff.getSelfNotices({where: {type: $stateParams.type}});
             } catch(err){
                 msgbox.log('刷新失败');
                 return
@@ -35,11 +38,17 @@ export async function IndexController($scope, Models, $location) {
         }
     }
     
-    function loadStaffs(pager) {
+    async function loadStaffs(pager) {
         if(pager && pager.length>0){
-            pager.forEach(function(notice){
+            await Promise.all(pager.map(async function(notice){
+                //有待查证
+                var noticeAccounts = await Models.noticeAccount.find({where: {accountId: staff.id, noticeId: notice.id}});
+                if(noticeAccounts && noticeAccounts.length>0){
+                    notice["isRead"] = noticeAccounts[0].isRead;
+                }
+                //有待查证
                 $scope.notices.push(notice);
-            });
+            }));
         }
     }
     function reloadNotices(pager){
@@ -53,11 +62,14 @@ export async function IndexController($scope, Models, $location) {
 
     $scope.pagersDate = pagersDate;
 
+
     $scope.detail = async function (notice) {
         //标记已读
-        if(!notice.isRead){
-            notice.isRead = true;
-            await notice.save();
+        var noticeAccounts = await Models.noticeAccount.find({where: {accountId: staff.id, noticeId: notice.id}});
+        if(noticeAccounts && noticeAccounts.length>0 && !noticeAccounts[0].isRead){
+            noticeAccounts[0].isRead = true;
+            noticeAccounts[0].readTime = moment().toDate();
+            await noticeAccounts[0].save();
         }
         if(notice.content && notice.content.startsWith("skipLink@")){
             // console.info("直接跳转");
@@ -67,5 +79,33 @@ export async function IndexController($scope, Models, $location) {
             window.location.href = "#/notice/detail?noticeId=" + notice.id;
         }
 
+    }
+
+    $scope.delete = async function(notice, index) {
+        $ionicPopup.show({
+            title: '确定删除该通知吗？',
+            scope: $scope,
+            buttons: [
+                {
+                    text: '取消',
+                },
+                {
+                    text: '确定',
+                    type: 'button-positive',
+                    onTap: async function (e) {
+                        try{
+                            var noticeAccount = await Models.noticeAccount.find({where: {accountId: staff.id, noticeId: notice.id}});
+                            if(noticeAccount && noticeAccount.length>0){
+                                await noticeAccount[0].destroy();
+                            }
+                            $scope.notices.splice(index, 1);
+                            msgbox.log("删除成功");
+                        }catch(err){
+                            msgbox.log(err.msg);
+                        }
+                    }
+                }
+            ]
+        })
     }
 }

@@ -4,7 +4,7 @@ import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from "
 import { TravelPolicy, SubsidyTemplate } from './travelPolicy';
 import { Department } from './department';
 import { AccordHotel } from './accordHotel';
-import { Notice } from './notice';
+import { Notice, NoticeAccount } from './notice';
 import { Agency, AgencyUser } from './agency';
 import {
     TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCode, TripDetailInvoice,
@@ -47,6 +47,7 @@ export interface ModelsInterface {
     subsidyTemplate: ModelInterface<SubsidyTemplate>;
     accordHotel: ModelInterface<AccordHotel>;
     notice: ModelInterface<Notice>;
+    noticeAccount: ModelInterface<NoticeAccount>;
 
     agency: ModelInterface<Agency>;
     agencyUser: ModelInterface<AgencyUser>;
@@ -93,6 +94,7 @@ export var Models: ModelsInterface = {
     subsidyTemplate: new ModelDelegate<SubsidyTemplate>(),
     accordHotel: new ModelDelegate<AccordHotel>(),
     notice: new ModelDelegate<Notice>(),
+    noticeAccount: new ModelDelegate<NoticeAccount>(),
 
     agency: new ModelDelegate<Agency>(),
     agencyUser: new ModelDelegate<AgencyUser>(),
