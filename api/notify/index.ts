@@ -8,6 +8,7 @@ import Logger = require('common/logger');
 const logger = new Logger('qm:notify');
 import redisClient = require("common/redis-client");
 import {Models} from "api/_types";
+import {ESendType, ENoticeType} from "../_types/notice/notice";
 
 const config = require('config');
 let API = require('common/api');
@@ -177,7 +178,7 @@ class NotifyTemplate{
         }
 
 
-        await API.notice.createNotice({title: title, content: content, description: description, staffId: to.accountId});
+        await API.notice.createNotice({title: title, content: content, description: description, staffId: to.accountId, sendType: ESendType.ONE_ACCOUNT, type: data.noticeType || ENoticeType.SYSTEM_NOTICE});
         logger.info('成功发送通知:', data.account.name, this.name);
     }
 }

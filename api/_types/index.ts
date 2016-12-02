@@ -4,7 +4,7 @@ import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from "
 import { TravelPolicy, SubsidyTemplate } from './travelPolicy';
 import { Department } from './department';
 import { AccordHotel } from './accordHotel';
-import { Notice } from './notice';
+import { Notice, NoticeAccount } from './notice';
 import { Agency, AgencyUser } from './agency';
 import {
     TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCode, TripDetailInvoice,
@@ -18,6 +18,7 @@ import {TravelBudgetLog} from "./travelbudget";
 import {DDTalkCorp, DDTalkUser} from "./ddtalk";
 import {CoinAccountChange, CoinAccount} from "./coin";
 import {TripDetailSubsidy, TripDetailSpecial} from "./tripPlan/tripDetailInfo";
+import {Approve} from "./approve/index";
 
 
 export enum EGender {
@@ -46,6 +47,7 @@ export interface ModelsInterface {
     subsidyTemplate: ModelInterface<SubsidyTemplate>;
     accordHotel: ModelInterface<AccordHotel>;
     notice: ModelInterface<Notice>;
+    noticeAccount: ModelInterface<NoticeAccount>;
 
     agency: ModelInterface<Agency>;
     agencyUser: ModelInterface<AgencyUser>;
@@ -62,6 +64,7 @@ export interface ModelsInterface {
     tripPlanLog: ModelInterface<TripPlanLog>;
     project: ModelInterface<Project>;
     tripApprove: ModelInterface<TripApprove>;
+    approve: ModelInterface<Approve>;
     travelBudgetLog: ModelInterface<TravelBudgetLog>;
     financeCheckCode: ModelInterface<FinanceCheckCode>;
 
@@ -91,6 +94,7 @@ export var Models: ModelsInterface = {
     subsidyTemplate: new ModelDelegate<SubsidyTemplate>(),
     accordHotel: new ModelDelegate<AccordHotel>(),
     notice: new ModelDelegate<Notice>(),
+    noticeAccount: new ModelDelegate<NoticeAccount>(),
 
     agency: new ModelDelegate<Agency>(),
     agencyUser: new ModelDelegate<AgencyUser>(),
@@ -107,6 +111,7 @@ export var Models: ModelsInterface = {
     tripPlanLog: new ModelDelegate<TripPlanLog>(),
     project: new ModelDelegate<Project>(),
     tripApprove: new ModelDelegate<TripApprove>(),
+    approve: new ModelDelegate<Approve>(),
     travelBudgetLog: new ModelDelegate<TravelBudgetLog>(),
     account: new ModelDelegate<Account>(),
     token: new ModelDelegate<Token>(),

@@ -55,6 +55,10 @@ angular
                     ref.addEventListener('loadstop', function(){
                         ref.executeScript({code: linkJS});
                     })
+                    // ref.addEventListener('exit', function(){
+                    //     ref.executeScript({code: 'localStorage.setItem("hasenter", "");'});
+                    //     console.log("exit sue")
+                    // })
                 }
             }
         }

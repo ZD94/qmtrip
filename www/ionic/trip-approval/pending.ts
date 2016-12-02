@@ -1,11 +1,13 @@
-import { EApproveStatus } from 'api/_types/tripPlan';
+import { QMEApproveStatus } from 'api/_types/tripPlan';
 import { Staff } from 'api/_types/staff/staff';
 export async function PendingController($scope, $stateParams){
     require('./trip-approval.scss');
     const PAGE_SIZE = 10;
     let staff = await Staff.getCurrent();
     let tripApproves = [];
-    let Pager = await staff.getTripApproves({where: {status: [EApproveStatus.CANCEL, EApproveStatus.PASS, EApproveStatus.REJECT, EApproveStatus.WAIT_APPROVE]}, limit: PAGE_SIZE})
+    let Pager = await staff.getTripApproves({
+        where: {status: [QMEApproveStatus.CANCEL, QMEApproveStatus.PASS, QMEApproveStatus.REJECT, QMEApproveStatus.WAIT_APPROVE]},
+        limit: PAGE_SIZE})
     var More = {
         hasNextPage: function() {
             return Pager.totalPages-1 > Pager.curPage;
@@ -34,7 +36,7 @@ export async function PendingController($scope, $stateParams){
 
     $scope.Pager = Pager;
     $scope.filter = 'ALL';
-    $scope.EApproveStatus = EApproveStatus;
+    $scope.EApproveStatus = QMEApproveStatus;
     $scope.tripApproves = [];
 
     $scope.changeTo = async function(filter) {
@@ -43,14 +45,14 @@ export async function PendingController($scope, $stateParams){
             $scope.filter = filter;
         }
         //let status: any = {$ne: EApproveStatus.CANCEL};
-        let EApproveStatusArray = [EApproveStatus.CANCEL, EApproveStatus.NO_BUDGET, EApproveStatus.REJECT, EApproveStatus.WAIT_APPROVE, EApproveStatus.PASS]
+        let EApproveStatusArray = [QMEApproveStatus.CANCEL, QMEApproveStatus.NO_BUDGET, QMEApproveStatus.REJECT, QMEApproveStatus.WAIT_APPROVE, QMEApproveStatus.PASS]
         let status: any = {$any: EApproveStatusArray};
         switch(filter) {
             //case 'ALL': status = {$ne: EApproveStatus.CANCEL};break;
             case 'ALL': status = {$any: EApproveStatusArray};break;
-            case 'WAIT_APPROVE': status = EApproveStatus.WAIT_APPROVE; break;
-            case 'APPROVE_FAIL': status = EApproveStatus.REJECT; break;
-            case 'APPROVE_SUCCESS': status = EApproveStatus.PASS; break;
+            case 'WAIT_APPROVE': status = QMEApproveStatus.WAIT_APPROVE; break;
+            case 'APPROVE_FAIL': status = QMEApproveStatus.REJECT; break;
+            case 'APPROVE_SUCCESS': status = QMEApproveStatus.PASS; break;
         }
         let where: any = {status: status};
         Pager = await staff.getTripApproves({ where: where, limit: PAGE_SIZE}); //获取待审批出差计划列表

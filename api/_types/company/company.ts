@@ -7,7 +7,7 @@ import {TravelPolicy} from "api/_types/travelPolicy";
 import { Types, Values } from 'common/model';
 import { Department } from 'api/_types/department';
 import { TripPlan } from "api/_types/tripPlan";
-import {Table, Create, Field, Reference, ResolveRef} from 'common/model/common';
+import {Table, Create, Field, Reference, ResolveRef, RemoteCall} from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import { MoneyChange } from './money-change';
 import { Supplier } from './supplier';
@@ -162,6 +162,10 @@ export class Company extends ModelObject{
     get isAppointSupplier(): boolean { return false; }
     set isAppointSupplier(val: boolean) {}
 
+    @Field({type: Types.INTEGER})
+    get oa() : EApproveChannel { return EApproveChannel.QM}
+    set oa(oa: EApproveChannel) {}
+
     getStaffs(options?: any): Promise<Staff[]> {
         if(!options) {options = {where: {}}};
         if(!options.where) {options.where = {}};
@@ -252,7 +256,6 @@ export class Company extends ModelObject{
                     suppliers.push(su);
                 }
             })
-
             await Promise.all(ps);
         }
 

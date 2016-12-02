@@ -137,7 +137,8 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
     $scope.tripPlanSave = 0;
     
     var staff = await Staff.getCurrent();
-    var noticePager = await staff.getSelfNotices();
+    // var noticePager = await staff.getSelfNotices();
+    var noticePager = [];
     function setupMenu(menuItems){
         Menu.delall();
         for(let item of menuItems){
@@ -147,6 +148,7 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
     function ifNewNotice(Pager){
         var num = 0;
         Pager.map(function(notice){
+            console.info(notice.isRead,"#####pppppppp");
             if(!notice.isRead){
                 $scope.Menu.notie = true;
             }else{
@@ -158,7 +160,7 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
         })
     }
     setupMenu(staffMenus);
-    $scope.$watch(function() { return $ionicSideMenuDelegate.isOpen(); }, async function(isOpen) {
+    /*$scope.$watch(function() { return $ionicSideMenuDelegate.isOpen(); }, async function(isOpen) {
         if (isOpen) {//Menu Open
             noticePager = await staff.getSelfNotices();
             ifNewNotice(noticePager);
@@ -166,7 +168,7 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
         else {
             // Menu Closed
         }
-    });
+    });*/
     // $scope.isAdminMenus = false;
     $scope.isAdmin = false;
     if (staff && (staff.roleId == EStaffRole.OWNER || staff.roleId == EStaffRole.ADMIN)) {

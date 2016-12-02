@@ -2,6 +2,7 @@ import { ETripType, EInvoiceType, MTxPlaneLevel } from 'api/_types/tripPlan';
 import moment = require('moment');
 import { Staff } from 'api/_types/staff/staff';
 import {EApproveType, EApproveChannel} from "api/_types/approve/types";
+
 export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup, $ionicHistory){
     require('./trip.scss');
     require('./budget.scss');
@@ -22,6 +23,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
 
     var id = $stateParams.id;
     API.require("travelBudget");
+    API.require("tripApprove");
     await API.onload();
     let result = await API.travelBudget.getBudgetInfo({id: id});
     let budgets = result.budgets;
@@ -80,7 +82,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     API.require("tripPlan");
     await API.onload();
 
-
+    $scope.showChooseApproveUser = (!staff.company.oa || staff.company.oa == EApproveChannel.QM)
     $scope.saveTripPlan = async function() {
         let trip = $scope.trip;
 
@@ -96,7 +98,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
 
         try {
             //let staff = await Staff.getCurrent();
-            let tripApprove = await API.tripPlan.saveTripApprove({budgetId: id, title: trip.reason||trip.reasonName, approveUserId: trip.auditUser.id});
+            let tripApprove = await API.tripApprove.saveTripApprove({budgetId: id, title: trip.reason||trip.reasonName, approveUserId: trip.auditUser.id});
             let approveId = tripApprove.id;
             $ionicPopup.show({
                 title: '出差申请已提交',

@@ -15,6 +15,7 @@ import {Notice} from 'api/_types/notice';
 import {SupplierOrder} from 'libs/suppliers/interface';
 import {SupplierGetter} from 'libs/suppliers';
 import L from 'common/language';
+import {ESendType} from "../notice/notice";
 
 declare var API: any;
 
@@ -121,12 +122,39 @@ export class Staff extends ModelObject implements Account {
     setTravelPolicy(val: TravelPolicy) {}
 
 
-    async getSelfNotices(options?: any): Promise<Notice[]> {
+    @RemoteCall()
+    async getSelfNotices(options?: any): Promise<any> {
+        var self = this;
         if (!options) options = {where: {}};
         if(!options.where) options.where = {};
-        options.where .staffId = this.id;
+
+        var noticeAccounts = await Models.noticeAccount.find({where: {accountId: this.id},limit: 100000, paranoid: false, order: [['createdAt', 'desc']]});
+
+        var mna: any = {};
+        var ids =  noticeAccounts.map(function(t){
+            mna[t.noticeId] = t;
+            return t.noticeId;
+        })
+        options.where .$or = [{id: {$in: ids}}, {sendType: ESendType.ALL_ACCOUNT}];
+        options.order = options.order || [['createdAt', 'desc']];
         var notices = await Models.notice.find(options);
-        return notices;
+        var result = await Promise.all(notices.map(async function(n){
+            if(mna[n.id]){
+                n["isRead"] = mna[n.id].isRead;
+                n["deletedAt"] = mna[n.id].deletedAt;
+                return n;
+            }
+
+            n["isRead"] =  false;
+            var na = Models.noticeAccount.create({accountId: self.id, noticeId: n.id, isRead: false});
+            await na.save();
+            return n;
+        }));
+        result = result.filter((item: any) => {
+            return !item["deletedAt"];
+        })
+        return result;
+
     }
 
     getTripPlans(options: {where?: any, limit?: number}): Promise<PaginateInterface<TripPlan>> {

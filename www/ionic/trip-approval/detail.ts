@@ -1,5 +1,5 @@
 import {
-    EInvoiceType, EApproveStatus, MTxPlaneLevel, EApproveResult, ETripType,
+    EInvoiceType, QMEApproveStatus, MTxPlaneLevel, EApproveResult, ETripType,
     EApproveStatus2Text
 } from 'api/_types/tripPlan';
 import { Staff } from 'api/_types/staff/staff';
@@ -16,7 +16,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     $scope.isConfirm = false;
     $scope.APPROVE_TEXT = EApproveStatus2Text;
     $scope.EInvoiceType = EInvoiceType;
-    $scope.EApproveStatus = EApproveStatus;
+    $scope.EApproveStatus = QMEApproveStatus;
     $scope.MTxPlaneLevel = MTxPlaneLevel;
     $scope.EApproveResult = EApproveResult;
     let currentStaff = await Staff.getCurrent();
@@ -48,7 +48,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
 
     let totalBudget: number = 0;
 
-    if (tripApprove.status == EApproveStatus.WAIT_APPROVE && tripApprove.query && isHasPermissionApprove && !tripApprove.isSpecialApprove) {
+    if (tripApprove.status == QMEApproveStatus.WAIT_APPROVE && tripApprove.query && isHasPermissionApprove && !tripApprove.isSpecialApprove) {
         $loading.reset();
         $loading.start({
             template: '预算计算中...'
@@ -150,7 +150,8 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
 
     async function approve(result: EApproveResult, approveRemark?: string) {
         try{
-            await tripApprove.approve({approveResult: result, isNextApprove: $scope.isNextApprove || false, nextApproveUserId: tripApprove.approveUser.id, approveRemark: approveRemark, budgetId: $scope.budgetId});
+            await tripApprove.approve({approveResult: result, isNextApprove: $scope.isNextApprove || false,
+                nextApproveUserId: tripApprove.approveUser.id, approveRemark: approveRemark, budgetId: $scope.budgetId});
             if(result == EApproveResult.PASS) {
                 $ionicPopup.show({
                     title: '通过申请',

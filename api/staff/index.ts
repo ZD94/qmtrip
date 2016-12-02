@@ -23,6 +23,7 @@ import { EAgencyUserRole, AgencyUser } from "api/_types/agency";
 import { Models, EAccountType } from 'api/_types';
 import {conditionDecorator, condition} from "../_decorator";
 import {FindResult} from "common/model/interface";
+import {ENoticeType} from "../_types/notice/notice";
 
 const invitedLinkCols = InvitedLink['$fieldnames'];
 const staffSupplierInfoCols = StaffSupplierInfo['$fieldnames'];
@@ -274,6 +275,7 @@ class StaffModule{
             let upDept = await Models.department.get(updateStaff["departmentId"]);
 
             let vals  = {
+                noticeType: ENoticeType.SYSTEM_NOTICE,
                 travelPolicy: tp ? tp.name: '',
                 time: moment().format('YYYY-MM-DD:hh:mm:ss'),
                 appMessageUrl: '#/staff/staff-info',
@@ -1285,7 +1287,7 @@ class StaffModule{
         delete params.email;
 
         return Promise.all([
-                API.auth.remove({email: email, mobile: mobile, type: 1}),
+                API.auth.removeByTest({email: email, mobile: mobile, type: 1}),
                 DBM.Staff.destroy({where: params})
             ])
             .spread(function(){

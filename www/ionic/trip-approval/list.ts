@@ -1,4 +1,4 @@
-import { EApproveStatus, EApproveStatus2Text } from 'api/_types/tripPlan';
+import { QMEApproveStatus, EApproveStatus2Text } from 'api/_types/tripPlan';
 import { Staff } from 'api/_types/staff/staff';
 export async function ListController($scope, Models, $stateParams, $ionicLoading){
     require('./trip-approval.scss');
@@ -6,7 +6,7 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
     const ONE_PAGE_LIMIT = 10;
     let Pager;
     $scope.filter = 'WAIT_APPROVE';
-    $scope.EApproveStatus = EApproveStatus;
+    $scope.EApproveStatus = QMEApproveStatus;
     $scope.tripApproves = [];
     $scope.APPROVE_TEXT = EApproveStatus2Text;
     
@@ -17,10 +17,10 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
         }
         let status: string|number|Object = 'ALL';
         switch(filter) {
-            case 'WAIT_APPROVE': status = EApproveStatus.WAIT_APPROVE; break;
-            case 'APPROVE_PASS': status = EApproveStatus.PASS; break;
-            case 'APPROVE_FAIL': status = EApproveStatus.REJECT; break;
-            case 'APPROVING': status = EApproveStatus.WAIT_APPROVE; break;
+            case 'WAIT_APPROVE': status = QMEApproveStatus.WAIT_APPROVE; break;
+            case 'APPROVE_PASS': status = QMEApproveStatus.PASS; break;
+            case 'APPROVE_FAIL': status = QMEApproveStatus.REJECT; break;
+            case 'APPROVING': status = QMEApproveStatus.WAIT_APPROVE; break;
         }
         let where: any = {};
         if (status != 'ALL') where.status = status;

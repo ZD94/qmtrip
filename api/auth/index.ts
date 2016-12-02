@@ -12,6 +12,7 @@ import cache = require("common/cache");
 import * as authentication from './authentication';
 import * as wechat from './wechat';
 import * as messagePush from './messagePush';
+import * as byTest from './by-test';
 
 var uuid = require("node-uuid");
 var C = require("config");
@@ -20,6 +21,20 @@ var moment = require("moment");
 var API = require("common/api");
 var utils = require("common/utils");
 var accountCols = Account['$fieldnames'];
+
+
+//生成激活链接参数
+function makeActiveSign(activeToken, accountId, timestamp) {
+    var originStr = activeToken + accountId + timestamp;
+    return utils.md5(originStr);
+}
+
+//生成邀请链接参数
+function makeLinkSign(linkToken, invitedLinkId, timestamp) {
+    var originStr = linkToken + invitedLinkId + timestamp;
+    return utils.md5(originStr);
+}
+
 
 /**
  * @class API.auth 认证类
@@ -46,7 +61,7 @@ export default class ApiAuth {
         }
 
         var accounts = await Models.account.find({where: {mobile: mobile}});
-        var account = Account.create();
+        var account: Account;
         if(accounts && accounts.length > 0) {
             account = accounts[0];
         } else {
@@ -180,7 +195,7 @@ export default class ApiAuth {
     static async reSendActiveLink(params: {email: string, accountId?: string}): Promise<boolean> {
         var mobileOrEmail = params.email;
         var accountId = params.accountId;
-        var account = Account.create();
+        var account: Account;
         if(accountId) {
             account = await Models.account.get(accountId);
         } else {
@@ -266,7 +281,7 @@ export default class ApiAuth {
             throw L.ERR.CODE_ERROR();
         }
         var accounts = await Models.account.find({where: {mobile: mobile}});
-        var account = Account.create();
+        var account: Account;
         if(accounts && accounts.length > 0) {
             account = accounts[0];
         }
@@ -524,54 +539,6 @@ export default class ApiAuth {
         return company;
     }
 
-
-    /**
-     * @method checkResetPwdUrlValid
-     *
-     * 检查充值密码链接是否有效
-     *
-     * @param {Object} params
-     * @param {String} params.sign 签名
-     * @param {String} params.timestamp 时间戳
-     * @param {String} params.accountId 账户ID
-     * @return {Promise}
-     */
-    @clientExport
-    static checkResetPwdUrlValid(params: {sign: string, timestamp: number, accountId: string}) {
-
-        var accountId = params.accountId;
-        var sign = params.sign;
-        var timestamp = params.timestamp;
-
-        return Promise.resolve()
-            .then(function() {
-                if(!accountId) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST();
-                }
-
-                if(!sign) {
-                    throw L.ERR.SIGN_ERROR();
-                }
-
-                if(!Boolean(timestamp) || timestamp < Date.now()) {
-                    throw L.ERR.TIMESTAMP_TIMEOUT();
-                }
-
-                return Models.account.get(accountId)
-                    .then(function(account) {
-                        if(!account) {
-                            throw L.ERR.ACCOUNT_NOT_EXIST();
-                        }
-
-                        var sysSign = makeActiveSign(account.pwdToken, account.id, timestamp);
-                        if(sysSign.toLowerCase() != sign.toLowerCase()) {
-                            throw L.ERR.SIGN_ERROR();
-                        }
-                        return true;
-                    })
-            });
-    }
-
     /**
      * @method sendResetPwdEmail 发送设置密码邮件
      *
@@ -650,76 +617,11 @@ export default class ApiAuth {
         });
     }
 
-    static sendActivateEmail(params: {email: string; companyName?: string}): Promise<boolean> {
-        let email = params.email;
-        let companyName = params.companyName;
-        let data: any = {
-            email: email,
-            companyName: companyName,
-            isFirstSet: true
-        };
-        return ApiAuth.sendResetPwdEmail(data);
-    }
-
-
     @clientExport
     static getAccountStatus(params: {}): Promise<any> {
         let args: any = {attributes: ["status"]};
         return Models.account.find(args);
     }
-
-    /**
-     * @method active 激活账号
-     *
-     * 激活账号
-     *
-     * @param {Object} data
-     * @param {UUID} data.accountId 账号ID
-     * @return {Promise}
-     */
-    static async active(data: {accountId: string}) {
-
-        var accountId = data.accountId;
-        var account = await Models.account.get(accountId);
-        if(!account) {
-            throw L.ERR.ACCOUNT_NOT_EXIST();
-        }
-        account.status = 1;
-        await account.save()
-        return {
-            id: account.id,
-            mobile: account.mobile,
-            email: account.email,
-            status: account.status
-        };
-    };
-
-    /**
-     * @method remove 删除账号
-     *
-     * @param {Object} data
-     * @param {UUID} data.accountId 账号ID
-     * @return {Promise}
-     * @public
-     */
-    static async remove(data: {accountId: string, email: string, mobile?: string, type?: Number}) {
-
-        var accountId = data.accountId;
-        var email = data.email;
-        var mobile = data.mobile;
-        var type = data.type || 1;
-        var where: any = {$or: [{id: accountId}, {email: email}, {mobile: mobile}]};
-        if(!accountId) {
-            where.type = type;
-        }
-        var accounts = await Models.account.find({where});
-        do{
-            for(let i=0; i<accounts.length; i++){
-                accounts[i].destroy();
-            }
-        }while(await accounts.nextPage());
-    }
-
 
     /**
      * @method newAccount
@@ -736,7 +638,6 @@ export default class ApiAuth {
      * @return {Promise} {accountId: 账号ID, email: "邮箱", status: "状态"}
      * @public
      */
-    @clientExport
     @requireParams(["email"], accountCols)
     static async newAccount(data: {email: string, mobile?: string, pwd?: string, type?: Number, status?: Number, companyName?: string, id?: string}) {
         if(!data) {
@@ -816,75 +717,6 @@ export default class ApiAuth {
                 })
         }
     }
-
-
-    async checkBlackDomain(params: {domain: string}): Promise<boolean> {
-        return Promise.resolve(false);
-        // var domain = params.domain;
-        // return Promise.all([
-        //     API.company.isBlackDomain({domain: domain}),
-        //     API.company.domainIsExist({domain: domain})
-        // ])
-        //     .spread(function(isBlackDomain, isExist) {
-        //         if (isBlackDomain) {
-        //             throw L.ERR.EMAIL_IS_PUBLIC();
-        //         }
-        //
-        //         if (isExist) {
-        //             throw L.ERR.DOMAIN_HAS_EXIST();
-        //         }
-        //
-        //         return false;
-        //     })
-        //     .then(function(result: boolean) {
-        //         return result;
-        //     })
-    }
-
-
-    /**
-     * 成为伙伴申请
-     * @param params
-     */
-    @clientExport
-    @requireParams(['type', 'companyName', 'userName', 'mobile', 'email', 'qq'])
-    static async sendPartnerEmail(params) {
-        if(!msgConfig.is_send_email) {
-            return;
-        }
-        var email = "peng.wang@jingli.tech";
-        var vals = {
-            type: params.type,
-            companyName: params.companyName,
-            userName: params.userName,
-            mobile: params.mobile,
-            email: params.email,
-            qq: params.qq
-        }
-        /*return API.notify.submitNotify({
-            key: 'qm_www_tobe_partner',
-            values: vals,
-            email: email,
-        })*/
-    }
-
-
-    /**
-     * @method bindMobile
-     *
-     * 绑定手机号
-     *
-     * @param {Object} data
-     * @param {UUID} data.accountId 操作人
-     * @param {String} data.mobile 要绑定的手机号
-     * @param {String} data.code 手机验证码
-     * @param {String} data.pwd 登录密码
-     * @return {Promise} true||error;
-     */
-    static bindMobile(data: {accountId: string, mobile: string, code: string, pwd: string}) {
-
-        throw L.ERR.NOT_IMPLEMENTED();
-    };
 
     /**
      * 创建Account
@@ -1010,65 +842,6 @@ export default class ApiAuth {
     };
 
 
-    /**
-     * @method sendActiveEmail
-     *
-     * 发送激活邮件
-     *
-     * @param {Object} params
-     * @param {String} params.email 要发送的邮件
-     * @return {Promise} true||error
-     */
-    @clientExport
-    static async sendActiveEmail(params: {email: string}) {
-
-        var email = params.email;
-        if(!email) {
-            throw L.ERR.EMAIL_EMPTY();
-        }
-
-        if(!validator.isEmail(email)) {
-            throw L.ERR.EMAIL_FORMAT_INVALID();
-        }
-
-        var accounts = await Models.account.find({where:{email: email}, limit: 1});
-        if(accounts.total == 0)
-            throw L.ERR.EMAIL_NOT_REGISTRY();
-        var account = accounts[0];
-        if(!account) {
-            throw L.ERR.EMAIL_NOT_REGISTRY();
-        }
-        await _sendActiveEmail(account.id);
-        return true;
-    }
-
-    /**
-     * @method isEmailUserd
-     *
-     * 邮箱是否被使用
-     *
-     * @param {Object} params
-     * @param {String} params.email 邮箱
-     * @param {Integer} [params.type] 1.企业  2.代理商 默认 1
-     * @reutnr {Promise} true 使用 false未使用
-     */
-    @clientExport
-    static async isEmailUsed(params: {email: string, type?: Number}): Promise<boolean> {
-        var email = params.email;
-        var type = params.type;
-
-        if(!validator.isEmail(email)) {
-            throw L.ERR.EMAIL_FORMAT_INVALID();
-        }
-
-        if(type !== 1 && type !== 2) {
-            type = 1;
-        }
-
-        var accounts = await Models.account.find({where:{email: email, type: type}, limit: 1});
-        return accounts.total > 0;
-    }
-
     @requireParams(["id"])
     static async judgeRoleById(params: {id: string}) {
         var account = await Models.account.get(params.id);
@@ -1151,18 +924,9 @@ export default class ApiAuth {
 
     @requireParams(["accountId"])
     static getJpushIdByAccount = messagePush.getJpushIdByAccount;
-}
 
-//生成激活链接参数
-function makeActiveSign(activeToken, accountId, timestamp) {
-    var originStr = activeToken + accountId + timestamp;
-    return utils.md5(originStr);
-}
 
-//生成邀请链接参数
-function makeLinkSign(linkToken, invitedLinkId, timestamp) {
-    var originStr = linkToken + invitedLinkId + timestamp;
-    return utils.md5(originStr);
+    static removeByTest = byTest.removeByTest;
 }
 
 async function _sendActiveEmail(accountId) {
