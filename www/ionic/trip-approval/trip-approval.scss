@@ -4,6 +4,7 @@
       margin:0px;
       font-size: 14px;
       background: rgba(256, 256, 256, .3);
+      border-color: rgba(256, 256, 256, .1);
       &.project_tit{
         color: #fff;
       }
@@ -15,13 +16,13 @@
           color: #fff;
           font-size: 14px;
         }
-        p:first-child{
+        &>p.project_title:first-child{
           height: 30px;
           line-height: 30px;
           padding-left: 18px;
         }
         p.totalBudget{
-          border-top: 1px solid rgba(256, 256, 256, .3);
+          border-top: 1px solid rgba(256, 256, 256, .1);
           line-height: 46px;
           height:46px;
           span:first-child{
@@ -37,6 +38,73 @@
             font-size: 36px;
             font-weight: bold;
             letter-spacing: 1px;
+          }
+        }
+        div.budget-info{
+          height: 112px;
+          border-top: 1px solid rgba(256, 256, 256, .1);
+          display:flex;
+          flex-direction:row;
+          padding-right: 8px;
+          .budget-progress{
+            flex:1;
+            padding:12px 0px 0px 10px;
+            &>div{
+              width: 54px;
+              height: 90px;
+              border:1px solid white;
+              text-align: center;
+              div:nth-child(1){
+                background-color: #a09ac1;
+                position: relative;
+                p{
+                  position: absolute;
+                  bottom: 0px;
+                  left: 0px;
+                  width:54px;
+                  text-align: center;
+                }
+              }
+              div:nth-child(2){
+                background-color: #c2beda;
+                border-top-left-radius: 3px;
+                border-top-right-radius: 3px;
+              }
+            }
+          }
+          .budget-info-right{
+            flex:3;
+            //margin-right: 8px;
+            &>div{
+              border:none;
+              height:54px;
+              background-color: transparent;
+              span{
+                color:#fff;
+                padding-top: 26px;
+              }
+              div.col{
+                text-align: center;
+                p{
+                  height:20px;
+                  line-height: 20px;
+                  padding-left: 0px;
+                }
+              }
+            }
+            &>div:first-child{
+              padding-top: 0px;
+              padding-bottom: 5px;
+              border-bottom: 1px solid rgba(256, 256, 256, .1);
+              div.col{
+                padding-top: 10px;
+              }
+            }
+            &>div.cost{
+              p{
+                font-size: 12px;
+              }
+            }
           }
         }
       }
