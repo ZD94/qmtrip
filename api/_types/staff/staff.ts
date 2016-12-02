@@ -11,7 +11,7 @@ import { TableExtends, Table, Create, Field, ResolveRef, Reference, RemoteCall }
 import { ModelObject } from 'common/model/object';
 import {PaginateInterface} from 'common/model/interface';
 import {CoinAccount} from 'api/_types/coin';
-import {Notice} from 'api/_types/notice';
+import {Notice, ENoticeType} from 'api/_types/notice';
 import {SupplierOrder} from 'libs/suppliers/interface';
 import {SupplierGetter} from 'libs/suppliers';
 import L from 'common/language';
@@ -122,7 +122,6 @@ export class Staff extends ModelObject implements Account {
     setTravelPolicy(val: TravelPolicy) {}
 
 
-    @RemoteCall()
     async getSelfNotices(options?: any): Promise<any> {
         var self = this;
         if (!options) options = {where: {}};
@@ -153,6 +152,7 @@ export class Staff extends ModelObject implements Account {
         result = result.filter((item: any) => {
             return !item["deletedAt"];
         })
+
         return result;
 
     }
@@ -298,6 +298,61 @@ export class Staff extends ModelObject implements Account {
         }catch(e){
             return false;
         }
+    }
+
+    async statisticNoticeByType(): Promise<any> {
+        /*if(!this.isLocal){
+         API.require('notice');
+         await API.onload();
+         }
+         return API.notice.statisticNoticeByType();*/
+
+        var result:any = {};
+        var num1 = 0;
+        var num2 = 0;
+        var num3 = 0;
+        var num4 = 0;
+
+        var latestObj1: Notice;
+        var latestObj2: Notice;
+        var latestObj3: Notice;
+        var latestObj4: Notice;
+
+        var allNotices = await this.getSelfNotices();
+
+        allNotices.forEach(async function(notice){
+            switch(notice.type){
+                case ENoticeType.SYSTEM_NOTICE:
+                    if(!latestObj1 || !latestObj1.id){
+                        latestObj1 = notice;
+                    }
+                    if(!notice.isRead) num1 += 1;
+                    break;
+                case ENoticeType.TRIP_APPROVE_NOTICE:
+                    if(!latestObj2 || !latestObj2.id){
+                        latestObj2 = notice;
+                    }
+                    if(!notice.isRead) num2 += 1;
+                    break;
+                case ENoticeType.TRIP_APPLY_NOTICE:
+                    if(!latestObj3 || !latestObj3.id){
+                        latestObj3 = notice;
+                    }
+                    if(!notice.isRead) num3 += 1;
+                    break;
+                case ENoticeType.ACTIVITY_NOTICE:
+                    if(!latestObj4 || !latestObj4.id){
+                        latestObj4 = notice;
+                    }
+                    if(!notice.isRead) num4 += 1;
+                    break;
+            }
+        });
+        result[ENoticeType.SYSTEM_NOTICE] = {unReadNum: num1, latestInfo: latestObj1};
+        result[ENoticeType.TRIP_APPROVE_NOTICE] = {unReadNum: num2, latestInfo: latestObj2};
+        result[ENoticeType.TRIP_APPLY_NOTICE] = {unReadNum: num3, latestInfo: latestObj3};
+        result[ENoticeType.ACTIVITY_NOTICE] = {unReadNum: num4, latestInfo: latestObj4};
+        return result;
     }
 
     @RemoteCall()
