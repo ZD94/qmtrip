@@ -620,6 +620,8 @@ class TripApproveModule {
         }
 
         await Promise.all([tripApprove.save(), tripPlanLog.save()]);
+        await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
+        await TripApproveModule.sendTripApproveNoticeToSystem({approveId: tripApprove.id});
         return tripApprove;
     }
 
@@ -689,7 +691,8 @@ class TripApproveModule {
         }
         await Promise.all([tripApprove.save(), tripPlanLog.save()]);
 
-        TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
+        await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
+        await TripApproveModule.sendTripApproveNoticeToSystem({approveId: tripApprove.id});
 
         return tripApprove;
     }
