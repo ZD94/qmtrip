@@ -1,6 +1,7 @@
 import { ENoticeType } from 'api/_types/notice/notice';
 import { Staff } from 'api/_types/staff/staff';
 export async function NoticeTypeController($scope, Models, $stateParams) {
+    require('./notice-type.scss');
     //待改进 后端写sql分组统计查询
     var num1 = 0;
     var num2 = 0;
@@ -9,7 +10,7 @@ export async function NoticeTypeController($scope, Models, $stateParams) {
 
     var staff = await Staff.getCurrent();
     var allNotices = await staff.getSelfNotices();
-
+    $scope.ENoticeType = ENoticeType;
     allNotices = await Promise.all(allNotices.map(async function(notice){
         //有待查证
         var noticeAccounts = await Models.noticeAccount.find({where: {accountId: staff.id, noticeId: notice.id}});
