@@ -1,7 +1,7 @@
 import { ETripType, EInvoiceType, MTxPlaneLevel } from 'api/_types/tripPlan';
 import moment = require('moment');
 import { Staff } from 'api/_types/staff/staff';
-import {EApproveType, EApproveChannel} from "../../../api/_types/approve/types";
+import {EApproveType, EApproveChannel} from "api/_types/approve/types";
 
 export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup, $ionicHistory){
     require('./trip.scss');
