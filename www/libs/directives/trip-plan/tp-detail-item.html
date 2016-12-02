@@ -96,12 +96,14 @@
     <ion-item class="trip-buttons">
         <div ng-if="item.type != ETripType.SUBSIDY" class="item-note detail_btn">
             <div ng-if="item.status == EPlanStatus.WAIT_UPLOAD">
-                <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve(item.id)" ng-if="isBeforeStartTime">
-                    预订
-                </a>
-                <a class="trip_btn button-small botton-outline" ng-click="viewInvoice(item.id)">
-                    添加票据
-                </a>
+                <div ng-if="isShowUploader">
+                    <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve(item.id)" ng-if="isBeforeStartTime">
+                        预订
+                    </a>
+                    <a class="trip_btn button-small botton-outline" ng-click="viewInvoice(item.id)">
+                        添加票据
+                    </a>
+                </div>
                 <div style="margin-top: 8px" ng-if="!isShowUploader">等待上传票据</div>
             </div>
 
@@ -133,7 +135,7 @@
             <div ng-if="item.status == EPlanStatus.AUDIT_NOT_PASS">
                 <a class="trip_btn button button-small button-outline"
                    ng-click="searchInvoice(item.id)" ng-if="isShowUploader">查看票据</a>
-                <a class="trip_btn button-small botton-outline" ng-click="viewInvoice(item.id)">
+                <a class="trip_btn button-small botton-outline" ng-click="viewInvoice(item.id)" ng-if="!isShowUploader">
                     修改票据
                 </a>
             </div>
