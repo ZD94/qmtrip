@@ -4,6 +4,7 @@ import { Table, Create, Field, ResolveRef , RemoteCall} from 'common/model/commo
 import { Models } from 'api/_types';
 import { ModelObject } from 'common/model/object';
 import { Staff } from 'api/_types/staff';
+import { NoticeAccount } from 'api/_types/notice';
 import moment = require("moment");
 
 declare var API: any;
@@ -71,23 +72,10 @@ export class Notice extends ModelObject{
     @Field({type: Types.DATE})
     get sendTime(): Date { return null; }
     set sendTime(val: Date) {}
-
-    /*//所属员工
-    @ResolveRef({type: Types.UUID}, Models.staff)
-    get staff(): Staff { return null; }
-    set staff(val: Staff) {}
-
-    @Field({type: Types.BOOLEAN, defaultValue: false})
-    get isRead(): boolean { return false; }
-    set isRead(val: boolean) {}
-
-    @Field({type: Types.STRING})
-    get fromWhere(): string { return ''; }
-    set fromWhere(val: string) {}*/
 /************************预计无用字段****************************/
 
     @RemoteCall()
-    async sendNotice(){
+    async sendNotice(): Promise<Notice>{
         /*if(!this.isLocal){
             API.require('jpush');
             await API.onload();
@@ -98,6 +86,28 @@ export class Notice extends ModelObject{
         var result = await notice.save();
         // var jpushId = JPush.ALL;
         // await API.jpush.pushAppMessage({content: result.description, title: result.title, link: null, jpushId: jpushId});
+        return result;
+    }
+    
+    async staffDeleteNotice(): Promise<boolean>{
+        var staff = await Staff.getCurrent();
+        var noticeAccount = await Models.noticeAccount.find({where: {accountId: staff.id, noticeId: this.id}});
+        if(noticeAccount && noticeAccount.length>0){
+            await noticeAccount[0].destroy();
+        }
+        return true;
+    }
+    
+    async setReadStatus(): Promise<NoticeAccount>{
+        var staff = await Staff.getCurrent();
+        var result: NoticeAccount;
+        var noticeAccounts = await Models.noticeAccount.find({where: {accountId: staff.id, noticeId: this.id}});
+        if(noticeAccounts && noticeAccounts.length>0 && !noticeAccounts[0].isRead){
+            result = noticeAccounts[0];
+            result.isRead = true;
+            result.readTime = new Date();
+            result = await result.save();
+        }
         return result;
     }
 }

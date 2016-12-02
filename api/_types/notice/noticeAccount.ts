@@ -37,7 +37,7 @@ export class NoticeAccount extends ModelObject{
     //阅读时间
     @Field({type: Types.DATE})
     get readTime(): Date { return null; }
-    set isReadTime(val: Date) {}
+    set readTime(val: Date) {}
 
 }
 
