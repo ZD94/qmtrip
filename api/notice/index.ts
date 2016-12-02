@@ -81,13 +81,13 @@ class NoticeModule{
         var id = params.id;
         var ah_delete = await Models.notice.get(id);
 
-        await ah_delete.destroy();
         var noticeAccounts = await Models.noticeAccount.find({where: {noticeId: ah_delete.id}});
         if(noticeAccounts && noticeAccounts.length > 0){
             await Promise.all(noticeAccounts.map(async (item) => {
                 await item.destroy()
             }))
         }
+        await ah_delete.destroy();
         return true;
     }
 
@@ -166,8 +166,6 @@ class NoticeModule{
             "and a.is_read <> true and a.deleted_at is null group by b.type`;
 
         var unReadCountInfo = await sequelize.query(sql1);
-        console.info(unReadCountInfo);
-        console.info("================");
         return unReadCountInfo;
 
     }
@@ -221,8 +219,6 @@ class NoticeModule{
     @clientExport
     @requireParams(["id"], noticeAccountCols)
     static async updateNoticeAccount(params) : Promise<NoticeAccount>{
-        console.info("==========进来没？？？？？？？")
-        console.info(params)
         var id = params.id;
 
         var ah = await Models.noticeAccount.get(id);
