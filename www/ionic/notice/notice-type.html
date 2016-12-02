@@ -1,11 +1,21 @@
 <ion-view title="通知通告" id="page30">
-    <ion-content padding="true" class="has-header">
+    <ion-content padding="true" class="has-header notice-type">
         <div class="list card" ng-repeat="t in noticeTypes" ng-click="goList(t.value)">
-            <div class="item item-body">
-                <div id="page30-markdown21" style="color:#000000;">
-                    <p>{{t.name}}</p>
-                    <p>未读信息{{t.unReadNum}}条</p>
+            <div class="item item-thumbnail-left">
+                <div class="type_icon"
+                     ng-class="{
+                     'notice_system':t.value == ENoticeType.SYSTEM_NOTICE,
+                     'notice_approve':t.value == ENoticeType.TRIP_APPROVE_NOTICE,
+                     'notice_request':t.value == ENoticeType.TRIP_APPLY_NOTICE,
+                     'notice_active':t.value == ENoticeType.ACTIVITY_NOTICE}"
+                >
+                    <i class="icon ion-android-settings" ng-if="t.value == ENoticeType.SYSTEM_NOTICE"></i>
+                    <i class="icon ion-android-create" ng-if="t.value == ENoticeType.TRIP_APPROVE_NOTICE"></i>
+                    <i class="icon ion-document-text" ng-if="t.value == ENoticeType.TRIP_APPLY_NOTICE"></i>
+                    <i class="fa fa-gift" ng-if="t.value == ENoticeType.ACTIVITY_NOTICE"></i>
                 </div>
+                <p class="notice_tit">{{t.name}}<span>{{t.latestInfo.createdAt | date:'MM-dd'}}</span></p>
+                <p class="notice_info">{{t.latestInfo.title}}<span class="notice_badge" ng-if="t.unReadNum">{{t.unReadNum}}</span></p>
             </div>
         </div>
     </ion-content>

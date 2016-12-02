@@ -1,8 +1,9 @@
 import { ENoticeType } from 'api/_types/notice/notice';
 import { Staff } from 'api/_types/staff/staff';
 export async function NoticeTypeController($scope, Models, $stateParams) {
+    require('./notice-type.scss');
+    $scope.ENoticeType = ENoticeType;
     var staff = await Staff.getCurrent();
-
     var statisticInfo = await staff.statisticNoticeByType();
 
     var noticeTypes = [
@@ -15,6 +16,7 @@ export async function NoticeTypeController($scope, Models, $stateParams) {
         {name: "精彩活动", value: ENoticeType.ACTIVITY_NOTICE
             , unReadNum: statisticInfo[ENoticeType.ACTIVITY_NOTICE].unReadNum, latestInfo: statisticInfo[ENoticeType.ACTIVITY_NOTICE].latestInfo}
     ];
+    console.info(noticeTypes);
     $scope.noticeTypes = noticeTypes;
     $scope.goList = async function(type){
         window.location.href = '#/notice/index?type='+type
