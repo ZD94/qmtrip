@@ -21,6 +21,7 @@ const L = require('common/language');
 var API = require('common/api');
 var config = require("config");
 import _ = require("lodash");
+import {ENoticeType} from "../_types/notice/notice";
 
 class TripApproveModule {
 
@@ -174,6 +175,7 @@ class TripApproveModule {
         };
         if(!nextApprove){
             try {
+                values.noticeType = ENoticeType.SYSTEM_NOTICE;
                 //给员工自己发送通知
                 await API.notify.submitNotify({
                     key: 'qm_notify_self_travelbudget',
@@ -237,6 +239,7 @@ class TripApproveModule {
                 // approve_values.autoApproveTime = moment(tripApprove.autoApproveTime).format(timeFormat)
             }
             try {
+                approve_values.noticeType = ENoticeType.TRIP_APPLY_NOTICE;
                 await API.notify.submitNotify({
                     key: 'qm_notify_new_travelbudget',
                     accountId: approveUser.id,
@@ -262,6 +265,7 @@ class TripApproveModule {
                 vals.email = staff.email;
                 vals.projectName = tripApprove.title;
                 vals.username = s.name;
+                vals.noticeType = ENoticeType.TRIP_APPLY_NOTICE;
                 try {
                     await API.notify.submitNotify({
                         key: 'qm_notify_new_travelbudget',
@@ -426,6 +430,7 @@ class TripApproveModule {
                 hotel = data.hotel;
                 subsidy = data.subsidy;
                 self_values = {
+                    noticeType: ENoticeType.TRIP_APPROVE_NOTICE,
                     username: user.name,
                     planNo: tripPlan.planNo,
                     approveTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
@@ -462,6 +467,7 @@ class TripApproveModule {
                 hotel = data.hotel;
                 subsidy = data.subsidy;
                 self_values = {
+                    noticeType: ENoticeType.TRIP_APPROVE_NOTICE,
                     username: user.name,
                     planNo: "无",
                     approveTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),

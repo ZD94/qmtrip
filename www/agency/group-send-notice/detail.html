@@ -1,0 +1,13 @@
+<div class="">
+    <div class="item item-body">
+        <div>
+            <span>{{notice.title}}</span>
+            <span class="item-note">{{notice.createdAt | date : 'yyyy-MM-dd'}}</span>
+        </div>
+        <div>
+            <p ng-bind-html="notice.content"></p>
+        </div>
+    </div>
+    <!--<div ng-click="senNotice(notice)">发送</div>-->
+    <div ng-click="deleteNotice(notice)">删除</div>
+</div>

@@ -1,0 +1,37 @@
+<div>
+    <form class="list">
+        <div class="item item-input" style="padding: 10px">
+            <span class="input-label">标题：</span>
+            <input type="text" placeholder="请输入通知标题" ng-model="notice.title">
+        </div>
+        <div class="item item-input"  style="padding: 10px">
+            <span class="input-label">描述：</span>
+            <input type="text" placeholder="请输入通知标题" ng-model="notice.description">
+        </div>
+        <div class="item item-input" style="padding: 10px">
+            <span class="input-label">内容</span>
+            <textarea  placeholder="请输入通知内容" ng-model="notice.content" cols="30" rows="10"></textarea>
+        </div>
+        <div class="item item-input" style="padding: 10px">
+            <span class="input-label">类型：</span>
+            <select ng-model="notice.type" id="">
+                <option ng-repeat="t in types" value="{{t.value}}">{{t.name}}</option>
+            </select>
+        </div>
+        <div class="item item-input" style="padding: 10px">
+            <span class="input-label">接收人：</span>
+            <textarea placeholder="请输入需要发送的员工id" ng-model="notice.toUsers" cols="30" rows="10"></textarea>
+        </div>
+
+        <div class="item item-input" style="padding: 10px">
+            <span class="input-label">图片：</span>
+            <div class="item-note" ng-uploader accept="image/png, image/jpeg, image/gif" url="uploadUrl" edit="true" width="160" height="160" done="invoicefuc.done">
+                <img class="avatar-img" ng-src="{{getImageUrl(notice.picture)}}" ng-if="notice.picture">
+                <span>点击上传</span>
+            </div>
+        </div>
+        <div  style="padding: 10px">
+            <a class="button button-positive  button-block" ng-click="saveNotice()">保存</a>
+        </div>
+    </form>
+</div>
