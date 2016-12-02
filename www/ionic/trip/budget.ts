@@ -177,6 +177,10 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
                         text: '我的行程',
                         type: 'button-calm',
                         onTap: function(){
+                            $ionicHistory.nextViewOptions({
+                                disableBack: true,
+                                expire: 300
+                            });
                             window.location.href = `#/trip/list`;  ///我的行程缺少tripid无法跳转
                         }
                     }
@@ -202,6 +206,10 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
                     text: '查看审批单',
                     type: ' button-calm',
                     onTap: function(){
+                        $ionicHistory.nextViewOptions({
+                            disableBack: true,
+                            expire: 300
+                        });
                         window.location.href = `#/trip-approval/detail?approveId=${approve.id}`
                     }
                 }
