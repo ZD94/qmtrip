@@ -103,6 +103,8 @@ export class QmPlugin extends AbstractOAPlugin {
         }
         await tripPlanLog.save();
         tripApprove = await tripApprove.save();
+        await API.tripApprove.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
+        await API.tripApprove.sendTripApproveNoticeToSystem({approveId: tripApprove.id});
         return {
             approveNo: approveNo,
             outerId: tripApprove.id,
