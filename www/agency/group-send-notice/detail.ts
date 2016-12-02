@@ -11,9 +11,10 @@ export async function DetailController($scope, Models, $stateParams) {
     };
 
     $scope.deleteNotice = async function(notice){
-        if(config("确定要删除吗？")){
+        if(confirm("确定要删除吗？")){
             await notice.destroy();
-            msgbox.log('发送成功！');
+            window.location.href = '#/group-send-notice/list';
+            msgbox.log('删除成功！');
         }
     };
 }
