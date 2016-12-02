@@ -43,6 +43,7 @@ export async function NoticeTypeController($scope, Models, $stateParams) {
         {name: "出差请示", value: ENoticeType.TRIP_APPLY_NOTICE, unReadNum: num3},
         {name: "精彩活动", value: ENoticeType.ACTIVITY_NOTICE, unReadNum: num4}
     ];
+    console.info(noticeTypes);
     $scope.noticeTypes = noticeTypes;
     $scope.goList = async function(type){
         window.location.href = '#/notice/index?type='+type
