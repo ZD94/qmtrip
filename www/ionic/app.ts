@@ -142,6 +142,13 @@ function initUpdater($ionicPlatform, $ionicPopup) {
             });
     })
 }
+function initStastics($ionicPlatform, $rootScope, statistics) {
+    $ionicPlatform.ready(function(){
+        $rootScope.$on('$stateChangeSuccess', function(){
+            statistics.trigger();
+        })
+    })
+}
 
 require('nglibs');
 require('www/libs');
@@ -164,6 +171,7 @@ app.config(function($ionicConfigProvider){
 app.run(initAPI);
 app.run(initKeyboard);
 app.run(initStatusBar);
+app.run(initStastics);
 if(window.cordova) {
     app.run(initUpdater);
     app.run(initJPush);
