@@ -93,8 +93,9 @@ var config = require('config');
 export function getImageUrl(id){
     if(typeof id !== 'string' || typeof config.update !== 'string')
         return null;
-    let imgUrl = path.join(config.update,'/attachments/',id);
-    return imgUrl;
+    let base = new URL(config.update, location.href);
+    let url = new URL(path.join('attachments', id), base.href);
+    return url.href;
 }
 
 export async function IndexController($scope, Menu, $ionicPopup, Models, $storage, $window, $location, $ionicHistory, $ionicSideMenuDelegate) {

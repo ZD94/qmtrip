@@ -25,13 +25,11 @@ export async function ApproveSetController($scope, $ionicPopup, Models){
         // company.oa = $scope.approveFun.open?$scope.approveFun.method:EApproveChannel.AUTO;
         if($scope.approveFun.open === (company.oa !== EApproveChannel.AUTO)){
             company.oa = $scope.approveFun.method;
-            console.info('step1');
         }else if($scope.approveFun.open){
             company.oa = EApproveChannel.QM;
             $scope.approveFun.method = EApproveChannel.QM;
         }else{
             company.oa = EApproveChannel.AUTO;
-            console.info('step3');
         }
     }
     syncFromOA();

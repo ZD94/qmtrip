@@ -8,6 +8,7 @@ import './inAppBrowser';
 import './AirCompany';
 import './Airport';
 import './closePopup';
+import './statistics';
 
 var dyload = require('dyload');
 function dyloadSerivce(src: string){
