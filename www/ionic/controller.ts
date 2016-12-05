@@ -161,7 +161,7 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
         })
     }
     setupMenu(staffMenus);
-    /*$scope.$watch(function() { return $ionicSideMenuDelegate.isOpen(); }, async function(isOpen) {
+    $scope.$watch(function() { return $ionicSideMenuDelegate.isOpen(); }, async function(isOpen) {
         if (isOpen) {//Menu Open
             noticePager = await staff.getSelfNotices();
             ifNewNotice(noticePager);
@@ -169,7 +169,7 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
         else {
             // Menu Closed
         }
-    });*/
+    });
     // $scope.isAdminMenus = false;
     $scope.isAdmin = false;
     if (staff && (staff.roleId == EStaffRole.OWNER || staff.roleId == EStaffRole.ADMIN)) {
