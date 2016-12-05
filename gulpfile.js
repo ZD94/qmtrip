@@ -42,7 +42,7 @@ gulplib.bundle_lib('preload', {ex: true, require:[
     'common/client/config:config',
 ]});
 gulplib.bundle_lib('api', {require: ['common/client/api:common/api', 'common/api/helper', 'common/language']});
-gulplib.bundle_lib('calendar', {require: ['lunar-calendar', "calendar"]});
+gulplib.bundle_lib('calendar', {require: ['lunar-calendar']});
 gulplib.bundle_lib('msgbox', {require: ['notie', 'msgbox']});
 gulplib.bundle_lib('nglibs', {require: ['nglibs', 'api/_types', 'api/_types/**/*', 'common/model/client:common/model']});
 gulplib.bundle_lib('ngapp', {require: ['common/client/ngapp/index.ts:ngapp', 'browserspec']});
