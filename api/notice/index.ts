@@ -8,6 +8,7 @@ import {Staff} from "api/_types/staff";
 import { Notice, NoticeAccount, ESendType } from 'api/_types/notice';
 import { Models } from 'api/_types';
 import {FindResult} from "common/model/interface";
+let sequelize = require("common/model").DB;
 
 var JPush = require("jpush-sdk");
 var API = require("common/api");
@@ -25,16 +26,16 @@ class NoticeModule{
     @requireParams(["title","content","description", "sendType"], noticeCols)
     static async createNotice (params) : Promise<Notice>{
         var notice = Notice.create(params);
+        result = await notice.save();
         var result:Notice;
+        var link = '#/notice/detail?noticeId='+result.id;
         if(params.sendType == ESendType.ONE_ACCOUNT){
             
-            result = await notice.save();
             var noticeAccount = NoticeAccount.create();
             noticeAccount.noticeId = result.id;
             noticeAccount.accountId = params.staffId;
             await noticeAccount.save();
             var jpushId = await API.auth.getJpushIdByAccount({accountId: params.staffId});
-            var link = "";
             if(result.content.startsWith("skipLink@")) {
                 link = result.content.substring(9);
             }
@@ -44,7 +45,6 @@ class NoticeModule{
             
         }else if(params.sendType == ESendType.MORE_ACCOUNT){
             
-            result = await notice.save();
             var accountIds = params.toUsers;
             accountIds = JSON.parse(accountIds);
             var jpushIds = [];
@@ -60,12 +60,11 @@ class NoticeModule{
                 }
             }))
 
-            await API.jpush.pushAppMessage({content: result.description, title: result.title, link: null, jpushId: jpushIds});
+            await API.jpush.pushAppMessage({content: result.description, title: result.title, link: link, jpushId: jpushIds});
 
         }else if(params.sendType == ESendType.ALL_ACCOUNT){
-            result = await notice.save();
             // var jpushId = JPush.ALL;
-            // await API.jpush.pushAppMessage({content: result.description, title: result.title, link: null, jpushId: jpushId});
+            // await API.jpush.pushAppMessage({content: result.description, title: result.title, link: link, jpushId: jpushId});
         }
         return result;
     }
@@ -82,13 +81,13 @@ class NoticeModule{
         var id = params.id;
         var ah_delete = await Models.notice.get(id);
 
-        await ah_delete.destroy();
         var noticeAccounts = await Models.noticeAccount.find({where: {noticeId: ah_delete.id}});
         if(noticeAccounts && noticeAccounts.length > 0){
             await Promise.all(noticeAccounts.map(async (item) => {
                 await item.destroy()
             }))
         }
+        await ah_delete.destroy();
         return true;
     }
 
@@ -154,6 +153,23 @@ class NoticeModule{
         return {ids: ids, count: paginate['total']};
     }
 
+    /**
+     * 根据属性查找通知通告
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    static async statisticNoticeByType(): Promise<any>{
+        var staff = await Staff.getCurrent();
+        var sql1 = `select b.type, count(b.id) from notice.notice_accounts a right join notice.notices b " +
+            "on a.notice_id = b.id where (a.account_id='${staff.id}' or b.send_type = ${ESendType.ALL_ACCOUNT}) " +
+            "and a.is_read <> true and a.deleted_at is null group by b.type`;
+
+        var unReadCountInfo = await sequelize.query(sql1);
+        return unReadCountInfo;
+
+    }
+
 /****************************************NoticeAccount begin************************************************/
 
     /**
@@ -184,6 +200,10 @@ class NoticeModule{
     static async deleteNoticeAccount(params) : Promise<any>{
         var id = params.id;
         var ah_delete = await Models.noticeAccount.get(id);
+        var notice = await Models.notice.get(ah_delete.noticeId);
+        if(notice && notice.sendType == ESendType.ONE_ACCOUNT){
+            await notice.destroy();
+        }
 
         await ah_delete.destroy();
         return true;
@@ -199,8 +219,6 @@ class NoticeModule{
     @clientExport
     @requireParams(["id"], noticeAccountCols)
     static async updateNoticeAccount(params) : Promise<NoticeAccount>{
-        console.info("==========进来没？？？？？？？")
-        console.info(params)
         var id = params.id;
 
         var ah = await Models.noticeAccount.get(id);
@@ -233,18 +251,7 @@ class NoticeModule{
     @clientExport
     static async getNoticeAccounts(params): Promise<FindResult>{
         var staff = await Staff.getCurrent();
-
-        var options: any = {
-            where: params.where
-        };
-        if(params.columns){
-            options.attributes = params.columns;
-        }
-        options.order = params.order || [['createdAt', 'desc']];
-        if(params.$or) {
-            options.where.$or = params.$or;
-        }
-        let paginate = await Models.noticeAccount.find(options);
+        let paginate = await Models.noticeAccount.find(params);
         let ids =  paginate.map(function(t){
             return t.id;
         })

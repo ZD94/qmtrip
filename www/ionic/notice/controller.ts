@@ -5,6 +5,7 @@ import moment = require("moment");
 export * from './detail';
 export * from './notice-type';
 var msgbox = require('msgbox');
+
 export async function IndexController($scope, Models, $ionicPopup, $stateParams) {
     require('./notice.scss');
     $scope.notices = [];
@@ -41,12 +42,6 @@ export async function IndexController($scope, Models, $ionicPopup, $stateParams)
     async function loadStaffs(pager) {
         if(pager && pager.length>0){
             await Promise.all(pager.map(async function(notice){
-                //有待查证
-                var noticeAccounts = await Models.noticeAccount.find({where: {accountId: staff.id, noticeId: notice.id}});
-                if(noticeAccounts && noticeAccounts.length>0){
-                    notice["isRead"] = noticeAccounts[0].isRead;
-                }
-                //有待查证
                 $scope.notices.push(notice);
             }));
         }
@@ -65,12 +60,7 @@ export async function IndexController($scope, Models, $ionicPopup, $stateParams)
 
     $scope.detail = async function (notice) {
         //标记已读
-        var noticeAccounts = await Models.noticeAccount.find({where: {accountId: staff.id, noticeId: notice.id}});
-        if(noticeAccounts && noticeAccounts.length>0 && !noticeAccounts[0].isRead){
-            noticeAccounts[0].isRead = true;
-            noticeAccounts[0].readTime = moment().toDate();
-            await noticeAccounts[0].save();
-        }
+        await notice.setReadStatus();
         if(notice.content && notice.content.startsWith("skipLink@")){
             // console.info("直接跳转");
             window.location.href = notice.content.substring(9);
@@ -94,10 +84,7 @@ export async function IndexController($scope, Models, $ionicPopup, $stateParams)
                     type: 'button-positive',
                     onTap: async function (e) {
                         try{
-                            var noticeAccount = await Models.noticeAccount.find({where: {accountId: staff.id, noticeId: notice.id}});
-                            if(noticeAccount && noticeAccount.length>0){
-                                await noticeAccount[0].destroy();
-                            }
+                            await notice.staffDeleteNotice();
                             $scope.notices.splice(index, 1);
                             msgbox.log("删除成功");
                         }catch(err){
