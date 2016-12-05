@@ -35,8 +35,8 @@ class ApproveModule {
 
     @clientExport
     @requireParams(["budgetId"], ["approveUser", "project"])
-    static async submitApprove(params: {budgetId: string, project?: string, approveUser?: string}) :Promise<Approve>{
-        let {budgetId, project} = params;
+    static async submitApprove(params: {budgetId: string, project?: string, approveUser?: Staff}) :Promise<Approve>{
+        let {budgetId, project, approveUser} = params;
         let submitter = await Staff.getCurrent();
 
         //获取预算详情
@@ -47,13 +47,14 @@ class ApproveModule {
             title: project,
             channel: submitter.company.oa,
             type: EApproveType.TRAVEL_BUDGET,
+            approveUser: approveUser,
         });
     }
 
     @clientExport
     @requireParams(['query', 'budget'], ['project', 'specialApproveRemark'])
-    static async submitSpecialApprove(params: {query: any, budget: number, project?: string, specialApproveRemark?: string}):Promise<Approve> {
-        let {query, budget, project, specialApproveRemark} = params;
+    static async submitSpecialApprove(params: {query: any, budget: number, project?: string, specialApproveRemark?: string, approveUser?: Staff}):Promise<Approve> {
+        let {query, budget, project, specialApproveRemark, approveUser} = params;
         let submitter = await Staff.getCurrent();
         let budgetInfo = {
             query: query,
@@ -75,13 +76,14 @@ class ApproveModule {
             type: EApproveType.TRAVEL_BUDGET,
             isSpecialApprove: true,
             specialApproveRemark: specialApproveRemark,
+            approveUser: approveUser,
         });
     }
 
     static async _submitApprove(params: {
         submitter: string,
         data?: any,
-        approveUser?: string,
+        approveUser?: Staff,
         title?: string,
         channel?: EApproveChannel,
         type?: EApproveType,
@@ -89,7 +91,6 @@ class ApproveModule {
         specialApproveRemark?: string,
     }) {
         let {submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark } = params;
-
         let staff = await Models.staff.get(submitter);
         let approve = Models.approve.create({
             submitter: submitter,
@@ -97,7 +98,7 @@ class ApproveModule {
             channel: channel,
             title: title,
             type: type,
-            approveUser: approveUser,
+            approveUser: approveUser ? approveUser.id: null,
             isSpecialApprove: isSpecialApprove,
             specialApproveRemark: specialApproveRemark,
             companyId: staff.company.id,
@@ -107,7 +108,7 @@ class ApproveModule {
         //对接第三方OA
         emitter.emit(EVENT.NEW_TRIP_APPROVE, {
             approveNo: approve.id,
-            approveUser: approveUser,
+            approveUser: approveUser.id,
             submitter: submitter,
             status: EApproveStatus.WAIT_APPROVE,
             oa: oaEnum2Str(channel) || 'qm'
