@@ -151,6 +151,8 @@ function initUpdater($ionicPlatform, $ionicPopup) {
 //     })
 // }
 
+
+
 require('nglibs');
 require('www/libs');
 var ngapp = require('ngapp');
