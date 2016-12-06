@@ -22,7 +22,7 @@
     "callsite": "^1.0.0",
     "co": "^4.6.0",
     "colors": "^1.1.2",
-    "connect-timeout": "^1.7.0",
+    "connect-timeout": "^1.8.0",
     "cookie-parser": "^1.4.3",
     "core-decorators": "^0.12.3",
     "dingtalk_suite_callback": "0.0.3",
