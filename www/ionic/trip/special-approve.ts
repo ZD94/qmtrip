@@ -1,4 +1,5 @@
 import { Staff } from 'api/_types/staff/staff';
+import {EApproveChannel} from "../../../api/_types/approve/types";
 var msgbox = require('msgbox');
 
 export async function SpecialApproveController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup){
@@ -44,9 +45,12 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
     $scope.saveSpecialTripPlan = async function() {
         let trip = $scope.trip;
 
-        if(!trip.auditUser) {
-            $scope.showErrorMsg('请选择审核人！');
-            return false;
+        let staff = await Staff.getCurrent();
+        if (!staff.company.oa || staff.company.oa == EApproveChannel.QM) {
+            if(!trip.auditUser) {
+                $scope.showErrorMsg('请选择审核人！');
+                return false;
+            }
         }
         if(!trip.specialApproveRemark) {
             $scope.showErrorMsg('请输入审批说明！');
@@ -70,14 +74,14 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
         try {
             API.require('approve');
             await API.onload();
-            let tripApprove = await API.approve.submitSpecialApprove({
-                query: query, 
+            let data = {
+                query: query,
                 project: trip.reason||trip.reasonName,
-                approveUser: trip.auditUser.id,
+                approveUser: trip.auditUser,
                 budget: trip.budget,
                 specialApproveRemark: trip.specialApproveRemark
-            });
-            
+            }
+            let tripApprove = await API.approve.submitSpecialApprove(data);
             let approveId = tripApprove.id;
             $ionicPopup.show({
                 title: '出差申请已提交',

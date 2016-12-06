@@ -52,7 +52,7 @@ class ApproveModule {
     }
 
     @clientExport
-    @requireParams(['query', 'budget'], ['project', 'specialApproveRemark'])
+    @requireParams(['query', 'budget'], ['project', 'specialApproveRemark', 'approveUser'])
     static async submitSpecialApprove(params: {query: any, budget: number, project?: string, specialApproveRemark?: string, approveUser?: Staff}):Promise<Approve> {
         let {query, budget, project, specialApproveRemark, approveUser} = params;
         let submitter = await Staff.getCurrent();
