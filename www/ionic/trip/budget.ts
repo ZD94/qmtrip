@@ -158,6 +158,13 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     $scope.submitApprove = async function() {
         API.require("approve");
         await API.onload();
+        if (!staff.company.oa || staff.company.oa == EApproveChannel.QM) {
+            if (!trip.auditUser) {
+                $scope.showErrorMsg(`请选择审批人`);
+                return false;
+            }
+        }
+
         let approve = await API.approve.submitApprove({budgetId: id, approveUser: trip.auditUser, project: $scope.trip.reason});
         if (staff.company.oa && staff.company.oa == EApproveChannel.AUTO) {
             $ionicPopup.show({
