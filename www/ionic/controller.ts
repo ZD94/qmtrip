@@ -149,7 +149,6 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
     function ifNewNotice(Pager){
         var num = 0;
         Pager.map(function(notice){
-            console.info(notice.isRead,"#####pppppppp");
             if(!notice.isRead){
                 $scope.Menu.notie = true;
             }else{
