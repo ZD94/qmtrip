@@ -16,7 +16,6 @@ export async function NoticeTypeController($scope, Models, $stateParams) {
         {name: "精彩活动", value: ENoticeType.ACTIVITY_NOTICE
             , unReadNum: statisticInfo[ENoticeType.ACTIVITY_NOTICE].unReadNum, latestInfo: statisticInfo[ENoticeType.ACTIVITY_NOTICE].latestInfo}
     ];
-    console.info(noticeTypes);
     $scope.noticeTypes = noticeTypes;
     $scope.goList = async function(type){
         window.location.href = '#/notice/index?type='+type
