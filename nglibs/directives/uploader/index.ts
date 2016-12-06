@@ -83,7 +83,7 @@ function ngUploader($loading, wxApi): any {
                     return;
                 }
                 for(let i=0; i<blobs.length; i++){
-                    if(!(blobs[i] instanceof File))
+                    if(blobs[i] instanceof Blob)
                         uploader.queue[i]._file = blobs[i];
                 }
                 //$loading.start();
