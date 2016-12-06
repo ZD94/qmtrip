@@ -35,6 +35,7 @@ async function picViewController($scope, $element) {
         canvas.height = loaded.height;
         let data = loaded.getContext('2d').getImageData(0, 0, loaded.width, loaded.height);
         canvas.getContext('2d').putImageData(data, 0, 0);
+        return;
     }
 
     var ctx = canvas.getContext('2d');
