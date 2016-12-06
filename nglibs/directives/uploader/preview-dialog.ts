@@ -24,7 +24,7 @@ function canvas2Blob(canvas: HTMLCanvasElement): Promise<Blob>{
         require('blueimp-canvas-to-blob');
         canvas.toBlob(function(blob){
             resolve(blob);
-        });
+        }, 'image/jpeg');
     });
 }
 
@@ -36,13 +36,14 @@ async function previewImageController($scope, $element){
         let canvases = $element.find('canvas');
         let results = Promise
             .all(canvases.map(function(index, canvas) {
-                if($scope.editable){
-                    return canvas2Blob(canvas);
-                }
-                let file = $scope.files[index];
-                if(!(file instanceof File))
-                    return canvas2Blob(canvas);
-                return Promise.resolve(file);
+                return canvas2Blob(canvas);
+                // if($scope.editable){
+                //     return canvas2Blob(canvas);
+                // }
+                // let file = $scope.files[index];
+                // if(!(file instanceof File))
+                //     return canvas2Blob(canvas);
+                // return Promise.resolve(file);
             }))
             .catch(function(e) {
                 console.log(e.stack);
