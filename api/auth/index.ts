@@ -953,10 +953,9 @@ async function _sendActiveEmail(accountId) {
     var activeToken = utils.getRndStr(6);
     var sign = makeActiveSign(activeToken, account.id, expireAt);
     var url = C.host + "/index.html#/login/active?accountId=" + account.id + "&sign=" + sign + "&timestamp=" + expireAt + "&email=" + account.email;
-    var appMessageUrl = "#/login/active?accountId=" + account.id + "&sign=" + sign + "&timestamp=" + expireAt + "&email=" + account.email;
+    var appMessageUrl = "#/staff/staff-info";
     try {
         url = await API.wechat.shorturl({longurl: url});
-        appMessageUrl = await API.wechat.shorturl({longurl: appMessageUrl});
     } catch(err) {
         console.error(err);
     }

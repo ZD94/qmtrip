@@ -1,6 +1,7 @@
 import validator = require('validator');
 import moment = require('moment');
 var msgbox = require('msgbox');
+var xregexp = require('xregexp');
 
 export async function InvitedStaffTwoController ($scope, $stateParams){
     let companyId = $stateParams.companyId;
@@ -94,6 +95,11 @@ export async function InvitedStaffTwoController ($scope, $stateParams){
         }
         if (!$scope.form.name) {
             msgbox.log("姓名不能为空");
+            return;
+        }
+        var re = xregexp('^\\pL+$');
+        if (!re.test($scope.form.name)){
+            msgbox.log("不能包含特殊字符");
             return;
         }
         var pwdPattern = /^[0-9a-zA-Z]*$/g;
