@@ -3,8 +3,8 @@
         <div class="button-bar jl_approvelist">
             <a ng-click="changeTo('ALL')" class="button button-small" ng-class="filter == 'ALL' ? 'active': ''">全部</a>
             <a ng-click="changeTo('WAIT_APPROVE')" class="button button-small" ng-class="filter == 'WAIT_APPROVE' ? 'active': ''">待审批</a>
-            <a ng-click="changeTo('APPROVE_FAIL')" class="button button-small" ng-class="filter == 'APPROVE_FAIL' ? 'active': ''">已驳回</a>
-            <a ng-click="changeTo('APPROVE_SUCCESS')" class="button button-small" ng-class="filter == 'APPROVE_SUCCESS' ? 'active': ''">已通过</a>
+            <a ng-click="changeTo('REJECT')" class="button button-small" ng-class="filter == 'REJECT' ? 'active': ''">已驳回</a>
+            <a ng-click="changeTo('PASS')" class="button button-small" ng-class="filter == 'PASS' ? 'active': ''">已通过</a>
         </div>
 
         <!--<div class="list card" ng-repeat="approve in tripApproves track by $index" ng-click="enterDetail(approve.id)">-->
@@ -27,6 +27,6 @@
         <trip-approve ng-repeat="approve in tripApproves track by $index" show-detail-status="true" show-header="false" data="approve" click="enterDetail"></trip-approve>
         <div ng-if="More.hasNextPage()" class="getMoreOrNoMore"><i class="icon ion-arrow-up-a"></i>&nbsp;上拉加载更多</div>
         <div ng-if="!More.hasNextPage()" class="getMoreOrNoMore">没有更多记录了</div>
-        <ion-infinite-scroll on-infinite="More.loadMore()" ng-if="More.hasNextPage()"></ion-infinite-scroll>
+        <ion-infinite-scroll on-infinite="More.loadMore()" distance="1%" ng-if="More.hasNextPage()"></ion-infinite-scroll>
     </ion-content>
 </ion-view>

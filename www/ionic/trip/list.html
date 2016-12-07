@@ -4,8 +4,8 @@
             <a ng-click="changeTo('ALL')" class="button button-small" ng-class="filter == 'ALL' ? 'active': ''">全部</a>
             <a ng-click="changeTo('WAIT_UPLOAD')" class="button button-small" ng-class="filter == 'WAIT_UPLOAD' ? 'active': ''">待传票据</a>
             <a ng-click="changeTo('AUDITING')" class="button button-small" ng-class="filter == 'AUDITING' ? 'active': ''">审批中</a>
-            <a ng-click="changeTo('TRIP_FAIL')" class="button button-small" ng-class="filter == 'TRIP_FAIL' ? 'active': ''">未通过</a>
-            <a ng-click="changeTo('TRIP_SUCCESS')" class="button button-small" ng-class="filter == 'TRIP_SUCCESS' ? 'active': ''">已完成</a>
+            <a ng-click="changeTo('AUDIT_NOT_PASS')" class="button button-small" ng-class="filter == 'AUDIT_NOT_PASS' ? 'active': ''">未通过</a>
+            <a ng-click="changeTo('COMPLETE')" class="button button-small" ng-class="filter == 'COMPLETE' ? 'active': ''">已完成</a>
         </div>
 
         <trip-plan ng-repeat="trip in (tripPlans | orderBy: startAt:reserve) track by $index" show-detail-status="true" data="trip" click="enterdetail"></trip-plan>

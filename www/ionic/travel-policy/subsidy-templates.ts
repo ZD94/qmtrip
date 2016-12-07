@@ -23,7 +23,7 @@ export async function SubsidyTemplatesController($scope, Models, $ionicPopup) {
             template:'<div> <p>模板标题</p> ' +
             '<input type="text" placeholder="请输入标题" ng-model="subsidyTemplate.name" maxlength="4"> </div>' +
             '<div> <p>补助金额（元/天）</p>' +
-            '<input type="text" placeholder="请输入金额" ng-model="subsidyTemplate.subsidyMoney"> </div>',
+            '<input type="text" placeholder="请输入金额" ng-model="subsidyTemplate.subsidyMoney" maxlength="5"> </div>',
             scope: $scope,
             buttons:[
                 {
