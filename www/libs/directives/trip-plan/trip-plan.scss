@@ -126,6 +126,10 @@ $color-blue: #28a7e1;
           font-size: 12px;
           font-weight: normal;
           color: #9b9b9b;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          width: 85%;
         }
       }
     }
