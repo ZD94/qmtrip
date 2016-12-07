@@ -88,6 +88,7 @@ export default async function ListAllController($scope, $stateParams) {
             nextPage : async function() {
                 if(!pager.hasNextPage()){
                     $scope.vm.isHasNextPage = false;
+                    $scope.$broadcast('scroll.infiniteScrollComplete');
                     return;
                 }
                 await pager.nextPage();
@@ -99,7 +100,9 @@ export default async function ListAllController($scope, $stateParams) {
 
         function loadTripPlans(pager) {
             pager.forEach(function(obj){
-                $scope.tripPlans.push(obj);
+                if($scope.tripPlans.indexOf(obj) < 0 ){
+                    $scope.tripPlans.push(obj);
+                }
             });
         }
 
