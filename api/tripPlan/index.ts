@@ -899,7 +899,7 @@ class TripPlanModule {
         let deptCity = await API.place.getCityInfo({cityCode: query.originPlace});
         let arrivalCity = await API.place.getCityInfo({cityCode: query.destinationPlace});
 
-        let tripPlan = TripPlan.create({});
+        let tripPlan = TripPlan.create({id: approve.id});
         tripPlan['companyId'] = account.company.id;
         tripPlan.deptCityCode = query.originPlace;
         tripPlan.arrivalCityCode = query.destinationPlace;
