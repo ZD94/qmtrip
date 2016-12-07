@@ -31,19 +31,25 @@ export async function EditMobileController($scope,Models,$ionicHistory) {
             $scope.$apply();
         }, 1000);
     }
-    $scope.sendCode = function(){
+    $scope.sendCode = async function(){
+        API.require('auth');
+        API.require('checkcode');
+        await API.onload();
+
         if (!$scope.form.mobile) {
             msgbox.log("手机号不能为空");
             return;
         }
 
         API.auth.checkEmailAndMobile({mobile: $scope.form.mobile})
-            .then(async function(){
-                return API.checkcode.getMsgCheckCode({mobile: $scope.form.mobile})
-                    .then(function(result){
-                        $scope.beginCountDown();
-                        $scope.form.msgTicket =  result.ticket;
-                    })
+            .then(async function(result){
+                if(result){
+                    return API.checkcode.getMsgCheckCode({mobile: $scope.form.mobile})
+                        .then(function(result){
+                            $scope.beginCountDown();
+                            $scope.form.msgTicket =  result.ticket;
+                        })
+                }
             })
             .catch(function(err){
                 msgbox.log(err.msg||err);
