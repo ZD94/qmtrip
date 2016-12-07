@@ -49,12 +49,12 @@ export class QmPlugin extends AbstractOAPlugin {
         let project = await API.tripPlan.getProjectByName({companyId: company.id, name: approve.title, userId: staff.id, isCreate: true});
         // let tripApprove =  TripApprove.create(params);
 
-        // if(params.approveUserId) {
-        //     let approveUser = await Models.staff.get(params.approveUserId);
-        //     if(!approveUser)
-        //         throw {code: -3, msg: '审批人不存在'}
-        //     tripApprove.approveUser = approveUser;
-        // }
+        if(params.approveUser) {
+            let approveUser = await Models.staff.get(params.approveUser);
+            if(!approveUser)
+                throw {code: -3, msg: '审批人不存在'}
+            tripApprove.approveUser = approveUser;
+        }
         tripApprove.isSpecialApprove = approve.isSpecialApprove;
         tripApprove.specialApproveRemark = approve.specialApproveRemark;
         tripApprove.status = QMEApproveStatus.WAIT_APPROVE;
