@@ -83,6 +83,12 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     await API.onload();
 
     $scope.showChooseApproveUser = (!staff.company.oa || staff.company.oa == EApproveChannel.QM)
+    function noBack(){
+        $ionicHistory.nextViewOptions({
+            disableBack: true,
+            expire: 300
+        });
+    }
     $scope.saveTripPlan = async function() {
         let trip = $scope.trip;
 
@@ -110,10 +116,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
                         text: '个人中心',
                         type: 'button-calm button-outline',
                         onTap:function(){
-                            $ionicHistory.nextViewOptions({
-                                disableBack: true,
-                                expire: 300
-                            });
+                            noBack();
                             window.location.href = '#/staff/index'
                         }
                     },
@@ -121,10 +124,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
                         text: '查看审批单',
                         type: ' button-calm',
                         onTap: function(){
-                            $ionicHistory.nextViewOptions({
-                                disableBack: true,
-                                expire: 300
-                            });
+                            noBack();
                             window.location.href = `#/trip-approval/detail?approveId=${approveId}`
                         }
                     }
@@ -177,6 +177,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
                         text: '个人中心',
                         type: 'button-calm button-outline',
                         onTap:function(){
+                            noBack();
                             window.location.href = '#/staff/index'
                         }
                     },
@@ -184,6 +185,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
                         text: '我的行程',
                         type: 'button-calm',
                         onTap: function(){
+                            noBack();
                             window.location.href = `#/trip/list`;  ///我的行程缺少tripid无法跳转
                         }
                     }
@@ -202,6 +204,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
                     text: '个人中心',
                     type: 'button-calm button-outline',
                     onTap:function(){
+                        noBack();
                         window.location.href = '#/staff/index'
                     }
                 },
@@ -209,6 +212,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
                     text: '查看审批单',
                     type: ' button-calm',
                     onTap: function(){
+                        noBack();
                         window.location.href = `#/trip-approval/detail?approveId=${approve.id}`
                     }
                 }

@@ -142,7 +142,6 @@ function initUpdater($ionicPlatform, $ionicPopup) {
             });
     })
 }
-
 // function initStatistics($ionicPlatform, $rootScope, statistics) {
 //     $ionicPlatform.ready(function(){
 //         $rootScope.$on('$stateChangeSuccess', function(){
@@ -151,7 +150,6 @@ function initUpdater($ionicPlatform, $ionicPopup) {
 //         })
 //     })
 // }
-
 
 require('nglibs');
 require('www/libs');

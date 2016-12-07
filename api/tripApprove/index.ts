@@ -196,7 +196,7 @@ class TripApproveModule {
 
         if(company.isApproveOpen) {
             //给审核人发审核邮件
-            let approveUser = tripApprove.approveUser;
+            let approveUser = await Models.staff.get(tripApprove['approveUserId']);
             let approve_url = `${config.host}/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
             let appMessageUrl = `#/trip-approval/detail?approveId=${tripApprove.id}`;
             let approve_values = _.cloneDeep(values);
@@ -206,6 +206,7 @@ class TripApproveModule {
             } catch(err) {
                 console.warn(`转换短链接失败`, err);
             }
+
             let openId = await API.auth.getOpenIdByAccount({accountId: approveUser.id});
             approve_values.managerName = approveUser.name;
             approve_values.username = staff.name;
@@ -240,14 +241,14 @@ class TripApproveModule {
             }
             try {
                 approve_values.noticeType = ENoticeType.TRIP_APPLY_NOTICE;
+                console.info("API.notify.submitNotify===>", approve_values);
                 await API.notify.submitNotify({
                     key: 'qm_notify_new_travelbudget',
                     accountId: approveUser.id,
                     values: approve_values
                 });
-
             } catch(err) {
-                console.error('发送通知失败', err)
+                console.error('发送通知失败', err.stack ? err.stack : err);
             }
 
             try {

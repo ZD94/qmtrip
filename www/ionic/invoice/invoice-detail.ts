@@ -242,6 +242,10 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
             msgbox.log('请输入金额');
             return;
         }
+        if(newInvoice.totalMoney < 0){
+            msgbox.log('输入金额不能为负数');
+            return;
+        }
         if(newInvoice.payType == null){
             msgbox.log('支付方式');
             return;
