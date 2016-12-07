@@ -7,21 +7,26 @@
             <ion-scroll style="padding: 10px;">
                 <div class="button-bar budgetMenu">
                     <a href="#/statistics/" id="page24-button73" class="button button-positive button-outline">汇总</a>
-                    <a ng-class="{true: '', false: 'button-outline'}[isSActive]" class="button button-positive" ng-click="searchStatistics('S')">按员工</a>
-                    <a ng-class="{true: '', false: 'button-outline'}[isPActive]" class="button button-positive" ng-click="searchStatistics('P')">按项目</a>
-                    <a ng-class="{true: '', false: 'button-outline'}[isDActive]" class="button button-positive" ng-click="searchStatistics('D')">按部门</a>
+                    <a ng-class="{true: '', false: 'button-outline'}[isSActive]" class="button button-positive"
+                       ng-click="searchStatistics('S')">按员工</a>
+                    <a ng-class="{true: '', false: 'button-outline'}[isPActive]" class="button button-positive"
+                       ng-click="searchStatistics('P')">按项目</a>
+                    <a ng-class="{true: '', false: 'button-outline'}[isDActive]" class="button button-positive"
+                       ng-click="searchStatistics('D')">按部门</a>
                 </div>
 
 
                 <form class="list">
                     <label class="item item-input">
                         <i class="icon ion-search placeholder-icon"></i>
-                        <input ng-change="searchStatistics(data.monthSelection.type)" type="search" placeholder="{{placeholder}}" ng-model="data.monthSelection.keyWord">
+                        <input ng-change="searchStatistics(data.monthSelection.type)" type="search"
+                               placeholder="{{placeholder}}" ng-model="data.monthSelection.keyWord">
                     </label>
                 </form>
 
                 <ion-list>
-                    <ion-item class="item stat-label-content" ng-repeat="en in statisticData" ng-click="goToStaffRecords(en.keyInfo.name)">
+                    <ion-item class="item stat-label-content" ng-repeat="en in statisticData"
+                              ng-click="goToStaffRecords(en.keyInfo.name)">
                         <div class="bar-header">{{en.keyInfo.name}}
                     <span style="float: right">查看详情
                         <i class="icon ion-chevron-right"></i>
@@ -42,7 +47,8 @@
                             <div>
                                 <div class="label-bottom-left">
                                     <p>还将进行出差({{showManTimes}})</p>
-                                    <h2 class="ng-binding" style="text-align: center;">{{(en.planTripNum || 0)-(en.completeTripNum || 0)}}</h2>
+                                    <h2 class="ng-binding" style="text-align: center;">{{(en.planTripNum ||
+                                        0)-(en.completeTripNum || 0)}}</h2>
                                 </div>
                                 <div class="label-right">
                                     <p>计划支出(元)</p>
@@ -52,7 +58,8 @@
                         </div>
                         <div class="right-div">
                             <p>实际节省(元)</p>
-                            <h2 class="ng-binding" style="text-align: center;">{{en.isSpecialApprove? 0 : (en.savedMoney || 0)}}</h2>
+                            <h2 class="ng-binding" style="text-align: center;">{{en.isSpecialApprove? 0 : (en.savedMoney
+                                || 0)}}</h2>
                         </div>
                     </ion-item>
                 </ion-list>
