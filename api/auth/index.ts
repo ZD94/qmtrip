@@ -965,7 +965,8 @@ async function _sendActiveEmail(accountId) {
         name: account.email,
         username: account.email,
         url: url,
-        appMessageUrl: appMessageUrl
+        appMessageUrl: appMessageUrl,
+        time: moment().format("YYYY-MM-DD HH:mm")
     };
     account.activeToken = activeToken;
     await Promise.all([

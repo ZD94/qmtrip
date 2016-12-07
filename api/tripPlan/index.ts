@@ -28,6 +28,8 @@ import {AgencyUser} from "../_types/agency";
 import {makeSpendReport} from './spendReport';
 import fs = require("fs");
 import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice} from "../_types/tripPlan";
+import {ENoticeType} from "../_types/notice/notice";
+import TripApproveModule = require("../tripApprove/index");
 
 
 class TripPlanModule {
@@ -1005,6 +1007,58 @@ class TripPlanModule {
             await Promise.all(ps);
         }
 
+        let data = await TripPlanModule.getPlanEmailDetails(tripPlan);
+        let {go, back, hotel, subsidy} = data;
+
+        let self_url = config.host + '/index.html#/trip/list-detail?tripid=' + approve.id;
+        let appMessageUrl = '#/trip/list-detail?tripid=' + approve.id;
+
+        let self_values = {
+            noticeType: ENoticeType.TRIP_APPROVE_NOTICE,
+            username: account.name,
+            planNo: tripPlan.planNo,
+            approveTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            approveUser: account.name,
+            projectName: tripPlan.title,
+            goTrafficBudget: go,
+            backTrafficBudget: back,
+            hotelBudget: hotel,
+            otherBudget: subsidy,
+            totalBudget: '￥' + tripPlan.budget,
+            url: self_url,
+            detailUrl: self_url,
+            appMessageUrl: appMessageUrl,
+            time: moment(tripPlan.startAt).format('YYYY-MM-DD'),
+            destination: tripPlan.arrivalCity,
+            staffName: account.name,
+            startTime: moment(tripPlan.startAt).format('YYYY-MM-DD'),
+            arrivalCity: tripPlan.arrivalCity,
+            budget: tripPlan.budget,
+            tripPlanNo: tripPlan.planNo,
+            approveResult: EApproveResult2Text[EApproveResult.PASS],
+            reason: '',
+            emailReason: '',
+            startAt: moment(tripPlan.startAt).format('MM.DD'),
+            backAt: moment(tripPlan.backAt).format('MM.DD'),
+            deptCity: tripPlan.deptCity,
+        };
+        try {
+            await API.tripApprove.sendApprovePassNoticeToCompany({approveId: approve.id});
+        } catch(err) {
+            console.error(err);
+        }
+        let tplName = 'qm_notify_approve_pass';
+        try {
+            await API.notify.submitNotify({accountId: account.id, key: tplName, values: self_values});
+        } catch(err) {
+            console.error(err);
+        }
+        try {
+            await API.ddtalk.sendLinkMsg({ accountId: account.id, text: '您的预算已审批完成', url: self_url});
+        } catch(err) {
+            console.error(err);
+        }
+
         return tripPlan;
     }
 
@@ -1018,14 +1072,14 @@ class TripPlanModule {
             limit = 10;
         }
         let sql = `select account_id, sum(budget) - sum(expenditure) as save from trip_plan.trip_plans 
-        where deleted_at is null and status = ${EPlanStatus.COMPLETE} AND company_id = '${companyId}' and is_special_approve = false`;
+        where deleted_at is null and status = ${EPlanStatus.COMPLETE} AND company_id = '${companyId}' and is_special_approve = false `;
         if(params.staffId)
             sql += ` and account_id = '${params.staffId}'`;
         if(params.startTime)
             sql += ` and start_at > '${params.startTime}'`;
         if(params.endTime)
             sql += ` and start_at < '${params.endTime}'`;
-        sql += `group by account_id order by save desc limit ${limit};`;
+        sql += ` group by account_id order by save desc limit ${limit};`;
 
         let ranks = await sequelize.query(sql)
             .then(function(result) {
