@@ -90,7 +90,9 @@ export default async function BudgetController($scope, $stateParams, Models) {
             type: $scope.data.monthSelection.type,
             startTime: startTime,
             endTime: endTime,
+            keyWord: $scope.data.monthSelection.keyWord,
         }
+        console.info(obj);
         let ret = await API.tripPlan.statisticBudgetsInfo(obj);
         ret = await Promise.all(ret.map(async (s) => {
             s.keyInfo = await Models[$scope.modelName].get(s.typeKey);
