@@ -1,5 +1,6 @@
 import moment = require('moment');
 import { Staff } from 'api/_types/staff/staff';
+import {EApproveChannel} from "api/_types/approve/types";
 
 var msgbox = require('msgbox');
 
@@ -75,6 +76,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
     }
 
     /*******************出差补助选择end************************/
+    $scope.showSpecialApprove = (!$scope.currentStaff.company.oa || $scope.currentStaff.company.oa == EApproveChannel.QM);
 
     /******住宿打开******/
     $scope.$watch('trip.place',function(n,o){
