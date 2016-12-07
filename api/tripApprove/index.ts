@@ -122,8 +122,6 @@ class TripApproveModule {
             try {
                 await Promise.all(systemNoticeEmails.map(async function(s) {
                     values.name = s.name;
-                    console.info(s);
-                    console.info("系统通知============");
                     try {
                         await API.notify.submitNotify({
                             key: 'qm_notify_system_new_travelbudget',
@@ -241,7 +239,6 @@ class TripApproveModule {
             }
             try {
                 approve_values.noticeType = ENoticeType.TRIP_APPLY_NOTICE;
-                console.info("API.notify.submitNotify===>", approve_values);
                 await API.notify.submitNotify({
                     key: 'qm_notify_new_travelbudget',
                     accountId: approveUser.id,
@@ -364,7 +361,7 @@ class TripApproveModule {
             tripApprove.budgetInfo = budgetInfo.budgets;
         }
 
-        let tripPlan: TripPlan;
+        // let tripPlan: TripPlan;
         let notifyRemark = '';
         let tplName = '';
         let log = TripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id});
@@ -378,7 +375,7 @@ class TripApproveModule {
             tripApprove.status = QMEApproveStatus.PASS;
             tripApprove.approveRemark = '审批通过';
             tripApprove.approvedUsers += `,${staff.id}`;
-            tripPlan = await TripPlanModule.saveTripPlanByApprove({tripApproveId: params.id});
+            //tripPlan = await TripPlanModule.saveTripPlanByApprove({tripApproveId: params.id});
         }else if(isNextApprove){ //指定下一级审批人
             log.approveStatus = EApproveResult.PASS;
             log.save();
@@ -408,9 +405,6 @@ class TripApproveModule {
             let self_url;
             let appMessageUrl;
             if (tripApprove.status == QMEApproveStatus.PASS) {
-                self_url = config.host + '/index.html#/trip/list-detail?tripid=' + tripApprove.id;
-                appMessageUrl = '#/trip/list-detail?tripid=' + tripApprove.id;
-            } else {
                 self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
                 appMessageUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
             }
@@ -424,43 +418,7 @@ class TripApproveModule {
                 console.error(err);
             }
             let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
-            if(approveResult == EApproveResult.PASS){
-                let data = await TripPlanModule.getPlanEmailDetails(tripPlan);
-                go = data.go;
-                back = data.back;
-                hotel = data.hotel;
-                subsidy = data.subsidy;
-                self_values = {
-                    noticeType: ENoticeType.TRIP_APPROVE_NOTICE,
-                    username: user.name,
-                    planNo: tripPlan.planNo,
-                    approveTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-                    approveUser: staff.name,
-                    projectName: tripPlan.title,
-                    goTrafficBudget: go,
-                    backTrafficBudget: back,
-                    hotelBudget: hotel,
-                    otherBudget: subsidy,
-                    totalBudget: '￥' + tripPlan.budget,
-                    url: self_url,
-                    detailUrl: self_url,
-                    appMessageUrl: appMessageUrl,
-                    time: moment(tripPlan.startAt).format('YYYY-MM-DD'),
-                    destination: tripPlan.arrivalCity,
-                    staffName: user.name,
-                    startTime: moment(tripPlan.startAt).format('YYYY-MM-DD'),
-                    arrivalCity: tripPlan.arrivalCity,
-                    budget: tripPlan.budget,
-                    tripPlanNo: tripPlan.planNo,
-                    approveResult: EApproveResult2Text[approveResult],
-                    reason: approveResult,
-                    emailReason: params.approveRemark,
-                    startAt: moment(tripPlan.startAt).format('MM.DD'),
-                    backAt: moment(tripPlan.backAt).format('MM.DD'),
-                    deptCity: tripPlan.deptCity,
-                };
-                await TripApproveModule.sendApprovePassNoticeToCompany({approveId: tripApprove.id});
-            }else if(approveResult == EApproveResult.REJECT){
+            if(approveResult == EApproveResult.REJECT){
                 let details = await TripApproveModule.getDetailsFromApprove({approveId: tripApprove.id});
                 let data = await TripPlanModule.getEmailInfoFromDetails(details);
                 go = data.go;
