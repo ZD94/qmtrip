@@ -52,7 +52,7 @@ class ApproveModule {
     }
 
     @clientExport
-    @requireParams(['query', 'budget'], ['project', 'specialApproveRemark'])
+    @requireParams(['query', 'budget'], ['project', 'specialApproveRemark', 'approveUser'])
     static async submitSpecialApprove(params: {query: any, budget: number, project?: string, specialApproveRemark?: string, approveUser?: Staff}):Promise<Approve> {
         let {query, budget, project, specialApproveRemark, approveUser} = params;
         let submitter = await Staff.getCurrent();
@@ -108,7 +108,7 @@ class ApproveModule {
         //对接第三方OA
         emitter.emit(EVENT.NEW_TRIP_APPROVE, {
             approveNo: approve.id,
-            approveUser: approveUser.id,
+            approveUser: approveUser ? approveUser.id: null,
             submitter: submitter,
             status: EApproveStatus.WAIT_APPROVE,
             oa: oaEnum2Str(channel) || 'qm'
