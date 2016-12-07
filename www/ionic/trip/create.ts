@@ -138,6 +138,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         if ($newVal != $oldVal) {
             $scope.trip.hotelPlaceObj = undefined;
             $scope.trip.hotelPlace = '';
+            $scope.trip.hotelName = '';
         }
     });
 
