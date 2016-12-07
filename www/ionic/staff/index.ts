@@ -1,5 +1,5 @@
 import { Staff, EStaffRole } from 'api/_types/staff/staff';
-import { EPlanStatus, EAuditStatus } from 'api/_types/tripPlan';
+import { EPlanStatus, QMEApproveStatus ,EAuditStatus } from 'api/_types/tripPlan';
 import {getImageUrl} from '../controller';
 var config = require('config');
 export default async function IndexController($scope, Models) {
@@ -19,7 +19,7 @@ export default async function IndexController($scope, Models) {
     $scope.staff = staff;
     $scope.EStaffRole = EStaffRole;
     $scope.EPlanStatus = EPlanStatus;
-    $scope.EAuditStatus = EAuditStatus;
+    $scope.QMEApproveStatus = QMEApproveStatus;
     await config.$ready;
     $scope.getImageUrl = getImageUrl;
 }
