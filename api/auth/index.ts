@@ -13,6 +13,7 @@ import * as authentication from './authentication';
 import * as wechat from './wechat';
 import * as messagePush from './messagePush';
 import * as byTest from './by-test';
+import {conditionDecorator, condition} from "../_decorator";
 
 var uuid = require("node-uuid");
 var C = require("config");
@@ -741,6 +742,22 @@ export default class ApiAuth {
         var options: any = {};
         options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt", "loginFailTimes", "lastLoginAt", "lastLoginIp", "activeToken", "pwdToken", "oldQrcodeToken", "qrcodeToken", "type", "isFirstLogin", "isValidateEmail", "isValidateMobile"];
         var acc = await Models.account.get(id, options);
+        return acc;
+    }
+
+    /**
+     * 由id查询账户信息
+     * @param id
+     * @returns {*}
+     */
+    @requireParams(["id"])
+    @conditionDecorator([
+        {if: condition.isMySelf("0.id")},
+        {if: condition.isMySelf("0.id")}
+    ])
+    static async getPrivateInfo(params) {
+        var id = params.id;
+        var acc = await Models.account.get(id);
         return acc;
     }
 

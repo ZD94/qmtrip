@@ -58,22 +58,25 @@ export async function ListController($scope , $stateParams, Models){
     }
 
     $scope.vm = vm;
-    $scope.filter = 'ALL';
-    $scope.EPlanStatus = EPlanStatus;
 
+    $scope.EPlanStatus = EPlanStatus;
+    if($stateParams.status){
+        $scope.filter = EPlanStatus[$stateParams.status];
+    }else{
+        $scope.filter = 'ALL';
+    }
     $scope.changeTo = async function(filter){
         $scope.tripPlans = [];
-        if (['WAIT_UPLOAD', 'ALL', 'AUDITING', 'TRIP_FAIL', 'TRIP_SUCCESS'].indexOf(filter) >= 0) {
+        if (['WAIT_UPLOAD', 'ALL', 'AUDITING', 'AUDIT_NOT_PASS', 'COMPLETE'].indexOf(filter) >= 0) {
             $scope.filter = filter;
         }
-
         let PlanStatus: any = {$notIn: [EPlanStatus.COMPLETE, EPlanStatus.NO_BUDGET]};
         switch(filter) {
             case 'ALL': PlanStatus = {$notIn: [EPlanStatus.COMPLETE, EPlanStatus.NO_BUDGET]};break;
             case 'WAIT_UPLOAD': PlanStatus = {$in: [EPlanStatus.WAIT_UPLOAD, EPlanStatus.WAIT_COMMIT]}; break;
             case 'AUDITING': PlanStatus = EPlanStatus.AUDITING; break;
-            case 'TRIP_FAIL': PlanStatus = EPlanStatus.AUDIT_NOT_PASS; break;
-            case 'TRIP_SUCCESS': PlanStatus = EPlanStatus.COMPLETE; break;
+            case 'AUDIT_NOT_PASS': PlanStatus = EPlanStatus.AUDIT_NOT_PASS; break;
+            case 'COMPLETE': PlanStatus = EPlanStatus.COMPLETE; break;
         }
         let where:any = {
             status: PlanStatus
