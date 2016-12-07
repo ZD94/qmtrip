@@ -918,6 +918,7 @@ class TripPlanModule {
         tripPlan.status = EPlanStatus.WAIT_UPLOAD;
         tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo'); //获取出差计划单号
         tripPlan.query = query;
+        tripPlan.isSpecialApprove = approve.isSpecialApprove;
 
         //计算总预算
         let totalBudget = budgets
