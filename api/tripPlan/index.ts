@@ -1072,14 +1072,14 @@ class TripPlanModule {
             limit = 10;
         }
         let sql = `select account_id, sum(budget) - sum(expenditure) as save from trip_plan.trip_plans 
-        where deleted_at is null and status = ${EPlanStatus.COMPLETE} AND company_id = '${companyId}' and is_special_approve = false`;
+        where deleted_at is null and status = ${EPlanStatus.COMPLETE} AND company_id = '${companyId}' and is_special_approve = false `;
         if(params.staffId)
             sql += ` and account_id = '${params.staffId}'`;
         if(params.startTime)
             sql += ` and start_at > '${params.startTime}'`;
         if(params.endTime)
             sql += ` and start_at < '${params.endTime}'`;
-        sql += `group by account_id order by save desc limit ${limit};`;
+        sql += ` group by account_id order by save desc limit ${limit};`;
 
         let ranks = await sequelize.query(sql)
             .then(function(result) {
