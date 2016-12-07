@@ -23,7 +23,9 @@ export default async function ListAllController($scope, $stateParams) {
     let company = staff.company;
     $scope.EPlanStatus = EPlanStatus;
     $scope.$watch('data.monthSelection',function (o,n) {
-        searchTripPlans();
+        if(o!=n){
+            searchTripPlans();
+        }
     },true);
 
 
