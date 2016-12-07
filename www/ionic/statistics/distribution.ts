@@ -55,8 +55,22 @@ export default async function DistributionController($scope, Models, City) {
         let longitude = 116.404;
         let latitude = 39.915;
         if (markers && markers.length) {
-            longitude = markers[0].longitude;
-            latitude = markers[0].latitude;
+            let stats = {
+                longitude: {min:Number.MAX_VALUE, max:Number.MIN_VALUE},
+                latitude: {min:Number.MAX_VALUE, max:Number.MIN_VALUE},
+            };
+            markers.forEach((m)=>{
+                if(!m.longitude || !m.latitude)
+                    return;
+                stats.longitude.min = Math.min(stats.longitude.min, m.longitude);
+                stats.longitude.max = Math.max(stats.longitude.max, m.longitude);
+                stats.latitude.min = Math.min(stats.latitude.min, m.latitude);
+                stats.latitude.max = Math.max(stats.latitude.max, m.latitude);
+            })
+            if(stats.longitude.min !== Number.MAX_VALUE){
+                longitude = (stats.longitude.min+stats.longitude.max)/2;
+                latitude = (stats.latitude.min+stats.latitude.max)/2;
+            }
         }
         $scope.mapOptions = {
             center: {
