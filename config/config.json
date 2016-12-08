@@ -91,5 +91,9 @@
       "qm_notify_invoice_not_pass": ""
     }
   },
-  "reportHimOAReceive": "peng.wang@jingli.tech"
+  "reportHimOAReceive": "peng.wang@jingli.tech",
+  "duiba": {
+    "appKey" : "3fFDdkKxibDiRjwy9DqaPwasvAup",
+    "appSecret" : "2FaLAocgDodNqCFa9PU8cyCk4Fnw"
+  }
 }

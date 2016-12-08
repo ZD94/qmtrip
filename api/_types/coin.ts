@@ -73,7 +73,7 @@ export class CoinAccount extends ModelObject {
         return await self.save();
     }
 
-    async costCoin(coins: number, remark?: string) : Promise<CoinAccount>{
+    async costCoin(coins: number, remark?: string, duiBaOrderNum?: string) : Promise<any>{
         let self = this;
         let balance = self.balance;
 
@@ -81,10 +81,11 @@ export class CoinAccount extends ModelObject {
             throw new Error(`余额不足`);
         }
 
-        let log = await Models.coinAccountChange.create({type: COIN_CHANGE_TYPE.CONSUME, coinAccountId: self.id, coins: coins, remark: remark});
+        let log = await Models.coinAccountChange.create({type: COIN_CHANGE_TYPE.CONSUME, coinAccountId: self.id, coins: coins, remark: remark, duiBaOrderNum: duiBaOrderNum});
         log = await log.save();
         self.consume = self.consume + coins;
-        return await self.save();
+        let coinAccount = await self.save();
+        return {coinAccount: coinAccount, coinAccountChange: log};
     }
 
     async lockCoin(coins: number, remark?: string) :Promise<CoinAccount>{
@@ -139,4 +140,9 @@ export class CoinAccountChange extends ModelObject {
     @Field({type: Types.TEXT})
     set remark(remark: string) {}
     get remark(): string {return ''}
+
+    @Field({type: Types.STRING})
+    get duiBaOrderNum(): string {return null}
+    set duiBaOrderNum(duiBaOrderNum: string) {}
+
 }
