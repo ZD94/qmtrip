@@ -8,6 +8,7 @@ let C = require("config");
 let API = require("common/api");
 let Logger = require('common/logger');
 let logger = new Logger('company');
+let moment = require('moment');
 
 import {requireParams, clientExport} from "common/api/helper";
 import {Models} from "api/_types";
@@ -89,6 +90,7 @@ class CompanyModule {
         let staff = Staff.create({email: params.email, name: params.userName, mobile: params.mobile, roleId: EStaffRole.OWNER, pwd: md5(pwd), status: params.status, isValidateMobile: params.isValidateMobile});
         let company = Company.create(params);
         company.domainName = domain;
+        company.expiryDate = moment().add(3, 'months').toDate();
         company.isApproveOpen = true;
         let department = Department.create({name: "我的企业", isDefault: true});
 

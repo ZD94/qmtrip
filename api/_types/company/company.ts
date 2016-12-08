@@ -166,6 +166,10 @@ export class Company extends ModelObject{
     get oa() : EApproveChannel { return EApproveChannel.QM}
     set oa(oa: EApproveChannel) {}
 
+    @Field({type: Types.DATE})
+    get expiryDate() : Date { return null; }
+    set expiryDate(val: Date) {}
+
     getStaffs(options?: any): Promise<Staff[]> {
         if(!options) {options = {where: {}}};
         if(!options.where) {options.where = {}};
