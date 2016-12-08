@@ -55,6 +55,7 @@ class NoticeModule{
                 await noticeAccount.save();
 
                 var jId = await API.auth.getJpushIdByAccount({accountId: item});
+                // jId 为数组 可能是一个或多个
                 if(jId){
                     jpushIds = jpushIds.concat(jId);
                 }
@@ -63,8 +64,8 @@ class NoticeModule{
             await API.jpush.pushAppMessage({content: result.description, title: result.title, link: link, jpushId: jpushIds});
 
         }else if(params.sendType == ESendType.ALL_ACCOUNT){
-            // var jpushId = JPush.ALL;
-            // await API.jpush.pushAppMessage({content: result.description, title: result.title, link: link, jpushId: jpushId});
+            var jpushId = JPush.ALL;
+            await API.jpush.pushAppMessage({content: result.description, title: result.title, link: link, jpushId: jpushId});
         }
         return result;
     }
