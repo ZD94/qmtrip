@@ -11,6 +11,7 @@ var API = require("common/api");
 module.exports = function(app) {
     app.get("/costcredit", costCredit);
     app.get("/result/notice", resultNotice);
+    app.get("/addcredit", addCredit);
 };
 
 /**
@@ -26,7 +27,7 @@ async function costCredit(req, res, next) {
     var staff = await Models.staff.get(uid);
     var coinAccount = staff.coinAccount;
     
-    if(!params.appKey || params.appKey != config.duiba.appKey){
+    if(!appKey || appKey != config.duiba.appKey){
         return {
             'status': 'fail',
             'errorMessage': 'appKey错误',
@@ -54,6 +55,13 @@ async function costCredit(req, res, next) {
             'status': 'ok',
             'errorMessage': '',
             'bizId': result.coinAccountChange.id,
+            'credits': coinAccount.balance
+        };
+    }else {
+        return {
+            'status': 'ok',
+            'errorMessage': '',
+            'bizId': coinAccountChanges[0].id,
             'credits': coinAccount.balance
         };
     }
@@ -89,9 +97,64 @@ async function resultNotice(req, res, next) {
             coinAccount.consume = coinAccount.consume - coinAccountChange.coins;
             await coinAccount.save();
             await coinAccountChange.destroy();
+        }else{
+            return true;
         }
     }
 
-    return success;
+    return true;
 
+}
+
+/**
+ * 增加积分
+ * @param req
+ * @param res
+ * @param next
+ * @returns {any}
+ */
+async function addCredit(req, res, next) {
+    var params = req.params;
+    var { uid, credits,appKey,type, timestamp, description, orderNum, sign } = params;
+    var staff = await Models.staff.get(uid);
+    var coinAccount = staff.coinAccount;
+
+    if(!appKey || appKey != config.duiba.appKey){
+        return {
+            'status': 'fail',
+            'errorMessage': 'appKey错误',
+            'credits': coinAccount.balance
+        };
+    }
+    if(params.sign){
+        delete params.sign;
+    }
+
+    var _sign = API.duiba.getSign(params);
+    if(sign != _sign){
+        return {
+            'status': 'fail',
+            'errorMessage': '签名错误',
+            'credits': coinAccount.balance
+        };
+    }
+
+    var coinAccountChanges = await Models.coinAccountChange.find({where: {duiBaOrderNum: orderNum}});
+    //防止订单重复处理
+    if(!coinAccountChanges || coinAccountChanges.length <= 0){
+        var result = await coinAccount.addCoin(credits, description, orderNum);
+        return {
+            'status': 'ok',
+            'errorMessage': '',
+            'bizId': result.coinAccountChange.id,
+            'credits': coinAccount.balance
+        };
+    }else {
+        return {
+            'status': 'ok',
+            'errorMessage': '',
+            'bizId': coinAccountChanges[0].id,
+            'credits': coinAccount.balance
+        };
+    }
 }

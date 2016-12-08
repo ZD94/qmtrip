@@ -356,7 +356,11 @@ export class Staff extends ModelObject implements Account {
     }
     
     async getDuiBaLoginUrl(): Promise<string>{
-        return API.duiba.getLoginUrl();
+        if(!this.isLocal){
+            API.require('duiba');
+            await API.onload();
+        }
+        return API.duiba.getLoginUrl({});
     }
     
 

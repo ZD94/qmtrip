@@ -64,13 +64,14 @@ export class CoinAccount extends ModelObject {
         return Models.coinAccountChange.find(options);
     }
 
-    async addCoin(coins: number, remark?: string) :Promise<CoinAccount> {
+    async addCoin(coins: number, remark?: string, duiBaOrderNum?: string) :Promise<any> {
         let self = this;
         //先记录日志
-        let log = await Models.coinAccountChange.create({type: COIN_CHANGE_TYPE.INCOME, coinAccountId: self.id, coins: coins, remark: remark});
+        let log = await Models.coinAccountChange.create({type: COIN_CHANGE_TYPE.INCOME, coinAccountId: self.id, coins: coins, remark: remark, duiBaOrderNum: duiBaOrderNum});
         log = await log.save();
         self.income = self.income + coins;
-        return await self.save();
+        let coinAccount =  await self.save();
+        return {coinAccount: coinAccount, coinAccountChange: log};
     }
 
     async costCoin(coins: number, remark?: string, duiBaOrderNum?: string) : Promise<any>{

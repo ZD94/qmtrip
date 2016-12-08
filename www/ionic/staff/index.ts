@@ -7,6 +7,9 @@ export default async function IndexController($scope, Models) {
     API.require('tripPlan');
     /*******************判断是否为第一次的登录  史聪************************/
     let staff = await Staff.getCurrent();
+    let url = await staff.getDuiBaLoginUrl();
+    console.info(url);
+    console.info("===========================");
     if(staff.roleId == EStaffRole.OWNER){
         let isFirstLogin = await staff.company.getTravelPolicies();
         if(isFirstLogin.length == 0){
