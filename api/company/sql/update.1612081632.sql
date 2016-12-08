@@ -1,0 +1,1 @@
+update company.companies set expiry_date = now() + interval '3 month';
