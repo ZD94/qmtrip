@@ -9,9 +9,9 @@ var config = require('config');
 var API = require("common/api");
 
 module.exports = function(app) {
-    app.get("/costcredit", costCredit);
-    app.get("/result/notice", resultNotice);
-    app.get("/addcredit", addCredit);
+    app.get("/duiba/costcredit", costCredit);
+    app.get("/duiba/result/notice", resultNotice);
+    app.get("/duiba/addcredit", addCredit);
 };
 
 /**
