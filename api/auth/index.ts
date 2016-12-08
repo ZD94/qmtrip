@@ -740,8 +740,9 @@ export default class ApiAuth {
     static async getAccount(params) {
         var id = params.id;
         var options: any = {};
-        options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt", "loginFailTimes", "lastLoginAt", "lastLoginIp", "activeToken", "pwdToken", "oldQrcodeToken", "qrcodeToken", "type", "isFirstLogin", "isValidateEmail", "isValidateMobile"];
+        // options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt", "loginFailTimes", "lastLoginAt", "lastLoginIp", "activeToken", "pwdToken", "oldQrcodeToken", "qrcodeToken", "type", "isFirstLogin", "isValidateEmail", "isValidateMobile"];
         var acc = await Models.account.get(id, options);
+        delete acc.pwd;
         return acc;
     }
 
@@ -752,7 +753,6 @@ export default class ApiAuth {
      */
     @requireParams(["id"])
     @conditionDecorator([
-        {if: condition.isMySelf("0.id")},
         {if: condition.isMySelf("0.id")}
     ])
     static async getPrivateInfo(params) {
