@@ -82,6 +82,7 @@ angular
                 remark: '@'
             },
             controller: function($scope) {
+                require('./trip-approve.scss');
                 $scope.EInvoiceType = EInvoiceType;
                 $scope.ETripType = ETripType;
                 $scope.MTxPlaneLevel = MTxPlaneLevel;

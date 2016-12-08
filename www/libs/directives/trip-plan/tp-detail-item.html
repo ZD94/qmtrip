@@ -8,50 +8,62 @@
 
     <ion-item class="item-divider" style="background-color:#fff">
         <div ng-if="item.type == ETripType.OUT_TRIP || item.type == ETripType.BACK_TRIP">
-            <span style="font-size: 12px">{{item.deptDateTime | date: 'MM-dd'}}</span>
+            <div>
+                <span style="font-size: 12px">{{item.deptDateTime | date: 'MM-dd'}}</span>
             <span class="spanRight actual-cost">
                 <span>实际:</span>
                 <span>{{item.expenditure | currency_int}}元</span>
             </span>
-            <br>
-            {{item.deptCity}}
-            &nbsp;
-            <i ng-if='item.invoiceType == EInvoiceType.PLANE' class="icon ion-plane"></i>
-            <i ng-if='item.invoiceType == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
-            <i ng-if='item.invoiceType == EInvoiceType.HOTEL' class="icon ion-home"></i>
-            <i ng-if='item.invoiceType == EInvoiceType.OTHER'>-</i>
-            &nbsp;
-            {{item.arrivalCity}}
-
-            <span class="spanRight spanRight-cost personal-cost">
-                <span>个人</span>
-                <span>{{item.personalExpenditure | currency_int}}</span>
-            </span>
-            <span class="spanRight spanRight-cost company-cost">
-                <span>公司</span>
-                <span>{{item.expenditure - item.personalExpenditure | currency_int}}</span>
-            </span>
-
+            </div>
+            <div class="flex-010">
+                <div>
+                    {{item.deptCity}}
+                    &nbsp;
+                    <i ng-if='item.invoiceType == EInvoiceType.PLANE' class="icon ion-plane"></i>
+                    <i ng-if='item.invoiceType == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
+                    <i ng-if='item.invoiceType == EInvoiceType.HOTEL' class="icon ion-home"></i>
+                    <i ng-if='item.invoiceType == EInvoiceType.OTHER'>-</i>
+                    &nbsp;
+                    {{item.arrivalCity}}
+                </div>
+                <div></div>
+                <div>
+                    <span class="spanRight spanRight-cost personal-cost">
+                        <span>个人</span>
+                        <span>{{item.personalExpenditure | currency_int}}</span>
+                    </span>
+                    <span class="spanRight spanRight-cost company-cost">
+                        <span>公司</span>
+                        <span>{{item.expenditure - item.personalExpenditure | currency_int}}</span>
+                    </span>
+                </div>
+            </div>
         </div>
 
         <div ng-if="item.type == ETripType.HOTEL">
-            <span style="font-size: 12px">{{item.checkInDate | date: 'MM-dd'}}至{{item.checkOutDate | date: 'MM-dd'}}(共{{days || 1}}天)</span>
-            <span class="spanRight actual-cost">
-                <span>实际:</span>
-                <span>{{item.expenditure | currency_int}}元</span>
-            </span>
-            <br/>
-            <i class="icon ion-home"></i>{{item.city}}<span ng-if="item.placeName">&nbsp;{{item.placeName}}附近</span>
-
-            <span class="spanRight spanRight-cost personal-cost">
-                <span>个人</span>
-                <span>{{item.personalExpenditure | currency_int}}</span>
-            </span>
-            <span class="spanRight spanRight-cost company-cost">
-                <span>公司</span>
-                <span>{{item.expenditure - item.personalExpenditure | currency_int}}</span>
-            </span>
-
+            <div>
+                <span style="font-size: 12px">{{item.checkInDate | date: 'MM-dd'}}至{{item.checkOutDate | date: 'MM-dd'}}(共{{days || 1}}天)</span>
+                <span class="spanRight actual-cost">
+                    <span>实际:</span>
+                    <span>{{item.expenditure | currency_int}}元</span>
+                </span>
+            </div>
+            <div class="flex-010">
+                <div>
+                    <i class="icon ion-home"></i>{{item.city}}
+                </div>
+                <span class="hotel-name" ng-if="item.placeName">&nbsp;{{item.placeName}}附近</span>
+                <div>
+                    <span class="spanRight spanRight-cost personal-cost">
+                        <span>个人</span>
+                        <span>{{item.personalExpenditure | currency_int}}</span>
+                    </span>
+                    <span class="spanRight spanRight-cost company-cost">
+                        <span>公司</span>
+                        <span>{{item.expenditure - item.personalExpenditure | currency_int}}</span>
+                    </span>
+                </div>
+            </div>
         </div>
 
         <div ng-if="item.type == ETripType.SUBSIDY">
@@ -97,7 +109,8 @@
         <div ng-if="item.type != ETripType.SUBSIDY" class="item-note detail_btn">
             <div ng-if="item.status == EPlanStatus.WAIT_UPLOAD">
                 <div ng-if="isShowUploader">
-                    <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve(item.id)" ng-if="isBeforeStartTime">
+                    <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve(item.id)"
+                       ng-if="isBeforeStartTime">
                         预订
                     </a>
                     <a class="trip_btn button-small botton-outline" ng-click="viewInvoice(item.id)">
@@ -109,7 +122,8 @@
 
             <div ng-if="item.status == EPlanStatus.WAIT_COMMIT">
                 <div ng-if="isShowUploader">
-                    <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve(item.id)" ng-if="isBeforeStartTime">
+                    <a class="trip_btn button-small botton-outline button-positive" ng-click="reserve(item.id)"
+                       ng-if="isBeforeStartTime">
                         退/改签
                     </a>
                     <a class="trip_btn button-small botton-outline" ng-click="searchInvoice(item.id)">
