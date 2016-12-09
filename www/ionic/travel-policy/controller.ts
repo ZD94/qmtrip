@@ -1,5 +1,8 @@
 import { Staff } from 'api/_types/staff/staff';
-import { MHotelLevel, MPlaneLevel, MTrainLevel } from 'api/_types/travelPolicy';
+import {
+    MHotelLevel, MPlaneLevel, MTrainLevel, enumHotelLevelToStr, enumPlaneLevelToStr,
+    enumTrainLevelToStr
+} from 'api/_types/travelPolicy';
 
 var msgbox = require('msgbox');
 
@@ -13,6 +16,10 @@ export async function IndexController($scope, Models, $location, $ionicPopup, $i
     $scope.MHotelLevel = MHotelLevel;
     $scope.MPlaneLevel = MPlaneLevel;
     $scope.MTrainLevel = MTrainLevel;
+    $scope.enumHotelLevelToStr = enumHotelLevelToStr;
+    $scope.enumPlaneLevelToStr = enumPlaneLevelToStr;
+    $scope.enumTrainLevelToStr = enumTrainLevelToStr;
+    
     let ps = travelPolicies.map(async function (policy) {
         var subsidyTemplates = await policy.getSubsidyTemplates();
         if(policy.isDefault){

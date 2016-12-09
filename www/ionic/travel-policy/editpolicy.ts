@@ -20,9 +20,9 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
 
         travelPolicy = TravelPolicy.create();
         travelPolicy.companyId = staff.company.id;
-        travelPolicy.planeLevel = EPlaneLevel.ECONOMY;
-        travelPolicy.trainLevel = ETrainLevel.SECOND_CLASS;
-        travelPolicy.hotelLevel = EHotelLevel.TWO_STAR;
+        travelPolicy.planeLevels = [EPlaneLevel.ECONOMY];
+        travelPolicy.trainLevels = [ETrainLevel.SECOND_CLASS];
+        travelPolicy.hotelLevels = [EHotelLevel.TWO_STAR];
     }
     $scope.travelPolicy = travelPolicy;
     $scope.savePolicy = async function () {

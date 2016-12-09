@@ -369,10 +369,10 @@ export default class ApiTravelBudget {
         }
 
         let cabinClass: string[] = [];
-        if (policy.planeLevel == EPlaneLevel.ECONOMY ) {
+        if (policy.planeLevels && policy.planeLevels.indexOf(EPlaneLevel.ECONOMY) >= 0) {
             cabinClass.push('Economy');
         }
-        if (policy.planeLevel == EPlaneLevel.BUSINESS_FIRST) {
+        if (policy.planeLevels && policy.planeLevels.indexOf(EPlaneLevel.BUSINESS_FIRST) >= 0) {
             cabinClass.push('PremiumEconomy');
             cabinClass.push('Business');
             cabinClass.push('First');

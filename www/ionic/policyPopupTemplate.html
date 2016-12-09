@@ -1,9 +1,14 @@
-<div>飞机: <span>{{MPlaneLevel[policy.planeLevel]}}</span></div>
-<div>火车: <span>{{MTrainLevel[policy.trainLevel]}}</span></div>
-<div>住宿: <span>{{MHotelLevel[policy.hotelLevel]}}</span></div>
+<div>飞机: <span>{{enumPlaneLevelToStr(policy.planeLevels)}}</span></div>
+<div>火车: <span>{{enumTrainLevelToStr(policy.trainLevels)}}</span></div>
+<div>住宿: <span>{{enumHotelLeveenumHotelLevelToStrlToStr(policy.hotelLevels)}}</span></div>
+<div>国外飞机: <span>{{enumPlaneLevelToStr(policy.internalPlaneLevels)}}</span></div>
+<div>国外住宿: <span>{{enumHotelLevelToStr(policy.internalHotelLevels)}}</span></div>
+
 <div class="policySubsidy" ng-if="subsidies.length>0">
     <span>补助: </span>
     <div>
         <p ng-repeat="subsidy in subsidies">&nbsp;{{subsidy.name}}: {{subsidy.subsidyMoney}}元/天</p>
     </div>
+</div>
+</div>
 </div>

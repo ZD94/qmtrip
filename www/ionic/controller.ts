@@ -1,6 +1,9 @@
 "use strict";
 import {Staff, EStaffRole} from 'api/_types/staff';
-import {MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
+import {
+    MHotelLevel, MPlaneLevel, MTrainLevel, enumHotelLevelToStr, enumPlaneLevelToStr,
+    enumTrainLevelToStr
+} from "api/_types/travelPolicy";
 import * as path from 'path';
 
 var API = require('common/api');
@@ -197,6 +200,9 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
         $scope.MTrainLevel = MTrainLevel;
         $scope.MPlaneLevel = MPlaneLevel;
         $scope.MHotelLevel = MHotelLevel;
+        $scope.enumHotelLevelToStr = enumHotelLevelToStr;
+        $scope.enumPlaneLevelToStr = enumPlaneLevelToStr;
+        $scope.enumTrainLevelToStr = enumTrainLevelToStr;
         if (policy) {   //判断是否设置差旅标准
             $ionicPopup.alert({
                 title: '差旅标准',

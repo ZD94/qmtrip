@@ -8,19 +8,31 @@
             </div>
             <div class="item item-body">
                 <div>
-                    <p>飞机：{{MPlaneLevel[policy.policy.planeLevel]}}</p>
+                    <p>飞机：{{enumPlaneLevelToStr(policy.policy.planeLevels)}}</p>
                 </div>
                 <div>
-                    <p>火车：{{MTrainLevel[policy.policy.trainLevel]}}</p>
+                    <p>火车：{{enumTrainLevelToStr(policy.policy.trainLevels)}}</p>
                 </div>
                 <div>
-                    <p>住宿：{{MHotelLevel[policy.policy.hotelLevel]}}</p>
+                    <p>住宿：{{enumHotelLevelToStr(policy.policy.hotelLevels)}}</p>
                 </div>
                 <div ng-if="policy.subsidy.length>0" class="policySubsidy">
                     <span>补助：</span>
                     <div>
                         <p ng-repeat="subsidy in policy.subsidy">{{subsidy.name}}:{{subsidy.subsidyMoney}}元/天</p>
                     </div>
+                </div>
+
+                <div class="spacer" style="width: 300px; height: 18px;"></div>
+                <div>国外标准</div>
+                <div>
+                    <p>飞机：{{enumPlaneLevelToStr(policy.policy.internalPlaneLevels)}}</p>
+                </div>
+                <div>
+                    <p>火车：{{enumTrainLevelToStr(policy.policy.internalTrainLevels)}}</p>
+                </div>
+                <div>
+                    <p>住宿：{{enumHotelLevelToStr(policy.policy.internalHotelLevels)}}</p>
                 </div>
             </div>
         </div>

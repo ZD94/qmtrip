@@ -4,40 +4,57 @@
 </label>
 <label class="item item-input item-select">
     <span class="input-label">飞机舱位</span>
-    <select ng-model="travelPolicy.planeLevel">
-        <option value="1" ng-selected="travelPolicy.planeLevel == 1">公务舱/头等舱</option>
-        <option value="2"  ng-selected="travelPolicy.planeLevel == 2">经济舱</option>
+    <select ng-model="travelPolicy.planeLevels">
+        <option value="1" ng-selected="travelPolicy.planeLevels.indexOf(EPlaneLevel.BUSINESS_FIRST) >= 0">公务舱/头等舱</option>
+        <option value="2"  ng-selected="travelPolicy.planeLevels.indexOf(EPlaneLevel.ECONOMY) >= 0">经济舱</option>
     </select>
 </label>
-<!--<label class="item item-input item-select">
-    <span class="input-label">飞机折扣</span>
-    <select ng-model="travelPolicy.planeDiscount" ng-options="discount.value as discount.text for discount in discounts">
-    </select>
-</label>-->
 <label class="item item-input item-select">
     <span class="input-label">火车</span>
-    <select ng-model="travelPolicy.trainLevel">
-        <option value="1" ng-selected="travelPolicy.trainLevel == 1">商务座/高级软卧</option>
-        <option value="2" ng-selected="travelPolicy.trainLevel == 2">一等座/软卧</option>
-        <option value="3" ng-selected="travelPolicy.trainLevel == 3">二等座/硬卧</option>
+    <select ng-model="travelPolicy.trainLevels">
+        <option value="1" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.BUSINESS)">商务座/高级软卧</option>
+        <option value="2" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.FIRST_CLASS)">一等座/软卧</option>
+        <option value="3" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.SECOND_CLASS)">二等座/硬卧</option>
     </select>
 </label>
 <div class="item item-input item-select">
     <span class="input-label">酒店星级</span>
     <ng-selector-list
             class="fake-input"
-            ng-model="travelPolicy.hotelLevel"
+            ng-model="travelPolicy.hotelLevels"
             dlg-title="酒店星级"
             dlg-options="selectHotalLevel"
     >
     </ng-selector-list>
 </div>
-<!--<label class="item item-input">
-    <span class="input-label">每日标准</span>
-    <input type="text" placeholder="元/晚" ng-model="travelPolicy.hotelPrice">
-</label>-->
+
 <div class="spacer" style="width: 300px; height: 18px;"></div>
-<!--<label class="item item-input">
-    <span class="input-label">补助</span>
-    <input type="text" placeholder="元/天" ng-model="travelPolicy.subsidy">
-</label>-->
+
+<label class="item">国外标准</label>
+
+<label class="item item-input item-select">
+    <span class="input-label">飞机舱位</span>
+    <select ng-model="travelPolicy.internalPlaneLevels">
+        <option value="1" ng-selected="travelPolicy.planeLevels.indexOf(EPlaneLevel.BUSINESS_FIRST) >= 0">公务舱/头等舱</option>
+        <option value="2"  ng-selected="travelPolicy.planeLevels.indexOf(EPlaneLevel.ECONOMY) >= 0">经济舱</option>
+    </select>
+</label>
+
+<label class="item item-input item-select">
+    <span class="input-label">火车</span>
+    <select ng-model="travelPolicy.internalTrainLevels">
+        <option value="1" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.BUSINESS)">商务座/高级软卧</option>
+        <option value="2" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.FIRST_CLASS)">一等座/软卧</option>
+        <option value="3" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.SECOND_CLASS)">二等座/硬卧</option>
+    </select>
+</label>
+<div class="item item-input item-select">
+    <span class="input-label">酒店星级</span>
+    <ng-selector-list
+            class="fake-input"
+            ng-model="travelPolicy.internalHotelLevels"
+            dlg-title="酒店星级"
+            dlg-options="selectHotalLevel"
+    >
+    </ng-selector-list>
+</div>
