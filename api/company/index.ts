@@ -15,7 +15,7 @@ import {requireParams, clientExport} from "common/api/helper";
 import {Models} from "api/_types";
 import {Company, MoneyChange, Supplier} from 'api/_types/company';
 import {Staff, EStaffRole} from "api/_types/staff";
-import {PromoCode} from "api/_types/PromoCode";
+import {PromoCode} from "api/_types/promoCode";
 import {Agency, AgencyUser, EAgencyUserRole} from "api/_types/agency";
 import {Department} from "api/_types/department";
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "api/_decorator";
