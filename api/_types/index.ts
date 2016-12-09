@@ -2,6 +2,7 @@
 import { Company, MoneyChange, Supplier } from "./company";
 import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from "./staff";
 import { TravelPolicy, SubsidyTemplate } from './travelPolicy';
+import { PromoCode } from './promoCode';
 import { Department } from './department';
 import { AccordHotel } from './accordHotel';
 import { Notice, NoticeAccount } from './notice';
@@ -42,6 +43,7 @@ export interface ModelsInterface {
     moneyChange: ModelInterface<MoneyChange>;
     supplier: ModelInterface<Supplier>;
 
+    promoCode: ModelInterface<PromoCode>;
     department: ModelInterface<Department>;
     travelPolicy: ModelInterface<TravelPolicy>;
     subsidyTemplate: ModelInterface<SubsidyTemplate>;
@@ -89,6 +91,7 @@ export var Models: ModelsInterface = {
     moneyChange: new ModelDelegate<MoneyChange>(),
     supplier: new ModelDelegate<Supplier>(),
 
+    promoCode: new ModelDelegate<PromoCode>(),
     department: new ModelDelegate<Department>(),
     travelPolicy: new ModelDelegate<TravelPolicy>(),
     subsidyTemplate: new ModelDelegate<SubsidyTemplate>(),
@@ -135,6 +138,7 @@ export * from "./company";
 export * from "./staff";
 export * from './travelPolicy';
 export * from './department';
+export * from './promoCode';
 export * from './accordHotel';
 export * from './agency';
 export * from './tripPlan';

@@ -10,6 +10,7 @@ import {ModelRemote, ModelRemoteOld} from 'common/model/remote';
 import { ngService } from '../index';
 import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from 'api/_types/staff';
 import { Company, MoneyChange, Supplier } from 'api/_types/company';
+import { PromoCode } from 'api/_types/promoCode';
 import { Department } from 'api/_types/department';
 import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
 import { AccordHotel } from 'api/_types/accordHotel';
@@ -66,6 +67,9 @@ var Services = {
     },
     supplier: { type: Supplier, modname: 'company',
         funcs: ['getSupplier', 'getSuppliers', 'createSupplier', 'updateSupplier', 'deleteSupplier']
+    },
+    promoCode: { type: PromoCode, modname: 'promoCode',
+        funcs: ['getPromoCode', 'getPromoCodes', 'createPromoCode', 'updatePromoCode', 'deletePromoCode']
     },
     department: { type: Department, modname: 'department',
         funcs: ['getDepartment', 'getDepartments', 'createDepartment', 'updateDepartment', 'deleteDepartment']
@@ -162,6 +166,7 @@ class ClientModels implements ModelsInterface {
     staffSupplierInfo:ModelInterface<StaffSupplierInfo>;
     company: ModelInterface<Company>;
     supplier: ModelInterface<Supplier>;
+    promoCode: ModelInterface<PromoCode>;
     department: ModelInterface<Department>;
     travelPolicy: ModelInterface<TravelPolicy>;
     subsidyTemplate: ModelInterface<SubsidyTemplate>;
@@ -204,6 +209,7 @@ class ClientModels implements ModelsInterface {
         this.invitedLink = createService<InvitedLink>(Services.invitedLink, $cacheFactory);
         this.staffSupplierInfo = createService<StaffSupplierInfo>(Services.staffSupplierInfo, $cacheFactory);
         this.company = createService<Company>(Services.company, $cacheFactory);
+        this.promoCode = createService<PromoCode>(Services.promoCode, $cacheFactory);
         this.department = createService<Department>(Services.department, $cacheFactory);
         this.travelPolicy = createService<TravelPolicy>(Services.travelPolicy, $cacheFactory);
         this.subsidyTemplate = createService<SubsidyTemplate>(Services.subsidyTemplate, $cacheFactory);
