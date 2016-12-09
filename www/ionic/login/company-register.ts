@@ -94,9 +94,9 @@ export async function CompanyRegisterController ($scope, $stateParams){
                 let expiryDate = moment(result.company.expiryDate).format('YYYY年MM月DD日');
                 let decrib = result.description;
                 if(decrib){
-                    window.location.href = '#/login/company-welcome?company='+result.name+'&expiryDate='+expiryDate+'&decrib='+decrib;
+                    window.location.href = '#/login/company-welcome?company='+result.company.name+'&expiryDate='+expiryDate+'&decrib='+decrib;
                 }else{
-                    window.location.href = '#/login/company-welcome?company='+result.name+'&expiryDate='+expiryDate;
+                    window.location.href = '#/login/company-welcome?company='+result.company.name+'&expiryDate='+expiryDate;
                 }
 
                 // window.location.href = "index.html#/login/company-register-success?company="+result.name;
