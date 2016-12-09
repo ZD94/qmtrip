@@ -2,8 +2,11 @@
     <ion-content class="text-center" padding="false">
         <div class="spacer" style="height:50px"></div>
         <h3 style="color:white">恭喜你已成功创建企业</h3>
-        <div class="spacer" style="height:50px"></div>
-        <div style="color:white;background-color: #7b75b8;height:50px;line-height: 50px">{{companyName}}</div>
+        <div class="spacer" style="height:30px"></div>
+        <p style="color:white">产品使用期至:{{params.expiryDate}}</p>
+        <p style="color:white">{{decrib}}</p>
+        <div class="spacer" style="height:20px"></div>
+        <div style="color:white;background-color: #7b75b8;height:50px;line-height: 50px">{{params.companyName}}</div>
         <div class="spacer" style="height:25px"></div>
         <a class="button button-calm button-block" style="margin-left: 10px;margin-right: 10px" ng-click="goLogin()" >开启智能商旅</a>
         <div class="spacer" style="height:25px"></div>
