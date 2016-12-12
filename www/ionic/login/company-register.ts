@@ -3,11 +3,11 @@ import moment = require('moment');
 var msgbox = require('msgbox');
 
 export async function CompanyRegisterController ($scope, $stateParams){
-
     API.require("checkcode");
     API.require("auth");
     await API.onload();
     require("./company-register.scss");
+    $scope.disable = false;
     $scope.form = {
         mobile:'',
         msgCode:'',
@@ -15,6 +15,11 @@ export async function CompanyRegisterController ($scope, $stateParams){
         name:'',
         userName:''
     };
+    if($stateParams.promoCode){
+        console.info('disable');
+        $scope.disable = true;
+        $scope.form.promoCode = $stateParams.promoCode;
+    }
     $scope.showCount = false;
     $scope.beginCountDown = function(){
         $scope.showCount = true;
@@ -86,7 +91,14 @@ export async function CompanyRegisterController ($scope, $stateParams){
 
         API.auth.registerCompany($scope.form)
             .then(function (result) {
-                window.location.href = '#/login/company-welcome?company='+result.name;
+                let expiryDate = moment(result.company.expiryDate).format('YYYY年MM月DD日');
+                let decrib = result.description;
+                if(decrib){
+                    window.location.href = '#/login/company-welcome?company='+result.company.name+'&expiryDate='+expiryDate+'&decrib='+decrib;
+                }else{
+                    window.location.href = '#/login/company-welcome?company='+result.company.name+'&expiryDate='+expiryDate;
+                }
+
                 // window.location.href = "index.html#/login/company-register-success?company="+result.name;
             })
             .catch(function(err){

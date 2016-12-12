@@ -17,6 +17,8 @@ import promise = require("common/test/api/promise/index");
 import {EApproveChannel, EApproveStatus, EApproveType} from "../approve/types";
 import {emitter} from "../../../libs/oa/emitter";
 import {EVENT} from "../../../libs/oa/index";
+import L from 'common/language';
+let promoCodeType = require('libs/promoCodeType');
 declare var API: any;
 
 export enum ECompanyStatus {
@@ -166,6 +168,10 @@ export class Company extends ModelObject{
     get oa() : EApproveChannel { return EApproveChannel.QM}
     set oa(oa: EApproveChannel) {}
 
+    @Field({type: Types.DATE})
+    get expiryDate() : Date { return null; }
+    set expiryDate(val: Date) {}
+
     getStaffs(options?: any): Promise<Staff[]> {
         if(!options) {options = {where: {}}};
         if(!options.where) {options.where = {}};
@@ -191,6 +197,27 @@ export class Company extends ModelObject{
             return tps[0];
         }else{
             return null;
+        }
+    }
+
+    @RemoteCall()
+    async doPromoCode(params:{code: string}): Promise<any> {
+        let promoCodes = await Models.promoCode.find({where : {code: params.code}});
+        if( promoCodes && promoCodes.length > 0 ){
+            let promoCode = promoCodes[0];
+            if(promoCode.expiryDate && promoCode.expiryDate.getTime() - new Date().getTime() < 0 ){
+                throw L.ERR.INVALID_PROMO_CODE();
+            }
+            let params = promoCode.params;
+            params.companyId = this.id;
+            let result = await promoCodeType[promoCode.type].execute(params);
+
+            let times = promoCode.times || 0;
+            promoCode.times = times+1;
+            await promoCode.save();
+            return promoCode;
+        }else{
+            throw L.ERR.INVALID_PROMO_CODE();
         }
     }
 

@@ -486,14 +486,14 @@ export default class ApiAuth {
 
 
     /**
-     * 企业注册【待用】
+     * 企业注册
      * @param params
      * @returns {Promise<TResult>|Promise<U>}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'userName', 'pwd', 'msgCode', 'msgTicket'], ['email', 'agencyId', 'remark', 'description'])
+    @requireParams(['mobile', 'name', 'userName', 'pwd', 'msgCode', 'msgTicket'], ['email', 'agencyId', 'remark', 'description', 'promoCode'])
     static async registerCompany(params: {name: string, userName: string, email?: string, mobile: string, pwd: string,
-        msgCode: string, msgTicket: string, agencyId?: string}) {
+        msgCode: string, msgTicket: string, agencyId?: string, promoCode?: string}) {
         var companyName = params.name;
         var name = params.userName;
         var email = params.email;
@@ -528,16 +528,17 @@ export default class ApiAuth {
 
         await API.auth.checkEmailAndMobile({email: email, mobile: mobile});
         await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
-        var company = await API.company.registerCompany({
+        var result = await API.company.registerCompany({
             mobile: mobile,
             email: email,
             name: companyName,
             userName: name,
             pwd: pwd,
             status: ACCOUNT_STATUS.ACTIVE,
-            isValidateMobile: true
+            isValidateMobile: true,
+            promoCode: params.promoCode
         });
-        return company;
+        return result;
     }
 
     /**
@@ -740,8 +741,9 @@ export default class ApiAuth {
     static async getAccount(params) {
         var id = params.id;
         var options: any = {};
-        options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt", "loginFailTimes", "lastLoginAt", "lastLoginIp", "activeToken", "pwdToken", "oldQrcodeToken", "qrcodeToken", "type", "isFirstLogin", "isValidateEmail", "isValidateMobile"];
+        // options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt", "loginFailTimes", "lastLoginAt", "lastLoginIp", "activeToken", "pwdToken", "oldQrcodeToken", "qrcodeToken", "type", "isFirstLogin", "isValidateEmail", "isValidateMobile"];
         var acc = await Models.account.get(id, options);
+        delete acc.pwd;
         return acc;
     }
 
@@ -752,7 +754,6 @@ export default class ApiAuth {
      */
     @requireParams(["id"])
     @conditionDecorator([
-        {if: condition.isMySelf("0.id")},
         {if: condition.isMySelf("0.id")}
     ])
     static async getPrivateInfo(params) {
