@@ -16,7 +16,7 @@
                         <div class="time-value"><span class="time-weekday">周{{weekDayNames[result.end.date.getDay()]}}</span> {{result.end.date|date:'MM-dd HH:mm'}}</div>
                     </div>
                 </div>
-                <div ng-class="{month_2col:month_2col}">
+                <div class="month-block" ng-class="{month_2col:month_2col}">
                     <div class="week-7col">
                         <div class="week-header" ng-repeat="weekday in weekDayNames">{{weekday}}</div>
                     </div>
@@ -26,19 +26,12 @@
                 </div>
             </div>
             <ion-scroll overflow-scroll="false" has-bouncing="true">
-                <div ng-class="{month_2col:month_2col}">
+                <div class="month-block" ng-class="{month_2col:month_2col}">
                     <div ng-repeat="month in months">
-                        <div class="month-title">{{month.year}}年{{month.month}}月</div>
-                        <div class="week-7col">
-                            <div ng-repeat="day in month.days">
-                                <ng-selector-date-day ng-modal="day"
-                                                      ng-style="{'visibility': month.month == day.month ? 'visible' : 'hidden'}"
-                                                      ng-click="confirm(day)"
-                                                      ng-day-options="dayOptions"
-                                >
-                                </ng-selector-date-day>
-                            </div>
-                        </div>
+                        <ng-selector-date-month ng-modal="month"
+                                                ng-date-options="dayOptions"
+                                                ng-select-day="confirm"
+                        ></ng-selector-date-month>
                     </div>
                 </div>
                 <ion-infinite-scroll
