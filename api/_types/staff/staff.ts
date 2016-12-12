@@ -354,6 +354,15 @@ export class Staff extends ModelObject implements Account {
         result[ENoticeType.ACTIVITY_NOTICE] = {unReadNum: num4, latestInfo: latestObj4};
         return result;
     }
+    
+    async getDuiBaLoginUrl(): Promise<string>{
+        if(!this.isLocal){
+            API.require('duiba');
+            await API.onload();
+        }
+        return API.duiba.getLoginUrl({});
+    }
+    
 
     @RemoteCall()
     async testServerFunc(){

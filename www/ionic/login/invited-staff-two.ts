@@ -102,6 +102,14 @@ export async function InvitedStaffTwoController ($scope, $stateParams){
             msgbox.log("不能包含特殊字符");
             return;
         }
+
+        var namePattern = /[\u4e00-\u9fa5]+/g;
+        var hasChinese = namePattern.test($scope.form.name);
+        if(($scope.form.name).length > 5 && hasChinese){
+            msgbox.log("姓名不可超过五个字符");
+            return;
+        }
+
         var pwdPattern = /^[0-9a-zA-Z]*$/g;
         var newPwd = $scope.form.pwd;
         if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >20){

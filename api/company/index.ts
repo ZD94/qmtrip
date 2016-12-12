@@ -8,11 +8,14 @@ let C = require("config");
 let API = require("common/api");
 let Logger = require('common/logger');
 let logger = new Logger('company');
+let moment = require('moment');
+let promoCodeType = require('libs/promoCodeType');
 
 import {requireParams, clientExport} from "common/api/helper";
 import {Models} from "api/_types";
 import {Company, MoneyChange, Supplier} from 'api/_types/company';
 import {Staff, EStaffRole} from "api/_types/staff";
+import {PromoCode} from "api/_types/promoCode";
 import {Agency, AgencyUser, EAgencyUserRole} from "api/_types/agency";
 import {Department} from "api/_types/department";
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "api/_decorator";
@@ -57,9 +60,9 @@ class CompanyModule {
      * @returns {Promise<Company>}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'pwd', 'userName'], ['email', 'status', 'remark', 'description', 'isValidateMobile'])
+    @requireParams(['mobile', 'name', 'pwd', 'userName'], ['email', 'status', 'remark', 'description', 'isValidateMobile', 'promoCode'])
     static async registerCompany(params: {mobile: string, name: string, email?: string,
-        userName: string, pwd?: string, status?: number, remark?: string, description?: string, isValidateMobile?: boolean}): Promise<Company>{
+        userName: string, pwd?: string, status?: number, remark?: string, description?: string, isValidateMobile?: boolean, promoCode?: string}): Promise<any>{
         let session = Zone.current.get('session');
         let pwd = params.pwd;
         let agencyId = Agency.__defaultAgencyId;
@@ -89,6 +92,7 @@ class CompanyModule {
         let staff = Staff.create({email: params.email, name: params.userName, mobile: params.mobile, roleId: EStaffRole.OWNER, pwd: md5(pwd), status: params.status, isValidateMobile: params.isValidateMobile});
         let company = Company.create(params);
         company.domainName = domain;
+        company.expiryDate = moment().add(3, 'months').toDate();
         company.isApproveOpen = true;
         let department = Department.create({name: "我的企业", isDefault: true});
 
@@ -99,8 +103,12 @@ class CompanyModule {
         company['agencyId'] = agencyId;
 
         await Promise.all([staff.save(), company.save(), department.save()]);
+        let promoCode: PromoCode;
+        if(params.promoCode){
+            promoCode = await company.doPromoCode({code: params.promoCode});
+        }
 
-        return company;
+        return {company: company, description: promoCode.description};
     }
 
 
