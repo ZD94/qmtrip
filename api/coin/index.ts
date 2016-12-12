@@ -12,7 +12,7 @@ import {CoinAccount} from "api/_types/coin";
 
 class CoinModule {
 
-    @requireParams(["companyId", "coin"], ['remark'])
+    @requireParams(["companyId", "coins"], ['remark'])
     static async companyCharge(params: ICompanyChargeParam) :Promise<CoinAccount>{
         let {companyId, coins, remark} = params;
         if (!remark) {
@@ -99,3 +99,12 @@ function getOrderNo() : string {
 }
 
 export=CoinModule
+
+
+setTimeout( ()=> {
+    CoinModule.companyCharge({
+        companyId: '00000001-0000-0000-0000-000012341237',
+        coins: 1000,
+        remark: '测试'
+    })
+}, 1000)
