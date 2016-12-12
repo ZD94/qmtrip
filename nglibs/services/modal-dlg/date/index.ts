@@ -84,9 +84,9 @@ function getMonth(year, month): MonthData {
         return monthCache[key];
     let ret = {year, month, days: []};
     let caldata = LunarCalendar.calendar(year, month, true);
-    //if(caldata.monthData[caldata.monthData.length-7].month != month){
-    //    caldata.monthData.splice(caldata.monthData.length-7);
-    //}
+    if(caldata.monthData[caldata.monthData.length-7].month != month){
+       caldata.monthData.splice(caldata.monthData.length-7);
+    }
     ret.days = caldata.monthData.map(function(day) {
         let festival;
         if(day.lunarFestival && lunarFest[day.lunarFestival]) {
@@ -378,22 +378,10 @@ export function selectDateSpanController($scope, $element, $ionicPopup, $ionicSc
 
 
 function fixMonths($scope) {
-    if($scope.month_2col) {
-        for(let i = 1; i < $scope.months.length; i += 2) {
-            let m1 = $scope.months[i - 1];
-            let m2 = $scope.months[i];
-            if(m1.days[m1.days.length - 7].month != m1.month
-                && m2.days[m2.days.length - 7].month != m2.month) {
-                m1.days.splice(m1.days.length - 7);
-                m2.days.splice(m2.days.length - 7);
-            }
-        }
-    } else {
-        for(let i = 0; i < $scope.months.length; i++) {
-            let m1 = $scope.months[i];
-            if(m1.days[m1.days.length - 7].month != m1.month) {
-                m1.days.splice(m1.days.length - 7);
-            }
+    for(let i = 0; i < $scope.months.length; i++) {
+        let m1 = $scope.months[i];
+        if(m1.days[m1.days.length - 7].month != m1.month) {
+            m1.days.splice(m1.days.length - 7);
         }
     }
     $scope.$broadcast('scroll.infiniteScrollComplete');
@@ -417,7 +405,9 @@ function loadMonths($scope, $element, $ionicScrollDelegate) {
     $scope.$on('modal.shown', function() {
         if($element.width() > 640)
             $scope.month_2col = true;
-        fixMonths($scope);
+        //fixMonths($scope);
+        $scope.$broadcast('scroll.infiniteScrollComplete');
+
     });
     $scope.months = [];
     $scope.$watchGroup([
@@ -475,8 +465,8 @@ function loadMonths($scope, $element, $ionicScrollDelegate) {
     $scope.loadNextMonth = function() {
         loadNextMonth();
         loadNextMonth();
-        fixMonths($scope);
-        //$scope.$broadcast('scroll.infiniteScrollComplete');
+        //fixMonths($scope);
+        $scope.$broadcast('scroll.infiniteScrollComplete');
     }
 
 }

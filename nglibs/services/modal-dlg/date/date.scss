@@ -64,12 +64,17 @@ $color-rest-bg: #3CA9D7;
     &.month_2col{
       display: block;
       overflow: hidden;
+      line-height: 1px;
       > *{
-        float: left;
+        line-height: initial;
+        //float: left;
         display: inline-block;
         width: 50%;
       }
 
+      > *:nth-child(2n+1){
+        float: left;
+      }
       > *:nth-child(2n){
         border-left: $border;
       }
@@ -81,9 +86,9 @@ $color-rest-bg: #3CA9D7;
   }
   .week-7col {
     display: block;
-    //flex-wrap: wrap;
+    overflow: hidden;
     > * {
-      display: inline-block;
+      float: left;
       width: 14.2857%;
     }
   }
@@ -122,12 +127,6 @@ $color-rest-bg: #3CA9D7;
 }
 
 .ng-modal-select-date-month-element{
-  .week-element{
-    display: flex;
-    > * {
-      flex: 1;
-    }
-  }
 }
 
 .ng-modal-select-date-day-element {
