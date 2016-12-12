@@ -6,6 +6,9 @@
     height:50px;
     line-height: 50px;
   }
+  p{
+    color: #fff;
+  }
   .begin-travel{
     margin-left: 10px;
     margin-right: 10px
@@ -13,6 +16,14 @@
   a.button{
     margin-left: 10px;
     margin-right: 10px;
+  }
+  .qr-code{
+    width: 160px;
+  }
+  @media (max-width: 320px) {
+    .qr-code{
+      width: 128px;
+    }
   }
 }
 
