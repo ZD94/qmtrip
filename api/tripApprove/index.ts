@@ -404,10 +404,8 @@ class TripApproveModule {
             //发送审核结果邮件
             let self_url;
             let appMessageUrl;
-            if (tripApprove.status == QMEApproveStatus.PASS) {
-                self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
-                appMessageUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
-            }
+            self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
+            appMessageUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
             let user = tripApprove.account;
             if(!user) user = await Models.staff.get(tripApprove['accountId']);
             let go = {},back = {},hotel = {},subsidy = {};
