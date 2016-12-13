@@ -35,7 +35,8 @@ export const createInstance = function(opts, element, cb) {
         map.centerAndZoom(new BMap.Point(opts.center.longitude, opts.center.latitude), opts.zoom);
     }
     // set the city name
-    map.setCurrentCity(opts.city);
+    // map.setCurrentCity(opts.city);
+    map.setCurrentCity(new BMap.Point(opts.center.longitude, opts.center.latitude));
 };
 
 export const createMarker = function(marker, pt) {
