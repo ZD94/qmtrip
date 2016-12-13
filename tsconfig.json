@@ -1,10 +1,11 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "target": "ES6",
+    "target": "ES2015",
     "module": "commonjs",
     "outDir": "tmp/tsreq",
     "noEmitHelpers": true,
+    "importHelpers": true,
     "sourceMap": true,
     "declaration": true,
     "experimentalDecorators": true,
@@ -13,7 +14,8 @@
     "baseUrl": ".",
     "paths": {
       "*": ["*", "*/index", "common/client/*", "common/client/*/index"]
-    }
+    },
+    "lib": ["ES2015", "DOM"]
   },
   "compilerOptionsNotUsing": {
     "emitDecoratorMetadata": true,

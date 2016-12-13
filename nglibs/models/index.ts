@@ -242,8 +242,9 @@ class ClientModels implements ModelsInterface {
 
     clearCache(){
         for(let k in this){
-            if(this[k] instanceof ModelCached)
-                this[k].clearCache();
+            let v = this[k];
+            if(v instanceof ModelCached)
+                v.clearCache();
         }
     }
 }
