@@ -47,10 +47,16 @@ angular
                 title: '@dlgTitle',
                 placeholder: '@dlgPlaceholder',
                 city: '<dlgPlace',
+                longitude: '<dlgLongitude',
+                latitude: '<dlgLatitude',
                 options: '=dlgOptions'
             },
             controller: function($scope, ngModalDlg) {
                 $scope.showSelectorDlg = async function() {
+                    if ($scope.latitude && $scope.longitude) {
+                        $scope.options.latitude = $scope.latitude;
+                        $scope.options.longitude = $scope.longitude;
+                    }
                     $scope.options.city = $scope.city;
                     var value: any = await ngModalDlg.selectMapPoint($scope, $scope.options, $scope.value)
                     if(value == undefined)
