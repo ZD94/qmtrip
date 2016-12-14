@@ -65,6 +65,9 @@ interface DayData {
     festival: string;
     term: string;
     worktime: number;
+    flags: {
+        [key:string]: boolean;
+    };
 }
 
 interface MonthData {
@@ -81,9 +84,9 @@ function getMonth(year, month): MonthData {
         return monthCache[key];
     let ret = {year, month, days: []};
     let caldata = LunarCalendar.calendar(year, month, true);
-    //if(caldata.monthData[caldata.monthData.length-7].month != month){
-    //    caldata.monthData.splice(caldata.monthData.length-7);
-    //}
+    if(caldata.monthData[caldata.monthData.length-7].month != month){
+       caldata.monthData.splice(caldata.monthData.length-7);
+    }
     ret.days = caldata.monthData.map(function(day) {
         let festival;
         if(day.lunarFestival && lunarFest[day.lunarFestival]) {
@@ -108,25 +111,61 @@ function getMonth(year, month): MonthData {
             lunar: day.lunarDay == 1 ? day.lunarMonthName : day.lunarDayName,
             festival: festival,
             term: day.term,
+            label: '',
+            flags: {},
         }
     });
+    for(let i=0;i<ret.days.length;i++){
+        let day = ret.days[i];
+        let w = i%7;
+        day.flags.notthismonth = day.month != ret.month;
+        if(w==0 || w==6)
+            day.flags.weekend = true;
+        if(day.worktime == 1){
+            day.flags.workday = true;
+        } else if(day.worktime == 2){
+            day.flags.restday = true;
+        }
+        if(day.festival){
+            day.flags.festival = true;
+            day.label = day.festival;
+        }
+        else if(day.term){
+            day.flags.term = true;
+            day.label = day.term;
+        }
+        else{
+            day.flags.lunar = true;
+            day.label = day.lunar;
+        }
+    }
     monthCache[key] = ret;
     return ret;
 }
 
 angular
     .module('nglibs')
+    .directive('ngSelectorDateMonth', function() {
+        return {
+            template: require('./date-month.html'),
+            scope: {
+                month: '=ngModal',
+                options: '<ngDateOptions',
+                selectDay: '<ngSelectDay',
+            },
+            controller: selectorDateMonthController
+        }
+    })
     .directive('ngSelectorDateDay', function() {
         return {
-            template: require('./day-element.html'),
+            template: require('./date-day.html'),
             scope: {
                 day: '=ngModal',
-                options: '=ngDayOptions',
+                options: '<ngDateOptions',
             },
             controller: selectorDateDayController
         }
     });
-
 
 function checkExpired(timestamp, valid){
     if(!valid)
@@ -136,6 +175,28 @@ function checkExpired(timestamp, valid){
     if(valid.end && valid.end <= timestamp)
         return true;
     return false;
+}
+function getWeeks(month){
+    let weeks = []
+    let weekcount = month.days.length/7;
+    for(let w=0; w<weekcount; w++){
+        let week = [];
+        for(let d=0; d<7; d++){
+            let day = month.days[w*7+d];
+            week.push(day);
+        }
+        weeks.push(week);
+    }
+    return weeks;
+}
+
+function selectorDateMonthController($scope){
+    $scope.weeks = getWeeks($scope.month);
+    $scope.$watch('month.days.length', function(o, n){
+        if(o == n)
+            return;
+        $scope.weeks = getWeeks($scope.month);
+    })
 }
 
 function selectorDateDayController($scope){
@@ -195,11 +256,13 @@ function parseDateSelect(date: Date, timeScale: number): DateSelect{
     };
 }
 
+let t0;
+function log_time(desc){
+    let t1 = Date.now();
+    console.info('time log:', t1-t0, desc);
+}
 function calendarController($scope, $element, value, $ionicScrollDelegate){
-    initLunarCalendar();
-
-    loadMonths($scope, $element, $ionicScrollDelegate);
-
+    t0 = Date.now();
     let timeScale = $scope.options.timeScale || 10;
     if($scope.options.timepicker) {
         $scope.timeScale = timeScale;
@@ -220,9 +283,21 @@ function calendarController($scope, $element, value, $ionicScrollDelegate){
         updateSelectedDate($scope.selected, timeScale);
     });
 
-    $scope.dayOptions = {};
-    $scope.dayOptions.valid = $scope.valid;
-    $scope.dayOptions.today = moment().startOf('day').valueOf();
+    let today = moment().startOf('day').valueOf();
+    $scope.dayOptions = {
+        valid: $scope.valid,
+        today: today,
+        selected: today,
+        begin: 0,
+        end: 0,
+    };
+    initLunarCalendar();
+    log_time('initLunarCalendar');
+
+    loadMonths($scope, $element, $ionicScrollDelegate);
+    log_time('loadMonths');
+
+    log_time('calendarController');
 }
 
 export function selectDateController($scope, $element, $ionicPopup, $ionicScrollDelegate) {
@@ -303,25 +378,25 @@ export function selectDateSpanController($scope, $element, $ionicPopup, $ionicSc
 
 
 function fixMonths($scope) {
-    if($scope.month_2col) {
-        for(let i = 1; i < $scope.months.length; i += 2) {
-            let m1 = $scope.months[i - 1];
-            let m2 = $scope.months[i];
-            if(m1.days[m1.days.length - 7].month != m1.month
-                && m2.days[m2.days.length - 7].month != m2.month) {
-                m1.days.splice(m1.days.length - 7);
-                m2.days.splice(m2.days.length - 7);
-            }
-        }
-    } else {
-        for(let i = 0; i < $scope.months.length; i++) {
-            let m1 = $scope.months[i];
-            if(m1.days[m1.days.length - 7].month != m1.month) {
-                m1.days.splice(m1.days.length - 7);
-            }
+    for(let i = 0; i < $scope.months.length; i++) {
+        let m1 = $scope.months[i];
+        if(m1.days[m1.days.length - 7].month != m1.month) {
+            m1.days.splice(m1.days.length - 7);
         }
     }
     $scope.$broadcast('scroll.infiniteScrollComplete');
+}
+
+function updateDayFlags(day, options) {
+    day.flags.expired = checkExpired(day.timestamp, options.valid);
+    day.flags.selected = day.timestamp == options.selected;
+    day.flags.begin = day.timestamp == options.begin;
+    day.flags.span = options.begin < day.timestamp && day.timestamp < options.end;
+    day.flags.end = day.timestamp == options.end;
+}
+function updateMonthFlags(month, options) {
+    for(let day of month.days)
+        updateDayFlags(day, options);
 }
 function loadMonths($scope, $element, $ionicScrollDelegate) {
     $scope.weekDayNames = weekDayNames;
@@ -330,9 +405,19 @@ function loadMonths($scope, $element, $ionicScrollDelegate) {
     $scope.$on('modal.shown', function() {
         if($element.width() > 640)
             $scope.month_2col = true;
-        fixMonths($scope);
+        //fixMonths($scope);
+        $scope.$broadcast('scroll.infiniteScrollComplete');
+
     });
     $scope.months = [];
+    $scope.$watchGroup([
+        'dayOptions.selected',
+        'dayOptions.begin',
+        'dayOptions.end',
+    ], function(n, o){
+        for(let month of $scope.months)
+            updateMonthFlags(month, $scope.dayOptions);
+    });
 
     let begin = moment($scope.options.beginDate).startOf('month');
     let valDate: any = $scope.value || new Date();
@@ -344,6 +429,7 @@ function loadMonths($scope, $element, $ionicScrollDelegate) {
 
     for(let m = begin.clone(); m.diff(end) <= 0; m.add(1, 'month')){
         let caldata = getMonth(m.year(), m.month() + 1);
+        updateMonthFlags(caldata, $scope.dayOptions);
         $scope.months.push(caldata);
     }
     if($scope.months.length % 2 == 1){
@@ -362,12 +448,14 @@ function loadMonths($scope, $element, $ionicScrollDelegate) {
         let date = moment({year: last.year, month: last.month - 1, day: 1});
         date.add(1, 'month');
         let caldata = getMonth(date.year(), date.month() + 1);
+        updateMonthFlags(caldata, $scope.dayOptions);
         $scope.months.push(caldata);
         $scope.hasMoreMonths = hasMoreMonths();
     }
 
     let unregShow = $scope.$on('modal.shown', function(){
-        let pos = $element.find('.selected').parents('.week-7col').parent().position();
+        log_time('modal.shown');
+        let pos = $element.find('.selected').parents('.ng-modal-select-date-month-element').position();
         $ionicScrollDelegate.scrollTo(0, pos.top);
         unregShow();
     })
@@ -377,8 +465,8 @@ function loadMonths($scope, $element, $ionicScrollDelegate) {
     $scope.loadNextMonth = function() {
         loadNextMonth();
         loadNextMonth();
-        fixMonths($scope);
-        //$scope.$broadcast('scroll.infiniteScrollComplete');
+        //fixMonths($scope);
+        $scope.$broadcast('scroll.infiniteScrollComplete');
     }
 
 }

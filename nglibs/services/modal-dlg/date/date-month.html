@@ -1,0 +1,21 @@
+<div class="ng-modal-select-date-month-element">
+    <div class="month-title">{{::month.year}}年{{::month.month}}月</div>
+    <div>
+        <div class="week-7col" ng-repeat="week in weeks">
+            <div ng-repeat="day in week">
+                <div class="ng-modal-select-date-day-element"
+                     ng-class="day.flags"
+                     ng-click="selectDay(day)"
+                >
+                    <div class="content" ng-if="::!day.flags.notthismonth">
+                        <div class="daynumber">
+                            {{::day.day}}
+                            <div class="flag" ng-if="::day.worktime!=0">{{::day.worktime==1?'班':'假'}}</div>
+                        </div>
+                        <div class="label">{{::day.label}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -5,7 +5,7 @@
     </ion-header-bar>
     <ion-content padding="false" class="has-header ng-modal-select-date" scroll="false">
         <div class="flex-c01">
-            <div ng-class="{month_2col:month_2col}">
+            <div class="month-block" ng-class="{month_2col:month_2col}">
                 <div class="week-7col">
                     <div class="week-header" ng-repeat="weekday in weekDayNames">{{weekday}}</div>
                 </div>
@@ -14,26 +14,18 @@
                 </div>
             </div>
             <ion-scroll overflow-scroll="false" has-bouncing="true">
-                <div ng-class="{month_2col:month_2col}">
+                <div class="month-block" ng-class="{month_2col:month_2col}">
                     <div ng-repeat="month in months">
-                        <div class="month-title">{{month.year}}年{{month.month}}月</div>
-                        <div class="week-7col">
-                            <div ng-repeat="day in month.days">
-                                <ng-selector-date-day ng-modal="day"
-                                                      ng-style="{'visibility': month.month == day.month ? 'visible' : 'hidden'}"
-                                                      ng-click="confirm(day)"
-                                                      ng-day-options="dayOptions"
-                                >
-                                </ng-selector-date-day>
-                            </div>
-                        </div>
+                        <ng-selector-date-month ng-modal="month"
+                                                ng-date-options="dayOptions"
+                                                ng-select-day="confirm"
+                        ></ng-selector-date-month>
                     </div>
                 </div>
                 <ion-infinite-scroll
                         ng-if="hasMoreMonths"
                         on-infinite="loadNextMonth()">
                 </ion-infinite-scroll>
-                <!--ng-if="months.length < 12"-->
             </ion-scroll>
         </div>
     </ion-content>

@@ -69,6 +69,9 @@ export class CoinAccount extends ModelObject {
         //先记录日志
         let log = await Models.coinAccountChange.create({type: COIN_CHANGE_TYPE.INCOME, coinAccountId: self.id, coins: coins, remark: remark, duiBaOrderNum: duiBaOrderNum});
         log = await log.save();
+        if (!self.income) {
+            self.income = 0;
+        }
         if (typeof self.income == 'string') {
             self.income = Number(self.income);
         }
@@ -87,8 +90,11 @@ export class CoinAccount extends ModelObject {
 
         let log = await Models.coinAccountChange.create({type: COIN_CHANGE_TYPE.CONSUME, coinAccountId: self.id, coins: coins, remark: remark, duiBaOrderNum: duiBaOrderNum});
         log = await log.save();
+        if (!self.consume) {
+            self.consume = 0;
+        }
         if (typeof self.consume == 'string') {
-            self.consume = self.consume + coins;
+            self.consume = Number(self.consume);
         }
         self.consume = self.consume + coins;
         let coinAccount = await self.save();
