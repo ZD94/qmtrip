@@ -391,13 +391,19 @@ export default class ApiTravelBudget {
         let m_originCity = await API.place.getCityInfo({cityCode: originPlace.id || originPlace});
         let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
 
+        let isInternal = false;
+        if (/^CTW/.test(m_destination.id)) {
+            isInternal = true;
+        }
+
         let flightTickets:ITicket[] = [];
         if (m_originCity && m_destination) {
             flightTickets = await API.flight.search_ticket({
                 originPlace: m_originCity,
                 destination: m_destination,
                 leaveDate: leaveDate,
-                cabin: cabinClass
+                cabin: cabinClass,
+                isInternal: isInternal,
             });
             if (!flightTickets) {
                 flightTickets = [];
@@ -422,12 +428,23 @@ export default class ApiTravelBudget {
             params.latestArrivalTime = '21:00'
         }
         let qs: any = {};
-        if (preferConfig && preferConfig.traffic) {
-            let compiled = _.template(JSON.stringify(preferConfig.traffic));
-            qs.prefers = JSON.parse(compiled(params));
-        } else {
-            qs.prefers = loadDefaultPrefer(params);
+
+        if (isInternal) {   //国际
+            if (preferConfig && preferConfig.internalTraffic) {
+                let compiled = _.template(JSON.stringify(preferConfig.internalTraffic));
+                qs.prefers = JSON.parse(compiled(params));
+            } else {
+                qs.prefers = loadDefaultPrefer(params, 'internalTicket');
+            }
+        } else {            //国内
+            if (preferConfig && preferConfig.traffic) {
+                let compiled = _.template(JSON.stringify(preferConfig.traffic));
+                qs.prefers = JSON.parse(compiled(params));
+            } else {
+                qs.prefers = loadDefaultPrefer(params, 'ticket');
+            }
         }
+
         if (!qs.prefers) {
             qs.prefers = [];
         }
