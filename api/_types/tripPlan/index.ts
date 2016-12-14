@@ -19,19 +19,18 @@ export enum ECabin {
     TRAIN_HARD_SLEEPER = 16,   //硬卧
 }
 
-
-let _cabin_text = new Map();
-_cabin_text.set(ECabin.PLANE_FIRST, ['头等舱', 'first']);
-_cabin_text.set(ECabin.PLANE_BUSINESS, ['商务舱', 'business']);
-_cabin_text.set(ECabin.PLANE_ECONOMY, ['经济舱', 'economy']);
-_cabin_text.set(ECabin.TRAIN_BUSINESS, '商务座');
-_cabin_text.set(ECabin.TRAIN_FIRST, '一等座');
-_cabin_text.set(ECabin.TRAIN_SECOND, '二等座');
+let _cabin_text: any = {};
+_cabin_text[ECabin.PLANE_FIRST] = ['头等舱', 'first'];
+_cabin_text[ECabin.PLANE_BUSINESS] = ['商务舱', 'business'];
+_cabin_text[ECabin.PLANE_ECONOMY] = ['经济舱', 'economy'];
+_cabin_text[ECabin.TRAIN_BUSINESS] = '商务座';
+_cabin_text[ECabin.TRAIN_FIRST] = '一等座';
+_cabin_text[ECabin.TRAIN_SECOND] = '二等座'
 
 export function getECabinByName(name: string) {
     let cabinKey = undefined;
-    for(let key of _cabin_text.keys()) {
-        if (_cabin_text.get(key).indexOf(name.toLowerCase()) >= 0) {
+    for(let key of Object.keys(_cabin_text)) {
+        if (_cabin_text[key].indexOf(name.toLowerCase()) >= 0) {
             cabinKey = key;
             break;
         }
@@ -40,7 +39,7 @@ export function getECabinByName(name: string) {
 }
 
 export function getNameByECabin(key: ECabin) {
-    let r = _cabin_text.get(key);
+    let r = _cabin_text[key];
     if (_.isArray(r)) {
         return r[0]
     }
