@@ -36,7 +36,6 @@ class LowestPricePrefer extends AbstractPrefer<IFinalTicket> {
             if (!data[i].score) data[i].score = 0;
             if (!data[i].reasons) data[i].reasons = [];
             data[i].score -= self.score * i;
-            console.info(data[i].score)
             data[i].reasons.push(`最低价打分-${self.score * i}`);
         }
         return data;
