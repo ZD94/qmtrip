@@ -1,0 +1,14 @@
+<ion-view>
+    <ion-content padding="true">
+        <span all-checked ng-check-options="testmodel" ng-model="values" all-checked="false"></span>
+        <!--<ion-checkbox ng-model="allchecked" ng-value=""></ion-checkbox>-->
+        <!--<check-box ng-check-options="testmodel" ng-model="values"></check-box>-->
+        <span all-select></span>
+        <single-check ng-repeat="model in testmodel"
+                      ng-model="values"
+                      check-option="model"
+                      modlen="testmodel.length">
+
+        </single-check>
+    </ion-content>
+</ion-view>
