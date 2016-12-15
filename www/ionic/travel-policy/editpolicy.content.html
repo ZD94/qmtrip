@@ -34,7 +34,7 @@
 
 <label class="item item-input item-select">
     <span class="input-label">飞机舱位</span>
-    <select ng-model="travelPolicy.internalPlaneLevels">
+    <select ng-model="travelPolicy.abroadPlaneLevels">
         <option value="1" ng-selected="travelPolicy.planeLevels.indexOf(EPlaneLevel.BUSINESS_FIRST) >= 0">公务舱/头等舱</option>
         <option value="2"  ng-selected="travelPolicy.planeLevels.indexOf(EPlaneLevel.ECONOMY) >= 0">经济舱</option>
     </select>
@@ -42,7 +42,7 @@
 
 <label class="item item-input item-select">
     <span class="input-label">火车</span>
-    <select ng-model="travelPolicy.internalTrainLevels">
+    <select ng-model="travelPolicy.abroadTrainLevels">
         <option value="1" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.BUSINESS)">商务座/高级软卧</option>
         <option value="2" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.FIRST_CLASS)">一等座/软卧</option>
         <option value="3" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.SECOND_CLASS)">二等座/硬卧</option>
@@ -52,7 +52,7 @@
     <span class="input-label">酒店星级</span>
     <ng-selector-list
             class="fake-input"
-            ng-model="travelPolicy.internalHotelLevels"
+            ng-model="travelPolicy.abroadHotelLevels"
             dlg-title="酒店星级"
             dlg-options="selectHotalLevel"
     >

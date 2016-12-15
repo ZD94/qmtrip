@@ -37,9 +37,9 @@ class TravelPolicyModule{
         params.planeLevels = tryConvertToArray(params.planeLevels);
         params.trainLevels = tryConvertToArray(params.trainLevels);
         params.hotelLevels = tryConvertToArray(params.hotelLevels);
-        params.internalHotelLevels = tryConvertToArray(params.internalHotelLevels);
-        params.internalTrainLevels = tryConvertToArray(params.internalTrainLevels)
-        params.internalPlaneLevels = tryConvertToArray(params.internalPlaneLevels);
+        params.abroadHotelLevels = tryConvertToArray(params.abroadHotelLevels);
+        params.abroadTrainLevels = tryConvertToArray(params.abroadTrainLevels)
+        params.abroadPlaneLevels = tryConvertToArray(params.abroadPlaneLevels);
         var travelp = TravelPolicy.create(params);
         return travelp.save();
     }
@@ -109,9 +109,9 @@ class TravelPolicyModule{
         params.planeLevels = tryConvertToArray(params.planeLevels);
         params.trainLevels = tryConvertToArray(params.trainLevels);
         params.hotelLevels = tryConvertToArray(params.hotelLevels);
-        params.internalHotelLevels = tryConvertToArray(params.internalHotelLevels);
-        params.internalTrainLevels = tryConvertToArray(params.internalTrainLevels)
-        params.internalPlaneLevels = tryConvertToArray(params.internalPlaneLevels);
+        params.abroadHotelLevels = tryConvertToArray(params.abroadHotelLevels);
+        params.abroadTrainLevels = tryConvertToArray(params.abroadTrainLevels)
+        params.abroadPlaneLevels = tryConvertToArray(params.abroadPlaneLevels);
         for(var key in params){
             tp[key] = params[key];
         }

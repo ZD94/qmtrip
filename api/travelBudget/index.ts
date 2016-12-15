@@ -391,9 +391,9 @@ export default class ApiTravelBudget {
         let m_originCity = await API.place.getCityInfo({cityCode: originPlace.id || originPlace});
         let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
 
-        let isInternal = false;
+        let isAbroad = false;
         if (/^CTW/.test(m_destination.id)) {
-            isInternal = true;
+            isAbroad = true;
         }
 
         let flightTickets:ITicket[] = [];
@@ -403,7 +403,7 @@ export default class ApiTravelBudget {
                 destination: m_destination,
                 leaveDate: leaveDate,
                 cabin: cabinClass,
-                isInternal: isInternal,
+                isAbroad: isAbroad,
             });
             if (!flightTickets) {
                 flightTickets = [];
@@ -429,12 +429,12 @@ export default class ApiTravelBudget {
         }
         let qs: any = {};
 
-        if (isInternal) {   //国际
-            if (preferConfig && preferConfig.internalTraffic) {
-                let compiled = _.template(JSON.stringify(preferConfig.internalTraffic));
+        if (isAbroad) {   //国际
+            if (preferConfig && preferConfig.abroadTraffic) {
+                let compiled = _.template(JSON.stringify(preferConfig.abroadTraffic));
                 qs.prefers = JSON.parse(compiled(params));
             } else {
-                qs.prefers = loadDefaultPrefer(params, 'internalTicket');
+                qs.prefers = loadDefaultPrefer(params, 'abroadTicket');
             }
         } else {            //国内
             if (preferConfig && preferConfig.traffic) {
