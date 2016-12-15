@@ -13,5 +13,5 @@ export async function ShowpolicyController($scope, Models, $stateParams){
     $scope.enumPlaneLevelToStr = enumPlaneLevelToStr;
     console.info(travelPolicy);
     console.info($scope.subsidies);
-    console.info(enumPlaneLevelToStr(travelPolicy.planeLevels));
+    console.info('enum',enumPlaneLevelToStr(travelPolicy.planeLevels));
 }

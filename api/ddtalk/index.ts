@@ -133,7 +133,7 @@ let ddTalkMsgHandle = {
 
             //创建默认差旅标准
             let travelPolicy = await TravelPolicy.create({name: '默认标准', planeLevel: EPlaneLevel.ECONOMY,
-                trainLevel: ETrainLevel.SECOND_CLASS, hotelLevel: EHotelLevel.THREE_STAR, subsidy: 0, isDefault: true});
+                trainLevel: ETrainLevel.SECOND_SEAT, hotelLevel: EHotelLevel.THREE_STAR, subsidy: 0, isDefault: true});
             travelPolicy.company = company;
             travelPolicy = await travelPolicy.save();
 

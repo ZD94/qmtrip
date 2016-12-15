@@ -7,7 +7,7 @@
 import _ = require('lodash');
 
 export enum ECabin {
-    PLANE_FIRST = 1,
+    PLANE_FIRST = 1,    //飞机头等舱
     PLANE_BUSINESS = 2,
     PLANE_ECONOMY = 4,
     TRAIN_BUSINESS = 10,
