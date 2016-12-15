@@ -11,10 +11,21 @@ export function selectMapPointController($scope){
         $scope.$apply();
     });
 
+    let center: any;
+    if ($scope.options.longitude && $scope.options.latitude) {
+        center  = {
+            longitude: $scope.options.longitude,
+            latitude: $scope.options.latitude,
+        }
+    } else {
+        center = $scope.options.city;
+    }
     $scope.mapOptions = {
-        center: $scope.options.city,
+        center: center,
         //zoom: 12,
         city: $scope.options.city,
+        latitude: $scope.options.latitude,
+        longitude: $scope.options.longitude,
         scaleCtrl: false,
         overviewCtrl: false,
         enableMessage: false,
@@ -22,7 +33,6 @@ export function selectMapPointController($scope){
         //markers: markers
     };
     $scope.loadMap = function(map){
-        console.log('map inited');
         $scope.map = map;
         window['map'] = map;
         var geoc = new BMap.Geocoder();

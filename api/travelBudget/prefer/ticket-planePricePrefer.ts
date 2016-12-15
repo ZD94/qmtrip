@@ -47,15 +47,30 @@ class PlanePricePrefer extends AbstractPrefer<IFinalTicket> {
             if (!v.score) v.score = 0;
             if (!v.reasons) v.reasons = [];
             if (self.cabins.indexOf(v.cabin) >= 0){
-                if (v.price <= midPrice) {
-                    var a = 1 - Math.pow((1 - (v.price-minPrice)/(midPrice-minPrice)),3);
+                /*if(self.percent == 0){
+                    // var a = 1 - Math.pow((1 - (maxPrice - v.price)/(maxPrice - midPrice)),3);
+                    var a = 1 - Math.pow((v.price-minPrice)/(maxPrice-minPrice),2);
                     if(this.type && this.type == "line"){
-                        a = (v.price-minPrice)/(midPrice-minPrice);
+                        a = (maxPrice - v.price)/(maxPrice-minPrice);
+                    }
+                }else if(self.percent == 1){
+                    // var a = 1 - Math.pow((1 - (v.price-minPrice)/(midPrice-minPrice)),3);
+                    var a = 1 - Math.pow((maxPrice - v.price)/(maxPrice-minPrice),2);
+                    if(this.type && this.type == "line"){
+                        a = (v.price - minPrice)/(maxPrice-minPrice);
+                    }
+                }*/
+                if (v.price < midPrice) {
+                    // var a = 1 - Math.pow((midPrice - v.price)/(midPrice - minPrice),2);
+                    var a = 1 - Math.pow((1 - (v.price - minPrice)/(midPrice - minPrice)),3);
+                    if(this.type && this.type == "line"){
+                        a = (v.price - minPrice)/(midPrice - minPrice);
                     }
                     var addScore = self.score * a;
                     v.score += addScore;
                     v.reasons.push(`价格偏好以下价格 ${addScore}`)
-                }else{
+                }else if(v.price > midPrice){
+                    // var a = 1 - Math.pow((v.price - midPrice)/(maxPrice - midPrice),2);
                     var a = 1 - Math.pow((1 - (maxPrice - v.price)/(maxPrice - midPrice)),3);
                     if(this.type && this.type == "line"){
                         a = (maxPrice - v.price)/(maxPrice - midPrice);
@@ -63,7 +78,12 @@ class PlanePricePrefer extends AbstractPrefer<IFinalTicket> {
                     var addScore = self.score * a;
                     v.score += addScore;
                     v.reasons.push(`价格偏好以上价格 ${addScore}`)
+                }else if(v.price = midPrice){
+                    var addScore = self.score;
+                    v.score += addScore;
+                    v.reasons.push(`等于价格偏好的价格 ${addScore}`)
                 }
+
             }
             return v;
         })

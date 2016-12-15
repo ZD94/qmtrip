@@ -38,7 +38,7 @@ gulplib.bundle_lib('base', {ex: true, require:[
 gulplib.bundle_lib('sourcemap', {ex: true, require: ['source-map-support']})
 
 gulplib.bundle_lib('preload', {ex: true, require:[
-    'dyload', 'babel-polyfill', 'bluebird', 'common/ts_helper', 'common/zone', 'path',
+    'dyload', 'babel-polyfill', 'bluebird', 'tslib', 'common/ts_helper', 'common/zone', 'path',
     'common/client/config:config',
 ]});
 gulplib.bundle_lib('api', {require: ['common/client/api:common/api', 'common/api/helper', 'common/language']});

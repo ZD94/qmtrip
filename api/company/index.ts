@@ -108,7 +108,7 @@ class CompanyModule {
             promoCode = await company.doPromoCode({code: params.promoCode});
         }
 
-        return {company: company, description: promoCode.description};
+        return {company: company, description: promoCode ? promoCode.description : ""};
     }
 
 

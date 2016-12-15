@@ -32,24 +32,24 @@
     </div>
 </div>
 <div class="list">
-    <ion-toggle class="item-tit" toggle-class="toggle-positive" ng-model="travelPolicy.isDefault">国际差旅标准</ion-toggle>
+    <ion-toggle class="item-tit" toggle-class="toggle-positive" ng-model="travelPolicy.isOpenAbroad">国际差旅标准</ion-toggle>
     <div class="checkbox-tit">飞机舱位
-        <span class="item-note" all-checked ng-check-options="internalPlaneLevels" ng-model="internalPlaneValue"></span>
+        <span class="item-note" all-checked ng-check-options="abroadPlaneLevels" ng-model="abroadPlaneValue"></span>
     </div>
     <div class="checkbox-options">
-        <single-check ng-repeat="internalPlaneLevel in internalPlaneLevels"
-                      ng-model="internalPlaneValue" check-option="internalPlaneLevel">
+        <single-check ng-repeat="abroadPlaneLevel in abroadPlaneLevels"
+                      ng-model="abroadPlaneValue" check-option="abroadPlaneLevel">
         </single-check>
     </div>
     <div class="checkbox-tit">住宿标准
-        <span class="item-note" all-checked ng-check-options="internalHotelLevels" ng-model="internalHotelValue"></span>
+        <span class="item-note" all-checked ng-check-options="abroadHotelLevels" ng-model="abroadHotelValue"></span>
     </div>
     <div class="checkbox-options">
-        <div class="hotel-opt" ng-repeat="internalHotelLevel in internalHotelLevels">
-            <single-check ng-model="internalHotelValue" check-option="internalHotelLevel"></single-check>
+        <div class="hotel-opt" ng-repeat="abroadHotelLevel in abroadHotelLevels">
+            <single-check ng-model="abroadHotelValue" check-option="abroadHotelLevel"></single-check>
             <div class="item-note">
-                <p>{{internalHotelLevel.desc1}}</p>
-                <p>{{internalHotelLevel.desc2}}</p>
+                <p>{{abroadHotelLevel.desc1}}</p>
+                <p>{{abroadHotelLevel.desc2}}</p>
             </div>
         </div>
     </div>

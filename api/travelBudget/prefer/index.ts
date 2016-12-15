@@ -4,8 +4,9 @@
 
 'use strict';
 import _ = require("lodash");
-var defaultTicketPrefer = require('./default-ticket-prefer.json');
-var defaultHotelPrefer = require('./default-hotel-prefer.json');
+let defaultTicketPrefer = require('./default-ticket-prefer.json');
+let defaultHotelPrefer = require('./default-hotel-prefer.json');
+let defaultInternalTicketPrefer = require('./default-internal-ticket-prefer.json');
 
 export interface IPrefer<T> {
     markScore(tickets: T[]): Promise<T[]>;
@@ -30,11 +31,20 @@ export abstract class AbstractPrefer<T> implements IPrefer<T> {
 
 export function loadDefaultPrefer(qs: any, type?: string) {
     let defaultPrefer;
-    if (type && type == 'hotel') {
-        defaultPrefer = defaultHotelPrefer;
-    } else {
-        defaultPrefer = defaultTicketPrefer;
+    switch(type) {
+        case 'hotel':
+            defaultPrefer = defaultHotelPrefer;
+            break;
+        case 'internalTicket':
+            defaultPrefer = defaultInternalTicketPrefer;
+            break;
+        case 'ticket':
+            defaultPrefer = defaultTicketPrefer;
+            break;
+        default:
+            defaultPrefer = defaultTicketPrefer;
     }
+    
     let _prefers = JSON.stringify(defaultPrefer);
     let _compiled = _.template(_prefers);
     return JSON.parse(_compiled(qs));
@@ -64,6 +74,9 @@ export var ticketPrefers = {
     earliestGoBackTimePrefer: require('./ticket-earliestGoBackTimePrefer'),
     trainPricePrefer: require('./ticket-trainPricePrefer'),
     planePricePrefer: require('./ticket-planePricePrefer'),
+    planeNumberPrefer: require('./ticket-planeNumberPrefer'),
     permitOnlySupplier: require('./ticket-permitOnlySupplier'),
-    priorSupplier: require('./ticket-priorSupplier')
+    priorSupplier: require('./ticket-priorSupplier'),
+    lowestPrice: require('./ticket-lowestprice'),
+    directArrive: require('./ticket-directArrive')
 }

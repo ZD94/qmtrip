@@ -25,6 +25,13 @@ async function costCredit(req, res, next) {
     var params = req.params;
     var { uid, credits,appKey, timestamp, description, orderNum, actualPrice,sign } = params;
     var staff = await Models.staff.get(uid);
+    //资金账户不存在先创建
+    if(!staff.coinAccount){
+        let ca = CoinAccount.create();
+        await ca.save();
+        staff.coinAccount = ca;
+        await staff.save();
+    }
     var coinAccount = staff.coinAccount;
     
     if(!appKey || appKey != config.duiba.appKey){
@@ -117,6 +124,13 @@ async function addCredit(req, res, next) {
     var params = req.params;
     var { uid, credits,appKey,type, timestamp, description, orderNum, sign } = params;
     var staff = await Models.staff.get(uid);
+    //资金账户不存在先创建
+    if(!staff.coinAccount){
+        let ca = CoinAccount.create();
+        await ca.save();
+        staff.coinAccount = ca;
+        await staff.save();
+    }
     var coinAccount = staff.coinAccount;
 
     if(!appKey || appKey != config.duiba.appKey){

@@ -54,32 +54,42 @@ $color-rest-bg: #3CA9D7;
     color: $color-weekheader;
     background-color: $color-weekheader-bg !important;
   }
-  .month_2col {
-    display: flex;
-    flex-wrap: wrap;
+  .month-block {
     > * {
-      flex: 40%;
-      border-left: $border;
+      border-bottom: $border;
+    }
+    > *:last-child{
+      border-bottom: none;
+    }
+    &.month_2col{
+      display: block;
+      overflow: hidden;
+      line-height: 1px;
+      > *{
+        line-height: initial;
+        //float: left;
+        display: inline-block;
+        width: 50%;
+      }
+
+      > *:nth-child(2n+1){
+        float: left;
+      }
+      > *:nth-child(2n){
+        border-left: $border;
+      }
+
+      > *:nth-last-child(2) {
+        border-bottom: none;
+      }
     }
   }
   .week-7col {
-    display: flex;
-    flex-wrap: wrap;
-
+    display: block;
+    overflow: hidden;
     > * {
-      flex: 14.28%;
-
-      &:nth-last-child(-n+7) {
-        border-bottom: $border;
-      }
-      &:nth-child(7n+1) {
-        color: $color-weekend;
-        background-color: $color-weekend-bg;
-      }
-      &:nth-child(7n) {
-        color: $color-weekend;
-        background-color: $color-weekend-bg;
-      }
+      float: left;
+      width: 14.2857%;
     }
   }
 }
@@ -116,6 +126,9 @@ $color-rest-bg: #3CA9D7;
   }
 }
 
+.ng-modal-select-date-month-element{
+}
+
 .ng-modal-select-date-day-element {
   width: 100%;
   //height: 100%;
@@ -128,7 +141,6 @@ $color-rest-bg: #3CA9D7;
   .label {
     font-size: 70%;
   }
-
   > .content {
     height: 100%;
     display: flex;
@@ -158,28 +170,42 @@ $color-rest-bg: #3CA9D7;
     color: $color-flag;
     border-radius: 8px;
   }
-  .lunar {
+  &.lunar .label {
     color: $color-lunar;
   }
-  .festival {
+  &.festival .label {
     color: $color-festival;
   }
-  .term {
+  &.term .label {
     color: $color-term;
   }
-  .workflag {
-    background: $color-work-bg;
+
+  &.notthismonth {
+    visibility: hidden;
   }
-  .restflag {
-    background: $color-rest-bg;
+  &.expired * {
+    color: $color-expired !important;
+  }
+  &.workday{
+    .flag {
+      background: $color-work-bg;
+    }
+  }
+  &.restday {
+    .flag {
+      background: $color-rest-bg;
+    }
+  }
+  &.weekend {
+    .daynumber, .label {
+      color: $color-weekend;
+    }
+    background-color: $color-weekend-bg;
   }
   &.today {
     color: $color-today;
     border: $color-today-border;
     border-radius: 5px;
-  }
-  &.expired * {
-    color: $color-expired;
   }
   &.selected {
     background-color: $color-selected-bg;

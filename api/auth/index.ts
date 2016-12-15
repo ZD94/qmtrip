@@ -526,6 +526,19 @@ export default class ApiAuth {
             throw {code: -1, msg: "密码为空"};
         }
 
+        //验证优惠码是否有效
+        if(params.promoCode){
+            let promoCodes = await Models.promoCode.find({where : {code: params.promoCode}});
+            if( promoCodes && promoCodes.length > 0 ) {
+                let promoCode = promoCodes[0];
+                if (promoCode.expiryDate && promoCode.expiryDate.getTime() - new Date().getTime() < 0) {
+                    throw L.ERR.INVALID_PROMO_CODE();
+                }
+            }else{
+                throw L.ERR.INVALID_PROMO_CODE();
+            }
+        }
+
         await API.auth.checkEmailAndMobile({email: email, mobile: mobile});
         await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
         var result = await API.company.registerCompany({

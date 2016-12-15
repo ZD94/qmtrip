@@ -122,17 +122,21 @@ export class TravelPolicy extends ModelObject{
     get company(): Company { return null; }
     set company(val: Company) {}
     
+    @Field({type: Types.BOOLEAN})
+    get isOpenAbroad() : boolean { return false}
+    set isOpenAbroad(b: boolean) {}
+    
     @Field({type: Types.ARRAY(Types.INTEGER)})   //国际机票
-    get internalPlaneLevels() :EPlaneLevel[] { return null}
-    set internalPlaneLevel(planeLevel: EPlaneLevel[]) {}
+    get abroadPlaneLevels() :EPlaneLevel[] { return null}
+    set abroadPlaneLevel(planeLevel: EPlaneLevel[]) {}
     
     @Field({type: Types.ARRAY(Types.INTEGER)})   //国际火车
-    get internalTrainLevels() :ETrainLevel[] { return null;}
-    set internalTrainLevel(trainLevel: ETrainLevel[]) {}
+    get abroadTrainLevels() :ETrainLevel[] { return null;}
+    set abroadTrainLevel(trainLevel: ETrainLevel[]) {}
 
     @Field({type: Types.ARRAY(Types.INTEGER)})   //国际酒店
-    get internalHotelLevels() :EHotelLevel[] { return null}
-    set internalHotelLevel(hotelLevel: EHotelLevel[]) {}
+    get abroadHotelLevels() :EHotelLevel[] { return null}
+    set abroadHotelLevel(hotelLevel: EHotelLevel[]) {}
 
     async getStaffs(): Promise<Staff[]> {
         let query = {where: {companyId: this.company.id, travelPolicyId: this.id}};

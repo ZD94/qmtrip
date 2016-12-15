@@ -77,12 +77,12 @@ function SpanChangeController($scope, ngModalDlg){
     }
     $scope.selfDefineFun = async function(modal){
         let value = {
-            begin: moment().add(-1,'years').startOf('months').toDate(),
-            end: moment().endOf('months').toDate()
+            begin: $scope.span.startTime,
+            end: $scope.span.endTime,
         }
         value = await ngModalDlg.selectDateSpan($scope, {
-            beginDate:value.begin,
-            endDate: value.end,
+            beginDate: moment().add(-1,'years').startOf('months').toDate(),
+            endDate: moment().add(1,'months').startOf('months').toDate(),
             timepicker: false,
             title: '选择开始时间',
             titleEnd: '选择结束时间',

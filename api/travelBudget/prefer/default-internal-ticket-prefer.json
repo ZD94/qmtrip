@@ -1,0 +1,28 @@
+[
+  {
+    "name": "lowestPrice",
+    "options": {
+      "score": 100000
+    }
+  },
+  {
+    "name": "directArrive",
+    "options": {
+      "deductScorePerStop": 10000
+    }
+  },
+  {
+    "name": "earliestGoBackTimePrefer",
+    "options": {
+      "score": 100000,
+      "earliestGoBackTime": "<%=goBackDate%> <%=earliestGoBackTime%>"
+    }
+  },
+  {
+    "name": "latestArrivalTimePrefer",
+    "options": {
+      "score": 100000,
+      "latestArrivalTime": "<%=leaveDate%> <%=latestArrivalTime%>"
+    }
+  }
+]
