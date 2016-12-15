@@ -5,7 +5,7 @@
 <label class="item item-input item-select">
     <span class="input-label">飞机舱位</span>
     <select ng-model="travelPolicy.planeLevels">
-        <option value="1" ng-selected="travelPolicy.planeLevels.indexOf(EPlaneLevel.BUSINESS_FIRST) >= 0">公务舱/头等舱</option>
+        <option value="1" ng-selected="travelPolicy.planeLevels.indexOf(EPlaneLevel.FIRST) >= 0">公务舱/头等舱</option>
         <option value="2"  ng-selected="travelPolicy.planeLevels.indexOf(EPlaneLevel.ECONOMY) >= 0">经济舱</option>
     </select>
 </label>
@@ -14,7 +14,7 @@
     <select ng-model="travelPolicy.trainLevels">
         <option value="1" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.BUSINESS)">商务座/高级软卧</option>
         <option value="2" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.FIRST_CLASS)">一等座/软卧</option>
-        <option value="3" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.SECOND_CLASS)">二等座/硬卧</option>
+        <option value="3" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.SECOND_SEAT)">二等座/硬卧</option>
     </select>
 </label>
 <div class="item item-input item-select">
@@ -35,7 +35,7 @@
 <label class="item item-input item-select">
     <span class="input-label">飞机舱位</span>
     <select ng-model="travelPolicy.abroadPlaneLevels">
-        <option value="1" ng-selected="travelPolicy.planeLevels.indexOf(EPlaneLevel.BUSINESS_FIRST) >= 0">公务舱/头等舱</option>
+        <option value="1" ng-selected="travelPolicy.planeLevels.indexOf(EPlaneLevel.FIRST) >= 0">公务舱/头等舱</option>
         <option value="2"  ng-selected="travelPolicy.planeLevels.indexOf(EPlaneLevel.ECONOMY) >= 0">经济舱</option>
     </select>
 </label>
@@ -45,7 +45,7 @@
     <select ng-model="travelPolicy.abroadTrainLevels">
         <option value="1" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.BUSINESS)">商务座/高级软卧</option>
         <option value="2" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.FIRST_CLASS)">一等座/软卧</option>
-        <option value="3" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.SECOND_CLASS)">二等座/硬卧</option>
+        <option value="3" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.SECOND_SEAT)">二等座/硬卧</option>
     </select>
 </label>
 <div class="item item-input item-select">

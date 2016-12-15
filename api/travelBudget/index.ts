@@ -373,13 +373,13 @@ export default class ApiTravelBudget {
         if (policy.planeLevels && policy.planeLevels.indexOf(EPlaneLevel.ECONOMY) >= 0) {
             cabinClass.push('Economy');
         }
-        if (policy.planeLevels && policy.planeLevels.indexOf(EPlaneLevel.BUSINESS_FIRST) >= 0) {
+        if (policy.planeLevels && policy.planeLevels.indexOf(EPlaneLevel.FIRST) >= 0) {
             cabinClass.push('PremiumEconomy');
             cabinClass.push('Business');
             cabinClass.push('First');
         }
 
-        let trainCabinClass = MTrainLevel[ETrainLevel.SECOND_CLASS].replace(/\//g, ",");
+        let trainCabinClass = MTrainLevel[ETrainLevel.SECOND_SEAT].replace(/\//g, ",");
         if (policy.trainLevel) {
             trainCabinClass = MTrainLevel[policy.trainLevel];
             trainCabinClass = trainCabinClass.replace(/\//g, ",");
