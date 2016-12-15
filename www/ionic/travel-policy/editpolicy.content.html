@@ -1,60 +1,56 @@
-<label class="item item-input item-input-right">
-    <span class="input-label">标准名称</span>
-    <input type="text" placeholder="请输入标准名称" ng-model="travelPolicy.name">
-</label>
-<label class="item item-input item-select">
-    <span class="input-label">飞机舱位</span>
-    <select ng-model="travelPolicy.planeLevels">
-        <option value="1" ng-selected="travelPolicy.planeLevels.indexOf(EPlaneLevel.BUSINESS_FIRST) >= 0">公务舱/头等舱</option>
-        <option value="2"  ng-selected="travelPolicy.planeLevels.indexOf(EPlaneLevel.ECONOMY) >= 0">经济舱</option>
-    </select>
-</label>
-<label class="item item-input item-select">
-    <span class="input-label">火车</span>
-    <select ng-model="travelPolicy.trainLevels">
-        <option value="1" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.BUSINESS)">商务座/高级软卧</option>
-        <option value="2" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.FIRST_CLASS)">一等座/软卧</option>
-        <option value="3" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.SECOND_CLASS)">二等座/硬卧</option>
-    </select>
-</label>
-<div class="item item-input item-select">
-    <span class="input-label">酒店星级</span>
-    <ng-selector-list
-            class="fake-input"
-            ng-model="travelPolicy.hotelLevels"
-            dlg-title="酒店星级"
-            dlg-options="selectHotalLevel"
-    >
-    </ng-selector-list>
+<div class="list">
+    <label class="item item-input item-input-right">
+        <span class="input-label">标准名称</span>
+        <input type="text" placeholder="请输入标准名称" ng-model="travelPolicy.name">
+    </label>
 </div>
-
-<div class="spacer" style="width: 300px; height: 18px;"></div>
-
-<label class="item">国外标准</label>
-
-<label class="item item-input item-select">
-    <span class="input-label">飞机舱位</span>
-    <select ng-model="travelPolicy.internalPlaneLevels">
-        <option value="1" ng-selected="travelPolicy.planeLevels.indexOf(EPlaneLevel.BUSINESS_FIRST) >= 0">公务舱/头等舱</option>
-        <option value="2"  ng-selected="travelPolicy.planeLevels.indexOf(EPlaneLevel.ECONOMY) >= 0">经济舱</option>
-    </select>
-</label>
-
-<label class="item item-input item-select">
-    <span class="input-label">火车</span>
-    <select ng-model="travelPolicy.internalTrainLevels">
-        <option value="1" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.BUSINESS)">商务座/高级软卧</option>
-        <option value="2" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.FIRST_CLASS)">一等座/软卧</option>
-        <option value="3" ng-selected="travelPolicy.trainLevels.indexOf(ETrainLevel.SECOND_CLASS)">二等座/硬卧</option>
-    </select>
-</label>
-<div class="item item-input item-select">
-    <span class="input-label">酒店星级</span>
-    <ng-selector-list
-            class="fake-input"
-            ng-model="travelPolicy.internalHotelLevels"
-            dlg-title="酒店星级"
-            dlg-options="selectHotalLevel"
-    >
-    </ng-selector-list>
+<div class="list">
+    <div class="item-tit">国内差旅标准<span class="item-note">必选</span></div>
+    <div class="checkbox-tit">飞机舱位
+        <span class="item-note" all-checked ng-check-options="planeLevels" ng-model="planeValue"></span>
+    </div>
+    <div class="checkbox-options">
+        <single-check ng-repeat="planeLevel in planeLevels" ng-model="planeValue" check-option="planeLevel"></single-check>
+    </div>
+    <div class="checkbox-tit">火车座次
+        <span class="item-note" all-checked ng-check-options="trainLevels" ng-model="trainValue"></span>
+    </div>
+    <div class="checkbox-options">
+        <single-check ng-repeat="trainLevel in trainLevels" ng-model="trainValue" check-option="trainLevel"></single-check>
+    </div>
+    <div class="checkbox-tit">住宿标准
+        <span class="item-note" all-checked ng-check-options="hotelLevels" ng-model="hotelValue"></span>
+    </div>
+    <div class="checkbox-options">
+        <div class="hotel-opt" ng-repeat="hotelLevel in hotelLevels">
+            <single-check ng-model="hotelValue" check-option="hotelLevel"></single-check>
+            <div class="item-note">
+                <p>{{hotelLevel.desc1}}</p>
+                <p>{{hotelLevel.desc2}}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="list">
+    <ion-toggle class="item-tit" toggle-class="toggle-positive" ng-model="travelPolicy.isDefault">国际差旅标准</ion-toggle>
+    <div class="checkbox-tit">飞机舱位
+        <span class="item-note" all-checked ng-check-options="internalPlaneLevels" ng-model="internalPlaneValue"></span>
+    </div>
+    <div class="checkbox-options">
+        <single-check ng-repeat="internalPlaneLevel in internalPlaneLevels"
+                      ng-model="internalPlaneValue" check-option="internalPlaneLevel">
+        </single-check>
+    </div>
+    <div class="checkbox-tit">住宿标准
+        <span class="item-note" all-checked ng-check-options="internalHotelLevels" ng-model="internalHotelValue"></span>
+    </div>
+    <div class="checkbox-options">
+        <div class="hotel-opt" ng-repeat="internalHotelLevel in internalHotelLevels">
+            <single-check ng-model="internalHotelValue" check-option="internalHotelLevel"></single-check>
+            <div class="item-note">
+                <p>{{internalHotelLevel.desc1}}</p>
+                <p>{{internalHotelLevel.desc2}}</p>
+            </div>
+        </div>
+    </div>
 </div>
