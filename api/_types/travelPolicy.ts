@@ -4,6 +4,7 @@ import { Company } from 'api/_types/company';
 import { Types, Values } from 'common/model';
 import { Table, Create, Field, ResolveRef } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
+import {underline} from "colors/safe";
 
 export var  MTrainLevel  = {
     1: "商务座/高级软卧",
@@ -42,6 +43,13 @@ export function enumHotelLevelToStr(hotelLevels: EHotelLevel[]) :string {
     return hotelLevels.map( (hotelLevel) => {
         return MHotelLevel[hotelLevel];
     }).join("、")
+}
+
+export function enumHotelsFormat(hotelLevels: EHotelLevel[]) :Array<{name: string, value: EHotelLevel}> {
+    if (!hotelLevels) return [];
+    return hotelLevels.map( (v) => {
+        return {name: MHotelLevel[v], value: v};
+    })
 }
 
 export var  MPlaneLevel  = {
