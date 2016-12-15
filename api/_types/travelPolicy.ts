@@ -7,14 +7,32 @@ import { ModelObject } from 'common/model/object';
 import {underline} from "colors/safe";
 
 export var  MTrainLevel  = {
-    1: "商务座/高级软卧",
-    2: "一等座/软卧",
-    3: "二等座/硬卧"
+    1: "商务座",
+    2: "一等座",
+    3: "二等座",
+    4: '特等座',
+    5: '高级软卧',
+    6: '软卧',
+    7: '硬卧',
+    8: '软座',
+    9: '硬座',
+    10: '无座'
 }
+
 export enum ETrainLevel {
-    BUSINESS = 1,
-    FIRST_CLASS = 2,
-    SECOND_CLASS = 3
+    // BUSINESS = 1,
+    // FIRST_CLASS = 2,
+    // SECOND_CLASS = 3,
+    BUSINESS_SEAT = 1,
+    FIRST_SEAT = 2,
+    SECOND_SEAT = 3,
+    PRINCIPAL_SEAT = 4,
+    SENIOR_SOFT_SLEEPER = 5,
+    SOFT_SLEEPER = 6,
+    HARD_SLEEPER = 7,
+    SOFT_SEAT = 8,
+    HARD_SEAT = 9,
+    NO_SEAT = 10,
 }
 
 export function enumTrainLevelToStr(trainLevels: ETrainLevel[]) :string {
@@ -53,14 +71,21 @@ export function enumHotelsFormat(hotelLevels: EHotelLevel[]) :Array<{name: strin
 }
 
 export var  MPlaneLevel  = {
-    1: "公务舱/头等舱",
+    // 1: "公务舱/头等舱",
     2: "经济舱",
+    3: '头等舱',
+    4: '商务舱',
+    5: '高端商务舱',
 }
 
 export enum EPlaneLevel {
-    BUSINESS_FIRST = 1,
-    ECONOMY = 2
+    // BUSINESS_FIRST = 1,
+    ECONOMY = 2,
+    FIRST = 3,
+    BUSINESS = 4,
+    PREMIUM_ECONOMY = 5,    //高端经济仓
 }
+
 
 export function enumPlaneLevelToStr(planeLevels: EPlaneLevel[]) :string {
     if (!planeLevels) return '';
