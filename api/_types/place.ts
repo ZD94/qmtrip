@@ -14,6 +14,8 @@ class Place {
     cityLevel: number
     didaCode: string
     parentId: string
+    isAbroad: boolean;
+    enName: string;
 
     constructor(obj: any) {
         this.id = obj.id;
@@ -28,6 +30,8 @@ class Place {
         this.cityLevel = obj.cityLevel;
         this.didaCode = obj.didaCode;
         this.parentId = obj.parentId;
+        this.isAbroad = obj.isAbroad;
+        this.enName = obj.enName;
     }
 
 /*

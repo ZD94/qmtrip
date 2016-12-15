@@ -311,7 +311,8 @@ export default class ApiTravelBudget {
             longitude: gps[1],
             businessDistrict: businessDistrict,
             checkInDate: checkInDate,
-            checkOutDate: checkOutDate
+            checkOutDate: checkOutDate,
+            isAbroad: city.isAbroad
         }
         let budgetConfig = staff.company.budgetConfig;
         if (budgetConfig && budgetConfig.hotel) {
@@ -392,7 +393,7 @@ export default class ApiTravelBudget {
         let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
 
         let isAbroad = false;
-        if (/^CTW/.test(m_destination.id)) {
+        if (/^CTW/.test(m_destination.isAbroad || m_destination.id)) {
             isAbroad = true;
         }
 
