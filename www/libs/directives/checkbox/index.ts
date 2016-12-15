@@ -66,7 +66,6 @@ angular
                         newlist[mod] = 3;
                     }
                     for(let option of $scope.options){
-                        console.info(newlist[option.value])
                         if(!newlist[option.value]){
                             $scope.selectAll = false;
                             return false;

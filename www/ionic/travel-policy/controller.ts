@@ -29,6 +29,7 @@ export async function IndexController($scope, Models, $location, $ionicPopup, $i
         return obj;
     })
     $scope.travelPolicies = await Promise.all(ps);
+    console.info($scope.travelPolicies);
     await Promise.all($scope.travelPolicies.map(async function (obj) {
         var result = await obj.policy.getStaffs();
         obj.usernum = result.length;

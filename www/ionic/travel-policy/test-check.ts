@@ -8,7 +8,7 @@ export async function TestCheckController($scope){
     $scope.testmodel = [
         {
             name: '头等舱',
-            value: EPlaneLevel.BUSINESS_FIRST
+            value: EPlaneLevel.BUSINESS
         },
         {
             name: '经济舱',
