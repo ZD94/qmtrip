@@ -7,23 +7,25 @@
 <div class="list">
     <div class="item-tit">国内差旅标准<span class="item-note">必选</span></div>
     <div class="checkbox-tit">飞机舱位
-        <span class="item-note" all-checked ng-check-options="planeLevels" ng-model="planeValue"></span>
+        <span class="item-note" all-checked ng-check-options="planeLevels" ng-model="travelPolicy.planeLevels"></span>
     </div>
     <div class="checkbox-options">
-        <single-check ng-repeat="planeLevel in planeLevels" ng-model="planeValue" check-option="planeLevel"></single-check>
+        <single-check ng-repeat="planeLevel in planeLevels"
+                      ng-model="travelPolicy.planeLevels" check-option="planeLevel"></single-check>
     </div>
     <div class="checkbox-tit">火车座次
-        <span class="item-note" all-checked ng-check-options="trainLevels" ng-model="trainValue"></span>
+        <span class="item-note" all-checked ng-check-options="trainLevels" ng-model="travelPolicy.trainLevels"></span>
     </div>
     <div class="checkbox-options">
-        <single-check ng-repeat="trainLevel in trainLevels" ng-model="trainValue" check-option="trainLevel"></single-check>
+        <single-check ng-repeat="trainLevel in trainLevels"
+                      ng-model="travelPolicy.trainLevels" check-option="trainLevel"></single-check>
     </div>
     <div class="checkbox-tit">住宿标准
-        <span class="item-note" all-checked ng-check-options="hotelLevels" ng-model="hotelValue"></span>
+        <span class="item-note" all-checked ng-check-options="hotelLevels" ng-model="travelPolicy.hotelLevels"></span>
     </div>
     <div class="checkbox-options">
         <div class="hotel-opt" ng-repeat="hotelLevel in hotelLevels">
-            <single-check ng-model="hotelValue" check-option="hotelLevel"></single-check>
+            <single-check ng-model="travelPolicy.hotelLevels" check-option="hotelLevel"></single-check>
             <div class="item-note">
                 <p>{{hotelLevel.desc1}}</p>
                 <p>{{hotelLevel.desc2}}</p>
@@ -33,23 +35,27 @@
 </div>
 <div class="list">
     <ion-toggle class="item-tit" toggle-class="toggle-positive" ng-model="travelPolicy.isOpenAbroad">国际差旅标准</ion-toggle>
-    <div class="checkbox-tit">飞机舱位
-        <span class="item-note" all-checked ng-check-options="abroadPlaneLevels" ng-model="abroadPlaneValue"></span>
-    </div>
-    <div class="checkbox-options">
-        <single-check ng-repeat="abroadPlaneLevel in abroadPlaneLevels"
-                      ng-model="abroadPlaneValue" check-option="abroadPlaneLevel">
-        </single-check>
-    </div>
-    <div class="checkbox-tit">住宿标准
-        <span class="item-note" all-checked ng-check-options="abroadHotelLevels" ng-model="abroadHotelValue"></span>
-    </div>
-    <div class="checkbox-options">
-        <div class="hotel-opt" ng-repeat="abroadHotelLevel in abroadHotelLevels">
-            <single-check ng-model="abroadHotelValue" check-option="abroadHotelLevel"></single-check>
-            <div class="item-note">
-                <p>{{abroadHotelLevel.desc1}}</p>
-                <p>{{abroadHotelLevel.desc2}}</p>
+    <div ng-if="travelPolicy.isOpenAbroad">
+        <div class="checkbox-tit">飞机舱位
+            <span class="item-note" all-checked ng-check-options="abroadPlaneLevels"
+                  ng-model="travelPolicy.abroadPlaneLevels"></span>
+        </div>
+        <div class="checkbox-options">
+            <single-check ng-repeat="abroadPlaneLevel in abroadPlaneLevels"
+                          ng-model="travelPolicy.abroadPlaneLevels" check-option="abroadPlaneLevel">
+            </single-check>
+        </div>
+        <div class="checkbox-tit">住宿标准
+            <span class="item-note" all-checked ng-check-options="abroadHotelLevels"
+                  ng-model="travelPolicy.abroadHotelLevels"></span>
+        </div>
+        <div class="checkbox-options">
+            <div class="hotel-opt" ng-repeat="abroadHotelLevel in abroadHotelLevels">
+                <single-check ng-model="travelPolicy.abroadHotelLevels" check-option="abroadHotelLevel"></single-check>
+                <div class="item-note">
+                    <p>{{abroadHotelLevel.desc1}}</p>
+                    <p>{{abroadHotelLevel.desc2}}</p>
+                </div>
             </div>
         </div>
     </div>

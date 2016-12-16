@@ -7,6 +7,7 @@ import {
 var msgbox = require('msgbox');
 
 export * from './editpolicy';
+export * from './showpolicy';
 
 export async function IndexController($scope, Models, $location, $ionicPopup, $ionicHistory) {
     require('./index.scss');
@@ -37,7 +38,7 @@ export async function IndexController($scope, Models, $location, $ionicPopup, $i
     }))
     $scope.editpolicy = async function (id) {
         // var travelpolicy = await Models.travelPolicy.get(id);
-        $location.path('/travel-policy/editpolicy').search({'policyId': id}).replace();
+        $location.path('/travel-policy/showpolicy').search({'policyId': id}).replace();
     }
 
     $scope.setDefault = async function(){

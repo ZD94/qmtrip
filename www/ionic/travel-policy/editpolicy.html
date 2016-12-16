@@ -1,8 +1,8 @@
 <ion-view title="编辑差旅标准" id="page31">
     <ion-content padding="true" class="has-header">
-        <form class="list">
+        <form class="list">{{travelPolicy.name}}
             <ng-include src="'ionic/travel-policy/editpolicy.content.html'"></ng-include>
-            <label class="item item-input item-icon-right" ng-click="subsidyTemplateList()">
+            <label class="item item-input item-icon-right" ng-click="subsidyTemplateList()" style="margin-top: 20px;">
                 <span class="input-label">补助模板</span>
                 <i class="icon ion-chevron-right"></i>
             </label>

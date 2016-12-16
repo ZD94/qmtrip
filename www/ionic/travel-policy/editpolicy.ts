@@ -5,6 +5,7 @@ var msgbox = require('msgbox');
 
 export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory, $ionicPopup, ngModalDlg) {
     require('./editpolicy.scss');
+    $scope.travelPolicy = {};
     $scope.planeLevels = [
         { name: MPlaneLevel[EPlaneLevel.ECONOMY],value: EPlaneLevel.ECONOMY},
         { name: MPlaneLevel[EPlaneLevel.FIRST],value: EPlaneLevel.FIRST},
@@ -64,10 +65,22 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         travelPolicy.hotelLevels = [EHotelLevel.TWO_STAR];
     }
     $scope.travelPolicy = travelPolicy;
-    console.info(travelPolicy);
+    console.info($scope.travelPolicy);
     $scope.savePolicy = async function () {
         if(!$scope.travelPolicy.name){
             msgbox.log("标准名称不能为空");
+            return false;
+        }
+        if($scope.travelPolicy.planeLevels.length <=0){
+            msgbox.log('飞机舱位不能为空')
+            return false;
+        }
+        if($scope.travelPolicy.trainLevels.length <=0){
+            msgbox.log('火车座次不能为空')
+            return false;
+        }
+        if($scope.travelPolicy.hotelLevels.length <=0){
+            msgbox.log('住宿标准不能为空')
             return false;
         }
         var re = /^[0-9]+.?[0-9]*$/;
@@ -75,6 +88,7 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
             msgbox.log("补助必须为数字");
             return false;
         }
+        console.info($scope.travelPolicy.planeLevels)
         $scope.travelPolicy.company = staff.company;
         let travelPolicy = await $scope.travelPolicy.save();
         for(let v of saveSubsidyTemplates) {
@@ -86,7 +100,7 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
                 await v.destroy();
             }
         }
-        $ionicHistory.goBack(-1);
+        window.location.href= `#/travel-policy/showpolicy?policyId=${policyId}`
     }
     $scope.selectHotalLevel = {
         searchbox: false,
@@ -126,7 +140,7 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
                                 throw {code: -1, msg: '还有'+ result.length +'位员工在使用该标准'};
                             }
                             await $scope.travelPolicy.destroy();
-                            $ionicHistory.goBack(-1);
+                            window.location.href = '#/travel-policy/index'
                         }catch(err){
                             if(err.code == -1){
                                 deleteFailed();

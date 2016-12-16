@@ -61,6 +61,9 @@ angular
             },
             controller: function($scope){
                 $scope.$watch('model.length',function(n,o){
+                    if(!$scope.model){
+                        $scope.model = [];
+                    }
                     var newlist = {};
                     for(let mod of $scope.model){
                         newlist[mod] = 3;
