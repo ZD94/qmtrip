@@ -1,0 +1,37 @@
+<ion-view title="鲸币记录" id="page30">
+    <ion-content padding="true" class="has-header">
+        <div>
+            <div>{{staff.coinAccount?staff.coinAccount.balance:0}}</div>
+            <a href="#/coin-account/get-coin"  style="color: white">获得鲸币</a>
+            <a ng-click="goShop()" style="color: white">花鲸币</a>
+        </div>
+        <ion-refresher
+                pulling-text="下拉刷新",
+                on-refresh="pagersDate.doRefresh()"
+        ></ion-refresher>
+        <ion-list class="list notice">
+            <ion-item class="item item-body" ng-repeat="item in coinAccountChanges track by $index" ng-click="detail(item)">
+                <div class="notice_title">
+                    <span class="item-note">{{item.createdAt | date : 'MM-dd'}}</span>
+                    <span ng-if="item.type == COIN_CHANGE_TYPE.INCOME">充</span>
+                    <span ng-if="item.type == COIN_CHANGE_TYPE.AWARD">奖</span>
+                    <span ng-if="item.type == COIN_CHANGE_TYPE.CONSUME">花</span>
+                    <span>
+                        {{(item.type != COIN_CHANGE_TYPE.CONSUME && item.type != COIN_CHANGE_TYPE.LOCK)? "+" : "-"}}
+                        {{item.coins}}
+                    </span>
+                    <span>{{item.remark}}</span>
+
+                </div>
+                <div>
+                    <div class="notice_desc">{{notice.description}}</div>
+                </div>
+                <!--<ion-option-button class="button-assertive" ng-click="delete(item, $index)"> 删除 </ion-option-button>-->
+            </ion-item>
+        </ion-list>
+        <div>
+            <div ng-if="!vm.isHasNextPage" class="getMoreOrNoMore">没有更多记录了</div>
+        </div>
+        <ion-infinite-scroll ng-if="vm.isHasNextPage" on-infinite="vm.nextPage()"></ion-infinite-scroll>
+    </ion-content>
+</ion-view>

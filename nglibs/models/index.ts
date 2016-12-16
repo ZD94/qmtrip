@@ -122,8 +122,8 @@ var Services = {
     },
     token: { type: Token, modname: 'token', funcs: []},
     //鲸币账户
-    coinAccount: { type: CoinAccount, modname: 'coin', funcs: ['clientStaffCoinAccount']},
-    coinAccountChange: { type: CoinAccountChange, modname: 'coin', funcs: []},
+    coinAccount: { type: CoinAccount, modname: 'coin', funcs: ['getCoinAccount', null, 'createCoinAccount']},
+    coinAccountChange: { type: CoinAccountChange, modname: 'coin', funcs: ['getCoinAccountChange','getCoinAccountChanges']},
 
     financeCheckCode: { type: FinanceCheckCode, modname: 'tripPlan', funcs: ['getTripDetail']},
     tripDetailInvoice: { type: TripDetailInvoice, modname: 'tripPlan', funcs: ['getTripDetailInvoice', 'getTripDetailInvoices', 'saveTripDetailInvoice', 'updateTripDetailInvoice', 'deleteTripDetailInvoice']},

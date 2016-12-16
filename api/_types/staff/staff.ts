@@ -10,7 +10,7 @@ import { getSession } from 'common/model';
 import { TableExtends, Table, Create, Field, ResolveRef, Reference, RemoteCall } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import {PaginateInterface} from 'common/model/interface';
-import {CoinAccount} from 'api/_types/coin';
+import {CoinAccount, CoinAccountChange} from 'api/_types/coin';
 import {Notice, ENoticeType} from 'api/_types/notice';
 import {SupplierOrder} from 'libs/suppliers/interface';
 import {SupplierGetter} from 'libs/suppliers';
@@ -82,12 +82,12 @@ export class Staff extends ModelObject implements Account {
     get staffStatus(): EStaffStatus { return EStaffStatus.ON_JOB; }
     set staffStatus(val: EStaffStatus) {}
     // '员工总获取的积分'
-    @Field({type: Types.INTEGER})
-    get totalPoints(): number { return 0; }
+    @Field({type: Types.NUMERIC(15,2)})
+    get totalPoints(): number { return 0.00; }
     set totalPoints(val: number) {}
     // '员工剩余积分'
-    @Field({type: Types.INTEGER})
-    get balancePoints(): number { return 0; }
+    @Field({type: Types.NUMERIC(15,2)})
+    get balancePoints(): number { return 0.00; }
     set balancePoints(val: number) {}
     // '权限'
     @Field({type: Types.INTEGER})
@@ -115,9 +115,9 @@ export class Staff extends ModelObject implements Account {
         return Models.travelPolicy.get(id);
     }
 
-    @ResolveRef({ type: Types.UUID}, Models.coinAccount)
+    /*@ResolveRef({ type: Types.UUID}, Models.coinAccount)
     get coinAccount(): CoinAccount {return null};
-    set coinAccount(coinAccount: CoinAccount) {}
+    set coinAccount(coinAccount: CoinAccount) {}*/
 
     setTravelPolicy(val: TravelPolicy) {}
 
@@ -362,7 +362,44 @@ export class Staff extends ModelObject implements Account {
         }
         return API.duiba.getLoginUrl({});
     }
-    
+
+    async getCoinAccountChanges(): Promise<any>{
+        let self = this;
+        this.coinAccount = this.$parents["account"]["coinAccount"];
+        if(!this.coinAccount){
+            let ca = CoinAccount.create();
+            await ca.save();
+            self.coinAccount = ca;
+            await self.save();
+        }
+        let coinAccount = self.coinAccount;
+        return coinAccount.getCoinAccountChanges({});
+    }
+
+    async score2Coin(params) :Promise<CoinAccount> {
+        if(!this.isLocal){
+            API.require('coin');
+            await API.onload();
+        }
+        let {points} = params;
+        return API.coin.staffPoint2Coin({staffId: this.id, points: points});
+    }
+
+    @RemoteCall()
+    async addCoin(coins: number, remark?: string, duiBaOrderNum?: string) :Promise<any> {
+        let self = this;
+        let account = await Models.account.get(self.id);
+        this.coinAccount = this.$parents["account"]["coinAccount"];
+        if(!this.coinAccount){
+            let ca = CoinAccount.create();
+            await ca.save();
+            account.coinAccount = ca;
+            self.coinAccount = ca;
+            await account.save();
+        }
+        let coinAccount = await this.coinAccount.addCoin(coins, remark, duiBaOrderNum);
+        return coinAccount;
+    }
 
     @RemoteCall()
     async testServerFunc(){
@@ -394,4 +431,5 @@ export class Staff extends ModelObject implements Account {
     isFirstLogin: boolean;
     isValidateMobile: boolean;
     isValidateEmail: boolean;
+    coinAccount: CoinAccount;
 }

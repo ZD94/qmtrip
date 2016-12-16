@@ -1,10 +1,13 @@
 
 import L from 'common/language';
-import { Table, TableIndex, Create, Field } from 'common/model/common';
+import { Table, TableIndex, Create, Field, ResolveRef } from 'common/model/common';
 import { Models, EAccountType } from 'api/_types';
 import { ModelObject } from 'common/model/object';
 import { Types } from 'common/model';
+import { CoinAccount, CoinAccountChange } from 'api/_types/coin';
 import validator = require("validator");
+
+declare var API: any;
 
 export enum ACCOUNT_STATUS {
     ACTIVE = 1,
@@ -100,6 +103,22 @@ export class Account extends ModelObject{
     @Field({type:Types.BOOLEAN})
     get isValidateEmail(): boolean { return false; }
     set isValidateEmail(isValidateEmail: boolean){}
+
+    @ResolveRef({ type: Types.UUID}, Models.coinAccount)
+    get coinAccount(): CoinAccount {return null};
+    set coinAccount(coinAccount: CoinAccount) {}
+
+    async getCoinAccountChanges(): Promise<CoinAccountChange[]>{
+        let self = this;
+        if(!this.coinAccount){
+            let ca = CoinAccount.create();
+            await ca.save();
+            self.coinAccount = ca;
+            await self.save();
+        }
+        let coinAccount = self.coinAccount;
+        return coinAccount.getCoinAccountChanges({});
+    }
 
     validate() {
         if(validator.isMobilePhone(this.mobile, 'zh-CN')){

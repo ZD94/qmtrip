@@ -6,7 +6,7 @@ let moment = require("moment");
 let DBM = require("common/model").DB.models;
 let Logger = require('common/logger');
 let logger = new Logger("seeds");
-let typeString = ['TripPlanNo', 'AgencyNo', 'CompanyNo'];
+let typeString = ['TripPlanNo', 'AgencyNo', 'CompanyNo', 'CoinAccountNo'];
 
 class SeedModule {
     /**

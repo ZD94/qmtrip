@@ -1,0 +1,1 @@
+alter table staff.staffs drop column coin_account_id;

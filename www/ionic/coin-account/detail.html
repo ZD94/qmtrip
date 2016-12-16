@@ -1,0 +1,21 @@
+<ion-view title="我的鲸币" id="page1" style="background-color:#E8E7E9;">
+    <ion-content padding="true" class="has-header">
+        <div class="list card accordlist">
+            <div class="item item-body">
+                <div>
+                    <span ng-if="coinAccountChange.type == COIN_CHANGE_TYPE.INCOME">充</span>
+                    <span ng-if="coinAccountChange.type == COIN_CHANGE_TYPE.AWARD">奖</span>
+                    <span ng-if="coinAccountChange.type == COIN_CHANGE_TYPE.CONSUME">花</span>
+                    <span>
+                        {{(coinAccountChange.type != COIN_CHANGE_TYPE.CONSUME && coinAccountChange.type != COIN_CHANGE_TYPE.LOCK)? "+" : "-"}}
+                        {{coinAccountChange.coins}}
+                    </span>
+                    <span class="item-note">交易类型：{{coinAccountChange.type}}</span>
+                    <span class="item-note">创建时间：{{coinAccountChange.createdAt | date : 'yyyy-MM-dd HH:mm'}}</span>
+                    <span class="item-note">交易单号：{{coinAccountChange.orderNum}}</span>
+                    <span class="item-note">交易说明：{{coinAccountChange.remark}}</span>
+                </div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>
