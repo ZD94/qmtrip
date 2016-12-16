@@ -2,37 +2,16 @@
     <ion-content padding="true" class="has-header">
         <a href="#/travel-policy/editpolicy" id="page30-button89" class="button button-positive  button-block">新增差旅标准</a>
         <a ng-click="setDefault()" class="button button-outline button-block button-positive" style="background: #fff">设置默认标准</a>
-        <div class="list card policyCard" ng-repeat="policy in travelPolicies" ng-click="editpolicy(policy.policy.id)">
-            <div class="item item-divider">{{policy.policy.name}}<span
-                    ng-if="policy.policy.isDefault">(默认标准)</span><span class="item-note" style="color: #000;">共{{policy.usernum || 0}}人</span>
-            </div>
-            <div class="item item-body">
-                <div>
-                    <p>飞机：{{enumPlaneLevelToStr(policy.policy.planeLevels)}}</p>
+        <div class="policyCard" ng-repeat="policy in travelPolicies" ng-click="editpolicy(policy.policy.id)">
+            <div class="item item-avatar">
+                <div class="policy-list-left">
+                    <p>{{policy.usernum || 0}}</p>人使用
                 </div>
-                <div>
-                    <p>火车：{{enumTrainLevelToStr(policy.policy.trainLevels)}}</p>
-                </div>
-                <div>
-                    <p>住宿：{{enumHotelLevelToStr(policy.policy.hotelLevels)}}</p>
-                </div>
-                <div ng-if="policy.subsidy.length>0" class="policySubsidy">
-                    <span>补助：</span>
-                    <div>
-                        <p ng-repeat="subsidy in policy.subsidy">{{subsidy.name}}:{{subsidy.subsidyMoney}}元/天</p>
-                    </div>
-                </div>
-
-                <div class="spacer" style="width: 300px; height: 18px;"></div>
-                <div>国外标准</div>
-                <div>
-                    <p>飞机：{{enumPlaneLevelToStr(policy.policy.abroadPlaneLevels)}}</p>
-                </div>
-                <div>
-                    <p>火车：{{enumTrainLevelToStr(policy.policy.abroadTrainLevels)}}</p>
-                </div>
-                <div>
-                    <p>住宿：{{enumHotelLevelToStr(policy.policy.abroadHotelLevels)}}</p>
+                <div class="policy-list-content">
+                    <p class="policy-list-tit">{{policy.policy.name}}
+                        <span ng-if="policy.policy.isDefault">(默认标准)</span>
+                    </p>
+                    <p class="policy-list-other">国内、<span ng-if="policy.policy.isOpenAbroad">国际、</span>{{policy.subsidy.length}}项补助模板</p>
                 </div>
             </div>
         </div>

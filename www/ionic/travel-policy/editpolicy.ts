@@ -72,15 +72,15 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
             return false;
         }
         if($scope.travelPolicy.planeLevels.length <=0){
-            msgbox.log('飞机舱位不能为空')
+            msgbox.log('飞机舱位不能为空');
             return false;
         }
         if($scope.travelPolicy.trainLevels.length <=0){
-            msgbox.log('火车座次不能为空')
+            msgbox.log('火车座次不能为空');
             return false;
         }
         if($scope.travelPolicy.hotelLevels.length <=0){
-            msgbox.log('住宿标准不能为空')
+            msgbox.log('住宿标准不能为空');
             return false;
         }
         var re = /^[0-9]+.?[0-9]*$/;
@@ -88,9 +88,20 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
             msgbox.log("补助必须为数字");
             return false;
         }
-        console.info($scope.travelPolicy.planeLevels)
-        $scope.travelPolicy.company = staff.company;
-        let travelPolicy = await $scope.travelPolicy.save();
+        console.info(staff.company ==$scope.travelPolicy.company);
+        // if(!policyId){
+        //     $scope.travelPolicy.company = staff.company;
+        // }
+        // console.info(policyId);
+        let travelPolicy;
+        console.info($scope.travelPolicy.planeLevels);
+        try{
+            console.info('start');
+            travelPolicy = await $scope.travelPolicy.save();
+            console.info('end');
+        }catch(err){
+            console.log(err);
+        }
         for(let v of saveSubsidyTemplates) {
             v.travelPolicy = travelPolicy;
             await v.save();
@@ -100,7 +111,7 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
                 await v.destroy();
             }
         }
-        window.location.href= `#/travel-policy/showpolicy?policyId=${policyId}`
+        window.location.href= `#/travel-policy/showpolicy?policyId=${policyId}`;
     }
     $scope.selectHotalLevel = {
         searchbox: false,
