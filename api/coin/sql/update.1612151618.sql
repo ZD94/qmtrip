@@ -1,0 +1,2 @@
+insert into coin.coin_accounts (id, created_at, updated_at) select id, now(), now() from company.companies c where c.coin_account_id is null;
+update company.companies set coin_account_id = id where coin_account_id is null;

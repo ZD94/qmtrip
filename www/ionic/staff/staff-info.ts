@@ -9,7 +9,6 @@ export async function StaffInfoController($scope, Models, ngModalDlg ,$ionicPopu
     $scope.travelpolicy = await staff.getTravelPolicy(staff['travelPolicyId']);
     $scope.staffRole = ['创建者','员工','管理员','财务'];
 
-    console.info(staff)
     $scope.invoicefuc = {title:'上传头像',done:function(response){
         if(response.ret != 0){
             console.error(response.errMsg);
@@ -22,8 +21,13 @@ export async function StaffInfoController($scope, Models, ngModalDlg ,$ionicPopu
         var fileId = response.fileId;
         staff.avatar = fileId[0];
         staff.save();
-        console.info(staff);
     }}
+
+    /*$scope.addCoin = async function(){
+        let a = await staff.addCoin(10,"测试加钱");
+        console.info(a);
+        console.info("==---------");
+    }*/
     // $scope.changeAvator = function(){
     //     ngModalDlg.createDialog({
     //         parent:$scope,

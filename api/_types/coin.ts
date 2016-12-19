@@ -4,14 +4,17 @@
 
 'use strict';
 import {ModelObject} from "common/model/object";
-import {Table, Field, Create} from "common/model/common";
+import {Table, Field, Create, RemoteCall} from "common/model/common";
 import {Models} from "./index";
 import {Types, Values} from "common/model/index";
 import {PaginateInterface} from "common/model/interface";
 
-enum COIN_CHANGE_TYPE {
+declare var API: any;
+
+export enum COIN_CHANGE_TYPE {
     INCOME = 1,
-    FREE_LOCK = 2,
+    AWARD = 2,
+    FREE_LOCK = 3,
     CONSUME = -1,
     LOCK = -2
 }
@@ -31,19 +34,19 @@ export class CoinAccount extends ModelObject {
     set id(id: string) {}
 
     //总收入
-    @Field({type: Types.BIGINT})
+    @Field({type: Types.NUMERIC(15,2), defaultValue: 0})
     get income() :number { return 0}
     set income(income: number) {}
 
     //消费掉的
-    @Field({type: Types.BIGINT})
+    @Field({type: Types.NUMERIC(15,2), defaultValue: 0})
     get consume(): number { return 0}
     set consume(consume: number) {}
 
     //锁定金额
-    @Field({ type: Types.BIGINT})
+    @Field({ type: Types.NUMERIC(15,2), defaultValue: 0})
     get locks(): number { return 0}
-    set locks(coins) {}
+    set locks(coins: number) {}
 
     //是否允许超支
     @Field({ type: Types.BOOLEAN})
@@ -64,10 +67,17 @@ export class CoinAccount extends ModelObject {
         return Models.coinAccountChange.find(options);
     }
 
-    async addCoin(coins: number, remark?: string, duiBaOrderNum?: string) :Promise<any> {
+    @RemoteCall()
+    async addCoin(coins: number, remark?: string, duiBaOrderNum?: string, type?: COIN_CHANGE_TYPE) :Promise<any> {
         let self = this;
+        /*if(!this.isLocal){
+            API.require('seeds');
+            await API.onload();
+        }*/
         //先记录日志
-        let log = await Models.coinAccountChange.create({type: COIN_CHANGE_TYPE.INCOME, coinAccountId: self.id, coins: coins, remark: remark, duiBaOrderNum: duiBaOrderNum});
+        // let coinAccountNo = await API.seeds.getSeedNo('CoinAccountNo');
+        let coinAccountNo = getOrderNo();
+        let log = await Models.coinAccountChange.create({orderNum: coinAccountNo, type: type || COIN_CHANGE_TYPE.INCOME, coinAccountId: self.id, coins: coins, remark: remark, duiBaOrderNum: duiBaOrderNum});
         log = await log.save();
         if (!self.income) {
             self.income = 0;
@@ -87,8 +97,14 @@ export class CoinAccount extends ModelObject {
         if (!self.isAllowOverCost && balance <= 0) {
             throw new Error(`余额不足`);
         }
-
-        let log = await Models.coinAccountChange.create({type: COIN_CHANGE_TYPE.CONSUME, coinAccountId: self.id, coins: coins, remark: remark, duiBaOrderNum: duiBaOrderNum});
+        /*if(!this.isLocal){
+            API.require('seeds');
+            await API.onload();
+        }
+        //先记录日志
+        let coinAccountNo = await API.seeds.getSeedNo('CoinAccountNo');*/
+        let coinAccountNo = getOrderNo();
+        let log = await Models.coinAccountChange.create({orderNum: coinAccountNo, type: COIN_CHANGE_TYPE.CONSUME, coinAccountId: self.id, coins: 0-coins, remark: remark, duiBaOrderNum: duiBaOrderNum});
         log = await log.save();
         if (!self.consume) {
             self.consume = 0;
@@ -103,7 +119,14 @@ export class CoinAccount extends ModelObject {
 
     async lockCoin(coins: number, remark?: string) :Promise<CoinAccount>{
         let self = this;
-        let log = await Models.coinAccountChange.create({type: COIN_CHANGE_TYPE.LOCK, coinAccountId: self.id, coins: coins, remark: remark});
+        /*if(!this.isLocal){
+            API.require('seeds');
+            await API.onload();
+        }
+        //先记录日志
+        let coinAccountNo = await API.seeds.getSeedNo('CoinAccountNo');*/
+        let coinAccountNo = getOrderNo();
+        let log = await Models.coinAccountChange.create({orderNum: coinAccountNo, type: COIN_CHANGE_TYPE.LOCK, coinAccountId: self.id, coins: coins, remark: remark});
         log = await log.save();
         self.locks = self.locks + coins;
         return self.save();
@@ -114,13 +137,27 @@ export class CoinAccount extends ModelObject {
         if (self.locks < coins) {
             throw new Error('解锁金额大于锁定金额');
         }
-        let log = await Models.coinAccountChange.create({type: COIN_CHANGE_TYPE.FREE_LOCK, coinAccountId: self.id, coins: coins, remark: remark});
+        if(!this.isLocal){
+            API.require('seeds');
+            await API.onload();
+        }
+        //先记录日志
+        let coinAccountNo = await API.seeds.getSeedNo('CoinAccountNo');
+        let log = await Models.coinAccountChange.create({orderNum: coinAccountNo, type: COIN_CHANGE_TYPE.FREE_LOCK, coinAccountId: self.id, coins: coins, remark: remark});
         log = await log.save();
         self.locks = self.locks - coins;
         if (self.locks < 0) {
             self.locks = 0;
         }
         return self.save()
+    }
+
+    async getCoinAccountChanges(params) :Promise<any> {
+        let self = this;
+        if(!params) params = {};
+        if(!params.where) params.where = {};
+        params.where.coinAccountId = self.id;
+        return Models.coinAccountChange.find(params);
     }
 }
 
@@ -146,7 +183,7 @@ export class CoinAccountChange extends ModelObject {
     get type(): number { return 1}
     set type(type: number) {}
     
-    @Field({type: Types.INTEGER})
+    @Field({type: Types.NUMERIC(15,2), defaultValue: 0})
     set coins(coins: number) {}
     get coins() : number { return 0}
     
@@ -155,7 +192,18 @@ export class CoinAccountChange extends ModelObject {
     get remark(): string {return ''}
 
     @Field({type: Types.STRING})
+    get orderNum(): string {return null}
+    set orderNum(orderNum: string) {}
+
+    @Field({type: Types.STRING})
     get duiBaOrderNum(): string {return null}
     set duiBaOrderNum(duiBaOrderNum: string) {}
 
+}
+
+function getOrderNo() : string {
+    var d = new Date();
+    var rnd =  (Math.ceil(Math.random() * 1000));
+    var str = `${d.getFullYear()}${d.getMonth()+1}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}-${rnd}`;
+    return str;
 }

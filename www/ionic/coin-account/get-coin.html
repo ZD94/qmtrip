@@ -1,0 +1,14 @@
+<ion-view title="获取鲸币" id="page30">
+    <ion-content padding="true" class="has-header notice-type">
+        <div class="list card">
+            <div>差旅节省奖励可兑：{{staff.balancePoints/2}}</div>
+            <div>剩余节省金额：{{staff.balancePoints}}</div>
+            <div>可兑换鲸币：{{staff.balancePoints/2}}</div>
+            <div>企业账户状态：{{companyCoinAccount.balance}}-{{companyCoinAccount.balance > staff.balancePoints/2? "充足": "不充足"}}</div>
+            <div>
+                <input type="text" ng-model="staff.exchangeNum" style="border: solid #ccc 1px;">
+                <span ng-click="exchange()">立即兑换</span>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>
