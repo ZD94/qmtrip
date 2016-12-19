@@ -2,6 +2,7 @@
  * Created by seven on 2016/12/12.
  */
 import angular = require('angular');
+import _ = require('lodash');
 
 angular
     .module('nglibs')
@@ -42,9 +43,11 @@ angular
                 $scope.checkOption = function(option){
                     let idx = $scope.model.indexOf(option.value);
                     if(idx >=0){
-                        $scope.model.splice(idx, 1);
+                        $scope.model = _.clone($scope.model).splice(idx, 1);
                     }else{
+                        $scope.model = _.clone($scope.model);
                         $scope.model.push(option.value);
+                        // $scope.model = _.clone($scope.model).push(option.value);
                         $scope.model.sort();
                     }
                 }
@@ -82,6 +85,7 @@ angular
                     }else{
                         $scope.options.map(function(opt){
                             if($scope.model.indexOf(opt.value) < 0){
+                                $scope.model = _.clone($scope.model);
                                 $scope.model.push(opt.value);
                                 $scope.model.sort();
                             }
