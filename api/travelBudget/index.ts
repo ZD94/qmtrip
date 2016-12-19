@@ -287,9 +287,13 @@ export default class ApiTravelBudget {
         if (!policy) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
-        if(policy.hotelLevels && policy.hotelLevels.length){
+        //区分国内国外标准
+        if (city.isAbroad) {
+            hotelStar = policy.abroadHotelLevels;
+        } else {
             hotelStar = policy.hotelLevels;
         }
+
         let gps = [];
         if (businessDistrict && /,/g.test(businessDistrict)) {
             gps = businessDistrict.split(/,/);
@@ -369,7 +373,20 @@ export default class ApiTravelBudget {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
 
-        let cabins: EPlaneLevel[] = policy.planeLevels
+        let isAbroad = false;
+        let m_originCity = await API.place.getCityInfo({cityCode: originPlace.id || originPlace});
+        let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
+
+        if (m_destination.isAbroad || m_originCity.isAbroad) {
+            isAbroad = true;
+        }
+        let cabins: EPlaneLevel[];
+        //区分国内国外标准
+        if (isAbroad) {
+            cabins = policy.abroadPlaneLevels;
+        } else {
+            cabins = policy.planeLevels
+        }
 
         if (!cabins || !cabins.length) {
             cabins = [EPlaneLevel.ECONOMY, EPlaneLevel.BUSINESS, EPlaneLevel.FIRST]
@@ -378,14 +395,6 @@ export default class ApiTravelBudget {
         let trainCabins: ETrainLevel[] = policy.trainLevels;
         if (!trainCabins || !trainCabins.length) {
             trainCabins = [];
-        }
-
-        let m_originCity = await API.place.getCityInfo({cityCode: originPlace.id || originPlace});
-        let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
-
-        let isAbroad = false;
-        if (m_destination.isAbroad || m_originCity.isAbroad) {
-            isAbroad = true;
         }
 
         let flightTickets:ITicket[] = [];
