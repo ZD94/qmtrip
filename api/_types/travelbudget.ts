@@ -37,6 +37,7 @@ export interface IFinalTicket {
     price: number;
     score?: number;
     reasons?: string[];
+    stops?: string[];
 }
 
 //仓位信息
@@ -67,6 +68,7 @@ export interface ITicket {
     originStation?: string; //出发机场或者车站
     destinationStation?: string;    //目的地机场或者车站
     type: TRAFFIC,
+    stops?: string[],   //中转城市
 }
 
 //酒店代理商

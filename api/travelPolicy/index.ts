@@ -24,17 +24,22 @@ class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["name","planeLevel","trainLevel","hotelLevel","companyId"], travalPolicyCols)
+    @requireParams(["name","planeLevels","trainLevels","hotelLevels","companyId"], travalPolicyCols)
     @conditionDecorator([
         {if: condition.isCompanyAdminOrOwner("0.companyId")},
         {if: condition.isCompanyAgency("0.companyId")}
     ])
     static async createTravelPolicy (params) : Promise<TravelPolicy>{
-
         let result = await Models.travelPolicy.find({where: {name: params.name, companyId: params.companyId}});
         if(result && result.length>0){
             throw {msg: "该等级名称已存在，请重新设置"};
         }
+        params.planeLevels = tryConvertToArray(params.planeLevels);
+        params.trainLevels = tryConvertToArray(params.trainLevels);
+        params.hotelLevels = tryConvertToArray(params.hotelLevels);
+        params.abroadHotelLevels = tryConvertToArray(params.abroadHotelLevels);
+        params.abroadTrainLevels = tryConvertToArray(params.abroadTrainLevels)
+        params.abroadPlaneLevels = tryConvertToArray(params.abroadPlaneLevels);
         var travelp = TravelPolicy.create(params);
         return travelp.save();
     }
@@ -100,9 +105,13 @@ class TravelPolicyModule{
     ])
     static async updateTravelPolicy(params) : Promise<TravelPolicy>{
         var id = params.id;
-        //var staff = await Staff.getCurrent();
-
         var tp = await Models.travelPolicy.get(id);
+        params.planeLevels = tryConvertToArray(params.planeLevels);
+        params.trainLevels = tryConvertToArray(params.trainLevels);
+        params.hotelLevels = tryConvertToArray(params.hotelLevels);
+        params.abroadHotelLevels = tryConvertToArray(params.abroadHotelLevels);
+        params.abroadTrainLevels = tryConvertToArray(params.abroadTrainLevels)
+        params.abroadPlaneLevels = tryConvertToArray(params.abroadPlaneLevels);
         for(var key in params){
             tp[key] = params[key];
         }
@@ -174,8 +183,8 @@ class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["where.companyId"],['attributes','where.name', 'where.planeLevel', 'where.planeDiscount',
-        'where.trainLevel', 'where.hotelLevel', 'where.hotelPrice', 'where.companyId', 'where.isChangeLevel', 'where.createdAt'])
+    @requireParams(["where.companyId"],['attributes','where.name', 'where.planeLevels', 'where.planeDiscount',
+        'where.trainLevels', 'where.hotelLevels', 'where.hotelPrice', 'where.companyId', 'where.isChangeLevel', 'where.createdAt'])
     @conditionDecorator([
         {if: condition.isCompanyAdminOrOwner("where.companyId")},
         {if: condition.isCompanyAgency("where.companyId")}
@@ -212,7 +221,7 @@ class TravelPolicyModule{
      * @param options options.perPage 每页条数 options.page当前页
      */
     @clientExport
-    @requireParams(["companyId"],['columns','name', 'planeLevel', 'planeDiscount', 'trainLevel', 'hotelLevel', 'hotelPrice', 'companyId', 'isChangeLevel', 'createdAt'])
+    @requireParams(["companyId"],['columns','name', 'planeLevels', 'planeDiscount', 'trainLevels', 'hotelLevels', 'hotelPrice', 'companyId', 'isChangeLevel', 'createdAt'])
     @conditionDecorator([
         {if: condition.isCompanyAdminOrOwner("0.companyId")},
         {if: condition.isCompanyAgency("0.companyId")}
@@ -356,6 +365,13 @@ class TravelPolicyModule{
     }
     /*************************************补助模板end***************************************/
 
+}
+
+function tryConvertToArray(val) {
+    if (val && !_.isArray(val)) {
+        return [val];
+    }
+    return val;
 }
 
 export = TravelPolicyModule;

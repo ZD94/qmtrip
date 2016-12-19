@@ -1,15 +1,56 @@
 import { Staff } from 'api/_types/staff/staff';
-import { TravelPolicy, EPlaneLevel, ETrainLevel, EHotelLevel } from 'api/_types/travelPolicy';
+import {TravelPolicy, EPlaneLevel, ETrainLevel, EHotelLevel, MPlaneLevel, MTrainLevel} from 'api/_types/travelPolicy';
 import { SubsidyTemplatesController } from './subsidy-templates';
 var msgbox = require('msgbox');
 
 export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory, $ionicPopup, ngModalDlg) {
     require('./editpolicy.scss');
+    $scope.travelPolicy = {};
+    $scope.planeLevels = [
+        { name: MPlaneLevel[EPlaneLevel.ECONOMY],value: EPlaneLevel.ECONOMY},
+        { name: MPlaneLevel[EPlaneLevel.FIRST],value: EPlaneLevel.FIRST},
+        { name: MPlaneLevel[EPlaneLevel.BUSINESS],value: EPlaneLevel.BUSINESS},
+        { name: MPlaneLevel[EPlaneLevel.PREMIUM_ECONOMY],value: EPlaneLevel.PREMIUM_ECONOMY}
+    ];
+    $scope.planeValue = [];
+    $scope.trainLevels = [
+        { name: MTrainLevel[ETrainLevel.BUSINESS_SEAT],value: ETrainLevel.BUSINESS_SEAT},
+        { name: MTrainLevel[ETrainLevel.FIRST_SEAT],value: ETrainLevel.FIRST_SEAT},
+        { name: MTrainLevel[ETrainLevel.SECOND_SEAT],value: ETrainLevel.SECOND_SEAT},
+        { name: MTrainLevel[ETrainLevel.PRINCIPAL_SEAT],value: ETrainLevel.PRINCIPAL_SEAT},
+        { name: MTrainLevel[ETrainLevel.SENIOR_SOFT_SLEEPER],value: ETrainLevel.SENIOR_SOFT_SLEEPER},
+        { name: MTrainLevel[ETrainLevel.SOFT_SLEEPER],value: ETrainLevel.SOFT_SLEEPER},
+        { name: MTrainLevel[ETrainLevel.HARD_SLEEPER],value: ETrainLevel.HARD_SLEEPER},
+        { name: MTrainLevel[ETrainLevel.SOFT_SEAT],value: ETrainLevel.SOFT_SEAT},
+        { name: MTrainLevel[ETrainLevel.HARD_SEAT],value: ETrainLevel.HARD_SEAT},
+        { name: MTrainLevel[ETrainLevel.NO_SEAT],value: ETrainLevel.NO_SEAT}
+    ]
+    $scope.trainValue = [];
+    let hotelLevels = $scope.hotelLevels = [
+        { name: '国际五星', value: 5, desc1: '万丽、喜来登 ',desc2: '希尔顿、皇冠假日等'},
+        { name: '高端商务', value: 4, desc1: '福朋喜来登、诺富特、希尔顿逸林',desc2: '豪生、、Holiday Inn、开元名都等'},
+        { name: '精品连锁', value: 3, desc1: '如家精选、和颐酒店、全季酒店、',desc2: '桔子水晶、智选假日、ZMAX等'},
+        { name: '快捷连锁', value: 2, desc1: '如家、莫泰168、汉庭',desc2: '速8、锦江之星、IBIS等'},
+    ];
+    $scope.hotelValue = [];
+    $scope.abroadPlaneLevels = [
+        { name: MPlaneLevel[EPlaneLevel.ECONOMY],value: EPlaneLevel.ECONOMY},
+        { name: MPlaneLevel[EPlaneLevel.FIRST],value: EPlaneLevel.FIRST},
+        { name: MPlaneLevel[EPlaneLevel.BUSINESS],value: EPlaneLevel.BUSINESS},
+        { name: MPlaneLevel[EPlaneLevel.PREMIUM_ECONOMY],value: EPlaneLevel.PREMIUM_ECONOMY}
+    ];
+    $scope.abroadPlaneValue = [];
+    $scope.abroadHotelLevels = [
+        { name: '国际五星', value: 5, desc1: '万丽、喜来登 ',desc2: '希尔顿、皇冠假日等'},
+        { name: '高端商务', value: 4, desc1: '福朋喜来登、诺富特、希尔顿逸林',desc2: '豪生、、Holiday Inn、开元名都等'},
+        { name: '精品连锁', value: 3, desc1: 'Comfort Inn、和颐酒店、全季酒店、',desc2: '桔子水晶、智选假日、ZMAX等'},
+        { name: '快捷连锁', value: 2, desc1: 'Green Hotel',desc2: 'Super8、IBIS等'},
+    ];
+    $scope.abroadHotelValue = [];
     var staff = await Staff.getCurrent();
     var travelPolicy;
     var subsidyTemplates;
     let policyId = $stateParams.policyId;
-
     let saveSubsidyTemplates = [];
     let removeSubsidyTemplates = [];
     $scope.subsidyTemplates = [];
@@ -17,17 +58,29 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         travelPolicy = await Models.travelPolicy.get($stateParams.policyId);
         $scope.subsidyTemplates = subsidyTemplates = await travelPolicy.getSubsidyTemplates();
     } else {
-
         travelPolicy = TravelPolicy.create();
         travelPolicy.companyId = staff.company.id;
-        travelPolicy.planeLevel = EPlaneLevel.ECONOMY;
-        travelPolicy.trainLevel = ETrainLevel.SECOND_CLASS;
-        travelPolicy.hotelLevel = EHotelLevel.TWO_STAR;
+        travelPolicy.planeLevels = [EPlaneLevel.ECONOMY];
+        travelPolicy.trainLevels = [ETrainLevel.SECOND_SEAT];
+        travelPolicy.hotelLevels = [EHotelLevel.TWO_STAR];
     }
     $scope.travelPolicy = travelPolicy;
+    console.info($scope.travelPolicy);
     $scope.savePolicy = async function () {
         if(!$scope.travelPolicy.name){
             msgbox.log("标准名称不能为空");
+            return false;
+        }
+        if($scope.travelPolicy.planeLevels.length <=0){
+            msgbox.log('飞机舱位不能为空');
+            return false;
+        }
+        if($scope.travelPolicy.trainLevels.length <=0){
+            msgbox.log('火车座次不能为空');
+            return false;
+        }
+        if($scope.travelPolicy.hotelLevels.length <=0){
+            msgbox.log('住宿标准不能为空');
             return false;
         }
         var re = /^[0-9]+.?[0-9]*$/;
@@ -35,8 +88,20 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
             msgbox.log("补助必须为数字");
             return false;
         }
-        $scope.travelPolicy.company = staff.company;
-        let travelPolicy = await $scope.travelPolicy.save();
+        console.info(staff.company ==$scope.travelPolicy.company);
+        // if(!policyId){
+        //     $scope.travelPolicy.company = staff.company;
+        // }
+        // console.info(policyId);
+        let travelPolicy;
+        console.info($scope.travelPolicy.planeLevels);
+        try{
+            console.info('start');
+            travelPolicy = await $scope.travelPolicy.save();
+            console.info('end');
+        }catch(err){
+            console.log(err);
+        }
         for(let v of saveSubsidyTemplates) {
             v.travelPolicy = travelPolicy;
             await v.save();
@@ -46,29 +111,22 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
                 await v.destroy();
             }
         }
-        $ionicHistory.goBack(-1);
+        window.location.href= `#/travel-policy/showpolicy?policyId=${policyId}`;
     }
-
-    let hotelLevels = [
-        { title: '国际五星', value: 5, desc: '万丽 喜来登 希尔顿 皇冠假日 等'},
-        { title: '高端商务', value: 4, desc: '福朋喜来登 诺富特 希尔顿逸林 假日酒店 等'},
-        { title: '精品连锁', value: 3, desc: '如家精选 和颐酒店 全季酒店 桔子水晶 智选假日 ZMAX 等'},
-        { title: '快捷连锁', value: 2, desc: '如家 莫泰 汉庭 IBIS 锦江之星 速8 等'},
-    ];
     $scope.selectHotalLevel = {
         searchbox: false,
         query: () => [5, 4, 3, 2],
         display: function(val){
             for(let level of hotelLevels){
                 if(level.value === val){
-                    return level.title;
+                    return level.name;
                 }
             }
         },
         note: function(val){
             for(let level of hotelLevels){
                 if(level.value === val){
-                    return level.desc;
+                    return level.desc1;
                 }
             }
         }
@@ -93,7 +151,7 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
                                 throw {code: -1, msg: '还有'+ result.length +'位员工在使用该标准'};
                             }
                             await $scope.travelPolicy.destroy();
-                            $ionicHistory.goBack(-1);
+                            window.location.href = '#/travel-policy/index'
                         }catch(err){
                             if(err.code == -1){
                                 deleteFailed();

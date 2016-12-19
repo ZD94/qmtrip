@@ -1,0 +1,49 @@
+<ion-view>
+    <ion-content class="has-header policy-detail" padding="true">
+        <div class="list">
+            <div class="item">
+                标准名称
+                <span class="item-note">{{travelPolicy.name}}</span>
+            </div>
+            <div class="item">
+                使用人数
+                <span class="item-note">{{}}</span>
+            </div>
+        </div>
+        <div class="list">
+            <div class="policy_tit">国内差旅标准</div>
+            <div class="item detail-left-right">
+                <span class="detail-left">飞机舱位</span>
+                <span class="detail-right">{{enumPlaneLevelToStr(travelPolicy.planeLevels)}}</span>
+            </div>
+            <div class="item detail-left-right">
+                <span class="detail-left">火车座次</span>
+                <span class="detail-right">{{enumTrainLevelToStr(travelPolicy.trainLevels)}}</span>
+            </div>
+            <div class="item detail-left-right">
+                <span class="detail-left">住宿标准</span>
+                <span class="detail-right">{{enumHotelLevelToStr(travelPolicy.hotelLevels)}}</span>
+            </div>
+        </div>
+        <div class="list" ng-if="travelPolicy.isOpenAbroad">
+            <div class="policy_tit">国际差旅标准</div>
+            <div class="item detail-left-right">
+                <span class="detail-left">飞机舱位</span>
+                <span class="detail-right">{{enumPlaneLevelToStr(travelPolicy.abroadPlaneLevels)}}</span>
+            </div>
+            <div class="item detail-left-right">
+                <span class="detail-left">住宿标准</span>
+                <span class="detail-right">{{enumHotelLevelToStr(travelPolicy.abroadHotelLevels)}}</span>
+            </div>
+        </div>
+        <div class="list">
+            <div class="policy_tit">补助模板</div>
+            <div class="item" ng-repeat="subsidy in subsidies">
+                {{subsidy.name}}
+                <span class="item-note">{{subsidy.subsidyMoney}}元/天</span>
+            </div>
+        </div>
+        <a class="button button-block button-calm" ng-click="editPolicy()">修改</a>
+        <a class="button button-block button-assertive" ng-click="deletePolicy()">删除</a>
+    </ion-content>
+</ion-view>

@@ -33,6 +33,7 @@ function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
                     bookUrl: agents[j].bookUrl,
                     duration: tickets[i].duration || ((new Date(tickets[i].arrivalDateTime).valueOf() - new Date(tickets[i].departDateTime).valueOf())/(60*1000)),
                     type: tickets[i].type,
+                    stops: tickets[i].stops,
                 } as IFinalTicket
                 _tickets.push(_ticket);
             }

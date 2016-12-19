@@ -4,7 +4,7 @@
 import { clientExport } from 'common/api/helper';
 import {Models } from 'api/_types'
 import {ETripType, EInvoiceType} from "../_types/tripPlan";
-import {EPlaneLevel, ETrainLevel, MTrainLevel} from "../_types/travelPolicy";
+import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel} from "../_types/travelPolicy";
 import {Staff} from "../_types/staff";
 const API = require("common/api");
 const validate = require("common/validate");
@@ -282,14 +282,18 @@ export default class ApiTravelBudget {
 
         //查询员工差旅标准
         let policy = await staff.getTravelPolicy();
-        let hotelStar: number = 3;
+        let hotelStar = [EHotelLevel.THREE_STAR];
         city = await API.place.getCityInfo({cityCode: city.id || city});
         if (!policy) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
-        if(policy.hotelLevel){
-            hotelStar = policy.hotelLevel;
+        //区分国内国外标准
+        if (city.isAbroad) {
+            hotelStar = policy.abroadHotelLevels;
+        } else {
+            hotelStar = policy.hotelLevels;
         }
+
         let gps = [];
         if (businessDistrict && /,/g.test(businessDistrict)) {
             gps = businessDistrict.split(/,/);
@@ -311,7 +315,8 @@ export default class ApiTravelBudget {
             longitude: gps[1],
             businessDistrict: businessDistrict,
             checkInDate: checkInDate,
-            checkOutDate: checkOutDate
+            checkOutDate: checkOutDate,
+            isAbroad: city.isAbroad
         }
         let budgetConfig = staff.company.budgetConfig;
         if (budgetConfig && budgetConfig.hotel) {
@@ -368,28 +373,29 @@ export default class ApiTravelBudget {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
 
-        let cabinClass: string[] = [];
-        if (policy.planeLevel == EPlaneLevel.ECONOMY ) {
-            cabinClass.push('Economy');
-        }
-        if (policy.planeLevel == EPlaneLevel.BUSINESS_FIRST) {
-            cabinClass.push('PremiumEconomy');
-            cabinClass.push('Business');
-            cabinClass.push('First');
-        }
-
-        let trainCabinClass = MTrainLevel[ETrainLevel.SECOND_CLASS].replace(/\//g, ",");
-        if (policy.trainLevel) {
-            trainCabinClass = MTrainLevel[policy.trainLevel];
-            trainCabinClass = trainCabinClass.replace(/\//g, ",");
-        }
-        if (leaveDate && !validate.isDate(leaveDate)) {
-            leaveDate = moment(leaveDate).format("YYYY-MM-DD");
-        }
-
-        //let companyPolicy = staff.company.budgetPolicy;
+        let isAbroad = false;
         let m_originCity = await API.place.getCityInfo({cityCode: originPlace.id || originPlace});
         let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
+
+        if (m_destination.isAbroad || m_originCity.isAbroad) {
+            isAbroad = true;
+        }
+        let cabins: EPlaneLevel[];
+        //区分国内国外标准
+        if (isAbroad) {
+            cabins = policy.abroadPlaneLevels;
+        } else {
+            cabins = policy.planeLevels
+        }
+
+        if (!cabins || !cabins.length) {
+            cabins = [EPlaneLevel.ECONOMY, EPlaneLevel.BUSINESS, EPlaneLevel.FIRST]
+        }
+
+        let trainCabins: ETrainLevel[] = policy.trainLevels;
+        if (!trainCabins || !trainCabins.length) {
+            trainCabins = [];
+        }
 
         let flightTickets:ITicket[] = [];
         if (m_originCity && m_destination) {
@@ -397,23 +403,27 @@ export default class ApiTravelBudget {
                 originPlace: m_originCity,
                 destination: m_destination,
                 leaveDate: leaveDate,
-                cabin: cabinClass
+                cabin: cabins,
+                isAbroad: isAbroad,
             });
             if (!flightTickets) {
                 flightTickets = [];
             }
         }
 
-        let trainCabins = trainCabinClass.split(/,/g)
-        let trainTickets = await API.train.search_ticket( {
-            originPlace: m_originCity,
-            destination: m_destination,
-            leaveDate: leaveDate,
-            cabin: trainCabins
-        });
-        if (!trainTickets) {
-            trainTickets = [];
+        let trainTickets = [];
+        if (!isAbroad) {
+            trainTickets = await API.train.search_ticket( {
+                originPlace: m_originCity,
+                destination: m_destination,
+                leaveDate: leaveDate,
+                cabin: trainCabins
+            });
+            if (!trainTickets) {
+                trainTickets = [];
+            }
         }
+
         let preferConfig: any = staff.company.budgetConfig;
         if (!params.earliestLeaveTime) {
             params.earliestLeaveTime = '09:00'
@@ -422,21 +432,35 @@ export default class ApiTravelBudget {
             params.latestArrivalTime = '21:00'
         }
         let qs: any = {};
-        if (preferConfig && preferConfig.traffic) {
-            let compiled = _.template(JSON.stringify(preferConfig.traffic));
-            qs.prefers = JSON.parse(compiled(params));
-        } else {
-            qs.prefers = loadDefaultPrefer(params);
+
+        if (isAbroad) {   //国际
+            if (preferConfig && preferConfig.abroadTraffic) {
+                let compiled = _.template(JSON.stringify(preferConfig.abroadTraffic));
+                qs.prefers = JSON.parse(compiled(params));
+            } else {
+                qs.prefers = loadDefaultPrefer(params, 'abroadTicket');
+            }
+        } else {            //国内
+            if (preferConfig && preferConfig.traffic) {
+                let compiled = _.template(JSON.stringify(preferConfig.traffic));
+                qs.prefers = JSON.parse(compiled(params));
+            } else {
+                qs.prefers = loadDefaultPrefer(params, 'ticket');
+            }
         }
+
         if (!qs.prefers) {
             qs.prefers = [];
         }
+
         qs.prefers = qs.prefers.map( (p) => {
             if (p.name == 'cabin') {
-                p.options['expectCabins'] = _.concat(cabinClass, trainCabins)
+                p.options['expectTrainCabins'] = trainCabins;
+                p.options['expectFlightCabins'] = cabins;
             }
             return p;
-        })
+        });
+
         qs.query = params;
         qs.query.originPlace = m_originCity;
         qs.query.destination = m_destination;

@@ -1,9 +1,13 @@
 import { Staff } from 'api/_types/staff/staff';
-import { MHotelLevel, MPlaneLevel, MTrainLevel } from 'api/_types/travelPolicy';
+import {
+    MHotelLevel, MPlaneLevel, MTrainLevel, enumHotelLevelToStr, enumPlaneLevelToStr,
+    enumTrainLevelToStr
+} from 'api/_types/travelPolicy';
 
 var msgbox = require('msgbox');
 
 export * from './editpolicy';
+export * from './showpolicy';
 
 export async function IndexController($scope, Models, $location, $ionicPopup, $ionicHistory) {
     require('./index.scss');
@@ -13,6 +17,10 @@ export async function IndexController($scope, Models, $location, $ionicPopup, $i
     $scope.MHotelLevel = MHotelLevel;
     $scope.MPlaneLevel = MPlaneLevel;
     $scope.MTrainLevel = MTrainLevel;
+    $scope.enumHotelLevelToStr = enumHotelLevelToStr;
+    $scope.enumPlaneLevelToStr = enumPlaneLevelToStr;
+    $scope.enumTrainLevelToStr = enumTrainLevelToStr;
+    
     let ps = travelPolicies.map(async function (policy) {
         var subsidyTemplates = await policy.getSubsidyTemplates();
         if(policy.isDefault){
@@ -22,6 +30,7 @@ export async function IndexController($scope, Models, $location, $ionicPopup, $i
         return obj;
     })
     $scope.travelPolicies = await Promise.all(ps);
+    console.info($scope.travelPolicies);
     await Promise.all($scope.travelPolicies.map(async function (obj) {
         var result = await obj.policy.getStaffs();
         obj.usernum = result.length;
@@ -29,7 +38,7 @@ export async function IndexController($scope, Models, $location, $ionicPopup, $i
     }))
     $scope.editpolicy = async function (id) {
         // var travelpolicy = await Models.travelPolicy.get(id);
-        $location.path('/travel-policy/editpolicy').search({'policyId': id}).replace();
+        $location.path('/travel-policy/showpolicy').search({'policyId': id}).replace();
     }
 
     $scope.setDefault = async function(){

@@ -1,0 +1,29 @@
+.check-box{
+  display: inline-block;
+  .checkbtn{
+    display: inline-block;
+    background: #fff;
+    color:#4a4a4a;
+    border: 1px solid #4A4A4A;
+    height: 24px;
+    line-height: 22px;
+    width: 70px;
+    text-align: center;
+    font-size: 12px;
+    margin: 9px;
+    border-radius: 3px;
+    &.checked{
+      color:#28A7E1;
+      border: 1px solid #28A7E1;
+    }
+  }
+  .checkbox_diy{
+    color: #fff;
+    &.all_check{
+      .icon{
+        color: #28A7E1;
+      }
+    }
+  }
+  
+}

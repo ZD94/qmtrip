@@ -5,15 +5,13 @@
     </ion-header-bar>
     <ion-content padding="true" class="has-header">
         <a ng-click="addTemplate()" id="page30-button89" class="button button-positive  button-block">新增补助模板</a>
-        <a id="page29-button88" class="button button-stable  button-block" ng-click="showDelete = !showDelete;showReorder = false">管理模板</a>
+        <a class="button button-stable  button-block" ng-click="showDelete = !showDelete;showReorder = false">管理模板</a>
         <ion-list show-delete="showDelete">
             <ion-item ng-repeat="st in subsidyTemplates">
                 <ion-delete-button class="ion-minus-circled" ng-click="deleteSt(st, $index)"> </ion-delete-button>
-                <div id="page30-markdown21" style="color:#000000;">
-                    <p>模板标题：{{st.name}}</p>
-                </div>
-                <div id="page30-markdown22" style="color:#000000;">
-                    <p>补助金额：{{st.subsidyMoney}}元/天</p>
+                <div style="color:#000000;">
+                    {{st.name}}<span class="item-note">{{st.subsidyMoney}}元/天</span>
+                    <!--<i class="icon ion-chevron-right"></i>-->
                 </div>
             </ion-item>
             <div class="subsidyAttend">说明<br/>
