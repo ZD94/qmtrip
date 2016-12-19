@@ -19,6 +19,9 @@ class CabinPrefer extends AbstractPrefer<IFinalTicket> {
         if (!this.score) {
             this.score = 0;
         }
+        if (!this.expectCabins) {
+            this.expectCabins = [];
+        }
     }
 
     async markScoreProcess(tickets:IFinalTicket[]):Promise<IFinalTicket[]> {
