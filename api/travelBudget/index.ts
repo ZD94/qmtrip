@@ -287,8 +287,11 @@ export default class ApiTravelBudget {
         if (!policy) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
+        if (city.isAbroad && (!policy.isOpenAbroad || !policy.abroadHotelLevels.length)) {
+            throw L.ERR.ABROAD_TRAVEL_POLICY_NOT_EXIST();
+        }
         //区分国内国外标准
-        if (city.isAbroad) {
+        if (city.isAbroad ) {
             hotelStar = policy.abroadHotelLevels;
         } else {
             hotelStar = policy.hotelLevels;
@@ -381,6 +384,10 @@ export default class ApiTravelBudget {
             isAbroad = true;
         }
         let cabins: EPlaneLevel[];
+        if (isAbroad && (!policy.isOpenAbroad || !policy.abroadPlaneLevels.length)) {
+            throw L.ERR.ABROAD_TRAVEL_POLICY_NOT_EXIST();
+        }
+
         //区分国内国外标准
         if (isAbroad) {
             cabins = policy.abroadPlaneLevels;
