@@ -3,7 +3,6 @@
  */
 
 'use strict';
-import {Models} from "../_types/index";
 import {requireParams, clientExport} from "../../common/api/helper";
 import {Staff} from "../_types/staff/staff";
 import {CoinAccount} from "api/_types/coin";
@@ -27,6 +26,7 @@ class DuiBa {
         if(!params) params = {};
         params.uid = staff.id;
         var credits = 0;
+        staff.coinAccount = staff.$parents["account"]["coinAccount"];
         if(staff.coinAccount && staff.coinAccount.balance){
             credits = staff.coinAccount.balance;
         }
@@ -41,18 +41,18 @@ class DuiBa {
         if(params.hasOwnProperty("appSecret")){
             delete params.appSecret;
         }
-        console.info("params:", params);
         let u = URL.parse(baseUrl);
         u.query = params;
         let url = URL.format(u);
-        console.info("url:", url)
         return url;
     }
 
     static async getSign(params) :Promise<string>{
-        console.info("getSign:", params)
-        if(!params.hasOwnProperty("sign")){
+        if(params.hasOwnProperty("sign")){
             delete params.sign;
+        }
+        if(!params.hasOwnProperty("appSecret")){
+            params.appSecret = config.duiba.appSecret;
         }
         let keys = Object.keys(params).sort();
         var keyValue = "";
@@ -60,9 +60,7 @@ class DuiBa {
             keyValue += params[key]
         }
 
-        console.info("keyValue:", keyValue)
         var sign = utils.md5(keyValue);
-        console.info("sign:",sign);
         return sign;
     }
 

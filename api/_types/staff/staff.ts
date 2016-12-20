@@ -355,12 +355,12 @@ export class Staff extends ModelObject implements Account {
         return result;
     }
     
-    async getDuiBaLoginUrl(): Promise<string>{
+    async getDuiBaLoginUrl(params?: any): Promise<string>{
         if(!this.isLocal){
             API.require('duiba');
             await API.onload();
         }
-        return API.duiba.getLoginUrl({});
+        return API.duiba.getLoginUrl(params);
     }
 
     async getCoinAccountChanges(): Promise<any>{
