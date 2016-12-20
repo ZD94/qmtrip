@@ -1,0 +1,101 @@
+.coin-table{
+  height: 120px;
+  background: #28A7E1 url("ionic/images/line.png") no-repeat;
+  background-size: cover;
+  border-radius: 5px;
+  padding: 20px 10px;
+  color: #fff;
+  margin-bottom: 10px;
+  .table-tit{
+    font-size: 36px;
+    .fa{
+      font-size: 20px;
+      margin: 0 10px;
+    }
+  }
+  .table-btns{
+    margin-top: 15px;
+    a{
+      color: #fff;
+      float: right;
+      height: 36px;
+      line-height: 36px;
+      width: 80px;
+      text-align: center;
+      border-radius: 5px;
+      margin-left: 10px;
+      &.get_coin{
+        background: #68C1E9;
+      }
+      &.pay_coin{
+        background: #F6A623;
+      }
+    }
+  }
+}
+.coin-list{
+  .list-tit{
+    background: #f9f9f9;
+    padding-left: 10px;
+    border-radius: 5px 5px 0 0;
+  }
+  .item{
+    padding-left: 10px;
+    overflow: hidden;
+    span{
+      float: left;
+      height: 40px;
+      line-height: 40px;
+      &.item-date{
+        color: #9b9b9b;
+      }
+      &.item-icon{
+        width: 40px;
+        background: red;
+        color: #fff;
+        text-align: center;
+        border-radius: 50%;
+        margin: 0 10px;
+      }
+    }
+    .item-info{
+      float: left;
+      p{
+        font-size: 12px;
+        &:first-child{
+          font-size: 16px;
+        }
+      }
+    }
+    .list-red{
+      .item-icon{
+        background: #ff0000;
+      }
+      .item-info{
+        p:first-child{
+          color: #ff0000;
+        }
+      }
+    }
+    .list-yellow{
+      .item-icon{
+        background: #f5a623;
+      }
+      .item-info{
+        p:first-child{
+          color: #f5a623;
+        }
+      }
+    }
+    .list-green{
+      .item-icon{
+        background: #417505;
+      }
+      .item-info{
+        p:first-child{
+          color: #417505;
+        }
+      }
+    }
+  }
+}

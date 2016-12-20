@@ -1,0 +1,71 @@
+.get_coins{
+  background: #f8f8f8;
+  .coins_head{
+    background: #28a7e1;
+    height: 64px;
+    line-height: 64px;
+    font-size: 14px;
+    color: #fff;
+    padding: 0 20px;
+    span{
+      float: right;
+      font-size: 24px;
+    }
+  }
+  .coins_charge{
+    margin: 10px;
+    padding: 10px 25px;
+    border-radius: 5px;
+    background: #fff;
+    box-shadow: 0 0 3px 1px #adadad;
+    .coins_item{
+      height: 50px;
+      line-height: 50px;
+      color: #9b9b9b;
+      border-bottom: 2px solid #dcdcdc;
+      span{
+        float: right;
+        color: #4a4a4a;
+      }
+    }
+    .convert{
+      text-align: center;
+      > div{
+        margin-top: 10px;
+        font-size: 0;
+        input{
+          width: 160px;
+          height: 36px;
+          line-height: 36px;
+          border: 1px solid #9b9b9b;
+          display: inline-block;
+          font-size: 14px;
+          vertical-align: 1px;
+          padding-left: 10px;
+        }
+        .convert_all{
+          display: inline-block;
+          height: 36px;
+          line-height: 36px;
+          width: 70px;
+          font-size: 14px;
+          vertical-align: 0px;
+          color: #28a7e1;
+          border: 1px solid #28a7e1;
+          border-left: 0;
+        }
+      }
+      .convert_now{
+        display: inline-block;
+        margin-top: 15px;
+        width: 230px;
+        height: 40px;
+        line-height: 40px;
+        color: #fff;
+        font-size: 14px;
+        text-align: center;
+        background: #28a7e1;
+      }
+    }
+  }
+}
