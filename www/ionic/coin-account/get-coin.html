@@ -1,13 +1,19 @@
 <ion-view title="获取鲸币" id="page30">
-    <ion-content padding="true" class="has-header notice-type">
-        <div class="list card">
-            <div>差旅节省奖励可兑：{{staff.balancePoints/2}}</div>
-            <div>剩余节省金额：{{staff.balancePoints}}</div>
-            <div>可兑换鲸币：{{staff.balancePoints/2}}</div>
-            <div>企业账户状态：{{companyCoinAccount.balance}}-{{companyCoinAccount.balance > staff.balancePoints/2? "充足": "不充足"}}</div>
+    <ion-content padding="false" class="has-header get_coins">
+        <div class="coins_head">差旅节省奖励可兑：<span>{{staff.balancePoints/2}}</span></div>
+        <div class="coins_charge">
             <div>
-                <input type="text" ng-model="staff.exchangeNum" style="border: solid #ccc 1px;">
-                <span ng-click="exchange()">立即兑换</span>
+                差旅节省奖励是您每次出差过程中节省的差旅费用，企业按照比例奖励给您的鲸币。企业需要根据每月鲸力提供的账单进行充值，充值完成后您随时可以到此页面兑换，企业账户状态为紧张时可能会导致兑换失败。
+            </div>
+            <div class="coins_item">剩余节省金额：<span>{{staff.balancePoints}}</span></div>
+            <div class="coins_item">可兑换鲸币：<span>{{staff.balancePoints/2}}</span></div>
+            <div class="coins_item">企业账户状态：<span>{{companyCoinAccount.balance > staff.balancePoints/2? "充足": "不充足"}}</span></div>
+            <div class="convert">
+                <div>
+                    <input type="text" placeholder="请输入兑换数量" ng-model="staff.exchangeNum">
+                    <a class="convert_all" ng-click="staff.exchangeNum = staff.balancePoints">全额兑换</a>
+                </div>
+                <a class="convert_now" ng-click="exchange()">立即兑换</a>
             </div>
         </div>
     </ion-content>

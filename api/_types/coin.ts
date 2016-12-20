@@ -18,7 +18,13 @@ export enum COIN_CHANGE_TYPE {
     CONSUME = -1,
     LOCK = -2
 }
-
+export var coin_change_str = {
+    1: '收入',
+    2: '奖励',
+    3: '解锁',
+    '-1': '消费',
+    '-2': '冻结'
+}
 @Table(Models.coinAccount, "coin.coin_accounts")
 export class CoinAccount extends ModelObject {
 

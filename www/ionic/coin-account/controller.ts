@@ -7,7 +7,7 @@ export * from './get-coin';
 var msgbox = require('msgbox');
 
 export async function IndexController($scope, Models, $ionicPopup, $stateParams, inAppBrowser) {
-    require('./notice.scss');
+    require('./index.scss');
     $scope.coinAccountChanges = [];
     var staff = await Staff.getCurrent();
     var pager = await staff.getCoinAccountChanges();
@@ -40,7 +40,7 @@ export async function IndexController($scope, Models, $ionicPopup, $stateParams,
             $scope.$broadcast('scroll.refreshComplete');
         }
     }
-    
+
     async function loadData(pager) {
         if(pager && pager.length>0){
             await Promise.all(pager.map(async function(item){

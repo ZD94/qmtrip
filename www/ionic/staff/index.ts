@@ -11,7 +11,9 @@ export default async function IndexController($scope, Models, inAppBrowser) {
         var duiBaUrl = await staff.getDuiBaLoginUrl();
         inAppBrowser.open(duiBaUrl);
     }
-    
+    $scope.toCoinAccount = function(){
+        window.location.href= '#/coin-account/index';
+    }
     if(staff.roleId == EStaffRole.OWNER){
         let isFirstLogin = await staff.company.getTravelPolicies();
         if(isFirstLogin.length == 0){

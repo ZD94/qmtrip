@@ -1,33 +1,47 @@
 <ion-view title="鲸币记录" id="page30">
     <ion-content padding="true" class="has-header">
-        <div>
-            <div>{{staff.coinAccount?staff.coinAccount.balance:0}}</div>
-            <a href="#/coin-account/get-coin"  style="color: white">获得鲸币</a>
-            <a ng-click="goShop()" style="color: white">花鲸币</a>
+        <div class="coin-table">
+            <div class="table-tit">
+                <i class="fa fa-database"></i>
+                {{(staff.coinAccount ? staff.coinAccount.balance : 0).toFixed(2)}}
+            </div>
+            <div class="table-btns">
+                <a ng-click="goShop()" class="pay_coin">花鲸币</a>
+                <a href="#/coin-account/get-coin" class="get_coin">获得鲸币</a>
+            </div>
+
         </div>
         <ion-refresher
                 pulling-text="下拉刷新",
                 on-refresh="pagersDate.doRefresh()"
         ></ion-refresher>
-        <ion-list class="list notice">
-            <ion-item class="item item-body" ng-repeat="item in coinAccountChanges track by $index" ng-click="detail(item)">
-                <div class="notice_title">
-                    <span class="item-note">{{item.createdAt | date : 'MM-dd'}}</span>
-                    <span ng-if="item.type == COIN_CHANGE_TYPE.INCOME">充</span>
-                    <span ng-if="item.type == COIN_CHANGE_TYPE.AWARD">奖</span>
-                    <span ng-if="item.type == COIN_CHANGE_TYPE.CONSUME">花</span>
-                    <span>
-                        {{(item.type != COIN_CHANGE_TYPE.CONSUME && item.type != COIN_CHANGE_TYPE.LOCK)? "+" : "-"}}
-                        {{item.coins}}
-                    </span>
-                    <span>{{item.remark}}</span>
-
+        <ion-list class="list coin-list">
+            <div class="list-tit">鲸币记录</div>
+            <ion-item class="item">
+                <span class="item-date">09-21</span>
+                <span class="item-icon">充</span>
+                <div class="item-info">
+                    <p>+100</p>
+                    <p>使用差旅节省奖励进行鲸币充值</p>
                 </div>
-                <div>
-                    <div class="notice_desc">{{notice.description}}</div>
+            </ion-item>
+            <div class="item" ng-repeat="item in coinAccountChanges track by $index" ng-click="detail(item)">
+                <div ng-class="{
+                     'list-red':item.type == COIN_CHANGE_TYPE.INCOME,
+                     'list-yellow':item.type == COIN_CHANGE_TYPE.AWARD,
+                     'list-green':item.type == COIN_CHANGE_TYPE.CONSUME}"
+                >
+                    <span class="item-date">{{item.createdAt | date : 'MM-dd'}}</span>
+                    <span class="item-icon" ng-if="item.type == COIN_CHANGE_TYPE.INCOME">充</span>
+                    <span class="item-icon" ng-if="item.type == COIN_CHANGE_TYPE.AWARD">奖</span>
+                    <span class="item-icon" ng-if="item.type == COIN_CHANGE_TYPE.CONSUME">花</span>
+                    <div class="item-info">
+                        <p>{{(item.type != COIN_CHANGE_TYPE.CONSUME && item.type != COIN_CHANGE_TYPE.LOCK)? "+" : "-"}}{{item.coins}}</p>
+                        <p>{{item.remark}}</p>
+                    </div>
                 </div>
                 <!--<ion-option-button class="button-assertive" ng-click="delete(item, $index)"> 删除 </ion-option-button>-->
-            </ion-item>
+            </div>
         </ion-list>
         <div>
             <div ng-if="!vm.isHasNextPage" class="getMoreOrNoMore">没有更多记录了</div>
