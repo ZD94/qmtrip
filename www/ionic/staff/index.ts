@@ -8,7 +8,8 @@ export default async function IndexController($scope, Models, inAppBrowser) {
 
     let staff = await Staff.getCurrent();
     $scope.toDuiBa = async function(){
-        var duiBaUrl = await staff.getDuiBaLoginUrl();
+        // window.location.href = '#/duiba/index';
+        var duiBaUrl = await staff.getDuiBaLoginUrl({});
         inAppBrowser.open(duiBaUrl);
     }
     $scope.toCoinAccount = function(){
