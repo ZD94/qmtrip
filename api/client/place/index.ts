@@ -29,16 +29,15 @@ class ApiPlace {
      * });
      * ```
      */
-    static async queryPlace(params: {keyword: string}):Promise<FindResult> {
+    static async queryPlace(params: {keyword: string, isAbroad?: boolean}):Promise<FindResult> {
         let _params: any = params;
         if (!_params) {
             _params = {};
         }
-
-        let keyword = _params.keyword;
+        let {keyword, isAbroad} = _params;
         let cities;
         if (!Boolean(keyword)) {
-            cities = await ApiPlace.hotCities({limit: 20})
+            cities = await ApiPlace.hotCities({limit: 20, isAbroad: isAbroad})
         } else {
             cities = await API.place.queryCity(_params)
         }
@@ -74,7 +73,7 @@ class ApiPlace {
      * @param {Number} params.limit
      * @return {Promise} [{id: "ID", name: "Name"}]
      */
-    static hotCities(params: {limit?: number}) :Promise<Array<Place>> {
+    static hotCities(params: {limit?: number, isAbroad?: boolean}) :Promise<Array<Place>> {
         return API.place.queryHotCity(params)
             .then(function(places) {
                 let arr:Array<Place> = places.map(function(place) {
@@ -110,7 +109,7 @@ class ApiPlace {
      * @param {string} params.cityCode 城市代码
      * @return {Promise} {id: id, name: name}
      */
-    static getCityInfo(params: {cityCode: string}) : Promise<Place> {
+    static getCityInfo(params: {cityCode: string, isAbroad?: boolean}) : Promise<Place> {
         if (!params.cityCode) {
             throw new Error("cityCode require but is " + params.cityCode);
         }
@@ -190,9 +189,18 @@ class ApiPlace {
      * @param params
      * @returns {any}
      */
-    static getAllCities(params: {type: number}) :Promise<Place> {
+    static getAllCities(params: {type: number, isAbroad?: boolean}) :Promise<Place> {
         if (!params || !params.type) params.type = 2;
         return API.place.getAllCities(params);
+    }
+
+    /**
+     * 获取城市列表根据字符分组
+     * @param params
+     * @returns {any}
+     */
+    static queryCitiesGroupByLetter(params: {isAbroad?: boolean}) {
+        return API.place.queryCitiesGroupByLetter(params);
     }
 }
 
