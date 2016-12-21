@@ -42,10 +42,10 @@ angular
                 require('./checkbox.scss');
                 $scope.checkOption = function(option){
                     let idx = $scope.model.indexOf(option.value);
+                    $scope.model = _.clone($scope.model);
                     if(idx >=0){
-                        $scope.model = _.clone($scope.model).splice(idx, 1);
+                        $scope.model.splice(idx, 1);
                     }else{
-                        $scope.model = _.clone($scope.model);
                         $scope.model.push(option.value);
                         // $scope.model = _.clone($scope.model).push(option.value);
                         $scope.model.sort();
