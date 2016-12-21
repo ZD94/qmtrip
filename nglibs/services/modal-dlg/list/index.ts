@@ -2,6 +2,7 @@
 var msgbox = require('msgbox');
 
 export async function selectFromListController($scope) {
+    require('./list.scss');
     if(typeof $scope.options.searchbox === 'undefined'){
         $scope.options.searchbox = true;
     }

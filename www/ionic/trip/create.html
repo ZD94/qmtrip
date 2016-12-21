@@ -32,12 +32,12 @@
                 ></ng-selector-list>
             </div>
             <div class="item item-input">
-                <span class="input-label">最晚何时到达</span>
+                <span class="input-label label-doubleline">最晚何时到达<br/><span>(目的地当地时间)</span></span>
                 <fake-input value="{{trip.beginDate|date:'yyyy-MM-dd HH:mm'}}" placeholder="请选择出差日期" ng-click="selectDatespan()">
                 </fake-input>
             </div>
             <div class="item item-input">
-                <span class="input-label">最早何时离开</span>
+                <span class="input-label label-doubleline">最早何时离开<br/><span>(目的地当地时间)</span></span>
                 <ng-selector-date
                         ng-model="trip.endDate"
                         dlg-options="endDateSelector"
