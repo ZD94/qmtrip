@@ -9,7 +9,9 @@ export async function ShowpolicyController($scope, Models, $stateParams, $ionicH
     let policyId = $stateParams.policyId;
     let travelPolicy = await Models.travelPolicy.get(policyId);
     let subsidies = await travelPolicy.getSubsidyTemplates();
+    let staffs = await travelPolicy.getStaffs();
     $scope.travelPolicy = travelPolicy;
+    $scope.staffs = staffs;
     $scope.subsidies = subsidies;
     $scope.enumPlaneLevelToStr = enumPlaneLevelToStr;
     $scope.enumTrainLevelToStr = enumTrainLevelToStr;
