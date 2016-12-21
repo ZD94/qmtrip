@@ -17,7 +17,7 @@ export async function ShowpolicyController($scope, Models, $stateParams, $ionicH
     $scope.editPolicy = function(){
         window.location.href = `#/travel-policy/editpolicy?policyId=${policyId}`
     }
-    $scope.deletePolicy = function(){
+
         $scope.deletePolicy = async function () {
             $ionicPopup.show({
                 title:'提示',
@@ -64,5 +64,4 @@ export async function ShowpolicyController($scope, Models, $stateParams, $ionicH
                 });
             }
         }
-    }
 }

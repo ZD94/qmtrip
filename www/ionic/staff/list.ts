@@ -8,7 +8,7 @@ export default async function ListController($scope, Models, $ionicPopup) {
     $scope.currentStaff = staff;
     $scope.staffs = [];
     var pager = await staff.company.getStaffs();
-    loadStaffs(pager);
+    await loadStaffs(pager);
 
     $scope.pager = pager;
     var vm = {
@@ -21,25 +21,27 @@ export default async function ListController($scope, Models, $ionicPopup) {
                 return;
             }
             $scope.pager = pager;
-            loadStaffs(pager);
+            await loadStaffs(pager);
             $scope.$broadcast('scroll.infiniteScrollComplete');
         }
     }
 
     $scope.vm = vm;
     
-    function loadStaffs(pager) {
+    async function loadStaffs(pager) {
         if(pager && pager.length>0){
-            pager.forEach(function(staff){
+            await Promise.all(pager.map(async function (staff) {
+                staff.travelPolicy = await staff.getTravelPolicy();
                 var obj = {staff: staff, role: ""};
                 if (obj.staff.roleId == EStaffRole.OWNER) {
                     obj.role = '创建者';
                 }
                 $scope.staffs.push(obj);
-            });
+            }));
         }
 
     }
+
     /*$scope.staffs = staffs.map(function (staff) {
         var obj = {staff: staff, role: ""};
         if (obj.staff.roleId == EStaffRole.OWNER) {
@@ -47,10 +49,7 @@ export default async function ListController($scope, Models, $ionicPopup) {
         }
         return obj;
     });*/
-    await Promise.all($scope.staffs.map(async function (obj) {
-        obj.travelPolicy = await obj.staff.getTravelPolicy();
-        return obj;
-    }));
+
     $scope.option = {name: ''};
     $scope.search = async function () {
 

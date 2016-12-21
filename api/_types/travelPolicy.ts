@@ -112,7 +112,7 @@ export class TravelPolicy extends ModelObject{
 
     @Field({type: Types.ARRAY(Types.INTEGER)})
     get planeLevels(): EPlaneLevel[] {return null}
-    set planeLevel(val: EPlaneLevel[]){}
+    set planeLevels(val: EPlaneLevel[]){}
 
     @Field({type: Types.DOUBLE})
     get planeDiscount(): number{return null}
@@ -120,11 +120,11 @@ export class TravelPolicy extends ModelObject{
 
     @Field({type: Types.ARRAY(Types.INTEGER)})
     get trainLevels(): ETrainLevel[] {return null}
-    set trainLevel(val: ETrainLevel[]){}
+    set trainLevels(val: ETrainLevel[]){}
 
     @Field({type: Types.ARRAY(Types.INTEGER)})
     get hotelLevels(): EHotelLevel[] {return null}
-    set hotelLevel(val: EHotelLevel[]){}
+    set hotelLevels(val: EHotelLevel[]){}
 
 
     @Field({type: Types.DOUBLE})

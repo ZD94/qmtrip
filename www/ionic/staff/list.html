@@ -14,7 +14,7 @@
             <ion-item class="item-avatar staffList" ng-repeat="staff in staffs">
                 <a ng-href="#/staff/edit?staffId={{staff.staff.id}}">
                     <h2>{{staff.staff.name}}<i class="icon ion-android-contact icon-accessory" ng-if="staff.role == '创建者'"></i></h2>
-                    <p>{{staff.travelPolicy.name}}</p>
+                    <p>{{staff.staff.travelPolicy.name}}</p>
                 </a>
                 <ion-option-button class="button-assertive" ng-if="!staff.staff.status && staff.staff.id != currentStaff.id && staff.staff.roleId != currentStaff.roleId && staff.staff.roleId != 0" ng-click="delete(staff.staff.id, $index)"> 删除 </ion-option-button>
                 <ion-option-button class="button-assertive" ng-if="staff.staff.status && staff.staff.id != currentStaff.id && staff.staff.roleId != currentStaff.roleId && staff.staff.roleId != 0" ng-click="forbidden(staff.staff.id, $index)"> 禁用 </ion-option-button>
