@@ -112,6 +112,13 @@ async function resultNotice(req, res, next) {
         coinAccountChange = coinAccountChanges[0];
         var coinAccount = await Models.coinAccount.get(coinAccountChange.coinAccountId);
 
+        if(!coinAccountChange.coins){
+            coinAccountChange.coins = 0;
+        }
+        if (typeof coinAccountChange.coins == 'string') {
+            coinAccountChange.coins = Number(coinAccountChange.coins);
+        }
+
         if(success == "false"){
             if (typeof coinAccount.locks == 'string') {
                 coinAccount.locks = Number(coinAccount.locks);
@@ -127,6 +134,9 @@ async function resultNotice(req, res, next) {
         }else{
             if (typeof coinAccount.locks == 'string') {
                 coinAccount.locks = Number(coinAccount.locks);
+            }
+            if(!coinAccount.consume){
+                coinAccount.consume = 0;
             }
             if (typeof coinAccount.consume == 'string') {
                 coinAccount.consume = Number(coinAccount.consume);
