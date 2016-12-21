@@ -91,6 +91,9 @@ export class CoinAccount extends ModelObject {
         if (typeof self.income == 'string') {
             self.income = Number(self.income);
         }
+        if (typeof coins == 'string') {
+            coins = Number(coins);
+        }
         self.income = self.income + coins;
         let coinAccount =  await self.save();
         return {coinAccount: coinAccount, coinAccountChange: log};
@@ -117,6 +120,9 @@ export class CoinAccount extends ModelObject {
         }
         if (typeof self.consume == 'string') {
             self.consume = Number(self.consume);
+        }
+        if (typeof coins == 'string') {
+            coins = Number(coins);
         }
         self.consume = self.consume + coins;
         let coinAccount = await self.save();
@@ -146,6 +152,10 @@ export class CoinAccount extends ModelObject {
         if (typeof self.locks == 'string') {
             self.locks = Number(self.locks);
         }
+
+        if (typeof coins == 'string') {
+            coins = Number(coins);
+        }
         self.locks = self.locks + coins;
         let coinAccount = await self.save();
         return {coinAccount: coinAccount, coinAccountChange: log};
@@ -165,6 +175,13 @@ export class CoinAccount extends ModelObject {
         let coinAccountNo = getOrderNo();
         let log = await Models.coinAccountChange.create({orderNum: coinAccountNo, type: COIN_CHANGE_TYPE.FREE_LOCK, coinAccountId: self.id, coins: coins, remark: remark});
         log = await log.save();
+        if (typeof self.locks == 'string') {
+            self.locks = Number(self.locks);
+        }
+
+        if (typeof coins == 'string') {
+            coins = Number(coins);
+        }
         self.locks = self.locks - coins;
         if (self.locks < 0) {
             self.locks = 0;

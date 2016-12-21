@@ -22,6 +22,7 @@ module.exports = function(app) {
  * @returns {any}
  */
 async function costCredit(req, res, next) {
+    console.info("扣积分接口================");
     var params = req.query;
     var { uid, credits,appKey, timestamp, description, orderNum, actualPrice,sign } = params;
     var staff = await Models.staff.get(uid);
@@ -83,6 +84,7 @@ async function costCredit(req, res, next) {
  * @returns {any}
  */
 async function resultNotice(req, res, next) {
+    console.info("接收通知接口================");
     var params = req.query;
     var { appKey, timestamp, success, errorMessage, orderNum, bizId,sign } = params;
 
@@ -112,6 +114,13 @@ async function resultNotice(req, res, next) {
         coinAccountChange = coinAccountChanges[0];
         var coinAccount = await Models.coinAccount.get(coinAccountChange.coinAccountId);
 
+        if(!coinAccountChange.coins){
+            coinAccountChange.coins = 0;
+        }
+        if (typeof coinAccountChange.coins == 'string') {
+            coinAccountChange.coins = Number(coinAccountChange.coins);
+        }
+
         if(success == "false"){
             if (typeof coinAccount.locks == 'string') {
                 coinAccount.locks = Number(coinAccount.locks);
@@ -127,6 +136,9 @@ async function resultNotice(req, res, next) {
         }else{
             if (typeof coinAccount.locks == 'string') {
                 coinAccount.locks = Number(coinAccount.locks);
+            }
+            if(!coinAccount.consume){
+                coinAccount.consume = 0;
             }
             if (typeof coinAccount.consume == 'string') {
                 coinAccount.consume = Number(coinAccount.consume);

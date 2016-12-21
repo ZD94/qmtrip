@@ -1,4 +1,5 @@
 import moment = require('moment');
+import validator = require('validator');
 var msgbox = require('msgbox');
 
 export async function ForgetPwdController($scope,Models) {
@@ -31,6 +32,10 @@ export async function ForgetPwdController($scope,Models) {
     $scope.sendCode = async function(){
         if(!$scope.form.mobile){
             msgbox.log("手机号不能为空");
+            return;
+        }
+        if ( !validator.isMobilePhone($scope.form.mobile, 'zh-CN')) {
+            msgbox.log("手机号格式不正确");
             return;
         }
         await API.onload();
