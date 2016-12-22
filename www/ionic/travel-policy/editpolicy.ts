@@ -97,9 +97,9 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
             return false;
         }
         console.info(staff.company ==$scope.travelPolicy.company);
-        // if(!policyId){
-        //     $scope.travelPolicy.company = staff.company;
-        // }
+        if(!policyId){
+            $scope.travelPolicy.company = staff.company;
+        }
         // console.info(policyId);
         let travelPolicy;
         console.info($scope.travelPolicy.planeLevels);
@@ -119,7 +119,7 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
                 await v.destroy();
             }
         }
-        window.location.href= `#/travel-policy/showpolicy?policyId=${policyId}`;
+        window.location.href= `#/travel-policy/showpolicy?policyId=${travelPolicy.id}`;
     }
     $scope.selectHotalLevel = {
         searchbox: false,

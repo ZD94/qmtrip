@@ -91,6 +91,9 @@ export class CoinAccount extends ModelObject {
         if (typeof self.income == 'string') {
             self.income = Number(self.income);
         }
+        if (typeof coins == 'string') {
+            coins = Number(coins);
+        }
         self.income = self.income + coins;
         let coinAccount =  await self.save();
         return {coinAccount: coinAccount, coinAccountChange: log};
@@ -100,7 +103,7 @@ export class CoinAccount extends ModelObject {
         let self = this;
         let balance = self.balance;
 
-        if (!self.isAllowOverCost && balance <= 0) {
+        if (!self.isAllowOverCost && balance <= 0 || self.balance < coins) {
             throw new Error(`余额不足`);
         }
         /*if(!this.isLocal){
@@ -110,7 +113,7 @@ export class CoinAccount extends ModelObject {
         //先记录日志
         let coinAccountNo = await API.seeds.getSeedNo('CoinAccountNo');*/
         let coinAccountNo = getOrderNo();
-        let log = await Models.coinAccountChange.create({orderNum: coinAccountNo, type: COIN_CHANGE_TYPE.CONSUME, coinAccountId: self.id, coins: 0-coins, remark: remark, duiBaOrderNum: duiBaOrderNum});
+        let log = await Models.coinAccountChange.create({orderNum: coinAccountNo, type: COIN_CHANGE_TYPE.CONSUME, coinAccountId: self.id, coins: coins, remark: remark, duiBaOrderNum: duiBaOrderNum});
         log = await log.save();
         if (!self.consume) {
             self.consume = 0;
@@ -118,13 +121,22 @@ export class CoinAccount extends ModelObject {
         if (typeof self.consume == 'string') {
             self.consume = Number(self.consume);
         }
+        if (typeof coins == 'string') {
+            coins = Number(coins);
+        }
         self.consume = self.consume + coins;
         let coinAccount = await self.save();
         return {coinAccount: coinAccount, coinAccountChange: log};
     }
 
-    async lockCoin(coins: number, remark?: string) :Promise<CoinAccount>{
+    async lockCoin(coins: number, remark?: string, duiBaOrderNum?: string) :Promise<any>{
         let self = this;
+        let balance = self.balance;
+
+        if (!self.isAllowOverCost && balance <= 0 || self.balance < coins) {
+            throw new Error(`余额不足`);
+        }
+
         /*if(!this.isLocal){
             API.require('seeds');
             await API.onload();
@@ -132,10 +144,21 @@ export class CoinAccount extends ModelObject {
         //先记录日志
         let coinAccountNo = await API.seeds.getSeedNo('CoinAccountNo');*/
         let coinAccountNo = getOrderNo();
-        let log = await Models.coinAccountChange.create({orderNum: coinAccountNo, type: COIN_CHANGE_TYPE.LOCK, coinAccountId: self.id, coins: coins, remark: remark});
+        let log = await Models.coinAccountChange.create({orderNum: coinAccountNo, type: COIN_CHANGE_TYPE.LOCK, coinAccountId: self.id, coins: coins, remark: remark, duiBaOrderNum: duiBaOrderNum});
         log = await log.save();
+        if (!self.locks) {
+            self.locks = 0;
+        }
+        if (typeof self.locks == 'string') {
+            self.locks = Number(self.locks);
+        }
+
+        if (typeof coins == 'string') {
+            coins = Number(coins);
+        }
         self.locks = self.locks + coins;
-        return self.save();
+        let coinAccount = await self.save();
+        return {coinAccount: coinAccount, coinAccountChange: log};
     }
 
     async freeCoin(coins: number, remark?: string) :Promise<CoinAccount> {
@@ -143,14 +166,22 @@ export class CoinAccount extends ModelObject {
         if (self.locks < coins) {
             throw new Error('解锁金额大于锁定金额');
         }
-        if(!this.isLocal){
+        /*if(!this.isLocal){
             API.require('seeds');
             await API.onload();
         }
         //先记录日志
-        let coinAccountNo = await API.seeds.getSeedNo('CoinAccountNo');
+        let coinAccountNo = await API.seeds.getSeedNo('CoinAccountNo');*/
+        let coinAccountNo = getOrderNo();
         let log = await Models.coinAccountChange.create({orderNum: coinAccountNo, type: COIN_CHANGE_TYPE.FREE_LOCK, coinAccountId: self.id, coins: coins, remark: remark});
         log = await log.save();
+        if (typeof self.locks == 'string') {
+            self.locks = Number(self.locks);
+        }
+
+        if (typeof coins == 'string') {
+            coins = Number(coins);
+        }
         self.locks = self.locks - coins;
         if (self.locks < 0) {
             self.locks = 0;
@@ -186,8 +217,8 @@ export class CoinAccountChange extends ModelObject {
     set coinAccountId(id: string) {}
     
     @Field({type: Types.INTEGER})
-    get type(): number { return 1}
-    set type(type: number) {}
+    get type(): COIN_CHANGE_TYPE { return COIN_CHANGE_TYPE.INCOME}
+    set type(type: COIN_CHANGE_TYPE) {}
     
     @Field({type: Types.NUMERIC(15,2), defaultValue: 0})
     set coins(coins: number) {}

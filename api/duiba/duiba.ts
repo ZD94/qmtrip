@@ -4,7 +4,7 @@
 'use strict';
 import {Models} from "../_types/index";
 import L from 'common/language';
-import {CoinAccount, CoinAccountChange} from "api/_types/coin";
+import {CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE} from "api/_types/coin";
 var config = require('config');
 var API = require("common/api");
 
@@ -22,7 +22,8 @@ module.exports = function(app) {
  * @returns {any}
  */
 async function costCredit(req, res, next) {
-    var params = req.params;
+    console.info("扣积分接口================");
+    var params = req.query;
     var { uid, credits,appKey, timestamp, description, orderNum, actualPrice,sign } = params;
     var staff = await Models.staff.get(uid);
     staff.coinAccount = staff.$parents["account"]["coinAccount"];
@@ -36,42 +37,42 @@ async function costCredit(req, res, next) {
     var coinAccount = staff.coinAccount;
     
     if(!appKey || appKey != config.duiba.appKey){
-        return {
+        res.json({
             'status': 'fail',
             'errorMessage': 'appKey错误',
             'credits': coinAccount.balance
-        };
+        });
     }
     if(params.sign){
         delete params.sign;
     }
-    
-    var _sign = API.duiba.getSign(params);
+
+    var _sign = await API.duiba.getSign(params);
     if(sign != _sign){
-        return {
+        res.json({
             'status': 'fail',
             'errorMessage': '签名错误',
             'credits': coinAccount.balance
-        };
+        });
     }
 
     var coinAccountChanges = await Models.coinAccountChange.find({where: {duiBaOrderNum: orderNum}});
     //防止订单重复处理
     if(!coinAccountChanges || coinAccountChanges.length <= 0){
-        var result = await coinAccount.costCoin(credits, description, orderNum);
-        return {
+        var result = await coinAccount.lockCoin(credits, description, orderNum);
+        res.json({
             'status': 'ok',
             'errorMessage': '',
             'bizId': result.coinAccountChange.id,
-            'credits': coinAccount.balance
-        };
+            'credits': result.coinAccount.balance
+        });
     }else {
-        return {
+        res.json({
             'status': 'ok',
-            'errorMessage': '',
+            'errorMessage': '该订单已处理',
             'bizId': coinAccountChanges[0].id,
             'credits': coinAccount.balance
-        };
+        });
     }
 }
 
@@ -83,35 +84,77 @@ async function costCredit(req, res, next) {
  * @returns {any}
  */
 async function resultNotice(req, res, next) {
-    var params = req.params;
+    console.info("接收通知接口================");
+    var params = req.query;
     var { appKey, timestamp, success, errorMessage, orderNum, bizId,sign } = params;
 
     if(params.sign){
         delete params.sign;
     }
 
-    var _sign = API.duiba.getSign(params);
-    if(sign != _sign){
-        throw L.ERR.SIGN_ERROR();
+    if(!appKey || appKey != config.duiba.appKey){
+        res.json({
+            'status': 'fail',
+            'errorMessage': 'appKey错误',
+        });
     }
 
-    if(!success){
-        //扣积分请求超时时兑吧也会发回失败通知 此时未携带bizId 所以查失败订单不能用bizId 要用orderNum
-        var coinAccountChanges = await Models.coinAccountChange.find({where: {duiBaOrderNum: orderNum}});
-        var coinAccountChange: CoinAccountChange;
-        if(coinAccountChanges && coinAccountChanges.length > 0){
-            coinAccountChange = coinAccountChanges[0];
-            var coinAccount = await Models.coinAccount.get(coinAccountChange.coinAccountId);
-            coinAccount.consume = coinAccount.consume - coinAccountChange.coins;
+    var _sign = await API.duiba.getSign(params);
+    if(sign != _sign){
+        res.json({
+            'status': 'fail',
+            'errorMessage': '签名错误',
+        });
+    }
+    //扣积分请求超时时兑吧也会发回失败通知 此时未携带bizId 所以查失败订单不能用bizId 要用orderNum
+    var coinAccountChanges = await Models.coinAccountChange.find({where: {duiBaOrderNum: orderNum, type: COIN_CHANGE_TYPE.LOCK}});
+    var coinAccountChange: CoinAccountChange;
+    
+    if(coinAccountChanges && coinAccountChanges.length > 0){
+        coinAccountChange = coinAccountChanges[0];
+        var coinAccount = await Models.coinAccount.get(coinAccountChange.coinAccountId);
+
+        if(!coinAccountChange.coins){
+            coinAccountChange.coins = 0;
+        }
+        if (typeof coinAccountChange.coins == 'string') {
+            coinAccountChange.coins = Number(coinAccountChange.coins);
+        }
+
+        if(success == "false"){
+            if (typeof coinAccount.locks == 'string') {
+                coinAccount.locks = Number(coinAccount.locks);
+            }
+            coinAccount.locks = coinAccount.locks - coinAccountChange.coins;
             await coinAccount.save();
             await coinAccountChange.destroy();
+            res.json({
+                'status': 'fail',
+                'errorMessage': errorMessage,
+            });
+
         }else{
-            return true;
+            if (typeof coinAccount.locks == 'string') {
+                coinAccount.locks = Number(coinAccount.locks);
+            }
+            if(!coinAccount.consume){
+                coinAccount.consume = 0;
+            }
+            if (typeof coinAccount.consume == 'string') {
+                coinAccount.consume = Number(coinAccount.consume);
+            }
+            coinAccount.locks = coinAccount.locks - coinAccountChange.coins;
+            coinAccount.consume = coinAccount.consume + coinAccountChange.coins;
+            await coinAccount.save();
+            coinAccountChange.type = COIN_CHANGE_TYPE.CONSUME;
+            await coinAccountChange.save();
+            res.json({
+                'status': 'success',
+            });
         }
+    }else{
+        res.send('ok');
     }
-
-    return true;
-
 }
 
 /**
@@ -122,7 +165,7 @@ async function resultNotice(req, res, next) {
  * @returns {any}
  */
 async function addCredit(req, res, next) {
-    var params = req.params;
+    var params = req.query;
     var { uid, credits,appKey,type, timestamp, description, orderNum, sign } = params;
     var staff = await Models.staff.get(uid);
     staff.coinAccount = staff.$parents["account"]["coinAccount"];
@@ -136,41 +179,41 @@ async function addCredit(req, res, next) {
     var coinAccount = staff.coinAccount;
 
     if(!appKey || appKey != config.duiba.appKey){
-        return {
+        res.json({
             'status': 'fail',
             'errorMessage': 'appKey错误',
             'credits': coinAccount.balance
-        };
+        });
     }
     if(params.sign){
         delete params.sign;
     }
 
-    var _sign = API.duiba.getSign(params);
+    var _sign = await API.duiba.getSign(params);
     if(sign != _sign){
-        return {
+        res.json({
             'status': 'fail',
             'errorMessage': '签名错误',
             'credits': coinAccount.balance
-        };
+        });
     }
 
     var coinAccountChanges = await Models.coinAccountChange.find({where: {duiBaOrderNum: orderNum}});
     //防止订单重复处理
     if(!coinAccountChanges || coinAccountChanges.length <= 0){
         var result = await coinAccount.addCoin(credits, description, orderNum);
-        return {
+        res.json({
             'status': 'ok',
             'errorMessage': '',
             'bizId': result.coinAccountChange.id,
             'credits': coinAccount.balance
-        };
+        });
     }else {
-        return {
+        res.json({
             'status': 'ok',
             'errorMessage': '',
             'bizId': coinAccountChanges[0].id,
             'credits': coinAccount.balance
-        };
+        });
     }
 }
