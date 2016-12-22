@@ -109,6 +109,8 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
             console.info('end');
         }catch(err){
             console.log(err);
+            msgbox.log(err.msg);
+            return false;
         }
         for(let v of saveSubsidyTemplates) {
             v.travelPolicy = travelPolicy;
@@ -196,6 +198,10 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
             controller: SubsidyTemplatesController
         });
         saveSubsidyTemplates = obj.saveSubsidyTemplates;
+        if(!$stateParams.policyId){
+            $scope.subsidyTemplates = subsidyTemplates = obj.saveSubsidyTemplates;
+        }
+
         removeSubsidyTemplates = obj.removeSubsidyTemplates;
     }
 
