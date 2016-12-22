@@ -22,6 +22,81 @@
       text-align: left;
     }
   }
+  .button-full{
+    margin: 0;
+  }
+  .policy-detail{
+    .policy_tit{
+      border-radius: 5px 5px 0 0;
+      height: 24px;
+      line-height: 24px;
+      padding-left: 10px;
+      background: #f9f9f9;
+    }
+    .detail-left-right{
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      .detail-right{
+        flex: 1;
+        white-space: normal;
+        font-size: 14px;
+        color: #aaa;
+      }
+      .detail-left{
+        width: 100px;
+        flex: none;
+      }
+    }
+  }
+  .item-input-right {
+    input{
+      text-align: right;
+      padding-right: 48px;
+    }
+  }
+  .item-icon-right{
+    .icon{
+      font-size: 14px;
+    }
+  }
+  .item-tit{
+    padding: 10px;
+    height: 44px;
+    font-size: 16px;
+    background: #fff;
+    &.item-toggle .toggle{
+      top: 5px;
+    }
+  }
+  .checkbox-tit{
+    height: 36px;
+    padding: 10px;
+    background: #f9f9f9;
+    font-size: 14px;
+    .check-box{
+      .checkbox_diy{
+        color: #606060;
+      }
+    }
+  }
+  .checkbox-options{
+    background: #fff;
+    .hotel-opt{
+      border-bottom: 1px solid #ddd;
+      padding-right: 10px;
+      &:last-child{
+        border: none;
+      }
+      .item-note{
+        font-size: 12px;
+        p{
+          margin: 0;
+          text-align: right;
+        }
+      }
+    }
+  }
 }
 
 //第一步和第二部的公共的类

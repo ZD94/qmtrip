@@ -27,10 +27,10 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
     ]
     $scope.trainValue = [];
     let hotelLevels = $scope.hotelLevels = [
-        { name: '国际五星', value: 5, desc1: '万丽、喜来登 ',desc2: '希尔顿、皇冠假日等'},
-        { name: '高端商务', value: 4, desc1: '福朋喜来登、诺富特、希尔顿逸林',desc2: '豪生、、Holiday Inn、开元名都等'},
-        { name: '精品连锁', value: 3, desc1: '如家精选、和颐酒店、全季酒店、',desc2: '桔子水晶、智选假日、ZMAX等'},
-        { name: '快捷连锁', value: 2, desc1: '如家、莫泰168、汉庭',desc2: '速8、锦江之星、IBIS等'},
+        { name: '国际五星', value: EHotelLevel.FIVE_STAR, desc1: '万丽、喜来登 ',desc2: '希尔顿、皇冠假日等'},
+        { name: '高端商务', value: EHotelLevel.FOUR_STAR, desc1: '福朋喜来登、诺富特、希尔顿逸林',desc2: '豪生、、Holiday Inn、开元名都等'},
+        { name: '精品连锁', value: EHotelLevel.THREE_STAR, desc1: '如家精选、和颐酒店、全季酒店、',desc2: '桔子水晶、智选假日、ZMAX等'},
+        { name: '快捷连锁', value: EHotelLevel.TWO_STAR, desc1: '如家、莫泰168、汉庭',desc2: '速8、锦江之星、IBIS等'},
     ];
     $scope.hotelValue = [];
     $scope.abroadPlaneLevels = [
@@ -41,10 +41,10 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
     ];
     $scope.abroadPlaneValue = [];
     $scope.abroadHotelLevels = [
-        { name: '国际五星', value: 5, desc1: '万丽、喜来登 ',desc2: '希尔顿、皇冠假日等'},
-        { name: '高端商务', value: 4, desc1: '福朋喜来登、诺富特、希尔顿逸林',desc2: '豪生、、Holiday Inn、开元名都等'},
-        { name: '精品连锁', value: 3, desc1: 'Comfort Inn、和颐酒店、全季酒店、',desc2: '桔子水晶、智选假日、ZMAX等'},
-        { name: '快捷连锁', value: 2, desc1: 'Green Hotel',desc2: 'Super8、IBIS等'},
+        { name: '国际五星', value: EHotelLevel.FIVE_STAR, desc1: '万丽、喜来登 ',desc2: '希尔顿、皇冠假日等'},
+        { name: '高端商务', value: EHotelLevel.FOUR_STAR, desc1: '福朋喜来登、诺富特、希尔顿逸林',desc2: '豪生、、Holiday Inn、开元名都等'},
+        { name: '精品连锁', value: EHotelLevel.THREE_STAR, desc1: 'Comfort Inn、和颐酒店、全季酒店、',desc2: '桔子水晶、智选假日、ZMAX等'},
+        { name: '快捷连锁', value: EHotelLevel.TWO_STAR, desc1: 'Green Hotel',desc2: 'Super8、IBIS等'},
     ];
     $scope.abroadHotelValue = [];
     var staff = await Staff.getCurrent();
@@ -81,6 +81,14 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         }
         if($scope.travelPolicy.hotelLevels.length <=0){
             msgbox.log('住宿标准不能为空');
+            return false;
+        }
+        if($scope.travelPolicy.isOpenAbroad && $scope.travelPolicy.abroadPlaneLevels.length <= 0){
+            msgbox.log('国际飞机舱位不能为空');
+            return false;
+        }
+        if($scope.travelPolicy.isOpenAbroad && $scope.travelPolicy.abroadHotelLevels.length <= 0){
+            msgbox.log('国际住宿标准不能为空');
             return false;
         }
         var re = /^[0-9]+.?[0-9]*$/;
