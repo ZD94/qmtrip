@@ -5,7 +5,10 @@
 
 import angular = require("angular");
 import {Staff} from "api/_types/staff/staff";
-import {MTrainLevel, MPlaneLevel, MHotelLevel} from "api/_types/travelPolicy";
+import {
+    MTrainLevel, MPlaneLevel, MHotelLevel, enumPlaneLevelToStr, enumTrainLevelToStr,
+    enumHotelLevelToStr
+} from "api/_types/travelPolicy";
 
 
 angular
@@ -53,6 +56,9 @@ angular
                     }
                     function PolicyShowController($scope){
                         require('./policy-show.scss');
+                        $scope.enumPlaneLevelToStr = enumPlaneLevelToStr;
+                        $scope.enumTrainLevelToStr = enumTrainLevelToStr;
+                        $scope.enumHotelLevelToStr = enumHotelLevelToStr;
                     }
                 };
             }
