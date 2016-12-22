@@ -20,6 +20,9 @@ angular
                 staffId: '<staffId'
             },
             controller: async function($scope, Models, ngModalDlg, $ionicPopup){
+                if(!$scope.title){
+                    $scope.title = '差旅标准';
+                }
                 $scope.showTravelPolicy = async function (staffId?: string) {
                     let pStaff = await Staff.getCurrent();
 
