@@ -1,0 +1,30 @@
+.policy-detail{
+  padding: 10px;
+  background: url("ionic/images/background.jpg") no-repeat;
+  background-size: cover;
+  .list{
+    margin-bottom: 10px;
+  }
+  .policy_tit{
+    border-radius: 5px 5px 0 0;
+    height: 24px;
+    line-height: 24px;
+    padding-left: 10px;
+    background: #f9f9f9;
+  }
+  .detail-left-right{
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    .detail-right{
+      flex: 1;
+      white-space: normal;
+      font-size: 14px;
+      color: #aaa;
+    }
+    .detail-left{
+      width: 100px;
+      flex: none;
+    }
+  }
+}

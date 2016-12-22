@@ -55,11 +55,13 @@ ion-side-menu {
       &.policySubsidy{
         overflow: hidden;
         font-size: 14px;
+        display: flex;
         > span{
-          float: left;
+          flex: 0;
+          min-width: 40px;
         }
         > div{
-          float: left;
+          flex: 1;
           p{
             margin-top: 0;
           }

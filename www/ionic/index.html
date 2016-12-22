@@ -13,8 +13,9 @@
                         <div class="menu-portrait menu-avatar" ng-if="currentStaff.avatar">
                             <img ng-src="{{getImageUrl(currentStaff.avatar)}}">
                         </div>
-                        <h2>{{currentStaff.name}}<i class="button button-dark button-small "
-                                                    ng-click="$event.stopPropagation();$event.preventDefault(); showTravelPolicy()">差旅标准</i></h2>
+                        <h2>{{currentStaff.name}}
+                            <policy-show class="button button-dark button-small"></policy-show>
+                        </h2>
                         <p>{{currentStaff.mobile || '暂未填写手机号'}}
                             <br>节省：{{tripPlanSave || 0}}元
                         </p>

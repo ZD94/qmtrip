@@ -4,3 +4,4 @@ import './trip-approve';
 import './spanchange';
 import './bottom-bar';
 import './checkbox';
+import './policy-show';

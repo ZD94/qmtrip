@@ -6,6 +6,7 @@ import { Staff } from 'api/_types/staff/staff';
 import moment = require('moment');
 import { MTrainLevel, MHotelLevel, MPlaneLevel } from 'api/_types/travelPolicy';
 import {EApproveChannel} from "api/_types/approve/types";
+
 export async function DetailController($scope, Models, $stateParams, $ionicPopup, $loading, $storage, ngModalDlg){
     require('./trip-approval.scss');
     let approveId = $stateParams.approveId;
@@ -169,31 +170,38 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         }
     }
 
-    $scope.showTravelPolicy = async function (staffId) {
-        var staff = await Models.staff.get(staffId);
-        if (!staff){
-            return;
-        }
-        var policy = await staff.getTravelPolicy();
-        $scope.policy = policy;
-        $scope.subsidies = await policy.getSubsidyTemplates();
-        $scope.MTrainLevel = MTrainLevel;
-        $scope.MPlaneLevel = MPlaneLevel;
-        $scope.MHotelLevel = MHotelLevel;
-        if (policy) {   //判断是否设置差旅标准
-            $ionicPopup.alert({
-                title: '差旅标准',
-                scope: $scope,
-                cssClass: 'policyPopup',
-                template: require('../policyPopupTemplate.html')
-            })
-        } else {
-            $ionicPopup.alert({   //定义show的原因是避免页面加载就执行
-                title: '提示',
-                template: '暂未设置差旅标准,请设置后查看'
-            })
-        }
-    };
+    // $scope.showTravelPolicy = async function (staffId) {
+    //     var staff = await Models.staff.get(staffId);
+    //     if (!staff){
+    //         return;
+    //     }
+    //     var policy = await staff.getTravelPolicy();
+    //     $scope.policy = policy;
+    //     $scope.subsidies = await policy.getSubsidyTemplates();
+    //     $scope.MTrainLevel = MTrainLevel;
+    //     $scope.MPlaneLevel = MPlaneLevel;
+    //     $scope.MHotelLevel = MHotelLevel;
+    //     if (policy) {   //判断是否设置差旅标准
+    //         // $ionicPopup.alert({
+    //         //     title: '差旅标准',
+    //         //     scope: $scope,
+    //         //     cssClass: 'policyPopup',
+    //         //     template: require('../policyPopupTemplate.html')
+    //         // })
+    //         console.info('ok???')
+    //         let obj = await ngModalDlg.createDialog({
+    //             parent:$scope,
+    //             scope: {policy},
+    //             template: require('../policy-show.html'),
+    //             controller: PolicyShowController
+    //         });
+    //     } else {
+    //         $ionicPopup.alert({   //定义show的原因是避免页面加载就执行
+    //             title: '提示',
+    //             template: '暂未设置差旅标准,请设置后查看'
+    //         })
+    //     }
+    // };
 
     $scope.showReasonDialog = function () {
         $scope.reject = {reason: ''};

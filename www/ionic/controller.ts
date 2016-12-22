@@ -101,7 +101,7 @@ export function getImageUrl(id){
     return url.href;
 }
 
-export async function IndexController($scope, Menu, $ionicPopup, Models, $storage, $window, $location, $ionicHistory, $ionicSideMenuDelegate) {
+export async function IndexController($scope, Menu, $ionicPopup, Models, $storage, $window, $location, $ionicHistory, $ionicSideMenuDelegate, ngModalDlg) {
     require('./index.scss');
     $scope.ionicGoBack = function () {
         let viewHistory = $ionicHistory.viewHistory();
@@ -185,39 +185,6 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
     }
     // }
 
-    $scope.showTravelPolicy = async function (staffId?: string) {
-        let pStaff = await Staff.getCurrent();
-
-        if(staffId)
-            pStaff = await Models.staff.get(staffId);
-
-        if (!pStaff)
-            return;
-
-        var policy = await pStaff.getTravelPolicy();
-        $scope.policy = policy;
-        $scope.subsidies = await policy.getSubsidyTemplates();
-        $scope.MTrainLevel = MTrainLevel;
-        $scope.MPlaneLevel = MPlaneLevel;
-        $scope.MHotelLevel = MHotelLevel;
-        $scope.enumHotelLevelToStr = enumHotelLevelToStr;
-        $scope.enumPlaneLevelToStr = enumPlaneLevelToStr;
-        $scope.enumTrainLevelToStr = enumTrainLevelToStr;
-        if (policy) {   //判断是否设置差旅标准
-            $ionicPopup.alert({
-                title: '差旅标准',
-                scope: $scope,
-                cssClass:'policyPopup',
-                template: require('./policyPopupTemplate.html')
-            })
-        } else {
-            $ionicPopup.alert({   //定义show的原因是避免页面加载就执行
-                title: '提示',
-                template: '暂未设置差旅标准,请设置后查看'
-            })
-        }
-    };
-    
     $scope.currentStaff = staff;
     if (staff) {
         $scope.tripPlanSave = await staff.getTripPlanSave();
@@ -229,4 +196,5 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
 
     await config.$ready;
     $scope.getImageUrl = getImageUrl;
+
 }

@@ -215,36 +215,8 @@ angular
             scope: {
                 staff : '='
             },
-            controller: function($scope, Models, $ionicPopup) {
-                $scope.showTravelPolicy = async function (staffId?: string) {
-                    let pStaff = await Staff.getCurrent();
+            controller: function($scope, Models, $ionicPopup, ngModalDlg) {
 
-                    if(staffId)
-                        pStaff = await Models.staff.get(staffId);
-
-                    if (!pStaff)
-                        return;
-
-                    var policy = await pStaff.getTravelPolicy();
-                    $scope.policy = policy;
-                    $scope.subsidies = await policy.getSubsidyTemplates();
-                    $scope.MTrainLevel = MTrainLevel;
-                    $scope.MPlaneLevel = MPlaneLevel;
-                    $scope.MHotelLevel = MHotelLevel;
-                    if (policy) {   //判断是否设置差旅标准
-                        $ionicPopup.alert({
-                            title: '差旅标准',
-                            scope: $scope,
-                            cssClass:'policyPopup',
-                            template: require('./policyPopupTemplate.html')
-                        })
-                    } else {
-                        $ionicPopup.alert({   //定义show的原因是避免页面加载就执行
-                            title: '提示',
-                            template: '暂未设置差旅标准,请设置后查看'
-                        })
-                    }
-                };
             }
         }
     })
