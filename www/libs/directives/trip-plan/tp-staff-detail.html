@@ -1,6 +1,5 @@
 <ion-list>
     <ion-item class="item-thumbnail-left opactic">
-        <div class="staff_portrait" ng-click="showTravelPolicy(staff.id)">{{staff.name.substring(staff.name.length-2,staff.name.length)}}</div>
         <policy-show class="staff_portrait" staff-id="staff.id" policy-title="staff.name.substring(staff.name.length-2,staff.name.length)"></policy-show>
         <span class="op_mult">{{staff.name}}&nbsp;&nbsp;{{staff.mobile}}</span>
         <br>{{staff.email}}

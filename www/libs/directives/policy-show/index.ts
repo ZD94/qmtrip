@@ -5,7 +5,10 @@
 
 import angular = require("angular");
 import {Staff} from "api/_types/staff/staff";
-import {MTrainLevel, MPlaneLevel, MHotelLevel} from "api/_types/travelPolicy";
+import {
+    MTrainLevel, MPlaneLevel, MHotelLevel, enumPlaneLevelToStr, enumTrainLevelToStr,
+    enumHotelLevelToStr
+} from "api/_types/travelPolicy";
 
 
 angular
@@ -20,6 +23,9 @@ angular
                 staffId: '<staffId'
             },
             controller: async function($scope, Models, ngModalDlg, $ionicPopup){
+                if(!$scope.title){
+                    $scope.title = '差旅标准';
+                }
                 $scope.showTravelPolicy = async function (staffId?: string) {
                     let pStaff = await Staff.getCurrent();
 
@@ -50,6 +56,9 @@ angular
                     }
                     function PolicyShowController($scope){
                         require('./policy-show.scss');
+                        $scope.enumPlaneLevelToStr = enumPlaneLevelToStr;
+                        $scope.enumTrainLevelToStr = enumTrainLevelToStr;
+                        $scope.enumHotelLevelToStr = enumHotelLevelToStr;
                     }
                 };
             }

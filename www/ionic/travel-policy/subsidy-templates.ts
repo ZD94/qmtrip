@@ -59,6 +59,11 @@ export async function SubsidyTemplatesController($scope, Models, $ionicPopup) {
                             msgbox.log("补助金额过大");
                             return false;
                         }
+                        if($scope.subsidyTemplate.subsidyMoney <=0){
+                            e.preventDefault();
+                            msgbox.log("补助金额必须大于0");
+                            return false;
+                        }
                         if($scope.policyId){
                             travelPolicy = await Models.travelPolicy.get($scope.policyId);
                             $scope.subsidyTemplate.travelPolicy = travelPolicy;

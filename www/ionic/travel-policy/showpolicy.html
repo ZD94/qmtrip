@@ -1,4 +1,4 @@
-<ion-view>
+<ion-view title="差旅标准">
     <ion-content class="has-header policy-detail" padding="true">
         <div class="list">
             <div class="item">
@@ -36,8 +36,8 @@
                 <span class="detail-right">{{enumHotelLevelToStr(travelPolicy.abroadHotelLevels)}}</span>
             </div>
         </div>
-        <div class="list">
-            <div class="policy_tit" ng-if="subsidies">补助模板</div>
+        <div class="list" ng-if="subsidies.length>0">
+            <div class="policy_tit">补助模板</div>
             <div class="item" ng-repeat="subsidy in subsidies">
                 {{subsidy.name}}
                 <span class="item-note">{{subsidy.subsidyMoney}}元/天</span>
