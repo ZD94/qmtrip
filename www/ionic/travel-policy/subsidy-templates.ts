@@ -1,6 +1,7 @@
 
 import { SubsidyTemplate } from 'api/_types/travelPolicy';
 var msgbox = require('msgbox');
+const _ = require("lodash");
 
 export async function SubsidyTemplatesController($scope, Models, $ionicPopup) {
     require('./subsidy-templates.scss');
@@ -9,11 +10,14 @@ export async function SubsidyTemplatesController($scope, Models, $ionicPopup) {
         $scope.subsidyTemplates = [];
     }
     var travelPolicy;
-    if($scope.policyId){
-        travelPolicy = await Models.travelPolicy.get($scope.policyId);
-    }
     let removeSubsidyTemplates= [];
     let saveSubsidyTemplates = [];
+    if($scope.policyId){
+        travelPolicy = await Models.travelPolicy.get($scope.policyId);
+    }else{
+        saveSubsidyTemplates = _.cloneDeep($scope.subsidyTemplates);
+    }
+
     $scope.addTemplate = async function () {
         $scope.subsidyTemplate = SubsidyTemplate.create();
         // $scope.subsidyTemplate.travelPolicy = travelPolicy;
