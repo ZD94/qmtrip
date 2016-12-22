@@ -18,7 +18,7 @@ angular
         let backImage = 'ionic/images/back.png';
         let closeImage = 'ionic/images/close.png';
         if(!ionic.Platform.isAndroid()){
-            let relpath = path.relative(window['bundle_url'], window['Manifest'].root);
+            let relpath = path.relative(window['bundle_url'], (window['Manifest'] ? window['Manifest'].root: './'));
             console.log(relpath);
             backImage = relpath+'/'+backImage;
             closeImage = relpath+'/'+closeImage;
