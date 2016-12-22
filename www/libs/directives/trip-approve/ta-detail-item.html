@@ -43,7 +43,7 @@
             </div>
             <div class="flex-010">
                 <span><i class="icon ion-home"></i>{{item.city}}</span>
-                <span class="hotel-name" ng-if="item.placeName">&nbsp;{{item.placeName}}附近</span>
+                <span class="hotel-name">&nbsp;{{item.placeName}}<span ng-if="item.placeName">附近</span></span>
                 <span class="spanRight right-budget" ng-if="item.price > 0">
                     {{item.price / days | currency_int}}元/天
                 </span>
