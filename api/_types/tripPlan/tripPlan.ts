@@ -6,7 +6,7 @@ import { Types, Values } from 'common/model';
 import {Table, Create, Field, ResolveRef, Reference, TableIndex, TableExtends} from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import {PaginateInterface} from "common/model/interface";
-import {TripDetail} from "./";
+import {TripDetail} from "./tripDetail";
 
 declare var API: any;
 

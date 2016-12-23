@@ -53,7 +53,7 @@
             <div class="spacer" style="width: 300px; height: 9px;"></div>
             <ion-toggle toggle-class="toggle-positive" ng-disabled="!trip.place" ng-model="trip.hotel">住宿<span
                     ng-if="trip.hotel">（共{{calcTripDuration()}}天）</span></ion-toggle>
-            <div ng-if="trip.hotel">
+            <div ng-if="trip.hotel && !trip.place.isAbroad">
                 <!--<div class="button-bar">
                     &lt;!&ndash;<button id="page6-button34" class="button button-light button-small button-block" ng-click="decTripDuration()">-</button>&ndash;&gt;
                     <button id="page6-button35" class="button button-stable button-block">共{{calcTripDuration()}}天</button>
