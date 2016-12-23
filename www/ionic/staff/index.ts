@@ -7,6 +7,7 @@ export default async function IndexController($scope, Models, inAppBrowser) {
     API.require('tripPlan');
 
     let staff = await Staff.getCurrent();
+    let coinAccount = staff.$parents["account"]["coinAccount"];
     $scope.toDuiBa = async function(){
         // window.location.href = '#/duiba/index';
         var duiBaUrl = await staff.getDuiBaLoginUrl({});
@@ -25,6 +26,7 @@ export default async function IndexController($scope, Models, inAppBrowser) {
     console.info(tripBudget);
     $scope.tripBudget = tripBudget;
     $scope.staff = staff;
+    $scope.coinAccount = coinAccount;
     $scope.EStaffRole = EStaffRole;
     $scope.EPlanStatus = EPlanStatus;
     $scope.QMEApproveStatus = QMEApproveStatus;
