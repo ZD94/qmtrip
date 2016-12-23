@@ -17,12 +17,6 @@ angular
         }
         let backImage = 'ionic/images/back.png';
         let closeImage = 'ionic/images/close.png';
-        if(!ionic.Platform.isAndroid()){
-            let relpath = path.relative(window['bundle_url'], (window['Manifest'] ? window['Manifest'].root: './'));
-            console.log(relpath);
-            backImage = relpath+'/'+backImage;
-            closeImage = relpath+'/'+closeImage;
-        }
         const ThemeableBrowserOption = {
             toolbar: {
                 height: 44,
@@ -50,6 +44,14 @@ angular
         };
         return {
             open: function(url: string, linkJS?: string){
+                if(!ionic.Platform.isAndroid()){
+                    let relpath = path.relative(window['bundle_url'], (window['Manifest'] ? window['Manifest'].root: './'));
+                    console.log(relpath);
+                    ThemeableBrowserOption.backButton.wwwImage =
+                        ThemeableBrowserOption.backButton.wwwImagePressed = relpath+'/'+backImage;
+                    ThemeableBrowserOption.closeButton.wwwImage =
+                        ThemeableBrowserOption.closeButton.wwwImagePressed = relpath+'/'+closeImage;
+                }
                 let ref = cordova['ThemeableBrowser'].open(url,'_blank',ThemeableBrowserOption);
                 if(linkJS){
                     ref.addEventListener('loadstop', function(){
