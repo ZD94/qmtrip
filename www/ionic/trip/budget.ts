@@ -1,7 +1,8 @@
-import { ETripType, EInvoiceType, MTxPlaneLevel } from 'api/_types/tripPlan';
+import { ETripType, EInvoiceType } from 'api/_types/tripPlan';
 import moment = require('moment');
 import { Staff } from 'api/_types/staff/staff';
 import {EApproveType, EApproveChannel} from "api/_types/approve/types";
+import {MPlaneLevel, MTrainLevel} from "../../../api/_types/travelPolicy";
 
 export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup, $ionicHistory){
     require('./trip.scss');
@@ -78,7 +79,8 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     $scope.budgets = budgets;
     $scope.EInvoiceType = EInvoiceType;
     $scope.ETripType = ETripType;
-    $scope.MTxPlaneLevel = MTxPlaneLevel;
+    $scope.MPlaneLevel = MPlaneLevel;
+    $scope.MTrainLevel = MTrainLevel;
     API.require("tripPlan");
     await API.onload();
 

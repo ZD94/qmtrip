@@ -88,8 +88,7 @@
                                 &nbsp;
                                 {{trip.destinationPlaceName}}
                                 <span class="spanRight right-budget">
-                                    <span>{{budget.type == EInvoiceType.TRAIN ? budget.cabinClass : (MTxPlaneLevel[budget.cabinClass ]? MTxPlaneLevel[budget.cabinClass] : "")}}</span>
-                                    <!--{{MTxPlaneLevel[budget.cabinClass]?MTxPlaneLevel[budget.cabinClass]:""}}-->
+                                    <span>{{budget.type == EInvoiceType.TRAIN ? MTrainLevel[budget.cabinClass] : MPlaneLevel[budget.cabinClass]}}</span>
                                     <span ng-if="budget.discount  && budget.cabinClass == 'Economy'">{{budget.discount}}</span>
                                 </span>
                             </div>

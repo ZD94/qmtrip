@@ -152,7 +152,12 @@ angular
                     let arrivalCity = await City.getCity($scope.item.arrivalCity);
                     $scope.item.deptCity = deptCity ? deptCity.name: '未知';
                     $scope.item.arrivalCity = arrivalCity ? arrivalCity.name : '未知';
-                    $scope.item.cabin = getNameByECabin($scope.item.cabin);
+                    if ($scope.item.invoiceType == EInvoiceType.TRAIN) {
+                        $scope.item.cabin = MTrainLevel[$scope.item.cabin];
+                    } else {
+                        $scope.item.cabin = MPlaneLevel[$scope.item.cabin];
+                    }
+                    // $scope.item.cabin = getNameByECabin($scope.item.cabin);
                 }
 
                 if ($scope.item.hasFirstDaySubsidy === false) {
