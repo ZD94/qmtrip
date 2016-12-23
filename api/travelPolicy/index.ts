@@ -40,7 +40,7 @@ class TravelPolicyModule{
         params.abroadHotelLevels = tryConvertToArray(params.abroadHotelLevels);
         params.abroadTrainLevels = tryConvertToArray(params.abroadTrainLevels)
         params.abroadPlaneLevels = tryConvertToArray(params.abroadPlaneLevels);
-        var travelp = TravelPolicy.create(params);
+        let travelp = TravelPolicy.create(params);
         if(travelp.isDefault){
             let defaults = await Models.travelPolicy.find({where: {id: {$ne: travelp.id}, is_default: true}});
             if(defaults && defaults.length>0){

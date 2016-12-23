@@ -168,6 +168,7 @@
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.7.0",
     "ws": "^1.1.1",
+    "xml2js": "^0.4.17",
     "xregexp": "^3.1.1",
     "yargs": "^5.0.0"
   }
