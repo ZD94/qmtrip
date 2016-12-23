@@ -1104,6 +1104,8 @@ class TripPlanModule {
         let companyId = staff.company.id;
         let sql = `select sum(budget) - sum(expenditure) as save from trip_plan.trip_plans where deleted_at is null and status = ${EPlanStatus.COMPLETE} AND company_id = '${companyId}' AND account_id =  '${accountId}' `;
 
+        console.info(sql);
+        console.info("==============-------------------");
         let ranks = await sequelize.query(sql)
             .then(function(result) {
                 return result[0];
