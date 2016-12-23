@@ -56,7 +56,9 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
     $scope.subsidyTemplates = [];
     if ($stateParams.policyId) {
         travelPolicy = await Models.travelPolicy.get($stateParams.policyId);
+        Models.resetOnPageChange(travelPolicy);
         $scope.subsidyTemplates = subsidyTemplates = await travelPolicy.getSubsidyTemplates();
+        subsidyTemplates.forEach((sub)=>Models.resetOnPageChange(sub));
     } else {
         travelPolicy = TravelPolicy.create();
         travelPolicy.companyId = staff.company.id;
