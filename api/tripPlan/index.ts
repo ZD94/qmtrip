@@ -545,9 +545,28 @@ class TripPlanModule {
                 orderId: tripPlan.id});
             await pc.save();
             try {
+                if(!staff.totalPoints){
+                    staff.totalPoints = 0;
+                }
+                if(!tripPlan.score){
+                    tripPlan.score = 0;
+                }
+                if(!staff.balancePoints){
+                    staff.balancePoints = 0;
+                }
+                if(typeof staff.totalPoints == 'string'){
+                    staff.totalPoints = Number(staff.totalPoints);
+                }
+                if(typeof tripPlan.score == 'string'){
+                    tripPlan.score = Number(tripPlan.score);
+                }
+                if(typeof staff.balancePoints == 'string'){
+                    staff.balancePoints = Number(staff.balancePoints);
+                }
                 staff.totalPoints = staff.totalPoints + tripPlan.score;
                 staff.balancePoints = staff.balancePoints + tripPlan.score;
                 let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: user.id, remark: `增加员工${tripPlan.score}积分`});
+                console.info("查看sql================");
                 await Promise.all([staff.save(), log.save()]);
             } catch(err) {
                 //如果保存出错,删除日志记录
