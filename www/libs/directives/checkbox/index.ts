@@ -66,33 +66,35 @@ angular
             controller: function($scope){
                 $scope.$watch('model.length',function(n,o){
                     if(!$scope.model){
-                        $scope.model = [];
+                        $scope.selectAll = false;
+                        return;
                     }
-                    var newlist = {};
-                    for(let mod of $scope.model){
-                        newlist[mod] = 3;
-                    }
-                    for(let option of $scope.options){
-                        if(!newlist[option.value]){
-                            $scope.selectAll = false;
-                            return false;
-                        }
-                        $scope.selectAll = true;
-                    }
+                    let allValues = $scope.options.map((opt)=>opt.value);
+                    $scope.selectAll = isAllChecked($scope.model, allValues);
                 })
                 $scope.checkall = function(){
                     if($scope.model.length == $scope.options.length){
                         $scope.model = []
                     }else{
-                        $scope.options.map(function(opt){
-                            if($scope.model.indexOf(opt.value) < 0){
-                                $scope.model = _.clone($scope.model);
-                                $scope.model.push(opt.value);
-                                $scope.model.sort();
-                            }
-                        })
+                        let allValues = $scope.options.map((opt)=>opt.value);
+                        allValues.sort();
+                        $scope.model = allValues;
                     }
                 }
             }
         }
-    })
+    });
+
+
+function isAllChecked(values, allValues){
+    var newlist = {};
+    for(let mod of value){
+        newlist[mod] = true;
+    }
+    for(let v of allValue){
+        if(!newlist[option]){
+            return false;
+        }
+    }
+    return true;
+}
