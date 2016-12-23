@@ -87,12 +87,12 @@ angular
 
 
 function isAllChecked(values, allValues){
-    var newlist = {};
-    for(let mod of value){
-        newlist[mod] = true;
+    var valueMap = {};
+    for(let mod of values){
+        valueMap[mod] = true;
     }
-    for(let v of allValue){
-        if(!newlist[option]){
+    for(let v of allValues){
+        if(!valueMap[v]){
             return false;
         }
     }
