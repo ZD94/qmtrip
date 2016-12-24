@@ -18,6 +18,9 @@ angular
             controller: function($scope,$element){
                 require('./checkbox.scss');
                 $scope.checkOption = function(option){
+                    if (!$scope.model) {
+                        $scope.model = [];
+                    }
                     let idx = $scope.model.indexOf(option.value);
                     if(idx >=0){
                         $scope.model.splice(idx, 1);
@@ -41,7 +44,7 @@ angular
             controller: function($scope, $element){
                 require('./checkbox.scss');
                 $scope.checkOption = function(option){
-                    let values = _.cloneDeep($scope.model);
+                    let values = _.cloneDeep($scope.model) || [];
                     let idx = values.indexOf(option.value);
                     if(idx >=0){
                         values.splice(idx, 1);
