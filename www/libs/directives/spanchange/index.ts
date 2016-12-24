@@ -25,7 +25,11 @@ angular
                 $scope.spacing.interval = calculateInterval(span);
                 $scope.monthChange = function (x: number) {
                     $scope.span.startTime = moment($scope.span.startTime).add(x, $scope.spacing.interval).toDate();
-                    $scope.span.endTime = moment($scope.span.endTime).add(x, $scope.spacing.interval).toDate();
+                    if ($scope.spacing.interval == 'months') {
+                        $scope.span.endTime = moment($scope.span.startTime).add(x, $scope.spacing.interval).add(-1, 'days').toDate();
+                    } else {
+                        $scope.span.endTime = moment($scope.span.endTime).add(x, $scope.spacing.interval).toDate();
+                    }
                 };
                 $scope.showmadel = async function () {
                     let ret = await ngModalDlg.createDialog({
