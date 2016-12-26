@@ -30,6 +30,9 @@ class DuiBa {
         if(staff.coinAccount && staff.coinAccount.balance){
             credits = staff.coinAccount.balance;
         }
+
+        credits = Math.floor(credits);
+
         params.credits = credits;
         params.appKey = config.duiba.appKey;
         params.appSecret = config.duiba.appSecret;

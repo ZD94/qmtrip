@@ -835,7 +835,7 @@ export default class ApiAuth {
      * @param companyName
      * @returns {*}
      */
-    @clientExport
+    /*@clientExport
     @requireParams(["id"], accountCols)
     static async updateAccount(params) {
         var id = params.id;
@@ -857,7 +857,7 @@ export default class ApiAuth {
         var newAcc = await accobj.save();
         return newAcc;
 
-        /*if(accobj.email == newAcc.email){
+        /!*if(accobj.email == newAcc.email){
          return newAcc;
          }
 
@@ -866,8 +866,8 @@ export default class ApiAuth {
          return ApiAuth.sendResetPwdEmail({companyName: companyName, email: newAcc.email, type: 1, isFirstSet: true})
          .then(function() {
          return newAcc;
-         });*/
-    }
+         });*!/
+    }*/
 
     /**
      * 删除Account

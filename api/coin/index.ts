@@ -42,7 +42,8 @@ class CoinModule {
         if (staff.balancePoints < points) {
             throw L.ERR.SHORT_OF_POINT();
         }
-        let coins = Math.floor(points * points2coinRate);
+        // let coins = Math.floor(points * points2coinRate);
+        let coins = points * points2coinRate;
 
         if (!company.coinAccount || company.coinAccount.balance < coins) {
             throw L.ERR.COMPANY_SHORT_OF_MONEY_FUND();
