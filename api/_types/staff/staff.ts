@@ -370,7 +370,9 @@ export class Staff extends ModelObject implements Account {
             let ca = CoinAccount.create();
             await ca.save();
             self.coinAccount = ca;
-            await self.save();
+            let account = await Models.account.get(self.id);
+            account.coinAccount = ca;
+            await account.save();
         }
         let coinAccount = self.coinAccount;
         return coinAccount.getCoinAccountChanges({});
