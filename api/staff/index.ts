@@ -75,11 +75,15 @@ class StaffModule{
         }else{
             throw L.ERR.PERMISSION_DENY();
         }
-        if(!newstaff.coinAccount){
+
+        let account = await Models.account.get(staff.id);
+
+        if(!account.coinAccount){
             //为员工设置资金账户
             let ca = CoinAccount.create();
             await ca.save();
-            newstaff.coinAccount = ca;
+            account.coinAccount = ca;
+            await account.save();
         }
         let result = await newstaff.save();
         await API.auth.sendResetPwdEmail({email: result.email, mobile: result.mobile, type: 1, isFirstSet: true, companyName: result.company.name});

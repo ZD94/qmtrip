@@ -741,7 +741,25 @@ export default class ApiAuth {
     @clientExport
     static async createAccount(params): Promise<Account> {
         var acc = Account.create(params);
-        return acc;
+        return acc.save();
+    }
+
+
+    /**
+     * 更新account(为员工添加资金账户时用【改进后可删除】)
+     * @param id
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    static async updateAccount(params) : Promise<Account>{
+        var id = params.id;
+
+        var ah = await Models.account.get(id);
+        for(var key in params){
+            ah[key] = params[key];
+        }
+        return ah.save();
     }
 
     /**
