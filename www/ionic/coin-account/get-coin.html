@@ -1,13 +1,13 @@
 <ion-view title="获取鲸币" id="page30">
     <ion-content padding="false" class="has-header get_coins">
-        <div class="coins_head">差旅节省奖励可兑：<span>{{staff.balancePoints/2}}</span></div>
+        <div class="coins_head">差旅节省奖励可兑：<span>{{staff.balancePoints*(staff.company.points2coinRate || 0.5)}}</span></div>
         <div class="coins_charge">
             <div>
                 差旅节省奖励是您每次出差过程中节省的差旅费用，企业按照比例奖励给您的鲸币。企业需要根据每月鲸力提供的账单进行充值，充值完成后您随时可以到此页面兑换，企业账户状态为紧张时可能会导致兑换失败。
             </div>
-            <div class="coins_item">剩余节省金额：<span>{{staff.balancePoints}}</span></div>
+            <div class="coins_item">剩余节省金额：<span>{{staff.balancePoints || 0}}</span></div>
             <div class="coins_item">可兑换鲸币：<span>{{staff.balancePoints*(staff.company.points2coinRate || 0.5)}}</span></div>
-            <div class="coins_item">企业账户状态：<span>{{companyCoinAccount.balance > staff.balancePoints*(staff.company.points2coinRate || 0.5)? "充足": "不充足"}}</span></div>
+            <div class="coins_item">企业账户状态：<span ng-class="{true:'enough',false:'not-enough'}[companyCoinAccount.balance > staff.balancePoints*(staff.company.points2coinRate || 0.5)]">{{companyCoinAccount.balance > staff.balancePoints*(staff.company.points2coinRate || 0.5)? "充足": "紧张"}}</span></div>
             <div class="convert">
                 <div>
                     <input type="text" placeholder="请输入兑换数量" ng-model="staff.exchangeNum">
