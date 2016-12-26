@@ -17,7 +17,9 @@ export default async function IndexController($scope, Models, inAppBrowser) {
 
     }
     $scope.toCoinAccount = function(){
-        window.location.href= '#/coin-account/index';
+        if(staff.email.indexOf('jingli.tech')>=0){
+            window.location.href= '#/coin-account/index';
+        }
     }
     if(staff.roleId == EStaffRole.OWNER){
         let isFirstLogin = await staff.company.getTravelPolicies();

@@ -74,7 +74,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         }
         totalPrice += price
     }
-
+    console.info(budgets);
     $scope.totalPrice = totalPrice;
     $scope.budgets = budgets;
     $scope.EInvoiceType = EInvoiceType;
