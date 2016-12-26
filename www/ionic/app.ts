@@ -93,7 +93,7 @@ function initAPI($window, $location, $ionicPopup){
     }
 }
 
-function initKeyboard($ionicPlatform) {
+function initKeyboard($ionicPlatform, $ionicHistory, $rootScope, $window, $location, IONIC_BACK_PRIORITY) {
     $ionicPlatform.ready(function() {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
@@ -102,6 +102,45 @@ function initKeyboard($ionicPlatform) {
             Keyboard.hideKeyboardAccessoryBar(true);
             Keyboard.disableScroll(true);
         }
+
+        $rootScope.ionicGoBack = function () {
+            let viewHistory = $ionicHistory.viewHistory();
+            let backView = viewHistory.backView;
+            if (!backView) {
+                $window.history.go(-1);
+            } else if (backView.url) {
+                //$location.replace();
+                $location.url(backView.url);
+            } else {
+                backView.go();
+            }
+        }
+        for(let k of Object.keys($ionicPlatform.$backButtonActions)) {
+            let act = $ionicPlatform.$backButtonActions[k];
+            if(act.fn.name == 'onHardwareBackButton') {
+                delete $ionicPlatform.$backButtonActions[k];
+                break;
+            }
+        }
+        //$ionicPlatform.$backButtonActions = {};
+        function onHardwareBackButton(e) {
+            var backView = $ionicHistory.backView();
+            if (backView) {
+                $rootScope.$apply(()=>{
+                    $rootScope.ionicGoBack();
+                });
+            } else {
+                // there is no back view, so close the app instead
+                ionic.Platform.exitApp();
+            }
+            e.preventDefault();
+            return false;
+        }
+        $ionicPlatform.registerBackButtonAction(
+            onHardwareBackButton,
+            IONIC_BACK_PRIORITY.view
+        );
+
     });
 }
 function initStatusBar($ionicPlatform, $rootScope) {
