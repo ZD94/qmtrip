@@ -44,6 +44,16 @@
     align-items: center;
     height: 50px;
     border-bottom: 1px solid #dcdcdc;
+    &.coin_detail{
+      border: 0;
+      align-items: flex-start;
+      margin-top: 10px;
+      p{
+        flex: 1;
+        text-align: right;
+        white-space: normal;
+      }
+    }
     span{
       &:first-child{
         flex: 0;
