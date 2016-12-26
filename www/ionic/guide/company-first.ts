@@ -89,7 +89,6 @@ export async function CompanyFirstController ($scope, Models, $stateParams){
         await $scope.travelPolicy.save();
         staff['travelPolicyId'] = $scope.travelPolicy.id;
         await staff.save();
-        //add   shicong
         window.location.href = '#/guide/company-second';
     }
 
