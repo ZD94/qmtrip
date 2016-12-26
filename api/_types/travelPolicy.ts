@@ -74,7 +74,7 @@ export var  MPlaneLevel  = {
     2: "经济舱",
     3: '头等舱',
     4: '商务舱',
-    5: '高端商务舱',
+    5: '高端经济舱',
 }
 
 export enum EPlaneLevel {
