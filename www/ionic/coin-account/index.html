@@ -17,14 +17,6 @@
         ></ion-refresher>
         <ion-list class="list coin-list">
             <div class="list-tit">鲸币记录</div>
-            <ion-item class="item">
-                <span class="item-date">09-21</span>
-                <span class="item-icon">充</span>
-                <div class="item-info">
-                    <p>+100</p>
-                    <p>使用差旅节省奖励进行鲸币充值</p>
-                </div>
-            </ion-item>
             <div class="item" ng-repeat="item in coinAccountChanges track by $index" ng-click="detail(item)">
                 <div ng-class="{
                      'list-red':item.type == COIN_CHANGE_TYPE.INCOME,
