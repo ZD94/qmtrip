@@ -14,7 +14,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     $scope.EApproveChannel = EApproveChannel;
     $scope.staffSelector = {
         query: async function(keyword) {
-            let staffs = await staff.company.getStaffs();
+            let staffs = await staff.company.getStaffs({where: {'name': {$ilike: '%'+keyword+'%'}}});
             return staffs;
         },
         display: (staff)=>staff.name
