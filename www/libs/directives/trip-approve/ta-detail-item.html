@@ -23,7 +23,9 @@
                 <span></span>
                 <span class="spanRight right-budget">
                     <span ng-if="item.cabinClass">
-                        {{item.type == EInvoiceType.PLANE ? MPlaneLevel[item.cabinClass] : MTrainLevel[item.cabinClass]}}
+                        {{item.type == EInvoiceType.PLANE ?
+                          (MPlaneLevel[item.cabinClass] ? MPlaneLevel[item.cabinClass]: item.cabinClass):
+                          (MTrainLevel[item.cabinClass] ? MTrainLevel[item.cabinClass]: item.cabinClass)}}
                     </span>
                     <!--{{item.price == -1 ? '暂无预算' : (item.price| currency: '')+'元'}}<br/>-->
                     <span ng-if="item.fullPrice && item.cabinClass == 'Economy'">
