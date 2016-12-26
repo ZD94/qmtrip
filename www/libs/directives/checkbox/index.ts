@@ -76,12 +76,11 @@ angular
                     $scope.selectAll = isAllChecked($scope.model, allValues);
                 })
                 $scope.checkall = function(){
-                    if($scope.model.length == $scope.options.length){
+                    if($scope.model && $scope.model.length == $scope.options.length){
                         $scope.model = []
                     }else{
-                        let allValues = $scope.options.map((opt)=>opt.value);
-                        allValues.sort();
-                        $scope.model = allValues;
+                        $scope.model = Array.from($scope.options.map( (item)=> item.value));
+                        $scope.model.sort();
                     }
                 }
             }
