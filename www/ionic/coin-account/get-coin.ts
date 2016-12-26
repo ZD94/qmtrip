@@ -14,7 +14,8 @@ export async function GetCoinController($scope, Models, $stateParams) {
     }
     $scope.exchange = async function(){
         try{
-            await staff.score2Coin({points: $scope.staff.exchangeNum});
+            let exchangePoints = $scope.staff.exchangeNum/(staff.company.points2coinRate || 0.5);
+            await staff.score2Coin({points: exchangePoints});
             window.location.href = '#/coin-account/index';
             msgbox.log("兑换成功");
         }catch (err){
