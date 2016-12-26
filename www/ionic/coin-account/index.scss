@@ -42,8 +42,11 @@
   .item{
     padding-left: 10px;
     overflow: hidden;
+    & > div{
+      display: flex;
+    }
     span{
-      float: left;
+      flex: none;
       height: 40px;
       line-height: 40px;
       &.item-date{
@@ -59,7 +62,9 @@
       }
     }
     .item-info{
-      float: left;
+      flex: 1;
+      text-overflow: ellipsis;
+      overflow: hidden;
       p{
         font-size: 12px;
         &:first-child{
