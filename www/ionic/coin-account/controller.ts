@@ -65,8 +65,8 @@ export async function IndexController($scope, Models, $ionicPopup, $stateParams,
     }
 
     $scope.goShop = async function(){
-        var duiBaUrl = await staff.getDuiBaLoginUrl();
-        inAppBrowser.open(duiBaUrl);
+        //var duiBaUrl = await staff.getDuiBaLoginUrl();
+        //inAppBrowser.open(duiBaUrl);
     }
 
     /*$scope.delete = async function(item, index) {

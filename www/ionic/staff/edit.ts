@@ -103,6 +103,16 @@ export default async function EditController($scope, $storage, $stateParams, Mod
                         throw L.ERR.MOBILE_HAS_REGISTRY();
                     }
                 }
+                if(!_staff.name){
+                    msgbox.log('姓名不能为空');
+                    return;
+                }
+                var namePattern = /[\u4e00-\u9fa5]+/g;
+                var hasChinese = namePattern.test($scope.form.name);
+                if(_staff.name.length>5 && hasChinese){
+                    msgbox.log('姓名不能超过5个字');
+                    return;
+                }
                 //管理员修改自身权限 修改后要重新登录
                 /*if(preRole == EStaffRole.ADMIN && _staff.roleId == EStaffRole.COMMON && currentstaff.id == _staff.id){
                     logout = true;
