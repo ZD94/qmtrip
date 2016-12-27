@@ -15,7 +15,7 @@ export async function GetCoinController($scope, Models, $stateParams) {
     $scope.exchange = async function(){
         if(validator.isInt($scope.staff.exchangeNum) || validator.isFloat($scope.staff.exchangeNum)){
             try{
-                let exchangePoints = $scope.staff.exchangeNum/(staff.company.points2coinRate || 0.5);
+                let exchangePoints = $scope.staff.exchangeNum/(staff.company.points2coinRate || 50);
                 await staff.score2Coin({points: exchangePoints});
                 window.location.href = '#/coin-account/index';
                 msgbox.log("兑换成功");
