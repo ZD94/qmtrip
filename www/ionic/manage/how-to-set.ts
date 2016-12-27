@@ -29,6 +29,10 @@ async function supportUsController($scope,$ionicPopup){
             msgbox.log('请填写OA名称');
             return;
         }
+        if (/^[\w\s4E00－9FA5]+$/.test($scope.OA.name)) {
+            msgbox.log('OA名称只能是字符或者汉子');
+            return;
+        }
         try{
             await API.approve.reportHimOA({oaName: OA.name, oaUrl: OA.url});
             $ionicPopup.show({

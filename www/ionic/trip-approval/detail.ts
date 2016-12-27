@@ -1,10 +1,9 @@
 import {
-    EInvoiceType, QMEApproveStatus, MTxPlaneLevel, EApproveResult, ETripType,
+    EInvoiceType, QMEApproveStatus, EApproveResult, ETripType,
     EApproveStatus2Text
 } from 'api/_types/tripPlan';
 import { Staff } from 'api/_types/staff/staff';
 import moment = require('moment');
-import { MTrainLevel, MHotelLevel, MPlaneLevel } from 'api/_types/travelPolicy';
 import {EApproveChannel} from "api/_types/approve/types";
 
 export async function DetailController($scope, Models, $stateParams, $ionicPopup, $loading, $storage, ngModalDlg){
@@ -18,7 +17,6 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     $scope.APPROVE_TEXT = EApproveStatus2Text;
     $scope.EInvoiceType = EInvoiceType;
     $scope.EApproveStatus = QMEApproveStatus;
-    $scope.MTxPlaneLevel = MTxPlaneLevel;
     $scope.EApproveResult = EApproveResult;
     let currentStaff = await Staff.getCurrent();
     let company = currentStaff.company;
@@ -250,7 +248,9 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         if(value.agree){
             $scope.isNextApprove = value.isNextApprove;
             approve(value.result);
-            //$scope.isHasPermissionApprove = false;
+            if($scope.tripApprove.approveUser != curStaff){
+                $scope.isHasPermissionApprove = false;
+            }
             $scope.isHasApprove = true;
         }
         // $scope.isConfirm = true;

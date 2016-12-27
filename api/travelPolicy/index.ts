@@ -32,7 +32,7 @@ class TravelPolicyModule{
     static async createTravelPolicy (params) : Promise<TravelPolicy>{
         let result = await Models.travelPolicy.find({where: {name: params.name, companyId: params.companyId}});
         if(result && result.length>0){
-            throw {msg: "该等级名称已存在，请重新设置"};
+            throw L.ERR.TRAVEL_POLICY_NAME_REPEAT();
         }
         params.planeLevels = tryConvertToArray(params.planeLevels);
         params.trainLevels = tryConvertToArray(params.trainLevels);
@@ -40,7 +40,7 @@ class TravelPolicyModule{
         params.abroadHotelLevels = tryConvertToArray(params.abroadHotelLevels);
         params.abroadTrainLevels = tryConvertToArray(params.abroadTrainLevels)
         params.abroadPlaneLevels = tryConvertToArray(params.abroadPlaneLevels);
-        var travelp = TravelPolicy.create(params);
+        let travelp = TravelPolicy.create(params);
         if(travelp.isDefault){
             let defaults = await Models.travelPolicy.find({where: {id: {$ne: travelp.id}, is_default: true}});
             if(defaults && defaults.length>0){

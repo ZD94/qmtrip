@@ -16,7 +16,7 @@ import _ = require('lodash');
 import {requireParams, clientExport} from 'common/api/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
-    TripApprove, QMEApproveStatus, EApproveResult, EApproveResult2Text, MTxPlaneLevel, getECabinByName, getNameByECabin,
+    TripApprove, QMEApproveStatus, EApproveResult, EApproveResult2Text,
     EPayType, ESourceType, EInvoiceFeeTypes, EInvoiceStatus
 } from "api/_types/tripPlan";
 import {Models} from "api/_types";
@@ -30,6 +30,7 @@ import fs = require("fs");
 import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice} from "../_types/tripPlan";
 import {ENoticeType} from "../_types/notice/notice";
 import TripApproveModule = require("../tripApprove/index");
+import {MPlaneLevel, MTrainLevel} from "../_types/travelPolicy";
 
 
 class TripPlanModule {
@@ -545,9 +546,28 @@ class TripPlanModule {
                 orderId: tripPlan.id});
             await pc.save();
             try {
+                if(!staff.totalPoints){
+                    staff.totalPoints = 0;
+                }
+                if(!tripPlan.score){
+                    tripPlan.score = 0;
+                }
+                if(!staff.balancePoints){
+                    staff.balancePoints = 0;
+                }
+                if(typeof staff.totalPoints == 'string'){
+                    staff.totalPoints = Number(staff.totalPoints);
+                }
+                if(typeof tripPlan.score == 'string'){
+                    tripPlan.score = Number(tripPlan.score);
+                }
+                if(typeof staff.balancePoints == 'string'){
+                    staff.balancePoints = Number(staff.balancePoints);
+                }
                 staff.totalPoints = staff.totalPoints + tripPlan.score;
                 staff.balancePoints = staff.balancePoints + tripPlan.score;
                 let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: user.id, remark: `增加员工${tripPlan.score}积分`});
+                console.info("查看sql================");
                 await Promise.all([staff.save(), log.save()]);
             } catch(err) {
                 //如果保存出错,删除日志记录
@@ -942,13 +962,14 @@ class TripPlanModule {
             let detail;
             let data: any = {
             }
+            console.info('BUDGET====>', budget);
             switch(tripType) {
                 case ETripType.OUT_TRIP:
                     data.deptCity = query.originPlace;
                     data.arrivalCity= query.destinationPlace;
                     data.deptDateTime = query.leaveDate;
                     data.arrivalDateTime = query.goBackDate;
-                    data.cabin = getECabinByName(budget.cabinClass);
+                    data.cabin = budget.cabinClass;
                     data.invoiceType = budget.type;
                     detail = Models.tripDetailTraffic.create(data);
                     tripPlan.isNeedTraffic = true;
@@ -958,7 +979,7 @@ class TripPlanModule {
                     data.arrivalCity = query.originPlace;
                     data.deptDateTime = query.goBackDate;
                     data.arrivalDateTime = null;
-                    data.cabin = getECabinByName(budget.cabinClass);
+                    data.cabin = budget.cabinClass;
                     data.invoiceType = budget.type;
                     detail = Models.tripDetailTraffic.create(data);
                     tripPlan.isNeedTraffic = true;
@@ -1215,7 +1236,7 @@ class TripPlanModule {
                 type = '交通'
                 trafficType = v1.type == ETripType.OUT_TRIP ? 'GO': 'BACK';
                 trafficInfo = v1.invoiceType == EInvoiceType.TRAIN ? '火车': '飞机';
-                trafficInfo += v1.invoiceType == EInvoiceType.PLANE ? getNameByECabin(v1.cabin) : v1.cabin;
+                trafficInfo += v1.invoiceType == EInvoiceType.PLANE ? MPlaneLevel[v1.cabin] : MTrainLevel[v1.cabin];
                 let deptCity = await API.place.getCityInfo({cityCode: v1.deptCity});
                 let arrivalCity = await API.place.getCityInfo({cityCode: v1.arrivalCity});
                 return {

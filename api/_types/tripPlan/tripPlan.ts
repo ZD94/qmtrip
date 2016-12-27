@@ -6,7 +6,7 @@ import { Types, Values } from 'common/model';
 import {Table, Create, Field, ResolveRef, Reference, TableIndex, TableExtends} from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import {PaginateInterface} from "common/model/interface";
-import {TripDetail} from "./";
+import {TripDetail} from "./tripDetail";
 
 declare var API: any;
 
@@ -75,13 +75,6 @@ export enum  EAuditStatus {
     AUDITING = 0, //审批中
     PASS = 1, //审批通过，待审核
     INVOICE_PASS = 2, //票据审核通过
-}
-
-export var  MTxPlaneLevel  = {
-    'Economy': "经济舱",
-    'PremiumEconomy': "公务舱",
-    'Business': "公务舱",
-    'First': "公务舱",
 }
 
 @Table(Models.project, 'tripPlan.')

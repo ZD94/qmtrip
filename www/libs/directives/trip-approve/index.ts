@@ -5,7 +5,8 @@
 
 import angular = require("angular");
 import moment = require('moment');
-import {QMEApproveStatus, EApproveStatus2Text, EInvoiceType, ETripType, MTxPlaneLevel} from "api/_types/tripPlan";
+import {QMEApproveStatus, EApproveStatus2Text, EInvoiceType, ETripType} from "api/_types/tripPlan";
+import {MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
 angular
     .module('nglibs')
     .directive('tripApprove', function(){
@@ -85,7 +86,8 @@ angular
                 require('./trip-approve.scss');
                 $scope.EInvoiceType = EInvoiceType;
                 $scope.ETripType = ETripType;
-                $scope.MTxPlaneLevel = MTxPlaneLevel;
+                $scope.MPlaneLevel = MPlaneLevel;
+                $scope.MTrainLevel = MTrainLevel;
                 $scope.days = moment($scope.item.endTime).diff(moment($scope.item.startTime), 'days');
 
                 $scope.subsidyDays = moment($scope.item.endDate).diff(moment($scope.item.fromDate), 'days')+1;

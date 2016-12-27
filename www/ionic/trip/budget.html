@@ -5,18 +5,6 @@
                 <div id="page16-markdown4" style="color:#000000;text-align:right;">
                     <p style="color: #fff;">{{trip.createAt| date: 'yyyy-MM-dd HH:mm:ss'}}</p>
                 </div>
-                <!--<form class="list">-->
-                    <!--<div class="item item-input">-->
-                        <!--<span class="input-label">选择审批人</span>-->
-                        <!--<ng-selector-list-->
-                                <!--ng-model="trip.auditUser"-->
-                                <!--dlg-options="staffSelector"-->
-                                <!--dlg-title="选择审批人"-->
-                                <!--dlg-placeholder="请选择审批人"-->
-                                <!--class="fake-input"-->
-                        <!--&gt;</ng-selector-list>-->
-                    <!--</div>-->
-                <!--</form>-->
 
                 <ion-list class="jl_projectinfo">
                     <ion-item class="project_tit">{{trip.beginDate| date: 'MM-dd'}} 至 {{trip.endDate | date: 'MM-dd'}}
@@ -57,8 +45,8 @@
                                 &nbsp;
                                 {{trip.originPlaceName}}
                                 <span class="spanRight right-budget">
-                                    <span>{{budget.type == EInvoiceType.TRAIN ? budget.cabinClass : (MTxPlaneLevel[budget.cabinClass ]? MTxPlaneLevel[budget.cabinClass] : "")}}</span>
-                                    <span ng-if="budget.discount && budget.cabinClass == 'Economy'">{{budget.discount}}</span>
+                                    <span>{{budget.type == EInvoiceType.TRAIN ? MTrainLevel[budget.cabinClass] : MPlaneLevel[budget.cabinClass]}}</span>
+                                    <span ng-if="budget.discount">{{budget.discount}}</span>
                                 </span>
                             </div>
 
@@ -88,9 +76,12 @@
                                 &nbsp;
                                 {{trip.destinationPlaceName}}
                                 <span class="spanRight right-budget">
-                                    <span>{{budget.type == EInvoiceType.TRAIN ? budget.cabinClass : (MTxPlaneLevel[budget.cabinClass ]? MTxPlaneLevel[budget.cabinClass] : "")}}</span>
-                                    <!--{{MTxPlaneLevel[budget.cabinClass]?MTxPlaneLevel[budget.cabinClass]:""}}-->
-                                    <span ng-if="budget.discount  && budget.cabinClass == 'Economy'">{{budget.discount}}</span>
+
+                                    <span>{{budget.type == EInvoiceType.PLANE ?
+                                            (MPlaneLevel[budget.cabinClass] ? MPlaneLevel[budget.cabinClass]: budget.cabinClass):
+                                            (MTrainLevel[budget.cabinClass] ? MTrainLevel[item.cabinClass]: budget.cabinClass)}}
+                                    </span>
+                                    <span ng-if="budget.discount">{{budget.discount}}</span>
                                 </span>
                             </div>
                         </ion-item>

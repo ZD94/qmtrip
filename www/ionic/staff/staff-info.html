@@ -19,7 +19,8 @@
                 头像
                 <div class="item-note" ng-uploader accept="image/png, image/jpeg, image/gif" url="uploadUrl" edit="true" width="160" height="160" done="invoicefuc.done">
                     <img class="avatar-img" ng-src="{{getImageUrl(staff.avatar)}}" ng-if="staff.avatar">
-                    <span ng-if="!staff.avatar" class="avatar-text">{{staff.name.substring(staff.name.length-2,staff.name.length)}}</span>
+                    <span ng-if="!staff.avatar" class="avatar-text">
+                        {{staff.name| shortName}}</span>
                 </div>
 
                 <i class="icon ion-chevron-right"></i>

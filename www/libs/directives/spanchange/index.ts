@@ -25,7 +25,12 @@ angular
                 $scope.spacing.interval = calculateInterval(span);
                 $scope.monthChange = function (x: number) {
                     $scope.span.startTime = moment($scope.span.startTime).add(x, $scope.spacing.interval).toDate();
-                    $scope.span.endTime = moment($scope.span.endTime).add(x, $scope.spacing.interval).toDate();
+                    if ($scope.spacing.interval == 'months') {
+                        //如果是按月 截止时间= 开始时间 + 1个月 - 1天 (如2016-01-31 = 2016-01-01 + 1月 - 1天)
+                        $scope.span.endTime = moment($scope.span.startTime).add(1, $scope.spacing.interval).add(-1, 'days').toDate();
+                    } else {
+                        $scope.span.endTime = moment($scope.span.endTime).add(x, $scope.spacing.interval).toDate();
+                    }
                 };
                 $scope.showmadel = async function () {
                     let ret = await ngModalDlg.createDialog({

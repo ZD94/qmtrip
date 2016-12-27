@@ -1,7 +1,8 @@
-import { ETripType, EInvoiceType, MTxPlaneLevel } from 'api/_types/tripPlan';
+import { ETripType, EInvoiceType } from 'api/_types/tripPlan';
 import moment = require('moment');
 import { Staff } from 'api/_types/staff/staff';
 import {EApproveType, EApproveChannel} from "api/_types/approve/types";
+import {MPlaneLevel, MTrainLevel} from "../../../api/_types/travelPolicy";
 
 export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup, $ionicHistory){
     require('./trip.scss');
@@ -13,7 +14,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     $scope.EApproveChannel = EApproveChannel;
     $scope.staffSelector = {
         query: async function(keyword) {
-            let staffs = await staff.company.getStaffs();
+            let staffs = await staff.company.getStaffs({where: {'name': {$ilike: '%'+keyword+'%'}}});
             return staffs;
         },
         display: (staff)=>staff.name
@@ -73,12 +74,13 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         }
         totalPrice += price
     }
-
+    console.info(budgets);
     $scope.totalPrice = totalPrice;
     $scope.budgets = budgets;
     $scope.EInvoiceType = EInvoiceType;
     $scope.ETripType = ETripType;
-    $scope.MTxPlaneLevel = MTxPlaneLevel;
+    $scope.MPlaneLevel = MPlaneLevel;
+    $scope.MTrainLevel = MTrainLevel;
     API.require("tripPlan");
     await API.onload();
 

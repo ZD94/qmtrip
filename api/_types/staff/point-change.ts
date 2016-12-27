@@ -36,11 +36,11 @@ export class PointChange extends ModelObject{
     get status(): number {return 1}
     set status(status: number){}
 
-    @Field({type: Types.INTEGER})
+    @Field({type: Types.NUMERIC(15,2)})
     get points(): number {return null}
     set points(points: number){}
 
-    @Field({type: Types.INTEGER})
+    @Field({type: Types.NUMERIC(15,2)})
     get currentPoint(): number {return null}
     set currentPoint(currentPoint: number){}
 

@@ -741,7 +741,25 @@ export default class ApiAuth {
     @clientExport
     static async createAccount(params): Promise<Account> {
         var acc = Account.create(params);
-        return acc;
+        return acc.save();
+    }
+
+
+    /**
+     * 更新account(为员工添加资金账户时用【改进后可删除】)
+     * @param id
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    static async updateAccount(params) : Promise<Account>{
+        var id = params.id;
+
+        var ah = await Models.account.get(id);
+        for(var key in params){
+            ah[key] = params[key];
+        }
+        return ah.save();
     }
 
     /**
@@ -756,7 +774,9 @@ export default class ApiAuth {
         var options: any = {};
         // options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt", "loginFailTimes", "lastLoginAt", "lastLoginIp", "activeToken", "pwdToken", "oldQrcodeToken", "qrcodeToken", "type", "isFirstLogin", "isValidateEmail", "isValidateMobile"];
         var acc = await Models.account.get(id, options);
-        delete acc.pwd;
+        if(acc.pwd){
+            delete acc.pwd;
+        }
         return acc;
     }
 
@@ -815,7 +835,7 @@ export default class ApiAuth {
      * @param companyName
      * @returns {*}
      */
-    @clientExport
+    /*@clientExport
     @requireParams(["id"], accountCols)
     static async updateAccount(params) {
         var id = params.id;
@@ -837,7 +857,7 @@ export default class ApiAuth {
         var newAcc = await accobj.save();
         return newAcc;
 
-        /*if(accobj.email == newAcc.email){
+        /!*if(accobj.email == newAcc.email){
          return newAcc;
          }
 
@@ -846,8 +866,8 @@ export default class ApiAuth {
          return ApiAuth.sendResetPwdEmail({companyName: companyName, email: newAcc.email, type: 1, isFirstSet: true})
          .then(function() {
          return newAcc;
-         });*/
-    }
+         });*!/
+    }*/
 
     /**
      * 删除Account

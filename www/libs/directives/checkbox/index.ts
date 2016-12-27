@@ -18,6 +18,9 @@ angular
             controller: function($scope,$element){
                 require('./checkbox.scss');
                 $scope.checkOption = function(option){
+                    if (!$scope.model) {
+                        $scope.model = [];
+                    }
                     let idx = $scope.model.indexOf(option.value);
                     if(idx >=0){
                         $scope.model.splice(idx, 1);
@@ -41,15 +44,16 @@ angular
             controller: function($scope, $element){
                 require('./checkbox.scss');
                 $scope.checkOption = function(option){
-                    let idx = $scope.model.indexOf(option.value);
-                    $scope.model = _.clone($scope.model);
+                    let values = _.cloneDeep($scope.model) || [];
+                    let idx = values.indexOf(option.value);
                     if(idx >=0){
-                        $scope.model.splice(idx, 1);
+                        values.splice(idx, 1);
                     }else{
-                        $scope.model.push(option.value);
+                        values.push(option.value);
                         // $scope.model = _.clone($scope.model).push(option.value);
-                        $scope.model.sort();
+                        values.sort();
                     }
+                    $scope.model = values;
                 }
             }
         }
@@ -65,33 +69,34 @@ angular
             controller: function($scope){
                 $scope.$watch('model.length',function(n,o){
                     if(!$scope.model){
-                        $scope.model = [];
+                        $scope.selectAll = false;
+                        return;
                     }
-                    var newlist = {};
-                    for(let mod of $scope.model){
-                        newlist[mod] = 3;
-                    }
-                    for(let option of $scope.options){
-                        if(!newlist[option.value]){
-                            $scope.selectAll = false;
-                            return false;
-                        }
-                        $scope.selectAll = true;
-                    }
+                    let allValues = $scope.options.map((opt)=>opt.value);
+                    $scope.selectAll = isAllChecked($scope.model, allValues);
                 })
                 $scope.checkall = function(){
-                    if($scope.model.length == $scope.options.length){
+                    if($scope.model && $scope.model.length == $scope.options.length){
                         $scope.model = []
                     }else{
-                        $scope.options.map(function(opt){
-                            if($scope.model.indexOf(opt.value) < 0){
-                                $scope.model = _.clone($scope.model);
-                                $scope.model.push(opt.value);
-                                $scope.model.sort();
-                            }
-                        })
+                        $scope.model = Array.from($scope.options.map( (item)=> item.value));
+                        $scope.model.sort();
                     }
                 }
             }
         }
-    })
+    });
+
+
+function isAllChecked(values, allValues){
+    var valueMap = {};
+    for(let mod of values){
+        valueMap[mod] = true;
+    }
+    for(let v of allValues){
+        if(!valueMap[v]){
+            return false;
+        }
+    }
+    return true;
+}

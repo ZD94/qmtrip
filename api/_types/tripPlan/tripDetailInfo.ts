@@ -9,9 +9,9 @@ import {EPlanStatus, ETripType, TripPlan, EInvoiceType, EAuditStatus} from "./tr
 import {Field, Table, TableExtends, RemoteCall} from "common/model/common";
 import {Models} from "../index";
 import {TripDetail, TripDetailInvoice} from "./tripDetail";
-import {ECabin, EPayType} from "./index";
 import {PaginateInterface} from "common/model/interface";
 import {ReserveLink} from 'libs/suppliers/interface';
+import {ETrainLevel, EPlaneLevel} from "../travelPolicy";
 
 
 @TableExtends(TripDetail, 'tripDetailInfo', 'type', [ETripType.OUT_TRIP, ETripType.BACK_TRIP])
@@ -36,8 +36,8 @@ export class TripDetailTraffic extends ModelObject implements TripDetail {
     set arrivalDateTime(d: Date) {}
 
     @Field({type: Types.INTEGER})
-    get cabin() :ECabin {return null}
-    set cabin(cabin: ECabin) {}
+    get cabin() :ETrainLevel|EPlaneLevel {return null}
+    set cabin(cabin: ETrainLevel|EPlaneLevel) {}
 
     @Field({type: Types.INTEGER})
     get invoiceType() :EInvoiceType{ return null}

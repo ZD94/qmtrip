@@ -115,7 +115,7 @@ var Services = {
     //     funcs: ['getCityInfo', 'queryPlace']
     // },
     account: { type: Account, modname: 'auth',
-        funcs: ['getAccount', 'getAccounts', 'createAccount', null, 'deleteAccount']
+        funcs: ['getAccount', 'getAccounts', 'createAccount', 'updateAccount', 'deleteAccount']
     },
     seed: { type: Seed, modname: 'seeds',
         funcs: []
@@ -201,7 +201,7 @@ class ClientModels implements ModelsInterface {
     coinAccount: ModelInterface<CoinAccount>;
     coinAccountChange: ModelInterface<CoinAccountChange>;
 
-    constructor($cacheFactory: ng.ICacheFactoryService) {
+    constructor($cacheFactory: ng.ICacheFactoryService, $rootScope: ng.IRootScopeService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
         this.credential = createService<Credential>(Services.credential, $cacheFactory);
         this.pointChange = createService<PointChange>(Services.pointChange, $cacheFactory);
@@ -237,6 +237,12 @@ class ClientModels implements ModelsInterface {
         this.approve = createService<Approve>(Services.approve, $cacheFactory);
         initModels(this);
 
+        $rootScope.$on('$locationChangeSuccess', ()=>{
+            for(let obj of this.$resetObjects){
+                obj.$reset();
+            }
+            this.$resetObjects = [];
+        });
         API.on('beforeConnect', this.clearCache.bind(this));
     }
 
@@ -246,6 +252,10 @@ class ClientModels implements ModelsInterface {
             if(v instanceof ModelCached)
                 v.clearCache();
         }
+    }
+    $resetObjects = [] as ModelObjInterface[];
+    resetOnPageChange(obj: ModelObjInterface){
+        this.$resetObjects.push(obj);
     }
 }
 
