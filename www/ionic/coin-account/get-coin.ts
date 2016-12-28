@@ -13,7 +13,7 @@ export async function GetCoinController($scope, Models, $stateParams) {
 
     }
     $scope.exchange = async function(){
-        if(validator.isInt($scope.staff.exchangeNum) || validator.isFloat($scope.staff.exchangeNum)){
+        if(validator.isInt($scope.staff.exchangeNum)){
             try{
                 let exchangePoints = $scope.staff.exchangeNum/(staff.company.points2coinRate || 50);
                 await staff.score2Coin({points: exchangePoints});
@@ -23,7 +23,7 @@ export async function GetCoinController($scope, Models, $stateParams) {
                 msgbox.log(err.msg);
             }
         }else {
-            msgbox.log('兑换数量只能为整数或小数');
+            msgbox.log('兑换数量只能为整数');
             return;
         }
     }
