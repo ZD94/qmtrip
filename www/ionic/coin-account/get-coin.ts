@@ -1,7 +1,7 @@
 import { ENoticeType } from 'api/_types/notice/notice';
 import { Staff } from 'api/_types/staff/staff';
 var msgbox = require('msgbox');
-
+var validator = require('validator');
 export async function GetCoinController($scope, Models, $stateParams) {
     require('./get-coin.scss');
     $scope.ENoticeType = ENoticeType;
@@ -13,13 +13,18 @@ export async function GetCoinController($scope, Models, $stateParams) {
 
     }
     $scope.exchange = async function(){
-        try{
-            let exchangePoints = $scope.staff.exchangeNum/(staff.company.points2coinRate || 0.5);
-            await staff.score2Coin({points: exchangePoints});
-            window.location.href = '#/coin-account/index';
-            msgbox.log("兑换成功");
-        }catch (err){
-            msgbox.log(err.msg);
+        if(validator.isInt($scope.staff.exchangeNum) || validator.isFloat($scope.staff.exchangeNum)){
+            try{
+                let exchangePoints = $scope.staff.exchangeNum/(staff.company.points2coinRate || 0.5);
+                await staff.score2Coin({points: exchangePoints});
+                window.location.href = '#/coin-account/index';
+                msgbox.log("兑换成功");
+            }catch (err){
+                msgbox.log(err.msg);
+            }
+        }else {
+            msgbox.log('兑换数量只能为整数或小数');
+            return;
         }
-    };
+    }
 }

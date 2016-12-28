@@ -21,6 +21,7 @@ import {Department} from "api/_types/department";
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import {md5} from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
+import {CoinAccount} from "api/_types/coin";
 
 const supplierCols = Supplier['$fieldnames'];
 
@@ -107,6 +108,19 @@ class CompanyModule {
         if(params.promoCode){
             promoCode = await company.doPromoCode({code: params.promoCode});
         }
+
+        //为企业设置资金账户
+        let ca = CoinAccount.create();
+        await ca.save();
+        company.coinAccount = ca;
+        await company.save();
+
+        //为创建人设置资金账户
+        let ca_staff = CoinAccount.create();
+        await ca_staff.save();
+        let account = await Models.account.get(staff.id);
+        account.coinAccount = ca;
+        await account.save();
 
         return {company: company, description: promoCode ? promoCode.description : ""};
     }

@@ -9,12 +9,17 @@ export default async function IndexController($scope, Models, inAppBrowser) {
     let staff = await Staff.getCurrent();
     let coinAccount = staff.$parents["account"]["coinAccount"];
     $scope.toDuiBa = async function(){
+        if(staff.email.indexOf('jingli.tech')>=0){
+            var duiBaUrl = await staff.getDuiBaLoginUrl({});
+            inAppBrowser.open(duiBaUrl);
+        }
         // window.location.href = '#/duiba/index';
-        var duiBaUrl = await staff.getDuiBaLoginUrl({});
-        inAppBrowser.open(duiBaUrl);
+
     }
     $scope.toCoinAccount = function(){
-        window.location.href= '#/coin-account/index';
+        if(staff.email.indexOf('jingli.tech')>=0){
+            window.location.href= '#/coin-account/index';
+        }
     }
     if(staff.roleId == EStaffRole.OWNER){
         let isFirstLogin = await staff.company.getTravelPolicies();

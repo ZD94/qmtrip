@@ -46,7 +46,7 @@
                                 {{trip.originPlaceName}}
                                 <span class="spanRight right-budget">
                                     <span>{{budget.type == EInvoiceType.TRAIN ? MTrainLevel[budget.cabinClass] : MPlaneLevel[budget.cabinClass]}}</span>
-                                    <span ng-if="budget.discount && budget.cabinClass == 'Economy'">{{budget.discount}}</span>
+                                    <span ng-if="budget.discount">{{budget.discount}}</span>
                                 </span>
                             </div>
 
@@ -76,10 +76,7 @@
                                 &nbsp;
                                 {{trip.destinationPlaceName}}
                                 <span class="spanRight right-budget">
-
-                                    <span>{{budget.type == EInvoiceType.PLANE ?
-                                            (MPlaneLevel[budget.cabinClass] ? MPlaneLevel[budget.cabinClass]: budget.cabinClass):
-                                            (MTrainLevel[budget.cabinClass] ? MTrainLevel[item.cabinClass]: budget.cabinClass)}}
+                                    <span>{{budget.type == EInvoiceType.PLANE ? MPlaneLevel[budget.cabinClass] : MTrainLevel[budget.cabinClass]}}
                                     </span>
                                     <span ng-if="budget.discount">{{budget.discount}}</span>
                                 </span>

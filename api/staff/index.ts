@@ -24,6 +24,7 @@ import { Models, EAccountType } from 'api/_types';
 import {conditionDecorator, condition} from "../_decorator";
 import {FindResult} from "common/model/interface";
 import {ENoticeType} from "../_types/notice/notice";
+import {CoinAccount} from "api/_types/coin";
 
 const invitedLinkCols = InvitedLink['$fieldnames'];
 const staffSupplierInfoCols = StaffSupplierInfo['$fieldnames'];
@@ -73,6 +74,16 @@ class StaffModule{
             }
         }else{
             throw L.ERR.PERMISSION_DENY();
+        }
+
+        let account = await Models.account.get(staff.id);
+
+        if(!account.coinAccount){
+            //为员工设置资金账户
+            let ca = CoinAccount.create();
+            await ca.save();
+            account.coinAccount = ca;
+            await account.save();
         }
         let result = await newstaff.save();
         await API.auth.sendResetPwdEmail({email: result.email, mobile: result.mobile, type: 1, isFirstSet: true, companyName: result.company.name});

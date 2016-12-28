@@ -101,20 +101,8 @@ export function getImageUrl(id){
     return url.href;
 }
 
-export async function IndexController($scope, Menu, $ionicPopup, Models, $storage, $window, $location, $ionicHistory, $ionicSideMenuDelegate, ngModalDlg) {
+export async function IndexController($scope, Menu, $ionicPopup, $storage, $location, $ionicSideMenuDelegate) {
     require('./index.scss');
-    $scope.ionicGoBack = function () {
-        let viewHistory = $ionicHistory.viewHistory();
-        let backView = viewHistory.backView;
-        if (!backView) {
-            $window.history.go(-1);
-        } else if (backView.url) {
-            //$location.replace();
-            $location.url(backView.url);
-        } else {
-            backView.go();
-        }
-    }
 
     $scope.showErrorMsg = function (msg) {
         $ionicPopup.alert({
