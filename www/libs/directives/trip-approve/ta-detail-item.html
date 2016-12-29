@@ -28,7 +28,7 @@
                           (MTrainLevel[item.cabinClass] ? MTrainLevel[item.cabinClass]: item.cabinClass)}}
                     </span>
                     <!--{{item.price == -1 ? '暂无预算' : (item.price| currency: '')+'元'}}<br/>-->
-                    <span ng-if="item.fullPrice && item.cabinClass == 'Economy'">
+                    <span ng-if="item.fullPrice">
                         {{item.fullPrice > item.price ? ((item.price/item.fullPrice)*10).toFixed(1)+'折' : '全价'}}<br/>
                     </span>
                 </span>
