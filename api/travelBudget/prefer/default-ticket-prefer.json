@@ -32,8 +32,8 @@
   {
     "name": "departStandardTimePrefer",
     "options": {
-      "end": "<%=leaveDate%> 16:00",
-      "begin": "<%=leaveDate%> 8:00",
+      "end": "<%=moment(leaveDate).format('YYYY-MM-DD')%> 16:00",
+      "begin": "<%=moment(leaveDate).format('YYYY-MM-DD')%> 8:00",
       "score": 500,
       "scoreInterval": -3
     }
@@ -41,8 +41,8 @@
   {
     "name": "arriveStandardTimePrefer",
     "options": {
-      "end": "<%=leaveDate%> 19:00",
-      "begin": "<%=leaveDate%> 9:00",
+      "end": "<%=moment(leaveDate).format('YYYY-MM-DD')%> 19:00",
+      "begin": "<%=moment(leaveDate).format('YYYY-MM-DD')%> 9:00",
       "score": 500,
       "scoreInterval": -3
     }
@@ -58,14 +58,14 @@
     "name": "earliestGoBackTimePrefer",
     "options": {
       "score": 100000,
-      "earliestGoBackTime": "<%=goBackDate%> <%=earliestGoBackTime%>"
+      "earliestGoBackTime": "<%=earliestLeaveDateTime%>"
     }
   },
   {
     "name": "latestArrivalTimePrefer",
     "options": {
       "score": 100000,
-      "latestArrivalTime": "<%=leaveDate%> <%=latestArrivalTime%>"
+      "latestArrivalTime": "<%=latestArrivalDateTime%>"
     }
   },
   {

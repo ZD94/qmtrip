@@ -4,10 +4,12 @@
 
 'use strict';
 import _ = require("lodash");
+import Logger = require('common/logger');
+import * as moment from "moment";
 let defaultTicketPrefer = require('./default-ticket-prefer.json');
 let defaultHotelPrefer = require('./default-hotel-prefer.json');
 let defaultInternalTicketPrefer = require('./default-internal-ticket-prefer.json');
-
+let logger = new Logger('travel-budget');
 export interface IPrefer<T> {
     markScore(tickets: T[]): Promise<T[]>;
 }
@@ -22,9 +24,9 @@ export abstract class AbstractPrefer<T> implements IPrefer<T> {
     }
     abstract async markScoreProcess(data: T[]) : Promise<T[]>;
     async markScore(data: T[]): Promise<T[]> {
-        console.log(`. BEGIN ${this.name}`);
+        logger.info(`. BEGIN ${this.name}`);
         let ret = await this.markScoreProcess(data);
-        console.log(`. END ${this.name}`);
+        logger.info(`. END ${this.name}`);
         return ret;
     }
 }
@@ -46,7 +48,7 @@ export function loadDefaultPrefer(qs: any, type?: string) {
     }
     
     let _prefers = JSON.stringify(defaultPrefer);
-    let _compiled = _.template(_prefers);
+    let _compiled = _.template(_prefers, { 'imports': { 'moment': moment } });
     return JSON.parse(_compiled(qs));
 }
 
