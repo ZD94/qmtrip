@@ -1,7 +1,7 @@
 'use strict';
 
 import { Models } from 'api/_types';
-import {Staff } from 'api/_types/staff';
+import {Staff, EStaffStatus } from 'api/_types/staff';
 import {Agency} from 'api/_types/agency';
 import {TravelPolicy} from "api/_types/travelPolicy";
 import { Types, Values } from 'common/model';
@@ -18,8 +18,12 @@ import {EApproveChannel, EApproveStatus, EApproveType} from "../approve/types";
 import {emitter} from "../../../libs/oa/emitter";
 import {EVENT} from "../../../libs/oa/index";
 import L from 'common/language';
+
+var sequelize = require("common/model").DB;
 let promoCodeType = require('libs/promoCodeType');
+
 declare var API: any;
+
 
 export enum ECompanyStatus {
     DELETE = -2,
@@ -172,11 +176,29 @@ export class Company extends ModelObject{
     get expiryDate() : Date { return null; }
     set expiryDate(val: Date) {}
 
+    // 企业员工数目限制
+    @Field({type: Types.INTEGER, defaultValue: 5})
+    get staffNumLimit(): number { return 5; }
+    set staffNumLimit(val: number) {}
+
+    // 企业出差审批数目限制（每月）
+    @Field({type: Types.INTEGER, defaultValue: 10})
+    get tripPlanNumLimit(): number { return 10; }
+    set tripPlanNumLimit(val: number) {}
+
     getStaffs(options?: any): Promise<Staff[]> {
         if(!options) {options = {where: {}}};
         if(!options.where) {options.where = {}};
         options.where.companyId = this.id;
         return Models.staff.find(options);
+    }
+
+    @RemoteCall()
+    async getStaffNum(options?: any): Promise<number> {
+        let companyId = this.id;
+        let sql = `select count(id) as staffnum from staff.staffs where company_id='${companyId}' and deleted_at is null and staff_status=${EStaffStatus.ON_JOB}`;
+        let staff_num = await sequelize.query(sql);
+        return Number(staff_num[0][0].staffnum || 0);
     }
     
     getDepartments(options?: any): Promise<Department[]> {
