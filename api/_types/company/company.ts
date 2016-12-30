@@ -157,7 +157,7 @@ export class Company extends ModelObject{
     set coinAccount(coinAccount: CoinAccount) {}
 
     @Field({type: Types.NUMERIC(10,2)})
-    get points2coinRate(): number { return 0.5};
+    get points2coinRate(): number { return 50};
     set points2coinRate(rate: number) {}
 
     @Field({type: Types.JSONB})
@@ -186,6 +186,16 @@ export class Company extends ModelObject{
     get tripPlanNumLimit(): number { return 10; }
     set tripPlanNumLimit(val: number) {}
 
+    // 企业出差审批通过数目（每月月初会清零）
+    @Field({type: Types.INTEGER, defaultValue: 0})
+    get tripPlanPassNum(): number { return 0; }
+    set tripPlanPassNum(val: number) {}
+
+    // 企业出差审批冻结数目
+    @Field({type: Types.INTEGER, defaultValue: 0})
+    get tripPlanFrozenNum(): number { return 0; }
+    set tripPlanFrozenNum(val: number) {}
+
     getStaffs(options?: any): Promise<Staff[]> {
         if(!options) {options = {where: {}}};
         if(!options.where) {options.where = {}};
@@ -199,6 +209,27 @@ export class Company extends ModelObject{
         let sql = `select count(id) as staffnum from staff.staffs where company_id='${companyId}' and deleted_at is null and staff_status=${EStaffStatus.ON_JOB}`;
         let staff_num = await sequelize.query(sql);
         return Number(staff_num[0][0].staffnum || 0);
+    }
+
+    @RemoteCall()
+    async frozenTripPlanNum(params?: any): Promise<Company> {
+        let number = params.number || 1;
+        this.tripPlanFrozenNum = this.tripPlanFrozenNum + number;
+        return this.save();
+    }
+
+    @RemoteCall()
+    async freeFrozenTripPlanNum(params?: any): Promise<Company> {
+        let number = params.number || 1;
+        this.tripPlanFrozenNum = this.tripPlanFrozenNum - number;
+        return this.save();
+    }
+
+    @RemoteCall()
+    async addTripPlanPassNum(params?: any): Promise<Company> {
+        let number = params.number || 1;
+        this.tripPlanPassNum = this.tripPlanPassNum + number;
+        return this.save();
     }
     
     getDepartments(options?: any): Promise<Department[]> {

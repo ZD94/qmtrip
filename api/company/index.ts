@@ -10,6 +10,8 @@ let Logger = require('common/logger');
 let logger = new Logger('company');
 let moment = require('moment');
 let promoCodeType = require('libs/promoCodeType');
+let scheduler = require('common/scheduler');
+let schedule = require("node-schedule");
 
 import {requireParams, clientExport} from "common/api/helper";
 import {Models} from "api/_types";
@@ -95,6 +97,7 @@ class CompanyModule {
         company.domainName = domain;
         company.expiryDate = moment().add(3, 'months').toDate();
         company.isApproveOpen = true;
+        company.points2coinRate = 50;
         let department = Department.create({name: "我的企业", isDefault: true});
 
         department.company = company;
@@ -506,6 +509,22 @@ class CompanyModule {
 
     /*************************************供应商end***************************************/
 
+    static _scheduleTask () {
+        let taskId = "resetTrainPlanPassNum";
+        logger.info('run task ' + taskId);
+        // var rule = new schedule.RecurrenceRule();
+        // rule.date =1;rule.hour =0;rule.minute =0;rule.second =0;
+        scheduler('0 5 0 1 * *', taskId, async function() {
+            let companies = await Models.company.find({where : {tripPlanPassNum : {$gt: 0}}});
+            await Promise.all(companies.map(async (co) => {
+                co["tripPlanPassNum"] = 0;
+                await co.save();
+            }))
+        });
+    }
+
 }
 
+
+CompanyModule._scheduleTask();
 export = CompanyModule;

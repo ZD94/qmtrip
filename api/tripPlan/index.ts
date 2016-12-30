@@ -1503,6 +1503,12 @@ class TripPlanModule {
         scheduler('*/5 * * * *', taskId, async function() {
             let tripApproves = await Models.tripApprove.find({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
             tripApproves.map(async (approve) => {
+                let approveCompany = await Models.company.get(approve.companyId);
+                if(!(approveCompany.tripPlanNumLimit >= (approveCompany.tripPlanPassNum + approveCompany.tripPlanFrozenNum))){
+                    throw L.ERR.BEYOND_LIMIT_NUM("出差申请");
+                }
+                await approveCompany.addTripPlanPassNum({number: 1});
+                await approveCompany.freeFrozenTripPlanNum({number: 1});
                 approve.status = QMEApproveStatus.PASS;
                 await approve.save();
                 if(approve.approveUser && approve.approveUser.id && /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(approve.approveUser.id)) {
