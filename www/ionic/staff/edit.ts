@@ -56,18 +56,6 @@ export default async function EditController($scope, $storage, $stateParams, Mod
             }
         }
         try{
-
-            /*if (!_staff.email) {
-             throw L.ERR.EMAIL_EMPTY();
-             }
-
-            if (!validator.isEmail(_staff.email)) {
-                throw L.ERR.EMAIL_FORMAT_INVALID();
-            }
-            f(company.domainName && company.domainName != "" && _staff.email.indexOf(company.domainName) == -1){
-                throw L.ERR.EMAIL_SUFFIX_INVALID();
-            }*/
-
             if (!_staff.mobile) {
                 throw L.ERR.MOBILE_EMPTY();
             }
@@ -81,19 +69,6 @@ export default async function EditController($scope, $storage, $stateParams, Mod
                 if(currentstaff.roleId == EStaffRole.ADMIN){
                     _staff.roleId = EStaffRole.COMMON;
                 }
-                //如果不是更新,再去判断
-                //查询邮箱是否已经注册
-                /*var account1 = await Models.account.find({where: {email: _staff.email, type: 1}, paranoid: false});
-                if (account1 && account1.length>0) {
-                    throw L.ERR.EMAIL_HAS_REGISTRY();
-                }
-
-                if(_staff.mobile){
-                    var account2 = await Models.account.find({where: {mobile: _staff.mobile, type: 1}, paranoid: false});
-                    if (account2 && account2.length>0) {
-                        throw L.ERR.MOBILE_HAS_REGISTRY();
-                    }
-                }*/
             }else{
                 //如果是更新
                 if(_staff.mobile){
@@ -108,15 +83,11 @@ export default async function EditController($scope, $storage, $stateParams, Mod
                     return;
                 }
                 var namePattern = /[\u4e00-\u9fa5]+/g;
-                var hasChinese = namePattern.test($scope.form.name);
+                var hasChinese = namePattern.test(staff.name);
                 if(_staff.name.length>5 && hasChinese){
                     msgbox.log('姓名不能超过5个字');
                     return;
                 }
-                //管理员修改自身权限 修改后要重新登录
-                /*if(preRole == EStaffRole.ADMIN && _staff.roleId == EStaffRole.COMMON && currentstaff.id == _staff.id){
-                    logout = true;
-                }*/
 
                 // 创建人修改管理员权限(二次确认)
                 if(currentstaff.roleId == EStaffRole.OWNER && preRole == EStaffRole.ADMIN && _staff.roleId == EStaffRole.COMMON){
@@ -149,29 +120,6 @@ export default async function EditController($scope, $storage, $stateParams, Mod
                 $ionicHistory.goBack(-1);
             }
 
-            //管理员修改自身权限 修改后要重新登录
-            /*if(logout){
-                //重新登录
-                var nshow = $ionicPopup.show({
-                    title: '修改权限需重新登录',
-                    scope: $scope,
-                    buttons: [
-                        {
-                            text: '确定',
-                            type: 'button-positive',
-                            onTap: async function (e) {
-                                await API.onload();
-                                $storage.local.remove('auth_data');
-                                API.reload_all_modules();
-                                window.location.href = '#login/';
-                                window.location.reload();
-                            }
-                        }
-                    ]
-                })
-            }else{
-                $ionicHistory.goBack(-1);
-            }*/
         }catch (err){
             if(err.code == -1){
                 $scope.staff.roleId = EStaffRole.ADMIN;

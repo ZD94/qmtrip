@@ -330,6 +330,20 @@ class TripApproveModule {
         let approveResult = params.approveResult;
         let budgetId = params.budgetId;
         let approveUser = await Models.staff.get(tripApprove['approveUserId']);
+        let approveCompany = approveUser.company;
+
+        if(approveResult == EApproveResult.PASS && !isNextApprove ){
+            if(!(approveCompany.tripPlanNumLimit >= (approveCompany.tripPlanPassNum + approveCompany.tripPlanFrozenNum))){
+                throw L.ERR.BEYOND_LIMIT_NUM("出差申请");
+            }
+            await approveCompany.addTripPlanPassNum({number: 1});
+            await approveCompany.freeFrozenTripPlanNum({number: 1});
+        }
+
+
+        if(approveResult == EApproveResult.REJECT ){
+            await approveCompany.freeFrozenTripPlanNum({number: 1});
+        }
 
         if(isNextApprove && !params.nextApproveUserId)
             throw new Error("审批人不能为空");
