@@ -38,6 +38,8 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         name: '请选择'
     };
     $scope.currentStaff = await Staff.getCurrent();
+    let currentCompany = $scope.currentStaff.company;
+
     $scope.currentTp = await $scope.currentStaff.getTravelPolicy();
     if($scope.currentTp){
         $scope.currentTpSts = await $scope.currentTp.getSubsidyTemplates();
@@ -225,6 +227,10 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         $scope.endDateSelector.beginDate = $scope.trip.beginDate;
     })
     $scope.nextStep = async function() {
+        if(!(currentCompany.tripPlanNumLimit > (currentCompany.tripPlanPassNum + currentCompany.tripPlanFrozenNum))){
+            $scope.showErrorMsg("出差申请数目已超过企业限制");
+            return false;
+        }
         if ($scope.currentTpSts && $scope.currentTpSts.length && (!$scope.subsidy || !$scope.subsidy.template)) {
             $scope.showErrorMsg('请选择补助信息');
             return false;

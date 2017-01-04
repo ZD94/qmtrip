@@ -62,6 +62,12 @@ class ApproveModule {
     static async submitSpecialApprove(params: {query: any, budget: number, project?: string, specialApproveRemark?: string, approveUser?: Staff}):Promise<Approve> {
         let {query, budget, project, specialApproveRemark, approveUser} = params;
         let submitter = await Staff.getCurrent();
+
+        let company = submitter.company;
+        if(!(company.tripPlanNumLimit > (company.tripPlanFrozenNum + company.tripPlanPassNum))){
+            throw L.ERR.BEYOND_LIMIT_NUM("出差申请");
+        }
+        await company.frozenTripPlanNum({number: 1});
         let budgetInfo = {
             query: query,
             budgets: [
