@@ -1,5 +1,13 @@
 .city_dialog{
+  .flex-c001{
+    display: flex;
+    flex-direction: column;
+    ion-scroll{
+      flex: 1;
+    }
+  }
   .city_search{
+    flex: none;
     padding: 7px;
     background: #d2d2d2;
     .item-input-inset{
@@ -9,6 +17,7 @@
     }
   }
   .city_tabs{
+    flex: none;
     display: flex;
     .city_tab{
       flex: 1;
@@ -52,7 +61,12 @@
       }
     }
     .city_list{
+      position: relative;
       .city_block{
+        position: absolute;
+        width: 100%;
+        left: 0;
+        margin-bottom: 0;
         .city_title{
           padding-left: 10px;
           font-size: 12px;

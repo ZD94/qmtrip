@@ -3,7 +3,7 @@
         <h1 class="title">{{options.title}}</h1>
         <div class="button button-clear" ng-click="modal.hide()">取消</div>
     </ion-header-bar>
-    <ion-content padding="false" scroll="false" class="has-header">
+    <ion-content padding="false" scroll="false" class="has-header flex-c001">
         <div class="city_search">
             <div class="bar bar-header item-input-inset">
                 <label class="item-input">
@@ -21,9 +21,7 @@
                 <div class="content_header">
                     <h3>当前/历史</h3>
                     <div class="hot_list">
-                        <span>上海</span>
-                        <span>广州</span>
-                        <span>深圳</span>
+                        <span ng-repeat="city in history_city track by $index" ng-class="{active:$scope.val == city}">{{city.name}}</span>
                     </div>
                     <h3>热门城市</h3>
                     <div class="hot_list">
@@ -40,14 +38,21 @@
                         <span>青岛</span>
                     </div>
                 </div>
-                <div class="city_list">
-                    <div class="city_block list" ng-repeat="item in items">
-                        <div class="city_title">{{item.name}}</div>
-                        <div class="item" ng-repeat="city in item.data">{{city}}</div>
+                <div class="city_list" ng-if="!isAbroad">
+                    <div class="city_block list" ng-repeat="item in internallist" ng-style="item.top">
+                        <div class="city_title">{{item.first_letter}}</div>
+                        <div class="item" ng-repeat="city in item.cities" ng-click="confirm(city)">{{city.name}}</div>
+                    </div>
+                </div>
+                <div class="city_list" ng-if="isAbroad">
+                    <div class="city_block list" ng-repeat="item in abroadlist" ng-style="item.top">
+                        <div class="city_title">{{item.first_letter}}</div>
+                        <div class="item" ng-repeat="city in item.cities" ng-click="confirm(city)">{{city.name}}</div>
                     </div>
                 </div>
             </div>
+            <ion-infinite-scroll ng-if="!isAbroad && pages.hasNextIndex()" on-infinite="pages.getCityList(internalCities)"></ion-infinite-scroll>
+            <ion-infinite-scroll ng-if="isAbroad && pages.hasNextIndex()" on-infinite="pages.getCityList(abroadCities)"></ion-infinite-scroll>
         </ion-scroll>
-
     </ion-content>
 </ion-modal-view>
