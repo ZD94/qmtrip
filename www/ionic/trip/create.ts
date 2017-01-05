@@ -227,8 +227,11 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         $scope.endDateSelector.beginDate = $scope.trip.beginDate;
     })
     $scope.nextStep = async function() {
-        if(!(currentCompany.tripPlanNumLimit > (currentCompany.tripPlanPassNum + currentCompany.tripPlanFrozenNum))){
-            $scope.showErrorMsg("出差申请数目已超过企业限制");
+        try{
+            await currentCompany.beforeGoTrip();
+        }catch(e){
+            console.info(e);
+            $scope.showErrorMsg(e.msg);
             return false;
         }
         if ($scope.currentTpSts && $scope.currentTpSts.length && (!$scope.subsidy || !$scope.subsidy.template)) {
