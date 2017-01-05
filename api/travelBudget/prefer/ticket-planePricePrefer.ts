@@ -29,7 +29,7 @@ class PlanePricePrefer extends AbstractPrefer<IFinalTicket> {
         let minPrice = 0;
 
         tickets.forEach( (v) => {
-            if (self.cabins.indexOf(v.cabin) >= 0){
+            if (v.type == TRAFFIC.FLIGHT && self.cabins.indexOf(v.cabin) >= 0){
                 targetTickets.push(v);
             }
         })
