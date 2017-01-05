@@ -108,7 +108,7 @@ export default async function EditController($scope, $storage, $stateParams, Mod
                     return;
                 }
                 var namePattern = /[\u4e00-\u9fa5]+/g;
-                var hasChinese = namePattern.test($scope.form.name);
+                var hasChinese = namePattern.test(staff.name);
                 if(_staff.name.length>5 && hasChinese){
                     msgbox.log('姓名不能超过5个字');
                     return;
