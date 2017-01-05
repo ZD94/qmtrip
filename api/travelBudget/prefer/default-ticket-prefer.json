@@ -17,6 +17,8 @@
   {
     "name": "cabin",
     "options": {
+      "expectTrainCabins": "<%=expectTrainCabins%>",
+      "expectFlightCabins": "<%=expectFlightCabins%>",
       "score": 100000
     }
   },
@@ -80,10 +82,10 @@
       "type": "square",
       "score": 10000,
       "cabins": [
-        "Economy",
-        "PremiumEconomy",
-        "Business",
-        "First"
+        2,
+        5,
+        4,
+        3
       ],
       "percent": 0.2
     }
@@ -93,10 +95,10 @@
     "options": {
       "score": 10000,
       "cabins": [
-        "Economy",
-        "PremiumEconomy",
-        "Business",
-        "First"
+        2,
+        5,
+        4,
+        3
       ],
       "percent": 0.2
     }
