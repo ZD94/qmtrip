@@ -444,6 +444,9 @@ export default class ApiTravelBudget {
         let preferConfig: any = staff.company.budgetConfig;
         let qs: any = {};
 
+        params['expectTrainCabins'] = trainCabins;
+        params['expectFlightCabins'] = cabins;
+
         if (isAbroad) {   //国际
             if (preferConfig && preferConfig.abroadTraffic) {
                 let compiled = _.template(JSON.stringify(preferConfig.abroadTraffic), { 'imports': { 'moment': moment } });
@@ -464,13 +467,13 @@ export default class ApiTravelBudget {
             qs.prefers = [];
         }
 
-        qs.prefers = qs.prefers.map( (p) => {
-            if (p.name == 'cabin') {
-                p.options['expectTrainCabins'] = trainCabins;
-                p.options['expectFlightCabins'] = cabins;
-            }
-            return p;
-        });
+        // qs.prefers = qs.prefers.map( (p) => {
+        //     if (p.name == 'cabin') {
+        //         p.options['expectTrainCabins'] = trainCabins || [];
+        //         p.options['expectFlightCabins'] = cabins || [];
+        //     }
+        //     return p;
+        // });
 
         qs.query = params;
         qs.query.originPlace = m_originCity;
