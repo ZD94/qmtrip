@@ -29,7 +29,7 @@ class PlanePricePrefer extends AbstractPrefer<IFinalTicket> {
         let minPrice = 0;
 
         tickets.forEach( (v) => {
-            if (self.cabins.indexOf(v.cabin) >= 0){
+            if (v.type == TRAFFIC.FLIGHT && self.cabins.indexOf(v.cabin) >= 0){
                 targetTickets.push(v);
             }
         })
@@ -46,20 +46,9 @@ class PlanePricePrefer extends AbstractPrefer<IFinalTicket> {
         tickets = tickets.map( (v) => {
             if (!v.score) v.score = 0;
             if (!v.reasons) v.reasons = [];
+            if (v.type != TRAFFIC.FLIGHT) return v;
+
             if (self.cabins.indexOf(v.cabin) >= 0){
-                /*if(self.percent == 0){
-                    // var a = 1 - Math.pow((1 - (maxPrice - v.price)/(maxPrice - midPrice)),3);
-                    var a = 1 - Math.pow((v.price-minPrice)/(maxPrice-minPrice),2);
-                    if(this.type && this.type == "line"){
-                        a = (maxPrice - v.price)/(maxPrice-minPrice);
-                    }
-                }else if(self.percent == 1){
-                    // var a = 1 - Math.pow((1 - (v.price-minPrice)/(midPrice-minPrice)),3);
-                    var a = 1 - Math.pow((maxPrice - v.price)/(maxPrice-minPrice),2);
-                    if(this.type && this.type == "line"){
-                        a = (v.price - minPrice)/(maxPrice-minPrice);
-                    }
-                }*/
                 if (v.price < midPrice) {
                     // var a = 1 - Math.pow((midPrice - v.price)/(midPrice - minPrice),2);
                     var a = 1 - Math.pow((1 - (v.price - minPrice)/(midPrice - minPrice)),3);
