@@ -7,8 +7,15 @@ import _ = require('lodash');
 
 export async function selectCityListController($scope, $storage, $ionicScrollDelegate){
     require("./dialog.scss");
+    $scope.searchBegin = false;
     let history = await $storage.local.get('history_city');
-    $scope.history_city = history;
+    $scope.keyList = await $scope.options.queryAll();
+    $scope.hotCities = $scope.keyList.slice(0,10);
+    if(history){
+        $scope.history_city = history;
+    }else{
+        $scope.history_city = [];
+    }
     $scope.isAbroad = false;
     $scope.abroadlist = [];
     let abroadIdx = 0;
@@ -105,5 +112,14 @@ export async function selectCityListController($scope, $storage, $ionicScrollDel
         }
         $storage.local.set('history_city',history);
         $scope.confirmModal(value);
+    }
+    $scope.queryCity = async function(keyword){
+        $scope.keyList = await $scope.options.queryAll(keyword);
+    }
+    $scope.showSearchList = function(){
+        $scope.searchBegin = true;
+    }
+    $scope.hideSearchList = function(){
+        $scope.searchBegin = false;
     }
 }

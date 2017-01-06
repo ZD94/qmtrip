@@ -1,4 +1,43 @@
 .city_dialog{
+  //search begin
+  .has-header{
+    transition: all 0.2s linear;
+  }
+  .search-header{
+    top: 0;
+    z-index: 10;
+    .city_search{
+      background: #f8f8f8;
+      .bar-header{
+        background: #f8f8f8;
+        .item-input-wrapper{
+          background: #fff;
+        }
+        .button{
+          color: #4a4a4a;
+        }
+      }
+    }
+    .mask_list{
+      position: absolute;
+      top: 44px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 9;
+      background: rgba(0,0,0,.6);
+      ion-scroll{
+        background: #fff;
+        height: 100%;
+        .no-result{
+          text-align: center;
+          color: #ccc;
+        }
+      }
+    }
+  }
+  //search end
+  //city select list
   .flex-c001{
     display: flex;
     flex-direction: column;
@@ -14,6 +53,9 @@
       padding: 0;
       height: 30px;
       border-radius: 5px;
+    }
+    .item-input-wrapper{
+      background: #fff;
     }
   }
   .city_tabs{

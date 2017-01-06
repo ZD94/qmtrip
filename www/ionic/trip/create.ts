@@ -144,7 +144,20 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         }
     });
 
-    async function queryPlaces(keyword){
+    // async function queryPlaces(keyword){
+    //     if (!keyword) {
+    //         let hotCities = $storage.local.get("hot_cities")
+    //         if (hotCities && hotCities[0] && hotCities[0].id) {
+    //             return hotCities;
+    //         }
+    //     }
+    //     var places = await API.place.queryPlace({keyword: keyword});
+    //     if (!keyword) {
+    //         $storage.local.set('hot_cities', places);
+    //     }
+    //     return places;
+    // }
+    async function queryAllPlaces(keyword){
         if (!keyword) {
             let hotCities = $storage.local.get("hot_cities")
             if (hotCities && hotCities[0] && hotCities[0].id) {
@@ -157,12 +170,32 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         }
         return places;
     }
+    async function queryAbroadPlaces(){
+        let abroad = $storage.local.get('abroad_cities');
+        if(!abroad){
+            abroad = await API.place.queryCitiesGroupByLetter({isAbroad:true});
+            $storage.local.set('abroad_cities',abroad);
+        }
+        return abroad;
+    }
+    async function queryInternalPlaces(){
+        let internal = $storage.local.get('internal_cities');
+        if(!internal){
+            internal = await API.place.queryCitiesGroupByLetter({isAbroad:false});
+            $storage.local.set('internal_cities',internal);
+        }
+        return internal;
+    }
     $scope.placeSelector = {
-        query: queryPlaces,
+        queryAll: queryAllPlaces,
+        queryAbroad: queryAbroadPlaces,
+        queryInternal: queryInternalPlaces,
         display: (item)=>item.name
     };
     $scope.fromPlaceSelector = {
-        query: queryPlaces,
+        queryAll: queryAllPlaces,
+        queryAbroad: queryAbroadPlaces,
+        queryInternal: queryInternalPlaces,
         display: (item)=>item.name
     };
     $scope.projectSelector = {

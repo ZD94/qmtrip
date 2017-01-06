@@ -13,23 +13,23 @@
             </div>
             <div class="item item-input">
                 <span class="input-label">出发地</span>
-                <ng-selector-list
+                <ng-selector-city
                         ng-model="trip.fromPlace"
                         dlg-options="fromPlaceSelector"
                         dlg-title="出发地选择"
                         dlg-placeholder="请输入城市名或首字母缩写"
                         class="fake-input"
-                ></ng-selector-list>
+                ></ng-selector-city>
             </div>
             <div class="item item-input">
                 <span class="input-label">目的地</span>
-                <ng-selector-list
+                <ng-selector-city
                         ng-model="trip.place"
                         dlg-options="placeSelector"
                         dlg-title="请选择出差地点"
                         dlg-placeholder="请输入城市名或首字母缩写"
                         class="fake-input"
-                ></ng-selector-list>
+                ></ng-selector-city>
             </div>
             <div class="item item-input">
                 <span class="input-label label-doubleline">最晚何时到达<br/><span>(目的地当地时间)</span></span>
