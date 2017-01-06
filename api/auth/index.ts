@@ -347,7 +347,7 @@ export default class ApiAuth {
      * @returns {Company}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'companyId', 'msgCode', 'msgTicket', 'pwd'])
+    @requireParams(['mobile', 'name', 'companyId', 'msgCode', 'msgTicket', 'pwd', 'avatarColor'])
     static async invitedStaffRegister(data): Promise<any> {
         var msgCode = data.msgCode;
         var msgTicket = data.msgTicket;
@@ -355,6 +355,7 @@ export default class ApiAuth {
         var name = data.name;
         var pwd = data.pwd;
         var companyId = data.companyId;
+        var avatarColor = data.avatarColor;
 
         if(!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
             throw L.ERR.MOBILE_NOT_CORRECT();
@@ -389,7 +390,8 @@ export default class ApiAuth {
                 companyId: companyId,
                 pwd: utils.md5(pwd),
                 status: ACCOUNT_STATUS.ACTIVE,
-                isValidateMobile: true
+                isValidateMobile: true,
+                avatarColor: avatarColor
             });
         } else {
             throw {code: -1, msg: "短信验证码错误"};
