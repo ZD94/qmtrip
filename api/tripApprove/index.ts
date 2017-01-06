@@ -333,11 +333,12 @@ class TripApproveModule {
         let approveCompany = approveUser.company;
 
         if(approveResult == EApproveResult.PASS && !isNextApprove ){
-            if(!(approveCompany.tripPlanNumLimit >= (approveCompany.tripPlanPassNum + approveCompany.tripPlanFrozenNum))){
-                throw L.ERR.BEYOND_LIMIT_NUM("出差申请");
-            }
+            await approveCompany.beforeApproveTrip();
             await approveCompany.addTripPlanPassNum({number: 1});
             await approveCompany.freeFrozenTripPlanNum({number: 1});
+            if(approveCompany.tripPlanNumLimit < approveCompany.tripPlanPassNum){
+                await approveCompany.reduceExtraTripPlanNum({number: 1});
+            }
         }
 
 
