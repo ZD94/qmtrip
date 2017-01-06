@@ -7,7 +7,7 @@
             <div class="flex-c010">
                 <a ng-href="#/staff/staff-info" menu-close>
                     <ion-item class="item-thumbnail-left menu-button">
-                        <div class="menu-portrait" ng-if="!currentStaff.avatar">
+                        <div class="menu-portrait" ng-style="{background: staff.avatarColor || '#2495da'}" ng-if="!currentStaff.avatar">
                             {{currentStaff.name | shortName}}
                         </div>
                         <div class="menu-portrait menu-avatar" ng-if="currentStaff.avatar">
