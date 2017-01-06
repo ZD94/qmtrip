@@ -222,16 +222,25 @@ export class Company extends ModelObject{
     }
 
     @RemoteCall()
-    async beforeGoTrip(): Promise<boolean> {
+    async beforeGoTrip(params?: any): Promise<boolean> {
         let self = this;
-        if(!(self.tripPlanNumLimit > (self.tripPlanFrozenNum + self.tripPlanPassNum))){
+        let number = 1;
+        if(params && params.number){
+            number = params.number;
+        }
+        //套餐内剩余量
+        let surplus = self.tripPlanNumLimit - self.tripPlanPassNum - self.tripPlanFrozenNum;
+        if(!(surplus >= (number + self.tripPlanFrozenNum))){
+            //套餐包剩余的条数不够
             if(!self.extraTripPlanNum){
                 throw L.ERR.BEYOND_LIMIT_NUM("出差申请");
             }else{
-                console.info(self.extraTripPlanNum > self.tripPlanFrozenNum && self.extraExpiryDate && self.extraExpiryDate.getTime() - new Date().getTime() > 0);
-                console.info(self.extraTripPlanNum > self.tripPlanFrozenNum );
-                console.info(self.extraExpiryDate && self.extraExpiryDate.getTime() - new Date().getTime() > 0);
-                if(!(self.extraTripPlanNum > self.tripPlanFrozenNum && self.extraExpiryDate && self.extraExpiryDate.getTime() - new Date().getTime() > 0)){
+                //套餐包剩余的加上加油包剩余的条数不够
+                if(surplus < 0){
+                    surplus = 0;
+                }
+                if(!((self.extraTripPlanNum + surplus) >= (number + self.tripPlanFrozenNum)
+                    && self.extraExpiryDate && self.extraExpiryDate.getTime() - new Date().getTime() > 0)){
                     throw L.ERR.BEYOND_LIMIT_NUM("出差申请");
                 }
             }
@@ -241,13 +250,23 @@ export class Company extends ModelObject{
     }
 
     @RemoteCall()
-    async beforeApproveTrip(): Promise<boolean> {
+    async beforeApproveTrip(params?: any): Promise<boolean> {
         let self = this;
-        if(!(self.tripPlanNumLimit >= (self.tripPlanFrozenNum + self.tripPlanPassNum))){
+        let number = 1;
+        if(params && params.number){
+            number = params.number;
+        }
+        //套餐内剩余量
+        let surplus = self.tripPlanNumLimit - self.tripPlanPassNum;
+        if(!(surplus >= number)){
             if(!self.extraTripPlanNum){
                 throw L.ERR.BEYOND_LIMIT_NUM("出差申请");
             }else{
-                if(!(self.extraTripPlanNum >= self.tripPlanFrozenNum && self.extraExpiryDate && self.extraExpiryDate.getTime() - new Date().getTime() > 0)){
+                if(surplus < 0){
+                    surplus = 0;
+                }
+                if(!((self.extraTripPlanNum + surplus) >= number
+                    && self.extraExpiryDate && self.extraExpiryDate.getTime() - new Date().getTime() > 0)){
                     throw L.ERR.BEYOND_LIMIT_NUM("出差申请");
                 }
             }
@@ -258,28 +277,40 @@ export class Company extends ModelObject{
 
     @RemoteCall()
     async frozenTripPlanNum(params?: any): Promise<Company> {
-        let number = params.number || 1;
+        let number = 1;
+        if(params && params.number){
+            number = params.number;
+        }
         this.tripPlanFrozenNum = this.tripPlanFrozenNum + number;
         return this.save();
     }
 
     @RemoteCall()
     async freeFrozenTripPlanNum(params?: any): Promise<Company> {
-        let number = params.number || 1;
+        let number = 1;
+        if(params && params.number){
+            number = params.number;
+        }
         this.tripPlanFrozenNum = this.tripPlanFrozenNum - number;
         return this.save();
     }
 
     @RemoteCall()
     async reduceExtraTripPlanNum(params?: any): Promise<Company> {
-        let number = params.number || 1;
+        let number = 1;
+        if(params && params.number){
+            number = params.number;
+        }
         this.extraTripPlanNum = this.extraTripPlanNum - number;
         return this.save();
     }
 
     @RemoteCall()
     async addTripPlanPassNum(params?: any): Promise<Company> {
-        let number = params.number || 1;
+        let number = 1;
+        if(params && params.number){
+            number = params.number;
+        }
         this.tripPlanPassNum = this.tripPlanPassNum + number;
         return this.save();
     }

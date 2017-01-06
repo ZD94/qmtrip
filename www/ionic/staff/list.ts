@@ -123,11 +123,11 @@ export default async function ListController($scope, Models, $ionicPopup) {
 
     $scope.goInviteStaff = async function(){
         var company = staff.company;
-        var staffNum = await company.getStaffNum();
+        /*var staffNum = await company.getStaffNum();
         if(staffNum >= company.staffNumLimit){
             msgbox.log('企业员工数已达到员工数目上限，无法继续邀请员工');
             return false;
-        }
+        }*/
         window.location.href = "#/company/staff-invited";
     }
 }

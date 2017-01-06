@@ -40,12 +40,19 @@ class ApproveModule {
         let {budgetId, project, approveUser} = params;
         let submitter = await Staff.getCurrent();
         let company = submitter.company;
-        await company.beforeGoTrip();
-        
-        await company.frozenTripPlanNum({number: 1});
 
         //获取预算详情
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: submitter.id});
+        let number = 0;
+        if(budgetInfo.budgets && budgetInfo.budgets.length>0){
+            budgetInfo.budgets.forEach(function(item){
+                if(item.tripType != 3){
+                    number = number + 1;
+                }
+            })
+        }
+        await company.beforeGoTrip({number: number});
+        await company.frozenTripPlanNum({number: number});
         return ApproveModule._submitApprove({
             submitter: submitter.id,
             data: budgetInfo,

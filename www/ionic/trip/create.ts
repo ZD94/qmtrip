@@ -260,8 +260,19 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         $scope.endDateSelector.beginDate = $scope.trip.beginDate;
     })
     $scope.nextStep = async function() {
+        let trip = $scope.trip;
+        let number = 0;
+        if(trip.traffic){
+            number = number + 1;
+        }
+        if(trip.round){
+            number = number + 1;
+        }
+        if(trip.hotel){
+            number = number + 1;
+        }
         try{
-            await currentCompany.beforeGoTrip();
+            await currentCompany.beforeGoTrip({number: number});
         }catch(e){
             console.info(e);
             $scope.showErrorMsg(e.msg);
@@ -274,8 +285,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         let beginMSecond = Date.now();
         API.require("travelBudget");
         await API.onload();
-
-        let trip = $scope.trip;
 
         if(!trip.place || !trip.place.id) {
             $scope.showErrorMsg('请填写出差目的地！');
