@@ -3,6 +3,7 @@
  */
 "use strict";
 
+var _ = require('lodash');
 var fs = require('fs');
 var path = require('path');
 var gulp = require('gulp');
@@ -58,34 +59,58 @@ gulplib.angular_app('ionic');
 gulplib.post_default('manifest', genManifest);
 
 gulplib.dist(function () {
-    var filter = require('gulp-filter');
-    var dist_all = [
-        gulp.src([gulplib.public_dir + '/**/*'])
-            .pipe(filter(['**', '!**/*.ts', '!**/*.less', '!**/*.scss', '!**/*.map']))
-            .pipe(gulp.dest('dist/' + gulplib.public_dir)),
-        gulp.src('api/**/*')
-            .pipe(gulp.dest('dist/api')),
-        gulp.src('common/**/*')
-            .pipe(gulp.dest('dist/common'))
-    ];
-    var copy;
-    copy = [
+    var gulp_filter = require('gulp-filter');
+    var merge2 = require('merge2');
+    var dist_all = [];
+    var files = [
         'README.md',
         'package.json',
         'server.js',
-        'tsd.json',
-        'tsconfig.json',
     ];
-    copy.forEach(function (fname) {
-        dist_all.push(gulp.src(fname).pipe(gulp.dest('dist')));
-    });
-    copy = [
-        'config',
-        'typings',
+    files.forEach(function(fname){
+        var t = gulp.src(fname).pipe(gulp.dest('dist'))
+        dist_all.push(t);
+    })
+
+    var filters = [
+        '**',
+        '!**/www/attachments/**/*',
+        '!**/common/vendor/**/*',
+        '!**/common/typings/**/*',
+        '!**/common/client/**/*',
+        '!**/common/gulplib/**/*',
+        '!**/common/test/**/*',
+        '!**/*.ts',
+        '!**/*.less',
+        '!**/*.scss',
+        '!**/*.map',
+        '!**/config/config.local.json',
+    ];
+    dist_all.push(
+        gulp.src(gulplib.public_dir + '/**/*', {base:'.'})
+            .pipe(gulp_filter(filters))
+            .pipe(through2.obj(function(file, enc, cb){
+                console.error(file.path);
+                cb(null, file);
+            }))
+            .pipe(gulp.dest('dist'))
+    );
+    var dirs = [
+        'api',
+        'common',
         'libs',
+        'config',
     ];
-    copy.forEach(function (fname) {
-        dist_all.push(gulp.src(fname + '/**/*').pipe(gulp.dest('dist/' + fname)));
+    dirs.forEach(function(dir){
+        var t = merge2(gulp.src(dir + '/**/*', {base:'.'}),
+                        gulp.src('tmp/tsreq/' + dir + '/**/*', {base:'tmp/tsreq'}))
+            .pipe(gulp_filter(filters))
+            .pipe(through2.obj(function(file, enc, cb){
+                console.error(file.path);
+                cb(null, file);
+            }))
+            .pipe(gulp.dest('dist'))
+        dist_all.push(t);
     });
     return dist_all;
 });

@@ -1,0 +1,1 @@
+update company.companies set points_2_coin_rate = 50;

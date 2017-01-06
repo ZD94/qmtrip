@@ -21,6 +21,9 @@ class LatestArrivalTimePrefer extends AbstractPrefer<IFinalTicket> {
     async markScoreProcess(tickets: IFinalTicket[]): Promise<IFinalTicket[]> {
         if (!tickets.length) return tickets;
         let d1 = this.latestArrivalTime;
+        //如果没有条件直接返回
+        if (!d1) return tickets;
+
         if (d1 && typeof d1 == 'string') {
             d1 = new Date(d1 as string);
         }

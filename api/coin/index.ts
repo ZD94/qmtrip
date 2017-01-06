@@ -38,7 +38,7 @@ class CoinModule {
         let {staffId, points} = params;
         let staff = await Models.staff.get(staffId);
         let company = staff.company
-        let points2coinRate = company.points2coinRate || 0.5;
+        let points2coinRate = company.points2coinRate || 50;
         if (staff.balancePoints < points) {
             throw L.ERR.SHORT_OF_POINT();
         }

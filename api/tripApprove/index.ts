@@ -330,6 +330,8 @@ class TripApproveModule {
         let approveResult = params.approveResult;
         let budgetId = params.budgetId;
         let approveUser = await Models.staff.get(tripApprove['approveUserId']);
+        let approveCompany = approveUser.company;
+
 
         if(isNextApprove && !params.nextApproveUserId)
             throw new Error("审批人不能为空");
@@ -345,12 +347,19 @@ class TripApproveModule {
         }
 
         let budgetInfo;
+        let number = 0;
+        if(tripApprove.isSpecialApprove){
+            number = 1;
+        }
         if(!tripApprove.isSpecialApprove){
             budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
             if (!budgetInfo || !budgetInfo.budgets)
                 throw new Error(`预算信息已失效请重新生成`);
             let finalBudget = 0;
             budgetInfo.budgets.forEach((v) => {
+                if(v.tripType != ETripType.SUBSIDY){
+                    number = number + 1;
+                }
                 if (v.price <= 0) {
                     finalBudget = -1;
                     return;
@@ -359,6 +368,29 @@ class TripApproveModule {
             });
             tripApprove.budget = finalBudget;
             tripApprove.budgetInfo = budgetInfo.budgets;
+        }
+
+
+        if(approveResult == EApproveResult.PASS && !isNextApprove ){
+            await approveCompany.beforeApproveTrip({number : number});
+            if((approveCompany.tripPlanNumLimit - approveCompany.tripPlanPassNum) > 0){
+                //套餐包还未用完
+                if(number > (approveCompany.tripPlanNumLimit - approveCompany.tripPlanPassNum)){
+                    //优先扣除套餐内的 再扣加油包的
+                    let reduceExtraNum = number - (approveCompany.tripPlanNumLimit - approveCompany.tripPlanPassNum);
+                    await approveCompany.reduceExtraTripPlanNum({number: reduceExtraNum});
+                }
+            }else{
+                //套餐包已用完 需要全部从加油包扣除
+                await approveCompany.reduceExtraTripPlanNum({number: number});
+            }
+            await approveCompany.addTripPlanPassNum({number: number});
+            await approveCompany.freeFrozenTripPlanNum({number: number});
+        }
+
+
+        if(approveResult == EApproveResult.REJECT ){
+            await approveCompany.freeFrozenTripPlanNum({number: number});
         }
 
         // let tripPlan: TripPlan;

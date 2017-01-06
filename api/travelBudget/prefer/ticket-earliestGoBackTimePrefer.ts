@@ -21,9 +21,14 @@ class EarliestGoBackTimePrefer extends AbstractPrefer<IFinalTicket> {
     async markScoreProcess(tickets: IFinalTicket[]): Promise<IFinalTicket[]> {
         if (!tickets.length) return tickets;
         let d1 = this.earliestGoBackTime;
+
+        if (!d1)    //如果没有设置条件直接跳过打分
+            return tickets;
+
         if (d1 && typeof d1 == 'string') {
             d1 = new Date(d1 as string);
         }
+
         let score = this.score;
 
         tickets = tickets.map( (v) => {

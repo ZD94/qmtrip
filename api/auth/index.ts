@@ -347,7 +347,7 @@ export default class ApiAuth {
      * @returns {Company}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'companyId', 'msgCode', 'msgTicket', 'pwd'])
+    @requireParams(['mobile', 'name', 'companyId', 'msgCode', 'msgTicket', 'pwd', 'avatarColor'])
     static async invitedStaffRegister(data): Promise<any> {
         var msgCode = data.msgCode;
         var msgTicket = data.msgTicket;
@@ -355,6 +355,7 @@ export default class ApiAuth {
         var name = data.name;
         var pwd = data.pwd;
         var companyId = data.companyId;
+        var avatarColor = data.avatarColor;
 
         if(!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
             throw L.ERR.MOBILE_NOT_CORRECT();
@@ -366,7 +367,7 @@ export default class ApiAuth {
         var ckeckMsgCode = await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
 
         if(ckeckMsgCode) {
-            var company = await Models.company.get(companyId);
+            /*var company = await Models.company.get(companyId);
             var defaultDeptment = await company.getDefaultDepartment();
             var defaultTravelPolicy = await company.getDefaultTravelPolicy();
             var staff = Staff.create({
@@ -381,7 +382,17 @@ export default class ApiAuth {
                 staff.department = defaultDeptment;
             }
             staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
-            staff = await staff.save();
+            staff = await staff.save();*/
+
+            var staff = await API.staff.registerStaff({
+                mobile: mobile,
+                name: name,
+                companyId: companyId,
+                pwd: utils.md5(pwd),
+                status: ACCOUNT_STATUS.ACTIVE,
+                isValidateMobile: true,
+                avatarColor: avatarColor
+            });
         } else {
             throw {code: -1, msg: "短信验证码错误"};
         }

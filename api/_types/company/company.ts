@@ -1,7 +1,7 @@
 'use strict';
 
 import { Models } from 'api/_types';
-import {Staff } from 'api/_types/staff';
+import {Staff, EStaffStatus } from 'api/_types/staff';
 import {Agency} from 'api/_types/agency';
 import {TravelPolicy} from "api/_types/travelPolicy";
 import { Types, Values } from 'common/model';
@@ -18,8 +18,12 @@ import {EApproveChannel, EApproveStatus, EApproveType} from "../approve/types";
 import {emitter} from "../../../libs/oa/emitter";
 import {EVENT} from "../../../libs/oa/index";
 import L from 'common/language';
+
+var sequelize = require("common/model").DB;
 let promoCodeType = require('libs/promoCodeType');
+
 declare var API: any;
+
 
 export enum ECompanyStatus {
     DELETE = -2,
@@ -153,7 +157,7 @@ export class Company extends ModelObject{
     set coinAccount(coinAccount: CoinAccount) {}
 
     @Field({type: Types.NUMERIC(10,2)})
-    get points2coinRate(): number { return 0.5};
+    get points2coinRate(): number { return 50};
     set points2coinRate(rate: number) {}
 
     @Field({type: Types.JSONB})
@@ -172,11 +176,143 @@ export class Company extends ModelObject{
     get expiryDate() : Date { return null; }
     set expiryDate(val: Date) {}
 
+    // 企业员工数目限制
+    @Field({type: Types.INTEGER, defaultValue: 5})
+    get staffNumLimit(): number { return 5; }
+    set staffNumLimit(val: number) {}
+
+    // 企业出差审批数目限制（每月）
+    @Field({type: Types.INTEGER, defaultValue: 10})
+    get tripPlanNumLimit(): number { return 10; }
+    set tripPlanNumLimit(val: number) {}
+
+    // 企业出差审批通过数目（每月月初会清零）
+    @Field({type: Types.INTEGER, defaultValue: 0})
+    get tripPlanPassNum(): number { return 0; }
+    set tripPlanPassNum(val: number) {}
+
+    // 企业出差审批冻结数目
+    @Field({type: Types.INTEGER, defaultValue: 0})
+    get tripPlanFrozenNum(): number { return 0; }
+    set tripPlanFrozenNum(val: number) {}
+
+    // 够买套餐条数
+    @Field({type: Types.INTEGER, defaultValue: 0})
+    get extraTripPlanNum(): number { return 0; }
+    set extraTripPlanNum(val: number) {}
+
+    // 够买套餐条数过期时间
+    @Field({type: Types.DATE})
+    get extraExpiryDate(): Date { return null; }
+    set extraExpiryDate(val: Date) {}
+
     getStaffs(options?: any): Promise<Staff[]> {
         if(!options) {options = {where: {}}};
         if(!options.where) {options.where = {}};
         options.where.companyId = this.id;
         return Models.staff.find(options);
+    }
+
+    @RemoteCall()
+    async getStaffNum(options?: any): Promise<number> {
+        let companyId = this.id;
+        let sql = `select count(id) as staffnum from staff.staffs where company_id='${companyId}' and deleted_at is null and staff_status=${EStaffStatus.ON_JOB}`;
+        let staff_num = await sequelize.query(sql);
+        return Number(staff_num[0][0].staffnum || 0);
+    }
+
+    @RemoteCall()
+    async beforeGoTrip(params?: any): Promise<boolean> {
+        let self = this;
+        let number = 1;
+        if(params && params.number){
+            number = params.number;
+        }
+        //套餐内剩余量
+        let surplus = self.tripPlanNumLimit - self.tripPlanPassNum - self.tripPlanFrozenNum;
+        if(!(surplus >= (number + self.tripPlanFrozenNum))){
+            //套餐包剩余的条数不够
+            if(!self.extraTripPlanNum){
+                throw L.ERR.BEYOND_LIMIT_NUM("出差申请");
+            }else{
+                //套餐包剩余的加上加油包剩余的条数不够
+                if(surplus < 0){
+                    surplus = 0;
+                }
+                if(!((self.extraTripPlanNum + surplus) >= (number + self.tripPlanFrozenNum)
+                    && self.extraExpiryDate && self.extraExpiryDate.getTime() - new Date().getTime() > 0)){
+                    throw L.ERR.BEYOND_LIMIT_NUM("出差申请");
+                }
+            }
+        }
+
+        return true;
+    }
+
+    @RemoteCall()
+    async beforeApproveTrip(params?: any): Promise<boolean> {
+        let self = this;
+        let number = 1;
+        if(params && params.number){
+            number = params.number;
+        }
+        //套餐内剩余量
+        let surplus = self.tripPlanNumLimit - self.tripPlanPassNum;
+        if(!(surplus >= number)){
+            if(!self.extraTripPlanNum){
+                throw L.ERR.BEYOND_LIMIT_NUM("出差申请");
+            }else{
+                if(surplus < 0){
+                    surplus = 0;
+                }
+                if(!((self.extraTripPlanNum + surplus) >= number
+                    && self.extraExpiryDate && self.extraExpiryDate.getTime() - new Date().getTime() > 0)){
+                    throw L.ERR.BEYOND_LIMIT_NUM("出差申请");
+                }
+            }
+        }
+
+        return true;
+    }
+
+    @RemoteCall()
+    async frozenTripPlanNum(params?: any): Promise<Company> {
+        let number = 1;
+        if(params && params.number){
+            number = params.number;
+        }
+        this.tripPlanFrozenNum = this.tripPlanFrozenNum + number;
+        return this.save();
+    }
+
+    @RemoteCall()
+    async freeFrozenTripPlanNum(params?: any): Promise<Company> {
+        let number = 1;
+        if(params && params.number){
+            number = params.number;
+        }
+        this.tripPlanFrozenNum = this.tripPlanFrozenNum - number;
+        return this.save();
+    }
+
+    @RemoteCall()
+    async reduceExtraTripPlanNum(params?: any): Promise<Company> {
+        let number = 1;
+        if(params && params.number){
+            number = params.number;
+        }
+        this.extraTripPlanNum = this.extraTripPlanNum - number;
+        return this.save();
+    }
+
+    @RemoteCall()
+    async addTripPlanPassNum(params?: any): Promise<Company> {
+        let number = 1;
+        if(params && params.number){
+            number = params.number;
+        }
+        this.tripPlanPassNum = this.tripPlanPassNum + number;
+        return this.save();
     }
     
     getDepartments(options?: any): Promise<Department[]> {

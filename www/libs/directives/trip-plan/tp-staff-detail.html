@@ -1,6 +1,6 @@
 <ion-list>
     <ion-item class="item-thumbnail-left opactic">
-        <policy-show class="staff_portrait" staff-id="staff.id" policy-title="staff.name.substring(staff.name.length-2,staff.name.length)"></policy-show>
+        <policy-show class="staff_portrait" ng-style="{background: staff.avatarColor|| '#2495da'}" staff-id="staff.id" policy-title="staff.name.substring(staff.name.length-2,staff.name.length)"></policy-show>
         <span class="op_mult">{{staff.name}}&nbsp;&nbsp;{{staff.mobile}}</span>
         <br>{{staff.email}}
         <p align="right" style="margin-top: 5px">

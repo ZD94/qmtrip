@@ -1503,6 +1503,36 @@ class TripPlanModule {
         scheduler('*/5 * * * *', taskId, async function() {
             let tripApproves = await Models.tripApprove.find({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
             tripApproves.map(async (approve) => {
+                let approveCompany = await approve.getCompany();
+                let number = 0;
+                if(approve.isSpecialApprove){
+                    number = number + 1;
+                }
+                if(approve.isNeedHotel){
+                    number = number + 1;
+                }
+                if(approve.isNeedTraffic){
+                    number = number + 1;
+                }
+                if(approve.isRoundTrip){
+                    number = number + 1;
+                }
+
+                await approveCompany.beforeApproveTrip({number : number});
+                if((approveCompany.tripPlanNumLimit - approveCompany.tripPlanPassNum) > 0){
+                    //套餐包还未用完
+                    if(number > (approveCompany.tripPlanNumLimit - approveCompany.tripPlanPassNum)){
+                        //优先扣除套餐内的 再扣加油包的
+                        let reduceExtraNum = number - (approveCompany.tripPlanNumLimit - approveCompany.tripPlanPassNum);
+                        await approveCompany.reduceExtraTripPlanNum({number: reduceExtraNum});
+                    }
+                }else{
+                    //套餐包已用完 需要全部从加油包扣除
+                    await approveCompany.reduceExtraTripPlanNum({number: number});
+                }
+                await approveCompany.addTripPlanPassNum({number: number});
+                await approveCompany.freeFrozenTripPlanNum({number: number});
+
                 approve.status = QMEApproveStatus.PASS;
                 await approve.save();
                 if(approve.approveUser && approve.approveUser.id && /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(approve.approveUser.id)) {

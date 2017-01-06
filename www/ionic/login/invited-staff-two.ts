@@ -8,6 +8,7 @@ export async function InvitedStaffTwoController ($scope, $stateParams){
     let linkId = $stateParams.linkId;
     let sign = $stateParams.sign;
     let timestamp = $stateParams.timestamp;
+    let colorful = ['#F44336','#E91E63','#9C27B0','#673AB7','#3F51B5','#2196F3','#03A9F4','#00BCD4','#009688','#4CAF50'];
     API.require("checkcode");
     API.require("auth");
     await API.onload();
@@ -102,21 +103,20 @@ export async function InvitedStaffTwoController ($scope, $stateParams){
             msgbox.log("不能包含特殊字符");
             return;
         }
-
         var namePattern = /[\u4e00-\u9fa5]+/g;
         var hasChinese = namePattern.test($scope.form.name);
         if(($scope.form.name).length > 5 && hasChinese){
             msgbox.log("姓名不可超过五个字符");
             return;
         }
-
         var pwdPattern = /^[0-9a-zA-Z]*$/g;
         var newPwd = $scope.form.pwd;
         if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >20){
             msgbox.log("密码格式应为6-20位字母或数字");
             return;
         }
-
+        let num = Math.random() * 10;
+        $scope.form.avatarColor = colorful[num];
         API.auth.invitedStaffRegister($scope.form)
             .then(function (result) {
                 console.info(result);

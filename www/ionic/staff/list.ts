@@ -27,7 +27,7 @@ export default async function ListController($scope, Models, $ionicPopup) {
     }
 
     $scope.vm = vm;
-    
+
     async function loadStaffs(pager) {
         if(pager && pager.length>0){
             await Promise.all(pager.map(async function (staff) {
@@ -43,12 +43,12 @@ export default async function ListController($scope, Models, $ionicPopup) {
     }
 
     /*$scope.staffs = staffs.map(function (staff) {
-        var obj = {staff: staff, role: ""};
-        if (obj.staff.roleId == EStaffRole.OWNER) {
-            obj.role = '创建者';
-        }
-        return obj;
-    });*/
+     var obj = {staff: staff, role: ""};
+     if (obj.staff.roleId == EStaffRole.OWNER) {
+     obj.role = '创建者';
+     }
+     return obj;
+     });*/
 
     $scope.option = {name: ''};
     $scope.search = async function () {
@@ -119,5 +119,15 @@ export default async function ListController($scope, Models, $ionicPopup) {
                 }
             ]
         })
+    }
+
+    $scope.goInviteStaff = async function(){
+        var company = staff.company;
+        /*var staffNum = await company.getStaffNum();
+        if(staffNum >= company.staffNumLimit){
+            msgbox.log('企业员工数已达到员工数目上限，无法继续邀请员工');
+            return false;
+        }*/
+        window.location.href = "#/company/staff-invited";
     }
 }
