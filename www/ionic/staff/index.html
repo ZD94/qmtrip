@@ -4,7 +4,7 @@
             <div class="card">
                 <a href="#/staff/staff-info">
                     <div class="item-thumbnail-left">
-                        <div class="avatar" ng-if="!staff.avatar">
+                        <div class="avatar" ng-if="!staff.avatar" ng-style="{background: staff.avatarColor || '#2495da'}">
                             {{staff.name | shortName}}</div>
                         <div class="avatar" ng-if="staff.avatar">
                             <img ng-src="{{getImageUrl(staff.avatar)}}">

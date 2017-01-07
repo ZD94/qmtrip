@@ -146,7 +146,20 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         }
     });
 
-    async function queryPlaces(keyword){
+    // async function queryPlaces(keyword){
+    //     if (!keyword) {
+    //         let hotCities = $storage.local.get("hot_cities")
+    //         if (hotCities && hotCities[0] && hotCities[0].id) {
+    //             return hotCities;
+    //         }
+    //     }
+    //     var places = await API.place.queryPlace({keyword: keyword});
+    //     if (!keyword) {
+    //         $storage.local.set('hot_cities', places);
+    //     }
+    //     return places;
+    // }
+    async function queryAllPlaces(keyword){
         if (!keyword) {
             let hotCities = $storage.local.get("hot_cities")
             if (hotCities && hotCities[0] && hotCities[0].id) {
@@ -159,12 +172,32 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         }
         return places;
     }
+    async function queryAbroadPlaces(){
+        let abroad = $storage.local.get('abroad_cities');
+        if(!abroad){
+            abroad = await API.place.queryCitiesGroupByLetter({isAbroad:true});
+            $storage.local.set('abroad_cities',abroad);
+        }
+        return abroad;
+    }
+    async function queryInternalPlaces(){
+        let internal = $storage.local.get('internal_cities');
+        if(!internal){
+            internal = await API.place.queryCitiesGroupByLetter({isAbroad:false});
+            $storage.local.set('internal_cities',internal);
+        }
+        return internal;
+    }
     $scope.placeSelector = {
-        query: queryPlaces,
+        queryAll: queryAllPlaces,
+        queryAbroad: queryAbroadPlaces,
+        queryInternal: queryInternalPlaces,
         display: (item)=>item.name
     };
     $scope.fromPlaceSelector = {
-        query: queryPlaces,
+        queryAll: queryAllPlaces,
+        queryAbroad: queryAbroadPlaces,
+        queryInternal: queryInternalPlaces,
         display: (item)=>item.name
     };
     $scope.projectSelector = {
@@ -227,8 +260,22 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         $scope.endDateSelector.beginDate = $scope.trip.beginDate;
     })
     $scope.nextStep = async function() {
-        if(!(currentCompany.tripPlanNumLimit > (currentCompany.tripPlanPassNum + currentCompany.tripPlanFrozenNum))){
-            $scope.showErrorMsg("出差申请数目已超过企业限制");
+        let trip = $scope.trip;
+        let number = 0;
+        if(trip.traffic){
+            number = number + 1;
+        }
+        if(trip.round){
+            number = number + 1;
+        }
+        if(trip.hotel){
+            number = number + 1;
+        }
+        try{
+            await currentCompany.beforeGoTrip({number: number});
+        }catch(e){
+            console.info(e);
+            $scope.showErrorMsg(e.msg);
             return false;
         }
         if ($scope.currentTpSts && $scope.currentTpSts.length && (!$scope.subsidy || !$scope.subsidy.template)) {
@@ -238,8 +285,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         let beginMSecond = Date.now();
         API.require("travelBudget");
         await API.onload();
-
-        let trip = $scope.trip;
 
         if(!trip.place || !trip.place.id) {
             $scope.showErrorMsg('请填写出差目的地！');

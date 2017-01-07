@@ -5,3 +5,4 @@ import './spanchange';
 import './bottom-bar';
 import './checkbox';
 import './policy-show';
+import './city-select';

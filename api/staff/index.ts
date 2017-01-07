@@ -44,10 +44,10 @@ class StaffModule{
     static async createStaff (params): Promise<Staff> {
         let currentStaff = await Staff.getCurrent();
         let company = currentStaff.company;
-        let staffNum = await company.getStaffNum();
+        /*let staffNum = await company.getStaffNum();
         if(staffNum >= company.staffNumLimit){
             throw L.ERR.BEYOND_LIMIT_NUM("员工");
-        }
+        }*/
         //检查邮箱 手机号码是否合法
         await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
 
@@ -87,10 +87,10 @@ class StaffModule{
     @requireParams(["name", "mobile", "companyId"], staffAllCols)
     static async registerStaff (params): Promise<Staff> {
         let company = await Models.company.get(params.companyId);
-        let staffNum = await company.getStaffNum();
+        /*let staffNum = await company.getStaffNum();
         if(staffNum >= company.staffNumLimit){
             throw L.ERR.BEYOND_LIMIT_NUM("员工");
-        }
+        }*/
 
         //检查邮箱 手机号码是否合法
         await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});

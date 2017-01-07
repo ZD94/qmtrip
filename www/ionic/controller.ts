@@ -101,7 +101,7 @@ export function getImageUrl(id){
     return url.href;
 }
 
-export async function IndexController($scope, Menu, $ionicPopup, $storage, $location, $ionicSideMenuDelegate) {
+export async function IndexController($scope, Menu, $ionicPopup, $storage, $location, $ionicSideMenuDelegate, Models) {
     require('./index.scss');
 
     $scope.showErrorMsg = function (msg) {

@@ -77,6 +77,10 @@ export class Staff extends ModelObject implements Account {
     @Field({type: Types.TEXT})
     get avatar(): string { return ''; }
     set avatar(val: string) {}
+    // '员工头像颜色'
+    @Field({type: Types.STRING(50)})
+    get avatarColor(): string { return ''; }
+    set avatarColor(val: string) {}
     //状态
     @Field({type: Types.INTEGER})
     get staffStatus(): EStaffStatus { return EStaffStatus.ON_JOB; }
