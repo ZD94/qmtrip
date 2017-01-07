@@ -259,6 +259,8 @@ export default class ApiTravelBudget {
         if (!checkOutDate) {
             throw L.ERR.CHECK_OUT_DATE_FORMAT_ERROR();
         }
+        checkOutDate = new Date(moment(checkOutDate).format('YYYY-MM-DD'));
+        checkInDate = new Date(moment(checkInDate).format('YYYY-MM-DD'));
         if (checkOutDate < checkInDate) {
             throw {code: -1, msg: "离开日期大于入住日期"};
         }
