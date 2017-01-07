@@ -11,6 +11,7 @@ import {emitter, EVENT} from "libs/oa";
 import {EApproveStatus, EApproveChannel, EApproveType} from "../_types/approve/types";
 import {TripPlan, ETripType} from "../_types/tripPlan/tripPlan";
 import TripPlanModule = require("../tripPlan/index");
+import L from 'common/language';
 let Config = require('config');
 var API = require("common/api");
 
@@ -38,9 +39,20 @@ class ApproveModule {
     static async submitApprove(params: {budgetId: string, project?: string, approveUser?: Staff}) :Promise<Approve>{
         let {budgetId, project, approveUser} = params;
         let submitter = await Staff.getCurrent();
+        let company = submitter.company;
 
         //获取预算详情
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: submitter.id});
+        let number = 0;
+        if(budgetInfo.budgets && budgetInfo.budgets.length>0){
+            budgetInfo.budgets.forEach(function(item){
+                if(item.tripType != 3){
+                    number = number + 1;
+                }
+            })
+        }
+        await company.beforeGoTrip({number: number});
+        await company.frozenTripPlanNum({number: number});
         return ApproveModule._submitApprove({
             submitter: submitter.id,
             data: budgetInfo,
@@ -56,6 +68,10 @@ class ApproveModule {
     static async submitSpecialApprove(params: {query: any, budget: number, project?: string, specialApproveRemark?: string, approveUser?: Staff}):Promise<Approve> {
         let {query, budget, project, specialApproveRemark, approveUser} = params;
         let submitter = await Staff.getCurrent();
+
+        let company = submitter.company;
+        await company.beforeGoTrip();
+        await company.frozenTripPlanNum({number: 1});
         let budgetInfo = {
             query: query,
             budgets: [

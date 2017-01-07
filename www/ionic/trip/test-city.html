@@ -1,0 +1,14 @@
+<ion-view title="test">
+    <ion-content padding="true" class="has-header">
+        <div class="item item-input">
+            <span class="input-label">出发地</span>
+            <ng-selector-city
+                    ng-model="fromPlace"
+                    dlg-options="fromPlaceSelector"
+                    dlg-title="出发地选择"
+                    dlg-placeholder="请输入城市名或首字母缩写"
+                    class="fake-input"
+            ></ng-selector-city>
+        </div>
+    </ion-content>
+</ion-view>

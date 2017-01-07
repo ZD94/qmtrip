@@ -40,41 +40,29 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["name", "email", "mobile"], staffAllCols)
+    @requireParams(["name", "mobile"], staffAllCols)
     static async createStaff (params): Promise<Staff> {
+        let currentStaff = await Staff.getCurrent();
+        let company = currentStaff.company;
+        /*let staffNum = await company.getStaffNum();
+        if(staffNum >= company.staffNumLimit){
+            throw L.ERR.BEYOND_LIMIT_NUM("员工");
+        }*/
         //检查邮箱 手机号码是否合法
         await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
-        var staff = await Staff.getCurrent();
-        var user = await AgencyUser.getCurrent();
-        //设置员工默认部门
-        if(!params.departmentId){
-            let dafaultDept = await Models.department.find({where: {companyId: params.companyId, isDefault: true}});
-            if(dafaultDept && dafaultDept.length>0){
-                params.departmentId = dafaultDept[0].id;
-            }
-        }
-        //设置员工默认差旅标准
-        if(!params.travelPolicyId){
-            params.travelPolicyId = 'dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a';
-        }
-        var newstaff = Staff.create(params);
-        if(staff){
-            newstaff.company = staff.company;
-        }else if(user){
-            if(!params.companyId){
-                throw L.ERR.INVALID_ARGUMENT('companyId');
-            }
-            var company = await Models.company.get(params.companyId);
 
-            if(!company){
-                throw L.ERR.INVALID_ARGUMENT('companyId');
-            }
-            if(company['agencyId'] != user['agencyId']){
-                throw L.ERR.PERMISSION_DENY();
-            }
-        }else{
-            throw L.ERR.PERMISSION_DENY();
+
+        let defaultDeptment = await company.getDefaultDepartment();
+        let defaultTravelPolicy = await company.getDefaultTravelPolicy();
+        let staff = Staff.create(params)
+        staff.company = company;
+        if(!staff["departmentId"]) {
+            staff.department = defaultDeptment;
         }
+        if(!staff["travelPolicyId"]){
+            staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
+        }
+        let result = await staff.save();
 
         let account = await Models.account.get(staff.id);
 
@@ -85,8 +73,49 @@ class StaffModule{
             account.coinAccount = ca;
             await account.save();
         }
-        let result = await newstaff.save();
-        await API.auth.sendResetPwdEmail({email: result.email, mobile: result.mobile, type: 1, isFirstSet: true, companyName: result.company.name});
+
+        // await API.auth.sendResetPwdEmail({email: result.email, mobile: result.mobile, type: 1, isFirstSet: true, companyName: result.company.name});
+        return result;
+    }
+
+    /**
+     * 邀请员工注册
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["name", "mobile", "companyId"], staffAllCols)
+    static async registerStaff (params): Promise<Staff> {
+        let company = await Models.company.get(params.companyId);
+        /*let staffNum = await company.getStaffNum();
+        if(staffNum >= company.staffNumLimit){
+            throw L.ERR.BEYOND_LIMIT_NUM("员工");
+        }*/
+
+        //检查邮箱 手机号码是否合法
+        await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
+        let defaultDeptment = await company.getDefaultDepartment();
+        let defaultTravelPolicy = await company.getDefaultTravelPolicy();
+        let staff = Staff.create(params)
+        staff.company = company;
+        if(!staff["departmentId"]) {
+            staff.department = defaultDeptment;
+        }
+        if(!staff["travelPolicyId"]){
+            staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
+        }
+        let result = await staff.save();
+
+        let account = await Models.account.get(staff.id);
+
+        if(!account.coinAccount){
+            //为员工设置资金账户
+            let ca = CoinAccount.create();
+            await ca.save();
+            account.coinAccount = ca;
+            await account.save();
+        }
+
         return result;
     }
 

@@ -19,12 +19,6 @@ import {
 } from "./strategy/index";
 import {loadDefaultPrefer} from "./prefer";
 
-// const defaultPrice = {
-//     "5": 500,
-//     "4": 450,
-//     "3": 400,
-//     "2": 350
-// }
 
 export interface BudgetOptions{
     originPlace: string,
@@ -34,10 +28,10 @@ export interface BudgetOptions{
     isRoundTrip: boolean,
     isNeedTraffic: boolean,
     goBackDate?: Date,
-    latestGoBackTime?: string,            //返程最晚到达时间
-    earliestGoBackTime?: string,    //返程最早出发时间
-    earliestLeaveTime?: string, //最早出发时间
-    latestArrivalTime?: string, //最晚到达时间
+    latestGoBackDateTime?: Date,   //返程最晚到达时间
+    earliestGoBackDateTime?: Date, //返程最早出发时间
+    earliestLeaveDateTime?: Date, //最早出发时间
+    latestArrivalDateTime?: Date, //最晚到达时间
     checkInDate?: Date,
     checkOutDate?: Date,
     businessDistrict?: string,
@@ -88,10 +82,23 @@ export default class ApiTravelBudget {
         if (!travelPolicy) {
             throw new Error(`差旅标准还未设置`);
         }
-        let {leaveDate, goBackDate, isRoundTrip, originPlace, destinationPlace, checkInDate,
-            checkOutDate, businessDistrict, earliestLeaveTime,
-            latestGoBackTime, isNeedHotel, isNeedTraffic, subsidy,
-            latestArrivalTime, earliestGoBackTime} = params;
+        let {
+            leaveDate,  //离开日期
+            goBackDate, //返回日期
+            isRoundTrip, //是否往返
+            originPlace,    //出发城市
+            destinationPlace,   //目的地
+            checkInDate,    //入住日期
+            checkOutDate,   //离开日期
+            businessDistrict,   //商圈
+            earliestLeaveDateTime,  //最早离开时间
+            latestArrivalDateTime,  //最晚到达时间
+            earliestGoBackDateTime, //最早返回日期
+            latestGoBackDateTime,   //最晚返回日期
+            isNeedHotel,    //是否需要住宿
+            isNeedTraffic,  //是否需要交通
+            subsidy,        //补助信息
+        } = params;
 
         if (!Boolean(leaveDate)) {
             throw L.ERR.LEAVE_DATE_FORMAT_ERROR();
@@ -120,9 +127,6 @@ export default class ApiTravelBudget {
         //返程需要参数
         if (isRoundTrip){
             if (!Boolean(goBackDate)) throw L.ERR.GO_BACK_DATE_FORMAT_ERROR();
-            // if (!validate.isDate(goBackDate as string)) {
-            //     goBackDate = moment(goBackDate).format(momentDateFormat);
-            // }
         }
 
         //去程参数
@@ -150,10 +154,8 @@ export default class ApiTravelBudget {
                             originPlace: originPlace,
                             destinationPlace: destinationPlace,
                             leaveDate: leaveDate,
-                            earliestLeaveTime: earliestLeaveTime,
-                            latestArrivalTime: latestArrivalTime,
-                            goBackDate: goBackDate,
-                            earliestGoBackTime: earliestGoBackTime
+                            earliestLeaveDateTime: earliestLeaveDateTime,
+                            latestArrivalDateTime: latestArrivalDateTime,
                         });
                         budget.tripType = ETripType.OUT_TRIP;
                         budgets.push(budget);
@@ -168,10 +170,8 @@ export default class ApiTravelBudget {
                             originPlace: destinationPlace,
                             destinationPlace: originPlace,
                             leaveDate: goBackDate,
-                            earliestLeaveTime: earliestGoBackTime,
-                            latestArrivalTime: latestGoBackTime,
-                            goBackDate: goBackDate,
-                            earliestGoBackTime: earliestGoBackTime
+                            earliestLeaveDateTime: earliestGoBackDateTime,
+                            latestArrivalTime: latestGoBackDateTime,
                         }
                         let budget = await ApiTravelBudget.getTrafficBudget(_params);
                         budget.tripType = ETripType.BACK_TRIP;
@@ -253,10 +253,10 @@ export default class ApiTravelBudget {
         if (!Boolean(city)) {
             throw L.ERR.CITY_NOT_EXIST();
         }
-        if (!checkInDate || !validate.isDate(checkInDate)) {
+        if (!checkInDate) {
             throw L.ERR.CHECK_IN_DATE_FORMAT_ERROR();
         }
-        if (!checkOutDate || !validate.isDate(checkOutDate)) {
+        if (!checkOutDate) {
             throw L.ERR.CHECK_OUT_DATE_FORMAT_ERROR();
         }
         checkOutDate = new Date(moment(checkOutDate).format('YYYY-MM-DD'));
@@ -347,9 +347,15 @@ export default class ApiTravelBudget {
      * @return {Promise} {price: "1000"}
      */
     @clientExport
-    static async getTrafficBudget(params: {originPlace: any, destinationPlace: any,
-        leaveDate: Date | string, goBackDate?: Date | string, earliestLeaveTime?: string, earliestGoBackTime?: string, latestArrivalTime?: string}) : Promise<TravelBudgeItem> {
-        let {originPlace, destinationPlace, leaveDate, earliestLeaveTime, latestArrivalTime} = params;
+    static async getTrafficBudget(params: {
+        originPlace: any,
+        destinationPlace: any,
+        leaveDate: Date,
+        latestArrivalDateTime?: Date,   //最晚到达时间
+        earliestLeaveDateTime?: Date,   //最早出发时间
+
+     }) : Promise<TravelBudgeItem> {
+        let {originPlace, destinationPlace, leaveDate, latestArrivalDateTime, earliestLeaveDateTime} = params;
 
         if (!destinationPlace) {
             throw new Error(JSON.stringify({code: -1, msg: "目的地城市信息不存在"}));
@@ -363,6 +369,12 @@ export default class ApiTravelBudget {
             throw {code: -1, msg: "出发时间不存在"};
         }
 
+        if (!latestArrivalDateTime) {
+            params.latestArrivalDateTime = undefined;
+        }
+        if (!earliestLeaveDateTime) {
+            params.earliestLeaveDateTime = undefined;
+        }
         //查询员工信息
         let staff = await Staff.getCurrent();
         if (!staff || !staff['travelPolicyId']) {
@@ -432,12 +444,6 @@ export default class ApiTravelBudget {
         }
 
         let preferConfig: any = staff.company.budgetConfig;
-        if (!params.earliestLeaveTime) {
-            params.earliestLeaveTime = '09:00'
-        }
-        if (!params.latestArrivalTime) {
-            params.latestArrivalTime = '21:00'
-        }
         let qs: any = {};
 
         params['expectTrainCabins'] = trainCabins;
@@ -445,14 +451,14 @@ export default class ApiTravelBudget {
 
         if (isAbroad) {   //国际
             if (preferConfig && preferConfig.abroadTraffic) {
-                let compiled = _.template(JSON.stringify(preferConfig.abroadTraffic));
+                let compiled = _.template(JSON.stringify(preferConfig.abroadTraffic), { 'imports': { 'moment': moment } });
                 qs.prefers = JSON.parse(compiled(params));
             } else {
                 qs.prefers = loadDefaultPrefer(params, 'abroadTicket');
             }
         } else {            //国内
             if (preferConfig && preferConfig.traffic) {
-                let compiled = _.template(JSON.stringify(preferConfig.traffic));
+                let compiled = _.template(JSON.stringify(preferConfig.traffic), { 'imports': { 'moment': moment } });
                 qs.prefers = JSON.parse(compiled(params));
             } else {
                 qs.prefers = loadDefaultPrefer(params, 'ticket');
