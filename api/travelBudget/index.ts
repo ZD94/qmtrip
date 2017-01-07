@@ -30,16 +30,16 @@ export interface BudgetOptions{
     originPlace: string,
     destinationPlace: string,
     isNeedHotel: boolean,
-    leaveDate: Date| string,
+    leaveDate: Date,
     isRoundTrip: boolean,
     isNeedTraffic: boolean,
-    goBackDate?: Date| string,
+    goBackDate?: Date,
     latestGoBackTime?: string,            //返程最晚到达时间
     earliestGoBackTime?: string,    //返程最早出发时间
     earliestLeaveTime?: string, //最早出发时间
     latestArrivalTime?: string, //最晚到达时间
-    checkInDate?: Date| string,
-    checkOutDate?: Date|string,
+    checkInDate?: Date,
+    checkOutDate?: Date,
     businessDistrict?: string,
     staffId?: string,
     subsidy: any,
@@ -110,26 +110,24 @@ export default class ApiTravelBudget {
             if (!Boolean(checkOutDate)) {
                 checkOutDate = goBackDate;
             }
-            if (!validate.isDate(checkInDate)) {
-                checkInDate = moment(checkInDate).format(momentDateFormat);
-            }
-            if (!validate.isDate(checkOutDate)) {
-                checkOutDate = moment(checkOutDate).format(momentDateFormat);
-            }
+            // if (!validate.isDate(checkInDate)) {
+            //     checkInDate = moment(checkInDate).format(momentDateFormat);
+            // }
+            // if (!validate.isDate(checkOutDate)) {
+            //     checkOutDate = moment(checkOutDate).format(momentDateFormat);
+            // }
         }
         //返程需要参数
         if (isRoundTrip){
             if (!Boolean(goBackDate)) throw L.ERR.GO_BACK_DATE_FORMAT_ERROR();
-            if (!validate.isDate(goBackDate as string)) {
-                goBackDate = moment(goBackDate).format(momentDateFormat);
-            }
+            // if (!validate.isDate(goBackDate as string)) {
+            //     goBackDate = moment(goBackDate).format(momentDateFormat);
+            // }
         }
 
         //去程参数
         if (isNeedTraffic && !leaveDate) {
             throw L.ERR.LEAVE_DATE_FORMAT_ERROR();
-        } else if (!validate.isDate(leaveDate as string)){
-            leaveDate = moment(leaveDate).format(momentDateFormat);
         }
 
         if (isNeedTraffic && !originPlace) {
@@ -188,8 +186,8 @@ export default class ApiTravelBudget {
                         let budget = await ApiTravelBudget.getHotelBudget({
                             city: destinationPlace,
                             businessDistrict: businessDistrict,
-                            checkInDate: checkInDate as string,
-                            checkOutDate: checkOutDate as string
+                            checkInDate: checkInDate,
+                            checkOutDate: checkOutDate
                         });
                         budget.tripType = ETripType.HOTEL;
                         budgets.push(budget);
@@ -243,13 +241,13 @@ export default class ApiTravelBudget {
      * @param {UUID} params.accountId 账号ID
      * @param {String} params.city    城市ID
      * @param {String} params.businessDistrict 商圈ID
-     * @param {String} params.checkInDate 入住时间
-     * @param {String} params.checkOutDate 离开时间
+     * @param {Date} params.checkInDate 入住时间
+     * @param {Date} params.checkOutDate 离开时间
      * @return {Promise} {prize: 1000, hotel: "酒店名称"}
      */
     @clientExport
     static async getHotelBudget(params: {city: any, businessDistrict: string,
-        checkInDate: string, checkOutDate: string}) :Promise<TravelBudgeItem> {
+        checkInDate: Date, checkOutDate: Date}) :Promise<TravelBudgeItem> {
         let {city, businessDistrict, checkInDate, checkOutDate} = params;
 
         if (!Boolean(city)) {
@@ -261,7 +259,9 @@ export default class ApiTravelBudget {
         if (!checkOutDate || !validate.isDate(checkOutDate)) {
             throw L.ERR.CHECK_OUT_DATE_FORMAT_ERROR();
         }
-        if (new Date(checkOutDate) < new Date(checkInDate)) {
+        checkOutDate = new Date(moment(checkOutDate).format('YYYY-MM-DD'));
+        checkInDate = new Date(moment(checkInDate).format('YYYY-MM-DD'));
+        if (checkOutDate < checkInDate) {
             throw {code: -1, msg: "离开日期大于入住日期"};
         }
         let days = moment(checkOutDate).diff(checkInDate, 'days');
