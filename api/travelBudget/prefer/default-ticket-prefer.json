@@ -17,8 +17,8 @@
   {
     "name": "cabin",
     "options": {
-      "expectTrainCabins": "<%=expectTrainCabins%>",
-      "expectFlightCabins": "<%=expectFlightCabins%>",
+      "expectTrainCabins": "<%=local.expectTrainCabins%>",
+      "expectFlightCabins": "<%=local.expectFlightCabins%>",
       "score": 100000
     }
   },
@@ -34,8 +34,8 @@
   {
     "name": "departStandardTimePrefer",
     "options": {
-      "end": "<%=moment(leaveDate).format('YYYY-MM-DD')%> 16:00",
-      "begin": "<%=moment(leaveDate).format('YYYY-MM-DD')%> 8:00",
+      "end": "<%=moment(local.leaveDate).format('YYYY-MM-DD')%> 16:00",
+      "begin": "<%=moment(local.leaveDate).format('YYYY-MM-DD')%> 8:00",
       "score": 500,
       "scoreInterval": -3
     }
@@ -43,8 +43,8 @@
   {
     "name": "arriveStandardTimePrefer",
     "options": {
-      "end": "<%=moment(leaveDate).format('YYYY-MM-DD')%> 19:00",
-      "begin": "<%=moment(leaveDate).format('YYYY-MM-DD')%> 9:00",
+      "end": "<%=moment(local.leaveDate).format('YYYY-MM-DD')%> 19:00",
+      "begin": "<%=moment(local.leaveDate).format('YYYY-MM-DD')%> 9:00",
       "score": 500,
       "scoreInterval": -3
     }
@@ -60,14 +60,14 @@
     "name": "earliestGoBackTimePrefer",
     "options": {
       "score": 100000,
-      "earliestGoBackTime": "<%=earliestLeaveDateTime%>"
+      "earliestGoBackTime": "<%=local.earliestLeaveDateTime%>"
     }
   },
   {
     "name": "latestArrivalTimePrefer",
     "options": {
       "score": 100000,
-      "latestArrivalTime": "<%=latestArrivalDateTime%>"
+      "latestArrivalTime": "<%=local.latestArrivalDateTime%>"
     }
   },
   {
