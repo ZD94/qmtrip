@@ -439,6 +439,9 @@ export var condition = {
                 let user = await AgencyUser.getCurrent();
                 let company = await tripPlan.getCompany();
                 let agency = await company.getAgency();
+                if(!agency){
+                    return true;
+                }
                 return agency.id == user.agency.id;
             }else {
                 throw L.ERR.PERMISSION_DENY();

@@ -36,7 +36,7 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
     $scope.staffSelector = {
         query: async function(keyword) {
             let staff = await Staff.getCurrent();
-            let staffs = await staff.company.getStaffs();
+            let staffs = await staff.company.getStaffs({where: {name: {$ilike: `%${keyword}%`}}})
             return staffs;
         },
         display: (staff)=>staff.name

@@ -359,7 +359,7 @@ export async function selectModeController ($scope){
         query: async function(keyword) {
             let staff = await Staff.getCurrent();
             //let approveStaffId = $scope.tripApprove.account.id;
-            let staffs = await staff.company.getStaffs();
+            let staffs = await staff.company.getStaffs({where: {name: {$ilike: `%${keyword}%`}}});
             return staffs;
         },
         display: (staff)=>staff.name

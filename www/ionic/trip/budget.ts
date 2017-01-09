@@ -51,7 +51,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
             budget.discount = '全价';
         }
         if (budget.tripType == ETripType.HOTEL) {
-            budget.duringDays = moment(trip.endDate).diff(moment(trip.beginDate), 'days');
+            budget.duringDays = moment(trip.endDate).diff(moment(trip.beginDate), 'days') || 1;
         }
         if (budget.tripType == ETripType.SUBSIDY) {
             let days = moment(trip.endDate).diff(moment(trip.beginDate), 'days')
