@@ -8,6 +8,8 @@ import _ = require('lodash');
 export async function selectCityListController($scope, $storage, $ionicScrollDelegate){
     require("./dialog.scss");
     $scope.searchBegin = false;
+    $scope.abroadCities = [];//所有国际城市数据
+    $scope.internalCities = [];//所有国内城市数据
     let history = await $storage.local.get('history_city');
     $scope.keyList = await $scope.options.queryAll();
     $scope.hotCities = $scope.keyList.slice(0,10);
@@ -17,7 +19,6 @@ export async function selectCityListController($scope, $storage, $ionicScrollDel
         $scope.history_city = [];
     }
     $scope.isAbroad = false;
-    $scope.abroadlist = [];
     let abroadIdx = 0;
     let internalIdx = 0;
     $scope.checkAbroad = async function(abroad){
