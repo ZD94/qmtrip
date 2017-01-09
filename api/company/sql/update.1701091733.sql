@@ -1,0 +1,1 @@
+update company.companies set budget_config = (regexp_replace(budget_config::text, '<%=(\w+)%>', '<%=local.\1%>', 'g'))::jsonb returning *;
