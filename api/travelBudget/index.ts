@@ -326,7 +326,7 @@ export default class ApiTravelBudget {
             let compiled = _.template(JSON.stringify(budgetConfig.hotel));
             qs.prefers = JSON.parse(compiled(query));
         } else {
-            qs.prefers = loadDefaultPrefer(query, 'hotel');
+            qs.prefers = loadDefaultPrefer({local: query}, 'hotel');
         }
         qs.query = query;
         let hotels = await API.hotel.search_hotels(query);
@@ -452,30 +452,22 @@ export default class ApiTravelBudget {
         if (isAbroad) {   //国际
             if (preferConfig && preferConfig.abroadTraffic) {
                 let compiled = _.template(JSON.stringify(preferConfig.abroadTraffic), { 'imports': { 'moment': moment } });
-                qs.prefers = JSON.parse(compiled(params));
+                qs.prefers = JSON.parse(compiled({local: params}));
             } else {
-                qs.prefers = loadDefaultPrefer(params, 'abroadTicket');
+                qs.prefers = loadDefaultPrefer({local: params}, 'abroadTicket');
             }
         } else {            //国内
             if (preferConfig && preferConfig.traffic) {
                 let compiled = _.template(JSON.stringify(preferConfig.traffic), { 'imports': { 'moment': moment } });
-                qs.prefers = JSON.parse(compiled(params));
+                qs.prefers = JSON.parse(compiled({local: params}));
             } else {
-                qs.prefers = loadDefaultPrefer(params, 'ticket');
+                qs.prefers = loadDefaultPrefer({local: params}, 'ticket');
             }
         }
 
         if (!qs.prefers) {
             qs.prefers = [];
         }
-
-        // qs.prefers = qs.prefers.map( (p) => {
-        //     if (p.name == 'cabin') {
-        //         p.options['expectTrainCabins'] = trainCabins || [];
-        //         p.options['expectFlightCabins'] = cabins || [];
-        //     }
-        //     return p;
-        // });
 
         qs.query = params;
         qs.query.originPlace = m_originCity;

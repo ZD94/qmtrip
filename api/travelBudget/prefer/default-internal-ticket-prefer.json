@@ -15,14 +15,14 @@
     "name": "earliestGoBackTimePrefer",
     "options": {
       "score": 100000,
-      "earliestGoBackTime": "<%=goBackDate%> <%=earliestGoBackTime%>"
+      "earliestGoBackTime": "<%=local.goBackDate%> <%=local.earliestGoBackTime%>"
     }
   },
   {
     "name": "latestArrivalTimePrefer",
     "options": {
       "score": 100000,
-      "latestArrivalTime": "<%=leaveDate%> <%=latestArrivalTime%>"
+      "latestArrivalTime": "<%=local.leaveDate%> <%=local.latestArrivalTime%>"
     }
   }
 ]

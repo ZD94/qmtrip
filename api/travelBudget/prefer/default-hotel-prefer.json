@@ -14,7 +14,7 @@
   {
     "name":"starMatch",
     "options": {
-      "expectStar": "<%=star%>",
+      "expectStar": "<%=local.star%>",
       "score": 10000
     }
   },

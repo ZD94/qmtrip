@@ -31,7 +31,7 @@ export abstract class AbstractPrefer<T> implements IPrefer<T> {
     }
 }
 
-export function loadDefaultPrefer(qs: any, type?: string) {
+export function loadDefaultPrefer(qs: {local: any}, type?: string) {
     let defaultPrefer;
     switch(type) {
         case 'hotel':
