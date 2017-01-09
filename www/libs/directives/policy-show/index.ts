@@ -20,7 +20,7 @@ angular
             replace: true,
             scope:{
                 title: '<policyTitle',
-                staffId: '<staffId'
+                staffId: '=staffId'
             },
             controller: async function($scope, Models, ngModalDlg, $ionicPopup){
                 if(!$scope.title){
