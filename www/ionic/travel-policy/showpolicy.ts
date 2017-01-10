@@ -34,26 +34,27 @@ export async function ShowpolicyController($scope, Models, $stateParams, $ionicH
                         type: 'button-positive',
                         onTap: async function () {
                             try{
+                                if($scope.travelPolicy.isDefault){
+                                    throw {code: -2, msg: '不允许删除默认差旅标准'};
+                                }
                                 var result = await $scope.travelPolicy.getStaffs();
                                 if(result && result.length > 0){//why后端delete方法throw出来的异常捕获不了
-                                    throw {code: -1, msg: '还有'+ result.length +'位员工在使用该标准'};
+                                    throw {code: -1, msg: '还有员工在使用该标准，请先移除'};
                                 }
                                 await $scope.travelPolicy.destroy();
                                 $ionicHistory.goBack(-1);
                             }catch(err){
-                                if(err.code == -1){
-                                    deleteFailed();
-                                }
+                                deleteFailed(err.msg);
                             }
                         }
                     }
                 ]
             });
 
-            function deleteFailed(){
+            function deleteFailed(msg){
                 $ionicPopup.show({
                     title:'删除失败',
-                    template:'还有员工在使用该标准，请先移除',
+                    template:msg,
                     scope: $scope,
                     buttons:[
                         {
