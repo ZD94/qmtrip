@@ -27,6 +27,7 @@ import {CoinAccount} from "api/_types/coin";
 
 const supplierCols = Supplier['$fieldnames'];
 
+const DEFAULT_EXPIRE_MONTH = 1;
 class CompanyModule {
     /**
      * 创建企业
@@ -95,7 +96,7 @@ class CompanyModule {
         let staff = Staff.create({email: params.email, name: params.userName, mobile: params.mobile, roleId: EStaffRole.OWNER, pwd: md5(pwd), status: params.status, isValidateMobile: params.isValidateMobile});
         let company = Company.create(params);
         company.domainName = domain;
-        company.expiryDate = moment().add(3, 'months').toDate();
+        company.expiryDate = moment().add(DEFAULT_EXPIRE_MONTH, 'months').toDate();
         company.isApproveOpen = true;
         company.points2coinRate = 50;
         let department = Department.create({name: "我的企业", isDefault: true});
