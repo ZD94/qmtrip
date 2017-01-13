@@ -3,6 +3,7 @@ import { Staff } from 'api/_types/staff/staff';
 var msgbox = require('msgbox');
 
 export async function IndexController($scope, Models, $ionicPopup, $ionicListDelegate) {
+    require('./department.scss');
     $scope.showDelete = false;
     var staff = await Staff.getCurrent();
     async function loadDepartment(){
