@@ -1,15 +1,56 @@
-<ion-view title="部门管理" id="page29">
-    <ion-content padding="true" class="has-header">
-        <ion-list show-delete="showDelete">
-            <ion-item ng-repeat="department in departments">
-                <ion-delete-button class="ion-minus-circled" ng-click="deleteDept(department, $index)"> </ion-delete-button>
-                {{department.department.name}}
-                <span class="item-note">{{department.staffnum}}人</span>
-                <ion-option-button class="button-calm" ng-click="editDept(department.department)"> 修改 </ion-option-button>
-                <!--<span class="item-note" ng-click="deleteDept(department.department, $index)">X</span>span-->
-            </ion-item>
-        </ion-list>
-        <button id="page29-button87" class="button button-positive  button-block" ng-click="newdepart()">增加部门</button>
-        <button id="page29-button88" class="button button-stable  button-block" ng-click="showDelete = !showDelete;showReorder = false">管理</button>
+<ion-view title="部门管理" class="department">
+    <div class="bar bar-subheader">
+        <div class="flex-subheader">
+            <label class="item item-input">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input type="text" placeholder="Search">
+            </label>
+            <span class="fa fa-sort-amount-desc">时间</span>
+            <span class="ion-android-person-add"></span>
+        </div>
+    </div>
+    <ion-content padding="true" class="has-header has-subheader">
+        <div class="list">
+            <div class="item department-list item-icon-right">
+                <div class="department-icon"><i class="icon ion-ios-folder"></i></div>
+                技术部
+                <i class="icon ion-chevron-right"></i>
+            </div>
+        </div>
+        <div class="list">
+            <div class="item staff-list">
+                <div class="staff-avatar-text">呼吁</div>
+                <span class="staff-role">管理员</span>
+                陈浩（员工级）
+                <span class="staff-flag">先加入</span>
+            </div>
+            <div class="item staff-list">
+                <img class="staff-avatar-img" src="ionic/images/logo.png">
+            </div>
+        </div>
+
+        <!--<ion-list show-delete="showDelete">-->
+            <!--<ion-item ng-repeat="department in departments">-->
+                <!--<ion-delete-button class="ion-minus-circled" ng-click="deleteDept(department, $index)"> </ion-delete-button>-->
+                <!--{{department.department.name}}-->
+                <!--<span class="item-note">{{department.staffnum}}人</span>-->
+                <!--<ion-option-button class="button-calm" ng-click="editDept(department.department)"> 修改 </ion-option-button>-->
+                <!--&lt;!&ndash;<span class="item-note" ng-click="deleteDept(department.department, $index)">X</span>span&ndash;&gt;-->
+            <!--</ion-item>-->
+        <!--</ion-list>-->
+        <!--<button id="page29-button87" class="button button-positive  button-block" ng-click="newdepart()">增加部门</button>-->
+        <!--<button id="page29-button88" class="button button-stable  button-block" ng-click="showDelete = !showDelete;showReorder = false">管理</button>-->
+
     </ion-content>
+    <div class="tabs">
+        <a class="tab-item">
+            添加子部门
+        </a>
+        <a class="tab-item">
+            部门管理
+        </a>
+        <a class="tab-item">
+            批量移动
+        </a>
+    </div>
 </ion-view>
