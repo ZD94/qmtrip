@@ -93,6 +93,11 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     $scope.saveTripPlan = async function() {
         let trip = $scope.trip;
 
+        if (totalPrice <= 0) {
+            $scope.showErrorMsg('当前条件下暂无预算!');
+            return false;
+        }
+
         if(!trip.auditUser) {
             $scope.showErrorMsg('请选择审核人！');
             return false;
