@@ -8,8 +8,12 @@
             <i class="fa fa-flag-o"></i>&nbsp;{{tripApprove.title}}</p>
         <p class="totalBudget" style="text-align: center">
             <span>总预算&nbsp;</span>
-            <span>{{(!tripApprove.budget || tripApprove.budget <= 0) ? '暂无预算' : (tripApprove.budget || 0 | currency_int)}}</span>
-            {{tripApprove.budget && tripApprove.budget == -1 ? '' : '元'}}
+            <span ng-if="!tripApprove.budget || tripApprove.budget <= 0">
+                暂无预算
+            </span>
+            <span ng-if="tripApprove.budget && tripApprove.budget > 0">
+                {{tripApprove.budget | currency_int}}元
+            </span>
         </p>
     </ion-item>
 </ion-list>
