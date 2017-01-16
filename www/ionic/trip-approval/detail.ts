@@ -162,6 +162,8 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
                         type:'button-positive'
                     }]
                 })
+            }else if(result == EApproveResult.REJECT) {
+                $scope.tripApprove = await Models.tripApprove.get(approveId);
             }
         }catch (e) {
             alert(e);
