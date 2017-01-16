@@ -130,7 +130,7 @@ export class Staff extends ModelObject implements Account {
     get coinAccount(): CoinAccount {return null};
     set coinAccount(coinAccount: CoinAccount) {}*/
 
-    async getDepartments(): promise<Department[]>{
+    async getDepartments(): Promise<Department[]>{
         let departmentStaffs = await Models.staffDepartment.find({where: {staffId: this.id}, order: [['createdAt', 'desc']]});
         let ids = [];
         departmentStaffs.forEach(function(t){
