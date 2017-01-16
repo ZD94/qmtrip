@@ -365,6 +365,15 @@ export class Company extends ModelObject{
             return null;
         }
     }
+    
+    async getRootDepartment(companyId?:string): Promise<Department> {
+        var depts = await Models.department.find({where: {companyId: this.id, parentId: null}});
+        if(depts && depts.length>0){
+            return depts[0];
+        }else{
+            return null;
+        }
+    }
 
     getTripPlans(options?: any): Promise<PaginateInterface<TripPlan> > {
         if(!options) {options = {where: {}}};

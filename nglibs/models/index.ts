@@ -11,7 +11,7 @@ import { ngService } from '../index';
 import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from 'api/_types/staff';
 import { Company, MoneyChange, Supplier } from 'api/_types/company';
 import { PromoCode } from 'api/_types/promoCode';
-import { Department } from 'api/_types/department';
+import { Department, StaffDepartment } from 'api/_types/department';
 import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
 import { AccordHotel } from 'api/_types/accordHotel';
 import { Notice, NoticeAccount } from 'api/_types/notice';
@@ -73,6 +73,9 @@ var Services = {
     },
     department: { type: Department, modname: 'department',
         funcs: ['getDepartment', 'getDepartments', 'createDepartment', 'updateDepartment', 'deleteDepartment']
+    },
+    staffDepartment: { type: StaffDepartment, modname: 'department',
+        funcs: ['getStaffDepartment', 'getStaffDepartments', 'createStaffDepartment', 'updateStaffDepartment', 'deleteStaffDepartment']
     },
     travelPolicy: { type: TravelPolicy, modname: 'travelPolicy',
         funcs: ['getTravelPolicy', 'getTravelPolicies', 'createTravelPolicy', 'updateTravelPolicy', 'deleteTravelPolicy']
@@ -168,6 +171,7 @@ class ClientModels implements ModelsInterface {
     supplier: ModelInterface<Supplier>;
     promoCode: ModelInterface<PromoCode>;
     department: ModelInterface<Department>;
+    staffDepartment: ModelInterface<StaffDepartment>;
     travelPolicy: ModelInterface<TravelPolicy>;
     subsidyTemplate: ModelInterface<SubsidyTemplate>;
     accordHotel: ModelInterface<AccordHotel>;
@@ -211,6 +215,7 @@ class ClientModels implements ModelsInterface {
         this.company = createService<Company>(Services.company, $cacheFactory);
         this.promoCode = createService<PromoCode>(Services.promoCode, $cacheFactory);
         this.department = createService<Department>(Services.department, $cacheFactory);
+        this.staffDepartment = createService<StaffDepartment>(Services.staffDepartment, $cacheFactory);
         this.travelPolicy = createService<TravelPolicy>(Services.travelPolicy, $cacheFactory);
         this.subsidyTemplate = createService<SubsidyTemplate>(Services.subsidyTemplate, $cacheFactory);
         this.accordHotel = createService<AccordHotel>(Services.accordHotel, $cacheFactory);

@@ -3,26 +3,26 @@
         <div class="flex-subheader">
             <label class="item item-input">
                 <i class="icon ion-search placeholder-icon"></i>
-                <input type="text" placeholder="Search">
             </label>
             <span class="fa fa-sort-amount-desc">时间</span>
             <span class="ion-android-person-add"></span>
         </div>
     </div>
+    <input type="text" placeholder="Search">
     <ion-content padding="true" class="has-header has-subheader">
         <div class="list">
-            <div class="item department-list item-icon-right">
+            <div class="item department-list item-icon-right" ng-repeat="item in departments" ng-click="goChildDept(item.id)">
                 <div class="department-icon"><i class="icon ion-ios-folder"></i></div>
-                技术部
+                {{item.name}}({{item.staffNum}}人)
                 <i class="icon ion-chevron-right"></i>
             </div>
         </div>
-        <div class="list">
+        <div class="list"  ng-repeat="item in staffs">
             <div class="item staff-list">
-                <div class="staff-avatar-text">呼吁</div>
-                <span class="staff-role">管理员</span>
-                陈浩（员工级）
-                <span class="staff-flag">先加入</span>
+                <div class="staff-avatar-text">{{item.name}}</div>
+                <span class="staff-role">{{EStaffRoleNames[item.roleId] }}</span>
+                {{item.name}}（{{item.travelPolicy.name}}）
+                <span class="staff-flag">{{item.status == 0 ? '未激活' : ''}}先加入</span>
             </div>
             <div class="item staff-list">
                 <img class="staff-avatar-img" src="ionic/images/logo.png">

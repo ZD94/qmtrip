@@ -16,6 +16,7 @@ import {SupplierOrder} from 'libs/suppliers/interface';
 import {SupplierGetter} from 'libs/suppliers';
 import L from 'common/language';
 import {ESendType} from "../notice/notice";
+import promise = require("../../../common/test/api/promise/index");
 
 declare var API: any;
 
@@ -123,13 +124,21 @@ export class Staff extends ModelObject implements Account {
     getTravelPolicy(id?:string): Promise<TravelPolicy> {
         return Models.travelPolicy.get(id);
     }
+    setTravelPolicy(val: TravelPolicy) {}
 
     /*@ResolveRef({ type: Types.UUID}, Models.coinAccount)
     get coinAccount(): CoinAccount {return null};
     set coinAccount(coinAccount: CoinAccount) {}*/
 
-    setTravelPolicy(val: TravelPolicy) {}
-
+    async getDepartments(): promise<Department[]>{
+        let departmentStaffs = await Models.staffDepartment.find({where: {staffId: this.id}, order: [['createdAt', 'desc']]});
+        let ids = [];
+        departmentStaffs.forEach(function(t){
+            ids.push(t.departmentId);
+        })
+        let departments = await Models.department.find({where : {id: {$in: ids}, companyId: this.company.id}, order: [['createdAt', 'desc']]});
+        return departments;
+    }
 
     async getSelfNotices(options?: any): Promise<any> {
         var self = this;

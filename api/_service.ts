@@ -3,7 +3,7 @@ import { initModels } from 'api/_types';
 
 import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from 'api/_types/staff';
 import { Company, MoneyChange, Supplier } from 'api/_types/company';
-import { Department } from 'api/_types/department';
+import { Department, StaffDepartment } from 'api/_types/department';
 import { PromoCode } from 'api/_types/promoCode';
 import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
 import { AccordHotel } from 'api/_types/accordHotel';
@@ -32,6 +32,7 @@ initModels({
     supplier: createServerService<Supplier>(Supplier),
     promoCode: createServerService<PromoCode>(PromoCode),
     department: createServerService<Department>(Department),
+    staffDepartment: createServerService<StaffDepartment>(StaffDepartment),
     travelPolicy: createServerService<TravelPolicy>(TravelPolicy),
     subsidyTemplate: createServerService<SubsidyTemplate>(SubsidyTemplate),
     accordHotel: createServerService<AccordHotel>(AccordHotel),

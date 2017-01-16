@@ -7,7 +7,7 @@ var sequelize = require("common/model").DB;
 let DBM = sequelize.models;
 let API = require("common/api");
 import L from 'common/language';
-import {Department} from "api/_types/department";
+import {Department, StaffDepartment} from "api/_types/department";
 import {requireParams, clientExport} from 'common/api/helper';
 import { Models } from '../_types/index';
 import { FindResult, PaginateInterface } from "common/model/interface";
@@ -15,6 +15,7 @@ import {Staff, EStaffStatus} from "api/_types/staff";
 import {conditionDecorator, condition} from "../_decorator";
 
 const departmentCols = Department['$fieldnames'];
+const staffDepartmentCols = StaffDepartment['$fieldnames'];
 class DepartmentModule{
     /**
      * 创建部门
@@ -396,6 +397,91 @@ class DepartmentModule{
                 return finalResult;
             })
     }
+
+    /****************************************StaffDepartment begin************************************************/
+
+    /**
+     * 创建员工部门记录
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    static async createStaffDepartment (params) : Promise<StaffDepartment>{
+        var staffDepartment = StaffDepartment.create(params);
+        var already = await Models.staffDepartment.find({where: {departmentId: params.departmentId, staffId: params.staffId}});
+        if(already && already.length>0){
+            return already[0];
+        }
+        var result = await staffDepartment.save();
+        return result;
+    }
+
+
+    /**
+     * 删除员工部门记录
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    static async deleteStaffDepartment(params) : Promise<any>{
+        var id = params.id;
+        var ah_delete = await Models.staffDepartment.get(id);
+
+        await ah_delete.destroy();
+        return true;
+    }
+
+
+    /**
+     * 更新员工部门记录
+     * @param id
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"], staffDepartmentCols)
+    static async updateStaffDepartment(params) : Promise<StaffDepartment>{
+        var id = params.id;
+
+        var ah = await Models.staffDepartment.get(id);
+        for(var key in params){
+            ah[key] = params[key];
+        }
+        return ah.save();
+    }
+
+    /**
+     * 根据id查询员工部门记录
+     * @param {String} params.id
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    static async getStaffDepartment(params: {id: string}) : Promise<StaffDepartment>{
+        let id = params.id;
+        var ah = await Models.staffDepartment.get(id);
+
+        return ah;
+    };
+
+
+    /**
+     * 根据属性查找员工部门记录
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    static async getStaffDepartments(params): Promise<FindResult>{
+        var staff = await Staff.getCurrent();
+        let paginate = await Models.staffDepartment.find(params);
+        let ids =  paginate.map(function(t){
+            return t.id;
+        })
+        return {ids: ids, count: paginate['total']};
+    }
+
+    /****************************************StaffDepartment end************************************************/
 }
 
 export = DepartmentModule;
