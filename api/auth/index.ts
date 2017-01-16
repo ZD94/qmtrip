@@ -12,6 +12,7 @@ import cache = require("common/cache");
 import * as authentication from './authentication';
 import * as wechat from './wechat';
 import * as messagePush from './messagePush';
+import * as qrcode from './qrcode';
 import * as byTest from './by-test';
 import {conditionDecorator, condition} from "../_decorator";
 
@@ -952,6 +953,7 @@ export default class ApiAuth {
 
     static __initHttpApp(app: any) {
         wechat.__initHttpApp(app);
+        qrcode.__initHttp(app);
     }
 
 
@@ -987,8 +989,12 @@ export default class ApiAuth {
     @requireParams(["accountId"])
     static getJpushIdByAccount = messagePush.getJpushIdByAccount;
 
+    @clientExport
+    @requireParams(["backUrl"])
+    static getQRCodeUrl = qrcode.getQRCodeUrl;
 
     static removeByTest = byTest.removeByTest;
+
 }
 
 async function _sendActiveEmail(accountId) {

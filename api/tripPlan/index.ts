@@ -803,7 +803,7 @@ class TripPlanModule {
             selectKey = type == 'S' ? 'account_id' : 'project_id';
             modelName = type == 'S' ? 'staff' : 'project';
             if(params.keyWord) {
-                let objs = await Models[modelName].find({where: {name: {$like: `%${params.keyWord}%`}}});
+                let objs = await Models[modelName].find({where: {name: {$like: `%${params.keyWord}%`}, companyId: company.id}, limit: 100000});
                 let selectStr = '';
                 objs.map((s) => {
                     if(s && s.id) {
@@ -833,7 +833,7 @@ class TripPlanModule {
             planSql = `${completeSql} and p.status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE})`;
             completeSql += ` and p.status=${EPlanStatus.COMPLETE}`;
             if(params.keyWord) {
-                let depts = await Models.department.find({where: {name: {$like: `%${params.keyWord}%`}}});
+                let depts = await Models.department.find({where: {name: {$like: `%${params.keyWord}%`}, companyId: company.id}, limit: 100000});
                 let deptStr = '';
                 depts.map((s) => {
                     if(s && s.id) {

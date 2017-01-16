@@ -15,7 +15,12 @@
                             </i>&nbsp;{{trip.reason || trip.reasonName}}</p>
                         <p class="totalBudget"  style="text-align: center">
                             <span>总预算</span>
-                            <span>{{totalPrice == -1 ? '暂无预算' : (totalPrice| currency_int)}}</span>{{totalPrice == -1 ? '' : '元'}}
+                            <span ng-if="totalPrice && totalPrice > 0">
+                                {{totalPrice| currency_int}}
+                            </span>
+                            <span ng-if="!totalPrice || totalPrice <= 0">
+                                暂无预算
+                            </span>
                         </p>
                     </ion-item>
                 </ion-list>
@@ -35,7 +40,7 @@
                         <ion-item>
                             <div ng-if="budget.tripType == ETripType.BACK_TRIP">
                                 <span>{{trip.endDate | date: 'MM-dd'}}</span>
-                                <span class="spanRight">{{budget.price == -1 ? '暂无预算' : (budget.price| currency_int)+'元'}}</span>
+                                <span class="spanRight">{{budget.price <=0 ? '暂无预算' : (budget.price| currency_int)+'元'}}</span>
                                 <br/>
                                 {{trip.destinationPlaceName}}
                                 &nbsp;
@@ -52,22 +57,42 @@
 
                             <div ng-if="budget.tripType == ETripType.HOTEL">
                                 <span>{{trip.beginDate | date: 'MM-dd'}}至{{trip.endDate | date: 'MM-dd'}}(共{{budget.duringDays}}天)</span>
-                                <span class="spanRight">{{budget.price| currency_int}}元</span>
+                                <span class="spanRight">
+                                    <span ng-if="budget.price && budget.price > 0">
+                                        {{budget.price| currency_int}}元
+                                    </span>
+                                    <span ng-if="!budget.price || budget.price <=0">
+                                        暂无预算
+                                    </span>
+                                </span>
                                 <br/>
                                 {{trip.destinationPlaceName}}<span ng-if="trip.hotelName">&nbsp;{{trip.hotelName}}附近</span>
-                                <span class="spanRight right-budget">{{budget.price == -1 ? '暂无预算' : (budget.price /budget.duringDays| currency_int)+'元/天'}}</span>
+                                <span class="spanRight right-budget">
+                                    <span ng-if="budget.price && budget.price >0">
+                                        {{(budget.price /budget.duringDays| currency_int)+'元/天'}}
+                                    </span>
+                                </span>
                             </div>
 
                             <div ng-if="budget.tripType == ETripType.SUBSIDY">
                                 <span>{{trip.beginDate | date: 'MM-dd'}}至{{trip.endDate | date: 'MM-dd'}}(共{{budget.duringDays}}天)</span>
-                                <span class="spanRight">{{budget.price| currency_int}}元</span>
+                                <span class="spanRight">
+                                    {{budget.price| currency_int}}元
+                                </span>
                                 <br/>
-                                <span class="spanRight right-budget">{{budget.price == -1 ? '暂无预算' : (budget.price/ budget.duringDays| currency_int)+'元/天'}}</span>
+                                <span class="spanRight right-budget">{{budget.price <=0 ? '暂无预算' : (budget.price/ budget.duringDays| currency_int)+'元/天'}}</span>
                             </div>
 
                             <div ng-if="budget.tripType == ETripType.OUT_TRIP">
                                 <span>{{trip.beginDate | date: 'MM-dd'}}</span>
-                                <span class="spanRight">{{budget.price == -1 ? '暂无预算' : (budget.price| currency_int)+'元'}}</span>
+                                <span class="spanRight">
+                                    <span ng-if="budget.price && budget.price > 0">
+                                        {{(budget.price| currency_int)+'元'}}
+                                    </span>
+                                    <span ng-if="!budget.price || budget.price <= 0">
+                                        暂无预算
+                                    </span>
+                                </span>
                                 <br/>
                                 {{trip.originPlaceName}}
                                 &nbsp;
@@ -109,8 +134,13 @@
                             <i class="icon ion-arrow-up-b"></i>
                         </div>
                     </form>
-                    <button class="button" ng-class="{true: 'hasAuditUser',false: ''}[bottomBottomClicked]" ng-click="submitApprove()">
-                        提交审批</button>
+                    <button ng-if="!totalPrice || totalPrice <= 0">提交审批</button>
+                    <button ng-if="totalPrice > 0"
+                            class="button"
+                            ng-class="{true: 'hasAuditUser',false: ''}[bottomBottomClicked]"
+                            ng-click="submitApprove()">
+                            提交审批
+                    </button>
                 </bottom-bar>
             </div>
         </div>

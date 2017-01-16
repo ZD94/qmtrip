@@ -324,7 +324,7 @@ export default class ApiTravelBudget {
         let budgetConfig = staff.company.budgetConfig;
         if (budgetConfig && budgetConfig.hotel) {
             let compiled = _.template(JSON.stringify(budgetConfig.hotel));
-            qs.prefers = JSON.parse(compiled(query));
+            qs.prefers = JSON.parse(compiled({local: query}));
         } else {
             qs.prefers = loadDefaultPrefer({local: query}, 'hotel');
         }
