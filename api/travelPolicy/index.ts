@@ -69,13 +69,18 @@ class TravelPolicyModule{
         var staff = await Staff.getCurrent();
         var id = params.id;
 
+
+
+        var tp_delete = await Models.travelPolicy.get(id);
+
+        if(tp_delete.isDefault){
+            throw {code: -2, msg: '不允许删除默认差旅标准'};
+        }
+
         let staffs = await Models.staff.find({where: {travelPolicyId: id, staffStatus: EStaffStatus.ON_JOB}});
         if(staffs && staffs.length > 0){
             throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准请先移除'};
         }
-
-
-        var tp_delete = await Models.travelPolicy.get(id);
 
         if(staff && tp_delete["companyId"] != staff["companyId"]){
             throw L.ERR.PERMISSION_DENY();
