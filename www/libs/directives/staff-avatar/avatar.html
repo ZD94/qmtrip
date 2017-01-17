@@ -1,8 +1,4 @@
 <div class="text-avatar" ng-class="textClass" ng-style="{background: staff.avatarColor || '#2495da'}" ng-if="!staff.avatar">
     {{staff.name | shortName}}
 </div>
-<div class="img-avatar" ng-class="imgClass" ng-if="staff.avatar">
-    <img ng-src="{{getImageUrl(staff.avatar)}}">
-</div>
-<span class="staff-role" style="background: #28a7e1;" ng-if="showRole && staff.roleId == EStaffRole.ADMIN">{{EStaffRoleNames[EStaffRole.ADMIN]}}</span>
-<span class="staff-role" style="background: #F5A623;" ng-if="showRole && staff.roleId == EStaffRole.OWNER">{{EStaffRoleNames[EStaffRole.OWNER]}}</span>
+<img class="img-avatar" ng-class="imgClass" ng-if="staff.avatar" ng-src="{{getImageUrl(staff.avatar)}}">

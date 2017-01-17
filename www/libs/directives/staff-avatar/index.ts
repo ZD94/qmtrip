@@ -4,6 +4,7 @@
 "use strict";
 import angular = require('angular');
 import {EStaffRole, EStaffRoleNames} from "api/_types/staff/staff";
+import * as path from 'path';
 
 angular
     .module('nglibs')
@@ -21,6 +22,15 @@ angular
                 require('./avatar.scss');
                 $scope.EStaffRole = EStaffRole;
                 $scope.EStaffRoleNames = EStaffRoleNames;
+                var config = require('config');
+
+                $scope.getImageUrl = function getImageUrl(id){
+                    if(typeof id !== 'string' || typeof config.update !== 'string')
+                        return null;
+                    let base = new URL(config.update, location.href);
+                    let url = new URL(path.join('attachments', id), base.href);
+                    return url.href;
+                }
             }
         }
     })
