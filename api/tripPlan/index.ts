@@ -1322,12 +1322,13 @@ class TripPlanModule {
             `校验地址: ${config.host}#/finance/trip-detail?id=${tripPlan.id}&code=${financeCheckCode.code}`
         ]
 
-        let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')})
+        let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')});
+        let departmentsStr = await staff.getDepartmentsStr();
 
 
         var data = {
             "submitter": staff.name,  //提交人
-            "department": staff.department.name,  //部门
+            "department": departmentsStr,  //部门
             "budgetMoney": tripPlan.budget || 0, //预算总金额
             "totalMoney": _personalExpenditure || 0,  //实际花费
             "totalMoneyHZ": money2hanzi.toHanzi(_personalExpenditure),  //汉字大写金额

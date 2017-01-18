@@ -24,7 +24,7 @@ import {Approve} from "./approve/index";
 
 export enum EGender {
     MALE = 1,
-    FEMALE
+    FEMALE = 2
 };
 
 export enum EAccountType {

@@ -27,6 +27,7 @@ import {clientExport} from "../../common/api/helper";
 import {TravelPolicy, EPlaneLevel, ETrainLevel, EHotelLevel} from "../_types/travelPolicy";
 import {get_msg} from "./lib/msg-template/index";
 import {md5} from "../../common/utils";
+import {StaffDepartment} from "../_types/department/staffDepartment";
 
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 
@@ -196,9 +197,12 @@ let ddTalkMsgHandle = {
                             }
                         }
 
-                        let _staff = Models.staff.create({name: u.name, travelPolicyId: travelPolicy.id})
+                        let _staff = Models.staff.create({name: u.name, travelPolicyId: travelPolicy.id});
                         _staff.company = company;
-                        _staff.department = _d;
+                        // _staff.department = _d;
+                        let staffDepartment = StaffDepartment.create({staffId: _staff.id, departmentId: _d.id});
+                        await staffDepartment.save();
+
                         _staff.pwd = md5(DEFAULT_PWD);
                         _staff = await _staff.save();
                         // console.info(`导入user:`, u.name);
