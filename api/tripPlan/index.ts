@@ -1040,7 +1040,7 @@ class TripPlanModule {
             username: account.name,
             planNo: tripPlan.planNo,
             approveTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-            approveUser: account.name,
+            approveUser: approveUser.name,
             projectName: tripPlan.title,
             goTrafficBudget: go,
             backTrafficBudget: back,
