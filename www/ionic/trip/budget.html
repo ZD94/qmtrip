@@ -134,7 +134,7 @@
                             <i class="icon ion-arrow-up-b"></i>
                         </div>
                     </form>
-                    <button ng-if="!totalPrice || totalPrice <= 0">提交审批</button>
+                    <button class="button" ng-if="!totalPrice || totalPrice <= 0">提交审批</button>
                     <button ng-if="totalPrice > 0"
                             class="button"
                             ng-class="{true: 'hasAuditUser',false: ''}[bottomBottomClicked]"

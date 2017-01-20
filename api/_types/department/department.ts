@@ -1,5 +1,5 @@
 import {Models} from 'api/_types';
-import {Staff} from 'api/_types/staff';
+import {Staff, EStaffStatus} from 'api/_types/staff';
 import { Company } from 'api/_types/company';
 import {Table, Create, Field, Reference, ResolveRef, RemoteCall, LocalCall} from 'common/model/common';
 import { ModelObject } from 'common/model/object';
@@ -18,10 +18,6 @@ export class Department extends ModelObject{
     get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
 
-    @Field({type: Types.UUID})
-    get parentId(): string { return null; }
-    set parentId(val: string) {}
-
     @Field({type: Types.STRING(50)})
     get code(): string {return null}
     set code(code: string){}
@@ -39,8 +35,8 @@ export class Department extends ModelObject{
     set parent(val: Department) {}
 
     @ResolveRef({type: Types.UUID}, Models.staff)
-    get staff(): Staff { return null; }
-    set staff(val: Staff) {}
+    get manager(): Staff { return null; }
+    set manager(val: Staff) {}
 
     @ResolveRef({type: Types.UUID}, Models.company)
     get company(): Company { return null; }
@@ -52,7 +48,7 @@ export class Department extends ModelObject{
         let ids =  await Promise.all(departmentStaffs.map(function(t){
             return t.staffId;
         }));
-        let staffs = await Models.staff.find({where : {id: {$in: ids}, companyId: this.company.id}, order: [['createdAt', 'desc']]});
+        let staffs = await Models.staff.find({where : {id: {$in: ids}, companyId: this.company.id, staffStatus: EStaffStatus.ON_JOB}, order: [['createdAt', 'desc']]});
         let result =  await Promise.all(staffs.map(async function(s){
             let travelPolicy = await s.getTravelPolicy();
             s["travelPolicy"] = travelPolicy;
@@ -78,5 +74,36 @@ export class Department extends ModelObject{
         }))
         return departments;
     }
+    
+    async getOneDepartmentStructure(): Promise<any> {
+        let department = await Models.department.get(this.id);
+        let departmentStructure = new Array();
+        let m = new Array();
+        let departments = await Models.department.find({where: {companyId: this.company.id}, limit: 100000});
+        for (let i = 0; i < departments.length; i++) {
+            let t = departments[i];
+            t["childDepartments"] = new Array();
+            m.push(t);
+        }
 
+        dg(department, m);
+        departmentStructure.push(department);
+
+        return departmentStructure;
+    }
+
+}
+
+//p为父菜单节点。o为菜单列表
+function dg(p, o) {
+    for (var i = 0; i < o.length; i++) {
+        var t = o[i];
+        if (t.parent && t.parent.id == p.id) {
+            if(!p.childDepartments){
+                p.childDepartments = [];
+            }
+            p.childDepartments.push(t);
+            dg(t, o);
+        }
+    }
 }

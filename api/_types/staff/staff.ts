@@ -17,6 +17,7 @@ import {SupplierGetter} from 'libs/suppliers';
 import L from 'common/language';
 import {ESendType} from "../notice/notice";
 import promise = require("../../../common/test/api/promise/index");
+import {StaffDepartment} from "../department/staffDepartment";
 
 declare var API: any;
 
@@ -116,20 +117,13 @@ export class Staff extends ModelObject implements Account {
     get company(): Company { return null; }
     set company(val: Company) {}
 
-    @ResolveRef({type: Types.UUID}, Models.department)
-    get department(): Department { return null; }
-    set department(val: Department) {}
-
     @Reference({type: Types.UUID})
     getTravelPolicy(id?:string): Promise<TravelPolicy> {
         return Models.travelPolicy.get(id);
     }
     setTravelPolicy(val: TravelPolicy) {}
 
-    /*@ResolveRef({ type: Types.UUID}, Models.coinAccount)
-    get coinAccount(): CoinAccount {return null};
-    set coinAccount(coinAccount: CoinAccount) {}*/
-
+    @RemoteCall()
     async getDepartments(): Promise<Department[]>{
         let departmentStaffs = await Models.staffDepartment.find({where: {staffId: this.id}, order: [['createdAt', 'desc']]});
         let ids = [];
@@ -138,6 +132,55 @@ export class Staff extends ModelObject implements Account {
         })
         let departments = await Models.department.find({where : {id: {$in: ids}, companyId: this.company.id}, order: [['createdAt', 'desc']]});
         return departments;
+    }
+
+    @RemoteCall()
+    async getDepartmentsStr(): Promise<string>{
+        let departmentStaffs = await Models.staffDepartment.find({where: {staffId: this.id}, order: [['createdAt', 'desc']]});
+        let ids = [];
+        departmentStaffs.forEach(function(t){
+            ids.push(t.departmentId);
+        })
+        let departments = await Models.department.find({where : {id: {$in: ids}, companyId: this.company.id}, order: [['createdAt', 'desc']]});
+        let departmentNames = departments.map(function(item){
+            return item.name;
+        })
+        return departmentNames.join(',');
+    }
+
+
+    @RemoteCall()
+    async saveStaffDepartments(departmentIds: string[]) :Promise<boolean> {
+        let self = this;
+        let staffId = this.id;
+        let company = this.company;
+        let defaultDeptment = await company.getDefaultDepartment();
+
+        if(!departmentIds || !(departmentIds.length > 0)){
+            let staffDepartment = StaffDepartment.create({staffId: self.id, departmentId: defaultDeptment.id});
+            await staffDepartment.save();
+        }else{
+            await Promise.all(departmentIds.map(async function(item){
+                let staffDept = StaffDepartment.create({staffId: staffId, departmentId: item});
+                await staffDept.save();
+            }));
+        }
+
+        return true;
+    }
+
+    @RemoteCall()
+    async deleteStaffDepartments() :Promise<boolean> {
+        let self = this;
+        let staffDepartments = await Models.staffDepartment.find({where: {staffId: self.id}});
+       
+        if(staffDepartments && staffDepartments.length > 0){
+            await Promise.all(staffDepartments.map(async function(item){
+                await item.destroy();
+            }))
+        }
+
+        return true;
     }
 
     async getSelfNotices(options?: any): Promise<any> {

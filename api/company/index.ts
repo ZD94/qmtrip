@@ -19,7 +19,7 @@ import {Company, MoneyChange, Supplier} from 'api/_types/company';
 import {Staff, EStaffRole} from "api/_types/staff";
 import {PromoCode} from "api/_types/promoCode";
 import {Agency, AgencyUser, EAgencyUserRole} from "api/_types/agency";
-import {Department} from "api/_types/department";
+import {Department, StaffDepartment} from "api/_types/department";
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import {md5} from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
@@ -100,14 +100,14 @@ class CompanyModule {
         company.isApproveOpen = true;
         company.points2coinRate = 50;
         let department = Department.create({name: "我的企业", isDefault: true});
+        let staffDepartment = StaffDepartment.create({staffId: staff.id, departmentId: department.id});
 
         department.company = company;
         staff.company = company;
-        staff.department = department;
         company.createUser = staff.id;
         company['agencyId'] = agencyId;
 
-        await Promise.all([staff.save(), company.save(), department.save()]);
+        await Promise.all([staff.save(), company.save(), department.save(), staffDepartment.save()]);
         let promoCode: PromoCode;
         if(params.promoCode){
             promoCode = await company.doPromoCode({code: params.promoCode});
