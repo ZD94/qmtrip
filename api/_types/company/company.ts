@@ -375,6 +375,25 @@ export class Company extends ModelObject{
         }
     }
 
+    async getAllDepartmentStructure(companyId?:string): Promise<any> {
+        let departmentStructure = new Array();
+        let m = new Array();
+        let departments = await Models.department.find({where: {companyId: this.id}, limit: 100000});
+        for (let i = 0; i < departments.length; i++) {
+            let t = departments[i];
+            t["childDepartments"] = new Array();
+            m.push(t);
+        }
+        for (let i = 0; i < m.length; i++) {
+            if (!m[i].parent || !m[i].parent.id) {
+                dg(m[i], m);
+                departmentStructure.push(m[i]);
+            }
+        }
+
+        return departmentStructure;
+    }
+
     getTripPlans(options?: any): Promise<PaginateInterface<TripPlan> > {
         if(!options) {options = {where: {}}};
         if(!options.where) {options.where = {};}
@@ -451,6 +470,20 @@ export class Company extends ModelObject{
         await Promise.all(ps);
         this.oa = oa;
         return this.save();
+    }
+}
+
+//p为父菜单节点。o为菜单列表
+function dg(p, o) {
+    for (var i = 0; i < o.length; i++) {
+        var t = o[i];
+        if (t.parent && t.parent.id == p.id) {
+            if(!p.childDepartments){
+                p.childDepartments = [];
+            }
+            p.childDepartments.push(t);
+            dg(t, o);
+        }
     }
 }
 

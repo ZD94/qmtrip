@@ -74,5 +74,36 @@ export class Department extends ModelObject{
         }))
         return departments;
     }
+    
+    async getOneDepartmentStructure(): Promise<any> {
+        let department = await Models.department.get(this.id);
+        let departmentStructure = new Array();
+        let m = new Array();
+        let departments = await Models.department.find({where: {companyId: this.company.id}, limit: 100000});
+        for (let i = 0; i < departments.length; i++) {
+            let t = departments[i];
+            t["childDepartments"] = new Array();
+            m.push(t);
+        }
 
+        dg(department, m);
+        departmentStructure.push(department);
+
+        return departmentStructure;
+    }
+
+}
+
+//p为父菜单节点。o为菜单列表
+function dg(p, o) {
+    for (var i = 0; i < o.length; i++) {
+        var t = o[i];
+        if (t.parent && t.parent.id == p.id) {
+            if(!p.childDepartments){
+                p.childDepartments = [];
+            }
+            p.childDepartments.push(t);
+            dg(t, o);
+        }
+    }
 }

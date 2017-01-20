@@ -154,10 +154,10 @@ export class Staff extends ModelObject implements Account {
         let self = this;
         let staffId = this.id;
         let company = this.company;
-        let defaultDeptment = company.getDefaultDepartment();
+        let defaultDeptment = await company.getDefaultDepartment();
 
-        if(!departmentIds || !departmentIds.length > 0){
-            let staffDepartment = StaffDepartment.create({staffId: staff.id, departmentId: defaultDeptment.id});
+        if(!departmentIds || !(departmentIds.length > 0)){
+            let staffDepartment = StaffDepartment.create({staffId: self.id, departmentId: defaultDeptment.id});
             await staffDepartment.save();
         }else{
             await Promise.all(departmentIds.map(async function(item){
@@ -175,9 +175,9 @@ export class Staff extends ModelObject implements Account {
         let staffDepartments = await Models.staffDepartment.find({where: {staffId: self.id}});
        
         if(staffDepartments && staffDepartments.length > 0){
-            await Promise.all(async function(item){
+            await Promise.all(staffDepartments.map(async function(item){
                 await item.destroy();
-            })
+            }))
         }
 
         return true;
