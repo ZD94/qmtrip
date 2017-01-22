@@ -78,8 +78,8 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     }
     $scope.staffSelector = {
         query: async function(keyword) {
-            // let staffs = await rootDepartment.getStaffs({where: {'name': {$ilike: '%'+keyword+'%'}}});
-            // return staffs;
+            let staffs = await rootDepartment.getStaffs({where: {'name': {$ilike: '%'+keyword+'%'}}});
+            return staffs;
         },
         display: (staff)=>staff.name
     };
@@ -98,6 +98,10 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
             if(parentDepartment){
                 $scope.department.parent = parentDepartment;
             }
+        }
+        $scope.saveDepartment = function(){
+            $scope.department.save();
+            $scope.confirmModal()
         }
         $scope.deleteDepartment = function(){
             if($scope.department)
