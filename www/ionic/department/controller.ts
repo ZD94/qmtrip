@@ -13,10 +13,14 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     let company = staff.company;
     let rootDepartment : Department;
     let newUrl;
-    if($location.path() == '/department/index'){
+    // console.info('location????', $location.path());
+    if($location.path() == '/department/index' ||$location.path() == '/department/'){
         newUrl = '#/department/index-instead';
     }else if($location.path() == '/department/index-instead'){
         newUrl = '#/department/index';
+    }else{
+        console.info('location????', $location.path());
+        return false;
     }
     async function initDepartment(departId?){
         if(departId){
