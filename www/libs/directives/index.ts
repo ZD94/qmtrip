@@ -7,3 +7,4 @@ import './checkbox';
 import './policy-show';
 import './city-select';
 import './staff-avatar';
+import './radio';
