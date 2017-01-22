@@ -817,23 +817,12 @@ export default class ApiAuth {
         if(!params.where) {
             params.where = {};
         }
-        var options: any = {
-            where: params.where
-        };
-        if(params.attributes) {
-            options.attributes = params.attributes;
-        } else {
-            options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt", "loginFailTimes", "lastLoginAt", "lastLoginIp", "activeToken", "pwdToken", "oldQrcodeToken", "qrcodeToken", "type", "isFirstLogin"];
+        if(!params.attributes){
+            params.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt", "loginFailTimes", "lastLoginAt", "lastLoginIp", "activeToken", "pwdToken", "oldQrcodeToken", "qrcodeToken", "type", "isFirstLogin"];
         }
-        if(params.order) {
-            options.order = params.order || "createdAt desc";
-        }
-        if(params.$or) {
-            options.where.$or = params.$or;
-        }
+        params.order = params.order || "createdAt desc";
 
-        options.paranoid = params.paranoid;
-        let paginate = await Models.account.find(options);
+        let paginate = await Models.account.find(params);
         let ids = paginate.map(function(t) {
             return t.id;
         })

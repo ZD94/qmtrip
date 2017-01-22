@@ -46,7 +46,15 @@ export class Department extends ModelObject{
         if (!options) options = {where: {}};
         if(!options.where) options.where = {};
 
-        let departmentStaffs = await Models.staffDepartment.find({where: {departmentId: this.id}, limit: 100000, order: [['createdAt', 'desc']]});
+        let pagers = await Models.staffDepartment.find({where: {departmentId: this.id}, order: [['createdAt', 'desc']]});
+
+        let departmentStaffs = [];
+        departmentStaffs.push.apply(departmentStaffs, pagers);
+        while(pagers.hasNextPage()){
+            let nextPager = await pagers.nextPage();
+            departmentStaffs.push.apply(departmentStaffs, nextPager);
+            // pagers = nextPager;
+        }
 
         let ids =  await Promise.all(departmentStaffs.map(function(t){
             return t.staffId;
@@ -73,7 +81,15 @@ export class Department extends ModelObject{
     }
 
     async getChildDeptStaffNum(): Promise<any> {
-        let childDepartments = await Models.department.find({where : {parentId: this.id, companyId: this.company.id}, limit: 100000, order: [['createdAt', 'desc']]});
+        let pagers = await Models.department.find({where : {parentId: this.id, companyId: this.company.id}, order: [['createdAt', 'desc']]});
+
+        let childDepartments = [];
+        childDepartments.push.apply(childDepartments, pagers);
+        while(pagers.hasNextPage()){
+            let nextPager = await pagers.nextPage();
+            childDepartments.push.apply(childDepartments, nextPager);
+            // pagers = nextPager;
+        }
 
         let departments =  await Promise.all(childDepartments.map(async function(d){
             let dStaffs = await d.getStaffs();
@@ -89,7 +105,16 @@ export class Department extends ModelObject{
         let department = await Models.department.get(this.id);
         let departmentStructure = new Array();
         let m = new Array();
-        let departments = await Models.department.find({where: {companyId: this.company.id}, limit: 100000});
+        let pagers = await Models.department.find({where: {companyId: this.company.id}, order: [['created_at','desc']]});
+
+        let departments = [];
+        departments.push.apply(departments, pagers);
+        while(pagers.hasNextPage()){
+            let nextPager = await pagers.nextPage();
+            departments.push.apply(departments, nextPager);
+            // pagers = nextPager;
+        }
+
         for (let i = 0; i < departments.length; i++) {
             let t = departments[i];
             t["childDepartments"] = new Array();

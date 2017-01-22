@@ -188,7 +188,15 @@ export class Staff extends ModelObject implements Account {
         if (!options) options = {where: {}};
         if(!options.where) options.where = {};
 
-        var noticeAccounts = await Models.noticeAccount.find({where: {accountId: this.id},limit: 100000, paranoid: false, order: [['createdAt', 'desc']]});
+        var pagers = await Models.noticeAccount.find({where: {accountId: this.id}, paranoid: false, order: [['createdAt', 'desc']]});
+
+        let noticeAccounts = [];
+        noticeAccounts.push.apply(noticeAccounts, pagers);
+        while(pagers.hasNextPage()){
+            let nextPager = await pagers.nextPage();
+            noticeAccounts.push.apply(noticeAccounts, nextPager);
+            // pagers = nextPager;
+        }
 
         var mna: any = {};
         var ids =  noticeAccounts.map(function(t){

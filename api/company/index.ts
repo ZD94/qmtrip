@@ -464,18 +464,9 @@ class CompanyModule {
      */
     @clientExport
     static async getSuppliers(params): Promise<FindResult>{
-        var options: any = {
-            where: params.where
-        };
-        if(params.columns){
-            options.attributes = params.columns;
-        }
-        options.order = params.order || [['created_at', 'desc']];
-        if(params.$or) {
-            options.where.$or = params.$or;
-        }
+        params.order = params.order || [['created_at', 'desc']];
 
-        let paginate = await Models.supplier.find(options);
+        let paginate = await Models.supplier.find(params);
         let ids =  paginate.map(function(s){
             return s.id;
         })
@@ -489,19 +480,10 @@ class CompanyModule {
      */
     @clientExport
     static async getPublicSuppliers(params): Promise<FindResult>{
-        var options: any = {
-            where: params.where
-        };
-        if(params.columns){
-            options.attributes = params.columns;
-        }
-        options.order = params.order || [['created_at', 'desc']];
-        if(params.$or) {
-            options.where.$or = params.$or;
-        }
+        params.order = params.order || [['created_at', 'desc']];
 
-        options.where.companyId = null;//查询companyId为空的公共供应商
-        let paginate = await Models.supplier.find(options);
+        params.where.companyId = null;//查询companyId为空的公共供应商
+        let paginate = await Models.supplier.find(params);
         let ids =  paginate.map(function(s){
             return s.id;
         })
