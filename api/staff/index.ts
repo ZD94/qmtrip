@@ -522,23 +522,16 @@ class StaffModule{
     ])
     static async getPointChanges(params) :Promise<FindResult>{
         let { accountId } = Zone.current.get("session");
-        var options : any = {};
-        options.where = _.pick(params.where, Object.keys(DBM.PointChange.attributes));
-        if(params.$or) {
-            options.where.$or = params.$or;
-        }
-        if(params.attributes){
-            options.attributes = params.attributes;
-        }
+        params.where = _.pick(params.where, Object.keys(DBM.PointChange.attributes));
         let role = await API.auth.judgeRoleById({id:accountId});
 
         let rows, count, ret;
         if(role == EAccountType.STAFF){
-            ret = DBM.PointChange.findAndCount(options);
+            ret = DBM.PointChange.findAndCount(params);
         } else {
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
             if(result){
-                ret = DBM.PointChange.findAndCount(options);
+                ret = DBM.PointChange.findAndCount(params);
             } else {
                 throw L.ERR.PERMISSION_DENY;
             }
@@ -1549,18 +1542,9 @@ class StaffModule{
      */
     @clientExport
     static async getStaffSupplierInfos(params): Promise<FindResult>{
-        var options: any = {
-            where: params.where
-        };
-        if(params.columns){
-            options.attributes = params.columns;
-        }
-        options.order = params.order || [['created_at', 'desc']];
-        if(params.$or) {
-            options.where.$or = params.$or;
-        }
+        params.order = params.order || [['created_at', 'desc']];
 
-        let paginate = await Models.staffSupplierInfo.find(options);
+        let paginate = await Models.staffSupplierInfo.find(params);
         let ids =  paginate.map(function(s){
             return s.id;
         })

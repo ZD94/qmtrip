@@ -88,19 +88,9 @@ class PromoCodeModule{
     @clientExport
     static async getPromoCodes(params): Promise<FindResult>{
         var staff = await Staff.getCurrent();
+        params.order = params.order || [['createdAt', 'desc']];
 
-        var options: any = {
-            where: params.where
-        };
-        if(params.columns){
-            options.attributes = params.columns;
-        }
-        options.order = params.order || [['createdAt', 'desc']];
-        if(params.$or) {
-            options.where.$or = params.$or;
-        }
-
-        let paginate = await Models.promoCode.find(options);
+        let paginate = await Models.promoCode.find(params);
         let ids =  paginate.map(function(t){
             return t.id;
         })

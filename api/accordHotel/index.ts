@@ -134,23 +134,12 @@ class AccordHotelModule{
     ])
     static async getAccordHotels(params): Promise<FindResult>{
         var staff = await Staff.getCurrent();
-
-        var options: any = {
-            // where:  _.pick(params, Object.keys(DBM.AccordHotel.attributes))
-            where: params.where
-        };
-        if(params.columns){
-            options.attributes = params.columns;
-        }
-        options.order = params.order || [['createdAt', 'desc']];
-        if(params.$or) {
-            options.where.$or = params.$or;
-        }
+        params.order = params.order || [['createdAt', 'desc']];
 
         if(staff){
-            options.where.companyId = staff["companyId"];//只允许查询该企业下的协议酒店
+            params.where.companyId = staff["companyId"];//只允许查询该企业下的协议酒店
         }
-        let paginate = await Models.accordHotel.find(options);
+        let paginate = await Models.accordHotel.find(params);
         let ids =  paginate.map(function(t){
             return t.id;
         })

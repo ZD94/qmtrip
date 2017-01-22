@@ -803,7 +803,16 @@ class TripPlanModule {
             selectKey = type == 'S' ? 'account_id' : 'project_id';
             modelName = type == 'S' ? 'staff' : 'project';
             if(params.keyWord) {
-                let objs = await Models[modelName].find({where: {name: {$like: `%${params.keyWord}%`}, companyId: company.id}, limit: 100000});
+                let  pagers = await Models[modelName].find({where: {name: {$like: `%${params.keyWord}%`}, companyId: company.id}, order: [['created_at','desc']]});
+
+                let objs = [];
+                objs.push.apply(objs, pagers);
+                while(pagers.hasNextPage()){
+                    let nextPager = await pagers.nextPage();
+                    objs.push.apply(objs, nextPager);
+                    // pagers = nextPager;
+                }
+
                 let selectStr = '';
                 objs.map((s) => {
                     if(s && s.id) {
@@ -833,7 +842,16 @@ class TripPlanModule {
             planSql = `${completeSql} and p.status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE})`;
             completeSql += ` and p.status=${EPlanStatus.COMPLETE}`;
             if(params.keyWord) {
-                let depts = await Models.department.find({where: {name: {$like: `%${params.keyWord}%`}, companyId: company.id}, limit: 100000});
+                let pagers = await Models.department.find({where: {name: {$like: `%${params.keyWord}%`}, companyId: company.id}, order: [['created_at','desc']]});
+
+                let depts = [];
+                depts.push.apply(depts, pagers);
+                while(pagers.hasNextPage()){
+                    let nextPager = await pagers.nextPage();
+                    depts.push.apply(depts, nextPager);
+                    // pagers = nextPager;
+                }
+
                 let deptStr = '';
                 depts.map((s) => {
                     if(s && s.id) {

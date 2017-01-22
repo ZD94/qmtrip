@@ -135,19 +135,8 @@ class NoticeModule{
     @clientExport
     static async getNotices(params): Promise<FindResult>{
         var staff = await Staff.getCurrent();
-
-        var options: any = {
-            // where:  _.pick(params, Object.keys(DBM.Notice.attributes))
-            where: params.where
-        };
-        if(params.columns){
-            options.attributes = params.columns;
-        }
-        options.order = params.order || [['createdAt', 'desc']];
-        if(params.$or) {
-            options.where.$or = params.$or;
-        }
-        let paginate = await Models.notice.find(options);
+        params.order = params.order || [['createdAt', 'desc']];
+        let paginate = await Models.notice.find(params);
         let ids =  paginate.map(function(t){
             return t.id;
         })

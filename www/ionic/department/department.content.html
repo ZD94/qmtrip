@@ -12,7 +12,7 @@
     <div class="list">
         <div class="item department-list item-icon-right" ng-repeat="item in departments" ng-click="goChildDept(item.id)">
             <div class="department-icon"><i class="icon ion-ios-folder"></i></div>
-            {{item.name}}({{item.staffNum}}人)
+            {{item.name}}({{item.staffNum || 0}}人)
             <i class="icon ion-chevron-right"></i>
         </div>
     </div>
