@@ -9,22 +9,23 @@
                 <span class="input-label">部门名称</span>
                 <input type="text" placeholder="" ng-model="department.name">
             </label>
-            <div class="item item-icon-right" ng-click="chooseParent()">上级部门
+            <div class="item item-icon-right" ng-if="department.parent" ng-click="chooseParent()">上级部门
                 <span class="item-note">{{department.parent.name}}</span>
                 <i class="icon ion-chevron-right"></i>
             </div>
-            <div class="item item-icon-right">部门主管
+            <div class="item item-icon-right item-input">
+                <span class="input-label">部门主管</span>
                 <ng-selector-list
-                        ng-model="department.manager.name"
+                        ng-model="department.manager"
                         dlg-options="staffSelector"
                         dlg-title=""
-                        dlg-placeholder=""
+                        dlg-placeholder="选择主管"
                         class="fake-input"
                 ></ng-selector-list>
                 <i class="icon ion-chevron-right"></i>
             </div>
         </div>
-        <a class="button button-block button-calm">确认</a>
+        <a class="button button-block button-calm" ng-click="saveDepartment()">确认</a>
         <a class="button button-block button-assertive" ng-click="deleteDepartment()" ng-if="department.parent">删除部门</a>
     </ion-content>
 </ion-modal-view>
