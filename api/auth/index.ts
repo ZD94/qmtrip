@@ -348,7 +348,7 @@ export default class ApiAuth {
      * @returns {Company}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'companyId', 'msgCode', 'msgTicket', 'pwd', 'avatarColor'])
+    @requireParams(['mobile', 'name', 'companyId', 'msgCode', 'msgTicket', 'pwd'], ['avatarColor'])
     static async invitedStaffRegister(data): Promise<any> {
         var msgCode = data.msgCode;
         var msgTicket = data.msgTicket;
