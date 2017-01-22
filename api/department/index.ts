@@ -62,7 +62,7 @@ class DepartmentModule{
     static async deleteDepartment(params): Promise<any>{
         var id = params.id;
         var department = await Models.department.get(params.id);
-        let staffs = await Models.staff.find({where : {companyId: department.company.id, departmentId: id, staffStatus: EStaffStatus.ON_JOB}});
+        let staffs = await department.getStaffs();
         if(staffs && staffs.length > 0){
             throw {code: -1, msg: '该部门下有' + staffs.length + '位员工，暂不能删除'};
         }
@@ -90,6 +90,12 @@ class DepartmentModule{
         {if: condition.isDepartmentAgency("0.id")}
     ])
     static async updateDepartment(params): Promise<Department>{
+        if(params.parentId){
+            let ids = await DepartmentModule.getAllChildDepartmentsId({parentId: params.id});
+            if(ids.indexOf(params.parentId) >= 0){
+                throw L.ERR.INVALID_ARGUMENT("parentId");
+            }
+        }
         let dept = await Models.department.get(params.id);
         for(let key in params){
             dept[key] = params[key];
@@ -200,7 +206,8 @@ class DepartmentModule{
     static getAllChildren(params: {parentId: string}){
         var sql = "with RECURSIVE cte as " +
             "( select a.id,a.name,a.parent_id from department.departments a where id='"+params.parentId+"' " +
-            "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id) " +
+            "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id " +
+            "where k.deleted_at is null) " +
             "select * from cte";
         return sequelize.query(sql)
             .spread(function(children, row){
@@ -233,11 +240,12 @@ class DepartmentModule{
         {if: condition.isDepartmentAdminOrOwner("0.parentId")},
         {if: condition.isDepartmentAgency("0.parentId")}
     ])
-    static getAllChildDepartmentsId(params: {parentId: string}){
+    static getAllChildDepartmentsId(params: {parentId: string}): string[]{
         var ids = [];
         var sql = "with RECURSIVE cte as " +
             "( select a.id,a.name,a.parent_id from department.departments a where id='"+params.parentId+"' " +
-            "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id) " +
+            "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id " +
+            "where k.deleted_at is null) " +
             "select * from cte";
         return sequelize.query(sql)
             .spread(function(children, row){
