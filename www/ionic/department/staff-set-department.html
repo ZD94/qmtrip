@@ -1,0 +1,31 @@
+<ion-modal-view class="staff-set-dpt">
+    <ion-header-bar class="bar-stable">
+        <h1 class="title">选择部门</h1>
+        <a class="button button-clear" ng-click="modal.hide()">取消</a>
+    </ion-header-bar>
+    <ion-content scroll="false">
+        <div class="flex-c10">
+            <ion-scroll>
+                <div class="item root-item" ng-class="{added: addedDepartments.indexOf(rootDepartment) >= 0}" ng-click="addToDepartments(rootDepartment)">
+                    <i class="icon ion-checkmark-circled"></i>{{rootDepartment.name}}
+                </div>
+                <div class="childs" ng-if="childDepartments && childDepartments.length > 0">
+                    <div class="item"
+                         ng-repeat="department in childDepartments"
+                         ng-click="addToDepartments(department)"
+                         ng-class="{added: addedDepartments.indexOf(department) >= 0}">
+                        <i class="icon ion-checkmark-circled"></i>{{department.name}}
+                        <!--<span class="item-note" ng-if="department.hasChild" ng-click="showChild(department)">-->
+                        <!--查看子部门-->
+                        <!--<i class="icon ion-chevron-right"></i>-->
+                        <!--</span>-->
+                    </div>
+                </div>
+            </ion-scroll>
+            <div class="array_menu">
+                <span ng-repeat="department in addedDepartments">{{department.name}}</span>
+                <div class="confirm" ng-click="confirmModal(addedDepartments)">确定</div>
+            </div>
+        </div>
+    </ion-content>
+</ion-modal-view>

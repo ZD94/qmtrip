@@ -1,0 +1,30 @@
+<ion-modal-view class="department-modal">
+    <ion-header-bar class="bar-stable">
+        <a class="button button-icon button-clear" ng-click="modal.hide()"><i class="icon ion-chevron-left"></i>返回</a>
+        <h1 class="title">部门管理</h1>
+    </ion-header-bar>
+    <ion-content class="has-header">
+        <div class="list">
+            <label class="item item-input">
+                <span class="input-label">部门名称</span>
+                <input type="text" placeholder="" ng-model="department.name">
+            </label>
+            <div class="item item-icon-right" ng-click="chooseParent()">上级部门
+                <span class="item-note">{{department.parent.name}}</span>
+                <i class="icon ion-chevron-right"></i>
+            </div>
+            <div class="item item-icon-right">部门主管
+                <ng-selector-list
+                        ng-model="department.manager.name"
+                        dlg-options="staffSelector"
+                        dlg-title=""
+                        dlg-placeholder=""
+                        class="fake-input"
+                ></ng-selector-list>
+                <i class="icon ion-chevron-right"></i>
+            </div>
+        </div>
+        <a class="button button-block button-calm">确认</a>
+        <a class="button button-block button-assertive" ng-click="deleteDepartment()" ng-if="department.parent">删除部门</a>
+    </ion-content>
+</ion-modal-view>

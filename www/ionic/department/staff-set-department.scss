@@ -1,0 +1,40 @@
+.staff-set-dpt{
+  ion-content{
+    background: #f8f8f8;
+    .added{
+      .ion-checkmark-circled{
+        color: #28a7e1;
+      }
+    }
+    .root-item{
+      padding: 0 0 0 16px;
+      line-height: 52px;
+      .item-note{
+        padding-right: 16px;
+      }
+    }
+    .childs{
+      .item{
+        padding: 0 0 0 40px;
+        line-height: 52px;
+        .item-note{
+          padding-right: 16px;
+        }
+      }
+    }
+    .array_menu{
+      height: 50px;
+      width: 100%;
+      background: #fff;
+      .confirm{
+        height: 50px;
+        line-height: 50px;
+        width: 100px;
+        float: right;
+        color: #fff;
+        background: #28a7e1;
+        text-align: center;
+      }
+    }
+  }
+}

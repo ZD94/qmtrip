@@ -1,0 +1,22 @@
+.dpt-modal{
+  ion-content{
+    background: #f8f8f8;
+    padding: 10px;
+    .root-item{
+      padding: 0 0 0 16px;
+      line-height: 52px;
+      .item-note{
+        padding-right: 16px;
+      }
+    }
+    .childs{
+      .item{
+        padding: 0 0 0 40px;
+        line-height: 52px;
+        .item-note{
+          padding-right: 16px;
+        }
+      }
+    }
+  }
+}

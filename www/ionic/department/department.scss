@@ -45,6 +45,7 @@
       padding-left: 60px;
       line-height: 16px;
       height: 50px;
+      padding-top: 10px;
       position: relative;
       .staff-avatar-text{
         position: absolute;
@@ -67,24 +68,40 @@
         height: 36px;
         border-radius: 50%;
       }
-      .staff-role{
-        position: absolute;
-        bottom: 2px;
-        left: 10px;
-        border-radius: 2px;
-        background: #F5A623;
-        color: #fff;
-        font-size: 10px;
-
+      .staff-info{
+        display: inline-block;
+        p{
+          margin: 0;
+          &:last-child{
+            font-size: 10px;
+            color: #9b9b9b;
+          }
+        }
+        .staff-role{
+          &.bg-blue{
+            background: #28a7e1;
+          }
+          border-radius: 2px;
+          background: #F5A623;
+          color: #fff;
+          font-size: 10px;
+        }
       }
       .staff-flag{
+        &.bg-gray{
+          background: #9b9b9b;
+        }
         float: right;
         background: red;
         color: #fff;
         font-size: 12px;
         border-radius: 3px;
+        margin-top: 4px;
         padding: 0 5px;
       }
+    }
+    &:last-child{
+      margin-bottom: 50px;
     }
   }
   .tabs{

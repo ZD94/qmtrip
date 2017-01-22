@@ -1,0 +1,20 @@
+<ion-modal-view class="dpt-modal">
+    <ion-header-bar class="bar-stable">
+        <h1 class="title">选择部门</h1>
+        <a class="button button-clear" ng-click="modal.hide()">取消</a>
+    </ion-header-bar>
+    <ion-content padding="true">
+        <div class="item root-item" ng-click="confirm(rootDepartment)">
+            {{rootDepartment.name}}
+            <span class="item-note" ng-if="rootDepartment.parent" ng-click="$event.stopPropagation();$event.preventDefault();backParent(rootDepartment.parent)">返回上级部门</span>
+        </div>
+        <div class="childs" ng-if="departments && departments.length > 0">
+            <div class="item" ng-repeat="department in departments" ng-click="confirm(department)">{{department.name}}
+                <span class="item-note" ng-if="department.hasChild" ng-click="$event.stopPropagation();$event.preventDefault();showChild(department)">
+                    查看子部门
+                    <i class="icon ion-chevron-right"></i>
+                </span>
+            </div>
+        </div>
+    </ion-content>
+</ion-modal-view>

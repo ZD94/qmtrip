@@ -1,0 +1,37 @@
+.new-staff{
+  .item{
+    &.avatars{
+      padding: 9px 20px 9px 11px;
+      line-height: 40px;
+      color: inherit;
+      .item-note{
+        height: 40px;
+      }
+      .avatar-img{
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+      }
+      .avatar-text{
+        width: 40px;
+        height: 40px;
+        color: #fff;
+        border-radius: 50%;
+        background: #2495da;
+        display: inline-block;
+        text-align: center;
+        font-size: 14px;
+      }
+    }
+    &.item-icon-right{
+      .icon{
+        font-size: 14px;
+      }
+    }
+    .sex{
+      margin-left: 70px;
+      display: inline-block;
+    }
+  }
+
+}
