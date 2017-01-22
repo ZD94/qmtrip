@@ -33,9 +33,9 @@
                 <span class="item-note">{{EStaffRoleNames[staff.role]}}</span>
                 <i class="icon ion-chevron-right"></i>
             </div>
-            <div class="item item-icon-right">
+            <div class="item item-icon-right" ng-click="choosePolicy()">
                 差旅标准
-                <span class="item-note">{{staffRole[staff.roleId]}}</span>
+                <span class="item-note">{{staffPolicyName}}</span>
                 <i class="icon ion-chevron-right"></i>
             </div>
             <div class="item">
@@ -46,7 +46,7 @@
             <div class="item" ng-click="setDepartment()">
                 <a>设置部门</a>
             </div>
-            <a class="button button-block">保存</a>
+            <a class="button button-block button-calm" ng-click="saveStaff()">保存</a>
         </div>
     </ion-content>
 </ion-view>
