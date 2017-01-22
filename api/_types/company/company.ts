@@ -378,7 +378,14 @@ export class Company extends ModelObject{
     async getAllDepartmentStructure(companyId?:string): Promise<any> {
         let departmentStructure = new Array();
         let m = new Array();
-        let departments = await Models.department.find({where: {companyId: this.id}, limit: 100000});
+        let pagers = await Models.department.find({where: {companyId: this.id}, order: [['created_at', 'desc']]});
+        let departments = [];
+        departments.push.apply(departments, pagers);
+        while(pagers.hasNextPage()){
+            let nextPager = await pagers.nextPage();
+            departments.push.apply(departments, nextPager);
+            // pagers = nextPager;
+        }
         for (let i = 0; i < departments.length; i++) {
             let t = departments[i];
             t["childDepartments"] = new Array();

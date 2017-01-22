@@ -129,17 +129,9 @@ class DepartmentModule{
         {if: condition.isCompanyAgency("where.companyId")}
     ])
     static async getDepartments(params) :Promise<FindResult>{
-        var options : any = {};
-        options.where = _.pick(params.where, Object.keys(DBM.Department.attributes));
-        if(params.$or) {
-            options.where.$or = params.where.$or;
-        }
-        if(options.columns){
-            options.attributes = params.attributes;
-        }
-        options.order = params.order || [['createdAt', 'desc']];
+        params.order = params.order || [['createdAt', 'desc']];
 
-        let paginate = await Models.department.find(options);
+        let paginate = await Models.department.find(params);
         return {ids: paginate.map((s)=> {return s.id;}), count: paginate['total']};
     }
 

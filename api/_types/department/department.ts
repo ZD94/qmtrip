@@ -42,13 +42,23 @@ export class Department extends ModelObject{
     get company(): Company { return null; }
     set company(val: Company) {}
 
-    async getStaffs(): Promise<any[]> {
-        let departmentStaffs = await Models.staffDepartment.find({where: {departmentId: this.id}, order: [['createdAt', 'desc']]});
+    async getStaffs(options?: any): Promise<any[]> {
+        if (!options) options = {where: {}};
+        if(!options.where) options.where = {};
+
+        let departmentStaffs = await Models.staffDepartment.find({where: {departmentId: this.id}, limit: 100000, order: [['createdAt', 'desc']]});
 
         let ids =  await Promise.all(departmentStaffs.map(function(t){
             return t.staffId;
         }));
-        let staffs = await Models.staff.find({where : {id: {$in: ids}, companyId: this.company.id, staffStatus: EStaffStatus.ON_JOB}, order: [['createdAt', 'desc']]});
+
+        options.where.staffStatus = EStaffStatus.ON_JOB;
+        options.where.companyId = this.company.id;
+        options.where.id = {$in: ids};
+        if(!options.order){
+            options.order = [['createdAt', 'desc']];
+        }
+        let staffs = await Models.staff.find(options);
         let result =  await Promise.all(staffs.map(async function(s){
             let travelPolicy = await s.getTravelPolicy();
             s["travelPolicy"] = travelPolicy;
@@ -63,7 +73,7 @@ export class Department extends ModelObject{
     }
 
     async getChildDeptStaffNum(): Promise<any> {
-        let childDepartments = await Models.department.find({where : {parentId: this.id, companyId: this.company.id}, order: [['createdAt', 'desc']]});
+        let childDepartments = await Models.department.find({where : {parentId: this.id, companyId: this.company.id}, limit: 100000, order: [['createdAt', 'desc']]});
 
         let departments =  await Promise.all(childDepartments.map(async function(d){
             let dStaffs = await d.getStaffs();
