@@ -6,19 +6,24 @@
     <ion-content scroll="false">
         <div class="flex-c10">
             <ion-scroll>
-                <div class="item root-item" ng-class="{added: addedDepartments.indexOf(rootDepartment.id) >= 0}" ng-click="addToDepartments(rootDepartment)">
+                <div class="item root-item" ng-class="{added: addedDepartments.indexOf(rootDepartment) >= 0}" ng-click="addToDepartments(rootDepartment)">
                     <i class="icon ion-checkmark-circled"></i>{{rootDepartment.name}}
+                    <span class="item-note" ng-if="rootDepartment.parent"
+                          ng-click="$event.stopPropagation();$event.preventDefault();backParent(rootDepartment.parent)">
+                        返回上级部门
+                    </span>
                 </div>
                 <div class="childs" ng-if="childDepartments && childDepartments.length > 0">
                     <div class="item"
                          ng-repeat="department in childDepartments"
-                         ng-click="addToDepartments(department.id)"
-                         ng-class="{added: addedDepartments.indexOf(department.id) >= 0}">
+                         ng-click="addToDepartments(department)"
+                         ng-class="{added: addedDepartments.indexOf(department) >= 0}">
                         <i class="icon ion-checkmark-circled"></i>{{department.name}}
-                        <!--<span class="item-note" ng-if="department.hasChild" ng-click="showChild(department)">-->
-                        <!--查看子部门-->
-                        <!--<i class="icon ion-chevron-right"></i>-->
-                        <!--</span>-->
+                        <span class="item-note" ng-if="department.hasChild"
+                              ng-click="$event.stopPropagation();$event.preventDefault();showChild(department)">
+                        查看子部门
+                        <i class="icon ion-chevron-right"></i>
+                        </span>
                     </div>
                 </div>
             </ion-scroll>

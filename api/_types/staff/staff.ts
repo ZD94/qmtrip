@@ -124,7 +124,7 @@ export class Staff extends ModelObject implements Account {
     setTravelPolicy(val: TravelPolicy) {}
 
     @RemoteCall()
-    async getDepartments(): Promise<Department[]>{
+    async getDepartments(): Promise<PaginateInterface<Department>>{
         let departmentStaffs = await Models.staffDepartment.find({where: {staffId: this.id}, order: [['createdAt', 'desc']]});
         let ids = [];
         departmentStaffs.forEach(function(t){

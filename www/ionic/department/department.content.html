@@ -17,7 +17,7 @@
         </div>
     </div>
     <div class="list" >
-        <div class="item staff-list" ng-repeat="item in staffs">
+        <div class="item staff-list" ng-repeat="item in staffs" ng-click="showStaff(item.id)">
             <!--<div class="staff-avatar-text">{{item.name}}</div>-->
             <staff-avatar staff="item"
                           text-class="staff-avatar-text"

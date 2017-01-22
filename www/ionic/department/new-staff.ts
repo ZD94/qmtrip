@@ -114,19 +114,59 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             template: require('./staff-set-department.html'),
             controller: setDepartment
         })
-        $scope.addedArray = dptBeenChecked;
+        if(dptBeenChecked){
+            dptBeenChecked.map(function(deparment){
+                $scope.addedArray.push(deparment.id);
+                $scope.addedArray.sort();
+            })
+        }
     }
-    function setDepartment($scope){
+    async function setDepartment($scope){
         require('./staff-set-department.scss');
-        $scope.addToDepartments = function(departmentId){
-            let idx = $scope.addedDepartments.indexOf(departmentId);
+        $scope.childDepartments = await Promise.all($scope.childDepartments.map(async function(department) {
+            let childDepartment = await department.getChildDeptStaffNum();
+            if(childDepartment && childDepartment.length>0){
+                department.hasChild = true;
+            }else{
+                department.hasChild = false;
+            }
+            return department;
+        }));
+        $scope.addToDepartments = function(department){
+            let idx = $scope.addedDepartments.indexOf(department);
             if(idx >= 0){
                 $scope.addedDepartments.splice(idx,1)
             }else{
-                $scope.addedDepartments.push(departmentId);
+                $scope.addedDepartments.push(department);
                 $scope.addedDepartments.sort();
             }
             console.info($scope.addedDepartments);
+        }
+        $scope.showChild = async function(department){
+            $scope.rootDepartment = department;
+            let childDepartments = await department.getChildDeptStaffNum();
+            $scope.childDepartments = await Promise.all(childDepartments.map(async function(department) {
+                let childDepartment = await department.getChildDeptStaffNum();
+                if(childDepartment && childDepartment.length>0){
+                    department.hasChild = true;
+                }else{
+                    department.hasChild = false;
+                }
+                return department;
+            }));
+        }
+        $scope.backParent = async function(parentDdepartment){
+            let childDepartments = await parentDdepartment.getChildDeptStaffNum();
+            $scope.childDepartments = await Promise.all(childDepartments.map(async function(department) {
+                let childDepartment = await department.getChildDeptStaffNum();
+                if(childDepartment && childDepartment.length>0){
+                    department.hasChild = true;
+                }else{
+                    department.hasChild = false;
+                }
+                return department;
+            }));
+            $scope.rootDepartment = parentDdepartment;
         }
     }
 

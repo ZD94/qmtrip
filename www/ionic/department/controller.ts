@@ -76,6 +76,9 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         //$location.url('#/department/index?departmentId=' + id +'&departName=' + department.name);
         // $state.go('ROOT.content',{__path:'department/index',departmentId:id,departName:department.name})
     }
+    $scope.showStaff = function(staffId){
+        window.location.href = '#/department/staff-info?staffId=' + staffId;
+    }
     $scope.staffSelector = {
         query: async function(keyword) {
             let staffs = await rootDepartment.getStaffs({where: {'name': {$ilike: '%'+keyword+'%'}}});
