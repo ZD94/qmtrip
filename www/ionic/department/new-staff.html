@@ -42,7 +42,7 @@
                 部门
                 <span class="item-note">{{departmentNames}}</span>
             </div>
-            <div class="item" ng-repeat="department in addedArray">{{department.name}}</div>
+            <div class="item" ng-repeat="department in selectDepartments track by $index">{{department.name}}</div>
             <div class="item" ng-click="setDepartment()">
                 <a>设置部门</a>
             </div>

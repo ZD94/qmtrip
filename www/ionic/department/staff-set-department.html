@@ -28,7 +28,12 @@
                 </div>
             </ion-scroll>
             <div class="array_menu">
-                <span ng-repeat="department in addedDepartments">{{department.name}}</span>
+                <div class="added-array">
+                    <ion-scroll direction="x" >
+                        <span ng-repeat="department in addedDepartments track by $index">{{department.name}}</span>
+                    </ion-scroll>
+                    <!--<scroll-x array-models="addedDepartments"></scroll-x>-->
+                </div>
                 <div class="confirm" ng-click="confirmModal(addedDepartments)">确定</div>
             </div>
         </div>

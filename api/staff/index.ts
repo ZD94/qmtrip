@@ -46,6 +46,8 @@ class StaffModule{
     @clientExport
     @requireParams(["name", "mobile"], staffAllCols)
     static async createStaff (params): Promise<Staff> {
+        console.info(params);
+        console.info("params=======================");
         let currentStaff = await Staff.getCurrent();
         let company = currentStaff.company;
         /*let staffNum = await company.getStaffNum();

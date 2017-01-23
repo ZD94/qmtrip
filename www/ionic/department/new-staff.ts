@@ -30,7 +30,8 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
         }
     }
     $scope.staff = staff;
-    $scope.addedArray = []; //用于存放已选择的部门
+    $scope.addedArray = []; //用于存放提交时的部门id
+    $scope.selectDepartments = []; //用于存放已选择的部门
     $scope.EStaffRoleNames = EStaffRoleNames;
     $scope.invoicefuc = {title:'上传头像',done:function(response){
         if(response.ret != 0){
@@ -109,12 +110,16 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             scope:{
                 rootDepartment:rootDepartment,
                 childDepartments: childDepartments,
-                addedDepartments: $scope.addedArray
+                addedDepartments: $scope.selectDepartments
             },
             template: require('./staff-set-department.html'),
             controller: setDepartment
         })
+        $scope.selectDepartments = dptBeenChecked;
         if(dptBeenChecked){
+            console.info(dptBeenChecked);
+
+            $scope.addedArray = [];
             dptBeenChecked.map(function(deparment){
                 $scope.addedArray.push(deparment.id);
                 $scope.addedArray.sort();
@@ -200,8 +205,8 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                     msgbox.log('姓名不能为空');
                     return;
                 }
-                if($scope.addedDepartments.length>0){
-                    staff.departmentIds = $scope.addedDepartments;
+                if($scope.addedArray.length>0){
+                    // staff.departmentIds = $scope.addedArray;
                 }else{
                     msgbox.log('部门不能为空')
                     return false;
@@ -239,7 +244,10 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             }
 
             if(!ownerModifyAdmin){
+                console.info(staff);
                 staff = await staff.save();
+                console.info($scope.addedArray,'=================');
+                await staff.saveStaffDepartments($scope.addedArray)
                 $ionicHistory.goBack(-1);
             }
         }catch(err){
