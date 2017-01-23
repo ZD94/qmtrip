@@ -102,30 +102,44 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
                 $scope.department.parent = parentDepartment;
             }
         }
-        $scope.saveDepartment = function(){
-            $scope.department.save();
+        $scope.saveDepartment = async function(){
+            try{
+                await $scope.department.save();
+            }catch(e){
+                if(e.code == -150){
+                    msgbox.log('不能设置该部门为上级部门');
+                }else{
+                    msgbox.log(e.msg);
+                }
+                return false;
+            }
             $scope.confirmModal()
         }
         $scope.deleteDepartment = function(){
-            if($scope.department)
-            $ionicPopup.show({
-                title: '删除部门',
-                template: '确定要删除吗？',
-                scope: $scope,
-                button:[
-                    {
-                        text: '取消',
-                        type: 'button-stable'
-                    },
-                    {
-                        text: '确认',
-                        type: 'button-positive',
-                        onTap: async function(){
-                            $scope.department.destroy()
+            if($scope.department){
+                $ionicPopup.show({
+                    title: '删除部门',
+                    template: '确定要删除吗？',
+                    scope: $scope,
+                    buttons:[
+                        {
+                            text: '取消',
+                            type: 'button-stable'
+                        },
+                        {
+                            text: '确认',
+                            type: 'button-positive',
+                            onTap: async function(){
+                                try{
+                                    await $scope.department.destroy();
+                                }catch(e){
+                                    msgbox.log(e.msg);
+                                }
+                            }
                         }
-                    }
-                ]
-            })
+                    ]
+                })
+            }
         }
     }
 
