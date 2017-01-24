@@ -35,12 +35,16 @@
                 部门（共{{departments.length}}个）
                 <!--<span class="item-note">{{departments.name}}</span>-->
             </div>
-            <div class="item" ng-repeat="department in departments">{{department.name}}</div>
+            <div class="item item-icon-left" ng-repeat="department in departments track by $index">
+                <i class="icon ion-ios-folder"></i>{{department.name}}
+            </div>
             <div class="spacer" style="height: 10px;"></div>
             <a class="button button-block button-calm" ng-click="editStaff()">
                 编辑
             </a>
-            <a class="button button-block button-assertive">
+            <a class="button button-block button-assertive"
+               ng-if="!staff.status && staff.id != currentStaff.id && staff.roleId != currentStaff.roleId && staff.roleId != EStaffRole.OWNER"
+               ng-click="deleteStaff()">
                 删除
             </a>
         </div>
