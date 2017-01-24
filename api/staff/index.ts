@@ -46,8 +46,6 @@ class StaffModule{
     @clientExport
     @requireParams(["name", "mobile"], staffAllCols)
     static async createStaff (params): Promise<Staff> {
-        console.info(params);
-        console.info("params=======================");
         let currentStaff = await Staff.getCurrent();
         let company = currentStaff.company;
         /*let staffNum = await company.getStaffNum();
@@ -66,19 +64,16 @@ class StaffModule{
         }
         let result = await staff.save();
 
-        await result.saveStaffDepartments(params.departmentIds);
-
         let account = await Models.account.get(staff.id);
 
         if(!account.coinAccount){
             //为员工设置资金账户
             let ca = CoinAccount.create();
             await ca.save();
-            account.coinAccount = ca;
-            await account.save();
+            staff["coinAccountId"] = ca.id;
+            await staff.save();
         }
 
-        // await API.auth.sendResetPwdEmail({email: result.email, mobile: result.mobile, type: 1, isFirstSet: true, companyName: result.company.name});
         return result;
     }
 
