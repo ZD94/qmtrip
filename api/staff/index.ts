@@ -315,6 +315,7 @@ class StaffModule{
             let tp = await Models.travelPolicy.get(updateStaff["travelPolicyId"]);
 
             let vals  = {
+                accountId: updateStaff.id,
                 noticeType: ENoticeType.SYSTEM_NOTICE,
                 travelPolicy: tp ? tp.name: '',
                 time: moment().format('YYYY-MM-DD:hh:mm:ss'),

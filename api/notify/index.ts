@@ -256,12 +256,16 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
     let values_clone =  _.cloneDeep(values);
     let openId = await API.auth.getOpenIdByAccount({accountId: accountId});
     let account: any = {};
+    let departmentNames;
     if(!accountId){
         account = {email: email};
     }else{
         account = await Models.staff.get(accountId);
         if(!account){
             account = await Models.agency.get(accountId);
+        }else{
+            departmentNames = await account.getDepartmentsStr();
+            account["departmentNames"] = departmentNames;
         }
     }
 
