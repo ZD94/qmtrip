@@ -205,24 +205,14 @@ class TravelPolicyModule{
     ])
     static async getTravelPolicies(params): Promise<FindResult>{
         var staff = await Staff.getCurrent();
-        //let companyId = params.companyId;
 
-        var options: any = {
-            where:  _.pick(params, Object.keys(DBM.TravelPolicy.attributes))
-        };
-        if(params.columns){
-            options.attributes = params.columns;
-        }
-        options.order = params.order || [['createdAt', 'desc']];
-        if(params.$or) {
-            options.where.$or = params.$or;
-        }
+        params.order = params.order || [['createdAt', 'desc']];
 
         if(staff){
-            options.where.companyId = staff["companyId"];//只允许查询该企业下的差旅标准
+            params.where.companyId = staff["companyId"];//只允许查询该企业下的差旅标准
         }
 
-        let paginate = await Models.travelPolicy.find(options);
+        let paginate = await Models.travelPolicy.find(params);
         let ids =  paginate.map(function(t){
             return t.id;
         })
@@ -360,18 +350,9 @@ class TravelPolicyModule{
         {if: condition.isTravelPolicyCompany("0.where.travelPolicyId")}
     ])
     static async getSubsidyTemplates(params): Promise<FindResult>{
-        var options: any = {
-            where: params.where
-        };
-        if(params.columns){
-            options.attributes = params.columns;
-        }
-        options.order = params.order || [['subsidyMoney', 'desc']];
-        if(params.$or) {
-            options.where.$or = params.$or;
-        }
+        params.order = params.order || [['subsidyMoney', 'desc']];
 
-        let paginate = await Models.subsidyTemplate.find(options);
+        let paginate = await Models.subsidyTemplate.find(params);
         let ids =  paginate.map(function(t){
             return t.id;
         })

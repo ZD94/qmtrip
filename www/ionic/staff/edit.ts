@@ -23,9 +23,9 @@ export default async function EditController($scope, $storage, $stateParams, Mod
         if($scope.travelpolicylist && $scope.travelpolicylist.length>0){
             staff.travelPolicyId = $scope.travelpolicylist[0].id;
         }
-        if($scope.departmentlist && $scope.departmentlist.length>0){
+        /*if($scope.departmentlist && $scope.departmentlist.length>0){
             staff.department = $scope.departmentlist[0];
-        }
+        }*/
         staff.company = company;
     }
     $scope.staffId = $stateParams.staffId;

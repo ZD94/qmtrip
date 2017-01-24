@@ -1,0 +1,1 @@
+alter table department.departments drop column IF EXISTS staff_id;

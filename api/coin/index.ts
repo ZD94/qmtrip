@@ -106,17 +106,8 @@ class CoinModule {
      */
     @clientExport
     static async getCoinAccountChanges(params): Promise<FindResult>{
-        var options: any = {
-            where: params.where
-        };
-        if(params.columns){
-            options.attributes = params.columns;
-        }
-        options.order = params.order || [['createdAt', 'desc']];
-        if(params.$or) {
-            options.where.$or = params.$or;
-        }
-        let paginate = await Models.coinAccountChange.find(options);
+        params.order = params.order || [['createdAt', 'desc']];
+        let paginate = await Models.coinAccountChange.find(params);
         let ids =  paginate.map(function(t){
             return t.id;
         })

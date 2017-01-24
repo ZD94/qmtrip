@@ -3,7 +3,7 @@ import { Company, MoneyChange, Supplier } from "./company";
 import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from "./staff";
 import { TravelPolicy, SubsidyTemplate } from './travelPolicy';
 import { PromoCode } from './promoCode';
-import { Department } from './department';
+import { Department, StaffDepartment } from './department';
 import { AccordHotel } from './accordHotel';
 import { Notice, NoticeAccount } from './notice';
 import { Agency, AgencyUser } from './agency';
@@ -24,7 +24,7 @@ import {Approve} from "./approve/index";
 
 export enum EGender {
     MALE = 1,
-    FEMALE
+    FEMALE = 2
 };
 
 export enum EAccountType {
@@ -45,6 +45,7 @@ export interface ModelsInterface {
 
     promoCode: ModelInterface<PromoCode>;
     department: ModelInterface<Department>;
+    staffDepartment: ModelInterface<StaffDepartment>;
     travelPolicy: ModelInterface<TravelPolicy>;
     subsidyTemplate: ModelInterface<SubsidyTemplate>;
     accordHotel: ModelInterface<AccordHotel>;
@@ -93,6 +94,7 @@ export var Models: ModelsInterface = {
 
     promoCode: new ModelDelegate<PromoCode>(),
     department: new ModelDelegate<Department>(),
+    staffDepartment: new ModelDelegate<StaffDepartment>(),
     travelPolicy: new ModelDelegate<TravelPolicy>(),
     subsidyTemplate: new ModelDelegate<SubsidyTemplate>(),
     accordHotel: new ModelDelegate<AccordHotel>(),

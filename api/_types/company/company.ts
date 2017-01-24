@@ -365,6 +365,41 @@ export class Company extends ModelObject{
             return null;
         }
     }
+    
+    async getRootDepartment(companyId?:string): Promise<Department> {
+        var depts = await Models.department.find({where: {companyId: this.id, parentId: null}});
+        if(depts && depts.length>0){
+            return depts[0];
+        }else{
+            return null;
+        }
+    }
+
+    async getAllDepartmentStructure(companyId?:string): Promise<any> {
+        let departmentStructure = new Array();
+        let m = new Array();
+        let pagers = await Models.department.find({where: {companyId: this.id}, order: [['created_at', 'desc']]});
+        let departments = [];
+        departments.push.apply(departments, pagers);
+        while(pagers.hasNextPage()){
+            let nextPager = await pagers.nextPage();
+            departments.push.apply(departments, nextPager);
+            // pagers = nextPager;
+        }
+        for (let i = 0; i < departments.length; i++) {
+            let t = departments[i];
+            t["childDepartments"] = new Array();
+            m.push(t);
+        }
+        for (let i = 0; i < m.length; i++) {
+            if (!m[i].parent || !m[i].parent.id) {
+                dg(m[i], m);
+                departmentStructure.push(m[i]);
+            }
+        }
+
+        return departmentStructure;
+    }
 
     getTripPlans(options?: any): Promise<PaginateInterface<TripPlan> > {
         if(!options) {options = {where: {}}};
@@ -442,6 +477,20 @@ export class Company extends ModelObject{
         await Promise.all(ps);
         this.oa = oa;
         return this.save();
+    }
+}
+
+//p为父菜单节点。o为菜单列表
+function dg(p, o) {
+    for (var i = 0; i < o.length; i++) {
+        var t = o[i];
+        if (t.parent && t.parent.id == p.id) {
+            if(!p.childDepartments){
+                p.childDepartments = [];
+            }
+            p.childDepartments.push(t);
+            dg(t, o);
+        }
     }
 }
 

@@ -371,6 +371,15 @@ export var condition = {
             }
         }
     },
+    isCompanyDepartment: function(idpath: string) {
+        return async function (fn ,self, args) {
+            let parentId = _.get(args, idpath);
+            let department = await Models.department.get(parentId);
+            let staff = await Staff.getCurrent();
+            let company = staff.company;
+            return staff && company && company.id == department.companyId;
+        }
+    },
     isMyTripPlan: function(idpath: string) {
         return async function (fn, self, args) {
             let id = _.get(args, idpath);

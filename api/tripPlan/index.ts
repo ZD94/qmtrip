@@ -803,7 +803,16 @@ class TripPlanModule {
             selectKey = type == 'S' ? 'account_id' : 'project_id';
             modelName = type == 'S' ? 'staff' : 'project';
             if(params.keyWord) {
-                let objs = await Models[modelName].find({where: {name: {$like: `%${params.keyWord}%`}, companyId: company.id}, limit: 100000});
+                let  pagers = await Models[modelName].find({where: {name: {$like: `%${params.keyWord}%`}, companyId: company.id}, order: [['created_at','desc']]});
+
+                let objs = [];
+                objs.push.apply(objs, pagers);
+                while(pagers.hasNextPage()){
+                    let nextPager = await pagers.nextPage();
+                    objs.push.apply(objs, nextPager);
+                    // pagers = nextPager;
+                }
+
                 let selectStr = '';
                 objs.map((s) => {
                     if(s && s.id) {
@@ -833,7 +842,16 @@ class TripPlanModule {
             planSql = `${completeSql} and p.status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE})`;
             completeSql += ` and p.status=${EPlanStatus.COMPLETE}`;
             if(params.keyWord) {
-                let depts = await Models.department.find({where: {name: {$like: `%${params.keyWord}%`}, companyId: company.id}, limit: 100000});
+                let pagers = await Models.department.find({where: {name: {$like: `%${params.keyWord}%`}, companyId: company.id}, order: [['created_at','desc']]});
+
+                let depts = [];
+                depts.push.apply(depts, pagers);
+                while(pagers.hasNextPage()){
+                    let nextPager = await pagers.nextPage();
+                    depts.push.apply(depts, nextPager);
+                    // pagers = nextPager;
+                }
+
                 let deptStr = '';
                 depts.map((s) => {
                     if(s && s.id) {
@@ -1322,12 +1340,13 @@ class TripPlanModule {
             `校验地址: ${config.host}#/finance/trip-detail?id=${tripPlan.id}&code=${financeCheckCode.code}`
         ]
 
-        let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')})
+        let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')});
+        let departmentsStr = await staff.getDepartmentsStr();
 
 
         var data = {
             "submitter": staff.name,  //提交人
-            "department": staff.department.name,  //部门
+            "department": departmentsStr,  //部门
             "budgetMoney": tripPlan.budget || 0, //预算总金额
             "totalMoney": _personalExpenditure || 0,  //实际花费
             "totalMoneyHZ": money2hanzi.toHanzi(_personalExpenditure),  //汉字大写金额

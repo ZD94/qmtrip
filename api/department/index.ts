@@ -7,7 +7,7 @@ var sequelize = require("common/model").DB;
 let DBM = sequelize.models;
 let API = require("common/api");
 import L from 'common/language';
-import {Department} from "api/_types/department";
+import {Department, StaffDepartment} from "api/_types/department";
 import {requireParams, clientExport} from 'common/api/helper';
 import { Models } from '../_types/index';
 import { FindResult, PaginateInterface } from "common/model/interface";
@@ -15,6 +15,7 @@ import {Staff, EStaffStatus} from "api/_types/staff";
 import {conditionDecorator, condition} from "../_decorator";
 
 const departmentCols = Department['$fieldnames'];
+const staffDepartmentCols = StaffDepartment['$fieldnames'];
 class DepartmentModule{
     /**
      * 创建部门
@@ -22,10 +23,11 @@ class DepartmentModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["name","companyId"], departmentCols)
+    @requireParams(["name","companyId", "parentId"], departmentCols)
     @conditionDecorator([
         {if: condition.isCompanyAdminOrOwner("0.companyId")},
-        {if: condition.isCompanyAgency("0.companyId")}
+        {if: condition.isCompanyAgency("0.companyId")},
+        {if: condition.isCompanyDepartment("0.parentId")}
     ])
     static async createDepartment (params): Promise<Department>{
 
@@ -40,7 +42,7 @@ class DepartmentModule{
         var department = Department.create(params);
 
         if(staff){
-            var company = await Models.company.get(staff["companyId"]);
+            var company = staff.company;
             department.company = company;
         }
         return department.save();
@@ -60,16 +62,14 @@ class DepartmentModule{
     static async deleteDepartment(params): Promise<any>{
         var id = params.id;
         var department = await Models.department.get(params.id);
-        let {ids, count} = await API.staff.getStaffs({where : {companyId: department.company.id, departmentId: id, staffStatus: EStaffStatus.ON_JOB}});
-        if(count > 0){
-            throw {code: -1, msg: '该部门下有'+count+'位员工，暂不能删除'};
+        let staffs = await department.getStaffs();
+        if(staffs && staffs.length > 0){
+            throw {code: -1, msg: '该部门下有' + staffs.length + '位员工，暂不能删除'};
         }
 
-        var staff = await Staff.getCurrent();
-        
-
-        if(staff && department["companyId"] != staff["companyId"]){
-            throw L.ERR.PERMISSION_DENY();
+        let childDepartments = await department.getChildDepartments();
+        if(childDepartments && childDepartments.length > 0){
+            throw {code: -2, msg: '该部门下有子级部门，暂不能删除'};
         }
 
         await department.destroy();
@@ -90,7 +90,12 @@ class DepartmentModule{
         {if: condition.isDepartmentAgency("0.id")}
     ])
     static async updateDepartment(params): Promise<Department>{
-        //var staff = await Staff.getCurrent();
+        if(params.parentId){
+            let ids = await DepartmentModule.getAllChildDepartmentsId({parentId: params.id});
+            if(ids.indexOf(params.parentId) >= 0){
+                throw L.ERR.INVALID_ARGUMENT("parentId");
+            }
+        }
         let dept = await Models.department.get(params.id);
         for(let key in params){
             dept[key] = params[key];
@@ -117,30 +122,6 @@ class DepartmentModule{
         return dept;
     };
 
-    /**
-     * 查询企业默认部门
-     * @param params
-     * @returns {*}
-     */
-    @clientExport
-    @requireParams(["companyId"])
-    @conditionDecorator([
-        {if: condition.isCompanyAdminOrOwner("0.companyId")},
-        {if: condition.isCompanyStaff("0.companyId")},
-        {if: condition.isCompanyAgency("0.companyId")}
-    ])
-    static async getDefaultDepartment(params): Promise<Department>{
-        params.isDefault = true;
-        let department = await Models.department.find({where: params});
-        if (department) {
-            return department[0];
-        }
-
-        let dept = Department.create({name: "我的企业", isDefault: true, companyId: params.companyId})
-        let result = await dept.save();
-        return result;
-    }
-
 
     /**
      * 根据属性查找部门id
@@ -154,50 +135,12 @@ class DepartmentModule{
         {if: condition.isCompanyAgency("where.companyId")}
     ])
     static async getDepartments(params) :Promise<FindResult>{
-        //let { accountId } = Zone.current.get("session");
-        //var staff = await Staff.getCurrent();
+        params.order = params.order || [['createdAt', 'desc']];
 
-        var options : any = {};
-        options.where = _.pick(params.where, Object.keys(DBM.Department.attributes));
-        if(params.$or) {
-            options.where.$or = params.where.$or;
-        }
-        if(options.columns){
-            options.attributes = params.attributes;
-        }
-        options.order = params.order || [['createdAt', 'desc']];
-
-        let paginate = await Models.department.find(options);
+        let paginate = await Models.department.find(params);
         return {ids: paginate.map((s)=> {return s.id;}), count: paginate['total']};
     }
 
-
-
-    /**
-     * 得到全部部门
-     * @param params
-     * @returns {*}
-     */
-    @clientExport
-    @requireParams(["companyId"],departmentCols)
-    @conditionDecorator([
-        {if: condition.isCompanyAdminOrOwner("0.companyId")},
-        {if: condition.isCompanyAgency("0.companyId")}
-    ])
-    static async getAllDepartment(params: {companyId?: string}): Promise<PaginateInterface<Department> >{
-        var staff = await Staff.getCurrent();
-        var options: any = {};
-        options.where = params;
-        options.order = "created_at desc";
-
-        if(staff){
-            params.companyId = staff["companyId"];
-            options.where = params;
-        }
-
-        let departments = await Models.department.find(options);
-        return departments;
-    };
 
 
     /**
@@ -263,7 +206,8 @@ class DepartmentModule{
     static getAllChildren(params: {parentId: string}){
         var sql = "with RECURSIVE cte as " +
             "( select a.id,a.name,a.parent_id from department.departments a where id='"+params.parentId+"' " +
-            "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id) " +
+            "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id " +
+            "where k.deleted_at is null) " +
             "select * from cte";
         return sequelize.query(sql)
             .spread(function(children, row){
@@ -296,17 +240,17 @@ class DepartmentModule{
         {if: condition.isDepartmentAdminOrOwner("0.parentId")},
         {if: condition.isDepartmentAgency("0.parentId")}
     ])
-    static getAllChildDepartmentsId(params: {parentId: string}){
+    static getAllChildDepartmentsId(params: {parentId: string}): string[]{
         var ids = [];
         var sql = "with RECURSIVE cte as " +
             "( select a.id,a.name,a.parent_id from department.departments a where id='"+params.parentId+"' " +
-            "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id) " +
+            "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id " +
+            "where k.deleted_at is null) " +
             "select * from cte";
         return sequelize.query(sql)
             .spread(function(children, row){
                 for(var i=0;i<children.length;i++)
-                    ids.push(children[i].id);{
-                }
+                    ids.push(children[i].id);
                 return ids;
             })
     }
@@ -318,115 +262,92 @@ class DepartmentModule{
             })
     }
 
+    /****************************************StaffDepartment begin************************************************/
+
     /**
-     * 查询所有的组织架构并组装数据
-     * @type {getDepartmentStructure}
+     * 创建员工部门记录
+     * @param data
+     * @returns {*}
      */
-    @requireParams(["companyId"])
-    @conditionDecorator([
-        {if: condition.isCompanyAdminOrOwner("0.companyId")},
-        {if: condition.isCompanyAgency("0.companyId")}
-    ])
-    static getDepartmentStructure(params: {companyId: string}){
-        var allDepartmentMap = {};
-        var noParentDep = [];
-        var childOrderId = [];
-        var finalResult = [];
-        return DBM.Department.findAll({where: {companyId: params.companyId}, order: [["created_at", "desc"]]})
-            .then(function(result){
-                //封装allDepartmentMap组装元素结构
-                for(var d=0;d< result.length;d++){
-                    var de = result[d].toJSON();
-                    de.children = [];
-                    allDepartmentMap[de.id] = de;
-                }
-                for(var d=0;d< result.length;d++){
-                    if(de.parentId){
-                        allDepartmentMap[de.parentId].children.push(de);
-                        childOrderId.push(de.id);
-                    }else{
-                        noParentDep.push(de.id);
-                    }
-                }
-                //去除已确定被挂在的最外层元素
-                for(var key in allDepartmentMap){
-                    if(allDepartmentMap[key].children.length == 0 && allDepartmentMap[key].parentId){
-                        delete allDepartmentMap[key];
-                        for(var j=0;j<childOrderId.length;j++){
-                            if(key == childOrderId[j]){
-                                childOrderId.splice(j,1);
-                            }
-                        }
-                    }
-                }
-                //childOrderId控制顺序 将既有子级又有父级的元素按顺序挂载至父级元素
-                for(var j=0;j<childOrderId.length;j++){
-                    var id = childOrderId[j];
-                    var par = allDepartmentMap[id];
-                    if(par){
-                        var pid = par.parentId;
-                        if(allDepartmentMap[pid]){
-                            for(var i=0;i<allDepartmentMap[pid].children.length;i++){
-                                var child = allDepartmentMap[pid].children[i];
-                                if(child.id == id){
-                                    allDepartmentMap[pid].children[i] = allDepartmentMap[id];
-                                }
-                            }
-                            delete allDepartmentMap[id];
-                        }else{
-                            console.log("此分支父级元素已被归位执行顺序有问题");
-                        }
-                    }else{
-                        console.log("childOrderId与allDepartmentMap对应有问题");
-                    }
-                }
-                for(var k=0;k<noParentDep.length;k++){
-                    var np = noParentDep[k];
-                    finalResult.push(allDepartmentMap[np]);
-                }
-                /*console.log(childOrderId);
-                 console.info("noParentDep"+noParentDep);
-                 console.info("allDepartmentMap"+allDepartmentMap);
-                 console.info(finalResult);
-                 console.log(finalResult[0].children);
-                 console.log(finalResult[0].children[0].children);
-                 console.log(finalResult[0].children[0].children[2]);
-                 console.log(finalResult[0].children[0].children[2].children);
-                 console.log("==================================");*/
-                return finalResult;
-            })
+    @clientExport
+    @requireParams(["departmentId", "staffId"], staffDepartmentCols)
+    static async createStaffDepartment (params) : Promise<StaffDepartment>{
+        var staffDepartment = StaffDepartment.create(params);
+        var already = await Models.staffDepartment.find({where: {departmentId: params.departmentId, staffId: params.staffId}});
+        if(already && already.length>0){
+            return already[0];
+        }
+        var result = await staffDepartment.save();
+        return result;
     }
+
+
+    /**
+     * 删除员工部门记录
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    static async deleteStaffDepartment(params) : Promise<any>{
+        var id = params.id;
+        var ah_delete = await Models.staffDepartment.get(id);
+
+        await ah_delete.destroy();
+        return true;
+    }
+
+
+    /**
+     * 更新员工部门记录
+     * @param id
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"], staffDepartmentCols)
+    static async updateStaffDepartment(params) : Promise<StaffDepartment>{
+        var id = params.id;
+
+        var ah = await Models.staffDepartment.get(id);
+        for(var key in params){
+            ah[key] = params[key];
+        }
+        return ah.save();
+    }
+
+    /**
+     * 根据id查询员工部门记录
+     * @param {String} params.id
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    static async getStaffDepartment(params: {id: string}) : Promise<StaffDepartment>{
+        let id = params.id;
+        var ah = await Models.staffDepartment.get(id);
+
+        return ah;
+    };
+
+
+    /**
+     * 根据属性查找员工部门记录
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    static async getStaffDepartments(params): Promise<FindResult>{
+        var staff = await Staff.getCurrent();
+        let paginate = await Models.staffDepartment.find(params);
+        let ids =  paginate.map(function(t){
+            return t.id;
+        })
+        return {ids: ids, count: paginate['total']};
+    }
+
+    /****************************************StaffDepartment end************************************************/
 }
 
+
 export = DepartmentModule;
-
-/*function getAllChildren(parentId){
-    return _children(parentId);
-
-    function _children(parentId) {
-        co(function *() {
-            var arr = [];
-            var children = yield DBM.Department.findAll({parentId: parentId});
-
-            if (children.length) {
-                for(var child of children) {
-                    child.children = yield  _children(child.id);
-                    arr.push(child);
-                }
-            }
-
-            return arr;
-        });
-    }
-}*/
-
-/*setTimeout(function() {
-
-    getAllChildren("")
-        .then(function(result) {
-            console.info(result);
-        })
-        .catch(function(err) {
-            console.info(err.stack);
-        })
-}, 1000);*/

@@ -1,0 +1,66 @@
+<div class="bar bar-subheader">
+    <div class="flex-subheader">
+        <label class="item item-input">
+            <i class="icon ion-search placeholder-icon"></i>
+            <input type="text" placeholder="Search">
+        </label>
+        <span class="fa fa-sort-amount-desc">时间</span>
+        <span class="ion-android-person-add" ng-click="addNewStaff()"></span>
+    </div>
+</div>
+<ion-content padding="true" class="has-header has-subheader">
+    <div class="list">
+        <div class="item department-list item-icon-right" ng-repeat="item in departments" ng-click="goChildDept(item.id)">
+            <div class="department-icon"><i class="icon ion-ios-folder"></i></div>
+            {{item.name}}({{item.staffNum || 0}}人)
+            <i class="icon ion-chevron-right"></i>
+        </div>
+    </div>
+    <div class="list" >
+        <div class="item staff-list" ng-repeat="item in staffs" ng-click="showStaff(item.id)">
+            <!--<div class="staff-avatar-text">{{item.name}}</div>-->
+            <staff-avatar staff="item"
+                          text-class="staff-avatar-text"
+                          img-class="staff-avatar-img"></staff-avatar>
+            <div class="staff-info">
+                <p>{{item.name}}
+                    <span class="staff-role" ng-class="{'bg-blue':item.roleId == EStaffRole.ADMIN}"
+                          ng-if="item.roleId == EStaffRole.ADMIN || item.roleId == EStaffRole.OWNER"
+                    >{{EStaffRoleNames[item.roleId] }}</span>
+                </p>
+                <p>{{item.travelPolicy.name}}</p>
+            </div>
+
+
+            <span class="staff-flag"
+                  ng-class="{'bg-gray':item.status == 0}">{{item.status == 0 ? '未激活' : ''}}新加入</span>
+        </div>
+        <!--<div class="item staff-list">-->
+        <!--<img class="staff-avatar-img" src="ionic/images/logo.png">-->
+        <!--</div>-->
+    </div>
+
+    <!--<ion-list show-delete="showDelete">-->
+    <!--<ion-item ng-repeat="department in departments">-->
+    <!--<ion-delete-button class="ion-minus-circled" ng-click="deleteDept(department, $index)"> </ion-delete-button>-->
+    <!--{{department.department.name}}-->
+    <!--<span class="item-note">{{department.staffnum}}人</span>-->
+    <!--<ion-option-button class="button-calm" ng-click="editDept(department.department)"> 修改 </ion-option-button>-->
+    <!--&lt;!&ndash;<span class="item-note" ng-click="deleteDept(department.department, $index)">X</span>span&ndash;&gt;-->
+    <!--</ion-item>-->
+    <!--</ion-list>-->
+    <!--<button id="page29-button87" class="button button-positive  button-block" ng-click="newdepart()">增加部门</button>-->
+    <!--<button id="page29-button88" class="button button-stable  button-block" ng-click="showDelete = !showDelete;showReorder = false">管理</button>-->
+
+</ion-content>
+<div class="tabs">
+    <a class="tab-item" ng-click="addDepartment()">
+        添加子部门
+    </a>
+    <a class="tab-item" ng-click="setDepartment()">
+        部门管理
+    </a>
+    <a class="tab-item">
+        批量移动
+    </a>
+</div>

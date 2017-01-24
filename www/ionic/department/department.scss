@@ -1,0 +1,120 @@
+.department{
+  .bar-subheader{
+    height: 40px;
+    .flex-subheader{
+      display: flex;
+      height: 30px;
+      width: 100%;
+      align-items: center;
+      .item-input{
+        flex: 1;
+        height: 30px;
+        margin-right: 10px;
+      }
+      .fa{
+        margin-right: 10px;
+      }
+    }
+  }
+  .list{
+    .department-list{
+      padding-left: 60px;
+      height: 50px;
+      line-height: 16px;
+      .department-icon{
+        position: absolute;
+        left: 10px;
+        top: 7px;
+        width: 36px;
+        height: 36px;
+        text-align: center;
+        border-radius: 50%;
+        border: 1px solid #dcdcdc;
+        background: #f8f8f8;
+        .icon{
+          color: #7aafec;
+          font-size: 20px;
+          left: 8px;
+        }
+      }
+      .ion-chevron-right{
+        font-size: 16px;
+      }
+    }
+    .staff-list{
+      padding-left: 60px;
+      line-height: 16px;
+      height: 50px;
+      padding-top: 10px;
+      position: relative;
+      .staff-avatar-text{
+        position: absolute;
+        top: 7px;
+        left: 10px;
+        width: 36px;
+        height: 36px;
+        line-height: 36px;
+        background: #28a7e1;
+        border-radius: 50%;
+        color: #fff;
+        text-align: center;
+        font-size: 14px;
+      }
+      .staff-avatar-img{
+        position: absolute;
+        top: 7px;
+        left: 10px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+      }
+      .staff-info{
+        display: inline-block;
+        p{
+          margin: 0;
+          &:last-child{
+            font-size: 10px;
+            color: #9b9b9b;
+          }
+        }
+        .staff-role{
+          &.bg-blue{
+            background: #28a7e1;
+          }
+          border-radius: 2px;
+          background: #F5A623;
+          color: #fff;
+          font-size: 10px;
+        }
+      }
+      .staff-flag{
+        &.bg-gray{
+          background: #9b9b9b;
+        }
+        float: right;
+        background: red;
+        color: #fff;
+        font-size: 12px;
+        border-radius: 3px;
+        margin-top: 4px;
+        padding: 0 5px;
+      }
+    }
+    &:last-child{
+      margin-bottom: 50px;
+    }
+  }
+  .tabs{
+    height: 50px;
+    line-height: 50px;
+    background: rgba(255,255,255,.8);
+    .tab-item{
+      color: #4990e2;
+      font-size: 16px;
+      &:nth-child(2){
+        border-left: 1px solid #ccc;
+        border-right: 1px solid #ccc;
+      }
+    }
+  }
+}

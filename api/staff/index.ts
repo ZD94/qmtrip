@@ -25,10 +25,14 @@ import {conditionDecorator, condition} from "../_decorator";
 import {FindResult} from "common/model/interface";
 import {ENoticeType} from "../_types/notice/notice";
 import {CoinAccount} from "api/_types/coin";
+import {StaffDepartment} from "api/_types/department";
 
 const invitedLinkCols = InvitedLink['$fieldnames'];
 const staffSupplierInfoCols = StaffSupplierInfo['$fieldnames'];
 const staffAllCols = Staff['$getAllFieldNames']();
+if(staffAllCols.indexOf("departmentIds") < 0){
+    staffAllCols.push("departmentIds");
+}
 
 const goInvitedLink = config.host + "/index.html#/login/invited-staff-one";
 
@@ -51,14 +55,10 @@ class StaffModule{
         //检查邮箱 手机号码是否合法
         await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
 
-
-        let defaultDeptment = await company.getDefaultDepartment();
         let defaultTravelPolicy = await company.getDefaultTravelPolicy();
         let staff = Staff.create(params)
         staff.company = company;
-        if(!staff["departmentId"]) {
-            staff.department = defaultDeptment;
-        }
+
         if(!staff["travelPolicyId"]){
             staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
         }
@@ -70,11 +70,10 @@ class StaffModule{
             //为员工设置资金账户
             let ca = CoinAccount.create();
             await ca.save();
-            account.coinAccount = ca;
-            await account.save();
+            staff["coinAccountId"] = ca.id;
+            await staff.save();
         }
 
-        // await API.auth.sendResetPwdEmail({email: result.email, mobile: result.mobile, type: 1, isFirstSet: true, companyName: result.company.name});
         return result;
     }
 
@@ -94,17 +93,16 @@ class StaffModule{
 
         //检查邮箱 手机号码是否合法
         await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
-        let defaultDeptment = await company.getDefaultDepartment();
         let defaultTravelPolicy = await company.getDefaultTravelPolicy();
         let staff = Staff.create(params)
         staff.company = company;
-        if(!staff["departmentId"]) {
-            staff.department = defaultDeptment;
-        }
+
         if(!staff["travelPolicyId"]){
             staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
         }
         let result = await staff.save();
+
+        await result.saveStaffDepartments(params.departmentIds);
 
         let account = await Models.account.get(staff.id);
 
@@ -140,6 +138,7 @@ class StaffModule{
                 throw {code: -3, msg: "不能删除同级用户"};
             }
         }
+        await deleteStaff.deleteStaffDepartments();
         await deleteStaff.destroy();
         return true;
 
@@ -261,12 +260,9 @@ class StaffModule{
 
         let updateStaff = await Models.staff.get(params.id);
         let staff = await Staff.getCurrent();
+        let company = staff.company;
 
         if(params.email){
-            /*if(staff && staff.company["domainName"] && params.email.indexOf(staff.company["domainName"]) == -1){
-                throw L.ERR.EMAIL_SUFFIX_INVALID();
-            }*/
-
             if(updateStaff.staffStatus != 0){
                 throw L.ERR.NOTALLOWED_MODIFY_EMAIL();
             }
@@ -305,16 +301,21 @@ class StaffModule{
         }
         updateStaff = await updateStaff.save();
 
+        //部门是否修改
+        if(params.departmentIds && params.departmentIds.length > 0){
+            await updateStaff.deleteStaffDepartments();
+            await updateStaff.saveStaffDepartments(params.departmentIds);
+        }
+
         if(params.email){
 
             return API.auth.sendResetPwdEmail({companyName: updateStaff.company.name, email: updateStaff.email, type: 1, isFirstSet: true});
         }else{
 
             let tp = await Models.travelPolicy.get(updateStaff["travelPolicyId"]);
-            let defaultDept = await API.department.getDefaultDepartment({companyId: updateStaff["companyId"]});
-            let upDept = await Models.department.get(updateStaff["departmentId"]);
 
             let vals  = {
+                accountId: updateStaff.id,
                 noticeType: ENoticeType.SYSTEM_NOTICE,
                 travelPolicy: tp ? tp.name: '',
                 time: moment().format('YYYY-MM-DD:hh:mm:ss'),
@@ -420,60 +421,6 @@ class StaffModule{
         return DBM.Staff.count({where: {departmentId: params.departmentId, staffStatus: {$gte: EStaffStatus.ON_JOB}}})
     }
 
-
-    /**
-     * 分页查询员工集合
-     * @param params 查询条件 params.company_id 企业id
-     * @param options options.perPage 每页条数 options.page当前页
-     */
-    @clientExport
-    @requireParams(["companyId"], ["name","staffStatus","roleId","departmentId","travelPolicyId","columns","order","$or", "options"])
-    @conditionDecorator([
-        {if: condition.isCompanyAdminOrOwner("0.companyId")},
-        {if: condition.isCompanyAgency("0.companyId")}
-    ])
-    static async listAndPaginateStaff(params) {
-        var options: any = {};
-        if(params.options){
-            options = params.options;
-            delete params.options;
-        }
-        var page, perPage, limit, offset;
-        if (options.page && /^\d+$/.test(options.page)) {
-            page = options.page;
-        } else {
-            page = 1;
-        }
-        if (options.perPage && /^\d+$/.test(options.perPage)) {
-            perPage = options.perPage;
-        } else {
-            perPage = 6;
-        }
-        limit = perPage;
-        offset = (page - 1) * perPage;
-        if (!options.order) {
-            options.order = [["id", "desc"]]
-        }
-        params.staffStatus = {$ne: EStaffStatus.DELETE};//只查询在职人员
-        options.limit = limit;
-        options.offset = offset;
-        options.where = params;
-        return API.department.getDefaultDepartment({companyId: params.companyId})
-            .then(function(defaultDept){
-
-                if(!defaultDept || defaultDept.id == params.departmentId){
-                    params.$or = [{departmentId: params.departmentId},["department_id is null"]];
-                    delete params.departmentId;
-                    options.where = params;
-                }
-                return DBM.Staff.findAndCountAll(options)
-                    .then(function(result){
-                        return new Paginate(page, perPage, result.count, result.rows);
-                    });
-            })
-
-    }
-
     /**
      * 增加员工积分
      * @param params{id: 员工id, increasePoint: 增加分数， remark: 增加原因}
@@ -573,23 +520,16 @@ class StaffModule{
     ])
     static async getPointChanges(params) :Promise<FindResult>{
         let { accountId } = Zone.current.get("session");
-        var options : any = {};
-        options.where = _.pick(params.where, Object.keys(DBM.PointChange.attributes));
-        if(params.$or) {
-            options.where.$or = params.$or;
-        }
-        if(params.attributes){
-            options.attributes = params.attributes;
-        }
+        params.where = _.pick(params.where, Object.keys(DBM.PointChange.attributes));
         let role = await API.auth.judgeRoleById({id:accountId});
 
         let rows, count, ret;
         if(role == EAccountType.STAFF){
-            ret = DBM.PointChange.findAndCount(options);
+            ret = DBM.PointChange.findAndCount(params);
         } else {
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
             if(result){
-                ret = DBM.PointChange.findAndCount(options);
+                ret = DBM.PointChange.findAndCount(params);
             } else {
                 throw L.ERR.PERMISSION_DENY;
             }
@@ -1116,10 +1056,11 @@ class StaffModule{
      * @returns {*}
      */
     @requireParams(['companyId'], ["departmentId"])
-    static statisticStaffsByRole(params: {companyId: string, departmentId?: string}){
+    static async statisticStaffsByRole(params: {companyId: string, departmentId?: string}){
         var where: any = {};
         var companyId = params.companyId;
         var departmentId = params.departmentId;
+        var company = await Models.company.get(companyId);
         where.companyId = companyId;
         if(departmentId){
             where.departmentId = departmentId;
@@ -1129,7 +1070,7 @@ class StaffModule{
         var commonStaffNum = 0;
         var unActiveNum = 0;
         var totalCount = 0;
-        return API.department.getDefaultDepartment({companyId: params.companyId})
+        return company.getDefaultDepartment()
             .then(function(defaultDept){
                 if(defaultDept.id == params.departmentId){
                     where.$or = [{departmentId: params.departmentId},["department_id is null"]];
@@ -1599,18 +1540,9 @@ class StaffModule{
      */
     @clientExport
     static async getStaffSupplierInfos(params): Promise<FindResult>{
-        var options: any = {
-            where: params.where
-        };
-        if(params.columns){
-            options.attributes = params.columns;
-        }
-        options.order = params.order || [['created_at', 'desc']];
-        if(params.$or) {
-            options.where.$or = params.$or;
-        }
+        params.order = params.order || [['created_at', 'desc']];
 
-        let paginate = await Models.staffSupplierInfo.find(options);
+        let paginate = await Models.staffSupplierInfo.find(params);
         let ids =  paginate.map(function(s){
             return s.id;
         })

@@ -1,0 +1,52 @@
+<ion-view title="员工管理">
+    <ion-content class="has-header" padding="true">
+        <div class="new-staff">
+            <div class="item">
+                姓名
+                <span class="item-note">{{staff.name}}</span>
+            </div>
+            <div class="item">
+                手机号<i class="icon ion-ios-checkmark verify" ng-class="{novalid: !staff.isValidateMobile}"></i>
+                <span class="item-note">{{staff.mobile}}</span>
+            </div>
+            <div class="item">
+                邮箱<i class="icon ion-ios-checkmark verify" ng-class="{novalid: !staff.isValidateEmail}"></i>
+                <span class="item-note">{{staff.email || '请绑定邮箱并验证'}}</span>
+            </div>
+            <div class="item item-icon-right avatars">
+                头像
+                <staff-avatar staff="staff" class="item-note" text-class="avatar-text" img-class="avatar-img"></staff-avatar>
+                <!--<div class="item-note" ng-uploader accept="image/png, image/jpeg, image/gif" url="uploadUrl" edit="true" width="160" height="160" done="invoicefuc.done">-->
+                    <!--<img class="avatar-img" ng-src="{{getImageUrl(staff.avatar)}}" ng-if="staff.avatar">-->
+                    <!--<span ng-if="!staff.avatar" class="avatar-text" ng-style="{background: staff.avatarColor || '#2495da'}">-->
+                        <!--{{staff.name| shortName}}</span>-->
+                <!--</div>-->
+            </div>
+            <div class="spacer" style="height: 10px;"></div>
+            <div class="item">
+                角色
+                <span class="item-note">{{EStaffRoleNames[staff.roleId]}}</span>
+            </div>
+            <div class="item">
+                差旅标准
+                <span class="item-note">{{travelPolicy.name}}</span>
+            </div>
+            <div class="item">
+                部门（共{{departments.length}}个）
+                <!--<span class="item-note">{{departments.name}}</span>-->
+            </div>
+            <div class="item item-icon-left" ng-repeat="department in departments track by $index">
+                <i class="icon ion-ios-folder"></i>{{department.name}}
+            </div>
+            <div class="spacer" style="height: 10px;"></div>
+            <a class="button button-block button-calm" ng-click="editStaff()">
+                编辑
+            </a>
+            <a class="button button-block button-assertive"
+               ng-if="!staff.status && staff.id != currentStaff.id && staff.roleId != currentStaff.roleId && staff.roleId != EStaffRole.OWNER"
+               ng-click="deleteStaff()">
+                删除
+            </a>
+        </div>
+    </ion-content>
+</ion-view>
