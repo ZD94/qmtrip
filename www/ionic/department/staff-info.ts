@@ -18,4 +18,7 @@ export async function StaffInfoController($scope,Models,$stateParams){
     console.info(departments);
     console.info(departments.length);
     $scope.EStaffRoleNames = EStaffRoleNames;
+    $scope.editStaff = function(){
+        window.location.href = `#/department/new-staff?staffId=${staff.id}`
+    }
 }

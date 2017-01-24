@@ -30,7 +30,7 @@
             <div class="spacer" style="height: 10px;"></div>
             <div class="item item-icon-right" ng-click="chooseRole()">
                 角色
-                <span class="item-note">{{EStaffRoleNames[staff.role]}}</span>
+                <span class="item-note">{{EStaffRoleNames[staff.roleId]}}</span>
                 <i class="icon ion-chevron-right"></i>
             </div>
             <div class="item item-icon-right" ng-click="choosePolicy()">
@@ -42,7 +42,9 @@
                 部门
                 <span class="item-note">{{departmentNames}}</span>
             </div>
-            <div class="item" ng-repeat="department in selectDepartments track by $index">{{department.name}}</div>
+            <div class="item item-icon-left" ng-repeat="department in selectDepartments track by $index">
+                <i class="icon ion-ios-folder"></i>{{department.name}}
+            </div>
             <div class="item" ng-click="setDepartment()">
                 <a>设置部门</a>
             </div>

@@ -30,6 +30,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
         }
     }
     $scope.staff = staff;
+    console.info(staff);
     $scope.addedArray = []; //用于存放提交时的部门id
     $scope.selectDepartments = []; //用于存放已选择的部门
     $scope.EStaffRoleNames = EStaffRoleNames;
@@ -53,17 +54,17 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
         return {text:rolename,role:EStaffRoleNames.indexOf(rolename)}
     });
     //begin 以下对于role分级暂时没用
-    roles = roles.filter(function(v){
-        if(current.roleId == EStaffRole.OWNER){
-            if(v.role != EStaffRole.OWNER){
-                return v;
-            }
-        }else{
-            if(v.role != EStaffRole.OWNER && v.role != EStaffRole.ADMIN){
-                return v;
-            }
-        }
-    })
+    // roles = roles.filter(function(v){
+    //     if(current.roleId == EStaffRole.OWNER){
+    //         if(v.role != EStaffRole.OWNER){
+    //             return v;
+    //         }
+    //     }else{
+    //         if(v.role != EStaffRole.OWNER && v.role != EStaffRole.ADMIN){
+    //             return v;
+    //         }
+    //     }
+    // })
     //end
     $scope.chooseRole =function(){
         if(current.roleId != EStaffRole.OWNER){
