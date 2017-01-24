@@ -2,7 +2,7 @@ import { Department } from 'api/_types/department';
 import {Staff, EStaffRoleNames, EStaffRole} from 'api/_types/staff/staff';
 var msgbox = require('msgbox');
 
-export async function IndexController($scope, $stateParams, Models, $ionicPopup, $state,$timeout, $location,ngModalDlg,$window) {
+export async function IndexController($scope, $stateParams, Models, $ionicPopup, $ionicNavBarDelegate,$timeout, $location,ngModalDlg,$window) {
     require('./department.scss');
     if($stateParams.departName){
         console.info('comming in....',$stateParams.departName)
@@ -27,7 +27,10 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         }else{
             rootDepartment = await company.getRootDepartment();
         }
-        //$ionicNavBarDelegate.title(rootDepartment.name);
+        $timeout(function(){
+            $ionicNavBarDelegate.title(rootDepartment.name);
+        },100);
+
         $scope.viewHeader = rootDepartment.name;
 
         let departments = await rootDepartment.getChildDeptStaffNum();

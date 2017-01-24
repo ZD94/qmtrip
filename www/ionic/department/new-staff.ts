@@ -140,10 +140,25 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             }
             return department;
         }));
+        $scope.selected = function(department){
+            $scope.hasSelect = false;
+            $scope.addedDepartments.map(function(added,index){
+                if(added.id == department.id){
+                    $scope.hasSelect = true;
+                }
+            })
+            return $scope.hasSelect;
+        }
         $scope.addToDepartments = function(department){
-            let idx = $scope.addedDepartments.indexOf(department);
-            if(idx >= 0){
-                $scope.addedDepartments.splice(idx,1)
+            // let idx = $scope.addedDepartments.indexOf(department);  //数组元素为obj，indexof只能用于str
+            $scope.idx = -1;
+            $scope.addedDepartments.map(function(added,index){
+                if(added.id == department.id){
+                    $scope.idx = index;
+                }
+            })
+            if($scope.idx >= 0){
+                $scope.addedDepartments.splice($scope.idx,1)
             }else{
                 $scope.addedDepartments.push(department);
                 $scope.addedDepartments.sort();
@@ -176,11 +191,14 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             $scope.rootDepartment = parentDdepartment;
         }
     }
-    $scope.saveStaff = function(){
+    $scope.saveStaff = async function(){
         $ionicHistory.nextViewOptions({
             disableBack: true,
             expire: 300
         });
+        if($scope.staffId){
+            await $scope.staff.deleteStaffDepartments();
+        }
         staffSave(BackToDetail)
     }
     $scope.addAnother = function(){

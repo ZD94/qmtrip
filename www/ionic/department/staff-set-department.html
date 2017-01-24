@@ -17,7 +17,7 @@
                     <div class="item"
                          ng-repeat="department in childDepartments"
                          ng-click="addToDepartments(department)"
-                         ng-class="{added: addedDepartments.indexOf(department) >= 0}">
+                         ng-class="{added: selected(department)}">
                         <i class="icon ion-checkmark-circled"></i>{{department.name}}
                         <span class="item-note" ng-if="department.hasChild"
                               ng-click="$event.stopPropagation();$event.preventDefault();showChild(department)">
