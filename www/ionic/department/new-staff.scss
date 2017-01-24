@@ -1,5 +1,8 @@
 .new-staff{
   .item{
+    input[readonly]:not(.cloned-text-input){
+      background: #fff;
+    }
     &.avatars{
       padding: 9px 20px 9px 11px;
       line-height: 40px;
