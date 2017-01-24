@@ -13,7 +13,6 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     let company = staff.company;
     let rootDepartment : Department;
     let newUrl;
-    // console.info('location????', $location.path());
     if($location.path() == '/department/index' ||$location.path() == '/department/'){
         newUrl = '#/department/index-instead';
     }else if($location.path() == '/department/index-instead'){
@@ -68,8 +67,6 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     $scope.goChildDept = async function(id){
         // $ionicNavBarDelegate.title(rootDepartment.name);
         let department = await Models.department.get(id);
-        // let newUrl = '#/department/index?departmentId=' + id +'&departName=' + department.name;
-        console.info(newUrl);
         window.location.href = newUrl + '?departmentId=' + id +'&departName=' + department.name;
 
         // initDepartment(id)
@@ -88,7 +85,6 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     };
     async function setDepartmentController($scope,ngModalDlg){
         require('./set-dialog.scss');
-        console.info($scope.department);
         $scope.chooseParent = async function () {
             let parentDepartment = await ngModalDlg.createDialog({
                 parent: $scope,
@@ -148,7 +144,6 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         let rootDepartment = await $scope.company.getRootDepartment();
         let departments = await rootDepartment.getChildDeptStaffNum();
         $scope.rootDepartment = rootDepartment;
-        console.info(rootDepartment);
         $scope.departments = await Promise.all(departments.map(async function(department) {
             let childDepartment = await department.getChildDeptStaffNum();
             if(childDepartment && childDepartment.length>0){

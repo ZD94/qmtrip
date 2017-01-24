@@ -6,21 +6,28 @@ import {Staff, EStaffRoleNames, EStaffRole} from "api/_types/staff/staff";
 import {EGender} from "api/_types/index";
 import L from 'common/language';
 import validator = require('validator');
+import {Pager} from "common/model/pager";
 var msgbox = require('msgbox');
 
 export async function NewStaffController($scope, Models, $ionicActionSheet, ngModalDlg, $stateParams, $ionicPopup, $ionicHistory){
     require('./new-staff.scss');
     let staff;
     let preRole;
+    let staffId = $scope.staffId = $stateParams.staffId;
     let current = await Staff.getCurrent();
     let company = current.company;
     let travelpolicylist = await company.getTravelPolicies();
     let department = await company.getDefaultDepartment();
-    if($stateParams.staffId){
-        staff = await Models.staff.get($stateParams.staffId);
+    $scope.selectDepartments = []; //用于存放已选择的部门
+    if(staffId){
+        staff = await Models.staff.get(staffId);
         preRole = staff.roleId;
         let currentPolicy = await staff.getTravelPolicy();
         $scope.staffPolicyName = currentPolicy.name;
+        let departments = await staff.getDepartments();
+        //prototype Pager departmentpager
+        Object.setPrototypeOf(departments, Pager.prototype);
+        $scope.selectDepartments = departments;
     }else {
         staff = Staff.create();
         staff.company = company;
@@ -30,9 +37,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
         }
     }
     $scope.staff = staff;
-    console.info(staff);
     $scope.addedArray = []; //用于存放提交时的部门id
-    $scope.selectDepartments = []; //用于存放已选择的部门
     $scope.EStaffRoleNames = EStaffRoleNames;
     $scope.invoicefuc = {title:'上传头像',done:function(response){
         if(response.ret != 0){
@@ -89,7 +94,6 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
         return {text:travelPolicy.name,travelPolicy:travelPolicy}
     })
     $scope.choosePolicy = function(){
-        console.info(travelPolicies);
         let hideSheet = $ionicActionSheet.show({
             buttons: travelPolicies,
             titleText: '请选择差旅标准',
@@ -118,8 +122,6 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
         })
         $scope.selectDepartments = dptBeenChecked;
         if(dptBeenChecked){
-            console.info(dptBeenChecked);
-
             $scope.addedArray = [];
             dptBeenChecked.map(function(deparment){
                 $scope.addedArray.push(deparment.id);
@@ -146,7 +148,6 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                 $scope.addedDepartments.push(department);
                 $scope.addedDepartments.sort();
             }
-            console.info($scope.addedDepartments);
         }
         $scope.showChild = async function(department){
             $scope.rootDepartment = department;
@@ -175,8 +176,21 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             $scope.rootDepartment = parentDdepartment;
         }
     }
-
-    $scope.saveStaff = async function(){
+    $scope.saveStaff = function(){
+        $ionicHistory.nextViewOptions({
+            disableBack: true,
+            expire: 300
+        });
+        staffSave(BackToDetail)
+    }
+    $scope.addAnother = function(){
+        $ionicHistory.nextViewOptions({
+            disableBack: true,
+            expire: 300
+        });
+        staffSave(AddAnotherOne);
+    }
+    async function staffSave(callback){
         let staff = $scope.staff;
         var ownerModifyAdmin = false;
         try{
@@ -236,7 +250,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                                 type: 'button-positive',
                                 onTap: async function (e) {
                                     staff = await staff.save();
-                                    $ionicHistory.goBack(-1);
+                                    callback();
                                 }
                             }
                         ]
@@ -245,11 +259,9 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             }
 
             if(!ownerModifyAdmin){
-                console.info(staff);
                 staff = await staff.save();
-                console.info($scope.addedArray,'=================');
                 await staff.saveStaffDepartments($scope.addedArray)
-                $ionicHistory.goBack(-1);
+                callback();
             }
         }catch(err){
             if(err.code == -1){
@@ -257,5 +269,11 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             }
             msgbox.log(err.msg || err);
         }
+    }
+    function BackToDetail(){
+        window.location.href = `#/department/staff-info?staffId=${$scope.staff.id}`
+    }
+    function AddAnotherOne(){
+        window.location.reload();
     }
 }

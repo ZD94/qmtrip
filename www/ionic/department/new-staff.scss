@@ -40,10 +40,19 @@
         font-size: 14px;
       }
     }
+    &.item-icon-left{
+      padding-left: 40px;
+      .ion-ios-folder{
+        font-size: 18px;
+        color: #7aafec;
+      }
+    }
     .sex{
       margin-left: 70px;
       display: inline-block;
     }
   }
-
+  .button.button-outline{
+    background: #fff;
+  }
 }

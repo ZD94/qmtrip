@@ -1,4 +1,4 @@
-<ion-view title="添加员工">
+<ion-view title="员工管理">
     <ion-content class="has-header" padding="true">
         <div class="new-staff">
             <label class="item item-input">
@@ -49,6 +49,9 @@
                 <a>设置部门</a>
             </div>
             <a class="button button-block button-calm" ng-click="saveStaff()">保存</a>
+            <a class="button button-block button-calm button-outline"
+               ng-if="!staffId"
+               ng-click="AddAnotherOne()">保存并添加下一个</a>
         </div>
     </ion-content>
 </ion-view>

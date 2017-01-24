@@ -5,6 +5,5 @@
 import {IndexController} from "./controller";
 
 export async function IndexInsteadController($scope,$injector){
-    console.info(",,,,")
     return $injector.invoke(IndexController,this,{$scope})
 }
