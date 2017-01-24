@@ -1,5 +1,4 @@
 import moment = require('moment');
-import UnitOfTime = moment.UnitOfTime;
 
 export default async function StaffSavedRankController($scope) {
     require('./staff-saved-rank.scss');
@@ -18,9 +17,9 @@ export default async function StaffSavedRankController($scope) {
         $scope[type] = true;
         
         if(!$scope.isAll) {
-            let typeStr = $scope.isMonth ? 'month' : 'year';
-            options.startTime = moment().startOf(typeStr as UnitOfTime).format(formatStr);
-            options.endTime = moment().endOf(typeStr as UnitOfTime).format(formatStr);
+            let typeStr: moment.unitOfTime.StartOf = $scope.isMonth ? 'month' : 'year';
+            options.startTime = moment().startOf(typeStr).format(formatStr);
+            options.endTime = moment().endOf(typeStr).format(formatStr);
         }
 
         $scope.staffSaves = await API.tripPlan.tripPlanSaveRank(options);
