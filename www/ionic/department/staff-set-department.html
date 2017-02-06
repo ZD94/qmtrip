@@ -1,7 +1,7 @@
 <ion-modal-view class="staff-set-dpt">
     <ion-header-bar class="bar-stable">
         <h1 class="title">选择部门</h1>
-        <a class="button button-clear" ng-click="modal.hide()">取消</a>
+        <a class="button button-clear" ng-click="confirm(oldDepartments)">取消</a>
     </ion-header-bar>
     <ion-content scroll="false">
         <div class="flex-c10">
@@ -34,7 +34,7 @@
                     </ion-scroll>
                     <!--<scroll-x array-models="addedDepartments"></scroll-x>-->
                 </div>
-                <div class="confirm" ng-click="confirmModal(addedDepartments)">确定</div>
+                <div class="confirm" ng-click="confirm(addedDepartments)">确定</div>
             </div>
         </div>
     </ion-content>

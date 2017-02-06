@@ -115,7 +115,7 @@ export async function InvitedStaffTwoController ($scope, $stateParams){
             msgbox.log("密码格式应为6-20位字母或数字");
             return;
         }
-        let num = Math.random() * 10;
+        let num = Math.floor(Math.random() * 10);
         $scope.form.avatarColor = colorful[num];
         API.auth.invitedStaffRegister($scope.form)
             .then(function (result) {

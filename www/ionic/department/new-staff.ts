@@ -7,6 +7,7 @@ import {EGender} from "api/_types/index";
 import L from 'common/language';
 import validator = require('validator');
 import {Pager} from "common/model/pager";
+var _ = require('lodash');
 var msgbox = require('msgbox');
 
 export async function NewStaffController($scope, Models, $ionicActionSheet, ngModalDlg, $stateParams, $ionicPopup, $ionicHistory){
@@ -131,6 +132,8 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     }
     async function setDepartment($scope){
         require('./staff-set-department.scss');
+        $scope.oldDepartments = _.clone($scope.addedDepartments)
+        // $scope.oldDepartments = oldDepartments;
         $scope.childDepartments = await Promise.all($scope.childDepartments.map(async function(department) {
             let childDepartment = await department.getChildDeptStaffNum();
             if(childDepartment && childDepartment.length>0){
@@ -189,6 +192,9 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                 return department;
             }));
             $scope.rootDepartment = parentDdepartment;
+        }
+        $scope.confirm = function(department){
+            $scope.confirmModal(department);
         }
     }
     $scope.saveStaff = async function(){
