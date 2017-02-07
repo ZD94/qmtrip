@@ -8,6 +8,8 @@ var msgbox = require('msgbox');
 
 export async function StaffInfoController($scope, Models, $stateParams, $ionicPopup, $ionicHistory){
     require('./new-staff.scss');
+    API.require("auth");
+    await API.onload();
     let staff = await Models.staff.get($stateParams.staffId);
     let travelPolicy = await staff.getTravelPolicy();
     let departments = await staff.getDepartments();
@@ -51,5 +53,10 @@ export async function StaffInfoController($scope, Models, $stateParams, $ionicPo
     }
     $scope.invitedAgain = function(){
         //重新给员工发送激活链接
+        try{
+            API.auth.reSendActiveSms({accountId: $scope.staff.id})
+        }catch(err){
+            msgbox.log(err.msg || err)
+        }
     }
 }
