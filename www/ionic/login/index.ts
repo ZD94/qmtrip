@@ -78,13 +78,13 @@ export class IndexController {
             this.$storage.local.set("last_login_user", this.account);
             this.saveAndGoBackUrl(data);
         } catch(err) {
-            //var str = err.msg;
             /*if(err.code == -28 && err.msg == "您的账号还未激活"){
              $scope.unactivated = true;
              }else */
-            if(err.code == -37 && err.msg.indexOf("您的手机号还未验证") != -1) {
+            /*if(err.code == -37 && err.msg.indexOf("您的手机号还未验证") != -1) {
                 this.showMobilePopup();
-            } else if(err.code == -38 && err.msg.indexOf("您的邮箱还未验证") != -1) {
+            } else*/
+            if(err.code == -38 && err.msg.indexOf("您的邮箱还未验证") != -1) {
                 this.showEmailPopup();
             } else {
                 msgbox.log(err.msg || err);//显示错误消息
