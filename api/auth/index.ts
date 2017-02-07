@@ -822,9 +822,6 @@ export default class ApiAuth {
      * @returns {*}
      */
     @requireParams(["id"])
-    @conditionDecorator([
-        {if: condition.isMySelf("0.id")}
-    ])
     static async getPrivateInfo(params) {
         var id = params.id;
         var acc = await Models.account.get(id);

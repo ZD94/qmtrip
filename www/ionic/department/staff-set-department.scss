@@ -1,11 +1,19 @@
 .staff-set-dpt{
   ion-content{
     background: #f8f8f8;
-    .added{
-      .ion-checkmark-circled{
+    .item{
+      .ion-ios-circle-outline,.ion-checkmark-circled{
+        width: 18px;
+        font-size: 20px;
+        display: inline-block;
         color: #28a7e1;
       }
     }
+    //.added{
+    //  .ion-checkmark-circled{
+    //    color: #28a7e1;
+    //  }
+    //}
     .root-item{
       padding: 0 0 0 16px;
       line-height: 52px;

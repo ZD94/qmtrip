@@ -39,8 +39,12 @@
                 <i class="icon ion-ios-folder"></i>{{department.name}}
             </div>
             <div class="spacer" style="height: 10px;"></div>
-            <a class="button button-block button-calm" ng-click="editStaff()">
+
+            <a class="button button-block button-calm" ng-if="staff.status != 0" ng-click="editStaff()">
                 编辑
+            </a>
+            <a class="button button-block button-calm" ng-if="staff.status == 0" ng-click="invitedAgain()">
+                重新邀请激活
             </a>
             <a class="button button-block button-assertive"
                ng-if="!staff.status && staff.id != currentStaff.id && staff.roleId != currentStaff.roleId && staff.roleId != EStaffRole.OWNER"

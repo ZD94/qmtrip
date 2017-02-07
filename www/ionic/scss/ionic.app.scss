@@ -152,6 +152,9 @@ ion-content {
   .scroll-view.scroll-y[overflow-scroll="false"][has-bouncing="true"] {
     overflow-y: hidden;
   }
+  .action-sheet .button{
+    text-align: center;
+  }
 }
 
 .platform-ios{

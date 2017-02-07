@@ -8,4 +8,7 @@ export async function AddStaffController($scope){
     $scope.addStaff = function(){
         window.location.href = '#/department/new-staff'
     }
+    $scope.shareLink = function(){
+        window.location.href = '#/company/staff-invited'
+    }
 }

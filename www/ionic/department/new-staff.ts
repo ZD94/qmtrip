@@ -20,6 +20,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     let travelpolicylist = await company.getTravelPolicies();
     let department = await company.getDefaultDepartment();
     $scope.selectDepartments = []; //用于存放已选择的部门
+    $scope.addedArray = []; //用于存放提交时的部门id
     if(staffId){
         staff = await Models.staff.get(staffId);
         preRole = staff.roleId;
@@ -29,6 +30,10 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
         //prototype Pager departmentpager
         Object.setPrototypeOf(departments, Pager.prototype);
         $scope.selectDepartments = departments;
+        departments.map(function(department){
+            $scope.addedArray.push(department.id);
+            $scope.addedArray.sort();
+        });
     }else {
         staff = Staff.create();
         staff.company = company;
@@ -38,7 +43,6 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
         }
     }
     $scope.staff = staff;
-    $scope.addedArray = []; //用于存放提交时的部门id
     $scope.EStaffRoleNames = EStaffRoleNames;
     $scope.invoicefuc = {title:'上传头像',done:function(response){
         if(response.ret != 0){
@@ -86,7 +90,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                 return true;
             },
             buttonClicked: function(index) {
-                $scope.staff.role = index;
+                $scope.staff.roleId = index;
                 return true;
             }
         })
