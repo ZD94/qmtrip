@@ -48,7 +48,8 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         let result = await ngModalDlg.createDialog({
             parent: $scope,
             scope:{
-                company: company
+                company: company,
+                parentDepartment: rootDepartment
             },
             template: require('./add-child-department.html'),
             controller: addChildDepartmentController
@@ -191,6 +192,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     async function addChildDepartmentController($scope,ngModalDlg){
         require('./add-department.scss');
         $scope.department = Department.create();
+        $scope.department.parent = $scope.parentDepartment;
         let staff = await Staff.getCurrent();
         let company = staff.company;
         $scope.chooseParent = async function () {
