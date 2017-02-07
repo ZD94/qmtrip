@@ -218,6 +218,30 @@ export default class ApiAuth {
     }
 
     /**
+     * 重新发送激活短信qm_new_staff_active
+     * @param params
+     * @returns {boolean}
+     */
+    @clientExport
+    static async reSendActiveSms(params: {accountId: string}): Promise<boolean> {
+        let accountId = params.accountId;
+        let account = await ApiAuth.getPrivateInfo({id: accountId});
+
+        //发送短信通知
+        let values  = {
+            pwd:account.pwd,
+            url:config.host +'#/login/'
+        }
+
+        await API.notify.submitNotify({
+            key: 'qm_new_staff_active',
+            values: values,
+            accountId: account.id
+        });
+        return true;
+    }
+
+    /**
      * @method activeByEmail 通过邮箱链接激活账号
      *
      * 通过邮箱激活账号
