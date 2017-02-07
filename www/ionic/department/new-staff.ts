@@ -90,7 +90,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                 return true;
             },
             buttonClicked: function(index) {
-                $scope.staff.role = index;
+                $scope.staff.roleId = index;
                 return true;
             }
         })
