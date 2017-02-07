@@ -230,7 +230,7 @@ export default class ApiAuth {
         //发送短信通知
         let values  = {
             pwd:account.pwd,
-            url:config.host +'#/login/'
+            url:C.host +'#/login/'
         }
 
         await API.notify.submitNotify({
