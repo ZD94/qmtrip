@@ -23,7 +23,8 @@ export async function StaffInfoController($scope, Models, $stateParams, $ionicPo
     }
     $scope.deleteStaff = function(){
         $ionicPopup.show({
-            title: '确定删除该员工吗？',
+            title: '确定删除',
+            template: '确认删除该员工么？删除后无法恢复，添加需重新邀请，与该员工相关的数据统计信息也无法继续查看',
             scope: $scope,
             buttons: [
                 {
@@ -47,5 +48,8 @@ export async function StaffInfoController($scope, Models, $stateParams, $ionicPo
                 }
             ]
         })
+    }
+    $scope.invitedAgain = function(){
+        //重新给员工发送激活链接
     }
 }
