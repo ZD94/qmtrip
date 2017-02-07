@@ -108,13 +108,18 @@
     height: 50px;
     line-height: 50px;
     background: rgba(255,255,255,.8);
+    -webkit-backdrop-filter: blur(2px);
     .tab-item{
       color: #4990e2;
       font-size: 16px;
+      opacity: 1;
       &:nth-child(2){
         border-left: 1px solid #ccc;
         border-right: 1px solid #ccc;
       }
     }
   }
+}
+.platform-android .department .tabs{
+  background: #f7f7f7;
 }
