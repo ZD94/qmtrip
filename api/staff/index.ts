@@ -56,8 +56,13 @@ class StaffModule{
         await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
 
         let defaultTravelPolicy = await company.getDefaultTravelPolicy();
-        let staff = Staff.create(params)
+        let staff = Staff.create(params);
         staff.company = company;
+        let pwd = '';
+        if(!staff.pwd){//设置员工默认密码为手机号后六位
+            pwd = staff.mobile.substr(staff.mobile.length - 6);
+            staff.pwd = utils.md5(pwd);
+        }
 
         if(!staff["travelPolicyId"]){
             staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
@@ -73,6 +78,18 @@ class StaffModule{
             staff["coinAccountId"] = ca.id;
             await staff.save();
         }
+        //发送短信通知
+        let values  = {
+            pwd: pwd,
+            url:config.host +'#/login/'
+        }
+
+        await API.notify.submitNotify({
+            key: 'qm_new_staff_active',
+            values: values,
+            accountId: staff.id
+        });
+
 
         return result;
     }
@@ -94,7 +111,7 @@ class StaffModule{
         //检查邮箱 手机号码是否合法
         await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
         let defaultTravelPolicy = await company.getDefaultTravelPolicy();
-        let staff = Staff.create(params)
+        let staff = Staff.create(params);
         staff.company = company;
 
         if(!staff["travelPolicyId"]){
