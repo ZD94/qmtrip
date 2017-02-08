@@ -5,7 +5,10 @@ const _ = require("lodash");
 
 export async function SubsidyTemplatesController($scope, Models, $ionicPopup) {
     require('./subsidy-templates.scss');
-    $scope.showDelete = false;
+    $scope.data = {
+        showDelete:false
+    }
+    // $scope.showDelete = false;
     if(!$scope.subsidyTemplates){
         $scope.subsidyTemplates = [];
     }
