@@ -5,10 +5,10 @@
     </ion-header-bar>
     <ion-content padding="true" class="has-header">
         <a ng-click="addTemplate()" id="page30-button89" class="button button-positive  button-block">新增补助模板</a>
-        <a class="button button-stable  button-block"
-           ng-click="showDelete = !showDelete;showReorder = false"
+        <a class="button button-stable button-block"
+           ng-click="data.showDelete = !data.showDelete;data.showReorder = false;"
            ng-if="subsidyTemplates.length>0">管理模板</a>
-        <ion-list show-delete="showDelete">
+        <ion-list show-delete="data.showDelete">
             <ion-item ng-repeat="st in subsidyTemplates track by $index">
                 <ion-delete-button class="ion-minus-circled" ng-click="deleteSt(st, $index)"> </ion-delete-button>
                 <div style="color:#000000;">

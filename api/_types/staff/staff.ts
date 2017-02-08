@@ -291,6 +291,14 @@ export class Staff extends ModelObject implements Account {
         params.id = this.id;
         return API.staff.modifyPwd(params);
     }
+    async activeByModifyPwd(params: {pwd: string, msgCode: string, msgTicket: number, accountId?: string}): Promise<boolean> {
+        if(!this.isLocal){
+            API.require('auth');
+            await API.onload();
+        }
+        params.accountId = this.id;
+        return API.auth.activeByModifyPwd(params);
+    }
 
     async getOneStaffSupplierInfo(params: {supplierId: string}): Promise<StaffSupplierInfo> {
         var options: any = {};

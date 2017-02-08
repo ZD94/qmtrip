@@ -100,7 +100,7 @@ export async function InvitedStaffTwoController ($scope, $stateParams){
         }
         var re = xregexp('^\\pL+$');
         if (!re.test($scope.form.name)){
-            msgbox.log("不能包含特殊字符");
+            msgbox.log("姓名不能包含特殊字符");
             return;
         }
         var namePattern = /[\u4e00-\u9fa5]+/g;

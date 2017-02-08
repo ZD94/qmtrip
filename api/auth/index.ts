@@ -229,8 +229,8 @@ export default class ApiAuth {
 
         //发送短信通知
         let values  = {
-            pwd:account.pwd,
-            url:config.host +'#/login/'
+            pwd:account.mobile.substr(account.mobile.length-6),
+            url:'http:'+C.host
         }
 
         await API.notify.submitNotify({
@@ -315,9 +315,9 @@ export default class ApiAuth {
             throw L.ERR.ACCOUNT_NOT_EXIST();
         }
 
-        var ckeckMsgCode = await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
+        var checkMsgCode = await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
 
-        if(ckeckMsgCode) {
+        if(checkMsgCode) {
             if(account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
                 account.status = ACCOUNT_STATUS.ACTIVE;
             }
@@ -327,6 +327,41 @@ export default class ApiAuth {
             throw {code: -1, msg: "短信验证码错误"};
         }
         return account;
+    }
+
+    /**
+     * （手动添加和批量导入员工）通过首次登陆修改密码激活账号
+     * @param data
+     * @returns {Account}
+     */
+    @clientExport
+    @requireParams(['pwd', 'msgCode', 'msgTicket', 'accountId'])
+    static async activeByModifyPwd(data: {pwd: string, msgCode: string, msgTicket: number, accountId: string}): Promise<boolean> {
+        let account = await Models.staff.get(data.accountId);
+        let pwd = data.pwd;
+        let msgCode = data.msgCode;
+        let msgTicket = data.msgTicket;
+
+        if(!msgCode || !msgTicket) {
+            throw L.ERR.CODE_ERROR();
+        }
+        if(!account) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+
+        var checkMsgCode = await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: account.mobile});
+
+        if(checkMsgCode) {
+            account.pwd = utils.md5(pwd);
+            if(account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
+                account.status = ACCOUNT_STATUS.ACTIVE;
+            }
+            account.isValidateMobile = true;
+            account = await account.save()
+        } else {
+            throw {code: -1, msg: "短信验证码错误"};
+        }
+        return true;
     }
 
     /**

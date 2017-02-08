@@ -103,6 +103,10 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
             }
         }
         $scope.saveDepartment = async function(){
+            if(!$scope.department.name){
+                msgbox.log('部门名称不能为空');
+                return false;
+            }
             try{
                 await $scope.department.save();
             }catch(e){

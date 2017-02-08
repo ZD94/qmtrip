@@ -5,6 +5,7 @@ import {Table, Create, Field, Reference, ResolveRef, RemoteCall, LocalCall} from
 import { ModelObject } from 'common/model/object';
 import { Types, Values } from 'common/model';
 import {RemoteInfo} from "dgram";
+let API = require("common/api");
 
 @Table(Models.department, "department.")
 export class Department extends ModelObject{
@@ -73,6 +74,16 @@ export class Department extends ModelObject{
             return s;
         }))
         return result;
+    }
+
+    @RemoteCall()
+    async getAllStaffNum(): Promise<number>{
+        if(!this.isLocal){
+            API.require('department');
+            await API.onload();
+        }
+        return API.department.getAllStaffNum({departmentId: this.id});
+        
     }
 
     @RemoteCall()

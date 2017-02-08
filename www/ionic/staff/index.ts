@@ -26,6 +26,10 @@ export default async function IndexController($scope, Models, inAppBrowser) {
         if(isFirstLogin.length == 0){
             window.location.href = '#/guide/company-guide';
         }
+    }else{
+        if(staff.isFirstLogin){
+            window.location.href = '#/guild/change-pwd'
+        }
     }
     var tripBudget = await API.tripPlan.statisticTripBudget({isStaff: true});
     console.info(tripBudget);

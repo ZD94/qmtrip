@@ -255,6 +255,25 @@ class DepartmentModule{
             })
     }
 
+    /**
+     * 得到部门下员工总数（包括子部门下的员工）
+     * @param params
+     * @returns {*}
+     */
+    @requireParams(["departmentId"])
+    @conditionDecorator([
+        {if: condition.isDepartmentAdminOrOwner("0.departmentId")},
+        {if: condition.isDepartmentAgency("0.departmentId")}
+    ])
+    static async getAllStaffNum(params: {departmentId: string}): Promise<number>{
+        let ids = await DepartmentModule.getAllChildDepartmentsId({parentId: params.departmentId});
+        let idsStr = ids.join("','");
+        let sql = "select count(*) from" +
+            " (select distinct staff_id from department.staff_departments where department_id in ('"+idsStr+"') and deleted_at is null) as a";
+        let result = await sequelize.query(sql);
+        return result[0][0].count;
+    }
+
     static deleteDepartmentByTest(params){
         return DBM.Department.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
             .then(function(){
