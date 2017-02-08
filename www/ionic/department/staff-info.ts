@@ -55,6 +55,7 @@ export async function StaffInfoController($scope, Models, $stateParams, $ionicPo
         //重新给员工发送激活链接
         try{
             await API.auth.reSendActiveSms({accountId: $scope.staff.id})
+            msgbox.log('激活短信发送成功');
         }catch(err){
             msgbox.log(err.msg || err)
         }

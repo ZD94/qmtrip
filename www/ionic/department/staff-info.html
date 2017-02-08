@@ -3,7 +3,7 @@
         <div class="new-staff">
             <div class="item">
                 姓名
-                <span class="item-note">{{staff.name}}</span>
+                <span class="item-note">{{staff.name}}<span ng-if="staff.status == 0">(未激活)</span></span>
             </div>
             <div class="item">
                 手机号<i class="icon ion-ios-checkmark verify" ng-class="{novalid: !staff.isValidateMobile}"></i>
