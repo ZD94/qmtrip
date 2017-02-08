@@ -143,17 +143,20 @@ class StaffModule{
     ])
     static async deleteStaff(params): Promise<any> {
         let deleteStaff = await Models.staff.get(params.id);
+        let departmentManger = await Models.department.$find({where: {managerId: deleteStaff.id}});
         let staff = await Staff.getCurrent();
         if(staff){
             if(staff["id"] == params.id){
                 throw {code: -1, msg: "不可删除自身信息"};
             }
-
             if(deleteStaff["roleId"] == EStaffRole.OWNER){
                 throw {code: -2, msg: "企业创建人不能被删除"};
             }
             if(staff["roleId"] == deleteStaff["roleId"]){
                 throw {code: -3, msg: "不能删除同级用户"};
+            }
+            if(departmentManger && departmentManger.count>0){
+                throw {code: -4, msg: "该员工为部门主管不能被删除"};
             }
         }
         await deleteStaff.deleteStaffDepartments();
