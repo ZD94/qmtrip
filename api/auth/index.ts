@@ -229,8 +229,8 @@ export default class ApiAuth {
 
         //发送短信通知
         let values  = {
-            pwd:account.pwd,
-            url:C.host +'#/login/'
+            pwd:account.mobile.substr(account.mobile.length-6),
+            url:'http:'+C.host
         }
 
         await API.notify.submitNotify({

@@ -51,10 +51,10 @@ export async function StaffInfoController($scope, Models, $stateParams, $ionicPo
             ]
         })
     }
-    $scope.invitedAgain = function(){
+    $scope.invitedAgain = async function(){
         //重新给员工发送激活链接
         try{
-            API.auth.reSendActiveSms({accountId: $scope.staff.id})
+            await API.auth.reSendActiveSms({accountId: $scope.staff.id})
         }catch(err){
             msgbox.log(err.msg || err)
         }
