@@ -89,7 +89,8 @@ class StaffModule{
             values: values,
             accountId: staff.id
         });
-
+        staff.isValidateMobile = true;
+        staff = await staff.save();
 
         return result;
     }
