@@ -81,7 +81,7 @@ class StaffModule{
         //发送短信通知
         let values  = {
             pwd: pwd,
-            url:config.host +'#/login/'
+            url:'http:' + config.host
         }
 
         await API.notify.submitNotify({
@@ -288,14 +288,14 @@ class StaffModule{
                 throw L.ERR.NOTALLOWED_MODIFY_EMAIL();
             }
 
-            var account1 = await Models.account.find({where: {email: params.email, type: 1}, paranoid: false});
+            var account1 = await Models.account.find({where: {email: params.email, type: 1}});
             if (account1 && account1.length>0) {
                 throw L.ERR.EMAIL_HAS_REGISTRY();
             }
         }
 
         if(params.mobile){
-            var account2 = await Models.account.find({where: {mobile: params.mobile, type: 1}, paranoid: false});
+            var account2 = await Models.account.find({where: {mobile: params.mobile, type: 1}});
             if (account2 && account2.length>0) {
                 throw L.ERR.MOBILE_HAS_REGISTRY();
             }

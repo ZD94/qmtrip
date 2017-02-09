@@ -483,7 +483,7 @@ export default class ApiAuth {
         var type = EAccountType.STAFF;
         //查询邮箱是否已经注册
         if(data.email) {
-            var account1 = await Models.account.find({where: {email: data.email, type: type}, paranoid: false});
+            var account1 = await Models.account.find({where: {email: data.email, type: type}});
             if(account1 && account1.length > 0) {
                 throw L.ERR.EMAIL_HAS_REGISTRY();
             }
@@ -503,7 +503,7 @@ export default class ApiAuth {
         }
 
         if(data.mobile) {
-            var account2 = await Models.account.find({where: {mobile: mobile, type: type}, paranoid: false});
+            var account2 = await Models.account.find({where: {mobile: mobile, type: type}});
             if(account2 && account2.length > 0) {
                 throw L.ERR.MOBILE_HAS_REGISTRY();
             }
@@ -979,14 +979,14 @@ export default class ApiAuth {
         }
         //查询邮箱是否已经注册
         if(data.email) {
-            var account1 = await Models.account.find({where: {email: data.email}, paranoid: false});
+            var account1 = await Models.account.find({where: {email: data.email}});
             if(account1 && account1.total > 0) {
                 throw L.ERR.EMAIL_HAS_REGISTRY();
             }
         }
 
         if(data.mobile) {
-            var account2 = await Models.account.find({where: {mobile: data.mobile}, paranoid: false});
+            var account2 = await Models.account.find({where: {mobile: data.mobile}});
             if(account2 && account2.total > 0) {
                 throw L.ERR.MOBILE_HAS_REGISTRY();
             }
