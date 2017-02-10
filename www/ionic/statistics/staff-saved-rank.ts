@@ -17,7 +17,7 @@ export default async function StaffSavedRankController($scope) {
         $scope[type] = true;
         
         if(!$scope.isAll) {
-            let typeStr: moment.unitOfTime.StartOf = $scope.isMonth ? 'month' : 'year';
+            let typeStr: any = $scope.isMonth ? 'month' : 'year';
             options.startTime = moment().startOf(typeStr).format(formatStr);
             options.endTime = moment().endOf(typeStr).format(formatStr);
         }
