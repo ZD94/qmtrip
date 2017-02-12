@@ -5,9 +5,9 @@
   "description": "qmtrip",
   "main": "server.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha --harmony --delay test",
-    "start": "node --harmony --harmony_destructuring server.js dev",
-    "dev": "nodemon --harmony --harmony_destructuring server.js dev"
+    "test": "NODE_ENV=test mocha --delay test",
+    "start": "node server.js dev",
+    "dev": "nodemon server.js dev"
   },
   "repository": {
     "type": "git",
