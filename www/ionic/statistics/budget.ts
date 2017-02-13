@@ -102,8 +102,8 @@ export default async function BudgetController($scope, $stateParams, Models) {
     }
 
     $scope.goToStaffRecords = function(name) {
-        let sTime = moment($scope.data.monthSelection.startTime).format();
-        let eTime = moment($scope.data.monthSelection.endTime).format();
+        let sTime = moment($scope.data.monthSelection.startTime).format(formatStr);
+        let eTime = moment($scope.data.monthSelection.endTime).format(formatStr);
         window.location.href = `#/trip/list-all?type=${$scope.data.monthSelection.type}&keyword=${name}&sTime=${sTime}&eTime=${eTime}`;
     };
 
