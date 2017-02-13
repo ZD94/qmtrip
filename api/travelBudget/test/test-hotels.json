@@ -1,0 +1,1374 @@
+[
+  {
+    "name": "滨州青藤源大饭店",
+    "star": 5,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 428
+      }
+    ],
+    "latitude": 37.3856239318848,
+    "longitude": 117.998176574707,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州贵苑大酒店",
+    "star": 4,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 288
+      }
+    ],
+    "latitude": 37.383355,
+    "longitude": 118.010159,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州大饭店",
+    "star": 5,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 298
+      }
+    ],
+    "latitude": 37.40342,
+    "longitude": 117.963005,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州佳泰饭店",
+    "star": 4,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 198
+      }
+    ],
+    "latitude": 37.380477,
+    "longitude": 118.014421,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "锦江之星（滨州黄河三路店）",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 119
+      }
+    ],
+    "latitude": 37.373357,
+    "longitude": 117.998968,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "7天（滨州渤海十路店）",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 77
+      }
+    ],
+    "latitude": 37.372931,
+    "longitude": 118.003111,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "如家（滨州渤海九路店）",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 104
+      }
+    ],
+    "latitude": 37.382875,
+    "longitude": 118.010304,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "速8（滨州汽车总站店）",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 109
+      }
+    ],
+    "latitude": 37.370618,
+    "longitude": 117.937901,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "银座佳驿酒店（滨州汽车总站店）",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 107
+      }
+    ],
+    "latitude": 37.371602,
+    "longitude": 117.932745,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "如家（滨州渤海十路美食街店）",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 104
+      }
+    ],
+    "latitude": 37.387004,
+    "longitude": 118.001326,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "汉庭（滨州汽车总站店）",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 136
+      }
+    ],
+    "latitude": 37.372345,
+    "longitude": 117.935036,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "悦家快捷酒店（滨州渤海八路店）",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 89
+      }
+    ],
+    "latitude": 37.393321,
+    "longitude": 118.012825,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州尚客优骏怡连锁酒店(店)",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 146
+      }
+    ],
+    "latitude": 37.383948810891,
+    "longitude": 117.99752749752,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "格林豪泰（滨州黄河十路店）",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 123
+      }
+    ],
+    "latitude": 37.396054,
+    "longitude": 117.997836,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州大学饭店",
+    "star": 3,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 198
+      }
+    ],
+    "latitude": 37.380337,
+    "longitude": 117.981657,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州世纪之星商务酒店",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 70
+      }
+    ],
+    "latitude": 37.373994,
+    "longitude": 118.002894,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "尚客优快捷酒店（滨州汽车总站店）",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 109
+      }
+    ],
+    "latitude": 37.371634,
+    "longitude": 117.938293,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "尚客优快捷酒店（滨州渤海九路店）",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 111
+      }
+    ],
+    "latitude": 37.387268,
+    "longitude": 118.009306,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州米澜风尚假日酒店",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 132
+      }
+    ],
+    "latitude": 37.371843,
+    "longitude": 117.933159,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州海洋之星温泉酒店",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 157
+      }
+    ],
+    "latitude": 37.3934859479142,
+    "longitude": 117.94780931557,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州微公寓",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 139
+      }
+    ],
+    "latitude": 37.3864287291005,
+    "longitude": 117.998007287559,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州如意阁商务精品酒店",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 104
+      }
+    ],
+    "latitude": 37.373316,
+    "longitude": 117.932825,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "汉庭（滨州滨城区政府店）",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 151
+      }
+    ],
+    "latitude": 37.419650397965,
+    "longitude": 118.01820528475,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州彩虹湖商务酒店",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 78
+      }
+    ],
+    "latitude": 37.370942,
+    "longitude": 117.98935,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州佳驿酒店青医店",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 120
+      }
+    ],
+    "latitude": 37.3696205933992,
+    "longitude": 117.999857331033,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州惠尔商务酒店",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 92
+      }
+    ],
+    "latitude": 37.368734,
+    "longitude": 117.954587,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州青苹果酒店",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 133
+      }
+    ],
+    "latitude": 37.377686,
+    "longitude": 117.984506,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州天天如家住宿",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 88
+      }
+    ],
+    "latitude": 37.3708709794407,
+    "longitude": 117.937999761355,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州蓝海公馆",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 80
+      }
+    ],
+    "latitude": 37.370505,
+    "longitude": 117.994513,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州MY·主题酒店",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 168
+      }
+    ],
+    "latitude": 37.4177615716027,
+    "longitude": 118.010290348316,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州宜人易居商务酒店",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 234
+      }
+    ],
+    "latitude": 37.376919506882,
+    "longitude": 117.9922974828,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州名雅商务会馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 88
+      }
+    ],
+    "latitude": 37.3930900626312,
+    "longitude": 118.018100048908,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州雅家快捷酒店",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 88
+      }
+    ],
+    "latitude": 37.380975,
+    "longitude": 118.011861,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州怡然宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 55
+      }
+    ],
+    "latitude": 37.371129,
+    "longitude": 117.935582,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州云鼎快捷酒店",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 83
+      }
+    ],
+    "latitude": 37.372553,
+    "longitude": 117.93386,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州千禧大酒店",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 76
+      }
+    ],
+    "latitude": 37.376388,
+    "longitude": 117.984415,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州惠康宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 40
+      }
+    ],
+    "latitude": 37.378366,
+    "longitude": 117.984503,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州兴旺旅馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 40
+      }
+    ],
+    "latitude": 37.385121,
+    "longitude": 117.989181,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州华滨招待所",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 66
+      }
+    ],
+    "latitude": 37.389126,
+    "longitude": 118.019063,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州365时尚宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 97
+      }
+    ],
+    "latitude": 37.3764228820801,
+    "longitude": 117.982391357422,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州君悦商务宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 80
+      }
+    ],
+    "latitude": 37.372357,
+    "longitude": 117.936677,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "骏怡城际酒店滨州渤海十一路店",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 148
+      }
+    ],
+    "latitude": 37.3837836713712,
+    "longitude": 117.997405999852,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州学院宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 40
+      }
+    ],
+    "latitude": 37.379114,
+    "longitude": 117.984645,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "鑫悦宾馆（滨州财富广场店）",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 60
+      }
+    ],
+    "latitude": 37.371244,
+    "longitude": 117.932675,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "便宜居连锁酒店（滨州车站店）",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 93
+      }
+    ],
+    "latitude": 37.372104,
+    "longitude": 117.934428,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州馨雅宾馆",
+    "star": 2,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 28
+      }
+    ],
+    "latitude": 37.369829,
+    "longitude": 117.934563,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州宇轩宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 50
+      }
+    ],
+    "latitude": 37.378534,
+    "longitude": 117.98451,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州路家宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 40
+      }
+    ],
+    "latitude": 37.370277,
+    "longitude": 117.935475,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州佳美宾馆（汽车站店）",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 40
+      }
+    ],
+    "latitude": 37.370575,
+    "longitude": 117.935014,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州如意宾馆(二)",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 30
+      }
+    ],
+    "latitude": 37.40731,
+    "longitude": 117.976276,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州聚鑫商务宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 30
+      }
+    ],
+    "latitude": 37.370227,
+    "longitude": 117.93421,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州瑞鑫宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 55
+      }
+    ],
+    "latitude": 37.369114,
+    "longitude": 117.996741,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州大众宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 60
+      }
+    ],
+    "latitude": 37.391565,
+    "longitude": 118.006251,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州顺合宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 50
+      }
+    ],
+    "latitude": 37.407419209197,
+    "longitude": 117.97638373218,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州安心宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 64
+      }
+    ],
+    "latitude": 37.407141,
+    "longitude": 117.97692,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州新院之家",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 30
+      }
+    ],
+    "latitude": 37.381596,
+    "longitude": 118.014576,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州大拇指主题酒店",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 149
+      }
+    ],
+    "latitude": 37.411447702658,
+    "longitude": 117.97591288169,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州旅客之家",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 40
+      }
+    ],
+    "latitude": 37.3822174217851,
+    "longitude": 118.01391518024,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州幸福宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 40
+      }
+    ],
+    "latitude": 37.379143,
+    "longitude": 117.98481,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州晟佳公寓",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 65
+      }
+    ],
+    "latitude": 37.392997,
+    "longitude": 118.010467,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州南洋宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 30
+      }
+    ],
+    "latitude": 37.367343,
+    "longitude": 117.998223,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州北极星网络旅馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 40
+      }
+    ],
+    "latitude": 37.380248931786,
+    "longitude": 117.98938203411,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州佳美宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 53
+      }
+    ],
+    "latitude": 37.386465947373,
+    "longitude": 118.01036714209,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州瑞萍宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 50
+      }
+    ],
+    "latitude": 37.381604,
+    "longitude": 118.013803,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州林芳商务宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 68
+      }
+    ],
+    "latitude": 37.417714014102,
+    "longitude": 118.00620254371,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州星期8宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 93
+      }
+    ],
+    "latitude": 37.376008463746,
+    "longitude": 117.9832050986,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州惠美宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 58
+      }
+    ],
+    "latitude": 37.387074855708,
+    "longitude": 118.00329149369,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州金泰商务宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 104
+      }
+    ],
+    "latitude": 37.376398695676,
+    "longitude": 117.98298071298,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州洁友宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 30
+      }
+    ],
+    "latitude": 37.378677,
+    "longitude": 117.984011,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州金安盛宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 83
+      }
+    ],
+    "latitude": 37.370146,
+    "longitude": 117.925464,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州惠满宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 30
+      }
+    ],
+    "latitude": 37.374574,
+    "longitude": 117.936741,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州32号公寓",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 92
+      }
+    ],
+    "latitude": 37.379953,
+    "longitude": 117.985165,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州鑫港宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 68
+      }
+    ],
+    "latitude": 37.371031,
+    "longitude": 117.93541,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州中海旅馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 55
+      }
+    ],
+    "latitude": 37.380778,
+    "longitude": 117.991516,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州盛鑫宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 120
+      }
+    ],
+    "latitude": 37.373695,
+    "longitude": 117.937104,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州汽车站红光旅馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 60
+      }
+    ],
+    "latitude": 37.370573,
+    "longitude": 117.935499,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州兴隆宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 48
+      }
+    ],
+    "latitude": 37.369654,
+    "longitude": 117.935668,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州顺风旅馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 50
+      }
+    ],
+    "latitude": 37.380484140842,
+    "longitude": 117.9849500538,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州通盛电力宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 88
+      }
+    ],
+    "latitude": 37.400564986203,
+    "longitude": 118.0073259999,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州幸福旅馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 45
+      }
+    ],
+    "latitude": 37.366748805015,
+    "longitude": 117.99293245214,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州红枫叶宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 45
+      }
+    ],
+    "latitude": 37.378875423707,
+    "longitude": 117.9973603536,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州天顺旅馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 35
+      }
+    ],
+    "latitude": 37.378246307373,
+    "longitude": 117.984733581543,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州铭都宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 58
+      }
+    ],
+    "latitude": 37.370906926678,
+    "longitude": 117.99485676886,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州可心宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 40
+      }
+    ],
+    "latitude": 37.391588132965,
+    "longitude": 118.01236306274,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州芯芯宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 40
+      }
+    ],
+    "latitude": 37.367254,
+    "longitude": 117.997177,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州松鹤湖商务宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 123
+      }
+    ],
+    "latitude": 37.386353591668,
+    "longitude": 118.00066878372,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州安康旅馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 50
+      }
+    ],
+    "latitude": 37.392047633919,
+    "longitude": 118.00331276942,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州爱之家宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 55
+      }
+    ],
+    "latitude": 37.398491721845,
+    "longitude": 118.00598895322,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州德馨缘商务酒店",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 48
+      }
+    ],
+    "latitude": 37.385938,
+    "longitude": 117.924403,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州鑫华旅馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 35
+      }
+    ],
+    "latitude": 37.380297,
+    "longitude": 117.989162,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州雅晴旅馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 35
+      }
+    ],
+    "latitude": 37.376947,
+    "longitude": 117.996854,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州69号旅馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 35
+      }
+    ],
+    "latitude": 37.376774,
+    "longitude": 117.997306,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州爱家宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 30
+      }
+    ],
+    "latitude": 37.37845969806,
+    "longitude": 117.9847919245,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州通盛电力宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 78
+      }
+    ],
+    "latitude": 37.40028,
+    "longitude": 118.007398,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州顺意宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 75
+      }
+    ],
+    "latitude": 37.378969,
+    "longitude": 117.98469,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州许家佳园宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 40
+      }
+    ],
+    "latitude": 37.378358,
+    "longitude": 117.984546,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州鼎和宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 60
+      }
+    ],
+    "latitude": 37.387166,
+    "longitude": 118.011918,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  },
+  {
+    "name": "滨州华洋宾馆",
+    "star": 0,
+    "agents": [
+      {
+        "name": "ctrip",
+        "price": 40
+      }
+    ],
+    "latitude": 37.371828,
+    "longitude": 117.935416,
+    "checkInDate": "2017-03-01T00:00:00.000Z",
+    "checkOutDate": "2017-03-02T00:00:00.000Z"
+  }
+]

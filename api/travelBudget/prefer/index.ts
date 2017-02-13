@@ -5,7 +5,7 @@
 'use strict';
 import _ = require("lodash");
 import Logger = require('common/logger');
-import * as moment from "moment";
+import moment = require("moment");
 let defaultTicketPrefer = require('./default-ticket-prefer.json');
 let defaultHotelPrefer = require('./default-hotel-prefer.json');
 let defaultInternalTicketPrefer = require('./default-internal-ticket-prefer.json');
