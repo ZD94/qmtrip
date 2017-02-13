@@ -493,16 +493,18 @@ class CompanyModule {
     /*************************************供应商end***************************************/
 
     static _scheduleTask () {
-        let taskId = "resetTrainPlanPassNum";
-        logger.info('run task ' + taskId);
-        // var rule = new schedule.RecurrenceRule();
-        // rule.date =1;rule.hour =0;rule.minute =0;rule.second =0;
-        scheduler('0 5 0 1 * *', taskId, async function() {
-            let companies = await Models.company.find({where : {tripPlanPassNum : {$gt: 0}}});
-            await Promise.all(companies.map(async (co) => {
-                co["tripPlanPassNum"] = 0;
-                await co.save();
-            }))
+        let taskId = "resetTripPlanPassNum";
+        scheduler('0 5 0 1 * *', taskId, function() {
+            (async ()=> {
+                let companies = await Models.company.find({where : {tripPlanPassNum : {$gt: 0}}});
+                await Promise.all(companies.map(async (co) => {
+                    co["tripPlanPassNum"] = 0;
+                    await co.save();
+                }))
+            })()
+                .catch( (err) => {
+                    logger.error(`执行任务${taskId}错误:${err.stack}`);
+                })
         });
 
         let taskId2 = 'notifyExpireCompany';
