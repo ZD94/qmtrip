@@ -845,7 +845,7 @@ export default class ApiAuth {
         var options: any = {};
         // options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt", "loginFailTimes", "lastLoginAt", "lastLoginIp", "activeToken", "pwdToken", "oldQrcodeToken", "qrcodeToken", "type", "isFirstLogin", "isValidateEmail", "isValidateMobile"];
         var acc = await Models.account.get(id, options);
-        if(acc.pwd){
+        if(acc && acc.pwd){
             delete acc.pwd;
         }
         return acc;
