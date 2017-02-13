@@ -1,3 +1,4 @@
+import {ECompanyType} from "../_types/company/company";
 /**
  * Created by yumiao on 15-12-9.
  */
@@ -518,7 +519,8 @@ class CompanyModule {
                     where: {
                         expiryDate: {
                             $lte: moment().add(EXPIRE_BEFORE_DAYS, 'days')
-                        }
+                        },
+                        type: ECompanyType.PAYED
                     }
                 });
                 pager.forEach((company) => {
