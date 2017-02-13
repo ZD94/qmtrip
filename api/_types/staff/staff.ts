@@ -188,6 +188,7 @@ export class Staff extends ModelObject implements Account {
         if (!options) options = {where: {}};
         if(!options.where) options.where = {};
 
+        //若不查已删除的下边逻辑就会以为已删除的那条通知是未读的全员通知会再加一条进关系表
         var pagers = await Models.noticeAccount.find({where: {accountId: this.id}, paranoid: false, order: [['createdAt', 'desc']]});
 
         let noticeAccounts = [];
@@ -213,6 +214,7 @@ export class Staff extends ModelObject implements Account {
                 return n;
             }
 
+            // 此处处理发给全体员工的 员工拉取通知列表时存入noticeAccount关系表记录（其余发给一个人或多个人的 发消息的时候存入关系表）
             n["isRead"] =  false;
             var na = Models.noticeAccount.create({accountId: self.id, noticeId: n.id, isRead: false});
             await na.save();

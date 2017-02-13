@@ -72,7 +72,7 @@ export default async function EditController($scope, $storage, $stateParams, Mod
             }else{
                 //如果是更新
                 if(_staff.mobile){
-                    var account2 = await Models.account.find({where: {mobile: _staff.mobile, type: 1, id: {$ne: _staff.id}}, paranoid: false});
+                    var account2 = await Models.account.find({where: {mobile: _staff.mobile, type: 1, id: {$ne: _staff.id}}});
 
                     if (account2 && account2.length>0) {
                         throw L.ERR.MOBILE_HAS_REGISTRY();
