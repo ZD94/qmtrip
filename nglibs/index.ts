@@ -17,7 +17,7 @@ angular.module('nglibs', [
         if(spec.is_wechat){
             $('body').addClass('platform-wechat');
         }
-        if(spec.is_wechat && ionic.Platform.isIOS()){
+        if(spec.is_wechat && ionic && ionic.Platform.isIOS()){
             $('title').on('DOMSubtreeModified', function(){
                 var $iframe = $('<iframe src="/favicon.ico"></iframe>');
                 $iframe.on('load',function() {
