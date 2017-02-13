@@ -220,7 +220,7 @@ let ddTalkMsgHandle = {
                 if(!defaultDept){
                     let dd = Models.department.create({name: company.name, isDefault: true});
                     dd.company = company;
-                    await _d.save();
+                    await dd.save();
                 }
             } catch(err) {
                 console.error("导入用户错误", err)
