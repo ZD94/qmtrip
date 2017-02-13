@@ -8,7 +8,7 @@
     <div class="item item-body">
         <ion-list>
             <div class="staff_info" ng-if="showHeader">
-                <div class="staff_portrait" ng-style="{background: trip.account.avatarColor || '#2495da'}">{{trip.account.name | limitTo: -2}}</div>
+                <staff-avatar class="staff_portrait" staff="trip.account"></staff-avatar>
                 <h2 style="margin-top: 0;">{{trip.account.name}}</h2>
             </div>
             <ion-item class="po_r">
