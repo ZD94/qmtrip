@@ -1,0 +1,2 @@
+update department.departments d1 set name = (select name from company.companies where id = d1.company_id) where is_default = true and name = '我的企业';
+update department.departments d1 set is_default = true where d1.name = (select name from company.companies where id = d1.company_id) and d1.is_default = false;

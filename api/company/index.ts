@@ -1,3 +1,4 @@
+import {ECompanyType} from "../_types/company/company";
 /**
  * Created by yumiao on 15-12-9.
  */
@@ -12,7 +13,7 @@ let moment = require('moment');
 let promoCodeType = require('libs/promoCodeType');
 let scheduler = require('common/scheduler');
 let schedule = require("node-schedule");
-
+let _ = require("lodash");
 import {requireParams, clientExport} from "common/api/helper";
 import {Models} from "api/_types";
 import {Company, MoneyChange, Supplier} from 'api/_types/company';
@@ -99,7 +100,7 @@ class CompanyModule {
         company.expiryDate = moment().add(DEFAULT_EXPIRE_MONTH, 'months').toDate();
         company.isApproveOpen = true;
         company.points2coinRate = 50;
-        let department = Department.create({name: "我的企业", isDefault: true});
+        let department = Department.create({name: company.name, isDefault: true});
         let staffDepartment = StaffDepartment.create({staffId: staff.id, departmentId: department.id});
 
         department.company = company;
@@ -493,17 +494,87 @@ class CompanyModule {
     /*************************************供应商end***************************************/
 
     static _scheduleTask () {
-        let taskId = "resetTrainPlanPassNum";
-        logger.info('run task ' + taskId);
-        // var rule = new schedule.RecurrenceRule();
-        // rule.date =1;rule.hour =0;rule.minute =0;rule.second =0;
-        scheduler('0 5 0 1 * *', taskId, async function() {
-            let companies = await Models.company.find({where : {tripPlanPassNum : {$gt: 0}}});
-            await Promise.all(companies.map(async (co) => {
-                co["tripPlanPassNum"] = 0;
-                await co.save();
-            }))
+        let taskId = "resetTripPlanPassNum";
+        scheduler('0 5 0 1 * *', taskId, function() {
+            (async ()=> {
+                let companies = await Models.company.find({where : {tripPlanPassNum : {$gt: 0}}});
+                await Promise.all(companies.map(async (co) => {
+                    co["tripPlanPassNum"] = 0;
+                    await co.save();
+                }))
+            })()
+                .catch( (err) => {
+                    logger.error(`执行任务${taskId}错误:${err.stack}`);
+                })
         });
+
+        let taskId2 = 'notifyExpireCompany';
+        scheduler('0 0 1 * * *', taskId2, function() {
+            //失效日期前1,7,15天时发送 App, 短信, 邮件通知
+            (async function() {
+                let companies = [];
+                let now = new Date();
+                const EXPIRE_BEFORE_DAYS = 15;
+                const PAYED_COMPANY_EXPIRE_NOTIFY = [1, 7, 15]
+                const TRYING_COMPANY_EXPIRE_NOTIFY = [7];
+
+                //获取所有待失效企业
+                let pager = await Models.company.find({
+                    where: {
+                        expiryDate: {
+                            $lte: moment().add(EXPIRE_BEFORE_DAYS, 'days'),
+                            $gte: now,
+                        },
+                    }
+                });
+                pager.forEach((company) => {
+                    companies.push(company);
+                });
+
+                while(pager && pager.hasNextPage()) {
+                    pager = await pager.nextPage();
+                    pager.forEach((company) => {
+                        companies.push(company);
+                    })
+                }
+
+                for(let company of companies) {
+                    if (!company.expiryDate) {
+                        continue;
+                    }
+
+                    let diffDays = moment(company.expiryDate).diff([now.getFullYear(), now.getMonth(), now.getDate()], 'days');
+                    let key = null;
+                    if (company.type == ECompanyType.PAYED
+                        && PAYED_COMPANY_EXPIRE_NOTIFY.indexOf(diffDays) >= 0) {
+                        key = 'qm_notify_will_expire_company';
+                    }
+                    if (company.type != ECompanyType.PAYED
+                        && TRYING_COMPANY_EXPIRE_NOTIFY.indexOf(diffDays) >= 0) {
+                        key = 'qm_notify_trying_will_expire_company'
+                    }
+                    if (key) {
+                        //查询公司管理员和创建人
+                        let managers = await company.getManagers({withOwner: true});
+                        let ps = managers.map( (manager) => {
+                            //给各个企业发送通知
+                            return API.notify.submitNotify({
+                                accountId: manager.id,
+                                key: key,
+                                values: {
+                                    expiryDate: moment(company.expiryDate).format('YYYY-MM-DD'),
+                                    days: diffDays,
+                                }
+                            });
+                        });
+                        await Promise.all(ps);
+                    }
+                }
+            })()
+                .catch((err) => {
+                    logger.error(`run stark ${taskId2} error:`, err.stack);
+                });
+        })
     }
 
 }

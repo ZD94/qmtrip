@@ -18,6 +18,7 @@ import {EApproveChannel, EApproveStatus, EApproveType} from "../approve/types";
 import {emitter} from "../../../libs/oa/emitter";
 import {EVENT} from "../../../libs/oa/index";
 import L from 'common/language';
+import {EStaffRole} from "../staff/staff";
 
 var sequelize = require("common/model").DB;
 let promoCodeType = require('libs/promoCodeType');
@@ -29,6 +30,11 @@ export enum ECompanyStatus {
     DELETE = -2,
     UN_ACTIVE = 0, //未激活状态
     ACTIVE = 1 //激活状态
+}
+
+export enum ECompanyType {
+    TRYING = 0,
+    PAYED = 1,
 }
 
 @Table(Models.company, 'company.')
@@ -206,7 +212,11 @@ export class Company extends ModelObject{
     get extraExpiryDate(): Date { return null; }
     set extraExpiryDate(val: Date) {}
 
-    getStaffs(options?: any): Promise<Staff[]> {
+    @Field({type: Types.INTEGER})
+    get type() :ECompanyType{return ECompanyType.TRYING}
+    set type(type: ECompanyType) {}
+
+    getStaffs(options?: any): Promise<PaginateInterface<Staff>> {
         if(!options) {options = {where: {}}};
         if(!options.where) {options.where = {}};
         options.where.companyId = this.id;
@@ -477,6 +487,33 @@ export class Company extends ModelObject{
         await Promise.all(ps);
         this.oa = oa;
         return this.save();
+    }
+
+    async getManagers(params: {withOwner: boolean}) {
+        let self = this;
+        let roles = [EStaffRole.ADMIN];
+        if (params && params.withOwner) {
+            roles.push(EStaffRole.OWNER);
+        }
+        let managers = []
+        let pager = await self.getStaffs({
+            where: {
+                roleId: {
+                    $in: roles,
+                }
+            }
+        });
+        pager.forEach( (manager) => {
+            managers.push(manager);
+        })
+
+        while(pager && pager.hasNextPage()) {
+            pager = await pager.nextPage();
+            pager.forEach( (manager) => {
+                managers.push(manager);
+            });
+        }
+        return managers;
     }
 }
 

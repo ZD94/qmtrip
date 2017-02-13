@@ -183,6 +183,10 @@ let ddTalkMsgHandle = {
                     // console.info(`导入department:`, d.name)
                     let _d = Models.department.create({name: d.name});
                     _d.company = company;
+                    //将名称与企业名称一致的部门设为默认部门
+                    if(_d.name == company.name){
+                        _d.isDefault = true;
+                    }
                     _d = await _d.save();
 
                     let users = await corpApi.getUserListByDepartment(d.id);
@@ -210,6 +214,13 @@ let ddTalkMsgHandle = {
                             isAdmin: u.isAdmin, name: u.name, ddUserId: u.userid, corpid: corpid});
                         await dingUser.save();
                     }
+                }
+                //若企业没有默认部门添加默认部门
+                let defaultDept = await company.getDefaultDepartment();
+                if(!defaultDept){
+                    let dd = Models.department.create({name: company.name, isDefault: true});
+                    dd.company = company;
+                    await dd.save();
                 }
             } catch(err) {
                 console.error("导入用户错误", err)

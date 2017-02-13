@@ -322,12 +322,12 @@ export default class ApiTravelBudget {
             isAbroad: city.isAbroad
         }
         let budgetConfig = staff.company.budgetConfig;
+        let defaults = loadDefaultPrefer({local: query}, 'hotel');
         if (budgetConfig && budgetConfig.hotel) {
             let compiled = _.template(JSON.stringify(budgetConfig.hotel));
-            qs.prefers = JSON.parse(compiled({local: query}));
-        } else {
-            qs.prefers = loadDefaultPrefer({local: query}, 'hotel');
+            defaults = mergePrefers(defaults, JSON.parse(compiled({local: query})));
         }
+        qs.prefers = defaults;
         qs.query = query;
         let hotels = await API.hotel.search_hotels(query);
         let strategy = await HotelBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
@@ -449,20 +449,21 @@ export default class ApiTravelBudget {
         params['expectTrainCabins'] = trainCabins;
         params['expectFlightCabins'] = cabins;
 
+        let defaults: any[] = [];
         if (isAbroad) {   //国际
+            defaults = loadDefaultPrefer({local: params}, 'abroadTicket');
             if (preferConfig && preferConfig.abroadTraffic) {
                 let compiled = _.template(JSON.stringify(preferConfig.abroadTraffic), { 'imports': { 'moment': moment } });
-                qs.prefers = JSON.parse(compiled({local: params}));
-            } else {
-                qs.prefers = loadDefaultPrefer({local: params}, 'abroadTicket');
+                defaults = mergePrefers(defaults, JSON.parse(compiled({local: params})));
             }
+            qs.prefers = defaults;
         } else {            //国内
+            defaults = loadDefaultPrefer({local: params}, 'ticket');
             if (preferConfig && preferConfig.traffic) {
                 let compiled = _.template(JSON.stringify(preferConfig.traffic), { 'imports': { 'moment': moment } });
-                qs.prefers = JSON.parse(compiled({local: params}));
-            } else {
-                qs.prefers = loadDefaultPrefer({local: params}, 'ticket');
+                defaults = mergePrefers(defaults, JSON.parse(compiled({local: params})));
             }
+            qs.prefers = defaults;
         }
 
         if (!qs.prefers) {
@@ -556,4 +557,23 @@ export default class ApiTravelBudget {
                 .catch(next)
         })
     }
+}
+
+function mergePrefers(defaults, news) {
+    for(let i=0, ii =news.length; i<ii; i++) {
+        let v = news[i];
+        let isHas = false;  //是否包含
+        //查找defaults中是否包含
+        for(let j=0, jj=defaults.length; j<jj; j++) {
+            if (v.name == defaults[j].name) {
+                isHas = true;
+                defaults[j] = _.defaultsDeep(v, defaults[j]);
+                break;
+            }
+        }
+        if (!isHas) {
+            defaults.push(v);
+        }
+    }
+    return defaults;
 }
