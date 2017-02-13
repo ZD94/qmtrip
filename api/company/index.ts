@@ -513,14 +513,18 @@ class CompanyModule {
             //失效日期前1,7,15天时发送 App, 短信, 邮件通知
             (async function() {
                 let companies = [];
+                let now = new Date();
                 const EXPIRE_BEFORE_DAYS = 15;
+                const PAYED_COMPANY_EXPIRE_NOTIFY = [1, 7, 15]
+                const TRYING_COMPANY_EXPIRE_NOTIFY = [7];
+
                 //获取所有待失效企业
                 let pager = await Models.company.find({
                     where: {
                         expiryDate: {
-                            $lte: moment().add(EXPIRE_BEFORE_DAYS, 'days')
+                            $lte: moment().add(EXPIRE_BEFORE_DAYS, 'days'),
+                            $gte: now,
                         },
-                        type: ECompanyType.PAYED
                     }
                 });
                 pager.forEach((company) => {
@@ -538,19 +542,25 @@ class CompanyModule {
                     if (!company.expiryDate) {
                         continue;
                     }
-                    let d = new Date();
-                    let diffDays = moment(company.expiryDate).diff([d.getFullYear(), d.getMonth(), d.getDate()], 'days');
-                    if ([1, 7, 15].indexOf(diffDays) >= 0) {
+
+                    let diffDays = moment(company.expiryDate).diff([now.getFullYear(), now.getMonth(), now.getDate()], 'days');
+                    let key = null;
+                    if (company.type == ECompanyType.PAYED
+                        && PAYED_COMPANY_EXPIRE_NOTIFY.indexOf(diffDays) >= 0) {
+                        key = 'qm_notify_will_expire_company';
+                    }
+                    if (company.type != ECompanyType.PAYED
+                        && TRYING_COMPANY_EXPIRE_NOTIFY.indexOf(diffDays) >= 0) {
+                        key = 'qm_notify_trying_will_expire_company'
+                    }
+                    if (key) {
                         //查询公司管理员和创建人
                         let managers = await company.getManagers({withOwner: true});
-                        if (!managers) {
-                            managers = [];
-                        }
                         let ps = managers.map( (manager) => {
                             //给各个企业发送通知
                             return API.notify.submitNotify({
                                 accountId: manager.id,
-                                key: 'qm_notify_will_expire_company',
+                                key: key,
                                 values: {
                                     expiryDate: moment(company.expiryDate).format('YYYY-MM-DD'),
                                     days: diffDays,
