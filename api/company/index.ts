@@ -99,7 +99,7 @@ class CompanyModule {
         company.expiryDate = moment().add(DEFAULT_EXPIRE_MONTH, 'months').toDate();
         company.isApproveOpen = true;
         company.points2coinRate = 50;
-        let department = Department.create({name: "我的企业", isDefault: true});
+        let department = Department.create({name: company.name, isDefault: true});
         let staffDepartment = StaffDepartment.create({staffId: staff.id, departmentId: department.id});
 
         department.company = company;
