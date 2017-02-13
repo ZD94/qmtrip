@@ -55,7 +55,7 @@ gulplib.bundle_lib('w3libs', {require: ['www/libs']});
 gulplib.angular_app('agency');
 //gulplib.angular_app('mobile');
 gulplib.angular_app('ionic');
-
+gulplib.angular_app('corp-mgr');
 gulplib.post_default('manifest', genManifest);
 
 gulplib.dist(function () {
