@@ -1,4 +1,6 @@
-<div class="text-avatar" ng-class="textClass" ng-style="{background: staff.avatarColor || '#2495da'}" ng-if="!staff.avatar">
-    {{staff.name | shortName}}
+<div class="staff-avatar">
+    <div ng-style="{background: staff.avatarColor || '#2495da'}" ng-if="!staff.avatar">
+        {{staff.name | shortName}}
+    </div>
+    <img ng-if="staff.avatar" ng-src="{{getImageUrl(staff.avatar)}}">
 </div>
-<img class="img-avatar" ng-class="imgClass" ng-if="staff.avatar" ng-src="{{getImageUrl(staff.avatar)}}">
