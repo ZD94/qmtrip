@@ -18,7 +18,7 @@
                     </ion-item>
                     <ion-item
                             class="item-icon-right"
-                            ng-repeat="option in optionItems"
+                            ng-repeat="option in optionItems track by $index"
                             ng-if="displayItem(option) != displayItem(value)"
                             ng-click="confirm(option)"
                             ng-class="{'item-stable':disableItem(option)}"
@@ -31,6 +31,7 @@
                         新建【{{form.keyword}}】
                     </ion-item>
                 </ion-list>
+                <ion-infinite-scroll ng-if="page.hasNextPage()" on-infinite="page.nextPage()"></ion-infinite-scroll>
             </ion-scroll>
         </form>
     </ion-content>
