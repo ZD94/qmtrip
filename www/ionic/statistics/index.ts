@@ -3,6 +3,7 @@ import moment = require("moment");
 export default async function IndexController($scope) {
     require('./statistics.scss');
     API.require("tripPlan");
+    let formatStr = 'YYYY-MM-DD HH:mm:ss';
     var now = moment();
     var data = $scope.data = {
         monthSelection: {
@@ -28,8 +29,8 @@ export default async function IndexController($scope) {
     }
 
     $scope.staffTripRecord = function(){
-        let sTime = moment($scope.data.monthSelection.startTime).format();
-        let eTime = moment($scope.data.monthSelection.endTime).format();
+        let sTime = moment($scope.data.monthSelection.startTime).format(formatStr);
+        let eTime = moment($scope.data.monthSelection.endTime).format(formatStr);
         window.location.href = `#/trip/list-all?sTime=${sTime}&eTime=${eTime}`
     }
 
