@@ -92,6 +92,7 @@ var ngapp = require('ngapp');
 ngapp.depend('nglibs');
 ngapp.root('corp-mgr', '/index/index');
 ngapp.useRoutePolicy(ngapp.RoutePolicy.None);
+ngapp.routeAddSingle('login');
 ngapp.routePushEmbed('');
 ngapp.routePopEmbed();
 var app = ngapp.create('qm.corp-mgr');

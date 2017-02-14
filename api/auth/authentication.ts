@@ -8,7 +8,7 @@ import { Token } from 'api/_types/auth/token';
 import { ACCOUNT_STATUS } from "api/_types/auth";
 
 //生成登录凭证
-export async function makeAuthenticateToken(accountId, os?: string): Promise<LoginResponse> {
+export async function makeAuthenticateToken(accountId, os?: string, expireAt?: Date): Promise<LoginResponse> {
     if(!os) {
         os = 'web';
     }
@@ -21,7 +21,11 @@ export async function makeAuthenticateToken(accountId, os?: string): Promise<Log
     } else {
         token = Models.token.create({token: utils.getRndStr(10), accountId, type});
     }
-    token.expireAt = moment().add(7, "days").toDate();
+    if (!expireAt) {
+        token.expireAt = moment().add(7, "days").toDate();
+    } else {
+        token.expireAt = expireAt;
+    }
     await token.save();
     return {accountId: token.accountId, tokenId: token.id, token: token.token};
 }

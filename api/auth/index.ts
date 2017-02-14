@@ -1074,4 +1074,3 @@ async function _sendActiveEmail(accountId) {
     ]);
 
 }
-
