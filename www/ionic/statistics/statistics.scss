@@ -64,9 +64,23 @@
   height: 160px;
   margin-bottom: 10px;
   .bar-header{
-    height: 30px;
+    height: 36px;
     line-height: 30px;
     border-bottom: 1px dashed #ddd;
+    .avatar{
+      position: relative;
+      width: 30px;
+      height: 30px;
+      float: left;
+      font-size: 12px;
+      margin-right: 5px;
+    }
+    .ion-ios-flag,.ion-ios-home{
+      font-size: 20px;
+      width: 18px;
+      display: inline-block;
+      text-align: center;
+    }
   }
   .left-div{
     float: left;

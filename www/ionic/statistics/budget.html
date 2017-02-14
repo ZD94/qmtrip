@@ -15,7 +15,6 @@
                        ng-click="searchStatistics('D')">按部门</a>
                 </div>
 
-
                 <form class="list">
                     <label class="item item-input">
                         <i class="icon ion-search placeholder-icon"></i>
@@ -27,10 +26,15 @@
                 <ion-list>
                     <ion-item class="item stat-label-content" ng-repeat="en in statisticData"
                               ng-click="goToStaffRecords(en.keyInfo.name)">
-                        <div class="bar-header">{{en.keyInfo.name}}
-                    <span style="float: right">查看详情
-                        <i class="icon ion-chevron-right"></i>
-                    </span>
+                        <div class="bar-header">
+                            <staff-avatar ng-if="isSActive" class="avatar" staff="en.keyInfo"></staff-avatar>
+                            <i ng-if="isPActive" class="icon ion-ios-flag"></i>
+                            <i ng-if="isDActive" class="icon ion-ios-home"></i>
+                            <span>{{en.keyInfo.name}}</span>
+                            <span style="float: right">
+                                查看详情
+                                <i class="icon ion-chevron-right"></i>
+                            </span>
                         </div>
                         <div class="left-div">
                             <div>
