@@ -273,7 +273,10 @@ export default class ApiAuth {
             throw L.ERR.ACCOUNT_NOT_EXIST();
         }
 
-        var needSign = makeActiveSign(account.activeToken, accountId, timestamp)
+        var needSign = makeActiveSign(account.activeToken, accountId, timestamp);
+        if (!sign) {
+            throw L.ERR.ACTIVE_URL_INVALID();
+        }
         if(sign.toLowerCase() != needSign.toLowerCase()) {
             throw L.ERR.ACTIVE_URL_INVALID();
         }
@@ -893,9 +896,9 @@ export default class ApiAuth {
         var options: any = {};
         // options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt", "loginFailTimes", "lastLoginAt", "lastLoginIp", "activeToken", "pwdToken", "oldQrcodeToken", "qrcodeToken", "type", "isFirstLogin", "isValidateEmail", "isValidateMobile"];
         var acc = await Models.account.get(id, options);
-        if(acc && acc.pwd){
-            delete acc.pwd;
-        }
+        // if(acc && acc.pwd){
+        //     delete acc.pwd;
+        // }
         return acc;
     }
 

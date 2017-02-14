@@ -139,9 +139,10 @@ export async function login(data: {account?: string, pwd: string, type?: Number,
         throw L.ERR.ACCOUNT_NOT_EXIST()
     }
     //第二步验证密码是否正确
-    if(loginAccount.pwd && loginAccount.pwd != pwd) {
+    if(!loginAccount.pwd || loginAccount.pwd != pwd) {
         throw L.ERR.PASSWORD_NOT_MATCH()
     }
+
     //第三步查看是邮箱登录或手机号登录 查看有限干活手机号是否已验证
     /*if(loginAccount.mobile == account && !loginAccount.isValidateMobile) {
         throw L.ERR.NO_VALIDATE_MOBILE();
