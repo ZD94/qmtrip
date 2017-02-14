@@ -1129,7 +1129,7 @@ class TripPlanModule {
         ranks = await Promise.all(ranks.map((v: any) => {
             return Models.staff.get(v.account_id)
                 .then(function(staff) {
-                    return {name: staff.name, save: v.save};
+                    return {staff: staff, save: v.save};
                 })
         }));
 
