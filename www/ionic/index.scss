@@ -80,31 +80,16 @@ ion-side-menu {
     border-right: none;
     background-color: transparent;
     border-bottom-color: #545454;
-    .menu-portrait:first-child{
+    .menu-portrait{
       position:absolute;
       top: 10px;
       left: 10px;
       font-size: 22px;
-      max-width: 80px;
-      max-height: 80px;
-      width: 100%;
-      height: 100%;
+      width: 80px;
+      height: 80px;
       line-height: 80px;
-      text-align: center;
       font-weight: bold;
-      -webkit-border-radius: 50%;
-      -moz-border-radius: 50%;
-      border-radius: 50%;
-      color: #fff;
-      background: rgb(36,149,218);
-      &.menu-avatar{
-        background: none;
-        img{
-          width: 80px;
-          height: 80px;
-          border-radius: 50%;
-        }
-      }
+      //background: rgb(36,149,218);
     }
     h2{
       font-size: 18px;

@@ -703,6 +703,54 @@ export default class ApiAuth {
         });
     }
 
+    /**
+     * @method sendImportStaffEmail 发送批量导入员工邮件
+     *
+     * @param {Object} params
+     * @param  params.accountId 账号id
+     * @returns {Promise} true|error
+     */
+    @clientExport
+    static async sendImportStaffEmail(params: {accountId: string}): Promise<boolean> {
+        var accountId = params.accountId;
+
+        if(!accountId) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+
+        var acc = await Models.staff.get(accountId);
+        if(!acc) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+        //生成设置密码token
+        var importStaffEmailToken = utils.getRndStr(6);
+        let list = await Models.token.find({where: {type:'import_staff_email_token', accountId: accountId}});
+
+        if(list && list.length > 0) {
+            await Promise.all(list.map((op) => op.destroy()));
+        }
+
+        let obj = Models.token.create({token: importStaffEmailToken, accountId: acc.id, type:'import_staff_email_token', expireAt: moment().add(1,'days')});
+        await obj.save();
+
+
+        var oneDay = 24 * 60 * 60 * 1000
+        var timestamp = Date.now() + oneDay;  //失效时间1天
+        var sign = makeActiveSign(importStaffEmailToken, acc.id, timestamp);
+        var url = "accountId=" + acc.id + "&timeStamp=" + timestamp + "&sign=" + sign;
+
+        var vals: any = {
+            url: "http:" + C.host + "/index.html#/admin/download-template?" + url
+        };
+        let key = 'qm_import_staff';
+
+        return API.notify.submitNotify({
+            key: key,
+            values: vals,
+            accountId: acc.id
+        });
+    }
+
     @clientExport
     static getAccountStatus(params: {}): Promise<any> {
         let args: any = {attributes: ["status"]};

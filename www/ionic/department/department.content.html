@@ -19,9 +19,7 @@
     <div class="list" >
         <div class="item staff-list" ng-repeat="item in staffs" ng-click="showStaff(item.id)">
             <!--<div class="staff-avatar-text">{{item.name}}</div>-->
-            <staff-avatar staff="item"
-                          text-class="staff-avatar-text"
-                          img-class="staff-avatar-img"></staff-avatar>
+            <staff-avatar staff="item" class="staff-avatar"></staff-avatar>
             <div class="staff-info">
                 <p>{{item.name}}
                     <span class="staff-role" ng-class="{'bg-blue':item.roleId == EStaffRole.ADMIN}"

@@ -3,7 +3,7 @@ import moment = require('moment');
 import { Staff } from 'api/_types/staff/staff';
 import { EPlanStatus } from 'api/_types/tripPlan';
 
-export default async function ListAllController($scope, $stateParams) {
+export default async function ListAllController($scope, $stateParams, Models) {
     require('../statistics/statistics.scss')
     let keyword = $stateParams.keyword || '';
     let type = $stateParams.type || null;
@@ -66,8 +66,21 @@ export default async function ListAllController($scope, $stateParams) {
             if(!type || type == 'D'){
                 let depts = await company.getDepartments({where: {name: {$like: `%${keyWord}%`}}});
                 let deptIds = depts.map((d) => d.id);
-                if(deptIds && deptIds.length > 0)
-                    staffOpt.where.$or.push({departmentId: deptIds});
+                let pagers = await Models.staffDepartment.find({where: {departmentId: deptIds}, order: [['createdAt', 'desc']]});
+
+                let departmentStaffs = [];
+                departmentStaffs.push.apply(departmentStaffs, pagers);
+                while(pagers.hasNextPage()){
+                    let nextPager = await pagers.nextPage();
+                    departmentStaffs.push.apply(departmentStaffs, nextPager);
+                    // pagers = nextPager;
+                }
+
+                let ids =  await Promise.all(departmentStaffs.map(function(t){
+                    return t.staffId;
+                }));
+                if(ids && ids.length > 0)
+                    staffOpt.where.$or.push({id: ids});
             }
 
             if(!type || type =='S' || type == 'D'){
