@@ -3,3 +3,4 @@
  */
 export * from './list';
 export * from './charge-coin';
+export * from './add-expiry-date';
