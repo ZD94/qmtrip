@@ -510,7 +510,7 @@ export class Staff extends ModelObject implements Account {
         let expireAt = new Date(moment().add(1, 'days').valueOf());
         let ret = await API.auth.makeAuthenticateToken(self.id, os, expireAt);
         let authstr = new Buffer(JSON.stringify(ret)).toString('base64')
-        return `${C.host}/corp-mgr.html?#/login/login?backurl=${backUrl}&authstr=${authstr}`;
+        return `${C.host}/corp-mgr.html?#/login/?backurl=${backUrl}&authstr=${authstr}`;
     }
 
     @RemoteCall()
