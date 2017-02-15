@@ -12,6 +12,7 @@ angular
         return {
             restrict: 'AE',
             template: require('./avatar.html'),
+            replace: true,
             scope: {
                 staff: '=staff',
                 textClass: '@textClass',

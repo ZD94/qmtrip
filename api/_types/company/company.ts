@@ -32,6 +32,11 @@ export enum ECompanyStatus {
     ACTIVE = 1 //激活状态
 }
 
+export enum ECompanyType {
+    TRYING = 0,
+    PAYED = 1,
+}
+
 @Table(Models.company, 'company.')
 export class Company extends ModelObject{
     constructor(target: Object) {
@@ -206,6 +211,10 @@ export class Company extends ModelObject{
     @Field({type: Types.DATE})
     get extraExpiryDate(): Date { return null; }
     set extraExpiryDate(val: Date) {}
+
+    @Field({type: Types.INTEGER})
+    get type() :ECompanyType{return ECompanyType.TRYING}
+    set type(type: ECompanyType) {}
 
     getStaffs(options?: any): Promise<PaginateInterface<Staff>> {
         if(!options) {options = {where: {}}};

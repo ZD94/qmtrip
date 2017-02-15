@@ -18,8 +18,11 @@ import L from 'common/language';
 import {ESendType} from "../notice/notice";
 import promise = require("../../../common/test/api/promise/index");
 import {StaffDepartment} from "../department/staffDepartment";
+import C = require("config");
+import moment = require("moment");
 
-declare var API: any;
+// declare var API: any;
+const API = require("common/api");
 
 let getSupplier: SupplierGetter;
 
@@ -486,6 +489,35 @@ export class Staff extends ModelObject implements Account {
     async testServerFunc(){
         console.log('testServerFunc');
         return 'OK';
+    }
+
+    @RemoteCall()
+    async getAutoLoginUrl(backUrl:string, os?: string) {
+        let self = this;
+        if (os != 'corp-mgr') {
+            throw L.ERR.INVALID_ARGUMENT(`目前仅支持企业PC平台自动登录`);
+        }
+        let expireAt = new Date(moment().add(1, 'days').valueOf());
+        let ret = await API.auth.makeAuthenticateToken(self.id, os, expireAt);
+        let authstr = new Buffer(JSON.stringify(ret)).toString('base64')
+        return `${C.host}/corp-mgr.html?#/login/?backurl=${backUrl}&authstr=${authstr}`;
+    }
+
+    @RemoteCall()
+    async getBatchAddStaffEmail() {
+        let self = this;
+        if (!self.email) {
+            throw L.ERR.EMAIL_EMPTY('邮箱还未绑定');
+        }
+        let url = await self.getAutoLoginUrl(`${C.host}/corp-mgr.html`, 'corp-mgr');
+        await API.notify.submitNotify({
+            accountId: self.id,
+            values: {
+                url: url,
+                name: self.name,
+            },
+            key: 'qm_notify_batch_add_staff'
+        });
     }
 
     /*async createInvitedLink(){

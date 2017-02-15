@@ -64,8 +64,25 @@ export class Department extends ModelObject{
         options.where.staffStatus = EStaffStatus.ON_JOB;
         options.where.companyId = this.company.id;
         options.where.id = {$in: ids};
+        //姓名Z-A
+        if(options.order = 'nameDesc'){
+            options.order = "convert_to(name,'gbk') desc";
+        }
+        //姓名A-Z
+        if(options.order = 'nameAsc'){
+            options.order = "convert_to(name,'gbk') asc";
+        }
+        //角色排序
+        if(options.order = 'role'){
+            options.order = [['roleId', 'asc']];
+        }
+        //差率标准排序
+        if(options.order = 'travelPolicy'){
+            options.order = [['travelPolicyId', 'asc']];
+        }
+        //默认按创建时间排序排序
         if(!options.order){
-            options.order = [['createdAt', 'desc']];
+            options.order = [['createdAt', 'asc']];
         }
         let staffs = await Models.staff.find(options);
         let result =  await Promise.all(staffs.map(async function(s){
@@ -73,6 +90,12 @@ export class Department extends ModelObject{
             s["travelPolicy"] = travelPolicy;
             return s;
         }))
+
+        if(options.order = 'status'){
+            result.sort(function(a,b){
+                return a.status - b.status;
+            })
+        }
         return result;
     }
 
