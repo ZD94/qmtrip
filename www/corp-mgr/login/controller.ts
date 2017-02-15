@@ -5,7 +5,7 @@
 'use strict';
 const API = require("common/api");
 
-export async function LoginController($scope, $stateParams, $location) {
+export async function LoginController($scope, $stateParams) {
     $scope.showAutoLoginMsg = false;
     $scope.errorMsg = 'sorry, 登录失败!';
     let backurl = $stateParams.backurl;
@@ -25,4 +25,8 @@ export async function LoginController($scope, $stateParams, $location) {
         API.reload_all_modules();
         window.location.href = backurl;
     }
+}
+
+export async function IndexController($scope, $stateParams) {
+
 }
