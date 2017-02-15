@@ -14,11 +14,9 @@ import * as wechat from './wechat';
 import * as messagePush from './messagePush';
 import * as qrcode from './qrcode';
 import * as byTest from './by-test';
-import {conditionDecorator, condition} from "../_decorator";
 
 var uuid = require("node-uuid");
 var C = require("config");
-let msgConfig = C.message;
 var moment = require("moment");
 var API = require("common/api");
 var utils = require("common/utils");
