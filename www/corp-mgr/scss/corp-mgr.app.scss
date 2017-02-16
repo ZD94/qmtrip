@@ -84,7 +84,7 @@ html,body{
   padding: 10px 32px;
   .content{
     width: 100%;
-    height: 500px;
+    min-height: 500px;
     background: #fff;
     margin: 0 auto;
     padding: 16px 20px;
@@ -142,6 +142,28 @@ html,body{
           margin-left: 100px;
         }
       }
+      .percent-tit{
+        text-align: center;
+        font-size: 16px;
+        color: #9b9b9b;
+        span{
+          color: #f39700;
+        }
+      }
+      .percent-bar{
+        width: 600px;
+        height: 20px;
+        border-radius: 10px;
+        background: #d8d8d8;
+        margin-top: 20px;
+        overflow: hidden;
+        .percent-block{
+          width: 0;
+          height: 20px;
+          border-radius: 10px;
+          background: #f39700;
+        }
+      }
     }
     .upload_btn{
       width: 240px;
@@ -154,6 +176,24 @@ html,body{
       color: #fff;
       border-radius: 3px;
       display: inherit;
+    }
+    .err_list{
+      border: 1px solid #979797;
+      color: #4a4a4a;
+      font-size: 14px;
+      tr{
+        th{
+          background: #d8d8d8;
+          border: 1px solid #979797;
+          text-align: center;
+          font-weight: normal;
+        }
+        td{
+          background: #fff;
+          border: 1px solid #979797;
+          text-align: center;
+        }
+      }
     }
   }
 }

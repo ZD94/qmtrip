@@ -2,6 +2,8 @@ import * as path from 'path';
 import {Staff} from "api/_types/staff/staff";
 
 export async function IndexController($scope, Models, FileUploader) {
+    $scope.title = '批量添加员工';
+    $scope.step = 'three';
     var upload_url = $scope.url || '/upload/ajax-upload-file';
     var uploader = $scope.uploader = new FileUploader({
         url: upload_url,
@@ -64,6 +66,21 @@ export async function IndexController($scope, Models, FileUploader) {
         //这里是上传成功之后的回调，在这里接口调用把fileId传给服务器
         console.info(obj);
     }
+    $scope.percent = 0;
+    let percentNum = 0;
+    let time = setInterval(function(){
+        if(percentNum > 99){
+            clearInterval(time);
+            $scope.step = 'three';
+            $scope.title = '处理结果';
+            $scope.$apply();
+            return;
+        }else{
+            percentNum++;
+            $scope.percent = percentNum;
+            $scope.$apply();
+        }
+    },100)
     $scope.upload = function(){
         if(!hasFile){
             alert('请先选择文件');
