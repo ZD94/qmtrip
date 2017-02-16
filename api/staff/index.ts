@@ -473,7 +473,7 @@ class StaffModule{
             let departmentPass = true;
             let staffObj: any = {name: s[0], mobile: s[1]+"", email: s[2]||'',sex: s[3]?((s[3] == '女') ? EGender.FEMALE : EGender.MALE) : null,
                 roleId: s[4] == '管理员' ? EStaffRole.ADMIN : EStaffRole.COMMON, travelPolicyId: travelPolicyMaps[s[5]]||'', companyId: companyId,
-                sexStr: s[3], role: s[4], travelPolicyName: s[5]};
+                sexStr: s[3], role: s[4], travelPolicyName: s[5], departmentName: s[6]};
             if(index>0 && index<201){//不取等于0的过滤抬头标题栏
                 if(_.trim(staffObj.name) == ""){
                     staffObj.reason = "姓名为空";
