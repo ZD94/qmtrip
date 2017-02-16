@@ -265,7 +265,7 @@ async function addDingUsersCompany(corp, dingUsers, corpApi: CorpApi) {
     let company = await corp.getCompany(corp['company_id']);
     let corpid = corp.id;
 
-    let travelPolicy = company.getDefaultTravelPolicy();
+    let travelPolicy = await company.getDefaultTravelPolicy();
     for(let u of dingUsers) {
         let dingUsers = await Models.ddtalkUser.find({ where: {corpid: corpid, ddUserId: u.userid}})
         if (dingUsers && dingUsers.length) {
