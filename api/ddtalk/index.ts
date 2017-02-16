@@ -24,11 +24,12 @@ import {Company} from "api/_types/company";
 import {Staff, EStaffRole} from "api/_types/staff";
 import {Models} from "../_types/index";
 import {clientExport} from "../../common/api/helper";
-import {TravelPolicy, EPlaneLevel, ETrainLevel, EHotelLevel} from "../_types/travelPolicy";
 import {get_msg} from "./lib/msg-template/index";
 import {md5} from "../../common/utils";
+import {StaffDepartment} from "../../tmp/tsreq/api/_types/department/staffDepartment";
 
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
+const DEFAULT_PWD = '000000';
 
 interface suiteTokenCached{
     suite_access_token: string;
@@ -115,10 +116,10 @@ let ddTalkMsgHandle = {
         let corpAccessToken = await isvApi.getCorpAccessToken();
         let corpApi = new CorpApi(corpid, corpAccessToken);
         let userInfo: any = await corpApi.getUser(authUserInfo.userId);
-        const DEFAULT_PWD = '000000';
         let corps = await Models.ddtalkCorp.find({where : {corpId: corpid}});
+        let corp;
         if (corps && corps.length) {
-            let corp = corps[0];
+            corp = corps[0];
             let company = await corp.getCompany(corp['company_id']);
             company.status = 1;
             company = await company.save();
@@ -130,12 +131,7 @@ let ddTalkMsgHandle = {
             //创建企业
             let company = Company.create({name: corp_name});
             company = await company.save();
-
-            //创建默认差旅标准
-            let travelPolicy = await TravelPolicy.create({name: '默认标准', planeLevel: EPlaneLevel.ECONOMY,
-                trainLevel: ETrainLevel.SECOND_SEAT, hotelLevel: EHotelLevel.THREE_STAR, subsidy: 0, isDefault: true});
-            travelPolicy.company = company;
-            travelPolicy = await travelPolicy.save();
+            let travelPolicy = await company.getDefaultTravelPolicy();
 
             //钉钉关联企业信息
             let obj = {
@@ -146,8 +142,8 @@ let ddTalkMsgHandle = {
                 isSuiteRelieve: false,
                 agentid: agentid
             }
-            let ddtalkCorp = Models.ddtalkCorp.create(obj);
-            await ddtalkCorp.save();
+            let corp = Models.ddtalkCorp.create(obj);
+            await corp.save();
 
             //管理员信息
             let staff = Staff.create({
@@ -185,27 +181,15 @@ let ddTalkMsgHandle = {
                     _d = await _d.save();
 
                     let users = await corpApi.getUserListByDepartment(d.id);
-                    for(let u of users) {
-                        let dingUsers = await Models.ddtalkUser.find({ where: {corpid: corpid, ddUserId: u.userid}})
-                        if (dingUsers && dingUsers.length) {
-                            //查看是否是同一个公司
-                            let dingUser = dingUsers[0];
-                            let s = await Models.staff.get(dingUser.id);
-                            if (company.id == s.company.id) {
-                                continue;
-                            }
-                        }
+                    await addDingUsersCompany(corp, users, corpApi);
+                }
 
-                        let _staff = Models.staff.create({name: u.name, travelPolicyId: travelPolicy.id})
-                        _staff.company = company;
-                        _staff.department = _d;
-                        _staff.pwd = md5(DEFAULT_PWD);
-                        _staff = await _staff.save();
-                        // console.info(`导入user:`, u.name);
-                        let dingUser = Models.ddtalkUser.create({id: _staff.id, avatar: u.avatar, dingId: u.dingId,
-                            isAdmin: u.isAdmin, name: u.name, ddUserId: u.userid, corpid: corpid});
-                        await dingUser.save();
-                    }
+                //若企业没有默认部门添加默认部门
+                let defaultDept = await company.getDefaultDepartment();
+                if(!defaultDept){
+                    let dd = Models.department.create({name: company.name, isDefault: true});
+                    dd.company = company;
+                    await dd.save();
                 }
             } catch(err) {
                 console.error("导入用户错误", err)
@@ -245,6 +229,86 @@ let ddTalkMsgHandle = {
         await cache.write(CACHE_KEY, JSON.stringify({ticket: ticket, timestamp: msg.TimeStamp}));
         return msg;
     },
+
+    /* * * 企业增加员工 * * */
+    /*
+     {
+     "EventType": "user_add_org",
+     "TimeStamp": 43535463645,
+     "UserId": ["efefef" , "111111"],
+     "CorpId": "corpid"
+     }
+     */
+    user_add_org: async function(msg) {
+        let userIds = msg.UserId;
+        let corpId = msg.CorpId;
+        let tokenObj = await _getSuiteToken();
+        let suiteToken = tokenObj['suite_access_token']
+
+        let corps = await Models.ddtalkCorp.find({where: {corpId: corpId}});
+        if (corps && corps.length) {
+            let corp = corps[0];
+            //禁用企业
+            let isvApi = new ISVApi(config.suiteid, suiteToken, corpId, corp.permanentCode);
+            let corpApi = await isvApi.getCorpApi();
+            let ps = userIds.map( async (userId) => {
+                return await corpApi.getUser(userId);
+            });
+            let users = await Promise.all(ps);
+            await addDingUsersCompany(corp, users, corpApi);
+        }
+    }
+}
+
+
+async function addDingUsersCompany(corp, dingUsers, corpApi: CorpApi) {
+    let company = await corp.getCompany(corp['company_id']);
+    let corpid = corp.id;
+
+    let travelPolicy = company.getDefaultTravelPolicy();
+    for(let u of dingUsers) {
+        let dingUsers = await Models.ddtalkUser.find({ where: {corpid: corpid, ddUserId: u.userid}})
+        if (dingUsers && dingUsers.length) {
+            //查看是否是同一个公司
+            let dingUser = dingUsers[0];
+            let s = await Models.staff.get(dingUser.id);
+            if (company.id == s.company.id) {
+                continue;
+            }
+        }
+        //保存员工信息
+        let _staff = Models.staff.create({name: u.name, travelPolicyId: travelPolicy.id});
+        _staff.company = company;
+        _staff.pwd = md5(DEFAULT_PWD);
+        _staff = await _staff.save();
+
+        //绑定部门关系
+        let departmentIds = u['department'];
+        let departmentId;
+        if (departmentIds && departmentIds.length) {
+            departmentId = departmentIds[0];
+        }
+
+        if (departmentId) {
+            //获取钉钉部门详情
+            let dingTalkDept = await corpApi.getDepartmentInfo(departmentId);
+            //根据名称与我们系统匹配
+            let jlDepts = await Models.department.find({where: {name: dingTalkDept.name}});
+            let department;
+            if (jlDepts && jlDepts.length) {
+                department = jlDepts[0];
+            } else {
+                department = Models.department.create({name: dingTalkDept.name});
+                department.company = company;
+                department = await department.save();
+            }
+            let staffDepartment = StaffDepartment.create({staffId: _staff.id, departmentId: department.id});
+            await staffDepartment.save();
+        }
+        let dingUser = Models.ddtalkUser.create({id: _staff.id, avatar: u.avatar, dingId: u.dingId,
+            isAdmin: u.isAdmin, name: u.name, ddUserId: u.userid, corpid: corpid});
+        await dingUser.save();
+    }
 }
 
 class DDTalk {
