@@ -32,6 +32,11 @@ export enum EStaffStatus {
     QUIT_JOB = -1,
     DELETE = -2
 }
+export enum EAddWay {
+    ADMIN_ADD = 0,
+    BATCH_IMPORT = 1,
+    INVITED = 2
+}
 export enum EStaffRole {
     OWNER = 0,
     COMMON = 1,
@@ -125,6 +130,11 @@ export class Staff extends ModelObject implements Account {
         return Models.travelPolicy.get(id);
     }
     setTravelPolicy(val: TravelPolicy) {}
+
+    // '添加方式'
+    @Field({type: Types.INTEGER})
+    get addWay(): EAddWay { return EAddWay.ADMIN_ADD; }
+    set addWay(val: EAddWay) {}
 
     @RemoteCall()
     async getDepartments(): Promise<PaginateInterface<Department>>{
