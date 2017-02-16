@@ -192,6 +192,7 @@ export class Company extends ModelObject{
     }
 
     async getDefaultTravelPolicy(): Promise<TravelPolicy> {
+        let self = this;
         var tps = await Models.travelPolicy.find({where: {companyId: this.id, isDefault: true}});
         if(tps && tps.length>0){
             return tps[0];
@@ -200,8 +201,10 @@ export class Company extends ModelObject{
             if (tps && tps.length) {
                 return tps[0];
             }
-            let travelPolicy = await TravelPolicy.create({name: '默认标准', planeLevels: [EPlaneLevel.ECONOMY],
+            let travelPolicy = TravelPolicy.create({name: '默认标准', planeLevels: [EPlaneLevel.ECONOMY],
                 trainLevels: [ETrainLevel.SECOND_SEAT], hotelLevels: [EHotelLevel.THREE_STAR], subsidy: 0, isDefault: true});
+            travelPolicy.company = self;
+            travelPolicy = await travelPolicy.save();
             return travelPolicy;
         }
     }
