@@ -26,7 +26,7 @@ import {Models} from "../_types/index";
 import {clientExport} from "../../common/api/helper";
 import {get_msg} from "./lib/msg-template/index";
 import {md5} from "../../common/utils";
-import {StaffDepartment} from "../../tmp/tsreq/api/_types/department/staffDepartment";
+import {Department} from "api/_types/department";
 
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 const DEFAULT_PWD = '000000';
@@ -280,7 +280,6 @@ async function addDingUsersCompany(corp, dingUsers, corpApi: CorpApi) {
         let _staff = Models.staff.create({name: u.name, travelPolicyId: travelPolicy.id});
         _staff.company = company;
         _staff.pwd = md5(DEFAULT_PWD);
-        _staff = await _staff.save();
 
         //绑定部门关系
         let departmentIds = u['department'];
@@ -302,9 +301,10 @@ async function addDingUsersCompany(corp, dingUsers, corpApi: CorpApi) {
                 department.company = company;
                 department = await department.save();
             }
-            let staffDepartment = StaffDepartment.create({staffId: _staff.id, departmentId: department.id});
-            await staffDepartment.save();
+            _staff.department = department;
         }
+        await _staff.save();
+
         let dingUser = Models.ddtalkUser.create({id: _staff.id, avatar: u.avatar, dingId: u.dingId,
             isAdmin: u.isAdmin, name: u.name, ddUserId: u.userid, corpid: corpid});
         await dingUser.save();
