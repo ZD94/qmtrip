@@ -4,3 +4,4 @@
 export * from './list';
 export * from './charge-coin';
 export * from './add-expiry-date';
+export * from './add-flow-package';
