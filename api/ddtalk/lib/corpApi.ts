@@ -121,7 +121,7 @@ export default class CorpApi {
     }
 
     async getDepartmentInfo(departmentId): Promise<any> {
-        let url = `https://oapi.dingtalk.com/department/get?access_token=${this.accessToken}&id=${departmentId}&lang=zh_CN`;
+        let url = `https://oapi.dingtalk.com/department/get?access_token=${this.accessToken.access_token}&id=${departmentId}&lang=zh_CN`;
         let result = await reqProxy(url, {
             name: '获取部门详情',
             method: 'GET',
