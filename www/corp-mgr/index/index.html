@@ -1,4 +1,19 @@
-<div>
-    Index
-    <p>{{name}}</p>
+<div class="view">
+    <div class="content">
+        <h2 class="corp_name">{{company.name}}</h2>
+        <h3 class="tit">批量添加员工</h3>
+        <div class="list">
+            <div class="item">1、下载模板，按照格式编辑员工信息，仔细阅读模板内说明。
+                <a class="download">点此下载</a>
+            </div>
+            <div class="item">2、上传编辑好的文件。
+                <div class="fileupload">
+                    <input nv-file-select uploader="uploader" accept="application/msexcel" type="file">
+                    <a class="btn">选择文件</a>
+                </div>
+                <span class="filename">{{fileName}}</span>
+            </div>
+        </div>
+        <a class="upload_btn" ng-click="upload()">上传文件</a>
+    </div>
 </div>
