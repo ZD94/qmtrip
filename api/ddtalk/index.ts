@@ -7,6 +7,7 @@ const API = require('common/api');
 let dingSuiteCallback = require("dingtalk_suite_callback");
 import fs = require("fs");
 import cache from "common/cache";
+const C = require("config");
 
 const config ={
     token: 'jingli2016',
@@ -26,7 +27,6 @@ import {Models} from "../_types/index";
 import {clientExport} from "../../common/api/helper";
 import {get_msg} from "./lib/msg-template/index";
 import {md5} from "../../common/utils";
-import {Department} from "api/_types/department";
 
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 const DEFAULT_PWD = '000000';
@@ -197,6 +197,7 @@ let ddTalkMsgHandle = {
             }
         }
         await isvApi.activeSuite();
+        await corpApi.registryContractChangeLister(config.token, config.encodingAESKey, C.host+'/ddtalk/isv/receive');
     },
 
     /* * * * * 授权变更* * * * * * */
