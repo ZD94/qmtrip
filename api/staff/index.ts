@@ -84,11 +84,15 @@ class StaffModule{
             url:'http:' + config.host
         }
 
-        await API.notify.submitNotify({
-            key: 'qm_new_staff_active',
-            values: values,
-            accountId: staff.id
-        });
+        try{
+            await API.notify.submitNotify({
+                key: 'qm_new_staff_active',
+                values: values,
+                accountId: staff.id
+            });
+        }catch(e){
+            console.info(e);
+        }
         staff.isValidateMobile = true;
         staff = await staff.save();
 
@@ -461,13 +465,13 @@ class StaffModule{
             let dep = departments[k];
             departmentMaps[dep.name] = dep.id;
         }
-        let data = xlsObj[0].data;
+        let data = xlsObj[1].data;
 
-        let items = await Promise.all(data.map(function(item, index){
+        let items = await Promise.all(data.map(async function(item, index){
             let s = data[index];
             let departmentIds = [];
             let departmentPass = true;
-            let staffObj: any = {name: s[0], mobile: s[1], email: s[2]||'',sex: s[3]?((s[3] == '女') ? EGender.FEMALE : EGender.MALE) : null,
+            let staffObj: any = {name: s[0], mobile: s[1]+"", email: s[2]||'',sex: s[3]?((s[3] == '女') ? EGender.FEMALE : EGender.MALE) : null,
                 roleId: s[4] == '管理员' ? EStaffRole.ADMIN : EStaffRole.COMMON, travelPolicyId: travelPolicyMaps[s[5]]||'', companyId: companyId,
                 sexStr: s[3], role: s[4], travelPolicyName: s[5]};
             if(index>0 && index<201){//不取等于0的过滤抬头标题栏
@@ -494,7 +498,6 @@ class StaffModule{
                     return;
                 }
                 mobileAttr.push(s[1]);
-
                 if(_.trim(staffObj.email) && !validate.isEmail(staffObj.email)){
                     staffObj.reason = "邮箱不符合要求";
                     s[7] = "邮箱不符合要求";
@@ -511,7 +514,13 @@ class StaffModule{
                     return;
                 }
                 emailAttr.push(s[2]);
-
+                if(!_.trim(staffObj.travelPolicyName)){
+                    staffObj.reason = "差旅标准为空";
+                    s[7] = "差旅标准为空";
+                    noAddObj.push(staffObj);
+                    downloadNoAddObj.push(s);
+                    return;
+                }
                 if(s[5] && _.trim(s[5]) != "" && staffObj.travelPolicyId == ""){
                     staffObj.reason = "差旅标准不存在";
                     s[7] = "差旅标准不存在";
@@ -537,15 +546,19 @@ class StaffModule{
                     if(!departmentPass){
                         return;
                     }
+                }else{
+                    let defaultDept = await company.getDefaultDepartment();
+                    departmentIds.push(defaultDept.id);
                 }
-                let staff1 = API.auth.checkAccExist({email: s[2], type: 1});
-                let staff2 = API.auth.checkAccExist({mobile: s[1], type: 1});
+                staffObj.departmentIds = departmentIds;
+                let staff1 = await API.auth.checkAccExist({where: {email: staffObj.email, type: 1}});
+                let staff2 = await API.auth.checkAccExist({where: {mobile: staffObj.mobile, type: 1}});
                 if(staff1){
                     staffObj.reason = "邮箱与已有用户重复";
                     s[7] = "邮箱与已有用户重复";
                     noAddObj.push(staffObj);
                     downloadNoAddObj.push(s);
-                }else if(staff2 && staff2.mobile && staff2.mobile != ""){
+                }else if(staff2){
                     staffObj.reason = "手机号与已有用户重复";
                     s[7] = "手机号与已有用户重复";
                     noAddObj.push(staffObj);
@@ -563,12 +576,13 @@ class StaffModule{
                 return;
             }
         }));
+
         //addObj中删除重复邮箱的用户
         let repeatEmailStr = repeatEmail.join(",");
-        for(var i=0;i<addObj.length;i++){
-            var addStaff = addObj[i];
+        for(let i=0;i<addObj.length;i++){
+            let addStaff = addObj[i];
             if(repeatEmailStr.indexOf(_.trim(addStaff.email)) != -1){
-                var obj = downloadAddObj[i];
+                let obj = downloadAddObj[i];
                 addObj.splice(i, 1);
                 downloadAddObj.splice(i, 1);
                 addStaff.reason = "邮箱与本次导入中邮箱重复";
@@ -580,10 +594,10 @@ class StaffModule{
 
         //addObj中删除重复邮箱的用户
         let repeatMobileStr = repeatMobile.join(",");
-        for(var i=0;i<addObj.length;i++){
-            var addStaff = addObj[i];
+        for(let i=0;i<addObj.length;i++){
+            let addStaff = addObj[i];
             if(repeatMobileStr.indexOf(_.trim(addStaff.mobile)) != -1){
-                var obj = downloadAddObj[i];
+                let obj = downloadAddObj[i];
                 addObj.splice(i, 1);
                 downloadAddObj.splice(i, 1);
                 addStaff.reason = "手机号与本次导入中手机号重复";
@@ -592,15 +606,17 @@ class StaffModule{
                 downloadNoAddObj.push(obj);
             }
         }
-        await API.attachments.removeFileAndAttach({id: fileId});
+
 
         await Promise.all(addObj.map(async function(item, index){
-            var s: any = item;
-            var staffObj: any = {name: s.name, mobile: s.mobile+"", email: s.email, sex: s.sex, roleId: s.roleId,
-                travelPolicyId: s.travelPolicyId, companyId: s.companyId, addWay: EAddWay.BATCH_IMPORT };
-            await StaffModule.createStaff(staffObj);
+            let deptIds = item.departmentIds;
+            let staffObj: any = {name: item.name, mobile: item.mobile+"", email: item.email, sex: item.sex, roleId: item.roleId,
+                travelPolicyId: item.travelPolicyId, companyId: item.companyId, addWay: EAddWay.BATCH_IMPORT };
+            let staffAdded = await StaffModule.createStaff(staffObj);
+            await staffAdded.saveStaffDepartments(deptIds)
         }));
-
+        
+        await API.attachments.removeFileAndAttach({id: fileId});
         return {addObj: JSON.stringify(addObj), downloadAddObj: JSON.stringify(downloadAddObj), noAddObj: JSON.stringify(noAddObj),
             downloadNoAddObj: JSON.stringify(downloadNoAddObj)};
     }

@@ -60,9 +60,27 @@ export async function IndexController($scope, Models, FileUploader) {
         //$loading.end();
     };
 
-    $scope.done = function(obj){
+    $scope.done = async function(obj){
         //这里是上传成功之后的回调，在这里接口调用把fileId传给服务器
         console.info(obj);
+        console.info(obj.fileId[0]);
+        API.require("staff");
+        await API.onload();
+        try{
+            let allData = await API.staff.batchImportStaff({fileId: obj.fileId[0]});
+            console.info(allData);
+            console.info("=======================----------------------------");
+            $scope.noAddObj = JSON.parse(allData.noAddObj);
+            $scope.addObj = JSON.parse(allData.addObj);
+            $scope.addObjNum = JSON.parse(allData.addObj).length;
+            $scope.noAddObjNum = JSON.parse(allData.noAddObj).length;
+            // $scope.downloadInvalidData = allData.downloadNoAddObj;
+            // $scope.downloadValidData = allData.downloadAddObj;
+            console.info($scope.addObj);
+            console.info($scope.noAddObj);
+        }catch(err){
+            console.info(err.msg);
+        }
     }
     $scope.upload = function(){
         if(!hasFile){

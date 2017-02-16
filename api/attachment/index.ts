@@ -64,14 +64,14 @@ class ApiAttachment {
     static async getSelfAttachment(params) {
         var fileId = params.fileId;
         var accountId = params.accountId;
-        var owner = await Owner.findOne({where: {fileId: fileId, accountId: accountId}});
-        if (!owner) {
-            throw L.ERR.PERMISSION_DENY();
-        }
+        // var owner = await Owner.findOne({where: {fileId: fileId, accountId: accountId}});
+        // if (!owner) {
+        //     throw L.ERR.PERMISSION_DENY();
+        // }
         var attachment = await API.attachments.getAttachment({id: fileId, isZoom:'off'});
 
-        var filepath = path.join('tmp', attachment.id);
-        fs.writeFile(filepath, attachment.content, {encoding: "binary"});
+        // var filepath = path.join('tmp', attachment.id);
+        // fs.writeFile(filepath, attachment.content, {encoding: "binary"});
 
         return attachment;
     }
