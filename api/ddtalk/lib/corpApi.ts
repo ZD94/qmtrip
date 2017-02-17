@@ -92,7 +92,7 @@ export default class CorpApi {
     }
 
     async getUserListByDepartment(departmentId): Promise<Array<any>> {
-        let url = `https://oapi.dingtalk.com/user/list?access_token=${this.accessToken.access_token}&department_id=${departmentId}`;
+        let url = `https://oapi.dingtalk.com/user/list?access_token=${this.accessToken.access_token}&department_id=${departmentId}&lang=zh_CN`;
         let hasMore = true;
         let users: Array<any> = [];
         while(hasMore) {
@@ -117,6 +117,16 @@ export default class CorpApi {
             method: 'POST',
             body: msg,
         })
+        return result;
+    }
+
+    async getDepartmentInfo(departmentId): Promise<any> {
+        let url = `https://oapi.dingtalk.com/department/get?access_token=${this.accessToken}&id=${departmentId}&lang=zh_CN`;
+        let result = await reqProxy(url, {
+            name: '获取部门详情',
+            method: 'GET',
+            lang: 'zh_CN'
+        });
         return result;
     }
 }
