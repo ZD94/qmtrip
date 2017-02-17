@@ -270,6 +270,54 @@ class StaffModule{
     }
 
     /**
+     * 转移创建人
+     * @param data
+     * @returns {boolean}
+     */
+    @clientExport
+    @requireParams(['pwd', 'msgCode', 'msgTicket', 'accountId'])
+    static async transferOwner(params: {pwd: string, msgCode: string, msgTicket: number, accountId: string}): Promise<boolean> {
+        let staff = await Staff.getCurrent();
+        let pwd = params.pwd;
+        let msgCode = params.msgCode;
+        let msgTicket = params.msgTicket;
+        let selfAcc = await API.auth.getPrivateInfo({id: staff.id});
+        if(staff.roleId != EStaffRole.OWNER){
+            throw L.ERR.FORBIDDEN();
+        }
+
+        if(pwd != selfAcc.pwd){
+            throw L.ERR.PASSWORD_ERROR();
+        }
+        let toStaff = await Models.staff.get(params.accountId);
+
+        if(!msgCode || !msgTicket) {
+            throw L.ERR.CODE_ERROR();
+        }
+        if(!toStaff) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+
+        var checkMsgCode = await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: account.mobile});
+
+        if(checkMsgCode) {
+            staff.roleId = EStaffRole.ADMIN;
+            staff.isValidateMobile = true;
+            staff = await staff.save();
+            toStaff.roleId = EStaffRole.OWNER;
+            await toStaff.save();
+            await API.notify.submitNotify({
+                key: 'qm_transfer_owner',
+                values: {url: 'http:' + config.host},
+                accountId: toStaff.id
+            });
+        } else {
+            throw L.ERR.CODE_ERROR();
+        }
+        return true;
+    }
+
+    /**
      * 更新员工
      * @param id
      * @param data
