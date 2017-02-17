@@ -3,7 +3,7 @@ import {Staff} from "api/_types/staff/staff";
 
 export async function IndexController($scope, Models, FileUploader) {
     $scope.title = '批量添加员工';
-    $scope.step = 'three';
+    $scope.step = 'one';
     var upload_url = $scope.url || '/upload/ajax-upload-file';
     var uploader = $scope.uploader = new FileUploader({
         url: upload_url,
@@ -26,8 +26,8 @@ export async function IndexController($scope, Models, FileUploader) {
     uploader.onAfterAddingAll = async function(files) {
 
         //$loading.start();
-        console.info(files[0]._file.name);
-        $scope.fileName = files[0]._file.name;
+        console.info(files[files.length-1]._file.name);
+        $scope.fileName = files[files.length-1]._file.name;
         hasFile = true;
         // uploader.uploadAll();
     };
@@ -64,41 +64,36 @@ export async function IndexController($scope, Models, FileUploader) {
 
     $scope.done = async function(obj){
         //这里是上传成功之后的回调，在这里接口调用把fileId传给服务器
-        console.info(obj);
-        console.info(obj.fileId[0]);
         API.require("staff");
         await API.onload();
         try{
-            let allData = await API.staff.batchImportStaff({fileId: obj.fileId[0]});
-            console.info(allData);
-            console.info("=======================----------------------------");
+            let allData = await API.staff.batchImportStaff({fileId: obj.fileId[obj.fileId.length-1]});
+            $scope.step = 'two';
+            $scope.title = '正在添加';
             $scope.noAddObj = JSON.parse(allData.noAddObj);
             $scope.addObj = JSON.parse(allData.addObj);
             $scope.addObjNum = JSON.parse(allData.addObj).length;
             $scope.noAddObjNum = JSON.parse(allData.noAddObj).length;
-            // $scope.downloadInvalidData = allData.downloadNoAddObj;
-            // $scope.downloadValidData = allData.downloadAddObj;
-            console.info($scope.addObj);
-            console.info($scope.noAddObj);
+            $scope.percent = 0;
+            let percentNum = 0;
+            let time = setInterval(function(){
+                if(percentNum > 99){
+                    clearInterval(time);
+                    $scope.step = 'three';
+                    $scope.title = '处理结果';
+                    $scope.$apply();
+                    return;
+                }else{
+                    percentNum++;
+                    $scope.percent = percentNum;
+                    $scope.$apply();
+                }
+            },100)
         }catch(err){
             console.info(err.msg);
+            alert('上传失败，请刷新重试');
         }
     }
-    $scope.percent = 0;
-    let percentNum = 0;
-    let time = setInterval(function(){
-        if(percentNum > 99){
-            clearInterval(time);
-            $scope.step = 'three';
-            $scope.title = '处理结果';
-            $scope.$apply();
-            return;
-        }else{
-            percentNum++;
-            $scope.percent = percentNum;
-            $scope.$apply();
-        }
-    },100)
     $scope.upload = function(){
         if(!hasFile){
             alert('请先选择文件');
@@ -106,5 +101,9 @@ export async function IndexController($scope, Models, FileUploader) {
         }
         uploader.uploadAll();
         console.info('success');
+    }
+    $scope.reUpload = function(){
+        $scope.step = 'one';
+        $scope.title = '批量添加员工';
     }
 }

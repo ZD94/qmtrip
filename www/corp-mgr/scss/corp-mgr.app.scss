@@ -105,6 +105,13 @@ html,body{
     .list{
       margin: 0 auto;
       width: 600px;
+      &.table-list{
+        width: 90%;
+        .item{
+          width: 600px;
+          margin: 15px auto;
+        }
+      }
       .item{
         font-size: 16px;
         color: #4a4a4a;

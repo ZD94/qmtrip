@@ -23,9 +23,9 @@
                 <div class="percent-block" ng-style="{width:percent+'%'}"></div>
             </div>
         </div>
-        <div class="list" ng-if="step == 'three'">
-            <div class="item">1、添加成功 {{}} 人</div>
-            <div class="item">2、添加失败 <span>{{}}</span> 人。下表为员工信息，请复制到Excel标中编辑并重新上传</div>
+        <div class="list table-list" ng-if="step == 'three'">
+            <div class="item">1、添加成功 {{addObj.length}} 人</div>
+            <div class="item">2、添加失败 <span>{{noAddObj.length}}</span> 人。下表为员工信息，请复制到Excel标中编辑并重新上传</div>
             <table class="err_list" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                     <th>姓名</th>
@@ -37,15 +37,15 @@
                     <th>部门</th>
                     <th>失败原因</th>
                 </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                <tr ng-repeat="item in noAddObj">
+                    <td>{{item.name}}</td>
+                    <td>{{item.mobile}}</td>
+                    <td>{{item.email}}</td>
+                    <td>{{item.sexStr}}</td>
+                    <td>{{item.role}}</td>
+                    <td>{{item.travelPolicyName}}</td>
+                    <td>{{item.departmentName}}</td>
+                    <td>{{item.reason}}</td>
                 </tr>
             </table>
             <a class="upload_btn" ng-click="reUpload()">重新上传</a>
