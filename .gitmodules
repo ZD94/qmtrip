@@ -1,4 +1,4 @@
 [submodule "common"]
 	path = common
-	url = git@local.jingli.tech:common.git
+	url = git@git.l.jingli365.com:old/common.git
 	update = merge
