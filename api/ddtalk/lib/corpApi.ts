@@ -143,7 +143,8 @@ export default class CorpApi {
             name: '注册通讯录变更监听',
             method: 'POST',
             lang: 'zh_CN',
-            body: JSON.stringify(body),
+            body: body,
+            json: true,
         });
         return result;
     }

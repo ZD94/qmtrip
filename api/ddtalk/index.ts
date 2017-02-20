@@ -175,21 +175,13 @@ let ddTalkMsgHandle = {
             try {
                 let departments = await corpApi.getDepartments();
                 for(let d of departments) {
-                    // console.info(`导入department:`, d.name)
-                    let _d = Models.department.create({name: d.name});
+                    let val = {name: d.name, isDefault: d.id == 1};
+                    let _d = Models.department.create(val);
                     _d.company = company;
                     _d = await _d.save();
 
                     let users = await corpApi.getUserListByDepartment(d.id);
                     await addDingUsersCompany(corp, users, corpApi);
-                }
-
-                //若企业没有默认部门添加默认部门
-                let defaultDept = await company.getDefaultDepartment();
-                if(!defaultDept){
-                    let dd = Models.department.create({name: company.name, isDefault: true});
-                    dd.company = company;
-                    await dd.save();
                 }
             } catch(err) {
                 console.error("导入用户错误", err)
@@ -258,13 +250,16 @@ let ddTalkMsgHandle = {
             let users = await Promise.all(ps);
             await addDingUsersCompany(corp, users, corpApi);
         }
+    },
+    check_url: async function(msg) {
+
     }
 }
 
 
 async function addDingUsersCompany(corp, dingUsers, corpApi: CorpApi) {
     let company = await corp.getCompany(corp['company_id']);
-    let corpid = corp.id;
+    let corpid = corp.corpId;
 
     let travelPolicy = await company.getDefaultTravelPolicy();
     for(let u of dingUsers) {
