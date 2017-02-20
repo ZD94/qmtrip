@@ -121,11 +121,30 @@ export default class CorpApi {
     }
 
     async getDepartmentInfo(departmentId): Promise<any> {
-        let url = `https://oapi.dingtalk.com/department/get?access_token=${this.accessToken}&id=${departmentId}&lang=zh_CN`;
+        let url = `https://oapi.dingtalk.com/department/get?access_token=${this.accessToken.access_token}&id=${departmentId}&lang=zh_CN`;
         let result = await reqProxy(url, {
             name: '获取部门详情',
             method: 'GET',
             lang: 'zh_CN'
+        });
+        return result;
+    }
+
+    async registryContractChangeLister(token: string, aesKey:string, eventListenUrl: string) {
+        let self = this;
+        let url = `https://oapi.dingtalk.com/call_back/register_call_back?access_token=${self.accessToken.access_token}`;
+        let body = {
+            "call_back_tag": ["user_add_org", "user_modify_org", "user_leave_org"],
+            "token": token,
+            "aes_key": aesKey,
+            "url": eventListenUrl,
+        }
+        let result = await reqProxy(url, {
+            name: '注册通讯录变更监听',
+            method: 'POST',
+            lang: 'zh_CN',
+            body: body,
+            json: true,
         });
         return result;
     }
