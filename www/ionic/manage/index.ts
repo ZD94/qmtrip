@@ -3,9 +3,11 @@
  */
 "use strict";
 import {Staff} from "api/_types/staff/staff";
+import {ECompanyType} from "api/_types/company/company";
 
 export default async function IndexController($scope){
     require('./manage.scss');
     let staff = await Staff.getCurrent();
     $scope.staff = staff;
+    $scope.ECompanyType = ECompanyType;
 }
