@@ -274,6 +274,75 @@ class DepartmentModule{
         return result[0][0].count;
     }
 
+    @clientExport
+    static async getStaffs(params: {options?: any, id: string}): Promise<Staff[]> {
+        let currentStaff = await Staff.getCurrent();
+        let options = params.options;
+        if (!options) options = {where: {}};
+        if(!options.where) options.where = {};
+
+        let pagers = await Models.staffDepartment.find({where: {departmentId: params.id}, order: [['createdAt', 'desc']]});
+
+        let departmentStaffs = [];
+        departmentStaffs.push.apply(departmentStaffs, pagers);
+        while(pagers.hasNextPage()){
+            let nextPager = await pagers.nextPage();
+            departmentStaffs.push.apply(departmentStaffs, nextPager);
+            // pagers = nextPager;
+        }
+
+        let ids =  await Promise.all(departmentStaffs.map(function(t){
+            return t.staffId;
+        }));
+
+        options.where.staffStatus = EStaffStatus.ON_JOB;
+        options.where.companyId = currentStaff.company.id;
+        options.where.id = {$in: ids};
+        //姓名Z-A
+        if(options.order == 'nameDesc'){
+            options.order = "convert_to(name,'gbk') desc";
+        }
+        //姓名A-Z
+        if(options.order == 'nameAsc'){
+            options.order = "convert_to(name,'gbk') asc";
+        }
+        //角色排序
+        if(options.order == 'role'){
+            options.order = [['roleId', 'asc']];
+        }
+        //差率标准排序
+        if(options.order == 'travelPolicy'){
+            options.order = [['travelPolicyId', 'asc']];
+        }
+        //员工状态
+        if(options.order == 'status'){
+            DBM.Staff.belongsTo(DBM.Account, {foreignKey: 'id', targetKey: 'id'});
+            options.include = [{
+                model: DBM.Account,
+                attributes : ['id','mobile','email','status','deleted_at']
+            }];
+            options.order = '"' + 'Account' + '"' + '.status asc';
+         }
+        //默认按创建时间排序排序
+        if(!options.order){
+            options.order = [['createdAt', 'asc']];
+        }
+        let staffs = await Models.staff.find(options);
+
+        let result =  await Promise.all(staffs.map(async function(s){
+            return s;
+        }))
+
+
+        //取出集合之后排序 不是对全部数据进行排序会出问题
+        /*if(options.order == 'status'){
+            result.sort(function(a,b){
+                return a.status - b.status;
+            })
+        }*/
+        return result;
+    }
+
     static deleteDepartmentByTest(params){
         return DBM.Department.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
             .then(function(){

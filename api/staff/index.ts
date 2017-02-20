@@ -298,7 +298,7 @@ class StaffModule{
             throw L.ERR.ACCOUNT_NOT_EXIST();
         }
 
-        var checkMsgCode = await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: account.mobile});
+        var checkMsgCode = await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: staff.mobile});
 
         if(checkMsgCode) {
             staff.roleId = EStaffRole.ADMIN;

@@ -44,58 +44,17 @@ export class Department extends ModelObject{
     set company(val: Company) {}
 
     async getStaffs(options?: any): Promise<any[]> {
-        if (!options) options = {where: {}};
-        if(!options.where) options.where = {};
-
-        let pagers = await Models.staffDepartment.find({where: {departmentId: this.id}, order: [['createdAt', 'desc']]});
-
-        let departmentStaffs = [];
-        departmentStaffs.push.apply(departmentStaffs, pagers);
-        while(pagers.hasNextPage()){
-            let nextPager = await pagers.nextPage();
-            departmentStaffs.push.apply(departmentStaffs, nextPager);
-            // pagers = nextPager;
+        if(!this.isLocal){
+            API.require('department');
+            await API.onload();
         }
-
-        let ids =  await Promise.all(departmentStaffs.map(function(t){
-            return t.staffId;
-        }));
-
-        options.where.staffStatus = EStaffStatus.ON_JOB;
-        options.where.companyId = this.company.id;
-        options.where.id = {$in: ids};
-        //姓名Z-A
-        if(options.order = 'nameDesc'){
-            options.order = "convert_to(name,'gbk') desc";
-        }
-        //姓名A-Z
-        if(options.order = 'nameAsc'){
-            options.order = "convert_to(name,'gbk') asc";
-        }
-        //角色排序
-        if(options.order = 'role'){
-            options.order = [['roleId', 'asc']];
-        }
-        //差率标准排序
-        if(options.order = 'travelPolicy'){
-            options.order = [['travelPolicyId', 'asc']];
-        }
-        //默认按创建时间排序排序
-        if(!options.order){
-            options.order = [['createdAt', 'asc']];
-        }
-        let staffs = await Models.staff.find(options);
+        let staffs =  await API.department.getStaffs({id: this.id,options: options});
         let result =  await Promise.all(staffs.map(async function(s){
             let travelPolicy = await s.getTravelPolicy();
             s["travelPolicy"] = travelPolicy;
             return s;
         }))
 
-        if(options.order = 'status'){
-            result.sort(function(a,b){
-                return a.status - b.status;
-            })
-        }
         return result;
     }
 
