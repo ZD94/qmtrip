@@ -1,6 +1,18 @@
 <ion-view title="管理企业" class="manage-index">
     <ion-content padding="true" class="has-header">
         <div class="list">
+            <div class="item item-icon-right">
+                企业名称
+                <span class="item-note">{{staff.company.name}}</span>
+            </div>
+
+            <div class="item item-icon-right">
+                企业类型
+                <span class="item-note" ng-if="!staff.company.type || staff.company.type == ECompanyType.TRYING">试用企业</span>
+                <span class="item-note" ng-if="staff.company.type == ECompanyType.PAYED">付费企业</span>
+            </div>
+        </div>
+        <div class="list">
             <a class="item item-icon-right" href="#statistics/">
                 差旅统计
                 <i class="icon ion-ios-arrow-right"></i>
