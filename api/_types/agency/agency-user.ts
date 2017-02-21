@@ -8,6 +8,8 @@ import { Agency } from './agency';
 import moment=require('moment');
 import {PaginateInterface} from "common/model/interface";
 import {Company} from "../company/company";
+let sequelize = require("common/model").DB;
+
 
 export enum EAgencyStatus {
     DELETE = -2, //删除状态
@@ -46,42 +48,101 @@ export class AgencyUser extends ModelObject{
     }
 
     @RemoteCall()
-    async  findByConditions(options?: any):Promise<PaginateInterface<Company>>{
-        let where: any = {};
-        if (options.name) {
-            //查询创建者时需要找到用户的id
-            let id = await Models.staff.find({where:{
-                name:{
-                    $like:'%'+options.name+'%'
-                }
-            }});
-            console.info('id:',id[0].id);
-            where.create_user = id[0].id;
+    async  findCompanies(options?: any):Promise<any>{
+        let {page, perPage} = options;
+        if (!page || !/^\d+$/.test(page)) {
+            page = 1;
         }
-        if (options.mobile){
-            where.mobile=options.mobile;
+        if (!perPage || !/^\d+$/.test(perPage)) {
+            perPage = 20;
         }
-        if(options.keyword){
-            where.name={
-                $like: '%' + options.keyword + '%'
-            }
+        let sql = `SELECT C.id, C.name, C.mobile, C.created_at, C.expiry_date, C.create_user FROM company.companies AS C `;
+        //分页
+        let countSQL = `SELECT  count(1) as total FROM company.companies AS C`;
+        let where = ' WHERE '
+        //创建者
+        if ( options.name) {
+            let piece = ' LEFT JOIN staff.staffs AS S ON S.id = C.create_user '
+            sql += piece;
+            countSQL += piece;
+            where += ` S.name like '%${options.name}%' AND `;
+
         }
-        if(options.regDateStart&&options.regDateEnd){
-            where.created_at = {
-                $between: [
-                    options.regDateStart,
-                    options.regDateEnd
-                ]
-            }
+        if (options.keyword) {
+            where += ` C.name like '%${options.keyword}%' AND `;
+
         }
-        if(options.expireDate){
-            where.expiryDate = {
-                $lte: new Date(moment(new Date()).add(options.expireDate, 'days').format('YYYY-MM-DD HH:mm:ss'))
-            }
+        if (options.mobile) {
+            where += ` C.mobile like '%${options.mobile}%' AND `
         }
-        let pager = await Models.company.find({where});
-        console.info('pager:',pager);
-        return pager;
+
+        if (options.regDateStart&&options.regDateEnd) {
+            where+=  ` C.created_at > '${moment(options.regDateStart).format('YYYY-MM-DD HH:mm:ss') }' AND  C.created_at < '${moment(options.regDateEnd).format('YYYY-MM-DD HH:mm:ss') }' AND `;
+        }
+        if(options.days){
+            where+= ` C.expiry_date <  '${moment().add(options.days, 'days').format('YYYY-MM-DD HH:mm:ss')}' AND `;
+        }
+        // where = where.replace(/AND\s*$/i, '');
+        where += '1=1';
+        sql = sql + where;
+        sql += ` LIMIT ${perPage} OFFSET ${ (page-1) * perPage} `;
+        countSQL += where;
+        let company_ret = await sequelize.query(sql);
+        let num_ret=await sequelize.query(countSQL);
+        let result = {
+            total: <number>(num_ret[0][0]['total']),
+            items: company_ret[0],
+            page: page,
+            perPage: perPage
+        };
+        console.info(company_ret);
+        return result;
+        // console.info(company_ret);
+        // return company_ret.map( (company) => {
+        //     console.log(company)
+        //     return company;
+        // });
+
+        // let where: any = {};
+        // if (options.name) {
+        //     //查询创建者时需要找到用户的id
+        //     let id = await Models.staff.find({where:{
+        //         name:{
+        //             $like:'%'+options.name+'%'
+        //         }
+        //     }});
+        //     console.info('id:',id[0].id);
+        //    //循环遍历返回的id
+        //     let pager:any={};
+        //     let item=id.map(async (staff)=>{
+        //         if(staff.roleId==0){
+        //             where.create_user = staff.id;
+        //         }
+        //     })
+        // }
+        // if (options.mobile){
+        //     where.mobile=options.mobile;
+        // }
+        // if(options.keyword){
+        //     where.name={
+        //         $like: '%' + options.keyword + '%'
+        //     }
+        // }
+        // if(options.regDateStart&&options.regDateEnd){
+        //     where.created_at = {
+        //         $between: [
+        //             options.regDateStart,
+        //             options.regDateEnd
+        //         ]
+        //     }
+        // }
+        // if(options.expireDate){
+        //     where.expiryDate = {
+        //         $lte: new Date(moment(new Date()).add(options.expireDate, 'days').format('YYYY-MM-DD HH:mm:ss'))
+        //     }
+        // }
+        // let pager = await Models.company.find({where});
+        // return pager;
     }
 
 

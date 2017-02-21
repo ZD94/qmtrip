@@ -50,17 +50,16 @@ export async function ListController($scope, Models) {
         obj.keyword = $scope.keyword;
         obj.regDateStart = $scope.regDateStart;
         obj.regDateEnd = $scope.regDateEnd;
-        obj.expireDate = $scope.expireDate;
-        let pager:any={};
+        obj.days = $scope.expireDate;
+        let res:any={};
         let agency=await AgencyUser.getCurrent();
-        pager= await agency.findByConditions(obj);
-        pager = Object.setPrototypeOf(pager, Pager.prototype);
-        let items = pager.map(async(company) => {
-            console.info(company.createUser);
+        res= await agency.findCompanies(obj);
+        let items=res.items;
+        // pager = Object.setPrototypeOf(pager, Pager.prototype);
+        let item = items.map( async (company) => {
             let staff = await Models.staff.get(company.createUser);
-            // let staff = await Models.staff.find({where:{id:company.createUser}});
-            let staffNum = await company.getStaffNum();
-            company["staffNum"] = staffNum;
+            // let staffNum = await company.getStaffNum();
+            // company["staffNum"] = staffNum;
             company['createUserObj'] = staff;
             //剩余有效期天数
             if (!company.expiryDate) {
@@ -77,9 +76,9 @@ export async function ListController($scope, Models) {
             }
             return company;
         });
-        let companies = await Promise.all(items);
+        let companies = await Promise.all(item);
         $scope.companylist = companies;
-        $scope.pager = pager;
+        // $scope.pager = res;
 
     }
 
