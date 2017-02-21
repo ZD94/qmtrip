@@ -58,13 +58,14 @@ class TransitWaiterDurationPrefer extends AbstractPrefer<IFinalTicket> {
             if (ticket.segs && ticket.segs.length > 1) {
                 let total = ticket.segs.length;
                 let t = 0;
-                ticket.segs.forEach ( (seg) => {
-                    seg = <IFlightSeg>seg;
-                    let arriDateTime = seg.arriDateTime;
-                    let deptDateTime = seg.deptDateTime;
-                    let minutes = moment(arriDateTime).diff(deptDateTime, 'minutes');
+                for(var i=0; i< total-1; i++) {
+                    let seg = <IFlightSeg>ticket.segs[i];
+                    let seg2 = <IFlightSeg>ticket.segs[i+1];
+                    let m1 = moment(seg.arriDateTime);
+                    let m2 = moment(seg2.deptDateTime);
+                    let minutes = m2.diff(m1, 'minutes');
                     t += minutes;
-                });
+                }
                 let score = 0;
 
                 if (t > self.maxDuration) {
