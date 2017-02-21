@@ -51,9 +51,9 @@ class ApproveModule {
                 }
             })
         }
+
         await company.beforeGoTrip({number: number});
-        await company.frozenTripPlanNum({number: number});
-        return ApproveModule._submitApprove({
+        let approve = await ApproveModule._submitApprove({
             submitter: submitter.id,
             data: budgetInfo,
             title: project,
@@ -61,6 +61,12 @@ class ApproveModule {
             type: EApproveType.TRAVEL_BUDGET,
             approveUser: approveUser,
         });
+
+        let content = budgetInfo.budgets[0].originPlace.name? budgetInfo.budgets[0].originPlace.name : budgetInfo.budgets[0].originPlace
+        + "-" + budgetInfo.budgets[0].destination.name? budgetInfo.budgets[0].destination.name: budgetInfo.budgets[0].destination;
+        await company.frozenTripPlanNum({accountId: submitter.id, tripPlanId: approve.id, number: number,
+            remark: "提交出差申请消耗行程点数", content: content});
+        return approve;
     }
 
     @clientExport
@@ -70,8 +76,9 @@ class ApproveModule {
         let submitter = await Staff.getCurrent();
 
         let company = submitter.company;
-        await company.beforeGoTrip();
-        await company.frozenTripPlanNum({number: 1});
+        //特殊审批不记录行程数
+        // await company.beforeGoTrip();
+        // await company.frozenTripPlanNum({number: 1});
         let budgetInfo = {
             query: query,
             budgets: [

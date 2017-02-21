@@ -1,4 +1,3 @@
-import {ECompanyType} from "../_types/company/company";
 /**
  * Created by yumiao on 15-12-9.
  */
@@ -16,7 +15,7 @@ let schedule = require("node-schedule");
 let _ = require("lodash");
 import {requireParams, clientExport} from "common/api/helper";
 import {Models} from "api/_types";
-import {Company, MoneyChange, Supplier} from 'api/_types/company';
+import {Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType} from 'api/_types/company';
 import {Staff, EStaffRole} from "api/_types/staff";
 import {PromoCode} from "api/_types/promoCode";
 import {Agency, AgencyUser, EAgencyUserRole} from "api/_types/agency";
@@ -492,6 +491,37 @@ class CompanyModule {
     }
 
     /*************************************供应商end***************************************/
+
+    /*************************************企业行程点数变更日志begin***************************************/
+
+    @clientExport
+    static async createTripPlanNumChange (params) : Promise<TripPlanNumChange>{
+        var tpc = TripPlanNumChange.create(params);
+        return tpc.save();
+    }
+
+    @clientExport
+    @requireParams(["id"])
+    static async getTripPlanNumChange(params) :Promise<TripPlanNumChange> {
+        return Models.tripPlanNumChange.get(params.id);
+    }
+
+    /**
+     * 企业行程点数变更记录
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    static async getTripPlanNumChanges(params): Promise<FindResult>{
+        params.order = params.order || [['createdAt', 'desc']];
+        let paginate = await Models.tripPlanNumChange.find(params);
+        let ids =  paginate.map(function(t){
+            return t.id;
+        })
+        return {ids: ids, count: paginate['total']};
+    }
+
+    /*************************************企业行程点数变更日志end***************************************/
 
     static _scheduleTask () {
         let taskId = "resetTripPlanPassNum";

@@ -19,6 +19,7 @@ import {emitter} from "../../../libs/oa/emitter";
 import {EVENT} from "../../../libs/oa/index";
 import L from 'common/language';
 import {EStaffRole} from "../staff/staff";
+import {TripPlanNumChange, NUM_CHANGE_TYPE} from "./trip-plan-num-change";
 
 var sequelize = require("common/model").DB;
 let promoCodeType = require('libs/promoCodeType');
@@ -240,7 +241,7 @@ export class Company extends ModelObject{
         }
         //套餐内剩余量
         let surplus = self.tripPlanNumLimit - self.tripPlanPassNum - self.tripPlanFrozenNum;
-        if(!(surplus >= (number + self.tripPlanFrozenNum))){
+        if(!(surplus >= number)){
             //套餐包剩余的条数不够
             if(!self.extraTripPlanNum){
                 throw L.ERR.BEYOND_LIMIT_NUM("出差申请");
@@ -249,7 +250,7 @@ export class Company extends ModelObject{
                 if(surplus < 0){
                     surplus = 0;
                 }
-                if(!((self.extraTripPlanNum + surplus) >= (number + self.tripPlanFrozenNum)
+                if(!((self.extraTripPlanNum + surplus) >= number
                     && self.extraExpiryDate && self.extraExpiryDate.getTime() - new Date().getTime() > 0)){
                     throw L.ERR.BEYOND_LIMIT_NUM("出差申请");
                 }
@@ -285,6 +286,11 @@ export class Company extends ModelObject{
         return true;
     }
 
+    /**
+     * 增加行程冻结点数
+     * @param params
+     * @returns {Company}
+     */
     @RemoteCall()
     async frozenTripPlanNum(params?: any): Promise<Company> {
         let number = 1;
@@ -292,9 +298,22 @@ export class Company extends ModelObject{
             number = params.number;
         }
         this.tripPlanFrozenNum = this.tripPlanFrozenNum + number;
-        return this.save();
+        let result = await this.save();
+        params.type = NUM_CHANGE_TYPE.FROZEN;
+        params.companyId = this.id;
+        params.number = 0 - number;
+        let log = TripPlanNumChange.create(params);
+        let account = await Models.staff.get(params.accountId);
+        log.account = account;
+        await log.save();
+        return result;
     }
 
+    /**
+     * 减少冻结行程点数
+     * @param params
+     * @returns {Company}
+     */
     @RemoteCall()
     async freeFrozenTripPlanNum(params?: any): Promise<Company> {
         let number = 1;
@@ -302,27 +321,101 @@ export class Company extends ModelObject{
             number = params.number;
         }
         this.tripPlanFrozenNum = this.tripPlanFrozenNum - number;
-        return this.save();
+        let result = await this.save();
+        params.type = NUM_CHANGE_TYPE.FREE_FROZEN;
+        params.companyId = this.id;
+        let log = TripPlanNumChange.create(params);
+        let account = await Models.staff.get(params.accountId);
+        log.account = account;
+        await log.save();
+        return result;
     }
-
+    /**
+     * 减少加油包行程条数
+     * @param params
+     * @returns {Company}
+     */
     @RemoteCall()
-    async reduceExtraTripPlanNum(params?: any): Promise<Company> {
+    async reduceExtraTripPlanNum(params: any): Promise<Company> {
         let number = 1;
         if(params && params.number){
             number = params.number;
         }
         this.extraTripPlanNum = this.extraTripPlanNum - number;
-        return this.save();
+        let result = await this.save();
+        params.type = NUM_CHANGE_TYPE.CONSUME;
+        params.companyId = this.id;
+        params.number = 0 - number;
+        console.info(params.number);
+        console.info("nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
+        let log = TripPlanNumChange.create(params);
+        let account = await Models.staff.get(params.accountId);
+        log.account = account;
+        await log.save();
+        return result;
     }
 
+    /**
+     * 增加行程审批通过条数
+     * @param params
+     * @returns {Company}
+     */
     @RemoteCall()
-    async addTripPlanPassNum(params?: any): Promise<Company> {
+    async addTripPlanPassNum(params: any): Promise<Company> {
         let number = 1;
         if(params && params.number){
             number = params.number;
         }
         this.tripPlanPassNum = this.tripPlanPassNum + number;
-        return this.save();
+        let result = await this.save();
+        params.type = NUM_CHANGE_TYPE.CONSUME;
+        params.companyId = this.id;
+        params.number = 0 - number;
+        let log = TripPlanNumChange.create(params);
+        let account = await Models.staff.get(params.accountId);
+        log.account = account;
+        await log.save();
+        return result;
+    }
+
+    /**
+     * 添加加油包
+     * @param params
+     * @returns {Company}
+     */
+    @RemoteCall()
+    async addPackage(params: any): Promise<Company> {
+        let number = params.number;
+        let extraExpiryDate = params.extraExpiryDate;
+        this.extraTripPlanNum = this.extraTripPlanNum + number;
+        this.extraExpiryDate = extraExpiryDate;
+        let result = await this.save();
+        params.type = NUM_CHANGE_TYPE.ADD_PACKAGE;
+        params.companyId = this.id;
+        let log = TripPlanNumChange.create(params);
+        let account = await Models.staff.get(params.accountId);
+        log.account = account;
+        await log.save();
+        return result;
+    }
+
+    /**
+     * 够买套餐包
+     * @param params
+     * @returns {Company}
+     */
+    @RemoteCall()
+    async buyPackageBag(params: any): Promise<Company> {
+        let number = params.number;
+        this.tripPlanNumLimit = number;
+        let result = await this.save();
+        params.type = NUM_CHANGE_TYPE.PACKAGE_BAG;
+        params.companyId = this.id;
+        let log = TripPlanNumChange.create(params);
+        let account = await Models.staff.get(params.accountId);
+        log.account = account;
+        await log.save();
+        return result;
     }
     
     getDepartments(options?: any): Promise<Department[]> {
