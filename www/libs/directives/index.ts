@@ -8,3 +8,4 @@ import './policy-show';
 import './city-select';
 import './staff-avatar';
 import './radio';
+import './sort-select';

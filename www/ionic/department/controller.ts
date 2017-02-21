@@ -1,8 +1,10 @@
 import { Department } from 'api/_types/department';
 import {Staff, EStaffRoleNames, EStaffRole} from 'api/_types/staff/staff';
+import moment = require('moment');
 var msgbox = require('msgbox');
 
-export async function IndexController($scope, $stateParams, Models, $ionicPopup, $ionicNavBarDelegate,$timeout, $location,ngModalDlg,$window) {
+
+export async function IndexController($scope, $stateParams, Models, $ionicPopup, $ionicNavBarDelegate,$timeout, $location,ngModalDlg,$window, sortDlg) {
     require('./department.scss');
     if($stateParams.departName){
         console.info('comming in....',$stateParams.departName)
@@ -35,12 +37,50 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
 
         let departments = await rootDepartment.getChildDeptStaffNum();
         let staffs = await rootDepartment.getStaffs();
+        staffs = staffs.map(function(staff){
+            let hours = moment().diff(moment(staff.createdAt),'hours');
+            console.info('status',staff.status);
+            if(staff.status == 1 && hours < 24){
+                staff['newStaff'] = true;
+            }else if(!status || staff.status == 0){
+                staff['newRegister'] = true;
+            }else{
+                staff['newStaff'] = false;
+                staff['newRegister'] = false;
+            }
+            console.info(staff);
+            return staff;
+        })
         $scope.departments = departments;
         $scope.staffs = staffs;
     }
     initDepartment(departmentId);
     $scope.EStaffRoleNames = EStaffRoleNames;
     $scope.EStaffRole = EStaffRole;
+    $scope.arrlist = [
+        {name:'最近加入',value:'',icon:'fa-sort-amount-desc'},
+        {name:'姓名(A-Z)',value:'nameAsc',icon:'fa-sort-amount-asc'},
+        {name:'姓名(Z-A)',value:'nameDesc',icon:'fa-sort-amount-desc'},
+        {name:'角色',value:'role',icon:'fa-sort-amount-desc'},
+        {name:'差旅标准',value:'travelPolicy',icon:'fa-sort-amount-desc'},
+        {name:'激活状态',value:'status',icon:'fa-sort-amount-desc'},
+        ]
+    $scope.selected = {name:'最近加入',value:'',icon:'fa-sort-amount-desc'};
+    $scope.sortBy = async function(selected){
+        let staffs = await rootDepartment.getStaffs({where:{},order: selected});
+        $scope.staffs = staffs.map(function(staff){
+            let hours = moment().diff(moment(staff.createdAt),'hours');
+            if(staff.status == 1 && hours < 24){
+                staff['newStaff'] = true;
+            }else if(staff.status == 0){
+                staff['newRegister'] = true;
+            }else{
+                staff['newStaff'] = false;
+                staff['newRegister'] = false;
+            }
+            return staff;
+        })
+    }
     $scope.addNewStaff = function(){
         window.location.href = '#/department/add-staff';
     }
