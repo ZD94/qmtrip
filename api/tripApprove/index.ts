@@ -116,7 +116,8 @@ class TripApproveModule {
                 otherBudget: subsidy,
                 totalBudget: '￥' + tripApprove.budget,
                 userName : staff.name,
-                email : staff.email
+                email : staff.email,
+                companyName: staff.company.name,
             };
 
             try {
