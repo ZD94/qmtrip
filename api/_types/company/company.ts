@@ -19,6 +19,7 @@ import {emitter} from "../../../libs/oa/emitter";
 import {EVENT} from "../../../libs/oa/index";
 import L from 'common/language';
 import {EStaffRole} from "../staff/staff";
+import moment = require("moment");
 
 var sequelize = require("common/model").DB;
 let promoCodeType = require('libs/promoCodeType');
@@ -525,6 +526,9 @@ export class Company extends ModelObject{
         }
         return managers;
     }
+
+
+
 }
 
 //p为父菜单节点。o为菜单列表
