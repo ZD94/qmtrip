@@ -49,6 +49,7 @@ export class AgencyUser extends ModelObject{
 
     @RemoteCall()
     async  findCompanies(options?: any):Promise<any>{
+        let self = this;
         let {page, perPage} = options;
         if (!page || !/^\d+$/.test(page)) {
             page = 1;
@@ -56,24 +57,30 @@ export class AgencyUser extends ModelObject{
         if (!perPage || !/^\d+$/.test(perPage)) {
             perPage = 20;
         }
-        let sql = `SELECT C.id, C.name, C.mobile, C.created_at, C.expiry_date, C.create_user FROM company.companies AS C `;
+        let sql = `SELECT C.id FROM company.companies AS C `;
         //分页
         let countSQL = `SELECT  count(1) as total FROM company.companies AS C`;
-        let where = ' WHERE '
-        //创建者
-        if ( options.name) {
+        let where = ` WHERE C.agency_id = '${self.agency.id}' AND `;
+        if (options.userName || options.mobile ) {
             let piece = ' LEFT JOIN staff.staffs AS S ON S.id = C.create_user '
             sql += piece;
             countSQL += piece;
-            where += ` S.name like '%${options.name}%' AND `;
-
         }
+
+        //创建者
+        if ( options.userName) {
+            where += ` S.name like '%${options.userName}%' AND `;
+        }
+
         if (options.keyword) {
             where += ` C.name like '%${options.keyword}%' AND `;
-
         }
+
         if (options.mobile) {
-            where += ` C.mobile like '%${options.mobile}%' AND `
+            let piece = ` LEFT JOIN auth.accounts AS A ON A.id = S.id `;
+            sql += piece;
+            countSQL += piece;
+            where += ` A.mobile like '%${options.mobile}%' AND `
         }
 
         if (options.regDateStart&&options.regDateEnd) {
@@ -82,11 +89,12 @@ export class AgencyUser extends ModelObject{
         if(options.days){
             where+= ` C.expiry_date <  '${moment().add(options.days, 'days').format('YYYY-MM-DD HH:mm:ss')}' AND `;
         }
-        // where = where.replace(/AND\s*$/i, '');
-        where += '1=1';
+        where = where.replace(/AND\s*$/i, '');
         sql = sql + where;
-        sql += ` LIMIT ${perPage} OFFSET ${ (page-1) * perPage} `;
+        sql += `  ORDER BY C.created_at desc LIMIT ${perPage} OFFSET ${ (page-1) * perPage} `;
+        console.log(sql)
         countSQL += where;
+        console.log(countSQL)
         let company_ret = await sequelize.query(sql);
         let num_ret=await sequelize.query(countSQL);
         let result = {
@@ -97,55 +105,8 @@ export class AgencyUser extends ModelObject{
         };
         console.info(company_ret);
         return result;
-        // console.info(company_ret);
-        // return company_ret.map( (company) => {
-        //     console.log(company)
-        //     return company;
-        // });
 
-        // let where: any = {};
-        // if (options.name) {
-        //     //查询创建者时需要找到用户的id
-        //     let id = await Models.staff.find({where:{
-        //         name:{
-        //             $like:'%'+options.name+'%'
-        //         }
-        //     }});
-        //     console.info('id:',id[0].id);
-        //    //循环遍历返回的id
-        //     let pager:any={};
-        //     let item=id.map(async (staff)=>{
-        //         if(staff.roleId==0){
-        //             where.create_user = staff.id;
-        //         }
-        //     })
-        // }
-        // if (options.mobile){
-        //     where.mobile=options.mobile;
-        // }
-        // if(options.keyword){
-        //     where.name={
-        //         $like: '%' + options.keyword + '%'
-        //     }
-        // }
-        // if(options.regDateStart&&options.regDateEnd){
-        //     where.created_at = {
-        //         $between: [
-        //             options.regDateStart,
-        //             options.regDateEnd
-        //         ]
-        //     }
-        // }
-        // if(options.expireDate){
-        //     where.expiryDate = {
-        //         $lte: new Date(moment(new Date()).add(options.expireDate, 'days').format('YYYY-MM-DD HH:mm:ss'))
-        //     }
-        // }
-        // let pager = await Models.company.find({where});
-        // return pager;
     }
-
-
 
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }
