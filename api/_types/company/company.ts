@@ -3,7 +3,7 @@
 import { Models } from 'api/_types';
 import {Staff, EStaffStatus } from 'api/_types/staff';
 import {Agency} from 'api/_types/agency';
-import {TravelPolicy} from "api/_types/travelPolicy";
+import {EHotelLevel, EPlaneLevel, ETrainLevel, TravelPolicy} from "api/_types/travelPolicy";
 import { Types, Values } from 'common/model';
 import { Department } from 'api/_types/department';
 import { TripPlan } from "api/_types/tripPlan";
@@ -338,12 +338,22 @@ export class Company extends ModelObject{
         return Models.travelPolicy.find(query);
     }
 
-    async getDefaultTravelPolicy(companyId?:string): Promise<TravelPolicy> {
+    async getDefaultTravelPolicy(): Promise<TravelPolicy> {
+        let self = this;
         var tps = await Models.travelPolicy.find({where: {companyId: this.id, isDefault: true}});
         if(tps && tps.length>0){
             return tps[0];
-        }else{
-            return null;
+        } else {
+            tps = await Models.travelPolicy.find({where: {companyId: this.id}});
+            if (tps && tps.length) {
+                return tps[0];
+            }
+
+            let travelPolicy = TravelPolicy.create({name: '默认标准', planeLevels: [EPlaneLevel.ECONOMY],
+                trainLevels: [ETrainLevel.SECOND_SEAT], hotelLevels: [EHotelLevel.THREE_STAR], subsidy: 0, isDefault: true});
+            travelPolicy.company = self;
+            travelPolicy = await travelPolicy.save();
+            return travelPolicy;
         }
     }
 

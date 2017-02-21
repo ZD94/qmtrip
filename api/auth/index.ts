@@ -228,7 +228,7 @@ export default class ApiAuth {
         //发送短信通知
         let values  = {
             pwd:account.mobile.substr(account.mobile.length-6),
-            url:'http:'+C.host
+            url: 'http:' + C.host
         }
 
         await API.notify.submitNotify({
@@ -325,7 +325,7 @@ export default class ApiAuth {
             account.isValidateMobile = true;
             account = await account.save()
         } else {
-            throw {code: -1, msg: "短信验证码错误"};
+            throw L.ERR.CODE_ERROR();
         }
         return account;
     }
@@ -360,7 +360,7 @@ export default class ApiAuth {
             account.isValidateMobile = true;
             account = await account.save()
         } else {
-            throw {code: -1, msg: "短信验证码错误"};
+            throw L.ERR.CODE_ERROR();
         }
         return true;
     }
@@ -423,7 +423,7 @@ export default class ApiAuth {
         }
 
         if(!msgCode || !msgTicket) {
-            throw {code: -1, msg: "短信验证码错误"};
+            throw L.ERR.CODE_ERROR();
         }
         var ckeckMsgCode = await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
 
@@ -455,7 +455,7 @@ export default class ApiAuth {
                 avatarColor: avatarColor
             });
         } else {
-            throw {code: -1, msg: "短信验证码错误"};
+            throw L.ERR.CODE_ERROR();
         }
         return staff.company;
     }
@@ -583,7 +583,7 @@ export default class ApiAuth {
          }*/
 
         if(!msgCode || !msgTicket) {
-            throw {code: -1, msg: "短信验证码错误"};
+            throw L.ERR.CODE_ERROR();
         }
 
         if(!name) {
@@ -595,7 +595,7 @@ export default class ApiAuth {
         }
 
         if(!pwd) {
-            throw {code: -1, msg: "密码为空"};
+            throw L.ERR.PASSWORD_EMPTY();
         }
 
         //验证优惠码是否有效

@@ -44,7 +44,7 @@
                 </div>
             </ion-scroll>
 
-            <div class="bottom-bar-approval" ng-if="tripApprove && company.oa == EApproveChannel.QM">
+            <div class="bottom-bar-approval" ng-if="tripApprove && (company.oa == EApproveChannel.QM || !company.oa)">
                 <bottom-bar ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE">
                     <div class="status-bar item status-bar-detail" ng-click="approveDetail()">
                         <div class="list" style="overflow: hidden;text-overflow: ellipsis;">等待{{tripApprove.approveUser.name}}审批</div>
