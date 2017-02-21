@@ -1,10 +1,13 @@
 
-import { TableExtends, Table, Create, Field, ResolveRef } from 'common/model/common';
+import {TableExtends, Table, Create, Field, ResolveRef, RemoteCall} from 'common/model/common';
 import { Account } from '../auth';
 import { Models, EAccountType, EGender } from 'api/_types';
 import { ModelObject } from 'common/model/object';
 import { getSession, Types, Values } from 'common/model';
 import { Agency } from './agency';
+import moment=require('moment');
+import {PaginateInterface} from "common/model/interface";
+import {Company} from "../company/company";
 
 export enum EAgencyStatus {
     DELETE = -2, //删除状态
@@ -41,6 +44,47 @@ export class AgencyUser extends ModelObject{
         session.currentAgencyUser = agencyUser;
         return agencyUser;
     }
+
+    @RemoteCall()
+    async  findByConditions(options?: any):Promise<PaginateInterface<Company>>{
+        let where: any = {};
+        if (options.name) {
+            //查询创建者时需要找到用户的id
+            let id = await Models.staff.find({where:{
+                name:{
+                    $like:'%'+options.name+'%'
+                }
+            }});
+            console.info('id:',id[0].id);
+            where.create_user = id[0].id;
+        }
+        if (options.mobile){
+            where.mobile=options.mobile;
+        }
+        if(options.keyword){
+            where.name={
+                $like: '%' + options.keyword + '%'
+            }
+        }
+        if(options.regDateStart&&options.regDateEnd){
+            where.created_at = {
+                $between: [
+                    options.regDateStart,
+                    options.regDateEnd
+                ]
+            }
+        }
+        if(options.expireDate){
+            where.expiryDate = {
+                $lte: new Date(moment(new Date()).add(options.expireDate, 'days').format('YYYY-MM-DD HH:mm:ss'))
+            }
+        }
+        let pager = await Models.company.find({where});
+        console.info('pager:',pager);
+        return pager;
+    }
+
+
 
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }

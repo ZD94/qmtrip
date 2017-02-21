@@ -18,6 +18,9 @@ ul li {
             <input type="checkbox" ng-model="AddFifty">50条
         </li>
         <li>
+            到期时间：{{company.expiryDate | date:"yyyy-MM-dd HH:mm:ss"}}
+        </li>
+        <li>
             <button ng-click="addFlowPackage()">确定</button>
             <button ng-click="reset()">取消</button>
         </li>
