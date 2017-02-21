@@ -20,6 +20,7 @@ import {EVENT} from "../../../libs/oa/index";
 import L from 'common/language';
 import {EStaffRole} from "../staff/staff";
 import {TripPlanNumChange, NUM_CHANGE_TYPE} from "./trip-plan-num-change";
+import moment = require("moment");
 
 var sequelize = require("common/model").DB;
 let promoCodeType = require('libs/promoCodeType');
@@ -346,8 +347,6 @@ export class Company extends ModelObject{
         params.type = NUM_CHANGE_TYPE.CONSUME;
         params.companyId = this.id;
         params.number = 0 - number;
-        console.info(params.number);
-        console.info("nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
         let log = TripPlanNumChange.create(params);
         let account = await Models.staff.get(params.accountId);
         log.account = account;
@@ -618,6 +617,9 @@ export class Company extends ModelObject{
         }
         return managers;
     }
+
+
+
 }
 
 //p为父菜单节点。o为菜单列表

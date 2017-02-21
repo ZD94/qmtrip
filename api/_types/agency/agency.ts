@@ -9,8 +9,11 @@ import { Table, Create, Field } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import { TripPlan } from "api/_types/tripPlan";
 import { AgencyUser, EAgencyStatus } from './agency-user';
+import moment=require('moment');
 
+//每一个.ts对应一个表，下面的代码是创建一个表，agency.是表的前缀
 @Table(Models.agency, 'agency.')
+//表名使用驼峰命名法
 export class Agency extends ModelObject{
     constructor(target: Object) {
         super(target);
@@ -90,4 +93,6 @@ export class Agency extends ModelObject{
         
         return Models.tripPlan.find(options);
     }
+
+
 }

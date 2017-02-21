@@ -5,3 +5,4 @@
 'use strict';
 
 import './city';
+import './sort-dlg'
