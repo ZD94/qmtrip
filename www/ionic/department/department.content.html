@@ -4,7 +4,14 @@
             <i class="icon ion-search placeholder-icon"></i>
             <input type="text" placeholder="Search">
         </label>
-        <span class="fa fa-sort-amount-desc">时间</span>
+        <span class="fa sort_btn" ng-class="[selected.icon]" sort-select select-list="arrlist" select="selected" done="sortBy">
+            <span ng-if="selected.value == ''">时间</span>
+            <span ng-if="selected.value == 'nameDesc'">姓名</span>
+            <span ng-if="selected.value == 'nameAsc'">姓名</span>
+            <span ng-if="selected.value == 'role'">角色</span>
+            <span ng-if="selected.value == 'travelPolicy'">标准</span>
+            <span ng-if="selected.value == 'status'">激活</span>
+        </span>
         <span class="ion-android-person-add" ng-click="addNewStaff()"></span>
     </div>
 </div>
@@ -30,8 +37,8 @@
             </div>
 
 
-            <span class="staff-flag"
-                  ng-class="{'bg-gray':item.status == 0}">{{item.status == 0 ? '未激活' : ''}}新加入</span>
+            <span class="staff-flag bg-gray" ng-if="item.newRegister">未激活</span>
+            <span class="staff-flag" ng-if="item.newStaff">新加入</span>
         </div>
         <!--<div class="item staff-list">-->
         <!--<img class="staff-avatar-img" src="ionic/images/logo.png">-->
