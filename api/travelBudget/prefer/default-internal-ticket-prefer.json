@@ -1,11 +1,5 @@
 [
   {
-    "name": "lowestPrice",
-    "options": {
-      "score": 100000
-    }
-  },
-  {
     "name": "directArrive",
     "options": {
       "deductScorePerStop": 10000
@@ -15,14 +9,69 @@
     "name": "earliestGoBackTimePrefer",
     "options": {
       "score": 100000,
-      "earliestGoBackTime": "<%=local.goBackDate%> <%=local.earliestGoBackTime%>"
+      "earliestGoBackTime": "<%=local.earliestLeaveDateTime%>"
     }
   },
   {
     "name": "latestArrivalTimePrefer",
     "options": {
       "score": 100000,
-      "latestArrivalTime": "<%=local.leaveDate%> <%=local.latestArrivalTime%>"
+      "latestArrivalTime": "<%=local.latestArrivalDateTime%>"
+    }
+  },
+  {
+    "name": "cabin",
+    "options": {
+      "score": 100000,
+      "expectFlightCabins": "<%=local.expectFlightCabins%>"
+    }
+  },
+  {
+    "name": "runningTimePrefer",
+    "options": {
+      "planeScore": 500,
+      "planeScoreInterval": 5
+    }
+  },
+  {
+    "name": "transitWaitDuration",
+    "options": {
+      "baseScore": 500,
+      "subScore": 5,
+      "maxDuration": 360,
+      "minDuration": 120
+    }
+  },
+  {
+    "name": "transitCityInChina",
+    "options": {
+      "baseScore": 5000
+    }
+  },
+  {
+    "name": "planePricePrefer",
+    "options": {
+      "type": "square",
+      "score": 10000,
+      "cabins": [
+        2, 3, 4, 5
+      ],
+      "percent": 0.2
+    }
+  },
+  {
+    "name": "cheapSupplier",
+    "options": {
+      "score": -100000,
+      "cheapSuppliers": [
+        "9C",
+        "KN",
+        "HO",
+        "PN",
+        "EU",
+        "AQ",
+        "JR"
+      ]
     }
   }
 ]
