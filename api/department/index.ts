@@ -324,7 +324,7 @@ class DepartmentModule{
             options.order = '"' + 'Account' + '"' + '.status asc';
          }
         //默认按创建时间排序排序
-        if(!options.order){
+        if(options.order == 'createdAt' || !options.order){
             options.order = [['createdAt', 'asc']];
         }
         let staffs = await Models.staff.find(options);
