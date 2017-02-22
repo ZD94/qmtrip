@@ -2,16 +2,6 @@
 .companylist{
 	background: #fff;
 	margin-top: 20px;
-	.todaystatistics{
-		h3{
-			margin: 10px;
-		}
-		.todaydata{
-			border:1px solid #e5e5e5;
-			height: 40px;
-			line-height: 40px;
-		}
-	}
 	.companylist{
 		padding: 10px;
 		h3{
@@ -41,8 +31,22 @@
 				}
 			}
 		}
+			.company_search {
+				//float: right;
+				height:100px;
+				padding:10px 100px 0px 0px;
+				input{
+					height:25px;
+					width:160px;
+				}
+				button{
+					height:30px;
+					width:60px;
+				}
+			}
 	}
 }
+
 .companyinfo{
 	background: #fff;
 	margin-top: 20px;

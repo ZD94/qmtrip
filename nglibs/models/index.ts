@@ -9,7 +9,7 @@ import { ModelCached } from 'common/model/cached';
 import {ModelRemote, ModelRemoteOld} from 'common/model/remote';
 import { ngService } from '../index';
 import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from 'api/_types/staff';
-import { Company, MoneyChange, Supplier } from 'api/_types/company';
+import { Company, MoneyChange, Supplier, TripPlanNumChange } from 'api/_types/company';
 import { PromoCode } from 'api/_types/promoCode';
 import { Department, StaffDepartment } from 'api/_types/department';
 import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
@@ -64,6 +64,9 @@ var Services = {
     },
     moneyChange: { type: MoneyChange, modname: 'company',
         funcs: ['getMoneyChange', 'listMoneyChange', 'saveMoneyChange']
+    },
+    tripPlanNumChange: { type: TripPlanNumChange, modname: 'company',
+        funcs: ['getTripPlanNumChange', 'getTripPlanNumChanges', 'createTripPlanNumChange']
     },
     supplier: { type: Supplier, modname: 'company',
         funcs: ['getSupplier', 'getSuppliers', 'createSupplier', 'updateSupplier', 'deleteSupplier']
@@ -169,6 +172,7 @@ class ClientModels implements ModelsInterface {
     staffSupplierInfo:ModelInterface<StaffSupplierInfo>;
     company: ModelInterface<Company>;
     supplier: ModelInterface<Supplier>;
+    tripPlanNumChange: ModelInterface<TripPlanNumChange>;
     promoCode: ModelInterface<PromoCode>;
     department: ModelInterface<Department>;
     staffDepartment: ModelInterface<StaffDepartment>;
@@ -210,6 +214,7 @@ class ClientModels implements ModelsInterface {
         this.credential = createService<Credential>(Services.credential, $cacheFactory);
         this.pointChange = createService<PointChange>(Services.pointChange, $cacheFactory);
         this.supplier = createService<Supplier>(Services.supplier, $cacheFactory);
+        this.tripPlanNumChange = createService<TripPlanNumChange>(Services.tripPlanNumChange, $cacheFactory);
         this.invitedLink = createService<InvitedLink>(Services.invitedLink, $cacheFactory);
         this.staffSupplierInfo = createService<StaffSupplierInfo>(Services.staffSupplierInfo, $cacheFactory);
         this.company = createService<Company>(Services.company, $cacheFactory);

@@ -1,0 +1,34 @@
+<style>html, body {
+    background: #F5F5F5;
+}
+ul li {
+    height: 30px;
+}</style>
+<div class="companylist" style="height: 200px;">
+    <ul>
+        <li>
+            企业名称: {{company.name}}
+        </li>
+        <li>
+            注册时间: {{company.createdAt | date:"yyyy-MM-dd HH:mm:ss"}}
+        </li>
+        <li>
+            到期时间: {{company.expiryDate | date:"yyyy-MM-dd HH:mm:ss"}}
+        </li>
+        <li>
+            增加服务期限:
+            <input type="text" ng-model="months">月
+        </li>
+        <li ng-show="!IsPayed">
+            是否转为付费用户：
+            <input type="checkbox"  ng-model="IsChange">是
+        </li>
+        <li>
+            <button ng-click="chargeMonths()">确定</button>
+            <button ng-click="reset()">取消</button>
+        </li>
+    </ul>
+
+
+</div>
+

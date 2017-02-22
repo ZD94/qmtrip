@@ -1,10 +1,15 @@
 
-import { TableExtends, Table, Create, Field, ResolveRef } from 'common/model/common';
+import {TableExtends, Table, Create, Field, ResolveRef, RemoteCall} from 'common/model/common';
 import { Account } from '../auth';
 import { Models, EAccountType, EGender } from 'api/_types';
 import { ModelObject } from 'common/model/object';
 import { getSession, Types, Values } from 'common/model';
 import { Agency } from './agency';
+import moment=require('moment');
+import {PaginateInterface} from "common/model/interface";
+import {Company} from "../company/company";
+let sequelize = require("common/model").DB;
+
 
 export enum EAgencyStatus {
     DELETE = -2, //删除状态
@@ -40,6 +45,64 @@ export class AgencyUser extends ModelObject{
         var agencyUser = await Models.agencyUser.get(session.accountId);
         session.currentAgencyUser = agencyUser;
         return agencyUser;
+    }
+
+    @RemoteCall()
+    async  findCompanies(options?: any):Promise<any>{
+        let self = this;
+        let {page, perPage} = options;
+        if (!page || !/^\d+$/.test(page)) {
+            page = 1;
+        }
+        if (!perPage || !/^\d+$/.test(perPage)) {
+            perPage = 20;
+        }
+        let sql = `SELECT C.id FROM company.companies AS C `;
+        //分页
+        let countSQL = `SELECT  count(1) as total FROM company.companies AS C`;
+        let where = ` WHERE C.agency_id = '${self.agency.id}' AND `;
+        if (options.userName || options.mobile ) {
+            let piece = ' LEFT JOIN staff.staffs AS S ON S.id = C.create_user '
+            sql += piece;
+            countSQL += piece;
+        }
+        //创建者
+        if ( options.userName) {
+            where += ` S.name like '%${options.userName}%' AND `;
+        }
+        //关键词
+        if (options.keyword) {
+            where += ` C.name like '%${options.keyword}%' AND `;
+        }
+        //联系人的手机号
+        if (options.mobile) {
+            let piece = ` LEFT JOIN auth.accounts AS A ON A.id = S.id `;
+            sql += piece;
+            countSQL += piece;
+            where += ` A.mobile like '%${options.mobile}%' AND `
+        }
+        //注册时间段
+        if (options.regDateStart&&options.regDateEnd) {
+            where+=  ` C.created_at > '${moment(options.regDateStart).format('YYYY-MM-DD HH:mm:ss') }' AND  C.created_at < '${moment(options.regDateEnd).format('YYYY-MM-DD HH:mm:ss') }' AND `;
+        }
+        //到期时间
+        if(options.days){
+            where+= ` C.expiry_date <  '${moment().add(options.days, 'days').format('YYYY-MM-DD HH:mm:ss')}' AND `;
+        }
+        where = where.replace(/AND\s*$/i, '');
+        sql = sql + where;
+        sql += `  ORDER BY C.created_at desc LIMIT ${perPage} OFFSET ${ (page-1) * perPage} `;
+        countSQL += where;
+        let company_ret = await sequelize.query(sql);
+        let num_ret=await sequelize.query(countSQL);
+        let result = {
+            total: <number>(num_ret[0][0]['total']),
+            items: company_ret[0],
+            page: page,
+            perPage: perPage
+        };
+        return result;
+
     }
 
     @Field({type: Types.UUID})

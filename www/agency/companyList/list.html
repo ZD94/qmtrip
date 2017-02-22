@@ -1,0 +1,58 @@
+<div class="companylist">
+    <div class="companylist">
+        <div class="companylist-title">
+            <div class="company_search">
+                <h3>公司列表</h3>
+               创建者姓名：<input type="text" placeholder="输入创建者姓名" ng-model="query.userName">
+               关键字：<input type="text" placeholder="输入关键词" ng-model="query.keyword">
+                手机号:<input type="text" placeholder="输入手机号" ng-model="query.mobile">
+                <br>
+                注册时间段: <input type="date"  ng-model="query.regDateStart">
+                --<input type="date" ng-model="query.regDateEnd">
+                剩余有效期天数:
+                <input type="text" ng-model="query.days" placeholder="输入有效期天数">
+                <button ng-click="doSearch()">搜索</button>
+            </div>
+            <div style="clear:both;"></div>
+        </div>
+        <table class="company">
+            <tr>
+                <td>序号</td>
+                <td>企业名称</td>
+                <td>创建人姓名</td>
+                <td>电话</td>
+                <td>注册时间</td>
+                <td>到期时间</td>
+                <td>剩余有效期天数</td>
+                <td>账户余额</td>
+                <td>员工数</td>
+                <td colspan="3" style="text-align: center">操作</td>
+            </tr>
+            <tr ng-repeat="company in companylist track by $index">
+                <td>{{$index+1}}</td>
+                <td>{{company.name}}</td>
+                <td>{{company.createUserObj.name}}</td>
+                <td>{{company.createUserObj.mobile}}</td>
+                <td>{{company.createdAt | date:"yyyy-MM-dd HH:mm:ss"}}</td>
+                <td>{{company.expiryDate | date:"yyyy-MM-dd HH:mm:ss"}}</td>
+                <td>{{company.remainDays}}</td>
+                <td>{{company.balance}}</td>
+                <td>{{company.staffNum}}</td>
+                <td>
+                    <a href="#/companyList/charge-coin?companyId={{company.id}}" target="_self" style=" color: #118FD6;">鲸币充值</a>
+                </td>
+                <td>
+                    <a href="#/companyList/add-expiry-date?companyId={{company.id}}" target="_self" style="color:#118FD6">增加服务期限</a>
+                </td>
+                <td>
+                    <a href="#/companyList/add-flow-package?companyId={{company.id}}" target="_self" style=" color: #118FD6;">增加流量包</a>
+                </td>
+            </tr>
+            <td colspan="12">
+                <a ng-click="prevPage()" ng-if="pager.hasPrevPage()">上一页</a>
+                <a ng-click="nextPage()" ng-if="pager.hasNextPage()">下一页</a>
+            </td>
+        </table>
+    </div>
+    <ul class="pagination" id="pagination"></ul>
+</div>
