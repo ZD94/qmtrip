@@ -24,12 +24,10 @@ export async function ListController($scope, Models, $stateParams) {
         query.perPage = perPage || 20;
         let pager = await agency.findCompanies(query);
         pager.hasNextPage = function() {
-            console.log('hasNextPage..', page,page * perPage)
             return pager.total >= page * perPage;
         }
 
         pager.hasPrevPage = function() {
-            console.log('hasPrevPage..', page)
             return page > 1;
         }
 

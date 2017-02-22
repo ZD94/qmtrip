@@ -66,35 +66,33 @@ export class AgencyUser extends ModelObject{
             sql += piece;
             countSQL += piece;
         }
-
         //创建者
         if ( options.userName) {
             where += ` S.name like '%${options.userName}%' AND `;
         }
-
+        //关键词
         if (options.keyword) {
             where += ` C.name like '%${options.keyword}%' AND `;
         }
-
+        //联系人的手机号
         if (options.mobile) {
             let piece = ` LEFT JOIN auth.accounts AS A ON A.id = S.id `;
             sql += piece;
             countSQL += piece;
             where += ` A.mobile like '%${options.mobile}%' AND `
         }
-
+        //注册时间段
         if (options.regDateStart&&options.regDateEnd) {
             where+=  ` C.created_at > '${moment(options.regDateStart).format('YYYY-MM-DD HH:mm:ss') }' AND  C.created_at < '${moment(options.regDateEnd).format('YYYY-MM-DD HH:mm:ss') }' AND `;
         }
+        //到期时间
         if(options.days){
             where+= ` C.expiry_date <  '${moment().add(options.days, 'days').format('YYYY-MM-DD HH:mm:ss')}' AND `;
         }
         where = where.replace(/AND\s*$/i, '');
         sql = sql + where;
         sql += `  ORDER BY C.created_at desc LIMIT ${perPage} OFFSET ${ (page-1) * perPage} `;
-        console.log(sql)
         countSQL += where;
-        console.log(countSQL)
         let company_ret = await sequelize.query(sql);
         let num_ret=await sequelize.query(countSQL);
         let result = {
@@ -103,7 +101,6 @@ export class AgencyUser extends ModelObject{
             page: page,
             perPage: perPage
         };
-        console.info(company_ret);
         return result;
 
     }
