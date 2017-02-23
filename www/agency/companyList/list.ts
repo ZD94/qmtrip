@@ -2,9 +2,9 @@
  * Created by chen on 2017/2/13.
  */
 import moment = require("moment");
-import {AgencyUser} from "../../../api/_types/agency/agency-user";
+import {AgencyUser} from "api/_types/agency/agency-user";
 
-export async function ListController($scope, Models, $stateParams) {
+export async function ListController($scope, Models) {
     $scope.query = {
         userName: '',
         mobile: '',
@@ -42,7 +42,8 @@ export async function ListController($scope, Models, $stateParams) {
             if (!company.expiryDate) {
                 company['remainDays'] = Infinity;
             } else {
-                let days = moment(company.expiryDate).diff(new Date(), 'days');
+                let d = moment();
+                let days = moment(company.expiryDate).diff(d, 'days');
                 company['remainDays'] = days;
             }
             if (!company.coinAccount) {
@@ -72,4 +73,5 @@ export async function ListController($scope, Models, $stateParams) {
         $scope.page -= 1;
         return $scope.getCompany($scope.page, $scope.perPage);
     }
+
 }

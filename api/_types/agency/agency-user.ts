@@ -1,5 +1,5 @@
 
-import {TableExtends, Table, Create, Field, ResolveRef, RemoteCall} from 'common/model/common';
+import {TableExtends, Table, Create, Field, ResolveRef, RemoteCall, LocalCall} from 'common/model/common';
 import { Account } from '../auth';
 import { Models, EAccountType, EGender } from 'api/_types';
 import { ModelObject } from 'common/model/object';
@@ -7,7 +7,10 @@ import { getSession, Types, Values } from 'common/model';
 import { Agency } from './agency';
 import moment=require('moment');
 import {PaginateInterface} from "common/model/interface";
-import {Company} from "../company/company";
+import {Company, ECompanyType} from "../company/company";
+import L from 'common/language';
+import {CoinAccount} from "../coin";
+const API = require("common/api");
 let sequelize = require("common/model").DB;
 
 
@@ -133,6 +136,126 @@ export class AgencyUser extends ModelObject{
     get agency(): Agency { return null; }
     set agency(val: Agency) {}
 
+    //充值鲸币
+    @RemoteCall()
+    async addCompanyCoin(companyId: string, coin: number, remark?: string): Promise<any> {
+        let self=this;
+        let company = await Models.company.get(companyId);
+        let agency = await company.getAgency();
+
+        if (agency.createUser != self.id ) {
+            throw L.ERR.PERMISSION_DENY();
+        }
+        //先记录操作日志
+        let log = await Models.agencyOperateLog.create({
+            agency_userId:this.id,
+            agencyId: agency.id,
+            remark:`因【${remark}】为【${company.name}(${company.id})】充值了【${coin}】鲸币`});
+        await log.save();
+        //如果没有鲸币账户，创建
+        if (!company.coinAccount) {
+            let coinAccount = CoinAccount.create({});
+            coinAccount = await coinAccount.save();
+            company.coinAccount = coinAccount;
+            company = await company.save();
+        }
+        //给企业加鲸币
+        let ret = await company.coinAccount.addCoin(coin, remark);
+        return ret;
+    }
+
+    //修改到期时间
+    @RemoteCall()
+    async addExpiryDate(companyId: string, qs:any): Promise<any>{
+        let self=this;
+        let company = await Models.company.get(companyId);
+        let agency = await company.getAgency();
+        if (agency.createUser != self.id ) {
+            throw L.ERR.PERMISSION_DENY();
+        }
+        //先记录操作日志
+        let log = await Models.agencyOperateLog.create({
+            agency_userId: this.id,
+            agencyId: agency.id,
+            remark: `因【${qs.remark}】为【${company.name}(${company.id})】增加了【${qs.months}】月有效期`
+        });
+        await log.save();
+        //修改企业到期时间
+        let ret =  new Date(moment(company.expiryDate).add(qs.months,'months').valueOf());
+        company.expiryDate = ret;
+        if(qs.IsChange){
+            company.type = ECompanyType.PAYED;
+        }
+        company = await company.save();
+        let staffs = await this.getCompanyAllStaffs({companyId: company.id});
+        let ps = staffs.map( (s) => {
+            //给各个员工发送通知
+            return API.notify.submitNotify({
+                accountId: s.id,
+                key: "qm_notify_lengthen_expiry_date",
+                values: {
+                    expiryDate: moment(company.expiryDate).format('YYYY-MM-DD')
+                }
+            });
+        });
+        await Promise.all(ps);
+        return ret;
+    }
+    //增加行程流量包
+    @RemoteCall()
+    async  addFlowPackage(companyId:string, qs:any):Promise<any>{
+        let self=this;
+        let company = await Models.company.get(companyId);
+        let agency = await company.getAgency();
+        if (agency.createUser != self.id ) {
+            throw L.ERR.PERMISSION_DENY();
+        }
+        //先记录操作日志
+        let log = await Models.agencyOperateLog.create({
+            agency_userId: this.id,
+            agencyId: agency.id,
+            remark:`因【${qs.remark}】为【${company.name}(${company.id})】的流量包到期时间增加了【3】个月`});
+        await log.save();
+
+        //修改行程流量包
+        if(qs.AddTwenty){
+            company.extraTripPlanNum = company.extraTripPlanNum + 20;
+        }
+        if(qs.AddFifty){
+            company.extraTripPlanNum = company.extraTripPlanNum + 50;
+        }
+        let ret =  new Date(moment(company.expiryDate).add(3,'months').valueOf());
+        company.expiryDate = ret;
+        company.save();
+        return company;
+    }
+
+    async getCompanyAllStaffs(params: any): Promise<any> {
+        let self = this;
+        let company = await Models.company.get(params.companyId);
+        let staffs = [];
+        if(!company){
+            throw L.ERR.COMPANY_NOT_EXIST();
+        }
+        let agency = await company.getAgency();
+        if(agency.id != self.agency.id){
+            throw L.ERR.PERMISSION_DENY("该企业员工");
+        }
+
+        let pager = await Models.staff.find({where: params});
+        pager.forEach((s) => {
+            staffs.push(s);
+        });
+
+        while(pager && pager.hasNextPage()) {
+            pager = await pager.nextPage();
+            pager.forEach((s) => {
+                staffs.push(s);
+            })
+        }
+
+        return staffs;
+    }
     //Account properties:
     email: string;
     mobile: string;

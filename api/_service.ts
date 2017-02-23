@@ -21,6 +21,7 @@ import {DDTalkCorp, DDTalkUser} from "api/_types/ddtalk";
 import {CoinAccount, CoinAccountChange} from "./_types/coin";
 import {TripDetailSubsidy, TripDetailSpecial} from "./_types/tripPlan/tripDetailInfo";
 import {Approve} from "./_types/approve/index";
+import {AgencyOperateLog} from "./_types/agency/agency-operate-log";
 
 initModels({
     staff: createServerService<Staff>(Staff),
@@ -65,4 +66,5 @@ initModels({
     
     coinAccount: createServerService<CoinAccount>(CoinAccount),
     coinAccountChange: createServerService<CoinAccountChange>(CoinAccountChange),
+    agencyOperateLog:createServerService<AgencyOperateLog>(AgencyOperateLog),
 });

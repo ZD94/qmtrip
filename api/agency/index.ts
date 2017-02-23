@@ -12,7 +12,8 @@ import {Agency, AgencyUser, EAgencyStatus, EAgencyUserRole} from "api/_types/age
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "../_decorator";
 import { Models, EGender } from '../_types/index';
 import {md5} from "common/utils";
-import {FindResult} from "common/model/interface";
+import {FindResult, PaginateInterface} from "common/model/interface";
+import {AgencyOperateLog} from "../_types/agency/agency-operate-log";
 let logger = new Logger("agency");
 
 class AgencyModule {
@@ -300,6 +301,33 @@ class AgencyModule {
             logger.error("初始化系统默认代理商失败...");
             logger.error(err.stack);
         }
+    }
+
+    @clientExport
+    static async getAgencyOperateLogs(options: any) :Promise<FindResult> {
+        let {limit, offset} = options;
+        let agencyUser = await AgencyUser.getCurrent();
+        let agency = agencyUser.agency;
+        let pager = await Models.agencyOperateLog.find( {
+            where: {agencyId: agency.id},
+            order: "created_at desc",
+            limit: limit,
+            offset: offset});
+        let ids = pager.map( (v) => {
+            return v.id;
+        });
+        return {ids: ids, count:pager.total}
+    }
+
+    @clientExport
+    static async getAgencyOperateLog(params: {id: string}): Promise<AgencyOperateLog> {
+        let agencyUser = await AgencyUser.getCurrent();
+        let {id} = params;
+        let log = await Models.agencyOperateLog.get(id);
+        if (log.agencyId != agencyUser.agency.id) {
+            return null;
+        }
+        return log;
     }
 }
 

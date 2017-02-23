@@ -73,7 +73,7 @@ export class CoinAccount extends ModelObject {
         return Models.coinAccountChange.find(options);
     }
 
-    @RemoteCall()
+    // @RemoteCall()
     async addCoin(coins: number, remark?: string, duiBaOrderNum?: string, type?: COIN_CHANGE_TYPE) :Promise<any> {
         let self = this;
         /*if(!this.isLocal){
