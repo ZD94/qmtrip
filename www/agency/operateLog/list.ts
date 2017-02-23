@@ -1,9 +1,10 @@
-import {Pager} from "common/model/pager";
-import {AgencyUser} from "api/_types/agency/agency-user";
-import {AgencyOperateLog} from "../../../api/_types/agency/agency-operate-log";
 /**
  * Created by chen on 2017/2/23.
  */
+'use strict';
+
+import {AgencyUser} from "api/_types/agency/agency-user";
+
 export async function ListController($scope,Models){
     $scope.init = async function(){
         let agencyUser = await AgencyUser.getCurrent();
