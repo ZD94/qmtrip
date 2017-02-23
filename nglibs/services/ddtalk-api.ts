@@ -7,8 +7,7 @@ var dyload = require('dyload');
 var ddtalkLoad;
 
 function isDingTalk () {
-    var ua = navigator.userAgent;
-    return /dingtalk/i.test(ua);
+    return !!window['ddtalk'];
 }
 
 if(isDingTalk()) {
@@ -36,6 +35,9 @@ class DDTalkApi {
             return this.$promise;
         }
         async function doResolve() {
+            if (!isDingTalk()) {
+                throw new Error("不在钉钉客户端");
+            }
             API.require('ddtalk');
             await API.onload();
             var url = window.location.href.split('#')[0];

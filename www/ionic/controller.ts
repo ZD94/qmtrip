@@ -112,7 +112,7 @@ export async function IndexController($scope, Menu, $ionicPopup, $storage, $loca
         });
     };
 
-    $scope.isShowLogout = !/dingtalk/i.test(window.navigator.userAgent);
+    $scope.isShowLogout = !window['ddtalk'];
     $scope.logout = async function () {
         await API.onload();
         var browserspec = require('browserspec');

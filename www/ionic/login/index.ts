@@ -9,8 +9,7 @@ var browserspec = require('browserspec');
 declare var dd;
 
 function isDingTalk() {
-    var ua = navigator.userAgent;
-    return /dingtalk/i.test(ua);
+    return !!window['ddtalk'];
 }
 
 export interface IndexScope extends IScope{
