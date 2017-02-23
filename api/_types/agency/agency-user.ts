@@ -1,5 +1,5 @@
 
-import {TableExtends, Table, Create, Field, ResolveRef, RemoteCall} from 'common/model/common';
+import {TableExtends, Table, Create, Field, ResolveRef, RemoteCall, LocalCall} from 'common/model/common';
 import { Account } from '../auth';
 import { Models, EAccountType, EGender } from 'api/_types';
 import { ModelObject } from 'common/model/object';
@@ -8,6 +8,7 @@ import { Agency } from './agency';
 import moment=require('moment');
 import {PaginateInterface} from "common/model/interface";
 import {Company} from "../company/company";
+import L from 'common/language';
 let sequelize = require("common/model").DB;
 
 
@@ -132,6 +133,33 @@ export class AgencyUser extends ModelObject{
     @ResolveRef({type: Types.UUID}, Models.agency)
     get agency(): Agency { return null; }
     set agency(val: Agency) {}
+
+    async getCompanyAllStaffs(params: any): Promise<any> {
+        let self = this;
+        let company = await Models.company.get(params.companyId);
+        let staffs = [];
+        if(!company){
+            throw L.ERR.COMPANY_NOT_EXIST();
+        }
+        let agency = await company.getAgency();
+        if(agency.id != self.agency.id){
+            throw L.ERR.PERMISSION_DENY("该企业员工");
+        }
+
+        let pager = await Models.staff.find({where: params});
+        pager.forEach((s) => {
+            staffs.push(s);
+        });
+
+        while(pager && pager.hasNextPage()) {
+            pager = await pager.nextPage();
+            pager.forEach((s) => {
+                staffs.push(s);
+            })
+        }
+
+        return staffs;
+    }
 
     //Account properties:
     email: string;
