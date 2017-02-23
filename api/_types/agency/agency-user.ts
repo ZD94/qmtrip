@@ -9,6 +9,7 @@ import moment=require('moment');
 import {PaginateInterface} from "common/model/interface";
 import {Company, ECompanyType} from "../company/company";
 import L from 'common/language';
+const API = require("common/api");
 let sequelize = require("common/model").DB;
 
 
@@ -170,7 +171,19 @@ export class AgencyUser extends ModelObject{
         if(qs.IsChange){
             company.type = ECompanyType.PAYED;
         }
-        await company.save();
+        company = await company.save();
+        let staffs = await this.getCompanyAllStaffs({companyId: company.id});
+        let ps = staffs.map( (s) => {
+            //给各个员工发送通知
+            return API.notify.submitNotify({
+                accountId: s.id,
+                key: "qm_notify_lengthen_expiry_date",
+                values: {
+                    expiryDate: moment(company.expiryDate).format('YYYY-MM-DD')
+                }
+            });
+        });
+        await Promise.all(ps);
         return ret;
     }
     //增加行程流量包
