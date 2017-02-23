@@ -43,6 +43,13 @@ var staffMenus = [
         title: '出差请示',
         link: 'trip-approval/list',
         badgeNum: 0
+    },
+    {
+        id: 1056,
+        icon: 'headphone',
+        title: '客户服务',
+        link: '',
+        badgeNum: 0
     }
 ];
 
@@ -110,7 +117,6 @@ export async function IndexController($scope, Menu, $ionicPopup, $storage, $loca
             template: msg
         });
     };
-
     $scope.isShowLogout = !/dingtalk/i.test(window.navigator.userAgent);
     $scope.logout = async function () {
         await API.onload();
@@ -125,9 +131,20 @@ export async function IndexController($scope, Menu, $ionicPopup, $storage, $loca
         window.location.reload();
     }
 
+    //判断是否从钉钉进入
+    function judge() {
+        if( /dingtalk/i.test(window.navigator.userAgent)) {
+            $scope.Menu.menus[5].link = 'customer/dingding-server';
+        } else {
+
+            $scope.Menu.menus[5].link = 'customer/others-server';
+        }
+    }
+
     $scope.Menu = Menu;
+
     $scope.tripPlanSave = 0;
-    
+
     var staff = await Staff.getCurrent();
     // var noticePager = await staff.getSelfNotices();
     var noticePager = [];
@@ -151,6 +168,8 @@ export async function IndexController($scope, Menu, $ionicPopup, $storage, $loca
         })
     }
     setupMenu(staffMenus);
+    console.log($scope.Menu);
+    judge();
     $scope.$watch(function() { return $ionicSideMenuDelegate.isOpen(); }, async function(isOpen) {
         if (isOpen) {//Menu Open
             noticePager = await staff.getSelfNotices();
