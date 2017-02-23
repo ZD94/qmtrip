@@ -1,12 +1,17 @@
 /**
  * Created by wlh on 16/9/20.
  */
-'use strict';
 (function(g) {
   //如果不是在钉钉中,直接跳过
   if (!/dingtalk/i.test(g.navigator.userAgent)) {
     return false;
   }
+
+  if ('undefined' == typeof WebViewJavascriptBridge) {
+    alert('目前仅支持钉钉IOS,ANDROID客户端自动登录');
+    return false;
+  }
+
   var cache = {
     set: function (key, val) {
       localStorage.setItem(key, val);
