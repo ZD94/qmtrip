@@ -150,7 +150,7 @@ export class AgencyUser extends ModelObject{
         let log = await Models.agencyOperateLog.create({
             agency_userId:this.id,
             agencyId: agency.id,
-            remark:`因${remark}为${company.name}(${company.id})充值了${coin}鲸币`});
+            remark:`因【${remark}】为【${company.name}(${company.id})】充值了【${coin}】鲸币`});
         await log.save();
         //如果没有鲸币账户，创建
         if (!company.coinAccount) {
