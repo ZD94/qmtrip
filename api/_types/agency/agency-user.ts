@@ -145,7 +145,7 @@ export class AgencyUser extends ModelObject{
             throw L.ERR.PERMISSION_DENY();
         }
         //先记录操作日志
-        let log = await Models.agencyOperateLog.create({agency_userId:this.id,agencyId: agency.id, remark:'因'+remark+'充值了'+coin+'鲸币'});
+        let log = await Models.agencyOperateLog.create({agency_userId:this.id,agencyId: agency.id, remark:'因'+remark+'的原因为'+company.name+'('+company.id+')'+'充值了'+coin+'鲸币'});
         await log.save();
         //给企业加鲸币
         let ret = await company.coinAccount.addCoin(coin, remark);
@@ -162,7 +162,7 @@ export class AgencyUser extends ModelObject{
             throw L.ERR.PERMISSION_DENY();
         }
         //先记录操作日志
-        let log = await Models.agencyOperateLog.create({agency_userId:this.id,agencyId: agency.id, remark:'因'+qs.remark+'到期时间增加了'+qs.months+'月'});
+        let log = await Models.agencyOperateLog.create({agency_userId:this.id,agencyId: agency.id, remark:'因'+qs.remark+'的原因为'+company.name+'('+company.id+')'+'的到期时间增加了'+qs.months+'月'});
         await log.save();
         //修改企业到期时间
         let ret =  new Date(moment(company.expiryDate).add(qs.months,'months').valueOf());
@@ -184,7 +184,7 @@ export class AgencyUser extends ModelObject{
             throw L.ERR.PERMISSION_DENY();
         }
         //先记录操作日志
-        let log = await Models.agencyOperateLog.create({agency_userId:this.id,agencyId: agency.id, remark:'因'+qs.remark+'流量包增加了'+'到期时间增加了3个月'});
+        let log = await Models.agencyOperateLog.create({agency_userId:this.id,agencyId: agency.id, remark:'因'+qs.remark+'的原因为'+company.name+'('+company.id+')'+'的流量包增加了'+'到期时间增加了3个月'});
         await log.save();
         //修改行程流量包
         if(qs.AddTwenty){
