@@ -12,7 +12,8 @@ import {Agency, AgencyUser, EAgencyStatus, EAgencyUserRole} from "api/_types/age
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "../_decorator";
 import { Models, EGender } from '../_types/index';
 import {md5} from "common/utils";
-import {FindResult} from "common/model/interface";
+import {FindResult, PaginateInterface} from "common/model/interface";
+import {AgencyOperateLog} from "../_types/agency/agency-operate-log";
 let logger = new Logger("agency");
 
 class AgencyModule {
@@ -300,6 +301,13 @@ class AgencyModule {
             logger.error("初始化系统默认代理商失败...");
             logger.error(err.stack);
         }
+    }
+
+    @clientExport
+    static async getAgencyOperateLogs(options: any) :Promise<PaginateInterface<AgencyOperateLog>>{
+        let agencyUser = await AgencyUser.getCurrent();
+        let agency = agencyUser.agency;
+        return Models.agencyOperateLog.find( { where: {agencyId: agency.id}});
     }
 }
 

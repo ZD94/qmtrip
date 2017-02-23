@@ -24,6 +24,7 @@ import {DDTalkCorp, DDTalkUser} from "api/_types/ddtalk";
 import {CoinAccount, CoinAccountChange} from "api/_types/coin";
 import {TripDetailInvoice, TripDetailHotel, TripDetailTraffic, TripDetailSubsidy, TripDetailSpecial} from "api/_types/tripPlan";
 import {Approve} from "api/_types/approve";
+import {AgencyOperateLog} from "api/_types/agency/agency-operate-log";
 
 const API = require('common/api');
 
@@ -128,7 +129,7 @@ var Services = {
     },
     token: { type: Token, modname: 'token', funcs: []},
     //鲸币账户
-    coinAccount: { type: CoinAccount, modname: 'coin', funcs: ['getCoinAccount', null, 'createCoinAccount']},
+    coinAccount: { type: CoinAccount, modname: 'coin', funcs: ['getCoinAccount']},
     coinAccountChange: { type: CoinAccountChange, modname: 'coin', funcs: ['getCoinAccountChange','getCoinAccountChanges']},
 
     financeCheckCode: { type: FinanceCheckCode, modname: 'tripPlan', funcs: ['getTripDetail']},
@@ -137,6 +138,7 @@ var Services = {
     tripDetailHotel: { type: TripDetailHotel, modname: 'tripPlan', funcs: ['getTripDetailHotel']},
     tripDetailSubsidy: { type: TripDetailSubsidy, modname: 'tripPlan', funcs: ['getTripDetailSubsidy']},
     tripDetailSpecial: { type: TripDetailSpecial, modname: 'tripPlan', funcs: ['getTripDetailSpecial']},
+    agencyOperateLog: { type: AgencyOperateLog, modname: 'agency', funcs: [null, 'getAgencyOperateLogs']}
 };
 
 function throwNotImplemented(){
@@ -208,6 +210,7 @@ class ClientModels implements ModelsInterface {
 
     coinAccount: ModelInterface<CoinAccount>;
     coinAccountChange: ModelInterface<CoinAccountChange>;
+    agencyOperateLog: ModelInterface<AgencyOperateLog>;
 
     constructor($cacheFactory: ng.ICacheFactoryService, $rootScope: ng.IRootScopeService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
@@ -245,6 +248,7 @@ class ClientModels implements ModelsInterface {
         this.tripDetailSubsidy = createService<TripDetailSubsidy>(Services.tripDetailSubsidy, $cacheFactory);
         this.tripDetailSpecial = createService<TripDetailSpecial>(Services.tripDetailSpecial, $cacheFactory);
         this.approve = createService<Approve>(Services.approve, $cacheFactory);
+        this.agencyOperateLog = createService<AgencyOperateLog>(Services.agencyOperateLog, $cacheFactory);
         initModels(this);
 
         $rootScope.$on('$locationChangeSuccess', ()=>{

@@ -2,9 +2,9 @@
  * Created by chen on 2017/2/13.
  */
 import moment = require("moment");
-import {AgencyUser} from "../../../api/_types/agency/agency-user";
+import {AgencyUser} from "api/_types/agency/agency-user";
 
-export async function ListController($scope, Models, $stateParams) {
+export async function ListController($scope, Models) {
     $scope.query = {
         userName: '',
         mobile: '',
@@ -72,4 +72,5 @@ export async function ListController($scope, Models, $stateParams) {
         $scope.page -= 1;
         return $scope.getCompany($scope.page, $scope.perPage);
     }
+
 }

@@ -14,14 +14,19 @@ ul li {
         </li>
         <li>
             增加的行程流量包:
-            <input type="checkbox" ng-model="AddTwenty" >20条
-            <input type="checkbox" ng-model="AddFifty">50条
+            <input type="checkbox" ng-model="qs.AddTwenty" >20条
+            <input type="checkbox" ng-model="qs.AddFifty">50条
+        </li>
+        <li>
+            增加理由：
+            <input type="text" ng-model="qs.remark">
         </li>
         <li>
             到期时间：{{company.expiryDate | date:"yyyy-MM-dd HH:mm:ss"}}
         </li>
+
         <li>
-            <button ng-click="addFlowPackage()">确定</button>
+            <button ng-click="chargeFlowPackage()">确定</button>
             <button ng-click="reset()">取消</button>
         </li>
     </ul>
