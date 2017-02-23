@@ -38,6 +38,7 @@ export interface IFinalTicket {
     score?: number;
     reasons?: string[];
     stops?: string[];
+    segs?: any[];
 }
 
 //仓位信息
@@ -69,7 +70,9 @@ export interface ITicket {
     destinationStation?: string;    //目的地机场或者车站
     type: TRAFFIC,
     stops?: string[],   //中转城市
+    segs?: ISeg[],
 }
+
 
 //酒店代理商
 export interface IHotelAgent extends IAgent{
@@ -101,6 +104,38 @@ export interface IFinalHotel {
     checkOutDate: string;
     outPriceRange: boolean;
 }
+
+export interface ICraft {
+    kind: string;
+    series: string;
+    name: string;
+}
+
+export interface IAirport {
+    name: string;
+    city: string;
+    code: string;
+    bname: string;
+}
+
+export interface ISeg {}
+
+export interface IFlightSeg extends ISeg {
+    deptAirport: IAirport,
+    arriAirport: IAirport,
+    deptDateTime: Date,
+    arriDateTime: Date,
+    craft: ICraft;
+    base: {
+        flgno: string,
+        aircode: string,
+        logourl: string,
+        airsname: string,
+        ishared: boolean,
+    }
+}
+
+export interface ITrainSeg extends ISeg {}
 
 //记录预算分析数据及结果
 @Table(Models.travelBudgetLog, "travelbudget.travel_budget_log")

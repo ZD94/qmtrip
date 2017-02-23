@@ -64,17 +64,17 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
         return {text:rolename,role:EStaffRoleNames.indexOf(rolename)}
     });
     //begin 以下对于role分级暂时没用
-    // roles = roles.filter(function(v){
-    //     if(current.roleId == EStaffRole.OWNER){
-    //         if(v.role != EStaffRole.OWNER){
-    //             return v;
-    //         }
-    //     }else{
-    //         if(v.role != EStaffRole.OWNER && v.role != EStaffRole.ADMIN){
-    //             return v;
-    //         }
-    //     }
-    // })
+    roles = roles.filter(function(v){
+        if(current.roleId == EStaffRole.OWNER){
+            if(v.role != EStaffRole.OWNER){
+                return v;
+            }
+        }else{
+            if(v.role != EStaffRole.OWNER && v.role != EStaffRole.ADMIN){
+                return v;
+            }
+        }
+    })
     //end
     $scope.chooseRole =function(){
         if(current.roleId != EStaffRole.OWNER){
@@ -85,6 +85,27 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             buttons:roles,
             titleText: '请选择角色',
             cancelText: '取消',
+            destructiveText: '转让创建人',
+            destructiveButtonClicked: function(){
+                $ionicPopup.show({
+                    title: '转让创建人',
+                    template: `创建人身份转让后，您将变为普通管理员，所有创建人的权限将转移给${staff.name}，确认转让么？`,
+                    scope: $scope,
+                    buttons: [
+                        {
+                            text: '取消',
+                            type: 'button-outline button-positive'
+                        },
+                        {
+                            text: '确认',
+                            type: 'button-positive',
+                            onTap: function(){
+                                window.location.href = `#/department/change-owner?staffId=${staff.id}`;
+                            }
+                        }
+                    ]
+                })
+            },
             cancel: function() {
                 // add cancel code..
                 return true;

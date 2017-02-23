@@ -17,7 +17,7 @@ import {ITicket, TravelBudgeItem, TRAFFIC} from "api/_types/travelbudget";
 import {
     TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
 } from "./strategy/index";
-import {loadDefaultPrefer} from "./prefer";
+import {DEFAULT_PREFER_CONFIG_TYPE, loadDefaultPrefer} from "./prefer";
 
 
 export interface BudgetOptions{
@@ -117,12 +117,6 @@ export default class ApiTravelBudget {
             if (!Boolean(checkOutDate)) {
                 checkOutDate = goBackDate;
             }
-            // if (!validate.isDate(checkInDate)) {
-            //     checkInDate = moment(checkInDate).format(momentDateFormat);
-            // }
-            // if (!validate.isDate(checkOutDate)) {
-            //     checkOutDate = moment(checkOutDate).format(momentDateFormat);
-            // }
         }
         //返程需要参数
         if (isRoundTrip){
@@ -322,7 +316,7 @@ export default class ApiTravelBudget {
             isAbroad: city.isAbroad
         }
         let budgetConfig = staff.company.budgetConfig;
-        let defaults = loadDefaultPrefer({local: query}, 'hotel');
+        let defaults = loadDefaultPrefer({local: query}, DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_HOTEL);
         if (budgetConfig && budgetConfig.hotel) {
             let compiled = _.template(JSON.stringify(budgetConfig.hotel));
             defaults = mergePrefers(defaults, JSON.parse(compiled({local: query})));
@@ -369,12 +363,7 @@ export default class ApiTravelBudget {
             throw {code: -1, msg: "出发时间不存在"};
         }
 
-        if (!latestArrivalDateTime) {
-            params.latestArrivalDateTime = undefined;
-        }
-        if (!earliestLeaveDateTime) {
-            params.earliestLeaveDateTime = undefined;
-        }
+
         //查询员工信息
         let staff = await Staff.getCurrent();
         if (!staff || !staff['travelPolicyId']) {
@@ -391,6 +380,26 @@ export default class ApiTravelBudget {
         let isAbroad = false;
         let m_originCity = await API.place.getCityInfo({cityCode: originPlace.id || originPlace});
         let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
+
+        //转换成当地时间
+        if (!latestArrivalDateTime) {
+            params.latestArrivalDateTime = undefined;
+        } else {
+            let endFix = ' GMT+0';
+            if (m_destination.offsetUtc) {
+                endFix = ' GMT+0' + (m_destination.offsetUtc / 60 / 60 * 100)
+            }
+            params.latestArrivalDateTime = new Date(moment(latestArrivalDateTime).format(`YYYY-MM-DD HH:mm:ss`) + endFix);
+        }
+        if (!earliestLeaveDateTime) {
+            params.earliestLeaveDateTime = undefined;
+        } else {
+            let endFix = 'GMT+0';
+            if (m_originCity.offsetUtc) {
+                endFix = 'GMT+0' + (m_originCity.offsetUtc / 60 / 60 * 100)
+            }
+            params.earliestLeaveDateTime = new Date(moment(earliestLeaveDateTime).format(`YYYY-MM-DD HH:mm:ss`) + endFix);
+        }
 
         if (m_destination.isAbroad || m_originCity.isAbroad) {
             isAbroad = true;
@@ -448,21 +457,25 @@ export default class ApiTravelBudget {
 
         params['expectTrainCabins'] = trainCabins;
         params['expectFlightCabins'] = cabins;
-
+        console.log("PARAMS========>", params)
         let defaults: any[] = [];
         if (isAbroad) {   //国际
-            defaults = loadDefaultPrefer({local: params}, 'abroadTicket');
+            defaults = loadDefaultPrefer({local: params}, DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_TICKET);
+            let corpAbroadTrafficPrefer = {}
             if (preferConfig && preferConfig.abroadTraffic) {
-                let compiled = _.template(JSON.stringify(preferConfig.abroadTraffic), { 'imports': { 'moment': moment } });
-                defaults = mergePrefers(defaults, JSON.parse(compiled({local: params})));
+                corpAbroadTrafficPrefer = preferConfig.abroadTraffic
             }
+            let compiled = _.template(JSON.stringify(corpAbroadTrafficPrefer), { 'imports': { 'moment': moment } });
+            defaults = mergePrefers(defaults, JSON.parse(compiled({local: params})));
             qs.prefers = defaults;
         } else {            //国内
-            defaults = loadDefaultPrefer({local: params}, 'ticket');
+            defaults = loadDefaultPrefer({local: params}, DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_TICKET);
+            let corpHomeTrafficPrefer = {};
             if (preferConfig && preferConfig.traffic) {
-                let compiled = _.template(JSON.stringify(preferConfig.traffic), { 'imports': { 'moment': moment } });
-                defaults = mergePrefers(defaults, JSON.parse(compiled({local: params})));
+                corpHomeTrafficPrefer = preferConfig.traffic;
             }
+            let compiled = _.template(JSON.stringify(preferConfig.traffic), { 'imports': { 'moment': moment } });
+            defaults = mergePrefers(defaults, JSON.parse(compiled({local: params})));
             qs.prefers = defaults;
         }
 

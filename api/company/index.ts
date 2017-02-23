@@ -525,11 +525,24 @@ class CompanyModule {
 
     static _scheduleTask () {
         let taskId = "resetTripPlanPassNum";
-        scheduler('0 5 0 1 * *', taskId, function() {
+        scheduler('0 5 0 1 * ?', taskId, function() {
+            //每月1号付费企业消耗行程数，冻结数归零
             (async ()=> {
-                let companies = await Models.company.find({where : {tripPlanPassNum : {$gt: 0}}});
+                let companies = [];
+                let pager = await Models.company.find({where : {tripPlanPassNum : {$gt: 0}, expiryDate : {$gt: moment().format('YYYY-MM-DD HH:mm:ss')}, type: ECompanyType.PAYED}});
+                pager.forEach((company) => {
+                    companies.push(company);
+                });
+
+                while(pager && pager.hasNextPage()) {
+                    pager = await pager.nextPage();
+                    pager.forEach((company) => {
+                        companies.push(company);
+                    })
+                }
                 await Promise.all(companies.map(async (co) => {
                     co["tripPlanPassNum"] = 0;
+                    co["tripPlanFrozenNum"] = 0;
                     await co.save();
                 }))
             })()
@@ -604,7 +617,33 @@ class CompanyModule {
                 .catch((err) => {
                     logger.error(`run stark ${taskId2} error:`, err.stack);
                 });
-        })
+        });
+
+        let taskId3 = "companyExpire";
+        scheduler('0 0 * * * *', taskId3, function() {
+            //每小时检查一次企业是否过期 将过期企业套餐行程数置为0
+            (async ()=> {
+                let companies = [];
+                let pager = await Models.company.find({where : {expiryDate : {$lt: moment().format('YYYY-MM-DD HH:mm:ss')}, tripPlanNumLimit: {$gt: 0}}});
+                pager.forEach((company) => {
+                    companies.push(company);
+                });
+
+                while(pager && pager.hasNextPage()) {
+                    pager = await pager.nextPage();
+                    pager.forEach((company) => {
+                        companies.push(company);
+                    })
+                }
+                await Promise.all(companies.map(async (co) => {
+                    co.tripPlanNumLimit = 0;
+                    await co.save();
+                }))
+            })()
+                .catch( (err) => {
+                    logger.error(`执行任务${taskId3}错误:${err.stack}`);
+                })
+        });
     }
 
 }

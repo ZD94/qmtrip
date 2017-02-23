@@ -62,10 +62,31 @@ class ApproveModule {
             approveUser: approveUser,
         });
 
+        let oldNum = company.tripPlanNumLimit + company.extraTripPlanNum - company.tripPlanPassNum - company.tripPlanFrozenNum;
         let content = budgetInfo.budgets[0].originPlace.name? budgetInfo.budgets[0].originPlace.name : budgetInfo.budgets[0].originPlace
         + "-" + budgetInfo.budgets[0].destination.name? budgetInfo.budgets[0].destination.name: budgetInfo.budgets[0].destination;
-        await company.frozenTripPlanNum({accountId: submitter.id, tripPlanId: approve.id, number: number,
+        let com = await company.frozenTripPlanNum({accountId: submitter.id, tripPlanId: approve.id, number: number,
             remark: "提交出差申请消耗行程点数", content: content});
+
+        //行程数第一次小于10或等于0时给管理员和创建人发通知
+        let newNum = com.tripPlanNumLimit + com.extraTripPlanNum - com.tripPlanPassNum - com.tripPlanFrozenNum;
+        if(com.extraExpiryDate.getTime() - new Date().getTime() < 0){
+            newNum = com.tripPlanNumLimit - com.tripPlanPassNum - com.tripPlanFrozenNum;
+        }
+        if(oldNum > 10 && newNum <= 10 || newNum == 0){
+            let managers = await company.getManagers({withOwner: true});
+            let ps = managers.map( (manager) => {
+                return API.notify.submitNotify({
+                    accountId: manager.id,
+                    key: "qm_notify_trip_plan_num_short",
+                    values: {
+                        number: newNum
+                    }
+                });
+            });
+            await Promise.all(ps);
+        }
+        
         return approve;
     }
 

@@ -1,0 +1,1 @@
+您的企业<%=account.company.name%>剩余行程点数为<%=number%>条，请您及时处理

@@ -286,6 +286,7 @@ class StaffModule{
             throw L.ERR.FORBIDDEN();
         }
 
+        pwd = utils.md5(pwd);
         if(pwd != selfAcc.pwd){
             throw L.ERR.PASSWORD_ERROR();
         }
@@ -301,16 +302,21 @@ class StaffModule{
         var checkMsgCode = await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: staff.mobile});
 
         if(checkMsgCode) {
-            staff.roleId = EStaffRole.ADMIN;
-            staff.isValidateMobile = true;
-            staff = await staff.save();
-            toStaff.roleId = EStaffRole.OWNER;
-            await toStaff.save();
-            await API.notify.submitNotify({
-                key: 'qm_transfer_owner',
-                values: {url: 'http:' + config.host},
-                accountId: toStaff.id
-            });
+            try{
+                staff.roleId = EStaffRole.ADMIN;
+                staff.isValidateMobile = true;
+                staff = await staff.save();
+                toStaff.roleId = EStaffRole.OWNER;
+                await toStaff.save();
+                await API.notify.submitNotify({
+                    key: 'qm_transfer_owner',
+                    values: {url: 'http:' + config.host},
+                    accountId: toStaff.id
+                });
+            }catch(e){
+                console.info(e);
+            }
+
         } else {
             throw L.ERR.CODE_ERROR();
         }

@@ -31,17 +31,27 @@ export abstract class AbstractPrefer<T> implements IPrefer<T> {
     }
 }
 
-export function loadDefaultPrefer(qs: {local: any}, type?: string) {
+export enum DEFAULT_PREFER_CONFIG_TYPE  {
+    INTERNAL_TICKET = 1,
+    INTERNAL_HOTEL = 2,
+    DOMESTIC_TICKET = 3,
+    DOMESTIC_HOTEL = 4,
+}
+
+export function loadDefaultPrefer(qs: {local: any}, type?: DEFAULT_PREFER_CONFIG_TYPE) {
     let defaultPrefer;
     switch(type) {
-        case 'hotel':
+        case DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_HOTEL:
             defaultPrefer = defaultHotelPrefer;
             break;
-        case 'internalTicket':
+        case DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_TICKET:
             defaultPrefer = defaultInternalTicketPrefer;
             break;
-        case 'ticket':
+        case DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_TICKET:
             defaultPrefer = defaultTicketPrefer;
+            break;
+        case DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_HOTEL:
+            defaultPrefer = defaultHotelPrefer;
             break;
         default:
             defaultPrefer = defaultTicketPrefer;
@@ -80,5 +90,7 @@ export var ticketPrefers = {
     permitOnlySupplier: require('./ticket-permitOnlySupplier'),
     priorSupplier: require('./ticket-priorSupplier'),
     lowestPrice: require('./ticket-lowestprice'),
-    directArrive: require('./ticket-directArrive')
+    directArrive: require('./ticket-directArrive'),
+    transitWaitDuration: require('./ticket-transitWaitDurationPrefer'),
+    transitCityInChina: require("./ticket-transitCityInChinaPrefer"),
 }

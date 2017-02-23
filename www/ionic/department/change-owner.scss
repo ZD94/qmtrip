@@ -1,0 +1,25 @@
+.send_msg_code{
+  .list{
+    .item-input{
+      padding: 2px 0 2px 16px;
+      input{
+        padding-right: 24px;
+      }
+      &.item-with-code{
+        padding: 0 0 0 16px;
+        input{
+          padding-right: 12px;
+          flex: 1;
+        }
+        .code-button{
+          flex: 1;
+          border-left: 1px solid #dcdcdc;
+          font-size: 14px;
+          color: #28a7e1;
+          text-align: center;
+          line-height: 44px;
+        }
+      }
+    }
+  }
+}

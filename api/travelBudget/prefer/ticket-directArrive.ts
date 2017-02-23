@@ -9,11 +9,13 @@ import {IFinalTicket} from "../../_types/travelbudget";
 class DirectArrivePrefer extends AbstractPrefer<IFinalTicket> {
 
 
-    private deductScorePerStop: number;
+    private baseScore: number;
+    private rate: number;
 
     constructor(name, options) {
         super(name, options);
-        this.deductScorePerStop = options.deductScorePerStop;
+        this.baseScore = options.baseScore || 20000;
+        this.rate = options.rate || 1.05;
     }
 
     async markScoreProcess(data:IFinalTicket[]):Promise<IFinalTicket[]> {
@@ -26,10 +28,13 @@ class DirectArrivePrefer extends AbstractPrefer<IFinalTicket> {
                 v.reasons = [];
             }
 
-            if (v.stops && v.stops.length) {
-                let l = v.stops.length;
-                v.score -= l * this.deductScorePerStop;
-                v.reasons.push(`需经过${v.stops.join('、')}中转`);
+            if (v.segs && v.segs.length) {
+                let l = v.segs.length;
+                if (l > 1) {
+                    let score = self.baseScore * ( 1- (l - 1) * self.rate);
+                    v.score += score;
+                    v.reasons.push(`需经过${l-1}次中转: ${score}`);
+                }
             }
             return v;
         })
