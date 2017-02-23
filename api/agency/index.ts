@@ -309,6 +309,11 @@ class AgencyModule {
         let agency = agencyUser.agency;
         return Models.agencyOperateLog.find( { where: {agencyId: agency.id}});
     }
+
+    @clientExport
+    static async getAgencyOperateLog(id): Promise<AgencyOperateLog> {
+        return Models.agencyOperateLog.get(id);
+    }
 }
 
 export = AgencyModule;

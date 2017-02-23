@@ -51,10 +51,12 @@
                     <a href="#/companyList/add-flow-package?companyId={{company.id}}" target="_self" style=" color: #118FD6;">增加流量包</a>
                 </td>
             </tr>
-            <td colspan="12">
-                <a ng-click="prevPage()" ng-if="pager.hasPrevPage()">上一页</a>
-                <a ng-click="nextPage()" ng-if="pager.hasNextPage()">下一页</a>
-            </td>
+            <tr>
+                <td colspan="12">
+                    <a ng-click="prevPage()" ng-if="pager.hasPrevPage()">上一页</a>
+                    <a ng-click="nextPage()" ng-if="pager.hasNextPage()">下一页</a>
+                </td>
+            </tr>
         </table>
     </div>
     <ul class="pagination" id="pagination"></ul>

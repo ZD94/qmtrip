@@ -138,7 +138,7 @@ var Services = {
     tripDetailHotel: { type: TripDetailHotel, modname: 'tripPlan', funcs: ['getTripDetailHotel']},
     tripDetailSubsidy: { type: TripDetailSubsidy, modname: 'tripPlan', funcs: ['getTripDetailSubsidy']},
     tripDetailSpecial: { type: TripDetailSpecial, modname: 'tripPlan', funcs: ['getTripDetailSpecial']},
-    agencyOperateLog: { type: AgencyOperateLog, modname: 'agency', funcs: [null, 'getAgencyOperateLogs']}
+    agencyOperateLog: { type: AgencyOperateLog, modname: 'agency', funcs: ['getAgencyOperateLog', 'getAgencyOperateLogs']}
 };
 
 function throwNotImplemented(){
