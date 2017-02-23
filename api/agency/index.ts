@@ -304,15 +304,29 @@ class AgencyModule {
     }
 
     @clientExport
-    static async getAgencyOperateLogs(options: any) :Promise<PaginateInterface<AgencyOperateLog>>{
+    static async getAgencyOperateLogs(options: any) :Promise<FindResult> {
+        let {limit, offset} = options;
         let agencyUser = await AgencyUser.getCurrent();
         let agency = agencyUser.agency;
-        return Models.agencyOperateLog.find( { where: {agencyId: agency.id}});
+        let pager = await Models.agencyOperateLog.find( {
+            where: {agencyId: agency.id},
+            limit: limit,
+            offset: offset});
+        let ids = pager.map( (v) => {
+            return v.id;
+        });
+        return {ids: ids, count:pager.total}
     }
 
     @clientExport
-    static async getAgencyOperateLog(id): Promise<AgencyOperateLog> {
-        return Models.agencyOperateLog.get(id);
+    static async getAgencyOperateLog(params: {id: string}): Promise<AgencyOperateLog> {
+        let agencyUser = await AgencyUser.getCurrent();
+        let {id} = params;
+        let log = await Models.agencyOperateLog.get(id);
+        if (log.agencyId != agencyUser.agency.id) {
+            return null;
+        }
+        return log;
     }
 }
 

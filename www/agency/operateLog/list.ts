@@ -7,8 +7,7 @@ import {AgencyOperateLog} from "../../../api/_types/agency/agency-operate-log";
 export async function ListController($scope,Models){
     $scope.init = async function(){
         let agencyUser = await AgencyUser.getCurrent();
-        let pager = await agencyUser.agency.getOperateLogs();
-        Object.setPrototypeOf(pager, Pager.prototype);
+        let pager = await Models.agencyOperateLog.find({where: {}});
         let logList = await addAgencyUser(pager)
         $scope.logList = logList;
         $scope.pager = pager;
@@ -17,14 +16,12 @@ export async function ListController($scope,Models){
     $scope.init();
     $scope.nextPage = async function() {
         let pager = await $scope.pager.nextPage();
-        Object.setPrototypeOf(pager, Pager.prototype);
         $scope.pager = pager;
         $scope.logList = await addAgencyUser($scope.pager);
     }
 
     $scope.prevPage = async function() {
         let pager = await $scope.pager.prevPage();
-        Object.setPrototypeOf(pager, Pager.prototype);
         $scope.pager = pager;
         $scope.logList = await addAgencyUser($scope.pager);
     }
