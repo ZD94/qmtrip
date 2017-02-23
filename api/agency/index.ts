@@ -310,6 +310,7 @@ class AgencyModule {
         let agency = agencyUser.agency;
         let pager = await Models.agencyOperateLog.find( {
             where: {agencyId: agency.id},
+            order: "created_at desc",
             limit: limit,
             offset: offset});
         let ids = pager.map( (v) => {
