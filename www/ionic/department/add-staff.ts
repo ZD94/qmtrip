@@ -23,11 +23,11 @@ export async function AddStaffController($scope, $ionicPopup){
             return msgbox.log('请不要频繁点击');
         }
 
-        if(!staff.email || !staff.isValidateEmail){
+        if(!staff.email){
             $ionicPopup.show({
                 title: '邮箱未绑定',
                 cssClass: 'showAlert',
-                template: '<div class="popupDiv"><span>您还未绑定邮箱或邮箱未激活，请完成操作后再进行批量添加员工操作!</span></div>',
+                template: '<div class="popupDiv"><span>您还未绑定邮箱，请完成操作后再进行批量添加员工操作!</span></div>',
                 scope: $scope,
                 buttons: [
                     {

@@ -1,4 +1,3 @@
-import {ECompanyType} from "../_types/company/company";
 /**
  * Created by yumiao on 15-12-9.
  */
@@ -16,7 +15,7 @@ let schedule = require("node-schedule");
 let _ = require("lodash");
 import {requireParams, clientExport} from "common/api/helper";
 import {Models} from "api/_types";
-import {Company, MoneyChange, Supplier} from 'api/_types/company';
+import {Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType} from 'api/_types/company';
 import {Staff, EStaffRole} from "api/_types/staff";
 import {PromoCode} from "api/_types/promoCode";
 import {Agency, AgencyUser, EAgencyUserRole} from "api/_types/agency";
@@ -493,13 +492,57 @@ class CompanyModule {
 
     /*************************************供应商end***************************************/
 
+    /*************************************企业行程点数变更日志begin***************************************/
+
+    @clientExport
+    static async createTripPlanNumChange (params) : Promise<TripPlanNumChange>{
+        var tpc = TripPlanNumChange.create(params);
+        return tpc.save();
+    }
+
+    @clientExport
+    @requireParams(["id"])
+    static async getTripPlanNumChange(params) :Promise<TripPlanNumChange> {
+        return Models.tripPlanNumChange.get(params.id);
+    }
+
+    /**
+     * 企业行程点数变更记录
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    static async getTripPlanNumChanges(params): Promise<FindResult>{
+        params.order = params.order || [['createdAt', 'desc']];
+        let paginate = await Models.tripPlanNumChange.find(params);
+        let ids =  paginate.map(function(t){
+            return t.id;
+        })
+        return {ids: ids, count: paginate['total']};
+    }
+
+    /*************************************企业行程点数变更日志end***************************************/
+
     static _scheduleTask () {
         let taskId = "resetTripPlanPassNum";
-        scheduler('0 5 0 1 * *', taskId, function() {
+        scheduler('0 5 0 1 * ?', taskId, function() {
+            //每月1号付费企业消耗行程数，冻结数归零
             (async ()=> {
-                let companies = await Models.company.find({where : {tripPlanPassNum : {$gt: 0}}});
+                let companies = [];
+                let pager = await Models.company.find({where : {tripPlanPassNum : {$gt: 0}, expiryDate : {$gt: moment().format('YYYY-MM-DD HH:mm:ss')}, type: ECompanyType.PAYED}});
+                pager.forEach((company) => {
+                    companies.push(company);
+                });
+
+                while(pager && pager.hasNextPage()) {
+                    pager = await pager.nextPage();
+                    pager.forEach((company) => {
+                        companies.push(company);
+                    })
+                }
                 await Promise.all(companies.map(async (co) => {
                     co["tripPlanPassNum"] = 0;
+                    co["tripPlanFrozenNum"] = 0;
                     await co.save();
                 }))
             })()
@@ -574,7 +617,33 @@ class CompanyModule {
                 .catch((err) => {
                     logger.error(`run stark ${taskId2} error:`, err.stack);
                 });
-        })
+        });
+
+        let taskId3 = "companyExpire";
+        scheduler('0 0 * * * *', taskId3, function() {
+            //每小时检查一次企业是否过期 将过期企业套餐行程数置为0
+            (async ()=> {
+                let companies = [];
+                let pager = await Models.company.find({where : {expiryDate : {$lt: moment().format('YYYY-MM-DD HH:mm:ss')}, tripPlanNumLimit: {$gt: 0}}});
+                pager.forEach((company) => {
+                    companies.push(company);
+                });
+
+                while(pager && pager.hasNextPage()) {
+                    pager = await pager.nextPage();
+                    pager.forEach((company) => {
+                        companies.push(company);
+                    })
+                }
+                await Promise.all(companies.map(async (co) => {
+                    co.tripPlanNumLimit = 0;
+                    await co.save();
+                }))
+            })()
+                .catch( (err) => {
+                    logger.error(`执行任务${taskId3}错误:${err.stack}`);
+                })
+        });
     }
 
 }

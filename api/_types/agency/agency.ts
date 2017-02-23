@@ -5,11 +5,13 @@
 import { Models } from 'api/_types';
 import { Company } from 'api/_types/company';
 import { Types, Values } from 'common/model';
-import { Table, Create, Field } from 'common/model/common';
+import {Table, Create, Field, RemoteCall} from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import { TripPlan } from "api/_types/tripPlan";
 import { AgencyUser, EAgencyStatus } from './agency-user';
 import moment=require('moment');
+import {AgencyOperateLog} from "./agency-operate-log";
+import {PaginateInterface} from "common/model/interface";
 
 //每一个.ts对应一个表，下面的代码是创建一个表，agency.是表的前缀
 @Table(Models.agency, 'agency.')
@@ -94,5 +96,10 @@ export class Agency extends ModelObject{
         return Models.tripPlan.find(options);
     }
 
+    @RemoteCall()
+    async getOperateLogs() :Promise<PaginateInterface<AgencyOperateLog>>{
+        let self = this;
+        return Models.agencyOperateLog.find( { where: {agencyId: self.id}});
+    }
 
 }

@@ -97,6 +97,13 @@ class DepartmentModule{
             }
         }
         let dept = await Models.department.get(params.id);
+
+        if(params.name){
+            let result = await Models.department.find({where: {name: params.name, companyId: dept.company.id}});
+            if(result && result.length>0){
+                throw {code:-1, msg: "该部门名称已存在，请重新设置"};
+            }
+        }
         for(let key in params){
             dept[key] = params[key];
         }
@@ -324,7 +331,7 @@ class DepartmentModule{
             options.order = '"' + 'Account' + '"' + '.status asc';
          }
         //默认按创建时间排序排序
-        if(!options.order){
+        if(options.order == 'createdAt' || !options.order){
             options.order = [['createdAt', 'asc']];
         }
         let staffs = await Models.staff.find(options);

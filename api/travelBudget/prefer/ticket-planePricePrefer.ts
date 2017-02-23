@@ -10,7 +10,7 @@ import {AbstractPrefer} from "./index";
 class PlanePricePrefer extends AbstractPrefer<IFinalTicket> {
     private score: number;
     private percent: number;
-    private cabins: string[];
+    private cabins: number[];
     private type: string;
 
     constructor(name, options) {
@@ -29,7 +29,7 @@ class PlanePricePrefer extends AbstractPrefer<IFinalTicket> {
         let minPrice = 0;
 
         tickets.forEach( (v) => {
-            if (v.type == TRAFFIC.FLIGHT && self.cabins.indexOf(v.cabin) >= 0){
+            if (v.type == TRAFFIC.FLIGHT && self.cabins.indexOf(parseInt(v.cabin)) >= 0){
                 targetTickets.push(v);
             }
         })
@@ -48,7 +48,7 @@ class PlanePricePrefer extends AbstractPrefer<IFinalTicket> {
             if (!v.reasons) v.reasons = [];
             if (v.type != TRAFFIC.FLIGHT) return v;
 
-            if (self.cabins.indexOf(v.cabin) >= 0){
+            if (self.cabins.indexOf(parseInt(v.cabin)) >= 0){
                 if (v.price < midPrice) {
                     // var a = 1 - Math.pow((midPrice - v.price)/(midPrice - minPrice),2);
                     var a = 1 - Math.pow((1 - (v.price - minPrice)/(midPrice - minPrice)),3);

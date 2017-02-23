@@ -168,7 +168,7 @@ export async function IndexController($scope, Menu, $ionicPopup, $storage, $loca
         })
     }
     setupMenu(staffMenus);
-    console.log($scope.Menu);
+    //给客户服务地址赋值
     judge();
     $scope.$watch(function() { return $ionicSideMenuDelegate.isOpen(); }, async function(isOpen) {
         if (isOpen) {//Menu Open

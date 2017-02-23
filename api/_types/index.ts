@@ -1,5 +1,6 @@
+///<reference path="agency/agency-operate-log.ts"/>
 
-import { Company, MoneyChange, Supplier } from "./company";
+import { Company, MoneyChange, Supplier, TripPlanNumChange } from "./company";
 import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from "./staff";
 import { TravelPolicy, SubsidyTemplate } from './travelPolicy';
 import { PromoCode } from './promoCode';
@@ -20,6 +21,7 @@ import {DDTalkCorp, DDTalkUser} from "./ddtalk";
 import {CoinAccountChange, CoinAccount} from "./coin";
 import {TripDetailSubsidy, TripDetailSpecial} from "./tripPlan/tripDetailInfo";
 import {Approve} from "./approve/index";
+import {AgencyOperateLog} from "./agency/agency-operate-log";
 
 
 export enum EGender {
@@ -42,6 +44,7 @@ export interface ModelsInterface {
     company: ModelInterface<Company>;
     moneyChange: ModelInterface<MoneyChange>;
     supplier: ModelInterface<Supplier>;
+    tripPlanNumChange: ModelInterface<TripPlanNumChange>;
 
     promoCode: ModelInterface<PromoCode>;
     department: ModelInterface<Department>;
@@ -54,6 +57,9 @@ export interface ModelsInterface {
 
     agency: ModelInterface<Agency>;
     agencyUser: ModelInterface<AgencyUser>;
+    agencyOperateLog: ModelInterface<AgencyOperateLog>;
+
+
 
     seed: ModelInterface<Seed>;
     tripPlan: ModelInterface<TripPlan>;
@@ -91,6 +97,7 @@ export var Models: ModelsInterface = {
     company: new ModelDelegate<Company>(),
     moneyChange: new ModelDelegate<MoneyChange>(),
     supplier: new ModelDelegate<Supplier>(),
+    tripPlanNumChange: new ModelDelegate<TripPlanNumChange>(),
 
     promoCode: new ModelDelegate<PromoCode>(),
     department: new ModelDelegate<Department>(),
@@ -103,6 +110,7 @@ export var Models: ModelsInterface = {
 
     agency: new ModelDelegate<Agency>(),
     agencyUser: new ModelDelegate<AgencyUser>(),
+    agencyOperateLog: new ModelDelegate<AgencyOperateLog>(),
 
     seed: new ModelDelegate<Seed>(),
     tripPlan: new ModelDelegate<TripPlan>(),

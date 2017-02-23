@@ -15,13 +15,24 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     let company = staff.company;
     let rootDepartment : Department;
     let newUrl;
-    if($location.path() == '/department/index' ||$location.path() == '/department/'){
-        newUrl = '#/department/index-instead';
-    }else if($location.path() == '/department/index-instead'){
-        newUrl = '#/department/index';
+    if(departmentId){
+        if($location.path() == '/department/index' ||$location.path() == '/department/'){
+            newUrl = `#/department/index-instead?departmentId=${departmentId}`;
+        }else if($location.path() == '/department/index-instead'){
+            newUrl = `#/department/index?departmentId=${departmentId}`;
+        }else{
+            console.info('location????', $location.path());
+            return false;
+        }
     }else{
-        console.info('location????', $location.path());
-        return false;
+        if($location.path() == '/department/index' ||$location.path() == '/department/'){
+            newUrl = '#/department/index-instead';
+        }else if($location.path() == '/department/index-instead'){
+            newUrl = '#/department/index';
+        }else{
+            console.info('location????', $location.path());
+            return false;
+        }
     }
     async function initDepartment(departId?){
         if(departId){
@@ -94,7 +105,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
             template: require('./add-child-department.html'),
             controller: addChildDepartmentController
         })
-        initDepartment();
+        initDepartment(departmentId);
     }
     $scope.setDepartment = async function () {
         let result = await ngModalDlg.createDialog({
@@ -106,7 +117,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
             template: require('./set-department.html'),
             controller: setDepartmentController
         })
-        initDepartment();
+        initDepartment(departmentId);
     }
     $scope.goChildDept = async function(id){
         // $ionicNavBarDelegate.title(rootDepartment.name);
@@ -130,6 +141,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     async function setDepartmentController($scope,ngModalDlg){
         require('./set-dialog.scss');
         $scope.chooseParent = async function () {
+            console.info($scope.department);
             let parentDepartment = await ngModalDlg.createDialog({
                 parent: $scope,
                 scope: {
@@ -143,12 +155,18 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
             }
         }
         $scope.saveDepartment = async function(){
-            if(!$scope.department.name){
+            let department = $scope.department;
+            if(!department.name){
                 msgbox.log('部门名称不能为空');
                 return false;
             }
+            let departmentName = await Models.department.find({where:{'name':department.name,'companyId':department.companyId}})
+            if(departmentName.length>0){
+                msgbox.log('部门名称已存在');
+                return false;
+            }
             try{
-                await $scope.department.save();
+                await department.save();
             }catch(e){
                 if(e.code == -150){
                     msgbox.log('不能设置该部门为上级部门');
@@ -269,7 +287,11 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
                 msgbox.log('请选择父级部门');
                 return false;
             }
-            await $scope.department.save();
+            try{
+                await $scope.department.save();
+            }catch(err){
+                msgbox.log(err.msg || err);
+            }
             $scope.confirmModal();
         }
     }

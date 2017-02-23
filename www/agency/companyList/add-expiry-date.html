@@ -17,11 +17,15 @@ ul li {
         </li>
         <li>
             增加服务期限:
-            <input type="text" ng-model="months">月
+            <input type="text" ng-model="qs.months">月
+        </li>
+        <li>
+            增加原因:
+            <input type="text" ng-model="qs.remark">
         </li>
         <li ng-show="!IsPayed">
             是否转为付费用户：
-            <input type="checkbox"  ng-model="IsChange">是
+            <input type="checkbox"  ng-model="qs.IsChange">是
         </li>
         <li>
             <button ng-click="chargeMonths()">确定</button>

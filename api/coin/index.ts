@@ -81,7 +81,6 @@ class CoinModule {
         return await coinAccount.costCoin(coins, remark)
     }
 
-    @clientExport
     static async createCoinAccount (params) : Promise<CoinAccount>{
         var ca = CoinAccount.create(params);
         return ca.save();

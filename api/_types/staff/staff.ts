@@ -41,13 +41,13 @@ export enum EStaffRole {
     OWNER = 0,
     COMMON = 1,
     ADMIN = 2,
-    FINANCE = 3
+    // FINANCE = 3
 }
 export var EStaffRoleNames = [];
 EStaffRoleNames[EStaffRole.OWNER] = '创建者';
 EStaffRoleNames[EStaffRole.COMMON] = '员工';
 EStaffRoleNames[EStaffRole.ADMIN] = '管理员';
-EStaffRoleNames[EStaffRole.FINANCE] = '财务';
+// EStaffRoleNames[EStaffRole.FINANCE] = '财务';
 
 //function enumValues(e){
 //    return Object.keys(e).map((k)=>e[k]).filter((v)=>(typeof v != 'number'));

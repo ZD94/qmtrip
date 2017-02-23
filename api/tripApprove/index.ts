@@ -349,9 +349,9 @@ class TripApproveModule {
 
         let budgetInfo;
         let number = 0;
-        if(tripApprove.isSpecialApprove){
+        /*if(tripApprove.isSpecialApprove){
             number = 1;
-        }
+        }*/
         if(!tripApprove.isSpecialApprove){
             budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
             if (!budgetInfo || !budgetInfo.budgets)
@@ -372,26 +372,37 @@ class TripApproveModule {
         }
 
 
-        if(approveResult == EApproveResult.PASS && !isNextApprove ){
-            await approveCompany.beforeApproveTrip({number : number});
-            if((approveCompany.tripPlanNumLimit - approveCompany.tripPlanPassNum) > 0){
-                //套餐包还未用完
-                if(number > (approveCompany.tripPlanNumLimit - approveCompany.tripPlanPassNum)){
-                    //优先扣除套餐内的 再扣加油包的
-                    let reduceExtraNum = number - (approveCompany.tripPlanNumLimit - approveCompany.tripPlanPassNum);
-                    await approveCompany.reduceExtraTripPlanNum({number: reduceExtraNum});
+        // 特殊审批和非当月提交的审批不记录行程点数
+        if(tripApprove.createdAt.getMonth() == new Date().getMonth() && !tripApprove.isSpecialApprove){
+            let content = tripApprove.deptCity+"-"+tripApprove.arrivalCity;
+            //审批通过
+            if(approveResult == EApproveResult.PASS && !isNextApprove){
+                await approveCompany.beforeApproveTrip({number : number});
+                //如果审批是当月提的才会减少企业行程点数
+                if((approveCompany.tripPlanNumLimit - approveCompany.tripPlanPassNum) > 0){
+                    //套餐包还未用完
+                    if(number > (approveCompany.tripPlanNumLimit - approveCompany.tripPlanPassNum)){
+                        //优先扣除套餐内的 再扣加油包的
+                        let reduceExtraNum = number - (approveCompany.tripPlanNumLimit - approveCompany.tripPlanPassNum);
+                        await approveCompany.reduceExtraTripPlanNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                            number: reduceExtraNum, remark: "审批通过消耗加油包的行程点数" , content: content, isShowToUser: false});
+                    }
+                }else{
+                    //套餐包已用完 需要全部从加油包扣除
+                    await approveCompany.reduceExtraTripPlanNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                        number: number, remark: "审批通过消耗加油包的行程点数"  , content: content, isShowToUser: false});
                 }
-            }else{
-                //套餐包已用完 需要全部从加油包扣除
-                await approveCompany.reduceExtraTripPlanNum({number: number});
+                await approveCompany.addTripPlanPassNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                    number: number, remark: "审批通过增加通过的行程点数"  , content: content, isShowToUser: false});
+                await approveCompany.freeFrozenTripPlanNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                    number: number, remark: "审批通过释放冻结行程点数"  , content: content, isShowToUser: false});
+
             }
-            await approveCompany.addTripPlanPassNum({number: number});
-            await approveCompany.freeFrozenTripPlanNum({number: number});
-        }
-
-
-        if(approveResult == EApproveResult.REJECT ){
-            await approveCompany.freeFrozenTripPlanNum({number: number});
+            //审批驳回
+            if(approveResult == EApproveResult.REJECT){
+                await approveCompany.freeFrozenTripPlanNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                    number: number, remark: "审批驳回释放冻结行程点数", content: content });
+            }
         }
 
         // let tripPlan: TripPlan;
