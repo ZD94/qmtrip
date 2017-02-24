@@ -80,6 +80,7 @@ class StaffModule{
         }
         //发送短信通知
         let values  = {
+            name: account.mobile,
             pwd: pwd,
             url:'http:' + config.host
         }
