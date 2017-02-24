@@ -3,7 +3,7 @@ import {TravelPolicy, EPlaneLevel, ETrainLevel, EHotelLevel, MPlaneLevel, MTrain
 import { SubsidyTemplatesController } from './subsidy-templates';
 var msgbox = require('msgbox');
 
-export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory, $ionicPopup, ngModalDlg) {
+export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory, $ionicPopup,ngModalDlg) {
     require('./editpolicy.scss');
     $scope.travelPolicy = {};
     $scope.planeLevels = [
@@ -117,7 +117,18 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
                 await v.destroy();
             }
         }
-        window.location.href= `#/travel-policy/`;
+        /*window.location.href= `#/travel-policy/`;*/
+        let viewHistory = $ionicHistory.viewHistory();
+        let backView = viewHistory.backView;
+        let backUrl = backView.url;
+        if (backUrl == `/travel-policy/`) {
+            console.log(1);
+            $ionicHistory.goBack(-1);
+        } else if ((backUrl.substr(0,backUrl.indexOf('?')))== `/travel-policy/showpolicy`){
+            console.log(2)
+            $ionicHistory.goBack(-2);
+        }
+
     }
     $scope.selectHotalLevel = {
         searchbox: false,
@@ -157,7 +168,8 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
                                 throw {code: -1, msg: '还有'+ result.length +'位员工在使用该标准'};
                             }
                             await $scope.travelPolicy.destroy();
-                            window.location.href = '#/travel-policy/index'
+                            /*window.location.href = '#/travel-policy/index'*/
+                            $ionicHistory.goBack(-2);
                         }catch(err){
                             if(err.code == -1){
                                 deleteFailed();

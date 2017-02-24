@@ -16,20 +16,22 @@
                 on-refresh="pagersDate.doRefresh()">
         </ion-refresher>
         <ion-list class="list coin-list">
-            <div class="item" ng-repeat="item in {{}} track by $index" ng-click="detail(item)">
+            <div class="item" ng-repeat="item in tripPlanNumInfo track by $index" ng-click="detail(item)">
                 <div ng-class="{
-                    'list-blue': item.type == '',
-                    'list-orange': item.type == '',
-                    'list-system' : item.type == ''
+                    'list-blue': item.type == NUM_CHANGE_TYPE.FREE_FROZEN ,
+                    'list-orange': item.type == NUM_CHANGE_TYPE.FROZEN,
+                    'list-system-add' : item.type == NUM_CHANGE_TYPE.SYSTEM_ADD ,
+                    'list-system-reduce': item.type == NUM_CHANGE_TYPE.SYSTEM_REDUCE
                 }">
-                    <span class="item-date">{{}}</span>
-                    <span class="item-coin" ng-if="item.type == ''">退</span>
-                    <span class="item-coin" ng-if="item.type == ''">花</span>
-                    <span class="item-coin" ng-if="item.type == ''"></span>
-                    <span class="item-coin"></span>
+                    <span class="item-date">{{item.createdAt | date : 'MM-dd'}}</span>
+                    <span class="item-icon" ng-if="item.type == NUM_CHANGE_TYPE.FREE_FROZEN ">退</span>
+                    <span class="item-icon" ng-if="item.type == NUM_CHANGE_TYPE.FROZEN ">花</span>
+                    <span class="item-icon" ng-if="item.type == NUM_CHANGE_TYPE.SYSTEM_ADD "></span>
+                    <span class="item-icon" ng-if="item.type == NUM_CHANGE_TYPE.SYSTEM_REDUCE "></span>
+                    <span class="item-num">{{item.number > 0? +item.number:item.number}}</span>
                     <div class="item-info">
-                        <p></p>
-                        <p></p>
+                        <p>{{item.staff}}</p>
+                        <p>{{item.content}}</p>
                     </div>
 
                 </div>

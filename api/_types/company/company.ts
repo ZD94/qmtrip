@@ -214,6 +214,15 @@ export class Company extends ModelObject{
     get extraExpiryDate(): Date { return null; }
     set extraExpiryDate(val: Date) {}
 
+    //可用剩余行程点数
+    get tripPlanNumBalance(): number {
+        let num = this.tripPlanNumLimit - this.extraTripPlanNum - this.tripPlanFrozenNum;
+        if(this.extraTripPlanNum && this.extraExpiryDate && (this.extraExpiryDate.getTime() - new Date().getTime()) > 0){
+            num = num + this.extraTripPlanNum;
+        }
+        return num;
+    }
+
     @Field({type: Types.INTEGER})
     get type() :ECompanyType{return ECompanyType.TRYING}
     set type(type: ECompanyType) {}
@@ -417,6 +426,14 @@ export class Company extends ModelObject{
         return result;
     }
     
+    getTripPlanNumChanges(options?: any): Promise<any> {
+        if(!options) { options = {}};
+        if(!options.where) { options.where = {}};
+        options.where.companyId = this.id;
+        options.where.isShowToUser = true;
+        return Models.tripPlanNumChange.find(options);
+    }
+
     getDepartments(options?: any): Promise<Department[]> {
         if(!options) { options = {}};
         if(!options.where) { options.where = {}};

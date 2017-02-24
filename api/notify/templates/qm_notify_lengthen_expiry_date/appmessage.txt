@@ -1,0 +1,1 @@
+您好,您的企业<%=account.company.name%>的有效期已延长至<%=expiryDate%>。

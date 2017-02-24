@@ -9,6 +9,8 @@ import moment=require('moment');
 import {PaginateInterface} from "common/model/interface";
 import {Company, ECompanyType} from "../company/company";
 import L from 'common/language';
+import {CoinAccount} from "../coin";
+const API = require("common/api");
 let sequelize = require("common/model").DB;
 
 
@@ -145,8 +147,18 @@ export class AgencyUser extends ModelObject{
             throw L.ERR.PERMISSION_DENY();
         }
         //先记录操作日志
-        let log = await Models.agencyOperateLog.create({agency_userId:this.id,agencyId: agency.id, remark:'因'+remark+'的原因为'+company.name+'('+company.id+')'+'充值了'+coin+'鲸币'});
+        let log = await Models.agencyOperateLog.create({
+            agency_userId:this.id,
+            agencyId: agency.id,
+            remark:`因【${remark}】为【${company.name}(${company.id})】充值了【${coin}】鲸币`});
         await log.save();
+        //如果没有鲸币账户，创建
+        if (!company.coinAccount) {
+            let coinAccount = CoinAccount.create({});
+            coinAccount = await coinAccount.save();
+            company.coinAccount = coinAccount;
+            company = await company.save();
+        }
         //给企业加鲸币
         let ret = await company.coinAccount.addCoin(coin, remark);
         return ret;
@@ -162,7 +174,11 @@ export class AgencyUser extends ModelObject{
             throw L.ERR.PERMISSION_DENY();
         }
         //先记录操作日志
-        let log = await Models.agencyOperateLog.create({agency_userId:this.id,agencyId: agency.id, remark:'因'+qs.remark+'的原因为'+company.name+'('+company.id+')'+'的到期时间增加了'+qs.months+'月'});
+        let log = await Models.agencyOperateLog.create({
+            agency_userId: this.id,
+            agencyId: agency.id,
+            remark: `因【${qs.remark}】为【${company.name}(${company.id})】增加了【${qs.months}】月有效期`
+        });
         await log.save();
         //修改企业到期时间
         let ret =  new Date(moment(company.expiryDate).add(qs.months,'months').valueOf());
@@ -170,13 +186,24 @@ export class AgencyUser extends ModelObject{
         if(qs.IsChange){
             company.type = ECompanyType.PAYED;
         }
-        await company.save();
+        company = await company.save();
+        let staffs = await this.getCompanyAllStaffs({companyId: company.id});
+        let ps = staffs.map( (s) => {
+            //给各个员工发送通知
+            return API.notify.submitNotify({
+                accountId: s.id,
+                key: "qm_notify_lengthen_expiry_date",
+                values: {
+                    expiryDate: moment(company.expiryDate).format('YYYY-MM-DD')
+                }
+            });
+        });
+        await Promise.all(ps);
         return ret;
     }
     //增加行程流量包
     @RemoteCall()
     async  addFlowPackage(companyId:string, qs:any):Promise<any>{
-        console.info("333");
         let self=this;
         let company = await Models.company.get(companyId);
         let agency = await company.getAgency();
@@ -184,14 +211,18 @@ export class AgencyUser extends ModelObject{
             throw L.ERR.PERMISSION_DENY();
         }
         //先记录操作日志
-        let log = await Models.agencyOperateLog.create({agency_userId:this.id,agencyId: agency.id, remark:'因'+qs.remark+'的原因为'+company.name+'('+company.id+')'+'的流量包增加了'+'到期时间增加了3个月'});
+        let log = await Models.agencyOperateLog.create({
+            agency_userId: this.id,
+            agencyId: agency.id,
+            remark:`因【${qs.remark}】为【${company.name}(${company.id})】的流量包到期时间增加了【3】个月`});
         await log.save();
+
         //修改行程流量包
         if(qs.AddTwenty){
-            company.extraTripPlanNum=company.extraTripPlanNum+20;
+            company.extraTripPlanNum = company.extraTripPlanNum + 20;
         }
         if(qs.AddFifty){
-            company.extraTripPlanNum=company.extraTripPlanNum+50;
+            company.extraTripPlanNum = company.extraTripPlanNum + 50;
         }
         let ret =  new Date(moment(company.expiryDate).add(3,'months').valueOf());
         company.expiryDate = ret;

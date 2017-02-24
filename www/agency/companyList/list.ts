@@ -42,7 +42,8 @@ export async function ListController($scope, Models) {
             if (!company.expiryDate) {
                 company['remainDays'] = Infinity;
             } else {
-                let days = moment(company.expiryDate).diff(new Date(), 'days');
+                let d = moment();
+                let days = moment(company.expiryDate).diff(d, 'days');
                 company['remainDays'] = days;
             }
             if (!company.coinAccount) {
