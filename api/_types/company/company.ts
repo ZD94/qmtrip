@@ -426,6 +426,14 @@ export class Company extends ModelObject{
         return result;
     }
     
+    getTripPlanNumChanges(options?: any): Promise<any> {
+        if(!options) { options = {}};
+        if(!options.where) { options.where = {}};
+        options.where.companyId = this.id;
+        options.where.isShowToUser = true;
+        return Models.tripPlanNumChange.find(options);
+    }
+
     getDepartments(options?: any): Promise<Department[]> {
         if(!options) { options = {}};
         if(!options.where) { options.where = {}};
