@@ -127,11 +127,13 @@ export default class SupplierCtripCT extends SupplierWebRobot{
     async getJsCode(options): Promise<string>{
         var str = `
                     alert('go');
+                    alert(${options.key});
                     var hasEnter = sessionStorage.getItem("hasEnter");
                     localStorage.setItem(${options.key}, ${options.json});
                     if(window.location.href == "http://ct.ctrip.com/m/"&&!hasEnter){
                         var login = document.getElementById("login");
                         alert('go1');
+                        alert(${options.url});
                         if(login){
                             document.getElementById("login").style.background = "yellow";
                         }else{
