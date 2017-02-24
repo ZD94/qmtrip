@@ -4,6 +4,7 @@ import {
     MHotelLevel, MPlaneLevel, MTrainLevel, enumHotelLevelToStr, enumPlaneLevelToStr,
     enumTrainLevelToStr
 } from "api/_types/travelPolicy";
+import moment = require('moment');
 import * as path from 'path';
 
 var API = require('common/api');
@@ -147,6 +148,71 @@ export async function IndexController($scope, Menu, $ionicPopup, $storage, $loca
 
     var staff = await Staff.getCurrent();
     // var noticePager = await staff.getSelfNotices();
+    let leftTime = moment(staff.company.expiryDate).diff(moment(),'days');
+    if(leftTime <= 7){
+        let popTitle = '服务即将到期';
+        let popText = '服务期限已不足7天，请您及时进行续费，以免影响使用';
+        if(staff.roleId == EStaffRole.ADMIN ||staff.roleId == EStaffRole.OWNER){
+            if(leftTime > 0){
+                $ionicPopup.show({
+                    title: popTitle,
+                    template: popText,
+                    scope: $scope,
+                    buttons:[
+                        {
+                            text: '暂不操作',
+                            type: 'button-positive button-outline'
+                        },
+                        {
+                            text: '立即续费',
+                            type: 'button-positive',
+                            onTap:function(){
+                                window.location.href=''  //管理跳转页面
+                            }
+                        }
+                    ]
+                })
+            }else{
+                popTitle = '服务已到期';
+                popText = '您企业的服务已到期，请您进行续费操作，谢谢！';
+                $ionicPopup.show({
+                    title: popTitle,
+                    template: popText,
+                    scope: $scope,
+                    buttons:[
+                        {
+                            text: '立即续费',
+                            type: 'button-positive',
+                            onTap:function(){
+                                window.location.href=''  //管理跳转页面
+                            }
+                        }
+                    ]
+                })
+            }
+        }else{
+            if(leftTime > 0){
+                popText = '服务期限已不足7天，请通知管理员及时进行续费，以免影响使用！';
+            }else{
+                popTitle = '服务已到期';
+                popText = '您企业的服务已到期，请通知管理员进行续期，谢谢！';
+            }
+            $ionicPopup.show({
+                title: popTitle,
+                template: popText,
+                scope: $scope,
+                buttons:[
+                    {
+                        text: '确认',
+                        type: 'button-positive',
+                        onTap:function(){
+                            window.location.href=''  //员工跳转页面
+                        }
+                    }
+                ]
+            })
+        }
+    }
     var noticePager = [];
     function setupMenu(menuItems){
         Menu.delall();
