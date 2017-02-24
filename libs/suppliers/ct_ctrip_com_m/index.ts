@@ -129,7 +129,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                     alert('go');
                     alert(${options.key});
                     var hasEnter = sessionStorage.getItem("hasEnter");
-                    var count = sessionStorage.getItem("count");
+                    var count = sessionStorage.getItem("count") / 1;
                     alert(111 , count);
                     if(count){
                         count++;
