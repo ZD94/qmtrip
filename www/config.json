@@ -58,6 +58,12 @@
       "update": "http://sc.jingli.tech:4002",
       "api": "http://sc.jingli.tech:4002/API",
       "debug": true
+    },
+    "hxs": {
+      "name": "hxs",
+      "update": "http://hxs.jingli.tech:4002",
+      "api": "http://hxs.jingli.tech:4002/API",
+      "debug": true
     }
   }
 }
