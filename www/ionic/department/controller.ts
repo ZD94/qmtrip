@@ -48,7 +48,11 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
 
         let departments = await rootDepartment.getChildDeptStaffNum();
         let staffs = await rootDepartment.getStaffs();
-        staffs = staffs.map(function(staff){
+        initStaffs(staffs)
+        $scope.departments = departments;
+    }
+    function initStaffs(staffs){
+        $scope.staffs = staffs.map(function(staff){
             let hours = moment().diff(moment(staff.createdAt),'hours');
             console.info('status',staff.status);
             if(staff.status == 1 && hours < 24){
@@ -59,11 +63,8 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
                 staff['newStaff'] = false;
                 staff['newRegister'] = false;
             }
-            console.info(staff);
             return staff;
         })
-        $scope.departments = departments;
-        $scope.staffs = staffs;
     }
     initDepartment(departmentId);
     $scope.EStaffRoleNames = EStaffRoleNames;
@@ -91,6 +92,10 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
             }
             return staff;
         })
+    }
+    $scope.searchKeyword = async function(keyword){
+        let staffs = await rootDepartment.getStaffs({where: {name: {$ilike: `%${keyword}%`}}});
+        initStaffs(staffs);
     }
     $scope.addNewStaff = function(){
         window.location.href = '#/department/add-staff';
