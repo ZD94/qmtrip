@@ -70,7 +70,7 @@ class ApproveModule {
 
         //行程数第一次小于10或等于0时给管理员和创建人发通知
         let newNum = com.tripPlanNumLimit + com.extraTripPlanNum - com.tripPlanPassNum - com.tripPlanFrozenNum;
-        if(com.extraExpiryDate.getTime() - new Date().getTime() < 0){
+        if(com.extraExpiryDate && com.extraExpiryDate.getTime() - new Date().getTime() < 0){
             newNum = com.tripPlanNumLimit - com.tripPlanPassNum - com.tripPlanFrozenNum;
         }
         if(oldNum > 10 && newNum <= 10 || newNum == 0){
