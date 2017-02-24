@@ -854,16 +854,16 @@ export default class ApiAuth {
         }
     }
 
-    /**
-     * 创建Account
-     * @param params
-     * @returns {Promise<Account>}
-     */
-    @clientExport
-    static async createAccount(params): Promise<Account> {
-        var acc = Account.create(params);
-        return acc.save();
-    }
+    // /**
+    //  * 创建Account
+    //  * @param params
+    //  * @returns {Promise<Account>}
+    //  */
+    // @clientExport
+    // static async createAccount(params): Promise<Account> {
+    //     var acc = Account.create(params);
+    //     return acc.save();
+    // }
 
 
     /**
