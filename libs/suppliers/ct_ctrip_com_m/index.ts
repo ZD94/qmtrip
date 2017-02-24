@@ -130,6 +130,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                     alert(${options.key});
                     var hasEnter = sessionStorage.getItem("hasEnter");
                     var count = sessionStorage.getItem("count");
+                    alert(111 , count);
                     if(count){
                         count++;
                         sessionStorage.setItem("count" , count);
@@ -141,7 +142,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                         return;
                     }
 
-                    alert(count);
+                    alert(222 , count);
 
                     localStorage.setItem(${options.key}, ${options.json});
                     if(window.location.href == "http://ct.ctrip.com/m/"&&!hasEnter){
