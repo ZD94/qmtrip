@@ -138,7 +138,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                         sessionStorage.setItem("count" , 1);
                         count = 1;
                     }
-                    if(count > 2){
+                    if(count > 20){
                         return;
                     }
 
