@@ -1,6 +1,5 @@
 import {Pager} from "common/model/pager";
 import {AgencyUser} from "api/_types/agency/agency-user";
-import {AgencyOperateLog} from "../../../api/_types/agency/agency-operate-log";
 /**
  * Created by chen on 2017/2/23.
  */
@@ -28,6 +27,16 @@ export async function ListController($scope,Models){
         $scope.pager = pager;
         $scope.logList = await addAgencyUser($scope.pager);
     }
+
+    // $scope.nextPage = async function() {
+    //     $scope.page += 1;
+    //     return $scope.addAgencyUser($scope.page, $scope.perPage);
+    // }
+    //
+    // $scope.prevPage = async function() {
+    //     $scope.page -= 1;
+    //     return $scope.addAgencyUser($scope.page, $scope.perPage);
+    // }
 
     async function addAgencyUser(operateLogs) {
         let items = operateLogs.map( async (log)=>{

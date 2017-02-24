@@ -1,0 +1,41 @@
+<ion-view title="行程点数">
+    <ion-content padding="true" class="has-header content">
+        <div class="tripInfo">
+                <p>月套餐行程余额：{{company.extraTripPlanNum}} ({{company.expiryDate | date:"yyyy-MM-dd" }}到期)</p>
+                <p>行程增量包余额：{{company.extraRemain}}
+                    ({{company.extraExpiryDate | date:"yyyy-MM-dd"}}到期)</p>
+            <div class="remainTripNum">
+                <p>行程点数剩余 <span> {{company.extraTripPlanNum+company.extraRemain}} </span> 点</p>
+            </div>
+            <div class="btn">
+                <span>购买流量包</span>
+            </div>
+        </div>
+        <ion-refresher
+                pulling-text="下拉刷新",
+                on-refresh="pagersDate.doRefresh()">
+        </ion-refresher>
+        <ion-list class="list coin-list">
+            <div class="item" ng-repeat="item in {{}} track by $index" ng-click="detail(item)">
+                <div ng-class="{
+                    'list-blue': item.type == '',
+                    'list-orange': item.type == '',
+                    'list-system' : item.type == ''
+                }">
+                    <span class="item-date">{{}}</span>
+                    <span class="item-coin" ng-if="item.type == ''">退</span>
+                    <span class="item-coin" ng-if="item.type == ''">花</span>
+                    <span class="item-coin" ng-if="item.type == ''"></span>
+                    <span class="item-coin"></span>
+                    <div class="item-info">
+                        <p></p>
+                        <p></p>
+                    </div>
+
+                </div>
+
+            </div>
+        </ion-list>
+
+    </ion-content>
+</ion-view>
