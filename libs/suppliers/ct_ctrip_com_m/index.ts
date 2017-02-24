@@ -129,6 +129,20 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                     alert('go');
                     alert(${options.key});
                     var hasEnter = sessionStorage.getItem("hasEnter");
+                    var count = sessionStorage.getItem("count");
+                    if(count){
+                        count++;
+                        sessionStorage.setItem("count" , count);
+                    }else{
+                        sessionStorage.setItem("count" , 1);
+                        count = 1;
+                    }
+                    if(count > 2){
+                        return;
+                    }
+
+                    alert(count);
+
                     localStorage.setItem(${options.key}, ${options.json});
                     if(window.location.href == "http://ct.ctrip.com/m/"&&!hasEnter){
                         var login = document.getElementById("login");
