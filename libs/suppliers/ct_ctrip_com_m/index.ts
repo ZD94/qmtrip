@@ -128,6 +128,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         alert("can change ?");
         var str = `
                     var hasEnter = sessionStorage.getItem("hasEnter");
+                    window.location.href = "http://www.baidu.com";
                     localStorage.setItem(${options.key}, ${options.json});
                     if(window.location.href == "http://ct.ctrip.com/m/" && !hasEnter){
                         var login = document.getElementById("login");
