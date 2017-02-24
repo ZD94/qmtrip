@@ -110,6 +110,7 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
         }
     },200)
 
+    alert('333333');
     let timeout = $timeout(function(){
         inAppBrowser.open(bookLink.url, bookLink.jsCode);
     },3000)

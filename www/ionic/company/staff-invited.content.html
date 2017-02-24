@@ -26,12 +26,12 @@
         </a>
     </div>
     <div class="send_buttons" ng-if="invitedLink">
-        <a class="button button-outline button-calm" href="" ng-click="sendWx()" ng-if="is_wechat ||isAndroid || isIos">
+        <a class="button button-outline button-calm" href="" ng-click="sendWx()" ng-if="is_wechat">
             <i class="fa fa-weixin"></i>
             <span>通过微信发送</span>
         </a>
         <a class="button button-outline button-calm" ng-href={{invitedLink.goInvitedLink}}
-           ng-if="!is_wechat && !isAndroid && !isIos">
+           ng-if="!is_wechat">
             <i class="fa fa-weixin"></i>
             <span>通过微信发送</span>
         </a>

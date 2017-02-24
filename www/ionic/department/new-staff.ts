@@ -71,10 +71,13 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             }
         }else{
             if(v.role != EStaffRole.OWNER && v.role != EStaffRole.ADMIN){
-                return v;
+                if(v.role != EStaffRole.OWNER){
+                    return v;
+                }
             }
         }
     })
+    console.info(roles);
     //end
     $scope.chooseRole =function(){
         if(current.roleId != EStaffRole.OWNER){
@@ -111,7 +114,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                 return true;
             },
             buttonClicked: function(index) {
-                $scope.staff.roleId = index;
+                $scope.staff.roleId = roles[index].role;
                 return true;
             }
         })
