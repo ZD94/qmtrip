@@ -39,7 +39,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
     };
     $scope.currentStaff = await Staff.getCurrent();
     let currentCompany = $scope.currentStaff.company;
-
+    console.info(currentCompany);
     $scope.currentTp = await $scope.currentStaff.getTravelPolicy();
     if($scope.currentTp){
         $scope.currentTpSts = await $scope.currentTp.getSubsidyTemplates();
@@ -274,8 +274,10 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         try{
             await currentCompany.beforeGoTrip({number: number});
         }catch(e){
-            console.info(e);
-            $scope.showErrorMsg(e.msg);
+            $ionicPopup.alert({
+                title: '行程余额不足',
+                template: '行程余额不足无法获取预算，请通知管理员进行充值或使用特别审批'
+            })
             return false;
         }
         if ($scope.currentTpSts && $scope.currentTpSts.length && (!$scope.subsidy || !$scope.subsidy.template)) {

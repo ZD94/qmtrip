@@ -2,7 +2,7 @@
     <div class="flex-subheader">
         <label class="item item-input">
             <i class="icon ion-search placeholder-icon"></i>
-            <input type="text" placeholder="Search">
+            <input type="text" placeholder="Search" ng-model="keywords" ng-change="searchKeyword(keywords)">
         </label>
         <span class="fa sort_btn" ng-class="[selected.icon]" sort-select select-list="arrlist" select="selected" done="sortBy">
             <span ng-if="selected.value == ''">时间</span>
