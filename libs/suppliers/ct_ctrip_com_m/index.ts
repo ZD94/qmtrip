@@ -132,9 +132,11 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                         var login = document.getElementById("login");
                         if(login){
                         }else{
+                            alert('go 1')
                             window.location.href = ${options.url};
                         }
                     }else if(window.location.href == ${options.url} && !hasEnter){
+                        alert('go 2');
                         sessionStorage.setItem("hasEnter","true");
                         var search = document.getElementById("btn_search");
                         return search && search.click();
