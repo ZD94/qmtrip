@@ -125,24 +125,21 @@ export default class SupplierCtripCT extends SupplierWebRobot{
     }
 
     async getJsCode(options): Promise<string>{
-        alert("can change ?");
         var str = `
                     var hasEnter = sessionStorage.getItem("hasEnter");
-                    window.location.href = "http://www.baidu.com";
                     localStorage.setItem(${options.key}, ${options.json});
-                    if(window.location.href == "http://ct.ctrip.com/m/" && !hasEnter){
+                    if(window.location.href == "http://ct.ctrip.com/m/"&&!hasEnter){
                         var login = document.getElementById("login");
                         if(login){
+                            document.getElementById("login").style.background = "yellow";
                         }else{
-                            alert('go 1')
                             window.location.href = ${options.url};
                         }
-                    }else if(window.location.href == ${options.url} && !hasEnter){
-                        alert('go 2');
-                        sessionStorage.setItem("hasEnter","true");
+                    }
+                    if(window.location.href == ${options.url}&&!hasEnter){
                         var search = document.getElementById("btn_search");
-                        return search && search.click();
-                        
+                        search.click();
+                        sessionStorage.setItem("hasEnter","true");
                     }
                   `;
         return str;
