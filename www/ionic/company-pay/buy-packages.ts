@@ -9,5 +9,4 @@ export async function BuyPackagesController($scope){
     $scope.staff = staff;
     $scope.company = staff.company;
     $scope.ECompanyType = ECompanyType;
-
 }
