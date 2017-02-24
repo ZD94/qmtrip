@@ -125,6 +125,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
     }
 
     async getJsCode(options): Promise<string>{
+        alert("can change ?");
         var str = `
                     var hasEnter = sessionStorage.getItem("hasEnter");
                     localStorage.setItem(${options.key}, ${options.json});
