@@ -131,6 +131,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                     if(window.location.href == "http://ct.ctrip.com/m/"&&!hasEnter){
                         var login = document.getElementById("login");
                         if(login){
+                            document.getElementById("login").style.background = "yellow";
                         }else{
                             window.location.href = ${options.url};
                         }
