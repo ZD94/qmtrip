@@ -167,7 +167,7 @@ export async function IndexController($scope, Menu, $ionicPopup, $storage, $loca
                             text: '立即续费',
                             type: 'button-positive',
                             onTap:function(){
-                                window.location.href=''  //管理跳转页面
+                                window.location.href='#/company-pay/service-pay'  //管理跳转页面
                             }
                         }
                     ]
@@ -184,7 +184,7 @@ export async function IndexController($scope, Menu, $ionicPopup, $storage, $loca
                             text: '立即续费',
                             type: 'button-positive',
                             onTap:function(){
-                                window.location.href=''  //管理跳转页面
+                                window.location.href='#/company-pay/service-pay'  //管理跳转页面
                             }
                         }
                     ]
@@ -206,7 +206,7 @@ export async function IndexController($scope, Menu, $ionicPopup, $storage, $loca
                         text: '确认',
                         type: 'button-positive',
                         onTap:function(){
-                            window.location.href=''  //员工跳转页面
+                            window.location.href='#/company-pay/service-pay'  //员工跳转页面
                         }
                     }
                 ]

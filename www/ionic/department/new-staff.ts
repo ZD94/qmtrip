@@ -79,7 +79,6 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             }
         }
     })
-    console.info(roles);
     //end
     $scope.chooseRole =function(){
         if(currentRole != EStaffRole.OWNER){

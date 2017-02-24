@@ -1,0 +1,46 @@
+<ion-view title="行程点数">
+    <ion-content padding="true" class="has-header content">
+        <div class="tripInfo">
+                <p>月套餐行程余额：{{company.extraRemain || 0}} ({{company.expiryDate | date:"yyyy-MM-dd" }}到期)</p>
+                <p>行程增量包余额：{{company.extraPackage || 0}}
+                    ({{company.extraExpiryDate | date:"yyyy-MM-dd"}}到期)</p>
+            <div class="remainTripNum">
+                <p>行程点数剩余 <span> {{company.extraTripPlanNum+company.extraRemain}} </span> 点</p>
+            </div>
+            <a ng-href="#/company-pay/buy-packages">
+                <div class="btn" >
+                    <span>购买流量包</span>
+                </div>
+            </a>
+
+        </div>
+        <ion-refresher
+                pulling-text="下拉刷新",
+                on-refresh="pagersDate.doRefresh()">
+        </ion-refresher>
+        <ion-list class="list coin-list">
+            <div class="item" ng-repeat="item in tripPlanNumInfo track by $index" ng-click="detail(item)">
+                <div ng-class="{
+                    'list-blue': item.type == NUM_CHANGE_TYPE.FREE_FROZEN ,
+                    'list-orange': item.type == NUM_CHANGE_TYPE.FROZEN,
+                    'list-system-add' : item.type == NUM_CHANGE_TYPE.SYSTEM_ADD ,
+                    'list-system-reduce': item.type == NUM_CHANGE_TYPE.SYSTEM_REDUCE
+                }">
+                    <span class="item-date">{{item.createdAt | date : 'MM-dd'}}</span>
+                    <span class="item-icon" ng-if="item.type == NUM_CHANGE_TYPE.FREE_FROZEN ">退</span>
+                    <span class="item-icon" ng-if="item.type == NUM_CHANGE_TYPE.FROZEN ">花</span>
+                    <span class="item-icon" ng-if="item.type == NUM_CHANGE_TYPE.SYSTEM_ADD "></span>
+                    <span class="item-icon" ng-if="item.type == NUM_CHANGE_TYPE.SYSTEM_REDUCE "></span>
+                    <span class="item-num">{{item.number > 0? +item.number:item.number}}</span>
+                    <div class="item-info">
+                        <p>{{item.staff}}</p>
+                        <p>{{item.content}}</p>
+                    </div>
+
+                </div>
+
+            </div>
+        </ion-list>
+
+    </ion-content>
+</ion-view>
