@@ -216,7 +216,7 @@ export class Company extends ModelObject{
 
     //可用剩余行程点数
     get tripPlanNumBalance(): number {
-        let num = this.tripPlanNumLimit - this.extraTripPlanNum - this.tripPlanFrozenNum;
+        let num = this.tripPlanNumLimit - this.tripPlanPassNum - this.tripPlanFrozenNum;
         if(this.extraTripPlanNum && this.extraExpiryDate && (this.extraExpiryDate.getTime() - new Date().getTime()) > 0){
             num = num + this.extraTripPlanNum;
         }
