@@ -92,7 +92,7 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     // let bookLink = await supplier.getBookLink({reserveType: $scope.reserveType, fromCityName: $scope.deptCity, toCityName: $scope.arrivalCity, leaveDate: deptDateTime,cityName: budget.city});
     let bookLink = await budget.getBookLink({reserveType: $scope.reserveType, supplierId: supplier.id});
     console.log(bookLink);
-
+    alert(123);
     //下面三个小圆点的轮播
     $scope.load_one = true;
     $scope.load_two = false;
