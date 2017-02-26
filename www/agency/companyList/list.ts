@@ -24,7 +24,6 @@ export async function ListController($scope , Models) {
         query.page = page || 1;
         query.perPage = perPage || 20;
         let pager = await agency.findCompanies(query);
-        console.info('total==>',pager.total);
         $scope.total = pager.total;
         pager.hasNextPage = function() {
             return pager.total >= page * perPage;
@@ -73,9 +72,6 @@ export async function ListController($scope , Models) {
 
     $scope.nextPage = async function() {
         $scope.fromIdx = $scope.page * $scope.perPage ;
-        console.info($scope.fromIdx);
-
-
         $scope.page += 1;
         return $scope.getCompany($scope.page, $scope.perPage);
     }
@@ -83,9 +79,6 @@ export async function ListController($scope , Models) {
     $scope.prevPage = async function() {
         $scope.page -= 1;
         $scope.fromIdx = ( $scope.page - 1 ) * $scope.perPage ;
-
-        console.info($scope.fromIdx);
-
         return $scope.getCompany($scope.page, $scope.perPage);
     }
 

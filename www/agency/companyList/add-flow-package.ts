@@ -7,7 +7,8 @@ import moment=require("moment");
 export async function AddFlowPackageController($scope,$stateParams,Models){
     $scope.qs={
         AddTwenty:'',
-        AddFifty:''
+        AddFifty:'',
+        remark:''
     };
     let agencyUser = await AgencyUser.getCurrent();
     let companyId = $stateParams.companyId;
@@ -15,7 +16,6 @@ export async function AddFlowPackageController($scope,$stateParams,Models){
         let company=await Models.company.get(companyId);
         $scope.company=company;
         $scope.chargeFlowPackage=async function(){
-            console.info("111");
             if(!$scope.qs.AddTwenty && !$scope.qs.AddFifty){
                 msgbox.alert("请选择合法的流量包");
                 return ;
@@ -23,7 +23,9 @@ export async function AddFlowPackageController($scope,$stateParams,Models){
                 msgbox.alert("不能同时选择两个流量包");
                 return ;
             }
-            console.info("222");
+            if(!$scope.qs.remark){
+                $scope.qs.remark = '';
+            }
             let res = await agencyUser.addFlowPackage(companyId, $scope.qs);
             msgbox.alert("充值成功");
         }
