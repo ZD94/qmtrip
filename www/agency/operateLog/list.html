@@ -2,9 +2,7 @@
     <div class="companylist">
 
         <div class="companylist-title">
-            <div class="company_search">
                 <h3>日志列表</h3>
-            </div>
         </div>
 
         <table class="company" style="text-align: center;">
@@ -19,7 +17,7 @@
 
             <tbody>
                 <tr ng-repeat="log in logList track by $index">
-                    <td>{{$index+1}}</td>
+                    <td>{{$index + 1 + fromIdx}}</td>
                     <td>{{log.agency_user}}</td>
                     <td colspan="2" style="text-align: left;padding: 0 10px;">{{log.remark}}</td>
                     <td>{{log.createdAt | date:"yyyy-MM-dd HH:mm:ss"}}</td>

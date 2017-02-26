@@ -18,25 +18,20 @@ export async function ListController($scope,Models){
     $scope.init();
     $scope.nextPage = async function() {
         let pager = await $scope.pager.nextPage();
+        console.info(pager);
+        $scope.fromIdx = pager.offset;
         $scope.pager = pager;
         $scope.logList = await addAgencyUser($scope.pager);
     }
 
     $scope.prevPage = async function() {
         let pager = await $scope.pager.prevPage();
+        console.info(pager);
+        $scope.fromIdx = pager.offset ;
         $scope.pager = pager;
         $scope.logList = await addAgencyUser($scope.pager);
     }
 
-    // $scope.nextPage = async function() {
-    //     $scope.page += 1;
-    //     return $scope.addAgencyUser($scope.page, $scope.perPage);
-    // }
-    //
-    // $scope.prevPage = async function() {
-    //     $scope.page -= 1;
-    //     return $scope.addAgencyUser($scope.page, $scope.perPage);
-    // }
 
     async function addAgencyUser(operateLogs) {
         let items = operateLogs.map( async (log)=>{

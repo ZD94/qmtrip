@@ -210,11 +210,18 @@ export class AgencyUser extends ModelObject{
         if (agency.createUser != self.id ) {
             throw L.ERR.PERMISSION_DENY();
         }
+        let chargePackage;
+        if(qs.AddFifty){
+            chargePackage = 50;
+        }else if(qs.AddTwenty){
+            chargePackage = 20 ;
+        }
+
         //先记录操作日志
         let log = await Models.agencyOperateLog.create({
             agency_userId: this.id,
             agencyId: agency.id,
-            remark:`因【${qs.remark}】为【${company.name}(${company.id})】的流量包到期时间增加了【3】个月`});
+            remark:`因【${qs.remark}】为【${company.name}(${company.id})】充值了【${chargePackage}】流量包到期时间增加了【3】个月`});
         await log.save();
 
         //修改行程流量包

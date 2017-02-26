@@ -24,7 +24,6 @@ export async function ListController($scope , Models) {
         query.page = page || 1;
         query.perPage = perPage || 20;
         let pager = await agency.findCompanies(query);
-        $scope.total = pager.total;
         pager.hasNextPage = function() {
             return pager.total >= page * perPage;
         }
