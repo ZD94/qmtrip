@@ -1,17 +1,20 @@
 .content{
   background: url("ionic/images/background.png") no-repeat;
   background-size:cover;
-  .tripInfo{
+  .packageInfo{
     height:159px;
     background: rgba(255,255,255,0.25);
     border-radius: 2px;
     margin-bottom: 10px;
-    > p{
+    p{
       padding:4px 10px;
       margin-bottom:0px;
       font-size: 14px;
       color: #FFFFFF;
       border-bottom: 0.5px solid rgba(248,248,250,0.25);
+      //border-bottom-width: 0.5px;
+      //border-bottom-style: solid;
+      //border-bottom-color: linear-gradient(rgba(255,0,0,0),rgba(255,0,0,1));
     }
     .remainTripNum{
       font-size:14px;
