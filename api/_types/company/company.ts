@@ -365,11 +365,11 @@ export class Company extends ModelObject{
         let result = this;
         let extraFrozen = params.frozenNum.extraFrozen;
         let limitFrozen = params.frozenNum.limitFrozen;
-        if(this.expiryDate.getTime() - new Date().getTime() > 0){
+        if(this.expiryDate && (this.expiryDate.getTime() - new Date().getTime() > 0) ){
             this.tripPlanFrozenNum = this.tripPlanFrozenNum - limitFrozen;
             this.tripPlanPassNum = this.tripPlanPassNum + limitFrozen;
         }
-        if(this.extraExpiryDate.getTime() - new Date().getTime() > 0){
+        if(this.extraExpiryDate && (this.extraExpiryDate.getTime() - new Date().getTime() > 0)){
             this.extraTripPlanFrozenNum = this.extraTripPlanFrozenNum - extraFrozen;
             this.extraTripPlanNum = this.extraTripPlanNum - extraFrozen;
         }
