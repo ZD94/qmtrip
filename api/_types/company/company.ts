@@ -497,13 +497,16 @@ export class Company extends ModelObject{
             return null;
         }
     }
-    
-    async getRootDepartment(companyId?:string): Promise<Department> {
+
+    @RemoteCall()
+    async getRootDepartment(): Promise<Department> {
+        let self = this;
         var depts = await Models.department.find({where: {companyId: this.id, parentId: null}});
         if(depts && depts.length>0){
             return depts[0];
         }else{
-            return null;
+            let department = Models.department.create({name: self.name, companyId: self.id, parentId: null});
+            return department.save();
         }
     }
 

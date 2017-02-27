@@ -17,9 +17,9 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     let newUrl;
     if(departmentId){
         if($location.path() == '/department/index' ||$location.path() == '/department/'){
-            newUrl = `#/department/index-instead?departmentId=${departmentId}`;
+            newUrl = `#/department/index-instead`;
         }else if($location.path() == '/department/index-instead'){
-            newUrl = `#/department/index?departmentId=${departmentId}`;
+            newUrl = `#/department/index`;
         }else{
             return false;
         }
@@ -35,8 +35,13 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     async function initDepartment(departId?){
         if(departId){
             rootDepartment = await Models.department.get(departId);
-        }else{
+        } else{
             rootDepartment = await company.getRootDepartment();
+        }
+        let departments = [];
+        if (rootDepartment) {
+            rootDepartment['staffNum'] = await rootDepartment.getStaffNum()
+            departments = await rootDepartment.getChildDeptStaffNum();
         }
         $timeout(function(){
             $ionicNavBarDelegate.title(rootDepartment.name);
@@ -44,7 +49,6 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
 
         $scope.viewHeader = rootDepartment.name;
 
-        let departments = await rootDepartment.getChildDeptStaffNum();
         let staffs = await rootDepartment.getStaffs();
         initStaffs(staffs)
         $scope.departments = departments;
@@ -122,13 +126,8 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         initDepartment(departmentId);
     }
     $scope.goChildDept = async function(id){
-        // $ionicNavBarDelegate.title(rootDepartment.name);
         let department = await Models.department.get(id);
-        window.location.href = newUrl + '?departmentId=' + id +'&departName=' + department.name;
-
-        // initDepartment(id)
-        //$location.url('#/department/index?departmentId=' + id +'&departName=' + department.name);
-        // $state.go('ROOT.content',{__path:'department/index',departmentId:id,departName:department.name})
+        window.location.href = `${newUrl}?departmentId=${id}&departName=${department.name}`;
     }
     $scope.showStaff = function(staffId){
         window.location.href = '#/department/staff-info?staffId=' + staffId;
