@@ -4,7 +4,7 @@ import { Company } from 'api/_types/company';
 import {Table, Create, Field, Reference, ResolveRef, RemoteCall, LocalCall} from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import { Types, Values } from 'common/model';
-import {RemoteInfo} from "dgram";
+import _ = require("lodash");
 let API = require("common/api");
 
 @Table(Models.department, "department.")
@@ -74,24 +74,49 @@ export class Department extends ModelObject{
     }
 
     async getChildDeptStaffNum(): Promise<any> {
-        let pagers = await Models.department.find({where : {parentId: this.id, companyId: this.company.id}, order: [['createdAt', 'desc']]});
+        let self = this;
+        let pagers = await Models.department.find({where : {parentId: this.id, companyId: self['companyId']}, order: [['createdAt', 'desc']]});
 
         let childDepartments = [];
         childDepartments.push.apply(childDepartments, pagers);
         while(pagers.hasNextPage()){
             let nextPager = await pagers.nextPage();
             childDepartments.push.apply(childDepartments, nextPager);
-            // pagers = nextPager;
         }
 
-        let departments =  await Promise.all(childDepartments.map(async function(d){
-            let dStaffs = await d.getStaffs();
-            if(dStaffs && dStaffs.length > 0){
-                d["staffNum"] = dStaffs.length;
-            }
+        let ps = childDepartments.map( async (d) => {
+            d['staffNum'] = await d.getStaffNum();
             return d;
-        }))
+        });
+
+        let departments = await Promise.all(ps);
         return departments;
+    }
+
+    //获取当前部门以及所有子部门下的总人数
+    @RemoteCall()
+    async getStaffNum(): Promise<number> {
+        let self = this;
+        let total = 0;
+        let pager = await Models.staffDepartment.find({where: {departmentId: self.id}});
+        total += pager.total;
+        //查找子部门
+        let children = [];
+        let departmentPager = await Models.department.find({ where: {parentId: self.id, companyId: self['companyId']}});
+        do {
+            departmentPager.forEach( (d) => {
+                children.push(d);
+            })
+          if (departmentPager) {
+              departmentPager = await departmentPager.nextPage();
+          }
+        } while(departmentPager && departmentPager.hasNextPage());
+
+        console.log(children)
+        for(var i=0, ii= children.length; i<ii; i++) {
+            total += await children[i].getStaffNum();
+        }
+        return total;
     }
     
     async getOneDepartmentStructure(): Promise<any> {

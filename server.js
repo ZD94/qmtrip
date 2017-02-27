@@ -72,7 +72,7 @@ server.on('init.http', function(server){
             stream.write('connected.<br>\n');
             var redis = require("redis");
             var client = redis.createClient(config.redis.url);
-            client.subscribe('checkcode:msg');
+            client.subscribe('qmtrip:msg');
             client.on("message", function (channel, message) {
                 stream.write(message+"<br/>");
                 // var msg = JSON.parse(message);
