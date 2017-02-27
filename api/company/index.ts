@@ -15,7 +15,7 @@ let schedule = require("node-schedule");
 let _ = require("lodash");
 import {requireParams, clientExport} from "common/api/helper";
 import {Models} from "api/_types";
-import {Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType} from 'api/_types/company';
+import {Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE} from 'api/_types/company';
 import {Staff, EStaffRole} from "api/_types/staff";
 import {PromoCode} from "api/_types/promoCode";
 import {Agency, AgencyUser, EAgencyUserRole} from "api/_types/agency";
@@ -529,7 +529,7 @@ class CompanyModule {
             //每月1号付费企业消耗行程数，冻结数归零
             (async ()=> {
                 let companies = [];
-                let pager = await Models.company.find({where : {tripPlanPassNum : {$gt: 0}, expiryDate : {$gt: moment().format('YYYY-MM-DD HH:mm:ss')}, type: ECompanyType.PAYED}});
+                let pager = await Models.company.find({where : {$or: [{tripPlanPassNum : {$gt: 0}}, {tripPlanFrozenNum : {$gt: 0}}], expiryDate : {$gt: moment().format('YYYY-MM-DD HH:mm:ss')}, type: ECompanyType.PAYED}});
                 pager.forEach((company) => {
                     companies.push(company);
                 });
@@ -541,9 +541,17 @@ class CompanyModule {
                     })
                 }
                 await Promise.all(companies.map(async (co) => {
-                    co["tripPlanPassNum"] = 0;
-                    co["tripPlanFrozenNum"] = 0;
+                    let num = co.tripPlanNumLimit - co.tripPlanPassNum;
+                    co.tripPlanPassNum = 0;
+                    co.tripPlanFrozenNum = 0;
                     await co.save();
+
+                    if(num > 0){
+                        let log1 = TripPlanNumChange.create({companyId: co.id, type:NUM_CHANGE_TYPE.SYSTEM_REDUCE, number:0-num, remark:"上月套餐余额及冻结余额过期", content:"套餐包余额过期"});
+                        await log1.save();
+                    }
+                    let log2 = TripPlanNumChange.create({companyId: co.id, type:NUM_CHANGE_TYPE.SYSTEM_ADD, number:co.tripPlanNumLimit, remark:"本月套餐新增行程", content:"本月套餐新增行程"});
+                    await log2.save();
                 }))
             })()
                 .catch( (err) => {
@@ -636,12 +644,52 @@ class CompanyModule {
                     })
                 }
                 await Promise.all(companies.map(async (co) => {
+                    let num = co.tripPlanNumLimit - co.tripPlanPassNum - co.tripPlanFrozenNum;
                     co.tripPlanNumLimit = 0;
                     await co.save();
+                    if(num > 0){
+                        let log = TripPlanNumChange.create({companyId: co.id, type:NUM_CHANGE_TYPE.SYSTEM_REDUCE, number:0-num, remark:"企业服务到期套餐内行程数置为0", content:"套餐包余额过期"});
+                        await log.save();
+                    }
                 }))
             })()
                 .catch( (err) => {
                     logger.error(`执行任务${taskId3}错误:${err.stack}`);
+                })
+        });
+
+        let taskId4 = "extraExpiryDate";
+        scheduler('0 0 * * * *', taskId4, function() {
+            //每小时检查一次增量包是否过期
+            (async ()=> {
+                let companies = [];
+                let pager = await Models.company.find({where : {extraExpiryDate : {$lt: moment().format('YYYY-MM-DD HH:mm:ss')}, extraTripPlanNum: {$gt: 0}}});
+                pager.forEach((company) => {
+                    companies.push(company);
+                });
+
+                while(pager && pager.hasNextPage()) {
+                    pager = await pager.nextPage();
+                    pager.forEach((company) => {
+                        companies.push(company);
+                    })
+                }
+                await Promise.all(companies.map(async (co) => {
+                    if(co.extraTripPlanNum){
+                        let num = co.extraTripPlanNum;
+                        co.extraTripPlanNum = 0;
+                        co.extraTripPlanFrozenNum = 0;
+                        await co.save();
+                        if(num > 0){
+                            let log = TripPlanNumChange.create({companyId: co.id, type:NUM_CHANGE_TYPE.SYSTEM_REDUCE, number:0-num, remark:"增量包余额过期", content:"增量包余额过期"});
+                            await log.save();
+                        }
+                    }
+                    
+                }))
+            })()
+                .catch( (err) => {
+                    logger.error(`执行任务${taskId4}错误:${err.stack}`);
                 })
         });
     }

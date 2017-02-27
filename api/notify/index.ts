@@ -96,12 +96,6 @@ class NotifyTemplate{
             return;
         let content = this.sms(data);
 
-        /*redisClient.simplePublish("checkcode:msg", content)
-            .catch((err)=>{
-                logger.error('simplePublish error:', err);
-            });*/
-        if(!config.notify.sendSms)
-            return;
         await API.sms.sendMsg({
             content: content,
             mobile: to.mobile
