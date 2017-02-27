@@ -33,14 +33,18 @@
             </div>
             <div style="clear:both"></div>
             <div class="telFlex">
-                <div class="btn" ng-if="company.type == ECompanyType.PAYED">
-                    <p>联系电话：010-86464518-802</p>
-                </div>
-                <div class="btn" ng-if="company.type == ECompanyType.TRYING">
-                   <div class="upBtn">
-                       <p>立即升级</p>
-                   </div>
-                </div>
+                <a href="">
+                    <div class="btn" ng-if="company.type == ECompanyType.PAYED">
+                        <p>联系电话：010-86464518-802</p>
+                    </div>
+                </a>
+                <a href="">
+                    <div class="btn" ng-if="company.type == ECompanyType.TRYING">
+                        <div class="upBtn">
+                            <p>立即升级</p>
+                        </div>
+                    </div>
+                </a>
                 <div class="contact">
                     <p>请联系客服进行咨询</p>
                 </div>

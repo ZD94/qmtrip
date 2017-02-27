@@ -226,14 +226,17 @@ export class AgencyUser extends ModelObject{
         await log.save();
 
         //修改行程流量包
+        let newExtraTripPlanNum;
         if(qs.AddTwenty){
-            company.extraTripPlanNum = company.extraTripPlanNum + 20;
+            newExtraTripPlanNum = company.extraTripPlanNum + 20;
         }
         if(qs.AddFifty){
-            company.extraTripPlanNum = company.extraTripPlanNum + 50;
+            newExtraTripPlanNum = company.extraTripPlanNum + 50;
         }
-        let ret =  new Date(moment(company.expiryDate).add(3,'months').valueOf());
-        company.expiryDate = ret;
+        company.extraTripPlanNum = newExtraTripPlanNum ;
+        let newExtraExpiryDate =  new Date(moment().add(3,'months').valueOf());
+        company.extraExpiryDate = newExtraExpiryDate;
+        console.info(company.extraExpiryDate);
         company.save();
         return company;
     }

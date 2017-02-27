@@ -27,6 +27,7 @@ export async function TripNumController($scope){
         return trip;
     })
     let tripPlanNumInfo = await Promise.all(pager);
+    console.info('行程列表',tripPlanNumInfo);
     $scope.tripPlanNumInfo = tripPlanNumInfo;
     $scope.NUM_CHANGE_TYPE = NUM_CHANGE_TYPE;
 }

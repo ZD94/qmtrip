@@ -50,7 +50,9 @@ export async function ListController($scope , Models) {
             if (!company.coinAccount) {
                 company['balance'] = 0;
             } else {
-                let balance = company.coinAccount.balance;
+                // let balance = company.coinAccount.balance;
+                let balance = company.tripPlanNumBalance;
+
                 company['balance'] = balance;
             }
             //是否为试用企业
