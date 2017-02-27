@@ -14,6 +14,7 @@ import * as wechat from './wechat';
 import * as messagePush from './messagePush';
 import * as qrcode from './qrcode';
 import * as byTest from './by-test';
+import {condition, conditionDecorator} from "../_decorator";
 
 var uuid = require("node-uuid");
 var C = require("config");
@@ -890,14 +891,18 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(["id"])
+    @conditionDecorator([
+        {if: condition.isSameCompany("0.id")},
+        {if: condition.isStaffsAgency("0.id")}
+    ])
     static async getAccount(params) {
+        let staff = await Staff.getCurrent();
         var id = params.id;
         var options: any = {};
-        // options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt", "loginFailTimes", "lastLoginAt", "lastLoginIp", "activeToken", "pwdToken", "oldQrcodeToken", "qrcodeToken", "type", "isFirstLogin", "isValidateEmail", "isValidateMobile"];
         var acc = await Models.account.get(id, options);
-        // if(acc && acc.pwd){
-        //     delete acc.pwd;
-        // }
+        if (staff.id !== id && acc) {
+            delete acc.pwd;
+        }
         return acc;
     }
 

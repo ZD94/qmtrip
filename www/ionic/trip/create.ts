@@ -39,7 +39,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
     };
     $scope.currentStaff = await Staff.getCurrent();
     let currentCompany = $scope.currentStaff.company;
-    console.info(currentCompany);
     $scope.currentTp = await $scope.currentStaff.getTravelPolicy();
     if($scope.currentTp){
         $scope.currentTpSts = await $scope.currentTp.getSubsidyTemplates();
@@ -351,12 +350,19 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             });
         }, 1000);
 
+        let calTimer;
         try {
+            calTimer = setTimeout( () => {
+                alert('系统错误，请稍后重试');
+                $loading.end();
+            }, 60 * 1000);
+
             budget = await API.travelBudget.getTravelPolicyBudget(params);
             if (isShowDone) {
                 cb();
             }
         } catch(err) {
+            clearTimeout(calTimer);
             clearInterval(timer);
             $loading.end();
             alert(err.msg || err);
@@ -367,6 +373,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             console.info('开始时间:', begin, '结束时间:', end, '耗时:', end - begin);
         }
         function cb() {
+            clearTimeout(calTimer);
             $loading.end();
             window.location.href = "#/trip/budget?id="+budget;
         }
