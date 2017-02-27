@@ -14,10 +14,10 @@
             </a>
 
         </div>
-        <ion-refresher
-                pulling-text="下拉刷新",
-                on-refresh="pagersDate.doRefresh()">
-        </ion-refresher>
+        <!--<ion-refresher-->
+                <!--pulling-text="下拉刷新",-->
+                <!--on-refresh="pagersDate.doRefresh()">-->
+        <!--</ion-refresher>-->
         <ion-list class="list coin-list">
             <div class="item" ng-repeat="item in tripPlanNumInfo track by $index" ng-click="detail(item)">
                 <div ng-class="{
@@ -36,9 +36,7 @@
                         <p>{{item.staff}}</p>
                         <p>{{item.content}}</p>
                     </div>
-
                 </div>
-
             </div>
         </ion-list>
 
