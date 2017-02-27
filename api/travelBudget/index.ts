@@ -457,7 +457,6 @@ export default class ApiTravelBudget {
 
         params['expectTrainCabins'] = trainCabins;
         params['expectFlightCabins'] = cabins;
-        console.log("PARAMS========>", params)
         let defaults: any[] = [];
         if (isAbroad) {   //国际
             defaults = loadDefaultPrefer({local: params}, DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_TICKET);
@@ -474,7 +473,7 @@ export default class ApiTravelBudget {
             if (preferConfig && preferConfig.traffic) {
                 corpHomeTrafficPrefer = preferConfig.traffic;
             }
-            let compiled = _.template(JSON.stringify(preferConfig.traffic), { 'imports': { 'moment': moment } });
+            let compiled = _.template(JSON.stringify(corpHomeTrafficPrefer), { 'imports': { 'moment': moment } });
             defaults = mergePrefers(defaults, JSON.parse(compiled({local: params})));
             qs.prefers = defaults;
         }
