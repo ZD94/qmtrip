@@ -14,6 +14,9 @@ export async function AddFlowPackageController($scope,$stateParams,Models){
     let companyId = $stateParams.companyId;
     $scope.init=async function(){
         let company=await Models.company.get(companyId);
+        if(!company.extraTripPlanNum || !company.extraExpiryDate || (company.extraExpiryDate.getTime() - new Date().getTime()) < 0){
+           company.extraTripPlanNum = 0;
+        }
         $scope.company=company;
         $scope.chargeFlowPackage=async function(){
             if(!$scope.qs.AddTwenty && !$scope.qs.AddFifty){

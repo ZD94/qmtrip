@@ -6,7 +6,7 @@ import {EStaffRoleNames, EStaffRole} from "api/_types/staff/staff";
 import {Pager} from "common/model/pager";
 var msgbox = require('msgbox');
 
-export async function StaffInfoController($scope, Models, $stateParams, $ionicPopup, $ionicHistory){
+export async function StaffInfoController($scope, Models, $stateParams, $ionicPopup, $ionicHistory, $window){
     require('./new-staff.scss');
     API.require("auth");
     await API.onload();
@@ -38,11 +38,12 @@ export async function StaffInfoController($scope, Models, $stateParams, $ionicPo
                     onTap: async function (e) {
                         try{
                             await $scope.staff.destroy();
-                            $ionicHistory.nextViewOptions({
+                            /*$ionicHistory.nextViewOptions({
                                 disableBack: true,
                                 expire: 300
-                            });
-                            window.location.href = `#/department/index`;
+                            });*/
+                            $window.history.go(-1);
+                            //window.location.href = `#/department/index`;
                         }catch(err){
                             msgbox.log(err.msg);
                         }

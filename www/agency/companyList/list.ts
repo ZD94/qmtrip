@@ -51,6 +51,9 @@ export async function ListController($scope , Models) {
                 company['balance'] = 0;
             } else {
                 let balance = company.coinAccount.balance;
+                //行程点数剩余
+                // let balance = company.tripPlanNumBalance;
+
                 company['balance'] = balance;
             }
             //是否为试用企业
