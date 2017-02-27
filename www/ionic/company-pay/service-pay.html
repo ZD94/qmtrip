@@ -4,7 +4,7 @@
               <div class="serviceInfo">
                   <p class="title">服务到期时间</p>
                   <p class="expireDate">{{company.expiryDate | date:"yyyy-MM-dd"}}</p>
-                  <div class="package" ng-if="staff.roleId == EStaffRole.ADMIN">
+                  <div class="package" ng-if="staff.roleId == EStaffRole.ADMIN || staff.roleId == EStaffRole.OWNER ">
                       <p>当前套餐</p>
                       <p>2999元/月</p>
                   </div>
@@ -12,20 +12,20 @@
                         服务已到期
                   </div>
               </div>
-              <div class="month-tit" ng-if="staff.roleId == EStaffRole.ADMIN">
+              <div class="month-tit" ng-if="staff.roleId == EStaffRole.ADMIN || staff.roleId == EStaffRole.OWNER">
                   月行程套餐
               </div>
                <div class="month-tit" ng-if="staff.roleId == EStaffRole.COMMON">
                    无法登录
                </div>
-              <div class="price" ng-if="staff.roleId == EStaffRole.ADMIN">
+              <div class="price" ng-if="staff.roleId == EStaffRole.ADMIN || staff.roleId == EStaffRole.OWNER ">
                   (价格：月费)
               </div>
                <div class="notice" ng-if="staff.roleId == EStaffRole.COMMON">
                    请通知管理员进行续费
                </div>
           </div>
-           <div class="bottom" ng-if="staff.roleId == EStaffRole.ADMIN">
+           <div class="bottom" ng-if="staff.roleId == EStaffRole.ADMIN || staff.roleId == EStaffRole.OWNER">
               <div class="priceFlex">
                   <div class="priceKinds">
                       <div>

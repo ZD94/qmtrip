@@ -10,4 +10,5 @@ export async function ServicePayController($scope){
     $scope.company = staff.company;
     $scope.EStaffRole = EStaffRole;
 
+
 }
