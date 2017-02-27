@@ -126,45 +126,25 @@ export default class SupplierCtripCT extends SupplierWebRobot{
 
     async getJsCode(options): Promise<string>{
         var str = `
-                    alert('go');
-                    alert(${options.key});
-                    var hasEnter = sessionStorage.getItem("hasEnter");
-                    var count = sessionStorage.getItem("count") / 1;
-                    alert(111 , count);
-                    if(count){
-                        count++;
-                        sessionStorage.setItem("count" , count);
-                    }else{
-                        sessionStorage.setItem("count" , 1);
-                        count = 1;
-                    }
-                    if(count > 20){
-                        return;
+                    var first = localStorage.getItem("first");
+                    if(first != "no"){
+                        localStorage.setItem("first" , "no");
                     }
 
-                    alert(222 , count);
+                    var hasEnter = sessionStorage.getItem("hasEnter");
 
                     localStorage.setItem(${options.key}, ${options.json});
-                    if(window.location.href == "http://ct.ctrip.com/m/"&&!hasEnter){
+                    if(window.location.href == "http://ct.ctrip.com/m/"&&!hasEnter && first == "no"){
                         var login = document.getElementById("login");
-                        alert('go1');
-                        alert(${options.url});
                         if(login){
-                            document.getElementById("login").style.background = "yellow";
                         }else{
                             window.location.href = ${options.url};
                         }
-                    }else if(window.location.href == ${options.url}&&!hasEnter){
-                        alert('go2');
+                    }else if(window.location.href == ${options.url}&&!hasEnter && first == "no"){
                         var search = document.getElementById("btn_search");
                         search.click();
                         sessionStorage.setItem("hasEnter","true");
                     }
-                    // if(window.location.href == ${options.url}&&!hasEnter){
-                    //     var search = document.getElementById("btn_search");
-                    //     search.click();
-                    //     sessionStorage.setItem("hasEnter","true");
-                    // }
                   `;
         return str;
     }
