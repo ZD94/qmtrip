@@ -79,7 +79,6 @@
   },
   "score_ratio": 1,
   "notify": {
-    "sendSms": true,
     "sendEmail": true,
     "sendWechat": true,
     "templates": {

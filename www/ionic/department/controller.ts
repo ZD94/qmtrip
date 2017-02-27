@@ -21,7 +21,6 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         }else if($location.path() == '/department/index-instead'){
             newUrl = `#/department/index?departmentId=${departmentId}`;
         }else{
-            console.info('location????', $location.path());
             return false;
         }
     }else{
@@ -30,7 +29,6 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         }else if($location.path() == '/department/index-instead'){
             newUrl = '#/department/index';
         }else{
-            console.info('location????', $location.path());
             return false;
         }
     }
@@ -54,7 +52,6 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     function initStaffs(staffs){
         $scope.staffs = staffs.map(function(staff){
             let hours = moment().diff(moment(staff.createdAt),'hours');
-            console.info('status',staff.status);
             if(staff.status == 1 && hours < 24){
                 staff['newStaff'] = true;
             }else if(!status || staff.status == 0){
