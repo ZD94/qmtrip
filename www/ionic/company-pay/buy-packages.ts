@@ -8,5 +8,6 @@ export async function BuyPackagesController($scope){
     var staff = await Staff.getCurrent();
     $scope.staff = staff;
     $scope.company = staff.company;
+    $scope.company.type =1;
     $scope.ECompanyType = ECompanyType;
 }
