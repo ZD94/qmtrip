@@ -132,7 +132,6 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                     }
 
                     var hasEnter = sessionStorage.getItem("hasEnter");
-
                     localStorage.setItem(${options.key}, ${options.json});
                     if(window.location.href == "http://ct.ctrip.com/m/"&&!hasEnter && first == "no"){
                         var login = document.getElementById("login");

@@ -7,12 +7,12 @@
             <div class="company_search">
                 <h3>公司列表</h3>
                创建者姓名：<input type="text" placeholder="输入创建者姓名" ng-model="query.userName">
-               关键字：<input type="text" placeholder="输入关键词" ng-model="query.keyword">
+               公司名称：<input type="text" placeholder="输入公司名称" ng-model="query.keyword">
                 手机号:<input type="text" placeholder="输入手机号" ng-model="query.mobile">
                 <br>
                 注册时间段: <input type="date"  ng-model="query.regDateStart">
                 --<input type="date" ng-model="query.regDateEnd">
-                剩余有效期天数:
+                小于剩余有效期天数:
                 <input type="text" ng-model="query.days" placeholder="输入有效期天数">
                 <button ng-click="doSearch()">搜索</button>
             </div>
@@ -32,8 +32,8 @@
                 <td colspan="3" style="text-align: center">操作</td>
             </tr>
             <tr ng-repeat="company in companylist track by $index">
-                <td>{{$index+1}}</td>
-                <td>{{company.name}}</td>
+                <td> {{$index+ 1 + fromIdx}}</td>
+                <td>{{company.name}} <span ng-if="company.trying">({{company.trying}})</span></td>
                 <td>{{company.createUserObj.name}}</td>
                 <td>{{company.createUserObj.mobile}}</td>
                 <td>{{company.createdAt | date:"yyyy-MM-dd HH:mm:ss"}}</td>

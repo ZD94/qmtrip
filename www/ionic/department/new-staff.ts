@@ -16,6 +16,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     let preRole;
     let staffId = $scope.staffId = $stateParams.staffId;
     let current = await Staff.getCurrent();
+    let currentRole = current.roleId;
     let company = current.company;
     let travelpolicylist = await company.getTravelPolicies();
     let department = await company.getDefaultDepartment();
@@ -23,6 +24,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     $scope.addedArray = []; //用于存放提交时的部门id
     if(staffId){
         staff = await Models.staff.get(staffId);
+        Models.resetOnPageChange(staff);
         preRole = staff.roleId;
         let currentPolicy = await staff.getTravelPolicy();
         $scope.staffPolicyName = currentPolicy.name;
@@ -71,13 +73,15 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             }
         }else{
             if(v.role != EStaffRole.OWNER && v.role != EStaffRole.ADMIN){
-                return v;
+                if(v.role != EStaffRole.OWNER){
+                    return v;
+                }
             }
         }
     })
     //end
     $scope.chooseRole =function(){
-        if(current.roleId != EStaffRole.OWNER){
+        if(currentRole != EStaffRole.OWNER){
             msgbox.log('你不是创建者，无法修改角色');
             return false;
         }
@@ -111,7 +115,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                 return true;
             },
             buttonClicked: function(index) {
-                $scope.staff.roleId = index;
+                $scope.staff.roleId = roles[index].role;
                 return true;
             }
         })

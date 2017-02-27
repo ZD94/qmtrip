@@ -18,8 +18,10 @@ export async function ChargeCoinController($scope,$stateParams,Models){
                 $scope.coins = '';
                 return;
             }
+            if(!$scope.remark){
+                $scope.remark = '';
+            }
             let result = await agencyUser.addCompanyCoin(companyId, $scope.coins,$scope.remark);
-            console.info(result);
             msgbox.alert("充值成功");
             $scope.coins = '';
             $scope.remark='';

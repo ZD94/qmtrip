@@ -67,19 +67,20 @@ class StaffModule{
         if(!staff["travelPolicyId"]){
             staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
         }
-        let result = await staff.save();
+        staff = await staff.save();
 
         let account = await Models.account.get(staff.id);
 
         if(!account.coinAccount){
             //为员工设置资金账户
             let ca = CoinAccount.create();
-            await ca.save();
+            ca = await ca.save();
             staff["coinAccountId"] = ca.id;
-            await staff.save();
+            staff = await staff.save();
         }
         //发送短信通知
         let values  = {
+            name: account.mobile,
             pwd: pwd,
             url:'http:' + config.host
         }
@@ -95,8 +96,7 @@ class StaffModule{
         }
         staff.isValidateMobile = true;
         staff = await staff.save();
-
-        return result;
+        return staff;
     }
 
     /**

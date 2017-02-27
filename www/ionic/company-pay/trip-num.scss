@@ -1,0 +1,110 @@
+.content{
+  background: url("ionic/images/background.png") no-repeat;
+  background-size:cover;
+  .packageInfo{
+    height:159px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 2px;
+    margin-bottom: 10px;
+    p{
+      padding:4px 10px;
+      margin-bottom:0px;
+      font-size: 14px;
+      color: #FFFFFF;
+      border-bottom: 0.5px solid rgba(248,248,250,0.25);
+      //border-bottom-width: 0.5px;
+      //border-bottom-style: solid;
+      //border-bottom-color: linear-gradient(rgba(255,0,0,0),rgba(255,0,0,1));
+    }
+    .remainTripNum{
+      font-size:14px;
+      color: #FFFFFF;
+      > p{
+        text-align: center;
+        padding:14px 0px 0px;
+        span{
+          font-size:36px;
+        }
+      }
+    }
+    .btn{
+      width:120px;
+      height: 30px;
+      margin:8px auto;
+      background: #28A7E1;
+      border-radius: 3px;
+      color:#FFF;
+      padding:4px 20px;
+      font-size:16px;
+      line-height:21px;
+    }
+  }
+  .coin-list{
+    .item{
+      padding-left:10px;
+      overflow: hidden;
+      & > div{
+        display: flex;
+      }
+      span{
+        flex:none;
+        height:40px;
+        line-height:40px;
+        &.item-date{
+          color:#9b9b9b;
+        }
+        &.item-icon{
+          width:40px;
+          background:#28A7E1;
+          color:#FFF;
+          text-align: center;
+          border-radius:50%;
+          margin:0 10px;
+        }
+        &.item-num{
+          width:40px;
+          margin-left:10px;
+          font-size:18px;
+        }
+      }
+    .item-info{
+      flex:1;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      text-align:right;
+      p{
+          font-size:14px;
+          color: #030303;
+          letter-spacing: -0.34px;
+        &:first-child{
+          font-size:12px;
+          color: #858585;
+          letter-spacing: -0.29px;
+         }
+        }
+      }
+      .list-blue{
+        .item-icon{
+          background: #28A7E1;
+        }
+      }
+      .list-orange{
+        .item-icon{
+          background: #F6A623;
+        }
+      }
+      .list-system-add{
+        .item-icon{
+          background:url("ionic/images/logo-whiteback.png") no-repeat;
+        }
+      }
+      .list-system-reduce{
+        .item-icon{
+          background:url("ionic/images/logo-whiteback.png") no-repeat;
+        }
+      }
+
+    }
+  }
+
+}

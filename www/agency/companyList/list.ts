@@ -3,8 +3,9 @@
  */
 import moment = require("moment");
 import {AgencyUser} from "api/_types/agency/agency-user";
+import {ECompanyType} from "api/_types/company/company";
 
-export async function ListController($scope, Models) {
+export async function ListController($scope , Models) {
     $scope.query = {
         userName: '',
         mobile: '',
@@ -52,6 +53,10 @@ export async function ListController($scope, Models) {
                 let balance = company.coinAccount.balance;
                 company['balance'] = balance;
             }
+            //是否为试用企业
+            if(company.type == ECompanyType.TRYING){
+                company["trying"] = '试用';
+            }
             return company;
         });
         $scope.companylist =await Promise.all(ps);
@@ -65,12 +70,14 @@ export async function ListController($scope, Models) {
     }
 
     $scope.nextPage = async function() {
+        $scope.fromIdx = $scope.page * $scope.perPage ;
         $scope.page += 1;
         return $scope.getCompany($scope.page, $scope.perPage);
     }
 
     $scope.prevPage = async function() {
         $scope.page -= 1;
+        $scope.fromIdx = ( $scope.page - 1 ) * $scope.perPage ;
         return $scope.getCompany($scope.page, $scope.perPage);
     }
 

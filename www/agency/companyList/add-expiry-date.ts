@@ -32,6 +32,9 @@ export async function AddExpiryDateController($scope,$stateParams,Models){
                 msgbox.alert('请输入合法月份!');
                 return;
             }
+            if(!$scope.qs.remark){
+                $scope.qs.remark = '';
+            }
             let res = await agencyUser.addExpiryDate(companyId , $scope.qs);
             //如果新的到期时间早于当前时间
             /*
