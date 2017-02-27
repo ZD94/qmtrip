@@ -1542,26 +1542,14 @@ class TripPlanModule {
                 approve.status = QMEApproveStatus.PASS;
                 approve = await approve.save();
 
+                let content = approve.deptCity+"-"+approve.arrivalCity;
+                let frozenNum = JSON.parse(approve.query).frozenNum;
                 if(approve.createdAt.getMonth() == new Date().getMonth() && !approve.isSpecialApprove){
-                    let content = approve.deptCity+"-"+approve.arrivalCity;
-                    if((approveCompany.tripPlanNumLimit - approveCompany.tripPlanPassNum) > 0){
-                        //套餐包还未用完
-                        if(number > (approveCompany.tripPlanNumLimit - approveCompany.tripPlanPassNum)){
-                            //优先扣除套餐内的 再扣加油包的
-                            let reduceExtraNum = number - (approveCompany.tripPlanNumLimit - approveCompany.tripPlanPassNum);
-                            await approveCompany.reduceExtraTripPlanNum({accountId: approve.account.id, tripPlanId: approve.id,
-                                number: reduceExtraNum, remark: "自动审批通过消耗加油包的行程点数", content: content, isShowToUser: false});
-                        }
-                    }else{
-                        //套餐包已用完 需要全部从加油包扣除
-                        await approveCompany.reduceExtraTripPlanNum({accountId: approve.account.id, tripPlanId: approve.id,
-                            number: number, remark: "自动审批通过消耗加油包的行程点数", content: content, isShowToUser: false});
-                    }
-
-                    await approveCompany.addTripPlanPassNum({accountId: approve.account.id, tripPlanId: approve.id,
-                        number: number, remark: "自动审批通过增加通过的行程点数", content: content, isShowToUser: false});
-                    await approveCompany.freeFrozenTripPlanNum({accountId: approve.account.id, tripPlanId: approve.id,
-                        number: number, remark: "自动审批通过释放冻结行程点数", content: content, isShowToUser: false});
+                    await approveCompany.approvePassReduceTripPlanNum({accountId: approve.account.id, tripPlanId: approve.id,
+                        remark: "自动审批通过消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
+                }else{
+                    await approveCompany.approvePassReduceBeforeNum({accountId: approve.account.id, tripPlanId: approve.id,
+                        remark: "自动审批通过上月申请消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
                 }
 
                 if(approve.approveUser && approve.approveUser.id && /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(approve.approveUser.id)) {
