@@ -1,3 +1,16 @@
+image: docker.l.jingli365.com/jingli-build
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+cache:
+  paths:
+    - node_modules/
+
+before_script:
+  - ln -s /opt/app/node_modules .
+  - npm --registry https://npm.l.jingli365.com install
+
 build:
-  - VERNAME=`git rev-parse --abbrev-ref HEAD 2> /dev/null`
-  - gulp tarball -n $VERNAME
+  script:
+  - gulp tarball -n $CI_BUILD_REF_NAME
