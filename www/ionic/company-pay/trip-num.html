@@ -1,11 +1,11 @@
 <ion-view title="行程点数">
     <ion-content padding="true" class="has-header content">
         <div class="packageInfo">
-                <p>月套餐行程余额：{{company.extraRemain || 0}} ({{company.expiryDate | date:"yyyy-MM-dd" }}到期)</p>
-                <p>行程增量包余额：{{company.extraPackage || 0}}
+                <p>月套餐行程余额：{{company.tripPlanNumInBase || 0}} ({{company.expiryDate | date:"yyyy-MM-dd" }}到期)</p>
+                <p>行程增量包余额：{{company.tripPlanNumInPack || 0}}
                     ({{company.extraExpiryDate | date:"yyyy-MM-dd"}}到期)</p>
             <div class="remainTripNum">
-                <p>行程点数剩余 <span> {{company.extraPackage + company.extraRemain}} </span> 点</p>
+                <p>行程点数剩余 <span> {{company.tripPlanNumBalance}} </span> 点</p>
             </div>
             <a ng-href="#/company-pay/buy-packages">
                 <div class="btn" >
