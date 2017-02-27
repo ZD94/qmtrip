@@ -3,7 +3,7 @@
        <div class="top">
            <div class="serviceInfo">
                <p class="title">行程余额 (点)</p>
-               <p class="expireDate">{{company.extraTripPlanNum}}</p>
+               <p class="expireDate">{{company.tripPlanNumBalance}}</p>
            </div>
            <div class="month-tit">
                充值流量包
@@ -37,7 +37,9 @@
                     <p>联系电话：010-86464518-802</p>
                 </div>
                 <div class="btn" ng-if="company.type == ECompanyType.TRYING">
-                    <p>立即升级</p>
+                   <div class="upBtn">
+                       <p>立即升级</p>
+                   </div>
                 </div>
                 <div class="contact">
                     <p>请联系客服进行咨询</p>

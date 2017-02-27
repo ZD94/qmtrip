@@ -87,6 +87,7 @@ export class AgencyUser extends ModelObject{
         //注册时间段
         if (options.regDateStart && options.regDateEnd) {
             where+=  ` C.created_at > '${moment(options.regDateStart).format('YYYY-MM-DD HH:mm:ss') }' AND  C.created_at < ' ${moment(options.regDateEnd).format('YYYY-MM-DD HH:mm:ss') } ' AND `;
+            console.info(where);
         }
         //到期时间
         if(options.days){

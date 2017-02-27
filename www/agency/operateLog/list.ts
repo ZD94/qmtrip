@@ -18,7 +18,6 @@ export async function ListController($scope,Models){
     $scope.init();
     $scope.nextPage = async function() {
         let pager = await $scope.pager.nextPage();
-        console.info(pager);
         $scope.fromIdx = pager.offset;
         $scope.pager = pager;
         $scope.logList = await addAgencyUser($scope.pager);
@@ -26,7 +25,6 @@ export async function ListController($scope,Models){
 
     $scope.prevPage = async function() {
         let pager = await $scope.pager.prevPage();
-        console.info(pager);
         $scope.fromIdx = pager.offset ;
         $scope.pager = pager;
         $scope.logList = await addAgencyUser($scope.pager);
