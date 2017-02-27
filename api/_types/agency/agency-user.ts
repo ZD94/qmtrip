@@ -236,9 +236,7 @@ export class AgencyUser extends ModelObject{
         company.extraTripPlanNum = newExtraTripPlanNum ;
         let newExtraExpiryDate =  new Date(moment().add(3,'months').valueOf());
         company.extraExpiryDate = newExtraExpiryDate;
-        console.info(company.extraExpiryDate);
-        company.save();
-        return company;
+        return company.save();
     }
 
     async getCompanyAllStaffs(params: any): Promise<any> {
