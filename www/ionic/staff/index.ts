@@ -1,4 +1,5 @@
-import { Staff, EStaffRole } from 'api/_types/staff/staff';
+import { Staff, EStaffRole, EAddWay } from 'api/_types/staff/staff';
+import { ACCOUNT_STATUS } from 'api/_types/auth';
 import { EPlanStatus, QMEApproveStatus ,EAuditStatus } from 'api/_types/tripPlan';
 import {getImageUrl} from '../controller';
 var config = require('config');
@@ -27,8 +28,8 @@ export default async function IndexController($scope, Models, inAppBrowser) {
             window.location.href = '#/guide/company-guide';
         }
     }else{
-        if(staff.isFirstLogin){
-            window.location.href = '#/guild/change-pwd'
+        if(staff.status == ACCOUNT_STATUS.NOT_ACTIVE && (staff.addWay == EAddWay.BATCH_IMPORT || staff.addWay == EAddWay.ADMIN_ADD)){
+            window.location.href = '#/staff/change-pwd'
         }
     }
     var tripBudget = await API.tripPlan.statisticTripBudget({isStaff: true});
