@@ -2,6 +2,8 @@ import validator = require('validator');
 import moment = require('moment');
 var msgbox = require('msgbox');
 var xregexp = require('xregexp');
+var utils  = require("www/util");
+let CheckUsername = utils.CheckUsername;
 
 export async function InvitedStaffTwoController ($scope, $stateParams){
     let companyId = $stateParams.companyId;
@@ -98,17 +100,22 @@ export async function InvitedStaffTwoController ($scope, $stateParams){
             msgbox.log("姓名不能为空");
             return;
         }
-        var re = xregexp('^\\pL+$');
-        if (!re.test($scope.form.name)){
-            msgbox.log("姓名不能包含特殊字符");
+        if(!CheckUsername($scope.form.name)){
+            msgbox.log('姓名格式不符合要求，请重新输入');
             return;
         }
-        var namePattern = /[\u4e00-\u9fa5]+/g;
-        var hasChinese = namePattern.test($scope.form.name);
-        if(($scope.form.name).length > 5 && hasChinese){
-            msgbox.log("姓名不可超过五个字符");
-            return;
-        }
+
+        // var re = xregexp('^\\pL+$');
+        // if (!re.test($scope.form.name)){
+        //     msgbox.log("姓名不能包含特殊字符");
+        //     return;
+        // }
+        // var namePattern = /[\u4e00-\u9fa5]+/g;
+        // var hasChinese = namePattern.test($scope.form.name);
+        // if(($scope.form.name).length > 5 && hasChinese){
+        //     msgbox.log("姓名不可超过五个字符");
+        //     return;
+        // }
         var pwdPattern = /^[0-9a-zA-Z]*$/g;
         var newPwd = $scope.form.pwd;
         if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >20){
