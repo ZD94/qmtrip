@@ -90,7 +90,7 @@ gulplib.dist(function () {
         gulp.src(gulplib.public_dir + '/**/*', {base:'.'})
             .pipe(gulp_filter(filters))
             .pipe(through2.obj(function(file, enc, cb){
-                console.error(file.path);
+                //console.error(file.path);
                 cb(null, file);
             }))
             .pipe(gulp.dest('dist'))
@@ -106,7 +106,7 @@ gulplib.dist(function () {
                         gulp.src('tmp/tsreq/' + dir + '/**/*', {base:'tmp/tsreq'}))
             .pipe(gulp_filter(filters))
             .pipe(through2.obj(function(file, enc, cb){
-                console.error(file.path);
+                //console.error(file.path);
                 cb(null, file);
             }))
             .pipe(gulp.dest('dist'))
