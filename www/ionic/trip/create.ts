@@ -274,6 +274,10 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
     })
     $scope.nextStep = async function() {
         let trip = $scope.trip;
+
+        console.log(trip);
+
+        alert(1234);
         let number = 0;
         if(trip.traffic){
             number = number + 1;
