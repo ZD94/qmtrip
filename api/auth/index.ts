@@ -360,6 +360,7 @@ export default class ApiAuth {
                 account.status = ACCOUNT_STATUS.ACTIVE;
             }
             account.isValidateMobile = true;
+            account.isNeedChangePwd = false;
             account = await account.save()
         } else {
             throw L.ERR.CODE_ERROR();

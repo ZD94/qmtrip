@@ -27,10 +27,6 @@ export default async function IndexController($scope, Models, inAppBrowser) {
         if(isFirstLogin.length == 0){
             window.location.href = '#/guide/company-guide';
         }
-    }else{
-        if(staff.status == ACCOUNT_STATUS.NOT_ACTIVE && (staff.addWay == EAddWay.BATCH_IMPORT || staff.addWay == EAddWay.ADMIN_ADD)){
-            window.location.href = '#/staff/change-pwd'
-        }
     }
     var tripBudget = await API.tripPlan.statisticTripBudget({isStaff: true});
     console.info(tripBudget);
