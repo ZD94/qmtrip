@@ -256,7 +256,6 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     }
     async function staffSave(callback){
         let staff = $scope.staff;
-        staff.addWay = EAddWay.ADMIN_ADD;
         var ownerModifyAdmin = false;
 
         if(!staff.name){
@@ -323,6 +322,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                                 type: 'button-positive',
                                 onTap: async function (e) {
                                     staff = await staff.save();
+                                    await staff.saveStaffDepartments($scope.addedArray);
                                     callback();
                                 }
                             }

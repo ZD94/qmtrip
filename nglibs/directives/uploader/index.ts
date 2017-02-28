@@ -1,7 +1,6 @@
 "use strict";
 
 import angular = require('angular');
-import * as path from 'path';
 import { wechatUploaderController } from './uploader-wechat';
 import { showPreviewDialog } from './preview-dialog';
 
@@ -61,7 +60,7 @@ function ngUploader($loading, wxApi): any {
             if(!upload_url.match(/^https?:\/\//)){
                 var config = require('config');
                 config.$ready.then(()=>{
-                    upload_url = path.normalize(path.join(config.update, upload_url));
+                    upload_url = config.update.replace(/\/$/, '') + upload_url;
                     $scope.uploader.url = upload_url;
                 })
             }

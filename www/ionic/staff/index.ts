@@ -29,7 +29,6 @@ export default async function IndexController($scope, Models, inAppBrowser) {
         }
     }
     var tripBudget = await API.tripPlan.statisticTripBudget({isStaff: true});
-    console.info(tripBudget);
     $scope.tripBudget = tripBudget;
     $scope.staff = staff;
     $scope.coinAccount = coinAccount;
