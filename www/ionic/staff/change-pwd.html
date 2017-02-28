@@ -14,7 +14,7 @@
         <div class="list">
             <div class="item item-input item-with-code">
                 <span class="input-label">验证码</span>
-                <input type="password" placeholder="请输入验证码" ng-model="form.msg" required ng-required>
+                <input type="text" placeholder="请输入验证码" ng-model="form.msg" required ng-required>
                 <a class="code-button" ng-click="sendCode()" ng-if="!showCount">发送验证码</a>
                 <div class="code-button" style="width: 116px;text-align: center;" ng-if="showCount"><span>{{beginNum}}</span>s</div>
             </div>
