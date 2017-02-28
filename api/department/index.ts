@@ -322,14 +322,18 @@ class DepartmentModule{
             options.order = [['travelPolicyId', 'asc']];
         }
         //员工状态
-        if(options.order == 'status'){
+        /*if(options.order == 'status'){
             DBM.Staff.belongsTo(DBM.Account, {foreignKey: 'id', targetKey: 'id'});
             options.include = [{
                 model: DBM.Account,
-                attributes : ['id','mobile','email','status','deleted_at']
+                attributes : []
             }];
             options.order = '"' + 'Account' + '"' + '.status asc';
-         }
+         }*/
+        let _order = options.order;
+        if(options.order == 'status'){
+            delete options.order;
+        }
         //默认按创建时间排序排序
         if(options.order == 'createdAt' || !options.order){
             options.order = [['createdAt', 'asc']];
@@ -337,11 +341,11 @@ class DepartmentModule{
         let staffs = await Models.staff.find(options);
 
         //取出集合之后排序 不是对全部数据进行排序会出问题
-        /*if(options.order == 'status'){
-            result.sort(function(a,b){
+        if(_order == 'status'){
+            staffs.sort(function(a,b){
                 return a.status - b.status;
             })
-        }*/
+        }
         return staffs;
     }
 
