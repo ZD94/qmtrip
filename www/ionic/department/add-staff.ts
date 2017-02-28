@@ -46,7 +46,7 @@ export async function AddStaffController($scope, $ionicPopup, $window){
             await staff.getBatchAddStaffEmail();
             var alertPop = $ionicPopup.alert({
                 title:'邮件发送成功',
-                template:'已发送批量添加员工的操作邮件到您绑定的邮箱，请查收并进行后续操作',
+                template:'已发送批量添加员工的操作邮件到您绑定的邮箱，请在PC端查收并进行后续操作',
                 okText: '返回'
             });
             alertPop.then(function(res){
