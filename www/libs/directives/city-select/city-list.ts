@@ -9,7 +9,7 @@ export async function selectCityListController($scope, $storage, $ionicScrollDel
     require("./dialog.scss");
     $scope.searchBegin = false;
     $scope.abroadCities = [];//所有国际城市数据
-    $scope.internalCities = [];//所有国内城市数据
+    $scope.domesticCities = [];//所有国内城市数据
     let history = await $storage.local.get('history_city');
     $scope.keyList = await $scope.options.queryAll();
     $scope.hotCities = $scope.keyList.slice(0,10);
@@ -20,12 +20,12 @@ export async function selectCityListController($scope, $storage, $ionicScrollDel
     }
     $scope.isAbroad = false;
     let abroadIdx = 0;
-    let internalIdx = 0;
+    let domesticIdx = 0;
     $scope.checkAbroad = async function(abroad){
         $scope.abroadlist = [];
-        $scope.internallist = [];
+        $scope.domesticlist = [];
         abroadIdx = 0;
-        internalIdx = 0;
+        domesticIdx = 0;
         if(abroad){
             //这里获取国际列表
             $scope.isAbroad = true;
@@ -44,11 +44,11 @@ export async function selectCityListController($scope, $storage, $ionicScrollDel
             //这里获取国内列表
             $scope.isAbroad = false;
             $ionicScrollDelegate.scrollTop();
-            let internalCities = $scope.internalCities = await $scope.options.queryInternal();
-            $scope.pages.getCityList(internalCities);
+            let domesticCities = $scope.domesticCities = await $scope.options.queryDomestic();
+            $scope.pages.getCityList(domesticCities);
             let intertop = 0;
-            let internal = [];
-            internal = internalCities.map(function(city, idx){
+            let domestic = [];
+            domestic = domesticCities.map(function(city, idx){
                 city.top = {top:intertop+'px'};
                 intertop = intertop + 20 + city.cities.length*41;
                 return city;
@@ -61,13 +61,15 @@ export async function selectCityListController($scope, $storage, $ionicScrollDel
             if($scope.isAbroad) {
                 return $scope.abroadCities.length - abroadIdx;
             }else {
-                return $scope.internalCities.length - internalIdx;
+                return $scope.domesticCities.length - domesticIdx;
             }
         },
         getCityList(list){
+
             list.sort(function(pre,current){
                 return pre.first_letter.charCodeAt(0) - current.first_letter.charCodeAt(0);
             });
+
             if($scope.isAbroad){
                 let total = 0;
                 while(list && list.length && total <50){
@@ -83,14 +85,14 @@ export async function selectCityListController($scope, $storage, $ionicScrollDel
             }else {
                 let total = 0;
                 while(list && list.length && total <50){
-                    if(!$scope.internallist){
-                        $scope.internallist = list[internalIdx];
+                    if(!$scope.domesticlist){
+                        $scope.domesticlist = list[domesticIdx];
                     }else{
-                        $scope.internallist = _.concat($scope.internallist, list[internalIdx]);
+                        $scope.domesticlist = _.concat($scope.domesticlist, list[domesticIdx]);
                     }
-                    total += list[internalIdx].cities.length;
-                    internalIdx++;
-                    if (internalIdx >= list.length) break;
+                    total += list[domesticIdx].cities.length;
+                    domesticIdx++;
+                    if (domesticIdx >= list.length) break;
                 }
             }
             $scope.$broadcast('scroll.infiniteScrollComplete');
