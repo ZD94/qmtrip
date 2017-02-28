@@ -16,10 +16,10 @@ import {SupplierOrder} from 'libs/suppliers/interface';
 import {SupplierGetter} from 'libs/suppliers';
 import L from 'common/language';
 import {ESendType} from "../notice/notice";
-import promise = require("../../../common/test/api/promise/index");
 import {StaffDepartment} from "../department/staffDepartment";
 import C = require("config");
 import moment = require("moment");
+import {OS_TYPE} from "../../auth/authentication";
 
 // declare var API: any;
 const API = require("common/api");
@@ -504,7 +504,7 @@ export class Staff extends ModelObject implements Account {
     @RemoteCall()
     async getAutoLoginUrl(backUrl:string, os?: string) {
         let self = this;
-        if (os != 'corp-mgr') {
+        if (os != OS_TYPE.TMP_CODE) {
             throw L.ERR.INVALID_ARGUMENT(`目前仅支持企业PC平台自动登录`);
         }
         let expireAt = new Date(moment().add(1, 'days').valueOf());
@@ -519,7 +519,7 @@ export class Staff extends ModelObject implements Account {
         if (!self.email) {
             throw L.ERR.EMAIL_EMPTY('邮箱还未绑定');
         }
-        let url = await self.getAutoLoginUrl(`${C.host}/corp-mgr.html`, 'corp-mgr');
+        let url = await self.getAutoLoginUrl(`${C.host}/corp-mgr.html`, OS_TYPE.TMP_CODE);
         await API.notify.submitNotify({
             accountId: self.id,
             values: {
