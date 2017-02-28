@@ -262,7 +262,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
             msgbox.log('请输入金额');
             return;
         }
-        newInvoice.save();
+        await newInvoice.save();
         tripDetail = await Models.tripDetail.get($stateParams.detailId);
         getTripDetailCity(tripDetail);
         $scope.invoices = formatInvoice(await tripDetail.getInvoices());
