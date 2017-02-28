@@ -37,8 +37,8 @@
             </div>
 
 
-            <span class="staff-flag bg-gray" ng-if="item.newRegister">未激活</span>
-            <span class="staff-flag" ng-if="item.newStaff">新加入</span>
+            <span class="staff-flag bg-gray" ng-if="item.staff.newRegister">未激活</span>
+            <span class="staff-flag" ng-if="item.staff.newStaff">新加入</span>
         </div>
     </div>
     <ion-infinite-scroll ng-if="page.hasNextPage()" on-infinite="page.nextPage()"></ion-infinite-scroll>
