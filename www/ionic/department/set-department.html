@@ -7,7 +7,7 @@
         <div class="list">
             <label class="item item-input">
                 <span class="input-label">部门名称</span>
-                <input type="text" placeholder="" ng-model="department.name">
+                <input type="text" placeholder="" ng-model="department.name" ng-readonly="!department.parent">
             </label>
             <div class="item item-icon-right" ng-if="department.parent" ng-click="chooseParent()">上级部门
                 <span class="item-note">{{department.parent.name}}</span>
