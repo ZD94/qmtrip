@@ -3,7 +3,7 @@
         <div class="packageInfo">
                 <p>月套餐行程余额：{{company.tripPlanNumInBase || 0}} ({{company.expiryDate | date:"yyyy-MM-dd" }}到期)</p>
                 <p>行程增量包余额：{{company.tripPlanNumInPack || 0}}
-                    ({{company.extraExpiryDate | date:"yyyy-MM-dd"}}到期)</p>
+                    <span ng-if="company.tripPlanNumInPack > 0 ">({{company.extraExpiryDate | date:"yyyy-MM-dd"}}到期)</span></p>
             <div class="remainTripNum">
                 <p>行程点数剩余 <span> {{company.tripPlanNumBalance}} </span> 点</p>
             </div>
