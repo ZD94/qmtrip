@@ -271,7 +271,6 @@ class StaffModule{
         newPwd = utils.md5(newPwd);
         var staff = await Models.staff.get(id);
         staff.pwd = newPwd;
-        staff.isNeedChangePwd = false;
         staff = await staff.save();
         return staff;
     }

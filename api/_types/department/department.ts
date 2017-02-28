@@ -113,18 +113,19 @@ export class Department extends ModelObject{
         let self = this;
         let total = 0;
         let sql = `
-        select count(1) as total from (
+         select count(1) as total from (
             select distinct staff_id from department.staff_departments as SD
             where SD.department_id in 
                 (
                     with RECURSIVE d as 
                     ( 
-                    select d1.id from department.departments as d1 where id = '${self.id}'
+                    select d1.id from department.departments as d1 where id = '${self.id}' AND deleted_at is null
                     union all  
-                    select d2.id from department.departments as d2 
+                    select d2.id from department.departments as d2
                     inner join d on d.id = d2.parent_id
+                    where d2.deleted_at is null
                     ) select id from d
-                )
+                ) AND SD.deleted_at is null
         ) as R;
         `
         let ret = await db.query(sql);
