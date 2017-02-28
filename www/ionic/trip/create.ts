@@ -29,7 +29,7 @@ function TripDefineFromJson(obj: any): TripDefine{
 }
 
 
-export async function CreateController($scope, $storage, $loading, ngModalDlg, $ionicPopup, Models){
+export async function CreateController($scope, $storage, $loading, ngModalDlg, $ionicPopup, Models, City){
     require('./trip.scss');
     API.require('tripPlan');
     await API.onload();
@@ -179,25 +179,36 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         }
         return abroad;
     }
-    async function queryInternalPlaces(){
-        let internal = $storage.local.get('internal_cities');
-        if(!internal){
-            internal = await API.place.queryCitiesGroupByLetter({isAbroad:false});
-            $storage.local.set('internal_cities',internal);
+    async function queryDomesticPlaces(){
+        let domistic = $storage.local.get('domestic_cities');
+        if(!domistic){
+            domistic = await API.place.queryCitiesGroupByLetter({isAbroad:false});
+            $storage.local.set('domestic_cities',domistic);
         }
-        return internal;
+        console.log(domistic)
+        return domistic;
     }
     $scope.placeSelector = {
         queryAll: queryAllPlaces,
         queryAbroad: queryAbroadPlaces,
-        queryInternal: queryInternalPlaces,
-        display: (item)=>item.name
+        queryDomestic: queryDomesticPlaces,
+        display: (item)=> {
+            if (item.isAbroad && item.code) {
+                return `${item.name}(${item.code})`;
+            }
+            return item.name
+        }
     };
     $scope.fromPlaceSelector = {
         queryAll: queryAllPlaces,
         queryAbroad: queryAbroadPlaces,
-        queryInternal: queryInternalPlaces,
-        display: (item)=>item.name
+        queryDomestic: queryDomesticPlaces,
+        display: (item)=> {
+            if (item.isAbroad && item.code) {
+                return `${item.name}(${item.ctripCode})`;
+            }
+            return item.name
+        }
     };
     $scope.projectSelector = {
         query: async function(keyword){
