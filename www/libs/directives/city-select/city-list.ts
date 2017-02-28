@@ -11,14 +11,15 @@ export async function selectCityListController($scope, $storage, $ionicScrollDel
     $scope.abroadCities = [];//所有国际城市数据
     $scope.domesticCities = [];//所有国内城市数据
     let history = await $storage.local.get('history_city');
-    $scope.keyList = await $scope.options.queryAll();
-    $scope.hotCities = $scope.keyList.slice(0,10);
+
     if(history){
         $scope.history_city = history;
     }else{
         $scope.history_city = [];
     }
     $scope.isAbroad = false;
+    $scope.keyList = await $scope.options.queryAll(null, $scope.isAbroad);
+    $scope.hotCities = $scope.keyList.slice(0,10);
     let abroadIdx = 0;
     let domesticIdx = 0;
     $scope.checkAbroad = async function(abroad){
@@ -29,6 +30,8 @@ export async function selectCityListController($scope, $storage, $ionicScrollDel
         if(abroad){
             //这里获取国际列表
             $scope.isAbroad = true;
+            $scope.keyList = await $scope.options.queryAll(null, $scope.isAbroad);
+            $scope.hotCities = $scope.keyList.slice(0,10);
             $ionicScrollDelegate.scrollTop();
             let abroadCities = $scope.abroadCities = await $scope.options.queryAbroad();
             $scope.pages.getCityList(abroadCities);
@@ -43,6 +46,8 @@ export async function selectCityListController($scope, $storage, $ionicScrollDel
         }else{
             //这里获取国内列表
             $scope.isAbroad = false;
+            $scope.keyList = await $scope.options.queryAll(null, abroad);
+            $scope.hotCities = $scope.keyList.slice(0,10);
             $ionicScrollDelegate.scrollTop();
             let domesticCities = $scope.domesticCities = await $scope.options.queryDomestic();
             $scope.pages.getCityList(domesticCities);

@@ -28,6 +28,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     let isHasApprove = false;
     let isSelf = false;
     let curStaff = await Staff.getCurrent();
+    $scope.curStaff = curStaff;
     if(tripApprove.approveUser && curStaff.id == tripApprove.approveUser.id) {
         isHasPermissionApprove = true;
     }

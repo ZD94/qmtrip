@@ -80,6 +80,9 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     async function initTravelPolicy(staffs){
         await Promise.all(staffs.map(async function(staff){
             let travelPolicy = await staff.getTravelPolicy();
+            if(!travelPolicy.name){
+                travelPolicy.name = '';
+            }
             $scope.policy_staffs.push({staff: staff,travelPolicy: travelPolicy.name});
         }))
     }
@@ -129,6 +132,8 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         }
         let staffs = await rootDepartment.getStaffs({where: {name: {$ilike: `%${keyword}%`}}});
         await initStaffs(staffs);
+        $scope.policy_staffs = [];
+        await initTravelPolicy($scope.staffs);
     }
     $scope.addNewStaff = function(){
         window.location.href = '#/department/add-staff';
