@@ -54,6 +54,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
 
         await initStaffs(staffs)
         $scope.departments = departments;
+        $scope.currentDepartments = departments;
     }
     async function initStaffs(staffs){
         Object.setPrototypeOf(staffs, Pager.prototype);
@@ -103,6 +104,11 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         })
     }
     $scope.searchKeyword = async function(keyword){
+        if(!keyword){
+            $scope.departments = $scope.currentDepartments;
+        }else{
+            $scope.departments = [];
+        }
         let staffs = await rootDepartment.getStaffs({where: {name: {$ilike: `%${keyword}%`}}});
         await initStaffs(staffs);
     }
@@ -143,6 +149,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     $scope.staffSelector = {
         query: async function(keyword) {
             let staffs = await rootDepartment.getStaffs({where: {'name': {$ilike: '%'+keyword+'%'}}});
+            Object.setPrototypeOf(staffs, Pager.prototype);
             return staffs;
         },
         display: (staff)=>staff.name
