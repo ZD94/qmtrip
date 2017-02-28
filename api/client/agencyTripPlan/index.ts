@@ -183,7 +183,7 @@ export function approveInvoice(params){
         })
         .then(function(ret){
             //判断ret类型，如果是Boolean则直接返回
-            if(typeof ret == 'Boolean'){
+            if(typeof ret == 'boolean'){
                 return ret;
             }
             let order = ret;

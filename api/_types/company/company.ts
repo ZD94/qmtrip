@@ -394,7 +394,7 @@ export class Company extends ModelObject{
     async approvePassReduceBeforeNum(params?: any): Promise<Company> {
         let extraFrozen = params.frozenNum.extraFrozen;
         let limitFrozen = params.frozenNum.limitFrozen;
-        if(this.extraExpiryDate.getTime() - new Date().getTime() > 0){
+        if(this.extraExpiryDate && (this.extraExpiryDate.getTime() - new Date().getTime() > 0) ){
             this.extraTripPlanFrozenNum = this.extraTripPlanFrozenNum - extraFrozen;
             this.extraTripPlanNum = this.extraTripPlanNum - extraFrozen;
         }
@@ -419,10 +419,10 @@ export class Company extends ModelObject{
     async approveRejectFreeTripPlanNum(params?: any): Promise<Company> {
         let extraFrozen = params.frozenNum.extraFrozen;
         let limitFrozen = params.frozenNum.limitFrozen;
-        if(this.expiryDate.getTime() - new Date().getTime() > 0){
+        if(this.expiryDate && (this.expiryDate.getTime() - new Date().getTime() > 0) ){
             this.tripPlanFrozenNum = this.tripPlanFrozenNum - limitFrozen;
         }
-        if(this.extraExpiryDate.getTime() - new Date().getTime() > 0){
+        if(this.extraExpiryDate && ( this.extraExpiryDate.getTime() - new Date().getTime() > 0) ){
             this.extraTripPlanFrozenNum = this.extraTripPlanFrozenNum - extraFrozen;
         }
         let result = await this.save();
@@ -445,7 +445,7 @@ export class Company extends ModelObject{
     @RemoteCall()
     async approveRejectFreeBeforeNum(params?: any): Promise<Company> {
         let extraFrozen = params.frozenNum.extraFrozen;
-        if(this.extraExpiryDate.getTime() - new Date().getTime() > 0){
+        if(this.extraExpiryDate && (this.extraExpiryDate.getTime() - new Date().getTime() > 0) ){
             this.extraTripPlanFrozenNum = this.extraTripPlanFrozenNum - extraFrozen;
         }
         let result = await this.save();

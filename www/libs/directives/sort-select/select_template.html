@@ -1,6 +1,6 @@
-<div class="sort-list" ng-click="$event.stopPropagation();$event.preventDefault;confirm()">
+<div class="sort-list" ng-click="$event.stopPropagation();$event.preventDefault;confirm(selected)">
     <div class="list-item">
-        <div class="item" ng-class="{'selected':item.value == select.value}" ng-repeat="item in list" ng-click="confirm(item)">
+        <div class="item" ng-class="{'selected':item.value == selected.value}" ng-repeat="item in list" ng-click="confirm(item)">
             {{item.name}}
         </div>
     </div>

@@ -104,9 +104,10 @@
       color: #4990e2;
       font-size: 16px;
       opacity: 1;
+      max-width: none;
       &:nth-child(2){
         border-left: 1px solid #ccc;
-        border-right: 1px solid #ccc;
+        //border-right: 1px solid #ccc;
       }
     }
   }

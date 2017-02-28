@@ -1,0 +1,1 @@
+update auth.accounts set is_need_change_pwd = false where is_need_change_pwd is null;
