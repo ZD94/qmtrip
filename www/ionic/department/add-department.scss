@@ -10,4 +10,11 @@
   .button-full{
     margin: 0;
   }
+  .item-note {
+    width: 60%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-align: right;
+  }
 }
