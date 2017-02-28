@@ -2,7 +2,7 @@
  * Created by seven on 2017/1/21.
  */
 "use strict";
-import {Staff, EStaffRoleNames, EStaffRole} from "api/_types/staff/staff";
+import {Staff, EStaffRoleNames, EStaffRole, EAddWay} from "api/_types/staff/staff";
 import {EGender} from "api/_types/index";
 import L from 'common/language';
 import validator = require('validator');
@@ -253,6 +253,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     }
     async function staffSave(callback){
         let staff = $scope.staff;
+        staff.addWay = EAddWay.ADMIN_ADD;
         var ownerModifyAdmin = false;
 
         if(!staff.name){
