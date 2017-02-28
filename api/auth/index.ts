@@ -755,7 +755,7 @@ export default class ApiAuth {
     }
 
     @clientExport
-    static async getAccountStatus(params: {}): Promise<any> {
+    static async getAccountStatus(params: {id: string}): Promise<Account> {
         let acc: Account;
         let args: any = {attributes: ["status"]};
         args.where = {id: params.id};
