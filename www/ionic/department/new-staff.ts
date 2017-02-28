@@ -90,6 +90,9 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
         if(currentRole != EStaffRole.OWNER){
             msgbox.log('你不是创建者，无法修改角色');
             return false;
+        }else if(currentRole == EStaffRole.OWNER && staff.id == current.id){
+            msgbox.log('创建者无法修改自身角色');
+            return false;
         }
         let hideSheet = $ionicActionSheet.show({
             buttons:roles,
