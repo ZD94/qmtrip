@@ -755,9 +755,15 @@ export default class ApiAuth {
     }
 
     @clientExport
-    static getAccountStatus(params: {}): Promise<any> {
+    static async getAccountStatus(params: {id: string}): Promise<Account> {
+        let acc: Account;
         let args: any = {attributes: ["status"]};
-        return Models.account.find(args);
+        args.where = {id: params.id};
+        let result = await Models.account.find(args);
+        if(result && result.length > 0){
+            acc = result[0];
+        }
+        return acc;
     }
 
     /**
@@ -891,18 +897,10 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(["id"])
-    @conditionDecorator([
-        {if: condition.isSameCompany("0.id")},
-        {if: condition.isStaffsAgency("0.id")}
-    ])
     static async getAccount(params) {
-        let staff = await Staff.getCurrent();
         var id = params.id;
         var options: any = {};
         var acc = await Models.account.get(id, options);
-        if (staff.id !== id && acc) {
-            delete acc.pwd;
-        }
         return acc;
     }
 

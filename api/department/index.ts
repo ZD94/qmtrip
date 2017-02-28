@@ -282,7 +282,7 @@ class DepartmentModule{
     }
 
     @clientExport
-    static async getStaffs(params: {options?: any, id: string}): Promise<Staff[]> {
+    static async getStaffs(params: {options?: any, id: string}): Promise<PaginateInterface<Staff>> {
         let currentStaff = await Staff.getCurrent();
         let options = params.options;
         if (!options) options = {where: {}};
@@ -336,18 +336,13 @@ class DepartmentModule{
         }
         let staffs = await Models.staff.find(options);
 
-        let result =  await Promise.all(staffs.map(async function(s){
-            return s;
-        }))
-
-
         //取出集合之后排序 不是对全部数据进行排序会出问题
         /*if(options.order == 'status'){
             result.sort(function(a,b){
                 return a.status - b.status;
             })
         }*/
-        return result;
+        return staffs;
     }
 
     static deleteDepartmentByTest(params){
