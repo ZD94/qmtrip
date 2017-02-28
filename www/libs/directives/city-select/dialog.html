@@ -49,7 +49,7 @@
                 <div class="city_list" ng-if="isAbroad">
                     <div class="city_block list" ng-repeat="item in abroadlist" ng-style="item.top">
                         <div class="city_title">{{item.first_letter}}</div>
-                        <div class="item" ng-repeat="city in item.cities" ng-click="confirm(city)">{{city.name}}</div>
+                        <div class="item" ng-repeat="city in item.cities" ng-click="confirm(city)">{{city.name}}<span ng-if="city.code">({{city.code}})</span></div>
                     </div>
                 </div>
             </div>

@@ -13,12 +13,16 @@
                 <h2 style="margin-top: 0;">{{tripApprove.account.name}}</h2>
             </div>
             <ion-item class="po_r">
-                <p><i class="icon ion-plane"></i> &nbsp;&nbsp;{{tripApprove.deptCity}} 到 {{tripApprove.arrivalCity}}</p>
+                <p><i class="icon ion-plane"></i> &nbsp;&nbsp;
+                {{tripApprove.deptCity}} 到 {{tripApprove.arrivalCity}}
+                &nbsp;&nbsp;
+                {{tripApprove.query.hotelName}}
+                </p>
                 <p><i class="icon ion-star"></i> &nbsp;&nbsp;出差事由：{{tripApprove.title}}</p>
             </ion-item>
         </ion-list>
         <div class="card-footer" ng-if="tripApprove.status != EApproveStatus.COMPLETE">
-            <span ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE">等待审批</span>
+            <span ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE">待审批</span>
             <span ng-if="tripApprove.status != EApproveStatus.REJECT && tripApprove.status != EApproveStatus.WAIT_APPROVE && tripApprove.status != EApproveStatus.CANCEL">审批通过</span>
             <span ng-if="tripApprove.status == EApproveStatus.REJECT" class="color-red">审批驳回</span>
             <span ng-if="tripApprove.status == EApproveStatus.CANCEL">审批撤销</span>
