@@ -208,7 +208,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         queryDomestic: queryDomesticPlaces,
         display: (item)=> {
             if (item.isAbroad && item.code) {
-                return `${item.name}(${item.ctripCode})`;
+                return `${item.name}(${item.code})`;
             }
             return item.name
         }
