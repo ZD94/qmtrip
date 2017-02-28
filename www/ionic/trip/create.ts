@@ -321,6 +321,11 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             return false;
         }
 
+        if(moment(trip.endDate).toDate().getTime() - moment(trip.beginDate).toDate().getTime() <= 0) {
+            $scope.showErrorMsg('到达时间不可晚于离开时间！');
+            return false;
+        }
+
         let params = {
             originPlace: trip.fromPlace? trip.fromPlace.id : '',
             destinationPlace: trip.place ? trip.place.id : '',
