@@ -212,7 +212,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
             return item.OrderStatus[0] === '已成交';
         })
         //console.log(JSON.stringify(list, null, ' '));
-        let ret = await Promise.all(list.map(async (item: any) => {
+        let ps = list.map(async (item: any) :Promise<SupplierOrder> => {
             let res = await this.asyncCall('http://ct.ctrip.com/m/OrderDetail/Flight', { OrderNumber: item.OrderNumber });
             if(!res.body.Result)
                 return null as SupplierOrder;
@@ -228,9 +228,10 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                 desc: item.Name,
                 starCityName: order.Domestic[0].FlightRoute.indexOf('-')>=0 ? order.Domestic[0].FlightRoute.split('-')[0]: null,
                 endCityName:  order.Domestic[0].FlightRoute.indexOf('-')>=0 ? order.Domestic[0].FlightRoute.split('-')[1]: null
-            };
-        }));
-        return ret.filter((item)=>item);
+            } as SupplierOrder;
+        });
+        let ret = await Promise.all(ps);
+        return ret.filter((item)=>item) as SupplierOrder[];
     }
 
     async getHotelOrderList(): Promise<SupplierOrder[]>{
@@ -258,7 +259,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                 desc: item.Name
             };
         }));
-        return ret.filter((item)=>item);
+        return ret.filter((item)=>item) as SupplierOrder[];
     }
     async getTrainOrderList(): Promise<SupplierOrder[]>{
         let res = await this.asyncCall('http://ct.ctrip.com/m/Order/TrainOrders');
@@ -288,7 +289,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
                 endCityName:  item.Name.indexOf('-')>=0 ? item.Name.split('-')[1]: null
             };
         }));
-        return ret.filter((item)=>item);
+        return ret.filter((item)=>item) as SupplierOrder[];
     }
     async asyncCall(url: string, req?: any): Promise<any> {
         let body = _.cloneDeep(req || {});
