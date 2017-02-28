@@ -5,7 +5,7 @@
 import {Staff} from "api/_types/staff/staff";
 var msgbox = require('msgbox');
 
-export async function AddStaffController($scope, $ionicPopup){
+export async function AddStaffController($scope, $ionicPopup, $window){
     require('./add-staff.scss');
     let staff = await Staff.getCurrent();
     $scope.addStaff = function(){
@@ -50,7 +50,8 @@ export async function AddStaffController($scope, $ionicPopup){
                 okText: '返回'
             });
             alertPop.then(function(res){
-                window.location.href="#/department/";
+                /*window.location.href="#/department/";*/
+                $window.history.go(-1);
             })
 
             //防止频繁点击
