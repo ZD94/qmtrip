@@ -1,24 +1,98 @@
-image: docker.l.jingli365.com/jingli-build
 
 variables:
-#  GIT_SUBMODULE_STRATEGY: recursive
+  DOCKER_REG: docker.l.jingli365.com
+  DOCKER_CI_NAME: $DOCKER_REG/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME:$CI_BUILD_REF
+  DOCKER_BRANCH_NAME: $DOCKER_REG/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME:$CI_BUILD_REF_SLUG
 
-cache:
-  paths:
-    - node_modules/
+stages:
+  - build
+  - docker
+  - deploy
+
+image: docker:1.12-git
 
 before_script:
   - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
   - eval $(ssh-agent -s)
-  - ssh-add <(echo "$SSH_PRIVATE_KEY")
-  - mkdir -p ~/.ssh
-  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-  - git submodule update --init --checkout
+  - echo "$SSH_PRIVATE_KEY" >ssh_key && chmod 600 ssh_key && ssh-add ssh_key
+  - rm -f ssh_key
+  - 'mkdir -p ~/.ssh && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
 
   - ln -s /opt/app/node_modules .
-  - npm --registry https://npm.l.jingli365.com install
 
-build:
+build:dist:
+  stage: build
+  image: $DOCKER_REG/jl-build
+  cache:
+    key: $CI_PIPELINE_ID
+    paths:
+      - dist/
   script:
-  - gulp tarball -n $CI_BUILD_REF_NAME
-  - scp $CI_PROJECT_NAME-$CI_BUILD_REF_NAME-*.tar.gz test@git.l.jingli365.com:~/versions/
+    - git submodule update --init --checkout
+    - npm --registry https://npm.l.jingli365.com install
+    - gulp tarball -n $CI_BUILD_REF_NAME
+    - scp $CI_PROJECT_NAME-$CI_BUILD_REF_NAME-*.tar.gz test@git.l.jingli365.com:~/versions/
+
+build:image:
+  stage: docker
+  cache:
+    key: $CI_PIPELINE_ID
+    paths:
+      - dist/
+  script:
+    - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
+    - docker build -t $DOCKER_CI_NAME .
+    - docker push $DOCKER_CI_NAME
+
+deploy:master:
+  stage: deploy
+  only:
+    - /^master$/
+  environment:
+    name: dev
+    url: https://l.jingli365.com
+  script:
+    - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
+    - docker pull $DOCKER_CI_NAME
+    - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
+    - docker push $DOCKER_BRANCH_NAME
+    - echo deploy to dev server
+
+deploy:test:
+  stage: deploy
+  only:
+    - /^test$/
+  environment:
+    name: test
+    url: https://t.jingli365.com
+  script:
+    - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
+    - docker pull $DOCKER_CI_NAME
+    - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
+    - docker push $DOCKER_BRANCH_NAME
+    - echo deploy to dev server
+
+deploy:release:
+  stage: deploy
+  only:
+    - /^release$/
+  when: manual
+  environment:
+    name: release
+    url: https://j.jingli365.com
+  script:
+    - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
+    - docker pull $DOCKER_CI_NAME
+    - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
+    - docker push $DOCKER_BRANCH_NAME
+
+deploy:tester:
+  stage: deploy
+  only:
+    - /^feature\//
+  when: manual
+  environment:
+    name: tester/$GITLAB_USER_ID
+    url: https://l.jingli365.com/$GITLAB_USER_ID
+  script:
+    - echo deploy to server owned by user trigger it.
