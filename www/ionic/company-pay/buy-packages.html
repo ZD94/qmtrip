@@ -24,7 +24,7 @@
                        <p>200元</p>
                    </div>
                </div>
-                <div class="tryingInfo" ng-if="company.type == ECompanyType.TRYING">
+                <div class="tryingInfo" ng-if="!company.type ||company.type == ECompanyType.TRYING">
                     <p>
                         您的企业是试用企业，无法购买增量包，请先升级为付费企业
                     </p>
@@ -38,7 +38,7 @@
                             <p>联系电话：010-86464518-802</p>
                         </div>
                     </div>
-                    <div class="btn" ng-if="company.type == ECompanyType.TRYING">
+                    <div class="btn" ng-if="!company.type || company.type == ECompanyType.TRYING">
                         <div class="upBtn">
                             <p>立即升级</p>
                         </div>

@@ -11,7 +11,6 @@ interface SortOption{
 @ngService('sortDlg')
 class sortDlg{
     constructor(private $injector, private $compile, private $ionicBody){
-        console.info('...');
         require('./sort-dlg.scss');
     }
     createDialog(options){

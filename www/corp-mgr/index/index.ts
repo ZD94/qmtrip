@@ -4,7 +4,7 @@ import {Staff} from "api/_types/staff/staff";
 export async function IndexController($scope, Models, FileUploader) {
     $scope.title = '批量添加员工';
     $scope.step = 'one';
-    var upload_url = $scope.url || '/upload/ajax-upload-file';
+    var upload_url = $scope.url || 'upload/ajax-upload-file';
     var uploader = $scope.uploader = new FileUploader({
         url: upload_url,
         alias: $scope.name || 'tmpFile',
@@ -15,7 +15,7 @@ export async function IndexController($scope, Models, FileUploader) {
     if(!upload_url.match(/^https?:\/\//)){
         var config = require('config');
         config.$ready.then(()=>{
-            upload_url = path.normalize(path.join(config.update, upload_url));
+            upload_url = config.update + upload_url;
             $scope.uploader.url = upload_url;
         })
     }
