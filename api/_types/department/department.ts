@@ -6,6 +6,8 @@ import { ModelObject } from 'common/model/object';
 import { Types, Values } from 'common/model';
 import _ = require("lodash");
 import {PaginateInterface} from "common/model/interface";
+let db = require("common/model").DB;
+
 let API = require("common/api");
 
 @Table(Models.department, "department.")
@@ -84,30 +86,49 @@ export class Department extends ModelObject{
         return departments;
     }
 
+    @RemoteCall()
+    async getAllChildren() :Promise<Array<Department>>{
+        let self = this;
+        let pager = await Models.department.find({ where: {parentId: self.id, companyId: self['companyId']}});
+        let children = [];
+        let allChildren = [];
+        do {
+            if (pager) {
+                pager.forEach( (d) => {
+                    children.push(d);
+                });
+                pager = await pager.nextPage();
+            }
+        } while(pager && pager.hasNextPage());
+        //查找children所有的子元素
+        for(let i, ii=children.length; i<ii; i++) {
+            allChildren = _.concat(allChildren, await children[i].getAllChildren());
+        }
+        return allChildren;
+    }
+
     //获取当前部门以及所有子部门下的总人数
     @RemoteCall()
     async getStaffNum(): Promise<number> {
         let self = this;
         let total = 0;
-        let pager = await Models.staffDepartment.find({where: {departmentId: self.id}});
-        total += pager.total;
-        //查找子部门
-        let children = [];
-        let departmentPager = await Models.department.find({ where: {parentId: self.id, companyId: self['companyId']}});
-        do {
-            departmentPager.forEach( (d) => {
-                children.push(d);
-            })
-          if (departmentPager) {
-              departmentPager = await departmentPager.nextPage();
-          }
-        } while(departmentPager && departmentPager.hasNextPage());
-
-        console.log(children)
-        for(var i=0, ii= children.length; i<ii; i++) {
-            total += await children[i].getStaffNum();
-        }
-        return total;
+        let sql = `
+        select count(1) as total from (
+            select distinct staff_id from department.staff_departments as SD
+            where SD.department_id in 
+                (
+                    with RECURSIVE d as 
+                    ( 
+                    select d1.id from department.departments as d1 where id = '${self.id}'
+                    union all  
+                    select d2.id from department.departments as d2 
+                    inner join d on d.id = d2.parent_id
+                    ) select id from d
+                )
+        ) as R;
+        `
+        let ret = await db.query(sql);
+        return ret[0][0]['total'] as number;
     }
     
     async getOneDepartmentStructure(): Promise<any> {

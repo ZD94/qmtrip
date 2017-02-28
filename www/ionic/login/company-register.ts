@@ -1,6 +1,7 @@
 import validator = require('validator');
 import moment = require('moment');
 var msgbox = require('msgbox');
+var CheckUsername = require("www/util").CheckUsername;
 
 export async function CompanyRegisterController ($scope, $stateParams){
     API.require("checkcode");
@@ -80,6 +81,10 @@ export async function CompanyRegisterController ($scope, $stateParams){
         }
         if (!$scope.form.userName) {
             msgbox.log("联系人不能为空");
+            return;
+        }
+        if(!CheckUsername($scope.form.userName)){
+            msgbox.log("姓名格式不符合要求，请重新输入");
             return;
         }
         var pwdPattern = /^[0-9a-zA-Z]*$/g;
