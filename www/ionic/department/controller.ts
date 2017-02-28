@@ -55,7 +55,6 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         $scope.staffPagers = staffs;
         Object.setPrototypeOf($scope.staffPagers, Pager.prototype);
         await initStaffs(staffs);
-        await initTravelPolicy($scope.staffs);
         $scope.departments = departments;
         $scope.currentDepartments = departments;
     }
@@ -85,6 +84,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         }))
     }
     await initDepartment(departmentId);
+    await initTravelPolicy($scope.staffs);
     var page = {
         hasNextPage: function() {
             return $scope.staffPagers.hasNextPage();
@@ -118,6 +118,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     $scope.sortBy = async function(selected){
         let staffs = await rootDepartment.getStaffs({where:{},order: selected});
         await initStaffs(staffs);
+        $scope.policy_staffs = [];
         await initTravelPolicy($scope.staffs);
     }
     $scope.searchKeyword = async function(keyword){
