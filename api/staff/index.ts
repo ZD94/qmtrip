@@ -509,6 +509,7 @@ class StaffModule{
         let company = staff.company;
         let companyId = company.id;
         let xlsObj;
+        let defaultDept = await company.getDefaultDepartment();
         let att = await API.attachment.getSelfAttachment({fileId: fileId, accountId: staff.id});
         if(att){
             var content = new Buffer(att.content, 'base64');
@@ -593,22 +594,68 @@ class StaffModule{
                     let departmentNames = s[6].split(",");
                     for(var i=0;i<departmentNames.length;i++){
                         let _d = departmentNames[i];
-                        if(departmentMaps[_d]){
-                            departmentIds.push(departmentMaps[_d]);
+                        if(_d.indexOf('/') != -1){
+                            let dd = _d.split('/');
+                            let p_id = null;
+                            for(var j=0;j<dd.length;j++){
+                                let _dd = dd[j];
+                                if(j == 0){
+                                    console.info("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                                    let one_d = await Models.department.find({where:{name: _dd, companyId: companyId, parentId: defaultDept.id}});
+                                    console.info(one_d);
+                                    console.info("---------============================");
+                                    if(one_d && one_d.length > 0){
+                                        console.info(one_d);
+                                        console.info(one_d[0]);
+                                        console.info("sssssssssssssssssssssssssssssssssssssssssss");
+                                        p_id = one_d[0].id;
+                                        console.info(p_id);
+                                    }else{
+                                        staffObj.reason = _dd + "部门不存在";
+                                        s[7] = _dd + "部门不存在";
+                                        noAddObj.push(staffObj);
+                                        downloadNoAddObj.push(s);
+                                        departmentPass = false;
+                                        break;
+                                    }
+                                }else{
+                                    let next_d = await Models.department.find({where:{name: _dd, companyId: companyId, parentId: p_id}});
+                                    if(!next_d || next_d.length <= 0){
+                                        staffObj.reason = _dd + "部门不存在";
+                                        s[7] = _dd + "部门不存在";
+                                        noAddObj.push(staffObj);
+                                        downloadNoAddObj.push(s);
+                                        departmentPass = false;
+                                        break;
+                                    }else{
+                                        p_id = next_d[0].id;
+                                    }
+
+                                    if(j == (dd.length - 1)){
+                                        let lost_d = next_d[0];
+                                        departmentIds.push(next_d[0].id);
+                                    }
+
+                                }
+                            }
                         }else{
-                            staffObj.reason = _d + "部门不存在";
-                            s[7] = _d + "部门不存在";
-                            noAddObj.push(staffObj);
-                            downloadNoAddObj.push(s);
-                            departmentPass = false;
-                            break;
+                            if(departmentMaps[_d]){
+                                departmentIds.push(departmentMaps[_d]);
+                            }else{
+                                staffObj.reason = _d + "部门不存在";
+                                s[7] = _d + "部门不存在";
+                                noAddObj.push(staffObj);
+                                downloadNoAddObj.push(s);
+                                departmentPass = false;
+                                break;
+                            }
                         }
+
                     }
                     if(!departmentPass){
                         return;
                     }
                 }else{
-                    let defaultDept = await company.getDefaultDepartment();
                     departmentIds.push(defaultDept.id);
                 }
                 staffObj.departmentIds = departmentIds;
