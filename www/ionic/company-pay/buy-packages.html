@@ -34,14 +34,18 @@
             <div style="clear:both"></div>
             <div class="telFlex">
                     <div class="btn" ng-if="company.type == ECompanyType.PAYED">
-                        <div class="upBtn">
-                            <p>联系电话：010-86464518-802</p>
-                        </div>
+                        <a href="tel:4000-401-108">
+                            <div class="upBtn">
+                                <p>联系电话：4000-401-018</p>
+                            </div>
+                        </a>
                     </div>
                     <div class="btn" ng-if="!company.type || company.type == ECompanyType.TRYING">
-                        <div class="upBtn">
-                            <p>立即升级</p>
-                        </div>
+                        <a href="#/company-pay/service-pay" style="width:100%">
+                            <div class="upBtn">
+                                <p>立即升级</p>
+                            </div>
+                        </a>
                     </div>
                 <div class="contact">
                     <p>请联系客服进行咨询</p>
