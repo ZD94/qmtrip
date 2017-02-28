@@ -106,7 +106,10 @@ body {
 a {
   text-decoration: none;
 }
-
+//readonly 的背景色清除
+input[readonly]:not(.cloned-text-input){
+  background: none;
+}
 //item左右会超出
 .item {
   margin-right: 0px;
