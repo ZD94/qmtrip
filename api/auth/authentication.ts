@@ -185,6 +185,9 @@ export async function login(data: {account?: string, pwd: string, type?: Number,
                 return ret;
             })
     }
+    if (loginAccount.isNeedChangePwd) {
+        ret['is_need_change_pwd'] = true;
+    }
 
     ret['is_first_login'] = false;
     return ret;

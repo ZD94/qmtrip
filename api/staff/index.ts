@@ -67,6 +67,9 @@ class StaffModule{
         if(!staff["travelPolicyId"]){
             staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
         }
+        if (params.isNeedChangePwd) {
+            staff.isNeedChangePwd = params.isNeedChangePwd;
+        }
         staff = await staff.save();
 
         let account = await Models.account.get(staff.id);
@@ -265,6 +268,7 @@ class StaffModule{
         newPwd = utils.md5(newPwd);
         var staff = await Models.staff.get(id);
         staff.pwd = newPwd;
+        staff.isNeedChangePwd = false;
         staff = await staff.save();
         return staff;
     }
@@ -665,7 +669,7 @@ class StaffModule{
         await Promise.all(addObj.map(async function(item, index){
             let deptIds = item.departmentIds;
             let staffObj: any = {name: item.name, mobile: item.mobile+"", email: item.email, sex: item.sex, roleId: item.roleId,
-                travelPolicyId: item.travelPolicyId, companyId: item.companyId, addWay: EAddWay.BATCH_IMPORT };
+                travelPolicyId: item.travelPolicyId, companyId: item.companyId, addWay: EAddWay.BATCH_IMPORT, isNeedChangePwd: true, };
             let staffAdded = await StaffModule.createStaff(staffObj);
             await staffAdded.saveStaffDepartments(deptIds)
         }));
