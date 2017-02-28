@@ -599,16 +599,9 @@ class StaffModule{
                             for(var j=0;j<dd.length;j++){
                                 let _dd = dd[j];
                                 if(j == 0){
-                                    console.info("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
                                     let one_d = await Models.department.find({where:{name: _dd, companyId: companyId, parentId: defaultDept.id}});
-                                    console.info(one_d);
-                                    console.info("---------============================");
                                     if(one_d && one_d.length > 0){
-                                        console.info(one_d);
-                                        console.info(one_d[0]);
-                                        console.info("sssssssssssssssssssssssssssssssssssssssssss");
                                         p_id = one_d[0].id;
-                                        console.info(p_id);
                                     }else{
                                         staffObj.reason = _dd + "部门不存在";
                                         s[7] = _dd + "部门不存在";
