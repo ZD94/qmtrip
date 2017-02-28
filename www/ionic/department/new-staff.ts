@@ -90,6 +90,9 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
         if(currentRole != EStaffRole.OWNER){
             msgbox.log('你不是创建者，无法修改角色');
             return false;
+        }else if(currentRole == EStaffRole.OWNER && staff.id == current.id){
+            msgbox.log('创建者无法修改自身角色');
+            return false;
         }
         let hideSheet = $ionicActionSheet.show({
             buttons:roles,
@@ -253,7 +256,6 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     }
     async function staffSave(callback){
         let staff = $scope.staff;
-        staff.addWay = EAddWay.ADMIN_ADD;
         var ownerModifyAdmin = false;
 
         if(!staff.name){
@@ -320,6 +322,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                                 type: 'button-positive',
                                 onTap: async function (e) {
                                     staff = await staff.save();
+                                    await staff.saveStaffDepartments($scope.addedArray);
                                     callback();
                                 }
                             }

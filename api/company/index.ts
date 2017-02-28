@@ -106,6 +106,8 @@ class CompanyModule {
         staff.company = company;
         company.createUser = staff.id;
         company['agencyId'] = agencyId;
+        //新注册企业默认套餐行程数为60
+        company.tripPlanNumLimit = 60;
 
         await Promise.all([staff.save(), company.save(), department.save(), staffDepartment.save()]);
         let promoCode: PromoCode;

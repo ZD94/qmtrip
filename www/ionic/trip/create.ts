@@ -208,7 +208,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         queryDomestic: queryDomesticPlaces,
         display: (item)=> {
             if (item.isAbroad && item.code) {
-                return `${item.name}(${item.ctripCode})`;
+                return `${item.name}(${item.code})`;
             }
             return item.name
         }
@@ -322,6 +322,11 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
 
         if(trip.traffic && (!trip.fromPlace || !trip.fromPlace.id)) {
             $scope.showErrorMsg('请选择出发地！');
+            return false;
+        }
+
+        if(moment(trip.endDate).toDate().getTime() - moment(trip.beginDate).toDate().getTime() <= 0) {
+            $scope.showErrorMsg('到达时间不可晚于离开时间！');
             return false;
         }
 

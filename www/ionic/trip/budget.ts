@@ -51,10 +51,10 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
             budget.discount = '全价';
         }
         if (budget.tripType == ETripType.HOTEL) {
-            budget.duringDays = moment(trip.endDate).diff(moment(trip.beginDate), 'days') || 1;
+            budget.duringDays = moment(moment(trip.endDate).format("YYYY-MM-DD")).diff(moment(moment(trip.beginDate).format("YYYY-MM-DD")), 'days') || 1;
         }
         if (budget.tripType == ETripType.SUBSIDY) {
-            let days = moment(trip.endDate).diff(moment(trip.beginDate), 'days')
+            let days = moment(moment(trip.endDate).format("YYYY-MM-DD")).diff(moment(moment(trip.beginDate).format("YYYY-MM-DD")), 'days')
             days = days + 1;
             if (!budget.hasFirstDaySubsidy) {
                 days -= 1;

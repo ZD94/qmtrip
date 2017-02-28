@@ -6,8 +6,6 @@ export async function StaffInfoController($scope, Models, ngModalDlg ,$ionicPopu
     $scope.staff = staff;
     $scope.company = staff.company;
     let departmentNames = await staff.getDepartmentsStr();
-    console.info(departmentNames);
-    console.info("===========================");
     $scope.departmentNames = departmentNames;
     $scope.travelpolicy = await staff.getTravelPolicy(staff['travelPolicyId']);
     $scope.staffRole = ['创建者','员工','管理员','财务'];
@@ -25,18 +23,4 @@ export async function StaffInfoController($scope, Models, ngModalDlg ,$ionicPopu
         staff.avatar = fileId[0];
         staff.save();
     }}
-
-    /*$scope.addCoin = async function(){
-        let a = await staff.addCoin(10,"测试加钱");
-        console.info(a);
-        console.info("==---------");
-    }*/
-    // $scope.changeAvator = function(){
-    //     ngModalDlg.createDialog({
-    //         parent:$scope,
-    //         scope:{},
-    //         template: require('./avator-template.html'),
-    //         controller: AvatroController
-    //     })
-    // }
 }
