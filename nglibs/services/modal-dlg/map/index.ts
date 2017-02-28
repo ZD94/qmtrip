@@ -64,6 +64,7 @@ export function selectMapPointController($scope){
         $scope.marker.setPosition(point);
         $scope.form.selected = result;
         $scope.showResults = false;
+        $scope.form.keyword=result.address;
     }
 
     $scope.$watch('form.keyword', function(o, n){
