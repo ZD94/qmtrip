@@ -5,6 +5,7 @@ import {Table, Create, Field, Reference, ResolveRef, RemoteCall, LocalCall} from
 import { ModelObject } from 'common/model/object';
 import { Types, Values } from 'common/model';
 import _ = require("lodash");
+import {PaginateInterface} from "common/model/interface";
 let API = require("common/api");
 
 @Table(Models.department, "department.")
@@ -43,19 +44,9 @@ export class Department extends ModelObject{
     get company(): Company { return null; }
     set company(val: Company) {}
 
-    async getStaffs(options?: any): Promise<any[]> {
-        if(!this.isLocal){
-            API.require('department');
-            await API.onload();
-        }
+    async getStaffs(options?: any): Promise<PaginateInterface<Staff>> {
         let staffs =  await API.department.getStaffs({id: this.id,options: options});
-        let result =  await Promise.all(staffs.map(async function(s){
-            let travelPolicy = await s.getTravelPolicy();
-            s["travelPolicy"] = travelPolicy;
-            return s;
-        }))
-
-        return result;
+        return staffs;
     }
 
     @RemoteCall()

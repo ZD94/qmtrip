@@ -755,9 +755,15 @@ export default class ApiAuth {
     }
 
     @clientExport
-    static getAccountStatus(params: {}): Promise<any> {
+    static async getAccountStatus(params: {}): Promise<any> {
+        let acc: Account;
         let args: any = {attributes: ["status"]};
-        return Models.account.find(args);
+        args.where = {id: params.id};
+        let result = await Models.account.find(args);
+        if(result && result.length > 0){
+            acc = result[0];
+        }
+        return acc;
     }
 
     /**
