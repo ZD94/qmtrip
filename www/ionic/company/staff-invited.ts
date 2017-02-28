@@ -1,5 +1,6 @@
 import { Staff } from 'api/_types/staff/staff';
 import moment = require('moment');
+import _ = require('lodash');
 import { InvitedLink } from 'api/_types/staff/invited-link';
 import _ = require('lodash');
 var browserspec = require('browserspec');

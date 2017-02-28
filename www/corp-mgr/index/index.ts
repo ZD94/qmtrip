@@ -4,7 +4,7 @@ import {Staff} from "api/_types/staff/staff";
 export async function IndexController($scope, Models, FileUploader) {
     $scope.title = '批量添加员工';
     $scope.step = 'one';
-    var upload_url = $scope.url || '/upload/ajax-upload-file';
+    var upload_url = $scope.url || 'upload/ajax-upload-file';
     var uploader = $scope.uploader = new FileUploader({
         url: upload_url,
         alias: $scope.name || 'tmpFile',
