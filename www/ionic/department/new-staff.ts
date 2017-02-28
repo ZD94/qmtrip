@@ -2,14 +2,18 @@
  * Created by seven on 2017/1/21.
  */
 "use strict";
-import {Staff, EStaffRoleNames, EStaffRole} from "api/_types/staff/staff";
+import {Staff, EStaffRoleNames, EStaffRole, EAddWay} from "api/_types/staff/staff";
 import {EGender} from "api/_types/index";
 import L from 'common/language';
 import validator = require('validator');
 import {Pager} from "common/model/pager";
 import {type} from "os";
+
+
 var _ = require('lodash');
 var msgbox = require('msgbox');
+var utils  = require("www/util");
+let CheckUsername = utils.CheckUsername;
 
 export async function NewStaffController($scope, Models, $ionicActionSheet, ngModalDlg, $stateParams, $ionicPopup, $ionicHistory){
     require('./new-staff.scss');
@@ -249,7 +253,18 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     }
     async function staffSave(callback){
         let staff = $scope.staff;
+        staff.addWay = EAddWay.ADMIN_ADD;
         var ownerModifyAdmin = false;
+
+        if(!staff.name){
+            msgbox.log('姓名不能为空');
+            return;
+        }
+        if(!CheckUsername(staff.name)){
+            msgbox.log('姓名格式不符合要求，请重新输入');
+            return;
+        }
+
         try{
             if (!staff.mobile) {
                 throw L.ERR.MOBILE_EMPTY();
@@ -273,22 +288,20 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                         throw L.ERR.MOBILE_HAS_REGISTRY();
                     }
                 }
-                if(!staff.name){
-                    msgbox.log('姓名不能为空');
-                    return;
-                }
+                
+
                 if($scope.addedArray.length>0){
                     // staff.departmentIds = $scope.addedArray;
                 }else{
                     msgbox.log('部门不能为空')
                     return false;
                 }
-                var namePattern = /[\u4e00-\u9fa5]+/g;
-                var hasChinese = namePattern.test(staff.name);
-                if(staff.name.length>5 && hasChinese){
-                    msgbox.log('姓名不能超过5个字');
-                    return;
-                }
+                // var namePattern = /[\u4e00-\u9fa5]+/g;
+                // var hasChinese = namePattern.test(staff.name);
+                // if(staff.name.length>5 && hasChinese){
+                //     msgbox.log('姓名不能超过5个字');
+                //     return;
+                // }
                 // 创建人修改管理员权限(二次确认)
                 if(current.roleId == EStaffRole.OWNER && preRole == EStaffRole.ADMIN && staff.roleId == EStaffRole.COMMON){
                     ownerModifyAdmin = true;

@@ -62,7 +62,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
             API.require("auth");
             await API.onload();
             let acc = await API.auth.getAccountStatus({id: staff.id});
-            staff['signStatus'] = 1;
+            staff['signStatus'] = acc.status;
             let hours = moment().diff(moment(staff.createdAt),'hours');
             if(staff.signStatus == 1 && hours < 24){
                 staff['newStaff'] = true;
@@ -89,19 +89,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     $scope.selected = {name:'最近加入',value:'',icon:'fa-sort-amount-desc'};
     $scope.sortBy = async function(selected){
         let staffs = await rootDepartment.getStaffs({where:{},order: selected});
-        Object.setPrototypeOf(staffs, Pager.prototype);
-        $scope.staffs = staffs.map(function(staff){
-            let hours = moment().diff(moment(staff.createdAt),'hours');
-            if(staff.status == 1 && hours < 24){
-                staff['newStaff'] = true;
-            }else if(staff.status == 0){
-                staff['newRegister'] = true;
-            }else{
-                staff['newStaff'] = false;
-                staff['newRegister'] = false;
-            }
-            return staff;
-        })
+        await initStaffs(staffs);
     }
     $scope.searchKeyword = async function(keyword){
         if(!keyword){
