@@ -16,6 +16,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     let company = staff.company;
     let rootDepartment : Department;
     let newUrl;
+    $scope.policy_staffs = [];//用于存放可以展示差旅标准的staff list
     if(departmentId){
         if($location.path() == '/department/index' ||$location.path() == '/department/'){
             newUrl = `#/department/index-instead`;
@@ -51,8 +52,10 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         $scope.viewHeader = rootDepartment.name;
 
         let staffs = await rootDepartment.getStaffs();
-
-        await initStaffs(staffs)
+        $scope.staffPagers = staffs;
+        Object.setPrototypeOf($scope.staffPagers, Pager.prototype);
+        await initStaffs(staffs);
+        await initTravelPolicy($scope.staffs);
         $scope.departments = departments;
         $scope.currentDepartments = departments;
     }
@@ -75,7 +78,32 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
             return staff;
         }))
     }
-    initDepartment(departmentId);
+    async function initTravelPolicy(staffs){
+        await Promise.all(staffs.map(async function(staff){
+            let travelPolicy = await staff.getTravelPolicy();
+            $scope.policy_staffs.push({staff: staff,travelPolicy: travelPolicy.name});
+        }))
+    }
+    await initDepartment(departmentId);
+    var page = {
+        hasNextPage: function() {
+            return $scope.staffPagers.hasNextPage();
+        },
+        nextPage : async function() {
+            try {
+                let newArr =[];
+                let join = {};
+                $scope.staffPagers = await $scope.staffPagers.nextPage();
+                await initTravelPolicy($scope.staffPagers);
+            } catch(err) {
+                alert("获取数据时,发生异常");
+                return;
+            } finally {
+                $scope.$broadcast('scroll.infiniteScrollComplete');
+            }
+        }
+    }
+    $scope.page = page;
     $scope.EStaffRoleNames = EStaffRoleNames;
     $scope.EStaffRole = EStaffRole;
     $scope.arrlist = [
@@ -90,6 +118,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     $scope.sortBy = async function(selected){
         let staffs = await rootDepartment.getStaffs({where:{},order: selected});
         await initStaffs(staffs);
+        await initTravelPolicy($scope.staffs);
     }
     $scope.searchKeyword = async function(keyword){
         if(!keyword){
