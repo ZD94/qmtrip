@@ -32,6 +32,10 @@ export async function PendingController($scope, $stateParams){
                 try {
                     Pager = await Pager.nextPage();
                     Pager.map(function(v) {
+                        try{
+                            v.query = JSON.parse(v.query);
+                        }catch(e){}
+                        
                         $scope.tripApproves.push(v);
                     });
                     $scope.hasNextPage = true;
@@ -69,7 +73,12 @@ export async function PendingController($scope, $stateParams){
         }
         let where: any = {status: status};
         Pager = await staff.getTripApproves({ where: where, limit: PAGE_SIZE}); //获取待审批出差计划列表
+
         Pager.forEach(function(v) {
+            try{
+                v.query = JSON.parse(v.query);
+            }catch(e){}
+            
             $scope.tripApproves.push(v);
         })
     };
