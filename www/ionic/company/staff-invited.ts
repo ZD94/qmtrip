@@ -4,7 +4,6 @@ import _ = require('lodash');
 import { InvitedLink } from 'api/_types/staff/invited-link';
 var browserspec = require('browserspec');
 var printf = require('printf');
-let _ = require('lodash');
 import * as path from 'path';
 
 declare var wx:any;
