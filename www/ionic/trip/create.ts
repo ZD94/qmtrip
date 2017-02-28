@@ -158,15 +158,18 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
     //     }
     //     return places;
     // }
-    async function queryAllPlaces(keyword){
-        let key = 'hot_cities_170228'
+    async function queryAllPlaces(keyword: string, isAbroad: boolean){
+        let key= 'hot_cities_170228_domestic';
+        if (isAbroad) {
+            key = 'hot_cities_170228_abroad';
+        }
         if (!keyword) {
             let hotCities = $storage.local.get(key)
             if (hotCities && hotCities[0] && hotCities[0].id) {
                 return hotCities;
             }
         }
-        var places = await API.place.queryPlace({keyword: keyword});
+        var places = await API.place.queryPlace({keyword: keyword, isAbroad: isAbroad});
         if (!keyword) {
             $storage.local.set(key, places);
         }
