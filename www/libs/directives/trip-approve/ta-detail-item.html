@@ -47,10 +47,10 @@
                     {{item.startTime | date: 'MM-dd'}}至{{item.endTime | date: 'MM-dd'}}(共{{days || 1}}天)
                 </span>
                 <span class="spanRight">
-                    <span ng-if="budget > 0">
-                        {{budget | currency_int}}元
+                     <span ng-if="item.price && item.price > 0">
+                          {{item.price | currency_int}}元
                     </span>
-                    <span ng-if="!budget || budget <= 0">
+                    <span ng-if="!item.price || item.price <=0 ">
                         暂无预算
                     </span>
                 </span>
@@ -68,12 +68,12 @@
         <div ng-if="item.tripType != ETripType.HOTEL && item.tripType != ETripType.OUT_TRIP && item.tripType != ETripType.BACK_TRIP">
             <span>{{item.startTime | date: 'MM-dd'}}至{{item.endTime | date: 'MM-dd'}}(共{{subsidyDays}}天)</span>
             <span class="spanRight">
-                <span ng-if="budget>0">
-                {{budget | currency_int}}元
-                </span>
-                <span ng-if="!budget || budget <= 0">
-                    暂无预算
-                </span>
+               <span ng-if="item.price && item.price > 0">
+                          {{item.price | currency_int}}元
+                    </span>
+                    <span ng-if="!item.price || item.price <=0 ">
+                        暂无预算
+                    </span>
             </span>
             <br/>
             <span class="spanRight right-budget" ng-if="item.price > 0">

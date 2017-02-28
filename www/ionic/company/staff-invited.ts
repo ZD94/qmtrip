@@ -1,5 +1,6 @@
 import { Staff } from 'api/_types/staff/staff';
 import moment = require('moment');
+import _ = require('lodash');
 import { InvitedLink } from 'api/_types/staff/invited-link';
 var browserspec = require('browserspec');
 var printf = require('printf');
@@ -69,6 +70,7 @@ export async function StaffInvitedController($scope, Models, $ionicHistory, $ion
     $scope.isAndroid = ionic.Platform.isAndroid();
     $scope.isIos =  ionic.Platform.isIOS();
     $scope.is_wechat = browserspec.is_wechat;
+    $scope.isCordova = window.cordova;
     var config = require('config');
     let shareImgUrl = path.join(config.update,'ionic/images/logo-whiteback.png');
     $scope.sendWx = async function(){

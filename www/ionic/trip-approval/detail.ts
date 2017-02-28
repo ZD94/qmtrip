@@ -139,7 +139,6 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     $scope.hotel = hotel;
     $scope.subsidy = subsidy;
     $scope.specialApprove = specialApprove;
-    console.info(isHasPermissionApprove);
     $scope.specialApproveBudgets = specialApproveBudget;
     $scope.trafficBudget = trafficBudget;
     $scope.hotelBudget = hotelBudget;

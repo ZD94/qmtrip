@@ -4,18 +4,58 @@
 <div class="companylist">
     <div class="companylist">
         <div class="companylist-title">
-            <div class="company_search">
-                <h3>公司列表</h3>
-               创建者姓名：<input type="text" placeholder="输入创建者姓名" ng-model="query.userName">
-               公司名称：<input type="text" placeholder="输入公司名称" ng-model="query.keyword">
-                手机号:<input type="text" placeholder="输入手机号" ng-model="query.mobile">
-                <br>
-                注册时间段: <input type="date"  ng-model="query.regDateStart">
-                --<input type="date" ng-model="query.regDateEnd">
-                小于剩余有效期天数:
-                <input type="text" ng-model="query.days" placeholder="输入有效期天数">
-                <button ng-click="doSearch()">搜索</button>
-            </div>
+            <h3>公司列表</h3>
+            <table>
+                <tr>
+                    <td>
+                        创建者姓名：
+                    </td>
+                    <td colspan="3"><input type="text" placeholder="输入创建者姓名" ng-model="query.userName"></td>
+                    <td colspan="2">
+                        公司名称：
+                    </td>
+                    <td colspan="2">
+                        <input type="text" placeholder="输入公司名称" ng-model="query.keyword">
+                    </td>
+                    <td >
+                        手机号:
+                    </td>
+                    <td colspan="2">
+                        <input type="text" placeholder="输入手机号" ng-model="query.mobile">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        注册时间段:
+                    </td>
+                    <td colspan="3">
+                        <input type="date"  ng-model="query.regDateStart"><input type="date" ng-model="query.regDateEnd">
+
+                    </td>
+                    <td colspan="2">
+                        小于剩余有效期天数:
+                    </td>
+                    <td colspan="2">
+                        <input type="text" ng-model="query.days" placeholder="输入有效期天数">
+                    </td>
+                    <td>
+                        <button class="btn" ng-click="doSearch()">搜索</button>
+                    </td>
+                </tr>
+            </table>
+
+            <!--<div class="company_search">-->
+                <!--<h3>公司列表</h3>-->
+                <!--创建者姓名：<input type="text" placeholder="输入创建者姓名" ng-model="query.userName">-->
+                <!--公司名称：<input type="text" placeholder="输入公司名称" ng-model="query.keyword">-->
+                <!--手机号:<input type="text" placeholder="输入手机号" ng-model="query.mobile">-->
+                <!--<br>-->
+                <!--注册时间段: <input type="date"  ng-model="query.regDateStart">-->
+                <!--&#45;&#45;<input type="date" ng-model="query.regDateEnd">-->
+                <!--小于剩余有效期天数:-->
+                <!--<input type="text" ng-model="query.days" placeholder="输入有效期天数">-->
+                <!--<button ng-click="doSearch()">搜索</button>-->
+            <!--</div>-->
             <div style="clear:both;"></div>
         </div>
         <table class="company">

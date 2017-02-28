@@ -1,0 +1,1 @@
+update company.companies set type = 0 where type is null;

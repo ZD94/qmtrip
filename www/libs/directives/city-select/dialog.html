@@ -40,7 +40,7 @@
                     </div>
                 </div>
                 <div class="city_list" ng-if="!isAbroad">
-                    <div class="city_block list" ng-repeat="item in internallist" ng-style="item.top">
+                    <div class="city_block list" ng-repeat="item in domesticlist" ng-style="item.top">
                         <div class="city_title">{{item.first_letter}}</div>
                         <div class="item" ng-repeat="city in item.cities" ng-click="confirm(city)">{{city.name}}</div>
                     </div>
@@ -52,7 +52,7 @@
                     </div>
                 </div>
             </div>
-            <ion-infinite-scroll ng-if="!isAbroad && pages.hasNextIndex()" on-infinite="pages.getCityList(internalCities)"></ion-infinite-scroll>
+            <ion-infinite-scroll ng-if="!isAbroad && pages.hasNextIndex()" on-infinite="pages.getCityList(domesticCities)"></ion-infinite-scroll>
             <ion-infinite-scroll ng-if="isAbroad && pages.hasNextIndex()" on-infinite="pages.getCityList(abroadCities)"></ion-infinite-scroll>
         </ion-scroll>
     </ion-content>

@@ -1,10 +1,11 @@
 import { Department } from 'api/_types/department';
 import {Staff, EStaffRoleNames, EStaffRole} from 'api/_types/staff/staff';
 import moment = require('moment');
+import {Pager} from "common/model/pager";
 var msgbox = require('msgbox');
 
 
-export async function IndexController($scope, $stateParams, Models, $ionicPopup, $ionicNavBarDelegate,$timeout, $location,ngModalDlg,$window, sortDlg) {
+export async function IndexController($scope, $stateParams, Models, $ionicPopup, $ionicNavBarDelegate,$timeout, $location,ngModalDlg, $ionicHistory, $window, sortDlg) {
     require('./department.scss');
     /*if($stateParams.departName){
         console.info('comming in....',$stateParams.departName)
@@ -50,22 +51,29 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         $scope.viewHeader = rootDepartment.name;
 
         let staffs = await rootDepartment.getStaffs();
-        initStaffs(staffs)
+
+        await initStaffs(staffs)
         $scope.departments = departments;
+        $scope.currentDepartments = departments;
     }
-    function initStaffs(staffs){
-        $scope.staffs = staffs.map(function(staff){
+    async function initStaffs(staffs){
+        Object.setPrototypeOf(staffs, Pager.prototype);
+        $scope.staffs = await Promise.all(staffs.map(async function(staff){
+            API.require("auth");
+            await API.onload();
+            let acc = await API.auth.getAccountStatus({id: staff.id});
+            staff['signStatus'] = 1;
             let hours = moment().diff(moment(staff.createdAt),'hours');
-            if(staff.status == 1 && hours < 24){
+            if(staff.signStatus == 1 && hours < 24){
                 staff['newStaff'] = true;
-            }else if(!status || staff.status == 0){
+            }else if(!staff.signStatus || staff.signStatus == 0){
                 staff['newRegister'] = true;
             }else{
                 staff['newStaff'] = false;
                 staff['newRegister'] = false;
             }
             return staff;
-        })
+        }))
     }
     initDepartment(departmentId);
     $scope.EStaffRoleNames = EStaffRoleNames;
@@ -81,6 +89,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     $scope.selected = {name:'最近加入',value:'',icon:'fa-sort-amount-desc'};
     $scope.sortBy = async function(selected){
         let staffs = await rootDepartment.getStaffs({where:{},order: selected});
+        Object.setPrototypeOf(staffs, Pager.prototype);
         $scope.staffs = staffs.map(function(staff){
             let hours = moment().diff(moment(staff.createdAt),'hours');
             if(staff.status == 1 && hours < 24){
@@ -95,8 +104,13 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         })
     }
     $scope.searchKeyword = async function(keyword){
+        if(!keyword){
+            $scope.departments = $scope.currentDepartments;
+        }else{
+            $scope.departments = [];
+        }
         let staffs = await rootDepartment.getStaffs({where: {name: {$ilike: `%${keyword}%`}}});
-        initStaffs(staffs);
+        await initStaffs(staffs);
     }
     $scope.addNewStaff = function(){
         window.location.href = '#/department/add-staff';
@@ -135,6 +149,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     $scope.staffSelector = {
         query: async function(keyword) {
             let staffs = await rootDepartment.getStaffs({where: {'name': {$ilike: '%'+keyword+'%'}}});
+            Object.setPrototypeOf(staffs, Pager.prototype);
             return staffs;
         },
         display: (staff)=>staff.name
@@ -157,26 +172,33 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         }
         $scope.saveDepartment = async function(){
             let department = $scope.department;
+            let fields = department.$fields;
             if(!department.name){
                 msgbox.log('部门名称不能为空');
                 return false;
             }
-            let departmentName = await Models.department.find({where:{'name':department.name,'companyId':department.companyId}})
-            if(departmentName.length>0){
-                msgbox.log('部门名称已存在');
-                return false;
-            }
-            try{
-                await department.save();
-            }catch(e){
-                if(e.code == -150){
-                    msgbox.log('不能设置该部门为上级部门');
-                }else{
-                    msgbox.log(e.msg);
+            if(fields.name || fields.parentId){
+                let departmentName = await Models.department.find({where:{'name':department.name,'companyId':department.companyId}})
+                if(departmentName.length>0){
+                    msgbox.log('部门名称已存在');
+                    return false;
                 }
-                return false;
+                try{
+                    await department.save();
+                }catch(e){
+                    if(e.code == -150){
+                        msgbox.log('不能设置该部门为上级部门');
+                    }else{
+                        msgbox.log(e.msg);
+                    }
+                    return false;
+                }
+                $scope.confirmModal()
+            }else{
+                console.info('no changes')
+                $scope.confirmModal()
             }
-            $scope.confirmModal()
+
         }
         $scope.deleteDepartment = function(){
             if($scope.department){
@@ -195,6 +217,13 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
                             onTap: async function(){
                                 try{
                                     await $scope.department.destroy();
+                                    $ionicHistory.nextViewOptions({
+                                        disableBack: true,
+                                        expire: 300
+                                    });
+                                    $scope.confirmModal();
+                                    window.location.href = '#/department/index';
+
                                 }catch(e){
                                     msgbox.log(e.msg);
                                 }

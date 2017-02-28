@@ -555,4 +555,5 @@ export class Staff extends ModelObject implements Account {
     isValidateMobile: boolean;
     isValidateEmail: boolean;
     coinAccount: CoinAccount;
+    isNeedChangePwd: boolean;
 }

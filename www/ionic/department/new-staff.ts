@@ -44,6 +44,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
         if(travelpolicylist && travelpolicylist.length>0){
             staff.travelPolicyId = travelpolicylist[0].id;
         }
+        staff.isNeedChangePwd = true;
     }
     $scope.staff = staff;
     $scope.EStaffRoleNames = EStaffRoleNames;
