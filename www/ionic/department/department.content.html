@@ -24,16 +24,16 @@
         </div>
     </div>
     <div class="list" >
-        <div class="item staff-list" ng-repeat="item in staffs" ng-click="showStaff(item.id)">
+        <div class="item staff-list" ng-repeat="item in policy_staffs" ng-click="showStaff(item.staff.id)">
             <!--<div class="staff-avatar-text">{{item.name}}</div>-->
-            <staff-avatar staff="item" class="staff-avatar"></staff-avatar>
+            <staff-avatar staff="item.staff" class="staff-avatar"></staff-avatar>
             <div class="staff-info">
-                <p>{{item.name}}
-                    <span class="staff-role" ng-class="{'bg-blue':item.roleId == EStaffRole.ADMIN}"
-                          ng-if="item.roleId == EStaffRole.ADMIN || item.roleId == EStaffRole.OWNER"
-                    >{{EStaffRoleNames[item.roleId] }}</span>
+                <p>{{item.staff.name}}
+                    <span class="staff-role" ng-class="{'bg-blue':item.staff.roleId == EStaffRole.ADMIN}"
+                          ng-if="item.staff.roleId == EStaffRole.ADMIN || item.staff.roleId == EStaffRole.OWNER"
+                    >{{EStaffRoleNames[item.staff.roleId] }}</span>
                 </p>
-                <p>{{item.travelPolicy.name}}</p>
+                <p>{{item.travelPolicy}}</p>
             </div>
 
 
@@ -41,7 +41,7 @@
             <span class="staff-flag" ng-if="item.newStaff">新加入</span>
         </div>
     </div>
-
+    <ion-infinite-scroll ng-if="page.hasNextPage()" on-infinite="page.nextPage()"></ion-infinite-scroll>
 </ion-content>
 <div class="tabs">
     <a class="tab-item" ng-click="addDepartment()">

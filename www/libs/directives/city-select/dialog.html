@@ -1,4 +1,5 @@
 <ion-modal-view class="city_dialog">
+<ion-modal-view class="city_dialog">
     <ion-header-bar class="bar-stable">
         <h1 class="title">{{options.title}}</h1>
         <div class="button button-clear" ng-click="modal.hide()">取消</div>
@@ -25,7 +26,7 @@
         </div>
         <div class="city_tabs">
             <a class="city_tab" ng-class="{active:!isAbroad}" ng-click="checkAbroad(false)">国内</a>
-            <a class="city_tab" ng-class="{active:isAbroad}" ng-click="checkAbroad(true)">国外</a>
+            <a class="city_tab" ng-class="{active:isAbroad}" ng-click="checkAbroad(true)">国际</a>
         </div>
         <ion-scroll>
             <div class="city_content">

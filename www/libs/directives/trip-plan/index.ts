@@ -140,10 +140,10 @@ angular
                 if ($scope.item.type == ETripType.HOTEL) {
                     let city = await City.getCity($scope.item.city);
                     $scope.item.city = city.name || $scope.item.city;
-                    $scope.days = moment($scope.item.checkOutDate).diff(moment($scope.item.checkInDate), 'days') || 1;
+                    $scope.days = moment(moment($scope.item.checkOutDate).format("YYYY-MM-DD")).diff(moment(moment($scope.item.checkInDate).format("YYYY-MM-DD")), 'days') || 1;
 
                 } else if ($scope.item.type == ETripType.SUBSIDY) {
-                    $scope.subsidyDays = moment($scope.item.endDateTime).diff(moment($scope.item.startDateTime), 'days') + 1;
+                    $scope.subsidyDays = moment(moment($scope.item.endDateTime).format("YYYY-MM-DD")).diff(moment(moment($scope.item.startDateTime).format("YYYY-MM-DD")), 'days') + 1;
 
                 } else if ([ETripType.OUT_TRIP, ETripType.BACK_TRIP, ETripType.SPECIAL_APPROVE].indexOf($scope.item.type) >= 0) {
                     let deptCity = await City.getCity($scope.item.deptCity);

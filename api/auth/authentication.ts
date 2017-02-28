@@ -7,17 +7,31 @@ import validator = require('validator');
 import { Token } from 'api/_types/auth/token';
 import { ACCOUNT_STATUS } from "api/_types/auth";
 
+export const OS_TYPE = {
+    WEB: 'web',
+    TMP_CODE: 'tmpCode',
+    WECHAT: 'wechat',
+}
+
 //生成登录凭证
 export async function makeAuthenticateToken(accountId, os?: string, expireAt?: Date): Promise<LoginResponse> {
     if(!os) {
-        os = 'web';
+        os = OS_TYPE.WEB;
     }
     let type = 'auth:'+os;
 
     let tokens = await Models.token.find({where:{accountId, type}, limit: 1});
     let token: Token;
     if(tokens.total > 0) {
-        token = tokens[0];
+        if (os == OS_TYPE.TMP_CODE) {
+            let ps = tokens.map((t) => {
+                return t.destroy();
+            });
+            await Promise.all(ps);
+            token = Models.token.create({token: utils.getRndStr(10), accountId, type});
+        } else {
+            token = tokens[0];
+        }
     } else {
         token = Models.token.create({token: utils.getRndStr(10), accountId, type});
     }
