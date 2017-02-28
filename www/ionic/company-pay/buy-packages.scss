@@ -96,24 +96,30 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      width:100%;
-      height:44px;
-      border-radius: 3px;
-      background: #28A7E1;
-      margin-top: 11px;
-      > p{
-        color:#FFF;
-        font-size:16px;
-        margin:0;
-      }
+     .upBtn{
+       width:100%;
+       height:44px;
+       border-radius: 3px;
+       background: #28A7E1;
+       margin-top: 11px;
+       line-height: 44px;
+       > p{
+         color:#FFF;
+         font-size:16px;
+         margin:0;
+       }
+     }
     }
     .contact{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
       width:100%;
       color:#FFF;
       font-size:14px;
       margin-top:42px;
     }
   }
-
  }
 }

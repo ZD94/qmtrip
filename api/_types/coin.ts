@@ -4,7 +4,7 @@
 
 'use strict';
 import {ModelObject} from "common/model/object";
-import {Table, Field, Create, RemoteCall} from "common/model/common";
+import {Table, Field, Create, RemoteCall, LocalCall} from "common/model/common";
 import {Models} from "./index";
 import {Types, Values} from "common/model/index";
 import {PaginateInterface} from "common/model/interface";
@@ -61,7 +61,8 @@ export class CoinAccount extends ModelObject {
 
     //可用余额
     get balance(): number { return this.income - this.consume - this.locks }
-    
+
+    @LocalCall()
     async findChanges(options: any) : Promise<PaginateInterface<CoinAccountChange>> {
         if (!options) {
             options = {}
@@ -73,15 +74,11 @@ export class CoinAccount extends ModelObject {
         return Models.coinAccountChange.find(options);
     }
 
-    // @RemoteCall()
+    @LocalCall()
     async addCoin(coins: number, remark?: string, duiBaOrderNum?: string, type?: COIN_CHANGE_TYPE) :Promise<any> {
         let self = this;
-        /*if(!this.isLocal){
-            API.require('seeds');
-            await API.onload();
-        }*/
+
         //先记录日志
-        // let coinAccountNo = await API.seeds.getSeedNo('CoinAccountNo');
         let coinAccountNo = getOrderNo();
         let log = await Models.coinAccountChange.create({orderNum: coinAccountNo, type: type || COIN_CHANGE_TYPE.INCOME, coinAccountId: self.id, coins: coins, remark: remark, duiBaOrderNum: duiBaOrderNum});
         log = await log.save();
@@ -99,6 +96,7 @@ export class CoinAccount extends ModelObject {
         return {coinAccount: coinAccount, coinAccountChange: log};
     }
 
+    @LocalCall()
     async costCoin(coins: number, remark?: string, duiBaOrderNum?: string) : Promise<any>{
         let self = this;
         let balance = self.balance;
@@ -129,6 +127,7 @@ export class CoinAccount extends ModelObject {
         return {coinAccount: coinAccount, coinAccountChange: log};
     }
 
+    @LocalCall()
     async lockCoin(coins: number, remark?: string, duiBaOrderNum?: string) :Promise<any>{
         let self = this;
         let balance = self.balance;
@@ -161,6 +160,7 @@ export class CoinAccount extends ModelObject {
         return {coinAccount: coinAccount, coinAccountChange: log};
     }
 
+    @LocalCall()
     async freeCoin(coins: number, remark?: string) :Promise<CoinAccount> {
         let self = this;
         if (self.locks < coins) {
@@ -189,6 +189,7 @@ export class CoinAccount extends ModelObject {
         return self.save()
     }
 
+    @LocalCall()
     async getCoinAccountChanges(params) :Promise<any> {
         let self = this;
         if(!params) params = {};

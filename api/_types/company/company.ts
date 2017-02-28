@@ -204,6 +204,11 @@ export class Company extends ModelObject{
     get tripPlanFrozenNum(): number { return 0; }
     set tripPlanFrozenNum(val: number) {}
 
+    // 套餐加油包冻结数目
+    @Field({type: Types.INTEGER, defaultValue: 0})
+    get extraTripPlanFrozenNum(): number { return 0; }
+    set extraTripPlanFrozenNum(val: number) {}
+
     // 够买套餐条数
     @Field({type: Types.INTEGER, defaultValue: 0})
     get extraTripPlanNum(): number { return 0; }
@@ -214,12 +219,26 @@ export class Company extends ModelObject{
     get extraExpiryDate(): Date { return null; }
     set extraExpiryDate(val: Date) {}
 
-    //可用剩余行程点数
+    //可用剩余行程数
     get tripPlanNumBalance(): number {
         let num = this.tripPlanNumLimit - this.tripPlanPassNum - this.tripPlanFrozenNum;
-        if(this.extraTripPlanNum && this.extraExpiryDate && (this.extraExpiryDate.getTime() - new Date().getTime()) > 0){
-            num = num + this.extraTripPlanNum;
+        if(num < 0){
+            num = 0;
         }
+        if(this.extraTripPlanNum && this.extraExpiryDate && (this.extraExpiryDate.getTime() - new Date().getTime()) > 0){
+            num = num + this.extraTripPlanNum - this.extraTripPlanFrozenNum;
+        }
+        return num;
+    }
+    //套餐内剩余行程数
+    get tripPlanNumInBase(): number {
+        let num = this.tripPlanNumLimit - this.tripPlanPassNum - this.tripPlanFrozenNum;
+        return num;
+    }
+
+    //加油包内剩余行程数
+    get tripPlanNumInPack(): number {
+        let num = this.extraTripPlanNum - this.extraTripPlanFrozenNum;
         return num;
     }
 
@@ -302,16 +321,138 @@ export class Company extends ModelObject{
      * @returns {Company}
      */
     @RemoteCall()
-    async frozenTripPlanNum(params?: any): Promise<Company> {
+    async frozenTripPlanNum(params?: any): Promise<any> {
         let number = 1;
         if(params && params.number){
             number = params.number;
         }
-        this.tripPlanFrozenNum = this.tripPlanFrozenNum + number;
+        let extraFrozen = 0;
+        let limitFrozen = 0;
+        let lostFrozenNum = this.tripPlanNumLimit - this.tripPlanPassNum - this.tripPlanFrozenNum;
+
+        if(lostFrozenNum > 0){
+            if(lostFrozenNum >= number){
+                limitFrozen = number;
+            }else{
+                limitFrozen = lostFrozenNum;
+                extraFrozen = number - lostFrozenNum;
+            }
+        }else{
+            extraFrozen = number;
+        }
+        this.tripPlanFrozenNum = this.tripPlanFrozenNum + limitFrozen;
+        this.extraTripPlanFrozenNum = this.extraTripPlanFrozenNum + extraFrozen;
         let result = await this.save();
+
         params.type = NUM_CHANGE_TYPE.FROZEN;
         params.companyId = this.id;
         params.number = 0 - number;
+        let log = TripPlanNumChange.create(params);
+        let account = await Models.staff.get(params.accountId);
+        log.account = account;
+        await log.save();
+        let frozenNum = {limitFrozen: limitFrozen, extraFrozen: extraFrozen};
+        return {company : result, frozenNum: frozenNum};
+    }
+
+    /**
+     * 审批通过扣减行程点数
+     * @param params
+     * @returns {Company}
+     */
+    @RemoteCall()
+    async approvePassReduceTripPlanNum(params?: any): Promise<Company> {
+        let result = this;
+        let extraFrozen = params.frozenNum.extraFrozen;
+        let limitFrozen = params.frozenNum.limitFrozen;
+        if(this.expiryDate && (this.expiryDate.getTime() - new Date().getTime() > 0) ){
+            this.tripPlanFrozenNum = this.tripPlanFrozenNum - limitFrozen;
+            this.tripPlanPassNum = this.tripPlanPassNum + limitFrozen;
+        }
+        if(this.extraExpiryDate && (this.extraExpiryDate.getTime() - new Date().getTime() > 0)){
+            this.extraTripPlanFrozenNum = this.extraTripPlanFrozenNum - extraFrozen;
+            this.extraTripPlanNum = this.extraTripPlanNum - extraFrozen;
+        }
+        result = await this.save();
+
+        params.type = NUM_CHANGE_TYPE.CONSUME;
+        params.companyId = this.id;
+        params.number = extraFrozen + limitFrozen;
+        let log = TripPlanNumChange.create(params);
+        let account = await Models.staff.get(params.accountId);
+        log.account = account;
+        await log.save();
+        return result;
+    }
+
+    /**
+     * 审批通过本月之前的行程只处理加油包行程数
+     * @param params
+     * @returns {Company}
+     */
+    @RemoteCall()
+    async approvePassReduceBeforeNum(params?: any): Promise<Company> {
+        let extraFrozen = params.frozenNum.extraFrozen;
+        let limitFrozen = params.frozenNum.limitFrozen;
+        if(this.extraExpiryDate.getTime() - new Date().getTime() > 0){
+            this.extraTripPlanFrozenNum = this.extraTripPlanFrozenNum - extraFrozen;
+            this.extraTripPlanNum = this.extraTripPlanNum - extraFrozen;
+        }
+        let result = await this.save();
+
+        params.type = NUM_CHANGE_TYPE.CONSUME;
+        params.companyId = this.id;
+        params.number = extraFrozen + limitFrozen;
+        let log = TripPlanNumChange.create(params);
+        let account = await Models.staff.get(params.accountId);
+        log.account = account;
+        await log.save();
+        return result;
+    }
+
+    /**
+     * 审批驳回返回行程点数
+     * @param params
+     * @returns {Company}
+     */
+    @RemoteCall()
+    async approveRejectFreeTripPlanNum(params?: any): Promise<Company> {
+        let extraFrozen = params.frozenNum.extraFrozen;
+        let limitFrozen = params.frozenNum.limitFrozen;
+        if(this.expiryDate.getTime() - new Date().getTime() > 0){
+            this.tripPlanFrozenNum = this.tripPlanFrozenNum - limitFrozen;
+        }
+        if(this.extraExpiryDate.getTime() - new Date().getTime() > 0){
+            this.extraTripPlanFrozenNum = this.extraTripPlanFrozenNum - extraFrozen;
+        }
+        let result = await this.save();
+
+        params.type = NUM_CHANGE_TYPE.FREE_FROZEN;
+        params.companyId = this.id;
+        params.number = extraFrozen + limitFrozen;
+        let log = TripPlanNumChange.create(params);
+        let account = await Models.staff.get(params.accountId);
+        log.account = account;
+        await log.save();
+        return result;
+    }
+
+    /**
+     *审批驳回本月之前的行程只处理加油包行程数
+     * @param params
+     * @returns {Company}
+     */
+    @RemoteCall()
+    async approveRejectFreeBeforeNum(params?: any): Promise<Company> {
+        let extraFrozen = params.frozenNum.extraFrozen;
+        if(this.extraExpiryDate.getTime() - new Date().getTime() > 0){
+            this.extraTripPlanFrozenNum = this.extraTripPlanFrozenNum - extraFrozen;
+        }
+        let result = await this.save();
+
+        params.type = NUM_CHANGE_TYPE.FREE_FROZEN;
+        params.companyId = this.id;
+        params.number = extraFrozen;
         let log = TripPlanNumChange.create(params);
         let account = await Models.staff.get(params.accountId);
         log.account = account;
@@ -494,13 +635,16 @@ export class Company extends ModelObject{
             return null;
         }
     }
-    
-    async getRootDepartment(companyId?:string): Promise<Department> {
+
+    @RemoteCall()
+    async getRootDepartment(): Promise<Department> {
+        let self = this;
         var depts = await Models.department.find({where: {companyId: this.id, parentId: null}});
         if(depts && depts.length>0){
             return depts[0];
         }else{
-            return null;
+            let department = Models.department.create({name: self.name, companyId: self.id, parentId: null});
+            return department.save();
         }
     }
 

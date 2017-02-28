@@ -3,7 +3,7 @@ import {TravelPolicy, EPlaneLevel, ETrainLevel, EHotelLevel, MPlaneLevel, MTrain
 import { SubsidyTemplatesController } from './subsidy-templates';
 var msgbox = require('msgbox');
 
-export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory, $ionicPopup,ngModalDlg) {
+export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory, $ionicPopup, ngModalDlg, $window) {
     require('./editpolicy.scss');
     $scope.travelPolicy = {};
     $scope.planeLevels = [
@@ -126,7 +126,7 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
             $ionicHistory.goBack(-1);
         } else if ((backUrl.substr(0,backUrl.indexOf('?')))== `/travel-policy/showpolicy`){
             console.log(2)
-            $ionicHistory.goBack(-2);
+            $window.history.go(-1);
         }
 
     }

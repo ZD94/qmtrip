@@ -7,6 +7,7 @@ import {EGender} from "api/_types/index";
 import L from 'common/language';
 import validator = require('validator');
 import {Pager} from "common/model/pager";
+import {type} from "os";
 var _ = require('lodash');
 var msgbox = require('msgbox');
 
@@ -43,6 +44,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
         if(travelpolicylist && travelpolicylist.length>0){
             staff.travelPolicyId = travelpolicylist[0].id;
         }
+        staff.isNeedChangePwd = true;
     }
     $scope.staff = staff;
     $scope.EStaffRoleNames = EStaffRoleNames;
@@ -228,7 +230,8 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     }
     $scope.saveStaff = async function(){
         $ionicHistory.nextViewOptions({
-            disableBack: true,
+            /*disableBack: true,*/
+            disableBack: false,
             expire: 300
         });
         if($scope.staffId){
@@ -238,7 +241,8 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     }
     $scope.addAnother = function(){
         $ionicHistory.nextViewOptions({
-            disableBack: true,
+            /*disableBack: true,*/
+            disableBack: false,
             expire: 300
         });
         staffSave(AddAnotherOne);
@@ -313,7 +317,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
 
             if(!ownerModifyAdmin){
                 staff = await staff.save();
-                await staff.saveStaffDepartments($scope.addedArray)
+                await staff.saveStaffDepartments($scope.addedArray);
                 callback();
             }
         }catch(err){
@@ -327,6 +331,14 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
         window.location.href = `#/department/staff-info?staffId=${$scope.staff.id}`
     }
     function AddAnotherOne(){
-        window.location.reload();
+        staff = Staff.create();
+        staff.company = company;
+        staff.sex = 0;
+        if(travelpolicylist && travelpolicylist.length>0){
+            staff.travelPolicyId = travelpolicylist[0].id;
+        }
+        $scope.staff = staff;
+        $scope.staffPolicyName = '';
+        $scope.selectDepartments = [];
     }
 }

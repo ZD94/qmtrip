@@ -44,6 +44,10 @@ class ApproveModule {
         //获取预算详情
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: submitter.id});
         let number = 0;
+        let content = "";
+        let originCity = await API.place.getCityInfo({cityCode: budgetInfo.query.originPlace});
+        let destinationCity = await API.place.getCityInfo({cityCode: budgetInfo.query.destinationPlace});
+        content = originCity.name + "-" + destinationCity.name;
         if(budgetInfo.budgets && budgetInfo.budgets.length>0){
             budgetInfo.budgets.forEach(function(item){
                 if(item.tripType != 3){
@@ -53,6 +57,15 @@ class ApproveModule {
         }
 
         await company.beforeGoTrip({number: number});
+
+        //冻结行程数
+        let oldNum = company.tripPlanNumLimit + company.extraTripPlanNum - company.tripPlanPassNum - company.tripPlanFrozenNum - company.extraTripPlanFrozenNum;
+        let result = await company.frozenTripPlanNum({accountId: submitter.id, number: number,
+            remark: "提交出差申请消耗行程点数", content: content});
+
+        let com = result.company;
+        let frozenNum = result.frozenNum;
+        budgetInfo.query.frozenNum = frozenNum;
         let approve = await ApproveModule._submitApprove({
             submitter: submitter.id,
             data: budgetInfo,
@@ -62,14 +75,9 @@ class ApproveModule {
             approveUser: approveUser,
         });
 
-        let oldNum = company.tripPlanNumLimit + company.extraTripPlanNum - company.tripPlanPassNum - company.tripPlanFrozenNum;
-        let content = budgetInfo.budgets[0].originPlace.name? budgetInfo.budgets[0].originPlace.name : budgetInfo.budgets[0].originPlace
-        + "-" + budgetInfo.budgets[0].destination.name? budgetInfo.budgets[0].destination.name: budgetInfo.budgets[0].destination;
-        let com = await company.frozenTripPlanNum({accountId: submitter.id, tripPlanId: approve.id, number: number,
-            remark: "提交出差申请消耗行程点数", content: content});
 
         //行程数第一次小于10或等于0时给管理员和创建人发通知
-        let newNum = com.tripPlanNumLimit + com.extraTripPlanNum - com.tripPlanPassNum - com.tripPlanFrozenNum;
+        let newNum = com.tripPlanNumLimit + com.extraTripPlanNum - com.tripPlanPassNum - com.tripPlanFrozenNum - com.extraTripPlanFrozenNum;
         if(com.extraExpiryDate && com.extraExpiryDate.getTime() - new Date().getTime() < 0){
             newNum = com.tripPlanNumLimit - com.tripPlanPassNum - com.tripPlanFrozenNum;
         }
