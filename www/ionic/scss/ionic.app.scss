@@ -291,3 +291,10 @@ textarea {
   border-radius: 5px;
   font-size: 12px;
 }
+
+//
+@media (max-width: 320px){
+  .item-icon-right .icon{
+    right: 0;
+  }
+}

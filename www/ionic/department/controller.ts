@@ -149,6 +149,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     $scope.staffSelector = {
         query: async function(keyword) {
             let staffs = await rootDepartment.getStaffs({where: {'name': {$ilike: '%'+keyword+'%'}}});
+            Object.setPrototypeOf(staffs, Pager.prototype);
             return staffs;
         },
         display: (staff)=>staff.name
