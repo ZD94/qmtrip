@@ -48,6 +48,9 @@ class StaffModule{
     static async createStaff (params): Promise<Staff> {
         let currentStaff = await Staff.getCurrent();
         let company = currentStaff.company;
+        if(params.roleId && params.roleId == EStaffRole.OWNER){
+            throw L.ERR.PERMISSION_DENY("添加创建者");
+        }
         /*let staffNum = await company.getStaffNum();
         if(staffNum >= company.staffNumLimit){
             throw L.ERR.BEYOND_LIMIT_NUM("员工");

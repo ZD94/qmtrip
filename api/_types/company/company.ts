@@ -190,8 +190,8 @@ export class Company extends ModelObject{
     set staffNumLimit(val: number) {}
 
     // 企业出差审批数目限制（每月）
-    @Field({type: Types.INTEGER, defaultValue: 10})
-    get tripPlanNumLimit(): number { return 10; }
+    @Field({type: Types.INTEGER, defaultValue: 60})
+    get tripPlanNumLimit(): number { return 60; }
     set tripPlanNumLimit(val: number) {}
 
     // 企业出差审批通过数目（每月月初会清零）

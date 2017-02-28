@@ -5,7 +5,7 @@
 import { requireParams, clientExport } from "../../common/api/helper";
 import { Models, EAccountType } from "api/_types";
 import { Account, ACCOUNT_STATUS } from "api/_types/auth";
-import { Staff, EInvitedLinkStatus } from "api/_types/staff";
+import { Staff, EInvitedLinkStatus, EAddWay } from "api/_types/staff";
 import validator = require('validator');
 import L from 'common/language';
 import cache = require("common/cache");
@@ -454,7 +454,8 @@ export default class ApiAuth {
                 pwd: utils.md5(pwd),
                 status: ACCOUNT_STATUS.ACTIVE,
                 isValidateMobile: true,
-                avatarColor: avatarColor
+                avatarColor: avatarColor,
+                addWay: EAddWay.INVITED
             });
         } else {
             throw L.ERR.CODE_ERROR();
@@ -471,7 +472,7 @@ export default class ApiAuth {
     @clientExport
     static async checkEmailAndMobile(data: {email?: string, mobile?: string}) {
         if(data.email && !validator.isEmail(data.email)) {
-            throw L.ERR.INVALID_FORMAT('email');
+            throw L.ERR.PERMISSION_DENY();
         }
 
         if(data.mobile && !validator.isMobilePhone(data.mobile, 'zh-CN')) {
@@ -755,7 +756,7 @@ export default class ApiAuth {
     }
 
     @clientExport
-    static async getAccountStatus(params: {}): Promise<any> {
+    static async getAccountStatus(params: {id: string}): Promise<any> {
         let acc: Account;
         let args: any = {attributes: ["status"]};
         args.where = {id: params.id};
