@@ -519,7 +519,7 @@ export class Staff extends ModelObject implements Account {
         if (!self.email) {
             throw L.ERR.EMAIL_EMPTY('邮箱还未绑定');
         }
-        let url = await self.getAutoLoginUrl(`${C.host}/corp-mgr.html`, 'corp-mgr');
+        let url = await self.getAutoLoginUrl(`${C.host}/corp-mgr.html`, OS_TYPE.TMP_CODE);
         await API.notify.submitNotify({
             accountId: self.id,
             values: {
