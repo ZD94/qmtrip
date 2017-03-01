@@ -88,7 +88,7 @@ class StaffModule{
         let values  = {
             name: account.mobile,
             pwd: pwd,
-            url:'http:' + config.host
+            url: config.host
         }
 
         try{
@@ -316,7 +316,7 @@ class StaffModule{
                 await toStaff.save();
                 await API.notify.submitNotify({
                     key: 'qm_transfer_owner',
-                    values: {url: 'http:' + config.host},
+                    values: {url: config.host},
                     accountId: toStaff.id
                 });
             }catch(e){
