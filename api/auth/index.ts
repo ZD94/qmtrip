@@ -473,7 +473,7 @@ export default class ApiAuth {
     @clientExport
     static async checkEmailAndMobile(data: {email?: string, mobile?: string}) {
         if(data.email && !validator.isEmail(data.email)) {
-            throw L.ERR.PERMISSION_DENY();
+            throw L.ERR.EMAIL_FORMAT_INVALID();
         }
 
         if(data.mobile && !validator.isMobilePhone(data.mobile, 'zh-CN')) {
