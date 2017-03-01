@@ -1,146 +1,150 @@
-.main{
-  background: url("ionic/images/payBg.png") no-repeat;
-  text-align: center;
-  background-size:cover;
-  display: flex;
-  flex-direction: column;
-  .top{
-    flex:1;
-    .serviceInfo{
-      width:188px;
-      height:198px;
-      margin: 10px auto;
-      background: url("ionic/images/info.png");
-      overflow: hidden;
-      .title{
-        margin-top:29px;
-        color:#0EC2D0;
-        font-size:16px;
-      }
-      .expireDate{
-        color:#0EC2D0;
-        font-size:24px;
-      }
-      .package{
-        width:92px;
-        height: 58px;
-        margin:20px auto;
-        border: 1px solid #75E3FF;
-        color:#56ABB9;
-        font-size: 14px;
-        .tryingPackage{
-          line-height: 58px;
-        }
-      }
-      .service{
-        line-height:58px;
-      }
-    }
-    .month-tit{
-      font-size:20px;
-      color:#FFF;
-    }
-    .price{
-      margin-top:10px;
-      font-size:14px;
-      color:#0EC2CF;
-    }
-    .notice{
-      margin-top:10px;
-      font-size:14px;
-      color:#FFF;
-    }
-  }
-  .bottom{
-    flex:1;
+.box-service{
+  overflow: auto;
+  .main{
+    background: url("ionic/images/payBg.png") no-repeat;
+    min-height:550px;
+    text-align: center;
+    background-size:cover;
     display: flex;
     flex-direction: column;
-   .priceFlex{
-     flex:1;
-     .priceKinds{
-       width:250px;
-       height:130px;
-       margin:0px auto;
-       > div{
-         width:120px;
-         height:60px;
-         border-radius: 3px;
-         background:#417E90;
-         float: left;
-         &:nth-child(odd){
-           margin-right:10px;
-         }
-         &:nth-child(1){
-           margin-bottom: 10px;
-         }
-         &:nth-child(2){
-           margin-bottom: 10px;
-         }
-         > p{
-           &:nth-child(odd){
-             color:#FFF;
-             font-size:16px;
-             margin-top:10px;
-             margin-bottom:0px;
-           }
-           &:nth-child(even){
-             color:#0EC2CF;
-             font-size:14px;
-           }
-         }
-       }
-     }
-   }
-    .telFlex{
+    .top{
+      flex:1;
+      .serviceInfo{
+        width:188px;
+        height:198px;
+        margin: 10px auto;
+        background: url("ionic/images/info.png");
+        overflow: hidden;
+        .title{
+          margin-top:29px;
+          color:#0EC2D0;
+          font-size:16px;
+        }
+        .expireDate{
+          color:#0EC2D0;
+          font-size:24px;
+        }
+        .package{
+          width:92px;
+          height: 58px;
+          margin:20px auto;
+          border: 1px solid #75E3FF;
+          color:#56ABB9;
+          font-size: 14px;
+          .tryingPackage{
+            line-height: 58px;
+          }
+        }
+        .service{
+          line-height:58px;
+        }
+      }
+      .month-tit{
+        font-size:20px;
+        color:#FFF;
+      }
+      .price{
+        margin-top:10px;
+        font-size:14px;
+        color:#0EC2CF;
+      }
+      .notice{
+        margin-top:10px;
+        font-size:14px;
+        color:#FFF;
+      }
+    }
+    .bottom{
       flex:1;
       display: flex;
       flex-direction: column;
-      .telBtn{
+      .priceFlex{
         flex:1;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        margin-top: 10px;
-       > a{
-         width:100%;
-         .btn{
-           width:100%;
-           height:44px;
-           border-radius: 3px;
-           background: #28A7E1;
-           line-height:44px;
-           p{
-             color:#FFF;
-             font-size:16px;
-             margin-bottom: 0;
-           }
-         }
-       }
+        .priceKinds{
+          width:250px;
+          height:130px;
+          margin:0px auto;
+          > div{
+            width:120px;
+            height:60px;
+            border-radius: 3px;
+            background:#417E90;
+            float: left;
+            &:nth-child(odd){
+              margin-right:10px;
+            }
+            &:nth-child(1){
+              margin-bottom: 10px;
+            }
+            &:nth-child(2){
+              margin-bottom: 10px;
+            }
+            > p{
+              &:nth-child(odd){
+                color:#FFF;
+                font-size:16px;
+                margin-top:10px;
+                margin-bottom:0px;
+              }
+              &:nth-child(even){
+                color:#0EC2CF;
+                font-size:14px;
+              }
+            }
+          }
+        }
       }
-      .contact{
+      .telFlex{
         flex:1;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        width:100%;
-        color:#FFF;
-        font-size:14px;
+        display: flex;
+        flex-direction: column;
+        .telBtn{
+          flex:1;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          margin-top: 10px;
+          > a{
+            width:100%;
+            .btn{
+              width:100%;
+              height:44px;
+              border-radius: 3px;
+              background: #28A7E1;
+              line-height:44px;
+              p{
+                color:#FFF;
+                font-size:16px;
+                margin-bottom: 0;
+              }
+            }
+          }
+        }
+        .contact{
+          flex:1;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          width:100%;
+          color:#FFF;
+          font-size:14px;
+        }
       }
     }
-  }
 
-  .login{
-    .btn{
-      margin-top: 10px;
-      width:100%;
-      height:44px;
-      border-radius: 3px;
-      background: #28A7E1;
-      line-height: 44px;
-      p{
-        color:#FFF;
-        font-size:16px;
-        margin-bottom: 0;
+    .login{
+      .btn{
+        margin-top: 10px;
+        width:100%;
+        height:44px;
+        border-radius: 3px;
+        background: #28A7E1;
+        line-height: 44px;
+        p{
+          color:#FFF;
+          font-size:16px;
+          margin-bottom: 0;
+        }
       }
     }
   }
