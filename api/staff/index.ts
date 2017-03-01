@@ -653,7 +653,7 @@ class StaffModule{
                 staffObj.departmentIds = departmentIds;
                 let staff1 = await API.auth.checkAccExist({where: {email: staffObj.email, type: 1}});
                 let staff2 = await API.auth.checkAccExist({where: {mobile: staffObj.mobile, type: 1}});
-                if(staff1){
+                if(staff1 && staffObj.email && staffObj.email != ""){
                     staffObj.reason = "邮箱与已有用户重复";
                     s[7] = "邮箱与已有用户重复";
                     noAddObj.push(staffObj);
