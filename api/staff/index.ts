@@ -658,7 +658,7 @@ class StaffModule{
                     s[7] = "邮箱与已有用户重复";
                     noAddObj.push(staffObj);
                     downloadNoAddObj.push(s);
-                }else if(staff2){
+                }else if(staff2 && staffObj.mobile && staffObj.mobile != ""){
                     staffObj.reason = "手机号与已有用户重复";
                     s[7] = "手机号与已有用户重复";
                     noAddObj.push(staffObj);
