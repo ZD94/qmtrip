@@ -298,7 +298,8 @@ export default class ApiTravelBudget {
             let obj;
             if (businessDistrict) {
                 obj = API.place.getCityInfo({cityCode: businessDistrict});
-            } else {
+            }
+            if (!obj || !obj.latitude || !obj.longitude) {
                 obj = city;
             }
             gps = [obj.latitude, obj.longitude];

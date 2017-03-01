@@ -80,7 +80,8 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     async function initTravelPolicy(staffs){
         await Promise.all(staffs.map(async function(staff){
             let travelPolicy = await staff.getTravelPolicy();
-            if(!travelPolicy.name){
+            if(!travelPolicy){
+                travelPolicy = {};
                 travelPolicy.name = '';
             }
             $scope.policy_staffs.push({staff: staff,travelPolicy: travelPolicy.name});
@@ -283,15 +284,22 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         $scope.showChild = async function(department){
             $scope.rootDepartment = department;
             let childDepartments = await department.getChildDeptStaffNum();
-            $scope.departments = await Promise.all(childDepartments.map(async function(department) {
+            $scope.departments = await Promise.all(childDepartments.map(async function(department,idx) {
                 let childDepartment = await department.getChildDeptStaffNum();
                 if(childDepartment && childDepartment.length>0){
                     department.hasChild = true;
                 }else{
                     department.hasChild = false;
                 }
-                return department;
+                if(department.id != $scope.department.id){
+                    return department;
+                }else{
+                    $scope.deleteIndex = idx;
+                }
             }));
+            if($scope.deleteIndex != null){
+                $scope.departments.splice($scope.deleteIndex,1);
+            }
         }
         $scope.backParent = async function(parentDdepartment){
             let childDepartments = await parentDdepartment.getChildDeptStaffNum();
