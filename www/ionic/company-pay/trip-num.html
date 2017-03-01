@@ -31,7 +31,7 @@
                     <span class="item-icon" ng-if="item.type == NUM_CHANGE_TYPE.FROZEN ">花</span>
                     <span class="item-icon" ng-if="item.type == NUM_CHANGE_TYPE.SYSTEM_ADD "></span>
                     <span class="item-icon" ng-if="item.type == NUM_CHANGE_TYPE.SYSTEM_REDUCE "></span>
-                    <span class="item-num">{{item.number > 0? +item.number:item.number}}</span>
+                    <span class="item-num">{{item.number > 0? '+'+item.number:item.number}}</span>
                     <div class="item-info">
                         <p>{{item.staff}}</p>
                         <p>{{item.content}}</p>
