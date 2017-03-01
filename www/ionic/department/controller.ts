@@ -55,7 +55,6 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         $scope.staffPagers = staffs;
         Object.setPrototypeOf($scope.staffPagers, Pager.prototype);
         await initStaffs(staffs);
-        await initTravelPolicy($scope.staffs);
         $scope.departments = departments;
         $scope.currentDepartments = departments;
     }
@@ -81,10 +80,15 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     async function initTravelPolicy(staffs){
         await Promise.all(staffs.map(async function(staff){
             let travelPolicy = await staff.getTravelPolicy();
+            if(!travelPolicy){
+                travelPolicy = {};
+                travelPolicy.name = '';
+            }
             $scope.policy_staffs.push({staff: staff,travelPolicy: travelPolicy.name});
         }))
     }
     await initDepartment(departmentId);
+    await initTravelPolicy($scope.staffs);
     var page = {
         hasNextPage: function() {
             return $scope.staffPagers.hasNextPage();
@@ -118,6 +122,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     $scope.sortBy = async function(selected){
         let staffs = await rootDepartment.getStaffs({where:{},order: selected});
         await initStaffs(staffs);
+        $scope.policy_staffs = [];
         await initTravelPolicy($scope.staffs);
     }
     $scope.searchKeyword = async function(keyword){
@@ -128,6 +133,8 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         }
         let staffs = await rootDepartment.getStaffs({where: {name: {$ilike: `%${keyword}%`}}});
         await initStaffs(staffs);
+        $scope.policy_staffs = [];
+        await initTravelPolicy($scope.staffs);
     }
     $scope.addNewStaff = function(){
         window.location.href = '#/department/add-staff';

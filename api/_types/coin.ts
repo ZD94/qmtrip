@@ -189,7 +189,6 @@ export class CoinAccount extends ModelObject {
         return self.save()
     }
 
-    @LocalCall()
     async getCoinAccountChanges(params) :Promise<any> {
         let self = this;
         if(!params) params = {};

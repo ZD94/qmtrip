@@ -72,7 +72,7 @@
                         <div class="list">审批通过</div>
                         <div class="list">查看审批详情</div>
                     </div>
-                    <button ng-if="isHasPermissionApprove" class="button button_right" ng-click="checkTrip()" style='color:#ffffff;background-color: #28A7E1'>查看行程
+                    <button ng-if="tripApprove.approveUser && curStaff.id == tripApprove.approveUser.id" class="button button_right" ng-click="checkTrip()" style='color:#ffffff;background-color: #28A7E1'>查看行程
                     </button>
                 </bottom-bar>
                 <bottom-bar ng-if="tripApprove.status == EApproveStatus.CANCEL">

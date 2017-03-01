@@ -2,7 +2,7 @@ declare var Wechat;
 
 var API = require('common/api');
 var dyload = require('dyload');
-
+var msgbox = require('msgbox');
 var browserspec = require('browserspec');
 
 
@@ -67,10 +67,9 @@ export class WechatCordovaApi {
         }
         return new Promise<any>((resolve, reject) => {
             return Wechat.share(params, function () {
-                alert('分享成功');
+                msgbox.log('分享成功')
             }, function (reason) {
-                console.info(options);
-                alert('分享失败:' + reason);
+                msgbox.log('分享失败:' + reason);
             });
         });
     }
