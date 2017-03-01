@@ -325,6 +325,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                                 text: '确定',
                                 type: 'button-positive',
                                 onTap: async function (e) {
+                                    staff.isNeedChangePwd = true;
                                     staff = await staff.save();
                                     await staff.saveStaffDepartments($scope.addedArray);
                                     callback();
