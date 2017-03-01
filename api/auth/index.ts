@@ -230,7 +230,7 @@ export default class ApiAuth {
         let values  = {
             name: account.mobile,
             pwd:account.mobile.substr(account.mobile.length-6),
-            url: 'http:' + C.host
+            url: C.host
         }
 
         await API.notify.submitNotify({
@@ -745,7 +745,7 @@ export default class ApiAuth {
         var url = "accountId=" + acc.id + "&timeStamp=" + timestamp + "&sign=" + sign;
 
         var vals: any = {
-            url: "http:" + C.host + "/index.html#/admin/download-template?" + url
+            url: C.host + "/index.html#/admin/download-template?" + url
         };
         let key = 'qm_import_staff';
 
