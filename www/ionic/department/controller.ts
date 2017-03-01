@@ -80,7 +80,8 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     async function initTravelPolicy(staffs){
         await Promise.all(staffs.map(async function(staff){
             let travelPolicy = await staff.getTravelPolicy();
-            if(!travelPolicy.name){
+            if(!travelPolicy){
+                travelPolicy = {};
                 travelPolicy.name = '';
             }
             $scope.policy_staffs.push({staff: staff,travelPolicy: travelPolicy.name});
