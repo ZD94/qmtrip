@@ -566,7 +566,7 @@ class StaffModule{
                     downloadNoAddObj.push(s);
                     return;
                 }
-                if(_.trim(staffObj.email) && emailAttr.join(",").indexOf(_.trim(s[2])) != -1){
+                if(staffObj.email && _.trim(staffObj.email) != "" && emailAttr.join(",").indexOf(_.trim(s[2])) != -1){
                     staffObj.reason = "邮箱与本次导入中邮箱重复";
                     s[7] = "邮箱与本次导入中邮箱重复";
                     noAddObj.push(staffObj);
@@ -681,7 +681,7 @@ class StaffModule{
         let repeatEmailStr = repeatEmail.join(",");
         for(let i=0;i<addObj.length;i++){
             let addStaff = addObj[i];
-            if(repeatEmailStr.indexOf(_.trim(addStaff.email)) != -1){
+            if(addStaff.email && repeatEmailStr.indexOf(_.trim(addStaff.email)) != -1 && _.trim(addStaff.email) != ""){
                 let obj = downloadAddObj[i];
                 addObj.splice(i, 1);
                 downloadAddObj.splice(i, 1);
