@@ -26,7 +26,7 @@
                 <ion-list>
                     <ion-item class="item stat-label-content" ng-repeat="en in statisticData"
                               ng-click="goToStaffRecords(en.keyInfo.name)">
-                        <div class="bar-header">
+                        <div class="item-header">
                             <staff-avatar ng-if="isSActive" class="avatar" staff="en.keyInfo"></staff-avatar>
                             <i ng-if="isPActive" class="icon ion-ios-flag"></i>
                             <i ng-if="isDActive" class="icon ion-ios-home"></i>
