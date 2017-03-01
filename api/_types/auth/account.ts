@@ -109,7 +109,7 @@ export class Account extends ModelObject{
     set coinAccount(coinAccount: CoinAccount) {}
 
     @Field({type: Types.BOOLEAN})
-    get isNeedChangePwd() :boolean { return true;}
+    get isNeedChangePwd() :boolean { return false;}
     set isNeedChangePwd(isNeedChangePwd: boolean) {}
 
     async getCoinAccountChanges(): Promise<CoinAccountChange[]>{
