@@ -11,4 +11,5 @@ export async function ServicePayController($scope){
     $scope.company = staff.company;
     $scope.EStaffRole = EStaffRole;
     $scope.ECompanyType = ECompanyType;
+    $scope.isExpiry = staff.company.expiryDate && staff.company.expiryDate < new Date();
 }
