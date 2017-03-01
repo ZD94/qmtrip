@@ -500,6 +500,7 @@ class TripApproveModule {
             try {
                 await API.notify.submitNotify({accountId: user.id, key: tplName, values: self_values});
             } catch(err) { console.error(err);}
+
             try {
                 await API.ddtalk.sendLinkMsg({ accountId: user.id, text: '您的预算已审批完成', url: self_url});
             } catch(err) { console.error(err);}
