@@ -9,13 +9,10 @@ stages:
   - docker
   - deploy
 
-image: docker:1.12-git
+image: docker:git
 
 before_script:
-  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
-  - eval $(ssh-agent -s)
-  - echo "$SSH_PRIVATE_KEY" >ssh_key && chmod 600 ssh_key && ssh-add ssh_key
-  - rm -f ssh_key
+  - 'eval $(ssh-agent -s) && echo "$SSH_PRIVATE_KEY">.k && chmod 600 .k && ssh-add .k && rm -f .k'
   - 'mkdir -p ~/.ssh && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
 
   - ln -s /opt/app/node_modules .
