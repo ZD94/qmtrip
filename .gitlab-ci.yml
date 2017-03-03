@@ -72,7 +72,7 @@ deploy:test:
     - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
     - docker push $DOCKER_BRANCH_NAME
     - echo deploy to https://t.jingli365.com
-    - ssh test@l.jingli365.com ~/bin/docker_start.sh $DOCKER_REG $DOCKER_NAME $CI_BUILD_REF_SLUG
+    - ssh test@l.jingli365.com /home/test/bin/docker_start.sh $DOCKER_REG $DOCKER_NAME $CI_BUILD_REF_SLUG
 
 deploy:release:
   stage: deploy
@@ -95,11 +95,11 @@ deploy:tester:
   when: manual
   environment:
     name: tester/$GITLAB_USER_ID
-    url: https://review.l.jingli365.com/$GITLAB_USER_ID
+    url: https://review.l.jingli365.com/tester/$GITLAB_USER_ID
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
     - docker tag $DOCKER_CI_NAME $DOCKER_REG/$DOCKER_NAME:tester-$GITLAB_USER_ID
     - docker push $DOCKER_REG/$DOCKER_NAME:tester-$GITLAB_USER_ID
-    - echo deploy to https://review.l.jingli365.com/$GITLAB_USER_ID
-    - ssh test@l.jingli365.com ~/bin/docker_start_user.sh $DOCKER_REG $DOCKER_NAME $GITLAB_USER_ID
+    - echo deploy to https://review.l.jingli365.com/tester/$GITLAB_USER_ID
+    - ssh test@l.jingli365.com /home/test/bin/docker_start_user.sh $DOCKER_REG $DOCKER_NAME $GITLAB_USER_ID
