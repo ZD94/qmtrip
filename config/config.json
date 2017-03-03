@@ -5,10 +5,10 @@
 
   "hostname": "${JL_APP_HOSTNAME}",
   "cluster": false,
-  "port": 4002,
+  "port": 80,
   "apiPort": 4102,
   "host": "//${{hostname}}:${{port}}",
-  "socket_file": null,
+  "socket_file": "${JL_APP_DATA_DIR}/web.sock",
   "pid_file": "${JL_APP_DATA_DIR}/tmp/server.pid",
 
   "logger": {
