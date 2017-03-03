@@ -100,4 +100,4 @@ deploy:tester:
     - docker tag $DOCKER_CI_NAME $DOCKER_REG/$DOCKER_NAME:tester-$GITLAB_USER_ID
     - docker push $DOCKER_REG/$DOCKER_NAME:tester-$GITLAB_USER_ID
     - echo deploy to https://review.l.jingli365.com/$GITLAB_USER_ID
-    - ssh test@l.jingli365.com ~/bin/docker_start.sh $DOCKER_REG $DOCKER_NAME tester-$GITLAB_USER_ID
+    - ssh test@l.jingli365.com ~/bin/docker_start_user.sh $DOCKER_REG $DOCKER_NAME $GITLAB_USER_ID

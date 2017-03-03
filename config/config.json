@@ -1,18 +1,18 @@
 {
-  "appName": "qmtrip",
+  "appName": "${JL_APP_NAME}",
   "debug": false,
   "ts_node": true,
 
-  "hostname": "my.jingli.tech",
+  "hostname": "${JL_APP_HOSTNAME}",
   "cluster": false,
   "port": 4002,
   "apiPort": 4102,
   "host": "//${{hostname}}:${{port}}",
   "socket_file": null,
-  "pid_file": "${{ROOT_DIR}}/tmp/server.pid",
+  "pid_file": "${JL_APP_DATA_DIR}/tmp/server.pid",
 
   "logger": {
-    "path": "${{ROOT_DIR}}/log",
+    "path": "${JL_APP_DATA_DIR}/log",
     "prefix": "${{appName}}_",
     "httptype": "short",
     "mods": {
@@ -26,20 +26,19 @@
     }
   },
   "postgres":{
-    "url": "postgres://postgres:root@localhost:5432/qmtrip",
-    "url_test": "postgres://postgres:root@localhost:5432/qmtrip",
+    "url": "${JL_APP_POSTGRES}",
     "debug": true
   },
   "redis":{
-    "url": "redis://localhost:6379"
+    "url": "${JL_APP_REDIS}"
   },
   "hosts": {
-    "main":{"addr":"api.local.jingli.tech", "port":4101, "www":"https://${{hosts.main.addr}}"}
+    "main":{"addr":"api.l.jingli365.com", "port":4101, "www":"https://${{hosts.main.addr}}"}
   },
   "upload":{
-    "tmpDir": "${{ROOT_DIR}}/tmp/upload",
-    "publicDir": "${{ROOT_DIR}}/www/attachments",
-    "privateDir": "${{ROOT_DIR}}/tmp/files"
+    "tmpDir": "${JL_APP_DATA_DIR}/tmp",
+    "publicDir": "${JL_APP_DATA_DIR}/attachments",
+    "privateDir": "${JL_APP_DATA_DIR}/tmp/files"
   },
   "template":{
     "file": "${{ROOT_DIR}}/public/templatefile"
@@ -54,16 +53,16 @@
       }
     ]
   },
-  "api_test": {
-    "postgres": "${{postgres.url_test}}",
-    "remotes": [
-      {
-        "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
-        "modules": "*"
-      }
-    ]
-  },
-  "system_notice_emails": [{"name": "cs", "email": "sales@jingli365.com"}, {"name": "lxc", "email": "xiaochen.li@jingli.tech"}],
+  "system_notice_emails": [
+    {
+      "name": "cs",
+      "email": "sales@jingli365.com"
+    },
+    {
+      "name": "lxc",
+      "email": "xiaochen.li@jingli.tech"
+    }
+  ],
   "default_agency": {
     "name": "系统默认代理商",
     "email": "agency.agency@jingli.tech",
