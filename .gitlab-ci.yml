@@ -20,6 +20,8 @@ before_script:
 
 build:dist:
   stage: build
+  only:
+    - branches
   image: $DOCKER_REG/jl-build
   cache:
     key: $CI_PIPELINE_ID
