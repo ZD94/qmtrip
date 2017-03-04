@@ -1,17 +1,40 @@
 {
   "appName": "${JL_APP_NAME}",
   "rootDir": "${JL_APP_DATA_DIR}",
+  "host": "${JL_APP_HOST}",
   "debug": false,
   "ts_node": true,
 
-  "hostname": "${JL_APP_HOSTNAME}",
   "cluster": false,
   "port": 80,
   "apiPort": 4102,
-  "host": "${JL_APP_HOST}",
   "socket_file": "${{rootDir}}/web.sock",
   "pid_file": "${{rootDir}}/tmp/server.pid",
 
+  "postgres":{
+    "url": "${JL_APP_POSTGRES}",
+    "debug": true
+  },
+  "redis":{
+    "url": "${JL_APP_REDIS}"
+  },
+  "hosts": {
+    "main":{"addr":"api.l.jingli365.com", "port":4101, "www":"https://${{hosts.main.addr}}"}
+  },
+  "api": {
+    "postgres": "${{postgres.url}}",
+    "remotes": [
+      {
+        "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
+        "modules": "*"
+      }
+    ]
+  },
+  "upload":{
+    "tmpDir": "${{rootDir}}/tmp/upload",
+    "publicDir": "${{rootDir}}/tmp/attachments",
+    "privateDir": "${{rootDir}}/tmp/files"
+  },
   "logger": {
     "path": "${{rootDir}}/log",
     "prefix": "${{appName}}_",
@@ -26,31 +49,7 @@
       }
     }
   },
-  "postgres":{
-    "url": "${JL_APP_POSTGRES}",
-    "debug": true
-  },
-  "redis":{
-    "url": "${JL_APP_REDIS}"
-  },
-  "hosts": {
-    "main":{"addr":"api.l.jingli365.com", "port":4101, "www":"https://${{hosts.main.addr}}"}
-  },
-  "upload":{
-    "tmpDir": "${{rootDir}}/tmp/upload",
-    "publicDir": "${{rootDir}}/tmp/attachments",
-    "privateDir": "${{rootDir}}/tmp/files"
-  },
   "is_allow_domain_repeat": false,
-  "api": {
-    "postgres": "${{postgres.url}}",
-    "remotes": [
-      {
-        "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
-        "modules": "*"
-      }
-    ]
-  },
   "system_notice_emails": [
     {
       "name": "cs",
