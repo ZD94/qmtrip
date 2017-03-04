@@ -1,5 +1,6 @@
 {
   "appName": "${JL_APP_NAME}",
+  "rootDir": "${JL_APP_DATA_DIR}",
   "debug": false,
   "ts_node": true,
 
@@ -7,12 +8,12 @@
   "cluster": false,
   "port": 80,
   "apiPort": 4102,
-  "host": "//${{hostname}}:${{port}}",
-  "socket_file": "${JL_APP_DATA_DIR}/web.sock",
-  "pid_file": "${JL_APP_DATA_DIR}/tmp/server.pid",
+  "host": "${JL_APP_HOST}",
+  "socket_file": "${{rootDir}}/web.sock",
+  "pid_file": "${{rootDir}}/tmp/server.pid",
 
   "logger": {
-    "path": "${JL_APP_DATA_DIR}/log",
+    "path": "${{rootDir}}/log",
     "prefix": "${{appName}}_",
     "httptype": "short",
     "mods": {
@@ -36,12 +37,9 @@
     "main":{"addr":"api.l.jingli365.com", "port":4101, "www":"https://${{hosts.main.addr}}"}
   },
   "upload":{
-    "tmpDir": "${JL_APP_DATA_DIR}/tmp",
-    "publicDir": "${JL_APP_DATA_DIR}/attachments",
-    "privateDir": "${JL_APP_DATA_DIR}/tmp/files"
-  },
-  "template":{
-    "file": "${{ROOT_DIR}}/public/templatefile"
+    "tmpDir": "${{rootDir}}/tmp/upload",
+    "publicDir": "${{rootDir}}/tmp/attachments",
+    "privateDir": "${{rootDir}}/tmp/files"
   },
   "is_allow_domain_repeat": false,
   "api": {
