@@ -292,6 +292,7 @@ async function addDingUsersCompany(corp, dingUsers, corpApi: CorpApi) {
         let _staff = Models.staff.create({name: u.name, travelPolicyId: travelPolicy.id});
         _staff.company = company;
         _staff.pwd = md5(DEFAULT_PWD);
+        _staff.status = 1;
         _staff = await _staff.save();
 
         //绑定部门关系
