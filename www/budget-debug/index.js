@@ -5,7 +5,7 @@
 
 var app = angular.module('debugModule',[]);
 
-var available_prefer = [
+/*var available_prefer = [
     {
         title: "[交通]到达时间",
         value: '{"name": "arrivalTime", "options": {"begin": "开始时间,格式YYYY-MM-DD HH:mm +0800", "end": "最晚时间", "outScore": "如果不在这个时间段内得分"}}'
@@ -34,7 +34,110 @@ var available_prefer = [
     title: "[酒店]黑名单",
     value: '{"name": "blackList", "options": {"score": -100}}'
 }
+];*/
+var available_prefer = [
+    {
+        title: "[交通]到达时间",
+        value: '{"name": "arrivalTime", "options": {"end": "最晚时间", "begin": "开始时间,格式YYYY-MM-DD HH:mm +0800", "score": "符合到达时间得分"}}'
+    },
+    {
+        title: "[交通]舱位",
+        value: '{"name": "cabin", "options": {"score": "符合舱位得分", "expectTrainCabins": "期待的火车舱位", "expectFlightCabins": "期待的飞机舱位"}}'
+    },
+    {
+        title: "[交通]廉价航空",
+        value: '{"name": "cheapSupplier", "options": {"score": "如果在廉价航空中得分", "cheapSuppliers": "廉价航班"}}'
+    },{
+        title: "[交通]出发时间",
+        value: '{"name": "departTime", "options": {"end": "最晚时间", "begin": "开始时间", "score": "符合时间得分"}}'
+    },
+    {
+        title: "[交通]交通方式",
+        value: '{"name": "selectTraffic", "options": {"score": 500, "commonTrainScore":-100000, "selectTrainDuration": 360, "selectFlightDuration": 210}}'
+    },{
+        title: "[酒店]星级",
+        value: '{"name": "starMatch", "options": {"score": 500, "expectStar": 3}}'
+    },{
+        title: "[酒店]代表性酒店",
+        value: '{"name": "represent", "options": {"score": 100}}'
+    },{
+        title: "[酒店]黑名单",
+        value: '{"name": "blackList", "options": {"score": -100}}'
+    }
 ];
+//描述翻译
+var prefer_translate = {
+
+
+    /*交通*/
+
+    //prefer.name
+    cheapSupplier:"廉价航空",
+    cabin:"舱位",
+    runningTimePrefer:"期望的运营时长",
+    departStandardTimePrefer:"期望的标准出发时间",
+    arriveStandardTimePrefer:"期望的标准到达时间",
+    trainDurationPrefer:"期望的火车运行时间",
+    earliestGoBackTimePrefer:"期待的最早返回时间",
+    latestArrivalTimePrefer:"期望的最晚到达时间",
+    trainPricePrefer:"期望的火车价格",
+    planePricePrefer:"期望的飞机价格",
+    arrivalTime:"到达时间",
+    departTime:"出发时间",
+    selectTraffic:"选择交通工具",
+    preferAgent:"期望的代理商",
+    directArrive:"直接到达",
+    transitWaitDuration:"过境等待时长",
+    transitCityInChina:"从中国过境城市",
+
+    //prefer.option
+    score:"基准得分",
+    cheapSuppliers:"廉价航班",
+    expectTrainCabins:"期待的火车舱位",
+    expectFlightCabins:"期待的飞机舱位",
+    planeScore:"选择飞机的基准得分",
+    trainScore:"选择火车的基准得分",
+    planeScoreInterval:"乘坐飞机期望值加分",
+    trainScoreInterval:"乘坐火车期望值加分",
+    begin:"最早时间",
+    end:"最晚时间",
+    scoreInterval:"未达到期望值扣分",
+    trainDuration:"火车持续时间",
+    earliestGoBackTime:"最早返回时间",
+    latestArrivalTime:"最晚到达时间",
+    type:"增长幅度",
+    cabins:"舱位",
+    percent:"期待的价格所占比",
+    commonTrainScore:"乘坐普快基准得分",
+    selectTrainDuration:"选择火车的时长",
+    selectFlightDuration:"选择飞机的时长",
+    expectedAgents:"期望代理商",
+    expectCabins:"期待舱位",
+    outScore:"如果不在这个时间段内得分",
+    deductScorePerStop:"每多停一次扣除期望值",
+    baseScore:"基础的基准得分",
+    subScore:"最低期望值",
+    maxDuration:"最大等待时长",
+    minDuration:"最小等待时长",
+
+
+    /*住宿*/
+
+    //prefer.name
+    priceRange:"价格区间",
+    starMatch:"星级",
+    represent:"代表酒店",
+    blackList:"黑名单",
+    price:"价格",
+
+    //prefer.option
+    expectStar:"期望星级",
+    range:"价格区间",
+
+
+
+
+};
 app.controller('debug',function($scope, $http, $location){
   var url = $location.search();
   var p;
@@ -48,6 +151,8 @@ app.controller('debug',function($scope, $http, $location){
   }
   $scope.prefers = available_prefer;
   $scope.ori_prefers = [];
+  //描述翻译
+  $scope.prefer_translate = prefer_translate;
   //数据的显示与隐藏
   $scope.showOriginData = false;
   $scope.showScoreData = false;

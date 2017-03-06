@@ -88,10 +88,10 @@
                     <table>
                         <tr ng-repeat="prefer in ori_prefers" style="height:50px">
                             <td style="color: #4A4EC1;padding-right: 5px">{{$index}}</td>
-                            <td style="padding-right: 15px">{{prefer.name}}</td>
+                            <td style="padding-right: 15px">{{prefer.name+"("+prefer_translate[prefer.name]+")"}}</td>
                             <!--<td><input type="text" style="width:1200px" ng-model="prefer.options" value="{{prefer.options}}"></td>-->
                             <td ng-repeat="(x,y) in prefer.options">
-                                {{x}}
+                                {{x+"("+prefer_translate[x]+")"}}
                                 <input style="width:auto" ng-model="prefer.options[x]" type="text">
                             </td>
                             <td style="padding-left: 15px;color: #9e0505">
