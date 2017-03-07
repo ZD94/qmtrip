@@ -25,7 +25,8 @@ import {conditionDecorator, condition} from "../_decorator";
 import {FindResult} from "common/model/interface";
 import {ENoticeType} from "../_types/notice/notice";
 import {CoinAccount} from "api/_types/coin";
-import {StaffDepartment} from "api/_types/department";
+import {StaffDepartment} from "api/_types/department/staffDepartment";
+
 
 const invitedLinkCols = InvitedLink['$fieldnames'];
 const staffSupplierInfoCols = StaffSupplierInfo['$fieldnames'];
@@ -1624,6 +1625,51 @@ class StaffModule{
         })
         return {ids: ids, count: paginate['total']};
     }
+
+    /**
+     *  批量移动员工
+     *  @time 2017.3.7
+     *  @param params
+     *  @return {*}
+     */
+    @clientExport
+    @requireParams(["staff_ids" , "depart_ids" , "from_depart"])
+    static async moveStaffs(params): Promise<boolean>{
+        //增加记录
+        let Record = [];
+        for(let item of params.staff_ids){
+            for(let i of params.depart_ids){
+                let obj = {
+                    "staff_id" : item,
+                    "depart_id": i
+                }
+                Record.push(obj);
+            }
+        }
+        await Promise.all(Record.map(async (item)=>{
+            await(await Models.staffDepartment.create({staffId: item.staff_ids , departmentId: item.depart_id})).save();
+        }));
+
+        //删除原有记录
+        let limit = params.staff_ids.length > 20 ? params.staff_ids.length : 20;
+        let originRecord = await Models.staffDepartment.find({
+            limit : limit ,
+            where : {
+                staff_id :{$in:params.staff_ids} ,
+                departmentId: params.from_depart
+            }
+        });
+
+        await Promise.all(originRecord.map(async (item)=>{
+            if(item){
+                await item.destroy();
+            }
+        }));
+
+        return true;
+    }
+
+
     /*************************************员工供应商网站信息end***************************************/
 
 }
@@ -1631,6 +1677,7 @@ class StaffModule{
 //生成邀请链接参数
 function makeLinkSign(linkToken, invitedLinkId, timestamp) {
     var originStr = linkToken + invitedLinkId + timestamp;
+    StaffDepartment
     return utils.md5(originStr);
 }
 export = StaffModule;
