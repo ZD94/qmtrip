@@ -29,6 +29,12 @@
         z-index: -100;
         font-size: 22px;
       }
+     p.input-label{
+        padding: 0px;
+        position: absolute;
+        top: 30px;
+        font-size: 12px;
+      }
     }
     .item-input > .fake-input{
       padding-right: 0px;
@@ -36,6 +42,7 @@
     fake-input>span{
       height: 34px;
     }
+
     .status-bar{
       font-size:14px;
       padding-top: 14px;

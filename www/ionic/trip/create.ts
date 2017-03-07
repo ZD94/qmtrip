@@ -401,7 +401,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             window.location.href = "#/trip/budget?id="+budget;
         }
     }
-
+    /*特别审批的按钮已经放到更深层次的budget页面中*/
     $scope.specialApprove = async function() {
         API.require("travelBudget");
         await API.onload();
@@ -455,6 +455,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             alert(err.msg || err);
         }
     }
+    /*特别审批的结束*/
 
     $scope.checkDate = function(isStartTime?: boolean) {
         let beginDate = trip.beginDate;

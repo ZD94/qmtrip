@@ -199,12 +199,6 @@ export async function BudgetController($scope, $storage,$loading, Models, $state
         }
     }
 
-
-
-
-
-
-
     //我要报错
     $scope.reportBudgetError = function() {
         let id = $stateParams.id;

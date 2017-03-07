@@ -132,6 +132,7 @@
                                     class="fake-input"
                             ></ng-selector-list>
                             <i class="icon ion-arrow-up-b"></i>
+                            <p class="input-label" ng-if="trip.auditUser">审批人</p>
                         </div>
                     </form>
                     <button class="button" ng-if="!totalPrice || totalPrice <= 0">特别审批</button>
