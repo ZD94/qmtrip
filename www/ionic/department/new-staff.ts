@@ -32,7 +32,11 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
         Models.resetOnPageChange(staff);
         preRole = staff.roleId;
         let currentPolicy = await staff.getTravelPolicy();
-        $scope.staffPolicyName = currentPolicy.name;
+        if(!currentPolicy){
+            $scope.staffPolicyName = '';
+        }else{
+            $scope.staffPolicyName = currentPolicy.name;
+        }
         let departments = await staff.getDepartments();
         //prototype Pager departmentpager
         Object.setPrototypeOf(departments, Pager.prototype);
@@ -321,6 +325,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                                 text: '确定',
                                 type: 'button-positive',
                                 onTap: async function (e) {
+                                    staff.isNeedChangePwd = true;
                                     staff = await staff.save();
                                     await staff.saveStaffDepartments($scope.addedArray);
                                     callback();

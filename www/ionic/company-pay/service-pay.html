@@ -1,4 +1,4 @@
-<ion-view title="服务期限">
+<ion-view title="服务期限"  class="box-service">
     <ion-content padding="true" scroll="false" class="has-header main">
            <div class="top">
               <div class="serviceInfo">
@@ -10,7 +10,8 @@
                       <p  class="tryingPackage" ng-if="!company.type || company.type == ECompanyType.TRYING">【试用版】</p>
                   </div>
                   <div class="package service" ng-if="staff.roleId == EStaffRole.COMMON">
-                        服务已到期
+                      <span ng-if="isExpiry">服务已到期</span>
+                      <span ng-if="!isExpiry">服务中</span>
                   </div>
               </div>
               <div class="month-tit" ng-if="staff.roleId == EStaffRole.ADMIN || staff.roleId == EStaffRole.OWNER">
@@ -50,7 +51,7 @@
               </div>
                <div class="telFlex">
                    <div class="telBtn">
-                       <a href="tel:4000-401-108" >
+                       <a href="tel:4000-401-018" >
                            <div class="btn">
                                <p>联系电话：4000-401-018</p>
                            </div>

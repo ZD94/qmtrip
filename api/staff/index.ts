@@ -88,7 +88,7 @@ class StaffModule{
         let values  = {
             name: account.mobile,
             pwd: pwd,
-            url:'http:' + config.host
+            url: config.host
         }
 
         try{
@@ -316,7 +316,7 @@ class StaffModule{
                 await toStaff.save();
                 await API.notify.submitNotify({
                     key: 'qm_transfer_owner',
-                    values: {url: 'http:' + config.host},
+                    values: {url: config.host},
                     accountId: toStaff.id
                 });
             }catch(e){
@@ -508,6 +508,7 @@ class StaffModule{
         let company = staff.company;
         let companyId = company.id;
         let xlsObj;
+        let defaultDept = await company.getDefaultDepartment();
         let att = await API.attachment.getSelfAttachment({fileId: fileId, accountId: staff.id});
         if(att){
             var content = new Buffer(att.content, 'base64');
@@ -565,7 +566,7 @@ class StaffModule{
                     downloadNoAddObj.push(s);
                     return;
                 }
-                if(_.trim(staffObj.email) && emailAttr.join(",").indexOf(_.trim(s[2])) != -1){
+                if(staffObj.email && _.trim(staffObj.email) != "" && emailAttr.join(",").indexOf(_.trim(s[2])) != -1){
                     staffObj.reason = "邮箱与本次导入中邮箱重复";
                     s[7] = "邮箱与本次导入中邮箱重复";
                     noAddObj.push(staffObj);
@@ -592,33 +593,72 @@ class StaffModule{
                     let departmentNames = s[6].split(",");
                     for(var i=0;i<departmentNames.length;i++){
                         let _d = departmentNames[i];
-                        if(departmentMaps[_d]){
-                            departmentIds.push(departmentMaps[_d]);
+                        if(_d.indexOf('/') != -1){
+                            let dd = _d.split('/');
+                            let p_id = null;
+                            for(var j=0;j<dd.length;j++){
+                                let _dd = dd[j];
+                                if(j == 0){
+                                    let one_d = await Models.department.find({where:{name: _dd, companyId: companyId, parentId: defaultDept.id}});
+                                    if(one_d && one_d.length > 0){
+                                        p_id = one_d[0].id;
+                                    }else{
+                                        staffObj.reason = _dd + "部门不存在";
+                                        s[7] = _dd + "部门不存在";
+                                        noAddObj.push(staffObj);
+                                        downloadNoAddObj.push(s);
+                                        departmentPass = false;
+                                        break;
+                                    }
+                                }else{
+                                    let next_d = await Models.department.find({where:{name: _dd, companyId: companyId, parentId: p_id}});
+                                    if(!next_d || next_d.length <= 0){
+                                        staffObj.reason = _dd + "部门不存在";
+                                        s[7] = _dd + "部门不存在";
+                                        noAddObj.push(staffObj);
+                                        downloadNoAddObj.push(s);
+                                        departmentPass = false;
+                                        break;
+                                    }else{
+                                        p_id = next_d[0].id;
+                                    }
+
+                                    if(j == (dd.length - 1)){
+                                        let lost_d = next_d[0];
+                                        departmentIds.push(next_d[0].id);
+                                    }
+
+                                }
+                            }
                         }else{
-                            staffObj.reason = _d + "部门不存在";
-                            s[7] = _d + "部门不存在";
-                            noAddObj.push(staffObj);
-                            downloadNoAddObj.push(s);
-                            departmentPass = false;
-                            break;
+                            if(departmentMaps[_d]){
+                                departmentIds.push(departmentMaps[_d]);
+                            }else{
+                                staffObj.reason = _d + "部门不存在";
+                                s[7] = _d + "部门不存在";
+                                noAddObj.push(staffObj);
+                                downloadNoAddObj.push(s);
+                                departmentPass = false;
+                                break;
+                            }
                         }
+
                     }
                     if(!departmentPass){
                         return;
                     }
                 }else{
-                    let defaultDept = await company.getDefaultDepartment();
                     departmentIds.push(defaultDept.id);
                 }
                 staffObj.departmentIds = departmentIds;
                 let staff1 = await API.auth.checkAccExist({where: {email: staffObj.email, type: 1}});
                 let staff2 = await API.auth.checkAccExist({where: {mobile: staffObj.mobile, type: 1}});
-                if(staff1){
+                if(staff1 && staffObj.email && staffObj.email != ""){
                     staffObj.reason = "邮箱与已有用户重复";
                     s[7] = "邮箱与已有用户重复";
                     noAddObj.push(staffObj);
                     downloadNoAddObj.push(s);
-                }else if(staff2){
+                }else if(staff2 && staffObj.mobile && staffObj.mobile != ""){
                     staffObj.reason = "手机号与已有用户重复";
                     s[7] = "手机号与已有用户重复";
                     noAddObj.push(staffObj);
@@ -641,7 +681,7 @@ class StaffModule{
         let repeatEmailStr = repeatEmail.join(",");
         for(let i=0;i<addObj.length;i++){
             let addStaff = addObj[i];
-            if(repeatEmailStr.indexOf(_.trim(addStaff.email)) != -1){
+            if(addStaff.email && repeatEmailStr.indexOf(_.trim(addStaff.email)) != -1 && _.trim(addStaff.email) != ""){
                 let obj = downloadAddObj[i];
                 addObj.splice(i, 1);
                 downloadAddObj.splice(i, 1);

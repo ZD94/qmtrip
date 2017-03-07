@@ -2,13 +2,13 @@
   "ver": "20160922",
   "name": "本地",
   "update": "./",
-  "api": "/API",
+  "api": "./API",
   "debug": true,
   "configs": {
     "local": {
       "name": "本地",
       "update": "./",
-      "api": "/API",
+      "api": "./API",
       "debug": true
     },
     "dev": {

@@ -32,6 +32,9 @@ class sortDlg{
                 $(element).remove();
                 resolve(value);
             }
+            $scope.$on("$destroy",function(){
+                $(element).remove();
+            })
             self.$injector.invoke(controller, self, {$scope, $element: element});
         })
 

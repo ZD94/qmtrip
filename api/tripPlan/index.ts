@@ -1053,6 +1053,12 @@ class TripPlanModule {
         let self_url = config.host + '/index.html#/trip/list-detail?tripid=' + approve.id;
         let appMessageUrl = '#/trip/list-detail?tripid=' + approve.id;
 
+        try {
+            self_url = await API.wechat.shorturl({longurl: self_url});
+        } catch(err) {
+            console.error(err);
+        }
+
         let self_values = {
             noticeType: ENoticeType.TRIP_APPROVE_NOTICE,
             username: account.name,

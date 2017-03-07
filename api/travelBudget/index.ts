@@ -191,7 +191,7 @@ export default class ApiTravelBudget {
                 }
 
                 if (subsidy && subsidy.template) {
-                    let days = moment(goBackDate).diff(moment(leaveDate), 'days');
+                    let days = moment(moment(goBackDate).format("YYYY-MM-DD")).diff(moment(moment(leaveDate).format("YYYY-MM-DD")), 'days');
                     days = days + 1;
                     if (!subsidy.hasFirstDaySubsidy) {
                         days = days -1;
@@ -298,7 +298,8 @@ export default class ApiTravelBudget {
             let obj;
             if (businessDistrict) {
                 obj = API.place.getCityInfo({cityCode: businessDistrict});
-            } else {
+            }
+            if (!obj || !obj.latitude || !obj.longitude) {
                 obj = city;
             }
             gps = [obj.latitude, obj.longitude];
