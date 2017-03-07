@@ -198,7 +198,6 @@ var prefer_translate = {
     range:"价格区间",
 
 
-
 };
 app.controller('debug',function($scope, $http, $location){
   var url = $location.search();
