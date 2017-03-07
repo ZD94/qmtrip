@@ -1,19 +1,37 @@
-/*
-To customize the look and feel of Ionic, you can override the variables
-in ionic's _variables.scss file.
 
-For example, you might change some of the default colors:
+//To customize the look and feel of Ionic, you can override the variables
+//in ionic's _variables.scss file.
+
+/*//For example, you might change some of the default colors:
 
 $light:                           #fff !default;
 $stable:                          #f8f8f8 !default;
 $positive:                        #387ef5 !default;
-$calm:                            #11c1f3 !default;
+$calm:                            #28A7E1 !default;
 $balanced:                        #33cd5f !default;
-$energized:                       #ffc900 !default;
+$energized:                       #F39800 !default;
 $assertive:                       #ef473a !default;
 $royal:                           #886aea !default;
-$dark:                            #444 !default;
-*/
+$dark:                            #393939 !default;
+
+// Lists
+// -------------------------------
+
+$list-header-bg:                  transparent !default;
+$list-header-color:               #222 !default;
+$list-header-padding:             5px 15px !default;
+$list-header-margin-top:          20px !default;
+
+
+// Cards
+// ---------------------------------------------
+$card-border-radius:              3px !default;*/
+
+
+// Include all of Ionic
+@import "./color.variable.scss";
+
+
 
 // The path for our ionicons font files, relative to the built CSS in www/css
 $ionicons-font-path: "../../fonts/ionic" !default;
@@ -25,8 +43,8 @@ $popup-background-color: white;
 $popup-border-radius: 5px;
 $z-index-popup: 100;
 
-// Include all of Ionic
 @import "../../../common/vendor/ionic/scss/ionic";
+
 
 // fade in from opacity, used for modals
 // -------------------------------
@@ -65,7 +83,7 @@ html {
 }
 
 @mixin app-background {
-  background: url(../images/background.jpg) no-repeat;
+  background: url(../images/background.png) no-repeat;
   background-size: cover;
   background-position: center;
 }
@@ -114,6 +132,16 @@ input[readonly]:not(.cloned-text-input){
 .item {
   margin-right: 0px;
   margin-left: 0px;
+}
+//模块上圆角
+.borderRadiusTop{
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+//模块下圆角
+.borderRadiusBottom{
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
 }
 
 //按钮图标大小过大

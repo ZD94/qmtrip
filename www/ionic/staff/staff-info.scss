@@ -1,6 +1,11 @@
+@import "../scss/color.variable.scss";
+
 .staffinfo {
   .item {
     padding: 11px;
+    .item-note{
+      color: lighten($dark,39%);
+    }
     &.item-icon-right {
       padding-right: 40px;
       .icon {
@@ -11,7 +16,7 @@
           position: static;
           display: inline-block;
           font-size: 16px;
-          color: #f5a623;
+          color: $balanced;
           &.novalid{
             color: #ddd;
           }
