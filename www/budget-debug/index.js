@@ -199,7 +199,6 @@ var prefer_translate = {
 
 
 
-
 };
 app.controller('debug',function($scope, $http, $location){
   var url = $location.search();
