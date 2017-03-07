@@ -1,4 +1,4 @@
-import {Models, EGender, EAccountType} from 'api/_types';
+﻿import {Models, EGender, EAccountType} from 'api/_types';
 import { Company } from 'api/_types/company';
 import { StaffSupplierInfo } from 'api/_types/staff';
 import {TripPlan, TripApprove, ESourceType} from 'api/_types/tripPlan';
@@ -159,6 +159,10 @@ export class Staff extends ModelObject implements Account {
             return item.name;
         })
         return departmentNames.join(',');
+    }
+    @RemoteCall()
+    async getNoticeToAdmins(params:{companyId:string,name:string}):Promise<any>{
+        return API.staff.sendNoticeToAdmins({companyId:params.companyId,name:params.name});
     }
 
 

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Created by wyl on 15-12-9.
  */
 'use strict';
@@ -144,6 +144,25 @@ class StaffModule{
 
         return result;
     }
+
+
+   static async  sendNoticeToAdmins(params:{companyId:string,name:string}):Promise<any>{
+        let company = await Models.company.get(params.companyId);
+        let managers=await company.getManagers({withOwner:false});
+        return await Promise.all(managers.map( (manager) => {
+            return API.notify.submitNotify({
+                accountId: manager.id,
+                key: "qm_notify_admins_add_staff",
+                values: {
+                    staff:params.name
+                }
+             });
+         }));
+
+    }
+
+
+
 
     @clientExport
     @requireParams(["id"])
@@ -713,7 +732,13 @@ class StaffModule{
             let staffObj: any = {name: item.name, mobile: item.mobile+"", email: item.email, sex: item.sex, roleId: item.roleId,
                 travelPolicyId: item.travelPolicyId, companyId: item.companyId, addWay: EAddWay.BATCH_IMPORT, isNeedChangePwd: true, };
             let staffAdded = await StaffModule.createStaff(staffObj);
-            await staffAdded.saveStaffDepartments(deptIds)
+            await staffAdded.saveStaffDepartments(deptIds);
+
+
+             StaffModule.sendNoticeToAdmins({
+                companyId:item.companyId,
+                name:item.name
+             });
         }));
         
         await API.attachments.removeFileAndAttach({id: fileId});

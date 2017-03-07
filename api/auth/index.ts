@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @module auth
  */
 "use strict";
@@ -461,6 +461,11 @@ export default class ApiAuth {
         } else {
             throw L.ERR.CODE_ERROR();
         }
+        
+        await API.staff.sendNoticeToAdmins({
+            companyId:companyId,
+            name:name
+        });
         return staff.company;
     }
 
