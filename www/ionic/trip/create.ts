@@ -30,7 +30,7 @@ function TripDefineFromJson(obj: any): TripDefine{
 
 
 export async function CreateController($scope, $storage, $loading, ngModalDlg, $ionicPopup, Models, City){
-    require('./trip.scss');
+    require('./create.scss');
     API.require('tripPlan');
     await API.onload();
     /*******************出差补助选择begin************************/
