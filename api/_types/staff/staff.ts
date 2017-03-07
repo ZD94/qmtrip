@@ -136,7 +136,6 @@ export class Staff extends ModelObject implements Account {
     get addWay(): EAddWay { return EAddWay.ADMIN_ADD; }
     set addWay(val: EAddWay) {}
 
-    @RemoteCall()
     async getDepartments(): Promise<PaginateInterface<Department>>{
         let departmentStaffs = await Models.staffDepartment.find({where: {staffId: this.id}, order: [['createdAt', 'desc']]});
         let ids = [];
@@ -144,6 +143,7 @@ export class Staff extends ModelObject implements Account {
             ids.push(t.departmentId);
         })
         let departments = await Models.department.find({where : {id: {$in: ids}, companyId: this.company.id}, order: [['createdAt', 'desc']]});
+        departments = await departments.fetchUnSerialize();
         return departments;
     }
 
@@ -196,7 +196,7 @@ export class Staff extends ModelObject implements Account {
         return true;
     }
 
-    async getSelfNotices(options?: any): Promise<any> {
+    async getSelfNotices(options?: any): Promise<PaginateInterface<Notice>>  {
         var self = this;
         if (!options) options = {where: {}};
         if(!options.where) options.where = {};
@@ -213,31 +213,30 @@ export class Staff extends ModelObject implements Account {
         }
 
         var mna: any = {};
-        var ids =  noticeAccounts.map(function(t){
+        var ids = [];
+        var no_ids = [];
+        noticeAccounts.forEach(function(t){
             mna[t.noticeId] = t;
-            return t.noticeId;
+            if(t.deletedAt){
+                no_ids.push(t.noticeId);
+            }else{
+                ids.push(t.noticeId);
+            }
         })
         options.where .$or = [{id: {$in: ids}}, {sendType: ESendType.ALL_ACCOUNT}];
+        if(no_ids && no_ids.length > 0){
+            options.where.id = {$notIn: no_ids};
+        }
         options.order = options.order || [['createdAt', 'desc']];
         var notices = await Models.notice.find(options);
         var result = await Promise.all(notices.map(async function(n){
-            if(mna[n.id]){
-                n["isRead"] = mna[n.id].isRead;
-                n["deletedAt"] = mna[n.id].deletedAt;
-                return n;
-            }
-
             // 此处处理发给全体员工的 员工拉取通知列表时存入noticeAccount关系表记录（其余发给一个人或多个人的 发消息的时候存入关系表）
-            n["isRead"] =  false;
             var na = Models.noticeAccount.create({accountId: self.id, noticeId: n.id, isRead: false});
             await na.save();
             return n;
         }));
-        result = result.filter((item: any) => {
-            return !item["deletedAt"];
-        })
 
-        return result;
+        return notices;
 
     }
 
@@ -398,7 +397,7 @@ export class Staff extends ModelObject implements Account {
          await API.onload();
          }
          return API.notice.statisticNoticeByType();*/
-
+        let self = this;
         var result:any = {};
         var num1 = 0;
         var num2 = 0;
@@ -410,9 +409,51 @@ export class Staff extends ModelObject implements Account {
         var latestObj3: Notice;
         var latestObj4: Notice;
 
-        var allNotices = await this.getSelfNotices();
+        // var allNotices = await this.getSelfNotices();
+        var pagers = await Models.noticeAccount.find({where: {accountId: this.id}, paranoid: false, order: [['createdAt', 'desc']]});
 
-        allNotices.forEach(async function(notice){
+        let noticeAccounts = [];
+        noticeAccounts.push.apply(noticeAccounts, pagers);
+        while(pagers.hasNextPage()){
+            let nextPager = await pagers.nextPage();
+            noticeAccounts.push.apply(noticeAccounts, nextPager);
+        }
+
+        var mna: any = {};
+        var ids = [];
+        var no_ids = [];
+        noticeAccounts.forEach(function(t){
+            mna[t.noticeId] = t;
+            if(t.deletedAt){
+                no_ids.push(t.noticeId);
+            }else{
+                ids.push(t.noticeId);
+            }
+        })
+        let options: any;
+        options = {where: {$or: [{id: {$in: ids}}, {sendType: ESendType.ALL_ACCOUNT}]}, order: [['createdAt', 'desc']]};
+        if(no_ids && no_ids.length > 0){
+            options = {where: {$or: [{id: {$in: ids}}, {sendType: ESendType.ALL_ACCOUNT}], id: {$notIn: no_ids}}, order: [['createdAt', 'desc']]};
+
+        }
+        var pagers2 = await Models.notice.find(options);
+
+        let allNotices = [];
+        allNotices.push.apply(allNotices, pagers2);
+        while(pagers2.hasNextPage()){
+            let nextPager = await pagers2.nextPage();
+            allNotices.push.apply(allNotices, nextPager);
+        }
+        let notices_result = await Promise.all(allNotices.map(async function(n){
+            if(mna[n.id]){
+                n["isRead"] = mna[n.id].isRead;
+            }else{
+                n["isRead"] = false;
+            }
+            return n;
+        }))
+
+        notices_result.forEach(async function(notice){
             switch(notice.type){
                 case ENoticeType.SYSTEM_NOTICE:
                     if(!latestObj1 || !latestObj1.id){

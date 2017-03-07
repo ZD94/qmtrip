@@ -15,7 +15,7 @@ export async function StaffInfoController($scope, Models, $stateParams, $ionicPo
     let departments = await staff.getDepartments();
     $scope.EStaffRole = EStaffRole;
     //prototype Pager departmentpager
-    Object.setPrototypeOf(departments, Pager.prototype);
+    // Object.setPrototypeOf(departments, Pager.prototype);
     $scope.staff = staff;
     $scope.travelPolicy = travelPolicy;
     $scope.departments = departments;
