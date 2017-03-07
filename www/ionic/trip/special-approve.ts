@@ -1,5 +1,5 @@
 import { Staff } from 'api/_types/staff/staff';
-import {EApproveChannel} from "../../../api/_types/approve/types";
+import {EApproveChannel} from "api/_types/approve/types";
 var msgbox = require('msgbox');
 
 export async function SpecialApproveController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup){
@@ -14,6 +14,7 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
     trip.beginDate = query.leaveDate;
     trip.endDate  = query.goBackDate;
     // trip.createAt = new Date(result.createAt);
+     trip['auditUser'] = await Models.staff.get(query.auditUser);
 
     if(query.originPlace) {
         let originPlace = await City.getCity(query.originPlace.id || query.originPlace);

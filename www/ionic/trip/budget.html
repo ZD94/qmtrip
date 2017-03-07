@@ -123,7 +123,7 @@
                 <bottom-bar ng-if="showChooseApproveUser && staff.company.oa != EApproveChannel.DING_TALK">
                     <form class="list">
                         <div class="item item-input status-bar status-bar-input">
-                            <span class="input-label">选择审批人</span>
+                            <span class="input-label" ng-if="!trip.auditUser">选择审批人</span>
                             <ng-selector-list
                                     ng-model="trip.auditUser"
                                     dlg-options="staffSelector"
@@ -134,6 +134,14 @@
                             <i class="icon ion-arrow-up-b"></i>
                         </div>
                     </form>
+                    <button class="button" ng-if="!totalPrice || totalPrice <= 0">特别审批</button>
+                    <button
+                            ng-if="totalPrice > 0"
+                            class="button"
+                            ng-class="{true: 'hasAuditUser button button-outline button-positive',false: ''}[bottomBottomClicked]"
+                            ng-click="specialApprove()">
+                        特别审批
+                    </button>
                     <button class="button" ng-if="!totalPrice || totalPrice <= 0">提交审批</button>
                     <button ng-if="totalPrice > 0"
                             class="button"

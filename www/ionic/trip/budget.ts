@@ -2,9 +2,10 @@ import { ETripType, EInvoiceType } from 'api/_types/tripPlan';
 import moment = require('moment');
 import { Staff } from 'api/_types/staff/staff';
 import {EApproveType, EApproveChannel} from "api/_types/approve/types";
-import {MPlaneLevel, MTrainLevel} from "../../../api/_types/travelPolicy";
+import {MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
+var msgbox = require("msgbox");
 
-export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup, $ionicHistory){
+export async function BudgetController($scope, $storage,$loading, Models, $stateParams, $ionicLoading, City, $ionicPopup, $ionicHistory){
     require('./trip.scss');
     require('./budget.scss');
     API.require("tripPlan");
@@ -142,6 +143,68 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
             $ionicLoading.hide();
         }
     }
+    //特别审批
+    $scope.specialApprove = async function() {
+        API.require("travelBudget");
+        await API.onload();
+
+        let trip = $scope.trip;
+
+        if(!trip.place || !trip.place.id) {
+            $scope.showErrorMsg('请填写出差目的地！');
+            return false;
+        }
+
+        if(!trip.reasonName) {
+            $scope.showErrorMsg('请填写出差事由！');
+            return false;
+        }
+
+        // if(!trip.traffic && ! trip.hotel) {
+        //     $scope.showErrorMsg('请选择交通或者住宿！');
+        //     return false;
+        // }
+
+        if(trip.traffic && (!trip.fromPlace || !trip.fromPlace.id)) {
+            $scope.showErrorMsg('请选择出发地！');
+            return false;
+        }
+
+        let params = {
+            originPlace: trip.fromPlace? trip.fromPlace.id : '',
+            destinationPlace: trip.place ? trip.place.id : '',
+            leaveDate: moment(trip.beginDate).toDate(),
+            goBackDate: moment(trip.endDate).toDate(),
+            latestArrivalDateTime: moment(trip.beginDate).toDate(),
+            earliestGoBackDateTime: moment(trip.endDate).toDate(),
+            isNeedTraffic: trip.traffic,
+            isRoundTrip: trip.round,
+            isNeedHotel: trip.hotel,
+            businessDistrict: trip.hotelPlace,
+            hotelName: trip.hotelName,
+            auditUser: trip.auditUser.id,
+        };
+
+        if(params.originPlace == params.destinationPlace){
+            msgbox.log("出差地点和出发地不能相同");
+            return false;
+        }
+
+        try {
+            $loading.end();
+            window.location.href = "#/trip/special-approve?params="+JSON.stringify(params);
+        } catch(err) {
+            $loading.end();
+            alert(err.msg || err);
+        }
+    }
+
+
+
+
+
+
+
     //我要报错
     $scope.reportBudgetError = function() {
         let id = $stateParams.id;
