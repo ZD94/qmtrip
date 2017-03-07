@@ -197,7 +197,6 @@ var prefer_translate = {
     expectStar:"期望星级",
     range:"价格区间",
 
-
 };
 app.controller('debug',function($scope, $http, $location){
   var url = $location.search();
