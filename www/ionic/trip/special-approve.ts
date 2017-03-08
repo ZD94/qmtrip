@@ -14,8 +14,9 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
     trip.beginDate = query.leaveDate;
     trip.endDate  = query.goBackDate;
     // trip.createAt = new Date(result.createAt);
-     trip['auditUser'] = await Models.staff.get(query.auditUser);
-
+    if(query.auditUser){
+        trip['auditUser'] = await Models.staff.get(query.auditUser);
+    }
     if(query.originPlace) {
         let originPlace = await City.getCity(query.originPlace.id || query.originPlace);
         trip.originPlaceName = originPlace.name;
