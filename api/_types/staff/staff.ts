@@ -20,6 +20,7 @@ import {StaffDepartment} from "../department/staffDepartment";
 import C = require("config");
 import moment = require("moment");
 import {OS_TYPE} from "../../auth/authentication";
+import {requireParams} from "common/api/helper";
 
 // declare var API: any;
 const API = require("common/api");
@@ -181,6 +182,84 @@ export class Staff extends ModelObject implements Account {
 
         return true;
     }
+
+
+    /**
+     *  批量移动员工
+     *  @time 2017.3.7
+     *  @param params
+     *  @return {*}
+     */
+    @requireParams(["staffIds" , "departmentIds" , "fromDepartmentId"])
+    @RemoteCall()//LocalCall 服务器端 //RemoteCall 客户端能调用到 //
+    async moveStaffsDepartment(params : {staffIds: string[], fromDepartmentId: string, departmentIds: string[]}): Promise<object>{
+        let self = this;
+        if(self.roleId == 0 || self.roleId == 2){
+
+        }else{
+            return {"msg" : "没有权限"}
+        }
+
+        //检查移动的员工是否与修改人属于同一公司, 检查移动的员工是否在原有部门
+        let Staffs = [] , waitDestroy = [];
+        await Promise.all(params.staffIds.map(async (id)=>{
+            let thisStaff = await Models.staff.find({where : { id : id }});
+            if(thisStaff[0].company.id != self.company.id){
+                return;
+            }
+
+            let originDepartment = await Models.staffDepartment.find({
+                where : { staff_id : id , department_id : params.fromDepartmentId }
+            });
+            if(originDepartment.length > 0){
+                Staffs.push(id);
+                waitDestroy.push(originDepartment[0])
+            }
+        }));
+
+        if(Staffs.length == 0){
+            return {"msg" : "传入员工信息不正确"};
+        }
+
+        //检查加入的部门是否属于同一公司
+        let Departments = [];
+        await Promise.all(params.departmentIds.map(async (d_id)=>{
+            let thisCompany = await Models.department.find({
+                where : { id : d_id , company_id : self.company.id }
+            });
+            if(thisCompany.length > 0){
+                Departments.push(d_id);
+            }
+        }));
+
+        if(Departments.length == 0){
+            return { "msg" : "传入部门信息不正确" };
+        }
+
+        let Record = [];
+        for(let item of Staffs){
+            for(let i of Departments){
+                let obj = {
+                    "staff_id" : item,
+                    "depart_id": i
+                }
+                Record.push(obj);
+            }
+        }
+        //add record
+        await Promise.all(Record.map(async (item)=>{
+            await(await Models.staffDepartment.create({
+                staffId: item.staff_ids , departmentId: item.depart_id
+            })).save();
+        }));
+
+        //remove this staff_department record.
+        await Promise.all(waitDestroy.map(async (item)=>{
+            await item.destroy();
+        }));
+        return {"msg":"移动成功"};
+    }
+
 
     @RemoteCall()
     async deleteStaffDepartments() :Promise<boolean> {
