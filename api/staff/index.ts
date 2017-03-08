@@ -148,7 +148,12 @@ class StaffModule{
 
    static async  sendNoticeToAdmins(params:{companyId:string,name:string}):Promise<any>{
         let company = await Models.company.get(params.companyId);
+        console.log("addbyhand: companyId: ",params.companyId);
         let managers=await company.getManagers({withOwner:false});
+        managers.map((manager)=>{
+            console.log(manager.id);
+            console.log(manager.name);
+        });
         return await Promise.all(managers.map( (manager) => {
             return API.notify.submitNotify({
                 accountId: manager.id,
