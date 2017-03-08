@@ -1,8 +1,9 @@
 import moment = require("moment");
 
-export default async function IndexController($scope) {
+export default async function IndexController($scope,CNZZ) {
     require('./statistics.scss');
     API.require("tripPlan");
+    CNZZ.addEvent("差旅统计","点击","进入差旅统计","");
     let formatStr = 'YYYY-MM-DD HH:mm:ss';
     var now = moment();
     var data = $scope.data = {
@@ -12,7 +13,6 @@ export default async function IndexController($scope) {
         }
     };
     $scope.statistic = {};
-
     $scope.saveMoneyChart = {};
     $scope.saveMoneyChart.labels = ["本月节省", "本月支出"];
     $scope.saveMoneyChart.options = {cutoutPercentage: 70};

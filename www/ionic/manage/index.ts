@@ -8,7 +8,7 @@ import {ECompanyType} from "api/_types/company/company";
 export default async function IndexController($scope,CNZZ){
     require('./manage.scss');
     let staff = await Staff.getCurrent();
-    CNZZ.addEvent("管理企业","点击");
     $scope.staff = staff;
+    CNZZ.addEvent("管理企业","点击","进入管理企业",$scope.staff);
     $scope.ECompanyType = ECompanyType;
 }

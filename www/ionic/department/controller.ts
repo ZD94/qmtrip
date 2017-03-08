@@ -5,7 +5,7 @@ import {Pager} from "common/model/pager";
 var msgbox = require('msgbox');
 
 
-export async function IndexController($scope, $stateParams, Models, $ionicPopup, $ionicNavBarDelegate,$timeout, $location,ngModalDlg, $ionicHistory, $window, sortDlg) {
+export async function IndexController($scope, $stateParams, Models, $ionicPopup, $ionicNavBarDelegate,$timeout, $location,ngModalDlg, $ionicHistory, $window, sortDlg,CNZZ) {
     require('./department.scss');
     /*if($stateParams.departName){
         console.info('comming in....',$stateParams.departName)
@@ -16,6 +16,8 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     let company = staff.company;
     let rootDepartment : Department;
     let newUrl;
+
+    CNZZ.addEvent("员工管理","点击","进入员工管理",staff);
     $scope.policy_staffs = [];//用于存放可以展示差旅标准的staff list
     if(departmentId){
         if($location.path() == '/department/index' ||$location.path() == '/department/'){
