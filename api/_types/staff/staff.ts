@@ -192,7 +192,7 @@ export class Staff extends ModelObject implements Account {
      */
     @requireParams(["staffIds" , "departmentIds" , "fromDepartmentId"])
     @RemoteCall()
-    async moveStaffsDepartment(params : {staffIds: string[], fromDepartmentId: string, departmentIds: string[]}): Promise<string>{
+    async moveStaffsDepartment(params : {staffIds: string[], fromDepartmentId: string, departmentIds: string[]}): Promise<boolean>{
         let self = this;
         let { staffIds , departmentIds , fromDepartmentId } = params;
         if(self.roleId != EStaffRole.ADMIN && self.roleId != EStaffRole.OWNER){
