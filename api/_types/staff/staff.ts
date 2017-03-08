@@ -21,8 +21,7 @@ import C = require("config");
 import moment = require("moment");
 import {OS_TYPE} from "../../auth/authentication";
 
-// declare var API: any;
-const API = require("common/api");
+declare var API: any;
 
 let getSupplier: SupplierGetter;
 
