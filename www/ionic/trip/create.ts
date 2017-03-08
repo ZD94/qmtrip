@@ -38,6 +38,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         name: '请选择'
     };
     $scope.currentStaff = await Staff.getCurrent();
+    CNZZ.addEvent("我要出差","点击","进入我要出差",$scope.currentStaff );
     let currentCompany = $scope.currentStaff.company;
     $scope.currentTp = await $scope.currentStaff.getTravelPolicy();
     if($scope.currentTp){

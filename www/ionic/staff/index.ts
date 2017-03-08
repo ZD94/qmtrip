@@ -10,7 +10,9 @@ export default async function IndexController($scope, Models, inAppBrowser,CNZZ)
     let staff = await Staff.getCurrent();
     let coinAccount = staff.$parents["account"]["coinAccount"];
     CNZZ.addEvent("个人中心","点击","进入个人中心", staff);
+
     $scope.toDuiBa = async function(){
+
         if(staff.email.indexOf('jingli.tech')>=0){
             var duiBaUrl = await staff.getDuiBaLoginUrl({});
             inAppBrowser.open(duiBaUrl);
