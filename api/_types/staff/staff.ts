@@ -191,73 +191,51 @@ export class Staff extends ModelObject implements Account {
      *  @return {*}
      */
     @requireParams(["staffIds" , "departmentIds" , "fromDepartmentId"])
-    @RemoteCall()//LocalCall 服务器端 //RemoteCall 客户端能调用到 //
-    async moveStaffsDepartment(params : {staffIds: string[], fromDepartmentId: string, departmentIds: string[]}): Promise<object>{
+    @RemoteCall()
+    async moveStaffsDepartment(params : {staffIds: string[], fromDepartmentId: string, departmentIds: string[]}): Promise<string>{
         let self = this;
-        if(self.roleId == 0 || self.roleId == 2){
-
-        }else{
-            return {"msg" : "没有权限"}
+        let { staffIds , departmentIds , fromDepartmentId } = params;
+        if(self.roleId != EStaffRole.ADMIN && self.roleId != EStaffRole.OWNER){
+            throw L.ERR.PERMISSION_DENY();
         }
 
-        //检查移动的员工是否与修改人属于同一公司, 检查移动的员工是否在原有部门
-        let Staffs = [] , waitDestroy = [];
-        await Promise.all(params.staffIds.map(async (id)=>{
-            let thisStaff = await Models.staff.find({where : { id : id }});
-            if(thisStaff[0].company.id != self.company.id){
-                return;
-            }
-
-            let originDepartment = await Models.staffDepartment.find({
-                where : { staff_id : id , department_id : params.fromDepartmentId }
-            });
-            if(originDepartment.length > 0){
-                Staffs.push(id);
-                waitDestroy.push(originDepartment[0])
-            }
-        }));
-
-        if(Staffs.length == 0){
-            return {"msg" : "传入员工信息不正确"};
-        }
-
-        //检查加入的部门是否属于同一公司
-        let Departments = [];
-        await Promise.all(params.departmentIds.map(async (d_id)=>{
-            let thisCompany = await Models.department.find({
-                where : { id : d_id , company_id : self.company.id }
-            });
-            if(thisCompany.length > 0){
-                Departments.push(d_id);
-            }
-        }));
-
-        if(Departments.length == 0){
-            return { "msg" : "传入部门信息不正确" };
-        }
-
-        let Record = [];
-        for(let item of Staffs){
-            for(let i of Departments){
-                let obj = {
-                    "staff_id" : item,
-                    "depart_id": i
+        for(let i=0,ii=staffIds.length;i<ii;i++){
+            let staff = await Models.staff.get(staffIds[i]);
+            for(let j=0,jj=departmentIds.length;j<jj;j++){
+                let department = await Models.department.get(departmentIds[j]);
+                //比较部门是否与员工是一个公司
+                if(staff.company.id != department.company.id){
+                    continue;
                 }
-                Record.push(obj);
+                //查关系表
+                let staffDepartment = await Models.staffDepartment.find({
+                    where : {
+                        "staffId" : staff.id,
+                        "departmentId" : department.id
+                    }
+                });
+                if(staffDepartment && staffDepartment.length){
+                    continue;
+                }
+
+                //插入数据
+                await(await Models.staffDepartment.create({
+                    staffId: staff.id , departmentId: department.id
+                })).save();
+                //删除数据
+                let fromData = await Models.staffDepartment.find({
+                    where : {
+                        "staffId" : staff.id,
+                        "departmentId" : fromDepartmentId
+                    }
+                });
+                if(fromData && fromData.length){
+                    await fromData[0].destroy();
+                }
             }
         }
-        //add record
-        await Promise.all(Record.map(async (item)=>{
-            await(await Models.staffDepartment.create({
-                staffId: item.staff_ids , departmentId: item.depart_id
-            })).save();
-        }));
 
-        //remove this staff_department record.
-        await Promise.all(waitDestroy.map(async (item)=>{
-            await item.destroy();
-        }));
-        return {"msg":"移动成功"};
+        return true;
     }
 
 
