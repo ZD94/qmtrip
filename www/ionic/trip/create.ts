@@ -29,7 +29,7 @@ function TripDefineFromJson(obj: any): TripDefine{
 }
 
 
-export async function CreateController($scope, $storage, $loading, ngModalDlg, $ionicPopup, Models, City){
+export async function CreateController($scope, $storage, $loading, ngModalDlg, $ionicPopup, Models, City, CNZZ){
     require('./trip.scss');
     API.require('tripPlan');
     await API.onload();
@@ -276,6 +276,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         $scope.endDateSelector.beginDate = $scope.trip.beginDate;
     })
     $scope.nextStep = async function() {
+        CNZZ.addEvent('预算', '获取预算', '获取预算', $scope.currentStaff);
         let trip = $scope.trip;
 
         let number = 0;
