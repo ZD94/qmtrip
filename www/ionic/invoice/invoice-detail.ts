@@ -6,7 +6,7 @@ import * as path from 'path';
 import {ImgTemplateController} from './img-template';
 import moment = require('moment');
 import {Model} from "sequelize";
-var API = require('common/api');
+declare var API;
 var msgbox = require('msgbox');
 
 export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate, ngModalDlg, City, $ionicModal, $timeout){

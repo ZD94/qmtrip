@@ -3,7 +3,7 @@ import { Staff } from '_types/staff/staff';
 import { ESupplierType } from '_types/company/supplier';
 import {TripDetailTraffic, TripDetailHotel} from "../../../_types/tripPlan/tripDetailInfo";
 
-
+declare var API;
 let moment = require("moment");
 
 export async function ReserveController($scope, Models, $stateParams){

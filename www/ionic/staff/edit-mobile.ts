@@ -1,7 +1,7 @@
 import { Staff } from '_types/staff/staff';
 import moment = require('moment');
 var msgbox = require('msgbox');
-
+declare var API;
 export async function EditMobileController($scope,Models,$ionicHistory) {
     $scope.isDingtalk = /dingtalk/i.test(window.navigator.userAgent);
     require('./edit-mobile.scss');

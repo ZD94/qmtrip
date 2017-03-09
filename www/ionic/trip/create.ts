@@ -11,6 +11,7 @@ import {ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan";
 
 var msgbox = require('msgbox');
 import _ = require('lodash');
+declare var API;
 
 var defaultTrip = {
     beginDate: moment().add(3, 'days').startOf('day').hour(18).toDate(),

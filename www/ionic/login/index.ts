@@ -5,7 +5,7 @@ import moment = require('moment');
 var msgbox = require('msgbox');
 var config = require('config');
 var browserspec = require('browserspec');
-
+declare var API;
 declare var dd;
 
 function isDingTalk() {

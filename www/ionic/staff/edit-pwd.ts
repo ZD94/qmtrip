@@ -1,6 +1,6 @@
 import { Staff } from '_types/staff/staff';
 var msgbox = require('msgbox');
-
+declare var API;
 export async function EditPwdController($scope,Models,$ionicHistory,$storage,$ionicPopup) {
     $scope.isDingtalk = /dingtalk/i.test(window.navigator.userAgent);
     require('./edit-mobile.scss');

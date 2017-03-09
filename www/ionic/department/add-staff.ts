@@ -4,7 +4,7 @@
 "use strict";
 import {Staff} from "_types/staff/staff";
 var msgbox = require('msgbox');
-
+declare var API;
 
 export async function AddStaffController($scope, $ionicPopup, $window){
     require('./add-staff.scss');

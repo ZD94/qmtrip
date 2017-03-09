@@ -3,6 +3,7 @@ import { ACCOUNT_STATUS } from '_types/auth';
 import { EPlanStatus, QMEApproveStatus ,EAuditStatus } from '_types/tripPlan';
 import {getImageUrl} from '../controller';
 var config = require('config');
+declare var API;
 export default async function IndexController($scope, Models, inAppBrowser) {
     require('./index.scss');
     API.require('tripPlan');

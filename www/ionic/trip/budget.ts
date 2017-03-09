@@ -4,6 +4,7 @@ import { Staff } from '_types/staff/staff';
 import {EApproveType, EApproveChannel} from "_types/approve/types";
 import {MPlaneLevel, MTrainLevel} from "_types/travelPolicy";
 var msgbox = require("msgbox");
+declare var API;
 
 export async function BudgetController($scope, $storage, $loading, Models, $stateParams, $ionicLoading, City, $ionicPopup, $ionicHistory){
     require('./trip.scss');

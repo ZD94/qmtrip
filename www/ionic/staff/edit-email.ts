@@ -1,7 +1,7 @@
 import { Staff } from '_types/staff/staff';
 
 var msgbox = require('msgbox');
-
+declare var API;
 export async function EditEmailController($scope, Models, $ionicHistory, $ionicPopup) {
     $scope.isDingtalk = /dingtalk/i.test(window.navigator.userAgent);
     require('./edit-mobile.scss');

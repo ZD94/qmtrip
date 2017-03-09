@@ -1,6 +1,6 @@
 import { Staff } from '_types/staff/staff';
 import { EPlanStatus } from '_types/tripPlan';
-
+declare var API;
 export default async function DistributionController($scope, Models, City) {
     require('./statistics.scss');
     API.require("place");

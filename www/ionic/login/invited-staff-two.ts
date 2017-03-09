@@ -4,7 +4,7 @@ var msgbox = require('msgbox');
 var xregexp = require('xregexp');
 var utils  = require("www/util");
 let CheckUsername = utils.CheckUsername;
-
+declare var API;
 export async function InvitedStaffTwoController ($scope, $stateParams){
     let companyId = $stateParams.companyId;
     let linkId = $stateParams.linkId;

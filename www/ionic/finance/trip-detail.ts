@@ -7,8 +7,8 @@ import {ETripType} from "_types/tripPlan";
 import {
     TripDetailTraffic, TripDetailHotel, TripDetailSubsidy,
     TripDetailSpecial
-} from "../../../_types/tripPlan/tripDetailInfo";
-
+} from "_types/tripPlan/tripDetailInfo";
+declare var API;
 
 export async function TripDetailController($scope, $stateParams, Models) {
     require('./style.scss');

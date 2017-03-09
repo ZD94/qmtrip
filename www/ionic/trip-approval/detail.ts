@@ -6,6 +6,7 @@ import { Staff } from '_types/staff/staff';
 import moment = require('moment');
 import {EApproveChannel} from "_types/approve/types";
 import _ = require("lodash");
+declare var API;
 
 export async function DetailController($scope, Models, $stateParams, $ionicPopup, $loading, $storage, ngModalDlg){
     require('./trip-approval.scss');

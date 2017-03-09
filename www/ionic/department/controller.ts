@@ -2,7 +2,9 @@ import { Department } from '_types/department';
 import {Staff, EStaffRoleNames, EStaffRole} from '_types/staff/staff';
 import moment = require('moment');
 import {multipleMoveController} from "./multiple-move";
+import {Pager} from "common/model/pager";
 var msgbox = require('msgbox');
+declare var API;
 
 export async function IndexController($scope, $stateParams, Models, $ionicPopup, $ionicNavBarDelegate,$timeout, $location,ngModalDlg, $ionicHistory, $window, sortDlg) {
     require('./department.scss');

@@ -3,6 +3,8 @@ import _ = require('lodash');
 import {EApproveChannel} from "_types/approve/types";
 var msgbox = require('msgbox');
 import {ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan";
+declare var API;
+
 export async function SpecialApproveController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup){
     require('./trip.scss');
     require('./budget.scss');
