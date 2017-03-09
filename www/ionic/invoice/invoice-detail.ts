@@ -8,6 +8,8 @@ import moment = require('moment');
 import {Model} from "sequelize";
 var API = require('common/api');
 var msgbox = require('msgbox');
+var Staff =require("api/_type/staff");
+
 
 export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate, ngModalDlg, City, $ionicModal, $timeout){
     let typeArray = [EPlanStatus.AUDIT_NOT_PASS,EPlanStatus.WAIT_UPLOAD,EPlanStatus.WAIT_COMMIT]
@@ -230,6 +232,23 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         payType: '',
         type: ''
     }
+
+    async function sendNoticeToJinli(){
+        //added by jack
+        var current=Staff.getCurrent();
+        await Promise.all(managers.map((manager)=>{
+            current.sendNoticeToAdmin({
+                accountId:"",
+                name: current.name,
+                noticeTemplate: "qm_notify_jingli_upload_invoice"
+            });
+        }));
+
+        let notice=await current.getNoticeToAdmin({
+
+        });
+    }
+
     $scope.createInvoice = async function(){
         var newInvoice = Models.tripDetailInvoice.create({tripDetailId: tripDetail.id});
         newInvoice.totalMoney = $scope.newInvoice.totalMoney;
@@ -263,7 +282,12 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
             return;
         }
         await newInvoice.save();
+
+        //added by jack
+        await sendNoticeToJinli();
+
         tripDetail = await Models.tripDetail.get($stateParams.detailId);
+
         getTripDetailCity(tripDetail);
         $scope.invoices = formatInvoice(await tripDetail.getInvoices());
         $ionicSlideBoxDelegate.update();
