@@ -6,12 +6,7 @@ import moment = require('moment');
 import validator = require('validator');
 import { Token } from '_types/auth/token';
 import { ACCOUNT_STATUS } from "_types/auth";
-
-export const OS_TYPE = {
-    WEB: 'web',
-    TMP_CODE: 'tmpCode',
-    WECHAT: 'wechat',
-}
+import {OS_TYPE} from '_types/auth/token';
 
 //生成登录凭证
 export async function makeAuthenticateToken(accountId, os?: string, expireAt?: Date): Promise<LoginResponse> {
