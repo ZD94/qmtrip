@@ -10,6 +10,7 @@ export async function IndexController($scope, Models, $location,CNZZ) {
     var accordHotels = await Models.accordHotel.find({where: {companyId: company.id}});
     $scope.accordHotels = accordHotels;
     $scope.editaccordhotel = async function (id) {
+        CNZZ.addEvent("新增协议酒店","新增","新增协议酒店",staff);
         // $location.path('/accord-hotel/edit').search({'accordHotelId': id}).replace();
         window.location.href = "#/accord-hotel/edit?accordHotelId=" + id;
     }

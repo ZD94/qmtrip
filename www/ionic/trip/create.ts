@@ -84,6 +84,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
     $scope.$watch('trip.place',function(n,o){
         if(n != undefined){
             $scope.trip.hotel = true;
+            CNZZ.addEvent("统计目的地","统计","统计目的地",n);
         }
     })
     /*****************/
@@ -143,6 +144,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             $scope.trip.hotelPlaceObj = undefined;
             $scope.trip.hotelPlace = '';
             $scope.trip.hotelName = '';
+            CNZZ.addEvent("选择地标","选择","选择地标",$scope.currentStaff);
         }
     });
 
@@ -214,6 +216,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             if (item.isAbroad && item.code) {
                 return `${item.name}(${item.code})`;
             }
+            CNZZ.addEvent("统计出发地","统计","统计出发地",item.name);
             return item.name
         }
     };
@@ -277,7 +280,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         $scope.endDateSelector.beginDate = $scope.trip.beginDate;
     })
     $scope.nextStep = async function() {
-        CNZZ.addEvent('预算', '获取预算', '获取预算', $scope.currentStaff);
+        CNZZ.addEvent('计算预算', '计算预算', '计算预算', $scope.currentStaff);
         let trip = $scope.trip;
 
         let number = 0;

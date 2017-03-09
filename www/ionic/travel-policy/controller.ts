@@ -9,7 +9,7 @@ var msgbox = require('msgbox');
 export * from './editpolicy';
 export * from './showpolicy';
 
-export async function IndexController($scope, Models, $location, $ionicPopup, $ionicHistory) {
+export async function IndexController($scope, Models, $location, $ionicPopup, $ionicHistory,CNZZ) {
     require('./index.scss');
     var staff = await Staff.getCurrent();
     var company = await staff.company;
@@ -42,6 +42,7 @@ export async function IndexController($scope, Models, $location, $ionicPopup, $i
     }
 
     $scope.setDefault = async function(){
+        CNZZ.addEvent("设置默认差旅标准","设置","设置默认差旅标准","");
         $scope.tripPolicy = {
             newDefaultTp:''
         }

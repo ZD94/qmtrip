@@ -49,7 +49,7 @@ export async function IndexController($scope, Models, $location,CNZZ) {
     }
 
     $scope.savePublicSupplierStatus = async function(e){
-        CNZZ.addEvent("携程商旅","预订","进入携程商旅",staff);
+        CNZZ.addEvent("携程商旅","开启","开启携程商旅",staff);
         if(e.isPointed){
             appointedPubilcSuppliers.push(e.id);
         }else{

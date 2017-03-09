@@ -5,7 +5,8 @@ var msgbox = require('msgbox');
 var validator = require('validator');
 //isURL
 
-export async function EditController($scope, Models, $stateParams, $ionicHistory, $ionicPopup) {
+export async function EditController($scope, Models, $stateParams, $ionicHistory, $ionicPopup,CNZZ) {
+    CNZZ.addEvent("新增自定义服务商","新增","新增自定义服务商","");
     require('./accord-hotel.scss');
     $scope.uploadUrl = '/upload/ajax-upload-file?type=avatar';
     var staff = await Staff.getCurrent();
