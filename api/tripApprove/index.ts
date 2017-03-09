@@ -5,23 +5,23 @@
 'use strict';
 import {clientExport, requireParams} from "common/api/helper";
 import {modelNotNull} from "../_decorator";
-import {Models} from "../_types/index";
+import {Models} from "api/_types/index";
 import {FindResult} from "common/model/interface";
 import {
     QMEApproveStatus, EApproveResult, ETripType, EPlanStatus,
     TripPlan, TripPlanLog, EApproveResult2Text, TripApprove
-} from "../_types/tripPlan/tripPlan";
+} from "api/_types/tripPlan/tripPlan";
 import moment = require("moment/moment");
-import {Staff, EStaffStatus, EStaffRole} from "../_types/staff/staff";
+import {Staff, EStaffStatus, EStaffRole} from "api/_types/staff/staff";
 import {EVENT, plugins, emitter} from "libs/oa/index";
-import {TripDetail} from "../_types/tripPlan/tripDetail";
+import {TripDetail} from "api/_types/tripPlan/tripDetail";
 import TripPlanModule = require("../tripPlan/index");
 let systemNoticeEmails = require('config/config').system_notice_emails;
 const L = require('common/language');
 var API = require('common/api');
 var config = require("config");
 import _ = require("lodash");
-import {ENoticeType} from "../_types/notice/notice";
+import {ENoticeType} from "api/_types/notice/notice";
 
 class TripApproveModule {
 

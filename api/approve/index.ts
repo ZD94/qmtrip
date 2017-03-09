@@ -4,12 +4,12 @@
 
 'use strict';
 import {clientExport, requireParams} from "../../common/api/helper";
-import {Approve} from "../_types/approve/index";
-import {Staff} from "../_types/staff/staff";
-import {Models} from "../_types/index";
+import {Approve} from "api/_types/approve/index";
+import {Staff} from "api/_types/staff/staff";
+import {Models} from "api/_types/index";
 import {emitter, EVENT} from "libs/oa";
-import {EApproveStatus, EApproveChannel, EApproveType} from "../_types/approve/types";
-import {TripPlan, ETripType} from "../_types/tripPlan/tripPlan";
+import {EApproveStatus, EApproveChannel, EApproveType} from "api/_types/approve/types";
+import {TripPlan, ETripType} from "api/_types/tripPlan/tripPlan";
 import TripPlanModule = require("../tripPlan/index");
 import _ = require('lodash');
 let Config = require('config');

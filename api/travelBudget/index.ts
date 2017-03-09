@@ -3,9 +3,9 @@
  */
 import { clientExport } from 'common/api/helper';
 import {Models } from 'api/_types'
-import {ETripType, EInvoiceType} from "../_types/tripPlan";
-import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel} from "../_types/travelPolicy";
-import {Staff} from "../_types/staff";
+import {ETripType, EInvoiceType} from "api/_types/tripPlan";
+import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel} from "api/_types/travelPolicy";
+import {Staff} from "api/_types/staff";
 const API = require("common/api");
 const validate = require("common/validate");
 import L from 'common/language';

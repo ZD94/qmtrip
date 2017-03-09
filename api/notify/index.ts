@@ -8,7 +8,7 @@ import Logger = require('common/logger');
 const logger = new Logger('qm:notify');
 import redisClient = require("common/redis-client");
 import {Models} from "api/_types";
-import {ESendType, ENoticeType} from "../_types/notice/notice";
+import {ESendType, ENoticeType} from "api/_types/notice/notice";
 
 const config = require('config');
 let API = require('common/api');

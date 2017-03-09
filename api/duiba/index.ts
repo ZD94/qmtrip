@@ -4,7 +4,7 @@
 
 'use strict';
 import {requireParams, clientExport} from "../../common/api/helper";
-import {Staff} from "../_types/staff/staff";
+import {Staff} from "api/_types/staff/staff";
 import {CoinAccount} from "api/_types/coin";
 var config = require('config');
 

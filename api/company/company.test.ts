@@ -1,4 +1,4 @@
-import {Company} from "../_types/company";
+import {Company} from "api/_types/company";
 /**
  * Created by wyl on 15-12-12.
  */

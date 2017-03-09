@@ -4,7 +4,7 @@
 
 'use strict';
 import {AbstractPrefer} from "./index";
-import {IFinalHotel} from "../../_types/travelbudget";
+import {IFinalHotel} from "api/_types/travelbudget";
 import _ = require("lodash");
 import moment = require("moment");
 

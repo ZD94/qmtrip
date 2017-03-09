@@ -23,7 +23,7 @@ import { EAgencyUserRole, AgencyUser } from "api/_types/agency";
 import { Models, EAccountType, EGender } from 'api/_types';
 import {conditionDecorator, condition} from "../_decorator";
 import {FindResult} from "common/model/interface";
-import {ENoticeType} from "../_types/notice/notice";
+import {ENoticeType} from "api/_types/notice/notice";
 import {CoinAccount} from "api/_types/coin";
 import {StaffDepartment} from "api/_types/department/staffDepartment";
 

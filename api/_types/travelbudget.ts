@@ -4,7 +4,7 @@
 
 'use strict';
 
-import {EInvoiceType, ETripType} from "../_types/tripPlan";
+import {EInvoiceType, ETripType} from "api/_types/tripPlan";
 import {ModelObject} from "common/model/object";
 import {Table, Create, Field} from "common/model/common";
 import {Models} from "./index";

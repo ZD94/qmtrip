@@ -1,5 +1,5 @@
 
-import { Models } from '../_types/index';
+import { Models } from 'api/_types/index';
 
 /**
  * @method removeByTest 删除账号

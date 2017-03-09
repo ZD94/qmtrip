@@ -24,13 +24,13 @@ import {FindResult, PaginateInterface} from "common/model/interface";
 import {Staff, EStaffRole, EStaffStatus} from "api/_types/staff";
 import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import {getSession} from "common/model";
-import {AgencyUser} from "../_types/agency";
+import {AgencyUser} from "api/_types/agency";
 import {makeSpendReport} from './spendReport';
 import fs = require("fs");
-import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice} from "../_types/tripPlan";
-import {ENoticeType} from "../_types/notice/notice";
+import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice} from "api/_types/tripPlan";
+import {ENoticeType} from "api/_types/notice/notice";
 import TripApproveModule = require("../tripApprove/index");
-import {MPlaneLevel, MTrainLevel} from "../_types/travelPolicy";
+import {MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
 import {ISegment, ICreateBudgetAndApproveParams} from 'api/_types/tripPlan'
 
 class TripPlanModule {

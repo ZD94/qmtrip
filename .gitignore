@@ -33,4 +33,4 @@ ts-node/*
 ts-node/
 wyl_test/
 mytest/
-@types/
+@JLTypes/
