@@ -44,7 +44,6 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
     })
 
 
-
     $scope.staffSelector = {
         query: async function(keyword) {
             let staff = await Staff.getCurrent();
