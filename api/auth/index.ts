@@ -466,6 +466,7 @@ export default class ApiAuth {
             name:name,
             noticeTemplate:"qm_notify_admins_add_staff"
         });
+
         return staff.company;
     }
 

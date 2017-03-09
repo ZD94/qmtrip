@@ -350,6 +350,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                    name:staff.name,
                    noticeTemplate:"qm_notify_admins_add_staff"
                 });
+
                 callback();
             }
         }catch(err){

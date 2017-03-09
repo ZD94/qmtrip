@@ -738,8 +738,6 @@ class StaffModule{
                 travelPolicyId: item.travelPolicyId, companyId: item.companyId, addWay: EAddWay.BATCH_IMPORT, isNeedChangePwd: true, };
             let staffAdded = await StaffModule.createStaff(staffObj);
             await staffAdded.saveStaffDepartments(deptIds);
-
-
              StaffModule.sendNoticeToAdmins({
                 companyId:item.companyId,
                 name:item.name,
