@@ -461,12 +461,6 @@ export default class ApiAuth {
         } else {
             throw L.ERR.CODE_ERROR();
         }
-        await API.staff.sendNoticeToAdmins({
-            companyId:companyId,
-            name:name,
-            noticeTemplate:"qm_notify_admins_add_staff"
-        });
-
         return staff.company;
     }
 

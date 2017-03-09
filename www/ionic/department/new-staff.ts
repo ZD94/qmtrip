@@ -21,7 +21,6 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     let preRole;
     let staffId = $scope.staffId = $stateParams.staffId;
     let current = await Staff.getCurrent();
-
     let currentRole = current.roleId;
     let company = current.company;
     let travelpolicylist = await company.getTravelPolicies();
@@ -262,7 +261,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     }
     async function staffSave(callback){
         let staff = $scope.staff;
-        let current=$scope.current;
+
         var ownerModifyAdmin = false;
 
         if(!staff.name){
@@ -285,6 +284,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
 
             if (!$stateParams.staffId) {
                 //管理员添加员工只能添加普通员工
+                alert("roleid");
                 if(current.roleId == EStaffRole.ADMIN){
                     staff.roleId = EStaffRole.COMMON;
                 }
@@ -328,8 +328,9 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                                 text: '确定',
                                 type: 'button-positive',
                                 onTap: async function (e) {
-                                    alert("hello world");
-                                    await current.saveStaffDepartments({staff:staff,department:$scope.addedArray,companyId:company.id,ownerModifyAdmin:ownerModifyAdmin});
+                                    alert(current.id);
+                                    alert(staff.id);
+                                    await current.saveStaffAndDepartment({staff:staff,department:$scope.addedArray,companyId:company.id,ownerModifyAdmin:ownerModifyAdmin});
                                     callback();
                                 }
                             }
@@ -339,9 +340,11 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             }
 
             if(!ownerModifyAdmin){
-                console.log("yes");
-                alert("hello world");
-                await current.saveStaffAndDepartments({staff:staff,department:$scope.addedArray,companyId:company.id,ownerModifyAdmin:ownerModifyAdmin});
+                alert(current.id);
+                console.log("current:",current);
+                console.log("staff: ",staff);
+
+                await current.saveStaffAndDepartment({staff:staff,department:$scope.addedArray,companyId:company.id,ownerModifyAdmin:ownerModifyAdmin});
                 callback();
             }
         }catch(err){
