@@ -1,6 +1,6 @@
 import { ETripType, TripDetail, EPlanStatus } from 'api/_types/tripPlan';
 import moment = require('moment');
-export async function ListDetailController($location, $scope , Models, $stateParams, $storage, $ionicPopup, wxApi){
+export async function ListDetailController($location, $scope , Models, $stateParams, $storage, $ionicPopup, wxApi,CNZZ){
     let id = $stateParams.tripid;
 
     if (!id) {
@@ -86,6 +86,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
     $scope.specialApproveBudgets = specialApproveBudgets;
 
     $scope.showAlterDialog = function () {
+        CNZZ.addEvent("提交审批","提交","提交审批",'');
         $scope.reject = {reason: ''};
         $ionicPopup.show({
             title: '确认将所有出差票据提交审核么？',
@@ -119,6 +120,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
     };
 
     $scope.cancelTripPlan = function() {
+        CNZZ.addEvent("撤销行程","撤销","撤销行程",'');
         $scope.cancel = {reason: ''};
         let ioTemplate = '<input type="text" ng-model="cancel.reason" placeholder="请输入撤销原因" style="border: 1px solid #ccc;padding-left: 10px;">';
         $ionicPopup.show({

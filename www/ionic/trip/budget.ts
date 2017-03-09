@@ -4,7 +4,7 @@ import { Staff } from 'api/_types/staff/staff';
 import {EApproveType, EApproveChannel} from "api/_types/approve/types";
 import {MPlaneLevel, MTrainLevel} from "../../../api/_types/travelPolicy";
 
-export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup, $ionicHistory){
+export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup, $ionicHistory,CNZZ){
     require('./trip.scss');
     require('./budget.scss');
     API.require("tripPlan");
@@ -162,6 +162,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     })
 
     $scope.submitApprove = async function() {
+        CNZZ.addEvent("提交普通审批","提交","提交普通审批",$scope.staff);
         API.require("approve");
         await API.onload();
         if (!staff.company.oa || staff.company.oa == EApproveChannel.QM) {

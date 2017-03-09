@@ -3,10 +3,12 @@ import {ESupplierType} from "api/_types/company/supplier";
 import { selectSuppliers } from '../staff/bind-suppliers'
 var msgbox = require('msgbox');
 
-export async function SelectSupplierController($scope, Models, $stateParams, ngModalDlg){
+export async function SelectSupplierController($scope, Models, $stateParams, ngModalDlg,CNZZ){
     require('./select-supplier.scss');
     //公共的供应商
     let currentStaff = await Staff.getCurrent();
+    CNZZ.addEvent("关联订单","关联","关联订单",currentStaff);
+
     async function ifBind(){
         var alreadyBinds = await Models.staffSupplierInfo.find({where: {staffId: currentStaff.id}});
         var suppliers = await Models.supplier.find({where: {companyId: null, type: ESupplierType.SYSTEM_CAN_IMPORT}});

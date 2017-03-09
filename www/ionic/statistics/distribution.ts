@@ -1,10 +1,11 @@
 import { Staff } from 'api/_types/staff/staff';
 import { EPlanStatus } from 'api/_types/tripPlan';
 
-export default async function DistributionController($scope, Models, City) {
+export default async function DistributionController($scope, Models, City,CNZZ) {
     require('./statistics.scss');
     API.require("place");
     await API.onload();
+
 
     $scope.showPlace = function() {
         $(".staff-phone").hide();
@@ -22,7 +23,7 @@ export default async function DistributionController($scope, Models, City) {
 
     let staff = await Staff.getCurrent();
     let company = staff.company;
-
+    CNZZ.addEvent("查看员工分布地图","查看","查看员工分布地图",company);
     $scope.dateObj = {selectedDate: new Date()};
 
     $scope.selectDate = async function () {

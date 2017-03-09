@@ -6,7 +6,7 @@ import { Staff } from 'api/_types/staff/staff';
 import moment = require('moment');
 import {EApproveChannel} from "api/_types/approve/types";
 
-export async function DetailController($scope, Models, $stateParams, $ionicPopup, $loading, $storage, ngModalDlg){
+export async function DetailController($scope, Models, $stateParams, $ionicPopup, $loading, $storage, ngModalDlg,CNZZ){
     require('./trip-approval.scss');
     let approveId = $stateParams.approveId;
     $scope.approveId =approveId;
@@ -29,6 +29,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     let isSelf = false;
     let curStaff = await Staff.getCurrent();
     $scope.curStaff = curStaff;
+    CNZZ.addEvent("审批单详情","查看","查看审批单详情",$scope.curStaff);
     if(tripApprove.approveUser && curStaff.id == tripApprove.approveUser.id) {
         isHasPermissionApprove = true;
     }
@@ -203,6 +204,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     // };
 
     $scope.showReasonDialog = function () {
+        CNZZ.addEvent("驳回审批","审批","驳回审批",'');
         $scope.reject = {reason: ''};
         $scope.reasonItems = ['重新安排时间','计划临时取消','预算不符合要求'];
         $scope.showReasons = false;
@@ -241,6 +243,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
 
 
     $scope.confirmButton = async function() {
+        CNZZ.addEvent("直接通过审批","审批","直接通过审批",$scope.curStaff);
         var value = await ngModalDlg.createDialog({
             parent: $scope,
             template: require('./confirm.html'),
@@ -315,6 +318,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     }
 
     $scope.cancelTripApprove = async function(){
+        CNZZ.addEvent("撤销审批单","撤销","撤销审批单",$scope.curStaff);
         $scope.cancel = {reason: ''};
         let ioTemplate = '<input type="text" ng-model="cancel.reason" placeholder="请输入撤销原因" style="border: 1px solid #ccc;padding-left: 10px;">';
         $ionicPopup.show({
@@ -350,7 +354,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     }
 }
 
-export async function selectModeController ($scope){
+export async function selectModeController ($scope,CNZZ){
     $scope.isNextApprove = false;
     $scope.chooseApprove = {
         approveUser: ''
@@ -367,6 +371,7 @@ export async function selectModeController ($scope){
     };
     $scope.chooseOption = function(isNextApprove) {
         $scope.isNextApprove = isNextApprove;
+        CNZZ.addEvent("通过并转给下一个人","审批","同意审批通过并转给下一个人",$scope.isNextApprove);
     };
     $scope.confirmApprove = async function () {
         var opt = {
@@ -375,6 +380,7 @@ export async function selectModeController ($scope){
             agree: true
         }
         $scope.tripApprove.approveUser = $scope.chooseApprove.approveUser;
+        CNZZ.addEvent("直接通过审批","审批","直接通过审批",$scope.tripApprove.approveUser);
         $scope.confirmModal(opt);
     }
     $scope.cancel = async function() {
