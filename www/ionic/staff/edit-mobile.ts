@@ -1,4 +1,4 @@
-import { Staff } from 'api/_types/staff/staff';
+import { Staff } from '_types/staff/staff';
 import moment = require('moment');
 var msgbox = require('msgbox');
 

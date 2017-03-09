@@ -2,9 +2,9 @@
  * Created by wyl on 16-12-6.
  */
 'use strict';
-import {Models} from "api/_types/index";
+import {Models} from "_types/index";
 import L from 'common/language';
-import {CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE} from "api/_types/coin";
+import {CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE} from "_types/coin";
 var config = require('config');
 var API = require("common/api");
 

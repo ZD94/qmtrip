@@ -1,5 +1,5 @@
-import { Staff } from 'api/_types/staff/staff';
-import { EPayType, EInvoiceFeeTypes } from 'api/_types/tripPlan';
+import { Staff } from '_types/staff/staff';
+import { EPayType, EInvoiceFeeTypes } from '_types/tripPlan';
 var msgbox = require('msgbox');
 
 export async function OrdersController($scope,Models, $stateParams, $ionicPopup){

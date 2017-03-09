@@ -7,11 +7,11 @@ var sequelize = require("common/model").DB;
 let DBM = sequelize.models;
 let API = require("common/api");
 import L from 'common/language';
-import {Department, StaffDepartment} from "api/_types/department";
+import {Department, StaffDepartment} from "_types/department";
 import {requireParams, clientExport} from 'common/api/helper';
-import { Models } from 'api/_types/index';
+import { Models } from '_types/index';
 import { FindResult, PaginateInterface } from "common/model/interface";
-import {Staff, EStaffStatus} from "api/_types/staff";
+import {Staff, EStaffStatus} from "_types/staff";
 import {conditionDecorator, condition} from "../_decorator";
 
 const departmentCols = Department['$fieldnames'];

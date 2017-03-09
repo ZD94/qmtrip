@@ -1,4 +1,4 @@
-import { Staff } from 'api/_types/staff/staff';
+import { Staff } from '_types/staff/staff';
 var msgbox = require('msgbox');
 
 export async function EditPwdController($scope,Models,$ionicHistory,$storage,$ionicPopup) {

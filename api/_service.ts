@@ -1,27 +1,27 @@
 
-import { initModels } from 'api/_types';
+import { initModels } from '_types';
 
-import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from 'api/_types/staff';
-import { Company, MoneyChange, Supplier, TripPlanNumChange } from 'api/_types/company';
-import { Department, StaffDepartment } from 'api/_types/department';
-import { PromoCode } from 'api/_types/promoCode';
-import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
-import { AccordHotel } from 'api/_types/accordHotel';
-import { Notice, NoticeAccount } from 'api/_types/notice';
-import { Agency, AgencyUser } from 'api/_types/agency';
+import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from '_types/staff';
+import { Company, MoneyChange, Supplier, TripPlanNumChange } from '_types/company';
+import { Department, StaffDepartment } from '_types/department';
+import { PromoCode } from '_types/promoCode';
+import { TravelPolicy, SubsidyTemplate } from '_types/travelPolicy';
+import { AccordHotel } from '_types/accordHotel';
+import { Notice, NoticeAccount } from '_types/notice';
+import { Agency, AgencyUser } from '_types/agency';
 import {
     TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCode,
     TripDetailInvoice, TripDetailTraffic, TripDetailHotel
-} from 'api/_types/tripPlan';
-import {Account, Token} from 'api/_types/auth';
-import { Seed } from 'api/_types/seed';
+} from '_types/tripPlan';
+import {Account, Token} from '_types/auth';
+import { Seed } from '_types/seed';
 import { createServerService } from 'common/model/sequelize';
-import {TravelBudgetLog} from "api/_types/travelbudget";
-import {DDTalkCorp, DDTalkUser, DDTalkDepartment} from "api/_types/ddtalk";
-import {CoinAccount, CoinAccountChange} from "./_types/coin";
-import {TripDetailSubsidy, TripDetailSpecial} from "./_types/tripPlan/tripDetailInfo";
-import {Approve} from "./_types/approve/index";
-import {AgencyOperateLog} from "./_types/agency/agency-operate-log";
+import {TravelBudgetLog} from "_types/travelbudget";
+import {DDTalkCorp, DDTalkUser, DDTalkDepartment} from "_types/ddtalk";
+import {CoinAccount, CoinAccountChange} from "_types/coin";
+import {TripDetailSubsidy, TripDetailSpecial} from "_types/tripPlan/tripDetailInfo";
+import {Approve} from "_types/approve/index";
+import {AgencyOperateLog} from "_types/agency/agency-operate-log";
 
 initModels({
     staff: createServerService<Staff>(Staff),

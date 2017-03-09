@@ -1,7 +1,7 @@
 import {
     ETripType, EPlanStatus, EInvoiceType, EInvoiceFeeTypes, EPayType, EInvoiceStatus,
     InvoiceFeeTypeNames, PayTypeNames
-} from 'api/_types/tripPlan';
+} from '_types/tripPlan';
 import * as path from 'path';
 import {ImgTemplateController} from './img-template';
 import moment = require('moment');

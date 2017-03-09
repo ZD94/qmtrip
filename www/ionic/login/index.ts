@@ -1,6 +1,6 @@
 import { autobind } from 'core-decorators';
 import IScope = angular.IScope;
-import { LoginResponse } from 'api/_types/auth/auth-cert';
+import { LoginResponse } from '_types/auth/auth-cert';
 import moment = require('moment');
 var msgbox = require('msgbox');
 var config = require('config');

@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {IFinalTicket, TRAFFIC} from "api/_types/travelbudget";
+import {IFinalTicket, TRAFFIC} from "_types/travelbudget";
 import {AbstractPrefer} from "./index";
 
 const ONLY_TRAIN_DURATION = 3.5 * 60;

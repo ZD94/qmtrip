@@ -1,5 +1,5 @@
 import moment = require("moment");
-import {COIN_CHANGE_TYPE ,coin_change_str} from "api/_types/coin";
+import {COIN_CHANGE_TYPE ,coin_change_str} from "_types/coin";
 
 export async function DetailController($scope, Models, $stateParams) {
     require('./detail.scss');

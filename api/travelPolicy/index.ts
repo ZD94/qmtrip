@@ -9,9 +9,9 @@ import {Paginate} from 'common/paginate';
 import L from 'common/language';
 import {requireParams, clientExport} from 'common/api/helper';
 import {conditionDecorator, condition} from "../_decorator";
-import {Staff, EStaffStatus} from "api/_types/staff";
-import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
-import { Models } from 'api/_types';
+import {Staff, EStaffStatus} from "_types/staff";
+import { TravelPolicy, SubsidyTemplate } from '_types/travelPolicy';
+import { Models } from '_types';
 import { FindResult, PaginateInterface } from "common/model/interface";
 
 const travalPolicyCols = TravelPolicy['$fieldnames'];

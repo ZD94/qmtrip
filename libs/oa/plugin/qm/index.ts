@@ -10,8 +10,8 @@ import {
 
 import TripPlanModule = require("api/tripPlan/index");
 import TripApproveModule = require("api/tripApprove/index");
-import {Models} from "api/_types/index";
-import {ETripType, TripApprove, QMEApproveStatus, EApproveResult, Project} from "api/_types/tripPlan/tripPlan";
+import {Models} from "_types/index";
+import {ETripType, TripApprove, QMEApproveStatus, EApproveResult, Project} from "_types/tripPlan/tripPlan";
 import _ = require('lodash');
 const L = require("common/language");
 import moment = require("moment");

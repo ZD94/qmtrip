@@ -1,11 +1,11 @@
 import L from 'common/language';
 import * as utils from 'common/utils';
-import { Models, EAccountType } from 'api/_types/index';
-import { AuthResponse, AuthRequest, signToken, LoginResponse } from 'api/_types/auth/auth-cert';
+import { Models, EAccountType } from '_types/index';
+import { AuthResponse, AuthRequest, signToken, LoginResponse } from '_types/auth/auth-cert';
 import moment = require('moment');
 import validator = require('validator');
-import { Token } from 'api/_types/auth/token';
-import { ACCOUNT_STATUS } from "api/_types/auth";
+import { Token } from '_types/auth/token';
+import { ACCOUNT_STATUS } from "_types/auth";
 
 export const OS_TYPE = {
     WEB: 'web',

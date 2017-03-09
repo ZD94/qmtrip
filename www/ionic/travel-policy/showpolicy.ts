@@ -2,7 +2,7 @@
  * Created by seven on 2016/12/15.
  */
 "use strict";
-import {enumPlaneLevelToStr, enumTrainLevelToStr, enumHotelLevelToStr} from "api/_types/travelPolicy";
+import {enumPlaneLevelToStr, enumTrainLevelToStr, enumHotelLevelToStr} from "_types/travelPolicy";
 
 export async function ShowpolicyController($scope, Models, $stateParams, $ionicHistory, $ionicPopup){
     require("./editpolicy.scss");

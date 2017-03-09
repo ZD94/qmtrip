@@ -2,8 +2,8 @@
  * Created by chen on 2017/2/13.
  */
 import moment = require("moment");
-import {AgencyUser} from "api/_types/agency/agency-user";
-import {ECompanyType} from "api/_types/company/company";
+import {AgencyUser} from "_types/agency/agency-user";
+import {ECompanyType} from "_types/company/company";
 
 export async function ListController($scope , Models) {
     $scope.query = {

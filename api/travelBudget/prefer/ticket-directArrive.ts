@@ -4,7 +4,7 @@
 
 'use strict';
 import {AbstractPrefer} from "./index";
-import {IFinalTicket} from "api/_types/travelbudget";
+import {IFinalTicket} from "_types/travelbudget";
 
 class DirectArrivePrefer extends AbstractPrefer<IFinalTicket> {
 

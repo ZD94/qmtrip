@@ -1,8 +1,8 @@
-import { ETripType, EInvoiceType } from 'api/_types/tripPlan';
+import { ETripType, EInvoiceType } from '_types/tripPlan';
 import moment = require('moment');
-import { Staff } from 'api/_types/staff/staff';
-import {EApproveType, EApproveChannel} from "api/_types/approve/types";
-import {MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
+import { Staff } from '_types/staff/staff';
+import {EApproveType, EApproveChannel} from "_types/approve/types";
+import {MPlaneLevel, MTrainLevel} from "_types/travelPolicy";
 var msgbox = require("msgbox");
 
 export async function BudgetController($scope, $storage, $loading, Models, $stateParams, $ionicLoading, City, $ionicPopup, $ionicHistory){

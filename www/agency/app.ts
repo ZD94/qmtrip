@@ -1,5 +1,5 @@
 import L from 'common/language';
-import { signToken } from 'api/_types/auth/auth-cert';
+import { signToken } from '_types/auth/auth-cert';
 import { getSession } from 'common/model';
 require("ionic");
 

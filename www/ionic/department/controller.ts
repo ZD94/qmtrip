@@ -1,5 +1,5 @@
-import { Department } from 'api/_types/department';
-import {Staff, EStaffRoleNames, EStaffRole} from 'api/_types/staff/staff';
+import { Department } from '_types/department';
+import {Staff, EStaffRoleNames, EStaffRole} from '_types/staff/staff';
 import moment = require('moment');
 import {multipleMoveController} from "./multiple-move";
 var msgbox = require('msgbox');

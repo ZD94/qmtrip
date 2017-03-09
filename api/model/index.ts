@@ -1,6 +1,6 @@
 
 import L from 'common/language';
-import { Models } from 'api/_types';
+import { Models } from '_types';
 import { clientExport } from 'common/api/helper';
 import { ModelInterface, PaginateInterface, ModelObjInterface, FindResult } from 'common/model/interface';
 

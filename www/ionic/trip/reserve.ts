@@ -1,7 +1,7 @@
-import { ETripType, TripDetail, EPlanStatus } from 'api/_types/tripPlan';
-import { Staff } from 'api/_types/staff/staff';
-import { ESupplierType } from 'api/_types/company/supplier';
-import {TripDetailTraffic, TripDetailHotel} from "../../../api/_types/tripPlan/tripDetailInfo";
+import { ETripType, TripDetail, EPlanStatus } from '_types/tripPlan';
+import { Staff } from '_types/staff/staff';
+import { ESupplierType } from '_types/company/supplier';
+import {TripDetailTraffic, TripDetailHotel} from "../../../_types/tripPlan/tripDetailInfo";
 
 
 let moment = require("moment");

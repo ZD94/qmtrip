@@ -1,5 +1,5 @@
-import { Staff } from 'api/_types/staff/staff';
-import { EPlanStatus } from 'api/_types/tripPlan';
+import { Staff } from '_types/staff/staff';
+import { EPlanStatus } from '_types/tripPlan';
 
 export default async function DistributionController($scope, Models, City) {
     require('./statistics.scss');

@@ -1,8 +1,8 @@
-import { Staff } from 'api/_types/staff/staff';
+import { Staff } from '_types/staff/staff';
 import _ = require('lodash');
-import {EApproveChannel} from "api/_types/approve/types";
+import {EApproveChannel} from "_types/approve/types";
 var msgbox = require('msgbox');
-import {ISegment, ICreateBudgetAndApproveParams} from "api/_types/tripPlan";
+import {ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan";
 export async function SpecialApproveController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup){
     require('./trip.scss');
     require('./budget.scss');

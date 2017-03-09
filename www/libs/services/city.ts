@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {Place} from "api/_types/place";
+import {Place} from "_types/place";
 
 angular
 .module('nglibs')

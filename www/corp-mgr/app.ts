@@ -1,7 +1,7 @@
 
 import L from 'common/language';
 import { getSession } from 'common/model';
-import { signToken, LoginResponse, genAuthString } from 'api/_types/auth/auth-cert';
+import { signToken, LoginResponse, genAuthString } from '_types/auth/auth-cert';
 
 function getAuthData(): LoginResponse {
     var data = localStorage.getItem('auth_data');

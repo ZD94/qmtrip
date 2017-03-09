@@ -19,7 +19,7 @@ const config ={
 
 import request = require('request');
 import ISVApi from "./lib/isvApi";
-import {Models} from "api/_types/index";
+import {Models} from "_types/index";
 import {clientExport} from "common/api/helper";
 import {get_msg} from "./lib/msg-template/index";
 

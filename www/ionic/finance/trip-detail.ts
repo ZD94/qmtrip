@@ -3,11 +3,11 @@
  */
 
 'use strict';
-import {ETripType} from "api/_types/tripPlan";
+import {ETripType} from "_types/tripPlan";
 import {
     TripDetailTraffic, TripDetailHotel, TripDetailSubsidy,
     TripDetailSpecial
-} from "../../../api/_types/tripPlan/tripDetailInfo";
+} from "../../../_types/tripPlan/tripDetailInfo";
 
 
 export async function TripDetailController($scope, $stateParams, Models) {

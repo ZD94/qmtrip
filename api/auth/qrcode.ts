@@ -1,8 +1,8 @@
 import * as utils from 'common/utils';
 import L from 'common/language';
 import { makeAuthenticateToken } from './authentication';
-import { Models } from 'api/_types/index';
-import { LoginResponse } from 'api/_types/auth/auth-cert';
+import { Models } from '_types/index';
+import { LoginResponse } from '_types/auth/auth-cert';
 var C = require("config");
 
 //拼接字符串

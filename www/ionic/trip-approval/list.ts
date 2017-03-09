@@ -1,5 +1,5 @@
-import { QMEApproveStatus, EApproveStatus2Text } from 'api/_types/tripPlan';
-import { Staff } from 'api/_types/staff/staff';
+import { QMEApproveStatus, EApproveStatus2Text } from '_types/tripPlan';
+import { Staff } from '_types/staff/staff';
 export async function ListController($scope, Models, $stateParams, $ionicLoading){
     require('./trip-approval.scss');
     let staff = await Staff.getCurrent();

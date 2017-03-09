@@ -2,9 +2,9 @@
  * Created by by wyl on 15-12-16.
  */
 'use strict';
-import { Models, EAccountType } from 'api/_types/index';
-import { EStaffRole } from 'api/_types/staff';
-import { parseAuthString } from 'api/_types/auth/auth-cert';
+import { Models, EAccountType } from '_types/index';
+import { EStaffRole } from '_types/staff';
+import { parseAuthString } from '_types/auth/auth-cert';
 var API = require("common/api");
 let Logger = require('common/logger');
 let logger = new Logger("tripPlan.invoice");

@@ -1,5 +1,5 @@
-import { Staff } from 'api/_types/staff/staff';
-import { AccordHotel } from 'api/_types/accordHotel';
+import { Staff } from '_types/staff/staff';
+import { AccordHotel } from '_types/accordHotel';
 
 var msgbox = require('msgbox');
 
