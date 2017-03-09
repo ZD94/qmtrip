@@ -8,7 +8,7 @@
     "importHelpers": true,
     "sourceMap": true,
     "declaration": true,
-    "declarationDir": "@JLTypes",
+    "declarationDir": "JLTypes",
     "experimentalDecorators": true,
     "noImplicitUseStrict": false,
     "allowSyntheticDefaultImports": true,
@@ -31,7 +31,7 @@
     "ionic",
     "tmp",
     "*.bak",
-    "@JLTypes"
+    "JLTypes"
   ],
   "excludeNotUsing": [
   ]

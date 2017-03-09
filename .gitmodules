@@ -2,3 +2,8 @@
 	path = common
 	url = git@git.l.jingli365.com:old/common.git
 	update = merge
+[submodule "JLTypes"]
+	path = JLTypes
+	url = git@git.l.jingli365.com:web/JLTypes.git
+	branch = master
+	update = merge
