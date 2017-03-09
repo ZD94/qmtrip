@@ -7,3 +7,7 @@
 	url = git@git.l.jingli365.com:web/JLTypes.git
 	branch = master
 	update = merge
+[submodule "_types"]
+	path = _types
+	url = git@git.l.jingli365.com:libs/jl-model.git
+	branch = master
