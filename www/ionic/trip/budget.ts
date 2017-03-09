@@ -150,25 +150,33 @@ export async function BudgetController($scope, $storage,$loading, Models, $state
 
         let trip = $scope.trip;
 
-        if(!trip.place || !trip.place.id) {
-            $scope.showErrorMsg('请填写出差目的地！');
-            return false;
+        if (!staff.company.oa || staff.company.oa == EApproveChannel.QM) {
+            if (!trip.auditUser) {
+                $scope.showErrorMsg(`请选择审批人`);
+                return false;
+            }
         }
 
-        if(!trip.reasonName) {
-            $scope.showErrorMsg('请填写出差事由！');
-            return false;
-        }
+
+        // if(!trip.place || !trip.place.id) {
+        //     $scope.showErrorMsg('请填写出差目的地！');
+        //     return false;
+        // }
+        //
+        // if(!trip.reasonName) {
+        //     $scope.showErrorMsg('请填写出差事由！');
+        //     return false;
+        // }
 
         // if(!trip.traffic && ! trip.hotel) {
         //     $scope.showErrorMsg('请选择交通或者住宿！');
         //     return false;
         // }
 
-        if(trip.traffic && (!trip.fromPlace || !trip.fromPlace.id)) {
-            $scope.showErrorMsg('请选择出发地！');
-            return false;
-        }
+        // if(trip.traffic && (!trip.fromPlace || !trip.fromPlace.id)) {
+        //     $scope.showErrorMsg('请选择出发地！');
+        //     return false;
+        // }
 
         let params = {
             originPlace: trip.fromPlace? trip.fromPlace.id : '',
