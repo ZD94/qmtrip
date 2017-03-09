@@ -156,8 +156,6 @@ export async function BudgetController($scope, $storage,$loading, Models, $state
                 return false;
             }
         }
-
-
         // if(!trip.place || !trip.place.id) {
         //     $scope.showErrorMsg('请填写出差目的地！');
         //     return false;
@@ -177,6 +175,7 @@ export async function BudgetController($scope, $storage,$loading, Models, $state
         //     $scope.showErrorMsg('请选择出发地！');
         //     return false;
         // }
+
 
         let params = {
             originPlace: trip.fromPlace? trip.fromPlace.id : '',
