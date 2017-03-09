@@ -182,7 +182,7 @@ export async function BudgetController($scope, $storage,$loading, Models, $state
             isNeedHotel: trip.hotel,
             businessDistrict: trip.hotelPlace,
             hotelName: trip.hotelName,
-            auditUser: trip.auditUser.id ? trip.auditUser.id:''
+            auditUser: trip.auditUser.id ? trip.auditUser.id:trip.auditUser
         };
 
         if(params.originPlace == params.destinationPlace){
