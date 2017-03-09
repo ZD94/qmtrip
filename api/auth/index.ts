@@ -463,7 +463,8 @@ export default class ApiAuth {
         }
         await API.staff.sendNoticeToAdmins({
             companyId:companyId,
-            name:name
+            name:name,
+            noticeTemplate:"qm_notify_admins_add_staff"
         });
         return staff.company;
     }

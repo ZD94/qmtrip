@@ -161,9 +161,9 @@ export class Staff extends ModelObject implements Account {
         return departmentNames.join(',');
     }
     @RemoteCall()
-    async getNoticeToAdmins(params:{companyId:string,name:string}):Promise<any>{
+    async getNoticeToAdmins(params:{companyId:string,name:string,noticeTemplate:string}):Promise<any>{
 
-        return API.staff.sendNoticeToAdmins({companyId:params.companyId,name:params.name});
+        return API.staff.sendNoticeToAdmins({companyId:params.companyId,name:params.name,noticeTemplate:params.noticeTemplate});
     }
 
 

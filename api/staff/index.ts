@@ -146,7 +146,7 @@ class StaffModule{
     }
 
 
-   static async  sendNoticeToAdmins(params:{companyId:string,name:string}):Promise<any>{
+   static async  sendNoticeToAdmins(params:{companyId:string,name:string,noticeTemplate:string}):Promise<any>{
         let company = await Models.company.get(params.companyId);
         console.log("addbyhand: companyId: ",params.companyId);
         let managers=await company.getManagers({withOwner:false});
@@ -157,7 +157,7 @@ class StaffModule{
         return await Promise.all(managers.map( (manager) => {
             return API.notify.submitNotify({
                 accountId: manager.id,
-                key: "qm_notify_admins_add_staff",
+                key: params.noticeTemplate,
                 values: {
                     staff:params.name
                 }
@@ -742,7 +742,8 @@ class StaffModule{
 
              StaffModule.sendNoticeToAdmins({
                 companyId:item.companyId,
-                name:item.name
+                name:item.name,
+                noticeTemplate:"qm_notify_admins_add_staff"
              });
         }));
         

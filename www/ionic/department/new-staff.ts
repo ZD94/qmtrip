@@ -331,7 +331,8 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                                     await staff.saveStaffDepartments($scope.addedArray);
                                     await staff.getNoticeToAdmins({
                                         companyId:company.id,
-                                        name:staff.name
+                                        name:staff.name,
+                                        noticeTemplate:"qm_notify_admins_add_staff"
                                     });
                                     callback();
                                 }
@@ -346,7 +347,8 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                 await staff.saveStaffDepartments($scope.addedArray);
                 await staff.getNoticeToAdmins({
                    companyId:company.id,
-                   name:staff.name
+                   name:staff.name,
+                   noticeTemplate:"qm_notify_admins_add_staff"
                 });
                 callback();
             }
