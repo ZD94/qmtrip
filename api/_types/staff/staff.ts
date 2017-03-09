@@ -195,11 +195,7 @@ export class Staff extends ModelObject implements Account {
 
         return true;
     }
-    @RemoteCall()
-    async getNoticeDesignatedAccount(params:{accountId?:string,name?:string,noticeTemplate?:string,email?:string,mobile?:string}):Promise<any>{
 
-        return API.staff.sendNoticeDesignatedAccount({accountId:params.accountId,name:params.name,noticeTemplate:params.noticeTemplate,email:params.email,mobile:params.mobile});
-    }
 
 
     async getSelfNotices(options?: any): Promise<any> {

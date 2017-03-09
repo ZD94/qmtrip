@@ -233,21 +233,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         type: ''
     }
 
-    async function sendNoticeToJinli(){
-        //added by jack
-        var current=Staff.getCurrent();
-        await Promise.all(managers.map((manager)=>{
-            current.sendNoticeToAdmin({
-                accountId:"",
-                name: current.name,
-                noticeTemplate: "qm_notify_jingli_upload_invoice"
-            });
-        }));
 
-        let notice=await current.getNoticeToAdmin({
-
-        });
-    }
 
     $scope.createInvoice = async function(){
         var newInvoice = Models.tripDetailInvoice.create({tripDetailId: tripDetail.id});
@@ -283,8 +269,6 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         }
         await newInvoice.save();
 
-        //added by jack
-        await sendNoticeToJinli();
 
         tripDetail = await Models.tripDetail.get($stateParams.detailId);
 
