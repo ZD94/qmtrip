@@ -21,6 +21,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     let preRole;
     let staffId = $scope.staffId = $stateParams.staffId;
     let current = await Staff.getCurrent();
+
     let currentRole = current.roleId;
     let company = current.company;
     let travelpolicylist = await company.getTravelPolicies();
@@ -261,6 +262,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     }
     async function staffSave(callback){
         let staff = $scope.staff;
+        let current=$scope.current;
         var ownerModifyAdmin = false;
 
         if(!staff.name){
@@ -326,14 +328,8 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                                 text: '确定',
                                 type: 'button-positive',
                                 onTap: async function (e) {
-                                    staff.isNeedChangePwd = true;
-                                    staff = await staff.save();
-                                    await staff.saveStaffDepartments($scope.addedArray);
-                                    await staff.getNoticeToAdmins({
-                                        companyId:company.id,
-                                        name:staff.name,
-                                        noticeTemplate:"qm_notify_admins_add_staff"
-                                    });
+                                    alert("hello world");
+                                    await current.saveStaffDepartments({staff:staff,department:$scope.addedArray,companyId:company.id,ownerModifyAdmin:ownerModifyAdmin});
                                     callback();
                                 }
                             }
@@ -343,14 +339,9 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             }
 
             if(!ownerModifyAdmin){
-                staff = await staff.save();
-                await staff.saveStaffDepartments($scope.addedArray);
-                await staff.getNoticeToAdmins({
-                   companyId:company.id,
-                   name:staff.name,
-                   noticeTemplate:"qm_notify_admins_add_staff"
-                });
-
+                console.log("yes");
+                alert("hello world");
+                await current.saveStaffAndDepartments({staff:staff,department:$scope.addedArray,companyId:company.id,ownerModifyAdmin:ownerModifyAdmin});
                 callback();
             }
         }catch(err){
