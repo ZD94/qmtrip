@@ -9,7 +9,7 @@ import {Staff} from "api/_types/staff/staff";
 import {Models} from "api/_types/index";
 import {emitter, EVENT} from "libs/oa";
 import {EApproveStatus, EApproveChannel, EApproveType} from "api/_types/approve/types";
-import {TripPlan, ETripType} from "api/_types/tripPlan/tripPlan";
+import {ETripType} from "api/_types/tripPlan/tripPlan";
 import TripPlanModule = require("../tripPlan/index");
 import _ = require('lodash');
 let Config = require('config');
