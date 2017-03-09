@@ -332,17 +332,18 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
 
         let params = {
             originPlace: trip.fromPlace? trip.fromPlace.id : '',
+            isRoundTrip: trip.round,
             destinationPlace: trip.place ? trip.place.id : '',
             leaveDate: moment(trip.beginDate).toDate(),
             goBackDate: moment(trip.endDate).toDate(),
             latestArrivalDateTime: moment(trip.beginDate).toDate(),
             earliestGoBackDateTime: moment(trip.endDate).toDate(),
             isNeedTraffic: trip.traffic,
-            isRoundTrip: trip.round,
             isNeedHotel: trip.hotel,
             businessDistrict: trip.hotelPlace,
             hotelName: trip.hotelName,
-            subsidy: $scope.subsidy
+            subsidy: $scope.subsidy,
+            reason: trip.reason
         };
 
         if(params.originPlace == params.destinationPlace){
@@ -380,7 +381,27 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
                 $loading.end();
             }, 60 * 1000);
 
-            budget = await API.travelBudget.getTravelPolicyBudget(params);
+            let new_params = [];
+            new_params.push(params);
+            /*let addParams = {
+                originPlace: "CT_131",
+                isRoundTrip: true,
+                destinationPlace: "CT_289",
+                leaveDate: moment(trip.beginDate).add(2,'d').toDate(),
+                goBackDate: moment(trip.endDate).add(4,'d').toDate(),
+                latestArrivalDateTime: moment(trip.beginDate).add(2,'d').toDate(),
+                earliestGoBackDateTime: moment(trip.endDate).add(4,'d').toDate(),
+                isNeedTraffic: true,
+                isNeedHotel: true,
+                businessDistrict: "",
+                hotelName: "",
+                subsidy: $scope.subsidy,
+                reason: trip.reason
+            }
+            new_params.push(addParams);*/
+            console.info(new_params);
+            console.info("new_params=========================================");
+            budget = await API.travelBudget.getTravelPolicyBudget(new_params);
             if (isShowDone) {
                 cb();
             }

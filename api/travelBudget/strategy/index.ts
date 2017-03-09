@@ -119,6 +119,10 @@ export abstract class AbstractHotelStrategy {
             star: ret.star,
             latitude: ret.latitude,
             longitude: ret.longitude,
+            checkInDate: this.qs.query.checkInDate,
+            checkOutDate: this.qs.query.checkOutDate,
+            cityName: this.qs.query.city.name,
+            hotelName: this.qs.query.hotelName
         }
         if (isRetMarkedData) {
             result.markedScoreData = _hotels;
@@ -223,6 +227,7 @@ export abstract class AbstractTicketStrategy {
             originPlace: ret.originPlace,
             departDateTime: ret.departDateTime,
             arrivalDateTime: ret.arrivalDateTime,
+            leaveDate: this.qs.query.leaveDate
         } as TravelBudgeItem;
         if (isRetMarkedData) {
             result.markedScoreData = _tickets;

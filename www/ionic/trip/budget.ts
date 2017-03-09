@@ -27,9 +27,11 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     API.require("tripApprove");
     await API.onload();
     let result = await API.travelBudget.getBudgetInfo({id: id});
+    console.info(result);
+    console.info("result====================================");
     let budgets = result.budgets;
     let trip = $storage.local.get("trip");
-    let query = result.query;
+    let query = result.query[0];//兼容多行程
     trip.beginDate = query.leaveDate;
     trip.endDate  = query.goBackDate;
     trip.hotelName = query.hotelName;
@@ -51,9 +53,9 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
             budget.discount = '全价';
         }
         if (budget.tripType == ETripType.HOTEL) {
-            budget.duringDays = moment(moment(trip.endDate).format("YYYY-MM-DD")).diff(moment(moment(trip.beginDate).format("YYYY-MM-DD")), 'days') || 1;
+            budget.duringDays = moment(moment(budget.checkOutDate).format("YYYY-MM-DD")).diff(moment(moment(budget.checkInDate).format("YYYY-MM-DD")), 'days') || 1;
         }
-        if (budget.tripType == ETripType.SUBSIDY) {
+        /*if (budget.tripType == ETripType.SUBSIDY) {
             let days = moment(moment(trip.endDate).format("YYYY-MM-DD")).diff(moment(moment(trip.beginDate).format("YYYY-MM-DD")), 'days')
             days = days + 1;
             if (!budget.hasFirstDaySubsidy) {
@@ -63,7 +65,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
                 days -= 1;
             }
             budget.duringDays = days;
-        }
+        }*/
         return budget;
     })
     for(let budget of budgets) {
