@@ -1,4 +1,4 @@
-import {Models, EGender, EAccountType} from 'api/_types';
+﻿import {Models, EGender, EAccountType} from 'api/_types';
 import { Company } from 'api/_types/company';
 import { StaffSupplierInfo } from 'api/_types/staff';
 import {TripPlan, TripApprove, ESourceType} from 'api/_types/tripPlan';
@@ -20,7 +20,7 @@ import {StaffDepartment} from "../department/staffDepartment";
 import C = require("config");
 import moment = require("moment");
 import {OS_TYPE} from "../../auth/authentication";
-import {ModelDelegate} from "common/model/delegate.ts"
+
 // declare var API: any;
 const API = require("common/api");
 
@@ -137,6 +137,36 @@ export class Staff extends ModelObject implements Account {
     set addWay(val: EAddWay) {}
 
     @RemoteCall()
+    async saveStaffAndDepartment(params:{staff: Staff,department:any,companyId:string,ownerModifyAdmin:boolean}):Promise<any> {
+        let self = this;
+/*
+        if(self.roleId!=EStaffRole.OWNER){
+            return;
+        }
+*/      let staff=params.staff;
+        //let result = await staff.save();
+        console.log("new staff: ",staff);
+        console.log("companyid: ",params.companyId);
+        console.log("company: ",staff.company);
+        //await Staff.saveStaffDepartments(staff,params.department);
+
+        if(!params.ownerModifyAdmin){
+            staff.isNeedChangePwd = true;
+            console.log("notice has been sent");
+          /*  await API.staff.sendNoticeToAdmins({
+                companyId:params.companyId,
+                name:staff.name,
+                noticeTemplate:"qm_notify_admins_add_staff"
+            }); */
+        }
+        //return result;
+        //第一步检查当前操作人是不是管理
+        //第二天add staff
+        //step3 部门关系
+        //step4 notify
+    }
+
+    @RemoteCall()
     async getDepartments(): Promise<PaginateInterface<Department>>{
         let departmentStaffs = await Models.staffDepartment.find({where: {staffId: this.id}, order: [['createdAt', 'desc']]});
         let ids = [];
@@ -162,47 +192,17 @@ export class Staff extends ModelObject implements Account {
     }
 
 
-    @RemoteCall()
-    async saveStaff(params:{staff: any,department:any,companyId:string,ownerModifyAdmin:boolean}):Promise<boolean>{
 
+
+  //  @RemoteCall()
+     async saveStaffDepartments(departmentIds: string[]) :Promise<boolean> {
         let self = this;
-        let staff=params.staff;
-        //let result = await staff.save();
-        console.log("new staff: ",staff);
-        console.log("companyid: ",params.companyId);
-
-        if(!staff.company) staff.company=self.company;
-        //console.log("company: ",staff.company);
-        await staff.save();
-        console.log("save done")
-        await staff.saveStaffDepartments(params.department);
-
-        if(!params.ownerModifyAdmin){
-            staff.isNeedChangePwd = true;
-            console.log("notice has been sent");
-            /*  await API.staff.sendNoticeToAdmins({
-             companyId:params.companyId,
-             name:staff.name,
-             noticeTemplate:"qm_notify_admins_add_staff"
-             }); */
-        }
-        //return result;
-        //第一步检查当前操作人是不是管理
-        //第二天add staff
-        //step3 部门关系
-        //step4 notify
-
-
-       return;
-}
-
-
-
-
-    async saveStaffDepartments(departmentIds: string[]) :Promise<boolean> {
-        let self = this;
+        console.log("this is new created one");
+        console.log("departmentId:",departmentIds );
+       // console.log("this: ",this);
         let staffId = this.id;
         let company = this.company;
+        console.log("this: ",company);
         let defaultDeptment = await company.getDefaultDepartment();
 
         if(!departmentIds || !(departmentIds.length > 0)){

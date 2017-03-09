@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Created by seven on 2017/1/21.
  */
 "use strict";
@@ -20,17 +20,13 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     let staff;
     let preRole;
     let staffId = $scope.staffId = $stateParams.staffId;
-
     let current = await Staff.getCurrent();
-    console.log("staffId: ",staffId);
-    console.log("currentid: ",current.id);
     let currentRole = current.roleId;
     let company = current.company;
     let travelpolicylist = await company.getTravelPolicies();
     let department = await company.getDefaultDepartment();
     $scope.selectDepartments = []; //用于存放已选择的部门
     $scope.addedArray = []; //用于存放提交时的部门id
-    alert("hello world");
     if(staffId){
         staff = await Models.staff.get(staffId);
         Models.resetOnPageChange(staff);
@@ -252,7 +248,8 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
         if($scope.staffId){
             await $scope.staff.deleteStaffDepartments();
         }
-        staffSave(BackToDetail)
+        staffSave(BackToDetail);
+
     }
     $scope.addAnother = function(){
         $ionicHistory.nextViewOptions({
@@ -264,6 +261,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     }
     async function staffSave(callback){
         let staff = $scope.staff;
+
         var ownerModifyAdmin = false;
 
         if(!staff.name){
@@ -286,6 +284,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
 
             if (!$stateParams.staffId) {
                 //管理员添加员工只能添加普通员工
+                alert("roleid");
                 if(current.roleId == EStaffRole.ADMIN){
                     staff.roleId = EStaffRole.COMMON;
                 }
@@ -329,9 +328,9 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                                 text: '确定',
                                 type: 'button-positive',
                                 onTap: async function (e) {
-                                    staff.isNeedChangePwd = true;
-                                    staff = await staff.save();
-                                    await staff.saveStaffDepartments($scope.addedArray);
+                                    alert(current.id);
+                                    alert(staff.id);
+                                    //await current.saveStaffAndDepartment({staff:staff,department:$scope.addedArray,companyId:company.id,ownerModifyAdmin:ownerModifyAdmin});
                                     callback();
                                 }
                             }
@@ -341,14 +340,11 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             }
 
             if(!ownerModifyAdmin){
+                alert(current.id);
                 console.log("current:",current);
                 console.log("staff: ",staff);
-                console.log("coms",current.company);
-                console.log("comsss",staff.company);
-                staff.isNeedChangePwd = true;
-                //staff = await staff.save();
-                await current.saveStaff({staff:staff,department:$scope.addedArray,companyId:company.id,ownerModifyAdmin:ownerModifyAdmin});
-                //await staff.saveStaffDepartments($scope.addedArray);
+
+               // await current.saveStaffAndDepartment({staff:staff,department:$scope.addedArray,companyId:company.id,ownerModifyAdmin:ownerModifyAdmin});
                 callback();
             }
         }catch(err){
