@@ -1,5 +1,5 @@
 import { Staff } from 'api/_types/staff/staff';
-export async function StaffInfoController($scope, Models, ngModalDlg ,$ionicPopup, wxApi) {
+export async function StaffInfoController($scope, Models, ngModalDlg ,$ionicPopup, wxApi,CNZZ) {
     $scope.uploadUrl = '/upload/ajax-upload-file?type=avatar';
     require('./staff-info.scss');
     var staff = await Staff.getCurrent();
@@ -9,6 +9,7 @@ export async function StaffInfoController($scope, Models, ngModalDlg ,$ionicPopu
     $scope.departmentNames = departmentNames;
     $scope.travelpolicy = await staff.getTravelPolicy(staff['travelPolicyId']);
     $scope.staffRole = ['创建者','员工','管理员','财务'];
+    CNZZ.addEvent("修改个人资料","修改","进入修改个人资料",staff);
 
     $scope.invoicefuc = {title:'上传头像',done:function(response){
         if(response.ret != 0){

@@ -2,7 +2,7 @@ import { Staff } from 'api/_types/staff/staff';
 
 var msgbox = require('msgbox');
 
-export async function EditEmailController($scope, Models, $ionicHistory, $ionicPopup) {
+export async function EditEmailController($scope, Models, $ionicHistory, $ionicPopup,CNZZ) {
     $scope.isDingtalk = /dingtalk/i.test(window.navigator.userAgent);
     require('./edit-mobile.scss');
     await API.onload();
@@ -34,6 +34,7 @@ export async function EditEmailController($scope, Models, $ionicHistory, $ionicP
                     }).then(function(res){
                         window.location.href = "index.html#/staff/staff-info";
                     })
+                    CNZZ.addEvent("修改个人资料","修改","修改邮箱",staff);
                     // window.location.href = "index.html#/staff/edit-email-success";
                 }
             })
