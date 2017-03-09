@@ -29,11 +29,21 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
     $scope.totalPrice = totalPrice;
     //下方的提交按钮，当选择完审批人之后变颜色
     $scope.bottomBottomClicked = false;
-    $scope.$watch('trip.auditUser',function(n, o){
-        if(n!= o){
+    // $scope.$watch('trip.auditUser',function(n, o){
+    //     if(n!= o){
+    //         $scope.bottomBottomClicked = true;
+    //     }
+    // })
+    //当审批说明和审批金额不为空时，下方按钮变颜色
+    $scope.$watchGroup(["trip.specialApproveRemark","trip.budget"],function(n, o){
+        if(n[0]&&n[1]){
             $scope.bottomBottomClicked = true;
+        }else{
+            $scope.bottomBottomClicked = false;
         }
     })
+
+
 
     $scope.staffSelector = {
         query: async function(keyword) {
