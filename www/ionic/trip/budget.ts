@@ -156,6 +156,8 @@ export async function BudgetController($scope, $storage,$loading, Models, $state
                 return false;
             }
         }
+
+
         // if(!trip.place || !trip.place.id) {
         //     $scope.showErrorMsg('请填写出差目的地！');
         //     return false;
