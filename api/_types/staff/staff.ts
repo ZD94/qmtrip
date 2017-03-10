@@ -252,6 +252,8 @@ export class Staff extends ModelObject implements Account {
         return true;
     }
 
+
+
     async getSelfNotices(options?: any): Promise<any> {
         var self = this;
         if (!options) options = {where: {}};

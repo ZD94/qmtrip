@@ -158,6 +158,7 @@ class StaffModule{
     }
 
 
+<<<<<<< HEAD
    static async  sendNoticeToAdmins(params:{companyId:string,name:string,noticeTemplate:string}):Promise<any>{
         let company = await Models.company.get(params.companyId);
         let managers= await company.getManagers({withOwner:true});
@@ -172,6 +173,10 @@ class StaffModule{
          }));
 
     }
+=======
+
+
+>>>>>>> c59f6edaf528fe5de745314fbe7057035722e37a
 
     @clientExport
     @requireParams(["id"])

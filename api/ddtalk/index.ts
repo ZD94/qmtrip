@@ -328,8 +328,22 @@ async function addDingUsersCompany(corp, dingUsers, corpApi: CorpApi) {
 class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
-        app.post("/ddtalk/isv/receive", dingSuiteCallback(config, function (msg, req, res, next) {
-            console.info(msg)
+        let url = "/ddtalk/isv/receive"
+        app.post(url, dingSuiteCallback(config, function (msg, req, res, next) {
+            request.post({
+                uri: 'https://d.l.jingli365.com' + url,
+                qs: req.query,
+                form: req.body,
+                strictSSL: false,
+            }, function(err, resp) {
+                if (err) {
+                    console.log(`推送到测试服务器失败`, err);
+                    return;
+                }
+                if (resp.statusCode != 200) {
+                    console.log('返回错误码:', resp.statusCode);
+                }
+            });
             return ddTalkMsgHandle[msg.EventType](msg)
                 .then((ret) => {
                     res.reply();
