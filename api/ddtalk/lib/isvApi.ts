@@ -55,7 +55,7 @@ export default class ISVApi {
     async getCorpAuthInfo() {
         let url = `https://oapi.dingtalk.com/service/get_auth_info?suite_access_token=${this.suiteToken}`;
         return reqProxy(url, {
-            name: '获取企业授权信息',
+            name: '获取企业授权的授权数据',
             body: {
                 auth_corpid: this.corpid,
                 permanent_code: this.permanent_code,

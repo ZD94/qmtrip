@@ -46,6 +46,31 @@ export class DDTalkCorp extends ModelObject {
     set agentid(id: string) {}
 }
 
+@Table(Models.ddtalkDepartment, "ddtalk.department")
+export class DDTalkDepartment extends ModelObject {
+
+    constructor(target: Object) {
+        super(target)
+    }
+
+    @Create()
+    static create(obj?: Object): DDTalkDepartment { return null; }
+
+    @Field({type: Types.UUID})
+    get id() : string { return Values.UUIDV1();}
+    set id(id: string)  {}
+
+    //local department id
+    @Field({type: Types.UUID})
+    get localDepartmentId(): string { return null; }
+    set localDepartmentId(val: string) {}
+
+    //dd department id
+    @Field({type: Types.UUID})
+    get DdDepartmentId(): string { return null; }
+    set DdDepartmentId(val: string) {}
+}
+
 
 @Table(Models.ddtalkUser, "ddtalk.users")
 export class DDTalkUser extends ModelObject {

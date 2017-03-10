@@ -134,7 +134,11 @@ export default class CorpApi {
         let self = this;
         let url = `https://oapi.dingtalk.com/call_back/register_call_back?access_token=${self.accessToken.access_token}`;
         let body = {
-            "call_back_tag": ["user_add_org", "user_modify_org", "user_leave_org"],
+            "call_back_tag": ["user_add_org", "user_modify_org", "user_leave_org"  ,
+                "org_dept_create" ,
+                "org_dept_modify" ,
+                "org_dept_remove"
+            ],
             "token": token,
             "aes_key": aesKey,
             "url": eventListenUrl,
