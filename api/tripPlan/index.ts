@@ -1448,6 +1448,7 @@ class TripPlanModule {
     }
 
 
+
     @clientExport
     @requireParams(['detailId', 'orderIds', 'supplierId'])
     static async relateOrders(params) :Promise<any> {

@@ -8,7 +8,7 @@ import moment = require('moment');
 import {Model} from "sequelize";
 var API = require('common/api');
 var msgbox = require('msgbox');
-var Staff =require("api/_type/staff");
+
 
 
 export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate, ngModalDlg, City, $ionicModal, $timeout){
