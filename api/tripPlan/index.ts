@@ -1420,6 +1420,8 @@ class TripPlanModule {
     static async saveTripDetailInvoice(params) :Promise<TripDetailInvoice> {
         let tripDetailInvoice = Models.tripDetailInvoice.create(params);
         tripDetailInvoice = await tripDetailInvoice.save();
+         await TripPlanModule.notifyDesignatedAcount();
+
         let tripDetail = await Models.tripDetail.get(tripDetailInvoice.tripDetailId);
         if (!tripDetail.expenditure) {
             tripDetail.expenditure = 0;
@@ -1428,6 +1430,23 @@ class TripPlanModule {
         await tryUpdateTripDetailStatus(tripDetail, EPlanStatus.WAIT_COMMIT);
         return tripDetailInvoice;
     }
+
+    static async notifyDesignatedAcount():Promise<any>{
+        let staff=await Staff.getCurrent();
+        let companyName=staff.company.name;
+        let staffName=staff.name;
+
+        return await API.notify.notifyDesignatedAccount({
+         mobile:"13810529805",
+         email:"notice@jingli365.com",
+         key:"qm_notify_designated_account",
+         values:{
+             company:companyName,
+             staffName:staff.name
+         }
+         });
+    }
+
 
 
     @clientExport
