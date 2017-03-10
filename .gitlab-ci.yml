@@ -1,4 +1,4 @@
-image: docker.l.jingli365.com/jingli-build
+image: docker.l.jingli365.com/jl-build
 
 variables:
 #  GIT_SUBMODULE_STRATEGY: recursive
