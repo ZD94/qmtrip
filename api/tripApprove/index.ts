@@ -30,6 +30,9 @@ class TripApproveModule {
         let account = approve.account;
         let budgets = approve.budgetInfo;
         let query = approve.query;
+        if(_.isArray(query)){
+            query = approve.query[0];//暂时兼容之前的逻辑
+        }
         return budgets.map(function (budget: any) {
             if (typeof budget == 'string') {
                 budget = JSON.parse(budget);
@@ -374,7 +377,14 @@ class TripApproveModule {
 
         // 特殊审批和非当月提交的审批不记录行程点数
         if(!tripApprove.isSpecialApprove){
-            let frozenNum = JSON.parse(tripApprove.query).frozenNum;
+            if(typeof tripApprove.query == 'string'){
+                tripApprove.query = JSON.parse(tripApprove.query);
+            }
+            let query = tripApprove.query;
+            let frozenNum = query.frozenNum;
+            if(_.isArray(query)){
+                frozenNum = query[0].frozenNum;
+            }
             let content = tripApprove.deptCity+"-"+tripApprove.arrivalCity;
             if(tripApprove.createdAt.getMonth() == new Date().getMonth()){
                 //审批本月记录审批通过

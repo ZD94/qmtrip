@@ -5,6 +5,7 @@ import {
 import { Staff } from 'api/_types/staff/staff';
 import moment = require('moment');
 import {EApproveChannel} from "api/_types/approve/types";
+import _ = require("lodash");
 
 export async function DetailController($scope, Models, $stateParams, $ionicPopup, $loading, $storage, ngModalDlg){
     require('./trip-approval.scss');
@@ -61,7 +62,11 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         if (typeof query == 'string')
             query = JSON.parse(tripApprove.query);
 
-        query.staffId = tripApprove.account.id;
+        if(_.isArray(query)){
+            query[0].staffId = tripApprove.account.id;
+        }else{
+            query.staffId = tripApprove.account.id;
+        }
         let budgetId = await API.travelBudget.getTravelPolicyBudget(query);
         $scope.budgetId = budgetId;
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
@@ -86,36 +91,38 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0, specialApproveBudget = 0;
     let subsidyDays:number = moment(tripApprove.backAt).diff(moment(tripApprove.startAt), 'days');
     tripApprove.budgetInfo.map((budget) => {
-        budget.startTime = tripApprove.startAt;
-        budget.endTime = tripApprove.backAt;
+        budget.startTime = budget.leaveDate || budget.checkInDate || budget.fromDate || tripApprove.startAt;
+        budget.endTime = budget.checkOutDate || budget.endDate || tripApprove.backAt;
         switch (budget.tripType) {
             case ETripType.OUT_TRIP:
-                budget.deptCity = tripApprove.deptCity;
-                budget.arrivalCity = tripApprove.arrivalCity;
+                budget.deptCity = budget.originPlace.name || budget.originPlace || tripApprove.deptCity;
+                budget.arrivalCity = budget.destination.name || budget.destination || tripApprove.arrivalCity;
                 traffic.push(budget);
                 trafficBudget += Number(budget.price);
                 break;
             case ETripType.BACK_TRIP:
-                budget.deptCity = tripApprove.arrivalCity;
-                budget.arrivalCity = tripApprove.deptCity;
-                budget.startTime = tripApprove.backAt;
+                budget.deptCity = budget.originPlace.name || budget.originPlace || tripApprove.deptCity;
+                budget.arrivalCity = budget.destination.name || budget.destination || tripApprove.arrivalCity;
+                budget.startTime = budget.leaveDate || tripApprove.backAt;
                 budget.endTime = tripApprove.startAt;
                 traffic.push(budget);
                 trafficBudget += Number(budget.price);
                 break;
             case ETripType.HOTEL:
-                budget.city = tripApprove.arrivalCity;
+                budget.city = budget.cityName || tripApprove.arrivalCity;
                 budget.duringDays = moment(tripApprove.backAt).diff(moment(tripApprove.startAt), 'days');
                 hotel.push(budget);
                 hotelBudget += Number(budget.price);
                 break;
             case ETripType.SUBSIDY:
-                budget.duringDays = moment(tripApprove.backAt).diff(moment(tripApprove.startAt), 'days') + 1;
-                if (budget.hasFirstDaySubsidy === false) {
-                    budget.duringDays -= 1;
-                }
-                if (budget.hasLastDaySubsidy === false) {
-                    budget.duringDays -= 1;
+                if(!budget.duringDays){
+                    budget.duringDays = moment(tripApprove.backAt).diff(moment(tripApprove.startAt), 'days') + 1;
+                    if (budget.hasFirstDaySubsidy === false) {
+                        budget.duringDays -= 1;
+                    }
+                    if (budget.hasLastDaySubsidy === false) {
+                        budget.duringDays -= 1;
+                    }
                 }
                 subsidy.push(budget);
                 subsidyBudget += Number(budget.price);

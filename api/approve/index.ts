@@ -11,6 +11,7 @@ import {emitter, EVENT} from "libs/oa";
 import {EApproveStatus, EApproveChannel, EApproveType} from "../_types/approve/types";
 import {TripPlan, ETripType} from "../_types/tripPlan/tripPlan";
 import TripPlanModule = require("../tripPlan/index");
+import _ = require('lodash');
 import L from 'common/language';
 let Config = require('config');
 var API = require("common/api");
@@ -43,11 +44,21 @@ class ApproveModule {
 
         //获取预算详情
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: submitter.id});
+        console.info(budgetInfo);
+        console.info("submitApprove_budgetInfo=============================================")
         let number = 0;
         let content = "";
-        let originCity = await API.place.getCityInfo({cityCode: budgetInfo.query.originPlace});
-        let destinationCity = await API.place.getCityInfo({cityCode: budgetInfo.query.destinationPlace});
-        content = originCity.name + "-" + destinationCity.name;
+        let query = budgetInfo.query;
+        if(query &&  _.isArray(query) && query.length > 0){
+            for(let i = 0; i < query.length; i++){
+                let originCity = await API.place.getCityInfo({cityCode: query[i].originPlace});
+                content = content + originCity.name + "-";
+                if(i == (query.length - 1)){
+                    let destinationCity = await API.place.getCityInfo({cityCode: query[i].destinationPlace});
+                    content = content + destinationCity.name;
+                }
+            }
+        }
         if(budgetInfo.budgets && budgetInfo.budgets.length>0){
             budgetInfo.budgets.forEach(function(item){
                 if(item.tripType != 3){
@@ -59,13 +70,17 @@ class ApproveModule {
         await company.beforeGoTrip({number: number});
 
         //冻结行程数
-        let oldNum = company.tripPlanNumLimit + company.extraTripPlanNum - company.tripPlanPassNum - company.tripPlanFrozenNum - company.extraTripPlanFrozenNum;
+        let oldNum = company.tripPlanNumBalance;
         let result = await company.frozenTripPlanNum({accountId: submitter.id, number: number,
             remark: "提交出差申请消耗行程点数", content: content});
 
         let com = result.company;
         let frozenNum = result.frozenNum;
-        budgetInfo.query.frozenNum = frozenNum;
+        if(_.isArray(budgetInfo.query)){
+            budgetInfo.query[0].frozenNum = frozenNum;//暂时兼容多行程
+        }else{
+            budgetInfo.query.frozenNum = frozenNum;
+        }
         let approve = await ApproveModule._submitApprove({
             submitter: submitter.id,
             data: budgetInfo,
@@ -77,10 +92,7 @@ class ApproveModule {
 
 
         //行程数第一次小于10或等于0时给管理员和创建人发通知
-        let newNum = com.tripPlanNumLimit + com.extraTripPlanNum - com.tripPlanPassNum - com.tripPlanFrozenNum - com.extraTripPlanFrozenNum;
-        if(com.extraExpiryDate && com.extraExpiryDate.getTime() - new Date().getTime() < 0){
-            newNum = com.tripPlanNumLimit - com.tripPlanPassNum - com.tripPlanFrozenNum;
-        }
+        let newNum = com.tripPlanNumBalance;
         if(oldNum > 10 && newNum <= 10 || newNum == 0){
             let managers = await company.getManagers({withOwner: true});
             let ps = managers.map( (manager) => {

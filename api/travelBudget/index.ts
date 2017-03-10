@@ -13,7 +13,7 @@ const moment = require('moment');
 const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
-import {ITicket, TravelBudgeItem, TRAFFIC} from "api/_types/travelbudget";
+import {ITicket, TRAFFIC, TravelBudgeTraffic, TravelBudgetHotel} from "api/_types/travelbudget";
 import {
     TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
 } from "./strategy/index";
@@ -257,7 +257,7 @@ export default class ApiTravelBudget {
      */
     @clientExport
     static async getHotelBudget(params: {city: any, businessDistrict: string,
-        checkInDate: Date, checkOutDate: Date, hotelName?: string}) :Promise<TravelBudgeItem> {
+        checkInDate: Date, checkOutDate: Date, hotelName?: string}) :Promise<TravelBudgetHotel> {
         let {city, businessDistrict, checkInDate, checkOutDate, hotelName} = params;
         if (!Boolean(city)) {
             throw L.ERR.CITY_NOT_EXIST();
@@ -288,7 +288,7 @@ export default class ApiTravelBudget {
         }
         if (accordHotel) {
             return {price: accordHotel.accordPrice * days, type: EInvoiceType.HOTEL,
-                hotelName: hotelName, cityName: city.name, checkInDate: checkInDate, checkOutDate: checkOutDate} as TravelBudgeItem;
+                hotelName: hotelName, cityName: city.name, checkInDate: checkInDate, checkOutDate: checkOutDate} as TravelBudgetHotel;
         }
 
         //查询员工差旅标准
@@ -366,7 +366,7 @@ export default class ApiTravelBudget {
         latestArrivalDateTime?: Date,   //最晚到达时间
         earliestLeaveDateTime?: Date,   //最早出发时间
 
-     }) : Promise<TravelBudgeItem> {
+     }) : Promise<TravelBudgeTraffic> {
         let {originPlace, destinationPlace, leaveDate, latestArrivalDateTime, earliestLeaveDateTime} = params;
 
         if (!destinationPlace) {
@@ -507,6 +507,8 @@ export default class ApiTravelBudget {
         let strategy = await TrafficBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
         let result =  await strategy.getResult(tickets);
         result.cabinClass = result.cabin;
+        result.originPlace = JSON.stringify(m_originCity);
+        result.destination = JSON.stringify(m_destination);
         if (<number>result.type == <number>TRAFFIC.FLIGHT) {
             let fullPriceObj = await API.place.getFlightFullPrice({
                 originPlace: m_originCity.id,

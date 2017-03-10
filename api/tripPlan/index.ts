@@ -928,30 +928,72 @@ class TripPlanModule {
         let approve = await Models.approve.get(params.tripApproveId);
         let account = await Models.staff.get(approve.submitter);
         let approveUser = await Models.staff.get(approve.approveUser);
+        let company = approveUser.company;
         if (typeof approve.data == 'string') approve.data = JSON.parse(approve.data);
         let query: any  = approve.data.query;   //查询条件
         if(typeof query == 'string') query = JSON.parse(query);
         let budgets: any = approve.data.budgets;
         if (typeof budgets == 'string') budgets = JSON.parse(budgets);
 
-        let deptCity = await API.place.getCityInfo({cityCode: query.originPlace});
-        let arrivalCity = await API.place.getCityInfo({cityCode: query.destinationPlace});
-
         let tripPlan = TripPlan.create({id: approve.id});
+        let projectIds = [];//事由名称
+        let arrivalCityCodes = [];//目的地代码
+        let project: Project;
+        if(query && _.isArray(query) && query.length > 0){
+            for(let i = 0; i < query.length; i++){
+                let q = query[i];
+                //处理出差事由放入projectIds 原project存放第一程出差事由
+                if(q.reason){
+                    let projectItem = await TripPlanModule.getProjectByName({companyId: company.id, name: q.reason,
+                        userId: account.id, isCreate: true});
+                    if(i == 0){
+                        project = projectItem;
+                    }
+                    if(projectIds.indexOf(projectItem.id) == -1){
+                        projectIds.push(projectItem.id);
+                    }
+                }
+
+                //处理目的地 放入arrivalCityCodes 原目的地信息存放第一程目的地信息
+                if(q.destinationPlace){
+                    let arrivalInfo = await API.place.getCityInfo({cityCode: q.destinationPlace.id|| q.destinationPlace}) || {name: null};
+                    arrivalCityCodes.push(arrivalInfo.id);
+                    if(i == 0){
+                        tripPlan.arrivalCityCode = arrivalInfo.id;
+                        tripPlan.arrivalCity = arrivalInfo.name;
+                    }
+                }
+
+                //处理其他数据
+                if(i == 0){
+                    if(q.originPlace) {
+                        let deptInfo = await API.place.getCityInfo({cityCode: q.originPlace.id || q.originPlace}) || {name: null};
+                        tripPlan.deptCityCode = deptInfo.id;
+                        tripPlan.deptCity = deptInfo.name;
+                    }
+                    tripPlan.startAt = q.leaveDate;
+                    //处理原始数据 用第一程数据
+                    tripPlan.isNeedTraffic = q.isNeedTraffic;
+                    tripPlan.isNeedHotel = q.isNeedHotel;
+                    tripPlan.isRoundTrip = q.isRoundTrip;
+                }
+                if(q.isRoundTrip && i == (query.length - 1)){
+                    tripPlan.backAt = q.goBackDate;
+                }
+            }
+        }
+        // let deptCity = await API.place.getCityInfo({cityCode: query.originPlace});
+        // let arrivalCity = await API.place.getCityInfo({cityCode: query.destinationPlace});
+
+        tripPlan.projectIds = JSON.stringify(projectIds);
+        tripPlan.arrivalCityCodes = JSON.stringify(arrivalCityCodes);
+
         tripPlan['companyId'] = account.company.id;
-        tripPlan.deptCityCode = query.originPlace;
-        tripPlan.arrivalCityCode = query.destinationPlace;
-        tripPlan.deptCity = deptCity.name;
-        tripPlan.arrivalCity = arrivalCity.name;
-        tripPlan.startAt = moment(query.leaveDate).toDate();
-        tripPlan.backAt = moment(query.goBackDate).toDate();
-        tripPlan.isNeedHotel = query.isNeedHotel;
-        tripPlan.isNeedTraffic = query.isNeedTraffic;
-        tripPlan.isRoundTrip = query.isRoundTrip;
+        // tripPlan.startAt = moment(query.leaveDate).toDate();
+        // tripPlan.backAt = moment(query.goBackDate).toDate();
         tripPlan.auditUser = tryObjId(approveUser);
-        tripPlan.id = approve.id;
-        tripPlan.project = await TripPlanModule.getProjectByName({name: approve.title});
-        tripPlan.title = approve.title;
+        tripPlan.project = project;
+        tripPlan.title = approve.title;//project名称
         tripPlan.account = account;
         tripPlan.status = EPlanStatus.WAIT_UPLOAD;
         tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo'); //获取出差计划单号
@@ -978,48 +1020,56 @@ class TripPlanModule {
             let tripType = budget.tripType;
             let price = Number(budget.price);
             let detail;
-            let data: any = {
+            let data: any = {};
+            if(budget.originPlace){
+                if (typeof budget.originPlace == 'string') budget.originPlace = JSON.parse(budget.originPlace);
+            }
+            if(budget.destination){
+                if (typeof budget.destination == 'string') budget.destination = JSON.parse(budget.destination);
             }
             console.info('BUDGET====>', budget);
             switch(tripType) {
                 case ETripType.OUT_TRIP:
-                    data.deptCity = query.originPlace;
-                    data.arrivalCity= query.destinationPlace;
-                    data.deptDateTime = query.leaveDate;
-                    data.arrivalDateTime = query.goBackDate;
+                    data.deptCity = budget.originPlace.id;
+                    data.arrivalCity= budget.destination.id;
+                    data.deptDateTime = budget.departDateTime;
+                    data.arrivalDateTime = budget.arrivalDateTime;
+                    data.leaveDate = budget.leaveDate;
                     data.cabin = budget.cabinClass;
                     data.invoiceType = budget.type;
                     detail = Models.tripDetailTraffic.create(data);
                     tripPlan.isNeedTraffic = true;
                     break;
                 case ETripType.BACK_TRIP:
-                    data.deptCity = query.destinationPlace;
-                    data.arrivalCity = query.originPlace;
-                    data.deptDateTime = query.goBackDate;
+                    data.deptCity = budget.originPlace.id;
+                    data.arrivalCity= budget.destination.id;
+                    data.deptDateTime = budget.departDateTime;
                     data.arrivalDateTime = null;
+                    data.leaveDate = budget.leaveDate;
                     data.cabin = budget.cabinClass;
                     data.invoiceType = budget.type;
                     detail = Models.tripDetailTraffic.create(data);
                     tripPlan.isNeedTraffic = true;
                     break;
                 case ETripType.HOTEL:
-                    data.city = tripPlan.arrivalCity;
-                    data.placeName = query.hotelName;
-                    data.position = query.businessDistrict;
-                    data.checkInDate = query.checkInDate || query.leaveDate;
-                    data.checkOutDate = query.checkOutDate || query.goBackDate;
+                    data.city = budget.cityName;
+                    data.placeName = budget.hotelName;
+                    data.name = budget.name;
+                    data.position = budget.hotelName;
+                    data.checkInDate = budget.checkInDate;
+                    data.checkOutDate = budget.checkOutDate;
                     detail = Models.tripDetailHotel.create(data);
                     tripPlan.isNeedHotel = true;
                     break;
                 case ETripType.SUBSIDY:
-                    data.hasFirstDaySubsidy = query.subsidy.hasFirstDaySubsidy;
-                    data.hasLastDaySubsidy = query.subsidy.hasLastDaySubsidy;
-                    data.template = query.subsidy.template.id;
-                    data.subsidyMoney = query.subsidy.template.subsidyMoney;
-                    data.startDateTime = query.leaveDate;
-                    data.endDateTime = query.goBackDate;
+                    data.hasFirstDaySubsidy = budget.hasFirstDaySubsidy;
+                    data.hasLastDaySubsidy = budget.hasLastDaySubsidy;
+                    data.template = budget.template.id;
+                    data.subsidyMoney = budget.price;//此字段做什么
+                    data.startDateTime = budget.fromDate;
+                    data.endDateTime = budget.endDate;
                     detail = Models.tripDetailSubsidy.create(data);
-                    detail.expenditure = price;
+                    detail.expenditure = price;//此字段与budget字段有什么区别
                     detail.status = EPlanStatus.COMPLETE;
                     break;
                 case ETripType.SPECIAL_APPROVE:
