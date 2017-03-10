@@ -19,7 +19,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     $scope.EPayType = EPayType;
     $scope.PayTypeNames = PayTypeNames;
     $scope.parseInt = parseInt;
-    
+
     //////绑定上传url
     require("./invoice-detail.scss");
     let authDataStr = window['getAuthDataStr']();
@@ -232,8 +232,6 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         payType: '',
         type: ''
     }
-
-
 
     $scope.createInvoice = async function(){
         var newInvoice = Models.tripDetailInvoice.create({tripDetailId: tripDetail.id});
