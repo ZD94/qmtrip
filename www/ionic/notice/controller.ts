@@ -6,7 +6,7 @@ export * from './detail';
 export * from './notice-type';
 var msgbox = require('msgbox');
 
-export async function IndexController($scope, Models, $ionicPopup, $stateParams) {
+export async function IndexController($scope, Models, $ionicPopup, $stateParams,CNZZ) {
     require('./notice.scss');
     $scope.notices = [];
     var staff = await Staff.getCurrent();
@@ -59,6 +59,7 @@ export async function IndexController($scope, Models, $ionicPopup, $stateParams)
 
 
     $scope.detail = async function (notice) {
+        CNZZ.addEvent("从通知直接跳进页面","页面跳转","从通知直接跳进页面",notice.id);
         //标记已读
         await notice.setReadStatus();
         if(notice.content && notice.content.startsWith("skipLink@")){

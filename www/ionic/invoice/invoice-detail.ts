@@ -222,6 +222,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     }
 
     $scope.linkOthers = function(){
+        CNZZ.addEvent("关联订单","关联订单","关联订单","");
         window.location.href = "#/trip/select-supplier?detailId="+$stateParams.detailId;
     }
 

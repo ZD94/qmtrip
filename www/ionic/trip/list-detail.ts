@@ -152,6 +152,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
 
     $scope.hasMakeSpendRecorder = false;    //防止一直生成
     $scope.makeSpendReport = async function() {
+        CNZZ.addEvent("生成报销单","报销单","生成报销单",'');
         $scope.hasMakeSpendRecorder = true;
         API.require('tripPlan');
         await API.onload();

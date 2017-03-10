@@ -285,6 +285,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     };
 
     $scope.reCommitTripApprove = async function() {
+        CNZZ.addEvent("重新提交","提交","重新提交","");
         let tripApprove = $scope.tripApprove;
         //let tripDetails = $scope.budgets;
         let trip: any = {
