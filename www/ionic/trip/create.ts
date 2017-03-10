@@ -172,28 +172,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
     };
     $scope.nextStep = async function(){
         let trip = $scope.trip;
-        let number = 0;
-        if(trip.traffic){
-            number = number + 1;
-        }
-        if(trip.round){
-            number = number + 1;
-        }
-        if(trip.hotel){
-            number = number + 1;
-        }
-        try{
-            await currentCompany.beforeGoTrip({number: number});
-        }catch(e){
-            $ionicPopup.alert({
-                title: '行程余额不足',
-                template: '行程余额不足无法获取预算，请通知管理员进行充值或使用特别审批'
-            })
-            return false;
-        }
-        let beginMSecond = Date.now();
-        API.require("travelBudget");
-        await API.onload();
         if(!trip.origin){
             trip.traffic = false;
         }
@@ -215,6 +193,41 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             msgbox.log("出差地点和出发地不能相同");
             return false;
         }
+        let number = 0;
+        if(trip.traffic){
+            number = number + 1;
+        }
+        if(trip.round){
+            number = number + 1;
+        }
+        if(trip.hotel){
+            number = number + 1;
+        }
+        try{
+            await currentCompany.beforeGoTrip({number: number});
+        }catch(e){
+            $ionicPopup.confirm({
+                title: '行程余额不足',
+                template: '行程余额不足无法获取预算，请通知管理员进行充值或使用特别审批',
+                buttons:[
+                    {
+                        text:'取消',
+                        type: 'button-calm button-outline',
+                    },
+                    {
+                        text: '特别审批',
+                        type: 'button-calm',
+                        onTap: function(){
+                            window.location.href = "#/trip/special-approve?params="+JSON.stringify(params);
+                        }
+                    }
+                ]
+            })
+            return false;
+        }
+        let beginMSecond = Date.now();
+        API.require("travelBudget");
+        await API.onload();
         let front = ['正在验证出行参数', '正在匹配差旅政策', '正在搜索全网数据', '动态预算即将完成'];
         $loading.reset();
         $loading.start({
