@@ -11,7 +11,7 @@ import {Field, Create, ResolveRef, Table} from "common/model/common";
 import {Models} from "../index";
 import {EInvoiceFeeTypes, EPayType, ESourceType, EInvoiceStatus} from "./index";
 import {PaginateInterface} from "common/model/interface";
-
+declare var API: any;
 
 @Table(Models.tripDetail, 'tripPlan.')
 export class TripDetail extends ModelObject{

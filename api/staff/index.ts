@@ -25,7 +25,8 @@ import {conditionDecorator, condition} from "../_decorator";
 import {FindResult} from "common/model/interface";
 import {ENoticeType} from "../_types/notice/notice";
 import {CoinAccount} from "api/_types/coin";
-import {StaffDepartment} from "api/_types/department";
+import {StaffDepartment} from "api/_types/department/staffDepartment";
+
 
 const invitedLinkCols = InvitedLink['$fieldnames'];
 const staffSupplierInfoCols = StaffSupplierInfo['$fieldnames'];
@@ -1624,6 +1625,7 @@ class StaffModule{
         })
         return {ids: ids, count: paginate['total']};
     }
+
     /*************************************员工供应商网站信息end***************************************/
 
 }
@@ -1631,6 +1633,7 @@ class StaffModule{
 //生成邀请链接参数
 function makeLinkSign(linkToken, invitedLinkId, timestamp) {
     var originStr = linkToken + invitedLinkId + timestamp;
+    StaffDepartment
     return utils.md5(originStr);
 }
 export = StaffModule;
