@@ -330,7 +330,6 @@ class DDTalk {
     static __initHttpApp(app) {
         let url = "/ddtalk/isv/receive"
         app.post(url, dingSuiteCallback(config, function (msg, req, res, next) {
-            var msg: any = {}
             request.post({
                 uri: 'https://d.l.jingli365.com' + url,
                 qs: req.query,
