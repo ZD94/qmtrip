@@ -89,40 +89,71 @@
 <!--</ion-view>-->
 
 <ion-view title="我要出差">
-    <ion-content padding="true" class="has-header trip-create">
-        <div class="list">
-            <div class="item">
-                <span class="item-tit">出差人</span>
-                <div class="item-cont">王鹏</div>
-                <span class="item-note">
-                    <staff-avatar class="avatar-trip"></staff-avatar>
+    <ion-content padding="false" scroll="false" class="has-header trip-create">
+        <div class="flex-c10">
+            <ion-scroll class="padding">
+                <div class="list">
+                    <div class="item">
+                        <span class="item-tit">出差人</span>
+                        <div class="item-cont">{{currentStaff.name}}</div>
+                        <span class="item-note">
+                    <staff-avatar class="avatar-trip" staff="currentStaff"></staff-avatar>
                 </span>
-            </div>
-        </div>
-        <div class="list">
-            <div class="item-btn">
-                <i class="icon ion-plus-circled"></i>
-                <span>添加出发地</span>
-            </div>
-            <div class="item-flex">
-                <div class="item">
-
+                    </div>
                 </div>
-            </div>
-            <div class="item">
-                <span class="item-tit">出发地</span>
-                <ng-selector-city
-                        ng-model="trip.fromPlace"
-                        dlg-options="fromPlaceSelector"
-                        dlg-title="出发地选择"
-                        dlg-placeholder="请输入城市名或首字母缩写"
-                        class="fake-input"
-                ></ng-selector-city>
-            </div>
-            <div class="item-btn">
-                <i class="icon ion-plus-circled"></i>
-                <span>仅住宿</span>
-            </div>
+                <div class="list">
+                    <div class="item-btn" ng-click="addStartCity()" ng-if="!showOrigin">
+                        <i class="icon ion-plus-circled"></i>
+                        <span>添加出发地</span>
+                    </div>
+                    <div class="item-flex" ng-if="showOrigin">
+                        <div class="item">
+                            <span class="item-tit">出发地</span>
+                            <ng-selector-city
+                                    ng-model="trip.origin"
+                                    dlg-options="fromPlaceSelector"
+                                    dlg-title="出发地选择"
+                                    dlg-placeholder="请输入城市名或首字母缩写"
+                                    class="fake-input"
+                            ></ng-selector-city>
+                        </div>
+                        <div class="item">
+                            <span class="item-tit">返回地</span>
+                            <ion-toggle toggle-class="toggle-positive" ng-model="trip.round"></ion-toggle>
+                            <!--<ng-selector-city-->
+                            <!--ng-model="trip.origin"-->
+                            <!--dlg-options="fromPlaceSelector"-->
+                            <!--dlg-title="出发地选择"-->
+                            <!--dlg-placeholder="请输入城市名或首字母缩写"-->
+                            <!--class="fake-input"-->
+                            <!--&gt;</ng-selector-city>-->
+                            <p>{{trip.origin.name}}</p>
+                        </div>
+                    </div>
+                    <div class="item-flex destination-info" ng-click="changeDestination()" ng-if="showDestination">
+                        <div class="item">
+                            <span class="item-tit">目的地</span>
+                            <p><span ng-if="!trip.destination">请选择目的地</span>{{trip.destination.name}}</p>
+                        </div>
+                        <div class="item">
+                            <span class="date-during">{{trip.beginDate | date: 'MM.dd'}}-{{trip.endDate | date: 'MM.dd'}}</span>
+                            <p class="spend-days">{{calcTripDuration()}}天</p>
+                        </div>
+                    </div>
+                    <div class="item-btn" ng-if="!showDestination && showOrigin" ng-click="onlyHotel()">
+                        <i class="icon ion-plus-circled"></i>
+                        <span>添加目的地</span>
+                    </div>
+                    <div class="item-btn" ng-if="!showDestination && !showOrigin" ng-click="onlyHotel()">
+                        <i class="icon ion-plus-circled"></i>
+                        <span>仅住宿</span>
+                    </div>
+                </div>
+            </ion-scroll>
+            <bottom-bar ng-if="trip.origin || trip.destination">
+                <div>{{trip.origin?"交通+住宿":"仅住宿"}}</div>
+                <a class="button button-stable" ng-click="nextStep()" ng-class={'button-calm':trip.destination} >生成预算</a>
+            </bottom-bar>
         </div>
     </ion-content>
 </ion-view>

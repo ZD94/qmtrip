@@ -2,11 +2,51 @@ $main-color: #28a7e1;
 .trip-create{
   .list{
     margin-bottom: 10px;
+    .item-flex{
+      display: flex;
+      .item{
+        flex: 1;
+      }
+      &.destination-info{
+        .item{
+          &:first-child{
+            border-right: none;
+          }
+          &:last-child{
+            border-left: none;
+            text-align: right;
+            .date-during{
+              color: #9b9b9b;
+              font-size: 12px;
+            }
+            .spend-days{
+              color: #f39800;
+              font-size: 16px;
+            }
+          }
+        }
+      }
+    }
     .item{
       padding: 8px 10px;
+      &.item-icon-right{
+        .icon{
+          font-size: 14px;
+        }
+      }
       .item-tit{
         font-size: 12px;
         color: $main-color;
+      }
+      .item-toggle{
+        position: absolute;
+        top: 0;
+        right: 0;
+        border: none;
+        overflow: visible;
+        .toggle{
+          top: 15px;
+        }
       }
       .avatar-trip{
         position: absolute;
@@ -29,7 +69,20 @@ $main-color: #28a7e1;
       }
       &:last-child{
         border-radius: 0 0 3px 3px;
+        border-top: 1px solid #eee;
       }
+    }
+  }
+  .bottom-bar{
+    background: rgba(255,255,255,.9);
+    line-height: 50px;
+    height: 50px;
+    & > div{
+      padding-left: 10px;
+    }
+    .button{
+      font-size: 14px;
+      border-radius: 0;
     }
   }
 }
