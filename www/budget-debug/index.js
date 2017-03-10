@@ -37,140 +37,279 @@ var app = angular.module('debugModule',[]);
 ];*/
 var available_prefer = [
     {
+        cn:"directArrive",
         title:"[交通]直接到达",
-        value: '{"name": "directArrive", "options": {"deductScorePerStop": 10000}}'
+        value: '{"name": "directArrive", "options": {"deductScorePerStop": 10000}}',
+        template:{
+            directArrive:"直接到达目的地",
+            deductScorePerStop:"每多中转一站扣除的分数"
+        }
     },
     {
+        cn:"transitWaitDuration",
         title:"[交通]出境等待时长",
-        value:'{"name": "transitWaitDuration", "options": {"baseScore": 500, "subScore": 5, "maxDuration": 360, "minDuration": 120}}'
+        value:'{"name": "transitWaitDuration", "options": {"baseScore": 500, "subScore": 5, "maxDuration": 360, "minDuration": 120}}',
+        template:{
+            transitWaitDuration:"出境需要的等待时长",
+            baseScore:"位于合理等待时长的得分",
+            subScore:"每超出合理的等待时长一分钟扣除的分数",
+            maxDuration:"合理的最大等待时长--单位/分钟",
+            minDuration:"合理的最小等待时长--单位/分钟"
+        }
     },
     {
-        title:"[交通]出境城市",
-        value:'{"name": "transitCityInChina", "options": {"baseScore": 5000}}'
+        cn:"transitCityInChina",
+        title:"[交通]从国内出境的中转城市",
+        value:'{"name": "transitCityInChina", "options": {"baseScore": 5000}}',
+        template:{
+            transitCityInChina:"从国内出境的中转城市",
+            baseScore:"位于期待的中转城市的得分"
+        }
     },
     {
-        title:"[交通]运营时长",
-        value:'{"name": "runningTimePrefer", "options": {"planeScore": 500, "trainScore": 250, "planeScoreInterval": 5, "trainScoreInterval":5}}'
+        cn:"runningTimePrefer",
+        title:"[交通]运行时长",
+        value:'{"name": "runningTimePrefer", "options": {"planeScore": 500, "trainScore": 250, "planeScoreInterval": 5, "trainScoreInterval":5}}',
+        template:{
+            runningTimePrefer:"运行时长",
+            planeScore:"乘坐飞机的得分",
+            trainScore:"乘坐火车的得分",
+            planeScoreInterval:"乘坐飞机时每超过预期时长一分钟扣除的分数",
+            trainScoreInterval:"乘坐火车时每超过预期时长一分钟扣除的分数"
+        }
     },
     {
-        title:"[交通]运营时长",
-        value:'{"name": "runningTimePrefer", "options": {"planeScore": 500, "trainScore": 250, "planeScoreInterval": 5, "trainScoreInterval":5}}'
+        cn:"departStandardTimePrefer",
+        title:"[交通]通用的出发时间",
+        value:'{"name": "departStandardTimePrefer", "options": {"end": "最晚时间（格式YYYY-MM-DD HH:mm +0800）", "begin": "最早时间（格式YYYY-MM-DD HH:mm +0800）", "score": 500, "scoreInterval":-3}}',
+        template: {
+            departStandardTimePrefer:"通用的出发时间",
+            end:"最晚出发时间",
+            begin:"开始出发时间",
+            score:"在通用的出发时间内出发的得分",
+            scoreInterval:"每超过通用的出发时间一分钟扣除的分数"
+        }
     },
     {
-        title:"[交通]标准出发时间",
-        value:'{"name": "departStandardTimePrefer", "options": {"end": "最晚时间（格式YYYY-MM-DD HH:mm +0800）", "begin": "开始时间（格式YYYY-MM-DD HH:mm +0800）", "score": 500, "scoreInterval":-3}}'
+        cn:"arriveStandardTimePrefer",
+        title: "[交通]通用的到达时间",
+        value: '{"name": "arriveStandardTimePrefer", "options": {"end": "最晚时间（格式YYYY-MM-DD HH:mm +0800）", "begin": "开始时间（格式YYYY-MM-DD HH:mm +0800）", "score": 500,  "scoreInterval":3}}',
+        template: {
+            arriveStandardTimePrefer:"通用的到达时间",
+            end:"最晚到达时间",
+            begin:"最早到达时间",
+            score:"在通用的到达时间内到达的得分",
+            scoreInterval:"每超过通用的到达时间一分钟扣除的分数"
+        }
     },
     {
-        title: "[交通]标准到达时间",
-        value: '{"name": "arriveStandardTimePrefer", "options": {"end": "最晚时间（格式YYYY-MM-DD HH:mm +0800）", "begin": "开始时间（格式YYYY-MM-DD HH:mm +0800）", "score": 500,  "scoreInterval":3}}'
+        cn:"trainDurationPrefer",
+        title: "[交通]乘坐火车时长偏好",
+        value: '{"name": "trainDurationPrefer", "options": {"score": 100000, "trainDuration":360}}',
+        template: {
+            trainDurationPrefer:"乘坐火车时长偏好",
+            score:"乘坐火车时长符合预期的得分",
+            trainDuration:"如果运行时长在输入的时间范围内则更倾向于坐火车--单位/分钟"
+        }
     },
     {
-        title: "[交通]火车运行时间",
-        value: '{"name": "trainDurationPrefer", "options": {"score": 100000, "trainDuration":360}}'
+        cn:"earliestGoBackTimePrefer",
+        title: "[交通]最早返回时间偏好",
+        value: '{"name": "earliestGoBackTimePrefer", "options": {"score": 100000, "earliestGoBackTime":"最早返回时间（格式YYYY-MM-DD HH:mm +0800）"}}',
+        template: {
+            earliestGoBackTimePrefer:"最早返回时间偏好",
+            score:"晚于最早返回时间的得分",
+            earliestGoBackTime:"最早返回时间"
+        }
     },
     {
-        title: "[交通]最早返回时间",
-        value: '{"name": "earliestGoBackTimePrefer", "options": {"score": 100000, "earliestGoBackTime":"最早返回时间（格式YYYY-MM-DD HH:mm +0800）"}}'
+        cn:"latestArrivalTimePrefer",
+        title: "[交通]最晚到达时间偏好",
+        value: '{"name": "latestArrivalTimePrefer", "options": {"score": 100000, "latestArrivalTime":"最晚到达时间（格式YYYY-MM-DD HH:mm +0800）"}}',
+        template: {
+            latestArrivalTimePrefer:"最晚到达时间偏好",
+            score:"早于最晚到达时间的得分",
+            latestArrivalTime:"最晚到达的时间"
+        }
     },
     {
-        title: "[交通]最晚到达时间",
-        value: '{"name": "latestArrivalTimePrefer", "options": {"score": 100000, "latestArrivalTime":"最晚到达时间（格式YYYY-MM-DD HH:mm +0800）"}}'
+        cn:"trainPricePrefer",
+        title: "[交通]火车价格偏好",
+        value: '{"name": "trainPricePrefer", "options": {"score": 100000}}',
+        template: {
+            trainPricePrefer:"火车价格偏好",
+            score:"火车价格位于自己期待的范围内得分"
+        }
     },
     {
-        title: "[交通]火车价格",
-        value: '{"name": "trainPricePrefer", "options": {"score": 100000}}'
+        cn:"planePricePrefer",
+        title: "[交通]飞机价格偏好",
+        value: '{"name": "planePricePrefer", "options": {"type": "square", "score": 10000, "cabins":2, "percent":0.2}}',
+        template: {
+            planePricePrefer:"飞机价格偏好",
+            score:"飞机价格位于自己期待的范围内得分",
+            type:"增长幅度",
+            cabins:"舱号",
+            percent:"期望的飞机价格所占总价格的比例"
+        }
     },
     {
-        title: "[交通]飞机票价期待值",
-        value: '{"name": "planePricePrefer", "options": {"type": "square", "score": 10000, "cabins":2, "percent":0.2}}'
+        cn:"preferAgent",
+        title: "[交通]代理商偏好",
+        value: '{"name": "preferAgent", "options": {"score": 100, "expectedAgents":"ctrip,携程,同城,南航,中航,中国航空公司"}}',
+        template:{
+            preferAgent:"代理商偏好",
+            score:"选择了自己期待的代理商得分",
+            expectedAgents:"期待的代理商"
+        }
     },
     {
-        title: "[交通]代理商",
-        value: '{"name": "preferAgent", "options": {"score": 100, "expectedAgents":"ctrip,携程,同城,南航,中航,中国航空公司"}}'
-    },
-    {
+        cn:"arrivalTime",
         title: "[交通]到达时间",
-        value: '{"name": "arrivalTime", "options": {"end": "最晚时间（格式YYYY-MM-DD HH:mm +0800）", "begin": "开始时间（格式YYYY-MM-DD HH:mm +0800）", "score": "20000"}}'
+        value: '{"name": "arrivalTime", "options": {"end": "最晚时间（格式YYYY-MM-DD HH:mm +0800）", "begin": "最早时间（格式YYYY-MM-DD HH:mm +0800）", "score": "20000"}}',
+        template:{
+            arrivalTime:"到达时间",
+            end:"最晚到达时间",
+            begin:"最早到达时间",
+            score:"到达时间位于期待的时间范围内"
+        }
     },
     {
+        cn:"cabin",
         title: "[交通]舱位",
-        value: '{"name": "cabin", "options": {"score": "10000", "expectTrainCabins": "2", "expectFlightCabins": "3,4,5"}}'
+        value: '{"name": "cabin", "options": {"score": "10000", "expectTrainCabins": "2", "expectFlightCabins": "3,4,5"}}',
+        template:{
+            cabin:"舱位",
+            score:"乘坐期待的舱位得分",
+            expectTrainCabins:"期待的火车舱位",
+            expectFlightCabins:"期待的飞机舱位"
+        }
     },
     {
+        cn:"cheapSupplier",
         title: "[交通]廉价航空",
-        value: '{"name": "cheapSupplier", "options": {"score": "-100", "cheapSuppliers": "9C,KN,HO,PN,EU,AQ,JR"}}'
-    },{
+        value: '{"name": "cheapSupplier", "options": {"score": "-100", "cheapSuppliers": "9C,KN,HO,PN,EU,AQ,JR"}}',
+        template:{
+            cheapSupplier:"廉价航空",
+            score:"乘坐廉价航空的得分",
+            cheapSuppliers:"廉价航空公司"
+        }
+    },
+    {
+        cn:"departTime",
         title: "[交通]出发时间",
-        value: '{"name": "departTime", "options": {"end": "最晚时间（格式YYYY-MM-DD HH:mm +0800）", "begin": "开始时间（格式YYYY-MM-DD HH:mm +0800）", "score": "-20000"}}'
+        value: '{"name": "departTime", "options": {"end": "最晚出发时间（格式YYYY-MM-DD HH:mm +0800）", "begin": "最早出发时间（格式YYYY-MM-DD HH:mm +0800）", "score": "-20000"}}',
+        template:{
+            departTime:"出发时间",
+            end:"最晚出发时间",
+            begin:"最早出发时间",
+            score:"出发时间在期待的范围之内"
+        }
     },
     {
-        title: "[交通]交通方式",
-        value: '{"name": "selectTraffic", "options": {"score": 500, "commonTrainScore":-100000, "selectTrainDuration": 360, "selectFlightDuration": 210}}'
+        cn:"selectTraffic",
+        title: "[交通]选择交通方式",
+        value: '{"name": "selectTraffic", "options": {"score": 500, "commonTrainScore":-100000, "selectTrainDuration": 360, "selectFlightDuration": 210}}',
+        template: {
+            selectTraffic:"选择交通方式",
+            score:"交通方式符合预期的得分",
+            commonTrainScore:"乘坐普通列车的得分",
+            selectTrainDuration:"如果运行时长小于输入框输入的时间则选择坐火车",
+            selectFlightDuration:"如果运行时长超过了输入框输入的时间则选择做飞机"
+        }
     },
     {
+        cn:"starMatch",
         title: "[酒店]星级",
-        value: '{"name": "starMatch", "options": {"score": 500, "expectStar": 3}}'
+        value: '{"name": "starMatch", "options": {"score": 500, "expectStar": 3}}',
+        template:{
+            starMatch:"酒店星级",
+            score:"选择的酒店星级符合预期得分",
+            expectStar:"期待的星级"
+        }
     },
     {
+        cn:"represent",
         title: "[酒店]代表性酒店",
-        value: '{"name": "represent", "options": {"score": 100}}'
+        value: '{"name": "represent", "options": {"score": 100}}',
+        template:{
+            represent:"代表性酒店",
+            score:"选择代表性酒店得分"
+        }
     },
     {
+        cn:"blackList",
         title: "[酒店]黑名单",
-        value: '{"name": "blackList", "options": {"score": -100}}'
+        value: '{"name": "blackList", "options": {"score": -100}}',
+        template:{
+            blackList:"酒店黑名单",
+            score:"选择了黑名单酒店得分"
+        }
     },
     {
+        cn:"priceRange",
         title: "[酒店]价格区间",
-        value: '{"name": "priceRange", "options": {"range":{"2":[120,380],"3":[180,600],"4":[280,1000],"5":[450,2300]}, "score": -1000000}}'
+        value: '{"name": "priceRange", "options": {"range":{"2":[120,380],"3":[180,600],"4":[280,1000],"5":[450,2300]}, "score": -1000000}}',
+        template:{
+            priceRange:"价格区间",
+            range:"价格范围",
+            score:"酒店价格位于价格范围内得分"
+        }
     },
     {
+        cn:"price",
         title: "[酒店]价格",
-        value: '{"name": "price", "options": { "score": 2000,"percent":0.2}}'
+        value: '{"name": "price", "options": { "score": 2000,"percent":0.2}}',
+        template:{
+            price:"价格",
+            score:"酒店的价格位于期待范围内得分",
+            percent:"期待的酒店价格所占总价格的比例"
+        }
     }
 ];
 //描述翻译
-var prefer_translate = {
+/*var prefer_translate = {
 
 
-    /*交通*/
+    /!*交通*!/
 
     //prefer.name
     cheapSupplier:"廉价航空",
     cabin:"舱位",
-    runningTimePrefer:"期望的运营时长",
-    departStandardTimePrefer:"期望的标准出发时间",
-    arriveStandardTimePrefer:"期望的标准到达时间",
-    trainDurationPrefer:"期望的火车运行时间",
-    earliestGoBackTimePrefer:"期待的最早返回时间",
-    latestArrivalTimePrefer:"期望的最晚到达时间",
-    trainPricePrefer:"期望的火车价格",
-    planePricePrefer:"期望的飞机价格",
-    arrivalTime:"到达时间",
-    departTime:"出发时间",
-    selectTraffic:"选择交通工具",
-    preferAgent:"期望的代理商",
+    runningTimePrefer:"运行时长偏好",
+    departStandardTimePrefer:"通用的出发时间偏好",
+    arriveStandardTimePrefer:"通用的到达时间偏好",
+    trainDurationPrefer:"火车超时偏好",
+    earliestGoBackTimePrefer:"最早返回时间偏好",
+    latestArrivalTimePrefer:"最晚到达时间偏好",
+    trainPricePrefer:"火车价格偏好",
+    planePricePrefer:"飞机价格偏好",
+    arrivalTime:"到达时间偏好",
+    departTime:"出发时间偏好",
+    selectTraffic:"交通工具偏好",
+    preferAgent:"代理商偏好",
     directArrive:"直接到达",
-    transitWaitDuration:"过境等待时长",
-    transitCityInChina:"从中国过境城市",
+    transitWaitDuration:"过境等待时长偏好",
+    transitCityInChina:"过境时国内中转城市偏好",
 
     //prefer.option
-    score:"基准得分",
+    score:"基准分",
     cheapSuppliers:"廉价航班",
     expectTrainCabins:"期待的火车舱位",
     expectFlightCabins:"期待的飞机舱位",
-    planeScore:"选择飞机的基准得分",
-    trainScore:"选择火车的基准得分",
-    planeScoreInterval:"乘坐飞机期望值加分",
-    trainScoreInterval:"乘坐火车期望值加分",
+    planeScore:"选择飞机的基准分",
+    trainScore:"选择火车的基准分",
+    planeScoreInterval:"未乘坐飞机扣除的基准分值",
+    trainScoreInterval:"未乘坐火车扣除的基准分值",
     begin:"最早时间",
     end:"最晚时间",
-    scoreInterval:"未达到期望值扣分",
-    trainDuration:"火车持续时间",
+    scoreInterval:"未达到期望值扣除的基准分值",
+    trainDuration:`火车每晚到分钟扣除基准分值`,
     earliestGoBackTime:"最早返回时间",
     latestArrivalTime:"最晚到达时间",
     type:"增长幅度",
     cabins:"舱位",
-    percent:"期待的价格所占比",
+    percent:"期待的价格所占比例",
     commonTrainScore:"乘坐普快基准得分",
     selectTrainDuration:"选择火车的时长",
     selectFlightDuration:"选择飞机的时长",
@@ -184,7 +323,7 @@ var prefer_translate = {
     minDuration:"最小等待时长",
 
 
-    /*住宿*/
+    /!*住宿*!/
 
     //prefer.name
     priceRange:"价格区间",
@@ -197,12 +336,12 @@ var prefer_translate = {
     expectStar:"期望星级",
     range:"价格区间",
 
-};
+};*/
 app.controller('debug',function($scope, $http, $location){
   var url = $location.search();
   var p;
   var pz;
-
+  var translate_prefer = [];
   if(url.p){
     p = url.p;
   }
@@ -212,7 +351,7 @@ app.controller('debug',function($scope, $http, $location){
   $scope.prefers = available_prefer;
   $scope.ori_prefers = [];
   //描述翻译
-  $scope.prefer_translate = prefer_translate;
+  // $scope.prefer_translate = prefer_translate;
   //数据的显示与隐藏
   $scope.showOriginData = false;
   $scope.showScoreData = false;
@@ -226,12 +365,10 @@ app.controller('debug',function($scope, $http, $location){
   var orderBooleanlast;
     //复制粘贴的功能
   var copyTemp = '';
-
   //拿到原始数据
   if(url.key){
     $http.get('/api/budgets?p='+p+'&pz='+pz+'&key='+url.key)
         .success(function(response){
-            console.log(response);
          for(let i=0;i<response.length;i++){
            let arr = response[i].markedData;
               for(let j=0;j<arr.length;j++){
@@ -244,7 +381,6 @@ app.controller('debug',function($scope, $http, $location){
         $scope.originDatas = response;
     });
   }
-
   //更改服务器
     $scope.originServer = {name:'默认',url:'/api/budgets'};
     $scope.originServers = [
@@ -322,13 +458,17 @@ app.controller('debug',function($scope, $http, $location){
   $scope.change = function(){
     var single = $scope.prefer;    //string
     var ori = $scope.ori_prefers;   //arr
-
     ori.push(JSON.parse(single));
     $scope.ori_prefers = ori;
+    for(var i = 0; i < available_prefer.length; i++) {
+        if(JSON.parse(single).name == available_prefer[i].cn) {
+            translate_prefer.push(available_prefer[i].template);
+        }
+    }
+    $scope.translate_prefer = translate_prefer;
   };
   $scope.changeOrigin = function(){
-    if($scope.originData){
-        $scope.ori_prefers = $scope.originData.prefers;
+    if($scope.originData){$scope.ori_prefers = $scope.originData.prefers;
         var arr = $scope.originData.markedData;
         var flag = arr[0].type;
         if(flag!==0 && flag!=1){
@@ -337,11 +477,24 @@ app.controller('debug',function($scope, $http, $location){
           $scope.ishotel = false;
         }
     }
+    //算法描述翻译
+    translate_prefer = [];
+    for (var i = 0; i < $scope.ori_prefers.length; i++) {
+        for(var j = 0; j < available_prefer.length; j++){
+            if ($scope.ori_prefers[i].name == available_prefer[j].cn) {
+                translate_prefer.push(available_prefer[j].template);
+            }
+        }
+    }
+    $scope.translate_prefer = translate_prefer;
   }
   $scope.delete = function(index){
     var del_arr = $scope.ori_prefers;
     del_arr.splice(index,1);
+    translate_prefer.splice(index,1);
+    $scope.translate_prefer = translate_prefer;
     $scope.ori_prefers = del_arr;
+    console.log(translate_prefer);
   }
   $scope.showMap = function(lon,lat){
       let mapKey = "rYaQkpPjbkxa0sAfIBHP13CGLrgVjzVG";
