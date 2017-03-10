@@ -289,7 +289,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             number = number + 1;
         }
         try{
-            await currentCompany.beforeGoTrip({number: number});
+           await currentCompany.beforeGoTrip({number: number});
         }catch(e){
             $ionicPopup.alert({
                 title: '行程余额不足',
