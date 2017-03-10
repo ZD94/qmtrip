@@ -226,10 +226,14 @@ export default class ApiAuth {
         let accountId = params.accountId;
         let account = await ApiAuth.getPrivateInfo({id: accountId});
 
+        if (!account.mobile) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+
         //发送短信通知
         let values  = {
             name: account.mobile,
-            pwd:account.mobile.substr(account.mobile.length-6),
+            pwd: account.mobile.substr(account.mobile.length-6),
             url: C.host
         }
 
