@@ -252,7 +252,7 @@ var available_prefer = [
         value: '{"name": "priceRange", "options": {"range":{"2":[120,380],"3":[180,600],"4":[280,1000],"5":[450,2300]}, "score": -1000000}}',
         template:{
             priceRange:"价格区间",
-            range:"价格范围",
+            range:"价格范围--前面的数字为星级，后面的数字为价格区间",
             score:"酒店价格位于价格范围内得分"
         }
     },
@@ -426,6 +426,8 @@ app.controller('debug',function($scope, $http, $location){
 
   //计算出结果
   $scope.getBudget = function(){
+      //  将价格区间的json字符串转换为json对象
+      rangeJsonChangeStr();
     var origin = $scope.originData;
     var originData = JSON.stringify(origin.originData);
     var query = JSON.stringify(origin.query);
@@ -453,16 +455,21 @@ app.controller('debug',function($scope, $http, $location){
     //               console.log(res);
     //           },function(){}
     //   )
-
+      //  将价格区间的json对象转换为json字符串
+      rangeStrChangeJson();
   };
   $scope.change = function(){
     var single = $scope.prefer;    //string
     var ori = $scope.ori_prefers;   //arr
-    ori.push(JSON.parse(single));
+    single = JSON.parse(single);
+    if (single.name == "priceRange") {
+        single.options.range=JSON.stringify(single.options.range);
+    }
+    ori.push(single);
     $scope.ori_prefers = ori;
     //算法描述翻译
     for(var i = 0; i < available_prefer.length; i++) {
-        if(JSON.parse(single).name == available_prefer[i].cn) {
+        if(single.name == available_prefer[i].cn) {
             translate_prefer.push(available_prefer[i].template);
         }
     }
@@ -478,6 +485,8 @@ app.controller('debug',function($scope, $http, $location){
           $scope.ishotel = false;
         }
     }
+      //  将价格区间的json对象转换为json字符串
+      rangeStrChangeJson();
     //算法描述翻译
     translate_prefer = [];
     for (var i = 0; i < $scope.ori_prefers.length; i++) {
@@ -523,5 +532,31 @@ app.controller('debug',function($scope, $http, $location){
   }
   $scope.paste = function(){
       $scope.ori_prefers = copyTemp;
+      //  将价格区间的json对象转换为json字符串
+      translate_prefer = [];
+      for (var i = 0; i < $scope.ori_prefers.length; i++) {
+          for(var j = 0; j < available_prefer.length; j++){
+              if ($scope.ori_prefers[i].name == available_prefer[j].cn) {
+                  translate_prefer.push(available_prefer[j].template);
+              }
+          }
+      }
+      $scope.translate_prefer = translate_prefer;
   }
+    //  将价格区间的json对象转换为json字符串
+    function rangeStrChangeJson() {
+        for(var i = 0; i < $scope.ori_prefers.length; i++) {
+            if($scope.ori_prefers[i].name == "priceRange") {
+                $scope.ori_prefers[i].options.range=JSON.stringify($scope.ori_prefers[i].options.range);
+            }
+        }
+    }
+    //  将价格区间的json字符串转换为json对象
+    function rangeJsonChangeStr() {
+        for(var i = 0; i < $scope.ori_prefers.length; i++) {
+            if($scope.ori_prefers[i].name == "priceRange") {
+                $scope.ori_prefers[i].options.range=JSON.parse($scope.ori_prefers[i].options.range);
+            }
+        }
+    }
 });
