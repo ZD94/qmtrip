@@ -462,6 +462,7 @@ export default class ApiAuth {
                 avatarColor: avatarColor,
                 addWay: EAddWay.INVITED
             });
+
         } else {
             throw L.ERR.CODE_ERROR();
         }

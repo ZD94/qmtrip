@@ -138,7 +138,7 @@ class StaffModule{
 
         await API.staff.sendNoticeToAdmins({
             companyId:params.companyId,
-            name:name,
+            name:params.name,
             noticeTemplate:"qm_notify_admins_add_staff"
         });
 
