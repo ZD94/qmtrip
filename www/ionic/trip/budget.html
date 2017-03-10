@@ -111,8 +111,17 @@
                 </ion-list>
             </ion-scroll>
             <div class="bottom-bar-budget">
-                <bottom-bar ng-if="!showChooseApproveUser">
-                    <button class="button button-positive" ng-click="submitApprove()">生成出差记录</button>
+                <bottom-bar ng-if="!showChooseApproveUser" class="bottom-noApprove">
+                    <p class="noApprove">无需审批</p>
+                    <button class="button button-positive button-outline bgColor"
+                            ng-click="specialApprove()">
+                        特别审批
+                    </button>
+                    <button  class="button hasAuditUser"
+                            ng-click="submitApprove()">
+                        生成行程
+                    </button>
+
                 </bottom-bar>
                 <bottom-bar ng-if="staff.company.oa == EApproveChannel.DING_TALK">
                     <div class="status-bar item status-bar-detail">
