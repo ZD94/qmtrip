@@ -66,6 +66,15 @@
     button.hasAuditUser{
       background-color: #28A7E1;
     }
+  .button.hasAuditUser.button-positive.button-outline.bgColor:active{
+    color:#387ef5;
+  }
+  .button.button-positive.button-outline.bgColor{
+      background-color:white;
+    }
+
+
+
     .status-bar-detail{
       padding-top: 8px;
       div.list:nth-child(2){
