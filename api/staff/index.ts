@@ -97,6 +97,11 @@ class StaffModule{
                 values: values,
                 accountId: staff.id
             });
+            await StaffModule.sendNoticeToAdmins({
+                companyId:company.id,
+                name:staff.name,
+                noticeTemplate:"qm_notify_admins_add_staff"
+            });
         }catch(e){
             console.info(e);
         }

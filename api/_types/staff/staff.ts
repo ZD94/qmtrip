@@ -161,44 +161,7 @@ export class Staff extends ModelObject implements Account {
         return departmentNames.join(',');
     }
 
-
     @RemoteCall()
-    async saveStaff(params:{staff: any,department:any,companyId:string,ownerModifyAdmin:boolean}):Promise<boolean>{
-
-        let self = this;
-        let staff=params.staff;
-        //let result = await staff.save();
-        console.log("new staff: ",staff);
-        console.log("companyid: ",params.companyId);
-
-        if(!staff.company) staff.company=self.company;
-        //console.log("company: ",staff.company);
-        await staff.save();
-        console.log("save done")
-        await staff.saveStaffDepartments(params.department);
-
-        if(!params.ownerModifyAdmin){
-            staff.isNeedChangePwd = true;
-            console.log("notice has been sent");
-            /*  await API.staff.sendNoticeToAdmins({
-             companyId:params.companyId,
-             name:staff.name,
-             noticeTemplate:"qm_notify_admins_add_staff"
-             }); */
-        }
-        //return result;
-        //第一步检查当前操作人是不是管理
-        //第二天add staff
-        //step3 部门关系
-        //step4 notify
-
-
-       return;
-}
-
-
-
-
     async saveStaffDepartments(departmentIds: string[]) :Promise<boolean> {
         let self = this;
         let staffId = this.id;

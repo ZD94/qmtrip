@@ -329,7 +329,6 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                                 text: '确定',
                                 type: 'button-positive',
                                 onTap: async function (e) {
-                                    staff.isNeedChangePwd = true;
                                     staff = await staff.save();
                                     await staff.saveStaffDepartments($scope.addedArray);
                                     callback();
@@ -341,14 +340,9 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             }
 
             if(!ownerModifyAdmin){
-                console.log("current:",current);
-                console.log("staff: ",staff);
-                console.log("coms",current.company);
-                console.log("comsss",staff.company);
                 staff.isNeedChangePwd = true;
-                //staff = await staff.save();
-                await current.saveStaff({staff:staff,department:$scope.addedArray,companyId:company.id,ownerModifyAdmin:ownerModifyAdmin});
-                //await staff.saveStaffDepartments($scope.addedArray);
+                staff = await staff.save();
+                await staff.saveStaffDepartments($scope.addedArray);
                 callback();
             }
         }catch(err){
