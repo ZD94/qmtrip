@@ -216,7 +216,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             if (item.isAbroad && item.code) {
                 return `${item.name}(${item.code})`;
             }
-            CNZZ.addEvent("统计出发地","统计","统计出发地",item.name);
             return item.name
         }
     };
@@ -327,6 +326,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
 
         if(trip.traffic && (!trip.fromPlace || !trip.fromPlace.id)) {
             $scope.showErrorMsg('请选择出发地！');
+            CNZZ.addEvent("统计出发地","统计","统计出发地",'');
             return false;
         }
 
@@ -406,6 +406,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             window.location.href = "#/trip/budget?id="+budget;
         }
     }
+
 
     $scope.specialApprove = async function() {
         API.require("travelBudget");
