@@ -333,6 +333,11 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         let params = {
             originPlace: trip.fromPlace? trip.fromPlace.id : '',
             isRoundTrip: trip.round,
+            destinationPlacesInfo: []
+        };
+        
+        let destinationItem = {
+            isRoundTrip: trip.round,
             destinationPlace: trip.place ? trip.place.id : '',
             leaveDate: moment(trip.beginDate).toDate(),
             goBackDate: moment(trip.endDate).toDate(),
@@ -346,10 +351,10 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             reason: trip.reason
         };
 
-        if(params.originPlace == params.destinationPlace){
+        /*if(params.originPlace == params.destinationPlace){
             msgbox.log("出差地点和出发地不能相同");
             return false;
-        }
+        }*/
 
         let front = ['正在验证出行参数', '正在匹配差旅政策', '正在搜索全网数据', '动态预算即将完成'];
         $loading.reset();
@@ -381,10 +386,8 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
                 $loading.end();
             }, 60 * 1000);
 
-            let new_params = [];
-            new_params.push(params);
+            params.destinationPlacesInfo.push(destinationItem);
             /*let addParams = {
-                originPlace: "CT_131",
                 isRoundTrip: true,
                 destinationPlace: "CT_289",
                 leaveDate: moment(trip.beginDate).add(2,'d').toDate(),
@@ -398,10 +401,10 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
                 subsidy: $scope.subsidy,
                 reason: trip.reason
             }
-            new_params.push(addParams);*/
-            console.info(new_params);
+             params.destinationPlacesInfo.push(addParams);*/
+            console.info(params);
             console.info("new_params=========================================");
-            budget = await API.travelBudget.getTravelPolicyBudget(new_params);
+            budget = await API.travelBudget.getTravelPolicyBudget(params);
             if (isShowDone) {
                 cb();
             }

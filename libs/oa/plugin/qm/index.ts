@@ -38,6 +38,7 @@ export class QmPlugin extends AbstractOAPlugin {
         }
 
         let {budgets, query} = budgetInfo;
+        let destinationPlacesInfo = query.destinationPlacesInfo;
         let totalBudget = 0;
         budgets.forEach((b) => {totalBudget += Number(b.price);});
         /*budgets = budgets.map( (v) => {
@@ -50,9 +51,17 @@ export class QmPlugin extends AbstractOAPlugin {
         let projectIds = [];//事由名称
         let arrivalCityCodes = [];//目的地代码
         let project: Project;
-        if(query &&  _.isArray(query) && query.length > 0){
-            for(let i = 0; i < query.length; i++){
-                let q = query[i];
+
+        if(query.originPlace) {
+            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace}) || {name: null};
+            tripApprove.deptCityCode = deptInfo.id;
+            tripApprove.deptCity = deptInfo.name;
+        }
+
+        tripApprove.isRoundTrip = query.isRoundTrip;
+        if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
+            for(let i = 0; i < destinationPlacesInfo.length; i++){
+                let q = destinationPlacesInfo[i];
                 //处理出差事由放入projectIds 原project存放第一程出差事由
                 if(q.reason){
                     let projectItem = await API.tripPlan.getProjectByName({companyId: company.id, name: q.reason,
@@ -77,19 +86,12 @@ export class QmPlugin extends AbstractOAPlugin {
 
                 //处理其他数据
                 if(i == 0){
-
-                    if(q.originPlace) {
-                        let deptInfo = await API.place.getCityInfo({cityCode: q.originPlace.id || q.originPlace}) || {name: null};
-                        tripApprove.deptCityCode = deptInfo.id;
-                        tripApprove.deptCity = deptInfo.name;
-                    }
-                    //处理原始数据 用第一程数据
                     tripApprove.isNeedTraffic = q.isNeedTraffic;
                     tripApprove.isNeedHotel = q.isNeedHotel;
-                    tripApprove.isRoundTrip = q.isRoundTrip;
+                    
                     tripApprove.startAt = q.leaveDate;
                 }
-                if(q.isRoundTrip && i == (query.length - 1)){
+                if(q.isRoundTrip && i == (destinationPlacesInfo.length - 1)){
                     tripApprove.backAt = q.goBackDate;
                 }
             }

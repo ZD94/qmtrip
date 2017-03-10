@@ -932,6 +932,8 @@ class TripPlanModule {
         if (typeof approve.data == 'string') approve.data = JSON.parse(approve.data);
         let query: any  = approve.data.query;   //查询条件
         if(typeof query == 'string') query = JSON.parse(query);
+        if(typeof query.destinationPlacesInfo == 'string') query.destinationPlacesInfo = JSON.parse(query.destinationPlacesInfo);
+        let destinationPlacesInfo = query.destinationPlacesInfo;
         let budgets: any = approve.data.budgets;
         if (typeof budgets == 'string') budgets = JSON.parse(budgets);
 
@@ -939,9 +941,16 @@ class TripPlanModule {
         let projectIds = [];//事由名称
         let arrivalCityCodes = [];//目的地代码
         let project: Project;
-        if(query && _.isArray(query) && query.length > 0){
-            for(let i = 0; i < query.length; i++){
-                let q = query[i];
+
+        if(query.originPlace) {
+            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace}) || {name: null};
+            tripPlan.deptCityCode = deptInfo.id;
+            tripPlan.deptCity = deptInfo.name;
+        }
+        tripPlan.isRoundTrip = query.isRoundTrip;
+        if(destinationPlacesInfo && _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
+            for(let i = 0; i < destinationPlacesInfo.length; i++){
+                let q = destinationPlacesInfo[i];
                 //处理出差事由放入projectIds 原project存放第一程出差事由
                 if(q.reason){
                     let projectItem = await TripPlanModule.getProjectByName({companyId: company.id, name: q.reason,
@@ -966,18 +975,12 @@ class TripPlanModule {
 
                 //处理其他数据
                 if(i == 0){
-                    if(q.originPlace) {
-                        let deptInfo = await API.place.getCityInfo({cityCode: q.originPlace.id || q.originPlace}) || {name: null};
-                        tripPlan.deptCityCode = deptInfo.id;
-                        tripPlan.deptCity = deptInfo.name;
-                    }
                     tripPlan.startAt = q.leaveDate;
                     //处理原始数据 用第一程数据
                     tripPlan.isNeedTraffic = q.isNeedTraffic;
                     tripPlan.isNeedHotel = q.isNeedHotel;
-                    tripPlan.isRoundTrip = q.isRoundTrip;
                 }
-                if(q.isRoundTrip && i == (query.length - 1)){
+                if(q.isRoundTrip && i == (destinationPlacesInfo.length - 1)){
                     tripPlan.backAt = q.goBackDate;
                 }
             }

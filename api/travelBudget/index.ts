@@ -22,6 +22,12 @@ import {DEFAULT_PREFER_CONFIG_TYPE, loadDefaultPrefer} from "./prefer";
 
 export interface BudgetOptions{
     originPlace: string,
+    staffId?: string,
+    isRoundTrip?: boolean,
+    destinationPlacesInfo: BudgetOptionsItem[]
+}
+
+export interface BudgetOptionsItem{
     destinationPlace: string,
     isNeedHotel: boolean,
     isRoundTrip?: boolean,
@@ -35,7 +41,6 @@ export interface BudgetOptions{
     checkInDate?: Date,
     checkOutDate?: Date,
     businessDistrict?: string,
-    staffId?: string,
     subsidy: any,
     reason?: string,
     hotelName?: string
@@ -78,18 +83,37 @@ export default class ApiTravelBudget {
     * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
     */
     @clientExport
-    static async getTravelPolicyBudget(params: BudgetOptions[]) :Promise<string> {
+    static async getTravelPolicyBudget(params: BudgetOptions) :Promise<string> {
         let {accountId} = Zone.current.get('session');
-        let staffId = params[0].staffId || accountId;
+        let staffId = params.staffId || accountId;
         let staff = await Models.staff.get(staffId);
         let travelPolicy = await staff.getTravelPolicy();
         if (!travelPolicy) {
             throw new Error(`差旅标准还未设置`);
         }
+        let paramsToBudget = [];
+        let destinationPlacesInfo = params.destinationPlacesInfo;
+        if(destinationPlacesInfo && destinationPlacesInfo.length > 0){
+            for(let j = 0; j < destinationPlacesInfo.length; j++){
+                let paramsItem : any = {};
+                for(let key in destinationPlacesInfo[j]) {
+                    paramsItem[key] = destinationPlacesInfo[j][key];
+                }
+                paramsItem.isRoundTrip = params.isRoundTrip;
+                paramsItem.staffId = params.staffId;
+                if(j == 0){
+                    paramsItem.originPlace = params.originPlace;
+                }else{
+                    paramsItem.originPlace = destinationPlacesInfo[j-1].destinationPlace;
+                }
+                paramsToBudget.push(paramsItem);
+            }
+        }
+
         let momentDateFormat = "YYYY-MM-DD";
         let budgets = [];
 
-        for(let i = 0; i < params.length; i++){
+        for(let i = 0; i < paramsToBudget.length; i++){
             let {
                 leaveDate,  //离开日期
                 goBackDate, //返回日期
@@ -107,7 +131,7 @@ export default class ApiTravelBudget {
                 isNeedTraffic,  //是否需要交通
                 subsidy,        //补助信息
                 hotelName        //住宿地标名称
-            } = params[i];
+            } = paramsToBudget[i];
 
 
             if (!Boolean(leaveDate)) {
@@ -167,11 +191,11 @@ export default class ApiTravelBudget {
                             }
                         }
 
-                        if (isNeedTraffic && isRoundTrip && i == (params.length - 1)) {
+                        if (isNeedTraffic && isRoundTrip && i == (paramsToBudget.length - 1)) {
                             try {
                                 let _params = {
                                     originPlace: destinationPlace,
-                                    destinationPlace: params[0].originPlace,
+                                    destinationPlace: paramsToBudget[0].originPlace,
                                     leaveDate: goBackDate,
                                     earliestLeaveDateTime: earliestGoBackDateTime,
                                     latestArrivalTime: latestGoBackDateTime,
@@ -202,7 +226,7 @@ export default class ApiTravelBudget {
                         }
 
                         if (subsidy && subsidy.template) {
-                            let days = moment(moment(goBackDate).format("YYYY-MM-DD")).diff(moment(moment(leaveDate).format("YYYY-MM-DD")), 'days');
+                            let days = moment(goBackDate).diff(moment(leaveDate), 'days');
                             days = days + 1;
                             if (!subsidy.hasFirstDaySubsidy) {
                                 days = days -1;
@@ -507,8 +531,8 @@ export default class ApiTravelBudget {
         let strategy = await TrafficBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
         let result =  await strategy.getResult(tickets);
         result.cabinClass = result.cabin;
-        result.originPlace = JSON.stringify(m_originCity);
-        result.destination = JSON.stringify(m_destination);
+        result.originPlace = m_originCity;
+        result.destination = m_destination;
         if (<number>result.type == <number>TRAFFIC.FLIGHT) {
             let fullPriceObj = await API.place.getFlightFullPrice({
                 originPlace: m_originCity.id,

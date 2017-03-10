@@ -49,14 +49,16 @@ class ApproveModule {
         let number = 0;
         let content = "";
         let query = budgetInfo.query;
-        if(query &&  _.isArray(query) && query.length > 0){
-            for(let i = 0; i < query.length; i++){
-                let originCity = await API.place.getCityInfo({cityCode: query[i].originPlace});
-                content = content + originCity.name + "-";
-                if(i == (query.length - 1)){
-                    let destinationCity = await API.place.getCityInfo({cityCode: query[i].destinationPlace});
-                    content = content + destinationCity.name;
-                }
+        let destinationPlacesInfo = query.destinationPlacesInfo;
+
+        if(query && query.originPlace){
+            let originCity = await API.place.getCityInfo({cityCode: query.originPlace});
+            content = content + originCity.name + "-";
+        }
+        if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
+            for(let i = 0; i < destinationPlacesInfo.length; i++){
+                let destinationCity = await API.place.getCityInfo({cityCode: destinationPlacesInfo[i].destinationPlace});
+                content = content + destinationCity.name;
             }
         }
         if(budgetInfo.budgets && budgetInfo.budgets.length>0){
@@ -76,11 +78,8 @@ class ApproveModule {
 
         let com = result.company;
         let frozenNum = result.frozenNum;
-        if(_.isArray(budgetInfo.query)){
-            budgetInfo.query[0].frozenNum = frozenNum;//暂时兼容多行程
-        }else{
-            budgetInfo.query.frozenNum = frozenNum;
-        }
+        budgetInfo.query.frozenNum = frozenNum;
+
         let approve = await ApproveModule._submitApprove({
             submitter: submitter.id,
             data: budgetInfo,

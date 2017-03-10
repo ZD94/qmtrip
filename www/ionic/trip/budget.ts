@@ -31,17 +31,21 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     console.info("result====================================");
     let budgets = result.budgets;
     let trip = $storage.local.get("trip");
-    let query = result.query[0];//兼容多行程
-    trip.beginDate = query.leaveDate;
-    trip.endDate  = query.goBackDate;
-    trip.hotelName = query.hotelName;
+    let query = result.query;//兼容多行程
+    let destinationPlacesInfo = query.destinationPlacesInfo;
+    let firstDes = destinationPlacesInfo[0];
+    let lastDes = destinationPlacesInfo[destinationPlacesInfo.length - 1];
+    trip.beginDate = firstDes.leaveDate || query.leaveDate;
+    trip.endDate  = lastDes.goBackDate || query.goBackDate;
+    trip.hotelName = firstDes.hotelName || query.hotelName;
     trip.createAt = new Date(result.createAt);
 
     if(query.originPlace) {
         let originPlace = await City.getCity(query.originPlace.id || query.originPlace);
         trip.originPlaceName = originPlace.name;
     }
-    let destination = await City.getCity(query.destinationPlace.id || query.destinationPlace);
+
+    let destination = await City.getCity(lastDes.destinationPlace.id  || lastDes.destinationPlace || query.destinationPlace.id || query.destinationPlace);
     trip.destinationPlaceName = destination.name;
     $scope.trip = trip;
     //补助,现在是0,后续可能会直接加入到预算中

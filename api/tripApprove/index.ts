@@ -30,8 +30,13 @@ class TripApproveModule {
         let account = approve.account;
         let budgets = approve.budgetInfo;
         let query = approve.query;
-        if(_.isArray(query)){
-            query = approve.query[0];//暂时兼容之前的逻辑
+        let destinationPlacesInfo = query.destinationPlacesInfo;
+        //暂时兼容之前的逻辑
+        if(_.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
+            let obj = destinationPlacesInfo[0];
+            for(let key in obj){
+                query[key] = obj[key];
+            }
         }
         return budgets.map(function (budget: any) {
             if (typeof budget == 'string') {
@@ -382,9 +387,6 @@ class TripApproveModule {
             }
             let query = tripApprove.query;
             let frozenNum = query.frozenNum;
-            if(_.isArray(query)){
-                frozenNum = query[0].frozenNum;
-            }
             let content = tripApprove.deptCity+"-"+tripApprove.arrivalCity;
             if(tripApprove.createdAt.getMonth() == new Date().getMonth()){
                 //审批本月记录审批通过

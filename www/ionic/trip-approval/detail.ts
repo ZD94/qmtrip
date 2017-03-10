@@ -62,11 +62,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         if (typeof query == 'string')
             query = JSON.parse(tripApprove.query);
 
-        if(_.isArray(query)){
-            query[0].staffId = tripApprove.account.id;
-        }else{
-            query.staffId = tripApprove.account.id;
-        }
+        query.staffId = tripApprove.account.id;
         let budgetId = await API.travelBudget.getTravelPolicyBudget(query);
         $scope.budgetId = budgetId;
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
