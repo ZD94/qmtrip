@@ -559,6 +559,7 @@ export class Staff extends ModelObject implements Account {
         return 'OK';
     }
 
+
     @RemoteCall()
     async getAutoLoginUrl(backUrl:string, os?: string) {
         let self = this;

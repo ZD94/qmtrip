@@ -156,9 +156,6 @@ class StaffModule{
 
         return result;
     }
-
-
-<<<<<<< HEAD
    static async  sendNoticeToAdmins(params:{companyId:string,name:string,noticeTemplate:string}):Promise<any>{
         let company = await Models.company.get(params.companyId);
         let managers= await company.getManagers({withOwner:true});
@@ -173,10 +170,6 @@ class StaffModule{
          }));
 
     }
-=======
-
-
->>>>>>> c59f6edaf528fe5de745314fbe7057035722e37a
 
     @clientExport
     @requireParams(["id"])
@@ -440,8 +433,6 @@ class StaffModule{
                 appMessageUrl: '#/staff/staff-info',
                 permission: updateStaff.roleId == EStaffRole.ADMIN ? "管理员" : (updateStaff.roleId == EStaffRole.OWNER ? "创建者" : "普通员工"),
             }
-
-
             //发送通知
             await API.notify.submitNotify({
                 key: 'staff_update',
@@ -514,9 +505,6 @@ class StaffModule{
         let paginate = await Models.staff.find(params);
         return {ids: paginate.map((s)=> {return s.id;}), count: paginate['total']};
     }
-
-
-
 
     /**
      * 检查导入员工数据
@@ -788,7 +776,6 @@ class StaffModule{
                 return {fileName: fileName+".xlsx"};
             });
     }
-
 
     /**
      * 根据属性查找一个员工
@@ -1088,8 +1075,6 @@ class StaffModule{
             });
     }
 
-
-
     /**
      * 判断员工是否在企业中
      * @param staffId
@@ -1163,7 +1148,6 @@ class StaffModule{
         }
 
     }
-
     /**
      * 得到企业管理员 普通员工 未激活人数
      * @param params
@@ -1247,7 +1231,6 @@ class StaffModule{
         }
 
     }
-
     /**
      * 统计企业内的员工总数
      * @param params
@@ -1285,8 +1268,7 @@ class StaffModule{
         }
 
     }
-
-
+    
     /**
      * 删除企业的所有员工
      * @param params
