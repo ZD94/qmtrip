@@ -161,7 +161,6 @@ class StaffModule{
    static async  sendNoticeToAdmins(params:{companyId:string,name:string,noticeTemplate:string}):Promise<any>{
         let company = await Models.company.get(params.companyId);
         let managers= await company.getManagers({withOwner:true});
-        console.log("managers: ",managers);
         return await Promise.all(managers.map( (manager) => {
             return API.notify.submitNotify({
                 accountId: manager.id,
@@ -173,9 +172,6 @@ class StaffModule{
          }));
 
     }
-
-
-
 
     @clientExport
     @requireParams(["id"])
