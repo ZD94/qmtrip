@@ -41,28 +41,35 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
     $scope.showDestination = false;
     $scope.currentStaff = await Staff.getCurrent();
     let currentCompany = $scope.currentStaff.company;
-    let trip;
-    try {
-        trip= TripDefineFromJson($storage.local.get('trip'));
-    } catch(err) {
-        trip = {};
-    }
-
-    if(!trip.regenerate) {
-        trip = defaultTrip;
-        await $storage.local.set('trip', trip);
-    }else {
-        var today = moment();
-        if (!trip.beginDate || (new Date(trip.beginDate) < new Date())) {
-            trip.beginDate = today.startOf('day').hour(18).toDate();
-        }
-
-        trip.regenerate = false;
-    }
+    let trip = defaultTrip;
+    // try {
+    //     trip= TripDefineFromJson($storage.local.get('trip'));
+    //     if(trip.origin){
+    //         $scope.showOrigin = true;
+    //     }
+    //     if(trip.destination){
+    //         $scope.showDestination = true;
+    //     }
+    // } catch(err) {
+    //     trip = {};
+    // }
+    //
+    // if(!trip.regenerate) {
+    //     trip = defaultTrip;
+    //     await $storage.local.set('trip', trip);
+    // }else {
+    //     var today = moment();
+    //     if (!trip.beginDate || (new Date(trip.beginDate) < new Date())) {
+    //         trip.beginDate = today.startOf('day').hour(18).toDate();
+    //     }
+    //
+    //     trip.regenerate = false;
+    // }
 
     $scope.oldBeginDate = trip.beginDate;
 
-    $storage.local.set('trip', trip);
+    // $storage.local.set('trip', trip);
+
     $scope.trip = trip;
     $scope.$watch('trip', function(){
         $storage.local.set('trip', $scope.trip);
@@ -87,6 +94,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
     }
     $scope.onlyHotel = async function(){
         let option = $scope.fromPlaceSelector;
+        $scope.trip.reason ='';
         option.title = '目的地选择';
         let city = await ngModalDlg.selectCity($scope,option,$scope.trip.destination);
         if(city){

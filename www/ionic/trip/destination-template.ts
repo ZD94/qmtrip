@@ -5,7 +5,7 @@
 import {Staff} from "api/_types/staff/staff";
 import moment = require('moment');
 var msgbox = require('msgbox');
-export async function destinationController($scope, ngModalDlg, Models, $ionicPopup){
+export async function destinationController($scope, ngModalDlg, Models, $ionicPopup, $storage){
     require('./destination-template.scss');
     $scope.projectSelector = {
         query: async function(keyword){
@@ -114,6 +114,62 @@ export async function destinationController($scope, ngModalDlg, Models, $ionicPo
 
     /*******************出差补助选择end************************/
 
+    $scope.addDestination = async function(){
+        let option = $scope.placeSelector;
+        $scope.trip.reason ='';
+        option.title = '目的地选择';
+        let city = await ngModalDlg.selectCity($scope,option,$scope.trip.destination);
+        if(city){
+            $scope.trip.destination = city;
+        }
+    }
+    async function queryAllPlaces(keyword: string, isAbroad: boolean){
+        let key= 'hot_cities_170228_domestic';
+        if (isAbroad) {
+            key = 'hot_cities_170228_abroad';
+        }
+        if (!keyword) {
+            let hotCities = $storage.local.get(key)
+            if (hotCities && hotCities[0] && hotCities[0].id) {
+                return hotCities;
+            }
+        }
+        var places = await API.place.queryPlace({keyword: keyword, isAbroad: isAbroad});
+        if (!keyword) {
+            $storage.local.set(key, places);
+        }
+        return places;
+    }
+    async function queryAbroadPlaces(){
+        let key = 'abroad_cities_170228'
+        let abroad = $storage.local.get(key);
+        if(!abroad){
+            abroad = await API.place.queryCitiesGroupByLetter({isAbroad:true});
+            $storage.local.set(key,abroad);
+        }
+        return abroad;
+    }
+    async function queryDomesticPlaces(){
+        let key = 'domestic_cities_170228';
+        let domistic = $storage.local.get(key);
+        if(!domistic){
+            domistic = await API.place.queryCitiesGroupByLetter({isAbroad:false});
+            $storage.local.set(key,domistic);
+        }
+        console.log(domistic)
+        return domistic;
+    }
+    $scope.placeSelector = {
+        queryAll: queryAllPlaces,
+        queryAbroad: queryAbroadPlaces,
+        queryDomestic: queryDomesticPlaces,
+        display: (item)=> {
+            if (item.isAbroad && item.code) {
+                return `${item.name}(${item.code})`;
+            }
+            return item.name
+        }
+    };
     $scope.complete = function(){
         let trip = $scope.trip;
         if(!trip.destination || !trip.destination.id) {

@@ -107,15 +107,16 @@
                         <span>添加出发地</span>
                     </div>
                     <div class="item-flex" ng-if="showOrigin">
-                        <div class="item">
+                        <div class="item" ng-click="addStartCity()">
                             <span class="item-tit">出发地</span>
-                            <ng-selector-city
-                                    ng-model="trip.origin"
-                                    dlg-options="fromPlaceSelector"
-                                    dlg-title="出发地选择"
-                                    dlg-placeholder="请输入城市名或首字母缩写"
-                                    class="fake-input"
-                            ></ng-selector-city>
+                            <p>{{trip.origin?trip.origin.name:"出发地选择"}}</p>
+                            <!--<ng-selector-city-->
+                                    <!--ng-model="trip.origin"-->
+                                    <!--dlg-options="fromPlaceSelector"-->
+                                    <!--dlg-title="出发地选择"-->
+                                    <!--dlg-placeholder="请输入城市名或首字母缩写"-->
+                                    <!--class="fake-input"-->
+                            <!--&gt;</ng-selector-city>-->
                         </div>
                         <div class="item">
                             <span class="item-tit">返回地</span>
@@ -152,7 +153,7 @@
             </ion-scroll>
             <bottom-bar ng-if="trip.origin || trip.destination">
                 <div>{{trip.origin?"交通+住宿":"仅住宿"}}</div>
-                <a class="button button-stable" ng-click="nextStep()" ng-class={'button-calm':trip.destination} >生成预算</a>
+                <a class="button button-stable" ng-click="nextStep()" ng-class={'button-calm':showDestination} >生成预算</a>
             </bottom-bar>
         </div>
     </ion-content>
