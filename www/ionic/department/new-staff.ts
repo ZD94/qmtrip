@@ -20,10 +20,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     let staff;
     let preRole;
     let staffId = $scope.staffId = $stateParams.staffId;
-    console.log("staffId",staffId);
-
     let current = await Staff.getCurrent();
-    console.log("currnentid：",current.id);
     let currentRole = current.roleId;
     let company = current.company;
     let travelpolicylist = await company.getTravelPolicies();
@@ -50,7 +47,6 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
         });
     }else {
         staff = Staff.create();
-        console.log("creaate: ");
         staff.company = company;
         staff.sex = 0;
         if(travelpolicylist && travelpolicylist.length>0){
@@ -59,7 +55,6 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
         staff.isNeedChangePwd = true;
     }
     $scope.staff = staff;
-    console.log("$scope.staff: ",$scope.staff.id);
     $scope.EStaffRoleNames = EStaffRoleNames;
     $scope.invoicefuc = {title:'上传头像',done:function(response){
         if(response.ret != 0){
@@ -330,8 +325,6 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                                 text: '确定',
                                 type: 'button-positive',
                                 onTap: async function (e) {
-
-                                    staff.isNeedChangePwd = true;
                                     staff = await staff.save();
                                     await staff.saveStaffDepartments($scope.addedArray);
                                     callback();
@@ -343,9 +336,8 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             }
 
             if(!ownerModifyAdmin){
-
+                staff.isNeedChangePwd = true;
                 staff = await staff.save();
-
                 await staff.saveStaffDepartments($scope.addedArray);
                 callback();
             }

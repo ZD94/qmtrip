@@ -272,16 +272,14 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
     return true;
 }
 //added by jack, to send notice to designated phone number or email account
-export async function submitNotifyToFixedAccount(params:{email?:string,mobile?:string,wechat?:string,key:string,values:{}}){
+export async function notifyDesignatedAccount(params:{email?:string,mobile?:string,key:string,values:any}){
       let email=params.email;
       let mobile=params.mobile;
       let values=params.values;
       let key=params.key;
 
-      //wechat not used temporarily
       let values_clone =  _.cloneDeep(values);
       let tpl=templates[key];
       await tpl.send({mobile:mobile,email: email},values_clone);
       return true;
-
 }
