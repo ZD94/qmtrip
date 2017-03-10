@@ -460,6 +460,7 @@ app.controller('debug',function($scope, $http, $location){
     var ori = $scope.ori_prefers;   //arr
     ori.push(JSON.parse(single));
     $scope.ori_prefers = ori;
+    //算法描述翻译
     for(var i = 0; i < available_prefer.length; i++) {
         if(JSON.parse(single).name == available_prefer[i].cn) {
             translate_prefer.push(available_prefer[i].template);
@@ -494,7 +495,6 @@ app.controller('debug',function($scope, $http, $location){
     translate_prefer.splice(index,1);
     $scope.translate_prefer = translate_prefer;
     $scope.ori_prefers = del_arr;
-    console.log(translate_prefer);
   }
   $scope.showMap = function(lon,lat){
       let mapKey = "rYaQkpPjbkxa0sAfIBHP13CGLrgVjzVG";
