@@ -136,7 +136,7 @@ class StaffModule{
         }
         let result = await staff.save();
 
-        await API.staff.sendNoticeToAdmins({
+        await StaffModule.sendNoticeToAdmins({
             companyId:params.companyId,
             name:params.name,
             noticeTemplate:"qm_notify_admins_add_staff"
