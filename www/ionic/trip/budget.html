@@ -12,7 +12,7 @@
                     </ion-item>
                     <ion-item class="project_cont">
                         <p class="project_title" ng-if="trip && trip.beginDate"><i class="fa fa-flag-o">
-                            </i>&nbsp;{{trip.reason || trip.reasonName}}</p>
+                            </i>&nbsp;{{trip.reason || trip.reasonName.name}}</p>
                         <p class="totalBudget"  style="text-align: center">
                             <span>总预算</span>
                             <span ng-if="totalPrice && totalPrice > 0">

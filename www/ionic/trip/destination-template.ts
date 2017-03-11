@@ -156,7 +156,6 @@ export async function destinationController($scope, ngModalDlg, Models, $ionicPo
             domistic = await API.place.queryCitiesGroupByLetter({isAbroad:false});
             $storage.local.set(key,domistic);
         }
-        console.log(domistic)
         return domistic;
     }
     $scope.placeSelector = {
@@ -190,6 +189,6 @@ export async function destinationController($scope, ngModalDlg, Models, $ionicPo
             $scope.showErrorMsg('请选择补助信息');
             return false;
         }
-        $scope.confirmModal(trip)
+        $scope.confirmModal({trip:trip,subsidy:$scope.subsidy})
     }
 }

@@ -9,7 +9,7 @@ import {EApproveChannel} from "api/_types/approve/types";
 import {destinationController} from "./destination-template";
 
 var msgbox = require('msgbox');
-
+import _ = require('lodash');
 
 var defaultTrip = {
     beginDate: moment().add(3, 'days').startOf('day').hour(18).toDate(),
@@ -35,13 +35,15 @@ function TripDefineFromJson(obj: any): TripDefine{
 }
 
 
-export async function CreateController($scope, $storage, $loading, ngModalDlg, $ionicPopup, Models, City){
+export async function CreateController($scope, $storage, $loading, ngModalDlg, $ionicPopup, Models, City, $rootScope){
     require('./create.scss');
     $scope.showOrigin = false;
     $scope.showDestination = false;
     $scope.currentStaff = await Staff.getCurrent();
     let currentCompany = $scope.currentStaff.company;
-    let trip = defaultTrip;
+    let trip = _.clone(defaultTrip);
+    $scope.trip = trip;
+
     // try {
     //     trip= TripDefineFromJson($storage.local.get('trip'));
     //     if(trip.origin){
@@ -68,12 +70,17 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
 
     $scope.oldBeginDate = trip.beginDate;
 
-    // $storage.local.set('trip', trip);
+    $storage.local.set('trip', trip);
 
-    $scope.trip = trip;
-    $scope.$watch('trip', function(){
-        $storage.local.set('trip', $scope.trip);
-    }, true);
+    $rootScope.$on('$stateChangeSuccess', function(){
+        trip = _.clone(defaultTrip);
+        $scope.trip=trip;
+        console.info("trip.....",trip);
+    })
+    console.info($scope.trip);
+    // $scope.$watch('trip', function(){
+    //     $storage.local.set('trip', $scope.trip);
+    // }, true);
     $scope.$watch('trip.beginDate', function(n, o){
         if (!trip.endDate || trip.endDate <= trip.beginDate) {
             trip.endDate = moment(trip.beginDate).add(3, 'days').toDate();
@@ -86,7 +93,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         let option = $scope.placeSelector;
         option.title = '出发地选择';
         let city = await ngModalDlg.selectCity($scope,option,$scope.trip.origin);
-        console.info(city);
         if(city){
             $scope.showOrigin = true;
             $scope.trip.origin = city;
@@ -113,11 +119,13 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             template: require('./destination-template.html'),
             controller: destinationController
         })
-        console.info(ret);
+        console.info('modal.result',ret)
         if(ret){
             $scope.showDestination = true;
-            $scope.trip = ret;
-            console.info(ret);
+            $scope.trip = ret.trip;
+            $scope.subsidy = ret.subsidy;
+        }else{
+            $scope.trip.destination = undefined;
         }
     }
     async function queryAllPlaces(keyword: string, isAbroad: boolean){
@@ -153,7 +161,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             domistic = await API.place.queryCitiesGroupByLetter({isAbroad:false});
             $storage.local.set(key,domistic);
         }
-        console.log(domistic)
         return domistic;
     }
     $scope.placeSelector = {
@@ -180,8 +187,18 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
     };
     $scope.nextStep = async function(){
         let trip = $scope.trip;
-        if(!trip.origin){
+        if(trip.origin && trip.origin == trip.destination){
+            msgbox.log("出差地点和出发地不能相同");
+            return false;
+        }else{
             trip.traffic = false;
+            trip.origin = trip.destination
+        }
+        if(!trip.destination || !trip.destination.id) {
+            return false;
+        }
+        if(!trip.reasonName) {
+            return false;
         }
         let params = {
             originPlace: trip.origin? trip.origin.id : '',
@@ -197,10 +214,8 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             hotelName: trip.hotelName,
             subsidy: $scope.subsidy
         };
-        if(trip.origin && params.originPlace == params.destinationPlace){
-            msgbox.log("出差地点和出发地不能相同");
-            return false;
-        }
+
+        $storage.local.set('trip',trip);
         let number = 0;
         if(trip.traffic){
             number = number + 1;
