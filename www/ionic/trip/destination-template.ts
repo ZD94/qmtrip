@@ -121,6 +121,9 @@ export async function destinationController($scope, ngModalDlg, Models, $ionicPo
         let city = await ngModalDlg.selectCity($scope,option,$scope.trip.destination);
         if(city){
             $scope.trip.destination = city;
+            $scope.trip.hotelPlaceObj = undefined;
+            $scope.trip.hotelPlace = undefined;
+            $scope.trip.hotelName = undefined;
         }
     }
     async function queryAllPlaces(keyword: string, isAbroad: boolean){
