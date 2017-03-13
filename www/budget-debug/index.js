@@ -134,7 +134,7 @@ var translate_prefer = {
     },
     planePricePrefer: {
         title: "[交通]飞机价格",
-        value: '{"name": "planePricePrefer", "options": {"type": "square", "score": 10000, "cabins":2,3,4,5 "percent":0.2}}',
+        value: '{"name": "planePricePrefer", "options": {"type": "square", "score": 10000, "cabins":"2,3,4,5" ,"percent":0.2}}',
         template: {
             planePricePrefer: "[偏好项]飞机价格",
             score: "基准分",
@@ -434,6 +434,9 @@ app.controller('debug',function($scope, $http, $location){
   //window.onload = loadJScript;
 
   //计算出结果
+  $.ajaxSetup({
+     async:false
+  });
   $scope.getBudget = function(){
 
       //翻译舱位
@@ -448,9 +451,10 @@ app.controller('debug',function($scope, $http, $location){
     var policy = JSON.stringify($scope.policy);
     let originServer = $scope.originServer;
     let originServerUrl = originServer.url+'?key='+url.key;
-    $.post(originServerUrl, {originData: originData, query: query, policy: policy, prefers: prefers, type: type}, function(datas) {
+    $.post(originServerUrl, {originData: originData, query: query, policy: policy, prefers: prefers, type: type},function(datas) {
         $scope.result = datas;
         $scope.originData.markedData = datas.markedScoreData;
+        console.log($scope.result);
     }, "json")
     // $http.post(originServerUrl,{originData: originData, query: query, policy: policy, prefers: prefers, type: type})
     //     .success(function(datas){
@@ -468,9 +472,8 @@ app.controller('debug',function($scope, $http, $location){
     //           },function(){}
     //   )
     //
-    console.log($scope.result);
     if($scope.result){
-        if($scope.result.star) {
+        if($scope.result.star != null) {
             $scope.result.star = MHotelLevel[$scope.result.star];
         } else {
             if($scope.result.type == 0){
@@ -478,8 +481,10 @@ app.controller('debug',function($scope, $http, $location){
             } else if ($scope.result.type == 1) {
                 $scope.result.cabin = MPlaneLevel[$scope.result.cabin];
             }
-            $scope.result.destination = $scope.result.destination.name;
-            $scope.result.originPlace = $scope.result.originPlace.name;
+            if($scope.result.destination.name) {
+                $scope.result.destination = $scope.result.destination.name;
+                $scope.result.originPlace = $scope.result.originPlace.name;
+            }
             $scope.result.type = $scope.result.type == 0 ? "火车" : "飞机";
         }
     }
@@ -521,6 +526,9 @@ app.controller('debug',function($scope, $http, $location){
       }
       if(single.name == "planePricePrefer") {
           if(single.options.cabins){
+              if(typeof (single.options.cabins) != "object") {
+                  single.options.cabins = single.options.cabins.replace(/[^\d]+/g, ",").replace(/,$/g,"").split(",");
+              }
               single.options.cabins.forEach(function (value, index) {
                   single.options.cabins[index] = value + ":" + MPlaneLevel[value];
               });
@@ -545,7 +553,6 @@ app.controller('debug',function($scope, $http, $location){
           $scope.ishotel = false;
         }
     }
-    console.log($scope.ori_prefers);
       //  将价格区间的json对象转换为json字符串
       rangeStrChangeJson();
     //算法描述翻译
@@ -561,6 +568,22 @@ app.controller('debug',function($scope, $http, $location){
 
       //翻译舱位
       changeLevel();
+      if($scope.result){
+          if($scope.result.star != null) {
+              $scope.result.star = MHotelLevel[$scope.result.star];
+          } else {
+              if($scope.result.type == 0){
+                  $scope.result.cabin = MTrainLevel[$scope.result.cabin];
+              } else if ($scope.result.type == 1) {
+                  $scope.result.cabin = MPlaneLevel[$scope.result.cabin];
+              }
+              if($scope.result.destination.name) {
+                  $scope.result.destination = $scope.result.destination.name;
+                  $scope.result.originPlace = $scope.result.originPlace.name;
+              }
+              $scope.result.type = $scope.result.type == 0 ? "火车" : "飞机";
+          }
+      }
   }
   $scope.delete = function(index){
     var del_arr = $scope.ori_prefers;
@@ -643,6 +666,9 @@ app.controller('debug',function($scope, $http, $location){
             }
             if($scope.ori_prefers[i].name == "planePricePrefer") {
                 if($scope.ori_prefers[i].options.cabins){
+                    if(typeof ($scope.ori_prefers[i].options.cabins) != "object") {
+                        $scope.ori_prefers[i].options.cabins = $scope.ori_prefers[i].options.cabins.replace(/[^\d]+/g, ",").replace(/,$/g,"").split(",");
+                    }
                     $scope.ori_prefers[i].options.cabins.forEach(function (value, index) {
                         $scope.ori_prefers[i].options.cabins[index] = value + ":" + MPlaneLevel[value];
                     });
@@ -656,7 +682,6 @@ app.controller('debug',function($scope, $http, $location){
             if($scope.ori_prefers[i].name == 'cabin') {
                 if ($scope.ori_prefers[i].options.expectTrainCabins) {
                     $scope.ori_prefers[i].options.expectTrainCabins = $scope.ori_prefers[i].options.expectTrainCabins.replace(/[^\d]+/g, ",").replace(/,$/g,"");
-                    console.log($scope.ori_prefers[i].options.expectTrainCabins);
                 }
                 if($scope.ori_prefers[i].options.expectFlightCabins){
                     $scope.ori_prefers[i].options.expectFlightCabins = $scope.ori_prefers[i].options.expectFlightCabins.match(/\d/g).join(",");
