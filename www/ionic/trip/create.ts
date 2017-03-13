@@ -187,13 +187,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
     };
     $scope.nextStep = async function(){
         let trip = $scope.trip;
-        if(trip.origin && trip.origin == trip.destination){
-            msgbox.log("出差地点和出发地不能相同");
-            return false;
-        }else{
-            trip.traffic = false;
-            trip.origin = trip.destination
-        }
+
         if(!trip.destination || !trip.destination.id) {
             return false;
         }
@@ -214,7 +208,14 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             hotelName: trip.hotelName,
             subsidy: $scope.subsidy
         };
-
+        if(trip.origin && params.originPlace == params.destinationPlace){
+            msgbox.log("出差地点和出发地不能相同");
+            return false;
+        }
+        if(!trip.origin){
+            params.isNeedTraffic = false;
+            params.originPlace = params.destinationPlace;
+        }
         $storage.local.set('trip',trip);
         let number = 0;
         if(trip.traffic){
@@ -227,7 +228,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             number = number + 1;
         }
         try{
-            await currentCompany.beforeGoTrip({number: number});
+           await currentCompany.beforeGoTrip({number: number});
         }catch(e){
             $ionicPopup.confirm({
                 title: '行程余额不足',
@@ -241,6 +242,19 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
                         text: '特别审批',
                         type: 'button-calm',
                         onTap: function(){
+                            let params = {
+                                originPlace: trip.origin? trip.origin.id : '',
+                                destinationPlace: trip.destination ? trip.destination.id : '',
+                                leaveDate: moment(trip.beginDate).toDate(),
+                                goBackDate: moment(trip.endDate).toDate(),
+                                latestArrivalDateTime: moment(trip.beginDate).toDate(),
+                                earliestGoBackDateTime: moment(trip.endDate).toDate(),
+                                isNeedTraffic: trip.traffic,
+                                isRoundTrip: trip.round,
+                                isNeedHotel: trip.hotel,
+                                businessDistrict: trip.hotelPlace,
+                                hotelName: trip.hotelName
+                            };
                             window.location.href = "#/trip/special-approve?params="+JSON.stringify(params);
                         }
                     }
@@ -303,4 +317,20 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         }
     }
 
+    $scope.checkDate = function(isStartTime?: boolean) {
+        let beginDate = trip.beginDate;
+        let endDate = trip.endDate;
+        if(moment(endDate).diff(moment(beginDate)) < 0) {
+            if(isStartTime) {
+                $scope.minEndDate = moment(beginDate).format('YYYY-MM-DD');
+            }else {
+                $scope.showErrorMsg('结束日期不能早于结束日期！');
+            }
+            $scope.trip.endDate = beginDate;
+            return;
+        }
+
+        $scope.oldBeginDate = beginDate;
+        $scope.minEndDate = moment(beginDate).format('YYYY-MM-DD');
+    }
 }
