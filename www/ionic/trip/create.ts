@@ -124,7 +124,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             $scope.showDestination = true;
             $scope.trip = ret.trip;
             $scope.subsidy = ret.subsidy;
-        }else{
+        }else if(!$scope.showDestination){
             $scope.trip.destination = undefined;
         }
     }
