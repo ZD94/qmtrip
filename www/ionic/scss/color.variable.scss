@@ -34,6 +34,4 @@ $button-positive-bg:              $calm !default;
 // Forms
 // ---------------------------------------------
 $input-label-color:               $dark !default;
-
-
-
+$input-color-placeholder:         lighten($dark,56)!default;
