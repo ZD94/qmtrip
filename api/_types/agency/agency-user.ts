@@ -238,7 +238,28 @@ export class AgencyUser extends ModelObject{
         company.extraExpiryDate = newExtraExpiryDate;
         return company.save();
     }
+    //配置企业偏好
+    @RemoteCall()
+    async configurePerference(companyId:string,budgetConfig:string):Promise<any>{
+        let self = this;
+        let company = await Models.company.get(companyId);
+        let agency = await company.getAgency();
+        if (agency.createUser != self.id ) {
+            throw L.ERR.PERMISSION_DENY();
+        }
+        let log = await Models.agencyOperateLog.create({
+            agency_userId: this.id,
+            agencyId: agency.id,
+            remark: `为【${company.name}(${company.id})】配置了企业偏好`
+        });
+        await log.save();
+        //修改企业偏好
+        let sql = ` update company.companies set budget_config = '${budgetConfig}' where id = '${companyId}'`
+        let ret = await sequelize.query(sql);
+        return ret;
+    }
 
+    
     async getCompanyAllStaffs(params: any): Promise<any> {
         let self = this;
         let company = await Models.company.get(params.companyId);
