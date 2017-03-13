@@ -78,7 +78,7 @@ export class QmPlugin extends AbstractOAPlugin {
                 if(q.destinationPlace){
                     let arrivalInfo = await API.place.getCityInfo({cityCode: q.destinationPlace.id|| q.destinationPlace}) || {name: null};
                     arrivalCityCodes.push(arrivalInfo.id);
-                    if(i == 0){
+                    if(i == (destinationPlacesInfo.length - 1)){//目的地存放最后一个目的地
                         tripApprove.arrivalCityCode = arrivalInfo.id;
                         tripApprove.arrivalCity = arrivalInfo.name;
                     }
@@ -141,8 +141,6 @@ export class QmPlugin extends AbstractOAPlugin {
         }
         await tripPlanLog.save();
         tripApprove = await tripApprove.save();
-        console.info(tripApprove);
-        console.info("tripApprove========================================");
         await API.tripApprove.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
         await API.tripApprove.sendTripApproveNoticeToSystem({approveId: tripApprove.id});
         return {

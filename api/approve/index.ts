@@ -119,6 +119,7 @@ class ApproveModule {
         //特殊审批不记录行程数
         // await company.beforeGoTrip();
         // await company.frozenTripPlanNum({number: 1});
+
         let budgetInfo = {
             query: query,
             budgets: [
@@ -128,9 +129,37 @@ class ApproveModule {
                     price: budget,
                     tripType: ETripType.SPECIAL_APPROVE,
                     reason: specialApproveRemark,
+                    originPlace: null,
+                    destination: null
                 }
             ]
         }
+        if(typeof query.destinationPlacesInfo == 'string') query.destinationPlacesInfo = JSON.parse(query.destinationPlacesInfo);
+        let destinationPlacesInfo = query.destinationPlacesInfo;
+        //出发地
+        if(query.originPlace) {
+            let originPlace = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace}) || {name: null};
+            budgetInfo.budgets[0].originPlace = originPlace;
+        }
+
+        if(destinationPlacesInfo && _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
+            for(let i = 0; i < destinationPlacesInfo.length; i++){
+                let q = destinationPlacesInfo[i];
+                //处理startAt,backAt
+                if(i == 0){
+                    budgetInfo.budgets[0].startAt = q.leaveDate;
+                }
+                if(q.isRoundTrip && i == (destinationPlacesInfo.length - 1)){
+                    budgetInfo.budgets[0].backAt = q.goBackDate;
+                }
+                //处理目的地
+                if(i == (destinationPlacesInfo.length - 1) && q.destinationPlace){
+                    let arrivalInfo = await API.place.getCityInfo({cityCode: q.destinationPlace.id|| q.destinationPlace}) || {name: null};
+                    budgetInfo.budgets[0].destination = arrivalInfo;
+                }
+            }
+        }
+
         return ApproveModule._submitApprove({
             submitter: submitter.id,
             data: budgetInfo,

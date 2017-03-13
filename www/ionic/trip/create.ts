@@ -401,9 +401,8 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
                 subsidy: $scope.subsidy,
                 reason: trip.reason
             }
-             params.destinationPlacesInfo.push(addParams);*/
-            console.info(params);
-            console.info("new_params=========================================");
+             params.destinationPlacesInfo.push(addParams);
+            console.info(params);*/
             budget = await API.travelBudget.getTravelPolicyBudget(params);
             if (isShowDone) {
                 cb();
@@ -454,6 +453,11 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
 
         let params = {
             originPlace: trip.fromPlace? trip.fromPlace.id : '',
+            isRoundTrip: trip.round,
+            destinationPlacesInfo: []
+        };
+
+        let destinationItem = {
             destinationPlace: trip.place ? trip.place.id : '',
             leaveDate: moment(trip.beginDate).toDate(),
             goBackDate: moment(trip.endDate).toDate(),
@@ -466,10 +470,29 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             hotelName: trip.hotelName,
         };
 
-        if(params.originPlace == params.destinationPlace){
+        params.destinationPlacesInfo.push(destinationItem);
+
+        /*let addParams = {
+            isRoundTrip: true,
+            destinationPlace: "CT_289",
+            leaveDate: moment(trip.beginDate).add(2,'d').toDate(),
+            goBackDate: moment(trip.endDate).add(4,'d').toDate(),
+            latestArrivalDateTime: moment(trip.beginDate).add(2,'d').toDate(),
+            earliestGoBackDateTime: moment(trip.endDate).add(4,'d').toDate(),
+            isNeedTraffic: true,
+            isNeedHotel: true,
+            businessDistrict: "",
+            hotelName: "",
+            subsidy: $scope.subsidy,
+            reason: trip.reason
+        }
+        params.destinationPlacesInfo.push(addParams);
+        console.info(params);*/
+
+        /*if(params.originPlace == params.destinationPlace){
             msgbox.log("出差地点和出发地不能相同");
             return false;
-        }
+        }*/
 
         try {
             $loading.end();

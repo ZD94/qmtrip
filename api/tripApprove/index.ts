@@ -29,15 +29,6 @@ class TripApproveModule {
         let approve = await Models.tripApprove.get(params.approveId);
         let account = approve.account;
         let budgets = approve.budgetInfo;
-        let query = approve.query;
-        let destinationPlacesInfo = query.destinationPlacesInfo;
-        //暂时兼容之前的逻辑
-        if(_.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
-            let obj = destinationPlacesInfo[0];
-            for(let key in obj){
-                query[key] = obj[key];
-            }
-        }
         return budgets.map(function (budget: any) {
             if (typeof budget == 'string') {
                 budget = JSON.parse(budget);
@@ -49,41 +40,39 @@ class TripApproveModule {
             switch(tripType) {
                 case ETripType.OUT_TRIP:
                     detail = Models.tripDetailTraffic.create(data);
-                    detail.deptCity = approve.deptCityCode;
-                    detail.arrivalCity = approve.arrivalCityCode;
-                    detail.deptDateTime = approve.startAt;
-                    detail.arrivalDateTime = approve.backAt;
+                    detail.deptCity = budget.originPlace.id;
+                    detail.arrivalCity = budget.destination.id;
+                    detail.deptDateTime = budget.leaveDate;
+                    // detail.arrivalDateTime = budget.arrivalDateTime;
                     detail.cabin = budget.cabinClass;
                     break;
                 case ETripType.BACK_TRIP:
                     detail = Models.tripDetailTraffic.create(data);
-                    detail.deptCity = approve.arrivalCityCode;
-                    detail.arrivalCity = approve.deptCityCode;
-                    detail.deptDateTime = approve.backAt;
-                    detail.arrivalDateTime = approve.backAt;
+                    detail.deptCity = budget.originPlace.id;
+                    detail.arrivalCity = budget.destination.id;
+                    detail.deptDateTime = budget.leaveDate;
+                    // detail.arrivalDateTime = budget.arrivalDateTime;
                     detail.cabin = budget.cabinClass;
                     break;
                 case ETripType.HOTEL:
                     detail = Models.tripDetailHotel.create(data);
                     detail.type = ETripType.HOTEL;
-                    detail.city = approve.arrivalCityCode;
-                    detail.position = query.businessDistrict;
-                    detail.placeName = query.hotelName;
-                    detail.checkInDate = query.checkInDate || approve.startAt;
-                    detail.checkOutDate = query.checkOutDate || approve.backAt;
+                    detail.city = budget.cityName;
+                    // detail.position = budget.businessDistrict;
+                    detail.placeName = budget.hotelName;
+                    detail.checkInDate = budget.checkInDate || approve.startAt;
+                    detail.checkOutDate = budget.checkOutDate || approve.backAt;
                     break;
                 case ETripType.SUBSIDY:
                     detail = Models.tripDetailSubsidy.create(data);
                     detail.type = ETripType.SUBSIDY;
-                    detail.deptCity = approve.deptCityCode;
-                    detail.arrivalCity = approve.arrivalCityCode;
-                    detail.startDateTime = approve.startAt
-                    detail.endDateTime = approve.backAt;
-                    if (approve.query && approve.query.subsidy) {
-                        detail.hasFirstDaySubsidy = approve.query.subsidy.hasFirstDaySubsidy || true;
-                        detail.hasLastDaySubsidy = approve.query.subsidy.hasLastDaySubsidy || true;
-                    }
-                    detail.expenditure = price;
+                    // detail.deptCity = approve.deptCityCode;
+                    // detail.arrivalCity = approve.arrivalCityCode;
+                    detail.startDateTime = budget.fromDate
+                    detail.endDateTime = budget.endDate;
+                    detail.hasFirstDaySubsidy = budget.hasFirstDaySubsidy || true;
+                    detail.hasLastDaySubsidy = budget.hasLastDaySubsidy || true;
+                    detail.expenditure = budget.price;
                     detail.status = EPlanStatus.COMPLETE;
                     break;
                 case ETripType.SPECIAL_APPROVE:
