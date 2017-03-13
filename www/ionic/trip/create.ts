@@ -293,7 +293,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             number = number + 1;
         }
         try{
-            await currentCompany.beforeGoTrip({number: number});
+           await currentCompany.beforeGoTrip({number: number});
         }catch(e){
             $ionicPopup.alert({
                 title: '行程余额不足',
@@ -407,7 +407,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         }
     }
 
-
     $scope.specialApprove = async function() {
         API.require("travelBudget");
         await API.onload();
@@ -461,6 +460,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             alert(err.msg || err);
         }
     }
+    /*特别审批的结束*/
 
     $scope.checkDate = function(isStartTime?: boolean) {
         let beginDate = trip.beginDate;

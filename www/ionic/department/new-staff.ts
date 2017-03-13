@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Created by seven on 2017/1/21.
  */
 "use strict";
@@ -325,7 +325,6 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                                 text: '确定',
                                 type: 'button-positive',
                                 onTap: async function (e) {
-                                    staff.isNeedChangePwd = true;
                                     staff = await staff.save();
                                     await staff.saveStaffDepartments($scope.addedArray);
                                     callback();
@@ -337,6 +336,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             }
 
             if(!ownerModifyAdmin){
+                staff.isNeedChangePwd = true;
                 staff = await staff.save();
                 await staff.saveStaffDepartments($scope.addedArray);
                 callback();
