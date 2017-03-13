@@ -326,3 +326,22 @@ textarea {
     right: 0;
   }
 }
+
+// 模块间距
+.card{
+  margin:0 0 10px;
+}
+
+// item
+// ---------------------------------------------
+.item{
+  color:$dark;
+  border-color:lighten($dark,71%);
+  p{
+    color:$dark;
+  }
+}
+
+a.item{
+  color:$dark;
+}

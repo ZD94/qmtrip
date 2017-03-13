@@ -35,16 +35,5 @@ $button-positive-bg:              $calm !default;
 // ---------------------------------------------
 $input-label-color:               $dark !default;
 
-// item
-// ---------------------------------------------
-.item{
-  color:$dark;
-  border-color:lighten($dark,71%);
-  p{
-    color:$dark;
-  }
-}
 
-a.item{
-  color:$dark;
-}
+
