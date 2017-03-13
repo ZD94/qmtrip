@@ -37,6 +37,7 @@ $main-color: #28a7e1;
       .item-tit{
         font-size: 12px;
         color: $main-color;
+        padding: 0;
       }
       .item-toggle{
         position: absolute;
@@ -54,6 +55,8 @@ $main-color: #28a7e1;
         top: 15px;
         width: 30px;
         height: 30px;
+        line-height: 30px;
+        font-size: 12px;
         overflow: hidden;
       }
     }
