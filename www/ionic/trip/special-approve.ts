@@ -1,6 +1,6 @@
 import { Staff } from 'api/_types/staff/staff';
-import {EApproveChannel} from "../../../api/_types/approve/types";
 import _ = require('lodash');
+import {EApproveChannel} from "api/_types/approve/types";
 var msgbox = require('msgbox');
 
 export async function SpecialApproveController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup){
@@ -33,7 +33,9 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
     trip.beginDate = trip.beginDate || query.leaveDate;
     trip.endDate  = trip.endDate || query.goBackDate;
     // trip.createAt = new Date(result.createAt);
-
+    if(query.auditUser){
+        trip['auditUser'] = await Models.staff.get(query.auditUser);
+    }
     if(query.originPlace) {
         let originPlace = await City.getCity(query.originPlace.id || query.originPlace);
         trip.originPlaceName = originPlace.name;
@@ -44,11 +46,20 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
     $scope.totalPrice = totalPrice;
     //下方的提交按钮，当选择完审批人之后变颜色
     $scope.bottomBottomClicked = false;
-    $scope.$watch('trip.auditUser',function(n, o){
-        if(n!= o){
+    // $scope.$watch('trip.auditUser',function(n, o){
+    //     if(n!= o){
+    //         $scope.bottomBottomClicked = true;
+    //     }
+    // })
+    //当审批说明和审批金额不为空时，下方按钮变颜色
+    $scope.$watchGroup(["trip.specialApproveRemark","trip.budget"],function(n, o){
+        if(n[0]&&n[1]){
             $scope.bottomBottomClicked = true;
+        }else{
+            $scope.bottomBottomClicked = false;
         }
     })
+
 
     $scope.staffSelector = {
         query: async function(keyword) {
