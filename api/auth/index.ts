@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @module auth
  */
 "use strict";
@@ -225,6 +225,10 @@ export default class ApiAuth {
     static async reSendActiveSms(params: {accountId: string}): Promise<boolean> {
         let accountId = params.accountId;
         let account = await ApiAuth.getPrivateInfo({id: accountId});
+
+        if (!account.mobile) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
 
         //发送短信通知
         let values  = {
@@ -458,6 +462,7 @@ export default class ApiAuth {
                 avatarColor: avatarColor,
                 addWay: EAddWay.INVITED
             });
+
         } else {
             throw L.ERR.CODE_ERROR();
         }
