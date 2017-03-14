@@ -1,7 +1,7 @@
 <ion-view title="个人资料">
     <ion-content class="has-header" padding="true">
         <div class="staffinfo">
-            <a class="item borderRadiusTop">
+            <a class="item">
                 姓名
                 <span class="item-note">{{staff.name}}</span>
             </a>
@@ -15,7 +15,7 @@
                 <span class="item-note">{{staff.email || '请绑定邮箱并验证'}}</span>
                 <i class="icon ion-chevron-right"></i>
             </a>
-            <div class="item item-icon-right avatars borderRadiusBottom">
+            <div class="item item-icon-right avatars">
                 头像
                 <div class="item-note" ng-uploader accept="image/png, image/jpeg, image/gif" url="uploadUrl" edit="true" width="160" height="160" done="invoicefuc.done">
                     <staff-avatar class="avatar" staff="staff"></staff-avatar>
@@ -24,7 +24,7 @@
                 <i class="icon ion-chevron-right"></i>
             </div>
             <div class="spacer" style="height: 10px;"></div>
-            <div class="item borderRadiusTop">
+            <div class="item">
                 企业
                 <span class="item-note">{{company.name}}</span>
             </div>
@@ -36,19 +36,19 @@
                 部门
                 <span class="item-note">{{departmentNames}}</span>
             </div>
-            <div class="item borderRadiusBottom">
+            <div class="item">
                 差旅标准
                 <span class="item-note">{{travelpolicy.name}}</span>
             </div>
             <div class="spacer" style="height: 10px;"></div>
             <a href="#/staff/edit-pwd">
-                <div class="item item-icon-right borderRadiusTop">
+                <div class="item item-icon-right">
                     修改密码
                     <i class="icon ion-chevron-right"></i>
                 </div>
             </a>
             <a href="#/staff/bind-suppliers">
-                <div class="item item-icon-right borderRadiusBottom">
+                <div class="item item-icon-right">
                     第三方预订平台帐号绑定
                     <i class="icon ion-chevron-right"></i>
                 </div>

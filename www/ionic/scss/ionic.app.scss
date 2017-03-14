@@ -357,6 +357,7 @@ textarea {
 .item{
   color:$dark;
   border-color:lighten($dark,71%);
+
   p{
     color:$dark;
   }
@@ -366,6 +367,20 @@ a.item{
   color:$dark;
 }
 
+.itemTopRadius{
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+
+.itemBottomRadius{
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+
+
+// list
+// -------------------------------------------
 .list{
   margin-bottom: 10px;
 }
