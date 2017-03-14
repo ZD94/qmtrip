@@ -1,3 +1,4 @@
+import '../scss/color.variable.css';
 .accordlist{
   .item{
     p{
@@ -35,7 +36,7 @@
     float: left;
   }
   .supplier-title{
-    color: #616161;
+    color: $dark;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
   }

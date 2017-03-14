@@ -8,6 +8,7 @@ export async function ConfigurePreferenceController($scope,Models,$stateParams){
     let agencyUser = await AgencyUser.getCurrent();
     let company = await Models.company.get(companyId);
     $scope.configure = async function(){
+        //
        let res = await agencyUser.configPreference(companyId, $scope.preferenceText);
         msgbox.alert("配置成功");
     }
