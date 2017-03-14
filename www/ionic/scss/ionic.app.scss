@@ -385,6 +385,7 @@ i.icon.ion-chevron-right{
 .item{
   color:$dark;
   border-color:lighten($dark,71%);
+
   p{
     color:$dark;
   }
@@ -393,6 +394,17 @@ i.icon.ion-chevron-right{
 a.item{
   color:$dark;
 }
+
+.itemTopRadius{
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+
+.itemBottomRadius{
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
 .list{
   margin-bottom: 10px;
 }
