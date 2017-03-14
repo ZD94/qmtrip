@@ -30,8 +30,9 @@ $card-border-radius:              3px !default;
 // ---------------------------------------------
 $button-calm-bg:                  $calm !default;
 $button-positive-bg:              $calm !default;
+$button-stable-text:              $dark !default;
 
 // Forms
 // ---------------------------------------------
 $input-label-color:               $dark !default;
-$input-color-placeholder:         lighten($dark,56)!default;
+$input-color-placeholder:         lighten($dark,56) !default;
