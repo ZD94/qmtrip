@@ -1,6 +1,6 @@
 @import "../scss/color.variable.scss";
 .button.button-positive.button-block.activated{
-  background-color: $calm;
+  background-color: darken($calm,10%);
 }
 .accordlist{
   .item{
