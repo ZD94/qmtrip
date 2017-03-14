@@ -1,4 +1,4 @@
-@import "../scss/color.variable.scss";
+@import '../scss/color.variable.scss';
 
 .accordlist{
   .item{
@@ -17,6 +17,7 @@
         margin-top: -12px;
       }
     }
+
   }
   p.supplier-text{
     padding:10px;
@@ -37,9 +38,7 @@
     float: left;
   }
   .supplier-title{
-    color:$dark;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
+    border-radius:4px;
   }
   .self-define{
     margin-bottom: 10px;
@@ -62,6 +61,7 @@
       font-size: 16px;
       i{
         font-size: 20px;
+        width:10px;
       }
     }
   }
