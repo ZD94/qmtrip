@@ -386,9 +386,14 @@ i.icon.ion-ios-arrow-right{
 a.item{
   color:$dark;
 }
-
 .list{
   margin-bottom: 10px;
 }
+
+//输入框输入文字颜色
+input[type="text"], input[type="password"] {
+  color: $dark;
+}
+
 
 
