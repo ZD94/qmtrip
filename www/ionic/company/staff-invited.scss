@@ -1,3 +1,4 @@
+@import "../scss/color.variable.scss";
 .invied_link{
   > *{
     &:nth-child(1){
@@ -24,6 +25,7 @@
           display: flex;
           justify-content: center;
           align-items: center;
+          color: $dark;
         }
         .countdown{
           line-height: 50px;
@@ -40,7 +42,7 @@
           border-radius: 30px;
         }
         p{
-          color:#9c9c9c;
+          color:lighten($dark,39);
           font-size: 12px;
           word-break: break-all;
           word-wrap: break-word;

@@ -123,10 +123,14 @@
           flex: 1;
           line-height: 30px;
         }
+
       }
     }
     .ion-checkmark-circled{
       color: green;
     }
   }
+}
+.button.button-outline.button-block.button-positive.activated {
+  color:$calm;
 }

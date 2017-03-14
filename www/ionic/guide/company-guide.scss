@@ -1,3 +1,4 @@
+@import "../scss/color.variable.scss";
 //guide页面的两个样式
 .company-guide{
   .guide-circle{
@@ -20,6 +21,19 @@
   form.list {
     span.input-label{
       text-align: left;
+    }
+    div.list:first-of-type{
+      .item {
+        border-radius: 3px;
+      }
+    }
+    div.list:last-of-type {
+      .item.ng-empty {
+        border-radius: 3px;
+      }
+      .item.ng-not-empty {
+        border-radius: 3px 3px 0 0;
+      }
     }
   }
   .button-full{
@@ -65,6 +79,7 @@
     height: 44px;
     font-size: 16px;
     background: #fff;
+    border-radius: 3px 3px 0 0;
     &.item-toggle .toggle{
       top: 5px;
     }
@@ -74,14 +89,19 @@
     padding: 10px;
     background: #f9f9f9;
     font-size: 14px;
+    color: $dark;
+    font-weight:bold;
     .check-box{
       .checkbox_diy{
-        color: #606060;
+        color: lighten($dark,39);
       }
     }
   }
   .checkbox-options{
     background: #fff;
+    &:last-of-type {
+      border-radius: 0 0 3px 3px;
+    }
     .hotel-opt{
       border-bottom: 1px solid #ddd;
       padding-right: 10px;
@@ -101,7 +121,7 @@
 
 //第一步和第二部的公共的类
 .guild-title{
-  background-color: #503b83;
+  background-color: rgba(255,255,255,0.2);
   line-height: 34px;
   color:white;
   border-bottom: none;

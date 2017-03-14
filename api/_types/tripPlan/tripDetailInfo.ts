@@ -12,7 +12,7 @@ import {TripDetail, TripDetailInvoice} from "./tripDetail";
 import {PaginateInterface} from "common/model/interface";
 import {ReserveLink} from 'libs/suppliers/interface';
 import {ETrainLevel, EPlaneLevel} from "../travelPolicy";
-
+declare var API: any;
 
 @TableExtends(TripDetail, 'tripDetailInfo', 'type', [ETripType.OUT_TRIP, ETripType.BACK_TRIP])
 @Table(Models.tripDetailTraffic, "tripPlan.")
