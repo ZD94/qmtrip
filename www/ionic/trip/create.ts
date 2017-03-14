@@ -194,28 +194,42 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         if(!trip.reasonName) {
             return false;
         }
+
         let params = {
-            originPlace: trip.origin? trip.origin.id : '',
-            destinationPlace: trip.destination ? trip.destination.id : '',
+            originPlace: trip.origin? trip.origin.id : null,
+            isRoundTrip: trip.round,
+            destinationPlacesInfo: []
+        };
+
+        let destinationItem = {
+            destinationPlace: trip.destination ? trip.destination.id : null,
             leaveDate: moment(trip.beginDate).toDate(),
             goBackDate: moment(trip.endDate).toDate(),
             latestArrivalDateTime: moment(trip.beginDate).toDate(),
             earliestGoBackDateTime: moment(trip.endDate).toDate(),
             isNeedTraffic: trip.traffic,
-            isRoundTrip: trip.round,
             isNeedHotel: trip.hotel,
             businessDistrict: trip.hotelPlace,
             hotelName: trip.hotelName,
-            subsidy: $scope.subsidy
+            subsidy: $scope.subsidy,
+            reason: trip.reason
         };
-        if(trip.origin && params.originPlace == params.destinationPlace){
+        if(trip.origin && trip.origin.id == destinationItem.destinationPlace){
             msgbox.log("出差地点和出发地不能相同");
             return false;
         }
         if(!trip.origin){
-            params.isNeedTraffic = false;
-            params.originPlace = params.destinationPlace;
+            destinationItem.isNeedTraffic = false;
+            params.isRoundTrip = false;
+            // params.originPlace = destinationItem.destinationPlace;
         }
+        if(!destinationItem.destinationPlace) {
+            $scope.showErrorMsg('请填写出差目的地！');
+            return false;
+        }
+        params.destinationPlacesInfo.push(destinationItem);
+
+
         $storage.local.set('trip',trip);
         let number = 0;
         if(trip.traffic){
@@ -242,19 +256,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
                         text: '特别审批',
                         type: 'button-calm',
                         onTap: function(){
-                            let params = {
-                                originPlace: trip.origin? trip.origin.id : '',
-                                destinationPlace: trip.destination ? trip.destination.id : '',
-                                leaveDate: moment(trip.beginDate).toDate(),
-                                goBackDate: moment(trip.endDate).toDate(),
-                                latestArrivalDateTime: moment(trip.beginDate).toDate(),
-                                earliestGoBackDateTime: moment(trip.endDate).toDate(),
-                                isNeedTraffic: trip.traffic,
-                                isRoundTrip: trip.round,
-                                isNeedHotel: trip.hotel,
-                                businessDistrict: trip.hotelPlace,
-                                hotelName: trip.hotelName
-                            };
                             window.location.href = "#/trip/special-approve?params="+JSON.stringify(params);
                         }
                     }
@@ -266,11 +267,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         API.require("travelBudget");
         await API.onload();
 
-        if(!trip.place || !trip.place.id) {
-            $scope.showErrorMsg('请填写出差目的地！');
-            return false;
-        }
-
         if(!trip.reasonName) {
             $scope.showErrorMsg('请填写出差事由！');
             return false;
@@ -281,41 +277,10 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             return false;
         }
 
-        if(trip.traffic && (!trip.fromPlace || !trip.fromPlace.id)) {
-            $scope.showErrorMsg('请选择出发地！');
-            return false;
-        }
-
         if(moment(trip.endDate).toDate().getTime() - moment(trip.beginDate).toDate().getTime() <= 0) {
             $scope.showErrorMsg('到达时间不可晚于离开时间！');
             return false;
         }
-
-        let params = {
-            originPlace: trip.fromPlace? trip.fromPlace.id : '',
-            isRoundTrip: trip.round,
-            destinationPlacesInfo: []
-        };
-        
-        let destinationItem = {
-            isRoundTrip: trip.round,
-            destinationPlace: trip.place ? trip.place.id : '',
-            leaveDate: moment(trip.beginDate).toDate(),
-            goBackDate: moment(trip.endDate).toDate(),
-            latestArrivalDateTime: moment(trip.beginDate).toDate(),
-            earliestGoBackDateTime: moment(trip.endDate).toDate(),
-            isNeedTraffic: trip.traffic,
-            isNeedHotel: trip.hotel,
-            businessDistrict: trip.hotelPlace,
-            hotelName: trip.hotelName,
-            subsidy: $scope.subsidy,
-            reason: trip.reason
-        };
-
-        /*if(params.originPlace == params.destinationPlace){
-            msgbox.log("出差地点和出发地不能相同");
-            return false;
-        }*/
 
         let front = ['正在验证出行参数', '正在匹配差旅政策', '正在搜索全网数据', '动态预算即将完成'];
         $loading.reset();
@@ -347,9 +312,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
                 $loading.end();
             }, 60 * 1000);
 
-            params.destinationPlacesInfo.push(destinationItem);
             /*let addParams = {
-                isRoundTrip: true,
                 destinationPlace: "CT_289",
                 leaveDate: moment(trip.beginDate).add(2,'d').toDate(),
                 goBackDate: moment(trip.endDate).add(4,'d').toDate(),
@@ -362,8 +325,8 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
                 subsidy: $scope.subsidy,
                 reason: trip.reason
             }
-             params.destinationPlacesInfo.push(addParams);
-            console.info(params);*/
+             params.destinationPlacesInfo.push(addParams);*/
+            console.info(params);
             budget = await API.travelBudget.getTravelPolicyBudget(params);
             if (isShowDone) {
                 cb();
@@ -399,16 +362,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
 
         if(!trip.reasonName) {
             $scope.showErrorMsg('请填写出差事由！');
-            return false;
-        }
-
-        // if(!trip.traffic && ! trip.hotel) {
-        //     $scope.showErrorMsg('请选择交通或者住宿！');
-        //     return false;
-        // }
-
-        if(trip.traffic && (!trip.fromPlace || !trip.fromPlace.id)) {
-            $scope.showErrorMsg('请选择出发地！');
             return false;
         }
 

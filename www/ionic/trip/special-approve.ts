@@ -20,7 +20,7 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
             if(i == 0){
                 trip.beginDate = q.leaveDate;
             }
-            if(q.isRoundTrip && i == (destinationPlacesInfo.length - 1)){
+            if(i == (destinationPlacesInfo.length - 1)){
                 trip.endDate = q.goBackDate;
             }
             //处理目的地

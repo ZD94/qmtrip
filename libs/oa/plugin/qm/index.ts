@@ -91,7 +91,7 @@ export class QmPlugin extends AbstractOAPlugin {
                     
                     tripApprove.startAt = q.leaveDate;
                 }
-                if(q.isRoundTrip && i == (destinationPlacesInfo.length - 1)){
+                if(i == (destinationPlacesInfo.length - 1)){
                     tripApprove.backAt = q.goBackDate;
                 }
             }

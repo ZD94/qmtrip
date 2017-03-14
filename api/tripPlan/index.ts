@@ -984,7 +984,7 @@ class TripPlanModule {
                     tripPlan.isNeedTraffic = q.isNeedTraffic;
                     tripPlan.isNeedHotel = q.isNeedHotel;
                 }
-                if(q.isRoundTrip && i == (destinationPlacesInfo.length - 1)){
+                if(i == (destinationPlacesInfo.length - 1)){
                     tripPlan.backAt = q.goBackDate;
                 }
             }
@@ -1038,7 +1038,7 @@ class TripPlanModule {
             console.info('BUDGET====>', budget);
             switch(tripType) {
                 case ETripType.OUT_TRIP:
-                    data.deptCity = budget.originPlace.id;
+                    data.deptCity = budget.originPlace ? budget.originPlace.id : "";
                     data.arrivalCity= budget.destination.id;
                     data.deptDateTime = budget.departDateTime;
                     data.arrivalDateTime = budget.arrivalDateTime;
@@ -1049,7 +1049,7 @@ class TripPlanModule {
                     tripPlan.isNeedTraffic = true;
                     break;
                 case ETripType.BACK_TRIP:
-                    data.deptCity = budget.originPlace.id;
+                    data.deptCity = budget.originPlace ? budget.originPlace.id : "";
                     data.arrivalCity= budget.destination.id;
                     data.deptDateTime = budget.departDateTime;
                     data.arrivalDateTime = null;
@@ -1081,7 +1081,7 @@ class TripPlanModule {
                     detail.status = EPlanStatus.COMPLETE;
                     break;
                 case ETripType.SPECIAL_APPROVE:
-                    data.deptCity = budget.originPlace.id;
+                    data.deptCity = budget.originPlace ? budget.originPlace.id : "";
                     data.arrivalCity = budget.destination.id;
                     data.deptDateTime = budget.startAt;
                     data.arrivalDateTime = budget.backAt;

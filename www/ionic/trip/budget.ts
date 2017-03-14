@@ -32,7 +32,7 @@ export async function BudgetController($scope, $storage,$loading, Models, $state
     console.info("result====================================");
     let budgets = result.budgets;
     let trip = $storage.local.get("trip");
-    let query = result.query;//兼容多行程
+    let query = result.query;
     let destinationPlacesInfo = query.destinationPlacesInfo;
     let firstDes = destinationPlacesInfo[0];
     let lastDes = destinationPlacesInfo[destinationPlacesInfo.length - 1];
@@ -44,6 +44,8 @@ export async function BudgetController($scope, $storage,$loading, Models, $state
     if(query.originPlace) {
         let originPlace = await City.getCity(query.originPlace.id || query.originPlace);
         trip.originPlaceName = originPlace.name;
+    }else{
+        trip.originPlaceName = '未知';
     }
 
     let destination = await City.getCity(lastDes.destinationPlace.id  || lastDes.destinationPlace || query.destinationPlace.id || query.destinationPlace);
@@ -60,17 +62,6 @@ export async function BudgetController($scope, $storage,$loading, Models, $state
         if (budget.tripType == ETripType.HOTEL) {
             budget.duringDays = moment(moment(budget.checkOutDate).format("YYYY-MM-DD")).diff(moment(moment(budget.checkInDate).format("YYYY-MM-DD")), 'days') || 1;
         }
-        /*if (budget.tripType == ETripType.SUBSIDY) {
-            let days = moment(moment(trip.endDate).format("YYYY-MM-DD")).diff(moment(moment(trip.beginDate).format("YYYY-MM-DD")), 'days')
-            days = days + 1;
-            if (!budget.hasFirstDaySubsidy) {
-                days -= 1;
-            }
-            if (!budget.hasLastDaySubsidy) {
-                days -= 1;
-            }
-            budget.duringDays = days;
-        }*/
         return budget;
     })
     for(let budget of budgets) {
@@ -163,47 +154,8 @@ export async function BudgetController($scope, $storage,$loading, Models, $state
             }
         }
 
-
-        // if(!trip.place || !trip.place.id) {
-        //     $scope.showErrorMsg('请填写出差目的地！');
-        //     return false;
-        // }
-        //
-        // if(!trip.reasonName) {
-        //     $scope.showErrorMsg('请填写出差事由！');
-        //     return false;
-        // }
-
-        // if(!trip.traffic && ! trip.hotel) {
-        //     $scope.showErrorMsg('请选择交通或者住宿！');
-        //     return false;
-        // }
-
-        // if(trip.traffic && (!trip.fromPlace || !trip.fromPlace.id)) {
-        //     $scope.showErrorMsg('请选择出发地！');
-        //     return false;
-        // }
-
-
-        let params = {
-            originPlace: trip.fromPlace? trip.fromPlace.id : '',
-            destinationPlace: trip.place ? trip.place.id : '',
-            leaveDate: moment(trip.beginDate).toDate(),
-            goBackDate: moment(trip.endDate).toDate(),
-            latestArrivalDateTime: moment(trip.beginDate).toDate(),
-            earliestGoBackDateTime: moment(trip.endDate).toDate(),
-            isNeedTraffic: trip.traffic,
-            isRoundTrip: trip.round,
-            isNeedHotel: trip.hotel,
-            businessDistrict: trip.hotelPlace,
-            hotelName: trip.hotelName,
-            auditUser: trip.auditUser ? trip.auditUser.id : ''
-        };
-
-        if(params.originPlace == params.destinationPlace){
-            msgbox.log("出差地点和出发地不能相同");
-            return false;
-        }
+        let params = query;
+        params.auditUser = trip.auditUser ? trip.auditUser.id : '';
 
         try {
             $loading.end();

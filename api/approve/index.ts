@@ -149,7 +149,7 @@ class ApproveModule {
                 if(i == 0){
                     budgetInfo.budgets[0].startAt = q.leaveDate;
                 }
-                if(q.isRoundTrip && i == (destinationPlacesInfo.length - 1)){
+                if(i == (destinationPlacesInfo.length - 1)){
                     budgetInfo.budgets[0].backAt = q.goBackDate;
                 }
                 //处理目的地

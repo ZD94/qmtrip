@@ -30,7 +30,6 @@ export interface BudgetOptions{
 export interface BudgetOptionsItem{
     destinationPlace: string,
     isNeedHotel: boolean,
-    isRoundTrip?: boolean,
     isNeedTraffic: boolean,
     leaveDate: Date,
     goBackDate?: Date,
@@ -99,10 +98,14 @@ export default class ApiTravelBudget {
                 for(let key in destinationPlacesInfo[j]) {
                     paramsItem[key] = destinationPlacesInfo[j][key];
                 }
-                paramsItem.isRoundTrip = params.isRoundTrip;
                 paramsItem.staffId = params.staffId;
                 if(j == 0){
-                    paramsItem.originPlace = params.originPlace;
+                    if(params.originPlace){
+                        paramsItem.originPlace = params.originPlace;
+                    }else{
+                        paramsItem.isNeedTraffic = false;
+                        paramsItem.isRoundTrip = false;
+                    }
                 }else{
                     paramsItem.originPlace = destinationPlacesInfo[j-1].destinationPlace;
                 }
@@ -110,6 +113,7 @@ export default class ApiTravelBudget {
             }
         }
 
+        let isRoundTrip = params.isRoundTrip;
         let momentDateFormat = "YYYY-MM-DD";
         let budgets = [];
 
@@ -117,7 +121,6 @@ export default class ApiTravelBudget {
             let {
                 leaveDate,  //离开日期
                 goBackDate, //返回日期
-                isRoundTrip, //是否往返
                 originPlace,    //出发城市
                 destinationPlace,   //目的地
                 checkInDate,    //入住日期
