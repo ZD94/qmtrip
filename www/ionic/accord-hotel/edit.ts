@@ -4,6 +4,7 @@ import { AccordHotel } from 'api/_types/accordHotel';
 var msgbox = require('msgbox');
 
 export async function EditController($scope, Models, $storage, $stateParams, $ionicHistory, $ionicPopup) {
+    require('./edit.scss');
     var staff = await Staff.getCurrent();
     var accordHotel;
     if ($stateParams.accordHotelId) {

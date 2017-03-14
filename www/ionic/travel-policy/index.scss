@@ -38,17 +38,11 @@
   color:$calm;
 }
 .policies {
-  .policyCard:first-of-type {
-    border-top-right-radius: 3px;
-    border-top-left-radius: 3px;
-  }
-  .policyCard:last-child {
-    border-bottom-right-radius: 3px;
-    border-bottom-left-radius: 3px;
-  }
   .policyCard{
+    margin-bottom: 10px;
     .item-avatar{
       height: 75px;
+      border-radius: 3px;
       .policy-list-left{
         position: absolute;
         left: 13px;
