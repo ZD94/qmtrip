@@ -339,6 +339,9 @@ textarea {
 i.icon.ion-ios-arrow-right{
   width:10px;
 }
+i.icon.ion-chevron-right{
+  width:10px;
+}
 
 //获取验证码样式
 .item-get-code{
@@ -361,6 +364,10 @@ i.icon.ion-ios-arrow-right{
     border-left: 1px solid lighten($dark,71%);
   }
 }
+.button.button-stable{
+  color:$dark;
+}
+
 @media (max-width: 320px){
   .item-icon-right .icon{
     right: 0;

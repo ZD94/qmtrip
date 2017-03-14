@@ -11,7 +11,7 @@
         <ion-list show-delete="data.showDelete">
             <ion-item ng-repeat="st in subsidyTemplates track by $index">
                 <ion-delete-button class="ion-minus-circled" ng-click="deleteSt(st, $index)"> </ion-delete-button>
-                <div style="color:#000000;">
+                <div style="color:#393939;">
                     {{st.name}}<span class="item-note">{{st.subsidyMoney | currency_int}}元/天</span>
                     <!--<i class="icon ion-chevron-right"></i>-->
                 </div>
