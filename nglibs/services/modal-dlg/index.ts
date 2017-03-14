@@ -2,6 +2,7 @@ import { ngService } from '../../index';
 import { selectFromListController } from './list';
 import { selectMapPointController } from './map';
 import { selectDateController, selectDateSpanController } from './date';
+import {selectCityListController} from "./city/index";
 
 interface DialogOptions{
     scope: any;
@@ -103,6 +104,14 @@ class ngModalDlg {
             template: require('./date/datespan-dialog.html'),
             controller: selectDateSpanController
         });
+    }
+    selectCity($scope, options, val) {
+        return this.createDialog({
+            parent: $scope,
+            scope: {options, val},
+            template: require('./city/dialog.html'),
+            controller: selectCityListController
+        })
     }
 
 }
