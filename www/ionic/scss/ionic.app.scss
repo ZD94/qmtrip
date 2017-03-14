@@ -25,6 +25,7 @@ $popup-background-color: white;
 $popup-border-radius: 5px;
 $z-index-popup: 100;
 
+@import "../scss/color.variable.scss";
 // Include all of Ionic
 @import "../../../common/vendor/ionic/scss/ionic";
 
@@ -110,10 +111,13 @@ a {
 input[readonly]:not(.cloned-text-input){
   background: none;
 }
-//item左右会超出
+//item样式
 .item {
   margin-right: 0px;
   margin-left: 0px;
+  color: $dark;
+  border-color: lighten($dark,71);
+  font-size: 16px;
 }
 
 //按钮图标大小过大
@@ -263,7 +267,22 @@ ion-content {
 .item-small{
   font-size:$font-size-small;
 }
-
+//a.item
+a.item{
+  color:$dark;
+}
+//item-note
+.item-note{
+  color: lighten($dark,39);
+}
+//.item-note.icon-right
+.item-note.icon-right{
+  padding-right: 20px;
+}
+//detail-left-right
+.detail-left-right .detail-right{
+  color:lighten($dark,39);
+}
 
 //筛选buttonbar
 .sub-button-bar{
@@ -291,6 +310,10 @@ textarea {
   border-radius: 5px;
   font-size: 12px;
 }
+//i.icon.ion-ios-arrow-right
+i.icon.ion-ios-arrow-right{
+  width:10px;
+}
 
 //
 @media (max-width: 320px){
@@ -303,3 +326,8 @@ textarea {
 //.toggle-calm.activated{
 //  color:$calm;
 //}
+
+//icon ion-ios-arrow-right
+.icon.ion-ios-arrow-right{
+  width: 10px;
+}

@@ -1,0 +1,37 @@
+//To customize the look and feel of Ionic, you can override the variables
+//in ionic's _variables.scss file.
+
+//For example, you might change some of the default colors:
+
+$light:                           #fff !default;
+$stable:                          #f8f8f8 !default;
+$positive:                        #28A7E1 !default;
+$calm:                            #28A7E1 !default;
+$balanced:                        #33cd5f !default;
+$energized:                       #F39800 !default;
+$assertive:                       #ef473a !default;
+$royal:                           #886aea !default;
+$dark:                            #393939 !default;
+
+// Lists
+// -------------------------------
+
+$list-header-bg:                  transparent !default;
+$list-header-color:               #222 !default;
+$list-header-padding:             5px 15px !default;
+$list-header-margin-top:          20px !default;
+
+// Cards
+// ---------------------------------------------
+$card-border-radius:              3px !default;
+
+
+// Buttons
+// ---------------------------------------------
+$button-calm-bg:                  $calm !default;
+$button-positive-bg:              $calm !default;
+
+// Forms
+// ---------------------------------------------
+$input-label-color:               $dark !default;
+$input-color-placeholder:         lighten($dark,56)!default;
