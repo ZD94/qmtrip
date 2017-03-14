@@ -1,10 +1,11 @@
 @import "../scss/color.variable.scss";
 .get_coins{
-  background: #f8f8f8;
   .coins_head{
+    border-radius: 3px;
+    margin: 10px;
     background: #28a7e1;
-    height: 64px;
-    line-height: 64px;
+    height: 60px;
+    line-height: 60px;
     font-size: 14px;
     color: #fff;
     padding: 0 20px;
