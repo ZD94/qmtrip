@@ -6,11 +6,11 @@
                     <span class="input-label">手机号码</span>
                     <input type="text" placeholder="请输入11位手机号" ng-model="form.mobile" required ng-required>
                 </div>
-                <div class="item item-input" style="padding-top: 0px;padding-bottom: 0px">
+                <div class="item item-input item-get-code" style="padding-top: 0px;padding-bottom: 0px">
                     <!--<span class="input-label">重复密码</span>-->
                     <input type="text" placeholder="请输入验证码" ng-model="form.msgCode" required ng-required>
-                    <a class="button button-calm getCodeBtn" ng-click="sendCode()" ng-if="!showCount">获取验证码</a>
-                    <div class="button button-stable" style="width: 116px;text-align: center;" ng-if="showCount"><span id="countNum">{{beginNum}}</span>s</div>
+                    <a class="button button-get-code" ng-click="sendCode()" ng-if="!showCount">获取验证码</a>
+                    <div class="button button-show-count" style="width: 116px;text-align: center;" ng-if="showCount"><span id="countNum">{{beginNum}}</span>s</div>
                 </div>
             </ion-list>
             <div class="spacer" style="height:10px"></div>
@@ -34,7 +34,7 @@
             <div class="spacer" style="height: 10px;"></div>
             <ion-list>
                 <div class="item item-input">
-                    <span class="input-label">优惠码(选填)</span>
+                    <span class="input-label">优惠码</span>
                     <input type="text"
                            placeholder="请输入您从渠道获得的优惠码"
                            ng-model="form.promoCode"

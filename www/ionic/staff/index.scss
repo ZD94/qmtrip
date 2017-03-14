@@ -1,6 +1,8 @@
-$color:#4a4a4a;
+@import "../scss/color.variable.scss";
+
+$fontBold: bold;
 .staff{
-  color: $color;
+  color: $dark;
   .item-thumbnail-left {
     position: relative;
     min-height: 80px;
@@ -30,16 +32,17 @@ $color:#4a4a4a;
       }
     }
     p{
-      color: $color;
+      color: $dark;
     }
     .icon{
       position: absolute;
       right: 10px;
       top:50%;
-      color: $color;
+      color: $dark;
     }
   }
   .card{
+    border-radius: 3px;
     .item.flex-111{
       padding:0;
       .item-avatar{
@@ -49,7 +52,7 @@ $color:#4a4a4a;
           margin-top: 10px;
           font-size: 18px;
           font-weight: bold;
-          color: $color;
+          color: $dark;
         }
         p{
           color: #9b9b9b;
@@ -70,12 +73,12 @@ $color:#4a4a4a;
         &:first-child{
           border-right: 1px solid #ddd;
           .bg_icon{
-            background: #50e3c2;
+            background: $calm;
           }
         }
         &:last-child{
           .bg_icon{
-            background: #f5a623;
+            background: $energized;
           }
         }
       }
@@ -92,23 +95,26 @@ $color:#4a4a4a;
   .list{
     .item-divider{
       padding: 10px;
-      color: $color;
+      color: $dark;
       background: #fff;
+      .item-note{
+        color: lighten($dark,39%);
+        font-size: 12px;
+      }
       .icon{
         color: #28a7e1;
         margin-right: 5px;
-        &.item-note{
-          color: $color;
-        }
+
       }
     }
+
     .item{
       padding: 10px;
       a{
         text-align: center;
-        color: $color;
+        color: lighten($dark,39%);
         .icon{
-          font-size: 22px;
+          font-size: 24px;
         }
         p{
           font-size: 12px;
@@ -118,7 +124,7 @@ $color:#4a4a4a;
     &:last-child{
       .item-divider{
         .icon{
-          color: #f5a623;
+          color: $energized;
         }
       }
       .item{
@@ -129,11 +135,12 @@ $color:#4a4a4a;
           }
           p{
             font-size: 12px;
-            color: #282828;
+            color: $dark;
           }
           &:nth-child(1){
             h2{
-              color: #9013fe;
+              color: $royal;
+              font-weight: $fontBold;
             }
           }
           &:nth-child(2){
@@ -153,12 +160,14 @@ $color:#4a4a4a;
               height: 80%;
             }
             h2{
-              color: #F5A623;
+              color: $energized;
+              font-weight: $fontBold;
             }
           }
           &:nth-child(3){
             h2{
-              color: #417505;
+              color: $balanced;
+              font-weight: $fontBold;
             }
           }
         }
@@ -166,10 +175,13 @@ $color:#4a4a4a;
     }
   }
   .button-calm{
-    font-size: 20px;
+    font-size: 16px;
+    border-radius: 3px;
+
     .fa{
       font-size: 20px;
       margin-right: 10px;
     }
   }
 }
+

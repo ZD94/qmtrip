@@ -16,7 +16,7 @@
                         <span class="item-note" ng-if="options.note" ng-bind-html="options.note(value)"></span>
                         <i class="icon ion-checkmark"></i>
                     </ion-item>
-                    <ion-item
+                    <!--<ion-item
                             class="item-icon-right"
                             ng-repeat="option in optionItems track by $index"
                             ng-if="displayItem(option) != displayItem(value)"
@@ -25,8 +25,8 @@
                     >
                         <span ng-bind-html="displayItem(option)"></span>
                         <span class="item-note" ng-if="options.note" ng-bind-html="options.note(option)"></span>
-                    </ion-item>
-
+                    </ion-item>-->
+                    <list-repeat arg="optionItems">abc{{$parent.$item.optionItems}}</list-repeat>
                     <ion-item class="new-item" ng-click="createItem(form.keyword)" ng-if="showCreate()">
                         新建【{{form.keyword}}】
                     </ion-item>
