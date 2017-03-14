@@ -19,6 +19,27 @@
 }
 
 .bottom-bar-budget{
+    .bottom-noApprove{
+      background-color: white;
+      p.noApprove{
+        margin:0;
+        padding-left:10px;
+        line-height: 52px;
+      }
+
+      .button.hasAuditUser{
+        background-color: #28A7E1;
+      }
+      .button.hasAuditUser.button-positive.button-outline.bgColor:active{
+        color:#28A7E1;
+      }
+      .button.button-positive.button-outline.bgColor{
+        background-color:white;
+        border:0px solid white;
+      }
+
+    }
+
     .list{
       margin-bottom: 0px;
       padding-top: 0px;
@@ -29,6 +50,12 @@
         z-index: -100;
         font-size: 22px;
       }
+     p.input-label{
+        padding: 0px;
+        position: absolute;
+        top: 30px;
+        font-size: 12px;
+      }
     }
     .item-input > .fake-input{
       padding-right: 0px;
@@ -36,6 +63,7 @@
     fake-input>span{
       height: 34px;
     }
+
     .status-bar{
       font-size:14px;
       padding-top: 14px;
@@ -59,6 +87,14 @@
     button.hasAuditUser{
       background-color: #28A7E1;
     }
+  .button.hasAuditUser.button-positive.button-outline.bgColor:active{
+    color:#28A7E1;
+  }
+  .button.button-positive.button-outline.bgColor{
+      background-color:white;
+      border:0px solid white;
+    }
+
     .status-bar-detail{
       padding-top: 8px;
       div.list:nth-child(2){
