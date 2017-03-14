@@ -2,6 +2,7 @@
 
 $fontBold: bold;
 .staff{
+  margin-top: -10px;
   color: $dark;
   .item-thumbnail-left {
     position: relative;
@@ -43,6 +44,7 @@ $fontBold: bold;
   }
   .card{
     border-radius: 3px;
+    margin: 10px 0;
     .item.flex-111{
       padding:0;
       .item-avatar{
@@ -93,16 +95,29 @@ $fontBold: bold;
     }
   }
   .list{
+    a{
+      div{
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+      }
+    }
+    .flex-111{
+      border-bottom-left-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
     .item-divider{
-      padding: 10px;
+      padding-left: 5px;
+      padding-right: 5px;
       color: $dark;
       background: #fff;
+      border-top-left-radius: 3px;
+      border-top-right-radius: 3px;
       .item-note{
         color: lighten($dark,39%);
         font-size: 12px;
       }
       .icon{
-        color: #28a7e1;
+        color: $dark;
         margin-right: 5px;
 
       }
@@ -112,7 +127,7 @@ $fontBold: bold;
       padding: 10px;
       a{
         text-align: center;
-        color: lighten($dark,39%);
+        color: $dark;
         .icon{
           font-size: 24px;
         }

@@ -1,6 +1,23 @@
 @import "../scss/color.variable.scss";
 
 .staffinfo {
+  a:last-child{
+    div:last-child{
+      border-radius: 0 0 3px 3px;
+    }
+  }
+  .item:first-child{
+    border-radius: 3px 3px 0 0 ;
+  }
+  .item:nth-child(6){
+    border-radius: 3px 3px 0 0 ;
+  }
+  .item:nth-child(9){
+    border-radius: 0 0 3px 3px;
+  }
+  .item:nth-child(12){
+    border-radius: 0 0 3px 3px;
+  }
   .item {
 
     padding: 11px;
@@ -8,7 +25,7 @@
       color: lighten($dark,39%);
     }
     &.item-icon-right {
-      padding-right: 40px;
+      padding-right: 25px;
       .icon {
         font-size: 14px;
         right: 5px;
@@ -24,9 +41,11 @@
         }
       }
       &.avatars{
-        padding: 9px 40px 9px 11px;
+        padding: 9px 25px 9px 11px;
         line-height: 40px;
         color: inherit;
+        border-radius: 0 0 3px 3px;
+
         .item-note{
           height: 40px;
         }
