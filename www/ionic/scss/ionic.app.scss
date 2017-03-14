@@ -43,6 +43,9 @@ $popup-background-color: white;
 $popup-border-radius: 5px;
 $z-index-popup: 100;
 
+
+
+// Include all of Ionic
 @import "../../../common/vendor/ionic/scss/ionic";
 
 
@@ -128,10 +131,11 @@ a {
 input[readonly]:not(.cloned-text-input){
   background: none;
 }
-//item左右会超出
+//item样式
 .item {
   margin-right: 0px;
   margin-left: 0px;
+  font-size: 16px;
 }
 //模块上圆角
 .borderRadiusTop{
@@ -292,6 +296,18 @@ ion-content {
   font-size:$font-size-small;
 }
 
+//item-note
+.item-note{
+  color: lighten($dark,39);
+}
+//.item-note.icon-right
+.item-note.icon-right{
+  padding-right: 20px;
+}
+//detail-left-right
+.detail-left-right .detail-right{
+  color:lighten($dark,39);
+}
 
 //筛选buttonbar
 .sub-button-bar{
@@ -318,6 +334,10 @@ textarea {
   color: #fff;
   border-radius: 5px;
   font-size: 12px;
+}
+//i.icon.ion-ios-arrow-right
+i.icon.ion-ios-arrow-right{
+  width:10px;
 }
 
 //获取验证码样式
@@ -347,6 +367,7 @@ textarea {
   }
 }
 
+
 // 模块间距
 .card{
   margin:0 0 10px;
@@ -365,8 +386,14 @@ textarea {
 a.item{
   color:$dark;
 }
+.list{
+  margin-bottom: 10px;
+}
 
 //输入框输入文字颜色
 input[type="text"], input[type="password"] {
   color: $dark;
 }
+
+
+

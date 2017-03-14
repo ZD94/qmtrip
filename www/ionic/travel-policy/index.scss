@@ -1,3 +1,4 @@
+@import "../scss/color.variable.scss";
 .withCheck{
   .item-radio{
     border: 0;
@@ -32,6 +33,20 @@
       margin-top: 0;
     }
   }
+}
+.button.button-outline.button-block.button-positive.activated{
+  color:$calm;
+}
+.policies {
+  .policyCard:first-of-type {
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+  }
+  .policyCard:last-child {
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+  }
+
 }
 
 .policyCard{
