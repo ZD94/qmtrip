@@ -32,3 +32,15 @@
     //}
   }
 }
+ion-list{
+  ion-item{
+    &:first-of-type{
+      border-top-right-radius: 3px;
+      border-top-left-radius: 3px;
+    }
+    &:last-of-type{
+      border-bottom-right-radius: 3px;
+      border-bottom-left-radius: 3px;
+    }
+  }
+}
