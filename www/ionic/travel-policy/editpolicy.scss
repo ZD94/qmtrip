@@ -1,3 +1,4 @@
+@import "../scss/color.variable.scss";
 .item-input-right {
   input{
     text-align: right;
@@ -53,6 +54,7 @@
     line-height: 24px;
     padding-left: 10px;
     background: #f9f9f9;
+    color:$dark;
   }
   .detail-left-right{
     display: flex;
