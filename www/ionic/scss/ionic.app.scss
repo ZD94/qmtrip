@@ -365,3 +365,8 @@ textarea {
 a.item{
   color:$dark;
 }
+
+//输入框输入文字颜色
+input[type="text"], input[type="password"] {
+  color: $dark;
+}
