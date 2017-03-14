@@ -379,7 +379,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
                 alert('系统错误，请稍后重试');
                 $loading.end();
             }, 60 * 1000);
-
+           console.log("this is params to budget: ",params);
             budget = await API.travelBudget.getTravelPolicyBudget(params);
             if (isShowDone) {
                 cb();
