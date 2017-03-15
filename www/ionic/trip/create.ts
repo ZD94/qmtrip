@@ -35,15 +35,53 @@ function TripDefineFromJson(obj: any): TripDefine{
 }
 
 
-export async function CreateController($scope, $storage, $loading, ngModalDlg, $ionicPopup, Models, City, $rootScope){
+export async function CreateController($scope, $storage,$stateParams, $loading, ngModalDlg, $ionicPopup, Models, City, $rootScope){
     require('./create.scss');
     $scope.showOrigin = false;
     $scope.showDestination = false;
     $scope.currentStaff = await Staff.getCurrent();
     let currentCompany = $scope.currentStaff.company;
     let trip = _.clone(defaultTrip);
+    let query = null;
+    if($stateParams.params){
+        query = JSON.parse($stateParams.params);
+        if(query.originPlace){
+            $scope.showOrigin = true;
+            let origin = await API.place.getCityInfo({cityCode: query.originPlace});
+            trip.origin = origin;
+        }
+        trip.round = query.isRoundTrip;
+        if(query.destinationPlacesInfo && _.isArray(query.destinationPlacesInfo) && query.destinationPlacesInfo.length > 0){
+            let oldParams = query.destinationPlacesInfo[0];
+            let destination = await API.place.getCityInfo({cityCode: oldParams.destinationPlace});
+            trip.destination = destination;
+            trip.beginDate = oldParams.leaveDate;
+            trip.endDate = oldParams.goBackDate;
+            trip.traffic = oldParams.isNeedTraffic;
+            trip.hotel = oldParams.isNeedHotel;
+            trip.hotelPlace = oldParams.businessDistrict;
+            trip.hotelName = oldParams.hotelName;
+            trip.reason = oldParams.reason;
+            trip.reasonName = oldParams.reason;
+            $scope.subsidy = oldParams.subsidy;
+            $scope.showDestination = true;
+        }else{
+            if(query.destinationPlace){
+                $scope.showDestination = true;
+            }
+            trip.destination = {id: query.destinationPlace};
+            trip.beginDate = query.leaveDate;
+            trip.endDate = query.goBackDate;
+            trip.traffic = query.isNeedTraffic;
+            trip.hotel = query.isNeedHotel;
+            trip.hotelPlace = query.businessDistrict;
+            trip.hotelName = query.hotelName;
+            trip.reason = query.reason;
+            trip.reasonName = query.reason;
+            $scope.subsidy = query.subsidy;
+        }
+    }
     $scope.trip = trip;
-
     // try {
     //     trip= TripDefineFromJson($storage.local.get('trip'));
     //     if(trip.origin){

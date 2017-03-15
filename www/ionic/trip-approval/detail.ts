@@ -285,9 +285,11 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     };
 
     $scope.reCommitTripApprove = async function() {
-        let tripApprove = $scope.tripApprove;
+        // let tripApprove = $scope.tripApprove;
+        let query = tripApprove.query;
+        if(typeof query != 'string') query = JSON.stringify(query);
         //let tripDetails = $scope.budgets;
-        let trip: any = {
+        /*let trip: any = {
             regenerate: true,
             traffic: tripApprove.isNeedTraffic,
             round: tripApprove.isRoundTrip,
@@ -309,8 +311,8 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
             trip.hotelPlaceName = tripApprove.arrivalCity || '';
         }
 
-        await $storage.local.set('trip', trip);
-        window.location.href="#/trip/create";
+        await $storage.local.set('trip', trip);*/
+        window.location.href="#/trip/create?params="+query;
     };
 
     $scope.checkTrip = async function(){

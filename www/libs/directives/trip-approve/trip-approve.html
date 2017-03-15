@@ -14,7 +14,7 @@
             </div>
             <ion-item class="po_r">
                 <p><i class="icon ion-plane"></i> &nbsp;&nbsp;
-                {{tripApprove.deptCity}} 到 {{tripApprove.arrivalCity}}
+                {{tripApprove.deptCity || "未知"}} 到 {{tripApprove.arrivalCity}}
                 &nbsp;&nbsp;
                 {{tripApprove.query.hotelName}}
                 </p>
