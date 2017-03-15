@@ -9,6 +9,6 @@ export default async function IndexController($scope,CNZZ){
     require('./manage.scss');
     let staff = await Staff.getCurrent();
     $scope.staff = staff;
-    CNZZ.addEvent("管理企业","点击","进入管理企业",$scope.staff);
+    // CNZZ.addEvent("管理企业","点击","进入管理企业",$scope.staff);
     $scope.ECompanyType = ECompanyType;
 }

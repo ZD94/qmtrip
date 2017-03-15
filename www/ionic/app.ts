@@ -189,6 +189,17 @@ function initUpdater($ionicPlatform, $ionicPopup) {
 //         })
 //     })
 // }
+    function initCNZZ($ionicPlatform,$rootScope,$location,CNZZ){
+       $ionicPlatform.ready(function(){
+           $rootScope.$on('$locationChangeSuccess',function(event,newUrl,oldUrl){
+               var url = $location.path();
+               console.info("url===>",url);
+
+               CNZZ.addEvent('页面统计','URL', newUrl ,'');
+           })
+       })
+    }
+
 
 require('nglibs');
 require('www/libs');
@@ -212,6 +223,9 @@ app.run(initAPI);
 app.run(initKeyboard);
 app.run(initStatusBar);
 // app.run(initStatistics);
+
+app.run(initCNZZ);
+
 if(window.cordova) {
     app.run(initUpdater);
     app.run(initJPush);
