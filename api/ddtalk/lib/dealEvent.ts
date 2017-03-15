@@ -223,14 +223,8 @@ async function getISVandCorp(permanentCode: string, corp): Promise<any> {
     let tokenObj = await _getSuiteToken();
     let suiteToken = tokenObj['suite_access_token']
 
-    console.log("yar");
     let isvApi = new ISVApi(config.suiteid, suiteToken, corpId, corp.permanentCode);
-
-    console.log("yar1");
-
     let corpApi = await isvApi.getCorpApi();
-
-    console.log("yar2");
 
     return {
         isvApi: isvApi,
@@ -244,15 +238,10 @@ async function getISVandCorp(permanentCode: string, corp): Promise<any> {
  *  corp    : ddtalk.corps 对象
  */
 export async function createCompanyOrganization(corpApi: CorpApi, corp: object) {
-    console.log("createCompanyOrganization");
     //拿到部门列表
     let departments = await corpApi.getDepartments();
     let company = await corp.getCompany(corp['company_id']);
-    console.log(company.name);
     let Translate = {}, Translate2 = {}, localDepartments = [];
-
-    console.log("I am saying : ", departments.length);
-
     let rootLocalDepartmentId;
     for (let d of departments) {
         let isDefault = false;
@@ -274,8 +263,6 @@ export async function createCompanyOrganization(corpApi: CorpApi, corp: object) 
         if (isDefault) {
             rootLocalDepartmentId = _d.id;
         }
-
-        console.log("d.name", d.name);
 
         //修改部门id 与 钉钉部门id 对照表
         let ddtalkDepartment = Models.ddtalkDepartment.create({
@@ -328,14 +315,7 @@ export async function createCompanyOrganization(corpApi: CorpApi, corp: object) 
  */
 
 export async function addCompanyStaffs(corpApi: CorpApi, DdDepartmentId: any, corp) {
-    console.log("yes ,in the addCompanyStaffs");
-    console.log(typeof DdDepartmentId, DdDepartmentId)
-
-
     let company = await corp.getCompany(corp["company_id"]);
-
-    console.log("company ");
-
     let corpid = corp.corpId;
     let dingUsers;
     if (DdDepartmentId instanceof Array) {
@@ -343,9 +323,6 @@ export async function addCompanyStaffs(corpApi: CorpApi, DdDepartmentId: any, co
     } else {
         dingUsers = await corpApi.getUserListByDepartment(DdDepartmentId);
     }
-
-    console.log("dingUsers", dingUsers);
-
 
     let travelPolicy = await company.getDefaultTravelPolicy();
     for (let u of dingUsers) {
@@ -363,7 +340,6 @@ export async function addCompanyStaffs(corpApi: CorpApi, DdDepartmentId: any, co
 
             ddtalkUserInfo = await ddtalkUserInfo.save();
 
-            console.log("ddtalkUserInfo.id : ", ddtalkUserInfo.id)
             _staff = await Models.staff.get(ddtalkUserInfo.id);
             if (_staff) {
                 console.log("s : ");
@@ -405,7 +381,6 @@ export async function addCompanyStaffs(corpApi: CorpApi, DdDepartmentId: any, co
 
         // 处理该员工与部门的关系
         for (let item of u.department) {
-            console.log("let item of u.department  :   ", item, corpid);
             let itemDepart = await Models.ddtalkDepartment.find({
                 where: {DdDepartmentId: item.toString(), corpId: corpid}
             });
@@ -415,7 +390,6 @@ export async function addCompanyStaffs(corpApi: CorpApi, DdDepartmentId: any, co
                 continue;
             }
 
-            console.log("itemDepart", itemDepart.length);
             let staffDepart = await Models.staffDepartment.find({ where : {
                 staffId: _staff.id,
                 departmentId: itemDepart[0].localDepartmentId
@@ -441,10 +415,10 @@ export async function addCompanyStaffs(corpApi: CorpApi, DdDepartmentId: any, co
  */
 
 export async function synchroDDorganization() {
-    // let current = await Staff.getCurrent();
-    // if(current.roleId != EStaffRole.OWNER && current.roleId != EStaffRole.ADMIN){
-    //     throw L.ERR.PERMISSION_DENY();
-    // }
+    let current = await Staff.getCurrent();
+    if(current.roleId != EStaffRole.OWNER && current.roleId != EStaffRole.ADMIN){
+        throw L.ERR.PERMISSION_DENY();
+    }
     /*let test = await Models.ddtalkCorp.find({where : { "companyId" : "658cd3a0-bde4-11e6-997b-a9af9a42d08a" }});
      test.map(async (item)=>{
      await item.destroy();
@@ -461,13 +435,12 @@ export async function synchroDDorganization() {
 
      return "good";*/
 
-    let current = {
+    /*let current = {
         company: {
             id: "658cd3a0-bde4-11e6-997b-a9af9a42d08a"
         }
-    }
+    }*/
 
-    console.log("company.id : ", current.company.id);
     let corps = await Models.ddtalkCorp.find({where: {companyId: current.company.id}});
     if (!corps || !corps.length) {
         return {"msg": "您的钉钉账户没有授权"};
@@ -478,8 +451,6 @@ export async function synchroDDorganization() {
     await deleteCompanyOrganization(current.company.id , corp)
 
     let {isvApi, corpApi} = await getISVandCorp(corp.permanentCode, corp);
-
-    console.log("ready coming to the create");
 
     await createCompanyOrganization(corpApi, corp);
     console.log("yes , hello");
@@ -512,20 +483,15 @@ async function arrDestroy(arr: [], callback?: Function) {
  *
  */
 export async function deleteCompanyOrganization(companyId: string , corp): boolean {
-    console.log("delete localDepart", companyId);
     //删除本地部门
     try {
 
         let localDept = await Models.department.find({where: {companyId: companyId}});
-        console.log("localDept : ", localDept.length);
-
-
 
         localDept.map(async (item) => {
             //删除员工部门对照关系表
             let localDeptStaff = await Models.staffDepartment.find({where: {departmentId: item.id}});
             await arrDestroy(localDeptStaff);
-            console.log(item.name);
             await item.destroy();
         });
 
@@ -550,7 +516,6 @@ export async function deleteCompanyOrganization(companyId: string , corp): boole
     catch (e) {
         console.log(e);
     }
-    console.log("delete ok");
 }
 
 

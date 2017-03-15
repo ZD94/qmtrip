@@ -12,13 +12,6 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         //$ionicNavBarDelegate.title($stateParams.departName);//这个东西会改变属性为nav-bar='cached'的这个div里面的value，然而显示的是nav-bar='active'的这个标签。刷新后才可以正常显示，暂时未解决、、、
     }*/
 
-
-    /* test */
-    API.require("ddtalk");
-    await API.onload();
-    // console.log(await API.ddtalk.synchroDDorganization());
-
-
     let departmentId = $stateParams.departmentId;
     let staff = await Staff.getCurrent();
     let company = staff.company;
