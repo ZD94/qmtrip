@@ -54,7 +54,7 @@ export class Department extends ModelObject{
 
         console.info(staffs.fetchUnSerialize);
         console.info(typeof staffs.fetchUnSerialize);
-        console.info("=======================================");
+        console.info("======================================");
         return staffs;
     }
 
