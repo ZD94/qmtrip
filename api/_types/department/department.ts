@@ -48,7 +48,13 @@ export class Department extends ModelObject{
 
     async getStaffs(options?: any): Promise<PaginateInterface<Staff>> {
         let staffs =  await API.department.getStaffs({id: this.id,options: options});
-        staffs = await staffs.fetchUnSerialize();
+        if(staffs.fetchUnSerialize && typeof staffs.fetchUnSerialize == 'function'){
+            staffs = await staffs.fetchUnSerialize();
+        }
+
+        console.info(staffs.fetchUnSerialize);
+        console.info(typeof staffs.fetchUnSerialize);
+        console.info("=======================================");
         return staffs;
     }
 
