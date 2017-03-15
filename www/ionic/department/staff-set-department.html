@@ -12,7 +12,7 @@
                     {{rootDepartment.name}}
                     <span class="item-note" ng-if="rootDepartment.parent"
                           ng-click="$event.stopPropagation();$event.preventDefault();backParent(rootDepartment.parent)">
-                        返回上级部门
+                        返回上级
                     </span>
                 </div>
                 <div class="childs" ng-if="childDepartments && childDepartments.length > 0">
@@ -25,7 +25,7 @@
                         {{department.name}}
                         <span class="item-note" ng-if="department.hasChild"
                               ng-click="$event.stopPropagation();$event.preventDefault();showChild(department)">
-                        查看子部门
+                        下级
                         <i class="icon ion-chevron-right"></i>
                         </span>
                     </div>

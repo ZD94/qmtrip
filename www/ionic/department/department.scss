@@ -44,18 +44,18 @@
       }
     }
     .staff-list{
-      padding-left: 60px;
+      padding-left: 70px;
       line-height: 16px;
-      height: 50px;
+      height: 60px;
       padding-top: 10px;
       position: relative;
       .staff-avatar{
         position: absolute;
         top: 7px;
         left: 10px;
-        width: 36px;
-        height: 36px;
-        line-height: 36px;
+        width: 46px;
+        height: 46px;
+        line-height: 46px;
         border-radius: 50%;
         font-size: 14px;
       }
@@ -87,7 +87,7 @@
         color: #fff;
         font-size: 12px;
         border-radius: 3px;
-        margin-top: 4px;
+        margin-top: 10px;
         padding: 0 5px;
       }
     }
@@ -107,7 +107,7 @@
       max-width: none;
       &:nth-child(2){
         border-left: 1px solid #ccc;
-        //border-right: 1px solid #ccc;
+        border-right: 1px solid #ccc;
       }
     }
   }
