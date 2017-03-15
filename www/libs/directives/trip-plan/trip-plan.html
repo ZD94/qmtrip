@@ -12,7 +12,7 @@
                 <h2 style="margin-top: 0;">{{trip.account.name}}</h2>
             </div>
             <ion-item class="po_r">
-                <p><i class="icon ion-plane"></i> &nbsp;&nbsp;{{trip.deptCity || "未知"}} 到 {{trip.arrivalCity}}</p>
+                <p><i class="icon ion-plane"></i> &nbsp;&nbsp;<span ng-if="trip.deptCity">{{trip.deptCity}} 到 </span>{{trip.arrivalCity}}</p>
                 <p><i class="icon ion-star"></i> &nbsp;&nbsp;出差事由：{{trip.title}}</p>
             </ion-item>
         </ion-list>

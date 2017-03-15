@@ -44,8 +44,6 @@ export async function BudgetController($scope, $storage,$loading, Models, $state
     if(query.originPlace) {
         let originPlace = await City.getCity(query.originPlace.id || query.originPlace);
         trip.originPlaceName = originPlace.name;
-    }else{
-        trip.originPlaceName = '未知';
     }
 
     let destination = await City.getCity(lastDes.destinationPlace.id  || lastDes.destinationPlace || query.destinationPlace.id || query.destinationPlace);
