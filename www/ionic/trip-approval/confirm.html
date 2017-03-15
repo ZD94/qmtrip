@@ -7,10 +7,10 @@
             <ion-item ng-click="chooseOption(false)"
                       ng-class="{true: 'item-icon-left-unchecked', false: 'item-option-selected item-icon-left'}[isNextApprove]"
             >
-                <i class="icon " ng-class="{true:'ion-ios-checkmark-outline - Ionicons',false:'ion-ios-checkmark - Ionicons'}[isNextApprove]"></i>直接同意</ion-item>
+                <i class="icon ion-ios-checkmark-outline"></i>直接同意</ion-item>
             <ion-item ng-click="chooseOption(true)"
                       ng-class="{true: 'item-option-selected item-icon-left', false: 'item-icon-left-unchecked'}[isNextApprove]">
-                <i class="icon" ng-class="{true:'ion-ios-checkmark - Ionicons',false:'ion-ios-checkmark-outline - Ionicons'}[isNextApprove]"></i>
+                <i class="icon ion-ios-checkmark-outline"></i>
                 <span class="input-label">同意并转给</span>
                 <ng-selector-list
                                   ng-model="chooseApprove.approveUser"
