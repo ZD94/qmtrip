@@ -211,11 +211,17 @@
   .item-divider {
     color: $dark;
     font-size: 14px;
-    font-weight: bold;
     background-color: lighten($dark,71%);
   }
+  ion-item.item-divider.ion-item-title{
+    font-size: 16px;
+    font-weight: bold;
+  }
   .spanRight {
-    font-weight: normal;
+    font-size:16px;
+  }
+  .spanRight.right-budget {
+    font-size: 14px;
   }
   ion-item:first-child{
     border-top-left-radius: 5px;

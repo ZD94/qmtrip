@@ -30,7 +30,7 @@
                 </div>
                 <ion-list>
                     <div ng-repeat="budget in budgets" class="ta-detail-item">
-                        <ion-item class="item-divider">
+                        <ion-item class="item-divider ion-item-title">
                             <span ng-if='budget.tripType == ETripType.OUT_TRIP'>去程交通</span>
                             <span ng-if='budget.tripType == ETripType.BACK_TRIP'>回程交通</span>
                             <span ng-if='budget.tripType == ETripType.HOTEL'>住宿</span>
