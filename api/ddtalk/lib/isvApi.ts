@@ -29,6 +29,9 @@ export default class ISVApi {
         }
         if (corpAccessToken && Boolean(corpAccessToken)) return corpAccessToken;
         let url = `https://oapi.dingtalk.com/service/get_corp_token?suite_access_token=${this.suiteToken}`;
+
+        console.log("corpid : " ,this.corpid );
+        console.log("permanent_code : ", this.permanent_code );
         let ret: any = await reqProxy(url, {
             name: '获取企业accessToken',
             body: {

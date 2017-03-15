@@ -11,6 +11,14 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         console.info('comming in....',$stateParams.departName)
         //$ionicNavBarDelegate.title($stateParams.departName);//这个东西会改变属性为nav-bar='cached'的这个div里面的value，然而显示的是nav-bar='active'的这个标签。刷新后才可以正常显示，暂时未解决、、、
     }*/
+
+
+    /* test */
+    API.require("ddtalk");
+    await API.onload();
+    // console.log(await API.ddtalk.synchroDDorganization());
+
+
     let departmentId = $stateParams.departmentId;
     let staff = await Staff.getCurrent();
     let company = staff.company;
@@ -100,7 +108,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
                 $scope.staffPagers = await $scope.staffPagers.nextPage();
                 await initTravelPolicy($scope.staffPagers);
             } catch(err) {
-                alert("获取数据时,发生异常");
+                //alert("获取数据时,发生异常");
                 return;
             } finally {
                 $scope.$broadcast('scroll.infiniteScrollComplete');

@@ -120,6 +120,7 @@ export class Staff extends ModelObject implements Account {
     get quitTime(): Date { return null; }
     set quitTime(val: Date) {}
 
+
     @ResolveRef({type: Types.UUID}, Models.company)
     get company(): Company { return null; }
     set company(val: Company) {}
