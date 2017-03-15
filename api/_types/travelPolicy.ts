@@ -164,7 +164,15 @@ export class TravelPolicy extends ModelObject{
 
     async getStaffs(): Promise<Staff[]> {
         let query = {where: {companyId: this.company.id, travelPolicyId: this.id}};
-        return Models.staff.find(query);
+        let pager = await Models.staff.find(query);
+        let staffs = [];
+        do {
+            if (pager) {
+                staffs.push.apply(staffs, pager);
+                pager = await pager.nextPage();
+            }
+        } while(pager && pager.hasNextPage());
+        return staffs;
     }
 
     async getSubsidyTemplates(): Promise<SubsidyTemplate[]> {
