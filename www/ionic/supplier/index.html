@@ -16,31 +16,31 @@
             说明：<br>
             开启显示系统推荐服务商功能，员工可在预订时选择下列列表中的专属服务商以及所有推荐服务商和其他服务商，关闭显示系统推荐服务商，则只显示列表中开启的服务商。
         </p>
-        <div>
+        <!--<div>-->
             <div class="list self-define">
-                <div class="item item-divider supplier-title">
-                    专属服务商
-                    <span class="pull-right">不支持订单关联</span>
-                </div>
-                <div class="item item-divider self-detail" ng-repeat="ah in suppliers">
-                    <div ng-click="editSupplier(ah.id)" class="pull-left" style="width:180px">
-                        <div class="logo pull-left">
-                            <img class="avatar-img" ng-src="{{getImageUrl(ah.logo)}}" ng-if="ah.logo">
-                        </div>
-                        <span class="self-name">{{ah.name}}</span>
-                    </div>
-                    <label class="toggle toggle-calm pull-right" ng-click="saveSupplierStatus(ah)">
-                        <input type="checkbox" ng-checked="ah.isInUse" ng-model="ah.isInUse">
-                        <div class="track">
-                            <div class="handle"></div>
-                        </div>
-                    </label>
-                </div>
-                <div class="item item-icon-left item-icon-right add-supplier" ng-click="addSupplier()">
-                    <i class="icon ion-plus-round"></i>
-                    添加供应商
-                    <i class="icon ion-chevron-right" style="color:#545454"></i>
-                </div>
+                   <div class="item item-divider supplier-title">
+                       专属服务商
+                       <span class="pull-right">不支持订单关联</span>
+                   </div>
+                   <div class="item item-divider self-detail" ng-repeat="ah in suppliers">
+                       <div ng-click="editSupplier(ah.id)" class="pull-left" style="width:180px">
+                           <div class="logo pull-left">
+                               <img class="avatar-img" ng-src="{{getImageUrl(ah.logo)}}" ng-if="ah.logo">
+                           </div>
+                           <span class="self-name">{{ah.name}}</span>
+                       </div>
+                       <label class="toggle toggle-calm pull-right" ng-click="saveSupplierStatus(ah)">
+                           <input type="checkbox" ng-checked="ah.isInUse" ng-model="ah.isInUse">
+                           <div class="track">
+                               <div class="handle"></div>
+                           </div>
+                       </label>
+                   </div>
+                   <div class="item item-icon-left item-icon-right add-supplier" ng-click="addSupplier()">
+                       <i class="icon ion-plus-round"></i>
+                       添加供应商
+                       <i class="icon ion-chevron-right" style="color:#545454"></i>
+                   </div>
             </div>
             <div class="list recommend-supplier">
                 <div class="item item-divider supplier-title">
@@ -73,6 +73,6 @@
                     </label>
                 </div>
             </div>
-        </div>
+        <!--</div>-->
     </ion-content>
 </ion-view>
