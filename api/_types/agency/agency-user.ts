@@ -256,7 +256,7 @@ export class AgencyUser extends ModelObject{
         //修改企业偏好
         let sql = ` update company.companies set budget_config = '${budgetConfig}' where id = '${companyId}'`;
         let ret = await sequelize.query(sql);
-        return ret;
+        return company.save();
     }
 
     async getCompanyAllStaffs(params: any): Promise<any> {
