@@ -9,7 +9,7 @@ import moment=require('moment');
 import {PaginateInterface} from "common/model/interface";
 import {Company, ECompanyType} from "../company/company";
 import L from 'common/language';
-import {CoinAccount} from "../coin";
+import { CoinAccount, CoinAccountChange } from "../coin";
 const API = require("common/api");
 let sequelize = require("common/model").DB;
 
@@ -28,7 +28,7 @@ export enum  EAgencyUserRole {
 
 @TableExtends(Account, 'account')
 @Table(Models.agencyUser, 'agency.')
-export class AgencyUser extends ModelObject{
+export class AgencyUser extends ModelObject implements Account{
     constructor(target: Object) {
         super(target);
     }
@@ -299,4 +299,11 @@ export class AgencyUser extends ModelObject{
     qrcodeToken: string;
     type: EAccountType;
     isFirstLogin: boolean;
+    checkcodeToken: string;
+    isValidateMobile: boolean;
+    isValidateEmail: boolean;
+    coinAccount: CoinAccount;
+    isNeedChangePwd: boolean;
+    getCoinAccountChanges: ()=>Promise<CoinAccountChange[]>;
+
 }
