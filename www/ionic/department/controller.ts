@@ -7,6 +7,7 @@ var msgbox = require('msgbox');
 export async function IndexController($scope, $stateParams, Models, $ionicPopup, $ionicNavBarDelegate,$timeout, $location,ngModalDlg, $ionicHistory, $window, sortDlg) {
     require('./department.scss');
     /*if($stateParams.departName){
+    
         console.info('comming in....',$stateParams.departName)
         //$ionicNavBarDelegate.title($stateParams.departName);//这个东西会改变属性为nav-bar='cached'的这个div里面的value，然而显示的是nav-bar='active'的这个标签。刷新后才可以正常显示，暂时未解决、、、
     }*/
