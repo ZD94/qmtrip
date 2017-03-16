@@ -46,9 +46,10 @@ export class Department extends ModelObject{
     get company(): Company { return null; }
     set company(val: Company) {}
 
+    @RemoteCall()
     async getStaffs(options?: any): Promise<PaginateInterface<Staff>> {
         let staffs =  await API.department.getStaffs({id: this.id,options: options});
-        staffs = await staffs.fetchUnSerialize();
+
         return staffs;
     }
 

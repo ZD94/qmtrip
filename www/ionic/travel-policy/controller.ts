@@ -22,27 +22,13 @@ export async function IndexController($scope, Models, $location, $ionicPopup, $i
     $scope.enumTrainLevelToStr = enumTrainLevelToStr;
     $scope.travelPolicies = [];
     async function loadTravelPolicies(pager) {
-        /*let ps = pager.map(async function (policy) {
-            var subsidyTemplates = await policy.getSubsidyTemplates();
-            if(policy.isDefault){
-                $scope.defaultTravelpolicy = policy;
-            }
-            var obj = {policy: policy, usernum: '',subsidy:subsidyTemplates};
-            return obj;
-        })
-        $scope.travelPolicies = await Promise.all(ps);
-        await Promise.all($scope.travelPolicies.map(async function (obj) {
-            var result = await obj.policy.getStaffs();
-            obj.usernum = result.length;
-            return obj;
-        }))*/
         pager.forEach(async function(policy){
             var subsidyTemplates = await policy.getSubsidyTemplates();
             if(policy.isDefault){
                 $scope.defaultTravelpolicy = policy;
             }
             var num = await policy.getStaffs();
-            var obj = {policy: policy, usernum: num.length,subsidy:subsidyTemplates};
+            var obj = {policy: policy, usernum: num.total,subsidy:subsidyTemplates};
             if($scope.travelPolicies.indexOf(obj) < 0 ){
                 $scope.travelPolicies.push(obj);
             }

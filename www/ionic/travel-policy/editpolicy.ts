@@ -165,7 +165,7 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
                         try{
                             var result = await $scope.travelPolicy.getStaffs();
                             if(result && result.length > 0){//why后端delete方法throw出来的异常捕获不了
-                                throw {code: -1, msg: '还有'+ result.length +'位员工在使用该标准'};
+                                throw {code: -1, msg: '还有'+ result.total +'位员工在使用该标准'};
                             }
                             await $scope.travelPolicy.destroy();
                             /*window.location.href = '#/travel-policy/index'*/

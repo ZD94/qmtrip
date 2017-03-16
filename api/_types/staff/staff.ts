@@ -136,6 +136,7 @@ export class Staff extends ModelObject implements Account {
     get addWay(): EAddWay { return EAddWay.ADMIN_ADD; }
     set addWay(val: EAddWay) {}
 
+    @RemoteCall()
     async getDepartments(): Promise<PaginateInterface<Department>>{
         let departmentStaffs = await Models.staffDepartment.find({where: {staffId: this.id}, order: [['createdAt', 'desc']]});
         let ids = [];
@@ -143,7 +144,6 @@ export class Staff extends ModelObject implements Account {
             ids.push(t.departmentId);
         })
         let departments = await Models.department.find({where : {id: {$in: ids}, companyId: this.company.id}, order: [['createdAt', 'desc']]});
-        departments = await departments.fetchUnSerialize();
         return departments;
     }
 
@@ -252,6 +252,7 @@ export class Staff extends ModelObject implements Account {
         return true;
     }
 
+    @RemoteCall()
     async getSelfNotices(options?: any): Promise<PaginateInterface<Notice>>  {
         var self = this;
         if (!options) options = {where: {}};
