@@ -71,6 +71,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
             }
             return staff;
         }))
+        $scope.staffPagers = staffs;
     }
     async function initTravelPolicy(staffs){
         await Promise.all(staffs.map(async function(staff){
