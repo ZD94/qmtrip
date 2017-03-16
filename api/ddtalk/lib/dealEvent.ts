@@ -33,33 +33,44 @@ const DEFAULT_PWD = '000000';
 
 
 export async function tmpAuthCode(msg) {
-    console.log("yes", msg);
+    console.log("yes");
 
-    const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
+    /*const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
     let isExist = await cache.read(TMP_CODE_KEY);
     if (isExist) {
         console.log("exist ?");
         return;
-    }
+    }*/
 
     console.log("ok , here");
     //暂时缓存，防止重复触发
-    await cache.write(TMP_CODE_KEY, true, 60 * 2);
+    // await cache.write(TMP_CODE_KEY, true, 60 * 2);
     let tokenObj = await _getSuiteToken();
     let suiteToken = tokenObj['suite_access_token'];
 
     //永久授权码和企业名称及id
-    let permanentAuthMsg: any = await _getPermanentCode(suiteToken, msg.AuthCode);
+    /*let permanentAuthMsg: any = await _getPermanentCode(suiteToken, msg.AuthCode);
     let permanentCode = permanentAuthMsg['permanent_code'];
 
-    let corp_name = permanentAuthMsg.auth_corp_info.corp_name;
-    let corpid = permanentAuthMsg.auth_corp_info.corpid;
+    let corp_name = permanentAuthMsg.auth_corp_info.corp_name;*/
+
+    //test
+    let corp_name = "鲸力测试3.16";
+    let permanentCode = "MiWZd0Ja6qRtHydnRjavun3Hv6xEjSQ0oyaAkGO2bP2wAQb0L6NeLvOQ1KQPrABD";
+
+    let corpid = "ding3c92322d23dbbbfa35c2f4657eb6378f";
+    //test end.
+
+    console.log("000");
+    // let corpid = permanentAuthMsg.auth_corp_info.corpid;
     let isvApi = new ISVApi(config.suiteid, suiteToken, corpid, permanentCode);
 
+    console.log('111');
     //获取企业授权的授权数据 , 拿到管理员信息
     let authInfo: any = await isvApi.getCorpAuthInfo();
     let authUserInfo = authInfo.auth_user_info;
 
+    console.log("222");
     //agentID每次都会变,所以每次授权都要获取我们对应的agentid
     let agents = authInfo.auth_info.agent || [];
     let agentid = '';
@@ -85,6 +96,7 @@ export async function tmpAuthCode(msg) {
         let company = await corp.getCompany(corp['company_id']);
         //修改状态，可能解除过
         company.status = 1;
+        company.name = corp_name;
         company = await company.save();
 
         //解绑 == false
@@ -93,10 +105,16 @@ export async function tmpAuthCode(msg) {
         corp.agentid = agentid;
         //更新企业对照表
         corp = await corp.save();
+
+
+        console.log("企业信息有记录 , 已经更新");
     } else {
+        console.log("企业信息没有记录 , 创建企业");
         //创建企业
         let company = Company.create({name: corp_name});
         company = await company.save();
+        console.log("company created");
+
         let travelPolicy = await company.getDefaultTravelPolicy();
         let corp = Models.ddtalkCorp.create({
             id: company.id,
@@ -107,6 +125,7 @@ export async function tmpAuthCode(msg) {
             agentid: agentid
         });
         await corp.save();
+        console.log("ddtalkCorp  created");
 
         /* ====== 单独处理 创建者信息 ====== */
         //在staff中新增一个员工
@@ -119,6 +138,7 @@ export async function tmpAuthCode(msg) {
         staff.pwd = md5(DEFAULT_PWD);
         staff.company = company;
         staff = await staff.save();
+        console.log("staff  owner staff created.");
 
         //更新公司信息 ，保存创建者id
         company.createUser = staff.id;
@@ -139,7 +159,7 @@ export async function tmpAuthCode(msg) {
         /* ====== 单独处理 创建者信息 ===  END  === */
 
         //保存部门信息
-        console.log(userInfo);
+        console.log(userInfo , "创建结束");
         try {
             createCompanyOrganization(corpApi, corp);
         } catch (err) {
@@ -148,8 +168,8 @@ export async function tmpAuthCode(msg) {
         }
     }
 
-    await isvApi.activeSuite();
-    await corpApi.registryContractChangeLister(config.token, config.encodingAESKey, C.host + '/ddtalk/isv/receive');
+    // await isvApi.activeSuite();
+    // await corpApi.registryContractChangeLister(config.token, config.encodingAESKey, C.host + '/ddtalk/isv/receive');
 }
 
 
@@ -200,7 +220,7 @@ export async function _getSuiteToken(): Promise<any> {
     // return d;
 
 
-    return {"suite_access_token": "366a45abe28b37b29dae0fe4694e0a86", "expire_at": 1489560379128}
+    return {"suite_access_token": "442a927d52b03ac78626b229bf9caa3e", "expire_at": 1489560379128}
 }
 
 
@@ -238,6 +258,7 @@ async function getISVandCorp(permanentCode: string, corp): Promise<any> {
  *  corp    : ddtalk.corps 对象
  */
 export async function createCompanyOrganization(corpApi: CorpApi, corp: object) {
+    console.log("enter createCompanyOrganization");
     //拿到部门列表
     let departments = await corpApi.getDepartments();
     let company = await corp.getCompany(corp['company_id']);
@@ -306,6 +327,8 @@ export async function createCompanyOrganization(corpApi: CorpApi, corp: object) 
     //     dd.company = company;
     //     await dd.save();
     // }
+
+    console.log("createCompanyOrganization over");
 }
 
 /*
@@ -315,6 +338,7 @@ export async function createCompanyOrganization(corpApi: CorpApi, corp: object) 
  */
 
 export async function addCompanyStaffs(corpApi: CorpApi, DdDepartmentId: any, corp) {
+    console.log("enter addCompanyStaffs");
     let company = await corp.getCompany(corp["company_id"]);
     let corpid = corp.corpId;
     let dingUsers;
@@ -407,6 +431,8 @@ export async function addCompanyStaffs(corpApi: CorpApi, DdDepartmentId: any, co
             }
         }
     }
+
+    console.log("addCompanyStaffs  over");
 }
 
 /*
@@ -415,21 +441,21 @@ export async function addCompanyStaffs(corpApi: CorpApi, DdDepartmentId: any, co
  */
 
 export async function synchroDDorganization() {
-    let current = await Staff.getCurrent();
-    if(current.roleId != EStaffRole.OWNER && current.roleId != EStaffRole.ADMIN){
-        throw L.ERR.PERMISSION_DENY();
-    }
+    // let current = await Staff.getCurrent();
+    // if(current.roleId != EStaffRole.OWNER && current.roleId != EStaffRole.ADMIN){
+    //     throw L.ERR.PERMISSION_DENY();
+    // }
     /*let test = await Models.ddtalkCorp.find({where : { "companyId" : "658cd3a0-bde4-11e6-997b-a9af9a42d08a" }});
      test.map(async (item)=>{
-     await item.destroy();
+         await item.destroy();
      });
 
      test = Models.ddtalkCorp.create({
-     "companyId" : "658cd3a0-bde4-11e6-997b-a9af9a42d08a",
-     "corpId"    : "ding3c92322d23dbbbfa35c2f4657eb6378f",
-     "permanentCode" : "MiWZd0Ja6qRtHydnRjavun3Hv6xEjSQ0oyaAkGO2bP2wAQb0L6NeLvOQ1KQPrABD",
-     "isSuiteRelieve" : false,
-     "agentid" : "80673127"
+        "companyId" : "658cd3a0-bde4-11e6-997b-a9af9a42d08a",
+        "corpId"    : "ding3c92322d23dbbbfa35c2f4657eb6378f",
+        "permanentCode" : "MiWZd0Ja6qRtHydnRjavun3Hv6xEjSQ0oyaAkGO2bP2wAQb0L6NeLvOQ1KQPrABD",
+        "isSuiteRelieve" : false,
+        "agentid" : "81524283"
      });
      test = await test.save();
 
@@ -457,9 +483,11 @@ export async function synchroDDorganization() {
 }
 
 
+
 setTimeout(() => {
     // synchroDDorganization();
     // deleteCompanyOrganization("658cd3a0-bde4-11e6-997b-a9af9a42d08a");
+    tmpAuthCode();
 }, 8000);
 
 

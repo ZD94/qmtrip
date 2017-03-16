@@ -81,6 +81,8 @@ class DDTalk {
                 return res.reply();
             }
 
+            // return;
+
             return ddTalkMsgHandle[msg.EventType](msg)
                 .then((ret) => {
                     res.reply();
