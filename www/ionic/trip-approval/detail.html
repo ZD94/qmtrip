@@ -55,7 +55,7 @@
                     <button class="button button_right" ng-if="isHasPermissionApprove" ng-click="confirmButton()" style='color:#ffffff;background-color: #28A7E1'>同意
                     </button>
                     <button class="button button_right button-calm" ng-if="!isHasApprove && !isHasPermissionApprove"
-                            ng-click="cancelTripApprove()">撤销行程
+                            ng-click="cancelTripApprove()" >撤销行程
                     </button>
                 </bottom-bar>
                 <bottom-bar ng-if="tripApprove.status == EApproveStatus.REJECT">
