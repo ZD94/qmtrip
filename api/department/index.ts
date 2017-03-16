@@ -341,11 +341,11 @@ class DepartmentModule{
         let staffs = await Models.staff.find(options);
 
         //取出集合之后排序 不是对全部数据进行排序会出问题
-        if(_order == 'status'){
+        /*if(_order == 'status'){
             staffs.sort(function(a,b){
                 return a.status - b.status;
             })
-        }
+        }*/
         return staffs;
     }
 

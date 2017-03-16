@@ -148,8 +148,8 @@ angular
                 } else if ([ETripType.OUT_TRIP, ETripType.BACK_TRIP, ETripType.SPECIAL_APPROVE].indexOf($scope.item.type) >= 0) {
                     let deptCity = await City.getCity($scope.item.deptCity);
                     let arrivalCity = await City.getCity($scope.item.arrivalCity);
-                    $scope.item.deptCity = deptCity ? deptCity.name: '未知';
-                    $scope.item.arrivalCity = arrivalCity ? arrivalCity.name : '未知';
+                    $scope.item.deptCity = deptCity ? deptCity.name: null;
+                    $scope.item.arrivalCity = arrivalCity ? arrivalCity.name : null;
                     if ($scope.item.invoiceType == EInvoiceType.TRAIN) {
                         $scope.item.cabin = MTrainLevel[$scope.item.cabin];
                     } else {

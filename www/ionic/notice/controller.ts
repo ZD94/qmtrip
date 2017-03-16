@@ -10,25 +10,36 @@ export async function IndexController($scope, Models, $ionicPopup, $stateParams)
     require('./notice.scss');
     $scope.notices = [];
     var staff = await Staff.getCurrent();
-    var pager = await staff.getSelfNotices({where: {type: $stateParams.type}});
-    $scope.pager = pager;
+    var pager = await staff.getSelfNotices({limit: 5,where: {type: $stateParams.type}});
     await loadStaffs(pager);
-    var pagersDate = {
-        isHasNextPage:true,
+    var vm = {
+        hasNextPage: function() {
+            return pager.totalPages-1 > pager.curPage;
+        },
         nextPage : async function() {
             try {
-                pager = await $scope.pager['nextPage']();
-            } catch(err) {
-                this.isHasNextPage = false;
+                let newArr =[];
+                let join = {};
+                pager = await pager.nextPage();
+                await Promise.all(pager.map(async function(item){
+                    let relate = await Models.noticeAccount.find({where: {accountId: staff.id, noticeId: item.id}});
+                    if(relate && relate.length >0){
+                        item["isRead"] = relate[0].isRead;
+                    }else{
+                        item["isRead"] = false;
+                    }
+                    $scope.notices.push(item);
+                }))
+            }catch(err) {
+                alert("获取数据时,发生异常");
                 return;
+            } finally {
+                $scope.$broadcast('scroll.infiniteScrollComplete');
             }
-            $scope.pager = pager;
-            await loadStaffs(pager);
-            $scope.$broadcast('scroll.infiniteScrollComplete');
         },
         doRefresh: async function(){
             try{
-                pager = await staff.getSelfNotices({where: {type: $stateParams.type}});
+                pager = await staff.getSelfNotices({limit: 5, where: {type: $stateParams.type}});
             } catch(err){
                 msgbox.log('刷新失败');
                 return
@@ -38,10 +49,18 @@ export async function IndexController($scope, Models, $ionicPopup, $stateParams)
             $scope.$broadcast('scroll.refreshComplete');
         }
     }
+
+    $scope.vm = vm;
     
     async function loadStaffs(pager) {
         if(pager && pager.length>0){
             await Promise.all(pager.map(async function(notice){
+                let relate = await Models.noticeAccount.find({where: {accountId: staff.id, noticeId: notice.id}});
+                if(relate && relate.length >0){
+                    notice["isRead"] = relate[0].isRead;
+                }else{
+                    notice["isRead"] = false;
+                }
                 $scope.notices.push(notice);
             }));
         }
@@ -54,9 +73,6 @@ export async function IndexController($scope, Models, $ionicPopup, $stateParams)
             });
         }
     }
-
-    $scope.pagersDate = pagersDate;
-
 
     $scope.detail = async function (notice) {
         //标记已读
