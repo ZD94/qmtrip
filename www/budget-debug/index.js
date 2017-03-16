@@ -555,6 +555,8 @@ app.controller('debug',function($scope, $http, $location){
     }
       //  将价格区间的json对象转换为json字符串
       rangeStrChangeJson();
+
+
     //算法描述翻译
     /*translate_prefer = [];
     for (var i = 0; i < $scope.ori_prefers.length; i++) {
@@ -565,7 +567,8 @@ app.controller('debug',function($scope, $http, $location){
         }
     }
     $scope.translate_prefer = translate_prefer;*/
-
+    console.log($scope.ori_prefers);
+      levelChange();
       //翻译舱位
       changeLevel();
       if($scope.result){
@@ -624,7 +627,9 @@ app.controller('debug',function($scope, $http, $location){
     function rangeStrChangeJson() {
         for(var i = 0; i < $scope.ori_prefers.length; i++) {
             if($scope.ori_prefers[i].name == "priceRange") {
-                $scope.ori_prefers[i].options.range=JSON.stringify($scope.ori_prefers[i].options.range);
+                if(typeof ($scope.ori_prefers[i].options.range) != "string") {
+                    $scope.ori_prefers[i].options.range=JSON.stringify($scope.ori_prefers[i].options.range);
+                }
             }
         }
     }
@@ -632,7 +637,9 @@ app.controller('debug',function($scope, $http, $location){
     function rangeJsonChangeStr() {
         for(var i = 0; i < $scope.ori_prefers.length; i++) {
             if($scope.ori_prefers[i].name == "priceRange") {
-                $scope.ori_prefers[i].options.range=JSON.parse($scope.ori_prefers[i].options.range);
+                if(typeof ($scope.ori_prefers[i].options.range) == "string") {
+                    $scope.ori_prefers[i].options.range=JSON.parse($scope.ori_prefers[i].options.range);
+                }
             }
         }
     }
@@ -694,7 +701,12 @@ app.controller('debug',function($scope, $http, $location){
             }
             if($scope.ori_prefers[i].name == "planePricePrefer") {
                 if($scope.ori_prefers[i].options.cabins){
-                    $scope.ori_prefers[i].options.cabins = $scope.ori_prefers[i].options.cabins.match(/\d/g);
+                    if(typeof ($scope.ori_prefers[i].options.cabins) == "string"){
+                        $scope.ori_prefers[i].options.cabins = $scope.ori_prefers[i].options.cabins.match(/\d/g);
+                    }
+                    else {
+                        $scope.ori_prefers[i].options.cabins = $scope.ori_prefers[i].options.cabins.join("").match(/\d/g);
+                    }
                 }
             }
         }
