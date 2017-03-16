@@ -1,7 +1,7 @@
 import { Staff } from 'api/_types/staff/staff';
 var msgbox = require('msgbox');
 
-export async function EditPwdController($scope,Models,$ionicHistory,$storage,$ionicPopup,CNZZ) {
+export async function EditPwdController($scope,Models,$ionicHistory,$storage,$ionicPopup) {
     $scope.isDingtalk = /dingtalk/i.test(window.navigator.userAgent);
     require('./edit-mobile.scss');
     await API.onload();
@@ -56,7 +56,6 @@ export async function EditPwdController($scope,Models,$ionicHistory,$storage,$io
                         }
                     ]
                 })
-                CNZZ.addEvent("修改个人资料","修改","修改密码",staff);
             })
             .catch(function(err){
                 msgbox.log(err.msg||err);

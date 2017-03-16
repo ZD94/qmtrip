@@ -206,6 +206,8 @@ function initUpdater($ionicPlatform, $ionicPopup) {
                     "/trip/list" : "进入我的行程",
                     "/supplier/edit" : "新增自定义服务商",
                     "invoice/invoice-detail" : "查看票据",
+                    " /invoice/invoice-detail" :"票据详情页",
+                    "/trip/reserve" : "访问服务商",
                     "/trip/select-supplier" : "关联订单",
                     "trip/list-detail" : "撤销行程",
                     "/trip-approval/list" : "进入出差请示",

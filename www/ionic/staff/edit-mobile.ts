@@ -2,7 +2,7 @@ import { Staff } from 'api/_types/staff/staff';
 import moment = require('moment');
 var msgbox = require('msgbox');
 
-export async function EditMobileController($scope,Models,$ionicHistory,CNZZ) {
+export async function EditMobileController($scope,Models,$ionicHistory) {
     $scope.isDingtalk = /dingtalk/i.test(window.navigator.userAgent);
     require('./edit-mobile.scss');
     API.require('checkcode');
@@ -72,7 +72,6 @@ export async function EditMobileController($scope,Models,$ionicHistory,CNZZ) {
         staff.modifyMobile({msgCode: $scope.form.msgCode, msgTicket: $scope.form.msgTicket, mobile: $scope.form.mobile, pwd: $scope.form.pwd})
             .then(function(result){
                 msgbox.log("修改成功");
-                CNZZ.addEvent("修改个人资料","修改","修改手机号",staff);
                 $ionicHistory.goBack(-1);
             })
             .catch(function(err){

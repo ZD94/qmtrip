@@ -109,7 +109,7 @@ export function getImageUrl(id){
     return url.href;
 }
 
-export async function IndexController($scope, Menu, $ionicPopup, $storage, $location, $ionicSideMenuDelegate, Models,CNZZ) {
+export async function IndexController($scope, Menu, $ionicPopup, $storage, $location, $ionicSideMenuDelegate, Models) {
     require('./index.scss');
 
     $scope.showErrorMsg = function (msg) {
@@ -120,7 +120,6 @@ export async function IndexController($scope, Menu, $ionicPopup, $storage, $loca
     };
     $scope.isShowLogout = !/dingtalk/i.test(window.navigator.userAgent);
     $scope.logout = async function () {
-        CNZZ.addEvent("退出登录","退出","退出登录",'');
         await API.onload();
         var browserspec = require('browserspec');
         if (browserspec.is_wechat) {
