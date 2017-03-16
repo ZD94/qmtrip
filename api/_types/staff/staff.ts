@@ -214,7 +214,7 @@ export class Staff extends ModelObject implements Account {
                     }
                 });
                 if(staffDepartment && staffDepartment.length){
-                    continue;
+                    // continue;
                 }else{
                     //插入数据
                     await(await Models.staffDepartment.create({

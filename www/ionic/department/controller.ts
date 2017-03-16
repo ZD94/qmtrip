@@ -2,6 +2,7 @@ import { Department } from 'api/_types/department';
 import {Staff, EStaffRoleNames, EStaffRole} from 'api/_types/staff/staff';
 import moment = require('moment');
 import {Pager} from "common/model/pager";
+import {multipleMoveController} from "./multiple-move";
 var msgbox = require('msgbox');
 
 export async function IndexController($scope, $stateParams, Models, $ionicPopup, $ionicNavBarDelegate,$timeout, $location,ngModalDlg, $ionicHistory, $window, sortDlg) {
@@ -16,6 +17,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     let rootDepartment : Department;
     let newUrl;
     $scope.policy_staffs = [];//用于存放可以展示差旅标准的staff list
+    $scope.moveStaffIds = [];
     if(departmentId){
         if($location.path() == '/department/index' ||$location.path() == '/department/'){
             newUrl = `#/department/index-instead`;
@@ -83,7 +85,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
                 travelPolicy = {};
                 travelPolicy.name = '';
             }
-            $scope.policy_staffs.push({staff: staff,travelPolicy: travelPolicy.name});
+            $scope.policy_staffs.push({staff: staff,travelPolicy: travelPolicy.name, value: staff.id});
         }))
     }
     await initDepartment(departmentId);
@@ -160,7 +162,44 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
             template: require('./set-department.html'),
             controller: setDepartmentController
         })
-        initDepartment(departmentId);
+        if(result.destroy){
+            initDepartment();
+        }else{
+            initDepartment(departmentId);
+        }
+    }
+    $scope.multipleMove = async function(){
+        let moveStaffIds;
+        let fromDepartmentId;
+        if($scope.moveStaffIds.length>0){
+            moveStaffIds = $scope.moveStaffIds;
+        }else{
+            moveStaffIds = [];
+        }
+        if(!departmentId){
+            fromDepartmentId = rootDepartment.id;
+        }else{
+            fromDepartmentId = departmentId;
+        }
+        let result = await ngModalDlg.createDialog({
+            parent:$scope,
+            scope: {
+                moveStaffIds: moveStaffIds,
+                company: company
+            },
+            template: require('./multiple-move.html'),
+            controller: multipleMoveController
+        })
+        if(result){
+            try{
+                let ret = await staff.moveStaffsDepartment({staffIds:result.staffIds,fromDepartmentId:fromDepartmentId,departmentIds:result.departmentIds})
+                await initDepartment(departmentId);
+                $scope.policy_staffs = [];
+                await initTravelPolicy($scope.staffs);
+            }catch(e){
+                msgbox.log(e.msg || e);
+            }
+        }
     }
     $scope.goChildDept = async function(id){
         let department = await Models.department.get(id);
@@ -177,10 +216,10 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         },
         display: (staff)=>staff.name
     };
-    async function setDepartmentController($scope,ngModalDlg){
+
+    async function setDepartmentController($scope,ngModalDlg,$ionicHistory){
         require('./set-dialog.scss');
         $scope.chooseParent = async function () {
-            console.info($scope.department);
             let parentDepartment = await ngModalDlg.createDialog({
                 parent: $scope,
                 scope: {
@@ -201,7 +240,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
                 return false;
             }
             if(fields.name || fields.parentId){
-                let departmentName = await Models.department.find({where:{'name':department.name,'companyId':department.companyId}})
+                let departmentName = await Models.department.find({where:{'name':department.name,'companyId':department.companyId,'parentId':department.parent.id}})
                 if(departmentName.length>0){
                     msgbox.log('部门名称已存在');
                     return false;
@@ -240,12 +279,8 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
                             onTap: async function(){
                                 try{
                                     await $scope.department.destroy();
-                                    $ionicHistory.nextViewOptions({
-                                        disableBack: true,
-                                        expire: 300
-                                    });
-                                    $scope.confirmModal();
                                     window.location.href = '#/department/index';
+                                    $scope.confirmModal({destroy:true});
 
                                 }catch(e){
                                     msgbox.log(e.msg);
