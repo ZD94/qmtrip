@@ -15,14 +15,15 @@ image: docker:git
 before_script:
   - 'eval $(ssh-agent -s) && echo "$SSH_PRIVATE_KEY">.k && chmod 600 .k && ssh-add .k && rm -f .k'
   - 'mkdir -p ~/.ssh && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-
-  - ln -s /opt/app/node_modules .
+  - mkdir -p /cache/build-cache/.npm
+  - mkdir -p /cache/build-cache/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME/$CI_BUILD_REF_SLUG/node_modules
+  - ln -s /cache/build-cache/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME/$CI_BUILD_REF_SLUG/node_modules .
 
 build:dist:
   stage: build
   only:
     - branches
-  image: $DOCKER_REG/jl-build
+  image: jl-build
   cache:
     key: $CI_PIPELINE_ID
     paths:
@@ -30,8 +31,8 @@ build:dist:
   script:
     - git submodule update --init --checkout
     - npm --registry https://npm.l.jingli365.com install
-    - gulp tarball -n $CI_BUILD_REF_NAME
-    - scp $CI_PROJECT_NAME-$CI_BUILD_REF_NAME-*.tar.gz test@git.l.jingli365.com:~/versions/
+    - gulp tarball -n $CI_BUILD_REF_SLUG
+    - scp $CI_PROJECT_NAME-$CI_BUILD_REF_SLUG-*.tar.gz test@git.l.jingli365.com:~/versions/
 
 build:image:
   stage: docker
