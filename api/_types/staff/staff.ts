@@ -216,12 +216,13 @@ export class Staff extends ModelObject implements Account {
                 });
                 if(staffDepartment && staffDepartment.length){
                     continue;
+                }else{
+                    //插入数据
+                    await(await Models.staffDepartment.create({
+                        staffId: staff.id , departmentId: department.id
+                    })).save();
                 }
 
-                //插入数据
-                await(await Models.staffDepartment.create({
-                    staffId: staff.id , departmentId: department.id
-                })).save();
                 //删除数据
                 let fromData = await Models.staffDepartment.find({
                     where : {
