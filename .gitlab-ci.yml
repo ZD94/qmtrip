@@ -4,6 +4,7 @@ variables:
   DOCKER_NAME: $CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
   DOCKER_CI_NAME: $DOCKER_REG/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME:$CI_BUILD_REF
   DOCKER_BRANCH_NAME: $DOCKER_REG/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME:$CI_BUILD_REF_SLUG
+  NPM_CACHE_DIR: /cache/build-cache/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME/$CI_BUILD_REF_SLUG
 
 stages:
   - build
@@ -15,16 +16,13 @@ image: docker:git
 before_script:
   - 'eval $(ssh-agent -s) && echo "$SSH_PRIVATE_KEY">.k && chmod 600 .k && ssh-add .k && rm -f .k'
   - 'mkdir -p ~/.ssh && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-  - mkdir -p /cache/build-cache/.npm
-  - ln -s /cache/build-cache/.npm ~/.npm
-  - mkdir -p /cache/build-cache/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME/$CI_BUILD_REF_SLUG/node_modules
-  - ln -s /cache/build-cache/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME/$CI_BUILD_REF_SLUG/node_modules .
+  - mkdir -p /cache/build-cache/.npm && ln -s /cache/build-cache/.npm ~/
 
 build:dist:
   stage: build
   only:
     - branches
-  image: jl-build
+  image: $DOCKER_REG/jl-build:v2
   tags:
     - serial
   cache:
@@ -32,6 +30,7 @@ build:dist:
     paths:
       - dist/
   script:
+    - mkdir -p $NPM_CACHE_DIR/node_modules && ln -s $NPM_CACHE_DIR/node_modules .
     - git submodule update --init --checkout
     - npm --registry https://npm.l.jingli365.com install
     - gulp tarball -n $CI_BUILD_REF_SLUG
