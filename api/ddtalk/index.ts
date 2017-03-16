@@ -3,6 +3,7 @@
  */
 
 'use strict';
+
 const API = require('common/api');
 let dingSuiteCallback = require("dingtalk_suite_callback");
 import fs = require("fs");
@@ -36,7 +37,9 @@ let ddTalkMsgHandle = {
     change_auth: async function(msg) {
         return msg;
     },
-
+    check_url: async function(msg) {
+        return msg;
+    },
     /* * * * 解除授权信息 * * * */
     suite_relieve: async function(msg) {
         DealEvent.suiteRelieve(msg);
@@ -45,17 +48,32 @@ let ddTalkMsgHandle = {
     /* * * 保存授权信息 , 每20分钟钉钉会请求一次 * * */
     suite_ticket: async function(msg) {
         let ticket = msg.SuiteTicket;
-        await cache.write(CACHE_KEY, JSON.stringify({ticket: ticket, timestamp: msg.TimeStamp}));
-        return msg;
+        await cache.write(CACHE_KEY, JSON.stringify({
+            ticket: ticket, timestamp: msg.TimeStamp
+        }));
     },
 
     /* * * 企业增加员工 * * */
     user_add_org: async function(msg) {
         DealEvent.userAddOrg(msg);
     },
-    check_url: async function(msg) {
+
+    /* * 通讯录用户更改 * */
+    user_modify_org : async function(msg){
+        DealEvent.userAddOrg(msg);
+    },
+    /* * 通讯录用户离职 * */
+    user_leave_org : async function(msg){
         return msg;
     },
+    /* * 通讯录用户被设为管理员 * */
+    // org_admin_add : async function(msg){
+    //     return msg;
+    // },
+    /* * 通讯录用户被取消设置管理员 * */
+    // org_admin_remove : async function(msg){
+    //     return msg;
+    // },
     /* * *  通讯录企业部门创建 * * */
     org_dept_create : async function(msg){
         DealEvent.orgDeptCreate(msg);
@@ -69,6 +87,11 @@ let ddTalkMsgHandle = {
         DealEvent.orgDeptRemove(msg);
         return msg;
     },
+    /* * *  企业被解散 * * */
+    org_remove : async function(msg){
+        DealEvent.orgDeptRemove(msg);
+        return msg;
+    }
 }
 
 
@@ -80,8 +103,6 @@ class DDTalk {
             if(!ddTalkMsgHandle[msg.EventType]){
                 return res.reply();
             }
-
-            // return;
 
             return ddTalkMsgHandle[msg.EventType](msg)
                 .then((ret) => {
