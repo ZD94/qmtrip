@@ -196,7 +196,7 @@ function initUpdater($ionicPlatform, $ionicPopup) {
                let reg = /\/[a-zA-Z-]*\/index$/i;
                let ret = reg.test(url);
                if(ret){
-                   url = url.substring(url.length-5,6);
+                   url = url.substring(url.length-6,6);
                }
                 var titles = {
                     "/staff/index" : "进入个人中心",
