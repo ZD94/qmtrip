@@ -454,7 +454,6 @@ app.controller('debug',function($scope, $http, $location){
     $.post(originServerUrl, {originData: originData, query: query, policy: policy, prefers: prefers, type: type},function(datas) {
         $scope.result = datas;
         $scope.originData.markedData = datas.markedScoreData;
-        console.log($scope.result);
     }, "json")
     // $http.post(originServerUrl,{originData: originData, query: query, policy: policy, prefers: prefers, type: type})
     //     .success(function(datas){
@@ -567,7 +566,6 @@ app.controller('debug',function($scope, $http, $location){
         }
     }
     $scope.translate_prefer = translate_prefer;*/
-    console.log($scope.ori_prefers);
       levelChange();
       //翻译舱位
       changeLevel();
