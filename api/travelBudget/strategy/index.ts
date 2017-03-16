@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {ITicket, IFinalTicket, TravelBudgeItem, IHotel, IFinalHotel} from "api/_types/travelbudget";
+import {ITicket, IFinalTicket, TravelBudgeItem, IHotel, IFinalHotel, TravelBudgeTraffic, TravelBudgetHotel} from "api/_types/travelbudget";
 import {ticketPrefers, hotelPrefers} from '../prefer'
 import {EInvoiceType} from "api/_types/tripPlan";
 import {IPrefer} from '../prefer'
@@ -93,7 +93,7 @@ export abstract class AbstractHotelStrategy {
 
     abstract async customMarkedScoreData(hotels: IFinalHotel[]) :Promise<IFinalHotel[]>;
 
-    async getResult(hotels: IHotel[], isRetMarkedData?: boolean): Promise<TravelBudgeItem> {
+    async getResult(hotels: IHotel[], isRetMarkedData?: boolean): Promise<TravelBudgetHotel> {
         let _hotels = formatHotel(hotels);
         if (!_hotels || !_hotels.length) {
             const defaultPrice = {
@@ -119,7 +119,11 @@ export abstract class AbstractHotelStrategy {
             star: ret.star,
             latitude: ret.latitude,
             longitude: ret.longitude,
-        }
+            checkInDate: this.qs.query.checkInDate,
+            checkOutDate: this.qs.query.checkOutDate,
+            cityName: this.qs.query.city.name,
+            hotelName: this.qs.query.hotelName
+        }as TravelBudgetHotel
         if (isRetMarkedData) {
             result.markedScoreData = _hotels;
         }
@@ -199,7 +203,7 @@ export abstract class AbstractTicketStrategy {
 
     abstract async customerMarkedScoreData(tickets: IFinalTicket[]): Promise<IFinalTicket[]>;
 
-    async getResult(tickets: ITicket[], isRetMarkedData?: boolean) :Promise<TravelBudgeItem> {
+    async getResult(tickets: ITicket[], isRetMarkedData?: boolean) :Promise<TravelBudgeTraffic> {
         let _tickets = formatTicketData(tickets);
         if (!_tickets || !_tickets.length) {
             return {
@@ -223,7 +227,8 @@ export abstract class AbstractTicketStrategy {
             originPlace: ret.originPlace,
             departDateTime: ret.departDateTime,
             arrivalDateTime: ret.arrivalDateTime,
-        } as TravelBudgeItem;
+            leaveDate: this.qs.query.leaveDate
+        } as TravelBudgeTraffic;
         if (isRetMarkedData) {
             result.markedScoreData = _tickets;
         }

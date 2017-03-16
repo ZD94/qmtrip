@@ -164,6 +164,14 @@ export class TripPlan extends ModelObject {
     get query() : any { return null};
     set query(obj: any) {}
 
+    @Field({ type: Types.JSONB})
+    get projectIds() : any { return null};
+    set projectIds(obj: any) {}
+
+    @Field({ type: Types.JSONB})
+    get arrivalCityCodes() : any { return null};
+    set arrivalCityCodes(obj: any) {}
+
     @Field({type: Types.STRING})
     get title(): string { return ''; }
     set title(val: string) {}
@@ -413,6 +421,14 @@ export class TripApprove extends ModelObject{
     @Field({ type: Types.JSONB})
     get query() : any { return null};
     set query(obj: any) {}
+
+    @Field({ type: Types.JSONB})
+    get projectIds() : any { return null};
+    set projectIds(obj: any) {}
+
+    @Field({ type: Types.JSONB})
+    get arrivalCityCodes() : any { return null};
+    set arrivalCityCodes(obj: any) {}
 
     @Field({type: Types.STRING})
     get title(): string { return ''; }
