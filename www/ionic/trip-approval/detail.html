@@ -50,7 +50,7 @@
                         <div class="list" style="overflow: hidden;text-overflow: ellipsis;">等待{{tripApprove.approveUser.name}}审批</div>
                         <div class="list">查看审批详情</div>
                     </div>
-                    <button class="button button_left" ng-if="isHasPermissionApprove" ng-click="showReasonDialog()" style='color:#ffffff;background-color: #D0021B;' ng-stat-event="驳回">驳回
+                    <button class="button button_left" ng-if="isHasPermissionApprove" ng-click="showReasonDialog()" style='color:#ffffff;background-color: #D0021B;' ng-stat-event="驳回审批">驳回
                     </button>
                     <button class="button button_right" ng-if="isHasPermissionApprove" ng-click="confirmButton()" style='color:#ffffff;background-color: #28A7E1'>同意
                     </button>
@@ -88,7 +88,7 @@
                         <div class="list">等待{{tripApprove.approveUser.name}}审批</div>
                         <div class="list">查看审批详情</div>
                     </div>
-                    <button class="button button_left" ng-if="isHasPermissionApprove" ng-click="showReasonDialog()" style='color:#ffffff;background-color: #D0021B;' ng-stat-event="驳回">驳回
+                    <button class="button button_left" ng-if="isHasPermissionApprove" ng-click="showReasonDialog()" style='color:#ffffff;background-color: #D0021B;' ng-stat-event="驳回审批">驳回
                     </button>
                     <button class="button button_right" ng-if="isHasPermissionApprove" ng-click="confirmButton()" style='color:#ffffff;background-color: #28A7E1'>同意
                     </button>
@@ -126,7 +126,7 @@
                         <div class="list">审批将通过钉钉完成</div>
                         <div class="list">请到钉钉查看审批进度</div>
                     </div>
-                    <button class="button button_left" ng-if="isHasPermissionApprove" ng-click="showReasonDialog()" style='color:#ffffff;background-color: #D0021B;'>驳回
+                    <button class="button button_left" ng-if="isHasPermissionApprove" ng-click="showReasonDialog()" style='color:#ffffff;background-color: #D0021B;' ng-stat-event="驳回审批">驳回
                     </button>
                     <button class="button button_right" ng-if="isHasPermissionApprove" ng-click="confirmButton()" style='color:#ffffff;background-color: #28A7E1'>同意
                     </button>
