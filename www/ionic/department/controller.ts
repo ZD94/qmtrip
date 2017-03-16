@@ -93,7 +93,8 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
                 let newArr =[];
                 let join = {};
                 $scope.staffPagers = await $scope.staffPagers.nextPage();
-                await initTravelPolicy($scope.staffPagers);
+                await initStaffs($scope.staffPagers);
+                await initTravelPolicy($scope.staffs);
             } catch(err) {
                 console.info(err);
                 alert("获取数据时,发生异常");
