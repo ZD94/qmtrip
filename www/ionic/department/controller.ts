@@ -162,7 +162,11 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
             template: require('./set-department.html'),
             controller: setDepartmentController
         })
-        initDepartment(departmentId);
+        if(result.destroy){
+            initDepartment();
+        }else{
+            initDepartment(departmentId);
+        }
     }
     $scope.multipleMove = async function(){
         let moveStaffIds;
@@ -213,7 +217,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         display: (staff)=>staff.name
     };
 
-    async function setDepartmentController($scope,ngModalDlg){
+    async function setDepartmentController($scope,ngModalDlg,$ionicHistory){
         require('./set-dialog.scss');
         $scope.chooseParent = async function () {
             let parentDepartment = await ngModalDlg.createDialog({
@@ -236,7 +240,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
                 return false;
             }
             if(fields.name || fields.parentId){
-                let departmentName = await Models.department.find({where:{'name':department.name,'companyId':department.companyId}})
+                let departmentName = await Models.department.find({where:{'name':department.name,'companyId':department.companyId,'parentId':department.parent.id}})
                 if(departmentName.length>0){
                     msgbox.log('部门名称已存在');
                     return false;
@@ -275,12 +279,8 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
                             onTap: async function(){
                                 try{
                                     await $scope.department.destroy();
-                                    $ionicHistory.nextViewOptions({
-                                        disableBack: true,
-                                        expire: 300
-                                    });
-                                    $scope.confirmModal();
                                     window.location.href = '#/department/index';
+                                    $scope.confirmModal({destroy:true});
 
                                 }catch(e){
                                     msgbox.log(e.msg);
