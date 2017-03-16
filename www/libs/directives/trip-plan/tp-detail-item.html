@@ -3,7 +3,7 @@
         <span>{{title}}</span>
     </ion-item>
     <ion-item class="item-divider" ng-if="title && item.type == ETripType.SPECIAL_APPROVE">
-        <span>{{item.deptCity}} - {{item.arrivalCity}}</span>
+        <span><span ng-if="item.deptCity">{{item.deptCity}} - </span>{{item.arrivalCity}}</span>
     </ion-item>
 
     <ion-item class="item-divider" style="background-color:#fff">
