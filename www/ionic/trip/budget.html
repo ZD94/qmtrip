@@ -37,7 +37,7 @@
                             <span ng-if='budget.tripType == ETripType.SUBSIDY'>补助</span>
                             <!--<span style="float: right">{{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')}}{{budget.price == -1 ? '' : '元'}}</span>-->
                         </ion-item>
-                        <ion-item>
+                        <ion-item class="item-divider">
                             <div ng-if="budget.tripType == ETripType.BACK_TRIP">
                                 <span>{{trip.endDate | date: 'MM-dd'}}</span>
                                 <span class="spanRight">{{budget.price <=0 ? '暂无预算' : (budget.price| currency_int)+'元'}}</span>
