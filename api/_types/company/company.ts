@@ -296,6 +296,10 @@ export class Company extends ModelObject{
         if(params && params.number){
             number = params.number;
         }
+        //过期企业 套餐会被置为0 冻结数不能被自动审批通过
+        /*if(self.expiryDate && (self.expiryDate.getTime() - new Date().getTime()) < 0){
+            return true;
+        }*/
         //套餐内剩余量
         let surplus = self.tripPlanNumLimit - self.tripPlanPassNum;
         if(!(surplus >= number)){
@@ -582,7 +586,7 @@ export class Company extends ModelObject{
         return Models.department.find(options);
     }
 
-    getTravelPolicies(): Promise<TravelPolicy[]> {
+    getTravelPolicies(): Promise<PaginateInterface<TravelPolicy>> {
         let query = { where: {companyId: this.id}}
         return Models.travelPolicy.find(query);
     }

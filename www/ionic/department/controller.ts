@@ -54,22 +54,17 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
 
         let staffs = await rootDepartment.getStaffs();
         $scope.staffPagers = staffs;
-        Object.setPrototypeOf($scope.staffPagers, Pager.prototype);
+        // Object.setPrototypeOf($scope.staffPagers, Pager.prototype);
         await initStaffs(staffs);
         $scope.departments = departments;
         $scope.currentDepartments = departments;
     }
     async function initStaffs(staffs){
-        Object.setPrototypeOf(staffs, Pager.prototype);
         $scope.staffs = await Promise.all(staffs.map(async function(staff){
-            API.require("auth");
-            await API.onload();
-            let acc = await API.auth.getAccountStatus({id: staff.id});
-            staff['signStatus'] = acc.status;
             let hours = moment().diff(moment(staff.createdAt),'hours');
-            if(staff.signStatus == 1 && hours < 24){
+            if(staff.status == 1 && hours < 24){
                 staff['newStaff'] = true;
-            }else if(!staff.signStatus || staff.signStatus == 0){
+            }else if(!staff.status || staff.status == 0){
                 staff['newRegister'] = true;
             }else{
                 staff['newStaff'] = false;
@@ -77,6 +72,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
             }
             return staff;
         }))
+        $scope.staffPagers = staffs;
     }
     async function initTravelPolicy(staffs){
         await Promise.all(staffs.map(async function(staff){
@@ -99,8 +95,10 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
                 let newArr =[];
                 let join = {};
                 $scope.staffPagers = await $scope.staffPagers.nextPage();
-                await initTravelPolicy($scope.staffPagers);
+                await initStaffs($scope.staffPagers);
+                await initTravelPolicy($scope.staffs);
             } catch(err) {
+                console.info(err);
                 alert("获取数据时,发生异常");
                 return;
             } finally {
@@ -111,14 +109,21 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     $scope.page = page;
     $scope.EStaffRoleNames = EStaffRoleNames;
     $scope.EStaffRole = EStaffRole;
-    $scope.arrlist = [
+    /*$scope.arrlist = [
         {name:'最近加入',value:'',icon:'fa-sort-amount-desc'},
         {name:'姓名(A-Z)',value:'nameAsc',icon:'fa-sort-amount-asc'},
         {name:'姓名(Z-A)',value:'nameDesc',icon:'fa-sort-amount-desc'},
         {name:'角色',value:'role',icon:'fa-sort-amount-desc'},
         {name:'差旅标准',value:'travelPolicy',icon:'fa-sort-amount-desc'},
         {name:'激活状态',value:'status',icon:'fa-sort-amount-desc'},
-        ]
+        ]*/
+    $scope.arrlist = [
+        {name:'最近加入',value:'',icon:'fa-sort-amount-desc'},
+        {name:'姓名(A-Z)',value:'nameAsc',icon:'fa-sort-amount-asc'},
+        {name:'姓名(Z-A)',value:'nameDesc',icon:'fa-sort-amount-desc'},
+        {name:'角色',value:'role',icon:'fa-sort-amount-desc'},
+        {name:'差旅标准',value:'travelPolicy',icon:'fa-sort-amount-desc'}
+    ]
     $scope.selected = {name:'最近加入',value:'',icon:'fa-sort-amount-desc'};
     $scope.sortBy = async function(selected){
         let staffs = await rootDepartment.getStaffs({where:{},order: selected});
