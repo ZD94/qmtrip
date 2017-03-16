@@ -98,11 +98,7 @@ class StaffModule{
                 values: values,
                 accountId: staff.id
             });
-            await StaffModule.sendNoticeToAdmins({
-                companyId:company.id,
-                name:staff.name,
-                noticeTemplate:"qm_notify_admins_add_staff"
-            });
+
         }catch(e){
             console.info(e);
         }
@@ -735,11 +731,7 @@ class StaffModule{
                 travelPolicyId: item.travelPolicyId, companyId: item.companyId, addWay: EAddWay.BATCH_IMPORT, isNeedChangePwd: true, };
             let staffAdded = await StaffModule.createStaff(staffObj);
             await staffAdded.saveStaffDepartments(deptIds);
-             StaffModule.sendNoticeToAdmins({
-                companyId:item.companyId,
-                name:item.name,
-                noticeTemplate:"qm_notify_admins_add_staff"
-             });
+
         }));
         
         await API.attachments.removeFileAndAttach({id: fileId});

@@ -330,10 +330,6 @@ export default class ApiTravelBudget {
         qs.query = query;
         let hotels = await API.hotel.search_hotels(query);
 
-
-        console.log("hotel: ",hotels);
-
-
         let strategy = await HotelBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
         let budget = await strategy.getResult(hotels);
         budget.type = EInvoiceType.HOTEL;
@@ -348,85 +344,6 @@ export default class ApiTravelBudget {
 
 
     }
-
-    /*
-     *逻辑：根据提供一張默认的数据列表，通过对比时间、地点坐车相应的价格预算。
-     */
-    static async fakeTrafficData(params:{
-        originPlace: any,
-        destination: any,
-        leaveDate: any
-    },trafficTickets:any){
-
-         let directory=fs.readdirSync("./fakeData/traffic");
-         let defaultTemplate="./fakeData/traffic/default.json";
-         let filename=params.originPlace.pinyin+"-"+params.destination.pinyin;
-         let ticketObject={};
-         let content:any;
-         let i=0;
-         for(i=0;i<directory.length;i++){
-             if(directory[i].split(".")[0]==filename){
-               break;
-             }
-         }
-        let dateNow=moment().date();
-        let dateDepart=moment(params.leaveDate).date();
-        let reserveGap=dateDepart-dateNow;
-        //文件需要解析成json文件？
-        let fakeTraffic:any;
-         //可以根据经纬度来估算距离长度
-         if(i>directory.length){
-             //读取默认数据模板
-             content=fs.readFileSync(defaultTemplate,"utf-8");
-             content=JSON.parse(content);
-             if(trafficTickets.length>5){  //若默认的返回列表超过5个，则返回5个，否则不返回
-                 for(let index=0;index<trafficTickets.length;index++){
-                     let ticket=trafficTickets[index];
-                     ticket.agents=content[0].agents;
-                     fakeTraffic.push(ticket);
-                 }
-             }
-            //此循环用于算price
-             /*for(let i=0;i<trafficTickets.length;i++){
-                 let basePrice=content.train.basePrice;
-                 if(reserveGap==1){
-                     basePrice+=content.train.aheadOne;
-                 }
-                 if(trafficTickets[i].startWith("G") || trafficTickets[i].startWith("D")){
-                     basePrice+=content.train.fast;
-                 }else{
-                     basePrice+=content.train.slow;
-                 }
-                 for(let j=0;j<content.agents.length;j++){
-                     if(trafficTickets[i].agents[0].name==content.agents[j].name){
-                         basePrice+=content.agents[j].price;
-
-                     }
-                 }
-                 trafficTickets[i].agents[0].cabins[0].price=basePrice;
-
-             }*/
-
-         }else{
-             content=fs.readFileSync(__dirname+"/fakeData/traffic/"+directory[i]);
-             content=JSON.parse(content);
-             for(let index=0;index<content.length;index++){
-                 for(let j=0;j<trafficTickets.length;j++){
-                     if(content[index].No==trafficTickets[j].No){
-                         let ticket=trafficTickets[j];
-                         ticket.agents=content.agents;
-                         fakeTraffic.push(ticket[j]);
-                     }
-                 }
-             }
-         }
-        return fakeTraffic;
-    }
-
-
-
-
-
 
     /**
      * @method getTrafficBudget
