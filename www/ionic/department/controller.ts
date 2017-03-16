@@ -4,7 +4,6 @@ import moment = require('moment');
 import {Pager} from "common/model/pager";
 var msgbox = require('msgbox');
 
-
 export async function IndexController($scope, $stateParams, Models, $ionicPopup, $ionicNavBarDelegate,$timeout, $location,ngModalDlg, $ionicHistory, $window, sortDlg) {
     require('./department.scss');
     /*if($stateParams.departName){

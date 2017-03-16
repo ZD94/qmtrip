@@ -20,6 +20,7 @@ import {StaffDepartment} from "../department/staffDepartment";
 import C = require("config");
 import moment = require("moment");
 import {OS_TYPE} from "../../auth/authentication";
+import {requireParams} from "common/api/helper";
 
 declare var API: any;
 
@@ -182,6 +183,63 @@ export class Staff extends ModelObject implements Account {
         return true;
     }
 
+
+    /**
+     *  批量移动员工
+     *  @time 2017.3.7
+     *  @param params
+     *  @return {*}
+     */
+    @requireParams(["staffIds" , "departmentIds" , "fromDepartmentId"])
+    @RemoteCall()
+    async moveStaffsDepartment(params : {staffIds: string[], fromDepartmentId: string, departmentIds: string[]}): Promise<boolean>{
+        let self = this;
+        let { staffIds , departmentIds , fromDepartmentId } = params;
+        if(self.roleId != EStaffRole.ADMIN && self.roleId != EStaffRole.OWNER){
+            throw L.ERR.PERMISSION_DENY();
+        }
+
+        for(let i=0,ii=staffIds.length;i<ii;i++){
+            let staff = await Models.staff.get(staffIds[i]);
+            for(let j=0,jj=departmentIds.length;j<jj;j++){
+                let department = await Models.department.get(departmentIds[j]);
+                //比较部门是否与员工是一个公司
+                if(staff.company.id != department.company.id){
+                    continue;
+                }
+                //查关系表
+                let staffDepartment = await Models.staffDepartment.find({
+                    where : {
+                        "staffId" : staff.id,
+                        "departmentId" : department.id
+                    }
+                });
+                if(staffDepartment && staffDepartment.length){
+                    continue;
+                }else{
+                    //插入数据
+                    await(await Models.staffDepartment.create({
+                        staffId: staff.id , departmentId: department.id
+                    })).save();
+                }
+
+                //删除数据
+                let fromData = await Models.staffDepartment.find({
+                    where : {
+                        "staffId" : staff.id,
+                        "departmentId" : fromDepartmentId
+                    }
+                });
+                if(fromData && fromData.length){
+                    await fromData[0].destroy();
+                }
+            }
+        }
+
+        return true;
+    }
+
+
     @RemoteCall()
     async deleteStaffDepartments() :Promise<boolean> {
         let self = this;
@@ -195,6 +253,8 @@ export class Staff extends ModelObject implements Account {
 
         return true;
     }
+
+
 
     async getSelfNotices(options?: any): Promise<any> {
         var self = this;
@@ -500,6 +560,7 @@ export class Staff extends ModelObject implements Account {
         console.log('testServerFunc');
         return 'OK';
     }
+
 
     @RemoteCall()
     async getAutoLoginUrl(backUrl:string, os?: string) {

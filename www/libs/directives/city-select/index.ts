@@ -27,12 +27,7 @@ angular
                     $scope.opts.noticeMsg = $scope.noticeMsg;
                     let val = $scope.value;
                     let options = $scope.opts;
-                    let value = await ngModalDlg.createDialog({
-                        parent: $scope,
-                        scope: {options, val},
-                        template: require('./dialog.html'),
-                        controller: selectCityListController
-                    })
+                    let value = await ngModalDlg.selectCity($scope,options,val);
                     // var value: any = await ngModalDlg.selectCityList($scope, $scope.opts, $scope.value)
                     if(value == undefined)
                         return;

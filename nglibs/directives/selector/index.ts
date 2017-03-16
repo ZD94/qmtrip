@@ -96,5 +96,108 @@ angular
             }
         }
     })
+    .directive('ngSelectorListTwo', function() {
+        return {
+            restrict: 'E',
+            template: require('./list2.html'),
+            scope: {
+                value: '=ngModel',
+                name: '@selectName',
+                must: '@must',
+                showArrow: '@showArrow',
+                noticeMsg: '@dlgNoticeMsg',
+                title: '@dlgTitle',
+                placeholder: '@dlgPlaceholder',
+                opts: '=dlgOptions'
+            },
+            controller: function($scope, $element, ngModalDlg) {
+                require('./selector.scss');
+                $scope.displayItem = function(item) {
+                    if(item && $scope.opts && $scope.opts.display) {
+                        return $scope.opts.display(item, false);
+                    }
+                    return item;
+                };
+                $scope.showSelectorDlg = async function() {
+                    $scope.opts.title = $scope.title;
+                    $scope.opts.placeholder = $scope.placeholder;
+                    $scope.opts.noticeMsg = $scope.noticeMsg;
+                    var value: any = await ngModalDlg.selectFromList($scope, $scope.opts, $scope.value)
+                    if(value == undefined)
+                        return;
+                    $scope.value = value;
 
+                    if($scope.opts.done && typeof $scope.opts.done == 'function') {
+                        return $scope.opts.done(value);
+                    }
+                };
+            }
+        }
+    })
+    .directive('ngSelectorMapTwo', function() {
+        return {
+            restrict: 'E',
+            template: require('./map2.html'),
+            scope: {
+                value: '=ngModel',
+                name: '@selectName',
+                must: '@must',
+                showArrow: '@showArrow',
+                title: '@dlgTitle',
+                placeholder: '@dlgPlaceholder',
+                city: '<dlgPlace',
+                longitude: '<dlgLongitude',
+                latitude: '<dlgLatitude',
+                options: '=dlgOptions'
+            },
+            controller: function($scope, ngModalDlg) {
+                require('./selector.scss');
+                $scope.showSelectorDlg = async function() {
+                    if ($scope.latitude && $scope.longitude) {
+                        $scope.options.latitude = $scope.latitude;
+                        $scope.options.longitude = $scope.longitude;
+                    }
+                    $scope.options.city = $scope.city;
+                    var value: any = await ngModalDlg.selectMapPoint($scope, $scope.options, $scope.value)
+                    if(value == undefined)
+                        return;
+
+                    $scope.value = value;
+
+                    if($scope.options.done && typeof $scope.options.done == 'function') {
+                        return $scope.options.done(value);
+                    }
+                };
+            }
+        }
+    })
+    .directive('ngSelectorDateTwo', function() {
+        return {
+            restrict: 'E',
+            template: require('./date2.html'),
+            scope: {
+                value: '=ngModel',
+                showArrow: '@showArrow',
+                must: '@must',
+                name: '@selectName',
+                title: '@dlgTitle',
+                options: '=dlgOptions',
+                filters: '@dateFilter'  //日期返回格式filter  字符串即可
+            },
+            controller: function($scope, ngModalDlg) {
+                require('./selector.scss');
+                $scope.datefilter = $scope.filters || 'yyyy-MM-dd HH:mm';
+                $scope.showSelectorDlg = async function() {
+                    $scope.options.title = $scope.title;
+                    var confirmed = await ngModalDlg.selectDate($scope, $scope.options, $scope.value)
+                    if(!confirmed)
+                        return;
+                    $scope.value = confirmed;
+                    if($scope.options.done && typeof $scope.options.done == 'function') {
+                        return $scope.options.done($scope.value);
+                    }
+                };
+            }
+        }
+    })
 

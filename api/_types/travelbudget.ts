@@ -22,6 +22,34 @@ export interface TravelBudgeItem {
     id?: string;
 }
 
+export interface TravelBudgeTraffic {
+    price: number;
+    destination?: string;
+    originPlace?: string;
+    leaveDate?: Date;
+    departDateTime?: string; //出发时间
+    arrivalDateTime?: string;    //到达时间
+    cabin?: string;
+    type?: EInvoiceType;
+    tripType?: ETripType;
+    id?: string;
+    fullPrice?: number;
+}
+
+export interface TravelBudgetHotel {
+    price: number;
+    star?: string| number,
+    hotelName?: string;
+    name?: string;
+    cityName?: string;
+    checkInDate?: Date;
+    checkOutDate?: Date;
+    type?: EInvoiceType;
+    tripType?: ETripType;
+    id?: string;
+    fullPrice?: number;
+}
+
 export interface IFinalTicket {
     No: string;   //航班号或者车次
     departDateTime: string; //出发时间

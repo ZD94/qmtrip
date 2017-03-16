@@ -1,0 +1,91 @@
+<ion-modal-view class="destination-template">
+    <ion-header-bar class="bar-stable">
+        <button class="button back-button button-clear" ng-click="modal.hide()">
+            <i class="icon ion-ios-arrow-back"></i>返回
+        </button>
+        <h1 class="title">我要出差</h1>
+    </ion-header-bar>
+    <ion-header-bar class="bar-subheader">
+        <ul class="slide-tab">
+            <li class="tab" ng-class="">
+                <a>{{trip.destination.name}}</a>
+            </li>
+        </ul>
+    </ion-header-bar>
+    <ion-content class="has-subheader" scroll="false">
+        <div class="flex-c10">
+            <ion-scroll>
+                <ion-slide-box on-slide-changed="slideChange(index)" show-pager="false" active-slide="slideIndex">
+                    <ion-slide>
+                        <div class="list">
+                            <div class="item item-icon-right" ng-click="addDestination()">
+                                <span class="item-tit">目的地</span>
+                                <p>{{trip.destination? trip.destination.name :"出发地选择"}}</p>
+                                <!--<ng-selector-city-->
+                                        <!--ng-model="trip.destination"-->
+                                        <!--dlg-options="fromPlaceSelector"-->
+                                        <!--dlg-title="出发地选择"-->
+                                        <!--dlg-placeholder="请输入城市名或首字母缩写"-->
+                                        <!--class="fake-input"-->
+                                <!--&gt;</ng-selector-city>-->
+                                <i class="icon ion-chevron-right"></i>
+                            </div>
+                            <div class="item-flex">
+                                <div class="item" ng-click="selectDatespan()">
+                                    <span class="item-tit">最晚到达(目的地时间)</span>
+                                    <fake-input value="{{trip.beginDate|date:'yyyy-MM-dd HH:mm'}}" placeholder="请选择出差日期" ></fake-input>
+                                </div>
+                                <ng-selector-date-two
+                                        ng-model="trip.endDate"
+                                        select-name="最早出发(目的地时间)"
+                                        dlg-options="endDateSelector"
+                                        dlg-title="请选择结束日期"
+                                        class="fake-input item"
+                                ></ng-selector-date-two>
+                                <!--<div class="item">-->
+                                <!--</div>-->
+                            </div>
+                        </div>
+                        <div class="list">
+                            <ng-selector-list-two
+                                    ng-model="trip.reasonName"
+                                    select-name="事由"
+                                    show-arrow="true"
+                                    must="true"
+                                    dlg-options="projectSelector"
+                                    dlg-title="请选择出差事由"
+                                    dlg-placeholder="请选择或输入事由"
+                                    class="fake-input item"
+                            ></ng-selector-list-two>
+                        </div>
+                        <div class="list list-border">
+                            <div class="item item-icon-right" ng-if="currentTpSts && currentTpSts.length" ng-click="selectSubsidyTemplate()">
+                                <span class="item-tit">补助<i class="fa fa-asterisk"></i></span>
+                                <p><span ng-if="subsidy.template">{{select_subsidy.subsidyMoney}}元/天</span> {{select_subsidy.name}}</p>
+                                <i class="icon ion-chevron-right"></i>
+                            </div>
+                            <div class="item">
+                                <span class="item-tit">住宿天数</span>
+                                <p>{{calcTripDuration()}}天</p>
+                            </div>
+                            <ng-selector-map-two
+                                    ng-model="trip.hotelPlaceObj"
+                                    dlg-options="hotelPlaceSelector"
+                                    dlg-place="trip.destination.name"
+                                    dlg-latitude="trip.destination.latitude"
+                                    dlg-longitude="trip.destination.longitude"
+                                    dlg-title="请选择地标"
+                                    dlg-placeholder='请输入地标名称'
+                                    show-arrow="true"
+                                    select-name="地标"
+                                    class="fake-input item"
+                                    ng-if="!trip.destination.isAbroad"
+                            ></ng-selector-map-two>
+                        </div>
+                    </ion-slide>
+                </ion-slide-box>
+            </ion-scroll>
+            <a class="button button-calm button-full" ng-click="complete()">完成</a>
+        </div>
+    </ion-content>
+</ion-modal-view>

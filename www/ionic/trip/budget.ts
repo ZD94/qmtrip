@@ -2,9 +2,10 @@ import { ETripType, EInvoiceType } from 'api/_types/tripPlan';
 import moment = require('moment');
 import { Staff } from 'api/_types/staff/staff';
 import {EApproveType, EApproveChannel} from "api/_types/approve/types";
-import {MPlaneLevel, MTrainLevel} from "../../../api/_types/travelPolicy";
+import {MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
+var msgbox = require("msgbox");
 
-export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup, $ionicHistory){
+export async function BudgetController($scope, $storage,$loading, Models, $stateParams, $ionicLoading, City, $ionicPopup, $ionicHistory){
     require('./trip.scss');
     require('./budget.scss');
     API.require("tripPlan");
@@ -27,19 +28,25 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     API.require("tripApprove");
     await API.onload();
     let result = await API.travelBudget.getBudgetInfo({id: id});
+    console.info(result);
+    console.info("result====================================");
     let budgets = result.budgets;
     let trip = $storage.local.get("trip");
     let query = result.query;
-    trip.beginDate = query.leaveDate;
-    trip.endDate  = query.goBackDate;
-    trip.hotelName = query.hotelName;
+    let destinationPlacesInfo = query.destinationPlacesInfo;
+    let firstDes = destinationPlacesInfo[0];
+    let lastDes = destinationPlacesInfo[destinationPlacesInfo.length - 1];
+    trip.beginDate = firstDes.leaveDate || query.leaveDate;
+    trip.endDate  = lastDes.goBackDate || query.goBackDate;
+    trip.hotelName = firstDes.hotelName || query.hotelName;
     trip.createAt = new Date(result.createAt);
 
     if(query.originPlace) {
         let originPlace = await City.getCity(query.originPlace.id || query.originPlace);
         trip.originPlaceName = originPlace.name;
     }
-    let destination = await City.getCity(query.destinationPlace.id || query.destinationPlace);
+
+    let destination = await City.getCity(lastDes.destinationPlace.id  || lastDes.destinationPlace || query.destinationPlace.id || query.destinationPlace);
     trip.destinationPlaceName = destination.name;
     $scope.trip = trip;
     //补助,现在是0,后续可能会直接加入到预算中
@@ -51,18 +58,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
             budget.discount = '全价';
         }
         if (budget.tripType == ETripType.HOTEL) {
-            budget.duringDays = moment(moment(trip.endDate).format("YYYY-MM-DD")).diff(moment(moment(trip.beginDate).format("YYYY-MM-DD")), 'days') || 1;
-        }
-        if (budget.tripType == ETripType.SUBSIDY) {
-            let days = moment(moment(trip.endDate).format("YYYY-MM-DD")).diff(moment(moment(trip.beginDate).format("YYYY-MM-DD")), 'days')
-            days = days + 1;
-            if (!budget.hasFirstDaySubsidy) {
-                days -= 1;
-            }
-            if (!budget.hasLastDaySubsidy) {
-                days -= 1;
-            }
-            budget.duringDays = days;
+            budget.duringDays = moment(moment(budget.checkOutDate).format("YYYY-MM-DD")).diff(moment(moment(budget.checkInDate).format("YYYY-MM-DD")), 'days') || 1;
         }
         return budget;
     })
@@ -142,6 +138,32 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
             $ionicLoading.hide();
         }
     }
+    //特别审批
+    $scope.specialApprove = async function() {
+        API.require("travelBudget");
+        await API.onload();
+
+        let trip = $scope.trip;
+
+        if (!staff.company.oa || staff.company.oa == EApproveChannel.QM) {
+            if (!trip.auditUser) {
+                $scope.showErrorMsg(`请选择审批人`);
+                return false;
+            }
+        }
+
+        let params = query;
+        params.auditUser = trip.auditUser ? trip.auditUser.id : '';
+
+        try {
+            $loading.end();
+            window.location.href = "#/trip/special-approve?params="+JSON.stringify(params);
+        } catch(err) {
+            $loading.end();
+            alert(err.msg || err);
+        }
+    }
+
     //我要报错
     $scope.reportBudgetError = function() {
         let id = $stateParams.id;
