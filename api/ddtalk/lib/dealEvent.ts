@@ -33,44 +33,38 @@ const DEFAULT_PWD = '000000';
 
 
 export async function tmpAuthCode(msg) {
-    console.log("yes");
-
-    /*const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
+    const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
     let isExist = await cache.read(TMP_CODE_KEY);
     if (isExist) {
         console.log("exist ?");
         return;
-    }*/
+    }
 
-    console.log("ok , here");
     //暂时缓存，防止重复触发
-    // await cache.write(TMP_CODE_KEY, true, 60 * 2);
+    await cache.write(TMP_CODE_KEY, true, 60 * 2);
     let tokenObj = await _getSuiteToken();
     let suiteToken = tokenObj['suite_access_token'];
 
     //永久授权码和企业名称及id
-    /*let permanentAuthMsg: any = await _getPermanentCode(suiteToken, msg.AuthCode);
+    let permanentAuthMsg: any = await _getPermanentCode(suiteToken, msg.AuthCode);
     let permanentCode = permanentAuthMsg['permanent_code'];
 
-    let corp_name = permanentAuthMsg.auth_corp_info.corp_name;*/
+    let corp_name = permanentAuthMsg.auth_corp_info.corp_name;
 
     //test
-    let corp_name = "鲸力测试3.16";
-    let permanentCode = "MiWZd0Ja6qRtHydnRjavun3Hv6xEjSQ0oyaAkGO2bP2wAQb0L6NeLvOQ1KQPrABD";
-
-    let corpid = "ding3c92322d23dbbbfa35c2f4657eb6378f";
+    // let corp_name = "鲸力测试3.16";
+    // let permanentCode = "MiWZd0Ja6qRtHydnRjavun3Hv6xEjSQ0oyaAkGO2bP2wAQb0L6NeLvOQ1KQPrABD";
+    //
+    // let corpid = "ding3c92322d23dbbbfa35c2f4657eb6378f";
     //test end.
 
-    console.log("000");
-    // let corpid = permanentAuthMsg.auth_corp_info.corpid;
+    let corpid = permanentAuthMsg.auth_corp_info.corpid;
     let isvApi = new ISVApi(config.suiteid, suiteToken, corpid, permanentCode);
 
-    console.log('111');
     //获取企业授权的授权数据 , 拿到管理员信息
     let authInfo: any = await isvApi.getCorpAuthInfo();
     let authUserInfo = authInfo.auth_user_info;
 
-    console.log("222");
     //agentID每次都会变,所以每次授权都要获取我们对应的agentid
     let agents = authInfo.auth_info.agent || [];
     let agentid = '';
@@ -107,9 +101,9 @@ export async function tmpAuthCode(msg) {
         corp = await corp.save();
 
 
-        console.log("企业信息有记录 , 已经更新");
+        // console.log("企业信息有记录 , 已经更新");
     } else {
-        console.log("企业信息没有记录 , 创建企业");
+        // console.log("企业信息没有记录 , 创建企业");
         //创建企业
         let company = Company.create({name: corp_name});
         company = await company.save();
@@ -125,7 +119,7 @@ export async function tmpAuthCode(msg) {
             agentid: agentid
         });
         await corp.save();
-        console.log("ddtalkCorp  created");
+        // console.log("ddtalkCorp  created");
 
         /* ====== 单独处理 创建者信息 ====== */
         //在staff中新增一个员工
@@ -138,7 +132,7 @@ export async function tmpAuthCode(msg) {
         staff.pwd = md5(DEFAULT_PWD);
         staff.company = company;
         staff = await staff.save();
-        console.log("staff  owner staff created.");
+        // console.log("staff  owner staff created.");
 
         //更新公司信息 ，保存创建者id
         company.createUser = staff.id;
@@ -159,7 +153,7 @@ export async function tmpAuthCode(msg) {
         /* ====== 单独处理 创建者信息 ===  END  === */
 
         //保存部门信息
-        console.log(userInfo , "创建结束");
+        // console.log(userInfo , "创建结束");
         try {
             createCompanyOrganization(corpApi, corp);
         } catch (err) {
@@ -168,8 +162,8 @@ export async function tmpAuthCode(msg) {
         }
     }
 
-    // await isvApi.activeSuite();
-    // await corpApi.registryContractChangeLister(config.token, config.encodingAESKey, C.host + '/ddtalk/isv/receive');
+    await isvApi.activeSuite();
+    await corpApi.registryContractChangeLister(config.token, config.encodingAESKey, C.host + '/ddtalk/isv/receive');
 }
 
 
@@ -487,7 +481,7 @@ export async function synchroDDorganization() {
 setTimeout(() => {
     // synchroDDorganization();
     // deleteCompanyOrganization("658cd3a0-bde4-11e6-997b-a9af9a42d08a");
-    tmpAuthCode();
+    // tmpAuthCode();
 }, 8000);
 
 
