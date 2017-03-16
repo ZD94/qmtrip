@@ -193,7 +193,6 @@ function initUpdater($ionicPlatform, $ionicPopup) {
        $ionicPlatform.ready(function(){
            $rootScope.$on('$locationChangeSuccess',function(event,newUrl,oldUrl){
                var url = $location.path();
-               console.info("url===>",url);
                 var titles = {
                     "/staff/index" : "进入个人中心",
                     "/staff/staff-info" : "修改个人资料",
