@@ -25,6 +25,8 @@ build:dist:
   only:
     - branches
   image: jl-build
+  tags:
+    - serial
   cache:
     key: $CI_PIPELINE_ID
     paths:
