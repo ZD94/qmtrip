@@ -10,11 +10,10 @@ declare var wx:any;
 declare var ionic:any;
 declare var Wechat:any;
 
-export async function StaffInvitedController($scope, Models, $ionicHistory, $ionicPopup, ClosePopupService, wxApi,CNZZ){
+export async function StaffInvitedController($scope, Models, $ionicHistory, $ionicPopup, ClosePopupService, wxApi){
     require('./staff-invited.scss');
     var staff = await Staff.getCurrent();
     $scope.staff = staff;
-    CNZZ.addEvent("员工邀请","点击","点击员工邀请",$scope.staff);
     var now = moment().format('YYYY-MM-DD HH:mm:ss');
     var invitedLinks = await Models.invitedLink.find({where: {staffId: staff.id, status: 1, expiresTime: {$gt: now}}});
     $scope.expireTimeout = 0;
@@ -54,7 +53,6 @@ export async function StaffInvitedController($scope, Models, $ionicHistory, $ion
         var invitedLink = InvitedLink.create();
         invitedLink = await invitedLink.save();
         $scope.invitedLink = invitedLink;
-        CNZZ.addEvent("邀请链接","生成","生成邀请链接",$scope.invitedLink);
         $scope.encodeLink = encodeURIComponent(invitedLink.goInvitedLink);
         transformSeconds();
     };
@@ -76,7 +74,6 @@ export async function StaffInvitedController($scope, Models, $ionicHistory, $ion
     var config = require('config');
     let shareImgUrl = path.join(config.update,'ionic/images/logo-whiteback.png');
     $scope.sendWx = async function(){
-        CNZZ.addEvent("微信分享","点击","点击微信分享邀请好友",'');
         if(browserspec.is_wechat){
             var show = $ionicPopup.show({
                 template: '<p>请点击微信右上角菜单<br>将链接分享给好友</p>',
@@ -108,7 +105,6 @@ export async function StaffInvitedController($scope, Models, $ionicHistory, $ion
             openConfig.link = 'https://jingli365.com';
             wxApi.setupSharePublic(openConfig);
         }else if(window.cordova){
-            CNZZ.addEvent("短信分享","点击","点击短信分享邀请好友",'');
             let installed = await wxApi.isInstalled();
             if(installed){
                 var wxConfig = {

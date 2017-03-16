@@ -1,10 +1,9 @@
 import { QMEApproveStatus} from 'api/_types/tripPlan';
 import { Staff } from 'api/_types/staff/staff';
-export async function PendingController($scope, $stateParams,CNZZ){
+export async function PendingController($scope, $stateParams){
     require('./trip-approval.scss');
     const PAGE_SIZE = 10;
     let staff = await Staff.getCurrent();
-    CNZZ.addEvent("审批单","点击","进入审批单",staff)
     let approveStatus = $stateParams.status;
     let tripApproves = [];
     let Pager;

@@ -1,7 +1,7 @@
 <ion-view title="差旅标准" id="page30">
     <ion-content padding="true" class="has-header">
-        <a href="#/travel-policy/editpolicy" id="page30-button89" class="button button-positive  button-block">新增差旅标准</a>
-        <a ng-click="setDefault()" class="button button-outline button-block button-positive" style="background: #fff">设置默认标准</a>
+        <a href="#/travel-policy/editpolicy" id="page30-button89" class="button button-positive  button-block" ng-stat-event="新增差旅标准">新增差旅标准</a>
+        <a ng-click="setDefault()" class="button button-outline button-block button-positive" style="background: #fff" ng-stat-event="设置默认标准">设置默认标准</a>
         <div class="policyCard" ng-repeat="policy in travelPolicies" ng-click="editpolicy(policy.policy.id)">
             <div class="item item-avatar">
                 <div class="policy-list-left">

@@ -29,7 +29,7 @@ function TripDefineFromJson(obj: any): TripDefine{
 }
 
 
-export async function CreateController($scope, $storage, $loading, ngModalDlg, $ionicPopup, Models, City, CNZZ){
+export async function CreateController($scope, $storage, $loading, ngModalDlg, $ionicPopup, Models, City){
     require('./trip.scss');
     API.require('tripPlan');
     await API.onload();
@@ -38,7 +38,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         name: '请选择'
     };
     $scope.currentStaff = await Staff.getCurrent();
-    CNZZ.addEvent("我要出差","点击","进入我要出差",$scope.currentStaff );
     let currentCompany = $scope.currentStaff.company;
     $scope.currentTp = await $scope.currentStaff.getTravelPolicy();
     if($scope.currentTp){
@@ -84,7 +83,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
     $scope.$watch('trip.place',function(n,o){
         if(n != undefined){
             $scope.trip.hotel = true;
-            CNZZ.addEvent("统计目的地","统计","统计目的地",n);
         }
     })
     /*****************/
@@ -144,7 +142,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             $scope.trip.hotelPlaceObj = undefined;
             $scope.trip.hotelPlace = '';
             $scope.trip.hotelName = '';
-            CNZZ.addEvent("选择地标","选择","选择地标",$scope.currentStaff);
         }
     });
 
@@ -279,7 +276,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         $scope.endDateSelector.beginDate = $scope.trip.beginDate;
     })
     $scope.nextStep = async function() {
-        CNZZ.addEvent('计算预算', '计算预算', '计算预算', $scope.currentStaff);
         let trip = $scope.trip;
 
         let number = 0;
@@ -326,7 +322,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
 
         if(trip.traffic && (!trip.fromPlace || !trip.fromPlace.id)) {
             $scope.showErrorMsg('请选择出发地！');
-            CNZZ.addEvent("统计出发地","统计","统计出发地",'');
             return false;
         }
 

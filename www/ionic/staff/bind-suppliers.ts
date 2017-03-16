@@ -13,9 +13,8 @@ export function selectSuppliers($scope, id, ngModalDlg){
 }
 
 
-export async function BindSuppliersController($scope, Models, ngModalDlg,CNZZ){
+export async function BindSuppliersController($scope, Models, ngModalDlg){
     var staff = await Staff.getCurrent();
-    CNZZ.addEvent("绑定第三方账户","绑定","绑定第三方账户",staff);
     async function ifBind(){
         var alreadyBinds = await Models.staffSupplierInfo.find({where: {staffId: staff.id}});
         var alreadyBindIds = [];

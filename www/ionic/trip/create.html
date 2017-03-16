@@ -11,8 +11,8 @@
                         class="fake-input"
                 ></ng-selector-list>
             </div>
-            <div class="item item-input">
-                <span class="input-label">出发地</span>
+            <div class="item item-input" ng-stat-event="出发地">
+                <span class="input-label" >出发地</span>
                 <ng-selector-city
                         ng-model="trip.fromPlace"
                         dlg-options="fromPlaceSelector"
@@ -21,7 +21,7 @@
                         class="fake-input"
                 ></ng-selector-city>
             </div>
-            <div class="item item-input">
+            <div class="item item-input" ng-stat-event="目的地">
                 <span class="input-label">目的地</span>
                 <ng-selector-city
                         ng-model="trip.place"
@@ -59,7 +59,7 @@
                     <button id="page6-button35" class="button button-stable button-block">共{{calcTripDuration()}}天</button>
                     &lt;!&ndash;<button id="page6-button36" class="button button-light button-small button-block" ng-click="incTripDuration()">+</button>&ndash;&gt;
                 </div>-->
-                <div class="item item-input" style="margin-top: 10px;">
+                <div class="item item-input" style="margin-top: 10px;" ng-stat-event="选择地标">
                     <span class="input-label">地标</span>
                     <ng-selector-map
                             ng-model="trip.hotelPlaceObj"

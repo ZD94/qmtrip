@@ -4,7 +4,7 @@
 "use strict";
 import {enumPlaneLevelToStr, enumTrainLevelToStr, enumHotelLevelToStr} from "api/_types/travelPolicy";
 
-export async function ShowpolicyController($scope, Models, $stateParams, $ionicHistory, $ionicPopup,CNZZ){
+export async function ShowpolicyController($scope, Models, $stateParams, $ionicHistory, $ionicPopup){
     require("./editpolicy.scss");
     let policyId = $stateParams.policyId;
     let travelPolicy = await Models.travelPolicy.get(policyId);
@@ -17,7 +17,6 @@ export async function ShowpolicyController($scope, Models, $stateParams, $ionicH
     $scope.enumTrainLevelToStr = enumTrainLevelToStr;
     $scope.enumHotelLevelToStr = enumHotelLevelToStr;
     $scope.editPolicy = function(){
-        CNZZ.addEvent("修改差旅标准","修改","修改差旅标准","");
         window.location.href = `#/travel-policy/editpolicy?policyId=${policyId}`
     }
 

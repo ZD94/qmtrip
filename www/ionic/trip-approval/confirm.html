@@ -6,10 +6,11 @@
         <ion-list show-delete="false">
             <ion-item ng-click="chooseOption(false)"
                       ng-class="{true: '', false: 'item-option-selected item-icon-left'}[isNextApprove]"
-            >
-                <i class="icon ion-android-done"></i>直接同意</ion-item>
+                      ng-stat-event="直接同意">
+                <i class="icon ion-android-done" ></i>直接同意</ion-item>
             <ion-item ng-click="chooseOption(true)"
-                      ng-class="{true: 'item-option-selected item-icon-left', false: ''}[isNextApprove]">
+                      ng-class="{true: 'item-option-selected item-icon-left', false: ''}[isNextApprove]"
+                      ng-stat-event="同意并转给">
                 <i class="icon ion-android-done"></i>
                 <span class="input-label">同意并转给</span>
                 <ng-selector-list

@@ -51,7 +51,7 @@
                         <div class="list" ng-if="isBeforeStartTime">预订/传票据</div>
                         <div class="list" ng-if="!isBeforeStartTime">待传票据</div>
                     </div>
-                    <button class="button button_left" ng-if="!hasInvoice" ng-click="cancelTripPlan()" style='color:#28A7E1;background-color:#ffffff;'>
+                    <button class="button button_left" ng-if="!hasInvoice" ng-click="cancelTripPlan()" style='color:#28A7E1;background-color:#ffffff;' ng-stat-event="撤销行程">
                         撤销行程
                     </button>
                     <button class="button button_right" style='color:#ffffff;background-color: #D8D8D8'>
@@ -79,7 +79,7 @@
                     <div class="status-bar item">
                         <div class="list">审核失败</div>
                     </div>
-                    <button class="button button_right" style='color:#ffffff;background-color: #D8D8D8'>
+                    <button class="button button_right" style='color:#ffffff;background-color: #D8D8D8' ng-stat-event="提交审批">
                         提交审核
                     </button>
                 </bottom-bar>
@@ -88,7 +88,7 @@
                     <div class="status-bar item">
                         <div class="list">已完成</div>
                     </div>
-                    <button ng-if="!hasMakeSpendRecorder" class="button button_right" ng-click="makeSpendReport()" style='color:#ffffff;background-color: #28A7E1'>
+                    <button ng-if="!hasMakeSpendRecorder" class="button button_right" ng-click="makeSpendReport()" style='color:#ffffff;background-color: #28A7E1' ng-stat-event="生成报销单">
                         生成报销单
                     </button>
                 </bottom-bar>

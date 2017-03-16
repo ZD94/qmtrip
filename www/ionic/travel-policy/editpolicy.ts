@@ -3,8 +3,7 @@ import {TravelPolicy, EPlaneLevel, ETrainLevel, EHotelLevel, MPlaneLevel, MTrain
 import { SubsidyTemplatesController } from './subsidy-templates';
 var msgbox = require('msgbox');
 
-export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory, $ionicPopup, ngModalDlg, $window,CNZZ) {
-    CNZZ.addEvent("新增差旅标准","新增","新增差旅标准",'');
+export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory, $ionicPopup, ngModalDlg, $window) {
     require('./editpolicy.scss');
     $scope.travelPolicy = {};
     $scope.planeLevels = [
@@ -69,7 +68,6 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
     }
     $scope.travelPolicy = travelPolicy;
     $scope.savePolicy = async function () {
-        CNZZ.addEvent("保存差旅标准","保存","保存差旅标准","");
         if(!$scope.travelPolicy.name){
             msgbox.log("标准名称不能为空");
             return false;
@@ -201,7 +199,6 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
 
 
     $scope.subsidyTemplateList = async function(){
-        CNZZ.addEvent("新增补助模板","新增","新增补助模板",'');
         let obj = await ngModalDlg.createDialog({
             parent:$scope,
             scope: {subsidyTemplates,policyId},

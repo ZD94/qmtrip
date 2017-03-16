@@ -1,9 +1,8 @@
 import moment = require("moment");
 
-export default async function IndexController($scope,CNZZ) {
+export default async function IndexController($scope) {
     require('./statistics.scss');
     API.require("tripPlan");
-    CNZZ.addEvent("差旅统计","点击","进入差旅统计","");
     let formatStr = 'YYYY-MM-DD HH:mm:ss';
     var now = moment();
     var data = $scope.data = {

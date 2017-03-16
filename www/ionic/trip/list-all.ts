@@ -3,8 +3,7 @@ import moment = require('moment');
 import { Staff } from 'api/_types/staff/staff';
 import { EPlanStatus } from 'api/_types/tripPlan';
 
-export default async function ListAllController($scope, $stateParams, Models,CNZZ) {
-    CNZZ.addEvent("查看员工出差记录","查看","查看员工出差记录",'');
+export default async function ListAllController($scope, $stateParams, Models) {
     require('../statistics/statistics.scss')
     let keyword = $stateParams.keyword || '';
     let type = $stateParams.type || null;

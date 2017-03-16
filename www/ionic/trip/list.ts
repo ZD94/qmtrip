@@ -1,9 +1,8 @@
 import { EPlanStatus } from 'api/_types/tripPlan';
 import { Staff } from 'api/_types/staff/staff';
 import indexOf = require("lodash/indexOf");
-export async function ListController($scope , $stateParams, Models,CNZZ){
+export async function ListController($scope , $stateParams, Models){
     var staff = await Staff.getCurrent();
-    CNZZ.addEvent("我的行程","点击","进入我的行程",staff);
     let statusTxt = {};
     statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
     statusTxt[EPlanStatus.NO_BUDGET] = "没有预算";

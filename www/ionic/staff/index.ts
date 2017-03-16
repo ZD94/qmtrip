@@ -3,13 +3,12 @@ import { ACCOUNT_STATUS } from 'api/_types/auth';
 import { EPlanStatus, QMEApproveStatus ,EAuditStatus } from 'api/_types/tripPlan';
 import {getImageUrl} from '../controller';
 var config = require('config');
-export default async function IndexController($scope, Models, inAppBrowser,CNZZ) {
+export default async function IndexController($scope, Models, inAppBrowser) {
     require('./index.scss');
     API.require('tripPlan');
 
     let staff = await Staff.getCurrent();
     let coinAccount = staff.$parents["account"]["coinAccount"];
-    CNZZ.addEvent("个人中心","点击","进入个人中心", staff);
 
     $scope.toDuiBa = async function(){
 

@@ -1,6 +1,6 @@
 <ion-view title="审批单列表" id="page12">
     <ion-content padding="true" class="has-header">
-        <div class="button-bar jl_approvelist">
+        <div class="button-bar jl_approvelist" ng-stat-event="查看审批进度">
             <a ng-click="changeTo('ALL')" class="button button-small" ng-class="filter == 'ALL' ? 'active': ''">全部</a>
             <a ng-click="changeTo('WAIT_APPROVE')" class="button button-small" ng-class="filter == 'WAIT_APPROVE' ? 'active': ''">待审批</a>
             <a ng-click="changeTo('REJECT')" class="button button-small" ng-class="filter == 'REJECT' ? 'active': ''">已驳回</a>

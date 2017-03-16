@@ -1,9 +1,8 @@
 import { QMEApproveStatus, EApproveStatus2Text } from 'api/_types/tripPlan';
 import { Staff } from 'api/_types/staff/staff';
-export async function ListController($scope, Models, $stateParams, $ionicLoading,CNZZ){
+export async function ListController($scope, Models, $stateParams, $ionicLoading){
     require('./trip-approval.scss');
     let staff = await Staff.getCurrent();
-    CNZZ.addEvent("出差请示","点击","进入出差请示",staff);
     const ONE_PAGE_LIMIT = 10;
     let Pager;
     $scope.filter = 'WAIT_APPROVE';

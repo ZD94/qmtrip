@@ -9,9 +9,8 @@ import {Model} from "sequelize";
 var API = require('common/api');
 var msgbox = require('msgbox');
 
-export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate, ngModalDlg, City, $ionicModal, $timeout,CNZZ){
+export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate, ngModalDlg, City, $ionicModal, $timeout){
     let typeArray = [EPlanStatus.AUDIT_NOT_PASS,EPlanStatus.WAIT_UPLOAD,EPlanStatus.WAIT_COMMIT]
-    CNZZ.addEvent("查看票据","查看","票据详情页",tripDetail.d_city.name+'-'+tripDetail.a_city.name);
     $scope.EInvoiceFeeTypes = EInvoiceFeeTypes;
     $scope.InvoiceFeeTypeNames = InvoiceFeeTypeNames;
     $scope.EPayType = EPayType;
@@ -118,7 +117,6 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
             let previewUrl = path.join(config.update,'attachment/temp',fileId)+'?expireTime='+tempFile.expireTime+'&sign='+tempFile.sign;
             $scope.previewUrl = previewUrl;
             $scope.$apply();
-            CNZZ.addEvent("上传票据照片","上传","上传票据照片", $scope.previewUrl);
         }
     }
 
@@ -217,12 +215,10 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
 
     //start 创建新票据button事件
     $scope.manual = function(){
-        CNZZ.addEvent("手动添加票据","添加","手动添加票据",'');
         $scope.select_menu = false;
     }
 
     $scope.linkOthers = function(){
-        CNZZ.addEvent("关联订单","关联订单","关联订单","");
         window.location.href = "#/trip/select-supplier?detailId="+$stateParams.detailId;
     }
 

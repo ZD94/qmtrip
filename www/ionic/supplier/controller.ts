@@ -3,13 +3,12 @@ import { ESupplierType } from 'api/_types/company/supplier';
 
 export * from './edit';
 
-export async function IndexController($scope, Models, $location,CNZZ) {
+export async function IndexController($scope, Models, $location) {
     require('./accord-hotel.scss');
     var staff = await Staff.getCurrent();
     var company = await staff.company;
     var suppliers = await company.getCompanySuppliers();
     $scope.suppliers = suppliers;
-    CNZZ.addEvent("预订","访问企业自定义预订商","进入预订服务商管理",staff);
     //公共的供应商
     var publicSuppliers = await Models.supplier.find({where:{companyId: null}});
     // $scope.publicSuppliers = publicSuppliers;
@@ -49,7 +48,6 @@ export async function IndexController($scope, Models, $location,CNZZ) {
     }
 
     $scope.savePublicSupplierStatus = async function(e){
-        CNZZ.addEvent("携程商旅","开启","开启携程商旅",staff);
         if(e.isPointed){
             appointedPubilcSuppliers.push(e.id);
         }else{
