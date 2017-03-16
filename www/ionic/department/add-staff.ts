@@ -5,6 +5,7 @@
 import {Staff} from "api/_types/staff/staff";
 var msgbox = require('msgbox');
 
+
 export async function AddStaffController($scope, $ionicPopup, $window){
     require('./add-staff.scss');
     let staff = await Staff.getCurrent();

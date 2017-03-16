@@ -269,17 +269,17 @@ export class Company extends ModelObject{
             number = params.number;
         }
         //套餐内剩余量
-        let surplus = self.tripPlanNumLimit - self.tripPlanPassNum - self.tripPlanFrozenNum;
+        let surplus = self.tripPlanNumInBase;
         if(!(surplus >= number)){
             //套餐包剩余的条数不够
-            if(!self.extraTripPlanNum){
+            if(!self.tripPlanNumInPack){
                 throw L.ERR.BEYOND_LIMIT_NUM("出差申请");
             }else{
                 //套餐包剩余的加上加油包剩余的条数不够
                 if(surplus < 0){
                     surplus = 0;
                 }
-                if(!((self.extraTripPlanNum + surplus) >= number
+                if(!((self.tripPlanNumInPack + surplus) >= number
                     && self.extraExpiryDate && self.extraExpiryDate.getTime() - new Date().getTime() > 0)){
                     throw L.ERR.BEYOND_LIMIT_NUM("出差申请");
                 }
