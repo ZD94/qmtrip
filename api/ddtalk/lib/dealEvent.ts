@@ -178,47 +178,41 @@ interface suiteTokenCached {
 
 export async function _getSuiteToken(): Promise<any> {
 
-    // let ticketObj: any = await cache.read(CACHE_KEY);
-    // if (typeof ticketObj == 'string') {
-    //     ticketObj = JSON.parse(ticketObj);
-    // }
-    // if (!ticketObj || !ticketObj.ticket ) {
-    //     throw new Error(`还没有ticket`);
-    // }
-    // let ticket = ticketObj.ticket;
-    //
-    // // ticket = "mWuJweSFdTWhiN8JErc6clkg1kjR2v54ojV7UOcic1oja2xBmEjvfQqsafPvzrtEyYBzovNaeU160IYy9FaB2V";
-    //
-    //
-    // if (!ticket) {
-    //     throw new Error('不存在ticket');
-    // }
-    // let key = `ddtalk:suite_access_token:${config.suiteid}`;
-    // let d = await cache.readAs<suiteTokenCached>(key)
-    // if (d && d.expire_at > Date.now()) {
-    //     return d;
-    // }
-    //
-    // console.log(2);
-    //
-    //
-    // let url = `https://oapi.dingtalk.com/service/get_suite_token`;
-    // let ret: any = await reqProxy(url, {
-    //     name: '获取套件Token',
-    //     body: {
-    //         suite_key: config.suiteid,
-    //         suite_secret: config.secret,
-    //         suite_ticket: ticket
-    //     }
-    // });
-    //
-    //
-    // d = {suite_access_token: ret.suite_access_token, expire_at: (ret.expires_in - 30) * 1000 + Date.now() };
-    // cache.write(key, JSON.stringify(d))
-    // return d;
+    let ticketObj: any = await cache.read(CACHE_KEY);
+    if (typeof ticketObj == 'string') {
+        ticketObj = JSON.parse(ticketObj);
+    }
+    if (!ticketObj || !ticketObj.ticket ) {
+        throw new Error(`还没有ticket`);
+    }
+    let ticket = ticketObj.ticket;
+
+    if (!ticket) {
+        throw new Error('不存在ticket');
+    }
+    let key = `ddtalk:suite_access_token:${config.suiteid}`;
+    let d = await cache.readAs<suiteTokenCached>(key)
+    if (d && d.expire_at > Date.now()) {
+        return d;
+    }
+
+    let url = `https://oapi.dingtalk.com/service/get_suite_token`;
+    let ret: any = await reqProxy(url, {
+        name: '获取套件Token',
+        body: {
+            suite_key: config.suiteid,
+            suite_secret: config.secret,
+            suite_ticket: ticket
+        }
+    });
 
 
-    return {"suite_access_token": "b60bb5fafd80399aa7d140283963ffa7", "expire_at": 1489560379128}
+    d = {suite_access_token: ret.suite_access_token, expire_at: (ret.expires_in - 30) * 1000 + Date.now() };
+    cache.write(key, JSON.stringify(d))
+    return d;
+
+
+    // return {"suite_access_token": "52cbe90c68de31b6b6ffa881dd0b8b6b", "expire_at": 1489560379128}
 }
 
 
@@ -334,8 +328,6 @@ export async function dealCompanyOrganization(corpApi: CorpApi, corp : DDTalkCor
     }
 
     /* ========   清除钉钉中没有的部门  ======== */
-    // let deletDepart_id = [];
-
     console.log("some problem");
     let deleDeparts = await Models.department.find({
         where : {companyId : company.id, id : { $notIn : localDepartment_ids}}
@@ -344,19 +336,18 @@ export async function dealCompanyOrganization(corpApi: CorpApi, corp : DDTalkCor
     let deleDdtalkDeparts = await Models.ddtalkDepartment.find({
         where : { corpId : corpId , localDepartmentId:{ $notIn : localDepartment_ids} }
     });
+
+    //将要清除的钉钉部门，删除staffDepartment关系
+    deleDeparts.map(async (item)=>{
+        let staffDeparts = await Models.staffDepartment.find({
+            where : { localDepartmentId : item.id }
+        });
+        await arrDestroy(staffDeparts);
+    });
     await arrDestroy(deleDdtalkDeparts);
     await arrDestroy(deleDeparts);
-    // deleDeparts.map(async (item)=>{
-    //     deletDepart_id.push(item.id);
-    //     await item.destroy();
-    // });
 
-    // let staffDeparts = await Models.staffDepartment.find({
-    //     where : { departmentId : deletDepart_id }
-    // });
-    // await arrDestroy(staffDeparts);
-
-    /* ========   清除钉钉中没有的部门  ==  END   ====== */
+    /* ==========  END   ====== */
 
     /*  ========== 追加部门层级关系 ========  */
     for(let item of localDepartments){
@@ -378,7 +369,6 @@ export async function dealCompanyOrganization(corpApi: CorpApi, corp : DDTalkCor
         //添加用户
         await addCompanyStaffs(corpApi, d.id, corp);
     }
-
 }
 
 /*
@@ -394,12 +384,27 @@ export async function addCompanyStaffs(corpApi: CorpApi, DdDepartmentId: any, co
     let dingUsers = await corpApi.getUserListByDepartment(DdDepartmentId);
     let travelPolicy = await company.getDefaultTravelPolicy();
 
+    // 处理该员工与部门的关系
+    let itemDepart = await Models.ddtalkDepartment.find({
+        where: {DdDepartmentId: DdDepartmentId.toString(), corpId: corpid}
+    });
+    if(!itemDepart || !itemDepart[0]){
+        logger.warn("这个部门不存在  dd_department_id :" , u.department , "corpid : " , corpid)
+        throw new Error("这个部门不存在");
+    }
+    let localDepartId = itemDepart[0].localDepartmentId;
+
+
+
+    let localStaff_ids = [];
     for (let u of dingUsers) {
+        console.log("u.name  " , u.name);
         let ddtalkUserInfos = await Models.ddtalkUser.find({
             where: {corpid: corpid, ddUserId: u.userid}
         });
         let dd_info = JSON.stringify(u);
 
+        console.log("go");
         let _staff , ddtalkUser;
         if (ddtalkUserInfos && ddtalkUserInfos.length) {
             let ddtalkUser = ddtalkUserInfos[0];
@@ -448,34 +453,32 @@ export async function addCompanyStaffs(corpApi: CorpApi, DdDepartmentId: any, co
             console.log("ddtalkUser 中新加入员工");
         }
 
-        // 处理该员工与部门的关系
-        for (let item of u.department) {
-            let itemDepart = await Models.ddtalkDepartment.find({
-                where: {DdDepartmentId: item.toString(), corpId: corpid}
-            });
+        localStaff_ids.push(_staff.id);
 
-            if(!itemDepart || !itemDepart[0]){
-                console.log("这个部门不存在  dd_department_id :" , u.department);
-                continue;
-            }
+        let staffDepart = await Models.staffDepartment.find({ where : {
+            staffId: _staff.id,
+            departmentId: localDepartId
+        } });
 
-            let staffDepart = await Models.staffDepartment.find({ where : {
+        if(staffDepart && staffDepart.length){
+            //a ready have
+            continue;
+        }else{
+            let staffDepart = Models.staffDepartment.create({
                 staffId: _staff.id,
-                departmentId: itemDepart[0].localDepartmentId
-            } });
-
-            if(staffDepart && staffDepart.length){
-                //a ready have
-                continue;
-            }else{
-                let staffDepart = Models.staffDepartment.create({
-                    staffId: _staff.id,
-                    departmentId: itemDepart[0].localDepartmentId
-                });
-                await staffDepart.save();
-            }
+                departmentId: localDepartId
+            });
+            await staffDepart.save();
         }
     }
+
+
+
+    //针对这个部门的staffDepartment清理该部门下没有的 staff_department
+    let staffDeparts = await Models.staffDepartment.find({
+        where : { departmentId : localDepartId , staffId : { $notIn : localStaff_ids } }
+    });
+    await Promise.all(staffDeparts.map((item)=>item.destroy()));
 
     console.log("addCompanyStaffs  over");
 }
@@ -486,10 +489,10 @@ export async function addCompanyStaffs(corpApi: CorpApi, DdDepartmentId: any, co
  */
 
 export async function synchroDDorganization() {
-    // let current = await Staff.getCurrent();
-    // if(current.roleId != EStaffRole.OWNER && current.roleId != EStaffRole.ADMIN){
-    //     throw L.ERR.PERMISSION_DENY();
-    // }
+    let current = await Staff.getCurrent();
+    if(current.roleId != EStaffRole.OWNER && current.roleId != EStaffRole.ADMIN){
+        throw L.ERR.PERMISSION_DENY();
+    }
     /*let test = await Models.ddtalkCorp.find({where : { "companyId" : "658cd3a0-bde4-11e6-997b-a9af9a42d08a" }});
      test.map(async (item)=>{
          await item.destroy();
@@ -506,11 +509,11 @@ export async function synchroDDorganization() {
 
      return "good";*/
 
-    let current = {
-        company: {
-            id: "658cd3a0-bde4-11e6-997b-a9af9a42d08a"
-        }
-    }
+    // let current = {
+    //     company: {
+    //         id: "658cd3a0-bde4-11e6-997b-a9af9a42d08a"
+    //     }
+    // }
 
     let corps = await Models.ddtalkCorp.find({where: {companyId: current.company.id}});
     if (!corps || !corps.length) {
@@ -519,20 +522,15 @@ export async function synchroDDorganization() {
 
     let corp = corps[0];
 
-    let {isvApi, corpApi} = await getISVandCorp(corp);
-
-    console.log("deletStaffDepartment");
-    await deletStaffDepartment( current.company.id );
+    let {corpApi} = await getISVandCorp(corp);
     await dealCompanyOrganization(corpApi, corp);
-
-
-    console.log("yes , hello");
+    // console.log("yes , hello");
 }
 
 
 
 setTimeout(async () => {
-    synchroDDorganization();
+    // synchroDDorganization();
     // deleteCompanyOrganization("658cd3a0-bde4-11e6-997b-a9af9a42d08a");
     // tmpAuthCode();
 
@@ -565,57 +563,8 @@ async function arrDestroy(arr: any, callback?: Function) {
     if (!arr || !arr[0]) {
         return;
     }
-    arr.map(async(item) => {
-        if (item.name) {
-            console.log(item.name);
-        }
-        await item.destroy();
-    });
+    Promise.all(arr.map((item)=>item.destroy()));
     return callback && callback();
-}
-
-/*
- *   删除某一企业的组织架构，删除所有部门，删除除owner外所有员工，及员工部门关系等
- *   time @ 2017.3.15
- *
- */
-export async function deleteCompanyOrganization(companyId: string , corp): Promise<boolean> {
-    //删除本地部门
-    try {
-
-        let localDept = await Models.department.find({where: {companyId: companyId}});
-
-        localDept.map(async (item) => {
-            //删除员工部门对照关系表
-            let localDeptStaff = await Models.staffDepartment.find({where: {departmentId: item.id}});
-            await arrDestroy(localDeptStaff);
-            await item.destroy();
-        });
-
-        //删除dd部门与本地部门对照关系表
-        let DdLocalDepart = await Models.ddtalkDepartment.find({where: {corpId: corp.corpId }});
-        await arrDestroy(DdLocalDepart);
-
-        //删除员工表
-        let localStaff = await Models.staff.find({
-            where: {companyId: companyId, roleId: {ne: EStaffRole.OWNER}}
-        });
-        await arrDestroy(localStaff);
-
-        //删除钉钉用户表
-        let corps = await Models.ddtalkCorp.find({where: {companyId: companyId}});
-        if (corps && corps[0]) {
-            let corp = corps[0];
-            let ddtalkUsers = await Models.ddtalkUser.find({where: {corpid: corp.corpId}});
-            await arrDestroy(ddtalkUsers);
-        }
-
-        return true;
-    }
-    catch (e) {
-        console.log(e);
-        return false;
-    }
 }
 
 
@@ -630,7 +579,7 @@ export async function deletStaffDepartment(companyId: string){
     });
 
     let staffDeparts = await Models.staffDepartment.find({
-        where : { departmentId : Depart_ids }
+        where : { departmentId : { $in : Depart_ids } }
     });
     await arrDestroy(staffDeparts);
 }
@@ -701,6 +650,7 @@ async function ddEventCommon(msg){
  */
 export async function userAddOrg(msg) {
     // let {corpApi , corp} = await ddEventCommon(msg);
+    // let userIds = msg.UserId;
     // let userInfos = userIds.map(async (userId)=>{
     //     return await corpApi.getUser(userId);
     // });
