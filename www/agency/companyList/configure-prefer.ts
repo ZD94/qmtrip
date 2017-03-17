@@ -38,6 +38,18 @@ export async function ConfigurePreferController($scope,Models,$stateParams){
     }
 
     $scope.configure = async function(){
+        if(!$scope.hotel){
+            $scope.hotel = [];
+        }
+        if(!$scope.traffic){
+            $scope.traffic =[];
+        }
+        if(!$scope.abroadHotel){
+            $scope.abroadHotel =[];
+        }
+        if(!$scope.abroadTraffic){
+            $scope.abroadTraffic = [];
+        }
         let obj:any ={};
         obj.hotel = tryConventToObj($scope.hotel) ;
         obj.traffic = tryConventToObj($scope.traffic);
