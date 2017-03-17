@@ -15,7 +15,6 @@ angular
             controller : function($scope, $element, CNZZ){
                 $element.click(function(){
                     let args = $scope.statEvent.split(',');
-                    console.info(args);
                     CNZZ.addEvent.apply(this, args);
                 })
             }

@@ -4,7 +4,7 @@
         <div class="item">
             <div class="about_link flex-c111">
                 <div ng-if="!invitedLink" class="create_link">
-                    <a class="button button-calm" ng-click="createLink()" ng-stat-event="生成邀请链接">生成链接</a>
+                    <a class="button button-calm" ng-click="createLink()" ng-stat-event="生成邀请链接,生成链接,邀请员工链接">生成链接</a>
                 </div>
                 <div ng-if="invitedLink" class="link_style" >{{invitedLink.goInvitedLink}}</div>
                 <div ng-if="invitedLink" class="countdown">剩余有效期:{{countdown(expireTimeout)}}</div>
@@ -16,11 +16,11 @@
         </div>
     </div>
     <div class="send_buttons" ng-if="!invitedLink">
-        <a class="button button-outline button-stable" ng-stat-event="点击微信分享">
+        <a class="button button-outline button-stable" ng-stat-event="点击微信分享,分享,点击微信分享">
             <i class="fa fa-weixin"></i>
             <span>通过微信发送</span>
         </a>
-        <a class="button button-outline button-stable" ng-stat-event="点击短信分享">
+        <a class="button button-outline button-stable" ng-stat-event="点击短信分享,分享,短信分享">
             <i class="fa fa-envelope-o"></i>
             <span>通过短信发送</span>
         </a>
