@@ -53,13 +53,11 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
 
         let staffs = await rootDepartment.getStaffs();
         $scope.staffPagers = staffs;
-        Object.setPrototypeOf($scope.staffPagers, Pager.prototype);
         await initStaffs(staffs);
         $scope.departments = departments;
         $scope.currentDepartments = departments;
     }
     async function initStaffs(staffs){
-        Object.setPrototypeOf(staffs, Pager.prototype);
         $scope.staffs = await Promise.all(staffs.map(async function(staff){
             API.require("auth");
             await API.onload();
@@ -173,7 +171,6 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     $scope.staffSelector = {
         query: async function(keyword) {
             let staffs = await rootDepartment.getStaffs({where: {'name': {$ilike: '%'+keyword+'%'}}});
-            Object.setPrototypeOf(staffs, Pager.prototype);
             return staffs;
         },
         display: (staff)=>staff.name
