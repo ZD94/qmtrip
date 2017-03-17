@@ -28,6 +28,10 @@
   font-size: 14px;
   color: $dark;
   font-weight: bold;
+  .ion-ios-medical{
+    color: #D0011B;
+    font-size: 12px;
+  }
   .check-box{
     .checkbox_diy{
       color: lighten($dark,39%);
