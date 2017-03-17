@@ -18,10 +18,14 @@
                 <ng-selector-list
                         ng-model="department.manager"
                         dlg-options="staffSelector"
-                        dlg-title=""
                         dlg-placeholder="选择主管"
                         class="fake-input"
-                ></ng-selector-list>
+                >
+                    <list-item>{{$item.name}}</list-item>
+                    <input-item>
+                        <fake-input value="{{department.manager.name}}" placeholder=""></fake-input>
+                    </input-item>
+                </ng-selector-list>
                 <i class="icon ion-chevron-right"></i>
             </div>
         </div>
