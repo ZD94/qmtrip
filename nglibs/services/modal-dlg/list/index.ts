@@ -11,6 +11,7 @@ export async function selectFromListController($scope) {
     };
     $scope.optionItems = [];
 
+
     function displayItem(item){
         if(item && $scope.options && $scope.options.display){
             return $scope.options.display(item, true);
@@ -48,6 +49,7 @@ export async function selectFromListController($scope) {
         lists = await $scope.options.query(form.keyword);
         $scope.optionItems = _.cloneDeep(lists);
         console.info($scope.optionItems);
+
     }
     await reloadOptionItems();
     var page = {
@@ -87,3 +89,7 @@ export async function selectFromListController($scope) {
         msgbox.log($scope.options.noticeMsg);
     }
 }
+
+
+
+

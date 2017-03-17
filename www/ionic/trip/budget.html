@@ -30,14 +30,14 @@
                 </div>
                 <ion-list>
                     <div ng-repeat="budget in budgets" class="ta-detail-item">
-                        <ion-item class="item-divider">
+                        <ion-item class="item-divider ion-item-title">
                             <span ng-if='budget.tripType == ETripType.OUT_TRIP'>去程交通</span>
                             <span ng-if='budget.tripType == ETripType.BACK_TRIP'>回程交通</span>
                             <span ng-if='budget.tripType == ETripType.HOTEL'>住宿</span>
                             <span ng-if='budget.tripType == ETripType.SUBSIDY'>补助</span>
                             <!--<span style="float: right">{{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')}}{{budget.price == -1 ? '' : '元'}}</span>-->
                         </ion-item>
-                        <ion-item>
+                        <ion-item class="item-divider">
                             <div ng-if="budget.tripType == ETripType.BACK_TRIP">
                                 <span>{{budget.leaveDate | date: 'MM-dd'}}</span>
                                 <span class="spanRight">{{budget.price <=0 ? '暂无预算' : (budget.price| currency_int)+'元'}}</span>

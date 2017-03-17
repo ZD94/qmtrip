@@ -1,20 +1,20 @@
-<ion-view title="忘记密码" class="sendCode">
+<ion-view title="忘记密码" class="forget-send-code">
     <ion-content padding="true">
         <form class="list">
-            <div class="spacer" style="height: 40px;"></div>
+            <div class="spacer" style="height: 0px;"></div>
             <ion-list>
                 <div class="item item-input">
                     <span class="input-label">手机号码</span>
                     <input type="text" placeholder="请输入11位手机号" ng-model="form.mobile" required ng-required>
                 </div>
-                <div class="item item-input">
+                <div class="item item-input item-get-code">
                     <!--<span class="input-label">重复密码</span>-->
                     <input type="text" placeholder="请输入验证码" ng-model="form.msgCode" required ng-required>
-                    <a class="button button-positive" ng-click="sendCode()" ng-if="!showCount">发送验证码</a>
-                    <div class="button button-stable" style="width: 116px;text-align: center;" ng-if="showCount"><span id="countNum">{{beginNum}}</span>s</div>
+                    <a class="button button-get-code" ng-click="sendCode()" ng-if="!showCount">发送验证码</a>
+                    <div class="button button-show-count" style="width: 116px;text-align: center;" ng-if="showCount"><span id="countNum">{{beginNum}}</span>s</div>
                 </div>
             </ion-list>
-            <div class="spacer" style="height: 40px;"></div>
+            <div class="spacer" style="height: 10px;"></div>
             <a id="btn_login" class="button button-calm button-block" ng-click="nextStep()">下一步</a>
             <a class="button button-stable button-block" href="#/login/index">返回</a>
         </form>
