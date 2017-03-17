@@ -17,7 +17,7 @@ import {Seed} from "./seed";
 import { ModelInterface } from 'common/model/interface';
 import { ModelDelegate } from 'common/model/delegate';
 import {TravelBudgetLog} from "./travelbudget";
-import {DDTalkCorp, DDTalkUser} from "./ddtalk";
+import {DDTalkCorp, DDTalkUser , DDTalkDepartment} from "./ddtalk";
 import {CoinAccountChange, CoinAccount} from "./coin";
 import {TripDetailSubsidy, TripDetailSpecial} from "./tripPlan/tripDetailInfo";
 import {Approve} from "./approve/index";
@@ -82,6 +82,7 @@ export interface ModelsInterface {
 
     ddtalkCorp: ModelInterface<DDTalkCorp>;
     ddtalkUser: ModelInterface<DDTalkUser>;
+    ddtalkDepartment: ModelInterface<DDTalkDepartment>;
 
     coinAccount: ModelInterface<CoinAccount>;
     coinAccountChange: ModelInterface<CoinAccountChange>;
@@ -132,6 +133,7 @@ export var Models: ModelsInterface = {
 
     ddtalkCorp: new ModelDelegate<DDTalkCorp>(),
     ddtalkUser: new ModelDelegate<DDTalkUser>(),
+    ddtalkDepartment: new ModelDelegate<DDTalkDepartment>(),
 
     coinAccount: new ModelDelegate<CoinAccount>(),
     coinAccountChange: new ModelDelegate<CoinAccountChange>(),

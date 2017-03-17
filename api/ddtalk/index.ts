@@ -3,11 +3,11 @@
  */
 
 'use strict';
+
 const API = require('common/api');
 let dingSuiteCallback = require("dingtalk_suite_callback");
 import fs = require("fs");
 import cache from "common/cache";
-const C = require("config");
 
 const config ={
     token: 'jingli2016',
@@ -19,331 +19,91 @@ const config ={
 
 import request = require('request');
 import ISVApi from "./lib/isvApi";
-import CorpApi from "./lib/corpApi";
-import {reqProxy} from "./lib/reqProxy";
-import {Company} from "api/_types/company";
-import {Staff, EStaffRole} from "api/_types/staff";
 import {Models} from "../_types/index";
 import {clientExport} from "../../common/api/helper";
 import {get_msg} from "./lib/msg-template/index";
-import {md5} from "../../common/utils";
-import {StaffDepartment} from "../_types/department/staffDepartment";
+
+import * as DealEvent from "./lib/dealEvent";
 
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
-const DEFAULT_PWD = '000000';
-
-interface suiteTokenCached{
-    suite_access_token: string;
-    expire_at: number;
-}
-
-async function _getSuiteToken() {
-    let ticketObj: any = await cache.read(CACHE_KEY);
-    if (typeof ticketObj == 'string') {
-        ticketObj = JSON.parse(ticketObj);
-    }
-    if (!ticketObj || !ticketObj.ticket ) {
-        throw new Error(`还没有ticket`);
-    }
-    let ticket = ticketObj.ticket;
-    if (!ticket) {
-        throw new Error('不存在ticket');
-    }
-    let key = `ddtalk:suite_access_token:${config.suiteid}`;
-    let d = await cache.readAs<suiteTokenCached>(key)
-    if (d && d.expire_at > Date.now()) {
-        return d;
-    }
-
-    let url = `https://oapi.dingtalk.com/service/get_suite_token`;
-    let ret: any = await reqProxy(url, {
-        name: '获取套件Token',
-        body: {
-            suite_key: config.suiteid,
-            suite_secret: config.secret,
-            suite_ticket: ticket
-        }
-    })
-    d = {suite_access_token: ret.suite_access_token, expire_at: (ret.expires_in - 30) * 1000 + Date.now() };
-    cache.write(key, JSON.stringify(d))
-    return d;
-}
-
-async function _getPermanentCode(suiteToken, tmpAuthCode) {
-    let url = 'https://oapi.dingtalk.com/service/get_permanent_code';
-    return reqProxy(url, {
-        name: '获取永久授权码',
-        qs: {
-            suite_access_token: suiteToken,
-        },
-        body: {
-            tmp_auth_code: tmpAuthCode,
-        }
-    })
-}
-
 
 let ddTalkMsgHandle = {
     /* * * * 临时授权码* * * * */
     tmp_auth_code: async function(msg) {
-        const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
-        let isExist = await cache.read(TMP_CODE_KEY);
-        if (isExist) {
-            return;
-        }
-        await cache.write(TMP_CODE_KEY, true, 60 * 2);
-        let tokenObj = await _getSuiteToken();
-        let suiteToken = tokenObj['suite_access_token']
-        let permanentAuthMsg: any = await _getPermanentCode(suiteToken, msg.AuthCode);
-        let permanentCode = permanentAuthMsg['permanent_code'];
-        let companyInfo = permanentAuthMsg.auth_corp_info;
-
-        let corp_name = companyInfo.corp_name;
-        let corpid = companyInfo.corpid;
-
-        let isvApi = new ISVApi(config.suiteid, suiteToken, corpid, permanentCode);
-        let authInfo: any = await isvApi.getCorpAuthInfo();
-        let authUserInfo = authInfo.auth_user_info;
-
-        //agentID每次都会变,所以每次授权都要获取
-        let agents = authInfo.auth_info.agent || [];
-        let agentid = '';
-        for(let agent of agents) {
-            if (agent['appid'] == config.appid) {
-                agentid = agent['agentid'];
-                break;
-            }
-        }
-        let corpAccessToken = await isvApi.getCorpAccessToken();
-        let corpApi = new CorpApi(corpid, corpAccessToken);
-        let userInfo: any = await corpApi.getUser(authUserInfo.userId);
-        let corps = await Models.ddtalkCorp.find({where : {corpId: corpid}});
-        let corp;
-        if (corps && corps.length) {
-            corp = corps[0];
-            let company = await corp.getCompany(corp['company_id']);
-            company.status = 1;
-            company = await company.save();
-            corp.isSuiteRelieve = false;
-            corp.permanentCode = permanentCode;
-            corp.agentid = agentid;
-            corp = await corp.save();
-        } else {
-            //创建企业
-            let company = Company.create({name: corp_name});
-            company = await company.save();
-            let travelPolicy = await company.getDefaultTravelPolicy();
-
-            //钉钉关联企业信息
-            let obj = {
-                id: company.id,
-                corpId: corpid,
-                permanentCode: permanentCode,
-                companyId: company.id,
-                isSuiteRelieve: false,
-                agentid: agentid
-            }
-            let corp = Models.ddtalkCorp.create(obj);
-            await corp.save();
-
-            //管理员信息
-            let staff = Staff.create({
-                name: userInfo.name,
-                status: 1,
-                roleId: EStaffRole.OWNER,
-                travelPolicyId: travelPolicy.id
-            })
-            staff.pwd = md5(DEFAULT_PWD);
-            staff.company = company;
-            staff = await staff.save();
-
-            //更新公司信息
-            company.createUser = staff.id;
-            await company.save();
-
-            let _ddtalkUser = {
-                id: staff.id,
-                dingId: userInfo.dingId,
-                ddUserId: userInfo.userid,
-                isAdmin: userInfo.isAdmin,
-                name: userInfo.name,
-                avatar: userInfo.avatar,
-                corpid: corpid,
-            }
-            let ddtalkUser = Models.ddtalkUser.create(_ddtalkUser);
-            await ddtalkUser.save();
-
-            try {
-                let departments = await corpApi.getDepartments();
-                for(let d of departments) {
-                    let val = {name: d.name, isDefault: d.id == 1};
-                    let _d = Models.department.create(val);
-                    _d.company = company;
-                    //将名称与企业名称一致的部门设为默认部门
-                    if(_d.name == company.name){
-                        _d.isDefault = true;
-                    }
-                    _d = await _d.save();
-
-                    let users = await corpApi.getUserListByDepartment(d.id);
-                    await addDingUsersCompany(corp, users, corpApi);
-                }
-
-                //若企业没有默认部门添加默认部门
-                let defaultDept = await company.getDefaultDepartment();
-                if(!defaultDept){
-                    let dd = Models.department.create({name: company.name, isDefault: true});
-                    dd.company = company;
-                    await dd.save();
-                }
-
-            } catch(err) {
-                console.error("导入用户错误", err)
-                throw err;
-            }
-        }
-        await isvApi.activeSuite();
-        await corpApi.registryContractChangeLister(config.token, config.encodingAESKey, C.host+'/ddtalk/isv/receive');
+        DealEvent.tmpAuthCode(msg);
     },
 
     /* * * * * 授权变更* * * * * * */
     change_auth: async function(msg) {
         return msg;
     },
-
+    check_url: async function(msg) {
+        return msg;
+    },
     /* * * * 解除授权信息 * * * */
     suite_relieve: async function(msg) {
-        let corpId = msg.AuthCorpId;
-        let corps = await Models.ddtalkCorp.find({where: {corpId: corpId}});
-        if (corps && corps.length) {
-            let corp = corps[0];
-            corp.isSuiteRelieve = true;
-            corp.permanentCode = null;
-            corp = await corp.save()
-
-            //禁用企业
-            let company = await corp.getCompany(corp['company_id']);
-            company.status = -1;
-            await company.save();
-            let isvApi = new ISVApi(config.suiteid, '', corpId, '');
-            await isvApi.removeCorpAccessToken();
-        }
+        DealEvent.suiteRelieve(msg);
     },
 
-    /* * * 保存授权信息 * */
+    /* * * 保存授权信息 , 每20分钟钉钉会请求一次 * * */
     suite_ticket: async function(msg) {
         let ticket = msg.SuiteTicket;
-        await cache.write(CACHE_KEY, JSON.stringify({ticket: ticket, timestamp: msg.TimeStamp}));
-        return msg;
+        await cache.write(CACHE_KEY, JSON.stringify({
+            ticket: ticket, timestamp: msg.TimeStamp
+        }));
     },
 
     /* * * 企业增加员工 * * */
-    /*
-     {
-     "EventType": "user_add_org",
-     "TimeStamp": 43535463645,
-     "UserId": ["efefef" , "111111"],
-     "CorpId": "corpid"
-     }
-     */
     user_add_org: async function(msg) {
-        let userIds = msg.UserId;
-        let corpId = msg.CorpId;
-        let tokenObj = await _getSuiteToken();
-        let suiteToken = tokenObj['suite_access_token']
-
-        let corps = await Models.ddtalkCorp.find({where: {corpId: corpId}});
-        if (corps && corps.length) {
-            let corp = corps[0];
-            //禁用企业
-            let isvApi = new ISVApi(config.suiteid, suiteToken, corpId, corp.permanentCode);
-            let corpApi = await isvApi.getCorpApi();
-            let ps = userIds.map( async (userId) => {
-                return await corpApi.getUser(userId);
-            });
-            let users = await Promise.all(ps);
-            await addDingUsersCompany(corp, users, corpApi);
-        }
+        DealEvent.userAddOrg(msg);
     },
-    check_url: async function(msg) {
+
+    /* * 通讯录用户更改 * */
+    user_modify_org : async function(msg){
+        DealEvent.userAddOrg(msg);
+    },
+    /* * 通讯录用户离职 * */
+    user_leave_org : async function(msg){
+        return msg;
+    },
+    /* * 通讯录用户被设为管理员 * */
+    // org_admin_add : async function(msg){
+    //     return msg;
+    // },
+    /* * 通讯录用户被取消设置管理员 * */
+    // org_admin_remove : async function(msg){
+    //     return msg;
+    // },
+    /* * *  通讯录企业部门创建 * * */
+    org_dept_create : async function(msg){
+        DealEvent.orgDeptCreate(msg);
+    },
+    /* * *  通讯录企业部门修改 * * */
+    org_dept_modify : async function(msg){
+        DealEvent.orgDeptModify(msg);
+    },
+    /* * *  通讯录企业部门删除 * * */
+    org_dept_remove : async function(msg){
+        DealEvent.orgDeptRemove(msg);
+        return msg;
+    },
+    /* * *  企业被解散 * * */
+    org_remove : async function(msg){
+        DealEvent.orgDeptRemove(msg);
         return msg;
     }
 }
 
-
-async function addDingUsersCompany(corp, dingUsers, corpApi: CorpApi) {
-    let company = await corp.getCompany(corp['company_id']);
-
-    let corpid = corp.corpId;
-
-    let travelPolicy = await company.getDefaultTravelPolicy();
-
-    for(let u of dingUsers) {
-        let dingUsers = await Models.ddtalkUser.find({ where: {corpid: corpid, ddUserId: u.userid}})
-        if (dingUsers && dingUsers.length) {
-            //查看是否是同一个公司
-            let dingUser = dingUsers[0];
-            let s = await Models.staff.get(dingUser.id);
-            if (company.id == s.company.id) {
-                continue;
-            }
-        }
-
-        let _staff = Models.staff.create({name: u.name, travelPolicyId: travelPolicy.id});
-        _staff.company = company;
-        _staff.pwd = md5(DEFAULT_PWD);
-        _staff.status = 1;
-        _staff = await _staff.save();
-
-        //绑定部门关系
-        let departmentIds = u['department'];
-        let departmentId;
-        if (departmentIds && departmentIds.length) {
-            departmentId = departmentIds[0];
-        }
-
-        if (departmentId) {
-            //获取钉钉部门详情
-            let dingTalkDept = await corpApi.getDepartmentInfo(departmentId);
-            //根据名称与我们系统匹配
-            let jlDepts = await Models.department.find({where: {name: dingTalkDept.name}});
-            let department;
-            if (jlDepts && jlDepts.length) {
-                department = jlDepts[0];
-            } else {
-                department = Models.department.create({name: dingTalkDept.name});
-                department.company = company;
-                department = await department.save();
-            }
-            let staffDepartment = StaffDepartment.create({staffId: _staff.id, departmentId: department.id});
-            await staffDepartment.save();
-        }
-
-        let dingUser = Models.ddtalkUser.create({id: _staff.id, avatar: u.avatar, dingId: u.dingId,
-            isAdmin: u.isAdmin, name: u.name, ddUserId: u.userid, corpid: corpid});
-        await dingUser.save();
-    }
-}
 
 class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
-        let url = "/ddtalk/isv/receive"
-        app.post(url, dingSuiteCallback(config, function (msg, req, res, next) {
-            request.post({
-                uri: 'https://d.l.jingli365.com' + url,
-                qs: req.query,
-                form: req.body,
-                strictSSL: false,
-            }, function(err, resp) {
-                if (err) {
-                    console.log(`推送到测试服务器失败`, err);
-                    return;
-                }
-                if (resp.statusCode != 200) {
-                    console.log('返回错误码:', resp.statusCode);
-                }
-            });
+        app.post("/ddtalk/isv/receive", dingSuiteCallback(config, function (msg, req, res, next) {
+            console.info(msg);
+            if(!ddTalkMsgHandle[msg.EventType]){
+                return res.reply();
+            }
+
             return ddTalkMsgHandle[msg.EventType](msg)
                 .then((ret) => {
                     res.reply();
@@ -368,7 +128,7 @@ class DDTalk {
                 let err = new Error(`企业还未授权或者已取消授权`);
                 throw err;
             }
-            let tokenObj = await _getSuiteToken();
+            let tokenObj = await DealEvent._getSuiteToken();
             let suiteToken = tokenObj['suite_access_token']
             let isvApi = new ISVApi(config.suiteid, suiteToken, orgid, corp.permanentCode);
             let corpApi = await isvApi.getCorpApi();
@@ -402,7 +162,7 @@ class DDTalk {
                 let err = new Error(`企业还未授权或者已取消授权`);
                 throw err;
             }
-            let tokenObj = await _getSuiteToken();
+            let tokenObj = await DealEvent._getSuiteToken();
             let suiteToken = tokenObj['suite_access_token']
             let isvApi = new ISVApi(config.suiteid, suiteToken, corpid, corp.permanentCode);
             let corpApi = await isvApi.getCorpApi();
@@ -431,7 +191,7 @@ class DDTalk {
         let corp = await Models.ddtalkCorp.get(company.id);
         let ddtalkUser = await Models.ddtalkUser.get(staff.id);
         if (corp && ddtalkUser) {
-            let tokenObj = await _getSuiteToken();
+            let tokenObj = await DealEvent._getSuiteToken();
             let isvApi = new ISVApi(config.suiteid, tokenObj['suite_access_token'], corp.corpId, corp.permanentCode);
             let corpApi = await isvApi.getCorpApi();
             let msg= await get_msg({
@@ -449,6 +209,14 @@ class DDTalk {
         console.warn(`企业不存在或者不是从钉钉导入`);
         return null;
     }
+
+    /*
+    *  同步钉钉组织架构
+    */
+    @clientExport
+    static async synchroDDorganization(){
+        return DealEvent.synchroDDorganization();
+    }
 }
 
 function getRndStr(length) : string {
@@ -458,5 +226,6 @@ function getRndStr(length) : string {
     }
     return ret;
 }
+
 
 export= DDTalk

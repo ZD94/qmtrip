@@ -733,6 +733,12 @@ class StaffModule{
             let deptIds = item.departmentIds;
             let staffObj: any = {name: item.name, mobile: item.mobile+"", email: item.email, sex: item.sex, roleId: item.roleId,
                 travelPolicyId: item.travelPolicyId, companyId: item.companyId, addWay: EAddWay.BATCH_IMPORT, isNeedChangePwd: true, };
+            if(_.trim(staffObj.mobile) == ""){
+                staffObj.mobile = null;
+            }
+            if(_.trim(staffObj.email) == ""){
+                staffObj.email = null;
+            }
             let staffAdded = await StaffModule.createStaff(staffObj);
             await staffAdded.saveStaffDepartments(deptIds);
              StaffModule.sendNoticeToAdmins({
