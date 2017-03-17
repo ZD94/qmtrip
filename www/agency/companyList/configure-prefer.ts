@@ -46,4 +46,11 @@ export async function ConfigurePreferController($scope,Models,$stateParams){
         let res = await agencyUser.configPreference(companyId, obj);
         msgbox.alert("配置成功");
     }
+    $scope.cancel = async function(){
+        $scope.hotel = '';
+        $scope.traffic = '';
+        $scope.abroadHotel = '';
+        $scope.abroadTraffic = '';
+    }
+
 }
