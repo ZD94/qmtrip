@@ -28,8 +28,6 @@ export async function BudgetController($scope, $storage, $loading, Models, $stat
     API.require("tripApprove");
     await API.onload();
     let result = await API.travelBudget.getBudgetInfo({id: id});
-    console.info(result);
-    console.info("result====================================");
     let budgets = result.budgets;
     let trip = $storage.local.get("trip");
     let query = result.query;
