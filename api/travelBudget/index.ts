@@ -13,12 +13,11 @@ const moment = require('moment');
 const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
-<<<<<<< HEAD
+
 import fs=require("fs");
-import {ITicket, TravelBudgeItem, TRAFFIC} from "api/_types/travelbudget";
-=======
+
 import {ITicket, TRAFFIC, TravelBudgeTraffic, TravelBudgetHotel} from "api/_types/travelbudget";
->>>>>>> f6c0c49cec6993d87256e10e541fbf736a3a795e
+
 import {
     TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
 } from "./strategy/index";

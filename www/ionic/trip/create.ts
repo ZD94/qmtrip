@@ -349,9 +349,9 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
                 alert('系统错误，请稍后重试');
                 $loading.end();
             }, 60 * 1000);
-<<<<<<< HEAD
+
            console.log("this is params to budget: ",params);
-=======
+
 
             /*let addParams = {
                 destinationPlace: "CT_289",
@@ -368,7 +368,7 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
             }
              params.destinationPlacesInfo.push(addParams);*/
             console.info(params);
->>>>>>> f6c0c49cec6993d87256e10e541fbf736a3a795e
+
             budget = await API.travelBudget.getTravelPolicyBudget(params);
             if (isShowDone) {
                 cb();
