@@ -197,6 +197,10 @@ function initUpdater($ionicPlatform, $ionicPopup) {
                if(ret){
                    url = url.substr(0,url.length-5);
                }
+               let res = url.endsWith('~2F');
+               if(res){
+                    url = url.replace('~2F','/');
+               }
                 var titles = {
                     "/staff/" : "进入个人中心",
                     "/staff/staff-info" : "修改个人资料",
@@ -221,7 +225,6 @@ function initUpdater($ionicPlatform, $ionicPopup) {
                     "/department/add-staff" : "点击邀请员工",
                     "/travel-policy/editpolicy" : "新增差旅标准",
                     "/travel-policy/showpolicy" : "差旅标准详情页",
-                    "/travel-policy~2F" : "保存差旅标准",
                     "/travel-policy/" : "修改差旅标准",
                     "/supplier/" : "进入预订服务管理",
                     "/accord-hotel/" : "进入协议酒店管理",
