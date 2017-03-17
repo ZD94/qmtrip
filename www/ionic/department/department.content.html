@@ -44,10 +44,10 @@
     <ion-infinite-scroll ng-if="page.hasNextPage()" on-infinite="page.nextPage()"></ion-infinite-scroll>
 </ion-content>
 <div class="tabs">
-    <a class="tab-item" ng-click="addDepartment()">
+    <a class="tab-item" ng-click="addDepartment()" ng-stat-event="添加子部门,添加，添加子部门">
         添加子部门
     </a>
-    <a class="tab-item" ng-click="setDepartment()">
+    <a class="tab-item" ng-click="setDepartment()" ng-stat-event="管理部门,点击,管理部门">
         部门管理
     </a>
     <a class="tab-item" ng-click="multipleMove()">

@@ -1,7 +1,6 @@
 import { Department } from 'api/_types/department';
 import {Staff, EStaffRoleNames, EStaffRole} from 'api/_types/staff/staff';
 import moment = require('moment');
-import {Pager} from "common/model/pager";
 import {multipleMoveController} from "./multiple-move";
 var msgbox = require('msgbox');
 
@@ -17,6 +16,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     let company = staff.company;
     let rootDepartment : Department;
     let newUrl;
+
     $scope.policy_staffs = [];//用于存放可以展示差旅标准的staff list
     $scope.moveStaffIds = [];
     if(departmentId){
@@ -55,7 +55,6 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
 
         let staffs = await rootDepartment.getStaffs();
         $scope.staffPagers = staffs;
-        // Object.setPrototypeOf($scope.staffPagers, Pager.prototype);
         await initStaffs(staffs);
         $scope.departments = departments;
         $scope.currentDepartments = departments;
@@ -217,7 +216,6 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     $scope.staffSelector = {
         query: async function(keyword) {
             let staffs = await rootDepartment.getStaffs({where: {'name': {$ilike: '%'+keyword+'%'}}});
-            Object.setPrototypeOf(staffs, Pager.prototype);
             return staffs;
         },
         display: (staff)=>staff.name
