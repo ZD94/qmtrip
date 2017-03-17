@@ -139,11 +139,11 @@ export class Company extends ModelObject{
     get isSetPwd(): boolean { return false; }
     set isSetPwd(val: boolean) {}
 
-    @Field({type: Types.BOOLEAN})
+    @Field({type: Types.BOOLEAN, defaultValue: true})
     get isApproveOpen(): boolean { return true; }
     set isApproveOpen(val: boolean) {}
 
-    @Field({type: Types.STRING(50)})
+    @Field({type: Types.STRING(50), defaultValue: 'default'})
     get budgetPolicy(): string { return 'default'; }
     set budgetPolicy(policy:string){}
 
@@ -151,7 +151,7 @@ export class Company extends ModelObject{
     get getNoticeEmail(): string { return  null; }
     set getNoticeEmail(val:string){}
 
-    @Field({type: Types.JSONB})
+    @Field({type: Types.JSONB, defaultValue: '{}'})
     get budgetConfig(): any { return {}};
     set budgetConfig(conf: any) {}
 
@@ -168,11 +168,11 @@ export class Company extends ModelObject{
     get points2coinRate(): number { return 50};
     set points2coinRate(rate: number) {}
 
-    @Field({type: Types.JSONB})
+    @Field({type: Types.JSONB, defaultValue: '[]'})
     get appointedPubilcSuppliers(): any { return []};
     set appointedPubilcSuppliers(val: any) {}
 
-    @Field({type: Types.BOOLEAN})
+    @Field({type: Types.BOOLEAN, defaultValue: false})
     get isAppointSupplier(): boolean { return false; }
     set isAppointSupplier(val: boolean) {}
 
