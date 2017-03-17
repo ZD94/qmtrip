@@ -377,7 +377,8 @@ app.controller('debug',function($scope, $http, $location){
   var copyTemp = '';
   //拿到原始数据
   if(url.key){
-    $http.get('/api/budgets?p='+p+'&pz='+pz+'&key='+url.key)
+    /*$http.get('/api/budgets?p='+p+'&pz='+pz+'&key='+url.key)*/
+    $http.get('../../api/budgets?p='+p+'&pz='+pz+'&key='+url.key)
         .success(function(response){
          for(let i=0;i<response.length;i++){
            let arr = response[i].markedData;
@@ -392,9 +393,9 @@ app.controller('debug',function($scope, $http, $location){
     });
   }
   //更改服务器
-    $scope.originServer = {name:'默认',url:'/api/budgets'};
+    $scope.originServer = {name:'默认',url:'../api/budgets'};
     $scope.originServers = [
-        {name:'默认',url:'/api/budgets'},
+        {name:'默认',url:'../api/budgets'},
         {name:'测试',url:'//t.jingli365.com/api/budgets'},
         {name:'本地',url:'//l.jingli365.com/api/budgets'},
         {name:'正式',url:'//j.jingli365.com/api/budgets'}
