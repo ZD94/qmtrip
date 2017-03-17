@@ -193,13 +193,13 @@ function initUpdater($ionicPlatform, $ionicPopup) {
        $ionicPlatform.ready(function(){
            $rootScope.$on('$locationChangeSuccess',function(event,newUrl,oldUrl){
                var url = $location.path();
-               let ret = url.endsWith('index')
+               let res = url.indexOf('~2F');
+               if(res>=0){
+                   url = url.replace(/~2F/g,'/');
+               }
+               let ret = url.endsWith('index');
                if(ret){
                    url = url.substr(0,url.length-5);
-               }
-               let res = url.endsWith('~2F');
-               if(res){
-                    url = url.replace('~2F','/');
                }
                 var titles = {
                     "/staff/" : "进入个人中心",
