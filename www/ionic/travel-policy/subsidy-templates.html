@@ -9,13 +9,13 @@
            ng-click="data.showDelete = !data.showDelete;data.showReorder = false;"
            ng-if="subsidyTemplates.length>0">管理模板</a>
         <ion-list show-delete="data.showDelete">
-            <ion-item ng-repeat="st in subsidyTemplates track by $index">
-                <ion-delete-button class="ion-minus-circled" ng-click="deleteSt(st, $index)"> </ion-delete-button>
-                <div style="color:#000000;">
-                    {{st.name}}<span class="item-note">{{st.subsidyMoney | currency_int}}元/天</span>
-                    <!--<i class="icon ion-chevron-right"></i>-->
-                </div>
-            </ion-item>
+                <ion-item ng-repeat="st in subsidyTemplates track by $index">
+                    <ion-delete-button class="ion-minus-circled" ng-click="deleteSt(st, $index)"> </ion-delete-button>
+                    <div style="color:#393939;">
+                        {{st.name}}<span class="item-note">{{st.subsidyMoney | currency_int}}元/天</span>
+                        <!--<i class="icon ion-chevron-right"></i>-->
+                    </div>
+                </ion-item>
             <div class="subsidyAttend">说明<br/>
                 请根据公司差旅政策设置补助标准，如果不设置此项默认为零。<br/>
                 员工在填写出差申请时，可选择对应的补助标准，系统将根据员工选择的标准计算差旅预算。<br/>

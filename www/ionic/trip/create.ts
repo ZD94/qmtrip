@@ -177,12 +177,13 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
         queryAll: queryAllPlaces,
         queryAbroad: queryAbroadPlaces,
         queryDomestic: queryDomesticPlaces,
-        display: (item)=> {
-            if (item.isAbroad && item.code) {
-                return `${item.name}(${item.code})`;
-            }
-            return item.name
-        }
+        display: '{{$item.name}}<span ng-if="$item.isAbroad && item.code">({{$item.code}})</span>',
+        //display: (item)=> {
+        //   if (item.isAbroad && item.code) {
+        //       return `${item.name}(${item.code})`;
+        //  }
+        //  return item.name
+        // }
     };
     $scope.fromPlaceSelector = {
         queryAll: queryAllPlaces,

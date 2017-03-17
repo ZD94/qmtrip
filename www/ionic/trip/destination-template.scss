@@ -1,3 +1,4 @@
+@import "../../../common/vendor/ionic/scss/variables.scss";
 .destination-template{
   background: url("ionic/images/background.jpg") no-repeat;
   background-size: cover;
@@ -73,6 +74,9 @@
   .item-radio{
     border: 0;
     margin-bottom: 5px;
+    input:checked + .radio-content .radio-icon{
+      color: $calm;
+    }
     .radio-content{
       .item-content{
         border: 1px solid #ddd;
@@ -82,7 +86,8 @@
       .icon{
         font-size: 14px;
         padding: 8px;
-        color: #28a7e1;
+        visibility:visible;
+        color: lighten($dark,39);
       }
     }
   }
