@@ -1,8 +1,9 @@
 //welcome页面
+@import "../scss/color.variable.scss";
 .company-welcome{
   .company{
     color:white;
-    background-color: #7b75b8;
+    background-color: rgba(255,255,255,0.2);;
     height:50px;
     line-height: 50px;
   }
@@ -30,8 +31,5 @@
 .sendCode{
   #password{
     padding-right: 30px;
-  }
-  .getCodeBtn{
-    width:126px;
   }
 }
