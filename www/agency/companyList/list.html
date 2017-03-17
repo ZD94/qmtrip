@@ -43,19 +43,6 @@
                     </td>
                 </tr>
             </table>
-
-            <!--<div class="company_search">-->
-                <!--<h3>公司列表</h3>-->
-                <!--创建者姓名：<input type="text" placeholder="输入创建者姓名" ng-model="query.userName">-->
-                <!--公司名称：<input type="text" placeholder="输入公司名称" ng-model="query.keyword">-->
-                <!--手机号:<input type="text" placeholder="输入手机号" ng-model="query.mobile">-->
-                <!--<br>-->
-                <!--注册时间段: <input type="date"  ng-model="query.regDateStart">-->
-                <!--&#45;&#45;<input type="date" ng-model="query.regDateEnd">-->
-                <!--小于剩余有效期天数:-->
-                <!--<input type="text" ng-model="query.days" placeholder="输入有效期天数">-->
-                <!--<button ng-click="doSearch()">搜索</button>-->
-            <!--</div>-->
             <div style="clear:both;"></div>
         </div>
         <table class="company">
@@ -90,9 +77,12 @@
                 <td>
                     <a href="#/companyList/add-flow-package?companyId={{company.id}}" target="_self" style=" color: #118FD6;">增加流量包</a>
                 </td>
+                <td>
+                    <a href="#/companyList/configure-prefer?companyId={{company.id}}" target="_self" style=" color: #118FD6;">配置企业差旅偏好</a>
+                </td>
             </tr>
             <tr>
-                <td colspan="12">
+                <td colspan="13">
                     <a ng-click="prevPage()" ng-if="pager.hasPrevPage()">上一页</a>
                     <a ng-click="nextPage()" ng-if="pager.hasNextPage()">下一页</a>
                 </td>
