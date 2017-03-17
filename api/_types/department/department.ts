@@ -70,6 +70,8 @@ export class Department extends ModelObject{
 
     async getChildDeptStaffNum(): Promise<any> {
         let self = this;
+
+        // console.log(this.id , this.company.id)
         let pagers = await Models.department.find({where : {parentId: this.id, companyId: self['companyId']}, order: [['createdAt', 'desc']]});
 
         let childDepartments = [];

@@ -17,7 +17,7 @@ import {Account, Token} from 'api/_types/auth';
 import { Seed } from 'api/_types/seed';
 import { createServerService } from 'common/model/sequelize';
 import {TravelBudgetLog} from "api/_types/travelbudget";
-import {DDTalkCorp, DDTalkUser} from "api/_types/ddtalk";
+import {DDTalkCorp, DDTalkUser, DDTalkDepartment} from "api/_types/ddtalk";
 import {CoinAccount, CoinAccountChange} from "./_types/coin";
 import {TripDetailSubsidy, TripDetailSpecial} from "./_types/tripPlan/tripDetailInfo";
 import {Approve} from "./_types/approve/index";
@@ -63,8 +63,10 @@ initModels({
 
     ddtalkCorp: createServerService<DDTalkCorp>(DDTalkCorp),
     ddtalkUser: createServerService<DDTalkUser>(DDTalkUser),
+    ddtalkDepartment : createServerService<DDTalkDepartment>(DDTalkDepartment),
     
     coinAccount: createServerService<CoinAccount>(CoinAccount),
     coinAccountChange: createServerService<CoinAccountChange>(CoinAccountChange),
     agencyOperateLog:createServerService<AgencyOperateLog>(AgencyOperateLog),
+
 });

@@ -134,13 +134,41 @@ export default class CorpApi {
         let self = this;
         let url = `https://oapi.dingtalk.com/call_back/register_call_back?access_token=${self.accessToken.access_token}`;
         let body = {
-            "call_back_tag": ["user_add_org", "user_modify_org", "user_leave_org"],
+            "call_back_tag": [
+                "user_add_org",
+                "user_modify_org",
+                "user_leave_org"  ,
+                "org_dept_create" ,
+                "org_dept_modify" ,
+                "org_dept_remove" ,
+                "org_remove"
+            ],
             "token": token,
             "aes_key": aesKey,
             "url": eventListenUrl,
         }
         let result = await reqProxy(url, {
             name: '注册通讯录变更监听',
+            method: 'POST',
+            lang: 'zh_CN',
+            body: body,
+            json: true,
+        });
+        return result;
+    }
+
+
+    async updateContractChangeLister(token: string, aesKey:string, eventListenUrl: string, callBackArr: string[]) {
+        let self = this;
+        let url = `https://oapi.dingtalk.com/call_back/update_call_back?access_token=${self.accessToken.access_token}`;
+        let body = {
+            "call_back_tag": callBackArr,
+            "token": token,
+            "aes_key": aesKey,
+            "url": eventListenUrl,
+        }
+        let result = await reqProxy(url, {
+            name: '更新事件回调',
             method: 'POST',
             lang: 'zh_CN',
             body: body,
