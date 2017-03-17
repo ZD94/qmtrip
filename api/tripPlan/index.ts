@@ -31,7 +31,7 @@ import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial
 import {ENoticeType} from "../_types/notice/notice";
 import TripApproveModule = require("../tripApprove/index");
 import {MPlaneLevel, MTrainLevel} from "../_types/travelPolicy";
-
+import {ISegment, ICreateBudgetAndApproveParams} from 'api/_types/tripPlan'
 
 class TripPlanModule {
 
@@ -954,10 +954,10 @@ class TripPlanModule {
         tripPlan.isRoundTrip = query.isRoundTrip;
         if(destinationPlacesInfo && _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
             for(let i = 0; i < destinationPlacesInfo.length; i++){
-                let q = destinationPlacesInfo[i];
+                let segment: ISegment = destinationPlacesInfo[i];
                 //处理出差事由放入projectIds 原project存放第一程出差事由
-                if(q.reason){
-                    let projectItem = await TripPlanModule.getProjectByName({companyId: company.id, name: q.reason,
+                if(segment.reason){
+                    let projectItem = await TripPlanModule.getProjectByName({companyId: company.id, name: segment.reason,
                         userId: account.id, isCreate: true});
                     if(i == 0){
                         project = projectItem;
@@ -968,8 +968,12 @@ class TripPlanModule {
                 }
 
                 //处理目的地 放入arrivalCityCodes 原目的地信息存放第一程目的地信息
-                if(q.destinationPlace){
-                    let arrivalInfo = await API.place.getCityInfo({cityCode: q.destinationPlace.id|| q.destinationPlace}) || {name: null};
+                if(segment.destinationPlace){
+                    let place = segment.destinationPlace;
+                    if (typeof place != 'string') {
+                        place = place['id']
+                    }
+                    let arrivalInfo = await API.place.getCityInfo({cityCode: place}) || {name: null};
                     arrivalCityCodes.push(arrivalInfo.id);
                     if(i == (destinationPlacesInfo.length - 1)){
                         tripPlan.arrivalCityCode = arrivalInfo.id;
@@ -979,25 +983,20 @@ class TripPlanModule {
 
                 //处理其他数据
                 if(i == 0){
-                    tripPlan.startAt = q.leaveDate;
+                    tripPlan.startAt = segment.leaveDate;
                     //处理原始数据 用第一程数据
-                    tripPlan.isNeedTraffic = q.isNeedTraffic;
-                    tripPlan.isNeedHotel = q.isNeedHotel;
+                    tripPlan.isNeedTraffic = segment.isNeedTraffic;
+                    tripPlan.isNeedHotel = segment.isNeedHotel;
                 }
                 if(i == (destinationPlacesInfo.length - 1)){
-                    tripPlan.backAt = q.goBackDate;
+                    tripPlan.backAt = segment.goBackDate;
                 }
             }
         }
-        // let deptCity = await API.place.getCityInfo({cityCode: query.originPlace});
-        // let arrivalCity = await API.place.getCityInfo({cityCode: query.destinationPlace});
-
         tripPlan.projectIds = JSON.stringify(projectIds);
         tripPlan.arrivalCityCodes = JSON.stringify(arrivalCityCodes);
 
         tripPlan['companyId'] = account.company.id;
-        // tripPlan.startAt = moment(query.leaveDate).toDate();
-        // tripPlan.backAt = moment(query.goBackDate).toDate();
         tripPlan.auditUser = tryObjId(approveUser);
         tripPlan.project = project;
         tripPlan.title = approve.title;//project名称
@@ -1035,7 +1034,6 @@ class TripPlanModule {
             if(budget.destination){
                 if (typeof budget.destination == 'string') budget.destination = JSON.parse(budget.destination);
             }
-            console.info('BUDGET====>', budget);
             switch(tripType) {
                 case ETripType.OUT_TRIP:
                     data.deptCity = budget.originPlace ? budget.originPlace.id : "";

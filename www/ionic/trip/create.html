@@ -12,11 +12,11 @@
                     </div>
                 </div>
                 <div class="list">
-                    <div class="item-btn" ng-click="addStartCity()" ng-if="!showOrigin">
+                    <div class="item-btn" ng-click="addStartCity()" ng-if="!showOrigin" ng-stat-event="统计出发地,按钮选择,出发地,出发地">
                         <i class="icon ion-plus-circled"></i>
                         <span>添加出发地</span>
                     </div>
-                    <div class="item-flex" ng-if="showOrigin">
+                    <div class="item-flex" ng-if="showOrigin" ng-stat-event="统计出发地,按钮选择,出发地,出发地">
                         <div class="item" ng-click="addStartCity()">
                             <span class="item-tit">出发地</span>
                             <p>{{trip.origin?trip.origin.name:"出发地选择"}}</p>
@@ -51,7 +51,7 @@
                             <p class="spend-days">{{calcTripDuration()}}天</p>
                         </div>
                     </div>
-                    <div class="item-btn" ng-if="!showDestination && showOrigin" ng-click="onlyHotel()">
+                    <div class="item-btn" ng-if="!showDestination && showOrigin" ng-click="onlyHotel()" ng-stat-event="统计目的地,按钮选择,目的地,目的地">
                         <i class="icon ion-plus-circled"></i>
                         <span>添加目的地</span>
                     </div>

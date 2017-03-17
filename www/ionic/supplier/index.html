@@ -49,7 +49,7 @@
                 </div>
                 <div class="item" ng-repeat="c in canImportList">
                     <img class="avatar-img" ng-src="{{getImageUrl(c.logo)}}" ng-if="c.logo">
-                    <label class="toggle pull-right" ng-click="savePublicSupplierStatus(c)">
+                    <label class="toggle pull-right" ng-click="savePublicSupplierStatus(c)" ng-stat-event="开启携程商旅,开启,开启携程商旅">
                         <input type="checkbox" ng-model="c.isPointed" ng-checked="c.isPointed">
                         <div class="track">
                             <div class="handle"></div>
@@ -65,7 +65,7 @@
                 </div>
                 <div class="item" ng-repeat="n in canNotImportList">
                     <img class="avatar-img" ng-src="{{getImageUrl(n.logo)}}" ng-if="n.logo">
-                    <label class="toggle pull-right" ng-click="savePublicSupplierStatus(n)">
+                    <label class="toggle pull-right" ng-click="savePublicSupplierStatus(n)" ng-stat-event="开启携程,开启,开启携程">
                         <input type="checkbox" ng-model="n.isPointed" ng-checked="n.isPointed">
                         <div class="track">
                             <div class="handle"></div>

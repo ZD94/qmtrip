@@ -4,7 +4,7 @@ variables:
   DOCKER_NAME: $CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
   DOCKER_CI_NAME: $DOCKER_REG/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME:$CI_BUILD_REF
   DOCKER_BRANCH_NAME: $DOCKER_REG/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME:$CI_BUILD_REF_SLUG
-  NPM_CACHE_DIR: /cache/build-cache/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME/$CI_BUILD_REF_SLUG
+  NPM_CACHE_DIR: /cache/build-cache/npmhash/
 
 stages:
   - build
@@ -30,7 +30,7 @@ build:dist:
     paths:
       - dist/
   script:
-    - mkdir -p $NPM_CACHE_DIR/node_modules && ln -s $NPM_CACHE_DIR/node_modules .
+    - mkdir -p $NPM_CACHE_DIR/`npmhash`/node_modules && ln -s $NPM_CACHE_DIR/`npmhash`/node_modules .
     - git submodule update --init --checkout
     - npm --registry https://npm.l.jingli365.com install
     - gulp tarball -n $CI_BUILD_REF_SLUG
