@@ -17,7 +17,7 @@ export async function destinationController($scope, ngModalDlg, Models, $ionicPo
             var projects = await Models.project.find(options);
             return projects;
         },
-        display: (item)=>item.name,
+        itemTemplate: '{{$item.name}}',
         create: async function(name){
             return {
                 name: name,

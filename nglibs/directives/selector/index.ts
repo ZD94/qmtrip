@@ -4,6 +4,19 @@ import angular = require('angular');
 
 angular
     .module('nglibs')
+    .directive('ngBindTemplateTemplate', function($compile){
+        return {
+            restrict: 'A',
+            scope: {
+                'template': '=ngBindTemplateTemplate'
+            },
+            link: function(scope, elem, attrs, controller, transcludeFn){
+                let template = angular.element('<div>'+scope.template+'</div>');
+                let child = $compile(template)(scope.$parent);
+                elem.append(child);
+            }
+        }
+    })
     .directive('ngSelectorList', function() {
         return {
             restrict: 'E',
@@ -96,7 +109,7 @@ angular
             }
         }
     })
-    .directive('ngSelectorListTwo', function() {
+    .directive('ngSelectorListTwo', function($compile) {
         return {
             restrict: 'E',
             template: require('./list2.html'),
@@ -112,11 +125,18 @@ angular
             },
             controller: function($scope, $element, ngModalDlg) {
                 require('./selector.scss');
+                $scope.$item = $scope.value;
+                $scope.$watch('value', function(){
+                    $scope.$item = $scope.value;
+                })
+                //let template = $scope.opts.titleTemplate || $scope.opts.itemTemplate;
                 $scope.displayItem = function(item) {
-                    if(item && $scope.opts && $scope.opts.display) {
-                        return $scope.opts.display(item, false);
-                    }
-                    return item;
+                    if(!$scope.opts)
+                        return 'null';
+                    return $scope.opts.titleTemplate;
+                    // let compiled = $compile(angular.element('<div>'+template+'</div>'));
+                    // let element = compiled($scope);
+                    // return element.text();
                 };
                 $scope.showSelectorDlg = async function() {
                     $scope.opts.title = $scope.title;

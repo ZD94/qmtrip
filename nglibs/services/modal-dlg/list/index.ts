@@ -6,19 +6,16 @@ export async function selectFromListController($scope) {
     if(typeof $scope.options.searchbox === 'undefined'){
         $scope.options.searchbox = true;
     }
+    if(!$scope.options.titleTemplate){
+        $scope.options.titleTemplate = $scope.options.itemTemplate;
+    }
     let form = $scope.form = {
         keyword: ''
     };
     $scope.optionItems = [];
-
-
-    function displayItem(item){
-        if(item && $scope.options && $scope.options.display){
-            return $scope.options.display(item, true);
-        }
-        return item;
-    };
-    $scope.displayItem = displayItem;
+    $scope.$watch('value', function(){
+        $scope.$item = $scope.value;
+    })
 
     $scope.disableItem = function(item){
         if(item && $scope.options && $scope.options.disable){
@@ -33,11 +30,7 @@ export async function selectFromListController($scope) {
         if(!form.keyword || form.keyword.length == 0)
             return false;
 
-        for(let v of $scope.optionItems){
-            if(displayItem(v) == form.keyword)
-                return false;
-        }
-        return true;
+
     }
 
     $scope.createItem = async function(keyword){
@@ -53,9 +46,9 @@ export async function selectFromListController($scope) {
     }
     await reloadOptionItems();
     var page = {
-        hasNextPage: function() {
-            return lists.hasNextPage();
-        },
+         // hasNextPage: function() {
+         //     return lists.hasNextPage();
+         // },
         nextPage : async function() {
             try {
                 let pager = await lists.nextPage();
@@ -77,11 +70,22 @@ export async function selectFromListController($scope) {
         if(o === n)
             return;
         reloadOptionItems();
+        if(o){
+            $scope.hidden = true;
+        }else{
+            $scope.hidden = false;
+        }
     })
+
+    $scope.toggle = function () {
+        $scope.hidden = false;
+        $scope.form.keyword = '';
+    }
+
     $scope.page = page;
     $scope.confirm = function(value){
         if($scope.disableItem(value))
-            return;
+            return value;
         $scope.confirmModal(value);
     }
 
