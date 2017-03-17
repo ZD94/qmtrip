@@ -13,31 +13,44 @@ export async function IndexController($scope, Models, $location, $ionicPopup, $i
     require('./index.scss');
     var staff = await Staff.getCurrent();
     var company = await staff.company;
-    var travelPolicies = await company.getTravelPolicies();
+    var pager = await company.getTravelPolicies();
     $scope.MHotelLevel = MHotelLevel;
     $scope.MPlaneLevel = MPlaneLevel;
     $scope.MTrainLevel = MTrainLevel;
     $scope.enumHotelLevelToStr = enumHotelLevelToStr;
     $scope.enumPlaneLevelToStr = enumPlaneLevelToStr;
     $scope.enumTrainLevelToStr = enumTrainLevelToStr;
-    
-    let ps = travelPolicies.map(async function (policy) {
-        var subsidyTemplates = await policy.getSubsidyTemplates();
-        if(policy.isDefault){
-            $scope.defaultTravelpolicy = policy;
+    $scope.travelPolicies = [];
+    async function loadTravelPolicies(pager) {
+        pager.forEach(async function(policy){
+            var subsidyTemplates = await policy.getSubsidyTemplates();
+            if(policy.isDefault){
+                $scope.defaultTravelpolicy = policy;
+            }
+            var num = await policy.getStaffs();
+            var obj = {policy: policy, usernum: num.total,subsidy:subsidyTemplates};
+            if($scope.travelPolicies.indexOf(obj) < 0 ){
+                $scope.travelPolicies.push(obj);
+            }
+        });
+    }
+    await loadTravelPolicies(pager);
+    $scope.vm = {
+        isHasNextPage:pager.hasNextPage(),
+        nextPage : async function() {
+            if(!pager.hasNextPage()){
+                $scope.vm.isHasNextPage = false;
+                $scope.$broadcast('scroll.infiniteScrollComplete');
+                return;
+            }
+            await pager.nextPage();
+            $scope.vm.isHasNextPage = pager.hasNextPage();
+            loadTravelPolicies(pager);
+            $scope.$broadcast('scroll.infiniteScrollComplete');
         }
-        var obj = {policy: policy, usernum: '',subsidy:subsidyTemplates};
-        return obj;
-    })
-    $scope.travelPolicies = await Promise.all(ps);
-    console.info($scope.travelPolicies);
-    await Promise.all($scope.travelPolicies.map(async function (obj) {
-        var result = await obj.policy.getStaffs();
-        obj.usernum = result.length;
-        return obj;
-    }))
+    };
+
     $scope.editpolicy = async function (id) {
-        // var travelpolicy = await Models.travelPolicy.get(id);
         $location.path('/travel-policy/showpolicy').search({'policyId': id}).replace();
     }
 

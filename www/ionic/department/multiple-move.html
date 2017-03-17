@@ -1,0 +1,56 @@
+<ion-modal-view class="multiple-move">
+    <ion-header-bar class="bar-stable">
+        <div class="button button-clear" all-checked ng-check-options="policy_staffs" ng-model="moveStaffIds">
+            <all>
+                <span>取消全选</span>
+            </all>
+            <not-all>
+                <span>全选</span>
+            </not-all>
+        </div>
+        <h1 class="title">批量移动</h1>
+        <a class="button button-clear" ng-click="cancel()">取消</a>
+    </ion-header-bar>
+    <ion-content class="has-header" scroll="false">
+        <div class="flex-c10">
+            <ion-scroll>
+                <div class="list">
+                    <single-check class="item staff-list"
+                                  ng-repeat="item in policy_staffs"
+                                  ng-model="moveStaffIds"
+                                  check-option="item"
+                    >
+                        <selected>
+                            <i class="icon ion-ios-checkmark"></i>
+                        </selected>
+                        <not-selected>
+                            <i class="icon ion-ios-checkmark-outline"></i>
+                            <!--<staff-avatar staff="item.staff" class="staff-avatar"></staff-avatar>-->
+                            <!--<div class="staff-info">-->
+                                <!--<p>{{item.staff.name}}-->
+                                    <!--<span class="staff-role"-->
+                                          <!--ng-class="{'bg-blue':item.staff.roleId == EStaffRole.ADMIN}"-->
+                                          <!--ng-if="item.staff.roleId == EStaffRole.ADMIN || item.staff.roleId == EStaffRole.OWNER"-->
+                                    <!--&gt;{{EStaffRoleNames[item.staff.roleId] }}</span>-->
+                                <!--</p>-->
+                                <!--<p>{{item.travelPolicy}}</p>-->
+                            <!--</div>-->
+                        </not-selected>
+                        <staff-avatar staff="item.staff" class="staff-avatar"></staff-avatar>
+                        <div class="staff-info">
+                            <p>{{item.staff.name}}
+                                <span class="staff-role"
+                                      ng-class="{'bg-blue':item.staff.roleId == EStaffRole.ADMIN}"
+                                      ng-if="item.staff.roleId == EStaffRole.ADMIN || item.staff.roleId == EStaffRole.OWNER"
+                                >{{EStaffRoleNames[item.staff.roleId] }}</span>
+                            </p>
+                            <p>{{item.travelPolicy}}</p>
+                        </div>
+                    </single-check>
+                </div>
+            </ion-scroll>
+            <a class="button button-full button-calm" ng-click="moveToDepartments()">移动到</a>
+        </div>
+        <ion-infinite-scroll ng-if="page.hasNextPage()" on-infinite="page.nextPage()"></ion-infinite-scroll>
+    </ion-content>
+</ion-modal-view>

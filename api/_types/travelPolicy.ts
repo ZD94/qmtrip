@@ -2,8 +2,9 @@ import {Models} from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import { Company } from 'api/_types/company';
 import { Types, Values } from 'common/model';
-import { Table, Create, Field, ResolveRef } from 'common/model/common';
+import {Table, Create, Field, ResolveRef, RemoteCall} from 'common/model/common';
 import { ModelObject } from 'common/model/object';
+import {PaginateInterface} from 'common/model/interface';
 
 export var  MTrainLevel  = {
     1: "商务座",
@@ -162,9 +163,11 @@ export class TravelPolicy extends ModelObject{
     get abroadHotelLevels() :EHotelLevel[] { return null}
     set abroadHotelLevel(hotelLevel: EHotelLevel[]) {}
 
-    async getStaffs(): Promise<Staff[]> {
+    @RemoteCall()
+    async getStaffs(): Promise<PaginateInterface<Staff>> {
         let query = {where: {companyId: this.company.id, travelPolicyId: this.id}};
-        return Models.staff.find(query);
+        let pager = await Models.staff.find(query);
+        return pager;
     }
 
     async getSubsidyTemplates(): Promise<SubsidyTemplate[]> {

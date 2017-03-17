@@ -1,4 +1,5 @@
 import { Staff } from 'api/_types/staff/staff';
+import _ = require('lodash');
 import {EApproveChannel} from "api/_types/approve/types";
 var msgbox = require('msgbox');
 
@@ -10,9 +11,27 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
     await API.onload();
 
     var query = JSON.parse($stateParams.params);
+    let destinationPlacesInfo = query.destinationPlacesInfo;
     let trip = $storage.local.get("trip");
-    trip.beginDate = query.leaveDate;
-    trip.endDate  = query.goBackDate;
+    if(destinationPlacesInfo && _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
+        for(let i = 0; i < destinationPlacesInfo.length; i++){
+            let q = destinationPlacesInfo[i];
+            //处理startAt,backAt
+            if(i == 0){
+                trip.beginDate = q.leaveDate;
+            }
+            if(i == (destinationPlacesInfo.length - 1)){
+                trip.endDate = q.goBackDate;
+            }
+            //处理目的地
+            if(i == (destinationPlacesInfo.length - 1) && q.destinationPlace){
+                let arrivalInfo = await API.place.getCityInfo({cityCode: q.destinationPlace.id|| q.destinationPlace}) || {name: null};
+                trip.destinationPlaceName = arrivalInfo.name;
+            }
+        }
+    }
+    trip.beginDate = trip.beginDate || query.leaveDate;
+    trip.endDate  = trip.endDate || query.goBackDate;
     // trip.createAt = new Date(result.createAt);
     if(query.auditUser){
         trip['auditUser'] = await Models.staff.get(query.auditUser);
@@ -21,8 +40,6 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
         let originPlace = await City.getCity(query.originPlace.id || query.originPlace);
         trip.originPlaceName = originPlace.name;
     }
-    let destination = await City.getCity(query.destinationPlace.id || query.destinationPlace);
-    trip.destinationPlaceName = destination.name;
     $scope.trip = trip;
     let totalPrice: number = 0;
 

@@ -52,12 +52,8 @@
   "is_allow_domain_repeat": false,
   "system_notice_emails": [
     {
-      "name": "cs",
-      "email": "sales@jingli365.com"
-    },
-    {
-      "name": "lxc",
-      "email": "xiaochen.li@jingli.tech"
+      "name": "用户",
+      "email": "tbudget@jingli365.com"
     }
   ],
   "default_agency": {

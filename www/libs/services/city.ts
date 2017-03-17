@@ -13,7 +13,11 @@ angular
             let allCities = await getAllCities();
             if (allCities && allCities[cityCode]) return allCities[cityCode];
         }
-        return API.place.getCityInfo({cityCode: cityCode});
+        if(cityCode){
+            return API.place.getCityInfo({cityCode: cityCode});
+        }else{
+            return null;
+        }
     }
 
     async function getAllCities() {
