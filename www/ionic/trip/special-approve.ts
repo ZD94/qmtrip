@@ -2,7 +2,7 @@ import { Staff } from 'api/_types/staff/staff';
 import _ = require('lodash');
 import {EApproveChannel} from "api/_types/approve/types";
 var msgbox = require('msgbox');
-
+import {ISegment, ICreateBudgetAndApproveParams} from "api/_types/tripPlan";
 export async function SpecialApproveController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup){
     require('./trip.scss');
     require('./budget.scss');
@@ -10,34 +10,42 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
     API.require("travelBudget");
     await API.onload();
 
-    var query = JSON.parse($stateParams.params);
+    var query: ICreateBudgetAndApproveParams = JSON.parse($stateParams.params);
     let destinationPlacesInfo = query.destinationPlacesInfo;
     let trip = $storage.local.get("trip");
     if(destinationPlacesInfo && _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
         for(let i = 0; i < destinationPlacesInfo.length; i++){
-            let seg: any = destinationPlacesInfo[i];
+            let segment: ISegment = destinationPlacesInfo[i];
             //处理startAt,backAt
             if(i == 0){
-                trip.beginDate = seg.leaveDate;
+                trip.beginDate = segment.leaveDate;
             }
             if(i == (destinationPlacesInfo.length - 1)){
-                trip.endDate = seg.goBackDate;
+                trip.endDate = segment.goBackDate;
             }
             //处理目的地
-            if(i == (destinationPlacesInfo.length - 1) && seg.destinationPlace){
-                let arrivalInfo = await API.place.getCityInfo({cityCode: seg.destinationPlace.id|| seg.destinationPlace}) || {name: null};
+            if(i == (destinationPlacesInfo.length - 1) && segment.destinationPlace){
+                let placeCode = segment.destinationPlace;
+                if (typeof placeCode != 'string') {
+                    placeCode = placeCode['id'];
+                }
+                let arrivalInfo = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
                 trip.destinationPlaceName = arrivalInfo.name;
             }
         }
     }
-    trip.beginDate = trip.beginDate || query.leaveDate;
-    trip.endDate  = trip.endDate || query.goBackDate;
+    trip.beginDate = trip.beginDate || query['leaveDate'];
+    trip.endDate  = trip.endDate || query['goBackDate'];
     // trip.createAt = new Date(result.createAt);
     if(query.auditUser){
         trip['auditUser'] = await Models.staff.get(query.auditUser);
     }
     if(query.originPlace) {
-        let originPlace = await City.getCity(query.originPlace.id || query.originPlace);
+        let placeCode = query.originPlace
+        if (typeof placeCode != 'string') {
+            placeCode = placeCode['id']
+        }
+        let originPlace = await City.getCity(placeCode);
         trip.originPlaceName = originPlace.name;
     }
     $scope.trip = trip;

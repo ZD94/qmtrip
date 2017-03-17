@@ -16,7 +16,7 @@ import _ = require('lodash');
 const L = require("common/language");
 import moment = require("moment");
 var API = require("common/api");
-
+import {ISegment, ICreateBudgetAndApproveParams} from "api/_types/tripPlan"
 //鲸力商旅OA对接实现
 export class QmPlugin extends AbstractOAPlugin {
     constructor() {
@@ -31,12 +31,11 @@ export class QmPlugin extends AbstractOAPlugin {
         let company = staff.company;
         let approve = await Models.approve.get(approveNo);
 
-        let budgetInfo = approve.data;
+        let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
 
         if(!budgetInfo) {
             throw L.ERR.TRAVEL_BUDGET_NOT_FOUND();
         }
-
         let {budgets, query} = budgetInfo;
         let destinationPlacesInfo = query.destinationPlacesInfo;
         let totalBudget = 0;
@@ -53,7 +52,11 @@ export class QmPlugin extends AbstractOAPlugin {
         let project: Project;
 
         if(query.originPlace) {
-            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace}) || {name: null};
+            let placeCode = query.originPlace;
+            if (typeof placeCode == 'string') {
+                placeCode = placeCode['id']
+            }
+            let deptInfo = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
             tripApprove.deptCityCode = deptInfo.id;
             tripApprove.deptCity = deptInfo.name;
         }
@@ -61,10 +64,10 @@ export class QmPlugin extends AbstractOAPlugin {
         tripApprove.isRoundTrip = query.isRoundTrip;
         if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
             for(let i = 0; i < destinationPlacesInfo.length; i++){
-                let seg: any = destinationPlacesInfo[i];
+                let segment: ISegment = destinationPlacesInfo[i];
                 //处理出差事由放入projectIds 原project存放第一程出差事由
-                if(seg.reason){
-                    let projectItem = await API.tripPlan.getProjectByName({companyId: company.id, name: seg.reason,
+                if(segment.reason){
+                    let projectItem = await API.tripPlan.getProjectByName({companyId: company.id, name: segment.reason,
                         userId: staff.id, isCreate: true});
                     if(i == 0){
                         project = projectItem;
@@ -75,8 +78,12 @@ export class QmPlugin extends AbstractOAPlugin {
                 }
 
                 //处理目的地 放入arrivalCityCodes 原目的地信息存放第一程目的地信息
-                if(seg.destinationPlace){
-                    let arrivalInfo = await API.place.getCityInfo({cityCode: seg.destinationPlace.id|| seg.destinationPlace}) || {name: null};
+                if(segment.destinationPlace){
+                    let placeCode = segment.destinationPlace;
+                    if (typeof placeCode != 'string') {
+                        placeCode = placeCode['id'];
+                    }
+                    let arrivalInfo = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
                     arrivalCityCodes.push(arrivalInfo.id);
                     if(i == (destinationPlacesInfo.length - 1)){//目的地存放最后一个目的地
                         tripApprove.arrivalCityCode = arrivalInfo.id;
@@ -86,13 +93,13 @@ export class QmPlugin extends AbstractOAPlugin {
 
                 //处理其他数据
                 if(i == 0){
-                    tripApprove.isNeedTraffic = seg.isNeedTraffic;
-                    tripApprove.isNeedHotel = seg.isNeedHotel;
+                    tripApprove.isNeedTraffic = segment.isNeedTraffic;
+                    tripApprove.isNeedHotel = segment.isNeedHotel;
                     
-                    tripApprove.startAt = seg.leaveDate;
+                    tripApprove.startAt = segment.leaveDate;
                 }
                 if(i == (destinationPlacesInfo.length - 1)){
-                    tripApprove.backAt = seg.goBackDate;
+                    tripApprove.backAt = segment.goBackDate;
                 }
             }
         }

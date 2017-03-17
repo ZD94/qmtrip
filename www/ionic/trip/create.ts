@@ -6,6 +6,8 @@
 import moment = require('moment');
 import { Staff } from 'api/_types/staff/staff';
 import {destinationController} from "./destination-template";
+import {Place} from "api/_types/place";
+import {ISegment, ICreateBudgetAndApproveParams} from "api/_types/tripPlan";
 
 var msgbox = require('msgbox');
 import _ = require('lodash');
@@ -35,7 +37,6 @@ function TripDefineFromJson(obj: any): TripDefine{
     return obj as TripDefine;
 }
 
-
 export async function CreateController($scope, $storage,$stateParams, $loading, ngModalDlg, $ionicPopup, Models, City, $rootScope){
     require('./create.scss');
     $scope.showOrigin = false;
@@ -43,7 +44,7 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
     $scope.currentStaff = await Staff.getCurrent();
     let currentCompany = $scope.currentStaff.company;
     let trip = _.clone(defaultTrip);
-    let query = null;
+    let query: ICreateBudgetAndApproveParams = null;
     if($stateParams.params){
         query = JSON.parse($stateParams.params);
         if(query.originPlace){
@@ -53,7 +54,7 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
         }
         trip.round = query.isRoundTrip;
         if(query.destinationPlacesInfo && _.isArray(query.destinationPlacesInfo) && query.destinationPlacesInfo.length > 0){
-            let oldParams = query.destinationPlacesInfo[0];
+            let oldParams: ISegment = query.destinationPlacesInfo[0];
             let destination = await API.place.getCityInfo({cityCode: oldParams.destinationPlace});
             trip.destination = destination;
             trip.beginDate = oldParams.leaveDate;
@@ -66,18 +67,19 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
             $scope.subsidy = oldParams.subsidy;
             $scope.showDestination = true;
         }else{
-            if(query.destinationPlace){
+            let qs: ISegment = query as ISegment;
+            if(qs.destinationPlace){
                 $scope.showDestination = true;
             }
-            trip.destination = {id: query.destinationPlace};
-            trip.beginDate = query.leaveDate;
-            trip.endDate = query.goBackDate;
-            trip.traffic = query.isNeedTraffic;
-            trip.hotel = query.isNeedHotel;
-            trip.hotelPlace = query.businessDistrict;
-            trip.hotelName = query.hotelName;
-            trip.reason = query.reason;
-            $scope.subsidy = query.subsidy;
+            trip.destination = {id: qs.destinationPlace};
+            trip.beginDate = qs.leaveDate;
+            trip.endDate = qs.goBackDate;
+            trip.traffic = qs.isNeedTraffic;
+            trip.hotel = qs.isNeedHotel;
+            trip.hotelPlace = qs.businessDistrict;
+            trip.hotelName = qs.hotelName;
+            trip.reason = qs.reason;
+            $scope.subsidy = qs.subsidy;
         }
     }
     $scope.trip = trip;
@@ -209,7 +211,7 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
             destinationPlacesInfo: []
         };
 
-        let destinationItem = {
+        let destinationItem: ISegment = {
             destinationPlace: trip.destination ? trip.destination.id : null,
             leaveDate: moment(trip.beginDate).toDate(),
             goBackDate: moment(trip.endDate).toDate(),

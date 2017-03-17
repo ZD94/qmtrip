@@ -10,6 +10,7 @@ import {Table, Create, Field} from "common/model/common";
 import {Models} from "./index";
 import {Types, Values} from "common/model";
 
+
 export enum TRAFFIC {
     TRAIN = 0,
     FLIGHT = 1
