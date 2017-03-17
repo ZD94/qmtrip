@@ -265,8 +265,6 @@ export default class ApiTravelBudget {
         let _id = Date.now() + utils.getRndStr(6);
         let key = `budgets:${staffId}:${_id}`;
         await cache.write(key, JSON.stringify(obj));
-        console.info(JSON.stringify(obj));
-        console.info("redis-budgets====================================================================");
         return _id;
     }
 
@@ -433,19 +431,13 @@ export default class ApiTravelBudget {
         if (!latestArrivalDateTime) {
             params.latestArrivalDateTime = undefined;
         } else {
-            let endFix = ' GMT+0';
-            if (m_destination.offsetUtc) {
-                endFix = ' GMT+0' + (m_destination.offsetUtc / 60 / 60 * 100)
-            }
+            let endFix = getTimezoneStr(m_destination.offsetUtc);
             params.latestArrivalDateTime = new Date(moment(latestArrivalDateTime).format(`YYYY-MM-DD HH:mm:ss`) + endFix);
         }
         if (!earliestLeaveDateTime) {
             params.earliestLeaveDateTime = undefined;
         } else {
-            let endFix = 'GMT+0';
-            if (m_originCity.offsetUtc) {
-                endFix = 'GMT+0' + (m_originCity.offsetUtc / 60 / 60 * 100)
-            }
+            let endFix = getTimezoneStr(m_originCity.offsetUtc);
             params.earliestLeaveDateTime = new Date(moment(earliestLeaveDateTime).format(`YYYY-MM-DD HH:mm:ss`) + endFix);
         }
 
@@ -646,4 +638,44 @@ function mergePrefers(defaults, news) {
         }
     }
     return defaults;
+}
+
+function getTimezoneStr(seconds) {
+    const HOUR = 60 * 60
+    const MINUTE = 60;
+    let hours = seconds / HOUR
+    if (hours < 0) {
+        hours = Math.ceil(hours);
+    } else {
+        hours = Math.floor(hours);
+    }
+    let minute = (seconds - hours * HOUR) / MINUTE;
+    if (minute < 0) {
+        minute = Math.ceil(minute)
+    } else {
+        minute = Math.floor(minute)
+    }
+    let ret = 'GMT';
+    if (hours < 0) {
+        ret += '-'
+        if (hours > -10) {
+            ret += '0'
+        }
+        hours = -hours;
+        ret += hours;
+    } else {
+        ret += '+';
+        if (hours < 10) {
+            ret += '0'
+        }
+        ret += hours;
+    }
+    if (minute < 0) {
+        minute = -minute;
+    }
+    if (minute < 10) {
+        ret += '0'
+    }
+    ret += minute;
+    return " "+ret;
 }

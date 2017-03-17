@@ -1,23 +1,25 @@
 <ion-view title="协议酒店" id="page1" style="background-color:#E8E7E9;">
-    <ion-content padding="true" class="has-header">
+    <ion-content padding="true" class="has-header accordIndex">
         <form class="list">
-            <div class="item item-input">
-                <span class="input-label">出差地点</span>
-                <ng-selector-list
-                        ng-model="city"
-                        dlg-options="placeSelector"
-                        dlg-notice-msg="该城市已设置协议酒店不能重复设置"
-                        dlg-title="请选择城市"
-                        dlg-placeholder="请输入城市名或首字母缩写"
-                        class="fake-input"
-                ></ng-selector-list>
-            </div>
-            <div class="item item-input">
-                <span class="input-label">协议价格</span>
-                <input type="text" placeholder="元/天" ng-model="accordHotel.accordPrice">
+            <div>
+                <div class="item item-input">
+                    <span class="input-label">出差地点</span>
+                    <ng-selector-list
+                            ng-model="city"
+                            dlg-options="placeSelector"
+                            dlg-notice-msg="该城市已设置协议酒店不能重复设置"
+                            dlg-title="请选择城市"
+                            dlg-placeholder="请输入城市名或首字母缩写"
+                            class="fake-input"
+                    ></ng-selector-list>
+                </div>
+                <div class="item item-input">
+                    <span class="input-label">协议价格</span>
+                    <input type="text" placeholder="元/天" ng-model="accordHotel.accordPrice">
+                </div>
             </div>
             <p style="color: #fff;font-size: 12px;padding: 10px 10px 0;">请输入与协议酒店洽谈的价格，如有多个协议酒店，建议输入最高的价格。</p>
-            <div class="spacer" style="width: 300px; height: 9px;"></div>
+            <div class="spacer" style="width: 300px; height: 1px;"></div>
             <div>
                 <a class="button button-positive  button-block" ng-click="saveAccordHotel()">保存</a>
                 <a ng-if="accordHotel.id" class="button button-assertive  button-block" ng-click="deleteAccordHotel(accordHotel)">删除</a>
