@@ -264,8 +264,6 @@ export default class ApiTravelBudget {
         let _id = Date.now() + utils.getRndStr(6);
         let key = `budgets:${staffId}:${_id}`;
         await cache.write(key, JSON.stringify(obj));
-        console.info(JSON.stringify(obj));
-        console.info("redis-budgets====================================================================");
         return _id;
     }
 
@@ -439,9 +437,9 @@ export default class ApiTravelBudget {
         if (!earliestLeaveDateTime) {
             params.earliestLeaveDateTime = undefined;
         } else {
-            let endFix = 'GMT+0';
+            let endFix = ' GMT+0';
             if (m_originCity.offsetUtc) {
-                endFix = 'GMT+0' + (m_originCity.offsetUtc / 60 / 60 * 100)
+                endFix = ' GMT+0' + (m_originCity.offsetUtc / 60 / 60 * 100)
             }
             params.earliestLeaveDateTime = new Date(moment(earliestLeaveDateTime).format(`YYYY-MM-DD HH:mm:ss`) + endFix);
         }
