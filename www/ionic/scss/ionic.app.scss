@@ -161,7 +161,7 @@ input[readonly]:not(.cloned-text-input){
 }
 
 ion-content {
-  > .flex-c10 {
+  > .flex-c10,.flex-c01 {
     > ion-scroll {
       padding: 10px;
     }

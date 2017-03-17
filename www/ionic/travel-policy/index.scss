@@ -38,7 +38,9 @@
   color:$calm;
 }
 .policies {
-
+  .policies-button {
+    padding: 0 10px;;
+  }
   .policyCard{
     &:first-of-type {
       .item{
