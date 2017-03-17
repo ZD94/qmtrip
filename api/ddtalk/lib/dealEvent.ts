@@ -389,7 +389,7 @@ export async function addCompanyStaffs(corpApi: CorpApi, DdDepartmentId: any, co
         where: {DdDepartmentId: DdDepartmentId.toString(), corpId: corpid}
     });
     if(!itemDepart || !itemDepart[0]){
-        logger.warn("这个部门不存在  dd_department_id :" , u.department , "corpid : " , corpid)
+        logger.warn("这个部门不存在  dd_department_id :" , DdDepartmentId , "corpid : " , corpid)
         throw new Error("这个部门不存在");
     }
     let localDepartId = itemDepart[0].localDepartmentId;
