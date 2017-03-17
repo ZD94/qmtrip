@@ -8,7 +8,6 @@ export async function IndexController($scope, Models, $location) {
     var company = await staff.company;
     var suppliers = await company.getCompanySuppliers();
     $scope.suppliers = suppliers;
-    $scope.ESupplierType = ESupplierType;
 
     //公共的供应商
     var publicSuppliers = await Models.supplier.find({where:{companyId: null}});
