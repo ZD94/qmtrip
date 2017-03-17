@@ -1,78 +1,25 @@
-<ion-view title="预订供应商管理" class="supplier">
-    <ion-content padding="true" class="has-header">
-        <!--<ion-toggle class="showSupplier" toggle-class="toggle-track" ng-model="showSupplier">指定商旅供应商</ion-toggle>-->
-        <div class="list assignSupplier">
-            <div class="item">
-                是否显示系统推荐服务商
-                <label class="toggle toggle-calm pull-right" ng-click="toggleAssignSupplier(assignSupplier)">
-                    <input type="checkbox" ng-checked="assignSupplier" ng-model="assignSupplier">
-                    <div class="track">
-                        <div class="handle"></div>
+<ion-view title="预定供应商管理">
+    <ion-content padding="false" class="has-header suppliers" scroll="false">
+        <div class="flex-c10">
+            <ion-scroll>
+                <div class="list">
+                    <div class="supplier-item" ng-repeat="ah in suppliers">
+                        <div class="title_left"></div>
+                        <img class="" ng-src="{{getImageUrl(ah.logo)}}" ng-if="ah.logo">
+                        <p>{{ah.name}}</p>
                     </div>
-                </label>
-            </div>
+                    <div class="supplier-item" ng-repeat="c in canImportList">
+                        <div class="title_left recommend"></div>
+                        <img class="" ng-src="{{getImageUrl(c.logo)}}" ng-if="c.logo">
+                        <p>{{ah.name}}</p>
+                    </div>
+                    <div class="supplier-item" ng-repeat="n in canNotImportList">
+                        <img class="" ng-src="{{getImageUrl(n.logo)}}" ng-if="n.logo">
+                        <p>{{ah.name}}</p>
+                    </div>
+                </div>
+            </ion-scroll>
+            <a class="button button-calm button-full" ng-click="editSupplier()">编辑</a>
         </div>
-        <p class="supplier-text">
-            说明：<br>
-            开启显示系统推荐服务商功能，员工可在预订时选择下列列表中的专属服务商以及所有推荐服务商和其他服务商，关闭显示系统推荐服务商，则只显示列表中开启的服务商。
-        </p>
-        <!--<div>-->
-            <div class="list self-define">
-                   <div class="item item-divider supplier-title">
-                       专属服务商
-                       <span class="pull-right">不支持订单关联</span>
-                   </div>
-                   <div class="item item-divider self-detail" ng-repeat="ah in suppliers">
-                       <div ng-click="editSupplier(ah.id)" class="pull-left" style="width:180px">
-                           <div class="logo pull-left">
-                               <img class="avatar-img" ng-src="{{getImageUrl(ah.logo)}}" ng-if="ah.logo">
-                           </div>
-                           <span class="self-name">{{ah.name}}</span>
-                       </div>
-                       <label class="toggle toggle-calm pull-right" ng-click="saveSupplierStatus(ah)">
-                           <input type="checkbox" ng-checked="ah.isInUse" ng-model="ah.isInUse">
-                           <div class="track">
-                               <div class="handle"></div>
-                           </div>
-                       </label>
-                   </div>
-                   <div class="item item-icon-left item-icon-right add-supplier" ng-click="addSupplier()">
-                       <i class="icon ion-plus-round"></i>
-                       添加供应商
-                       <i class="icon ion-chevron-right" style="color:#545454"></i>
-                   </div>
-            </div>
-            <div class="list recommend-supplier">
-                <div class="item item-divider supplier-title">
-                    推荐服务商
-                    <span class="pull-right">支持订单关联</span>
-                </div>
-                <div class="item" ng-repeat="c in canImportList">
-                    <img class="avatar-img" ng-src="{{getImageUrl(c.logo)}}" ng-if="c.logo">
-                    <label class="toggle toggle-calm pull-right" ng-click="savePublicSupplierStatus(c)">
-                        <input type="checkbox" ng-model="c.isPointed" ng-checked="c.isPointed">
-                        <div class="track">
-                            <div class="handle"></div>
-                        </div>
-                    </label>
-                </div>
-            </div>
-
-            <div class="list recommend-supplier">
-                <div class="item item-divider supplier-title">
-                    其他服务商
-                    <span class="pull-right">不支持订单关联</span>
-                </div>
-                <div class="item" ng-repeat="n in canNotImportList">
-                    <img class="avatar-img" ng-src="{{getImageUrl(n.logo)}}" ng-if="n.logo">
-                    <label class="toggle toggle-calm pull-right" ng-click="savePublicSupplierStatus(n)">
-                        <input type="checkbox" ng-model="n.isPointed" ng-checked="n.isPointed">
-                        <div class="track">
-                            <div class="handle"></div>
-                        </div>
-                    </label>
-                </div>
-            </div>
-        <!--</div>-->
     </ion-content>
 </ion-view>
