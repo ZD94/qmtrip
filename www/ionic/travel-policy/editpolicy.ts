@@ -68,29 +68,32 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
     }
     $scope.travelPolicy = travelPolicy;
     $scope.savePolicy = async function () {
-        if(!$scope.travelPolicy.name){
+        let policy = $scope.travelPolicy;
+        if(!policy.name){
             msgbox.log("标准名称不能为空");
             return false;
         }
-        if($scope.travelPolicy.planeLevels.length <=0){
+        if(!policy.planeLevels || policy.planeLevels.length <=0){
             msgbox.log('飞机舱位不能为空');
             return false;
         }
-        if($scope.travelPolicy.trainLevels.length <=0){
+        if(!policy.trainLevels || policy.trainLevels.length <=0){
             msgbox.log('火车座次不能为空');
             return false;
         }
-        if($scope.travelPolicy.hotelLevels.length <=0){
+        if(!policy.hotelLevels || policy.hotelLevels.length <=0){
             msgbox.log('住宿标准不能为空');
             return false;
         }
-        if($scope.travelPolicy.isOpenAbroad && $scope.travelPolicy.abroadPlaneLevels.length <= 0){
-            msgbox.log('国际飞机舱位不能为空');
-            return false;
-        }
-        if($scope.travelPolicy.isOpenAbroad && $scope.travelPolicy.abroadHotelLevels.length <= 0){
-            msgbox.log('国际住宿标准不能为空');
-            return false;
+        if(policy.isOpenAbroad){
+            if(!policy.abroadPlaneLevels || policy.abroadPlaneLevels.length <= 0){
+                msgbox.log('国际飞机舱位不能为空');
+                return false;
+            }
+            if(!policy.abroadHotelLevels || policy.abroadHotelLevels.length <= 0){
+                msgbox.log('国际住宿标准不能为空');
+                return false;
+            }
         }
         var re = /^[0-9]+.?[0-9]*$/;
         if($scope.travelPolicy.subsidy && !re.test($scope.travelPolicy.subsidy)){
