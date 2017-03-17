@@ -4,7 +4,7 @@
 
 'use strict';
 import request = require("request");
-var Agent = require('socks5-https-client/lib/Agent');
+// var Agent = require('socks5-https-client/lib/Agent');
 
 export function reqProxy(url, options) {
     return new Promise( (resolve, reject) => {
