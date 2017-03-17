@@ -7,4 +7,5 @@
 export interface DdTalkDepartment {
     id: number;
     name: string;
+    parentid:number;
 }
