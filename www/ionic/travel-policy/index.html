@@ -2,7 +2,6 @@
     <ion-content padding="true" class="has-header"  scroll="false">
         <a href="#/travel-policy/editpolicy" id="page30-button89" class="button button-positive  button-block">新增差旅标准</a>
         <a ng-click="setDefault()" class="button button-outline button-block button-positive" style="background: #fff">设置默认标准</a>
-        <ion-scroll style="padding: 10px;">
             <div class="policyCard" ng-repeat="policy in travelPolicies" ng-click="editpolicy(policy.policy.id)">
                 <div class="item item-avatar">
                     <div class="policy-list-left">
@@ -16,10 +15,5 @@
                     </div>
                 </div>
             </div>
-            <div id="page13-markdown3">
-                <div ng-if="!vm.isHasNextPage" class="getMoreOrNoMore">没有更多记录了</div>
-            </div>
-            <ion-infinite-scroll ng-if="vm.isHasNextPage" on-infinite="vm.nextPage()"></ion-infinite-scroll>
-        </ion-scroll>
     </ion-content>
 </ion-view>
