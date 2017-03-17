@@ -9,7 +9,7 @@ import moment=require('moment');
 import {PaginateInterface} from "common/model/interface";
 import {Company, ECompanyType} from "../company/company";
 import L from 'common/language';
-import {CoinAccount} from "../coin";
+import { CoinAccount, CoinAccountChange } from "../coin";
 const API = require("common/api");
 let sequelize = require("common/model").DB;
 
@@ -28,7 +28,7 @@ export enum  EAgencyUserRole {
 
 @TableExtends(Account, 'account')
 @Table(Models.agencyUser, 'agency.')
-export class AgencyUser extends ModelObject{
+export class AgencyUser extends ModelObject implements Account{
     constructor(target: Object) {
         super(target);
     }
@@ -240,7 +240,7 @@ export class AgencyUser extends ModelObject{
     }
     //配置企业偏好
     @RemoteCall()
-    async configPreference(companyId:string,budgetConfig:string):Promise<any>{
+    async configPreference(companyId:string,budgetConfig:{hotel?: any, traffic?: any, abroadHotel?: any, abroadTraffic?: any}):Promise<any>{
         let self = this;
         let company = await Models.company.get(companyId);
         let agency = await company.getAgency();
@@ -254,9 +254,8 @@ export class AgencyUser extends ModelObject{
         });
         await log.save();
         //修改企业偏好
-        let sql = ` update company.companies set budget_config = '${budgetConfig}' where id = '${companyId}'`;
-        let ret = await sequelize.query(sql);
-        return ret;
+        company.budgetConfig = budgetConfig;
+        return company.save();
     }
 
     async getCompanyAllStaffs(params: any): Promise<any> {
@@ -299,4 +298,11 @@ export class AgencyUser extends ModelObject{
     qrcodeToken: string;
     type: EAccountType;
     isFirstLogin: boolean;
+    checkcodeToken: string;
+    isValidateMobile: boolean;
+    isValidateEmail: boolean;
+    coinAccount: CoinAccount;
+    isNeedChangePwd: boolean;
+    getCoinAccountChanges: ()=>Promise<CoinAccountChange[]>;
+
 }
