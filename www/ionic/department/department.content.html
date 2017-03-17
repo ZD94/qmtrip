@@ -12,7 +12,7 @@
             <span ng-if="selected.value == 'travelPolicy'">标准</span>
             <span ng-if="selected.value == 'status'">激活</span>
         </span>
-        <span class="ion-android-person-add" ng-click="addNewStaff()"></span>
+        <span class="ion-android-person-add" ng-click="addNewStaff()">添加</span>
     </div>
 </div>
 <ion-content padding="true" class="has-header has-subheader">
@@ -50,7 +50,7 @@
     <a class="tab-item" ng-click="setDepartment()" ng-stat-event="管理部门">
         部门管理
     </a>
-    <!--<a class="tab-item">-->
-        <!--批量移动-->
-    <!--</a>-->
+    <a class="tab-item" ng-click="multipleMove()">
+        批量移动
+    </a>
 </div>
