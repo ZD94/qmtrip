@@ -193,13 +193,12 @@ function initUpdater($ionicPlatform, $ionicPopup) {
        $ionicPlatform.ready(function(){
            $rootScope.$on('$locationChangeSuccess',function(event,newUrl,oldUrl){
                var url = $location.path();
-               let reg = /\/[a-zA-Z-]*\/index$/i;
-               let ret = reg.test(url);
+               let ret = url.endsWith('index')
                if(ret){
-                   url = url.substring(url.length-6,6);
+                   url = url.substr(0,url.length-5);
                }
                 var titles = {
-                    "/staff/index" : "进入个人中心",
+                    "/staff/" : "进入个人中心",
                     "/staff/staff-info" : "修改个人资料",
                     "/staff/bind-suppliers" : "绑定第三方账户",
                     "/trip/create" : "进入我要出差",
@@ -214,21 +213,21 @@ function initUpdater($ionicPlatform, $ionicPopup) {
                     "/trip/select-supplier" : "关联订单",
                     "/trip/list-detail" : "撤销行程",
                     "/trip-approval/list" : "进入出差请示",
-                    "/manage/index" : "进入管理企业",
-                    "/statistics/index" : "进入差旅统计",
+                    "/manage/" : "进入管理企业",
+                    "/statistics/" : "进入差旅统计",
                     "/trip/list-all" : "查看员工出差记录",
                     "/statistics/distribution" : "查看员工分布地图",
-                    "/department/index" : "进入员工管理",
+                    "/department/" : "进入员工管理",
                     "/department/add-staff" : "点击邀请员工",
                     "/travel-policy/editpolicy" : "新增差旅标准",
                     "/travel-policy/showpolicy" : "差旅标准详情页",
                     "/travel-policy~2F" : "保存差旅标准",
-                    "/travel-policy/index" : "修改差旅标准",
-                    "/supplier/index" : "进入预订服务管理",
-                    "/accord-hotel/index" : "进入协议酒店管理",
+                    "/travel-policy/" : "修改差旅标准",
+                    "/supplier/" : "进入预订服务管理",
+                    "/accord-hotel/" : "进入协议酒店管理",
                     "/accord-hotel/edit" : "新增协议酒店城市",
                     "/manage/approve-set" : "审批设置",
-                    "/login/index" : "退出登录",
+                    "/login/" : "退出登录",
                 };
                 if(!titles[url]){
                     CNZZ.addEvent(url,'URL', newUrl ,oldUrl);
