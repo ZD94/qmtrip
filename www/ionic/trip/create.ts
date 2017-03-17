@@ -350,9 +350,6 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
                 $loading.end();
             }, 60 * 1000);
 
-           console.log("this is params to budget: ",params);
-
-
             /*let addParams = {
                 destinationPlace: "CT_289",
                 leaveDate: moment(trip.beginDate).add(2,'d').toDate(),
@@ -367,8 +364,6 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
                 reason: trip.reason
             }
              params.destinationPlacesInfo.push(addParams);*/
-            console.info(params);
-
             budget = await API.travelBudget.getTravelPolicyBudget(params);
             if (isShowDone) {
                 cb();

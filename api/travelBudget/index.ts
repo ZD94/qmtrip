@@ -13,9 +13,6 @@ const moment = require('moment');
 const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
-
-import fs=require("fs");
-
 import {ITicket, TRAFFIC, TravelBudgeTraffic, TravelBudgetHotel} from "api/_types/travelbudget";
 
 import {
@@ -273,9 +270,6 @@ export default class ApiTravelBudget {
         return _id;
     }
 
-
-
-
     /**
      * @method getHotelBudget
      *
@@ -381,15 +375,6 @@ export default class ApiTravelBudget {
         let budget = await strategy.getResult(hotels);
         budget.type = EInvoiceType.HOTEL;
         return budget;
-    }
-
-    static async fakeHotelData(params:{
-        originPlace: any,
-        destination: any,
-        leaveDate: any
-    },trafficTickets:any){
-
-
     }
 
     /**
@@ -500,7 +485,6 @@ export default class ApiTravelBudget {
                 isAbroad: isAbroad,
             });
 
-            //fs.writeFileSync("flight.js",JSON.stringify(flightTickets));
             if (!flightTickets) {
                 flightTickets = [];
             }
@@ -516,36 +500,10 @@ export default class ApiTravelBudget {
                 leaveDate: leaveDate,
                 cabin: trainCabins
             });
-            //fs.writeFileSync("train.js",JSON.stringify(flightTickets));
             if (!trainTickets) {
                 trainTickets = [];
             }
         }
-/*      //written by jack
-        let isForTest=true;
-         if(isForTest){
-              flightTickets = ApiTravelBudget.fakeTrafficData({
-              originPlace: m_originCity,
-              destination: m_destination,
-              leaveDate: leaveDate
-              },flightTickets);
-             trainTickets = ApiTravelBudget.fakeTrafficData({
-                 originPlace: m_originCity,
-                 destination: m_destination,
-                 leaveDate: leaveDate
-             },trainTickets);
-
-         }
-*/
-        //console.log("m_originCity",m_originCity);
-       // console.log("m_destination",m_destination);
-        //console.log("leaveDate",leaveDate);
-        //console.log("cabins",cabins);
-        //console.log("isAbroad",isAbroad);
-        //console.log("train_ticket: ", flightTickets);
-        console.log("__dirname",__dirname);
-        console.log(__dirname+"/fakeData/"+"beijing-shanghai.json");
-
 
         let preferConfig: any = staff.company.budgetConfig;
         let qs: any = {};
