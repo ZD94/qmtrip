@@ -6,11 +6,11 @@
         <ion-list show-delete="false">
             <ion-item ng-click="chooseOption(false)"
                       ng-class="{true: 'item-icon-left-unchecked', false: 'item-option-selected item-icon-left'}[isNextApprove]"
-                      ng-stat-event="直接同意,按钮,审批直接同意">
+                      >
                 <i class="icon ion-ios-checkmark-outline" ></i>直接同意</ion-item>
             <ion-item ng-click="chooseOption(true)"
                       ng-class="{true: 'item-option-selected item-icon-left', false: 'item-icon-left-unchecked'}[isNextApprove]"
-                      ng-stat-event="同意并转给,按钮点击,审批同意并转给">
+                      >
                 <i class="icon ion-ios-checkmark-outline"></i>
                 <span class="input-label">同意并转给</span>
                 <ng-selector-list

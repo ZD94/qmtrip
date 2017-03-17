@@ -25,7 +25,6 @@ import {CoinAccount, CoinAccountChange} from "api/_types/coin";
 import {TripDetailInvoice, TripDetailHotel, TripDetailTraffic, TripDetailSubsidy, TripDetailSpecial} from "api/_types/tripPlan";
 import {Approve} from "api/_types/approve";
 import {AgencyOperateLog} from "api/_types/agency/agency-operate-log";
-import {DDTalkDepartment} from "api/_types/ddtalk";
 
 const API = require('common/api');
 
