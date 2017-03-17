@@ -240,7 +240,7 @@ export class AgencyUser extends ModelObject implements Account{
     }
     //配置企业偏好
     @RemoteCall()
-    async configPreference(companyId:string,budgetConfig:string):Promise<any>{
+    async configPreference(companyId:string,budgetConfig:{hotel?: any, traffic?: any, abroadHotel?: any, abroadTraffic?: any}):Promise<any>{
         let self = this;
         let company = await Models.company.get(companyId);
         let agency = await company.getAgency();
@@ -254,8 +254,7 @@ export class AgencyUser extends ModelObject implements Account{
         });
         await log.save();
         //修改企业偏好
-        let sql = ` update company.companies set budget_config = '${budgetConfig}' where id = '${companyId}'`;
-        let ret = await sequelize.query(sql);
+        company.budgetConfig = budgetConfig;
         return company.save();
     }
 
