@@ -31,7 +31,7 @@ export class Supplier extends ModelObject{
     set id(val: string) {}
 
     //类型
-    @Field({type: Types.INTEGER})
+    @Field({type: Types.INTEGER, defaultValue: ESupplierType.COMPANY_CUSTOM})
     get type(): ESupplierType { return ESupplierType.COMPANY_CUSTOM; }
     set type(val: ESupplierType) {}
 
