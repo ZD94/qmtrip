@@ -14,6 +14,7 @@ const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
 import {ITicket, TRAFFIC, TravelBudgeTraffic, TravelBudgetHotel} from "api/_types/travelbudget";
+
 import {
     TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
 } from "./strategy/index";
@@ -369,6 +370,7 @@ export default class ApiTravelBudget {
         qs.prefers = defaults;
         qs.query = query;
         let hotels = await API.hotel.search_hotels(query);
+
         let strategy = await HotelBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
         let budget = await strategy.getResult(hotels);
         budget.type = EInvoiceType.HOTEL;
@@ -426,6 +428,7 @@ export default class ApiTravelBudget {
         let m_originCity = await API.place.getCityInfo({cityCode: originPlace.id || originPlace});
         let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
 
+        console.log("this is city info: ", m_originCity);
         //转换成当地时间
         if (!latestArrivalDateTime) {
             params.latestArrivalDateTime = undefined;
@@ -470,7 +473,9 @@ export default class ApiTravelBudget {
             trainCabins = [];
         }
 
+
         let flightTickets:ITicket[] = [];
+
         if (m_originCity && m_destination) {
             flightTickets = await API.flight.search_ticket({
                 originPlace: m_originCity,
@@ -479,10 +484,13 @@ export default class ApiTravelBudget {
                 cabin: cabins,
                 isAbroad: isAbroad,
             });
+
             if (!flightTickets) {
                 flightTickets = [];
             }
         }
+
+
 
         let trainTickets = [];
         if (!isAbroad) {
@@ -533,6 +541,7 @@ export default class ApiTravelBudget {
         let tickets: ITicket[] = _.concat(flightTickets, trainTickets) as ITicket[];
         let strategy = await TrafficBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
         let result =  await strategy.getResult(tickets);
+        console.log("result: ",result);
         result.cabinClass = result.cabin;
         result.originPlace = m_originCity;
         result.destination = m_destination;
@@ -617,6 +626,8 @@ export default class ApiTravelBudget {
         })
     }
 }
+
+
 
 function mergePrefers(defaults, news) {
     for(let i=0, ii =news.length; i<ii; i++) {

@@ -336,7 +336,6 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
                 reason: trip.reason
             }
              params.destinationPlacesInfo.push(addParams);*/
-            console.info(params);
             budget = await API.travelBudget.getTravelPolicyBudget(params);
             if (isShowDone) {
                 cb();
