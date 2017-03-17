@@ -1,7 +1,6 @@
 import { Department } from 'api/_types/department';
 import {Staff, EStaffRoleNames, EStaffRole} from 'api/_types/staff/staff';
 import moment = require('moment');
-import {Pager} from "common/model/pager";
 import {multipleMoveController} from "./multiple-move";
 var msgbox = require('msgbox');
 
@@ -11,6 +10,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         console.info('comming in....',$stateParams.departName)
         //$ionicNavBarDelegate.title($stateParams.departName);//这个东西会改变属性为nav-bar='cached'的这个div里面的value，然而显示的是nav-bar='active'的这个标签。刷新后才可以正常显示，暂时未解决、、、
     }*/
+
     let departmentId = $stateParams.departmentId;
     let staff = await Staff.getCurrent();
     let company = staff.company;
@@ -55,7 +55,6 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
 
         let staffs = await rootDepartment.getStaffs();
         $scope.staffPagers = staffs;
-        // Object.setPrototypeOf($scope.staffPagers, Pager.prototype);
         await initStaffs(staffs);
         $scope.departments = departments;
         $scope.currentDepartments = departments;
@@ -217,7 +216,6 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     $scope.staffSelector = {
         query: async function(keyword) {
             let staffs = await rootDepartment.getStaffs({where: {'name': {$ilike: '%'+keyword+'%'}}});
-            Object.setPrototypeOf(staffs, Pager.prototype);
             return staffs;
         },
         display: (staff)=>staff.name
