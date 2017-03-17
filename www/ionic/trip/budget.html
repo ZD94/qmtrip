@@ -8,11 +8,11 @@
 
                 <ion-list class="jl_projectinfo">
                     <ion-item class="project_tit">{{trip.beginDate| date: 'MM-dd'}} 至 {{trip.endDate | date: 'MM-dd'}}
-                        <span style="padding-left: 13px">{{trip.originPlaceName}} - {{trip.destinationPlaceName}}</span>
+                        <span style="padding-left: 13px"><span ng-if="trip.originPlaceName">{{trip.originPlaceName}} - </span>{{trip.destinationPlaceName}}</span>
                     </ion-item>
                     <ion-item class="project_cont">
                         <p class="project_title" ng-if="trip && trip.beginDate"><i class="fa fa-flag-o">
-                            </i>&nbsp;{{trip.reason || trip.reasonName}}</p>
+                            </i>&nbsp;{{trip.reason || trip.reasonName.name}}</p>
                         <p class="totalBudget"  style="text-align: center">
                             <span>总预算</span>
                             <span ng-if="totalPrice && totalPrice > 0">
@@ -39,16 +39,16 @@
                         </ion-item>
                         <ion-item>
                             <div ng-if="budget.tripType == ETripType.BACK_TRIP">
-                                <span>{{trip.endDate | date: 'MM-dd'}}</span>
+                                <span>{{budget.leaveDate | date: 'MM-dd'}}</span>
                                 <span class="spanRight">{{budget.price <=0 ? '暂无预算' : (budget.price| currency_int)+'元'}}</span>
                                 <br/>
-                                {{trip.destinationPlaceName}}
+                                {{budget.originPlace.name || budget.originPlace}}
                                 &nbsp;
                                 <i ng-if='budget.type == EInvoiceType.PLANE' class="icon ion-plane"></i>
                                 <i ng-if='budget.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
                                 <i ng-if='budget.type == EInvoiceType.HOTEL' class="icon ion-home"></i>
                                 &nbsp;
-                                {{trip.originPlaceName}}
+                                {{budget.destination.name || budget.destination}}
                                 <span class="spanRight right-budget">
                                     <span>{{budget.type == EInvoiceType.TRAIN ? MTrainLevel[budget.cabinClass] : MPlaneLevel[budget.cabinClass]}}</span>
                                     <span ng-if="budget.discount">{{budget.discount}}</span>
@@ -56,7 +56,7 @@
                             </div>
 
                             <div ng-if="budget.tripType == ETripType.HOTEL">
-                                <span>{{trip.beginDate | date: 'MM-dd'}}至{{trip.endDate | date: 'MM-dd'}}(共{{budget.duringDays}}天)</span>
+                                <span>{{budget.checkInDate | date: 'MM-dd'}}至{{budget.checkOutDate | date: 'MM-dd'}}(共{{budget.duringDays}}天)</span>
                                 <span class="spanRight">
                                     <span ng-if="budget.price && budget.price > 0">
                                         {{budget.price| currency_int}}元
@@ -66,7 +66,7 @@
                                     </span>
                                 </span>
                                 <br/>
-                                {{trip.destinationPlaceName}}<span ng-if="trip.hotelName">&nbsp;{{trip.hotelName}}附近</span>
+                                {{budget.cityName}}<span ng-if="budget.hotelName">&nbsp;{{budget.hotelName}}附近</span>
                                 <span class="spanRight right-budget">
                                     <span ng-if="budget.price && budget.price >0">
                                         {{(budget.price /budget.duringDays| currency_int)+'元/天'}}
@@ -75,7 +75,7 @@
                             </div>
 
                             <div ng-if="budget.tripType == ETripType.SUBSIDY">
-                                <span>{{trip.beginDate | date: 'MM-dd'}}至{{trip.endDate | date: 'MM-dd'}}(共{{budget.duringDays}}天)</span>
+                                <span>{{budget.fromDate | date: 'MM-dd'}}至{{budget.endDate | date: 'MM-dd'}}(共{{budget.duringDays}}天)</span>
                                 <span class="spanRight">
                                     {{budget.price| currency_int}}元
                                 </span>
@@ -84,7 +84,7 @@
                             </div>
 
                             <div ng-if="budget.tripType == ETripType.OUT_TRIP">
-                                <span>{{trip.beginDate | date: 'MM-dd'}}</span>
+                                <span>{{budget.leaveDate | date: 'MM-dd'}}</span>
                                 <span class="spanRight">
                                     <span ng-if="budget.price && budget.price > 0">
                                         {{(budget.price| currency_int)+'元'}}
@@ -94,12 +94,12 @@
                                     </span>
                                 </span>
                                 <br/>
-                                {{trip.originPlaceName}}
+                                {{budget.originPlace.name || budget.originPlace}}
                                 &nbsp;
                                 <i ng-if='budget.type == EInvoiceType.PLANE' class="icon ion-plane"></i>
                                 <i ng-if='budget.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
                                 &nbsp;
-                                {{trip.destinationPlaceName}}
+                                {{budget.destination.name ||budget.destination}}
                                 <span class="spanRight right-budget">
                                     <span>{{budget.type == EInvoiceType.PLANE ? MPlaneLevel[budget.cabinClass] : MTrainLevel[budget.cabinClass]}}
                                     </span>
@@ -111,8 +111,17 @@
                 </ion-list>
             </ion-scroll>
             <div class="bottom-bar-budget">
-                <bottom-bar ng-if="!showChooseApproveUser">
-                    <button class="button button-positive" ng-click="submitApprove()">生成出差记录</button>
+                <bottom-bar ng-if="!showChooseApproveUser" class="bottom-noApprove">
+                    <p class="noApprove">无需审批</p>
+                    <button class="button button-positive button-outline bgColor"
+                            ng-click="specialApprove()">
+                        特别审批
+                    </button>
+                    <button  class="button hasAuditUser"
+                            ng-click="submitApprove()">
+                        生成行程
+                    </button>
+
                 </bottom-bar>
                 <bottom-bar ng-if="staff.company.oa == EApproveChannel.DING_TALK">
                     <div class="status-bar item status-bar-detail">
@@ -123,7 +132,7 @@
                 <bottom-bar ng-if="showChooseApproveUser && staff.company.oa != EApproveChannel.DING_TALK">
                     <form class="list">
                         <div class="item item-input status-bar status-bar-input">
-                            <span class="input-label">选择审批人</span>
+                            <span class="input-label" ng-if="!trip.auditUser">选择审批人</span>
                             <ng-selector-list
                                     ng-model="trip.auditUser"
                                     dlg-options="staffSelector"
@@ -132,8 +141,17 @@
                                     class="fake-input"
                             ></ng-selector-list>
                             <i class="icon ion-arrow-up-b"></i>
+                            <p class="input-label" ng-if="trip.auditUser">审批人</p>
                         </div>
                     </form>
+                    <button class="button" ng-if="!totalPrice || totalPrice <= 0">特别审批</button>
+                    <button
+                            ng-if="totalPrice > 0"
+                            class="button"
+                            ng-class="{true: 'hasAuditUser button button-outline button-positive bgColor',false: ''}[bottomBottomClicked]"
+                            ng-click="specialApprove()">
+                        特别审批
+                    </button>
                     <button class="button" ng-if="!totalPrice || totalPrice <= 0">提交审批</button>
                     <button ng-if="totalPrice > 0"
                             class="button"

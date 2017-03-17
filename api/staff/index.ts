@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Created by wyl on 15-12-9.
  */
 'use strict';
@@ -25,7 +25,8 @@ import {conditionDecorator, condition} from "../_decorator";
 import {FindResult} from "common/model/interface";
 import {ENoticeType} from "../_types/notice/notice";
 import {CoinAccount} from "api/_types/coin";
-import {StaffDepartment} from "api/_types/department";
+import {StaffDepartment} from "api/_types/department/staffDepartment";
+
 
 const invitedLinkCols = InvitedLink['$fieldnames'];
 const staffSupplierInfoCols = StaffSupplierInfo['$fieldnames'];
@@ -97,6 +98,11 @@ class StaffModule{
                 values: values,
                 accountId: staff.id
             });
+            await StaffModule.sendNoticeToAdmins({
+                companyId:company.id,
+                name:staff.name,
+                noticeTemplate:"qm_notify_admins_add_staff"
+            });
         }catch(e){
             console.info(e);
         }
@@ -130,6 +136,12 @@ class StaffModule{
         }
         let result = await staff.save();
 
+        await StaffModule.sendNoticeToAdmins({
+            companyId:params.companyId,
+            name:params.name,
+            noticeTemplate:"qm_notify_admins_add_staff"
+        });
+
         await result.saveStaffDepartments(params.departmentIds);
 
         let account = await Models.account.get(staff.id);
@@ -143,6 +155,20 @@ class StaffModule{
         }
 
         return result;
+    }
+   static async  sendNoticeToAdmins(params:{companyId:string,name:string,noticeTemplate:string}):Promise<any>{
+        let company = await Models.company.get(params.companyId);
+        let managers= await company.getManagers({withOwner:true});
+        return await Promise.all(managers.map( (manager) => {
+            return API.notify.submitNotify({
+                accountId: manager.id,
+                key: params.noticeTemplate,
+                values: {
+                    staff:params.name
+                }
+             });
+         }));
+
     }
 
     @clientExport
@@ -407,8 +433,6 @@ class StaffModule{
                 appMessageUrl: '#/staff/staff-info',
                 permission: updateStaff.roleId == EStaffRole.ADMIN ? "管理员" : (updateStaff.roleId == EStaffRole.OWNER ? "创建者" : "普通员工"),
             }
-
-
             //发送通知
             await API.notify.submitNotify({
                 key: 'staff_update',
@@ -481,9 +505,6 @@ class StaffModule{
         let paginate = await Models.staff.find(params);
         return {ids: paginate.map((s)=> {return s.id;}), count: paginate['total']};
     }
-
-
-
 
     /**
      * 检查导入员工数据
@@ -712,8 +733,19 @@ class StaffModule{
             let deptIds = item.departmentIds;
             let staffObj: any = {name: item.name, mobile: item.mobile+"", email: item.email, sex: item.sex, roleId: item.roleId,
                 travelPolicyId: item.travelPolicyId, companyId: item.companyId, addWay: EAddWay.BATCH_IMPORT, isNeedChangePwd: true, };
+            if(_.trim(staffObj.mobile) == ""){
+                staffObj.mobile = null;
+            }
+            if(_.trim(staffObj.email) == ""){
+                staffObj.email = null;
+            }
             let staffAdded = await StaffModule.createStaff(staffObj);
-            await staffAdded.saveStaffDepartments(deptIds)
+            await staffAdded.saveStaffDepartments(deptIds);
+             StaffModule.sendNoticeToAdmins({
+                companyId:item.companyId,
+                name:item.name,
+                noticeTemplate:"qm_notify_admins_add_staff"
+             });
         }));
         
         await API.attachments.removeFileAndAttach({id: fileId});
@@ -750,7 +782,6 @@ class StaffModule{
                 return {fileName: fileName+".xlsx"};
             });
     }
-
 
     /**
      * 根据属性查找一个员工
@@ -1050,8 +1081,6 @@ class StaffModule{
             });
     }
 
-
-
     /**
      * 判断员工是否在企业中
      * @param staffId
@@ -1125,7 +1154,6 @@ class StaffModule{
         }
 
     }
-
     /**
      * 得到企业管理员 普通员工 未激活人数
      * @param params
@@ -1209,7 +1237,6 @@ class StaffModule{
         }
 
     }
-
     /**
      * 统计企业内的员工总数
      * @param params
@@ -1247,8 +1274,7 @@ class StaffModule{
         }
 
     }
-
-
+    
     /**
      * 删除企业的所有员工
      * @param params
@@ -1624,6 +1650,7 @@ class StaffModule{
         })
         return {ids: ids, count: paginate['total']};
     }
+
     /*************************************员工供应商网站信息end***************************************/
 
 }
@@ -1631,6 +1658,7 @@ class StaffModule{
 //生成邀请链接参数
 function makeLinkSign(linkToken, invitedLinkId, timestamp) {
     var originStr = linkToken + invitedLinkId + timestamp;
+    StaffDepartment
     return utils.md5(originStr);
 }
 export = StaffModule;

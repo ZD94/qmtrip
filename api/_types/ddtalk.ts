@@ -46,6 +46,36 @@ export class DDTalkCorp extends ModelObject {
     set agentid(id: string) {}
 }
 
+@Table(Models.ddtalkDepartment, "ddtalk.department")
+export class DDTalkDepartment extends ModelObject {
+
+    constructor(target: Object) {
+        super(target)
+    }
+
+    @Create()
+    static create(obj?: Object): DDTalkDepartment { return null; }
+
+    @Field({type: Types.UUID})
+    get id() : string { return Values.UUIDV1();}
+    set id(id: string)  {}
+
+    //local department id
+    @Field({type: Types.UUID})
+    get localDepartmentId(): string { return null; }
+    set localDepartmentId(val: string) {}
+
+    //dd department id
+    @Field({type: Types.STRING})
+    get DdDepartmentId(): string { return null; }
+    set DdDepartmentId(val: string) {}
+
+    //dd corpId
+    @Field({type: Types.STRING(50)})
+    get corpId() : string { return null};
+    set corpId(corpId: string) {}
+}
+
 
 @Table(Models.ddtalkUser, "ddtalk.users")
 export class DDTalkUser extends ModelObject {
@@ -84,4 +114,9 @@ export class DDTalkUser extends ModelObject {
     @Field({type: Types.STRING(50)})
     get corpid(): string { return null}
     set corpid(corpid: string) {}
+
+    // '获取到的钉钉信息'
+    @Field({type: Types.TEXT })
+    get ddInfo(): string { return ''; }
+    set ddInfo(val: string) {}
 }

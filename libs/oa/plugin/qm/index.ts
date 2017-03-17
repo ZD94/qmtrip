@@ -11,7 +11,8 @@ import {
 import TripPlanModule = require("api/tripPlan/index");
 import TripApproveModule = require("api/tripApprove/index");
 import {Models} from "api/_types/index";
-import {ETripType, TripApprove, QMEApproveStatus, EApproveResult} from "api/_types/tripPlan/tripPlan";
+import {ETripType, TripApprove, QMEApproveStatus, EApproveResult, Project} from "api/_types/tripPlan/tripPlan";
+import _ = require('lodash');
 const L = require("common/language");
 import moment = require("moment");
 var API = require("common/api");
@@ -37,16 +38,65 @@ export class QmPlugin extends AbstractOAPlugin {
         }
 
         let {budgets, query} = budgetInfo;
+        let destinationPlacesInfo = query.destinationPlacesInfo;
         let totalBudget = 0;
         budgets.forEach((b) => {totalBudget += Number(b.price);});
-        budgets = budgets.map( (v) => {
+        /*budgets = budgets.map( (v) => {
             if (v.type == ETripType.HOTEL) {
                 v.placeName = budgetInfo.query.hotelName;
             }
             return v;
-        });
+        });*/
 
-        let project = await API.tripPlan.getProjectByName({companyId: company.id, name: approve.title, userId: staff.id, isCreate: true});
+        let projectIds = [];//事由名称
+        let arrivalCityCodes = [];//目的地代码
+        let project: Project;
+
+        if(query.originPlace) {
+            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace}) || {name: null};
+            tripApprove.deptCityCode = deptInfo.id;
+            tripApprove.deptCity = deptInfo.name;
+        }
+
+        tripApprove.isRoundTrip = query.isRoundTrip;
+        if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
+            for(let i = 0; i < destinationPlacesInfo.length; i++){
+                let q = destinationPlacesInfo[i];
+                //处理出差事由放入projectIds 原project存放第一程出差事由
+                if(q.reason){
+                    let projectItem = await API.tripPlan.getProjectByName({companyId: company.id, name: q.reason,
+                        userId: staff.id, isCreate: true});
+                    if(i == 0){
+                        project = projectItem;
+                    }
+                    if(projectIds.indexOf(projectItem.id) == -1){
+                        projectIds.push(projectItem.id);
+                    }
+                }
+
+                //处理目的地 放入arrivalCityCodes 原目的地信息存放第一程目的地信息
+                if(q.destinationPlace){
+                    let arrivalInfo = await API.place.getCityInfo({cityCode: q.destinationPlace.id|| q.destinationPlace}) || {name: null};
+                    arrivalCityCodes.push(arrivalInfo.id);
+                    if(i == (destinationPlacesInfo.length - 1)){//目的地存放最后一个目的地
+                        tripApprove.arrivalCityCode = arrivalInfo.id;
+                        tripApprove.arrivalCity = arrivalInfo.name;
+                    }
+                }
+
+                //处理其他数据
+                if(i == 0){
+                    tripApprove.isNeedTraffic = q.isNeedTraffic;
+                    tripApprove.isNeedHotel = q.isNeedHotel;
+                    
+                    tripApprove.startAt = q.leaveDate;
+                }
+                if(i == (destinationPlacesInfo.length - 1)){
+                    tripApprove.backAt = q.goBackDate;
+                }
+            }
+        }
+
         // let tripApprove =  TripApprove.create(params);
 
         if(params.approveUser) {
@@ -62,23 +112,11 @@ export class QmPlugin extends AbstractOAPlugin {
         tripApprove['companyId'] = company.id;
         tripApprove.project = project;
         tripApprove.title = approve.title;
-        tripApprove.startAt = query.leaveDate;
-        tripApprove.backAt = query.goBackDate;
+
         tripApprove.query = JSON.stringify(query);
+        tripApprove.projectIds = JSON.stringify(projectIds);
+        tripApprove.arrivalCityCodes = JSON.stringify(arrivalCityCodes);
 
-        let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace.id|| query.destinationPlace}) || {name: null};
-
-        if(query.originPlace) {
-            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace}) || {name: null};
-            tripApprove.deptCityCode = deptInfo.id;
-            tripApprove.deptCity = deptInfo.name;
-        }
-
-        tripApprove.arrivalCityCode = arrivalInfo.id;
-        tripApprove.arrivalCity = arrivalInfo.name;
-        tripApprove.isNeedTraffic = query.isNeedTraffic;
-        tripApprove.isNeedHotel = query.isNeedHotel;
-        tripApprove.isRoundTrip = query.isRoundTrip;
         tripApprove.budgetInfo = budgets;
         tripApprove.budget = totalBudget;
         tripApprove.status = totalBudget < 0 ? QMEApproveStatus.NO_BUDGET : QMEApproveStatus.WAIT_APPROVE;

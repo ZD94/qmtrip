@@ -1,6 +1,6 @@
 <ion-list class="jl_projectinfo">
     <ion-item class="project_tit">{{trip.startAt | date: 'MM-dd'}}&nbsp;至&nbsp;{{trip.backAt | date: 'MM-dd'}}
-        <span style="padding-left: 13px">{{trip.deptCity}} - {{trip.arrivalCity}}</span>
+        <span style="padding-left: 13px"><span ng-if="trip.deptCity">{{trip.deptCity}} - </span>{{trip.arrivalCity}}</span>
         <span class="tit_special" ng-if="trip.isSpecialApprove">特别审批</span>
     </ion-item>
     <ion-item class="project_cont">
