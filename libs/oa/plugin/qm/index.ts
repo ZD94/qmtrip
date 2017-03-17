@@ -53,7 +53,7 @@ export class QmPlugin extends AbstractOAPlugin {
 
         if(query.originPlace) {
             let placeCode = query.originPlace;
-            if (typeof placeCode == 'string') {
+            if (typeof placeCode != 'string') {
                 placeCode = placeCode['id']
             }
             let deptInfo = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
