@@ -149,6 +149,7 @@
                             ng-if="totalPrice > 0"
                             class="button"
                             ng-class="{true: 'hasAuditUser button button-outline button-positive bgColor',false: ''}[bottomBottomClicked]"
+                            ng-stat-event="提交特别审批,按钮点击,提交特别审批"
                             ng-click="specialApprove()">
                         特别审批
                     </button>
@@ -156,6 +157,7 @@
                     <button ng-if="totalPrice > 0"
                             class="button"
                             ng-class="{true: 'hasAuditUser',false: ''}[bottomBottomClicked]"
+                            ng-stat-event="提交普通审批,按钮点击,提交普通审批"
                             ng-click="submitApprove()">
                             提交审批
                     </button>

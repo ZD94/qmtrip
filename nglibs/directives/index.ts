@@ -11,3 +11,4 @@ import './uploader';
 import './progressBar';
 import './baidu-map';
 import './fake-input';
+import './stat-event';

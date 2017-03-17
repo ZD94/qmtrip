@@ -16,6 +16,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
     let company = staff.company;
     let rootDepartment : Department;
     let newUrl;
+
     $scope.policy_staffs = [];//用于存放可以展示差旅标准的staff list
     $scope.moveStaffIds = [];
     if(departmentId){
