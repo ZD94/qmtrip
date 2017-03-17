@@ -5,6 +5,7 @@
 'use strict';
 
 import _ = require('lodash');
+import {Place} from 'api/_types/place';
 
 export enum ECabin {
     PLANE_FIRST = 1,    //飞机头等舱
@@ -85,6 +86,28 @@ export enum EInvoiceStatus {
     WAIT_AUDIT = 0,
     AUDIT_PASS = 1,
     AUDIT_FAIL = -1,
+}
+
+
+export interface ISegment {
+    destinationPlace?: string;
+    leaveDate?: Date;
+    goBackDate?: Date;
+    isNeedTraffic?: boolean;
+    isNeedHotel?: boolean;
+    businessDistrict?: any;
+    hotelName?: string;
+    reason?: any;
+    subsidy?: any;
+    latestArrivalDateTime?: Date;
+    earliestGoBackDateTime?: Date;
+}
+
+export interface ICreateBudgetAndApproveParams {
+    originPlace: string;
+    isRoundTrip?: boolean;
+    auditUser?: string;
+    destinationPlacesInfo: ISegment[];
 }
 
 export * from './tripPlan'
