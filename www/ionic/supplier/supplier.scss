@@ -1,0 +1,57 @@
+.suppliers{
+  .list{
+    background: #fff;
+    border-radius: 6px;
+    overflow: hidden;
+    padding: 0;
+    .supplier-item{
+      float: left;
+      width: 50%;
+      height: 100px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-right: 1px solid #eee;
+      border-bottom: 1px solid #eee;
+      .title_left{
+        position: absolute;
+        left: 0;
+        top: 0;
+        width:0;
+        height:0;
+        border-left:36px solid #28a7e1;
+        border-right:30px solid transparent;
+        border-bottom:36px solid transparent;
+        &:after{
+          content: '专属';
+          transform: rotate(-45deg);
+          color: #fff;
+          position: absolute;
+          left: -36px;
+          top: 0;
+          width: 30px;
+          font-size: 12px;
+        }
+        &.recommend{
+          border-left:36px solid #d0011b;
+          &:after{
+            content:'推荐';
+          }
+        }
+      }
+      img{
+        width: 100px;
+        height: 30px;
+      }
+      p{
+        margin: 10px 0 0 0;
+        height: 20px;
+      }
+    }
+  }
+  .button{
+    margin: 0;
+  }
+}
