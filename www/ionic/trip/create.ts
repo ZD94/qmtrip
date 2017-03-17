@@ -5,7 +5,6 @@
 
 import moment = require('moment');
 import { Staff } from 'api/_types/staff/staff';
-import {EApproveChannel} from "api/_types/approve/types";
 import {destinationController} from "./destination-template";
 
 var msgbox = require('msgbox');
@@ -23,8 +22,10 @@ var defaultTrip = {
     round: true,
 
     hotel: true,
-    hotelPlace: undefined
+    hotelPlace: undefined,
+    hotelName: '',
 };
+
 type TripDefine = typeof defaultTrip;
 function TripDefineFromJson(obj: any): TripDefine{
     if(obj == undefined)
@@ -62,7 +63,6 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
             trip.hotelPlace = oldParams.businessDistrict;
             trip.hotelName = oldParams.hotelName;
             trip.reason = oldParams.reason;
-            trip.reasonName = oldParams.reason;
             $scope.subsidy = oldParams.subsidy;
             $scope.showDestination = true;
         }else{
@@ -77,34 +77,10 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
             trip.hotelPlace = query.businessDistrict;
             trip.hotelName = query.hotelName;
             trip.reason = query.reason;
-            trip.reasonName = query.reason;
             $scope.subsidy = query.subsidy;
         }
     }
     $scope.trip = trip;
-    // try {
-    //     trip= TripDefineFromJson($storage.local.get('trip'));
-    //     if(trip.origin){
-    //         $scope.showOrigin = true;
-    //     }
-    //     if(trip.destination){
-    //         $scope.showDestination = true;
-    //     }
-    // } catch(err) {
-    //     trip = {};
-    // }
-    //
-    // if(!trip.regenerate) {
-    //     trip = defaultTrip;
-    //     await $storage.local.set('trip', trip);
-    // }else {
-    //     var today = moment();
-    //     if (!trip.beginDate || (new Date(trip.beginDate) < new Date())) {
-    //         trip.beginDate = today.startOf('day').hour(18).toDate();
-    //     }
-    //
-    //     trip.regenerate = false;
-    // }
 
     $scope.oldBeginDate = trip.beginDate;
 
@@ -113,12 +89,7 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
     $rootScope.$on('$stateChangeSuccess', function(){
         trip = _.clone(defaultTrip);
         $scope.trip=trip;
-        console.info("trip.....",trip);
     })
-    console.info($scope.trip);
-    // $scope.$watch('trip', function(){
-    //     $storage.local.set('trip', $scope.trip);
-    // }, true);
     $scope.$watch('trip.beginDate', function(n, o){
         if (!trip.endDate || trip.endDate <= trip.beginDate) {
             trip.endDate = moment(trip.beginDate).add(3, 'days').toDate();
@@ -157,7 +128,6 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
             template: require('./destination-template.html'),
             controller: destinationController
         })
-        console.info('modal.result',ret)
         if(ret){
             $scope.showDestination = true;
             $scope.trip = ret.trip;

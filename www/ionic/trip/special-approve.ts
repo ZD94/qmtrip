@@ -15,17 +15,17 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
     let trip = $storage.local.get("trip");
     if(destinationPlacesInfo && _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
         for(let i = 0; i < destinationPlacesInfo.length; i++){
-            let q = destinationPlacesInfo[i];
+            let seg: any = destinationPlacesInfo[i];
             //处理startAt,backAt
             if(i == 0){
-                trip.beginDate = q.leaveDate;
+                trip.beginDate = seg.leaveDate;
             }
             if(i == (destinationPlacesInfo.length - 1)){
-                trip.endDate = q.goBackDate;
+                trip.endDate = seg.goBackDate;
             }
             //处理目的地
-            if(i == (destinationPlacesInfo.length - 1) && q.destinationPlace){
-                let arrivalInfo = await API.place.getCityInfo({cityCode: q.destinationPlace.id|| q.destinationPlace}) || {name: null};
+            if(i == (destinationPlacesInfo.length - 1) && seg.destinationPlace){
+                let arrivalInfo = await API.place.getCityInfo({cityCode: seg.destinationPlace.id|| seg.destinationPlace}) || {name: null};
                 trip.destinationPlaceName = arrivalInfo.name;
             }
         }

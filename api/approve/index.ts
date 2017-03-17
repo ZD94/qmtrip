@@ -12,7 +12,6 @@ import {EApproveStatus, EApproveChannel, EApproveType} from "../_types/approve/t
 import {TripPlan, ETripType} from "../_types/tripPlan/tripPlan";
 import TripPlanModule = require("../tripPlan/index");
 import _ = require('lodash');
-import L from 'common/language';
 let Config = require('config');
 var API = require("common/api");
 
@@ -44,8 +43,6 @@ class ApproveModule {
 
         //获取预算详情
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: submitter.id});
-        console.info(budgetInfo);
-        console.info("submitApprove_budgetInfo=============================================")
         let number = 0;
         let content = "";
         let query = budgetInfo.query;
@@ -57,7 +54,8 @@ class ApproveModule {
         }
         if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
             for(let i = 0; i < destinationPlacesInfo.length; i++){
-                let destinationCity = await API.place.getCityInfo({cityCode: destinationPlacesInfo[i].destinationPlace});
+                let seg: any = destinationPlacesInfo[i]
+                let destinationCity = await API.place.getCityInfo({cityCode: seg.destinationPlace});
                 content = content + destinationCity.name;
             }
         }
@@ -144,17 +142,17 @@ class ApproveModule {
 
         if(destinationPlacesInfo && _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
             for(let i = 0; i < destinationPlacesInfo.length; i++){
-                let q = destinationPlacesInfo[i];
+                let seg: any = destinationPlacesInfo[i];
                 //处理startAt,backAt
                 if(i == 0){
-                    budgetInfo.budgets[0].startAt = q.leaveDate;
+                    budgetInfo.budgets[0].startAt = seg.leaveDate;
                 }
                 if(i == (destinationPlacesInfo.length - 1)){
-                    budgetInfo.budgets[0].backAt = q.goBackDate;
+                    budgetInfo.budgets[0].backAt = seg.goBackDate;
                 }
                 //处理目的地
-                if(i == (destinationPlacesInfo.length - 1) && q.destinationPlace){
-                    let arrivalInfo = await API.place.getCityInfo({cityCode: q.destinationPlace.id|| q.destinationPlace}) || {name: null};
+                if(i == (destinationPlacesInfo.length - 1) && seg.destinationPlace){
+                    let arrivalInfo = await API.place.getCityInfo({cityCode:seg.destinationPlace.id|| seg.destinationPlace}) || {name: null};
                     budgetInfo.budgets[0].destination = arrivalInfo;
                 }
             }

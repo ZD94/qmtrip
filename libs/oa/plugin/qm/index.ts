@@ -61,10 +61,10 @@ export class QmPlugin extends AbstractOAPlugin {
         tripApprove.isRoundTrip = query.isRoundTrip;
         if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
             for(let i = 0; i < destinationPlacesInfo.length; i++){
-                let q = destinationPlacesInfo[i];
+                let seg: any = destinationPlacesInfo[i];
                 //处理出差事由放入projectIds 原project存放第一程出差事由
-                if(q.reason){
-                    let projectItem = await API.tripPlan.getProjectByName({companyId: company.id, name: q.reason,
+                if(seg.reason){
+                    let projectItem = await API.tripPlan.getProjectByName({companyId: company.id, name: seg.reason,
                         userId: staff.id, isCreate: true});
                     if(i == 0){
                         project = projectItem;
@@ -75,8 +75,8 @@ export class QmPlugin extends AbstractOAPlugin {
                 }
 
                 //处理目的地 放入arrivalCityCodes 原目的地信息存放第一程目的地信息
-                if(q.destinationPlace){
-                    let arrivalInfo = await API.place.getCityInfo({cityCode: q.destinationPlace.id|| q.destinationPlace}) || {name: null};
+                if(seg.destinationPlace){
+                    let arrivalInfo = await API.place.getCityInfo({cityCode: seg.destinationPlace.id|| seg.destinationPlace}) || {name: null};
                     arrivalCityCodes.push(arrivalInfo.id);
                     if(i == (destinationPlacesInfo.length - 1)){//目的地存放最后一个目的地
                         tripApprove.arrivalCityCode = arrivalInfo.id;
@@ -86,13 +86,13 @@ export class QmPlugin extends AbstractOAPlugin {
 
                 //处理其他数据
                 if(i == 0){
-                    tripApprove.isNeedTraffic = q.isNeedTraffic;
-                    tripApprove.isNeedHotel = q.isNeedHotel;
+                    tripApprove.isNeedTraffic = seg.isNeedTraffic;
+                    tripApprove.isNeedHotel = seg.isNeedHotel;
                     
-                    tripApprove.startAt = q.leaveDate;
+                    tripApprove.startAt = seg.leaveDate;
                 }
                 if(i == (destinationPlacesInfo.length - 1)){
-                    tripApprove.backAt = q.goBackDate;
+                    tripApprove.backAt = seg.goBackDate;
                 }
             }
         }
