@@ -7,11 +7,14 @@
                     <ng-selector-list
                             ng-model="city"
                             dlg-options="placeSelector"
-                            dlg-notice-msg="该城市已设置协议酒店不能重复设置"
-                            dlg-title="请选择城市"
                             dlg-placeholder="请输入城市名或首字母缩写"
                             class="fake-input"
-                    ></ng-selector-list>
+                    >
+                        <list-item>{{$item.name}}<span ng-if="isSetCity($item)" class="item-note">已设置</span></list-item>
+                        <input-item>
+                            <fake-input value="{{city.name}}" placeholder="请选择城市"></fake-input>
+                        </input-item>
+                    </ng-selector-list>
                 </div>
                 <div class="item item-input">
                     <span class="input-label">协议价格</span>

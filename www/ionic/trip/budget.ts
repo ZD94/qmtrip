@@ -17,8 +17,7 @@ export async function BudgetController($scope, $storage, $loading, Models, $stat
         query: async function(keyword) {
             let staffs = await staff.company.getStaffs({where: {'name': {$ilike: '%'+keyword+'%'}}});
             return staffs;
-        },
-        display: (staff)=>staff.name
+        }
     };
 
     await API.onload();

@@ -74,8 +74,7 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
             let staff = await Staff.getCurrent();
             let staffs = await staff.company.getStaffs({where: {name: {$ilike: `%${keyword}%`}}})
             return staffs;
-        },
-        display: (staff)=>staff.name
+        }
     };
 
     $scope.saveSpecialTripPlan = async function() {

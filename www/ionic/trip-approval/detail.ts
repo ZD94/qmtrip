@@ -367,8 +367,7 @@ export async function selectModeController ($scope){
             //let approveStaffId = $scope.tripApprove.account.id;
             let staffs = await staff.company.getStaffs({where: {name: {$ilike: `%${keyword}%`}}});
             return staffs;
-        },
-        display: (staff)=>staff.name
+        }
     };
     $scope.chooseOption = function(isNextApprove) {
         $scope.isNextApprove = isNextApprove;

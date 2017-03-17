@@ -8,12 +8,41 @@ angular
         return {
             restrict: 'A',
             scope: {
-                'template': '=ngBindTemplateTemplate'
+                'options': '&ngBindTemplateTemplate',
+                'inject': '&inject'
             },
             link: function(scope, elem, attrs, controller, transcludeFn){
-                let template = angular.element('<div>'+scope.template+'</div>');
-                let child = $compile(template)(scope.$parent);
+                let options = scope.options();
+                let inject = scope.inject();
+                let parent = options.scope || scope;
+                let childScope = parent.$new(false);
+                Object.keys(inject).forEach((k)=>{
+                    childScope[k] = inject[k];
+                })
+                let template = angular.element('<div>'+options.template+'</div>');
+                let child = $compile(template)(childScope);
                 elem.append(child);
+            }
+        }
+    })
+    .directive('ngBindTransclude', function(){
+        return {
+            restrict: 'A',
+            scope: {
+                'options': '&ngBindTransclude',
+                'inject': '&inject'
+            },
+            link: function(scope, elem, attrs, controller, transcludeFn){
+                let options = scope.options();
+                let inject = scope.inject();
+                let parent = options.scope || scope;
+                let childScope = parent.$new(false);
+                Object.keys(inject).forEach((k)=>{
+                    childScope[k] = inject[k];
+                })
+                options.transclude(childScope, function(clone){
+                    elem.append(clone);
+                }, elem, options.slot);
             }
         }
     })
@@ -21,24 +50,24 @@ angular
         return {
             restrict: 'E',
             template: require('./list.html'),
+            transclude:{
+                listItem: 'listItem',
+                inputItem: '?inputItem'
+            },
             scope: {
                 value: '=ngModel',
-                noticeMsg: '@dlgNoticeMsg',
-                title: '@dlgTitle',
                 placeholder: '@dlgPlaceholder',
                 opts: '=dlgOptions'
             },
-            controller: function($scope, $element, ngModalDlg) {
-                $scope.displayItem = function(item) {
-                    if(item && $scope.opts && $scope.opts.display) {
-                        return $scope.opts.display(item, false);
-                    }
-                    return item;
-                };
+            controller: function($scope, $element, $transclude, ngModalDlg) {
+                require('./selector.scss');
                 $scope.showSelectorDlg = async function() {
-                    $scope.opts.title = $scope.title;
                     $scope.opts.placeholder = $scope.placeholder;
-                    $scope.opts.noticeMsg = $scope.noticeMsg;
+                    $scope.opts.transclude = {
+                        transclude: $transclude,
+                        scope: $scope.$parent,
+                        slot: 'listItem',
+                    };
                     var value: any = await ngModalDlg.selectFromList($scope, $scope.opts, $scope.value)
                     if(value == undefined)
                         return;
@@ -104,51 +133,6 @@ angular
                     $scope.value = confirmed;
                     if($scope.options.done && typeof $scope.options.done == 'function') {
                         return $scope.options.done($scope.value);
-                    }
-                };
-            }
-        }
-    })
-    .directive('ngSelectorListTwo', function($compile) {
-        return {
-            restrict: 'E',
-            template: require('./list2.html'),
-            scope: {
-                value: '=ngModel',
-                name: '@selectName',
-                must: '@must',
-                showArrow: '@showArrow',
-                noticeMsg: '@dlgNoticeMsg',
-                title: '@dlgTitle',
-                placeholder: '@dlgPlaceholder',
-                opts: '=dlgOptions'
-            },
-            controller: function($scope, $element, ngModalDlg) {
-                require('./selector.scss');
-                $scope.$item = $scope.value;
-                $scope.$watch('value', function(){
-                    $scope.$item = $scope.value;
-                })
-                //let template = $scope.opts.titleTemplate || $scope.opts.itemTemplate;
-                $scope.displayItem = function(item) {
-                    if(!$scope.opts)
-                        return 'null';
-                    return $scope.opts.titleTemplate;
-                    // let compiled = $compile(angular.element('<div>'+template+'</div>'));
-                    // let element = compiled($scope);
-                    // return element.text();
-                };
-                $scope.showSelectorDlg = async function() {
-                    $scope.opts.title = $scope.title;
-                    $scope.opts.placeholder = $scope.placeholder;
-                    $scope.opts.noticeMsg = $scope.noticeMsg;
-                    var value: any = await ngModalDlg.selectFromList($scope, $scope.opts, $scope.value)
-                    if(value == undefined)
-                        return;
-                    $scope.value = value;
-
-                    if($scope.opts.done && typeof $scope.opts.done == 'function') {
-                        return $scope.opts.done(value);
                     }
                 };
             }

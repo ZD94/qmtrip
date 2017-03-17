@@ -6,16 +6,10 @@ export async function selectFromListController($scope) {
     if(typeof $scope.options.searchbox === 'undefined'){
         $scope.options.searchbox = true;
     }
-    if(!$scope.options.titleTemplate){
-        $scope.options.titleTemplate = $scope.options.itemTemplate;
-    }
     let form = $scope.form = {
         keyword: ''
     };
     $scope.optionItems = [];
-    $scope.$watch('value', function(){
-        $scope.$item = $scope.value;
-    })
 
     $scope.disableItem = function(item){
         if(item && $scope.options && $scope.options.disable){
@@ -29,8 +23,6 @@ export async function selectFromListController($scope) {
             return false;
         if(!form.keyword || form.keyword.length == 0)
             return false;
-
-
     }
 
     $scope.createItem = async function(keyword){
@@ -41,8 +33,7 @@ export async function selectFromListController($scope) {
     async function reloadOptionItems(){
         lists = await $scope.options.query(form.keyword);
         $scope.optionItems = _.cloneDeep(lists);
-        console.info($scope.optionItems);
-
+        //console.info($scope.optionItems);
     }
     await reloadOptionItems();
     var page = {
@@ -87,10 +78,6 @@ export async function selectFromListController($scope) {
         if($scope.disableItem(value))
             return value;
         $scope.confirmModal(value);
-    }
-
-    $scope.haveSet = function() {
-        msgbox.log($scope.options.noticeMsg);
     }
 }
 

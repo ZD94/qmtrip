@@ -1,19 +1,12 @@
-.model-list{
-  .bar-input{
-    position: absolute;
-    right: 50px;
-    height: 43px;
-    line-height: 44px;
-    font-size: 16px;
+
+.ng-modal-select-list {
+  .search_bar {
+    position: fixed;
+    top: 0;
+    width: 100%;
   }
 
-}
-.search_bar{
-  position: fixed;
-  top:0;
-  width: 100%;
-}
-
-.bar .button.button-clear, .bar button.button-clear {
-  color: #4a4a4a;
+  .bar .button.button-clear, .bar button.button-clear {
+    color: #4a4a4a;
+  }
 }

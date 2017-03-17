@@ -217,8 +217,7 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         query: async function(keyword) {
             let staffs = await rootDepartment.getStaffs({where: {'name': {$ilike: '%'+keyword+'%'}}});
             return staffs;
-        },
-        display: (staff)=>staff.name
+        }
     };
 
     async function setDepartmentController($scope,ngModalDlg,$ionicHistory){

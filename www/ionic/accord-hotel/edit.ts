@@ -34,24 +34,7 @@ export async function EditController($scope, Models, $storage, $stateParams, $io
             var places = await API.place.queryPlace({keyword: keyword});
             return places;
         },
-        titleTemplate: '{{$item.name}}',
-        itemTemplate: '{{$item.name}}<span ng-if="isSetCity($item)" class="item-note">已设置</span>',
-        // display: (item, forList)=>{
-        //     if(forList){
-        //         for(let city of accordHotels){
-        //             if(city.cityName == item.name)
-        //                 return item.name + '<span class="item-note">已设置</span>';
-        //         }
-        //     }
-        //     return item.name;
-        // },
-        disable: (item)=>{
-            for(let city of accordHotels){
-                if(city.cityName == item.name)
-                    return true;
-            }
-            return false;
-        },
+        disable: $scope.isSetCity,
         done: function(val) {
             $scope.accordHotel.cityName = val.name;
             $scope.accordHotel.cityCode = val.id;
