@@ -22,11 +22,11 @@ export function reqProxy(url, options) {
             method: method,
             qs: qs,
             body: body,
-            agentClass : Agent,
-            agentOptions: {
-                socksHost: 'localhost', // Defaults to 'localhost'.
-                socksPort: 8888 // Defaults to 1080.
-            }
+            // agentClass : Agent,
+            // agentOptions: {
+            //     socksHost: 'localhost', // Defaults to 'localhost'.
+            //     socksPort: 8888 // Defaults to 1080.
+            // }
         }, (err, resp, data: any) => {
             if (typeof data == 'string') {
                 data = JSON.parse(data);
