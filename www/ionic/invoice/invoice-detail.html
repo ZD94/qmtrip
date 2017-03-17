@@ -209,7 +209,7 @@
                 <div class="chooseFun" ng-if="select_menu">
                     <div class="chooseBtn">
                         <a class="button button-calm" ng-click="linkOthers()">关联订单</a>
-                        <a class="button button-calm button-outline" ng-click="manual()">手动添加</a>
+                        <a class="button button-calm button-outline" ng-click="manual()" ng-stat-event="手动添加票据,添加,手动添加票据">手动添加</a>
                     </div>
                 </div>
                 <div class="addInvoice invoice-form invoice-edit flex-c10" ng-if="!select_menu">
@@ -218,7 +218,7 @@
                             <div class="invoice-img-min" ng-uploader="" accept="image/png, image/jpeg, image/gif" url="uploadUrl" done="invoicefuc.done">
                                 <img ng-if="previewUrl" ng-src="{{previewUrl}}">
                                 <img ng-if="!previewUrl" src="ionic/images/invoiceEmpty.png">
-                                <a class="button button-positive">点击上传</a>
+                                <a class="button button-positive" ng-stat-event="上传票据照片,上传,上传票据">点击上传</a>
                             </div>
                             <div>
                                 <span class="item-tit">金额</span>

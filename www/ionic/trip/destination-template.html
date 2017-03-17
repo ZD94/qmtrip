@@ -58,7 +58,7 @@
                                     class="fake-input item"
                             ></ng-selector-list-two>
                         </div>
-                        <div class="list list-border">
+                        <div class="list list-border" ng-stat-event="选择地标,选择，地标">
                             <div class="item item-icon-right" ng-if="currentTpSts && currentTpSts.length" ng-click="selectSubsidyTemplate()">
                                 <span class="item-tit">补助<i class="fa fa-asterisk"></i></span>
                                 <p><span ng-if="subsidy.template">{{select_subsidy.subsidyMoney}}元/天</span> {{select_subsidy.name}}</p>
