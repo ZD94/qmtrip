@@ -378,7 +378,7 @@ app.controller('debug',function($scope, $http, $location){
   //拿到原始数据
   if(url.key){
     /*$http.get('/api/budgets?p='+p+'&pz='+pz+'&key='+url.key)*/
-    $http.get('../../api/budgets?p='+p+'&pz='+pz+'&key='+url.key)
+    $http.get('../api/budgets?p='+p+'&pz='+pz+'&key='+url.key)
         .success(function(response){
          for(let i=0;i<response.length;i++){
            let arr = response[i].markedData;
