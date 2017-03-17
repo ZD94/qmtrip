@@ -1,4 +1,9 @@
-<div class="check-box">
+<div class="check-box" ng-click="checkall()">
     <!--<ion-checkbox ng-model="checked">全选</ion-checkbox>-->
-    <a ng-click="checkall()" ng-class="{all_check: selectAll}" class="checkbox_diy"><i class="icon ion-checkmark-circled"></i>全选</a>
+    <span ng-if="selectAll" ng-transclude="all" class="all_check checkbox_diy">
+        <i class="icon ion-checkmark-circled"></i>全选
+    </span>
+    <span ng-if="!selectAll" ng-transclude="notAll" class="checkbox_diy">
+        <i class="icon ion-checkmark-circled"></i>全选
+    </span>
 </div>

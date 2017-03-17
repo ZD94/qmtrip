@@ -2,7 +2,7 @@
     <ion-content padding="true" class="has-header">
         <ion-refresher
                 pulling-text="下拉刷新",
-                on-refresh="pagersDate.doRefresh()"
+                on-refresh="vm.doRefresh()"
         ></ion-refresher>
         <ion-list class="list notice">
             <ion-item class="item item-body" ng-repeat="notice in notices track by $index" ng-click="detail(notice)">
@@ -18,8 +18,8 @@
             </ion-item>
         </ion-list>
         <div>
-            <div ng-if="!vm.isHasNextPage" class="getMoreOrNoMore">没有更多记录了</div>
+            <div ng-if="!vm.hasNextPage()" class="getMoreOrNoMore">没有更多记录了</div>
         </div>
-        <ion-infinite-scroll ng-if="vm.isHasNextPage" on-infinite="vm.nextPage()"></ion-infinite-scroll>
+        <ion-infinite-scroll ng-if="vm.hasNextPage()" on-infinite="vm.nextPage()"></ion-infinite-scroll>
     </ion-content>
 </ion-view>

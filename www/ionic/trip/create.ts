@@ -35,15 +35,53 @@ function TripDefineFromJson(obj: any): TripDefine{
 }
 
 
-export async function CreateController($scope, $storage, $loading, ngModalDlg, $ionicPopup, Models, City, $rootScope){
+export async function CreateController($scope, $storage,$stateParams, $loading, ngModalDlg, $ionicPopup, Models, City, $rootScope){
     require('./create.scss');
     $scope.showOrigin = false;
     $scope.showDestination = false;
     $scope.currentStaff = await Staff.getCurrent();
     let currentCompany = $scope.currentStaff.company;
     let trip = _.clone(defaultTrip);
+    let query = null;
+    if($stateParams.params){
+        query = JSON.parse($stateParams.params);
+        if(query.originPlace){
+            $scope.showOrigin = true;
+            let origin = await API.place.getCityInfo({cityCode: query.originPlace});
+            trip.origin = origin;
+        }
+        trip.round = query.isRoundTrip;
+        if(query.destinationPlacesInfo && _.isArray(query.destinationPlacesInfo) && query.destinationPlacesInfo.length > 0){
+            let oldParams = query.destinationPlacesInfo[0];
+            let destination = await API.place.getCityInfo({cityCode: oldParams.destinationPlace});
+            trip.destination = destination;
+            trip.beginDate = oldParams.leaveDate;
+            trip.endDate = oldParams.goBackDate;
+            trip.traffic = oldParams.isNeedTraffic;
+            trip.hotel = oldParams.isNeedHotel;
+            trip.hotelPlace = oldParams.businessDistrict;
+            trip.hotelName = oldParams.hotelName;
+            trip.reason = oldParams.reason;
+            trip.reasonName = oldParams.reason;
+            $scope.subsidy = oldParams.subsidy;
+            $scope.showDestination = true;
+        }else{
+            if(query.destinationPlace){
+                $scope.showDestination = true;
+            }
+            trip.destination = {id: query.destinationPlace};
+            trip.beginDate = query.leaveDate;
+            trip.endDate = query.goBackDate;
+            trip.traffic = query.isNeedTraffic;
+            trip.hotel = query.isNeedHotel;
+            trip.hotelPlace = query.businessDistrict;
+            trip.hotelName = query.hotelName;
+            trip.reason = query.reason;
+            trip.reasonName = query.reason;
+            $scope.subsidy = query.subsidy;
+        }
+    }
     $scope.trip = trip;
-
     // try {
     //     trip= TripDefineFromJson($storage.local.get('trip'));
     //     if(trip.origin){
@@ -195,28 +233,42 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         if(!trip.reasonName) {
             return false;
         }
+
         let params = {
-            originPlace: trip.origin? trip.origin.id : '',
-            destinationPlace: trip.destination ? trip.destination.id : '',
+            originPlace: trip.origin? trip.origin.id : null,
+            isRoundTrip: trip.round,
+            destinationPlacesInfo: []
+        };
+
+        let destinationItem = {
+            destinationPlace: trip.destination ? trip.destination.id : null,
             leaveDate: moment(trip.beginDate).toDate(),
             goBackDate: moment(trip.endDate).toDate(),
             latestArrivalDateTime: moment(trip.beginDate).toDate(),
             earliestGoBackDateTime: moment(trip.endDate).toDate(),
             isNeedTraffic: trip.traffic,
-            isRoundTrip: trip.round,
             isNeedHotel: trip.hotel,
             businessDistrict: trip.hotelPlace,
             hotelName: trip.hotelName,
-            subsidy: $scope.subsidy
+            subsidy: $scope.subsidy,
+            reason: trip.reason
         };
-        if(trip.origin && params.originPlace == params.destinationPlace){
+        if(trip.origin && trip.origin.id == destinationItem.destinationPlace){
             msgbox.log("出差地点和出发地不能相同");
             return false;
         }
         if(!trip.origin){
-            params.isNeedTraffic = false;
-            params.originPlace = params.destinationPlace;
+            destinationItem.isNeedTraffic = false;
+            params.isRoundTrip = false;
+            // params.originPlace = destinationItem.destinationPlace;
         }
+        if(!destinationItem.destinationPlace) {
+            $scope.showErrorMsg('请填写出差目的地！');
+            return false;
+        }
+        params.destinationPlacesInfo.push(destinationItem);
+
+
         $storage.local.set('trip',trip);
         let number = 0;
         if(trip.traffic){
@@ -243,19 +295,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
                         text: '特别审批',
                         type: 'button-calm',
                         onTap: function(){
-                            let params = {
-                                originPlace: trip.origin? trip.origin.id : '',
-                                destinationPlace: trip.destination ? trip.destination.id : '',
-                                leaveDate: moment(trip.beginDate).toDate(),
-                                goBackDate: moment(trip.endDate).toDate(),
-                                latestArrivalDateTime: moment(trip.beginDate).toDate(),
-                                earliestGoBackDateTime: moment(trip.endDate).toDate(),
-                                isNeedTraffic: trip.traffic,
-                                isRoundTrip: trip.round,
-                                isNeedHotel: trip.hotel,
-                                businessDistrict: trip.hotelPlace,
-                                hotelName: trip.hotelName
-                            };
                             window.location.href = "#/trip/special-approve?params="+JSON.stringify(params);
                         }
                     }
@@ -266,6 +305,22 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
         let beginMSecond = Date.now();
         API.require("travelBudget");
         await API.onload();
+
+        if(!trip.reasonName) {
+            $scope.showErrorMsg('请填写出差事由！');
+            return false;
+        }
+
+        if(!trip.traffic && ! trip.hotel) {
+            $scope.showErrorMsg('请选择交通或者住宿！');
+            return false;
+        }
+
+        if(moment(trip.endDate).toDate().getTime() - moment(trip.beginDate).toDate().getTime() <= 0) {
+            $scope.showErrorMsg('到达时间不可晚于离开时间！');
+            return false;
+        }
+
         let front = ['正在验证出行参数', '正在匹配差旅政策', '正在搜索全网数据', '动态预算即将完成'];
         $loading.reset();
         $loading.start({
@@ -296,6 +351,21 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
                 $loading.end();
             }, 60 * 1000);
 
+            /*let addParams = {
+                destinationPlace: "CT_289",
+                leaveDate: moment(trip.beginDate).add(2,'d').toDate(),
+                goBackDate: moment(trip.endDate).add(4,'d').toDate(),
+                latestArrivalDateTime: moment(trip.beginDate).add(2,'d').toDate(),
+                earliestGoBackDateTime: moment(trip.endDate).add(4,'d').toDate(),
+                isNeedTraffic: true,
+                isNeedHotel: true,
+                businessDistrict: "",
+                hotelName: "",
+                subsidy: $scope.subsidy,
+                reason: trip.reason
+            }
+             params.destinationPlacesInfo.push(addParams);*/
+            console.info(params);
             budget = await API.travelBudget.getTravelPolicyBudget(params);
             if (isShowDone) {
                 cb();
@@ -315,6 +385,74 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg, $
             clearTimeout(calTimer);
             $loading.end();
             window.location.href = "#/trip/budget?id="+budget;
+        }
+    }
+
+    $scope.specialApprove = async function() {
+        API.require("travelBudget");
+        await API.onload();
+
+        let trip = $scope.trip;
+
+        if(!trip.place || !trip.place.id) {
+            $scope.showErrorMsg('请填写出差目的地！');
+            return false;
+        }
+
+        if(!trip.reasonName) {
+            $scope.showErrorMsg('请填写出差事由！');
+            return false;
+        }
+
+        let params = {
+            originPlace: trip.fromPlace? trip.fromPlace.id : '',
+            isRoundTrip: trip.round,
+            destinationPlacesInfo: []
+        };
+
+        let destinationItem = {
+            destinationPlace: trip.place ? trip.place.id : '',
+            leaveDate: moment(trip.beginDate).toDate(),
+            goBackDate: moment(trip.endDate).toDate(),
+            latestArrivalDateTime: moment(trip.beginDate).toDate(),
+            earliestGoBackDateTime: moment(trip.endDate).toDate(),
+            isNeedTraffic: trip.traffic,
+            isRoundTrip: trip.round,
+            isNeedHotel: trip.hotel,
+            businessDistrict: trip.hotelPlace,
+            hotelName: trip.hotelName,
+        };
+
+        params.destinationPlacesInfo.push(destinationItem);
+
+        /*let addParams = {
+            isRoundTrip: true,
+            destinationPlace: "CT_289",
+            leaveDate: moment(trip.beginDate).add(2,'d').toDate(),
+            goBackDate: moment(trip.endDate).add(4,'d').toDate(),
+            latestArrivalDateTime: moment(trip.beginDate).add(2,'d').toDate(),
+            earliestGoBackDateTime: moment(trip.endDate).add(4,'d').toDate(),
+            isNeedTraffic: true,
+            isNeedHotel: true,
+            businessDistrict: "",
+            hotelName: "",
+            subsidy: $scope.subsidy,
+            reason: trip.reason
+        }
+        params.destinationPlacesInfo.push(addParams);
+        console.info(params);*/
+
+        /*if(params.originPlace == params.destinationPlace){
+            msgbox.log("出差地点和出发地不能相同");
+            return false;
+        }*/
+
+        try {
+            $loading.end();
+            window.location.href = "#/trip/special-approve?params="+JSON.stringify(params);
+        } catch(err) {
+            $loading.end();
+            alert(err.msg || err);
         }
     }
 
