@@ -529,7 +529,7 @@ export async function synchroDDorganization() {
 
 
 
-setTimeout(async () => {
+// setTimeout(async () => {
     // synchroDDorganization();
     // deleteCompanyOrganization("658cd3a0-bde4-11e6-997b-a9af9a42d08a");
     // tmpAuthCode();
@@ -555,7 +555,7 @@ setTimeout(async () => {
     // ]
     // await corpApi.updateContractChangeLister(config.token, config.encodingAESKey, url , eventTypes);
     // console.log("good");
-}, 8000);
+// }, 8000);
 
 
 /* do arr destroy */
