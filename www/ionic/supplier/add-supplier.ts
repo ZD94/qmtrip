@@ -1,5 +1,5 @@
-import { Staff } from 'api/_types/staff/staff';
-import { Supplier } from 'api/_types/company/supplier';
+import { Staff } from '_types/staff/staff';
+import { Supplier } from '_types/company/supplier';
 
 var msgbox = require('msgbox');
 var validator = require('validator');

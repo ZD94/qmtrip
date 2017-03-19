@@ -16,7 +16,7 @@ import _ = require('lodash');
 const L = require("common/language");
 import moment = require("moment");
 var API = require("common/api");
-import {ISegment, ICreateBudgetAndApproveParams} from "api/_types/tripPlan"
+import {ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan"
 //鲸力商旅OA对接实现
 export class QmPlugin extends AbstractOAPlugin {
     constructor() {

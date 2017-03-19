@@ -14,7 +14,7 @@ import TripPlanModule = require("../tripPlan/index");
 import _ = require('lodash');
 let Config = require('config');
 var API = require("common/api");
-import {ISegment, ICreateBudgetAndApproveParams} from 'api/_types/tripPlan';
+import {ISegment, ICreateBudgetAndApproveParams} from '_types/tripPlan';
 
 function oaStr2Enum(str: string) :EApproveChannel{
     let obj = {
