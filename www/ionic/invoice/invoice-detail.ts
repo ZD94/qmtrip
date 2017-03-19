@@ -11,13 +11,12 @@ var msgbox = require('msgbox');
 
 export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate, ngModalDlg, City, $ionicModal, $timeout){
     let typeArray = [EPlanStatus.AUDIT_NOT_PASS,EPlanStatus.WAIT_UPLOAD,EPlanStatus.WAIT_COMMIT]
-
     $scope.EInvoiceFeeTypes = EInvoiceFeeTypes;
     $scope.InvoiceFeeTypeNames = InvoiceFeeTypeNames;
     $scope.EPayType = EPayType;
     $scope.PayTypeNames = PayTypeNames;
     $scope.parseInt = parseInt;
-    
+
     //////绑定上传url
     require("./invoice-detail.scss");
     let authDataStr = window['getAuthDataStr']();
@@ -230,6 +229,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
         payType: '',
         type: ''
     }
+
     $scope.createInvoice = async function(){
         var newInvoice = Models.tripDetailInvoice.create({tripDetailId: tripDetail.id});
         newInvoice.totalMoney = $scope.newInvoice.totalMoney;
@@ -263,7 +263,10 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
             return;
         }
         await newInvoice.save();
+
+
         tripDetail = await Models.tripDetail.get($stateParams.detailId);
+
         getTripDetailCity(tripDetail);
         $scope.invoices = formatInvoice(await tripDetail.getInvoices());
         $ionicSlideBoxDelegate.update();

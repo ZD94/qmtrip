@@ -7,7 +7,7 @@
             </div>
             <div class="item">
                 使用人数
-                <span class="item-note">{{staffs.length}}</span>
+                <span class="item-note">{{staffs.total}}</span>
             </div>
         </div>
         <div class="list">
@@ -43,7 +43,7 @@
                 <span class="item-note">{{subsidy.subsidyMoney}}元/天</span>
             </div>
         </div>
-        <a class="button button-block button-calm" ng-click="editPolicy()">修改</a>
+        <a class="button button-block button-calm" ng-click="editPolicy()" >修改</a>
         <a class="button button-block button-assertive" ng-click="deletePolicy()">删除</a>
     </ion-content>
 </ion-view>

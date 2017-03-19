@@ -1,10 +1,11 @@
+@import "../../../ionic/scss/color.variable.scss";
 .check-box{
   display: inline-block;
   .checkbtn{
     display: inline-block;
     background: #fff;
-    color:#4a4a4a;
-    border: 1px solid #4A4A4A;
+    color:$dark;
+    border: 1px solid $dark;
     height: 24px;
     line-height: 22px;
     width: 70px;
@@ -13,8 +14,8 @@
     margin: 9px;
     border-radius: 3px;
     &.checked{
-      color:#28A7E1;
-      border: 1px solid #28A7E1;
+      color: $calm;
+      border: 1px solid $calm;
     }
   }
   .checkbox_diy{

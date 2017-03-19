@@ -5,19 +5,23 @@
     <ion-content padding="true" scroll="false" class="has-header ng-modal-select-list">
         <ion-list show-delete="false">
             <ion-item ng-click="chooseOption(false)"
-                      ng-class="{true: '', false: 'item-option-selected item-icon-left'}[isNextApprove]"
-            >
-                <i class="icon ion-android-done"></i>直接同意</ion-item>
+                      ng-class="{true: 'item-icon-left-unchecked', false: 'item-option-selected item-icon-left'}[isNextApprove]"
+                      >
+                <i class="icon ion-ios-checkmark-outline" ></i>直接同意</ion-item>
             <ion-item ng-click="chooseOption(true)"
-                      ng-class="{true: 'item-option-selected item-icon-left', false: ''}[isNextApprove]">
-                <i class="icon ion-android-done"></i>
+                      ng-class="{true: 'item-option-selected item-icon-left', false: 'item-icon-left-unchecked'}[isNextApprove]"
+                      >
+                <i class="icon ion-ios-checkmark-outline"></i>
                 <span class="input-label">同意并转给</span>
                 <ng-selector-list
                                   ng-model="chooseApprove.approveUser"
                                   dlg-options="staffSelector"
-                                  dlg-title="选择审批人"
                                   dlg-placeholder="请选择审批人"
                                   class="fake-input selectApproveUser">
+                    <list-item>{{$item.name}}</list-item>
+                    <input-item>
+                        <fake-input value="{{chooseApprove.approveUser.name}}" placeholder="选择审批人"></fake-input>
+                    </input-item>
                 </ng-selector-list>
             </ion-item>
         </ion-list>

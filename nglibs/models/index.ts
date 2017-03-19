@@ -20,7 +20,7 @@ import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCod
 import {Account, Token} from 'api/_types/auth';
 import { Seed } from 'api/_types/seed';
 import {TravelBudgetLog} from "api/_types/travelbudget";
-import {DDTalkCorp, DDTalkUser} from "api/_types/ddtalk";
+import {DDTalkCorp, DDTalkUser, DDTalkDepartment} from "api/_types/ddtalk";
 import {CoinAccount, CoinAccountChange} from "api/_types/coin";
 import {TripDetailInvoice, TripDetailHotel, TripDetailTraffic, TripDetailSubsidy, TripDetailSpecial} from "api/_types/tripPlan";
 import {Approve} from "api/_types/approve";
@@ -211,6 +211,7 @@ class ClientModels implements ModelsInterface {
     coinAccount: ModelInterface<CoinAccount>;
     coinAccountChange: ModelInterface<CoinAccountChange>;
     agencyOperateLog: ModelInterface<AgencyOperateLog>;
+    ddtalkDepartment: ModelInterface<DDTalkDepartment>;
 
     constructor($cacheFactory: ng.ICacheFactoryService, $rootScope: ng.IRootScopeService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
