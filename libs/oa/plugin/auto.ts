@@ -8,8 +8,8 @@ import {
     createTripInvoiceAuditFlowParam, createTripInvoiceAuditFlowResult, regTripInvoiceAuditUpdateCbParam
 } from "./index";
 
-import {EApproveStatus} from "api/_types/approve";
-import {EInvoiceStatus} from "api/_types/tripPlan/index";
+import {EApproveStatus} from "_types/approve";
+import {EInvoiceStatus} from "_types/tripPlan/index";
 
 export class AutoPlugin extends AbstractOAPlugin {
     

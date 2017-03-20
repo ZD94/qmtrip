@@ -1,8 +1,8 @@
-import { Staff } from 'api/_types/staff/staff';
+import { Staff } from '_types/staff/staff';
 import {
     MHotelLevel, MPlaneLevel, MTrainLevel, enumHotelLevelToStr, enumPlaneLevelToStr,
     enumTrainLevelToStr
-} from 'api/_types/travelPolicy';
+} from '_types/travelPolicy';
 
 var msgbox = require('msgbox');
 

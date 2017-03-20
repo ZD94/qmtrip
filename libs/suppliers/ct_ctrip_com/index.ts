@@ -1,6 +1,6 @@
 
 import {SupplierWebRobot, SupplierOrder, ReserveLink} from "../index";
-import {EPayType, EInvoiceFeeTypes} from "api/_types/tripPlan";
+import {EPayType, EInvoiceFeeTypes} from "_types/tripPlan";
 import L from 'common/language';
 
 var MOrderType = {

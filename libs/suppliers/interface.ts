@@ -1,5 +1,5 @@
 
-import { EPayType, EInvoiceFeeTypes } from 'api/_types/tripPlan/index';
+import { EPayType, EInvoiceFeeTypes } from '_types/tripPlan/index';
 
 export interface SupplierOrder{
     id: string;

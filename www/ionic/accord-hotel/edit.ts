@@ -1,8 +1,8 @@
-import { Staff } from 'api/_types/staff/staff';
-import { AccordHotel } from 'api/_types/accordHotel';
+import { Staff } from '_types/staff/staff';
+import { AccordHotel } from '_types/accordHotel';
 
 var msgbox = require('msgbox');
-
+declare var API;
 export async function EditController($scope, Models, $storage, $stateParams, $ionicHistory, $ionicPopup) {
     var staff = await Staff.getCurrent();
     var accordHotel;

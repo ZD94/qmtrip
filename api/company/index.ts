@@ -14,16 +14,16 @@ let scheduler = require('common/scheduler');
 let schedule = require("node-schedule");
 let _ = require("lodash");
 import {requireParams, clientExport} from "common/api/helper";
-import {Models} from "api/_types";
-import {Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE} from 'api/_types/company';
-import {Staff, EStaffRole} from "api/_types/staff";
-import {PromoCode} from "api/_types/promoCode";
-import {Agency, AgencyUser, EAgencyUserRole} from "api/_types/agency";
-import {Department, StaffDepartment} from "api/_types/department";
+import {Models} from "_types";
+import {Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE} from '_types/company';
+import {Staff, EStaffRole} from "_types/staff";
+import {PromoCode} from "_types/promoCode";
+import {Agency, AgencyUser, EAgencyUserRole} from "_types/agency";
+import {Department, StaffDepartment} from "_types/department";
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import {md5} from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
-import {CoinAccount} from "api/_types/coin";
+import {CoinAccount} from "_types/coin";
 
 const supplierCols = Supplier['$fieldnames'];
 

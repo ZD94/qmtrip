@@ -1,4 +1,4 @@
-import {AgencyUser} from "api/_types/agency/agency-user";
+import {AgencyUser} from "_types/agency/agency-user";
 var msgbox = require('msgbox');
 /**
  * Created by chen on 2017/2/14.

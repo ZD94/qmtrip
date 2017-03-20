@@ -2,10 +2,10 @@
  * Created by wlh on 15/12/12.
  */
 import { clientExport } from 'common/api/helper';
-import {Models } from 'api/_types'
-import {ETripType, EInvoiceType} from "../_types/tripPlan";
-import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel} from "../_types/travelPolicy";
-import {Staff} from "../_types/staff";
+import {Models } from '_types'
+import {ETripType, EInvoiceType} from "_types/tripPlan";
+import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel} from "_types/travelPolicy";
+import {Staff} from "_types/staff";
 const API = require("common/api");
 const validate = require("common/validate");
 import L from 'common/language';
@@ -13,7 +13,7 @@ const moment = require('moment');
 const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
-import {ITicket, TRAFFIC, TravelBudgeTraffic, TravelBudgetHotel} from "api/_types/travelbudget";
+import {ITicket, TRAFFIC, TravelBudgeTraffic, TravelBudgetHotel} from "_types/travelbudget";
 
 import {
     TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory

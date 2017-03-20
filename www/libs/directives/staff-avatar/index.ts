@@ -3,7 +3,7 @@
  */
 "use strict";
 import angular = require('angular');
-import {EStaffRole, EStaffRoleNames} from "api/_types/staff/staff";
+import {EStaffRole, EStaffRoleNames} from "_types/staff/staff";
 import * as path from 'path';
 
 angular

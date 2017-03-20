@@ -1,17 +1,12 @@
 import L from 'common/language';
 import * as utils from 'common/utils';
-import { Models, EAccountType } from 'api/_types/index';
-import { AuthResponse, AuthRequest, signToken, LoginResponse } from 'api/_types/auth/auth-cert';
+import { Models, EAccountType } from '_types/index';
+import { AuthResponse, AuthRequest, signToken, LoginResponse } from '_types/auth/auth-cert';
 import moment = require('moment');
 import validator = require('validator');
-import { Token } from 'api/_types/auth/token';
-import { ACCOUNT_STATUS } from "api/_types/auth";
-
-export const OS_TYPE = {
-    WEB: 'web',
-    TMP_CODE: 'tmpCode',
-    WECHAT: 'wechat',
-}
+import { Token } from '_types/auth/token';
+import { ACCOUNT_STATUS } from "_types/auth";
+import {OS_TYPE} from '_types/auth/token';
 
 //生成登录凭证
 export async function makeAuthenticateToken(accountId, os?: string, expireAt?: Date): Promise<LoginResponse> {

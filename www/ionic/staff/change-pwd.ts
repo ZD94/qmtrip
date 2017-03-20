@@ -3,10 +3,10 @@
  */
 "use strict";
 import moment = require('moment');
-import {Staff} from "api/_types/staff/staff";
+import {Staff} from "_types/staff/staff";
 import validator = require('validator');
 var msgbox = require('msgbox');
-
+declare var API;
 export async function ChangePwdController($scope, $ionicPopup, $storage){
     require('./change-pwd.scss');
     $scope.form = {

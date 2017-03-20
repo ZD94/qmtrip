@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {IFinalTicket} from "api/_types/travelbudget";
+import {IFinalTicket} from "_types/travelbudget";
 import {AbstractPrefer} from "./index";
 
 class EarliestGoBackTimePrefer extends AbstractPrefer<IFinalTicket> {

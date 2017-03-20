@@ -1,6 +1,6 @@
 import * as path from 'path';
-import {Staff} from "api/_types/staff/staff";
-
+import {Staff} from "_types/staff/staff";
+declare var API;
 export async function IndexController($scope, Models, FileUploader) {
     $scope.title = '批量添加员工';
     $scope.step = 'one';

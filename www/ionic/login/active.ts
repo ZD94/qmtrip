@@ -1,5 +1,5 @@
 var msgbox = require('msgbox');
-
+declare var API;
 export async function ActiveController ($scope, $stateParams) {
     require('./active.scss');
     let accountId = $stateParams.accountId;
