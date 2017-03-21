@@ -136,10 +136,14 @@
                             <ng-selector-list
                                     ng-model="trip.auditUser"
                                     dlg-options="staffSelector"
-                                    dlg-title=""
                                     dlg-placeholder="请选择审批人"
                                     class="fake-input"
-                            ></ng-selector-list>
+                            >
+                                <list-item>{{$item.name}}</list-item>
+                                <input-item>
+                                    <fake-input value="{{trip.auditUser.name}}" placeholder=""></fake-input>
+                                </input-item>
+                            </ng-selector-list>
                             <i class="icon ion-arrow-up-b"></i>
                             <p class="input-label" ng-if="trip.auditUser">审批人</p>
                         </div>

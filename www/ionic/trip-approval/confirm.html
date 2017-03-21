@@ -16,9 +16,12 @@
                 <ng-selector-list
                                   ng-model="chooseApprove.approveUser"
                                   dlg-options="staffSelector"
-                                  dlg-title="选择审批人"
                                   dlg-placeholder="请选择审批人"
                                   class="fake-input selectApproveUser">
+                    <list-item>{{$item.name}}</list-item>
+                    <input-item>
+                        <fake-input value="{{chooseApprove.approveUser.name}}" placeholder="选择审批人"></fake-input>
+                    </input-item>
                 </ng-selector-list>
             </ion-item>
         </ion-list>

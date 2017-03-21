@@ -1,38 +1,42 @@
 <ion-modal-view>
-    <ion-header-bar class="bar-stable">
-        <h1 class="title">{{options.title}}</h1>
-        <div class="button button-clear" ng-click="modal.hide()">取消</div>
-    </ion-header-bar>
     <ion-content padding="false" scroll="false" class="has-header ng-modal-select-list">
         <form class="list flex-c01">
-            <label ng-if="options.searchbox" class="item item-input">
-                <i class="icon ion-search placeholder-icon"></i>
-                <input ng-model="form.keyword" type="search" placeholder="{{options.placeholder}}">
-            </label>
+            <div class="city_search search_bar">
+                <div class="bar item-input-inset">
+                    <lable ng-if="options.searchbox" class="item-input-wrapper">
+                        <i class="icon ion-ios-search placeholder-icon"></i>
+                        <input ng-model="form.keyword" type="search" placeholder="{{options.placeholder}}">
+                        <i class="icon ion-ios-close placeholder-icon" ng-hide="!hidden" ng-click="toggle()"></i>
+                    </lable>
+                    <button class="button button-clear" ng-click="modal.hide()">取消</button>
+                </div>
+            </div>
             <ion-scroll>
-                <ion-list>
-                    <ion-item ng-if="value && form.keyword == ''" ng-click="confirm(value)" class="item-icon-right item-stable">
-                        <span style="display: inline-block;">已选择：<br><span ng-bind-html="displayItem(value)"></span></span>
-                        <span class="item-note" ng-if="options.note" ng-bind-html="options.note(value)"></span>
+            <ion-list>
+                <ion-item ng-if="value && form.keyword == ''" ng-click="confirm(value)" class="item-icon-right item-stable">
+                        <span style="display: inline-block;">已选择：<br>
+                            <span ng-if="options.transclude" ng-bind-transclude="options.transclude" inject="{$item:value}"></span>
+                            <span ng-if="options.item" ng-bind-template-template="options.item" inject="{$item:value}"></span>
+                        </span>
                         <i class="icon ion-checkmark"></i>
-                    </ion-item>
-                    <ion-item
-                            class="item-icon-right"
-                            ng-repeat="option in optionItems track by $index"
-                            ng-if="displayItem(option) != displayItem(value)"
-                            ng-click="confirm(option)"
-                            ng-class="{'item-stable':disableItem(option)}"
-                    >
-                        <span ng-bind-html="displayItem(option)"></span>
-                        <span class="item-note" ng-if="options.note" ng-bind-html="options.note(option)"></span>
-                    </ion-item>
+                </ion-item>
 
-                    <ion-item class="new-item" ng-click="createItem(form.keyword)" ng-if="showCreate()">
-                        新建【{{form.keyword}}】
-                    </ion-item>
-                </ion-list>
-                <ion-infinite-scroll ng-if="page.hasNextPage()" on-infinite="page.nextPage()"></ion-infinite-scroll>
-            </ion-scroll>
+                <ion-item
+                        class="item-icon-right"
+                        ng-repeat="$item in optionItems track by $index"
+                        ng-if="$item != value"
+                        ng-click="confirm($item)"
+                        ng-class="{'item-stable':disableItem($item)}"
+                >
+                    <span ng-if="options.transclude" ng-bind-transclude="options.transclude" inject="{$item}"></span>
+                    <span ng-if="options.item" ng-bind-template-template="options.item" inject="{$item}"></span>
+                </ion-item>
+                <ion-item class="new-item" ng-click="createItem(form.keyword)" ng-if="showCreate()">
+                    新建【{{form.keyword}}】
+                </ion-item>
+            </ion-list>
+            <ion-infinite-scroll ng-if="page.hasNextPage()" on-infinite="page.nextPage()"></ion-infinite-scroll>
+        </ion-scroll>
         </form>
     </ion-content>
 </ion-modal-view>

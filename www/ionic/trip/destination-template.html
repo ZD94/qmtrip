@@ -47,16 +47,23 @@
                             </div>
                         </div>
                         <div class="list">
-                            <ng-selector-list-two
+                            <ng-selector-list
                                     ng-model="trip.reasonName"
-                                    select-name="事由"
-                                    show-arrow="true"
-                                    must="true"
                                     dlg-options="projectSelector"
-                                    dlg-title="请选择出差事由"
                                     dlg-placeholder="请选择或输入事由"
                                     class="fake-input item"
-                            ></ng-selector-list-two>
+                            >
+                                <list-item>{{$item.name}}</list-item>
+                                <input-item>
+                                    <div class="item-icon-right">
+                                        <span class="item-tit">事由<i class="fa fa-asterisk"></i></span>
+                                        <fake-input value="{{trip.reasonName.name}}" placeholder="请选择出差事由">
+                                            <div ng-bind-template-template="opts.titleTemplate"></div>
+                                        </fake-input>
+                                        <i class="icon ion-chevron-right"></i>
+                                    </div>
+                                </input-item>
+                            </ng-selector-list>
                         </div>
                         <div class="list list-border" ng-stat-event="选择地标,选择,地标">
                             <div class="item item-icon-right" ng-if="currentTpSts && currentTpSts.length" ng-click="selectSubsidyTemplate()">
