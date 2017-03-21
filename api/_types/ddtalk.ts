@@ -60,6 +60,10 @@ export class DDTalkDepartment extends ModelObject {
     get id() : string { return Values.UUIDV1();}
     set id(id: string)  {}
 
+    @Field({type: Types.STRING(50)})
+    get ddName(): string { return null};
+    set ddName(name: string) {}
+
     //local department id
     @Field({type: Types.UUID})
     get localDepartmentId(): string { return null; }
@@ -112,8 +116,8 @@ export class DDTalkUser extends ModelObject {
     set name(name: string) {}
 
     @Field({type: Types.STRING(50)})
-    get corpid(): string { return null}
-    set corpid(corpid: string) {}
+    get corpId(): string { return null}
+    set corpId(corpId: string) {}
 
     // '获取到的钉钉信息'
     @Field({type: Types.TEXT })

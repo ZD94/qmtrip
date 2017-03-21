@@ -55,16 +55,16 @@ let ddTalkMsgHandle = {
 
     /* * * 企业增加员工 * * */
     user_add_org: async function(msg) {
-        DealEvent.userAddOrg(msg);
+        DealEvent.userModifyOrg(msg);
     },
 
     /* * 通讯录用户更改 * */
     user_modify_org : async function(msg){
-        DealEvent.userAddOrg(msg);
+        DealEvent.userModifyOrg(msg);
     },
     /* * 通讯录用户离职 * */
     user_leave_org : async function(msg){
-        return msg;
+        DealEvent.userLeaveOrg(msg);
     },
     /* * 通讯录用户被设为管理员 * */
     // org_admin_add : async function(msg){

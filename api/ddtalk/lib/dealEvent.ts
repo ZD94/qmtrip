@@ -29,7 +29,7 @@ import L from 'common/language';
 
 import {md5} from "common/utils";
 import {DDTalkCorp , DDTalkDepartment , DDTalkUser} from "api/_types/ddtalk";
-
+import {ddCrud} from "./ddCrud";
 
 
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
@@ -150,7 +150,7 @@ export async function tmpAuthCode(msg) {
             isAdmin: userInfo.isAdmin,
             name: userInfo.name,
             avatar: userInfo.avatar,
-            corpid: corpid,   //钉钉企业id
+            corpId: corpid,   //钉钉企业id
         });
         await ddtalkUser.save();
 
@@ -182,6 +182,7 @@ export async function _getSuiteToken(): Promise<any> {
     if (typeof ticketObj == 'string') {
         ticketObj = JSON.parse(ticketObj);
     }
+
     if (!ticketObj || !ticketObj.ticket ) {
         throw new Error(`还没有ticket`);
     }
@@ -196,6 +197,7 @@ export async function _getSuiteToken(): Promise<any> {
         return d;
     }
 
+    // ticket = 'yUXP8ncarWkVTiKXYGEaeUdUWz3TF9YEaJgRw0wxTV3Dyva6v88GVADnITI04YFOuKvAAjHNf3cMYetX6LCTMD';
     let url = `https://oapi.dingtalk.com/service/get_suite_token`;
     let ret: any = await reqProxy(url, {
         name: '获取套件Token',
@@ -212,8 +214,11 @@ export async function _getSuiteToken(): Promise<any> {
     return d;
 
 
-    // return {"suite_access_token": "52cbe90c68de31b6b6ffa881dd0b8b6b", "expire_at": 1489560379128}
+    // return {"suite_access_token": "9761c575f39c3505b5478e98bf28e705", "expire_at": 1489560379128}
 }
+
+
+
 
 
 async function _getPermanentCode(suiteToken, tmpAuthCode) {
@@ -271,6 +276,7 @@ export async function dealCompanyOrganization(corpApi: CorpApi, corp : DDTalkCor
         let ddtalkDepart , localDepart;
 
         if(d["parentid"] == undefined){
+            console.log("root department" , d.name);
             isDefault = true;
         }
 
@@ -278,10 +284,12 @@ export async function dealCompanyOrganization(corpApi: CorpApi, corp : DDTalkCor
             where : { corpId : corpId , DdDepartmentId : d.id+'' }
         });
 
-        console.log("for : " , d.name);
+        console.log("钉钉的部门名称 : " , d.name);
         if(ddtalkDeparts && ddtalkDeparts[0]){
             //有这个部门的钉钉对应关系
             ddtalkDepart = ddtalkDeparts[0];
+            ddtalkDepart.ddName = d.name;
+            ddtalkDepart = await ddtalkDepart.save();
             localDepart  = await Models.department.get(ddtalkDepart.localDepartmentId);
             if(localDepart){
                 localDepart.name = d.name;
@@ -310,6 +318,7 @@ export async function dealCompanyOrganization(corpApi: CorpApi, corp : DDTalkCor
             ddtalkDepart = Models.ddtalkDepartment.create({
                 localDepartmentId: localDepart.id,
                 DdDepartmentId: d.id+'',
+                ddName        : d.name,
                 corpId: corpId
             });
             ddtalkDepart = await ddtalkDepart.save();
@@ -320,14 +329,17 @@ export async function dealCompanyOrganization(corpApi: CorpApi, corp : DDTalkCor
         localDepartment_ids.push(localDepart.id);
 
         //处理部门间关系
-        rootLocalDepartmentId = isDefault ? localDepart.id : undefined;
+        if(!rootLocalDepartmentId && isDefault){
+            rootLocalDepartmentId = localDepart.id;
+        }
+
         // dd_id : local_id
         Translate[d.id] = localDepart.id;
         // local_id : dd_parentid
         Translate2[localDepart.id] = d.parentid;
     }
 
-    /* ========   清除钉钉中没有的部门  ======== */
+    /* ========   清除本地 钉钉中没有的部门  ======== */
     console.log("some problem");
     let deleDeparts = await Models.department.find({
         where : {companyId : company.id, id : { $notIn : localDepartment_ids}}
@@ -340,14 +352,15 @@ export async function dealCompanyOrganization(corpApi: CorpApi, corp : DDTalkCor
     //将要清除的钉钉部门，删除staffDepartment关系
     deleDeparts.map(async (item)=>{
         let staffDeparts = await Models.staffDepartment.find({
-            where : { localDepartmentId : item.id }
+            where : { departmentId : item.id }
         });
         await arrDestroy(staffDeparts);
+        await item.destroy();
     });
     await arrDestroy(deleDdtalkDeparts);
-    await arrDestroy(deleDeparts);
 
     /* ==========  END   ====== */
+
 
     /*  ========== 追加部门层级关系 ========  */
     for(let item of localDepartments){
@@ -363,13 +376,14 @@ export async function dealCompanyOrganization(corpApi: CorpApi, corp : DDTalkCor
         await item.save();
     }
 
-    /*  ========== 追加部门层级关系 ===  END   =====  */
+    /*  ===========  END   ===========  */
 
     for (let d of DDdepartments) {
         //添加用户
-        await addCompanyStaffs(corpApi, d.id, corp);
+        await addCompanyStaffsByDepartment(corpApi, d.id, corp);
     }
 }
+
 
 /*
  *   从钉钉导入一个部门的员工
@@ -377,109 +391,33 @@ export async function dealCompanyOrganization(corpApi: CorpApi, corp : DDTalkCor
  *   corp    : ddtalk.corps 对象
  */
 
-export async function addCompanyStaffs(corpApi: CorpApi, DdDepartmentId: any, corp) {
+export async function addCompanyStaffsByDepartment(corpApi: CorpApi, DdDepartmentId: any, corp) {
     console.log("enter addCompanyStaffs");
-    let company = await corp.getCompany(corp["company_id"]);
-    let corpid = corp.corpId;
     let dingUsers = await corpApi.getUserListByDepartment(DdDepartmentId);
-    let travelPolicy = await company.getDefaultTravelPolicy();
-
-    // 处理该员工与部门的关系
-    let itemDepart = await Models.ddtalkDepartment.find({
-        where: {DdDepartmentId: DdDepartmentId.toString(), corpId: corpid}
-    });
-    if(!itemDepart || !itemDepart[0]){
-        logger.warn("这个部门不存在  dd_department_id :" , DdDepartmentId , "corpid : " , corpid)
-        throw new Error("这个部门不存在");
+    let staff_ids = [] , localDepart = [];
+    let DDcrud = new ddCrud(corp.corpId);
+    for(let u of dingUsers){
+        let staff = await DDcrud.createStaff( u );
+        await DDcrud.createDDuser( staff , u );
+        localDepart = await DDcrud.addStaffDeparts( staff , [DdDepartmentId] );
+        staff_ids.push(staff.id);
     }
-    let localDepartId = itemDepart[0].localDepartmentId;
 
+    if(localDepart.length){
+        //清除不存在的 staff_department
+        await DDcrud.deleteStaffDepartment( "department" , localDepart[0] , staff_ids );
+    }
 
-
-    let localStaff_ids = [];
-    for (let u of dingUsers) {
-        console.log("u.name  " , u.name);
-        let ddtalkUserInfos = await Models.ddtalkUser.find({
-            where: {corpid: corpid, ddUserId: u.userid}
+    if(!dingUsers.length){
+        //这是一个空部门
+        let localDeparts = await Models.ddtalkDepartment.find({
+            where : { corpId : corp.corpId , DdDepartmentId : DdDepartmentId.toString() }
         });
-        let dd_info = JSON.stringify(u);
-
-        console.log("go");
-        let _staff , ddtalkUser;
-        if (ddtalkUserInfos && ddtalkUserInfos.length) {
-            let ddtalkUser = ddtalkUserInfos[0];
-
-            //更新dd_info
-            ddtalkUser.ddInfo = dd_info;
-
-            ddtalkUser = await ddtalkUser.save();
-
-            _staff = await Models.staff.get(ddtalkUser.id);
-            if (_staff) {
-                console.log("s : ");
-                _staff.company = company;
-                _staff.email = u.email;
-                _staff.mobile = u.mobile;
-                _staff.avatar = u.avatar;
-                _staff = await _staff.save();
-            }else{
-                console.log("ddtalkUser 有， staff中没有")
-            }
-        }else{
-            // staff 中新加入员工
-            _staff = Models.staff.create({name: u.name, travelPolicyId: travelPolicy.id});
-            _staff.company = company;
-            _staff.pwd = md5(DEFAULT_PWD);
-            _staff.status = 1;
-            _staff.email = u.email;
-            _staff.mobile = u.mobile;
-            _staff.avatar = u.avatar;
-            _staff = await _staff.save();
-
-            console.log("staff 中新加入员工");
-
-            //ddtalkUser 中新加入员工
-            let ddtalkUser = Models.ddtalkUser.create({
-                id: _staff.id,
-                avatar: u.avatar,
-                dingId: u.dingId,
-                isAdmin: u.isAdmin,
-                name: u.name,
-                ddUserId: u.userid,
-                corpid: corpid,
-                ddInfo: dd_info
-            });
-            await ddtalkUser.save();
-            console.log("ddtalkUser 中新加入员工");
-        }
-
-        localStaff_ids.push(_staff.id);
-
-        let staffDepart = await Models.staffDepartment.find({ where : {
-            staffId: _staff.id,
-            departmentId: localDepartId
-        } });
-
-        if(staffDepart && staffDepart.length){
-            //a ready have
-            continue;
-        }else{
-            let staffDepart = Models.staffDepartment.create({
-                staffId: _staff.id,
-                departmentId: localDepartId
-            });
-            await staffDepart.save();
+        if(localDeparts && localDeparts.length){
+            //清除该部门所有的 staff_department
+            await DDcrud.deleteStaffDepartment( "department" , localDeparts[0].localDepartmentId );
         }
     }
-
-
-
-    //针对这个部门的staffDepartment清理该部门下没有的 staff_department
-    let staffDeparts = await Models.staffDepartment.find({
-        where : { departmentId : localDepartId , staffId : { $notIn : localStaff_ids } }
-    });
-    await Promise.all(staffDeparts.map((item)=>item.destroy()));
-
     console.log("addCompanyStaffs  over");
 }
 
@@ -489,10 +427,11 @@ export async function addCompanyStaffs(corpApi: CorpApi, DdDepartmentId: any, co
  */
 
 export async function synchroDDorganization() {
-    let current = await Staff.getCurrent();
-    if(current.roleId != EStaffRole.OWNER && current.roleId != EStaffRole.ADMIN){
-        throw L.ERR.PERMISSION_DENY();
-    }
+    // let current = await Staff.getCurrent();
+    // if(current.roleId != EStaffRole.OWNER && current.roleId != EStaffRole.ADMIN){
+    //     throw L.ERR.PERMISSION_DENY();
+    // }
+
     /*let test = await Models.ddtalkCorp.find({where : { "companyId" : "658cd3a0-bde4-11e6-997b-a9af9a42d08a" }});
      test.map(async (item)=>{
          await item.destroy();
@@ -509,11 +448,11 @@ export async function synchroDDorganization() {
 
      return "good";*/
 
-    // let current = {
-    //     company: {
-    //         id: "658cd3a0-bde4-11e6-997b-a9af9a42d08a"
-    //     }
-    // }
+    let current = {
+        company: {
+            id: "658cd3a0-bde4-11e6-997b-a9af9a42d08a"
+        }
+    }
 
     let corps = await Models.ddtalkCorp.find({where: {companyId: current.company.id}});
     if (!corps || !corps.length) {
@@ -529,33 +468,37 @@ export async function synchroDDorganization() {
 
 
 
-// setTimeout(async () => {
-    // synchroDDorganization();
-    // deleteCompanyOrganization("658cd3a0-bde4-11e6-997b-a9af9a42d08a");
-    // tmpAuthCode();
+setTimeout(async () => {
+    // let result = await _getSuiteToken();
+    // console.log(result);
+    await synchroDDorganization();
+//     deleteCompanyOrganization("658cd3a0-bde4-11e6-997b-a9af9a42d08a");
+//     tmpAuthCode();
+//
+//
+//     更新钉钉监听事件列表
+    /*let corps = await Models.ddtalkCorp.find({where : { companyId : "658cd3a0-bde4-11e6-997b-a9af9a42d08a" }});
+    let corp  = corps[0];
+    let { isvApi , corpApi } = await getISVandCorp(corp);
+    console.log("what");
+    // await isvApi.activeSuite();
+
+    let url = "https://j.jingli365.com/ddtalk/isv/receive";
+
+    let eventTypes = [
+        "user_add_org",
+        "user_modify_org",
+        "user_leave_org"  ,
+        "org_dept_create" ,dd
+        "org_dept_modify" ,
+        "org_dept_remove" ,
+        "org_remove"
+    ]
+    await corpApi.updateContractChangeLister(config.token, config.encodingAESKey, url , eventTypes);*/
+//     console.log("good");
 
 
-    //更新钉钉监听事件列表
-    // let corps = await Models.ddtalkCorp.find({where : { companyId : "658cd3a0-bde4-11e6-997b-a9af9a42d08a" }});
-    // let corp  = corps[0];
-    // let { isvApi , corpApi } = await getISVandCorp(corp);
-    // console.log("what");
-    // // await isvApi.activeSuite();
-    //
-    // let url = "https://j.jingli365.com/ddtalk/isv/receive";
-    //
-    // let eventTypes = [
-    //     "user_add_org",
-    //     "user_modify_org",
-    //     "user_leave_org"  ,
-    //     "org_dept_create" ,
-    //     "org_dept_modify" ,
-    //     "org_dept_remove" ,
-    //     "org_remove"
-    // ]
-    // await corpApi.updateContractChangeLister(config.token, config.encodingAESKey, url , eventTypes);
-    // console.log("good");
-// }, 8000);
+}, 8000);
 
 
 /* do arr destroy */
@@ -563,28 +506,9 @@ async function arrDestroy(arr: any, callback?: Function) {
     if (!arr || !arr[0]) {
         return;
     }
-    Promise.all(arr.map((item)=>item.destroy()));
+    await Promise.all(arr.map((item)=>item.destroy()));
     return callback && callback();
 }
-
-
-/*
-*   删除某一企业的所有员工部门关系
-*/
-export async function deletStaffDepartment(companyId: string){
-    let Departs = await Models.department.find({ where : {companyId: companyId} });
-    let Depart_ids = [];
-    Departs.map((item)=>{
-        Depart_ids.push(item.id);
-    });
-
-    let staffDeparts = await Models.staffDepartment.find({
-        where : { departmentId : { $in : Depart_ids } }
-    });
-    await arrDestroy(staffDeparts);
-}
-
-
 
 /*
  *   EventType : suite_relieve
@@ -610,8 +534,6 @@ export async function suiteRelieve(msg) {
 }
 
 
-
-
 /*
 *   钉钉通讯录事件处理，公共函数
 *   msg :{
@@ -627,8 +549,7 @@ async function ddEventCommon(msg){
     let corpId = msg.CorpId;
     let corps = await Models.ddtalkCorp.find({where: {corpId: corpId}});
     if(!corps || !corps.length){
-        logger.info("DDEvent : ddtalk.corp没有这条记录 : " , corpId);
-        throw new Error(`ddtalk.corp没有这条记录`)
+        logger.warn("DDEvent : ddtalk.corp没有这条记录 : " , corpId);
     }
     let corp = corps[0];
 
@@ -640,54 +561,79 @@ async function ddEventCommon(msg){
     };
 }
 
+/*
+ *   EventType : user_modify_org , user_add_org
+ *   通讯录用户更改 ， 企业增加员工
+ */
+export async function userModifyOrg(msg){
+    let {corpApi , corp} = await ddEventCommon(msg);
+    let userIds = msg.UserId;
+
+    let DDcrud = new ddCrud(corp.corpId);
+    userIds.map(async (item)=>{
+        let userInfo = await corpApi.getUser(item);
+
+        console.log(222 , userInfo);
+
+        let staff = await DDcrud.createStaff( userInfo );
+        await DDcrud.createDDuser(staff , userInfo);
+        let localDeparts = await DDcrud.addStaffDeparts( staff , userInfo['department'] );
+        await DDcrud.deleteStaffDepartment( "staff" , staff.id , localDeparts );
+    });
+}
 
 /*
- *   EventType : user_add_org
- *   企业增加员工
- *
- *   EventType : user_modify_org
- *   通讯录用户更改
+ *  EventType : user_leave_org
+ *  钉钉删除员工
  */
-export async function userAddOrg(msg) {
-    // let {corpApi , corp} = await ddEventCommon(msg);
-    // let userIds = msg.UserId;
-    // let userInfos = userIds.map(async (userId)=>{
-    //     return await corpApi.getUser(userId);
-    // });
-    // await addCompanyStaffs(corpApi , userInfos , corp);
+export async function userLeaveOrg(msg){
+    let {corpApi , corp} = await ddEventCommon(msg);
+    let userIds = msg.UserId;
+
+    let DDcrud = new ddCrud(corp.corpId);
+    userIds.map(async (item)=>{
+        let staff_id = await DDcrud.deleteDDuser( item );
+        await DDcrud.deleteStaffDepartment( "staff" , staff_id );
+    });
 }
+
+
 
 /*
  *  EventType : org_dept_create
  *  通讯录企业部门创建
  */
 export async function orgDeptCreate(msg) : Promise<void>{
-    // let {DeptId, CorpId} = msg;
-    // let corps = await Models.ddtalkCorp.find({where: {corpId: CorpId}});
-    // let corp = corps && corps[0];
-    // if (!corp || !corp.permanentCode) {
-    //     return;
-    // }
-    //
-    // let { corpApi } = getISVandCorp(corp);
-    //
-    // for (let item of DeptId) {
-    //     let deptInfo = await corpApi.getDepartmentInfo(item);
-    //     if (!deptInfo)
-    //         continue;
-    //     //创建一个新的部门
-    //     let localNewDepartment = {"name": deptInfo.name, "companyId": corp["companyId"], "parentId": null}
-    //     if (deptInfo.parentId != 1) {
-    //         //has parentId department
-    //         let ParentDepartment = await Models.ddtalkDepartment.find({where: {ddDepartmentId: deptInfo.parentId}});
-    //         if (ParentDepartment && ParentDepartment[0]) {
-    //             localNewDepartment.parentId = ParentDepartment[0].local_department_id;
-    //         }
-    //     }
-    //
-    //     let department = Models.department.create(localNewDepartment);
-    //     await department.save();
-    // }
+    let {DeptId, CorpId} = msg;
+    let corps = await Models.ddtalkCorp.find({where: {corpId: CorpId}});
+    let corp = corps && corps[0];
+    if (!corp || !corp.permanentCode) {
+        return;
+    }
+
+    let { corpApi } = getISVandCorp(corp);
+
+    for (let item of DeptId) {
+        let deptInfo = await corpApi.getDepartmentInfo(item);
+        if (!deptInfo)
+            continue;
+        //创建一个新的部门
+
+        console.log("look" , deptInfo);
+
+        return;
+        let localNewDepartment = {"name": deptInfo.name, "companyId": corp["companyId"], "parentId": null}
+        if (deptInfo.parentId != 1) {
+            //has parentId department
+            let ParentDepartment = await Models.ddtalkDepartment.find({where: {ddDepartmentId: deptInfo.parentId}});
+            if (ParentDepartment && ParentDepartment[0]) {
+                localNewDepartment.parentId = ParentDepartment[0].local_department_id;
+            }
+        }
+
+        let department = Models.department.create(localNewDepartment);
+        await department.save();
+    }
 }
 
 /*
