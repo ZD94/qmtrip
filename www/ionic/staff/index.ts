@@ -1,15 +1,18 @@
-import { Staff, EStaffRole, EAddWay } from 'api/_types/staff/staff';
-import { ACCOUNT_STATUS } from 'api/_types/auth';
-import { EPlanStatus, QMEApproveStatus ,EAuditStatus } from 'api/_types/tripPlan';
+import { Staff, EStaffRole, EAddWay } from '_types/staff/staff';
+import { ACCOUNT_STATUS } from '_types/auth';
+import { EPlanStatus, QMEApproveStatus ,EAuditStatus } from '_types/tripPlan';
 import {getImageUrl} from '../controller';
 var config = require('config');
+declare var API;
 export default async function IndexController($scope, Models, inAppBrowser) {
     require('./index.scss');
     API.require('tripPlan');
 
     let staff = await Staff.getCurrent();
     let coinAccount = staff.$parents["account"]["coinAccount"];
+
     $scope.toDuiBa = async function(){
+
         if(staff.email.indexOf('jingli.tech')>=0){
             var duiBaUrl = await staff.getDuiBaLoginUrl({});
             inAppBrowser.open(duiBaUrl);
@@ -17,6 +20,13 @@ export default async function IndexController($scope, Models, inAppBrowser) {
         // window.location.href = '#/duiba/index';
 
     }
+
+
+
+
+
+
+
     $scope.toCoinAccount = function(){
         if(staff.email.indexOf('jingli.tech')>=0){
             window.location.href= '#/coin-account/index';

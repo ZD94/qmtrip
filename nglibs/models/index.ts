@@ -3,28 +3,28 @@
 import ng = require('angular');
 import L from 'common/language';
 
-import { ModelsInterface, initModels } from 'api/_types';
+import { ModelsInterface, initModels } from '_types';
 import {ModelObjInterface, ModelInterface} from 'common/model/interface';
 import { ModelCached } from 'common/model/cached';
 import {ModelRemote, ModelRemoteOld} from 'common/model/remote';
 import { ngService } from '../index';
-import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from 'api/_types/staff';
-import { Company, MoneyChange, Supplier, TripPlanNumChange } from 'api/_types/company';
-import { PromoCode } from 'api/_types/promoCode';
-import { Department, StaffDepartment } from 'api/_types/department';
-import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
-import { AccordHotel } from 'api/_types/accordHotel';
-import { Notice, NoticeAccount } from 'api/_types/notice';
-import { Agency, AgencyUser } from 'api/_types/agency';
-import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCode} from 'api/_types/tripPlan';
-import {Account, Token} from 'api/_types/auth';
-import { Seed } from 'api/_types/seed';
-import {TravelBudgetLog} from "api/_types/travelbudget";
-import {DDTalkCorp, DDTalkUser, DDTalkDepartment} from "api/_types/ddtalk";
-import {CoinAccount, CoinAccountChange} from "api/_types/coin";
-import {TripDetailInvoice, TripDetailHotel, TripDetailTraffic, TripDetailSubsidy, TripDetailSpecial} from "api/_types/tripPlan";
-import {Approve} from "api/_types/approve";
-import {AgencyOperateLog} from "api/_types/agency/agency-operate-log";
+import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from '_types/staff';
+import { Company, MoneyChange, Supplier, TripPlanNumChange } from '_types/company';
+import { PromoCode } from '_types/promoCode';
+import { Department, StaffDepartment } from '_types/department';
+import { TravelPolicy, SubsidyTemplate } from '_types/travelPolicy';
+import { AccordHotel } from '_types/accordHotel';
+import { Notice, NoticeAccount } from '_types/notice';
+import { Agency, AgencyUser } from '_types/agency';
+import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCode} from '_types/tripPlan';
+import {Account, Token} from '_types/auth';
+import { Seed } from '_types/seed';
+import {TravelBudgetLog} from "_types/travelbudget";
+import {DDTalkCorp, DDTalkUser, DDTalkDepartment} from "_types/ddtalk";
+import {CoinAccount, CoinAccountChange} from "_types/coin";
+import {TripDetailInvoice, TripDetailHotel, TripDetailTraffic, TripDetailSubsidy, TripDetailSpecial} from "_types/tripPlan";
+import {Approve} from "_types/approve";
+import {AgencyOperateLog} from "_types/agency/agency-operate-log";
 
 const API = require('common/api');
 
@@ -212,6 +212,7 @@ class ClientModels implements ModelsInterface {
     coinAccount: ModelInterface<CoinAccount>;
     coinAccountChange: ModelInterface<CoinAccountChange>;
     agencyOperateLog: ModelInterface<AgencyOperateLog>;
+    ddtalkDepartment: ModelInterface<DDTalkDepartment>;
 
     constructor($cacheFactory: ng.ICacheFactoryService, $rootScope: ng.IRootScopeService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);

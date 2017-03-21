@@ -1,5 +1,5 @@
-import { QMEApproveStatus} from 'api/_types/tripPlan';
-import { Staff } from 'api/_types/staff/staff';
+import { QMEApproveStatus} from '_types/tripPlan';
+import { Staff } from '_types/staff/staff';
 export async function PendingController($scope, $stateParams){
     require('./trip-approval.scss');
     const PAGE_SIZE = 10;

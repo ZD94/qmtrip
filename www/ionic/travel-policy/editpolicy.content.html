@@ -1,26 +1,26 @@
 <div class="list">
-    <label class="item item-input item-input-right">
+    <label class="item item-input">
         <span class="input-label">标准名称</span>
         <input type="text" placeholder="请输入标准名称" ng-model="travelPolicy.name">
     </label>
 </div>
 <div class="list">
     <div class="item-tit">国内差旅标准<span class="item-note">必选</span></div>
-    <div class="checkbox-tit">飞机舱位
+    <div class="checkbox-tit">飞机舱位 <i class="icon ion-ios-medical"></i>
         <span class="item-note" all-checked ng-check-options="planeLevels" ng-model="travelPolicy.planeLevels"></span>
     </div>
     <div class="checkbox-options">
         <single-check ng-repeat="planeLevel in planeLevels"
                       ng-model="travelPolicy.planeLevels" check-option="planeLevel"></single-check>
     </div>
-    <div class="checkbox-tit">火车座次
+    <div class="checkbox-tit">火车座次 <i class="icon ion-ios-medical"></i>
         <span class="item-note" all-checked ng-check-options="trainLevels" ng-model="travelPolicy.trainLevels"></span>
     </div>
     <div class="checkbox-options">
         <single-check ng-repeat="trainLevel in trainLevels"
                       ng-model="travelPolicy.trainLevels" check-option="trainLevel"></single-check>
     </div>
-    <div class="checkbox-tit">住宿标准
+    <div class="checkbox-tit">住宿标准 <i class="icon ion-ios-medical"></i>
         <span class="item-note" all-checked ng-check-options="hotelLevels" ng-model="travelPolicy.hotelLevels"></span>
     </div>
     <div class="checkbox-options">
@@ -36,7 +36,7 @@
 <div class="list">
     <ion-toggle class="item-tit" toggle-class="toggle-positive" ng-model="travelPolicy.isOpenAbroad">国际差旅标准</ion-toggle>
     <div ng-if="travelPolicy.isOpenAbroad">
-        <div class="checkbox-tit">飞机舱位
+        <div class="checkbox-tit">飞机舱位 <i class="icon ion-ios-medical"></i>
             <span class="item-note" all-checked ng-check-options="abroadPlaneLevels"
                   ng-model="travelPolicy.abroadPlaneLevels"></span>
         </div>
@@ -45,7 +45,7 @@
                           ng-model="travelPolicy.abroadPlaneLevels" check-option="abroadPlaneLevel">
             </single-check>
         </div>
-        <div class="checkbox-tit">住宿标准
+        <div class="checkbox-tit">住宿标准 <i class="icon ion-ios-medical"></i>
             <span class="item-note" all-checked ng-check-options="abroadHotelLevels"
                   ng-model="travelPolicy.abroadHotelLevels"></span>
         </div>

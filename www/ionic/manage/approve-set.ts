@@ -2,8 +2,8 @@
  * Created by seven on 2016/11/24.
  */
 "use strict";
-import {EApproveChannel} from "api/_types/approve/types";
-import {Staff} from "api/_types/staff/staff";
+import {EApproveChannel} from "_types/approve/types";
+import {Staff} from "_types/staff/staff";
 var msgbox = require('msgbox');
 
 export async function ApproveSetController($scope, $ionicPopup, Models){

@@ -2,8 +2,8 @@
  * Created by seven on 2017/1/21.
  */
 "use strict";
-import {Staff, EStaffRoleNames, EStaffRole, EAddWay} from "api/_types/staff/staff";
-import {EGender} from "api/_types/index";
+import {Staff, EStaffRoleNames, EStaffRole, EAddWay} from "_types/staff/staff";
+import {EGender} from "_types/index";
 import L from 'common/language';
 import validator = require('validator');
 import {Pager} from "common/model/pager";

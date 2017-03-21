@@ -1,6 +1,6 @@
 
 import moment = require('moment');
-
+declare var API;
 export default async function BudgetController($scope, $stateParams, Models) {
     require('./statistics.scss');
     API.require('tripPlan');

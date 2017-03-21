@@ -4,9 +4,9 @@
 'use strict';
 import {requireParams, clientExport} from 'common/api/helper';
 import {conditionDecorator, condition} from "../_decorator";
-import {Staff} from "api/_types/staff";
-import { PromoCode } from 'api/_types/promoCode';
-import { Models } from 'api/_types';
+import {Staff} from "_types/staff";
+import { PromoCode } from '_types/promoCode';
+import { Models } from '_types';
 import {FindResult} from "common/model/interface";
 
 const promoCodeCols = PromoCode['$fieldnames'];

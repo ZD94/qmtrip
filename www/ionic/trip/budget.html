@@ -30,14 +30,14 @@
                 </div>
                 <ion-list>
                     <div ng-repeat="budget in budgets" class="ta-detail-item">
-                        <ion-item class="item-divider">
+                        <ion-item class="item-divider ion-item-title">
                             <span ng-if='budget.tripType == ETripType.OUT_TRIP'>去程交通</span>
                             <span ng-if='budget.tripType == ETripType.BACK_TRIP'>回程交通</span>
                             <span ng-if='budget.tripType == ETripType.HOTEL'>住宿</span>
                             <span ng-if='budget.tripType == ETripType.SUBSIDY'>补助</span>
                             <!--<span style="float: right">{{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')}}{{budget.price == -1 ? '' : '元'}}</span>-->
                         </ion-item>
-                        <ion-item>
+                        <ion-item class="item-divider">
                             <div ng-if="budget.tripType == ETripType.BACK_TRIP">
                                 <span>{{budget.leaveDate | date: 'MM-dd'}}</span>
                                 <span class="spanRight">{{budget.price <=0 ? '暂无预算' : (budget.price| currency_int)+'元'}}</span>
@@ -136,10 +136,14 @@
                             <ng-selector-list
                                     ng-model="trip.auditUser"
                                     dlg-options="staffSelector"
-                                    dlg-title=""
                                     dlg-placeholder="请选择审批人"
                                     class="fake-input"
-                            ></ng-selector-list>
+                            >
+                                <list-item>{{$item.name}}</list-item>
+                                <input-item>
+                                    <fake-input value="{{trip.auditUser.name}}" placeholder=""></fake-input>
+                                </input-item>
+                            </ng-selector-list>
                             <i class="icon ion-arrow-up-b"></i>
                             <p class="input-label" ng-if="trip.auditUser">审批人</p>
                         </div>
@@ -149,6 +153,7 @@
                             ng-if="totalPrice > 0"
                             class="button"
                             ng-class="{true: 'hasAuditUser button button-outline button-positive bgColor',false: ''}[bottomBottomClicked]"
+                            ng-stat-event="提交特别审批,按钮点击,提交特别审批"
                             ng-click="specialApprove()">
                         特别审批
                     </button>
@@ -156,6 +161,7 @@
                     <button ng-if="totalPrice > 0"
                             class="button"
                             ng-class="{true: 'hasAuditUser',false: ''}[bottomBottomClicked]"
+                            ng-stat-event="提交普通审批,按钮点击,提交普通审批"
                             ng-click="submitApprove()">
                             提交审批
                     </button>

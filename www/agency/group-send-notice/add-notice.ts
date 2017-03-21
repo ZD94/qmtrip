@@ -1,5 +1,5 @@
-import { Notice, ENoticeType } from 'api/_types/notice';
-import {ESendType} from "../../../api/_types/notice/notice";
+import { Notice, ENoticeType } from '_types/notice';
+import {ESendType} from "../../../_types/notice/notice";
 var msgbox = require('msgbox');
 
 export async function AddNoticeController($scope, Models, $stateParams, $ionicPopup) {

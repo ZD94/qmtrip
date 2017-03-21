@@ -2,7 +2,7 @@
  * Created by seven on 2017/3/8.
  */
 "use strict";
-import {Staff} from "api/_types/staff/staff";
+import {Staff} from "_types/staff/staff";
 import moment = require('moment');
 var msgbox = require('msgbox');
 export async function destinationController($scope, ngModalDlg, Models, $ionicPopup, $storage){
@@ -17,7 +17,6 @@ export async function destinationController($scope, ngModalDlg, Models, $ionicPo
             var projects = await Models.project.find(options);
             return projects;
         },
-        display: (item)=>item.name,
         create: async function(name){
             return {
                 name: name,

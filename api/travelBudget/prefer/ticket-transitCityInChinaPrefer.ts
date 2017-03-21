@@ -4,7 +4,7 @@
 
 'use strict';
 import {AbstractPrefer} from "./index";
-import {IFinalTicket, IFlightSeg, TRAFFIC} from "../../_types/travelbudget";
+import {IFinalTicket, IFlightSeg, TRAFFIC} from "_types/travelbudget";
 
 class TransitCityInChinaPrefer extends AbstractPrefer<IFinalTicket> {
     private baseScore: number;

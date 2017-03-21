@@ -1,7 +1,7 @@
 
-import { Company } from 'api/_types/company';
-import { Staff, EStaffRole } from 'api/_types/staff';
-import { Models } from 'api/_types/index';
+import { Company } from '_types/company';
+import { Staff, EStaffRole } from '_types/staff';
+import { Models } from '_types/index';
 
 require('common/zone');
 
@@ -29,7 +29,7 @@ model.init(config.postgres);
 var API = require('common/api');
 
 require('api/_service');
-require('api/_types/staff');
+require('_types/staff');
 
 async function main(){
     await API.init('api', config);

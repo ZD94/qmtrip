@@ -4,17 +4,17 @@
 
 'use strict';
 import {clientExport, requireParams} from "../../common/api/helper";
-import {Approve} from "../_types/approve/index";
-import {Staff} from "../_types/staff/staff";
-import {Models} from "../_types/index";
+import {Approve} from "_types/approve/index";
+import {Staff} from "_types/staff/staff";
+import {Models} from "_types/index";
 import {emitter, EVENT} from "libs/oa";
-import {EApproveStatus, EApproveChannel, EApproveType} from "../_types/approve/types";
-import {TripPlan, ETripType} from "../_types/tripPlan/tripPlan";
+import {EApproveStatus, EApproveChannel, EApproveType} from "_types/approve/types";
+import {ETripType} from "_types/tripPlan/tripPlan";
 import TripPlanModule = require("../tripPlan/index");
 import _ = require('lodash');
-import L from 'common/language';
 let Config = require('config');
 var API = require("common/api");
+import {ISegment, ICreateBudgetAndApproveParams} from '_types/tripPlan';
 
 function oaStr2Enum(str: string) :EApproveChannel{
     let obj = {
@@ -44,11 +44,9 @@ class ApproveModule {
 
         //获取预算详情
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: submitter.id});
-        console.info(budgetInfo);
-        console.info("submitApprove_budgetInfo=============================================")
         let number = 0;
         let content = "";
-        let query = budgetInfo.query;
+        let query: ICreateBudgetAndApproveParams = budgetInfo.query;
         let destinationPlacesInfo = query.destinationPlacesInfo;
 
         if(query && query.originPlace){
@@ -57,7 +55,8 @@ class ApproveModule {
         }
         if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
             for(let i = 0; i < destinationPlacesInfo.length; i++){
-                let destinationCity = await API.place.getCityInfo({cityCode: destinationPlacesInfo[i].destinationPlace});
+                let segment: ISegment = destinationPlacesInfo[i]
+                let destinationCity = await API.place.getCityInfo({cityCode: segment.destinationPlace});
                 content = content + destinationCity.name;
             }
         }
@@ -144,17 +143,21 @@ class ApproveModule {
 
         if(destinationPlacesInfo && _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
             for(let i = 0; i < destinationPlacesInfo.length; i++){
-                let q = destinationPlacesInfo[i];
+                let segment: ISegment = destinationPlacesInfo[i];
                 //处理startAt,backAt
                 if(i == 0){
-                    budgetInfo.budgets[0].startAt = q.leaveDate;
+                    budgetInfo.budgets[0].startAt = segment.leaveDate;
                 }
                 if(i == (destinationPlacesInfo.length - 1)){
-                    budgetInfo.budgets[0].backAt = q.goBackDate;
+                    budgetInfo.budgets[0].backAt = segment.goBackDate;
                 }
                 //处理目的地
-                if(i == (destinationPlacesInfo.length - 1) && q.destinationPlace){
-                    let arrivalInfo = await API.place.getCityInfo({cityCode: q.destinationPlace.id|| q.destinationPlace}) || {name: null};
+                if(i == (destinationPlacesInfo.length - 1) && segment.destinationPlace){
+                    let place = segment.destinationPlace;
+                    if (typeof place != 'string') {
+                        place = place['id'];
+                    }
+                    let arrivalInfo = await API.place.getCityInfo({cityCode: place}) || {name: null};
                     budgetInfo.budgets[0].destination = arrivalInfo;
                 }
             }

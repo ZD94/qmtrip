@@ -1,7 +1,7 @@
 
 import L from 'common/language';
 import { getSession } from 'common/model';
-import { signToken, LoginResponse, genAuthString } from 'api/_types/auth/auth-cert';
+import { signToken, LoginResponse, genAuthString } from '_types/auth/auth-cert';
 import initJPush from './jpush';
 require('ionic');
 
@@ -189,6 +189,56 @@ function initUpdater($ionicPlatform, $ionicPopup) {
 //         })
 //     })
 // }
+    function initCNZZ($ionicPlatform,$rootScope,$location,CNZZ){
+       $ionicPlatform.ready(function(){
+           $rootScope.$on('$locationChangeSuccess',function(event,newUrl,oldUrl){
+               var url = $location.path();
+               let res = url.indexOf('~2F');
+               if(res>=0){
+                   url = url.replace(/~2F/g,'/');
+               }
+               let ret = url.endsWith('index');
+               if(ret){
+                   url = url.substr(0,url.length-5);
+               }
+                var titles = {
+                    "/staff/" : "进入个人中心",
+                    "/staff/staff-info" : "修改个人资料",
+                    "/staff/bind-suppliers" : "绑定第三方账户",
+                    "/trip/create" : "进入我要出差",
+                    "/trip/budget" : "计算预算",
+                    "/trip/special-approve" : "进入特别审批",
+                    "/trip-approval/pending" : "进入审批单",
+                    "/trip-approval/detail" : "撤销申请单",
+                    "/trip/list" : "进入我的行程",
+                    "/supplier/edit" : "新增自定义服务商",
+                    "/invoice/invoice-detail" :"票据详情页",
+                    "/trip/reserve" : "访问服务商",
+                    "/trip/select-supplier" : "关联订单",
+                    "/trip/list-detail" : "撤销行程",
+                    "/trip-approval/list" : "进入出差请示",
+                    "/manage/" : "进入管理企业",
+                    "/statistics/" : "进入差旅统计",
+                    "/trip/list-all" : "查看员工出差记录",
+                    "/statistics/distribution" : "查看员工分布地图",
+                    "/department/" : "进入员工管理",
+                    "/department/add-staff" : "点击邀请员工",
+                    "/travel-policy/editpolicy" : "新增差旅标准",
+                    "/travel-policy/showpolicy" : "差旅标准详情页",
+                    "/travel-policy/" : "修改差旅标准",
+                    "/supplier/" : "进入预订服务管理",
+                    "/accord-hotel/" : "进入协议酒店管理",
+                    "/accord-hotel/edit" : "新增协议酒店城市",
+                    "/manage/approve-set" : "审批设置",
+                    "/login/" : "退出登录",
+                };
+                if(!titles[url]){
+                    CNZZ.addEvent(url,'URL', newUrl ,oldUrl);
+                }
+               CNZZ.addEvent(titles[url],'URL', newUrl ,oldUrl);
+           })
+       })
+    }
 
 require('nglibs');
 require('www/libs');
@@ -212,6 +262,8 @@ app.run(initAPI);
 app.run(initKeyboard);
 app.run(initStatusBar);
 // app.run(initStatistics);
+app.run(initCNZZ);
+
 if(window.cordova) {
     app.run(initUpdater);
     app.run(initJPush);

@@ -1,9 +1,9 @@
 "use strict";
-import {Staff, EStaffRole} from 'api/_types/staff';
+import {Staff, EStaffRole} from '_types/staff';
 import {
     MHotelLevel, MPlaneLevel, MTrainLevel, enumHotelLevelToStr, enumPlaneLevelToStr,
     enumTrainLevelToStr
-} from "api/_types/travelPolicy";
+} from "_types/travelPolicy";
 import moment = require('moment');
 import * as path from 'path';
 

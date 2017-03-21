@@ -52,14 +52,18 @@
                             <ng-selector-list
                                     ng-model="trip.auditUser"
                                     dlg-options="staffSelector"
-                                    dlg-title=""
                                     dlg-placeholder="请选择审批人"
                                     class="fake-input"
-                            ></ng-selector-list>
+                            >
+                                <list-item>{{$item.name}}</list-item>
+                                <input-item>
+                                    <fake-input value="{{trip.auditUser.name}}" placeholder=""></fake-input>
+                                </input-item>
+                            </ng-selector-list>
                             <i class="icon ion-arrow-up-b"></i>
                         </div>
                     </form>
-                    <button class="button button_right" ng-class="{true: 'hasAuditUser',false: ''}[bottomBottomClicked]" ng-click="saveSpecialTripPlan()">
+                    <button class="button button_right" ng-class="{true: 'hasAuditUser',false: ''}[bottomBottomClicked]" ng-click="saveSpecialTripPlan()" ng-stat-event="提交审批,提交,提交审批">
                         提交审批</button>
                 </bottom-bar>
             </div>

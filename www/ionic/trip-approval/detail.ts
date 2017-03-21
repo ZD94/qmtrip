@@ -1,11 +1,12 @@
 import {
     EInvoiceType, QMEApproveStatus, EApproveResult, ETripType,
     EApproveStatus2Text
-} from 'api/_types/tripPlan';
-import { Staff } from 'api/_types/staff/staff';
+} from '_types/tripPlan';
+import { Staff } from '_types/staff/staff';
 import moment = require('moment');
-import {EApproveChannel} from "api/_types/approve/types";
+import {EApproveChannel} from "_types/approve/types";
 import _ = require("lodash");
+declare var API;
 
 export async function DetailController($scope, Models, $stateParams, $ionicPopup, $loading, $storage, ngModalDlg){
     require('./trip-approval.scss');
@@ -367,8 +368,7 @@ export async function selectModeController ($scope){
             //let approveStaffId = $scope.tripApprove.account.id;
             let staffs = await staff.company.getStaffs({where: {name: {$ilike: `%${keyword}%`}}});
             return staffs;
-        },
-        display: (staff)=>staff.name
+        }
     };
     $scope.chooseOption = function(isNextApprove) {
         $scope.isNextApprove = isNextApprove;

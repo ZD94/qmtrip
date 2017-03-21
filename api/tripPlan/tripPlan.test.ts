@@ -5,9 +5,9 @@
 "use strict";
 var API = require("common/api");
 import assert = require("assert");
-import {Models} from 'api/_types';
+import {Models} from '_types';
 import {getSession} from 'common/model';
-import {EInvoiceType, ETripType} from 'api/_types/tripPlan'
+import {EInvoiceType, ETripType} from '_types/tripPlan'
 
 var agencyId = "";
 var agencyUserId = "";

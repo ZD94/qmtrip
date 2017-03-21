@@ -4,12 +4,14 @@
 "use strict";
 
 import moment = require('moment');
-import { Staff } from 'api/_types/staff/staff';
-import {EApproveChannel} from "api/_types/approve/types";
+import { Staff } from '_types/staff/staff';
 import {destinationController} from "./destination-template";
+import {Place} from "_types/place";
+import {ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan";
 
 var msgbox = require('msgbox');
 import _ = require('lodash');
+declare var API;
 
 var defaultTrip = {
     beginDate: moment().add(3, 'days').startOf('day').hour(18).toDate(),
@@ -23,8 +25,10 @@ var defaultTrip = {
     round: true,
 
     hotel: true,
-    hotelPlace: undefined
+    hotelPlace: undefined,
+    hotelName: '',
 };
+
 type TripDefine = typeof defaultTrip;
 function TripDefineFromJson(obj: any): TripDefine{
     if(obj == undefined)
@@ -34,7 +38,6 @@ function TripDefineFromJson(obj: any): TripDefine{
     return obj as TripDefine;
 }
 
-
 export async function CreateController($scope, $storage,$stateParams, $loading, ngModalDlg, $ionicPopup, Models, City, $rootScope){
     require('./create.scss');
     $scope.showOrigin = false;
@@ -42,7 +45,7 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
     $scope.currentStaff = await Staff.getCurrent();
     let currentCompany = $scope.currentStaff.company;
     let trip = _.clone(defaultTrip);
-    let query = null;
+    let query: ICreateBudgetAndApproveParams = null;
     if($stateParams.params){
         query = JSON.parse($stateParams.params);
         if(query.originPlace){
@@ -52,7 +55,7 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
         }
         trip.round = query.isRoundTrip;
         if(query.destinationPlacesInfo && _.isArray(query.destinationPlacesInfo) && query.destinationPlacesInfo.length > 0){
-            let oldParams = query.destinationPlacesInfo[0];
+            let oldParams: ISegment = query.destinationPlacesInfo[0];
             let destination = await API.place.getCityInfo({cityCode: oldParams.destinationPlace});
             trip.destination = destination;
             trip.beginDate = oldParams.leaveDate;
@@ -62,49 +65,25 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
             trip.hotelPlace = oldParams.businessDistrict;
             trip.hotelName = oldParams.hotelName;
             trip.reason = oldParams.reason;
-            trip.reasonName = oldParams.reason;
             $scope.subsidy = oldParams.subsidy;
             $scope.showDestination = true;
         }else{
-            if(query.destinationPlace){
+            let qs: ISegment = query as ISegment;
+            if(qs.destinationPlace){
                 $scope.showDestination = true;
             }
-            trip.destination = {id: query.destinationPlace};
-            trip.beginDate = query.leaveDate;
-            trip.endDate = query.goBackDate;
-            trip.traffic = query.isNeedTraffic;
-            trip.hotel = query.isNeedHotel;
-            trip.hotelPlace = query.businessDistrict;
-            trip.hotelName = query.hotelName;
-            trip.reason = query.reason;
-            trip.reasonName = query.reason;
-            $scope.subsidy = query.subsidy;
+            trip.destination = {id: qs.destinationPlace};
+            trip.beginDate = qs.leaveDate;
+            trip.endDate = qs.goBackDate;
+            trip.traffic = qs.isNeedTraffic;
+            trip.hotel = qs.isNeedHotel;
+            trip.hotelPlace = qs.businessDistrict;
+            trip.hotelName = qs.hotelName;
+            trip.reason = qs.reason;
+            $scope.subsidy = qs.subsidy;
         }
     }
     $scope.trip = trip;
-    // try {
-    //     trip= TripDefineFromJson($storage.local.get('trip'));
-    //     if(trip.origin){
-    //         $scope.showOrigin = true;
-    //     }
-    //     if(trip.destination){
-    //         $scope.showDestination = true;
-    //     }
-    // } catch(err) {
-    //     trip = {};
-    // }
-    //
-    // if(!trip.regenerate) {
-    //     trip = defaultTrip;
-    //     await $storage.local.set('trip', trip);
-    // }else {
-    //     var today = moment();
-    //     if (!trip.beginDate || (new Date(trip.beginDate) < new Date())) {
-    //         trip.beginDate = today.startOf('day').hour(18).toDate();
-    //     }
-    //
-    //     trip.regenerate = false;
-    // }
 
     $scope.oldBeginDate = trip.beginDate;
 
@@ -113,12 +92,7 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
     $rootScope.$on('$stateChangeSuccess', function(){
         trip = _.clone(defaultTrip);
         $scope.trip=trip;
-        console.info("trip.....",trip);
     })
-    console.info($scope.trip);
-    // $scope.$watch('trip', function(){
-    //     $storage.local.set('trip', $scope.trip);
-    // }, true);
     $scope.$watch('trip.beginDate', function(n, o){
         if (!trip.endDate || trip.endDate <= trip.beginDate) {
             trip.endDate = moment(trip.beginDate).add(3, 'days').toDate();
@@ -157,7 +131,6 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
             template: require('./destination-template.html'),
             controller: destinationController
         })
-        console.info('modal.result',ret)
         if(ret){
             $scope.showDestination = true;
             $scope.trip = ret.trip;
@@ -205,12 +178,13 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
         queryAll: queryAllPlaces,
         queryAbroad: queryAbroadPlaces,
         queryDomestic: queryDomesticPlaces,
-        display: (item)=> {
-            if (item.isAbroad && item.code) {
-                return `${item.name}(${item.code})`;
-            }
-            return item.name
-        }
+        display: '{{$item.name}}<span ng-if="$item.isAbroad && item.code">({{$item.code}})</span>',
+        //display: (item)=> {
+        //   if (item.isAbroad && item.code) {
+        //       return `${item.name}(${item.code})`;
+        //  }
+        //  return item.name
+        // }
     };
     $scope.fromPlaceSelector = {
         queryAll: queryAllPlaces,
@@ -239,7 +213,7 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
             destinationPlacesInfo: []
         };
 
-        let destinationItem = {
+        let destinationItem: ISegment = {
             destinationPlace: trip.destination ? trip.destination.id : null,
             leaveDate: moment(trip.beginDate).toDate(),
             goBackDate: moment(trip.endDate).toDate(),
@@ -364,7 +338,6 @@ export async function CreateController($scope, $storage,$stateParams, $loading, 
                 reason: trip.reason
             }
              params.destinationPlacesInfo.push(addParams);*/
-            console.info(params);
             budget = await API.travelBudget.getTravelPolicyBudget(params);
             if (isShowDone) {
                 cb();

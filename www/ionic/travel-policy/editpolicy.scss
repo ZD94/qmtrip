@@ -1,3 +1,4 @@
+@import "../scss/color.variable.scss";
 .item-input-right {
   input{
     text-align: right;
@@ -5,6 +6,7 @@
   }
 }
 .item-icon-right{
+  border-radius: 3px;
   .icon{
     font-size: 14px;
   }
@@ -14,6 +16,7 @@
   height: 44px;
   font-size: 16px;
   background: #fff;
+  border-radius: 3px 3px 0 0;
   &.item-toggle .toggle{
     top: 5px;
   }
@@ -23,16 +26,25 @@
   padding: 10px;
   background: #f9f9f9;
   font-size: 14px;
+  color: $dark;
+  font-weight: bold;
+  .ion-ios-medical{
+    color: #D0011B;
+    font-size: 12px;
+  }
   .check-box{
     .checkbox_diy{
-      color: #606060;
+      color: lighten($dark,39%);
     }
   }
 }
 .checkbox-options{
   background: #fff;
+  &:last-of-type {
+    border-radius: 0 0 3px 3px;
+  }
   .hotel-opt{
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid lighten($dark,71%);
     padding-right: 10px;
     &:last-child{
       border: none;
@@ -53,6 +65,7 @@
     line-height: 24px;
     padding-left: 10px;
     background: #f9f9f9;
+    color:$dark;
   }
   .detail-left-right{
     display: flex;

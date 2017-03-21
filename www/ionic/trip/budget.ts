@@ -1,11 +1,12 @@
-import { ETripType, EInvoiceType } from 'api/_types/tripPlan';
+import { ETripType, EInvoiceType } from '_types/tripPlan';
 import moment = require('moment');
-import { Staff } from 'api/_types/staff/staff';
-import {EApproveType, EApproveChannel} from "api/_types/approve/types";
-import {MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
+import { Staff } from '_types/staff/staff';
+import {EApproveType, EApproveChannel} from "_types/approve/types";
+import {MPlaneLevel, MTrainLevel} from "_types/travelPolicy";
 var msgbox = require("msgbox");
+declare var API;
 
-export async function BudgetController($scope, $storage,$loading, Models, $stateParams, $ionicLoading, City, $ionicPopup, $ionicHistory){
+export async function BudgetController($scope, $storage, $loading, Models, $stateParams, $ionicLoading, City, $ionicPopup, $ionicHistory){
     require('./trip.scss');
     require('./budget.scss');
     API.require("tripPlan");
@@ -17,8 +18,7 @@ export async function BudgetController($scope, $storage,$loading, Models, $state
         query: async function(keyword) {
             let staffs = await staff.company.getStaffs({where: {'name': {$ilike: '%'+keyword+'%'}}});
             return staffs;
-        },
-        display: (staff)=>staff.name
+        }
     };
 
     await API.onload();
@@ -28,8 +28,6 @@ export async function BudgetController($scope, $storage,$loading, Models, $state
     API.require("tripApprove");
     await API.onload();
     let result = await API.travelBudget.getBudgetInfo({id: id});
-    console.info(result);
-    console.info("result====================================");
     let budgets = result.budgets;
     let trip = $storage.local.get("trip");
     let query = result.query;

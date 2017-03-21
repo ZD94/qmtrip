@@ -1,6 +1,6 @@
-import { Models } from 'api/_types/index';
-import { Staff } from 'api/_types/staff/staff';
-import { Token } from 'api/_types/auth/token';
+import { Models } from '_types/index';
+import { Staff } from '_types/staff/staff';
+import { Token } from '_types/auth/token';
 
 /**
  * 删除绑定的设备id

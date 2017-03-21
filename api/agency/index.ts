@@ -8,12 +8,12 @@ let API = require("common/api");
 import L from 'common/language';
 import Logger = require('common/logger');
 import {requireParams, clientExport} from 'common/api/helper';
-import {Agency, AgencyUser, EAgencyStatus, EAgencyUserRole} from "api/_types/agency";
+import {Agency, AgencyUser, EAgencyStatus, EAgencyUserRole} from "_types/agency";
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "../_decorator";
-import { Models, EGender } from '../_types/index';
+import { Models, EGender } from '_types/index';
 import {md5} from "common/utils";
 import {FindResult, PaginateInterface} from "common/model/interface";
-import {AgencyOperateLog} from "../_types/agency/agency-operate-log";
+import {AgencyOperateLog} from "_types/agency/agency-operate-log";
 let logger = new Logger("agency");
 
 class AgencyModule {
@@ -64,6 +64,7 @@ class AgencyModule {
         agency.status = EAgencyStatus.ACTIVE;
         agency.createUser = agencyUser.id;
         agencyUser.agency = agency;
+        agencyUser.isValidateEmail = true;
 
         await Promise.all([agency.save(), agencyUser.save()]);
 

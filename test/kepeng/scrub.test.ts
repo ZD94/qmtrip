@@ -8,7 +8,7 @@ global.Promise = require('bluebird');
 Promise.promisifyAll(require("fs"));
 Promise.config({longStackTraces: true});
 
-import {Models} from 'api/_types';
+import {Models} from '_types';
 import * as Sequelize from 'sequelize';
 var scrubber = require('common/api/scrubber');
 var path = require('path');

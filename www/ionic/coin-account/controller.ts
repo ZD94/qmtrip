@@ -1,5 +1,5 @@
-import { Staff } from 'api/_types/staff/staff';
-import { COIN_CHANGE_TYPE } from 'api/_types/coin';
+import { Staff } from '_types/staff/staff';
+import { COIN_CHANGE_TYPE } from '_types/coin';
 import moment = require("moment");
 
 export * from './detail';

@@ -1,8 +1,8 @@
-import { Staff } from 'api/_types/staff/staff';
-import { AccordHotel } from 'api/_types/accordHotel';
+import { Staff } from '_types/staff/staff';
+import { AccordHotel } from '_types/accordHotel';
 
 var msgbox = require('msgbox');
-
+declare var API;
 export async function EditController($scope, Models, $storage, $stateParams, $ionicHistory, $ionicPopup) {
     var staff = await Staff.getCurrent();
     var accordHotel;
@@ -22,27 +22,19 @@ export async function EditController($scope, Models, $storage, $stateParams, $io
     var accordHotels = await Models.accordHotel.find({where: {companyId: staff.company.id}});
 
     $scope.city = accordHotel.cityName?{name: accordHotel.cityName}:undefined;
+    $scope.isSetCity = function($item){
+        for(let city of accordHotels){
+            if(city.cityName == $item.name)
+                return true;
+        }
+        return false;
+    }
     $scope.placeSelector = {
         query: async function(keyword){
             var places = await API.place.queryPlace({keyword: keyword});
             return places;
         },
-        display: (item, forList)=>{
-            if(forList){
-                for(let city of accordHotels){
-                    if(city.cityName == item.name)
-                        return item.name + '<span class="item-note">已设置</span>';
-                }
-            }
-            return item.name;
-        },
-        disable: (item)=>{
-            for(let city of accordHotels){
-                if(city.cityName == item.name)
-                    return true;
-            }
-            return false;
-        },
+        disable: $scope.isSetCity,
         done: function(val) {
             $scope.accordHotel.cityName = val.name;
             $scope.accordHotel.cityCode = val.id;

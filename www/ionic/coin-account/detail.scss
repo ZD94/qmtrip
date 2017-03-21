@@ -1,3 +1,4 @@
+@import "../scss/color.variable.scss";
 .coin_detail {
   &.list.card .item{
     border-radius: 5px;
@@ -21,7 +22,7 @@
         display: inline-block;
         text-align: center;
         &.icon_red {
-          background: #ff0000;
+          background: $energized;
         }
         &.icon_yellow {
           background: #f5a623;
@@ -57,10 +58,13 @@
     span{
       &:first-child{
         flex: 0;
+        color: lighten($dark,39%);
+        font-size: 14px;
       }
       &:last-child{
         flex: 1;
         text-align: right;
+        color: $dark;
       }
     }
   }

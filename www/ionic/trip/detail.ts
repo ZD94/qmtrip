@@ -1,6 +1,6 @@
 import moment = require('moment');
-import { Staff } from 'api/_types/staff/staff';
-import { ETripType, EAuditStatus, EPlanStatus } from 'api/_types/tripPlan';
+import { Staff } from '_types/staff/staff';
+import { ETripType, EAuditStatus, EPlanStatus } from '_types/tripPlan';
 
 export default async function DetailController($scope, Models, $stateParams, $ionicPopup, $ionicLoading){
     require('../trip-approval/trip-approval.scss');

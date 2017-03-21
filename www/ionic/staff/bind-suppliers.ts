@@ -1,6 +1,6 @@
-import {StaffSupplierInfo} from "api/_types/staff/staff-supplier-info";
-import { Staff } from 'api/_types/staff/staff';
-import { ESupplierType } from 'api/_types/company/supplier';
+import {StaffSupplierInfo} from "_types/staff/staff-supplier-info";
+import { Staff } from '_types/staff/staff';
+import { ESupplierType } from '_types/company/supplier';
 
 var msgbox = require('msgbox');
 export function selectSuppliers($scope, id, ngModalDlg){

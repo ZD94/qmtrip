@@ -1,6 +1,6 @@
 'use strict';
-import {Models} from 'api/_types';
-import {CoinAccount} from "api/_types/coin";
+import {Models} from '_types';
+import {CoinAccount} from "_types/coin";
 var moment = require("moment");
 /**
  * 延长企业有效期

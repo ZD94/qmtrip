@@ -1,10 +1,9 @@
-import { Staff } from 'api/_types/staff/staff';
-import { ESupplierType } from 'api/_types/company/supplier';
+import { Staff } from '_types/staff/staff';
+import { ESupplierType } from '_types/company/supplier';
 
-export * from './edit';
 
 export async function IndexController($scope, Models, $location) {
-    require('./accord-hotel.scss');
+    require('./supplier.scss');
     var staff = await Staff.getCurrent();
     var company = await staff.company;
     var suppliers = await company.getCompanySuppliers();
@@ -26,7 +25,6 @@ export async function IndexController($scope, Models, $location) {
             publicSuppliers[i].isPointed = false;
         }
     }
-
     var canImportList  = publicSuppliers.filter((item: any)=>{
         return item.type == ESupplierType.SYSTEM_CAN_IMPORT;
     })
@@ -36,32 +34,8 @@ export async function IndexController($scope, Models, $location) {
     })
     $scope.canNotImportList = canNotImportList;
 
-    //是否让员工自主选择
-    let assignSupplier = company.isAppointSupplier;
-    $scope.assignSupplier = assignSupplier;
-    $scope.toggleAssignSupplier = async function(assignSupplier){
-        company.isAppointSupplier = assignSupplier;
-        await company.save();
-    }
-    //自定义供应商
-    $scope.saveSupplierStatus = async function(ah){
-        await ah.save();
-    }
 
-    $scope.savePublicSupplierStatus = async function(e){
-        if(e.isPointed){
-            appointedPubilcSuppliers.push(e.id);
-        }else{
-            let index = appointedPubilcSuppliers.indexOf(e.id);
-            appointedPubilcSuppliers.splice(index,1);
-        }
-        company.appointedPubilcSuppliers = JSON.stringify(appointedPubilcSuppliers);
-        await company.save();
-    }
-    $scope.editSupplier = async function (id) {
-        window.location.href = "#/supplier/edit?supplierId=" + id;
-    }
-    $scope.addSupplier = async function () {
+    $scope.editSupplier = async function () {
         window.location.href = "#/supplier/edit";
     }
 }

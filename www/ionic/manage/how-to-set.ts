@@ -2,7 +2,7 @@
  * Created by seven on 2016/11/30.
  */
 "use strict";
-var API = require('common/api');
+declare var API;
 var msgbox = require('msgbox');
 export async function HowToSetController($scope, ngModalDlg, $ionicPopup){
     require('./how-to-set.scss');

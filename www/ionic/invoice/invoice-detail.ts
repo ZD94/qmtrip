@@ -1,19 +1,16 @@
 import {
     ETripType, EPlanStatus, EInvoiceType, EInvoiceFeeTypes, EPayType, EInvoiceStatus,
     InvoiceFeeTypeNames, PayTypeNames
-} from 'api/_types/tripPlan';
+} from '_types/tripPlan';
 import * as path from 'path';
 import {ImgTemplateController} from './img-template';
 import moment = require('moment');
 import {Model} from "sequelize";
-var API = require('common/api');
+declare var API;
 var msgbox = require('msgbox');
-
-
 
 export async function InvoiceDetailController($scope , Models, $stateParams, $ionicPopup, $ionicSlideBoxDelegate, ngModalDlg, City, $ionicModal, $timeout){
     let typeArray = [EPlanStatus.AUDIT_NOT_PASS,EPlanStatus.WAIT_UPLOAD,EPlanStatus.WAIT_COMMIT]
-
     $scope.EInvoiceFeeTypes = EInvoiceFeeTypes;
     $scope.InvoiceFeeTypeNames = InvoiceFeeTypeNames;
     $scope.EPayType = EPayType;
