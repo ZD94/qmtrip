@@ -22,13 +22,13 @@ import request = require('request');
 import ISVApi from "./isvApi";
 import CorpApi from "./corpApi";
 import {reqProxy} from "./reqProxy";
-import {Company} from "api/_types/company";
-import {Staff, EStaffRole} from "api/_types/staff";
-import {Models} from "api/_types/index";
+import {Company} from "_types/company";
+import {Staff, EStaffRole} from "_types/staff";
+import {Models} from "_types/index";
 import L from 'common/language';
 
 import {md5} from "common/utils";
-import {DDTalkCorp , DDTalkDepartment , DDTalkUser} from "api/_types/ddtalk";
+import {DDTalkCorp , DDTalkDepartment , DDTalkUser} from "_types/ddtalk";
 
 
 

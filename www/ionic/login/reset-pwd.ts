@@ -1,6 +1,6 @@
 import _ = require('lodash');
 var msgbox = require('msgbox');
-
+declare var API;
 export async function ResetPwdController($scope, Models, $stateParams){
     API.require("auth");
     await API.onload();

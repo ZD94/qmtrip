@@ -7,7 +7,7 @@
 import {emitter, OAEmitter} from './emitter';
 import {QmPlugin, IOAPlugin} from './plugin';
 import {AutoPlugin} from "./plugin/auto";
-import {EApproveType} from "../../api/_types/approve/types";
+import {EApproveType} from "../../_types/approve/types";
 // import {DDTalkPlugin} from "./plugin/ddtalk/index";
 
 export const EVENT = {

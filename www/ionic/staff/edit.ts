@@ -1,5 +1,5 @@
 import L from 'common/language';
-import { Staff, EStaffRole } from 'api/_types/staff/staff';
+import { Staff, EStaffRole } from '_types/staff/staff';
 import validator = require('validator');
 
 var msgbox = require('msgbox');

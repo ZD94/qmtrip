@@ -1,5 +1,5 @@
 'use strict';
-import {Models} from 'api/_types';
+import {Models} from '_types';
 var moment = require("moment");
 /**
  * 延长企业有效期

@@ -17,15 +17,15 @@ import L from 'common/language';
 import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {requireParams, clientExport} from 'common/api/helper';
-import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo, EAddWay } from "api/_types/staff";
-import { Notice } from "api/_types/notice";
-import { EAgencyUserRole, AgencyUser } from "api/_types/agency";
-import { Models, EAccountType, EGender } from 'api/_types';
+import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo, EAddWay } from "_types/staff";
+import { Notice } from "_types/notice";
+import { EAgencyUserRole, AgencyUser } from "_types/agency";
+import { Models, EAccountType, EGender } from '_types';
 import {conditionDecorator, condition} from "../_decorator";
 import {FindResult} from "common/model/interface";
-import {ENoticeType} from "../_types/notice/notice";
-import {CoinAccount} from "api/_types/coin";
-import {StaffDepartment} from "api/_types/department/staffDepartment";
+import {ENoticeType} from "_types/notice/notice";
+import {CoinAccount} from "_types/coin";
+import {StaffDepartment} from "_types/department/staffDepartment";
 
 
 const invitedLinkCols = InvitedLink['$fieldnames'];

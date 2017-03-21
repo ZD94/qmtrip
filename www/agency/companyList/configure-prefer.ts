@@ -1,7 +1,7 @@
 /**
  * Created by chen on 2017/3/13.
  */
-import {AgencyUser} from "api/_types/agency/agency-user";
+import {AgencyUser} from "_types/agency/agency-user";
 let msgbox=require("msgbox");
 export async function ConfigurePreferController($scope,Models,$stateParams){
     let companyId = $stateParams.companyId;

@@ -4,7 +4,7 @@
  */
 'use strict';
 
-import {AgencyUser} from "api/_types/agency/agency-user";
+import {AgencyUser} from "_types/agency/agency-user";
 
 export async function ListController($scope,Models){
     $scope.init = async function(){

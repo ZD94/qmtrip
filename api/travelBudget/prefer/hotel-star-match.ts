@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {IFinalHotel} from "api/_types/travelbudget";
+import {IFinalHotel} from "_types/travelbudget";
 import {AbstractPrefer} from "./index";
 
 

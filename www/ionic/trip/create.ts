@@ -4,13 +4,14 @@
 "use strict";
 
 import moment = require('moment');
-import { Staff } from 'api/_types/staff/staff';
+import { Staff } from '_types/staff/staff';
 import {destinationController} from "./destination-template";
-import {Place} from "api/_types/place";
-import {ISegment, ICreateBudgetAndApproveParams} from "api/_types/tripPlan";
+import {Place} from "_types/place";
+import {ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan";
 
 var msgbox = require('msgbox');
 import _ = require('lodash');
+declare var API;
 
 var defaultTrip = {
     beginDate: moment().add(3, 'days').startOf('day').hour(18).toDate(),

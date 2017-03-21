@@ -1,5 +1,5 @@
 
-import {LoginResponse} from "api/_types/auth/auth-cert";
+import {LoginResponse} from "_types/auth/auth-cert";
 declare var ionic:any;
 var jPushPlugin;
 var API = require('common/api');

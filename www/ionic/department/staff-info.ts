@@ -2,9 +2,10 @@
  * Created by seven on 2017/1/22.
  */
 "use strict";
-import {EStaffRoleNames, EStaffRole} from "api/_types/staff/staff";
+import {EStaffRoleNames, EStaffRole} from "_types/staff/staff";
 import {Pager} from "common/model/pager";
 var msgbox = require('msgbox');
+declare var API;
 
 export async function StaffInfoController($scope, Models, $stateParams, $ionicPopup, $ionicHistory, $window){
     require('./new-staff.scss');

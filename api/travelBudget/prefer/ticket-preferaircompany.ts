@@ -4,7 +4,7 @@
 
 'use strict';
 
-import {IFinalTicket, TRAFFIC} from 'api/_types/travelbudget';
+import {IFinalTicket, TRAFFIC} from '_types/travelbudget';
 
 function preferaircompany(data: IFinalTicket[], expected: Array<string>|string, score: number) :IFinalTicket[] {
     let airCompanies: Array<string> = [];

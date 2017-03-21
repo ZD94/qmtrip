@@ -4,10 +4,10 @@
 
 'use strict';
 import {ICompanyChargeParam, IStaffPoint2CoinParam, IStaffCostCoinParam} from "./_types";
-import {Models} from "../_types/index";
+import {Models} from "_types/index";
 import {requireParams, clientExport} from "../../common/api/helper";
-import {Staff, PointChange} from "../_types/staff";
-import {CoinAccount, CoinAccountChange} from "api/_types/coin";
+import {Staff, PointChange} from "_types/staff";
+import {CoinAccount, CoinAccountChange} from "_types/coin";
 import {FindResult} from "common/model/interface";
 import L from 'common/language';
 

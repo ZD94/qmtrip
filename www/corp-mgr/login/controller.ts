@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {signToken} from "api/_types/auth/auth-cert";
+import {signToken} from "_types/auth/auth-cert";
 const API = require("common/api");
 
 export async function IndexController($scope, $stateParams) {

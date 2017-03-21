@@ -4,7 +4,7 @@
  *  权限模块
  */
 "use strict";
-import { EAccountType, Models } from '../_types/index';
+import { EAccountType, Models } from '_types/index';
 
 import L from 'common/language';
 

@@ -1,5 +1,5 @@
-import { Department } from 'api/_types/department';
-import { Staff } from 'api/_types/staff/staff';
+import { Department } from '_types/department';
+import { Staff } from '_types/staff/staff';
 var msgbox = require('msgbox');
 
 
