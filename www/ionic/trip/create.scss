@@ -1,4 +1,5 @@
 $main-color: #28a7e1;
+@import "../scss/color.variable.scss";
 .trip-create{
   .list{
     margin-bottom: 10px;
@@ -16,11 +17,11 @@ $main-color: #28a7e1;
             border-left: none;
             text-align: right;
             .date-during{
-              color: #9b9b9b;
+              color: lighten($dark,39);
               font-size: 12px;
             }
             .spend-days{
-              color: #f39800;
+              color: $energized;
               font-size: 16px;
             }
           }
@@ -29,6 +30,9 @@ $main-color: #28a7e1;
     }
     .item{
       padding: 8px 10px;
+      p.ng-binding {
+        font-size: 16px;
+      }
       &.item-icon-right{
         .icon{
           font-size: 14px;
@@ -61,7 +65,7 @@ $main-color: #28a7e1;
       }
     }
     .item-btn{
-      font-size: 18px;
+      font-size: 16px;
       height: 60px;
       line-height: 60px;
       text-align: center;
@@ -86,6 +90,23 @@ $main-color: #28a7e1;
     .button{
       font-size: 14px;
       border-radius: 0;
+      width: 100px;
+      height: 50px;
+      &.button-stable {
+        color: #fff;
+        background-color: lighten($dark,64);
+        &.activated {
+          border-color: lighten($dark,64);
+        }
+      }
+      &.button-calm {
+        background-color: $calm;
+        color: #fff;
+        &.activated {
+          background-color: #1a89bc;
+          border-color: #1a89bc;
+        }
+      }
     }
   }
 }
