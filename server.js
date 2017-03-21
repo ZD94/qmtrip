@@ -52,8 +52,8 @@ server.http_port = config.port;
 if(config.socket_file){
     server.http_port = config.socket_file;
 }
-server.http_root = path.join(__dirname, 'www');
-server.http_favicon = path.join(server.http_root, 'favicon.ico');
+//server.http_root = path.join(__dirname, 'www');
+//server.http_favicon = path.join(server.http_root, 'favicon.ico');
 //server.on('init.http_handler', require('./app'));
 
 server.api_path = path.join(__dirname, 'api');
