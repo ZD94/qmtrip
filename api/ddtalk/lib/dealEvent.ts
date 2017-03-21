@@ -471,7 +471,7 @@ export async function synchroDDorganization() {
 setTimeout(async () => {
     // let result = await _getSuiteToken();
     // console.log(result);
-    await synchroDDorganization();
+    // await synchroDDorganization();
 //     deleteCompanyOrganization("658cd3a0-bde4-11e6-997b-a9af9a42d08a");
 //     tmpAuthCode();
 //
