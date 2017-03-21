@@ -2,11 +2,11 @@
     <ion-content class="has-header" padding="true">
         <div class="new-staff">
             <label class="item item-input">
-                <span class="input-label">姓名*</span>
+                <span class="input-label">姓名<span style="color: #D0011B;">*</span></span>
                 <input type="text" ng-model="staff.name" placeholder="请输入姓名">
             </label>
             <label class="item item-input">
-                <span class="input-label">手机号*</span>
+                <span class="input-label">手机号<span style="color: #D0011B;">*</span></span>
                 <input type="text" ng-model="staff.mobile" placeholder="请输入手机号" ng-readonly="staffId">
             </label>
             <label class="item item-input">
@@ -28,24 +28,24 @@
                 <!--</div>-->
             <!--</div>-->
             <div class="spacer" style="height: 10px;"></div>
-            <div class="item item-icon-right" ng-click="chooseRole()">
+            <div class="item item-icon-right item-top-radius" ng-click="chooseRole()">
                 角色
                 <span class="item-note">{{EStaffRoleNames[staff.roleId]}}</span>
-                <i class="icon ion-chevron-right"></i>
+                <i class="icon ion-ios-arrow-right"></i>
             </div>
             <div class="item item-icon-right" ng-click="choosePolicy()">
                 差旅标准
                 <span class="item-note">{{staffPolicyName}}</span>
-                <i class="icon ion-chevron-right"></i>
+                <i class="icon ion-ios-arrow-right"></i>
             </div>
             <div class="item">
                 部门
                 <span class="item-note">{{departmentNames}}</span>
             </div>
             <div class="item item-icon-left" ng-repeat="department in selectDepartments track by $index">
-                <i class="icon ion-ios-folder"></i>{{department.name}}
+                <i class="icon ion-ios-folder" style="width:10px;"></i>{{department.name}}
             </div>
-            <div class="item" ng-click="setDepartment()">
+            <div class="item item-bottom-radius" ng-click="setDepartment()">
                 <a>设置部门</a>
             </div>
             <a class="button button-block button-calm" ng-click="saveStaff()">保存</a>
