@@ -27,6 +27,9 @@
   "exclude": [
     "node_modules",
     "public",
+    "www",
+    "nglibs",
+    "common/client",
     "dist",
     "ionic",
     "tmp",
