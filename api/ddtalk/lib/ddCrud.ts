@@ -4,7 +4,7 @@
 *
 */
 
-import {Models} from "api/_types/index";
+import {Models} from "_types/index";
 import {md5} from "../../../common/utils";
 import {Staff} from "../../_types/staff/staff";
 import {DDTalkUser} from "../../_types/ddtalk";
