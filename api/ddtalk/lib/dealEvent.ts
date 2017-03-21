@@ -36,12 +36,7 @@ const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 const DEFAULT_PWD = '000000';
 
 let moment = require("moment");
-/* get after 30 days date */
-function getDate(){
-    let oneDay = 60 * 60 * 24 * 1000;
-    let now    = +new Date();
-    return moment(now + oneDay*30).format('YYYY-MM-DD');
-}
+
 
 
 export async function tmpAuthCode(msg) {
@@ -117,7 +112,7 @@ export async function tmpAuthCode(msg) {
     } else {
         // console.log("企业信息没有记录 , 创建企业");
         //创建企业
-        let company = Company.create({name: corp_name , expiryDate : getDate() });
+        let company = Company.create({name : corp_name , expiryDate : moment.add(1 , "months")});
         company = await company.save();
         console.log("company created");
 
