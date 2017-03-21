@@ -79,7 +79,7 @@ $color-blue: #28a7e1;
 
 //行程详情样式调整
 .trip-card{
-  border-radius: 0;
+  border-radius: 3px;
   padding-top: 0;
   .card-header{
     padding: 4px 16px;
@@ -87,7 +87,7 @@ $color-blue: #28a7e1;
     font-weight: normal;
     color: #9b9b9b;
     line-height: 22px;
-    background: #dadada;
+    background: $stable;
     &.special{
       background: #f5a623;
       color: #fff;
