@@ -1,7 +1,7 @@
 <ion-view title="员工管理">
     <ion-content class="has-header" padding="true">
         <div class="new-staff">
-            <label class="item item-input">
+            <label class="item item-input border-top-radius">
                 <span class="input-label">姓名<span style="color: #D0011B;">*</span></span>
                 <input type="text" ng-model="staff.name" placeholder="请输入姓名">
             </label>
@@ -13,7 +13,7 @@
                 <span class="input-label">邮箱</span>
                 <input type="text" ng-model="staff.email" placeholder="请输入邮箱" ng-readonly="staffId">
             </label>
-            <div class="item">
+            <div class="item border-bottom-radius">
                 性别
                 <div class="sex">
                     <new-radio ng-repeat="sex in sexes" ng-model="staff.sex" ng-check-options="sex"></new-radio>
@@ -27,7 +27,7 @@
                         <!--{{(staff.name || "暂无") | shortName }}</span>-->
                 <!--</div>-->
             <!--</div>-->
-            <div class="spacer" style="height: 10px;"></div>
+            <!--<div class="spacer" style="height: 10px;"></div>-->
             <div class="item item-icon-right item-top-radius" ng-click="chooseRole()">
                 角色
                 <span class="item-note">{{EStaffRoleNames[staff.roleId]}}</span>
