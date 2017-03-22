@@ -1,7 +1,7 @@
 import _ = require('lodash');
 var msgbox = require('msgbox');
 
-export async function selectFromListController($scope) {
+export async function selectFromListController($scope, $element) {
     require('./list.scss');
     if(typeof $scope.options.searchbox === 'undefined'){
         $scope.options.searchbox = true;
@@ -18,11 +18,19 @@ export async function selectFromListController($scope) {
         return false;
     }
 
-    $scope.showCreate = function(){
+    $scope.showCreate = function(keyword){
         if($scope.options.create == undefined)
             return false;
         if(!form.keyword || form.keyword.length == 0)
             return false;
+
+        let item_elements = $element.find('list-item');
+        let found = false;
+        item_elements.each(function(){
+            if($(this).text() == form.keyword)
+                found = true;
+        })
+        return !found;
     }
 
     $scope.createItem = async function(keyword){
