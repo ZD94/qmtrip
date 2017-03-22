@@ -61,38 +61,32 @@ export default class SupplierCtripCT extends SupplierWebRobot{
     }
 
     async getTrainTicketReserveLink(options):Promise<ReserveLink> {
-        let trafficBookLink = "http://m.ctrip.com/webapp/train/home/list";
+        let trafficBookLink = "http://m.ctrip.com/webapp/train/v2/index#!/list";
         let param = {
             "value":
             {
-                "privateCustomType":null,
-                "aStation":"",
-                "dStation":"",
-                "dDate":0,
-                "setField":"aStation",
-                "dStationCityName":"",
-                "dStationCityId":1,
-                "aStationCityName":"",
-                "aStationCityId":1,
-                "isFirstToListPage":true
+                "from": {
+                    "name": "",
+                    "cityName": ""
+                },
+                "to": {
+                    "name": "",
+                    "cityName": ""
+                },
+                "date": "",
+                "isGaotie": false
             },
             "timeout":"",
-            "tag":null,
-            "savedate":"",
-            "oldvalue":{}
-        }
-        param.value.aStation = param.value.aStationCityName = options.toCity;
-        param.value.dStation = param.value.dStationCityName = options.fromCity;
-        param.value.dDate = options.leaveDate.getTime();
-        let aStationCityId = await this.queryHotelCityCode(options.toCity);
-        let dStationCityId = await this.queryHotelCityCode(options.fromCity);
-        param.value.dStationCityId = parseInt(dStationCityId);
-        param.value.aStationCityId = parseInt(aStationCityId);
+            "savedate":""
+        };
+        param.value.to.name = param.value.to.cityName = options.toCity;
+        param.value.from.name = param.value.from.cityName = options.fromCity;
+        param.value.date = options.leaveDate.getTime();
         param.savedate = moment().format("YYYY/MM/DD HH:mm:ss");
-        param.timeout = moment().add(1, 'years').format("YYYY/MM/DD HH:mm:ss")
+        param.timeout = moment().add(1, 'month').format("YYYY/MM/DD HH:mm:ss");
 
         var param_str = JSON.stringify(param);
-        var linkJS = "localStorage.setItem('TRAIN_SEARCH_PARAM', \'"+param_str+"\');console.log('train_search_param');";
+        var linkJS = "localStorage.setItem('TRAIN_SEARCH_STORE_LIGHT', \'"+param_str+"\');console.log('train_search_param');";
         return {url:trafficBookLink, jsCode: linkJS};
     }
 
