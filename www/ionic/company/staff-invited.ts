@@ -4,7 +4,6 @@ import _ = require('lodash');
 import { InvitedLink } from '_types/staff/invited-link';
 var browserspec = require('browserspec');
 var printf = require('printf');
-import * as path from 'path';
 
 declare var wx:any;
 declare var ionic:any;
@@ -72,7 +71,8 @@ export async function StaffInvitedController($scope, Models, $ionicHistory, $ion
     $scope.is_wechat = browserspec.is_wechat;
     $scope.isCordova = window.cordova;
     var config = require('config');
-    let shareImgUrl = path.join(config.update,'ionic/images/logo-whiteback.png');
+    let url = new URL(config.update,'ionic/images/logo-whiteback.png');
+    let shareImgUrl = url.href;
     $scope.sendWx = async function(){
         if(browserspec.is_wechat){
             var show = $ionicPopup.show({

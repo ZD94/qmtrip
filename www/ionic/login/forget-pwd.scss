@@ -1,5 +1,8 @@
 .forget-send-code{
   .list{
+    .platform-ios{
+      height:10px;
+    }
     .item{
       &:last-child{
         padding-top: 0;

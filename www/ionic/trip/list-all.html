@@ -5,7 +5,6 @@
 
             </spanchange>
             <ion-scroll style="padding: 10px;">
-                <div class="spacer" style="width: 300px; height: 10px;"></div>
 
                 <form class="list">
                     <label class="item item-input">
@@ -14,7 +13,7 @@
                     </label>
                 </form>
                 <trip-plan ng-repeat="trip in tripPlans track by $index"
-                           show-header="true" data="trip" show-detail-status="true" click="enterDetail" status="{{trip.status}}" style="margin: 0 0 20px;"></trip-plan>
+                           show-header="true" data="trip" show-detail-status="true" click="enterDetail" status="{{trip.status}}" style="margin: 0 0 10px;"></trip-plan>
                 <div id="page13-markdown3">
                     <div ng-if="!vm.isHasNextPage" class="getMoreOrNoMore">没有更多记录了</div>
                 </div>
