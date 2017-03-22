@@ -167,10 +167,12 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
             template: require('./set-department.html'),
             controller: setDepartmentController
         })
-        if(result.destroy){
-            initDepartment();
-        }else{
-            initDepartment(departmentId);
+        if(result){
+            if(result.destroy){
+                initDepartment();
+            }else{
+                initDepartment(departmentId);
+            }
         }
     }
     $scope.multipleMove = async function(){
