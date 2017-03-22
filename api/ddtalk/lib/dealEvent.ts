@@ -112,7 +112,7 @@ export async function tmpAuthCode(msg) {
     } else {
         // console.log("企业信息没有记录 , 创建企业");
         //创建企业
-        let company = Company.create({name : corp_name , expiryDate : moment.add(1 , "months")});
+        let company = Company.create({name : corp_name , expiryDate : moment.add(1 , "months").toDate()});
         company = await company.save();
         console.log("company created");
 
