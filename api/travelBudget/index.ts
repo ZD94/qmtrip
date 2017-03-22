@@ -18,7 +18,7 @@ import {ITicket, TRAFFIC, TravelBudgeTraffic, TravelBudgetHotel} from "_types/tr
 import {
     TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
 } from "./strategy/index";
-import {DEFAULT_PREFER_CONFIG_TYPE, loadDefaultPrefer} from "./prefer";
+import {DEFAULT_PREFER_CONFIG_TYPE, loadPrefers} from "./prefer";
 
 
 export interface BudgetOptions{
@@ -360,11 +360,10 @@ export default class ApiTravelBudget {
             hotelName: hotelName
         }
         let budgetConfig = staff.company.budgetConfig;
-        let defaults = loadDefaultPrefer({local: query}, DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_HOTEL);
-        if (budgetConfig && budgetConfig.hotel) {
-            let compiled = _.template(JSON.stringify(budgetConfig.hotel));
-            defaults = mergePrefers(defaults, JSON.parse(compiled({local: query})));
+        if (!budgetConfig) {
+            budgetConfig = {};
         }
+        let defaults = loadPrefers(budgetConfig.hotel, {local: query}, DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_HOTEL);
         qs.prefers = defaults;
         qs.query = query;
         let hotels = await API.hotel.search_hotels(query);
@@ -504,22 +503,10 @@ export default class ApiTravelBudget {
         params['expectFlightCabins'] = cabins;
         let defaults: any[] = [];
         if (isAbroad) {   //国际
-            defaults = loadDefaultPrefer({local: params}, DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_TICKET);
-            let corpAbroadTrafficPrefer = {}
-            if (preferConfig && preferConfig.abroadTraffic) {
-                corpAbroadTrafficPrefer = preferConfig.abroadTraffic
-            }
-            let compiled = _.template(JSON.stringify(corpAbroadTrafficPrefer), { 'imports': { 'moment': moment } });
-            defaults = mergePrefers(defaults, JSON.parse(compiled({local: params})));
+            defaults = loadPrefers(preferConfig.abroadTraffic, {local: params}, DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_TICKET);
             qs.prefers = defaults;
         } else {            //国内
-            defaults = loadDefaultPrefer({local: params}, DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_TICKET);
-            let corpHomeTrafficPrefer = {};
-            if (preferConfig && preferConfig.traffic) {
-                corpHomeTrafficPrefer = preferConfig.traffic;
-            }
-            let compiled = _.template(JSON.stringify(corpHomeTrafficPrefer), { 'imports': { 'moment': moment } });
-            defaults = mergePrefers(defaults, JSON.parse(compiled({local: params})));
+            defaults = loadPrefers(preferConfig.traffic, {local: params}, DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_TICKET);
             qs.prefers = defaults;
         }
 
@@ -617,54 +604,4 @@ export default class ApiTravelBudget {
                 .catch(next)
         })
     }
-}
-
-
-
-function mergePrefers(defaults, news) {
-    for(let i=0, ii =news.length; i<ii; i++) {
-        let v = news[i];
-        defaults.push(v);
-    }
-    return defaults;
-}
-
-function getTimezoneStr(seconds) {
-    const HOUR = 60 * 60
-    const MINUTE = 60;
-    let hours = seconds / HOUR
-    if (hours < 0) {
-        hours = Math.ceil(hours);
-    } else {
-        hours = Math.floor(hours);
-    }
-    let minute = (seconds - hours * HOUR) / MINUTE;
-    if (minute < 0) {
-        minute = Math.ceil(minute)
-    } else {
-        minute = Math.floor(minute)
-    }
-    let ret = 'GMT';
-    if (hours < 0) {
-        ret += '-'
-        if (hours > -10) {
-            ret += '0'
-        }
-        hours = -hours;
-        ret += hours;
-    } else {
-        ret += '+';
-        if (hours < 10) {
-            ret += '0'
-        }
-        ret += hours;
-    }
-    if (minute < 0) {
-        minute = -minute;
-    }
-    if (minute < 10) {
-        ret += '0'
-    }
-    ret += minute;
-    return " "+ret;
 }
