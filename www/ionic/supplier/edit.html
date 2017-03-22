@@ -14,7 +14,7 @@
                             </div>
                             <span class="self-name">{{ah.name}}</span>
                         </div>
-                        <label class="toggle pull-right" ng-click="saveSupplierStatus(ah)">
+                        <label class="toggle pull-right toggle-positive" ng-click="saveSupplierStatus(ah)">
                             <input type="checkbox" ng-checked="ah.isInUse" ng-model="ah.isInUse">
                             <div class="track">
                                 <div class="handle"></div>
@@ -37,7 +37,7 @@
                                 <img class="avatar-img" ng-src="{{getImageUrl(c.logo)}}" ng-if="c.logo">
                             </div>
                         </div>
-                        <label class="toggle pull-right" ng-click="savePublicSupplierStatus(c)">
+                        <label class="toggle pull-right toggle-positive" ng-click="savePublicSupplierStatus(c)">
                             <input type="checkbox" ng-model="c.isPointed" ng-checked="c.isPointed">
                             <div class="track">
                                 <div class="handle"></div>
@@ -57,7 +57,7 @@
                                 <img class="avatar-img" ng-src="{{getImageUrl(n.logo)}}" ng-if="n.logo">
                             </div>
                         </div>
-                        <label class="toggle pull-right" ng-click="savePublicSupplierStatus(n)">
+                        <label class="toggle pull-right toggle-positive" ng-click="savePublicSupplierStatus(n)">
                             <input type="checkbox" ng-model="n.isPointed" ng-checked="n.isPointed">
                             <div class="track">
                                 <div class="handle"></div>
