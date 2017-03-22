@@ -31,7 +31,7 @@
                     <span ng-if="options.transclude" ng-bind-transclude="options.transclude" inject="{$item}"></span>
                     <span ng-if="options.item" ng-bind-template-template="options.item" inject="{$item}"></span>
                 </ion-item>
-                <ion-item class="new-item" ng-click="createItem(form.keyword)" ng-if="showCreate()">
+                <ion-item class="new-item" ng-click="createItem(form.keyword)" ng-if="showCreate(form.keyword)">
                     新建【{{form.keyword}}】
                 </ion-item>
             </ion-list>
