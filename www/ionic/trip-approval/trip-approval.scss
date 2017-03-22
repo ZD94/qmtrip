@@ -314,3 +314,11 @@
       }
     }
 }
+ion-content {
+  .flex-c01 {
+    > ion-scroll {
+      padding: 0;
+      padding-top: 10px;
+    }
+  }
+}

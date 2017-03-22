@@ -251,6 +251,7 @@ ngapp.root('ionic', '/staff/index');
 ngapp.useRoutePolicy(ngapp.RoutePolicy.None);
 ngapp.routeAddSingle('login');
 ngapp.routeAddSingle('guide');
+ngapp.routeAddSingle('company-expired');
 ngapp.routeAddSingle('finance');
 ngapp.routePushEmbed('');
 ngapp.routePopEmbed();

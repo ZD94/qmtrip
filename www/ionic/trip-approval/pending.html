@@ -1,32 +1,35 @@
 <ion-view title="审批单列表" id="page12">
-    <ion-content padding="true" class="has-header">
-        <div class="button-bar jl_approvelist" ng-stat-event="查看审批进度,tab切换,审批进度">
-            <a ng-click="changeTo('ALL')" class="button button-small" ng-class="filter == 'ALL' ? 'active': ''">全部</a>
-            <a ng-click="changeTo('WAIT_APPROVE')" class="button button-small" ng-class="filter == 'WAIT_APPROVE' ? 'active': ''">待审批</a>
-            <a ng-click="changeTo('REJECT')" class="button button-small" ng-class="filter == 'REJECT' ? 'active': ''">已驳回</a>
-            <a ng-click="changeTo('PASS')" class="button button-small" ng-class="filter == 'PASS' ? 'active': ''">已通过</a>
-        </div>
-
-        <!--<div class="list card" ng-repeat="approve in tripApproves track by $index" ng-click="enterDetail(approve.id)">-->
+    <ion-content padding="true" class="has-header" scroll="false">
+        <div class="flex-c01">
+            <div class="button-bar jl_approvelist" ng-stat-event="查看审批进度,tab切换,审批进度">
+                <a ng-click="changeTo('ALL')" class="button button-small" ng-class="filter == 'ALL' ? 'active': ''">全部</a>
+                <a ng-click="changeTo('WAIT_APPROVE')" class="button button-small" ng-class="filter == 'WAIT_APPROVE' ? 'active': ''">待审批</a>
+                <a ng-click="changeTo('REJECT')" class="button button-small" ng-class="filter == 'REJECT' ? 'active': ''">已驳回</a>
+                <a ng-click="changeTo('PASS')" class="button button-small" ng-class="filter == 'PASS' ? 'active': ''">已通过</a>
+            </div>
+            <!--<div class="list card" ng-repeat="approve in tripApproves track by $index" ng-click="enterDetail(approve.id)">-->
             <!--<div class="item item-divider">{{approve.startAt | date: 'yyyy-MM-dd'}} 至 {{approve.backAt | date: 'yyyy-MM-dd'}}</div>-->
             <!--<div class="item item-body">-->
-                <!--<ion-list>-->
-                    <!--<ion-item><i class="icon ion-plane"></i> &nbsp;&nbsp;{{approve.deptCity}} 到 {{approve.arrivalCity}}-->
-                        <!--<br><i class="icon ion-briefcase"></i>&nbsp;&nbsp;出差事由：{{approve.title}}-->
-                    <!--</ion-item>-->
-                <!--</ion-list>-->
+            <!--<ion-list>-->
+            <!--<ion-item><i class="icon ion-plane"></i> &nbsp;&nbsp;{{approve.deptCity}} 到 {{approve.arrivalCity}}-->
+            <!--<br><i class="icon ion-briefcase"></i>&nbsp;&nbsp;出差事由：{{approve.title}}-->
+            <!--</ion-item>-->
+            <!--</ion-list>-->
             <!--</div>-->
             <!--<div class="item item-divider">-->
-                <!--<span ng-if="approve.status == EApproveStatus.CANCEL">已撤销</span>-->
-                <!--<span ng-if="approve.status == EApproveStatus.WAIT_APPROVE">待审批</span>-->
-                <!--<span ng-if="approve.status == EApproveStatus.REJECT">审批驳回</span>-->
-                <!--<span ng-if="approve.status == EApproveStatus.PASS">审批通过</span>-->
-                <!--<span class="spanRight">{{approve.budget | currency: ''}}元</span>-->
+            <!--<span ng-if="approve.status == EApproveStatus.CANCEL">已撤销</span>-->
+            <!--<span ng-if="approve.status == EApproveStatus.WAIT_APPROVE">待审批</span>-->
+            <!--<span ng-if="approve.status == EApproveStatus.REJECT">审批驳回</span>-->
+            <!--<span ng-if="approve.status == EApproveStatus.PASS">审批通过</span>-->
+            <!--<span class="spanRight">{{approve.budget | currency: ''}}元</span>-->
             <!--</div>-->
-        <!--</div>-->
-        <trip-approve ng-repeat="approve in tripApproves track by $index" show-detail-status="true" show-header="false" data="approve" click="enterDetail"></trip-approve>
-        <div ng-if="More.hasNextPage()" class="getMoreOrNoMore"><i class="icon ion-arrow-up-a"></i>&nbsp;上拉加载更多</div>
-        <div ng-if="!More.hasNextPage()" class="getMoreOrNoMore">没有更多记录了</div>
-        <ion-infinite-scroll on-infinite="More.loadMore()" distance="1%" ng-if="More.hasNextPage()"></ion-infinite-scroll>
+            <!--</div>-->
+            <ion-scroll>
+                <trip-approve ng-repeat="approve in tripApproves track by $index" show-detail-status="true" show-header="false" data="approve" click="enterDetail"></trip-approve>
+                <div ng-if="More.hasNextPage()" class="getMoreOrNoMore"><i class="icon ion-arrow-up-a"></i>&nbsp;上拉加载更多</div>
+                <div ng-if="!More.hasNextPage()" class="getMoreOrNoMore">没有更多记录了</div>
+                <ion-infinite-scroll on-infinite="More.loadMore()" distance="1%" ng-if="More.hasNextPage()"></ion-infinite-scroll>
+            </ion-scroll>
+        </div>
     </ion-content>
 </ion-view>
