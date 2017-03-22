@@ -1,8 +1,8 @@
 /**
  * Created by chen on 2017/2/23.
  */
-import {Staff, EStaffRole} from 'api/_types/staff/staff';
-import {ECompanyType} from "api/_types/company/company";
+import {Staff, EStaffRole} from '_types/staff/staff';
+import {ECompanyType} from "_types/company/company";
 
 export async function ServicePayController($scope, Models){
     require('../company-pay/service-pay.scss');
