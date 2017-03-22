@@ -5,9 +5,9 @@
 */
 
 import {Models} from "_types/index";
-import {md5} from "../../../common/utils";
-import {Staff} from "../../_types/staff/staff";
-import {DDTalkUser} from "../../_types/ddtalk";
+import {md5} from "common/utils";
+import {Staff} from "_types/staff/staff";
+import {DDTalkUser} from "_types/ddtalk";
 
 let Logger = require('common/logger');
 var logger = new Logger('main');
@@ -31,7 +31,6 @@ export class ddCrud {
             where : { corpId : self.corpId }
         });
         if(ddtalkCorp && ddtalkCorp[0]){
-            console.log(22222 , ddtalkCorp[0]["companyId"]);
             let company = await Models.company.get(ddtalkCorp[0]["companyId"]);
             if(company){
                 return self.company = company;
@@ -58,7 +57,7 @@ export class ddCrud {
         let company      = await this.getCompany();
 
         let ddtalkUser = await Models.ddtalkUser.find({
-            where : { ddUserId : ddUserInfo.userid , corpId : this.corpId }
+            where : { ddUserId : ddUserInfo.userid , corpid : this.corpId }
         });
         if(ddtalkUser && ddtalkUser.length){
             //更新员工基本信息
@@ -69,7 +68,7 @@ export class ddCrud {
             staff.mobile = ddUserInfo.mobile;
             staff.avatar = ddUserInfo.avatar;
 
-            console.log("staff 中更新员工" , staff.id);
+            // console.log("staff 中更新员工" , staff.id);
             return await staff.save();
         }else{
             //创建这个员工
@@ -82,7 +81,7 @@ export class ddCrud {
             _staff.avatar = ddUserInfo.avatar;
             _staff = await _staff.save();
 
-            console.log("staff 中新加入员工" , _staff.id);
+            // console.log("staff 中新加入员工" , _staff.id);
             return _staff;
         }
     }
@@ -90,7 +89,7 @@ export class ddCrud {
     //ddtalkUser 中新加入员工 或者是更新
     async createDDuser( staff , ddUserInfo ) : Promise<DDTalkUser>{
         let ddtalkUsers = await Models.ddtalkUser.find({
-            where : { ddUserId : ddUserInfo.userid }
+            where : { ddUserId : ddUserInfo.userid , corpid : this.corpId }
         });
         let dd_info = JSON.stringify( ddUserInfo );
         let ddtalkUser;
@@ -110,11 +109,11 @@ export class ddCrud {
                 isAdmin: ddUserInfo.isAdmin,
                 name: ddUserInfo.name,
                 ddUserId: ddUserInfo.userid,
-                corpId: this.corpId,
+                corpid: this.corpId,
                 ddInfo: dd_info
             });
             ddtalkUser = await ddtalkUser.save();
-            console.log("ddtalkUser 中新加入员工" , ddtalkUser.id);
+            // console.log("ddtalkUser 中新加入员工" , ddtalkUser.id);
         }
 
         return ddtalkUser;
@@ -123,7 +122,7 @@ export class ddCrud {
     //ddtalkUser delete
     async deleteDDuser( dd_user_id ){
         let ddtalkUser = await Models.ddtalkUser.find({
-            where : { ddUserId:dd_user_id , corpId : this.corpId }
+            where : { ddUserId:dd_user_id , corpid : this.corpId }
         });
 
         let staff_id;
@@ -142,7 +141,7 @@ export class ddCrud {
 
         for(let item of dd_departs){
             let ddDeparts = await Models.ddtalkDepartment.find({
-                where : { corpId : self.corpId , DdDepartmentId : item.toString() }
+                where : { corpId : self.corpId , DdDepartmentId : item }
             });
 
             if(ddDeparts && ddDeparts.length){
@@ -158,7 +157,6 @@ export class ddCrud {
 
                 if(staffDeparts && staffDeparts[0]){
                     //already have.
-                    console.log("部门关系 already have");
                 }else{
                     let staffDepart = Models.staffDepartment.create({
                         staffId : staff.id,
@@ -210,41 +208,60 @@ export class ddCrud {
 
 
     /*
-    *   钉钉添加一个部门
+    *   钉钉添加一个部门 , 更新部门信息
     *   添加、更新
     */
-    async createDepartment ( ddDepartInfo ){
+    async createDepartment ( ddDepartInfo , notAddParentid ){
+        // console.log("enter create department" , ddDepartInfo);
+
         let ddDeparts = await Models.ddtalkDepartment.find({
             where : { corpId : this.corpId , DdDepartmentId : ddDepartInfo.id }
         });
         let company = await this.getCompany();
         let parentid;
-        if(ddDepartInfo.parentId){
-            if(ddDepartInfo.parentId == 1){
-                //from root department
-                parentid = await company.getRootDepartment();
-                parentid = parentid.id;
-            }else{
+        let localDepart;
 
-            }
-        }else{
+        if(notAddParentid){
             parentid = null;
+        }else{
+            parentid = await this.getParentId( ddDepartInfo.parentid );
         }
-
 
         if(ddDeparts && ddDeparts.length){
             //update
+            localDepart = await Models.department.get( ddDeparts[0].localDepartmentId );
+            localDepart.name = ddDepartInfo.name;
+            localDepart.parentId = parentid;
+            if(parentid == null){
+                localDepart.isDefault = true;
+            }else{
+                localDepart.isDefault = false;
+            }
 
+            localDepart = await localDepart.save();
         }else{
             //add
-            if(ddDepartInfo.parentId){
-
+            let localNewDepartment = {"name": ddDepartInfo.name, "companyId": company.id, "parentId": parentid};
+            if(parentid == null){
+                localNewDepartment.isDefault = true;
             }else{
-                //根部门
-                parentid = null;
+                localNewDepartment.isDefault = false;
             }
-            let localNewDepartment = {"name": ddDepartInfo.name, "companyId": company.id, "parentId": null};
+            localDepart = Models.department.create( localNewDepartment );
+            localDepart = await localDepart.save();
+
+            let ddDepart = Models.ddtalkDepartment.create({
+                corpId : this.corpId ,
+                DdDepartmentId : ddDepartInfo.id ,
+                localDepartmentId : localDepart.id ,
+                ddName : ddDepartInfo.name
+            });
+            await ddDepart.save();
         }
+
+        // console.log("enter create department  over");
+
+        return localDepart;
     }
 
 
@@ -259,16 +276,46 @@ export class ddCrud {
         let company = await this.getCompany();
         if(dd_parentId == 1){
             let depart = await company.getRootDepartment();
-            return depart;
+            return depart.id;
         }
 
         let localDeparts = await Models.ddtalkDepartment.find({
-            where : { corpId : this.corpId , localDepartmentId : dd_parentId }
+            where : { corpId : this.corpId , DdDepartmentId : dd_parentId }
         });
         if(localDeparts && localDeparts.length){
-            return localDeparts[0];
+            return localDeparts[0].localDepartmentId;
         }else{
-            return undefined;
+            logger.warn("这个dd_parentId , 本地没有对应部门 , 挂载到根部门");
+            let depart = await company.getRootDepartment();
+            return depart.id;
+        }
+    }
+
+
+    /*
+    *    企业在钉钉上删除了一个部门
+    */
+    async ddDeleteDepart( dd_depart_id ){
+        //delete dd department
+        let ddtalkDepartments = await Models.ddtalkDepartment.find({
+            where : { DdDepartmentId : dd_depart_id , corpId : this.corpId }
+        });
+
+        let localDepartId;
+        if(ddtalkDepartments && ddtalkDepartments.length){
+            localDepartId = ddtalkDepartments[0].localDepartmentId;
+            await ddtalkDepartments[0].destroy();
+        }else{
+            return;
+        }
+
+        //delete staff_department
+        await this.deleteStaffDepartment( "department" , localDepartId );
+
+        //delete local department
+        let localDepart = await Models.department.get(localDepartId);
+        if(localDepart){
+            await localDepart.destroy();
         }
     }
 }

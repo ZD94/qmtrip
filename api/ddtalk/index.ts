@@ -8,15 +8,9 @@ const API = require('common/api');
 let dingSuiteCallback = require("dingtalk_suite_callback");
 import fs = require("fs");
 import cache from "common/cache";
+const C = require("config");
 
-const config ={
-    token: 'jingli2016',
-    encodingAESKey: '8nf2df6n0hiifsgg521mmjl6euyxoy3y6d9d3mt1laq',
-    suiteid: 'suitezutlhpvgyvgakcdo',
-    secret: 'pV--T2FZj-3QCjJzcQd5OnzDBAe6rRKRQGEmc8iVCvdtc2FUOS5icq1gVfkbqiTx',
-    appid: '2156',
-}
-
+const config = C.ddconfig;
 import request = require('request');
 import ISVApi from "./lib/isvApi";
 import {Models} from "_types/index";
@@ -80,7 +74,7 @@ let ddTalkMsgHandle = {
     },
     /* * *  通讯录企业部门修改 * * */
     org_dept_modify : async function(msg){
-        DealEvent.orgDeptModify(msg);
+        DealEvent.orgDeptCreate(msg);
     },
     /* * *  通讯录企业部门删除 * * */
     org_dept_remove : async function(msg){
@@ -99,7 +93,7 @@ class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
         app.post("/ddtalk/isv/receive", dingSuiteCallback(config, function (msg, req, res, next) {
-            console.info(msg);
+            // console.info("from DD : " , msg);
             if(!ddTalkMsgHandle[msg.EventType]){
                 return res.reply();
             }
