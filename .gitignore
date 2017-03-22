@@ -33,5 +33,7 @@ ts-node/*
 ts-node/
 wyl_test/
 mytest/
+_types/
+JLTypes/
 
 
