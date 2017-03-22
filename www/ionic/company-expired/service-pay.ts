@@ -4,7 +4,7 @@
 import {Staff, EStaffRole} from 'api/_types/staff/staff';
 import {ECompanyType} from "api/_types/company/company";
 
-export async function ServicePayController($scope){
+export async function ServicePayController($scope, Models){
     require('../company-pay/service-pay.scss');
     var staff = await Staff.getCurrent();
     $scope.staff = staff;
