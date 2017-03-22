@@ -1,9 +1,11 @@
+@import "../scss/color.variable.scss";
 .get_coins{
-  background: #f8f8f8;
   .coins_head{
+    border-radius: 3px;
+    margin: 10px;
     background: #28a7e1;
-    height: 64px;
-    line-height: 64px;
+    height: 60px;
+    line-height: 60px;
     font-size: 14px;
     color: #fff;
     padding: 0 20px;
@@ -17,18 +19,23 @@
     padding: 10px 25px;
     border-radius: 5px;
     background: #fff;
-    box-shadow: 0 0 3px 1px #adadad;
+    border:1px solid lighten($dark,71%);
+    .coins_text{
+      font-size: 14px;
+      color: $dark;
+    }
     .coins_item{
       height: 50px;
       line-height: 50px;
       color: #9b9b9b;
-      border-bottom: 2px solid #dcdcdc;
+      border-bottom: 1px solid lighten($dark,71%);
       span{
         float: right;
-        color: #4a4a4a;
+        color: $dark;
+        font-size: 16px;
       }
       .enough{
-        color: #7ed321;
+        color: $balanced;
       }
       .not-enough{
         color: #ff0000;
@@ -43,12 +50,12 @@
           width: 160px;
           height: 36px;
           line-height: 36px;
-          border: 1px solid #9b9b9b;
+          border: 1px solid lighten($dark,71%);
           display: inline-block;
           font-size: 14px;
           vertical-align: 1px;
           padding-left: 10px;
-          border-right: 0;
+          border-radius:3px;
         }
         .convert_all{
           display: inline-block;
@@ -57,8 +64,7 @@
           width: 70px;
           font-size: 14px;
           vertical-align: 0px;
-          color: #28a7e1;
-          border: 1px solid #28a7e1;
+          color: $calm;
         }
       }
       .convert_now{
@@ -70,7 +76,8 @@
         color: #fff;
         font-size: 14px;
         text-align: center;
-        background: #28a7e1;
+        background: $calm;
+        border-radius: 3px;
       }
     }
   }

@@ -12,7 +12,7 @@ import {TripDetail, TripDetailInvoice} from "./tripDetail";
 import {PaginateInterface} from "common/model/interface";
 import {ReserveLink} from 'libs/suppliers/interface';
 import {ETrainLevel, EPlaneLevel} from "../travelPolicy";
-
+declare var API: any;
 
 @TableExtends(TripDetail, 'tripDetailInfo', 'type', [ETripType.OUT_TRIP, ETripType.BACK_TRIP])
 @Table(Models.tripDetailTraffic, "tripPlan.")
@@ -25,15 +25,20 @@ export class TripDetailTraffic extends ModelObject implements TripDetail {
     get id() : string {return Values.UUIDV1()}
     set id(id: string) {}
 
-    //出发时间
+    //出发时间(发车或起飞时间)
     @Field({type: Types.DATE})
     get deptDateTime() :Date {return null;}
     set deptDateTime(d: Date) {}
 
-    //最晚到达时间
+    //最晚到达时间（到达时间）
     @Field({type: Types.DATE})
     get arrivalDateTime() :Date { return null;}
     set arrivalDateTime(d: Date) {}
+
+    //预算出发时间
+    @Field({type: Types.DATE})
+    get leaveDate() :Date { return null;}
+    set leaveDate(d: Date) {}
 
     @Field({type: Types.INTEGER})
     get cabin() :ETrainLevel|EPlaneLevel {return null}
@@ -111,6 +116,10 @@ export class TripDetailHotel extends ModelObject implements TripDetail {
     @Field({type: Types.STRING(20)})    //住宿城市
     get city(): string { return null}
     set city(city: string) {}
+
+    @Field({type: Types.STRING(50)})    //酒店名称
+    get name(): string { return null}
+    set name(name: string) {}
 
     @Field({type: Types.STRING(50)})    //住宿地点
     get placeName(): string { return null}

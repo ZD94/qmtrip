@@ -1,7 +1,8 @@
 import { Staff } from 'api/_types/staff/staff';
-import {EApproveChannel} from "../../../api/_types/approve/types";
+import _ = require('lodash');
+import {EApproveChannel} from "api/_types/approve/types";
 var msgbox = require('msgbox');
-
+import {ISegment, ICreateBudgetAndApproveParams} from "api/_types/tripPlan";
 export async function SpecialApproveController($scope, $storage, Models, $stateParams, $ionicLoading, City, $ionicPopup){
     require('./trip.scss');
     require('./budget.scss');
@@ -9,37 +10,71 @@ export async function SpecialApproveController($scope, $storage, Models, $stateP
     API.require("travelBudget");
     await API.onload();
 
-    var query = JSON.parse($stateParams.params);
+    var query: ICreateBudgetAndApproveParams = JSON.parse($stateParams.params);
+    let destinationPlacesInfo = query.destinationPlacesInfo;
     let trip = $storage.local.get("trip");
-    trip.beginDate = query.leaveDate;
-    trip.endDate  = query.goBackDate;
+    if(destinationPlacesInfo && _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
+        for(let i = 0; i < destinationPlacesInfo.length; i++){
+            let segment: ISegment = destinationPlacesInfo[i];
+            //处理startAt,backAt
+            if(i == 0){
+                trip.beginDate = segment.leaveDate;
+            }
+            if(i == (destinationPlacesInfo.length - 1)){
+                trip.endDate = segment.goBackDate;
+            }
+            //处理目的地
+            if(i == (destinationPlacesInfo.length - 1) && segment.destinationPlace){
+                let placeCode = segment.destinationPlace;
+                if (typeof placeCode != 'string') {
+                    placeCode = placeCode['id'];
+                }
+                let arrivalInfo = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
+                trip.destinationPlaceName = arrivalInfo.name;
+            }
+        }
+    }
+    trip.beginDate = trip.beginDate || query['leaveDate'];
+    trip.endDate  = trip.endDate || query['goBackDate'];
     // trip.createAt = new Date(result.createAt);
-
+    if(query.auditUser){
+        trip['auditUser'] = await Models.staff.get(query.auditUser);
+    }
     if(query.originPlace) {
-        let originPlace = await City.getCity(query.originPlace.id || query.originPlace);
+        let placeCode = query.originPlace
+        if (typeof placeCode != 'string') {
+            placeCode = placeCode['id']
+        }
+        let originPlace = await City.getCity(placeCode);
         trip.originPlaceName = originPlace.name;
     }
-    let destination = await City.getCity(query.destinationPlace.id || query.destinationPlace);
-    trip.destinationPlaceName = destination.name;
     $scope.trip = trip;
     let totalPrice: number = 0;
 
     $scope.totalPrice = totalPrice;
     //下方的提交按钮，当选择完审批人之后变颜色
     $scope.bottomBottomClicked = false;
-    $scope.$watch('trip.auditUser',function(n, o){
-        if(n!= o){
+    // $scope.$watch('trip.auditUser',function(n, o){
+    //     if(n!= o){
+    //         $scope.bottomBottomClicked = true;
+    //     }
+    // })
+    //当审批说明和审批金额不为空时，下方按钮变颜色
+    $scope.$watchGroup(["trip.specialApproveRemark","trip.budget"],function(n, o){
+        if(n[0]&&n[1]){
             $scope.bottomBottomClicked = true;
+        }else{
+            $scope.bottomBottomClicked = false;
         }
     })
+
 
     $scope.staffSelector = {
         query: async function(keyword) {
             let staff = await Staff.getCurrent();
             let staffs = await staff.company.getStaffs({where: {name: {$ilike: `%${keyword}%`}}})
             return staffs;
-        },
-        display: (staff)=>staff.name
+        }
     };
 
     $scope.saveSpecialTripPlan = async function() {

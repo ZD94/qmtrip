@@ -50,6 +50,7 @@ class TravelPolicyModule{
                 }))
             }
         }
+        travelp.company = await Models.company.get(params.companyId);
         return travelp.save();
     }
 

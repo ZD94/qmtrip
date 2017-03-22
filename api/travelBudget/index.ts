@@ -13,7 +13,8 @@ const moment = require('moment');
 const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
-import {ITicket, TravelBudgeItem, TRAFFIC} from "api/_types/travelbudget";
+import {ITicket, TRAFFIC, TravelBudgeTraffic, TravelBudgetHotel} from "api/_types/travelbudget";
+
 import {
     TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
 } from "./strategy/index";
@@ -22,21 +23,27 @@ import {DEFAULT_PREFER_CONFIG_TYPE, loadDefaultPrefer} from "./prefer";
 
 export interface BudgetOptions{
     originPlace: string,
+    staffId?: string,
+    isRoundTrip?: boolean,
+    destinationPlacesInfo: BudgetOptionsItem[]
+}
+
+export interface BudgetOptionsItem{
     destinationPlace: string,
     isNeedHotel: boolean,
-    leaveDate: Date,
-    isRoundTrip: boolean,
     isNeedTraffic: boolean,
+    leaveDate: Date,
     goBackDate?: Date,
-    latestGoBackDateTime?: Date,   //返程最晚到达时间
-    earliestGoBackDateTime?: Date, //返程最早出发时间
     earliestLeaveDateTime?: Date, //最早出发时间
     latestArrivalDateTime?: Date, //最晚到达时间
+    earliestGoBackDateTime?: Date, //返程最早出发时间
+    latestGoBackDateTime?: Date,   //返程最晚到达时间
     checkInDate?: Date,
     checkOutDate?: Date,
     businessDistrict?: string,
-    staffId?: string,
     subsidy: any,
+    reason?: string,
+    hotelName?: string
 }
 
 
@@ -71,6 +78,8 @@ export default class ApiTravelBudget {
     * @param {Boolean} [params.isNeedHotel] 是否需要酒店
     * @param {Boolean} [params.isRoundTrip] 是否往返 [如果为true,goBackDate必须存在]
     * @param {Boolean} [params.isNeedTraffic] 是否需要交通
+    * @param {Striing} [params.reason] 出差事由
+    * @param {String} [params.hotelName] 住宿地标名称
     * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
     */
     @clientExport
@@ -82,139 +91,172 @@ export default class ApiTravelBudget {
         if (!travelPolicy) {
             throw new Error(`差旅标准还未设置`);
         }
-        let {
-            leaveDate,  //离开日期
-            goBackDate, //返回日期
-            isRoundTrip, //是否往返
-            originPlace,    //出发城市
-            destinationPlace,   //目的地
-            checkInDate,    //入住日期
-            checkOutDate,   //离开日期
-            businessDistrict,   //商圈
-            earliestLeaveDateTime,  //最早离开时间
-            latestArrivalDateTime,  //最晚到达时间
-            earliestGoBackDateTime, //最早返回日期
-            latestGoBackDateTime,   //最晚返回日期
-            isNeedHotel,    //是否需要住宿
-            isNeedTraffic,  //是否需要交通
-            subsidy,        //补助信息
-        } = params;
-
-        if (!Boolean(leaveDate)) {
-            throw L.ERR.LEAVE_DATE_FORMAT_ERROR();
+        let paramsToBudget = [];
+        let destinationPlacesInfo = params.destinationPlacesInfo;
+        if(destinationPlacesInfo && destinationPlacesInfo.length > 0){
+            for(let j = 0; j < destinationPlacesInfo.length; j++){
+                let paramsItem : any = {};
+                for(let key in destinationPlacesInfo[j]) {
+                    paramsItem[key] = destinationPlacesInfo[j][key];
+                }
+                paramsItem.staffId = params.staffId;
+                if(j == 0){
+                    if(params.originPlace){
+                        paramsItem.originPlace = params.originPlace;
+                    }else{
+                        paramsItem.isNeedTraffic = false;
+                        paramsItem.isRoundTrip = false;
+                    }
+                }else{
+                    paramsItem.originPlace = destinationPlacesInfo[j-1].destinationPlace;
+                }
+                paramsToBudget.push(paramsItem);
+            }
         }
 
-        if (!isNeedTraffic && !isNeedHotel) {
-            throw new Error("住宿和交通不能同时不需要");
-        }
-
+        let isRoundTrip = params.isRoundTrip;
         let momentDateFormat = "YYYY-MM-DD";
-        //住宿需要参数
-        if (isNeedHotel) {
-            if (!Boolean(checkInDate)) {
-                checkInDate = leaveDate;
-            }
-            if (!Boolean(checkOutDate)) {
-                checkOutDate = goBackDate;
-            }
-        }
-        //返程需要参数
-        if (isRoundTrip){
-            if (!Boolean(goBackDate)) throw L.ERR.GO_BACK_DATE_FORMAT_ERROR();
-        }
-
-        //去程参数
-        if (isNeedTraffic && !leaveDate) {
-            throw L.ERR.LEAVE_DATE_FORMAT_ERROR();
-        }
-
-        if (isNeedTraffic && !originPlace) {
-            throw L.ERR.CITY_NOT_EXIST();
-        }
-        if (!destinationPlace) {
-            throw L.ERR.CITY_NOT_EXIST();
-        }
-
         let budgets = [];
 
-        await new Promise(function(resolve, reject) {
-            let session = {accountId: staffId}
-            Zone.current.fork({name: "getTravelPolicy",properties: { session: session}})
-            .run(async function() {
-                if (isNeedTraffic) {
-                    try {
-                        //去程预算
-                        let budget = await ApiTravelBudget.getTrafficBudget({
-                            originPlace: originPlace,
-                            destinationPlace: destinationPlace,
-                            leaveDate: leaveDate,
-                            earliestLeaveDateTime: earliestLeaveDateTime,
-                            latestArrivalDateTime: latestArrivalDateTime,
-                        });
-                        budget.tripType = ETripType.OUT_TRIP;
-                        budgets.push(budget);
-                    } catch (err) {
-                        reject(err);
-                    }
-                }
+        for(let i = 0; i < paramsToBudget.length; i++){
+            let {
+                leaveDate,  //离开日期
+                goBackDate, //返回日期
+                originPlace,    //出发城市
+                destinationPlace,   //目的地
+                checkInDate,    //入住日期
+                checkOutDate,   //离开日期
+                businessDistrict,   //商圈
+                earliestLeaveDateTime,  //最早离开时间
+                latestArrivalDateTime,  //最晚到达时间
+                earliestGoBackDateTime, //最早返回日期
+                latestGoBackDateTime,   //最晚返回日期
+                isNeedHotel,    //是否需要住宿
+                isNeedTraffic,  //是否需要交通
+                subsidy,        //补助信息
+                hotelName        //住宿地标名称
+            } = paramsToBudget[i];
 
-                if (isNeedTraffic && isRoundTrip) {
-                    try {
-                        let _params = {
-                            originPlace: destinationPlace,
-                            destinationPlace: originPlace,
-                            leaveDate: goBackDate,
-                            earliestLeaveDateTime: earliestGoBackDateTime,
-                            latestArrivalTime: latestGoBackDateTime,
+
+            if (!Boolean(leaveDate)) {
+                throw L.ERR.LEAVE_DATE_FORMAT_ERROR();
+            }
+
+            if (!isNeedTraffic && !isNeedHotel) {
+                throw new Error("住宿和交通不能同时不需要");
+            }
+
+
+            //住宿需要参数
+            if (isNeedHotel) {
+                if (!Boolean(checkInDate)) {
+                    checkInDate = leaveDate;
+                }
+                if (!Boolean(checkOutDate)) {
+                    checkOutDate = goBackDate;
+                }
+            }
+
+            //去程参数
+            if (isNeedTraffic && !leaveDate) {
+                throw L.ERR.LEAVE_DATE_FORMAT_ERROR();
+            }
+
+            if (isNeedTraffic && !originPlace) {
+                throw L.ERR.CITY_NOT_EXIST();
+            }
+            if (!destinationPlace) {
+                throw L.ERR.CITY_NOT_EXIST();
+            }
+
+            //返程需要参数
+            if (isRoundTrip){
+                if (!Boolean(goBackDate)) throw L.ERR.GO_BACK_DATE_FORMAT_ERROR();
+            }
+
+            await new Promise(function(resolve, reject) {
+                let session = {accountId: staffId}
+                Zone.current.fork({name: "getTravelPolicy",properties: { session: session}})
+                    .run(async function() {
+                        if (isNeedTraffic) {
+                            try {
+                                //去程预算
+                                let budget = await ApiTravelBudget.getTrafficBudget({
+                                    originPlace: originPlace,
+                                    destinationPlace: destinationPlace,
+                                    leaveDate: leaveDate,
+                                    earliestLeaveDateTime: earliestLeaveDateTime,
+                                    latestArrivalDateTime: latestArrivalDateTime,
+                                });
+                                budget.tripType = ETripType.OUT_TRIP;
+                                budgets.push(budget);
+                            } catch (err) {
+                                reject(err);
+                            }
                         }
-                        let budget = await ApiTravelBudget.getTrafficBudget(_params);
-                        budget.tripType = ETripType.BACK_TRIP;
-                        budgets.push(budget);
-                    } catch (err) {
-                        reject(err);
-                    }
-                }
 
-                if (isNeedHotel) {
-                    try {
-                        let budget = await ApiTravelBudget.getHotelBudget({
-                            city: destinationPlace,
-                            businessDistrict: businessDistrict,
-                            checkInDate: checkInDate,
-                            checkOutDate: checkOutDate
-                        });
-                        budget.tripType = ETripType.HOTEL;
-                        budgets.push(budget);
-                    } catch (err) {
-                        reject(err)
-                    }
-                }
+                        if (isNeedTraffic && isRoundTrip && i == (paramsToBudget.length - 1)) {
+                            try {
+                                let _params = {
+                                    originPlace: destinationPlace,
+                                    destinationPlace: paramsToBudget[0].originPlace,
+                                    leaveDate: goBackDate,
+                                    earliestLeaveDateTime: earliestGoBackDateTime,
+                                    latestArrivalTime: latestGoBackDateTime,
+                                }
+                                let budget = await ApiTravelBudget.getTrafficBudget(_params);
+                                budget.tripType = ETripType.BACK_TRIP;
+                                budgets.push(budget);
+                            } catch (err) {
+                                reject(err);
+                            }
+                        }
 
-                if (subsidy && subsidy.template) {
-                    let days = moment(moment(goBackDate).format("YYYY-MM-DD")).diff(moment(moment(leaveDate).format("YYYY-MM-DD")), 'days');
-                    days = days + 1;
-                    if (!subsidy.hasFirstDaySubsidy) {
-                        days = days -1;
-                    }
-                    if (!subsidy.hasLastDaySubsidy) {
-                        days = days - 1;
-                    }
-                    if (days > 0) {
-                        let budget: any = {};
-                        budget.fromDate = leaveDate;
-                        budget.endDate = goBackDate;
-                        budget.hasFirstDaySubsidy = subsidy.hasFirstDaySubsidy;
-                        budget.hasLastDaySubsidy = subsidy.hasLastDaySubsidy;
-                        budget.tripType = ETripType.SUBSIDY;
-                        budget.type = EInvoiceType.SUBSIDY;
-                        budget.price = subsidy.template.target.subsidyMoney * days;
-                        budget.template = {id: subsidy.template.target.id, name: subsidy.template.target.name}
-                        budgets.push(budget);
-                    }
-                }
-                resolve(true);
+                        if (isNeedHotel) {
+                            try {
+                                let budget = await ApiTravelBudget.getHotelBudget({
+                                    city: destinationPlace,
+                                    businessDistrict: businessDistrict,
+                                    checkInDate: leaveDate,
+                                    checkOutDate: goBackDate,
+                                    hotelName: hotelName
+                                });
+                                budget.tripType = ETripType.HOTEL;
+                                budgets.push(budget);
+                            } catch (err) {
+                                console.info(err);
+                                reject(err)
+                            }
+                        }
+
+                        if (subsidy && subsidy.template) {
+                            let days = moment(goBackDate).diff(moment(leaveDate), 'days');
+                            days = days + 1;
+                            if (!subsidy.hasFirstDaySubsidy) {
+                                days = days -1;
+                            }
+                            if (!subsidy.hasLastDaySubsidy) {
+                                days = days - 1;
+                            }
+                            if (days > 0) {
+                                let budget: any = {};
+                                budget.fromDate = leaveDate;
+                                budget.endDate = goBackDate;
+                                budget.hasFirstDaySubsidy = subsidy.hasFirstDaySubsidy;
+                                budget.hasLastDaySubsidy = subsidy.hasLastDaySubsidy;
+                                budget.tripType = ETripType.SUBSIDY;
+                                budget.type = EInvoiceType.SUBSIDY;
+                                budget.price = subsidy.template.target.subsidyMoney * days;
+                                budget.duringDays = days;
+                                budget.template = {id: subsidy.template.target.id, name: subsidy.template.target.name}
+                                budgets.push(budget);
+                            }
+                        }
+                        resolve(true);
+                    })
             })
-        })
+
+        }
 
         let obj: any = {};
         obj.budgets = budgets;
@@ -222,7 +264,7 @@ export default class ApiTravelBudget {
         obj.createAt = Date.now();
         let _id = Date.now() + utils.getRndStr(6);
         let key = `budgets:${staffId}:${_id}`;
-        await cache.write(key, JSON.stringify(obj))
+        await cache.write(key, JSON.stringify(obj));
         return _id;
     }
 
@@ -241,9 +283,8 @@ export default class ApiTravelBudget {
      */
     @clientExport
     static async getHotelBudget(params: {city: any, businessDistrict: string,
-        checkInDate: Date, checkOutDate: Date}) :Promise<TravelBudgeItem> {
-        let {city, businessDistrict, checkInDate, checkOutDate} = params;
-
+        checkInDate: Date, checkOutDate: Date, hotelName?: string}) :Promise<TravelBudgetHotel> {
+        let {city, businessDistrict, checkInDate, checkOutDate, hotelName} = params;
         if (!Boolean(city)) {
             throw L.ERR.CITY_NOT_EXIST();
         }
@@ -264,6 +305,7 @@ export default class ApiTravelBudget {
         if (!staff || !staff["travelPolicyId"]) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
+        city = await API.place.getCityInfo({cityCode: city.id || city});
         //查询是否有协议酒店
         let accordHotel;
         try {
@@ -271,13 +313,13 @@ export default class ApiTravelBudget {
         } catch(err) {
         }
         if (accordHotel) {
-            return {price: accordHotel.accordPrice * days, type: EInvoiceType.HOTEL} as TravelBudgeItem;
+            return {price: accordHotel.accordPrice * days, type: EInvoiceType.HOTEL,
+                hotelName: hotelName, cityName: city.name, checkInDate: checkInDate, checkOutDate: checkOutDate} as TravelBudgetHotel;
         }
 
         //查询员工差旅标准
         let policy = await staff.getTravelPolicy();
         let hotelStar = [EHotelLevel.THREE_STAR];
-        city = await API.place.getCityInfo({cityCode: city.id || city});
         if (!policy) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
@@ -314,7 +356,8 @@ export default class ApiTravelBudget {
             businessDistrict: businessDistrict,
             checkInDate: checkInDate,
             checkOutDate: checkOutDate,
-            isAbroad: city.isAbroad
+            isAbroad: city.isAbroad,
+            hotelName: hotelName
         }
         let budgetConfig = staff.company.budgetConfig;
         let defaults = loadDefaultPrefer({local: query}, DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_HOTEL);
@@ -325,6 +368,7 @@ export default class ApiTravelBudget {
         qs.prefers = defaults;
         qs.query = query;
         let hotels = await API.hotel.search_hotels(query);
+
         let strategy = await HotelBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
         let budget = await strategy.getResult(hotels);
         budget.type = EInvoiceType.HOTEL;
@@ -349,7 +393,7 @@ export default class ApiTravelBudget {
         latestArrivalDateTime?: Date,   //最晚到达时间
         earliestLeaveDateTime?: Date,   //最早出发时间
 
-     }) : Promise<TravelBudgeItem> {
+     }) : Promise<TravelBudgeTraffic> {
         let {originPlace, destinationPlace, leaveDate, latestArrivalDateTime, earliestLeaveDateTime} = params;
 
         if (!destinationPlace) {
@@ -382,23 +426,18 @@ export default class ApiTravelBudget {
         let m_originCity = await API.place.getCityInfo({cityCode: originPlace.id || originPlace});
         let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
 
+        console.log("this is city info: ", m_originCity);
         //转换成当地时间
         if (!latestArrivalDateTime) {
             params.latestArrivalDateTime = undefined;
         } else {
-            let endFix = ' GMT+0';
-            if (m_destination.offsetUtc) {
-                endFix = ' GMT+0' + (m_destination.offsetUtc / 60 / 60 * 100)
-            }
+            let endFix = getTimezoneStr(m_destination.offsetUtc);
             params.latestArrivalDateTime = new Date(moment(latestArrivalDateTime).format(`YYYY-MM-DD HH:mm:ss`) + endFix);
         }
         if (!earliestLeaveDateTime) {
             params.earliestLeaveDateTime = undefined;
         } else {
-            let endFix = 'GMT+0';
-            if (m_originCity.offsetUtc) {
-                endFix = 'GMT+0' + (m_originCity.offsetUtc / 60 / 60 * 100)
-            }
+            let endFix = getTimezoneStr(m_originCity.offsetUtc);
             params.earliestLeaveDateTime = new Date(moment(earliestLeaveDateTime).format(`YYYY-MM-DD HH:mm:ss`) + endFix);
         }
 
@@ -426,7 +465,9 @@ export default class ApiTravelBudget {
             trainCabins = [];
         }
 
+
         let flightTickets:ITicket[] = [];
+
         if (m_originCity && m_destination) {
             flightTickets = await API.flight.search_ticket({
                 originPlace: m_originCity,
@@ -435,10 +476,13 @@ export default class ApiTravelBudget {
                 cabin: cabins,
                 isAbroad: isAbroad,
             });
+
             if (!flightTickets) {
                 flightTickets = [];
             }
         }
+
+
 
         let trainTickets = [];
         if (!isAbroad) {
@@ -489,7 +533,10 @@ export default class ApiTravelBudget {
         let tickets: ITicket[] = _.concat(flightTickets, trainTickets) as ITicket[];
         let strategy = await TrafficBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
         let result =  await strategy.getResult(tickets);
+        console.log("result: ",result);
         result.cabinClass = result.cabin;
+        result.originPlace = m_originCity;
+        result.destination = m_destination;
         if (<number>result.type == <number>TRAFFIC.FLIGHT) {
             let fullPriceObj = await API.place.getFlightFullPrice({
                 originPlace: m_originCity.id,
@@ -572,6 +619,8 @@ export default class ApiTravelBudget {
     }
 }
 
+
+
 function mergePrefers(defaults, news) {
     for(let i=0, ii =news.length; i<ii; i++) {
         let v = news[i];
@@ -589,4 +638,44 @@ function mergePrefers(defaults, news) {
         }
     }
     return defaults;
+}
+
+function getTimezoneStr(seconds) {
+    const HOUR = 60 * 60
+    const MINUTE = 60;
+    let hours = seconds / HOUR
+    if (hours < 0) {
+        hours = Math.ceil(hours);
+    } else {
+        hours = Math.floor(hours);
+    }
+    let minute = (seconds - hours * HOUR) / MINUTE;
+    if (minute < 0) {
+        minute = Math.ceil(minute)
+    } else {
+        minute = Math.floor(minute)
+    }
+    let ret = 'GMT';
+    if (hours < 0) {
+        ret += '-'
+        if (hours > -10) {
+            ret += '0'
+        }
+        hours = -hours;
+        ret += hours;
+    } else {
+        ret += '+';
+        if (hours < 10) {
+            ret += '0'
+        }
+        ret += hours;
+    }
+    if (minute < 0) {
+        minute = -minute;
+    }
+    if (minute < 10) {
+        ret += '0'
+    }
+    ret += minute;
+    return " "+ret;
 }

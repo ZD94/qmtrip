@@ -68,29 +68,32 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
     }
     $scope.travelPolicy = travelPolicy;
     $scope.savePolicy = async function () {
-        if(!$scope.travelPolicy.name){
+        let policy = $scope.travelPolicy;
+        if(!policy.name){
             msgbox.log("标准名称不能为空");
             return false;
         }
-        if($scope.travelPolicy.planeLevels.length <=0){
+        if(!policy.planeLevels || policy.planeLevels.length <=0){
             msgbox.log('飞机舱位不能为空');
             return false;
         }
-        if($scope.travelPolicy.trainLevels.length <=0){
+        if(!policy.trainLevels || policy.trainLevels.length <=0){
             msgbox.log('火车座次不能为空');
             return false;
         }
-        if($scope.travelPolicy.hotelLevels.length <=0){
+        if(!policy.hotelLevels || policy.hotelLevels.length <=0){
             msgbox.log('住宿标准不能为空');
             return false;
         }
-        if($scope.travelPolicy.isOpenAbroad && $scope.travelPolicy.abroadPlaneLevels.length <= 0){
-            msgbox.log('国际飞机舱位不能为空');
-            return false;
-        }
-        if($scope.travelPolicy.isOpenAbroad && $scope.travelPolicy.abroadHotelLevels.length <= 0){
-            msgbox.log('国际住宿标准不能为空');
-            return false;
+        if(policy.isOpenAbroad){
+            if(!policy.abroadPlaneLevels || policy.abroadPlaneLevels.length <= 0){
+                msgbox.log('国际飞机舱位不能为空');
+                return false;
+            }
+            if(!policy.abroadHotelLevels || policy.abroadHotelLevels.length <= 0){
+                msgbox.log('国际住宿标准不能为空');
+                return false;
+            }
         }
         var re = /^[0-9]+.?[0-9]*$/;
         if($scope.travelPolicy.subsidy && !re.test($scope.travelPolicy.subsidy)){
@@ -165,7 +168,7 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
                         try{
                             var result = await $scope.travelPolicy.getStaffs();
                             if(result && result.length > 0){//why后端delete方法throw出来的异常捕获不了
-                                throw {code: -1, msg: '还有'+ result.length +'位员工在使用该标准'};
+                                throw {code: -1, msg: '还有'+ result.total +'位员工在使用该标准'};
                             }
                             await $scope.travelPolicy.destroy();
                             /*window.location.href = '#/travel-policy/index'*/

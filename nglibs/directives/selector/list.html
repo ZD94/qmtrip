@@ -1,2 +1,3 @@
-<fake-input value="{{displayItem(value)}}" placeholder="{{title}}" ng-click="showSelectorDlg()">
-</fake-input>
+<div ng-transclude="inputItem" ng-click="showSelectorDlg()">
+    <fake-input value="{{value.name?value.name:value}}" placeholder="{{placeholder}}"></fake-input>
+</div>

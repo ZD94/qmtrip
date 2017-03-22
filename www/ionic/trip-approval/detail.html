@@ -25,20 +25,20 @@
 
                 <div ng-if="!tripApprove.isSpecialApprove">
                     <!--交通-->
-                    <ta-detail-item ng-repeat="t in traffic track by t.id"
+                    <ta-detail-item ng-repeat="t in traffic track by $index"
                                     item="t" title="交通"
                                     budget="{{trafficBudget| currency: ''}}元">
                     </ta-detail-item>
                     <!--酒店-->
-                    <ta-detail-item ng-repeat="h in hotel track by h.id"
+                    <ta-detail-item ng-repeat="h in hotel track by $index"
                                     item="h"
-                                    title="{{$index == 0 ? '住宿': ''}}"
+                                    title="住宿"
                                     budget="{{hotelBudget | currency: ''}}元">
                     </ta-detail-item>
                     <!--补助-->
-                    <ta-detail-item ng-repeat="s in subsidy track by s.id"
+                    <ta-detail-item ng-repeat="s in subsidy track by $index"
                                     item="s"
-                                    title="补助"
+                                    title="公司补助"
                                     budget="{{subsidyBudget| currency: ''}}元">
                     </ta-detail-item>
                 </div>
@@ -50,12 +50,12 @@
                         <div class="list" style="overflow: hidden;text-overflow: ellipsis;">等待{{tripApprove.approveUser.name}}审批</div>
                         <div class="list">查看审批详情</div>
                     </div>
-                    <button class="button button_left" ng-if="isHasPermissionApprove" ng-click="showReasonDialog()" style='color:#ffffff;background-color: #D0021B;'>驳回
+                    <button class="button button_left button-assertive" ng-if="isHasPermissionApprove" ng-click="showReasonDialog()" style='color:#ffffff' ng-stat-event="驳回审批,按钮点击,驳回审批">驳回
                     </button>
-                    <button class="button button_right" ng-if="isHasPermissionApprove" ng-click="confirmButton()" style='color:#ffffff;background-color: #28A7E1'>同意
+                    <button class="button button_right button-calm" ng-if="isHasPermissionApprove" ng-click="confirmButton()" style='color:#ffffff'>同意
                     </button>
                     <button class="button button_right button-calm" ng-if="!isHasApprove && !isHasPermissionApprove"
-                            ng-click="cancelTripApprove()">撤销行程
+                            ng-click="cancelTripApprove()" ng-stat-event="撤销申请单,按钮点击,撤销申请单">撤销行程
                     </button>
                 </bottom-bar>
                 <bottom-bar ng-if="tripApprove.status == EApproveStatus.REJECT">
@@ -64,7 +64,7 @@
                         <div class="list">查看审批详情</div>
                     </div>
                     <button class="button button_right button-assertive" ng-click="reCommitTripApprove()" ng-if="!isHasPermissionApprove&&isSelf"
-                            style='color:#ffffff;background-color: #28A7E1'>重新提交
+                            style='color:#ffffff;background-color: #28A7E1' ng-stat-event="重新提交,按钮点击,重新提交审批">重新提交
                     </button>
                 </bottom-bar>
                 <bottom-bar ng-if="tripApprove.status == EApproveStatus.PASS">
@@ -88,12 +88,12 @@
                         <div class="list">等待{{tripApprove.approveUser.name}}审批</div>
                         <div class="list">查看审批详情</div>
                     </div>
-                    <button class="button button_left" ng-if="isHasPermissionApprove" ng-click="showReasonDialog()" style='color:#ffffff;background-color: #D0021B;'>驳回
+                    <button class="button button_left button-assertive" ng-if="isHasPermissionApprove" ng-click="showReasonDialog()" style='color:#ffffff;' ng-stat-event="驳回审批,点击,驳回审批">驳回
                     </button>
-                    <button class="button button_right" ng-if="isHasPermissionApprove" ng-click="confirmButton()" style='color:#ffffff;background-color: #28A7E1'>同意
+                    <button class="button button_right button-calm" ng-if="isHasPermissionApprove" ng-click="confirmButton()" style='color:#ffffff'>同意
                     </button>
                     <button class="button button_right button-calm" ng-if="!isHasApprove && !isHasPermissionApprove"
-                            ng-click="cancelTripApprove()">撤销行程
+                            ng-click="cancelTripApprove()" ng-stat-event="撤销申请单,按钮点击,撤销申请单">撤销行程
                     </button>
                 </bottom-bar>
                 <bottom-bar ng-if="tripApprove.status == EApproveStatus.REJECT">
@@ -102,7 +102,7 @@
                         <div class="list">查看审批详情</div>
                     </div>
                     <button class="button button_right button-assertive" ng-click="reCommitTripApprove()" ng-if="!isHasPermissionApprove && isSelf"
-                            style='color:#ffffff;background-color: #28A7E1'>重新提交
+                            style='color:#ffffff;background-color: #28A7E1' ng-stat-event="重新提交,按钮点击,重新提交">重新提交
                     </button>
                 </bottom-bar>
                 <bottom-bar ng-if="tripApprove.status == EApproveStatus.PASS">
@@ -126,12 +126,12 @@
                         <div class="list">审批将通过钉钉完成</div>
                         <div class="list">请到钉钉查看审批进度</div>
                     </div>
-                    <button class="button button_left" ng-if="isHasPermissionApprove" ng-click="showReasonDialog()" style='color:#ffffff;background-color: #D0021B;'>驳回
+                    <button class="button button_left button-assertive" ng-if="isHasPermissionApprove" ng-click="showReasonDialog()" style='color:#ffffff;' ng-stat-event="驳回审批,点击,驳回审批">驳回
                     </button>
-                    <button class="button button_right" ng-if="isHasPermissionApprove" ng-click="confirmButton()" style='color:#ffffff;background-color: #28A7E1'>同意
+                    <button class="button button_right button-calm" ng-if="isHasPermissionApprove" ng-click="confirmButton()" style='color:#ffffff'>同意
                     </button>
                     <button class="button button_right button-calm" ng-if="!isHasApprove && !isHasPermissionApprove"
-                            ng-click="cancelTripApprove()">撤销行程
+                            ng-click="cancelTripApprove()" ng-stat-event="撤销申请单,按钮点击,撤销申请单">撤销行程
                     </button>
                 </bottom-bar>
                 <bottom-bar ng-if="tripApprove.status == EApproveStatus.REJECT">
@@ -140,7 +140,7 @@
                         <div class="list">请到钉钉查看审批进度</div>
                     </div>
                     <button class="button button_right button-assertive" ng-click="reCommitTripApprove()" ng-if="!isHasPermissionApprove&&isSelf"
-                            style='color:#ffffff;background-color: #28A7E1'>重新提交
+                            style='color:#ffffff;background-color: #28A7E1' ng-stat-event="重新提交,按钮点击,重新提交审批">重新提交
                     </button>
                 </bottom-bar>
                 <bottom-bar ng-if="tripApprove.status == EApproveStatus.PASS">

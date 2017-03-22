@@ -103,6 +103,8 @@ export async function IndexController($scope, Models, FileUploader) {
         console.info('success');
     }
     $scope.reUpload = function(){
+        fileIds = [];
+        $scope.fileName = "";
         $scope.step = 'one';
         $scope.title = '批量添加员工';
     }

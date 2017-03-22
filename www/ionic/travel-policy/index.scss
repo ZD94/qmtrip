@@ -1,3 +1,4 @@
+@import "../scss/color.variable.scss";
 .withCheck{
   .item-radio{
     border: 0;
@@ -33,36 +34,59 @@
     }
   }
 }
-
-.policyCard{
-  .item-avatar{
-    height: 75px;
-    .policy-list-left{
-      position: absolute;
-      left: 13px;
-      top: 13px;
-      width: 50px;
-      height: 50px;
-      background: #596BC4;
-      border-radius: 50%;
-      text-align: center;
-      font-size: 12px;
-      color: #fff;
-      p{
-        color: #fff;
-        font-size: 16px;
-        font-weight: bold;
-        margin-top: 5px;
+.button.button-outline.button-block.button-positive.activated{
+  color:$calm;
+}
+.policies {
+  .policies-button {
+    padding: 0 10px;;
+  }
+  .policyCard{
+    &:first-of-type {
+      .item{
+        &:first-of-type{
+          border-top-left-radius: 3px;
+          border-top-right-radius: 3px;
+        }
       }
     }
-    .policy-list-content{
-      .policy-list-tit{
-        font-size: 16px;
+    &:last-of-type{
+      .item{
+          border-bottom-left-radius: 3px;
+          border-bottom-right-radius: 3px;
       }
-      .policy-list-other{
-        font-size: 14px;
-        color: #9b9b9b;
+    }
+
+    .item-avatar{
+      height: 75px;
+      .policy-list-left{
+        position: absolute;
+        left: 13px;
+        top: 13px;
+        width: 50px;
+        height: 50px;
+        background: #596BC4;
+        border-radius: 50%;
+        text-align: center;
+        font-size: 12px;
+        color: #fff;
+        p{
+          color: #fff;
+          font-size: 16px;
+          font-weight: bold;
+          margin-top: 5px;
+        }
+      }
+      .policy-list-content{
+        .policy-list-tit{
+          font-size: 16px;
+        }
+        .policy-list-other{
+          font-size: 14px;
+          color: #9b9b9b;
+        }
       }
     }
   }
 }
+

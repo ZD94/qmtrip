@@ -64,6 +64,7 @@ class AgencyModule {
         agency.status = EAgencyStatus.ACTIVE;
         agency.createUser = agencyUser.id;
         agencyUser.agency = agency;
+        agencyUser.isValidateEmail = true;
 
         await Promise.all([agency.save(), agencyUser.save()]);
 
