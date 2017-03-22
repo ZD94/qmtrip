@@ -167,7 +167,7 @@ export async function IndexController($scope, Menu, $ionicPopup, $storage, $loca
                             text: '立即续费',
                             type: 'button-positive',
                             onTap:function(){
-                                window.location.href='#/company-pay/service-pay'  //管理跳转页面
+                                window.location.href='#/company-pay/service-pay';  //管理跳转页面
                             }
                         }
                     ]
@@ -184,18 +184,21 @@ export async function IndexController($scope, Menu, $ionicPopup, $storage, $loca
                             text: '立即续费',
                             type: 'button-positive',
                             onTap:function(){
-                                window.location.href='#/company-pay/service-pay'  //管理跳转页面
+                                window.location.href='#/company-expired/service-pay'; //管理跳转页面
                             }
                         }
                     ]
                 })
             }
         }else{
+            let popUrl='';
             if(leftTime > 0){
                 popText = '服务期限已不足7天，请通知管理员及时进行续费，以免影响使用！';
+                popUrl = '#/company-pay/service-pay';
             }else{
                 popTitle = '服务已到期';
                 popText = '您企业的服务已到期，请通知管理员进行续期，谢谢！';
+                popUrl = '#/company-expired/service-pay';
             }
             $ionicPopup.show({
                 title: popTitle,
@@ -206,7 +209,7 @@ export async function IndexController($scope, Menu, $ionicPopup, $storage, $loca
                         text: '确认',
                         type: 'button-positive',
                         onTap:function(){
-                            window.location.href='#/company-pay/service-pay'  //员工跳转页面
+                            window.location.href= popUrl; //员工跳转页面
                         }
                     }
                 ]
