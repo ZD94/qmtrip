@@ -30,6 +30,8 @@
     "dist",
     "ionic",
     "tmp",
+    "_types",
+    "JLTypes",
     "*.bak"
   ],
   "excludeNotUsing": [
