@@ -1,7 +1,7 @@
 <ion-view title="员工管理">
     <ion-content class="has-header" padding="true">
         <div class="new-staff">
-            <div class="item">
+            <div class="item border-top-radius">
                 姓名
                 <span class="item-note">{{staff.name}}<span ng-if="staff.status == 0">(未激活)</span></span>
             </div>
@@ -13,7 +13,7 @@
                 邮箱<i class="icon ion-ios-checkmark verify" ng-class="{novalid: !staff.isValidateEmail}"></i>
                 <span class="item-note">{{staff.email || '请绑定邮箱并验证'}}</span>
             </div>
-            <div class="item item-icon-right avatars">
+            <div class="item item-icon-right avatars border-bottom-radius">
                 头像
                 <staff-avatar staff="staff" class="item-note" text-class="avatar-text" img-class="avatar-img"></staff-avatar>
                 <!--<div class="item-note" ng-uploader accept="image/png, image/jpeg, image/gif" url="uploadUrl" edit="true" width="160" height="160" done="invoicefuc.done">-->
@@ -23,7 +23,7 @@
                 <!--</div>-->
             </div>
             <div class="spacer" style="height: 10px;"></div>
-            <div class="item">
+            <div class="item border-top-radius">
                 角色
                 <span class="item-note">{{EStaffRoleNames[staff.roleId]}}</span>
             </div>
@@ -35,10 +35,10 @@
                 部门（共{{departments.length}}个）
                 <!--<span class="item-note">{{departments.name}}</span>-->
             </div>
-            <div class="item item-icon-left" ng-repeat="department in departments track by $index">
-                <i class="icon ion-ios-folder"></i>{{department.name}}
+            <div class="item item-icon-left border-bottom-radius" ng-repeat="department in departments track by $index">
+                <i class="icon ion-ios-folder" style="width:10px;"></i>{{department.name}}
             </div>
-            <div class="spacer" style="height: 10px;"></div>
+            <!--<div class="spacer" style="height: 10px;"></div>-->
 
             <a class="button button-block button-calm" ng-if="staff.status != 0" ng-click="editStaff()">
                 编辑

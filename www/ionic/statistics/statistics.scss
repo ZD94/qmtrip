@@ -1,13 +1,24 @@
-.date_selected{
-  padding:0;
-  justify-content: center;
-  .data_show{
-    padding: 7px;
+@import "../scss/color.variable.scss";
+.flex-c01{
+  .item{
+    border-radius: 3px;
   }
-  .icon{
-    text-align: center;
+
+  .date_selected{
+    padding:0;
+    justify-content: center;
+    border-radius: 0px;
+    .data_show{
+      padding: 7px;
+    }
+    .icon{
+      text-align: center;
+    }
   }
+
 }
+
+
 
 .budgetMenu{
   margin-bottom: 10px;
@@ -26,17 +37,23 @@
     }
   }
 }
+
 .tripStat{
   .item{
     display: flex;
     align-items: center;
     padding: 0;
     height:75px;
+
     &:first-child{
-      border-bottom: 1px dashed #ddd;
+      border-bottom: 1px dashed lighten($dark,71);
+      border-bottom-left-radius: 0px;
+      border-bottom-right-radius: 0px;
     }
     &:last-child{
-      border-top: 1px dashed #ddd;
+      border-top: 1px dashed lighten($dark,71);
+      border-top-left-radius: 0px;
+      border-top-right-radius: 0px;
     }
     >div{
       flex:1;
@@ -94,11 +111,11 @@
         width: 100%;
         border-bottom: 1px dashed #ddd;
         h2{
-          color: #4a90e2;
+          color: $calm;
         }
       }
       h2{
-        color: #f7a05a;
+        color: $energized;
         text-align: center;
       }
     }
@@ -128,12 +145,19 @@
     bottom: 40px;
     h2{
       text-align: center;
-      color: #62894e;
+      color: $balanced;
     }
   }
 }
 
+
 .link-div{
+  a:last-child{
+    div{
+      border-top-left-radius: 0px;
+      border-top-right-radius: 0px;
+    }
+  }
   a:link {
     text-decoration: none;
   }
@@ -152,6 +176,7 @@
       font-size: 14px;
     }
   }
+
   .fa{
     font-size: 12px;
     line-height: 20px;
@@ -170,6 +195,23 @@
 
 }
 
+.link-div:last-child{
+  a:first-child{
+    div{
+      border-bottom-left-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
+  }
+}
+
+
+.list:last-child{
+  .item{
+    //border-top-left-radius: 3px;
+    //border-top-right-radius: 3px;
+  }
+
+}
 
 ion-nav-view ion-view ion-content {
   .withChart {

@@ -2,6 +2,7 @@ import { EPlanStatus } from 'api/_types/tripPlan';
 import { Staff } from 'api/_types/staff/staff';
 import indexOf = require("lodash/indexOf");
 export async function ListController($scope , $stateParams, Models){
+    require('./trip-approval.scss');
     var staff = await Staff.getCurrent();
     let statusTxt = {};
     statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
