@@ -99,7 +99,7 @@ deploy:tester:
   when: manual
   environment:
     name: tester/$GITLAB_USER_ID
-    url: https://review.l.jingli365.com/tester/$GITLAB_USER_ID
+    url: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
