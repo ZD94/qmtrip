@@ -23,3 +23,19 @@
     }
   }
 }
+
+.button.button-block, .button.button-full{
+  margin-top: 5px;
+}
+
+.disable-user-behavior{
+  .list{
+    .item:first-child{
+      border-radius: 3px 3px 0 0;
+    }
+    .item:last-child{
+      border-radius: 0 0 3px 3px;
+    }
+  }
+
+}

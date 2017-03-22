@@ -1,6 +1,6 @@
 @import "../../../common/vendor/ionic/scss/variables.scss";
 .destination-template{
-  background: url("ionic/images/background.jpg") no-repeat;
+  background: url("ionic/images/background.png") no-repeat;
   background-size: cover;
   .bar-subheader{
     background: #fff;
@@ -49,6 +49,9 @@
       .item{
         border: 0;
         padding: 8px 10px;
+        p {
+          font-size: 16px;
+        }
         &.item-icon-right{
           .icon{
             font-size: 14px;
@@ -64,6 +67,19 @@
   }
   .button.button-full{
     margin: 0;
+  }
+}
+//调整安卓上popup的toggle样式  shicong
+
+body.platform-android div.selectSubsidy{
+  .toggle-small.item-toggle .toggle{
+    top:10px
+  }
+  div.item-toggle{
+    label.toggle > div.track > div.handle{
+      top:7px;
+      left:8px;
+    }
   }
 }
 //补助选择popup

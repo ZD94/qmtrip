@@ -414,4 +414,10 @@ input[type="text"], input[type="password"] {
   color: $dark;
 }
 
+//开关颜色调整
+.toggle input:checked + .track{
+  border-color: $calm;
+  background-color: $calm;
+}
+
 
