@@ -19,14 +19,6 @@
                     <new-radio ng-repeat="sex in sexes" ng-model="staff.sex" ng-check-options="sex"></new-radio>
                 </div>
             </div>
-            <!--<div class="item item-icon-right avatars" ng-if="!staffId">-->
-                <!--头像-->
-                <!--<div class="item-note" ng-uploader accept="image/png, image/jpeg, image/gif" url="uploadUrl" edit="true" width="160" height="160" done="invoicefuc.done">-->
-                    <!--<img class="avatar-img" ng-src="{{getImageUrl(staff.avatar)}}" ng-if="staff.avatar">-->
-                    <!--<span ng-if="!staff.avatar" class="avatar-text" ng-style="{background: staff.avatarColor || '#2495da'}">-->
-                        <!--{{(staff.name || "暂无") | shortName }}</span>-->
-                <!--</div>-->
-            <!--</div>-->
             <div class="spacer" style="height: 10px;"></div>
             <div class="item item-icon-right" ng-click="chooseRole()">
                 角色
