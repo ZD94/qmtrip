@@ -260,34 +260,33 @@ export class Staff extends ModelObject implements Account {
         var self = this;
         if (!options) options = {where: {}};
         if(!options.where) options.where = {};
+        let ids = [];
+        let no_ids = [];
+        let mna: any = {};
 
         //若不查已删除的下边逻辑就会以为已删除的那条通知是未读的全员通知会再加一条进关系表
-        var pagers = await Models.noticeAccount.find({where: {accountId: this.id}, paranoid: false, order: [['createdAt', 'desc']]});
+        let sql = `select id, notice_id as "noticeId", deleted_at as "deletedAt" from notice.notice_accounts where account_id = '${self.id}'`;
+        let ret = await db.query(sql);
 
-        let noticeAccounts = [];
-        noticeAccounts.push.apply(noticeAccounts, pagers);
-        while(pagers.hasNextPage()){
-            let nextPager = await pagers.nextPage();
-            noticeAccounts.push.apply(noticeAccounts, nextPager);
-            // pagers = nextPager;
+        let ids_query = ret[0];
+        if(ids_query && ids_query.length > 0){
+            ids_query.forEach(function(t){
+                mna[t.noticeId] = t;
+                if(t.deletedAt){
+                    no_ids.push(t.noticeId);
+                }else{
+                    ids.push(t.noticeId);
+                }
+            })
         }
 
-        var mna: any = {};
-        var ids = [];
-        var no_ids = [];
-        noticeAccounts.forEach(function(t){
-            mna[t.noticeId] = t;
-            if(t.deletedAt){
-                no_ids.push(t.noticeId);
-            }else{
-                ids.push(t.noticeId);
-            }
-        })
         options.where .$or = [{id: {$in: ids}}, {sendType: ESendType.ALL_ACCOUNT}];
         if(no_ids && no_ids.length > 0){
             options.where.id = {$notIn: no_ids};
         }
         options.order = options.order || [['createdAt', 'desc']];
+        // let sql_query = `select * from notice.notices nn join notice.notice_accounts na on nn.id = na.notice_id
+        //  where (na.account_id = '${self.id}' or nn.send_type = ${ESendType.ALL_ACCOUNT}) and nn.type = 1 order by nn.created_at desc limit 5 offset 0`;
         var notices = await Models.notice.find(options);
         var result = await Promise.all(notices.map(async function(n){
             // 此处处理发给全体员工的 员工拉取通知列表时存入noticeAccount关系表记录（其余发给一个人或多个人的 发消息的时候存入关系表）
@@ -453,23 +452,19 @@ export class Staff extends ModelObject implements Account {
 
     @RemoteCall()
     async statisticNoticeByType(): Promise<any> {
-        /*if(!this.isLocal){
-         API.require('notice');
-         await API.onload();
-         }
-         return API.notice.statisticNoticeByType();*/
         let self = this;
         let result:any = {};
 
         let sql = `select type, count(*) from notice.notice_accounts na 
-        join notice.notices nn on na.notice_id = nn.id where na.account_id = '${self.id}' 
-        and na.deleted_at is null and na.is_read = false group by nn.type order by nn.type asc`;
+        right join notice.notices nn on na.notice_id = nn.id where na.account_id = '${self.id}'  
+        and na.deleted_at is null and na.is_read = false or nn.send_type = ${ESendType.ALL_ACCOUNT} 
+        group by nn.type order by nn.type asc`;
         let ret = await db.query(sql);
         let arr = ret[0];
         for(let i = 0; i < arr.length; i++){
-            let _sql = `select nn.* from notice.notice_accounts na join notice.notices nn 
-            on na.notice_id = nn.id where na.account_id = '${self.id}' and na.deleted_at is null and 
-            na.is_read = false and nn.type = '${arr[i].type}' order by created_at desc limit 1`;
+            let _sql = `select nn.* from notice.notice_accounts na right join notice.notices nn 
+            on na.notice_id = nn.id where na.account_id = '${self.id}' and na.deleted_at is null  
+            and na.is_read = false and nn.type = '${arr[i].type}' order by created_at desc limit 1`;
             let na = await db.query(_sql);
             result[arr[i].type] = {unReadNum: arr[i].count, latestInfo: na[0][0]};
         }
