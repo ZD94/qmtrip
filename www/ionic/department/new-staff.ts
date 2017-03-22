@@ -26,8 +26,11 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     let company = current.company;
     let travelpolicylist = await company.getTravelPolicies();
     let department = await company.getDefaultDepartment();
+    let defaultTravelPolicy = await company.getDefaultTravelPolicy();
+
     $scope.selectDepartments = []; //用于存放已选择的部门
     $scope.addedArray = []; //用于存放提交时的部门id
+    $scope.staffPolicyName = defaultTravelPolicy.name;
     if(staffId){
         staff = await Models.staff.get(staffId);
         Models.resetOnPageChange(staff);
