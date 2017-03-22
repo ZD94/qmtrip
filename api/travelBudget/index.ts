@@ -575,18 +575,7 @@ export default class ApiTravelBudget {
 function mergePrefers(defaults, news) {
     for(let i=0, ii =news.length; i<ii; i++) {
         let v = news[i];
-        let isHas = false;  //是否包含
-        //查找defaults中是否包含
-        for(let j=0, jj=defaults.length; j<jj; j++) {
-            if (v.name == defaults[j].name) {
-                isHas = true;
-                defaults[j] = _.defaultsDeep(v, defaults[j]);
-                break;
-            }
-        }
-        if (!isHas) {
-            defaults.push(v);
-        }
+        defaults.push(v);
     }
     return defaults;
 }
