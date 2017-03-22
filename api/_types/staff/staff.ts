@@ -22,7 +22,7 @@ import moment = require("moment");
 import {OS_TYPE} from "../../auth/authentication";
 import {requireParams} from "common/api/helper";
 
-declare var API: any;
+let API = require("common/api");
 
 let getSupplier: SupplierGetter;
 
