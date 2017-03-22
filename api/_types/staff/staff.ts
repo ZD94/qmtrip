@@ -215,7 +215,7 @@ export class Staff extends ModelObject implements Account {
                     }
                 });
                 if(staffDepartment && staffDepartment.length){
-                    // continue;
+                    //已经有了，准备删除
                 }else{
                     //插入数据
                     await(await Models.staffDepartment.create({
@@ -224,6 +224,10 @@ export class Staff extends ModelObject implements Account {
                 }
 
                 //删除数据
+                if(fromDepartmentId == departmentIds[j]){
+                    //移入的部门中包含了本部门
+                    continue;
+                }
                 let fromData = await Models.staffDepartment.find({
                     where : {
                         "staffId" : staff.id,

@@ -86,3 +86,11 @@
 .select-button {
   border-bottom: 3px solid #387ef5;
 }
+ion-content {
+  .flex-c01 {
+    > ion-scroll {
+      padding: 0;
+      padding-top: 10px;
+    }
+  }
+}

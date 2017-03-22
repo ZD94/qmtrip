@@ -7,7 +7,6 @@ import {EGender} from "api/_types/index";
 import L from 'common/language';
 import validator = require('validator');
 import {Pager} from "common/model/pager";
-import {type} from "os";
 import {setDepartment} from "./set-department";
 
 
@@ -231,18 +230,11 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                 }
                 
 
-                if($scope.addedArray.length>0){
-                    // staff.departmentIds = $scope.addedArray;
-                }else{
+                if(!$scope.addedArray.length){
                     msgbox.log('部门不能为空')
                     return false;
                 }
-                // var namePattern = /[\u4e00-\u9fa5]+/g;
-                // var hasChinese = namePattern.test(staff.name);
-                // if(staff.name.length>5 && hasChinese){
-                //     msgbox.log('姓名不能超过5个字');
-                //     return;
-                // }
+
                 // 创建人修改管理员权限(二次确认)
                 if(current.roleId == EStaffRole.OWNER && preRole == EStaffRole.ADMIN && staff.roleId == EStaffRole.COMMON){
                     ownerModifyAdmin = true;
@@ -271,7 +263,6 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             }
 
             if(!ownerModifyAdmin){
-                staff.isNeedChangePwd = true;
                 staff = await staff.save();
                 await staff.saveStaffDepartments($scope.addedArray);
                 callback();
