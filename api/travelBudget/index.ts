@@ -367,8 +367,12 @@ export default class ApiTravelBudget {
         if (!budgetConfig) {
             budgetConfig = {};
         }
-        let defaults = loadPrefers(budgetConfig.hotel, {local: query}, DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_HOTEL);
-        qs.prefers = defaults;
+        let key = DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_HOTEL;
+        if (city.isAbroad) {
+            key = DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_HOTEL
+        }
+        let prefers = loadPrefers(budgetConfig.hotel, {local: query}, key);
+        qs.prefers = prefers;
         qs.query = query;
         let hotels = await API.hotel.search_hotels(query);
 
@@ -429,7 +433,6 @@ export default class ApiTravelBudget {
         let m_originCity = await API.place.getCityInfo({cityCode: originPlace.id || originPlace});
         let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
 
-        console.log("this is city info: ", m_originCity);
         //转换成当地时间
         if (!latestArrivalDateTime) {
             params.latestArrivalDateTime = undefined;

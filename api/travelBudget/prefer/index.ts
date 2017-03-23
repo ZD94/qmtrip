@@ -83,7 +83,7 @@ function mergePrefers(prefers: any[], newPrefers: any[]) {
     newPrefers.forEach( (prefer) => {
         prefers.push(prefer);
     });
-    return newPrefers;
+    return prefers;
 }
 
 
@@ -91,7 +91,6 @@ export var hotelPrefers = {
     starMatch: require('./hotel-star-match'),
     blackList: require('./hotel-blacklist'),
     represent: require('./hotel-represent'),
-    maxPriceLimit: require('./hotel-max-price-limit'),
     price: require('./hotel-price'),
     priceRange: require('./hotel-pricerange')
 }
