@@ -424,7 +424,6 @@ export class Staff extends ModelObject implements Account {
                 return l;
             })
 
-            console.info(JSON.stringify(list, null, ' '));
             return list;
         }catch(e){
             throw L.ERR.BIND_ACCOUNT_ERR();
