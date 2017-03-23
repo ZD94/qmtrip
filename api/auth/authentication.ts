@@ -76,16 +76,6 @@ export async function checkTokenAuth(params: AuthRequest): Promise<AuthResponse|
         return null;
     }
 
-    //验证企业是否过期
-    let staff = await Models.staff.get(token.accountId);
-    if(staff){
-        let staffCom = staff.company;
-        //企业已过期
-        if(staffCom.expiryDate && staffCom.expiryDate.getTime() - new Date().getTime() < 0 ){
-            return null;
-            // throw L.ERR.PAYMENT_REQUIRED();
-        }
-    }
     token.expireAt = moment().add(7, "days").toDate();
     await token.save();
     return {accountId: token.accountId};
@@ -172,16 +162,6 @@ export async function login(data: {account?: string, pwd: string, type?: Number,
     //第五步查看账号是否禁用
     if(loginAccount.status == ACCOUNT_STATUS.FORBIDDEN) {
         throw L.ERR.ACCOUNT_FORBIDDEN();
-    }
-
-    // 第六步查看企业是否过期
-    let staff = await Models.staff.get(loginAccount.id);
-    if(staff){
-        let staffCom = staff.company;
-        //企业已过期
-        if(staffCom.expiryDate && staffCom.expiryDate.getTime() - new Date().getTime() < 0 ){
-            throw L.ERR.PAYMENT_REQUIRED();
-        }
     }
 
     var ret = await makeAuthenticateToken(loginAccount.id)
