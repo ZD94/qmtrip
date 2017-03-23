@@ -10,6 +10,7 @@ import {PaginateInterface} from "common/model/interface";
 import {Company, ECompanyType} from "../company/company";
 import L from 'common/language';
 import { CoinAccount, CoinAccountChange } from "../coin";
+import {NUM_CHANGE_TYPE} from "../company/trip-plan-num-change";
 const API = require("common/api");
 let sequelize = require("common/model").DB;
 
@@ -224,6 +225,17 @@ export class AgencyUser extends ModelObject implements Account{
             agencyId: agency.id,
             remark:`因【${qs.remark}】为【${company.name}(${company.id})】充值了【${chargePackage}】流量包到期时间增加了【3】个月`});
         await log.save();
+
+        //trip_plan_num_changes添加数据
+        let changes = await Models.tripPlanNumChange.create({
+            companyId: companyId,
+            type:NUM_CHANGE_TYPE.SYSTEM_ADD,
+            number:chargePackage,
+            remark:'后台增加流量包',
+            content:'后台增加流量包',
+        });
+        await changes.save();
+
 
         //修改行程流量包
         let newExtraTripPlanNum;
