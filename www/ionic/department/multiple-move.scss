@@ -2,6 +2,21 @@
   background: url(ionic/images/background.png) no-repeat;
   background-size: cover;
   background-position: center;
+  .flex-c10{
+    .list{
+      .item:first-child{
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+      }
+      .item:last-child{
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+      }
+    }
+    .button.button-block, .button.button-full{
+      margin-bottom:0px;
+    }
+  }
   .bar-header{
     .check-box{
       .checkbox_diy{
