@@ -50,13 +50,12 @@
         }
       }
     }
-    &:last-of-type{
-      .item{
-          border-bottom-left-radius: 3px;
-          border-bottom-right-radius: 3px;
+    &:last-child{
+       .item{
+             border-bottom-left-radius: 3px;
+             border-bottom-right-radius: 3px;
       }
     }
-
     .item-avatar{
       height: 75px;
       .policy-list-left{
