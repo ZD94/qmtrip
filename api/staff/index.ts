@@ -226,14 +226,11 @@ class StaffModule{
         var result =  await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
 
         if(result){
-            var staff = await Models.staff.get(id);
-            staff.mobile = mobile;
-            staff.isValidateMobile = true;
-            staff = await staff.save();
+            let staff = await StaffModule.updateStaff({id: id, mobile: mobile, isValidateMobile: true});
+            return staff;
         }else{
             throw L.ERR.CODE_ERROR();
         }
-        return staff;
     }
 
     /**
@@ -395,24 +392,10 @@ class StaffModule{
             throw {code: -2, msg: "不可禁用自身账号"};
         }
 
-        //管理员修改管理员权限仅剩一个管理员是不允许修改权限
-        /*if(staff.roleId == EStaffRole.ADMIN && updateStaff.roleId == EStaffRole.ADMIN && params.roleId == EStaffRole.COMMON){
-            var admins = await Models.staff.find({where: {companyId: updateStaff.company.id, roleId: EStaffRole.ADMIN, id:{$ne: updateStaff.id}}});
-            if(!admins || admins.length == 0){
-                throw {code: -1, msg: "该企业仅剩一位管理员，不能取消身份"};
-            }
-        }*/
-
         for(var key in params){
             updateStaff[key] = params[key];
         }
         updateStaff = await updateStaff.save();
-
-        //部门是否修改
-        if(params.departmentIds && params.departmentIds.length > 0){
-            await updateStaff.deleteStaffDepartments();
-            await updateStaff.saveStaffDepartments(params.departmentIds);
-        }
 
         if(params.email){
 
@@ -436,13 +419,6 @@ class StaffModule{
                 accountId: updateStaff.id
             });
 
-            /*var options = {
-                key: 'staff_update',
-                values: vals,
-                email: updateStaff.email
-            };
-            var link = config.host + "/index.html#/staff/edit?staffId="+updateStaff.id;
-            await API.notice.recordNotice({optins: options, staffId: updateStaff.id, link: link});*/
         }
         return updateStaff;
     }
