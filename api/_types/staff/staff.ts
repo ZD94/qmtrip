@@ -22,7 +22,7 @@ import moment = require("moment");
 import {OS_TYPE} from "../../auth/authentication";
 import {requireParams} from "common/api/helper";
 
-declare var API: any;
+let API = require("common/api");
 
 let getSupplier: SupplierGetter;
 
@@ -424,7 +424,6 @@ export class Staff extends ModelObject implements Account {
                 return l;
             })
 
-            console.info(JSON.stringify(list, null, ' '));
             return list;
         }catch(e){
             throw L.ERR.BIND_ACCOUNT_ERR();
