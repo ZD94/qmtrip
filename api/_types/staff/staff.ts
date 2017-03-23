@@ -470,7 +470,7 @@ export class Staff extends ModelObject implements Account {
             on na.notice_id = nn.id where na.account_id = '${self.id}' and na.deleted_at is null  
             and na.is_read = false and nn.type = '${arr[i].type}' order by created_at desc limit 1`;
             let na = await db.query(_sql);
-            result[arr[i].type] = {unReadNum: arr[i].count, latestInfo: na[0][0]};
+            result[arr[i].type] = {unReadNum: parseInt(arr[i].count), latestInfo: na[0][0]};
         }
         return result;
     }
