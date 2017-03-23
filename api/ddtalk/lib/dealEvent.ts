@@ -35,6 +35,9 @@ import {DDTalkCorp , DDTalkDepartment , DDTalkUser} from "api/_types/ddtalk";
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 const DEFAULT_PWD = '000000';
 
+let moment = require("moment");
+
+
 
 export async function tmpAuthCode(msg) {
     const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
@@ -109,7 +112,7 @@ export async function tmpAuthCode(msg) {
     } else {
         // console.log("企业信息没有记录 , 创建企业");
         //创建企业
-        let company = Company.create({name: corp_name});
+        let company = Company.create({name : corp_name , expiryDate : moment.add(1 , "months").toDate()});
         company = await company.save();
         console.log("company created");
 

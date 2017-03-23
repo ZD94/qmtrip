@@ -1,0 +1,39 @@
+<style type="text/css">
+    table.imagetable {
+        font-family: verdana,arial,sans-serif;
+        font-size:11px;
+        color:#333333;
+        border-width: 1px;
+        border-color: #999999;
+        border-collapse: collapse;
+    }
+    table.imagetable th {
+        background:#b5cfd2 ;
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #999999;
+    }
+    table.imagetable td {
+        background:#dcddc0;
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #999999;
+    }
+</style>
+<table class="imagetable">
+    <thead>
+        <tr>
+            <th>企业名称</th><th>注册时间</th><th>注册人</th><th>联系方式</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% _.forEach(companies, function(company) { %>
+        <tr>
+            <td><%=company.name%></td><td><%=company.createdAt%></td><td><%=company.createUser.name%></td><td><%=company.createUser.mobile%></td>
+        </tr>
+        <%}); %>
+    </tbody>
+</table>
