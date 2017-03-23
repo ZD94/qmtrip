@@ -32,6 +32,7 @@ $main-color: #28a7e1;
       padding: 8px 10px;
       &:first-child {
         border-top-left-radius: 3px;
+        border-right: 0;
       }
       &:last-child {
         border-top-right-radius: 3px;
