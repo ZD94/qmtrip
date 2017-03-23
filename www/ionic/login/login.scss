@@ -4,33 +4,27 @@
   background-size: cover;
   background-position: center;
   .logo_title{
-    margin: 50px auto 0;
+    margin: 107px auto 0;
+    position: relative;
     .logo{
-      background: url(ionic/images/logo.png) no-repeat;
-      background-size: 36px auto;
-      padding-left: 50px;
-      width: 200px;
-      color:#fff;
-      font-size: 36px;
-      height: 36px;
-      line-height: 36px;
+      text-indent: -9999px;
+      background: url(ionic/images/logo-slogan.png) no-repeat;
+      background-size: cover;
+      width: 203px;
+      height: 58px;
       margin: 0 auto;
-      white-space: nowrap;
-      .config-name{
-        font-size: 12px;
-        line-height: 12px;
-        min-width: 30px;
-        min-height: 13px;
-        padding: 2px;
-        margin: 0px;
-      }
     }
-    .logo_text{
-      background: url(ionic/images/logo_text.png) center no-repeat;
-      width: 240px;
-      height: 51px;
-      margin: 0 auto;
-      background-size: contain;
+    .config-name{
+      font-size: 12px;
+      line-height: 12px;
+      min-width: 30px;
+      min-height: 13px;
+      margin:0;
+      padding: 2px;
+      position: absolute;
+      top: 0px;
+      left: 50%;
+      margin-left: 110px;
     }
   }
   .invited_from{
