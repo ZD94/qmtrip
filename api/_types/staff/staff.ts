@@ -223,12 +223,12 @@ export class Staff extends ModelObject implements Account {
                         staffId: staff.id , departmentId: department.id
                     })).save();
                 }
+            }
 
-                //删除数据
-                if(fromDepartmentId == departmentIds[j]){
-                    //移入的部门中包含了本部门
-                    continue;
-                }
+            //删除数据
+            if(departmentIds.indexOf(fromDepartmentId) > -1) {
+                //移入的部门中包含了本部门
+            }else{
                 let fromData = await Models.staffDepartment.find({
                     where : {
                         "staffId" : staff.id,
