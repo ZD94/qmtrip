@@ -21,6 +21,7 @@ import C = require("config");
 import moment = require("moment");
 import {OS_TYPE} from "../../auth/authentication";
 import {requireParams} from "common/api/helper";
+let db = require("common/model").DB;
 
 let API = require("common/api");
 
@@ -263,44 +264,43 @@ export class Staff extends ModelObject implements Account {
         var self = this;
         if (!options) options = {where: {}};
         if(!options.where) options.where = {};
+        let ids = [];
+        let no_ids = [];
+        let mna: any = {};
 
         //若不查已删除的下边逻辑就会以为已删除的那条通知是未读的全员通知会再加一条进关系表
-        var pagers = await Models.noticeAccount.find({where: {accountId: this.id}, paranoid: false, order: [['createdAt', 'desc']]});
+        let sql = `select id, notice_id as "noticeId", deleted_at as "deletedAt" from notice.notice_accounts where account_id = '${self.id}'`;
+        let ret = await db.query(sql);
 
-        let noticeAccounts = [];
-        noticeAccounts.push.apply(noticeAccounts, pagers);
-        while(pagers.hasNextPage()){
-            let nextPager = await pagers.nextPage();
-            noticeAccounts.push.apply(noticeAccounts, nextPager);
-            // pagers = nextPager;
+        let ids_query = ret[0];
+        if(ids_query && ids_query.length > 0){
+            ids_query.forEach(function(t){
+                mna[t.noticeId] = t;
+                if(t.deletedAt){
+                    no_ids.push(t.noticeId);
+                }else{
+                    ids.push(t.noticeId);
+                }
+            })
         }
 
-        var mna: any = {};
-        var ids = [];
-        var no_ids = [];
-        noticeAccounts.forEach(function(t){
-            mna[t.noticeId] = t;
-            if(t.deletedAt){
-                no_ids.push(t.noticeId);
-            }else{
-                ids.push(t.noticeId);
-            }
-        })
         options.where .$or = [{id: {$in: ids}}, {sendType: ESendType.ALL_ACCOUNT}];
         if(no_ids && no_ids.length > 0){
             options.where.id = {$notIn: no_ids};
         }
         options.order = options.order || [['createdAt', 'desc']];
+        // let sql_query = `select * from notice.notices nn join notice.notice_accounts na on nn.id = na.notice_id
+        //  where (na.account_id = '${self.id}' or nn.send_type = ${ESendType.ALL_ACCOUNT}) and nn.type = 1 order by nn.created_at desc limit 5 offset 0`;
         var notices = await Models.notice.find(options);
         var result = await Promise.all(notices.map(async function(n){
             // 此处处理发给全体员工的 员工拉取通知列表时存入noticeAccount关系表记录（其余发给一个人或多个人的 发消息的时候存入关系表）
-            var na = Models.noticeAccount.create({accountId: self.id, noticeId: n.id, isRead: false});
-            await na.save();
+            if(!mna[n.id]){
+                var na = Models.noticeAccount.create({accountId: self.id, noticeId: n.id, isRead: false});
+                await na.save();
+            }
             return n;
         }));
-
         return notices;
-
     }
 
     getTripPlans(options: {where?: any, limit?: number}): Promise<PaginateInterface<TripPlan>> {
@@ -453,100 +453,24 @@ export class Staff extends ModelObject implements Account {
         }
     }
 
+    @RemoteCall()
     async statisticNoticeByType(): Promise<any> {
-        /*if(!this.isLocal){
-         API.require('notice');
-         await API.onload();
-         }
-         return API.notice.statisticNoticeByType();*/
         let self = this;
-        var result:any = {};
-        var num1 = 0;
-        var num2 = 0;
-        var num3 = 0;
-        var num4 = 0;
+        let result:any = {};
 
-        var latestObj1: Notice;
-        var latestObj2: Notice;
-        var latestObj3: Notice;
-        var latestObj4: Notice;
-
-        // var allNotices = await this.getSelfNotices();
-        var pagers = await Models.noticeAccount.find({where: {accountId: this.id}, paranoid: false, order: [['createdAt', 'desc']]});
-
-        let noticeAccounts = [];
-        noticeAccounts.push.apply(noticeAccounts, pagers);
-        while(pagers.hasNextPage()){
-            let nextPager = await pagers.nextPage();
-            noticeAccounts.push.apply(noticeAccounts, nextPager);
+        let sql = `select type, count(*) from notice.notice_accounts na 
+        right join notice.notices nn on na.notice_id = nn.id where na.account_id = '${self.id}'  
+        and na.deleted_at is null and na.is_read = false or nn.send_type = ${ESendType.ALL_ACCOUNT} 
+        group by nn.type order by nn.type asc`;
+        let ret = await db.query(sql);
+        let arr = ret[0];
+        for(let i = 0; i < arr.length; i++){
+            let _sql = `select nn.* from notice.notice_accounts na right join notice.notices nn 
+            on na.notice_id = nn.id where na.account_id = '${self.id}' and na.deleted_at is null  
+            and na.is_read = false and nn.type = '${arr[i].type}' order by created_at desc limit 1`;
+            let na = await db.query(_sql);
+            result[arr[i].type] = {unReadNum: parseInt(arr[i].count), latestInfo: na[0][0]};
         }
-
-        var mna: any = {};
-        var ids = [];
-        var no_ids = [];
-        noticeAccounts.forEach(function(t){
-            mna[t.noticeId] = t;
-            if(t.deletedAt){
-                no_ids.push(t.noticeId);
-            }else{
-                ids.push(t.noticeId);
-            }
-        })
-        let options: any;
-        options = {where: {$or: [{id: {$in: ids}}, {sendType: ESendType.ALL_ACCOUNT}]}, order: [['createdAt', 'desc']]};
-        if(no_ids && no_ids.length > 0){
-            options = {where: {$or: [{id: {$in: ids}}, {sendType: ESendType.ALL_ACCOUNT}], id: {$notIn: no_ids}}, order: [['createdAt', 'desc']]};
-
-        }
-        var pagers2 = await Models.notice.find(options);
-
-        let allNotices = [];
-        allNotices.push.apply(allNotices, pagers2);
-        while(pagers2.hasNextPage()){
-            let nextPager = await pagers2.nextPage();
-            allNotices.push.apply(allNotices, nextPager);
-        }
-        let notices_result = await Promise.all(allNotices.map(async function(n){
-            if(mna[n.id]){
-                n["isRead"] = mna[n.id].isRead;
-            }else{
-                n["isRead"] = false;
-            }
-            return n;
-        }))
-
-        notices_result.forEach(async function(notice){
-            switch(notice.type){
-                case ENoticeType.SYSTEM_NOTICE:
-                    if(!latestObj1 || !latestObj1.id){
-                        latestObj1 = notice;
-                    }
-                    if(!notice.isRead) num1 += 1;
-                    break;
-                case ENoticeType.TRIP_APPROVE_NOTICE:
-                    if(!latestObj2 || !latestObj2.id){
-                        latestObj2 = notice;
-                    }
-                    if(!notice.isRead) num2 += 1;
-                    break;
-                case ENoticeType.TRIP_APPLY_NOTICE:
-                    if(!latestObj3 || !latestObj3.id){
-                        latestObj3 = notice;
-                    }
-                    if(!notice.isRead) num3 += 1;
-                    break;
-                case ENoticeType.ACTIVITY_NOTICE:
-                    if(!latestObj4 || !latestObj4.id){
-                        latestObj4 = notice;
-                    }
-                    if(!notice.isRead) num4 += 1;
-                    break;
-            }
-        });
-        result[ENoticeType.SYSTEM_NOTICE] = {unReadNum: num1, latestInfo: latestObj1};
-        result[ENoticeType.TRIP_APPROVE_NOTICE] = {unReadNum: num2, latestInfo: latestObj2};
-        result[ENoticeType.TRIP_APPLY_NOTICE] = {unReadNum: num3, latestInfo: latestObj3};
-        result[ENoticeType.ACTIVITY_NOTICE] = {unReadNum: num4, latestInfo: latestObj4};
         return result;
     }
     
@@ -607,6 +531,10 @@ export class Staff extends ModelObject implements Account {
 
     @RemoteCall()
     async getAutoLoginUrl(backUrl:string, os?: string) {
+        if(!this.isLocal){
+            API.require('auth');
+            await API.onload();
+        }
         let self = this;
         if (os != OS_TYPE.TMP_CODE) {
             throw L.ERR.INVALID_ARGUMENT(`目前仅支持企业PC平台自动登录`);
