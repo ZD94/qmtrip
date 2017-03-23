@@ -1,10 +1,23 @@
+@import "../scss/color.variable.scss";
 .set-questions{
   .item{
+    h3{
+      color:$dark;
+      font-weight: bold;
+    }
     &.item-icon-right{
       padding: 11px;
       .icon{
         font-size: 14px;
       }
+    }
+    &:first-of-type{
+      border-top-left-radius: 3px;
+      border-top-right-radius: 3px;
+    }
+    &:last-of-type{
+      border-bottom-left-radius: 3px;
+      border-bottom-right-radius: 3px;
     }
     p{
       white-space: normal;
