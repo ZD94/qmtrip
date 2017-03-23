@@ -62,6 +62,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
 
     async getTrainTicketReserveLink(options):Promise<ReserveLink> {
         let trafficBookLink = "http://m.ctrip.com/webapp/train/v2/index#!/list";
+        let indexBookLink = 'http://m.ctrip.com/webapp/train/v2/index';
         let param = {
             "value":
             {
@@ -87,7 +88,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
 
         var param_str = JSON.stringify(param);
         var linkJS = "localStorage.setItem('TRAIN_SEARCH_STORE_LIGHT', \'"+param_str+"\');console.log('train_search_param');";
-        return {url:trafficBookLink, jsCode: linkJS};
+        return {url:trafficBookLink, indexUrl:indexBookLink, jsCode: linkJS};
     }
 
     async queryFlightCityCode(city: string): Promise<string>{
