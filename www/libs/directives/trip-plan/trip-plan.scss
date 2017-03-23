@@ -1,3 +1,4 @@
+@import "../../../ionic/scss/color.variable.scss";
 $color-red: #fe2851;
 $color-blue: #28a7e1;
 .staff_info{
@@ -78,7 +79,7 @@ $color-blue: #28a7e1;
 
 //行程详情样式调整
 .trip-card{
-  border-radius: 0;
+  border-radius: 3px;
   padding-top: 0;
   .card-header{
     padding: 4px 16px;
@@ -86,7 +87,7 @@ $color-blue: #28a7e1;
     font-weight: normal;
     color: #9b9b9b;
     line-height: 22px;
-    background: #dadada;
+    background: $stable;
     &.special{
       background: #f5a623;
       color: #fff;
@@ -146,100 +147,109 @@ $color-blue: #28a7e1;
 }
 
 .tp-detail-item{
-    margin-bottom: 15px;
-    ion-item:first-child{
-      border-top-left-radius: 5px;
-      border-top-right-radius: 5px;
-    }
-    ion-item:last-child{
-      border-bottom-left-radius: 5px;
-      border-bottom-right-radius: 5px;
-    }
-    .right-budget{
-      background-color: #f39800;
-      color:#ffffff;
+  margin-bottom: 15px;
+  .item-divider {
+    color: $dark;
+    font-size: 14px;
+    background-color: lighten($dark,71%);
+  }
+  ion-item.item-divider.ion-item-title{
+    font-size: 16px;
+    font-weight: bold;
+  }
+  ion-item:first-child{
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+  ion-item:last-child{
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+  .right-budget{
+    background-color: #f39800;
+    color:#ffffff;
+    font-size: 12px;
+    border-radius: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .actual-cost{
+    display: inline-block;
+    width:95px;
+    span:first-child{
+      color: #b6b6b6;
+      text-align: left;
       font-size: 12px;
-      border-radius: 3px;
-      padding-left: 5px;
-      padding-right: 5px;
     }
-    .actual-cost{
-      display: inline-block;
-      width:95px;
-      span:first-child{
-        color: #b6b6b6;
-        text-align: left;
-        font-size: 12px;
-      }
-      span:nth-child(2){
-        color:#f49e0e;
-        float: right;
-        font-size: 16px;
-      }
+    span:nth-child(2){
+      color:#f49e0e;
+      float: right;
+      font-size: 16px;
     }
-    .spanRight-cost{
-      font-size: 12px;
-      color:#fff;
-      border-radius: 3px;
-      border:1px solid #fff;
-      line-height: 16px;
+  }
+  .spanRight-cost{
+    font-size: 12px;
+    color:#fff;
+    border-radius: 3px;
+    border:1px solid #fff;
+    line-height: 16px;
+  }
+  .spanRight-cost span:nth-child(1){
+    padding:1px 2px 1px 2px;
+  }
+  .spanRight-cost span:nth-child(2){
+    display: inline-block;
+    min-width: 14px;
+    text-align: right;
+    padding-right: 2px;
+  }
+  .spanRight-cost.company-cost{
+    border-color: #28a7e1;
+    margin-right: 8px;
+    span:first-child{
+      background-color: #28a7e1;
     }
-    .spanRight-cost span:nth-child(1){
-      padding:1px 2px 1px 2px;
+    span:nth-child(2){
+      color:#28a7e1;
     }
-    .spanRight-cost span:nth-child(2){
-      display: inline-block;
-      min-width: 14px;
-      text-align: right;
-      padding-right: 2px;
+  }
+  .spanRight-cost.personal-cost{
+    border-color: #ff5b12;
+    span:first-child{
+      background-color: #ff5b12;
     }
-    .spanRight-cost.company-cost{
-      border-color: #28a7e1;
-      margin-right: 8px;
-      span:first-child{
-        background-color: #28a7e1;
-      }
-      span:nth-child(2){
-        color:#28a7e1;
-      }
+    span:nth-child(2){
+      color:#ff5b12;
     }
-    .spanRight-cost.personal-cost{
-      border-color: #ff5b12;
-      span:first-child{
-        background-color: #ff5b12;
-      }
-      span:nth-child(2){
-        color:#ff5b12;
-      }
-    }
+  }
 
-    .trip-buttons{
-      padding-top: 0px;
-      padding-bottom: 0px;
-      height:36px;
-      .subsidy-inform{
-        font-size: 12px;
-        color: #a5a5a5;
-        line-height: 36px;
-      }
-      .trip_btn{
-        height:22px;
-        line-height:20px;
-        min-height:22px;
-        width: 68px;
-        border: 1px solid #a5a5a5;
-        color: #a5a5a5;
-        float: right;
-        border-radius: 3px;
-        padding:0px;
-        text-align: center;
-        margin-top: 7px;
-        &.button-positive{
-          color: #43b2e5;
-          border-color: #43b2e5;
-        }
+  .trip-buttons{
+    padding-top: 0px;
+    padding-bottom: 0px;
+    height:36px;
+    .subsidy-inform{
+      font-size: 12px;
+      color: #a5a5a5;
+      line-height: 36px;
+    }
+    .trip_btn{
+      height:22px;
+      line-height:20px;
+      min-height:22px;
+      width: 68px;
+      border: 1px solid #a5a5a5;
+      color: #a5a5a5;
+      float: right;
+      border-radius: 3px;
+      padding:0px;
+      text-align: center;
+      margin-top: 7px;
+      &.button-positive{
+        color: #43b2e5;
+        border-color: #43b2e5;
       }
     }
+  }
   .hotel-name{
     white-space: nowrap;
     overflow: hidden;

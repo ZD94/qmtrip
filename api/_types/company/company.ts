@@ -139,11 +139,11 @@ export class Company extends ModelObject{
     get isSetPwd(): boolean { return false; }
     set isSetPwd(val: boolean) {}
 
-    @Field({type: Types.BOOLEAN})
+    @Field({type: Types.BOOLEAN, defaultValue: true})
     get isApproveOpen(): boolean { return true; }
     set isApproveOpen(val: boolean) {}
 
-    @Field({type: Types.STRING(50)})
+    @Field({type: Types.STRING(50), defaultValue: 'default'})
     get budgetPolicy(): string { return 'default'; }
     set budgetPolicy(policy:string){}
 
@@ -151,7 +151,7 @@ export class Company extends ModelObject{
     get getNoticeEmail(): string { return  null; }
     set getNoticeEmail(val:string){}
 
-    @Field({type: Types.JSONB})
+    @Field({type: Types.JSONB, defaultValue: '{}'})
     get budgetConfig(): any { return {}};
     set budgetConfig(conf: any) {}
 
@@ -168,11 +168,11 @@ export class Company extends ModelObject{
     get points2coinRate(): number { return 50};
     set points2coinRate(rate: number) {}
 
-    @Field({type: Types.JSONB})
+    @Field({type: Types.JSONB, defaultValue: '[]'})
     get appointedPubilcSuppliers(): any { return []};
     set appointedPubilcSuppliers(val: any) {}
 
-    @Field({type: Types.BOOLEAN})
+    @Field({type: Types.BOOLEAN, defaultValue: false})
     get isAppointSupplier(): boolean { return false; }
     set isAppointSupplier(val: boolean) {}
 
@@ -269,17 +269,17 @@ export class Company extends ModelObject{
             number = params.number;
         }
         //套餐内剩余量
-        let surplus = self.tripPlanNumLimit - self.tripPlanPassNum - self.tripPlanFrozenNum;
+        let surplus = self.tripPlanNumInBase;
         if(!(surplus >= number)){
             //套餐包剩余的条数不够
-            if(!self.extraTripPlanNum){
+            if(!self.tripPlanNumInPack){
                 throw L.ERR.BEYOND_LIMIT_NUM("出差申请");
             }else{
                 //套餐包剩余的加上加油包剩余的条数不够
                 if(surplus < 0){
                     surplus = 0;
                 }
-                if(!((self.extraTripPlanNum + surplus) >= number
+                if(!((self.tripPlanNumInPack + surplus) >= number
                     && self.extraExpiryDate && self.extraExpiryDate.getTime() - new Date().getTime() > 0)){
                     throw L.ERR.BEYOND_LIMIT_NUM("出差申请");
                 }
@@ -296,6 +296,10 @@ export class Company extends ModelObject{
         if(params && params.number){
             number = params.number;
         }
+        //过期企业 套餐会被置为0 冻结数不能被自动审批通过
+        /*if(self.expiryDate && (self.expiryDate.getTime() - new Date().getTime()) < 0){
+            return true;
+        }*/
         //套餐内剩余量
         let surplus = self.tripPlanNumLimit - self.tripPlanPassNum;
         if(!(surplus >= number)){
@@ -582,7 +586,7 @@ export class Company extends ModelObject{
         return Models.department.find(options);
     }
 
-    getTravelPolicies(): Promise<TravelPolicy[]> {
+    getTravelPolicies(): Promise<PaginateInterface<TravelPolicy>> {
         let query = { where: {companyId: this.id}}
         return Models.travelPolicy.find(query);
     }

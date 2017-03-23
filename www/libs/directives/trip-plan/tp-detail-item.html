@@ -1,15 +1,15 @@
 <div class="tp-detail-item">
-    <ion-item class="item-divider" ng-if="title && item.type != ETripType.SPECIAL_APPROVE">
+    <ion-item class="item-divider ion-item-title" ng-if="title && item.type != ETripType.SPECIAL_APPROVE">
         <span>{{title}}</span>
     </ion-item>
     <ion-item class="item-divider" ng-if="title && item.type == ETripType.SPECIAL_APPROVE">
-        <span>{{item.deptCity}} - {{item.arrivalCity}}</span>
+        <span><span ng-if="item.deptCity">{{item.deptCity}} - </span>{{item.arrivalCity}}</span>
     </ion-item>
 
     <ion-item class="item-divider" style="background-color:#fff">
         <div ng-if="item.type == ETripType.OUT_TRIP || item.type == ETripType.BACK_TRIP">
             <div>
-                <span style="font-size: 12px">{{item.deptDateTime | date: 'MM-dd'}}</span>
+                <span>{{item.deptDateTime | date: 'MM-dd'}}</span>
             <span class="spanRight actual-cost">
                 <span>实际:</span>
                 <span>{{item.expenditure | currency_int}}元</span>
@@ -42,7 +42,7 @@
 
         <div ng-if="item.type == ETripType.HOTEL">
             <div>
-                <span style="font-size: 12px">{{item.checkInDate | date: 'MM-dd'}}至{{item.checkOutDate | date: 'MM-dd'}}(共{{days || 1}}天)</span>
+                <span>{{item.checkInDate | date: 'MM-dd'}}至{{item.checkOutDate | date: 'MM-dd'}}(共{{days || 1}}天)</span>
                 <span class="spanRight actual-cost">
                     <span>实际:</span>
                     <span>{{item.expenditure | currency_int}}元</span>
@@ -67,7 +67,7 @@
         </div>
 
         <div ng-if="item.type == ETripType.SUBSIDY">
-            <span style="font-size: 12px">{{item.startDateTime | date: 'MM-dd'}}至{{item.endDateTime | date: 'MM-dd'}}(共{{subsidyDays}}天)</span>
+            <span>{{item.startDateTime | date: 'MM-dd'}}至{{item.endDateTime | date: 'MM-dd'}}(共{{subsidyDays}}天)</span>
             <span class="spanRight actual-cost">
                 <span>实际:</span>
                 <span>{{item.expenditure | currency_int}}元</span>

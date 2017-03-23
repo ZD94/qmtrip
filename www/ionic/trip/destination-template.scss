@@ -1,0 +1,135 @@
+@import "../../../common/vendor/ionic/scss/variables.scss";
+.destination-template{
+  background: url("ionic/images/background.png") no-repeat;
+  background-size: cover;
+  .bar-subheader{
+    background: #fff;
+    height: 44px;
+    line-height: 44px;
+    padding: 0;
+    .slide-tab{
+      height: 100%;
+    }
+    .tab{
+      width: 110px;
+      text-align: center;
+      border-bottom: 2px solid #28a7e1;
+      height: 100%;
+      a{
+        color: #28a7e1;
+        font-size: 16px;
+      }
+    }
+  }
+  ion-slide{
+    .list{
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      &.list-border{
+        .item{
+          border-top: 1px solid #eee;
+          &:first-child{
+            border-top: 0;
+          }
+        }
+      }
+      .item-flex {
+        display: flex;
+        .item {
+          flex: 1;
+          margin-top: 1px;
+          border-top: 1px solid #eee;
+          font-size: 14px;
+          &:first-child{
+            border-right: 1px solid #eee;
+          }
+        }
+      }
+      .item{
+        border: 0;
+        padding: 8px 10px;
+        p {
+          font-size: 16px;
+        }
+        &.item-icon-right{
+          .icon{
+            font-size: 14px;
+          }
+        }
+        .item-tit{
+          font-size: 12px;
+          color: #28a7e1;
+          padding: 0;
+        }
+      }
+    }
+  }
+  .button.button-full{
+    margin: 0;
+  }
+}
+//调整安卓上popup的toggle样式  shicong
+
+body.platform-android div.selectSubsidy{
+  .toggle-small.item-toggle .toggle{
+    top:10px
+  }
+  div.item-toggle{
+    label.toggle > div.track > div.handle{
+      top:7px;
+      left:8px;
+    }
+  }
+}
+//补助选择popup
+.selectSubsidy{
+  .scroll-bar-v{
+    right: -3px;//使滚动条在view外,即不可见
+  }
+  .item-radio{
+    border: 0;
+    margin-bottom: 5px;
+    input:checked + .radio-content .radio-icon{
+      color: $calm;
+    }
+    .radio-content{
+      .item-content{
+        border: 1px solid #ddd;
+        padding: 10px 10px 10px 40px;
+        font-size: 14px;
+      }
+      .icon{
+        font-size: 14px;
+        padding: 8px;
+        visibility:visible;
+        color: lighten($dark,39);
+      }
+    }
+  }
+  .item-toggle{
+    border: 0;
+    padding-left: 0;
+    font-size: 12px;
+    padding: 10px;
+    .toggle{
+      .track{
+        height: 25px;
+        width: 43px;
+        .handle{
+          height: 21px;
+          width: 21px;
+          border-radius: 21px;
+        }
+      }
+    }
+  }
+  .item-radio input:checked + .radio-content .item-content{
+    border: 1px solid #28a7e1;
+    background: none;
+  }
+  ion-scroll{
+    padding-top: 5px;
+    max-height: 155px;
+  }
+}

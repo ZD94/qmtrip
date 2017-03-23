@@ -1,17 +1,20 @@
 <ion-view title="我的行程" id="page13">
-    <ion-content padding="true" class="has-header">
-        <div class="button-bar sub-button-bar">
-            <a ng-click="changeTo('ALL')" class="button button-small" ng-class="filter == 'ALL' ? 'active': ''">全部</a>
-            <a ng-click="changeTo('WAIT_UPLOAD')" class="button button-small" ng-class="filter == 'WAIT_UPLOAD' ? 'active': ''">待传票据</a>
-            <a ng-click="changeTo('AUDITING')" class="button button-small" ng-class="filter == 'AUDITING' ? 'active': ''">审批中</a>
-            <a ng-click="changeTo('AUDIT_NOT_PASS')" class="button button-small" ng-class="filter == 'AUDIT_NOT_PASS' ? 'active': ''">未通过</a>
-            <a ng-click="changeTo('COMPLETE')" class="button button-small" ng-class="filter == 'COMPLETE' ? 'active': ''">已完成</a>
+    <ion-content padding="true" class="has-header" scroll="false">
+        <div class="flex-c01">
+            <div class="button-bar sub-button-bar">
+                <a ng-click="changeTo('ALL')" class="button button-small" ng-class="filter == 'ALL' ? 'active': ''">全部</a>
+                <a ng-click="changeTo('WAIT_UPLOAD')" class="button button-small" ng-class="filter == 'WAIT_UPLOAD' ? 'active': ''">待传票据</a>
+                <a ng-click="changeTo('AUDITING')" class="button button-small" ng-class="filter == 'AUDITING' ? 'active': ''">审批中</a>
+                <a ng-click="changeTo('AUDIT_NOT_PASS')" class="button button-small" ng-class="filter == 'AUDIT_NOT_PASS' ? 'active': ''">未通过</a>
+                <a ng-click="changeTo('COMPLETE')" class="button button-small" ng-class="filter == 'COMPLETE' ? 'active': ''">已完成</a>
+            </div>
+            <ion-scroll>
+                <trip-plan ng-repeat="trip in (tripPlans | orderBy: startAt:reserve) track by $index" show-detail-status="true" data="trip" click="enterdetail"></trip-plan>
+                <div id="page13-markdown3">
+                    <div ng-if="!vm.hasNextPage()" class="getMoreOrNoMore">没有更多记录了</div>
+                </div>
+                <ion-infinite-scroll ng-if="vm.hasNextPage()" on-infinite="vm.nextPage()"></ion-infinite-scroll>
+            </ion-scroll>
         </div>
-
-        <trip-plan ng-repeat="trip in (tripPlans | orderBy: startAt:reserve) track by $index" show-detail-status="true" data="trip" click="enterdetail"></trip-plan>
-        <div id="page13-markdown3">
-            <div ng-if="!vm.hasNextPage()" class="getMoreOrNoMore">没有更多记录了</div>
-        </div>
-        <ion-infinite-scroll ng-if="vm.hasNextPage()" on-infinite="vm.nextPage()"></ion-infinite-scroll>
     </ion-content>
 </ion-view>

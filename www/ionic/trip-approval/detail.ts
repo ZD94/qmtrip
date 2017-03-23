@@ -5,6 +5,7 @@ import {
 import { Staff } from 'api/_types/staff/staff';
 import moment = require('moment');
 import {EApproveChannel} from "api/_types/approve/types";
+import _ = require("lodash");
 
 export async function DetailController($scope, Models, $stateParams, $ionicPopup, $loading, $storage, ngModalDlg){
     require('./trip-approval.scss');
@@ -86,36 +87,38 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0, specialApproveBudget = 0;
     let subsidyDays:number = moment(tripApprove.backAt).diff(moment(tripApprove.startAt), 'days');
     tripApprove.budgetInfo.map((budget) => {
-        budget.startTime = tripApprove.startAt;
-        budget.endTime = tripApprove.backAt;
+        budget.startTime = budget.leaveDate || budget.checkInDate || budget.fromDate || tripApprove.startAt;
+        budget.endTime = budget.checkOutDate || budget.endDate || tripApprove.backAt;
         switch (budget.tripType) {
             case ETripType.OUT_TRIP:
-                budget.deptCity = tripApprove.deptCity;
-                budget.arrivalCity = tripApprove.arrivalCity;
+                budget.deptCity = budget.originPlace.name || budget.originPlace || tripApprove.deptCity;
+                budget.arrivalCity = budget.destination.name || budget.destination || tripApprove.arrivalCity;
                 traffic.push(budget);
                 trafficBudget += Number(budget.price);
                 break;
             case ETripType.BACK_TRIP:
-                budget.deptCity = tripApprove.arrivalCity;
-                budget.arrivalCity = tripApprove.deptCity;
-                budget.startTime = tripApprove.backAt;
+                budget.deptCity = budget.originPlace.name || budget.originPlace || tripApprove.deptCity;
+                budget.arrivalCity = budget.destination.name || budget.destination || tripApprove.arrivalCity;
+                budget.startTime = budget.leaveDate || tripApprove.backAt;
                 budget.endTime = tripApprove.startAt;
                 traffic.push(budget);
                 trafficBudget += Number(budget.price);
                 break;
             case ETripType.HOTEL:
-                budget.city = tripApprove.arrivalCity;
+                budget.city = budget.cityName || tripApprove.arrivalCity;
                 budget.duringDays = moment(tripApprove.backAt).diff(moment(tripApprove.startAt), 'days');
                 hotel.push(budget);
                 hotelBudget += Number(budget.price);
                 break;
             case ETripType.SUBSIDY:
-                budget.duringDays = moment(tripApprove.backAt).diff(moment(tripApprove.startAt), 'days') + 1;
-                if (budget.hasFirstDaySubsidy === false) {
-                    budget.duringDays -= 1;
-                }
-                if (budget.hasLastDaySubsidy === false) {
-                    budget.duringDays -= 1;
+                if(!budget.duringDays){
+                    budget.duringDays = moment(tripApprove.backAt).diff(moment(tripApprove.startAt), 'days') + 1;
+                    if (budget.hasFirstDaySubsidy === false) {
+                        budget.duringDays -= 1;
+                    }
+                    if (budget.hasLastDaySubsidy === false) {
+                        budget.duringDays -= 1;
+                    }
                 }
                 subsidy.push(budget);
                 subsidyBudget += Number(budget.price);
@@ -282,9 +285,11 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     };
 
     $scope.reCommitTripApprove = async function() {
-        let tripApprove = $scope.tripApprove;
+        // let tripApprove = $scope.tripApprove;
+        let query = tripApprove.query;
+        if(typeof query != 'string') query = JSON.stringify(query);
         //let tripDetails = $scope.budgets;
-        let trip: any = {
+        /*let trip: any = {
             regenerate: true,
             traffic: tripApprove.isNeedTraffic,
             round: tripApprove.isRoundTrip,
@@ -306,8 +311,8 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
             trip.hotelPlaceName = tripApprove.arrivalCity || '';
         }
 
-        await $storage.local.set('trip', trip);
-        window.location.href="#/trip/create";
+        await $storage.local.set('trip', trip);*/
+        window.location.href="#/trip/create?params="+query;
     };
 
     $scope.checkTrip = async function(){
@@ -362,8 +367,7 @@ export async function selectModeController ($scope){
             //let approveStaffId = $scope.tripApprove.account.id;
             let staffs = await staff.company.getStaffs({where: {name: {$ilike: `%${keyword}%`}}});
             return staffs;
-        },
-        display: (staff)=>staff.name
+        }
     };
     $scope.chooseOption = function(isNextApprove) {
         $scope.isNextApprove = isNextApprove;

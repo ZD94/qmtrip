@@ -1,3 +1,4 @@
+@import "../../../www/ionic/scss/color.variable.scss";
 .preview_img{
   canvas, img{
     width:100%;
@@ -7,6 +8,7 @@
 .preview_btn{
   border-radius: 0;
   margin-bottom: 0!important;
+
 }
 
 [ng-uploader]:after {

@@ -61,16 +61,31 @@
     padding-left: 36px;
     &.item-option-selected{
       border: 1px #28a7e1 solid;
+      border-radius: 3px;
     }
     &:first-child{
       margin-bottom: 10px;
     }
-    &.item-icon-left{
+    &.item-icon-left , &.item-icon-left-unchecked{
       .icon{
         display: flex;
         left: 2px;
         font-size: 16px;
         color: #28a7e1;
+      }
+    }
+    &.item-icon-left-unchecked {
+      .icon{
+        color: lighten($dark,39%);
+        align-items: center;
+        position: absolute;
+        top: 0;
+        height: 100%;
+        &:before {
+          display: block;
+          width: 32px;
+          text-align: center;
+        }
       }
     }
     .icon{
@@ -88,7 +103,7 @@
         min-height: 20px;
         line-height: 36px;
         height: 40px;
-        border-radius: 0;
+        border-radius: 3px;
         font-size: 14px;
         margin: 0;
         &.button-outline{

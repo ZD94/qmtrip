@@ -36,15 +36,24 @@ angular
         return{
             restrict: 'AE',
             template: require( './single-check.html'),
-            replace: true,
+            // replace: true,
             scope: {
                 model: '=ngModel',
                 option: '=checkOption', //这种写法option传过来的是单独的一个对象
             },
+            transclude: {
+                'selected':'?selected',
+                'notSelected':'?notSelected'
+            },
             controller: function($scope, $element){
                 require('./checkbox.scss');
                 $scope.checkOption = function(option){
-                    let values = _.cloneDeep($scope.model) || [];
+                    // let values = _.cloneDeep($scope.model) || [];
+                    // ?????为什么我之前要加clone？？？现在导致model全选内存地址引用不同，无法通信，，奇怪，奇怪
+                    if(!$scope.model){
+                        $scope.model = [];
+                    }
+                    let values = $scope.model;
                     let idx = values.indexOf(option.value);
                     if(idx >=0){
                         values.splice(idx, 1);
@@ -65,6 +74,11 @@ angular
             scope:{
                 model:'=ngModel',
                 options: '=ngCheckOptions'
+            },
+            replace: true,
+            transclude: {
+                'all': '?all',
+                'notAll': '?notAll'
             },
             controller: function($scope){
                 $scope.$watch('model.length',function(n,o){

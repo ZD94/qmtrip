@@ -1,5 +1,6 @@
+@import "../ionic/scss/color.variable.scss";
 .side-menu-left{
-  background-color: #444;
+  background-color: $dark;
   .scroll,.list{
     height: 100%;
     .button-bar{

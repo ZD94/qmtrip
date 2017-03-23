@@ -63,7 +63,7 @@
                 <div placeholder="预算结果" rows="4" cols="80" ng-if="hideCalResult">
                     <table class="table-bordered">
                         <tr ng-repeat="(x,y) in result" ng-hide="$last">
-                            <td>{{x}}</td>
+                            <td>{{translate_result[x].translate}}</td>
                             <td>{{y}}</td>
                         </tr>
                     </table>
@@ -88,10 +88,10 @@
                     <table>
                         <tr ng-repeat="prefer in ori_prefers" style="height:50px">
                             <td style="color: #4A4EC1;padding-right: 5px">{{$index}}</td>
-                            <td style="padding-right: 15px">{{prefer.name}}</td>
+                            <td style="padding-right: 15px">{{translate_prefer[prefer.name].template[prefer.name]}}</td>
                             <!--<td><input type="text" style="width:1200px" ng-model="prefer.options" value="{{prefer.options}}"></td>-->
                             <td ng-repeat="(x,y) in prefer.options">
-                                {{x}}
+                                {{translate_prefer[prefer.name].template[x]}}
                                 <input style="width:auto" ng-model="prefer.options[x]" type="text">
                             </td>
                             <td style="padding-left: 15px;color: #9e0505">
