@@ -54,13 +54,16 @@
      p.input-label{
         padding: 0px;
         position: absolute;
-        top: 30px;
+        margin-top: 6px;
         font-size: 10px;
         color: lighten($dark,39%);
       }
     }
     .item-input > .fake-input{
       padding-right: 0px;
+      .ng-binding {
+        margin-top: -6px;
+      }
     }
     fake-input>span{
       height: 34px;

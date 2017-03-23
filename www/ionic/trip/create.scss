@@ -12,10 +12,12 @@ $main-color: #28a7e1;
         .item{
           &:first-child{
             border-right: none;
+            border-bottom-left-radius: 3px;
           }
           &:last-child{
             border-left: none;
             text-align: right;
+            border-bottom-right-radius: 3px;
             .date-during{
               color: lighten($dark,39);
               font-size: 12px;
