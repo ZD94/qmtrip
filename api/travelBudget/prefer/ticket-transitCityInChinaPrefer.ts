@@ -36,7 +36,7 @@ class TransitCityInChinaPrefer extends AbstractPrefer<IFinalTicket> {
             for(let i=1, ii=ticket.segs.length; i<ii; i++) {
                 let seg = <IFlightSeg>ticket.segs[i];
                 let city = await API.place.getCityInfo({cityCode: seg.deptAirport.city});
-                if (!city.isAbroad) {
+                if (city && !city.isAbroad) {
                     transitInChinaNum += 1;
                 }
             }
