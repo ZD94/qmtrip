@@ -214,47 +214,45 @@
 
   }
 
-  ion-nav-view ion-view ion-content {
-    .withChart {
-      background: #fff;
-      .doughnut-text {
-        position: relative;
-        .text-in-doughnut {
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          width: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-direction: column;
-          span {
-            color: #666;
-          }
-          .savePercent {
-            margin: 10px 0;
-            text-align: center;
-            font-size: 30px;
-            @media (max-width: 320px) {
-              font-size: 26px;
-            }
+  .withChart {
+    background: #fff;
+    .doughnut-text {
+      position: relative;
+      .text-in-doughnut {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        span {
+          color: #666;
+        }
+        .savePercent {
+          margin: 10px 0;
+          text-align: center;
+          font-size: 30px;
+          @media (max-width: 320px) {
+            font-size: 26px;
           }
         }
       }
-      .right-of-doughnut {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        p {
-          color: #666;
-          font-size: 14px;
-          margin-bottom: 2px;
-        }
-        h2 {
-          font-size: 16px;
-          margin: 2px;
-        }
+    }
+    .right-of-doughnut {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      p {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 2px;
+      }
+      h2 {
+        font-size: 16px;
+        margin: 2px;
       }
     }
   }
