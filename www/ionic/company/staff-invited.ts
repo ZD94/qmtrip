@@ -71,8 +71,12 @@ export async function StaffInvitedController($scope, Models, $ionicHistory, $ion
     $scope.is_wechat = browserspec.is_wechat;
     $scope.isCordova = window.cordova;
     var config = require('config');
-    let url = new URL(config.update,'ionic/images/logo-whiteback.png');
-    let shareImgUrl = url.href;
+    let url = config.update;
+    if (!/\/$/.test(url)) {
+        url += '/';
+    }
+    url += 'ionic/images/logo-whiteback.png';
+    let shareImgUrl = url
     $scope.sendWx = async function(){
         if(browserspec.is_wechat){
             var show = $ionicPopup.show({
