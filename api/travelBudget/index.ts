@@ -284,8 +284,10 @@ export default class ApiTravelBudget {
      * @return {Promise} {prize: 1000, hotel: "酒店名称"}
      */
     @clientExport
-    static async getHotelBudget(params: {city: any, businessDistrict: string,
-        checkInDate: Date, checkOutDate: Date, hotelName?: string}) :Promise<TravelBudgetHotel> {
+    static async getHotelBudget(params: {
+        city: any, businessDistrict: string,
+        checkInDate: Date, checkOutDate: Date, hotelName?: string
+    }): Promise<TravelBudgetHotel> {
         let {city, businessDistrict, checkInDate, checkOutDate, hotelName} = params;
         if (!Boolean(city)) {
             throw L.ERR.CITY_NOT_EXIST();
@@ -315,8 +317,10 @@ export default class ApiTravelBudget {
         } catch(err) {
         }
         if (accordHotel) {
-            return {price: accordHotel.accordPrice * days, type: EInvoiceType.HOTEL,
-                hotelName: hotelName, cityName: city.name, checkInDate: checkInDate, checkOutDate: checkOutDate} as TravelBudgetHotel;
+            return {
+                price: accordHotel.accordPrice * days, type: EInvoiceType.HOTEL,
+                hotelName: hotelName, cityName: city.name, checkInDate: checkInDate, checkOutDate: checkOutDate
+            } as TravelBudgetHotel;
         }
 
         //查询员工差旅标准
@@ -609,4 +613,44 @@ export default class ApiTravelBudget {
                 .catch(next)
         })
     }
+}
+
+function getTimezoneStr(seconds) {
+    const HOUR = 60 * 60
+    const MINUTE = 60;
+    let hours = seconds / HOUR
+    if (hours < 0) {
+        hours = Math.ceil(hours);
+    } else {
+        hours = Math.floor(hours);
+    }
+    let minute = (seconds - hours * HOUR) / MINUTE;
+    if (minute < 0) {
+        minute = Math.ceil(minute)
+    } else {
+        minute = Math.floor(minute)
+    }
+    let ret = 'GMT';
+    if (hours < 0) {
+        ret += '-'
+        if (hours > -10) {
+            ret += '0'
+        }
+        hours = -hours;
+        ret += hours;
+    } else {
+        ret += '+';
+        if (hours < 10) {
+            ret += '0'
+        }
+        ret += hours;
+    }
+    if (minute < 0) {
+        minute = -minute;
+    }
+    if (minute < 10) {
+        ret += '0'
+    }
+    ret += minute;
+    return " "+ret;
 }
