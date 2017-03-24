@@ -10,16 +10,14 @@ import {TripFuelAddPackage} from "_types/tripPackage/tripFuelAddPackage";
 class TripPackageModule{
     @clientExport
     @requireParams(["id"])
-    static async getBasicPackage(params): Promise<TripBasicPackage>{
-        let tripBasicPackage = await Models.tripBasicPackage.get(params.id);
-        return tripBasicPackage;
+    static getBasicTripPackage(params: {id: string}) {
+        return Models.tripBasicPackage.get(params.id);
     }
 
     @clientExport
     @requireParams(["id"])
-    static async getFuelAddPackage(params): Promise<TripFuelAddPackage>{
-        let tripFuelAddPackage = await Models.tripFuelAddPackage.get(params.id);
-        return tripFuelAddPackage;
+    static getFuelAddPackage(params: {id: string}) {
+        return Models.tripFuelAddPackage.get(params.id);
     }
 
 }
