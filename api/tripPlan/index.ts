@@ -933,7 +933,8 @@ class TripPlanModule {
         let approve = await Models.approve.get(params.tripApproveId);
         let account = await Models.staff.get(approve.submitter);
         let approveUser = await Models.staff.get(approve.approveUser);
-        let company = approveUser.company;
+        let currentUser = await Staff.getCurrent();
+        let company = approve.approveUser ? approveUser.company : currentUser.company;
         if (typeof approve.data == 'string') approve.data = JSON.parse(approve.data);
         let query: any  = approve.data.query;   //查询条件
         if(typeof query == 'string') query = JSON.parse(query);
@@ -1121,7 +1122,7 @@ class TripPlanModule {
             username: account.name,
             planNo: tripPlan.planNo,
             approveTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-            approveUser: approveUser.name,
+            approveUser: approveUser ? approveUser.name : "",
             projectName: tripPlan.title,
             goTrafficBudget: go,
             backTrafficBudget: back,

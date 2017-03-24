@@ -15,6 +15,7 @@ export async function StaffInfoController($scope, Models, $stateParams, $ionicPo
     let departments = await staff.getDepartments();
     $scope.EStaffRole = EStaffRole;
     $scope.staff = staff;
+    console.info('newStaff',staff);
     $scope.travelPolicy = travelPolicy;
     $scope.departments = departments;
     $scope.EStaffRoleNames = EStaffRoleNames;

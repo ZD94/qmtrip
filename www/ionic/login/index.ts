@@ -113,7 +113,7 @@ export class IndexController {
             await API.auth.saveOrUpdateOpenId({code: this.$stateParams.wxauthcode});
         }
         if (data['is_need_change_pwd']) {
-            return window.location.href = '#/staff/change-pwd';
+            return window.location.href = '#/login/change-pwd';
         }
         window.location.href = this.backUrl;
     }
