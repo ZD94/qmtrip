@@ -336,7 +336,7 @@ export async function addCompanyStaffsByDepartment(corpApi: CorpApi, DdDepartmen
  *
  */
 
-export async function synchroDDorganization() {
+export async function synchroDDorganization() : Promise<boolean> {
     let current = await Staff.getCurrent();
     if(current.roleId != EStaffRole.OWNER && current.roleId != EStaffRole.ADMIN){
         throw L.ERR.PERMISSION_DENY();
@@ -372,7 +372,14 @@ export async function synchroDDorganization() {
     let corp = corps[0];
 
     let {corpApi} = await getISVandCorp(corp);
-    await dealCompanyOrganization(corpApi, corp);
+
+    try{
+        // await dealCompanyOrganization(corpApi, corp);
+        return true;
+    }catch(e){
+        return false;
+        // throw new Error("同步钉钉组织架构出错");
+    }
 }
 
 // setTimeout(async () => {
