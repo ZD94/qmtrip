@@ -211,7 +211,7 @@ export class ddCrud {
     *   钉钉添加一个部门 , 更新部门信息
     *   添加、更新
     */
-    async createDepartment ( ddDepartInfo , notAddParentid ){
+    async createDepartment ( ddDepartInfo : any , notAddParentid ?: boolean ){
         // console.log("enter create department" , ddDepartInfo);
 
         let ddDeparts = await Models.ddtalkDepartment.find({
@@ -241,7 +241,7 @@ export class ddCrud {
             localDepart = await localDepart.save();
         }else{
             //add
-            let localNewDepartment = {"name": ddDepartInfo.name, "companyId": company.id, "parentId": parentid};
+            let localNewDepartment = {"name": ddDepartInfo.name, "companyId": company.id, "parentId": parentid , isDefault : false };
             if(parentid == null){
                 localNewDepartment.isDefault = true;
             }else{
