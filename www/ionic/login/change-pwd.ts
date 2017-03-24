@@ -7,7 +7,7 @@ import {Staff} from "_types/staff/staff";
 import validator = require('validator');
 var msgbox = require('msgbox');
 declare var API;
-export async function ChangePwdController($scope, $ionicPopup, $storage){
+export async function ChangePwdController($scope, Models, $ionicPopup, $storage){
     require('./change-pwd.scss');
     $scope.form = {
         newPwd: '',
