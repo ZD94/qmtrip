@@ -338,6 +338,7 @@ class TripPlanModule {
         //更改状态
         tripPlan.isCommit = true;
         tripPlan = await tryUpdateTripPlanStatus(tripPlan, EPlanStatus.AUDITING)
+        await TripPlanModule.notifyDesignatedAcount();
 
         let default_agency = config.default_agency;
         if(default_agency && default_agency.manager_email) {
@@ -1476,7 +1477,7 @@ class TripPlanModule {
     static async saveTripDetailInvoice(params) :Promise<TripDetailInvoice> {
         let tripDetailInvoice = Models.tripDetailInvoice.create(params);
         tripDetailInvoice = await tripDetailInvoice.save();
-         await TripPlanModule.notifyDesignatedAcount();
+
 
         let tripDetail = await Models.tripDetail.get(tripDetailInvoice.tripDetailId);
         if (!tripDetail.expenditure) {
@@ -1495,7 +1496,7 @@ class TripPlanModule {
         return await API.notify.notifyDesignatedAccount({
          mobile:"13810529805",
          email:"notice@jingli365.com",
-         key:"qm_notify_designated_account",
+         key:"qm_notify_invoice_audit_request",
          values:{
              company:companyName,
              staffName:staff.name
