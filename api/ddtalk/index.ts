@@ -211,6 +211,13 @@ class DDTalk {
     static async synchroDDorganization(){
         return DealEvent.synchroDDorganization();
     }
+
+    @clientExport
+    static async hello(){
+        console.log("hello");
+        return "hello world";
+    }
+
 }
 
 function getRndStr(length) : string {
