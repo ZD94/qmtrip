@@ -1,245 +1,290 @@
-.date_selected{
-  padding:0;
-  justify-content: center;
-  .data_show{
-    padding: 7px;
-  }
-  .icon{
-    text-align: center;
-  }
-}
+@import "../scss/color.variable.scss";
+.statistics{
+  .flex-c01{
+    .item{
+      border-radius: 3px;
+    }
 
-.budgetMenu{
-  margin-bottom: 10px;
-  .button{
-    min-height: 30px;
-    line-height: 30px;
-    &.button-outline{
-      background: #fff;
-    }
-  }
-}
-@media (max-width: 320px){
-  .button-bar{
-    .button{
-      font-size: 12px;
-    }
-  }
-}
-.tripStat{
-  .item{
-    display: flex;
-    align-items: center;
-    padding: 0;
-    height:75px;
-    &:first-child{
-      border-bottom: 1px dashed #ddd;
-    }
-    &:last-child{
-      border-top: 1px dashed #ddd;
-    }
-    >div{
-      flex:1;
-      text-align: center;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      &:last-child{
-        border-left: 1px dotted #ddd;
+    .date_selected{
+      padding:0;
+      justify-content: center;
+      border-radius: 0px;
+      .data_show{
+        padding: 7px;
       }
-      p{
-        text-align: left;
-        font-size: 12px;
-        padding: 5px;
-      }
-      h2{
-        font-size: 30px;
-      }
-    }
-  }
-}
-.stat-label-content{
-  position: relative;
-  padding-top: 10px;
-  height: 160px;
-  margin-bottom: 10px;
-  .item-header{
-    height: 36px;
-    line-height: 30px;
-    border-bottom: 1px dashed #ddd;
-    .avatar{
-      position: relative;
-      width: 30px;
-      height: 30px;
-      float: left;
-      font-size: 12px;
-      margin-right: 5px;
-    }
-    .ion-ios-flag,.ion-ios-home{
-      font-size: 20px;
-      width: 18px;
-      display: inline-block;
-      text-align: center;
-    }
-  }
-  .left-div{
-    float: left;
-    position: absolute;
-    width: 65%;
-    height: 100px;
-    bottom: 10px;
-    >div{
-      &:first-child{
-        display: inline-block;
-        width: 100%;
-        border-bottom: 1px dashed #ddd;
-        h2{
-          color: #4a90e2;
-        }
-      }
-      h2{
-        color: #f7a05a;
+      .icon{
         text-align: center;
       }
     }
-    .label-top-left{
-      float: left;
-      padding: 5px 1px;
-      padding-left: 0.5em;
-    }
-    .label-bottom-left{
-      float: left;
-      padding: 5px 1px;
-    }
-    .label-top-right{
-      float: right;
-      padding: 5px 16px 5px 0px;
-      padding-right: 0.5em;
-    }
-    .label-right{
-      float: right;
-      padding: 5px 1px;
-    }
-  }
-  .right-div{
-    float: right;
-    position: absolute;
-    right: 10px;
-    bottom: 40px;
-    h2{
-      text-align: center;
-      color: #62894e;
-    }
-  }
-}
 
-.link-div{
-  a:link {
-    text-decoration: none;
-  }
-  a:visited {
-    text-decoration: none;
-  }
-  a:hover {
-    text-decoration: none;
-  }
-  a:active {
-    text-decoration: none;
-  }
-  .row{
-    padding: 8px;
-    .icon{
-      font-size: 14px;
-    }
-  }
-  .fa{
-    font-size: 12px;
-    line-height: 20px;
-    margin-right: 5px;
-    &.fa-list{
-      color:#F5A623;
-    }
-    &.fa-map{
-      color:#cb0a00;
-    }
-  }
-  .ion-android-person {
-    margin-right: 5px;
-    color: #4a90e2;
   }
 
-}
 
 
-ion-nav-view ion-view ion-content {
-  .withChart {
-    background: #fff;
-    .doughnut-text {
-      position: relative;
-      .text-in-doughnut {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 100%;
+  .budgetMenu{
+    margin-bottom: 10px;
+    .button{
+      min-height: 30px;
+      line-height: 30px;
+      &.button-outline{
+        background: #fff;
+      }
+    }
+  }
+  @media (max-width: 320px){
+    .button-bar{
+      .button{
+        font-size: 12px;
+      }
+    }
+  }
+
+  .tripStat{
+    .item{
+      display: flex;
+      align-items: center;
+      padding: 0;
+      height:75px;
+
+      &:first-child{
+        border-bottom: 1px dashed lighten($dark,71);
+        border-bottom-left-radius: 0px;
+        border-bottom-right-radius: 0px;
+      }
+      &:last-child{
+        border-top: 1px dashed lighten($dark,71);
+        border-top-left-radius: 0px;
+        border-top-right-radius: 0px;
+      }
+      >div{
+        flex:1;
+        text-align: center;
+        height: 100%;
         display: flex;
-        justify-content: center;
-        align-items: center;
         flex-direction: column;
-        span {
-          color: #666;
+        &:last-child{
+          border-left: 1px dotted #ddd;
         }
-        .savePercent {
-          margin: 10px 0;
-          text-align: center;
+        p{
+          text-align: left;
+          font-size: 12px;
+          padding: 5px;
+        }
+        h2{
           font-size: 30px;
-          @media (max-width: 320px) {
-            font-size: 26px;
+        }
+      }
+    }
+  }
+  .stat-label-content{
+    position: relative;
+    padding-top: 10px;
+    height: 160px;
+    margin-bottom: 10px;
+    .item-header{
+      height: 36px;
+      line-height: 30px;
+      border-bottom: 1px dashed #ddd;
+      .avatar{
+        position: relative;
+        width: 30px;
+        height: 30px;
+        float: left;
+        font-size: 12px;
+        margin-right: 5px;
+      }
+      .ion-ios-flag,.ion-ios-home{
+        font-size: 20px;
+        width: 18px;
+        display: inline-block;
+        text-align: center;
+      }
+    }
+    .left-div{
+      float: left;
+      position: absolute;
+      width: 65%;
+      height: 100px;
+      bottom: 10px;
+      >div{
+        &:first-child{
+          display: inline-block;
+          width: 100%;
+          border-bottom: 1px dashed #ddd;
+          h2{
+            color: $calm;
+          }
+        }
+        h2{
+          color: $energized;
+          text-align: center;
+        }
+      }
+      .label-top-left{
+        float: left;
+        padding: 5px 1px;
+        padding-left: 0.5em;
+      }
+      .label-bottom-left{
+        float: left;
+        padding: 5px 1px;
+      }
+      .label-top-right{
+        float: right;
+        padding: 5px 16px 5px 0px;
+        padding-right: 0.5em;
+      }
+      .label-right{
+        float: right;
+        padding: 5px 1px;
+      }
+    }
+    .right-div{
+      float: right;
+      position: absolute;
+      right: 10px;
+      bottom: 40px;
+      h2{
+        text-align: center;
+        color: $balanced;
+      }
+    }
+  }
+
+
+  .link-div{
+    a:last-child{
+      div{
+        border-top-left-radius: 0px;
+        border-top-right-radius: 0px;
+      }
+    }
+    a:link {
+      text-decoration: none;
+    }
+    a:visited {
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: none;
+    }
+    a:active {
+      text-decoration: none;
+    }
+    .row{
+      padding: 8px;
+      .icon{
+        font-size: 14px;
+      }
+    }
+
+    .fa{
+      font-size: 12px;
+      line-height: 20px;
+      margin-right: 5px;
+      &.fa-list{
+        color:#F5A623;
+      }
+      &.fa-map{
+        color:#cb0a00;
+      }
+    }
+    .ion-android-person {
+      margin-right: 5px;
+      color: #4a90e2;
+    }
+
+  }
+
+  .link-div:last-child{
+    a:first-child{
+      div{
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+      }
+    }
+  }
+
+
+  .list:last-child{
+    .item{
+      //border-top-left-radius: 3px;
+      //border-top-right-radius: 3px;
+    }
+
+  }
+
+  ion-nav-view ion-view ion-content {
+    .withChart {
+      background: #fff;
+      .doughnut-text {
+        position: relative;
+        .text-in-doughnut {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+          span {
+            color: #666;
+          }
+          .savePercent {
+            margin: 10px 0;
+            text-align: center;
+            font-size: 30px;
+            @media (max-width: 320px) {
+              font-size: 26px;
+            }
           }
         }
       }
-    }
-    .right-of-doughnut {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      p {
-        color: #666;
-        font-size: 14px;
-        margin-bottom: 2px;
-      }
-      h2 {
-        font-size: 16px;
-        margin: 2px;
+      .right-of-doughnut {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        p {
+          color: #666;
+          font-size: 14px;
+          margin-bottom: 2px;
+        }
+        h2 {
+          font-size: 16px;
+          margin: 2px;
+        }
       }
     }
   }
-}
 
-//预算统计，员工分布样式
-.select-bar {
-  background-color: #fff;
-  color: grey;
-  padding: 5px 10px 5px 2px;
-}
-
-.staff-phone {
-  background-color: #fff;
-  padding-left: 5px;
-  padding-right: 5px;
-
-  .call-phone-button {
-    color: white;
-    background-color: #387ef5;
-    display: initial;
-    padding: 3px 12px;
-    border-top: -5px;
-    font-size: 12px;
-    line-height: 2;
+  //预算统计，员工分布样式
+  .select-bar {
+    background-color: #fff;
+    color: grey;
+    padding: 5px 10px 5px 2px;
   }
-}
 
-.select-button {
-  border-bottom: 3px solid #387ef5;
-}
+  .staff-phone {
+    background-color: #fff;
+    padding-left: 5px;
+    padding-right: 5px;
 
+    .call-phone-button {
+      color: white;
+      background-color: #387ef5;
+      display: initial;
+      padding: 3px 12px;
+      border-top: -5px;
+      font-size: 12px;
+      line-height: 2;
+    }
+  }
+
+  .select-button {
+    border-bottom: 3px solid #387ef5;
+  }
+
+
+}

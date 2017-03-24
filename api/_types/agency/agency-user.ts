@@ -9,7 +9,8 @@ import moment=require('moment');
 import {PaginateInterface} from "common/model/interface";
 import {Company, ECompanyType} from "../company/company";
 import L from 'common/language';
-import {CoinAccount} from "../coin";
+import { CoinAccount, CoinAccountChange } from "../coin";
+import {NUM_CHANGE_TYPE} from "../company/trip-plan-num-change";
 const API = require("common/api");
 let sequelize = require("common/model").DB;
 
@@ -28,7 +29,7 @@ export enum  EAgencyUserRole {
 
 @TableExtends(Account, 'account')
 @Table(Models.agencyUser, 'agency.')
-export class AgencyUser extends ModelObject{
+export class AgencyUser extends ModelObject implements Account{
     constructor(target: Object) {
         super(target);
     }
@@ -225,6 +226,17 @@ export class AgencyUser extends ModelObject{
             remark:`因【${qs.remark}】为【${company.name}(${company.id})】充值了【${chargePackage}】流量包到期时间增加了【3】个月`});
         await log.save();
 
+        //trip_plan_num_changes添加数据
+        let changes = await Models.tripPlanNumChange.create({
+            companyId: companyId,
+            type:NUM_CHANGE_TYPE.SYSTEM_ADD,
+            number:chargePackage,
+            remark:'后台增加流量包',
+            content:'后台增加流量包',
+        });
+        await changes.save();
+
+
         //修改行程流量包
         let newExtraTripPlanNum;
         if(qs.AddTwenty){
@@ -236,6 +248,25 @@ export class AgencyUser extends ModelObject{
         company.extraTripPlanNum = newExtraTripPlanNum ;
         let newExtraExpiryDate =  new Date(moment().add(3,'months').valueOf());
         company.extraExpiryDate = newExtraExpiryDate;
+        return company.save();
+    }
+    //配置企业偏好
+    @RemoteCall()
+    async configPreference(companyId:string,budgetConfig:{hotel?: any, traffic?: any, abroadHotel?: any, abroadTraffic?: any}):Promise<any>{
+        let self = this;
+        let company = await Models.company.get(companyId);
+        let agency = await company.getAgency();
+        if (agency.createUser != self.id ) {
+            throw L.ERR.PERMISSION_DENY();
+        }
+        let log = await Models.agencyOperateLog.create({
+            agency_userId: this.id,
+            agencyId: agency.id,
+            remark: `为【${company.name}(${company.id})】配置了企业偏好`
+        });
+        await log.save();
+        //修改企业偏好
+        company.budgetConfig = budgetConfig;
         return company.save();
     }
 
@@ -279,4 +310,11 @@ export class AgencyUser extends ModelObject{
     qrcodeToken: string;
     type: EAccountType;
     isFirstLogin: boolean;
+    checkcodeToken: string;
+    isValidateMobile: boolean;
+    isValidateEmail: boolean;
+    coinAccount: CoinAccount;
+    isNeedChangePwd: boolean;
+    getCoinAccountChanges: ()=>Promise<CoinAccountChange[]>;
+
 }

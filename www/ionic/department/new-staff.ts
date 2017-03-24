@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Created by seven on 2017/1/21.
  */
 "use strict";
@@ -7,7 +7,7 @@ import {EGender} from "api/_types/index";
 import L from 'common/language';
 import validator = require('validator');
 import {Pager} from "common/model/pager";
-import {type} from "os";
+import {setDepartment} from "./set-department";
 
 
 var _ = require('lodash');
@@ -25,8 +25,11 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     let company = current.company;
     let travelpolicylist = await company.getTravelPolicies();
     let department = await company.getDefaultDepartment();
+    let defaultTravelPolicy = await company.getDefaultTravelPolicy();
+
     $scope.selectDepartments = []; //用于存放已选择的部门
     $scope.addedArray = []; //用于存放提交时的部门id
+    $scope.staffPolicyName = defaultTravelPolicy.name;
     if(staffId){
         staff = await Models.staff.get(staffId);
         Models.resetOnPageChange(staff);
@@ -172,73 +175,7 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             })
         }
     }
-    async function setDepartment($scope){
-        require('./staff-set-department.scss');
-        $scope.oldDepartments = _.clone($scope.addedDepartments)
-        // $scope.oldDepartments = oldDepartments;
-        $scope.childDepartments = await Promise.all($scope.childDepartments.map(async function(department) {
-            let childDepartment = await department.getChildDeptStaffNum();
-            if(childDepartment && childDepartment.length>0){
-                department.hasChild = true;
-            }else{
-                department.hasChild = false;
-            }
-            return department;
-        }));
-        $scope.selected = function(department){
-            $scope.hasSelect = false;
-            $scope.addedDepartments.map(function(added,index){
-                if(added.id == department.id){
-                    $scope.hasSelect = true;
-                }
-            })
-            return $scope.hasSelect;
-        }
-        $scope.addToDepartments = function(department){
-            // let idx = $scope.addedDepartments.indexOf(department);  //数组元素为obj，indexof只能用于str
-            $scope.idx = -1;
-            $scope.addedDepartments.map(function(added,index){
-                if(added.id == department.id){
-                    $scope.idx = index;
-                }
-            })
-            if($scope.idx >= 0){
-                $scope.addedDepartments.splice($scope.idx,1)
-            }else{
-                $scope.addedDepartments.push(department);
-                $scope.addedDepartments.sort();
-            }
-        }
-        $scope.showChild = async function(department){
-            $scope.rootDepartment = department;
-            let childDepartments = await department.getChildDeptStaffNum();
-            $scope.childDepartments = await Promise.all(childDepartments.map(async function(department) {
-                let childDepartment = await department.getChildDeptStaffNum();
-                if(childDepartment && childDepartment.length>0){
-                    department.hasChild = true;
-                }else{
-                    department.hasChild = false;
-                }
-                return department;
-            }));
-        }
-        $scope.backParent = async function(parentDdepartment){
-            let childDepartments = await parentDdepartment.getChildDeptStaffNum();
-            $scope.childDepartments = await Promise.all(childDepartments.map(async function(department) {
-                let childDepartment = await department.getChildDeptStaffNum();
-                if(childDepartment && childDepartment.length>0){
-                    department.hasChild = true;
-                }else{
-                    department.hasChild = false;
-                }
-                return department;
-            }));
-            $scope.rootDepartment = parentDdepartment;
-        }
-        $scope.confirm = function(department){
-            $scope.confirmModal(department);
-        }
-    }
+
     $scope.saveStaff = async function(){
         $ionicHistory.nextViewOptions({
             /*disableBack: true,*/
@@ -296,18 +233,11 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                 }
                 
 
-                if($scope.addedArray.length>0){
-                    // staff.departmentIds = $scope.addedArray;
-                }else{
+                if(!$scope.addedArray.length){
                     msgbox.log('部门不能为空')
                     return false;
                 }
-                // var namePattern = /[\u4e00-\u9fa5]+/g;
-                // var hasChinese = namePattern.test(staff.name);
-                // if(staff.name.length>5 && hasChinese){
-                //     msgbox.log('姓名不能超过5个字');
-                //     return;
-                // }
+
                 // 创建人修改管理员权限(二次确认)
                 if(current.roleId == EStaffRole.OWNER && preRole == EStaffRole.ADMIN && staff.roleId == EStaffRole.COMMON){
                     ownerModifyAdmin = true;
@@ -325,7 +255,6 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
                                 text: '确定',
                                 type: 'button-positive',
                                 onTap: async function (e) {
-                                    staff.isNeedChangePwd = true;
                                     staff = await staff.save();
                                     await staff.saveStaffDepartments($scope.addedArray);
                                     callback();

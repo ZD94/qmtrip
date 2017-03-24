@@ -20,9 +20,10 @@ import {StaffDepartment} from "../department/staffDepartment";
 import C = require("config");
 import moment = require("moment");
 import {OS_TYPE} from "../../auth/authentication";
+import {requireParams} from "common/api/helper";
+let db = require("common/model").DB;
 
-// declare var API: any;
-const API = require("common/api");
+let API = require("common/api");
 
 let getSupplier: SupplierGetter;
 
@@ -121,6 +122,7 @@ export class Staff extends ModelObject implements Account {
     get quitTime(): Date { return null; }
     set quitTime(val: Date) {}
 
+
     @ResolveRef({type: Types.UUID}, Models.company)
     get company(): Company { return null; }
     set company(val: Company) {}
@@ -182,6 +184,67 @@ export class Staff extends ModelObject implements Account {
         return true;
     }
 
+
+    /**
+     *  批量移动员工
+     *  @time 2017.3.7
+     *  @param params
+     *  @return {*}
+     */
+    @requireParams(["staffIds" , "departmentIds" , "fromDepartmentId"])
+    @RemoteCall()
+    async moveStaffsDepartment(params : {staffIds: string[], fromDepartmentId: string, departmentIds: string[]}): Promise<boolean>{
+        let self = this;
+        let { staffIds , departmentIds , fromDepartmentId } = params;
+        if(self.roleId != EStaffRole.ADMIN && self.roleId != EStaffRole.OWNER){
+            throw L.ERR.PERMISSION_DENY();
+        }
+
+        for(let i=0,ii=staffIds.length;i<ii;i++){
+            let staff = await Models.staff.get(staffIds[i]);
+            for(let j=0,jj=departmentIds.length;j<jj;j++){
+                let department = await Models.department.get(departmentIds[j]);
+                //比较部门是否与员工是一个公司
+                if(staff.company.id != department.company.id){
+                    continue;
+                }
+                //查关系表
+                let staffDepartment = await Models.staffDepartment.find({
+                    where : {
+                        "staffId" : staff.id,
+                        "departmentId" : department.id
+                    }
+                });
+                if(staffDepartment && staffDepartment.length){
+                    //已经有了，准备删除
+                }else{
+                    //插入数据
+                    await(await Models.staffDepartment.create({
+                        staffId: staff.id , departmentId: department.id
+                    })).save();
+                }
+            }
+
+            //删除数据
+            if(departmentIds.indexOf(fromDepartmentId) > -1) {
+                //移入的部门中包含了本部门
+            }else{
+                let fromData = await Models.staffDepartment.find({
+                    where : {
+                        "staffId" : staff.id,
+                        "departmentId" : fromDepartmentId
+                    }
+                });
+                if(fromData && fromData.length){
+                    await fromData[0].destroy();
+                }
+            }
+        }
+
+        return true;
+    }
+
+
     @RemoteCall()
     async deleteStaffDepartments() :Promise<boolean> {
         let self = this;
@@ -196,49 +259,48 @@ export class Staff extends ModelObject implements Account {
         return true;
     }
 
-    async getSelfNotices(options?: any): Promise<any> {
+    @RemoteCall()
+    async getSelfNotices(options?: any): Promise<PaginateInterface<Notice>>  {
         var self = this;
         if (!options) options = {where: {}};
         if(!options.where) options.where = {};
+        let ids = [];
+        let no_ids = [];
+        let mna: any = {};
 
         //若不查已删除的下边逻辑就会以为已删除的那条通知是未读的全员通知会再加一条进关系表
-        var pagers = await Models.noticeAccount.find({where: {accountId: this.id}, paranoid: false, order: [['createdAt', 'desc']]});
+        let sql = `select id, notice_id as "noticeId", deleted_at as "deletedAt" from notice.notice_accounts where account_id = '${self.id}'`;
+        let ret = await db.query(sql);
 
-        let noticeAccounts = [];
-        noticeAccounts.push.apply(noticeAccounts, pagers);
-        while(pagers.hasNextPage()){
-            let nextPager = await pagers.nextPage();
-            noticeAccounts.push.apply(noticeAccounts, nextPager);
-            // pagers = nextPager;
+        let ids_query = ret[0];
+        if(ids_query && ids_query.length > 0){
+            ids_query.forEach(function(t){
+                mna[t.noticeId] = t;
+                if(t.deletedAt){
+                    no_ids.push(t.noticeId);
+                }else{
+                    ids.push(t.noticeId);
+                }
+            })
         }
 
-        var mna: any = {};
-        var ids =  noticeAccounts.map(function(t){
-            mna[t.noticeId] = t;
-            return t.noticeId;
-        })
         options.where .$or = [{id: {$in: ids}}, {sendType: ESendType.ALL_ACCOUNT}];
+        if(no_ids && no_ids.length > 0){
+            options.where.id = {$notIn: no_ids};
+        }
         options.order = options.order || [['createdAt', 'desc']];
+        // let sql_query = `select * from notice.notices nn join notice.notice_accounts na on nn.id = na.notice_id
+        //  where (na.account_id = '${self.id}' or nn.send_type = ${ESendType.ALL_ACCOUNT}) and nn.type = 1 order by nn.created_at desc limit 5 offset 0`;
         var notices = await Models.notice.find(options);
         var result = await Promise.all(notices.map(async function(n){
-            if(mna[n.id]){
-                n["isRead"] = mna[n.id].isRead;
-                n["deletedAt"] = mna[n.id].deletedAt;
-                return n;
-            }
-
             // 此处处理发给全体员工的 员工拉取通知列表时存入noticeAccount关系表记录（其余发给一个人或多个人的 发消息的时候存入关系表）
-            n["isRead"] =  false;
-            var na = Models.noticeAccount.create({accountId: self.id, noticeId: n.id, isRead: false});
-            await na.save();
+            if(!mna[n.id]){
+                var na = Models.noticeAccount.create({accountId: self.id, noticeId: n.id, isRead: false});
+                await na.save();
+            }
             return n;
         }));
-        result = result.filter((item: any) => {
-            return !item["deletedAt"];
-        })
-
-        return result;
-
+        return notices;
     }
 
     getTripPlans(options: {where?: any, limit?: number}): Promise<PaginateInterface<TripPlan>> {
@@ -362,7 +424,6 @@ export class Staff extends ModelObject implements Account {
                 return l;
             })
 
-            console.info(JSON.stringify(list, null, ' '));
             return list;
         }catch(e){
             throw L.ERR.BIND_ACCOUNT_ERR();
@@ -392,58 +453,24 @@ export class Staff extends ModelObject implements Account {
         }
     }
 
+    @RemoteCall()
     async statisticNoticeByType(): Promise<any> {
-        /*if(!this.isLocal){
-         API.require('notice');
-         await API.onload();
-         }
-         return API.notice.statisticNoticeByType();*/
+        let self = this;
+        let result:any = {};
 
-        var result:any = {};
-        var num1 = 0;
-        var num2 = 0;
-        var num3 = 0;
-        var num4 = 0;
-
-        var latestObj1: Notice;
-        var latestObj2: Notice;
-        var latestObj3: Notice;
-        var latestObj4: Notice;
-
-        var allNotices = await this.getSelfNotices();
-
-        allNotices.forEach(async function(notice){
-            switch(notice.type){
-                case ENoticeType.SYSTEM_NOTICE:
-                    if(!latestObj1 || !latestObj1.id){
-                        latestObj1 = notice;
-                    }
-                    if(!notice.isRead) num1 += 1;
-                    break;
-                case ENoticeType.TRIP_APPROVE_NOTICE:
-                    if(!latestObj2 || !latestObj2.id){
-                        latestObj2 = notice;
-                    }
-                    if(!notice.isRead) num2 += 1;
-                    break;
-                case ENoticeType.TRIP_APPLY_NOTICE:
-                    if(!latestObj3 || !latestObj3.id){
-                        latestObj3 = notice;
-                    }
-                    if(!notice.isRead) num3 += 1;
-                    break;
-                case ENoticeType.ACTIVITY_NOTICE:
-                    if(!latestObj4 || !latestObj4.id){
-                        latestObj4 = notice;
-                    }
-                    if(!notice.isRead) num4 += 1;
-                    break;
-            }
-        });
-        result[ENoticeType.SYSTEM_NOTICE] = {unReadNum: num1, latestInfo: latestObj1};
-        result[ENoticeType.TRIP_APPROVE_NOTICE] = {unReadNum: num2, latestInfo: latestObj2};
-        result[ENoticeType.TRIP_APPLY_NOTICE] = {unReadNum: num3, latestInfo: latestObj3};
-        result[ENoticeType.ACTIVITY_NOTICE] = {unReadNum: num4, latestInfo: latestObj4};
+        let sql = `select type, count(*) from notice.notice_accounts na 
+        right join notice.notices nn on na.notice_id = nn.id where na.account_id = '${self.id}'  
+        and na.deleted_at is null and na.is_read = false or nn.send_type = ${ESendType.ALL_ACCOUNT} 
+        group by nn.type order by nn.type asc`;
+        let ret = await db.query(sql);
+        let arr = ret[0];
+        for(let i = 0; i < arr.length; i++){
+            let _sql = `select nn.* from notice.notice_accounts na right join notice.notices nn 
+            on na.notice_id = nn.id where na.account_id = '${self.id}' and na.deleted_at is null  
+            and na.is_read = false and nn.type = '${arr[i].type}' order by created_at desc limit 1`;
+            let na = await db.query(_sql);
+            result[arr[i].type] = {unReadNum: parseInt(arr[i].count), latestInfo: na[0][0]};
+        }
         return result;
     }
     
@@ -501,8 +528,13 @@ export class Staff extends ModelObject implements Account {
         return 'OK';
     }
 
+
     @RemoteCall()
     async getAutoLoginUrl(backUrl:string, os?: string) {
+        if(!this.isLocal){
+            API.require('auth');
+            await API.onload();
+        }
         let self = this;
         if (os != OS_TYPE.TMP_CODE) {
             throw L.ERR.INVALID_ARGUMENT(`目前仅支持企业PC平台自动登录`);

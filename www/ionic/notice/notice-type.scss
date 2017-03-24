@@ -1,3 +1,4 @@
+@import "../scss/color.variable.scss";
 .notice-type{
   .item-thumbnail-left{
     min-height: 76px;
@@ -36,22 +37,24 @@
         float: right;
         font-size: 12px;
         font-weight: normal;
+        color: lighten($dark,39%);
       }
     }
     .notice_info{
       line-height: 25px;
       font-size: 12px;
       margin-top: 5px;
+      color: lighten($dark,39%);
       .notice_badge{
         float: right;
-        background: #D0011B 100%;
+        background: $assertive;
         color: #fff;
         width: 23px;
         height: 23px;
         line-height: 23px;
         border-radius: 50%;
         text-align: center;
-        border: 1px solid #D0011B;
+        border: 1px solid $assertive;
       }
     }
 

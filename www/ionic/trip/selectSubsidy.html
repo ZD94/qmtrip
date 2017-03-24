@@ -1,7 +1,7 @@
 <div>请选择补助模板</div>
 <ion-list>
     <ion-scroll overflow-scroll="false" has-bouncing="true">
-        <ion-radio ng-model="subsidy.template" ng-value="st" ng-repeat="st in currentTpSts" class="item-icon-left item-small">
+        <ion-radio ng-model="subsidy.template" ng-value="st" ng-repeat="st in currentTpSts" class="item-icon-left item-small" icon="ion-ios-checkmark-outline">
             {{st.name}}<span class="item-note">{{st.subsidyMoney}}/天</span>
         </ion-radio>
     </ion-scroll>

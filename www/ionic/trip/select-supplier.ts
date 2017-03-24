@@ -7,6 +7,7 @@ export async function SelectSupplierController($scope, Models, $stateParams, ngM
     require('./select-supplier.scss');
     //公共的供应商
     let currentStaff = await Staff.getCurrent();
+
     async function ifBind(){
         var alreadyBinds = await Models.staffSupplierInfo.find({where: {staffId: currentStaff.id}});
         var suppliers = await Models.supplier.find({where: {companyId: null, type: ESupplierType.SYSTEM_CAN_IMPORT}});

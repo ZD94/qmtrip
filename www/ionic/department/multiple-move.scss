@@ -1,0 +1,83 @@
+.multiple-move{
+  background: url(ionic/images/background.png) no-repeat;
+  background-size: cover;
+  background-position: center;
+  .flex-c10{
+    .list{
+      .item:first-child{
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+      }
+      .item:last-child{
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+      }
+    }
+    .button.button-block, .button.button-full{
+      margin-bottom:0px;
+    }
+  }
+  .bar-header{
+    .check-box{
+      .checkbox_diy{
+        color: inherit;
+      }
+    }
+  }
+  .staff-list {
+    padding: 0;
+    line-height: 16px;
+    height: 60px;
+    position: relative;
+    .check-box{
+      display: block;
+      padding-top: 10px;
+      height: 100%;
+      .checkbtn{
+        display: block;
+        border: none;
+        margin: auto;
+        width: inherit;
+        text-align: inherit;
+        height: auto;
+        line-height: initial;
+        border-radius: initial;
+      }
+    }
+    .icon{
+      position: absolute;
+      font-size: 20px;
+      top: 18px;
+      left: 10px;
+    }
+    .staff-avatar {
+      position: absolute;
+      top: 7px;
+      left: 35px;
+      width: 46px;
+      height: 46px;
+      line-height: 46px;
+      border-radius: 50%;
+      font-size: 14px;
+    }
+    .staff-info {
+      margin-left: 90px;
+      p {
+        margin: 0;
+        &:last-child {
+          font-size: 10px;
+          color: #9b9b9b;
+        }
+      }
+      .staff-role {
+        &.bg-blue {
+          background: #28a7e1;
+        }
+        border-radius: 2px;
+        background: #F5A623;
+        color: #fff;
+        font-size: 10px;
+      }
+    }
+  }
+}

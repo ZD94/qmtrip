@@ -170,8 +170,6 @@ class NotifyTemplate{
             };
             content = this.appmessage.html(context);
         }
-
-
         await API.notice.createNotice({title: title, content: content, description: description, staffId: to.accountId, sendType: ESendType.ONE_ACCOUNT, type: data.noticeType || ENoticeType.SYSTEM_NOTICE});
         logger.info('成功发送通知:', data.account.name, this.name);
     }
@@ -272,4 +270,16 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
     values_clone.account = account;
     await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: accountId }, values_clone);
     return true;
+}
+//added by jack, to send notice to designated phone number or email account
+export async function notifyDesignatedAccount(params:{email?:string,mobile?:string,key:string,values:any}){
+      let email=params.email;
+      let mobile=params.mobile;
+      let values=params.values;
+      let key=params.key;
+
+      let values_clone =  _.cloneDeep(values);
+      let tpl=templates[key];
+      await tpl.send({mobile:mobile,email: email},values_clone);
+      return true;
 }

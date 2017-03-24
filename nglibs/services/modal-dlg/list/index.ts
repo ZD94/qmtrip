@@ -1,7 +1,7 @@
 import _ = require('lodash');
 var msgbox = require('msgbox');
 
-export async function selectFromListController($scope) {
+export async function selectFromListController($scope, $element) {
     require('./list.scss');
     if(typeof $scope.options.searchbox === 'undefined'){
         $scope.options.searchbox = true;
@@ -11,14 +11,6 @@ export async function selectFromListController($scope) {
     };
     $scope.optionItems = [];
 
-    function displayItem(item){
-        if(item && $scope.options && $scope.options.display){
-            return $scope.options.display(item, true);
-        }
-        return item;
-    };
-    $scope.displayItem = displayItem;
-
     $scope.disableItem = function(item){
         if(item && $scope.options && $scope.options.disable){
             return $scope.options.disable(item);
@@ -26,17 +18,19 @@ export async function selectFromListController($scope) {
         return false;
     }
 
-    $scope.showCreate = function(){
+    $scope.showCreate = function(keyword){
         if($scope.options.create == undefined)
             return false;
         if(!form.keyword || form.keyword.length == 0)
             return false;
 
-        for(let v of $scope.optionItems){
-            if(displayItem(v) == form.keyword)
-                return false;
-        }
-        return true;
+        let item_elements = $element.find('list-item');
+        let found = false;
+        item_elements.each(function(){
+            if($(this).text() == form.keyword)
+                found = true;
+        })
+        return !found;
     }
 
     $scope.createItem = async function(keyword){
@@ -47,13 +41,13 @@ export async function selectFromListController($scope) {
     async function reloadOptionItems(){
         lists = await $scope.options.query(form.keyword);
         $scope.optionItems = _.cloneDeep(lists);
-        console.info($scope.optionItems);
+        //console.info($scope.optionItems);
     }
     await reloadOptionItems();
     var page = {
-        hasNextPage: function() {
-            return lists.hasNextPage();
-        },
+         // hasNextPage: function() {
+         //     return lists.hasNextPage();
+         // },
         nextPage : async function() {
             try {
                 let pager = await lists.nextPage();
@@ -75,15 +69,26 @@ export async function selectFromListController($scope) {
         if(o === n)
             return;
         reloadOptionItems();
+        if(o){
+            $scope.hidden = true;
+        }else{
+            $scope.hidden = false;
+        }
     })
+
+    $scope.toggle = function () {
+        $scope.hidden = false;
+        $scope.form.keyword = '';
+    }
+
     $scope.page = page;
     $scope.confirm = function(value){
         if($scope.disableItem(value))
-            return;
+            return value;
         $scope.confirmModal(value);
     }
-
-    $scope.haveSet = function() {
-        msgbox.log($scope.options.noticeMsg);
-    }
 }
+
+
+
+

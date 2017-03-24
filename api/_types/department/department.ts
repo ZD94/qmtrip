@@ -46,8 +46,10 @@ export class Department extends ModelObject{
     get company(): Company { return null; }
     set company(val: Company) {}
 
+    @RemoteCall()
     async getStaffs(options?: any): Promise<PaginateInterface<Staff>> {
         let staffs =  await API.department.getStaffs({id: this.id,options: options});
+
         return staffs;
     }
 
@@ -68,6 +70,8 @@ export class Department extends ModelObject{
 
     async getChildDeptStaffNum(): Promise<any> {
         let self = this;
+
+        // console.log(this.id , this.company.id)
         let pagers = await Models.department.find({where : {parentId: this.id, companyId: self['companyId']}, order: [['createdAt', 'desc']]});
 
         let childDepartments = [];

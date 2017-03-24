@@ -1,24 +1,109 @@
-image: docker.l.jingli365.com/jl-build
 
 variables:
-#  GIT_SUBMODULE_STRATEGY: recursive
+  DOCKER_REG: docker.l.jingli365.com
+  DOCKER_NAME: $CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
+  DOCKER_CI_NAME: $DOCKER_REG/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME:$CI_BUILD_REF
+  DOCKER_BRANCH_NAME: $DOCKER_REG/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME:$CI_BUILD_REF_SLUG
+  NPM_CACHE_DIR: /cache/build-cache/npmhash/
 
-cache:
-  paths:
-    - node_modules/
+stages:
+  - build
+  - docker
+  - deploy
+
+image: docker:git
 
 before_script:
-  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
-  - eval $(ssh-agent -s)
-  - ssh-add <(echo "$SSH_PRIVATE_KEY")
-  - mkdir -p ~/.ssh
-  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-  - git submodule update --init --checkout
+  - 'eval $(ssh-agent -s) && echo "$SSH_PRIVATE_KEY">.k && chmod 600 .k && ssh-add .k && rm -f .k'
+  - 'mkdir -p ~/.ssh && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  - mkdir -p /cache/build-cache/.npm && ln -s /cache/build-cache/.npm ~/
 
-  - ln -s /opt/app/node_modules .
-  - npm --registry https://npm.l.jingli365.com install
-
-build:
+build:dist:
+  stage: build
+  only:
+    - branches
+  image: $DOCKER_REG/jl-build:v2
+  tags:
+    - serial
+  cache:
+    key: $CI_PIPELINE_ID
+    paths:
+      - dist/
   script:
-  - gulp tarball -n $CI_BUILD_REF_NAME
-  - scp $CI_PROJECT_NAME-$CI_BUILD_REF_NAME-*.tar.gz test@git.l.jingli365.com:~/versions/
+    - mkdir -p $NPM_CACHE_DIR/`npmhash`/node_modules && ln -s $NPM_CACHE_DIR/`npmhash`/node_modules .
+    - echo `npmhash`
+    - git submodule update --init --checkout
+    - npm --registry https://npm.l.jingli365.com install
+    - gulp tarball -n $CI_BUILD_REF_SLUG
+    - scp $CI_PROJECT_NAME-$CI_BUILD_REF_SLUG-*.tar.gz test@git.l.jingli365.com:~/versions/
+
+build:image:
+  stage: docker
+  cache:
+    key: $CI_PIPELINE_ID
+    paths:
+      - dist/
+  script:
+    - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
+    - docker build -t $DOCKER_CI_NAME .
+    - docker push $DOCKER_CI_NAME
+
+deploy:master:
+  stage: deploy
+  only:
+    - /^master$/
+  environment:
+    name: dev
+    url: https://l.jingli365.com
+  script:
+    - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
+    - docker pull $DOCKER_CI_NAME
+    - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
+    - docker push $DOCKER_BRANCH_NAME
+    - echo deploy to https://l.jingli365.com
+    - ssh test@l.jingli365.com /home/test/bin/docker_start.sh $DOCKER_REG $DOCKER_NAME $CI_BUILD_REF_SLUG
+
+deploy:test:
+  stage: deploy
+  only:
+    - /^test$/
+  environment:
+    name: test
+    url: https://t.jingli365.com
+  script:
+    - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
+    - docker pull $DOCKER_CI_NAME
+    - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
+    - docker push $DOCKER_BRANCH_NAME
+    - echo deploy to https://t.jingli365.com
+    - ssh test@l.jingli365.com /home/test/bin/docker_start.sh $DOCKER_REG $DOCKER_NAME $CI_BUILD_REF_SLUG
+
+deploy:release:
+  stage: deploy
+  only:
+    - /^release$/
+  when: manual
+  environment:
+    name: release
+    url: https://j.jingli365.com
+  script:
+    - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
+    - docker pull $DOCKER_CI_NAME
+    - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
+    - docker push $DOCKER_BRANCH_NAME
+
+deploy:tester:
+  stage: deploy
+  only:
+    - /^feature\//
+  when: manual
+  environment:
+    name: tester/$GITLAB_USER_ID
+    url: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
+  script:
+    - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
+    - docker pull $DOCKER_CI_NAME
+    - docker tag $DOCKER_CI_NAME $DOCKER_REG/$DOCKER_NAME:tester-$GITLAB_USER_ID
+    - docker push $DOCKER_REG/$DOCKER_NAME:tester-$GITLAB_USER_ID
+    - echo deploy to https://review.l.jingli365.com/tester/$GITLAB_USER_ID
+    - ssh test@l.jingli365.com /home/test/bin/docker_start_user.sh $DOCKER_REG $DOCKER_NAME $GITLAB_USER_ID
