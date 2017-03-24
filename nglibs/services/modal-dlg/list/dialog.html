@@ -23,7 +23,7 @@
 
                 <ion-item
                         class="item-icon-right"
-                        ng-repeat="$item in optionItems track by $index"
+                        ng-repeat="$item in optionItems"
                         ng-if="$item != value"
                         ng-click="confirm($item)"
                         ng-class="{'item-stable':disableItem($item)}"
