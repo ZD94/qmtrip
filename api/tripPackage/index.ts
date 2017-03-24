@@ -21,3 +21,5 @@ class TripPackageModule{
     }
 
 }
+
+export = TripPackageModule
