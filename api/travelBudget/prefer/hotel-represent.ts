@@ -30,13 +30,20 @@ class RepresentPrefer extends AbstractPrefer<IFinalHotel> {
             if (!v.score) v.score = 0;
             if (!v.reasons) v.reasons = [];
             let representHotels = REFERENCE_HOTELS_PRICE[""+v.star] || [];
-            representHotels.forEach( (keyword) => {
-                if (!v.outPriceRange && v.name.indexOf(keyword) >=0 ){
+            let i=0;
+            let ii = representHotels.length;
+            for(; i<ii; i++) {
+                let keyword = representHotels[i];
+                if (v.name.indexOf(keyword) >=0 ){
                     v.score += self.score;
                     v.reasons.push(`匹配${keyword}为代表性酒店+${self.score}`);
-                    return;
+                    break;
                 }
-            });
+            }
+
+            if (i >= ii) {
+                v.reasons.push(`未匹配代表性酒店 0`)
+            }
             return v;
         })
         return hotels;

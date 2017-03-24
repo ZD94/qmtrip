@@ -18,7 +18,7 @@ import {ITicket, TRAFFIC, TravelBudgeTraffic, TravelBudgetHotel} from "_types/tr
 import {
     TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
 } from "./strategy/index";
-import {DEFAULT_PREFER_CONFIG_TYPE, loadDefaultPrefer} from "./prefer";
+import {DEFAULT_PREFER_CONFIG_TYPE, loadPrefers} from "./prefer";
 
 
 export interface BudgetOptions{
@@ -230,7 +230,9 @@ export default class ApiTravelBudget {
                         }
 
                         if (subsidy && subsidy.template) {
-                            let days = moment(goBackDate).diff(moment(leaveDate), 'days');
+                            let goBackDay = moment(goBackDate).format("YYYY-MM-DD");
+                            let leaveDay = moment(leaveDate).format("YYYY-MM-DD");
+                            let days = moment(goBackDay).diff(moment(leaveDay), 'days');
                             days = days + 1;
                             if (!subsidy.hasFirstDaySubsidy) {
                                 days = days -1;
@@ -282,8 +284,10 @@ export default class ApiTravelBudget {
      * @return {Promise} {prize: 1000, hotel: "酒店名称"}
      */
     @clientExport
-    static async getHotelBudget(params: {city: any, businessDistrict: string,
-        checkInDate: Date, checkOutDate: Date, hotelName?: string}) :Promise<TravelBudgetHotel> {
+    static async getHotelBudget(params: {
+        city: any, businessDistrict: string,
+        checkInDate: Date, checkOutDate: Date, hotelName?: string
+    }): Promise<TravelBudgetHotel> {
         let {city, businessDistrict, checkInDate, checkOutDate, hotelName} = params;
         if (!Boolean(city)) {
             throw L.ERR.CITY_NOT_EXIST();
@@ -313,8 +317,10 @@ export default class ApiTravelBudget {
         } catch(err) {
         }
         if (accordHotel) {
-            return {price: accordHotel.accordPrice * days, type: EInvoiceType.HOTEL,
-                hotelName: hotelName, cityName: city.name, checkInDate: checkInDate, checkOutDate: checkOutDate} as TravelBudgetHotel;
+            return {
+                price: accordHotel.accordPrice * days, type: EInvoiceType.HOTEL,
+                hotelName: hotelName, cityName: city.name, checkInDate: checkInDate, checkOutDate: checkOutDate
+            } as TravelBudgetHotel;
         }
 
         //查询员工差旅标准
@@ -360,12 +366,15 @@ export default class ApiTravelBudget {
             hotelName: hotelName
         }
         let budgetConfig = staff.company.budgetConfig;
-        let defaults = loadDefaultPrefer({local: query}, DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_HOTEL);
-        if (budgetConfig && budgetConfig.hotel) {
-            let compiled = _.template(JSON.stringify(budgetConfig.hotel));
-            defaults = mergePrefers(defaults, JSON.parse(compiled({local: query})));
+        if (!budgetConfig) {
+            budgetConfig = {};
         }
-        qs.prefers = defaults;
+        let key = DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_HOTEL;
+        if (city.isAbroad) {
+            key = DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_HOTEL
+        }
+        let prefers = loadPrefers(budgetConfig.hotel, {local: query}, key);
+        qs.prefers = prefers;
         qs.query = query;
         let hotels = await API.hotel.search_hotels(query);
 
@@ -426,7 +435,6 @@ export default class ApiTravelBudget {
         let m_originCity = await API.place.getCityInfo({cityCode: originPlace.id || originPlace});
         let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
 
-        console.log("this is city info: ", m_originCity);
         //转换成当地时间
         if (!latestArrivalDateTime) {
             params.latestArrivalDateTime = undefined;
@@ -504,22 +512,10 @@ export default class ApiTravelBudget {
         params['expectFlightCabins'] = cabins;
         let defaults: any[] = [];
         if (isAbroad) {   //国际
-            defaults = loadDefaultPrefer({local: params}, DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_TICKET);
-            let corpAbroadTrafficPrefer = {}
-            if (preferConfig && preferConfig.abroadTraffic) {
-                corpAbroadTrafficPrefer = preferConfig.abroadTraffic
-            }
-            let compiled = _.template(JSON.stringify(corpAbroadTrafficPrefer), { 'imports': { 'moment': moment } });
-            defaults = mergePrefers(defaults, JSON.parse(compiled({local: params})));
+            defaults = loadPrefers(preferConfig.abroadTraffic, {local: params}, DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_TICKET);
             qs.prefers = defaults;
         } else {            //国内
-            defaults = loadDefaultPrefer({local: params}, DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_TICKET);
-            let corpHomeTrafficPrefer = {};
-            if (preferConfig && preferConfig.traffic) {
-                corpHomeTrafficPrefer = preferConfig.traffic;
-            }
-            let compiled = _.template(JSON.stringify(corpHomeTrafficPrefer), { 'imports': { 'moment': moment } });
-            defaults = mergePrefers(defaults, JSON.parse(compiled({local: params})));
+            defaults = loadPrefers(preferConfig.traffic, {local: params}, DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_TICKET);
             qs.prefers = defaults;
         }
 
@@ -617,16 +613,6 @@ export default class ApiTravelBudget {
                 .catch(next)
         })
     }
-}
-
-
-
-function mergePrefers(defaults, news) {
-    for(let i=0, ii =news.length; i<ii; i++) {
-        let v = news[i];
-        defaults.push(v);
-    }
-    return defaults;
 }
 
 function getTimezoneStr(seconds) {

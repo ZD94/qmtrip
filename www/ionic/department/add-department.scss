@@ -3,6 +3,14 @@
   background-size: cover;
   background-position: center;
   .item{
+   &:first-child{
+     border-top-right-radius: 3px;
+     border-top-left-radius: 3px;
+   }
+    &:last-child{
+      border-bottom-right-radius: 3px;
+      border-bottom-left-radius: 3px;
+    }
     .icon{
       font-size: 14px;
     }
@@ -18,3 +26,4 @@
     text-align: right;
   }
 }
+

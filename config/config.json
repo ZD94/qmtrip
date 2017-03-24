@@ -93,5 +93,6 @@
     "suiteid": "suitezutlhpvgyvgakcdo",
     "secret": "pV--T2FZj-3QCjJzcQd5OnzDBAe6rRKRQGEmc8iVCvdtc2FUOS5icq1gVfkbqiTx",
     "appid": "2156"
-  }
+  },
+  "perDayRegisterEmail": ""
 }

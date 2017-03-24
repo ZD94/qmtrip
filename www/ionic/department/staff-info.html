@@ -47,7 +47,7 @@
                 重新邀请激活
             </a>
             <a class="button button-block button-assertive"
-               ng-if="!staff.status && staff.id != currentStaff.id && staff.roleId != currentStaff.roleId && staff.roleId != EStaffRole.OWNER"
+               ng-if="!staff.status && staff.id != currentStaff.id && staff.roleId != currentStaff.roleId && staff.roleId != EStaffRole.OWNER "
                ng-click="deleteStaff()">
                 删除
             </a>

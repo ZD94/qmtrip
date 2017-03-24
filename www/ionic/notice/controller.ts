@@ -5,12 +5,13 @@ import moment = require("moment");
 export * from './detail';
 export * from './notice-type';
 var msgbox = require('msgbox');
+import _ = require("lodash");
 
 export async function IndexController($scope, Models, $ionicPopup, $stateParams) {
     require('./notice.scss');
     $scope.notices = [];
     var staff = await Staff.getCurrent();
-    var pager = await staff.getSelfNotices({limit: 5,where: {type: $stateParams.type}});
+    var pager = await staff.getSelfNotices({limit: 5, where: {type: $stateParams.type}});
     await loadStaffs(pager);
     var vm = {
         hasNextPage: function() {
@@ -45,7 +46,7 @@ export async function IndexController($scope, Models, $ionicPopup, $stateParams)
                 return
             }
             $scope.pager = pager;
-            reloadNotices(pager);
+            await reloadNotices(pager);
             $scope.$broadcast('scroll.refreshComplete');
         }
     }
@@ -54,7 +55,19 @@ export async function IndexController($scope, Models, $ionicPopup, $stateParams)
     
     async function loadStaffs(pager) {
         if(pager && pager.length>0){
-            await Promise.all(pager.map(async function(notice){
+            let _notices = await Promise.all(pager.map(async function(notice){
+                let relate = await Models.noticeAccount.find({where: {accountId: staff.id, noticeId: notice.id}});
+                if(relate && relate.length >0){
+                    notice["isRead"] = relate[0].isRead;
+                 }else{
+                    notice["isRead"] = false;
+                }
+                return notice;
+             }));
+            $scope.notices = _.concat($scope.notices, _notices);
+
+            /*for(let i = 0; i< pager.length; i++){
+                let notice = pager[i];
                 let relate = await Models.noticeAccount.find({where: {accountId: staff.id, noticeId: notice.id}});
                 if(relate && relate.length >0){
                     notice["isRead"] = relate[0].isRead;
@@ -62,15 +75,22 @@ export async function IndexController($scope, Models, $ionicPopup, $stateParams)
                     notice["isRead"] = false;
                 }
                 $scope.notices.push(notice);
-            }));
+            }*/
         }
     }
-    function reloadNotices(pager){
+    async function reloadNotices(pager){
         if(pager && pager.length>0){
             $scope.notices = [];
-            pager.forEach(function(notice){
-                $scope.notices.push(notice);
-            });
+            let _notices = await Promise.all(pager.map(async function(notice){
+                let relate = await Models.noticeAccount.find({where: {accountId: staff.id, noticeId: notice.id}});
+                if(relate && relate.length >0){
+                    notice["isRead"] = relate[0].isRead;
+                }else{
+                    notice["isRead"] = false;
+                }
+                return notice;
+            }));
+            $scope.notices = _.concat($scope.notices, _notices);
         }
     }
 
