@@ -23,6 +23,8 @@ gulplib.dist(function () {
         'README.md',
         'package.json',
         'server.js',
+        'initTestData.ts',
+        'test-data.json'
     ];
     files.forEach(function(fname){
         var t = gulp.src(fname).pipe(gulp.dest('dist'))
