@@ -21,7 +21,7 @@
       ],
       "subsidyTemplates": [
         {
-          "name": "•国际城市",
+          "name": "国际城市",
           "subsidyMoney": 1000
         },
         {
@@ -63,7 +63,7 @@
       ],
       "subsidyTemplates": [
         {
-          "name": "•国际城市",
+          "name": "国际城市",
           "subsidyMoney": 500
         },
         {
