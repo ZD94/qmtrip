@@ -5,7 +5,7 @@
 //可以直接require服务器根目录下的模块
 require('app-module-path').addPath(__dirname);
 require('common/node_ts').install();
-var initData = require('./initTestData');
+var initData = require('libs/initTestData');
 
 
 Error.stackTraceLimit = 40;

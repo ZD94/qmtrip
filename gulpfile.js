@@ -29,8 +29,6 @@ gulplib.dist(function () {
         var t = gulp.src(fname).pipe(gulp.dest('dist'));
         dist_all.push(t);
     })
-    var t = gulp.src('tmp/tsreq/initTestData.js', {base:'tmp/tsreq'}).pipe(gulp.dest('dist'));
-    dist_all.push(t);
 
     var filters = [
         '**',
