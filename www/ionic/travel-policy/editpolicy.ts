@@ -1,6 +1,8 @@
 import { Staff } from 'api/_types/staff/staff';
 import {TravelPolicy, EPlaneLevel, ETrainLevel, EHotelLevel, MPlaneLevel, MTrainLevel} from 'api/_types/travelPolicy';
 import { SubsidyTemplatesController } from './subsidy-templates';
+import _ = require("lodash");
+
 var msgbox = require('msgbox');
 
 export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory, $ionicPopup, ngModalDlg, $window) {
@@ -47,6 +49,13 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         { name: '快捷连锁', value: EHotelLevel.TWO_STAR, desc1: 'Green Hotel',desc2: 'Super8、IBIS等'},
     ];
     $scope.abroadHotelValue = [];
+
+    $scope.checkedHotelLevels = [];
+    $scope.checkedPlaneLevels = [];
+    $scope.checkedTrainLevels = [];
+    $scope.checkedAbroadHotelLevels = [];
+    $scope.checkedAbroadPlaneLevels = [];
+
     var staff = await Staff.getCurrent();
     var travelPolicy;
     var subsidyTemplates;
@@ -66,6 +75,12 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         travelPolicy.trainLevels = [ETrainLevel.SECOND_SEAT];
         travelPolicy.hotelLevels = [EHotelLevel.TWO_STAR];
     }
+    $scope.checkedHotelLevels = _.cloneDeep(travelPolicy.hotelLevels);
+    $scope.checkedPlaneLevels = _.cloneDeep(travelPolicy.planeLevels);
+    $scope.checkedTrainLevels = _.cloneDeep(travelPolicy.trainLevels);
+    $scope.checkedAbroadHotelLevels = _.cloneDeep(travelPolicy.abroadHotelLevels);
+    $scope.checkedAbroadPlaneLevels = _.cloneDeep(travelPolicy.abroadPlaneLevels);
+
     $scope.travelPolicy = travelPolicy;
     $scope.savePolicy = async function () {
         let policy = $scope.travelPolicy;
@@ -73,28 +88,35 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
             msgbox.log("标准名称不能为空");
             return false;
         }
-        if(!policy.planeLevels || policy.planeLevels.length <=0){
+        if(!$scope.checkedPlaneLevels || $scope.checkedPlaneLevels.length <=0){
             msgbox.log('飞机舱位不能为空');
             return false;
         }
-        if(!policy.trainLevels || policy.trainLevels.length <=0){
+        if(!$scope.checkedTrainLevels || $scope.checkedTrainLevels.length <=0){
             msgbox.log('火车座次不能为空');
             return false;
         }
-        if(!policy.hotelLevels || policy.hotelLevels.length <=0){
+        if(!$scope.checkedHotelLevels || $scope.checkedHotelLevels.length <=0){
             msgbox.log('住宿标准不能为空');
             return false;
         }
         if(policy.isOpenAbroad){
-            if(!policy.abroadPlaneLevels || policy.abroadPlaneLevels.length <= 0){
-                msgbox.log('国际飞机舱位不能为空');
-                return false;
-            }
-            if(!policy.abroadHotelLevels || policy.abroadHotelLevels.length <= 0){
+            if(!$scope.checkedAbroadHotelLevels || $scope.checkedAbroadHotelLevels.length <= 0){
                 msgbox.log('国际住宿标准不能为空');
                 return false;
             }
+            if(!$scope.checkedAbroadPlaneLevels || $scope.checkedAbroadPlaneLevels.length <= 0){
+                msgbox.log('国际飞机舱位不能为空');
+                return false;
+            }
         }
+
+        $scope.travelPolicy.planeLevels = $scope.checkedPlaneLevels;
+        $scope.travelPolicy.trainLevels = $scope.checkedTrainLevels;
+        $scope.travelPolicy.hotelLevels = $scope.checkedHotelLevels;
+        $scope.travelPolicy.abroadHotelLevels = $scope.checkedAbroadHotelLevels;
+        $scope.travelPolicy.abroadPlaneLevels = $scope.checkedAbroadPlaneLevels;
+
         var re = /^[0-9]+.?[0-9]*$/;
         if($scope.travelPolicy.subsidy && !re.test($scope.travelPolicy.subsidy)){
             msgbox.log("补助必须为数字");
