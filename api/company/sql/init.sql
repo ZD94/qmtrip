@@ -12,4 +12,4 @@ INSERT INTO company.suppliers(
 INSERT INTO company.suppliers(
             id, name, traffic_book_link, hotel_book_link, logo, company_id, created_at, updated_at, supplier_key, type, is_in_use)
     VALUES ('2244b1a1-74c7-11e6-b1b9-f14ff84d5a8e', '去哪儿', 'https://touch.qunar.com/h5/flight', 'https://touch.qunar.com/hotel',
-    'c3ebd500-385f-11e6-8e0a-d53d0d2d4e19', null, now(), now(), 'qunar_com_m', 2, true);
+    '5abf9f3e-fdd4-454e-a8f7-3d19b95f944e', null, now(), now(), 'qunar_com_m', 2, true);
