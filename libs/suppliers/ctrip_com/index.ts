@@ -55,7 +55,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         let days = +moment(options.backDate) - (+moment(options.leaveDate));
         days = Math.floor( days / (1000 * 60 * 60 * 24) );
         let after = +moment(options.leaveDate) - (+new Date());
-        after = Math.floor( after / (1000 * 60 * 60 * 24) );
+        after = Math.ceil( after / (1000 * 60 * 60 * 24) );
 
         var cityInfo = await this.queryHotelCityCode(options.city);
         var values = {cityInfo: cityInfo , days : days , after : after};
