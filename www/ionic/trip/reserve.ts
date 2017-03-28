@@ -91,9 +91,8 @@ export async function ReserveRedirectController($scope, Models, $stateParams, $i
     // let deptDateTime = moment(budget.deptDateTime).format('YYYY-MM-DD')
     // let bookLink = await supplier.getBookLink({reserveType: $scope.reserveType, fromCityName: $scope.deptCity, toCityName: $scope.arrivalCity, leaveDate: deptDateTime,cityName: budget.city});
     let bookLink = await budget.getBookLink({reserveType: $scope.reserveType, supplierId: supplier.id});
-    console.log(bookLink);
     if(!window.cordova && $scope.reserveType == "travel_train"){
-        bookLink.url == bookLink.indexUrl;
+        bookLink.url = bookLink.indexUrl;
     }
     //下面三个小圆点的轮播
     $scope.load_one = true;
