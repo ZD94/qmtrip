@@ -17,7 +17,7 @@ let moment = require('moment');
 let testData = require('./test-data.json');
 
 export async function initDataForTest (params: {name: string, userName: string, mobile: string, email?: string, pwd?: string}){
-    console.info("begin123-======================================");
+    console.info("begin======================================");
     let co = await Models.company.find({where: {name: '笑傲江湖'}});
     if(co && co.length > 0){
         return null;
@@ -66,37 +66,6 @@ async function initCompany(params: {name: string, userName: string, mobile: stri
 async function initXAJHTravelPolicy(params: {companyId: string}): Promise<any[]> {
     let companyId = params.companyId;
     let company = await Models.company.get(companyId);
-    /*let tps = [
-        {
-            name: "总监级", planeLevels: [3], trainLevels: [4,5], hotelLevels: [5], isOpenAbroad: true,
-            abroadPlaneLevels: [3], abroadHotelLevels: [5],
-            subsidyTemplates: [
-                {name: "•国际城市", subsidyMoney: 1000},
-                {name: "1线城市", subsidyMoney: 800},
-                {name: "2线城市", subsidyMoney: 600},
-                {name: "3线城市", subsidyMoney: 400}
-            ]
-        },
-        {
-            name: "高管级", planeLevels: [4], trainLevels: [1,2,3], hotelLevels: [3,4], isOpenAbroad: true,
-            abroadPlaneLevels: [4,5], abroadHotelLevels: [3,4],
-            subsidyTemplates: [
-                {name: "•国际城市", subsidyMoney: 500},
-                {name: "1线城市", subsidyMoney: 300},
-                {name: "2线城市", subsidyMoney: 200},
-                {name: "3线城市", subsidyMoney: 100}
-            ]
-        },
-        {
-            name: "员工级", planeLevels: [2], trainLevels: [6,7], hotelLevels: [2], isOpenAbroad: true,
-            abroadPlaneLevels: [2], abroadHotelLevels: [2],
-            subsidyTemplates: []
-        },
-        {
-            name: "员工级（仅国内）", planeLevels: [2], trainLevels: [6,7], hotelLevels: [2], isOpenAbroad: false,
-            subsidyTemplates: []
-        }
-    ];*/
     let tps = testData.travelPolicyes;
     for(let i = 0; i < tps.length; i++){
 
@@ -149,31 +118,6 @@ async function initXAJHStaffs(params: {companyId: string}): Promise<any[]> {
     let companyId = params.companyId;
     let company = await Models.company.get(companyId);
     let defaultDepartment = await company.getDefaultDepartment();
-
-    /*let staffs =  [
-        {name: "令狐冲", mobile: "13700000003", email: "l.hchong@xajh.com", isValidateMobile: true,
-            isValidateEmail: true, roleId: EStaffRole.ADMIN, departmentName: ["业务发展部"], travelPolicyName: "总监级"},
-        {name: "任盈盈", mobile: "13700000011", email: "r.yying@xajh.com", isValidateMobile: true, sex: EGender.FEMALE,
-            isValidateEmail: true, roleId: EStaffRole.ADMIN, departmentName: ["业务发展部", "监察部"], travelPolicyName: "总监级"},
-        {name: "岳灵珊", mobile: "13700000004", email: "y.lshan@xajh.com", isValidateMobile: true, sex: EGender.FEMALE,
-            isValidateEmail: true, roleId: EStaffRole.COMMON, departmentName: ["业务发展部"], travelPolicyName: "员工级"},
-        {name: "林平之", mobile: "13700000006", email: "l.pzhi@xajh.com", isValidateMobile: true,
-            isValidateEmail: true, roleId: EStaffRole.COMMON, departmentName: ["业务发展部"], travelPolicyName: "员工级"},
-        {name: "任我行", mobile: "13700000010", email: "r.wxing@xajh.com", isValidateMobile: true,
-            isValidateEmail: true, roleId: EStaffRole.COMMON, departmentName: ["监察部"], travelPolicyName: "总监级"},
-        {name: "向问天", mobile: "13700000012", email: "x.wtian@xajh.com", isValidateMobile: true,
-            isValidateEmail: true, roleId: EStaffRole.COMMON, departmentName: ["监察部"], travelPolicyName: "总监级"},
-        {name: "陆大有", mobile: "13700000007", email: "l.dyou@xajh.com", isValidateMobile: true,
-            isValidateEmail: true, roleId: EStaffRole.COMMON, departmentName: ["监察部", "笑傲江湖"], travelPolicyName: "员工级"},
-        {name: "左冷禅", mobile: "13700000009", email: "z.lchan@xajh.com", isValidateMobile: true,
-            isValidateEmail: true, roleId: EStaffRole.COMMON, departmentName: ["财务部"], travelPolicyName: "总监级"},
-        {name: "宁中则", mobile: "13700000008", email: "n.zze@xajh.com", isValidateMobile: true, sex: EGender.FEMALE,
-            isValidateEmail: true, roleId: EStaffRole.COMMON, departmentName: ["财务部"], travelPolicyName: "总监级"},
-        {name: "杨莲亭", mobile: "13700000013", email: "y.lting@xajh.com", isValidateMobile: true,
-            isValidateEmail: true, roleId: EStaffRole.COMMON, departmentName: ["行政部"], travelPolicyName: "总监级"},
-        {name: "岳不群", mobile: "13700000002", email: "y.bqun@xajh.com", isValidateMobile: true,
-            isValidateEmail: true, roleId: EStaffRole.ADMIN, departmentName: ["笑傲江湖"], travelPolicyName: "总监级"}
-    ];*/
     let staffs = testData.staffs;
 
     let result = await Promise.all(staffs.map(async function(staff){
@@ -205,7 +149,7 @@ async function initXAJHStaffs(params: {companyId: string}): Promise<any[]> {
         if(depts.length == 0){
             depts.push(defaultDepartment);
         }
-        await st.addDepartments(depts);
+        await st.addDepartment(depts);
         return st;
     }));
     let create_user = await company.getCreateUser();
@@ -215,9 +159,25 @@ async function initXAJHStaffs(params: {companyId: string}): Promise<any[]> {
     }
     create_user = await create_user.save();
     result.push(create_user);
+    //设置部门主管
+    await setDepartmentManager({staffName: "岳不群", departmentName: "笑傲江湖", companyId: companyId});
+    await setDepartmentManager({staffName: "左冷禅", departmentName: "财务部", companyId: companyId});
+    await setDepartmentManager({staffName: "任我行", departmentName: "监察部", companyId: companyId});
+    await setDepartmentManager({staffName: "杨莲亭", departmentName: "行政部", companyId: companyId});
+
     return result;
 }
 
+async function setDepartmentManager(params: {staffName: string, departmentName: string, companyId: string}): Promise<boolean>{
+    let {staffName, departmentName, companyId} = params;
+    let dept = await Models.department.find({where : {name: departmentName, companyId: companyId}});
+    let staff = await Models.staff.find({where : {name: staffName, companyId: companyId}});
+    if(dept && staff && dept.length > 0 && staff.length > 0){
+        dept[0].manager = staff[0];
+        await dept[0].save();
+    }
+    return true;
+}
 function translateRole(str: string){
     let role = EStaffRole.COMMON;
     switch(str) {
