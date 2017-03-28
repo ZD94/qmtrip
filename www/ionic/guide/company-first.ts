@@ -1,6 +1,7 @@
 import { Staff } from 'api/_types/staff/staff';
 import {TravelPolicy, MPlaneLevel, MTrainLevel, EPlaneLevel, ETrainLevel, EHotelLevel} from 'api/_types/travelPolicy';
 var msgbox = require('msgbox');
+import _ = require("lodash");
 
 export async function CompanyFirstController ($scope, Models, $stateParams){
     require("./company-guide.scss");
@@ -46,6 +47,13 @@ export async function CompanyFirstController ($scope, Models, $stateParams){
         { name: '快捷连锁', value: EHotelLevel.TWO_STAR, desc1: 'Green Hotel',desc2: 'Super8、IBIS等'},
     ];
     $scope.abroadHotelValue = [];
+
+    $scope.checkedHotelLevels = [];
+    $scope.checkedPlaneLevels = [];
+    $scope.checkedTrainLevels = [];
+    $scope.checkedAbroadHotelLevels = [];
+    $scope.checkedAbroadPlaneLevels = [];
+
     var staff = await Staff.getCurrent();
     var travelPolicy;
     if ($stateParams.policyId) {
@@ -53,11 +61,18 @@ export async function CompanyFirstController ($scope, Models, $stateParams){
     } else {
         travelPolicy = TravelPolicy.create();
         travelPolicy.companyId = staff.company.id;
-        travelPolicy.planeLevel = 2;
-        travelPolicy.trainLevel = 3;
-        travelPolicy.hotelLevel = 2;
+        travelPolicy.planeLevels = [EPlaneLevel.ECONOMY];
+        travelPolicy.trainLevels = [ETrainLevel.SECOND_SEAT];
+        travelPolicy.hotelLevels = [EHotelLevel.TWO_STAR];
     }
+
     $scope.travelPolicy = travelPolicy;
+
+    $scope.checkedHotelLevels = _.cloneDeep(travelPolicy.hotelLevels);
+    $scope.checkedPlaneLevels = _.cloneDeep(travelPolicy.planeLevels);
+    $scope.checkedTrainLevels = _.cloneDeep(travelPolicy.trainLevels);
+    $scope.checkedAbroadHotelLevels = _.cloneDeep(travelPolicy.abroadHotelLevels);
+    $scope.checkedAbroadPlaneLevels = _.cloneDeep(travelPolicy.abroadPlaneLevels);
 
     $scope.savePolicy = async function () {
         let policy = $scope.travelPolicy;
@@ -65,31 +80,37 @@ export async function CompanyFirstController ($scope, Models, $stateParams){
             msgbox.log("标准名称不能为空");
             return false;
         }
-        if(!policy.planeLevels || policy.planeLevels.length <=0){
+        if(!$scope.checkedPlaneLevels || $scope.checkedPlaneLevels.length <=0){
             msgbox.log('飞机舱位不能为空');
             return false;
         }
-        if(!policy.trainLevels || policy.trainLevels.length <=0){
+        if(!$scope.checkedTrainLevels || $scope.checkedTrainLevels.length <=0){
             msgbox.log('火车座次不能为空');
             return false;
         }
-        if(!policy.hotelLevels || policy.hotelLevels.length <=0){
+        if(!$scope.checkedHotelLevels || $scope.checkedHotelLevels.length <=0){
             msgbox.log('住宿标准不能为空');
             return false;
         }
         if(policy.isOpenAbroad){
-            if(!policy.abroadPlaneLevels || policy.abroadPlaneLevels.length <= 0){
-                msgbox.log('国际飞机舱位不能为空');
-                return false;
-            }
-            if(!policy.abroadHotelLevels || policy.abroadHotelLevels.length <= 0){
+            if(!$scope.checkedAbroadHotelLevels || $scope.checkedAbroadHotelLevels.length <= 0){
                 msgbox.log('国际住宿标准不能为空');
                 return false;
             }
+            if(!$scope.checkedAbroadPlaneLevels || $scope.checkedAbroadPlaneLevels.length <= 0){
+                msgbox.log('国际飞机舱位不能为空');
+                return false;
+            }
         }
+        $scope.travelPolicy.planeLevels = $scope.checkedPlaneLevels;
+        $scope.travelPolicy.trainLevels = $scope.checkedTrainLevels;
+        $scope.travelPolicy.hotelLevels = $scope.checkedHotelLevels;
+        $scope.travelPolicy.abroadHotelLevels = $scope.checkedAbroadHotelLevels;
+        $scope.travelPolicy.abroadPlaneLevels = $scope.checkedAbroadPlaneLevels;
         $scope.travelPolicy.company = staff.company;
         $scope.travelPolicy.isDefault = true;
         await $scope.travelPolicy.save();
+
         staff['travelPolicyId'] = $scope.travelPolicy.id;
         await staff.save();
         window.location.href = '#/guide/company-second';
