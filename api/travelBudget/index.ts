@@ -195,23 +195,6 @@ export default class ApiTravelBudget {
                             }
                         }
 
-                        if (isNeedTraffic && isRoundTrip && i == (paramsToBudget.length - 1)) {
-                            try {
-                                let _params = {
-                                    originPlace: destinationPlace,
-                                    destinationPlace: paramsToBudget[0].originPlace,
-                                    leaveDate: goBackDate,
-                                    earliestLeaveDateTime: earliestGoBackDateTime,
-                                    latestArrivalTime: latestGoBackDateTime,
-                                }
-                                let budget = await ApiTravelBudget.getTrafficBudget(_params);
-                                budget.tripType = ETripType.BACK_TRIP;
-                                budgets.push(budget);
-                            } catch (err) {
-                                reject(err);
-                            }
-                        }
-
                         if (isNeedHotel) {
                             try {
                                 let budget = await ApiTravelBudget.getHotelBudget({
@@ -226,6 +209,23 @@ export default class ApiTravelBudget {
                             } catch (err) {
                                 console.info(err);
                                 reject(err)
+                            }
+                        }
+
+                        if (isNeedTraffic && isRoundTrip && i == (paramsToBudget.length - 1)) {
+                            try {
+                                let _params = {
+                                    originPlace: destinationPlace,
+                                    destinationPlace: paramsToBudget[0].originPlace,
+                                    leaveDate: goBackDate,
+                                    earliestLeaveDateTime: earliestGoBackDateTime,
+                                    latestArrivalTime: latestGoBackDateTime,
+                                }
+                                let budget = await ApiTravelBudget.getTrafficBudget(_params);
+                                budget.tripType = ETripType.BACK_TRIP;
+                                budgets.push(budget);
+                            } catch (err) {
+                                reject(err);
                             }
                         }
 
@@ -528,7 +528,6 @@ export default class ApiTravelBudget {
         let tickets: ITicket[] = _.concat(flightTickets, trainTickets) as ITicket[];
         let strategy = await TrafficBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
         let result =  await strategy.getResult(tickets);
-        console.log("result: ",result);
         result.cabinClass = result.cabin;
         result.originPlace = m_originCity;
         result.destination = m_destination;
