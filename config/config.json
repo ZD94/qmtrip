@@ -87,5 +87,12 @@
     "appKey" : "3fFDdkKxibDiRjwy9DqaPwasvAup",
     "appSecret" : "2FaLAocgDodNqCFa9PU8cyCk4Fnw"
   },
+  "ddconfig" : {
+    "token": "jingli2016",
+    "encodingAESKey": "8nf2df6n0hiifsgg521mmjl6euyxoy3y6d9d3mt1laq",
+    "suiteid": "suitezutlhpvgyvgakcdo",
+    "secret": "pV--T2FZj-3QCjJzcQd5OnzDBAe6rRKRQGEmc8iVCvdtc2FUOS5icq1gVfkbqiTx",
+    "appid": "2156"
+  },
   "perDayRegisterEmail": ""
 }

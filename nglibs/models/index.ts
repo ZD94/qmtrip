@@ -207,11 +207,11 @@ class ClientModels implements ModelsInterface {
     
     ddtalkCorp: ModelInterface<DDTalkCorp>;
     ddtalkUser: ModelInterface<DDTalkUser>;
+    ddtalkDepartment : ModelInterface<DDTalkDepartment>;
 
     coinAccount: ModelInterface<CoinAccount>;
     coinAccountChange: ModelInterface<CoinAccountChange>;
     agencyOperateLog: ModelInterface<AgencyOperateLog>;
-    ddtalkDepartment: ModelInterface<DDTalkDepartment>;
 
     constructor($cacheFactory: ng.ICacheFactoryService, $rootScope: ng.IRootScopeService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
