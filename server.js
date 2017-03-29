@@ -12,7 +12,7 @@ Error.stackTraceLimit = 40;
 var zone = require('common/zone');
 
 //服务器启动性能日志
-//var perf = require('common/perf');
+//var perf = require('@jingli/perf');
 //perf.init('init');
 
 global.Promise = require('bluebird');
