@@ -70,7 +70,7 @@ export async function StaffInvitedController($scope, Models, $ionicHistory, $ion
     $scope.isIos =  ionic.Platform.isIOS();
     $scope.is_wechat = browserspec.is_wechat;
     $scope.isCordova = window.cordova;
-    var config = require('config');
+    var config = require('@jingli/config');
     let url = config.update;
     if (!/\/$/.test(url)) {
         url += '/';

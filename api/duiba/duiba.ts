@@ -5,7 +5,7 @@
 import {Models} from "_types/index";
 import L from 'common/language';
 import {CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE} from "_types/coin";
-var config = require('config');
+var config = require('@jingli/config');
 var API = require("common/api");
 
 module.exports = function(app) {
