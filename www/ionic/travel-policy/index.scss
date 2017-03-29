@@ -42,12 +42,10 @@
     padding: 0 10px;;
   }
   .policyCard{
-    &:first-of-type {
+    &:first-child {
       .item{
-        &:first-of-type{
           border-top-left-radius: 3px;
           border-top-right-radius: 3px;
-        }
       }
     }
     &:last-child{

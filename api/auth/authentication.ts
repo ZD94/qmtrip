@@ -165,6 +165,9 @@ export async function login(data: {account?: string, pwd: string, type?: Number,
     }
 
     var ret = await makeAuthenticateToken(loginAccount.id)
+    if (loginAccount.isNeedChangePwd) {
+        ret['is_need_change_pwd'] = true;
+    }
     //判断是否首次登录
     if(loginAccount.isFirstLogin) {
         loginAccount.isFirstLogin = false;
@@ -173,9 +176,6 @@ export async function login(data: {account?: string, pwd: string, type?: Number,
                 ret['is_first_login'] = true;
                 return ret;
             })
-    }
-    if (loginAccount.isNeedChangePwd) {
-        ret['is_need_change_pwd'] = true;
     }
 
     ret['is_first_login'] = false;

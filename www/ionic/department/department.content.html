@@ -5,7 +5,7 @@
             <input type="text" placeholder="Search" ng-model="keywords" ng-change="searchKeyword(keywords)">
         </label>
         <span class="fa sort_btn" ng-class="[selected.icon]" sort-select select-list="arrlist" select="selected" done="sortBy">
-            <span ng-if="selected.value == ''">时间</span>
+            <span ng-if="selected.value == 'createdAt'">时间</span>
             <span ng-if="selected.value == 'nameDesc'">姓名</span>
             <span ng-if="selected.value == 'nameAsc'">姓名</span>
             <span ng-if="selected.value == 'role'">角色</span>
