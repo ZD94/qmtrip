@@ -40,6 +40,7 @@ async function initCompany(params: {name: string, userName: string, mobile: stri
     company.expiryDate = moment().add(7, 'days').toDate();
     company.tripPlanNumLimit = 20;
     company.extraTripPlanNum = 5;
+    company.extraExpiryDate = moment().add(10, 'days').toDate();
     company.type = ECompanyType.PAYED;
     company.createUser = staff.id;
     company['agencyId'] = agencyId;

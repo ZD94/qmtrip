@@ -1,7 +1,7 @@
 {
   "travelPolicyes": [
     {
-      "name": "总监级",
+      "name": "高管级",
       "planeLevels": [
         3
       ],
@@ -39,7 +39,7 @@
       ]
     },
     {
-      "name": "高管级",
+      "name": "总监级",
       "planeLevels": [
         4
       ],
@@ -167,7 +167,7 @@
       "departmentName": [
         "业务发展部"
       ],
-      "travelPolicyName": "员工级"
+      "travelPolicyName": "员工级（仅国内）"
     },
     {
       "name": "任我行",
@@ -249,11 +249,11 @@
       "email": "y.bqun@xajh.com",
       "isValidateMobile": true,
       "isValidateEmail": true,
-      "roleId": "admin",
+      "roleId": "staff",
       "departmentName": [
         "笑傲江湖"
       ],
-      "travelPolicyName": "总监级"
+      "travelPolicyName": "高管级"
     }
   ]
 }
