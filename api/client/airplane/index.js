@@ -5,7 +5,7 @@
 
 var API = require("common/api");
 var L = require("@jingli/language");
-import Logger from '@jingli/logger';
+var Logger = require('@jingli/logger');
 var _ = require('lodash');
 var moment = require('moment');
 var getRndStr = require('common/utils').getRndStr;

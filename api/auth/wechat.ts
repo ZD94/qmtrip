@@ -5,7 +5,7 @@ import { makeAuthenticateToken } from './authentication';
 import { Staff } from '_types/staff/staff';
 import { Models } from '_types/index';
 import { requireParams } from '../../common/api/helper';
-var C = require("config");
+import C = require("@jingli/config");
 var API = require("common/api");
 
 export function __initHttpApp(app: any) {

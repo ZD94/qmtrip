@@ -269,7 +269,7 @@ class AgencyModule {
 
     static async __initOnce() {
         logger.info("init default agency...");
-        let default_agency = require('config/config').default_agency;
+        let default_agency = require('@jingli/config').default_agency;
         let email = default_agency.email;
         let mobile = default_agency.mobile;
         let pwd = default_agency.pwd;

@@ -6,7 +6,7 @@
 'use strict';
 import fs = require("fs");
 import cache from "common/cache";
-const C = require("config");
+import C = require("@jingli/config");
 
 const config = C.ddconfig;
 
