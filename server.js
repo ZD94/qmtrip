@@ -63,7 +63,9 @@ server.api_config = config.api;
 
 server.on('init.api', function(API){
     API.registerAuthWeb(API.auth.authentication);
-    initData.initDataForTest({name: '笑傲江湖', userName: '风清扬', mobile: '13700000001', pwd: '123456'});
+    if(config.is_init_test_company){
+        initData.initDataForTest({name: '笑傲江湖', userName: '风清扬', mobile: '13700000001', pwd: '123456'});
+    }
 });
 
 server.on('init.http', function(server){
