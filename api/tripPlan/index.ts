@@ -2,7 +2,7 @@
  * Created by yumiao on 15-12-10.
  */
 "use strict";
-let sequelize = require("common/model").DB;
+import {DB} from "common/model";
 let uuid = require("node-uuid");
 import L from 'common/language';
 import utils = require("common/utils");
@@ -706,11 +706,11 @@ class TripPlanModule {
         let saved_sql = 'select sum(budget-expenditure) as \"savedMoney\" ' + complete_sql;
         let expenditure_sql = 'select sum(expenditure) as expenditure ' + complete_sql;
 
-        let staff_num_sql_ret = await sequelize.query(staff_num_sql);
-        let project_num_sql_ret = await sequelize.query(project_num_sql);
-        let budget_sql_ret = await sequelize.query(budget_sql);
-        let saved_sql_ret = await sequelize.query(saved_sql);
-        let expenditure_sql_ret = await sequelize.query(expenditure_sql);
+        let staff_num_sql_ret = await DB.query(staff_num_sql);
+        let project_num_sql_ret = await DB.query(project_num_sql);
+        let budget_sql_ret = await DB.query(budget_sql);
+        let saved_sql_ret = await DB.query(saved_sql);
+        let expenditure_sql_ret = await DB.query(expenditure_sql);
 
         return {
             month: month,
@@ -754,9 +754,9 @@ class TripPlanModule {
         let complete = `${selectSql} ${completeSql};`;
         let plan = `${selectSql} ${planSql};`;
 
-        let savedMoneyCompleteInfo = await sequelize.query(savedMoneyComplete);
-        let completeInfo = await sequelize.query(complete);
-        let planInfo = await sequelize.query(plan);
+        let savedMoneyCompleteInfo = await DB.query(savedMoneyComplete);
+        let completeInfo = await DB.query(complete);
+        let planInfo = await DB.query(plan);
 
         let ret = {
             planTripNum: 0,//计划出差人数(次)
@@ -875,9 +875,9 @@ class TripPlanModule {
             plan = `${selectSql} ${planSql} group by d.id;`;
         }
 
-        let completeInfo = await sequelize.query(complete);
-        let savedMoneyCompleteInfo = await sequelize.query(savedMoneyComplete);
-        let planInfo = await sequelize.query(plan);
+        let completeInfo = await DB.query(complete);
+        let savedMoneyCompleteInfo = await DB.query(savedMoneyComplete);
+        let planInfo = await DB.query(plan);
 
         let result = {};
         if(completeInfo && completeInfo.length > 0 && completeInfo[0].length > 0) {
@@ -1185,7 +1185,7 @@ class TripPlanModule {
             sql += ` and start_at < '${params.endTime}'`;
         sql += ` group by account_id order by save desc limit ${limit};`;
 
-        let ranks = await sequelize.query(sql)
+        let ranks = await DB.query(sql)
             .then(function(result) {
                 return result[0];
             });
@@ -1207,7 +1207,7 @@ class TripPlanModule {
         let companyId = staff.company.id;
         let sql = `select sum(budget) - sum(expenditure) as save from trip_plan.trip_plans where deleted_at is null and status = ${EPlanStatus.COMPLETE} AND company_id = '${companyId}' AND account_id =  '${accountId}' `;
 
-        let ranks = await sequelize.query(sql)
+        let ranks = await DB.query(sql)
             .then(function(result) {
                 return result[0];
             });
