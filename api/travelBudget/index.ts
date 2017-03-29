@@ -195,23 +195,6 @@ export default class ApiTravelBudget {
                             }
                         }
 
-                        if (isNeedTraffic && isRoundTrip && i == (paramsToBudget.length - 1)) {
-                            try {
-                                let _params = {
-                                    originPlace: destinationPlace,
-                                    destinationPlace: paramsToBudget[0].originPlace,
-                                    leaveDate: goBackDate,
-                                    earliestLeaveDateTime: earliestGoBackDateTime,
-                                    latestArrivalTime: latestGoBackDateTime,
-                                }
-                                let budget = await ApiTravelBudget.getTrafficBudget(_params);
-                                budget.tripType = ETripType.BACK_TRIP;
-                                budgets.push(budget);
-                            } catch (err) {
-                                reject(err);
-                            }
-                        }
-
                         if (isNeedHotel) {
                             try {
                                 let budget = await ApiTravelBudget.getHotelBudget({
@@ -226,6 +209,23 @@ export default class ApiTravelBudget {
                             } catch (err) {
                                 console.info(err);
                                 reject(err)
+                            }
+                        }
+
+                        if (isNeedTraffic && isRoundTrip && i == (paramsToBudget.length - 1)) {
+                            try {
+                                let _params = {
+                                    originPlace: destinationPlace,
+                                    destinationPlace: paramsToBudget[0].originPlace,
+                                    leaveDate: goBackDate,
+                                    earliestLeaveDateTime: earliestGoBackDateTime,
+                                    latestArrivalTime: latestGoBackDateTime,
+                                }
+                                let budget = await ApiTravelBudget.getTrafficBudget(_params);
+                                budget.tripType = ETripType.BACK_TRIP;
+                                budgets.push(budget);
+                            } catch (err) {
+                                reject(err);
                             }
                         }
 
@@ -286,8 +286,7 @@ export default class ApiTravelBudget {
     @clientExport
     static async getHotelBudget(params: {
         city: any, businessDistrict: string,
-        checkInDate: Date, checkOutDate: Date, hotelName?: string
-    }): Promise<TravelBudgetHotel> {
+        checkInDate: Date, checkOutDate: Date, hotelName?: string}) :Promise<TravelBudgetHotel> {
         let {city, businessDistrict, checkInDate, checkOutDate, hotelName} = params;
         if (!Boolean(city)) {
             throw L.ERR.CITY_NOT_EXIST();
@@ -319,8 +318,7 @@ export default class ApiTravelBudget {
         if (accordHotel) {
             return {
                 price: accordHotel.accordPrice * days, type: EInvoiceType.HOTEL,
-                hotelName: hotelName, cityName: city.name, checkInDate: checkInDate, checkOutDate: checkOutDate
-            } as TravelBudgetHotel;
+                hotelName: hotelName, cityName: city.name, checkInDate: checkInDate, checkOutDate: checkOutDate} as TravelBudgetHotel;
         }
 
         //查询员工差旅标准
@@ -435,6 +433,7 @@ export default class ApiTravelBudget {
         let m_originCity = await API.place.getCityInfo({cityCode: originPlace.id || originPlace});
         let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
 
+        console.log("this is city info: ", m_originCity);
         //转换成当地时间
         if (!latestArrivalDateTime) {
             params.latestArrivalDateTime = undefined;
@@ -529,7 +528,6 @@ export default class ApiTravelBudget {
         let tickets: ITicket[] = _.concat(flightTickets, trainTickets) as ITicket[];
         let strategy = await TrafficBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
         let result =  await strategy.getResult(tickets);
-        console.log("result: ",result);
         result.cabinClass = result.cabin;
         result.originPlace = m_originCity;
         result.destination = m_destination;
