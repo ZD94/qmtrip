@@ -873,7 +873,7 @@ class StaffModule{
     ])
     static async getPointChanges(params) :Promise<FindResult>{
         let { accountId } = Zone.current.get("session");
-        params.where = _.pick(params.where, Object.keys(DB.models.PointChange.attributes));
+        params.where = _.pick(params.where, Object.keys(DB.models.PointChange['attributes']));
         let role = await API.auth.judgeRoleById({id:accountId});
 
         let rows, count, ret;
@@ -1407,7 +1407,7 @@ class StaffModule{
         var options: any = {};
         options.where = {id: id};
         options.returning = true;
-        return DB.models.Credential.update(params, options)
+        return <Promise<Credential>>DB.models.Credential.update(params, options)
             .spread(function(rownum, rows){
                 return new Credential(rows[0]);
             });
