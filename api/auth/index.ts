@@ -7,7 +7,7 @@ import { Models, EAccountType } from "_types";
 import { Account, ACCOUNT_STATUS } from "_types/auth";
 import { Staff, EInvitedLinkStatus, EAddWay } from "_types/staff";
 import validator = require('validator');
-import L from 'common/language';
+import L from '@jingli/language';
 import cache = require("common/cache");
 import * as authentication from './authentication';
 import * as wechat from './wechat';

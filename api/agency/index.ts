@@ -5,7 +5,7 @@
 let sequelize = require("common/model").DB;
 let DBM = sequelize.models;
 let API = require("common/api");
-import L from 'common/language';
+import L from '@jingli/language';
 import Logger = require('common/logger');
 import {requireParams, clientExport} from 'common/api/helper';
 import {Agency, AgencyUser, EAgencyStatus, EAgencyUserRole} from "_types/agency";

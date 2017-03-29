@@ -13,7 +13,7 @@ var API = require("common/api");
 var validate = require("common/validate");
 
 import _ = require('lodash');
-import L from 'common/language';
+import L from '@jingli/language';
 import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {requireParams, clientExport} from 'common/api/helper';

@@ -17,7 +17,7 @@ import {EVENT, plugins, emitter} from "libs/oa/index";
 import {TripDetail} from "_types/tripPlan/tripDetail";
 import TripPlanModule = require("../tripPlan/index");
 let systemNoticeEmails = require('config/config').system_notice_emails;
-const L = require('common/language');
+const L = require('@jingli/language');
 var API = require('common/api');
 var config = require("config");
 import _ = require("lodash");

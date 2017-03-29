@@ -9,7 +9,7 @@ import {requireParams, clientExport} from "../../common/api/helper";
 import {Staff, PointChange} from "_types/staff";
 import {CoinAccount, CoinAccountChange} from "_types/coin";
 import {FindResult} from "common/model/interface";
-import L from 'common/language';
+import L from '@jingli/language';
 
 
 class CoinModule {

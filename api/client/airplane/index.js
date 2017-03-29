@@ -4,7 +4,7 @@
 'use strict';
 
 var API = require("common/api");
-var L = require("common/language");
+var L = require("@jingli/language");
 var Logger = require('common/logger');
 var _ = require('lodash');
 var moment = require('moment');

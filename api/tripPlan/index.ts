@@ -4,7 +4,7 @@
 "use strict";
 let sequelize = require("common/model").DB;
 let uuid = require("node-uuid");
-import L from 'common/language';
+import L from '@jingli/language';
 import utils = require("common/utils");
 let API = require('common/api');
 let Logger = require('common/logger');

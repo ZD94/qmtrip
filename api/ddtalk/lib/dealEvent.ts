@@ -19,7 +19,7 @@ import {reqProxy} from "./reqProxy";
 import {Company} from "_types/company";
 import {Staff, EStaffRole} from "_types/staff";
 import {Models} from "_types/index";
-import L from 'common/language';
+import L from '@jingli/language';
 
 import {md5} from "common/utils";
 import {DDTalkCorp , DDTalkDepartment , DDTalkUser} from "_types/ddtalk";

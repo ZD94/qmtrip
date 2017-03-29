@@ -4,7 +4,7 @@
 "use strict";
 import {Staff, EStaffRoleNames, EStaffRole, EAddWay} from "_types/staff/staff";
 import {EGender} from "_types/index";
-import L from 'common/language';
+import L from '@jingli/language';
 import validator = require('validator');
 import {Pager} from "common/model/pager";
 import {setDepartment} from "./set-department";

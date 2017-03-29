@@ -4,7 +4,7 @@
 'use strict';
 var sequelize = require("common/model").importModel("./models");
 var Owner = sequelize.models.Owner;
-import L from 'common/language';
+import L from '@jingli/language';
 var API = require("common/api");
 var config = require('@jingli/config');
 let Logger = require('common/logger');
