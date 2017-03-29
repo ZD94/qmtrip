@@ -694,6 +694,59 @@ class CompanyModule {
                     logger.error(`执行任务${taskId4}错误:${err.stack}`);
                 })
         });
+
+        let taskId5 = 'qm:task:perDayMail'
+        scheduler('0 10 8 * * *', taskId5, function() {
+            if (!C.perDayRegisterEmail) {
+                return false;
+            }
+
+            //每天八点10分发送每日企业注册邮件
+            ( async () => {
+                let pager;
+                let companies = [];
+                do {
+                    pager = await Models.company.find( {
+                        where: {
+                            createdAt: {
+                                "$lte": new Date(),
+                                "$gte": moment().add(-1, 'days').format('YYYY-MM-DD 08:00')
+                            }
+                        }
+                    });
+
+                    let ps = pager.map( async (company) => {
+                        let staff = await Models.staff.get(company.createUser);
+                        company['createUserObj'] = staff;
+                        return company;
+                    })
+
+                    let _companies = await Promise.all(ps);
+                    _companies.forEach( (company: Company) => {
+                        companies.push({
+                            name: company.name,
+                            createUser: {
+                                name: company['createUserObj']['name'],
+                                mobile: company['createUserObj']['mobile']
+                            },
+                            createdAt: company.createdAt
+                        })
+                    });
+                } while(pager && pager.hasNextPage())
+
+                await API.notify.submitNotify({
+                    key: "qm_notify_perday_mail",
+                    values: {
+                        companies: companies,
+                    },
+                    email: C.perDayRegisterEmail
+                });
+                logger.info(`成功执行任务${taskId5}`);
+            })()
+                .catch( (err) => {
+                    logger.error(`执行任务${taskId5}错误:${err.stack}`);
+                })
+        })
     }
 
 }

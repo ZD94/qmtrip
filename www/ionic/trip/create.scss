@@ -12,10 +12,12 @@ $main-color: #28a7e1;
         .item{
           &:first-child{
             border-right: none;
+            border-bottom-left-radius: 3px;
           }
           &:last-child{
             border-left: none;
             text-align: right;
+            border-bottom-right-radius: 3px;
             .date-during{
               color: lighten($dark,39);
               font-size: 12px;
@@ -30,7 +32,13 @@ $main-color: #28a7e1;
     }
     .item{
       padding: 8px 10px;
-      border-radius: 3px;
+      &:first-child {
+        border-top-left-radius: 3px;
+        border-right: 0;
+      }
+      &:last-child {
+        border-top-right-radius: 3px;
+      }
       p.ng-binding {
         font-size: 16px;
       }

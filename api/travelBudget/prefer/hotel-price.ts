@@ -93,18 +93,16 @@ class PricePrefer extends AbstractPrefer<IFinalHotel> {
             hotels = hotels.map ( (v) => {
                 if (!v.score) v.score = 0;
                 if (!v.reasons) v.reasons = [];
-                if(!v.outPriceRange){
-                    if (v.price <= expectPrice) {
-                        let score = Math.floor(self.score * ( 1- Math.pow((v.price - expectPrice) / (expectPrice - lowestLimit), 2)));
-                        v.score += score;
-                        v.reasons.push(`价格在偏好价格下 ${score}`);
-                    }
+                if (v.price <= expectPrice) {
+                    let score = Math.floor(self.score * ( 1- Math.pow((v.price - expectPrice) / (expectPrice - lowestLimit), 2)));
+                    v.score += score;
+                    v.reasons.push(`价格在偏好价格下 ${score}`);
+                }
 
-                    if (v.price > expectPrice) {
-                        let score = Math.floor(self.score * (1 - Math.pow((v.price - expectPrice) / (expectPrice - highestLimit), 2)));
-                        v.score += score
-                        v.reasons.push(`价格在偏好价格上 ${score}`);
-                    }
+                if (v.price > expectPrice) {
+                    let score = Math.floor(self.score * (1 - Math.pow((v.price - expectPrice) / (expectPrice - highestLimit), 2)));
+                    v.score += score
+                    v.reasons.push(`价格在偏好价格上 ${score}`);
                 }
                 return v;
             });
