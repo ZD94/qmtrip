@@ -48,6 +48,9 @@ angular
             controller: function($scope, $element){
                 require('./checkbox.scss');
                 $scope.checkOption = function(option){
+                    if (!$scope.model) {
+                        $scope.model = [];
+                    }
                     let values = _.clone($scope.model)
                     let idx = values.indexOf(option.value);
                     if(idx >=0){
