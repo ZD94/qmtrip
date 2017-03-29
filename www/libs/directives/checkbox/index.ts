@@ -48,18 +48,12 @@ angular
             controller: function($scope, $element){
                 require('./checkbox.scss');
                 $scope.checkOption = function(option){
-                    // let values = _.cloneDeep($scope.model) || [];
-                    // ?????为什么我之前要加clone？？？现在导致model全选内存地址引用不同，无法通信，，奇怪，奇怪
-                    if(!$scope.model){
-                        $scope.model = [];
-                    }
-                    let values = $scope.model;
+                    let values = _.clone($scope.model)
                     let idx = values.indexOf(option.value);
                     if(idx >=0){
                         values.splice(idx, 1);
                     }else{
                         values.push(option.value);
-                        // $scope.model = _.clone($scope.model).push(option.value);
                         values.sort();
                     }
                     $scope.model = values;
