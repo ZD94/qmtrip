@@ -3,10 +3,10 @@
  */
 var sequelize = require("common/model").DB;
 var DBM = sequelize.models;
-import L from 'common/language';
-let C = require("config");
+import L from '@jingli/language';
+import C = require("@jingli/config");
 let API = require("common/api");
-let Logger = require('common/logger');
+import Logger from '@jingli/logger';
 let logger = new Logger('company');
 let moment = require('moment');
 let promoCodeType = require('libs/promoCodeType');

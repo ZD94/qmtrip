@@ -13,7 +13,7 @@ export async function IndexController($scope, Models, FileUploader) {
     let staff = await Staff.getCurrent();
     $scope.company = staff.company;
     if(!upload_url.match(/^https?:\/\//)){
-        var config = require('config');
+        var config = require('@jingli/config');
         config.$ready.then(()=>{
             upload_url = config.update + upload_url;
             $scope.uploader.url = upload_url;

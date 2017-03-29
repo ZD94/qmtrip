@@ -4,13 +4,13 @@
 
 'use strict';
 import _ = require('lodash');
-import Logger = require('common/logger');
+import Logger from '@jingli/logger';
 const logger = new Logger('qm:notify');
 import redisClient = require("common/redis-client");
 import {Models} from "_types";
 import {ESendType, ENoticeType} from "_types/notice/notice";
 
-const config = require('config');
+const config = require('@jingli/config');
 let API = require('common/api');
 
 const path = require("path");

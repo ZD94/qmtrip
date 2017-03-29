@@ -4,7 +4,7 @@
 
 let moment = require("moment");
 let DBM = require("common/model").DB.models;
-let Logger = require('common/logger');
+import Logger from '@jingli/logger';
 let logger = new Logger("seeds");
 let typeString = ['TripPlanNo', 'AgencyNo', 'CompanyNo', 'CoinAccountNo'];
 
