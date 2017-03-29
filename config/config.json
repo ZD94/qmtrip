@@ -87,6 +87,7 @@
     "appKey" : "3fFDdkKxibDiRjwy9DqaPwasvAup",
     "appSecret" : "2FaLAocgDodNqCFa9PU8cyCk4Fnw"
   },
+  "is_init_test_company": true,
   "ddconfig" : {
     "token": "jingli2016",
     "encodingAESKey": "8nf2df6n0hiifsgg521mmjl6euyxoy3y6d9d3mt1laq",
