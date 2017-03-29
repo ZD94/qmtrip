@@ -53,9 +53,9 @@ export async function CompanyFirstController ($scope, Models, $stateParams){
     } else {
         travelPolicy = TravelPolicy.create();
         travelPolicy.companyId = staff.company.id;
-        travelPolicy.planeLevel = 2;
-        travelPolicy.trainLevel = 3;
-        travelPolicy.hotelLevel = 2;
+        travelPolicy.planeLevels = [EPlaneLevel.ECONOMY];
+        travelPolicy.trainLevels = [ETrainLevel.SECOND_SEAT];
+        travelPolicy.hotelLevels = [EHotelLevel.TWO_STAR];
     }
     $scope.travelPolicy = travelPolicy;
 
