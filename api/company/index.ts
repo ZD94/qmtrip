@@ -125,7 +125,7 @@ class CompanyModule {
         let ca_staff = CoinAccount.create();
         await ca_staff.save();
         let account = await Models.account.get(staff.id);
-        account.coinAccount = ca;
+        account.coinAccount = ca_staff;
         await account.save();
 
         return {company: company, description: promoCode ? promoCode.description : ""};
