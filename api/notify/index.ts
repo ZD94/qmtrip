@@ -4,7 +4,7 @@
 
 'use strict';
 import _ = require('lodash');
-import Logger = require('common/logger');
+import Logger from '@jingli/logger';
 const logger = new Logger('qm:notify');
 import redisClient = require("common/redis-client");
 import {Models} from "_types";

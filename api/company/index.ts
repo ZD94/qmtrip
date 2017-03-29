@@ -6,7 +6,7 @@ var DBM = sequelize.models;
 import L from '@jingli/language';
 let C = require("config");
 let API = require("common/api");
-let Logger = require('common/logger');
+import Logger from '@jingli/logger';
 let logger = new Logger('company');
 let moment = require('moment');
 let promoCodeType = require('libs/promoCodeType');

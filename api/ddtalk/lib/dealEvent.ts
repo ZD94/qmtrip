@@ -10,7 +10,7 @@ const C = require("config");
 
 const config = C.ddconfig;
 
-var Logger = require('common/logger');
+import Logger from '@jingli/logger';
 var logger = new Logger('main');
 import request = require('request');
 import ISVApi from "./isvApi";

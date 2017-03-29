@@ -6,7 +6,7 @@ let sequelize = require("common/model").DB;
 let DBM = sequelize.models;
 let API = require("common/api");
 import L from '@jingli/language';
-import Logger = require('common/logger');
+import Logger from '@jingli/logger';
 import {requireParams, clientExport} from 'common/api/helper';
 import {Agency, AgencyUser, EAgencyStatus, EAgencyUserRole} from "_types/agency";
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "../_decorator";

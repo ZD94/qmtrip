@@ -7,7 +7,7 @@ let uuid = require("node-uuid");
 import L from '@jingli/language';
 import utils = require("common/utils");
 let API = require('common/api');
-let Logger = require('common/logger');
+import Logger from '@jingli/logger';
 let logger = new Logger("tripPlan");
 let config = require("../../config");
 let moment = require("moment");

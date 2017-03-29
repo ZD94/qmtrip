@@ -7,7 +7,7 @@ var Owner = sequelize.models.Owner;
 import L from '@jingli/language';
 var API = require("common/api");
 var config = require('@jingli/config');
-let Logger = require('common/logger');
+import Logger from '@jingli/logger';
 let logger = new Logger("attachment");
 import * as fs from 'fs';
 import * as path from 'path';

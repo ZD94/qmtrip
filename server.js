@@ -30,7 +30,7 @@ if(config.debug) {
 
 var path = require('path');
 
-var Logger = require('common/logger');
+import Logger from '@jingli/logger';
 Logger.init(config.logger);
 var logger = new Logger('main');
 
