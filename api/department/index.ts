@@ -246,14 +246,14 @@ class DepartmentModule{
         {if: condition.isDepartmentAdminOrOwner("0.parentId")},
         {if: condition.isDepartmentAgency("0.parentId")}
     ])
-    static getAllChildDepartmentsId(params: {parentId: string}): string[]{
+    static async getAllChildDepartmentsId(params: {parentId: string}): Promise<string[]>{
         var ids = [];
         var sql = "with RECURSIVE cte as " +
             "( select a.id,a.name,a.parent_id from department.departments a where id='"+params.parentId+"' " +
             "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id " +
             "where k.deleted_at is null) " +
             "select * from cte";
-        return DB.query(sql)
+        return <Promise<string[]>>DB.query(sql)
             .spread(function(children, row){
                 for(var i=0;i<children.length;i++)
                     ids.push(children[i].id);
