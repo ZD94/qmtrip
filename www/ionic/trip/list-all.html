@@ -1,11 +1,10 @@
 <ion-view title="出差统计-出差记录" id="page25">
-    <ion-content padding="false" class="has-header" scroll="false">
+    <ion-content padding="false" class="has-header statistics" scroll="false">
         <div class="flex-c01">
             <spanchange class="item item-input date_selected" ng-model="data.monthSelection">
 
             </spanchange>
             <ion-scroll style="padding: 10px;">
-                <div class="spacer" style="width: 300px; height: 10px;"></div>
 
                 <form class="list">
                     <label class="item item-input">
@@ -14,7 +13,7 @@
                     </label>
                 </form>
                 <trip-plan ng-repeat="trip in tripPlans track by $index"
-                           show-header="true" data="trip" show-detail-status="true" click="enterDetail" status="{{trip.status}}" style="margin: 0 0 20px;"></trip-plan>
+                           show-header="true" data="trip" show-detail-status="true" click="enterDetail" status="{{trip.status}}" style="margin: 0 0 10px;"></trip-plan>
                 <div id="page13-markdown3">
                     <div ng-if="!vm.isHasNextPage" class="getMoreOrNoMore">没有更多记录了</div>
                 </div>

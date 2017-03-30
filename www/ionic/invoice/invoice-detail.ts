@@ -41,7 +41,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams, $io
     }
     $scope.EInvoiceStatus = EInvoiceStatus;
     $scope.select_menu = true;
-    var config = require('config');
+    var config = require('@jingli/config');
     await config.$ready;
     var tripDetail = await Models.tripDetail.get($stateParams.detailId);
     var invoices = await tripDetail.getInvoices();

@@ -1,7 +1,7 @@
 
 
 import ng = require('angular');
-import L from 'common/language';
+import L from '@jingli/language';
 
 import { ModelsInterface, initModels } from '_types';
 import {ModelObjInterface, ModelInterface} from 'common/model/interface';
@@ -207,11 +207,11 @@ class ClientModels implements ModelsInterface {
     
     ddtalkCorp: ModelInterface<DDTalkCorp>;
     ddtalkUser: ModelInterface<DDTalkUser>;
+    ddtalkDepartment : ModelInterface<DDTalkDepartment>;
 
     coinAccount: ModelInterface<CoinAccount>;
     coinAccountChange: ModelInterface<CoinAccountChange>;
     agencyOperateLog: ModelInterface<AgencyOperateLog>;
-    ddtalkDepartment: ModelInterface<DDTalkDepartment>;
 
     constructor($cacheFactory: ng.ICacheFactoryService, $rootScope: ng.IRootScopeService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);

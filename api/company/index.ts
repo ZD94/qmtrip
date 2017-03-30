@@ -1,12 +1,12 @@
 /**
  * Created by yumiao on 15-12-9.
  */
-var sequelize = require("common/model").DB;
-var DBM = sequelize.models;
-import L from 'common/language';
-let C = require("config");
+
+import {DB} from "common/model";
+import L from '@jingli/language';
+let C = require("@jingli/config");
 let API = require("common/api");
-let Logger = require('common/logger');
+import Logger from '@jingli/logger';
 let logger = new Logger('company');
 let moment = require('moment');
 let promoCodeType = require('libs/promoCodeType');
@@ -125,7 +125,7 @@ class CompanyModule {
         let ca_staff = CoinAccount.create();
         await ca_staff.save();
         let account = await Models.account.get(staff.id);
-        account.coinAccount = ca;
+        account.coinAccount = ca_staff;
         await account.save();
 
         return {company: company, description: promoCode ? promoCode.description : ""};
@@ -358,7 +358,7 @@ class CompanyModule {
     @requireParams(['domain'])
     static async isBlackDomain(params: {domain: string}) {
         //var domain = params.domain.toLowerCase();
-        // let black = await DBM.BlackDomain.findAll({where: params});
+        // let black = await DB.models.BlackDomain.findAll({where: params});
         // if(black && black.length > 0) {
         //     return true;
         // }
@@ -373,14 +373,14 @@ class CompanyModule {
     static deleteCompanyByTest(params){
         var mobile = params.mobile;
         var email = params.email;
-        return DBM.Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
+        return DB.models.Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
             .then(function(companys){
                 return companys.map(function(c){
                     return true;
                 })
             })
             .then(function(){
-                return DBM.Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
+                return DB.models.Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
             })
             .then(function(){
                 return true;
@@ -694,6 +694,59 @@ class CompanyModule {
                     logger.error(`执行任务${taskId4}错误:${err.stack}`);
                 })
         });
+
+        let taskId5 = 'qm:task:perDayMail'
+        scheduler('0 10 8 * * *', taskId5, function() {
+            if (!C.perDayRegisterEmail) {
+                return false;
+            }
+
+            //每天八点10分发送每日企业注册邮件
+            ( async () => {
+                let pager;
+                let companies = [];
+                do {
+                    pager = await Models.company.find( {
+                        where: {
+                            createdAt: {
+                                "$lte": new Date(),
+                                "$gte": moment().add(-1, 'days').format('YYYY-MM-DD 08:00')
+                            }
+                        }
+                    });
+
+                    let ps = pager.map( async (company) => {
+                        let staff = await Models.staff.get(company.createUser);
+                        company['createUserObj'] = staff;
+                        return company;
+                    })
+
+                    let _companies = await Promise.all(ps);
+                    _companies.forEach( (company: Company) => {
+                        companies.push({
+                            name: company.name,
+                            createUser: {
+                                name: company['createUserObj']['name'],
+                                mobile: company['createUserObj']['mobile']
+                            },
+                            createdAt: company.createdAt
+                        })
+                    });
+                } while(pager && pager.hasNextPage())
+
+                await API.notify.submitNotify({
+                    key: "qm_notify_perday_mail",
+                    values: {
+                        companies: companies,
+                    },
+                    email: C.perDayRegisterEmail
+                });
+                logger.info(`成功执行任务${taskId5}`);
+            })()
+                .catch( (err) => {
+                    logger.error(`执行任务${taskId5}错误:${err.stack}`);
+                })
+        })
     }
 
 }

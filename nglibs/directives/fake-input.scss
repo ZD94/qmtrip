@@ -1,3 +1,4 @@
+@import "../../www/ionic/scss/color.variable.scss";
 @import "../../common/vendor/ionic/scss/variables";
 
 .item-input {
@@ -21,7 +22,11 @@ fake-input {
   span {
     display: block;
     &.placeholder-div {
-      color: $input-color-placeholder;
+      color: lighten($dark,56);
+    }
+    >span{
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 }

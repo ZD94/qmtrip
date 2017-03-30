@@ -2,11 +2,10 @@
  * Created by wyl on 15-12-12.
  */
 'use strict';
-var sequelize = require("common/model").DB;
-var DBM = sequelize.models;
+import {DB} from "common/model";
 var _ = require('lodash');
 import {Paginate} from 'common/paginate';
-import L from 'common/language';
+import L from '@jingli/language';
 import {requireParams, clientExport} from 'common/api/helper';
 import {conditionDecorator, condition} from "../_decorator";
 import {Staff, EStaffStatus} from "_types/staff";
@@ -100,7 +99,7 @@ class TravelPolicyModule{
     }
 
     static deleteTravelPolicyByTest(params){
-        return DBM.TravelPolicy.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
+        return DB.models.TravelPolicy.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
             .then(function(){
                 return true;
             })
@@ -257,7 +256,7 @@ class TravelPolicyModule{
         options.offset = offset;
         options.where = params;
 
-        return DBM.TravelPolicy.findAndCountAll(options)
+        return DB.models.TravelPolicy.findAndCountAll(options)
             .then(function(result){
                 return new Paginate(page, perPage, result.count, result.rows);
             });

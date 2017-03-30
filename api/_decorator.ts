@@ -7,7 +7,7 @@ import {EAccountType} from "_types";
  */
 const API = require("common/api");
 const _ = require("lodash");
-import L from 'common/language';
+import L from '@jingli/language';
 const Models = require("_types").Models;
 
 export function requirePermit(permits: string| string[], type?: number) {

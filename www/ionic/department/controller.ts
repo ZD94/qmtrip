@@ -120,13 +120,13 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
         {name:'激活状态',value:'status',icon:'fa-sort-amount-desc'},
         ]*/
     $scope.arrlist = [
-        {name:'最近加入',value:'',icon:'fa-sort-amount-desc'},
+        {name:'最近加入',value:'createdAt',icon:'fa-sort-amount-asc'},
         {name:'姓名(A-Z)',value:'nameAsc',icon:'fa-sort-amount-asc'},
         {name:'姓名(Z-A)',value:'nameDesc',icon:'fa-sort-amount-desc'},
         {name:'角色',value:'role',icon:'fa-sort-amount-desc'},
         {name:'差旅标准',value:'travelPolicy',icon:'fa-sort-amount-desc'}
     ]
-    $scope.selected = {name:'最近加入',value:'',icon:'fa-sort-amount-desc'};
+    $scope.selected = {name:'最近加入',value:'createdAt',icon:'fa-sort-amount-desc'};
     $scope.sortBy = async function(selected){
         let staffs = await rootDepartment.getStaffs({where:{},order: selected});
         await initStaffs(staffs);
@@ -169,8 +169,10 @@ export async function IndexController($scope, $stateParams, Models, $ionicPopup,
             template: require('./set-department.html'),
             controller: setDepartmentController
         })
-        if(result.destroy){
-            initDepartment();
+        if(result){
+            if(result.destroy){
+                initDepartment();
+            }
         }else{
             initDepartment(departmentId);
         }

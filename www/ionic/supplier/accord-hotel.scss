@@ -84,6 +84,8 @@
       font-size: 14px;
       padding: 0 45px;
       line-height: 36px;
+      border-bottom-left-radius: 3px;
+      border-bottom-right-radius: 3px;
       i{
         font-size: 16px;
       }
@@ -97,6 +99,8 @@
       padding: 0 16px;
       height: 44px;
       line-height: 44px;
+      border-bottom-left-radius: 3px;
+      border-bottom-right-radius: 3px;
       & > .pull-left{
         flex: 1;
         display: flex;
@@ -126,6 +130,8 @@
     padding:6px 0 5px 16px;
     height:47px;
     position: relative;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
     .logo{
       position: absolute;
       width:100px;

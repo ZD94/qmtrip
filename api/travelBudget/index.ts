@@ -8,7 +8,7 @@ import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel} from "_types/travelP
 import {Staff} from "_types/staff";
 const API = require("common/api");
 const validate = require("common/validate");
-import L from 'common/language';
+import L from '@jingli/language';
 const moment = require('moment');
 const cache = require("common/cache");
 const utils = require("common/utils");
@@ -18,7 +18,7 @@ import {ITicket, TRAFFIC, TravelBudgeTraffic, TravelBudgetHotel} from "_types/tr
 import {
     TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
 } from "./strategy/index";
-import {DEFAULT_PREFER_CONFIG_TYPE, loadDefaultPrefer} from "./prefer";
+import {DEFAULT_PREFER_CONFIG_TYPE, loadPrefers} from "./prefer";
 
 
 export interface BudgetOptions{
@@ -195,23 +195,6 @@ export default class ApiTravelBudget {
                             }
                         }
 
-                        if (isNeedTraffic && isRoundTrip && i == (paramsToBudget.length - 1)) {
-                            try {
-                                let _params = {
-                                    originPlace: destinationPlace,
-                                    destinationPlace: paramsToBudget[0].originPlace,
-                                    leaveDate: goBackDate,
-                                    earliestLeaveDateTime: earliestGoBackDateTime,
-                                    latestArrivalTime: latestGoBackDateTime,
-                                }
-                                let budget = await ApiTravelBudget.getTrafficBudget(_params);
-                                budget.tripType = ETripType.BACK_TRIP;
-                                budgets.push(budget);
-                            } catch (err) {
-                                reject(err);
-                            }
-                        }
-
                         if (isNeedHotel) {
                             try {
                                 let budget = await ApiTravelBudget.getHotelBudget({
@@ -229,8 +212,27 @@ export default class ApiTravelBudget {
                             }
                         }
 
+                        if (isNeedTraffic && isRoundTrip && i == (paramsToBudget.length - 1)) {
+                            try {
+                                let _params = {
+                                    originPlace: destinationPlace,
+                                    destinationPlace: paramsToBudget[0].originPlace,
+                                    leaveDate: goBackDate,
+                                    earliestLeaveDateTime: earliestGoBackDateTime,
+                                    latestArrivalTime: latestGoBackDateTime,
+                                }
+                                let budget = await ApiTravelBudget.getTrafficBudget(_params);
+                                budget.tripType = ETripType.BACK_TRIP;
+                                budgets.push(budget);
+                            } catch (err) {
+                                reject(err);
+                            }
+                        }
+
                         if (subsidy && subsidy.template) {
-                            let days = moment(goBackDate).diff(moment(leaveDate), 'days');
+                            let goBackDay = moment(goBackDate).format("YYYY-MM-DD");
+                            let leaveDay = moment(leaveDate).format("YYYY-MM-DD");
+                            let days = moment(goBackDay).diff(moment(leaveDay), 'days');
                             days = days + 1;
                             if (!subsidy.hasFirstDaySubsidy) {
                                 days = days -1;
@@ -282,7 +284,8 @@ export default class ApiTravelBudget {
      * @return {Promise} {prize: 1000, hotel: "酒店名称"}
      */
     @clientExport
-    static async getHotelBudget(params: {city: any, businessDistrict: string,
+    static async getHotelBudget(params: {
+        city: any, businessDistrict: string,
         checkInDate: Date, checkOutDate: Date, hotelName?: string}) :Promise<TravelBudgetHotel> {
         let {city, businessDistrict, checkInDate, checkOutDate, hotelName} = params;
         if (!Boolean(city)) {
@@ -313,7 +316,8 @@ export default class ApiTravelBudget {
         } catch(err) {
         }
         if (accordHotel) {
-            return {price: accordHotel.accordPrice * days, type: EInvoiceType.HOTEL,
+            return {
+                price: accordHotel.accordPrice * days, type: EInvoiceType.HOTEL,
                 hotelName: hotelName, cityName: city.name, checkInDate: checkInDate, checkOutDate: checkOutDate} as TravelBudgetHotel;
         }
 
@@ -360,12 +364,15 @@ export default class ApiTravelBudget {
             hotelName: hotelName
         }
         let budgetConfig = staff.company.budgetConfig;
-        let defaults = loadDefaultPrefer({local: query}, DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_HOTEL);
-        if (budgetConfig && budgetConfig.hotel) {
-            let compiled = _.template(JSON.stringify(budgetConfig.hotel));
-            defaults = mergePrefers(defaults, JSON.parse(compiled({local: query})));
+        if (!budgetConfig) {
+            budgetConfig = {};
         }
-        qs.prefers = defaults;
+        let key = DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_HOTEL;
+        if (city.isAbroad) {
+            key = DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_HOTEL
+        }
+        let prefers = loadPrefers(budgetConfig.hotel, {local: query}, key);
+        qs.prefers = prefers;
         qs.query = query;
         let hotels = await API.hotel.search_hotels(query);
 
@@ -504,22 +511,10 @@ export default class ApiTravelBudget {
         params['expectFlightCabins'] = cabins;
         let defaults: any[] = [];
         if (isAbroad) {   //国际
-            defaults = loadDefaultPrefer({local: params}, DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_TICKET);
-            let corpAbroadTrafficPrefer = {}
-            if (preferConfig && preferConfig.abroadTraffic) {
-                corpAbroadTrafficPrefer = preferConfig.abroadTraffic
-            }
-            let compiled = _.template(JSON.stringify(corpAbroadTrafficPrefer), { 'imports': { 'moment': moment } });
-            defaults = mergePrefers(defaults, JSON.parse(compiled({local: params})));
+            defaults = loadPrefers(preferConfig.abroadTraffic, {local: params}, DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_TICKET);
             qs.prefers = defaults;
         } else {            //国内
-            defaults = loadDefaultPrefer({local: params}, DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_TICKET);
-            let corpHomeTrafficPrefer = {};
-            if (preferConfig && preferConfig.traffic) {
-                corpHomeTrafficPrefer = preferConfig.traffic;
-            }
-            let compiled = _.template(JSON.stringify(corpHomeTrafficPrefer), { 'imports': { 'moment': moment } });
-            defaults = mergePrefers(defaults, JSON.parse(compiled({local: params})));
+            defaults = loadPrefers(preferConfig.traffic, {local: params}, DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_TICKET);
             qs.prefers = defaults;
         }
 
@@ -533,7 +528,6 @@ export default class ApiTravelBudget {
         let tickets: ITicket[] = _.concat(flightTickets, trainTickets) as ITicket[];
         let strategy = await TrafficBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
         let result =  await strategy.getResult(tickets);
-        console.log("result: ",result);
         result.cabinClass = result.cabin;
         result.originPlace = m_originCity;
         result.destination = m_destination;
@@ -617,27 +611,6 @@ export default class ApiTravelBudget {
                 .catch(next)
         })
     }
-}
-
-
-
-function mergePrefers(defaults, news) {
-    for(let i=0, ii =news.length; i<ii; i++) {
-        let v = news[i];
-        let isHas = false;  //是否包含
-        //查找defaults中是否包含
-        for(let j=0, jj=defaults.length; j<jj; j++) {
-            if (v.name == defaults[j].name) {
-                isHas = true;
-                defaults[j] = _.defaultsDeep(v, defaults[j]);
-                break;
-            }
-        }
-        if (!isHas) {
-            defaults.push(v);
-        }
-    }
-    return defaults;
 }
 
 function getTimezoneStr(seconds) {

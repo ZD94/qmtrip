@@ -414,4 +414,22 @@ input[type="text"], input[type="password"] {
   color: $dark;
 }
 
+//开关颜色调整
+.toggle input:checked + .track{
+  border-color: $calm;
+  background-color: $calm;
+}
+
+//输入框中的值距右侧10px
+.item-icon-right{
+  padding-right: 30px;
+}
+.item-input{
+  padding: 6px 10px 5px 10px;
+}
+
+
+.item-input{
+  padding: 6px 10px 5px 10px;
+}
 

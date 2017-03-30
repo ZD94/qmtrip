@@ -2,14 +2,14 @@
  * Created by yumiao on 15-12-10.
  */
 "use strict";
-let sequelize = require("common/model").DB;
+import {DB} from "common/model";
 let uuid = require("node-uuid");
-import L from 'common/language';
+import L from '@jingli/language';
 import utils = require("common/utils");
 let API = require('common/api');
-let Logger = require('common/logger');
+import Logger from '@jingli/logger';
 let logger = new Logger("tripPlan");
-let config = require("../../config");
+import config = require("@jingli/config");
 let moment = require("moment");
 let scheduler = require('common/scheduler');
 import _ = require('lodash');
@@ -338,6 +338,7 @@ class TripPlanModule {
         //更改状态
         tripPlan.isCommit = true;
         tripPlan = await tryUpdateTripPlanStatus(tripPlan, EPlanStatus.AUDITING)
+        await TripPlanModule.notifyDesignatedAcount();
 
         let default_agency = config.default_agency;
         if(default_agency && default_agency.manager_email) {
@@ -705,11 +706,11 @@ class TripPlanModule {
         let saved_sql = 'select sum(budget-expenditure) as \"savedMoney\" ' + complete_sql;
         let expenditure_sql = 'select sum(expenditure) as expenditure ' + complete_sql;
 
-        let staff_num_sql_ret = await sequelize.query(staff_num_sql);
-        let project_num_sql_ret = await sequelize.query(project_num_sql);
-        let budget_sql_ret = await sequelize.query(budget_sql);
-        let saved_sql_ret = await sequelize.query(saved_sql);
-        let expenditure_sql_ret = await sequelize.query(expenditure_sql);
+        let staff_num_sql_ret = await DB.query(staff_num_sql);
+        let project_num_sql_ret = await DB.query(project_num_sql);
+        let budget_sql_ret = await DB.query(budget_sql);
+        let saved_sql_ret = await DB.query(saved_sql);
+        let expenditure_sql_ret = await DB.query(expenditure_sql);
 
         return {
             month: month,
@@ -753,9 +754,9 @@ class TripPlanModule {
         let complete = `${selectSql} ${completeSql};`;
         let plan = `${selectSql} ${planSql};`;
 
-        let savedMoneyCompleteInfo = await sequelize.query(savedMoneyComplete);
-        let completeInfo = await sequelize.query(complete);
-        let planInfo = await sequelize.query(plan);
+        let savedMoneyCompleteInfo = await DB.query(savedMoneyComplete);
+        let completeInfo = await DB.query(complete);
+        let planInfo = await DB.query(plan);
 
         let ret = {
             planTripNum: 0,//计划出差人数(次)
@@ -874,9 +875,9 @@ class TripPlanModule {
             plan = `${selectSql} ${planSql} group by d.id;`;
         }
 
-        let completeInfo = await sequelize.query(complete);
-        let savedMoneyCompleteInfo = await sequelize.query(savedMoneyComplete);
-        let planInfo = await sequelize.query(plan);
+        let completeInfo = await DB.query(complete);
+        let savedMoneyCompleteInfo = await DB.query(savedMoneyComplete);
+        let planInfo = await DB.query(plan);
 
         let result = {};
         if(completeInfo && completeInfo.length > 0 && completeInfo[0].length > 0) {
@@ -932,7 +933,8 @@ class TripPlanModule {
         let approve = await Models.approve.get(params.tripApproveId);
         let account = await Models.staff.get(approve.submitter);
         let approveUser = await Models.staff.get(approve.approveUser);
-        let company = approveUser.company;
+        let currentUser = await Staff.getCurrent();
+        let company = approve.approveUser ? approveUser.company : currentUser.company;
         if (typeof approve.data == 'string') approve.data = JSON.parse(approve.data);
         let query: any  = approve.data.query;   //查询条件
         if(typeof query == 'string') query = JSON.parse(query);
@@ -1120,7 +1122,7 @@ class TripPlanModule {
             username: account.name,
             planNo: tripPlan.planNo,
             approveTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-            approveUser: approveUser.name,
+            approveUser: approveUser ? approveUser.name : "",
             projectName: tripPlan.title,
             goTrafficBudget: go,
             backTrafficBudget: back,
@@ -1183,7 +1185,7 @@ class TripPlanModule {
             sql += ` and start_at < '${params.endTime}'`;
         sql += ` group by account_id order by save desc limit ${limit};`;
 
-        let ranks = await sequelize.query(sql)
+        let ranks = await DB.query(sql)
             .then(function(result) {
                 return result[0];
             });
@@ -1205,7 +1207,7 @@ class TripPlanModule {
         let companyId = staff.company.id;
         let sql = `select sum(budget) - sum(expenditure) as save from trip_plan.trip_plans where deleted_at is null and status = ${EPlanStatus.COMPLETE} AND company_id = '${companyId}' AND account_id =  '${accountId}' `;
 
-        let ranks = await sequelize.query(sql)
+        let ranks = await DB.query(sql)
             .then(function(result) {
                 return result[0];
             });
@@ -1476,7 +1478,7 @@ class TripPlanModule {
     static async saveTripDetailInvoice(params) :Promise<TripDetailInvoice> {
         let tripDetailInvoice = Models.tripDetailInvoice.create(params);
         tripDetailInvoice = await tripDetailInvoice.save();
-         await TripPlanModule.notifyDesignatedAcount();
+
 
         let tripDetail = await Models.tripDetail.get(tripDetailInvoice.tripDetailId);
         if (!tripDetail.expenditure) {
@@ -1492,15 +1494,19 @@ class TripPlanModule {
         let companyName=staff.company.name;
         let staffName=staff.name;
 
-        return await API.notify.notifyDesignatedAccount({
-         mobile:"13810529805",
-         email:"notice@jingli365.com",
-         key:"qm_notify_designated_account",
-         values:{
-             company:companyName,
-             staffName:staff.name
-         }
-         });
+         try{
+             await API.notify.notifyDesignatedAccount({
+                 mobile:"13810529805",
+                 email:"notice@jingli365.com",
+                 key:"qm_notify_invoice_audit_request",
+                 values:{
+                     company:companyName,
+                     staffName:staff.name
+                 }
+             });
+         }catch(err){
+             logger.info(err);
+        }
     }
 
 
