@@ -868,8 +868,8 @@ class StaffModule{
     @clientExport
     @requireParams(["where.staffId"], ["where.companyId","where.orderId", "where.status", "attributes"])
     @conditionDecorator([
-        {if: condition.isSameCompany("where.staffId")},
-        {if: condition.isStaffsAgency("where.staffId")}
+        {if: condition.isSameCompany("0.where.staffId")},
+        {if: condition.isStaffsAgency("0.where.staffId")}
     ])
     static async getPointChanges(params) :Promise<FindResult>{
         let { accountId } = Zone.current.get("session");
