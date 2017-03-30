@@ -2,7 +2,7 @@
 import _ = require('lodash');
 import moment = require("moment");
 import { SupplierWebRobot, SupplierOrder, ReserveLink } from '../index';
-import L from 'common/language';
+import L from '@jingli/language';
 const CityName = require("./cityName.json");
 const CityCodes = require("./cityCode.json");
 
@@ -56,7 +56,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
             checkOutDate  = moment(options.backDate).format("YYYY-MM-DD"),
             cityCode      = CityCodes[options.city];
         if(cityCode){
-            cityCode = cityCode.code;
+            cityCode = cityCode.cId;
         }else{
             cityCode = 53;
         }
@@ -80,8 +80,18 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         let startStation = encodeURI(options.fromCity),
             endStation   = encodeURI(options.toCity),
             date         = moment(options.leaveDate).format("YYYY-MM-DD");
-        let trafficBookLink = `http://m.ly.com/uniontrain/webapp/train/list.html?startdatetime=${date}&startname=${startStation}&arrivename=${endStation}`;
+        let trafficBookLink = `http://m.ly.com/uniontrain/webapp/train/list.html?startname=${startStation}&arrivename=${endStation}`;
+        let jsCode = `
+            let isIn = sessionStorage.getItem("isIn");
+            if(isIn){
+            
+            }else{
+                sessionStorage.setItem("isIn" , true);
+                localStorage.setItem("TrainList_QueryDate" , '{"value":"${date}"}' );
+                location.href = location.href;                
+            };
+        `;
 
-        return {url:trafficBookLink, jsCode: ''};
+        return {url:trafficBookLink, jsCode: jsCode};
     }
 }
