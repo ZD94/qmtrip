@@ -200,8 +200,8 @@ class TravelPolicyModule{
     @requireParams(["where.companyId"],['attributes','where.name', 'where.planeLevels', 'where.planeDiscount',
         'where.trainLevels', 'where.hotelLevels', 'where.hotelPrice', 'where.companyId', 'where.isChangeLevel', 'where.createdAt'])
     @conditionDecorator([
-        {if: condition.isCompanyAdminOrOwner("where.companyId")},
-        {if: condition.isCompanyAgency("where.companyId")}
+        {if: condition.isCompanyAdminOrOwner("0.where.companyId")},
+        {if: condition.isCompanyAgency("0.where.companyId")}
     ])
     static async getTravelPolicies(params): Promise<FindResult>{
         var staff = await Staff.getCurrent();
