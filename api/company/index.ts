@@ -1,10 +1,10 @@
 /**
  * Created by yumiao on 15-12-9.
  */
-var sequelize = require("common/model").DB;
-var DBM = sequelize.models;
+
+import {DB} from "common/model";
 import L from '@jingli/language';
-import C = require("@jingli/config");
+let C = require("config");
 let API = require("common/api");
 import Logger from '@jingli/logger';
 let logger = new Logger('company');
@@ -358,7 +358,7 @@ class CompanyModule {
     @requireParams(['domain'])
     static async isBlackDomain(params: {domain: string}) {
         //var domain = params.domain.toLowerCase();
-        // let black = await DBM.BlackDomain.findAll({where: params});
+        // let black = await DB.models.BlackDomain.findAll({where: params});
         // if(black && black.length > 0) {
         //     return true;
         // }
@@ -373,14 +373,14 @@ class CompanyModule {
     static deleteCompanyByTest(params){
         var mobile = params.mobile;
         var email = params.email;
-        return DBM.Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
+        return DB.models.Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
             .then(function(companys){
                 return companys.map(function(c){
                     return true;
                 })
             })
             .then(function(){
-                return DBM.Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
+                return DB.models.Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
             })
             .then(function(){
                 return true;

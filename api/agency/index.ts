@@ -2,8 +2,7 @@
  * Created by yumiao on 15-12-9.
  */
 "use strict";
-let sequelize = require("common/model").DB;
-let DBM = sequelize.models;
+import {DB} from "common/model";
 let API = require("common/api");
 import L from '@jingli/language';
 import Logger from '@jingli/logger';
@@ -260,8 +259,8 @@ class AgencyModule {
         let name = params.name;
 
         await API.auth.removeByTest({email: email, mobile: mobile, type: 2});
-        await DBM.Agency.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}});
-        await DBM.AgencyUser.destroy({where: {name: name}});
+        await DB.models.Agency.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}});
+        await DB.models.AgencyUser.destroy({where: {name: name}});
 
         return true;
     }
