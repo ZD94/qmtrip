@@ -149,8 +149,8 @@ class AgencyModule {
      * @returns {Promise<AgencyUser>}
      */
     @clientExport
-    @requireParams(['email', 'name'], ['mobile', 'sex', 'avatar', 'roleId', 'pwd'])
-    static async createAgencyUser(params: {email: string, name: string, mobile?: string, sex?: number, avatar?: string, roleId?: number, pwd?: string}): Promise<AgencyUser> {
+    @requireParams(['mobile', 'name'], ['email', 'sex', 'avatar', 'roleId', 'pwd'])
+    static async createAgencyUser(params: {email?: string, name: string, mobile: string, sex?: number, avatar?: string, roleId?: number, pwd?: string}): Promise<AgencyUser> {
         let curUser = await AgencyUser.getCurrent();
 
         if(!curUser) {
