@@ -4,7 +4,7 @@
 
 import {DB} from "common/model";
 import L from '@jingli/language';
-let C = require("config");
+let C = require("@jingli/config");
 let API = require("common/api");
 import Logger from '@jingli/logger';
 let logger = new Logger('company');
