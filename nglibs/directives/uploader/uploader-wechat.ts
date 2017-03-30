@@ -5,7 +5,7 @@ import * as path from 'path';
 var API = require('common/api');
 
 export function wechatUploaderController($scope, $element, $loading, ngModalDlg, wxApi) {
-    var config = require('config');
+    var config = require('@jingli/config');
     $element.click(async function() {
         try{
             var localIds = await wxApi.chooseImage({

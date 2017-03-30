@@ -3,7 +3,7 @@ import IScope = angular.IScope;
 import { LoginResponse } from '_types/auth/auth-cert';
 import moment = require('moment');
 var msgbox = require('msgbox');
-var config = require('config');
+var config = require('@jingli/config');
 var browserspec = require('browserspec');
 declare var API;
 declare var dd;

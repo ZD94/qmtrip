@@ -1,4 +1,4 @@
-import L from 'common/language';
+import L from '@jingli/language';
 import * as utils from 'common/utils';
 import { Models, EAccountType } from '_types/index';
 import { AuthResponse, AuthRequest, signToken, LoginResponse } from '_types/auth/auth-cert';
