@@ -6,13 +6,13 @@ var nodeXlsx = require("node-xlsx");
 var moment = require("moment");
 var crypto = require("crypto");
 import {DB} from "common/model"
-var config = require('../../config');
+var config = require('@jingli/config');
 var fs = require('fs');
 var API = require("common/api");
 var validate = require("common/validate");
 
 import _ = require('lodash');
-import L from 'common/language';
+import L from '@jingli/language';
 import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {requireParams, clientExport} from 'common/api/helper';

@@ -6,11 +6,11 @@
 'use strict';
 import fs = require("fs");
 import cache from "common/cache";
-const C = require("config");
+import C = require("@jingli/config");
 
 const config = C.ddconfig;
 
-var Logger = require('common/logger');
+import Logger from '@jingli/logger';
 var logger = new Logger('main');
 import request = require('request');
 import ISVApi from "./isvApi";
@@ -19,7 +19,7 @@ import {reqProxy} from "./reqProxy";
 import {Company} from "_types/company";
 import {Staff, EStaffRole} from "_types/staff";
 import {Models} from "_types/index";
-import L from 'common/language';
+import L from '@jingli/language';
 
 import {md5} from "common/utils";
 import {DDTalkCorp , DDTalkDepartment , DDTalkUser} from "_types/ddtalk";

@@ -8,7 +8,7 @@ const API = require('common/api');
 let dingSuiteCallback = require("dingtalk_suite_callback");
 import fs = require("fs");
 import cache from "common/cache";
-const C = require("config");
+import C = require("@jingli/config");
 
 const config = C.ddconfig;
 import request = require('request');

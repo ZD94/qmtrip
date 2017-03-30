@@ -1,5 +1,5 @@
 
-import L from 'common/language';
+import L from '@jingli/language';
 import { getSession } from 'common/model';
 import { signToken, LoginResponse, genAuthString } from '_types/auth/auth-cert';
 import initJPush from './jpush';
