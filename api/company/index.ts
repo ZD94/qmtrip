@@ -369,21 +369,12 @@ class CompanyModule {
      * @param params
      * @returns {*}
      */
-    static deleteCompanyByTest(params){
+    static async deleteCompanyByTest(params){
         var mobile = params.mobile;
         var email = params.email;
         return DB.models.Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
-            .then(function(companys){
-                return companys.map(function(c){
-                    return true;
-                })
-            })
-            .then(function(){
                 return DB.models.Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
-            })
-            .then(function(){
-                return true;
-            })
+        return true;
     }
 
     /*************************************供应商begin***************************************/

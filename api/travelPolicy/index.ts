@@ -98,11 +98,9 @@ class TravelPolicyModule{
         return true;
     }
 
-    static deleteTravelPolicyByTest(params){
-        return DB.models.TravelPolicy.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
-            .then(function(){
-                return true;
-            })
+    static async deleteTravelPolicyByTest(params){
+        await DB.models.TravelPolicy.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}});
+        return true;
     }
 
     /**
