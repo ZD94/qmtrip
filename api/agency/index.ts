@@ -14,6 +14,7 @@ import { Models, EGender, EAccountType } from '_types/index';
 import {md5} from "common/utils";
 import {FindResult, PaginateInterface} from "common/model/interface";
 import {AgencyOperateLog} from "_types/agency/agency-operate-log";
+import validator = require('validator');
 let logger = new Logger("agency");
 
 class AgencyModule {
@@ -155,6 +156,13 @@ class AgencyModule {
 
         if(!curUser) {
             throw L.ERR.AGENCY_USER_NOT_EXIST();
+        }
+        let mobile = params.mobile;
+        if(!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+        if(params.email && !validator.isEmail(params.email)) {
+            throw L.ERR.EMAIL_FORMAT_INVALID();
         }
         params.pwd = params.pwd || '123456';
         params.roleId = params.roleId || EAgencyUserRole.COMMON;
