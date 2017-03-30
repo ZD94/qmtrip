@@ -2,7 +2,7 @@
  * Created by wyl on 15-12-12.
  */
 'use strict';
-import {DB} from "common/model";
+import {DB} from '@jingli/database';
 var _ = require('lodash');
 import {Paginate} from 'common/paginate';
 import L from '@jingli/language';

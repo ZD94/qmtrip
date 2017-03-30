@@ -2,7 +2,7 @@
  * Created by yumiao on 15-12-9.
  */
 "use strict";
-import {DB} from "common/model";
+import {DB} from '@jingli/database';
 let API = require("common/api");
 import L from '@jingli/language';
 import Logger from '@jingli/logger';

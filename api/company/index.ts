@@ -1,8 +1,7 @@
 /**
  * Created by yumiao on 15-12-9.
  */
-
-import {DB} from "common/model";
+import {DB} from '@jingli/database';
 import L from '@jingli/language';
 let C = require("@jingli/config");
 let API = require("common/api");

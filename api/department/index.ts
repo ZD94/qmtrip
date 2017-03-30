@@ -3,7 +3,7 @@
  */
 'use strict';
 var _ = require("lodash");
-import {DB} from "common/model";
+import {DB} from '@jingli/database';
 let API = require("common/api");
 import L from '@jingli/language';
 import {Department, StaffDepartment} from "_types/department";
@@ -253,12 +253,10 @@ class DepartmentModule{
             "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id " +
             "where k.deleted_at is null) " +
             "select * from cte";
-        return <Promise<string[]>>DB.query(sql)
-            .spread(function(children, row){
-                for(var i=0;i<children.length;i++)
-                    ids.push(children[i].id);
-                return ids;
-            })
+        let [children, row] = await DB.query(sql);
+        for(var i=0;i<children.length;i++)
+            ids.push(children[i].id);
+        return ids;
     }
 
     /**

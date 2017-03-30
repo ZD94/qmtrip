@@ -2,7 +2,7 @@
  * Created by yumiao on 15-12-10.
  */
 "use strict";
-import {DB} from "common/model";
+import {DB} from '@jingli/database';
 let uuid = require("node-uuid");
 import L from '@jingli/language';
 import utils = require("common/utils");

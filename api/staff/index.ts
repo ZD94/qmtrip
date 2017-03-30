@@ -5,7 +5,7 @@
 var nodeXlsx = require("node-xlsx");
 var moment = require("moment");
 var crypto = require("crypto");
-import {DB} from "common/model"
+import {DB} from '@jingli/database';
 var config = require('@jingli/config');
 var fs = require('fs');
 var API = require("common/api");
@@ -1412,15 +1412,13 @@ class StaffModule{
         }
         params.ownerId = accountId;
 
-        var id = params.id;
+        let id = params.id;
         delete params.id;
-        var options: any = {};
+        let options: any = {};
         options.where = {id: id};
         options.returning = true;
-        return <Promise<Credential>>DB.models.Credential.update(params, options)
-            .spread(function(rownum, rows){
-                return new Credential(rows[0]);
-            });
+        let [rownum, rows] = await DB.models.Credential.update(params, options);
+        return new Credential(rows[0]);
     }
     /**
      * 根据id查询证件信息
