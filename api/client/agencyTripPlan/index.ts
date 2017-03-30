@@ -3,8 +3,8 @@
  */
 
 let API = require("common/api");
-import L from 'common/language';
-let config = require("../../../config");
+import L from '@jingli/language';
+import config = require("@jingli/config");
 import moment = require("moment");
 import _ = require('lodash');
 

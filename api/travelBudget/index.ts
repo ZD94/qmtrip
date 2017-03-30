@@ -8,7 +8,7 @@ import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel} from "_types/travelP
 import {Staff} from "_types/staff";
 const API = require("common/api");
 const validate = require("common/validate");
-import L from 'common/language';
+import L from '@jingli/language';
 const moment = require('moment');
 const cache = require("common/cache");
 const utils = require("common/utils");
