@@ -584,7 +584,7 @@ class TripPlanModule {
 
 
     @clientExport
-    @requireParams(['name', 'createUser', 'company_id'], ['code'])
+    @requireParams(['name', 'createUser', 'companyId'], ['code'])
     static createProject(params): Promise<Project> {
         return Project.create(params).save();
     }
