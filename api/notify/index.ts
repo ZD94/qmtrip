@@ -26,6 +26,7 @@ export interface NotifyToAddress{
 export interface ISubmitNotifyParam{
     accountId?: string;
     email?: string;
+    mobile?: string;
     key: string;
     values: any;
 }
@@ -244,13 +245,13 @@ export async function __init() {
 
 //通知模块
 export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean> {
-    let {accountId, key, values, email} = params;
+    let {accountId, key, values, email, mobile} = params;
     let values_clone =  _.cloneDeep(values);
     let openId = await API.auth.getOpenIdByAccount({accountId: accountId});
     let account: any = {};
     let departmentNames;
     if(!accountId){
-        account = {email: email};
+        account = {email, mobile};
     }else{
         account = await Models.staff.get(accountId);
         if(!account){
@@ -270,16 +271,4 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
     values_clone.account = account;
     await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: accountId }, values_clone);
     return true;
-}
-//added by jack, to send notice to designated phone number or email account
-export async function notifyDesignatedAccount(params:{email?:string,mobile?:string,key:string,values:any}){
-      let email=params.email;
-      let mobile=params.mobile;
-      let values=params.values;
-      let key=params.key;
-
-      let values_clone =  _.cloneDeep(values);
-      let tpl=templates[key];
-      await tpl.send({mobile:mobile,email: email},values_clone);
-      return true;
 }
