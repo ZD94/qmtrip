@@ -388,8 +388,17 @@ export var condition = {
             let acc_type = account.type;
             
             if(acc_type == EAccountType.STAFF) {
-                let staff = await Models.staff.get(account.id);
-                return staff.roleId == EStaffRole.ADMIN || staff.roleId == EStaffRole.OWNER || tripPlan.accountId == account.id || tripPlan.auditUser == account.id;
+                let staffs = await Models.staff.all({ where: {accountId: account.id}});
+                let isHasPermit;
+                for(let staff of staffs) {
+                    isHasPermit =
+                        staff.roleId == EStaffRole.ADMIN
+                        || staff.roleId == EStaffRole.OWNER
+                        || tripPlan.accountId == account.id
+                        || tripPlan.auditUser == account.id;
+                    if (isHasPermit) break;
+                }
+                return !!isHasPermit;
             }else if(acc_type == EAccountType.AGENCY) {
                 let user = await AgencyUser.getCurrent();
                 let company = await tripPlan.getCompany();
@@ -401,6 +410,17 @@ export var condition = {
             }else {
                 throw L.ERR.PERMISSION_DENY();
             }
+        }
+    },
+    isSameAccount: function(idpath: string) {
+        return async function (fn, self, args) {
+            let session = Zone.current.get('session');
+            if(!session || !session.accountId) {
+                throw L.ERR.PERMISSION_DENY();
+            }
+            let accountId = session['accountId'];
+            let id = _.get(args, idpath);
+            return id == accountId;
         }
     }
 }

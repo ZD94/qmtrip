@@ -31,7 +31,7 @@ async function costCredit(req, res, next) {
     if(!staff.coinAccount){
         let ca = CoinAccount.create();
         await ca.save();
-        let account = await Models.account.get(staff.id);
+        let account = await Models.account.get(staff.accountId);
         account.coinAccount = ca;
         await account.save();
         // staff.coinAccount = ca;
@@ -176,7 +176,7 @@ async function addCredit(req, res, next) {
     if(!staff.coinAccount){
         let ca = CoinAccount.create();
         await ca.save();
-        let account = await Models.account.get(staff.id);
+        let account = await Models.account.get(staff.accountId);
         account.coinAccount = ca;
         await account.save();
         // staff.coinAccount = ca;

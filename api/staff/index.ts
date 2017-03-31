@@ -75,7 +75,7 @@ class StaffModule{
         }
         staff = await staff.save();
 
-        let account = await Models.account.get(staff.id);
+        let account = await Models.account.get(staff.accountId);
 
         if(!account.coinAccount){
             //为员工设置资金账户
@@ -139,7 +139,7 @@ class StaffModule{
 
         await result.saveStaffDepartments(params.departmentIds);
 
-        let account = await Models.account.get(staff.id);
+        let account = await Models.account.get(staff.accountId);
 
         if(!account.coinAccount){
             //为员工设置资金账户
@@ -440,7 +440,6 @@ class StaffModule{
         return getObj;
     }
 
-
     /**
      * 根据属性查找员工对象
      * @param params
@@ -456,7 +455,6 @@ class StaffModule{
     ])
     static async getStaffs(params: {where: any, order?: any, attributes?: any}) :Promise<FindResult>{
         let staff = await Staff.getCurrent();
-
         // params.where.staffStatus = {$ne: EStaffStatus.FORBIDDEN}
         params.where.staffStatus = EStaffStatus.ON_JOB;
         let { accountId } = Zone.current.get("session");
@@ -467,7 +465,7 @@ class StaffModule{
 
         if(staff){
             params.where.companyId = staff["companyId"];
-        }else{
+        } else {
             let result = await API.company.checkAgencyCompany({companyId: params.where.companyId,userId: accountId});
             if(!result){
                 throw L.ERR.PERMISSION_DENY();
@@ -1619,6 +1617,18 @@ class StaffModule{
     }
 
     /*************************************员工供应商网站信息end***************************************/
+
+    @clientExport
+    static async getCompanyStaff(params: {companyId: string}) {
+        let {companyId } = params;
+        let session = Zone.current.get("session");
+        let accountId = session["accountId"];
+        let pager = await Models.staff.find({where: {companyId: companyId, accountId: accountId}});
+        if (pager && pager.length) {
+            return pager[0];
+        }
+        return null;
+    }
 
 }
 
