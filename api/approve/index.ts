@@ -37,8 +37,8 @@ class ApproveModule {
 
     @clientExport
     @requireParams(["budgetId"], ["approveUser", "project"])
-    static async submitApprove(params: {budgetId: string, project?: string, approveUser?: Staff}) :Promise<Approve>{
-        let {budgetId, project, approveUser} = params;
+    static async submitApprove(params: {budgetId: string, approveUser?: Staff}) :Promise<Approve>{
+        let {budgetId, approveUser} = params;
         let submitter = await Staff.getCurrent();
         let company = submitter.company;
 
@@ -62,7 +62,7 @@ class ApproveModule {
         }
         if(budgetInfo.budgets && budgetInfo.budgets.length>0){
             budgetInfo.budgets.forEach(function(item){
-                if(item.tripType != 3){
+                if(item.tripType != ETripType.SUBSIDY){
                     number = number + 1;
                 }
             })
@@ -82,7 +82,7 @@ class ApproveModule {
         let approve = await ApproveModule._submitApprove({
             submitter: submitter.id,
             data: budgetInfo,
-            title: project,
+            title: query.projectName,
             channel: submitter.company.oa,
             type: EApproveType.TRAVEL_BUDGET,
             approveUser: approveUser,
@@ -110,8 +110,8 @@ class ApproveModule {
 
     @clientExport
     @requireParams(['query', 'budget'], ['project', 'specialApproveRemark', 'approveUser'])
-    static async submitSpecialApprove(params: {query: any, budget: number, project?: string, specialApproveRemark?: string, approveUser?: Staff}):Promise<Approve> {
-        let {query, budget, project, specialApproveRemark, approveUser} = params;
+    static async submitSpecialApprove(params: {query: any, budget: number, specialApproveRemark?: string, approveUser?: Staff}):Promise<Approve> {
+        let {query, budget, specialApproveRemark, approveUser} = params;
         let submitter = await Staff.getCurrent();
 
         let company = submitter.company;
@@ -166,7 +166,7 @@ class ApproveModule {
         return ApproveModule._submitApprove({
             submitter: submitter.id,
             data: budgetInfo,
-            title: project,
+            title: query.projectName,
             channel: submitter.company.oa,
             type: EApproveType.TRAVEL_BUDGET,
             isSpecialApprove: true,

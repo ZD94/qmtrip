@@ -47,9 +47,12 @@ export class QmPlugin extends AbstractOAPlugin {
             return v;
         });*/
 
-        let projectIds = [];//事由名称
         let arrivalCityCodes = [];//目的地代码
         let project: Project;
+        if(query.projectName){
+            project = await API.tripPlan.getProjectByName({companyId: company.id, name: query.projectName,
+                userId: staff.id, isCreate: true});
+        }
 
         if(query.originPlace) {
             let placeCode = query.originPlace;
@@ -65,19 +68,8 @@ export class QmPlugin extends AbstractOAPlugin {
         if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
             for(let i = 0; i < destinationPlacesInfo.length; i++){
                 let segment: ISegment = destinationPlacesInfo[i];
-                //处理出差事由放入projectIds 原project存放第一程出差事由
-                if(segment.reason){
-                    let projectItem = await API.tripPlan.getProjectByName({companyId: company.id, name: segment.reason,
-                        userId: staff.id, isCreate: true});
-                    if(i == 0){
-                        project = projectItem;
-                    }
-                    if(projectIds.indexOf(projectItem.id) == -1){
-                        projectIds.push(projectItem.id);
-                    }
-                }
 
-                //处理目的地 放入arrivalCityCodes 原目的地信息存放第一程目的地信息
+                //处理目的地 放入arrivalCityCodes
                 if(segment.destinationPlace){
                     let placeCode = segment.destinationPlace;
                     if (typeof placeCode != 'string') {
@@ -121,7 +113,6 @@ export class QmPlugin extends AbstractOAPlugin {
         tripApprove.title = approve.title;
 
         tripApprove.query = JSON.stringify(query);
-        tripApprove.projectIds = JSON.stringify(projectIds);
         tripApprove.arrivalCityCodes = JSON.stringify(arrivalCityCodes);
 
         tripApprove.budgetInfo = budgets;
