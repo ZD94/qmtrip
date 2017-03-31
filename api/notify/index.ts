@@ -24,7 +24,7 @@ export interface NotifyToAddress{
 }
 
 export interface ISubmitNotifyParam{
-    accountId?: string;
+    userId?: string;
     email?: string;
     mobile?: string;
     key: string;
@@ -245,30 +245,32 @@ export async function __init() {
 
 //通知模块
 export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean> {
-    let {accountId, key, values, email, mobile} = params;
+    let {userId, key, values, email, mobile} = params;
     let values_clone =  _.cloneDeep(values);
-    let openId = await API.auth.getOpenIdByAccount({accountId: accountId});
     let account: any = {};
-    let departmentNames;
-    if(!accountId){
+    let openId;
+    if(!userId){
         account = {email, mobile};
     }else{
-        account = await Models.staff.get(accountId);
+        account = await Models.staff.get(userId);
         if(!account){
-            account = await Models.agency.get(accountId);
-        }else{
+            account = await Models.agency.get(userId);
+        } else {
+            let departmentNames;
             departmentNames = await account.getDepartmentsStr();
             account["departmentNames"] = departmentNames;
+            openId = await API.auth.getOpenIdByAccount({accountId: account.accountId});
         }
     }
 
     if (openId) {
         values_clone.templateId = config.notify.templates[key];
     }
+
     let tpl = templates[key];
     if(!tpl)
         return false;
     values_clone.account = account;
-    await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: accountId }, values_clone);
+    await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: userId }, values_clone);
     return true;
 }

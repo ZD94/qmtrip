@@ -240,7 +240,7 @@ export default class ApiAuth {
         await API.notify.submitNotify({
             key: 'qm_new_staff_active',
             values: values,
-            accountId: account.id
+            mobile: account.mobile,
         });
         return true;
     }
@@ -709,7 +709,7 @@ export default class ApiAuth {
         return API.notify.submitNotify({
             key: key,
             values: vals,
-            accountId: acc.id
+            email: acc.email,
         });
     }
 
@@ -757,7 +757,7 @@ export default class ApiAuth {
         return API.notify.submitNotify({
             key: key,
             values: vals,
-            accountId: acc.id
+            email: acc.email
         });
     }
 
@@ -1134,7 +1134,7 @@ async function _sendActiveEmail(accountId) {
         API.notify.submitNotify({
             key: 'qm_active',
             values: vals,
-            accountId: account.id,
+            email: account.email
         })
     ]);
 
