@@ -527,7 +527,7 @@ class CompanyModule {
     static async getSelfCompanies(params): Promise<Company[]> {
         let session = Zone.current.get("session");
         let accountId = session["accountId"]
-        let staffs = await Models.staff.all({accountId: accountId});
+        let staffs = await Models.staff.all({where: {accountId: accountId}});
         let companies = staffs.map( (staff) => {
             return staff.company;
         })

@@ -245,8 +245,12 @@ class StaffModule{
         let id = params.id;
 
         await API.auth.checkEmailAndMobile({email: email});
-        var account = await API.auth.getPrivateInfo({id: id});
+        var staff = await Models.staff.get(id);
+        if (!staff) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
 
+        var account = await API.auth.getPrivateInfo({id: staff.accountId});
         if (!account) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
         }
@@ -256,7 +260,6 @@ class StaffModule{
             throw L.ERR.PWD_ERROR();
         }
 
-        var staff = await Models.staff.get(id);
         staff.isValidateEmail = false;
         staff.email = email;
         staff = await staff.save();
@@ -274,8 +277,11 @@ class StaffModule{
         let pwd = params.pwd;
         let newPwd = params.newPwd;
         let id = params.id;
-
-        var account = await API.auth.getPrivateInfo({id: id});;
+        var staff = await Models.staff.get(id);
+        if (!staff) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+        var account = await API.auth.getPrivateInfo({id: staff.accountId});;
 
         if (!account) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
@@ -287,7 +293,6 @@ class StaffModule{
         }
 
         newPwd = utils.md5(newPwd);
-        var staff = await Models.staff.get(id);
         staff.pwd = newPwd;
         staff = await staff.save();
         return staff;
@@ -305,7 +310,7 @@ class StaffModule{
         let pwd = params.pwd;
         let msgCode = params.msgCode;
         let msgTicket = params.msgTicket;
-        let selfAcc = await API.auth.getPrivateInfo({id: staff.id});
+        let selfAcc = await API.auth.getPrivateInfo({id: staff.accountId});
         if(staff.roleId != EStaffRole.OWNER){
             throw L.ERR.FORBIDDEN();
         }
