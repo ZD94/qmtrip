@@ -10,7 +10,7 @@ Promise.config({longStackTraces: true});
 
 import {Models} from '_types';
 import * as Sequelize from 'sequelize';
-var scrubber = require('common/api/scrubber');
+import scrubber from '@jingli/patch-dnode-scrub';
 var path = require('path');
 
 var config = {
@@ -59,9 +59,9 @@ export default async function main(){
     //console.log(agency.__proto__);
     console.log(Sequelize.Instance['prototype'] === token.target.__proto__.__proto__);
 
-    var json = scrubber.scrub.call(tmp, token);
-
-    console.log(JSON.stringify(json));
+    // var json = scrubber.scrub.call(tmp, token);
+    //
+    // console.log(JSON.stringify(json));
 
     //console.log(Sequelize.Instance.prototype === agency.__proto__);
 
