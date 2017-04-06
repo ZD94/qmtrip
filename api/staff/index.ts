@@ -137,8 +137,6 @@ class StaffModule{
             noticeTemplate:"qm_notify_admins_add_staff"
         });
 
-        await result.saveStaffDepartments(params.departmentIds);
-
         let account = await Models.account.get(staff.id);
 
         if(!account.coinAccount){
@@ -516,13 +514,13 @@ class StaffModule{
         }
         for(let k=0;k<departments.length;k++){
             let dep = departments[k];
-            departmentMaps[dep.name] = dep.id;
+            departmentMaps[dep.name] = dep;
         }
         let data = xlsObj[1].data;
 
         let items = await Promise.all(data.map(async function(item, index){
             let s = data[index];
-            let departmentIds = [];
+            let departments = [];
             let departmentPass = true;
             let staffObj: any = {name: s[0], mobile: s[1]+"", email: s[2]||'',sex: s[3]?((s[3] == '女') ? EGender.FEMALE : EGender.MALE) : null,
                 roleId: s[4] == '管理员' ? EStaffRole.ADMIN : EStaffRole.COMMON, travelPolicyId: travelPolicyMaps[s[5]]||'', companyId: companyId,
@@ -617,14 +615,14 @@ class StaffModule{
 
                                     if(j == (dd.length - 1)){
                                         let lost_d = next_d[0];
-                                        departmentIds.push(next_d[0].id);
+                                        departments.push(next_d[0]);
                                     }
 
                                 }
                             }
                         }else{
                             if(departmentMaps[_d]){
-                                departmentIds.push(departmentMaps[_d]);
+                                departments.push(departmentMaps[_d]);
                             }else{
                                 staffObj.reason = _d + "部门不存在";
                                 s[7] = _d + "部门不存在";
@@ -640,9 +638,9 @@ class StaffModule{
                         return;
                     }
                 }else{
-                    departmentIds.push(defaultDept.id);
+                    departments.push(defaultDept);
                 }
-                staffObj.departmentIds = departmentIds;
+                staffObj.departments = departments;
                 let staff1 = await API.auth.checkAccExist({where: {email: staffObj.email, type: 1}});
                 let staff2 = await API.auth.checkAccExist({where: {mobile: staffObj.mobile, type: 1}});
                 if(staff1 && staffObj.email && staffObj.email != ""){
@@ -701,7 +699,7 @@ class StaffModule{
 
 
         await Promise.all(addObj.map(async function(item, index){
-            let deptIds = item.departmentIds;
+            let depts = item.departments;
             let staffObj: any = {name: item.name, mobile: item.mobile+"", email: item.email, sex: item.sex, roleId: item.roleId,
                 travelPolicyId: item.travelPolicyId, companyId: item.companyId, addWay: EAddWay.BATCH_IMPORT, isNeedChangePwd: true, };
             if(_.trim(staffObj.mobile) == ""){
@@ -711,7 +709,7 @@ class StaffModule{
                 staffObj.email = null;
             }
             let staffAdded = await StaffModule.createStaff(staffObj);
-            await staffAdded.saveStaffDepartments(deptIds);
+            await staffAdded.addDepartment(depts);
 
         }));
         
@@ -868,8 +866,8 @@ class StaffModule{
     @clientExport
     @requireParams(["where.staffId"], ["where.companyId","where.orderId", "where.status", "attributes"])
     @conditionDecorator([
-        {if: condition.isSameCompany("where.staffId")},
-        {if: condition.isStaffsAgency("where.staffId")}
+        {if: condition.isSameCompany("0.where.staffId")},
+        {if: condition.isStaffsAgency("0.where.staffId")}
     ])
     static async getPointChanges(params) :Promise<FindResult>{
         let { accountId } = Zone.current.get("session");
