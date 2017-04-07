@@ -78,7 +78,6 @@
     "fsevents": "^1.0.5"
   },
   "devDependencies": {
-    "angular": "1.5.8",
     "angular-animate": "1.5.8",
     "angular-async-filter": "^1.0.1",
     "angular-bluebird-promises": "^1.0.2",
