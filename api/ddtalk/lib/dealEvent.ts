@@ -30,10 +30,22 @@ const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 const DEFAULT_PWD = '000000';
 
 let moment = require("moment");
+let requestProxy = require('express-request-proxy');
+let reg = new RegExp( config.name_reg );
 
 
+/* transpond */
+export async function transpond(req , res , next){
+    return requestProxy({
+        url: config.test_url ,
+        reqAsBuffer: true,
+        cache: false,
+        timeout: 180000,
+    })(req, res, next);
+}
 
-export async function tmpAuthCode(msg) {
+
+export async function tmpAuthCode(msg , req , res , next) {
     const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
     let isExist = await cache.read(TMP_CODE_KEY);
     if (isExist) {
@@ -51,6 +63,16 @@ export async function tmpAuthCode(msg) {
     let permanentCode = permanentAuthMsg['permanent_code'];
 
     let corp_name = permanentAuthMsg.auth_corp_info.corp_name;
+
+    /* ====== using for test ===== */
+    if(reg.test(corp_name) && config.reg_go){
+        //it's our test company.
+        transpond( req , res , next );
+        return;
+    }
+
+    /* ============ End =========== */
+
 
     //test
     // let corp_name = "鲸力测试3.16";
@@ -411,6 +433,15 @@ export async function synchroDDorganization() : Promise<boolean> {
 //     await corpApi.updateContractChangeLister(config.token, config.encodingAESKey, url , eventTypes);
 //     console.log("good");
 
+    /*await cache.write("keyforme" , "abcdfefegeg" , 20);
+
+
+    for(let i=1;i<=30;i++){
+        setTimeout(async function(){
+            let g = await cache.read("keyforme");
+            console.log(i , g);
+        } , 1000*i)
+    }*/
 
 // }, 8000);
 

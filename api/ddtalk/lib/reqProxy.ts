@@ -4,7 +4,10 @@
 
 'use strict';
 import request = require("request");
-// var Agent = require('socks5-https-client/lib/Agent');
+import C = require("config");
+var Agent = require('socks5-https-client/lib/Agent');
+
+let ddConfig = C.ddconfig;
 
 export function reqProxy(url, options) {
     return new Promise( (resolve, reject) => {
@@ -14,7 +17,7 @@ export function reqProxy(url, options) {
         let name = options.name || '未知';
         body = JSON.stringify(body)
 
-        request({
+        let OPTION = {
             uri: url,
             headers: {
                 'Content-Type': 'application/json',
@@ -27,7 +30,16 @@ export function reqProxy(url, options) {
             //     socksHost: 'localhost', // Defaults to 'localhost'.
             //     socksPort: 8888 // Defaults to 1080.
             // }
-        }, (err, resp, data: any) => {
+        };
+        if(ddConfig.dd_agent){
+            OPTION["agentClass"] = Agent;
+            OPTION["agentOptions"]={
+                socksHost : ddConfig.dd_agent,
+                socksPort : ddConfig.dd_agent_port
+            }
+        }
+
+        request( OPTION , (err, resp, data: any) => {
             if (typeof data == 'string') {
                 data = JSON.parse(data);
             }
