@@ -64,9 +64,9 @@ class CompanyModule {
      * @returns {Promise<Company>}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'pwd', 'userName'], ['email', 'status', 'remark', 'description', 'isValidateMobile', 'promoCode'])
+    @requireParams(['mobile', 'name', 'pwd', 'userName'], ['email', 'status', 'remark', 'description', 'isValidateMobile', 'promoCode', 'referrerMobile'])
     static async registerCompany(params: {mobile: string, name: string, email?: string,
-        userName: string, pwd?: string, status?: number, remark?: string, description?: string, isValidateMobile?: boolean, promoCode?: string}): Promise<any>{
+        userName: string, pwd?: string, status?: number, remark?: string, description?: string, isValidateMobile?: boolean, promoCode?: string, referrerMobile?: string}): Promise<any>{
         let session = Zone.current.get('session');
         let pwd = params.pwd;
         let agencyId = Agency.__defaultAgencyId;
@@ -108,6 +108,13 @@ class CompanyModule {
         company['agencyId'] = agencyId;
         //新注册企业默认套餐行程数为60
         company.tripPlanNumLimit = 60;
+
+        if(params.referrerMobile){
+            let ac = await Models.account.find({where: {mobile: params.referrerMobile}});
+            if(ac && ac.length > 0){
+                company.setReferrer(ac[0]);
+            }
+        }
 
         await Promise.all([staff.save(), company.save(), department.save(), staffDepartment.save()]);
         let promoCode: PromoCode;

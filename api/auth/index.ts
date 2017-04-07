@@ -572,9 +572,9 @@ export default class ApiAuth {
      * @returns {Promise<TResult>|Promise<U>}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'userName', 'pwd', 'msgCode', 'msgTicket'], ['email', 'agencyId', 'remark', 'description', 'promoCode'])
+    @requireParams(['mobile', 'name', 'userName', 'pwd', 'msgCode', 'msgTicket'], ['email', 'agencyId', 'remark', 'description', 'promoCode', 'referrerMobile'])
     static async registerCompany(params: {name: string, userName: string, email?: string, mobile: string, pwd: string,
-        msgCode: string, msgTicket: string, agencyId?: string, promoCode?: string}) {
+        msgCode: string, msgTicket: string, agencyId?: string, promoCode?: string, referrerMobile?: string}) {
         var companyName = params.name;
         var name = params.userName;
         var email = params.email;
@@ -582,6 +582,7 @@ export default class ApiAuth {
         var msgCode = params.msgCode;
         var msgTicket = params.msgTicket;
         var pwd = params.pwd;
+        var referrerMobile = params.referrerMobile;
 
         if(!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
             throw L.ERR.MOBILE_NOT_CORRECT();
@@ -630,7 +631,8 @@ export default class ApiAuth {
             pwd: pwd,
             status: ACCOUNT_STATUS.ACTIVE,
             isValidateMobile: true,
-            promoCode: params.promoCode
+            promoCode: params.promoCode,
+            referrerMobile: referrerMobile,
         });
         return result;
     }
