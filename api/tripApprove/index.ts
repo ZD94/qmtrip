@@ -16,10 +16,10 @@ import {Staff, EStaffStatus, EStaffRole} from "_types/staff/staff";
 import {EVENT, plugins, emitter} from "libs/oa/index";
 import {TripDetail} from "_types/tripPlan/tripDetail";
 import TripPlanModule = require("../tripPlan/index");
-let systemNoticeEmails = require('config/config').system_notice_emails;
-const L = require('common/language');
+let systemNoticeEmails = require('@jingli/config').system_notice_emails;
+const L = require('@jingli/language');
 var API = require('common/api');
-var config = require("config");
+var config = require("@jingli/config");
 import _ = require("lodash");
 import {ENoticeType} from "_types/notice/notice";
 

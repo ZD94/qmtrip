@@ -19,7 +19,7 @@ global.Promise = require('bluebird');
 Promise.promisifyAll(require("redis"));
 Promise.promisifyAll(require("fs"));
 
-var config = require("./config");
+var config = require("@jingli/config");
 
 require("common/redis-client").init(config.redis.url);
 
@@ -30,7 +30,7 @@ if(config.debug) {
 
 var path = require('path');
 
-var Logger = require('common/logger');
+var Logger = require('@jingli/logger');
 Logger.init(config.logger);
 var logger = new Logger('main');
 

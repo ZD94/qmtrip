@@ -4,8 +4,8 @@
 "use strict";
 import {DB} from "common/model";
 let API = require("common/api");
-import L from 'common/language';
-import Logger = require('common/logger');
+import L from '@jingli/language';
+import Logger from '@jingli/logger';
 import {requireParams, clientExport} from 'common/api/helper';
 import {Agency, AgencyUser, EAgencyStatus, EAgencyUserRole} from "_types/agency";
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "../_decorator";
@@ -268,7 +268,7 @@ class AgencyModule {
 
     static async __initOnce() {
         logger.info("init default agency...");
-        let default_agency = require('config/config').default_agency;
+        let default_agency = require('@jingli/config').default_agency;
         let email = default_agency.email;
         let mobile = default_agency.mobile;
         let pwd = default_agency.pwd;

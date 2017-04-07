@@ -4,7 +4,7 @@
 
 'use strict';
 import request = require("request");
-import C = require("config");
+import C = require("@jingli/config");
 var Agent = require('socks5-https-client/lib/Agent');
 
 let ddConfig = C.ddconfig;
