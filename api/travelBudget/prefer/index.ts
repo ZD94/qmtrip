@@ -4,7 +4,7 @@
 
 'use strict';
 import _ = require("lodash");
-import Logger = require('common/logger');
+import Logger = require('@jingli/logger');
 import moment = require("moment");
 let logger = new Logger('travel-budget');
 export interface IPrefer<T> {

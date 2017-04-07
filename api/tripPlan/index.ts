@@ -4,12 +4,12 @@
 "use strict";
 import {DB} from "common/model";
 let uuid = require("node-uuid");
-import L from 'common/language';
+import L from '@jingli/language';
 import utils = require("common/utils");
 let API = require('common/api');
-let Logger = require('common/logger');
+import Logger from '@jingli/logger';
 let logger = new Logger("tripPlan");
-let config = require("../../config");
+let config = require("@jingli/config");
 let moment = require("moment");
 let scheduler = require('common/scheduler');
 import _ = require('lodash');

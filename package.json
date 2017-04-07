@@ -15,6 +15,8 @@
   },
   "license": "ISC",
   "dependencies": {
+    "@jingli/config": "^1.0.6",
+    "@jingli/language": "^1.0.0",
     "@types/lodash": "^4.14.53",
     "app-module-path": "^1.1.0",
     "bindings": "^1.2.1",
@@ -58,6 +60,7 @@
     "serve-favicon": "^2.3.0",
     "shimmer": "^1.1.0",
     "shoe": "0.0.15",
+    "socks5-https-client": "^1.2.0",
     "through2": "^2.0.1",
     "traverse": "^0.6.6",
     "tslib": "^1.2.0",

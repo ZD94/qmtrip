@@ -5,7 +5,7 @@
 var _ = require("lodash");
 import {DB} from "common/model";
 let API = require("common/api");
-import L from 'common/language';
+import L from '@jingli/language';
 import {Department, StaffDepartment} from "_types/department";
 import {requireParams, clientExport} from 'common/api/helper';
 import { Models } from '_types/index';
