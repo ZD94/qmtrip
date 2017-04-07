@@ -101,7 +101,6 @@ class StaffModule{
         }catch(e){
             console.info(e);
         }
-        staff.isValidateMobile = true;
         staff = await staff.save();
         return staff;
     }
