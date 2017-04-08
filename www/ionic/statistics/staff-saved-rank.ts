@@ -1,5 +1,5 @@
 import moment = require('moment');
-
+declare var API;
 export default async function StaffSavedRankController($scope) {
     require('./staff-saved-rank.scss');
     API.require('tripPlan');

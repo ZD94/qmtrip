@@ -5,7 +5,7 @@
 
 var API = require("common/api");
 
-import {Place, AirCompany, Airport} from 'api/_types/place';
+import {Place, AirCompany, Airport} from '_types/place';
 import {FindResult} from "common/model/interface";
 
 class ApiPlace {

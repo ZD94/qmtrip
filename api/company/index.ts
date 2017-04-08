@@ -1,12 +1,11 @@
 /**
  * Created by yumiao on 15-12-9.
  */
-var sequelize = require("common/model").DB;
-var DBM = sequelize.models;
-import L from 'common/language';
-let C = require("config");
+import {DB} from "common/model";
+import L from '@jingli/language';
+let C = require("@jingli/config");
 let API = require("common/api");
-let Logger = require('common/logger');
+import Logger from '@jingli/logger';
 let logger = new Logger('company');
 let moment = require('moment');
 let promoCodeType = require('libs/promoCodeType');
@@ -14,16 +13,16 @@ let scheduler = require('common/scheduler');
 let schedule = require("node-schedule");
 let _ = require("lodash");
 import {requireParams, clientExport} from "common/api/helper";
-import {Models} from "api/_types";
-import {Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE} from 'api/_types/company';
-import {Staff, EStaffRole} from "api/_types/staff";
-import {PromoCode} from "api/_types/promoCode";
-import {Agency, AgencyUser, EAgencyUserRole} from "api/_types/agency";
-import {Department, StaffDepartment} from "api/_types/department";
+import {Models} from "_types";
+import {Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE} from '_types/company';
+import {Staff, EStaffRole} from "_types/staff";
+import {PromoCode} from "_types/promoCode";
+import {Agency, AgencyUser, EAgencyUserRole} from "_types/agency";
+import {Department, StaffDepartment} from "_types/department";
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import {md5} from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
-import {CoinAccount} from "api/_types/coin";
+import {CoinAccount} from "_types/coin";
 
 const supplierCols = Supplier['$fieldnames'];
 
@@ -125,7 +124,7 @@ class CompanyModule {
         let ca_staff = CoinAccount.create();
         await ca_staff.save();
         let account = await Models.account.get(staff.id);
-        account.coinAccount = ca;
+        account.coinAccount = ca_staff;
         await account.save();
 
         return {company: company, description: promoCode ? promoCode.description : ""};
@@ -358,7 +357,7 @@ class CompanyModule {
     @requireParams(['domain'])
     static async isBlackDomain(params: {domain: string}) {
         //var domain = params.domain.toLowerCase();
-        // let black = await DBM.BlackDomain.findAll({where: params});
+        // let black = await DB.models.BlackDomain.findAll({where: params});
         // if(black && black.length > 0) {
         //     return true;
         // }
@@ -373,14 +372,14 @@ class CompanyModule {
     static deleteCompanyByTest(params){
         var mobile = params.mobile;
         var email = params.email;
-        return DBM.Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
+        return DB.models.Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
             .then(function(companys){
                 return companys.map(function(c){
                     return true;
                 })
             })
             .then(function(){
-                return DBM.Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
+                return DB.models.Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
             })
             .then(function(){
                 return true;

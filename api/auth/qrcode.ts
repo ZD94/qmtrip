@@ -1,9 +1,9 @@
 import * as utils from 'common/utils';
-import L from 'common/language';
+import L from '@jingli/language';
 import { makeAuthenticateToken } from './authentication';
-import { Models } from '../_types/index';
-import { LoginResponse } from '../_types/auth/auth-cert';
-var C = require("config");
+import { Models } from '_types/index';
+import { LoginResponse } from '_types/auth/auth-cert';
+var C = require("@jingli/config");
 
 //拼接字符串
 function combineData(obj) {

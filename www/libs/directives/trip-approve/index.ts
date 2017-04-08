@@ -5,8 +5,8 @@
 
 import angular = require("angular");
 import moment = require('moment');
-import {QMEApproveStatus, EApproveStatus2Text, EInvoiceType, ETripType} from "api/_types/tripPlan";
-import {MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
+import {QMEApproveStatus, EApproveStatus2Text, EInvoiceType, ETripType} from "_types/tripPlan";
+import {MPlaneLevel, MTrainLevel} from "_types/travelPolicy";
 angular
     .module('nglibs')
     .directive('tripApprove', function(){

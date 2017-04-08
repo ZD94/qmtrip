@@ -2,9 +2,9 @@
  * Created by wyl on 16-1-21.
  */
 var uuid = require("node-uuid");
-var now = require("../../../common/utils").now;
+var now = require("common/utils").now;
 
-module.exports = function (Db, DataType) {
+export= function (Db, DataType) {
 
     return Db.define("Feedback", {
         id           : {type: DataType.UUID,        defaultValue: uuid.v1, primaryKey: true},

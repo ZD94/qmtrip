@@ -1,5 +1,5 @@
-import {Staff} from "api/_types/staff/staff";
-import {ESupplierType} from "api/_types/company/supplier";
+import {Staff} from "_types/staff/staff";
+import {ESupplierType} from "_types/company/supplier";
 import { selectSuppliers } from '../staff/bind-suppliers'
 var msgbox = require('msgbox');
 

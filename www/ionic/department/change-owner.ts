@@ -4,9 +4,9 @@
 "use strict";
 import moment = require('moment');
 import validator = require('validator');
-import {Staff} from "api/_types/staff/staff";
+import {Staff} from "_types/staff/staff";
 var msgbox = require('msgbox');
-
+declare var API;
 export async function ChangeOwnerController($scope, Models, $stateParams, $ionicPopup, $storage) {
     require('./change-owner.scss');
     let staffId = $stateParams.staffId;

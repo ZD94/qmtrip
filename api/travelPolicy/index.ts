@@ -2,16 +2,15 @@
  * Created by wyl on 15-12-12.
  */
 'use strict';
-var sequelize = require("common/model").DB;
-var DBM = sequelize.models;
+import {DB} from "common/model";
 var _ = require('lodash');
 import {Paginate} from 'common/paginate';
-import L from 'common/language';
+import L from '@jingli/language';
 import {requireParams, clientExport} from 'common/api/helper';
 import {conditionDecorator, condition} from "../_decorator";
-import {Staff, EStaffStatus} from "api/_types/staff";
-import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
-import { Models } from 'api/_types';
+import {Staff, EStaffStatus} from "_types/staff";
+import { TravelPolicy, SubsidyTemplate } from '_types/travelPolicy';
+import { Models } from '_types';
 import { FindResult, PaginateInterface } from "common/model/interface";
 
 const travalPolicyCols = TravelPolicy['$fieldnames'];
@@ -42,7 +41,7 @@ class TravelPolicyModule{
         params.abroadPlaneLevels = tryConvertToArray(params.abroadPlaneLevels);
         let travelp = TravelPolicy.create(params);
         if(travelp.isDefault){
-            let defaults = await Models.travelPolicy.find({where: {id: {$ne: travelp.id}, is_default: true}});
+            let defaults = await Models.travelPolicy.find({where: {id: {$ne: travelp.id}, is_default: true, companyId: params.companyId}});
             if(defaults && defaults.length>0){
                 await Promise.all(defaults.map(async function(item){
                     item.isDefault = false;
@@ -100,7 +99,7 @@ class TravelPolicyModule{
     }
 
     static deleteTravelPolicyByTest(params){
-        return DBM.TravelPolicy.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
+        return DB.models.TravelPolicy.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
             .then(function(){
                 return true;
             })
@@ -121,6 +120,22 @@ class TravelPolicyModule{
     static async updateTravelPolicy(params) : Promise<TravelPolicy>{
         var id = params.id;
         var tp = await Models.travelPolicy.get(id);
+        if(params.name){
+            let result = await Models.travelPolicy.find({where: {name: params.name, companyId: tp.company.id}});
+            if(result && result.length>0){
+                throw L.ERR.TRAVEL_POLICY_NAME_REPEAT();
+            }
+        }
+
+        if(params.isDefault){
+            let defaults = await Models.travelPolicy.find({where: {id: {$ne: tp.id}, is_default: true, companyId: tp.company.id}});
+            if(defaults && defaults.length>0){
+                await Promise.all(defaults.map(async function(item){
+                    item.isDefault = false;
+                    await item.save();
+                }))
+            }
+        }
         params.planeLevels = tryConvertToArray(params.planeLevels);
         params.trainLevels = tryConvertToArray(params.trainLevels);
         params.hotelLevels = tryConvertToArray(params.hotelLevels);
@@ -257,7 +272,7 @@ class TravelPolicyModule{
         options.offset = offset;
         options.where = params;
 
-        return DBM.TravelPolicy.findAndCountAll(options)
+        return DB.models.TravelPolicy.findAndCountAll(options)
             .then(function(result){
                 return new Paginate(page, perPage, result.count, result.rows);
             });

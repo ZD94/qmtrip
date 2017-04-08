@@ -3,9 +3,9 @@
  */
 
 'use strict';
-import {IFinalTicket} from "api/_types/travelbudget";
+import {IFinalTicket} from "_types/travelbudget";
 import {AbstractPrefer} from "./index";
-import {TRAFFIC} from "api/_types/travelbudget";
+import {TRAFFIC} from "_types/travelbudget";
 /* * * * * * * * *
  * 仓位信息打分
  * * * * * * * * */

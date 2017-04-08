@@ -4,17 +4,17 @@
 
 'use strict';
 import {clientExport, requireParams} from "../../common/api/helper";
-import {Approve} from "../_types/approve/index";
-import {Staff} from "../_types/staff/staff";
-import {Models} from "../_types/index";
+import {Approve} from "_types/approve/index";
+import {Staff} from "_types/staff/staff";
+import {Models} from "_types/index";
 import {emitter, EVENT} from "libs/oa";
-import {EApproveStatus, EApproveChannel, EApproveType} from "../_types/approve/types";
-import {TripPlan, ETripType} from "../_types/tripPlan/tripPlan";
+import {EApproveStatus, EApproveChannel, EApproveType} from "_types/approve/types";
+import {ETripType} from "_types/tripPlan/tripPlan";
 import TripPlanModule = require("../tripPlan/index");
 import _ = require('lodash');
-let Config = require('config');
+let Config = require('@jingli/config');
 var API = require("common/api");
-import {ISegment, ICreateBudgetAndApproveParams} from 'api/_types/tripPlan';
+import {ISegment, ICreateBudgetAndApproveParams} from '_types/tripPlan';
 
 function oaStr2Enum(str: string) :EApproveChannel{
     let obj = {

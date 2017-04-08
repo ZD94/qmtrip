@@ -1,5 +1,5 @@
 
-import { SubsidyTemplate } from 'api/_types/travelPolicy';
+import { SubsidyTemplate } from '_types/travelPolicy';
 var msgbox = require('msgbox');
 const _ = require("lodash");
 

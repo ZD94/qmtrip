@@ -3,11 +3,11 @@
  */
 
 'use strict';
-import {ITicket, IFinalTicket, TravelBudgeItem, IHotel, IFinalHotel, TravelBudgeTraffic, TravelBudgetHotel} from "api/_types/travelbudget";
+import {ITicket, IFinalTicket, TravelBudgeItem, IHotel, IFinalHotel, TravelBudgeTraffic, TravelBudgetHotel} from "_types/travelbudget";
 import {ticketPrefers, hotelPrefers} from '../prefer'
-import {EInvoiceType} from "api/_types/tripPlan";
+import {EInvoiceType} from "_types/tripPlan";
 import {IPrefer} from '../prefer'
-import {Models} from "api/_types/index";
+import {Models} from "_types/index";
 
 function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
     let _tickets : IFinalTicket[] = [];

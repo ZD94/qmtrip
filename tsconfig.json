@@ -8,7 +8,7 @@
     "importHelpers": true,
     "sourceMap": true,
     "declaration": true,
-    "declarationDir": "tmp/@types",
+    "declarationDir": "JLTypes",
     "experimentalDecorators": true,
     "noImplicitUseStrict": false,
     "allowSyntheticDefaultImports": true,
@@ -27,12 +27,14 @@
   "exclude": [
     "node_modules",
     "public",
+    "www",
+    "nglibs",
+    "common/client",
     "dist",
     "ionic",
     "tmp",
-    "_types",
-    "JLTypes",
-    "*.bak"
+    "*.bak",
+    "JLTypes"
   ],
   "excludeNotUsing": [
   ]

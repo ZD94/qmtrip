@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {IFinalTicket, TRAFFIC} from "api/_types/travelbudget";
+import {IFinalTicket, TRAFFIC} from "_types/travelbudget";
 import {AbstractPrefer} from "./index";
 //只允许乘坐供应商
 

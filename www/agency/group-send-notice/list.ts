@@ -1,6 +1,6 @@
-import { NoticeAccount } from 'api/_types/notice/noticeAccount';
-import { Staff } from 'api/_types/staff/staff';
-import {ENoticeType, ESendType} from "../../../api/_types/notice/notice";
+import { NoticeAccount } from '_types/notice/noticeAccount';
+import { Staff } from '_types/staff/staff';
+import {ENoticeType, ESendType} from "../../../_types/notice/notice";
 
 export async function ListController($scope, Models, $stateParams) {
     $scope.getList = async function (senfType){

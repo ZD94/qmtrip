@@ -4,7 +4,7 @@
 "use strict";
 var API = require("common/api");
 import assert = require("assert");
-import {Models} from 'api/_types';
+import {Models} from '_types';
 import {getSession} from 'common/model';
 
 describe("api/agency", function() {

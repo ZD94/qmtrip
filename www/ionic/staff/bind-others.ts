@@ -1,5 +1,5 @@
-import {StaffSupplierInfo} from "api/_types/staff/staff-supplier-info";
-import { Staff } from 'api/_types/staff/staff';
+import {StaffSupplierInfo} from "_types/staff/staff-supplier-info";
+import { Staff } from '_types/staff/staff';
 var msgbox = require('msgbox');
 
 export async function BindOthersController($scope, $stateParams, Models, $ionicHistory, $ionicPopup){

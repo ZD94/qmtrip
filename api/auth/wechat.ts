@@ -1,11 +1,11 @@
-import { LoginResponse } from 'api/_types/auth/auth-cert';
+import { LoginResponse } from '_types/auth/auth-cert';
 import cache from "common/cache";
 import ApiAuth from './index';
 import { makeAuthenticateToken } from './authentication';
-import { Staff } from 'api/_types/staff/staff';
-import { Models } from 'api/_types/index';
+import { Staff } from '_types/staff/staff';
+import { Models } from '_types/index';
 import { requireParams } from '../../common/api/helper';
-var C = require("config");
+var C = require("@jingli/config");
 var API = require("common/api");
 
 export function __initHttpApp(app: any) {

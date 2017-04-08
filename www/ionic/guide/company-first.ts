@@ -1,5 +1,5 @@
-import { Staff } from 'api/_types/staff/staff';
-import {TravelPolicy, MPlaneLevel, MTrainLevel, EPlaneLevel, ETrainLevel, EHotelLevel} from 'api/_types/travelPolicy';
+import { Staff } from '_types/staff/staff';
+import {TravelPolicy, MPlaneLevel, MTrainLevel, EPlaneLevel, ETrainLevel, EHotelLevel} from '_types/travelPolicy';
 var msgbox = require('msgbox');
 
 export async function CompanyFirstController ($scope, Models, $stateParams){

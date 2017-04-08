@@ -1,6 +1,6 @@
 import moment = require('moment');
-import { Staff } from 'api/_types/staff/staff';
-import {EApproveChannel} from "api/_types/approve/types";
+import { Staff } from '_types/staff/staff';
+import {EApproveChannel} from "_types/approve/types";
 
 var msgbox = require('msgbox');
 

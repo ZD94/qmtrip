@@ -4,9 +4,9 @@
 'use strict';
 import {requireParams, clientExport} from 'common/api/helper';
 import {conditionDecorator, condition} from "../_decorator";
-import {Staff} from "api/_types/staff";
-import { AccordHotel } from 'api/_types/accordHotel';
-import { Models } from 'api/_types';
+import {Staff} from "_types/staff";
+import { AccordHotel } from '_types/accordHotel';
+import { Models } from '_types';
 import {FindResult} from "common/model/interface";
 
 const accordHotelCols = AccordHotel['$fieldnames'];

@@ -1,4 +1,5 @@
 import _ = require('lodash');
+declare var API;
 export async function FirstSetPwdController ($scope, $stateParams) {
     let accountId = $stateParams.accountId;
     let sign = $stateParams.sign;

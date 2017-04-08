@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = {
+export = {
     addExpiryDate: require('./addExpiryDate'),
     addCoin: require('./addCoin')
 }

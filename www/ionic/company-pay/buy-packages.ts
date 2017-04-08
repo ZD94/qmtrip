@@ -1,8 +1,8 @@
 /**
  * Created by chen on 2017/2/23.
  */
-import { Staff } from 'api/_types/staff/staff';
-import {ECompanyType} from "api/_types/company/company";
+import { Staff } from '_types/staff/staff';
+import {ECompanyType} from "_types/company/company";
 export async function BuyPackagesController($scope){
     require("./buy-packages.scss");
     var staff = await Staff.getCurrent();
