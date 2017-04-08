@@ -41,7 +41,7 @@ class TravelPolicyModule{
         params.abroadPlaneLevels = tryConvertToArray(params.abroadPlaneLevels);
         let travelp = TravelPolicy.create(params);
         if(travelp.isDefault){
-            let defaults = await Models.travelPolicy.find({where: {id: {$ne: travelp.id}, is_default: true}});
+            let defaults = await Models.travelPolicy.find({where: {id: {$ne: travelp.id}, is_default: true, companyId: params.companyId}});
             if(defaults && defaults.length>0){
                 await Promise.all(defaults.map(async function(item){
                     item.isDefault = false;
@@ -120,6 +120,22 @@ class TravelPolicyModule{
     static async updateTravelPolicy(params) : Promise<TravelPolicy>{
         var id = params.id;
         var tp = await Models.travelPolicy.get(id);
+        if(params.name){
+            let result = await Models.travelPolicy.find({where: {name: params.name, companyId: tp.company.id}});
+            if(result && result.length>0){
+                throw L.ERR.TRAVEL_POLICY_NAME_REPEAT();
+            }
+        }
+
+        if(params.isDefault){
+            let defaults = await Models.travelPolicy.find({where: {id: {$ne: tp.id}, is_default: true, companyId: tp.company.id}});
+            if(defaults && defaults.length>0){
+                await Promise.all(defaults.map(async function(item){
+                    item.isDefault = false;
+                    await item.save();
+                }))
+            }
+        }
         params.planeLevels = tryConvertToArray(params.planeLevels);
         params.trainLevels = tryConvertToArray(params.trainLevels);
         params.hotelLevels = tryConvertToArray(params.hotelLevels);
