@@ -16,6 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "@jingli/config": "^1.0.6",
+    "@jingli/fs-promisify": "^1.0.0",
     "@jingli/language": "^1.0.0",
     "@jingli/logger": "^1.0.0",
     "@jingli/perf": "^1.0.0",
@@ -78,7 +79,6 @@
     "fsevents": "^1.0.5"
   },
   "devDependencies": {
-    "angular-animate": "1.5.8",
     "angular-async-filter": "^1.0.1",
     "angular-bluebird-promises": "^1.0.2",
     "angular-chart.js": "^1.0.2",
