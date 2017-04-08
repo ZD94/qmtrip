@@ -4,11 +4,11 @@
 "use strict";
 
 import angular = require("angular");
-import {Staff} from "api/_types/staff/staff";
+import {Staff} from "_types/staff/staff";
 import {
     MTrainLevel, MPlaneLevel, MHotelLevel, enumPlaneLevelToStr, enumTrainLevelToStr,
     enumHotelLevelToStr
-} from "api/_types/travelPolicy";
+} from "_types/travelPolicy";
 
 
 angular

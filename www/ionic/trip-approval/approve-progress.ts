@@ -1,4 +1,4 @@
-import { QMEApproveStatus, EApproveResult2Text } from 'api/_types/tripPlan';
+import { QMEApproveStatus, EApproveResult2Text } from '_types/tripPlan';
 export async function ApproveProgressController ($scope, Models, $stateParams){
     require('./approve-progress.scss');
     let approveId = $stateParams.approveId;

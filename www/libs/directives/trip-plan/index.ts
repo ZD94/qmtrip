@@ -7,9 +7,9 @@
 import angular = require("angular");
 import {
     EPlanStatus, EInvoiceType, ETripType
-} from 'api/_types/tripPlan';
+} from '_types/tripPlan';
 import moment = require("moment");
-import {MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
+import {MHotelLevel, MPlaneLevel, MTrainLevel} from "_types/travelPolicy";
 require("./trip-plan.scss");
 
 let statusTxt = {};

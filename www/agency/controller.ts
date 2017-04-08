@@ -1,5 +1,5 @@
 "use strict";
-import { AgencyUser } from 'api/_types/agency/agency-user';
+import { AgencyUser } from '_types/agency/agency-user';
 var API = require('common/api');
 var msgbox = require('msgbox');
 

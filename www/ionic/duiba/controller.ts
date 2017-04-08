@@ -1,4 +1,4 @@
-import { Staff } from 'api/_types/staff/staff';
+import { Staff } from '_types/staff/staff';
 
 export async function IndexController($scope, $stateParams, inAppBrowser) {
     var staff = await Staff.getCurrent();

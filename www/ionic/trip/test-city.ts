@@ -2,7 +2,7 @@
  * Created by seven on 2016/12/27.
  */
 "use strict";
-
+declare var API;
 export async function TestCityController($scope, $storage){
     API.require('tripPlan');
     $scope.fromPlace='';

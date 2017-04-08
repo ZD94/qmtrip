@@ -1,5 +1,5 @@
 import moment = require("moment");
-
+declare var API;
 export default async function IndexController($scope) {
     require('./statistics.scss');
     API.require("tripPlan");

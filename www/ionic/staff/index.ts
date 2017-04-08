@@ -1,8 +1,9 @@
-import { Staff, EStaffRole, EAddWay } from 'api/_types/staff/staff';
-import { ACCOUNT_STATUS } from 'api/_types/auth';
-import { EPlanStatus, QMEApproveStatus ,EAuditStatus } from 'api/_types/tripPlan';
+import { Staff, EStaffRole, EAddWay } from '_types/staff/staff';
+import { ACCOUNT_STATUS } from '_types/auth';
+import { EPlanStatus, QMEApproveStatus ,EAuditStatus } from '_types/tripPlan';
 import {getImageUrl} from '../controller';
 var config = require('config');
+declare var API;
 export default async function IndexController($scope, Models, inAppBrowser) {
     require('./index.scss');
     API.require('tripPlan');

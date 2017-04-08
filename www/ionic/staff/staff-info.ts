@@ -1,4 +1,4 @@
-import { Staff } from 'api/_types/staff/staff';
+import { Staff } from '_types/staff/staff';
 export async function StaffInfoController($scope, Models, ngModalDlg ,$ionicPopup, wxApi) {
     $scope.uploadUrl = '/upload/ajax-upload-file?type=avatar';
     require('./staff-info.scss');

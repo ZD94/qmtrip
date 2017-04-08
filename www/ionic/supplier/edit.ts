@@ -2,8 +2,8 @@
  * Created by seven on 2017/3/16.
  */
 "use strict";
-import { Staff } from 'api/_types/staff/staff';
-import { ESupplierType } from 'api/_types/company/supplier';
+import { Staff } from '_types/staff/staff';
+import { ESupplierType } from '_types/company/supplier';
 
 export async function EditController($scope, Models, $ionicHistory){
     require('./accord-hotel.scss');

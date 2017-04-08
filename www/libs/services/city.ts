@@ -3,8 +3,8 @@
  */
 
 'use strict';
-import {Place} from "api/_types/place";
-
+import {Place} from "_types/place";
+declare var API;
 angular
 .module('nglibs')
 .service('City', function() {

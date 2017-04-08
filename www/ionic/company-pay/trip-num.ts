@@ -1,8 +1,8 @@
 /**
  * Created by chen on 2017/2/24.
  */
-import { Staff } from 'api/_types/staff/staff';
-import {NUM_CHANGE_TYPE} from "api/_types/company/trip-plan-num-change";
+import { Staff } from '_types/staff/staff';
+import {NUM_CHANGE_TYPE} from "_types/company/trip-plan-num-change";
 
 export async function TripNumController($scope){
     require("./trip-num.scss");

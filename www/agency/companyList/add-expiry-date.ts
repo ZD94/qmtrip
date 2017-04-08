@@ -5,8 +5,8 @@
 let msgbox=require("msgbox");
 import moment=require("moment");
 import async = Q.async;
-import {ECompanyType} from "api/_types/company/company";
-import {AgencyUser} from "api/_types/agency/agency-user";
+import {ECompanyType} from "_types/company/company";
+import {AgencyUser} from "_types/agency/agency-user";
 
 export async function AddExpiryDateController($scope,$stateParams,Models){
     $scope.qs = {

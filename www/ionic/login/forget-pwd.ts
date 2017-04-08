@@ -1,7 +1,7 @@
 import moment = require('moment');
 import validator = require('validator');
 var msgbox = require('msgbox');
-
+declare var API;
 export async function ForgetPwdController($scope,Models) {
     require("./forget-pwd.scss");
     API.require("auth");

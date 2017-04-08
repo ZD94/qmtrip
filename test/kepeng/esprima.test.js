@@ -11,7 +11,7 @@ var ast = esprima.parse(content, {
     //range: true,
     //tokens: true,
     //comment: true,
-    source: 'tmp/tsreq/api/_types/staff.js',
+    source: 'tmp/tsreq/_types/staff.js',
 });
 //ast = escodegen.attachComments(ast, ast.comments, ast.tokens);
 

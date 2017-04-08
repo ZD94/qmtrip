@@ -1,14 +1,14 @@
 import { getSession } from '../common/model/index';
-import { Staff, EStaffRole } from './_types/staff';
-import { AgencyUser } from './_types/agency';
-import {EAccountType} from "./_types";
+import { Staff, EStaffRole } from '_types/staff';
+import { AgencyUser } from '_types/agency';
+import {EAccountType} from "_types";
 /**
  * Created by wlh on 16/5/16.
  */
 const API = require("common/api");
 const _ = require("lodash");
-import L from 'common/language';
-const Models = require("api/_types").Models;
+import L from '@jingli/language';
+const Models = require("_types").Models;
 
 export function requirePermit(permits: string| string[], type?: number) {
     return function (target, key, desc) {
@@ -32,60 +32,6 @@ export interface CheckInterface {
     if: (fn: Function, self: any, args: any) => Promise<boolean>,
     then?: (target: Function, string: any, desc: any) => Promise<any>    //then函数直接是decorator函数
 }
-
-//
-// function _getTestAccountId() {
-//     return 1;
-// }
-//
-// function _testDecorator(idpath: string) {
-//     return function(fn: Function, self: any, args: any) {
-//         let id = _.get(args, idpath);
-//         return Promise.resolve(id == _getTestAccountId());
-//     }
-// }
-//
-// class Test2 {
-//     @conditionDecorator([
-//         {"if": _testDecorator("0.id"), "then": filterResultColumn(["id", "username"])} as CheckInterface,
-//     ])
-//     static myTest(params) {
-//         let result = {
-//             id: "1",
-//             username: "王大拿",
-//             password: "time9818",
-//             sex: '男'
-//         };
-//         return Promise.resolve(result);
-//     }
-//
-//     @conditionDecorator([
-//         {"if": _testDecorator("0.id")}
-//     ])
-//     static myTest2(params) {
-//         let result = {
-//             username: "username",
-//             password: "password"
-//         }
-//         return Promise.resolve(result);
-//     }
-// }
-//
-// Test2.myTest({"id": "1"})
-//     .then(function(result) {
-//         console.info("函数最终返回值是:", result);
-//     })
-//     .catch(function(err) {
-//         console.info(err);
-//     })
-//
-// Test2.myTest2({"id": "1"})
-//     .then(function(result) {
-//         console.info("MyTest2最终返回值是:", result);
-//     })
-//     .catch(function(err) {
-//         console.info(err);
-//     })
 
 //筛选返回结果
 export function filterResultColumn(columns: string[]) {

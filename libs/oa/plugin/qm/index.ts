@@ -10,13 +10,13 @@ import {
 
 import TripPlanModule = require("api/tripPlan/index");
 import TripApproveModule = require("api/tripApprove/index");
-import {Models} from "api/_types/index";
-import {ETripType, TripApprove, QMEApproveStatus, EApproveResult, Project} from "api/_types/tripPlan/tripPlan";
+import {Models} from "_types/index";
+import {ETripType, TripApprove, QMEApproveStatus, EApproveResult, Project} from "_types/tripPlan/tripPlan";
 import _ = require('lodash');
-const L = require("common/language");
+const L = require("@jingli/language");
 import moment = require("moment");
 var API = require("common/api");
-import {ISegment, ICreateBudgetAndApproveParams} from "api/_types/tripPlan"
+import {ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan"
 //鲸力商旅OA对接实现
 export class QmPlugin extends AbstractOAPlugin {
     constructor() {

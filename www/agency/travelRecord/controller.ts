@@ -2,10 +2,10 @@
  * Created by seven on 16/7/4.
  */
 "use strict";
-import { signToken, genAuthString } from 'api/_types/auth/auth-cert';
-import {ETripType} from "../../../api/_types/tripPlan/tripPlan";
-import {TripDetailTraffic, TripDetailHotel} from "api/_types/tripPlan/tripDetailInfo";
-import {TripDetail} from "api/_types/tripPlan/tripDetail";
+import { signToken, genAuthString } from '_types/auth/auth-cert';
+import {ETripType} from "../../../_types/tripPlan/tripPlan";
+import {TripDetailTraffic, TripDetailHotel} from "_types/tripPlan/tripDetailInfo";
+import {TripDetail} from "_types/tripPlan/tripDetail";
 
 var msgbox = require('msgbox');
 

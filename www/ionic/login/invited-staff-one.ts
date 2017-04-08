@@ -1,6 +1,6 @@
 import {getSession} from "common/model";
 var msgbox = require('msgbox');
-
+declare var API;
 export async function InvitedStaffOneController ($scope, $stateParams, $storage , $ionicPopup){
     require("./login.scss");
     let linkId = $stateParams.linkId;

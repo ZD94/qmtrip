@@ -1,5 +1,5 @@
-import { ENoticeType } from 'api/_types/notice/notice';
-import { Staff } from 'api/_types/staff/staff';
+import { ENoticeType } from '_types/notice/notice';
+import { Staff } from '_types/staff/staff';
 var msgbox = require('msgbox');
 var validator = require('validator');
 export async function GetCoinController($scope, Models, $stateParams) {

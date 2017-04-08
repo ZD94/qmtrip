@@ -1,8 +1,8 @@
 
 import _ = require('lodash');
 import { SupplierWebRobot, SupplierOrder , ReserveLink } from '../index';
-import { EPayType, EInvoiceFeeTypes } from '../../../api/_types/tripPlan/index';
-import L from 'common/language';
+import { EPayType, EInvoiceFeeTypes } from '../../../_types/tripPlan/index';
+import L from '@jingli/language';
 import moment = require("moment");
 
 var iconv = require('iconv-lite');

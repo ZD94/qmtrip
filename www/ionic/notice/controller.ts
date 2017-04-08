@@ -1,5 +1,5 @@
-import { Staff } from 'api/_types/staff/staff';
-import { NoticeAccount, ESendType } from 'api/_types/notice';
+import { Staff } from '_types/staff/staff';
+import { NoticeAccount, ESendType } from '_types/notice';
 import moment = require("moment");
 
 export * from './detail';

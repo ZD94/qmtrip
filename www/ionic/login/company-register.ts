@@ -2,7 +2,7 @@ import validator = require('validator');
 import moment = require('moment');
 var msgbox = require('msgbox');
 var CheckUsername = require("www/util").CheckUsername;
-
+declare var API;
 export async function CompanyRegisterController ($scope, $stateParams){
     API.require("checkcode");
     API.require("auth");
