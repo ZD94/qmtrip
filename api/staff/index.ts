@@ -129,6 +129,11 @@ class StaffModule{
             staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
         }
         let result = await staff.save();
+        
+        //设置默认部门
+        let defaultDepartment = await company.getDefaultDepartment();
+        let sd = StaffDepartment.create({staffId: staff.id, departmentId: defaultDepartment.id});
+        await sd.save();
 
         await StaffModule.sendNoticeToAdmins({
             companyId:params.companyId,
