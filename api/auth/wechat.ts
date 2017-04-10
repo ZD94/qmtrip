@@ -6,6 +6,7 @@ import { Staff } from '_types/staff/staff';
 import { Models } from '_types/index';
 import { requireParams } from '../../common/api/helper';
 import C = require("@jingli/config");
+
 var API = require("common/api");
 
 export function __initHttpApp(app: any) {

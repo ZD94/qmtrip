@@ -531,6 +531,7 @@ class TripApproveModule {
     @requireParams(['id'],['remark'])
     static async cancelTripApprove(params: {id: string, remark?: string}): Promise<boolean> {
         let tripApprove = await Models.tripApprove.get(params.id);
+        let company = tripApprove.account.company;
         if( tripApprove.status != QMEApproveStatus.WAIT_APPROVE && tripApprove.approvedUsers && tripApprove.approvedUsers.indexOf(",") != -1 ) {
             throw {code: -2, msg: "审批单状态不正确，该审批单不能撤销！"};
         }
@@ -539,6 +540,23 @@ class TripApproveModule {
         let staff = await Staff.getCurrent();
         let log = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, remark: `撤销行程审批单`});
         await Promise.all([tripApprove.save(), log.save()]);
+
+        let query = tripApprove.query;
+        if (typeof query == 'string') {
+            query = JSON.parse(query);
+        }
+        let frozenNum = query.frozenNum;
+        console.info(frozenNum);
+        let content = tripApprove.deptCity+"-"+tripApprove.arrivalCity;
+        if(tripApprove.createdAt.getMonth() == new Date().getMonth()){
+            await company.approveRejectFreeTripPlanNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                remark: "审批前撤销行程释放冻结行程点数", content: content, frozenNum: frozenNum});
+        }else{
+            await company.approveRejectFreeBeforeNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                remark: "审批前撤销上月行程释放冻结行程点数", content: content, frozenNum: frozenNum});
+
+        }
+
         return true;
     }
 
