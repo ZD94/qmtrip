@@ -8,7 +8,7 @@ const API = require('common/api');
 let dingSuiteCallback = require("dingtalk_suite_callback");
 import fs = require("fs");
 import cache from "common/cache";
-const C = require("config");
+const C = require("@jingli/config");
 
 const config = C.ddconfig;
 import request = require('request');
@@ -23,8 +23,8 @@ const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 
 let ddTalkMsgHandle = {
     /* * * * 临时授权码* * * * */
-    tmp_auth_code: async function(msg) {
-        DealEvent.tmpAuthCode(msg);
+    tmp_auth_code: async function(msg , req , res , next) {
+        return await DealEvent.tmpAuthCode(msg , req , res , next);
     },
 
     /* * * * * 授权变更* * * * * * */
@@ -36,29 +36,29 @@ let ddTalkMsgHandle = {
     },
     /* * * * 解除授权信息 * * * */
     suite_relieve: async function(msg) {
-        DealEvent.suiteRelieve(msg);
+        return await DealEvent.suiteRelieve(msg);
     },
 
     /* * * 保存授权信息 , 每20分钟钉钉会请求一次 * * */
     suite_ticket: async function(msg) {
         let ticket = msg.SuiteTicket;
-        await cache.write(CACHE_KEY, JSON.stringify({
+        return await cache.write(CACHE_KEY, JSON.stringify({
             ticket: ticket, timestamp: msg.TimeStamp
         }));
     },
 
     /* * * 企业增加员工 * * */
     user_add_org: async function(msg) {
-        DealEvent.userModifyOrg(msg);
+        return await DealEvent.userModifyOrg(msg);
     },
 
     /* * 通讯录用户更改 * */
     user_modify_org : async function(msg){
-        DealEvent.userModifyOrg(msg);
+        return await DealEvent.userModifyOrg(msg);
     },
     /* * 通讯录用户离职 * */
     user_leave_org : async function(msg){
-        DealEvent.userLeaveOrg(msg);
+        return await DealEvent.userLeaveOrg(msg);
     },
     /* * 通讯录用户被设为管理员 * */
     // org_admin_add : async function(msg){
@@ -70,36 +70,66 @@ let ddTalkMsgHandle = {
     // },
     /* * *  通讯录企业部门创建 * * */
     org_dept_create : async function(msg){
-        DealEvent.orgDeptCreate(msg);
+        return await DealEvent.orgDeptCreate(msg);
     },
     /* * *  通讯录企业部门修改 * * */
     org_dept_modify : async function(msg){
-        DealEvent.orgDeptCreate(msg);
+        return await DealEvent.orgDeptCreate(msg);
     },
     /* * *  通讯录企业部门删除 * * */
     org_dept_remove : async function(msg){
-        DealEvent.orgDeptRemove(msg);
-        return msg;
+        return await DealEvent.orgDeptRemove(msg);
     },
     /* * *  企业被解散 * * */
     org_remove : async function(msg){
-        DealEvent.orgDeptRemove(msg);
+        // return await DealEvent.orgDeptRemove(msg);
         return msg;
     }
+
 }
 
 
 class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
-        app.post("/ddtalk/isv/receive", dingSuiteCallback(config, function (msg, req, res, next) {
-            // console.info("from DD : " , msg);
+
+        /*app.get("/hello2" , (req , res, next)=>{
+           res.send("yes, it's hello2. Change them.");
+        });
+
+        app.get("/hello" , (req, res, next)=>{
+            console.log("hello in");
+            if(config.reg_go){
+                DealEvent.transpond(req , res , next);
+                return;
+            }
+            res.json({
+                "msg":"yes , hello2222"
+            });
+            return;
+        });*/
+
+        app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
+            if(msg.CorpId){
+                let corps = await Models.ddtalkCorp.find({
+                    where : { corpId : msg.CorpId }
+                });
+                if(!corps.length){
+                    DealEvent.transpond(req , res , next);
+                    return;
+                }
+            }
+
+            if(msg.EventType == "suite_ticket"){
+                //transpond
+                DealEvent.transpond(req , res , ()=>{});
+            }
+
             if(!ddTalkMsgHandle[msg.EventType]){
                 return res.reply();
             }
-
-            return ddTalkMsgHandle[msg.EventType](msg)
-                .then((ret) => {
+            return ddTalkMsgHandle[msg.EventType](msg , req , res , next)
+                .then(() => {
                     res.reply();
                 })
                 .catch((err) => {

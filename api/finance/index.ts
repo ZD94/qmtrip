@@ -11,7 +11,7 @@ import {
     TripDetailTraffic, TripDetailHotel, TripDetailSpecial,
     TripDetailSubsidy
 } from "_types/tripPlan/tripDetailInfo";
-const L = require("common/language");
+const L = require("@jingli/language");
 
 class FinanceModule {
 

@@ -5,7 +5,7 @@
 import {DB} from "common/model";
 var _ = require('lodash');
 import {Paginate} from 'common/paginate';
-import L from 'common/language';
+import L from '@jingli/language';
 import {requireParams, clientExport} from 'common/api/helper';
 import {conditionDecorator, condition} from "../_decorator";
 import {Staff, EStaffStatus} from "_types/staff";

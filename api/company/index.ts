@@ -2,10 +2,10 @@
  * Created by yumiao on 15-12-9.
  */
 import {DB} from "common/model";
-import L from 'common/language';
-let C = require("config");
+import L from '@jingli/language';
+let C = require("@jingli/config");
 let API = require("common/api");
-let Logger = require('common/logger');
+import Logger from '@jingli/logger';
 let logger = new Logger('company');
 let moment = require('moment');
 let promoCodeType = require('libs/promoCodeType');

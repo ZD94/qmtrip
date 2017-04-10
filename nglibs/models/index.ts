@@ -1,7 +1,7 @@
 
 
 import ng = require('angular');
-import L from 'common/language';
+import L from '@jingli/language';
 
 import { ModelsInterface, initModels } from '_types';
 import {ModelObjInterface, ModelInterface} from 'common/model/interface';
