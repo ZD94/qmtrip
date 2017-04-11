@@ -4,7 +4,7 @@
 
 let API = require("common/api");
 import L from '@jingli/language';
-let config = require("@jingli/config");
+import config = require("@jingli/config");
 import moment = require("moment");
 import _ = require('lodash');
 

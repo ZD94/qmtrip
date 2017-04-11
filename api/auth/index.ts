@@ -17,7 +17,7 @@ import * as byTest from './by-test';
 import {condition, conditionDecorator} from "../_decorator";
 
 var uuid = require("node-uuid");
-var C = require("@jingli/config");
+import C = require("@jingli/config");
 var moment = require("moment");
 var API = require("common/api");
 var utils = require("common/utils");

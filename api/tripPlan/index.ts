@@ -9,7 +9,8 @@ import utils = require("common/utils");
 let API = require('common/api');
 import Logger from '@jingli/logger';
 let logger = new Logger("tripPlan");
-let config = require("@jingli/config");
+import config = require("@jingli/config");
+
 let moment = require("moment");
 let scheduler = require('common/scheduler');
 import _ = require('lodash');
@@ -584,7 +585,7 @@ class TripPlanModule {
 
 
     @clientExport
-    @requireParams(['name', 'createUser', 'company_id'], ['code'])
+    @requireParams(['name', 'createUser', 'companyId'], ['code'])
     static createProject(params): Promise<Project> {
         return Project.create(params).save();
     }
