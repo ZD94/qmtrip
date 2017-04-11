@@ -121,7 +121,7 @@
     {
       "name": "令狐冲",
       "mobile": "13700000003",
-      "email": "l.hchong@xajh.com",
+      "email": "l.hchong@jingli.tech",
       "isValidateMobile": true,
       "isValidateEmail": true,
       "roleId": "admin",
@@ -133,7 +133,7 @@
     {
       "name": "任盈盈",
       "mobile": "13700000011",
-      "email": "r.yying@xajh.com",
+      "email": "r.yying@jingli.tech",
       "isValidateMobile": true,
       "sex": "female",
       "isValidateEmail": true,
@@ -147,7 +147,7 @@
     {
       "name": "岳灵珊",
       "mobile": "13700000004",
-      "email": "y.lshan@xajh.com",
+      "email": "y.lshan@jingli.tech",
       "isValidateMobile": true,
       "sex": "female",
       "isValidateEmail": true,
@@ -160,7 +160,7 @@
     {
       "name": "林平之",
       "mobile": "13700000006",
-      "email": "l.pzhi@xajh.com",
+      "email": "l.pzhi@jingli.tech",
       "isValidateMobile": true,
       "isValidateEmail": true,
       "roleId": "staff",
@@ -172,7 +172,7 @@
     {
       "name": "任我行",
       "mobile": "13700000010",
-      "email": "r.wxing@xajh.com",
+      "email": "r.wxing@jingli.tech",
       "isValidateMobile": true,
       "isValidateEmail": true,
       "roleId": "staff",
@@ -184,7 +184,7 @@
     {
       "name": "向问天",
       "mobile": "13700000012",
-      "email": "x.wtian@xajh.com",
+      "email": "x.wtian@jingli.tech",
       "isValidateMobile": true,
       "isValidateEmail": true,
       "roleId": "staff",
@@ -196,7 +196,7 @@
     {
       "name": "陆大有",
       "mobile": "13700000007",
-      "email": "l.dyou@xajh.com",
+      "email": "l.dyou@jingli.tech",
       "isValidateMobile": true,
       "isValidateEmail": true,
       "roleId": "staff",
@@ -209,7 +209,7 @@
     {
       "name": "左冷禅",
       "mobile": "13700000009",
-      "email": "z.lchan@xajh.com",
+      "email": "z.lchan@jingli.tech",
       "isValidateMobile": true,
       "isValidateEmail": true,
       "roleId": "staff",
@@ -221,7 +221,7 @@
     {
       "name": "宁中则",
       "mobile": "13700000008",
-      "email": "n.zze@xajh.com",
+      "email": "n.zze@jingli.tech",
       "isValidateMobile": true,
       "sex": "female",
       "isValidateEmail": true,
@@ -234,7 +234,7 @@
     {
       "name": "杨莲亭",
       "mobile": "13700000013",
-      "email": "y.lting@xajh.com",
+      "email": "y.lting@jingli.tech",
       "isValidateMobile": true,
       "isValidateEmail": true,
       "roleId": "staff",
@@ -246,7 +246,7 @@
     {
       "name": "岳不群",
       "mobile": "13700000002",
-      "email": "y.bqun@xajh.com",
+      "email": "y.bqun@jingli.tech",
       "isValidateMobile": true,
       "isValidateEmail": true,
       "roleId": "staff",

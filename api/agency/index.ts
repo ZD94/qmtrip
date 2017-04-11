@@ -2,18 +2,18 @@
  * Created by yumiao on 15-12-9.
  */
 "use strict";
-let sequelize = require("common/model").DB;
-let DBM = sequelize.models;
+import {DB} from "common/model";
 let API = require("common/api");
-import L from 'common/language';
-import Logger = require('common/logger');
+import L from '@jingli/language';
+import Logger from '@jingli/logger';
 import {requireParams, clientExport} from 'common/api/helper';
 import {Agency, AgencyUser, EAgencyStatus, EAgencyUserRole} from "_types/agency";
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "../_decorator";
-import { Models, EGender } from '_types/index';
+import { Models, EGender, EAccountType } from '_types/index';
 import {md5} from "common/utils";
 import {FindResult, PaginateInterface} from "common/model/interface";
 import {AgencyOperateLog} from "_types/agency/agency-operate-log";
+import validator = require('validator');
 let logger = new Logger("agency");
 
 class AgencyModule {
@@ -149,16 +149,25 @@ class AgencyModule {
      * @returns {Promise<AgencyUser>}
      */
     @clientExport
-    @requirePermit('user.add', 2)
-    @requireParams(['email', 'name'], ['mobile', 'sex', 'avatar', 'roleId'])
-    static async createAgencyUser(params: {email: string, name: string, mobile?: string, sex?: number, avatar?: string, roleId?: number}): Promise<AgencyUser> {
+    @requireParams(['mobile', 'name'], ['email', 'sex', 'avatar', 'roleId', 'pwd'])
+    static async createAgencyUser(params: {email?: string, name: string, mobile: string, sex?: number, avatar?: string, roleId?: number, pwd?: string}): Promise<AgencyUser> {
         let curUser = await AgencyUser.getCurrent();
 
         if(!curUser) {
             throw L.ERR.AGENCY_USER_NOT_EXIST();
         }
+        let mobile = params.mobile;
+        if(!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+        if(params.email && !validator.isEmail(params.email)) {
+            throw L.ERR.EMAIL_FORMAT_INVALID();
+        }
+        params.pwd = params.pwd || '123456';
+        params.roleId = params.roleId || EAgencyUserRole.COMMON;
 
-        let user = await Models.agencyUser.create(params);
+        let user = await Models.agencyUser.create({name: params.name, pwd: md5(params.pwd), status: EAgencyStatus.ACTIVE,
+            roleId: params.roleId, type: EAccountType.AGENCY, email: params.email, mobile: params.mobile});
         user.agency = curUser.agency;
         return user.save();
     }
@@ -260,8 +269,8 @@ class AgencyModule {
         let name = params.name;
 
         await API.auth.removeByTest({email: email, mobile: mobile, type: 2});
-        await DBM.Agency.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}});
-        await DBM.AgencyUser.destroy({where: {name: name}});
+        await DB.models.Agency.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}});
+        await DB.models.AgencyUser.destroy({where: {name: name}});
 
         return true;
     }
@@ -269,7 +278,7 @@ class AgencyModule {
 
     static async __initOnce() {
         logger.info("init default agency...");
-        let default_agency = require('config/config').default_agency;
+        let default_agency = require('@jingli/config').default_agency;
         let email = default_agency.email;
         let mobile = default_agency.mobile;
         let pwd = default_agency.pwd;
@@ -306,14 +315,12 @@ class AgencyModule {
 
     @clientExport
     static async getAgencyOperateLogs(options: any) :Promise<FindResult> {
-        let {limit, offset} = options;
+        options.where = options.where || {};
+        options.order = options.order || "created_at desc";
         let agencyUser = await AgencyUser.getCurrent();
         let agency = agencyUser.agency;
-        let pager = await Models.agencyOperateLog.find( {
-            where: {agencyId: agency.id},
-            order: "created_at desc",
-            limit: limit,
-            offset: offset});
+        options.where.agencyId = agency.id;
+        let pager = await Models.agencyOperateLog.find(options);
         let ids = pager.map( (v) => {
             return v.id;
         });
