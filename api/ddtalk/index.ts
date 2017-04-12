@@ -93,36 +93,29 @@ class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
 
-        /*app.get("/hello2" , (req , res, next)=>{
-           res.send("yes, it's hello2. Change them.");
-        });
-
-        app.get("/hello" , (req, res, next)=>{
-            console.log("hello in");
-            if(config.reg_go){
-                DealEvent.transpond(req , res , next);
-                return;
-            }
-            res.json({
-                "msg":"yes , hello2222"
-            });
-            return;
-        });*/
-
         app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
             if(msg.CorpId){
                 let corps = await Models.ddtalkCorp.find({
                     where : { corpId : msg.CorpId }
                 });
                 if(!corps.length){
-                    DealEvent.transpond(req , res , next);
-                    return;
+                    return DealEvent.transpond(req , res , next);
                 }
             }
 
             if(msg.EventType == "suite_ticket"){
                 //transpond
-                DealEvent.transpond(req , res , ()=>{});
+                let url = config.test_url.replace(/\/$/g, "");
+                if(config.test_url && config.reg_go){
+                    request({
+                        uri: url + "/ddtalk/suite_ticket",
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        method: "POST",
+                        body: msg
+                    })
+                }
             }
 
             if(!ddTalkMsgHandle[msg.EventType]){
@@ -137,6 +130,12 @@ class DDTalk {
                     next(err);
                 });
         }));
+
+        app.post("/ddtalk/suite_ticket" , (req , res , next)=>{
+            let msg = req.body || {};
+            ddTalkMsgHandle.suite_ticket(msg);
+            res.send("ok");
+        });
     }
 
     @clientExport
