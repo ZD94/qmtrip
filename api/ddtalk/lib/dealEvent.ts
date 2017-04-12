@@ -35,7 +35,7 @@ let reg = new RegExp( config.name_reg );
 
 
 /* transpond */
-export async function transpond(req , res , next){
+export function transpond(req , res , next){
     return requestProxy({
         url: config.test_url ,
         reqAsBuffer: true,
