@@ -16,7 +16,6 @@ import ISVApi from "./lib/isvApi";
 import {Models} from "_types/index";
 import {clientExport} from "common/api/helper";
 import {get_msg} from "./lib/msg-template/index";
-import path = require("path");
 
 import * as DealEvent from "./lib/dealEvent";
 
@@ -106,9 +105,10 @@ class DDTalk {
 
             if(msg.EventType == "suite_ticket"){
                 //transpond
+                let url = config.test_url.replace(/\/$/g, "");
                 if(config.test_url && config.reg_go){
                     request({
-                        uri: path.join(config.test_url, "/ddtalk/suite_ticket"),
+                        uri: url + "/ddtalk/suite_ticket",
                         headers: {
                             'Content-Type': 'application/json',
                         },
