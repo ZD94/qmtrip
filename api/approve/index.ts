@@ -82,7 +82,7 @@ class ApproveModule {
         let approve = await ApproveModule._submitApprove({
             submitter: submitter.id,
             data: budgetInfo,
-            title: query.projectName,
+            title: query['projectName'],
             channel: submitter.company.oa,
             type: EApproveType.TRAVEL_BUDGET,
             approveUser: approveUser,
