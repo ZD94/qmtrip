@@ -622,9 +622,8 @@ class TripPlanModule {
     @modelNotNull('project')
     static async deleteProject(params:{id:string}):Promise<boolean> {
         let project = await Models.project.get(params.id);
-        // let trip = await project.getTripPlans();
-        let trip = await project.getTripPlans();
-        if(trip && trip.length > 0){
+        let trips = await Models.tripPlan.find({where: {projectId: projet.id}});
+        if(trips && trips.length > 0){
             throw {code: -1, msg: '该项目下有行程，不能删除'};
         }
 

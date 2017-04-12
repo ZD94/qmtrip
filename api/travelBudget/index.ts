@@ -89,7 +89,7 @@ export default class ApiTravelBudget {
         }
 
         let isRoundTrip = params.isRoundTrip;
-        let goBackPlace = params.goBackPlace;
+        let goBackPlace = params['goBackPlace'];
         let momentDateFormat = "YYYY-MM-DD";
         let budgets = [];
 
@@ -167,7 +167,7 @@ export default class ApiTravelBudget {
                                     latestArrivalDateTime: latestArrivalDateTime,
                                 });
                                 budget.tripType = ETripType.OUT_TRIP;
-                                budget.reason = reason;
+                                budget['reason'] = reason;
                                 budgets.push(budget);
                             } catch (err) {
                                 reject(err);
@@ -184,7 +184,7 @@ export default class ApiTravelBudget {
                                     hotelName: hotelName
                                 });
                                 budget.tripType = ETripType.HOTEL;
-                                budget.reason = reason;
+                                budget['reason'] = reason;
                                 budgets.push(budget);
                             } catch (err) {
                                 console.info(err);
@@ -206,7 +206,7 @@ export default class ApiTravelBudget {
                                 }
                                 let budget = await ApiTravelBudget.getTrafficBudget(_params);
                                 budget.tripType = ETripType.BACK_TRIP;
-                                budget.reason = reason;
+                                budget['reason'] = reason;
                                 budgets.push(budget);
                             } catch (err) {
                                 reject(err);
