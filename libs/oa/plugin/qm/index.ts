@@ -49,8 +49,9 @@ export class QmPlugin extends AbstractOAPlugin {
 
         let arrivalCityCodes = [];//目的地代码
         let project: Project;
-        if(query.projectName){
-            project = await API.tripPlan.getProjectByName({companyId: company.id, name: query.projectName,
+        let projectName = query['projectName']
+        if(projectName){
+            project = await API.tripPlan.getProjectByName({companyId: company.id, name: projectName,
                 userId: staff.id, isCreate: true});
         }
 

@@ -59,7 +59,7 @@ export default class ApiTravelBudget {
     @clientExport
     static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams) :Promise<string> {
         let {accountId} = Zone.current.get('session');
-        let staffId = params.staffId || accountId;
+        let staffId = params['staffId'] || accountId;
         let staff = await Models.staff.get(staffId);
         let travelPolicy = await staff.getTravelPolicy();
         if (!travelPolicy) {
@@ -73,7 +73,7 @@ export default class ApiTravelBudget {
                 for(let key in destinationPlacesInfo[j]) {
                     paramsItem[key] = destinationPlacesInfo[j][key];
                 }
-                paramsItem.staffId = params.staffId;
+                paramsItem.staffId = params['staffId'];
                 if(j == 0){
                     if(params.originPlace){
                         paramsItem.originPlace = params.originPlace;
