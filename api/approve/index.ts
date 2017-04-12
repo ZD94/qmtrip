@@ -12,7 +12,7 @@ import {EApproveStatus, EApproveChannel, EApproveType} from "_types/approve/type
 import {ETripType} from "_types/tripPlan/tripPlan";
 import TripPlanModule = require("../tripPlan/index");
 import _ = require('lodash');
-let Config = require('config');
+let Config = require('@jingli/config');
 var API = require("common/api");
 import {ISegment, ICreateBudgetAndApproveParams} from '_types/tripPlan';
 

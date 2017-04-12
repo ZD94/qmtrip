@@ -1,4 +1,4 @@
-import L from 'common/language';
+import L from '@jingli/language';
 import { signToken } from '_types/auth/auth-cert';
 import { getSession } from 'common/model';
 require("ionic");

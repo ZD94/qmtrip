@@ -13,7 +13,7 @@ import TripApproveModule = require("api/tripApprove/index");
 import {Models} from "_types/index";
 import {ETripType, TripApprove, QMEApproveStatus, EApproveResult, Project} from "_types/tripPlan/tripPlan";
 import _ = require('lodash');
-const L = require("common/language");
+const L = require("@jingli/language");
 import moment = require("moment");
 var API = require("common/api");
 import {ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan"

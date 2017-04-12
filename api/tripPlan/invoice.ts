@@ -6,7 +6,7 @@ import { Models, EAccountType } from '_types/index';
 import { EStaffRole } from '_types/staff';
 import { parseAuthString } from '_types/auth/auth-cert';
 var API = require("common/api");
-let Logger = require('common/logger');
+import Logger from '@jingli/logger';
 let logger = new Logger("tripPlan.invoice");
 
 

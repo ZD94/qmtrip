@@ -6,7 +6,7 @@
 import {requireParams, clientExport} from "../../common/api/helper";
 import {Staff} from "_types/staff/staff";
 import {CoinAccount} from "_types/coin";
-var config = require('config');
+var config = require('@jingli/config');
 
 var URL = require('url');
 var utils = require("common/utils");

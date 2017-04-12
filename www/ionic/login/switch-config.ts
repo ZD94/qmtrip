@@ -2,7 +2,7 @@
 var msgbox = require('msgbox');
 
 export default async function SwitchConfigController($scope, $rootScope, $location, $window, $timeout){
-    var config = require('config');
+    var config = require('@jingli/config');
     await config.$ready;
     if(!config.$config || !config.$config.configs){
         $window.alert('该版本还不支持选择配置');
