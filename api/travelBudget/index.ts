@@ -19,7 +19,7 @@ import {
     TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
 } from "./strategy/index";
 import {DEFAULT_PREFER_CONFIG_TYPE, loadPrefers} from "./prefer";
-import companyDefaultPrefer = require("./prefer/default-prefer/default-company-prefer.json");
+const companyDefaultPrefer = require("./prefer/default-prefer/default-company-prefer.json");
 
 export default class ApiTravelBudget {
 
@@ -32,6 +32,7 @@ export default class ApiTravelBudget {
         let key = `budgets:${accountId}:${params.id}`;
         return cache.read(key);
     }
+
     @clientExport
     static getDefaultPrefer() {
         return companyDefaultPrefer;
