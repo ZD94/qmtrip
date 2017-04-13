@@ -94,7 +94,6 @@ class DDTalk {
     static __initHttpApp(app) {
         
         app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
-            console.log("I say : ",msg ,typeof msg);
             if(msg.CorpId){
                 let corps = await Models.ddtalkCorp.find({
                     where : { corpId : msg.CorpId }
@@ -114,7 +113,7 @@ class DDTalk {
                             'Content-Type': 'application/json',
                         },
                         form: msg
-                    }, function(err, resp) {
+                    }, function(err, res) {
                         if (err) {
                             return console.error(err)
                         }
@@ -127,9 +126,7 @@ class DDTalk {
             }
             return ddTalkMsgHandle[msg.EventType](msg , req , res , next)
                 .then((result) => {
-                    if(result && result.notReply){
-
-                    }else{
+                    if(!(result && result.notReply)){
                         res.reply();
                     }
                 })
