@@ -92,8 +92,9 @@ let ddTalkMsgHandle = {
 class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
-
+        
         app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
+            console.log("I say : ",msg ,typeof msg);
             if(msg.CorpId){
                 let corps = await Models.ddtalkCorp.find({
                     where : { corpId : msg.CorpId }
@@ -107,14 +108,17 @@ class DDTalk {
                 //transpond
                 let url = config.test_url.replace(/\/$/g, "");
                 if(config.test_url && config.reg_go){
-                    request({
-                        uri: url + "/ddtalk/suite_ticket",
+                    request.post({
+                        url : url + "/ddtalk/suite_ticket",
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        method: "POST",
-                        body: msg
-                    })
+                        form: msg
+                    }, function(err, resp) {
+                        if (err) {
+                            return console.error(err)
+                        }
+                    });
                 }
             }
 
@@ -122,8 +126,12 @@ class DDTalk {
                 return res.reply();
             }
             return ddTalkMsgHandle[msg.EventType](msg , req , res , next)
-                .then(() => {
-                    res.reply();
+                .then((result) => {
+                    if(result && result.notReply){
+
+                    }else{
+                        res.reply();
+                    }
                 })
                 .catch((err) => {
                     console.error(err.stack);
