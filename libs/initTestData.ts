@@ -10,6 +10,7 @@ import { TravelPolicy, SubsidyTemplate } from '_types/travelPolicy';
 import {md5} from "common/utils";
 import {CoinAccount} from "_types/coin";
 import {EGender} from "_types";
+import utils = require("common/utils");
 
 const _ = require("lodash");
 const Models = require("_types").Models;
@@ -137,6 +138,12 @@ async function initXAJHStaffs(params: {companyId: string}): Promise<any[]> {
         if(staff.sex){
             staff.sex = translateSex(staff.sex);
         }
+        if(!staff.pwd){
+            staff.pwd = utils.md5("123456");
+        }
+        staff.isNeedChangePwd = false;
+        staff.status = ACCOUNT_STATUS.ACTIVE;
+
         let st = Staff.create(staff);
         st.setTravelPolicy(travelPolicy);
         st.company = company;

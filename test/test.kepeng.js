@@ -8,6 +8,7 @@ require('app-module-path').addPath(path.join(__dirname, '..'));
 require('common/node_ts').install(false);
 
 import Logger from '@jingli/logger';
+
 Logger.init({
     path: path.join(__dirname, "../log"),
     prefix: 'test_',

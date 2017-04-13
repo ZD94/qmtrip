@@ -22,6 +22,7 @@ require('./mocha-zone')(global);
 var config = require("../config");
 
 import Logger from '@jingli/logger';
+
 Logger.init({
     path: path.join(__dirname, "../log"),
     prefix: "mocha_",
