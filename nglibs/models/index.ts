@@ -119,7 +119,7 @@ var Services = {
         funcs: ['getTripPlanLog', 'getTripPlanLogs', 'saveTripPlanLog', 'updateTripPlanLog', 'deleteTripPlanLog']
     },
     project: { type: Project, modname: 'tripPlan',
-        funcs: ['getProjectById', 'getProjectList', 'createProject']
+        funcs: ['getProjectById', 'getProjectList', 'createProject', 'updateProject']
     },
     // place: { type: Place, modname: 'place',
     //     funcs: ['getCityInfo', 'queryPlace']
