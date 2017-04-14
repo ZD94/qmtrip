@@ -13,7 +13,6 @@ let promoCodeType = require('libs/promoCodeType');
 let scheduler = require('common/scheduler');
 let schedule = require("node-schedule");
 let _ = require("lodash");
-let fs=require("fs");
 import {requireParams, clientExport} from "common/api/helper";
 import {Models} from "_types";
 import {Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE} from '_types/company';
@@ -25,6 +24,7 @@ import {requirePermit, conditionDecorator, condition, modelNotNull} from "api/_d
 import {md5} from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
 import {CoinAccount} from "_types/coin";
+
 
 const supplierCols = Supplier['$fieldnames'];
 
@@ -70,8 +70,7 @@ class CompanyModule {
         userName: string, pwd?: string, status?: number, remark?: string, description?: string, isValidateMobile?: boolean, promoCode?: string}): Promise<any>{
         let session = Zone.current.get('session');
         let pwd = params.pwd;
-        let config=JSON.parse(fs.readFileAsync('../../config/config.json','utf-8'));
-        let defaultAgency = await Models.agency.find({where:{email:config.default_agency.email}});//Agency.__defaultAgencyId;
+        let defaultAgency = await Models.agency.find({where:{email:C.default_agency.email}});//Agency.__defaultAgencyId;
         let agencyId:any;
         if(defaultAgency && defaultAgency.length==1){
             agencyId=defaultAgency[0].id;
@@ -86,7 +85,6 @@ class CompanyModule {
         }
 
         /*let companies = await Models.company.find({where: {$or: [{email: params.email}, {mobile: params.mobile}/!*, {domain_name: domain}*!/]}});
-
         if(companies && companies.length > 0) {
             throw {code: -7, msg: '邮箱或手机号已经注册'};
         }*/
