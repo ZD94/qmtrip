@@ -363,7 +363,8 @@ class TravelPolicyModule{
     @clientExport
     @requireParams(["where.travelPolicyId"],['attributes','where.name', 'where.subsudyMoney'])
     @conditionDecorator([
-        {if: condition.isTravelPolicyCompany("0.where.travelPolicyId")}
+        {if: condition.isTravelPolicyCompany("0.where.travelPolicyId")},
+        {if: condition.isTravelPolicyAgency("0.where.travelPolicyId")}
     ])
     static async getSubsidyTemplates(params): Promise<FindResult>{
         params.order = params.order || [['subsidyMoney', 'desc']];
