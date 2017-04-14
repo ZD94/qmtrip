@@ -128,12 +128,19 @@ class StaffModule{
         if(!staff["travelPolicyId"]){
             staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
         }
-        let result = await staff.save();
-        
-        //设置默认部门
-        let defaultDepartment = await company.getDefaultDepartment();
-        let sd = StaffDepartment.create({staffId: staff.id, departmentId: defaultDepartment.id});
-        await sd.save();
+        await staff.save();
+
+        let departmentIds = params.departmentIds as string[];
+        if (departmentIds && departmentIds.length >= 1) {
+            let departments = await Promise.all(departmentIds.map( (id) => {
+                return Models.department.get(id)
+            }));
+            await staff.addDepartment(departments);
+        } else {
+            //设置默认部门
+            let defaultDepartment = await company.getDefaultDepartment();
+            await staff.addDepartment(defaultDepartment);
+        }
 
         await StaffModule.sendNoticeToAdmins({
             companyId:params.companyId,
@@ -141,9 +148,7 @@ class StaffModule{
             noticeTemplate:"qm_notify_admins_add_staff"
         });
 
-        await result.saveStaffDepartments(params.departmentIds);
         let account = await Models.account.get(staff.accountId);
-
         if(!account.coinAccount){
             //为员工设置资金账户
             let ca = CoinAccount.create();
@@ -151,8 +156,7 @@ class StaffModule{
             account.coinAccount = ca;
             await account.save();
         }
-
-        return result;
+        return staff;
     }
    static async  sendNoticeToAdmins(params:{companyId:string,name:string,noticeTemplate:string}):Promise<any>{
         let company = await Models.company.get(params.companyId);
