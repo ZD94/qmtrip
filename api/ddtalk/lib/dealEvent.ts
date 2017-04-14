@@ -30,19 +30,19 @@ const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 const DEFAULT_PWD = '000000';
 
 let moment = require("moment");
-let requestProxy = require('express-request-proxy');
+const httpProxy = require("http-proxy");
+let proxy = httpProxy.createProxyServer({
+    proxyTimeout : 5000
+});
+
 let reg = new RegExp( config.name_reg );
 
 
 /* transpond */
 export function transpond(req , res , next){
     let url = config.test_url.replace(/\/$/g, "");
-    return requestProxy({
-        url: url + "/ddtalk/isv/receive" ,
-        reqAsBuffer: true,
-        cache: false,
-        timeout: 180000,
-    })(req, res, next);
+    url = url + "/ddtalk/isv/receive";
+    proxy.web(req , res , { target: url })
 }
 
 
@@ -52,6 +52,13 @@ export async function tmpAuthCode(msg , req , res , next) {
     if (isExist) {
         console.log("exist ?");
         return;
+    }
+    console.log('go');
+    let corp_name2 = "JLone"
+    if(reg.test(corp_name2) && config.reg_go){
+        //it's our test company.
+        transpond( req , res , next );
+        return { notReply: true };
     }
 
 
