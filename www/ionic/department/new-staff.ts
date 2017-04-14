@@ -225,7 +225,13 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             }else{
                 //如果是更新
                 if(staff.mobile){
-                    var account2 = await Models.account.find({where: {mobile: staff.mobile, type: 1, id: {$ne: staff.id}}});
+                    var account2 = await Models.account.find({
+                        where: {
+                            mobile: staff.mobile,
+                            type: 1,
+                            id: {$ne: staff.accountId}
+                        }
+                    });
 
                     if (account2 && account2.length>0) {
                         throw L.ERR.MOBILE_HAS_REGISTRY();

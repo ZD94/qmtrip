@@ -198,7 +198,7 @@ export default class ApiAuth {
         var accountId = params.accountId;
         var account: Account;
         if(accountId) {
-            account = await Models.account.get(accountId);
+            account = await Models.account.get(accountId, {notParent: true});
         } else {
             var accounts = await Models.account.find({where: {$or: [{email: mobileOrEmail}, {mobile: mobileOrEmail}]}});
             if(accounts && accounts.length > 0) {
@@ -240,7 +240,7 @@ export default class ApiAuth {
         await API.notify.submitNotify({
             key: 'qm_new_staff_active',
             values: values,
-            accountId: account.id
+            mobile: account.mobile,
         });
         return true;
     }
@@ -709,7 +709,7 @@ export default class ApiAuth {
         return API.notify.submitNotify({
             key: key,
             values: vals,
-            accountId: acc.id
+            email: acc.email,
         });
     }
 
@@ -757,7 +757,7 @@ export default class ApiAuth {
         return API.notify.submitNotify({
             key: key,
             values: vals,
-            accountId: acc.id
+            email: acc.email
         });
     }
 
@@ -889,7 +889,7 @@ export default class ApiAuth {
     @clientExport
     static async updateAccount(params) : Promise<Account>{
         var id = params.id;
-
+        console.log("更新字段:====>", params);
         var ah = await Models.account.get(id);
         for(var key in params){
             ah[key] = params[key];
@@ -1100,6 +1100,11 @@ export default class ApiAuth {
 
     static removeByTest = byTest.removeByTest;
 
+    @clientExport
+    static setUserId = authentication.setUserId;
+
+    @clientExport
+    static getUserId = authentication.getUserId;
 }
 
 async function _sendActiveEmail(accountId) {
@@ -1129,7 +1134,7 @@ async function _sendActiveEmail(accountId) {
         API.notify.submitNotify({
             key: 'qm_active',
             values: vals,
-            accountId: account.id,
+            email: account.email
         })
     ]);
 

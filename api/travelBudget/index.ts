@@ -153,7 +153,7 @@ export default class ApiTravelBudget {
             }
 
             await new Promise(function(resolve, reject) {
-                let session = {accountId: staffId}
+                let session = {staffId: staffId}
                 Zone.current.fork({name: "getTravelPolicy",properties: { session: session}})
                     .run(async function() {
                         if (isNeedTraffic) {

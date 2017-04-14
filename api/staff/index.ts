@@ -75,7 +75,7 @@ class StaffModule{
         }
         staff = await staff.save();
 
-        let account = await Models.account.get(staff.id);
+        let account = await Models.account.get(staff.accountId);
 
         if(!account.coinAccount){
             //为员工设置资金账户
@@ -128,12 +128,19 @@ class StaffModule{
         if(!staff["travelPolicyId"]){
             staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
         }
-        let result = await staff.save();
-        
-        //设置默认部门
-        let defaultDepartment = await company.getDefaultDepartment();
-        let sd = StaffDepartment.create({staffId: staff.id, departmentId: defaultDepartment.id});
-        await sd.save();
+        await staff.save();
+
+        let departmentIds = params.departmentIds as string[];
+        if (departmentIds && departmentIds.length >= 1) {
+            let departments = await Promise.all(departmentIds.map( (id) => {
+                return Models.department.get(id)
+            }));
+            await staff.addDepartment(departments);
+        } else {
+            //设置默认部门
+            let defaultDepartment = await company.getDefaultDepartment();
+            await staff.addDepartment(defaultDepartment);
+        }
 
         await StaffModule.sendNoticeToAdmins({
             companyId:params.companyId,
@@ -141,8 +148,7 @@ class StaffModule{
             noticeTemplate:"qm_notify_admins_add_staff"
         });
 
-        let account = await Models.account.get(staff.id);
-
+        let account = await Models.account.get(staff.accountId);
         if(!account.coinAccount){
             //为员工设置资金账户
             let ca = CoinAccount.create();
@@ -150,8 +156,7 @@ class StaffModule{
             account.coinAccount = ca;
             await account.save();
         }
-
-        return result;
+        return staff;
     }
    static async  sendNoticeToAdmins(params:{companyId:string,name:string,noticeTemplate:string}):Promise<any>{
         let company = await Models.company.get(params.companyId);
@@ -247,8 +252,12 @@ class StaffModule{
         let id = params.id;
 
         await API.auth.checkEmailAndMobile({email: email});
-        var account = await API.auth.getPrivateInfo({id: id});
+        var staff = await Models.staff.get(id);
+        if (!staff) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
 
+        var account = await API.auth.getPrivateInfo({id: staff.accountId});
         if (!account) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
         }
@@ -258,7 +267,6 @@ class StaffModule{
             throw L.ERR.PWD_ERROR();
         }
 
-        var staff = await Models.staff.get(id);
         staff.isValidateEmail = false;
         staff.email = email;
         staff = await staff.save();
@@ -276,8 +284,11 @@ class StaffModule{
         let pwd = params.pwd;
         let newPwd = params.newPwd;
         let id = params.id;
-
-        var account = await API.auth.getPrivateInfo({id: id});;
+        var staff = await Models.staff.get(id);
+        if (!staff) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+        var account = await API.auth.getPrivateInfo({id: staff.accountId});;
 
         if (!account) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
@@ -289,7 +300,6 @@ class StaffModule{
         }
 
         newPwd = utils.md5(newPwd);
-        var staff = await Models.staff.get(id);
         staff.pwd = newPwd;
         staff = await staff.save();
         return staff;
@@ -307,7 +317,7 @@ class StaffModule{
         let pwd = params.pwd;
         let msgCode = params.msgCode;
         let msgTicket = params.msgTicket;
-        let selfAcc = await API.auth.getPrivateInfo({id: staff.id});
+        let selfAcc = await API.auth.getPrivateInfo({id: staff.accountId});
         if(staff.roleId != EStaffRole.OWNER){
             throw L.ERR.FORBIDDEN();
         }
@@ -442,7 +452,6 @@ class StaffModule{
         return getObj;
     }
 
-
     /**
      * 根据属性查找员工对象
      * @param params
@@ -458,7 +467,6 @@ class StaffModule{
     ])
     static async getStaffs(params: {where: any, order?: any, attributes?: any}) :Promise<FindResult>{
         let staff = await Staff.getCurrent();
-
         // params.where.staffStatus = {$ne: EStaffStatus.FORBIDDEN}
         params.where.staffStatus = EStaffStatus.ON_JOB;
         let { accountId } = Zone.current.get("session");
@@ -469,7 +477,7 @@ class StaffModule{
 
         if(staff){
             params.where.companyId = staff["companyId"];
-        }else{
+        } else {
             let result = await API.company.checkAgencyCompany({companyId: params.where.companyId,userId: accountId});
             if(!result){
                 throw L.ERR.PERMISSION_DENY();
@@ -1621,6 +1629,18 @@ class StaffModule{
     }
 
     /*************************************员工供应商网站信息end***************************************/
+
+    @clientExport
+    static async getCompanyStaff(params: {companyId: string}) {
+        let {companyId } = params;
+        let session = Zone.current.get("session");
+        let accountId = session["accountId"];
+        let pager = await Models.staff.find({where: {companyId: companyId, accountId: accountId}});
+        if (pager && pager.length) {
+            return pager[0];
+        }
+        return null;
+    }
 
 }
 

@@ -1507,22 +1507,20 @@ class TripPlanModule {
         let companyName=staff.company.name;
         let staffName=staff.name;
 
-         try{
-             await API.notify.notifyDesignatedAccount({
-                 mobile:"13810529805",
-                 email:"notice@jingli365.com",
-                 key:"qm_notify_invoice_audit_request",
-                 values:{
-                     company:companyName,
-                     staffName:staff.name
-                 }
-             });
-         }catch(err){
-             logger.info(err);
+        try{
+            await API.notify.submitNotify({
+             mobile: '13810529805',
+             email: 'notice@jingli365.com',
+             key: 'qm_notify_invoice_audit_request',
+             values:{
+                 company:companyName,
+                 staffName:staff.name
+             }
+            })
+        }catch(err){
+            logger.info(err);
         }
     }
-
-
 
     @clientExport
     @requireParams(['detailId', 'orderIds', 'supplierId'])
