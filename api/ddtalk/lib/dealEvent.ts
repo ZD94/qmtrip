@@ -42,6 +42,7 @@ let reg = new RegExp( config.name_reg );
 export function transpond(req , res , next){
     let url = config.test_url.replace(/\/$/g, "");
     url = url + "/ddtalk/isv/receive";
+    console.log("enter transpond");
     proxy.web(req , res , { target: url })
 }
 
@@ -54,12 +55,12 @@ export async function tmpAuthCode(msg , req , res , next) {
         return;
     }
     console.log('go');
-    let corp_name2 = "JLone"
+    /*let corp_name2 = "JLone"
     if(reg.test(corp_name2) && config.reg_go){
         //it's our test company.
         transpond( req , res , next );
         return { notReply: true };
-    }
+    }*/
 
 
     //暂时缓存，防止重复触发
@@ -75,11 +76,12 @@ export async function tmpAuthCode(msg , req , res , next) {
 
     /* ====== using for test ===== */
     if(reg.test(corp_name) && config.reg_go){
+        console.log("go transpond");
         //it's our test company.
         transpond( req , res , next );
         return { notReply: true };
     }
-
+    console.log("tmp_auth_code 正常逻辑");
     /* ============ End =========== */
 
     //test

@@ -95,7 +95,7 @@
     "secret": "pV--T2FZj-3QCjJzcQd5OnzDBAe6rRKRQGEmc8iVCvdtc2FUOS5icq1gVfkbqiTx",
     "appid": "2156",
     "test_url" : "http://t.jingli365.com",
-    "name_reg" : "JL",
+    "name_reg" : "^jl0418",
     "reg_go": true
   },
   "perDayRegisterEmail": ""
