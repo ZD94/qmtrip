@@ -38,7 +38,6 @@ let reg = new RegExp( config.name_reg );
 export function transpond(req , res , next){
     let url = config.test_url.replace(/\/$/g, "");
     url = url + "/ddtalk/isv/receive";
-    console.log("enter transpond");
     proxy(url)(req, res, next);
 }
 
@@ -47,17 +46,8 @@ export async function tmpAuthCode(msg , req , res , next) {
     const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
     let isExist = await cache.read(TMP_CODE_KEY);
     if (isExist) {
-        console.log("exist ?");
         return;
     }
-    console.log('go');
-    let corp_name2 = "jl0418test"
-    if(reg.test(corp_name2) && config.reg_go){
-        //it's our test company.
-        transpond( req , res , next );
-        return { notReply: true };
-    }
-
 
     //暂时缓存，防止重复触发
     await cache.write(TMP_CODE_KEY, true, 60 * 2);
@@ -72,7 +62,6 @@ export async function tmpAuthCode(msg , req , res , next) {
 
     /* ====== using for test ===== */
     if(reg.test(corp_name) && config.reg_go){
-        console.log("go transpond");
         //it's our test company.
         transpond( req , res , next );
         return { notReply: true };
