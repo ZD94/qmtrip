@@ -13,6 +13,7 @@ let promoCodeType = require('libs/promoCodeType');
 let scheduler = require('common/scheduler');
 let schedule = require("node-schedule");
 let _ = require("lodash");
+let config=require("config");
 import {requireParams, clientExport} from "common/api/helper";
 import {Models} from "_types";
 import {Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE} from '_types/company';
@@ -69,9 +70,12 @@ class CompanyModule {
         userName: string, pwd?: string, status?: number, remark?: string, description?: string, isValidateMobile?: boolean, promoCode?: string}): Promise<any>{
         let session = Zone.current.get('session');
         let pwd = params.pwd;
-        let agencyId = Agency.__defaultAgencyId;
+        let defaultAgency = await Models.agency.find({where:{email:config.default_agency.email}});//Agency.__defaultAgencyId;
+        let agencyId:any;
+        if(defaultAgency && defaultAgency.length==1){
+            agencyId=defaultAgency[0].id;
+        }
         let domain = ""; //企业域名
-
         if(params.email){
             domain = params.email.match(/.*\@(.*)/)[1];
         }
