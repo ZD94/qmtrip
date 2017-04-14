@@ -49,10 +49,18 @@ export function transpond(req , res , next){
 export async function tmpAuthCode(msg , req , res , next) {
     const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
     let isExist = await cache.read(TMP_CODE_KEY);
+    console.log(123 , isExist);
     if (isExist) {
         console.log("exist ?");
         return;
     }
+
+   /* let corp_name2 = "JLone"
+    if(reg.test(corp_name2) && config.reg_go){
+        //it's our test company.
+        transpond( req , res , next );
+        return { notReply: true };
+    }*/
 
 
     //暂时缓存，防止重复触发
