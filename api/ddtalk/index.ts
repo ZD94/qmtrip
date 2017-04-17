@@ -92,6 +92,11 @@ let ddTalkMsgHandle = {
 class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
+
+        app.get("/hello" , (req , res , next)=>{
+            console.log("enter hello");
+            return DealEvent.transpond(req , res , next);
+        });
         
         app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
             if(msg.CorpId){
