@@ -5,15 +5,14 @@
 var nodeXlsx = require("node-xlsx");
 var moment = require("moment");
 var crypto = require("crypto");
-var sequelize = require("common/model").DB;
-var DBM = sequelize.models;
-var config = require('../../config');
+import {DB} from "common/model"
+var config = require('@jingli/config');
 var fs = require('fs');
 var API = require("common/api");
 var validate = require("common/validate");
 
 import _ = require('lodash');
-import L from 'common/language';
+import L from '@jingli/language';
 import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {requireParams, clientExport} from 'common/api/helper';
@@ -76,7 +75,7 @@ class StaffModule{
         }
         staff = await staff.save();
 
-        let account = await Models.account.get(staff.id);
+        let account = await Models.account.get(staff.accountId);
 
         if(!account.coinAccount){
             //为员工设置资金账户
@@ -102,7 +101,6 @@ class StaffModule{
         }catch(e){
             console.info(e);
         }
-        staff.isValidateMobile = true;
         staff = await staff.save();
         return staff;
     }
@@ -130,7 +128,19 @@ class StaffModule{
         if(!staff["travelPolicyId"]){
             staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
         }
-        let result = await staff.save();
+        await staff.save();
+
+        let departmentIds = params.departmentIds as string[];
+        if (departmentIds && departmentIds.length >= 1) {
+            let departments = await Promise.all(departmentIds.map( (id) => {
+                return Models.department.get(id)
+            }));
+            await staff.addDepartment(departments);
+        } else {
+            //设置默认部门
+            let defaultDepartment = await company.getDefaultDepartment();
+            await staff.addDepartment(defaultDepartment);
+        }
 
         await StaffModule.sendNoticeToAdmins({
             companyId:params.companyId,
@@ -138,10 +148,7 @@ class StaffModule{
             noticeTemplate:"qm_notify_admins_add_staff"
         });
 
-        await result.saveStaffDepartments(params.departmentIds);
-
-        let account = await Models.account.get(staff.id);
-
+        let account = await Models.account.get(staff.accountId);
         if(!account.coinAccount){
             //为员工设置资金账户
             let ca = CoinAccount.create();
@@ -149,8 +156,7 @@ class StaffModule{
             account.coinAccount = ca;
             await account.save();
         }
-
-        return result;
+        return staff;
     }
    static async  sendNoticeToAdmins(params:{companyId:string,name:string,noticeTemplate:string}):Promise<any>{
         let company = await Models.company.get(params.companyId);
@@ -246,8 +252,12 @@ class StaffModule{
         let id = params.id;
 
         await API.auth.checkEmailAndMobile({email: email});
-        var account = await API.auth.getPrivateInfo({id: id});
+        var staff = await Models.staff.get(id);
+        if (!staff) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
 
+        var account = await API.auth.getPrivateInfo({id: staff.accountId});
         if (!account) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
         }
@@ -257,7 +267,6 @@ class StaffModule{
             throw L.ERR.PWD_ERROR();
         }
 
-        var staff = await Models.staff.get(id);
         staff.isValidateEmail = false;
         staff.email = email;
         staff = await staff.save();
@@ -275,8 +284,11 @@ class StaffModule{
         let pwd = params.pwd;
         let newPwd = params.newPwd;
         let id = params.id;
-
-        var account = await API.auth.getPrivateInfo({id: id});;
+        var staff = await Models.staff.get(id);
+        if (!staff) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+        var account = await API.auth.getPrivateInfo({id: staff.accountId});;
 
         if (!account) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
@@ -288,7 +300,6 @@ class StaffModule{
         }
 
         newPwd = utils.md5(newPwd);
-        var staff = await Models.staff.get(id);
         staff.pwd = newPwd;
         staff = await staff.save();
         return staff;
@@ -306,7 +317,7 @@ class StaffModule{
         let pwd = params.pwd;
         let msgCode = params.msgCode;
         let msgTicket = params.msgTicket;
-        let selfAcc = await API.auth.getPrivateInfo({id: staff.id});
+        let selfAcc = await API.auth.getPrivateInfo({id: staff.accountId});
         if(staff.roleId != EStaffRole.OWNER){
             throw L.ERR.FORBIDDEN();
         }
@@ -441,7 +452,6 @@ class StaffModule{
         return getObj;
     }
 
-
     /**
      * 根据属性查找员工对象
      * @param params
@@ -457,7 +467,6 @@ class StaffModule{
     ])
     static async getStaffs(params: {where: any, order?: any, attributes?: any}) :Promise<FindResult>{
         let staff = await Staff.getCurrent();
-
         // params.where.staffStatus = {$ne: EStaffStatus.FORBIDDEN}
         params.where.staffStatus = EStaffStatus.ON_JOB;
         let { accountId } = Zone.current.get("session");
@@ -468,7 +477,7 @@ class StaffModule{
 
         if(staff){
             params.where.companyId = staff["companyId"];
-        }else{
+        } else {
             let result = await API.company.checkAgencyCompany({companyId: params.where.companyId,userId: accountId});
             if(!result){
                 throw L.ERR.PERMISSION_DENY();
@@ -517,13 +526,13 @@ class StaffModule{
         }
         for(let k=0;k<departments.length;k++){
             let dep = departments[k];
-            departmentMaps[dep.name] = dep.id;
+            departmentMaps[dep.name] = dep;
         }
         let data = xlsObj[1].data;
 
         let items = await Promise.all(data.map(async function(item, index){
             let s = data[index];
-            let departmentIds = [];
+            let departments = [];
             let departmentPass = true;
             let staffObj: any = {name: s[0], mobile: s[1]+"", email: s[2]||'',sex: s[3]?((s[3] == '女') ? EGender.FEMALE : EGender.MALE) : null,
                 roleId: s[4] == '管理员' ? EStaffRole.ADMIN : EStaffRole.COMMON, travelPolicyId: travelPolicyMaps[s[5]]||'', companyId: companyId,
@@ -618,14 +627,14 @@ class StaffModule{
 
                                     if(j == (dd.length - 1)){
                                         let lost_d = next_d[0];
-                                        departmentIds.push(next_d[0].id);
+                                        departments.push(next_d[0]);
                                     }
 
                                 }
                             }
                         }else{
                             if(departmentMaps[_d]){
-                                departmentIds.push(departmentMaps[_d]);
+                                departments.push(departmentMaps[_d]);
                             }else{
                                 staffObj.reason = _d + "部门不存在";
                                 s[7] = _d + "部门不存在";
@@ -641,9 +650,9 @@ class StaffModule{
                         return;
                     }
                 }else{
-                    departmentIds.push(defaultDept.id);
+                    departments.push(defaultDept);
                 }
-                staffObj.departmentIds = departmentIds;
+                staffObj.departments = departments;
                 let staff1 = await API.auth.checkAccExist({where: {email: staffObj.email, type: 1}});
                 let staff2 = await API.auth.checkAccExist({where: {mobile: staffObj.mobile, type: 1}});
                 if(staff1 && staffObj.email && staffObj.email != ""){
@@ -702,7 +711,7 @@ class StaffModule{
 
 
         await Promise.all(addObj.map(async function(item, index){
-            let deptIds = item.departmentIds;
+            let depts = item.departments;
             let staffObj: any = {name: item.name, mobile: item.mobile+"", email: item.email, sex: item.sex, roleId: item.roleId,
                 travelPolicyId: item.travelPolicyId, companyId: item.companyId, addWay: EAddWay.BATCH_IMPORT, isNeedChangePwd: true, };
             if(_.trim(staffObj.mobile) == ""){
@@ -712,7 +721,7 @@ class StaffModule{
                 staffObj.email = null;
             }
             let staffAdded = await StaffModule.createStaff(staffObj);
-            await staffAdded.saveStaffDepartments(deptIds);
+            await staffAdded.addDepartment(depts);
 
         }));
         
@@ -759,7 +768,7 @@ class StaffModule{
     static findOneStaff(params){
         var options: any = {};
         options.where = params;
-        return DBM.Staff.findOne(options)
+        return DB.models.Staff.findOne(options)
             .then(function(data){
                 return new Staff(data);
             })
@@ -772,7 +781,7 @@ class StaffModule{
     @clientExport
     @requireParams(["departmentId"])
     static getCountByDepartment(params: {departmentId: string}){
-        return DBM.Staff.count({where: {departmentId: params.departmentId, staffStatus: {$gte: EStaffStatus.ON_JOB}}})
+        return DB.models.Staff.count({where: {departmentId: params.departmentId, staffStatus: {$gte: EStaffStatus.ON_JOB}}})
     }
 
     /**
@@ -787,7 +796,7 @@ class StaffModule{
         var id = params.id;
         var operatorId = params.accountId;
         var increasePoint = params.increasePoint;
-        return DBM.Staff.findById(id)
+        return DB.models.Staff.findById(id)
             .then(function(obj) {
                 var totalPoints = obj.totalPoints + increasePoint;
                 var balancePoints = obj.balancePoints + increasePoint;
@@ -796,10 +805,10 @@ class StaffModule{
                     pointChange.orderId = params.orderId;
                 }
                 pointChange.companyId = params.companyId;
-                return sequelize.transaction(function(t) {
+                return DB.transaction(function(t) {
                     return Promise.all([
-                        DBM.Staff.update({totalPoints: totalPoints, balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
-                        DBM.PointChange.create(pointChange, {transaction: t})
+                        DB.models.Staff.update({totalPoints: totalPoints, balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
+                        DB.models.PointChange.create(pointChange, {transaction: t})
                     ]);
                 });
             })
@@ -820,7 +829,7 @@ class StaffModule{
         var id = params.id;
         var decreasePoint = params.decreasePoint;
         var operatorId = params.accountId;
-        return DBM.Staff.findById(id)
+        return DB.models.Staff.findById(id)
             .then(function(obj) {
                 if(obj.balancePoints < decreasePoint){
                     throw {code: -3, msg: "积分不足"};
@@ -828,10 +837,10 @@ class StaffModule{
                 var balancePoints = obj.balancePoints - decreasePoint;
                 var pointChange = { staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分",
                     operatorId: operatorId, currentPoint: balancePoints, companyId: params.companyId};//此处也应该用model里的属性名封装obj
-                return sequelize.transaction(function(t) {
+                return DB.transaction(function(t) {
                     return Promise.all([
-                        DBM.Staff.update({balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
-                        DBM.PointChange.create(pointChange, {transaction: t})
+                        DB.models.Staff.update({balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
+                        DB.models.PointChange.create(pointChange, {transaction: t})
                     ]);
                 });
             })
@@ -869,21 +878,21 @@ class StaffModule{
     @clientExport
     @requireParams(["where.staffId"], ["where.companyId","where.orderId", "where.status", "attributes"])
     @conditionDecorator([
-        {if: condition.isSameCompany("where.staffId")},
-        {if: condition.isStaffsAgency("where.staffId")}
+        {if: condition.isSameCompany("0.where.staffId")},
+        {if: condition.isStaffsAgency("0.where.staffId")}
     ])
     static async getPointChanges(params) :Promise<FindResult>{
         let { accountId } = Zone.current.get("session");
-        params.where = _.pick(params.where, Object.keys(DBM.PointChange.attributes));
+        params.where = _.pick(params.where, Object.keys(DB.models.PointChange['attributes']));
         let role = await API.auth.judgeRoleById({id:accountId});
 
         let rows, count, ret;
         if(role == EAccountType.STAFF){
-            ret = DBM.PointChange.findAndCount(params);
+            ret = DB.models.PointChange.findAndCount(params);
         } else {
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
             if(result){
-                ret = DBM.PointChange.findAndCount(params);
+                ret = DB.models.PointChange.findAndCount(params);
             } else {
                 throw L.ERR.PERMISSION_DENY;
             }
@@ -933,7 +942,7 @@ class StaffModule{
         options.limit = limit;
         options.offset = offset;
         options.where = params;
-        return DBM.PointChange.findAndCountAll(options)
+        return DB.models.PointChange.findAndCountAll(options)
             .then(function(result){
                 return new Paginate(page, perPage, result.count, result.rows);
             });
@@ -970,10 +979,10 @@ class StaffModule{
             q3.createdAt = {$lte: end_time};
             q4.createdAt = {$lte: end_time};
             return Promise.all([
-                    DBM.PointChange.sum('points', {where: q1}),
-                    DBM.PointChange.sum('points', {where: q2}),
-                    DBM.PointChange.sum('points', {where: q3}),
-                    DBM.PointChange.sum('points', {where: q4})
+                    DB.models.PointChange.sum('points', {where: q1}),
+                    DB.models.PointChange.sum('points', {where: q2}),
+                    DB.models.PointChange.sum('points', {where: q3}),
+                    DB.models.PointChange.sum('points', {where: q4})
                 ])
                 .spread(function(a, b, c, d){
                     a = a || 0;
@@ -1001,7 +1010,7 @@ class StaffModule{
     @clientExport
     static async getStaffPointsChangeByMonth(params) {
         let { accountId } = Zone.current.get("session");
-        return DBM.Staff.findById(accountId)
+        return DB.models.Staff.findById(accountId)
             .then(function(staff){
                 return staff["companyId"];
             })
@@ -1035,7 +1044,7 @@ class StaffModule{
         var changeDate = [];
         var changePoint = [];
         options.where = {staffId: staffId, createdAt: {$gte: startTime, $lte: endTime}};
-        return DBM.PointChange.findAll(options)
+        return DB.models.PointChange.findAll(options)
             .then(function(result){
                 if(result && result.length > 0){
                     for(var i=0;i<result.length;i++){
@@ -1057,7 +1066,7 @@ class StaffModule{
      */
     @requireParams(['staffId','companyId'])
     static isStaffInCompany (params:{staffId: string, companyId:string}){
-        return DBM.Staff.findById(params.staffId, {attributes: ['companyId']})
+        return DB.models.Staff.findById(params.staffId, {attributes: ['companyId']})
             .then(function(staff){
                 if(!staff){
                     throw {code: 1, msg: '没有找到该员工'};
@@ -1080,9 +1089,9 @@ class StaffModule{
         var start = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
         var end = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
         return Promise.all([
-                DBM.Staff.count({where: {companyId: companyId, staffStatus: {$gte: 0}}}),
-                DBM.Staff.count({where: {companyId: companyId, createdAt: {$gte: start, $lte: end}}}),
-                DBM.Staff.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, staffStatus: {$lt: 0} }})
+                DB.models.Staff.count({where: {companyId: companyId, staffStatus: {$gte: 0}}}),
+                DB.models.Staff.count({where: {companyId: companyId, createdAt: {$gte: start, $lte: end}}}),
+                DB.models.Staff.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, staffStatus: {$lt: 0} }})
             ])
             .spread(function(all, inNum, outNum){
                 var sta = {
@@ -1148,7 +1157,7 @@ class StaffModule{
                     where.$or = [{departmentId: params.departmentId},["department_id is null"]];
                     delete where.departmentId;
                 }
-                return DBM.Staff.findAll({where: where})
+                return DB.models.Staff.findAll({where: where})
                     .then(function(staffs){
                         if(staffs && staffs.length>0){
                             totalCount = staffs.length;
@@ -1222,7 +1231,7 @@ class StaffModule{
             let staff = await Models.staff.get(user_id);
             if(staff){
                 companyId = staff["companyId"];
-                return DBM.Staff.count({where: {companyId: companyId, staffStatus:{$ne: EStaffStatus.DELETE}}})
+                return DB.models.Staff.count({where: {companyId: companyId, staffStatus:{$ne: EStaffStatus.DELETE}}})
                     .then(function(all){
                         return all || 1;
                     });
@@ -1232,7 +1241,7 @@ class StaffModule{
         }else{
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
             if(result){
-                return DBM.Staff.count({where: {companyId: companyId, staffStatus:{$ne: EStaffStatus.DELETE}}})
+                return DB.models.Staff.count({where: {companyId: companyId, staffStatus:{$ne: EStaffStatus.DELETE}}})
                     .then(function(all){
                         return all || 1;
                     });
@@ -1250,7 +1259,7 @@ class StaffModule{
      */
     @requireParams(['company'])
     static deleteAllStaffs(params: {company: string}){
-        return DBM.Staff.destroy({where: {companyId: params.company}})
+        return DB.models.Staff.destroy({where: {companyId: params.company}})
             .then(function(){
                 return true;
             })
@@ -1265,7 +1274,7 @@ class StaffModule{
     static getInvoiceViewer (params: {accountId: string}){
         var viewerId = [];
         var id = params.accountId;
-        return DBM.Staff.findById(id)
+        return DB.models.Staff.findById(id)
             .then(function(obj){
                 if(obj && obj.company.id){
                     return API.company.getCompany({id: obj.company.id})
@@ -1298,8 +1307,8 @@ class StaffModule{
     static statStaffByPoints(params: {companyId: string}){
         var query = params;
         return Promise.all([
-                DBM.Staff.sum('total_points', {where: query}),
-                DBM.Staff.sum('balance_points', {where: query})
+                DB.models.Staff.sum('total_points', {where: query}),
+                DB.models.Staff.sum('balance_points', {where: query})
             ])
             .spread(function(all, balance){
                 return {
@@ -1339,7 +1348,7 @@ class StaffModule{
 
         return Promise.all([
                 API.auth.removeByTest({email: email, mobile: mobile, type: 1}),
-                DBM.Staff.destroy({where: params})
+                DB.models.Staff.destroy({where: params})
             ])
             .spread(function(){
                 return true;
@@ -1360,10 +1369,10 @@ class StaffModule{
         let { accountId } = Zone.current.get("session");
         params.ownerId = accountId;
         //查询该用户该类型证件信息是否已经存在 不存在添加 存在则修改
-        return DBM.Credential.findOne({where: {type: params.type, ownerId: params.ownerId}})
+        return DB.models.Credential.findOne({where: {type: params.type, ownerId: params.ownerId}})
             .then(function(result){
                 if(!result) {
-                    return DBM.Credential.create(params);
+                    return DB.models.Credential.create(params);
                 }
                 return result.update(params);
             })
@@ -1382,7 +1391,7 @@ class StaffModule{
     static deletePapers(params): Promise<any>{
         let { accountId } = Zone.current.get("session")
         params.ownerId = accountId;
-        return DBM.Credential.destroy({where: params})
+        return DB.models.Credential.destroy({where: params})
             .then(function(obj){
                 return true;
             });
@@ -1408,7 +1417,7 @@ class StaffModule{
         var options: any = {};
         options.where = {id: id};
         options.returning = true;
-        return DBM.Credential.update(params, options)
+        return <Promise<Credential>>DB.models.Credential.update(params, options)
             .spread(function(rownum, rows){
                 return new Credential(rows[0]);
             });
@@ -1425,7 +1434,7 @@ class StaffModule{
         var options: any = {};
         options.where = {id: params.id, ownerId: accountId};
         options.attributes = params.attributes? ['*'] :params.attributes;
-        return DBM.Credential.findOne(options)
+        return DB.models.Credential.findOne(options)
             .then(function(data){
                 return new Credential(data);
             })
@@ -1447,7 +1456,7 @@ class StaffModule{
         if (!options.attributes) {
             options.attributes = ['*'];
         }
-        return DBM.Credential.findOne(options)
+        return DB.models.Credential.findOne(options)
             .then(function(result){
                 return new Credential(result);
             })
@@ -1465,7 +1474,7 @@ class StaffModule{
         var options: any = {};
         options.where = {ownerId: accountId};
         options.attributes = params.attributes? ['*'] :params.attributes;
-        return DBM.Credential.findAll(options);
+        return DB.models.Credential.findAll(options);
     }
     /***********************证件信息end***********************/
 
@@ -1620,6 +1629,18 @@ class StaffModule{
     }
 
     /*************************************员工供应商网站信息end***************************************/
+
+    @clientExport
+    static async getCompanyStaff(params: {companyId: string}) {
+        let {companyId } = params;
+        let session = Zone.current.get("session");
+        let accountId = session["accountId"];
+        let pager = await Models.staff.find({where: {companyId: companyId, accountId: accountId}});
+        if (pager && pager.length) {
+            return pager[0];
+        }
+        return null;
+    }
 
 }
 

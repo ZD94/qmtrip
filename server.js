@@ -5,21 +5,21 @@
 //可以直接require服务器根目录下的模块
 require('app-module-path').addPath(__dirname);
 require('common/node_ts').install();
-
+var initData = require('libs/initTestData');
 
 
 Error.stackTraceLimit = 40;
 var zone = require('common/zone');
 
 //服务器启动性能日志
-//var perf = require('common/perf');
+//var perf = require('@jingli/perf');
 //perf.init('init');
 
 global.Promise = require('bluebird');
 Promise.promisifyAll(require("redis"));
 Promise.promisifyAll(require("fs"));
 
-var config = require("./config");
+var config = require("@jingli/config");
 
 require("common/redis-client").init(config.redis.url);
 
@@ -30,7 +30,7 @@ if(config.debug) {
 
 var path = require('path');
 
-var Logger = require('common/logger');
+var Logger = require('@jingli/logger');
 Logger.init(config.logger);
 var logger = new Logger('main');
 
@@ -60,9 +60,12 @@ server.api_path = path.join(__dirname, 'api');
 server.api_port = config.apiPort;
 server.api_config = config.api;
 
-
+var cluster = require('cluster');
 server.on('init.api', function(API){
     API.registerAuthWeb(API.auth.authentication);
+    if(cluster.isMaster && config.is_init_test_company){
+        initData.initDataForTest({name: '笑傲江湖', userName: '风清扬', mobile: '13700000001', pwd: '123456', email: 'fq.yang@jingli.tech'});
+    }
 });
 
 server.on('init.http', function(server){
@@ -89,7 +92,7 @@ server.on('init.http', function(server){
 });
 
 zone.forkStackTrace().run(function(){
-    server.start();
+    server.start()
 });
 
 process.on('unhandledRejection', (reason, p) => {

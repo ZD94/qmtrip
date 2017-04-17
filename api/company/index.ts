@@ -1,12 +1,12 @@
 /**
  * Created by yumiao on 15-12-9.
  */
-var sequelize = require("common/model").DB;
-var DBM = sequelize.models;
-import L from 'common/language';
-let C = require("config");
+
+import {DB} from "common/model";
+import L from '@jingli/language';
+let C = require("@jingli/config");
 let API = require("common/api");
-let Logger = require('common/logger');
+import Logger from '@jingli/logger';
 let logger = new Logger('company');
 let moment = require('moment');
 let promoCodeType = require('libs/promoCodeType');
@@ -124,8 +124,8 @@ class CompanyModule {
         //为创建人设置资金账户
         let ca_staff = CoinAccount.create();
         await ca_staff.save();
-        let account = await Models.account.get(staff.id);
-        account.coinAccount = ca;
+        let account = await Models.account.get(staff.accountId);
+        account.coinAccount = ca_staff;
         await account.save();
 
         return {company: company, description: promoCode ? promoCode.description : ""};
@@ -217,16 +217,16 @@ class CompanyModule {
      * @param params.companyId 企业id
      */
     @requireParams(['companyId','userId'])
-    static async checkAgencyCompany(params){
+    static async checkAgencyCompany(params) :Promise<boolean> {
         var c = await Models.company.get(params.companyId);
         var user = await Models.agencyUser.get(params.userId);
 
         if(!c || c.status == -2){
-            throw L.ERR.COMPANY_NOT_EXIST();
+            return false;
         }
 
         if(c['agencyId'] != user.agency.id || (user.roleId != EAgencyUserRole.OWNER && user.roleId != EAgencyUserRole.ADMIN)) {
-            throw L.ERR.PERMISSION_DENY();
+            return false;
         }
 
         return true;
@@ -358,7 +358,7 @@ class CompanyModule {
     @requireParams(['domain'])
     static async isBlackDomain(params: {domain: string}) {
         //var domain = params.domain.toLowerCase();
-        // let black = await DBM.BlackDomain.findAll({where: params});
+        // let black = await DB.models.BlackDomain.findAll({where: params});
         // if(black && black.length > 0) {
         //     return true;
         // }
@@ -373,14 +373,14 @@ class CompanyModule {
     static deleteCompanyByTest(params){
         var mobile = params.mobile;
         var email = params.email;
-        return DBM.Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
+        return DB.models.Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
             .then(function(companys){
                 return companys.map(function(c){
                     return true;
                 })
             })
             .then(function(){
-                return DBM.Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
+                return DB.models.Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
             })
             .then(function(){
                 return true;
@@ -521,6 +521,17 @@ class CompanyModule {
             return t.id;
         })
         return {ids: ids, count: paginate['total']};
+    }
+
+    @clientExport
+    static async getSelfCompanies(params): Promise<Company[]> {
+        let session = Zone.current.get("session");
+        let accountId = session["accountId"]
+        let staffs = await Models.staff.all({where: {accountId: accountId}});
+        let companies = staffs.map( (staff) => {
+            return staff.company;
+        })
+        return companies;
     }
 
     /*************************************企业行程点数变更日志end***************************************/

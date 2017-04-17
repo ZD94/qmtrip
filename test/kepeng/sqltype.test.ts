@@ -16,7 +16,7 @@ var config = {
     "remotes": []
 };
 
-var Logger = require('common/logger');
+import Logger from '@jingli/logger';
 var logger = new Logger('test');
 
 var model = require('common/model');
