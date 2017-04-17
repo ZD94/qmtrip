@@ -38,6 +38,9 @@ let reg = new RegExp( config.name_reg );
 export function transpond(req , res , next){
     let url = config.test_url.replace(/\/$/g, "");
     url = url + "/ddtalk/isv/receive";
+
+    url = "http://hxs.jingli.tech:4002/hello";
+
     proxy(url)(req, res, next);
 }
 
