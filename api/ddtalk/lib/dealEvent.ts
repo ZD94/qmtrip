@@ -35,9 +35,12 @@ let reg = new RegExp( config.name_reg );
 
 
 /* transpond */
-export function transpond(req , res , next){
+export function transpond(req , res , next, urls){
     let url = config.test_url.replace(/\/$/g, "");
     url = url + "/ddtalk/isv/receive";
+    if(urls){
+        url = urls;
+    }
 
     proxy(url)(req, res, next);
 }

@@ -17,8 +17,6 @@ import {Models} from "_types/index";
 import {clientExport} from "common/api/helper";
 import {get_msg} from "./lib/msg-template/index";
 
-const proxy = require("express-http-proxy");
-
 import * as DealEvent from "./lib/dealEvent";
 
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
@@ -97,11 +95,11 @@ class DDTalk {
 
         app.get("/JLTesthello" , (req , res , next)=>{
             console.log("enter hello");
-            return DealEvent.transpond(req , res , next);
+            return DealEvent.transpond(req , res , next, "http://t.jingli365.com/JLTesthello");
         });
         app.get("/JLTesthello2" , (req, res, next)=>{
             let url = "http://hxs.jingli.tech:4002/hello";
-            proxy(url)(req, res, next);
+            return DealEvent.transpond(req , res , next, url);
         });
         
         app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
