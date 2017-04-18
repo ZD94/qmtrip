@@ -2,7 +2,7 @@ import { showPreviewDialog } from './preview-dialog';
 
 import * as path from 'path';
 
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 
 export function wechatUploaderController($scope, $element, $loading, ngModalDlg, wxApi) {
     var config = require('@jingli/config');

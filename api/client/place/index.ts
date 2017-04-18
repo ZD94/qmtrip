@@ -3,7 +3,7 @@
  */
 "use strict";
 
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 
 import {Place, AirCompany, Airport} from '_types/place';
 import {FindResult} from "common/model/interface";

@@ -36,9 +36,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var path = require("path");
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 function wechatUploaderController($scope, $element, $loading, ngModalDlg, wxApi) {
-    var config = require('config');
+    var config = require('@jingli/config');
     $element.click(function () {
         return __awaiter(this, void 0, void 0, function () {
             var localIds, serverIds, _i, localIds_1, id, serverId, files, urls, e_1;

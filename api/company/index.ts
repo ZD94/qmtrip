@@ -1,11 +1,10 @@
 /**
  * Created by yumiao on 15-12-9.
  */
-
-import {DB} from "common/model";
+import {DB} from '@jingli/database';
 import L from '@jingli/language';
 let C = require("@jingli/config");
-let API = require("common/api");
+let API = require("@jingli/dnode-api");
 import Logger from '@jingli/logger';
 let logger = new Logger('company');
 let moment = require('moment');
@@ -13,7 +12,7 @@ let promoCodeType = require('libs/promoCodeType');
 let scheduler = require('common/scheduler');
 let schedule = require("node-schedule");
 let _ = require("lodash");
-import {requireParams, clientExport} from "common/api/helper";
+import {requireParams, clientExport} from "@jingli/dnode-api/dist/src/helper";
 import {Models} from "_types";
 import {Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE} from '_types/company';
 import {Staff, EStaffRole} from "_types/staff";
@@ -373,21 +372,11 @@ class CompanyModule {
      * @param params
      * @returns {*}
      */
-    static deleteCompanyByTest(params){
+    static async deleteCompanyByTest(params){
         var mobile = params.mobile;
         var email = params.email;
-        return DB.models.Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
-            .then(function(companys){
-                return companys.map(function(c){
-                    return true;
-                })
-            })
-            .then(function(){
-                return DB.models.Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
-            })
-            .then(function(){
-                return true;
-            })
+        await DB.models.Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
+        return true;
     }
 
     /*************************************供应商begin***************************************/
