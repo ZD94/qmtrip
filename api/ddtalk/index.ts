@@ -17,6 +17,8 @@ import {Models} from "_types/index";
 import {clientExport} from "common/api/helper";
 import {get_msg} from "./lib/msg-template/index";
 
+const proxy = require("express-http-proxy");
+
 import * as DealEvent from "./lib/dealEvent";
 
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
@@ -93,9 +95,13 @@ class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
 
-        app.get("/hello" , (req , res , next)=>{
+        app.get("/JLTesthello" , (req , res , next)=>{
             console.log("enter hello");
             return DealEvent.transpond(req , res , next);
+        });
+        app.get("/JLTesthello2" , (req, res, next)=>{
+            let url = "http://hxs.jingli.tech:4002/hello";
+            proxy(url)(req, res, next);
         });
         
         app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
@@ -187,6 +193,7 @@ class DDTalk {
 
     @clientExport
     static async loginByDdTalkCode(params) : Promise<any> {
+        console.log("enter In loginByDdTalkCode" , params);
         let {corpid, code} = params;
         let corps = await Models.ddtalkCorp.find({ where: {corpId: corpid}, limit: 1});
         if (corps && corps.length) {
