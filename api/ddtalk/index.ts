@@ -4,7 +4,7 @@
 
 'use strict';
 
-const API = require('common/api');
+const API = require('@jingli/dnode-api');
 let dingSuiteCallback = require("dingtalk_suite_callback");
 import fs = require("fs");
 import cache from "common/cache";
@@ -14,7 +14,7 @@ const config = C.ddconfig;
 import request = require('request');
 import ISVApi from "./lib/isvApi";
 import {Models} from "_types/index";
-import {clientExport} from "common/api/helper";
+import {clientExport} from "@jingli/dnode-api/dist/src/helper";
 import {get_msg} from "./lib/msg-template/index";
 
 import * as DealEvent from "./lib/dealEvent";

@@ -8,14 +8,14 @@ var crypto = require("crypto");
 import {DB} from '@jingli/database';
 var config = require('@jingli/config');
 var fs = require('fs');
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 var validate = require("common/validate");
 
 import _ = require('lodash');
 import L from '@jingli/language';
 import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
-import {requireParams, clientExport} from 'common/api/helper';
+import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo, EAddWay } from "_types/staff";
 import { Notice } from "_types/notice";
 import { EAgencyUserRole, AgencyUser } from "_types/agency";

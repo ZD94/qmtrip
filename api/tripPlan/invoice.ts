@@ -5,7 +5,7 @@
 import { Models, EAccountType } from '_types/index';
 import { EStaffRole } from '_types/staff';
 import { parseAuthString } from '_types/auth/auth-cert';
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 import Logger from '@jingli/logger';
 let logger = new Logger("tripPlan.invoice");
 

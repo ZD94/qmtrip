@@ -2,7 +2,7 @@
  * Created by yumiao on 15-12-12.
  */
 
-let API = require("common/api");
+let API = require("@jingli/dnode-api");
 import L from '@jingli/language';
 import config = require("@jingli/config");
 import moment = require("moment");

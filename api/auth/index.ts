@@ -2,7 +2,7 @@
  * @module auth
  */
 "use strict";
-import { requireParams, clientExport } from "../../common/api/helper";
+import { requireParams, clientExport } from "@jingli/dnode-api/dist/src/helper";
 import { Models, EAccountType } from "_types";
 import { Account, ACCOUNT_STATUS } from "_types/auth";
 import { Staff, EInvitedLinkStatus, EAddWay } from "_types/staff";
@@ -19,7 +19,7 @@ import {condition, conditionDecorator} from "../_decorator";
 var uuid = require("node-uuid");
 import C = require("@jingli/config");
 var moment = require("moment");
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 var utils = require("common/utils");
 var accountCols = Account['$fieldnames'];
 

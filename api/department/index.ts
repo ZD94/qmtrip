@@ -4,10 +4,10 @@
 'use strict';
 var _ = require("lodash");
 import {DB} from '@jingli/database';
-let API = require("common/api");
+let API = require("@jingli/dnode-api");
 import L from '@jingli/language';
 import {Department, StaffDepartment} from "_types/department";
-import {requireParams, clientExport} from 'common/api/helper';
+import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import { Models } from '_types/index';
 import { FindResult, PaginateInterface } from "common/model/interface";
 import {Staff, EStaffStatus} from "_types/staff";

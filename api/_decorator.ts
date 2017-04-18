@@ -5,7 +5,7 @@ import {EAccountType} from "_types";
 /**
  * Created by wlh on 16/5/16.
  */
-const API = require("common/api");
+const API = require("@jingli/dnode-api");
 const _ = require("lodash");
 import L from '@jingli/language';
 const Models = require("_types").Models;

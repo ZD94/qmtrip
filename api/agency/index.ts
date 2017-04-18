@@ -3,10 +3,10 @@
  */
 "use strict";
 import {DB} from '@jingli/database';
-let API = require("common/api");
+let API = require("@jingli/dnode-api");
 import L from '@jingli/language';
 import Logger from '@jingli/logger';
-import {requireParams, clientExport} from 'common/api/helper';
+import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {Agency, AgencyUser, EAgencyStatus, EAgencyUserRole} from "_types/agency";
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "../_decorator";
 import { Models, EGender, EAccountType } from '_types/index';

@@ -6,7 +6,7 @@ import {DB} from '@jingli/database';
 var _ = require('lodash');
 import {Paginate} from 'common/paginate';
 import L from '@jingli/language';
-import {requireParams, clientExport} from 'common/api/helper';
+import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {conditionDecorator, condition} from "../_decorator";
 import {Staff, EStaffStatus} from "_types/staff";
 import { TravelPolicy, SubsidyTemplate } from '_types/travelPolicy';

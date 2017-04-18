@@ -40,7 +40,7 @@ cache.init({redis_conf: config.redis.url, prefix: 'times:cache'});
 var database = require('@jingli/database');
 database.init(config.postgres.url);
 
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 
 var Server = require('common/server');
 var server = new Server(config.appName, config.pid_file);
