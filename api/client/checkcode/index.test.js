@@ -4,7 +4,7 @@
 /**
  * Created by wlh on 15/12/28.
  */
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 var assert = require("assert");
 
 describe("api/checkcode/index.js", function() {

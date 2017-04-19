@@ -3,11 +3,11 @@
  */
 'use strict';
 var _ = require("lodash");
-import {DB} from "common/model";
-let API = require("common/api");
+import {DB} from '@jingli/database';
+let API = require("@jingli/dnode-api");
 import L from '@jingli/language';
 import {Department, StaffDepartment} from "_types/department";
-import {requireParams, clientExport} from 'common/api/helper';
+import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import { Models } from '_types/index';
 import { FindResult, PaginateInterface } from "common/model/interface";
 import {Staff, EStaffStatus} from "_types/staff";
@@ -209,16 +209,14 @@ class DepartmentModule{
         {if: condition.isDepartmentAdminOrOwner("0.parentId")},
         {if: condition.isDepartmentAgency("0.parentId")}
     ])
-    static getAllChildren(params: {parentId: string}){
+    static async getAllChildren(params: {parentId: string}){
         var sql = "with RECURSIVE cte as " +
             "( select a.id,a.name,a.parent_id from department.departments a where id='"+params.parentId+"' " +
             "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id " +
             "where k.deleted_at is null) " +
             "select * from cte";
-        return DB.query(sql)
-            .spread(function(children, row){
-                return children;
-            })
+        let [children, row] = await DB.query(sql);
+        return children;
     }
 
     @requireParams(["parentId"])
@@ -253,12 +251,10 @@ class DepartmentModule{
             "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id " +
             "where k.deleted_at is null) " +
             "select * from cte";
-        return <Promise<string[]>>DB.query(sql)
-            .spread(function(children, row){
-                for(var i=0;i<children.length;i++)
-                    ids.push(children[i].id);
-                return ids;
-            })
+        let [children, row] = await DB.query(sql);
+        for(var i=0;i<children.length;i++)
+            ids.push(children[i].id);
+        return ids;
     }
 
     /**
@@ -348,11 +344,9 @@ class DepartmentModule{
         return staffs;
     }
 
-    static deleteDepartmentByTest(params){
-        return DB.models.Department.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
-            .then(function(){
-                return true;
-            })
+    static async deleteDepartmentByTest(params){
+        await DB.models.Department.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}});
+        return true;
     }
 
     /****************************************StaffDepartment begin************************************************/

@@ -22,6 +22,7 @@ require('./mocha-zone')(global);
 var config = require("../config");
 
 import Logger from '@jingli/logger';
+
 Logger.init({
     path: path.join(__dirname, "../log"),
     prefix: "mocha_",
@@ -32,7 +33,7 @@ Logger.init({
 });
 var logger = new Logger('test');
 
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 
 var model = require('common/model');
 model.init(config.postgres.url_test);

@@ -3,7 +3,7 @@
  */
 
 let moment = require("moment");
-import {DB} from "common/model";
+import {DB} from '@jingli/database';
 import Logger from '@jingli/logger';
 let logger = new Logger("seeds");
 let typeString = ['TripPlanNo', 'AgencyNo', 'CompanyNo', 'CoinAccountNo'];

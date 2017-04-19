@@ -37,10 +37,10 @@ var logger = new Logger('main');
 var cache = require("common/cache");
 cache.init({redis_conf: config.redis.url, prefix: 'times:cache'});
 
-var model = require('common/model');
-model.init(config.postgres.url);
+var database = require('@jingli/database');
+database.init(config.postgres.url);
 
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 
 var Server = require('common/server');
 var server = new Server(config.appName, config.pid_file);
@@ -64,7 +64,7 @@ var cluster = require('cluster');
 server.on('init.api', function(API){
     API.registerAuthWeb(API.auth.authentication);
     if(cluster.isMaster && config.is_init_test_company){
-        initData.initDataForTest({name: '笑傲江湖', userName: '风清扬', mobile: '13700000001', pwd: '123456', email: 'fq.yang@xajh.com'});
+        initData.initDataForTest({name: '笑傲江湖', userName: '风清扬', mobile: '13700000001', pwd: '123456', email: 'fq.yang@jingli.tech'});
     }
 });
 

@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {clientExport, requireParams} from "common/api/helper";
+import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
 import {modelNotNull} from "../_decorator";
 import {Models} from "_types/index";
 import {FindResult} from "common/model/interface";
@@ -18,7 +18,7 @@ import {TripDetail} from "_types/tripPlan/tripDetail";
 import TripPlanModule = require("../tripPlan/index");
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 const L = require('@jingli/language');
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 import config = require("@jingli/config");
 import _ = require("lodash");
 import {ENoticeType} from "_types/notice/notice";
@@ -531,6 +531,7 @@ class TripApproveModule {
     @requireParams(['id'],['remark'])
     static async cancelTripApprove(params: {id: string, remark?: string}): Promise<boolean> {
         let tripApprove = await Models.tripApprove.get(params.id);
+        let company = tripApprove.account.company;
         if( tripApprove.status != QMEApproveStatus.WAIT_APPROVE && tripApprove.approvedUsers && tripApprove.approvedUsers.indexOf(",") != -1 ) {
             throw {code: -2, msg: "审批单状态不正确，该审批单不能撤销！"};
         }
@@ -539,6 +540,23 @@ class TripApproveModule {
         let staff = await Staff.getCurrent();
         let log = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, remark: `撤销行程审批单`});
         await Promise.all([tripApprove.save(), log.save()]);
+
+        let query = tripApprove.query;
+        if (typeof query == 'string') {
+            query = JSON.parse(query);
+        }
+        let frozenNum = query.frozenNum;
+        console.info(frozenNum);
+        let content = tripApprove.deptCity+"-"+tripApprove.arrivalCity;
+        if(tripApprove.createdAt.getMonth() == new Date().getMonth()){
+            await company.approveRejectFreeTripPlanNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                remark: "审批前撤销行程释放冻结行程点数", content: content, frozenNum: frozenNum});
+        }else{
+            await company.approveRejectFreeBeforeNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                remark: "审批前撤销上月行程释放冻结行程点数", content: content, frozenNum: frozenNum});
+
+        }
+
         return true;
     }
 

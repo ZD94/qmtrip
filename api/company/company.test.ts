@@ -3,7 +3,7 @@ import {Company} from "_types/company";
  * Created by wyl on 15-12-12.
  */
 var assert = require("assert");
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 var getSession = require('common/model').getSession;
 
 describe("api/company", function() {
