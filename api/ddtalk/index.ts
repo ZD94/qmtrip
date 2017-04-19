@@ -94,11 +94,12 @@ class DDTalk {
     static __initHttpApp(app) {
 
         app.get("/JLTesthello" , (req , res , next)=>{
-            console.log("enter hello");
+            console.log("enter JLTesthello");
             return DealEvent.transpond(req , res , next, "http://t.jingli365.com/JLTesthello");
         });
         app.get("/JLTesthello2" , (req, res, next)=>{
             let url = "http://hxs.jingli.tech:4002/hello";
+            console.log("enter JLTesthello2");
             return DealEvent.transpond(req , res , next, url);
         });
         
@@ -210,6 +211,7 @@ class DDTalk {
             if (ddtalkUsers && ddtalkUsers.length) {
                 let ddtalkUser = ddtalkUsers[0]
                 // //自动登录
+                console.log("钉钉自动登录: API.auth.makeAuthenticateToken  ", ddtalkUser.id);
                 let ret = await API.auth.makeAuthenticateToken(ddtalkUser.id, 'ddtalk');
                 return ret;
             }
