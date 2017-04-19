@@ -953,8 +953,7 @@ class TripPlanModule {
         let approve = await Models.approve.get(params.tripApproveId);
         let account = await Models.staff.get(approve.submitter);
         let approveUser = await Models.staff.get(approve.approveUser);
-        let currentUser = await Staff.getCurrent();
-        let company = approve.approveUser ? approveUser.company : currentUser.company;
+        let company = approve.approveUser ? approveUser.company : account.company;
         if (typeof approve.data == 'string') approve.data = JSON.parse(approve.data);
         let query: any  = approve.data.query;   //查询条件
         if(typeof query == 'string') query = JSON.parse(query);
