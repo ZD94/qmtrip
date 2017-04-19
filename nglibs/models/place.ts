@@ -1,5 +1,5 @@
 
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 
 import {ngService} from "../index";
 

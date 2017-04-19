@@ -2,11 +2,11 @@
  * Created by wyl on 15-12-12.
  */
 'use strict';
-import {DB} from "common/model";
+import {DB} from '@jingli/database';
 var _ = require('lodash');
 import {Paginate} from 'common/paginate';
 import L from '@jingli/language';
-import {requireParams, clientExport} from 'common/api/helper';
+import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {conditionDecorator, condition} from "../_decorator";
 import {Staff, EStaffStatus} from "_types/staff";
 import { TravelPolicy, SubsidyTemplate } from '_types/travelPolicy';
@@ -98,11 +98,9 @@ class TravelPolicyModule{
         return true;
     }
 
-    static deleteTravelPolicyByTest(params){
-        return DB.models.TravelPolicy.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
-            .then(function(){
-                return true;
-            })
+    static async deleteTravelPolicyByTest(params){
+        await DB.models.TravelPolicy.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}});
+        return true;
     }
 
     /**
@@ -363,7 +361,8 @@ class TravelPolicyModule{
     @clientExport
     @requireParams(["where.travelPolicyId"],['attributes','where.name', 'where.subsudyMoney'])
     @conditionDecorator([
-        {if: condition.isTravelPolicyCompany("0.where.travelPolicyId")}
+        {if: condition.isTravelPolicyCompany("0.where.travelPolicyId")},
+        {if: condition.isTravelPolicyAgency("0.where.travelPolicyId")}
     ])
     static async getSubsidyTemplates(params): Promise<FindResult>{
         params.order = params.order || [['subsidyMoney', 'desc']];

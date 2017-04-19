@@ -1,12 +1,12 @@
 /**
  * Created by wlh on 15/12/12.
  */
-import { clientExport } from 'common/api/helper';
+import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import {Models } from '_types'
 import {ETripType, EInvoiceType, ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan";
 import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel} from "_types/travelPolicy";
 import {Staff} from "_types/staff";
-const API = require("common/api");
+const API = require("@jingli/dnode-api");
 const validate = require("common/validate");
 import L from '@jingli/language';
 const moment = require('moment');
@@ -153,7 +153,7 @@ export default class ApiTravelBudget {
             }
 
             await new Promise(function(resolve, reject) {
-                let session = {accountId: staffId}
+                let session = {staffId: staffId}
                 Zone.current.fork({name: "getTravelPolicy",properties: { session: session}})
                     .run(async function() {
                         if (isNeedTraffic) {

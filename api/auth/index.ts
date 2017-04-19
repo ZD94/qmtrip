@@ -2,10 +2,10 @@
  * @module auth
  */
 "use strict";
-import { requireParams, clientExport } from "../../common/api/helper";
+import { requireParams, clientExport } from "@jingli/dnode-api/dist/src/helper";
 import { Models, EAccountType } from "_types";
 import { Account, ACCOUNT_STATUS } from "_types/auth";
-import { Staff, EInvitedLinkStatus, EAddWay } from "_types/staff";
+import { Staff, EInvitedLinkStatus, EAddWay, EStaffRole } from "_types/staff";
 import validator = require('validator');
 import L from '@jingli/language';
 import cache = require("common/cache");
@@ -19,10 +19,11 @@ import {condition, conditionDecorator} from "../_decorator";
 var uuid = require("node-uuid");
 import C = require("@jingli/config");
 var moment = require("moment");
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 var utils = require("common/utils");
 var accountCols = Account['$fieldnames'];
 
+let codeTicket = "checkcode:ticket:";
 
 //生成激活链接参数
 function makeActiveSign(activeToken, accountId, timestamp) {
@@ -35,6 +36,7 @@ function makeLinkSign(linkToken, invitedLinkId, timestamp) {
     var originStr = linkToken + invitedLinkId + timestamp;
     return utils.md5(originStr);
 }
+
 
 
 /**
@@ -198,7 +200,7 @@ export default class ApiAuth {
         var accountId = params.accountId;
         var account: Account;
         if(accountId) {
-            account = await Models.account.get(accountId);
+            account = await Models.account.get(accountId, {notParent: true});
         } else {
             var accounts = await Models.account.find({where: {$or: [{email: mobileOrEmail}, {mobile: mobileOrEmail}]}});
             if(accounts && accounts.length > 0) {
@@ -240,7 +242,7 @@ export default class ApiAuth {
         await API.notify.submitNotify({
             key: 'qm_new_staff_active',
             values: values,
-            accountId: account.id
+            mobile: account.mobile,
         });
         return true;
     }
@@ -467,6 +469,105 @@ export default class ApiAuth {
             throw L.ERR.CODE_ERROR();
         }
         return staff.company;
+    }
+
+
+    /**
+     * 被邀请人通过邀请链接验证手机号
+     *
+     */
+    @clientExport
+    @requireParams(['mobile', 'msgCode', 'msgTicket'])
+    static async inviteStaffone( params ) : Promise<any>{
+        let mobile = params.mobile && params.mobile.toString(),
+            msgCode= params.msgCode && params.msgCode.toString(),
+            msgTicket=params.msgTicket;
+
+        if(mobile && !validator.isMobilePhone(mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+        if(!msgCode || !msgTicket) {
+            throw L.ERR.CODE_ERROR();
+        }
+        let checkMsgCode = await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
+        if(!checkMsgCode){
+            throw L.ERR.CODE_ERROR();
+        }
+
+        let Result = {
+            isRegister : false,
+            ticket     : null,
+            staff      : null,
+            mobile     : null
+        };
+
+        let accounts = await Models.account.find({where: {mobile: mobile}});
+        if(accounts && accounts.total > 0){
+            //已经注册
+            let account = accounts[0];
+            Result.isRegister = true;
+            let staffs = await Models.staff.find({where: {accountId : account.id}});
+            Result.staff = staffs[0];
+        }else{
+            Result.mobile = mobile;
+        }
+
+        Result.ticket = msgTicket;
+        let key = codeTicket + msgTicket;
+
+        //save ticket
+        await cache.write(key, mobile, 10 * 60);
+        return Result;
+    }
+
+    /**
+     * 被邀请人加入其它企业
+     */
+    @clientExport
+    @requireParams(["msgTicket", "mobile", "companyId"])
+    static async joinAnCompany( params ) : Promise<any>{
+        let mobile = params.mobile,
+            msgTicket=params.msgTicket,
+            companyId=params.companyId;
+
+        if(mobile && !validator.isMobilePhone(mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+        if(!msgTicket) {
+            throw L.ERR.SIGN_ERROR();
+        }
+        if(!companyId){
+            throw L.ERR.INVALID_ARGUMENT();
+        }
+        let key = codeTicket + msgTicket;
+        let cacheMobile =await cache.read(key);
+        if(!cacheMobile || cacheMobile != mobile){
+            throw L.ERR.SIGN_ERROR();
+        }
+
+        let accounts = await Models.account.find({where:{mobile:mobile}});
+        if(!accounts.length){
+            throw L.ERR.USER_NOT_EXIST();
+        }
+        let account = accounts[0];
+
+        let company = await Models.company.get( companyId );
+        if(!company){
+            throw L.ERR.COMPANY_NOT_EXIST();
+        }
+        let travelPolicy = await company.getDefaultTravelPolicy();
+        let otherStaffs = await Models.staff.find({where: {
+            accountId : account.id
+        }});
+        let otherStaff = otherStaffs[0];
+
+        let staff = Staff.create({
+            name: otherStaff.name,
+            status: ACCOUNT_STATUS.ACTIVE,
+            roleId: EStaffRole.COMMON,
+            travelPolicyId: travelPolicy.id
+        });
+        return await staff.save();
     }
 
 
@@ -709,7 +810,7 @@ export default class ApiAuth {
         return API.notify.submitNotify({
             key: key,
             values: vals,
-            accountId: acc.id
+            email: acc.email,
         });
     }
 
@@ -757,7 +858,7 @@ export default class ApiAuth {
         return API.notify.submitNotify({
             key: key,
             values: vals,
-            accountId: acc.id
+            email: acc.email
         });
     }
 
@@ -889,7 +990,7 @@ export default class ApiAuth {
     @clientExport
     static async updateAccount(params) : Promise<Account>{
         var id = params.id;
-
+        console.log("更新字段:====>", params);
         var ah = await Models.account.get(id);
         for(var key in params){
             ah[key] = params[key];
@@ -1100,6 +1201,11 @@ export default class ApiAuth {
 
     static removeByTest = byTest.removeByTest;
 
+    @clientExport
+    static setUserId = authentication.setUserId;
+
+    @clientExport
+    static getUserId = authentication.getUserId;
 }
 
 async function _sendActiveEmail(accountId) {
@@ -1129,7 +1235,7 @@ async function _sendActiveEmail(accountId) {
         API.notify.submitNotify({
             key: 'qm_active',
             values: vals,
-            accountId: account.id,
+            email: account.email
         })
     ]);
 

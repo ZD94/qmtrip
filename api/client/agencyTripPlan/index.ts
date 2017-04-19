@@ -2,7 +2,7 @@
  * Created by yumiao on 15-12-12.
  */
 
-let API = require("common/api");
+let API = require("@jingli/dnode-api");
 import L from '@jingli/language';
 import config = require("@jingli/config");
 import moment = require("moment");
@@ -305,7 +305,7 @@ export function approveInvoice(params){
  * @param params
  * @returns {*}
  */
-export function countTripPlanNum(params){
+export async function countTripPlanNum(params){
     let self = this;
     let accountId = self.accountId; //代理商用户Id
 
@@ -314,25 +314,21 @@ export function countTripPlanNum(params){
     }
     let companyId = params.companyId;
 
-    return Promise.all([
+    let [user, company] = await Promise.all([
         API.agency.getAgencyUser({id: accountId, columns: ['id', 'agencyId']}),
         API.company.getCompany({id: companyId, columns: ['agencyId']})
-    ])
-        .spread(function(user, company){
-            if(user.agencyId != company.agencyId){
-                throw L.ERR.PERMISSION_DENY();
-            }
-        })
-        .then(function(){
-            return API.tripPlan.countTripPlanNum(params);
-        });
+    ]);
+    if(user.agencyId != company.agencyId){
+        throw L.ERR.PERMISSION_DENY();
+    }
+    return API.tripPlan.countTripPlanNum(params);
 }
 
 /**
  * 统计计划单的动态预算/计划金额和实际支出
  * @param params
  */
-export function statPlanOrderMoneyByAgency (params) {
+export async function statPlanOrderMoneyByAgency (params) {
     let self = this;
     if(!params.companyId){
         throw {code: -1, msg: '企业Id不能为空'};
@@ -340,15 +336,13 @@ export function statPlanOrderMoneyByAgency (params) {
     let companyId = params.companyId;
     params = _.pick(params, ['companyId', 'startTime', 'endTime']);
 
-    return Promise.all([
+    let [u, c] = await Promise.all([
         API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']}),
         API.company.getCompany({id: companyId, columns: ['agencyId']})
-    ])
-        .spread(function(u, c){
-            if(u.agencyId != c.agencyId){
-                throw L.ERR.PERMISSION_DENY();
-            }
-            params.companyId = companyId;
-            return API.tripPlan.statPlanOrderMoney(params);
-        })
+    ]);
+    if(u.agencyId != c.agencyId){
+        throw L.ERR.PERMISSION_DENY();
+    }
+    params.companyId = companyId;
+    return API.tripPlan.statPlanOrderMoney(params);
 }

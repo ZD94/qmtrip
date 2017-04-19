@@ -4,7 +4,7 @@
 
 'use strict';
 
-const API = require('common/api');
+const API = require('@jingli/dnode-api');
 let dingSuiteCallback = require("dingtalk_suite_callback");
 import fs = require("fs");
 import cache from "common/cache";
@@ -14,7 +14,7 @@ const config = C.ddconfig;
 import request = require('request');
 import ISVApi from "./lib/isvApi";
 import {Models} from "_types/index";
-import {clientExport} from "common/api/helper";
+import {clientExport} from "@jingli/dnode-api/dist/src/helper";
 import {get_msg} from "./lib/msg-template/index";
 
 import * as DealEvent from "./lib/dealEvent";
@@ -92,7 +92,7 @@ let ddTalkMsgHandle = {
 class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
-
+        
         app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
             if(msg.CorpId){
                 let corps = await Models.ddtalkCorp.find({
@@ -107,14 +107,17 @@ class DDTalk {
                 //transpond
                 let url = config.test_url.replace(/\/$/g, "");
                 if(config.test_url && config.reg_go){
-                    request({
-                        uri: url + "/ddtalk/suite_ticket",
+                    request.post({
+                        url : url + "/ddtalk/suite_ticket",
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        method: "POST",
-                        body: msg
-                    })
+                        form: msg
+                    }, function(err, res) {
+                        if (err) {
+                            return console.error(err)
+                        }
+                    });
                 }
             }
 
@@ -122,8 +125,10 @@ class DDTalk {
                 return res.reply();
             }
             return ddTalkMsgHandle[msg.EventType](msg , req , res , next)
-                .then(() => {
-                    res.reply();
+                .then((result) => {
+                    if(!(result && result.notReply)){
+                        res.reply();
+                    }
                 })
                 .catch((err) => {
                     console.error(err.stack);

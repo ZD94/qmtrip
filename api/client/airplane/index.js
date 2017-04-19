@@ -3,7 +3,7 @@
  */
 'use strict';
 
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 var L = require("@jingli/language");
 var Logger = require('@jingli/logger');
 var _ = require('lodash');

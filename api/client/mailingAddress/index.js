@@ -6,7 +6,7 @@
 /**
  * @module API
  */
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 
 /**
  * @class mailingAddress 邮寄地址
