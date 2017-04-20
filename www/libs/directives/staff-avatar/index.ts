@@ -23,7 +23,7 @@ angular
                 require('./avatar.scss');
                 $scope.EStaffRole = EStaffRole;
                 $scope.EStaffRoleNames = EStaffRoleNames;
-                var config = require('config');
+                var config = require('@jingli/config');
 
                 $scope.getImageUrl = function getImageUrl(id){
                     if(typeof id !== 'string' || typeof config.update !== 'string')

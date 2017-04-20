@@ -4,11 +4,12 @@
 'use strict';
 var sequelize = require("common/model").importModel("./models");
 var Owner = sequelize.models.Owner;
-import L from 'common/language';
-var API = require("common/api");
-var config = require('config');
-let Logger = require('common/logger');
+import L from '@jingli/language';
+var API = require("@jingli/dnode-api");
+var config = require('@jingli/config');
+import Logger from '@jingli/logger';
 let logger = new Logger("attachment");
+import '@jingli/fs-promisify';
 import * as fs from 'fs';
 import * as path from 'path';
 

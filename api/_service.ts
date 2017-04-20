@@ -22,6 +22,8 @@ import {CoinAccount, CoinAccountChange} from "_types/coin";
 import {TripDetailSubsidy, TripDetailSpecial} from "_types/tripPlan/tripDetailInfo";
 import {Approve} from "_types/approve/index";
 import {AgencyOperateLog} from "_types/agency/agency-operate-log";
+import {TripFuelAddPackage} from "../_types/tripPackage/tripFuelAddPackage";
+import {TripBasicPackage} from "../_types/tripPackage/tripBasicPackage";
 
 initModels({
     staff: createServerService<Staff>(Staff),
@@ -68,5 +70,6 @@ initModels({
     coinAccount: createServerService<CoinAccount>(CoinAccount),
     coinAccountChange: createServerService<CoinAccountChange>(CoinAccountChange),
     agencyOperateLog:createServerService<AgencyOperateLog>(AgencyOperateLog),
-
+    tripFuelAddPackage: createServerService<TripFuelAddPackage>(TripFuelAddPackage),
+    tripBasicPackage: createServerService<TripBasicPackage>(TripBasicPackage),
 });

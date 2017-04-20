@@ -5,7 +5,7 @@
 'use strict';
 import {AbstractPrefer} from "./index";
 import {IFinalTicket, IFlightSeg, TRAFFIC} from "_types/travelbudget";
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 
 class TransitCityInChinaPrefer extends AbstractPrefer<IFinalTicket> {
     private baseScore: number;
