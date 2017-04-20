@@ -3,9 +3,9 @@
  */
 'use strict';
 
-var API = require("common/api");
-var L = require("common/language");
-var Logger = require('common/logger');
+var API = require("@jingli/dnode-api");
+var L = require("@jingli/language");
+var Logger = require('@jingli/logger');
 var _ = require('lodash');
 var moment = require('moment');
 var getRndStr = require('common/utils').getRndStr;

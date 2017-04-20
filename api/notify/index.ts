@@ -4,14 +4,14 @@
 
 'use strict';
 import _ = require('lodash');
-import Logger = require('common/logger');
+import Logger from '@jingli/logger';
 const logger = new Logger('qm:notify');
 import redisClient = require("common/redis-client");
 import {Models} from "_types";
 import {ESendType, ENoticeType} from "_types/notice/notice";
 
-const config = require('config');
-let API = require('common/api');
+const config = require('@jingli/config');
+let API = require('@jingli/dnode-api');
 
 const path = require("path");
 const fs = require("fs");
@@ -24,8 +24,9 @@ export interface NotifyToAddress{
 }
 
 export interface ISubmitNotifyParam{
-    accountId?: string;
+    userId?: string;
     email?: string;
+    mobile?: string;
     key: string;
     values: any;
 }
@@ -244,42 +245,32 @@ export async function __init() {
 
 //通知模块
 export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean> {
-    let {accountId, key, values, email} = params;
+    let {userId, key, values, email, mobile} = params;
     let values_clone =  _.cloneDeep(values);
-    let openId = await API.auth.getOpenIdByAccount({accountId: accountId});
     let account: any = {};
-    let departmentNames;
-    if(!accountId){
-        account = {email: email};
+    let openId;
+    if(!userId){
+        account = {email, mobile};
     }else{
-        account = await Models.staff.get(accountId);
+        account = await Models.staff.get(userId);
         if(!account){
-            account = await Models.agency.get(accountId);
-        }else{
+            account = await Models.agency.get(userId);
+        } else {
+            let departmentNames;
             departmentNames = await account.getDepartmentsStr();
             account["departmentNames"] = departmentNames;
+            openId = await API.auth.getOpenIdByAccount({accountId: account.accountId});
         }
     }
 
     if (openId) {
         values_clone.templateId = config.notify.templates[key];
     }
+
     let tpl = templates[key];
     if(!tpl)
         return false;
     values_clone.account = account;
-    await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: accountId }, values_clone);
+    await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: userId }, values_clone);
     return true;
-}
-//added by jack, to send notice to designated phone number or email account
-export async function notifyDesignatedAccount(params:{email?:string,mobile?:string,key:string,values:any}){
-      let email=params.email;
-      let mobile=params.mobile;
-      let values=params.values;
-      let key=params.key;
-
-      let values_clone =  _.cloneDeep(values);
-      let tpl=templates[key];
-      await tpl.send({mobile:mobile,email: email},values_clone);
-      return true;
 }

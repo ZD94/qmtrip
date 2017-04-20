@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {clientExport, requireParams} from "common/api/helper";
+import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
 import {Models} from "_types/index";
 import {TripDetail, TripPlan} from "_types/tripPlan";
 import {PaginateInterface} from "common/model/interface";
@@ -11,7 +11,7 @@ import {
     TripDetailTraffic, TripDetailHotel, TripDetailSpecial,
     TripDetailSubsidy
 } from "_types/tripPlan/tripDetailInfo";
-const L = require("common/language");
+const L = require("@jingli/language");
 
 class FinanceModule {
 

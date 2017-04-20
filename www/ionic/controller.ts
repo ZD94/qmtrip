@@ -7,7 +7,7 @@ import {
 import moment = require('moment');
 import * as path from 'path';
 
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 
 var staffMenus = [
     {
@@ -99,7 +99,7 @@ var staffMenus = [
 //     },
 // ];
 
-var config = require('config');
+var config = require('@jingli/config');
 
 export function getImageUrl(id){
     if(typeof id !== 'string' || typeof config.update !== 'string')

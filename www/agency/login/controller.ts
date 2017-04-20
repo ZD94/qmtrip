@@ -3,7 +3,7 @@
  */
 "use strict";
 
-const API = require("common/api");
+const API = require("@jingli/dnode-api");
 var msgbox = require('msgbox');
 
 export async function LoginController($scope, $stateParams, $storage){

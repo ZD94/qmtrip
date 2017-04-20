@@ -9,7 +9,7 @@ import {md5} from "common/utils";
 import {Staff} from "_types/staff/staff";
 import {DDTalkUser} from "_types/ddtalk";
 
-let Logger = require('common/logger');
+import Logger from '@jingli/logger';
 var logger = new Logger('main');
 const DEFAULT_PWD = '000000';
 

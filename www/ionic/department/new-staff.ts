@@ -4,7 +4,7 @@
 "use strict";
 import {Staff, EStaffRoleNames, EStaffRole, EAddWay} from "_types/staff/staff";
 import {EGender} from "_types/index";
-import L from 'common/language';
+import L from '@jingli/language';
 import validator = require('validator');
 import {Pager} from "common/model/pager";
 import {setDepartment} from "./set-department";
@@ -225,7 +225,13 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             }else{
                 //如果是更新
                 if(staff.mobile){
-                    var account2 = await Models.account.find({where: {mobile: staff.mobile, type: 1, id: {$ne: staff.id}}});
+                    var account2 = await Models.account.find({
+                        where: {
+                            mobile: staff.mobile,
+                            type: 1,
+                            id: {$ne: staff.accountId}
+                        }
+                    });
 
                     if (account2 && account2.length>0) {
                         throw L.ERR.MOBILE_HAS_REGISTRY();

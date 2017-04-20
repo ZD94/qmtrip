@@ -17,7 +17,7 @@ var config = {
     "remotes": []
 };
 
-var Logger = require('common/logger');
+import Logger from '@jingli/logger';
 var logger = new Logger('test');
 
 //var cluster = require('cluster');
@@ -27,7 +27,7 @@ var logger = new Logger('test');
 var model = require('common/model');
 model.init(config.postgres);
 
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 
 require('api/_service');
 require('_types/staff');
