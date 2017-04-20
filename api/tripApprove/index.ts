@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {clientExport, requireParams} from "common/api/helper";
+import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
 import {modelNotNull} from "../_decorator";
 import {Models} from "_types/index";
 import {FindResult} from "common/model/interface";
@@ -18,7 +18,7 @@ import {TripDetail} from "_types/tripPlan/tripDetail";
 import TripPlanModule = require("../tripPlan/index");
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 const L = require('@jingli/language');
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 import config = require("@jingli/config");
 import _ = require("lodash");
 import {ENoticeType} from "_types/notice/notice";

@@ -3,7 +3,7 @@
  */
 'use strict';
 var config = require('@jingli/config');
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 var requestProxy = require('express-request-proxy');
 var conn_timeout = require('connect-timeout');
 

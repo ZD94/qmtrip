@@ -5,7 +5,7 @@
 import { Models, EAccountType } from '_types/index';
 import { EStaffRole } from '_types/staff';
 import { parseAuthString } from '_types/auth/auth-cert';
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 import Logger from '@jingli/logger';
 let logger = new Logger("tripPlan.invoice");
 
@@ -20,14 +20,24 @@ async function checkInvoicePermission(userId, tripDetailId){
     var tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
     var account = await Models.account.get(userId);
     if(account.type == EAccountType.STAFF){
-        var staff = await Models.staff.get(userId);
-        if(!staff)
+
+        var staffs = await Models.staff.all({ where: {accountId: userId}});
+        if(!staffs || !staffs.length)
             return false;
-        if(staff.id == tripPlan.account.id)
-            return true;
-        if(staff.company.id == tripPlan.account.company.id &&
-            (staff.roleId == EStaffRole.ADMIN || staff.roleId == EStaffRole.OWNER))
-            return true;
+        let isHasPermit = false;
+        for(let staff of staffs) {
+            if(staff.id == tripPlan.account.id){
+                isHasPermit = true;
+                break;
+            }
+            if(staff.company.id == tripPlan.account.company.id &&
+                (staff.roleId == EStaffRole.ADMIN || staff.roleId == EStaffRole.OWNER)) {
+                isHasPermit = true;
+                break;
+            }
+        }
+        return isHasPermit;
+
     } else if(account.type == EAccountType.AGENCY){
         var agencyUser = await Models.agencyUser.get(userId);
         if(!agencyUser)

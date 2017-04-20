@@ -2,11 +2,11 @@
  * Created by yumiao on 15-12-10.
  */
 "use strict";
-import {DB} from "common/model";
+import {DB} from '@jingli/database';
 let uuid = require("node-uuid");
 import L from '@jingli/language';
 import utils = require("common/utils");
-let API = require('common/api');
+let API = require('@jingli/dnode-api');
 import Logger from '@jingli/logger';
 let logger = new Logger("tripPlan");
 import config = require("@jingli/config");
@@ -14,7 +14,7 @@ import config = require("@jingli/config");
 let moment = require("moment");
 let scheduler = require('common/scheduler');
 import _ = require('lodash');
-import {requireParams, clientExport} from 'common/api/helper';
+import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
     TripApprove, QMEApproveStatus, EApproveResult, EApproveResult2Text,
@@ -33,6 +33,7 @@ import {ENoticeType} from "_types/notice/notice";
 import TripApproveModule = require("../tripApprove/index");
 import {MPlaneLevel, MTrainLevel} from "_types/travelPolicy";
 import {ISegment, ICreateBudgetAndApproveParams} from '_types/tripPlan'
+const projectCols = Project['$fieldnames'];
 
 class TripPlanModule {
 
@@ -591,6 +592,17 @@ class TripPlanModule {
     }
 
     @clientExport
+    @requireParams(["id"], projectCols)
+    static async updateProject(params): Promise<Project> {
+        let project = await Models.project.get(params.id);
+
+        for(let key in params){
+            project[key] = params[key];
+        }
+        return project.save();
+    }
+
+    @clientExport
     @requireParams(['id'])
     @modelNotNull('project')
     static getProjectById(params:{id:string}):Promise<Project> {
@@ -605,11 +617,18 @@ class TripPlanModule {
         return {ids: projects.map((p)=> {return p.id}), count: projects['total']};
     }
 
+    @clientExport
     @requireParams(['id'])
     @modelNotNull('project')
     static async deleteProject(params:{id:string}):Promise<boolean> {
         let project = await Models.project.get(params.id);
-        return await project.destroy();
+        let trips = await Models.tripPlan.find({where: {projectId: project.id}});
+        if(trips && trips.length > 0){
+            throw {code: -1, msg: '该项目下有行程，不能删除'};
+        }
+
+        await project.destroy();
+        return true;
     }
 
 
@@ -945,9 +964,12 @@ class TripPlanModule {
         if (typeof budgets == 'string') budgets = JSON.parse(budgets);
 
         let tripPlan = TripPlan.create({id: approve.id});
-        let projectIds = [];//事由名称
         let arrivalCityCodes = [];//目的地代码
         let project: Project;
+        if(query.projectName){
+            project = await API.tripPlan.getProjectByName({companyId: company.id, name: query.projectName,
+                userId: account.id, isCreate: true});
+        }
 
         if(query.originPlace) {
             let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace}) || {name: null};
@@ -958,17 +980,6 @@ class TripPlanModule {
         if(destinationPlacesInfo && _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
             for(let i = 0; i < destinationPlacesInfo.length; i++){
                 let segment: ISegment = destinationPlacesInfo[i];
-                //处理出差事由放入projectIds 原project存放第一程出差事由
-                if(segment.reason){
-                    let projectItem = await TripPlanModule.getProjectByName({companyId: company.id, name: segment.reason,
-                        userId: account.id, isCreate: true});
-                    if(i == 0){
-                        project = projectItem;
-                    }
-                    if(projectIds.indexOf(projectItem.id) == -1){
-                        projectIds.push(projectItem.id);
-                    }
-                }
 
                 //处理目的地 放入arrivalCityCodes 原目的地信息存放第一程目的地信息
                 if(segment.destinationPlace){
@@ -996,7 +1007,6 @@ class TripPlanModule {
                 }
             }
         }
-        tripPlan.projectIds = JSON.stringify(projectIds);
         tripPlan.arrivalCityCodes = JSON.stringify(arrivalCityCodes);
 
         tripPlan['companyId'] = account.company.id;
@@ -1028,6 +1038,7 @@ class TripPlanModule {
 
         tripDetails = budgets.map(function (budget) {
             let tripType = budget.tripType;
+            let reason = budget.reason;
             let price = Number(budget.price);
             let detail;
             let data: any = {};
@@ -1091,6 +1102,7 @@ class TripPlanModule {
                 default:
                     throw new Error("not support tripDetail type!");
             }
+            detail.reason = reason;
             detail.type = tripType;
             detail.budget = price;
             detail.accountId= account.id;
@@ -1495,22 +1507,20 @@ class TripPlanModule {
         let companyName=staff.company.name;
         let staffName=staff.name;
 
-         try{
-             await API.notify.notifyDesignatedAccount({
-                 mobile:"13810529805",
-                 email:"notice@jingli365.com",
-                 key:"qm_notify_invoice_audit_request",
-                 values:{
-                     company:companyName,
-                     staffName:staff.name
-                 }
-             });
-         }catch(err){
-             logger.info(err);
+        try{
+            await API.notify.submitNotify({
+             mobile: '13810529805',
+             email: 'notice@jingli365.com',
+             key: 'qm_notify_invoice_audit_request',
+             values:{
+                 company:companyName,
+                 staffName:staff.name
+             }
+            })
+        }catch(err){
+            logger.info(err);
         }
     }
-
-
 
     @clientExport
     @requireParams(['detailId', 'orderIds', 'supplierId'])

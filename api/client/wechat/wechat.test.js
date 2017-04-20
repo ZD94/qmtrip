@@ -2,7 +2,7 @@
  * Created by wlh on 16/1/24.
  */
 
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 var assert = require("assert");
 var path = require("path");
 

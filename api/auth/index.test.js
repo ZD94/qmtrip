@@ -2,7 +2,7 @@
  * Created by wlh on 15/12/24.
  */
 
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 var assert = require("assert");
 
 describe("api/auth/index.js", function() {
