@@ -8,7 +8,7 @@ import { Account, ACCOUNT_STATUS } from "_types/auth";
 import { Staff, EInvitedLinkStatus, EAddWay, EStaffRole } from "_types/staff";
 import validator = require('validator');
 import L from '@jingli/language';
-import cache = require("common/cache");
+import cache from "common/cache";
 import * as authentication from './authentication';
 import * as wechat from './wechat';
 import * as messagePush from './messagePush';
