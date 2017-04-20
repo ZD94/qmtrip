@@ -2,7 +2,7 @@
 import {LoginResponse} from "_types/auth/auth-cert";
 declare var ionic:any;
 var jPushPlugin;
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 
 export default async function initJPush($ionicPlatform, $document){
     API.require('auth');

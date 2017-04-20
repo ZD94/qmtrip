@@ -1,9 +1,9 @@
 /**
  * Created by wyl on 15-12-12.
  */
-//var API = require('common/api');
+//var API = require('@jingli/dnode-api');
 "use strict";
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 import assert = require("assert");
 import {Models} from '_types';
 import {getSession} from 'common/model';

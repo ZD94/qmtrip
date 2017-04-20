@@ -1,4 +1,4 @@
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 API.authenticate = function(remote, cb) {
     var tokenId = Cookie.get("token_id");
     var userId = Cookie.get("user_id");

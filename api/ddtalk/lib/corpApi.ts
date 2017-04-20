@@ -56,16 +56,16 @@ export default class CorpApi {
             return ticketObj;
         }
         let url = `https://oapi.dingtalk.com/get_jsapi_ticket?access_token=${this.accessToken.access_token}`
-        return reqProxy(url, {
+        let ret = await reqProxy(url, {
             name: '获取ticket',
             method: 'GET'
-        }).then( async (ret: any) => {
-            if (ret.errcode) throw new Error(ret);
-            let expire_at = Date.now() + (ret.expires_in - 30) * 1000;
-            ticketObj = {ticket: ret.ticket, expire_at: expire_at}
-            await self.cache.set(key, ticketObj);
-            return ticketObj;
-        })
+        });
+        if (ret.errcode)
+            throw new Error(ret);
+        let expire_at = Date.now() + (ret.expires_in - 30) * 1000;
+        ticketObj = {ticket: ret.ticket, expire_at: expire_at}
+        await self.cache.set(key, ticketObj);
+        return ticketObj;
     }
 
     async getUserInfoByOAuth(code) : Promise<any> {
@@ -81,14 +81,9 @@ export default class CorpApi {
 
     async getDepartments() :Promise<Array<DdTalkDepartment>> {
         let url = `https://oapi.dingtalk.com/department/list?access_token=${this.accessToken.access_token}`;
-        return reqProxy(url, {
-            name: '获取部门列表',
-            method: 'GET',
-            lang: 'zh_CN',
-        }).then( async (ret: any) => {
-            if (ret.errcode) throw new Error(JSON.stringify(ret));
-            return ret.department;
-        })
+        let ret = await reqProxy(url, { name: '获取部门列表', method: 'GET', lang: 'zh_CN' });
+        if (ret.errcode) throw new Error(JSON.stringify(ret));
+        return ret.department;
     }
 
     async getUserListByDepartment(departmentId): Promise<Array<any>> {

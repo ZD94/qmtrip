@@ -1,7 +1,7 @@
 /**
  * Created by wyl on 15-12-10.
  */
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 var Q = require("q");
 var assert = require("assert");
 
