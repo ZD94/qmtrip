@@ -6,7 +6,7 @@ import {Models} from "_types/index";
 import L from '@jingli/language';
 import {CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE} from "_types/coin";
 var config = require('@jingli/config');
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 
 module.exports = function(app) {
     app.get("/duiba/costcredit", costCredit);

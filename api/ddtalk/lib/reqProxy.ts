@@ -9,8 +9,8 @@ var Agent = require('socks5-https-client/lib/Agent');
 
 let ddConfig = C.ddconfig;
 
-export function reqProxy(url, options) {
-    return new Promise( (resolve, reject) => {
+export function reqProxy(url, options): Promise<any> {
+    return new Promise<any>( (resolve, reject) => {
         let method = options.method || 'POST';
         let qs = options.qs || {};
         let body: any = options.body || {};

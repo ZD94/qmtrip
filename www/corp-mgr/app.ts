@@ -2,7 +2,7 @@
 import L from '@jingli/language';
 import { getSession } from 'common/model';
 import { signToken, LoginResponse, genAuthString } from '_types/auth/auth-cert';
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 function getAuthData(): LoginResponse {
     var data = localStorage.getItem('auth_data');
     try{
@@ -47,7 +47,7 @@ function apiAuth(remote, callback) {
 }
 
 function initAPI($window, $location){
-    var API = require('common/api');
+    var API = require('@jingli/dnode-api');
     API.require('auth');
     API.authenticate = apiAuth;
     API.onlogin(gotoLogin);
@@ -72,7 +72,7 @@ function initAPI($window, $location){
             return;
         }
 
-        var API = require('common/api');
+        var API = require('@jingli/dnode-api');
         var browserspec = require('browserspec');
         if(browserspec.is_wechat && /^[tj]\.jingli365\.com$/.test($location.host())) {
             let args = $location.search();

@@ -35,7 +35,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 var dyload = require('dyload');
 var ddtalkLoad;
 function isDingTalk() {

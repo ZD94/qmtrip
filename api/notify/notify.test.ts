@@ -5,7 +5,7 @@
 
 import util = require("util")
 import assert = require("assert");
-import API = require("common/api");
+import API = require("@jingli/dnode-api");
 
 describe('api/notify', function() {
     this.timeout( 5 * 1000)

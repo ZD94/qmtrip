@@ -11,7 +11,7 @@ import {Models} from "_types";
 import {ESendType, ENoticeType} from "_types/notice/notice";
 
 const config = require('@jingli/config');
-let API = require('common/api');
+let API = require('@jingli/dnode-api');
 
 const path = require("path");
 const fs = require("fs");

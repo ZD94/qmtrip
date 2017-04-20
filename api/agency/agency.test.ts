@@ -2,7 +2,7 @@
  * Created by wyl on 15-12-11.
  */
 "use strict";
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 import assert = require("assert");
 import {Models} from '_types';
 import {getSession} from 'common/model';
