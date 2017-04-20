@@ -1,6 +1,6 @@
 declare var Wechat;
 
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 var dyload = require('dyload');
 var msgbox = require('msgbox');
 var browserspec = require('browserspec');

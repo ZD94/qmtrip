@@ -1,11 +1,10 @@
 /**
  * Created by yumiao on 15-12-9.
  */
-
-import {DB} from "common/model";
+import {DB} from '@jingli/database';
 import L from '@jingli/language';
 let C = require("@jingli/config");
-let API = require("common/api");
+let API = require("@jingli/dnode-api");
 import Logger from '@jingli/logger';
 let logger = new Logger('company');
 let moment = require('moment');
@@ -13,7 +12,7 @@ let promoCodeType = require('libs/promoCodeType');
 let scheduler = require('common/scheduler');
 let schedule = require("node-schedule");
 let _ = require("lodash");
-import {requireParams, clientExport} from "common/api/helper";
+import {requireParams, clientExport} from "@jingli/dnode-api/dist/src/helper";
 import {Models} from "_types";
 import {Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE} from '_types/company';
 import {Staff, EStaffRole} from "_types/staff";
@@ -24,6 +23,7 @@ import {requirePermit, conditionDecorator, condition, modelNotNull} from "api/_d
 import {md5} from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
 import {CoinAccount} from "_types/coin";
+
 
 const supplierCols = Supplier['$fieldnames'];
 
@@ -69,9 +69,12 @@ class CompanyModule {
         userName: string, pwd?: string, status?: number, remark?: string, description?: string, isValidateMobile?: boolean, promoCode?: string, referrerMobile?: string}): Promise<any>{
         let session = Zone.current.get('session');
         let pwd = params.pwd;
-        let agencyId = Agency.__defaultAgencyId;
+        let defaultAgency = await Models.agency.find({where:{email:C.default_agency.email}});//Agency.__defaultAgencyId;
+        let agencyId:any;
+        if(defaultAgency && defaultAgency.length==1){
+            agencyId=defaultAgency[0].id;
+        }
         let domain = ""; //企业域名
-
         if(params.email){
             domain = params.email.match(/.*\@(.*)/)[1];
         }
@@ -81,7 +84,6 @@ class CompanyModule {
         }
 
         /*let companies = await Models.company.find({where: {$or: [{email: params.email}, {mobile: params.mobile}/!*, {domain_name: domain}*!/]}});
-
         if(companies && companies.length > 0) {
             throw {code: -7, msg: '邮箱或手机号已经注册'};
         }*/
@@ -131,7 +133,7 @@ class CompanyModule {
         //为创建人设置资金账户
         let ca_staff = CoinAccount.create();
         await ca_staff.save();
-        let account = await Models.account.get(staff.id);
+        let account = await Models.account.get(staff.accountId);
         account.coinAccount = ca_staff;
         await account.save();
 
@@ -224,16 +226,16 @@ class CompanyModule {
      * @param params.companyId 企业id
      */
     @requireParams(['companyId','userId'])
-    static async checkAgencyCompany(params){
+    static async checkAgencyCompany(params) :Promise<boolean> {
         var c = await Models.company.get(params.companyId);
         var user = await Models.agencyUser.get(params.userId);
 
         if(!c || c.status == -2){
-            throw L.ERR.COMPANY_NOT_EXIST();
+            return false;
         }
 
         if(c['agencyId'] != user.agency.id || (user.roleId != EAgencyUserRole.OWNER && user.roleId != EAgencyUserRole.ADMIN)) {
-            throw L.ERR.PERMISSION_DENY();
+            return false;
         }
 
         return true;
@@ -377,21 +379,11 @@ class CompanyModule {
      * @param params
      * @returns {*}
      */
-    static deleteCompanyByTest(params){
+    static async deleteCompanyByTest(params){
         var mobile = params.mobile;
         var email = params.email;
-        return DB.models.Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
-            .then(function(companys){
-                return companys.map(function(c){
-                    return true;
-                })
-            })
-            .then(function(){
-                return DB.models.Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
-            })
-            .then(function(){
-                return true;
-            })
+        await DB.models.Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
+        return true;
     }
 
     /*************************************供应商begin***************************************/
@@ -528,6 +520,17 @@ class CompanyModule {
             return t.id;
         })
         return {ids: ids, count: paginate['total']};
+    }
+
+    @clientExport
+    static async getSelfCompanies(params): Promise<Company[]> {
+        let session = Zone.current.get("session");
+        let accountId = session["accountId"]
+        let staffs = await Models.staff.all({where: {accountId: accountId}});
+        let companies = staffs.map( (staff) => {
+            return staff.company;
+        })
+        return companies;
     }
 
     /*************************************企业行程点数变更日志end***************************************/

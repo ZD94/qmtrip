@@ -25,8 +25,11 @@ import {CoinAccount, CoinAccountChange} from "_types/coin";
 import {TripDetailInvoice, TripDetailHotel, TripDetailTraffic, TripDetailSubsidy, TripDetailSpecial} from "_types/tripPlan";
 import {Approve} from "_types/approve";
 import {AgencyOperateLog} from "_types/agency/agency-operate-log";
+import {TripBasicPackage} from "_types/tripPackage/tripBasicPackage";
+import {TripFuelAddPackage} from "_types/tripPackage/tripFuelAddPackage";
 
-const API = require('common/api');
+
+const API = require('@jingli/dnode-api');
 
 function resolverAPIModule(modname: string){
     return function(){
@@ -116,7 +119,7 @@ var Services = {
         funcs: ['getTripPlanLog', 'getTripPlanLogs', 'saveTripPlanLog', 'updateTripPlanLog', 'deleteTripPlanLog']
     },
     project: { type: Project, modname: 'tripPlan',
-        funcs: ['getProjectById', 'getProjectList', 'createProject']
+        funcs: ['getProjectById', 'getProjectList', 'createProject', 'updateProject']
     },
     // place: { type: Place, modname: 'place',
     //     funcs: ['getCityInfo', 'queryPlace']
@@ -138,7 +141,11 @@ var Services = {
     tripDetailHotel: { type: TripDetailHotel, modname: 'tripPlan', funcs: ['getTripDetailHotel']},
     tripDetailSubsidy: { type: TripDetailSubsidy, modname: 'tripPlan', funcs: ['getTripDetailSubsidy']},
     tripDetailSpecial: { type: TripDetailSpecial, modname: 'tripPlan', funcs: ['getTripDetailSpecial']},
-    agencyOperateLog: { type: AgencyOperateLog, modname: 'agency', funcs: ['getAgencyOperateLog', 'getAgencyOperateLogs']}
+    agencyOperateLog: { type: AgencyOperateLog, modname: 'agency', funcs: ['getAgencyOperateLog', 'getAgencyOperateLogs']},
+
+    tripBasicPackage:{type:TripBasicPackage, modname:'tripPackage',funcs:[]},
+    tripFuelAddPackage:{type:TripFuelAddPackage, modname:'tripPackage',funcs:[]},
+
 };
 
 function throwNotImplemented(){
@@ -204,7 +211,7 @@ class ClientModels implements ModelsInterface {
     token: ModelInterface<Token>;
     travelBudgetLog: ModelInterface<TravelBudgetLog>;
     financeCheckCode: ModelInterface<FinanceCheckCode>;
-    
+
     ddtalkCorp: ModelInterface<DDTalkCorp>;
     ddtalkUser: ModelInterface<DDTalkUser>;
     ddtalkDepartment : ModelInterface<DDTalkDepartment>;
@@ -212,6 +219,9 @@ class ClientModels implements ModelsInterface {
     coinAccount: ModelInterface<CoinAccount>;
     coinAccountChange: ModelInterface<CoinAccountChange>;
     agencyOperateLog: ModelInterface<AgencyOperateLog>;
+
+    tripBasicPackage:ModelInterface<TripBasicPackage>;
+    tripFuelAddPackage:ModelInterface<TripFuelAddPackage>
 
     constructor($cacheFactory: ng.ICacheFactoryService, $rootScope: ng.IRootScopeService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
@@ -250,6 +260,9 @@ class ClientModels implements ModelsInterface {
         this.tripDetailSpecial = createService<TripDetailSpecial>(Services.tripDetailSpecial, $cacheFactory);
         this.approve = createService<Approve>(Services.approve, $cacheFactory);
         this.agencyOperateLog = createService<AgencyOperateLog>(Services.agencyOperateLog, $cacheFactory);
+        this.tripBasicPackage = createService<TripBasicPackage>(Services.tripBasicPackage, $cacheFactory);
+        this.tripFuelAddPackage = createService<TripFuelAddPackage>(Services.tripFuelAddPackage, $cacheFactory);
+
         initModels(this);
 
         $rootScope.$on('$locationChangeSuccess', ()=>{
@@ -278,3 +291,5 @@ class ClientModels implements ModelsInterface {
 
 import './menu';
 import './place';
+
+

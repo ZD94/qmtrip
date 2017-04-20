@@ -35,9 +35,10 @@ let reg = new RegExp( config.name_reg );
 
 
 /* transpond */
-export async function transpond(req , res , next){
+export function transpond(req , res , next){
+    let url = config.test_url.replace(/\/$/g, "");
     return requestProxy({
-        url: config.test_url ,
+        url: url + "/ddtalk/isv/receive" ,
         reqAsBuffer: true,
         cache: false,
         timeout: 180000,
@@ -52,6 +53,7 @@ export async function tmpAuthCode(msg , req , res , next) {
         console.log("exist ?");
         return;
     }
+
 
     //暂时缓存，防止重复触发
     await cache.write(TMP_CODE_KEY, true, 60 * 2);
@@ -68,11 +70,10 @@ export async function tmpAuthCode(msg , req , res , next) {
     if(reg.test(corp_name) && config.reg_go){
         //it's our test company.
         transpond( req , res , next );
-        return;
+        return { notReply: true };
     }
 
     /* ============ End =========== */
-
 
     //test
     // let corp_name = "鲸力测试3.16";
