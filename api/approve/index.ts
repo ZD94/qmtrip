@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {clientExport, requireParams} from "../../common/api/helper";
+import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
 import {Approve} from "_types/approve/index";
 import {Staff} from "_types/staff/staff";
 import {Models} from "_types/index";
@@ -13,7 +13,7 @@ import {ETripType} from "_types/tripPlan/tripPlan";
 import TripPlanModule = require("../tripPlan/index");
 import _ = require('lodash');
 let Config = require('@jingli/config');
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 import {ISegment, ICreateBudgetAndApproveParams} from '_types/tripPlan';
 
 function oaStr2Enum(str: string) :EApproveChannel{

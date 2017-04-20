@@ -5,7 +5,7 @@
 var sequelize = require("common/model").importModel("./models");
 var feedbacktModel = sequelize.models.Feedback;
 var utils = require("common/utils");
-var API = require("../../common/api");
+var API = require("@jingli/dnode-api");
 
 /**
  * 创建部门
