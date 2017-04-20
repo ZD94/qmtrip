@@ -1387,14 +1387,17 @@ class TripPlanModule {
         financeCheckCode = await financeCheckCode.save();
         // let roundLine = `${tripPlan.deptCity}-${tripPlan.arrivalCity}${tripPlan.isRoundTrip ? '-' + tripPlan.deptCity: ''}`;
         let roundLine = tripPlan.deptCity;
+        if(typeof tripPlan.arrivalCityCodes == 'string'){
+            tripPlan.arrivalCityCodes = JSON.parse(tripPlan.arrivalCityCodes);
+        }
         await Promise.all(tripPlan.arrivalCityCodes.map(async function(item){
             let arrCity = await API.place.getCityInfo({ cityCode: item });
             if(arrCity){
                 roundLine = roundLine + "-" + arrCity.name;
             }
         }))
+        roundLine += tripPlan.isRoundTrip ? '-'+tripPlan.deptCity : '';
         console.info(roundLine);
-        console.info("======================================");
         _tripDetails = await Promise.all(_tripDetails);
         _tripDetails = _tripDetails.filter( (v) => {
             return v['money'] > 0;
