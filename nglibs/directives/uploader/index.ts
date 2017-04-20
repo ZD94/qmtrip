@@ -58,7 +58,7 @@ function ngUploader($loading, wxApi): any {
                 autoUpload: false
             });
             if(!upload_url.match(/^https?:\/\//)){
-                var config = require('config');
+                var config = require('@jingli/config');
                 config.$ready.then(()=>{
                     upload_url = config.update.replace(/\/$/, '') + upload_url;
                     $scope.uploader.url = upload_url;

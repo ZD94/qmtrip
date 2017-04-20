@@ -9,7 +9,8 @@ import utils = require("common/utils");
 let API = require('common/api');
 import Logger from '@jingli/logger';
 let logger = new Logger("tripPlan");
-let config = require("@jingli/config");
+import config = require("@jingli/config");
+
 let moment = require("moment");
 let scheduler = require('common/scheduler');
 import _ = require('lodash');
@@ -32,6 +33,7 @@ import {ENoticeType} from "_types/notice/notice";
 import TripApproveModule = require("../tripApprove/index");
 import {MPlaneLevel, MTrainLevel} from "_types/travelPolicy";
 import {ISegment, ICreateBudgetAndApproveParams} from '_types/tripPlan'
+const projectCols = Project['$fieldnames'];
 
 class TripPlanModule {
 
@@ -584,9 +586,20 @@ class TripPlanModule {
 
 
     @clientExport
-    @requireParams(['name', 'createUser', 'company_id'], ['code'])
+    @requireParams(['name', 'createUser', 'companyId'], ['code'])
     static createProject(params): Promise<Project> {
         return Project.create(params).save();
+    }
+
+    @clientExport
+    @requireParams(["id"], projectCols)
+    static async updateProject(params): Promise<Project> {
+        let project = await Models.project.get(params.id);
+
+        for(let key in params){
+            project[key] = params[key];
+        }
+        return project.save();
     }
 
     @clientExport
@@ -604,11 +617,18 @@ class TripPlanModule {
         return {ids: projects.map((p)=> {return p.id}), count: projects['total']};
     }
 
+    @clientExport
     @requireParams(['id'])
     @modelNotNull('project')
     static async deleteProject(params:{id:string}):Promise<boolean> {
         let project = await Models.project.get(params.id);
-        return await project.destroy();
+        let trips = await Models.tripPlan.find({where: {projectId: project.id}});
+        if(trips && trips.length > 0){
+            throw {code: -1, msg: '该项目下有行程，不能删除'};
+        }
+
+        await project.destroy();
+        return true;
     }
 
 
@@ -842,7 +862,7 @@ class TripPlanModule {
 
         if(type == 'D') {
             selectKey = 'departmentId';
-            completeSql = `from department.departments as d, staff.staffs as s, trip_plan.trip_plans as p where d.deleted_at is null and s.deleted_at is null and p.deleted_at is null and p.company_id='${company.id}' and d.id=s.department_id and p.account_id=s.id and p.start_at>'${params.startTime}' and p.start_at<'${params.endTime}'`;
+            completeSql=`from trip_plan.trip_plans as p, department.staff_departments as s, department.departments as d where d.deleted_at is null and s.deleted_at is null and p.deleted_at is null and p.company_id ='${company.id}'  and s.staff_id=p.account_id and d.id=s.department_id and p.start_at>'${params.startTime}' and p.start_at<'${params.endTime}'`;
             savedMoneyCompleteSql = '';
             planSql = `${completeSql} and p.status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE})`;
             completeSql += ` and p.status=${EPlanStatus.COMPLETE}`;
@@ -874,8 +894,9 @@ class TripPlanModule {
             savedMoneyComplete = `${savedMoneySelectSql} ${savedMoneyCompleteSql} group by d.id;`;
             plan = `${selectSql} ${planSql} group by d.id;`;
         }
-
+        console.log(complete);
         let completeInfo = await DB.query(complete);
+        console.log("completeInfo:",completeInfo);
         let savedMoneyCompleteInfo = await DB.query(savedMoneyComplete);
         let planInfo = await DB.query(plan);
 
@@ -933,8 +954,7 @@ class TripPlanModule {
         let approve = await Models.approve.get(params.tripApproveId);
         let account = await Models.staff.get(approve.submitter);
         let approveUser = await Models.staff.get(approve.approveUser);
-        let currentUser = await Staff.getCurrent();
-        let company = approve.approveUser ? approveUser.company : currentUser.company;
+        let company = approve.approveUser ? approveUser.company : account.company;
         if (typeof approve.data == 'string') approve.data = JSON.parse(approve.data);
         let query: any  = approve.data.query;   //查询条件
         if(typeof query == 'string') query = JSON.parse(query);
@@ -944,9 +964,12 @@ class TripPlanModule {
         if (typeof budgets == 'string') budgets = JSON.parse(budgets);
 
         let tripPlan = TripPlan.create({id: approve.id});
-        let projectIds = [];//事由名称
         let arrivalCityCodes = [];//目的地代码
         let project: Project;
+        if(query.projectName){
+            project = await API.tripPlan.getProjectByName({companyId: company.id, name: query.projectName,
+                userId: account.id, isCreate: true});
+        }
 
         if(query.originPlace) {
             let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace}) || {name: null};
@@ -957,17 +980,6 @@ class TripPlanModule {
         if(destinationPlacesInfo && _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
             for(let i = 0; i < destinationPlacesInfo.length; i++){
                 let segment: ISegment = destinationPlacesInfo[i];
-                //处理出差事由放入projectIds 原project存放第一程出差事由
-                if(segment.reason){
-                    let projectItem = await TripPlanModule.getProjectByName({companyId: company.id, name: segment.reason,
-                        userId: account.id, isCreate: true});
-                    if(i == 0){
-                        project = projectItem;
-                    }
-                    if(projectIds.indexOf(projectItem.id) == -1){
-                        projectIds.push(projectItem.id);
-                    }
-                }
 
                 //处理目的地 放入arrivalCityCodes 原目的地信息存放第一程目的地信息
                 if(segment.destinationPlace){
@@ -995,7 +1007,6 @@ class TripPlanModule {
                 }
             }
         }
-        tripPlan.projectIds = JSON.stringify(projectIds);
         tripPlan.arrivalCityCodes = JSON.stringify(arrivalCityCodes);
 
         tripPlan['companyId'] = account.company.id;
@@ -1027,6 +1038,7 @@ class TripPlanModule {
 
         tripDetails = budgets.map(function (budget) {
             let tripType = budget.tripType;
+            let reason = budget.reason;
             let price = Number(budget.price);
             let detail;
             let data: any = {};
@@ -1090,6 +1102,7 @@ class TripPlanModule {
                 default:
                     throw new Error("not support tripDetail type!");
             }
+            detail.reason = reason;
             detail.type = tripType;
             detail.budget = price;
             detail.accountId= account.id;

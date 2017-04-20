@@ -7,7 +7,7 @@
 import fs = require("fs");
 import cache from "common/cache";
 const C = require("@jingli/config");
-const proxy = require("express-http-proxy")
+const proxy = require("express-http-proxy");
 const config = C.ddconfig;
 
 import Logger from '@jingli/logger';
@@ -35,9 +35,15 @@ let reg = new RegExp( config.name_reg );
 
 
 /* transpond */
-export function transpond(req , res , next){
+export function transpond(req , res , next, urls?:string){
     let url = config.test_url.replace(/\/$/g, "");
     url = url + "/ddtalk/isv/receive";
+    if(urls){
+        url = urls;
+    }
+
+    console.log("enter in transpond , the url : ", url);
+
     proxy(url)(req, res, next);
 }
 

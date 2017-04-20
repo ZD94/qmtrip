@@ -19,7 +19,7 @@ import TripPlanModule = require("../tripPlan/index");
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 const L = require('@jingli/language');
 var API = require('common/api');
-var config = require("@jingli/config");
+import config = require("@jingli/config");
 import _ = require("lodash");
 import {ENoticeType} from "_types/notice/notice";
 

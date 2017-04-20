@@ -99,7 +99,7 @@ var staffMenus = [
 //     },
 // ];
 
-var config = require('config');
+var config = require('@jingli/config');
 
 export function getImageUrl(id){
     if(typeof id !== 'string' || typeof config.update !== 'string')

@@ -1,6 +1,7 @@
 /**
  * Created by yumiao on 15-12-9.
  */
+
 import {DB} from "common/model";
 import L from '@jingli/language';
 let C = require("@jingli/config");
@@ -23,6 +24,7 @@ import {requirePermit, conditionDecorator, condition, modelNotNull} from "api/_d
 import {md5} from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
 import {CoinAccount} from "_types/coin";
+
 
 const supplierCols = Supplier['$fieldnames'];
 
@@ -68,9 +70,12 @@ class CompanyModule {
         userName: string, pwd?: string, status?: number, remark?: string, description?: string, isValidateMobile?: boolean, promoCode?: string}): Promise<any>{
         let session = Zone.current.get('session');
         let pwd = params.pwd;
-        let agencyId = Agency.__defaultAgencyId;
+        let defaultAgency = await Models.agency.find({where:{email:C.default_agency.email}});//Agency.__defaultAgencyId;
+        let agencyId:any;
+        if(defaultAgency && defaultAgency.length==1){
+            agencyId=defaultAgency[0].id;
+        }
         let domain = ""; //企业域名
-
         if(params.email){
             domain = params.email.match(/.*\@(.*)/)[1];
         }
@@ -80,7 +85,6 @@ class CompanyModule {
         }
 
         /*let companies = await Models.company.find({where: {$or: [{email: params.email}, {mobile: params.mobile}/!*, {domain_name: domain}*!/]}});
-
         if(companies && companies.length > 0) {
             throw {code: -7, msg: '邮箱或手机号已经注册'};
         }*/
