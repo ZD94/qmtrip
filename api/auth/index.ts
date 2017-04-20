@@ -8,7 +8,7 @@ import { Account, ACCOUNT_STATUS } from "_types/auth";
 import { Staff, EInvitedLinkStatus, EAddWay } from "_types/staff";
 import validator = require('validator');
 import L from '@jingli/language';
-import cache = require("common/cache");
+import cache from 'common/cache';
 import * as authentication from './authentication';
 import * as wechat from './wechat';
 import * as messagePush from './messagePush';
@@ -469,6 +469,43 @@ export default class ApiAuth {
         return staff.company;
     }
 
+
+
+    /**
+     * 被邀请人通过邀请链接注册员工信息
+     * @param data
+     * @returns {Company}
+     */
+    @clientExport
+    @requireParams(['mobile', 'name', 'companyId', 'msgTicket', 'pwd', 'sex'])
+    static async invitedNewStaffRegister(data): Promise<any> {
+        let msgTicket = data.msgTicket;
+        let mobile = data.mobile;
+        let name = data.name;
+        let pwd = data.pwd;
+        let companyId = data.companyId;
+        let sex = data.sex;
+
+        if(!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+        let redis_mobile = cache.read(msgTicket);
+
+        if(redis_mobile != mobile){
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+
+        let staff = await API.staff.registerStaff({
+            mobile: mobile,
+            name: name,
+            companyId: companyId,
+            pwd: utils.md5(pwd),
+            status: ACCOUNT_STATUS.ACTIVE,
+            isValidateMobile: true,
+            addWay: EAddWay.INVITED
+        });
+        return staff.company;
+    }
 
     /**
      * 添加员工验证手机号和邮箱
