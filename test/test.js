@@ -6,7 +6,7 @@ var path = require('path');
 process.env.NODE_PATH = '.:'+process.env.NODE_PATH;
 
 require('app-module-path').addPath(path.normalize(path.join(__dirname, '..')));
-var zone = require('common/zone');
+var zone = require('@jingli/zone-setup');
 require('common/node_ts').install();
 
 global.Promise = require('bluebird');
