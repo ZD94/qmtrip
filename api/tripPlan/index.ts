@@ -2,11 +2,11 @@
  * Created by yumiao on 15-12-10.
  */
 "use strict";
-import {DB} from "common/model";
+import {DB} from '@jingli/database';
 let uuid = require("node-uuid");
 import L from '@jingli/language';
 import utils = require("common/utils");
-let API = require('common/api');
+let API = require('@jingli/dnode-api');
 import Logger from '@jingli/logger';
 let logger = new Logger("tripPlan");
 import config = require("@jingli/config");
@@ -14,7 +14,7 @@ import config = require("@jingli/config");
 let moment = require("moment");
 let scheduler = require('common/scheduler');
 import _ = require('lodash');
-import {requireParams, clientExport} from 'common/api/helper';
+import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
     TripApprove, QMEApproveStatus, EApproveResult, EApproveResult2Text,
@@ -1507,22 +1507,20 @@ class TripPlanModule {
         let companyName=staff.company.name;
         let staffName=staff.name;
 
-         try{
-             await API.notify.notifyDesignatedAccount({
-                 mobile:"13810529805",
-                 email:"notice@jingli365.com",
-                 key:"qm_notify_invoice_audit_request",
-                 values:{
-                     company:companyName,
-                     staffName:staff.name
-                 }
-             });
-         }catch(err){
-             logger.info(err);
+        try{
+            await API.notify.submitNotify({
+             mobile: '13810529805',
+             email: 'notice@jingli365.com',
+             key: 'qm_notify_invoice_audit_request',
+             values:{
+                 company:companyName,
+                 staffName:staff.name
+             }
+            })
+        }catch(err){
+            logger.info(err);
         }
     }
-
-
 
     @clientExport
     @requireParams(['detailId', 'orderIds', 'supplierId'])

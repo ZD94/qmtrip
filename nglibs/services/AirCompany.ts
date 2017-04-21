@@ -1,7 +1,7 @@
 
 import angular = require('angular');
 
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 API.require("place");
 
 angular

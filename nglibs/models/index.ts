@@ -29,7 +29,7 @@ import {TripBasicPackage} from "_types/tripPackage/tripBasicPackage";
 import {TripFuelAddPackage} from "_types/tripPackage/tripFuelAddPackage";
 
 
-const API = require('common/api');
+const API = require('@jingli/dnode-api');
 
 function resolverAPIModule(modname: string){
     return function(){

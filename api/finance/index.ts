@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {clientExport, requireParams} from "common/api/helper";
+import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
 import {Models} from "_types/index";
 import {TripDetail, TripPlan} from "_types/tripPlan";
 import {PaginateInterface} from "common/model/interface";
