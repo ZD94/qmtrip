@@ -7,19 +7,20 @@ require('app-module-path').addPath(__dirname);
 require('common/node_ts').install();
 var initData = require('libs/initTestData');
 
+var Logger = require('@jingli/logger');
 
 Error.stackTraceLimit = 40;
-var zone = require('common/zone');
+var zone = require('@jingli/zone-setup');
 
 //服务器启动性能日志
-//var perf = require('common/perf');
+//var perf = require('@jingli/perf');
 //perf.init('init');
 
 global.Promise = require('bluebird');
 Promise.promisifyAll(require("redis"));
 Promise.promisifyAll(require("fs"));
 
-var config = require("./config");
+var config = require("@jingli/config");
 
 require("common/redis-client").init(config.redis.url);
 
@@ -30,17 +31,16 @@ if(config.debug) {
 
 var path = require('path');
 
-var Logger = require('common/logger');
 Logger.init(config.logger);
 var logger = new Logger('main');
 
 var cache = require("common/cache");
 cache.init({redis_conf: config.redis.url, prefix: 'times:cache'});
 
-var model = require('common/model');
-model.init(config.postgres.url);
+var database = require('@jingli/database');
+database.init(config.postgres.url);
 
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 
 var Server = require('common/server');
 var server = new Server(config.appName, config.pid_file);
@@ -60,11 +60,11 @@ server.api_path = path.join(__dirname, 'api');
 server.api_port = config.apiPort;
 server.api_config = config.api;
 
-
+var cluster = require('cluster');
 server.on('init.api', function(API){
     API.registerAuthWeb(API.auth.authentication);
-    if(config.is_init_test_company){
-        initData.initDataForTest({name: '笑傲江湖', userName: '风清扬', mobile: '13700000001', pwd: '123456', email: 'fq.yang@xajh.com'});
+    if(cluster.isMaster && config.is_init_test_company){
+        initData.initDataForTest({name: '笑傲江湖', userName: '风清扬', mobile: '13700000001', pwd: '123456', email: 'fq.yang@jingli.tech'});
     }
 });
 

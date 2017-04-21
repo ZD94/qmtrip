@@ -1,6 +1,6 @@
 "use strict";
 import { AgencyUser } from '_types/agency/agency-user';
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 var msgbox = require('msgbox');
 
 API.require("auth");

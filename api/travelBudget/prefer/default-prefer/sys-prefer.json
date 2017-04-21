@@ -36,24 +36,6 @@
     ],
     "abroadTraffic": [
         {
-            "name": "departStandardTimePrefer",
-            "options": {
-                "end": "<%=moment(local.leaveDate).format('YYYY-MM-DD')%> 16:00",
-                "begin": "<%=moment(local.leaveDate).format('YYYY-MM-DD')%> 8:00",
-                "score": 500,
-                "scoreInterval": -3
-            }
-        },
-        {
-            "name": "arriveStandardTimePrefer",
-            "options": {
-                "end": "<%=moment(local.leaveDate).format('YYYY-MM-DD')%> 19:00",
-                "begin": "<%=moment(local.leaveDate).format('YYYY-MM-DD')%> 9:00",
-                "score": 500,
-                "scoreInterval": -3
-            }
-        },
-        {
             "name": "directArrive",
             "options": {
                 "deductScorePerStop": 10000

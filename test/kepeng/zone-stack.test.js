@@ -1,7 +1,7 @@
 
 var events = require('events');
 
-var zone = require('../../common/zone');
+var zone = require('@jingli/zone-setup');
 require('zone.js/dist/long-stack-trace-zone')
 
 global.Promise = require('bluebird');

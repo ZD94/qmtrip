@@ -1,7 +1,7 @@
 /**
  * Created by wyl on 15-12-12.
  */
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 
 var assert = require("assert");
 var getSession = require('common/model').getSession;

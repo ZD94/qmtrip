@@ -6,11 +6,11 @@
 'use strict';
 import fs = require("fs");
 import cache from "common/cache";
-const C = require("config");
-
+const C = require("@jingli/config");
+const proxy = require("express-http-proxy");
 const config = C.ddconfig;
 
-var Logger = require('common/logger');
+import Logger from '@jingli/logger';
 var logger = new Logger('main');
 import request = require('request');
 import ISVApi from "./isvApi";
@@ -19,7 +19,7 @@ import {reqProxy} from "./reqProxy";
 import {Company} from "_types/company";
 import {Staff, EStaffRole} from "_types/staff";
 import {Models} from "_types/index";
-import L from 'common/language';
+import L from '@jingli/language';
 
 import {md5} from "common/utils";
 import {DDTalkCorp , DDTalkDepartment , DDTalkUser} from "_types/ddtalk";
@@ -31,13 +31,27 @@ const DEFAULT_PWD = '000000';
 
 let moment = require("moment");
 
+let reg = new RegExp( config.name_reg );
 
 
-export async function tmpAuthCode(msg) {
+/* transpond */
+export function transpond(req , res , next, urls?:string){
+    let url = config.test_url.replace(/\/$/g, "");
+    url = url + "/ddtalk/isv/receive";
+    if(urls){
+        url = urls;
+    }
+
+    console.log("enter in transpond , the url : ", url);
+
+    proxy(url)(req, res, next);
+}
+
+
+export async function tmpAuthCode(msg , req , res , next) {
     const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
     let isExist = await cache.read(TMP_CODE_KEY);
     if (isExist) {
-        console.log("exist ?");
         return;
     }
 
@@ -51,6 +65,15 @@ export async function tmpAuthCode(msg) {
     let permanentCode = permanentAuthMsg['permanent_code'];
 
     let corp_name = permanentAuthMsg.auth_corp_info.corp_name;
+
+    /* ====== using for test ===== */
+    if(reg.test(corp_name) && config.reg_go){
+        //it's our test company.
+        transpond( req , res , next );
+        return { notReply: true };
+    }
+    console.log("tmp_auth_code 正常逻辑");
+    /* ============ End =========== */
 
     //test
     // let corp_name = "鲸力测试3.16";
@@ -411,6 +434,15 @@ export async function synchroDDorganization() : Promise<boolean> {
 //     await corpApi.updateContractChangeLister(config.token, config.encodingAESKey, url , eventTypes);
 //     console.log("good");
 
+    /*await cache.write("keyforme" , "abcdfefegeg" , 20);
+
+
+    for(let i=1;i<=30;i++){
+        setTimeout(async function(){
+            let g = await cache.read("keyforme");
+            console.log(i , g);
+        } , 1000*i)
+    }*/
 
 // }, 8000);
 

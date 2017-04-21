@@ -3,12 +3,11 @@
  */
 'use strict';
 var _ = require("lodash");
-var sequelize = require("common/model").DB;
-let DBM = sequelize.models;
-let API = require("common/api");
-import L from 'common/language';
+import {DB} from '@jingli/database';
+let API = require("@jingli/dnode-api");
+import L from '@jingli/language';
 import {Department, StaffDepartment} from "_types/department";
-import {requireParams, clientExport} from 'common/api/helper';
+import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import { Models } from '_types/index';
 import { FindResult, PaginateInterface } from "common/model/interface";
 import {Staff, EStaffStatus} from "_types/staff";
@@ -138,8 +137,8 @@ class DepartmentModule{
     @clientExport
     @requireParams(["where.companyId"], departmentCols.map((v) => 'where.'+ v))
     @conditionDecorator([
-        {if: condition.isCompanyAdminOrOwner("where.companyId")},
-        {if: condition.isCompanyAgency("where.companyId")}
+        {if: condition.isCompanyAdminOrOwner("0.where.companyId")},
+        {if: condition.isCompanyAgency("0.where.companyId")}
     ])
     static async getDepartments(params) :Promise<FindResult>{
         params.order = params.order || [['createdAt', 'desc']];
@@ -210,16 +209,14 @@ class DepartmentModule{
         {if: condition.isDepartmentAdminOrOwner("0.parentId")},
         {if: condition.isDepartmentAgency("0.parentId")}
     ])
-    static getAllChildren(params: {parentId: string}){
+    static async getAllChildren(params: {parentId: string}){
         var sql = "with RECURSIVE cte as " +
             "( select a.id,a.name,a.parent_id from department.departments a where id='"+params.parentId+"' " +
             "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id " +
             "where k.deleted_at is null) " +
             "select * from cte";
-        return sequelize.query(sql)
-            .spread(function(children, row){
-                return children;
-            })
+        let [children, row] = await DB.query(sql);
+        return children;
     }
 
     @requireParams(["parentId"])
@@ -247,19 +244,17 @@ class DepartmentModule{
         {if: condition.isDepartmentAdminOrOwner("0.parentId")},
         {if: condition.isDepartmentAgency("0.parentId")}
     ])
-    static getAllChildDepartmentsId(params: {parentId: string}): string[]{
+    static async getAllChildDepartmentsId(params: {parentId: string}): Promise<string[]>{
         var ids = [];
         var sql = "with RECURSIVE cte as " +
             "( select a.id,a.name,a.parent_id from department.departments a where id='"+params.parentId+"' " +
             "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id " +
             "where k.deleted_at is null) " +
             "select * from cte";
-        return sequelize.query(sql)
-            .spread(function(children, row){
-                for(var i=0;i<children.length;i++)
-                    ids.push(children[i].id);
-                return ids;
-            })
+        let [children, row] = await DB.query(sql);
+        for(var i=0;i<children.length;i++)
+            ids.push(children[i].id);
+        return ids;
     }
 
     /**
@@ -277,7 +272,7 @@ class DepartmentModule{
         let idsStr = ids.join("','");
         let sql = "select count(*) from" +
             " (select distinct staff_id from department.staff_departments where department_id in ('"+idsStr+"') and deleted_at is null) as a";
-        let result = await sequelize.query(sql);
+        let result = await DB.query(sql);
         return result[0][0].count;
     }
 
@@ -323,9 +318,9 @@ class DepartmentModule{
         }
         //员工状态
         /*if(options.order == 'status'){
-            DBM.Staff.belongsTo(DBM.Account, {foreignKey: 'id', targetKey: 'id'});
+            DB.models.Staff.belongsTo(DB.models.Account, {foreignKey: 'id', targetKey: 'id'});
             options.include = [{
-                model: DBM.Account,
+                model: DB.models.Account,
                 attributes : []
             }];
             options.order = '"' + 'Account' + '"' + '.status asc';
@@ -349,11 +344,9 @@ class DepartmentModule{
         return staffs;
     }
 
-    static deleteDepartmentByTest(params){
-        return DBM.Department.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
-            .then(function(){
-                return true;
-            })
+    static async deleteDepartmentByTest(params){
+        await DB.models.Department.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}});
+        return true;
     }
 
     /****************************************StaffDepartment begin************************************************/

@@ -6,7 +6,7 @@ var path = require('path');
 process.env.NODE_PATH = '.:'+process.env.NODE_PATH;
 
 require('app-module-path').addPath(path.normalize(path.join(__dirname, '..')));
-var zone = require('common/zone');
+var zone = require('@jingli/zone-setup');
 require('common/node_ts').install();
 
 global.Promise = require('bluebird');
@@ -21,7 +21,8 @@ require('./mocha-zone')(global);
 
 var config = require("../config");
 
-var Logger = require('common/logger');
+import Logger from '@jingli/logger';
+
 Logger.init({
     path: path.join(__dirname, "../log"),
     prefix: "mocha_",
@@ -32,7 +33,7 @@ Logger.init({
 });
 var logger = new Logger('test');
 
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 
 var model = require('common/model');
 model.init(config.postgres.url_test);

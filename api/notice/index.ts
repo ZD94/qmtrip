@@ -2,16 +2,16 @@
  * Created by wyl on 16-11-11.
  */
 'use strict';
-import {requireParams, clientExport} from 'common/api/helper';
+import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {conditionDecorator, condition} from "../_decorator";
 import {Staff} from "_types/staff";
 import { Notice, NoticeAccount, ESendType } from '_types/notice';
 import { Models } from '_types';
 import {FindResult} from "common/model/interface";
-let sequelize = require("common/model").DB;
+import {DB} from '@jingli/database';
 
 var JPush = require("jpush-sdk");
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 
 const noticeCols = Notice['$fieldnames'];
 const noticeAccountCols = NoticeAccount['$fieldnames'];
@@ -155,7 +155,7 @@ class NoticeModule{
             "on a.notice_id = b.id where (a.account_id='${staff.id}' or b.send_type = ${ESendType.ALL_ACCOUNT}) " +
             "and a.is_read <> true and a.deleted_at is null group by b.type`;
 
-        var unReadCountInfo = await sequelize.query(sql1);
+        var unReadCountInfo = await DB.query(sql1);
         return unReadCountInfo;
 
     }

@@ -1,4 +1,4 @@
-import L from 'common/language';
+import L from '@jingli/language';
 import { Staff, EStaffRole } from '_types/staff/staff';
 import validator = require('validator');
 
