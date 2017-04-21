@@ -498,6 +498,7 @@ export default class ApiAuth {
         let staff = await API.staff.registerStaff({
             mobile: mobile,
             name: name,
+            sex: sex,
             companyId: companyId,
             pwd: utils.md5(pwd),
             status: ACCOUNT_STATUS.ACTIVE,
