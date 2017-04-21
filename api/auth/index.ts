@@ -197,8 +197,10 @@ export default class ApiAuth {
         var mobileOrEmail = params.email;
         var accountId = params.accountId;
         var account: Account;
+        let staff: Staff;
         if(accountId) {
-            account = await Models.account.get(accountId, {notParent: true});
+            staff = await Models.staff.get(accountId);
+            account = await Models.account.get(staff.accountId, {notParent: true});
         } else {
             var accounts = await Models.account.find({where: {$or: [{email: mobileOrEmail}, {mobile: mobileOrEmail}]}});
             if(accounts && accounts.length > 0) {
@@ -212,7 +214,11 @@ export default class ApiAuth {
         // var staff = await Models.staff.get(account.id);
         // await API.auth.sendResetPwdEmail({email: account.email, mobile: account.mobile, type: 1, isFirstSet: true, companyName: staff.company.name});
         //发送qm_active
-        await _sendActiveEmail(account.id);
+        let account_id = account.id;
+        if(staff && staff.id){
+            account_id = staff.id;
+        }
+        await _sendActiveEmail(account_id);
         return true;
     }
 
@@ -1108,7 +1114,12 @@ export default class ApiAuth {
 }
 
 async function _sendActiveEmail(accountId) {
-    var account = await Models.account.get(accountId)
+    let staff = await Models.staff.get(accountId);
+    let account_id = accountId;
+    if(staff && staff.accountId){
+        account_id = staff.accountId;
+    }
+    var account = await Models.account.get(account_id);
     //生成激活码
     var expireAt = Date.now() + 24 * 60 * 60 * 1000;//失效时间一天
     var activeToken = utils.getRndStr(6);
@@ -1134,7 +1145,8 @@ async function _sendActiveEmail(accountId) {
         API.notify.submitNotify({
             key: 'qm_active',
             values: vals,
-            email: account.email
+            email: account.email,
+            userId: staff ? staff.id : null
         })
     ]);
 

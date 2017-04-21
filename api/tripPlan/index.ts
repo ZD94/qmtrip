@@ -375,7 +375,7 @@ class TripPlanModule {
                 await API.notify.submitNotify({
                     key: 'qm_notify_agency_budget',
                     values: auditValues,
-                    accountId: default_agency.id
+                    userId: default_agency.id
                 })
             } catch(err) { console.error(err);}
 
@@ -528,7 +528,7 @@ class TripPlanModule {
 
             let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
             try {
-                await API.notify.submitNotify({key: templateName, values: templateValue, accountId: staff.id});
+                await API.notify.submitNotify({key: templateName, values: templateValue, userId: staff.id});
 
             } catch(err) {
                 console.error(`发送通知失败:`, err);
@@ -1166,7 +1166,7 @@ class TripPlanModule {
         }
         let tplName = 'qm_notify_approve_pass';
         try {
-            await API.notify.submitNotify({accountId: account.id, key: tplName, values: self_values});
+            await API.notify.submitNotify({userId: account.id, key: tplName, values: self_values});
         } catch(err) {
             console.error(err);
         }
@@ -1442,7 +1442,7 @@ class TripPlanModule {
         try {
             await API.notify.submitNotify({
                 key: 'qm_spend_report',
-                accountId: staff.id,
+                userId: staff.id,
                 values: {
                     title: title,
                     attachments: [{
@@ -1622,9 +1622,6 @@ class TripPlanModule {
             tripApproves.map(async (approve) => {
                 let approveCompany = await approve.getCompany();
                 let number = 0;
-                if(approve.isSpecialApprove){
-                    number = number + 1;
-                }
                 if(approve.isNeedHotel){
                     number = number + 1;
                 }
