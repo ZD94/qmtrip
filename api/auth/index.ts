@@ -193,7 +193,7 @@ export default class ApiAuth {
      * @returns {boolean}
      */
     @clientExport
-    static async reSendActiveLink(params: {email: string, accountId?: string}): Promise<boolean> {
+    static async reSendActiveLink(params: {email: string, accountId?: string, origin?: string}): Promise<boolean> {
         var mobileOrEmail = params.email;
         var accountId = params.accountId;
         var account: Account;
@@ -212,7 +212,7 @@ export default class ApiAuth {
         // var staff = await Models.staff.get(account.id);
         // await API.auth.sendResetPwdEmail({email: account.email, mobile: account.mobile, type: 1, isFirstSet: true, companyName: staff.company.name});
         //发送qm_active
-        await _sendActiveEmail(account.id);
+        await _sendActiveEmail(account.id, params.origin);
         return true;
     }
 
@@ -1144,13 +1144,14 @@ export default class ApiAuth {
     static getUserId = authentication.getUserId;
 }
 
-async function _sendActiveEmail(accountId) {
+async function _sendActiveEmail(accountId: string, origin?: string) {
     var account = await Models.account.get(accountId)
     //生成激活码
     var expireAt = Date.now() + 24 * 60 * 60 * 1000;//失效时间一天
     var activeToken = utils.getRndStr(6);
     var sign = makeActiveSign(activeToken, account.id, expireAt);
-    var url = C.host + "/index.html#/login/active?accountId=" + account.id + "&sign=" + sign + "&timestamp=" + expireAt + "&email=" + account.email;
+    let host = origin ? origin : C.host;
+    var url = host + "/index.html#/login/active?accountId=" + account.id + "&sign=" + sign + "&timestamp=" + expireAt + "&email=" + account.email;
     var appMessageUrl = "#/staff/staff-info";
     try {
         url = await API.wechat.shorturl({longurl: url});

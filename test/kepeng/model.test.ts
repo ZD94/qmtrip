@@ -4,7 +4,7 @@ import { Staff, EStaffRole } from '_types/staff';
 import { Models } from '_types/index';
 import Sequelize = require("sequelize");
 
-require('common/zone');
+require('@jingli/zone-setup');
 
 global.Promise = require('bluebird');
 Promise.promisifyAll(require("fs"));
