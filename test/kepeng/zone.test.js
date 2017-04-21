@@ -1,5 +1,5 @@
 
-require('common/zone');
+require('@jingli/zone-setup');
 
 var Q = require('q');
 
