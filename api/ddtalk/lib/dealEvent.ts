@@ -6,8 +6,8 @@
 'use strict';
 import fs = require("fs");
 import cache from "common/cache";
-import C = require("@jingli/config");
-
+const C = require("@jingli/config");
+const proxy = require("express-http-proxy");
 const config = C.ddconfig;
 
 import Logger from '@jingli/logger';
@@ -30,18 +30,21 @@ const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 const DEFAULT_PWD = '000000';
 
 let moment = require("moment");
-let requestProxy = require('express-request-proxy');
+
 let reg = new RegExp( config.name_reg );
 
 
 /* transpond */
-export function transpond(req , res , next){
-    return requestProxy({
-        url: config.test_url ,
-        reqAsBuffer: true,
-        cache: false,
-        timeout: 180000,
-    })(req, res, next);
+export function transpond(req , res , next, urls?:string){
+    let url = config.test_url.replace(/\/$/g, "");
+    url = url + "/ddtalk/isv/receive";
+    if(urls){
+        url = urls;
+    }
+
+    console.log("enter in transpond , the url : ", url);
+
+    proxy(url)(req, res, next);
 }
 
 
@@ -49,7 +52,6 @@ export async function tmpAuthCode(msg , req , res , next) {
     const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
     let isExist = await cache.read(TMP_CODE_KEY);
     if (isExist) {
-        console.log("exist ?");
         return;
     }
 
@@ -68,11 +70,10 @@ export async function tmpAuthCode(msg , req , res , next) {
     if(reg.test(corp_name) && config.reg_go){
         //it's our test company.
         transpond( req , res , next );
-        return;
+        return { notReply: true };
     }
-
+    console.log("tmp_auth_code 正常逻辑");
     /* ============ End =========== */
-
 
     //test
     // let corp_name = "鲸力测试3.16";
