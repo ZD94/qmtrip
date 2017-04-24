@@ -97,6 +97,9 @@ class DDTalk {
             let url = config.test_url.replace(/\/$/g, "");
             console.log("enter JLTesthello");
             console.log(req.body);
+
+
+            res.send("yes, you are in the local");
             return DealEvent.transpond(req , res , next, {
                 timeout : 5000,
                 decorateRequest: (proxyReq, originalReq)=>{
