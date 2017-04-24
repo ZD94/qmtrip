@@ -7,9 +7,10 @@ require('app-module-path').addPath(__dirname);
 require('common/node_ts').install();
 var initData = require('libs/initTestData');
 
+var Logger = require('@jingli/logger');
 
 Error.stackTraceLimit = 40;
-var zone = require('common/zone');
+var zone = require('@jingli/zone-setup');
 
 //服务器启动性能日志
 //var perf = require('@jingli/perf');
@@ -30,7 +31,6 @@ if(config.debug) {
 
 var path = require('path');
 
-var Logger = require('@jingli/logger');
 Logger.init(config.logger);
 var logger = new Logger('main');
 

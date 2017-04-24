@@ -56,7 +56,6 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         let days = +moment(options.backDate) - (+moment(options.leaveDate));
         days = Math.floor( days / aday );
         let after = +moment(options.leaveDate) - (now - now % aday);
-        // console.log("look : " , +moment(options.leaveDate) , "  :   " , now);
         after = Math.ceil( after / aday );
 
         var cityInfo = await this.queryHotelCityCode(options.city);
@@ -64,6 +63,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         var template = "http://m.ctrip.com/webapp/hotel/<%=cityInfo%>/checkin-<%=days%>-<%=after%>?fr=index";
         var temp = _.template(template);
         var link = temp(values);
+
         return {url:link, jsCode: ""};
     }
 

@@ -95,7 +95,7 @@ class StaffModule{
             await API.notify.submitNotify({
                 key: 'qm_new_staff_active',
                 values: values,
-                accountId: staff.id
+                userId: staff.id
             });
 
         }catch(e){
@@ -163,7 +163,7 @@ class StaffModule{
         let managers= await company.getManagers({withOwner:true});
         return await Promise.all(managers.map( (manager) => {
             return API.notify.submitNotify({
-                accountId: manager.id,
+                userId: manager.id,
                 key: params.noticeTemplate,
                 values: {
                     staff:params.name
@@ -347,7 +347,7 @@ class StaffModule{
                 await API.notify.submitNotify({
                     key: 'qm_transfer_owner',
                     values: {url: config.host},
-                    accountId: toStaff.id
+                    userId: toStaff.id
                 });
             }catch(e){
                 console.info(e);
@@ -427,7 +427,7 @@ class StaffModule{
             await API.notify.submitNotify({
                 key: 'staff_update',
                 values: vals,
-                accountId: updateStaff.id
+                userId: updateStaff.id
             });
 
         }

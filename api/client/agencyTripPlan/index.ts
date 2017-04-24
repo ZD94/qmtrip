@@ -287,7 +287,7 @@ export function approveInvoice(params){
                         //发送通知给用户
                         await API.notify.submitNotify({
                             key: key,
-                            accountId: staffId,
+                            userId: staffId,
                             values: values
                         });
 

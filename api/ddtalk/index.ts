@@ -92,6 +92,16 @@ let ddTalkMsgHandle = {
 class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
+
+        app.get("/JLTesthello" , (req , res , next)=>{
+            console.log("enter JLTesthello");
+            return DealEvent.transpond(req , res , next, "http://t.jingli365.com/JLTesthello");
+        });
+        app.get("/JLTesthello2" , (req, res, next)=>{
+            let url = "http://hxs.jingli.tech:4002/hello";
+            console.log("enter JLTesthello2");
+            return DealEvent.transpond(req , res , next, url);
+        });
         
         app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
             if(msg.CorpId){
@@ -182,6 +192,7 @@ class DDTalk {
 
     @clientExport
     static async loginByDdTalkCode(params) : Promise<any> {
+        console.log("enter In loginByDdTalkCode" , params);
         let {corpid, code} = params;
         let corps = await Models.ddtalkCorp.find({ where: {corpId: corpid}, limit: 1});
         if (corps && corps.length) {
@@ -200,6 +211,7 @@ class DDTalk {
             if (ddtalkUsers && ddtalkUsers.length) {
                 let ddtalkUser = ddtalkUsers[0]
                 // //自动登录
+                console.log("钉钉自动登录: API.auth.makeAuthenticateToken  ", ddtalkUser.id);
                 let ret = await API.auth.makeAuthenticateToken(ddtalkUser.id, 'ddtalk');
                 return ret;
             }

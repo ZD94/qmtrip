@@ -375,7 +375,7 @@ class TripPlanModule {
                 await API.notify.submitNotify({
                     key: 'qm_notify_agency_budget',
                     values: auditValues,
-                    accountId: default_agency.id
+                    userId: default_agency.id
                 })
             } catch(err) { console.error(err);}
 
@@ -528,7 +528,7 @@ class TripPlanModule {
 
             let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
             try {
-                await API.notify.submitNotify({key: templateName, values: templateValue, accountId: staff.id});
+                await API.notify.submitNotify({key: templateName, values: templateValue, userId: staff.id});
 
             } catch(err) {
                 console.error(`发送通知失败:`, err);
@@ -862,7 +862,7 @@ class TripPlanModule {
 
         if(type == 'D') {
             selectKey = 'departmentId';
-            completeSql = `from department.departments as d, staff.staffs as s, trip_plan.trip_plans as p where d.deleted_at is null and s.deleted_at is null and p.deleted_at is null and p.company_id='${company.id}' and d.id=s.department_id and p.account_id=s.id and p.start_at>'${params.startTime}' and p.start_at<'${params.endTime}'`;
+            completeSql=`from trip_plan.trip_plans as p, department.staff_departments as s, department.departments as d where d.deleted_at is null and s.deleted_at is null and p.deleted_at is null and p.company_id ='${company.id}'  and s.staff_id=p.account_id and d.id=s.department_id and p.start_at>'${params.startTime}' and p.start_at<'${params.endTime}'`;
             savedMoneyCompleteSql = '';
             planSql = `${completeSql} and p.status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE})`;
             completeSql += ` and p.status=${EPlanStatus.COMPLETE}`;
@@ -894,8 +894,9 @@ class TripPlanModule {
             savedMoneyComplete = `${savedMoneySelectSql} ${savedMoneyCompleteSql} group by d.id;`;
             plan = `${selectSql} ${planSql} group by d.id;`;
         }
-
+        console.log(complete);
         let completeInfo = await DB.query(complete);
+        console.log("completeInfo:",completeInfo);
         let savedMoneyCompleteInfo = await DB.query(savedMoneyComplete);
         let planInfo = await DB.query(plan);
 
@@ -953,8 +954,7 @@ class TripPlanModule {
         let approve = await Models.approve.get(params.tripApproveId);
         let account = await Models.staff.get(approve.submitter);
         let approveUser = await Models.staff.get(approve.approveUser);
-        let currentUser = await Staff.getCurrent();
-        let company = approve.approveUser ? approveUser.company : currentUser.company;
+        let company = approve.approveUser ? approveUser.company : account.company;
         if (typeof approve.data == 'string') approve.data = JSON.parse(approve.data);
         let query: any  = approve.data.query;   //查询条件
         if(typeof query == 'string') query = JSON.parse(query);
@@ -1166,7 +1166,7 @@ class TripPlanModule {
         }
         let tplName = 'qm_notify_approve_pass';
         try {
-            await API.notify.submitNotify({accountId: account.id, key: tplName, values: self_values});
+            await API.notify.submitNotify({userId: account.id, key: tplName, values: self_values});
         } catch(err) {
             console.error(err);
         }
@@ -1442,7 +1442,7 @@ class TripPlanModule {
         try {
             await API.notify.submitNotify({
                 key: 'qm_spend_report',
-                accountId: staff.id,
+                userId: staff.id,
                 values: {
                     title: title,
                     attachments: [{
@@ -1622,9 +1622,6 @@ class TripPlanModule {
             tripApproves.map(async (approve) => {
                 let approveCompany = await approve.getCompany();
                 let number = 0;
-                if(approve.isSpecialApprove){
-                    number = number + 1;
-                }
                 if(approve.isNeedHotel){
                     number = number + 1;
                 }
