@@ -615,7 +615,7 @@ class CompanyModule {
                         let ps = managers.map( (manager) => {
                             //给各个企业发送通知
                             return API.notify.submitNotify({
-                                accountId: manager.id,
+                                userId: manager.id,
                                 key: key,
                                 values: {
                                     expiryDate: moment(company.expiryDate).format('YYYY-MM-DD'),
