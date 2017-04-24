@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {clientExport, requireParams} from "common/api/helper";
+import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
 import {modelNotNull} from "../_decorator";
 import {Models} from "_types/index";
 import {FindResult} from "common/model/interface";
@@ -18,7 +18,7 @@ import {TripDetail} from "_types/tripPlan/tripDetail";
 import TripPlanModule = require("../tripPlan/index");
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 const L = require('@jingli/language');
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 import config = require("@jingli/config");
 import _ = require("lodash");
 import {ENoticeType} from "_types/notice/notice";
@@ -151,7 +151,7 @@ class TripApproveModule {
         //给员工发送邮件
         let self_url = `${config.host}/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
         let appMessageUrl = `#/trip-approval/detail?approveId=${tripApprove.id}`;
-        let openid = await API.auth.getOpenIdByAccount({accountId: staff.id});
+        let openid = await API.auth.getOpenIdByAccount({accountId: staff.accountId});
         let values: any = {
             staffName: staff.name,
             time: moment(tripApprove.createdAt).format(timeFormat),
@@ -175,7 +175,7 @@ class TripApproveModule {
                 //给员工自己发送通知
                 await API.notify.submitNotify({
                     key: 'qm_notify_self_travelbudget',
-                    accountId: staff.id,
+                    userId: staff.id,
                     values: values
                 });
 
@@ -203,7 +203,7 @@ class TripApproveModule {
                 console.warn(`转换短链接失败`, err);
             }
 
-            let openId = await API.auth.getOpenIdByAccount({accountId: approveUser.id});
+            let openId = await API.auth.getOpenIdByAccount({accountId: approveUser.accountId});
             approve_values.managerName = approveUser.name;
             approve_values.username = staff.name;
             approve_values.email = staff.email;
@@ -239,7 +239,7 @@ class TripApproveModule {
                 approve_values.noticeType = ENoticeType.TRIP_APPLY_NOTICE;
                 await API.notify.submitNotify({
                     key: 'qm_notify_new_travelbudget',
-                    accountId: approveUser.id,
+                    userId: approveUser.id,
                     values: approve_values
                 });
             } catch(err) {
@@ -265,7 +265,7 @@ class TripApproveModule {
                 try {
                     await API.notify.submitNotify({
                         key: 'qm_notify_new_travelbudget',
-                        accountId: s.id,
+                        userId: s.id,
                         values: vals
                     });
 
@@ -499,7 +499,7 @@ class TripApproveModule {
                 };
             }
             try {
-                await API.notify.submitNotify({accountId: user.id, key: tplName, values: self_values});
+                await API.notify.submitNotify({userId: user.id, key: tplName, values: self_values});
             } catch(err) { console.error(err);}
 
             try {

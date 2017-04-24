@@ -63,6 +63,7 @@
 		.content table.second-table {
 			width: 178mm;
 			text-align: left;
+            margin-top: 24pt;
 		}
 		.content table.second-table tbody > tr > td {
 			border-top: none;
@@ -119,11 +120,11 @@
 		}
 		.content .content-middle .explain .qrcode {
 			float: left;
-			margin-top: 14pt;
+			padding-top: 14pt;
 		}
 		.content .content-middle .explain .explain-text {
 			float: right;
-			width: 85mm;
+			width: 90mm;
 		}
 		.content .content-middle .explain .explain-text div {
 			border-bottom: 1pt solid #222;
@@ -223,6 +224,35 @@
 			</td>
 		</tr>
 	</table>
+    <div class="content-middle">
+        <div class="explain">
+            <div class="qrcode">
+                <img src="<%=data.qrcode%>" width="100pt">
+                <div style="font-size:7pt">查看预算详情</div>
+            </div>
+
+            <div class="explain-text">
+                <h3>超支说明</h3>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+        <div class="detail">
+            <p>预算审批人</p>
+            <%_.forEach(data.approveUsers, function(user) {%>
+            <p><%=user%></p>
+            <%})%>
+        </div>
+        <div class="sign">
+            <div class="row"  style="padding-left:15px">
+                <div class="col-xs-3">总经理:____________</div>
+                <div class="col-xs-3">审批人:_____________</div>
+                <div class="col-xs-3">财务审核:_____________</div>
+                <div class="col-xs-3">提交人签字:____________</div>
+            </div>
+        </div>
+    </div>
 	<table class="table second-table">
 		<thead>
 			<tr>
@@ -257,71 +287,6 @@
 			</tr>
 		</tbody>
 	</table>
-	<div class="content-middle">
-		<div class="explain">
-			<div class="qrcode">
-				<img src="<%=data.qrcode%>" width="100pt">
-				<div style="font-size:7pt">查看预算详情</div>
-			</div>
-
-			<div class="explain-text">
-				<h3>超支说明</h3>
-				<div></div>
-				<div></div>
-				<div></div>
-			</div>
-		</div>
-		<div class="detail">
-			<p>预算审批人</p>
-			<%_.forEach(data.approveUsers, function(user) {%>
-				<p><%=user%></p>
-			<%})%>
-		</div>
-		<div class="sign">
-			<div class="row"  style="padding-left:15px">
-				<div class="col-xs-3">总经理:____________</div>
-				<div class="col-xs-3">审批人:_____________</div>
-				<div class="col-xs-3">财务审核:_____________</div>
-				<div class="col-xs-3">提交人签字:____________</div>
-			</div>
-		</div>
-	</div>
-	<div class="ticket">
-		<p class="ticket-title">
-			在此区域贴票
-		</p>
-		<table class="table">
-			<thead>
-				<tr>
-					<td>序号</td>
-					<td>类别</td>
-					<td>金额</td>
-					<td>发票日期</td>
-				</tr>
-			</thead>
-			<tbody>
-				<%
-					var invoices = data.invoices;
-					var index=1;
-					_.forEach(invoices,function(invoice){
-				    if (invoice.type == '补助') {
-						//not do anything
-					} else {
-						%>
-							<tr>
-								<td><%=index%></td>
-								<td><%=invoice.invoiceInfo%></td>
-								<td><%=invoice.money%></td>
-								<td><%=invoice.date%></td>
-							</tr>
-						<%
-							index++;
-						}
-					})					
-				%>
-			</tbody>
-		</table>
-	</div>
 </div>
 </body>
 </html>

@@ -1,7 +1,7 @@
 
 import isUndefined = require("lodash/isUndefined");
 declare var dd;
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 var dyload = require('dyload');
 
 var ddtalkLoad;

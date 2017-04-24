@@ -4,7 +4,7 @@
 
 'use strict';
 import {signToken} from "_types/auth/auth-cert";
-const API = require("common/api");
+const API = require("@jingli/dnode-api");
 
 export async function IndexController($scope, $stateParams) {
     $scope.errorMsg = '';
