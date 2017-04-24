@@ -64,7 +64,7 @@ export async function tmpAuthCode(msg , req , res , next) {
     suiteToken = tokenObj['suite_access_token'];
 
 
-    console.log("show the req.body", req.body);
+    console.log("show the req.body: ", req.body);
     if(req.body && req.body.permanentAuthMsg){
         //不是在production
         permanentAuthMsg = req.body.permanentAuthMsg;
