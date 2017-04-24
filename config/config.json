@@ -95,7 +95,6 @@
     "secret": "pV--T2FZj-3QCjJzcQd5OnzDBAe6rRKRQGEmc8iVCvdtc2FUOS5icq1gVfkbqiTx",
     "appid": "2156",
     "test_url" : "https://t.jingli365.com/",
-    "test_url2" : "http://hxs.jingli.tech:4002",
     "name_reg" : "^jl0418",
     "reg_go": true
   },
