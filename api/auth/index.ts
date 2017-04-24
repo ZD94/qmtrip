@@ -571,7 +571,8 @@ export default class ApiAuth {
             name: otherStaff.name,
             status: ACCOUNT_STATUS.ACTIVE,
             roleId: EStaffRole.COMMON,
-            travelPolicyId: travelPolicy.id
+            travelPolicyId: travelPolicy.id,
+            accountId: account.id
         });
         return await staff.save();
     }
