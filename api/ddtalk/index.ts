@@ -93,23 +93,39 @@ class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
 
-        app.get("/JLTesthello" , (req , res , next)=>{
+        app.post("/JLTesthello" , (req , res , next)=>{
+            let url = config.test_url.replace(/\/$/g, "");
             console.log("enter JLTesthello");
-            return DealEvent.transpond(req , res , next, "http://t.jingli365.com/JLTesthello");
+            console.log(req.body);
+            return DealEvent.transpond(req , res , next, {
+                timeout : 5000,
+                decorateRequest: (proxyReq, originalReq)=>{
+                    if(!originalReq.body){
+                        originalReq.body = {};
+                    }
+                    originalReq.body.hello = {"hello":"hello I write in."};
+                    return proxyReq;
+                }
+            }, url+"/JLTesthello");
         });
+
         app.get("/JLTesthello2" , (req, res, next)=>{
-            let url = "http://hxs.jingli.tech:4002/hello";
+            console.log("yes, it's coming");
+            console.log(req.body);
+            return res.send("ok22");
+            let url = "https://hxs.jingli.tech:4002";
             console.log("enter JLTesthello2");
-            return DealEvent.transpond(req , res , next, url);
+            return DealEvent.transpond(req , res , next, null, url);
         });
-        
+
         app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
+            console.log("hello : ", msg);
             if(msg.CorpId){
                 let corps = await Models.ddtalkCorp.find({
                     where : { corpId : msg.CorpId }
                 });
                 if(!corps.length){
-                    return DealEvent.transpond(req , res , next);
+                    return DealEvent.transpond(req, res, next, null);
                 }
             }
 

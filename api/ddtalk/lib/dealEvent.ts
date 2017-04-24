@@ -35,7 +35,7 @@ let reg = new RegExp( config.name_reg );
 
 
 /* transpond */
-export function transpond(req , res , next, urls?:string){
+export function transpond(req, res, next, options:any, urls?:string){
     let url = config.test_url.replace(/\/$/g, "");
     url = url + "/ddtalk/isv/receive";
     if(urls){
@@ -44,9 +44,11 @@ export function transpond(req , res , next, urls?:string){
 
     console.log("enter in transpond , the url : ", url);
 
-    proxy(url)(req, res, next);
+    options = options || {
+            timeout : 5000
+        };
+    proxy(url, options)(req, res, next);
 }
-
 
 export async function tmpAuthCode(msg , req , res , next) {
     const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
@@ -55,21 +57,47 @@ export async function tmpAuthCode(msg , req , res , next) {
         return;
     }
 
+    let suiteToken, permanentAuthMsg: any, permanentCode, corp_name;
     //暂时缓存，防止重复触发
     await cache.write(TMP_CODE_KEY, true, 60 * 2);
     let tokenObj = await _getSuiteToken();
-    let suiteToken = tokenObj['suite_access_token'];
+    suiteToken = tokenObj['suite_access_token'];
 
-    //永久授权码和企业名称及id
-    let permanentAuthMsg: any = await _getPermanentCode(suiteToken, msg.AuthCode);
-    let permanentCode = permanentAuthMsg['permanent_code'];
 
-    let corp_name = permanentAuthMsg.auth_corp_info.corp_name;
+    console.log("show the req.body", req.body);
+    if(req.body && req.body.permanentAuthMsg){
+        //不是在production
+        permanentAuthMsg = req.body.permanentAuthMsg;
+        console.log("不是在production :", permanentAuthMsg);
+        permanentCode = permanentAuthMsg['permanent_code'];
+        corp_name = permanentAuthMsg.auth_corp_info.corp_name;
+    }else{
+        //on the production
+        //永久授权码和企业名称及id
+        permanentAuthMsg = await _getPermanentCode(suiteToken, msg.AuthCode);
+        console.log("on the production: ", permanentAuthMsg);
+        permanentCode = permanentAuthMsg['permanent_code'];
+        corp_name = permanentAuthMsg.auth_corp_info.corp_name;
+    }
+
+
+
+
 
     /* ====== using for test ===== */
     if(reg.test(corp_name) && config.reg_go){
         //it's our test company.
-        transpond( req , res , next );
+        transpond( req, res, next, {
+            timeout : 5000,
+            decorateRequest: (proxyReq, originalReq)=>{
+                if(!originalReq.body){
+                    originalReq.body = {};
+                }
+                originalReq.body.permanentAuthMsg = permanentAuthMsg;
+                return proxyReq;
+            }
+        });
+
         return { notReply: true };
     }
     console.log("tmp_auth_code 正常逻辑");
