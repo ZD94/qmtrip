@@ -112,7 +112,7 @@ class DDTalk {
         app.get("/JLTesthello2" , (req, res, next)=>{
             console.log("yes, it's coming");
             console.log(req.body);
-            return res.send("ok22");
+            // return res.send("ok22");
             let url = "https://hxs.jingli.tech:4002";
             console.log("enter JLTesthello2");
             return DealEvent.transpond(req , res , next, null, url);
