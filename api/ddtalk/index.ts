@@ -123,7 +123,7 @@ class DDTalk {
                         url : url + "/ddtalk/suite_ticket",
                         headers: {
                             'Content-Type': 'application/json',
-                        },；
+                        },
                         form: msg
                     }, function(err, res) {
                         if (err) {
