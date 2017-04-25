@@ -54,7 +54,8 @@ export async function tmpAuthCode(msg , req , res , next) {
     const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
     let isExist = await cache.read(TMP_CODE_KEY);
     if (isExist) {
-        return;
+        console.log("exist?");
+        // return;
     }
 
     let suiteToken, permanentAuthMsg: any, permanentCode, corp_name;
@@ -137,6 +138,9 @@ export async function tmpAuthCode(msg , req , res , next) {
     //查找本地记录的企业信息
     let corps = await Models.ddtalkCorp.find({where: {corpId: corpid}});
     if (corps && corps.length) {
+        // console.log("暂时退出 0");
+        // return;
+
         //有记录，曾经授权过
         let corp = corps[0];
         let company = await corp.getCompany(corp['company_id']);
@@ -157,6 +161,9 @@ export async function tmpAuthCode(msg , req , res , next) {
     } else {
         // console.log("企业信息没有记录 , 创建企业");
         //创建企业
+        // console.log("暂时退出 1");
+        // return;
+
         let company = Company.create({name : corp_name , expiryDate : moment.add(1 , "months").toDate()});
         company = await company.save();
         console.log("company created");
@@ -206,11 +213,11 @@ export async function tmpAuthCode(msg , req , res , next) {
 
         //保存部门信息
         // console.log(userInfo , "创建结束");
-        try {
-            dealCompanyOrganization(corpApi, corp);
-        } catch (err) {
-            console.error("导入企业组织结构出错", err)
-            throw err;
+        dealCompanyOrganization(corpApi, corp).then((result)=>{
+
+        }).catch(err){
+            console.log(err);
+            return false;
         }
     }
 

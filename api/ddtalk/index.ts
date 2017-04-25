@@ -93,30 +93,15 @@ class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
 
-        app.post("/JLTesthello" , (req , res , next)=>{
-            let url = config.test_url.replace(/\/$/g, "");
+        app.get("/JLTesthello", (req, res, next)=>{
+            console.log("goo");
+
             console.log("enter JLTesthello");
-            console.log(req.body);
-
-            return DealEvent.transpond(req , res , next, {
-                timeout : 5000,
-                decorateRequest: (proxyReq, originalReq)=>{
-                    if(!originalReq.body){
-                        originalReq.body = {};
-                    }
-                    originalReq.body.hello = {"hello":"hello I write in."};
-                    return proxyReq;
-                }
-            }, url+"/JLTesthello");
-        });
-
-        app.get("/JLTesthello2" , (req, res, next)=>{
-            console.log("yes, it's coming");
-            console.log(req.body);
-            // return res.send("ok22");
-            let url = "https://hxs.jingli.tech:4002";
-            console.log("enter JLTesthello2");
-            return DealEvent.transpond(req , res , next, null, url);
+            if(config.reg_go){
+                return DealEvent.transpond(req, res, next, null, config.test_url2 + "/JLTesthello");
+            }else{
+                res.send("ok");
+            }
         });
 
         app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
@@ -129,7 +114,7 @@ class DDTalk {
                     return DealEvent.transpond(req, res, next, null);
                 }
             }
-
+            console.log(111);
             if(msg.EventType == "suite_ticket"){
                 //transpond
                 let url = config.test_url.replace(/\/$/g, "");
@@ -138,7 +123,7 @@ class DDTalk {
                         url : url + "/ddtalk/suite_ticket",
                         headers: {
                             'Content-Type': 'application/json',
-                        },
+                        },；
                         form: msg
                     }, function(err, res) {
                         if (err) {
@@ -147,12 +132,14 @@ class DDTalk {
                     });
                 }
             }
-
+            console.log(222);
             if(!ddTalkMsgHandle[msg.EventType]){
+                console.log(333);
                 return res.reply();
             }
             return ddTalkMsgHandle[msg.EventType](msg , req , res , next)
                 .then((result) => {
+                    console.log(444);
                     if(!(result && result.notReply)){
                         res.reply();
                     }
