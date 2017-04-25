@@ -64,6 +64,14 @@
                 "maxDuration": 360,
                 "minDuration": 120
             }
+        },
+        {
+            "name": "trainPricePrefer",
+            "options": {
+                "score": 10000,
+                "expectTrainCabins": "<%=local.expectTrainCabins%>",
+                "type": "square"
+            }
         }
     ],
     "domesticHotel": [

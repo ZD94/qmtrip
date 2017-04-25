@@ -419,6 +419,7 @@ export default class ApiTravelBudget {
         }
 
         let isAbroad = false;
+        let isEurope = false;
         let m_originCity = await API.place.getCityInfo({cityCode: originPlace.id || originPlace});
         let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
 
@@ -439,6 +440,9 @@ export default class ApiTravelBudget {
 
         if (m_destination.isAbroad || m_originCity.isAbroad) {
             isAbroad = true;
+            if(m_destination.euroRailCtripCode && m_originCity.euroRailCtripCode){
+                isEurope = true;
+            }
         }
         let cabins: EPlaneLevel[];
         if (isAbroad && (!policy.isOpenAbroad || !policy.abroadPlaneLevels.length)) {
@@ -481,7 +485,7 @@ export default class ApiTravelBudget {
 
 
         let trainTickets = [];
-        if (!isAbroad) {
+        if (!isAbroad || isEurope) {
             trainTickets = await API.train.search_ticket( {
                 originPlace: m_originCity,
                 destination: m_destination,

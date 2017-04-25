@@ -163,6 +163,13 @@
         "score": 100000,
         "latestArrivalTime": "<%=local.latestArrivalDateTime%>"
       }
+    },
+    {
+      "name": "trainDurationPrefer",
+      "options": {
+        "score": 80000,
+        "trainDuration": 360
+      }
     }
   ],
   "domesticHotel": [
