@@ -205,12 +205,12 @@ export async function tmpAuthCode(msg , req , res , next) {
 
         //保存部门信息
         // console.log(userInfo , "创建结束");
-        dealCompanyOrganization(corpApi, corp).then((result)=>{
-
-        }).catch((err)=>{
+        try{
+            await dealCompanyOrganization(corpApi, corp);
+        }catch(err){
             console.log(err);
             return false;
-        });
+        }
     }
 
     await isvApi.activeSuite();

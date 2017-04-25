@@ -138,6 +138,7 @@ class DDTalk {
 
         app.post("/ddtalk/suite_ticket" , (req , res , next)=>{
             let msg = req.body || {};
+            console.log("enter in : /ddtalk/suite_ticket");
             ddTalkMsgHandle.suite_ticket(msg);
             res.send("ok");
         });
