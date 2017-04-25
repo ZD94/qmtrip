@@ -164,7 +164,7 @@ export async function tmpAuthCode(msg , req , res , next) {
         // console.log("暂时退出 1");
         // return;
 
-        let company = Company.create({name : corp_name , expiryDate : moment.add(1 , "months").toDate()});
+        let company = Company.create({name : corp_name , expiryDate : moment.add(1 , "months").toDate(), isConnectDd: true});
         company = await company.save();
         console.log("company created");
 
@@ -438,6 +438,8 @@ export async function synchroDDorganization() : Promise<boolean> {
         return false;
         // throw new Error("同步钉钉组织架构出错");
     }
+
+    /* 同步成功后需要修改company isConnectDd true */
 }
 
 // setTimeout(async () => {
