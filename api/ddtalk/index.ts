@@ -213,9 +213,9 @@ class DDTalk {
             //查找是否已经绑定账号
             let ddtalkUsers = await Models.ddtalkUser.find( { where: {corpid: corpid, ddUserId: dingTalkUser.userId}});
             if (ddtalkUsers && ddtalkUsers.length) {
-                let ddtalkUser = ddtalkUsers[0]
+                let ddtalkUser = ddtalkUsers[0];
                 // //自动登录
-                console.log("钉钉自动登录: API.auth.makeAuthenticateToken  ", ddtalkUser.id);
+                console.log("钉钉自动登录: API.auth.makeAuthenticateToken ", ddtalkUser.id);
                 let ret = await API.auth.makeAuthenticateToken(ddtalkUser.id, 'ddtalk');
                 return ret;
             }

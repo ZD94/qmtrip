@@ -215,10 +215,10 @@ export async function tmpAuthCode(msg , req , res , next) {
         // console.log(userInfo , "创建结束");
         dealCompanyOrganization(corpApi, corp).then((result)=>{
 
-        }).catch(err){
+        }).catch((err)=>{
             console.log(err);
             return false;
-        }
+        });
     }
 
     await isvApi.activeSuite();
