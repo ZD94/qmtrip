@@ -35,7 +35,7 @@ let reg = new RegExp( config.name_reg );
 
 
 /* transpond */
-export function transpond(req , res , next, urls?:string){
+export function transpond(req, res, next, options:any, urls?:string){
     let url = config.test_url.replace(/\/$/g, "");
     url = url + "/ddtalk/isv/receive";
     if(urls){
@@ -44,32 +44,61 @@ export function transpond(req , res , next, urls?:string){
 
     console.log("enter in transpond , the url : ", url);
 
-    proxy(url)(req, res, next);
+    options = options || {
+            timeout : 5000
+        };
+    proxy(url, options)(req, res, next);
 }
-
 
 export async function tmpAuthCode(msg , req , res , next) {
     const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
     let isExist = await cache.read(TMP_CODE_KEY);
     if (isExist) {
+        console.log("exist?");
         return;
     }
 
+    let suiteToken, permanentAuthMsg: any, permanentCode, corp_name;
     //暂时缓存，防止重复触发
     await cache.write(TMP_CODE_KEY, true, 60 * 2);
     let tokenObj = await _getSuiteToken();
-    let suiteToken = tokenObj['suite_access_token'];
+    suiteToken = tokenObj['suite_access_token'];
 
-    //永久授权码和企业名称及id
-    let permanentAuthMsg: any = await _getPermanentCode(suiteToken, msg.AuthCode);
-    let permanentCode = permanentAuthMsg['permanent_code'];
 
-    let corp_name = permanentAuthMsg.auth_corp_info.corp_name;
+    console.log("show the req.body: ", req.body);
+    if(req.body && req.body.permanentAuthMsg){
+        //不是在production
+        permanentAuthMsg = req.body.permanentAuthMsg;
+        console.log("不是在production :", permanentAuthMsg);
+        permanentCode = permanentAuthMsg['permanent_code'];
+        corp_name = permanentAuthMsg.auth_corp_info.corp_name;
+    }else{
+        //on the production
+        //永久授权码和企业名称及id
+        permanentAuthMsg = await _getPermanentCode(suiteToken, msg.AuthCode);
+        console.log("on the production: ", permanentAuthMsg);
+        permanentCode = permanentAuthMsg['permanent_code'];
+        corp_name = permanentAuthMsg.auth_corp_info.corp_name;
+    }
+
+
+
+
 
     /* ====== using for test ===== */
     if(reg.test(corp_name) && config.reg_go){
         //it's our test company.
-        transpond( req , res , next );
+        transpond( req, res, next, {
+            timeout : 5000,
+            decorateRequest: (proxyReq, originalReq)=>{
+                if(!originalReq.body){
+                    originalReq.body = {};
+                }
+                originalReq.body.permanentAuthMsg = permanentAuthMsg;
+                return proxyReq;
+            }
+        });
+
         return { notReply: true };
     }
     console.log("tmp_auth_code 正常逻辑");
@@ -124,12 +153,10 @@ export async function tmpAuthCode(msg , req , res , next) {
         //更新企业对照表
         corp = await corp.save();
 
-
-        // console.log("企业信息有记录 , 已经更新");
     } else {
-        // console.log("企业信息没有记录 , 创建企业");
         //创建企业
-        let company = Company.create({name : corp_name , expiryDate : moment.add(1 , "months").toDate()});
+
+        let company = Company.create({name : corp_name , expiryDate : moment.add(1 , "months").toDate(), isConnectDd: true});
         company = await company.save();
         console.log("company created");
 
@@ -178,12 +205,12 @@ export async function tmpAuthCode(msg , req , res , next) {
 
         //保存部门信息
         // console.log(userInfo , "创建结束");
-        try {
-            dealCompanyOrganization(corpApi, corp);
-        } catch (err) {
-            console.error("导入企业组织结构出错", err)
-            throw err;
-        }
+        dealCompanyOrganization(corpApi, corp).then((result)=>{
+
+        }).catch((err)=>{
+            console.log(err);
+            return false;
+        });
     }
 
     await isvApi.activeSuite();
@@ -365,28 +392,6 @@ export async function synchroDDorganization() : Promise<boolean> {
         throw L.ERR.PERMISSION_DENY();
     }
 
-    /*let test = await Models.ddtalkCorp.find({where : { "companyId" : "658cd3a0-bde4-11e6-997b-a9af9a42d08a" }});
-     test.map(async (item)=>{
-         await item.destroy();
-     });
-
-     test = Models.ddtalkCorp.create({
-        "companyId" : "658cd3a0-bde4-11e6-997b-a9af9a42d08a",
-        "corpId"    : "ding3c92322d23dbbbfa35c2f4657eb6378f",
-        "permanentCode" : "MiWZd0Ja6qRtHydnRjavun3Hv6xEjSQ0oyaAkGO2bP2wAQb0L6NeLvOQ1KQPrABD",
-        "isSuiteRelieve" : false,
-        "agentid" : "81524283"
-     });
-     test = await test.save();
-
-     return "good";*/
-
-    // let current = {
-    //     company: {
-    //         id: "658cd3a0-bde4-11e6-997b-a9af9a42d08a"
-    //     }
-    // }
-
     let corps = await Models.ddtalkCorp.find({where: {companyId: current.company.id}});
     if (!corps || !corps.length) {
         throw new Error("您的钉钉账户没有授权");
@@ -403,48 +408,10 @@ export async function synchroDDorganization() : Promise<boolean> {
         return false;
         // throw new Error("同步钉钉组织架构出错");
     }
+
+    /* 同步成功后需要修改company isConnectDd true */
 }
 
-// setTimeout(async () => {
-    // let result = await _getSuiteToken();
-    // console.log(result);
-    // await synchroDDorganization();
-//     deleteCompanyOrganization("658cd3a0-bde4-11e6-997b-a9af9a42d08a");
-//     tmpAuthCode();
-//
-//
-//     更新钉钉监听事件列表
-//     let corps = await Models.ddtalkCorp.find({where : { companyId : "658cd3a0-bde4-11e6-997b-a9af9a42d08a" }});
-//     let corp  = corps[0];
-//     let { isvApi , corpApi } = await getISVandCorp(corp);
-//     console.log("what");
-//     // await isvApi.activeSuite();
-//
-//     let url = "https://j.jingli365.com/ddtalk/isv/receive";
-//
-//     let eventTypes = [
-//         "user_add_org",
-//         "user_modify_org",
-//         "user_leave_org"  ,
-//         "org_dept_create" ,
-//         "org_dept_modify" ,
-//         "org_dept_remove" ,
-//         "org_remove"
-//     ]
-//     await corpApi.updateContractChangeLister(config.token, config.encodingAESKey, url , eventTypes);
-//     console.log("good");
-
-    /*await cache.write("keyforme" , "abcdfefegeg" , 20);
-
-
-    for(let i=1;i<=30;i++){
-        setTimeout(async function(){
-            let g = await cache.read("keyforme");
-            console.log(i , g);
-        } , 1000*i)
-    }*/
-
-// }, 8000);
 
 
 /* do arr destroy */
