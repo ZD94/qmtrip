@@ -93,23 +93,14 @@ class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
 
-        app.get("/JLTesthello" , (req , res , next)=>{
-            console.log("enter JLTesthello");
-            return DealEvent.transpond(req , res , next, "http://t.jingli365.com/JLTesthello");
-        });
-        app.get("/JLTesthello2" , (req, res, next)=>{
-            let url = "http://hxs.jingli.tech:4002/hello";
-            console.log("enter JLTesthello2");
-            return DealEvent.transpond(req , res , next, url);
-        });
-        
         app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
+            console.log("hello : ", msg);
             if(msg.CorpId){
                 let corps = await Models.ddtalkCorp.find({
                     where : { corpId : msg.CorpId }
                 });
                 if(!corps.length){
-                    return DealEvent.transpond(req , res , next);
+                    return DealEvent.transpond(req, res, next, null);
                 }
             }
 
@@ -130,7 +121,6 @@ class DDTalk {
                     });
                 }
             }
-
             if(!ddTalkMsgHandle[msg.EventType]){
                 return res.reply();
             }
@@ -209,9 +199,9 @@ class DDTalk {
             //查找是否已经绑定账号
             let ddtalkUsers = await Models.ddtalkUser.find( { where: {corpid: corpid, ddUserId: dingTalkUser.userId}});
             if (ddtalkUsers && ddtalkUsers.length) {
-                let ddtalkUser = ddtalkUsers[0]
+                let ddtalkUser = ddtalkUsers[0];
                 // //自动登录
-                console.log("钉钉自动登录: API.auth.makeAuthenticateToken  ", ddtalkUser.id);
+                console.log("钉钉自动登录: API.auth.makeAuthenticateToken ", ddtalkUser.id);
                 let ret = await API.auth.makeAuthenticateToken(ddtalkUser.id, 'ddtalk');
                 return ret;
             }
