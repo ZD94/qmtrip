@@ -38,6 +38,19 @@ function makeLinkSign(linkToken, invitedLinkId, timestamp) {
 }
 
 
+setTimeout(async ()=>{
+    let staff = Staff.create({
+        name: "Test123",
+        status: ACCOUNT_STATUS.ACTIVE,
+        roleId: EStaffRole.COMMON,
+        travelPolicyId: '025200c0-1b7d-11e7-a571-7fedc950bceb',
+        accountId: 'e3e79870-1b7c-11e7-a571-7fedc950bceb'
+    });
+    staff.$created = false;
+    let result = await staff.save();
+    // console.log(result);
+}, 10000);
+
 
 /**
  * @class API.auth 认证类
