@@ -93,17 +93,6 @@ class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
 
-        app.get("/JLTesthello", (req, res, next)=>{
-            console.log("goo");
-
-            console.log("enter JLTesthello");
-            if(config.reg_go){
-                return DealEvent.transpond(req, res, next, null, config.test_url2 + "/JLTesthello");
-            }else{
-                res.send("ok");
-            }
-        });
-
         app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
             console.log("hello : ", msg);
             if(msg.CorpId){
@@ -114,7 +103,7 @@ class DDTalk {
                     return DealEvent.transpond(req, res, next, null);
                 }
             }
-            console.log(111);
+
             if(msg.EventType == "suite_ticket"){
                 //transpond
                 let url = config.test_url.replace(/\/$/g, "");
@@ -132,14 +121,11 @@ class DDTalk {
                     });
                 }
             }
-            console.log(222);
             if(!ddTalkMsgHandle[msg.EventType]){
-                console.log(333);
                 return res.reply();
             }
             return ddTalkMsgHandle[msg.EventType](msg , req , res , next)
                 .then((result) => {
-                    console.log(444);
                     if(!(result && result.notReply)){
                         res.reply();
                     }
