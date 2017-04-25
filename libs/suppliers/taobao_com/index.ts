@@ -2,7 +2,7 @@
 import _ = require('lodash');
 import moment = require("moment");
 import { SupplierWebRobot, SupplierOrder, ReserveLink } from '../index';
-import L from 'common/language';
+import L from '@jingli/language';
 const CityCodes = require("./cityCode.json");
 
 var iconv = require('iconv-lite');

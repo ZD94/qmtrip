@@ -2,6 +2,7 @@ import { getSession } from '../common/model/index';
 import { Staff, EStaffRole } from '_types/staff';
 import { AgencyUser } from '_types/agency';
 import {EAccountType} from "_types";
+import Zone from '@jingli/zone-setup';
 /**
  * Created by wlh on 16/5/16.
  */

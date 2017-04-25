@@ -47,9 +47,11 @@
     "dnode": "^1.2.2",
     "exif-js": "^2.1.1",
     "express": "^4.14.0",
+    "express-http-proxy": "^0.11.0",
     "express-request-proxy": "^2.0.0",
     "formidable": "^1.0.17",
     "html-pdf": "^2.1.0",
+    "http-proxy": "^1.16.2",
     "iconv-lite": "^0.4.13",
     "jpush-sdk": "^3.2.8",
     "js-format": "^0.2.0",
@@ -82,8 +84,7 @@
     "uuid": "^2.0.2",
     "validator": "^5.5.0",
     "weak": "^1.0.1",
-    "wechat-oauth": "^1.1.1",
-    "zone.js": "^0.6.17 <0.6.22"
+    "wechat-oauth": "^1.1.1"
   },
   "optionalDependency": {
     "bufferutil": "^1.2.1",

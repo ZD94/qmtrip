@@ -95,7 +95,7 @@ class ApproveModule {
             let managers = await company.getManagers({withOwner: true});
             let ps = managers.map( (manager) => {
                 return API.notify.submitNotify({
-                    accountId: manager.id,
+                    userId: manager.id,
                     key: "qm_notify_trip_plan_num_short",
                     values: {
                         number: newNum
