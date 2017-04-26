@@ -6,8 +6,8 @@
 'use strict';
 import fs = require("fs");
 import cache from "common/cache";
-import C = require("@jingli/config");
-
+const C = require("@jingli/config");
+const proxy = require("express-http-proxy");
 const config = C.ddconfig;
 
 import Logger from '@jingli/logger';
@@ -30,57 +30,79 @@ const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 const DEFAULT_PWD = '000000';
 
 let moment = require("moment");
-let requestProxy = require('express-request-proxy');
+
 let reg = new RegExp( config.name_reg );
 
 
 /* transpond */
-export function transpond(req , res , next){
+export function transpond(req, res, next, options:any, urls?:string){
     let url = config.test_url.replace(/\/$/g, "");
-    return requestProxy({
-        url: url + "/ddtalk/isv/receive" ,
-        reqAsBuffer: true,
-        cache: false,
-        timeout: 180000,
-    })(req, res, next);
-}
+    url = url + "/ddtalk/isv/receive";
+    if(urls){
+        url = urls;
+    }
 
+    console.log("enter in transpond , the url : ", url);
+
+    options = options || {
+            timeout : 5000
+        };
+    proxy(url, options)(req, res, next);
+}
 
 export async function tmpAuthCode(msg , req , res , next) {
     const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
     let isExist = await cache.read(TMP_CODE_KEY);
     if (isExist) {
-        console.log("exist ?");
+        console.log("exist?");
         return;
     }
 
-
+    let suiteToken, permanentAuthMsg: any, permanentCode, corp_name;
     //暂时缓存，防止重复触发
-    await cache.write(TMP_CODE_KEY, true, 60 * 2);
+    await cache.write(TMP_CODE_KEY, true, 60 * 1);
     let tokenObj = await _getSuiteToken();
-    let suiteToken = tokenObj['suite_access_token'];
+    suiteToken = tokenObj['suite_access_token'];
 
-    //永久授权码和企业名称及id
-    let permanentAuthMsg: any = await _getPermanentCode(suiteToken, msg.AuthCode);
-    let permanentCode = permanentAuthMsg['permanent_code'];
 
-    let corp_name = permanentAuthMsg.auth_corp_info.corp_name;
+    console.log("show the req.body: ", req.body);
+    if(req.body && req.body.permanentAuthMsg){
+        //不是在production
+        permanentAuthMsg = req.body.permanentAuthMsg;
+        console.log("不是在production :", permanentAuthMsg);
+        permanentCode = permanentAuthMsg['permanent_code'];
+        corp_name = permanentAuthMsg.auth_corp_info.corp_name;
+    }else{
+        //on the production
+        //永久授权码和企业名称及id
+        permanentAuthMsg = await _getPermanentCode(suiteToken, msg.AuthCode);
+        console.log("on the production: ", permanentAuthMsg);
+        permanentCode = permanentAuthMsg['permanent_code'];
+        corp_name = permanentAuthMsg.auth_corp_info.corp_name;
+    }
+
+
+
+
 
     /* ====== using for test ===== */
     if(reg.test(corp_name) && config.reg_go){
         //it's our test company.
-        transpond( req , res , next );
+        transpond( req, res, next, {
+            timeout : 5000,
+            decorateRequest: (proxyReq, originalReq)=>{
+                if(!originalReq.body){
+                    originalReq.body = {};
+                }
+                originalReq.body.permanentAuthMsg = permanentAuthMsg;
+                return proxyReq;
+            }
+        });
+
         return { notReply: true };
     }
-
+    console.log("tmp_auth_code 正常逻辑");
     /* ============ End =========== */
-
-    //test
-    // let corp_name = "鲸力测试3.16";
-    // let permanentCode = "MiWZd0Ja6qRtHydnRjavun3Hv6xEjSQ0oyaAkGO2bP2wAQb0L6NeLvOQ1KQPrABD";
-    //
-    // let corpid = "ding3c92322d23dbbbfa35c2f4657eb6378f";
-    //test end.
 
     let corpid = permanentAuthMsg.auth_corp_info.corpid;
     let isvApi = new ISVApi(config.suiteid, suiteToken, corpid, permanentCode);
@@ -108,9 +130,10 @@ export async function tmpAuthCode(msg , req , res , next) {
 
     //查找本地记录的企业信息
     let corps = await Models.ddtalkCorp.find({where: {corpId: corpid}});
+    let corp;
     if (corps && corps.length) {
         //有记录，曾经授权过
-        let corp = corps[0];
+        corp = corps[0];
         let company = await corp.getCompany(corp['company_id']);
         //修改状态，可能解除过
         company.status = 1;
@@ -124,17 +147,15 @@ export async function tmpAuthCode(msg , req , res , next) {
         //更新企业对照表
         corp = await corp.save();
 
-
-        // console.log("企业信息有记录 , 已经更新");
     } else {
-        // console.log("企业信息没有记录 , 创建企业");
         //创建企业
-        let company = Company.create({name : corp_name , expiryDate : moment.add(1 , "months").toDate()});
+
+        let company = Company.create({name : corp_name , expiryDate : moment().add(1 , "months").toDate(), isConnectDd: true});
         company = await company.save();
         console.log("company created");
 
         let travelPolicy = await company.getDefaultTravelPolicy();
-        let corp = Models.ddtalkCorp.create({
+        corp = Models.ddtalkCorp.create({
             id: company.id,
             corpId: corpid,
             permanentCode: permanentCode,
@@ -142,7 +163,7 @@ export async function tmpAuthCode(msg , req , res , next) {
             isSuiteRelieve: false,
             agentid: agentid
         });
-        await corp.save();
+        corp = await corp.save();
         // console.log("ddtalkCorp  created");
 
         /* ====== 单独处理 创建者信息 ====== */
@@ -173,21 +194,20 @@ export async function tmpAuthCode(msg , req , res , next) {
             corpid: corpid,   //钉钉企业id
         });
         await ddtalkUser.save();
-
-        /* ====== 单独处理 创建者信息 ===  END  === */
-
-        //保存部门信息
-        // console.log(userInfo , "创建结束");
-        try {
-            dealCompanyOrganization(corpApi, corp);
-        } catch (err) {
-            console.error("导入企业组织结构出错", err)
-            throw err;
-        }
     }
 
     await isvApi.activeSuite();
-    await corpApi.registryContractChangeLister(config.token, config.encodingAESKey, C.host + '/ddtalk/isv/receive');
+    await corpApi.registryContractChangeLister(config.token, config.encodingAESKey, config.dd_online_url + '/ddtalk/isv/receive');
+
+    /* ====== 单独处理 创建者信息 ===  END  === */
+
+    //保存部门信息
+    try{
+        await dealCompanyOrganization(corpApi, corp);
+    }catch(err){
+        console.log(err);
+        return false;
+    }
 }
 
 
@@ -365,28 +385,6 @@ export async function synchroDDorganization() : Promise<boolean> {
         throw L.ERR.PERMISSION_DENY();
     }
 
-    /*let test = await Models.ddtalkCorp.find({where : { "companyId" : "658cd3a0-bde4-11e6-997b-a9af9a42d08a" }});
-     test.map(async (item)=>{
-         await item.destroy();
-     });
-
-     test = Models.ddtalkCorp.create({
-        "companyId" : "658cd3a0-bde4-11e6-997b-a9af9a42d08a",
-        "corpId"    : "ding3c92322d23dbbbfa35c2f4657eb6378f",
-        "permanentCode" : "MiWZd0Ja6qRtHydnRjavun3Hv6xEjSQ0oyaAkGO2bP2wAQb0L6NeLvOQ1KQPrABD",
-        "isSuiteRelieve" : false,
-        "agentid" : "81524283"
-     });
-     test = await test.save();
-
-     return "good";*/
-
-    // let current = {
-    //     company: {
-    //         id: "658cd3a0-bde4-11e6-997b-a9af9a42d08a"
-    //     }
-    // }
-
     let corps = await Models.ddtalkCorp.find({where: {companyId: current.company.id}});
     if (!corps || !corps.length) {
         throw new Error("您的钉钉账户没有授权");
@@ -397,7 +395,11 @@ export async function synchroDDorganization() : Promise<boolean> {
     let {corpApi} = await getISVandCorp(corp);
 
     try{
-        // await dealCompanyOrganization(corpApi, corp);
+        await dealCompanyOrganization(corpApi, corp);
+
+        /* 同步成功后需要修改company isConnectDd true */
+        current.company.isConnectDd = true;
+        await current.company.save();
         return true;
     }catch(e){
         return false;
@@ -405,46 +407,6 @@ export async function synchroDDorganization() : Promise<boolean> {
     }
 }
 
-// setTimeout(async () => {
-    // let result = await _getSuiteToken();
-    // console.log(result);
-    // await synchroDDorganization();
-//     deleteCompanyOrganization("658cd3a0-bde4-11e6-997b-a9af9a42d08a");
-//     tmpAuthCode();
-//
-//
-//     更新钉钉监听事件列表
-//     let corps = await Models.ddtalkCorp.find({where : { companyId : "658cd3a0-bde4-11e6-997b-a9af9a42d08a" }});
-//     let corp  = corps[0];
-//     let { isvApi , corpApi } = await getISVandCorp(corp);
-//     console.log("what");
-//     // await isvApi.activeSuite();
-//
-//     let url = "https://j.jingli365.com/ddtalk/isv/receive";
-//
-//     let eventTypes = [
-//         "user_add_org",
-//         "user_modify_org",
-//         "user_leave_org"  ,
-//         "org_dept_create" ,
-//         "org_dept_modify" ,
-//         "org_dept_remove" ,
-//         "org_remove"
-//     ]
-//     await corpApi.updateContractChangeLister(config.token, config.encodingAESKey, url , eventTypes);
-//     console.log("good");
-
-    /*await cache.write("keyforme" , "abcdfefegeg" , 20);
-
-
-    for(let i=1;i<=30;i++){
-        setTimeout(async function(){
-            let g = await cache.read("keyforme");
-            console.log(i , g);
-        } , 1000*i)
-    }*/
-
-// }, 8000);
 
 
 /* do arr destroy */
