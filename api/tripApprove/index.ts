@@ -380,7 +380,7 @@ class TripApproveModule {
             if(tripApprove.createdAt.getMonth() == new Date().getMonth()){
                 //审批本月记录审批通过
                 if(approveResult == EApproveResult.PASS && !isNextApprove){
-                    await approveCompany.beforeApproveTrip({number : number});
+                    await approveCompany.beforeApproveTrip({number : frozenNum});
                     await approveCompany.approvePassReduceTripPlanNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
                         remark: "审批通过消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
                 }
@@ -392,7 +392,7 @@ class TripApproveModule {
             }else{
                 //审批上月记录审批通过
                 if(approveResult == EApproveResult.PASS && !isNextApprove){
-                    await approveCompany.beforeApproveTrip({number : number});
+                    await approveCompany.beforeApproveTrip({number : frozenNum});
                     await approveCompany.approvePassReduceBeforeNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
                         remark: "审批通过上月申请消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
                 }

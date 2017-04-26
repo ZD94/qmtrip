@@ -1620,38 +1620,34 @@ class TripPlanModule {
         scheduler('*/5 * * * *', taskId, async function() {
             let tripApproves = await Models.tripApprove.find({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
             tripApproves.map(async (approve) => {
-                let approveCompany = await approve.getCompany();
-                let number = 0;
-                if(approve.isNeedHotel){
-                    number = number + 1;
-                }
-                if(approve.isNeedTraffic){
-                    number = number + 1;
-                }
-                if(approve.isRoundTrip){
-                    number = number + 1;
-                }
+                try{
+                    let approveCompany = await approve.getCompany();
+                    let frozenNum = JSON.parse(approve.query).frozenNum;
 
-                await approveCompany.beforeApproveTrip({number : number});
+                    await approveCompany.beforeApproveTrip({number: frozenNum});
 
-                approve.status = QMEApproveStatus.PASS;
-                approve = await approve.save();
+                    let content = approve.deptCity+"-"+approve.arrivalCity;
+                    if(!approve.isSpecialApprove){
+                        if(approve.createdAt.getMonth() == new Date().getMonth()){
+                            await approveCompany.approvePassReduceTripPlanNum({accountId: approve.account.id, tripPlanId: approve.id,
+                                remark: "自动审批通过消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
+                        }else{
+                            await approveCompany.approvePassReduceBeforeNum({accountId: approve.account.id, tripPlanId: approve.id,
+                                remark: "自动审批通过上月申请消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
+                        }
+                    }
 
-                let content = approve.deptCity+"-"+approve.arrivalCity;
-                let frozenNum = JSON.parse(approve.query).frozenNum;
-                if(approve.createdAt.getMonth() == new Date().getMonth() && !approve.isSpecialApprove){
-                    await approveCompany.approvePassReduceTripPlanNum({accountId: approve.account.id, tripPlanId: approve.id,
-                        remark: "自动审批通过消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
-                }else{
-                    await approveCompany.approvePassReduceBeforeNum({accountId: approve.account.id, tripPlanId: approve.id,
-                        remark: "自动审批通过上月申请消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
+                    if(approve.approveUser && approve.approveUser.id && /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(approve.approveUser.id)) {
+                        let log = Models.tripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser.id, approveStatus: EApproveResult.AUTO_APPROVE, remark: '自动通过'});
+                        await log.save();
+                    }
+                    await TripPlanModule.saveTripPlanByApprove({tripApproveId: approve.id});
+
+                    approve.status = QMEApproveStatus.PASS;
+                    approve = await approve.save();
+                }catch(e){
+                    logger.error(e.stack);
                 }
-
-                if(approve.approveUser && approve.approveUser.id && /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(approve.approveUser.id)) {
-                    let log = Models.tripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser.id, approveStatus: EApproveResult.AUTO_APPROVE, remark: '自动通过'});
-                    await log.save();
-                }
-                await TripPlanModule.saveTripPlanByApprove({tripApproveId: approve.id});
             });
         });
     }
