@@ -4,7 +4,7 @@
 
 'use strict';
 
-const API = require('common/api');
+const API = require('@jingli/dnode-api');
 let dingSuiteCallback = require("dingtalk_suite_callback");
 import fs = require("fs");
 import cache from "common/cache";
@@ -14,7 +14,7 @@ const config = C.ddconfig;
 import request = require('request');
 import ISVApi from "./lib/isvApi";
 import {Models} from "_types/index";
-import {clientExport} from "common/api/helper";
+import {clientExport} from "@jingli/dnode-api/dist/src/helper";
 import {get_msg} from "./lib/msg-template/index";
 
 import * as DealEvent from "./lib/dealEvent";
@@ -93,6 +93,16 @@ class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
 
+        app.get("/JLTesthello" , (req , res , next)=>{
+            console.log("enter JLTesthello");
+            return DealEvent.transpond(req , res , next, "http://t.jingli365.com/JLTesthello");
+        });
+        app.get("/JLTesthello2" , (req, res, next)=>{
+            let url = "http://hxs.jingli.tech:4002/hello";
+            console.log("enter JLTesthello2");
+            return DealEvent.transpond(req , res , next, url);
+        });
+        
         app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
             if(msg.CorpId){
                 let corps = await Models.ddtalkCorp.find({
@@ -107,14 +117,17 @@ class DDTalk {
                 //transpond
                 let url = config.test_url.replace(/\/$/g, "");
                 if(config.test_url && config.reg_go){
-                    request({
-                        uri: url + "/ddtalk/suite_ticket",
+                    request.post({
+                        url : url + "/ddtalk/suite_ticket",
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        method: "POST",
-                        body: msg
-                    })
+                        form: msg
+                    }, function(err, res) {
+                        if (err) {
+                            return console.error(err)
+                        }
+                    });
                 }
             }
 
@@ -122,8 +135,10 @@ class DDTalk {
                 return res.reply();
             }
             return ddTalkMsgHandle[msg.EventType](msg , req , res , next)
-                .then(() => {
-                    res.reply();
+                .then((result) => {
+                    if(!(result && result.notReply)){
+                        res.reply();
+                    }
                 })
                 .catch((err) => {
                     console.error(err.stack);
@@ -177,6 +192,7 @@ class DDTalk {
 
     @clientExport
     static async loginByDdTalkCode(params) : Promise<any> {
+        console.log("enter In loginByDdTalkCode" , params);
         let {corpid, code} = params;
         let corps = await Models.ddtalkCorp.find({ where: {corpId: corpid}, limit: 1});
         if (corps && corps.length) {
@@ -195,6 +211,7 @@ class DDTalk {
             if (ddtalkUsers && ddtalkUsers.length) {
                 let ddtalkUser = ddtalkUsers[0]
                 // //自动登录
+                console.log("钉钉自动登录: API.auth.makeAuthenticateToken  ", ddtalkUser.id);
                 let ret = await API.auth.makeAuthenticateToken(ddtalkUser.id, 'ddtalk');
                 return ret;
             }

@@ -6,7 +6,7 @@ import {Models} from "_types/index";
 import L from '@jingli/language';
 import {CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE} from "_types/coin";
 var config = require('@jingli/config');
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 
 module.exports = function(app) {
     app.get("/duiba/costcredit", costCredit);
@@ -31,7 +31,7 @@ async function costCredit(req, res, next) {
     if(!staff.coinAccount){
         let ca = CoinAccount.create();
         await ca.save();
-        let account = await Models.account.get(staff.id);
+        let account = await Models.account.get(staff.accountId);
         account.coinAccount = ca;
         await account.save();
         // staff.coinAccount = ca;
@@ -176,7 +176,7 @@ async function addCredit(req, res, next) {
     if(!staff.coinAccount){
         let ca = CoinAccount.create();
         await ca.save();
-        let account = await Models.account.get(staff.id);
+        let account = await Models.account.get(staff.accountId);
         account.coinAccount = ca;
         await account.save();
         // staff.coinAccount = ca;

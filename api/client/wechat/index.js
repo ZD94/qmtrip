@@ -6,7 +6,7 @@
  * @class wechat
  */
 var service = {};
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 var utils = require("common/utils");
 
 /**

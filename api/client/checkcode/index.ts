@@ -6,7 +6,7 @@
  * @module API
  */
 
-const API = require("common/api");
+const API = require("@jingli/dnode-api");
 
 export interface MsgCheckCode {
     ticket: string

@@ -1,12 +1,12 @@
 /**
  * Created by wlh on 15/12/12.
  */
-import { clientExport } from 'common/api/helper';
+import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import {Models } from '_types'
 import {ETripType, EInvoiceType, ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan";
 import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel} from "_types/travelPolicy";
 import {Staff} from "_types/staff";
-const API = require("common/api");
+const API = require("@jingli/dnode-api");
 const validate = require("common/validate");
 import L from '@jingli/language';
 const moment = require('moment');
@@ -24,10 +24,11 @@ const companyDefaultPrefer = require("./prefer/default-prefer/default-company-pr
 export default class ApiTravelBudget {
 
     @clientExport
-    static getBudgetInfo(params: {id: string, accountId? : string}) {
+    static async getBudgetInfo(params: {id: string, accountId? : string}) {
         let accountId = params.accountId;
         if (!accountId) {
-            accountId = Zone.current.get('session')["accountId"];
+            let staff = await Staff.getCurrent();
+            accountId = staff.id;
         }
         let key = `budgets:${accountId}:${params.id}`;
         return cache.read(key);
@@ -64,9 +65,12 @@ export default class ApiTravelBudget {
     */
     @clientExport
     static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams) :Promise<string> {
-        let {accountId} = Zone.current.get('session');
-        let staffId = params['staffId'] || accountId;
-        let staff = await Models.staff.get(staffId);
+        // let {accountId} = Zone.current.get('session');
+        // let staffId = params['staffId'] || accountId;
+        // let staff = await Models.staff.get(staffId);
+        let staff = await Staff.getCurrent();
+        let accountId = staff.accountId;
+        let staffId = staff.id;
         let travelPolicy = await staff.getTravelPolicy();
         if (!travelPolicy) {
             throw new Error(`差旅标准还未设置`);
@@ -159,7 +163,7 @@ export default class ApiTravelBudget {
             }
 
             await new Promise(function(resolve, reject) {
-                let session = {accountId: staffId}
+                let session = {staffId: staffId}
                 Zone.current.fork({name: "getTravelPolicy",properties: { session: session}})
                     .run(async function() {
                         if (isNeedTraffic) {

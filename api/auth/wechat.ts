@@ -4,10 +4,10 @@ import ApiAuth from './index';
 import { makeAuthenticateToken } from './authentication';
 import { Staff } from '_types/staff/staff';
 import { Models } from '_types/index';
-import { requireParams } from '../../common/api/helper';
+import { requireParams } from '@jingli/dnode-api/dist/src/helper';
 import C = require("@jingli/config");
 
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 
 export function __initHttpApp(app: any) {
     //微信自动登录

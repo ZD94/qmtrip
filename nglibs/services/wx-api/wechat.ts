@@ -2,7 +2,7 @@
 import reject = require("lodash/reject");
 declare var wx;
 
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 var dyload = require('dyload');
 
 var browserspec = require('browserspec');

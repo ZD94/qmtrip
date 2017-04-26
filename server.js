@@ -7,9 +7,10 @@ require('app-module-path').addPath(__dirname);
 require('common/node_ts').install();
 var initData = require('libs/initTestData');
 
+var Logger = require('@jingli/logger');
 
 Error.stackTraceLimit = 40;
-var zone = require('common/zone');
+var zone = require('@jingli/zone-setup');
 
 //服务器启动性能日志
 //var perf = require('@jingli/perf');
@@ -30,17 +31,16 @@ if(config.debug) {
 
 var path = require('path');
 
-var Logger = require('@jingli/logger');
 Logger.init(config.logger);
 var logger = new Logger('main');
 
 var cache = require("common/cache");
 cache.init({redis_conf: config.redis.url, prefix: 'times:cache'});
 
-var model = require('common/model');
-model.init(config.postgres.url);
+var database = require('@jingli/database');
+database.init(config.postgres.url);
 
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 
 var Server = require('common/server');
 var server = new Server(config.appName, config.pid_file);
