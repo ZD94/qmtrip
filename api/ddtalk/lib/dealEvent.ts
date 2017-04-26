@@ -60,7 +60,7 @@ export async function tmpAuthCode(msg , req , res , next) {
 
     let suiteToken, permanentAuthMsg: any, permanentCode, corp_name;
     //暂时缓存，防止重复触发
-    await cache.write(TMP_CODE_KEY, true, 60 * 2);
+    await cache.write(TMP_CODE_KEY, true, 60 * 1);
     let tokenObj = await _getSuiteToken();
     suiteToken = tokenObj['suite_access_token'];
 
@@ -156,7 +156,7 @@ export async function tmpAuthCode(msg , req , res , next) {
     } else {
         //创建企业
 
-        let company = Company.create({name : corp_name , expiryDate : moment.add(1 , "months").toDate(), isConnectDd: true});
+        let company = Company.create({name : corp_name , expiryDate : moment().add(1 , "months").toDate(), isConnectDd: true});
         company = await company.save();
         console.log("company created");
 
@@ -201,6 +201,10 @@ export async function tmpAuthCode(msg , req , res , next) {
         });
         await ddtalkUser.save();
 
+
+        await isvApi.activeSuite();
+        await corpApi.registryContractChangeLister(config.token, config.encodingAESKey, config.dd_online_url + '/ddtalk/isv/receive');
+
         /* ====== 单独处理 创建者信息 ===  END  === */
 
         //保存部门信息
@@ -212,9 +216,6 @@ export async function tmpAuthCode(msg , req , res , next) {
             return false;
         }
     }
-
-    await isvApi.activeSuite();
-    await corpApi.registryContractChangeLister(config.token, config.encodingAESKey, C.host + '/ddtalk/isv/receive');
 }
 
 
