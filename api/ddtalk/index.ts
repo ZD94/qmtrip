@@ -93,6 +93,14 @@ class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
 
+        app.get("/JLTesthello", (req, res, next)=>{
+            let url = config.test_url.replace(/\/$/g, "");
+            if(config.reg_go){
+                return DealEvent.transpond(req, res, next, null, url+"/JLTesthello");
+            }
+            res.send("ok");
+        });
+
         app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
             console.log("hello : ", msg);
             if(msg.CorpId){
