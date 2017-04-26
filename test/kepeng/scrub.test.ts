@@ -2,7 +2,7 @@
 
 import 'api/_service';
 
-require('common/zone');
+require('@jingli/zone-setup');
 
 global.Promise = require('bluebird');
 Promise.promisifyAll(require("fs"));

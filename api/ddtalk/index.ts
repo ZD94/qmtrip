@@ -92,14 +92,23 @@ let ddTalkMsgHandle = {
 class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
-        
+
+        app.get("/JLTesthello", (req, res, next)=>{
+            let url = config.test_url.replace(/\/$/g, "");
+            if(config.reg_go){
+                return DealEvent.transpond(req, res, next, null, url+"/JLTesthello");
+            }
+            res.send("ok");
+        });
+
         app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
+            console.log("hello : ", msg);
             if(msg.CorpId){
                 let corps = await Models.ddtalkCorp.find({
                     where : { corpId : msg.CorpId }
                 });
                 if(!corps.length){
-                    return DealEvent.transpond(req , res , next);
+                    return DealEvent.transpond(req, res, next, null);
                 }
             }
 
@@ -120,7 +129,6 @@ class DDTalk {
                     });
                 }
             }
-
             if(!ddTalkMsgHandle[msg.EventType]){
                 return res.reply();
             }
@@ -138,6 +146,7 @@ class DDTalk {
 
         app.post("/ddtalk/suite_ticket" , (req , res , next)=>{
             let msg = req.body || {};
+            console.log("enter in : /ddtalk/suite_ticket");
             ddTalkMsgHandle.suite_ticket(msg);
             res.send("ok");
         });
@@ -182,6 +191,7 @@ class DDTalk {
 
     @clientExport
     static async loginByDdTalkCode(params) : Promise<any> {
+        console.log("enter In loginByDdTalkCode" , params);
         let {corpid, code} = params;
         let corps = await Models.ddtalkCorp.find({ where: {corpId: corpid}, limit: 1});
         if (corps && corps.length) {
@@ -198,8 +208,9 @@ class DDTalk {
             //查找是否已经绑定账号
             let ddtalkUsers = await Models.ddtalkUser.find( { where: {corpid: corpid, ddUserId: dingTalkUser.userId}});
             if (ddtalkUsers && ddtalkUsers.length) {
-                let ddtalkUser = ddtalkUsers[0]
+                let ddtalkUser = ddtalkUsers[0];
                 // //自动登录
+                console.log("钉钉自动登录: API.auth.makeAuthenticateToken ", ddtalkUser.id);
                 let ret = await API.auth.makeAuthenticateToken(ddtalkUser.id, 'ddtalk');
                 return ret;
             }
