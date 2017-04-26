@@ -18,7 +18,6 @@ let moment = require('moment');
 let testData = require('./test-data.json');
 
 export async function initDataForTest (params: {name: string, userName: string, mobile: string, email?: string, pwd?: string}){
-    console.info("begin======================================");
     let co = await Models.company.find({where: {name: '笑傲江湖'}});
     if(co && co.length > 0){
         return null;
