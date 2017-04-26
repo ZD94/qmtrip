@@ -1,4 +1,4 @@
-import L from 'common/language';
+import L from '@jingli/language';
 import * as utils from 'common/utils';
 import { Models, EAccountType } from '_types/index';
 import { AuthResponse, AuthRequest, signToken, LoginResponse } from '_types/auth/auth-cert';
@@ -78,7 +78,7 @@ export async function checkTokenAuth(params: AuthRequest): Promise<AuthResponse|
 
     token.expireAt = moment().add(7, "days").toDate();
     await token.save();
-    return {accountId: token.accountId};
+    return {accountId: token.accountId, tokenId: token.id};
 };
 
 
@@ -165,6 +165,9 @@ export async function login(data: {account?: string, pwd: string, type?: Number,
     }
 
     var ret = await makeAuthenticateToken(loginAccount.id)
+    if (loginAccount.isNeedChangePwd) {
+        ret['is_need_change_pwd'] = true;
+    }
     //判断是否首次登录
     if(loginAccount.isFirstLogin) {
         loginAccount.isFirstLogin = false;
@@ -173,9 +176,6 @@ export async function login(data: {account?: string, pwd: string, type?: Number,
                 ret['is_first_login'] = true;
                 return ret;
             })
-    }
-    if (loginAccount.isNeedChangePwd) {
-        ret['is_need_change_pwd'] = true;
     }
 
     ret['is_first_login'] = false;
@@ -202,3 +202,26 @@ export async function logout(params: {}): Promise<boolean> {
     }
     return true;
 };
+
+export async function setUserId(params: {userId: string}) :Promise<boolean> {
+    let {userId} = params;
+    let session = Zone.current.get("session");
+    let tokenId = session['tokenId'];
+    let token = await Models.token.get(tokenId);
+    if (token.accountId != session['accountId']) {
+        return false;
+    }
+    token.userId = userId;
+    await token.save();
+    return true;
+}
+
+export async function getUserId(params): Promise<string> {
+    let session = Zone.current.get("session");
+    let tokenId = session['tokenId'];
+    let token = await Models.token.get(tokenId);
+    if (token && token.accountId == session['accountId']) {
+        return token.userId;
+    }
+    return null;
+}

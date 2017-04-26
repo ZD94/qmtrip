@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {clientExport, requireParams} from "common/api/helper";
+import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
 import {modelNotNull} from "../_decorator";
 import {Models} from "_types/index";
 import {FindResult} from "common/model/interface";
@@ -16,10 +16,10 @@ import {Staff, EStaffStatus, EStaffRole} from "_types/staff/staff";
 import {EVENT, plugins, emitter} from "libs/oa/index";
 import {TripDetail} from "_types/tripPlan/tripDetail";
 import TripPlanModule = require("../tripPlan/index");
-let systemNoticeEmails = require('config/config').system_notice_emails;
-const L = require('common/language');
-var API = require('common/api');
-var config = require("config");
+let systemNoticeEmails = require('@jingli/config').system_notice_emails;
+const L = require('@jingli/language');
+var API = require('@jingli/dnode-api');
+import config = require("@jingli/config");
 import _ = require("lodash");
 import {ENoticeType} from "_types/notice/notice";
 
@@ -151,7 +151,7 @@ class TripApproveModule {
         //给员工发送邮件
         let self_url = `${config.host}/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
         let appMessageUrl = `#/trip-approval/detail?approveId=${tripApprove.id}`;
-        let openid = await API.auth.getOpenIdByAccount({accountId: staff.id});
+        let openid = await API.auth.getOpenIdByAccount({accountId: staff.accountId});
         let values: any = {
             staffName: staff.name,
             time: moment(tripApprove.createdAt).format(timeFormat),
@@ -175,7 +175,7 @@ class TripApproveModule {
                 //给员工自己发送通知
                 await API.notify.submitNotify({
                     key: 'qm_notify_self_travelbudget',
-                    accountId: staff.id,
+                    userId: staff.id,
                     values: values
                 });
 
@@ -203,7 +203,7 @@ class TripApproveModule {
                 console.warn(`转换短链接失败`, err);
             }
 
-            let openId = await API.auth.getOpenIdByAccount({accountId: approveUser.id});
+            let openId = await API.auth.getOpenIdByAccount({accountId: approveUser.accountId});
             approve_values.managerName = approveUser.name;
             approve_values.username = staff.name;
             approve_values.email = staff.email;
@@ -239,7 +239,7 @@ class TripApproveModule {
                 approve_values.noticeType = ENoticeType.TRIP_APPLY_NOTICE;
                 await API.notify.submitNotify({
                     key: 'qm_notify_new_travelbudget',
-                    accountId: approveUser.id,
+                    userId: approveUser.id,
                     values: approve_values
                 });
             } catch(err) {
@@ -265,7 +265,7 @@ class TripApproveModule {
                 try {
                     await API.notify.submitNotify({
                         key: 'qm_notify_new_travelbudget',
-                        accountId: s.id,
+                        userId: s.id,
                         values: vals
                     });
 
@@ -380,7 +380,7 @@ class TripApproveModule {
             if(tripApprove.createdAt.getMonth() == new Date().getMonth()){
                 //审批本月记录审批通过
                 if(approveResult == EApproveResult.PASS && !isNextApprove){
-                    await approveCompany.beforeApproveTrip({number : number});
+                    await approveCompany.beforeApproveTrip({number : frozenNum});
                     await approveCompany.approvePassReduceTripPlanNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
                         remark: "审批通过消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
                 }
@@ -392,7 +392,7 @@ class TripApproveModule {
             }else{
                 //审批上月记录审批通过
                 if(approveResult == EApproveResult.PASS && !isNextApprove){
-                    await approveCompany.beforeApproveTrip({number : number});
+                    await approveCompany.beforeApproveTrip({number : frozenNum});
                     await approveCompany.approvePassReduceBeforeNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
                         remark: "审批通过上月申请消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
                 }
@@ -499,7 +499,7 @@ class TripApproveModule {
                 };
             }
             try {
-                await API.notify.submitNotify({accountId: user.id, key: tplName, values: self_values});
+                await API.notify.submitNotify({userId: user.id, key: tplName, values: self_values});
             } catch(err) { console.error(err);}
 
             try {
@@ -531,6 +531,7 @@ class TripApproveModule {
     @requireParams(['id'],['remark'])
     static async cancelTripApprove(params: {id: string, remark?: string}): Promise<boolean> {
         let tripApprove = await Models.tripApprove.get(params.id);
+        let company = tripApprove.account.company;
         if( tripApprove.status != QMEApproveStatus.WAIT_APPROVE && tripApprove.approvedUsers && tripApprove.approvedUsers.indexOf(",") != -1 ) {
             throw {code: -2, msg: "审批单状态不正确，该审批单不能撤销！"};
         }
@@ -539,6 +540,23 @@ class TripApproveModule {
         let staff = await Staff.getCurrent();
         let log = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, remark: `撤销行程审批单`});
         await Promise.all([tripApprove.save(), log.save()]);
+
+        let query = tripApprove.query;
+        if (typeof query == 'string') {
+            query = JSON.parse(query);
+        }
+        let frozenNum = query.frozenNum;
+        console.info(frozenNum);
+        let content = tripApprove.deptCity+"-"+tripApprove.arrivalCity;
+        if(tripApprove.createdAt.getMonth() == new Date().getMonth()){
+            await company.approveRejectFreeTripPlanNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                remark: "审批前撤销行程释放冻结行程点数", content: content, frozenNum: frozenNum});
+        }else{
+            await company.approveRejectFreeBeforeNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                remark: "审批前撤销上月行程释放冻结行程点数", content: content, frozenNum: frozenNum});
+
+        }
+
         return true;
     }
 

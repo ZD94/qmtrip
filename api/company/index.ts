@@ -1,19 +1,18 @@
 /**
  * Created by yumiao on 15-12-9.
  */
-var sequelize = require("common/model").DB;
-var DBM = sequelize.models;
-import L from 'common/language';
-let C = require("config");
-let API = require("common/api");
-let Logger = require('common/logger');
+import {DB} from '@jingli/database';
+import L from '@jingli/language';
+let C = require("@jingli/config");
+let API = require("@jingli/dnode-api");
+import Logger from '@jingli/logger';
 let logger = new Logger('company');
 let moment = require('moment');
 let promoCodeType = require('libs/promoCodeType');
 let scheduler = require('common/scheduler');
 let schedule = require("node-schedule");
 let _ = require("lodash");
-import {requireParams, clientExport} from "common/api/helper";
+import {requireParams, clientExport} from "@jingli/dnode-api/dist/src/helper";
 import {Models} from "_types";
 import {Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE} from '_types/company';
 import {Staff, EStaffRole} from "_types/staff";
@@ -24,6 +23,7 @@ import {requirePermit, conditionDecorator, condition, modelNotNull} from "api/_d
 import {md5} from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
 import {CoinAccount} from "_types/coin";
+
 
 const supplierCols = Supplier['$fieldnames'];
 
@@ -64,14 +64,17 @@ class CompanyModule {
      * @returns {Promise<Company>}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'pwd', 'userName'], ['email', 'status', 'remark', 'description', 'isValidateMobile', 'promoCode'])
+    @requireParams(['mobile', 'name', 'pwd', 'userName'], ['email', 'status', 'remark', 'description', 'isValidateMobile', 'promoCode', 'referrerMobile'])
     static async registerCompany(params: {mobile: string, name: string, email?: string,
-        userName: string, pwd?: string, status?: number, remark?: string, description?: string, isValidateMobile?: boolean, promoCode?: string}): Promise<any>{
+        userName: string, pwd?: string, status?: number, remark?: string, description?: string, isValidateMobile?: boolean, promoCode?: string, referrerMobile?: string}): Promise<any>{
         let session = Zone.current.get('session');
         let pwd = params.pwd;
-        let agencyId = Agency.__defaultAgencyId;
+        let defaultAgency = await Models.agency.find({where:{email:C.default_agency.email}});//Agency.__defaultAgencyId;
+        let agencyId:any;
+        if(defaultAgency && defaultAgency.length==1){
+            agencyId=defaultAgency[0].id;
+        }
         let domain = ""; //企业域名
-
         if(params.email){
             domain = params.email.match(/.*\@(.*)/)[1];
         }
@@ -81,7 +84,6 @@ class CompanyModule {
         }
 
         /*let companies = await Models.company.find({where: {$or: [{email: params.email}, {mobile: params.mobile}/!*, {domain_name: domain}*!/]}});
-
         if(companies && companies.length > 0) {
             throw {code: -7, msg: '邮箱或手机号已经注册'};
         }*/
@@ -109,6 +111,13 @@ class CompanyModule {
         //新注册企业默认套餐行程数为60
         company.tripPlanNumLimit = 60;
 
+        if(params.referrerMobile){
+            let ac = await Models.account.find({where: {mobile: params.referrerMobile}});
+            if(ac && ac.length > 0){
+                company.setReferrer(ac[0]);
+            }
+        }
+
         await Promise.all([staff.save(), company.save(), department.save(), staffDepartment.save()]);
         let promoCode: PromoCode;
         if(params.promoCode){
@@ -124,8 +133,8 @@ class CompanyModule {
         //为创建人设置资金账户
         let ca_staff = CoinAccount.create();
         await ca_staff.save();
-        let account = await Models.account.get(staff.id);
-        account.coinAccount = ca;
+        let account = await Models.account.get(staff.accountId);
+        account.coinAccount = ca_staff;
         await account.save();
 
         return {company: company, description: promoCode ? promoCode.description : ""};
@@ -217,16 +226,16 @@ class CompanyModule {
      * @param params.companyId 企业id
      */
     @requireParams(['companyId','userId'])
-    static async checkAgencyCompany(params){
+    static async checkAgencyCompany(params) :Promise<boolean> {
         var c = await Models.company.get(params.companyId);
         var user = await Models.agencyUser.get(params.userId);
 
         if(!c || c.status == -2){
-            throw L.ERR.COMPANY_NOT_EXIST();
+            return false;
         }
 
         if(c['agencyId'] != user.agency.id || (user.roleId != EAgencyUserRole.OWNER && user.roleId != EAgencyUserRole.ADMIN)) {
-            throw L.ERR.PERMISSION_DENY();
+            return false;
         }
 
         return true;
@@ -358,7 +367,7 @@ class CompanyModule {
     @requireParams(['domain'])
     static async isBlackDomain(params: {domain: string}) {
         //var domain = params.domain.toLowerCase();
-        // let black = await DBM.BlackDomain.findAll({where: params});
+        // let black = await DB.models.BlackDomain.findAll({where: params});
         // if(black && black.length > 0) {
         //     return true;
         // }
@@ -370,21 +379,11 @@ class CompanyModule {
      * @param params
      * @returns {*}
      */
-    static deleteCompanyByTest(params){
+    static async deleteCompanyByTest(params){
         var mobile = params.mobile;
         var email = params.email;
-        return DBM.Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
-            .then(function(companys){
-                return companys.map(function(c){
-                    return true;
-                })
-            })
-            .then(function(){
-                return DBM.Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
-            })
-            .then(function(){
-                return true;
-            })
+        await DB.models.Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
+        return true;
     }
 
     /*************************************供应商begin***************************************/
@@ -523,6 +522,17 @@ class CompanyModule {
         return {ids: ids, count: paginate['total']};
     }
 
+    @clientExport
+    static async getSelfCompanies(params): Promise<Company[]> {
+        let session = Zone.current.get("session");
+        let accountId = session["accountId"]
+        let staffs = await Models.staff.all({where: {accountId: accountId}});
+        let companies = staffs.map( (staff) => {
+            return staff.company;
+        })
+        return companies;
+    }
+
     /*************************************企业行程点数变更日志end***************************************/
 
     static _scheduleTask () {
@@ -612,7 +622,7 @@ class CompanyModule {
                         let ps = managers.map( (manager) => {
                             //给各个企业发送通知
                             return API.notify.submitNotify({
-                                accountId: manager.id,
+                                userId: manager.id,
                                 key: key,
                                 values: {
                                     expiryDate: moment(company.expiryDate).format('YYYY-MM-DD'),
@@ -694,6 +704,59 @@ class CompanyModule {
                     logger.error(`执行任务${taskId4}错误:${err.stack}`);
                 })
         });
+
+        let taskId5 = 'qm:task:perDayMail'
+        scheduler('0 10 8 * * *', taskId5, function() {
+            if (!C.perDayRegisterEmail) {
+                return false;
+            }
+
+            //每天八点10分发送每日企业注册邮件
+            ( async () => {
+                let pager;
+                let companies = [];
+                do {
+                    pager = await Models.company.find( {
+                        where: {
+                            createdAt: {
+                                "$lte": new Date(),
+                                "$gte": moment().add(-1, 'days').format('YYYY-MM-DD 08:00')
+                            }
+                        }
+                    });
+
+                    let ps = pager.map( async (company) => {
+                        let staff = await Models.staff.get(company.createUser);
+                        company['createUserObj'] = staff;
+                        return company;
+                    })
+
+                    let _companies = await Promise.all(ps);
+                    _companies.forEach( (company: Company) => {
+                        companies.push({
+                            name: company.name,
+                            createUser: {
+                                name: company['createUserObj']['name'],
+                                mobile: company['createUserObj']['mobile']
+                            },
+                            createdAt: company.createdAt
+                        })
+                    });
+                } while(pager && pager.hasNextPage())
+
+                await API.notify.submitNotify({
+                    key: "qm_notify_perday_mail",
+                    values: {
+                        companies: companies,
+                    },
+                    email: C.perDayRegisterEmail
+                });
+                logger.info(`成功执行任务${taskId5}`);
+            })()
+                .catch( (err) => {
+                    logger.error(`执行任务${taskId5}错误:${err.stack}`);
+                })
+        })
     }
 
 }

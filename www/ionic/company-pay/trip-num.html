@@ -29,7 +29,7 @@
                     <span class="item-date">{{item.createdAt | date : 'MM-dd'}}</span>
                     <span class="item-icon" ng-if="item.type == NUM_CHANGE_TYPE.FREE_FROZEN ">退</span>
                     <span class="item-icon" ng-if="item.type == NUM_CHANGE_TYPE.FROZEN ">花</span>
-                    <span class="item-icon" ng-if="item.type == NUM_CHANGE_TYPE.SYSTEM_ADD "></span>
+                    <span class="item-icon" ng-if="item.type == NUM_CHANGE_TYPE.SYSTEM_ADD ">1</span>
                     <span class="item-icon" ng-if="item.type == NUM_CHANGE_TYPE.SYSTEM_REDUCE "></span>
                     <span class="item-num">{{item.number > 0? '+'+item.number:item.number}}</span>
                     <div class="item-info">

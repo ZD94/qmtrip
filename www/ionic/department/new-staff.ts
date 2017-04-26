@@ -4,7 +4,7 @@
 "use strict";
 import {Staff, EStaffRoleNames, EStaffRole, EAddWay} from "_types/staff/staff";
 import {EGender} from "_types/index";
-import L from 'common/language';
+import L from '@jingli/language';
 import validator = require('validator');
 import {Pager} from "common/model/pager";
 import {setDepartment} from "./set-department";
@@ -25,8 +25,11 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
     let company = current.company;
     let travelpolicylist = await company.getTravelPolicies();
     let department = await company.getDefaultDepartment();
+    let defaultTravelPolicy = await company.getDefaultTravelPolicy();
+
     $scope.selectDepartments = []; //用于存放已选择的部门
     $scope.addedArray = []; //用于存放提交时的部门id
+    $scope.staffPolicyName = defaultTravelPolicy.name;
     if(staffId){
         staff = await Models.staff.get(staffId);
         Models.resetOnPageChange(staff);
@@ -222,7 +225,13 @@ export async function NewStaffController($scope, Models, $ionicActionSheet, ngMo
             }else{
                 //如果是更新
                 if(staff.mobile){
-                    var account2 = await Models.account.find({where: {mobile: staff.mobile, type: 1, id: {$ne: staff.id}}});
+                    var account2 = await Models.account.find({
+                        where: {
+                            mobile: staff.mobile,
+                            type: 1,
+                            id: {$ne: staff.accountId}
+                        }
+                    });
 
                     if (account2 && account2.length>0) {
                         throw L.ERR.MOBILE_HAS_REGISTRY();

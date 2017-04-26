@@ -2,8 +2,8 @@
  * Created by by wyl on 15-12-16.
  */
 'use strict';
-var config = require('config');
-var API = require("common/api");
+var config = require('@jingli/config');
+var API = require("@jingli/dnode-api");
 var requestProxy = require('express-request-proxy');
 var conn_timeout = require('connect-timeout');
 
@@ -43,6 +43,8 @@ module.exports = function(app) {
  * @param next
  * @returns {*}
  */
+let pwd = process.cwd();
+let path= require("path");
 async function getPublicFile(req, res, next) {
     req.clearTimeout();
     var cacheFile = await API.attachment.getFileCache({id:req.params.id, isPublic:true});
@@ -50,5 +52,5 @@ async function getPublicFile(req, res, next) {
         return next(404);
     }
     res.set("Content-Type", cacheFile.type);
-    return res.sendFile(cacheFile.file);
+    return res.sendFile(path.join(pwd , cacheFile.file));
 }

@@ -12,8 +12,8 @@ angular
                 'inject': '&inject'
             },
             link: function(scope, elem, attrs, controller, transcludeFn){
-                let options = scope.options();
-                let inject = scope.inject();
+                let options = scope["options"]();
+                let inject = scope["inject"]();
                 let parent = options.scope || scope;
                 let childScope = parent.$new(false);
                 Object.keys(inject).forEach((k)=>{
@@ -33,8 +33,8 @@ angular
                 'inject': '&inject'
             },
             link: function(scope, elem, attrs, controller, transcludeFn){
-                let options = scope.options();
-                let inject = scope.inject();
+                let options = scope["options"]();
+                let inject = scope["inject"]();
                 let parent = options.scope || scope;
                 let childScope = parent.$new(false);
                 Object.keys(inject).forEach((k)=>{

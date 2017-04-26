@@ -3,15 +3,10 @@
  */
 
 'use strict';
-import {clientExport, requireParams} from "common/api/helper";
+import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
 import {Models} from "_types/index";
 import {TripDetail, TripPlan} from "_types/tripPlan";
-import {PaginateInterface} from "common/model/interface";
-import {
-    TripDetailTraffic, TripDetailHotel, TripDetailSpecial,
-    TripDetailSubsidy
-} from "_types/tripPlan/tripDetailInfo";
-const L = require("common/language");
+const L = require("@jingli/language");
 
 class FinanceModule {
 
@@ -29,16 +24,17 @@ class FinanceModule {
 
     @clientExport
     @requireParams(['tripPlanId', 'code'])
-    static async getTripDetails(params: {tripPlanId: string, code: string }) :Promise<PaginateInterface<TripDetail>>{
+    static async getTripDetails(params: {tripPlanId: string, code: string }) :Promise<TripDetail[]>{
         let {tripPlanId, code} = params;
         if (!isValidCode(tripPlanId, code)) {
             throw L.ERR.PERMISSION_DENY();
         }
         let tripPlan = await Models.tripPlan.get(tripPlanId);
-        return Models.tripDetail.find({
+        let tripDetails = await Models.tripDetail.find({
             where: {tripPlanId: tripPlan.id},
             order: [["created_at", "asc"]]
         });
+        return Array.from(tripDetails);
     }
 
     @clientExport

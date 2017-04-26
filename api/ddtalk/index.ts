@@ -4,23 +4,17 @@
 
 'use strict';
 
-const API = require('common/api');
+const API = require('@jingli/dnode-api');
 let dingSuiteCallback = require("dingtalk_suite_callback");
 import fs = require("fs");
 import cache from "common/cache";
+import C = require("@jingli/config");
 
-const config ={
-    token: 'jingli2016',
-    encodingAESKey: '8nf2df6n0hiifsgg521mmjl6euyxoy3y6d9d3mt1laq',
-    suiteid: 'suitezutlhpvgyvgakcdo',
-    secret: 'pV--T2FZj-3QCjJzcQd5OnzDBAe6rRKRQGEmc8iVCvdtc2FUOS5icq1gVfkbqiTx',
-    appid: '2156',
-}
-
+const config = C.ddconfig;
 import request = require('request');
 import ISVApi from "./lib/isvApi";
 import {Models} from "_types/index";
-import {clientExport} from "common/api/helper";
+import {clientExport} from "@jingli/dnode-api/dist/src/helper";
 import {get_msg} from "./lib/msg-template/index";
 
 import * as DealEvent from "./lib/dealEvent";
@@ -29,8 +23,8 @@ const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 
 let ddTalkMsgHandle = {
     /* * * * 临时授权码* * * * */
-    tmp_auth_code: async function(msg) {
-        DealEvent.tmpAuthCode(msg);
+    tmp_auth_code: async function(msg , req , res , next) {
+        return await DealEvent.tmpAuthCode(msg , req , res , next);
     },
 
     /* * * * * 授权变更* * * * * * */
@@ -42,29 +36,29 @@ let ddTalkMsgHandle = {
     },
     /* * * * 解除授权信息 * * * */
     suite_relieve: async function(msg) {
-        DealEvent.suiteRelieve(msg);
+        return await DealEvent.suiteRelieve(msg);
     },
 
     /* * * 保存授权信息 , 每20分钟钉钉会请求一次 * * */
     suite_ticket: async function(msg) {
         let ticket = msg.SuiteTicket;
-        await cache.write(CACHE_KEY, JSON.stringify({
+        return await cache.write(CACHE_KEY, JSON.stringify({
             ticket: ticket, timestamp: msg.TimeStamp
         }));
     },
 
     /* * * 企业增加员工 * * */
     user_add_org: async function(msg) {
-        DealEvent.userAddOrg(msg);
+        return await DealEvent.userModifyOrg(msg);
     },
 
     /* * 通讯录用户更改 * */
     user_modify_org : async function(msg){
-        DealEvent.userAddOrg(msg);
+        return await DealEvent.userModifyOrg(msg);
     },
     /* * 通讯录用户离职 * */
     user_leave_org : async function(msg){
-        return msg;
+        return await DealEvent.userLeaveOrg(msg);
     },
     /* * 通讯录用户被设为管理员 * */
     // org_admin_add : async function(msg){
@@ -76,43 +70,86 @@ let ddTalkMsgHandle = {
     // },
     /* * *  通讯录企业部门创建 * * */
     org_dept_create : async function(msg){
-        DealEvent.orgDeptCreate(msg);
+        return await DealEvent.orgDeptCreate(msg);
     },
     /* * *  通讯录企业部门修改 * * */
     org_dept_modify : async function(msg){
-        DealEvent.orgDeptModify(msg);
+        return await DealEvent.orgDeptCreate(msg);
     },
     /* * *  通讯录企业部门删除 * * */
     org_dept_remove : async function(msg){
-        DealEvent.orgDeptRemove(msg);
-        return msg;
+        return await DealEvent.orgDeptRemove(msg);
     },
     /* * *  企业被解散 * * */
     org_remove : async function(msg){
-        DealEvent.orgDeptRemove(msg);
+        // return await DealEvent.orgDeptRemove(msg);
         return msg;
     }
+
 }
 
 
 class DDTalk {
     static __public: boolean = true;
     static __initHttpApp(app) {
-        app.post("/ddtalk/isv/receive", dingSuiteCallback(config, function (msg, req, res, next) {
-            console.info(msg);
+
+        app.get("/JLTesthello", (req, res, next)=>{
+            let url = config.test_url.replace(/\/$/g, "");
+            if(config.reg_go){
+                return DealEvent.transpond(req, res, next, null, url+"/JLTesthello");
+            }
+            res.send("ok");
+        });
+
+        app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
+            console.log("hello : ", msg);
+            if(msg.CorpId){
+                let corps = await Models.ddtalkCorp.find({
+                    where : { corpId : msg.CorpId }
+                });
+                if(!corps.length){
+                    return DealEvent.transpond(req, res, next, null);
+                }
+            }
+
+            if(msg.EventType == "suite_ticket"){
+                //transpond
+                let url = config.test_url.replace(/\/$/g, "");
+                if(config.test_url && config.reg_go){
+                    request.post({
+                        url : url + "/ddtalk/suite_ticket",
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        form: msg
+                    }, function(err, res) {
+                        if (err) {
+                            return console.error(err)
+                        }
+                    });
+                }
+            }
             if(!ddTalkMsgHandle[msg.EventType]){
                 return res.reply();
             }
-
-            return ddTalkMsgHandle[msg.EventType](msg)
-                .then((ret) => {
-                    res.reply();
+            return ddTalkMsgHandle[msg.EventType](msg , req , res , next)
+                .then((result) => {
+                    if(!(result && result.notReply)){
+                        res.reply();
+                    }
                 })
                 .catch((err) => {
                     console.error(err.stack);
                     next(err);
                 });
         }));
+
+        app.post("/ddtalk/suite_ticket" , (req , res , next)=>{
+            let msg = req.body || {};
+            console.log("enter in : /ddtalk/suite_ticket");
+            ddTalkMsgHandle.suite_ticket(msg);
+            res.send("ok");
+        });
     }
 
     @clientExport
@@ -154,6 +191,7 @@ class DDTalk {
 
     @clientExport
     static async loginByDdTalkCode(params) : Promise<any> {
+        console.log("enter In loginByDdTalkCode" , params);
         let {corpid, code} = params;
         let corps = await Models.ddtalkCorp.find({ where: {corpId: corpid}, limit: 1});
         if (corps && corps.length) {
@@ -170,8 +208,9 @@ class DDTalk {
             //查找是否已经绑定账号
             let ddtalkUsers = await Models.ddtalkUser.find( { where: {corpid: corpid, ddUserId: dingTalkUser.userId}});
             if (ddtalkUsers && ddtalkUsers.length) {
-                let ddtalkUser = ddtalkUsers[0]
+                let ddtalkUser = ddtalkUsers[0];
                 // //自动登录
+                console.log("钉钉自动登录: API.auth.makeAuthenticateToken ", ddtalkUser.id);
                 let ret = await API.auth.makeAuthenticateToken(ddtalkUser.id, 'ddtalk');
                 return ret;
             }

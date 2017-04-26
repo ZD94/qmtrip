@@ -1,9 +1,9 @@
-import L from 'common/language';
+import L from '@jingli/language';
 import { signToken } from '_types/auth/auth-cert';
 import { getSession } from 'common/model';
 require("ionic");
 
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 API.onlogin(function(){
     var backurl = window.location.href;
     backurl = encodeURIComponent(backurl);

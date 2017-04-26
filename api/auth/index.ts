@@ -2,12 +2,12 @@
  * @module auth
  */
 "use strict";
-import { requireParams, clientExport } from "../../common/api/helper";
+import { requireParams, clientExport } from "@jingli/dnode-api/dist/src/helper";
 import { Models, EAccountType } from "_types";
 import { Account, ACCOUNT_STATUS } from "_types/auth";
 import { Staff, EInvitedLinkStatus, EAddWay } from "_types/staff";
 import validator = require('validator');
-import L from 'common/language';
+import L from '@jingli/language';
 import cache = require("common/cache");
 import * as authentication from './authentication';
 import * as wechat from './wechat';
@@ -17,9 +17,9 @@ import * as byTest from './by-test';
 import {condition, conditionDecorator} from "../_decorator";
 
 var uuid = require("node-uuid");
-var C = require("config");
+import C = require("@jingli/config");
 var moment = require("moment");
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 var utils = require("common/utils");
 var accountCols = Account['$fieldnames'];
 
@@ -193,12 +193,14 @@ export default class ApiAuth {
      * @returns {boolean}
      */
     @clientExport
-    static async reSendActiveLink(params: {email: string, accountId?: string}): Promise<boolean> {
+    static async reSendActiveLink(params: {email: string, accountId?: string, origin?: string}): Promise<boolean> {
         var mobileOrEmail = params.email;
         var accountId = params.accountId;
         var account: Account;
+        let staff: Staff;
         if(accountId) {
-            account = await Models.account.get(accountId);
+            staff = await Models.staff.get(accountId);
+            account = await Models.account.get(staff.accountId, {notParent: true});
         } else {
             var accounts = await Models.account.find({where: {$or: [{email: mobileOrEmail}, {mobile: mobileOrEmail}]}});
             if(accounts && accounts.length > 0) {
@@ -212,7 +214,11 @@ export default class ApiAuth {
         // var staff = await Models.staff.get(account.id);
         // await API.auth.sendResetPwdEmail({email: account.email, mobile: account.mobile, type: 1, isFirstSet: true, companyName: staff.company.name});
         //发送qm_active
-        await _sendActiveEmail(account.id);
+        let account_id = account.id;
+        if(staff && staff.id){
+            account_id = staff.id;
+        }
+        await _sendActiveEmail(account_id, params.origin);
         return true;
     }
 
@@ -240,7 +246,7 @@ export default class ApiAuth {
         await API.notify.submitNotify({
             key: 'qm_new_staff_active',
             values: values,
-            accountId: account.id
+            mobile: account.mobile,
         });
         return true;
     }
@@ -436,21 +442,21 @@ export default class ApiAuth {
 
         if(ckeckMsgCode) {
             /*var company = await Models.company.get(companyId);
-            var defaultDeptment = await company.getDefaultDepartment();
-            var defaultTravelPolicy = await company.getDefaultTravelPolicy();
-            var staff = Staff.create({
-                mobile: mobile,
-                name: name,
-                pwd: utils.md5(pwd),
-                status: ACCOUNT_STATUS.ACTIVE,
-                isValidateMobile: true
-            })
-            staff.company = company;
-            if(defaultDeptment) {
-                staff.department = defaultDeptment;
-            }
-            staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
-            staff = await staff.save();*/
+             var defaultDeptment = await company.getDefaultDepartment();
+             var defaultTravelPolicy = await company.getDefaultTravelPolicy();
+             var staff = Staff.create({
+             mobile: mobile,
+             name: name,
+             pwd: utils.md5(pwd),
+             status: ACCOUNT_STATUS.ACTIVE,
+             isValidateMobile: true
+             })
+             staff.company = company;
+             if(defaultDeptment) {
+             staff.department = defaultDeptment;
+             }
+             staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
+             staff = await staff.save();*/
 
             var staff = await API.staff.registerStaff({
                 mobile: mobile,
@@ -572,9 +578,9 @@ export default class ApiAuth {
      * @returns {Promise<TResult>|Promise<U>}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'userName', 'pwd', 'msgCode', 'msgTicket'], ['email', 'agencyId', 'remark', 'description', 'promoCode'])
+    @requireParams(['mobile', 'name', 'userName', 'pwd', 'msgCode', 'msgTicket'], ['email', 'agencyId', 'remark', 'description', 'promoCode', 'referrerMobile'])
     static async registerCompany(params: {name: string, userName: string, email?: string, mobile: string, pwd: string,
-        msgCode: string, msgTicket: string, agencyId?: string, promoCode?: string}) {
+        msgCode: string, msgTicket: string, agencyId?: string, promoCode?: string, referrerMobile?: string}) {
         var companyName = params.name;
         var name = params.userName;
         var email = params.email;
@@ -582,6 +588,7 @@ export default class ApiAuth {
         var msgCode = params.msgCode;
         var msgTicket = params.msgTicket;
         var pwd = params.pwd;
+        var referrerMobile = params.referrerMobile;
 
         if(!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
             throw L.ERR.MOBILE_NOT_CORRECT();
@@ -630,7 +637,8 @@ export default class ApiAuth {
             pwd: pwd,
             status: ACCOUNT_STATUS.ACTIVE,
             isValidateMobile: true,
-            promoCode: params.promoCode
+            promoCode: params.promoCode,
+            referrerMobile: referrerMobile,
         });
         return result;
     }
@@ -709,7 +717,7 @@ export default class ApiAuth {
         return API.notify.submitNotify({
             key: key,
             values: vals,
-            accountId: acc.id
+            email: acc.email,
         });
     }
 
@@ -757,7 +765,7 @@ export default class ApiAuth {
         return API.notify.submitNotify({
             key: key,
             values: vals,
-            accountId: acc.id
+            email: acc.email
         });
     }
 
@@ -889,7 +897,7 @@ export default class ApiAuth {
     @clientExport
     static async updateAccount(params) : Promise<Account>{
         var id = params.id;
-
+        console.log("更新字段:====>", params);
         var ah = await Models.account.get(id);
         for(var key in params){
             ah[key] = params[key];
@@ -953,38 +961,38 @@ export default class ApiAuth {
      * @returns {*}
      */
     /*@clientExport
-    @requireParams(["id"], accountCols)
-    static async updateAccount(params) {
-        var id = params.id;
-        var accobj = await Models.account.get(id);
-        var staff = await Staff.getCurrent();
-        if(params.email && staff && staff.company["domainName"] && params.email.indexOf(staff.company["domainName"]) == -1) {
-            throw L.ERR.INVALID_ARGUMENT('email');
-        }
+     @requireParams(["id"], accountCols)
+     static async updateAccount(params) {
+     var id = params.id;
+     var accobj = await Models.account.get(id);
+     var staff = await Staff.getCurrent();
+     if(params.email && staff && staff.company["domainName"] && params.email.indexOf(staff.company["domainName"]) == -1) {
+     throw L.ERR.INVALID_ARGUMENT('email');
+     }
 
-        if(params.email && accobj["status"] != 0 && accobj.email != params.email) {
-            // throw {code: -2, msg: "该账号不允许修改邮箱"};
-            throw L.ERR.NOTALLOWED_MODIFY_EMAIL();
-        }
+     if(params.email && accobj["status"] != 0 && accobj.email != params.email) {
+     // throw {code: -2, msg: "该账号不允许修改邮箱"};
+     throw L.ERR.NOTALLOWED_MODIFY_EMAIL();
+     }
 
 
-        for(var key in params) {
-            accobj[key] = params[key];
-        }
-        var newAcc = await accobj.save();
-        return newAcc;
+     for(var key in params) {
+     accobj[key] = params[key];
+     }
+     var newAcc = await accobj.save();
+     return newAcc;
 
-        /!*if(accobj.email == newAcc.email){
-         return newAcc;
-         }
+     /!*if(accobj.email == newAcc.email){
+     return newAcc;
+     }
 
-         var staff = await Models.staff.get(id);
-         var companyName = (staff && staff.company) ? staff.company.name : "";
-         return ApiAuth.sendResetPwdEmail({companyName: companyName, email: newAcc.email, type: 1, isFirstSet: true})
-         .then(function() {
-         return newAcc;
-         });*!/
-    }*/
+     var staff = await Models.staff.get(id);
+     var companyName = (staff && staff.company) ? staff.company.name : "";
+     return ApiAuth.sendResetPwdEmail({companyName: companyName, email: newAcc.email, type: 1, isFirstSet: true})
+     .then(function() {
+     return newAcc;
+     });*!/
+     }*/
 
     /**
      * 删除Account
@@ -1100,15 +1108,26 @@ export default class ApiAuth {
 
     static removeByTest = byTest.removeByTest;
 
+    @clientExport
+    static setUserId = authentication.setUserId;
+
+    @clientExport
+    static getUserId = authentication.getUserId;
 }
 
-async function _sendActiveEmail(accountId) {
-    var account = await Models.account.get(accountId)
+async function _sendActiveEmail(accountId: string, origin?: string) {
+    let staff = await Models.staff.get(accountId);
+    let account_id = accountId;
+    if(staff && staff.accountId){
+        account_id = staff.accountId;
+    }
+    var account = await Models.account.get(account_id);
     //生成激活码
     var expireAt = Date.now() + 24 * 60 * 60 * 1000;//失效时间一天
     var activeToken = utils.getRndStr(6);
     var sign = makeActiveSign(activeToken, account.id, expireAt);
-    var url = C.host + "/index.html#/login/active?accountId=" + account.id + "&sign=" + sign + "&timestamp=" + expireAt + "&email=" + account.email;
+    let host = origin ? origin : C.host;
+    var url = host + "/index.html#/login/active?accountId=" + account.id + "&sign=" + sign + "&timestamp=" + expireAt + "&email=" + account.email;
     var appMessageUrl = "#/staff/staff-info";
     try {
         url = await API.wechat.shorturl({longurl: url});
@@ -1129,7 +1148,8 @@ async function _sendActiveEmail(accountId) {
         API.notify.submitNotify({
             key: 'qm_active',
             values: vals,
-            accountId: account.id,
+            email: account.email,
+            userId: staff ? staff.id : null
         })
     ]);
 

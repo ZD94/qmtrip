@@ -7,7 +7,7 @@ import {
 import moment = require('moment');
 import * as path from 'path';
 
-var API = require('common/api');
+var API = require('@jingli/dnode-api');
 
 var staffMenus = [
     {
@@ -99,7 +99,7 @@ var staffMenus = [
 //     },
 // ];
 
-var config = require('config');
+var config = require('@jingli/config');
 
 export function getImageUrl(id){
     if(typeof id !== 'string' || typeof config.update !== 'string')
@@ -147,7 +147,6 @@ export async function IndexController($scope, Menu, $ionicPopup, $storage, $loca
     $scope.tripPlanSave = 0;
 
     var staff = await Staff.getCurrent();
-    // var noticePager = await staff.getSelfNotices();
     let leftTime = moment(staff.company.expiryDate).diff(moment(),'days');
     if(leftTime <= 7){
         let popTitle = '服务即将到期';
@@ -216,33 +215,33 @@ export async function IndexController($scope, Menu, $ionicPopup, $storage, $loca
             })
         }
     }
-    var noticePager = [];
     function setupMenu(menuItems){
         Menu.delall();
         for(let item of menuItems){
             Menu.add(item);
         }
     }
-    function ifNewNotice(Pager){
-        var num = 0;
-        Pager.map(function(notice){
-            if(!notice.isRead){
-                $scope.Menu.notie = true;
-            }else{
-                num++;
-                if(num == Pager.length){
-                    $scope.Menu.notie = false;
+    function ifNewNotice(result){
+        let num = 0;
+        $scope.Menu.notie = false;
+        if(result){
+            for(var key in result){
+                if(result[key] && result[key].unReadNum && result[key].unReadNum > 0){
+                    num += result[key].unReadNum;
                 }
             }
-        })
+            if(num > 0){
+                $scope.Menu.notie = true;
+            }
+        }
     }
     setupMenu(staffMenus);
     //给客户服务地址赋值
     judge();
     $scope.$watch(function() { return $ionicSideMenuDelegate.isOpen(); }, async function(isOpen) {
         if (isOpen) {//Menu Open
-            noticePager = await staff.getSelfNotices();
-            ifNewNotice(noticePager);
+            let result = await staff.statisticNoticeByType();
+            ifNewNotice(result);
         }
         else {
             // Menu Closed

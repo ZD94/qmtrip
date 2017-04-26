@@ -1,0 +1,99 @@
+{
+    "domesticTraffic": [
+        {
+            "name": "departStandardTimePrefer",
+            "options": {
+                "end": "<%=moment(local.leaveDate).format('YYYY-MM-DD')%> 16:00",
+                "begin": "<%=moment(local.leaveDate).format('YYYY-MM-DD')%> 8:00",
+                "score": 500,
+                "scoreInterval": -3
+            }
+        },
+        {
+            "name": "arriveStandardTimePrefer",
+            "options": {
+                "end": "<%=moment(local.leaveDate).format('YYYY-MM-DD')%> 19:00",
+                "begin": "<%=moment(local.leaveDate).format('YYYY-MM-DD')%> 9:00",
+                "score": 500,
+                "scoreInterval": -3
+            }
+        },
+        {
+            "name": "runningTimePrefer",
+            "options": {
+                "planeScore": 500,
+                "trainScore": 250,
+                "planeScoreInterval": 5,
+                "trainScoreInterval": 5
+            }
+        },
+        {
+            "name": "trainPricePrefer",
+            "options": {
+                "type": "square",
+                "score": 10000,
+                "expectTrainCabins": "<%=local.expectTrainCabins%>"
+            }
+        }
+    ],
+    "abroadTraffic": [
+        {
+            "name": "directArrive",
+            "options": {
+                "deductScorePerStop": 10000
+            }
+        },
+        {
+            "name": "runningTimePrefer",
+            "options": {
+                "planeScore": 500,
+                "trainScore": 250,
+                "planeScoreInterval": 5,
+                "trainScoreInterval": 5
+            }
+        },
+        {
+            "name": "transitCityInChina",
+            "options": {
+                "baseScore": 5000
+            }
+        },
+        {
+            "name": "transitWaitDuration",
+            "options": {
+                "baseScore": 500,
+                "subScore": 5,
+                "maxDuration": 360,
+                "minDuration": 120
+            }
+        }
+    ],
+    "domesticHotel": [
+        {
+            "name": "represent",
+            "options": {
+                "score": 2000
+            }
+        },
+        {
+            "name": "blackList",
+            "options": {
+                "score": -100000
+            }
+        }
+    ],
+    "abroadHotel": [
+        {
+            "name": "represent",
+            "options": {
+                "score": 2000
+            }
+        },
+        {
+            "name": "blackList",
+            "options": {
+                "score": -100000
+            }
+        }
+    ]
+}

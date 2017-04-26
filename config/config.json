@@ -53,7 +53,7 @@
   "system_notice_emails": [
     {
       "name": "用户",
-      "email": "tbudget@jingli365.com"
+      "email": "testteam@jingli365.com"
     }
   ],
   "default_agency": {
@@ -86,5 +86,18 @@
   "duiba": {
     "appKey" : "3fFDdkKxibDiRjwy9DqaPwasvAup",
     "appSecret" : "2FaLAocgDodNqCFa9PU8cyCk4Fnw"
-  }
+  },
+  "is_init_test_company": true,
+  "ddconfig" : {
+    "token": "jingli2016",
+    "encodingAESKey": "8nf2df6n0hiifsgg521mmjl6euyxoy3y6d9d3mt1laq",
+    "suiteid": "suitezutlhpvgyvgakcdo",
+    "secret": "pV--T2FZj-3QCjJzcQd5OnzDBAe6rRKRQGEmc8iVCvdtc2FUOS5icq1gVfkbqiTx",
+    "appid": "2156",
+    "test_url" : "https://t.jingli365.com/",
+    "name_reg" : "^jl0418",
+    "reg_go": true,
+    "dd_online_url": "https://j.jingli365.com"
+  },
+  "perDayRegisterEmail": ""
 }
