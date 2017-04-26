@@ -1431,7 +1431,7 @@ class TripPlanModule {
             "createAt": moment().format('YYYY年MM月DD日HH:mm'), //生成时间
             "departDate": moment(tripPlan.startAt).format('YYYY.MM.DD'), //出差起始时间
             "backDate": moment(tripPlan.backAt).format('YYYY.MM.DD'), //出差返回时间
-            "reason": tripPlan.project.name, //出差事由
+            "reason": tripPlan.project ? tripPlan.project.name: '', //出差事由
             "approveUsers": approveUsers, //本次出差审批人
             "qrcode": `data:image/png;base64,${qrcodeCxt}`,
             "invoices": _tripDetails,
