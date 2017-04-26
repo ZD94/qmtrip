@@ -94,7 +94,26 @@ export default class SupplierCtripCT extends SupplierWebRobot{
 
         var param_str = JSON.stringify(param);
         var linkJS = "localStorage.setItem('TRAIN_SEARCH_STORE_LIGHT', \'"+param_str+"\');console.log('train_search_param');";
-        return {url:trafficBookLink, indexUrl:indexBookLink, jsCode: linkJS};
+
+        let date = moment(options.leaveDate).format("YYYY-MM-DD");
+        let jsCode = `
+            var canGo = sessionStorage.getItem("canGo");
+            if(canGo){
+
+            }else{
+                sessionStorage.setItem("canGo" , true);
+                var Info = localStorage.getItem('TRAIN_SEARCH_STORE_LIGHT');
+                Info = JSON.parse(Info);
+                Info.value.date = "${date}";
+                Info.value.from.cityName = Info.value.from.name = "${options.fromCity}";
+                Info.value.to.cityName   = Info.value.to.name   = "${options.toCity}";
+                Info = JSON.stringify(Info);
+                localStorage.setItem('TRAIN_SEARCH_STORE_LIGHT' , Info);
+                location.reload();
+            }
+        `;
+
+        return {url:trafficBookLink, indexUrl:indexBookLink, jsCode: jsCode};
     }
 
     async queryFlightCityCode(city: string): Promise<string>{
