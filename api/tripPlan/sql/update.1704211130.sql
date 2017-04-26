@@ -1,0 +1,1 @@
+update trip_plan.trip_detail_invoices set source_type = 1 where source_type is null;
