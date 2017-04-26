@@ -60,7 +60,7 @@ export async function tmpAuthCode(msg , req , res , next) {
 
     let suiteToken, permanentAuthMsg: any, permanentCode, corp_name;
     //暂时缓存，防止重复触发
-    await cache.write(TMP_CODE_KEY, true, 60 * 2);
+    await cache.write(TMP_CODE_KEY, true, 60 * 1);
     let tokenObj = await _getSuiteToken();
     suiteToken = tokenObj['suite_access_token'];
 
@@ -104,13 +104,6 @@ export async function tmpAuthCode(msg , req , res , next) {
     console.log("tmp_auth_code 正常逻辑");
     /* ============ End =========== */
 
-    //test
-    // let corp_name = "鲸力测试3.16";
-    // let permanentCode = "MiWZd0Ja6qRtHydnRjavun3Hv6xEjSQ0oyaAkGO2bP2wAQb0L6NeLvOQ1KQPrABD";
-    //
-    // let corpid = "ding3c92322d23dbbbfa35c2f4657eb6378f";
-    //test end.
-
     let corpid = permanentAuthMsg.auth_corp_info.corpid;
     let isvApi = new ISVApi(config.suiteid, suiteToken, corpid, permanentCode);
 
@@ -137,9 +130,10 @@ export async function tmpAuthCode(msg , req , res , next) {
 
     //查找本地记录的企业信息
     let corps = await Models.ddtalkCorp.find({where: {corpId: corpid}});
+    let corp;
     if (corps && corps.length) {
         //有记录，曾经授权过
-        let corp = corps[0];
+        corp = corps[0];
         let company = await corp.getCompany(corp['company_id']);
         //修改状态，可能解除过
         company.status = 1;
@@ -156,12 +150,12 @@ export async function tmpAuthCode(msg , req , res , next) {
     } else {
         //创建企业
 
-        let company = Company.create({name : corp_name , expiryDate : moment.add(1 , "months").toDate(), isConnectDd: true});
+        let company = Company.create({name : corp_name , expiryDate : moment().add(1 , "months").toDate(), isConnectDd: true});
         company = await company.save();
         console.log("company created");
 
         let travelPolicy = await company.getDefaultTravelPolicy();
-        let corp = Models.ddtalkCorp.create({
+        corp = Models.ddtalkCorp.create({
             id: company.id,
             corpId: corpid,
             permanentCode: permanentCode,
@@ -169,7 +163,7 @@ export async function tmpAuthCode(msg , req , res , next) {
             isSuiteRelieve: false,
             agentid: agentid
         });
-        await corp.save();
+        corp = await corp.save();
         // console.log("ddtalkCorp  created");
 
         /* ====== 单独处理 创建者信息 ====== */
@@ -200,21 +194,20 @@ export async function tmpAuthCode(msg , req , res , next) {
             corpid: corpid,   //钉钉企业id
         });
         await ddtalkUser.save();
-
-        /* ====== 单独处理 创建者信息 ===  END  === */
-
-        //保存部门信息
-        // console.log(userInfo , "创建结束");
-        dealCompanyOrganization(corpApi, corp).then((result)=>{
-
-        }).catch((err)=>{
-            console.log(err);
-            return false;
-        });
     }
 
     await isvApi.activeSuite();
-    await corpApi.registryContractChangeLister(config.token, config.encodingAESKey, C.host + '/ddtalk/isv/receive');
+    await corpApi.registryContractChangeLister(config.token, config.encodingAESKey, config.dd_online_url + '/ddtalk/isv/receive');
+
+    /* ====== 单独处理 创建者信息 ===  END  === */
+
+    //保存部门信息
+    try{
+        await dealCompanyOrganization(corpApi, corp);
+    }catch(err){
+        console.log(err);
+        return false;
+    }
 }
 
 
@@ -402,14 +395,16 @@ export async function synchroDDorganization() : Promise<boolean> {
     let {corpApi} = await getISVandCorp(corp);
 
     try{
-        // await dealCompanyOrganization(corpApi, corp);
+        await dealCompanyOrganization(corpApi, corp);
+
+        /* 同步成功后需要修改company isConnectDd true */
+        current.company.isConnectDd = true;
+        await current.company.save();
         return true;
     }catch(e){
         return false;
         // throw new Error("同步钉钉组织架构出错");
     }
-
-    /* 同步成功后需要修改company isConnectDd true */
 }
 
 

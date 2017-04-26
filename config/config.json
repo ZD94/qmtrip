@@ -96,7 +96,8 @@
     "appid": "2156",
     "test_url" : "https://t.jingli365.com/",
     "name_reg" : "^jl0418",
-    "reg_go": true
+    "reg_go": true,
+    "dd_online_url": "https://j.jingli365.com"
   },
   "perDayRegisterEmail": ""
 }
