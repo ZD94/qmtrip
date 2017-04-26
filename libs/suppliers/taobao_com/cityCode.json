@@ -1,1 +1,5472 @@
-{"上海":{"cityName":"上海","pinYin":"shanghai","py":"sh","code":"310100"},"北京":{"cityName":"北京","pinYin":"beijing","py":"bj","code":"110100"},"杭州":{"cityName":"杭州","pinYin":"hangzhou","py":"hz","code":"330100"},"成都":{"cityName":"成都","pinYin":"chengdu","py":"cd","code":"510100"},"广州":{"cityName":"广州","pinYin":"guangzhou","py":"gz","code":"440100"},"深圳":{"cityName":"深圳","pinYin":"shenzhen","py":"sz","code":"440300"},"武汉":{"cityName":"武汉","pinYin":"wuhan","py":"wh","code":"420100"},"重庆":{"cityName":"重庆","pinYin":"chongqing","py":"cq","code":"500100"},"西安":{"cityName":"西安","pinYin":"xian","py":"xa","code":"610100"},"香港":{"cityName":"香港","pinYin":"xianggang","py":"xg","code":"810100"},"南京":{"cityName":"南京","pinYin":"nanjing","py":"nj","code":"320100"},"三亚":{"cityName":"三亚","pinYin":"sanya","py":"sy","code":"460200"},"厦门":{"cityName":"厦门","pinYin":"xiamen","py":"xm","code":"350200"},"长沙":{"cityName":"长沙","pinYin":"changsha","py":"cs","code":"430100"},"苏州":{"cityName":"苏州","pinYin":"suzhou","py":"sz","code":"320500"},"天津":{"cityName":"天津","pinYin":"tianjin","py":"tj","code":"120100"},"澳门":{"cityName":"澳门","pinYin":"aomen","py":"am","code":"820100"},"郑州":{"cityName":"郑州","pinYin":"zhengzhou","py":"zz","code":"410100"},"哈尔滨":{"cityName":"哈尔滨","pinYin":"haerbin","py":"heb","code":"230100"},"宁波":{"cityName":"宁波","pinYin":"ningbo","py":"nb","code":"330200"},"昆明":{"cityName":"昆明","pinYin":"kunming","py":"km","code":"530100"},"阿坝藏族羌族自治州":{"cityName":"阿坝藏族羌族自治州","pinYin":"abazangzuqiangzuzizhizhou","py":"abzzqzzzz","code":"513200"},"安阳":{"cityName":"安阳","pinYin":"anyang","py":"ay","code":"410500"},"安顺":{"cityName":"安顺","pinYin":"anshun","py":"as","code":"520400"},"安庆":{"cityName":"安庆","pinYin":"anqing","py":"aq","code":"340800"},"鞍山":{"cityName":"鞍山","pinYin":"anshan","py":"as","code":"210300"},"安康":{"cityName":"安康","pinYin":"ankang","py":"ak","code":"610900"},"阿克苏":{"cityName":"阿克苏","pinYin":"akesu","py":"aks","code":"652900"},"阿勒泰":{"cityName":"阿勒泰","pinYin":"aletai","py":"alt","code":"654300"},"阿拉善盟":{"cityName":"阿拉善盟","pinYin":"alashanmeng","py":"als","code":"152900"},"阿里":{"cityName":"阿里","pinYin":"ali","py":"ali","code":"542500"},"阿拉尔":{"cityName":"阿拉尔","pinYin":"alaer","py":"ale","code":"659002"},"阿尔山":{"cityName":"阿尔山","pinYin":"aershan","py":"aes","code":"152202"},"安昌":{"cityName":"安昌","pinYin":"anchang","py":"ac","code":"100007"},"安国":{"cityName":"安国","pinYin":"anguo","py":"ag","code":"130683"},"安吉县":{"cityName":"安吉县","pinYin":"anjixian","py":"ajx","code":"330523"},"阿图什":{"cityName":"阿图什","pinYin":"atushi","py":"ats","code":"653001"},"北海":{"cityName":"北海","pinYin":"beihai","py":"bh","code":"450500"},"保定":{"cityName":"保定","pinYin":"baoding","py":"bd","code":"130600"},"宝鸡":{"cityName":"宝鸡","pinYin":"baoji","py":"bj","code":"610300"},"蚌埠":{"cityName":"蚌埠","pinYin":"bengbu","py":"bb","code":"340300"},"包头":{"cityName":"包头","pinYin":"baotou","py":"bt","code":"150200"},"百色":{"cityName":"百色","pinYin":"baise","py":"bs","code":"451000"},"白山":{"cityName":"白山","pinYin":"baishan","py":"bs","code":"220600"},"滨州":{"cityName":"滨州","pinYin":"binzhou","py":"bz","code":"371600"},"保亭黎族苗族自治县":{"cityName":"保亭黎族苗族自治县","pinYin":"baotinglizumiaozuzizhixian","py":"btlzmzzzx","code":"469035"},"巴中":{"cityName":"巴中","pinYin":"bazhong","py":"bz","code":"511900"},"毕节":{"cityName":"毕节","pinYin":"bijie","py":"bj","code":"522400"},"本溪":{"cityName":"本溪","pinYin":"benxi","py":"bx","code":"210500"},"巴音郭楞蒙古自治州":{"cityName":"巴音郭楞蒙古自治州","pinYin":"bayinguolengmengguzizhizhou","py":"byglmgzzz","code":"652800"},"白城":{"cityName":"白城","pinYin":"baicheng","py":"bc","code":"220800"},"巴彦淖尔":{"cityName":"巴彦淖尔","pinYin":"bayannaoer","py":"byne","code":"150800"},"白银":{"cityName":"白银","pinYin":"baiyin","py":"by","code":"620400"},"博尔塔拉蒙古自治州":{"cityName":"博尔塔拉蒙古自治州","pinYin":"boertalamengguzizhizhou","py":"betlmgzzz","code":"652700"},"白沙黎族自治县":{"cityName":"白沙黎族自治县","pinYin":"baishalizuzizhixian","py":"bslzzzx","code":"469030"},"保山":{"cityName":"保山","pinYin":"baoshan","py":"bs","code":"530500"},"霸州":{"cityName":"霸州","pinYin":"bazhou","py":"bz","code":"131081"},"北戴河":{"cityName":"北戴河","pinYin":"beidaihe","py":"bdh","code":"130304"},"亳州":{"cityName":"亳州","pinYin":"bozhou","py":"bz","code":"341600"},"布尔津县":{"cityName":"布尔津县","pinYin":"buerjinxian","py":"bejx","code":"654321"},"长春":{"cityName":"长春","pinYin":"changchun","py":"cc","code":"220100"},"常州":{"cityName":"常州","pinYin":"changzhou","py":"cz","code":"320400"},"承德":{"cityName":"承德","pinYin":"chengde","py":"cd","code":"130800"},"郴州":{"cityName":"郴州","pinYin":"chenzhou","py":"cz","code":"431000"},"常德":{"cityName":"常德","pinYin":"changde","py":"cd","code":"430700"},"沧州":{"cityName":"沧州","pinYin":"cangzhou","py":"cz","code":"130900"},"潮州":{"cityName":"潮州","pinYin":"chaozhou","py":"cz","code":"445100"},"长治":{"cityName":"长治","pinYin":"changzhi","py":"cz","code":"140400"},"滁州":{"cityName":"滁州","pinYin":"chuzhou","py":"cz","code":"341100"},"池州":{"cityName":"池州","pinYin":"chizhou","py":"cz","code":"341700"},"赤峰":{"cityName":"赤峰","pinYin":"chifeng","py":"cf","code":"150400"},"崇左":{"cityName":"崇左","pinYin":"chongzuo","py":"cz","code":"451400"},"楚雄":{"cityName":"楚雄","pinYin":"chuxiong","py":"cx","code":"532300"},"昌吉":{"cityName":"昌吉","pinYin":"changji","py":"cj","code":"652300"},"朝阳":{"cityName":"朝阳","pinYin":"chaoyang","py":"cy","code":"211300"},"巢湖":{"cityName":"巢湖","pinYin":"chaohu","py":"ch","code":"341400"},"昌都":{"cityName":"昌都","pinYin":"changdu","py":"cd","code":"542100"},"昌江黎族自治县":{"cityName":"昌江黎族自治县","pinYin":"changjianglizuzizhixian","py":"cjlzzzx","code":"469031"},"澄迈县":{"cityName":"澄迈县","pinYin":"chengmai","py":"cm","code":"469027"},"长葛":{"cityName":"长葛","pinYin":"changge","py":"cg","code":"411082"},"长乐":{"cityName":"长乐","pinYin":"changle","py":"cl","code":"350182"},"常宁":{"cityName":"常宁","pinYin":"changning","py":"cn","code":"430482"},"常熟":{"cityName":"常熟","pinYin":"changshu","py":"cs","code":"320581"},"赤壁":{"cityName":"赤壁","pinYin":"chibi","py":"cb","code":"421281"},"崇明县":{"cityName":"崇明县","pinYin":"chongmingxian","py":"cmx","code":"310230"},"崇州":{"cityName":"崇州","pinYin":"chongzhou","py":"cz","code":"510184"},"淳安县":{"cityName":"淳安县","pinYin":"chunanxian","py":"cax","code":"330127"},"慈溪":{"cityName":"慈溪","pinYin":"cixi","py":"cx","code":"330282"},"从化":{"cityName":"从化","pinYin":"conghua","py":"ch","code":"440184"},"大理":{"cityName":"大理","pinYin":"dali","py":"dl","code":"532900"},"大连":{"cityName":"大连","pinYin":"dalian","py":"dl","code":"210200"},"东莞":{"cityName":"东莞","pinYin":"dongguan","py":"dg","code":"441900"},"德阳":{"cityName":"德阳","pinYin":"deyang","py":"dy","code":"510600"},"大同":{"cityName":"大同","pinYin":"datong","py":"dt","code":"140200"},"丹东":{"cityName":"丹东","pinYin":"dandong","py":"dd","code":"210600"},"德州":{"cityName":"德州","pinYin":"dezhou","py":"dz","code":"371400"},"达州":{"cityName":"达州","pinYin":"dazhou","py":"dz","code":"511700"},"大庆":{"cityName":"大庆","pinYin":"daqing","py":"dq","code":"230600"},"东营":{"cityName":"东营","pinYin":"dongying","py":"dy","code":"370500"},"迪庆藏族自治州":{"cityName":"迪庆藏族自治州","pinYin":"diqingzangzuzizhizhou","py":"dqzzzzz","code":"533400"},"德宏傣族景颇族自治州":{"cityName":"德宏傣族景颇族自治州","pinYin":"dehongdaizujingpozuzizhizhou","py":"dhdzjpzzzz","code":"533100"},"定西":{"cityName":"定西","pinYin":"dingxi","py":"lx","code":"621100"},"定安县":{"cityName":"定安县","pinYin":"dingan","py":"da","code":"469025"},"大兴安岭":{"cityName":"大兴安岭","pinYin":"daxinganling","py":"dxal","code":"232700"},"东方":{"cityName":"东方","pinYin":"dongfang","py":"df","code":"469007"},"儋县":{"cityName":"儋县","pinYin":"danxian","py":"dx","code":"469003"},"大东海":{"cityName":"大东海","pinYin":"dadonghai","py":"ddh","code":"100021"},"岱山县":{"cityName":"岱山县","pinYin":"daishanxian","py":"dsx","code":"330921"},"当阳":{"cityName":"当阳","pinYin":"dangyang","py":"dy","code":"420582"},"丹霞山":{"cityName":"丹霞山","pinYin":"danxianshan","py":"dxs","code":"100011"},"丹阳":{"cityName":"丹阳","pinYin":"danyang","py":"dy","code":"321181"},"稻城县":{"cityName":"稻城县","pinYin":"daochengxian","py":"dcx","code":"513337"},"达县":{"cityName":"达县","pinYin":"daxian","py":"dx","code":"511721"},"大研古城":{"cityName":"大研古城","pinYin":"dayangucheng","py":"dygc","code":"100029"},"大冶":{"cityName":"大冶","pinYin":"daye","py":"dy","code":"420281"},"登封":{"cityName":"登封","pinYin":"dengfeng","py":"df","code":"410185"},"邓州":{"cityName":"邓州","pinYin":"dengzhou","py":"dz","code":"411381"},"德清县":{"cityName":"德清县","pinYin":"deqingxian","py":"dqx","code":"330521"},"德兴":{"cityName":"德兴","pinYin":"dexing","py":"dx","code":"361181"},"电白县":{"cityName":"电白县","pinYin":"dianbaixian","py":"dbx","code":"440923"},"定州":{"cityName":"定州","pinYin":"dingzhou","py":"dz","code":"130682"},"东胜":{"cityName":"东胜","pinYin":"dongsheng","py":"ds","code":"150602"},"东阳":{"cityName":"东阳","pinYin":"dongyang","py":"dy","code":"330783"},"都江堰":{"cityName":"都江堰","pinYin":"dujiangyan","py":"djy","code":"510181"},"敦煌":{"cityName":"敦煌","pinYin":"dunhuang","py":"dh","code":"620982"},"恩施":{"cityName":"恩施","pinYin":"enshi","py":"es","code":"422800"},"鄂尔多斯":{"cityName":"鄂尔多斯","pinYin":"eerduosi","py":"eeds","code":"150600"},"鄂州":{"cityName":"鄂州","pinYin":"ezhou","py":"ez","code":"420700"},"额尔古纳":{"cityName":"额尔古纳","pinYin":"eerguna","py":"eegn","code":"150784"},"峨眉山":{"cityName":"峨眉山","pinYin":"emeishan","py":"ems","code":"511181"},"洱海":{"cityName":"洱海","pinYin":"erhai","py":"eh","code":"100044"},"二连浩特":{"cityName":"二连浩特","pinYin":"erlianhaote","py":"elht","code":"152501"},"福州":{"cityName":"福州","pinYin":"fuzhou","py":"fz","code":"350100"},"佛山":{"cityName":"佛山","pinYin":"foshan","py":"fs","code":"440600"},"阜阳":{"cityName":"阜阳","pinYin":"fuyang","py":"fy","code":"341200"},"抚州":{"cityName":"抚州","pinYin":"fuzhou","py":"fz","code":"361000"},"防城港":{"cityName":"防城港","pinYin":"fangchenggang","py":"fcg","code":"450600"},"抚顺":{"cityName":"抚顺","pinYin":"fushun","py":"fs","code":"210400"},"阜新":{"cityName":"阜新","pinYin":"fuxin","py":"fx","code":"210900"},"放鸡岛":{"cityName":"放鸡岛","pinYin":"fangjidao","py":"fjd","code":"100012"},"奉化":{"cityName":"奉化","pinYin":"fenghua","py":"fh","code":"330283"},"凤凰":{"cityName":"凤凰","pinYin":"fenghuang","py":"fh","code":"433123"},"凤翔县":{"cityName":"凤翔县","pinYin":"fengxiangxian","py":"fxx","code":"610322"},"扶风县":{"cityName":"扶风县","pinYin":"fufengxian","py":"ffx","code":"610324"},"福清":{"cityName":"福清","pinYin":"fuqing","py":"fq","code":"350181"},"富阳":{"cityName":"富阳","pinYin":"fuyang","py":"fy","code":"330183"},"桂林":{"cityName":"桂林","pinYin":"guilin","py":"gl","code":"450300"},"贵阳":{"cityName":"贵阳","pinYin":"guiyang","py":"gy","code":"520100"},"赣州":{"cityName":"赣州","pinYin":"ganzhou","py":"gz","code":"360700"},"广元":{"cityName":"广元","pinYin":"guangyuan","py":"gy","code":"510800"},"贵港":{"cityName":"贵港","pinYin":"guigang","py":"gg","code":"450800"},"广安":{"cityName":"广安","pinYin":"guangan","py":"ga","code":"511600"},"甘孜藏族自治州":{"cityName":"甘孜藏族自治州","pinYin":"ganzizangzuzizhizhou","py":"gzzzzzz","code":"513300"},"高雄":{"cityName":"高雄","pinYin":"gaoxiongshi","py":"gxs","code":"710200"},"固原":{"cityName":"固原","pinYin":"guyuan","py":"gy","code":"640400"},"甘南":{"cityName":"甘南","pinYin":"gannanzangzuzizhizhou","py":"gnzzzzz","code":"623000"},"高雄县":{"cityName":"高雄县","pinYin":"gaoxiongxian","py":"gxx","code":"712300"},"果洛藏族自治州":{"cityName":"果洛藏族自治州","pinYin":"guoluozangzuzizhizhou","py":"glzzzzz","code":"632600"},"高碑店":{"cityName":"高碑店","pinYin":"gaobeidian","py":"gbd","code":"130684"},"高要":{"cityName":"高要","pinYin":"gaoyao","py":"gy","code":"441283"},"高邮":{"cityName":"高邮","pinYin":"gaoyou","py":"gy","code":"321084"},"格尔木":{"cityName":"格尔木","pinYin":"geermu","py":"gem","code":"632801"},"个旧":{"cityName":"个旧","pinYin":"gejiu","py":"gj","code":"532501"},"根河":{"cityName":"根河","pinYin":"genhe","py":"gh","code":"150785"},"巩义":{"cityName":"巩义","pinYin":"gongyi","py":"gy","code":"410181"},"鼓浪屿":{"cityName":"鼓浪屿","pinYin":"gulangyu","py":"gly","code":"100018"},"合肥":{"cityName":"合肥","pinYin":"hefei","py":"hf","code":"340100"},"海口":{"cityName":"海口","pinYin":"haikou","py":"hk","code":"460100"},"惠州":{"cityName":"惠州","pinYin":"huizhou","py":"hz","code":"441300"},"黄山":{"cityName":"黄山","pinYin":"huangshan","py":"hs","code":"341000"},"呼和浩特":{"cityName":"呼和浩特","pinYin":"huhehaote","py":"hhht","code":"150100"},"湖州":{"cityName":"湖州","pinYin":"huzhou","py":"hz","code":"330500"},"衡阳":{"cityName":"衡阳","pinYin":"hengyang","py":"hy","code":"430400"},"邯郸":{"cityName":"邯郸","pinYin":"handan","py":"hd","code":"130400"},"淮安":{"cityName":"淮安","pinYin":"huaian","py":"ha","code":"320800"},"葫芦岛":{"cityName":"葫芦岛","pinYin":"huludao","py":"hld","code":"211400"},"菏泽":{"cityName":"菏泽","pinYin":"heze","py":"hz","code":"371700"},"汉中":{"cityName":"汉中","pinYin":"hanzhong","py":"hz","code":"610700"},"河源":{"cityName":"河源","pinYin":"heyuan","py":"hp","code":"441600"},"怀化":{"cityName":"怀化","pinYin":"huaihua","py":"hh","code":"431200"},"黄冈":{"cityName":"黄冈","pinYin":"huanggang","py":"hg","code":"421100"},"淮南":{"cityName":"淮南","pinYin":"huainan","py":"hn","code":"340400"},"呼伦贝尔":{"cityName":"呼伦贝尔","pinYin":"hulunbeier","py":"hlbe","code":"150700"},"黄石":{"cityName":"黄石","pinYin":"huangshi","py":"hs","code":"420200"},"贺州":{"cityName":"贺州","pinYin":"hezhou","py":"hz","code":"451100"},"衡水":{"cityName":"衡水","pinYin":"hengshui","py":"hs","code":"131100"},"花莲县":{"cityName":"花莲县","pinYin":"hualianxian","py":"hlx","code":"712600"},"红河哈尼族彝族自治州":{"cityName":"红河哈尼族彝族自治州","pinYin":"honghehanizuyizuzizhizhou","py":"hhhnzyzzzz","code":"532500"},"淮北":{"cityName":"淮北","pinYin":"huaibei","py":"hb","code":"340600"},"河池":{"cityName":"河池","pinYin":"hechi","py":"hc","code":"451200"},"鹤壁":{"cityName":"鹤壁","pinYin":"hebi","py":"hb","code":"410600"},"鹤岗":{"cityName":"鹤岗","pinYin":"hegang","py":"hg","code":"230400"},"黑河":{"cityName":"黑河","pinYin":"heihe","py":"hh","code":"231100"},"海西蒙古族藏族自治州":{"cityName":"海西蒙古族藏族自治州","pinYin":"haiximengguzuzangzuzizhizhou","py":"hxmgzzzzzz","code":"632800"},"哈密":{"cityName":"哈密","pinYin":"hami","py":"hm","code":"652200"},"海南藏族自治州":{"cityName":"海南藏族自治州","pinYin":"hainanzangzuzizhizhou","py":"hnzzzzz","code":"632500"},"海北藏族自治州":{"cityName":"海北藏族自治州","pinYin":"haibeizangzuzizhizhou","py":"hbzzzzz","code":"632200"},"和田":{"cityName":"和田","pinYin":"hetian","py":"ht","code":"653200"},"海东":{"cityName":"海东","pinYin":"haidong","py":"hd","code":"632100"},"黄南藏族自治州":{"cityName":"黄南藏族自治州","pinYin":"huangnanzangzuzizhizhou","py":"hnzzzzz","code":"632300"},"海城":{"cityName":"海城","pinYin":"haicheng","py":"hc","code":"210381"},"海拉尔":{"cityName":"海拉尔","pinYin":"hailaer","py":"hle","code":"150702"},"海螺沟":{"cityName":"海螺沟","pinYin":"hailuogou","py":"hlg","code":"100038"},"海门":{"cityName":"海门","pinYin":"haimen","py":"hm","code":"320684"},"海宁":{"cityName":"海宁","pinYin":"haining","py":"hn","code":"330481"},"海阳":{"cityName":"海阳","pinYin":"haiyang","py":"hy","code":"370687"},"海盐县":{"cityName":"海盐县","pinYin":"haiyanxian","py":"hyx","code":"330424"},"韩城":{"cityName":"韩城","pinYin":"hancheng","py":"hc","code":"610581"},"河间":{"cityName":"河间","pinYin":"hejian","py":"hj","code":"130984"},"衡山":{"cityName":"衡山","pinYin":"hengshan","py":"hs","code":"100026"},"和顺":{"cityName":"和顺","pinYin":"heshunxian","py":"hsx","code":"140723"},"合作":{"cityName":"合作","pinYin":"hezuo","py":"hz","code":"623001"},"宏村":{"cityName":"宏村","pinYin":"hongcun","py":"hc","code":"100009"},"侯马":{"cityName":"侯马","pinYin":"houma","py":"hm","code":"141081"},"怀仁县":{"cityName":"怀仁县","pinYin":"huairenxian","py":"hrx","code":"140624"},"黄果树":{"cityName":"黄果树","pinYin":"huangguoshu","py":"hgs","code":"100013"},"黄龙溪":{"cityName":"黄龙溪","pinYin":"huanglongxi","py":"hlx","code":"100037"},"华山":{"cityName":"华山","pinYin":"huashan","py":"hs","code":"100014"},"华阴":{"cityName":"华阴","pinYin":"huayin","py":"hy","code":"610582"},"徽州":{"cityName":"徽州","pinYin":"huizhou","py":"hz","code":"341004"},"霍林郭勒":{"cityName":"霍林郭勒","pinYin":"huolinguole","py":"hlgl","code":"150581"},"霍州":{"cityName":"霍州","pinYin":"huozhou","py":"hz","code":"141082"},"嘉兴":{"cityName":"嘉兴","pinYin":"jiaxing","py":"jx","code":"330400"},"济南":{"cityName":"济南","pinYin":"jinan","py":"jn","code":"370100"},"金华":{"cityName":"金华","pinYin":"jinhua","py":"jh","code":"330700"},"九江":{"cityName":"九江","pinYin":"jiujiang","py":"jj","code":"360400"},"江门":{"cityName":"江门","pinYin":"jiangmen","py":"jm","code":"440700"},"济宁":{"cityName":"济宁","pinYin":"jining","py":"jn","code":"370800"},"焦作":{"cityName":"焦作","pinYin":"jiaozuo","py":"jz","code":"410800"},"吉林":{"cityName":"吉林","pinYin":"jilin","py":"jl","code":"220200"},"荆州":{"cityName":"荆州","pinYin":"jingzhou","py":"jz","code":"421000"},"晋中":{"cityName":"晋中","pinYin":"jinzhong","py":"jz","code":"140700"},"吉安":{"cityName":"吉安","pinYin":"jian","py":"ja","code":"360800"},"揭阳":{"cityName":"揭阳","pinYin":"jieyang","py":"jy","code":"445200"},"锦州":{"cityName":"锦州","pinYin":"jinzhou","py":"jz","code":"210700"},"景德镇":{"cityName":"景德镇","pinYin":"jingdezhen","py":"jdz","code":"360200"},"酒泉":{"cityName":"酒泉","pinYin":"jiuquan","py":"jq","code":"620900"},"佳木斯":{"cityName":"佳木斯","pinYin":"jiamusi","py":"jms","code":"230800"},"嘉峪关":{"cityName":"嘉峪关","pinYin":"jiayuguan","py":"jyg","code":"620200"},"荆门":{"cityName":"荆门","pinYin":"jingmen","py":"jm","code":"420800"},"晋城":{"cityName":"晋城","pinYin":"jincheng","py":"jc","code":"140500"},"鸡西":{"cityName":"鸡西","pinYin":"jixi","py":"jx","code":"230300"},"济源":{"cityName":"济源","pinYin":"jiyuan","py":"jy","code":"410881"},"金门县(台湾)":{"cityName":"金门县(台湾)","pinYin":"jinmenxian","py":"jmx","code":"710500"},"金昌":{"cityName":"金昌","pinYin":"jinchang","py":"jc","code":"620300"},"嘉义县":{"cityName":"嘉义县","pinYin":"jiayixian","py":"jyx","code":"711900"},"基隆":{"cityName":"基隆","pinYin":"jilongshi","py":"jls","code":"710700"},"嘉义":{"cityName":"嘉义","pinYin":"jiayishi","py":"jys","code":"710900"},"建昌县":{"cityName":"建昌县","pinYin":"jianchangxian","py":"jcx","code":"211422"},"建德":{"cityName":"建德","pinYin":"jiande","py":"jd","code":"330182"},"江都":{"cityName":"江都","pinYin":"jiangdu","py":"jd","code":"321088"},"绛县":{"cityName":"绛县","pinYin":"jiangxian","py":"jx","code":"140826"},"江阴":{"cityName":"江阴","pinYin":"jiangyin","py":"jy","code":"320281"},"嘉善县":{"cityName":"嘉善县","pinYin":"jiashanxian","py":"jsx","code":"330421"},"介休":{"cityName":"介休","pinYin":"jiexiu","py":"jx","code":"140781"},"井冈山":{"cityName":"井冈山","pinYin":"jinggangshan","py":"jgs","code":"360881"},"静海县":{"cityName":"静海县","pinYin":"jinghaixian","py":"jhx","code":"120223"},"景洪":{"cityName":"景洪","pinYin":"jinghong","py":"jh","code":"532801"},"集宁":{"cityName":"集宁","pinYin":"jining","py":"jn","code":"150902"},"晋江":{"cityName":"晋江","pinYin":"jinjiang","py":"jj","code":"350582"},"金门县(泉州)":{"cityName":"金门县(泉州)","pinYin":"jinmenxian","py":"jmx","code":"350527"},"吉首":{"cityName":"吉首","pinYin":"jishou","py":"js","code":"433101"},"九华山":{"cityName":"九华山","pinYin":"jiuhuashan","py":"jhs","code":"100010"},"九寨沟":{"cityName":"九寨沟","pinYin":"jiuzhaigou","py":"jzg","code":"513225"},"蓟县":{"cityName":"蓟县","pinYin":"jixian","py":"jx","code":"120225"},"句容":{"cityName":"句容","pinYin":"jurong","py":"jr","code":"321183"},"开封":{"cityName":"开封","pinYin":"kaifeng","py":"kf","code":"410200"},"喀什":{"cityName":"喀什","pinYin":"kashi","py":"ks","code":"653100"},"克拉玛依":{"cityName":"克拉玛依","pinYin":"kelamayi","py":"klmy","code":"650200"},"克孜勒苏柯尔克孜自治州":{"cityName":"克孜勒苏柯尔克孜自治州","pinYin":"kezilesukeerkezizizhizhou","py":"kzlskekzzzz","code":"653000"},"喀纳斯":{"cityName":"喀纳斯","pinYin":"kanasi","py":"kns","code":"100015"},"康定县":{"cityName":"康定县","pinYin":"kangdingxian","py":"kdx","code":"513321"},"垦丁":{"cityName":"垦丁","pinYin":"kending","py":"kd","code":"100036"},"库车":{"cityName":"库车","pinYin":"kuche","py":"kc","code":"652923"},"库尔勒":{"cityName":"库尔勒","pinYin":"kuerle","py":"kel","code":"652801"},"奎屯":{"cityName":"奎屯","pinYin":"kuitun","py":"kt","code":"654003"},"昆山":{"cityName":"昆山","pinYin":"kunshan","py":"ks","code":"320583"},"丽江":{"cityName":"丽江","pinYin":"lijiang","py":"lj","code":"530700"},"兰州":{"cityName":"兰州","pinYin":"lanzhou","py":"lz","code":"620100"},"拉萨":{"cityName":"拉萨","pinYin":"lasa","py":"ls","code":"540100"},"洛阳":{"cityName":"洛阳","pinYin":"luoyang","py":"ly","code":"410300"},"柳州":{"cityName":"柳州","pinYin":"liuzhou","py":"lz","code":"450200"},"临沂":{"cityName":"临沂","pinYin":"linyi","py":"ly","code":"371300"},"乐山":{"cityName":"乐山","pinYin":"leshan","py":"ls","code":"511100"},"连云港":{"cityName":"连云港","pinYin":"lianyungang","py":"lyg","code":"320700"},"廊坊":{"cityName":"廊坊","pinYin":"langfang","py":"lf","code":"131000"},"丽水":{"cityName":"丽水","pinYin":"lishui","py":"ls","code":"331100"},"临汾":{"cityName":"临汾","pinYin":"linfen","py":"lf","code":"141000"},"聊城":{"cityName":"聊城","pinYin":"liaocheng","py":"lc","code":"371500"},"龙岩":{"cityName":"龙岩","pinYin":"longyan","py":"ly","code":"350800"},"凉山彝族自治州":{"cityName":"凉山彝族自治州","pinYin":"liangshanyizuzizhizhou","py":"lsyzzzz","code":"513400"},"六安":{"cityName":"六安","pinYin":"liuan","py":"la","code":"341500"},"泸州":{"cityName":"泸州","pinYin":"luzhou","py":"lz","code":"510500"},"漯河":{"cityName":"漯河","pinYin":"leihe","py":"lh","code":"411100"},"娄底":{"cityName":"娄底","pinYin":"loudi","py":"ld","code":"431300"},"六盘水":{"cityName":"六盘水","pinYin":"liupanshui","py":"lps","code":"520200"},"吕梁":{"cityName":"吕梁","pinYin":"lvliang","py":"ll","code":"141100"},"陵水":{"cityName":"陵水","pinYin":"lingshui","py":"ls","code":"469034"},"来宾":{"cityName":"来宾","pinYin":"laibin","py":"lb","code":"451300"},"辽阳":{"cityName":"辽阳","pinYin":"liaoyang","py":"ld","code":"211000"},"莱芜":{"cityName":"莱芜","pinYin":"laiwu","py":"lw","code":"371200"},"林芝":{"cityName":"林芝","pinYin":"linzhi","py":"lz","code":"542600"},"陇南":{"cityName":"陇南","pinYin":"longnan","py":"ln","code":"621200"},"辽源":{"cityName":"辽源","pinYin":"liaoyuan","py":"ly","code":"220400"},"临沧":{"cityName":"临沧","pinYin":"lincang","py":"lc","code":"530900"},"乐东黎族自治县":{"cityName":"乐东黎族自治县","pinYin":"ledonglizuzizhixian","py":"ldlzzzx","code":"469033"},"临夏":{"cityName":"临夏","pinYin":"linxiahuizuzizhizhou","py":"lxhzzzz","code":"622900"},"临高县":{"cityName":"临高县","pinYin":"lingao","py":"lg","code":"469028"},"莱阳":{"cityName":"莱阳","pinYin":"laiyang","py":"ly","code":"370682"},"莱州":{"cityName":"莱州","pinYin":"laizhou","py":"lz","code":"370683"},"阆中":{"cityName":"阆中","pinYin":"langzhong","py":"lz","code":"511381"},"兰溪":{"cityName":"兰溪","pinYin":"lanxi","py":"lx","code":"330781"},"耒阳":{"cityName":"耒阳","pinYin":"leiyang","py":"ly","code":"430481"},"乐陵":{"cityName":"乐陵","pinYin":"leling","py":"ll","code":"371481"},"乐清":{"cityName":"乐清","pinYin":"leqing","py":"lq","code":"330382"},"连城":{"cityName":"连城","pinYin":"liancheng","py":"lc","code":"350825"},"连州":{"cityName":"连州","pinYin":"lianzhou","py":"lz","code":"441882"},"醴陵":{"cityName":"醴陵","pinYin":"liling","py":"ll","code":"430281"},"临安":{"cityName":"临安","pinYin":"linan","py":"la","code":"330185"},"灵宝":{"cityName":"灵宝","pinYin":"lingbao","py":"lb","code":"411282"},"灵石县":{"cityName":"灵石县","pinYin":"lingshixian","py":"lsx","code":"140729"},"临海":{"cityName":"临海","pinYin":"linhai","py":"lh","code":"331082"},"临河":{"cityName":"临河","pinYin":"linhe","py":"lh","code":"150802"},"临湘":{"cityName":"临湘","pinYin":"linxiang","py":"lx","code":"430682"},"林芝县":{"cityName":"林芝县","pinYin":"linzhixian","py":"lzx","code":"542621"},"黎平":{"cityName":"黎平","pinYin":"liping","py":"lp","code":"522631"},"荔浦县":{"cityName":"荔浦县","pinYin":"lipuxian","py":"ltx","code":"450331"},"浏阳":{"cityName":"浏阳","pinYin":"liuyang","py":"ly","code":"430181"},"龙海":{"cityName":"龙海","pinYin":"longhai","py":"lh","code":"350681"},"隆化县":{"cityName":"隆化县","pinYin":"longhuaxian","py":"lhx","code":"130825"},"龙口":{"cityName":"龙口","pinYin":"longkou","py":"lk","code":"370681"},"龙门县":{"cityName":"龙门县","pinYin":"longmenxian","py":"lmx","code":"441324"},"滦平县":{"cityName":"滦平县","pinYin":"luanpingxian","py":"lpx","code":"130824"},"滦县":{"cityName":"滦县","pinYin":"luanxian","py":"lx","code":"130223"},"泸沽湖":{"cityName":"泸沽湖","pinYin":"luguhu","py":"lgh","code":"100028"},"庐山":{"cityName":"庐山","pinYin":"lushan","py":"ls","code":"360402"},"潞西":{"cityName":"潞西","pinYin":"luxi","py":"lx","code":"533103"},"绵阳":{"cityName":"绵阳","pinYin":"mianyang","py":"my","code":"510700"},"茂名":{"cityName":"茂名","pinYin":"maoming","py":"mm","code":"440900"},"牡丹江":{"cityName":"牡丹江","pinYin":"mudanjiang","py":"mdj","code":"231000"},"马鞍山":{"cityName":"马鞍山","pinYin":"maanshan","py":"mas","code":"340500"},"梅州":{"cityName":"梅州","pinYin":"meizhou","py":"mz","code":"441400"},"眉山":{"cityName":"眉山","pinYin":"meishan","py":"ms","code":"511400"},"苗栗县":{"cityName":"苗栗县","pinYin":"miaolixian","py":"mlx","code":"711500"},"满洲里":{"cityName":"满洲里","pinYin":"manzhouli","py":"mzl","code":"150781"},"梅县":{"cityName":"梅县","pinYin":"meixian","py":"mx","code":"441421"},"绵竹":{"cityName":"绵竹","pinYin":"mianzhu","py":"mz","code":"510683"},"汨罗":{"cityName":"汨罗","pinYin":"miluo","py":"ml","code":"430681"},"漠河":{"cityName":"漠河","pinYin":"mohe","py":"kc","code":"232723"},"木渎":{"cityName":"木渎","pinYin":"mudu","py":"md","code":"100001"},"南昌":{"cityName":"南昌","pinYin":"nanchang","py":"nc","code":"360100"},"南宁":{"cityName":"南宁","pinYin":"nanning","py":"nn","code":"450100"},"南通":{"cityName":"南通","pinYin":"nantong","py":"nt","code":"320600"},"南充":{"cityName":"南充","pinYin":"nanchong","py":"nc","code":"511300"},"宁德":{"cityName":"宁德","pinYin":"ningde","py":"nd","code":"350900"},"南阳":{"cityName":"南阳","pinYin":"nanyang","py":"ny","code":"411300"},"南平":{"cityName":"南平","pinYin":"nanping","py":"np","code":"350700"},"内江":{"cityName":"内江","pinYin":"neijiang","py":"nj","code":"511000"},"南投县":{"cityName":"南投县","pinYin":"nantouxian","py":"ntx","code":"710600"},"那曲":{"cityName":"那曲","pinYin":"naqu","py":"nq","code":"542400"},"怒江傈僳族自治州":{"cityName":"怒江傈僳族自治州","pinYin":"nujianglisuzuzizhizhou","py":"njlszzzz","code":"533300"},"南沙群岛":{"cityName":"南沙群岛","pinYin":"nanshaqundaoxian","py":"nsqdx","code":"469038"},"南安":{"cityName":"南安","pinYin":"nanan","py":"na","code":"350583"},"南澳县":{"cityName":"南澳县","pinYin":"nanaoxian","py":"nax","code":"440523"},"南浔":{"cityName":"南浔","pinYin":"nanxun","py":"nx","code":"330503"},"宁城县":{"cityName":"宁城县","pinYin":"ningchengxian","py":"ncx","code":"150429"},"宁海县":{"cityName":"宁海县","pinYin":"ninghaixian","py":"nhx","code":"330226"},"莆田":{"cityName":"莆田","pinYin":"putian","py":"pt","code":"350300"},"平顶山":{"cityName":"平顶山","pinYin":"pingdingshan","py":"pds","code":"410400"},"萍乡":{"cityName":"萍乡","pinYin":"pingxiang","py":"px","code":"360300"},"屏东县":{"cityName":"屏东县","pinYin":"pingdongxian","py":"pdx","code":"712400"},"濮阳":{"cityName":"濮阳","pinYin":"puyang","py":"tq","code":"410900"},"攀枝花":{"cityName":"攀枝花","pinYin":"panzhihua","py":"pzh","code":"510400"},"盘锦":{"cityName":"盘锦","pinYin":"panjin","py":"pj","code":"211100"},"普洱":{"cityName":"普洱","pinYin":"puer","py":"pe","code":"530800"},"平凉":{"cityName":"平凉","pinYin":"pingliang","py":"pl","code":"620800"},"澎湖县":{"cityName":"澎湖县","pinYin":"penghuxian","py":"phx","code":"712700"},"磐安县":{"cityName":"磐安县","pinYin":"pananxian","py":"pax","code":"330727"},"蓬莱":{"cityName":"蓬莱","pinYin":"penglai","py":"pl","code":"370684"},"彭州":{"cityName":"彭州","pinYin":"pengzhou","py":"pz","code":"510182"},"平湖":{"cityName":"平湖","pinYin":"pinghu","py":"ph","code":"330482"},"平乐":{"cityName":"平乐","pinYin":"pinglexian","py":"plx","code":"450330"},"平遥县":{"cityName":"平遥县","pinYin":"pingyaoxian","py":"pyx","code":"140728"},"浦江县":{"cityName":"浦江县","pinYin":"pujiangxian","py":"pjx","code":"330726"},"普宁":{"cityName":"普宁","pinYin":"puning","py":"pn","code":"445281"},"普陀山":{"cityName":"普陀山","pinYin":"putuoshan","py":"pts","code":"100008"},"青岛":{"cityName":"青岛","pinYin":"qingdao","py":"qd","code":"370200"},"秦皇岛":{"cityName":"秦皇岛","pinYin":"qinhuangdao","py":"qhd","code":"130300"},"泉州":{"cityName":"泉州","pinYin":"quanzhou","py":"qz","code":"350500"},"清远":{"cityName":"清远","pinYin":"qingyuan","py":"qy","code":"441800"},"黔东南苗族侗族自治州":{"cityName":"黔东南苗族侗族自治州","pinYin":"qiandongnanmiaozudongzuzizhizhou","py":"qdnmzdzzzz","code":"522600"},"齐齐哈尔":{"cityName":"齐齐哈尔","pinYin":"qiqihaer","py":"qqhe","code":"230200"},"衢州":{"cityName":"衢州","pinYin":"quzhou","py":"qz","code":"330800"},"琼海":{"cityName":"琼海","pinYin":"qionghai","py":"qh","code":"469002"},"曲靖":{"cityName":"曲靖","pinYin":"qujing","py":"qj","code":"530300"},"钦州":{"cityName":"钦州","pinYin":"qinzhou","py":"qz","code":"450700"},"黔南布依族苗族自治州":{"cityName":"黔南布依族苗族自治州","pinYin":"qiannanbuyizumiaozuzizhizhou","py":"qnbyzmzzzz","code":"522700"},"黔西南布依族苗族自治州":{"cityName":"黔西南布依族苗族自治州","pinYin":"qianxinanbuyizumiaozuzizhizhou","py":"qxnbyzmzzzz","code":"522300"},"庆阳":{"cityName":"庆阳","pinYin":"qingyang","py":"qy","code":"621000"},"潜江":{"cityName":"潜江","pinYin":"qianjiang","py":"qj","code":"429005"},"七台河":{"cityName":"七台河","pinYin":"qitaihe","py":"qth","code":"230900"},"琼中黎族苗族自治县":{"cityName":"琼中黎族苗族自治县","pinYin":"qiongzhonglizumiaozuzizhixian","py":"qzlzmzzzx","code":"469036"},"千岛湖":{"cityName":"千岛湖","pinYin":"qiandaohu","py":"qdh","code":"100017"},"乾县":{"cityName":"乾县","pinYin":"qianxian","py":"qx","code":"610424"},"祁门县":{"cityName":"祁门县","pinYin":"qimenxian","py":"qmx","code":"341024"},"青城山":{"cityName":"青城山","pinYin":"qingchengshan","py":"qcs","code":"100023"},"青铜峡":{"cityName":"青铜峡","pinYin":"qingtongxia","py":"qtx","code":"640381"},"清新县":{"cityName":"清新县","pinYin":"qingxinxian","py":"qxx","code":"441827"},"邛崃":{"cityName":"邛崃","pinYin":"qionglai","py":"ql","code":"510183"},"岐山县":{"cityName":"岐山县","pinYin":"qishanxian","py":"qsx","code":"610323"},"栖霞":{"cityName":"栖霞","pinYin":"qixia","py":"qx","code":"370686"},"祁县":{"cityName":"祁县","pinYin":"qixian","py":"qx","code":"140727"},"曲阜":{"cityName":"曲阜","pinYin":"qufu","py":"qf","code":"370881"},"日照":{"cityName":"日照","pinYin":"rizhao","py":"rz","code":"371100"},"日喀则":{"cityName":"日喀则","pinYin":"rikaze","py":"rikaze","code":"542300"},"仁化县":{"cityName":"仁化县","pinYin":"renhuaxian","py":"rhx","code":"440224"},"日月潭":{"cityName":"日月潭","pinYin":"riyuetan","py":"ryt","code":"100030"},"瑞安":{"cityName":"瑞安","pinYin":"ruian","py":"ra","code":"330381"},"瑞昌":{"cityName":"瑞昌","pinYin":"ruichang","py":"rc","code":"360481"},"芮城县":{"cityName":"芮城县","pinYin":"ruichengxian","py":"rcx","code":"140830"},"瑞丽":{"cityName":"瑞丽","pinYin":"ruili","py":"rl","code":"533102"},"沈阳":{"cityName":"沈阳","pinYin":"shenyang","py":"sy","code":"210100"},"石家庄":{"cityName":"石家庄","pinYin":"shijiazhuang","py":"sjz","code":"130100"},"绍兴":{"cityName":"绍兴","pinYin":"shaoxing","py":"sx","code":"330600"},"汕头":{"cityName":"汕头","pinYin":"shantou","py":"st","code":"440500"},"上饶":{"cityName":"上饶","pinYin":"shangrao","py":"sr","code":"361100"},"韶关":{"cityName":"韶关","pinYin":"shaoguan","py":"sg","code":"440200"},"十堰":{"cityName":"十堰","pinYin":"shiyan","py":"sy","code":"420300"},"商丘":{"cityName":"商丘","pinYin":"shangqiu","py":"sq","code":"411400"},"汕尾":{"cityName":"汕尾","pinYin":"shanwei","py":"sw","code":"441500"},"三明":{"cityName":"三明","pinYin":"sanming","py":"sm","code":"350400"},"宿迁":{"cityName":"宿迁","pinYin":"suqian","py":"sq","code":"321300"},"遂宁":{"cityName":"遂宁","pinYin":"suining","py":"sn","code":"510900"},"宿州":{"cityName":"宿州","pinYin":"suzhou","py":"sz","code":"341300"},"邵阳":{"cityName":"邵阳","pinYin":"shaoyang","py":"sy","code":"430500"},"三门峡":{"cityName":"三门峡","pinYin":"sanmenxia","py":"smx","code":"411200"},"随州":{"cityName":"随州","pinYin":"suizhou","py":"sz","code":"421300"},"四平":{"cityName":"四平","pinYin":"siping","py":"sp","code":"220300"},"商洛":{"cityName":"商洛","pinYin":"shangluo","py":"sn","code":"611000"},"绥化":{"cityName":"绥化","pinYin":"suihua","py":"hl","code":"231200"},"朔州":{"cityName":"朔州","pinYin":"shuozhou","py":"sz","code":"140600"},"松原":{"cityName":"松原","pinYin":"songyuan","py":"sy","code":"220700"},"神农架林区":{"cityName":"神农架林区","pinYin":"shennongjialinqu","py":"snjlq","code":"429021"},"石河子":{"cityName":"石河子","pinYin":"shihezi","py":"shz","code":"659001"},"石嘴山":{"cityName":"石嘴山","pinYin":"shizuishan","py":"szs","code":"640200"},"双鸭山":{"cityName":"双鸭山","pinYin":"shuangyashan","py":"sys","code":"230500"},"山南":{"cityName":"山南","pinYin":"shannandiqu","py":"sndq","code":"542200"},"三河":{"cityName":"三河","pinYin":"sanhe","py":"sh","code":"131082"},"三门县":{"cityName":"三门县","pinYin":"sanmenxian","py":"smx","code":"331022"},"三清山":{"cityName":"三清山","pinYin":"sanqingshan","py":"sqs","code":"100022"},"三亚湾":{"cityName":"三亚湾","pinYin":"sanyawan","py":"syw","code":"100019"},"上虞":{"cityName":"上虞","pinYin":"shangyu","py":"sy","code":"330682"},"山海关":{"cityName":"山海关","pinYin":"shanhaiguan","py":"shg","code":"130303"},"山阴县":{"cityName":"山阴县","pinYin":"shanyinxian","py":"syx","code":"140621"},"韶山":{"cityName":"韶山","pinYin":"shaoshan","py":"ss","code":"430382"},"绍兴县":{"cityName":"绍兴县","pinYin":"shaoxingxian","py":"sxx","code":"330621"},"沙县":{"cityName":"沙县","pinYin":"shaxian","py":"sx","code":"350427"},"嵊泗":{"cityName":"嵊泗","pinYin":"shengsixian","py":"ssx","code":"330922"},"嵊州":{"cityName":"嵊州","pinYin":"shengzhou","py":"sz","code":"330683"},"神木县":{"cityName":"神木县","pinYin":"shenmuxian","py":"smx","code":"610821"},"歙县":{"cityName":"歙县","pinYin":"shexian","py":"sx","code":"341021"},"石狮":{"cityName":"石狮","pinYin":"shishi","py":"ss","code":"350581"},"双廊":{"cityName":"双廊","pinYin":"shuanglang","py":"sl","code":"100041"},"束河古镇":{"cityName":"束河古镇","pinYin":"shuheguzhen","py":"shgz","code":"100016"},"四会":{"cityName":"四会","pinYin":"sihui","py":"sh","code":"441284"},"思茅":{"cityName":"思茅","pinYin":"simao","py":"sm","code":"530802"},"遂昌":{"cityName":"遂昌","pinYin":"suichang","py":"sc","code":"331123"},"绥中县":{"cityName":"绥中县","pinYin":"suizhongxian","py":"szx","code":"211421"},"太原":{"cityName":"太原","pinYin":"taiyuan","py":"ty","code":"140100"},"台北":{"cityName":"台北","pinYin":"taibeishi","py":"tbs","code":"710100"},"泰安":{"cityName":"泰安","pinYin":"taian","py":"ta","code":"370900"},"台州":{"cityName":"台州","pinYin":"taizhou","py":"tz","code":"331000"},"唐山":{"cityName":"唐山","pinYin":"tangshan","py":"ts","code":"130200"},"泰州":{"cityName":"泰州","pinYin":"taizhou","py":"tz","code":"321200"},"天水":{"cityName":"天水","pinYin":"tianshui","py":"ts","code":"620500"},"通辽":{"cityName":"通辽","pinYin":"tongliao","py":"tl","code":"150500"},"铜仁":{"cityName":"铜仁","pinYin":"tongren","py":"tr","code":"522200"},"铜陵":{"cityName":"铜陵","pinYin":"tongling","py":"tl","code":"340700"},"通化":{"cityName":"通化","pinYin":"tonghua","py":"th","code":"220500"},"铁岭":{"cityName":"铁岭","pinYin":"tieling","py":"tl","code":"211200"},"台中":{"cityName":"台中","pinYin":"taizhongshi","py":"tzs","code":"710400"},"吐鲁番":{"cityName":"吐鲁番","pinYin":"tulufan","py":"tlf","code":"652100"},"铜川":{"cityName":"铜川","pinYin":"tongchuan","py":"tc","code":"610200"},"天门":{"cityName":"天门","pinYin":"tianmen","py":"tm","code":"429006"},"台南":{"cityName":"台南","pinYin":"tainanshi","py":"tns","code":"710300"},"塔城":{"cityName":"塔城","pinYin":"tacheng","py":"tc","code":"654200"},"桃园县":{"cityName":"桃园县","pinYin":"taoyuanxian","py":"tyx","code":"711400"},"台东县":{"cityName":"台东县","pinYin":"taidongxian","py":"tdx","code":"712500"},"台南县":{"cityName":"台南县","pinYin":"tainanxian","py":"tnx","code":"712200"},"屯昌县":{"cityName":"屯昌县","pinYin":"tunchang","py":"tc","code":"469026"},"图木舒克":{"cityName":"图木舒克","pinYin":"tumushuke","py":"tmsk","code":"659003"},"太仓":{"cityName":"太仓","pinYin":"taicang","py":"tc","code":"320585"},"太湖县":{"cityName":"太湖县","pinYin":"taihuxian","py":"th","code":"340825"},"泰山":{"cityName":"泰山","pinYin":"taishan","py":"ts","code":"370902"},"台山":{"cityName":"台山","pinYin":"taishan","py":"ts","code":"440781"},"台湾":{"cityName":"台湾","pinYin":"taiwan","py":"tw","code":"100035"},"腾冲":{"cityName":"腾冲","pinYin":"tengchong","py":"tc","code":"530522"},"滕州":{"cityName":"滕州","pinYin":"tengzhou","py":"tz","code":"370481"},"天台县":{"cityName":"天台县","pinYin":"tiantaixian","py":"ttx","code":"331023"},"同里":{"cityName":"同里","pinYin":"tongli","py":"tl","code":"100003"},"桐庐县":{"cityName":"桐庐县","pinYin":"tongluxian","py":"tlx","code":"330122"},"桐乡":{"cityName":"桐乡","pinYin":"tongxiang","py":"tx","code":"330483"},"屯溪":{"cityName":"屯溪","pinYin":"tunxi","py":"tx","code":"341002"},"无锡":{"cityName":"无锡","pinYin":"wuxi","py":"wx","code":"320200"},"温州":{"cityName":"温州","pinYin":"wenzhou","py":"wz","code":"330300"},"乌鲁木齐":{"cityName":"乌鲁木齐","pinYin":"wulumuqi","py":"wlmq","code":"650100"},"威海":{"cityName":"威海","pinYin":"weihai","py":"wh","code":"371000"},"潍坊":{"cityName":"潍坊","pinYin":"weifang","py":"wf","code":"370700"},"芜湖":{"cityName":"芜湖","pinYin":"wuhu","py":"wh","code":"340200"},"渭南":{"cityName":"渭南","pinYin":"weinan","py":"wn","code":"610500"},"梧州":{"cityName":"梧州","pinYin":"wuzhou","py":"wz","code":"450400"},"万宁":{"cityName":"万宁","pinYin":"wangning","py":"wn","code":"469006"},"文昌":{"cityName":"文昌","pinYin":"wenchang","py":"wc","code":"469005"},"武威":{"cityName":"武威","pinYin":"wuwei","py":"ww","code":"620600"},"文山":{"cityName":"文山","pinYin":"wenshan","py":"ws","code":"532600"},"乌兰察布":{"cityName":"乌兰察布","pinYin":"wulanchabu","py":"wlcb","code":"150900"},"乌海":{"cityName":"乌海","pinYin":"wuhai","py":"wh","code":"150300"},"五指山":{"cityName":"五指山","pinYin":"wuzhishan","py":"wzs","code":"469001"},"吴忠":{"cityName":"吴忠","pinYin":"wuzhong","py":"wz","code":"640300"},"五家渠":{"cityName":"五家渠","pinYin":"wujiaqu","py":"wjq","code":"659004"},"万州":{"cityName":"万州","pinYin":"wanzhou","py":"wz","code":"500101"},"涠洲岛":{"cityName":"涠洲岛","pinYin":"weizhoudao","py":"wzd","code":"100039"},"温岭":{"cityName":"温岭","pinYin":"wenling","py":"wl","code":"331081"},"五大连池":{"cityName":"五大连池","pinYin":"wudalianchi","py":"wdlc","code":"231182"},"武当山":{"cityName":"武当山","pinYin":"wudangshan","py":"wds","code":"100040"},"吴江":{"cityName":"吴江","pinYin":"wujiang","py":"wj","code":"320584"},"乌兰浩特":{"cityName":"乌兰浩特","pinYin":"wulanhaote","py":"wlht","code":"152201"},"巫山县":{"cityName":"巫山县","pinYin":"wushanxian","py":"wsx","code":"500237"},"五台山":{"cityName":"五台山","pinYin":"wutaishan","py":"wts","code":"100000"},"武夷山":{"cityName":"武夷山","pinYin":"wuyishan","py":"wys","code":"350782"},"武义县":{"cityName":"武义县","pinYin":"wuyixian","py":"wyx","code":"330723"},"婺源县":{"cityName":"婺源县","pinYin":"wuyuanxian","py":"wyx","code":"361130"},"乌镇":{"cityName":"乌镇","pinYin":"wuzhen","py":"wz","code":"100006"},"西宁":{"cityName":"西宁","pinYin":"xining","py":"xn","code":"630100"},"徐州":{"cityName":"徐州","pinYin":"xuzhou","py":"xz","code":"320300"},"湘西土家族苗族自治州":{"cityName":"湘西土家族苗族自治州","pinYin":"xiangxitujiazumiaozuzizhizhou","py":"xxtjzmzzzz","code":"433100"},"西双版纳":{"cityName":"西双版纳","pinYin":"xishuangbanna","py":"xsbn","code":"532800"},"咸阳":{"cityName":"咸阳","pinYin":"xianyang","py":"xy","code":"610400"},"新乡":{"cityName":"新乡","pinYin":"xinxiang","py":"xx","code":"410700"},"信阳":{"cityName":"信阳","pinYin":"xinyang","py":"xy","code":"411500"},"襄樊":{"cityName":"襄樊","pinYin":"xiangfan","py":"xf","code":"420600"},"许昌":{"cityName":"许昌","pinYin":"xuchang","py":"xc","code":"411000"},"湘潭":{"cityName":"湘潭","pinYin":"xiangtan","py":"xt","code":"430300"},"邢台":{"cityName":"邢台","pinYin":"xingtai","py":"xt","code":"130500"},"孝感":{"cityName":"孝感","pinYin":"xiaogan","py":"xg","code":"420900"},"咸宁":{"cityName":"咸宁","pinYin":"xianning","py":"xn","code":"421200"},"忻州":{"cityName":"忻州","pinYin":"xinzhou","py":"xz","code":"140900"},"宣城":{"cityName":"宣城","pinYin":"xuancheng","py":"xc","code":"341800"},"新余":{"cityName":"新余","pinYin":"xinyu","py":"xy","code":"360500"},"仙桃":{"cityName":"仙桃","pinYin":"xiantao","py":"xt","code":"429004"},"锡林郭勒盟":{"cityName":"锡林郭勒盟","pinYin":"xilinguole","py":"xlgl","code":"152500"},"兴安盟":{"cityName":"兴安盟","pinYin":"xinganmeng","py":"xam","code":"152200"},"新北":{"cityName":"新北","pinYin":"xinbeishi","py":"xbx","code":"711100"},"新竹县":{"cityName":"新竹县","pinYin":"xinzhuxian","py":"xzx","code":"711300"},"新竹":{"cityName":"新竹","pinYin":"xinzhushi","py":"xzs","code":"710800"},"西沙群岛":{"cityName":"西沙群岛","pinYin":"xishaqundaoxian","py":"xsqdx","code":"469037"},"香格里拉":{"cityName":"香格里拉","pinYin":"xianggelila","py":"xgll","code":"533421"},"象山县":{"cityName":"象山县","pinYin":"xiangshanxian","py":"xsx","code":"330225"},"湘乡":{"cityName":"湘乡","pinYin":"xiangxiang","py":"xx","code":"430381"},"仙居县":{"cityName":"仙居县","pinYin":"xianjuxian","py":"xjx","code":"331024"},"西昌":{"cityName":"西昌","pinYin":"xichang","py":"xc","code":"513401"},"锡林浩特":{"cityName":"锡林浩特","pinYin":"xilinhaote","py":"xlht","code":"152502"},"新昌县":{"cityName":"新昌县","pinYin":"xinchangxian","py":"xcx","code":"330624"},"兴城":{"cityName":"兴城","pinYin":"xingcheng","py":"xc","code":"211481"},"兴隆县":{"cityName":"兴隆县","pinYin":"xinglongxian","py":"xlx","code":"130822"},"兴宁":{"cityName":"兴宁","pinYin":"xingning","py":"xn","code":"441481"},"荥阳":{"cityName":"荥阳","pinYin":"xingyang","py":"xy","code":"410182"},"兴义":{"cityName":"兴义","pinYin":"xingyi","py":"xy","code":"522301"},"新密":{"cityName":"新密","pinYin":"xinmi","py":"xm","code":"410183"},"新民":{"cityName":"新民","pinYin":"xinmin","py":"xm","code":"210181"},"新郑":{"cityName":"新郑","pinYin":"xinzheng","py":"xz","code":"410184"},"西塘":{"cityName":"西塘","pinYin":"xitang","py":"xt","code":"100005"},"休宁县":{"cityName":"休宁县","pinYin":"xiuningxian","py":"xnx","code":"341022"},"巽寮湾":{"cityName":"巽寮湾","pinYin":"xunliaowan","py":"xlw","code":"100031"},"盱眙县":{"cityName":"盱眙县","pinYin":"xuyixian","py":"xyx","code":"320830"},"阳江":{"cityName":"阳江","pinYin":"yangjiang","py":"yj","code":"441700"},"烟台":{"cityName":"烟台","pinYin":"yantai","py":"yt","code":"370600"},"扬州":{"cityName":"扬州","pinYin":"yangzhou","py":"yz","code":"321000"},"宜昌":{"cityName":"宜昌","pinYin":"yichang","py":"yc","code":"420500"},"银川":{"cityName":"银川","pinYin":"yinchuan","py":"yc","code":"640100"},"盐城":{"cityName":"盐城","pinYin":"yancheng","py":"yc","code":"320900"},"玉溪":{"cityName":"玉溪","pinYin":"yuxi","py":"yx","code":"530400"},"岳阳":{"cityName":"岳阳","pinYin":"yueyang","py":"yy","code":"430600"},"宜春":{"cityName":"宜春","pinYin":"yichun","py":"yc","code":"360900"},"宜宾":{"cityName":"宜宾","pinYin":"yibin","py":"yb","code":"511500"},"榆林":{"cityName":"榆林","pinYin":"yulin","py":"yl","code":"610800"},"营口":{"cityName":"营口","pinYin":"yingkou","py":"yk","code":"210800"},"运城":{"cityName":"运城","pinYin":"yuncheng","py":"yc","code":"140800"},"延安":{"cityName":"延安","pinYin":"yanan","py":"ya","code":"610600"},"玉林":{"cityName":"玉林","pinYin":"yulin","py":"yl","code":"450900"},"雅安":{"cityName":"雅安","pinYin":"yaan","py":"hy","code":"511800"},"延吉":{"cityName":"延吉","pinYin":"yanji","py":"yj","code":"222400"},"永州":{"cityName":"永州","pinYin":"yongzhou","py":"yz","code":"431100"},"鹰潭":{"cityName":"鹰潭","pinYin":"yingtan","py":"yt","code":"360600"},"益阳":{"cityName":"益阳","pinYin":"yiyang","py":"yy","code":"430900"},"伊犁哈萨克自治州":{"cityName":"伊犁哈萨克自治州","pinYin":"yilihasakezizhizhou","py":"ylhskzzz","code":"654000"},"云浮":{"cityName":"云浮","pinYin":"yunfu","py":"yf","code":"445300"},"阳泉":{"cityName":"阳泉","pinYin":"yangquan","py":"yq","code":"140300"},"伊春":{"cityName":"伊春","pinYin":"yichun","py":"yc","code":"230700"},"宜兰县":{"cityName":"宜兰县","pinYin":"yilanxian","py":"ylx","code":"711200"},"玉树":{"cityName":"玉树","pinYin":"yushu","py":"kc","code":"632700"},"云林县":{"cityName":"云林县","pinYin":"yunlinxian","py":"ylx","code":"712100"},"亚布力":{"cityName":"亚布力","pinYin":"yabuli","py":"ybl","code":"100025"},"牙克石":{"cityName":"牙克石","pinYin":"yakeshi","py":"yks","code":"150782"},"亚龙湾":{"cityName":"亚龙湾","pinYin":"yalongwan","py":"ylw","code":"100020"},"雁荡山":{"cityName":"雁荡山","pinYin":"yandangshan","py":"yds","code":"100004"},"阳朔":{"cityName":"阳朔","pinYin":"yangshuoxian","py":"ysx","code":"450321"},"扬中":{"cityName":"扬中","pinYin":"yangzhong","py":"yz","code":"321182"},"偃师":{"cityName":"偃师","pinYin":"yanshi","py":"ys","code":"410381"},"兖州":{"cityName":"兖州","pinYin":"yanzhou","py":"yz","code":"370882"},"宜都":{"cityName":"宜都","pinYin":"yidu","py":"yd","code":"420581"},"义马":{"cityName":"义马","pinYin":"yima","py":"ym","code":"411281"},"英德":{"cityName":"英德","pinYin":"yingde","py":"yd","code":"441881"},"应县":{"cityName":"应县","pinYin":"yingxian","py":"yx","code":"140622"},"伊宁":{"cityName":"伊宁","pinYin":"yining","py":"yn","code":"654002"},"义乌":{"cityName":"义乌","pinYin":"yiwu","py":"yw","code":"330782"},"黟县":{"cityName":"黟县","pinYin":"yixian","py":"yx","code":"341023"},"宜兴":{"cityName":"宜兴","pinYin":"yixing","py":"yx","code":"320282"},"永安":{"cityName":"永安","pinYin":"yongan","py":"ya","code":"350481"},"永城":{"cityName":"永城","pinYin":"yongcheng","py":"yc","code":"411481"},"永济":{"cityName":"永济","pinYin":"yongji","py":"yj","code":"140881"},"永康":{"cityName":"永康","pinYin":"yongkang","py":"yk","code":"330784"},"右玉县":{"cityName":"右玉县","pinYin":"youyuxian","py":"yyx","code":"140623"},"禹城":{"cityName":"禹城","pinYin":"yucheng","py":"yc","code":"371482"},"玉环县":{"cityName":"玉环县","pinYin":"yuhuanxian","py":"yhx","code":"331021"},"玉门":{"cityName":"玉门","pinYin":"yumen","py":"ym","code":"620981"},"余姚":{"cityName":"余姚","pinYin":"yuyao","py":"yy","code":"330281"},"禹州":{"cityName":"禹州","pinYin":"yuzhou","py":"yz","code":"411081"},"珠海":{"cityName":"珠海","pinYin":"zhuhai","py":"zh","code":"440400"},"舟山":{"cityName":"舟山","pinYin":"zhoushan","py":"zs","code":"330900"},"张家界":{"cityName":"张家界","pinYin":"zhangjiajie","py":"zjj","code":"430800"},"中山":{"cityName":"中山","pinYin":"zhongshan","py":"ds","code":"442000"},"漳州":{"cityName":"漳州","pinYin":"zhangzhou","py":"zz","code":"350600"},"湛江":{"cityName":"湛江","pinYin":"zhanjiang","py":"zj","code":"440800"},"镇江":{"cityName":"镇江","pinYin":"zhenjiang","py":"zj","code":"321100"},"淄博":{"cityName":"淄博","pinYin":"zibo","py":"zb","code":"370300"},"肇庆":{"cityName":"肇庆","pinYin":"zhaoqing","py":"zq","code":"441200"},"株洲":{"cityName":"株洲","pinYin":"zhuzhou","py":"zz","code":"430200"},"遵义":{"cityName":"遵义","pinYin":"zunyi","py":"zy","code":"520300"},"张家口":{"cityName":"张家口","pinYin":"zhangjiakou","py":"zjk","code":"130700"},"枣庄":{"cityName":"枣庄","pinYin":"zaozhuang","py":"zz","code":"370400"},"驻马店":{"cityName":"驻马店","pinYin":"zhumadian","py":"zmd","code":"411700"},"周口":{"cityName":"周口","pinYin":"zhoukou","py":"zk","code":"411600"},"张掖":{"cityName":"张掖","pinYin":"zhangye","py":"zy","code":"620700"},"自贡":{"cityName":"自贡","pinYin":"zigong","py":"zg","code":"510300"},"中卫":{"cityName":"中卫","pinYin":"zhongwei","py":"zw","code":"640500"},"昭通":{"cityName":"昭通","pinYin":"zhaotong","py":"zt","code":"530600"},"资阳":{"cityName":"资阳","pinYin":"ziyang","py":"zy","code":"512000"},"彰化县":{"cityName":"彰化县","pinYin":"zhanghuaxian","py":"zhx","code":"711700"},"中沙群岛的岛礁及其海域":{"cityName":"中沙群岛的岛礁及其海域","pinYin":"zhongshaqundaodidaojiaojiqihaiyu","py":"zsqdddjjqhy","code":"469039"},"扎兰屯":{"cityName":"扎兰屯","pinYin":"zalantun","py":"zlt","code":"150783"},"增城":{"cityName":"增城","pinYin":"zengcheng","py":"zc","code":"440183"},"曾厝垵":{"cityName":"曾厝垵","pinYin":"zengcuoan","py":"zca","code":"100042"},"张家港":{"cityName":"张家港","pinYin":"zhangjiagang","py":"zjg","code":"320582"},"漳平":{"cityName":"漳平","pinYin":"zhangping","py":"zp","code":"350881"},"赵县":{"cityName":"赵县","pinYin":"zhaoxian","py":"zx","code":"130133"},"招远":{"cityName":"招远","pinYin":"zhaoyuan","py":"zy","code":"370685"},"镇宁布依族苗族自治县":{"cityName":"镇宁布依族苗族自治县","pinYin":"zhenningbuyizumiaozuzizhixian","py":"znbyzmzzzx","code":"520423"},"枝江":{"cityName":"枝江","pinYin":"zhijiang","py":"zj","code":"420583"},"芷江":{"cityName":"芷江","pinYin":"zhijiangdongzuzizhixian","py":"zjdzzzx","code":"431228"},"周庄":{"cityName":"周庄","pinYin":"zhouzhuang","py":"zz","code":"100002"},"诸暨":{"cityName":"诸暨","pinYin":"zhuji","py":"zj","code":"330681"},"朱家尖":{"cityName":"朱家尖","pinYin":"zhujiajian","py":"zjj","code":"100043"},"涿州":{"cityName":"涿州","pinYin":"zhuozhou","py":"zz","code":"130681"},"邹城":{"cityName":"邹城","pinYin":"zoucheng","py":"zc","code":"370883"},"遵化":{"cityName":"遵化","pinYin":"zunhua","py":"zh","code":"130281"},"曼谷":{"cityName":"曼谷","pinYin":"mangu","py":"mg","code":"904976"},"普吉岛":{"cityName":"普吉岛","pinYin":"pujidao","py":"pjd","code":"904986"},"新加坡":{"cityName":"新加坡","pinYin":"xinjiapo","py":"xjp","code":"904544"},"首尔":{"cityName":"首尔","pinYin":"shouer","py":"se","code":"903551"},"清迈":{"cityName":"清迈","pinYin":"qingmai","py":"qm","code":"904973"},"亚庇":{"cityName":"亚庇","pinYin":"yabi","py":"yb","code":"912188"},"芭堤雅":{"cityName":"芭堤雅","pinYin":"badiya","py":"bdy","code":"904974"},"吉隆坡":{"cityName":"吉隆坡","pinYin":"jilongpo","py":"jlp","code":"903673"},"济州岛":{"cityName":"济州岛","pinYin":"jizhoudao","py":"jzd","code":"903552"},"东京":{"cityName":"东京","pinYin":"dongjing","py":"dj","code":"903457"},"苏梅岛":{"cityName":"苏梅岛","pinYin":"sumeidao","py":"smd","code":"904998"},"甲米":{"cityName":"甲米","pinYin":"jiami","py":"jm","code":"904981"},"巴厘岛":{"cityName":"巴厘岛","pinYin":"balidao","py":"bld","code":"902887"},"沙巴":{"cityName":"沙巴","pinYin":"shaba","py":"sb","code":"903668"},"大阪":{"cityName":"大阪","pinYin":"daban","py":"db","code":"903466"},"胡志明市":{"cityName":"胡志明市","pinYin":"huzhimingshi","py":"hzms","code":"907592"},"纽约(纽约州)":{"cityName":"纽约(纽约州)","pinYin":"niuyue","py":"ny","code":"905457"},"悉尼":{"cityName":"悉尼","pinYin":"xini","py":"xn","code":"901157"},"冲绳":{"cityName":"冲绳","pinYin":"chongsheng","py":"cs","code":"903475"},"京都":{"cityName":"京都","pinYin":"jingdou","py":"jd","code":"903451"},"迪拜":{"cityName":"迪拜","pinYin":"dibai","py":"db","code":"905152"},"巴黎":{"cityName":"巴黎","pinYin":"bali","py":"bl","code":"902013"},"伦敦":{"cityName":"伦敦","pinYin":"lundun","py":"ld","code":"905165"},"新德里":{"cityName":"新德里","pinYin":"xindeli","py":"xdl","code":"902707"},"罗马":{"cityName":"罗马","pinYin":"luoma","py":"lm","code":"903139"},"伊斯坦布尔":{"cityName":"伊斯坦布尔","pinYin":"yisitanbuer","py":"ystbe","code":"905096"},"巴塞罗那":{"cityName":"巴塞罗那","pinYin":"basailuona","py":"bsln","code":"904572"},"河内":{"cityName":"河内","pinYin":"henei","py":"hn","code":"907590"},"华欣/七岩":{"cityName":"华欣/七岩","pinYin":"huaxinqiyan","py":"hxqy","code":"904991"},"暹粒":{"cityName":"暹粒","pinYin":"xianli","py":"xl","code":"901596"},"万隆":{"cityName":"万隆","pinYin":"wanlong","py":"wl","code":"902891"},"柏林":{"cityName":"柏林","pinYin":"bolin","py":"bl","code":"902249"},"马德里":{"cityName":"马德里","pinYin":"madeli","py":"mdl","code":"904590"},"马尼拉":{"cityName":"马尼拉","pinYin":"manila","py":"mnl","code":"904140"},"班加罗尔/卡纳塔卡":{"cityName":"班加罗尔/卡纳塔卡","pinYin":"banjialuoerkanataka","py":"bjlekntk","code":"902674"},"墨尔本":{"cityName":"墨尔本","pinYin":"moerben","py":"meb","code":"901115"},"果阿":{"cityName":"果阿","pinYin":"guoa","py":"ga","code":"902698"},"开普敦":{"cityName":"开普敦","pinYin":"kaipudun","py":"kpd","code":"904398"},"雅加达":{"cityName":"雅加达","pinYin":"yajiada","py":"yjd","code":"902881"},"布达佩斯":{"cityName":"布达佩斯","pinYin":"budapeisi","py":"bdps","code":"902568"},"日惹":{"cityName":"日惹","pinYin":"rire","py":"rr","code":"902884"},"黄金海岸":{"cityName":"黄金海岸","pinYin":"huangjinhaian","py":"hjha","code":"901179"},"加德满都":{"cityName":"加德满都","pinYin":"jiademandou","py":"jdmd","code":"903926"},"孟买":{"cityName":"孟买","pinYin":"mengmai","py":"mm","code":"902716"},"金边":{"cityName":"金边","pinYin":"jinbian","py":"jb","code":"901595"},"长滩岛/卡提克兰":{"cityName":"长滩岛/卡提克兰","pinYin":"zhangtandaokatikelan","py":"ztdktkl","code":"904145"},"宿雾市":{"cityName":"宿雾市","pinYin":"suwushi","py":"sws","code":"904142"},"龙目岛":{"cityName":"龙目岛","pinYin":"longmudao","py":"lmd","code":"902886"},"槟城":{"cityName":"槟城","pinYin":"bincheng","py":"bc","code":"903678"},"马六甲":{"cityName":"马六甲","pinYin":"maliujia","py":"mlj","code":"903674"},"斋浦尔":{"cityName":"斋浦尔","pinYin":"zhaipuer","py":"zpe","code":"902687"},"康提":{"cityName":"康提","pinYin":"kangti","py":"kt","code":"904841"},"岘港":{"cityName":"岘港","pinYin":"xiangang","py":"xg","code":"907596"},"约翰内斯堡":{"cityName":"约翰内斯堡","pinYin":"yuehanneisibao","py":"yhnsb","code":"904405"},"帕岸岛":{"cityName":"帕岸岛","pinYin":"paandao","py":"pad","code":"905003"},"洛杉矶 (加利福尼亚州)":{"cityName":"洛杉矶 (加利福尼亚州)","pinYin":"luoshanji","py":"lsj","code":"906119"},"兰卡威":{"cityName":"兰卡威","pinYin":"lankawei","py":"lkw","code":"903679"},"利雅德":{"cityName":"利雅德","pinYin":"liyade","py":"lyd","code":"904520"},"芽庄":{"cityName":"芽庄","pinYin":"yazhuang","py":"yz","code":"907589"},"釜山":{"cityName":"釜山","pinYin":"fushan","py":"fs","code":"903553"},"布拉格":{"cityName":"布拉格","pinYin":"bulage","py":"blg","code":"901808"},"钦奈":{"cityName":"钦奈","pinYin":"qinnai","py":"qn","code":"902726"},"毛里求斯岛":{"cityName":"毛里求斯岛","pinYin":"maoliqiusidao","py":"mlqsd","code":"903786"},"圣彼得堡":{"cityName":"圣彼得堡","pinYin":"shengbidebao","py":"sbdb","code":"904372"},"米兰":{"cityName":"米兰","pinYin":"milan","py":"ml","code":"903138"},"科伦坡":{"cityName":"科伦坡","pinYin":"kelunpo","py":"klp","code":"904838"},"考艾/呵叻":{"cityName":"考艾/呵叻","pinYin":"kaoaihele","py":"kahl","code":"904990"},"布里斯班":{"cityName":"布里斯班","pinYin":"bulisiban","py":"blsb","code":"901104"},"琅勃拉邦":{"cityName":"琅勃拉邦","pinYin":"langbolabang","py":"lblb","code":"903620"},"马拉喀什":{"cityName":"马拉喀什","pinYin":"malakashen","py":"mlks","code":"903887"},"塞舌尔群岛":{"cityName":"塞舌尔群岛","pinYin":"saisheerqundao","py":"sseqd","code":"911155"},"浦那":{"cityName":"浦那","pinYin":"punei","py":"pn","code":"902720"},"奥克兰":{"cityName":"奥克兰","pinYin":"aokelan","py":"akl","code":"903984"},"阳光海岸":{"cityName":"阳光海岸","pinYin":"yangguanghaian","py":"ygha","code":"901230"},"高知":{"cityName":"高知","pinYin":"gaozhi","py":"gz","code":"902704"},"薄荷岛":{"cityName":"薄荷岛","pinYin":"bohedao","py":"bhd","code":"904147"},"大叻":{"cityName":"大叻","pinYin":"dale","py":"dl","code":"907593"},"莫斯科":{"cityName":"莫斯科","pinYin":"mosike","py":"msk","code":"904373"},"马尔代夫群岛":{"cityName":"马尔代夫群岛","pinYin":"maerdaifuqundao","py":"medfqd","code":"903767"},"藩切":{"cityName":"藩切","pinYin":"fanqie","py":"fq","code":"907595"},"斯里那加":{"cityName":"斯里那加","pinYin":"silineijia","py":"slnj","code":"902694"},"兰塔岛 (甲米)":{"cityName":"兰塔岛 (甲米)","pinYin":"lantadao","py":"ltd","code":"904994"},"长野":{"cityName":"长野","pinYin":"zhangye","py":"zy","code":"903449"},"会安":{"cityName":"会安","pinYin":"huian","py":"ha","code":"907597"},"凯恩斯":{"cityName":"凯恩斯","pinYin":"kaiensi","py":"kes","code":"901150"},"海德拉巴":{"cityName":"海德拉巴","pinYin":"haidelaba","py":"hdlb","code":"902686"},"慕尼黑":{"cityName":"慕尼黑","pinYin":"munihei","py":"mnh","code":"902347"},"公主港":{"cityName":"公主港","pinYin":"gongzhugang","py":"gzg","code":"908086"},"下龙":{"cityName":"下龙","pinYin":"xialong","py":"xl","code":"907601"},"奥兰多 (佛罗里达州)":{"cityName":"奥兰多 (佛罗里达州)","pinYin":"aolanduo","py":"ald","code":"906007"},"象岛":{"cityName":"象岛","pinYin":"xiangdao","py":"xd","code":"904993"},"顺化":{"cityName":"顺化","pinYin":"shunhua","py":"sh","code":"907591"},"圣托里尼/提拉":{"cityName":"圣托里尼/提拉","pinYin":"shengtuolinitila","py":"stlntl","code":"902481"},"爱丁堡":{"cityName":"爱丁堡","pinYin":"aidingbao","py":"adb","code":"905334"},"仰光":{"cityName":"仰光","pinYin":"yangguang","py":"yg","code":"903905"},"努瓦拉埃利亚":{"cityName":"努瓦拉埃利亚","pinYin":"nuwalaailiya","py":"nwlaly","code":"904839"},"阿格拉":{"cityName":"阿格拉","pinYin":"agela","py":"agl","code":"902692"},"万象":{"cityName":"万象","pinYin":"wanxiang","py":"wx","code":"903619"},"佛罗伦萨":{"cityName":"佛罗伦萨","pinYin":"foluolunsa","py":"flls","code":"903136"},"头顿":{"cityName":"头顿","pinYin":"toudun","py":"td","code":"907603"},"拜县":{"cityName":"拜县","pinYin":"baixian","py":"bx","code":"905029"},"乌代浦":{"cityName":"乌代浦","pinYin":"wudaipu","py":"wdp","code":"902673"},"加尔各答":{"cityName":"加尔各答","pinYin":"jiaergeda","py":"jegd","code":"902679"},"柔佛巴鲁":{"cityName":"柔佛巴鲁","pinYin":"roufobalu","py":"rfbl","code":"903665"},"基督城":{"cityName":"基督城","pinYin":"jiducheng","py":"jdc","code":"912147"},"西哈努克":{"cityName":"西哈努克","pinYin":"xihanuke","py":"xhnk","code":"901597"},"威尼斯":{"cityName":"威尼斯","pinYin":"weinisi","py":"wns","code":"903141"},"福冈":{"cityName":"福冈","pinYin":"fugang","py":"fg","code":"903476"},"安曼":{"cityName":"安曼","pinYin":"anman","py":"am","code":"903537"},"珀斯":{"cityName":"珀斯","pinYin":"posi","py":"ps","code":"901139"},"拉斯维加斯 (内华达州)":{"cityName":"拉斯维加斯 (内华达州)","pinYin":"lasiweijiasi","py":"lswjs","code":"906302"},"德班":{"cityName":"德班","pinYin":"deban","py":"db","code":"904408"},"清莱":{"cityName":"清莱","pinYin":"qinglai","py":"ql","code":"904969"},"博卡拉":{"cityName":"博卡拉","pinYin":"bokala","py":"bkl","code":"911893"},"旧金山 (加利福尼亚州)":{"cityName":"旧金山 (加利福尼亚州)","pinYin":"jiujinshan","py":"jjs","code":"906181"},"阿德莱德":{"cityName":"阿德莱德","pinYin":"adelaide","py":"adld","code":"901140"},"孔敬":{"cityName":"孔敬","pinYin":"kongjing","py":"kj","code":"904972"},"泗水":{"cityName":"泗水","pinYin":"sishui","py":"ss","code":"902882"},"特拉维夫":{"cityName":"特拉维夫","pinYin":"telaweifu","py":"tlwf","code":"903008"},"皇后镇":{"cityName":"皇后镇","pinYin":"huanghouzhen","py":"hhz","code":"903981"},"南果阿县":{"cityName":"南果阿县","pinYin":"nanguoaxian","py":"ngax","code":"911222"},"阿姆斯特丹":{"cityName":"阿姆斯特丹","pinYin":"amusitedan","py":"amstd","code":"903960"},"乌纳瓦图纳":{"cityName":"乌纳瓦图纳","pinYin":"wunawatuna","py":"wnwtn","code":"908414"},"拜伦湾":{"cityName":"拜伦湾","pinYin":"bailunwan","py":"blw","code":"901090"},"古晋":{"cityName":"古晋","pinYin":"gujin","py":"gj","code":"903672"},"芹苴":{"cityName":"芹苴","pinYin":"qinju","py":"qj","code":"907594"},"仁川":{"cityName":"仁川","pinYin":"renchuan","py":"rc","code":"903557"},"尼干布":{"cityName":"尼干布","pinYin":"niganbu","py":"ngb","code":"904840"},"春武里":{"cityName":"春武里","pinYin":"chunwuli","py":"cwl","code":"905009"},"瓦拉纳西":{"cityName":"瓦拉纳西","pinYin":"walanaxi","py":"wlnx","code":"902670"},"富国岛":{"cityName":"富国岛","pinYin":"fuguodao","py":"fgd","code":"907602"},"马拉里":{"cityName":"马拉里","pinYin":"malali","py":"mll","code":"902690"},"麦纳麦":{"cityName":"麦纳麦","pinYin":"mainamai","py":"mnm","code":"901475"},"雅典":{"cityName":"雅典","pinYin":"yadian","py":"yd","code":"902484"},"努萨":{"cityName":"努萨","pinYin":"nusa","py":"ns","code":"907685"},"亚美达巴德":{"cityName":"亚美达巴德","pinYin":"yameidabade","py":"ymdbd","code":"902680"},"斋沙默尔":{"cityName":"斋沙默尔","pinYin":"zhaishamoer","py":"zsme","code":"902683"},"道格拉斯港":{"cityName":"道格拉斯港","pinYin":"daogelasigang","py":"dglsg","code":"901036"},"马略卡岛":{"cityName":"马略卡岛","pinYin":"malvekadao","py":"mlkd","code":"904645"},"皮皮岛 (甲米)":{"cityName":"皮皮岛 (甲米)","pinYin":"pipidao","py":"ppd","code":"904984"},"乌隆他尼":{"cityName":"乌隆他尼","pinYin":"wulongtani","py":"wltn","code":"904977"},"福德和马其顿山脉":{"cityName":"福德和马其顿山脉","pinYin":"fudehemaqidunshanmai","py":"fdhmqdsm","code":"901081"},"维也纳":{"cityName":"维也纳","pinYin":"weiyena","py":"wyn","code":"901459"},"布宜诺斯艾利斯":{"cityName":"布宜诺斯艾利斯","pinYin":"buyinuosiailisi","py":"bynsals","code":"901021"},"焦特布尔":{"cityName":"焦特布尔","pinYin":"jiaotebuer","py":"jtbe","code":"902697"},"本托塔":{"cityName":"本托塔","pinYin":"bentuota","py":"btt","code":"908895"},"达沃市":{"cityName":"达沃市","pinYin":"dawoshi","py":"dws","code":"904143"},"吉达":{"cityName":"吉达","pinYin":"jida","py":"jd","code":"904523"},"罗吐鲁阿":{"cityName":"罗吐鲁阿","pinYin":"luotulua","py":"ltla","code":"904005"},"札幌":{"cityName":"札幌","pinYin":"zhahuang","py":"zh","code":"903453"},"美因河畔法兰克福":{"cityName":"美因河畔法兰克福","pinYin":"meiyinhepanfalankefu","py":"myhpflkf","code":"908937"},"米里萨":{"cityName":"米里萨","pinYin":"milisa","py":"mls","code":"910888"},"麦加/马卡":{"cityName":"麦加/马卡","pinYin":"maijiamaka","py":"mjmk","code":"904529"},"普卡":{"cityName":"普卡","pinYin":"puka","py":"pk","code":"902978"},"合艾":{"cityName":"合艾","pinYin":"heai","py":"ha","code":"904975"},"玛琅":{"cityName":"玛琅","pinYin":"malang","py":"ml","code":"902879"},"霍巴特":{"cityName":"霍巴特","pinYin":"huobate","py":"hbt","code":"901167"},"考拉":{"cityName":"考拉","pinYin":"kaola","py":"kl","code":"912131"},"望加锡":{"cityName":"望加锡","pinYin":"wangjiaxi","py":"wjx","code":"902915"},"亚勒":{"cityName":"亚勒","pinYin":"yale","py":"yl","code":"904859"},"北碧府":{"cityName":"北碧府","pinYin":"beibifu","py":"bbf","code":"904989"},"惠灵顿":{"cityName":"惠灵顿","pinYin":"huilingdun","py":"hld","code":"903982"},"拉差布里":{"cityName":"拉差布里","pinYin":"lachabuli","py":"lcbl","code":"905033"},"玛格丽特河红酒区":{"cityName":"玛格丽特河红酒区","pinYin":"magelitehehongjiuqu","py":"mglthhjq","code":"901042"},"龟岛":{"cityName":"龟岛","pinYin":"guidao","py":"gd","code":"905001"},"阿布达比":{"cityName":"阿布达比","pinYin":"abudabi","py":"abdb","code":"905158"},"金马伦高原":{"cityName":"金马伦高原","pinYin":"jinmalungaoyuan","py":"jmlgy","code":"903664"},"希克杜沃":{"cityName":"希克杜沃","pinYin":"xikeduwo","py":"xkdw","code":"908415"},"芭东海滩 (普吉岛)":{"cityName":"芭东海滩 (普吉岛)","pinYin":"badonghaitan","py":"bdht","code":"907673"},"塞维利亚":{"cityName":"塞维利亚","pinYin":"saiweiliya","py":"swly","code":"904644"},"比勒陀利亚":{"cityName":"比勒陀利亚","pinYin":"biletuoliya","py":"bltly","code":"904424"},"斐济市":{"cityName":"斐济市","pinYin":"feijishi","py":"fjs","code":"901874"},"罗勇府":{"cityName":"罗勇府","pinYin":"luoyongfu","py":"lyf","code":"904966"},"富士山":{"cityName":"富士山","pinYin":"fushishan","py":"fss","code":"903529"},"伊豆/热海":{"cityName":"伊豆/热海","pinYin":"yidou/rehai","py":"yd/rh","code":"910850"},"巴蜀府":{"cityName":"巴蜀府","pinYin":"bashufu","py":"bsf","code":"905021"},"多哈":{"cityName":"多哈","pinYin":"duoha","py":"dh","code":"904323"},"达尔文":{"cityName":"达尔文","pinYin":"daerwen","py":"dew","code":"901083"},"乌蒂":{"cityName":"乌蒂","pinYin":"wudi","py":"wd","code":"902722"},"克拉克 (潘帕嘉)":{"cityName":"克拉克 (潘帕嘉)","pinYin":"kelake","py":"klk","code":"904158"},"万荣":{"cityName":"万荣","pinYin":"wanrong","py":"wr","code":"903622"},"怡保":{"cityName":"怡保","pinYin":"yibao","py":"yb","code":"903675"},"埃尔尼多":{"cityName":"埃尔尼多","pinYin":"aierniduo","py":"aend","code":"911335"},"奈尼塔尔":{"cityName":"奈尼塔尔","pinYin":"nainitaer","py":"nnte","code":"902701"},"桑给巴尔":{"cityName":"桑给巴尔","pinYin":"sangjibaer","py":"sjbe","code":"904964"},"萨帕":{"cityName":"萨帕","pinYin":"sapa","py":"sp","code":"911420"},"耶路撒冷":{"cityName":"耶路撒冷","pinYin":"yelusaleng","py":"ylsl","code":"903014"},"呵叻":{"cityName":"呵叻","pinYin":"hele","py":"hl","code":"908467"},"列城":{"cityName":"列城","pinYin":"liecheng","py":"lc","code":"902737"},"八打雁":{"cityName":"八打雁","pinYin":"badayan","py":"bdy","code":"904149"},"大城府":{"cityName":"大城府","pinYin":"dachengfu","py":"dcf","code":"905004"},"名古屋":{"cityName":"名古屋","pinYin":"mingguwu","py":"mgw","code":"903474"},"海豚湾":{"cityName":"海豚湾","pinYin":"haitunwan","py":"htw","code":"909020"},"特内里费岛":{"cityName":"特内里费岛","pinYin":"teneilifeidao","py":"tnlfd","code":"904648"},"箱根":{"cityName":"箱根","pinYin":"xianggen","py":"xg","code":"903504"},"阿勒皮":{"cityName":"阿勒皮","pinYin":"alepi","py":"alp","code":"902706"},"尼尔森":{"cityName":"尼尔森","pinYin":"niersen","py":"nes","code":"904018"},"素叻他尼府":{"cityName":"素叻他尼府","pinYin":"suletanifu","py":"sltnf","code":"904968"},"米科诺斯":{"cityName":"米科诺斯","pinYin":"mikenuosi","py":"mkns","code":"902474"},"大雅塔":{"cityName":"大雅塔","pinYin":"dayata","py":"dyt","code":"904151"},"格拉纳达":{"cityName":"格拉纳达","pinYin":"gelanada","py":"glnd","code":"904608"}}
+{
+  "上海": {
+    "cityName": "上海",
+    "pinYin": "shanghai",
+    "py": "sh",
+    "code": "310100",
+    "airCode": "SHA"
+  },
+  "北京": {
+    "cityName": "北京",
+    "pinYin": "beijing",
+    "py": "bj",
+    "code": "110100",
+    "airCode": "BJS"
+  },
+  "杭州": {
+    "cityName": "杭州",
+    "pinYin": "hangzhou",
+    "py": "hz",
+    "code": "330100",
+    "airCode": "HGH"
+  },
+  "成都": {
+    "cityName": "成都",
+    "pinYin": "chengdu",
+    "py": "cd",
+    "code": "510100",
+    "airCode": "CTU"
+  },
+  "广州": {
+    "cityName": "广州",
+    "pinYin": "guangzhou",
+    "py": "gz",
+    "code": "440100",
+    "airCode": "CAN"
+  },
+  "深圳": {
+    "cityName": "深圳",
+    "pinYin": "shenzhen",
+    "py": "sz",
+    "code": "440300",
+    "airCode": "SZX"
+  },
+  "武汉": {
+    "cityName": "武汉",
+    "pinYin": "wuhan",
+    "py": "wh",
+    "code": "420100",
+    "airCode": "WUH"
+  },
+  "重庆": {
+    "cityName": "重庆",
+    "pinYin": "chongqing",
+    "py": "cq",
+    "code": "500100",
+    "airCode": "CKG"
+  },
+  "西安": {
+    "cityName": "西安",
+    "pinYin": "xian",
+    "py": "xa",
+    "code": "610100",
+    "airCode": "SIA"
+  },
+  "香港": {
+    "cityName": "香港",
+    "pinYin": "xianggang",
+    "py": "xg",
+    "code": "810100",
+    "airCode": "HKG"
+  },
+  "南京": {
+    "cityName": "南京",
+    "pinYin": "nanjing",
+    "py": "nj",
+    "code": "320100",
+    "airCode": "NKG"
+  },
+  "三亚": {
+    "cityName": "三亚",
+    "pinYin": "sanya",
+    "py": "sy",
+    "code": "460200",
+    "airCode": "SYX"
+  },
+  "厦门": {
+    "cityName": "厦门",
+    "pinYin": "xiamen",
+    "py": "xm",
+    "code": "350200",
+    "airCode": "XMN"
+  },
+  "长沙": {
+    "cityName": "长沙",
+    "pinYin": "changsha",
+    "py": "cs",
+    "code": "430100",
+    "airCode": "CSX"
+  },
+  "苏州": {
+    "cityName": "苏州",
+    "pinYin": "suzhou",
+    "py": "sz",
+    "code": "320500",
+    "airCode": "SZV"
+  },
+  "天津": {
+    "cityName": "天津",
+    "pinYin": "tianjin",
+    "py": "tj",
+    "code": "120100",
+    "airCode": "TSN"
+  },
+  "澳门": {
+    "cityName": "澳门",
+    "pinYin": "aomen",
+    "py": "am",
+    "code": "820100"
+  },
+  "郑州": {
+    "cityName": "郑州",
+    "pinYin": "zhengzhou",
+    "py": "zz",
+    "code": "410100",
+    "airCode": "CGO"
+  },
+  "哈尔滨": {
+    "cityName": "哈尔滨",
+    "pinYin": "haerbin",
+    "py": "heb",
+    "code": "230100",
+    "airCode": "HRB"
+  },
+  "宁波": {
+    "cityName": "宁波",
+    "pinYin": "ningbo",
+    "py": "nb",
+    "code": "330200",
+    "airCode": "NGB"
+  },
+  "昆明": {
+    "cityName": "昆明",
+    "pinYin": "kunming",
+    "py": "km",
+    "code": "530100",
+    "airCode": "KMG"
+  },
+  "阿坝藏族羌族自治州": {
+    "cityName": "阿坝藏族羌族自治州",
+    "pinYin": "abazangzuqiangzuzizhizhou",
+    "py": "abzzqzzzz",
+    "code": "513200"
+  },
+  "安阳": {
+    "cityName": "安阳",
+    "pinYin": "anyang",
+    "py": "ay",
+    "code": "410500",
+    "airCode": "AYN"
+  },
+  "安顺": {
+    "cityName": "安顺",
+    "pinYin": "anshun",
+    "py": "as",
+    "code": "520400",
+    "airCode": "AVA"
+  },
+  "安庆": {
+    "cityName": "安庆",
+    "pinYin": "anqing",
+    "py": "aq",
+    "code": "340800",
+    "airCode": "AQG"
+  },
+  "鞍山": {
+    "cityName": "鞍山",
+    "pinYin": "anshan",
+    "py": "as",
+    "code": "210300",
+    "airCode": "AOG"
+  },
+  "安康": {
+    "cityName": "安康",
+    "pinYin": "ankang",
+    "py": "ak",
+    "code": "610900",
+    "airCode": "AKA"
+  },
+  "阿克苏": {
+    "cityName": "阿克苏",
+    "pinYin": "akesu",
+    "py": "aks",
+    "code": "652900",
+    "airCode": "AKU"
+  },
+  "阿勒泰": {
+    "cityName": "阿勒泰",
+    "pinYin": "aletai",
+    "py": "alt",
+    "code": "654300",
+    "airCode": "AAT"
+  },
+  "阿拉善盟": {
+    "cityName": "阿拉善盟",
+    "pinYin": "alashanmeng",
+    "py": "als",
+    "code": "152900"
+  },
+  "阿里": {
+    "cityName": "阿里",
+    "pinYin": "ali",
+    "py": "ali",
+    "code": "542500",
+    "airCode": "NGQ"
+  },
+  "阿拉尔": {
+    "cityName": "阿拉尔",
+    "pinYin": "alaer",
+    "py": "ale",
+    "code": "659002"
+  },
+  "阿尔山": {
+    "cityName": "阿尔山",
+    "pinYin": "aershan",
+    "py": "aes",
+    "code": "152202",
+    "airCode": "YIE"
+  },
+  "安昌": {
+    "cityName": "安昌",
+    "pinYin": "anchang",
+    "py": "ac",
+    "code": "100007"
+  },
+  "安国": {
+    "cityName": "安国",
+    "pinYin": "anguo",
+    "py": "ag",
+    "code": "130683"
+  },
+  "安吉县": {
+    "cityName": "安吉县",
+    "pinYin": "anjixian",
+    "py": "ajx",
+    "code": "330523"
+  },
+  "阿图什": {
+    "cityName": "阿图什",
+    "pinYin": "atushi",
+    "py": "ats",
+    "code": "653001"
+  },
+  "北海": {
+    "cityName": "北海",
+    "pinYin": "beihai",
+    "py": "bh",
+    "code": "450500",
+    "airCode": "BHY"
+  },
+  "保定": {
+    "cityName": "保定",
+    "pinYin": "baoding",
+    "py": "bd",
+    "code": "130600"
+  },
+  "宝鸡": {
+    "cityName": "宝鸡",
+    "pinYin": "baoji",
+    "py": "bj",
+    "code": "610300"
+  },
+  "蚌埠": {
+    "cityName": "蚌埠",
+    "pinYin": "bengbu",
+    "py": "bb",
+    "code": "340300",
+    "airCode": "BFU"
+  },
+  "包头": {
+    "cityName": "包头",
+    "pinYin": "baotou",
+    "py": "bt",
+    "code": "150200",
+    "airCode": "BAV"
+  },
+  "百色": {
+    "cityName": "百色",
+    "pinYin": "baise",
+    "py": "bs",
+    "code": "451000",
+    "airCode": "AEB"
+  },
+  "白山": {
+    "cityName": "白山",
+    "pinYin": "baishan",
+    "py": "bs",
+    "code": "220600"
+  },
+  "滨州": {
+    "cityName": "滨州",
+    "pinYin": "binzhou",
+    "py": "bz",
+    "code": "371600"
+  },
+  "保亭黎族苗族自治县": {
+    "cityName": "保亭黎族苗族自治县",
+    "pinYin": "baotinglizumiaozuzizhixian",
+    "py": "btlzmzzzx",
+    "code": "469035"
+  },
+  "巴中": {
+    "cityName": "巴中",
+    "pinYin": "bazhong",
+    "py": "bz",
+    "code": "511900"
+  },
+  "毕节": {
+    "cityName": "毕节",
+    "pinYin": "bijie",
+    "py": "bj",
+    "code": "522400",
+    "airCode": "BFJ"
+  },
+  "本溪": {
+    "cityName": "本溪",
+    "pinYin": "benxi",
+    "py": "bx",
+    "code": "210500"
+  },
+  "巴音郭楞蒙古自治州": {
+    "cityName": "巴音郭楞蒙古自治州",
+    "pinYin": "bayinguolengmengguzizhizhou",
+    "py": "byglmgzzz",
+    "code": "652800"
+  },
+  "白城": {
+    "cityName": "白城",
+    "pinYin": "baicheng",
+    "py": "bc",
+    "code": "220800"
+  },
+  "巴彦淖尔": {
+    "cityName": "巴彦淖尔",
+    "pinYin": "bayannaoer",
+    "py": "byne",
+    "code": "150800",
+    "airCode": "RLK"
+  },
+  "白银": {
+    "cityName": "白银",
+    "pinYin": "baiyin",
+    "py": "by",
+    "code": "620400"
+  },
+  "博尔塔拉蒙古自治州": {
+    "cityName": "博尔塔拉蒙古自治州",
+    "pinYin": "boertalamengguzizhizhou",
+    "py": "betlmgzzz",
+    "code": "652700"
+  },
+  "白沙黎族自治县": {
+    "cityName": "白沙黎族自治县",
+    "pinYin": "baishalizuzizhixian",
+    "py": "bslzzzx",
+    "code": "469030"
+  },
+  "保山": {
+    "cityName": "保山",
+    "pinYin": "baoshan",
+    "py": "bs",
+    "code": "530500",
+    "airCode": "BSD"
+  },
+  "霸州": {
+    "cityName": "霸州",
+    "pinYin": "bazhou",
+    "py": "bz",
+    "code": "131081"
+  },
+  "北戴河": {
+    "cityName": "北戴河",
+    "pinYin": "beidaihe",
+    "py": "bdh",
+    "code": "130304"
+  },
+  "亳州": {
+    "cityName": "亳州",
+    "pinYin": "bozhou",
+    "py": "bz",
+    "code": "341600"
+  },
+  "布尔津县": {
+    "cityName": "布尔津县",
+    "pinYin": "buerjinxian",
+    "py": "bejx",
+    "code": "654321"
+  },
+  "长春": {
+    "cityName": "长春",
+    "pinYin": "changchun",
+    "py": "cc",
+    "code": "220100",
+    "airCode": "CGQ"
+  },
+  "常州": {
+    "cityName": "常州",
+    "pinYin": "changzhou",
+    "py": "cz",
+    "code": "320400",
+    "airCode": "CZX"
+  },
+  "承德": {
+    "cityName": "承德",
+    "pinYin": "chengde",
+    "py": "cd",
+    "code": "130800"
+  },
+  "郴州": {
+    "cityName": "郴州",
+    "pinYin": "chenzhou",
+    "py": "cz",
+    "code": "431000"
+  },
+  "常德": {
+    "cityName": "常德",
+    "pinYin": "changde",
+    "py": "cd",
+    "code": "430700",
+    "airCode": "CGD"
+  },
+  "沧州": {
+    "cityName": "沧州",
+    "pinYin": "cangzhou",
+    "py": "cz",
+    "code": "130900"
+  },
+  "潮州": {
+    "cityName": "潮州",
+    "pinYin": "chaozhou",
+    "py": "cz",
+    "code": "445100"
+  },
+  "长治": {
+    "cityName": "长治",
+    "pinYin": "changzhi",
+    "py": "cz",
+    "code": "140400",
+    "airCode": "CIH"
+  },
+  "滁州": {
+    "cityName": "滁州",
+    "pinYin": "chuzhou",
+    "py": "cz",
+    "code": "341100"
+  },
+  "池州": {
+    "cityName": "池州",
+    "pinYin": "chizhou",
+    "py": "cz",
+    "code": "341700",
+    "airCode": "JUH"
+  },
+  "赤峰": {
+    "cityName": "赤峰",
+    "pinYin": "chifeng",
+    "py": "cf",
+    "code": "150400",
+    "airCode": "CIF"
+  },
+  "崇左": {
+    "cityName": "崇左",
+    "pinYin": "chongzuo",
+    "py": "cz",
+    "code": "451400"
+  },
+  "楚雄": {
+    "cityName": "楚雄",
+    "pinYin": "chuxiong",
+    "py": "cx",
+    "code": "532300"
+  },
+  "昌吉": {
+    "cityName": "昌吉",
+    "pinYin": "changji",
+    "py": "cj",
+    "code": "652300"
+  },
+  "朝阳": {
+    "cityName": "朝阳",
+    "pinYin": "chaoyang",
+    "py": "cy",
+    "code": "211300",
+    "airCode": "CHG"
+  },
+  "巢湖": {
+    "cityName": "巢湖",
+    "pinYin": "chaohu",
+    "py": "ch",
+    "code": "341400"
+  },
+  "昌都": {
+    "cityName": "昌都",
+    "pinYin": "changdu",
+    "py": "cd",
+    "code": "542100",
+    "airCode": "BPX"
+  },
+  "昌江黎族自治县": {
+    "cityName": "昌江黎族自治县",
+    "pinYin": "changjianglizuzizhixian",
+    "py": "cjlzzzx",
+    "code": "469031"
+  },
+  "澄迈县": {
+    "cityName": "澄迈县",
+    "pinYin": "chengmai",
+    "py": "cm",
+    "code": "469027"
+  },
+  "长葛": {
+    "cityName": "长葛",
+    "pinYin": "changge",
+    "py": "cg",
+    "code": "411082"
+  },
+  "长乐": {
+    "cityName": "长乐",
+    "pinYin": "changle",
+    "py": "cl",
+    "code": "350182"
+  },
+  "常宁": {
+    "cityName": "常宁",
+    "pinYin": "changning",
+    "py": "cn",
+    "code": "430482"
+  },
+  "常熟": {
+    "cityName": "常熟",
+    "pinYin": "changshu",
+    "py": "cs",
+    "code": "320581"
+  },
+  "赤壁": {
+    "cityName": "赤壁",
+    "pinYin": "chibi",
+    "py": "cb",
+    "code": "421281"
+  },
+  "崇明县": {
+    "cityName": "崇明县",
+    "pinYin": "chongmingxian",
+    "py": "cmx",
+    "code": "310230"
+  },
+  "崇州": {
+    "cityName": "崇州",
+    "pinYin": "chongzhou",
+    "py": "cz",
+    "code": "510184"
+  },
+  "淳安县": {
+    "cityName": "淳安县",
+    "pinYin": "chunanxian",
+    "py": "cax",
+    "code": "330127"
+  },
+  "慈溪": {
+    "cityName": "慈溪",
+    "pinYin": "cixi",
+    "py": "cx",
+    "code": "330282"
+  },
+  "从化": {
+    "cityName": "从化",
+    "pinYin": "conghua",
+    "py": "ch",
+    "code": "440184"
+  },
+  "大理": {
+    "cityName": "大理",
+    "pinYin": "dali",
+    "py": "dl",
+    "code": "532900",
+    "airCode": "DLU"
+  },
+  "大连": {
+    "cityName": "大连",
+    "pinYin": "dalian",
+    "py": "dl",
+    "code": "210200",
+    "airCode": "DLC"
+  },
+  "东莞": {
+    "cityName": "东莞",
+    "pinYin": "dongguan",
+    "py": "dg",
+    "code": "441900"
+  },
+  "德阳": {
+    "cityName": "德阳",
+    "pinYin": "deyang",
+    "py": "dy",
+    "code": "510600"
+  },
+  "大同": {
+    "cityName": "大同",
+    "pinYin": "datong",
+    "py": "dt",
+    "code": "140200",
+    "airCode": "DAT"
+  },
+  "丹东": {
+    "cityName": "丹东",
+    "pinYin": "dandong",
+    "py": "dd",
+    "code": "210600",
+    "airCode": "DDG"
+  },
+  "德州": {
+    "cityName": "德州",
+    "pinYin": "dezhou",
+    "py": "dz",
+    "code": "371400"
+  },
+  "达州": {
+    "cityName": "达州",
+    "pinYin": "dazhou",
+    "py": "dz",
+    "code": "511700",
+    "airCode": "DAX"
+  },
+  "大庆": {
+    "cityName": "大庆",
+    "pinYin": "daqing",
+    "py": "dq",
+    "code": "230600",
+    "airCode": "DQA"
+  },
+  "东营": {
+    "cityName": "东营",
+    "pinYin": "dongying",
+    "py": "dy",
+    "code": "370500",
+    "airCode": "DOY"
+  },
+  "迪庆藏族自治州": {
+    "cityName": "迪庆藏族自治州",
+    "pinYin": "diqingzangzuzizhizhou",
+    "py": "dqzzzzz",
+    "code": "533400"
+  },
+  "德宏傣族景颇族自治州": {
+    "cityName": "德宏傣族景颇族自治州",
+    "pinYin": "dehongdaizujingpozuzizhizhou",
+    "py": "dhdzjpzzzz",
+    "code": "533100"
+  },
+  "定西": {
+    "cityName": "定西",
+    "pinYin": "dingxi",
+    "py": "lx",
+    "code": "621100"
+  },
+  "定安县": {
+    "cityName": "定安县",
+    "pinYin": "dingan",
+    "py": "da",
+    "code": "469025"
+  },
+  "大兴安岭": {
+    "cityName": "大兴安岭",
+    "pinYin": "daxinganling",
+    "py": "dxal",
+    "code": "232700"
+  },
+  "东方": {
+    "cityName": "东方",
+    "pinYin": "dongfang",
+    "py": "df",
+    "code": "469007"
+  },
+  "儋县": {
+    "cityName": "儋县",
+    "pinYin": "danxian",
+    "py": "dx",
+    "code": "469003"
+  },
+  "大东海": {
+    "cityName": "大东海",
+    "pinYin": "dadonghai",
+    "py": "ddh",
+    "code": "100021"
+  },
+  "岱山县": {
+    "cityName": "岱山县",
+    "pinYin": "daishanxian",
+    "py": "dsx",
+    "code": "330921"
+  },
+  "当阳": {
+    "cityName": "当阳",
+    "pinYin": "dangyang",
+    "py": "dy",
+    "code": "420582"
+  },
+  "丹霞山": {
+    "cityName": "丹霞山",
+    "pinYin": "danxianshan",
+    "py": "dxs",
+    "code": "100011"
+  },
+  "丹阳": {
+    "cityName": "丹阳",
+    "pinYin": "danyang",
+    "py": "dy",
+    "code": "321181",
+    "airCode": "DYN"
+  },
+  "稻城县": {
+    "cityName": "稻城县",
+    "pinYin": "daochengxian",
+    "py": "dcx",
+    "code": "513337"
+  },
+  "达县": {
+    "cityName": "达县",
+    "pinYin": "daxian",
+    "py": "dx",
+    "code": "511721"
+  },
+  "大研古城": {
+    "cityName": "大研古城",
+    "pinYin": "dayangucheng",
+    "py": "dygc",
+    "code": "100029"
+  },
+  "大冶": {
+    "cityName": "大冶",
+    "pinYin": "daye",
+    "py": "dy",
+    "code": "420281"
+  },
+  "登封": {
+    "cityName": "登封",
+    "pinYin": "dengfeng",
+    "py": "df",
+    "code": "410185"
+  },
+  "邓州": {
+    "cityName": "邓州",
+    "pinYin": "dengzhou",
+    "py": "dz",
+    "code": "411381"
+  },
+  "德清县": {
+    "cityName": "德清县",
+    "pinYin": "deqingxian",
+    "py": "dqx",
+    "code": "330521"
+  },
+  "德兴": {
+    "cityName": "德兴",
+    "pinYin": "dexing",
+    "py": "dx",
+    "code": "361181"
+  },
+  "电白县": {
+    "cityName": "电白县",
+    "pinYin": "dianbaixian",
+    "py": "dbx",
+    "code": "440923"
+  },
+  "定州": {
+    "cityName": "定州",
+    "pinYin": "dingzhou",
+    "py": "dz",
+    "code": "130682"
+  },
+  "东胜": {
+    "cityName": "东胜",
+    "pinYin": "dongsheng",
+    "py": "ds",
+    "code": "150602"
+  },
+  "东阳": {
+    "cityName": "东阳",
+    "pinYin": "dongyang",
+    "py": "dy",
+    "code": "330783"
+  },
+  "都江堰": {
+    "cityName": "都江堰",
+    "pinYin": "dujiangyan",
+    "py": "djy",
+    "code": "510181"
+  },
+  "敦煌": {
+    "cityName": "敦煌",
+    "pinYin": "dunhuang",
+    "py": "dh",
+    "code": "620982",
+    "airCode": "DNH"
+  },
+  "恩施": {
+    "cityName": "恩施",
+    "pinYin": "enshi",
+    "py": "es",
+    "code": "422800",
+    "airCode": "ENH"
+  },
+  "鄂尔多斯": {
+    "cityName": "鄂尔多斯",
+    "pinYin": "eerduosi",
+    "py": "eeds",
+    "code": "150600",
+    "airCode": "DSN"
+  },
+  "鄂州": {
+    "cityName": "鄂州",
+    "pinYin": "ezhou",
+    "py": "ez",
+    "code": "420700"
+  },
+  "额尔古纳": {
+    "cityName": "额尔古纳",
+    "pinYin": "eerguna",
+    "py": "eegn",
+    "code": "150784"
+  },
+  "峨眉山": {
+    "cityName": "峨眉山",
+    "pinYin": "emeishan",
+    "py": "ems",
+    "code": "511181"
+  },
+  "洱海": {
+    "cityName": "洱海",
+    "pinYin": "erhai",
+    "py": "eh",
+    "code": "100044"
+  },
+  "二连浩特": {
+    "cityName": "二连浩特",
+    "pinYin": "erlianhaote",
+    "py": "elht",
+    "code": "152501",
+    "airCode": "ERL"
+  },
+  "福州": {
+    "cityName": "福州",
+    "pinYin": "fuzhou",
+    "py": "fz",
+    "code": "350100",
+    "airCode": "FOC"
+  },
+  "佛山": {
+    "cityName": "佛山",
+    "pinYin": "foshan",
+    "py": "fs",
+    "code": "440600",
+    "airCode": "FUO"
+  },
+  "阜阳": {
+    "cityName": "阜阳",
+    "pinYin": "fuyang",
+    "py": "fy",
+    "code": "341200",
+    "airCode": "FUG"
+  },
+  "抚州": {
+    "cityName": "抚州",
+    "pinYin": "fuzhou",
+    "py": "fz",
+    "code": "361000"
+  },
+  "防城港": {
+    "cityName": "防城港",
+    "pinYin": "fangchenggang",
+    "py": "fcg",
+    "code": "450600"
+  },
+  "抚顺": {
+    "cityName": "抚顺",
+    "pinYin": "fushun",
+    "py": "fs",
+    "code": "210400"
+  },
+  "阜新": {
+    "cityName": "阜新",
+    "pinYin": "fuxin",
+    "py": "fx",
+    "code": "210900"
+  },
+  "放鸡岛": {
+    "cityName": "放鸡岛",
+    "pinYin": "fangjidao",
+    "py": "fjd",
+    "code": "100012"
+  },
+  "奉化": {
+    "cityName": "奉化",
+    "pinYin": "fenghua",
+    "py": "fh",
+    "code": "330283"
+  },
+  "凤凰": {
+    "cityName": "凤凰",
+    "pinYin": "fenghuang",
+    "py": "fh",
+    "code": "433123"
+  },
+  "凤翔县": {
+    "cityName": "凤翔县",
+    "pinYin": "fengxiangxian",
+    "py": "fxx",
+    "code": "610322"
+  },
+  "扶风县": {
+    "cityName": "扶风县",
+    "pinYin": "fufengxian",
+    "py": "ffx",
+    "code": "610324"
+  },
+  "福清": {
+    "cityName": "福清",
+    "pinYin": "fuqing",
+    "py": "fq",
+    "code": "350181"
+  },
+  "富阳": {
+    "cityName": "富阳",
+    "pinYin": "fuyang",
+    "py": "fy",
+    "code": "330183"
+  },
+  "桂林": {
+    "cityName": "桂林",
+    "pinYin": "guilin",
+    "py": "gl",
+    "code": "450300",
+    "airCode": "KWL"
+  },
+  "贵阳": {
+    "cityName": "贵阳",
+    "pinYin": "guiyang",
+    "py": "gy",
+    "code": "520100",
+    "airCode": "KWE"
+  },
+  "赣州": {
+    "cityName": "赣州",
+    "pinYin": "ganzhou",
+    "py": "gz",
+    "code": "360700",
+    "airCode": "KOW"
+  },
+  "广元": {
+    "cityName": "广元",
+    "pinYin": "guangyuan",
+    "py": "gy",
+    "code": "510800",
+    "airCode": "GYS"
+  },
+  "贵港": {
+    "cityName": "贵港",
+    "pinYin": "guigang",
+    "py": "gg",
+    "code": "450800"
+  },
+  "广安": {
+    "cityName": "广安",
+    "pinYin": "guangan",
+    "py": "ga",
+    "code": "511600"
+  },
+  "甘孜藏族自治州": {
+    "cityName": "甘孜藏族自治州",
+    "pinYin": "ganzizangzuzizhizhou",
+    "py": "gzzzzzz",
+    "code": "513300"
+  },
+  "高雄": {
+    "cityName": "高雄",
+    "pinYin": "gaoxiongshi",
+    "py": "gxs",
+    "code": "710200",
+    "airCode": "KHH"
+  },
+  "固原": {
+    "cityName": "固原",
+    "pinYin": "guyuan",
+    "py": "gy",
+    "code": "640400",
+    "airCode": "GYU"
+  },
+  "甘南": {
+    "cityName": "甘南",
+    "pinYin": "gannanzangzuzizhizhou",
+    "py": "gnzzzzz",
+    "code": "623000"
+  },
+  "高雄县": {
+    "cityName": "高雄县",
+    "pinYin": "gaoxiongxian",
+    "py": "gxx",
+    "code": "712300"
+  },
+  "果洛藏族自治州": {
+    "cityName": "果洛藏族自治州",
+    "pinYin": "guoluozangzuzizhizhou",
+    "py": "glzzzzz",
+    "code": "632600"
+  },
+  "高碑店": {
+    "cityName": "高碑店",
+    "pinYin": "gaobeidian",
+    "py": "gbd",
+    "code": "130684"
+  },
+  "高要": {
+    "cityName": "高要",
+    "pinYin": "gaoyao",
+    "py": "gy",
+    "code": "441283"
+  },
+  "高邮": {
+    "cityName": "高邮",
+    "pinYin": "gaoyou",
+    "py": "gy",
+    "code": "321084"
+  },
+  "格尔木": {
+    "cityName": "格尔木",
+    "pinYin": "geermu",
+    "py": "gem",
+    "code": "632801",
+    "airCode": "GOQ"
+  },
+  "个旧": {
+    "cityName": "个旧",
+    "pinYin": "gejiu",
+    "py": "gj",
+    "code": "532501"
+  },
+  "根河": {
+    "cityName": "根河",
+    "pinYin": "genhe",
+    "py": "gh",
+    "code": "150785"
+  },
+  "巩义": {
+    "cityName": "巩义",
+    "pinYin": "gongyi",
+    "py": "gy",
+    "code": "410181"
+  },
+  "鼓浪屿": {
+    "cityName": "鼓浪屿",
+    "pinYin": "gulangyu",
+    "py": "gly",
+    "code": "100018"
+  },
+  "合肥": {
+    "cityName": "合肥",
+    "pinYin": "hefei",
+    "py": "hf",
+    "code": "340100",
+    "airCode": "HFE"
+  },
+  "海口": {
+    "cityName": "海口",
+    "pinYin": "haikou",
+    "py": "hk",
+    "code": "460100",
+    "airCode": "HAK"
+  },
+  "惠州": {
+    "cityName": "惠州",
+    "pinYin": "huizhou",
+    "py": "hz",
+    "code": "441300",
+    "airCode": "HUZ"
+  },
+  "黄山": {
+    "cityName": "黄山",
+    "pinYin": "huangshan",
+    "py": "hs",
+    "code": "341000",
+    "airCode": "TXN"
+  },
+  "呼和浩特": {
+    "cityName": "呼和浩特",
+    "pinYin": "huhehaote",
+    "py": "hhht",
+    "code": "150100",
+    "airCode": "HET"
+  },
+  "湖州": {
+    "cityName": "湖州",
+    "pinYin": "huzhou",
+    "py": "hz",
+    "code": "330500"
+  },
+  "衡阳": {
+    "cityName": "衡阳",
+    "pinYin": "hengyang",
+    "py": "hy",
+    "code": "430400",
+    "airCode": "HNY"
+  },
+  "邯郸": {
+    "cityName": "邯郸",
+    "pinYin": "handan",
+    "py": "hd",
+    "code": "130400",
+    "airCode": "HDG"
+  },
+  "淮安": {
+    "cityName": "淮安",
+    "pinYin": "huaian",
+    "py": "ha",
+    "code": "320800",
+    "airCode": "HIA"
+  },
+  "葫芦岛": {
+    "cityName": "葫芦岛",
+    "pinYin": "huludao",
+    "py": "hld",
+    "code": "211400"
+  },
+  "菏泽": {
+    "cityName": "菏泽",
+    "pinYin": "heze",
+    "py": "hz",
+    "code": "371700"
+  },
+  "汉中": {
+    "cityName": "汉中",
+    "pinYin": "hanzhong",
+    "py": "hz",
+    "code": "610700",
+    "airCode": "HZG"
+  },
+  "河源": {
+    "cityName": "河源",
+    "pinYin": "heyuan",
+    "py": "hp",
+    "code": "441600"
+  },
+  "怀化": {
+    "cityName": "怀化",
+    "pinYin": "huaihua",
+    "py": "hh",
+    "code": "431200",
+    "airCode": "HJJ"
+  },
+  "黄冈": {
+    "cityName": "黄冈",
+    "pinYin": "huanggang",
+    "py": "hg",
+    "code": "421100"
+  },
+  "淮南": {
+    "cityName": "淮南",
+    "pinYin": "huainan",
+    "py": "hn",
+    "code": "340400"
+  },
+  "呼伦贝尔": {
+    "cityName": "呼伦贝尔",
+    "pinYin": "hulunbeier",
+    "py": "hlbe",
+    "code": "150700"
+  },
+  "黄石": {
+    "cityName": "黄石",
+    "pinYin": "huangshi",
+    "py": "hs",
+    "code": "420200"
+  },
+  "贺州": {
+    "cityName": "贺州",
+    "pinYin": "hezhou",
+    "py": "hz",
+    "code": "451100"
+  },
+  "衡水": {
+    "cityName": "衡水",
+    "pinYin": "hengshui",
+    "py": "hs",
+    "code": "131100"
+  },
+  "花莲县": {
+    "cityName": "花莲县",
+    "pinYin": "hualianxian",
+    "py": "hlx",
+    "code": "712600"
+  },
+  "红河哈尼族彝族自治州": {
+    "cityName": "红河哈尼族彝族自治州",
+    "pinYin": "honghehanizuyizuzizhizhou",
+    "py": "hhhnzyzzzz",
+    "code": "532500"
+  },
+  "淮北": {
+    "cityName": "淮北",
+    "pinYin": "huaibei",
+    "py": "hb",
+    "code": "340600"
+  },
+  "河池": {
+    "cityName": "河池",
+    "pinYin": "hechi",
+    "py": "hc",
+    "code": "451200",
+    "airCode": "HCJ"
+  },
+  "鹤壁": {
+    "cityName": "鹤壁",
+    "pinYin": "hebi",
+    "py": "hb",
+    "code": "410600"
+  },
+  "鹤岗": {
+    "cityName": "鹤岗",
+    "pinYin": "hegang",
+    "py": "hg",
+    "code": "230400"
+  },
+  "黑河": {
+    "cityName": "黑河",
+    "pinYin": "heihe",
+    "py": "hh",
+    "code": "231100",
+    "airCode": "HEK"
+  },
+  "海西蒙古族藏族自治州": {
+    "cityName": "海西蒙古族藏族自治州",
+    "pinYin": "haiximengguzuzangzuzizhizhou",
+    "py": "hxmgzzzzzz",
+    "code": "632800"
+  },
+  "哈密": {
+    "cityName": "哈密",
+    "pinYin": "hami",
+    "py": "hm",
+    "code": "652200",
+    "airCode": "HMI"
+  },
+  "海南藏族自治州": {
+    "cityName": "海南藏族自治州",
+    "pinYin": "hainanzangzuzizhizhou",
+    "py": "hnzzzzz",
+    "code": "632500"
+  },
+  "海北藏族自治州": {
+    "cityName": "海北藏族自治州",
+    "pinYin": "haibeizangzuzizhizhou",
+    "py": "hbzzzzz",
+    "code": "632200"
+  },
+  "和田": {
+    "cityName": "和田",
+    "pinYin": "hetian",
+    "py": "ht",
+    "code": "653200",
+    "airCode": "HTN"
+  },
+  "海东": {
+    "cityName": "海东",
+    "pinYin": "haidong",
+    "py": "hd",
+    "code": "632100"
+  },
+  "黄南藏族自治州": {
+    "cityName": "黄南藏族自治州",
+    "pinYin": "huangnanzangzuzizhizhou",
+    "py": "hnzzzzz",
+    "code": "632300"
+  },
+  "海城": {
+    "cityName": "海城",
+    "pinYin": "haicheng",
+    "py": "hc",
+    "code": "210381"
+  },
+  "海拉尔": {
+    "cityName": "海拉尔",
+    "pinYin": "hailaer",
+    "py": "hle",
+    "code": "150702",
+    "airCode": "HLD"
+  },
+  "海螺沟": {
+    "cityName": "海螺沟",
+    "pinYin": "hailuogou",
+    "py": "hlg",
+    "code": "100038"
+  },
+  "海门": {
+    "cityName": "海门",
+    "pinYin": "haimen",
+    "py": "hm",
+    "code": "320684"
+  },
+  "海宁": {
+    "cityName": "海宁",
+    "pinYin": "haining",
+    "py": "hn",
+    "code": "330481"
+  },
+  "海阳": {
+    "cityName": "海阳",
+    "pinYin": "haiyang",
+    "py": "hy",
+    "code": "370687"
+  },
+  "海盐县": {
+    "cityName": "海盐县",
+    "pinYin": "haiyanxian",
+    "py": "hyx",
+    "code": "330424"
+  },
+  "韩城": {
+    "cityName": "韩城",
+    "pinYin": "hancheng",
+    "py": "hc",
+    "code": "610581"
+  },
+  "河间": {
+    "cityName": "河间",
+    "pinYin": "hejian",
+    "py": "hj",
+    "code": "130984"
+  },
+  "衡山": {
+    "cityName": "衡山",
+    "pinYin": "hengshan",
+    "py": "hs",
+    "code": "100026"
+  },
+  "和顺": {
+    "cityName": "和顺",
+    "pinYin": "heshunxian",
+    "py": "hsx",
+    "code": "140723"
+  },
+  "合作": {
+    "cityName": "合作",
+    "pinYin": "hezuo",
+    "py": "hz",
+    "code": "623001"
+  },
+  "宏村": {
+    "cityName": "宏村",
+    "pinYin": "hongcun",
+    "py": "hc",
+    "code": "100009"
+  },
+  "侯马": {
+    "cityName": "侯马",
+    "pinYin": "houma",
+    "py": "hm",
+    "code": "141081"
+  },
+  "怀仁县": {
+    "cityName": "怀仁县",
+    "pinYin": "huairenxian",
+    "py": "hrx",
+    "code": "140624"
+  },
+  "黄果树": {
+    "cityName": "黄果树",
+    "pinYin": "huangguoshu",
+    "py": "hgs",
+    "code": "100013"
+  },
+  "黄龙溪": {
+    "cityName": "黄龙溪",
+    "pinYin": "huanglongxi",
+    "py": "hlx",
+    "code": "100037"
+  },
+  "华山": {
+    "cityName": "华山",
+    "pinYin": "huashan",
+    "py": "hs",
+    "code": "100014"
+  },
+  "华阴": {
+    "cityName": "华阴",
+    "pinYin": "huayin",
+    "py": "hy",
+    "code": "610582"
+  },
+  "徽州": {
+    "cityName": "徽州",
+    "pinYin": "huizhou",
+    "py": "hz",
+    "code": "341004"
+  },
+  "霍林郭勒": {
+    "cityName": "霍林郭勒",
+    "pinYin": "huolinguole",
+    "py": "hlgl",
+    "code": "150581"
+  },
+  "霍州": {
+    "cityName": "霍州",
+    "pinYin": "huozhou",
+    "py": "hz",
+    "code": "141082"
+  },
+  "嘉兴": {
+    "cityName": "嘉兴",
+    "pinYin": "jiaxing",
+    "py": "jx",
+    "code": "330400",
+    "airCode": "JXS"
+  },
+  "济南": {
+    "cityName": "济南",
+    "pinYin": "jinan",
+    "py": "jn",
+    "code": "370100",
+    "airCode": "TNA"
+  },
+  "金华": {
+    "cityName": "金华",
+    "pinYin": "jinhua",
+    "py": "jh",
+    "code": "330700"
+  },
+  "九江": {
+    "cityName": "九江",
+    "pinYin": "jiujiang",
+    "py": "jj",
+    "code": "360400",
+    "airCode": "JIU"
+  },
+  "江门": {
+    "cityName": "江门",
+    "pinYin": "jiangmen",
+    "py": "jm",
+    "code": "440700"
+  },
+  "济宁": {
+    "cityName": "济宁",
+    "pinYin": "jining",
+    "py": "jn",
+    "code": "370800",
+    "airCode": "JNG"
+  },
+  "焦作": {
+    "cityName": "焦作",
+    "pinYin": "jiaozuo",
+    "py": "jz",
+    "code": "410800"
+  },
+  "吉林": {
+    "cityName": "吉林",
+    "pinYin": "jilin",
+    "py": "jl",
+    "code": "220200",
+    "airCode": "JIL"
+  },
+  "荆州": {
+    "cityName": "荆州",
+    "pinYin": "jingzhou",
+    "py": "jz",
+    "code": "421000",
+    "airCode": "SHS"
+  },
+  "晋中": {
+    "cityName": "晋中",
+    "pinYin": "jinzhong",
+    "py": "jz",
+    "code": "140700"
+  },
+  "吉安": {
+    "cityName": "吉安",
+    "pinYin": "jian",
+    "py": "ja",
+    "code": "360800",
+    "airCode": "KNC"
+  },
+  "揭阳": {
+    "cityName": "揭阳",
+    "pinYin": "jieyang",
+    "py": "jy",
+    "code": "445200",
+    "airCode": "SWA"
+  },
+  "锦州": {
+    "cityName": "锦州",
+    "pinYin": "jinzhou",
+    "py": "jz",
+    "code": "210700",
+    "airCode": "JNZ"
+  },
+  "景德镇": {
+    "cityName": "景德镇",
+    "pinYin": "jingdezhen",
+    "py": "jdz",
+    "code": "360200",
+    "airCode": "JDZ"
+  },
+  "酒泉": {
+    "cityName": "酒泉",
+    "pinYin": "jiuquan",
+    "py": "jq",
+    "code": "620900",
+    "airCode": "CHW"
+  },
+  "佳木斯": {
+    "cityName": "佳木斯",
+    "pinYin": "jiamusi",
+    "py": "jms",
+    "code": "230800",
+    "airCode": "JMU"
+  },
+  "嘉峪关": {
+    "cityName": "嘉峪关",
+    "pinYin": "jiayuguan",
+    "py": "jyg",
+    "code": "620200",
+    "airCode": "JGN"
+  },
+  "荆门": {
+    "cityName": "荆门",
+    "pinYin": "jingmen",
+    "py": "jm",
+    "code": "420800"
+  },
+  "晋城": {
+    "cityName": "晋城",
+    "pinYin": "jincheng",
+    "py": "jc",
+    "code": "140500"
+  },
+  "鸡西": {
+    "cityName": "鸡西",
+    "pinYin": "jixi",
+    "py": "jx",
+    "code": "230300",
+    "airCode": "JXA"
+  },
+  "济源": {
+    "cityName": "济源",
+    "pinYin": "jiyuan",
+    "py": "jy",
+    "code": "410881"
+  },
+  "金门县(台湾)": {
+    "cityName": "金门县(台湾)",
+    "pinYin": "jinmenxian",
+    "py": "jmx",
+    "code": "710500"
+  },
+  "金昌": {
+    "cityName": "金昌",
+    "pinYin": "jinchang",
+    "py": "jc",
+    "code": "620300",
+    "airCode": "JIC"
+  },
+  "嘉义县": {
+    "cityName": "嘉义县",
+    "pinYin": "jiayixian",
+    "py": "jyx",
+    "code": "711900"
+  },
+  "基隆": {
+    "cityName": "基隆",
+    "pinYin": "jilongshi",
+    "py": "jls",
+    "code": "710700"
+  },
+  "嘉义": {
+    "cityName": "嘉义",
+    "pinYin": "jiayishi",
+    "py": "jys",
+    "code": "710900",
+    "airCode": "CYI"
+  },
+  "建昌县": {
+    "cityName": "建昌县",
+    "pinYin": "jianchangxian",
+    "py": "jcx",
+    "code": "211422"
+  },
+  "建德": {
+    "cityName": "建德",
+    "pinYin": "jiande",
+    "py": "jd",
+    "code": "330182"
+  },
+  "江都": {
+    "cityName": "江都",
+    "pinYin": "jiangdu",
+    "py": "jd",
+    "code": "321088"
+  },
+  "绛县": {
+    "cityName": "绛县",
+    "pinYin": "jiangxian",
+    "py": "jx",
+    "code": "140826"
+  },
+  "江阴": {
+    "cityName": "江阴",
+    "pinYin": "jiangyin",
+    "py": "jy",
+    "code": "320281"
+  },
+  "嘉善县": {
+    "cityName": "嘉善县",
+    "pinYin": "jiashanxian",
+    "py": "jsx",
+    "code": "330421"
+  },
+  "介休": {
+    "cityName": "介休",
+    "pinYin": "jiexiu",
+    "py": "jx",
+    "code": "140781"
+  },
+  "井冈山": {
+    "cityName": "井冈山",
+    "pinYin": "jinggangshan",
+    "py": "jgs",
+    "code": "360881",
+    "airCode": "JGS"
+  },
+  "静海县": {
+    "cityName": "静海县",
+    "pinYin": "jinghaixian",
+    "py": "jhx",
+    "code": "120223"
+  },
+  "景洪": {
+    "cityName": "景洪",
+    "pinYin": "jinghong",
+    "py": "jh",
+    "code": "532801"
+  },
+  "集宁": {
+    "cityName": "集宁",
+    "pinYin": "jining",
+    "py": "jn",
+    "code": "150902"
+  },
+  "晋江": {
+    "cityName": "晋江",
+    "pinYin": "jinjiang",
+    "py": "jj",
+    "code": "350582",
+    "airCode": "JJN"
+  },
+  "金门县(泉州)": {
+    "cityName": "金门县(泉州)",
+    "pinYin": "jinmenxian",
+    "py": "jmx",
+    "code": "350527"
+  },
+  "吉首": {
+    "cityName": "吉首",
+    "pinYin": "jishou",
+    "py": "js",
+    "code": "433101"
+  },
+  "九华山": {
+    "cityName": "九华山",
+    "pinYin": "jiuhuashan",
+    "py": "jhs",
+    "code": "100010"
+  },
+  "九寨沟": {
+    "cityName": "九寨沟",
+    "pinYin": "jiuzhaigou",
+    "py": "jzg",
+    "code": "513225",
+    "airCode": "JZH"
+  },
+  "蓟县": {
+    "cityName": "蓟县",
+    "pinYin": "jixian",
+    "py": "jx",
+    "code": "120225"
+  },
+  "句容": {
+    "cityName": "句容",
+    "pinYin": "jurong",
+    "py": "jr",
+    "code": "321183"
+  },
+  "开封": {
+    "cityName": "开封",
+    "pinYin": "kaifeng",
+    "py": "kf",
+    "code": "410200"
+  },
+  "喀什": {
+    "cityName": "喀什",
+    "pinYin": "kashi",
+    "py": "ks",
+    "code": "653100",
+    "airCode": "KHG"
+  },
+  "克拉玛依": {
+    "cityName": "克拉玛依",
+    "pinYin": "kelamayi",
+    "py": "klmy",
+    "code": "650200",
+    "airCode": "KRY"
+  },
+  "克孜勒苏柯尔克孜自治州": {
+    "cityName": "克孜勒苏柯尔克孜自治州",
+    "pinYin": "kezilesukeerkezizizhizhou",
+    "py": "kzlskekzzzz",
+    "code": "653000"
+  },
+  "喀纳斯": {
+    "cityName": "喀纳斯",
+    "pinYin": "kanasi",
+    "py": "kns",
+    "code": "100015",
+    "airCode": "KJI"
+  },
+  "康定县": {
+    "cityName": "康定县",
+    "pinYin": "kangdingxian",
+    "py": "kdx",
+    "code": "513321"
+  },
+  "垦丁": {
+    "cityName": "垦丁",
+    "pinYin": "kending",
+    "py": "kd",
+    "code": "100036"
+  },
+  "库车": {
+    "cityName": "库车",
+    "pinYin": "kuche",
+    "py": "kc",
+    "code": "652923",
+    "airCode": "KCA"
+  },
+  "库尔勒": {
+    "cityName": "库尔勒",
+    "pinYin": "kuerle",
+    "py": "kel",
+    "code": "652801",
+    "airCode": "KRL"
+  },
+  "奎屯": {
+    "cityName": "奎屯",
+    "pinYin": "kuitun",
+    "py": "kt",
+    "code": "654003"
+  },
+  "昆山": {
+    "cityName": "昆山",
+    "pinYin": "kunshan",
+    "py": "ks",
+    "code": "320583",
+    "airCode": "KVN"
+  },
+  "丽江": {
+    "cityName": "丽江",
+    "pinYin": "lijiang",
+    "py": "lj",
+    "code": "530700",
+    "airCode": "LJG"
+  },
+  "兰州": {
+    "cityName": "兰州",
+    "pinYin": "lanzhou",
+    "py": "lz",
+    "code": "620100",
+    "airCode": "LHW"
+  },
+  "拉萨": {
+    "cityName": "拉萨",
+    "pinYin": "lasa",
+    "py": "ls",
+    "code": "540100",
+    "airCode": "LXA"
+  },
+  "洛阳": {
+    "cityName": "洛阳",
+    "pinYin": "luoyang",
+    "py": "ly",
+    "code": "410300",
+    "airCode": "LYA"
+  },
+  "柳州": {
+    "cityName": "柳州",
+    "pinYin": "liuzhou",
+    "py": "lz",
+    "code": "450200",
+    "airCode": "LZH"
+  },
+  "临沂": {
+    "cityName": "临沂",
+    "pinYin": "linyi",
+    "py": "ly",
+    "code": "371300",
+    "airCode": "LYI"
+  },
+  "乐山": {
+    "cityName": "乐山",
+    "pinYin": "leshan",
+    "py": "ls",
+    "code": "511100"
+  },
+  "连云港": {
+    "cityName": "连云港",
+    "pinYin": "lianyungang",
+    "py": "lyg",
+    "code": "320700",
+    "airCode": "LYG"
+  },
+  "廊坊": {
+    "cityName": "廊坊",
+    "pinYin": "langfang",
+    "py": "lf",
+    "code": "131000"
+  },
+  "丽水": {
+    "cityName": "丽水",
+    "pinYin": "lishui",
+    "py": "ls",
+    "code": "331100"
+  },
+  "临汾": {
+    "cityName": "临汾",
+    "pinYin": "linfen",
+    "py": "lf",
+    "code": "141000",
+    "airCode": "LFQ"
+  },
+  "聊城": {
+    "cityName": "聊城",
+    "pinYin": "liaocheng",
+    "py": "lc",
+    "code": "371500"
+  },
+  "龙岩": {
+    "cityName": "龙岩",
+    "pinYin": "longyan",
+    "py": "ly",
+    "code": "350800"
+  },
+  "凉山彝族自治州": {
+    "cityName": "凉山彝族自治州",
+    "pinYin": "liangshanyizuzizhizhou",
+    "py": "lsyzzzz",
+    "code": "513400"
+  },
+  "六安": {
+    "cityName": "六安",
+    "pinYin": "liuan",
+    "py": "la",
+    "code": "341500"
+  },
+  "泸州": {
+    "cityName": "泸州",
+    "pinYin": "luzhou",
+    "py": "lz",
+    "code": "510500",
+    "airCode": "LZO"
+  },
+  "漯河": {
+    "cityName": "漯河",
+    "pinYin": "leihe",
+    "py": "lh",
+    "code": "411100"
+  },
+  "娄底": {
+    "cityName": "娄底",
+    "pinYin": "loudi",
+    "py": "ld",
+    "code": "431300"
+  },
+  "六盘水": {
+    "cityName": "六盘水",
+    "pinYin": "liupanshui",
+    "py": "lps",
+    "code": "520200",
+    "airCode": "LPF"
+  },
+  "吕梁": {
+    "cityName": "吕梁",
+    "pinYin": "lvliang",
+    "py": "ll",
+    "code": "141100",
+    "airCode": "LLV"
+  },
+  "陵水": {
+    "cityName": "陵水",
+    "pinYin": "lingshui",
+    "py": "ls",
+    "code": "469034"
+  },
+  "来宾": {
+    "cityName": "来宾",
+    "pinYin": "laibin",
+    "py": "lb",
+    "code": "451300"
+  },
+  "辽阳": {
+    "cityName": "辽阳",
+    "pinYin": "liaoyang",
+    "py": "ld",
+    "code": "211000"
+  },
+  "莱芜": {
+    "cityName": "莱芜",
+    "pinYin": "laiwu",
+    "py": "lw",
+    "code": "371200"
+  },
+  "林芝": {
+    "cityName": "林芝",
+    "pinYin": "linzhi",
+    "py": "lz",
+    "code": "542600",
+    "airCode": "LZY"
+  },
+  "陇南": {
+    "cityName": "陇南",
+    "pinYin": "longnan",
+    "py": "ln",
+    "code": "621200"
+  },
+  "辽源": {
+    "cityName": "辽源",
+    "pinYin": "liaoyuan",
+    "py": "ly",
+    "code": "220400"
+  },
+  "临沧": {
+    "cityName": "临沧",
+    "pinYin": "lincang",
+    "py": "lc",
+    "code": "530900",
+    "airCode": "LNJ"
+  },
+  "乐东黎族自治县": {
+    "cityName": "乐东黎族自治县",
+    "pinYin": "ledonglizuzizhixian",
+    "py": "ldlzzzx",
+    "code": "469033"
+  },
+  "临夏": {
+    "cityName": "临夏",
+    "pinYin": "linxiahuizuzizhizhou",
+    "py": "lxhzzzz",
+    "code": "622900"
+  },
+  "临高县": {
+    "cityName": "临高县",
+    "pinYin": "lingao",
+    "py": "lg",
+    "code": "469028"
+  },
+  "莱阳": {
+    "cityName": "莱阳",
+    "pinYin": "laiyang",
+    "py": "ly",
+    "code": "370682"
+  },
+  "莱州": {
+    "cityName": "莱州",
+    "pinYin": "laizhou",
+    "py": "lz",
+    "code": "370683"
+  },
+  "阆中": {
+    "cityName": "阆中",
+    "pinYin": "langzhong",
+    "py": "lz",
+    "code": "511381"
+  },
+  "兰溪": {
+    "cityName": "兰溪",
+    "pinYin": "lanxi",
+    "py": "lx",
+    "code": "330781"
+  },
+  "耒阳": {
+    "cityName": "耒阳",
+    "pinYin": "leiyang",
+    "py": "ly",
+    "code": "430481"
+  },
+  "乐陵": {
+    "cityName": "乐陵",
+    "pinYin": "leling",
+    "py": "ll",
+    "code": "371481"
+  },
+  "乐清": {
+    "cityName": "乐清",
+    "pinYin": "leqing",
+    "py": "lq",
+    "code": "330382"
+  },
+  "连城": {
+    "cityName": "连城",
+    "pinYin": "liancheng",
+    "py": "lc",
+    "code": "350825",
+    "airCode": "LCX"
+  },
+  "连州": {
+    "cityName": "连州",
+    "pinYin": "lianzhou",
+    "py": "lz",
+    "code": "441882"
+  },
+  "醴陵": {
+    "cityName": "醴陵",
+    "pinYin": "liling",
+    "py": "ll",
+    "code": "430281"
+  },
+  "临安": {
+    "cityName": "临安",
+    "pinYin": "linan",
+    "py": "la",
+    "code": "330185"
+  },
+  "灵宝": {
+    "cityName": "灵宝",
+    "pinYin": "lingbao",
+    "py": "lb",
+    "code": "411282"
+  },
+  "灵石县": {
+    "cityName": "灵石县",
+    "pinYin": "lingshixian",
+    "py": "lsx",
+    "code": "140729"
+  },
+  "临海": {
+    "cityName": "临海",
+    "pinYin": "linhai",
+    "py": "lh",
+    "code": "331082"
+  },
+  "临河": {
+    "cityName": "临河",
+    "pinYin": "linhe",
+    "py": "lh",
+    "code": "150802"
+  },
+  "临湘": {
+    "cityName": "临湘",
+    "pinYin": "linxiang",
+    "py": "lx",
+    "code": "430682"
+  },
+  "林芝县": {
+    "cityName": "林芝县",
+    "pinYin": "linzhixian",
+    "py": "lzx",
+    "code": "542621"
+  },
+  "黎平": {
+    "cityName": "黎平",
+    "pinYin": "liping",
+    "py": "lp",
+    "code": "522631",
+    "airCode": "HZH"
+  },
+  "荔浦县": {
+    "cityName": "荔浦县",
+    "pinYin": "lipuxian",
+    "py": "ltx",
+    "code": "450331"
+  },
+  "浏阳": {
+    "cityName": "浏阳",
+    "pinYin": "liuyang",
+    "py": "ly",
+    "code": "430181"
+  },
+  "龙海": {
+    "cityName": "龙海",
+    "pinYin": "longhai",
+    "py": "lh",
+    "code": "350681"
+  },
+  "隆化县": {
+    "cityName": "隆化县",
+    "pinYin": "longhuaxian",
+    "py": "lhx",
+    "code": "130825"
+  },
+  "龙口": {
+    "cityName": "龙口",
+    "pinYin": "longkou",
+    "py": "lk",
+    "code": "370681"
+  },
+  "龙门县": {
+    "cityName": "龙门县",
+    "pinYin": "longmenxian",
+    "py": "lmx",
+    "code": "441324"
+  },
+  "滦平县": {
+    "cityName": "滦平县",
+    "pinYin": "luanpingxian",
+    "py": "lpx",
+    "code": "130824"
+  },
+  "滦县": {
+    "cityName": "滦县",
+    "pinYin": "luanxian",
+    "py": "lx",
+    "code": "130223"
+  },
+  "泸沽湖": {
+    "cityName": "泸沽湖",
+    "pinYin": "luguhu",
+    "py": "lgh",
+    "code": "100028"
+  },
+  "庐山": {
+    "cityName": "庐山",
+    "pinYin": "lushan",
+    "py": "ls",
+    "code": "360402",
+    "airCode": "LUZ"
+  },
+  "潞西": {
+    "cityName": "潞西",
+    "pinYin": "luxi",
+    "py": "lx",
+    "code": "533103"
+  },
+  "绵阳": {
+    "cityName": "绵阳",
+    "pinYin": "mianyang",
+    "py": "my",
+    "code": "510700",
+    "airCode": "MIG"
+  },
+  "茂名": {
+    "cityName": "茂名",
+    "pinYin": "maoming",
+    "py": "mm",
+    "code": "440900"
+  },
+  "牡丹江": {
+    "cityName": "牡丹江",
+    "pinYin": "mudanjiang",
+    "py": "mdj",
+    "code": "231000",
+    "airCode": "MDG"
+  },
+  "马鞍山": {
+    "cityName": "马鞍山",
+    "pinYin": "maanshan",
+    "py": "mas",
+    "code": "340500"
+  },
+  "梅州": {
+    "cityName": "梅州",
+    "pinYin": "meizhou",
+    "py": "mz",
+    "code": "441400",
+    "airCode": "MXZ"
+  },
+  "眉山": {
+    "cityName": "眉山",
+    "pinYin": "meishan",
+    "py": "ms",
+    "code": "511400"
+  },
+  "苗栗县": {
+    "cityName": "苗栗县",
+    "pinYin": "miaolixian",
+    "py": "mlx",
+    "code": "711500"
+  },
+  "满洲里": {
+    "cityName": "满洲里",
+    "pinYin": "manzhouli",
+    "py": "mzl",
+    "code": "150781",
+    "airCode": "NZH"
+  },
+  "梅县": {
+    "cityName": "梅县",
+    "pinYin": "meixian",
+    "py": "mx",
+    "code": "441421"
+  },
+  "绵竹": {
+    "cityName": "绵竹",
+    "pinYin": "mianzhu",
+    "py": "mz",
+    "code": "510683"
+  },
+  "汨罗": {
+    "cityName": "汨罗",
+    "pinYin": "miluo",
+    "py": "ml",
+    "code": "430681"
+  },
+  "漠河": {
+    "cityName": "漠河",
+    "pinYin": "mohe",
+    "py": "kc",
+    "code": "232723",
+    "airCode": "OHE"
+  },
+  "木渎": {
+    "cityName": "木渎",
+    "pinYin": "mudu",
+    "py": "md",
+    "code": "100001"
+  },
+  "南昌": {
+    "cityName": "南昌",
+    "pinYin": "nanchang",
+    "py": "nc",
+    "code": "360100",
+    "airCode": "KHN"
+  },
+  "南宁": {
+    "cityName": "南宁",
+    "pinYin": "nanning",
+    "py": "nn",
+    "code": "450100",
+    "airCode": "NNG"
+  },
+  "南通": {
+    "cityName": "南通",
+    "pinYin": "nantong",
+    "py": "nt",
+    "code": "320600",
+    "airCode": "NTG"
+  },
+  "南充": {
+    "cityName": "南充",
+    "pinYin": "nanchong",
+    "py": "nc",
+    "code": "511300",
+    "airCode": "NAO"
+  },
+  "宁德": {
+    "cityName": "宁德",
+    "pinYin": "ningde",
+    "py": "nd",
+    "code": "350900"
+  },
+  "南阳": {
+    "cityName": "南阳",
+    "pinYin": "nanyang",
+    "py": "ny",
+    "code": "411300",
+    "airCode": "NNY"
+  },
+  "南平": {
+    "cityName": "南平",
+    "pinYin": "nanping",
+    "py": "np",
+    "code": "350700"
+  },
+  "内江": {
+    "cityName": "内江",
+    "pinYin": "neijiang",
+    "py": "nj",
+    "code": "511000"
+  },
+  "南投县": {
+    "cityName": "南投县",
+    "pinYin": "nantouxian",
+    "py": "ntx",
+    "code": "710600"
+  },
+  "那曲": {
+    "cityName": "那曲",
+    "pinYin": "naqu",
+    "py": "nq",
+    "code": "542400"
+  },
+  "怒江傈僳族自治州": {
+    "cityName": "怒江傈僳族自治州",
+    "pinYin": "nujianglisuzuzizhizhou",
+    "py": "njlszzzz",
+    "code": "533300"
+  },
+  "南沙群岛": {
+    "cityName": "南沙群岛",
+    "pinYin": "nanshaqundaoxian",
+    "py": "nsqdx",
+    "code": "469038"
+  },
+  "南安": {
+    "cityName": "南安",
+    "pinYin": "nanan",
+    "py": "na",
+    "code": "350583"
+  },
+  "南澳县": {
+    "cityName": "南澳县",
+    "pinYin": "nanaoxian",
+    "py": "nax",
+    "code": "440523"
+  },
+  "南浔": {
+    "cityName": "南浔",
+    "pinYin": "nanxun",
+    "py": "nx",
+    "code": "330503"
+  },
+  "宁城县": {
+    "cityName": "宁城县",
+    "pinYin": "ningchengxian",
+    "py": "ncx",
+    "code": "150429"
+  },
+  "宁海县": {
+    "cityName": "宁海县",
+    "pinYin": "ninghaixian",
+    "py": "nhx",
+    "code": "330226"
+  },
+  "莆田": {
+    "cityName": "莆田",
+    "pinYin": "putian",
+    "py": "pt",
+    "code": "350300"
+  },
+  "平顶山": {
+    "cityName": "平顶山",
+    "pinYin": "pingdingshan",
+    "py": "pds",
+    "code": "410400"
+  },
+  "萍乡": {
+    "cityName": "萍乡",
+    "pinYin": "pingxiang",
+    "py": "px",
+    "code": "360300"
+  },
+  "屏东县": {
+    "cityName": "屏东县",
+    "pinYin": "pingdongxian",
+    "py": "pdx",
+    "code": "712400"
+  },
+  "濮阳": {
+    "cityName": "濮阳",
+    "pinYin": "puyang",
+    "py": "tq",
+    "code": "410900"
+  },
+  "攀枝花": {
+    "cityName": "攀枝花",
+    "pinYin": "panzhihua",
+    "py": "pzh",
+    "code": "510400",
+    "airCode": "PZI"
+  },
+  "盘锦": {
+    "cityName": "盘锦",
+    "pinYin": "panjin",
+    "py": "pj",
+    "code": "211100"
+  },
+  "普洱": {
+    "cityName": "普洱",
+    "pinYin": "puer",
+    "py": "pe",
+    "code": "530800",
+    "airCode": "SYM"
+  },
+  "平凉": {
+    "cityName": "平凉",
+    "pinYin": "pingliang",
+    "py": "pl",
+    "code": "620800"
+  },
+  "澎湖县": {
+    "cityName": "澎湖县",
+    "pinYin": "penghuxian",
+    "py": "phx",
+    "code": "712700"
+  },
+  "磐安县": {
+    "cityName": "磐安县",
+    "pinYin": "pananxian",
+    "py": "pax",
+    "code": "330727"
+  },
+  "蓬莱": {
+    "cityName": "蓬莱",
+    "pinYin": "penglai",
+    "py": "pl",
+    "code": "370684",
+    "airCode": "PNJ"
+  },
+  "彭州": {
+    "cityName": "彭州",
+    "pinYin": "pengzhou",
+    "py": "pz",
+    "code": "510182"
+  },
+  "平湖": {
+    "cityName": "平湖",
+    "pinYin": "pinghu",
+    "py": "ph",
+    "code": "330482"
+  },
+  "平乐": {
+    "cityName": "平乐",
+    "pinYin": "pinglexian",
+    "py": "plx",
+    "code": "450330"
+  },
+  "平遥县": {
+    "cityName": "平遥县",
+    "pinYin": "pingyaoxian",
+    "py": "pyx",
+    "code": "140728"
+  },
+  "浦江县": {
+    "cityName": "浦江县",
+    "pinYin": "pujiangxian",
+    "py": "pjx",
+    "code": "330726"
+  },
+  "普宁": {
+    "cityName": "普宁",
+    "pinYin": "puning",
+    "py": "pn",
+    "code": "445281"
+  },
+  "普陀山": {
+    "cityName": "普陀山",
+    "pinYin": "putuoshan",
+    "py": "pts",
+    "code": "100008"
+  },
+  "青岛": {
+    "cityName": "青岛",
+    "pinYin": "qingdao",
+    "py": "qd",
+    "code": "370200",
+    "airCode": "TAO"
+  },
+  "秦皇岛": {
+    "cityName": "秦皇岛",
+    "pinYin": "qinhuangdao",
+    "py": "qhd",
+    "code": "130300",
+    "airCode": "BPE"
+  },
+  "泉州": {
+    "cityName": "泉州",
+    "pinYin": "quanzhou",
+    "py": "qz",
+    "code": "350500"
+  },
+  "清远": {
+    "cityName": "清远",
+    "pinYin": "qingyuan",
+    "py": "qy",
+    "code": "441800"
+  },
+  "黔东南苗族侗族自治州": {
+    "cityName": "黔东南苗族侗族自治州",
+    "pinYin": "qiandongnanmiaozudongzuzizhizhou",
+    "py": "qdnmzdzzzz",
+    "code": "522600"
+  },
+  "齐齐哈尔": {
+    "cityName": "齐齐哈尔",
+    "pinYin": "qiqihaer",
+    "py": "qqhe",
+    "code": "230200",
+    "airCode": "NDG"
+  },
+  "衢州": {
+    "cityName": "衢州",
+    "pinYin": "quzhou",
+    "py": "qz",
+    "code": "330800",
+    "airCode": "JUZ"
+  },
+  "琼海": {
+    "cityName": "琼海",
+    "pinYin": "qionghai",
+    "py": "qh",
+    "code": "469002",
+    "airCode": "BAR"
+  },
+  "曲靖": {
+    "cityName": "曲靖",
+    "pinYin": "qujing",
+    "py": "qj",
+    "code": "530300"
+  },
+  "钦州": {
+    "cityName": "钦州",
+    "pinYin": "qinzhou",
+    "py": "qz",
+    "code": "450700"
+  },
+  "黔南布依族苗族自治州": {
+    "cityName": "黔南布依族苗族自治州",
+    "pinYin": "qiannanbuyizumiaozuzizhizhou",
+    "py": "qnbyzmzzzz",
+    "code": "522700"
+  },
+  "黔西南布依族苗族自治州": {
+    "cityName": "黔西南布依族苗族自治州",
+    "pinYin": "qianxinanbuyizumiaozuzizhizhou",
+    "py": "qxnbyzmzzzz",
+    "code": "522300"
+  },
+  "庆阳": {
+    "cityName": "庆阳",
+    "pinYin": "qingyang",
+    "py": "qy",
+    "code": "621000",
+    "airCode": "IQN"
+  },
+  "潜江": {
+    "cityName": "潜江",
+    "pinYin": "qianjiang",
+    "py": "qj",
+    "code": "429005"
+  },
+  "七台河": {
+    "cityName": "七台河",
+    "pinYin": "qitaihe",
+    "py": "qth",
+    "code": "230900"
+  },
+  "琼中黎族苗族自治县": {
+    "cityName": "琼中黎族苗族自治县",
+    "pinYin": "qiongzhonglizumiaozuzizhixian",
+    "py": "qzlzmzzzx",
+    "code": "469036"
+  },
+  "千岛湖": {
+    "cityName": "千岛湖",
+    "pinYin": "qiandaohu",
+    "py": "qdh",
+    "code": "100017"
+  },
+  "乾县": {
+    "cityName": "乾县",
+    "pinYin": "qianxian",
+    "py": "qx",
+    "code": "610424"
+  },
+  "祁门县": {
+    "cityName": "祁门县",
+    "pinYin": "qimenxian",
+    "py": "qmx",
+    "code": "341024"
+  },
+  "青城山": {
+    "cityName": "青城山",
+    "pinYin": "qingchengshan",
+    "py": "qcs",
+    "code": "100023"
+  },
+  "青铜峡": {
+    "cityName": "青铜峡",
+    "pinYin": "qingtongxia",
+    "py": "qtx",
+    "code": "640381"
+  },
+  "清新县": {
+    "cityName": "清新县",
+    "pinYin": "qingxinxian",
+    "py": "qxx",
+    "code": "441827"
+  },
+  "邛崃": {
+    "cityName": "邛崃",
+    "pinYin": "qionglai",
+    "py": "ql",
+    "code": "510183"
+  },
+  "岐山县": {
+    "cityName": "岐山县",
+    "pinYin": "qishanxian",
+    "py": "qsx",
+    "code": "610323"
+  },
+  "栖霞": {
+    "cityName": "栖霞",
+    "pinYin": "qixia",
+    "py": "qx",
+    "code": "370686"
+  },
+  "祁县": {
+    "cityName": "祁县",
+    "pinYin": "qixian",
+    "py": "qx",
+    "code": "140727"
+  },
+  "曲阜": {
+    "cityName": "曲阜",
+    "pinYin": "qufu",
+    "py": "qf",
+    "code": "370881"
+  },
+  "日照": {
+    "cityName": "日照",
+    "pinYin": "rizhao",
+    "py": "rz",
+    "code": "371100",
+    "airCode": "RIZ"
+  },
+  "日喀则": {
+    "cityName": "日喀则",
+    "pinYin": "rikaze",
+    "py": "rikaze",
+    "code": "542300",
+    "airCode": "RKZ"
+  },
+  "仁化县": {
+    "cityName": "仁化县",
+    "pinYin": "renhuaxian",
+    "py": "rhx",
+    "code": "440224"
+  },
+  "日月潭": {
+    "cityName": "日月潭",
+    "pinYin": "riyuetan",
+    "py": "ryt",
+    "code": "100030"
+  },
+  "瑞安": {
+    "cityName": "瑞安",
+    "pinYin": "ruian",
+    "py": "ra",
+    "code": "330381"
+  },
+  "瑞昌": {
+    "cityName": "瑞昌",
+    "pinYin": "ruichang",
+    "py": "rc",
+    "code": "360481"
+  },
+  "芮城县": {
+    "cityName": "芮城县",
+    "pinYin": "ruichengxian",
+    "py": "rcx",
+    "code": "140830"
+  },
+  "瑞丽": {
+    "cityName": "瑞丽",
+    "pinYin": "ruili",
+    "py": "rl",
+    "code": "533102"
+  },
+  "沈阳": {
+    "cityName": "沈阳",
+    "pinYin": "shenyang",
+    "py": "sy",
+    "code": "210100",
+    "airCode": "SHE"
+  },
+  "石家庄": {
+    "cityName": "石家庄",
+    "pinYin": "shijiazhuang",
+    "py": "sjz",
+    "code": "130100",
+    "airCode": "SJW"
+  },
+  "绍兴": {
+    "cityName": "绍兴",
+    "pinYin": "shaoxing",
+    "py": "sx",
+    "code": "330600"
+  },
+  "汕头": {
+    "cityName": "汕头",
+    "pinYin": "shantou",
+    "py": "st",
+    "code": "440500"
+  },
+  "上饶": {
+    "cityName": "上饶",
+    "pinYin": "shangrao",
+    "py": "sr",
+    "code": "361100"
+  },
+  "韶关": {
+    "cityName": "韶关",
+    "pinYin": "shaoguan",
+    "py": "sg",
+    "code": "440200",
+    "airCode": "SHG"
+  },
+  "十堰": {
+    "cityName": "十堰",
+    "pinYin": "shiyan",
+    "py": "sy",
+    "code": "420300",
+    "airCode": "WDS"
+  },
+  "商丘": {
+    "cityName": "商丘",
+    "pinYin": "shangqiu",
+    "py": "sq",
+    "code": "411400"
+  },
+  "汕尾": {
+    "cityName": "汕尾",
+    "pinYin": "shanwei",
+    "py": "sw",
+    "code": "441500"
+  },
+  "三明": {
+    "cityName": "三明",
+    "pinYin": "sanming",
+    "py": "sm",
+    "code": "350400",
+    "airCode": "SQJ"
+  },
+  "宿迁": {
+    "cityName": "宿迁",
+    "pinYin": "suqian",
+    "py": "sq",
+    "code": "321300"
+  },
+  "遂宁": {
+    "cityName": "遂宁",
+    "pinYin": "suining",
+    "py": "sn",
+    "code": "510900"
+  },
+  "宿州": {
+    "cityName": "宿州",
+    "pinYin": "suzhou",
+    "py": "sz",
+    "code": "341300"
+  },
+  "邵阳": {
+    "cityName": "邵阳",
+    "pinYin": "shaoyang",
+    "py": "sy",
+    "code": "430500",
+    "airCode": "SYG"
+  },
+  "三门峡": {
+    "cityName": "三门峡",
+    "pinYin": "sanmenxia",
+    "py": "smx",
+    "code": "411200"
+  },
+  "随州": {
+    "cityName": "随州",
+    "pinYin": "suizhou",
+    "py": "sz",
+    "code": "421300"
+  },
+  "四平": {
+    "cityName": "四平",
+    "pinYin": "siping",
+    "py": "sp",
+    "code": "220300"
+  },
+  "商洛": {
+    "cityName": "商洛",
+    "pinYin": "shangluo",
+    "py": "sn",
+    "code": "611000"
+  },
+  "绥化": {
+    "cityName": "绥化",
+    "pinYin": "suihua",
+    "py": "hl",
+    "code": "231200"
+  },
+  "朔州": {
+    "cityName": "朔州",
+    "pinYin": "shuozhou",
+    "py": "sz",
+    "code": "140600"
+  },
+  "松原": {
+    "cityName": "松原",
+    "pinYin": "songyuan",
+    "py": "sy",
+    "code": "220700"
+  },
+  "神农架林区": {
+    "cityName": "神农架林区",
+    "pinYin": "shennongjialinqu",
+    "py": "snjlq",
+    "code": "429021"
+  },
+  "石河子": {
+    "cityName": "石河子",
+    "pinYin": "shihezi",
+    "py": "shz",
+    "code": "659001",
+    "airCode": "SHF"
+  },
+  "石嘴山": {
+    "cityName": "石嘴山",
+    "pinYin": "shizuishan",
+    "py": "szs",
+    "code": "640200"
+  },
+  "双鸭山": {
+    "cityName": "双鸭山",
+    "pinYin": "shuangyashan",
+    "py": "sys",
+    "code": "230500"
+  },
+  "山南": {
+    "cityName": "山南",
+    "pinYin": "shannandiqu",
+    "py": "sndq",
+    "code": "542200"
+  },
+  "三河": {
+    "cityName": "三河",
+    "pinYin": "sanhe",
+    "py": "sh",
+    "code": "131082"
+  },
+  "三门县": {
+    "cityName": "三门县",
+    "pinYin": "sanmenxian",
+    "py": "smx",
+    "code": "331022"
+  },
+  "三清山": {
+    "cityName": "三清山",
+    "pinYin": "sanqingshan",
+    "py": "sqs",
+    "code": "100022"
+  },
+  "三亚湾": {
+    "cityName": "三亚湾",
+    "pinYin": "sanyawan",
+    "py": "syw",
+    "code": "100019"
+  },
+  "上虞": {
+    "cityName": "上虞",
+    "pinYin": "shangyu",
+    "py": "sy",
+    "code": "330682"
+  },
+  "山海关": {
+    "cityName": "山海关",
+    "pinYin": "shanhaiguan",
+    "py": "shg",
+    "code": "130303"
+  },
+  "山阴县": {
+    "cityName": "山阴县",
+    "pinYin": "shanyinxian",
+    "py": "syx",
+    "code": "140621"
+  },
+  "韶山": {
+    "cityName": "韶山",
+    "pinYin": "shaoshan",
+    "py": "ss",
+    "code": "430382"
+  },
+  "绍兴县": {
+    "cityName": "绍兴县",
+    "pinYin": "shaoxingxian",
+    "py": "sxx",
+    "code": "330621"
+  },
+  "沙县": {
+    "cityName": "沙县",
+    "pinYin": "shaxian",
+    "py": "sx",
+    "code": "350427"
+  },
+  "嵊泗": {
+    "cityName": "嵊泗",
+    "pinYin": "shengsixian",
+    "py": "ssx",
+    "code": "330922"
+  },
+  "嵊州": {
+    "cityName": "嵊州",
+    "pinYin": "shengzhou",
+    "py": "sz",
+    "code": "330683"
+  },
+  "神木县": {
+    "cityName": "神木县",
+    "pinYin": "shenmuxian",
+    "py": "smx",
+    "code": "610821"
+  },
+  "歙县": {
+    "cityName": "歙县",
+    "pinYin": "shexian",
+    "py": "sx",
+    "code": "341021"
+  },
+  "石狮": {
+    "cityName": "石狮",
+    "pinYin": "shishi",
+    "py": "ss",
+    "code": "350581"
+  },
+  "双廊": {
+    "cityName": "双廊",
+    "pinYin": "shuanglang",
+    "py": "sl",
+    "code": "100041"
+  },
+  "束河古镇": {
+    "cityName": "束河古镇",
+    "pinYin": "shuheguzhen",
+    "py": "shgz",
+    "code": "100016"
+  },
+  "四会": {
+    "cityName": "四会",
+    "pinYin": "sihui",
+    "py": "sh",
+    "code": "441284"
+  },
+  "思茅": {
+    "cityName": "思茅",
+    "pinYin": "simao",
+    "py": "sm",
+    "code": "530802",
+    "airCode": "SYM"
+  },
+  "遂昌": {
+    "cityName": "遂昌",
+    "pinYin": "suichang",
+    "py": "sc",
+    "code": "331123"
+  },
+  "绥中县": {
+    "cityName": "绥中县",
+    "pinYin": "suizhongxian",
+    "py": "szx",
+    "code": "211421"
+  },
+  "太原": {
+    "cityName": "太原",
+    "pinYin": "taiyuan",
+    "py": "ty",
+    "code": "140100",
+    "airCode": "TYN"
+  },
+  "台北": {
+    "cityName": "台北",
+    "pinYin": "taibeishi",
+    "py": "tbs",
+    "code": "710100",
+    "airCode": "TPE"
+  },
+  "泰安": {
+    "cityName": "泰安",
+    "pinYin": "taian",
+    "py": "ta",
+    "code": "370900"
+  },
+  "台州": {
+    "cityName": "台州",
+    "pinYin": "taizhou",
+    "py": "tz",
+    "code": "331000",
+    "airCode": "HYN"
+  },
+  "唐山": {
+    "cityName": "唐山",
+    "pinYin": "tangshan",
+    "py": "ts",
+    "code": "130200",
+    "airCode": "TVS"
+  },
+  "泰州": {
+    "cityName": "泰州",
+    "pinYin": "taizhou",
+    "py": "tz",
+    "code": "321200"
+  },
+  "天水": {
+    "cityName": "天水",
+    "pinYin": "tianshui",
+    "py": "ts",
+    "code": "620500",
+    "airCode": "THQ"
+  },
+  "通辽": {
+    "cityName": "通辽",
+    "pinYin": "tongliao",
+    "py": "tl",
+    "code": "150500",
+    "airCode": "TGO"
+  },
+  "铜仁": {
+    "cityName": "铜仁",
+    "pinYin": "tongren",
+    "py": "tr",
+    "code": "522200",
+    "airCode": "TEN"
+  },
+  "铜陵": {
+    "cityName": "铜陵",
+    "pinYin": "tongling",
+    "py": "tl",
+    "code": "340700"
+  },
+  "通化": {
+    "cityName": "通化",
+    "pinYin": "tonghua",
+    "py": "th",
+    "code": "220500",
+    "airCode": "TNH"
+  },
+  "铁岭": {
+    "cityName": "铁岭",
+    "pinYin": "tieling",
+    "py": "tl",
+    "code": "211200"
+  },
+  "台中": {
+    "cityName": "台中",
+    "pinYin": "taizhongshi",
+    "py": "tzs",
+    "code": "710400"
+  },
+  "吐鲁番": {
+    "cityName": "吐鲁番",
+    "pinYin": "tulufan",
+    "py": "tlf",
+    "code": "652100",
+    "airCode": "TLQ"
+  },
+  "铜川": {
+    "cityName": "铜川",
+    "pinYin": "tongchuan",
+    "py": "tc",
+    "code": "610200"
+  },
+  "天门": {
+    "cityName": "天门",
+    "pinYin": "tianmen",
+    "py": "tm",
+    "code": "429006"
+  },
+  "台南": {
+    "cityName": "台南",
+    "pinYin": "tainanshi",
+    "py": "tns",
+    "code": "710300"
+  },
+  "塔城": {
+    "cityName": "塔城",
+    "pinYin": "tacheng",
+    "py": "tc",
+    "code": "654200",
+    "airCode": "TCG"
+  },
+  "桃园县": {
+    "cityName": "桃园县",
+    "pinYin": "taoyuanxian",
+    "py": "tyx",
+    "code": "711400"
+  },
+  "台东县": {
+    "cityName": "台东县",
+    "pinYin": "taidongxian",
+    "py": "tdx",
+    "code": "712500"
+  },
+  "台南县": {
+    "cityName": "台南县",
+    "pinYin": "tainanxian",
+    "py": "tnx",
+    "code": "712200"
+  },
+  "屯昌县": {
+    "cityName": "屯昌县",
+    "pinYin": "tunchang",
+    "py": "tc",
+    "code": "469026"
+  },
+  "图木舒克": {
+    "cityName": "图木舒克",
+    "pinYin": "tumushuke",
+    "py": "tmsk",
+    "code": "659003"
+  },
+  "太仓": {
+    "cityName": "太仓",
+    "pinYin": "taicang",
+    "py": "tc",
+    "code": "320585"
+  },
+  "太湖县": {
+    "cityName": "太湖县",
+    "pinYin": "taihuxian",
+    "py": "th",
+    "code": "340825"
+  },
+  "泰山": {
+    "cityName": "泰山",
+    "pinYin": "taishan",
+    "py": "ts",
+    "code": "370902"
+  },
+  "台山": {
+    "cityName": "台山",
+    "pinYin": "taishan",
+    "py": "ts",
+    "code": "440781"
+  },
+  "台湾": {
+    "cityName": "台湾",
+    "pinYin": "taiwan",
+    "py": "tw",
+    "code": "100035"
+  },
+  "腾冲": {
+    "cityName": "腾冲",
+    "pinYin": "tengchong",
+    "py": "tc",
+    "code": "530522",
+    "airCode": "TCZ"
+  },
+  "滕州": {
+    "cityName": "滕州",
+    "pinYin": "tengzhou",
+    "py": "tz",
+    "code": "370481"
+  },
+  "天台县": {
+    "cityName": "天台县",
+    "pinYin": "tiantaixian",
+    "py": "ttx",
+    "code": "331023"
+  },
+  "同里": {
+    "cityName": "同里",
+    "pinYin": "tongli",
+    "py": "tl",
+    "code": "100003"
+  },
+  "桐庐县": {
+    "cityName": "桐庐县",
+    "pinYin": "tongluxian",
+    "py": "tlx",
+    "code": "330122"
+  },
+  "桐乡": {
+    "cityName": "桐乡",
+    "pinYin": "tongxiang",
+    "py": "tx",
+    "code": "330483",
+    "airCode": "TVX"
+  },
+  "屯溪": {
+    "cityName": "屯溪",
+    "pinYin": "tunxi",
+    "py": "tx",
+    "code": "341002"
+  },
+  "无锡": {
+    "cityName": "无锡",
+    "pinYin": "wuxi",
+    "py": "wx",
+    "code": "320200",
+    "airCode": "WUX"
+  },
+  "温州": {
+    "cityName": "温州",
+    "pinYin": "wenzhou",
+    "py": "wz",
+    "code": "330300",
+    "airCode": "WNZ"
+  },
+  "乌鲁木齐": {
+    "cityName": "乌鲁木齐",
+    "pinYin": "wulumuqi",
+    "py": "wlmq",
+    "code": "650100",
+    "airCode": "URC"
+  },
+  "威海": {
+    "cityName": "威海",
+    "pinYin": "weihai",
+    "py": "wh",
+    "code": "371000",
+    "airCode": "WEH"
+  },
+  "潍坊": {
+    "cityName": "潍坊",
+    "pinYin": "weifang",
+    "py": "wf",
+    "code": "370700",
+    "airCode": "WEF"
+  },
+  "芜湖": {
+    "cityName": "芜湖",
+    "pinYin": "wuhu",
+    "py": "wh",
+    "code": "340200"
+  },
+  "渭南": {
+    "cityName": "渭南",
+    "pinYin": "weinan",
+    "py": "wn",
+    "code": "610500"
+  },
+  "梧州": {
+    "cityName": "梧州",
+    "pinYin": "wuzhou",
+    "py": "wz",
+    "code": "450400",
+    "airCode": "WUZ"
+  },
+  "万宁": {
+    "cityName": "万宁",
+    "pinYin": "wangning",
+    "py": "wn",
+    "code": "469006"
+  },
+  "文昌": {
+    "cityName": "文昌",
+    "pinYin": "wenchang",
+    "py": "wc",
+    "code": "469005"
+  },
+  "武威": {
+    "cityName": "武威",
+    "pinYin": "wuwei",
+    "py": "ww",
+    "code": "620600"
+  },
+  "文山": {
+    "cityName": "文山",
+    "pinYin": "wenshan",
+    "py": "ws",
+    "code": "532600",
+    "airCode": "WNH"
+  },
+  "乌兰察布": {
+    "cityName": "乌兰察布",
+    "pinYin": "wulanchabu",
+    "py": "wlcb",
+    "code": "150900",
+    "airCode": "UCB"
+  },
+  "乌海": {
+    "cityName": "乌海",
+    "pinYin": "wuhai",
+    "py": "wh",
+    "code": "150300",
+    "airCode": "WUA"
+  },
+  "五指山": {
+    "cityName": "五指山",
+    "pinYin": "wuzhishan",
+    "py": "wzs",
+    "code": "469001"
+  },
+  "吴忠": {
+    "cityName": "吴忠",
+    "pinYin": "wuzhong",
+    "py": "wz",
+    "code": "640300"
+  },
+  "五家渠": {
+    "cityName": "五家渠",
+    "pinYin": "wujiaqu",
+    "py": "wjq",
+    "code": "659004"
+  },
+  "万州": {
+    "cityName": "万州",
+    "pinYin": "wanzhou",
+    "py": "wz",
+    "code": "500101",
+    "airCode": "WXN"
+  },
+  "涠洲岛": {
+    "cityName": "涠洲岛",
+    "pinYin": "weizhoudao",
+    "py": "wzd",
+    "code": "100039"
+  },
+  "温岭": {
+    "cityName": "温岭",
+    "pinYin": "wenling",
+    "py": "wl",
+    "code": "331081"
+  },
+  "五大连池": {
+    "cityName": "五大连池",
+    "pinYin": "wudalianchi",
+    "py": "wdlc",
+    "code": "231182"
+  },
+  "武当山": {
+    "cityName": "武当山",
+    "pinYin": "wudangshan",
+    "py": "wds",
+    "code": "100040"
+  },
+  "吴江": {
+    "cityName": "吴江",
+    "pinYin": "wujiang",
+    "py": "wj",
+    "code": "320584"
+  },
+  "乌兰浩特": {
+    "cityName": "乌兰浩特",
+    "pinYin": "wulanhaote",
+    "py": "wlht",
+    "code": "152201",
+    "airCode": "HLH"
+  },
+  "巫山县": {
+    "cityName": "巫山县",
+    "pinYin": "wushanxian",
+    "py": "wsx",
+    "code": "500237"
+  },
+  "五台山": {
+    "cityName": "五台山",
+    "pinYin": "wutaishan",
+    "py": "wts",
+    "code": "100000"
+  },
+  "武夷山": {
+    "cityName": "武夷山",
+    "pinYin": "wuyishan",
+    "py": "wys",
+    "code": "350782",
+    "airCode": "WUS"
+  },
+  "武义县": {
+    "cityName": "武义县",
+    "pinYin": "wuyixian",
+    "py": "wyx",
+    "code": "330723"
+  },
+  "婺源县": {
+    "cityName": "婺源县",
+    "pinYin": "wuyuanxian",
+    "py": "wyx",
+    "code": "361130"
+  },
+  "乌镇": {
+    "cityName": "乌镇",
+    "pinYin": "wuzhen",
+    "py": "wz",
+    "code": "100006"
+  },
+  "西宁": {
+    "cityName": "西宁",
+    "pinYin": "xining",
+    "py": "xn",
+    "code": "630100",
+    "airCode": "XNN"
+  },
+  "徐州": {
+    "cityName": "徐州",
+    "pinYin": "xuzhou",
+    "py": "xz",
+    "code": "320300",
+    "airCode": "XUZ"
+  },
+  "湘西土家族苗族自治州": {
+    "cityName": "湘西土家族苗族自治州",
+    "pinYin": "xiangxitujiazumiaozuzizhizhou",
+    "py": "xxtjzmzzzz",
+    "code": "433100"
+  },
+  "西双版纳": {
+    "cityName": "西双版纳",
+    "pinYin": "xishuangbanna",
+    "py": "xsbn",
+    "code": "532800",
+    "airCode": "JHG"
+  },
+  "咸阳": {
+    "cityName": "咸阳",
+    "pinYin": "xianyang",
+    "py": "xy",
+    "code": "610400"
+  },
+  "新乡": {
+    "cityName": "新乡",
+    "pinYin": "xinxiang",
+    "py": "xx",
+    "code": "410700"
+  },
+  "信阳": {
+    "cityName": "信阳",
+    "pinYin": "xinyang",
+    "py": "xy",
+    "code": "411500"
+  },
+  "襄樊": {
+    "cityName": "襄樊",
+    "pinYin": "xiangfan",
+    "py": "xf",
+    "code": "420600"
+  },
+  "许昌": {
+    "cityName": "许昌",
+    "pinYin": "xuchang",
+    "py": "xc",
+    "code": "411000"
+  },
+  "湘潭": {
+    "cityName": "湘潭",
+    "pinYin": "xiangtan",
+    "py": "xt",
+    "code": "430300"
+  },
+  "邢台": {
+    "cityName": "邢台",
+    "pinYin": "xingtai",
+    "py": "xt",
+    "code": "130500",
+    "airCode": "XNT"
+  },
+  "孝感": {
+    "cityName": "孝感",
+    "pinYin": "xiaogan",
+    "py": "xg",
+    "code": "420900"
+  },
+  "咸宁": {
+    "cityName": "咸宁",
+    "pinYin": "xianning",
+    "py": "xn",
+    "code": "421200"
+  },
+  "忻州": {
+    "cityName": "忻州",
+    "pinYin": "xinzhou",
+    "py": "xz",
+    "code": "140900",
+    "airCode": "WUT"
+  },
+  "宣城": {
+    "cityName": "宣城",
+    "pinYin": "xuancheng",
+    "py": "xc",
+    "code": "341800"
+  },
+  "新余": {
+    "cityName": "新余",
+    "pinYin": "xinyu",
+    "py": "xy",
+    "code": "360500"
+  },
+  "仙桃": {
+    "cityName": "仙桃",
+    "pinYin": "xiantao",
+    "py": "xt",
+    "code": "429004"
+  },
+  "锡林郭勒盟": {
+    "cityName": "锡林郭勒盟",
+    "pinYin": "xilinguole",
+    "py": "xlgl",
+    "code": "152500"
+  },
+  "兴安盟": {
+    "cityName": "兴安盟",
+    "pinYin": "xinganmeng",
+    "py": "xam",
+    "code": "152200"
+  },
+  "新北": {
+    "cityName": "新北",
+    "pinYin": "xinbeishi",
+    "py": "xbx",
+    "code": "711100"
+  },
+  "新竹县": {
+    "cityName": "新竹县",
+    "pinYin": "xinzhuxian",
+    "py": "xzx",
+    "code": "711300"
+  },
+  "新竹": {
+    "cityName": "新竹",
+    "pinYin": "xinzhushi",
+    "py": "xzs",
+    "code": "710800"
+  },
+  "西沙群岛": {
+    "cityName": "西沙群岛",
+    "pinYin": "xishaqundaoxian",
+    "py": "xsqdx",
+    "code": "469037"
+  },
+  "香格里拉": {
+    "cityName": "香格里拉",
+    "pinYin": "xianggelila",
+    "py": "xgll",
+    "code": "533421"
+  },
+  "象山县": {
+    "cityName": "象山县",
+    "pinYin": "xiangshanxian",
+    "py": "xsx",
+    "code": "330225"
+  },
+  "湘乡": {
+    "cityName": "湘乡",
+    "pinYin": "xiangxiang",
+    "py": "xx",
+    "code": "430381"
+  },
+  "仙居县": {
+    "cityName": "仙居县",
+    "pinYin": "xianjuxian",
+    "py": "xjx",
+    "code": "331024"
+  },
+  "西昌": {
+    "cityName": "西昌",
+    "pinYin": "xichang",
+    "py": "xc",
+    "code": "513401",
+    "airCode": "XIC"
+  },
+  "锡林浩特": {
+    "cityName": "锡林浩特",
+    "pinYin": "xilinhaote",
+    "py": "xlht",
+    "code": "152502",
+    "airCode": "XIL"
+  },
+  "新昌县": {
+    "cityName": "新昌县",
+    "pinYin": "xinchangxian",
+    "py": "xcx",
+    "code": "330624"
+  },
+  "兴城": {
+    "cityName": "兴城",
+    "pinYin": "xingcheng",
+    "py": "xc",
+    "code": "211481",
+    "airCode": "XEN"
+  },
+  "兴隆县": {
+    "cityName": "兴隆县",
+    "pinYin": "xinglongxian",
+    "py": "xlx",
+    "code": "130822"
+  },
+  "兴宁": {
+    "cityName": "兴宁",
+    "pinYin": "xingning",
+    "py": "xn",
+    "code": "441481",
+    "airCode": "XIN"
+  },
+  "荥阳": {
+    "cityName": "荥阳",
+    "pinYin": "xingyang",
+    "py": "xy",
+    "code": "410182"
+  },
+  "兴义": {
+    "cityName": "兴义",
+    "pinYin": "xingyi",
+    "py": "xy",
+    "code": "522301",
+    "airCode": "ACX"
+  },
+  "新密": {
+    "cityName": "新密",
+    "pinYin": "xinmi",
+    "py": "xm",
+    "code": "410183"
+  },
+  "新民": {
+    "cityName": "新民",
+    "pinYin": "xinmin",
+    "py": "xm",
+    "code": "210181"
+  },
+  "新郑": {
+    "cityName": "新郑",
+    "pinYin": "xinzheng",
+    "py": "xz",
+    "code": "410184"
+  },
+  "西塘": {
+    "cityName": "西塘",
+    "pinYin": "xitang",
+    "py": "xt",
+    "code": "100005"
+  },
+  "休宁县": {
+    "cityName": "休宁县",
+    "pinYin": "xiuningxian",
+    "py": "xnx",
+    "code": "341022"
+  },
+  "巽寮湾": {
+    "cityName": "巽寮湾",
+    "pinYin": "xunliaowan",
+    "py": "xlw",
+    "code": "100031"
+  },
+  "盱眙县": {
+    "cityName": "盱眙县",
+    "pinYin": "xuyixian",
+    "py": "xyx",
+    "code": "320830"
+  },
+  "阳江": {
+    "cityName": "阳江",
+    "pinYin": "yangjiang",
+    "py": "yj",
+    "code": "441700"
+  },
+  "烟台": {
+    "cityName": "烟台",
+    "pinYin": "yantai",
+    "py": "yt",
+    "code": "370600",
+    "airCode": "YNT"
+  },
+  "扬州": {
+    "cityName": "扬州",
+    "pinYin": "yangzhou",
+    "py": "yz",
+    "code": "321000",
+    "airCode": "YTY"
+  },
+  "宜昌": {
+    "cityName": "宜昌",
+    "pinYin": "yichang",
+    "py": "yc",
+    "code": "420500",
+    "airCode": "YIH"
+  },
+  "银川": {
+    "cityName": "银川",
+    "pinYin": "yinchuan",
+    "py": "yc",
+    "code": "640100",
+    "airCode": "INC"
+  },
+  "盐城": {
+    "cityName": "盐城",
+    "pinYin": "yancheng",
+    "py": "yc",
+    "code": "320900",
+    "airCode": "YNZ"
+  },
+  "玉溪": {
+    "cityName": "玉溪",
+    "pinYin": "yuxi",
+    "py": "yx",
+    "code": "530400"
+  },
+  "岳阳": {
+    "cityName": "岳阳",
+    "pinYin": "yueyang",
+    "py": "yy",
+    "code": "430600"
+  },
+  "宜春": {
+    "cityName": "宜春",
+    "pinYin": "yichun",
+    "py": "yc",
+    "code": "360900",
+    "airCode": "YIC"
+  },
+  "宜宾": {
+    "cityName": "宜宾",
+    "pinYin": "yibin",
+    "py": "yb",
+    "code": "511500",
+    "airCode": "YBP"
+  },
+  "榆林": {
+    "cityName": "榆林",
+    "pinYin": "yulin",
+    "py": "yl",
+    "code": "610800",
+    "airCode": "UYN"
+  },
+  "营口": {
+    "cityName": "营口",
+    "pinYin": "yingkou",
+    "py": "yk",
+    "code": "210800",
+    "airCode": "YKH"
+  },
+  "运城": {
+    "cityName": "运城",
+    "pinYin": "yuncheng",
+    "py": "yc",
+    "code": "140800",
+    "airCode": "YCU"
+  },
+  "延安": {
+    "cityName": "延安",
+    "pinYin": "yanan",
+    "py": "ya",
+    "code": "610600",
+    "airCode": "ENY"
+  },
+  "玉林": {
+    "cityName": "玉林",
+    "pinYin": "yulin",
+    "py": "yl",
+    "code": "450900"
+  },
+  "雅安": {
+    "cityName": "雅安",
+    "pinYin": "yaan",
+    "py": "hy",
+    "code": "511800"
+  },
+  "延吉": {
+    "cityName": "延吉",
+    "pinYin": "yanji",
+    "py": "yj",
+    "code": "222400",
+    "airCode": "YNJ"
+  },
+  "永州": {
+    "cityName": "永州",
+    "pinYin": "yongzhou",
+    "py": "yz",
+    "code": "431100",
+    "airCode": "LLF"
+  },
+  "鹰潭": {
+    "cityName": "鹰潭",
+    "pinYin": "yingtan",
+    "py": "yt",
+    "code": "360600"
+  },
+  "益阳": {
+    "cityName": "益阳",
+    "pinYin": "yiyang",
+    "py": "yy",
+    "code": "430900"
+  },
+  "伊犁哈萨克自治州": {
+    "cityName": "伊犁哈萨克自治州",
+    "pinYin": "yilihasakezizhizhou",
+    "py": "ylhskzzz",
+    "code": "654000"
+  },
+  "云浮": {
+    "cityName": "云浮",
+    "pinYin": "yunfu",
+    "py": "yf",
+    "code": "445300"
+  },
+  "阳泉": {
+    "cityName": "阳泉",
+    "pinYin": "yangquan",
+    "py": "yq",
+    "code": "140300"
+  },
+  "伊春": {
+    "cityName": "伊春",
+    "pinYin": "yichun",
+    "py": "yc",
+    "code": "230700",
+    "airCode": "LDS"
+  },
+  "宜兰县": {
+    "cityName": "宜兰县",
+    "pinYin": "yilanxian",
+    "py": "ylx",
+    "code": "711200"
+  },
+  "玉树": {
+    "cityName": "玉树",
+    "pinYin": "yushu",
+    "py": "kc",
+    "code": "632700",
+    "airCode": "YUS"
+  },
+  "云林县": {
+    "cityName": "云林县",
+    "pinYin": "yunlinxian",
+    "py": "ylx",
+    "code": "712100"
+  },
+  "亚布力": {
+    "cityName": "亚布力",
+    "pinYin": "yabuli",
+    "py": "ybl",
+    "code": "100025"
+  },
+  "牙克石": {
+    "cityName": "牙克石",
+    "pinYin": "yakeshi",
+    "py": "yks",
+    "code": "150782"
+  },
+  "亚龙湾": {
+    "cityName": "亚龙湾",
+    "pinYin": "yalongwan",
+    "py": "ylw",
+    "code": "100020"
+  },
+  "雁荡山": {
+    "cityName": "雁荡山",
+    "pinYin": "yandangshan",
+    "py": "yds",
+    "code": "100004"
+  },
+  "阳朔": {
+    "cityName": "阳朔",
+    "pinYin": "yangshuoxian",
+    "py": "ysx",
+    "code": "450321"
+  },
+  "扬中": {
+    "cityName": "扬中",
+    "pinYin": "yangzhong",
+    "py": "yz",
+    "code": "321182"
+  },
+  "偃师": {
+    "cityName": "偃师",
+    "pinYin": "yanshi",
+    "py": "ys",
+    "code": "410381"
+  },
+  "兖州": {
+    "cityName": "兖州",
+    "pinYin": "yanzhou",
+    "py": "yz",
+    "code": "370882"
+  },
+  "宜都": {
+    "cityName": "宜都",
+    "pinYin": "yidu",
+    "py": "yd",
+    "code": "420581"
+  },
+  "义马": {
+    "cityName": "义马",
+    "pinYin": "yima",
+    "py": "ym",
+    "code": "411281"
+  },
+  "英德": {
+    "cityName": "英德",
+    "pinYin": "yingde",
+    "py": "yd",
+    "code": "441881"
+  },
+  "应县": {
+    "cityName": "应县",
+    "pinYin": "yingxian",
+    "py": "yx",
+    "code": "140622"
+  },
+  "伊宁": {
+    "cityName": "伊宁",
+    "pinYin": "yining",
+    "py": "yn",
+    "code": "654002",
+    "airCode": "YIN"
+  },
+  "义乌": {
+    "cityName": "义乌",
+    "pinYin": "yiwu",
+    "py": "yw",
+    "code": "330782",
+    "airCode": "YIW"
+  },
+  "黟县": {
+    "cityName": "黟县",
+    "pinYin": "yixian",
+    "py": "yx",
+    "code": "341023"
+  },
+  "宜兴": {
+    "cityName": "宜兴",
+    "pinYin": "yixing",
+    "py": "yx",
+    "code": "320282"
+  },
+  "永安": {
+    "cityName": "永安",
+    "pinYin": "yongan",
+    "py": "ya",
+    "code": "350481"
+  },
+  "永城": {
+    "cityName": "永城",
+    "pinYin": "yongcheng",
+    "py": "yc",
+    "code": "411481"
+  },
+  "永济": {
+    "cityName": "永济",
+    "pinYin": "yongji",
+    "py": "yj",
+    "code": "140881"
+  },
+  "永康": {
+    "cityName": "永康",
+    "pinYin": "yongkang",
+    "py": "yk",
+    "code": "330784"
+  },
+  "右玉县": {
+    "cityName": "右玉县",
+    "pinYin": "youyuxian",
+    "py": "yyx",
+    "code": "140623"
+  },
+  "禹城": {
+    "cityName": "禹城",
+    "pinYin": "yucheng",
+    "py": "yc",
+    "code": "371482"
+  },
+  "玉环县": {
+    "cityName": "玉环县",
+    "pinYin": "yuhuanxian",
+    "py": "yhx",
+    "code": "331021"
+  },
+  "玉门": {
+    "cityName": "玉门",
+    "pinYin": "yumen",
+    "py": "ym",
+    "code": "620981"
+  },
+  "余姚": {
+    "cityName": "余姚",
+    "pinYin": "yuyao",
+    "py": "yy",
+    "code": "330281"
+  },
+  "禹州": {
+    "cityName": "禹州",
+    "pinYin": "yuzhou",
+    "py": "yz",
+    "code": "411081"
+  },
+  "珠海": {
+    "cityName": "珠海",
+    "pinYin": "zhuhai",
+    "py": "zh",
+    "code": "440400",
+    "airCode": "ZUH"
+  },
+  "舟山": {
+    "cityName": "舟山",
+    "pinYin": "zhoushan",
+    "py": "zs",
+    "code": "330900",
+    "airCode": "HSN"
+  },
+  "张家界": {
+    "cityName": "张家界",
+    "pinYin": "zhangjiajie",
+    "py": "zjj",
+    "code": "430800",
+    "airCode": "DYG"
+  },
+  "中山": {
+    "cityName": "中山",
+    "pinYin": "zhongshan",
+    "py": "ds",
+    "code": "442000"
+  },
+  "漳州": {
+    "cityName": "漳州",
+    "pinYin": "zhangzhou",
+    "py": "zz",
+    "code": "350600"
+  },
+  "湛江": {
+    "cityName": "湛江",
+    "pinYin": "zhanjiang",
+    "py": "zj",
+    "code": "440800",
+    "airCode": "ZHA"
+  },
+  "镇江": {
+    "cityName": "镇江",
+    "pinYin": "zhenjiang",
+    "py": "zj",
+    "code": "321100",
+    "airCode": "ZUJ"
+  },
+  "淄博": {
+    "cityName": "淄博",
+    "pinYin": "zibo",
+    "py": "zb",
+    "code": "370300"
+  },
+  "肇庆": {
+    "cityName": "肇庆",
+    "pinYin": "zhaoqing",
+    "py": "zq",
+    "code": "441200"
+  },
+  "株洲": {
+    "cityName": "株洲",
+    "pinYin": "zhuzhou",
+    "py": "zz",
+    "code": "430200"
+  },
+  "遵义": {
+    "cityName": "遵义",
+    "pinYin": "zunyi",
+    "py": "zy",
+    "code": "520300",
+    "airCode": "ZYI"
+  },
+  "张家口": {
+    "cityName": "张家口",
+    "pinYin": "zhangjiakou",
+    "py": "zjk",
+    "code": "130700",
+    "airCode": "ZQZ"
+  },
+  "枣庄": {
+    "cityName": "枣庄",
+    "pinYin": "zaozhuang",
+    "py": "zz",
+    "code": "370400"
+  },
+  "驻马店": {
+    "cityName": "驻马店",
+    "pinYin": "zhumadian",
+    "py": "zmd",
+    "code": "411700"
+  },
+  "周口": {
+    "cityName": "周口",
+    "pinYin": "zhoukou",
+    "py": "zk",
+    "code": "411600"
+  },
+  "张掖": {
+    "cityName": "张掖",
+    "pinYin": "zhangye",
+    "py": "zy",
+    "code": "620700",
+    "airCode": "YZY"
+  },
+  "自贡": {
+    "cityName": "自贡",
+    "pinYin": "zigong",
+    "py": "zg",
+    "code": "510300"
+  },
+  "中卫": {
+    "cityName": "中卫",
+    "pinYin": "zhongwei",
+    "py": "zw",
+    "code": "640500",
+    "airCode": "ZHY"
+  },
+  "昭通": {
+    "cityName": "昭通",
+    "pinYin": "zhaotong",
+    "py": "zt",
+    "code": "530600",
+    "airCode": "ZAT"
+  },
+  "资阳": {
+    "cityName": "资阳",
+    "pinYin": "ziyang",
+    "py": "zy",
+    "code": "512000"
+  },
+  "彰化县": {
+    "cityName": "彰化县",
+    "pinYin": "zhanghuaxian",
+    "py": "zhx",
+    "code": "711700"
+  },
+  "中沙群岛的岛礁及其海域": {
+    "cityName": "中沙群岛的岛礁及其海域",
+    "pinYin": "zhongshaqundaodidaojiaojiqihaiyu",
+    "py": "zsqdddjjqhy",
+    "code": "469039"
+  },
+  "扎兰屯": {
+    "cityName": "扎兰屯",
+    "pinYin": "zalantun",
+    "py": "zlt",
+    "code": "150783",
+    "airCode": "NZL"
+  },
+  "增城": {
+    "cityName": "增城",
+    "pinYin": "zengcheng",
+    "py": "zc",
+    "code": "440183"
+  },
+  "曾厝垵": {
+    "cityName": "曾厝垵",
+    "pinYin": "zengcuoan",
+    "py": "zca",
+    "code": "100042"
+  },
+  "张家港": {
+    "cityName": "张家港",
+    "pinYin": "zhangjiagang",
+    "py": "zjg",
+    "code": "320582"
+  },
+  "漳平": {
+    "cityName": "漳平",
+    "pinYin": "zhangping",
+    "py": "zp",
+    "code": "350881"
+  },
+  "赵县": {
+    "cityName": "赵县",
+    "pinYin": "zhaoxian",
+    "py": "zx",
+    "code": "130133"
+  },
+  "招远": {
+    "cityName": "招远",
+    "pinYin": "zhaoyuan",
+    "py": "zy",
+    "code": "370685"
+  },
+  "镇宁布依族苗族自治县": {
+    "cityName": "镇宁布依族苗族自治县",
+    "pinYin": "zhenningbuyizumiaozuzizhixian",
+    "py": "znbyzmzzzx",
+    "code": "520423"
+  },
+  "枝江": {
+    "cityName": "枝江",
+    "pinYin": "zhijiang",
+    "py": "zj",
+    "code": "420583"
+  },
+  "芷江": {
+    "cityName": "芷江",
+    "pinYin": "zhijiangdongzuzizhixian",
+    "py": "zjdzzzx",
+    "code": "431228",
+    "airCode": "HJJ"
+  },
+  "周庄": {
+    "cityName": "周庄",
+    "pinYin": "zhouzhuang",
+    "py": "zz",
+    "code": "100002"
+  },
+  "诸暨": {
+    "cityName": "诸暨",
+    "pinYin": "zhuji",
+    "py": "zj",
+    "code": "330681"
+  },
+  "朱家尖": {
+    "cityName": "朱家尖",
+    "pinYin": "zhujiajian",
+    "py": "zjj",
+    "code": "100043"
+  },
+  "涿州": {
+    "cityName": "涿州",
+    "pinYin": "zhuozhou",
+    "py": "zz",
+    "code": "130681"
+  },
+  "邹城": {
+    "cityName": "邹城",
+    "pinYin": "zoucheng",
+    "py": "zc",
+    "code": "370883"
+  },
+  "遵化": {
+    "cityName": "遵化",
+    "pinYin": "zunhua",
+    "py": "zh",
+    "code": "130281"
+  },
+  "曼谷": {
+    "cityName": "曼谷",
+    "pinYin": "mangu",
+    "py": "mg",
+    "code": "904976"
+  },
+  "普吉岛": {
+    "cityName": "普吉岛",
+    "pinYin": "pujidao",
+    "py": "pjd",
+    "code": "904986"
+  },
+  "新加坡": {
+    "cityName": "新加坡",
+    "pinYin": "xinjiapo",
+    "py": "xjp",
+    "code": "904544",
+    "airCode": "SIN"
+  },
+  "首尔": {
+    "cityName": "首尔",
+    "pinYin": "shouer",
+    "py": "se",
+    "code": "903551",
+    "airCode": "SEL"
+  },
+  "清迈": {
+    "cityName": "清迈",
+    "pinYin": "qingmai",
+    "py": "qm",
+    "code": "904973"
+  },
+  "亚庇": {
+    "cityName": "亚庇",
+    "pinYin": "yabi",
+    "py": "yb",
+    "code": "912188"
+  },
+  "芭堤雅": {
+    "cityName": "芭堤雅",
+    "pinYin": "badiya",
+    "py": "bdy",
+    "code": "904974"
+  },
+  "吉隆坡": {
+    "cityName": "吉隆坡",
+    "pinYin": "jilongpo",
+    "py": "jlp",
+    "code": "903673",
+    "airCode": "KUL"
+  },
+  "济州岛": {
+    "cityName": "济州岛",
+    "pinYin": "jizhoudao",
+    "py": "jzd",
+    "code": "903552"
+  },
+  "东京": {
+    "cityName": "东京",
+    "pinYin": "dongjing",
+    "py": "dj",
+    "code": "903457",
+    "airCode": "TYO"
+  },
+  "苏梅岛": {
+    "cityName": "苏梅岛",
+    "pinYin": "sumeidao",
+    "py": "smd",
+    "code": "904998",
+    "airCode": "USM"
+  },
+  "甲米": {
+    "cityName": "甲米",
+    "pinYin": "jiami",
+    "py": "jm",
+    "code": "904981",
+    "airCode": "KBV"
+  },
+  "巴厘岛": {
+    "cityName": "巴厘岛",
+    "pinYin": "balidao",
+    "py": "bld",
+    "code": "902887",
+    "airCode": "DPS"
+  },
+  "沙巴": {
+    "cityName": "沙巴",
+    "pinYin": "shaba",
+    "py": "sb",
+    "code": "903668",
+    "airCode": "BKI"
+  },
+  "大阪": {
+    "cityName": "大阪",
+    "pinYin": "daban",
+    "py": "db",
+    "code": "903466",
+    "airCode": "OSA"
+  },
+  "胡志明市": {
+    "cityName": "胡志明市",
+    "pinYin": "huzhimingshi",
+    "py": "hzms",
+    "code": "907592"
+  },
+  "纽约(纽约州)": {
+    "cityName": "纽约(纽约州)",
+    "pinYin": "niuyue",
+    "py": "ny",
+    "code": "905457"
+  },
+  "悉尼": {
+    "cityName": "悉尼",
+    "pinYin": "xini",
+    "py": "xn",
+    "code": "901157",
+    "airCode": "SYD"
+  },
+  "冲绳": {
+    "cityName": "冲绳",
+    "pinYin": "chongsheng",
+    "py": "cs",
+    "code": "903475"
+  },
+  "京都": {
+    "cityName": "京都",
+    "pinYin": "jingdou",
+    "py": "jd",
+    "code": "903451"
+  },
+  "迪拜": {
+    "cityName": "迪拜",
+    "pinYin": "dibai",
+    "py": "db",
+    "code": "905152",
+    "airCode": "DXB"
+  },
+  "巴黎": {
+    "cityName": "巴黎",
+    "pinYin": "bali",
+    "py": "bl",
+    "code": "902013"
+  },
+  "伦敦": {
+    "cityName": "伦敦",
+    "pinYin": "lundun",
+    "py": "ld",
+    "code": "905165",
+    "airCode": "LON"
+  },
+  "新德里": {
+    "cityName": "新德里",
+    "pinYin": "xindeli",
+    "py": "xdl",
+    "code": "902707"
+  },
+  "罗马": {
+    "cityName": "罗马",
+    "pinYin": "luoma",
+    "py": "lm",
+    "code": "903139",
+    "airCode": "ROM"
+  },
+  "伊斯坦布尔": {
+    "cityName": "伊斯坦布尔",
+    "pinYin": "yisitanbuer",
+    "py": "ystbe",
+    "code": "905096"
+  },
+  "巴塞罗那": {
+    "cityName": "巴塞罗那",
+    "pinYin": "basailuona",
+    "py": "bsln",
+    "code": "904572",
+    "airCode": "BCN"
+  },
+  "河内": {
+    "cityName": "河内",
+    "pinYin": "henei",
+    "py": "hn",
+    "code": "907590",
+    "airCode": "HAN"
+  },
+  "华欣/七岩": {
+    "cityName": "华欣/七岩",
+    "pinYin": "huaxinqiyan",
+    "py": "hxqy",
+    "code": "904991"
+  },
+  "暹粒": {
+    "cityName": "暹粒",
+    "pinYin": "xianli",
+    "py": "xl",
+    "code": "901596"
+  },
+  "万隆": {
+    "cityName": "万隆",
+    "pinYin": "wanlong",
+    "py": "wl",
+    "code": "902891"
+  },
+  "柏林": {
+    "cityName": "柏林",
+    "pinYin": "bolin",
+    "py": "bl",
+    "code": "902249"
+  },
+  "马德里": {
+    "cityName": "马德里",
+    "pinYin": "madeli",
+    "py": "mdl",
+    "code": "904590",
+    "airCode": "MAD"
+  },
+  "马尼拉": {
+    "cityName": "马尼拉",
+    "pinYin": "manila",
+    "py": "mnl",
+    "code": "904140",
+    "airCode": "MNL"
+  },
+  "班加罗尔/卡纳塔卡": {
+    "cityName": "班加罗尔/卡纳塔卡",
+    "pinYin": "banjialuoerkanataka",
+    "py": "bjlekntk",
+    "code": "902674"
+  },
+  "墨尔本": {
+    "cityName": "墨尔本",
+    "pinYin": "moerben",
+    "py": "meb",
+    "code": "901115"
+  },
+  "果阿": {
+    "cityName": "果阿",
+    "pinYin": "guoa",
+    "py": "ga",
+    "code": "902698"
+  },
+  "开普敦": {
+    "cityName": "开普敦",
+    "pinYin": "kaipudun",
+    "py": "kpd",
+    "code": "904398",
+    "airCode": "CPT"
+  },
+  "雅加达": {
+    "cityName": "雅加达",
+    "pinYin": "yajiada",
+    "py": "yjd",
+    "code": "902881"
+  },
+  "布达佩斯": {
+    "cityName": "布达佩斯",
+    "pinYin": "budapeisi",
+    "py": "bdps",
+    "code": "902568",
+    "airCode": "BUD"
+  },
+  "日惹": {
+    "cityName": "日惹",
+    "pinYin": "rire",
+    "py": "rr",
+    "code": "902884"
+  },
+  "黄金海岸": {
+    "cityName": "黄金海岸",
+    "pinYin": "huangjinhaian",
+    "py": "hjha",
+    "code": "901179"
+  },
+  "加德满都": {
+    "cityName": "加德满都",
+    "pinYin": "jiademandou",
+    "py": "jdmd",
+    "code": "903926",
+    "airCode": "KTM"
+  },
+  "孟买": {
+    "cityName": "孟买",
+    "pinYin": "mengmai",
+    "py": "mm",
+    "code": "902716",
+    "airCode": "BOM"
+  },
+  "金边": {
+    "cityName": "金边",
+    "pinYin": "jinbian",
+    "py": "jb",
+    "code": "901595",
+    "airCode": "PNH"
+  },
+  "长滩岛/卡提克兰": {
+    "cityName": "长滩岛/卡提克兰",
+    "pinYin": "zhangtandaokatikelan",
+    "py": "ztdktkl",
+    "code": "904145"
+  },
+  "宿雾市": {
+    "cityName": "宿雾市",
+    "pinYin": "suwushi",
+    "py": "sws",
+    "code": "904142"
+  },
+  "龙目岛": {
+    "cityName": "龙目岛",
+    "pinYin": "longmudao",
+    "py": "lmd",
+    "code": "902886"
+  },
+  "槟城": {
+    "cityName": "槟城",
+    "pinYin": "bincheng",
+    "py": "bc",
+    "code": "903678"
+  },
+  "马六甲": {
+    "cityName": "马六甲",
+    "pinYin": "maliujia",
+    "py": "mlj",
+    "code": "903674"
+  },
+  "斋浦尔": {
+    "cityName": "斋浦尔",
+    "pinYin": "zhaipuer",
+    "py": "zpe",
+    "code": "902687"
+  },
+  "康提": {
+    "cityName": "康提",
+    "pinYin": "kangti",
+    "py": "kt",
+    "code": "904841"
+  },
+  "岘港": {
+    "cityName": "岘港",
+    "pinYin": "xiangang",
+    "py": "xg",
+    "code": "907596",
+    "airCode": "DAD"
+  },
+  "约翰内斯堡": {
+    "cityName": "约翰内斯堡",
+    "pinYin": "yuehanneisibao",
+    "py": "yhnsb",
+    "code": "904405",
+    "airCode": "JNB"
+  },
+  "帕岸岛": {
+    "cityName": "帕岸岛",
+    "pinYin": "paandao",
+    "py": "pad",
+    "code": "905003"
+  },
+  "洛杉矶 (加利福尼亚州)": {
+    "cityName": "洛杉矶 (加利福尼亚州)",
+    "pinYin": "luoshanji",
+    "py": "lsj",
+    "code": "906119"
+  },
+  "兰卡威": {
+    "cityName": "兰卡威",
+    "pinYin": "lankawei",
+    "py": "lkw",
+    "code": "903679",
+    "airCode": "LGK"
+  },
+  "利雅德": {
+    "cityName": "利雅德",
+    "pinYin": "liyade",
+    "py": "lyd",
+    "code": "904520"
+  },
+  "芽庄": {
+    "cityName": "芽庄",
+    "pinYin": "yazhuang",
+    "py": "yz",
+    "code": "907589"
+  },
+  "釜山": {
+    "cityName": "釜山",
+    "pinYin": "fushan",
+    "py": "fs",
+    "code": "903553",
+    "airCode": "PUS"
+  },
+  "布拉格": {
+    "cityName": "布拉格",
+    "pinYin": "bulage",
+    "py": "blg",
+    "code": "901808",
+    "airCode": "PRG"
+  },
+  "钦奈": {
+    "cityName": "钦奈",
+    "pinYin": "qinnai",
+    "py": "qn",
+    "code": "902726"
+  },
+  "毛里求斯岛": {
+    "cityName": "毛里求斯岛",
+    "pinYin": "maoliqiusidao",
+    "py": "mlqsd",
+    "code": "903786"
+  },
+  "圣彼得堡": {
+    "cityName": "圣彼得堡",
+    "pinYin": "shengbidebao",
+    "py": "sbdb",
+    "code": "904372",
+    "airCode": "LED"
+  },
+  "米兰": {
+    "cityName": "米兰",
+    "pinYin": "milan",
+    "py": "ml",
+    "code": "903138",
+    "airCode": "MIL"
+  },
+  "科伦坡": {
+    "cityName": "科伦坡",
+    "pinYin": "kelunpo",
+    "py": "klp",
+    "code": "904838",
+    "airCode": "CMB"
+  },
+  "考艾/呵叻": {
+    "cityName": "考艾/呵叻",
+    "pinYin": "kaoaihele",
+    "py": "kahl",
+    "code": "904990"
+  },
+  "布里斯班": {
+    "cityName": "布里斯班",
+    "pinYin": "bulisiban",
+    "py": "blsb",
+    "code": "901104",
+    "airCode": "BNE"
+  },
+  "琅勃拉邦": {
+    "cityName": "琅勃拉邦",
+    "pinYin": "langbolabang",
+    "py": "lblb",
+    "code": "903620"
+  },
+  "马拉喀什": {
+    "cityName": "马拉喀什",
+    "pinYin": "malakashen",
+    "py": "mlks",
+    "code": "903887"
+  },
+  "塞舌尔群岛": {
+    "cityName": "塞舌尔群岛",
+    "pinYin": "saisheerqundao",
+    "py": "sseqd",
+    "code": "911155"
+  },
+  "浦那": {
+    "cityName": "浦那",
+    "pinYin": "punei",
+    "py": "pn",
+    "code": "902720"
+  },
+  "奥克兰": {
+    "cityName": "奥克兰",
+    "pinYin": "aokelan",
+    "py": "akl",
+    "code": "903984"
+  },
+  "阳光海岸": {
+    "cityName": "阳光海岸",
+    "pinYin": "yangguanghaian",
+    "py": "ygha",
+    "code": "901230"
+  },
+  "高知": {
+    "cityName": "高知",
+    "pinYin": "gaozhi",
+    "py": "gz",
+    "code": "902704"
+  },
+  "薄荷岛": {
+    "cityName": "薄荷岛",
+    "pinYin": "bohedao",
+    "py": "bhd",
+    "code": "904147"
+  },
+  "大叻": {
+    "cityName": "大叻",
+    "pinYin": "dale",
+    "py": "dl",
+    "code": "907593"
+  },
+  "莫斯科": {
+    "cityName": "莫斯科",
+    "pinYin": "mosike",
+    "py": "msk",
+    "code": "904373",
+    "airCode": "MOW"
+  },
+  "马尔代夫群岛": {
+    "cityName": "马尔代夫群岛",
+    "pinYin": "maerdaifuqundao",
+    "py": "medfqd",
+    "code": "903767"
+  },
+  "藩切": {
+    "cityName": "藩切",
+    "pinYin": "fanqie",
+    "py": "fq",
+    "code": "907595"
+  },
+  "斯里那加": {
+    "cityName": "斯里那加",
+    "pinYin": "silineijia",
+    "py": "slnj",
+    "code": "902694"
+  },
+  "兰塔岛 (甲米)": {
+    "cityName": "兰塔岛 (甲米)",
+    "pinYin": "lantadao",
+    "py": "ltd",
+    "code": "904994"
+  },
+  "长野": {
+    "cityName": "长野",
+    "pinYin": "zhangye",
+    "py": "zy",
+    "code": "903449"
+  },
+  "会安": {
+    "cityName": "会安",
+    "pinYin": "huian",
+    "py": "ha",
+    "code": "907597"
+  },
+  "凯恩斯": {
+    "cityName": "凯恩斯",
+    "pinYin": "kaiensi",
+    "py": "kes",
+    "code": "901150",
+    "airCode": "CNS"
+  },
+  "海德拉巴": {
+    "cityName": "海德拉巴",
+    "pinYin": "haidelaba",
+    "py": "hdlb",
+    "code": "902686",
+    "airCode": "HYD"
+  },
+  "慕尼黑": {
+    "cityName": "慕尼黑",
+    "pinYin": "munihei",
+    "py": "mnh",
+    "code": "902347",
+    "airCode": "MUC"
+  },
+  "公主港": {
+    "cityName": "公主港",
+    "pinYin": "gongzhugang",
+    "py": "gzg",
+    "code": "908086"
+  },
+  "下龙": {
+    "cityName": "下龙",
+    "pinYin": "xialong",
+    "py": "xl",
+    "code": "907601"
+  },
+  "奥兰多 (佛罗里达州)": {
+    "cityName": "奥兰多 (佛罗里达州)",
+    "pinYin": "aolanduo",
+    "py": "ald",
+    "code": "906007"
+  },
+  "象岛": {
+    "cityName": "象岛",
+    "pinYin": "xiangdao",
+    "py": "xd",
+    "code": "904993"
+  },
+  "顺化": {
+    "cityName": "顺化",
+    "pinYin": "shunhua",
+    "py": "sh",
+    "code": "907591"
+  },
+  "圣托里尼/提拉": {
+    "cityName": "圣托里尼/提拉",
+    "pinYin": "shengtuolinitila",
+    "py": "stlntl",
+    "code": "902481"
+  },
+  "爱丁堡": {
+    "cityName": "爱丁堡",
+    "pinYin": "aidingbao",
+    "py": "adb",
+    "code": "905334",
+    "airCode": "EDI"
+  },
+  "仰光": {
+    "cityName": "仰光",
+    "pinYin": "yangguang",
+    "py": "yg",
+    "code": "903905",
+    "airCode": "RGN"
+  },
+  "努瓦拉埃利亚": {
+    "cityName": "努瓦拉埃利亚",
+    "pinYin": "nuwalaailiya",
+    "py": "nwlaly",
+    "code": "904839"
+  },
+  "阿格拉": {
+    "cityName": "阿格拉",
+    "pinYin": "agela",
+    "py": "agl",
+    "code": "902692"
+  },
+  "万象": {
+    "cityName": "万象",
+    "pinYin": "wanxiang",
+    "py": "wx",
+    "code": "903619"
+  },
+  "佛罗伦萨": {
+    "cityName": "佛罗伦萨",
+    "pinYin": "foluolunsa",
+    "py": "flls",
+    "code": "903136"
+  },
+  "头顿": {
+    "cityName": "头顿",
+    "pinYin": "toudun",
+    "py": "td",
+    "code": "907603"
+  },
+  "拜县": {
+    "cityName": "拜县",
+    "pinYin": "baixian",
+    "py": "bx",
+    "code": "905029"
+  },
+  "乌代浦": {
+    "cityName": "乌代浦",
+    "pinYin": "wudaipu",
+    "py": "wdp",
+    "code": "902673"
+  },
+  "加尔各答": {
+    "cityName": "加尔各答",
+    "pinYin": "jiaergeda",
+    "py": "jegd",
+    "code": "902679",
+    "airCode": "CCU"
+  },
+  "柔佛巴鲁": {
+    "cityName": "柔佛巴鲁",
+    "pinYin": "roufobalu",
+    "py": "rfbl",
+    "code": "903665"
+  },
+  "基督城": {
+    "cityName": "基督城",
+    "pinYin": "jiducheng",
+    "py": "jdc",
+    "code": "912147",
+    "airCode": "CHC"
+  },
+  "西哈努克": {
+    "cityName": "西哈努克",
+    "pinYin": "xihanuke",
+    "py": "xhnk",
+    "code": "901597"
+  },
+  "威尼斯": {
+    "cityName": "威尼斯",
+    "pinYin": "weinisi",
+    "py": "wns",
+    "code": "903141",
+    "airCode": "VCE"
+  },
+  "福冈": {
+    "cityName": "福冈",
+    "pinYin": "fugang",
+    "py": "fg",
+    "code": "903476",
+    "airCode": "FUK"
+  },
+  "安曼": {
+    "cityName": "安曼",
+    "pinYin": "anman",
+    "py": "am",
+    "code": "903537",
+    "airCode": "AMM"
+  },
+  "珀斯": {
+    "cityName": "珀斯",
+    "pinYin": "posi",
+    "py": "ps",
+    "code": "901139",
+    "airCode": "PSL"
+  },
+  "拉斯维加斯 (内华达州)": {
+    "cityName": "拉斯维加斯 (内华达州)",
+    "pinYin": "lasiweijiasi",
+    "py": "lswjs",
+    "code": "906302"
+  },
+  "德班": {
+    "cityName": "德班",
+    "pinYin": "deban",
+    "py": "db",
+    "code": "904408"
+  },
+  "清莱": {
+    "cityName": "清莱",
+    "pinYin": "qinglai",
+    "py": "ql",
+    "code": "904969",
+    "airCode": "CEI"
+  },
+  "博卡拉": {
+    "cityName": "博卡拉",
+    "pinYin": "bokala",
+    "py": "bkl",
+    "code": "911893"
+  },
+  "旧金山 (加利福尼亚州)": {
+    "cityName": "旧金山 (加利福尼亚州)",
+    "pinYin": "jiujinshan",
+    "py": "jjs",
+    "code": "906181"
+  },
+  "阿德莱德": {
+    "cityName": "阿德莱德",
+    "pinYin": "adelaide",
+    "py": "adld",
+    "code": "901140"
+  },
+  "孔敬": {
+    "cityName": "孔敬",
+    "pinYin": "kongjing",
+    "py": "kj",
+    "code": "904972"
+  },
+  "泗水": {
+    "cityName": "泗水",
+    "pinYin": "sishui",
+    "py": "ss",
+    "code": "902882"
+  },
+  "特拉维夫": {
+    "cityName": "特拉维夫",
+    "pinYin": "telaweifu",
+    "py": "tlwf",
+    "code": "903008"
+  },
+  "皇后镇": {
+    "cityName": "皇后镇",
+    "pinYin": "huanghouzhen",
+    "py": "hhz",
+    "code": "903981"
+  },
+  "南果阿县": {
+    "cityName": "南果阿县",
+    "pinYin": "nanguoaxian",
+    "py": "ngax",
+    "code": "911222"
+  },
+  "阿姆斯特丹": {
+    "cityName": "阿姆斯特丹",
+    "pinYin": "amusitedan",
+    "py": "amstd",
+    "code": "903960",
+    "airCode": "AMS"
+  },
+  "乌纳瓦图纳": {
+    "cityName": "乌纳瓦图纳",
+    "pinYin": "wunawatuna",
+    "py": "wnwtn",
+    "code": "908414"
+  },
+  "拜伦湾": {
+    "cityName": "拜伦湾",
+    "pinYin": "bailunwan",
+    "py": "blw",
+    "code": "901090"
+  },
+  "古晋": {
+    "cityName": "古晋",
+    "pinYin": "gujin",
+    "py": "gj",
+    "code": "903672"
+  },
+  "芹苴": {
+    "cityName": "芹苴",
+    "pinYin": "qinju",
+    "py": "qj",
+    "code": "907594"
+  },
+  "仁川": {
+    "cityName": "仁川",
+    "pinYin": "renchuan",
+    "py": "rc",
+    "code": "903557"
+  },
+  "尼干布": {
+    "cityName": "尼干布",
+    "pinYin": "niganbu",
+    "py": "ngb",
+    "code": "904840"
+  },
+  "春武里": {
+    "cityName": "春武里",
+    "pinYin": "chunwuli",
+    "py": "cwl",
+    "code": "905009"
+  },
+  "瓦拉纳西": {
+    "cityName": "瓦拉纳西",
+    "pinYin": "walanaxi",
+    "py": "wlnx",
+    "code": "902670"
+  },
+  "富国岛": {
+    "cityName": "富国岛",
+    "pinYin": "fuguodao",
+    "py": "fgd",
+    "code": "907602"
+  },
+  "马拉里": {
+    "cityName": "马拉里",
+    "pinYin": "malali",
+    "py": "mll",
+    "code": "902690"
+  },
+  "麦纳麦": {
+    "cityName": "麦纳麦",
+    "pinYin": "mainamai",
+    "py": "mnm",
+    "code": "901475"
+  },
+  "雅典": {
+    "cityName": "雅典",
+    "pinYin": "yadian",
+    "py": "yd",
+    "code": "902484",
+    "airCode": "ATH"
+  },
+  "努萨": {
+    "cityName": "努萨",
+    "pinYin": "nusa",
+    "py": "ns",
+    "code": "907685"
+  },
+  "亚美达巴德": {
+    "cityName": "亚美达巴德",
+    "pinYin": "yameidabade",
+    "py": "ymdbd",
+    "code": "902680"
+  },
+  "斋沙默尔": {
+    "cityName": "斋沙默尔",
+    "pinYin": "zhaishamoer",
+    "py": "zsme",
+    "code": "902683"
+  },
+  "道格拉斯港": {
+    "cityName": "道格拉斯港",
+    "pinYin": "daogelasigang",
+    "py": "dglsg",
+    "code": "901036"
+  },
+  "马略卡岛": {
+    "cityName": "马略卡岛",
+    "pinYin": "malvekadao",
+    "py": "mlkd",
+    "code": "904645"
+  },
+  "皮皮岛 (甲米)": {
+    "cityName": "皮皮岛 (甲米)",
+    "pinYin": "pipidao",
+    "py": "ppd",
+    "code": "904984"
+  },
+  "乌隆他尼": {
+    "cityName": "乌隆他尼",
+    "pinYin": "wulongtani",
+    "py": "wltn",
+    "code": "904977"
+  },
+  "福德和马其顿山脉": {
+    "cityName": "福德和马其顿山脉",
+    "pinYin": "fudehemaqidunshanmai",
+    "py": "fdhmqdsm",
+    "code": "901081"
+  },
+  "维也纳": {
+    "cityName": "维也纳",
+    "pinYin": "weiyena",
+    "py": "wyn",
+    "code": "901459",
+    "airCode": "VIE"
+  },
+  "布宜诺斯艾利斯": {
+    "cityName": "布宜诺斯艾利斯",
+    "pinYin": "buyinuosiailisi",
+    "py": "bynsals",
+    "code": "901021",
+    "airCode": "BUE"
+  },
+  "焦特布尔": {
+    "cityName": "焦特布尔",
+    "pinYin": "jiaotebuer",
+    "py": "jtbe",
+    "code": "902697"
+  },
+  "本托塔": {
+    "cityName": "本托塔",
+    "pinYin": "bentuota",
+    "py": "btt",
+    "code": "908895"
+  },
+  "达沃市": {
+    "cityName": "达沃市",
+    "pinYin": "dawoshi",
+    "py": "dws",
+    "code": "904143"
+  },
+  "吉达": {
+    "cityName": "吉达",
+    "pinYin": "jida",
+    "py": "jd",
+    "code": "904523",
+    "airCode": "JED"
+  },
+  "罗吐鲁阿": {
+    "cityName": "罗吐鲁阿",
+    "pinYin": "luotulua",
+    "py": "ltla",
+    "code": "904005"
+  },
+  "札幌": {
+    "cityName": "札幌",
+    "pinYin": "zhahuang",
+    "py": "zh",
+    "code": "903453"
+  },
+  "美因河畔法兰克福": {
+    "cityName": "美因河畔法兰克福",
+    "pinYin": "meiyinhepanfalankefu",
+    "py": "myhpflkf",
+    "code": "908937"
+  },
+  "米里萨": {
+    "cityName": "米里萨",
+    "pinYin": "milisa",
+    "py": "mls",
+    "code": "910888"
+  },
+  "麦加/马卡": {
+    "cityName": "麦加/马卡",
+    "pinYin": "maijiamaka",
+    "py": "mjmk",
+    "code": "904529"
+  },
+  "普卡": {
+    "cityName": "普卡",
+    "pinYin": "puka",
+    "py": "pk",
+    "code": "902978"
+  },
+  "合艾": {
+    "cityName": "合艾",
+    "pinYin": "heai",
+    "py": "ha",
+    "code": "904975"
+  },
+  "玛琅": {
+    "cityName": "玛琅",
+    "pinYin": "malang",
+    "py": "ml",
+    "code": "902879"
+  },
+  "霍巴特": {
+    "cityName": "霍巴特",
+    "pinYin": "huobate",
+    "py": "hbt",
+    "code": "901167"
+  },
+  "考拉": {
+    "cityName": "考拉",
+    "pinYin": "kaola",
+    "py": "kl",
+    "code": "912131"
+  },
+  "望加锡": {
+    "cityName": "望加锡",
+    "pinYin": "wangjiaxi",
+    "py": "wjx",
+    "code": "902915"
+  },
+  "亚勒": {
+    "cityName": "亚勒",
+    "pinYin": "yale",
+    "py": "yl",
+    "code": "904859"
+  },
+  "北碧府": {
+    "cityName": "北碧府",
+    "pinYin": "beibifu",
+    "py": "bbf",
+    "code": "904989"
+  },
+  "惠灵顿": {
+    "cityName": "惠灵顿",
+    "pinYin": "huilingdun",
+    "py": "hld",
+    "code": "903982",
+    "airCode": "WLG"
+  },
+  "拉差布里": {
+    "cityName": "拉差布里",
+    "pinYin": "lachabuli",
+    "py": "lcbl",
+    "code": "905033"
+  },
+  "玛格丽特河红酒区": {
+    "cityName": "玛格丽特河红酒区",
+    "pinYin": "magelitehehongjiuqu",
+    "py": "mglthhjq",
+    "code": "901042"
+  },
+  "龟岛": {
+    "cityName": "龟岛",
+    "pinYin": "guidao",
+    "py": "gd",
+    "code": "905001"
+  },
+  "阿布达比": {
+    "cityName": "阿布达比",
+    "pinYin": "abudabi",
+    "py": "abdb",
+    "code": "905158"
+  },
+  "金马伦高原": {
+    "cityName": "金马伦高原",
+    "pinYin": "jinmalungaoyuan",
+    "py": "jmlgy",
+    "code": "903664"
+  },
+  "希克杜沃": {
+    "cityName": "希克杜沃",
+    "pinYin": "xikeduwo",
+    "py": "xkdw",
+    "code": "908415"
+  },
+  "芭东海滩 (普吉岛)": {
+    "cityName": "芭东海滩 (普吉岛)",
+    "pinYin": "badonghaitan",
+    "py": "bdht",
+    "code": "907673"
+  },
+  "塞维利亚": {
+    "cityName": "塞维利亚",
+    "pinYin": "saiweiliya",
+    "py": "swly",
+    "code": "904644"
+  },
+  "比勒陀利亚": {
+    "cityName": "比勒陀利亚",
+    "pinYin": "biletuoliya",
+    "py": "bltly",
+    "code": "904424",
+    "airCode": "PRY"
+  },
+  "斐济市": {
+    "cityName": "斐济市",
+    "pinYin": "feijishi",
+    "py": "fjs",
+    "code": "901874"
+  },
+  "罗勇府": {
+    "cityName": "罗勇府",
+    "pinYin": "luoyongfu",
+    "py": "lyf",
+    "code": "904966"
+  },
+  "富士山": {
+    "cityName": "富士山",
+    "pinYin": "fushishan",
+    "py": "fss",
+    "code": "903529"
+  },
+  "伊豆/热海": {
+    "cityName": "伊豆/热海",
+    "pinYin": "yidou/rehai",
+    "py": "yd/rh",
+    "code": "910850"
+  },
+  "巴蜀府": {
+    "cityName": "巴蜀府",
+    "pinYin": "bashufu",
+    "py": "bsf",
+    "code": "905021"
+  },
+  "多哈": {
+    "cityName": "多哈",
+    "pinYin": "duoha",
+    "py": "dh",
+    "code": "904323",
+    "airCode": "DOH"
+  },
+  "达尔文": {
+    "cityName": "达尔文",
+    "pinYin": "daerwen",
+    "py": "dew",
+    "code": "901083"
+  },
+  "乌蒂": {
+    "cityName": "乌蒂",
+    "pinYin": "wudi",
+    "py": "wd",
+    "code": "902722"
+  },
+  "克拉克 (潘帕嘉)": {
+    "cityName": "克拉克 (潘帕嘉)",
+    "pinYin": "kelake",
+    "py": "klk",
+    "code": "904158"
+  },
+  "万荣": {
+    "cityName": "万荣",
+    "pinYin": "wanrong",
+    "py": "wr",
+    "code": "903622"
+  },
+  "怡保": {
+    "cityName": "怡保",
+    "pinYin": "yibao",
+    "py": "yb",
+    "code": "903675"
+  },
+  "埃尔尼多": {
+    "cityName": "埃尔尼多",
+    "pinYin": "aierniduo",
+    "py": "aend",
+    "code": "911335"
+  },
+  "奈尼塔尔": {
+    "cityName": "奈尼塔尔",
+    "pinYin": "nainitaer",
+    "py": "nnte",
+    "code": "902701"
+  },
+  "桑给巴尔": {
+    "cityName": "桑给巴尔",
+    "pinYin": "sangjibaer",
+    "py": "sjbe",
+    "code": "904964"
+  },
+  "萨帕": {
+    "cityName": "萨帕",
+    "pinYin": "sapa",
+    "py": "sp",
+    "code": "911420"
+  },
+  "耶路撒冷": {
+    "cityName": "耶路撒冷",
+    "pinYin": "yelusaleng",
+    "py": "ylsl",
+    "code": "903014",
+    "airCode": "JRS"
+  },
+  "呵叻": {
+    "cityName": "呵叻",
+    "pinYin": "hele",
+    "py": "hl",
+    "code": "908467"
+  },
+  "列城": {
+    "cityName": "列城",
+    "pinYin": "liecheng",
+    "py": "lc",
+    "code": "902737"
+  },
+  "八打雁": {
+    "cityName": "八打雁",
+    "pinYin": "badayan",
+    "py": "bdy",
+    "code": "904149"
+  },
+  "大城府": {
+    "cityName": "大城府",
+    "pinYin": "dachengfu",
+    "py": "dcf",
+    "code": "905004"
+  },
+  "名古屋": {
+    "cityName": "名古屋",
+    "pinYin": "mingguwu",
+    "py": "mgw",
+    "code": "903474",
+    "airCode": "NGO"
+  },
+  "海豚湾": {
+    "cityName": "海豚湾",
+    "pinYin": "haitunwan",
+    "py": "htw",
+    "code": "909020"
+  },
+  "特内里费岛": {
+    "cityName": "特内里费岛",
+    "pinYin": "teneilifeidao",
+    "py": "tnlfd",
+    "code": "904648"
+  },
+  "箱根": {
+    "cityName": "箱根",
+    "pinYin": "xianggen",
+    "py": "xg",
+    "code": "903504"
+  },
+  "阿勒皮": {
+    "cityName": "阿勒皮",
+    "pinYin": "alepi",
+    "py": "alp",
+    "code": "902706"
+  },
+  "尼尔森": {
+    "cityName": "尼尔森",
+    "pinYin": "niersen",
+    "py": "nes",
+    "code": "904018"
+  },
+  "素叻他尼府": {
+    "cityName": "素叻他尼府",
+    "pinYin": "suletanifu",
+    "py": "sltnf",
+    "code": "904968"
+  },
+  "米科诺斯": {
+    "cityName": "米科诺斯",
+    "pinYin": "mikenuosi",
+    "py": "mkns",
+    "code": "902474"
+  },
+  "大雅塔": {
+    "cityName": "大雅塔",
+    "pinYin": "dayata",
+    "py": "dyt",
+    "code": "904151"
+  },
+  "格拉纳达": {
+    "cityName": "格拉纳达",
+    "pinYin": "gelanada",
+    "py": "glnd",
+    "code": "904608"
+  }
+}
