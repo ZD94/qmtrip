@@ -46,7 +46,6 @@ export default class SupplierCtripCT extends SupplierWebRobot{
             endCode      = CityCodes[options.toCity].airCode;
         let link = `https://h5.m.taobao.com/trip/flight/searchlist/index.html?searchType=1&depCityCode=${startCode}&arrCityCode=${endCode}&leaveDate=${date}&depCityName=${startStation}&arrCityName=${endStation}`;
 
-        console.log(link);
         return {url:link, jsCode: ''};
     }
 
