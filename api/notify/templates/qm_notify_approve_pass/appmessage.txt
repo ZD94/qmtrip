@@ -1,2 +1,2 @@
-<%=approveUser || '' %> 通过了您的出差请求
-<%=startAt || '' %>-<%=backAt || '' %>   <%=deptCity || '' %>-<%=arrivalCity || '' %>  预算：<%=totalBudget || '' %>
+<%=local.approveUser.name || '' %> 通过了您的出差请求
+<%=local.startTime || '' %>-<%=local.backTime || '' %>   <%=local.deptCity || '' %>-<%=local.arrivalCity || '' %>  预算：￥<%=local.budget || '' %>

@@ -1,2 +1,7 @@
-您好<br/>您公司员工<%=userName || '' %>的出差计划已经审批通过，审批人：<%=approveUser || '' %>，审批时间：<%=approveTime || '' %>。<br/>关联出差记录如下：
-<%= include('budget_detail.html') %>
+您好<br/>您公司员工<%=local.account.name || '' %>的出差计划已经审批通过<br/>
+项目：<%=local.project.name || '' %><br/>
+行程：<%=local.cityNames %><br/>
+类型：<%=local.isSpecialApprove ? '特别审批' : '普通申请'%><br/>
+总预算：<%=local.budget %>元<br/>
+<!--出差人：李晓辰、彭科、王鹏<br/>-->
+<!--审批人：<%=local.agreeUserNames %><br/>-->

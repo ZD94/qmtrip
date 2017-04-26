@@ -1118,9 +1118,6 @@ class TripPlanModule {
             await Promise.all(ps);
         }
 
-        let data = await TripPlanModule.getPlanEmailDetails(tripPlan);
-        let {go, back, hotel, subsidy} = data;
-
         let self_url = config.host + '/index.html#/trip/list-detail?tripid=' + approve.id;
         let appMessageUrl = '#/trip/list-detail?tripid=' + approve.id;
 
@@ -1130,35 +1127,6 @@ class TripPlanModule {
             console.error(err);
         }
 
-        let self_values = {
-            noticeType: ENoticeType.TRIP_APPROVE_NOTICE,
-            username: account.name,
-            planNo: tripPlan.planNo,
-            approveTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-            approveUser: approveUser ? approveUser.name : "",
-            projectName: tripPlan.title,
-            goTrafficBudget: go,
-            backTrafficBudget: back,
-            hotelBudget: hotel,
-            otherBudget: subsidy,
-            totalBudget: '￥' + tripPlan.budget,
-            url: self_url,
-            detailUrl: self_url,
-            appMessageUrl: appMessageUrl,
-            time: moment(tripPlan.startAt).format('YYYY-MM-DD'),
-            destination: tripPlan.arrivalCity,
-            staffName: account.name,
-            startTime: moment(tripPlan.startAt).format('YYYY-MM-DD'),
-            arrivalCity: tripPlan.arrivalCity,
-            budget: tripPlan.budget,
-            tripPlanNo: tripPlan.planNo,
-            approveResult: EApproveResult2Text[EApproveResult.PASS],
-            reason: '',
-            emailReason: '',
-            startAt: moment(tripPlan.startAt).format('MM.DD'),
-            backAt: moment(tripPlan.backAt).format('MM.DD'),
-            deptCity: tripPlan.deptCity,
-        };
         try {
             await API.tripApprove.sendApprovePassNoticeToCompany({approveId: approve.id});
         } catch(err) {
@@ -1166,7 +1134,7 @@ class TripPlanModule {
         }
         let tplName = 'qm_notify_approve_pass';
         try {
-            await API.notify.submitNotify({userId: account.id, key: tplName, values: self_values});
+            await API.notify.submitNotify({userId: account.id, key: tplName, local: tripPlan, values: {detailUrl: self_url, appMessageUrl: appMessageUrl}});
         } catch(err) {
             console.error(err);
         }

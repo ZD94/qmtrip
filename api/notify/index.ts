@@ -9,6 +9,7 @@ const logger = new Logger('qm:notify');
 import redisClient = require("common/redis-client");
 import {Models} from "_types";
 import {ESendType, ENoticeType} from "_types/notice/notice";
+import {TripApprove} from "_types/tripPlan/tripPlan";
 
 const config = require('@jingli/config');
 let API = require('@jingli/dnode-api');
@@ -28,7 +29,8 @@ export interface ISubmitNotifyParam{
     email?: string;
     mobile?: string;
     key: string;
-    values: any;
+    values?: any;
+    local?: any;
 }
 
 async function tryReadFile(filename): Promise<string>{
@@ -245,10 +247,14 @@ export async function __init() {
 
 //通知模块
 export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean> {
-    let {userId, key, values, email, mobile} = params;
-    let values_clone =  _.cloneDeep(values);
+    let {userId, key, values, email, mobile, local} = params;
+    let values_clone: any = {};
+    if(values){
+        values_clone = _.cloneDeep(values)
+    }
     let account: any = {};
     let openId;
+    let tripApprove: TripApprove;
     if(!userId){
         account = {email, mobile};
     }else{
@@ -271,6 +277,20 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
     if(!tpl)
         return false;
     values_clone.account = account;
+
+    if(local){
+        try {
+            let path_require = './templates/' + key + '/transform';
+            let transform = require(`${path_require}`);
+            if(transform){
+                local = await transform(local);
+            }
+            values_clone.local = local;
+        } catch(err) {
+            console.info(err);
+        }
+    }
+
     await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: userId }, values_clone);
     return true;
 }
