@@ -96,8 +96,6 @@ deploy:release:
 
 deploy:tester:
   stage: deploy
-  only:
-    - /^feature\//
   when: manual
   environment:
     name: tester/$GITLAB_USER_ID
