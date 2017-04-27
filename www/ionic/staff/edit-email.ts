@@ -23,7 +23,7 @@ export async function EditEmailController($scope, Models, $ionicHistory, $ionicP
         staff.modifyEmail({ email: $scope.form.email, pwd: $scope.form.pwd })
             .then(async function(result){
                 await API.onload();
-                return API.auth.reSendActiveLink({email: $scope.form.email, accountId: staff.id});
+                return API.auth.reSendActiveLink({email: $scope.form.email, accountId: staff.accountId});
             })
             .then(function(data){
                 if(data){

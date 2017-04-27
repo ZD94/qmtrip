@@ -15,7 +15,7 @@ import {ETripType, TripApprove, QMEApproveStatus, EApproveResult, Project} from 
 import _ = require('lodash');
 const L = require("@jingli/language");
 import moment = require("moment");
-var API = require("common/api");
+var API = require("@jingli/dnode-api");
 import {ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan"
 //鲸力商旅OA对接实现
 export class QmPlugin extends AbstractOAPlugin {

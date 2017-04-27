@@ -2,10 +2,11 @@ import { getSession } from '../common/model/index';
 import { Staff, EStaffRole } from '_types/staff';
 import { AgencyUser } from '_types/agency';
 import {EAccountType} from "_types";
+import Zone from '@jingli/zone-setup';
 /**
  * Created by wlh on 16/5/16.
  */
-const API = require("common/api");
+const API = require("@jingli/dnode-api");
 const _ = require("lodash");
 import L from '@jingli/language';
 const Models = require("_types").Models;
@@ -388,8 +389,17 @@ export var condition = {
             let acc_type = account.type;
             
             if(acc_type == EAccountType.STAFF) {
-                let staff = await Models.staff.get(account.id);
-                return staff.roleId == EStaffRole.ADMIN || staff.roleId == EStaffRole.OWNER || tripPlan.accountId == account.id || tripPlan.auditUser == account.id;
+                let staffs = await Models.staff.all({ where: {accountId: account.id}});
+                let isHasPermit;
+                for(let staff of staffs) {
+                    isHasPermit =
+                        staff.roleId == EStaffRole.ADMIN
+                        || staff.roleId == EStaffRole.OWNER
+                        || tripPlan.accountId == account.id
+                        || tripPlan.auditUser == account.id;
+                    if (isHasPermit) break;
+                }
+                return !!isHasPermit;
             }else if(acc_type == EAccountType.AGENCY) {
                 let user = await AgencyUser.getCurrent();
                 let company = await tripPlan.getCompany();
@@ -401,6 +411,17 @@ export var condition = {
             }else {
                 throw L.ERR.PERMISSION_DENY();
             }
+        }
+    },
+    isSameAccount: function(idpath: string) {
+        return async function (fn, self, args) {
+            let session = Zone.current.get('session');
+            if(!session || !session.accountId) {
+                throw L.ERR.PERMISSION_DENY();
+            }
+            let accountId = session['accountId'];
+            let id = _.get(args, idpath);
+            return id == accountId;
         }
     }
 }

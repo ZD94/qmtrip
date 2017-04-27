@@ -2,7 +2,7 @@
  * Created by wyl on 16-12-09.
  */
 'use strict';
-import {requireParams, clientExport} from 'common/api/helper';
+import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {conditionDecorator, condition} from "../_decorator";
 import {Staff} from "_types/staff";
 import { PromoCode } from '_types/promoCode';

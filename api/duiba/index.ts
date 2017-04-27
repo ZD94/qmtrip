@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {requireParams, clientExport} from "../../common/api/helper";
+import {requireParams, clientExport} from "@jingli/dnode-api/dist/src/helper";
 import {Staff} from "_types/staff/staff";
 import {CoinAccount} from "_types/coin";
 var config = require('@jingli/config');

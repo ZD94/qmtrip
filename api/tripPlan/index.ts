@@ -2,11 +2,11 @@
  * Created by yumiao on 15-12-10.
  */
 "use strict";
-import {DB} from "common/model";
+import {DB} from '@jingli/database';
 let uuid = require("node-uuid");
 import L from '@jingli/language';
 import utils = require("common/utils");
-let API = require('common/api');
+let API = require('@jingli/dnode-api');
 import Logger from '@jingli/logger';
 let logger = new Logger("tripPlan");
 import config = require("@jingli/config");
@@ -14,7 +14,7 @@ import config = require("@jingli/config");
 let moment = require("moment");
 let scheduler = require('common/scheduler');
 import _ = require('lodash');
-import {requireParams, clientExport} from 'common/api/helper';
+import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
     TripApprove, QMEApproveStatus, EApproveResult, EApproveResult2Text,
@@ -375,7 +375,7 @@ class TripPlanModule {
                 await API.notify.submitNotify({
                     key: 'qm_notify_agency_budget',
                     values: auditValues,
-                    accountId: default_agency.id
+                    userId: default_agency.id
                 })
             } catch(err) { console.error(err);}
 
@@ -528,7 +528,7 @@ class TripPlanModule {
 
             let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
             try {
-                await API.notify.submitNotify({key: templateName, values: templateValue, accountId: staff.id});
+                await API.notify.submitNotify({key: templateName, values: templateValue, userId: staff.id});
 
             } catch(err) {
                 console.error(`发送通知失败:`, err);
@@ -1166,7 +1166,7 @@ class TripPlanModule {
         }
         let tplName = 'qm_notify_approve_pass';
         try {
-            await API.notify.submitNotify({accountId: account.id, key: tplName, values: self_values});
+            await API.notify.submitNotify({userId: account.id, key: tplName, values: self_values});
         } catch(err) {
             console.error(err);
         }
@@ -1385,7 +1385,19 @@ class TripPlanModule {
         })
         let financeCheckCode = Models.financeCheckCode.create({tripPlanId: tripPlanId, isValid: true});
         financeCheckCode = await financeCheckCode.save();
-        let roundLine = `${tripPlan.deptCity}-${tripPlan.arrivalCity}${tripPlan.isRoundTrip ? '-' + tripPlan.deptCity: ''}`;
+        // let roundLine = `${tripPlan.deptCity}-${tripPlan.arrivalCity}${tripPlan.isRoundTrip ? '-' + tripPlan.deptCity: ''}`;
+        let roundLine = tripPlan.deptCity;
+        if(typeof tripPlan.arrivalCityCodes == 'string'){
+            tripPlan.arrivalCityCodes = JSON.parse(tripPlan.arrivalCityCodes);
+        }
+        await Promise.all(tripPlan.arrivalCityCodes.map(async function(item){
+            let arrCity = await API.place.getCityInfo({ cityCode: item });
+            if(arrCity){
+                roundLine = roundLine + "-" + arrCity.name;
+            }
+        }))
+        roundLine += tripPlan.isRoundTrip ? '-'+tripPlan.deptCity : '';
+        console.info(roundLine);
         _tripDetails = await Promise.all(_tripDetails);
         _tripDetails = _tripDetails.filter( (v) => {
             return v['money'] > 0;
@@ -1431,7 +1443,7 @@ class TripPlanModule {
             "createAt": moment().format('YYYY年MM月DD日HH:mm'), //生成时间
             "departDate": moment(tripPlan.startAt).format('YYYY.MM.DD'), //出差起始时间
             "backDate": moment(tripPlan.backAt).format('YYYY.MM.DD'), //出差返回时间
-            "reason": tripPlan.project.name, //出差事由
+            "reason": tripPlan.project ? tripPlan.project.name: '', //出差事由
             "approveUsers": approveUsers, //本次出差审批人
             "qrcode": `data:image/png;base64,${qrcodeCxt}`,
             "invoices": _tripDetails,
@@ -1442,7 +1454,7 @@ class TripPlanModule {
         try {
             await API.notify.submitNotify({
                 key: 'qm_spend_report',
-                accountId: staff.id,
+                userId: staff.id,
                 values: {
                     title: title,
                     attachments: [{
@@ -1507,22 +1519,20 @@ class TripPlanModule {
         let companyName=staff.company.name;
         let staffName=staff.name;
 
-         try{
-             await API.notify.notifyDesignatedAccount({
-                 mobile:"13810529805",
-                 email:"notice@jingli365.com",
-                 key:"qm_notify_invoice_audit_request",
-                 values:{
-                     company:companyName,
-                     staffName:staff.name
-                 }
-             });
-         }catch(err){
-             logger.info(err);
+        try{
+            await API.notify.submitNotify({
+             mobile: '13810529805',
+             email: 'notice@jingli365.com',
+             key: 'qm_notify_invoice_audit_request',
+             values:{
+                 company:companyName,
+                 staffName:staff.name
+             }
+            })
+        }catch(err){
+            logger.info(err);
         }
     }
-
-
 
     @clientExport
     @requireParams(['detailId', 'orderIds', 'supplierId'])
