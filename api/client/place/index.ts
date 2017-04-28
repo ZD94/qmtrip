@@ -77,7 +77,6 @@ class ApiPlace {
         return API.place.queryHotCity(params)
             .then(function(places) {
                 let arr:Array<Place> = places.map(function(place) {
-                    console.log("===============",new Place(place));
                     return new Place(place);
                 })
                 return arr;
