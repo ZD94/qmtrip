@@ -41,27 +41,12 @@ export default class SupplierCtripCT extends SupplierWebRobot{
     async getAirTicketReserveLink(options):Promise<ReserveLink> {
         let startStation = encodeURI(options.fromCity),
             endStation   = encodeURI(options.toCity),
-            date         = moment(options.leaveDate).format("YYYY-MM-DD");
-        let link = `https://h5.m.taobao.com/trip/flight/search/index.html`;
-        let jsCode=`
-            var isIn = sessionStorage.getItem("isIn");
-            if(isIn){
-                
-            }else{
-                sessionStorage.setItem("isIn", true);
-                localStorage.setItem("depCity" , "${options.fromCity}");
-                localStorage.setItem("arrCity" , "${options.toCity}");
-                var ele = document.getElementById("J_depDate");
-                ele.value = "${date}";
-                var searchBtn = document.getElementById("J_SearchSubmitBtn");
-                if(searchBtn){
-                    setTimeout(function(){
-                        searchBtn.click();
-                    } , 500);
-                }
-            }
-        `;
-        return {url:link, jsCode: jsCode};
+            date         = moment(options.leaveDate).format("YYYY-MM-DD"),
+            startCode    = CityCodes[options.fromCity].airCode,
+            endCode      = CityCodes[options.toCity].airCode;
+        let link = `https://h5.m.taobao.com/trip/flight/searchlist/index.html?searchType=1&depCityCode=${startCode}&arrCityCode=${endCode}&leaveDate=${date}&depCityName=${startStation}&arrCityName=${endStation}`;
+
+        return {url:link, jsCode: ''};
     }
 
     async getHotelReserveLink(options):Promise<ReserveLink> {

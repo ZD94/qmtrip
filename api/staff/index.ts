@@ -130,17 +130,9 @@ class StaffModule{
         }
         await staff.save();
 
-        let departmentIds = params.departmentIds as string[];
-        if (departmentIds && departmentIds.length >= 1) {
-            let departments = await Promise.all(departmentIds.map( (id) => {
-                return Models.department.get(id)
-            }));
-            await staff.addDepartment(departments);
-        } else {
-            //设置默认部门
-            let defaultDepartment = await company.getDefaultDepartment();
-            await staff.addDepartment(defaultDepartment);
-        }
+        //设置默认部门
+        let defaultDepartment = await company.getDefaultDepartment();
+        await staff.addDepartment(defaultDepartment);
 
         await StaffModule.sendNoticeToAdmins({
             companyId:params.companyId,

@@ -4,6 +4,7 @@ import { makeAuthenticateToken } from './authentication';
 import { Models } from '_types/index';
 import { LoginResponse } from '_types/auth/auth-cert';
 import C = require("@jingli/config");
+var API = require("@jingli/dnode-api");
 
 //拼接字符串
 function combineData(obj) {
