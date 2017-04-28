@@ -30,7 +30,9 @@
         {
             "name": "trainPricePrefer",
             "options": {
-                "score": 1000
+                "type": "square",
+                "score": 10000,
+                "expectTrainCabins": "<%=local.expectTrainCabins%>"
             }
         }
     ],

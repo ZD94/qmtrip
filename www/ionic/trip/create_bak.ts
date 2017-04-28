@@ -3,7 +3,7 @@ import { Staff } from '_types/staff/staff';
 import {EApproveChannel} from "_types/approve/types";
 
 var msgbox = require('msgbox');
-
+var API = require("@jingli/dnode-api");
 
 var defaultTrip = {
     beginDate: moment().add(3, 'days').startOf('day').hour(18).toDate(),

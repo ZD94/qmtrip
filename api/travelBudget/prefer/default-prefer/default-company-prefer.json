@@ -18,7 +18,7 @@
     {
       "name": "trainDurationPrefer",
       "options": {
-        "score": 100000,
+        "score": 80000,
         "trainDuration": 360
       }
     },
