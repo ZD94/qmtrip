@@ -1,1 +1,1 @@
-<%=username || '' %>的出差请示
+<%=local.account.name || '' %>的出差请示

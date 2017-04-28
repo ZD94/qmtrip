@@ -1,1 +1,1 @@
-您<%=time%>到<%=destination%>的出差申请被驳回,点击此处查看详情<%=url || ''%>
+您<%=moment(local.startAt).format('YYYY.MM.DD')%>到<%=local.arrivalCity%>的出差申请被驳回,点击此处查看详情<%=detailUrl || ''%>

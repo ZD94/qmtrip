@@ -1,2 +1,3 @@
 <%=local.approveUser.name || '' %> 通过了您的出差请求
-<%=local.startTime || '' %>-<%=local.backTime || '' %>   <%=local.deptCity || '' %>-<%=local.arrivalCity || '' %>  预算：￥<%=local.budget || '' %>
+<%=moment(local.startAt).format('YYYY.MM.DD') || '' %>-<%=moment(local.backAt).format('YYYY.MM.DD') || '' %>
+<%=local.deptCity || '' %>-<%=local.arrivalCity || '' %>  预算：￥<%=local.budget || '' %>

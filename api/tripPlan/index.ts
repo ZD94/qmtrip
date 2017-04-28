@@ -1134,7 +1134,8 @@ class TripPlanModule {
         }
         let tplName = 'qm_notify_approve_pass';
         try {
-            await API.notify.submitNotify({userId: account.id, key: tplName, local: tripPlan, values: {detailUrl: self_url, appMessageUrl: appMessageUrl}});
+            await API.notify.submitNotify({userId: account.id, key: tplName, local: tripPlan,
+                values: {detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
         } catch(err) {
             console.error(err);
         }

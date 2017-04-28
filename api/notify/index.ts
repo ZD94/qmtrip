@@ -10,6 +10,7 @@ import redisClient = require("common/redis-client");
 import {Models} from "_types";
 import {ESendType, ENoticeType} from "_types/notice/notice";
 import {TripApprove} from "_types/tripPlan/tripPlan";
+import moment = require("moment");
 
 const config = require('@jingli/config');
 let API = require('@jingli/dnode-api');
@@ -59,27 +60,27 @@ class NotifyTemplate{
     };
     constructor(public name, sms_text, wechat_json, email_title, email_html, email_text, appmessage_title, appmessage_html, appmessage_text){
         if(sms_text)
-            this.sms = _.template(sms_text);
+            this.sms = _.template(sms_text, {imports: {moment: moment}});
         if(wechat_json){
             let templateId = config.notify.templates[name];
             if(templateId)
-                this.wechat = _.template(wechat_json);
+                this.wechat = _.template(wechat_json, {imports: {moment: moment}});
         }
         if(email_title){
             this.email = {};
-            this.email.title = _.template(email_title);
+            this.email.title = _.template(email_title, {imports: {moment: moment}});
             if(email_html)
-                this.email.html = _.template(email_html);
+                this.email.html = _.template(email_html, {imports: {moment: moment}});
             if(email_text)
-                this.email.text = _.template(email_text);
+                this.email.text = _.template(email_text, {imports: {moment: moment}});
         }
         if(appmessage_title){
             this.appmessage = {};
-            this.appmessage.title = _.template(appmessage_title);
+            this.appmessage.title = _.template(appmessage_title, {imports: {moment: moment}});
             if(appmessage_html)
-                this.appmessage.html = _.template(appmessage_html);
+                this.appmessage.html = _.template(appmessage_html, {imports: {moment: moment}});
             if(appmessage_text)
-                this.appmessage.text = _.template(appmessage_text);
+                this.appmessage.text = _.template(appmessage_text, {imports: {moment: moment}});
         }
     }
 
@@ -285,10 +286,10 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
             if(transform){
                 local = await transform(local);
             }
-            values_clone.local = local;
         } catch(err) {
             console.info(err);
         }
+        values_clone.local = local;
     }
 
     await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: userId }, values_clone);
