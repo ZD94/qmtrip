@@ -33,6 +33,8 @@ function initSuppliers(){
         ct_ctrip_com: require('./ct_ctrip_com'),
         ct_ctrip_com_m: require('./ct_ctrip_com_m'),
         ctrip_com: require('./ctrip_com'),
+        qunar_com_m: require('./qunar_com'),
+        taobao_com : require('./taobao_com')
     }
 }
 
