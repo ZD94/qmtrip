@@ -483,7 +483,7 @@ export default class ApiAuth {
      * @returns {Company}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'companyId', 'msgTicket', 'pwd', 'sex'])
+    @requireParams(['mobile', 'name', 'companyId', 'msgTicket', 'pwd'], ['avatarColor', 'sex'])
     static async invitedNewStaffRegister(data): Promise<any> {
         let msgTicket = data.msgTicket;
         let mobile = data.mobile;
@@ -509,6 +509,7 @@ export default class ApiAuth {
             pwd: utils.md5(pwd),
             status: ACCOUNT_STATUS.ACTIVE,
             isValidateMobile: true,
+            avatarColor: data.avatarColor,
             addWay: EAddWay.INVITED
         });
         return staff.company;
