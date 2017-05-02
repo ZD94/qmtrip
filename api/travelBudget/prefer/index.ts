@@ -35,55 +35,56 @@ export enum DEFAULT_PREFER_CONFIG_TYPE  {
     DOMESTIC_HOTEL = 4,
 }
 
-const sysPrefer = require("./default-prefer/sys-prefer.json");
-const defaultPrefer = require("./default-prefer/default-company-prefer.json");
+const sysDefaultPrefer = require("./default-prefer/sys-prefer.json");
+const companyDefaultPrefer = require("./default-prefer/default-company-prefer.json");
 
 export function loadPrefers(prefers: any[], qs: {local: any}, type?: DEFAULT_PREFER_CONFIG_TYPE) {
-    let defaultPrefers;
+    let allPrefers;
     let sysPrefers;
     switch(type) {
         case DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_HOTEL:
-            sysPrefers = _.cloneDeep(sysPrefer.domesticHotel);
+            sysPrefers = _.cloneDeep(sysDefaultPrefer.domesticHotel);
             if (!prefers || !prefers.length) {
-                prefers = _.cloneDeep(defaultPrefer.domesticHotel);
+                prefers = _.cloneDeep(companyDefaultPrefer.domesticHotel);
             }
-            defaultPrefers = mergePrefers(sysPrefers, prefers);
+            allPrefers = mergePrefers(sysPrefers, prefers);
             break;
         case DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_TICKET:
-            sysPrefers = _.cloneDeep(sysPrefer.abroadTraffic);
+            sysPrefers = _.cloneDeep(sysDefaultPrefer.abroadTraffic);
             if (!prefers || !prefers.length) {
-                prefers = _.cloneDeep(defaultPrefer.abroadTraffic);
+                prefers = _.cloneDeep(companyDefaultPrefer.abroadTraffic);
             }
-            defaultPrefers = mergePrefers(sysPrefers, prefers);
+            allPrefers = mergePrefers(sysPrefers, prefers);
             break;
         case DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_TICKET:
-            sysPrefers = _.cloneDeep(sysPrefer.domesticTraffic);
+            sysPrefers = _.cloneDeep(sysDefaultPrefer.domesticTraffic);
             if (!prefers || !prefers.length) {
-                prefers = _.cloneDeep(defaultPrefer.domesticTraffic);
+                prefers = _.cloneDeep(companyDefaultPrefer.domesticTraffic);
             }
-            defaultPrefers = mergePrefers(sysPrefers, prefers);
+            allPrefers = mergePrefers(sysPrefers, prefers);
             break;
         case DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_HOTEL:
-            sysPrefers = _.cloneDeep(sysPrefer.abroadHotel);
+            sysPrefers = _.cloneDeep(sysDefaultPrefer.abroadHotel);
             if (!prefers || !prefers.length) {
-                prefers = _.cloneDeep(defaultPrefer.abroadHotel);
+                prefers = _.cloneDeep(companyDefaultPrefer.abroadHotel);
             }
-            defaultPrefers = mergePrefers(sysPrefers, prefers);
+            allPrefers = mergePrefers(sysPrefers, prefers);
             break;
     }
-    let _prefers = JSON.stringify(defaultPrefers);
+    let _prefers = JSON.stringify(allPrefers);
     let _compiled = _.template(_prefers, { 'imports': { 'moment': moment } });
     return JSON.parse(_compiled(qs));
 }
 
 function mergePrefers(prefers: any[], newPrefers: any[]) {
+    let allPrefers = _.cloneDeep(prefers);
     if (!newPrefers) {
         newPrefers = [];
     }
     newPrefers.forEach( (prefer) => {
-        prefers.push(prefer);
+        allPrefers.push(prefer);
     });
-    return prefers;
+    return allPrefers;
 }
 
 
