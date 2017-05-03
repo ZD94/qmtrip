@@ -184,7 +184,8 @@ export default class ApiTravelBudget {
                             }
                         }
 
-                        if (isNeedHotel) {
+                        let days = moment(moment(goBackDate).format(momentDateFormat)).diff(moment(leaveDate).format(momentDateFormat), 'days')
+                        if (isNeedHotel && days > 0) {
                             try {
                                 let budget = await ApiTravelBudget.getHotelBudget({
                                     city: destinationPlace,
