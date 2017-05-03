@@ -610,7 +610,7 @@ export default class ApiAuth {
 
         let staffed = await Models.staff.find({where:{ companyId: companyId, accountId: account.id }});
         if(staffed && staffed.total > 0){
-            throw L.ERR.INTERNAL_ERROR();
+            throw L.ERR.MOBILE_HAS_REGISTRY();
         }
 
         let staff = Staff.create({
