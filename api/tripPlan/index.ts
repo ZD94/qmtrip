@@ -1402,6 +1402,9 @@ class TripPlanModule {
         _tripDetails = _tripDetails.filter( (v) => {
             return v['money'] > 0;
         });
+        if (_tripDetails.length<= 0 ) {
+            throw L.ERROR_CODE(500, '本次出差中无需要报销费用');
+        }
         var invoiceQuantity = _tripDetails
             .map( (v) => {
                 return v['quantity'] || 0;
