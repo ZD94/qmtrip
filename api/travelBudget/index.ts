@@ -27,7 +27,7 @@ export default class ApiTravelBudget {
     static async getBudgetInfo(params: {id: string, accountId? : string}) {
         let accountId = params.accountId;
 
-        console.log("getBudgetInfo: ", id , accountId);
+        console.log("getBudgetInfo: ", params.id , accountId);
 
         if (!accountId) {
             let staff = await Staff.getCurrent();
