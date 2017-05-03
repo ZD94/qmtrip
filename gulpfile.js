@@ -40,6 +40,7 @@ gulplib.dist(function () {
         '!**/*.ts',
         '!**/*.map',
         '!**/config/config.local.json',
+        '!*.test.ts'
     ];
     var dirs = [
         'api',
