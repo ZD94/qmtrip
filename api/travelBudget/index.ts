@@ -26,10 +26,15 @@ export default class ApiTravelBudget {
     @clientExport
     static async getBudgetInfo(params: {id: string, accountId? : string}) {
         let accountId = params.accountId;
+
+        console.log("getBudgetInfo: ", id , accountId);
+
         if (!accountId) {
             let staff = await Staff.getCurrent();
             accountId = staff.id;
         }
+
+
         let key = `budgets:${accountId}:${params.id}`;
         return cache.read(key);
     }
@@ -541,6 +546,7 @@ export default class ApiTravelBudget {
         let {accountId} = Zone.current.get('session');
         let {budgetId} = params;
         //let staff = await Staff.getCurrent();
+        console.log("reportBudgetError: ", budgetId, accountId);
         let content = await ApiTravelBudget.getBudgetInfo({id: budgetId, accountId: accountId});
         let budgets = content.budgets;
         let ps = budgets.map( async (budget): Promise<any> => {
