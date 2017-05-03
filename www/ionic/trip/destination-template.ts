@@ -5,6 +5,7 @@
 import {Staff} from "_types/staff/staff";
 import moment = require('moment');
 var msgbox = require('msgbox');
+var API = require("@jingli/dnode-api");
 export async function destinationController($scope, ngModalDlg, Models, $ionicPopup, $storage){
     require('./destination-template.scss');
     $scope.projectSelector = {
