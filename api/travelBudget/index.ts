@@ -30,6 +30,7 @@ export default class ApiTravelBudget {
             let staff = await Staff.getCurrent();
             accountId = staff.id;
         }
+
         let key = `budgets:${accountId}:${params.id}`;
         return cache.read(key);
     }
@@ -65,12 +66,11 @@ export default class ApiTravelBudget {
     */
     @clientExport
     static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams) :Promise<string> {
-        // let {accountId} = Zone.current.get('session');
-        // let staffId = params['staffId'] || accountId;
-        // let staff = await Models.staff.get(staffId);
-        let staff = await Staff.getCurrent();
+        let currentStaff = await Staff.getCurrent();
+        let staffId = params['staffId'] || currentStaff.id;
+        let staff = await Models.staff.get(staffId);
+
         let accountId = staff.accountId;
-        let staffId = staff.id;
         let travelPolicy = await staff.getTravelPolicy();
         if (!travelPolicy) {
             throw new Error(`差旅标准还未设置`);
@@ -538,10 +538,9 @@ export default class ApiTravelBudget {
 
     @clientExport
     static async reportBudgetError(params: { budgetId: string}) {
-        let {accountId} = Zone.current.get('session');
+        let staff = await Staff.getCurrent();
         let {budgetId} = params;
-        //let staff = await Staff.getCurrent();
-        let content = await ApiTravelBudget.getBudgetInfo({id: budgetId, accountId: accountId});
+        let content = await ApiTravelBudget.getBudgetInfo({id: budgetId, accountId: staff.id});
         let budgets = content.budgets;
         let ps = budgets.map( async (budget): Promise<any> => {
             if (!budget.id) {
