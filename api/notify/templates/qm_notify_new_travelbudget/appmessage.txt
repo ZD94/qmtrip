@@ -1,2 +1,2 @@
-<%=local.account.name || '' %>申请一次新的出差
-<%=moment(local.startAt).format('YYYY.MM.DD') || '' %>-<%=moment(local.backAt).format('YYYY.MM.DD') || '' %>   <%=local.deptCity || '' %>-<%=local.arrivalCity || '' %>
+<%=tripApprove.account.name || '' %>申请一次新的出差
+<%=moment(tripApprove.startAt).format('YYYY.MM.DD') || '' %>-<%=moment(tripApprove.backAt).format('YYYY.MM.DD') || '' %>   <%=tripApprove.deptCity || '' %>-<%=tripApprove.arrivalCity || '' %>

@@ -8,27 +8,27 @@
       "color":"#173177"
     },
     "keyword1":{
-      "value":"<%=local.account.name || '' %>",
+      "value":"<%=tripApprove.account.name || '' %>",
       "color":"#173177"
     },
     "keyword2":{
-      "value":"<%=moment(local.startAt).format('YYYY.MM.DD') || '' %> - <%=moment(local.backAt).format('YYYY.MM.DD') || '' %>",
+      "value":"<%=moment(tripApprove.startAt).format('YYYY.MM.DD') || '' %> - <%=moment(tripApprove.backAt).format('YYYY.MM.DD') || '' %>",
       "color":"#173177"
     },
     "keyword3":{
-      "value":"<%=local.cityNames || '' %>",
+      "value":"<%=cityNames || '' %>",
       "color":"#173177"
     },
     "keyword4":{
-      "value":"<%=local.title || '' %>",
+      "value":"<%=tripApprove.title || '' %>",
       "color":"#173177"
     },
     "keyword5":{
-      "value":"<%=local.budget || '' %>元",
+      "value":"<%=tripApprove.budget || '' %>元",
       "color":"#173177"
     },
     "remark":{
-      "value":"请您尽快完成审批，该出差计划将在<%=moment(local.autoApproveTime).format('YYYY.MM.DD') || '' %>由系统自动审批",
+      "value":"请您尽快完成审批，该出差计划将在<%=moment(tripApprove.autoApproveTime).format('YYYY.MM.DD') || '' %>由系统自动审批",
       "color":"#173177"
     }
   }

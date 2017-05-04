@@ -8,7 +8,7 @@
       "color":"#173177"
     },
     "keyword1":{
-      "value":"<%=moment(local.startAt).format('YYYY.MM.DD') || '' %>到<%=local.arrivalCity || '' %>的出差记录，预算：￥<%=local.budget || '' %>，出差计划号：<%=local.tripPlanNo || '' %>",
+      "value":"<%=moment(tripPlan.startAt).format('YYYY.MM.DD') || '' %>到<%=tripPlan.arrivalCity || '' %>的出差记录，预算：￥<%=tripPlan.budget || '' %>，出差计划号：<%=tripPlan.tripPlanNo || '' %>",
       "color":"#173177"
     },
     "keyword2":{
@@ -16,7 +16,7 @@
       "color":"#173177"
     },
     "remark":{
-      "value":"<%=moment().format('YYYY.MM.DD') || '' %>，由<%=local.agreeUserNames || '' %>审批",
+      "value":"<%=moment().format('YYYY.MM.DD') || '' %>，由<%=agreeUserNames || '' %>审批",
       "color":"#173177"
     }
   }

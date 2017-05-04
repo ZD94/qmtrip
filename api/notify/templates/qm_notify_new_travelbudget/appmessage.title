@@ -1,1 +1,1 @@
-<%=local.account.name || '' %>的出差请示
+<%=tripApprove.account.name || '' %>的出差请示

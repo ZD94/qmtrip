@@ -1,9 +1,9 @@
 尊敬的<%=account.name || '' %>，您的出差申请审批通过。<br/>
-项目：<%=local.project.name || '' %><br/>
-行程：<%=local.cityNames %><br/>
-类型：<%=local.isSpecialApprove ? '特别审批' : '普通申请'%><br/>
-总预算：<%=local.budget %>元<br/>
+项目：<%=tripPlan.project.name || '' %><br/>
+行程：<%=cityNames %><br/>
+类型：<%=tripPlan.isSpecialApprove ? '特别审批' : '普通申请'%><br/>
+总预算：<%=tripPlan.budget %>元<br/>
 <!--出差人：李晓辰、彭科、王鹏<br/>-->
-审批人：<%=local.agreeUserNames %><br/>
+审批人：<%=agreeUserNames %><br/>
 查看详情<a href=<%=detailUrl || '' %>>【按钮】</a><br/>
 如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅： <%=detailUrl || '' %>

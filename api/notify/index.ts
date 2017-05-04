@@ -31,7 +31,6 @@ export interface ISubmitNotifyParam{
     mobile?: string;
     key: string;
     values?: any;
-    local?: any;
 }
 
 async function tryReadFile(filename): Promise<string>{
@@ -98,13 +97,17 @@ class NotifyTemplate{
             return;
         if(!this.sms)
             return;
-        let content = this.sms(data);
+        try{
+            let content = this.sms(data);
+            await API.sms.sendMsg({
+                content: content,
+                mobile: to.mobile
+            });
+            logger.info('成功发送短信:', to.mobile, content);
+        }catch (e){
+            console.log(e);
+        }
 
-        await API.sms.sendMsg({
-            content: content,
-            mobile: to.mobile
-        });
-        logger.info('成功发送短信:', to.mobile, content);
     }
     async sendWechat(to: NotifyToAddress, data: any){
         if(!config.notify.sendWechat)
@@ -113,17 +116,22 @@ class NotifyTemplate{
             return;
         if(!this.wechat)
             return;
-        let content = this.wechat(data);
-        let json = JSON.parse(content);
-        if (!data.templateId) return;
-        await API.wechat.sendTplMsg({
-            openid: to.openId,
-            data: json.data,
-            topColor: json.topColor,
-            url: json.url,
-            templateId: json.template_id,
-        });
-        logger.info('成功发送微信通知:', to.openId, this.name);
+        try{
+            let content = this.wechat(data);
+            let json = JSON.parse(content);
+            if (!data.templateId) return;
+            await API.wechat.sendTplMsg({
+                openid: to.openId,
+                data: json.data,
+                topColor: json.topColor,
+                url: json.url,
+                templateId: json.template_id,
+            });
+            logger.info('成功发送微信通知:', to.openId, this.name);
+        }catch (e){
+            console.log(e);
+        }
+
     }
 
     async sendEmail(to: NotifyToAddress, data: any) {
@@ -131,29 +139,34 @@ class NotifyTemplate{
             return;
         if(!this.email)
             return;
-        let subject = this.email.title(data);
-        let context = Object.create(data);
-        context.include = function(incname){
-            return includes[incname](context);
-        };
-        let content = this.email.html(context);
+        try{
+            let subject = this.email.title(data);
+            let context = Object.create(data);
+            context.include = function(incname){
+                return includes[incname](context);
+            };
+            let content = this.email.html(context);
 
-        content = includes['email_frame.html']({content: content});
-        let attachments = data.attachments || [];
+            content = includes['email_frame.html']({content: content});
+            let attachments = data.attachments || [];
 
-        /*redisClient.simplePublish("checkcode:msg", content)
-            .catch((err)=>{
-                logger.error('simplePublish error:', err);
-            });*/
-        if(!config.notify.sendEmail)
-            return;
-        await API.mail.sendEmail({
-            toEmails: to.email,
-            content: content,
-            subject: subject,
-            attachments: attachments,
-        });
-        logger.info('成功发送邮件:', to.email, this.name);
+            /*redisClient.simplePublish("checkcode:msg", content)
+             .catch((err)=>{
+             logger.error('simplePublish error:', err);
+             });*/
+            if(!config.notify.sendEmail)
+                return;
+            await API.mail.sendEmail({
+                toEmails: to.email,
+                content: content,
+                subject: subject,
+                attachments: attachments,
+            });
+            logger.info('成功发送邮件:', to.email, this.name);
+        }catch (e){
+            console.log(e);
+            console.log("666666666666666666666666666666666666666666666666666666666666");
+        }
     }
 
     async saveNotice(to: NotifyToAddress, data: any) {
@@ -164,18 +177,22 @@ class NotifyTemplate{
             return;
         if(!this.appmessage.title || !this.appmessage.text)
             return;
-        let content;
-        let title = this.appmessage.title(data);
-        let description = this.appmessage.text(data);
-        if(this.appmessage.html){
-            let context = Object.create(data);
-            context.include = function(incname){
-                return includes[incname](context);
-            };
-            content = this.appmessage.html(context);
+        try{
+            let content;
+            let title = this.appmessage.title(data);
+            let description = this.appmessage.text(data);
+            if(this.appmessage.html){
+                let context = Object.create(data);
+                context.include = function(incname){
+                    return includes[incname](context);
+                };
+                content = this.appmessage.html(context);
+            }
+            await API.notice.createNotice({title: title, content: content, description: description, staffId: to.accountId, sendType: ESendType.ONE_ACCOUNT, type: data.noticeType || ENoticeType.SYSTEM_NOTICE});
+            logger.info('成功发送通知:', data.account.name, this.name);
+        }catch (e){
+            console.log(e);
         }
-        await API.notice.createNotice({title: title, content: content, description: description, staffId: to.accountId, sendType: ESendType.ONE_ACCOUNT, type: data.noticeType || ENoticeType.SYSTEM_NOTICE});
-        logger.info('成功发送通知:', data.account.name, this.name);
     }
 }
 
@@ -248,10 +265,12 @@ export async function __init() {
 
 //通知模块
 export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean> {
-    let {userId, key, values, email, mobile, local} = params;
-    let values_clone: any = {};
-    if(values){
-        values_clone = _.cloneDeep(values)
+    let {userId, key, email, mobile, values} = params;
+    console.info(values);
+    console.info("_values11111111111111111111111111111111111111111");
+    let _values: any = {};
+    for(let k in values){
+        _values[k] = values[k];
     }
     let account: any = {};
     let openId;
@@ -271,27 +290,27 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
     }
 
     if (openId) {
-        values_clone.templateId = config.notify.templates[key];
+        _values.templateId = config.notify.templates[key];
     }
 
     let tpl = templates[key];
     if(!tpl)
         return false;
-    values_clone.account = account;
+    _values.account = account;
 
-    if(local){
-        try {
-            let path_require = './templates/' + key + '/transform';
-            let transform = require(`${path_require}`);
-            if(transform){
-                local = await transform(local);
-            }
-        } catch(err) {
-            console.info(err);
+    try {
+        let path_require = './templates/' + key + '/transform';
+        let transform = require(`${path_require}`);
+        if(transform){
+            _values = await transform(_values);
         }
-        values_clone.local = local;
+    } catch(err) {
+        console.info(err);
     }
 
-    await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: userId }, values_clone);
+    console.info(_values);
+    console.info("_values99999999999999999999999999999999999999999999");
+
+    await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: userId }, _values);
     return true;
 }

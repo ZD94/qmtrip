@@ -1,7 +1,7 @@
-<%=name || '' %>您好<br/><%=local.account.name || '' %>(<%=local.account.company.name || '' %>)
-在<%=moment(local.createdAt).format('YYYY.MM.DD') || '' %>生成了新的出差预算，具体内容如下：<br/>
-项目：<%=local.project.name || '' %><br/>
-行程：<%=local.cityNames %><br/>
-类型：<%=local.isSpecialApprove ? '特别审批' : '普通申请'%><br/>
-总预算：<%=local.budget %>元<br/>
+<%=name || '' %>您好<br/><%=tripApprove.account.name || '' %>(<%=tripApprove.account.company.name || '' %>)
+在<%=moment(tripApprove.createdAt).format('YYYY.MM.DD') || '' %>生成了新的出差预算，具体内容如下：<br/>
+项目：<%=tripApprove.project.name || '' %><br/>
+行程：<%=cityNames %><br/>
+类型：<%=tripApprove.isSpecialApprove ? '特别审批' : '普通申请'%><br/>
+总预算：<%=tripApprove.budget %>元<br/>
 <!--出差人：李晓辰、彭科、王鹏<br/>-->

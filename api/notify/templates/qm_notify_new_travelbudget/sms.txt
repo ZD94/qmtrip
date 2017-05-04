@@ -1,1 +1,1 @@
-员工 <%=local.account.name || ''%>, <%=moment(local.startAt).format('YYYY.MM.DD') || ''%>到<%=local.arrivalCity || ''%>的出差申请已发送给您, 点击此处进行审批 <%=detailUrl || ''%>
+员工 <%=tripApprove.account.name || ''%>, <%=moment(tripApprove.startAt).format('YYYY.MM.DD') || ''%>到<%=tripApprove.arrivalCity || ''%>的出差申请已发送给您, 点击此处进行审批 <%=detailUrl || ''%>

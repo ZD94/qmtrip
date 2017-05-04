@@ -1,14 +1,15 @@
 /**
- * Created by wangyali on 2017/4/26.
+ * Created by wangyali on 2017/5/4.
  */
 import {TripApprove} from "_types/tripPlan/tripPlan";
 import {Models} from "_types";
 import moment = require("moment");
 var API = require('@jingli/dnode-api');
 
-export = async function transform(params: any): Promise<any>{
-        let tripPlan = await Models.tripPlan.get(params.id);
-        let tripApprove = await Models.tripApprove.get(params.id);
+export = async function transform(values: any): Promise<any>{
+    if(values.tripPlan && values.tripPlan.id){
+        let tripPlan = await Models.tripPlan.get(values.tripPlan.id);
+        let tripApprove = await Models.tripApprove.get(values.tripPlan.id);
 
         let arrivalCityCodes = tripPlan.arrivalCityCodes;
         let cityNames = tripPlan.deptCity+"-";
@@ -26,7 +27,7 @@ export = async function transform(params: any): Promise<any>{
         }else{
             cityNames = cityNames + tripPlan.arrivalCity;
         }
-        tripPlan["cityNames"] = cityNames;
+        values.cityNames = cityNames;
 
         if(tripApprove){
             let approvedUsers = tripApprove.approvedUsers.split(',');
@@ -38,10 +39,10 @@ export = async function transform(params: any): Promise<any>{
                 }
             }))
             agreeUserNames = agreeUserNames.substr(0, agreeUserNames.length - 1);
-            tripPlan["agreeUserNames"] = agreeUserNames;
+            values.agreeUserNames = agreeUserNames;
         }else{
-            tripPlan["agreeUserNames"] = "";
+            values.agreeUserNames = "";
         }
-
-        return tripPlan;
+    }
+    return values;
 }
