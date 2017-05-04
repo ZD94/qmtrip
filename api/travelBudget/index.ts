@@ -30,6 +30,7 @@ export default class ApiTravelBudget {
             let staff = await Staff.getCurrent();
             accountId = staff.id;
         }
+
         let key = `budgets:${accountId}:${params.id}`;
         return cache.read(key);
     }
@@ -65,12 +66,11 @@ export default class ApiTravelBudget {
     */
     @clientExport
     static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams) :Promise<string> {
-        // let {accountId} = Zone.current.get('session');
-        // let staffId = params['staffId'] || accountId;
-        // let staff = await Models.staff.get(staffId);
-        let staff = await Staff.getCurrent();
+        let currentStaff = await Staff.getCurrent();
+        let staffId = params['staffId'] || currentStaff.id;
+        let staff = await Models.staff.get(staffId);
+
         let accountId = staff.accountId;
-        let staffId = staff.id;
         let travelPolicy = await staff.getTravelPolicy();
         if (!travelPolicy) {
             throw new Error(`差旅标准还未设置`);
@@ -167,60 +167,48 @@ export default class ApiTravelBudget {
                 Zone.current.fork({name: "getTravelPolicy",properties: { session: session}})
                     .run(async function() {
                         if (isNeedTraffic) {
-                            try {
-                                //去程预算
-                                let budget = await ApiTravelBudget.getTrafficBudget({
-                                    originPlace: originPlace,
-                                    destinationPlace: destinationPlace,
-                                    leaveDate: leaveDate,
-                                    earliestLeaveDateTime: null,
-                                    latestArrivalDateTime: latestArrivalDateTime,
-                                });
-                                budget.tripType = ETripType.OUT_TRIP;
-                                budget['reason'] = reason;
-                                budgets.push(budget);
-                            } catch (err) {
-                                reject(err);
-                            }
+                            //去程预算
+                            let budget = await ApiTravelBudget.getTrafficBudget({
+                                originPlace: originPlace,
+                                destinationPlace: destinationPlace,
+                                leaveDate: leaveDate,
+                                earliestLeaveDateTime: null,
+                                latestArrivalDateTime: latestArrivalDateTime,
+                            });
+                            budget.tripType = ETripType.OUT_TRIP;
+                            budget['reason'] = reason;
+                            budgets.push(budget);
                         }
 
-                        if (isNeedHotel) {
-                            try {
-                                let budget = await ApiTravelBudget.getHotelBudget({
-                                    city: destinationPlace,
-                                    businessDistrict: businessDistrict,
-                                    checkInDate: leaveDate,
-                                    checkOutDate: goBackDate,
-                                    hotelName: hotelName
-                                });
-                                budget.tripType = ETripType.HOTEL;
-                                budget['reason'] = reason;
-                                budgets.push(budget);
-                            } catch (err) {
-                                console.info(err);
-                                reject(err)
-                            }
+                        let days = moment(moment(goBackDate).format(momentDateFormat)).diff(moment(leaveDate).format(momentDateFormat), 'days')
+                        if (isNeedHotel && days > 0) {
+                            let budget = await ApiTravelBudget.getHotelBudget({
+                                city: destinationPlace,
+                                businessDistrict: businessDistrict,
+                                checkInDate: leaveDate,
+                                checkOutDate: goBackDate,
+                                hotelName: hotelName
+                            });
+                            budget.tripType = ETripType.HOTEL;
+                            budget['reason'] = reason;
+                            budgets.push(budget);
                         }
 
                         if (isNeedTraffic && isRoundTrip && i == (paramsToBudget.length - 1)) {
-                            try {
-                                let _params = {
-                                    originPlace: destinationPlace,
-                                    destinationPlace: params.originPlace,
-                                    leaveDate: goBackDate,
-                                    earliestLeaveDateTime: earliestGoBackDateTime,
-                                    latestArrivalTime: null,
-                                }
-                                if(goBackPlace){
-                                    _params.destinationPlace = goBackPlace;
-                                }
-                                let budget = await ApiTravelBudget.getTrafficBudget(_params);
-                                budget.tripType = ETripType.BACK_TRIP;
-                                budget['reason'] = reason;
-                                budgets.push(budget);
-                            } catch (err) {
-                                reject(err);
+                            let _params = {
+                                originPlace: destinationPlace,
+                                destinationPlace: params.originPlace,
+                                leaveDate: goBackDate,
+                                earliestLeaveDateTime: earliestGoBackDateTime,
+                                latestArrivalTime: null,
                             }
+                            if(goBackPlace){
+                                _params.destinationPlace = goBackPlace;
+                            }
+                            let budget = await ApiTravelBudget.getTrafficBudget(_params);
+                            budget.tripType = ETripType.BACK_TRIP;
+                            budget['reason'] = reason;
+                            budgets.push(budget);
                         }
 
                         if (subsidy && subsidy.template) {
@@ -425,6 +413,7 @@ export default class ApiTravelBudget {
         }
 
         let isAbroad = false;
+        let isEurope = false;
         let m_originCity = await API.place.getCityInfo({cityCode: originPlace.id || originPlace});
         let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
 
@@ -445,6 +434,9 @@ export default class ApiTravelBudget {
 
         if (m_destination.isAbroad || m_originCity.isAbroad) {
             isAbroad = true;
+            if(m_destination.euroRailCtripCode && m_originCity.euroRailCtripCode){
+                isEurope = true;
+            }
         }
         let cabins: EPlaneLevel[];
         if (isAbroad && (!policy.isOpenAbroad || !policy.abroadPlaneLevels.length)) {
@@ -459,7 +451,7 @@ export default class ApiTravelBudget {
         }
 
         if (!cabins || !cabins.length) {
-            cabins = [EPlaneLevel.ECONOMY, EPlaneLevel.BUSINESS, EPlaneLevel.FIRST]
+            cabins = [EPlaneLevel.ECONOMY]
         }
 
         let trainCabins: ETrainLevel[] = policy.trainLevels;
@@ -487,7 +479,7 @@ export default class ApiTravelBudget {
 
 
         let trainTickets = [];
-        if (!isAbroad) {
+        if (!isAbroad || isEurope) {
             trainTickets = await API.train.search_ticket( {
                 originPlace: m_originCity,
                 destination: m_destination,
@@ -538,10 +530,9 @@ export default class ApiTravelBudget {
 
     @clientExport
     static async reportBudgetError(params: { budgetId: string}) {
-        let {accountId} = Zone.current.get('session');
+        let staff = await Staff.getCurrent();
         let {budgetId} = params;
-        //let staff = await Staff.getCurrent();
-        let content = await ApiTravelBudget.getBudgetInfo({id: budgetId, accountId: accountId});
+        let content = await ApiTravelBudget.getBudgetInfo({id: budgetId, accountId: staff.id});
         let budgets = content.budgets;
         let ps = budgets.map( async (budget): Promise<any> => {
             if (!budget.id) {
