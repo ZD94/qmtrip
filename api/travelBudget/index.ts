@@ -66,12 +66,11 @@ export default class ApiTravelBudget {
     */
     @clientExport
     static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams) :Promise<string> {
-        // let {accountId} = Zone.current.get('session');
-        // let staffId = params['staffId'] || accountId;
-        // let staff = await Models.staff.get(staffId);
-        let staff = await Staff.getCurrent();
+        let currentStaff = await Staff.getCurrent();
+        let staffId = params['staffId'] || currentStaff.id;
+        let staff = await Models.staff.get(staffId);
+
         let accountId = staff.accountId;
-        let staffId = staff.id;
         let travelPolicy = await staff.getTravelPolicy();
         if (!travelPolicy) {
             throw new Error(`差旅标准还未设置`);
