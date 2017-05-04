@@ -451,7 +451,7 @@ export default class ApiTravelBudget {
         }
 
         if (!cabins || !cabins.length) {
-            cabins = [EPlaneLevel.ECONOMY, EPlaneLevel.BUSINESS, EPlaneLevel.FIRST]
+            cabins = [EPlaneLevel.ECONOMY]
         }
 
         let trainCabins: ETrainLevel[] = policy.trainLevels;
