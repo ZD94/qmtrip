@@ -262,8 +262,6 @@ export default class ApiTravelBudget {
         obj.createAt = Date.now();
         let _id = Date.now() + utils.getRndStr(6);
         let key = `budgets:${staffId}:${_id}`;
-        console.info(key);
-        console.info("111111111111111111111111111111111111111");
         await cache.write(key, JSON.stringify(obj));
         return _id;
     }
