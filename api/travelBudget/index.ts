@@ -237,7 +237,6 @@ export default class ApiTravelBudget {
             budget['reason'] = '';
             budgets.push(budget);
         }
-        console.log(budgets);
 
         let obj: any = {};
         obj.budgets = budgets;
