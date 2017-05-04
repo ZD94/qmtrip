@@ -30,7 +30,9 @@
         {
             "name": "trainPricePrefer",
             "options": {
-                "score": 1000
+                "type": "square",
+                "score": 10000,
+                "expectTrainCabins": "<%=local.expectTrainCabins%>"
             }
         }
     ],
@@ -63,6 +65,14 @@
                 "subScore": 5,
                 "maxDuration": 360,
                 "minDuration": 120
+            }
+        },
+        {
+            "name": "trainPricePrefer",
+            "options": {
+                "score": 10000,
+                "expectTrainCabins": "<%=local.expectTrainCabins%>",
+                "type": "square"
             }
         }
     ],
