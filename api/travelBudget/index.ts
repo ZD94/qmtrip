@@ -223,7 +223,7 @@ export default class ApiTravelBudget {
         if (isRoundTrip) {
             let lastDestination = destinationPlacesInfo[destinationPlacesInfo.length-1]
             let deptCity = lastDestination.destinationPlace;
-            let destCity = params.originPlace;
+            let destCity = params.goBackPlace || params.originPlace;
             let leaveData = lastDestination.goBackDate;
             let _params = {
                 originPlace: deptCity,
