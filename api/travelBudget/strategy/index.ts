@@ -8,6 +8,7 @@ import {ticketPrefers, hotelPrefers} from '../prefer'
 import {EInvoiceType} from "_types/tripPlan";
 import {IPrefer} from '../prefer'
 import {Models} from "_types/index";
+import util = require("util");
 
 function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
     let _tickets : IFinalTicket[] = [];
@@ -95,6 +96,7 @@ export abstract class AbstractHotelStrategy {
 
     async getResult(hotels: IHotel[], isRetMarkedData?: boolean): Promise<TravelBudgetHotel> {
         let _hotels = formatHotel(hotels);
+        let query = this.qs.query || {};
         if (!_hotels || !_hotels.length) {
             const defaultPrice = {
                 "5": 500,
@@ -102,8 +104,19 @@ export abstract class AbstractHotelStrategy {
                 "3": 400,
                 "2": 350
             }
+            if (!util.isArray(query.star)) {
+                this.qs.star = [query.star];
+            }
+            let prices = query.star.map( (star) => {
+                return defaultPrice[star];
+            });
+            prices.sort();
             return {
-                price: defaultPrice[this.qs.star]
+                price: prices[prices.length-1],
+                checkInDate: query.checkInDate,
+                checkOutDate: query.checkOutDate,
+                cityName: query.city.name,
+                hotelName: query.hotelName
             }
         }
         _hotels = await this.getMarkedScoreHotels(_hotels);
@@ -119,19 +132,19 @@ export abstract class AbstractHotelStrategy {
             star: ret.star,
             latitude: ret.latitude,
             longitude: ret.longitude,
-            checkInDate: this.qs.query.checkInDate,
-            checkOutDate: this.qs.query.checkOutDate,
-            cityName: this.qs.query.city.name,
-            hotelName: this.qs.query.hotelName
+            checkInDate: query.checkInDate,
+            checkOutDate: query.checkOutDate,
+            cityName: query.city.name,
+            hotelName: query.hotelName
         }as TravelBudgetHotel
         if (isRetMarkedData) {
             result.markedScoreData = _hotels;
         }
         if (this.isRecord) {
             let travelBudgetLog = await Models.travelBudgetLog.create({});
-            travelBudgetLog.title = `[住宿]${this.qs.query.city.name}-(${this.qs.query.checkInDate})`
+            travelBudgetLog.title = `[住宿]${query.city.name}-(${query.checkInDate})`
             travelBudgetLog.prefers = this.qs.prefers;
-            travelBudgetLog.query = this.qs.query;
+            travelBudgetLog.query = query;
             travelBudgetLog.originData = hotels;
             travelBudgetLog.type = 2;
             travelBudgetLog.result = result;
