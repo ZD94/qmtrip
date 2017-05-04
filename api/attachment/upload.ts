@@ -2,7 +2,8 @@
  * Created by by wyl on 15-12-16.
  */
 'use strict';
-var config = require('@jingli/config');
+let config = require('@jingli/config');
+import * as path from 'path';
 var API = require("@jingli/dnode-api");
 var requestProxy = require('express-request-proxy');
 import fs = require("fs");
@@ -44,7 +45,6 @@ module.exports = function(app) {
  * @returns {*}
  */
 let pwd = process.cwd();
-let path= require("path");
 async function getPublicFile(req, res, next) {
     req.clearTimeout();
     var cacheFile = await API.attachment.getFileCache({id:req.params.id, isPublic:true});
@@ -52,12 +52,15 @@ async function getPublicFile(req, res, next) {
         return next(404);
     }
     res.set("Content-Type", cacheFile.type);
-    let filePath = path.join(pwd , cacheFile.file)
+    let file = cacheFile.file;
+    if(!path.isAbsolute(file))
+        file = path.join(pwd, file);
+
     let isExist = await new Promise((resolve, reject) => {
-        fs.exists(filePath, resolve);
+        fs.exists(file, resolve);
     });
     if (!isExist) {
         return next(404);
     }
-    return res.sendFile(filePath);
+    return res.sendFile(path.join(pwd , cacheFile.file));
 }
