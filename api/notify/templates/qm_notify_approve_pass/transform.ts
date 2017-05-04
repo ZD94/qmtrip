@@ -11,6 +11,8 @@ export = async function transform(values: any): Promise<any>{
         let tripPlan = await Models.tripPlan.get(values.tripPlan.id);
         let tripApprove = await Models.tripApprove.get(values.tripPlan.id);
 
+        values.tripApprove = tripApprove;
+
         let arrivalCityCodes = tripPlan.arrivalCityCodes;
         let cityNames = tripPlan.deptCity+"-";
         if(typeof arrivalCityCodes == 'string')arrivalCityCodes = JSON.parse(arrivalCityCodes);
