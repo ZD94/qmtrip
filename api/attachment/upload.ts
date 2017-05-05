@@ -62,5 +62,5 @@ async function getPublicFile(req, res, next) {
     if (!isExist) {
         return next(404);
     }
-    return res.sendFile(path.join(pwd , cacheFile.file));
+    return res.sendFile(file);
 }
