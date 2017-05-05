@@ -207,7 +207,7 @@ async function addCredit(req, res, next) {
     var coinAccountChanges = await Models.coinAccountChange.find({where: {duiBaOrderNum: orderNum}});
     //防止订单重复处理
     if(!coinAccountChanges || coinAccountChanges.length <= 0){
-        var result = await coinAccount.addCoin(credits, description, orderNum);
+        var result = await coinAccount.addCoin(credits, "每日签到奖励", orderNum);
         res.json({
             'status': 'ok',
             'errorMessage': '',
