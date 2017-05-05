@@ -9,6 +9,7 @@ import {EInvoiceType} from "_types/tripPlan";
 import {IPrefer} from '../prefer'
 import {Models} from "_types/index";
 import util = require("util");
+import moment = require("moment");
 
 function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
     let _tickets : IFinalTicket[] = [];
@@ -111,8 +112,9 @@ export abstract class AbstractHotelStrategy {
                 return defaultPrice[star];
             });
             prices.sort();
+            let days = moment(query.checkOutDate).diff(query.checkInDate, 'days');
             return {
-                price: prices[prices.length-1],
+                price: prices[prices.length-1] * days,
                 checkInDate: query.checkInDate,
                 checkOutDate: query.checkOutDate,
                 cityName: query.city.name,
