@@ -1,3 +1,10 @@
+delete from company.suppliers where id = '2244b1a1-74c7-11e6-b1b9-f14ff84d5a8e';
+
+delete from company.suppliers where id = 'c45ea130-13af-11e7-a4e1-75d4ee29fe4d';
+
+delete from company.suppliers where id = 'b3f0f3c0-1463-11e7-a095-3b6378932eda';
+
+
 INSERT INTO company.suppliers(
             id, name, traffic_book_link, hotel_book_link, logo, company_id, created_at, updated_at, supplier_key, type, is_in_use)
     VALUES ('2244b1a1-74c7-11e6-b1b9-f14ff84d5a8e', '去哪儿', 'https://touch.qunar.com/h5/flight', 'https://touch.qunar.com/hotel',
