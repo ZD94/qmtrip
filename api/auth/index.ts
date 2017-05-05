@@ -1090,6 +1090,7 @@ export default class ApiAuth {
     @clientExport
     static logout = authentication.logout;
 
+    @clientExport
     static authentication = authentication.checkTokenAuth;
     static makeAuthenticateToken = authentication.makeAuthenticateToken;
 
