@@ -6,7 +6,7 @@ let config = require('@jingli/config');
 import * as path from 'path';
 var API = require("@jingli/dnode-api");
 var requestProxy = require('express-request-proxy');
-var conn_timeout = require('connect-timeout');
+import fs = require("fs");
 
 function resetTimeout(req, res, next){
     req.clearTimeout();
@@ -55,5 +55,12 @@ async function getPublicFile(req, res, next) {
     let file = cacheFile.file;
     if(!path.isAbsolute(file))
         file = path.join(pwd, file);
+
+    let isExist = await new Promise((resolve, reject) => {
+        fs.exists(file, resolve);
+    });
+    if (!isExist) {
+        return next(404);
+    }
     return res.sendFile(file);
 }

@@ -176,7 +176,8 @@ export default class ApiTravelBudget {
                             budgets.push(budget);
                         }
 
-                        if (isNeedHotel) {
+                        let days = moment(moment(goBackDate).format(momentDateFormat)).diff(moment(leaveDate).format(momentDateFormat), 'days')
+                        if (isNeedHotel && days > 0) {
                             let budget = await ApiTravelBudget.getHotelBudget({
                                 city: destinationPlace,
                                 businessDistrict: businessDistrict,
@@ -408,6 +409,7 @@ export default class ApiTravelBudget {
         }
 
         let isAbroad = false;
+        let isEurope = false;
         let m_originCity = await API.place.getCityInfo({cityCode: originPlace.id || originPlace});
         let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
 
@@ -427,6 +429,9 @@ export default class ApiTravelBudget {
 
         if (m_destination.isAbroad || m_originCity.isAbroad) {
             isAbroad = true;
+            if(m_destination.euroRailCtripCode && m_originCity.euroRailCtripCode){
+                isEurope = true;
+            }
         }
         let cabins: EPlaneLevel[];
         if (isAbroad && (!policy.isOpenAbroad || !policy.abroadPlaneLevels.length)) {
@@ -441,7 +446,7 @@ export default class ApiTravelBudget {
         }
 
         if (!cabins || !cabins.length) {
-            cabins = [EPlaneLevel.ECONOMY, EPlaneLevel.BUSINESS, EPlaneLevel.FIRST]
+            cabins = [EPlaneLevel.ECONOMY]
         }
 
         let trainCabins: ETrainLevel[] = policy.trainLevels;
@@ -469,7 +474,7 @@ export default class ApiTravelBudget {
 
 
         let trainTickets = [];
-        if (!isAbroad) {
+        if (!isAbroad || isEurope) {
             trainTickets = await API.train.search_ticket( {
                 originPlace: m_originCity,
                 destination: m_destination,
