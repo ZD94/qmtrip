@@ -364,8 +364,10 @@ class TripApproveModule {
                 }
                 finalBudget += Number(v.price);
             });
-            tripApprove.budget = finalBudget;
-            tripApprove.budgetInfo = budgetInfo.budgets;
+            if (finalBudget > tripApprove.budget) {
+                tripApprove.budget = finalBudget;
+                tripApprove.budgetInfo = budgetInfo.budgets;
+            }
         }
 
 
