@@ -954,7 +954,7 @@ class TripPlanModule {
         let approve = await Models.approve.get(params.tripApproveId);
         let account = await Models.staff.get(approve.submitter);
         let approveUser = await Models.staff.get(approve.approveUser);
-        let company = approve.approveUser ? approveUser.company : account.company;
+        let company = approve.submitter ? account.company : approveUser.company;
         if (typeof approve.data == 'string') approve.data = JSON.parse(approve.data);
         let query: any  = approve.data.query;   //查询条件
         if(typeof query == 'string') query = JSON.parse(query);
@@ -1385,11 +1385,26 @@ class TripPlanModule {
         })
         let financeCheckCode = Models.financeCheckCode.create({tripPlanId: tripPlanId, isValid: true});
         financeCheckCode = await financeCheckCode.save();
-        let roundLine = `${tripPlan.deptCity}-${tripPlan.arrivalCity}${tripPlan.isRoundTrip ? '-' + tripPlan.deptCity: ''}`;
+        // let roundLine = `${tripPlan.deptCity}-${tripPlan.arrivalCity}${tripPlan.isRoundTrip ? '-' + tripPlan.deptCity: ''}`;
+        let roundLine = tripPlan.deptCity;
+        if(typeof tripPlan.arrivalCityCodes == 'string'){
+            tripPlan.arrivalCityCodes = JSON.parse(tripPlan.arrivalCityCodes);
+        }
+        await Promise.all(tripPlan.arrivalCityCodes.map(async function(item){
+            let arrCity = await API.place.getCityInfo({ cityCode: item });
+            if(arrCity){
+                roundLine = roundLine + "-" + arrCity.name;
+            }
+        }))
+        roundLine += tripPlan.isRoundTrip ? '-'+tripPlan.deptCity : '';
+        console.info(roundLine);
         _tripDetails = await Promise.all(_tripDetails);
         _tripDetails = _tripDetails.filter( (v) => {
             return v['money'] > 0;
         });
+        if (_tripDetails.length<= 0 ) {
+            throw L.ERROR_CODE(500, '本次出差中无需要报销费用');
+        }
         var invoiceQuantity = _tripDetails
             .map( (v) => {
                 return v['quantity'] || 0;
@@ -1431,7 +1446,7 @@ class TripPlanModule {
             "createAt": moment().format('YYYY年MM月DD日HH:mm'), //生成时间
             "departDate": moment(tripPlan.startAt).format('YYYY.MM.DD'), //出差起始时间
             "backDate": moment(tripPlan.backAt).format('YYYY.MM.DD'), //出差返回时间
-            "reason": tripPlan.project.name, //出差事由
+            "reason": tripPlan.project ? tripPlan.project.name: '', //出差事由
             "approveUsers": approveUsers, //本次出差审批人
             "qrcode": `data:image/png;base64,${qrcodeCxt}`,
             "invoices": _tripDetails,
@@ -1620,38 +1635,37 @@ class TripPlanModule {
         scheduler('*/5 * * * *', taskId, async function() {
             let tripApproves = await Models.tripApprove.find({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
             tripApproves.map(async (approve) => {
-                let approveCompany = await approve.getCompany();
-                let number = 0;
-                if(approve.isNeedHotel){
-                    number = number + 1;
-                }
-                if(approve.isNeedTraffic){
-                    number = number + 1;
-                }
-                if(approve.isRoundTrip){
-                    number = number + 1;
-                }
+                try{
+                    let approveCompany = await approve.getCompany();
+                    if(typeof approve.query == 'string'){
+                        approve.query = JSON.parse(approve.query);
+                    }
+                    let frozenNum = approve.query.frozenNum;
 
-                await approveCompany.beforeApproveTrip({number : number});
+                    await approveCompany.beforeApproveTrip({number: frozenNum});
 
-                approve.status = QMEApproveStatus.PASS;
-                approve = await approve.save();
+                    let content = approve.deptCity+"-"+approve.arrivalCity;
+                    if(!approve.isSpecialApprove){
+                        if(approve.createdAt.getMonth() == new Date().getMonth()){
+                            await approveCompany.approvePassReduceTripPlanNum({accountId: approve.account.id, tripPlanId: approve.id,
+                                remark: "自动审批通过消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
+                        }else{
+                            await approveCompany.approvePassReduceBeforeNum({accountId: approve.account.id, tripPlanId: approve.id,
+                                remark: "自动审批通过上月申请消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
+                        }
+                    }
 
-                let content = approve.deptCity+"-"+approve.arrivalCity;
-                let frozenNum = JSON.parse(approve.query).frozenNum;
-                if(approve.createdAt.getMonth() == new Date().getMonth() && !approve.isSpecialApprove){
-                    await approveCompany.approvePassReduceTripPlanNum({accountId: approve.account.id, tripPlanId: approve.id,
-                        remark: "自动审批通过消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
-                }else{
-                    await approveCompany.approvePassReduceBeforeNum({accountId: approve.account.id, tripPlanId: approve.id,
-                        remark: "自动审批通过上月申请消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
+                    if(approve.approveUser && approve.approveUser.id && /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(approve.approveUser.id)) {
+                        let log = Models.tripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser.id, approveStatus: EApproveResult.AUTO_APPROVE, remark: '自动通过'});
+                        await log.save();
+                    }
+                    await TripPlanModule.saveTripPlanByApprove({tripApproveId: approve.id});
+
+                    approve.status = QMEApproveStatus.PASS;
+                    approve = await approve.save();
+                }catch(e){
+                    logger.error(e.stack);
                 }
-
-                if(approve.approveUser && approve.approveUser.id && /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(approve.approveUser.id)) {
-                    let log = Models.tripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser.id, approveStatus: EApproveResult.AUTO_APPROVE, remark: '自动通过'});
-                    await log.save();
-                }
-                await TripPlanModule.saveTripPlanByApprove({tripApproveId: approve.id});
             });
         });
     }

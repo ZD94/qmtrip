@@ -52,10 +52,11 @@ export default class SupplierCtripCT extends SupplierWebRobot{
     }
 
     async getHotelReserveLink(options):Promise<ReserveLink> {
+        let now  = +new Date() , aday = 1000 * 60 * 60 * 24;
         let days = +moment(options.backDate) - (+moment(options.leaveDate));
-        days = Math.floor( days / (1000 * 60 * 60 * 24) );
-        let after = +moment(options.leaveDate) - (+new Date());
-        after = Math.ceil( after / (1000 * 60 * 60 * 24) );
+        days = Math.floor( days / aday );
+        let after = +moment(options.leaveDate) - (now - now % aday);
+        after = Math.ceil( after / aday );
 
         var cityInfo = await this.queryHotelCityCode(options.city);
         var values = {cityInfo: cityInfo , days : days , after : after};
@@ -94,7 +95,26 @@ export default class SupplierCtripCT extends SupplierWebRobot{
 
         var param_str = JSON.stringify(param);
         var linkJS = "localStorage.setItem('TRAIN_SEARCH_STORE_LIGHT', \'"+param_str+"\');console.log('train_search_param');";
-        return {url:trafficBookLink, indexUrl:indexBookLink, jsCode: linkJS};
+
+        let date = moment(options.leaveDate).format("YYYY-MM-DD");
+        let jsCode = `
+            var canGo = sessionStorage.getItem("canGo");
+            if(canGo){
+
+            }else{
+                sessionStorage.setItem("canGo" , true);
+                var Info = localStorage.getItem('TRAIN_SEARCH_STORE_LIGHT');
+                Info = JSON.parse(Info);
+                Info.value.date = "${date}";
+                Info.value.from.cityName = Info.value.from.name = "${options.fromCity}";
+                Info.value.to.cityName   = Info.value.to.name   = "${options.toCity}";
+                Info = JSON.stringify(Info);
+                localStorage.setItem('TRAIN_SEARCH_STORE_LIGHT' , Info);
+                location.reload();
+            }
+        `;
+
+        return {url:trafficBookLink, indexUrl:indexBookLink, jsCode: jsCode};
     }
 
     async queryFlightCityCode(city: string): Promise<string>{

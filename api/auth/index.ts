@@ -5,10 +5,10 @@
 import { requireParams, clientExport } from "@jingli/dnode-api/dist/src/helper";
 import { Models, EAccountType } from "_types";
 import { Account, ACCOUNT_STATUS } from "_types/auth";
-import { Staff, EInvitedLinkStatus, EAddWay } from "_types/staff";
+import { Staff, EInvitedLinkStatus, EAddWay, EStaffRole } from "_types/staff";
 import validator = require('validator');
 import L from '@jingli/language';
-import cache = require("common/cache");
+import cache from "common/cache";
 import * as authentication from './authentication';
 import * as wechat from './wechat';
 import * as messagePush from './messagePush';
@@ -23,6 +23,7 @@ var API = require("@jingli/dnode-api");
 var utils = require("common/utils");
 var accountCols = Account['$fieldnames'];
 
+let codeTicket = "checkcode:ticket:";
 
 //生成激活链接参数
 function makeActiveSign(activeToken, accountId, timestamp) {
@@ -35,6 +36,7 @@ function makeLinkSign(linkToken, invitedLinkId, timestamp) {
     var originStr = linkToken + invitedLinkId + timestamp;
     return utils.md5(originStr);
 }
+
 
 
 /**
@@ -476,6 +478,154 @@ export default class ApiAuth {
     }
 
 
+
+    /**
+     * 被邀请人通过邀请链接注册员工信息
+     * @param data
+     * @returns {Company}
+     */
+    @clientExport
+    @requireParams(['mobile', 'name', 'companyId', 'msgTicket', 'pwd'], ['avatarColor', 'sex'])
+    static async invitedNewStaffRegister(data): Promise<any> {
+        let msgTicket = data.msgTicket;
+        let mobile = data.mobile;
+        let name = data.name;
+        let pwd = data.pwd;
+        let companyId = data.companyId;
+        let sex = data.sex;
+        console.log(mobile);
+        if(!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+        let key = codeTicket + msgTicket;
+        let redis_mobile = await cache.read(key);
+
+        if(redis_mobile != mobile){
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+
+        let staff = await API.staff.registerStaff({
+            mobile: mobile,
+            name: name,
+            sex: sex,
+            companyId: companyId,
+            pwd: utils.md5(pwd),
+            status: ACCOUNT_STATUS.ACTIVE,
+            isValidateMobile: true,
+            avatarColor: data.avatarColor,
+            addWay: EAddWay.INVITED
+        });
+        return staff.company;
+    }
+
+    /**
+     * 被邀请人通过邀请链接验证手机号
+     *
+     */
+    @clientExport
+    @requireParams(['mobile', 'msgCode', 'msgTicket'])
+    static async inviteStaffone( params ) : Promise<any>{
+        let mobile = params.mobile && params.mobile.toString(),
+            msgCode= params.msgCode && params.msgCode.toString(),
+            msgTicket=params.msgTicket;
+
+        if(mobile && !validator.isMobilePhone(mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+        if(!msgCode || !msgTicket) {
+            throw L.ERR.CODE_ERROR();
+        }
+        let checkMsgCode = await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
+        if(!checkMsgCode){
+            throw L.ERR.CODE_ERROR();
+        }
+
+        let Result = {
+            isRegister : false,
+            ticket     : null,
+            staff      : null,
+            mobile     : null
+        };
+
+        let accounts = await Models.account.find({where: {mobile: mobile}});
+        if(accounts && accounts.total > 0){
+            //已经注册
+            let account = accounts[0];
+            Result.isRegister = true;
+            Result.mobile = mobile;
+            let staffs = await Models.staff.find({where: {accountId : account.id}});
+            Result.staff = staffs[0];
+        }else{
+            Result.mobile = mobile;
+        }
+
+        Result.ticket = msgTicket;
+        let key = codeTicket + msgTicket;
+
+        //save ticket
+        await cache.write(key, mobile, 10 * 60);
+        return Result;
+    }
+
+    /**
+     * 被邀请人加入其它企业
+     */
+    @clientExport
+    @requireParams(["msgTicket", "mobile", "companyId"])
+    static async joinAnCompany( params ) : Promise<any>{
+        let mobile = params.mobile,
+            msgTicket=params.msgTicket,
+            companyId=params.companyId;
+
+        if(mobile && !validator.isMobilePhone(mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+        if(!msgTicket) {
+            throw L.ERR.SIGN_ERROR();
+        }
+        if(!companyId){
+            throw L.ERR.INVALID_ARGUMENT();
+        }
+        let key = codeTicket + msgTicket;
+        let cacheMobile =await cache.read(key);
+        if(!cacheMobile || cacheMobile != mobile){
+            throw L.ERR.SIGN_ERROR();
+        }
+
+        let accounts = await Models.account.find({where:{mobile:mobile}});
+        if(!accounts.length){
+            throw L.ERR.USER_NOT_EXIST();
+        }
+        let account = accounts[0];
+
+        let company = await Models.company.get( companyId );
+        if(!company){
+            throw L.ERR.COMPANY_NOT_EXIST();
+        }
+        let travelPolicy = await company.getDefaultTravelPolicy();
+        let otherStaffs = await Models.staff.find({where: {
+            accountId : account.id
+        }});
+        let otherStaff = otherStaffs[0];
+
+        let staffed = await Models.staff.find({where:{ companyId: companyId, accountId: account.id }});
+        if(staffed && staffed.total > 0){
+            throw L.ERR.MOBILE_HAS_REGISTRY();
+        }
+
+        let staff = Staff.create({
+            name: otherStaff.name,
+            status: ACCOUNT_STATUS.ACTIVE,
+            roleId: EStaffRole.COMMON,
+            travelPolicyId: travelPolicy.id,
+            accountId: account.id
+        });
+        staff.company = company;
+        await staff.save();
+        return staff.company;
+    }
+
+
     /**
      * 添加员工验证手机号和邮箱
      * @param data
@@ -578,9 +728,9 @@ export default class ApiAuth {
      * @returns {Promise<TResult>|Promise<U>}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'userName', 'pwd', 'msgCode', 'msgTicket'], ['email', 'agencyId', 'remark', 'description', 'promoCode'])
+    @requireParams(['mobile', 'name', 'userName', 'pwd', 'msgCode', 'msgTicket'], ['email', 'agencyId', 'remark', 'description', 'promoCode', 'referrerMobile'])
     static async registerCompany(params: {name: string, userName: string, email?: string, mobile: string, pwd: string,
-                                     msgCode: string, msgTicket: string, agencyId?: string, promoCode?: string}) {
+        msgCode: string, msgTicket: string, agencyId?: string, promoCode?: string, referrerMobile?: string}) {
         var companyName = params.name;
         var name = params.userName;
         var email = params.email;
@@ -588,6 +738,7 @@ export default class ApiAuth {
         var msgCode = params.msgCode;
         var msgTicket = params.msgTicket;
         var pwd = params.pwd;
+        var referrerMobile = params.referrerMobile;
 
         if(!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
             throw L.ERR.MOBILE_NOT_CORRECT();
@@ -636,7 +787,8 @@ export default class ApiAuth {
             pwd: pwd,
             status: ACCOUNT_STATUS.ACTIVE,
             isValidateMobile: true,
-            promoCode: params.promoCode
+            promoCode: params.promoCode,
+            referrerMobile: referrerMobile,
         });
         return result;
     }
@@ -1088,6 +1240,7 @@ export default class ApiAuth {
     @clientExport
     static logout = authentication.logout;
 
+    @clientExport
     static authentication = authentication.checkTokenAuth;
     static makeAuthenticateToken = authentication.makeAuthenticateToken;
 
