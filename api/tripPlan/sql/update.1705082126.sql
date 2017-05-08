@@ -1,0 +1,1 @@
+update trip_plan.trip_approves set arrival_city_codes = json_build_array(arrival_city_code)  where arrival_city_codes is null returning *;
