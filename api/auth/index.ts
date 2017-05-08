@@ -493,7 +493,7 @@ export default class ApiAuth {
         let pwd = data.pwd;
         let companyId = data.companyId;
         let sex = data.sex;
-
+        console.log(mobile);
         if(!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
             throw L.ERR.MOBILE_NOT_CORRECT();
         }
@@ -552,6 +552,7 @@ export default class ApiAuth {
             //已经注册
             let account = accounts[0];
             Result.isRegister = true;
+            Result.mobile = mobile;
             let staffs = await Models.staff.find({where: {accountId : account.id}});
             Result.staff = staffs[0];
         }else{
@@ -607,6 +608,11 @@ export default class ApiAuth {
         }});
         let otherStaff = otherStaffs[0];
 
+        let staffed = await Models.staff.find({where:{ companyId: companyId, accountId: account.id }});
+        if(staffed && staffed.total > 0){
+            throw L.ERR.MOBILE_HAS_REGISTRY();
+        }
+
         let staff = Staff.create({
             name: otherStaff.name,
             status: ACCOUNT_STATUS.ACTIVE,
@@ -614,7 +620,9 @@ export default class ApiAuth {
             travelPolicyId: travelPolicy.id,
             accountId: account.id
         });
-        return await staff.save();
+        staff.company = company;
+        await staff.save();
+        return staff.company;
     }
 
 
@@ -1232,6 +1240,7 @@ export default class ApiAuth {
     @clientExport
     static logout = authentication.logout;
 
+    @clientExport
     static authentication = authentication.checkTokenAuth;
     static makeAuthenticateToken = authentication.makeAuthenticateToken;
 

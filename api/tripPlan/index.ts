@@ -954,7 +954,7 @@ class TripPlanModule {
         let approve = await Models.approve.get(params.tripApproveId);
         let account = await Models.staff.get(approve.submitter);
         let approveUser = await Models.staff.get(approve.approveUser);
-        let company = approve.approveUser ? approveUser.company : account.company;
+        let company = approve.submitter ? account.company : approveUser.company;
         if (typeof approve.data == 'string') approve.data = JSON.parse(approve.data);
         let query: any  = approve.data.query;   //查询条件
         if(typeof query == 'string') query = JSON.parse(query);
@@ -1371,6 +1371,9 @@ class TripPlanModule {
         _tripDetails = _tripDetails.filter( (v) => {
             return v['money'] > 0;
         });
+        if (_tripDetails.length<= 0 ) {
+            throw L.ERROR_CODE(500, '本次出差中无需要报销费用');
+        }
         var invoiceQuantity = _tripDetails
             .map( (v) => {
                 return v['quantity'] || 0;
@@ -1603,7 +1606,10 @@ class TripPlanModule {
             tripApproves.map(async (approve) => {
                 try{
                     let approveCompany = await approve.getCompany();
-                    let frozenNum = JSON.parse(approve.query).frozenNum;
+                    if(typeof approve.query == 'string'){
+                        approve.query = JSON.parse(approve.query);
+                    }
+                    let frozenNum = approve.query.frozenNum;
 
                     await approveCompany.beforeApproveTrip({number: frozenNum});
 
