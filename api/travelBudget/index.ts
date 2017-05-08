@@ -76,6 +76,7 @@ export default class ApiTravelBudget {
             throw new Error(`差旅标准还未设置`);
         }
         let paramsToBudget = [];
+
         let destinationPlacesInfo = params.destinationPlacesInfo;
         if(destinationPlacesInfo && destinationPlacesInfo.length > 0){
             for(let j = 0; j < destinationPlacesInfo.length; j++){
@@ -157,71 +158,36 @@ export default class ApiTravelBudget {
                 throw L.ERR.CITY_NOT_EXIST();
             }
 
-            //返程需要参数
-            if (isRoundTrip){
-                if (!Boolean(goBackDate)) throw L.ERR.GO_BACK_DATE_FORMAT_ERROR();
-            }
-
             await new Promise(function(resolve, reject) {
                 let session = {staffId: staffId}
                 Zone.current.fork({name: "getTravelPolicy",properties: { session: session}})
                     .run(async function() {
                         if (isNeedTraffic) {
-                            try {
-                                //去程预算
-                                let budget = await ApiTravelBudget.getTrafficBudget({
-                                    originPlace: originPlace,
-                                    destinationPlace: destinationPlace,
-                                    leaveDate: leaveDate,
-                                    earliestLeaveDateTime: null,
-                                    latestArrivalDateTime: latestArrivalDateTime,
-                                });
-                                budget.tripType = ETripType.OUT_TRIP;
-                                budget['reason'] = reason;
-                                budgets.push(budget);
-                            } catch (err) {
-                                reject(err);
-                            }
+                            //去程预算
+                            let budget = await ApiTravelBudget.getTrafficBudget({
+                                originPlace: originPlace,
+                                destinationPlace: destinationPlace,
+                                leaveDate: leaveDate,
+                                earliestLeaveDateTime: null,
+                                latestArrivalDateTime: latestArrivalDateTime,
+                            });
+                            budget.tripType = ETripType.OUT_TRIP;
+                            budget['reason'] = reason;
+                            budgets.push(budget);
                         }
 
                         let days = moment(moment(goBackDate).format(momentDateFormat)).diff(moment(leaveDate).format(momentDateFormat), 'days')
                         if (isNeedHotel && days > 0) {
-                            try {
-                                let budget = await ApiTravelBudget.getHotelBudget({
-                                    city: destinationPlace,
-                                    businessDistrict: businessDistrict,
-                                    checkInDate: leaveDate,
-                                    checkOutDate: goBackDate,
-                                    hotelName: hotelName
-                                });
-                                budget.tripType = ETripType.HOTEL;
-                                budget['reason'] = reason;
-                                budgets.push(budget);
-                            } catch (err) {
-                                console.info(err);
-                                reject(err)
-                            }
-                        }
-
-                        if (isNeedTraffic && isRoundTrip && i == (paramsToBudget.length - 1)) {
-                            try {
-                                let _params = {
-                                    originPlace: destinationPlace,
-                                    destinationPlace: params.originPlace,
-                                    leaveDate: goBackDate,
-                                    earliestLeaveDateTime: earliestGoBackDateTime,
-                                    latestArrivalTime: null,
-                                }
-                                if(goBackPlace){
-                                    _params.destinationPlace = goBackPlace;
-                                }
-                                let budget = await ApiTravelBudget.getTrafficBudget(_params);
-                                budget.tripType = ETripType.BACK_TRIP;
-                                budget['reason'] = reason;
-                                budgets.push(budget);
-                            } catch (err) {
-                                reject(err);
-                            }
+                            let budget = await ApiTravelBudget.getHotelBudget({
+                                city: destinationPlace,
+                                businessDistrict: businessDistrict,
+                                checkInDate: leaveDate,
+                                checkOutDate: goBackDate,
+                                hotelName: hotelName
+                            });
+                            budget.tripType = ETripType.HOTEL;
+                            budget['reason'] = reason;
+                            budgets.push(budget);
                         }
 
                         if (subsidy && subsidy.template) {
@@ -243,9 +209,9 @@ export default class ApiTravelBudget {
                                 budget.hasLastDaySubsidy = subsidy.hasLastDaySubsidy;
                                 budget.tripType = ETripType.SUBSIDY;
                                 budget.type = EInvoiceType.SUBSIDY;
-                                budget.price = subsidy.template.target.subsidyMoney * days;
+                                budget.price = subsidy.template.subsidyMoney * days;
                                 budget.duringDays = days;
-                                budget.template = {id: subsidy.template.target.id, name: subsidy.template.target.name};
+                                budget.template = {id: subsidy.template.id, name: subsidy.template.name};
                                 budget.reason = reason;
                                 budgets.push(budget);
                             }
@@ -253,7 +219,24 @@ export default class ApiTravelBudget {
                         resolve(true);
                     })
             })
+        }
 
+        if (isRoundTrip) {
+            let lastDestination = destinationPlacesInfo[destinationPlacesInfo.length-1]
+            let deptCity = lastDestination.destinationPlace;
+            let destCity = params.goBackPlace || params.originPlace;
+            let leaveData = lastDestination.goBackDate;
+            let _params = {
+                originPlace: deptCity,
+                destinationPlace: destCity,
+                leaveDate: leaveData,
+                earliestLeaveDateTime: leaveData,
+                latestArrivalTime: null,
+            }
+            let budget = await ApiTravelBudget.getTrafficBudget(_params);
+            budget.tripType = ETripType.BACK_TRIP;
+            budget['reason'] = '';
+            budgets.push(budget);
         }
 
         let obj: any = {};
@@ -426,10 +409,10 @@ export default class ApiTravelBudget {
         }
 
         let isAbroad = false;
+        let isEurope = false;
         let m_originCity = await API.place.getCityInfo({cityCode: originPlace.id || originPlace});
         let m_destination = await API.place.getCityInfo({cityCode: destinationPlace.id || destinationPlace});
 
-        console.log("this is city info: ", m_originCity);
         //转换成当地时间
         if (!latestArrivalDateTime) {
             params.latestArrivalDateTime = undefined;
@@ -446,6 +429,9 @@ export default class ApiTravelBudget {
 
         if (m_destination.isAbroad || m_originCity.isAbroad) {
             isAbroad = true;
+            if(m_destination.euroRailCtripCode && m_originCity.euroRailCtripCode){
+                isEurope = true;
+            }
         }
         let cabins: EPlaneLevel[];
         if (isAbroad && (!policy.isOpenAbroad || !policy.abroadPlaneLevels.length)) {
@@ -460,7 +446,7 @@ export default class ApiTravelBudget {
         }
 
         if (!cabins || !cabins.length) {
-            cabins = [EPlaneLevel.ECONOMY, EPlaneLevel.BUSINESS, EPlaneLevel.FIRST]
+            cabins = [EPlaneLevel.ECONOMY]
         }
 
         let trainCabins: ETrainLevel[] = policy.trainLevels;
@@ -488,7 +474,7 @@ export default class ApiTravelBudget {
 
 
         let trainTickets = [];
-        if (!isAbroad) {
+        if (!isAbroad || isEurope) {
             trainTickets = await API.train.search_ticket( {
                 originPlace: m_originCity,
                 destination: m_destination,
