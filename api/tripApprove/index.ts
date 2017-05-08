@@ -122,7 +122,6 @@ class TripApproveModule {
     }
 
     static async sendTripApproveNotice(params: {approveId: string, nextApprove?: boolean}) {
-        console.info("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         let tripApprove = await Models.tripApprove.get(params.approveId);
         let staff = tripApprove.account;
         let company = staff.company;
@@ -136,14 +135,11 @@ class TripApproveModule {
         } catch(err) {
             console.warn(`转换短链接失败`, err);
         }
-        console.info("bbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
         if(company.isApproveOpen) {
             //给审核人发审核邮件
             let approveUser = await Models.staff.get(tripApprove['approveUserId']);
 
             try {
-                console.info("9999999999999999999999999999911111111111111111111111111111");
-                console.info({tripApprove: tripApprove, detailUrl: shortUrl, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPLY_NOTICE});
                 await API.notify.submitNotify({
                     key: 'qm_notify_new_travelbudget',
                     userId: approveUser.id,
@@ -159,7 +155,6 @@ class TripApproveModule {
                 console.error(`发送钉钉通知失败`, err)
             }
         } else {
-            console.info("cccccccccccccccccccccccccccccccccc");
             let admins = await Models.staff.find({ where: {companyId: tripApprove['companyId'], roleId: [EStaffRole.OWNER,
                 EStaffRole.ADMIN], staffStatus: EStaffStatus.ON_JOB, id: {$ne: staff.id}}}); //获取激活状态的管理员
             //给所有的管理员发送邮件

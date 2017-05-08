@@ -165,7 +165,6 @@ class NotifyTemplate{
             logger.info('成功发送邮件:', to.email, this.name);
         }catch (e){
             console.log(e);
-            console.log("666666666666666666666666666666666666666666666666666666666666");
         }
     }
 
@@ -266,8 +265,6 @@ export async function __init() {
 //通知模块
 export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean> {
     let {userId, key, email, mobile, values} = params;
-    console.info(values);
-    console.info("_values11111111111111111111111111111111111111111");
     let _values: any = {};
     for(let k in values){
         _values[k] = values[k];
@@ -308,8 +305,6 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
         console.info(err);
     }
 
-    console.info(_values);
-    console.info("_values99999999999999999999999999999999999999999999");
 
     await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: userId }, _values);
     return true;
