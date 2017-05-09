@@ -1,0 +1,12 @@
+<%=username || '' %>,您好<br/>您在<%=time || '' %>生成的出差记录已出动态预算，具体内容如下：
+项目名称：<%=projectName || '' %>
+去程交通：<%=goTrafficBudget || '' %>
+回程交通：<%=backTrafficBudget || '' %>
+住宿：    <%=hotelBudget || '' %>
+其他补助：<%=otherBudget || '' %>
+总预算：  <%=totalBudget || '' %>
+
+<a href="<%=url || '' %>">点击此处查看出差详情</a>
+
+如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅：
+<%=detailUrl || '' %>
