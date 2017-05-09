@@ -1,7 +1,20 @@
+<!--
 尊敬的<%=account.name%>：<br/>
 您企业有新员工加入<br/>
 姓名 手机号 差旅标准
 <%=staff.name%> <%=staff.mobile%> <%=travelPolicy.name%>
 查看详情<a href=<%=detailUrl || '' %>>【按钮】</a><br/>
 点击按钮可查看详情并修改员工信息<br/>
-如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅： <%=detailUrl || '' %><br/>
+如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅： <%=detailUrl || '' %><br/>-->
+
+<p style="font-size: 20px;color: #74C7CD">邀请加入</p>
+<p style="border-top: 1px solid #EEEEEE;padding-top: 25px;color: #4A4A4A">
+    尊敬的<%=account.name%>,您的企业有新员工加入<br/></br>
+</p>
+<%= include('qm_notify_admins_add_staff_detail') %>
+<a href=http://w.url.cn/s/AUn22HK style="display:block;width: 100px;height: 36px;text-align: center;line-height: 36px; background-color: #28A7FF;color: #ffffff; text-decoration:none;border-radius: 3px;margin-top: 20px">查看详情</a><br/>
+<p style="color: #9B9B9B;font-size: 14px;margin-top: -10px">点击按钮可查看详情并修改员工信息</p>
+<p style="font-size: 14px;color:#4A4A4A;border-top: 1px solid #EEEEEE"><br/>
+    如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅<br/>
+    （该链接在24小时内有效）： <%=detailUrl || '' %>
+</p>
