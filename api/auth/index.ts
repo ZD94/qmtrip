@@ -1287,11 +1287,9 @@ async function _sendActiveEmail(accountId: string, origin?: string) {
     }
     //发送激活邮件
     var vals = {
-        name: account.email,
-        username: account.email,
-        url: url,
-        appMessageUrl: appMessageUrl,
-        time: moment().format("YYYY-MM-DD HH:mm")
+        staff: staff,
+        detailUrl: url,
+        appMessageUrl: appMessageUrl
     };
     account.activeToken = activeToken;
     await Promise.all([

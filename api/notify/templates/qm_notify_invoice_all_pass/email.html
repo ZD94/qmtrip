@@ -1,3 +1,9 @@
-<%=username || '' %>,您好<br/>您<%=time || '' %>出差记录的相关票据已全部审核通过，具体内容如下：
-<%= include('budget_detail.html') %>
-<p><a href=<%=url || '' %>>点击此处查看出差详情</a><br/>如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅：<br/><%=detailUrl || '' %></p>
+尊敬的<%=account.name || '' %>，您提交的票据审核通过。<br/>
+项目：<%=tripPlan.project.name || '' %><br/>
+行程：<%=cityNames %><br/>
+总预算：<%=tripPlan.budget %>元<br/>
+实际支出：<%=tripPlan.expenditure %>元<br/>
+节省：<%=tripPlan.budget - tripPlan.expenditure || '' %>元<br/>
+<!--出差人：李晓辰、彭科、王鹏<br/>-->
+查看详情<a href=<%=detailUrl || '' %>>【按钮】</a><br/>
+如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅）：<%=detailUrl || '' %><br/>
