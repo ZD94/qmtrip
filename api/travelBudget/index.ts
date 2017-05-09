@@ -194,13 +194,11 @@ export default class ApiTravelBudget {
                             let goBackDay = moment(goBackDate).format("YYYY-MM-DD");
                             let leaveDay = moment(leaveDate).format("YYYY-MM-DD");
                             let days = moment(goBackDay).diff(moment(leaveDay), 'days');
-                            days = days + 1;
-                            if (!subsidy.hasFirstDaySubsidy) {
-                                days = days -1;
+
+                            if (i == (paramsToBudget.length-1)) {
+                                days = days + 1;
                             }
-                            if (!subsidy.hasLastDaySubsidy) {
-                                days = days - 1;
-                            }
+
                             if (days > 0) {
                                 let budget: any = {};
                                 budget.fromDate = leaveDate;
