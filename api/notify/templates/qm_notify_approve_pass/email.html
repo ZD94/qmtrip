@@ -1,3 +1,9 @@
-<%=account.name || '' %>,您好<br/>您的出差计划<%=planNo || '' %>已经审批通过，审批人：<%=approveUser || '' %>，审批时间：<%=approveTime || '' %>。<br/>关联出差记录如下：
-<%= include('budget_detail.html') %>
-<p><a href=<%=url || '' %>>点击此处查看出差详情</a><br/>如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅：<br/><%=detailUrl || '' %></p>
+尊敬的<%=account.name || '' %>，您的出差申请审批通过。<br/>
+项目：<%=tripPlan.project.name || '' %><br/>
+行程：<%=cityNames %><br/>
+类型：<%=tripPlan.isSpecialApprove ? '特别审批' : '普通申请'%><br/>
+总预算：<%=tripPlan.budget %>元<br/>
+<!--出差人：李晓辰、彭科、王鹏<br/>-->
+审批人：<%=agreeUserNames %><br/>
+查看详情<a href="<%=detailUrl%>">【按钮】</a><br/>
+如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅： <%=detailUrl || '' %>

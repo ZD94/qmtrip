@@ -578,7 +578,7 @@ class CompanyModule {
                 let companies = [];
                 let now = new Date();
                 const EXPIRE_BEFORE_DAYS = 15;
-                const PAYED_COMPANY_EXPIRE_NOTIFY = [1, 7, 15]
+                const PAYED_COMPANY_EXPIRE_NOTIFY = [-1,1, 7, 15]
                 const TRYING_COMPANY_EXPIRE_NOTIFY = [7];
 
                 //获取所有待失效企业
