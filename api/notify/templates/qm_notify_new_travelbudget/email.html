@@ -1,9 +1,25 @@
-尊敬的<%=account.name || '' %>，有新的出差请示等待您审批<br/>
-项目：<%=tripApprove.project.name || '' %><br/>
-行程：<%=cityNames %><br/>
-类型：<%=tripApprove.isSpecialApprove ? '特别审批' : '普通申请'%><br/>
-总预算：<%=tripApprove.budget %>元<br/>
-<!--出差人：李晓辰、彭科、王鹏-->
-审批人：<%=agreeUserNames %><br/>
-审批<a href=<%=detailUrl || '' %>>【按钮】</a><br/>
-如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅： <%=detailUrl || '' %>
+<p style="color: #74c7cd;
+    font-size: 20px;"
+>出差请示</p>
+<p style="border: 1px #eee solid;
+    border-width: 1px 0 0 0;
+    font-size: 18px;
+    padding: 30px 0 4px;"
+>
+    尊敬的<%=account.name || '' %>，有新的出差请示等待您审批<br/>
+</p>
+<%= include('trip_approve_detail.html') %><br/>
+<a style="display: block;
+    width: 100px;
+    height: 36px;
+    color: white;
+    font-size: 16px;
+    background-color: rgb(40,167,255);
+    border-radius: 3px;
+    text-align: center;
+    line-height: 36px;
+    text-decoration: none;" href=<%=detailUrl || '' %>>审批</a><br/>
+<p style="padding-top: 20px;
+    font-size: 14px;
+    border-top: 1px solid #eee;">如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅：<br/>
+    <%=detailUrl || '' %></p>

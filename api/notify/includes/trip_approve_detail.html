@@ -1,0 +1,25 @@
+<table width="422" border="1" cellpadding="8" style="
+    border: 1px solid #dcdcdc;
+    margin-bottom: 20px;
+    color: #747474;
+    border-collapse: collapse;" >
+    <tr>
+        <td colspan="2" style="text-align: center;background-color: #f8f8f8;color: #393939;font-size: 16px;"><%=tripApprove.project.name || '' %></td>
+    </tr>
+    <tr>
+        <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">行程</td>
+        <td style="padding-left: 20px;font-size: 16px;"><%=cityNames %></td>
+    </tr>
+    <tr>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">类型</td>
+        <td style="padding-left: 20px;font-size: 16px;"><%=tripApprove.isSpecialApprove ? '特别审批' : '普通申请'%></td>
+    </tr>
+    <tr>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b; font-size: 16px;">总预算</td>
+        <td style="padding-left: 20px;font-size: 16px;"><%=tripApprove.budget %>元</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">审批人</td>
+        <td style="padding-left: 20px;font-size: 16px;"><%=agreeUserNames %></td>
+    </tr>
+</table>
