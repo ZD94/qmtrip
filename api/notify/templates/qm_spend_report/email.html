@@ -1,5 +1,17 @@
+<!--
 尊敬的<%=account.name%>，
 您的报销单已生成，您可以通过附件预览报销单，并打印进行贴票。
 其他使用建议：
 在企业报销系统中只填报销总金额，附件中的报销单二维码可以直接贴入企业报销系统，方便财务查看出差详情
-二维码不方便识别时，可以复制如下链接链接为<%=detailUrl%>
+二维码不方便识别时，可以复制如下链接链接为<%=detailUrl%>-->
+
+<p style="font-size: 20px;color: #74C7CD">报销单</p>
+<p style="border-top: 1px solid #EEEEEE;padding-top: 25px;">
+    尊敬的<%=account.name%>,您的报销单已生成，您可以通过附件预览报销单，并打印进行贴票。<br/></br>
+</p>
+<p style="font-size: 14px;color:#4A4A4A;border-top: 1px solid #EEEEEE;line-height: 24px"><br/>
+    其他使用建议：<br/>
+    在企业报销系统中只填报销总金额，附件中的报销单二维码可以直接贴入企业报销系统，方便财务<br/>
+    查看出差详情。二维码不方便识别时，可以复制如下链接链接为：<br/>
+    http://wyl.jingli.tech:4002#/finance/trip-detail?id=61de2f00-33ce-11e7-b21b-fbff4ac7735e&code=691156
+</p>
