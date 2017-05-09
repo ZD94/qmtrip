@@ -355,7 +355,7 @@ export default class ApiTravelBudget {
         qs.query = query;
         let hotels = await API.hotel.search_hotels(query);
 
-        let strategy = await HotelBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
+        let strategy = await HotelBudgetStrategyFactory.getStrategy(qs, {isRecord: true,landmark:{latitude:query.latitude,longitude:query.longitude}});
         let budget = await strategy.getResult(hotels);
         budget.type = EInvoiceType.HOTEL;
         return budget;
