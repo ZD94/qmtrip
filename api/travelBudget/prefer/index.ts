@@ -7,9 +7,9 @@ import _ = require("lodash");
 import Logger from '@jingli/logger';
 import moment = require("moment");
 let logger = new Logger('travel-budget');
-import {LandMark} from "../_interface";
+import {LandMark,RemarkCondition} from "../_interface";
 export interface IPrefer<T> {
-    markScore(tickets: T[],landmark?:LandMark): Promise<T[]>;
+    markScore(tickets: T[],remarkCondition?:RemarkCondition): Promise<T[]>;
 }
 
 export abstract class AbstractPrefer<T> implements IPrefer<T> {
@@ -20,10 +20,10 @@ export abstract class AbstractPrefer<T> implements IPrefer<T> {
             }
         }
     }
-    abstract async markScoreProcess(data: T[],landmark?:LandMark) : Promise<T[]>;
-    async markScore(data: T[],landmark?:LandMark): Promise<T[]> {
+    abstract async markScoreProcess(data: T[],remarkConditon?:RemarkCondition) : Promise<T[]>;
+    async markScore(data: T[],remarkCondition?:RemarkCondition): Promise<T[]> {
         logger.info(`. BEGIN ${this.name}`);
-        let ret = await this.markScoreProcess(data,landmark);
+        let ret = await this.markScoreProcess(data,remarkCondition);
         logger.info(`. END ${this.name}`);
         return ret;
     }

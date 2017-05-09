@@ -10,7 +10,7 @@ import {IPrefer} from '../prefer'
 import {Models} from "_types/index";
 import util = require("util");
 import moment = require("moment");
-import {LandMark} from "../_interface"
+import {LandMark,RemarkCondition} from "../_interface"
 
 
 function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
@@ -74,6 +74,7 @@ export abstract class AbstractHotelStrategy {
     private prefers: IPrefer<IFinalHotel>[];
     private isRecord: boolean;
     private landmark:LandMark;
+    private remarkCondition:RemarkCondition;
 
     constructor(public qs: any, options: any) {
         if(options){
@@ -82,10 +83,10 @@ export abstract class AbstractHotelStrategy {
             }else{
                 this.isRecord=false;
             }
-            if(options.landmark){
-                this.landmark=options.landmark;
+            if(options.remarkCondition){
+                this.remarkCondition=options.remarkCondition;
             }else{
-                this.landmark=null;
+                this.remarkCondition=null;
             }
         }
         this.prefers = [];
@@ -98,7 +99,7 @@ export abstract class AbstractHotelStrategy {
     async getMarkedScoreHotels(hotels: IFinalHotel[]) :Promise<IFinalHotel[]> {
         let self = this;
         for(let prefer of self.prefers) {
-            hotels = await prefer.markScore(hotels,self.landmark);
+            hotels = await prefer.markScore(hotels,self.remarkCondition);
         }
         return hotels;
     }
