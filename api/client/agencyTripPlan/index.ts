@@ -7,6 +7,7 @@ import L from '@jingli/language';
 import config = require("@jingli/config");
 import moment = require("moment");
 import _ = require('lodash');
+import {ENoticeType} from "_types/notice/notice";
 
 
 export function getConsumeInvoiceImg(params) {
@@ -121,9 +122,10 @@ export function approveInvoice(params){
     let companyId = "";
     let staffEmail = "";
     let staffName = "";
-    let invoiceName = "";
+    // let invoiceName = "";
     let expenditure = '0';
     let _startTime = "";
+    let reason = "";
 
     return API.tripPlan.getTripDetail({consumeId: consumeId, columns: ['accountId', 'orderId', 'type', 'startTime']})
         .then(function(consumeDetail){
@@ -132,13 +134,13 @@ export function approveInvoice(params){
             }
             orderId = consumeDetail.orderId;
 
-            if(consumeDetail.type === -1){
+            /*if(consumeDetail.type === -1){
                 invoiceName = '去程交通'
             }else if(consumeDetail.type === 0){
                 invoiceName = '酒店发票';
             }else if(consumeDetail.type === 1){
                 invoiceName = '回程交通';
-            }
+            }*/
 
             expenditure = '￥' + params.expenditure;
             _startTime = consumeDetail.startTime;
@@ -190,7 +192,7 @@ export function approveInvoice(params){
             if(typeof ret.toJSON == 'function'){
                 order = order.toJSON();
             }
-            let go = '无', back = '无', hotel = '无';
+            /*let go = '无', back = '无', hotel = '无';
             if(order.outTraffic.length > 0){
                 let g = order.outTraffic[0];
                 go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.deptCity + ' 到 ' + g.arrivalCity;
@@ -227,7 +229,7 @@ export function approveInvoice(params){
                 if(h.expenditure){
                     hotel += ',实际支出￥' + h.expenditure;
                 }
-            }
+            }*/
             let orderTime = ret.startAt;
             if(!orderTime){
                 orderTime = _startTime
@@ -237,7 +239,7 @@ export function approveInvoice(params){
             let appMessageUrl = '#/travelPlan/PlanDetail?tripPlanId=' + order.id;
 
             let key;
-            let values: any = {
+            /*let values: any = {
                 username: staffName,
                 email: staffEmail,
                 projectName: ret.description,
@@ -249,18 +251,18 @@ export function approveInvoice(params){
                 url: url,
                 appMessageUrl: appMessageUrl,
                 detailUrl: url
-            }
+            }*/
 
             //审核完成后给用户发送邮件
             if(params.status == -1){ //审核不通过
                 key = 'qm_notify_invoice_not_pass';
-                values.reason = params.remark;
+                reason = params.remark;
             }
 
-            if(params.status == 1){
+            /*if(params.status == 1){
                 key = 'qm_notify_invoice_one_pass';
                 values.consume = expenditure
-            }
+            }*/
 
             if(ret.status == 2){
                 key = 'qm_notify_invoice_all_pass';
@@ -273,8 +275,8 @@ export function approveInvoice(params){
                     _score += '积分已发放到您的积分账户';
                 }
                 //let total = `全麦预算￥${order.budget},实际支出￥${order.expenditure},节省￥${s.toFixed(2)}`;
-                values.time = orderTime;
-                values.score = _score;
+                // values.time = orderTime;
+                // values.score = _score;
             }
 
 
@@ -288,7 +290,8 @@ export function approveInvoice(params){
                         await API.notify.submitNotify({
                             key: key,
                             userId: staffId,
-                            values: values
+                            values: {tripPlan: order, detailUrl: url, appMessageUrl: appMessageUrl,
+                                noticeType: ENoticeType.TRIP_APPROVE_NOTICE, reason: reason}
                         });
 
                     }
