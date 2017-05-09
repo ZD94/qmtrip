@@ -1,2 +1,3 @@
-<%=approveUser || '' %> 拒绝了您的出差请求
-<%=startAt || '' %>-<%=backAt || '' %>   <%=deptCity || '' %>-<%=arrivalCity || '' %>  预算：<%=totalBudget || '' %>
+<%=tripApprove.approveUser.name || '' %> 拒绝了您的出差请求
+<%=moment(tripApprove.startAt).format('YYYY.MM.DD') || '' %>-<%=moment(tripApprove.backAt).format('YYYY.MM.DD') || '' %>
+<%=cityNames || '' %>  预算：￥<%=tripApprove.budget || '' %>
