@@ -7,7 +7,7 @@ import _ = require("lodash");
 import Logger from '@jingli/logger';
 import moment = require("moment");
 let logger = new Logger('travel-budget');
-import {LandMark,RemarkCondition} from "../_interface";
+import {RemarkCondition} from "../_interface";
 export interface IPrefer<T> {
     markScore(tickets: T[],remarkCondition?:RemarkCondition): Promise<T[]>;
 }

@@ -2,14 +2,14 @@
 'use strict';
 import {AbstractPrefer} from "./index";
 import {IFinalHotel} from "_types/travelbudget";
-import {LandMark,RemarkCondition} from "../_interface";
+import {RemarkCondition} from "../_interface";
 const API=require("@jingli/dnode-api");
 var request=require("request");
 const baiduCoordKey=`6vAKY71IUSzT3mrhFC5HdMHkUDZHKo6G`;
 
 class DistancePrefer extends AbstractPrefer<IFinalHotel>{
     private score:number;
-    private landmark:any;
+    private remarkCondition:any;
     constructor(name,options){
         super(name,options);
         if (!this.score) {
@@ -77,19 +77,14 @@ class DistancePrefer extends AbstractPrefer<IFinalHotel>{
             distance = R * 2 * Math.atan2(Math.sqrt(temp), Math.sqrt(1 - temp));
             distances.push(distance);
         }
-        console.log("=======hotels: ",distances);
         minDistance = Math.min.apply(Math,distances);
         let cscore:number;
-        console.log("length of hotels: ",hotels.length);
-        console.log("length of distances",distances.length);
         for (let i = 0; i < hotels.length; i++) {
             if(distances[i]>0){
                 cscore=Math.round(2000 - Math.pow(minDistance, 1 / 6) * Math.pow(distances[i] / minDistance, 1 / 3) * (distances[i] - minDistance));
-                console.log("===========scores: ",cscore);
                 hotels[i].score +=cscore;
             }
         }
-        console.log("=======hotels: ",hotels);
         return hotels;
     }
 }
