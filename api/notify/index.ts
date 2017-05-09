@@ -2,6 +2,7 @@
  * Created by wlh on 16/7/13.
  */
 
+
 'use strict';
 import _ = require('lodash');
 import Logger from '@jingli/logger';
@@ -9,6 +10,8 @@ const logger = new Logger('qm:notify');
 import redisClient = require("common/redis-client");
 import {Models} from "_types";
 import {ESendType, ENoticeType} from "_types/notice/notice";
+import {TripApprove} from "_types/tripPlan/tripPlan";
+import moment = require("moment");
 
 const config = require('@jingli/config');
 let API = require('@jingli/dnode-api');
@@ -28,7 +31,7 @@ export interface ISubmitNotifyParam{
     email?: string;
     mobile?: string;
     key: string;
-    values: any;
+    values?: any;
 }
 
 async function tryReadFile(filename): Promise<string>{
@@ -57,27 +60,27 @@ class NotifyTemplate{
     };
     constructor(public name, sms_text, wechat_json, email_title, email_html, email_text, appmessage_title, appmessage_html, appmessage_text){
         if(sms_text)
-            this.sms = _.template(sms_text);
+            this.sms = _.template(sms_text, {imports: {moment: moment}});
         if(wechat_json){
             let templateId = config.notify.templates[name];
             if(templateId)
-                this.wechat = _.template(wechat_json);
+                this.wechat = _.template(wechat_json, {imports: {moment: moment}});
         }
         if(email_title){
             this.email = {};
-            this.email.title = _.template(email_title);
+            this.email.title = _.template(email_title, {imports: {moment: moment}});
             if(email_html)
-                this.email.html = _.template(email_html);
+                this.email.html = _.template(email_html, {imports: {moment: moment}});
             if(email_text)
-                this.email.text = _.template(email_text);
+                this.email.text = _.template(email_text, {imports: {moment: moment}});
         }
         if(appmessage_title){
             this.appmessage = {};
-            this.appmessage.title = _.template(appmessage_title);
+            this.appmessage.title = _.template(appmessage_title, {imports: {moment: moment}});
             if(appmessage_html)
-                this.appmessage.html = _.template(appmessage_html);
+                this.appmessage.html = _.template(appmessage_html, {imports: {moment: moment}});
             if(appmessage_text)
-                this.appmessage.text = _.template(appmessage_text);
+                this.appmessage.text = _.template(appmessage_text, {imports: {moment: moment}});
         }
     }
 
@@ -114,7 +117,7 @@ class NotifyTemplate{
             return;
         if(!this.wechat)
             return;
-        try {
+        try{
             let content = this.wechat(data);
             let json = JSON.parse(content);
             if (!data.templateId) return;
@@ -263,10 +266,14 @@ export async function __init() {
 
 //通知模块
 export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean> {
-    let {userId, key, values, email, mobile} = params;
-    let values_clone =  _.cloneDeep(values);
+    let {userId, key, email, mobile, values} = params;
+    let _values: any = {};
+    for(let k in values){
+        _values[k] = values[k];
+    }
     let account: any = {};
     let openId;
+    let tripApprove: TripApprove;
     if(!userId){
         account = {email, mobile};
     }else{
@@ -282,13 +289,25 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
     }
 
     if (openId) {
-        values_clone.templateId = config.notify.templates[key];
+        _values.templateId = config.notify.templates[key];
     }
 
     let tpl = templates[key];
     if(!tpl)
         return false;
-    values_clone.account = account;
-    await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: userId }, values_clone);
+    _values.account = account;
+
+    try {
+        let path_require = './templates/' + key + '/transform';
+        let transform = require(`${path_require}`);
+        if(transform){
+            _values = await transform(_values);
+        }
+    } catch(err) {
+        console.info(err);
+    }
+
+
+    await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: userId }, _values);
     return true;
 }
