@@ -1,1 +1,1 @@
-您好<%=company%> 公司的员工 <%=staffName%> 提交了票据审核请求，请注意查收
+您好<%=company.name%> 公司的员工 <%=staff.name%> 提交了票据审核请求，请注意查收

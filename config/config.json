@@ -58,11 +58,11 @@
   ],
   "default_agency": {
     "name": "系统默认代理商",
-    "email": "agency.agency@jingli.tech",
+    "email": "1554497019@qq.com",
     "pwd": "123456",
     "mobile": "",
     "user_name": "鲸力代理商",
-    "manager_email": "shuang.cao@jingli.tech"
+    "manager_email": "1554497019@qq.com"
   },
   "message": {
     "is_send_message": true,

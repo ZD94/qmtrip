@@ -1,1 +1,1 @@
-您<%=time%>到<%=destination%>的出差申请已审核通过,点击此处查看详情<%=url || ''%>
+您<%=moment(tripPlan.startAt).format('YYYY.MM.DD')%>到<%=tripPlan.arrivalCity%>的出差申请已审核通过,点击此处查看详情<%=detailUrl || ''%>
