@@ -1,12 +1,16 @@
 <table width="330px" height="100%" style="border-collapse:collapse;padding-bottom: 20px">
     <tr style="background-color: #F8F8F8;padding-left: 10px">
-        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B;width: 110px;height: 36px">姓名</td>
-        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B;width: 110px;height: 36px">手机号</td>
-        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B;width: 110px;height: 36px">差旅标准</td>
+        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B;width: 110px;height: 36px">姓名</td>
+        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B;width: 110px;height: 36px">手机号</td>
+        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B;width: 110px;height: 36px">差旅标准</td>
     </tr>
+    <% _.forEach(staff, function(values) { %>
     <tr>
-        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A;height: 36px"><%=staff.name%></td>
-        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A;height: 36px"><%=staff.mobile%></td>
-        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A;height: 36px"><%=travelPolicy.name%></td>
+        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A;height: 36px"><%=staff.name%></td>
+        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A;height: 36px"><%=staff.mobile%></td>
+        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A;height: 36px"><%=staff.travelPolicy.name%></td>
     </tr>
+    <%}); %>
 </table>
+
+
