@@ -1,0 +1,25 @@
+项目：<%=tripApprove.project.name || '' %><br/>
+行程：
+<%=tripApprove.deptCity%>-
+<% _.forEach(tripApprove.arrivalCityCodes, function(cityCode, index) { %>
+<%=cityMap[cityCode].name%>
+<%if(index != (tripApprove.arrivalCityCodes.length - 1)){%>
+-
+<%}%>
+<%}); %><br/>
+类型：<%=tripApprove.isSpecialApprove ? '特别审批' : '普通申请'%><br/>
+总预算：<%=tripApprove.budget %>元<br/>
+<!--出差人：李晓辰、彭科、王鹏<br/>-->
+审批人：
+<% _.forEach(tripApprove.approvedUsers.split(','), function(staffId, index) {
+if(staffId && staffId != ""){
+%>
+<%=approveUserMap[staffId].name%>(同意)
+<%}}); %>
+<%if(tripApprove.status == -1){%>
+<%=approveUserMap[tripApprove.approveUserId].name%>
+(驳回, <%=tripApprove.approveRemark%>)
+<%if(tripApprove.status == 0){%>
+<%=approveUserMap[tripApprove.approveUserId].name%>
+(等待审批)
+<%}%><br/>
