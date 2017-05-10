@@ -1,7 +1,2 @@
 您好<br/>您公司员工<%=tripApprove.account.name || '' %>的出差计划已经审批通过<br/>
-项目：<%=tripApprove.project.name || '' %><br/>
-行程：<%=cityNames %><br/>
-类型：<%=tripApprove.isSpecialApprove ? '特别审批' : '普通申请'%><br/>
-总预算：<%=tripApprove.budget %>元<br/>
-<!--出差人：李晓辰、彭科、王鹏<br/>-->
-审批人：<%=agreeUserNames %><br/>
+<%= include('trip_plan_detail.html') %>

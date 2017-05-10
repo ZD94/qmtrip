@@ -1,7 +1,5 @@
 尊敬的<%=account.name || '' %>，您提交的票据审核通过。<br/>
-项目：<%=tripPlan.project.name || '' %><br/>
-行程：<%=cityNames %><br/>
-总预算：<%=tripPlan.budget %>元<br/>
+<%= include('trip_plan_simple_detail.html') %>
 实际支出：<%=tripPlan.expenditure %>元<br/>
 节省：<%=tripPlan.budget - tripPlan.expenditure || '' %>元<br/>
 <!--出差人：李晓辰、彭科、王鹏<br/>-->
