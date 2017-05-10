@@ -1750,6 +1750,8 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: EPlanSt
         case EPlanStatus.COMPLETE:
             if (EPlanStatus.AUDITING == tripDetail.status) {
                 tripDetail.status = status;
+            }else if(tripDetail.type == ETripType.SUBSIDY){
+                tripDetail.status = status;
             }
             break;
     }
