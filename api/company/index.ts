@@ -625,6 +625,7 @@ class CompanyModule {
                                 userId: manager.id,
                                 key: key,
                                 values: {
+                                    company: company,
                                     expiryDate: moment(company.expiryDate).format('YYYY-MM-DD'),
                                     days: diffDays,
                                 }

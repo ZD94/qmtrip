@@ -364,21 +364,35 @@ class TripPlanModule {
             let company = await tripPlan.getCompany();
             let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
             let appMessageUrl = `#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
-            let {go, back, hotel, subsidy} = await TripPlanModule.getPlanEmailDetails(tripPlan);
+            /*let {go, back, hotel, subsidy} = await TripPlanModule.getPlanEmailDetails(tripPlan);
             let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
             let auditValues = {username: user.name, time:tripPlan.createdAt, auditUserName: user.name, companyName: company.name, staffName: staff.name, projectName: tripPlan.title, goTrafficBudget: go,
                 backTrafficBudget: back, hotelBudget: hotel, otherBudget: subsidy, totalBudget: tripPlan.budget, appMessageUrl: appMessageUrl, url: auditUrl, detailUrl: auditUrl,
                 approveUser: user.name, tripPlanNo: tripPlan.planNo,
                 content: `企业 ${company.name} 员工 ${staff.name}${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差计划票据已提交，预算：￥${tripPlan.budget}，等待您审核！`,
                 createdAt: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-            };
-            try {
+            };*/
+            try{
+                await API.notify.submitNotify({
+                    email: auditEmail,
+                    key: 'qm_notify_invoice_audit_request',
+                    values:{
+                        company: company,
+                        staff: staff,
+                        userId: user.id,
+                        detailUrl: auditUrl
+                    }
+                })
+            }catch(err){
+                logger.info(err);
+            }
+            /*try {
                 await API.notify.submitNotify({
                     key: 'qm_notify_agency_budget',
                     values: auditValues,
                     userId: default_agency.id
                 })
-            } catch(err) { console.error(err);}
+            } catch(err) { console.error(err);}*/
 
         }
         return true;
@@ -1497,8 +1511,8 @@ class TripPlanModule {
              email: 'notice@jingli365.com',
              key: 'qm_notify_invoice_audit_request',
              values:{
-                 company:companyName,
-                 staffName:staff.name,
+                 company:staff.company,
+                 staff:staff,
                  detailUrl: notifyUrl
              }
             })
