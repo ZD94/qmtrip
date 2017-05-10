@@ -326,10 +326,16 @@ class TripPlanModule {
         let tripDetails = await tripPlan.getTripDetails({where: {}});
         if(tripDetails && tripDetails.length > 0) {
             let tripDetailPromise = tripDetails.map(async function (detail) {
-                /*if (detail.type == ETripType.SUBSIDY) {
-                    return detail;
-                }*/
-                return tryUpdateTripDetailStatus(detail, EPlanStatus.AUDITING);
+                if (detail.type == ETripType.SUBSIDY) {
+                    let invoices = await detail.getInvoices();
+                    if(invoices && invoices.length > 0){
+                        return tryUpdateTripDetailStatus(detail, EPlanStatus.AUDITING);
+                    }else{
+                        return tryUpdateTripDetailStatus(detail, EPlanStatus.COMPLETE);
+                    }
+                }else{
+                    return tryUpdateTripDetailStatus(detail, EPlanStatus.AUDITING);
+                }
             });
             await (Promise.all(tripDetailPromise));
         }
