@@ -1,3 +1,6 @@
-<%=account.name || '' %>,您好<br/>您有1张<%=tripType || '' %>票据审核未通过，原因：<%=reason || '' %>。请调整后重新上传。<br/>关联出差记录如下：
-<%= include('budget_detail.html') %>
-<p><a href=<%=url || '' %>>点击此处查看出差详情</a><br/>如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅：<br/><%=detailUrl || '' %></p>
+尊敬的<%=account.name || '' %>，您提交的票据审核失败。<br/>
+失败原因：<%=reason || '' %><br/>
+<%= include('trip_plan_simple_detail.html') %>
+<!--出差人：李晓辰、彭科、王鹏<br/>-->
+查看详情<a href=<%=detailUrl || '' %>>【按钮】</a><br/>
+如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅）：<%=detailUrl || '' %><br/>

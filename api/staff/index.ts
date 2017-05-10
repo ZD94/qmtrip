@@ -134,12 +134,6 @@ class StaffModule{
         let defaultDepartment = await company.getDefaultDepartment();
         await staff.addDepartment(defaultDepartment);
 
-        await StaffModule.sendNoticeToAdmins({
-            companyId:params.companyId,
-            name:params.name,
-            noticeTemplate:"qm_notify_admins_add_staff"
-        });
-
         let account = await Models.account.get(staff.accountId);
         if(!account.coinAccount){
             //为员工设置资金账户
@@ -148,17 +142,29 @@ class StaffModule{
             account.coinAccount = ca;
             await account.save();
         }
+
+        await StaffModule.sendNoticeToAdmins({
+            companyId:params.companyId,
+            staffId: staff.id,
+            noticeTemplate:"qm_notify_admins_add_staff"
+        });
         return staff;
     }
-   static async  sendNoticeToAdmins(params:{companyId:string,name:string,noticeTemplate:string}):Promise<any>{
+   static async  sendNoticeToAdmins(params:{companyId:string,noticeTemplate:string, staffId?: string}):Promise<any>{
         let company = await Models.company.get(params.companyId);
         let managers= await company.getManagers({withOwner:true});
+       let staff: Staff;
+       let detailUrl = `${config.host}/#/department/staff-info?staffId=${params.staffId}`;
+        if(params.staffId){
+            staff = await Models.staff.get(params.staffId);
+        }
         return await Promise.all(managers.map( (manager) => {
             return API.notify.submitNotify({
                 userId: manager.id,
                 key: params.noticeTemplate,
                 values: {
-                    staff:params.name
+                    staff:staff,
+                    detailUrl: detailUrl
                 }
              });
          }));
@@ -408,12 +414,11 @@ class StaffModule{
             let tp = await Models.travelPolicy.get(updateStaff["travelPolicyId"]);
 
             let vals  = {
-                accountId: updateStaff.id,
                 noticeType: ENoticeType.SYSTEM_NOTICE,
-                travelPolicy: tp ? tp.name: '',
-                time: moment().format('YYYY-MM-DD:hh:mm:ss'),
                 appMessageUrl: '#/staff/staff-info',
-                permission: updateStaff.roleId == EStaffRole.ADMIN ? "管理员" : (updateStaff.roleId == EStaffRole.OWNER ? "创建者" : "普通员工"),
+                detailUrl: config.host + '/#/staff/staff-info',
+                admin: staff,
+                staff: updateStaff
             }
             //发送通知
             await API.notify.submitNotify({
