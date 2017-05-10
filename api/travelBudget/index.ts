@@ -194,13 +194,11 @@ export default class ApiTravelBudget {
                             let goBackDay = moment(goBackDate).format("YYYY-MM-DD");
                             let leaveDay = moment(leaveDate).format("YYYY-MM-DD");
                             let days = moment(goBackDay).diff(moment(leaveDay), 'days');
-                            days = days + 1;
-                            if (!subsidy.hasFirstDaySubsidy) {
-                                days = days -1;
+
+                            if (i == (paramsToBudget.length-1)) {
+                                days = days + 1;
                             }
-                            if (!subsidy.hasLastDaySubsidy) {
-                                days = days - 1;
-                            }
+
                             if (days > 0) {
                                 let budget: any = {};
                                 budget.fromDate = leaveDate;
@@ -209,9 +207,9 @@ export default class ApiTravelBudget {
                                 budget.hasLastDaySubsidy = subsidy.hasLastDaySubsidy;
                                 budget.tripType = ETripType.SUBSIDY;
                                 budget.type = EInvoiceType.SUBSIDY;
-                                budget.price = subsidy.template.target.subsidyMoney * days;
+                                budget.price = subsidy.template.subsidyMoney * days;
                                 budget.duringDays = days;
-                                budget.template = {id: subsidy.template.target.id, name: subsidy.template.target.name};
+                                budget.template = {id: subsidy.template.id, name: subsidy.template.name};
                                 budget.reason = reason;
                                 budgets.push(budget);
                             }
