@@ -16,7 +16,7 @@
       "color":"#173177"
     },
     "keyword3":{
-      "value":"<%=cityNames || '' %>",
+      "value":"<%=tripApprove.deptCity || '' %>-<%=tripApprove.arrivalCity || '' %>",
       "color":"#173177"
     },
     "keyword4":{
