@@ -8,7 +8,15 @@
     </tr>
     <tr>
         <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">行程</td>
-        <td style="padding-left: 20px;font-size: 16px;"><%=cityNames %></td>
+        <td style="padding-left: 20px;font-size: 16px;">
+            <%=tripApprove.deptCity%>-
+            <% _.forEach(tripApprove.arrivalCityCodes, function(cityCode, index) { %>
+            <%=cityMap[cityCode].name%>
+            <%if(index != (tripApprove.arrivalCityCodes.length - 1)){%>
+            -
+            <%}%>
+            <%}); %>
+        </td>
     </tr>
     <tr>
         <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">类型</td>
@@ -20,7 +28,21 @@
     </tr>
     <tr>
         <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">审批人</td>
-        <td style="padding-left: 20px;font-size: 16px;"><%=agreeUserNames %></td>
+        <td style="padding-left: 20px;font-size: 16px;">
+            <% _.forEach(tripApprove.approvedUsers.split(','), function(staffId, index) {
+            if(staffId && staffId != ""){
+            %>
+            <%=approveUserMap[staffId].name%>
+            (<i style="font-style: normal;color: #30c74d;">同意</i>)
+            <%}}); %>
+            <%if(tripApprove.status == -1){%>
+            <%=approveUserMap[tripApprove.approveUserId].name%>
+            (<i style="font-style: normal;color: #e82f2d;">驳回, <%=tripApprove.approveRemark%></i>)
+            <%} if(tripApprove.status == 0){%>
+            <%=approveUserMap[tripApprove.approveUserId].name%>
+            (<i style="font-style: normal;color: #898989;">等待审批</i>)
+            <%}%>
+        </td>
     </tr>
 </table>
 
@@ -33,10 +55,3 @@
 
 
 
-<!--
-项目：<%=tripApprove.project.name || '' %><br/>
-行程：<%=cityNames %><br/>
-类型：<%=tripApprove.isSpecialApprove ? '特别审批' : '普通申请'%><br/>
-总预算：<%=tripApprove.budget %>元<br/>
-&lt;!&ndash;出差人：李晓辰、彭科、王鹏<br/>&ndash;&gt;
-审批人：<%=agreeUserNames %><br/>-->

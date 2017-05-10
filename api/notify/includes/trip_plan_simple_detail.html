@@ -1,0 +1,11 @@
+项目：<%=tripApprove.project.name || '' %><br/>
+行程：
+<%=tripApprove.deptCity%>-
+<% _.forEach(tripApprove.arrivalCityCodes, function(cityCode, index) { %>
+<%=cityMap[cityCode].name%>
+<%if(index != (tripApprove.arrivalCityCodes.length - 1)){%>
+-
+<%}%>
+<%}); %><br/>
+总预算：<%=tripApprove.budget %>元<br/>
+<!--出差人：李晓辰、彭科、王鹏<br/>-->
