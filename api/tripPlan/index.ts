@@ -327,9 +327,15 @@ class TripPlanModule {
         if(tripDetails && tripDetails.length > 0) {
             let tripDetailPromise = tripDetails.map(async function (detail) {
                 if (detail.type == ETripType.SUBSIDY) {
-                    return detail;
+                    let invoices = await detail.getInvoices();
+                    if(invoices && invoices.length > 0){
+                        return tryUpdateTripDetailStatus(detail, EPlanStatus.AUDITING);
+                    }else{
+                        return tryUpdateTripDetailStatus(detail, EPlanStatus.COMPLETE);
+                    }
+                }else{
+                    return tryUpdateTripDetailStatus(detail, EPlanStatus.AUDITING);
                 }
-                return tryUpdateTripDetailStatus(detail, EPlanStatus.AUDITING);
             });
             await (Promise.all(tripDetailPromise));
         }
@@ -574,7 +580,6 @@ class TripPlanModule {
                 staff.totalPoints = staff.totalPoints + tripPlan.score;
                 staff.balancePoints = staff.balancePoints + tripPlan.score;
                 let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: user.id, remark: `增加员工${tripPlan.score}积分`});
-                console.info("查看sql================");
                 await Promise.all([staff.save(), log.save()]);
             } catch(err) {
                 //如果保存出错,删除日志记录
@@ -1090,7 +1095,7 @@ class TripPlanModule {
                     data.endDateTime = budget.endDate;
                     detail = Models.tripDetailSubsidy.create(data);
                     detail.expenditure = price;//此字段与budget字段有什么区别
-                    detail.status = EPlanStatus.COMPLETE;
+                    // detail.status = EPlanStatus.COMPLETE;
                     break;
                 case ETripType.SPECIAL_APPROVE:
                     data.deptCity = budget.originPlace ? budget.originPlace.id : "";
@@ -1721,31 +1726,34 @@ async function updateTripPlanExpenditure(tripPlan: TripPlan) {
 
 //尝试修改tripDetail状态
 async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: EPlanStatus) :Promise<TripDetail> {
-    if ([ETripType.SUBSIDY].indexOf(tripDetail.type) >= 0 ) {
+    /*if ([ETripType.SUBSIDY].indexOf(tripDetail.type) >= 0 ) {
         tripDetail.status = status;
     } else {
-        switch(status) {
-            case EPlanStatus.WAIT_UPLOAD:
+
+    }*/
+    switch(status) {
+        case EPlanStatus.WAIT_UPLOAD:
+            tripDetail.status = status;
+            break;
+        case EPlanStatus.WAIT_COMMIT:
+            //如果票据不为空,则设置状态为可提交状态
+            let invoices = await Models.tripDetailInvoice.find({where: {tripDetailId: tripDetail.id}});
+            if (invoices && invoices.length) {
+                tripDetail.status = EPlanStatus.WAIT_COMMIT;
+            }
+            break;
+        case EPlanStatus.AUDITING:
+            if ([ EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.WAIT_COMMIT].indexOf(tripDetail.status) >= 0) {
                 tripDetail.status = status;
-                break;
-            case EPlanStatus.WAIT_COMMIT:
-                //如果票据不为空,则设置状态为可提交状态
-                let invoices = await Models.tripDetailInvoice.find({where: {tripDetailId: tripDetail.id}});
-                if (invoices && invoices.length) {
-                    tripDetail.status = EPlanStatus.WAIT_COMMIT;
-                }
-                break;
-            case EPlanStatus.AUDITING:
-                if ([ EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.WAIT_COMMIT].indexOf(tripDetail.status) >= 0) {
-                    tripDetail.status = status;
-                }
-                break;
-            case EPlanStatus.COMPLETE:
-                if (EPlanStatus.AUDITING == tripDetail.status) {
-                    tripDetail.status = status;
-                }
-                break;
-        }
+            }
+            break;
+        case EPlanStatus.COMPLETE:
+            if (EPlanStatus.AUDITING == tripDetail.status) {
+                tripDetail.status = status;
+            }else if(tripDetail.type == ETripType.SUBSIDY){
+                tripDetail.status = status;
+            }
+            break;
     }
 
     //更改行程详情状态
