@@ -617,6 +617,8 @@ class CompanyModule {
                         key = 'qm_notify_trying_will_expire_company'
                     }
                     if (key) {
+                        // let detailUrl = C.host + "/#/company-pay/service-pay";
+                        let host = C.host;
                         //查询公司管理员和创建人
                         let managers = await company.getManagers({withOwner: true});
                         let ps = managers.map( (manager) => {
@@ -628,6 +630,7 @@ class CompanyModule {
                                     company: company,
                                     expiryDate: moment(company.expiryDate).format('YYYY-MM-DD'),
                                     days: diffDays,
+                                    host: host
                                 }
                             });
                         });
