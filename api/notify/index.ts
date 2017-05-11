@@ -116,7 +116,7 @@ class NotifyTemplate{
             return;
         if(!this.wechat)
             return;
-        try{
+        try {
             let content = this.wechat(data);
             let json = JSON.parse(content);
             if (!data.templateId) return;
@@ -139,7 +139,7 @@ class NotifyTemplate{
             return;
         if(!this.email)
             return;
-        try{
+        try {
             let subject = this.email.title(data);
             let context = Object.create(data);
             context.include = function(incname){
@@ -177,7 +177,7 @@ class NotifyTemplate{
             return;
         if(!this.appmessage.title || !this.appmessage.text)
             return;
-        try {
+        try{
             let content;
             let title = this.appmessage.title(data);
             let description = this.appmessage.text(data);
