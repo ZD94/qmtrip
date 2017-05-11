@@ -19,7 +19,7 @@ if(staffId && staffId != ""){
 <%if(tripApprove.status == -1){%>
 <%=approveUserMap[tripApprove.approveUserId].name%>
 (驳回, <%=tripApprove.approveRemark%>)
-<%if(tripApprove.status == 0){%>
+<%} if(tripApprove.status == 0){%>
 <%=approveUserMap[tripApprove.approveUserId].name%>
 (等待审批)
 <%}%><br/>

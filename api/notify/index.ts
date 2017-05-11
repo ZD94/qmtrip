@@ -310,3 +310,4 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
     await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: userId }, _values);
     return true;
 }
+
