@@ -8,7 +8,7 @@
 >
     尊敬的<%=account.name || '' %>，您的出差申请审批不通过。<br/>
 </p>
-<%= include('trip_approve_detail.html') %><br/>
+<%= include('trip_approve_detail.html') %>
 <a style="display: block;
     width: 100px;
     height: 36px;
@@ -18,8 +18,9 @@
     border-radius: 3px;
     text-align: center;
     line-height: 36px;
-    text-decoration: none;" href=<%=detailUrl || '' %>>查看详情</a><br/>
+    text-decoration: none;" href=<%=detailUrl || '' %>>查看详情</a>
 <p style="padding-top: 20px;
+    margin-top: 20px;
     font-size: 14px;
     border-top: 1px solid #eee;">如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅：<br/>
     <%=detailUrl || '' %></p>
