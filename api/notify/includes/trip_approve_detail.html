@@ -22,9 +22,19 @@
         <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">类型</td>
         <td style="padding-left: 20px;font-size: 16px;"><%=tripApprove.isSpecialApprove ? '特别审批' : '普通申请'%></td>
     </tr>
+    <%if(tripApprove.isSpecialApprove) {%>
+    <tr>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">说明</td>
+        <td style="padding-left: 20px;font-size: 16px;"><%=tripApprove.specialApproveRemark || '' %></td>
+    </tr>
+    <%}%>
     <tr>
         <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">总预算</td>
         <td style="padding-left: 20px;font-size: 16px;"><%=tripApprove.budget %>元</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">出差人</td>
+        <td style="padding-left: 20px;font-size: 16px;"><%=tripApprove.account.name %></td>
     </tr>
     <tr>
         <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">审批人</td>
