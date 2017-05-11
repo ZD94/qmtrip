@@ -38,7 +38,9 @@
             %>
             <%=approveUserMap[staffId].name%>
             (<i style="font-style: normal;color: #30c74d;">同意</i>)
-            <%}}); %>
+            <%if(!(tripApprove.status == 1 && !isAutoApprove && (index == tripApprove.approvedUsers.split(',').length - 1))){%>
+            、
+            <%}}}); %>
             <%if(tripApprove.status == -1){%>
             <%=approveUserMap[tripApprove.approveUserId].name%>
             (<i style="font-style: normal;color: #e82f2d;">驳回, <%=tripApprove.approveRemark%></i>)
