@@ -23,7 +23,12 @@ class RemarkPrefer extends AbstractPrefer<IFinalHotel> {
         if(!hotels || !hotels.length){
             return;
         }
-        let channel=hotels[0].channel;
+        let channel:any;
+        if(hotels[0].channel){
+            channel=hotels[0].channel;
+        }else{
+            channel="ctrip";
+        }
         hotels = hotels.map( (v) => {
             if(!v.remark){
                 return v;
