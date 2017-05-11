@@ -2,7 +2,6 @@
  * Created by wlh on 16/7/13.
  */
 
-
 'use strict';
 import _ = require('lodash');
 import Logger from '@jingli/logger';
@@ -311,3 +310,4 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
     await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: userId }, _values);
     return true;
 }
+
