@@ -1,6 +1,34 @@
-尊敬的<%=account.name || '' %>，您提交的票据审核失败。<br/>
-失败原因：<%=reason || '' %><br/>
-<%= include('trip_plan_simple_detail.html') %>
-<!--出差人：李晓辰、彭科、王鹏<br/>-->
-查看详情<a href=<%=detailUrl || '' %>>【按钮】</a><br/>
-如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅）：<%=detailUrl || '' %><br/>
+<p style="color: #ef473a;
+    font-size: 20px;"
+>票据审核失败</p>
+<p style="border: 1px #eee solid;
+    border-width: 1px 0 0 0;
+    font-size: 18px;
+    padding: 30px 0 4px;"
+>
+    尊敬的<%=account.name || '' %>，您提交的票据审核失败。<br/>
+</p>
+<table width="422" border="1" cellpadding="8" style="
+		    border: 1px solid #dcdcdc;
+		    margin-bottom: 20px;
+		    color: #747474;
+		    border-collapse: collapse;" >
+    <tr>
+        <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">失败原因</td>
+        <td style="padding-left: 20px;font-size: 16px;"><%=reason || '' %></td>
+    </tr>
+</table><br/>
+<a style="display: block;
+    width: 100px;
+    height: 36px;
+    color: white;
+    font-size: 16px;
+    background-color: rgb(40,167,255);
+    border-radius: 3px;
+    text-align: center;
+    line-height: 36px;
+    text-decoration: none;" href=<%=detailUrl || '' %>>查看详情</a><br/>
+<p style="padding-top: 20px;
+    font-size: 14px;
+    border-top: 1px solid #eee;">如果按钮无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅：<br/>
+    <%=detailUrl || '' %></p>
