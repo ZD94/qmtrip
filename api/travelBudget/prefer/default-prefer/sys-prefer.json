@@ -96,7 +96,7 @@
             }
         },
         {
-            "name": "remark",
+            "name": "commentScore",
             "options": {
                 "score": 5000
             }

@@ -23,31 +23,13 @@ class RemarkPrefer extends AbstractPrefer<IFinalHotel> {
         if(!hotels || !hotels.length){
             return;
         }
-        let channel:any;
-        if(hotels[0].channel){
-            channel=hotels[0].channel;
-        }else{
-            channel="ctrip";
-        }
         hotels = hotels.map( (v) => {
-            if(!v.remark){
+            if(!v.commentScore || v.commentScore<0){
                 return v;
             }
             if(!v.score) v.score=0;
             if(!v.reasons) v.reasons=[];
-            let rate:any;
-
-            switch(channel){
-                case "ctrip":
-                    rate=2;
-                    break;
-                case "skyscanner":
-                    rate=2;
-                    break;
-                default:
-                    rate=1;
-            }
-            v.score+=Math.round(self.score* Math.sqrt(v.remark*rate+1));
+            v.score+=Math.round(self.score* Math.sqrt(v.commentScore+1));
             return v;
         })
         return hotels;

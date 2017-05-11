@@ -150,8 +150,7 @@ export abstract class AbstractHotelStrategy {
             checkOutDate: query.checkOutDate,
             cityName: query.city.name,
             hotelName: query.hotelName,
-            remark:ret.remark,
-            channel:ret.channel,
+            commentScore:ret.commentScore
         }as TravelBudgetHotel
         if (isRetMarkedData) {
             result.markedScoreData = _hotels;
