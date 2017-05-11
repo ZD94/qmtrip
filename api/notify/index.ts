@@ -97,17 +97,17 @@ class NotifyTemplate{
             return;
         if(!this.sms)
             return;
-        try{
+        try {
             let content = this.sms(data);
+
             await API.sms.sendMsg({
                 content: content,
                 mobile: to.mobile
             });
             logger.info('成功发送短信:', to.mobile, content);
-        }catch (e){
-            console.log(e);
+        } catch(err) {
+            logger.error(err);
         }
-
     }
     async sendWechat(to: NotifyToAddress, data: any){
         if(!config.notify.sendWechat)
@@ -116,7 +116,7 @@ class NotifyTemplate{
             return;
         if(!this.wechat)
             return;
-        try{
+        try {
             let content = this.wechat(data);
             let json = JSON.parse(content);
             if (!data.templateId) return;
@@ -128,8 +128,8 @@ class NotifyTemplate{
                 templateId: json.template_id,
             });
             logger.info('成功发送微信通知:', to.openId, this.name);
-        }catch (e){
-            console.log(e);
+        } catch(err) {
+            logger.error(err);
         }
 
     }
@@ -139,7 +139,7 @@ class NotifyTemplate{
             return;
         if(!this.email)
             return;
-        try{
+        try {
             let subject = this.email.title(data);
             let context = Object.create(data);
             context.include = function(incname){
@@ -163,12 +163,13 @@ class NotifyTemplate{
                 attachments: attachments,
             });
             logger.info('成功发送邮件:', to.email, this.name);
-        }catch (e){
-            console.log(e);
+        } catch(err) {
+            logger.error(err);
         }
     }
 
     async saveNotice(to: NotifyToAddress, data: any) {
+
         if(!to.accountId)
             return;
 
@@ -176,7 +177,7 @@ class NotifyTemplate{
             return;
         if(!this.appmessage.title || !this.appmessage.text)
             return;
-        try{
+        try {
             let content;
             let title = this.appmessage.title(data);
             let description = this.appmessage.text(data);
@@ -189,8 +190,8 @@ class NotifyTemplate{
             }
             await API.notice.createNotice({title: title, content: content, description: description, staffId: to.accountId, sendType: ESendType.ONE_ACCOUNT, type: data.noticeType || ENoticeType.SYSTEM_NOTICE});
             logger.info('成功发送通知:', data.account.name, this.name);
-        }catch (e){
-            console.log(e);
+        } catch(err) {
+            logger.error(err);
         }
     }
 }
