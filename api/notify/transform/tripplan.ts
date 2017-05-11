@@ -2,6 +2,7 @@
  * Created by wangyali on 2017/5/4.
  */
 import {Models} from "_types";
+import {EApproveResult} from "_types/tripPlan";
 import moment = require("moment");
 var API = require('@jingli/dnode-api');
 
@@ -27,7 +28,6 @@ export = async function transform(values: any): Promise<any>{
             cityMap[item] = arrivalInfo;
         }))
     }
-
     values.cityMap = cityMap;
 
     if(tripApprove){
@@ -44,5 +44,12 @@ export = async function transform(values: any): Promise<any>{
         approveUserMap[lastApproveUser.id] = lastApproveUser;
     }
     values.approveUserMap = approveUserMap;
+
+    let logs = await Models.tripPlanLog.find({tripPlanId: tripApprove.id, approveStatus: EApproveResult.AUTO_APPROVE, remark: '自动通过'});
+    if(logs && logs.length > 0){
+        values.isAutoApprove = true;
+    }else{
+        values.isAutoApprove = true;
+    }
     return values;
 }
