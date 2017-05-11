@@ -1064,7 +1064,7 @@ class TripPlanModule {
                     data.deptCity = budget.originPlace ? budget.originPlace.id : "";
                     data.arrivalCity= budget.destination.id;
                     data.deptDateTime = budget.departDateTime;
-                    data.arrivalDateTime = null;
+                    data.arrivalDateTime = budget.arrivalDateTime;
                     data.leaveDate = budget.leaveDate;
                     data.cabin = budget.cabinClass;
                     data.invoiceType = budget.type;
