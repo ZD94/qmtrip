@@ -6,7 +6,7 @@
     font-size: 18px;
     padding: 30px 0 4px;"
 >
-    尊敬的<%=account.name || '' %>，您的出差申请审批通过。<br/>
+    尊敬的<%=account.name || '' %>，您的出差申请<%= isAutoApprove ? "因超时，由系统自动" : "" %>审批通过。<br/>
 </p>
 <%= include('trip_approve_detail.html') %><br/>
 <a style="display: block;

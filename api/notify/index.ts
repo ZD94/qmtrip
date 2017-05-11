@@ -97,17 +97,17 @@ class NotifyTemplate{
             return;
         if(!this.sms)
             return;
-        try{
+        try {
             let content = this.sms(data);
+
             await API.sms.sendMsg({
                 content: content,
                 mobile: to.mobile
             });
             logger.info('成功发送短信:', to.mobile, content);
-        }catch (e){
-            console.log(e);
+        } catch(err) {
+            logger.error(err);
         }
-
     }
     async sendWechat(to: NotifyToAddress, data: any){
         if(!config.notify.sendWechat)
@@ -128,8 +128,8 @@ class NotifyTemplate{
                 templateId: json.template_id,
             });
             logger.info('成功发送微信通知:', to.openId, this.name);
-        }catch (e){
-            console.log(e);
+        } catch(err) {
+            logger.error(err);
         }
 
     }
@@ -163,8 +163,8 @@ class NotifyTemplate{
                 attachments: attachments,
             });
             logger.info('成功发送邮件:', to.email, this.name);
-        }catch (e){
-            console.log(e);
+        } catch(err) {
+            logger.error(err);
         }
     }
 
@@ -190,8 +190,8 @@ class NotifyTemplate{
             }
             await API.notice.createNotice({title: title, content: content, description: description, staffId: to.accountId, sendType: ESendType.ONE_ACCOUNT, type: data.noticeType || ENoticeType.SYSTEM_NOTICE});
             logger.info('成功发送通知:', data.account.name, this.name);
-        }catch (e){
-            console.log(e);
+        } catch(err) {
+            logger.error(err);
         }
     }
 }

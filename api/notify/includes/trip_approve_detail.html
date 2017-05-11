@@ -34,11 +34,15 @@
             %>
             <%=approveUserMap[staffId].name%>
             (<i style="font-style: normal;color: #30c74d;">同意</i>)
-            <%}}); %>
+            <%if(!(tripApprove.status == 1 && !isAutoApprove && (index == tripApprove.approvedUsers.split(',').length - 1))){%>
+            、
+            <%}}}); %>
             <%if(tripApprove.status == -1){%>
             <%=approveUserMap[tripApprove.approveUserId].name%>
             (<i style="font-style: normal;color: #e82f2d;">驳回, <%=tripApprove.approveRemark%></i>)
-            <%} if(tripApprove.status == 0){%>
+            <%}else if(tripApprove.status == 1 && isAutoApprove){%>
+            系统审批（<i style="font-style: normal;color: #30c74d;">同意</i>）
+            <%}else if(tripApprove.status == 0){%>
             <%=approveUserMap[tripApprove.approveUserId].name%>
             (<i style="font-style: normal;color: #898989;">等待审批</i>)
             <%}%>
