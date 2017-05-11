@@ -63,7 +63,9 @@ function formatHotel(hotels: IHotel[]) : IFinalHotel[] {
                 agent: agents[j].name,
                 checkInDate: hotel.checkInDate,
                 checkOutDate: hotel.checkOutDate,
-                outPriceRange: false
+                outPriceRange: false,
+                remark:hotel.remark,
+                channel:hotel.channel,
             } as IFinalHotel)
         }
     }
@@ -147,7 +149,9 @@ export abstract class AbstractHotelStrategy {
             checkInDate: query.checkInDate,
             checkOutDate: query.checkOutDate,
             cityName: query.city.name,
-            hotelName: query.hotelName
+            hotelName: query.hotelName,
+            remark:ret.remark,
+            channel:ret.channel,
         }as TravelBudgetHotel
         if (isRetMarkedData) {
             result.markedScoreData = _hotels;

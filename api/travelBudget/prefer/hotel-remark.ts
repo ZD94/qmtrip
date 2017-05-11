@@ -20,19 +20,18 @@ class RemarkPrefer extends AbstractPrefer<IFinalHotel> {
 
     async markScoreProcess(hotels: IFinalHotel[],remarkCondition?:RemarkCondition) : Promise<IFinalHotel[]> {
         let self = this;
-        console.log("============score: ",self.score);
+        if(!hotels || !hotels.length){
+            return;
+        }
+        let channel=hotels[0].channel;
         hotels = hotels.map( (v) => {
             if(!v.remark){
                 return v;
             }
             if(!v.score) v.score=0;
             if(!v.reasons) v.reasons=[];
-            let channel:any;
             let rate:any;
-            if(!remarkCondition || !remarkCondition.channel){
-                 channel='ctrip';
-            }
-            channel=remarkCondition.channel;
+
             switch(channel){
                 case "ctrip":
                     rate=2;

@@ -95,7 +95,8 @@ export var hotelPrefers = {
     represent: require('./hotel-represent'),
     price: require('./hotel-price'),
     priceRange: require('./hotel-pricerange'),
-    distance:require('./hotel-distance')
+    distance:require('./hotel-distance'),
+    remark:require("./hotel-remark")
 }
 
 export var ticketPrefers = {
