@@ -94,6 +94,12 @@
             "options": {
                 "score": 20000
             }
+        },
+        {
+            "name": "remark",
+            "options": {
+                "score": 5000
+            }
         }
     ],
     "abroadHotel": [
