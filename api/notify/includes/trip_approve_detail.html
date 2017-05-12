@@ -1,0 +1,72 @@
+<table width="422" border="1" cellpadding="8" style="
+    border: 1px solid #dcdcdc;
+    margin-bottom: 20px;
+    color: #747474;
+    border-collapse: collapse;" >
+    <tr>
+        <td colspan="2" style="text-align: center;background-color: #f8f8f8;color: #393939; font-size: 16px;"><%=tripApprove.project.name || '' %></td>
+    </tr>
+    <tr>
+        <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">行程</td>
+        <td style="padding-left: 20px;font-size: 16px;">
+            <%=tripApprove.deptCity%>-
+            <% _.forEach(tripApprove.arrivalCityCodes, function(cityCode, index) { %>
+            <%=cityMap[cityCode].name%>
+            <%if(index != (tripApprove.arrivalCityCodes.length - 1)){%>
+            -
+            <%}%>
+            <%}); %>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">类型</td>
+        <td style="padding-left: 20px;font-size: 16px;"><%=tripApprove.isSpecialApprove ? '特别审批' : '普通申请'%></td>
+    </tr>
+    <%if(tripApprove.isSpecialApprove) {%>
+    <tr>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">说明</td>
+        <td style="padding-left: 20px;font-size: 16px;"><%=tripApprove.specialApproveRemark || '' %></td>
+    </tr>
+    <%}%>
+    <tr>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">总预算</td>
+        <td style="padding-left: 20px;font-size: 16px;"><%=tripApprove.budget %>元</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">出差人</td>
+        <td style="padding-left: 20px;font-size: 16px;"><%=tripApprove.account.name %></td>
+    </tr>
+    <tr>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">审批人</td>
+        <td style="padding-left: 20px;font-size: 16px;">
+            <% _.forEach(tripApprove.approvedUsers.split(','), function(staffId, index) {
+            if(staffId && staffId != ""){
+            %>
+            <%=approveUserMap[staffId].name%>
+            (<i style="font-style: normal;color: #30c74d;">同意</i>)
+            <%if(!(tripApprove.status == 1 && !isAutoApprove && (index == tripApprove.approvedUsers.split(',').length - 1))){%>
+            、
+            <%}}}); %>
+            <%if(tripApprove.status == -1){%>
+            <%=approveUserMap[tripApprove.approveUserId].name%>
+            (<i style="font-style: normal;color: #e82f2d;">驳回, <%=tripApprove.approveRemark%></i>)
+            <%}else if(tripApprove.status == 1 && isAutoApprove){%>
+            系统审批（<i style="font-style: normal;color: #30c74d;">同意</i>）
+            <%}else if(tripApprove.status == 0){%>
+            <%=approveUserMap[tripApprove.approveUserId].name%>
+            (<i style="font-style: normal;color: #898989;">等待审批</i>)
+            <%}%>
+        </td>
+    </tr>
+</table>
+
+
+
+
+
+
+
+
+
+
+>>>>>>> a780c97c7505cc8a966e61dfff6737bf6db74e0a

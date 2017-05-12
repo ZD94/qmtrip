@@ -1,1 +1,20 @@
-<%=account.name || '' %>，您好<br/>【<%=account.company.name || '' %>】在<%=time || '' %>更新了您的鲸力商旅账号信息<br/>更新内容如下：<br/>姓名：<%=account.name || '' %><br/>手机号：<%=account.mobile || '' %><br/>部门：<%=account.departmentNames || account.company.name %><br/>差旅标准：<%=travelPolicy || '' %><br/>权限：<%=permission || '' %><br/>状态：<%=account.staffStatus == 0 ? '禁用' : '启用' %><br/>
+<!--
+尊敬的<%=account.name || '' %>：<br/>
+您的员工信息被管理员<%=admin.name || '' %>修改<br/>
+项目 信息 是否修改<br/>
+角色 <%=staff.roleId == EStaffRole.ADMIN ? "管理员":(staff.roleId == EStaffRole.OWNER ? "创建者":"普通员工")%><br/>
+差旅标准 <%=travelPolicy.name || '' %><br/>
+部门 <%=departmentNames%><br/>
+查看详情<a href=<%=detailUrl || '' %>>【按钮】</a><br/>
+如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅： <%=detailUrl || '' %><br/>-->
+
+<p style="font-size: 20px;color: #74C7CD">个人资料修改</p>
+<p style="border-top: 1px solid #EEEEEE;padding-top: 25px;color: #4A4A4A">
+    尊敬的<%=account.name || '' %>,您的员工信息被管理员<%=admin.name || '' %>修改<br/></br>
+</p>
+<%= include('staff_update_detail.html') %>
+<a href=http://w.url.cn/s/AUn22HK style="display:block;width: 100px;height: 36px;text-align: center;line-height: 36px; background-color: #28A7FF;color: #ffffff; text-decoration:none;border-radius: 3px;margin-top: 20px">查看详情</a><br/>
+<p style="font-size: 14px;color:#4A4A4A;border-top: 1px solid #EEEEEE"><br/>
+    如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅<br/>
+    （该链接在24小时内有效）： <%=detailUrl || '' %><br/>
+</p>
