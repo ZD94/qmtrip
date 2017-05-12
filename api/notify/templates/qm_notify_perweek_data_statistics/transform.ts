@@ -11,6 +11,8 @@ export = async function transform(values: any): Promise<any>{
     values.weekNum = weekNum;
     values.beginTime = beginTime;
     values.endTime = endTime;
+    let weekMap = {1: "一", 2: "二", 3: "三", 4: "四", 5: "五"};
+    values.weekMap = weekMap;
     return values;
 }
 function getWeekOfMonth(time) {
