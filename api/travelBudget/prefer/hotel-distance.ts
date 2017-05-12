@@ -49,6 +49,7 @@ class DistancePrefer extends AbstractPrefer<IFinalHotel>{
             distance = R * 2 * Math.atan2(Math.sqrt(temp), Math.sqrt(1 - temp));
             distances.push(distance);
         }
+        
         minDistance = Math.min.apply(Math,distances);
         let cscore:number;
         for (let i = 0; i < hotels.length; i++) {
