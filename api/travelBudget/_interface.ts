@@ -4,7 +4,5 @@ export interface LandMark{
     longitude:number
 }
 export interface RemarkCondition{
-    landmark?:LandMark,
-    isAbroad?:boolean,
-    channel?:string
+    landmark?:LandMark
 }

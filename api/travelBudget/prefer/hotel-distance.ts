@@ -3,9 +3,6 @@
 import {AbstractPrefer} from "./index";
 import {IFinalHotel} from "_types/travelbudget";
 import {RemarkCondition} from "../_interface";
-const API=require("@jingli/dnode-api");
-var request=require("request");
-const baiduCoordKey=`6vAKY71IUSzT3mrhFC5HdMHkUDZHKo6G`;
 
 class DistancePrefer extends AbstractPrefer<IFinalHotel>{
     private score:number;
@@ -21,30 +18,6 @@ class DistancePrefer extends AbstractPrefer<IFinalHotel>{
             coor=Number(coor);
         }
         return coor * Math.PI/ 180;
-    }
-
-    async coordConversion(params:{latitude:any,longitude:any}):Promise<any>{
-        var coordinates=`${params.latitude},${params.longitude}`;
-        let sourceType=3;
-        let toType=5;
-
-        var url=`http://api.map.baidu.com/geoconv/v1/?coords=${coordinates}&from=${sourceType}&to=${toType}&ak=${baiduCoordKey}`;
-        let coords=await new Promise<any>((resolve,reject)=>{
-            request.get({
-                        uri:url,
-                    },function(err,res){
-                        resolve(res.body)
-                    }
-                )
-            }
-        );
-        if(coords && typeof coords =="string"){
-            coords=JSON.parse(coords)
-        }
-        if(!coords || coords.status !=0){
-            return null;
-        }
-        return coords.result[0];
     }
 
     async markScoreProcess(hotels: IFinalHotel[],remarkCondition?:RemarkCondition) {
@@ -64,16 +37,14 @@ class DistancePrefer extends AbstractPrefer<IFinalHotel>{
         for(let i=0;i<hotels.length;i++){
             if (!hotels[i]['score']) hotels[i].score = 0;
             if (!hotels[i]['reasons']) hotels[i].reasons = [];
-            let coords = await self.coordConversion({latitude: hotels[i].latitude, longitude: hotels[i].longitude});
-            if (coords && typeof coords == "string") {
-                coords = JSON.parse(coords)
+
+            if (!hotels[i]['latitude'] || !hotels[i]['longitude']) {
+                break;
             }
-            if (!coords) {
-                distances.push(-1);
-            }
-            dLat = self.toRadian(Number(coords.x) - Number(landmark.latitude));
-            dLon = self.toRadian(Number(coords.y) - Number(landmark.longitude));
-            temp = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(self.toRadian(coords.x)) * Math.cos(self.toRadian(landmark.latitude)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            dLat = self.toRadian(Number(hotels[i]['latitude']) - Number(landmark.latitude));
+            dLon = self.toRadian(Number(hotels[i]['longitude']) - Number(landmark.longitude));
+            temp = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                   Math.cos(self.toRadian(hotels[i]['latitude'])) * Math.cos(self.toRadian(landmark.latitude)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
             distance = R * 2 * Math.atan2(Math.sqrt(temp), Math.sqrt(1 - temp));
             distances.push(distance);
         }
@@ -81,7 +52,8 @@ class DistancePrefer extends AbstractPrefer<IFinalHotel>{
         let cscore:number;
         for (let i = 0; i < hotels.length; i++) {
             if(distances[i]>0){
-                cscore=Math.round(2000 - Math.pow(minDistance, 1 / 6) * Math.pow(distances[i] / minDistance, 1 / 3) * (distances[i] - minDistance));
+                cscore=Math.round(2000 - Math.pow(minDistance, 1 / 6) *
+                       Math.pow(distances[i] / minDistance, 1 / 3) * (distances[i] - minDistance));
                 hotels[i].score +=cscore;
             }
         }
