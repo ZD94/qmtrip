@@ -116,7 +116,7 @@ class NotifyTemplate{
             return;
         if(!this.wechat)
             return;
-        try {
+        try{
             let content = this.wechat(data);
             let json = JSON.parse(content);
             if (!data.templateId) return;
@@ -177,7 +177,7 @@ class NotifyTemplate{
             return;
         if(!this.appmessage.title || !this.appmessage.text)
             return;
-        try{
+        try {
             let content;
             let title = this.appmessage.title(data);
             let description = this.appmessage.text(data);
@@ -310,3 +310,4 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
     await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: userId }, _values);
     return true;
 }
+
