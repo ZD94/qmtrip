@@ -352,7 +352,7 @@ export default class ApiTravelBudget {
         qs.prefers = prefers;
         qs.query = query;
         let hotels = await API.hotel.search_hotels(query);
-        let landmark={latitude:query.latitude,longitude:query.latitude};
+        let landmark={latitude:query.latitude,longitude:query.longitude};
         let strategy = await HotelBudgetStrategyFactory.getStrategy(qs, {isRecord: true,
             remarkCondition:{landmark:landmark}});
         let budget = await strategy.getResult(hotels);

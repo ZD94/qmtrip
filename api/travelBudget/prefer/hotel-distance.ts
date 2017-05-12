@@ -3,6 +3,7 @@
 import {AbstractPrefer} from "./index";
 import {IFinalHotel} from "_types/travelbudget";
 import {RemarkCondition} from "../_interface";
+var haversine=require("haversine");
 
 class DistancePrefer extends AbstractPrefer<IFinalHotel>{
     private score:number;
@@ -28,10 +29,8 @@ class DistancePrefer extends AbstractPrefer<IFinalHotel>{
             landmark=JSON.parse(landmark);
         }
         let distances=new Array();
-        let dLat: any;
-        let dLon: any;
-        let R = 6371;
-        let temp: number;
+        let start: any;
+        let end: any;
         let minDistance: number;
         let distance:number;
         for(let i=0;i<hotels.length;i++){
@@ -41,12 +40,15 @@ class DistancePrefer extends AbstractPrefer<IFinalHotel>{
             if (!hotels[i]['latitude'] || !hotels[i]['longitude']) {
                 continue;
             }
-            dLat = self.toRadian(Number(hotels[i]['latitude']) - Number(landmark.latitude));
-            dLon = self.toRadian(Number(hotels[i]['longitude']) - Number(landmark.longitude));
-            temp = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                   Math.cos(self.toRadian(hotels[i]['latitude'])) * Math.cos(self.toRadian(landmark.latitude)) *
-                   Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            distance = R * 2 * Math.atan2(Math.sqrt(temp), Math.sqrt(1 - temp));
+            start={
+                latitude:Number(hotels[i]['latitude']),
+                longitude:Number(hotels[i]['longitude'])
+            }
+            end={
+                latitude:Number(landmark.latitude),
+                longitude:Number(landmark.longitude)
+            }
+            distance=haversine(start,end,{unit:'meter'})
             distances.push(distance);
         }
         
@@ -54,7 +56,7 @@ class DistancePrefer extends AbstractPrefer<IFinalHotel>{
         let cscore:number;
         for (let i = 0; i < hotels.length; i++) {
             if(distances[i]>0){
-                cscore=Math.round(2000 - Math.pow(minDistance, 1 / 6) *
+                cscore=Math.round(self.score - Math.pow(minDistance, 1 / 6) *
                        Math.pow(distances[i] / minDistance, 1 / 3) * (distances[i] - minDistance));
                 hotels[i].score +=cscore;
                 hotels[i].reasons.push(`距离打分+${cscore}`);
