@@ -45,11 +45,11 @@ export = async function transform(values: any): Promise<any>{
     }
     values.approveUserMap = approveUserMap;
 
-    let logs = await Models.tripPlanLog.find({tripPlanId: tripApprove.id, approveStatus: EApproveResult.AUTO_APPROVE, remark: '自动通过'});
+    let logs = await Models.tripPlanLog.find({where: {tripPlanId: tripApprove.id, approveStatus: EApproveResult.AUTO_APPROVE, remark: '自动通过'}});
     if(logs && logs.length > 0){
         values.isAutoApprove = true;
     }else{
-        values.isAutoApprove = true;
+        values.isAutoApprove = false;
     }
     return values;
 }

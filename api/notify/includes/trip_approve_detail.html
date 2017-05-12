@@ -22,6 +22,12 @@
         <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">类型</td>
         <td style="padding-left: 20px;font-size: 16px;"><%=tripApprove.isSpecialApprove ? '特别审批' : '普通申请'%></td>
     </tr>
+    <%if(tripApprove.isSpecialApprove) {%>
+    <tr>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">说明</td>
+        <td style="padding-left: 20px;font-size: 16px;"><%=tripApprove.specialApproveRemark || '' %></td>
+    </tr>
+    <%}%>
     <tr>
         <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">总预算</td>
         <td style="padding-left: 20px;font-size: 16px;"><%=tripApprove.budget %>元</td>
@@ -44,10 +50,23 @@
             <%if(tripApprove.status == -1){%>
             <%=approveUserMap[tripApprove.approveUserId].name%>
             (<i style="font-style: normal;color: #e82f2d;">驳回, <%=tripApprove.approveRemark%></i>)
-            <%} if(tripApprove.status == 0){%>
+            <%}else if(tripApprove.status == 1 && isAutoApprove){%>
+            系统审批（<i style="font-style: normal;color: #30c74d;">同意</i>）
+            <%}else if(tripApprove.status == 0){%>
             <%=approveUserMap[tripApprove.approveUserId].name%>
             (<i style="font-style: normal;color: #898989;">等待审批</i>)
             <%}%>
         </td>
     </tr>
 </table>
+
+
+
+
+
+
+
+
+
+
+>>>>>>> a780c97c7505cc8a966e61dfff6737bf6db74e0a
