@@ -578,7 +578,7 @@ class CompanyModule {
                 let companies = [];
                 let now = new Date();
                 const EXPIRE_BEFORE_DAYS = 15;
-                const PAYED_COMPANY_EXPIRE_NOTIFY = [1, 7, 15]
+                const PAYED_COMPANY_EXPIRE_NOTIFY = [-1,1, 7, 15]
                 const TRYING_COMPANY_EXPIRE_NOTIFY = [7];
 
                 //获取所有待失效企业
@@ -617,6 +617,8 @@ class CompanyModule {
                         key = 'qm_notify_trying_will_expire_company'
                     }
                     if (key) {
+                        // let detailUrl = C.host + "/#/company-pay/service-pay";
+                        let host = C.host;
                         //查询公司管理员和创建人
                         let managers = await company.getManagers({withOwner: true});
                         let ps = managers.map( (manager) => {
@@ -625,8 +627,10 @@ class CompanyModule {
                                 userId: manager.id,
                                 key: key,
                                 values: {
+                                    company: company,
                                     expiryDate: moment(company.expiryDate).format('YYYY-MM-DD'),
                                     days: diffDays,
+                                    host: host
                                 }
                             });
                         });
