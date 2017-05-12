@@ -20,13 +20,17 @@ class RemarkPrefer extends AbstractPrefer<IFinalHotel> {
         if(!hotels || !hotels.length){
             return;
         }
+        let cscore:any;
         hotels = hotels.map( (v) => {
             if(!v.commentScore || v.commentScore<0){
                 return v;
             }
             if(!v.score) v.score=0;
             if(!v.reasons) v.reasons=[];
-            v.score+=Math.round(self.score* Math.sqrt(v.commentScore+1));
+
+            cscore = Math.round(self.score* Math.sqrt(v.commentScore+1));
+            v.score+=cscore;
+            v.reasons.push(`用户评分打分+${cscore}`);
             return v;
         })
         return hotels;
