@@ -78,7 +78,7 @@ export async function checkTokenAuth(params: AuthRequest): Promise<AuthResponse|
 
     token.expireAt = moment().add(7, "days").toDate();
     await token.save();
-    return {accountId: token.accountId, tokenId: token.id};
+    return {accountId: token.accountId, tokenId: token.id} as AuthResponse;
 };
 
 
