@@ -57,7 +57,6 @@ class DistancePrefer extends AbstractPrefer<IFinalHotel>{
                 cscore=Math.round(2000 - Math.pow(minDistance, 1 / 6) *
                        Math.pow(distances[i] / minDistance, 1 / 3) * (distances[i] - minDistance));
                 hotels[i].score +=cscore;
-                hotels[i].reasons.push(`距离打分+${cscore}`);
             }
         }
         return hotels;
