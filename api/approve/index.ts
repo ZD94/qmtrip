@@ -91,14 +91,17 @@ class ApproveModule {
 
         //行程数第一次小于10或等于0时给管理员和创建人发通知
         let newNum = com.tripPlanNumBalance;
-        if(oldNum > 10 && newNum <= 10 || newNum == 0){
+        if(oldNum > 10 && newNum < 10 || newNum == 0){
+            // let detailUrl = Config.host + "/#/company-pay/buy-packages";
+            let host = Config.host;
             let managers = await company.getManagers({withOwner: true});
             let ps = managers.map( (manager) => {
                 return API.notify.submitNotify({
                     userId: manager.id,
                     key: "qm_notify_trip_plan_num_short",
                     values: {
-                        number: newNum
+                        number: newNum,
+                        host: host
                     }
                 });
             });
