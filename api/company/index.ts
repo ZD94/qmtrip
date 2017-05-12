@@ -760,7 +760,53 @@ class CompanyModule {
                 .catch( (err) => {
                     logger.error(`执行任务${taskId5}错误:${err.stack}`);
                 })
-        })
+        });
+
+        let taskId6 = 'dataStatisticsPerWeek';
+        scheduler('0 0 1 * * 1', taskId6, function() {
+            //每周一晚上一点给管理员 创建者发送统计邮件
+            (async function() {
+                let now = new Date();
+
+                //获取所有企业
+                let companies = await Models.company.all({
+                    where: {
+                        expiryDate: {$gte: now},
+                        type: ECompanyType.PAYED
+                    }
+                });
+
+                for(let company of companies) {
+                    if (!company.expiryDate) {
+                        continue;
+                    }
+
+                    let staticData = await company.staticTripPlanInfo({beginTime: moment().subtract(7, 'days'), endTime: now});
+                    let key =  'qm_notify_perweek_data_statistics';
+                    let host = C.host;
+                    //查询公司管理员和创建人
+                    let managers = await company.getManagers({withOwner: true});
+                    let ps = managers.map( (manager) => {
+                        //给各个企业发送通知
+                        return API.notify.submitNotify({
+                            userId: manager.id,
+                            key: key,
+                            values: {
+                                company: company,
+                                sumBudget: staticData.sumBudget,
+                                sumTripPlanNum: staticData.sumTripPlanNum,
+                                staffNum: staticData.staffNum,
+                                host: host
+                            }
+                        });
+                    });
+                    await Promise.all(ps);
+                }
+            })()
+                .catch((err) => {
+                    logger.error(`run stark ${taskId6} error:`, err.stack);
+                });
+        });
     }
 
 }
