@@ -177,7 +177,7 @@ class NotifyTemplate{
             return;
         if(!this.appmessage.title || !this.appmessage.text)
             return;
-        try {
+        try{
             let content;
             let title = this.appmessage.title(data);
             let description = this.appmessage.text(data);

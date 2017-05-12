@@ -1,7 +1,24 @@
-尊敬的<%=account.name || '' %>，您提交的票据审核通过。<br/>
-<%= include('trip_plan_simple_detail.html') %>
-实际支出：<%=tripPlan.expenditure %>元<br/>
-节省：<%=tripPlan.budget - tripPlan.expenditure || '' %>元<br/>
-<!--出差人：李晓辰、彭科、王鹏<br/>-->
-查看详情<a href=<%=detailUrl || '' %>>【按钮】</a><br/>
-如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅）：<%=detailUrl || '' %><br/>
+<p style="color: #33cd5f;
+    font-size: 20px;"
+>票据审核通过</p>
+<p style="border: 1px #eee solid;
+    border-width: 1px 0 0 0;
+    font-size: 18px;
+    padding: 30px 0 4px;"
+>
+    尊敬的<%=account.name || '' %>，您提交的票据审核通过。<br/>
+</p>
+<a style="display: block;
+    width: 100px;
+    height: 36px;
+    color: white;
+    font-size: 16px;
+    background-color: rgb(40,167,255);
+    border-radius: 3px;
+    text-align: center;
+    line-height: 36px;
+    text-decoration: none;" href=<%=detailUrl || '' %>>查看详情</a><br/>
+<p style="padding-top: 20px;
+    font-size: 14px;
+    border-top: 1px solid #eee;">如果按钮无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅：<br/>
+    <%=detailUrl || '' %></p>
