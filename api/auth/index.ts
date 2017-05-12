@@ -944,7 +944,7 @@ export default class ApiAuth {
         if(!params.attributes){
             params.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt", "loginFailTimes", "lastLoginAt", "lastLoginIp", "activeToken", "pwdToken", "oldQrcodeToken", "qrcodeToken", "type", "isFirstLogin"];
         }
-        params.order = params.order || "createdAt desc";
+        params.order = params.order || "created_at desc";
 
         let paginate = await Models.account.find(params);
         let ids = paginate.map(function(t) {
