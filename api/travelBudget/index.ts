@@ -352,9 +352,12 @@ export default class ApiTravelBudget {
         let prefers = loadPrefers(budgetConfig.hotel, {local: query}, key);
 
         if(policy.hotelPrefer === 0 || (policy.hotelPrefer && policy.hotelPrefer != -1)){
-            prefers.push({
-                "name":"price","options":{"score":5000,"percent": policy.hotelPrefer/100 }
-            })
+            for(let item of policy.hotelLevels){
+                prefers.push({
+                    "name":"price","options":{"score":5000,"percent": policy.hotelPrefer/100, "star":[item]}
+                })
+            }
+            
         }
 
         qs.prefers = prefers;
@@ -512,10 +515,14 @@ export default class ApiTravelBudget {
         }
 
         if(policy.trafficPrefer === 0 || (policy.trafficPrefer && policy.trafficPrefer != -1)){
-            qs.prefers.push({
-                "name":"price",
-                "options":{"type":"square","score":50000,"cabins":[2],"percent": policy.trafficPrefer/100 }
-            });
+            let arr = [...policy.trainLevels, ...policy.planeLevels];
+            for(let item of arr){
+                qs.prefers.push({
+                    "name":"price",
+                    "options":{"type":"square","score":50000,"cabins":[item],"percent": policy.trafficPrefer/100 }
+                });
+            }
+            
         }
 
         qs.query = params;
