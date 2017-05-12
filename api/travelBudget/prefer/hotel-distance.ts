@@ -39,12 +39,13 @@ class DistancePrefer extends AbstractPrefer<IFinalHotel>{
             if (!hotels[i]['reasons']) hotels[i].reasons = [];
 
             if (!hotels[i]['latitude'] || !hotels[i]['longitude']) {
-                break;
+                continue;
             }
             dLat = self.toRadian(Number(hotels[i]['latitude']) - Number(landmark.latitude));
             dLon = self.toRadian(Number(hotels[i]['longitude']) - Number(landmark.longitude));
             temp = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                   Math.cos(self.toRadian(hotels[i]['latitude'])) * Math.cos(self.toRadian(landmark.latitude)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                   Math.cos(self.toRadian(hotels[i]['latitude'])) * Math.cos(self.toRadian(landmark.latitude)) *
+                   Math.sin(dLon / 2) * Math.sin(dLon / 2);
             distance = R * 2 * Math.atan2(Math.sqrt(temp), Math.sqrt(1 - temp));
             distances.push(distance);
         }
