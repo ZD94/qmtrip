@@ -252,7 +252,7 @@ export class ddCrud {
 
             let ddDepart = Models.ddtalkDepartment.create({
                 corpId : this.corpId ,
-                DdDepartmentId : ddDepartInfo.id ,
+                DdDepartmentId : `${ddDepartInfo.id}`,
                 localDepartmentId : localDepart.id ,
                 ddName : ddDepartInfo.name
             });
