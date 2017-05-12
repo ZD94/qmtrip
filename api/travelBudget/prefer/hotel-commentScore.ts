@@ -7,8 +7,6 @@ import {IFinalHotel} from "_types/travelbudget";
 import {AbstractPrefer} from "./index";
 import {RemarkCondition} from "../_interface";
 
-
-
 class RemarkPrefer extends AbstractPrefer<IFinalHotel> {
     private score: number;
     constructor(name, options) {
@@ -17,7 +15,6 @@ class RemarkPrefer extends AbstractPrefer<IFinalHotel> {
             this.score = 0;
         }
     }
-
     async markScoreProcess(hotels: IFinalHotel[],remarkCondition?:RemarkCondition) : Promise<IFinalHotel[]> {
         let self = this;
         if(!hotels || !hotels.length){
@@ -35,5 +32,4 @@ class RemarkPrefer extends AbstractPrefer<IFinalHotel> {
         return hotels;
     }
 }
-
 export= RemarkPrefer;
