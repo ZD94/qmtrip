@@ -411,21 +411,20 @@ class StaffModule{
             return API.auth.sendResetPwdEmail({companyName: updateStaff.company.name, email: updateStaff.email, type: 1, isFirstSet: true});
         }else{
 
-            let tp = await Models.travelPolicy.get(updateStaff["travelPolicyId"]);
-
-            let vals  = {
+            /*let vals  = {
                 noticeType: ENoticeType.SYSTEM_NOTICE,
                 appMessageUrl: '#/staff/staff-info',
                 detailUrl: config.host + '/#/staff/staff-info',
                 admin: staff,
-                staff: updateStaff
+                staff: updateStaff,
+                updateParams: params
             }
             //发送通知
             await API.notify.submitNotify({
                 key: 'staff_update',
                 values: vals,
                 userId: updateStaff.id
-            });
+            });*/
 
         }
         return updateStaff;

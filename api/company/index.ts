@@ -802,10 +802,42 @@ class CompanyModule {
                     });
                     await Promise.all(ps);
                 }
+                logger.info(`成功执行任务${taskId6}`);
             })()
                 .catch((err) => {
                     logger.error(`run stark ${taskId6} error:`, err.stack);
                 });
+        });
+
+        let taskId7 = 'notifyNewStaffPerDayMail';
+        scheduler('0 0 8 * * *', taskId7, function() {
+            if (!C.perDayRegisterEmail) {
+                return false;
+            }
+
+            //每天八点发送每日添加员工邮件
+            ( async () => {
+                let staffs = await Models.staff.all( {
+                    where: {
+                        createdAt: {
+                            "$lte": new Date(),
+                            "$gte": moment().add(-1, 'days').format('YYYY-MM-DD 08:00')
+                        }
+                    }
+                });
+
+                await API.notify.submitNotify({
+                    key: "qm_notify_perday_mail_staff",
+                    values: {
+                        staffs: staffs,
+                    },
+                    email: C.perDayRegisterEmail
+                });
+                logger.info(`成功执行任务${taskId7}`);
+            })()
+                .catch( (err) => {
+                    logger.error(`执行任务${taskId7}错误:${err.stack}`);
+                })
         });
     }
 
