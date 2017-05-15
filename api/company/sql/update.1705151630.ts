@@ -25,7 +25,7 @@ function dealBudget(obj){
 
 module.exports = function(DB, t) {
 
-    let sql = `SELECT * FROM company.companies`;
+    let sql = `SELECT * FROM company.companies where deleted_at is null`;
     return DB.query(sql)
     .then(async (rets) => {
         for(let item of rets[0]){
