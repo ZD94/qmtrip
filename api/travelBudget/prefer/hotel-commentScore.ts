@@ -31,7 +31,6 @@ class RemarkPrefer extends AbstractPrefer<IFinalHotel> {
             cscore = Math.round(self.score* Math.sqrt(v.commentScore+1));
             v.score+=cscore;
             v.reasons.push(`用户评分打分+${cscore}`);
-            console.log("========cscore: ",cscore);
             return v;
         })
         return hotels;
