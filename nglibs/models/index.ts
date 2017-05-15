@@ -145,7 +145,7 @@ var Services = {
 
     tripBasicPackage:{type:TripBasicPackage, modname:'tripPackage',funcs:[]},
     tripFuelAddPackage:{type:TripFuelAddPackage, modname:'tripPackage',funcs:[]},
-
+    errorLog: {},
 };
 
 function throwNotImplemented(){
@@ -223,6 +223,8 @@ class ClientModels implements ModelsInterface {
     tripBasicPackage:ModelInterface<TripBasicPackage>;
     tripFuelAddPackage:ModelInterface<TripFuelAddPackage>
 
+    errorLog: ModelInterface<ErrorLog>;
+
     constructor($cacheFactory: ng.ICacheFactoryService, $rootScope: ng.IRootScopeService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
         this.credential = createService<Credential>(Services.credential, $cacheFactory);
@@ -262,7 +264,7 @@ class ClientModels implements ModelsInterface {
         this.agencyOperateLog = createService<AgencyOperateLog>(Services.agencyOperateLog, $cacheFactory);
         this.tripBasicPackage = createService<TripBasicPackage>(Services.tripBasicPackage, $cacheFactory);
         this.tripFuelAddPackage = createService<TripFuelAddPackage>(Services.tripFuelAddPackage, $cacheFactory);
-
+        this.errorLog = createService<ErrorLog>(Services.errorLog, $cacheFactory);
         initModels(this);
 
         $rootScope.$on('$locationChangeSuccess', ()=>{
@@ -291,5 +293,6 @@ class ClientModels implements ModelsInterface {
 
 import './menu';
 import './place';
+import {ErrorLog} from "../../_types/errorLog";
 
 
