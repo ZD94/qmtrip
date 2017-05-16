@@ -88,6 +88,12 @@
             "options": {
                 "score": -100000
             }
+        },
+        {
+            "name": "distance",
+            "options": {
+                "score": 20000
+            }
         }
     ],
     "abroadHotel": [

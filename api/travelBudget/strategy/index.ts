@@ -11,6 +11,7 @@ import {Models} from "_types/index";
 import util = require("util");
 import moment = require("moment");
 
+
 function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
     let _tickets : IFinalTicket[] = [];
     //把数据平铺
@@ -78,6 +79,7 @@ export abstract class AbstractHotelStrategy {
         } else {
             this.isRecord = false;
         }
+
         this.prefers = [];
     }
 
