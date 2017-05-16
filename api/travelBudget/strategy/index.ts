@@ -98,7 +98,7 @@ export abstract class AbstractHotelStrategy {
     async getMarkedScoreHotels(hotels: IFinalHotel[]) :Promise<IFinalHotel[]> {
         let self = this;
         for(let prefer of self.prefers) {
-            hotels = await prefer.markScore(hotels,self.remarkCondition);
+            hotels = await prefer.markScore(hotels);
         }
         return hotels;
     }

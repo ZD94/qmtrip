@@ -350,6 +350,11 @@ export default class ApiTravelBudget {
         }
 
         let prefers = loadPrefers(budgetConfig.hotel, {local: query}, key);
+        for(let p of prefers){
+            if(p.name=="distance"){
+                p.options.landmark={latitude:query.latitude,longitude:query.longitude};
+            }
+        }
 
         if(policy.hotelPrefer === 0 || (policy.hotelPrefer && policy.hotelPrefer != -1)){
             for(let item of policy.hotelLevels){
@@ -364,9 +369,7 @@ export default class ApiTravelBudget {
         qs.query = query;
 
         let hotels = await API.hotel.search_hotels(query);
-        let landmark={latitude:query.latitude,longitude:query.longitude};
-        let strategy = await HotelBudgetStrategyFactory.getStrategy(qs, {isRecord: true,
-            remarkCondition:{landmark:landmark}});
+        let strategy = await HotelBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
         let budget = await strategy.getResult(hotels);
         budget.type = EInvoiceType.HOTEL;
         return budget;

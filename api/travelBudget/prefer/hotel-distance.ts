@@ -2,32 +2,28 @@
 'use strict';
 import {AbstractPrefer} from "./index";
 import {IFinalHotel} from "_types/travelbudget";
-import {RemarkCondition} from "../_interface";
 var haversine=require("haversine");
 
 class DistancePrefer extends AbstractPrefer<IFinalHotel>{
     private score:number;
-    private remarkCondition:any;
+    private landmark:any;
     constructor(name,options){
         super(name,options);
         if (!this.score) {
             this.score = 0;
         }
     }
-    toRadian(coor:any):number{
-        if(typeof coor =='string' ){
-            coor=Number(coor);
-        }
-        return coor * Math.PI/ 180;
-    }
 
-    async markScoreProcess(hotels: IFinalHotel[],remarkCondition?:RemarkCondition) {
+
+    async markScoreProcess(hotels: IFinalHotel[]) {
         let self = this;
-        let {landmark}=remarkCondition;
-        if (!hotels.length && !landmark) return hotels;
+        let landmark=this.landmark;
+        console.log("landmark: ",landmark);
+        if (!hotels.length || !landmark) return hotels;
         if(typeof landmark =="string"){
             landmark=JSON.parse(landmark);
         }
+        if (!landmark.longitude || !landmark.latitude) return hotels;
         let distances=new Array();
         let start: any;
         let end: any;
@@ -54,11 +50,13 @@ class DistancePrefer extends AbstractPrefer<IFinalHotel>{
         
         minDistance = Math.min.apply(Math,distances);
         let cscore:number;
+        console.log("minDistance: ",minDistance);
         for (let i = 0; i < hotels.length; i++) {
             if(distances[i]>0){
                 cscore=Math.round(self.score - Math.pow(minDistance, 1 / 6) *
                        Math.pow(distances[i] / minDistance, 1 / 3) * (distances[i] - minDistance));
                 hotels[i].score +=cscore;
+                console.log("======distance: ",cscore);
                 hotels[i].reasons.push(`距离打分+${cscore}`);
             }
         }
