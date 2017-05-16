@@ -916,9 +916,9 @@ class TripPlanModule {
             savedMoneyComplete = `${savedMoneySelectSql} ${savedMoneyCompleteSql} group by d.id;`;
             plan = `${selectSql} ${planSql} group by d.id;`;
         }
-        console.log(complete);
+        // console.log(complete);
         let completeInfo = await DB.query(complete);
-        console.log("completeInfo:",completeInfo);
+        // console.log("completeInfo:",completeInfo);
         let savedMoneyCompleteInfo = await DB.query(savedMoneyComplete);
         let planInfo = await DB.query(plan);
 
