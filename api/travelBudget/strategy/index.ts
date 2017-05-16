@@ -318,7 +318,7 @@ export class TrafficBudgetStrategyFactory {
         }
         //通过企业配置的喜好打分
         for(let k of prefers) {
-            let prefer = PreferFactory.getPrefer(k.name, k.options);
+            let prefer = PreferFactory.getPrefer(k.name, k.options, 'traffic');
             if (!prefer) continue;
             strategy.addPrefer(prefer)
         }
@@ -344,7 +344,7 @@ class PreferFactory {
     static getPrefer(name, options, type?: string) {
         let cls = type == 'hotel' ? hotelPrefers[name]: ticketPrefers[name];
         if (cls && typeof cls == 'function') {
-            return new (cls)(name, options);
+            return new (cls)(name, options, type);
         }
         return null;
     }
