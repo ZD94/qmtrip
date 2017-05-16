@@ -6,34 +6,28 @@
 import {IFinalTicket, IFinalHotel, TRAFFIC} from "_types/travelbudget";
 import {AbstractPrefer} from "./index";
 
-function Price(v:any, param:any):any{
-    let self = param.self;
+function price(v:any, param:any):any{
     if (!v.score) v.score = 0;
     if (!v.reasons) v.reasons = [];
     let level = v.cabin || v["star"];
-    if (param.level.indexOf(parseInt(level)) >= 0){
+    if (this.level.indexOf(parseInt(level)) >= 0){
         if (v.price < param.midPrice) {
             var a = 1 - Math.pow((1 - (v.price - param.minPrice)/(param.midPrice - param.minPrice)),3);
-            if(self.type && self.type == "line"){
+            if(this.type && this.type == "line"){
                 a = (v.price - param.minPrice)/(param.midPrice - param.minPrice);
             }
             var addScore = param.score * a;
             v.score += addScore;
             v.reasons.push(`价格偏好以下价格 ${addScore}`)
-        }else if(v.price >= param.midPrice){
+        }else{
             var a = 1 - Math.pow((1 - (param.maxPrice - v.price)/(param.maxPrice - param.midPrice)),3);
-            if(self.type && self.type == "line"){
+            if(this.type && this.type == "line"){
                 a = (param.maxPrice - v.price)/(param.maxPrice - param.midPrice);
             }
             var addScore = param.score * a;
             v.score += addScore;
             v.reasons.push(`价格偏好以上价格 ${addScore}`)
-        }/*else if(v.price = param.midPrice){
-            var addScore = param.score as number;
-            v.score += addScore;
-            v.reasons.push(`等于价格偏好的价格 ${addScore}`)
-        }*/
-
+        }
     }
     return v;
 }
@@ -70,14 +64,11 @@ class PricePrefer extends AbstractPrefer<any> {
         }
 
         data = data.map( (v) => {
-            return Price(v, {
-                level: self.level,
+            return price.apply(self, [v, {
                 midPrice : midPrice,
                 minPrice : minPrice,
-                maxPrice : maxPrice,
-                score    : self.score,
-                self     : self
-            });
+                maxPrice : maxPrice
+            }]);
         })
         return data;
     }
