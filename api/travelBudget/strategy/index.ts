@@ -80,6 +80,7 @@ export abstract class AbstractHotelStrategy {
         } else {
             this.isRecord = false;
         }
+
         this.prefers = [];
     }
 
