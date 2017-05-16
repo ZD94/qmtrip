@@ -7,9 +7,8 @@ import _ = require("lodash");
 import Logger from '@jingli/logger';
 import moment = require("moment");
 let logger = new Logger('travel-budget');
-import {RemarkCondition} from "../_interface";
 export interface IPrefer<T> {
-    markScore(tickets: T[],remarkCondition?:RemarkCondition): Promise<T[]>;
+    markScore(tickets: T[]): Promise<T[]>;
 }
 
 export abstract class AbstractPrefer<T> implements IPrefer<T> {
@@ -20,10 +19,10 @@ export abstract class AbstractPrefer<T> implements IPrefer<T> {
             }
         }
     }
-    abstract async markScoreProcess(data: T[],remarkConditon?:RemarkCondition) : Promise<T[]>;
-    async markScore(data: T[],remarkCondition?:RemarkCondition): Promise<T[]> {
+    abstract async markScoreProcess(data: T[]) : Promise<T[]>;
+    async markScore(data: T[]): Promise<T[]> {
         logger.info(`. BEGIN ${this.name}`);
-        let ret = await this.markScoreProcess(data,remarkCondition);
+        let ret = await this.markScoreProcess(data);
         logger.info(`. END ${this.name}`);
         return ret;
     }
@@ -95,9 +94,6 @@ export var hotelPrefers = {
     represent: require('./hotel-represent'),
     price: require('./price'),
     priceRange: require('./hotel-pricerange'),
-    price: require('./hotel-price'),
-    priceRange: require('./hotel-pricerange'),
-    distance:require('./hotel-distance'),
     commentScore:require("./hotel-commentScore")
 }
 
