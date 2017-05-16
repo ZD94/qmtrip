@@ -10,7 +10,6 @@ import {IPrefer} from '../prefer'
 import {Models} from "_types/index";
 import util = require("util");
 import moment = require("moment");
-import {RemarkCondition} from "../_interface"
 
 
 function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
@@ -73,21 +72,14 @@ function formatHotel(hotels: IHotel[]) : IFinalHotel[] {
 export abstract class AbstractHotelStrategy {
     private prefers: IPrefer<IFinalHotel>[];
     private isRecord: boolean;
-    private remarkCondition:RemarkCondition;
 
     constructor(public qs: any, options: any) {
-        if(options){
-            if(options.isRecord){
-                this.isRecord=true;
-            }else{
-                this.isRecord=false;
-            }
-            if(options.remarkCondition){
-                this.remarkCondition=options.remarkCondition;
-            }else{
-                this.remarkCondition=null;
-            }
+        if (options && options.isRecord) {
+            this.isRecord = true;
+        } else {
+            this.isRecord = false;
         }
+
         this.prefers = [];
     }
 
