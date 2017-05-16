@@ -10,6 +10,8 @@ import {IPrefer} from '../prefer'
 import {Models} from "_types/index";
 import util = require("util");
 import moment = require("moment");
+import {RemarkCondition} from "../_interface"
+
 
 function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
     let _tickets : IFinalTicket[] = [];
@@ -61,7 +63,8 @@ function formatHotel(hotels: IHotel[]) : IFinalHotel[] {
                 agent: agents[j].name,
                 checkInDate: hotel.checkInDate,
                 checkOutDate: hotel.checkOutDate,
-                outPriceRange: false
+                outPriceRange: false,
+                commentScore:hotel.commentScore
             } as IFinalHotel)
         }
     }
@@ -71,12 +74,20 @@ function formatHotel(hotels: IHotel[]) : IFinalHotel[] {
 export abstract class AbstractHotelStrategy {
     private prefers: IPrefer<IFinalHotel>[];
     private isRecord: boolean;
+    private remarkCondition:RemarkCondition;
 
     constructor(public qs: any, options: any) {
-        if (options && options.isRecord) {
-            this.isRecord = true;
-        } else {
-            this.isRecord = false;
+        if(options){
+            if(options.isRecord){
+                this.isRecord=true;
+            }else{
+                this.isRecord=false;
+            }
+            if(options.remarkCondition){
+                this.remarkCondition=options.remarkCondition;
+            }else{
+                this.remarkCondition=null;
+            }
         }
         this.prefers = [];
     }
@@ -88,7 +99,7 @@ export abstract class AbstractHotelStrategy {
     async getMarkedScoreHotels(hotels: IFinalHotel[]) :Promise<IFinalHotel[]> {
         let self = this;
         for(let prefer of self.prefers) {
-            hotels = await prefer.markScore(hotels);
+            hotels = await prefer.markScore(hotels,self.remarkCondition);
         }
         return hotels;
     }
@@ -137,7 +148,8 @@ export abstract class AbstractHotelStrategy {
             checkInDate: query.checkInDate,
             checkOutDate: query.checkOutDate,
             cityName: query.city.name,
-            hotelName: query.hotelName
+            hotelName: query.hotelName,
+            commentScore:ret.commentScore
         }as TravelBudgetHotel
         if (isRetMarkedData) {
             result.markedScoreData = _hotels;

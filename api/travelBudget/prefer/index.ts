@@ -7,8 +7,9 @@ import _ = require("lodash");
 import Logger from '@jingli/logger';
 import moment = require("moment");
 let logger = new Logger('travel-budget');
+import {RemarkCondition} from "../_interface";
 export interface IPrefer<T> {
-    markScore(tickets: T[]): Promise<T[]>;
+    markScore(tickets: T[],remarkCondition?:RemarkCondition): Promise<T[]>;
 }
 
 export abstract class AbstractPrefer<T> implements IPrefer<T> {
@@ -19,10 +20,10 @@ export abstract class AbstractPrefer<T> implements IPrefer<T> {
             }
         }
     }
-    abstract async markScoreProcess(data: T[]) : Promise<T[]>;
-    async markScore(data: T[]): Promise<T[]> {
+    abstract async markScoreProcess(data: T[],remarkConditon?:RemarkCondition) : Promise<T[]>;
+    async markScore(data: T[],remarkCondition?:RemarkCondition): Promise<T[]> {
         logger.info(`. BEGIN ${this.name}`);
-        let ret = await this.markScoreProcess(data);
+        let ret = await this.markScoreProcess(data,remarkCondition);
         logger.info(`. END ${this.name}`);
         return ret;
     }
@@ -92,8 +93,16 @@ export var hotelPrefers = {
     starMatch: require('./hotel-star-match'),
     blackList: require('./hotel-blacklist'),
     represent: require('./hotel-represent'),
+<<<<<<< HEAD
     price: require('./price'),
     priceRange: require('./hotel-pricerange')
+=======
+    price: require('./hotel-price'),
+    priceRange: require('./hotel-pricerange'),
+    distance:require('./hotel-distance'),
+    commentScore:require("./hotel-commentScore")
+    
+>>>>>>> 25897eb3730d52c1f7f19a206a10aca43e2b7565
 }
 
 export var ticketPrefers = {
