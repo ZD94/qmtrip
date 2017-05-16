@@ -93,16 +93,12 @@ export var hotelPrefers = {
     starMatch: require('./hotel-star-match'),
     blackList: require('./hotel-blacklist'),
     represent: require('./hotel-represent'),
-<<<<<<< HEAD
     price: require('./price'),
-    priceRange: require('./hotel-pricerange')
-=======
+    priceRange: require('./hotel-pricerange'),
     price: require('./hotel-price'),
     priceRange: require('./hotel-pricerange'),
     distance:require('./hotel-distance'),
     commentScore:require("./hotel-commentScore")
-    
->>>>>>> 25897eb3730d52c1f7f19a206a10aca43e2b7565
 }
 
 export var ticketPrefers = {
