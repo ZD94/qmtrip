@@ -18,7 +18,6 @@ class DistancePrefer extends AbstractPrefer<IFinalHotel>{
     async markScoreProcess(hotels: IFinalHotel[]) {
         let self = this;
         let landmark=this.landmark;
-        console.log("landmark: ",landmark);
         if (!hotels.length || !landmark) return hotels;
         if(typeof landmark =="string"){
             landmark=JSON.parse(landmark);
@@ -56,7 +55,6 @@ class DistancePrefer extends AbstractPrefer<IFinalHotel>{
                 cscore=Math.round(self.score - Math.pow(minDistance, 1 / 6) *
                        Math.pow(distances[i] / minDistance, 1 / 3) * (distances[i] - minDistance));
                 hotels[i].score +=cscore;
-                console.log("======distance: ",cscore);
                 hotels[i].reasons.push(`距离打分+${cscore}`);
             }
         }
