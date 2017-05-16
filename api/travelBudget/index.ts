@@ -348,9 +348,21 @@ export default class ApiTravelBudget {
         if (city.isAbroad) {
             key = DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_HOTEL
         }
+
         let prefers = loadPrefers(budgetConfig.hotel, {local: query}, key);
+
+        if(policy.hotelPrefer === 0 || (policy.hotelPrefer && policy.hotelPrefer != -1)){
+            for(let item of policy.hotelLevels){
+                prefers.push({
+                    "name":"price","options":{"score":5000,"percent": policy.hotelPrefer/100, "level":[item]}
+                })
+            }
+            
+        }
+
         qs.prefers = prefers;
         qs.query = query;
+
         let hotels = await API.hotel.search_hotels(query);
 
         let strategy = await HotelBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
@@ -377,7 +389,7 @@ export default class ApiTravelBudget {
         latestArrivalDateTime?: Date,   //最晚到达时间
         earliestLeaveDateTime?: Date,   //最早出发时间
 
-     }) : Promise<TravelBudgeTraffic> {
+    }) : Promise<TravelBudgeTraffic> {
         let {originPlace, destinationPlace, leaveDate, latestArrivalDateTime, earliestLeaveDateTime} = params;
 
         if (!destinationPlace) {
@@ -500,6 +512,17 @@ export default class ApiTravelBudget {
 
         if (!qs.prefers) {
             qs.prefers = [];
+        }
+
+        if(policy.trafficPrefer === 0 || (policy.trafficPrefer && policy.trafficPrefer != -1)){
+            let arr = [...policy.trainLevels, ...policy.planeLevels];
+            for(let item of arr){
+                qs.prefers.push({
+                    "name":"price",
+                    "options":{"type":"square","score":50000,"level":[item],"percent": policy.trafficPrefer/100 }
+                });
+            }
+            
         }
 
         qs.query = params;
