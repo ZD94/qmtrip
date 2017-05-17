@@ -452,6 +452,7 @@ class TripPlanModule {
                 tripPlan.expenditure = expenditure;
                 tripPlan.status = EPlanStatus.COMPLETE;
                 tripPlan.auditStatus = EAuditStatus.INVOICE_PASS;
+                tripPlan.allInvoicesPassTime = new Date();
                 savedMoney = (tripPlan.budget - tripPlan.expenditure);
                 savedMoney = savedMoney > 0 ? savedMoney : 0;
                 tripPlan.score = parseInt((savedMoney * SAVED2SCORE).toString());
@@ -840,11 +841,11 @@ class TripPlanModule {
 
         if(params.startTime){
             let startTime = moment(params.startTime).format(formatStr);
-            completeSql += ` and start_at>='${startTime}'`;
+            completeSql += ` and all_invoices_pass_time>='${startTime}'`;
         }
         if(params.endTime){
             let endTime = moment(params.endTime).format(formatStr);
-            completeSql += ` and start_at<='${endTime}'`;
+            completeSql += ` and all_invoices_pass_time<='${endTime}'`;
         }
 
         completeSql += ` and status=${EPlanStatus.COMPLETE}`;
