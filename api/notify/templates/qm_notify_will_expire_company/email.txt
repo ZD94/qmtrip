@@ -1,1 +1,1 @@
-<p>您的鲸力商旅账户将于<%=expiryDate%>到期，截止目前仅剩<%=days%>天，请您及时续费。</p>
+<p>您的鲸力商旅账户将于<%=moment(company.expiryDate).format('YYYY-MM-DD')%>到期，截止目前仅剩<%=days%>天，请您及时续费。</p>

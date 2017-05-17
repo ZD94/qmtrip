@@ -1094,7 +1094,7 @@ export default class ApiAuth {
         if(!params.attributes){
             params.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt", "loginFailTimes", "lastLoginAt", "lastLoginIp", "activeToken", "pwdToken", "oldQrcodeToken", "qrcodeToken", "type", "isFirstLogin"];
         }
-        params.order = params.order || "createdAt desc";
+        params.order = params.order || "created_at desc";
 
         let paginate = await Models.account.find(params);
         let ids = paginate.map(function(t) {
@@ -1240,6 +1240,7 @@ export default class ApiAuth {
     @clientExport
     static logout = authentication.logout;
 
+    @clientExport
     static authentication = authentication.checkTokenAuth;
     static makeAuthenticateToken = authentication.makeAuthenticateToken;
 
@@ -1286,11 +1287,9 @@ async function _sendActiveEmail(accountId: string, origin?: string) {
     }
     //发送激活邮件
     var vals = {
-        name: account.email,
-        username: account.email,
-        url: url,
-        appMessageUrl: appMessageUrl,
-        time: moment().format("YYYY-MM-DD HH:mm")
+        staff: staff,
+        detailUrl: url,
+        appMessageUrl: appMessageUrl
     };
     account.activeToken = activeToken;
     await Promise.all([

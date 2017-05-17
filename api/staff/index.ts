@@ -134,12 +134,6 @@ class StaffModule{
         let defaultDepartment = await company.getDefaultDepartment();
         await staff.addDepartment(defaultDepartment);
 
-        await StaffModule.sendNoticeToAdmins({
-            companyId:params.companyId,
-            name:params.name,
-            noticeTemplate:"qm_notify_admins_add_staff"
-        });
-
         let account = await Models.account.get(staff.accountId);
         if(!account.coinAccount){
             //为员工设置资金账户
@@ -148,17 +142,29 @@ class StaffModule{
             account.coinAccount = ca;
             await account.save();
         }
+
+        await StaffModule.sendNoticeToAdmins({
+            companyId:params.companyId,
+            staffId: staff.id,
+            noticeTemplate:"qm_notify_admins_add_staff"
+        });
         return staff;
     }
-   static async  sendNoticeToAdmins(params:{companyId:string,name:string,noticeTemplate:string}):Promise<any>{
+   static async  sendNoticeToAdmins(params:{companyId:string,noticeTemplate:string, staffId?: string}):Promise<any>{
         let company = await Models.company.get(params.companyId);
         let managers= await company.getManagers({withOwner:true});
+       let staff: Staff;
+       let detailUrl = `${config.host}/#/department/staff-info?staffId=${params.staffId}`;
+        if(params.staffId){
+            staff = await Models.staff.get(params.staffId);
+        }
         return await Promise.all(managers.map( (manager) => {
             return API.notify.submitNotify({
                 userId: manager.id,
                 key: params.noticeTemplate,
                 values: {
-                    staff:params.name
+                    staff:staff,
+                    detailUrl: detailUrl
                 }
              });
          }));
@@ -405,22 +411,20 @@ class StaffModule{
             return API.auth.sendResetPwdEmail({companyName: updateStaff.company.name, email: updateStaff.email, type: 1, isFirstSet: true});
         }else{
 
-            let tp = await Models.travelPolicy.get(updateStaff["travelPolicyId"]);
-
-            let vals  = {
-                accountId: updateStaff.id,
+            /*let vals  = {
                 noticeType: ENoticeType.SYSTEM_NOTICE,
-                travelPolicy: tp ? tp.name: '',
-                time: moment().format('YYYY-MM-DD:hh:mm:ss'),
                 appMessageUrl: '#/staff/staff-info',
-                permission: updateStaff.roleId == EStaffRole.ADMIN ? "管理员" : (updateStaff.roleId == EStaffRole.OWNER ? "创建者" : "普通员工"),
+                detailUrl: config.host + '/#/staff/staff-info',
+                admin: staff,
+                staff: updateStaff,
+                updateParams: params
             }
             //发送通知
             await API.notify.submitNotify({
                 key: 'staff_update',
                 values: vals,
                 userId: updateStaff.id
-            });
+            });*/
 
         }
         return updateStaff;
@@ -933,7 +937,7 @@ class StaffModule{
      * @param options
      * @returns {*}
      */
-    static async staffPointsChangeByMonth (params) {
+    static async staffPointsChangeByMonth (params) :Promise<any> {
         var q1: any  = _.pick(params, ['companyId', 'staffId']);
         var q2: any   = _.pick(params, ['companyId', 'staffId']);
         var q3: any  = _.pick(params, ['companyId', 'staffId']);
@@ -958,12 +962,16 @@ class StaffModule{
             q2.createdAt = {$gte: start_time, $lte: end_time};
             q3.createdAt = {$lte: end_time};
             q4.createdAt = {$lte: end_time};
-            let [a, b, c, d] = await Promise.all([
+            let ret = await Promise.all([
                     DB.models.PointChange.sum('points', {where: q1}),
                     DB.models.PointChange.sum('points', {where: q2}),
                     DB.models.PointChange.sum('points', {where: q3}),
                     DB.models.PointChange.sum('points', {where: q4})
                 ]);
+            let a: number = ret['a']
+            let b: number = ret['b']
+            let c: number = ret['c']
+            let d: number = ret['d'];
             a = a || 0;
             b = b || 0;
             c = c || 0;
@@ -1053,7 +1061,7 @@ class StaffModule{
      * @returns {*}
      */
     @requireParams(['companyId'], ['startTime', 'endTime'])
-    static async statisticStaffsByTime(params){
+    static async statisticStaffsByTime(params) : Promise<any> {
         var companyId = params.companyId;
         var start = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
         var end = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
@@ -1247,7 +1255,7 @@ class StaffModule{
      * @param params
      */
     @requireParams(['companyId'])
-    static async statStaffByPoints(params: {companyId: string}){
+    static async statStaffByPoints(params: {companyId: string}): Promise<any> {
         var query = params;
         let [all, balance] = await Promise.all([
                 DB.models.Staff.sum('total_points', {where: query}),

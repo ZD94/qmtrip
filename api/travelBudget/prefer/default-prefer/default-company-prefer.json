@@ -27,7 +27,7 @@
       "options": {
         "type": "square",
         "score": 10000,
-        "cabins": [
+        "level": [
           2
         ],
         "percent": 0.05
@@ -38,7 +38,7 @@
       "options": {
         "type": "square",
         "score": 10000,
-        "cabins": [
+        "level": [
           5
         ],
         "percent": 0.05
@@ -49,7 +49,7 @@
       "options": {
         "type": "square",
         "score": 10000,
-        "cabins": [
+        "level": [
           3
         ],
         "percent": 0.05
@@ -60,7 +60,7 @@
       "options": {
         "type": "square",
         "score": 10000,
-        "cabins": [
+        "level": [
           4
         ],
         "percent": 0.05
@@ -103,7 +103,7 @@
       "options": {
         "type": "square",
         "score": 10000,
-        "cabins": [
+        "level": [
           2
         ],
         "percent": 0
@@ -114,7 +114,7 @@
       "options": {
         "type": "square",
         "score": 10000,
-        "cabins": [
+        "level": [
           5
         ],
         "percent": 0
@@ -125,7 +125,7 @@
       "options": {
         "type": "square",
         "score": 10000,
-        "cabins": [
+        "level": [
           3
         ],
         "percent": 0
@@ -136,7 +136,7 @@
       "options": {
         "type": "square",
         "score": 10000,
-        "cabins": [
+        "level": [
           4
         ],
         "percent": 0
