@@ -554,7 +554,7 @@ export default class ApiAuth {
             Result.isRegister = true;
             Result.mobile = mobile;
             let staffs = await Models.staff.find({where: {accountId : account.id}});
-            Result.staff = staffs[0];
+            Result.staff = staffs[0].toJSON();
         }else{
             Result.mobile = mobile;
         }
