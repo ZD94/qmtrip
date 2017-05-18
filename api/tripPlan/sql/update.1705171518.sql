@@ -1,0 +1,1 @@
+update trip_plan.trip_plans set all_invoices_pass_time = updated_at  where status = 4;
