@@ -858,6 +858,7 @@ class TripPlanModule {
         let wastedMoneyComplete = `${selectSql} ${wastedMoneyCompleteSql};`;
         let complete = `${selectSql} ${completeSql};`;
 
+        let completeInfo = await DB.query(complete);
         let savedMoneyCompleteInfo = await DB.query(savedMoneyComplete);
         let wastedMoneyCompleteInfo = await DB.query(wastedMoneyComplete);
 
@@ -865,9 +866,15 @@ class TripPlanModule {
             completeBudget: 0,//动态预算(元)
             actualExpenditure: 0,//动态预算实际支出(元)
             savedMoney: 0,//节省,
+            completeTripNum: 0,//出差人数,
             wastedMoney: 0,//浪费,
             wastedTripPlanNum: 0//超支行程数,
         };
+
+        if(completeInfo && completeInfo.length > 0 && completeInfo[0].length > 0) {
+            let c = completeInfo[0][0];
+            ret.completeTripNum = Number(c.tripNum);
+        }
 
         if(savedMoneyCompleteInfo && savedMoneyCompleteInfo.length > 0 && savedMoneyCompleteInfo[0].length > 0) {
             let c = savedMoneyCompleteInfo[0][0];
