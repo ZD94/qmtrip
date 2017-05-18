@@ -348,7 +348,8 @@ export default class ApiTravelBudget {
         if (city.isAbroad) {
             key = DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_HOTEL
         }
-        let prefers = loadPrefers(budgetConfig.hotel, {local: query}, key);
+        let companyHotelPrefers = city.isAbroad ? budgetConfig.abroadHotel : budgetConfig.hotel
+        let prefers = loadPrefers(companyHotelPrefers, {local: query}, key);
         qs.prefers = prefers;
         qs.query = query;
         let hotels = await API.hotel.search_hotels(query);
