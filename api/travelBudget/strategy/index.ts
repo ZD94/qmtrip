@@ -11,6 +11,7 @@ import {Models} from "_types/index";
 import util = require("util");
 import moment = require("moment");
 
+
 function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
     let _tickets : IFinalTicket[] = [];
     //把数据平铺
@@ -61,7 +62,8 @@ function formatHotel(hotels: IHotel[]) : IFinalHotel[] {
                 agent: agents[j].name,
                 checkInDate: hotel.checkInDate,
                 checkOutDate: hotel.checkOutDate,
-                outPriceRange: false
+                outPriceRange: false,
+                commentScore:hotel.commentScore
             } as IFinalHotel)
         }
     }
@@ -78,6 +80,7 @@ export abstract class AbstractHotelStrategy {
         } else {
             this.isRecord = false;
         }
+
         this.prefers = [];
     }
 
@@ -137,7 +140,8 @@ export abstract class AbstractHotelStrategy {
             checkInDate: query.checkInDate,
             checkOutDate: query.checkOutDate,
             cityName: query.city.name,
-            hotelName: query.hotelName
+            hotelName: query.hotelName,
+            commentScore:ret.commentScore
         }as TravelBudgetHotel
         if (isRetMarkedData) {
             result.markedScoreData = _hotels;
@@ -308,7 +312,7 @@ export class TrafficBudgetStrategyFactory {
         }
         //通过企业配置的喜好打分
         for(let k of prefers) {
-            let prefer = PreferFactory.getPrefer(k.name, k.options);
+            let prefer = PreferFactory.getPrefer(k.name, k.options, 'traffic');
             if (!prefer) continue;
             strategy.addPrefer(prefer)
         }
@@ -334,7 +338,7 @@ class PreferFactory {
     static getPrefer(name, options, type?: string) {
         let cls = type == 'hotel' ? hotelPrefers[name]: ticketPrefers[name];
         if (cls && typeof cls == 'function') {
-            return new (cls)(name, options);
+            return new (cls)(name, options, type);
         }
         return null;
     }

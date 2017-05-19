@@ -1,0 +1,22 @@
+<table width="300px" height="140px" style="border-collapse:collapse;padding-bottom: 20px">
+    <tr style="background-color: #F8F8F8;padding-left: 10px">
+        <td style="border: 1px solid #DCDCDC;"></td>
+        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B">信息</td>
+        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B">是否修改</td>
+    </tr>
+    <tr>
+        <td style="background-color: #F8F8F8;padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B">角色</td>
+        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A"><%=staff.roleId == EStaffRole.ADMIN ? "管理员":(staff.roleId == EStaffRole.OWNER ? "创建者":"普通员工")%></td>
+        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A"><%= oldStaff.roleId == staff.roleId ? "否" : "是"%></td>
+    </tr>
+    <tr>
+        <td style="background-color: #F8F8F8;padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B">差旅标准</td>
+        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A"><%=travelPolicy.name || '' %></td>
+        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A"><%= oldStaff["travelPolicyId"] == travelPolicy.id ? "否" : "是"%></td>
+    </tr>
+    <tr>
+        <td style="background-color: #F8F8F8;padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B">部门</td>
+        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A"><%=departmentNames%></td>
+        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A"><%= oldStaff.departmentNames == departmentNames ? "否" : "是"%></td>
+    </tr>
+</table>

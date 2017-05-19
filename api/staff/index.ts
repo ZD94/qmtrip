@@ -411,21 +411,20 @@ class StaffModule{
             return API.auth.sendResetPwdEmail({companyName: updateStaff.company.name, email: updateStaff.email, type: 1, isFirstSet: true});
         }else{
 
-            let tp = await Models.travelPolicy.get(updateStaff["travelPolicyId"]);
-
-            let vals  = {
+            /*let vals  = {
                 noticeType: ENoticeType.SYSTEM_NOTICE,
                 appMessageUrl: '#/staff/staff-info',
                 detailUrl: config.host + '/#/staff/staff-info',
                 admin: staff,
-                staff: updateStaff
+                staff: updateStaff,
+                updateParams: params
             }
             //发送通知
             await API.notify.submitNotify({
                 key: 'staff_update',
                 values: vals,
                 userId: updateStaff.id
-            });
+            });*/
 
         }
         return updateStaff;
@@ -938,7 +937,7 @@ class StaffModule{
      * @param options
      * @returns {*}
      */
-    static async staffPointsChangeByMonth (params) {
+    static async staffPointsChangeByMonth (params) :Promise<any> {
         var q1: any  = _.pick(params, ['companyId', 'staffId']);
         var q2: any   = _.pick(params, ['companyId', 'staffId']);
         var q3: any  = _.pick(params, ['companyId', 'staffId']);
@@ -963,12 +962,16 @@ class StaffModule{
             q2.createdAt = {$gte: start_time, $lte: end_time};
             q3.createdAt = {$lte: end_time};
             q4.createdAt = {$lte: end_time};
-            let [a, b, c, d] = await Promise.all([
+            let ret = await Promise.all([
                     DB.models.PointChange.sum('points', {where: q1}),
                     DB.models.PointChange.sum('points', {where: q2}),
                     DB.models.PointChange.sum('points', {where: q3}),
                     DB.models.PointChange.sum('points', {where: q4})
                 ]);
+            let a: number = ret['a']
+            let b: number = ret['b']
+            let c: number = ret['c']
+            let d: number = ret['d'];
             a = a || 0;
             b = b || 0;
             c = c || 0;
@@ -1058,7 +1061,7 @@ class StaffModule{
      * @returns {*}
      */
     @requireParams(['companyId'], ['startTime', 'endTime'])
-    static async statisticStaffsByTime(params){
+    static async statisticStaffsByTime(params) : Promise<any> {
         var companyId = params.companyId;
         var start = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
         var end = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
@@ -1252,7 +1255,7 @@ class StaffModule{
      * @param params
      */
     @requireParams(['companyId'])
-    static async statStaffByPoints(params: {companyId: string}){
+    static async statStaffByPoints(params: {companyId: string}): Promise<any> {
         var query = params;
         let [all, balance] = await Promise.all([
                 DB.models.Staff.sum('total_points', {where: query}),

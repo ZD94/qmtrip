@@ -327,9 +327,15 @@ class TripPlanModule {
         if(tripDetails && tripDetails.length > 0) {
             let tripDetailPromise = tripDetails.map(async function (detail) {
                 if (detail.type == ETripType.SUBSIDY) {
-                    return detail;
+                    let invoices = await detail.getInvoices();
+                    if(invoices && invoices.length > 0){
+                        return tryUpdateTripDetailStatus(detail, EPlanStatus.AUDITING);
+                    }else{
+                        return tryUpdateTripDetailStatus(detail, EPlanStatus.COMPLETE);
+                    }
+                }else{
+                    return tryUpdateTripDetailStatus(detail, EPlanStatus.AUDITING);
                 }
-                return tryUpdateTripDetailStatus(detail, EPlanStatus.AUDITING);
             });
             await (Promise.all(tripDetailPromise));
         }
@@ -446,6 +452,7 @@ class TripPlanModule {
                 tripPlan.expenditure = expenditure;
                 tripPlan.status = EPlanStatus.COMPLETE;
                 tripPlan.auditStatus = EAuditStatus.INVOICE_PASS;
+                tripPlan.allInvoicesPassTime = new Date();
                 savedMoney = (tripPlan.budget - tripPlan.expenditure);
                 savedMoney = savedMoney > 0 ? savedMoney : 0;
                 tripPlan.score = parseInt((savedMoney * SAVED2SCORE).toString());
@@ -755,6 +762,55 @@ class TripPlanModule {
         };
     }
 
+    @clientExport
+    @requireParams([], ['startTime', 'endTime'])
+    static async statisticProjectTripBudget(params: {startTime?: Date, endTime?: Date}) {
+        let staff = await Staff.getCurrent();
+        let companyId = staff.company.id;
+        let formatStr = 'YYYY-MM-DD HH:mm:ss';
+
+        let selectSql = `select count(id) as "tripNum", sum(expenditure) as expenditure, project_id as "projectId" from`;
+        let completeSql = `trip_plan.trip_plans where deleted_at is null and company_id='${companyId}' and status=${EPlanStatus.COMPLETE}`;
+
+        if(params.startTime){
+            let startTime = moment(params.startTime).format(formatStr);
+            completeSql += ` and all_invoices_pass_time>='${startTime}'`;
+        }
+        if(params.endTime){
+            let endTime = moment(params.endTime).format(formatStr);
+            completeSql += ` and all_invoices_pass_time<='${endTime}'`;
+        }
+
+        let groupProjectSql = `${completeSql} group by project_id`;
+
+        let groupProject = `${selectSql} ${groupProjectSql};`;
+
+        let groupProjectInfo = await DB.query(groupProject);
+
+        if(groupProjectInfo && groupProjectInfo.length > 0 && groupProjectInfo[0].length > 0) {
+            let projectInfo = groupProjectInfo[0];
+            projectInfo = await Promise.all(projectInfo.map(async (p) => {
+                p["project"] = await Models.project.get(p.projectId);
+                let peopleDays = 0;
+                let selectPeopleDaySql = `select back_at as "backAt", start_at as "startAt" from`;
+                let wherePeopleDaySql = `${completeSql} and project_id = '${p.projectId}'`;
+                let peopleDaySql = `${selectPeopleDaySql} ${wherePeopleDaySql};`;
+                let peopleDayInfo = await DB.query(peopleDaySql);
+                if(peopleDayInfo && peopleDayInfo.length > 0 && peopleDayInfo[0].length > 0) {
+                    peopleDayInfo[0].map((t) => {
+                        let peopleDay = moment(t.backAt).startOf('day').diff(moment(t.startAt).startOf('day'), 'days');
+                        peopleDays += peopleDay;
+                    })
+                }
+                p["peopleDays"] = peopleDays;
+                return p;
+            }));
+
+            return projectInfo;
+        }
+
+        return [];
+    }
 
     @clientExport
     @requireParams([], ['startTime', 'endTime', 'isStaff'])
@@ -818,6 +874,70 @@ class TripPlanModule {
             ret.planTripNum = Number(p.tripNum);
             ret.planBudget = Number(p.budget);
         }
+        return ret;
+    }
+
+    @clientExport
+    @requireParams([], ['startTime', 'endTime'])
+    static async statisticSaveAndWaste(params: {startTime?: Date, endTime?: Date}) {
+        let staff = await Staff.getCurrent();
+        let companyId = staff.company.id;
+        let formatStr = 'YYYY-MM-DD HH:mm:ss';
+
+        let selectSql = `select count(id) as "tripNum", sum(budget) as budget, sum(expenditure) as expenditure, 
+        sum(budget-expenditure) as "savedMoney", sum(expenditure-budget) as "wastedMoney" from`;
+        let completeSql = `trip_plan.trip_plans where deleted_at is null and company_id='${companyId}'`;
+
+        if(params.startTime){
+            let startTime = moment(params.startTime).format(formatStr);
+            completeSql += ` and all_invoices_pass_time>='${startTime}'`;
+        }
+        if(params.endTime){
+            let endTime = moment(params.endTime).format(formatStr);
+            completeSql += ` and all_invoices_pass_time<='${endTime}'`;
+        }
+
+        completeSql += ` and status=${EPlanStatus.COMPLETE}`;
+
+        let savedMoneyCompleteSql = completeSql + ' and is_special_approve = false';
+
+        let wastedMoneyCompleteSql = completeSql + ' and is_special_approve = false and expenditure > budget ';
+
+        let savedMoneyComplete = `${selectSql} ${savedMoneyCompleteSql};`;
+        let wastedMoneyComplete = `${selectSql} ${wastedMoneyCompleteSql};`;
+        let complete = `${selectSql} ${completeSql};`;
+
+        let completeInfo = await DB.query(complete);
+        let savedMoneyCompleteInfo = await DB.query(savedMoneyComplete);
+        let wastedMoneyCompleteInfo = await DB.query(wastedMoneyComplete);
+
+        let ret = {
+            completeBudget: 0,//动态预算(元)
+            actualExpenditure: 0,//动态预算实际支出(元)
+            savedMoney: 0,//节省,
+            completeTripNum: 0,//出差人数,
+            wastedMoney: 0,//浪费,
+            wastedTripPlanNum: 0//超支行程数,
+        };
+
+        if(completeInfo && completeInfo.length > 0 && completeInfo[0].length > 0) {
+            let c = completeInfo[0][0];
+            ret.completeTripNum = Number(c.tripNum);
+        }
+
+        if(savedMoneyCompleteInfo && savedMoneyCompleteInfo.length > 0 && savedMoneyCompleteInfo[0].length > 0) {
+            let c = savedMoneyCompleteInfo[0][0];
+            ret.completeBudget = Number(c.budget);
+            ret.savedMoney = Number(c.savedMoney);
+            ret.actualExpenditure = Number(c.expenditure);
+        }
+
+        if(wastedMoneyCompleteInfo && wastedMoneyCompleteInfo.length > 0 && wastedMoneyCompleteInfo[0].length > 0) {
+            let w = wastedMoneyCompleteInfo[0][0];
+            ret.wastedMoney = Number(w.wastedMoney);
+            ret.wastedTripPlanNum = Number(w.tripNum);
+        }
+
         return ret;
     }
 
@@ -1077,7 +1197,7 @@ class TripPlanModule {
                     data.deptCity = budget.originPlace ? budget.originPlace.id : "";
                     data.arrivalCity= budget.destination.id;
                     data.deptDateTime = budget.departDateTime;
-                    data.arrivalDateTime = null;
+                    data.arrivalDateTime = budget.arrivalDateTime;
                     data.leaveDate = budget.leaveDate;
                     data.cabin = budget.cabinClass;
                     data.invoiceType = budget.type;
@@ -1099,11 +1219,12 @@ class TripPlanModule {
                     data.hasLastDaySubsidy = budget.hasLastDaySubsidy;
                     data.template = budget.template.id;
                     data.subsidyMoney = budget.price;//此字段做什么
+                    data.subsidyTemplateId = budget.template.id;
                     data.startDateTime = budget.fromDate;
                     data.endDateTime = budget.endDate;
                     detail = Models.tripDetailSubsidy.create(data);
-                    detail.expenditure = price;//此字段与budget字段有什么区别
-                    detail.status = EPlanStatus.COMPLETE;
+                    // detail.expenditure = price;
+                    // detail.status = EPlanStatus.COMPLETE;
                     break;
                 case ETripType.SPECIAL_APPROVE:
                     data.deptCity = budget.originPlace ? budget.originPlace.id : "";
@@ -1705,31 +1826,34 @@ async function updateTripPlanExpenditure(tripPlan: TripPlan) {
 
 //尝试修改tripDetail状态
 async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: EPlanStatus) :Promise<TripDetail> {
-    if ([ETripType.SUBSIDY].indexOf(tripDetail.type) >= 0 ) {
+    /*if ([ETripType.SUBSIDY].indexOf(tripDetail.type) >= 0 ) {
         tripDetail.status = status;
     } else {
-        switch(status) {
-            case EPlanStatus.WAIT_UPLOAD:
+
+    }*/
+    switch(status) {
+        case EPlanStatus.WAIT_UPLOAD:
+            tripDetail.status = status;
+            break;
+        case EPlanStatus.WAIT_COMMIT:
+            //如果票据不为空,则设置状态为可提交状态
+            let invoices = await Models.tripDetailInvoice.find({where: {tripDetailId: tripDetail.id}});
+            if (invoices && invoices.length) {
+                tripDetail.status = EPlanStatus.WAIT_COMMIT;
+            }
+            break;
+        case EPlanStatus.AUDITING:
+            if ([ EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.WAIT_COMMIT].indexOf(tripDetail.status) >= 0) {
                 tripDetail.status = status;
-                break;
-            case EPlanStatus.WAIT_COMMIT:
-                //如果票据不为空,则设置状态为可提交状态
-                let invoices = await Models.tripDetailInvoice.find({where: {tripDetailId: tripDetail.id}});
-                if (invoices && invoices.length) {
-                    tripDetail.status = EPlanStatus.WAIT_COMMIT;
-                }
-                break;
-            case EPlanStatus.AUDITING:
-                if ([ EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.WAIT_COMMIT].indexOf(tripDetail.status) >= 0) {
-                    tripDetail.status = status;
-                }
-                break;
-            case EPlanStatus.COMPLETE:
-                if (EPlanStatus.AUDITING == tripDetail.status) {
-                    tripDetail.status = status;
-                }
-                break;
-        }
+            }
+            break;
+        case EPlanStatus.COMPLETE:
+            if (EPlanStatus.AUDITING == tripDetail.status) {
+                tripDetail.status = status;
+            }else if(tripDetail.type == ETripType.SUBSIDY){
+                tripDetail.status = status;
+            }
+            break;
     }
 
     //更改行程详情状态
