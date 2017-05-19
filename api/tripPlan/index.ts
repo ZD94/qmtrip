@@ -452,6 +452,7 @@ class TripPlanModule {
                 tripPlan.expenditure = expenditure;
                 tripPlan.status = EPlanStatus.COMPLETE;
                 tripPlan.auditStatus = EAuditStatus.INVOICE_PASS;
+                tripPlan.allInvoicesPassTime = new Date();
                 savedMoney = (tripPlan.budget - tripPlan.expenditure);
                 savedMoney = savedMoney > 0 ? savedMoney : 0;
                 tripPlan.score = parseInt((savedMoney * SAVED2SCORE).toString());
@@ -824,6 +825,70 @@ class TripPlanModule {
             ret.planTripNum = Number(p.tripNum);
             ret.planBudget = Number(p.budget);
         }
+        return ret;
+    }
+
+    @clientExport
+    @requireParams([], ['startTime', 'endTime'])
+    static async statisticSaveAndWaste(params: {startTime?: Date, endTime?: Date}) {
+        let staff = await Staff.getCurrent();
+        let companyId = staff.company.id;
+        let formatStr = 'YYYY-MM-DD HH:mm:ss';
+
+        let selectSql = `select count(id) as "tripNum", sum(budget) as budget, sum(expenditure) as expenditure, 
+        sum(budget-expenditure) as "savedMoney", sum(expenditure-budget) as "wastedMoney" from`;
+        let completeSql = `trip_plan.trip_plans where deleted_at is null and company_id='${companyId}'`;
+
+        if(params.startTime){
+            let startTime = moment(params.startTime).format(formatStr);
+            completeSql += ` and all_invoices_pass_time>='${startTime}'`;
+        }
+        if(params.endTime){
+            let endTime = moment(params.endTime).format(formatStr);
+            completeSql += ` and all_invoices_pass_time<='${endTime}'`;
+        }
+
+        completeSql += ` and status=${EPlanStatus.COMPLETE}`;
+
+        let savedMoneyCompleteSql = completeSql + ' and is_special_approve = false';
+
+        let wastedMoneyCompleteSql = completeSql + ' and is_special_approve = false and expenditure > budget ';
+
+        let savedMoneyComplete = `${selectSql} ${savedMoneyCompleteSql};`;
+        let wastedMoneyComplete = `${selectSql} ${wastedMoneyCompleteSql};`;
+        let complete = `${selectSql} ${completeSql};`;
+
+        let completeInfo = await DB.query(complete);
+        let savedMoneyCompleteInfo = await DB.query(savedMoneyComplete);
+        let wastedMoneyCompleteInfo = await DB.query(wastedMoneyComplete);
+
+        let ret = {
+            completeBudget: 0,//动态预算(元)
+            actualExpenditure: 0,//动态预算实际支出(元)
+            savedMoney: 0,//节省,
+            completeTripNum: 0,//出差人数,
+            wastedMoney: 0,//浪费,
+            wastedTripPlanNum: 0//超支行程数,
+        };
+
+        if(completeInfo && completeInfo.length > 0 && completeInfo[0].length > 0) {
+            let c = completeInfo[0][0];
+            ret.completeTripNum = Number(c.tripNum);
+        }
+
+        if(savedMoneyCompleteInfo && savedMoneyCompleteInfo.length > 0 && savedMoneyCompleteInfo[0].length > 0) {
+            let c = savedMoneyCompleteInfo[0][0];
+            ret.completeBudget = Number(c.budget);
+            ret.savedMoney = Number(c.savedMoney);
+            ret.actualExpenditure = Number(c.expenditure);
+        }
+
+        if(wastedMoneyCompleteInfo && wastedMoneyCompleteInfo.length > 0 && wastedMoneyCompleteInfo[0].length > 0) {
+            let w = wastedMoneyCompleteInfo[0][0];
+            ret.wastedMoney = Number(w.wastedMoney);
+            ret.wastedTripPlanNum = Number(w.tripNum);
+        }
+
         return ret;
     }
 
