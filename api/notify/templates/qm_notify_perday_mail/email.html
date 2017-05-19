@@ -1,14 +1,13 @@
-
-<p style="font-size: 20px;color: #74C7CD">新用户注册信息</p>
+<p style="font-size: 20px;color: #74C7CD">新企业注册信息</p>
 <p style="border-top: 1px solid #EEEEEE;padding-top: 25px;color: #4A4A4A">
 
 </p>
-<table width="50%"  style="border-collapse:collapse;padding-bottom: 20px">
+<table  style="border-collapse:collapse;padding-bottom: 20px">
     <tr style="background-color: #F8F8F8;padding-left: 10px;height: 36px;">
-        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B">姓名</td>
+        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B">创建人姓名</td>
         <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B">手机号</td>
-        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B">加入时间</td>
-        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B">所属公司</td>
+        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B">创建时间</td>
+        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B">公司名称</td>
     </tr>
     <% _.forEach(companies, function(company) { %>
     <tr style="height: 36px;">
@@ -20,11 +19,6 @@
     <%}); %>
 </table>
 <br/>
-
-<p style="font-size: 14px;color:#4A4A4A;border-top: 1px solid #EEEEEE"><br/>
-    如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅<br/>
-    （该链接在24小时内有效）： <%=detailUrl || '' %>
-</p>
 
 
 
