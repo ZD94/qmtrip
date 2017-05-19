@@ -216,7 +216,11 @@ class StaffModule{
         let id = params.id;
 
         await API.auth.checkEmailAndMobile({mobile: mobile});
-        var account = await API.auth.getPrivateInfo({id: id});
+        let staff = await Models.staff.get(id);
+        if (!staff) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+        var account = await API.auth.getPrivateInfo({id: staff.accountId});
 
         if (!account) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
