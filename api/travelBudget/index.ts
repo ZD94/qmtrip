@@ -365,8 +365,8 @@ export default class ApiTravelBudget {
         if (city.isAbroad) {
             key = DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_HOTEL
         }
-
-        let prefers = loadPrefers(budgetConfig.hotel, {local: query}, key);
+        let companyHotelPrefers = city.isAbroad ? budgetConfig.abroadHotel : budgetConfig.hotel
+        let prefers = loadPrefers(companyHotelPrefers, {local: query}, key);
         for(let p of prefers){
             if(p.name=="distance"){
                 p.options.landmark={latitude:query.latitude,longitude:query.longitude};
