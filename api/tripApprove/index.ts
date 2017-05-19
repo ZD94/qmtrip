@@ -72,7 +72,7 @@ class TripApproveModule {
                     detail.endDateTime = budget.endDate;
                     detail.hasFirstDaySubsidy = budget.hasFirstDaySubsidy || true;
                     detail.hasLastDaySubsidy = budget.hasLastDaySubsidy || true;
-                    detail.expenditure = budget.price;
+                    // detail.expenditure = budget.price;
                     detail.status = EPlanStatus.COMPLETE;
                     break;
                 case ETripType.SPECIAL_APPROVE:
