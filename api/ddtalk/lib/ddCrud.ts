@@ -141,7 +141,7 @@ export class ddCrud {
 
         for(let item of dd_departs){
             let ddDeparts = await Models.ddtalkDepartment.find({
-                where : { corpId : self.corpId , DdDepartmentId : item }
+                where : { corpId : self.corpId , DdDepartmentId : `${item}` }
             });
 
             if(ddDeparts && ddDeparts.length){
@@ -215,7 +215,7 @@ export class ddCrud {
         // console.log("enter create department" , ddDepartInfo);
 
         let ddDeparts = await Models.ddtalkDepartment.find({
-            where : { corpId : this.corpId , DdDepartmentId : ddDepartInfo.id }
+            where : { corpId : this.corpId , DdDepartmentId : `${ddDepartInfo.id}` }
         });
         let company = await this.getCompany();
         let parentid;
@@ -252,7 +252,7 @@ export class ddCrud {
 
             let ddDepart = Models.ddtalkDepartment.create({
                 corpId : this.corpId ,
-                DdDepartmentId : ddDepartInfo.id ,
+                DdDepartmentId : `${ddDepartInfo.id}`,
                 localDepartmentId : localDepart.id ,
                 ddName : ddDepartInfo.name
             });
@@ -280,7 +280,7 @@ export class ddCrud {
         }
 
         let localDeparts = await Models.ddtalkDepartment.find({
-            where : { corpId : this.corpId , DdDepartmentId : dd_parentId }
+            where : { corpId : this.corpId , DdDepartmentId : `${dd_parentId}` }
         });
         if(localDeparts && localDeparts.length){
             return localDeparts[0].localDepartmentId;
@@ -298,7 +298,7 @@ export class ddCrud {
     async ddDeleteDepart( dd_depart_id ){
         //delete dd department
         let ddtalkDepartments = await Models.ddtalkDepartment.find({
-            where : { DdDepartmentId : dd_depart_id , corpId : this.corpId }
+            where : { DdDepartmentId : `${dd_depart_id}` , corpId : this.corpId }
         });
 
         let localDepartId;

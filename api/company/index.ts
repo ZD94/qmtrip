@@ -578,7 +578,7 @@ class CompanyModule {
                 let companies = [];
                 let now = new Date();
                 const EXPIRE_BEFORE_DAYS = 15;
-                const PAYED_COMPANY_EXPIRE_NOTIFY = [1, 7, 15]
+                const PAYED_COMPANY_EXPIRE_NOTIFY = [-1,1, 7, 15]
                 const TRYING_COMPANY_EXPIRE_NOTIFY = [7];
 
                 //获取所有待失效企业
@@ -617,6 +617,8 @@ class CompanyModule {
                         key = 'qm_notify_trying_will_expire_company'
                     }
                     if (key) {
+                        // let detailUrl = C.host + "/#/company-pay/service-pay";
+                        let host = C.host;
                         //查询公司管理员和创建人
                         let managers = await company.getManagers({withOwner: true});
                         let ps = managers.map( (manager) => {
@@ -625,8 +627,10 @@ class CompanyModule {
                                 userId: manager.id,
                                 key: key,
                                 values: {
+                                    company: company,
                                     expiryDate: moment(company.expiryDate).format('YYYY-MM-DD'),
                                     days: diffDays,
+                                    host: host
                                 }
                             });
                         });
@@ -756,7 +760,85 @@ class CompanyModule {
                 .catch( (err) => {
                     logger.error(`执行任务${taskId5}错误:${err.stack}`);
                 })
-        })
+        });
+
+        let taskId6 = 'dataStatisticsPerWeek';
+        scheduler('0 0 1 * * 1', taskId6, function() {
+            //每周一晚上一点给管理员 创建者发送统计邮件
+            (async function() {
+                let now = new Date();
+
+                //获取所有企业
+                let companies = await Models.company.all({
+                    where: {
+                        expiryDate: {$gte: now},
+                        type: ECompanyType.PAYED
+                    }
+                });
+
+                for(let company of companies) {
+                    if (!company.expiryDate) {
+                        continue;
+                    }
+
+                    let staticData = await company.staticTripPlanInfo({beginTime: moment().subtract(7, 'days'), endTime: now});
+                    let key =  'qm_notify_perweek_data_statistics';
+                    let host = C.host;
+                    //查询公司管理员和创建人
+                    let managers = await company.getManagers({withOwner: true});
+                    let ps = managers.map( (manager) => {
+                        //给各个企业发送通知
+                        return API.notify.submitNotify({
+                            userId: manager.id,
+                            key: key,
+                            values: {
+                                company: company,
+                                sumBudget: staticData.sumBudget,
+                                sumTripPlanNum: staticData.sumTripPlanNum,
+                                staffNum: staticData.staffNum,
+                                host: host
+                            }
+                        });
+                    });
+                    await Promise.all(ps);
+                }
+                logger.info(`成功执行任务${taskId6}`);
+            })()
+                .catch((err) => {
+                    logger.error(`run stark ${taskId6} error:`, err.stack);
+                });
+        });
+
+        let taskId7 = 'notifyNewStaffPerDayMail';
+        scheduler('0 0 8 * * *', taskId7, function() {
+            if (!C.perDayRegisterEmail) {
+                return false;
+            }
+
+            //每天八点发送每日添加员工邮件
+            ( async () => {
+                let staffs = await Models.staff.all( {
+                    where: {
+                        createdAt: {
+                            "$lte": new Date(),
+                            "$gte": moment().add(-1, 'days').format('YYYY-MM-DD 08:00')
+                        }
+                    }
+                });
+
+                await API.notify.submitNotify({
+                    key: "qm_notify_perday_mail_staff",
+                    values: {
+                        staffs: staffs,
+                    },
+                    email: C.perDayRegisterEmail
+                });
+                logger.info(`成功执行任务${taskId7}`);
+            })()
+                .catch( (err) => {
+                    logger.error(`执行任务${taskId7}错误:${err.stack}`);
+                })
+        });
     }
 
 }

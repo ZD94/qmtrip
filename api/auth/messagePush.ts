@@ -7,9 +7,15 @@ import { Token } from '_types/auth/token';
  * @param params
  * @returns {boolean}
  */
-export async function destroyJpushId(params?: {}): Promise<boolean> {
+export async function destroyJpushId(params?: any): Promise<boolean> {
     let staff = await Staff.getCurrent();
-    let tokens = await Models.token.find({where: {accountId: staff.id, type:'jpush_id'}});
+    let options: any = {};
+    options.accountId = staff.id;
+    options.type = 'jpush_id';
+    if(params.jpushId){
+        options.token = params.jpushId;
+    }
+    let tokens = await Models.token.find({where: options});
 
     if(!tokens || tokens.length <= 0) {
         return false;

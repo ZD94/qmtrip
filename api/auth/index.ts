@@ -493,7 +493,7 @@ export default class ApiAuth {
         let pwd = data.pwd;
         let companyId = data.companyId;
         let sex = data.sex;
-
+        console.log(mobile);
         if(!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
             throw L.ERR.MOBILE_NOT_CORRECT();
         }
@@ -552,8 +552,9 @@ export default class ApiAuth {
             //已经注册
             let account = accounts[0];
             Result.isRegister = true;
+            Result.mobile = mobile;
             let staffs = await Models.staff.find({where: {accountId : account.id}});
-            Result.staff = staffs[0];
+            Result.staff = staffs[0].toJSON();
         }else{
             Result.mobile = mobile;
         }
@@ -607,6 +608,11 @@ export default class ApiAuth {
         }});
         let otherStaff = otherStaffs[0];
 
+        let staffed = await Models.staff.find({where:{ companyId: companyId, accountId: account.id }});
+        if(staffed && staffed.total > 0){
+            throw L.ERR.CODE_ERROR(500, "您已在此企业中")
+        }
+
         let staff = Staff.create({
             name: otherStaff.name,
             status: ACCOUNT_STATUS.ACTIVE,
@@ -614,7 +620,9 @@ export default class ApiAuth {
             travelPolicyId: travelPolicy.id,
             accountId: account.id
         });
-        return await staff.save();
+        staff.company = company;
+        await staff.save();
+        return staff.company;
     }
 
 
@@ -1086,7 +1094,7 @@ export default class ApiAuth {
         if(!params.attributes){
             params.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt", "loginFailTimes", "lastLoginAt", "lastLoginIp", "activeToken", "pwdToken", "oldQrcodeToken", "qrcodeToken", "type", "isFirstLogin"];
         }
-        params.order = params.order || "createdAt desc";
+        params.order = params.order || "created_at desc";
 
         let paginate = await Models.account.find(params);
         let ids = paginate.map(function(t) {
@@ -1232,6 +1240,7 @@ export default class ApiAuth {
     @clientExport
     static logout = authentication.logout;
 
+    @clientExport
     static authentication = authentication.checkTokenAuth;
     static makeAuthenticateToken = authentication.makeAuthenticateToken;
 
@@ -1278,11 +1287,9 @@ async function _sendActiveEmail(accountId: string, origin?: string) {
     }
     //发送激活邮件
     var vals = {
-        name: account.email,
-        username: account.email,
-        url: url,
-        appMessageUrl: appMessageUrl,
-        time: moment().format("YYYY-MM-DD HH:mm")
+        staff: staff,
+        detailUrl: url,
+        appMessageUrl: appMessageUrl
     };
     account.activeToken = activeToken;
     await Promise.all([

@@ -64,7 +64,7 @@ class CoinModule {
 
         //增加员工鲸币
         // return staff.coinAccount.addCoin(coins, `${points}积分兑换${coins}`);
-        return staff.$parents["account"]["coinAccount"].addCoin(coins, `${points}积分兑换${coins}`);
+        return staff.$parents["account"]["coinAccount"].addCoin(coins, `使用${points}元节省金额兑换${coins}鲸币`);
     }
 
     @requireParams(["staffId", "coins"], ["remark"])

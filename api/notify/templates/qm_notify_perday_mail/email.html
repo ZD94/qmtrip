@@ -1,39 +1,42 @@
-<style type="text/css">
-    table.imagetable {
-        font-family: verdana,arial,sans-serif;
-        font-size:11px;
-        color:#333333;
-        border-width: 1px;
-        border-color: #999999;
-        border-collapse: collapse;
-    }
-    table.imagetable th {
-        background:#b5cfd2 ;
-        border-width: 1px;
-        padding: 8px;
-        border-style: solid;
-        border-color: #999999;
-    }
-    table.imagetable td {
-        background:#dcddc0;
-        border-width: 1px;
-        padding: 8px;
-        border-style: solid;
-        border-color: #999999;
-    }
-</style>
-<table class="imagetable">
-    <thead>
-        <tr>
-            <th>企业名称</th><th>注册时间</th><th>注册人</th><th>联系方式</th>
-        </tr>
-    </thead>
+<p style="font-size: 20px;color: #74C7CD">新企业注册信息</p>
+<p style="border-top: 1px solid #EEEEEE;padding-top: 25px;color: #4A4A4A">
 
-    <tbody>
-        <% _.forEach(companies, function(company) { %>
-        <tr>
-            <td><%=company.name%></td><td><%=company.createdAt%></td><td><%=company.createUser.name%></td><td><%=company.createUser.mobile%></td>
-        </tr>
-        <%}); %>
-    </tbody>
+</p>
+<table  style="border-collapse:collapse;padding-bottom: 20px">
+    <tr style="background-color: #F8F8F8;padding-left: 10px;height: 36px;">
+        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B">创建人姓名</td>
+        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B">手机号</td>
+        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B">创建时间</td>
+        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B">公司名称</td>
+    </tr>
+    <% _.forEach(companies, function(company) { %>
+    <tr style="height: 36px;">
+        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A"><%=company.createUser.name%></td>
+        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A"><%=company.createUser.mobile%></td>
+        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A"><%=company.createdAt%></td>
+        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A"><%=company.name%></td>
+    </tr>
+    <%}); %>
 </table>
+<br/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

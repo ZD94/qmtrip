@@ -64,6 +64,12 @@
       "update": "http://hxs.jingli.tech:4002",
       "api": "http://hxs.jingli.tech:4002/API",
       "debug": true
+    },
+    "zwf": {
+      "name": "zwf",
+      "update": "http://zwf.jingli.tech:4002",
+      "api": "http://zwf.jingli.tech:4002/API",
+      "debug": true
     }
   }
 }
