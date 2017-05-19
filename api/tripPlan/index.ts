@@ -834,12 +834,15 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['startTime', 'endTime', 'type'], ['keyWord'])
-    static async statisticBudgetsInfo(params: {startTime: string, endTime: string, type: string, keyWord?: string}) {
+    static async statisticBudgetsInfo(params: {startTime: string, endTime: string, type: string, keyWord?: string, unComplete?:boolean}) {
         let staff = await Staff.getCurrent();
         let company =staff.company;
         let completeSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status=${EPlanStatus.COMPLETE} and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
         let savedMoneyCompleteSql = '';
         let planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
+        if(params.unComplete){
+            planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
+        }
 
         let type = params.type;
         let selectKey = '', modelName = '';
@@ -913,9 +916,9 @@ class TripPlanModule {
             savedMoneyComplete = `${savedMoneySelectSql} ${savedMoneyCompleteSql} group by d.id;`;
             plan = `${selectSql} ${planSql} group by d.id;`;
         }
-        console.log(complete);
+        // console.log(complete);
         let completeInfo = await DB.query(complete);
-        console.log("completeInfo:",completeInfo);
+        // console.log("completeInfo:",completeInfo);
         let savedMoneyCompleteInfo = await DB.query(savedMoneyComplete);
         let planInfo = await DB.query(plan);
 
