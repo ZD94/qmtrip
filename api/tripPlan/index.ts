@@ -1223,7 +1223,7 @@ class TripPlanModule {
                     data.startDateTime = budget.fromDate;
                     data.endDateTime = budget.endDate;
                     detail = Models.tripDetailSubsidy.create(data);
-                    detail.expenditure = price;//此字段与budget字段有什么区别
+                    // detail.expenditure = price;
                     // detail.status = EPlanStatus.COMPLETE;
                     break;
                 case ETripType.SPECIAL_APPROVE:
