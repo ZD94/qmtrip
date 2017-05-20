@@ -941,7 +941,7 @@ class StaffModule{
      * @param options
      * @returns {*}
      */
-    static async staffPointsChangeByMonth (params) {
+    static async staffPointsChangeByMonth (params) :Promise<any> {
         var q1: any  = _.pick(params, ['companyId', 'staffId']);
         var q2: any   = _.pick(params, ['companyId', 'staffId']);
         var q3: any  = _.pick(params, ['companyId', 'staffId']);
@@ -966,7 +966,8 @@ class StaffModule{
             q2.createdAt = {$gte: start_time, $lte: end_time};
             q3.createdAt = {$lte: end_time};
             q4.createdAt = {$lte: end_time};
-            let [a, b, c, d] = await Promise.all([
+            let a: any, b: any, c: any, d:any;
+            [a, b, c, d] = await Promise.all([
                     DB.models.PointChange.sum('points', {where: q1}),
                     DB.models.PointChange.sum('points', {where: q2}),
                     DB.models.PointChange.sum('points', {where: q3}),
@@ -994,7 +995,7 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    static async getStaffPointsChangeByMonth(params) {
+    static async getStaffPointsChangeByMonth(params) :Promise<any>{
         let { accountId } = Zone.current.get("session");
         let staff = await DB.models.Staff.findById(accountId)
         params.companyId = staff.companyId;
@@ -1061,7 +1062,7 @@ class StaffModule{
      * @returns {*}
      */
     @requireParams(['companyId'], ['startTime', 'endTime'])
-    static async statisticStaffsByTime(params){
+    static async statisticStaffsByTime(params) :Promise<any> {
         var companyId = params.companyId;
         var start = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
         var end = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
@@ -1255,7 +1256,7 @@ class StaffModule{
      * @param params
      */
     @requireParams(['companyId'])
-    static async statStaffByPoints(params: {companyId: string}){
+    static async statStaffByPoints(params: {companyId: string}) :Promise<any> {
         var query = params;
         let [all, balance] = await Promise.all([
                 DB.models.Staff.sum('total_points', {where: query}),
@@ -1268,7 +1269,7 @@ class StaffModule{
     }
 
     @clientExport
-    static async statStaffPoints(params){
+    static async statStaffPoints(params) :Promise<any> {
         let { accountId } = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
 
