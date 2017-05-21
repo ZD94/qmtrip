@@ -176,7 +176,16 @@ export default class ApiTravelBudget {
                                 budget['reason'] = reason;
                                 budgets.push(budget);
                             }
+                            resolve(true);
+                        })().catch(reject);
+                    })
+            })
 
+            await new Promise(function(resolve, reject) {
+                let session = {staffId: staffId}
+                Zone.current.fork({name: "getTravelPolicy",properties: { session: session}})
+                    .run(function() {
+                        return (async function () {
                             let days = moment(moment(goBackDate).format(momentDateFormat)).diff(moment(leaveDate).format(momentDateFormat), 'days')
                             if (isNeedHotel && days > 0) {
                                 let budget = await ApiTravelBudget.getHotelBudget({
@@ -190,7 +199,16 @@ export default class ApiTravelBudget {
                                 budget['reason'] = reason;
                                 budgets.push(budget);
                             }
+                            return resolve(true);
+                        })().catch(reject);
+                    });
+            })
 
+            await new Promise(function(resolve, reject) {
+                let session = {staffId: staffId}
+                Zone.current.fork({name: "getTravelPolicy",properties: { session: session}})
+                    .run(function() {
+                        return (async function () {
                             if (subsidy && subsidy.template) {
                                 let goBackDay = moment(goBackDate).format("YYYY-MM-DD");
                                 let leaveDay = moment(leaveDate).format("YYYY-MM-DD");
@@ -215,7 +233,16 @@ export default class ApiTravelBudget {
                                     budgets.push(budget);
                                 }
                             }
+                            return resolve(true);
+                        })().catch(reject);
+                    });
+            })
 
+            await new Promise(function(resolve, reject) {
+                let session = {staffId: staffId}
+                Zone.current.fork({name: "getTravelPolicy",properties: { session: session}})
+                    .run(function() {
+                        return (async function () {
                             if (isRoundTrip) {
                                 let lastDestination = destinationPlacesInfo[destinationPlacesInfo.length-1]
                                 let deptCity = lastDestination.destinationPlace;
@@ -233,9 +260,9 @@ export default class ApiTravelBudget {
                                 budget['reason'] = '';
                                 budgets.push(budget);
                             }
-                            resolve(true);
+                            return resolve(true);
                         })().catch(reject);
-                    })
+                    });
             })
         }
 
@@ -289,6 +316,7 @@ export default class ApiTravelBudget {
         if (!staff || !staff["travelPolicyId"]) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
+        console.log("出差人====>", staff.name);
         city = await API.place.getCityInfo({cityCode: city.id || city});
         //查询是否有协议酒店
         let accordHotel;
@@ -403,7 +431,7 @@ export default class ApiTravelBudget {
         if (!staff || !staff['travelPolicyId']) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
-
+        console.log("出差人====>", staff.name);
         //查询员工差旅标准
         let policy = await staff.getTravelPolicy();
 
