@@ -123,7 +123,7 @@ class ApproveModule {
         // await company.frozenTripPlanNum({number: 1});
         let reason:string="";
         if(query.destinationPlacesInfo && query.destinationPlacesInfo.length && query.destinationPlacesInfo[0].reason){
-            reason=query.reason;
+            reason=query.destinationPlacesInfo[0].reason;
         }
 
         let budgetInfo = {
