@@ -966,16 +966,14 @@ class StaffModule{
             q2.createdAt = {$gte: start_time, $lte: end_time};
             q3.createdAt = {$lte: end_time};
             q4.createdAt = {$lte: end_time};
-            let ret = await Promise.all([
+
+            let a: any, b: any, c: any, d:any;
+            [a, b, c, d] = await Promise.all([
                     DB.models.PointChange.sum('points', {where: q1}),
                     DB.models.PointChange.sum('points', {where: q2}),
                     DB.models.PointChange.sum('points', {where: q3}),
                     DB.models.PointChange.sum('points', {where: q4})
                 ]);
-            let a: number = ret['a']
-            let b: number = ret['b']
-            let c: number = ret['c']
-            let d: number = ret['d'];
             a = a || 0;
             b = b || 0;
             c = c || 0;
@@ -998,7 +996,7 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    static async getStaffPointsChangeByMonth(params) {
+    static async getStaffPointsChangeByMonth(params) :Promise<any>{
         let { accountId } = Zone.current.get("session");
         let staff = await DB.models.Staff.findById(accountId)
         params.companyId = staff.companyId;
@@ -1065,7 +1063,7 @@ class StaffModule{
      * @returns {*}
      */
     @requireParams(['companyId'], ['startTime', 'endTime'])
-    static async statisticStaffsByTime(params) : Promise<any> {
+    static async statisticStaffsByTime(params) :Promise<any> {
         var companyId = params.companyId;
         var start = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
         var end = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
@@ -1272,7 +1270,7 @@ class StaffModule{
     }
 
     @clientExport
-    static async statStaffPoints(params){
+    static async statStaffPoints(params) :Promise<any> {
         let { accountId } = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
 
