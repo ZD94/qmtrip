@@ -104,7 +104,7 @@ export default class ApiTravelBudget {
         let momentDateFormat = "YYYY-MM-DD";
         let budgets = [];
 
-        for(let i = 0; i < paramsToBudget.length; i++){
+        for(let i = 0; i < paramsToBudget.length; i++) {
             let {
                 leaveDate,  //离开日期
                 goBackDate, //返回日期
@@ -158,6 +158,7 @@ export default class ApiTravelBudget {
                 throw L.ERR.CITY_NOT_EXIST();
             }
 
+            //交通
             await new Promise(function(resolve, reject) {
                 let session = {staffId: staffId}
                 Zone.current.fork({name: "getTravelPolicy",properties: { session: session}})
@@ -181,6 +182,7 @@ export default class ApiTravelBudget {
                     })
             })
 
+            //住宿
             await new Promise(function(resolve, reject) {
                 let session = {staffId: staffId}
                 Zone.current.fork({name: "getTravelPolicy",properties: { session: session}})
@@ -204,40 +206,42 @@ export default class ApiTravelBudget {
                     });
             })
 
+            //补助
             await new Promise(function(resolve, reject) {
                 let session = {staffId: staffId}
-                Zone.current.fork({name: "getTravelPolicy",properties: { session: session}})
-                    .run(function() {
+                Zone.current.fork({name: "getTravelPolicy", properties: {session: session}})
+                    .run(function () {
                         return (async function () {
                             if (subsidy && subsidy.template) {
                                 let goBackDay = moment(goBackDate).format("YYYY-MM-DD");
                                 let leaveDay = moment(leaveDate).format("YYYY-MM-DD");
                                 let days = moment(goBackDay).diff(moment(leaveDay), 'days');
 
-                            if (i == (paramsToBudget.length-1)) {
-                                days = days + 1;
-                            }
+                                if (i == (paramsToBudget.length - 1)) {
+                                    days = days + 1;
+                                }
 
-                            if (days > 0) {
-                                let budget: any = {};
-                                budget.fromDate = leaveDate;
-                                budget.endDate = goBackDate;
-                                budget.hasFirstDaySubsidy = subsidy.hasFirstDaySubsidy;
-                                budget.hasLastDaySubsidy = subsidy.hasLastDaySubsidy;
-                                budget.tripType = ETripType.SUBSIDY;
-                                budget.type = EInvoiceType.SUBSIDY;
-                                budget.price = subsidy.template.subsidyMoney * days;
-                                budget.duringDays = days;
-                                budget.template = {id: subsidy.template.id, name: subsidy.template.name};
-                                budget.reason = reason;
-                                budgets.push(budget);
+                                if (days > 0) {
+                                    let budget: any = {};
+                                    budget.fromDate = leaveDate;
+                                    budget.endDate = goBackDate;
+                                    budget.hasFirstDaySubsidy = subsidy.hasFirstDaySubsidy;
+                                    budget.hasLastDaySubsidy = subsidy.hasLastDaySubsidy;
+                                    budget.tripType = ETripType.SUBSIDY;
+                                    budget.type = EInvoiceType.SUBSIDY;
+                                    budget.price = subsidy.template.subsidyMoney * days;
+                                    budget.duringDays = days;
+                                    budget.template = {id: subsidy.template.id, name: subsidy.template.name};
+                                    budget.reason = reason;
+                                    budgets.push(budget);
+                                }
                             }
-                        }
-                        resolve(true);
+                            resolve(true);
+                        })().catch(reject);
                     })
             })
-        }
 
+            //返程交通
             await new Promise(function(resolve, reject) {
                 let session = {staffId: staffId}
                 Zone.current.fork({name: "getTravelPolicy",properties: { session: session}})
@@ -264,6 +268,7 @@ export default class ApiTravelBudget {
                         })().catch(reject);
                     });
             })
+
         }
 
         let obj: any = {};
