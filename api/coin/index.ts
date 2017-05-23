@@ -50,8 +50,12 @@ class CoinModule {
         }
         // let orderNo = getOrderNo()
         //减掉企业金币
-        let result = await company.coinAccount.costCoin(coins, `员工${staff.name}(${staff.mobile})积分兑换`)
-
+        let result:any;
+        try{
+            result= await company.coinAccount.costCoin(coins, `员工${staff.name}(${staff.mobile})积分兑换`)
+        } catch(err){
+            throw new Error("余额不足");
+        }
         //减掉员工积分
         staff.balancePoints = staff.balancePoints - points;
         staff = await staff.save();
