@@ -612,7 +612,7 @@ export default class ApiAuth {
         if(staffed && staffed.total > 0){
             return {
                 "inCompany" : true,
-                "company"   : staffed[0].company;
+                "company"   : staffed[0].company
             }
         }
 
