@@ -276,7 +276,7 @@ interface getISVandCorp {
 }
 
 //提供isv , corp 的api对象
-async function getISVandCorp(corp : DDTalkCorp): Promise<getISVandCorp> {
+export async function getISVandCorp(corp : DDTalkCorp): Promise<any> {
     let corpId = corp.corpId;
     let tokenObj = await _getSuiteToken();
     let suiteToken = tokenObj['suite_access_token']
@@ -347,6 +347,7 @@ export async function dealCompanyOrganization(corpApi: CorpApi, corp : DDTalkCor
  */
 
 export async function addCompanyStaffsByDepartment(corpApi: CorpApi, DdDepartmentId: any, corp) {
+    console.log("enter in addCompanyStaffsByDepartment");
     let dingUsers = await corpApi.getUserListByDepartment(DdDepartmentId);
     let staff_ids = [] , localDepart = [];
     let DDcrud = new ddCrud(corp.corpId);
