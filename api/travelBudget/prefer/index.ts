@@ -39,6 +39,7 @@ const sysDefaultPrefer = require("./default-prefer/sys-prefer.json");
 const companyDefaultPrefer = require("./default-prefer/default-company-prefer.json");
 
 export function loadPrefers(prefers: any[], qs: {local: any}, type?: DEFAULT_PREFER_CONFIG_TYPE) {
+    console.log("公司偏好:")
     let allPrefers;
     let sysPrefers;
     switch(type) {
@@ -47,30 +48,30 @@ export function loadPrefers(prefers: any[], qs: {local: any}, type?: DEFAULT_PRE
             if (!prefers || !prefers.length) {
                 prefers = _.cloneDeep(companyDefaultPrefer.domesticHotel);
             }
-            allPrefers = mergePrefers(sysPrefers, prefers);
             break;
         case DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_TICKET:
             sysPrefers = _.cloneDeep(sysDefaultPrefer.abroadTraffic);
             if (!prefers || !prefers.length) {
                 prefers = _.cloneDeep(companyDefaultPrefer.abroadTraffic);
             }
-            allPrefers = mergePrefers(sysPrefers, prefers);
             break;
         case DEFAULT_PREFER_CONFIG_TYPE.DOMESTIC_TICKET:
             sysPrefers = _.cloneDeep(sysDefaultPrefer.domesticTraffic);
             if (!prefers || !prefers.length) {
                 prefers = _.cloneDeep(companyDefaultPrefer.domesticTraffic);
             }
-            allPrefers = mergePrefers(sysPrefers, prefers);
             break;
         case DEFAULT_PREFER_CONFIG_TYPE.INTERNAL_HOTEL:
             sysPrefers = _.cloneDeep(sysDefaultPrefer.abroadHotel);
             if (!prefers || !prefers.length) {
                 prefers = _.cloneDeep(companyDefaultPrefer.abroadHotel);
             }
-            allPrefers = mergePrefers(sysPrefers, prefers);
             break;
     }
+    console.log('系统偏好:', JSON.stringify(sysPrefers));
+    console.log('公司偏好:', JSON.stringify(prefers));
+    console.log('查询条件:', JSON.stringify(qs));
+    allPrefers = mergePrefers(sysPrefers, prefers);
     let _prefers = JSON.stringify(allPrefers);
     let _compiled = _.template(_prefers, { 'imports': { 'moment': moment } });
     return JSON.parse(_compiled(qs));
