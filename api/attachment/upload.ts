@@ -16,12 +16,18 @@ function resetTimeout(req, res, next){
 
 module.exports = function(app) {
     //app.post('/upload/ajax-upload-file', proxy('http://localhost:4001', { reqAsBuffer: true,reqBodyEncoding: false }));
-    app.post('/upload/ajax-upload-file', resetTimeout, requestProxy({
+    let url = '/upload/ajax-upload-file'
+
+    app.post(url, resetTimeout, requestProxy({
         url:config.hosts.main.www+'/upload/ajax-upload-file',
         reqAsBuffer: true,
         cache: false,
         timeout: 180000,
     }));
+    app.options(url, function(req, res, next) {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.sendStatus(200);
+    })
     app.get("/attachment/temp/:id", resetTimeout, function(req, res, next) {
         let id = req.params.id;
         return requestProxy({
