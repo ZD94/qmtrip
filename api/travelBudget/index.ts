@@ -247,7 +247,7 @@ export default class ApiTravelBudget {
                 Zone.current.fork({name: "getTravelPolicy",properties: { session: session}})
                     .run(function() {
                         return (async function () {
-                            if (isRoundTrip) {
+                            if (isRoundTrip && destinationPlacesInfo.length-1 == i) {
                                 let lastDestination = destinationPlacesInfo[destinationPlacesInfo.length-1]
                                 let deptCity = lastDestination.destinationPlace;
                                 let destCity = params.goBackPlace || params.originPlace;
