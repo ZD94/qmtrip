@@ -1413,8 +1413,8 @@ class StaffModule{
     /*************************************邀请链接begin***************************************/
     @clientExport
     static async createInvitedLink(params): Promise<InvitedLink>{
-        let host = params.host || config.host;
-        let goInvitedLink = host + "/index.html#/login/invited-staff-one";
+        let host = params.url || config.host;
+        let goInvitedLink = host + "#/login/invited-staff-one";
         var staff = await Staff.getCurrent();
         var invitedLink = InvitedLink.create();
         invitedLink.staff = staff;
