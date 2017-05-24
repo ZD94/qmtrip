@@ -7,8 +7,8 @@
 import {Models} from "_types/index";
 import {md5} from "common/utils";
 import {Staff} from "_types/staff/staff";
-import {DDTalkUser} from "_types/ddtalk";
-
+import {DDTalkUser, DDTalkCorp} from "_types/ddtalk";
+import {getISVandCorp} from "api/ddtalk/lib/dealEvent";
 import Logger from '@jingli/logger';
 var logger = new Logger('main');
 const DEFAULT_PWD = '000000';
@@ -17,6 +17,7 @@ const DEFAULT_PWD = '000000';
 export class ddCrud {
     private company: any;
     private travelPolicy : any;
+    private corp : DDTalkCorp;
 
     constructor( public corpId : string ) {
     }
@@ -27,11 +28,9 @@ export class ddCrud {
             return self.company;
         }
 
-        let ddtalkCorp = await Models.ddtalkCorp.find({
-            where : { corpId : self.corpId }
-        });
-        if(ddtalkCorp && ddtalkCorp[0]){
-            let company = await Models.company.get(ddtalkCorp[0]["companyId"]);
+        let corp = await this.getCorp();
+        if(corp){
+            let company = await Models.company.get(corp["companyId"]);
             if(company){
                 return self.company = company;
             }else{
@@ -40,6 +39,20 @@ export class ddCrud {
         }else{
             throw new Error("dd关系中没有找到这个企业");
         }
+    }
+
+    private async getCorp(){
+        let self = this;
+        if(this.corp){
+            return this.corp;
+        }
+        let ddtalkCorp = await Models.ddtalkCorp.find({
+            where : { corpId : self.corpId }
+        });
+        if(ddtalkCorp && ddtalkCorp[0]){
+            self.corp = ddtalkCorp[0];
+        }
+        return self.corp;
     }
 
 
@@ -144,29 +157,41 @@ export class ddCrud {
                 where : { corpId : self.corpId , DdDepartmentId : `${item}` }
             });
 
+            let localDepartId;
             if(ddDeparts && ddDeparts.length){
-                let localDepartId = ddDeparts[0].localDepartmentId;
-                localDepart_ids.push(localDepartId);
-
-                let staffDeparts = await Models.staffDepartment.find({
-                    where : {
-                        staffId : staff.id,
-                        departmentId : localDepartId
-                    }
-                });
-
-                if(staffDeparts && staffDeparts[0]){
-                    //already have.
-                }else{
-                    let staffDepart = Models.staffDepartment.create({
-                        staffId : staff.id,
-                        departmentId : localDepartId
-                    });
-
-                    staffDepart = await staffDepart.save();
-                }
+                localDepartId = ddDeparts[0].localDepartmentId;
             }else{
                 logger.warn(`员工添加: 部门缺失: , corpId: ${this.corpId} , dd_departId : ${item}`);
+
+                //create this department.
+                let corp = await self.getCorp();
+                let {corpApi} = await getISVandCorp(corp); 
+                let ddDepartmentInfo = await corpApi.getDepartmentInfo(item);
+                let localDepart = await self.createDepartment( ddDepartmentInfo );
+                localDepartId = localDepart.id;
+                
+            }
+            localDepart_ids.push( localDepartId );
+
+
+            let staffDeparts = await Models.staffDepartment.find({
+                where : {
+                    staffId : staff.id,
+                    departmentId : localDepartId
+                }
+            });
+
+            if(staffDeparts && staffDeparts[0]){
+                //already have.
+                console.log("staffDepart already have.");
+            }else{
+                let staffDepart = Models.staffDepartment.create({
+                    staffId : staff.id,
+                    departmentId : localDepartId
+                });
+
+                staffDepart = await staffDepart.save();
+                console.log("staffDepart save.");
             }
         }
 
@@ -212,7 +237,7 @@ export class ddCrud {
     *   添加、更新
     */
     async createDepartment ( ddDepartInfo : any , notAddParentid ? : boolean){
-        // console.log("enter create department" , ddDepartInfo);
+        console.log("enter create department" , ddDepartInfo);
 
         let ddDeparts = await Models.ddtalkDepartment.find({
             where : { corpId : this.corpId , DdDepartmentId : `${ddDepartInfo.id}` }
@@ -221,7 +246,7 @@ export class ddCrud {
         let parentid;
         let localDepart;
 
-        if(notAddParentid){
+        if(notAddParentid || !ddDepartInfo.parentid){
             parentid = null;
         }else{
             parentid = await this.getParentId( ddDepartInfo.parentid );
@@ -259,7 +284,7 @@ export class ddCrud {
             await ddDepart.save();
         }
 
-        // console.log("enter create department  over");
+        console.log("enter create department  over");
 
         return localDepart;
     }
@@ -269,6 +294,7 @@ export class ddCrud {
     *   获取一个钉钉部门 的 parentId 的本地部门id
     */
     async getParentId( dd_parentId ){
+        let self = this;
         if(!dd_parentId){
             return null;
         }
@@ -285,9 +311,13 @@ export class ddCrud {
         if(localDeparts && localDeparts.length){
             return localDeparts[0].localDepartmentId;
         }else{
-            logger.warn("这个dd_parentId , 本地没有对应部门 , 挂载到根部门");
-            let depart = await company.getRootDepartment();
-            return depart.id;
+            logger.warn("这个dd_parentId , 本地没有对应部门 , 创建它");
+            // let depart = await company.getRootDepartment();
+            let corp = await self.getCorp();
+            let {corpApi} = await getISVandCorp(corp); 
+            let ddDepartmentInfo = await corpApi.getDepartmentInfo(dd_parentId);
+            let localDepart = await self.createDepartment( ddDepartmentInfo );
+            return localDepart.id;
         }
     }
 

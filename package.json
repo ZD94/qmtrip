@@ -17,7 +17,7 @@
   "dependencies": {
     "@jingli/config": "^1.0.6",
     "@jingli/database": "^1.0.1",
-    "@jingli/dnode-api": "^1.0.5",
+    "@jingli/dnode-api": "^1.1.1",
     "@jingli/fs-promisify": "^1.0.0",
     "@jingli/language": "^1.0.0",
     "@jingli/logger": "^1.0.1",
@@ -50,6 +50,7 @@
     "express-http-proxy": "^0.11.0",
     "express-request-proxy": "^2.0.0",
     "formidable": "^1.0.17",
+    "haversine": "^1.0.2",
     "html-pdf": "^2.1.0",
     "http-proxy": "^1.16.2",
     "iconv-lite": "^0.4.13",
@@ -84,8 +85,7 @@
     "uuid": "^2.0.2",
     "validator": "^5.5.0",
     "weak": "^1.0.1",
-    "wechat-oauth": "^1.1.1",
-    "haversine":"^1.0.2"
+    "wechat-oauth": "^1.1.1"
   },
   "optionalDependency": {
     "bufferutil": "^1.2.1",
