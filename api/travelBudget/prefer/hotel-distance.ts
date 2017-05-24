@@ -1,4 +1,3 @@
-///<reference path="../../../_types/travelbudget.ts"/>
 'use strict';
 import {AbstractPrefer} from "./index";
 import {IFinalHotel} from "_types/travelbudget";
@@ -46,7 +45,7 @@ class DistancePrefer extends AbstractPrefer<IFinalHotel>{
             distance=haversine(start,end,{unit:'meter'})
             distances.push(distance);
         }
-        
+
         minDistance = Math.min.apply(Math,distances);
         let cscore:number;
         console.log("minDistance: ",minDistance);
