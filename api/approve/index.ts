@@ -121,6 +121,10 @@ class ApproveModule {
         //特殊审批不记录行程数
         // await company.beforeGoTrip();
         // await company.frozenTripPlanNum({number: 1});
+        let reason:string="";
+        if(query.destinationPlacesInfo && query.destinationPlacesInfo.length && query.destinationPlacesInfo[0].reason){
+            reason=query.destinationPlacesInfo[0].reason;
+        }
 
         let budgetInfo = {
             query: query,
@@ -130,7 +134,7 @@ class ApproveModule {
                     backAt: query.goBackDate,
                     price: budget,
                     tripType: ETripType.SPECIAL_APPROVE,
-                    reason: specialApproveRemark,
+                    reason: reason,
                     originPlace: null,
                     destination: null
                 }
