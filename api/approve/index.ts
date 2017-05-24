@@ -158,6 +158,7 @@ class ApproveModule {
                 //处理startAt,backAt
                 if(i == 0){
                     budgetInfo.budgets[0].startAt = segment.leaveDate;
+                    budgetInfo.budgets[0].reason = segment.reason;
                 }
                 if(i == (destinationPlacesInfo.length - 1)){
                     budgetInfo.budgets[0].backAt = segment.goBackDate;
