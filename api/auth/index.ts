@@ -610,7 +610,10 @@ export default class ApiAuth {
 
         let staffed = await Models.staff.find({where:{ companyId: companyId, accountId: account.id }});
         if(staffed && staffed.total > 0){
-            throw L.ERR.CODE_ERROR(500, "您已在此企业中")
+            return {
+                "inCompany" : true,
+                "company"   : staffed[0].company
+            }
         }
 
         let staff = Staff.create({
