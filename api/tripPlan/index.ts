@@ -1105,6 +1105,7 @@ class TripPlanModule {
                     data.hasLastDaySubsidy = budget.hasLastDaySubsidy;
                     data.template = budget.template.id;
                     data.subsidyMoney = budget.price;//此字段做什么
+                    data.subsidyTemplateId = budget.template.id;
                     data.startDateTime = budget.fromDate;
                     data.endDateTime = budget.endDate;
                     detail = Models.tripDetailSubsidy.create(data);
