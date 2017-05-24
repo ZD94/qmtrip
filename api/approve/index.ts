@@ -57,7 +57,11 @@ class ApproveModule {
             for(let i = 0; i < destinationPlacesInfo.length; i++){
                 let segment: ISegment = destinationPlacesInfo[i]
                 let destinationCity = await API.place.getCityInfo({cityCode: segment.destinationPlace});
-                content = content + destinationCity.name;
+                if(i<destinationPlacesInfo.length-1){
+                    content = content + destinationCity.name+"-";
+                }else{
+                    content = content + destinationCity.name;
+                }
             }
         }
         if(budgetInfo.budgets && budgetInfo.budgets.length>0){
