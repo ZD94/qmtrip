@@ -98,6 +98,7 @@ class DDTalk {
             if(config.reg_go){
                 return DealEvent.transpond(req, res, next, null, url+"/JLTesthello");
             }
+            console.log("yes, it's the hello");
             res.send("ok");
         });
 
