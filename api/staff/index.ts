@@ -34,8 +34,6 @@ if(staffAllCols.indexOf("departmentIds") < 0){
     staffAllCols.push("departmentIds");
 }
 
-const goInvitedLink = config.host + "/index.html#/login/invited-staff-one";
-
 class StaffModule{
     /**
      * 创建员工
@@ -1415,6 +1413,8 @@ class StaffModule{
     /*************************************邀请链接begin***************************************/
     @clientExport
     static async createInvitedLink(params): Promise<InvitedLink>{
+        let host = params.url || config.host;
+        let goInvitedLink = host + "#/login/invited-staff-one";
         var staff = await Staff.getCurrent();
         var invitedLink = InvitedLink.create();
         invitedLink.staff = staff;
