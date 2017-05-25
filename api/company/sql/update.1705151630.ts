@@ -4,6 +4,9 @@ function dealBudget(obj){
     let keys = Object.keys(obj);
     for(let key of keys){
         let arr = obj[key];
+        if(!arr[Symbol.iterator]){
+            continue;
+        }
         for(let item of arr){
             if(item.name == "planePricePrefer"){
                 item.name = "price";

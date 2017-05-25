@@ -9,7 +9,7 @@ let dingSuiteCallback = require("dingtalk_suite_callback");
 import fs = require("fs");
 import cache from "common/cache";
 import C = require("@jingli/config");
-
+import L from '@jingli/language';
 const config = C.ddconfig;
 import request = require('request');
 import ISVApi from "./lib/isvApi";
@@ -98,6 +98,7 @@ class DDTalk {
             if(config.reg_go){
                 return DealEvent.transpond(req, res, next, null, url+"/JLTesthello");
             }
+            console.log("yes, it's the hello");
             res.send("ok");
         });
 
@@ -214,9 +215,9 @@ class DDTalk {
                 let ret = await API.auth.makeAuthenticateToken(ddtalkUser.id, 'ddtalk');
                 return ret;
             }
-            throw new Error(`{"code":-1, "msg": "用户还未绑定账户"}`);
+            throw L.ERR.UNAUTHORIZED();
         } else {
-            throw new Error(`企业不存在`)
+            throw L.ERR.COMPANY_NOT_EXIST();
         }
     }
 

@@ -762,6 +762,55 @@ class TripPlanModule {
         };
     }
 
+    @clientExport
+    @requireParams([], ['startTime', 'endTime'])
+    static async statisticProjectTripBudget(params: {startTime?: Date, endTime?: Date}) {
+        let staff = await Staff.getCurrent();
+        let companyId = staff.company.id;
+        let formatStr = 'YYYY-MM-DD HH:mm:ss';
+
+        let selectSql = `select count(id) as "tripNum", sum(expenditure) as expenditure, project_id as "projectId" from`;
+        let completeSql = `trip_plan.trip_plans where deleted_at is null and company_id='${companyId}' and status=${EPlanStatus.COMPLETE}`;
+
+        if(params.startTime){
+            let startTime = moment(params.startTime).format(formatStr);
+            completeSql += ` and all_invoices_pass_time>='${startTime}'`;
+        }
+        if(params.endTime){
+            let endTime = moment(params.endTime).format(formatStr);
+            completeSql += ` and all_invoices_pass_time<='${endTime}'`;
+        }
+
+        let groupProjectSql = `${completeSql} group by project_id`;
+
+        let groupProject = `${selectSql} ${groupProjectSql};`;
+
+        let groupProjectInfo = await DB.query(groupProject);
+
+        if(groupProjectInfo && groupProjectInfo.length > 0 && groupProjectInfo[0].length > 0) {
+            let projectInfo = groupProjectInfo[0];
+            projectInfo = await Promise.all(projectInfo.map(async (p) => {
+                p["project"] = await Models.project.get(p.projectId);
+                let peopleDays = 0;
+                let selectPeopleDaySql = `select back_at as "backAt", start_at as "startAt" from`;
+                let wherePeopleDaySql = `${completeSql} and project_id = '${p.projectId}'`;
+                let peopleDaySql = `${selectPeopleDaySql} ${wherePeopleDaySql};`;
+                let peopleDayInfo = await DB.query(peopleDaySql);
+                if(peopleDayInfo && peopleDayInfo.length > 0 && peopleDayInfo[0].length > 0) {
+                    peopleDayInfo[0].map((t) => {
+                        let peopleDay = moment(t.backAt).startOf('day').diff(moment(t.startAt).startOf('day'), 'days');
+                        peopleDays += peopleDay;
+                    })
+                }
+                p["peopleDays"] = peopleDays;
+                return p;
+            }));
+
+            return projectInfo;
+        }
+
+        return [];
+    }
 
     @clientExport
     @requireParams([], ['startTime', 'endTime', 'isStaff'])
@@ -775,11 +824,11 @@ class TripPlanModule {
 
         if(params.startTime){
             let startTime = moment(params.startTime).format(formatStr);
-            completeSql += ` and start_at>='${startTime}'`;
+            completeSql += ` and all_invoices_pass_time>='${startTime}'`;
         }
         if(params.endTime){
             let endTime = moment(params.endTime).format(formatStr);
-            completeSql += ` and start_at<='${endTime}'`;
+            completeSql += ` and all_invoices_pass_time<='${endTime}'`;
         }
         if(params.isStaff){
             completeSql += ` and account_id='${staff.id}'`;
@@ -902,7 +951,7 @@ class TripPlanModule {
     static async statisticBudgetsInfo(params: {startTime: string, endTime: string, type: string, keyWord?: string, unComplete?:boolean}) {
         let staff = await Staff.getCurrent();
         let company =staff.company;
-        let completeSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status=${EPlanStatus.COMPLETE} and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
+        let completeSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status=${EPlanStatus.COMPLETE} and all_invoices_pass_time>'${params.startTime}' and all_invoices_pass_time<'${params.endTime}'`;
         let savedMoneyCompleteSql = '';
         let planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
         if(params.unComplete){
@@ -949,7 +998,7 @@ class TripPlanModule {
 
         if(type == 'D') {
             selectKey = 'departmentId';
-            completeSql=`from trip_plan.trip_plans as p, department.staff_departments as s, department.departments as d where d.deleted_at is null and s.deleted_at is null and p.deleted_at is null and p.company_id ='${company.id}'  and s.staff_id=p.account_id and d.id=s.department_id and p.start_at>'${params.startTime}' and p.start_at<'${params.endTime}'`;
+            completeSql=`from trip_plan.trip_plans as p, department.staff_departments as s, department.departments as d where d.deleted_at is null and s.deleted_at is null and p.deleted_at is null and p.company_id ='${company.id}'  and s.staff_id=p.account_id and d.id=s.department_id and p.all_invoices_pass_time>'${params.startTime}' and p.all_invoices_pass_time<'${params.endTime}'`;
             savedMoneyCompleteSql = '';
             planSql = `${completeSql} and p.status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE})`;
             completeSql += ` and p.status=${EPlanStatus.COMPLETE}`;
@@ -1173,10 +1222,11 @@ class TripPlanModule {
                     data.hasLastDaySubsidy = budget.hasLastDaySubsidy;
                     data.template = budget.template.id;
                     data.subsidyMoney = budget.price;//此字段做什么
+                    data.subsidyTemplateId = budget.template.id;
                     data.startDateTime = budget.fromDate;
                     data.endDateTime = budget.endDate;
                     detail = Models.tripDetailSubsidy.create(data);
-                    detail.expenditure = price;//此字段与budget字段有什么区别
+                    // detail.expenditure = price;
                     // detail.status = EPlanStatus.COMPLETE;
                     break;
                 case ETripType.SPECIAL_APPROVE:
