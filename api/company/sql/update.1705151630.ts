@@ -25,17 +25,19 @@ function dealBudget(obj){
 
 module.exports = function(DB, t) {
 
-    let sql = `SELECT * FROM company.companies where deleted_at is null`;
-    return DB.query(sql)
-    .then(async (rets) => {
-        for(let item of rets[0]){
-            try{
-                item.budget_config = JSON.parse(item.budget_config);
-            }catch(e){
-            }
-            
-            let budget_config = dealBudget( item.budget_config );
-            let result = await DB.query(`update company.companies set budget_config = '${JSON.stringify(budget_config)}'::jsonb where id = '${item.id}'`);
-        }
-    })
+    // let sql = `SELECT * FROM company.companies where deleted_at is null`;
+    // return DB.query(sql)
+    // .then(async (rets) => {
+    //     for(let item of rets[0]){
+    //         try{
+    //             item.budget_config = JSON.parse(item.budget_config);
+    //         }catch(e){
+    //         }
+    //
+    //         let budget_config = dealBudget( item.budget_config );
+    //         let configStr = JSON.stringify(budget_config);
+    //         configStr = configStr.replace(/'/, "''");
+    //         let result = await DB.query(`update company.companies set budget_config = '${configStr}'::jsonb where id = '${item.id}'`);
+    //     }
+    // })
 }
