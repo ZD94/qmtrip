@@ -35,7 +35,9 @@ module.exports = function(DB, t) {
             }
             
             let budget_config = dealBudget( item.budget_config );
-            let result = await DB.query(`update company.companies set budget_config = '${JSON.stringify(budget_config)}'::jsonb where id = '${item.id}'`);
+            let configStr = JSON.stringify(budget_config);
+            configStr = configStr.replace(/'/, "''");
+            let result = await DB.query(`update company.companies set budget_config = '${configStr}'::jsonb where id = '${item.id}'`);
         }
     })
 }
