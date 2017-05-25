@@ -16,7 +16,7 @@
       "color":"#173177"
     },
     "remark":{
-      "value":"<%=moment().format('YYYY.MM.DD') || '' %>，由<%=agreeUserNames || '' %>审批",
+      "value":"<%=moment().format('YYYY.MM.DD') || '' %>，由<%=tripApprove.account.name || '' %>审批",
       "color":"#173177"
     }
   }
