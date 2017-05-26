@@ -16,7 +16,7 @@ function price(v:any, param:any):any{
             if(this.type && this.type == "line"){
                 a = (v.price - param.minPrice)/(param.midPrice - param.minPrice);
             }
-            var addScore = this.score * a;
+            var addScore = Math.floor(this.score * a);
             v.score += addScore;
             v.reasons.push(`价格偏好以下价格 ${addScore}`)
         }else{
@@ -24,7 +24,7 @@ function price(v:any, param:any):any{
             if(this.type && this.type == "line"){
                 a = (param.maxPrice - v.price)/(param.maxPrice - param.midPrice);
             }
-            var addScore = this.score * a;
+            var addScore = Math.floor(this.score * a);
             v.score += addScore;
             v.reasons.push(`价格偏好以上价格 ${addScore}`)
         }
@@ -75,6 +75,9 @@ class PricePrefer extends AbstractPrefer<any> {
         }
 
         data = data.map( (v) => {
+            if (v.type == TRAFFIC.TRAIN) {
+                return;
+            }
             return price.apply(self, [v, {
                 midPrice : midPrice,
                 minPrice : minPrice,
