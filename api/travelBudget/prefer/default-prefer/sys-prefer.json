@@ -1,6 +1,23 @@
 {
     "domesticTraffic": [
         {
+            "name": "runningTimePrefer",
+            "options": {
+                "planeScore": 500,
+                "trainScore": 250,
+                "planeScoreInterval": 5,
+                "trainScoreInterval": 5
+            }
+        },
+        {
+            "name": "trainPricePrefer",
+            "options": {
+                "type": "square",
+                "score": 10000,
+                "expectTrainCabins": "<%=local.expectTrainCabins%>"
+            }
+        },
+        {
             "name": "departStandardTimePrefer",
             "options": {
                 "end": "<%=moment(local.leaveDate).format('YYYY-MM-DD')%> 16:00",
@@ -19,20 +36,25 @@
             }
         },
         {
-            "name": "runningTimePrefer",
+            "name": "cabin",
             "options": {
-                "planeScore": 500,
-                "trainScore": 250,
-                "planeScoreInterval": 5,
-                "trainScoreInterval": 5
+                "expectTrainCabins": "<%=local.expectTrainCabins%>",
+                "expectFlightCabins": "<%=local.expectFlightCabins%>",
+                "score": 100000
             }
         },
         {
-            "name": "trainPricePrefer",
+            "name": "earliestGoBackTimePrefer",
             "options": {
-                "type": "square",
-                "score": 10000,
-                "expectTrainCabins": "<%=local.expectTrainCabins%>"
+                "score": 100000,
+                "earliestGoBackTime": "<%=local.earliestLeaveDateTime%>"
+            }
+        },
+        {
+            "name": "latestArrivalTimePrefer",
+            "options": {
+                "score": 100000,
+                "latestArrivalTime": "<%=local.latestArrivalDateTime%>"
             }
         }
     ],
@@ -74,6 +96,28 @@
                 "expectTrainCabins": "<%=local.expectTrainCabins%>",
                 "type": "square"
             }
+        },
+        {
+            "name": "cabin",
+            "options": {
+                "expectTrainCabins": "<%=local.expectTrainCabins%>",
+                "expectFlightCabins": "<%=local.expectFlightCabins%>",
+                "score": 100000
+            }
+        },
+        {
+            "name": "earliestGoBackTimePrefer",
+            "options": {
+                "score": 100000,
+                "earliestGoBackTime": "<%=local.earliestLeaveDateTime%>"
+            }
+        },
+        {
+            "name": "latestArrivalTimePrefer",
+            "options": {
+                "score": 100000,
+                "latestArrivalTime": "<%=local.latestArrivalDateTime%>"
+            }
         }
     ],
     "domesticHotel": [
@@ -100,6 +144,13 @@
             "options": {
                 "score": 5000
             }
+        },
+        {
+            "name":"starMatch",
+            "options": {
+                "expectStar": "<%=local.star%>",
+                "score": 100000
+            }
         }
     ],
     "abroadHotel": [
@@ -113,6 +164,13 @@
             "name": "blackList",
             "options": {
                 "score": -100000
+            }
+        },
+        {
+            "name":"starMatch",
+            "options": {
+                "expectStar": "<%=local.star%>",
+                "score": 100000
             }
         }
     ]
