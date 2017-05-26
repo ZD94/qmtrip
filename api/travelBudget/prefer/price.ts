@@ -56,6 +56,10 @@ class PricePrefer extends AbstractPrefer<any> {
         let minPrice = 0;
 
         data.forEach( (v: any) => {
+            if (v.type == TRAFFIC.TRAIN) {
+                return;
+            }
+
             if (self.level.indexOf(parseInt(v['cabin'])) >= 0 || self.level.indexOf(parseInt(v['star'])) >= 0) {
                 targetTickets.push(v);
             }
