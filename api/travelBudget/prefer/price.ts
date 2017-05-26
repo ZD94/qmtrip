@@ -55,6 +55,12 @@ class PricePrefer extends AbstractPrefer<any> {
         let maxPrice = 0;
         let minPrice = 0;
 
+        data.forEach( (v: any) => {
+            if (self.level.indexOf(parseInt(v['cabin'])) >= 0 || self.level.indexOf(parseInt(v['star'])) >= 0) {
+                targetTickets.push(v);
+            }
+        })
+
         if (targetTickets.length){
             targetTickets.sort( function(v1, v2) {
                 return v1.price - v2.price;
