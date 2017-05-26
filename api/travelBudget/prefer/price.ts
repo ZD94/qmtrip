@@ -16,7 +16,7 @@ function price(v:any, param:any):any{
             if(this.type && this.type == "line"){
                 a = (v.price - param.minPrice)/(param.midPrice - param.minPrice);
             }
-            var addScore = param.score * a;
+            var addScore = this.score * a;
             v.score += addScore;
             v.reasons.push(`价格偏好以下价格 ${addScore}`)
         }else{
@@ -24,10 +24,11 @@ function price(v:any, param:any):any{
             if(this.type && this.type == "line"){
                 a = (param.maxPrice - v.price)/(param.maxPrice - param.midPrice);
             }
-            var addScore = param.score * a;
+            var addScore = this.score * a;
             v.score += addScore;
             v.reasons.push(`价格偏好以上价格 ${addScore}`)
         }
+        v.score = Math.floor(v.score * 100) / 100;
     }
     return v;
 }
