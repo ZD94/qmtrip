@@ -75,6 +75,9 @@ class PricePrefer extends AbstractPrefer<any> {
         }
 
         data = data.map( (v) => {
+            if (v.type == TRAFFIC.TRAIN) {
+                return;
+            }
             return price.apply(self, [v, {
                 midPrice : midPrice,
                 minPrice : minPrice,
