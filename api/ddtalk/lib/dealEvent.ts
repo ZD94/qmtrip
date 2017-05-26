@@ -177,6 +177,17 @@ export async function tmpAuthCode(msg , req , res , next) {
         staff.pwd = md5(DEFAULT_PWD);
         staff.company = company;
         staff = await staff.save();
+        let defaultDepart = await company.getDefaultDepartment();
+        if(defaultDepart){
+            let staffDepart = Models.staffDepartment.create({
+                staffId : staff.id,
+                departmentId : defaultDepart.id
+            });
+
+            staffDepart = await staffDepart.save();
+        }
+
+        
         // console.log("staff  owner staff created.");
 
         //更新公司信息 ，保存创建者id

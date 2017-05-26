@@ -16,7 +16,7 @@ function price(v:any, param:any):any{
             if(this.type && this.type == "line"){
                 a = (v.price - param.minPrice)/(param.midPrice - param.minPrice);
             }
-            var addScore = param.score * a;
+            var addScore = Math.floor(this.score * a);
             v.score += addScore;
             v.reasons.push(`价格偏好以下价格 ${addScore}`)
         }else{
@@ -24,10 +24,11 @@ function price(v:any, param:any):any{
             if(this.type && this.type == "line"){
                 a = (param.maxPrice - v.price)/(param.maxPrice - param.midPrice);
             }
-            var addScore = param.score * a;
+            var addScore = Math.floor(this.score * a);
             v.score += addScore;
             v.reasons.push(`价格偏好以上价格 ${addScore}`)
         }
+        v.score = Math.floor(v.score * 100) / 100;
     }
     return v;
 }
@@ -54,6 +55,16 @@ class PricePrefer extends AbstractPrefer<any> {
         let maxPrice = 0;
         let minPrice = 0;
 
+        data.forEach( (v: any) => {
+            if (v.type == TRAFFIC.TRAIN) {
+                return;
+            }
+
+            if (self.level.indexOf(parseInt(v['cabin'])) >= 0 || self.level.indexOf(parseInt(v['star'])) >= 0) {
+                targetTickets.push(v);
+            }
+        })
+
         if (targetTickets.length){
             targetTickets.sort( function(v1, v2) {
                 return v1.price - v2.price;
@@ -64,6 +75,9 @@ class PricePrefer extends AbstractPrefer<any> {
         }
 
         data = data.map( (v) => {
+            if (v.type == TRAFFIC.TRAIN) {
+                return v;
+            }
             return price.apply(self, [v, {
                 midPrice : midPrice,
                 minPrice : minPrice,
