@@ -112,6 +112,7 @@ export var ticketPrefers = {
     earliestGoBackTimePrefer: require('./ticket-earliestGoBackTimePrefer'),
     trainPricePrefer: require('./ticket-trainPricePrefer'),
     planePricePrefer: require('./price'),
+    price: require('./price'),
     planeNumberPrefer: require('./ticket-planeNumberPrefer'),
     permitOnlySupplier: require('./ticket-permitOnlySupplier'),
     priorSupplier: require('./ticket-priorSupplier'),

@@ -23,7 +23,7 @@
       }
     },
     {
-      "name": "planePricePrefer",
+      "name": "price",
       "options": {
         "type": "square",
         "score": 10000,
@@ -34,7 +34,7 @@
       }
     },
     {
-      "name": "planePricePrefer",
+      "name": "price",
       "options": {
         "type": "square",
         "score": 10000,
@@ -45,7 +45,7 @@
       }
     },
     {
-      "name": "planePricePrefer",
+      "name": "price",
       "options": {
         "type": "square",
         "score": 10000,
@@ -56,7 +56,7 @@
       }
     },
     {
-      "name": "planePricePrefer",
+      "name": "price",
       "options": {
         "type": "square",
         "score": 10000,
@@ -64,28 +64,6 @@
           4
         ],
         "percent": 0.05
-      }
-    },
-    {
-      "name": "cabin",
-      "options": {
-        "expectTrainCabins": "<%=local.expectTrainCabins%>",
-        "expectFlightCabins": "<%=local.expectFlightCabins%>",
-        "score": 100000
-      }
-    },
-    {
-      "name": "earliestGoBackTimePrefer",
-      "options": {
-        "score": 100000,
-        "earliestGoBackTime": "<%=local.earliestLeaveDateTime%>"
-      }
-    },
-    {
-      "name": "latestArrivalTimePrefer",
-      "options": {
-        "score": 100000,
-        "latestArrivalTime": "<%=local.latestArrivalDateTime%>"
       }
     }
   ],
@@ -99,7 +77,7 @@
       }
     },
     {
-      "name": "planePricePrefer",
+      "name": "price",
       "options": {
         "type": "square",
         "score": 10000,
@@ -110,7 +88,7 @@
       }
     },
     {
-      "name": "planePricePrefer",
+      "name": "price",
       "options": {
         "type": "square",
         "score": 10000,
@@ -121,7 +99,7 @@
       }
     },
     {
-      "name": "planePricePrefer",
+      "name": "price",
       "options": {
         "type": "square",
         "score": 10000,
@@ -132,7 +110,7 @@
       }
     },
     {
-      "name": "planePricePrefer",
+      "name": "price",
       "options": {
         "type": "square",
         "score": 10000,
@@ -140,28 +118,6 @@
           4
         ],
         "percent": 0
-      }
-    },
-    {
-      "name": "cabin",
-      "options": {
-        "expectTrainCabins": "<%=local.expectTrainCabins%>",
-        "expectFlightCabins": "<%=local.expectFlightCabins%>",
-        "score": 100000
-      }
-    },
-    {
-      "name": "earliestGoBackTimePrefer",
-      "options": {
-        "score": 100000,
-        "earliestGoBackTime": "<%=local.earliestLeaveDateTime%>"
-      }
-    },
-    {
-      "name": "latestArrivalTimePrefer",
-      "options": {
-        "score": 100000,
-        "latestArrivalTime": "<%=local.latestArrivalDateTime%>"
       }
     },
     {
@@ -183,13 +139,6 @@
           "3": [180, 600],
           "2": [120, 380]
         }
-      }
-    },
-    {
-      "name":"starMatch",
-      "options": {
-        "expectStar": "<%=local.star%>",
-        "score": 10000
       }
     },
     {
@@ -226,13 +175,6 @@
     }
   ],
   "abroadHotel": [
-    {
-      "name":"starMatch",
-      "options": {
-        "expectStar": "<%=local.star%>",
-        "score": 10000
-      }
-    },
     {
       "name": "price",
       "options": {
