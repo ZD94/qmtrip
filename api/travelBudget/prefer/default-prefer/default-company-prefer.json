@@ -144,7 +144,7 @@
     {
       "name": "price",
       "options": {
-        "score": 2000,
+        "score": 20000,
         "percent": 0.05,
         "level": [2]
       }
@@ -152,7 +152,7 @@
     {
       "name": "price",
       "options": {
-        "score": 2000,
+        "score": 20000,
         "percent": 0.05,
         "level": [3]
       }
@@ -160,7 +160,7 @@
     {
       "name": "price",
       "options": {
-        "score": 2000,
+        "score": 20000,
         "percent": 0.05,
         "level": [4]
       }
@@ -168,7 +168,7 @@
     {
       "name": "price",
       "options": {
-        "score": 2000,
+        "score": 20000,
         "percent": 0.05,
         "level": [5]
       }
@@ -178,7 +178,7 @@
     {
       "name": "price",
       "options": {
-        "score": 2000,
+        "score": 20000,
         "percent": 0,
         "level": [2]
       }
@@ -186,7 +186,7 @@
     {
       "name": "price",
       "options": {
-        "score": 2000,
+        "score": 20000,
         "percent": 0,
         "level": [3]
       }
@@ -194,7 +194,7 @@
     {
       "name": "price",
       "options": {
-        "score": 2000,
+        "score": 20000,
         "percent": 0,
         "level": [4]
       }
@@ -202,7 +202,7 @@
     {
       "name": "price",
       "options": {
-        "score": 2000,
+        "score": 20000,
         "percent": 0,
         "level": [5]
       }

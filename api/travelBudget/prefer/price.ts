@@ -86,6 +86,8 @@ class PricePrefer extends AbstractPrefer<any> {
             midPrice = minPrice + (maxPrice - minPrice) * self.percent;
         }
         targetTickets.forEach((v)=>{
+            if(!v.reason) v.reason = [];
+            if(!v.score) v.score = 0;
             let {scale, up} = price(v.price, this.type, minPrice, midPrice, maxPrice);
             let score = Math.floor(scale*this.score);
             v.score += score;
