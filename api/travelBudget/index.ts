@@ -534,7 +534,7 @@ export default class ApiTravelBudget {
             }
         }
 
-        let preferConfig: any = staff.company.budgetConfig;
+        let preferConfig: any = staff.company.budgetConfig || {};
         let qs: any = {};
 
         params['expectTrainCabins'] = trainCabins;
