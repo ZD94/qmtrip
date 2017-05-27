@@ -45,7 +45,7 @@ function price(price:number, type:string, min:number, mid:number, max:number):{s
     }
 }
 
-class PricePrefer extends AbstractPrefer<any> {
+class PricePrefer extends AbstractPrefer<(IFinalHotel|IFinalTicket)> {
     private score: number;
     private percent: number;
     private level: number[];
@@ -59,7 +59,7 @@ class PricePrefer extends AbstractPrefer<any> {
         this.level = options.level || [];
     }
 
-    async markScoreProcess(data: any[]): Promise<any[]> {
+    async markScoreProcess(data: (IFinalHotel|IFinalTicket)[]): Promise<(IFinalHotel|IFinalTicket)[]> {
         if (!data.length) return data;
         let self = this;
         let targetTickets = [];
@@ -67,15 +67,14 @@ class PricePrefer extends AbstractPrefer<any> {
         let maxPrice = 0;
         let minPrice = 0;
 
-        data.forEach( (v: any) => {
-            if (v.type == TRAFFIC.TRAIN) {
+        data.forEach( (v: (IFinalHotel|IFinalTicket)) => {
+            if (v['type'] == TRAFFIC.TRAIN) {
                 return;
             }
-
             if (self.level.indexOf(parseInt(v['cabin'])) >= 0 || self.level.indexOf(parseInt(v['star'])) >= 0) {
                 targetTickets.push(v);
             }
-        })
+        });
 
         if (targetTickets.length){
             targetTickets.sort( function(v1, v2) {
@@ -85,17 +84,22 @@ class PricePrefer extends AbstractPrefer<any> {
             minPrice = targetTickets[0].price;
             midPrice = minPrice + (maxPrice - minPrice) * self.percent;
         }
-        targetTickets.forEach((v)=>{
-            if(!v.reason) v.reason = [];
+
+        data = data.map( (v: (IFinalHotel|IFinalTicket)) => {
+            if(!v.reasons) v.reasons = [];
             if(!v.score) v.score = 0;
+            if (self.level.indexOf(parseInt(v['cabin'])) < 0 && self.level.indexOf(parseInt(v['star'])) < 0) {
+                return v;
+            }
             let {scale, up} = price(v.price, this.type, minPrice, midPrice, maxPrice);
             let score = Math.floor(scale*this.score);
             v.score += score;
             if(scale != 1){
-                v.reason.push(`价格偏好以${up?'上':'下'}价格 ${score}`);
+                v.reasons.push(`价格偏好以${up?'上':'下'}价格 ${score}`);
             }else{
-                v.reason.push(`价格偏好相等价格 ${score}`);
+                v.reasons.push(`价格偏好相等价格 ${score}`);
             }
+            return v;
         })
         return data;
     }
@@ -103,97 +107,3 @@ class PricePrefer extends AbstractPrefer<any> {
 }
 
 export= PricePrefer;
-
-// export class hotelPricePrefer extends AbstractPrefer<IFinalHotel> {
-//     private score: number;
-//     private percent: number;
-//     private level: number[];
-//     private type: string;
-
-//     constructor(name, options) {
-//         super(name, options);
-
-//         // console.log("good man: ", options);
-
-//         if (!this.score) {
-//             this.score = 0;
-//         }
-//         this.level = options.level || [];
-//     }
-
-//     async markScoreProcess(tickets:IFinalHotel[]):Promise<IFinalHotel[]> {
-//         if (!tickets.length) return tickets;
-//         let self = this;
-//         let targetTickets: IFinalTicket[] = [];
-//         let midPrice = 0;
-//         let maxPrice = 0;
-//         let minPrice = 0;
-
-//         if (targetTickets.length){
-//             targetTickets.sort( function(v1, v2) {
-//                 return v1.price - v2.price;
-//             });
-//             maxPrice = targetTickets[targetTickets.length-1].price;
-//             minPrice = targetTickets[0].price;
-//             midPrice = minPrice + (maxPrice - minPrice) * self.percent;
-//         }
-
-//         tickets = tickets.map( (v) => {
-//             return Price(v, {
-//                 level: self.level,
-//                 midPrice : midPrice,
-//                 minPrice : minPrice,
-//                 maxPrice : maxPrice,
-//                 score    : self.score,
-//                 self     : self
-//             });
-//         })
-//         return tickets;
-//     }
-// }
-
-
-// export class PlanePricePrefer extends AbstractPrefer<IFinalTicket> {
-//     private score: number;
-//     private percent: number;
-//     private level: number[];
-//     private type: string;
-
-//     constructor(name, options) {
-//         super(name, options);
-//         if (!this.score) {
-//             this.score = 0;
-//         }
-//         this.level = options.level || [];
-//     }
-
-//     async markScoreProcess(tickets:IFinalTicket[]):Promise<IFinalTicket[]> {
-//         if (!tickets.length) return tickets;
-//         let self = this;
-//         let targetTickets: IFinalTicket[] = [];
-//         let midPrice = 0;
-//         let maxPrice = 0;
-//         let minPrice = 0;
-
-//         if (targetTickets.length){
-//             targetTickets.sort( function(v1, v2) {
-//                 return v1.price - v2.price;
-//             });
-//             maxPrice = targetTickets[targetTickets.length-1].price;
-//             minPrice = targetTickets[0].price;
-//             midPrice = minPrice + (maxPrice - minPrice) * self.percent;
-//         }
-
-//         tickets = tickets.map( (v) => {
-//             return Price(v, {
-//                 level: self.level,
-//                 midPrice : midPrice,
-//                 minPrice : minPrice,
-//                 maxPrice : maxPrice,
-//                 score    : self.score,
-//                 self     : self
-//             });
-//         })
-//         return tickets;
-//     }
-// }
