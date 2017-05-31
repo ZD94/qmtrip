@@ -93,7 +93,9 @@ export default class ApiTravelBudget {
             policy: 'domestic',
         }
         let staffs = [_staff];
-
+        let isRoundTrip = params.isRoundTrip;
+        let goBackPlace = params['goBackPlace'];
+        let momentDateFormat = "YYYY-MM-DD";
         let segments: any[] = await Promise.all(destinationPlacesInfo.map( async (placeInfo) => {
             var segment: any = {};
             segment.city = placeInfo.destinationPlace;
@@ -194,6 +196,7 @@ export default class ApiTravelBudget {
         await cache.write(key, JSON.stringify(obj));
         return _id;
 
+
         function getSubsidyBudget(destination) {
             let {subsidy, leaveDate, goBackDate, reason} = destination;
             let budget: any = null
@@ -286,44 +289,4 @@ export default class ApiTravelBudget {
                 .catch(next)
         })
     }
-}
-
-function getTimezoneStr(seconds) {
-    const HOUR = 60 * 60
-    const MINUTE = 60;
-    let hours = seconds / HOUR
-    if (hours < 0) {
-        hours = Math.ceil(hours);
-    } else {
-        hours = Math.floor(hours);
-    }
-    let minute = (seconds - hours * HOUR) / MINUTE;
-    if (minute < 0) {
-        minute = Math.ceil(minute)
-    } else {
-        minute = Math.floor(minute)
-    }
-    let ret = 'GMT';
-    if (hours < 0) {
-        ret += '-'
-        if (hours > -10) {
-            ret += '0'
-        }
-        hours = -hours;
-        ret += hours;
-    } else {
-        ret += '+';
-        if (hours < 10) {
-            ret += '0'
-        }
-        ret += hours;
-    }
-    if (minute < 0) {
-        minute = -minute;
-    }
-    if (minute < 10) {
-        ret += '0'
-    }
-    ret += minute;
-    return " "+ret;
 }

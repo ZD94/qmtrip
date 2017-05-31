@@ -73,5 +73,5 @@ initModels({
     agencyOperateLog:createServerService<AgencyOperateLog>(AgencyOperateLog),
     tripFuelAddPackage: createServerService<TripFuelAddPackage>(TripFuelAddPackage),
     tripBasicPackage: createServerService<TripBasicPackage>(TripBasicPackage),
-    errorLog: createServerService<ErrorLog>(ErrorLog),
+    errorLog: createServerService<ErrorLog>(ErrorLog)
 });

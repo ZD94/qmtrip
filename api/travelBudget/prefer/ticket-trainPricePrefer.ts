@@ -82,7 +82,7 @@ class TrainPricePrefer extends AbstractPrefer<IFinalTicket> {
                 if(this.type && this.type == "line"){
                     a = (v.price - minPrice)/(targetPrice - minPrice);
                 }
-                let addScore = self.score * a;
+                let addScore = Math.floor(self.score * a);
                 v.score += addScore;
                 v.reasons.push(`火车价格偏好以下价格 ${addScore}`)
             }else if(v.price > targetPrice){
@@ -90,10 +90,10 @@ class TrainPricePrefer extends AbstractPrefer<IFinalTicket> {
                 if(this.type && this.type == "line"){
                     a = (maxPrice - v.price)/(maxPrice - targetPrice);
                 }
-                let addScore = self.score * a;
+                let addScore = Math.floor(self.score * a);
                 v.score += addScore;
                 v.reasons.push(`火车价格偏好以上价格 ${addScore}`)
-            }else if(v.price = targetPrice){
+            }else if(v.price == targetPrice){
                 let addScore = self.score;
                 v.score += addScore;
                 v.reasons.push(`火车等于价格偏好的价格 ${addScore}`)

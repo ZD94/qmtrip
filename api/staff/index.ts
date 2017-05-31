@@ -34,8 +34,6 @@ if(staffAllCols.indexOf("departmentIds") < 0){
     staffAllCols.push("departmentIds");
 }
 
-const goInvitedLink = config.host + "/index.html#/login/invited-staff-one";
-
 class StaffModule{
     /**
      * 创建员工
@@ -216,7 +214,11 @@ class StaffModule{
         let id = params.id;
 
         await API.auth.checkEmailAndMobile({mobile: mobile});
-        var account = await API.auth.getPrivateInfo({id: id});
+        let staff = await Models.staff.get(id);
+        if (!staff) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+        var account = await API.auth.getPrivateInfo({id: staff.accountId});
 
         if (!account) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
@@ -411,21 +413,20 @@ class StaffModule{
             return API.auth.sendResetPwdEmail({companyName: updateStaff.company.name, email: updateStaff.email, type: 1, isFirstSet: true});
         }else{
 
-            let tp = await Models.travelPolicy.get(updateStaff["travelPolicyId"]);
-
-            let vals  = {
+            /*let vals  = {
                 noticeType: ENoticeType.SYSTEM_NOTICE,
                 appMessageUrl: '#/staff/staff-info',
                 detailUrl: config.host + '/#/staff/staff-info',
                 admin: staff,
-                staff: updateStaff
+                staff: updateStaff,
+                updateParams: params
             }
             //发送通知
             await API.notify.submitNotify({
                 key: 'staff_update',
                 values: vals,
                 userId: updateStaff.id
-            });
+            });*/
 
         }
         return updateStaff;
@@ -963,16 +964,14 @@ class StaffModule{
             q2.createdAt = {$gte: start_time, $lte: end_time};
             q3.createdAt = {$lte: end_time};
             q4.createdAt = {$lte: end_time};
-            let ret = await Promise.all([
+
+            let a: any, b: any, c: any, d:any;
+            [a, b, c, d] = await Promise.all([
                     DB.models.PointChange.sum('points', {where: q1}),
                     DB.models.PointChange.sum('points', {where: q2}),
                     DB.models.PointChange.sum('points', {where: q3}),
                     DB.models.PointChange.sum('points', {where: q4})
                 ]);
-            let a: number = ret['a']
-            let b: number = ret['b']
-            let c: number = ret['c']
-            let d: number = ret['d'];
             a = a || 0;
             b = b || 0;
             c = c || 0;
@@ -995,7 +994,7 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    static async getStaffPointsChangeByMonth(params) {
+    static async getStaffPointsChangeByMonth(params) :Promise<any>{
         let { accountId } = Zone.current.get("session");
         let staff = await DB.models.Staff.findById(accountId)
         params.companyId = staff.companyId;
@@ -1062,7 +1061,7 @@ class StaffModule{
      * @returns {*}
      */
     @requireParams(['companyId'], ['startTime', 'endTime'])
-    static async statisticStaffsByTime(params) : Promise<any> {
+    static async statisticStaffsByTime(params) :Promise<any> {
         var companyId = params.companyId;
         var start = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
         var end = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
@@ -1269,7 +1268,7 @@ class StaffModule{
     }
 
     @clientExport
-    static async statStaffPoints(params){
+    static async statStaffPoints(params) :Promise<any> {
         let { accountId } = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
 
@@ -1418,6 +1417,8 @@ class StaffModule{
     /*************************************邀请链接begin***************************************/
     @clientExport
     static async createInvitedLink(params): Promise<InvitedLink>{
+        let host = params.url || config.host;
+        let goInvitedLink = host + "#/login/invited-staff-one";
         var staff = await Staff.getCurrent();
         var invitedLink = InvitedLink.create();
         invitedLink.staff = staff;

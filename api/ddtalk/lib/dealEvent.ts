@@ -177,6 +177,17 @@ export async function tmpAuthCode(msg , req , res , next) {
         staff.pwd = md5(DEFAULT_PWD);
         staff.company = company;
         staff = await staff.save();
+        let defaultDepart = await company.getDefaultDepartment();
+        if(defaultDepart){
+            let staffDepart = Models.staffDepartment.create({
+                staffId : staff.id,
+                departmentId : defaultDepart.id
+            });
+
+            staffDepart = await staffDepart.save();
+        }
+
+        
         // console.log("staff  owner staff created.");
 
         //更新公司信息 ，保存创建者id
@@ -276,7 +287,7 @@ interface getISVandCorp {
 }
 
 //提供isv , corp 的api对象
-async function getISVandCorp(corp : DDTalkCorp): Promise<getISVandCorp> {
+export async function getISVandCorp(corp : DDTalkCorp): Promise<any> {
     let corpId = corp.corpId;
     let tokenObj = await _getSuiteToken();
     let suiteToken = tokenObj['suite_access_token']
@@ -347,6 +358,7 @@ export async function dealCompanyOrganization(corpApi: CorpApi, corp : DDTalkCor
  */
 
 export async function addCompanyStaffsByDepartment(corpApi: CorpApi, DdDepartmentId: any, corp) {
+    console.log("enter in addCompanyStaffsByDepartment");
     let dingUsers = await corpApi.getUserListByDepartment(DdDepartmentId);
     let staff_ids = [] , localDepart = [];
     let DDcrud = new ddCrud(corp.corpId);

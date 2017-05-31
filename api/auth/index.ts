@@ -554,7 +554,7 @@ export default class ApiAuth {
             Result.isRegister = true;
             Result.mobile = mobile;
             let staffs = await Models.staff.find({where: {accountId : account.id}});
-            Result.staff = staffs[0];
+            Result.staff = staffs[0].toJSON();
         }else{
             Result.mobile = mobile;
         }
@@ -610,7 +610,10 @@ export default class ApiAuth {
 
         let staffed = await Models.staff.find({where:{ companyId: companyId, accountId: account.id }});
         if(staffed && staffed.total > 0){
-            throw L.ERR.MOBILE_HAS_REGISTRY();
+            return {
+                "inCompany" : true,
+                "company"   : staffed[0].company
+            }
         }
 
         let staff = Staff.create({
@@ -621,7 +624,17 @@ export default class ApiAuth {
             accountId: account.id
         });
         staff.company = company;
-        await staff.save();
+        staff = await staff.save();
+        let defaultDepart = await company.getDefaultDepartment();
+        if(defaultDepart){
+            let staffDepart = Models.staffDepartment.create({
+                staffId : staff.id,
+                departmentId : defaultDepart.id
+            });
+
+            staffDepart = await staffDepart.save();
+        }
+
         return staff.company;
     }
 

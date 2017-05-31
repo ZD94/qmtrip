@@ -23,69 +23,47 @@
       }
     },
     {
-      "name": "planePricePrefer",
+      "name": "price",
       "options": {
         "type": "square",
         "score": 10000,
-        "cabins": [
+        "level": [
           2
         ],
         "percent": 0.05
       }
     },
     {
-      "name": "planePricePrefer",
+      "name": "price",
       "options": {
         "type": "square",
         "score": 10000,
-        "cabins": [
+        "level": [
           5
         ],
         "percent": 0.05
       }
     },
     {
-      "name": "planePricePrefer",
+      "name": "price",
       "options": {
         "type": "square",
         "score": 10000,
-        "cabins": [
+        "level": [
           3
         ],
         "percent": 0.05
       }
     },
     {
-      "name": "planePricePrefer",
+      "name": "price",
       "options": {
         "type": "square",
         "score": 10000,
-        "cabins": [
+        "level": [
           4
         ],
         "percent": 0.05
-      }
-    },
-    {
-      "name": "cabin",
-      "options": {
-        "expectTrainCabins": "<%=local.expectTrainCabins%>",
-        "expectFlightCabins": "<%=local.expectFlightCabins%>",
-        "score": 100000
-      }
-    },
-    {
-      "name": "earliestGoBackTimePrefer",
-      "options": {
-        "score": 100000,
-        "earliestGoBackTime": "<%=local.earliestLeaveDateTime%>"
-      }
-    },
-    {
-      "name": "latestArrivalTimePrefer",
-      "options": {
-        "score": 100000,
-        "latestArrivalTime": "<%=local.latestArrivalDateTime%>"
       }
     }
   ],
@@ -99,69 +77,47 @@
       }
     },
     {
-      "name": "planePricePrefer",
+      "name": "price",
       "options": {
         "type": "square",
         "score": 10000,
-        "cabins": [
+        "level": [
           2
         ],
         "percent": 0
       }
     },
     {
-      "name": "planePricePrefer",
+      "name": "price",
       "options": {
         "type": "square",
         "score": 10000,
-        "cabins": [
+        "level": [
           5
         ],
         "percent": 0
       }
     },
     {
-      "name": "planePricePrefer",
+      "name": "price",
       "options": {
         "type": "square",
         "score": 10000,
-        "cabins": [
+        "level": [
           3
         ],
         "percent": 0
       }
     },
     {
-      "name": "planePricePrefer",
+      "name": "price",
       "options": {
         "type": "square",
         "score": 10000,
-        "cabins": [
+        "level": [
           4
         ],
         "percent": 0
-      }
-    },
-    {
-      "name": "cabin",
-      "options": {
-        "expectTrainCabins": "<%=local.expectTrainCabins%>",
-        "expectFlightCabins": "<%=local.expectFlightCabins%>",
-        "score": 100000
-      }
-    },
-    {
-      "name": "earliestGoBackTimePrefer",
-      "options": {
-        "score": 100000,
-        "earliestGoBackTime": "<%=local.earliestLeaveDateTime%>"
-      }
-    },
-    {
-      "name": "latestArrivalTimePrefer",
-      "options": {
-        "score": 100000,
-        "latestArrivalTime": "<%=local.latestArrivalDateTime%>"
       }
     },
     {
@@ -186,33 +142,69 @@
       }
     },
     {
-      "name":"starMatch",
+      "name": "price",
       "options": {
-        "expectStar": "<%=local.star%>",
-        "score": 10000
+        "score": 20000,
+        "percent": 0.05,
+        "level": [2]
       }
     },
     {
       "name": "price",
       "options": {
-        "score": 2000,
-        "percent": 0.05
+        "score": 20000,
+        "percent": 0.05,
+        "level": [3]
+      }
+    },
+    {
+      "name": "price",
+      "options": {
+        "score": 20000,
+        "percent": 0.05,
+        "level": [4]
+      }
+    },
+    {
+      "name": "price",
+      "options": {
+        "score": 20000,
+        "percent": 0.05,
+        "level": [5]
       }
     }
   ],
   "abroadHotel": [
     {
-      "name":"starMatch",
+      "name": "price",
       "options": {
-        "expectStar": "<%=local.star%>",
-        "score": 10000
+        "score": 20000,
+        "percent": 0,
+        "level": [2]
       }
     },
     {
       "name": "price",
       "options": {
-        "score": 2000,
-        "percent": 0
+        "score": 20000,
+        "percent": 0,
+        "level": [3]
+      }
+    },
+    {
+      "name": "price",
+      "options": {
+        "score": 20000,
+        "percent": 0,
+        "level": [4]
+      }
+    },
+    {
+      "name": "price",
+      "options": {
+        "score": 20000,
+        "percent": 0,
+        "level": [5]
       }
     }
   ]
