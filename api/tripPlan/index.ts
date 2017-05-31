@@ -1472,7 +1472,7 @@ class TripPlanModule {
                     "type": '补助',
                     "date": moment(v1.startDateTime).format('YYYY.MM.DD'),
                     "invoiceInfo": "补助费",
-                    quantity: 0,
+                    quantity: tripDetailInvoices.length,
                     money: v1.personalExpenditure,
                     remark: '补助费'
                 }
