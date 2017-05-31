@@ -624,7 +624,17 @@ export default class ApiAuth {
             accountId: account.id
         });
         staff.company = company;
-        await staff.save();
+        staff = await staff.save();
+        let defaultDepart = await company.getDefaultDepartment();
+        if(defaultDepart){
+            let staffDepart = Models.staffDepartment.create({
+                staffId : staff.id,
+                departmentId : defaultDepart.id
+            });
+
+            staffDepart = await staffDepart.save();
+        }
+
         return staff.company;
     }
 

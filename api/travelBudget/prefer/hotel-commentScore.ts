@@ -17,7 +17,7 @@ class RemarkPrefer extends AbstractPrefer<IFinalHotel> {
     async markScoreProcess(hotels: IFinalHotel[]) : Promise<IFinalHotel[]> {
         let self = this;
         if(!hotels || !hotels.length){
-            return;
+            return hotels;
         }
         let cscore:any;
         hotels = hotels.map( (v) => {
