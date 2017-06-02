@@ -19,7 +19,8 @@
     "url": "${JL_APP_REDIS}"
   },
   "hosts": {
-    "main":{"addr":"api.l.jingli365.com", "port":4101, "www":"https://${{hosts.main.addr}}"}
+    "main":{"addr":"api.l.jingli365.com", "port":4101, "www":"https://${{hosts.main.addr}}"},
+    "budget":{"addr": "l.jingli365.com", "port": 14103}
   },
   "api": {
     "postgres": "${{postgres.url}}",
@@ -27,6 +28,10 @@
       {
         "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
         "modules": "*"
+      },
+      {
+        "connect": {"host": "${{hosts.budget.addr}}", "port": "${{hosts.budget.port}}"},
+        "modules": ["budget"]
       }
     ]
   },
