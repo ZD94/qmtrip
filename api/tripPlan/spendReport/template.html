@@ -48,12 +48,7 @@
 			border-left: none;
 			border-right: none;
 		}
-		.content table.first-table tr td:first-child{
-			border-left: none;
-		}
-		.content table.first-table tr td:last-child{
-			border-right: none;
-		}
+
 		.content table.first-table tr td span:nth-child(1) {
 			float: left;
 		}
@@ -198,17 +193,22 @@
 <body>
 <div class="content">
 	<h1>差旅费用报销单</h1>
-	<p class="date">日期：<%=data.createAt%></p>
+	<div class="row">
+		<div class="col-xs-8" style="text-align: left;">
+			<span>提交人：</span><span><%=data.submitter%></span>
+			<span>部门：</span><span><%=data.department%></span>
+		</div>
+		<div class="col-xs-4" style="text-align: right;">
+			<span>日期:<%=data.createAt%></span>
+		</div>
+	</div>
 	<table class="first-table table table-bordered">
 		<tr>
 			<td>
-				<span>提交人</span><span><%=data.submitter%></span>
+				<span>总预算</span><span><%=data.budgetMoney.toFixed(0)%></span>
 			</td>
-			<td>
-				<span>部门</span><span><%=data.department%></span>
-			</td>
-			<td>
-				<span>金额</span><span><%=data.totalMoney%></span>
+			<td colspan="2">
+				<span>总支出</span><span><%=data.totalMoney%></span>
 			</td>
 		</tr>
 		<tr>
@@ -220,7 +220,13 @@
 					<span><%=data.roundLine%></span>
 			</td>
 			<td>
-				<span>项目编号/事由</span><span><%=data.reason%></span>
+				<span>项目名称</span><span><%=data.reason%></span>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3">
+				<span>出差人</span>
+				<span><%=data.submitter%></span>
 			</td>
 		</tr>
 	</table>
@@ -271,9 +277,9 @@
 			%>		
 			<tr style="border-top:1px dashed #000000">
 				<td><%=invoice.type%></td>
-				<td><%=(invoice.type=== '补助' ? '-': invoice.date)%></td>
+				<td><%=invoice.date%></td>
 				<td><%=invoice.invoiceInfo%></td>
-				<td><%=(invoice.type=== '补助' ? '-': invoice.quantity+'张')%></td>
+				<td><%=invoice.quantity+'张'%></td>
 				<td><%=invoice.money%></td>
 				<td><%=invoice.remark%></td>
 			</tr>
