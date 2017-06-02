@@ -13,12 +13,7 @@ const moment = require('moment');
 const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
-
-import {
-    TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
-} from "./strategy/index";
 import {Place} from "_types/place";
-const companyDefaultPrefer = require("./prefer/default-prefer/default-company-prefer.json");
 
 export default class ApiTravelBudget {
 
@@ -36,7 +31,7 @@ export default class ApiTravelBudget {
 
     @clientExport
     static getDefaultPrefer() {
-        return companyDefaultPrefer;
+        // return {};
     }
 
 
@@ -276,16 +271,16 @@ export default class ApiTravelBudget {
                 query: JSON.parse(query),
             }
 
-            let factory = (type == 1) ? TrafficBudgetStrategyFactory : HotelBudgetStrategyFactory;
-            factory.getStrategy(qs, {isRecord: false})
-                .then( (strategy) => {
-                    return strategy.getResult(JSON.parse(originData), true);
-                })
-                .then( (result) => {
-                    res.header('Access-Control-Allow-Origin', '*');
-                    res.json(result);
-                })
-                .catch(next)
+            // let factory = (type == 1) ? TrafficBudgetStrategyFactory : HotelBudgetStrategyFactory;
+            // factory.getStrategy(qs, {isRecord: false})
+            //     .then( (strategy) => {
+            //         return strategy.getResult(JSON.parse(originData), true);
+            //     })
+            //     .then( (result) => {
+            //         res.header('Access-Control-Allow-Origin', '*');
+            //         res.json(result);
+            //     })
+            //     .catch(next)
         })
     }
 }
