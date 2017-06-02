@@ -1170,19 +1170,24 @@ class TripPlanModule {
         let log = TripPlanLog.create({tripPlanId: tripPlan.id, userId: tryObjId(approveUser), remark: `出差审批通过，生成出差记录`});
         await Promise.all([tripPlan.save(), log.save()]);
 
-        let tripDetails: TripDetail[] = [];
+        let tripDetails: any[] = [];
 
-        tripDetails = budgets.map(function (budget) {
+        let ps = budgets.map(async function (budget) :Promise<TripDetail>{
             let tripType = budget.tripType;
             let reason = budget.reason;
             let price = Number(budget.price);
             let detail;
             let data: any = {};
             if(budget.originPlace){
-                if (typeof budget.originPlace == 'string') budget.originPlace = JSON.parse(budget.originPlace);
+
+                if (typeof budget.originPlace == 'string') {
+                    budget.originPlace = await API.place.getCityInfo({cityCode: budget.originPlace});
+                }
             }
             if(budget.destination){
-                if (typeof budget.destination == 'string') budget.destination = JSON.parse(budget.destination);
+                if (typeof budget.destination == 'string') {
+                    budget.destination = await API.place.getCityInfo({cityCode: budget.destination});
+                }
             }
             switch(tripType) {
                 case ETripType.OUT_TRIP:
@@ -1245,8 +1250,9 @@ class TripPlanModule {
             detail.accountId= account.id;
             detail.status = EPlanStatus.WAIT_UPLOAD;
             detail.tripPlanId = tripPlan.id;
-            return detail;
+            return detail as TripDetail;
         });
+        tripDetails = await Promise.all(ps);
 
         if(tripDetails && tripDetails.length > 0){
             let ps = tripDetails.map((d) => {
