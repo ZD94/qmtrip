@@ -13,12 +13,10 @@ const moment = require('moment');
 const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
-import {ITicket, TRAFFIC, TravelBudgeTraffic, TravelBudgetHotel} from "_types/travelbudget";
 
 import {
     TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
 } from "./strategy/index";
-import {DEFAULT_PREFER_CONFIG_TYPE, loadPrefers} from "./prefer";
 import {Place} from "_types/place";
 const companyDefaultPrefer = require("./prefer/default-prefer/default-company-prefer.json");
 
@@ -149,7 +147,7 @@ export default class ApiTravelBudget {
             let placeInfo = destinationPlacesInfo[i];
 
             //交通
-            let traffic = _budgets[city].traffic;
+            let traffic = _budgets[i].traffic;
             if (traffic && traffic.length) {
                 let budget = traffic[0];
                 budget.cabinClass = budget.cabin;
@@ -160,7 +158,7 @@ export default class ApiTravelBudget {
             }
 
             //住宿
-            let hotel = _budgets[city].hotel;
+            let hotel = _budgets[i].hotel;
             if (hotel && hotel.length) {
                 let budget = hotel[0];
                 let cityObj = await API.place.getCityInfo({cityCode: city});
@@ -182,6 +180,7 @@ export default class ApiTravelBudget {
             }
 
             let budget = await getSubsidyBudget(placeInfo);
+            budget.city = city;
             if (budget) {
                 budgets.push(budget);
             }
