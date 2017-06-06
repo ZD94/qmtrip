@@ -395,8 +395,8 @@ export var condition = {
                     isHasPermit =
                         staff.roleId == EStaffRole.ADMIN
                         || staff.roleId == EStaffRole.OWNER
-                        || tripPlan.accountId == account.id
-                        || tripPlan.auditUser == account.id;
+                        || tripPlan.accountId == staff.id
+                        || tripPlan.auditUser == staff.id;
                     if (isHasPermit) break;
                 }
                 return !!isHasPermit;
