@@ -2,9 +2,12 @@
 variables:
   DOCKER_REG: docker.l.jingli365.com
   DOCKER_NAME: $CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
-  DOCKER_CI_NAME: $DOCKER_REG/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME:$CI_BUILD_REF
-  DOCKER_BRANCH_NAME: $DOCKER_REG/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME:$CI_BUILD_REF_SLUG
+  DOCKER_CI_NAME: $DOCKER_REG/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME:$CI_COMMIT_SHA
+  DOCKER_BRANCH_NAME: $DOCKER_REG/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME:$CI_COMMIT_REF_SLUG
   NPM_CACHE_DIR: /cache/build-cache/npmhash/
+  JL_APP_DAEMON: "true"
+  JL_APP_COMMAND: node server.js >/data/log/nohup.out 2>&1
+  JL_APP_DAEMON_WAIT_INIT: /data/log/nohup.out
 
 stages:
   - build
@@ -15,7 +18,7 @@ image: docker:git
 
 before_script:
   - 'eval $(ssh-agent -s) && echo "$SSH_PRIVATE_KEY">.k && chmod 600 .k && ssh-add .k && rm -f .k'
-  - 'mkdir -p ~/.ssh && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  - 'mkdir -p ~/.ssh && echo -e "Host *\n\tStrictHostKeyChecking no\n\tSendEnv JL_APP_*\n\n" > ~/.ssh/config'
   - mkdir -p /cache/build-cache/.npm && ln -s /cache/build-cache/.npm ~/
 
 build:dist:
@@ -34,8 +37,8 @@ build:dist:
     - echo `npmhash`
     - git submodule update --init --checkout
     - npm --registry https://npm.l.jingli365.com install
-    - gulp tarball -n $CI_BUILD_REF_SLUG
-    - scp $CI_PROJECT_NAME-$CI_BUILD_REF_SLUG-*.tar.gz test@git.l.jingli365.com:~/versions/
+    - gulp tarball -n $CI_COMMIT_REF_SLUG
+    - scp $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-*.tar.gz test@git.l.jingli365.com:~/versions/
 
 build:image:
   stage: docker
@@ -61,7 +64,7 @@ deploy:master:
     - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
     - docker push $DOCKER_BRANCH_NAME
     - echo deploy to https://l.jingli365.com
-    - ssh test@l.jingli365.com /home/test/bin/docker_start.sh $DOCKER_REG $DOCKER_NAME $CI_BUILD_REF_SLUG
+    - ssh test@l.jingli365.com /home/test/bin/docker_start.sh $DOCKER_REG $DOCKER_NAME $CI_COMMIT_REF_SLUG
 
 deploy:test:
   stage: deploy
@@ -76,7 +79,7 @@ deploy:test:
     - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
     - docker push $DOCKER_BRANCH_NAME
     - echo deploy to https://t.jingli365.com
-    - ssh test@l.jingli365.com /home/test/bin/docker_start.sh $DOCKER_REG $DOCKER_NAME $CI_BUILD_REF_SLUG
+    - ssh test@l.jingli365.com /home/test/bin/docker_start.sh $DOCKER_REG $DOCKER_NAME $CI_COMMIT_REF_SLUG
 
 deploy:release:
   stage: deploy
@@ -92,7 +95,7 @@ deploy:release:
     - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
     - docker push $DOCKER_BRANCH_NAME
     - echo deploy to https://j.jingli365.com
-    - ssh test@j.jingli365.com /home/test/bin/docker_start.sh $DOCKER_REG $DOCKER_NAME $CI_BUILD_REF_SLUG
+    - ssh test@j.jingli365.com /home/test/bin/docker_start.sh $DOCKER_REG $DOCKER_NAME $CI_COMMIT_REF_SLUG
 
 deploy:tester:
   stage: deploy
@@ -100,10 +103,15 @@ deploy:tester:
   environment:
     name: tester/$GITLAB_USER_ID
     url: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
+  variables:
+    JL_APP_HOST: //review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
+    JL_APP_REDIS: redis://dockerhost:16379
+    JL_APP_POSTGRES: postgres://test:JingliTest0418@dockerhost:15432/tester_$GITLAB_USER_ID
+    JL_APP_POSTGRES_INITDB: tester_$GITLAB_USER_ID
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
     - docker tag $DOCKER_CI_NAME $DOCKER_REG/$DOCKER_NAME:tester-$GITLAB_USER_ID
     - docker push $DOCKER_REG/$DOCKER_NAME:tester-$GITLAB_USER_ID
     - echo deploy to https://review.l.jingli365.com/tester/$GITLAB_USER_ID
-    - ssh test@l.jingli365.com /home/test/bin/docker_start_user.sh $DOCKER_REG $DOCKER_NAME $GITLAB_USER_ID
+    - ssh test@l.jingli365.com /home/test/bin/docker_start.sh $DOCKER_REG $DOCKER_NAME tester-$GITLAB_USER_ID
