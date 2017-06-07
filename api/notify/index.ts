@@ -246,7 +246,7 @@ async function loadIncludes(): Promise<any>{
     let ret = {};
     await Promise.all(dirs.map(async function(incname){
         let content = await tryReadFile(path.join(__dirname, 'includes', incname));
-        ret[incname] = _.template(content);
+        ret[incname] = _.template(content, {imports: {moment: moment}});
     }));
     return ret;
 }

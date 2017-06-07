@@ -19,6 +19,12 @@
         </td>
     </tr>
     <tr>
+        <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">日期</td>
+        <td style="padding-left: 20px;font-size: 16px;">
+            <%=moment(tripApprove.startAt).format('MM月DD日 HH点') || ''%> 至 <%=moment(tripApprove.backAt).format('MM月DD日 HH点') || ''%>
+        </td>
+    </tr>
+    <tr>
         <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">类型</td>
         <td style="padding-left: 20px;font-size: 16px;"><%=tripApprove.isSpecialApprove ? '特别审批' : '普通申请'%></td>
     </tr>

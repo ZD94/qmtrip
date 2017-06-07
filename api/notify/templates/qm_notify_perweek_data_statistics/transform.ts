@@ -31,7 +31,7 @@ function formatMoney(number, places, symbol) {
     let decimal = ".";
     let negative = number < 0 ? "-" : "";
     let i = parseInt(number = Math.abs(+number || 0).toFixed(places), 10) + "";
-    let j =  i.length > 3 ? parseInt(i) % 3 : 0;
+    let j =  i.length > 3 ? i.length % 3 : 0;
     return symbol + negative + (j ? i.substr(0, j) + thousand : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousand) +
         (places ? decimal + Math.abs(number - parseInt(i)).toFixed(places).slice(2) : "");
 };
