@@ -195,6 +195,15 @@ class ApiPlace {
     }
 
     /**
+     * 按照字母获取对应城市列表
+     * @param
+     * @returns []
+    */
+    static getCitiesByLetter(params: {}) : Promise<Place>{
+        return API.place.getCitiesByLetter(params);
+    }
+
+    /**
      * 获取城市列表根据字符分组
      * @param params
      * @returns {any}
