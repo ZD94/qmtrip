@@ -1754,6 +1754,28 @@ class TripPlanModule {
                     if(typeof approve.query == 'string'){
                         approve.query = JSON.parse(approve.query);
                     }
+                    let query={
+                        originPlace:approve.query.originPlace,
+                        isRoundTrip:approve.query.isRoundTrip,
+                        goBackPlace:approve.query.goBackPlace,
+                        staffId:approve['account_id'],
+                        destinationPlacesInfo:approve.query.destinationPlacesInfo
+                    };
+                    let budgetsInfo = API.travelBudget.getTravelPolicyBudget(query);
+                    let totalBudget = 0;
+                    let budgets = budgetsInfo.budgets;
+                    budgets.forEach((v) => {
+                        if (v.price <= 0) {
+                            totalBudget = -1;
+                            return;
+                        }
+                        totalBudget += Number(v.price);
+                    });
+                    if (totalBudget > approve.budget) {
+                        approve.budget = totalBudget;
+                        approve.budgetInfo = budgets;
+                    }
+
                     let frozenNum = approve.query.frozenNum;
 
                     await approveCompany.beforeApproveTrip({number: frozenNum});
