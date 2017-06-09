@@ -58,6 +58,7 @@ export default class ApiTravelBudget {
         let currentStaff = await Staff.getCurrent();
         let staffId = params['staffId'] || currentStaff.id;
         let staff = await Models.staff.get(staffId);
+
         // console.log("=====>staffList:", params.staffList);
 
         let staffList:string[]=[];
@@ -85,7 +86,9 @@ export default class ApiTravelBudget {
                 travelPolicyList.set(travelPolicy.id,count+1);
             }
         }
+
         // console.log("=====>staffList:", travelPolicyList);
+
         let accountId = currentStaff.accountId;
         let paramsToBudget = [];
         let budgets=[];
@@ -228,6 +231,7 @@ export default class ApiTravelBudget {
         for(let i=0;i<budgets.length;i++){
             budgets[i].price=budgets[i].price*staffCount;
         }
+
         // console.log("====>budgets; ",budgets);
 
         let obj: any = {};
