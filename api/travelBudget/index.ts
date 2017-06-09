@@ -23,11 +23,11 @@ export default class ApiTravelBudget {
         if(params.accountId){
             staffId = params.accountId;
         }else{
-            let staff = = await Staff.getCurrent();
+            let staff = await Staff.getCurrent();
             staffId = staff.id;
         }
 
-        let key = `budgets:${id}:${params.id}`;
+        let key = `budgets:${staffId}:${params.id}`;
         return cache.read(key);
     }
 
