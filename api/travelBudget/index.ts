@@ -19,13 +19,8 @@ export default class ApiTravelBudget {
 
     @clientExport
     static async getBudgetInfo(params: {id: string, accountId? : string}) {
-        let accountId = params.accountId;
-        if (!accountId) {
-            let staff = await Staff.getCurrent();
-            accountId = staff.id;
-        }
-
-        let key = `budgets:${accountId}:${params.id}`;
+        let staff = await Staff.getCurrent();
+        let key = `budgets:${staff.id}:${params.id}`;
         return cache.read(key);
     }
 
@@ -63,7 +58,7 @@ export default class ApiTravelBudget {
         let currentStaff = await Staff.getCurrent();
         let staffId = params['staffId'] || currentStaff.id;
         let staff = await Models.staff.get(staffId);
-        console.log("=====>staffList:", params.staffList);
+        // console.log("=====>staffList:", params.staffList);
 
         let staffList:string[]=[];
         let staffCount:number;  //暂时按照提交人的差旅标准计算，预算乘以相应的人数
@@ -72,7 +67,7 @@ export default class ApiTravelBudget {
             staffCount=1;
         }else{
             staffCount=params.staffList.length;
-            //staffList=params.staffList;
+            // staffList=params.staffList;
             staffList.push(staffId);
         }
         let travelPolicyList=new Map<string,number>();
@@ -90,7 +85,7 @@ export default class ApiTravelBudget {
                 travelPolicyList.set(travelPolicy.id,count+1);
             }
         }
-        console.log("=====>staffList:", travelPolicyList);
+        // console.log("=====>staffList:", travelPolicyList);
         let accountId = currentStaff.accountId;
         let paramsToBudget = [];
         let budgets=[];
@@ -204,10 +199,12 @@ export default class ApiTravelBudget {
                 }
 
                 let budget = await getSubsidyBudget(placeInfo);
-                budget.city = city;
-                budget.price=budget.price*count;
-                if (budget) {
-                    multiTripBudgets.push(budget);
+                if(budget){
+                    budget.city = city;
+                    budget.price=budget.price*count;
+                    if (budget) {
+                        multiTripBudgets.push(budget);
+                    }
                 }
             }
 
@@ -231,14 +228,14 @@ export default class ApiTravelBudget {
         for(let i=0;i<budgets.length;i++){
             budgets[i].price=budgets[i].price*staffCount;
         }
-        console.log("====>budgets; ",budgets);
+        // console.log("====>budgets; ",budgets);
 
         let obj: any = {};
         obj.budgets = budgets;
         obj.query = params;
         obj.createAt = Date.now();
         let _id = Date.now() + utils.getRndStr(6);
-        let key = `budgets:${staffId}:${_id}`;
+        let key = `budgets:${staff.id}:${_id}`;
         await cache.write(key, JSON.stringify(obj));
         return _id;
 
