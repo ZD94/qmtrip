@@ -19,8 +19,15 @@ export default class ApiTravelBudget {
 
     @clientExport
     static async getBudgetInfo(params: {id: string, accountId? : string}) {
-        let staff = await Staff.getCurrent();
-        let key = `budgets:${staff.id}:${params.id}`;
+        let staffId;
+        if(params.accountId){
+            staffId = params.accountId;
+        }else{
+            let staff = = await Staff.getCurrent();
+            staffId = staff.id;
+        }
+
+        let key = `budgets:${id}:${params.id}`;
         return cache.read(key);
     }
 
