@@ -86,9 +86,7 @@ export default class ApiTravelBudget {
             policy: 'domestic',
         }
         let staffs = [_staff];
-        let isRoundTrip = params.isRoundTrip;
         let goBackPlace = params['goBackPlace'];
-        let momentDateFormat = "YYYY-MM-DD";
         let segments: any[] = await Promise.all(destinationPlacesInfo.map( async (placeInfo) => {
             var segment: any = {};
             segment.city = placeInfo.destinationPlace;
@@ -131,7 +129,6 @@ export default class ApiTravelBudget {
             fromCity: params.originPlace,
             prefers: staff.company.budgetConfig,
         });
-
 
         let cities = segmentsBudget.cities;
         let _budgets = segmentsBudget.budgets;
@@ -243,44 +240,34 @@ export default class ApiTravelBudget {
         }
 
         app.get("/api/budgets", _auth_middleware, function(req, res, next) {
-            let {p, pz} = req.query;
+            let {p, pz, type} = req.query;
             if (!p || !/^\d+$/.test(p) || p< 1) {
                 p = 1;
             }
             if (!pz || !/^\d+$/.test(pz) || pz < 1) {
-                pz = 20;
+                pz = 5;
             }
 
-            let offset = (p - 1) * pz;
-            Models.travelBudgetLog.find({where: {}, limit: pz, offset: offset, order: 'created_at desc'})
-                .then( (travelBudgetLogs) => {
-                    let datas = travelBudgetLogs.map( (v)=> {
-                        return v.target;
-                    });
+            API.budget.getBudgetItems({page: p, pageSize: pz, type: type,})
+                .then( (data) => {
                     res.header('Access-Control-Allow-Origin', '*');
-                    res.json(datas);
+                    res.json(data);
                 })
                 .catch(next);
         })
 
         app.post('/api/budgets', _auth_middleware, function(req, res, next) {
             let {query, prefers, policy, originData, type} = req.body;
-            let qs = {
-                policy: policy,
-                prefers: JSON.parse(prefers),
-                query: JSON.parse(query),
-            }
+            originData = JSON.parse(originData);
+            query = JSON.parse(query);
+            prefers = JSON.parse(prefers);
 
-            // let factory = (type == 1) ? TrafficBudgetStrategyFactory : HotelBudgetStrategyFactory;
-            // factory.getStrategy(qs, {isRecord: false})
-            //     .then( (strategy) => {
-            //         return strategy.getResult(JSON.parse(originData), true);
-            //     })
-            //     .then( (result) => {
-            //         res.header('Access-Control-Allow-Origin', '*');
-            //         res.json(result);
-            //     })
-            //     .catch(next)
+            return API.budget.debugBudgetItem({query, originData, type, prefers})
+                .then( (result) => {
+                    res.header('Access-Control-Allow-Origin', '*');
+                    res.json(result);
+                })
+                .catch(next);
         })
     }
 }
