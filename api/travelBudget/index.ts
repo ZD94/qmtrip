@@ -68,16 +68,16 @@ export default class ApiTravelBudget {
 
         // console.log("=====>staffList:", params.staffList);
 
-        let staffList:string[]=[];
+        let staffList:string[]=[staffId];  //差率标准现阶段，只按照提交人来计算
         let staffCount:number;  //暂时按照提交人的差旅标准计算，预算乘以相应的人数
-        if(typeof(params.staffList)=='undefined' || !params.staffList || !params.staffList.length){
-            staffList.push(staffId);
-            staffCount=1;
-        }else{
-            staffCount=params.staffList.length;
-            // staffList=params.staffList;
-            staffList.push(staffId);
+        if(!params.staffList){
+            params.staffList = [];
         }
+        if(params.staffList.indexOf(staffId) < 0){
+            params.staffList.push(staffId);
+        }
+        staffCount = params.staffList.length;
+
         let travelPolicyList=new Map<string,number>();
         for(let i =0; i < staffList.length;i++){
             let staff = await Models.staff.get(staffList[i]);
