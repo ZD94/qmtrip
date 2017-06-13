@@ -14,6 +14,7 @@ const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
 import {Place} from "_types/place";
+let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 
 export default class ApiTravelBudget {
 
@@ -185,6 +186,7 @@ export default class ApiTravelBudget {
         let _id = Date.now() + utils.getRndStr(6);
         let key = `budgets:${staffId}:${_id}`;
         await cache.write(key, JSON.stringify(obj));
+        await ApiTravelBudget.sendTripApproveNoticeToSystem({cacheId: _id, staffId: staffId});
         return _id;
 
 
@@ -209,6 +211,32 @@ export default class ApiTravelBudget {
             }
             return budget;
         }
+    }
+
+    static async sendTripApproveNoticeToSystem(params: {cacheId: string, staffId: string}) {
+        let staff = await Staff.getCurrent();
+        let company = staff.company;
+
+        if(company.name != "鲸力智享"){
+
+            try {
+                await Promise.all(systemNoticeEmails.map(async function(s) {
+                    try {
+                        await API.notify.submitNotify({
+                            key: 'qm_notify_system_new_travelbudget',
+                            email: s.email,
+                            values: {cacheId: params.cacheId, name: s.name, staffId: params.staffId}
+                        })
+
+                    } catch(err) {
+                        console.error(err);
+                    }
+                }));
+            } catch(err) {
+                console.error('发送系统通知失败', err)
+            }
+        }
+        return true;
     }
 
     @clientExport
