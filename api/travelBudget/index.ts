@@ -66,19 +66,24 @@ export default class ApiTravelBudget {
 
         let travelPolicy = await staff.getTravelPolicy();
         if (!travelPolicy) {
-            throw new Error(`差旅标准还未设置`);
+            throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
         }
+
         let destinationPlacesInfo = params.destinationPlacesInfo;
         let policies = {
             "domestic": {
                 hotelStar: travelPolicy.hotelLevels,
                 cabin: travelPolicy.planeLevels,
                 trainSeat: travelPolicy.trainLevels,
+                hotelPrefer: travelPolicy.hotelPrefer,
+                trafficPrefer: travelPolicy.trafficPrefer
             },
             "abroad": {
                 hotelStar: travelPolicy.abroadHotelLevels,
                 cabin: travelPolicy.abroadPlaneLevels,
                 trainSeat: travelPolicy.abroadTrainLevels,
+                hotelPrefer: travelPolicy.hotelPrefer,
+                trafficPrefer: travelPolicy.trafficPrefer
             }
         }
         let _staff: any = {
@@ -96,10 +101,12 @@ export default class ApiTravelBudget {
                 s.policy = 'abroad';
                 segment.staffs = [s];
             }
+
             segment.beginTime = placeInfo.latestArrivalDateTime;
             segment.endTime = placeInfo.earliestGoBackDateTime;
             segment.isNeedTraffic = placeInfo.isNeedTraffic;
             segment.isNeedHotel = placeInfo.isNeedHotel;
+
             let businessDistrict = placeInfo.businessDistrict;
             let gps = [];
             if (businessDistrict && /,/g.test(businessDistrict)) {
@@ -127,7 +134,7 @@ export default class ApiTravelBudget {
             segments,
             ret: params.isRoundTrip ? 1: 0,
             fromCity: params.originPlace,
-            prefers: staff.company.budgetConfig,
+            preferSet: staff.company.budgetConfig || {},
         });
 
         let cities = segmentsBudget.cities;
