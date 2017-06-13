@@ -7,6 +7,7 @@ import {MPlaneLevel, MTrainLevel, MHotelLevel} from '_types/travelPolicy';
 
 export = async function transform(values: any): Promise<any>{
     let cityMap = {};
+    let staffMap = {};
     let staff = await Models.staff.get(values.staffId);
     let travelPolicy = await staff.getTravelPolicy();
     values.staff =  staff;
@@ -41,5 +42,18 @@ export = async function transform(values: any): Promise<any>{
     }
     values.destinationPlacesInfo = destinationPlacesInfo;
     values.cityMap = cityMap;
+    if(!query.staffList){
+        query.staffList = [staff.id];
+    }
+
+    let staffIds = query.staffList;
+    if(typeof staffIds == 'string'){
+        staffIds = JSON.parse(staffIds);
+    }
+    await Promise.all(staffIds.map(async function(item, index){
+        let s = await Models.staff.get(item);
+        staffMap[item] = s;
+    }))
+    values.staffMap = staffMap;
     return values;
 }

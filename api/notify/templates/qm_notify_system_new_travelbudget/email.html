@@ -4,7 +4,7 @@
     padding: 16px 0 4px;"
 >
     <%=staff.name || '' %>(<%=staff.company.name || '' %>)
-    在<%=moment().format('YYYY.MM.DD HH:MM') || '' %>生成了新的出差预算：<br/>
+    在<%=moment().format('YYYY-MM-DD HH:MM') || '' %>生成了新的出差预算：<br/>
 </p>
 
 <table width="422" border="1" cellpadding="8" style="
@@ -40,7 +40,14 @@
     </tr>
     <tr>
         <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">出差人</td>
-        <td style="padding-left: 20px;font-size: 16px;"><%=staff.name %></td>
+        <td style="padding-left: 20px;font-size: 16px;">
+            <% _.forEach(query.staffList, function(item, index) { %>
+            <%=staffMap[item].name%>
+            <%if(index != (query.staffList.length - 1)){%>
+            、
+            <%}%>
+            <%}) %>
+        </td>
     </tr>
 </table>
 
@@ -57,12 +64,16 @@
     border-collapse: collapse;" >
     <tr>
         <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">标准</td>
+        <% _.forEach(query.staffList, function(item, index) { %>
         <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">
-            <%=staff.name%>
+            <%=staffMap[item].name%>
         </td>
+        <%}) %>
+
     </tr>
     <tr>
         <td width="80" style="padding-left: 20px;font-size: 16px;">国内飞机</td>
+        <% _.forEach(query.staffList, function(item, index) { %>
         <td style="padding-left: 20px;font-size: 16px;">
             <% _.forEach(travelPolicy.planeLevels, function(item, index) { %>
             <%=MPlaneLevel[item]%>
@@ -71,9 +82,12 @@
             <%}%>
             <%}); %>
         </td>
+        <%}) %>
+
     </tr>
     <tr>
         <td width="80" style="padding-left: 20px;font-size: 16px;">国内火车</td>
+        <% _.forEach(query.staffList, function(item, index) { %>
         <td style="padding-left: 20px;font-size: 16px;">
             <% _.forEach(travelPolicy.trainLevels, function(item, index) { %>
             <%=MTrainLevel[item]%>
@@ -82,9 +96,11 @@
             <%}%>
             <%}); %>
         </td>
+        <%}) %>
     </tr>
     <tr>
         <td width="80" style="padding-left: 20px;font-size: 16px;">国内住宿</td>
+        <% _.forEach(query.staffList, function(item, index) { %>
         <td style="padding-left: 20px;font-size: 16px;">
             <% _.forEach(travelPolicy.hotelLevels, function(item, index) { %>
             <%=MHotelLevel[item]%>
@@ -93,9 +109,11 @@
             <%}%>
             <%}); %>
         </td>
+        <%}) %>
     </tr>
     <tr>
         <td width="80" style="padding-left: 20px;font-size: 16px;">国际交通</td>
+        <% _.forEach(query.staffList, function(item, index) { %>
         <td style="padding-left: 20px;font-size: 16px;">
             <% _.forEach(travelPolicy.abroadPlaneLevels, function(item, index) { %>
             <%=MPlaneLevel[item]%>
@@ -104,9 +122,11 @@
             <%}%>
             <%}); %>
         </td>
+        <%}) %>
     </tr>
     <tr>
         <td width="80" style="padding-left: 20px;font-size: 16px;">国际住宿</td>
+        <% _.forEach(query.staffList, function(item, index) { %>
         <td style="padding-left: 20px;font-size: 16px;">
             <% _.forEach(travelPolicy.abroadHotelLevels, function(item, index) { %>
             <%=MHotelLevel[item]%>
@@ -115,12 +135,15 @@
             <%}%>
             <%}); %>
         </td>
+        <%}) %>
     </tr>
     <tr>
         <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">明细</td>
+        <% _.forEach(query.staffList, function(item, index) { %>
         <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">
-            <%=staff.name%>
+            <%=staffMap[item].name%>
         </td>
+        <%}) %>
     </tr>
     <% _.forEach(budgets, function(b, index) { %>
     <%if(b.tripType == 0 || b.tripType == 1 || b.tripType == 2){%>
@@ -135,9 +158,11 @@
             (<%=moment(b.checkOutDate).startOf('day').diff(moment(b.checkInDate).startOf('day'), 'days') || 1%>晚)
             <%}%>
         </td>
+        <% _.forEach(query.staffList, function(item, index) { %>
         <td style="padding-left: 20px;font-size: 16px;">
-            <%=b.price %>元
+            <%=(b.price/query.staffList.length).toFixed(2) %>元
         </td>
+        <%}) %>
     </tr>
     <%}%>
     <%}); %>
