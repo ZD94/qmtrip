@@ -83,8 +83,6 @@ export default class ApiTravelBudget {
             throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
         }
 
-        console.log("params====>  ", JSON.stringify(params));
-
         if(!params.staffList){
             params.staffList = [];
         }
