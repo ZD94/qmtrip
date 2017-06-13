@@ -64,16 +64,18 @@
     border-collapse: collapse;" >
     <tr>
         <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">标准</td>
-        <% _.forEach(query.staffList, function(item, index) { %>
         <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">
+            <% _.forEach(query.staffList, function(item, index) { %>
             <%=staffMap[item].name%>
+            <%if(index != (query.staffList.length - 1)){%>
+            、
+            <%}%>
+            <%}) %>
         </td>
-        <%}) %>
 
     </tr>
     <tr>
         <td width="80" style="padding-left: 20px;font-size: 16px;">国内飞机</td>
-        <% _.forEach(query.staffList, function(item, index) { %>
         <td style="padding-left: 20px;font-size: 16px;">
             <% _.forEach(travelPolicy.planeLevels, function(item, index) { %>
             <%=MPlaneLevel[item]%>
@@ -82,12 +84,10 @@
             <%}%>
             <%}); %>
         </td>
-        <%}) %>
 
     </tr>
     <tr>
         <td width="80" style="padding-left: 20px;font-size: 16px;">国内火车</td>
-        <% _.forEach(query.staffList, function(item, index) { %>
         <td style="padding-left: 20px;font-size: 16px;">
             <% _.forEach(travelPolicy.trainLevels, function(item, index) { %>
             <%=MTrainLevel[item]%>
@@ -96,11 +96,9 @@
             <%}%>
             <%}); %>
         </td>
-        <%}) %>
     </tr>
     <tr>
         <td width="80" style="padding-left: 20px;font-size: 16px;">国内住宿</td>
-        <% _.forEach(query.staffList, function(item, index) { %>
         <td style="padding-left: 20px;font-size: 16px;">
             <% _.forEach(travelPolicy.hotelLevels, function(item, index) { %>
             <%=MHotelLevel[item]%>
@@ -109,11 +107,9 @@
             <%}%>
             <%}); %>
         </td>
-        <%}) %>
     </tr>
     <tr>
         <td width="80" style="padding-left: 20px;font-size: 16px;">国际交通</td>
-        <% _.forEach(query.staffList, function(item, index) { %>
         <td style="padding-left: 20px;font-size: 16px;">
             <% _.forEach(travelPolicy.abroadPlaneLevels, function(item, index) { %>
             <%=MPlaneLevel[item]%>
@@ -122,11 +118,9 @@
             <%}%>
             <%}); %>
         </td>
-        <%}) %>
     </tr>
     <tr>
         <td width="80" style="padding-left: 20px;font-size: 16px;">国际住宿</td>
-        <% _.forEach(query.staffList, function(item, index) { %>
         <td style="padding-left: 20px;font-size: 16px;">
             <% _.forEach(travelPolicy.abroadHotelLevels, function(item, index) { %>
             <%=MHotelLevel[item]%>
@@ -135,15 +129,17 @@
             <%}%>
             <%}); %>
         </td>
-        <%}) %>
     </tr>
     <tr>
         <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">明细</td>
-        <% _.forEach(query.staffList, function(item, index) { %>
         <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">
+            <% _.forEach(query.staffList, function(item, index) { %>
             <%=staffMap[item].name%>
+            <%if(index != (query.staffList.length - 1)){%>
+            、
+            <%}%>
+            <%}) %>
         </td>
-        <%}) %>
     </tr>
     <% _.forEach(budgets, function(b, index) { %>
     <%if(b.tripType == 0 || b.tripType == 1 || b.tripType == 2){%>
@@ -158,11 +154,9 @@
             (<%=moment(b.checkOutDate).startOf('day').diff(moment(b.checkInDate).startOf('day'), 'days') || 1%>晚)
             <%}%>
         </td>
-        <% _.forEach(query.staffList, function(item, index) { %>
         <td style="padding-left: 20px;font-size: 16px;">
-            <%=(b.price/query.staffList.length).toFixed(2) %>元
+            <%=b.price %>元
         </td>
-        <%}) %>
     </tr>
     <%}%>
     <%}); %>
