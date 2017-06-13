@@ -5,7 +5,7 @@ import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from '
 import { Company, MoneyChange, Supplier, TripPlanNumChange } from '_types/company';
 import { Department, StaffDepartment } from '_types/department';
 import { PromoCode } from '_types/promoCode';
-import { TravelPolicy, SubsidyTemplate } from '_types/travelPolicy';
+import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion} from '_types/travelPolicy';
 import { AccordHotel } from '_types/accordHotel';
 import { Notice, NoticeAccount } from '_types/notice';
 import { Agency, AgencyUser } from '_types/agency';
@@ -73,5 +73,7 @@ initModels({
     agencyOperateLog:createServerService<AgencyOperateLog>(AgencyOperateLog),
     tripFuelAddPackage: createServerService<TripFuelAddPackage>(TripFuelAddPackage),
     tripBasicPackage: createServerService<TripBasicPackage>(TripBasicPackage),
-    errorLog: createServerService<ErrorLog>(ErrorLog)
+    errorLog: createServerService<ErrorLog>(ErrorLog),
+
+    travelPolicyRegion: createServerService<TravelPolicyRegion>(TravelPolicyRegion)
 });
