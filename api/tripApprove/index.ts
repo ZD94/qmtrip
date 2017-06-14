@@ -128,7 +128,9 @@ class TripApproveModule {
         let nextApprove = params.nextApprove || false;
 
         let approve_url = `${config.host}/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
-        let appMessageUrl = `#/trip-approval/detail?approveId=${tripApprove.id}`;
+        let finalUrl = `#/trip-approval/detail?approveId=${tripApprove.id}`;
+        finalUrl = encodeURIComponent(finalUrl);
+        let appMessageUrl = `#/judge-permission/index?id=${tripApprove.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
         let shortUrl = approve_url;
         try {
             shortUrl = await API.wechat.shorturl({longurl: approve_url});
@@ -330,7 +332,9 @@ class TripApproveModule {
             let self_url;
             let appMessageUrl;
             self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
-            appMessageUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
+            let finalUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
+            finalUrl = encodeURIComponent(finalUrl);
+            appMessageUrl = `#/judge-permission/index?id=${tripApprove.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
             let user = tripApprove.account;
             if(!user) user = await Models.staff.get(tripApprove['accountId']);
             try {

@@ -35,7 +35,8 @@ class NoticeModule{
             noticeAccount.noticeId = result.id;
             noticeAccount.accountId = params.staffId;
             await noticeAccount.save();
-            var jpushId = await API.auth.getJpushIdByAccount({accountId: params.staffId});
+            let staff = await Models.staff.get(params.staffId);
+            var jpushId = await API.auth.getJpushIdByAccount({accountId: staff.accountId});
             if(result.content.startsWith("skipLink@")) {
                 link = result.content.substring(9);
             }
