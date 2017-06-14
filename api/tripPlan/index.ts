@@ -1563,6 +1563,7 @@ class TripPlanModule {
 
         var data = {
             "submitter": staff.name,  //提交人
+            "staffList": tripPlan.staffList.join(","),
             "department": departmentsStr,  //部门
             "budgetMoney": tripPlan.budget || 0, //预算总金额
             "totalMoney": _personalExpenditure || 0,  //实际花费
