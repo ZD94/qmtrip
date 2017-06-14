@@ -15,6 +15,8 @@ const utils = require("common/utils");
 import _ = require("lodash");
 import {Place} from "_types/place";
 import {DefaultRegion} from "_types/travelPolicy"
+let systemNoticeEmails = require('@jingli/config').system_notice_emails;
+
 
 export default class ApiTravelBudget {
 
@@ -67,50 +69,40 @@ export default class ApiTravelBudget {
 
         let travelPolicy = await staff.getTravelPolicy();
         if (!travelPolicy) {
-            throw new Error(`差旅标准还未设置`);
+            throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
         }
-        let planeLevels:number[];
-        let trainLevels:number[];
-        let hotelLevels:number[];
-        let abroadplaneLevels:number[];
-        let abroadtrainLevels:number[];
-        let abroadhotelLevels:number[];
+        let domestic:any = {};
+        let abroad:any = {};
 
         let travelPolicyRegions = await travelPolicy.getTravelPolicyRegions();
         travelPolicyRegions.map(async function(item){
             if(!(item.regionId == DefaultRegion.abroad)){
-                abroadplaneLevels = item.planeLevels ;
-                abroadtrainLevels = item.trainLevels;
-                abroadhotelLevels = item.hotelLevels ;
+                abroad.cabin = item.planeLevels ;
+                abroad.trainSeat = item.trainLevels;
+                abroad.hotelStar = item.hotelLevels ;
+                abroad.hotelPrefer = item.hotelPrefer;
+                abroad.trafficPrefer = item.trafficPrefer;
             }
             if(item.regionId == DefaultRegion.domestic){
-                planeLevels = item.planeLevels;
-                trainLevels = item.trainLevels;
-                hotelLevels = item.hotelLevels ;
+                domestic.cabin = item.planeLevels;
+                domestic.trainSeat = item.trainLevels;
+                domestic.hotelStar = item.hotelLevels ;
+                domestic.hotelPrefer = item.hotelPrefer;
+                domestic.trafficPrefer = item.trafficPrefer;
             }
         });
 
         let destinationPlacesInfo = params.destinationPlacesInfo;
         let policies = {
-            "domestic": {
-                hotelStar: planeLevels,
-                cabin: planeLevels,
-                trainSeat: trainLevels
-            },
-            "abroad": {
-                hotelStar: abroadhotelLevels,
-                cabin: abroadplaneLevels,
-                trainSeat: abroadtrainLevels
-            }
+            "domestic": domestic,
+            "abroad": abroad
         }
         let _staff: any = {
             gender: staff.sex,
             policy: 'domestic',
         }
         let staffs = [_staff];
-        let isRoundTrip = params.isRoundTrip;
         let goBackPlace = params['goBackPlace'];
-        let momentDateFormat = "YYYY-MM-DD";
         let segments: any[] = await Promise.all(destinationPlacesInfo.map( async (placeInfo) => {
             var segment: any = {};
             segment.city = placeInfo.destinationPlace;
@@ -120,10 +112,12 @@ export default class ApiTravelBudget {
                 s.policy = 'abroad';
                 segment.staffs = [s];
             }
+
             segment.beginTime = placeInfo.latestArrivalDateTime;
             segment.endTime = placeInfo.earliestGoBackDateTime;
             segment.isNeedTraffic = placeInfo.isNeedTraffic;
             segment.isNeedHotel = placeInfo.isNeedHotel;
+
             let businessDistrict = placeInfo.businessDistrict;
             let gps = [];
             if (businessDistrict && /,/g.test(businessDistrict)) {
@@ -151,9 +145,8 @@ export default class ApiTravelBudget {
             segments,
             ret: params.isRoundTrip ? 1: 0,
             fromCity: params.originPlace,
-            prefers: staff.company.budgetConfig,
+            preferSet: staff.company.budgetConfig || {},
         });
-
 
         let cities = segmentsBudget.cities;
         let _budgets = segmentsBudget.budgets;
@@ -210,6 +203,7 @@ export default class ApiTravelBudget {
         let _id = Date.now() + utils.getRndStr(6);
         let key = `budgets:${staffId}:${_id}`;
         await cache.write(key, JSON.stringify(obj));
+        await ApiTravelBudget.sendTripApproveNoticeToSystem({cacheId: _id, staffId: staffId});
         return _id;
 
 
@@ -234,6 +228,32 @@ export default class ApiTravelBudget {
             }
             return budget;
         }
+    }
+
+    static async sendTripApproveNoticeToSystem(params: {cacheId: string, staffId: string}) {
+        let staff = await Staff.getCurrent();
+        let company = staff.company;
+
+        if(company.name != "鲸力智享"){
+
+            try {
+                await Promise.all(systemNoticeEmails.map(async function(s) {
+                    try {
+                        await API.notify.submitNotify({
+                            key: 'qm_notify_system_new_travelbudget',
+                            email: s.email,
+                            values: {cacheId: params.cacheId, name: s.name, staffId: params.staffId}
+                        })
+
+                    } catch(err) {
+                        console.error(err);
+                    }
+                }));
+            } catch(err) {
+                console.error('发送系统通知失败', err)
+            }
+        }
+        return true;
     }
 
     @clientExport
@@ -265,44 +285,34 @@ export default class ApiTravelBudget {
         }
 
         app.get("/api/budgets", _auth_middleware, function(req, res, next) {
-            let {p, pz} = req.query;
+            let {p, pz, type} = req.query;
             if (!p || !/^\d+$/.test(p) || p< 1) {
                 p = 1;
             }
             if (!pz || !/^\d+$/.test(pz) || pz < 1) {
-                pz = 20;
+                pz = 5;
             }
 
-            let offset = (p - 1) * pz;
-            Models.travelBudgetLog.find({where: {}, limit: pz, offset: offset, order: 'created_at desc'})
-                .then( (travelBudgetLogs) => {
-                    let datas = travelBudgetLogs.map( (v)=> {
-                        return v.target;
-                    });
+            API.budget.getBudgetItems({page: p, pageSize: pz, type: type,})
+                .then( (data) => {
                     res.header('Access-Control-Allow-Origin', '*');
-                    res.json(datas);
+                    res.json(data);
                 })
                 .catch(next);
         })
 
         app.post('/api/budgets', _auth_middleware, function(req, res, next) {
             let {query, prefers, policy, originData, type} = req.body;
-            let qs = {
-                policy: policy,
-                prefers: JSON.parse(prefers),
-                query: JSON.parse(query),
-            }
+            originData = JSON.parse(originData);
+            query = JSON.parse(query);
+            prefers = JSON.parse(prefers);
 
-            // let factory = (type == 1) ? TrafficBudgetStrategyFactory : HotelBudgetStrategyFactory;
-            // factory.getStrategy(qs, {isRecord: false})
-            //     .then( (strategy) => {
-            //         return strategy.getResult(JSON.parse(originData), true);
-            //     })
-            //     .then( (result) => {
-            //         res.header('Access-Control-Allow-Origin', '*');
-            //         res.json(result);
-            //     })
-            //     .catch(next)
+            return API.budget.debugBudgetItem({query, originData, type, prefers})
+                .then( (result) => {
+                    res.header('Access-Control-Allow-Origin', '*');
+                    res.json(result);
+                })
+                .catch(next);
         })
     }
 }
