@@ -1256,22 +1256,19 @@ class TripPlanModule {
         });
         tripDetails = await Promise.all(ps);
 
-        if(tripDetails && tripDetails.length > 0){
-            let nums = tripPlan.staffList.length || 1;
-            let ps = tripDetails.map(async (d) => {
-                let tripDetail = await d.save();
-                //insert into tripDetailStaff
-                for(let staffId of tripPlan.staffList){
-                    let tripDetailStaff = Models.tripDetailStaff.create({
-                        staffId : staffId,
-                        tripDetailId : tripDetail.id,
-                        budget  : tripDetail.budget / nums,
-                        expenditure : (tripDetail.expenditure || 0) / nums
-                    });
-                    tripDetailStaff.save();
-                }
-            });
-            await Promise.all(ps);
+        let nums = tripPlan.staffList.length || 1;
+        for(let tripDetail of tripDetails) {
+            tripDetail = await tripDetail.save();
+            //保存
+            for(let staffId of tripPlan.staffList){
+                let tripDetailStaff = Models.tripDetailStaff.create({
+                    staffId : staffId,
+                    tripDetailId : tripDetail.id,
+                    budget  : tripDetail.budget / nums,
+                    expenditure : (tripDetail.expenditure || 0) / nums
+                });
+                await tripDetailStaff.save();
+            }
         }
 
         let self_url = config.host + '/index.html#/trip/list-detail?tripid=' + approve.id;
@@ -1280,7 +1277,7 @@ class TripPlanModule {
         try {
             self_url = await API.wechat.shorturl({longurl: self_url});
         } catch(err) {
-            console.error(err);
+            logger.error(err);
         }
 
         try {
