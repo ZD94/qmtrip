@@ -44,6 +44,15 @@ async function tryReadFile(filename): Promise<string>{
     return content;
 }
 
+let common_imports = {
+    moment,
+    Math,
+    String,
+    Number,
+    Boolean,
+    Array
+};
+
 class NotifyTemplate{
     sms: Function|undefined;
     wechat: Function|undefined;
@@ -59,27 +68,27 @@ class NotifyTemplate{
     };
     constructor(public name, sms_text, wechat_json, email_title, email_html, email_text, appmessage_title, appmessage_html, appmessage_text){
         if(sms_text)
-            this.sms = _.template(sms_text, {imports: {moment: moment}});
+            this.sms = _.template(sms_text, {imports: common_imports});
         if(wechat_json){
             let templateId = config.notify.templates[name];
             if(templateId)
-                this.wechat = _.template(wechat_json, {imports: {moment: moment}});
+                this.wechat = _.template(wechat_json, {imports: common_imports});
         }
         if(email_title){
             this.email = {};
-            this.email.title = _.template(email_title, {imports: {moment: moment}});
+            this.email.title = _.template(email_title, {imports: common_imports});
             if(email_html)
-                this.email.html = _.template(email_html, {imports: {moment: moment}});
+                this.email.html = _.template(email_html, {imports: common_imports});
             if(email_text)
-                this.email.text = _.template(email_text, {imports: {moment: moment}});
+                this.email.text = _.template(email_text, {imports: common_imports});
         }
         if(appmessage_title){
             this.appmessage = {};
-            this.appmessage.title = _.template(appmessage_title, {imports: {moment: moment}});
+            this.appmessage.title = _.template(appmessage_title, {imports: common_imports});
             if(appmessage_html)
-                this.appmessage.html = _.template(appmessage_html, {imports: {moment: moment}});
+                this.appmessage.html = _.template(appmessage_html, {imports: common_imports});
             if(appmessage_text)
-                this.appmessage.text = _.template(appmessage_text, {imports: {moment: moment}});
+                this.appmessage.text = _.template(appmessage_text, {imports: common_imports});
         }
     }
 
@@ -246,7 +255,7 @@ async function loadIncludes(): Promise<any>{
     let ret = {};
     await Promise.all(dirs.map(async function(incname){
         let content = await tryReadFile(path.join(__dirname, 'includes', incname));
-        ret[incname] = _.template(content, {imports: {moment: moment}});
+        ret[incname] = _.template(content, {imports: common_imports});
     }));
     return ret;
 }
