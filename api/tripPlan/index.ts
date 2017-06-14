@@ -317,8 +317,9 @@ class TripPlanModule {
     @requireParams(['id'])
     @modelNotNull('tripPlan')
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
-    static async commitTripPlan(params: {id: string}): Promise<boolean> {
-        let tripPlan = await Models.tripPlan.get(params.id);
+    static async commitTripPlan(params: {id: string, staffId: string}): Promise<boolean> {
+        let {id, staffId} = params;
+        let tripPlan = await Models.tripPlan.get(id);
         if(tripPlan.status != EPlanStatus.WAIT_COMMIT) {
             throw {code: -2, msg: "该出差计划不能提交，请检查状态"};
         }
@@ -340,14 +341,13 @@ class TripPlanModule {
             await (Promise.all(tripDetailPromise));
         }
         //记录日志
-        let staff = await Staff.getCurrent();
-        let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id, remark: `提交票据`});
+        let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: staffId, remark: `提交票据`});
         await log.save();
         //更改状态
         tripPlan.isCommit = true;
         tripPlan = await tryUpdateTripPlanStatus(tripPlan, EPlanStatus.AUDITING);
         let notifyUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
-        await TripPlanModule.notifyDesignatedAcount({notifyUrl: notifyUrl, staffId:staff.id});
+        await TripPlanModule.notifyDesignatedAcount({notifyUrl: notifyUrl, staffId: staffId});
 
         let default_agency = config.default_agency;
         if(default_agency && default_agency.manager_email) {
@@ -362,11 +362,7 @@ class TripPlanModule {
             if(!user) {
                 user = await Models.staff.get(accounts[0].id);
             }
-            let staff = tripPlan.account;
-            if(!staff) {
-                staff = await Models.staff.get(tripPlan['accountId']);
-            }
-
+            let staff = await Models.staff.get(staffId);
             let company = await tripPlan.getCompany();
             let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
             let appMessageUrl = `#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
@@ -1782,7 +1778,6 @@ class TripPlanModule {
                         approve.budget = totalBudget;
                         approve.budgetInfo = budgets;
                     }
-
 
                     let frozenNum = approve.query.frozenNum;
 
