@@ -21,7 +21,7 @@ export default class ApiTravelBudget {
     @clientExport
     static async getBudgetInfo(params: {id: string, accountId? : string}) {
         let accountId = params.accountId;
-        if (!accountId) {
+        if (!accountId || accountId == 'undefined') {
             let staff = await Staff.getCurrent();
             accountId = staff.id;
         }
@@ -224,7 +224,13 @@ export default class ApiTravelBudget {
     }
 
     static async sendTripApproveNoticeToSystem(params: {cacheId: string, staffId: string}) {
-        let staff = await Staff.getCurrent();
+        let {cacheId, staffId } = params;
+        if(!staffId || staffId == 'undefined'){
+            console.log("sendTripApproveNoticeToSystem executed");
+            let currentStaff = await Staff.getCurrent();
+            staffId = currentStaff.id;
+        }
+        let staff = await Models.staff.get(staffId);
         let company = staff.company;
 
         if(company.name != "鲸力智享"){
@@ -235,7 +241,7 @@ export default class ApiTravelBudget {
                         await API.notify.submitNotify({
                             key: 'qm_notify_system_new_travelbudget',
                             email: s.email,
-                            values: {cacheId: params.cacheId, name: s.name, staffId: params.staffId}
+                            values: {cacheId: cacheId, name: s.name, staffId: staffId}
                         })
 
                     } catch(err) {
