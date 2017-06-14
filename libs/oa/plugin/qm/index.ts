@@ -121,6 +121,7 @@ export class QmPlugin extends AbstractOAPlugin {
         tripApprove.oldBudget = totalBudget;
         tripApprove.status = totalBudget < 0 ? QMEApproveStatus.NO_BUDGET : QMEApproveStatus.WAIT_APPROVE;
 
+        tripApprove.staffList=approve.staffList;
         let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, approveStatus: EApproveResult.WAIT_APPROVE, remark: '提交审批单，等待审批'});
 
         //如果出差计划是待审批状态，增加自动审批时间

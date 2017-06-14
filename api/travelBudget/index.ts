@@ -17,18 +17,32 @@ import {Place} from "_types/place";
 import {DefaultRegion} from "_types/travelPolicy"
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 
+interface SegmentsBudgetResult {
+    id: string;
+    cities: string[];
+    /**
+     * 数组每一项为多人每段预算信息,分为交通与住宿
+     */
+    budgets: Array<{
+        hotel: any[],   //数组每项为每个人的住宿预算
+        traffic: any[]  //数组每项为每个人的交通预算
+    }>
+}
+
 
 export default class ApiTravelBudget {
 
     @clientExport
     static async getBudgetInfo(params: {id: string, accountId? : string}) {
-        let accountId = params.accountId;
-        if (!accountId) {
+        let staffId;
+        if(params.accountId){
+            staffId = params.accountId;
+        }else{
             let staff = await Staff.getCurrent();
-            accountId = staff.id;
+            staffId = staff.id;
         }
 
-        let key = `budgets:${accountId}:${params.id}`;
+        let key = `budgets:${staffId}:${params.id}`;
         return cache.read(key);
     }
 
@@ -92,11 +106,20 @@ export default class ApiTravelBudget {
             }
         });
 
+        if(!params.staffList){
+            params.staffList = [];
+        }
+        if(params.staffList.indexOf(staffId) < 0){
+            params.staffList.push(staffId);
+        }
+        let count = params.staffList.length;
+
         let destinationPlacesInfo = params.destinationPlacesInfo;
         let policies = {
             "domestic": domestic,
             "abroad": abroad
         }
+
         let _staff: any = {
             gender: staff.sex,
             policy: 'domestic',
@@ -139,7 +162,7 @@ export default class ApiTravelBudget {
             return segment;
         }));
 
-        let segmentsBudget = await API.budget.createBudget({
+        let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
             policies,
             staffs,
             segments,
@@ -164,6 +187,7 @@ export default class ApiTravelBudget {
                 budget.originPlace = budget.fromCity;
                 budget.destination = budget.toCity;
                 budget.tripType = ETripType.OUT_TRIP;
+                budget.price=budget.price * count;
                 budgets.push(budget);
             }
 
@@ -175,6 +199,7 @@ export default class ApiTravelBudget {
                 budget.hotelName = placeInfo ? placeInfo.hotelName: null;
                 budget.cityName = cityObj.name;
                 budget.tripType = ETripType.HOTEL;
+                budget.price=budget.price * count;
                 budgets.push(budget);
             }
 
@@ -190,18 +215,22 @@ export default class ApiTravelBudget {
             }
 
             let budget = await getSubsidyBudget(placeInfo);
-            budget.city = city;
-            if (budget) {
-                budgets.push(budget);
+            if(budget){
+                budget.city = city;
+                budget.price=budget.price * count;
+                if (budget) {
+                    budgets.push(budget);
+                }
             }
         }
+
 
         let obj: any = {};
         obj.budgets = budgets;
         obj.query = params;
         obj.createAt = Date.now();
         let _id = Date.now() + utils.getRndStr(6);
-        let key = `budgets:${staffId}:${_id}`;
+        let key = `budgets:${staff.id}:${_id}`;
         await cache.write(key, JSON.stringify(obj));
         await ApiTravelBudget.sendTripApproveNoticeToSystem({cacheId: _id, staffId: staffId});
         return _id;

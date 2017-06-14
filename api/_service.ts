@@ -10,7 +10,7 @@ import { AccordHotel } from '_types/accordHotel';
 import { Notice, NoticeAccount } from '_types/notice';
 import { Agency, AgencyUser } from '_types/agency';
 import {
-    TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCode,
+    TripPlan, TripDetail, TripDetailStaff, Project, TripPlanLog, TripApprove, FinanceCheckCode,
     TripDetailInvoice, TripDetailTraffic, TripDetailHotel
 } from '_types/tripPlan';
 import {Account, Token} from '_types/auth';
@@ -47,6 +47,7 @@ initModels({
     agencyUser: createServerService<AgencyUser>(AgencyUser),
     tripPlan: createServerService<TripPlan>(TripPlan),
     tripDetail: createServerService<TripDetail>(TripDetail),
+    tripDetailStaff: createServerService<TripDetailStaff>(TripDetailStaff),
     tripDetailInvoice: createServerService<TripDetailInvoice>(TripDetailInvoice),
     tripDetailTraffic: createServerService<TripDetailTraffic>(TripDetailTraffic),
     tripDetailHotel: createServerService<TripDetailHotel>(TripDetailHotel),

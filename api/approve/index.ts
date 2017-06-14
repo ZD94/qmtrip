@@ -71,6 +71,9 @@ class ApproveModule {
                 }
             })
         }
+        if(budgetInfo.query && budgetInfo.query.staffList){
+            number *= budgetInfo.query.staffList.length;
+        }
 
         await company.beforeGoTrip({number: number});
 
@@ -90,6 +93,7 @@ class ApproveModule {
             channel: submitter.company.oa,
             type: EApproveType.TRAVEL_BUDGET,
             approveUser: approveUser,
+            staffList:budgetInfo.query.staffList
         });
 
 
@@ -128,6 +132,10 @@ class ApproveModule {
         let reason:string="";
         if(query.destinationPlacesInfo && query.destinationPlacesInfo.length && query.destinationPlacesInfo[0].reason){
             reason=query.destinationPlacesInfo[0].reason;
+        }
+
+        if(typeof(query.staffList)=="undefined" || !query.staffList || !query.staffList.length){
+            query.staffList=[submitter.id];
         }
 
         let budgetInfo = {
@@ -184,6 +192,7 @@ class ApproveModule {
             isSpecialApprove: true,
             specialApproveRemark: specialApproveRemark,
             approveUser: approveUser,
+            staffList:query.staffList,
         });
     }
 
@@ -196,8 +205,9 @@ class ApproveModule {
         type?: EApproveType,
         isSpecialApprove?: boolean,
         specialApproveRemark?: string,
+        staffList?:string[]
     }) {
-        let {submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark } = params;
+        let {submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark,staffList } = params;
         let staff = await Models.staff.get(submitter);
         let approve = Models.approve.create({
             submitter: submitter,
@@ -209,6 +219,7 @@ class ApproveModule {
             isSpecialApprove: isSpecialApprove,
             specialApproveRemark: specialApproveRemark,
             companyId: staff.company.id,
+            staffList:staffList
         });
         approve = await approve.save();
 

@@ -1,0 +1,1 @@
+update trip_plan.trip_detail_invoices set belong_to = account_id where account_id is not null;
