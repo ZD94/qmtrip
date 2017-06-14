@@ -94,7 +94,7 @@ class TripApproveModule {
         });
     }
 
-    static async sendTripApproveNoticeToSystem(params: {approveId: string}) {
+    /*static async sendTripApproveNoticeToSystem(params: {approveId: string}) {
         let tripApprove = await Models.tripApprove.get(params.approveId);
         let staff = tripApprove.account;
         let company = staff.company;
@@ -119,7 +119,7 @@ class TripApproveModule {
             }
         }
         return true;
-    }
+    }*/
 
     static async sendTripApproveNotice(params: {approveId: string, nextApprove?: boolean}) {
         let tripApprove = await Models.tripApprove.get(params.approveId);
@@ -480,7 +480,7 @@ class TripApproveModule {
 
         await Promise.all([tripApprove.save(), tripPlanLog.save()]);
         await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
-        await TripApproveModule.sendTripApproveNoticeToSystem({approveId: tripApprove.id});
+        // await TripApproveModule.sendTripApproveNoticeToSystem({approveId: tripApprove.id});
         return tripApprove;
     }
 
@@ -551,7 +551,7 @@ class TripApproveModule {
         await Promise.all([tripApprove.save(), tripPlanLog.save()]);
 
         await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
-        await TripApproveModule.sendTripApproveNoticeToSystem({approveId: tripApprove.id});
+        // await TripApproveModule.sendTripApproveNoticeToSystem({approveId: tripApprove.id});
 
         return tripApprove;
     }

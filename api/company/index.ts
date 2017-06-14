@@ -540,9 +540,8 @@ class CompanyModule {
         scheduler('0 5 0 1 * ?', taskId, function() {
             //每月1号付费企业消耗行程数，冻结数归零
             (async ()=> {
-                let companies = [];
-                let pager = await Models.company.find({where : {$or: [{tripPlanPassNum : {$gt: 0}}, {tripPlanFrozenNum : {$gt: 0}}], expiryDate : {$gt: moment().format('YYYY-MM-DD HH:mm:ss')}, type: ECompanyType.PAYED}});
-                pager.forEach((company) => {
+                let companies = await Models.company.all({where : {expiryDate : {$gt: moment().format('YYYY-MM-DD HH:mm:ss')}, type: ECompanyType.PAYED}});
+                /*pager.forEach((company) => {
                     companies.push(company);
                 });
 
@@ -551,11 +550,15 @@ class CompanyModule {
                     pager.forEach((company) => {
                         companies.push(company);
                     })
-                }
+                }*/
                 await Promise.all(companies.map(async (co) => {
+                    let tripBasicPackage = co.tripBasicPackage;
                     let num = co.tripPlanNumLimit - co.tripPlanPassNum;
                     co.tripPlanPassNum = 0;
                     co.tripPlanFrozenNum = 0;
+                    if(tripBasicPackage){
+                        co.tripPlanNumLimit = parseInt(tripBasicPackage.tripNum+"");
+                    }
                     await co.save();
 
                     if(num > 0){

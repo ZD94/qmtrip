@@ -1,3 +1,164 @@
-<%=name || '' %>您好<br/><%=tripApprove.account.name || '' %>(<%=tripApprove.account.company.name || '' %>)
-在<%=moment(tripApprove.createdAt).format('YYYY.MM.DD') || '' %>生成了新的出差预算，具体内容如下：<br/>
-<%= include('trip_approve_detail.html') %>
+<p style="border: 1px #eee solid;
+    border-width: 1px 0 0 0;
+    font-size: 18px;
+    padding: 16px 0 4px;"
+>
+    <%=staff.name || '' %>(<%=staff.company.name || '' %>)
+    在<%=moment().format('YYYY-MM-DD HH:MM') || '' %>生成了新的出差预算：<br/>
+</p>
+
+<table width="422" border="1" cellpadding="8" style="
+    border: 1px solid #dcdcdc;
+    margin-bottom: 20px;
+    color: #747474;
+    border-collapse: collapse;" >
+    <tr>
+        <td colspan="2" style="text-align: center;background-color: #f8f8f8;color: #393939; font-size: 16px;"><%=query.projectName || '' %></td>
+    </tr>
+    <tr>
+        <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">行程</td>
+        <td style="padding-left: 20px;font-size: 16px;">
+            <%=cityMap[query.originPlace].name%>-
+            <% _.forEach(destinationPlacesInfo, function(item, index) { %>
+            <%=cityMap[item.destinationPlace].name%>
+            <%if(index != (destinationPlacesInfo.length - 1)){%>
+            -
+            <%}%>
+            <%}); %>
+        </td>
+    </tr>
+    <tr>
+        <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">日期</td>
+        <td style="padding-left: 20px;font-size: 16px;">
+            <%=moment(destinationPlacesInfo[0].leaveDate).format('MM月DD日 HH点') || ''%> 至
+            <%=moment(destinationPlacesInfo[destinationPlacesInfo.length - 1].goBackDate).format('MM月DD日 HH点') || ''%>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">总预算</td>
+        <td style="padding-left: 20px;font-size: 16px;"><%=totalBudget %>元</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">出差人</td>
+        <td style="padding-left: 20px;font-size: 16px;">
+            <% _.forEach(query.staffList, function(item, index) { %>
+            <%=staffMap[item].name%>
+            <%if(index != (query.staffList.length - 1)){%>
+            、
+            <%}%>
+            <%}) %>
+        </td>
+    </tr>
+</table>
+
+<p style="border-width: 0 0 0 0;
+    font-size: 18px;
+    padding: 16px 0 4px;"
+>
+    差旅标准及明细<br/>
+</p>
+<table width="422" border="1" cellpadding="8" style="
+    border: 1px solid #dcdcdc;
+    margin-bottom: 20px;
+    color: #747474;
+    border-collapse: collapse;" >
+    <tr>
+        <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">标准</td>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">
+            <% _.forEach(query.staffList, function(item, index) { %>
+            <%=staffMap[item].name%>
+            <%if(index != (query.staffList.length - 1)){%>
+            、
+            <%}%>
+            <%}) %>
+        </td>
+
+    </tr>
+    <tr>
+        <td width="80" style="padding-left: 20px;font-size: 16px;">国内飞机</td>
+        <td style="padding-left: 20px;font-size: 16px;">
+            <% _.forEach(travelPolicy.planeLevels, function(item, index) { %>
+            <%=MPlaneLevel[item]%>
+            <%if(index != (travelPolicy.planeLevels.length - 1)){%>
+            、
+            <%}%>
+            <%}); %>
+        </td>
+
+    </tr>
+    <tr>
+        <td width="80" style="padding-left: 20px;font-size: 16px;">国内火车</td>
+        <td style="padding-left: 20px;font-size: 16px;">
+            <% _.forEach(travelPolicy.trainLevels, function(item, index) { %>
+            <%=MTrainLevel[item]%>
+            <%if(index != (travelPolicy.trainLevels.length - 1)){%>
+            、
+            <%}%>
+            <%}); %>
+        </td>
+    </tr>
+    <tr>
+        <td width="80" style="padding-left: 20px;font-size: 16px;">国内住宿</td>
+        <td style="padding-left: 20px;font-size: 16px;">
+            <% _.forEach(travelPolicy.hotelLevels, function(item, index) { %>
+            <%=MHotelLevel[item]%>
+            <%if(index != (travelPolicy.hotelLevels.length - 1)){%>
+            、
+            <%}%>
+            <%}); %>
+        </td>
+    </tr>
+    <tr>
+        <td width="80" style="padding-left: 20px;font-size: 16px;">国际交通</td>
+        <td style="padding-left: 20px;font-size: 16px;">
+            <% _.forEach(travelPolicy.abroadPlaneLevels, function(item, index) { %>
+            <%=MPlaneLevel[item]%>
+            <%if(index != (travelPolicy.abroadPlaneLevels.length - 1)){%>
+            、
+            <%}%>
+            <%}); %>
+        </td>
+    </tr>
+    <tr>
+        <td width="80" style="padding-left: 20px;font-size: 16px;">国际住宿</td>
+        <td style="padding-left: 20px;font-size: 16px;">
+            <% _.forEach(travelPolicy.abroadHotelLevels, function(item, index) { %>
+            <%=MHotelLevel[item]%>
+            <%if(index != (travelPolicy.abroadHotelLevels.length - 1)){%>
+            、
+            <%}%>
+            <%}); %>
+        </td>
+    </tr>
+    <tr>
+        <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">明细</td>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">
+            <% _.forEach(query.staffList, function(item, index) { %>
+            <%=staffMap[item].name%>
+            <%if(index != (query.staffList.length - 1)){%>
+            、
+            <%}%>
+            <%}) %>
+        </td>
+    </tr>
+    <% _.forEach(budgets, function(b, index) { %>
+    <%if(b.tripType == 0 || b.tripType == 1 || b.tripType == 2){%>
+    <tr>
+        <td width="80" style="padding-left: 20px;font-size: 16px;">
+            <%if(b.tripType == 0 || b.tripType == 1){%>
+            <%=b.fromCity.name ? b.fromCity.name : cityMap[b.fromCity].name%>-
+            <%=b.toCity.name ? b.toCity.name : cityMap[b.toCity].name%>
+            <%}%>
+            <%if(b.tripType == 2){%>
+            <%=b.cityName%>
+            (<%=moment(b.checkOutDate).startOf('day').diff(moment(b.checkInDate).startOf('day'), 'days') || 1%>晚)
+            <%}%>
+        </td>
+        <td style="padding-left: 20px;font-size: 16px;">
+            <%=b.price %>元
+        </td>
+    </tr>
+    <%}%>
+    <%}); %>
+
+</table>
