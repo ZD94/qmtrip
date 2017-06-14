@@ -16,7 +16,7 @@ import { TravelPolicy, SubsidyTemplate } from '_types/travelPolicy';
 import { AccordHotel } from '_types/accordHotel';
 import { Notice, NoticeAccount } from '_types/notice';
 import { Agency, AgencyUser } from '_types/agency';
-import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove, FinanceCheckCode} from '_types/tripPlan';
+import {TripPlan, TripDetail, TripDetailStaff, Project, TripPlanLog, TripApprove, FinanceCheckCode} from '_types/tripPlan';
 import {Account, Token} from '_types/auth';
 import { Seed } from '_types/seed';
 import {TravelBudgetLog} from "_types/travelbudget";
@@ -194,6 +194,7 @@ class ClientModels implements ModelsInterface {
     agencyUser: ModelInterface<AgencyUser>;
     tripPlan: ModelInterface<TripPlan>;
     tripDetail: ModelInterface<TripDetail>;
+    tripDetailStaff: ModelInterface<TripDetailStaff>;
     tripDetailTraffic: ModelInterface<TripDetailTraffic>;
     tripDetailHotel: ModelInterface<TripDetailHotel>;
     tripDetailSubsidy: ModelInterface<TripDetailSubsidy>;

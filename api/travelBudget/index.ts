@@ -226,7 +226,6 @@ export default class ApiTravelBudget {
     static async sendTripApproveNoticeToSystem(params: {cacheId: string, staffId: string}) {
         let {cacheId, staffId } = params;
         if(!staffId || staffId == 'undefined'){
-            console.log("sendTripApproveNoticeToSystem executed");
             let currentStaff = await Staff.getCurrent();
             staffId = currentStaff.id;
         }
