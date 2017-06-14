@@ -1560,10 +1560,14 @@ class TripPlanModule {
         let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')});
         let departmentsStr = await staff.getDepartmentsStr();
 
+        let staffNames = await Promise.all(tripPlan.staffList.map(async (id)=>{
+            let staff = await Models.staff.get(id);
+            return staff.name;
+        }));
 
         var data = {
             "submitter": staff.name,  //提交人
-            "staffList": tripPlan.staffList.join(","),
+            "staffList": staffNames.join(","),
             "department": departmentsStr,  //部门
             "budgetMoney": tripPlan.budget || 0, //预算总金额
             "totalMoney": _personalExpenditure || 0,  //实际花费
