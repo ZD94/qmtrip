@@ -1632,7 +1632,6 @@ class TripPlanModule {
 
     static async notifyDesignatedAcount(params:{notifyUrl?: string, staffId: string}):Promise<any>{
         let staffId = params.staffId;
-        console.log("===> staffId: ",staffId);
         if(!staffId || staffId == 'undefined'){
              throw L.ERR.USER_NOT_EXIST();
         }
