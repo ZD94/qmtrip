@@ -61,8 +61,11 @@ export default class ApiTravelBudget {
     */
     @clientExport
     static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams) :Promise<string> {
-        let currentStaff = await Staff.getCurrent();
-        let staffId = params['staffId'] || currentStaff.id;
+        let staffId = params['staffId'];
+        if(!staffId || staffId =='undefined'){
+            let currentStaff = await Staff.getCurrent();
+            staffId = currentStaff.id;
+        }
         let staff = await Models.staff.get(staffId);
 
         let travelPolicy = await staff.getTravelPolicy();

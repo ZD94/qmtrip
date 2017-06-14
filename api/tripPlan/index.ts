@@ -347,7 +347,7 @@ class TripPlanModule {
         tripPlan.isCommit = true;
         tripPlan = await tryUpdateTripPlanStatus(tripPlan, EPlanStatus.AUDITING);
         let notifyUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
-        await TripPlanModule.notifyDesignatedAcount(notifyUrl);
+        await TripPlanModule.notifyDesignatedAcount({notifyUrl: notifyUrl, staffId:staff.id});
 
         let default_agency = config.default_agency;
         if(default_agency && default_agency.manager_email) {
@@ -1630,8 +1630,15 @@ class TripPlanModule {
         return tripDetailInvoice;
     }
 
-    static async notifyDesignatedAcount(notifyUrl?: string):Promise<any>{
-        let staff=await Staff.getCurrent();
+    static async notifyDesignatedAcount(params:{notifyUrl?: string, staffId: string}):Promise<any>{
+        let staffId = params.staffId;
+        console.log("===> staffId: ",staffId);
+        if(!staffId || staffId == 'undefined'){
+             throw L.ERR.USER_NOT_EXIST();
+        }
+        let staff = await Models.staff.get(staffId);
+
+
         let companyName=staff.company.name;
         let staffName=staff.name;
 
@@ -1643,7 +1650,7 @@ class TripPlanModule {
              values:{
                  company:staff.company,
                  staff:staff,
-                 detailUrl: notifyUrl
+                 detailUrl: params.notifyUrl
              }
             })
         }catch(err){
@@ -1758,10 +1765,11 @@ class TripPlanModule {
                         originPlace:approve.query.originPlace,
                         isRoundTrip:approve.query.isRoundTrip,
                         goBackPlace:approve.query.goBackPlace,
-                        staffId:approve['account_id'],
+                        staffId:approve['accountId'],
                         destinationPlacesInfo:approve.query.destinationPlacesInfo
                     };
-                    let budgetsInfo = await API.travelBudget.getTravelPolicyBudget(query);
+                    let budgetsId = await API.travelBudget.getTravelPolicyBudget(query);
+                    let budgetsInfo = await API.travelBudget.getBudgetInfo({id: budgetsId,accountId: approve['accountId']});
                     let totalBudget = 0;
                     let budgets = budgetsInfo.budgets;
                     budgets.forEach((v) => {
@@ -1799,7 +1807,6 @@ class TripPlanModule {
                     await TripPlanModule.saveTripPlanByApprove({tripApproveId: approve.id});
 
                     approve.status = QMEApproveStatus.PASS;
-                    approve.budget = 10;
                     approve = await approve.save();
                 }catch(e){
                     logger.error(e.stack);
