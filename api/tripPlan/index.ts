@@ -1761,7 +1761,7 @@ class TripPlanModule {
                         staffId:approve['account_id'],
                         destinationPlacesInfo:approve.query.destinationPlacesInfo
                     };
-                    let budgetsInfo = API.travelBudget.getTravelPolicyBudget(query);
+                    let budgetsInfo = await API.travelBudget.getTravelPolicyBudget(query);
                     let totalBudget = 0;
                     let budgets = budgetsInfo.budgets;
                     budgets.forEach((v) => {
@@ -1775,6 +1775,7 @@ class TripPlanModule {
                         approve.budget = totalBudget;
                         approve.budgetInfo = budgets;
                     }
+
 
                     let frozenNum = approve.query.frozenNum;
 
@@ -1798,6 +1799,7 @@ class TripPlanModule {
                     await TripPlanModule.saveTripPlanByApprove({tripApproveId: approve.id});
 
                     approve.status = QMEApproveStatus.PASS;
+                    approve.budget = 10;
                     approve = await approve.save();
                 }catch(e){
                     logger.error(e.stack);
