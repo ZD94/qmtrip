@@ -12,10 +12,13 @@ import {Staff, EStaffStatus} from "_types/staff";
 import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
 import { Models } from '_types';
 import { FindResult, PaginateInterface } from "common/model/interface";
+import setPrototypeOf = Reflect.setPrototypeOf;
 
 const travalPolicyCols = TravelPolicy['$fieldnames'];
 const subsidyTemplateCols = SubsidyTemplate['$fieldnames'];
 
+let API = require("@jingli/dnode-api");
+import {DefaultRegion} from "_types/travelPolicy"
 class TravelPolicyModule{
     /**
      * 创建差旅标准
@@ -33,11 +36,18 @@ class TravelPolicyModule{
         if(result && result.length>0){
             throw L.ERR.TRAVEL_POLICY_NAME_REPEAT();
         }
-        let travelPolicy = {
-            name:params.name,
-            companyId:params.companyId,
+        let travelPolicyParams:{name: string,companyId: string, isOpenAbroad?:boolean, isDefault?: boolean} = {
+            name: params.name,
+            companyId: params.companyId,
         };
-        let travelp = TravelPolicy.create(params);
+        if(params.isOpenAbroad){
+            travelPolicyParams.isOpenAbroad = params.isOpenAbroad;
+        }
+        if(params.isDefault){
+            travelPolicyParams.isDefault = params.isDefault;
+        }
+
+        let travelp = TravelPolicy.create(travelPolicyParams);
 
         if(travelp.isDefault){
             let defaults = await Models.travelPolicy.find({where: {id: {$ne: travelp.id}, is_default: true, companyId: params.companyId}});
@@ -49,29 +59,25 @@ class TravelPolicyModule{
             }
         }
         travelp.company = await Models.company.get(params.companyId)
-
         let multiAreaTravelPolicy = [];
-
-        let detailPolicy = {
-            name:`${params.name}-国内`,
-            policyId:travelp.id,
-            planeLevels:tryConvertToArray(params.planLevels),
-            trainLevels:tryConvertToArray(params.trainLevels),
-            hotelsLevels:tryConvertToArray(params.hotelLevels),
-            isAbroad:false,
+        let domesticPolicy = {
+            policyId: travelp.id,
+            regionId: DefaultRegion.domestic,
+            planeLevels: tryConvertToArray(params.planeLevels),
+            trainLevels: tryConvertToArray(params.trainLevels),
+            hotelLevels: tryConvertToArray(params.hotelLevels)
         }
 
-        multiAreaTravelPolicy.push(detailPolicy);
+        multiAreaTravelPolicy.push(domesticPolicy);
         if(params.isOpenAbroad){
-            let detailPolicy = {
-                name:`${params.name}-国际`,
-                policyId:travelp.id,
-                planeLevels:tryConvertToArray(params.planLevels),
-                trainLevels:tryConvertToArray(params.trainLevels),
-                hotelsLevels:tryConvertToArray(params.hotelLevels),
-                isAbroad:true,
+            let abroadPolicy = {
+                policyId: travelp.id,
+                regionId: DefaultRegion.abroad,
+                planeLevels: tryConvertToArray(params.planeLevels),
+                trainLevels: tryConvertToArray(params.trainLevels),
+                hotelLevels: tryConvertToArray(params.hotelLevels)
             }
-            multiAreaTravelPolicy.push(detailPolicy);
+            multiAreaTravelPolicy.push(abroadPolicy);
         }
 
         let ps = multiAreaTravelPolicy.map(function(policy){
@@ -84,7 +90,7 @@ class TravelPolicyModule{
     }
 
     static async createTravelPolicyRegion(params):Promise<TravelPolicyRegion>{
-        let result = await Models.travelPolicyRegion.find({where: {name: params.name, companyId: params.companyId}});
+        let result = await Models.travelPolicyRegion.find({where: {name: params.name}});
         if(result && result.length>0){
             throw L.ERR.TRAVEL_POLICY_NAME_REPEAT();
         }
@@ -192,14 +198,14 @@ class TravelPolicyModule{
         params.abroadTrainLevels = tryConvertToArray(params.abroadTrainLevels)
         params.abroadPlaneLevels = tryConvertToArray(params.abroadPlaneLevels);
 
-        let travelPolicyRegions = await tp.getTravelPolicyRegions(id);
+        let travelPolicyRegions = await tp.getTravelPolicyRegions();
         await Promise.all(travelPolicyRegions.map(async function(item){
-            if(item.isAbroad){
+            if(!(item.regionId == DefaultRegion.abroad)){
                 item.planeLevels = params.abroadplaneLevels;
                 item.trainLevels = params.abroadtrainLevels;
                 item.hotelLevels = params.abroadhotelLevels;
             }
-            if(!item.isAbroad){
+            if(item.regionId == DefaultRegion.domestic){
                 item.planeLevels = params.planeLevels;
                 item.trainLevels = params.trainLevels;
                 item.hotelLevels = params.hotelLevels;
@@ -207,7 +213,6 @@ class TravelPolicyModule{
             await item.save();
             return true;
         }));
-
 
         // for(var key in params){
         //     tp[key] = params[key];
@@ -444,6 +449,41 @@ class TravelPolicyModule{
     }
     /*************************************补助模板end***************************************/
 
+
+    /**
+     * 根据id查询区域差旅标准
+     * @param {String} params.id
+     * @param {Boolean} params.isReturnDefault 如果不存在返回默认 default true,
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"], ["travelPolicyId"])
+    static async getTravelPolicyRegion(params:{id:string,travelPolicyId?:string}): Promise<TravelPolicyRegion> {
+        let id = params.id
+        let tpr = await Models.travelPolicyRegion.get(id);
+        return tpr;
+    }
+
+    /**
+     * 根据属性查找区域差旅标准
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["where.travelPolicyId"],['attributes','where.name', 'where.subsudyMoney'])
+    @conditionDecorator([
+        {if: condition.isTravelPolicyCompany("0.where.travelPolicyId")},
+        {if: condition.isTravelPolicyAgency("0.where.travelPolicyId")}
+    ])
+    static async getTravelPolicyRegions(params): Promise<FindResult>{
+        params.order = params.order || [['subsidyMoney', 'desc']];
+
+        let paginate = await Models.travelPolicyRegion.find(params);
+        let ids =  paginate.map(function(t){
+            return t.id;
+        })
+        return {ids: ids, count: paginate['total']};
+    }
 }
 
 function tryConvertToArray(val) {

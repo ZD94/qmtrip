@@ -14,6 +14,7 @@ const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
 import {Place} from "_types/place";
+import {DefaultRegion} from "_types/travelPolicy"
 
 export default class ApiTravelBudget {
 
@@ -68,17 +69,38 @@ export default class ApiTravelBudget {
         if (!travelPolicy) {
             throw new Error(`差旅标准还未设置`);
         }
+        let planeLevels:number[];
+        let trainLevels:number[];
+        let hotelLevels:number[];
+        let abroadplaneLevels:number[];
+        let abroadtrainLevels:number[];
+        let abroadhotelLevels:number[];
+
+        let travelPolicyRegions = await travelPolicy.getTravelPolicyRegions();
+        travelPolicyRegions.map(async function(item){
+            if(!(item.regionId == DefaultRegion.abroad)){
+                abroadplaneLevels = item.planeLevels ;
+                abroadtrainLevels = item.trainLevels;
+                abroadhotelLevels = item.hotelLevels ;
+            }
+            if(item.regionId == DefaultRegion.domestic){
+                planeLevels = item.planeLevels;
+                trainLevels = item.trainLevels;
+                hotelLevels = item.hotelLevels ;
+            }
+        });
+
         let destinationPlacesInfo = params.destinationPlacesInfo;
         let policies = {
             "domestic": {
-                hotelStar: travelPolicy.hotelLevels,
-                cabin: travelPolicy.planeLevels,
-                trainSeat: travelPolicy.trainLevels,
+                hotelStar: planeLevels,
+                cabin: planeLevels,
+                trainSeat: trainLevels
             },
             "abroad": {
-                hotelStar: travelPolicy.abroadHotelLevels,
-                cabin: travelPolicy.abroadPlaneLevels,
-                trainSeat: travelPolicy.abroadTrainLevels,
+                hotelStar: abroadhotelLevels,
+                cabin: abroadplaneLevels,
+                trainSeat: abroadtrainLevels
             }
         }
         let _staff: any = {
