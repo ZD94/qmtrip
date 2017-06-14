@@ -7,7 +7,7 @@ var moment=require("moment");
 
 
 export default async function update(DB: Sequelize, t: Transaction){
-    //await DB.query(sql, {transaction: t});
+    
     var querySql='select * from travel_policy.travel_policies order by created_at desc';
     let [children] = await DB.query(querySql) as any[];
     for(var i=0; i < children.length; i++){
@@ -34,8 +34,7 @@ export default async function update(DB: Sequelize, t: Transaction){
                    ${children[i].plane_discount}, ${children[i].traffic_prefer}, ${children[i].hotel_prefer}, '${createdAt}',
                    '${updatedAt}', ${deletedAt})`;
 
-        DB.query(insertSql).spread(function(children,row){
-        });
+        await DB.query(insertSql)
 
         if(children[i].is_open_abroad){
             insertSql = `insert into travel_policy.travel_policy_regions( id, name, region_id, policy_id, plane_levels, train_levels, hotel_levels,
@@ -43,9 +42,7 @@ export default async function update(DB: Sequelize, t: Transaction){
                values('${uuid.v1()}', 'Globe', '${children[i].id}', ${abroad_plane_levels}, ${abroad_train_levels}, ${abroad_hotel_levels},
                ${children[i].plane_discount}, ${children[i].traffic_prefer}, ${children[i].hotel_prefer}, '${createdAt}',
                '${updatedAt}', ${deletedAt}) `;
-
-            DB.query(insertSql).spread(function(children,row){
-            });
+            await DB.query(insertSql);
         }
     }
 

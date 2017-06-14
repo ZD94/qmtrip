@@ -29,7 +29,6 @@ interface SegmentsBudgetResult {
     }>
 }
 
-
 export default class ApiTravelBudget {
 
     @clientExport
