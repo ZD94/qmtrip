@@ -1155,6 +1155,7 @@ class TripPlanModule {
         tripPlan.query = query;
         tripPlan.isSpecialApprove = approve.isSpecialApprove;
         tripPlan.specialApproveRemark = approve.specialApproveRemark;
+        tripPlan.staffList = query.staffList || [];
 
         //计算总预算
         let totalBudget = budgets
@@ -1250,13 +1251,25 @@ class TripPlanModule {
             detail.accountId= account.id;
             detail.status = EPlanStatus.WAIT_UPLOAD;
             detail.tripPlanId = tripPlan.id;
+
             return detail as TripDetail;
         });
         tripDetails = await Promise.all(ps);
 
         if(tripDetails && tripDetails.length > 0){
-            let ps = tripDetails.map((d) => {
-                return d.save();
+            let nums = tripPlan.staffList.length || 1;
+            let ps = tripDetails.map(async (d) => {
+                let tripDetail = await d.save();
+                //insert into tripDetailStaff
+                for(let staffId of tripPlan.staffList){
+                    let tripDetailStaff = Models.tripDetailStaff.create({
+                        staffId : staffId,
+                        tripDetailId : tripDetail.id,
+                        budget  : tripDetail.budget / nums,
+                        expenditure : (tripDetail.expenditure || 0) / nums
+                    });
+                    tripDetailStaff.save();
+                }
             });
             await Promise.all(ps);
         }
@@ -1547,9 +1560,14 @@ class TripPlanModule {
         let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')});
         let departmentsStr = await staff.getDepartmentsStr();
 
+        let staffNames = await Promise.all(tripPlan.staffList.map(async (id)=>{
+            let staff = await Models.staff.get(id);
+            return staff.name;
+        }));
 
         var data = {
             "submitter": staff.name,  //提交人
+            "staffList": staffNames.join(","),
             "department": departmentsStr,  //部门
             "budgetMoney": tripPlan.budget || 0, //预算总金额
             "totalMoney": _personalExpenditure || 0,  //实际花费
