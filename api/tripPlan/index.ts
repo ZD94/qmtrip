@@ -1793,9 +1793,7 @@ class TripPlanModule {
                         approve.budget = totalBudget;
                         approve.budgetInfo = budgets;
                     }
-
                     let frozenNum = approve.query.frozenNum;
-
                     await approveCompany.beforeApproveTrip({number: frozenNum});
 
                     let content = approve.deptCity+"-"+approve.arrivalCity;
