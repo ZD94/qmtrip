@@ -75,7 +75,7 @@ export default class ApiTravelBudget {
     @clientExport
     static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams) :Promise<string> {
         let staffId = params['staffId'];
-        if(!staffId || staffId =='undefined'){
+        if (!staffId || staffId == 'undefined') {
             let currentStaff = await Staff.getCurrent();
             staffId = currentStaff.id;
         }
@@ -84,31 +84,31 @@ export default class ApiTravelBudget {
         if (!travelPolicy) {
             throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
         }
-        let domestic:any = {};
-        let abroad:any = {};
+        let domestic: any = {};
+        let abroad: any = {};
 
         let travelPolicyRegions = await travelPolicy.getTravelPolicyRegions();
-        travelPolicyRegions.map(async function(item){
-            if(!(item.regionId == DefaultRegion.abroad)){
-                abroad.cabin = item.planeLevels ;
+        travelPolicyRegions.map(async function (item) {
+            if (!(item.regionId == DefaultRegion.abroad)) {
+                abroad.cabin = item.planeLevels;
                 abroad.trainSeat = item.trainLevels;
-                abroad.hotelStar = item.hotelLevels ;
+                abroad.hotelStar = item.hotelLevels;
                 abroad.hotelPrefer = item.hotelPrefer;
                 abroad.trafficPrefer = item.trafficPrefer;
             }
-            if(item.regionId == DefaultRegion.domestic){
+            if (item.regionId == DefaultRegion.domestic) {
                 domestic.cabin = item.planeLevels;
                 domestic.trainSeat = item.trainLevels;
-                domestic.hotelStar = item.hotelLevels ;
+                domestic.hotelStar = item.hotelLevels;
                 domestic.hotelPrefer = item.hotelPrefer;
                 domestic.trafficPrefer = item.trafficPrefer;
             }
         });
 
-        if(!params.staffList){
+        if (!params.staffList) {
             params.staffList = [];
         }
-        if(params.staffList.indexOf(staffId) < 0){
+        if (params.staffList.indexOf(staffId) < 0) {
             params.staffList.push(staffId);
         }
         let count = params.staffList.length;
@@ -124,7 +124,7 @@ export default class ApiTravelBudget {
         }
         let staffs = [_staff];
         let goBackPlace = params['goBackPlace'];
-        let segments: any[] = await Promise.all(destinationPlacesInfo.map( async (placeInfo) => {
+        let segments: any[] = await Promise.all(destinationPlacesInfo.map(async(placeInfo) => {
             var segment: any = {};
             segment.city = placeInfo.destinationPlace;
             let city: Place = (await API.place.getCityInfo({cityCode: placeInfo.destinationPlace}));
@@ -160,11 +160,11 @@ export default class ApiTravelBudget {
             return segment;
         }));
 
-        let segmentsBudget: SegmentsBudgetResult  = await API.budget.createBudget({
+        let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
             policies,
             staffs,
             segments,
-            ret: params.isRoundTrip ? 1: 0,
+            ret: params.isRoundTrip ? 1 : 0,
             fromCity: params.originPlace,
             preferSet: staff.company.budgetConfig || {},
         });
@@ -172,7 +172,7 @@ export default class ApiTravelBudget {
         let cities = segmentsBudget.cities;
         let _budgets = segmentsBudget.budgets;
         let budgets = [];
-        for(let i=0, ii=cities.length;i<ii;i++) {
+        for (let i = 0, ii = cities.length; i < ii; i++) {
             let city = cities[i];
             //补助信息
             let placeInfo = destinationPlacesInfo[i];
@@ -185,7 +185,7 @@ export default class ApiTravelBudget {
                 budget.originPlace = budget.fromCity;
                 budget.destination = budget.toCity;
                 budget.tripType = ETripType.OUT_TRIP;
-                budget.price=budget.price * count;
+                budget.price = budget.price * count;
                 budgets.push(budget);
             }
 
@@ -194,16 +194,16 @@ export default class ApiTravelBudget {
             if (hotel && hotel.length) {
                 let budget = hotel[0];
                 let cityObj = await API.place.getCityInfo({cityCode: city});
-                budget.hotelName = placeInfo ? placeInfo.hotelName: null;
+                budget.hotelName = placeInfo ? placeInfo.hotelName : null;
                 budget.cityName = cityObj.name;
                 budget.tripType = ETripType.HOTEL;
-                budget.price=budget.price * count;
+                budget.price = budget.price * count;
                 budgets.push(budget);
             }
 
             let destLength = destinationPlacesInfo.length;
             if (!placeInfo && i == destLength) {
-                let lastDest = destinationPlacesInfo[destLength-1];
+                let lastDest = destinationPlacesInfo[destLength - 1];
                 placeInfo = {
                     leaveDate: lastDest.earliestGoBackDateTime,
                     goBackDate: moment(lastDest.earliestGoBackDateTime).add(1, 'days').toDate(),
@@ -214,52 +214,52 @@ export default class ApiTravelBudget {
 
 
             let budget = await getSubsidyBudget(placeInfo);
-            if(budget){
+            if (budget) {
                 budget.city = city;
-                budget.price=budget.price * count;
+                budget.price = budget.price * count;
                 if (budget) {
                     budgets.push(budget);
                 }
                 budget.city = city;
-            if (budget) {
-                budgets.push(budget);
-            }
-        }
-
-        let obj: any = {};
-        obj.budgets = budgets;
-        obj.query = params;
-        obj.createAt = Date.now();
-        let _id = Date.now() + utils.getRndStr(6);
-        let key = `budgets:${staffId}:${_id}`;
-        await cache.write(key, JSON.stringify(obj));
-        await ApiTravelBudget.sendTripApproveNoticeToSystem({cacheId: _id, staffId: staffId});
-        return _id;
-
-
-        function getSubsidyBudget(destination) {
-            let {subsidy, leaveDate, goBackDate, reason} = destination;
-            let budget: any = null
-            if (subsidy && subsidy.template) {
-                let goBackDay = moment(goBackDate).format("YYYY-MM-DD");
-                let leaveDay = moment(leaveDate).format("YYYY-MM-DD");
-                let days = moment(goBackDay).diff(moment(leaveDay), 'days');
-                if (days > 0) {
-                    budget = {};
-                    budget.fromDate = leaveDate;
-                    budget.endDate = goBackDate;
-                    budget.tripType = ETripType.SUBSIDY;
-                    budget.type = EInvoiceType.SUBSIDY;
-                    budget.price = subsidy.template.subsidyMoney * days;
-                    budget.duringDays = days;
-                    budget.template = {id: subsidy.template.id, name: subsidy.template.name};
-                    budget.reason = reason;
+                if (budget) {
+                    budgets.push(budget);
                 }
             }
-            return budget;
+
+            let obj: any = {};
+            obj.budgets = budgets;
+            obj.query = params;
+            obj.createAt = Date.now();
+            let _id = Date.now() + utils.getRndStr(6);
+            let key = `budgets:${staffId}:${_id}`;
+            await cache.write(key, JSON.stringify(obj));
+            await ApiTravelBudget.sendTripApproveNoticeToSystem({cacheId: _id, staffId: staffId});
+            return _id;
+
+
+            function getSubsidyBudget(destination) {
+                let {subsidy, leaveDate, goBackDate, reason} = destination;
+                let budget: any = null
+                if (subsidy && subsidy.template) {
+                    let goBackDay = moment(goBackDate).format("YYYY-MM-DD");
+                    let leaveDay = moment(leaveDate).format("YYYY-MM-DD");
+                    let days = moment(goBackDay).diff(moment(leaveDay), 'days');
+                    if (days > 0) {
+                        budget = {};
+                        budget.fromDate = leaveDate;
+                        budget.endDate = goBackDate;
+                        budget.tripType = ETripType.SUBSIDY;
+                        budget.type = EInvoiceType.SUBSIDY;
+                        budget.price = subsidy.template.subsidyMoney * days;
+                        budget.duringDays = days;
+                        budget.template = {id: subsidy.template.id, name: subsidy.template.name};
+                        budget.reason = reason;
+                    }
+                }
+                return budget;
+            }
         }
     }
-
     static async sendTripApproveNoticeToSystem(params: {cacheId: string, staffId: string}) {
         let {cacheId, staffId } = params;
         if(!staffId || staffId == 'undefined'){
