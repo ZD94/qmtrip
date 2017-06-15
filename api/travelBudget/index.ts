@@ -4,7 +4,7 @@
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import {Models } from '_types'
 import {ETripType, EInvoiceType, ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan";
-import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel} from "_types/travelPolicy";
+import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel,TravelPolicyRegion, TravelPolicy} from "_types/travelPolicy";
 import {Staff} from "_types/staff";
 const API = require("@jingli/dnode-api");
 const validate = require("common/validate");
@@ -87,23 +87,6 @@ export default class ApiTravelBudget {
         let domestic:any = {};
         let abroad:any = {};
 
-        let travelPolicyRegions = await travelPolicy.getTravelPolicyRegions();
-        travelPolicyRegions.map(async function(item){
-            if(!(item.regionId == DefaultRegion.abroad)){
-                abroad.cabin = item.planeLevels ;
-                abroad.trainSeat = item.trainLevels;
-                abroad.hotelStar = item.hotelLevels ;
-                abroad.hotelPrefer = item.hotelPrefer;
-                abroad.trafficPrefer = item.trafficPrefer;
-            }
-            if(item.regionId == DefaultRegion.domestic){
-                domestic.cabin = item.planeLevels;
-                domestic.trainSeat = item.trainLevels;
-                domestic.hotelStar = item.hotelLevels ;
-                domestic.hotelPrefer = item.hotelPrefer;
-                domestic.trafficPrefer = item.trafficPrefer;
-            }
-        });
 
         if(!params.staffList){
             params.staffList = [];
@@ -115,8 +98,8 @@ export default class ApiTravelBudget {
 
         let destinationPlacesInfo = params.destinationPlacesInfo;
         let policies = {
-            "domestic": domestic,
-            "abroad": abroad
+            "domestic": {},
+            "abroad": {}
         }
 
         let _staff: any = {
@@ -129,6 +112,27 @@ export default class ApiTravelBudget {
             var segment: any = {};
             segment.city = placeInfo.destinationPlace;
             let city: Place = (await API.place.getCityInfo({cityCode: placeInfo.destinationPlace}));
+            let bestTravelPolicy = await ApiTravelBudget.getBestTravelPolicys ({regionId: city.id,staffId: staffId})
+            if(!bestTravelPolicy){
+                throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
+            }
+
+            policies = {
+                "domestic": {
+                    hotelStar: bestTravelPolicy.hotelLevels,
+                    cabin: bestTravelPolicy.planeLevels,
+                    trainSeat: bestTravelPolicy.trainLevels,
+                    hotelPrefer: bestTravelPolicy.hotelPrefer,
+                    trafficPrefer: bestTravelPolicy.trafficPrefer
+                },
+                "abroad": {
+                    hotelStar: bestTravelPolicy.hotelLevels,
+                    cabin: bestTravelPolicy.planeLevels,
+                    trainSeat: bestTravelPolicy.trainLevels,
+                    hotelPrefer: bestTravelPolicy.hotelPrefer,
+                    trafficPrefer: bestTravelPolicy.trafficPrefer
+                }
+            }
             if (city.isAbroad) {
                 let s = _.cloneDeep(_staff);
                 s.policy = 'abroad';
@@ -256,6 +260,114 @@ export default class ApiTravelBudget {
             }
             return budget;
         }
+    }
+
+    static async getBestTravelPolicys(params: {regionId: string,staffId: string,travelPolicy?:TravelPolicy}):Promise<TravelPolicyRegion> {
+        let { regionId, staffId,travelPolicy } = params;
+        if(!travelPolicy){
+            if(!staffId || staffId == 'undefined'){
+                let currentStaff = await Staff.getCurrent();
+                staffId = currentStaff.id;
+            }
+            let staff = await Models.staff.get(staffId);
+            travelPolicy = await staff.getTravelPolicy();
+        }
+        if(!regionId){
+            return null;
+        }
+        let travelPolicyRegion = await travelPolicy.getTravelPolicyByPlaceId ({
+            id: travelPolicy.id,
+            regionId: regionId
+        });
+
+        let bestTravelp:TravelPolicyRegion;
+
+        while(!travelPolicyRegion || travelPolicyRegion.length == 0){
+            let cityInfo = await API.place.getCityInfo({cityCode:regionId});
+            travelPolicyRegion = await travelPolicy.getTravelPolicyByPlaceId ({
+                id: travelPolicy.id,
+                regionId: regionId
+            });
+            if(cityInfo.parentId){
+                regionId = cityInfo.parentId;
+            }
+            //兼容老数据，城市信息完善后删除
+            if(travelPolicyRegion.length==0 && cityInfo.isAbroad && !cityInfo.parentId){
+                regionId = 'Global';  //全球
+            }
+            if(travelPolicyRegion.length==0 && !cityInfo.isAbroad && !cityInfo.parentId){
+                regionId = 'CTW_5';   //中国
+            }
+
+
+        }
+
+        if(travelPolicyRegion && travelPolicyRegion.length){
+            bestTravelp = travelPolicyRegion[0];
+            if (!bestTravelp.planeLevels){
+                bestTravelp.planeLevels = await ApiTravelBudget.getDetailTravelPolicy({type:"planeLevels",staffId:staffId, regionId:regionId,travelPolicy:travelPolicy});
+            }
+            if (!bestTravelp.trainLevels){
+                bestTravelp.trainLevels = await ApiTravelBudget.getDetailTravelPolicy({type:"trainLevels", staffId:staffId, regionId:regionId,travelPolicy:travelPolicy});
+            }
+            if (!bestTravelp.hotelLevels){
+                bestTravelp.hotelLevels = await ApiTravelBudget.getDetailTravelPolicy({type:"hotelLevels", staffId:staffId, regionId:regionId,travelPolicy:travelPolicy});
+            }
+            if (!bestTravelp.hotelPrefer){
+                bestTravelp.hotelPrefer = await ApiTravelBudget.getDetailTravelPolicy({type:"hotelPrefer", staffId:staffId, regionId:regionId,travelPolicy:travelPolicy});
+            }
+            if (!bestTravelp.trafficPrefer){
+                bestTravelp.trafficPrefer = await ApiTravelBudget.getDetailTravelPolicy({type:"trafficPrefer", staffId:staffId, regionId:regionId,travelPolicy:travelPolicy});
+            }
+        }
+
+        if(!bestTravelp || typeof(bestTravelp)=="undefined"){
+            return null;
+        }
+        return bestTravelp;
+    }
+
+    static async getDetailTravelPolicy(params:{type:string, regionId: string,staffId: string, travelPolicy?:TravelPolicy}): Promise< any> {   //类型为number[] \ number
+        let { regionId, staffId,travelPolicy,type} = params;
+        if(!type){
+            return null;
+        }
+        if(!travelPolicy){
+            if(!staffId || staffId == 'undefined'){
+                let currentStaff = await Staff.getCurrent();
+                staffId = currentStaff.id;
+            }
+            let staff = await Models.staff.get(staffId);
+            travelPolicy = await staff.getTravelPolicy();
+        }
+
+        if(!regionId){
+            return null;
+        }
+
+        let result:number|number[];
+
+        while(true){
+            let travelPolicyRegion = await travelPolicy.getTravelPolicyByPlaceId ({
+                id: travelPolicy.id,
+                regionId: regionId
+            });
+            let bestTravelp:TravelPolicyRegion;
+            if(travelPolicyRegion && travelPolicyRegion.length){
+                bestTravelp = travelPolicyRegion[0];
+            }
+            if(!bestTravelp.hotelPrefer){
+                let cityInfo = await API.place.getCityInfo({cityCode:regionId});
+                if(!cityInfo.parentId) {
+                    return null;
+                }
+                regionId = cityInfo.parentId;
+            }else{
+                result = bestTravelp[type];
+                break;
+            }
+        }
+        return result;
     }
 
     static async sendTripApproveNoticeToSystem(params: {cacheId: string, staffId: string}) {
