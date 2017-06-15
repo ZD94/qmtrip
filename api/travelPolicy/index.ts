@@ -9,13 +9,16 @@ import L from '@jingli/language';
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {conditionDecorator, condition} from "../_decorator";
 import {Staff, EStaffStatus} from "_types/staff";
-import { TravelPolicy, SubsidyTemplate } from '_types/travelPolicy';
+import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
 import { Models } from '_types';
 import { FindResult, PaginateInterface } from "common/model/interface";
+import setPrototypeOf = Reflect.setPrototypeOf;
 
 const travalPolicyCols = TravelPolicy['$fieldnames'];
 const subsidyTemplateCols = SubsidyTemplate['$fieldnames'];
 
+let API = require("@jingli/dnode-api");
+import {DefaultRegion} from "_types/travelPolicy"
 class TravelPolicyModule{
     /**
      * 创建差旅标准
@@ -33,13 +36,19 @@ class TravelPolicyModule{
         if(result && result.length>0){
             throw L.ERR.TRAVEL_POLICY_NAME_REPEAT();
         }
-        params.planeLevels = tryConvertToArray(params.planeLevels);
-        params.trainLevels = tryConvertToArray(params.trainLevels);
-        params.hotelLevels = tryConvertToArray(params.hotelLevels);
-        params.abroadHotelLevels = tryConvertToArray(params.abroadHotelLevels);
-        params.abroadTrainLevels = tryConvertToArray(params.abroadTrainLevels)
-        params.abroadPlaneLevels = tryConvertToArray(params.abroadPlaneLevels);
-        let travelp = TravelPolicy.create(params);
+        let travelPolicyParams:{name: string,companyId: string, isOpenAbroad?:boolean, isDefault?: boolean} = {
+            name: params.name,
+            companyId: params.companyId,
+        };
+        if(params.isOpenAbroad){
+            travelPolicyParams.isOpenAbroad = params.isOpenAbroad;
+        }
+        if(params.isDefault){
+            travelPolicyParams.isDefault = params.isDefault;
+        }
+
+        let travelp = TravelPolicy.create(travelPolicyParams);
+
         if(travelp.isDefault){
             let defaults = await Models.travelPolicy.find({where: {id: {$ne: travelp.id}, is_default: true, companyId: params.companyId}});
             if(defaults && defaults.length>0){
@@ -49,8 +58,50 @@ class TravelPolicyModule{
                 }))
             }
         }
-        travelp.company = await Models.company.get(params.companyId);
+        travelp.company = await Models.company.get(params.companyId)
+        let multiAreaTravelPolicy = [];
+        let domesticPolicy = {
+            policyId: travelp.id,
+            regionId: DefaultRegion.domestic,
+            planeLevels: tryConvertToArray(params.planeLevels),
+            trainLevels: tryConvertToArray(params.trainLevels),
+            hotelLevels: tryConvertToArray(params.hotelLevels)
+        }
+
+        multiAreaTravelPolicy.push(domesticPolicy);
+        if(params.isOpenAbroad){
+            let abroadPolicy = {
+                policyId: travelp.id,
+                regionId: DefaultRegion.abroad,
+                planeLevels: tryConvertToArray(params.planeLevels),
+                trainLevels: tryConvertToArray(params.trainLevels),
+                hotelLevels: tryConvertToArray(params.hotelLevels)
+            }
+            multiAreaTravelPolicy.push(abroadPolicy);
+        }
+
+        let ps = multiAreaTravelPolicy.map(function(policy){
+            let travelPR=TravelPolicyModule.createTravelPolicyRegion(policy);
+            return travelPR;
+        });
+        await Promise.all(ps);
         return travelp.save();
+
+    }
+
+    static async createTravelPolicyRegion(params):Promise<TravelPolicyRegion>{
+        let result = await Models.travelPolicyRegion.find({where: {name: params.name}});
+        if(result && result.length>0){
+            throw L.ERR.TRAVEL_POLICY_NAME_REPEAT();
+        }
+
+        params.planeLevels = tryConvertToArray(params.planeLevels);
+        params.trainLevels = tryConvertToArray(params.trainLevels);
+        params.hotelLevels = tryConvertToArray(params.hotelLevels);
+
+        let travelPolicyRegion = await Models.travelPolicyRegion.create(params);
+
+        return travelPolicyRegion.save();
     }
 
 
@@ -69,8 +120,6 @@ class TravelPolicyModule{
         var staff = await Staff.getCurrent();
         var id = params.id;
 
-
-
         var tp_delete = await Models.travelPolicy.get(id);
 
         if(tp_delete.isDefault){
@@ -84,6 +133,14 @@ class TravelPolicyModule{
 
         if(staff && tp_delete["companyId"] != staff["companyId"]){
             throw L.ERR.PERMISSION_DENY();
+        }
+
+        var travelPolicyRegions = await tp_delete.getTravelPolicyRegions();
+        if(travelPolicyRegions && travelPolicyRegions.length > 0){
+            await Promise.all(travelPolicyRegions.map(async function(item){
+                await item.destroy();
+                return true;
+            }))
         }
 
         var templates = await tp_delete.getSubsidyTemplates();
@@ -140,9 +197,26 @@ class TravelPolicyModule{
         params.abroadHotelLevels = tryConvertToArray(params.abroadHotelLevels);
         params.abroadTrainLevels = tryConvertToArray(params.abroadTrainLevels)
         params.abroadPlaneLevels = tryConvertToArray(params.abroadPlaneLevels);
-        for(var key in params){
-            tp[key] = params[key];
-        }
+
+        let travelPolicyRegions = await tp.getTravelPolicyRegions();
+        await Promise.all(travelPolicyRegions.map(async function(item){
+            if(!(item.regionId == DefaultRegion.abroad)){
+                item.planeLevels = params.abroadplaneLevels;
+                item.trainLevels = params.abroadtrainLevels;
+                item.hotelLevels = params.abroadhotelLevels;
+            }
+            if(item.regionId == DefaultRegion.domestic){
+                item.planeLevels = params.planeLevels;
+                item.trainLevels = params.trainLevels;
+                item.hotelLevels = params.hotelLevels;
+            }
+            await item.save();
+            return true;
+        }));
+
+        // for(var key in params){
+        //     tp[key] = params[key];
+        // }
         return tp.save();
     }
 
@@ -375,6 +449,41 @@ class TravelPolicyModule{
     }
     /*************************************补助模板end***************************************/
 
+
+    /**
+     * 根据id查询区域差旅标准
+     * @param {String} params.id
+     * @param {Boolean} params.isReturnDefault 如果不存在返回默认 default true,
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"], ["travelPolicyId"])
+    static async getTravelPolicyRegion(params:{id:string,travelPolicyId?:string}): Promise<TravelPolicyRegion> {
+        let id = params.id
+        let tpr = await Models.travelPolicyRegion.get(id);
+        return tpr;
+    }
+
+    /**
+     * 根据属性查找区域差旅标准
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["where.travelPolicyId"],['attributes','where.name', 'where.subsudyMoney'])
+    @conditionDecorator([
+        {if: condition.isTravelPolicyCompany("0.where.travelPolicyId")},
+        {if: condition.isTravelPolicyAgency("0.where.travelPolicyId")}
+    ])
+    static async getTravelPolicyRegions(params): Promise<FindResult>{
+        params.order = params.order || [['subsidyMoney', 'desc']];
+
+        let paginate = await Models.travelPolicyRegion.find(params);
+        let ids =  paginate.map(function(t){
+            return t.id;
+        })
+        return {ids: ids, count: paginate['total']};
+    }
 }
 
 function tryConvertToArray(val) {

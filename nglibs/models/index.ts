@@ -12,7 +12,7 @@ import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from '
 import { Company, MoneyChange, Supplier, TripPlanNumChange } from '_types/company';
 import { PromoCode } from '_types/promoCode';
 import { Department, StaffDepartment } from '_types/department';
-import { TravelPolicy, SubsidyTemplate } from '_types/travelPolicy';
+import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
 import { AccordHotel } from '_types/accordHotel';
 import { Notice, NoticeAccount } from '_types/notice';
 import { Agency, AgencyUser } from '_types/agency';
@@ -146,6 +146,7 @@ var Services = {
     tripBasicPackage:{type:TripBasicPackage, modname:'tripPackage',funcs:[]},
     tripFuelAddPackage:{type:TripFuelAddPackage, modname:'tripPackage',funcs:[]},
     errorLog: {},
+    travelPolicyRegion:{},
 };
 
 function throwNotImplemented(){
@@ -226,6 +227,8 @@ class ClientModels implements ModelsInterface {
 
     errorLog: ModelInterface<ErrorLog>;
 
+    travelPolicyRegion: ModelInterface<TravelPolicyRegion>;
+
     constructor($cacheFactory: ng.ICacheFactoryService, $rootScope: ng.IRootScopeService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
         this.credential = createService<Credential>(Services.credential, $cacheFactory);
@@ -266,6 +269,7 @@ class ClientModels implements ModelsInterface {
         this.tripBasicPackage = createService<TripBasicPackage>(Services.tripBasicPackage, $cacheFactory);
         this.tripFuelAddPackage = createService<TripFuelAddPackage>(Services.tripFuelAddPackage, $cacheFactory);
         this.errorLog = createService<ErrorLog>(Services.errorLog, $cacheFactory);
+        this.travelPolicyRegion = createService<TravelPolicyRegion>(Services.travelPolicyRegion, $cacheFactory)
         initModels(this);
 
         $rootScope.$on('$locationChangeSuccess', ()=>{
