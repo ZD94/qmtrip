@@ -479,7 +479,7 @@ class TripApproveModule {
         return tripApprove;
     }
 
-    
+
     static calculateAutoApproveTime( params: {
         type: AutoApproveType,
         config: AutoApproveConfig,
@@ -497,23 +497,23 @@ class TripApproveModule {
 
             switch(type) {
                 case AutoApproveType.AfterSubmit:  // 审批提交时间
-                    expectedApproveTime = moment(submitAt).add(day, 'hour').hour(hour).toDate();
+                    expectedApproveTime = moment(submitAt).add(day, 'hours').hour(hour).minute(0).toDate();
 
                     interval = moment(tripStartAt).diff(expectedApproveTime, 'hours');
                     if(interval > 0 ) {
                         autoApproveDateTime = expectedApproveTime;
                     } else {
-                        autoApproveDateTime = moment(submitAt).add(defaultDelay, 'hours').toDate();
+                        autoApproveDateTime = moment(submitAt).add(defaultDelay, 'hours').minute(0).toDate();
                     }
 
                     break;
                 default:           //出行时间
-                    expectedApproveTime = moment(submitAt).subtract(day, 'day').hour(hour).toDate();
+                    expectedApproveTime = moment(submitAt).subtract(day, 'days').hour(hour).minute(0).toDate();
                     interval = moment(tripStartAt).diff(expectedApproveTime, 'hours');
                     if(interval > 0){
                         autoApproveDateTime = expectedApproveTime;
                     } else {
-                        autoApproveDateTime = moment(submitAt).add(defaultDelay, 'hours').toDate();
+                        autoApproveDateTime = moment(submitAt).add(defaultDelay, 'hours').minute(0).toDate();
                     }
                     break;
             }
