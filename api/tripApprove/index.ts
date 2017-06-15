@@ -479,8 +479,7 @@ class TripApproveModule {
         return tripApprove;
     }
 
-
-
+    
     static calculateAutoApproveTime( params: {
         type: AutoApproveType,
         config: AutoApproveConfig,
