@@ -22,6 +22,8 @@ var API = require('@jingli/dnode-api');
 import config = require("@jingli/config");
 import _ = require("lodash");
 import {ENoticeType} from "_types/notice/notice";
+import {AutoApproveType, AutoApproveConfig} from "_types/tripPlan"
+
 
 class TripApproveModule {
 
@@ -463,25 +465,61 @@ class TripApproveModule {
 
         //如果出差计划是待审批状态，增加自动审批时间
         if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
-            var days = moment(tripApprove.startAt).diff(moment(), 'days');
-            let format = 'YYYY-MM-DD HH:mm:ss';
-            if (days <= 0) {
-                tripApprove.autoApproveTime = moment(tripApprove.createdAt).add(1, 'hours').toDate();
-            } else {
-                //出发前一天18点
-                let autoApproveTime = moment(tripApprove.startAt).subtract(6, 'hours').toDate();
-                //当天18点以后申请的出差计划，一个小时后自动审批
-                if(moment(autoApproveTime).diff(moment()) <= 0) {
-                    autoApproveTime = <Date>(moment(tripApprove.createdAt).add(1, 'hours').toDate());
-                }
-                tripApprove.autoApproveTime = autoApproveTime;
-            }
+            tripApprove.autoApproveTime = TripApproveModule.calculateAutoApproveTime({
+                type: company.autoApproveType,
+                config: company.autoApprovePreference,
+                submitAt: tripApprove.createdAt,
+                tripStartAt: tripApprove.startAt,
+            });
         }
 
         await Promise.all([tripApprove.save(), tripPlanLog.save()]);
         await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
         // await TripApproveModule.sendTripApproveNoticeToSystem({approveId: tripApprove.id});
         return tripApprove;
+    }
+
+
+
+    static calculateAutoApproveTime( params: {
+        type: AutoApproveType,
+        config: AutoApproveConfig,
+        submitAt:Date,
+        tripStartAt:Date
+    }):Date {
+            let {type, config, submitAt, tripStartAt} = params;
+            config = <AutoApproveConfig>config;
+            let autoApproveDateTime: Date;
+            let expectedApproveTime: Date;
+            let interval = 0;
+            let day = config.day ? config.day : 1;
+            let hour = config.hour ? config.hour :18;
+            let defaultDelay = config.defaultDelay ? config.defaultDelay : 1;
+
+            switch(type) {
+                case AutoApproveType.AfterSubmit:  // 审批提交时间
+                    expectedApproveTime = moment(submitAt).add(day, 'hour').hour(hour).toDate();
+
+                    interval = moment(tripStartAt).diff(expectedApproveTime, 'hours');
+                    if(interval > 0 ) {
+                        autoApproveDateTime = expectedApproveTime;
+                    } else {
+                        autoApproveDateTime = moment(submitAt).add(defaultDelay, 'hours').toDate();
+                    }
+
+                    break;
+                default:           //出行时间
+                    expectedApproveTime = moment(submitAt).subtract(day, 'day').hour(hour).toDate();
+                    interval = moment(tripStartAt).diff(expectedApproveTime, 'hours');
+                    if(interval > 0){
+                        autoApproveDateTime = expectedApproveTime;
+                    } else {
+                        autoApproveDateTime = moment(submitAt).add(defaultDelay, 'hours').toDate();
+                    }
+                    break;
+            }
+
+            return autoApproveDateTime;
     }
 
     @clientExport
@@ -534,19 +572,12 @@ class TripApproveModule {
 
         //如果出差计划是待审批状态，增加自动审批时间
         if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
-            var days = moment(tripApprove.startAt).diff(moment(), 'days');
-            let format = 'YYYY-MM-DD HH:mm:ss';
-            if (days <= 0) {
-                tripApprove.autoApproveTime = moment(tripApprove.createdAt).add(1, 'hours').toDate()
-            } else {
-                //出发前一天18点
-                let autoApproveTime = moment(tripApprove.startAt).subtract(6, 'hours').toDate()
-                //当天18点以后申请的出差计划，一个小时后自动审批
-                if(moment(autoApproveTime).diff(moment()) <= 0) {
-                    autoApproveTime = moment(tripApprove.createdAt).add(1, 'hours').toDate();
-                }
-                tripApprove.autoApproveTime = autoApproveTime;
-            }
+            tripApprove.autoApproveTime = TripApproveModule.calculateAutoApproveTime({
+                type: company.autoApproveType,
+                config: company.autoApprovePreference,
+                submitAt: tripApprove.createdAt,
+                tripStartAt: tripApprove.startAt,
+            });
         }
         await Promise.all([tripApprove.save(), tripPlanLog.save()]);
 
