@@ -15,6 +15,7 @@ import { FindResult, PaginateInterface } from "common/model/interface";
 import setPrototypeOf = Reflect.setPrototypeOf;
 
 const travalPolicyCols = TravelPolicy['$fieldnames'];
+const travalPolicyRegionCols = TravelPolicyRegion['$fieldnames'];
 const subsidyTemplateCols = SubsidyTemplate['$fieldnames'];
 
 let API = require("@jingli/dnode-api");
@@ -26,7 +27,7 @@ class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["name","planeLevels","trainLevels","hotelLevels","companyId"], travalPolicyCols)
+    @requireParams(["name", "companyId"], travalPolicyCols)
     @conditionDecorator([
         {if: condition.isCompanyAdminOrOwner("0.companyId")},
         {if: condition.isCompanyAgency("0.companyId")}
@@ -36,6 +37,9 @@ class TravelPolicyModule{
         if(result && result.length>0){
             throw L.ERR.TRAVEL_POLICY_NAME_REPEAT();
         }
+
+
+
         let travelPolicyParams:{name: string,companyId: string, isOpenAbroad?:boolean, isDefault?: boolean} = {
             name: params.name,
             companyId: params.companyId,
@@ -46,7 +50,6 @@ class TravelPolicyModule{
         if(params.isDefault){
             travelPolicyParams.isDefault = params.isDefault;
         }
-
         let travelp = TravelPolicy.create(travelPolicyParams);
 
         if(travelp.isDefault){
@@ -59,9 +62,29 @@ class TravelPolicyModule{
             }
         }
         travelp.company = await Models.company.get(params.companyId)
+
+        return travelp.save();
+
+    }
+
+    /**
+     * 创建地区差旅标准
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["policyId","planeLevels","hotelLevels"], travalPolicyRegionCols)
+    static async createTravelPolicyRegion(params):Promise<any>{
+        let {policyId, planeLevels, trainLevels, hotelLevels } = params;
         let multiAreaTravelPolicy = [];
+
+        // let result = await Models.travelPolicyRegion.find({where: {regionId: params.regionId}});
+        // if(result && result.length>0){
+        //     throw L.ERR.TRAVEL_POLICY_NAME_REPEAT();
+        // }
+
         let domesticPolicy = {
-            policyId: travelp.id,
+            policyId: policyId,
             regionId: DefaultRegion.domestic,
             planeLevels: tryConvertToArray(params.planeLevels),
             trainLevels: tryConvertToArray(params.trainLevels),
@@ -71,37 +94,21 @@ class TravelPolicyModule{
         multiAreaTravelPolicy.push(domesticPolicy);
         if(params.isOpenAbroad){
             let abroadPolicy = {
-                policyId: travelp.id,
+                policyId: policyId,
                 regionId: DefaultRegion.abroad,
-                planeLevels: tryConvertToArray(params.planeLevels),
+                planeLevels: tryConvertToArray(params.aplaneLevels),
                 trainLevels: tryConvertToArray(params.trainLevels),
                 hotelLevels: tryConvertToArray(params.hotelLevels)
             }
             multiAreaTravelPolicy.push(abroadPolicy);
         }
 
-        let ps = multiAreaTravelPolicy.map(function(policy){
-            let travelPR=TravelPolicyModule.createTravelPolicyRegion(policy);
-            return travelPR;
-        });
-        await Promise.all(ps);
-        return travelp.save();
-
-    }
-
-    static async createTravelPolicyRegion(params):Promise<TravelPolicyRegion>{
-        let result = await Models.travelPolicyRegion.find({where: {name: params.name}});
-        if(result && result.length>0){
-            throw L.ERR.TRAVEL_POLICY_NAME_REPEAT();
+        for(let i =0; i < multiAreaTravelPolicy.length; i++){
+            let travelPolicyRegion = await Models.travelPolicyRegion.create(params);
+            await travelPolicyRegion.save();
         }
 
-        params.planeLevels = tryConvertToArray(params.planeLevels);
-        params.trainLevels = tryConvertToArray(params.trainLevels);
-        params.hotelLevels = tryConvertToArray(params.hotelLevels);
-
-        let travelPolicyRegion = await Models.travelPolicyRegion.create(params);
-
-        return travelPolicyRegion.save();
+        return true;
     }
 
 
