@@ -104,7 +104,7 @@ class TravelPolicyModule{
         }
 
         for(let i =0; i < multiAreaTravelPolicy.length; i++){
-            let travelPolicyRegion = await Models.travelPolicyRegion.create(params);
+            let travelPolicyRegion = await Models.travelPolicyRegion.create(multiAreaTravelPolicy[i]);
             await travelPolicyRegion.save();
         }
 
