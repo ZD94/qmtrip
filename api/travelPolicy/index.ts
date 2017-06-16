@@ -493,7 +493,7 @@ class TravelPolicyModule{
      */
     @clientExport
     @requireParams(["regionId"], ["travelPolicyId"])
-    async getTravelPolicyByPlaceId (params:{id: string, regionId:string}) :Promise<TravelPolicyRegion[]> {
+    async getTravelPolicyByPlaceId (params:{id?: string, regionId:string}) :Promise<TravelPolicyRegion[]> {
         let { id, regionId} =params;
         let query = { where : { policyId: id,regionId: regionId }};
         let travelp = await Models.travelPolicyRegion.all(query);
