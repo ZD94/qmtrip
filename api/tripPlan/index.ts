@@ -1782,12 +1782,13 @@ class TripPlanModule {
                     let budgetsInfo = await API.travelBudget.getBudgetInfo({id: budgetsId,accountId: approve['accountId']});
                     let totalBudget = 0;
                     let budgets = budgetsInfo.budgets;
+
                     for(let i=0; i < budgets.length; i++){
                         if (budgets[i].price <= 0) {
                             totalBudget = -1;
                             break;
                         }
-                        totalBudget += Number(v.price);
+                        totalBudget += Number(budgets[i].price);
                     }
                     if (totalBudget > approve.budget) {
                         approve.budget = totalBudget;
