@@ -506,6 +506,29 @@ class TravelPolicyModule{
         let travelp = await Models.travelPolicyRegion.all(query);
         return travelp;
     }
+
+    /**
+     * 根据regionId 获取某个地区的差旅标准
+     * @param {String} params.id
+     * @param {Boolean} params.isReturnDefault 如果不存在返回默认 default true,
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["regionId"], ["travelPolicyId"])
+    async getTravelPolicyByPlaceId (params:{id?: string, regionId:string}) :Promise<TravelPolicyRegion[]> {
+        let { id, regionId} =params;
+        let query = { where : { policyId: id,regionId: regionId }};
+        let travelp = await Models.travelPolicyRegion.all(query);
+        return travelp;
+    }
+
+    @clientExport
+    @requireParams(["policyId"])
+    async getAvaliableRegionIds(params: {where: any}) : Promise<TravelPolicyRegion[]>{
+
+        return Models.travelPolicyRegion.find(params);
+    }
+
 }
 
 function tryConvertToArray(val) {
