@@ -49,12 +49,20 @@ class StaffModule{
         if(params.roleId && params.roleId == EStaffRole.OWNER){
             throw L.ERR.PERMISSION_DENY("添加创建者");
         }
+
         /*let staffNum = await company.getStaffNum();
         if(staffNum >= company.staffNumLimit){
             throw L.ERR.BEYOND_LIMIT_NUM("员工");
         }*/
-        //检查邮箱 手机号码是否合法
-        await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
+        if(params.accountId){
+            let account = await Models.account.get(params.accountId);
+            if(!account){
+                throw L.ERR.USER_NOT_EXIST();
+            }
+        }else{
+            //检查邮箱 手机号码是否合法
+            await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
+        }
 
         let defaultTravelPolicy = await company.getDefaultTravelPolicy();
         let staff = Staff.create(params);
