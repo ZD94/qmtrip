@@ -1782,17 +1782,18 @@ class TripPlanModule {
                     let budgetsInfo = await API.travelBudget.getBudgetInfo({id: budgetsId,accountId: approve['accountId']});
                     let totalBudget = 0;
                     let budgets = budgetsInfo.budgets;
-                    budgets.forEach((v) => {
-                        if (v.price <= 0) {
+                    for(let i=0; i < budgets.length; i++){
+                        if (budgets[i].price <= 0) {
                             totalBudget = -1;
-                            return;
+                            break;
                         }
                         totalBudget += Number(v.price);
-                    });
+                    }
                     if (totalBudget > approve.budget) {
                         approve.budget = totalBudget;
                         approve.budgetInfo = budgets;
                     }
+
                     let frozenNum = approve.query.frozenNum;
                     await approveCompany.beforeApproveTrip({number: frozenNum});
 
@@ -1806,7 +1807,6 @@ class TripPlanModule {
                                 remark: "自动审批通过上月申请消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
                         }
                     }
-
                     if(approve.approveUser && approve.approveUser.id && /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(approve.approveUser.id)) {
                         let log = Models.tripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser.id, approveStatus: EApproveResult.AUTO_APPROVE, remark: '自动通过'});
                         await log.save();
