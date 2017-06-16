@@ -399,93 +399,12 @@ class TripApproveModule {
         return true;
     }
 
-    @clientExport
-    @requireParams(['budgetId', 'title'], ['description', 'remark', 'approveUserId'])
-    static async saveTripApprove(params) {
-        let staff = await Staff.getCurrent();
-        let company = staff.company;
-
-        if(company.isApproveOpen && !params.approveUserId) { //企业开启审核功能后，审核人不能为空
-            throw {code: -2, msg: '审批人不能为空'};
-        }
-
-        let budgetInfo = await API.travelBudget.getBudgetInfo({id: params.budgetId});
-
-        if(!budgetInfo) {
-            throw L.ERR.TRAVEL_BUDGET_NOT_FOUND();
-        }
-
-        let {budgets, query} = budgetInfo;
-        let totalBudget = 0;
-        budgets.forEach((b) => {totalBudget += Number(b.price);});
-        budgets = budgets.map( (v) => {
-            if (v.type == ETripType.HOTEL) {
-                v.placeName = budgetInfo.query.hotelName;
-            }
-            return v;
-        });
-        let project = await API.tripPlan.getProjectByName({companyId: company.id, name: params.title, userId: staff.id, isCreate: true});
-        let tripApprove =  TripApprove.create(params);
-
-        if(params.approveUserId) {
-            let approveUser = await Models.staff.get(params.approveUserId);
-            if(!approveUser)
-                throw {code: -3, msg: '审批人不存在'}
-            // if(tripApprove.approveUser && tripApprove['approveUser'].id == staff.id)
-            //     throw {code: -4, msg: '审批人不能是自己'};
-            tripApprove.approveUser = approveUser;
-        }
-
-        tripApprove.status = QMEApproveStatus.WAIT_APPROVE;
-        tripApprove.account = staff;
-        tripApprove['companyId'] = company.id;
-        tripApprove.project = project;
-        tripApprove.startAt = query.leaveDate;
-        tripApprove.backAt = query.goBackDate
-        tripApprove.query = JSON.stringify(query);
-
-        let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace.id|| query.destinationPlace}) || {name: null};
-
-        if(query.originPlace) {
-            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace}) || {name: null};
-            tripApprove.deptCityCode = deptInfo.id;
-            tripApprove.deptCity = deptInfo.name;
-        }
-
-        tripApprove.arrivalCityCode = arrivalInfo.id;
-        tripApprove.arrivalCity = arrivalInfo.name;
-        tripApprove.isNeedTraffic = query.isNeedTraffic;
-        tripApprove.isNeedHotel = query.isNeedHotel;
-        tripApprove.isRoundTrip = query.isRoundTrip;
-        tripApprove.budgetInfo = budgets;
-        tripApprove.budget = totalBudget;
-        tripApprove.status = totalBudget < 0 ? QMEApproveStatus.NO_BUDGET : QMEApproveStatus.WAIT_APPROVE;
-
-        let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, approveStatus: EApproveResult.WAIT_APPROVE, remark: '提交审批单，等待审批'});
-
-        //如果出差计划是待审批状态，增加自动审批时间
-        if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
-            tripApprove.autoApproveTime = TripApproveModule.calculateAutoApproveTime({
-                type: company.autoApproveType,
-                config: company.autoApprovePreference,
-                submitAt: tripApprove.createdAt,
-                tripStartAt: tripApprove.startAt,
-            });
-        }
-
-        await Promise.all([tripApprove.save(), tripPlanLog.save()]);
-        await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
-        // await TripApproveModule.sendTripApproveNoticeToSystem({approveId: tripApprove.id});
-        return tripApprove;
-    }
-
-
-    static calculateAutoApproveTime( params: {
+    static async calculateAutoApproveTime( params: {
         type: AutoApproveType,
         config: AutoApproveConfig,
         submitAt:Date,
         tripStartAt:Date
-    }):Date {
+    }):Promise<Date> {
             let {type, config, submitAt, tripStartAt} = params;
             config = <AutoApproveConfig>config;
             let autoApproveDateTime: Date;
@@ -517,75 +436,8 @@ class TripApproveModule {
                     }
                     break;
             }
-
             return autoApproveDateTime;
     }
-
-    @clientExport
-    @requireParams(['query', 'title', 'budget', 'specialApproveRemark'], ['description', 'remark', 'approveUserId'])
-    static async saveSpecialTripApprove(params) {
-        let staff = await Staff.getCurrent();
-        let company = staff.company;
-
-        if(company.isApproveOpen && !params.approveUserId) { //企业开启审核功能后，审核人不能为空
-            throw {code: -2, msg: '审批人不能为空'};
-        }
-
-        let query = params.query;
-        let project = await API.tripPlan.getProjectByName({companyId: company.id, name: params.title, userId: staff.id, isCreate: true});
-        let tripApprove =  TripApprove.create(params);
-        tripApprove.isSpecialApprove = true;
-
-        if(params.approveUserId) {
-            let approveUser = await Models.staff.get(params.approveUserId);
-            if(!approveUser)
-                throw {code: -3, msg: '审批人不存在'}
-            if(tripApprove.approveUser && tripApprove['approveUser'].id == staff.id)
-                throw {code: -4, msg: '审批人不能是自己'};
-            tripApprove.approveUser = approveUser;
-        }
-
-        tripApprove.status = QMEApproveStatus.WAIT_APPROVE;
-        tripApprove.account = staff;
-        tripApprove['companyId'] = company.id;
-        tripApprove.project = project;
-        tripApprove.startAt = query.leaveDate;
-        tripApprove.backAt = query.goBackDate;
-        tripApprove.query = JSON.stringify(query);
-
-        let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace.id|| query.destinationPlace}) || {name: null};
-
-        if(query.originPlace) {
-            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace}) || {name: null};
-            tripApprove.deptCityCode = deptInfo.id;
-            tripApprove.deptCity = deptInfo.name;
-        }
-
-        tripApprove.arrivalCityCode = arrivalInfo.id;
-        tripApprove.arrivalCity = arrivalInfo.name;
-        tripApprove.isNeedTraffic = query.isNeedTraffic;
-        tripApprove.isNeedHotel = query.isNeedHotel;
-        tripApprove.isRoundTrip = query.isRoundTrip;
-
-        let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, approveStatus: EApproveResult.WAIT_APPROVE, remark: '特别审批提交审批单，等待审批'});
-
-        //如果出差计划是待审批状态，增加自动审批时间
-        if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
-            tripApprove.autoApproveTime = TripApproveModule.calculateAutoApproveTime({
-                type: company.autoApproveType,
-                config: company.autoApprovePreference,
-                submitAt: tripApprove.createdAt,
-                tripStartAt: tripApprove.startAt,
-            });
-        }
-        await Promise.all([tripApprove.save(), tripPlanLog.save()]);
-
-        await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
-        // await TripApproveModule.sendTripApproveNoticeToSystem({approveId: tripApprove.id});
-
-        return tripApprove;
-    }
-
 
     @clientExport
     @requireParams(['id'])
