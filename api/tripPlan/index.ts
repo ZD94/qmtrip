@@ -317,8 +317,9 @@ class TripPlanModule {
     @requireParams(['id'])
     @modelNotNull('tripPlan')
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
-    static async commitTripPlan(params: {id: string}): Promise<boolean> {
-        let tripPlan = await Models.tripPlan.get(params.id);
+    static async commitTripPlan(params: {id: string, staffId: string}): Promise<boolean> {
+        let {id, staffId} = params;
+        let tripPlan = await Models.tripPlan.get(id);
         if(tripPlan.status != EPlanStatus.WAIT_COMMIT) {
             throw {code: -2, msg: "该出差计划不能提交，请检查状态"};
         }
@@ -340,14 +341,13 @@ class TripPlanModule {
             await (Promise.all(tripDetailPromise));
         }
         //记录日志
-        let staff = await Staff.getCurrent();
-        let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id, remark: `提交票据`});
+        let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: staffId, remark: `提交票据`});
         await log.save();
         //更改状态
         tripPlan.isCommit = true;
         tripPlan = await tryUpdateTripPlanStatus(tripPlan, EPlanStatus.AUDITING);
         let notifyUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
-        await TripPlanModule.notifyDesignatedAcount(notifyUrl);
+        await TripPlanModule.notifyDesignatedAcount({notifyUrl: notifyUrl, staffId: staffId});
 
         let default_agency = config.default_agency;
         if(default_agency && default_agency.manager_email) {
@@ -362,11 +362,7 @@ class TripPlanModule {
             if(!user) {
                 user = await Models.staff.get(accounts[0].id);
             }
-            let staff = tripPlan.account;
-            if(!staff) {
-                staff = await Models.staff.get(tripPlan['accountId']);
-            }
-
+            let staff = await Models.staff.get(staffId);
             let company = await tripPlan.getCompany();
             let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
             let appMessageUrl = `#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
@@ -1649,8 +1645,14 @@ class TripPlanModule {
         return tripDetailInvoice;
     }
 
-    static async notifyDesignatedAcount(notifyUrl?: string):Promise<any>{
-        let staff=await Staff.getCurrent();
+    static async notifyDesignatedAcount(params:{notifyUrl?: string, staffId: string}):Promise<any>{
+        let staffId = params.staffId;
+        if(!staffId || staffId == 'undefined'){
+             throw L.ERR.USER_NOT_EXIST();
+        }
+        let staff = await Models.staff.get(staffId);
+
+
         let companyName=staff.company.name;
         let staffName=staff.name;
 
@@ -1662,7 +1664,7 @@ class TripPlanModule {
              values:{
                  company:staff.company,
                  staff:staff,
-                 detailUrl: notifyUrl
+                 detailUrl: params.notifyUrl
              }
             })
         }catch(err){
@@ -1773,8 +1775,31 @@ class TripPlanModule {
                     if(typeof approve.query == 'string'){
                         approve.query = JSON.parse(approve.query);
                     }
-                    let frozenNum = approve.query.frozenNum;
+                    let query={
+                        originPlace:approve.query.originPlace,
+                        isRoundTrip:approve.query.isRoundTrip,
+                        goBackPlace:approve.query.goBackPlace,
+                        staffId:approve['accountId'],
+                        destinationPlacesInfo:approve.query.destinationPlacesInfo
+                    };
+                    let budgetsId = await API.travelBudget.getTravelPolicyBudget(query);
+                    let budgetsInfo = await API.travelBudget.getBudgetInfo({id: budgetsId,accountId: approve['accountId']});
+                    let totalBudget = 0;
+                    let budgets = budgetsInfo.budgets;
 
+                    for(let i=0; i < budgets.length; i++){
+                        if (budgets[i].price <= 0) {
+                            totalBudget = -1;
+                            break;
+                        }
+                        totalBudget += Number(budgets[i].price);
+                    }
+                    if (totalBudget > approve.budget) {
+                        approve.budget = totalBudget;
+                        approve.budgetInfo = budgets;
+                    }
+
+                    let frozenNum = approve.query.frozenNum;
                     await approveCompany.beforeApproveTrip({number: frozenNum});
 
                     let content = approve.deptCity+"-"+approve.arrivalCity;
@@ -1787,7 +1812,6 @@ class TripPlanModule {
                                 remark: "自动审批通过上月申请消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
                         }
                     }
-
                     if(approve.approveUser && approve.approveUser.id && /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(approve.approveUser.id)) {
                         let log = Models.tripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser.id, approveStatus: EApproveResult.AUTO_APPROVE, remark: '自动通过'});
                         await log.save();
