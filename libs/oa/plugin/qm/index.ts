@@ -126,20 +126,14 @@ export class QmPlugin extends AbstractOAPlugin {
 
         //如果出差计划是待审批状态，增加自动审批时间
         if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
-            var days = moment(tripApprove.startAt).diff(moment(), 'days');
-            let format = 'YYYY-MM-DD HH:mm:ss';
-            if (days <= 0) {
-                tripApprove.autoApproveTime = moment(tripApprove.createdAt).add(1, 'hours').toDate();
-            } else {
-                //出发前一天18点
-                let autoApproveTime = moment(tripApprove.startAt).subtract(6, 'hours').toDate();
-                //当天18点以后申请的出差计划，一个小时后自动审批
-                if(moment(autoApproveTime).diff(moment()) <= 0) {
-                    autoApproveTime = <Date>(moment(tripApprove.createdAt).add(1, 'hours').toDate());
-                }
-                tripApprove.autoApproveTime = autoApproveTime;
-            }
+            tripApprove.autoApproveTime = await TripApproveModule.calculateAutoApproveTime({
+                type: company.autoApproveType,
+                config: company.autoApprovePreference,
+                submitAt: tripApprove.createdAt,
+                tripStartAt: tripApprove.startAt,
+            });
         }
+
         await tripPlanLog.save();
         tripApprove = await tripApprove.save();
         await API.tripApprove.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
