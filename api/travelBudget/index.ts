@@ -116,7 +116,6 @@ export default class ApiTravelBudget {
             if(!bestTravelPolicy){
                 throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
             }
-
             policies = {
                 "domestic": {
                     hotelStar: bestTravelPolicy.hotelLevels,
