@@ -54,60 +54,70 @@ class StaffModule{
         if(staffNum >= company.staffNumLimit){
             throw L.ERR.BEYOND_LIMIT_NUM("员工");
         }*/
+        let staff;
         if(params.accountId){
             let account = await Models.account.get(params.accountId);
             if(!account){
                 throw L.ERR.USER_NOT_EXIST();
             }
+             staff = Staff.create({
+                name: params.name,
+                status: params.status,
+                roleId: params.roleId,
+                travelPolicyId: params.travelPolicyId,
+                accountId: params.accountId
+            });
+
+            staff = await staff.save();
         }else{
             //检查邮箱 手机号码是否合法
             await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
-        }
 
-        let defaultTravelPolicy = await company.getDefaultTravelPolicy();
-        let staff = Staff.create(params);
-        staff.company = company;
-        let pwd = '';
-        if(!staff.pwd){//设置员工默认密码为手机号后六位
-            pwd = staff.mobile.substr(staff.mobile.length - 6);
-            staff.pwd = utils.md5(pwd);
-        }
+            let pwd = '';
+            let staff = Staff.create(params);
+            staff.company = company;
 
-        if(!staff["travelPolicyId"]){
-            staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
-        }
-        if (params.isNeedChangePwd) {
-            staff.isNeedChangePwd = params.isNeedChangePwd;
-        }
-        staff = await staff.save();
+            if(!staff.pwd){//设置员工默认密码为手机号后六位
+                pwd = staff.mobile.substr(staff.mobile.length - 6);
+                staff.pwd = utils.md5(pwd);
+                let defaultTravelPolicy = await company.getDefaultTravelPolicy();
+                if(!staff["travelPolicyId"]){
+                    staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
+                }
+            }
 
-        let account = await Models.account.get(staff.accountId);
+            if (params.isNeedChangePwd) {
+                staff.isNeedChangePwd = params.isNeedChangePwd;
+            }
 
-        if(!account.coinAccount){
-            //为员工设置资金账户
-            let ca = CoinAccount.create();
-            ca = await ca.save();
-            staff["coinAccountId"] = ca.id;
             staff = await staff.save();
-        }
-        //发送短信通知
-        let values  = {
-            name: account.mobile,
-            pwd: pwd,
-            url: config.host
+            let account = await Models.account.get(staff.accountId);
+            if(!account.coinAccount){
+                //为员工设置资金账户
+                let ca = CoinAccount.create();
+                ca = await ca.save();
+                staff["coinAccountId"] = ca.id;
+                staff = await staff.save();
+            }
+            //发送短信通知
+            let values  = {
+                name: account.mobile,
+                pwd: pwd,
+                url: config.host
+            }
+
+            try{
+                await API.notify.submitNotify({
+                    key: 'qm_new_staff_active',
+                    values: values,
+                    userId: staff.id
+                });
+
+            }catch(e){
+                console.info(e);
+            }
         }
 
-        try{
-            await API.notify.submitNotify({
-                key: 'qm_new_staff_active',
-                values: values,
-                userId: staff.id
-            });
-
-        }catch(e){
-            console.info(e);
-        }
-        staff = await staff.save();
         return staff;
     }
 
