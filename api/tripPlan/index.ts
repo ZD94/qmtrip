@@ -525,7 +525,9 @@ class TripPlanModule {
 
             // let {go, back, hotel, subsidy} = await TripPlanModule.getPlanEmailDetails(tripPlan);
             let self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
-            let appMessageUrl = `#/trip/list-detail?tripid=${tripPlan.id}`;
+            let finalUrl = `#/trip/list-detail?tripid=${tripPlan.id}`;
+            finalUrl = encodeURIComponent(finalUrl);
+            let appMessageUrl = `#/judge-permission/index?id=${tripPlan.id}&modelName=tripPlan&finalUrl=${finalUrl}`;
 
             /*templateValue.ticket = templateValue.tripType;
             templateValue.username = staff.name;
@@ -1268,7 +1270,9 @@ class TripPlanModule {
         }
 
         let self_url = config.host + '/index.html#/trip/list-detail?tripid=' + approve.id;
-        let appMessageUrl = '#/trip/list-detail?tripid=' + approve.id;
+        let finalUrl = `#/trip/list-detail?tripid=${approve.id}`;
+        finalUrl = encodeURIComponent(finalUrl);
+        let appMessageUrl = `#/judge-permission/index?id=${approve.id}&modelName=tripPlan&finalUrl=${finalUrl}`;
 
         try {
             self_url = await API.wechat.shorturl({longurl: self_url});
