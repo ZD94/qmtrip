@@ -4,7 +4,7 @@
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import {Models } from '_types'
 import {ETripType, EInvoiceType, ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan";
-import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel} from "_types/travelPolicy";
+import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel,TravelPolicyRegion, TravelPolicy} from "_types/travelPolicy";
 import {Staff} from "_types/staff";
 const API = require("@jingli/dnode-api");
 const validate = require("common/validate");
@@ -84,26 +84,6 @@ export default class ApiTravelBudget {
         if (!travelPolicy) {
             throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
         }
-        let domestic: any = {};
-        let abroad: any = {};
-
-        let travelPolicyRegions = await travelPolicy.getTravelPolicyRegions();
-        travelPolicyRegions.map(async function (item) {
-            if (!(item.regionId == DefaultRegion.abroad)) {
-                abroad.cabin = item.planeLevels;
-                abroad.trainSeat = item.trainLevels;
-                abroad.hotelStar = item.hotelLevels;
-                abroad.hotelPrefer = item.hotelPrefer;
-                abroad.trafficPrefer = item.trafficPrefer;
-            }
-            if (item.regionId == DefaultRegion.domestic) {
-                domestic.cabin = item.planeLevels;
-                domestic.trainSeat = item.trainLevels;
-                domestic.hotelStar = item.hotelLevels;
-                domestic.hotelPrefer = item.hotelPrefer;
-                domestic.trafficPrefer = item.trafficPrefer;
-            }
-        });
 
         if (!params.staffList) {
             params.staffList = [];
@@ -115,8 +95,8 @@ export default class ApiTravelBudget {
 
         let destinationPlacesInfo = params.destinationPlacesInfo;
         let policies = {
-            "domestic": domestic,
-            "abroad": abroad
+            "domestic": {},
+            "abroad": {}
         }
         let _staff: any = {
             gender: staff.sex,
@@ -128,6 +108,26 @@ export default class ApiTravelBudget {
             var segment: any = {};
             segment.city = placeInfo.destinationPlace;
             let city: Place = (await API.place.getCityInfo({cityCode: placeInfo.destinationPlace}));
+            let bestTravelPolicy = await staff.getBestTravelPolicys ({regionId: city.id})
+            if(!bestTravelPolicy){
+                throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
+            }
+            policies = {
+                "domestic": {
+                    hotelStar: bestTravelPolicy.hotelLevels,
+                    cabin: bestTravelPolicy.planeLevels,
+                    trainSeat: bestTravelPolicy.trainLevels,
+                    hotelPrefer: bestTravelPolicy.hotelPrefer,
+                    trafficPrefer: bestTravelPolicy.trafficPrefer
+                },
+                "abroad": {
+                    hotelStar: bestTravelPolicy.hotelLevels,
+                    cabin: bestTravelPolicy.planeLevels,
+                    trainSeat: bestTravelPolicy.trainLevels,
+                    hotelPrefer: bestTravelPolicy.hotelPrefer,
+                    trafficPrefer: bestTravelPolicy.trafficPrefer
+                }
+            }
             if (city.isAbroad) {
                 let s = _.cloneDeep(_staff);
                 s.policy = 'abroad';
@@ -260,6 +260,7 @@ export default class ApiTravelBudget {
             }
         }
     }
+
     static async sendTripApproveNoticeToSystem(params: {cacheId: string, staffId: string}) {
         let {cacheId, staffId } = params;
         if(!staffId || staffId == 'undefined'){
