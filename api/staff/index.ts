@@ -61,12 +61,14 @@ class StaffModule{
                 throw L.ERR.USER_NOT_EXIST();
             }
              staff = Staff.create({
-                name: params.name,
-                status: params.status,
-                roleId: params.roleId,
-                travelPolicyId: params.travelPolicyId,
-                accountId: params.accountId
+                 name: params.name,
+                 status: params.status,
+                 roleId: params.roleId,
+                 travelPolicyId: params.travelPolicyId,
+                 accountId: params.accountId
             });
+
+            staff.company = company;
 
             staff = await staff.save();
         }else{
@@ -74,7 +76,7 @@ class StaffModule{
             await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
 
             let pwd = '';
-            let staff = Staff.create(params);
+            staff = Staff.create(params);
             staff.company = company;
 
             if(!staff.pwd){//设置员工默认密码为手机号后六位
