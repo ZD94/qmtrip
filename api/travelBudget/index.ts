@@ -84,26 +84,6 @@ export default class ApiTravelBudget {
         if (!travelPolicy) {
             throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
         }
-        let domestic: any = {};
-        let abroad: any = {};
-
-        // let travelPolicyRegions = await travelPolicy.getTravelPolicyRegions();
-        // travelPolicyRegions.map(async function (item) {
-        //     if (!(item.regionId == DefaultRegion.abroad)) {
-        //         abroad.cabin = item.planeLevels;
-        //         abroad.trainSeat = item.trainLevels;
-        //         abroad.hotelStar = item.hotelLevels;
-        //         abroad.hotelPrefer = item.hotelPrefer;
-        //         abroad.trafficPrefer = item.trafficPrefer;
-        //     }
-        //     if (item.regionId == DefaultRegion.domestic) {
-        //         domestic.cabin = item.planeLevels;
-        //         domestic.trainSeat = item.trainLevels;
-        //         domestic.hotelStar = item.hotelLevels;
-        //         domestic.hotelPrefer = item.hotelPrefer;
-        //         domestic.trafficPrefer = item.trafficPrefer;
-        //     }
-        // });
 
         if (!params.staffList) {
             params.staffList = [];
