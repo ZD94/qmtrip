@@ -60,9 +60,11 @@ class StaffModule{
             if(!account){
                 throw L.ERR.USER_NOT_EXIST();
             }
+
              staff = Staff.create({
                  name: params.name,
-                 status: params.status,
+                 status: account.status,
+                 ifFistLogin : account.isFirstLogin,
                  roleId: params.roleId,
                  travelPolicyId: params.travelPolicyId,
                  accountId: params.accountId
