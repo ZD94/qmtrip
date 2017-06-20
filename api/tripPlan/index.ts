@@ -346,7 +346,7 @@ class TripPlanModule {
         //更改状态
         tripPlan.isCommit = true;
         tripPlan = await tryUpdateTripPlanStatus(tripPlan, EPlanStatus.AUDITING);
-        let notifyUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
+        let notifyUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
         await TripPlanModule.notifyDesignatedAcount(notifyUrl);
 
         let default_agency = config.default_agency;
@@ -368,8 +368,8 @@ class TripPlanModule {
             }
 
             let company = await tripPlan.getCompany();
-            let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
-            let appMessageUrl = `#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
+            let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
+            let appMessageUrl = `#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
             /*let {go, back, hotel, subsidy} = await TripPlanModule.getPlanEmailDetails(tripPlan);
             let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
             let auditValues = {username: user.name, time:tripPlan.createdAt, auditUserName: user.name, companyName: company.name, staffName: staff.name, projectName: tripPlan.title, goTrafficBudget: go,
@@ -381,7 +381,7 @@ class TripPlanModule {
             try{
                 await API.notify.submitNotify({
                     email: auditEmail,
-                    key: 'qm_notify_invoice_audit_request',
+                    key: 'qm_notify_agency_budget',
                     values:{
                         company: company,
                         staff: staff,
@@ -1654,7 +1654,7 @@ class TripPlanModule {
             await API.notify.submitNotify({
              mobile: '13810529805',
              email: 'notice@jingli365.com',
-             key: 'qm_notify_invoice_audit_request',
+             key: 'qm_notify_agency_budget',
              values:{
                  company:staff.company,
                  staff:staff,
