@@ -1198,13 +1198,14 @@ class TripPlanModule {
                     budget.destination = await API.place.getCityInfo({cityCode: budget.destination});
                 }
             }
+
             switch(tripType) {
                 case ETripType.OUT_TRIP:
                     data.deptCity = budget.originPlace ? budget.originPlace.id : "";
                     data.arrivalCity= budget.destination.id;
-                    data.deptDateTime = budget.departDateTime || budget.startAt;
-                    data.arrivalDateTime = budget.arrivalDateTime || budget.backAt;
-                    data.leaveDate = budget.leaveDate || budget.startAt;
+                    data.deptDateTime = budget.departDateTime || budget.departTime;
+                    data.arrivalDateTime = budget.arrivalDateTime || budget.arrivalTime;
+                    data.leaveDate = budget.leaveDate || budget.departTime;
                     data.cabin = budget.cabinClass;
                     data.invoiceType = budget.type;
                     detail = Models.tripDetailTraffic.create(data);
@@ -1213,9 +1214,9 @@ class TripPlanModule {
                 case ETripType.BACK_TRIP:
                     data.deptCity = budget.originPlace ? budget.originPlace.id : "";
                     data.arrivalCity= budget.destination.id;
-                    data.deptDateTime = budget.departDateTime || budget.startAt;
-                    data.arrivalDateTime = budget.arrivalDateTime || budget.backAt;
-                    data.leaveDate = budget.leaveDate || budget.startAt;
+                    data.deptDateTime = budget.departDateTime || budget.departTime;
+                    data.arrivalDateTime = budget.arrivalDateTime || budget.arrivalTime;
+                    data.leaveDate = budget.leaveDate || budget.departTime;
                     data.cabin = budget.cabinClass;
                     data.invoiceType = budget.type;
                     detail = Models.tripDetailTraffic.create(data);
