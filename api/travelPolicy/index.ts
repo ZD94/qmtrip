@@ -455,8 +455,7 @@ class TravelPolicyModule{
         return {ids: ids, count: paginate['total']};
     }
     /*************************************补助模板end***************************************/
-
-
+    
     /**
      * 根据id查询区域差旅标准
      * @param {String} params.id
@@ -491,6 +490,14 @@ class TravelPolicyModule{
         })
         return {ids: ids, count: paginate['total']};
     }
+
+
+    @clientExport
+    @requireParams(["policyId"])
+    async getAvaliableRegionIds(params: {where: any}) : Promise<TravelPolicyRegion[]>{
+        return Models.travelPolicyRegion.find(params);
+    }
+
 }
 
 function tryConvertToArray(val) {
