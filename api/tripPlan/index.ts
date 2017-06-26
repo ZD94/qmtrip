@@ -370,14 +370,6 @@ class TripPlanModule {
             let company = await tripPlan.getCompany();
             let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
             let appMessageUrl = `#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
-            /*let {go, back, hotel, subsidy} = await TripPlanModule.getPlanEmailDetails(tripPlan);
-            let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
-            let auditValues = {username: user.name, time:tripPlan.createdAt, auditUserName: user.name, companyName: company.name, staffName: staff.name, projectName: tripPlan.title, goTrafficBudget: go,
-                backTrafficBudget: back, hotelBudget: hotel, otherBudget: subsidy, totalBudget: tripPlan.budget, appMessageUrl: appMessageUrl, url: auditUrl, detailUrl: auditUrl,
-                approveUser: user.name, tripPlanNo: tripPlan.planNo,
-                content: `企业 ${company.name} 员工 ${staff.name}${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差计划票据已提交，预算：￥${tripPlan.budget}，等待您审核！`,
-                createdAt: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-            };*/
             try{
                 await API.notify.submitNotify({
                     email: auditEmail,
@@ -392,13 +384,6 @@ class TripPlanModule {
             }catch(err){
                 logger.info(err);
             }
-            /*try {
-                await API.notify.submitNotify({
-                    key: 'qm_notify_agency_budget',
-                    values: auditValues,
-                    userId: default_agency.id
-                })
-            } catch(err) { console.error(err);}*/
 
         }
         return true;
@@ -423,11 +408,6 @@ class TripPlanModule {
 
         let audit = params.auditResult;
         let tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
-        /*let templateValue: any = {
-            invoiceDetail: '无',
-            projectName: tripPlan.title,
-            totalBudget: '￥' + tripPlan.budget,
-            time: moment(tripPlan.startAt).format('YYYY-MM-DD')};*/
         let templateValue: any = {};
         let templateName: any = '';
         let isNotify = false;
@@ -440,6 +420,8 @@ class TripPlanModule {
             tripDetail.expenditure = expenditure;
             let query = {where: {id: {$ne: tripDetail.id}, status: [EPlanStatus.AUDITING, EPlanStatus.AUDIT_NOT_PASS]}}
             let noAuditDetails = await tripPlan.getTripDetails(query); //获取所有未经过审核的票据
+            let waitApproveQuery = {where: {id: {$ne: tripDetail.id}, status: EPlanStatus.AUDITING}}
+            let waitApproveDetails = await tripPlan.getTripDetails(waitApproveQuery); //获取所有未审核票据的detail
             if(!noAuditDetails || noAuditDetails.length == 0 ) {
                 isNotify = true;
                 templateName = 'qm_notify_invoice_all_pass';
@@ -456,19 +438,26 @@ class TripPlanModule {
                 savedMoney = (tripPlan.budget - tripPlan.expenditure);
                 savedMoney = savedMoney > 0 ? savedMoney : 0;
                 tripPlan.score = parseInt((savedMoney * SAVED2SCORE).toString());
+            }else if(!waitApproveDetails || waitApproveDetails.length == 0 ){
+                isNotify = true;
+                templateName = 'qm_notify_invoice_not_pass';
+                reason = noAuditDetails[0].auditRemark;
             }
             // templateValue.consume = '￥' + (tripDetail.expenditure || 0);
             let detailSavedM = tripDetail.budget - tripDetail.expenditure;
             detailSavedM = detailSavedM > 0 ? detailSavedM : 0;
         } else if(audit == EAuditStatus.INVOICE_NOT_PASS) {
             logResult = '未通过';
-            isNotify = true;
             tripDetail.auditRemark = reason;
             tripDetail.status = EPlanStatus.AUDIT_NOT_PASS;
             tripPlan.status = EPlanStatus.AUDIT_NOT_PASS;
             tripPlan.auditStatus = EAuditStatus.INVOICE_NOT_PASS;
-            // templateValue.reason = reason;
-            templateName = 'qm_notify_invoice_not_pass';
+            let waitApproveQuery = {where: {id: {$ne: tripDetail.id}, status: EPlanStatus.AUDITING}}
+            let waitApproveDetails = await tripPlan.getTripDetails(waitApproveQuery); //获取所有未审核票据的detail
+            if(!waitApproveDetails || waitApproveDetails.length == 0 ){
+                isNotify = true;
+                templateName = 'qm_notify_invoice_not_pass';
+            }
         } else {
             throw L.ERR.PERMISSION_DENY(); //代理商只能审核票据权限
         }
@@ -482,66 +471,26 @@ class TripPlanModule {
 
         switch (tripDetail.type) {
             case ETripType.OUT_TRIP:
-                // let d1 = <TripDetailTraffic>tripDetail;
-                // var deptCity = await API.place.getCityInfo({cityCode: d1.deptCity});
-                // var arrivalCity = await API.place.getCityInfo({cityCode: d1.arrivalCity});
                 templateValue.tripType = '去程';
-                // templateValue.invoiceDetail = `${moment(d1.deptDateTime).format('YYYY-MM-DD')} 由 ${deptCity.name} 到 ${arrivalCity.name}， 去程发票， 预算：${d1.budget}元`;
                 break;
             case ETripType.BACK_TRIP:
-                // let d2 = <TripDetailTraffic>tripDetail;
-                // var deptCity = await API.place.getCityInfo({cityCode: d2.deptCity});
-                // var arrivalCity = await API.place.getCityInfo({cityCode: d2.arrivalCity});
                 templateValue.tripType = '回程';
-                // templateValue.invoiceDetail = `${moment(d2.deptDateTime).format('YYYY-MM-DD')} 由 ${deptCity.name} 到 ${arrivalCity.name}， 回程发票， 预算：${d2.budget}元`;
                 break;
             case ETripType.HOTEL:
-                // let d3 = <TripDetailHotel>tripDetail;
-                // var city = await API.place.getCityInfo({cityCode: d3.city});
                 templateValue.tripType = '酒店';
-                // templateValue.invoiceDetail = `${moment(d3.checkInDate).format('YYYY.MM.DD')} - ${moment(d3.checkOutDate).format('YYYY.MM.DD')}， ${city.name}`;
-                // if(d3.placeName) {
-                //     templateValue.invoiceDetail += d3.placeName;
-                // }
-                // templateValue.invoiceDetail += `，酒店发票，预算：${d3.budget}元`;
                 break;
             case ETripType.SUBSIDY:
-                // let d4 = <TripDetailSubsidy>tripDetail;
                 templateValue.tripType = '补助';
-                // templateValue.invoiceDetail = `补助发票，预算：${d4.budget}元`;
                 break;
             case ETripType.SPECIAL_APPROVE:
-                // let d5 = <TripDetailSpecial>tripDetail;
                 templateValue.tripType = '特殊审批'
-                // templateValue.invoiceDetail = `特殊审批发票,预算 ${d5.budget}元`
                 break;
             default:
                 templateValue.tripType = ''; break;
         }
         if(isNotify) {
-            /*if(tripPlan.status == EPlanStatus.COMPLETE) {
-                if(tripPlan.isSpecialApprove){
-                    templateValue.invoiceDetail = `${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差票据，预算：${tripPlan.budget}元，实际花费：${tripPlan.expenditure}元`;
-                }else{
-                    templateValue.invoiceDetail = `${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差票据，预算：${tripPlan.budget}元，实际花费：${tripPlan.expenditure}元，节省：${savedMoney}元`;
-                }
-            }*/
-
-            // let {go, back, hotel, subsidy} = await TripPlanModule.getPlanEmailDetails(tripPlan);
             let self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
             let appMessageUrl = `#/trip/list-detail?tripid=${tripPlan.id}`;
-
-            /*templateValue.ticket = templateValue.tripType;
-            templateValue.username = staff.name;
-            templateValue.goTrafficBudget = go;
-            templateValue.backTrafficBudget = back;
-            templateValue.hotelBudget = hotel;
-            templateValue.otherBudget = subsidy;
-            templateValue.detailUrl = self_url;
-            templateValue.url = self_url;
-            templateValue.appMessageUrl = appMessageUrl;
-            templateValue.auditUser = '鲸力商旅';
-            templateValue.auditTime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');*/
 
             try {
                 await API.notify.submitNotify({
