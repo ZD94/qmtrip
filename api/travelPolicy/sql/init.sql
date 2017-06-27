@@ -6,6 +6,7 @@ INSERT INTO travel_policy.travel_policies (
 
 
 
+alter table travel_policy.travel_policy_regions DROP COLUMN  IF EXISTS  policy_id;
 
 INSERT INTO travel_policy.travel_policy_regions (
             id, region_id, policy_id, plane_levels, train_levels, hotel_levels,
