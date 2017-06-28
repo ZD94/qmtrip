@@ -28,7 +28,7 @@ export default async function update(DB: Sequelize, t: Transaction){
             deletedAt = null;
         }
 
-        insertSql = `insert into travel_policy.travel_policy_regions( id, region_id, travel_policy_id, plane_levels, train_levels, hotel_levels,
+        insertSql = `insert into travel_policy.travel_policy_regions( id, region_id, policy_id, plane_levels, train_levels, hotel_levels,
                    plane_discount, traffic_prefer, hotel_prefer, created_at, updated_at, deleted_at)
                    values('${uuid.v1()}', 'CTW_5', '${children[i].id}', ${plane_levels}, ${train_levels}, ${hotel_levels},
                    ${children[i].plane_discount}, ${children[i].traffic_prefer}, ${children[i].hotel_prefer}, '${createdAt}',
@@ -37,7 +37,7 @@ export default async function update(DB: Sequelize, t: Transaction){
         await DB.query(insertSql)
 
         if(children[i].is_open_abroad){
-            insertSql = `insert into travel_policy.travel_policy_regions( id, region_id, travel_policy_id, plane_levels, train_levels, hotel_levels,
+            insertSql = `insert into travel_policy.travel_policy_regions( id, region_id, policy_id, plane_levels, train_levels, hotel_levels,
                plane_discount, traffic_prefer, hotel_prefer, created_at, updated_at, deleted_at)
                values('${uuid.v1()}', 'Global', '${children[i].id}', ${abroad_plane_levels}, ${abroad_train_levels}, ${abroad_hotel_levels},
                ${children[i].plane_discount}, ${children[i].traffic_prefer}, ${children[i].hotel_prefer}, '${createdAt}',
