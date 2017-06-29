@@ -467,9 +467,6 @@ class StaffModule{
         let staff = await Staff.getCurrent();
         // params.where.staffStatus = {$ne: EStaffStatus.FORBIDDEN}
 
-
-        console.log("getStaffs===>", params);
-        console.log("staff===>", staff);
         params.where.staffStatus = EStaffStatus.ON_JOB;
         let { accountId } = Zone.current.get("session");
         if (!params.where) {

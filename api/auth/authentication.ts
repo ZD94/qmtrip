@@ -7,7 +7,6 @@ import validator = require('validator');
 import { Token } from '_types/auth/token';
 import { ACCOUNT_STATUS } from "_types/auth";
 import {OS_TYPE} from '_types/auth/token';
-import {getSession} from "common/model";
 
 //生成登录凭证
 export async function makeAuthenticateToken(accountId, os?: string, expireAt?: Date): Promise<LoginResponse> {
@@ -56,11 +55,6 @@ export async function makeAuthenticateToken(accountId, os?: string, expireAt?: D
 export async function checkTokenAuth(params: AuthRequest): Promise<AuthResponse|null> {
     if(!params.tokenId || !params.sign || !params.timestamp) {
         return null;
-    }
-
-    let session = getSession();
-    if(params["companyId"]){
-        session.companyId = params["companyId"];
     }
 
     var tokenId = params.tokenId;
