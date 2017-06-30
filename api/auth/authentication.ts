@@ -7,6 +7,11 @@ import validator = require('validator');
 import { Token } from '_types/auth/token';
 import { ACCOUNT_STATUS } from "_types/auth";
 import {OS_TYPE} from '_types/auth/token';
+import {CPropertyType} from '_types/company';
+import {SPropertyType} from '_types/staff';
+import LdapAPi from "../ldap/ldapApi";
+import{staffOpts} from "../ldap";
+var API = require("@jingli/dnode-api");
 
 //生成登录凭证
 export async function makeAuthenticateToken(accountId, os?: string, expireAt?: Date): Promise<LoginResponse> {
@@ -144,8 +149,8 @@ export async function login(data: {account?: string, pwd: string, type?: Number,
 
     //第三步查看是邮箱登录或手机号登录 查看有限干活手机号是否已验证
     /*if(loginAccount.mobile == account && !loginAccount.isValidateMobile) {
-        throw L.ERR.NO_VALIDATE_MOBILE();
-    }*/
+     throw L.ERR.NO_VALIDATE_MOBILE();
+     }*/
     if(loginAccount.email == account && !loginAccount.isValidateEmail) {
         throw L.ERR.NO_VALIDATE_EMAIL();
     }
@@ -183,6 +188,73 @@ export async function login(data: {account?: string, pwd: string, type?: Number,
 
 }
 
+export async function loginByLdap(data: {account?: string, pwd: string}): Promise<LoginResponse> {
+    if(!data) {
+        throw L.ERR.DATA_NOT_EXIST();
+    }
+
+    if(!data.account) {
+        throw L.ERR.USERNAME_EMPTY();
+    }
+
+    if(!data.pwd) {
+        throw L.ERR.PWD_EMPTY();
+    }
+
+    var type = EAccountType.STAFF;
+    var account = data.account;
+    //ldap认证
+    let company = await Models.company.get("1826e3b0-5d78-11e7-8209-39ca94a15277");
+    let ldapProperty = await Models.companyProperty.find({where: {companyId: company.id, type: CPropertyType.LDAP}});
+    if(!ldapProperty || !ldapProperty[0]){
+        throw L.ERR.INVALID_ARGUMENT("ldap相关设置");
+    }
+    let ldapInfo = ldapProperty[0].jsonValue;
+    if(typeof ldapInfo == "string") ldapInfo = JSON.parse(ldapInfo);
+
+    let ldapApi = new LdapAPi(ldapInfo.ldapUrl);
+    let entryDn = `uid=${account},${ldapInfo.ldapStaffRootDn}`;
+    let bindResult = await ldapApi.bindUser({entryDn: entryDn, userPassword: data.pwd});
+    if(!bindResult){
+        throw L.ERR.ACCOUNT_NOT_EXIST();
+    }
+
+    let result = await ldapApi.searchDn({rootDn: entryDn, opts: staffOpts});
+
+    if(!result){
+        throw L.ERR.ACCOUNT_NOT_EXIST();
+    }
+
+    let ldapUser = result[0];
+    let ldapUserId = result[0].entryUUID;
+
+    let staffLdapProperty = await Models.staffProperty.find({where : {type: SPropertyType.LDAP, value: ldapUserId}});
+
+    if(!staffLdapProperty || !staffLdapProperty[0]){
+        throw L.ERR.ACCOUNT_NOT_EXIST();
+    }
+
+    let loginAccount = await Models.staff.get(staffLdapProperty[0].staffId);
+    await API.ldap.syncStaff(ldapUser, company.id);
+
+    var ret = await makeAuthenticateToken(loginAccount.accountId);
+    if (loginAccount.isNeedChangePwd) {
+        ret['is_need_change_pwd'] = true;
+    }
+    //判断是否首次登录
+    if(loginAccount.isFirstLogin) {
+        loginAccount.isFirstLogin = false;
+        return loginAccount.save()
+            .then(function() {
+                ret['is_first_login'] = true;
+                return ret;
+            })
+    }
+
+    ret['is_first_login'] = false;
+    return ret;
+
+}
 
 /**
  * 退出登录
