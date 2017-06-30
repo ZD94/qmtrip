@@ -7,7 +7,7 @@ var moment=require("moment");
 
 
 export default async function update(DB: Sequelize, t: Transaction){
-    
+
     var querySql='select * from travel_policy.travel_policies order by created_at desc';
     let [children] = await DB.query(querySql) as any[];
     for(var i=0; i < children.length; i++){
