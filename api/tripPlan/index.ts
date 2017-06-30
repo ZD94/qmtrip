@@ -463,12 +463,11 @@ class TripPlanModule {
         await Promise.all([tripPlan.save(), tripDetail.save()]);
         //修改票据状态
         let invoices = await tripDetail.getInvoices();
-        invoices.map((invoice)=>{
+        Promise.all(invoices.map(async (invoice)=>{
             invoice.status = audit == EAuditStatus.INVOICE_PASS ? EInvoiceStatus.AUDIT_PASS : EInvoiceStatus.AUDIT_FAIL;
             invoice.auditRemark = params.reason || '';
-            invoice.save();
-        });
-
+            await invoice.save();
+        }));
 
         /*******************************************发送通知消息**********************************************/
         let staff = await Models.staff.get(tripPlan['accountId']);
