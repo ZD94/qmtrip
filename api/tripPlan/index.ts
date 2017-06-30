@@ -1038,13 +1038,21 @@ class TripPlanModule {
         let account = await Models.staff.get(approve.submitter);
         let approveUser = await Models.staff.get(approve.approveUser);
         let company = approve.submitter ? account.company : approveUser.company;
-        if (typeof approve.data == 'string') approve.data = JSON.parse(approve.data);
+
+        if (typeof approve.data == 'string')
+            approve.data = JSON.parse(approve.data);
+
         let query: any  = approve.data.query;   //查询条件
-        if(typeof query == 'string') query = JSON.parse(query);
-        if(typeof query.destinationPlacesInfo == 'string') query.destinationPlacesInfo = JSON.parse(query.destinationPlacesInfo);
+        if(typeof query == 'string')
+            query = JSON.parse(query);
+
+        if(typeof query.destinationPlacesInfo == 'string')
+            query.destinationPlacesInfo = JSON.parse(query.destinationPlacesInfo);
+
         let destinationPlacesInfo = query.destinationPlacesInfo;
         let budgets: any = approve.data.budgets;
-        if (typeof budgets == 'string') budgets = JSON.parse(budgets);
+        if (typeof budgets == 'string')
+            budgets = JSON.parse(budgets);
 
         let tripPlan = TripPlan.create({id: approve.id});
         let arrivalCityCodes = [];//目的地代码
@@ -1137,13 +1145,14 @@ class TripPlanModule {
                     budget.destination = await API.place.getCityInfo({cityCode: budget.destination});
                 }
             }
+
             switch(tripType) {
                 case ETripType.OUT_TRIP:
                     data.deptCity = budget.originPlace ? budget.originPlace.id : "";
                     data.arrivalCity= budget.destination.id;
-                    data.deptDateTime = budget.departDateTime;
-                    data.arrivalDateTime = budget.arrivalDateTime;
-                    data.leaveDate = budget.leaveDate;
+                    data.deptDateTime = budget.departDateTime || budget.departTime;
+                    data.arrivalDateTime = budget.arrivalDateTime || budget.arrivalTime;
+                    data.leaveDate = budget.leaveDate || budget.departTime;
                     data.cabin = budget.cabinClass;
                     data.invoiceType = budget.type;
                     detail = Models.tripDetailTraffic.create(data);
@@ -1152,9 +1161,9 @@ class TripPlanModule {
                 case ETripType.BACK_TRIP:
                     data.deptCity = budget.originPlace ? budget.originPlace.id : "";
                     data.arrivalCity= budget.destination.id;
-                    data.deptDateTime = budget.departDateTime;
-                    data.arrivalDateTime = budget.arrivalDateTime;
-                    data.leaveDate = budget.leaveDate;
+                    data.deptDateTime = budget.departDateTime || budget.departTime;
+                    data.arrivalDateTime = budget.arrivalDateTime || budget.arrivalTime;
+                    data.leaveDate = budget.leaveDate || budget.departTime;
                     data.cabin = budget.cabinClass;
                     data.invoiceType = budget.type;
                     detail = Models.tripDetailTraffic.create(data);
