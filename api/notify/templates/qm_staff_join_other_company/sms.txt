@@ -1,0 +1,1 @@
+尊敬的<%= staffName %>, <%= companyName %>的<%= inviterName %>邀请你使用鲸力商旅服务。登录地址 http://j.jingli365.com
