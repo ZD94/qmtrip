@@ -185,7 +185,8 @@ export default class ApiTravelBudget {
                 budget.originPlace = budget.fromCity;
                 budget.destination = budget.toCity;
                 budget.tripType = ETripType.OUT_TRIP;
-                budget.price = budget.price * count;
+                budget.price=budget.price * count;
+                budget.type = budget.trafficType;
                 budgets.push(budget);
             }
 

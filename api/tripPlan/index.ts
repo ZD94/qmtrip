@@ -364,8 +364,8 @@ class TripPlanModule {
             }
             let staff = await Models.staff.get(staffId);
             let company = await tripPlan.getCompany();
-            let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
-            let appMessageUrl = `#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
+            let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
+            let appMessageUrl = `#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
             /*let {go, back, hotel, subsidy} = await TripPlanModule.getPlanEmailDetails(tripPlan);
             let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
             let auditValues = {username: user.name, time:tripPlan.createdAt, auditUserName: user.name, companyName: company.name, staffName: staff.name, projectName: tripPlan.title, goTrafficBudget: go,
@@ -377,7 +377,7 @@ class TripPlanModule {
             try{
                 await API.notify.submitNotify({
                     email: auditEmail,
-                    key: 'qm_notify_invoice_audit_request',
+                    key: 'qm_notify_agency_budget',
                     values:{
                         company: company,
                         staff: staff,
@@ -1089,13 +1089,21 @@ class TripPlanModule {
         let account = await Models.staff.get(approve.submitter);
         let approveUser = await Models.staff.get(approve.approveUser);
         let company = approve.submitter ? account.company : approveUser.company;
-        if (typeof approve.data == 'string') approve.data = JSON.parse(approve.data);
+
+        if (typeof approve.data == 'string')
+            approve.data = JSON.parse(approve.data);
+
         let query: any  = approve.data.query;   //查询条件
-        if(typeof query == 'string') query = JSON.parse(query);
-        if(typeof query.destinationPlacesInfo == 'string') query.destinationPlacesInfo = JSON.parse(query.destinationPlacesInfo);
+        if(typeof query == 'string')
+            query = JSON.parse(query);
+
+        if(typeof query.destinationPlacesInfo == 'string')
+            query.destinationPlacesInfo = JSON.parse(query.destinationPlacesInfo);
+
         let destinationPlacesInfo = query.destinationPlacesInfo;
         let budgets: any = approve.data.budgets;
-        if (typeof budgets == 'string') budgets = JSON.parse(budgets);
+        if (typeof budgets == 'string')
+            budgets = JSON.parse(budgets);
 
         let tripPlan = TripPlan.create({id: approve.id});
         let arrivalCityCodes = [];//目的地代码
@@ -1188,13 +1196,14 @@ class TripPlanModule {
                     budget.destination = await API.place.getCityInfo({cityCode: budget.destination});
                 }
             }
+
             switch(tripType) {
                 case ETripType.OUT_TRIP:
                     data.deptCity = budget.originPlace ? budget.originPlace.id : "";
                     data.arrivalCity= budget.destination.id;
-                    data.deptDateTime = budget.departDateTime;
-                    data.arrivalDateTime = budget.arrivalDateTime;
-                    data.leaveDate = budget.leaveDate;
+                    data.deptDateTime = budget.departDateTime || budget.departTime;
+                    data.arrivalDateTime = budget.arrivalDateTime || budget.arrivalTime;
+                    data.leaveDate = budget.leaveDate || budget.departTime;
                     data.cabin = budget.cabinClass;
                     data.invoiceType = budget.type;
                     detail = Models.tripDetailTraffic.create(data);
@@ -1203,9 +1212,9 @@ class TripPlanModule {
                 case ETripType.BACK_TRIP:
                     data.deptCity = budget.originPlace ? budget.originPlace.id : "";
                     data.arrivalCity= budget.destination.id;
-                    data.deptDateTime = budget.departDateTime;
-                    data.arrivalDateTime = budget.arrivalDateTime;
-                    data.leaveDate = budget.leaveDate;
+                    data.deptDateTime = budget.departDateTime || budget.departTime;
+                    data.arrivalDateTime = budget.arrivalDateTime || budget.arrivalTime;
+                    data.leaveDate = budget.leaveDate || budget.departTime;
                     data.cabin = budget.cabinClass;
                     data.invoiceType = budget.type;
                     detail = Models.tripDetailTraffic.create(data);
@@ -1660,7 +1669,7 @@ class TripPlanModule {
             await API.notify.submitNotify({
              mobile: '13810529805',
              email: 'notice@jingli365.com',
-             key: 'qm_notify_invoice_audit_request',
+             key: 'qm_notify_agency_budget',
              values:{
                  company:staff.company,
                  staff:staff,
