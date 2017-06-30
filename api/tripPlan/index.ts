@@ -1674,7 +1674,7 @@ class TripPlanModule {
     }
 
     @clientExport
-    @requireParams(["id"], ['totalMoney', 'status', 'auditRemark', 'payType', 'invoiceDateTime', 'type', 'remark', 'pictureFileId'])
+    @requireParams(["id"], ['totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark', 'pictureFileId'])
     static async updateTripDetailInvoice(params) :Promise<TripDetailInvoice> {
         let {id, totalMoney} = params;
         let oldMoney = 0;
@@ -1689,9 +1689,16 @@ class TripPlanModule {
         if (tripDetailInvoice.totalMoney) {
             oldMoney = tripDetailInvoice.totalMoney;
         }
+
+        if(params.totalMoney != oldMoney || params.pictureFileId != tripDetailInvoice.pictureFileId){
+            tripDetailInvoice.status = EInvoiceStatus.WAIT_AUDIT;
+            tripDetailInvoice.auditRemark = "";
+        }
+
         for(let key in params) {
             tripDetailInvoice[key] = params[key];
         }
+
         tripDetailInvoice = await tripDetailInvoice.save()
 
         let tripDetail = await Models.tripDetail.get(tripDetailInvoice.tripDetailId);
