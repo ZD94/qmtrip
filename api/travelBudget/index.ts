@@ -166,6 +166,7 @@ export default class ApiTravelBudget {
             segments,
             ret: params.isRoundTrip ? 1 : 0,
             fromCity: params.originPlace,
+            backCity: params.goBackPlace,
             preferSet: staff.company.budgetConfig || {},
         });
 
