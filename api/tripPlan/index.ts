@@ -461,6 +461,13 @@ class TripPlanModule {
 
         //保存更改记录
         await Promise.all([tripPlan.save(), tripDetail.save()]);
+        //修改票据状态
+        let invoices = await tripDetail.getInvoices();
+        Promise.all(invoices.map(async (invoice)=>{
+            invoice.status = audit == EAuditStatus.INVOICE_PASS ? EInvoiceStatus.AUDIT_PASS : EInvoiceStatus.AUDIT_FAIL;
+            invoice.auditRemark = params.reason || '';
+            await invoice.save();
+        }));
 
         /*******************************************发送通知消息**********************************************/
         let staff = await Models.staff.get(tripPlan['accountId']);
@@ -1691,9 +1698,16 @@ class TripPlanModule {
         if (tripDetailInvoice.totalMoney) {
             oldMoney = tripDetailInvoice.totalMoney;
         }
+
+        if(params.totalMoney != oldMoney || params.pictureFileId != tripDetailInvoice.pictureFileId){
+            tripDetailInvoice.status = EInvoiceStatus.WAIT_AUDIT;
+            tripDetailInvoice.auditRemark = "";
+        }
+
         for(let key in params) {
             tripDetailInvoice[key] = params[key];
         }
+
         tripDetailInvoice = await tripDetailInvoice.save()
 
         let tripDetail = await Models.tripDetail.get(tripDetailInvoice.tripDetailId);
