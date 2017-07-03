@@ -34,3 +34,4 @@ ts-node/
 wyl_test/
 mytest/
 nglibs/**/*.js
+typings/
