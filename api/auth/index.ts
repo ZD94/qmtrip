@@ -254,6 +254,40 @@ export default class ApiAuth {
     }
 
     /**
+     * 发送短信qm_staff_join_other_company
+     * @param params
+     * @returns {boolean}
+     */
+    @clientExport
+    static async reSendJoinedSms(params: {accountId: string, inviterStaffId: string, targetStaffName: string}): Promise<boolean> {
+        let accountId = params.accountId;
+        let account = await ApiAuth.getPrivateInfo({id: accountId});
+
+        if (!account.mobile) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+
+        if(!params.inviterStaffId || !params.targetStaffName){
+            throw L.ERR.INVALID_ARGUMENT();
+        }
+
+        let inviterStaff = await Models.staff.get(params.inviterStaffId);
+        //发送短信通知
+        let values  = {
+            staffName: params.targetStaffName,
+            companyName:inviterStaff.company.name,
+            inviterName: inviterStaff.name
+        }
+
+        await API.notify.submitNotify({
+            key: 'qm_staff_join_other_company',
+            values: values,
+            mobile: account.mobile,
+        });
+        return true;
+    }
+
+    /**
      * @method activeByEmail 通过邮箱链接激活账号
      *
      * 通过邮箱激活账号
