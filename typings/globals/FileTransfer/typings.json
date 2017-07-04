@@ -1,8 +1,0 @@
-{
-  "resolution": "main",
-  "tree": {
-    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/37ae2de2a11eac6fc4584ea0b79b142f64f9874e/cordova/plugins/FileTransfer.d.ts",
-    "raw": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/37ae2de2a11eac6fc4584ea0b79b142f64f9874e/cordova/plugins/FileTransfer.d.ts",
-    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/37ae2de2a11eac6fc4584ea0b79b142f64f9874e/cordova/plugins/FileTransfer.d.ts"
-  }
-}
