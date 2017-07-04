@@ -62,7 +62,22 @@ server.api_config = config.api;
 
 var cluster = require('cluster');
 server.on('init.api', function(API){
-    API.registerAuthWeb(API.auth.authentication);
+    API.registerAuthWeb((params)=>{
+        return API.auth.authentication(params).then((ret)=>{
+
+            //在session中加入staffId
+            if(ret && params.staffId){
+                let sql = `select * from staff.staffs where id = '${params.staffId}' and account_id = '${ret.accountId}'`;
+                database.DB.query(sql).then((result)=>{
+                    if(result[0].length){
+                        let session = zone.current.get('session');
+                        session.staffId = params.staffId;
+                    }
+                })
+            }
+            return ret;
+        });
+    });
     if(cluster.isMaster && config.is_init_test_company){
         initData.initDataForTest({name: '笑傲江湖', userName: '风清扬', mobile: '13700000001', pwd: '123456', email: 'fq.yang@jingli.tech'});
     }

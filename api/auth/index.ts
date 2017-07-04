@@ -1305,12 +1305,6 @@ export default class ApiAuth {
     static getQRCodeUrl = qrcode.getQRCodeUrl;
 
     static removeByTest = byTest.removeByTest;
-
-    @clientExport
-    static setUserId = authentication.setUserId;
-
-    @clientExport
-    static getUserId = authentication.getUserId;
 }
 
 async function _sendActiveEmail(accountId: string, origin?: string) {

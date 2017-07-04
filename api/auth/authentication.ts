@@ -56,7 +56,7 @@ export async function checkTokenAuth(params: AuthRequest): Promise<AuthResponse|
     if(!params.tokenId || !params.sign || !params.timestamp) {
         return null;
     }
-    //var userId = params.userId || params.user_id;
+
     var tokenId = params.tokenId;
     var timestamp = params.timestamp;
     var tokenSign = params.sign;
@@ -96,6 +96,7 @@ export async function checkTokenAuth(params: AuthRequest): Promise<AuthResponse|
  * @public
  */
 export async function login(data: {account?: string, pwd: string, type?: Number, email?: string}): Promise<LoginResponse> {
+
     if(!data) {
         throw L.ERR.DATA_NOT_EXIST();
     }
@@ -202,26 +203,3 @@ export async function logout(params: {}): Promise<boolean> {
     }
     return true;
 };
-
-export async function setUserId(params: {userId: string}) :Promise<boolean> {
-    let {userId} = params;
-    let session = Zone.current.get("session");
-    let tokenId = session['tokenId'];
-    let token = await Models.token.get(tokenId);
-    if (token.accountId != session['accountId']) {
-        return false;
-    }
-    token.userId = userId;
-    await token.save();
-    return true;
-}
-
-export async function getUserId(params): Promise<string> {
-    let session = Zone.current.get("session");
-    let tokenId = session['tokenId'];
-    let token = await Models.token.get(tokenId);
-    if (token && token.accountId == session['accountId']) {
-        return token.userId;
-    }
-    return null;
-}

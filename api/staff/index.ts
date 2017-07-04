@@ -170,7 +170,7 @@ class StaffModule{
         });
         return staff;
     }
-   static async  sendNoticeToAdmins(params:{companyId:string,noticeTemplate:string, staffId?: string}):Promise<any>{
+    static async  sendNoticeToAdmins(params:{companyId:string,noticeTemplate:string, staffId?: string}):Promise<any>{
         let company = await Models.company.get(params.companyId);
         let managers= await company.getManagers({withOwner:true});
        let staff: Staff;
@@ -488,12 +488,15 @@ class StaffModule{
     static async getStaffs(params: {where: any, order?: any, attributes?: any}) :Promise<FindResult>{
         let staff = await Staff.getCurrent();
         // params.where.staffStatus = {$ne: EStaffStatus.FORBIDDEN}
+
         params.where.staffStatus = EStaffStatus.ON_JOB;
         let { accountId } = Zone.current.get("session");
         if (!params.where) {
             params.where = {};
         }
         params.order = params.order || [['createdAt', 'desc']];
+
+
 
         if(staff){
             params.where.companyId = staff["companyId"];
