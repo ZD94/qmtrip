@@ -1292,6 +1292,9 @@ export default class ApiAuth {
     static makeAuthenticateToken = authentication.makeAuthenticateToken;
 
     @clientExport
+    static setSessionStaffId = authentication.setSessionStaffId;
+
+    @clientExport
     @requireParams(["jpushId"])
     static saveOrUpdateJpushId = messagePush.saveOrUpdateJpushId;
     @clientExport

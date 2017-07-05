@@ -25,6 +25,7 @@ import {FindResult} from "common/model/interface";
 import {ENoticeType} from "_types/notice/notice";
 import {CoinAccount} from "_types/coin";
 import {StaffDepartment} from "_types/department/staffDepartment";
+import {getSession} from "common/model/index";
 
 
 const invitedLinkCols = InvitedLink['$fieldnames'];
@@ -453,6 +454,34 @@ class StaffModule{
         }
         return updateStaff;
     }
+
+
+    /*
+    * 根据accountId查询与之对应的staffs
+    */
+    @clientExport
+    static async getStaffsByAccountId() : Promise<Staff[]>{
+
+        let session = getSession();
+        if(session && session.accountId){
+            let staffs = await Models.staff.find({
+                where : {
+                    accountId : session.accountId
+                }
+            });
+            let resultStaffs = [];
+
+            staffs.map((staff)=>{
+                resultStaffs.push(staff);
+            });
+
+            return resultStaffs;
+        }else{
+            throw L.ERR.PERMISSION_DENIED();
+        }
+    }
+
+
 
     /**
      * 根据id查询员工

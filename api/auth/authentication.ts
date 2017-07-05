@@ -7,6 +7,7 @@ import validator = require('validator');
 import { Token } from '_types/auth/token';
 import { ACCOUNT_STATUS } from "_types/auth";
 import {OS_TYPE} from '_types/auth/token';
+import { getSession } from "common/model";
 
 //生成登录凭证
 export async function makeAuthenticateToken(accountId, os?: string, expireAt?: Date): Promise<LoginResponse> {
@@ -80,6 +81,32 @@ export async function checkTokenAuth(params: AuthRequest): Promise<AuthResponse|
     await token.save();
     return {accountId: token.accountId, tokenId: token.id} as AuthResponse;
 };
+
+
+/**
+ * @method check
+ *
+ * 修改session设置
+ */
+export async function setSessionStaffId( params : {
+    staffId : string,
+    accountId ? : string
+} ){
+    let session = getSession();
+    let { accountId, staffId } = params;
+
+    if(session && session.accountId){
+        accountId = session.accountId;
+    }
+
+    let staff= await Models.staff.get(staffId);
+    if(staff && staff.accountId == accountId){
+        session.staffId = staffId;
+        return true;
+    }else{
+        return false;
+    }
+}
 
 
 /**
