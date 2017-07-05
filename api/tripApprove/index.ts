@@ -390,6 +390,9 @@ class TripApproveModule {
         }
         let frozenNum = query.frozenNum;
         console.info(frozenNum);
+        if(!frozenNum){
+            frozenNum = { extraFrozen: 0, limitFrozen: 0 };
+        }
         let content = tripApprove.deptCity+"-"+tripApprove.arrivalCity;
         if(tripApprove.createdAt.getMonth() == new Date().getMonth()){
             await company.approveRejectFreeTripPlanNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
