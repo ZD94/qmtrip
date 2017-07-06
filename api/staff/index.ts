@@ -477,7 +477,7 @@ class StaffModule{
 
             return resultStaffs;
         }else{
-            throw L.ERR.PERMISSION_DENIED();
+            throw L.ERR.PERMISSION_DENY();
         }
     }
 

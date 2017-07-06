@@ -65,11 +65,18 @@ server.on('init.api', function(API){
     API.registerAuthWeb((params)=>{
         return API.auth.authentication(params).then((ret)=>{
 
-            if(ret && params.staffId){
-                API.auth.setCurrentStaffId({
+            if(ret){
+                 return API.auth.setCurrentStaffId({
                     accountId : ret.accountId,
                     staffId   : params.staffId
-                });
+                 })
+                 .then((staff)=>{
+                    ret.staff = staff;
+                    return ret;
+                 })
+                 .catch((e)=>{
+                     return ret;
+                 });
             }
             return ret;
         });
