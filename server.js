@@ -71,14 +71,15 @@ server.on('init.api', function(API){
                     staffId   : params.staffId
                  })
                  .then((staff)=>{
-                    ret.staff = staff;
+                    ret.staffId = staff.id;
                     return ret;
                  })
                  .catch((e)=>{
                      return ret;
                  });
+            }else{
+                return null;
             }
-            return ret;
         });
     });
     if(cluster.isMaster && config.is_init_test_company){
