@@ -43,6 +43,12 @@ export default class LdapApi {
         })
     }
 
+    async getParentDn(params:{dn: string}){
+        let parseDN = ldap.parseDN;
+        let dn = parseDN(params.dn);
+        let parentDn = dn.parent();
+        return parentDn.toString();
+    }
 
     async unBind(){
         return new Promise<any>( (resolve, reject) => {

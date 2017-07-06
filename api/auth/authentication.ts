@@ -219,7 +219,7 @@ export async function loginByLdap(data: {account?: string, pwd: string}): Promis
         throw L.ERR.ACCOUNT_NOT_EXIST();
     }
 
-    let result = await ldapApi.searchDn({rootDn: entryDn, opts: staffOpts});
+    let result = await ldapApi.searchDn({rootDn: entryDn, opts: staffOpts.attributes});
 
     if(!result){
         throw L.ERR.ACCOUNT_NOT_EXIST();
