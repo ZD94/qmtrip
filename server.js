@@ -65,13 +65,21 @@ server.on('init.api', function(API){
     API.registerAuthWeb((params)=>{
         return API.auth.authentication(params).then((ret)=>{
 
-            if(ret && params.staffId){
-                API.auth.setCurrentStaffId({
+            if(ret){
+                 return API.auth.setCurrentStaffId({
                     accountId : ret.accountId,
                     staffId   : params.staffId
-                });
+                 })
+                 .then((staff)=>{
+                    ret.staffId = staff.id;
+                    return ret;
+                 })
+                 .catch((e)=>{
+                     return ret;
+                 });
+            }else{
+                return null;
             }
-            return ret;
         });
     });
     if(cluster.isMaster && config.is_init_test_company){

@@ -111,7 +111,6 @@ export async function setCurrentStaffId( params : {
     }
 
     session.staffId = staff.id;
-
     return staff;
 }
 
