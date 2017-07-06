@@ -66,7 +66,7 @@ server.on('init.api', function(API){
         return API.auth.authentication(params).then((ret)=>{
 
             if(ret && params.staffId){
-                API.auth.setSessionStaffId({
+                API.auth.setCurrentStaffId({
                     accountId : ret.accountId,
                     staffId   : params.staffId
                 });

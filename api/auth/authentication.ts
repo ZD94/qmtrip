@@ -8,6 +8,8 @@ import { Token } from '_types/auth/token';
 import { ACCOUNT_STATUS } from "_types/auth";
 import {OS_TYPE} from '_types/auth/token';
 import { getSession } from "common/model";
+import {Staff} from "_types/staff/staff";
+let API = require("@jingli/dnode-api");
 
 //生成登录凭证
 export async function makeAuthenticateToken(accountId, os?: string, expireAt?: Date): Promise<LoginResponse> {
@@ -88,10 +90,10 @@ export async function checkTokenAuth(params: AuthRequest): Promise<AuthResponse|
  *
  * 修改session设置
  */
-export async function setSessionStaffId( params : {
+export async function setCurrentStaffId( params : {
     staffId : string,
     accountId ? : string
-} ){
+} ) :Promise<Staff> {
     let session = getSession();
     let { accountId, staffId } = params;
 
@@ -100,12 +102,17 @@ export async function setSessionStaffId( params : {
     }
 
     let staff= await Models.staff.get(staffId);
-    if(staff && staff.accountId == accountId){
-        session.staffId = staffId;
-        return true;
-    }else{
-        return false;
+    if(!(staff && staff.accountId == accountId)){
+        let staffs = await API.staff.getStaffsByAccountId();
+        if(!staffs.length){
+            throw L.ERR.USER_NOT_EXIST();
+        }
+        staff = staffs[0];
     }
+
+    session.staffId = staff.id;
+
+    return staff;
 }
 
 
