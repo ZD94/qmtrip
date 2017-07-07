@@ -65,17 +65,21 @@ server.on('init.api', function(API){
     API.registerAuthWeb((params)=>{
         return API.auth.authentication(params).then((ret)=>{
 
-            //在session中加入staffId
-            if(ret && params.staffId){
-                let sql = `select * from staff.staffs where id = '${params.staffId}' and account_id = '${ret.accountId}'`;
-                database.DB.query(sql).then((result)=>{
-                    if(result[0].length){
-                        let session = zone.current.get('session');
-                        session.staffId = params.staffId;
-                    }
-                })
+            if(ret){
+                 return API.auth.setCurrentStaffId({
+                    accountId : ret.accountId,
+                    staffId   : params.staffId
+                 })
+                 .then((staff)=>{
+                    ret.staffId = staff.id;
+                    return ret;
+                 })
+                 .catch((e)=>{
+                     return ret;
+                 });
+            }else{
+                return null;
             }
-            return ret;
         });
     });
     if(cluster.isMaster && config.is_init_test_company){
