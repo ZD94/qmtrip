@@ -1,7 +1,9 @@
 /**
  * Created by wangyali on 2017/7/6.
  */
-import { OaDepartment } from './lib/department';
+import { OaDepartment } from './lib/oaDepartment';
+import { OaStaff } from './lib/OaStaff';
+import LdapStaff from './ldapStaff';
 import LdapAPi from "./ldapApi";
 import{departmentOpts} from "./index"
 export default class LdapDepartment extends OaDepartment {
@@ -48,7 +50,12 @@ export default class LdapDepartment extends OaDepartment {
         this.target.dn = val;
     }
 
+    async getSelfById(): Promise<OaDepartment> {
+        return null;
+    }
+
     async getChildrenDepartments(): Promise<OaDepartment[]> {
+        let self = this;
         let selfEntry = await this.getSelfEntry();
         let opts = {
             filter: `(objectClass=${selfEntry.objectClass})`,
@@ -57,7 +64,36 @@ export default class LdapDepartment extends OaDepartment {
         };
         let result = await this.ldapApi.searchDn({rootDn: this.dn, opts: opts});
         let returnResult = result.map((item) => {
-            return new LdapDepartment({});
+            return new LdapDepartment({id: item.entryUUID, dn: item.dn, name: item.ou, parentId: self.id, ldapApi: self.ldapApi});
+        })
+        return returnResult;
+    }
+
+    async getParent(): Promise<OaDepartment> {
+        let self = this;
+        let parentDn = await this.ldapApi.getParentDn({dn: this.dn});
+        let opts = {
+            attributes: departmentOpts.attributes
+        };
+        let result = await this.ldapApi.searchDn({rootDn: parentDn, opts: opts});
+        if(result && result[0]){
+            return new LdapDepartment({id: result[0].entryUUID, dn: result[0].dn, name: result[0].ou, ldapApi: self.ldapApi});
+        }
+        return null;
+    }
+
+    async getStaffs(): Promise<OaStaff[]> {
+        let self = this;
+        let selfEntry = await this.getSelfEntry();
+        let opts = {
+            filter: `!(objectClass=${selfEntry.objectClass})`,
+            scope: 'one',
+            attributes: departmentOpts.attributes
+        };
+        let result = await this.ldapApi.searchDn({rootDn: this.dn, opts: opts});
+        let returnResult = result.map((item) => {
+            return new LdapStaff({id: item.entryUUID, dn: item.dn, name: item.cn, mobile: item.mobile,
+                email: item.email, sex: item.sex, userPassword: item.userPassword, ldapApi: self.ldapApi});
         })
         return returnResult;
     }
@@ -70,32 +106,9 @@ export default class LdapDepartment extends OaDepartment {
         return result[0];
     }
 
-    async getParent(): Promise<any> {
-        let parentDn = await this.ldapApi.getParentDn({dn: this.dn});
-        return parentDn;
-    }
-
-    async getStaffs(): Promise<any> {
-        let selfEntry = await this.getSelfEntry();
-        let opts = {
-            filter: `!(objectClass=${selfEntry.objectClass})`,
-            scope: 'one',
-            attributes: departmentOpts.attributes
-        };
-        let result = await this.ldapApi.searchDn({rootDn: this.dn, opts: opts});
-        return result;
-    }
     constructor(target: any) {
         super(target);
         this.ldapApi = target.ldapApi;
-        console.info(this.id);
-        // this.id = aaa.id;
-        // this.manager = aaa.manager;
-        // this.dn = aaa.dn;
-        // this.manager = aaa.manager;
-        // this.parentId = aaa.parentId;
-        // console.info(this.ldapApi);
-        // console.info("this.ldapApi=========================");
     }
 
 };

@@ -8,7 +8,6 @@ import { Token } from '_types/auth/token';
 import { ACCOUNT_STATUS } from "_types/auth";
 import {OS_TYPE} from '_types/auth/token';
 import {CPropertyType} from '_types/company';
-import {SPropertyType} from '_types/staff';
 import LdapAPi from "../ldap/ldapApi";
 import{staffOpts} from "../ldap";
 var API = require("@jingli/dnode-api");
@@ -212,6 +211,8 @@ export async function loginByLdap(data: {account?: string, pwd: string}): Promis
     let ldapInfo = ldapProperty[0].jsonValue;
     if(typeof ldapInfo == "string") ldapInfo = JSON.parse(ldapInfo);
 
+    console.info(ldapInfo)
+    console.info("ldapInfo======================")
     let ldapApi = new LdapAPi(ldapInfo.ldapUrl);
     let entryDn = `uid=${account},${ldapInfo.ldapStaffRootDn}`;
     let bindResult = await ldapApi.bindUser({entryDn: entryDn, userPassword: data.pwd});
@@ -219,7 +220,9 @@ export async function loginByLdap(data: {account?: string, pwd: string}): Promis
         throw L.ERR.ACCOUNT_NOT_EXIST();
     }
 
-    let result = await ldapApi.searchDn({rootDn: entryDn, opts: staffOpts.attributes});
+    console.info(bindResult);
+    console.info("bindResult========================");
+    let result = await ldapApi.searchDn({rootDn: entryDn, opts: {attributes: staffOpts.attributes}});
 
     if(!result){
         throw L.ERR.ACCOUNT_NOT_EXIST();
@@ -227,15 +230,20 @@ export async function loginByLdap(data: {account?: string, pwd: string}): Promis
 
     let ldapUser = result[0];
     let ldapUserId = result[0].entryUUID;
+    console.info(ldapUser);
+    console.info(ldapUserId);
+    console.info("ldapUserId============================");
 
-    let staffLdapProperty = await Models.staffProperty.find({where : {type: SPropertyType.LDAP, value: ldapUserId}});
+    let staffLdapProperty = await Models.staffProperty.find({where : {type: CPropertyType.LDAP, value: ldapUserId}});
+    console.info(staffLdapProperty)
+    console.info("staffLdapProperty=============")
 
     if(!staffLdapProperty || !staffLdapProperty[0]){
         throw L.ERR.ACCOUNT_NOT_EXIST();
     }
 
     let loginAccount = await Models.staff.get(staffLdapProperty[0].staffId);
-    await API.ldap.syncStaff(ldapUser, company.id);
+    // await API.ldap.syncStaff(ldapUser, company.id);
 
     var ret = await makeAuthenticateToken(loginAccount.accountId);
     if (loginAccount.isNeedChangePwd) {
