@@ -28,3 +28,4 @@ INSERT INTO company.suppliers(
 
 
 
+update company.companies set auto_approve_type = 2 where auto_approve_type is null;
