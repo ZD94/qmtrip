@@ -214,7 +214,6 @@ export default class ApiTravelBudget {
                 }
             }
 
-
             let budget = await getSubsidyBudget(placeInfo);
             if (budget) {
                 budget.city = city;
@@ -222,44 +221,40 @@ export default class ApiTravelBudget {
                 if (budget) {
                     budgets.push(budget);
                 }
-                budget.city = city;
-                if (budget) {
-                    budgets.push(budget);
+            }
+        }
+
+        let obj: any = {};
+        obj.budgets = budgets;
+        obj.query = params;
+        obj.createAt = Date.now();
+        let _id = Date.now() + utils.getRndStr(6);
+        let key = `budgets:${staffId}:${_id}`;
+        await cache.write(key, JSON.stringify(obj));
+        await ApiTravelBudget.sendTripApproveNoticeToSystem({ cacheId: _id, staffId: staffId });
+        return _id;
+
+
+        function getSubsidyBudget(destination) {
+            let { subsidy, leaveDate, goBackDate, reason } = destination;
+            let budget: any = null
+            if (subsidy && subsidy.template) {
+                let goBackDay = moment(goBackDate).format("YYYY-MM-DD");
+                let leaveDay = moment(leaveDate).format("YYYY-MM-DD");
+                let days = moment(goBackDay).diff(moment(leaveDay), 'days');
+                if (days > 0) {
+                    budget = {};
+                    budget.fromDate = leaveDate;
+                    budget.endDate = goBackDate;
+                    budget.tripType = ETripType.SUBSIDY;
+                    budget.type = EInvoiceType.SUBSIDY;
+                    budget.price = subsidy.template.subsidyMoney * days;
+                    budget.duringDays = days;
+                    budget.template = { id: subsidy.template.id, name: subsidy.template.name };
+                    budget.reason = reason;
                 }
             }
-
-            let obj: any = {};
-            obj.budgets = budgets;
-            obj.query = params;
-            obj.createAt = Date.now();
-            let _id = Date.now() + utils.getRndStr(6);
-            let key = `budgets:${staffId}:${_id}`;
-            await cache.write(key, JSON.stringify(obj));
-            await ApiTravelBudget.sendTripApproveNoticeToSystem({cacheId: _id, staffId: staffId});
-            return _id;
-
-
-            function getSubsidyBudget(destination) {
-                let {subsidy, leaveDate, goBackDate, reason} = destination;
-                let budget: any = null
-                if (subsidy && subsidy.template) {
-                    let goBackDay = moment(goBackDate).format("YYYY-MM-DD");
-                    let leaveDay = moment(leaveDate).format("YYYY-MM-DD");
-                    let days = moment(goBackDay).diff(moment(leaveDay), 'days');
-                    if (days > 0) {
-                        budget = {};
-                        budget.fromDate = leaveDate;
-                        budget.endDate = goBackDate;
-                        budget.tripType = ETripType.SUBSIDY;
-                        budget.type = EInvoiceType.SUBSIDY;
-                        budget.price = subsidy.template.subsidyMoney * days;
-                        budget.duringDays = days;
-                        budget.template = {id: subsidy.template.id, name: subsidy.template.name};
-                        budget.reason = reason;
-                    }
-                }
-                return budget;
-            }
+            return budget;
         }
     }
 
