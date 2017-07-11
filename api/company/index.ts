@@ -537,7 +537,7 @@ class CompanyModule {
 
     static _scheduleTask () {
         let taskId = "resetTripPlanPassNum";
-        scheduler('0 5 0 1 * ?', taskId, function() {
+        scheduler('0 5 0 1 * *', taskId, function() {
             //每月1号付费企业消耗行程数，冻结数归零
             (async ()=> {
                 let companies = await Models.company.all({where : {expiryDate : {$gt: moment().format('YYYY-MM-DD HH:mm:ss')}, type: ECompanyType.PAYED}});
