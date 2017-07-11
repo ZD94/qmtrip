@@ -245,7 +245,7 @@ export default class ApiTravelBudget {
                 if (days > 0) {
                     budget = {};
                     budget.fromDate = leaveDate;
-                    budget.endDate = goBackDate;
+                    budget.endDate = goBackDate == leaveDay ? goBackDate: moment(goBackDate).add(-1, 'days').format('YYYY-MM-DD');
                     budget.tripType = ETripType.SUBSIDY;
                     budget.type = EInvoiceType.SUBSIDY;
                     budget.price = subsidy.template.subsidyMoney * days;
