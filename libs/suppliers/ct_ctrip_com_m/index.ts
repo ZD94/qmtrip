@@ -276,11 +276,18 @@ export default class SupplierCtripCT extends SupplierWebRobot{
             if(!res.body.Result)
                 return null as SupplierOrder;
             let order = res.body.Response.OrderDetailBase;
+            let passengers = order.Passenger ? order.Passenger.map((p) => p.name) : [];
+            if (!passengers.length && order.Train.passenger) {
+                for(let key of order.Train.passenger) {
+                    passengers.push(order.Train.passenger[key].name);
+                }
+            }
+
             return {
                 id: 'ct_ctrip_com_'+item.OrderNumber,
                 price: item.Price,
                 date: new Date(item.Time[0]),
-                persons: order.Passenger.map((p)=>p.name),
+                persons: passengers,
                 parType: order.Pay == '公司账户支付' ? EPayType.COMPANY_PAY : EPayType.PERSONAL_PAY,
                 orderType: EInvoiceFeeTypes.TRAIN_TICKET,
                 number: order.Train.name,
