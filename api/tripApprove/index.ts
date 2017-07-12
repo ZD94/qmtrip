@@ -423,23 +423,22 @@ class TripApproveModule {
 
             switch(type) {
                 case AutoApproveType.AfterSubmit:  // 审批提交时间
-                    expectedApproveTime = moment(submitAt).add(day, 'hours').hour(hour).minute(0).toDate();
-
+                    expectedApproveTime = moment(submitAt).add(day, 'days').hour(hour).minute(0).toDate();
                     interval = moment(tripStartAt).diff(expectedApproveTime, 'hours');
                     if(interval > 0 ) {
                         autoApproveDateTime = expectedApproveTime;
                     } else {
-                        autoApproveDateTime = moment(submitAt).add(defaultDelay, 'hours').minute(0).toDate();
+                        autoApproveDateTime = moment(submitAt).add(defaultDelay, 'hours').toDate();
                     }
 
                     break;
                 default:           //出行时间
-                    expectedApproveTime = moment(submitAt).subtract(day, 'days').hour(hour).minute(0).toDate();
-                    interval = moment(tripStartAt).diff(expectedApproveTime, 'hours');
+                    expectedApproveTime = moment(tripStartAt).subtract(day, 'days').hour(hour).minute(0).toDate();
+                    interval = moment(expectedApproveTime).diff(submitAt, 'hours');
                     if(interval > 0){
                         autoApproveDateTime = expectedApproveTime;
                     } else {
-                        autoApproveDateTime = moment(submitAt).add(defaultDelay, 'hours').minute(0).toDate();
+                        autoApproveDateTime = moment(submitAt).add(defaultDelay, 'hours').toDate();
                     }
                     break;
             }
