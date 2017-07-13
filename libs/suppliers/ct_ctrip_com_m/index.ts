@@ -126,23 +126,32 @@ export default class SupplierCtripCT extends SupplierWebRobot{
 
     async getJsCode(options): Promise<string>{
         var str = `
-                    var first = localStorage.getItem("first");
+                    var first = localStorage.getItem("first");                 
                     if(first != "no"){
                         localStorage.setItem("first" , "no");
                     }
-
                     var hasEnter = sessionStorage.getItem("hasEnter");
                     localStorage.setItem(${options.key}, ${options.json});
+
                     if(window.location.href == "http://ct.ctrip.com/m/"&&!hasEnter && first == "no"){
                         var login = document.getElementById("login");
                         if(login){
+
                         }else{
                             window.location.href = ${options.url};
                         }
                     }else if(window.location.href == ${options.url}&&!hasEnter && first == "no"){
-                        var search = document.getElementById("btn_search");
-                        search.click();
                         sessionStorage.setItem("hasEnter","true");
+
+                        var search = document.getElementById("btn_search");
+                        if(!search){
+                            setTimeout(function(){
+                                var search = document.getElementById("btn_search");
+                                search.click();
+                            }, 800);
+                        }else{
+                            search.click();
+                        }
                     }
                   `;
         return str;
