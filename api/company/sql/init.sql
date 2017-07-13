@@ -29,3 +29,4 @@ INSERT INTO company.suppliers(
 
 
 update company.companies set auto_approve_type = 2 where auto_approve_type is null;
+update company.companies set "auto_approve_preference" ='{"day":1, "hour":12, "defaultDelay":1}', "auto_approve_type" = 1;
