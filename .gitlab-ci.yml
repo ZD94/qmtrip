@@ -1,4 +1,3 @@
-
 variables:
   DOCKER_REG: docker.l.jingli365.com
   DOCKER_NAME: $CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
@@ -102,7 +101,7 @@ deploy:tester:
   when: manual
   environment:
     name: tester/$GITLAB_USER_ID
-    url: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
+    url: https://review.l.jingli365.com/vm/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
   variables:
     JL_APP_HOST: //review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
     JL_APP_REDIS: redis://dockerhost:16379
