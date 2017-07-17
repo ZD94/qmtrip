@@ -420,7 +420,7 @@ class TripApproveModule {
             let expectedApproveTime: Date;
             let interval = 0;
             let day = config.day ? config.day : 1;
-            let hour = config.hour ? config.hour :18;
+            let hour = config.hour ? config.hour :12;
             let defaultDelay = config.defaultDelay ? config.defaultDelay : 1;
 
             switch(type) {
