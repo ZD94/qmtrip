@@ -3,11 +3,9 @@
  */
 import {OaDepartment} from "./OaDepartment";
 import {Models} from "_types/index";
-import LdapApi from "../ldapApi";
-import {Staff, SPropertyType} from "_types/staff";
+import {Staff} from "_types/staff";
 import {Company, CPropertyType} from "_types/company";
 import {Department} from "_types/department";
-import LdapStaff from "../ldapStaff";
 import L from '@jingli/language';
 
 export  abstract class OaStaff{

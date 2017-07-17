@@ -8,7 +8,7 @@ import {Models} from "_types/index";
 import {clientExport} from "@jingli/dnode-api/dist/src/helper";
 import { ACCOUNT_STATUS } from "_types/auth";
 import utils = require("common/utils");
-import syncData from "./lib/syncData";
+import syncData from "libs/asyncOrganization/syncData";
 
 export let staffOpts = {
     scope: 'sub',

@@ -11,7 +11,7 @@ import {OS_TYPE} from '_types/auth/token';
 import {CPropertyType} from '_types/company';
 import shareConnection from "../ldap/shareConnection";
 import{staffOpts} from "../ldap";
-import syncData from "../ldap/lib/syncData";
+import syncData from "libs/asyncOrganization/syncData";
 var API = require("@jingli/dnode-api");
 
 //生成登录凭证

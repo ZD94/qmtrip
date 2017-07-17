@@ -1,12 +1,10 @@
 /**
  * Created by wangyali on 2017/7/6.
  */
-import {Department, DPropertyType} from "_types/department";
-import {Company, CPropertyType} from "_types/company";
+import {Department} from "_types/department";
+import {Company} from "_types/company";
 import {Models} from "_types/index";
-import {Staff, EStaffStatus} from "_types/staff";
 import L from '@jingli/language';
-import {departmentOpts} from "../index"
 
 //create（工厂方法）拆除去，删除部门员工修改， 循环引用尽量避免， ldap链接池 connection pool(链接有无状态， 数据库链接有状态，redis链接无状态)
 //oaDepartment, oaStaff添加company getParent做限制

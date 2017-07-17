@@ -7,11 +7,10 @@ import {Staff, StaffProperty, SPropertyType} from "_types/staff";
 import {Department, DepartmentProperty, StaffDepartment, DPropertyType} from "_types/department";
 import { OaDepartment } from './oaDepartment';
 import { OaStaff } from './OaStaff';
-import LdapDepartment from "../ldapDepartment";
-import LdapStaff from "../ldapStaff";
-import LdapApi from "../ldapApi";
-import shareConnection from "../ShareConnection";
-import {departmentOpts} from "../index";
+import LdapDepartment from "api/ldap/ldapDepartment";
+import LdapStaff from "api/ldap/ldapStaff";
+import shareConnection from "api/ldap/ShareConnection";
+import {departmentOpts} from "api/ldap";
 import L from '@jingli/language';
 
 export class SyncData {
