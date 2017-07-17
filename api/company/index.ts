@@ -535,39 +535,45 @@ class CompanyModule {
 
     /*************************************企业行程点数变更日志end***************************************/
 
+    static async resetTripPlanNum(){
+        let companies = await Models.company.all({where : {expiryDate : {$gt: moment().format('YYYY-MM-DD HH:mm:ss')}, type: ECompanyType.PAYED}});
+        await Promise.all(companies.map(async (co) => {
+            let tripBasicPackage = co.tripBasicPackage;
+            let num = co.tripPlanNumLimit - co.tripPlanPassNum;
+            co.tripPlanPassNum = 0;
+            co.tripPlanFrozenNum = 0;
+            if (tripBasicPackage) {
+                co.tripPlanNumLimit = parseInt(tripBasicPackage.tripNum + "");
+            }
+            await co.save();
+
+            if (num > 0) {
+                let log1 = TripPlanNumChange.create({
+                    companyId: co.id,
+                    type: NUM_CHANGE_TYPE.SYSTEM_REDUCE,
+                    number: 0 - num,
+                    remark: "上月套餐余额及冻结余额过期",
+                    content: "套餐包余额过期"
+                });
+                await log1.save();
+            }
+            let log2 = TripPlanNumChange.create({
+                companyId: co.id,
+                type: NUM_CHANGE_TYPE.SYSTEM_ADD,
+                number: co.tripPlanNumLimit,
+                remark: "本月套餐新增行程",
+                content: "本月套餐新增行程"
+            });
+            await log2.save();
+        }))
+    }
+
     static _scheduleTask () {
         let taskId = "resetTripPlanPassNum";
         scheduler('0 5 0 1 * *', taskId, function() {
             //每月1号付费企业消耗行程数，冻结数归零
             (async ()=> {
-                let companies = await Models.company.all({where : {expiryDate : {$gt: moment().format('YYYY-MM-DD HH:mm:ss')}, type: ECompanyType.PAYED}});
-                /*pager.forEach((company) => {
-                    companies.push(company);
-                });
-
-                while(pager && pager.hasNextPage()) {
-                    pager = await pager.nextPage();
-                    pager.forEach((company) => {
-                        companies.push(company);
-                    })
-                }*/
-                await Promise.all(companies.map(async (co) => {
-                    let tripBasicPackage = co.tripBasicPackage;
-                    let num = co.tripPlanNumLimit - co.tripPlanPassNum;
-                    co.tripPlanPassNum = 0;
-                    co.tripPlanFrozenNum = 0;
-                    if(tripBasicPackage){
-                        co.tripPlanNumLimit = parseInt(tripBasicPackage.tripNum+"");
-                    }
-                    await co.save();
-
-                    if(num > 0){
-                        let log1 = TripPlanNumChange.create({companyId: co.id, type:NUM_CHANGE_TYPE.SYSTEM_REDUCE, number:0-num, remark:"上月套餐余额及冻结余额过期", content:"套餐包余额过期"});
-                        await log1.save();
-                    }
-                    let log2 = TripPlanNumChange.create({companyId: co.id, type:NUM_CHANGE_TYPE.SYSTEM_ADD, number:co.tripPlanNumLimit, remark:"本月套餐新增行程", content:"本月套餐新增行程"});
-                    await log2.save();
-                }))
+                await CompanyModule.resetTripPlanNum();
             })()
                 .catch( (err) => {
                     logger.error(`执行任务${taskId}错误:${err.stack}`);
