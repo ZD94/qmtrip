@@ -1,16 +1,16 @@
 /**
  * Created by wangyali on 2017/7/6.
  */
-import {Department, DepartmentProperty} from "_types/department";
+import {Department, DPropertyType} from "_types/department";
 import {Company, CPropertyType} from "_types/company";
 import {Models} from "_types/index";
-import LdapApi from "../ldapApi";
-import LdapDepartment from "../LdapDepartment";
+import {Staff, EStaffStatus} from "_types/staff";
 import L from '@jingli/language';
-import {Model} from "sequelize";
 import {departmentOpts} from "../index"
 
-export  abstract class OaDepartment{
+//create（工厂方法）拆除去，删除部门员工修改， 循环引用尽量避免， ldap链接池 connection pool(链接有无状态， 数据库链接有状态，redis链接无状态)
+//oaDepartment, oaStaff添加company getParent做限制
+export abstract class OaDepartment{
     constructor(public target: any){
     }
     abstract get id();
@@ -25,41 +25,14 @@ export  abstract class OaDepartment{
     abstract get parentId();
     abstract set parentId(val: string);
 
+    abstract get company();
+    abstract set company(val: Company);
+
     abstract async getChildrenDepartments(): Promise<OaDepartment[]>;
     abstract async getParent(): Promise<OaDepartment>;
     abstract async getStaffs();
     abstract async getSelfById(): Promise<OaDepartment>;
-
-    /*static async create(params:{company: Company, department?: Department}): Promise<OaDepartment>{
-        let company = params.company;
-        let department = params.department;
-        let type = await company.getOaType();
-
-        if(type == CPropertyType.LDAP){
-            let ldapProperty = await Models.companyProperty.find({where: {companyId: company.id, type: CPropertyType.LDAP}});
-            if(!ldapProperty || !ldapProperty[0]){
-                throw L.ERR.INVALID_ARGUMENT("ldap相关设置");
-            }
-            let ldapInfo = ldapProperty[0].value;
-            let ldapInfoJson = JSON.parse(ldapInfo);
-
-            let ldapApi = new LdapApi(ldapInfoJson.ldapUrl);
-            await ldapApi.bindUser({entryDn: ldapInfoJson.ldapAdminDn, userPassword: ldapInfoJson.ldapAdminPassword});
-
-            if(department){
-                let departmentProperty = await Models.departmentProperty.find({where: {type: type, departmentId: department.id}});
-                let jsonValue = JSON.parse(departmentProperty[0].value);
-                return new LdapDepartment({id: jsonValue.id, dn: jsonValue.dn, name: department.name, ldapApi: ldapApi});
-            }else{
-                let rootDn = ldapInfoJson.ldapDepartmentRootDn || ldapInfoJson.ldapBaseDn;
-                let rootDepartmentInfos = await ldapApi.searchDn({rootDn: rootDn, opts: {attributes: departmentOpts.attributes}});
-                let rootDepartmentInfo = rootDepartmentInfos[0];
-                return new LdapDepartment({id: rootDepartmentInfo.entryUUID, dn: rootDepartmentInfo.dn, name: rootDepartmentInfo.ou, ldapApi: ldapApi});
-            }
-        }
-
-        return null;
-    }
+    abstract async saveDepartmentProperty(params: {departmentId: string}): Promise<boolean>;
 
     async getDepartment(): Promise<Department>{
         let self = this;
@@ -71,14 +44,20 @@ export  abstract class OaDepartment{
         return department;
     }
 
-    async sync(params:{companyId: string, type: string}): Promise<Department>{
-        let self = this;
-
-        let result: Department;
-        let company = await Models.company.get(params.companyId);
+    async sync(params?:{company?: Company, oaDepartment?: OaDepartment}): Promise<Department>{
+        if(!params) params = {};
+        let self = params.oaDepartment || this;
+        let company = self.company || params.company;
+        let type = await company.getOaType();
+        /*if(!company){
+            let staff = await Staff.getCurrent();
+            company = staff.company;
+        }*/
         if(!company){
             throw L.ERR.INVALID_ACCESS_ERR();
         }
+        let result: Department;
+
         let defaultDepartment = await company.getDefaultDepartment();
 
         let parentDepartment: Department;
@@ -106,14 +85,78 @@ export  abstract class OaDepartment{
                 dept.company = company;
                 dept.parent = parentDepartment;
                 result = await dept.save();
-                let departmentProperty = DepartmentProperty.create({departmentId: dept.id, type: params.type, value: self.id});
-                await departmentProperty.save();
+                await self.saveDepartmentProperty({departmentId: result.id});
             }
+
+            //2、同步部门下员工
+            let oaStaffs = await self.getStaffs();
+            let oaStaffsMap = {};
+            if (oaStaffs && oaStaffs.length > 0) {
+                await Promise.all(oaStaffs.map(async (item) => {
+                    oaStaffsMap[item.id] = item;
+                    let ret = await item.sync({company: company});
+                }))
+            }
+
+            //3、删除被删除的员工
+            let childrenStaffs = await result.getAllStaffs();
+            await Promise.all(childrenStaffs.map(async (item) => {
+                let staffProperty = await item.getStaffProperty();
+                let oaSt = oaStaffsMap[staffProperty.value];
+                if(!oaSt){
+                    let deleteProperty = await Models.staffProperty.find({where: {staffId: item.id}});
+                    await Promise.all(deleteProperty.map(async (d) => {
+                        await d.destroy();
+                    }));
+
+                    try{
+                        await item.destroy();
+                    }catch (e){
+                        console.info("删除员工失败", e);
+                    }
+                }
+            }));
+
+            //获取ldap子部门
+            let childrenDepartments = await self.getChildrenDepartments();
+            let childrenDepartmentsMap = {};
+            for(let d = 0; d < childrenDepartments.length; d++){
+                let ld = childrenDepartments[d];
+                childrenDepartmentsMap[ld.id] = ld;
+            }
+
+            //4、删除被删除的子部门
+            let childrenDepts = await Models.department.all({where: {parentId: result.id}});
+            await Promise.all(childrenDepts.map(async (item) => {
+                let deptProperty = await item.getDepartmentProperty();
+                let oaDept = childrenDepartmentsMap[deptProperty.value];
+                if(!oaDept){
+                    let deleteProperty = await Models.departmentProperty.find({where: {departmentId: item.id}});
+                    await Promise.all(deleteProperty.map(async (d) => {
+                        await d.destroy();
+                    }));
+
+                    try{
+                        await item.destroy();
+                    }catch(e) {
+                        console.info("删除部门失败",e);
+                    }
+                }
+            }));
+
+            //5、递归同步子部门信息
+            if(childrenDepartments && childrenDepartments.length > 0){
+                await Promise.all(childrenDepartments.map(async (item) => {
+                    await this.sync({company: company, oaDepartment: item});
+                }))
+            }
+
         }else{
-            //syncOrganization(oaParent);
+            //父级部门不存在同步父级部门
+            // await oaParent.sync({company: company});
         }
 
         return result;
-    }*/
+    }
 
 }

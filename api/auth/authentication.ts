@@ -6,10 +6,12 @@ import moment = require('moment');
 import validator = require('validator');
 import { Token } from '_types/auth/token';
 import { ACCOUNT_STATUS } from "_types/auth";
+import { EStaffStatus, Staff, SPropertyType } from "_types/staff";
 import {OS_TYPE} from '_types/auth/token';
 import {CPropertyType} from '_types/company';
-import LdapAPi from "../ldap/ldapApi";
+import shareConnection from "../ldap/shareConnection";
 import{staffOpts} from "../ldap";
+import syncData from "../ldap/lib/syncData";
 var API = require("@jingli/dnode-api");
 
 //生成登录凭证
@@ -199,53 +201,69 @@ export async function loginByLdap(data: {account?: string, pwd: string}): Promis
     if(!data.pwd) {
         throw L.ERR.PWD_EMPTY();
     }
-
-    var type = EAccountType.STAFF;
-    var account = data.account;
     //ldap认证
-    let company = await Models.company.get("1826e3b0-5d78-11e7-8209-39ca94a15277");
-    let ldapProperty = await Models.companyProperty.find({where: {companyId: company.id, type: CPropertyType.LDAP}});
-    if(!ldapProperty || !ldapProperty[0]){
-        throw L.ERR.INVALID_ARGUMENT("ldap相关设置");
+    let company = await Models.company.get("4438e4c0-686e-11e7-89aa-a14f4c6f4292");
+    if(!shareConnection.connectionMap[company.id]){
+        await shareConnection.initConnection({companyId: company.id});
     }
-    let ldapInfo = ldapProperty[0].jsonValue;
-    if(typeof ldapInfo == "string") ldapInfo = JSON.parse(ldapInfo);
+    let ldapApi = shareConnection.connectionMap[company.id];
 
-    console.info(ldapInfo)
-    console.info("ldapInfo======================")
-    let ldapApi = new LdapAPi(ldapInfo.ldapUrl);
-    let entryDn = `uid=${account},${ldapInfo.ldapStaffRootDn}`;
-    let bindResult = await ldapApi.bindUser({entryDn: entryDn, userPassword: data.pwd});
-    if(!bindResult){
+    let ldapProperty = await Models.companyProperty.find({where: {companyId: company.id, type: CPropertyType.LDAP}});
+    let ldapInfo = ldapProperty[0].value;
+    let ldapInfoJson = JSON.parse(ldapInfo);
+    await ldapApi.bindUser({entryDn: ldapInfoJson.ldapAdminDn, userPassword: ldapInfoJson.ldapAdminPassword});
+
+    let type = EAccountType.STAFF;
+    let account = data.account;
+
+    let accounts = await Models.account.find({
+        where:{
+            type: type,
+            $or: [
+                {email: account},
+                {mobile: account}
+            ],
+        },
+        limit: 1,
+    });
+    if(accounts.total == 0) {
+        throw L.ERR.ACCOUNT_NOT_EXIST()
+    }
+    let loginAccount = accounts[0];
+
+    let staffs = await Models.staff.find({where: {accountId: loginAccount.id, staffStatus: EStaffStatus.ON_JOB}});
+    if(staffs.total == 0) {
         throw L.ERR.ACCOUNT_NOT_EXIST();
     }
+    let loginStaff: Staff;
+    staffs.map((item) => {
+        if(item.company.id == company.id){
+            loginStaff = item;
+        }
+    });
 
-    console.info(bindResult);
-    console.info("bindResult========================");
+    let staffProperty = await Models.staffProperty.find({where: {staffId: loginStaff.id, type: SPropertyType.LDAP_DN}});
+    if(staffProperty.total == 0) {
+        throw L.ERR.INVALID_ARGUMENT("ldap相关设置");
+    }
+
+    let entryDn = staffProperty[0].value;
+    let bindResult = await ldapApi.bindUser({entryDn: entryDn, userPassword: data.pwd});
+    if(!bindResult){
+        throw L.ERR.ACCOUNT_FORBIDDEN();
+    }
     let result = await ldapApi.searchDn({rootDn: entryDn, opts: {attributes: staffOpts.attributes}});
 
     if(!result){
         throw L.ERR.ACCOUNT_NOT_EXIST();
     }
 
-    let ldapUser = result[0];
-    let ldapUserId = result[0].entryUUID;
-    console.info(ldapUser);
-    console.info(ldapUserId);
-    console.info("ldapUserId============================");
+    let departments = await loginStaff.getDepartments();
+    await Promise.all(departments.map(async (item) => {
+        await syncData.syncOrganization({company: company, department: item});
+    }));
 
-    let staffLdapProperty = await Models.staffProperty.find({where : {type: CPropertyType.LDAP, value: ldapUserId}});
-    console.info(staffLdapProperty)
-    console.info("staffLdapProperty=============")
-
-    if(!staffLdapProperty || !staffLdapProperty[0]){
-        throw L.ERR.ACCOUNT_NOT_EXIST();
-    }
-
-    let loginAccount = await Models.staff.get(staffLdapProperty[0].staffId);
-    // await API.ldap.syncStaff(ldapUser, company.id);
-
-    var ret = await makeAuthenticateToken(loginAccount.accountId);
+    var ret = await makeAuthenticateToken(loginAccount.id);
     if (loginAccount.isNeedChangePwd) {
         ret['is_need_change_pwd'] = true;
     }

@@ -125,7 +125,7 @@ class CompanyModule {
             let jsonValue = {ldapUrl: params.ldapUrl, ldapBaseDn: params.ldapBaseDn,
                 ldapStaffRootDn: params.ldapStaffRootDn, ldapDepartmentRootDn: params.ldapDepartmentRootDn,
                 ldapAdminPassword: params.ldapAdminPassword, ldapAdminDn: params.ldapAdminDn };
-            let companyProperty = CompanyProperty.create({companyId: company.id, type: CPropertyType.LDAP, jsonValue: jsonValue});
+            let companyProperty = CompanyProperty.create({companyId: company.id, type: CPropertyType.LDAP, value: JSON.stringify(jsonValue)});
             await companyProperty.save();
         }
 

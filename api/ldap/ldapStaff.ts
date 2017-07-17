@@ -3,11 +3,17 @@
  */
 import { OaDepartment } from './lib/oaDepartment';
 import { OaStaff } from './lib/oastaff';
-import LdapAPi from "./ldapApi";
-import{staffOpts} from "./index"
+import LdapApi from "./ldapApi";
+import{staffOpts, departmentOpts} from "./index";
+import LdapDepartment from "./LdapDepartment";
+import {StaffProperty, SPropertyType} from "_types/staff";
+import {Models} from "_types/index";
+import L from '@jingli/language';
+import {Company} from "_types/company";
+
 export default class LdapStaff extends OaStaff {
 
-    private ldapApi: LdapAPi;
+    private ldapApi: LdapApi;
 
     get id() {
         return this.target.id;
@@ -57,6 +63,14 @@ export default class LdapStaff extends OaStaff {
         this.target.sex = val;
     }
 
+    get company() {
+        return this.target.company;
+    }
+
+    set company(val: Company) {
+        this.target.company = val;
+    }
+
     //Ldap特有属性
     get dn() {
         return this.target.dn;
@@ -67,11 +81,41 @@ export default class LdapStaff extends OaStaff {
     }
 
     async getDepartments(): Promise<OaDepartment[]> {
-        return null;
+        let self = this;
+        let oaDepartments: OaDepartment[] = [];
+        let parentDn = await this.ldapApi.getParentDn({dn: this.dn});
+        let opts = {
+            attributes: departmentOpts.attributes
+        };
+        let result = await this.ldapApi.searchDn({rootDn: parentDn, opts: opts});
+        if(result && result[0]){
+            oaDepartments.push(new LdapDepartment({id: result[0].entryUUID, dn: result[0].dn,
+                name: result[0].ou, ldapApi: self.ldapApi, company: self.company}));
+        }
+        return oaDepartments;
     }
 
     async getSelfById(): Promise<OaStaff> {
+        let self = this;
+        let opts = {
+            attributes: staffOpts.attributes
+        };
+        let results = await this.ldapApi.searchDn({rootDn: this.dn, opts: opts});
+        if(results && results[0]){
+            let result = results[0];
+            return new LdapStaff({id: result.entryUUID, dn: result.dn, name: result.cn, mobile: result.mobile,
+                email: result.mail, sex: result.sex, userPassword: result.userPassword,
+                ldapApi: self.ldapApi, company: self.company});
+        }
         return null;
+    }
+
+    async saveStaffProperty(params: {staffId: string}): Promise<boolean> {
+        let staffUuidProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.LDAP_UUID, value: this.id});
+        let staffDnProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.LDAP_DN, value: this.dn});
+        await staffUuidProperty.save();
+        await staffDnProperty.save();
+        return true;
     }
 
     constructor(target: any) {

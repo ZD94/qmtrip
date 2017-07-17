@@ -4,11 +4,12 @@
 import {OaDepartment} from "./OaDepartment";
 import {Models} from "_types/index";
 import LdapApi from "../ldapApi";
-import LdapDepartment from "../LdapDepartment";
-import {Staff, StaffProperty} from "_types/staff";
+import {Staff, SPropertyType} from "_types/staff";
 import {Company, CPropertyType} from "_types/company";
-import {Department, DepartmentProperty} from "_types/department";
+import {Department} from "_types/department";
 import LdapStaff from "../ldapStaff";
+import L from '@jingli/language';
+
 export  abstract class OaStaff{
     constructor(public target: any){
     }
@@ -30,30 +31,12 @@ export  abstract class OaStaff{
     abstract get sex();
     abstract set sex(val: string);
 
-    abstract get dn();
-    abstract set dn(val: string);
+    abstract get company();
+    abstract set company(val: Company);
 
     abstract async getDepartments(): Promise<OaDepartment[]>;
     abstract async getSelfById(): Promise<OaStaff>;
-
-    static async create(params:{companyId: string, staffId: string}): Promise<OaStaff>{
-        let company = await Models.company.get(params.companyId);
-        let type = await company.getOaType();
-        let staffProperty = await Models.staffProperty.find({where: {type: type, staffId: params.staffId}});
-        if(staffProperty && staffProperty.length > 0){
-            if(type == CPropertyType.LDAP){
-                let ldapProperty = await Models.companyProperty.find({where: {companyId: company.id, type: CPropertyType.LDAP}});
-                let ldapInfo = ldapProperty[0].jsonValue;
-                if(typeof ldapInfo == "string") ldapInfo = JSON.parse(ldapInfo);
-
-                let ldapApi = new LdapApi(ldapInfo.ldapUrl);
-                await ldapApi.bindUser({entryDn: ldapInfo.ldapAdminDn, userPassword: ldapInfo.ldapAdminPassword});
-                return new LdapStaff({id: staffProperty[0].value, ldapApi: ldapApi});
-            }
-        }
-
-        return null;
-    }
+    abstract async saveStaffProperty(params: {staffId: string}): Promise<boolean>;
 
     async getStaff(): Promise<Staff>{
         let self = this;
@@ -65,21 +48,21 @@ export  abstract class OaStaff{
         return staff;
     }
 
-    async sync(params:{companyId: string, type: string}): Promise<Staff>{
+    async sync(params?:{company: Company}): Promise<Staff>{
         let self = this;
-        let {companyId, type} = params;
-        let company: Company;
-        if(companyId){
-            company = await Models.company.get(companyId);
-        }else{
+        let company = self.company || params.company;
+        let type = await company.getOaType();
+        /*if(!company){
             let staff = await Staff.getCurrent();
             company = staff.company;
+        }*/
+        if(!company){
+            throw L.ERR.INVALID_ACCESS_ERR();
         }
 
         let defaultDepartment = await company.getDefaultDepartment();
         let defaultTravelPolicy = await company.getDefaultTravelPolicy();
 
-        // let staffProperty = await Models.staffProperty.find({where : {type: type, value: self.id}});
         let companyCreateUser = await Models.staff.get(company.createUser);
 
         let returnStaff: Staff;
@@ -88,13 +71,17 @@ export  abstract class OaStaff{
         // 处理部门
         let oaDepartments = await self.getDepartments();
 
-        if(!oaDepartments){
+        if(!oaDepartments || oaDepartments.length == 0){
             newDepartments.push(defaultDepartment)
         }else{
-            let oaDepartmentIds = oaDepartments.map((item) => {
+            let oaDepartmentIds = await Promise.all(oaDepartments.map(async (item) => {
+                let deptPro = await Models.departmentProperty.find({where: {value: item.id}});
+                if(!deptPro || deptPro.length == 0){
+                    await item.sync();
+                }
                 return item.id;
-            })
-            let departmentProperty = await Models.departmentProperty.find({where: {value: oaDepartmentIds, type: type}});
+            }));
+            let departmentProperty = await Models.departmentProperty.find({where: {value: oaDepartmentIds}});
             newDepartments = await Promise.all(departmentProperty.map(async function(item){
                 let dept = await Models.department.get(item.departmentId);
                 return dept;
@@ -107,8 +94,7 @@ export  abstract class OaStaff{
             if(type == CPropertyType.LDAP && companyCreateUser.mobile == self.mobile){
 
                 alreadyStaff = companyCreateUser;
-                let staffProperty = StaffProperty.create({staffId: alreadyStaff.id, type: type, value: self.id});
-                await staffProperty.save();
+                await self.saveStaffProperty({staffId: alreadyStaff.id});
 
             }else{
 
@@ -117,8 +103,7 @@ export  abstract class OaStaff{
                 staff.setTravelPolicy(defaultTravelPolicy);
                 staff.company = company;
                 staff = await staff.save();
-                let staffProperty = StaffProperty.create({staffId: staff.id, type: type, value: self.id});
-                await staffProperty.save();
+                await self.saveStaffProperty({staffId: staff.id});
 
                 // 处理部门
                 await staff.addDepartment(newDepartments);
@@ -127,11 +112,6 @@ export  abstract class OaStaff{
         }
 
         if(alreadyStaff && alreadyStaff.id){
-            for(let k in self){
-                console.info(k);
-                console.info(self[k]);
-                console.info("oaStaffKey==================================测试测试测试");
-            }
             alreadyStaff.name = self.name;
             // alreadyStaff.sex = self.sex;//类型有问题
             alreadyStaff.mobile = self.mobile;
