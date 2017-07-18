@@ -6,7 +6,7 @@
 require('app-module-path').addPath(__dirname);
 require('common/node_ts').install();
 var initData = require('libs/initTestData');
-var replModel = require('libs/replService');
+var ReplModel = require('libs/replService');
 
 var Logger = require('@jingli/logger');
 
@@ -87,7 +87,9 @@ server.on('init.api', function(API){
         initData.initDataForTest({name: '笑傲江湖', userName: '风清扬', mobile: '13700000001', pwd: '123456', email: 'fq.yang@jingli.tech'});
     }
     if(cluster.isMaster){
-        replModel.createReplServer();
+        let target = {port: 1337, host: "127.0.0.1", context: {API: API}};
+        let replServer = new ReplModel(target);
+        replServer.initReplServer();
     }
 });
 

@@ -104,6 +104,5 @@
     "reg_go": true,
     "dd_online_url": "https://j.jingli365.com"
   },
-  "perDayRegisterEmail": "",
-  "replPort": 1337
+  "perDayRegisterEmail": ""
 }
