@@ -24,11 +24,11 @@ class DuiBa {
     static async getLoginUrl(params) :Promise<string>{
         var staff = await Staff.getCurrent();
         if(!params) params = {};
-        params.uid = staff.id;
+        params.uid = staff.accountId;
         var credits = 0;
-        staff.coinAccount = staff.$parents["account"]["coinAccount"];
-        if(staff.coinAccount && staff.coinAccount.balance){
-            credits = staff.coinAccount.balance;
+        let account = await Models.account.get(staff.accountId);
+        if(account.coinAccount && account.coinAccount.balance){
+            credits = account.coinAccount.balance;
         }
 
         credits = Math.floor(credits);
