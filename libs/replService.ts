@@ -4,9 +4,10 @@
 var repl = require('repl')
 var net = require('net')
 const API = require('@jingli/dnode-api');
+import C = require("@jingli/config");
 
 export class ReplModel{
-    createServer(){
+    createReplServer(){
         net.createServer(function (socket) {
             var r = repl.start({
                 prompt: 'socket '+socket.remoteAddress+':'+socket.remotePort+'> '
@@ -19,7 +20,7 @@ export class ReplModel{
                 socket.end()
             })
             r.context.API = API;
-        }).listen(1337)
+        }).listen(C.replPort, "127.0.0.1")
     }
 }
 let replModel = new ReplModel();
