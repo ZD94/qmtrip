@@ -452,6 +452,8 @@ class TripPlanModule {
             tripDetail.status = EPlanStatus.AUDIT_NOT_PASS;
             tripPlan.status = EPlanStatus.AUDIT_NOT_PASS;
             tripPlan.auditStatus = EAuditStatus.INVOICE_NOT_PASS;
+
+            tripPlan.readNumber = 0;
             let waitApproveQuery = {where: {id: {$ne: tripDetail.id}, status: EPlanStatus.AUDITING}}
             let waitApproveDetails = await tripPlan.getTripDetails(waitApproveQuery); //获取所有未审核票据的detail
             if(!waitApproveDetails || waitApproveDetails.length == 0 ){
