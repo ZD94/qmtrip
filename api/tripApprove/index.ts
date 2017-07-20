@@ -324,6 +324,7 @@ class TripApproveModule {
             log.approveStatus = EApproveResult.REJECT;
             log.remark = approveRemark;
             log.save();
+            tripApprove.readNumber = 0;
             tripApprove.approveRemark = approveRemark;
             tripApprove.status = QMEApproveStatus.REJECT;
         }

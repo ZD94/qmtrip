@@ -1123,6 +1123,8 @@ class TripPlanModule {
         tripPlan.specialApproveRemark = approve.specialApproveRemark;
         tripPlan.staffList = query.staffList || [];
 
+        tripPlan.readNumber = 0;
+
         //计算总预算
         let totalBudget = budgets
             .map( (item) => {
