@@ -5,6 +5,7 @@ import {Department} from "_types/department";
 import {Company} from "_types/company";
 import {Models} from "_types/index";
 import L from '@jingli/language';
+import {OaStaff} from './oaStaff';
 
 //create（工厂方法）拆除去，删除部门员工修改， 循环引用尽量避免， ldap链接池 connection pool(链接有无状态， 数据库链接有状态，redis链接无状态)
 //oaDepartment, oaStaff添加company getParent做限制
@@ -28,7 +29,7 @@ export abstract class OaDepartment{
 
     abstract async getChildrenDepartments(): Promise<OaDepartment[]>;
     abstract async getParent(): Promise<OaDepartment>;
-    abstract async getStaffs();
+    abstract async getStaffs(): Promise<OaStaff[]>;
     abstract async getSelfById(): Promise<OaDepartment>;
     abstract async saveDepartmentProperty(params: {departmentId: string}): Promise<boolean>;
 
