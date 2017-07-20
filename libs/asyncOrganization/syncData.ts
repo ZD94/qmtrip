@@ -6,22 +6,34 @@ import {Company, CPropertyType} from "_types/company";
 import {Staff, StaffProperty, SPropertyType} from "_types/staff";
 import {Department, DepartmentProperty, StaffDepartment, DPropertyType} from "_types/department";
 import { OaDepartment } from './oaDepartment';
-import { OaStaff } from './OaStaff';
+import { OaStaff } from './oaStaff';
+import { OaCompany } from './oaCompany';
 import LdapDepartment from "api/ldap/ldapDepartment";
+import DdDepartment from "api/ddtalk/lib/ddDepartment";
 import LdapStaff from "api/ldap/ldapStaff";
+import DdStaff from "api/ddtalk/lib/ddStaff";
 import shareConnection from "api/ldap/ShareConnection";
 import {departmentOpts} from "api/ldap";
 import L from '@jingli/language';
+import {getISVandCorp} from "api/ddtalk/lib/dealEvent"
+import DdCompany from "../../api/ddtalk/lib/ddCompany";
 
 export class SyncData {
-    async createOaDepartment(params:{company: Company, department?: Department}): Promise<OaDepartment>{
+    async createOaCompany(params:{type: string}): Promise<OaCompany>{
+        let type = params.type;
+        if(type == "dd"){
+
+        }
+
+        return null;
+    }
+    async createOaDepartment(params:{company: Company, department?: Department, type?: string}): Promise<OaDepartment>{
         let company = params.company;
         let department = params.department;
         let type = await company.getOaType();
+        if(params.type) type = params.type;
 
         if(type == CPropertyType.LDAP){
-            // console.info(shareConnection.connectionMap);
-            // console.info("22222222222222222222222222222222222222");
             if(!shareConnection.connectionMap || !shareConnection.connectionMap[company.id]){
                 await shareConnection.initConnection({companyId: company.id});
             }
@@ -47,12 +59,40 @@ export class SyncData {
                 let result = await ldapDept.getSelfById();
                 return result;
             }else{
-                // let rootDn = ldapInfoJson.ldapDepartmentRootDn || ldapInfoJson.ldapBaseDn;
-                let rootDn = "ou=department,dc=jingli,dc=com";
+                let rootDn = ldapInfoJson.ldapDepartmentRootDn || ldapInfoJson.ldapBaseDn;
+                // let rootDn = "ou=department,dc=jingli,dc=com";
                 let rootDepartmentInfos = await ldapApi.searchDn({rootDn: rootDn, opts: {attributes: departmentOpts.attributes}});
                 let rootDepartmentInfo = rootDepartmentInfos[0];
                 return new LdapDepartment({id: rootDepartmentInfo.entryUUID, dn: rootDepartmentInfo.dn, name: rootDepartmentInfo.ou,
                     ldapApi: ldapApi, company: company});
+            }
+        }else if(type == "dd"){
+
+            let corps = await Models.ddtalkCorp.find({where: {companyId: company.id}});
+            if (!corps || !corps.length) {
+                throw new Error("您的钉钉账户没有授权");
+            }
+
+            let corp = corps[0];
+
+            let {isvApi, corpApi} = await getISVandCorp(corp);
+
+            if(department){
+                let ddDeparts = await Models.ddtalkDepartment.find({
+                    where : { localDepartmentId : department.id }
+                });
+                if(ddDeparts && ddDeparts.length){
+                    let ddDept = new DdDepartment({ id: ddDeparts[0].DdDepartmentId, corpId: ddDeparts[0].corpId,
+                        isvApi: isvApi, corpApi: corpApi, company: company });
+                    let result = await ddDept.getSelfById();
+                    return result;
+                }
+            }else{
+                let ddCompany = new DdCompany({id: corp.corpId, permanentCode: corp.permanentCode, agentid: corp.agentid,
+                    isvApi: isvApi, corpApi: corpApi});
+
+                let rootDept = await ddCompany.getRootDepartment();
+                return rootDept;
             }
         }
 

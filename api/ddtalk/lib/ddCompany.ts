@@ -34,6 +34,7 @@ export default class DdCompany extends OaCompany {
         this.target.name = val;
     }
 
+    //钉钉特有属性
     get permanentCode() {
         return this.target.permanentCode;
     }
@@ -105,7 +106,6 @@ export default class DdCompany extends OaCompany {
         let com: Company = null;
         let corps = await Models.ddtalkCorp.find({where: {corpId: self.id}});
         if (corps && corps.length) {
-            //有记录，曾经授权过
             let corp = corps[0];
             com = await corp.getCompany(corp['company_id']);
         }

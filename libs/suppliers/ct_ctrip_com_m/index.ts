@@ -126,23 +126,32 @@ export default class SupplierCtripCT extends SupplierWebRobot{
 
     async getJsCode(options): Promise<string>{
         var str = `
-                    var first = localStorage.getItem("first");
+                    var first = localStorage.getItem("first");                 
                     if(first != "no"){
                         localStorage.setItem("first" , "no");
                     }
-
                     var hasEnter = sessionStorage.getItem("hasEnter");
                     localStorage.setItem(${options.key}, ${options.json});
+
                     if(window.location.href == "http://ct.ctrip.com/m/"&&!hasEnter && first == "no"){
                         var login = document.getElementById("login");
                         if(login){
+
                         }else{
                             window.location.href = ${options.url};
                         }
                     }else if(window.location.href == ${options.url}&&!hasEnter && first == "no"){
-                        var search = document.getElementById("btn_search");
-                        search.click();
                         sessionStorage.setItem("hasEnter","true");
+
+                        var search = document.getElementById("btn_search");
+                        if(!search){
+                            setTimeout(function(){
+                                var search = document.getElementById("btn_search");
+                                search.click();
+                            }, 800);
+                        }else{
+                            search.click();
+                        }
                     }
                   `;
         return str;
@@ -276,11 +285,18 @@ export default class SupplierCtripCT extends SupplierWebRobot{
             if(!res.body.Result)
                 return null as SupplierOrder;
             let order = res.body.Response.OrderDetailBase;
+            let passengers = order.Passenger ? order.Passenger.map((p) => p.name) : [];
+            if (!passengers.length && order.Train.passenger) {
+                for(let key of order.Train.passenger) {
+                    passengers.push(order.Train.passenger[key].name);
+                }
+            }
+
             return {
                 id: 'ct_ctrip_com_'+item.OrderNumber,
                 price: item.Price,
                 date: new Date(item.Time[0]),
-                persons: order.Passenger.map((p)=>p.name),
+                persons: passengers,
                 parType: order.Pay == '公司账户支付' ? EPayType.COMPANY_PAY : EPayType.PERSONAL_PAY,
                 orderType: EInvoiceFeeTypes.TRAIN_TICKET,
                 number: order.Train.name,

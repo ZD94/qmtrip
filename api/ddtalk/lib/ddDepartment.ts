@@ -70,8 +70,8 @@ export default class DdDepartment extends OaDepartment {
         let self = this;
         let result = await self.corpApi.getDepartmentInfo(self.id);
         if(result){
-            return new DdDepartment({id: result.id, name: result.name, isvApi: self.isvApi, corpApi: self.corpApi,
-                company: self.company, parentId: result.parentid});
+            return new DdDepartment({id: result.id, name: result.name, parentId: result.parentid, corpId: self.corpId,
+                isvApi: self.isvApi, corpApi: self.corpApi, company: self.company});
         }
         return null;
     }

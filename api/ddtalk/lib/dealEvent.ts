@@ -106,6 +106,8 @@ export async function tmpAuthCode(msg , req , res , next) {
 
     let corpid = permanentAuthMsg.auth_corp_info.corpid;
     let isvApi = new ISVApi(config.suiteid, suiteToken, corpid, permanentCode);
+    //生成获取该企业信息api对象
+    let corpApi = await isvApi.getCorpApi()
 
     //获取企业授权的授权数据 , 拿到管理员信息
     let authInfo: any = await isvApi.getCorpAuthInfo();
@@ -120,10 +122,6 @@ export async function tmpAuthCode(msg , req , res , next) {
             break;
         }
     }
-
-    //生成获取该企业信息api对象
-    let corpAccessToken = await isvApi.getCorpAccessToken();
-    let corpApi = new CorpApi(corpid, corpAccessToken);
 
     //拿到管理员的个人信息
     let userInfo: any = await corpApi.getUser(authUserInfo.userId);
@@ -226,7 +224,7 @@ interface suiteTokenCached {
     suite_access_token: string;
     expire_at: number;
 }
-
+//有用=====================
 export async function _getSuiteToken(): Promise<any> {
 
     let ticketObj: any = await cache.read(CACHE_KEY);
@@ -287,10 +285,11 @@ interface getISVandCorp {
 }
 
 //提供isv , corp 的api对象
+//有用==================
 export async function getISVandCorp(corp : DDTalkCorp): Promise<any> {
     let corpId = corp.corpId;
     let tokenObj = await _getSuiteToken();
-    let suiteToken = tokenObj['suite_access_token']
+    let suiteToken = tokenObj['suite_access_token'];
 
     let isvApi = new ISVApi(config.suiteid, suiteToken, corpId, corp.permanentCode);
     let corpApi = await isvApi.getCorpApi();

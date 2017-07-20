@@ -25,6 +25,7 @@ import {FindResult} from "common/model/interface";
 import {ENoticeType} from "_types/notice/notice";
 import {CoinAccount} from "_types/coin";
 import {StaffDepartment} from "_types/department/staffDepartment";
+import {getSession} from "common/model/index";
 
 
 const invitedLinkCols = InvitedLink['$fieldnames'];
@@ -49,57 +50,79 @@ class StaffModule{
         if(params.roleId && params.roleId == EStaffRole.OWNER){
             throw L.ERR.PERMISSION_DENY("添加创建者");
         }
+
         /*let staffNum = await company.getStaffNum();
         if(staffNum >= company.staffNumLimit){
             throw L.ERR.BEYOND_LIMIT_NUM("员工");
         }*/
-        //检查邮箱 手机号码是否合法
-        await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
+        let staff;
+        if(params.accountId){
+            let account = await Models.account.get(params.accountId);
+            if(!account){
+                throw L.ERR.USER_NOT_EXIST();
+            }
 
-        let defaultTravelPolicy = await company.getDefaultTravelPolicy();
-        let staff = Staff.create(params);
-        staff.company = company;
-        let pwd = '';
-        if(!staff.pwd){//设置员工默认密码为手机号后六位
-            pwd = staff.mobile.substr(staff.mobile.length - 6);
-            staff.pwd = utils.md5(pwd);
-        }
-
-        if(!staff["travelPolicyId"]){
-            staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
-        }
-        if (params.isNeedChangePwd) {
-            staff.isNeedChangePwd = params.isNeedChangePwd;
-        }
-        staff = await staff.save();
-
-        let account = await Models.account.get(staff.accountId);
-
-        if(!account.coinAccount){
-            //为员工设置资金账户
-            let ca = CoinAccount.create();
-            ca = await ca.save();
-            staff["coinAccountId"] = ca.id;
-            staff = await staff.save();
-        }
-        //发送短信通知
-        let values  = {
-            name: account.mobile,
-            pwd: pwd,
-            url: config.host
-        }
-
-        try{
-            await API.notify.submitNotify({
-                key: 'qm_new_staff_active',
-                values: values,
-                userId: staff.id
+             staff = Staff.create({
+                 name: params.name,
+                 status: account.status,
+                 ifFistLogin : account.isFirstLogin,
+                 roleId: params.roleId,
+                 travelPolicyId: params.travelPolicyId,
+                 accountId: params.accountId
             });
 
-        }catch(e){
-            console.info(e);
+            staff.company = company;
+
+            staff = await staff.save();
+        }else{
+            //检查邮箱 手机号码是否合法
+            await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
+
+            let pwd = '';
+            staff = Staff.create(params);
+            staff.company = company;
+
+            if(!staff.pwd){//设置员工默认密码为手机号后六位
+                pwd = staff.mobile.substr(staff.mobile.length - 6);
+                staff.pwd = utils.md5(pwd);
+                let defaultTravelPolicy = await company.getDefaultTravelPolicy();
+                if(!staff["travelPolicyId"]){
+                    staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
+                }
+            }
+
+            if (params.isNeedChangePwd) {
+                staff.isNeedChangePwd = params.isNeedChangePwd;
+            }
+
+            staff = await staff.save();
+            let account = await Models.account.get(staff.accountId);
+            if(!account.coinAccount){
+                //为员工设置资金账户
+                let ca = CoinAccount.create();
+                ca = await ca.save();
+                staff["coinAccountId"] = ca.id;
+                staff = await staff.save();
+            }
+            //发送短信通知
+            let values  = {
+                name: account.mobile,
+                pwd: pwd,
+                url: config.host
+            }
+
+            try{
+                await API.notify.submitNotify({
+                    key: 'qm_new_staff_active',
+                    values: values,
+                    userId: staff.id
+                });
+
+            }catch(e){
+                console.info(e);
+            }
         }
-        staff = await staff.save();
+
         return staff;
     }
 
@@ -148,7 +171,7 @@ class StaffModule{
         });
         return staff;
     }
-   static async  sendNoticeToAdmins(params:{companyId:string,noticeTemplate:string, staffId?: string}):Promise<any>{
+    static async  sendNoticeToAdmins(params:{companyId:string,noticeTemplate:string, staffId?: string}):Promise<any>{
         let company = await Models.company.get(params.companyId);
         let managers= await company.getManagers({withOwner:true});
        let staff: Staff;
@@ -432,6 +455,34 @@ class StaffModule{
         return updateStaff;
     }
 
+
+    /*
+    * 根据accountId查询与之对应的staffs
+    */
+    @clientExport
+    static async getStaffsByAccountId() : Promise<Staff[]>{
+
+        let session = getSession();
+        if(session && session.accountId){
+            let staffs = await Models.staff.find({
+                where : {
+                    accountId : session.accountId
+                }
+            });
+            let resultStaffs = [];
+
+            staffs.map((staff)=>{
+                resultStaffs.push(staff);
+            });
+
+            return resultStaffs;
+        }else{
+            throw L.ERR.PERMISSION_DENY();
+        }
+    }
+
+
+
     /**
      * 根据id查询员工
      * @param id
@@ -466,12 +517,15 @@ class StaffModule{
     static async getStaffs(params: {where: any, order?: any, attributes?: any}) :Promise<FindResult>{
         let staff = await Staff.getCurrent();
         // params.where.staffStatus = {$ne: EStaffStatus.FORBIDDEN}
+
         params.where.staffStatus = EStaffStatus.ON_JOB;
         let { accountId } = Zone.current.get("session");
         if (!params.where) {
             params.where = {};
         }
         params.order = params.order || [['createdAt', 'desc']];
+
+
 
         if(staff){
             params.where.companyId = staff["companyId"];
