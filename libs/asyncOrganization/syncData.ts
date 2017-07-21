@@ -139,7 +139,6 @@ export class SyncData {
 
     async syncOrganization(params: {company: Company, department?: Department}): Promise<boolean> {
         let oaDepartment = await this.createOaDepartment({company: params.company, department: params.department});
-        // let oaDepartment = new LdapDepartment(result);
         await oaDepartment.sync();
         return true;
 

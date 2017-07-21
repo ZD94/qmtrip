@@ -34,6 +34,7 @@ export  abstract class OaStaff{
 
     abstract async getDepartments(): Promise<OaDepartment[]>;
     abstract async getSelfById(): Promise<OaStaff>;
+    abstract async getCompany(): Promise<Company>;
     abstract async saveStaffProperty(params: {staffId: string}): Promise<boolean>;
 
     async getStaff(): Promise<Staff>{
@@ -46,9 +47,28 @@ export  abstract class OaStaff{
         return staff;
     }
 
+    async destroy(): Promise<boolean>{
+        let self = this;
+        let staff = await self.getStaff();
+        if(staff){
+            await staff.deleteStaffProperty();
+
+            try{
+                await staff.destroy();
+            }catch (e){
+                console.info("删除员工失败", e);
+            }
+        }
+
+        return true;
+    }
+
     async sync(params?:{company: Company}): Promise<Staff>{
         let self = this;
         let company = self.company || params.company;
+        if(!company){
+            company = await self.getCompany();
+        }
         let type = await company.getOaType();
         /*if(!company){
             let staff = await Staff.getCurrent();
@@ -73,16 +93,13 @@ export  abstract class OaStaff{
             newDepartments.push(defaultDepartment)
         }else{
             let oaDepartmentIds = await Promise.all(oaDepartments.map(async (item) => {
-                let deptPro = await Models.departmentProperty.find({where: {value: item.id}});
-                if(!deptPro || deptPro.length == 0){
-                    await item.sync();
+                let department = await item.getDepartment();
+                if(!department){
+                    let dept = await item.sync();//此处需要验证
+                    newDepartments.push(dept);
+                }else{
+                    newDepartments.push(department);
                 }
-                return item.id;
-            }));
-            let departmentProperty = await Models.departmentProperty.find({where: {value: oaDepartmentIds}});
-            newDepartments = await Promise.all(departmentProperty.map(async function(item){
-                let dept = await Models.department.get(item.departmentId);
-                return dept;
             }));
         }
 
@@ -95,7 +112,6 @@ export  abstract class OaStaff{
                 await self.saveStaffProperty({staffId: alreadyStaff.id});
 
             }else{
-
                 // 不存在，添加
                 let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, pwd: self.userPassword});
                 staff.setTravelPolicy(defaultTravelPolicy);

@@ -118,6 +118,10 @@ export default class LdapStaff extends OaStaff {
         return true;
     }
 
+    async getCompany(): Promise<Company>{
+        return this.company;
+    }
+
     constructor(target: any) {
         super(target);
         this.ldapApi = target.ldapApi;

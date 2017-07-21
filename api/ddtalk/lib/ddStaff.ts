@@ -162,6 +162,17 @@ export default class DdStaff extends OaStaff {
         return true;
     }
 
+    async getCompany(): Promise<Company>{
+        let self = this;
+        let company: Company;
+        let corps = await Models.ddtalkCorp.find({where: {corpId: self.corpId}});
+        if(corps && corps.length){
+            let corp = corps[0];
+            company = await corp.getCompany();
+        }
+        return company;
+    }
+
     async getStaff(): Promise<Staff>{
         let self = this;
         let staff: Staff = null;

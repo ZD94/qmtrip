@@ -9,6 +9,11 @@ import {clientExport} from "@jingli/dnode-api/dist/src/helper";
 import { ACCOUNT_STATUS } from "_types/auth";
 import utils = require("common/utils");
 import syncData from "libs/asyncOrganization/syncData";
+import shareConnection from "./shareConnection";
+import L from '@jingli/language';
+import { EStaffStatus, Staff, SPropertyType, EStaffRole } from "_types/staff";
+import {CPropertyType} from "_types/company";
+import { EAccountType } from '_types/index';
 
 export let staffOpts = {
     scope: 'sub',
@@ -61,8 +66,108 @@ export class LdapModule {
     @clientExport
     async registerLdapCompany(params){
         var result = await API.company.registerCompany(params);
-
         return result;
+    }
+
+    @clientExport
+    async loginByLdapUser(data: {account: string, pwd: string, companyId: string}){
+
+        if(!data) {
+            throw L.ERR.DATA_NOT_EXIST();
+        }
+
+        if(!data.account) {
+            throw L.ERR.USERNAME_EMPTY();
+        }
+
+        if(!data.pwd) {
+            throw L.ERR.PWD_EMPTY();
+        }
+        //ldap认证
+        // let company = await Models.company.get(params.companyId);
+        let company = await Models.company.get("4438e4c0-686e-11e7-89aa-a14f4c6f4292");
+        if(!shareConnection.connectionMap[company.id]){
+            await shareConnection.initConnection({companyId: company.id});
+        }
+        let ldapApi = shareConnection.connectionMap[company.id];
+
+        let ldapProperty = await Models.companyProperty.find({where: {companyId: company.id, type: CPropertyType.LDAP}});
+        let ldapInfo = ldapProperty[0].value;
+        let ldapInfoJson = JSON.parse(ldapInfo);
+        await ldapApi.bindUser({entryDn: ldapInfoJson.ldapAdminDn, userPassword: ldapInfoJson.ldapAdminPassword});
+
+        let type = EAccountType.STAFF;
+        let account = data.account;
+
+        let accounts = await Models.account.find({
+            where:{
+                type: type,
+                $or: [
+                    {email: account},
+                    {mobile: account}
+                ],
+            },
+            limit: 1,
+        });
+        if(accounts.total == 0) {
+            throw L.ERR.ACCOUNT_NOT_EXIST()
+        }
+        let loginAccount = accounts[0];
+
+        let staffs = await Models.staff.find({where: {accountId: loginAccount.id, staffStatus: EStaffStatus.ON_JOB}});
+        if(staffs.total == 0) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+        let loginStaff: Staff;
+        staffs.map((item) => {
+            if(item.company.id == company.id){
+                loginStaff = item;
+            }
+        });
+
+        let staffProperty = await Models.staffProperty.find({where: {staffId: loginStaff.id, type: SPropertyType.LDAP_DN}});
+        if(staffProperty.total == 0) {
+            throw L.ERR.INVALID_ARGUMENT("ldap相关设置");
+        }
+
+        let entryDn = staffProperty[0].value;
+        let bindResult = await ldapApi.bindUser({entryDn: entryDn, userPassword: data.pwd});
+        if(!bindResult){
+            throw L.ERR.ACCOUNT_FORBIDDEN();
+        }
+
+        let departments = await loginStaff.getDepartments();
+        await Promise.all(departments.map(async (item) => {
+            await syncData.syncOrganization({company: company, department: item});
+        }));
+
+        var ret = await API.auth.makeAuthenticateToken(loginAccount.id, 'ldap');
+        if (loginAccount.isNeedChangePwd) {
+            ret['is_need_change_pwd'] = true;
+        }
+        //判断是否首次登录
+        if(loginAccount.isFirstLogin) {
+            loginAccount.isFirstLogin = false;
+            return loginAccount.save()
+                .then(function() {
+                    ret['is_first_login'] = true;
+                    return ret;
+                })
+        }
+
+        ret['is_first_login'] = false;
+        return ret;
+    }
+
+    @clientExport
+    async syncLdapOrganization(params): Promise<boolean>{
+        let current = await Staff.getCurrent();
+        if(current.roleId != EStaffRole.OWNER && current.roleId != EStaffRole.ADMIN){
+            throw L.ERR.PERMISSION_DENY();
+        }
+        let company = current.company;
+        let depts = await syncData.syncOrganization({company: company});
+        return true;
     }
 }
 

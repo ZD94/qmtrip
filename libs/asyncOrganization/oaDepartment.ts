@@ -43,6 +43,22 @@ export abstract class OaDepartment{
         return department;
     }
 
+    async destroy(): Promise<boolean>{
+        let self = this;
+        let dept = await self.getDepartment();
+        if(dept){
+            await dept.deleteDepartmentProperty();
+
+            try{
+                await dept.destroy();
+            }catch(e) {
+                console.info("删除部门失败",e);
+            }
+        }
+
+        return true;
+    }
+
     async sync(params?:{company?: Company, oaDepartment?: OaDepartment}): Promise<Department>{
         if(!params) params = {};
         let self = params.oaDepartment || this;
@@ -75,6 +91,7 @@ export abstract class OaDepartment{
         if(parentDepartment){
             let alreadyDepartment = await self.getDepartment();
             if(alreadyDepartment){
+                alreadyDepartment.company = company;
                 alreadyDepartment.parent = parentDepartment;
                 alreadyDepartment.name = self.name;//同步已有部门信息
                 result = await alreadyDepartment.save();
@@ -100,13 +117,10 @@ export abstract class OaDepartment{
             //3、删除被删除的员工
             let childrenStaffs = await result.getAllStaffs();
             await Promise.all(childrenStaffs.map(async (item) => {
-                let staffProperty = await item.getStaffProperty();
+                let staffProperty = await item.getOaStaffIdProperty();
                 let oaSt = oaStaffsMap[staffProperty.value];
                 if(!oaSt){
-                    let deleteProperty = await Models.staffProperty.find({where: {staffId: item.id}});
-                    await Promise.all(deleteProperty.map(async (d) => {
-                        await d.destroy();
-                    }));
+                    await item.deleteStaffProperty();
 
                     try{
                         await item.destroy();
@@ -127,13 +141,10 @@ export abstract class OaDepartment{
             //4、删除被删除的子部门
             let childrenDepts = await Models.department.all({where: {parentId: result.id}});
             await Promise.all(childrenDepts.map(async (item) => {
-                let deptProperty = await item.getDepartmentProperty();
+                let deptProperty = await item.getOaDeptIdProperty();
                 let oaDept = childrenDepartmentsMap[deptProperty.value];
                 if(!oaDept){
-                    let deleteProperty = await Models.departmentProperty.find({where: {departmentId: item.id}});
-                    await Promise.all(deleteProperty.map(async (d) => {
-                        await d.destroy();
-                    }));
+                    await item.deleteDepartmentProperty();
 
                     try{
                         await item.destroy();
