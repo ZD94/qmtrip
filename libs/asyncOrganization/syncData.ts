@@ -45,15 +45,14 @@ export class SyncData {
             await ldapApi.bindUser({entryDn: ldapInfoJson.ldapAdminDn, userPassword: ldapInfoJson.ldapAdminPassword});
 
             if(department){
-                let ldapUuidProperty = await Models.departmentProperty.find({where: {type: DPropertyType.LDAP_UUID, departmentId: department.id}});
-                let ldapDndProperty = await Models.departmentProperty.find({where: {type: DPropertyType.LDAP_DN, departmentId: department.id}});
+                let ldapDeptProperties = await Models.departmentProperty.find({where: {type: [DPropertyType.LDAP_UUID, DPropertyType.LDAP_DN], departmentId: department.id}});
                 let id = "";
                 let dn = "";
-                if(ldapUuidProperty && ldapUuidProperty.length > 0){
-                    id = ldapUuidProperty[0].value;
-                }
-                if(ldapDndProperty && ldapDndProperty.length > 0){
-                    dn = ldapDndProperty[0].value;
+                if(ldapDeptProperties && ldapDeptProperties.length){
+                    for(let d of ldapDeptProperties){
+                        if(d.type == SPropertyType.LDAP_UUID) id = d.value;
+                        if(d.type == SPropertyType.LDAP_DN) dn = d.value;
+                    }
                 }
                 let ldapDept =  new LdapDepartment({id: id, dn: dn, name: department.name, ldapApi: ldapApi, company: company});
                 let result = await ldapDept.getSelfById();
@@ -68,27 +67,39 @@ export class SyncData {
             }
         }else if(type == "dd"){
 
-            let corps = await Models.ddtalkCorp.find({where: {companyId: company.id}});
-            if (!corps || !corps.length) {
+            // let corps = await Models.ddtalkCorp.find({where: {companyId: company.id}});
+            let comPros = await Models.companyProperty.find({where: {companyId: company.id, type:
+                [CPropertyType.DD_ID, CPropertyType.DD_PERMANENT_CODE, CPropertyType.DD_AGENT_ID]}});
+            if (!comPros || !comPros.length) {
                 throw new Error("您的钉钉账户没有授权");
             }
 
-            let corp = corps[0];
+            let corpId = "";
+            let permanentCode = "";
+            let agentId = "";
+            for(let c of comPros){
+                if(c.type == CPropertyType.DD_ID) corpId = c.value;
+                if(c.type == CPropertyType.DD_PERMANENT_CODE) permanentCode = c.value;
+                if(c.type == CPropertyType.DD_AGENT_ID) agentId = c.value;
+            }
 
-            let {isvApi, corpApi} = await getISVandCorp(corp);
+            let {isvApi, corpApi} = await getISVandCorp({corpId: corpId, permanentCode: permanentCode});
 
             if(department){
-                let ddDeparts = await Models.ddtalkDepartment.find({
+                /*let ddDeparts = await Models.ddtalkDepartment.find({
                     where : { localDepartmentId : department.id }
-                });
-                if(ddDeparts && ddDeparts.length){
-                    let ddDept = new DdDepartment({ id: ddDeparts[0].DdDepartmentId, corpId: ddDeparts[0].corpId,
-                        isvApi: isvApi, corpApi: corpApi, company: company });
-                    let result = await ddDept.getSelfById();
-                    return result;
+                });*/
+
+                let ddDeptIdProperty = await Models.departmentProperty.find({where: {type: DPropertyType.DD_ID, departmentId: department.id}});
+                let id = "";
+                if(ddDeptIdProperty && ddDeptIdProperty.length){
+                    id = ddDeptIdProperty[0].value;
                 }
+                let ddDept = new DdDepartment({ id: id, corpId: corpId, isvApi: isvApi, corpApi: corpApi, company: company });
+                let result = await ddDept.getSelfById();
+                return result;
             }else{
-                let ddCompany = new DdCompany({id: corp.corpId, permanentCode: corp.permanentCode, agentid: corp.agentid,
+                let ddCompany = new DdCompany({id: corpId, permanentCode: permanentCode, agentid: agentId,
                     isvApi: isvApi, corpApi: corpApi});
 
                 let rootDept = await ddCompany.getRootDepartment();
@@ -116,15 +127,14 @@ export class SyncData {
             await ldapApi.bindUser({entryDn: ldapInfoJson.ldapAdminDn, userPassword: ldapInfoJson.ldapAdminPassword});
 
             if(staff){
-                let ldapUuidProperty = await Models.staffProperty.find({where: {type: SPropertyType.LDAP_UUID, staffId: staff.id}});
-                let ldapDndProperty = await Models.staffProperty.find({where: {type: SPropertyType.LDAP_DN, staffId: staff.id}});
+                let ldapStaffProperties = await Models.staffProperty.find({where: {type: [SPropertyType.LDAP_UUID, SPropertyType.LDAP_DN], staffId: staff.id}});
                 let id = "";
                 let dn = "";
-                if(ldapUuidProperty && ldapUuidProperty.length > 0){
-                    id = ldapUuidProperty[0].value;
-                }
-                if(ldapDndProperty && ldapDndProperty.length > 0){
-                    dn = ldapDndProperty[0].value;
+                if(ldapStaffProperties && ldapStaffProperties.length){
+                    for(let s of ldapStaffProperties){
+                        if(s.type == SPropertyType.LDAP_UUID) id = s.value;
+                        if(s.type == SPropertyType.LDAP_DN) dn = s.value;
+                    }
                 }
                 let ldapStaff =  new LdapStaff({id: id, dn: dn, ldapApi: ldapApi});
                 let result = await ldapStaff.getSelfById();
@@ -139,6 +149,8 @@ export class SyncData {
 
     async syncOrganization(params: {company: Company, department?: Department}): Promise<boolean> {
         let oaDepartment = await this.createOaDepartment({company: params.company, department: params.department});
+        console.info(oaDepartment);
+        console.info("oaDepartment======================");
         await oaDepartment.sync();
         return true;
 

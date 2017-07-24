@@ -6,7 +6,7 @@ import { OaStaff } from 'libs/asyncOrganization/oastaff';
 import {StaffProperty, SPropertyType, Staff} from "_types/staff";
 import {Models} from "_types/index";
 import L from '@jingli/language';
-import {Company} from "_types/company";
+import {Company, CPropertyType} from "_types/company";
 import ISVApi from "./isvApi";
 import corpApi from "./corpApi";
 import DdDepartment from "./ddDepartment";
@@ -146,7 +146,7 @@ export default class DdStaff extends OaStaff {
 
     async saveStaffProperty(params: {staffId: string}): Promise<boolean> {
         let self = this;
-        let ddUserInfo: any = await self.corpApi.getUser(self.id);
+        /*let ddUserInfo: any = await self.corpApi.getUser(self.id);
         let dd_info = JSON.stringify( ddUserInfo );
         let ddtalkUser = Models.ddtalkUser.create({
             id: params.staffId,
@@ -158,17 +158,31 @@ export default class DdStaff extends OaStaff {
             corpid: self.corpId,
             ddInfo: dd_info
         });
-        ddtalkUser = await ddtalkUser.save();
+        ddtalkUser = await ddtalkUser.save();*/
+
+        let staffUuidProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.DD_ID, value: self.id});
+        let staffCorpProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.DD_COMPANY_ID, value: self.corpId});
+        let ddUser = await self.corpApi.getUser(self.id);
+        let userInfo = JSON.stringify(ddUser);
+        let staffDdInfoProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.DD_USER_INFO, value: userInfo});
+        await staffUuidProperty.save();
+        await staffCorpProperty.save();
+        await staffDdInfoProperty.save();
         return true;
     }
 
     async getCompany(): Promise<Company>{
         let self = this;
         let company: Company;
-        let corps = await Models.ddtalkCorp.find({where: {corpId: self.corpId}});
+        /*let corps = await Models.ddtalkCorp.find({where: {corpId: self.corpId}});
         if(corps && corps.length){
             let corp = corps[0];
             company = await corp.getCompany();
+        }*/
+
+        let companyPro = await Models.companyProperty.find({where : {value: self.corpId, type: CPropertyType.DD_ID}});
+        if(companyPro && companyPro.length > 0){
+            company = await Models.company.get(companyPro[0].companyId);
         }
         return company;
     }
@@ -176,11 +190,16 @@ export default class DdStaff extends OaStaff {
     async getStaff(): Promise<Staff>{
         let self = this;
         let staff: Staff = null;
-        let ddtalkUser = await Models.ddtalkUser.find({
+        /*let ddtalkUser = await Models.ddtalkUser.find({
             where : { ddUserId : self.id , corpid : self.corpId }
         });
         if(ddtalkUser && ddtalkUser.length) {
             staff = await Models.staff.get(ddtalkUser[0].id);
+        }*/
+
+        let staffPro = await Models.staffProperty.find({where : {value: self.id, type: SPropertyType.DD_ID}});
+        if(staffPro && staffPro.length > 0){
+            staff = await Models.staff.get(staffPro[0].staffId);
         }
         return staff;
     }

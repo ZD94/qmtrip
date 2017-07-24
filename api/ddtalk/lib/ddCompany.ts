@@ -6,7 +6,7 @@ import { OaDepartment } from 'libs/asyncOrganization/OaDepartment';
 import { OaStaff } from 'libs/asyncOrganization/OaStaff';
 import { DepartmentProperty, DPropertyType} from "_types/department";
 import {Models} from "_types/index";
-import {Company, CPropertyType} from "_types/company";
+import {Company, CPropertyType, CompanyProperty} from "_types/company";
 import L from '@jingli/language';
 import ISVApi from "./isvApi";
 import corpApi from "./corpApi";
@@ -43,11 +43,11 @@ export default class DdCompany extends OaCompany {
         this.target.permanentCode = val;
     }
 
-    get agentid() {
+    get agentId() {
         return this.target.agentid;
     }
 
-    set agentid(val: string) {
+    set agentId(val: string) {
         this.target.agentid = val;
     }
 
@@ -89,7 +89,7 @@ export default class DdCompany extends OaCompany {
 
     async saveCompanyProperty(params: { companyId: string }): Promise<boolean> {
         let self = this;
-        let corp = Models.ddtalkCorp.create({
+        /*let corp = Models.ddtalkCorp.create({
             id: params.companyId,
             corpId: self.id,
             permanentCode: self.permanentCode,
@@ -97,17 +97,29 @@ export default class DdCompany extends OaCompany {
             isSuiteRelieve: false,
             agentid: self.agentid
         });
-        corp = await corp.save();
+        corp = await corp.save();*/
+
+        let companyUuidProperty = CompanyProperty.create({companyId: params.companyId, type: CPropertyType.DD_ID, value: self.id});
+        let companyCorpProperty = CompanyProperty.create({companyId: params.companyId, type: CPropertyType.DD_PERMANENT_CODE, value: self.permanentCode});
+        let companyAgentProperty = CompanyProperty.create({companyId: params.companyId, type: CPropertyType.DD_AGENT_ID, value: self.agentId});
+        await companyUuidProperty.save();
+        await companyCorpProperty.save();
+        await companyAgentProperty.save();
         return true;
     }
 
     async getCompany(): Promise<Company>{
         let self = this;
         let com: Company = null;
-        let corps = await Models.ddtalkCorp.find({where: {corpId: self.id}});
+        /*let corps = await Models.ddtalkCorp.find({where: {corpId: self.id}});
         if (corps && corps.length) {
             let corp = corps[0];
             com = await corp.getCompany(corp['company_id']);
+        }*/
+
+        let companyPro = await Models.companyProperty.find({where : {value: self.id, type: CPropertyType.DD_ID}});
+        if(companyPro && companyPro.length > 0){
+            com = await Models.company.get(companyPro[0].companyId);
         }
         return com;
     }

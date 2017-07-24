@@ -16,7 +16,7 @@ import request = require('request');
 import ISVApi from "./isvApi";
 import CorpApi from "./corpApi";
 import {reqProxy} from "./reqProxy";
-import {Company} from "_types/company";
+import {Company, CPropertyType} from "_types/company";
 import {Staff, EStaffRole} from "_types/staff";
 import {Models} from "_types/index";
 import L from '@jingli/language';
@@ -103,7 +103,7 @@ interface getISVandCorp {
 }
 
 //提供isv , corp 的api对象
-export async function getISVandCorp(corp : DDTalkCorp): Promise<any> {
+export async function getISVandCorp(corp : {corpId: string, permanentCode: string}): Promise<any> {
     let corpId = corp.corpId;
     let tokenObj = await _getSuiteToken();
     let suiteToken = tokenObj['suite_access_token'];
@@ -225,18 +225,28 @@ export async function synchroDDorganization() : Promise<boolean> {
         throw L.ERR.PERMISSION_DENY();
     }
 
-    let corps = await Models.ddtalkCorp.find({where: {companyId: current.company.id}});
-    if (!corps || !corps.length) {
+    /*let corps = await Models.ddtalkCorp.find({where: {companyId: current.company.id}});*/
+
+    let comPros = await Models.companyProperty.find({where: {companyId: current.company.id, type:
+        [CPropertyType.DD_ID, CPropertyType.DD_PERMANENT_CODE, CPropertyType.DD_AGENT_ID]}});
+    if (!comPros || !comPros.length) {
         throw new Error("您的钉钉账户没有授权");
     }
 
-    let corp = corps[0];
+    let corpId = "";
+    let permanentCode = "";
+    let agentId = "";
+    for(let c of comPros){
+        if(c.type == CPropertyType.DD_ID) corpId = c.value;
+        if(c.type == CPropertyType.DD_PERMANENT_CODE) permanentCode = c.value;
+        if(c.type == CPropertyType.DD_AGENT_ID) agentId = c.value;
+    }
 
-    let {isvApi, corpApi} = await getISVandCorp(corp);
+    let {isvApi, corpApi} = await getISVandCorp({corpId: corpId, permanentCode: permanentCode});
 
     try{
         let company = current.company;
-        let ddCompany = new DdCompany({id: corp.corpId, name: company.name, permanentCode: corp.permanentCode, agentid: corp.agentid,
+        let ddCompany = new DdCompany({id: corpId, name: company.name, permanentCode: permanentCode, agentid: agentId,
             isvApi: isvApi, corpApi: corpApi});
 
         await ddCompany.sync();
@@ -259,15 +269,23 @@ export async function synchroDDorganization() : Promise<boolean> {
 
 export async function suiteRelieve(msg) {
     let corpId = msg.AuthCorpId;
-    let corps = await Models.ddtalkCorp.find({where: {corpId: corpId}});
-    if (corps && corps.length) {
-        let corp = corps[0];
-        corp.isSuiteRelieve = true;
-        corp.permanentCode = null;
-        corp = await corp.save()
+    // let corps = await Models.ddtalkCorp.find({where: {corpId: corpId}});
+    let comPro = await Models.companyProperty.find({where: {value: corpId, type: CPropertyType.DD_ID}});
+    if (comPro && comPro.length) {
+        let comCorp = comPro[0];
+        let company = await Models.company.get(comCorp.companyId);
+        let comPros = await Models.companyProperty.find({where: {companyId: company.id,
+            type: [CPropertyType.DD_PERMANENT_CODE, CPropertyType.DD_AGENT_ID]}});
+
+        for(let c of comPros){
+            if(c.type == CPropertyType.DD_PERMANENT_CODE){
+                c.value = null;
+                await c.save();
+            }
+        }
 
         //禁用企业
-        let company = await corp.getCompany(corp['company_id']);
+        company.isSuiteRelieve = true;
         company.status = -1;
         await company.save();
         let isvApi = new ISVApi(config.suiteid, '', corpId, '');
@@ -289,17 +307,27 @@ export async function suiteRelieve(msg) {
 
 async function ddEventCommon(msg){
     let corpId = msg.CorpId;
-    let corps = await Models.ddtalkCorp.find({where: {corpId: corpId}});
-    if(!corps || !corps.length){
+    // let corps = await Models.ddtalkCorp.find({where: {corpId: corpId}});
+
+    let comPro = await Models.companyProperty.find({where: {value: corpId, type: CPropertyType.DD_ID}});
+    if (!comPro || !comPro.length) {
         logger.warn("DDEvent : ddtalk.corp没有这条记录 : " , corpId);
     }
-    let corp = corps[0];
+    let comPros = await Models.companyProperty.find({where: {companyId: comPro[0].companyId,
+        type: [CPropertyType.DD_PERMANENT_CODE, CPropertyType.DD_AGENT_ID]}});
+    let permanentCode = "";
+    let agentId = "";
+    for(let c of comPros){
+        if(c.type == CPropertyType.DD_PERMANENT_CODE) permanentCode = c.value;
+        if(c.type == CPropertyType.DD_AGENT_ID) agentId = c.value;
+    }
 
-    let result = await getISVandCorp(corp);
+    let {isvApi, corpApi} = await getISVandCorp({corpId: corpId, permanentCode: permanentCode});
+
     return {
-        corpApi : result.corpApi,
-        isvApi: result.isvApi,
-        corp  : corp
+        corpApi : corpApi,
+        isvApi: isvApi,
+        corp  : {corpId: corpId, permanentCode: permanentCode, agentId: agentId}
     };
 }
 

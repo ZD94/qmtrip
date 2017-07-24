@@ -106,6 +106,8 @@ export abstract class OaDepartment{
 
             //2、同步部门下员工
             let oaStaffs = await self.getStaffs();
+            console.info(oaStaffs.length);
+            console.info("oaStaffs.length===========================");
             let oaStaffsMap = {};
             if (oaStaffs && oaStaffs.length > 0) {
                 await Promise.all(oaStaffs.map(async (item) => {
@@ -130,7 +132,7 @@ export abstract class OaDepartment{
                 }
             }));
 
-            //获取ldap子部门
+            //获取oa子部门
             let childrenDepartments = await self.getChildrenDepartments();
             let childrenDepartmentsMap = {};
             for(let d = 0; d < childrenDepartments.length; d++){

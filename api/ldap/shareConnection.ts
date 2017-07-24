@@ -12,7 +12,7 @@ export default class ShareConnection {
     static async initConnection(params: {companyId: string}){
         let ldapProperty = await Models.companyProperty.find({where: {companyId: params.companyId, type: CPropertyType.LDAP}});
         if(!ldapProperty || !ldapProperty[0]){
-            throw L.ERR.INVALID_ARGUMENT("ldap相关设置");
+            throw new Error("缺少ldap相关设置");
         }
         let ldapInfo = ldapProperty[0].value;
         let ldapInfoJson = JSON.parse(ldapInfo);

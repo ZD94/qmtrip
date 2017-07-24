@@ -111,35 +111,56 @@ export default class DdDepartment extends OaDepartment {
 
     async saveDepartmentProperty(params: {departmentId: string}): Promise<boolean> {
         let self = this;
-        let ddDepart = Models.ddtalkDepartment.create({
+        /*let ddDepart = Models.ddtalkDepartment.create({
             corpId : self.corpId ,
             DdDepartmentId : self.id,
             localDepartmentId : params.departmentId ,
             ddName : self.name
         });
-        await ddDepart.save();
+        await ddDepart.save();*/
+
+        let departmentUuidProperty = DepartmentProperty.create({departmentId: params.departmentId, type: DPropertyType.DD_ID, value: self.id});
+        let departmentDnProperty = DepartmentProperty.create({departmentId: params.departmentId, type: DPropertyType.DD_COMPANY_ID, value: self.corpId});
+        await departmentUuidProperty.save();
+        await departmentDnProperty.save();
         return true;
     }
 
-    async getDepartmentProperty(params: {departmentId: string}): Promise<DDTalkDepartment> {
+    async getDepartmentProperty(params: {departmentId: string}): Promise<DepartmentProperty> {
         let self = this;
-        let ddDeparts = await Models.ddtalkDepartment.find({
+       /* let ddDeparts = await Models.ddtalkDepartment.find({
             where : { corpId : this.corpId , DdDepartmentId : self.id }
         });
         if(ddDeparts && ddDeparts.length){
             return ddDeparts[0];
+        }*/
+        let departmentUuidProperty = await Models.departmentProperty.find({where: {departmentId: params.departmentId, type: DPropertyType.DD_ID}});
+        if(departmentUuidProperty && departmentUuidProperty.length){
+            return departmentUuidProperty[0];
         }
         return null;
     }
 
     async getDepartment(): Promise<Department>{
         let self = this;
-        let department: Department = null;
+        /*let department: Department = null;
         let ddDeparts = await Models.ddtalkDepartment.find({
             where : { corpId : self.corpId , DdDepartmentId : self.id }
         });
         if(ddDeparts && ddDeparts.length) {
             department = await Models.department.get(ddDeparts[0].localDepartmentId);
+        }*/
+
+        let department: Department = null;
+        let deptPro = await Models.departmentProperty.find({where : {value: self.id, type: DPropertyType.DD_ID}});
+        if(deptPro && deptPro.length > 0){
+            for(let d of deptPro){
+                let dept = await Models.department.get(d.departmentId);
+                let deptCorpPro = await Models.departmentProperty.find({where : {value: self.corpId, type: DPropertyType.DD_COMPANY_ID, departmentId: dept.id}});
+                if(deptCorpPro && deptCorpPro.length){//此处有待考证【是否可以再property表添加一个CorpId的属性】
+                    department = dept;
+                }
+            }
         }
         return department;
     }
