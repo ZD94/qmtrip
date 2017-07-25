@@ -9,7 +9,9 @@
     <tr>
         <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">行程</td>
         <td style="padding-left: 20px;font-size: 16px;">
+            <%if(tripApprove.deptCity){%>
             <%=tripApprove.deptCity%>-
+            <%}%>
             <% _.forEach(tripApprove.arrivalCityCodes, function(cityCode, index) { %>
             <%=cityMap[cityCode].name%>
             <%if(index != (tripApprove.arrivalCityCodes.length - 1)){%>
