@@ -28,12 +28,27 @@ import {getSession} from "common/model";
 import {AgencyUser} from "_types/agency";
 import {makeSpendReport} from './spendReport';
 import fs = require("fs");
-import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice} from "_types/tripPlan";
+import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice, InvoiceFeeTypeNames} from "_types/tripPlan";
 import {ENoticeType} from "_types/notice/notice";
 import TripApproveModule = require("../tripApprove/index");
 import {MPlaneLevel, MTrainLevel} from "_types/travelPolicy";
 import {ISegment, ICreateBudgetAndApproveParams} from '_types/tripPlan'
 const projectCols = Project['$fieldnames'];
+
+interface ReportInvoice {
+    type: string;
+    date: Date;
+    invoiceInfo: string;
+    quantity: number;
+    money: number;
+    departCity?: string;
+    arrivalCity?: string;
+    remark?: string;
+    trafficType?: string;
+    trafficInfo?: string;
+    duration? : string;
+}
+
 
 class TripPlanModule {
 
@@ -1412,68 +1427,87 @@ class TripPlanModule {
                 return '';
             })
         approveUsers = await Promise.all(approveUsers)
-        let _tripDetails = tripDetails.map (async (v) :Promise<any> => {
+        let _tripDetails = await Promise.all(tripDetails.map (async (v) : Promise<ReportInvoice[]> => {
             let tripDetailInvoices = await Models.tripDetailInvoice.find({where: {tripDetailId: v.id, payType: {$ne: EPayType.COMPANY_PAY}}});
+
             if (v.type == ETripType.OUT_TRIP || v.type == ETripType.BACK_TRIP) {
                 let v1 = <TripDetailTraffic>v;
                 let trafficType;
                 let trafficInfo;
-                let type;
-                type = '交通'
                 trafficType = v1.type == ETripType.OUT_TRIP ? 'GO': 'BACK';
                 trafficInfo = v1.invoiceType == EInvoiceType.TRAIN ? '火车': '飞机';
                 trafficInfo += v1.invoiceType == EInvoiceType.PLANE ? MPlaneLevel[v1.cabin] : MTrainLevel[v1.cabin];
                 let deptCity = await API.place.getCityInfo({cityCode: v1.deptCity});
                 let arrivalCity = await API.place.getCityInfo({cityCode: v1.arrivalCity});
-                return {
-                    type: type,
-                    date: moment(v1.deptDateTime).format('YYYY.MM.DD'),
-                    invoiceInfo: `${type}费`,
-                    quantity: tripDetailInvoices.length,
-                    money: v1.personalExpenditure,
-                    departCity: deptCity.name,
-                    arrivalCity: arrivalCity.name,
-                    remark: `${deptCity.name}-${arrivalCity.name}`,
-                    trafficType: `${trafficType}`,
-                    trafficInfo: `${trafficInfo}`
-                }
+
+                return tripDetailInvoices.map((invoice)=>{
+                    let type = InvoiceFeeTypeNames[invoice.type];
+                    let data: ReportInvoice = {
+                        type: '交通',
+                        date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
+                        invoiceInfo: `交通费`,
+                        quantity: 1,
+                        money: invoice.totalMoney,
+                        departCity: deptCity.name,
+                        arrivalCity: arrivalCity.name,
+                        remark: `${deptCity.name}-${arrivalCity.name}`,
+                        trafficType: `${trafficType}`,
+                        trafficInfo: `${trafficInfo}`
+                    }
+
+                    return data;
+                });
             }
             if (v.type == ETripType.HOTEL) {
                 let v1 = <TripDetailHotel>v;
                 let city = await API.place.getCityInfo({cityCode: v1.city})
-                return {
-                    "type": "住宿",
-                    "date": moment(v1.checkInDate).format('YYYY.MM.DD'),
-                    "invoiceInfo": "住宿费",
-                    "quantity": tripDetailInvoices.length,
-                    "money": v1.personalExpenditure,
-                    "remark": `${moment(v1.checkInDate).format('YYYY.MM.DD')}-${moment(v1.checkOutDate).format('YYYY.MM.DD')} ${city.name} 共${moment(v1.checkOutDate).diff(v1.checkInDate, 'days')}日`,
-                    "duration": `${moment(v1.checkOutDate).diff(v1.checkInDate, 'days')}`
-                }
+
+                return tripDetailInvoices.map((invoice)=>{
+                    let type = InvoiceFeeTypeNames[invoice.type];
+                    let data: ReportInvoice = {
+                        type: '住宿',
+                        date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
+                        invoiceInfo: `住宿费`,
+                        quantity: 1,
+                        money: invoice.totalMoney,
+                        "remark": `${moment(v1.checkInDate).format('YYYY.MM.DD')}-${moment(v1.checkOutDate).format('YYYY.MM.DD')} ${city.name} 共${moment(v1.checkOutDate).diff(v1.checkInDate, 'days')}日`,
+                        "duration": `${moment(v1.checkOutDate).diff(v1.checkInDate, 'days')}`
+                    }
+
+                    return data;
+                });
             }
             if (v.type == ETripType.SUBSIDY) {
-                let v1 = <TripDetailSubsidy>v;
-                return {
-                    "type": '补助',
-                    "date": moment(v1.startDateTime).format('YYYY.MM.DD'),
-                    "invoiceInfo": "补助费",
-                    quantity: tripDetailInvoices.length,
-                    money: v1.personalExpenditure,
-                    remark: '补助费'
-                }
+                return tripDetailInvoices.map((invoice)=>{
+                    let type = InvoiceFeeTypeNames[invoice.type];
+                    let data: ReportInvoice = {
+                        type: '补助',
+                        date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
+                        invoiceInfo: `补助费`,
+                        quantity: 1,
+                        money: invoice.totalMoney,
+                        remark: `补助费`,
+                    }
+
+                    return data;
+                });
             }
             if (v.type == ETripType.SPECIAL_APPROVE) {
-                let v1 = <TripDetailSpecial>v;
-                return {
-                    "type": '出差费用',
-                    "date": moment(v1.deptDateTime).format('YYYY.MM.DD'),
-                    "invoiceInfo": "出差费",
-                    quantity: tripDetailInvoices.length,
-                    money: v1.personalExpenditure,
-                    remark: '特别审批出差费用'
-                }
+                return tripDetailInvoices.map((invoice)=>{
+                    let type = InvoiceFeeTypeNames[invoice.type];
+                    let data: ReportInvoice = {
+                        type: '特殊审批',
+                        date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
+                        invoiceInfo: `特殊审批费`,
+                        quantity: 1,
+                        money: invoice.totalMoney,
+                        remark: `特别审批出差费用`,
+                    }
+
+                    return data;
+                });
             }
-        })
+        }))
         let financeCheckCode = Models.financeCheckCode.create({tripPlanId: tripPlanId, isValid: true});
         financeCheckCode = await financeCheckCode.save();
         // let roundLine = `${tripPlan.deptCity}-${tripPlan.arrivalCity}${tripPlan.isRoundTrip ? '-' + tripPlan.deptCity: ''}`;
@@ -1489,7 +1523,14 @@ class TripPlanModule {
         }))
         roundLine += tripPlan.isRoundTrip ? '-'+tripPlan.deptCity : '';
         console.info(roundLine);
-        _tripDetails = await Promise.all(_tripDetails);
+
+        let invoiceDetail = [];
+        _tripDetails.map((item)=>{
+            invoiceDetail.push(...item);
+        });
+
+        _tripDetails = invoiceDetail;
+
         _tripDetails = _tripDetails.filter( (v) => {
             return v['money'] > 0;
         });
@@ -1746,8 +1787,14 @@ class TripPlanModule {
         scheduler('0 */5 * * * *', taskId, async function() {
             let tripApproves = await Models.tripApprove.find({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
             tripApproves.map(async (approve) => {
+
+                let approveCompany = await approve.getCompany();
+                let content = approve.deptCity+"-"+approve.arrivalCity;
+                let frozenNum = approve.query.frozenNum;
+
+                
                 try{
-                    let approveCompany = await approve.getCompany();
+                    
                     if(typeof approve.query == 'string'){
                         approve.query = JSON.parse(approve.query);
                     }
@@ -1759,47 +1806,7 @@ class TripPlanModule {
                         destinationPlacesInfo:approve.query.destinationPlacesInfo
                     };
 
-                    let budgetsId;
-                    try{
-                        budgetsId = await API.travelBudget.getTravelPolicyBudget(query);
-                    }catch(e){
-                        logger.error(e.stack);
-                        if(!approve.autoApproveNum){
-                            approve.autoApproveNum = 0;
-                        }
-                        approve.autoApproveNum++;
-
-                        if(approve.autoApproveNum >= 3){
-                            //已经自动审批三次了，仍然获取预算失败，直接驳回
-                            approve.status = QMEApproveStatus.REJECT;
-                            approve.approveRemark = "自动审批失败";
-                            await approve.save();
-
-                            //发送审核结果邮件
-                            let self_url;
-                            let appMessageUrl;
-                            self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + approve.id;
-                            let finalUrl = '#/trip-approval/detail?approveId=' + approve.id;
-                            finalUrl = encodeURIComponent(finalUrl);
-                            appMessageUrl = `#/judge-permission/index?id=${approve.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
-                            let user = approve.account;
-                            if(!user) user = await Models.staff.get(approve['accountId']);
-                            try {
-                                self_url = await API.wechat.shorturl({longurl: self_url});
-                            } catch(err) {
-                                console.error(err);
-                            }
-                            try {
-                                await API.notify.submitNotify({userId: user.id, key: 'qm_notify_approve_not_pass',
-                                    values: { tripApprove: approve, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
-                            } catch(err) { console.error(err);}
-
-
-                        }else{
-                            await approve.save();
-                        }
-                        return;
-                    }
+                    let budgetsId = await API.travelBudget.getTravelPolicyBudget(query);
 
                     let budgetsInfo = await API.travelBudget.getBudgetInfo({id: budgetsId,accountId: approve['accountId']});
                     let totalBudget = 0;
@@ -1817,10 +1824,8 @@ class TripPlanModule {
                         approve.budgetInfo = budgets;
                     }
 
-                    let frozenNum = approve.query.frozenNum;
                     await approveCompany.beforeApproveTrip({number: frozenNum});
 
-                    let content = approve.deptCity+"-"+approve.arrivalCity;
                     if(!approve.isSpecialApprove){
                         if(approve.createdAt.getMonth() == new Date().getMonth()){
                             await approveCompany.approvePassReduceTripPlanNum({accountId: approve.account.id, tripPlanId: approve.id,
@@ -1840,6 +1845,48 @@ class TripPlanModule {
                     approve = await approve.save();
                 }catch(e){
                     logger.error(e.stack);
+                    if(!approve.autoApproveNum){
+                        approve.autoApproveNum = 0;
+                    }
+                    approve.autoApproveNum++;
+
+                    if(approve.autoApproveNum >= 3){
+                        //已经自动审批三次了，仍然获取预算失败，直接驳回
+                        approve.status = QMEApproveStatus.REJECT;
+                        approve.approveRemark = "自动审批失败";
+                        await approve.save();
+
+                        if(approve.createdAt.getMonth() == new Date().getMonth()){
+                            await approveCompany.approveRejectFreeTripPlanNum({accountId: approve.account.id, tripPlanId: approve.id,
+                                remark: "审批驳回释放冻结行程点数", content: content, frozenNum: frozenNum});
+
+                        }else{
+                            await approveCompany.approveRejectFreeBeforeNum({accountId: approve.account.id, tripPlanId: approve.id,
+                                remark: "审批驳回上月申请释放冻结行程点数", content: content, frozenNum: frozenNum});
+                        }
+
+                        //发送审核结果邮件
+                        let self_url;
+                        let appMessageUrl;
+                        self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + approve.id;
+                        let finalUrl = '#/trip-approval/detail?approveId=' + approve.id;
+                        finalUrl = encodeURIComponent(finalUrl);
+                        appMessageUrl = `#/judge-permission/index?id=${approve.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
+                        let user = approve.account;
+                        if(!user) user = await Models.staff.get(approve['accountId']);
+                        try {
+                            self_url = await API.wechat.shorturl({longurl: self_url});
+                        } catch(err) {
+                            console.error(err);
+                        }
+                        try {
+                            await API.notify.submitNotify({userId: user.id, key: 'qm_notify_approve_not_pass',
+                                values: { tripApprove: approve, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
+                        } catch(err) { console.error(err);}
+
+                    }else{
+                        await approve.save();
+                    }
                 }
             });
         });

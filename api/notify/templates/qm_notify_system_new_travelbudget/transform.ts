@@ -55,6 +55,7 @@ export = async function transform(values: any): Promise<any>{
         staffMap[item] = s;
     }))
     values.staffMap = staffMap;
-    values.date = moment().format('YYYY-MM-DD HH:MM');
+    values.date = moment().format('YYYY-MM-DD HH:mm');
+
     return values;
 }

@@ -51,6 +51,7 @@ const templatePath = path.normalize(path.join(__dirname, 'template.html'));
 var templateBase = 'file://' + templatePath;
 
 export async function makeSpendReport(data): Promise<Buffer> {
+    console.info('data======================',data);
     let html = await compile(templatePath, {data: data});
     return html2pdf(html, templateBase);
 }
