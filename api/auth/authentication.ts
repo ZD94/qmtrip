@@ -221,7 +221,7 @@ export async function login(data: {account?: string, pwd: string, type?: Number,
 
 }
 
-export async function loginByLdap(data: {account?: string, pwd: string}): Promise<LoginResponse> {
+export async function loginByLdap(data: {account?: string, pwd: string, companyId: string}): Promise<LoginResponse> {
     if(!data) {
         throw L.ERR.DATA_NOT_EXIST();
     }
@@ -234,7 +234,7 @@ export async function loginByLdap(data: {account?: string, pwd: string}): Promis
         throw L.ERR.PWD_EMPTY();
     }
     //ldap认证
-    let company = await Models.company.get("4438e4c0-686e-11e7-89aa-a14f4c6f4292");
+    let company = await Models.company.get(data.companyId);
     if(!shareConnection.connectionMap[company.id]){
         await shareConnection.initConnection({companyId: company.id});
     }

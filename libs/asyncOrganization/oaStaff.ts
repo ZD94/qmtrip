@@ -142,7 +142,7 @@ export  abstract class OaStaff{
             alreadyStaff.mobile = self.mobile;
             alreadyStaff.email = self.email;
             alreadyStaff.pwd = utils.md5(pwd);
-            alreadyStaff.roleId = roleId;
+            // alreadyStaff.roleId = roleId;//ldap此处更新权限有问题 创建者被更新为了普通员工
             await alreadyStaff.save();
 
             // 处理部门

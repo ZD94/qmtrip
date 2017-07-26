@@ -51,8 +51,8 @@ export class SyncData {
                 let result = await ldapDept.getSelfById();
                 return result;
             }else{
-                // let rootDn = ldapInfoJson.ldapDepartmentRootDn || ldapInfoJson.ldapBaseDn;
-                let rootDn = "ou=department,dc=jingli,dc=com";
+                let rootDn = ldapInfoJson.ldapDepartmentRootDn || ldapInfoJson.ldapBaseDn;
+                // let rootDn = "ou=department,dc=jingli,dc=com";
                 let rootDepartmentInfos = await ldapApi.searchDn({rootDn: rootDn, opts: {attributes: departmentOpts.attributes}});
                 let rootDepartmentInfo = rootDepartmentInfos[0];
                 return new LdapDepartment({id: rootDepartmentInfo.entryUUID, dn: rootDepartmentInfo.dn, name: rootDepartmentInfo.ou,

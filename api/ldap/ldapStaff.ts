@@ -63,6 +63,14 @@ export default class LdapStaff extends OaStaff {
         this.target.sex = val;
     }
 
+    get isAdmin() {
+        return this.target.isAdmin;
+    }
+
+    set isAdmin(val: boolean) {
+        this.target.isAdmin = val;
+    }
+
     get company() {
         return this.target.company;
     }

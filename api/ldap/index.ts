@@ -30,15 +30,15 @@ export class LdapModule {
 
         app.get("/initLdap", async (req, res, next)=>{
             let params={
-                mobile: "18401208626",
-                email: "66666@qq.com",
+                mobile: "10000000001",
+                email: "10000000001@qq.com",
                 name: "测试ldap同步",
-                userName: "staff1",
+                userName: "xiao1",
                 pwd: "123456",
                 status: ACCOUNT_STATUS.ACTIVE,
                 isValidateMobile: true,
                 ldapBaseDn: "dc=jingli,dc=com",
-                ldapStaffRootDn: "cn=employee,dc=jingli,dc=com",
+                ldapStaffRootDn: "ou=department,dc=jingli,dc=com",
                 ldapDepartmentRootDn: "ou=department,dc=jingli,dc=com",
                 ldapUrl: "ldap://123.56.70.171:389/DC=jingli,DC=com",
                 ldapAdminDn: "cn=Manager,dc=jingli,dc=com",
@@ -49,7 +49,7 @@ export class LdapModule {
             // console.info(result);
 
             //同步组织架构
-            let company = await Models.company.get("4438e4c0-686e-11e7-89aa-a14f4c6f4292")
+            let company = await Models.company.get("d8496510-71fe-11e7-b0b2-a1691f820b1a")
             let depts = await syncData.syncOrganization({company: company});
             console.info(depts);
             console.info("depts==============================================");
@@ -85,8 +85,8 @@ export class LdapModule {
             throw L.ERR.PWD_EMPTY();
         }
         //ldap认证
-        // let company = await Models.company.get(params.companyId);
-        let company = await Models.company.get("4438e4c0-686e-11e7-89aa-a14f4c6f4292");
+        let company = await Models.company.get(data.companyId);
+        // let company = await Models.company.get("4438e4c0-686e-11e7-89aa-a14f4c6f4292");
         if(!shareConnection.connectionMap[company.id]){
             await shareConnection.initConnection({companyId: company.id});
         }
