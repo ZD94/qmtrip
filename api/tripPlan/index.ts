@@ -1443,9 +1443,9 @@ class TripPlanModule {
                 return tripDetailInvoices.map((invoice)=>{
                     let type = InvoiceFeeTypeNames[invoice.type];
                     let data: ReportInvoice = {
-                        type: type,
+                        type: '交通',
                         date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
-                        invoiceInfo: `${type}费`,
+                        invoiceInfo: `交通费`,
                         quantity: 1,
                         money: invoice.totalMoney,
                         departCity: deptCity.name,
@@ -1465,9 +1465,9 @@ class TripPlanModule {
                 return tripDetailInvoices.map((invoice)=>{
                     let type = InvoiceFeeTypeNames[invoice.type];
                     let data: ReportInvoice = {
-                        type: type,
+                        type: '住宿',
                         date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
-                        invoiceInfo: `${type}费`,
+                        invoiceInfo: `住宿费`,
                         quantity: 1,
                         money: invoice.totalMoney,
                         "remark": `${moment(v1.checkInDate).format('YYYY.MM.DD')}-${moment(v1.checkOutDate).format('YYYY.MM.DD')} ${city.name} 共${moment(v1.checkOutDate).diff(v1.checkInDate, 'days')}日`,
@@ -1481,9 +1481,9 @@ class TripPlanModule {
                 return tripDetailInvoices.map((invoice)=>{
                     let type = InvoiceFeeTypeNames[invoice.type];
                     let data: ReportInvoice = {
-                        type: type,
+                        type: '补助',
                         date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
-                        invoiceInfo: `${type}费`,
+                        invoiceInfo: `补助费`,
                         quantity: 1,
                         money: invoice.totalMoney,
                         remark: `补助费`,
@@ -1496,9 +1496,9 @@ class TripPlanModule {
                 return tripDetailInvoices.map((invoice)=>{
                     let type = InvoiceFeeTypeNames[invoice.type];
                     let data: ReportInvoice = {
-                        type: type,
+                        type: '特殊审批',
                         date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
-                        invoiceInfo: `${type}费`,
+                        invoiceInfo: `特殊审批费`,
                         quantity: 1,
                         money: invoice.totalMoney,
                         remark: `特别审批出差费用`,
