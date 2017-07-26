@@ -62,8 +62,11 @@ export abstract class OaDepartment{
     async sync(params?:{company?: Company, oaDepartment?: OaDepartment}): Promise<Department>{
         if(!params) params = {};
         let self = params.oaDepartment || this;
-        let company = self.company || params.company;
-        let type = await company.getOaType();
+        let company = self.company;
+        if(params.company){
+            company = params.company;
+        }
+        // let type = await company.getOaType();
         /*if(!company){
             let staff = await Staff.getCurrent();
             company = staff.company;
@@ -90,9 +93,10 @@ export abstract class OaDepartment{
 
         if(parentDepartment){
             let alreadyDepartment = await self.getDepartment();
-            console.info(alreadyDepartment, self.name, "8888888888888888888888888");
             if(alreadyDepartment){
-                alreadyDepartment.company = company;
+                if(company){
+                    alreadyDepartment.company = company;
+                }
                 alreadyDepartment.parent = parentDepartment;
                 alreadyDepartment.name = self.name;//同步已有部门信息
                 result = await alreadyDepartment.save();

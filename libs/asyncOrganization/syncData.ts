@@ -19,14 +19,7 @@ import {getISVandCorp} from "api/ddtalk/lib/dealEvent"
 import DdCompany from "../../api/ddtalk/lib/ddCompany";
 
 export class SyncData {
-    async createOaCompany(params:{type: string}): Promise<OaCompany>{
-        let type = params.type;
-        if(type == "dd"){
 
-        }
-
-        return null;
-    }
     async createOaDepartment(params:{company: Company, department?: Department, type?: string}): Promise<OaDepartment>{
         let company = params.company;
         let department = params.department;
@@ -67,7 +60,6 @@ export class SyncData {
             }
         }else if(type == "dd"){
 
-            // let corps = await Models.ddtalkCorp.find({where: {companyId: company.id}});
             let comPros = await Models.companyProperty.find({where: {companyId: company.id, type:
                 [CPropertyType.DD_ID, CPropertyType.DD_PERMANENT_CODE, CPropertyType.DD_AGENT_ID]}});
             if (!comPros || !comPros.length) {
@@ -86,9 +78,6 @@ export class SyncData {
             let {isvApi, corpApi} = await getISVandCorp({corpId: corpId, permanentCode: permanentCode});
 
             if(department){
-                /*let ddDeparts = await Models.ddtalkDepartment.find({
-                    where : { localDepartmentId : department.id }
-                });*/
 
                 let ddDeptIdProperty = await Models.departmentProperty.find({where: {type: DPropertyType.DD_ID, departmentId: department.id}});
                 let id = "";
@@ -149,8 +138,6 @@ export class SyncData {
 
     async syncOrganization(params: {company: Company, department?: Department}): Promise<boolean> {
         let oaDepartment = await this.createOaDepartment({company: params.company, department: params.department});
-        console.info(oaDepartment);
-        console.info("oaDepartment======================");
         await oaDepartment.sync();
         return true;
 

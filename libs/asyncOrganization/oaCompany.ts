@@ -3,7 +3,7 @@
  */
 import {Department} from "_types/department";
 import {Company} from "_types/company";
-import {Staff} from "_types/staff";
+import {Staff, EStaffRole} from "_types/staff";
 import {Models} from "_types/index";
 import L from '@jingli/language';
 import {OaStaff} from './oaStaff';
@@ -47,21 +47,8 @@ export abstract class OaCompany{
             alreadyCompany.name = self.name;
             alreadyCompany.status = 1;
             result = await alreadyCompany.save();
-
-            //钉钉需要更新企业对照表
-            /*let corps = await Models.ddtalkCorp.find({where: {corpId: self.id}});
-            if (corps && corps.length) {
-                let corp = corps[0];
-                corp.isSuiteRelieve = false;
-                corp.permanentCode = permanentCode;
-                corp.agentid = agentid;
-                //更新企业对照表
-                corp = await corp.save()
-            }*/
         }else{
             // 不存在，添加
-            //钉钉需要修改企业isConnectDd属性
-            // let company = Company.create({name : corp_name , expiryDate : moment().add(1 , "months").toDate(), isConnectDd: true});
             let company = Company.create({name : self.name , expiryDate : moment().add(1 , "months").toDate()});
             result = await company.save();
             await self.saveCompanyProperty({companyId: result.id});
@@ -84,9 +71,11 @@ export abstract class OaCompany{
         if(createStaff){
             result.createUser = createStaff.id;
             await result.save();
+            createStaff.roleId = EStaffRole.OWNER;
+            await createStaff.save();
         }
 
-        console.info("end=*********&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        console.info("company sync end==============================")
         return result;
     }
 

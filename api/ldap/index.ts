@@ -14,6 +14,7 @@ import L from '@jingli/language';
 import { EStaffStatus, Staff, SPropertyType, EStaffRole } from "_types/staff";
 import {CPropertyType} from "_types/company";
 import { EAccountType } from '_types/index';
+import {Department} from "../../_types/department/department";
 
 export let staffOpts = {
     scope: 'sub',
@@ -160,13 +161,14 @@ export class LdapModule {
     }
 
     @clientExport
-    async syncLdapOrganization(params): Promise<boolean>{
+    async syncLdapOrganization(params?: {department: Department}): Promise<boolean>{
         let current = await Staff.getCurrent();
         if(current.roleId != EStaffRole.OWNER && current.roleId != EStaffRole.ADMIN){
             throw L.ERR.PERMISSION_DENY();
         }
         let company = current.company;
-        let depts = await syncData.syncOrganization({company: company});
+        let department = params.department;
+        let depts = await syncData.syncOrganization({company: company, department: department});
         return true;
     }
 }

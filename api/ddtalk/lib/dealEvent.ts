@@ -203,12 +203,14 @@ export async function tmpAuthCode(msg , req , res , next) {
         }
     }
 
+    //同步钉钉企业数据
     let ddCompany = new DdCompany({id: corpid, name: corp_name, permanentCode: permanentCode, agentid: agentid,
         isvApi: isvApi, corpApi: corpApi});
-
-    await ddCompany.sync();
+    let resultCompany = await ddCompany.sync();
 
     //doSomethingAfterSync
+    resultCompany.isConnectDd = true;
+    await resultCompany.save();
     await isvApi.activeSuite();
     await corpApi.registryContractChangeLister(config.token, config.encodingAESKey, config.dd_online_url + '/ddtalk/isv/receive');
 
@@ -224,8 +226,6 @@ export async function synchroDDorganization() : Promise<boolean> {
     if(current.roleId != EStaffRole.OWNER && current.roleId != EStaffRole.ADMIN){
         throw L.ERR.PERMISSION_DENY();
     }
-
-    /*let corps = await Models.ddtalkCorp.find({where: {companyId: current.company.id}});*/
 
     let comPros = await Models.companyProperty.find({where: {companyId: current.company.id, type:
         [CPropertyType.DD_ID, CPropertyType.DD_PERMANENT_CODE, CPropertyType.DD_AGENT_ID]}});
@@ -250,7 +250,6 @@ export async function synchroDDorganization() : Promise<boolean> {
             isvApi: isvApi, corpApi: corpApi});
 
         await ddCompany.sync();
-        // await dealCompanyOrganization(corpApi, corp);
 
         /* 同步成功后需要修改company isConnectDd true */
         current.company.isConnectDd = true;
@@ -307,7 +306,6 @@ export async function suiteRelieve(msg) {
 
 async function ddEventCommon(msg){
     let corpId = msg.CorpId;
-    // let corps = await Models.ddtalkCorp.find({where: {corpId: corpId}});
 
     let comPro = await Models.companyProperty.find({where: {value: corpId, type: CPropertyType.DD_ID}});
     if (!comPro || !comPro.length) {
@@ -341,17 +339,16 @@ export async function userModifyOrg(msg){
     let userIds = msg.UserId;
     let corpId = msg.CorpId;
 
-    // let DDcrud = new ddCrud(corp.corpId);
+    let comPro = await Models.companyProperty.find({where: {value: corpId, type: CPropertyType.DD_ID}});
+    if (!comPro || !comPro.length) {
+        throw new Error("该企业没有钉钉授权");
+    }
+    let company = await Models.company.get(comPro[0].companyId);
+    console.info(company);
     userIds.map(async (item)=>{
-        let oaStaff = new DdStaff({id: item, corpId: corpId, isvApi: isvApi, corpApi: corpApi});
+        let oaStaff = new DdStaff({id: item, corpId: corpId, isvApi: isvApi, corpApi: corpApi, company: company});
         let ddStaff = await oaStaff.getSelfById();
         await ddStaff.sync();
-
-        /*let userInfo = await corpApi.getUser(item);
-         let staff = await DDcrud.createStaff( userInfo );
-         await DDcrud.createDDuser(staff , userInfo);
-         let localDeparts = await DDcrud.addStaffDeparts( staff , userInfo['department'] );
-         await DDcrud.deleteStaffDepartment( "staff" , staff.id , localDeparts );*/
     });
 }
 
@@ -364,7 +361,6 @@ export async function userLeaveOrg(msg){
     let userIds = msg.UserId;
     let corpId = msg.CorpId;
 
-    // let DDcrud = new ddCrud(corp.corpId);
     userIds.map(async (item)=>{
         let oaStaff = new DdStaff({id: item, corpId: corpId, isvApi: isvApi, corpApi: corpApi});
         await oaStaff.destroy();
@@ -382,14 +378,17 @@ export async function orgDeptCreate(msg) : Promise<void>{
     let {corpApi, isvApi, corp} = await ddEventCommon(msg);
     let ddDeparts = msg.DeptId;
     let corpId = msg.CorpId;
-    let DDcrud    = new ddCrud( corp.corpId );
+
+    let comPro = await Models.companyProperty.find({where: {value: corpId, type: CPropertyType.DD_ID}});
+    if (!comPro || !comPro.length) {
+        throw new Error("该企业没有钉钉授权");
+    }
+    let company = await Models.company.get(comPro[0].companyId);
 
     ddDeparts.map(async (item)=>{
-        let oaDepartment = new DdDepartment({id: item, corpId: corpId, isvApi: isvApi, corpApi: corpApi});
+        let oaDepartment = new DdDepartment({id: item, corpId: corpId, isvApi: isvApi, corpApi: corpApi, company: company});
         let ddDept = await oaDepartment.getSelfById();
         await ddDept.sync();
-        // let ddDepartInfo = await corpApi.getDepartmentInfo(item);
-        // await DDcrud.createDepartment( ddDepartInfo );
     });
 }
 
@@ -401,13 +400,10 @@ export async function orgDeptRemove(msg) : Promise<any> {
     let {corpApi, isvApi, corp} = await ddEventCommon(msg);
     let ddDeparts = msg.DeptId;
     let corpId = msg.CorpId;
-    // let DDcrud    = new ddCrud( msg.CorpId );
 
     ddDeparts.map(async (item)=>{
         let oaDepartment = new DdDepartment({id: item, corpId: corpId, isvApi: isvApi, corpApi: corpApi});
         await oaDepartment.destroy();
-
-        // await DDcrud.ddDeleteDepart( item );
     });
 }
 

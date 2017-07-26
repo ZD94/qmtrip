@@ -113,7 +113,7 @@ export default class DdDepartment extends OaDepartment {
         let dingUsers = await self.corpApi.getUserListByDepartment(self.id);
         let result: OaStaff[] = [];
         for(let u of dingUsers){
-            let oaStaff = new DdStaff({id: u.userid, name: u.name, email: u.email, mobile: u.mobile, departmentIds: u.department,
+            let oaStaff = new DdStaff({id: u.userid, isAdmin: u.isAdmin, name: u.name, email: u.email, mobile: u.mobile, departmentIds: u.department,
                 corpId: self.corpId, isvApi: self.isvApi, corpApi: self.corpApi});
             result.push(oaStaff);
         }

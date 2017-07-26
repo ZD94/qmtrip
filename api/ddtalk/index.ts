@@ -17,6 +17,7 @@ import {Models} from "_types/index";
 import {SPropertyType, Staff} from "_types/staff";
 import {clientExport} from "@jingli/dnode-api/dist/src/helper";
 import {get_msg} from "./lib/msg-template/index";
+import syncData from "libs/asyncOrganization/syncData";
 
 import * as DealEvent from "./lib/dealEvent";
 import {CPropertyType} from "../../_types/company/company-property";

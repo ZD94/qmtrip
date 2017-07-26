@@ -3,11 +3,13 @@
  */
 import {OaDepartment} from "./OaDepartment";
 import {Models} from "_types/index";
-import {Staff} from "_types/staff";
+import {Staff, EStaffRole} from "_types/staff";
 import {Company, CPropertyType} from "_types/company";
 import {Department} from "_types/department";
 import L from '@jingli/language';
+import utils = require("common/utils");
 
+const DEFAULT_PWD = '000000';
 export  abstract class OaStaff{
     constructor(public target: any){
     }
@@ -28,6 +30,9 @@ export  abstract class OaStaff{
 
     abstract get sex();
     abstract set sex(val: string);
+
+    abstract get isAdmin();
+    abstract set isAdmin(val: boolean);
 
     abstract get company();
     abstract set company(val: Company);
@@ -65,7 +70,10 @@ export  abstract class OaStaff{
 
     async sync(params?:{company: Company}): Promise<Staff>{
         let self = this;
-        let company = self.company || params.company;
+        let company = self.company;
+        if(params){
+            company = params.company;
+        }
         if(!company){
             company = await self.getCompany();
         }
@@ -89,7 +97,7 @@ export  abstract class OaStaff{
         // 处理部门
         let oaDepartments = await self.getDepartments();
 
-        if(!oaDepartments || oaDepartments.length == 0){
+        if(!oaDepartments || !oaDepartments.length){
             newDepartments.push(defaultDepartment)
         }else{
             let oaDepartmentIds = await Promise.all(oaDepartments.map(async (item) => {
@@ -104,7 +112,9 @@ export  abstract class OaStaff{
         }
 
         let alreadyStaff: Staff = await self.getStaff();
-        console.info(alreadyStaff, self.name, "9999999999999999999999999999999999999999999999999999999999999999999999999999");
+        let pwd = self.userPassword || DEFAULT_PWD;
+        let roleId = EStaffRole.COMMON;
+        if(self.isAdmin) roleId = EStaffRole.ADMIN;
         if(!alreadyStaff){
 
             if(type == CPropertyType.LDAP && companyCreateUser.mobile == self.mobile){
@@ -114,7 +124,7 @@ export  abstract class OaStaff{
 
             }else{
                 // 不存在，添加
-                let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, pwd: self.userPassword});
+                let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd)});
                 staff.setTravelPolicy(defaultTravelPolicy);
                 staff.company = company;
                 staff = await staff.save();
@@ -131,7 +141,8 @@ export  abstract class OaStaff{
             // alreadyStaff.sex = self.sex;//类型有问题
             alreadyStaff.mobile = self.mobile;
             alreadyStaff.email = self.email;
-            alreadyStaff.pwd = self.userPassword;
+            alreadyStaff.pwd = utils.md5(pwd);
+            alreadyStaff.roleId = roleId;
             await alreadyStaff.save();
 
             // 处理部门

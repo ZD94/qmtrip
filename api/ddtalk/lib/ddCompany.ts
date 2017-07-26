@@ -82,7 +82,7 @@ export default class DdCompany extends OaCompany {
         let authInfo: any = await self.isvApi.getCorpAuthInfo();
         let authUserInfo = authInfo.auth_user_info;
         let userInfo: any = await self.corpApi.getUser(authUserInfo.userId);
-        let oaStaff = new DdStaff({id: userInfo.userid, name: userInfo.name, mobile: userInfo.mobile, email: userInfo.email,
+        let oaStaff = new DdStaff({id: userInfo.userid, isAdmin: userInfo.isAdmin, name: userInfo.name, mobile: userInfo.mobile, email: userInfo.email,
             departmentIds: userInfo.department, corpId: self.id, isvApi: self.isvApi, corpApi: self.corpApi});
         return oaStaff;
     }
@@ -111,15 +111,28 @@ export default class DdCompany extends OaCompany {
     async getCompany(): Promise<Company>{
         let self = this;
         let com: Company = null;
-        /*let corps = await Models.ddtalkCorp.find({where: {corpId: self.id}});
-        if (corps && corps.length) {
-            let corp = corps[0];
-            com = await corp.getCompany(corp['company_id']);
-        }*/
 
         let companyPro = await Models.companyProperty.find({where : {value: self.id, type: CPropertyType.DD_ID}});
         if(companyPro && companyPro.length > 0){
             com = await Models.company.get(companyPro[0].companyId);
+            if(com){
+                //可能解绑过钉钉 需要更新企业钉钉property信息
+                let comPros = await Models.companyProperty.find({where: {companyId: com.id,
+                    type: [CPropertyType.DD_PERMANENT_CODE, CPropertyType.DD_AGENT_ID]}});
+
+                for(let c of comPros){
+                    if(c.type == CPropertyType.DD_PERMANENT_CODE){
+                        c.value = self.permanentCode;
+                        await c.save();
+                    }
+                    if(c.type == CPropertyType.DD_AGENT_ID){
+                        c.value = self.agentId;
+                        await c.save();
+                    }
+                }
+                com.isSuiteRelieve = false;
+                await com.save();
+            }
         }
         return com;
     }

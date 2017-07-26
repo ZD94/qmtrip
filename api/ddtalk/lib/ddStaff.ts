@@ -73,6 +73,14 @@ export default class DdStaff extends OaStaff {
         this.target.company = val;
     }
 
+    get isAdmin() {
+        return this.target.isAdmin;
+    }
+
+    set isAdmin(val: boolean) {
+        this.target.isAdmin = val;
+    }
+
     //钉钉特有属性
     get departmentIds() {
         return this.target.departmentIds;
@@ -98,14 +106,6 @@ export default class DdStaff extends OaStaff {
         this.target.avatar = val;
     }
 
-    get isAdmin() {
-        return this.target.isAdmin;
-    }
-
-    set isAdmin(val: boolean) {
-        this.target.isAdmin = val;
-    }
-
     get unionid() {
         return this.target.unionid;
     }
@@ -128,8 +128,8 @@ export default class DdStaff extends OaStaff {
         let result: OaDepartment[] = [];
         DDdepartments.forEach((item) => {
             if(self.departmentIds.indexOf(item.id) >= 0){
-                let oaDept = new DdDepartment({name: item.name, parentId: item.parentid, id: item.id, isvApi: self.isvApi,
-                    corpApi: self.corpApi});
+                let oaDept = new DdDepartment({name: item.name, parentId: item.parentid, id: item.id, corpId: self.corpId,
+                    isvApi: self.isvApi, corpApi: self.corpApi});
                 result.push(oaDept);
             }
         })
@@ -140,26 +140,13 @@ export default class DdStaff extends OaStaff {
         let self = this;
         let userInfo: any = await self.corpApi.getUser(self.id);
         let oaStaff = new DdStaff({id: userInfo.userid, name: userInfo.name, mobile: userInfo.mobile,
-            email: userInfo.email, departmentIds: userInfo.department, corpId: self.corpId,
-            isvApi: self.isvApi, corpApi: self.corpApi});
+            email: userInfo.email, departmentIds: userInfo.department, corpId: self.corpId, company: self.company,
+            isvApi: self.isvApi, corpApi: self.corpApi, isAdmin: self.isAdmin});
         return oaStaff;
     }
 
     async saveStaffProperty(params: {staffId: string}): Promise<boolean> {
         let self = this;
-        /*let ddUserInfo: any = await self.corpApi.getUser(self.id);
-        let dd_info = JSON.stringify( ddUserInfo );
-        let ddtalkUser = Models.ddtalkUser.create({
-            id: params.staffId,
-            avatar: self.avatar,
-            dingId: self.dingId,
-            isAdmin: self.isAdmin,
-            name: self.name,
-            ddUserId: self.id,//为钉钉数据的userid
-            corpid: self.corpId,
-            ddInfo: dd_info
-        });
-        ddtalkUser = await ddtalkUser.save();*/
 
         let staffUuidProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.DD_ID, value: self.id});
         let staffCorpProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.DD_COMPANY_ID, value: self.corpId});
