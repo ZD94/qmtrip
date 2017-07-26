@@ -60,12 +60,19 @@ export abstract class OaCompany{
             }*/
         }else{
             // 不存在，添加
-            let createUser = await self.getCreateUser();
             //钉钉需要修改企业isConnectDd属性
             // let company = Company.create({name : corp_name , expiryDate : moment().add(1 , "months").toDate(), isConnectDd: true});
             let company = Company.create({name : self.name , expiryDate : moment().add(1 , "months").toDate()});
             result = await company.save();
             await self.saveCompanyProperty({companyId: result.id});
+        }
+
+
+        //处理企业组织架构
+        let rootDepartment = await self.getRootDepartment();
+        let department: Department;
+        if(rootDepartment){
+            department = await rootDepartment.sync({company: result});
         }
 
         //处理企业创建者
@@ -79,13 +86,7 @@ export abstract class OaCompany{
             await result.save();
         }
 
-        //处理企业组织架构
-        let rootDepartment = await self.getRootDepartment();
-        let department: Department;
-        if(rootDepartment){
-            department = await rootDepartment.sync();
-        }
-
+        console.info("end=*********&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
         return result;
     }
 

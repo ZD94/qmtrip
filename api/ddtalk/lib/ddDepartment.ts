@@ -78,13 +78,23 @@ export default class DdDepartment extends OaDepartment {
 
     async getChildrenDepartments(): Promise<OaDepartment[]> {
         let self = this;
-        let DDdepartments = await self.corpApi.getDepartments(self.id);
-        let result: OaDepartment[];
+        /*let DDdepartments = await self.corpApi.getDepartments(self.id);
+        let result: OaDepartment[] = [];
         for(let d of DDdepartments){
             let oaDept = new DdDepartment({id: d.id, name: d.name, isvApi: self.isvApi, corpApi: self.corpApi,
                 company: self.company, parentId: d.parentid});
             result.push(oaDept)
-        }
+        }*/
+
+        let DDdepartments = await self.corpApi.getDepartments();
+        let result: OaDepartment[] = [];
+        DDdepartments.forEach((d) => {
+            if(d.parentid+"" == self.id){
+                let oaDept = new DdDepartment({id: d.id, name: d.name, corpId: self.corpId, isvApi: self.isvApi, corpApi: self.corpApi,
+                    company: self.company, parentId: d.parentid});
+                result.push(oaDept);
+            }
+        })
         return result;
     }
 
@@ -92,7 +102,7 @@ export default class DdDepartment extends OaDepartment {
         let self = this;
         let result = await self.corpApi.getDepartmentInfo(self.parentId);
         if(result){
-            return new DdDepartment({id: result.id, name: result.name, isvApi: self.isvApi, corpApi: self.corpApi,
+            return new DdDepartment({id: result.id, name: result.name, corpId: self.corpId, isvApi: self.isvApi, corpApi: self.corpApi,
                 company: self.company, parentId: result.parentid});
         }
         return null;
@@ -101,9 +111,10 @@ export default class DdDepartment extends OaDepartment {
     async getStaffs(): Promise<OaStaff[]> {
         let self = this;
         let dingUsers = await self.corpApi.getUserListByDepartment(self.id);
-        let result: OaStaff[];
+        let result: OaStaff[] = [];
         for(let u of dingUsers){
-            let oaStaff = new DdStaff({name: u.name, email: u.email, mobile: u.mobile, isvApi: self.isvApi, corpApi: self.corpApi});
+            let oaStaff = new DdStaff({id: u.userid, name: u.name, email: u.email, mobile: u.mobile, departmentIds: u.department,
+                corpId: self.corpId, isvApi: self.isvApi, corpApi: self.corpApi});
             result.push(oaStaff);
         }
         return result;
@@ -119,7 +130,7 @@ export default class DdDepartment extends OaDepartment {
         });
         await ddDepart.save();*/
 
-        let departmentUuidProperty = DepartmentProperty.create({departmentId: params.departmentId, type: DPropertyType.DD_ID, value: self.id});
+        let departmentUuidProperty = DepartmentProperty.create({departmentId: params.departmentId, type: DPropertyType.DD_ID, value: self.id+""});
         let departmentDnProperty = DepartmentProperty.create({departmentId: params.departmentId, type: DPropertyType.DD_COMPANY_ID, value: self.corpId});
         await departmentUuidProperty.save();
         await departmentDnProperty.save();
@@ -152,7 +163,7 @@ export default class DdDepartment extends OaDepartment {
         }*/
 
         let department: Department = null;
-        let deptPro = await Models.departmentProperty.find({where : {value: self.id, type: DPropertyType.DD_ID}});
+        let deptPro = await Models.departmentProperty.find({where : {value: self.id+"", type: DPropertyType.DD_ID}});
         if(deptPro && deptPro.length > 0){
             for(let d of deptPro){
                 let dept = await Models.department.get(d.departmentId);

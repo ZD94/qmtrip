@@ -125,7 +125,7 @@ export default class DdStaff extends OaStaff {
     async getDepartments(): Promise<OaDepartment[]> {
         let self = this;
         let DDdepartments = await self.corpApi.getDepartments();
-        let result: OaDepartment[];
+        let result: OaDepartment[] = [];
         DDdepartments.forEach((item) => {
             if(self.departmentIds.indexOf(item.id) >= 0){
                 let oaDept = new DdDepartment({name: item.name, parentId: item.parentid, id: item.id, isvApi: self.isvApi,
@@ -140,7 +140,8 @@ export default class DdStaff extends OaStaff {
         let self = this;
         let userInfo: any = await self.corpApi.getUser(self.id);
         let oaStaff = new DdStaff({id: userInfo.userid, name: userInfo.name, mobile: userInfo.mobile,
-            email: userInfo.email, departmentIds: userInfo.department, isvApi: self.isvApi, corpApi: self.corpApi});
+            email: userInfo.email, departmentIds: userInfo.department, corpId: self.corpId,
+            isvApi: self.isvApi, corpApi: self.corpApi});
         return oaStaff;
     }
 
@@ -198,6 +199,7 @@ export default class DdStaff extends OaStaff {
         }*/
 
         let staffPro = await Models.staffProperty.find({where : {value: self.id, type: SPropertyType.DD_ID}});
+        console.info(staffPro.length);
         if(staffPro && staffPro.length > 0){
             staff = await Models.staff.get(staffPro[0].staffId);
         }

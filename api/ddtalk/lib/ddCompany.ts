@@ -57,7 +57,7 @@ export default class DdCompany extends OaCompany {
         let result: OaDepartment[];
         DDdepartments.forEach((item) => {
             let ddDept = new DdDepartment({name: item.name, parentId: item.parentid, id: item.id, isvApi: self.isvApi,
-                corpApi: self.corpApi});
+                corpApi: self.corpApi, corpId: self.id});
             result.push(ddDept);
         })
         return result;
@@ -68,9 +68,9 @@ export default class DdCompany extends OaCompany {
         let DDdepartments = await self.corpApi.getDepartments();
         let result: OaDepartment;
         DDdepartments.forEach((item) => {
-            if(item.parentid == 1){
-                result = new DdDepartment({name: item.name, parentId: item.parentid, id: item.id, isvApi: self.isvApi,
-                    corpApi: self.corpApi});
+            if(item.id == 1){
+                result = new DdDepartment({name: item.name, parentId: null, id: item.id, isvApi: self.isvApi,
+                    corpApi: self.corpApi, corpId: self.id});
             }
         })
         return result;
@@ -82,8 +82,8 @@ export default class DdCompany extends OaCompany {
         let authInfo: any = await self.isvApi.getCorpAuthInfo();
         let authUserInfo = authInfo.auth_user_info;
         let userInfo: any = await self.corpApi.getUser(authUserInfo.userId);
-        let oaStaff = new DdStaff({id: userInfo.userid, name: userInfo.name, mobile: userInfo.mobile,
-            email: userInfo.email, departmentIds: userInfo.department, isvApi: self.isvApi, corpApi: self.corpApi});
+        let oaStaff = new DdStaff({id: userInfo.userid, name: userInfo.name, mobile: userInfo.mobile, email: userInfo.email,
+            departmentIds: userInfo.department, corpId: self.id, isvApi: self.isvApi, corpApi: self.corpApi});
         return oaStaff;
     }
 

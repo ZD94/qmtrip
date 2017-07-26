@@ -95,8 +95,8 @@ export  abstract class OaStaff{
             let oaDepartmentIds = await Promise.all(oaDepartments.map(async (item) => {
                 let department = await item.getDepartment();
                 if(!department){
-                    let dept = await item.sync();//此处需要验证
-                    newDepartments.push(dept);
+                    // let dept = await item.sync({company: company});//此处需要验证
+                    // newDepartments.push(dept);
                 }else{
                     newDepartments.push(department);
                 }
@@ -104,6 +104,7 @@ export  abstract class OaStaff{
         }
 
         let alreadyStaff: Staff = await self.getStaff();
+        console.info(alreadyStaff, self.name, "9999999999999999999999999999999999999999999999999999999999999999999999999999");
         if(!alreadyStaff){
 
             if(type == CPropertyType.LDAP && companyCreateUser.mobile == self.mobile){

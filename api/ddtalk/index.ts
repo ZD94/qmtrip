@@ -111,7 +111,7 @@ class DDTalk {
                     where : { corpId : msg.CorpId }
                 });*/
                 let comPros = await Models.companyProperty.find({where: {value: msg.CorpId, type: CPropertyType.DD_ID}});
-                if(!comPros || !comPros.length){
+                if(config.test_url && config.reg_go && (!comPros || !comPros.length)){
                     return DealEvent.transpond(req, res, next, null);
                 }
             }

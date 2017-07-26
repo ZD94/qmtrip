@@ -38,7 +38,7 @@ export class LdapModule {
                 isValidateMobile: true,
                 ldapBaseDn: "dc=jingli,dc=com",
                 ldapStaffRootDn: "cn=employee,dc=jingli,dc=com",
-                ldapDepartmentRootDn: "cn=Manager,dc=jingli,dc=com",
+                ldapDepartmentRootDn: "ou=department,dc=jingli,dc=com",
                 ldapUrl: "ldap://123.56.70.171:389/DC=jingli,DC=com",
                 ldapAdminDn: "cn=Manager,dc=jingli,dc=com",
                 ldapAdminPassword: "wang123456"

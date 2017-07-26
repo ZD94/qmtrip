@@ -136,10 +136,10 @@ export function transpond(req, res, next, options:any, urls?:string){
 export async function tmpAuthCode(msg , req , res , next) {
     const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
     let isExist = await cache.read(TMP_CODE_KEY);
-    if (isExist) {
+    /*if (isExist) {
         console.log("exist?");
         return;
-    }
+    }*/
 
     let suiteToken, permanentAuthMsg: any, permanentCode, corp_name;
     //暂时缓存，防止重复触发
@@ -312,6 +312,7 @@ async function ddEventCommon(msg){
     let comPro = await Models.companyProperty.find({where: {value: corpId, type: CPropertyType.DD_ID}});
     if (!comPro || !comPro.length) {
         logger.warn("DDEvent : ddtalk.corp没有这条记录 : " , corpId);
+        throw new Error("ddtalk.corp没有这条记录");
     }
     let comPros = await Models.companyProperty.find({where: {companyId: comPro[0].companyId,
         type: [CPropertyType.DD_PERMANENT_CODE, CPropertyType.DD_AGENT_ID]}});

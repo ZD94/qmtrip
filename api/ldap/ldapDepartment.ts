@@ -105,14 +105,15 @@ export default class LdapDepartment extends OaDepartment {
                 }
                 let ldapInfo = ldapProperty[0].value;
                 let ldapInfoJson = JSON.parse(ldapInfo);
-
-                if(result[0].dn.indexOf(ldapInfoJson.rootDepartment) >= 0){
+                // ldapInfoJson.ldapDepartmentRootDn = 'ou=department,dc=jingli,dc=com';
+                if(result[0].dn.indexOf(ldapInfoJson.ldapDepartmentRootDn) >= 0){
                     return new LdapDepartment({id: result[0].entryUUID, dn: result[0].dn, name: result[0].ou,
                         ldapApi: self.ldapApi, company: self.company});
                 }
             }
         }catch(e){
 
+            console.info(e);
         }
         return null;
     }

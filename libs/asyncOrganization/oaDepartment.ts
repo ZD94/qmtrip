@@ -90,6 +90,7 @@ export abstract class OaDepartment{
 
         if(parentDepartment){
             let alreadyDepartment = await self.getDepartment();
+            console.info(alreadyDepartment, self.name, "8888888888888888888888888");
             if(alreadyDepartment){
                 alreadyDepartment.company = company;
                 alreadyDepartment.parent = parentDepartment;
@@ -106,8 +107,6 @@ export abstract class OaDepartment{
 
             //2、同步部门下员工
             let oaStaffs = await self.getStaffs();
-            console.info(oaStaffs.length);
-            console.info("oaStaffs.length===========================");
             let oaStaffsMap = {};
             if (oaStaffs && oaStaffs.length > 0) {
                 await Promise.all(oaStaffs.map(async (item) => {
