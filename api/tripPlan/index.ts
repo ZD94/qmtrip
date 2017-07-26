@@ -1787,8 +1787,14 @@ class TripPlanModule {
         scheduler('0 */5 * * * *', taskId, async function() {
             let tripApproves = await Models.tripApprove.find({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
             tripApproves.map(async (approve) => {
+
+                let approveCompany = await approve.getCompany();
+                let content = approve.deptCity+"-"+approve.arrivalCity;
+                let frozenNum = approve.query.frozenNum;
+
+                
                 try{
-                    let approveCompany = await approve.getCompany();
+                    
                     if(typeof approve.query == 'string'){
                         approve.query = JSON.parse(approve.query);
                     }
@@ -1818,10 +1824,8 @@ class TripPlanModule {
                         approve.budgetInfo = budgets;
                     }
 
-                    let frozenNum = approve.query.frozenNum;
                     await approveCompany.beforeApproveTrip({number: frozenNum});
 
-                    let content = approve.deptCity+"-"+approve.arrivalCity;
                     if(!approve.isSpecialApprove){
                         if(approve.createdAt.getMonth() == new Date().getMonth()){
                             await approveCompany.approvePassReduceTripPlanNum({accountId: approve.account.id, tripPlanId: approve.id,
@@ -1851,6 +1855,15 @@ class TripPlanModule {
                         approve.status = QMEApproveStatus.REJECT;
                         approve.approveRemark = "自动审批失败";
                         await approve.save();
+
+                        if(approve.createdAt.getMonth() == new Date().getMonth()){
+                            await approveCompany.approveRejectFreeTripPlanNum({accountId: approve.account.id, tripPlanId: approve.id,
+                                remark: "审批驳回释放冻结行程点数", content: content, frozenNum: frozenNum});
+
+                        }else{
+                            await approveCompany.approveRejectFreeBeforeNum({accountId: approve.account.id, tripPlanId: approve.id,
+                                remark: "审批驳回上月申请释放冻结行程点数", content: content, frozenNum: frozenNum});
+                        }
 
                         //发送审核结果邮件
                         let self_url;
