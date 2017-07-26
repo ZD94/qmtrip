@@ -35,6 +35,21 @@ import {MPlaneLevel, MTrainLevel} from "_types/travelPolicy";
 import {ISegment, ICreateBudgetAndApproveParams} from '_types/tripPlan'
 const projectCols = Project['$fieldnames'];
 
+interface ReportInvoice {
+    type: string;
+    date: Date;
+    invoiceInfo: string;
+    quantity: number;
+    money: number;
+    departCity?: string;
+    arrivalCity?: string;
+    remark?: string;
+    trafficType?: string;
+    trafficInfo?: string;
+    duration? : string;
+}
+
+
 class TripPlanModule {
 
     /**
@@ -1412,7 +1427,7 @@ class TripPlanModule {
                 return '';
             })
         approveUsers = await Promise.all(approveUsers)
-        let _tripDetails = tripDetails.map (async (v) :Promise<any> => {
+        let _tripDetails = await Promise.all(tripDetails.map (async (v) : Promise<ReportInvoice[]> => {
             let tripDetailInvoices = await Models.tripDetailInvoice.find({where: {tripDetailId: v.id, payType: {$ne: EPayType.COMPANY_PAY}}});
 
             if (v.type == ETripType.OUT_TRIP || v.type == ETripType.BACK_TRIP) {
@@ -1427,7 +1442,7 @@ class TripPlanModule {
 
                 return tripDetailInvoices.map((invoice)=>{
                     let type = InvoiceFeeTypeNames[invoice.type];
-                    let data = {
+                    let data: ReportInvoice = {
                         type: type,
                         date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
                         invoiceInfo: `${type}费`,
@@ -1449,7 +1464,7 @@ class TripPlanModule {
 
                 return tripDetailInvoices.map((invoice)=>{
                     let type = InvoiceFeeTypeNames[invoice.type];
-                    let data = {
+                    let data: ReportInvoice = {
                         type: type,
                         date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
                         invoiceInfo: `${type}费`,
@@ -1465,7 +1480,7 @@ class TripPlanModule {
             if (v.type == ETripType.SUBSIDY) {
                 return tripDetailInvoices.map((invoice)=>{
                     let type = InvoiceFeeTypeNames[invoice.type];
-                    let data = {
+                    let data: ReportInvoice = {
                         type: type,
                         date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
                         invoiceInfo: `${type}费`,
@@ -1480,7 +1495,7 @@ class TripPlanModule {
             if (v.type == ETripType.SPECIAL_APPROVE) {
                 return tripDetailInvoices.map((invoice)=>{
                     let type = InvoiceFeeTypeNames[invoice.type];
-                    let data = {
+                    let data: ReportInvoice = {
                         type: type,
                         date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
                         invoiceInfo: `${type}费`,
@@ -1492,7 +1507,7 @@ class TripPlanModule {
                     return data;
                 });
             }
-        })
+        }))
         let financeCheckCode = Models.financeCheckCode.create({tripPlanId: tripPlanId, isValid: true});
         financeCheckCode = await financeCheckCode.save();
         // let roundLine = `${tripPlan.deptCity}-${tripPlan.arrivalCity}${tripPlan.isRoundTrip ? '-' + tripPlan.deptCity: ''}`;
@@ -1508,7 +1523,6 @@ class TripPlanModule {
         }))
         roundLine += tripPlan.isRoundTrip ? '-'+tripPlan.deptCity : '';
         console.info(roundLine);
-        _tripDetails = await Promise.all(_tripDetails);
 
         let invoiceDetail = [];
         _tripDetails.map((item)=>{
@@ -1575,7 +1589,6 @@ class TripPlanModule {
             "invoices": _tripDetails,
             "roundLine": roundLine,
         }
-
 
         let buf = await makeSpendReport(data);
         try {
