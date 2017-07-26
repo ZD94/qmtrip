@@ -215,6 +215,15 @@ export default class ApiTravelBudget {
             }
 
             let budget = await getSubsidyBudget(placeInfo);
+
+            //处理没有返回地的 最后一个目的地补助信息
+            if(destLength == cities.length && i == (destLength - 1)){
+                let lastDest = destinationPlacesInfo[destLength - 1];
+                let subsidy = lastDest.subsidy;
+                budget.endDate = moment(budget.endDate).add(1, 'days').format('YYYY-MM-DD');
+                budget.duringDays = budget.duringDays + 1;
+                budget.price = subsidy.template.subsidyMoney * budget.duringDays;
+            }
             if (budget) {
                 budget.city = city;
                 budget.price = budget.price * count;
