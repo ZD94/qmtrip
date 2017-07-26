@@ -7,6 +7,7 @@ import {requireParams, clientExport} from "@jingli/dnode-api/dist/src/helper";
 import {Staff} from "_types/staff/staff";
 import {CoinAccount} from "_types/coin";
 var config = require('@jingli/config');
+import {Models} from "_types/index";
 
 var URL = require('url');
 var utils = require("common/utils");
@@ -24,11 +25,11 @@ class DuiBa {
     static async getLoginUrl(params) :Promise<string>{
         var staff = await Staff.getCurrent();
         if(!params) params = {};
-        params.uid = staff.id;
+        params.uid = staff.accountId;
         var credits = 0;
-        staff.coinAccount = staff.$parents["account"]["coinAccount"];
-        if(staff.coinAccount && staff.coinAccount.balance){
-            credits = staff.coinAccount.balance;
+        let account = await Models.account.get(staff.accountId);
+        if(account.coinAccount && account.coinAccount.balance){
+            credits = account.coinAccount.balance;
         }
 
         credits = Math.floor(credits);
