@@ -319,6 +319,10 @@ class TripPlanModule {
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
     static async commitTripPlan(params: {id: string, staffId: string}): Promise<boolean> {
         let {id, staffId} = params;
+
+        let currentStaff = await Staff.getCurrent();
+        staffId = currentStaff.id;
+
         let tripPlan = await Models.tripPlan.get(id);
         if(tripPlan.status != EPlanStatus.WAIT_COMMIT) {
             throw {code: -2, msg: "该出差计划不能提交，请检查状态"};
@@ -1739,7 +1743,7 @@ class TripPlanModule {
     static _scheduleTask () {
         let taskId = "authApproveTrainPlan";
         logger.info('run task ' + taskId);
-        scheduler('*/5 * * * *', taskId, async function() {
+        scheduler('0 */5 * * * *', taskId, async function() {
             let tripApproves = await Models.tripApprove.find({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
             tripApproves.map(async (approve) => {
                 try{
@@ -1754,7 +1758,9 @@ class TripPlanModule {
                         staffId:approve['accountId'],
                         destinationPlacesInfo:approve.query.destinationPlacesInfo
                     };
+
                     let budgetsId = await API.travelBudget.getTravelPolicyBudget(query);
+
                     let budgetsInfo = await API.travelBudget.getBudgetInfo({id: budgetsId,accountId: approve['accountId']});
                     let totalBudget = 0;
                     let budgets = budgetsInfo.budgets;
@@ -1794,6 +1800,39 @@ class TripPlanModule {
                     approve = await approve.save();
                 }catch(e){
                     logger.error(e.stack);
+                    if(!approve.autoApproveNum){
+                        approve.autoApproveNum = 0;
+                    }
+                    approve.autoApproveNum++;
+
+                    if(approve.autoApproveNum >= 3){
+                        //已经自动审批三次了，仍然获取预算失败，直接驳回
+                        approve.status = QMEApproveStatus.REJECT;
+                        approve.approveRemark = "自动审批失败";
+                        await approve.save();
+
+                        //发送审核结果邮件
+                        let self_url;
+                        let appMessageUrl;
+                        self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + approve.id;
+                        let finalUrl = '#/trip-approval/detail?approveId=' + approve.id;
+                        finalUrl = encodeURIComponent(finalUrl);
+                        appMessageUrl = `#/judge-permission/index?id=${approve.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
+                        let user = approve.account;
+                        if(!user) user = await Models.staff.get(approve['accountId']);
+                        try {
+                            self_url = await API.wechat.shorturl({longurl: self_url});
+                        } catch(err) {
+                            console.error(err);
+                        }
+                        try {
+                            await API.notify.submitNotify({userId: user.id, key: 'qm_notify_approve_not_pass',
+                                values: { tripApprove: approve, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
+                        } catch(err) { console.error(err);}
+
+                    }else{
+                        await approve.save();
+                    }
                 }
             });
         });
