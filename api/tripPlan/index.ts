@@ -28,7 +28,7 @@ import {getSession} from "common/model";
 import {AgencyUser} from "_types/agency";
 import {makeSpendReport} from './spendReport';
 import fs = require("fs");
-import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice} from "_types/tripPlan";
+import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice, InvoiceFeeTypeNames} from "_types/tripPlan";
 import {ENoticeType} from "_types/notice/notice";
 import TripApproveModule = require("../tripApprove/index");
 import {MPlaneLevel, MTrainLevel} from "_types/travelPolicy";
@@ -1414,64 +1414,83 @@ class TripPlanModule {
         approveUsers = await Promise.all(approveUsers)
         let _tripDetails = tripDetails.map (async (v) :Promise<any> => {
             let tripDetailInvoices = await Models.tripDetailInvoice.find({where: {tripDetailId: v.id, payType: {$ne: EPayType.COMPANY_PAY}}});
+
             if (v.type == ETripType.OUT_TRIP || v.type == ETripType.BACK_TRIP) {
                 let v1 = <TripDetailTraffic>v;
                 let trafficType;
                 let trafficInfo;
-                let type;
-                type = '交通'
                 trafficType = v1.type == ETripType.OUT_TRIP ? 'GO': 'BACK';
                 trafficInfo = v1.invoiceType == EInvoiceType.TRAIN ? '火车': '飞机';
                 trafficInfo += v1.invoiceType == EInvoiceType.PLANE ? MPlaneLevel[v1.cabin] : MTrainLevel[v1.cabin];
                 let deptCity = await API.place.getCityInfo({cityCode: v1.deptCity});
                 let arrivalCity = await API.place.getCityInfo({cityCode: v1.arrivalCity});
-                return {
-                    type: type,
-                    date: moment(v1.deptDateTime).format('YYYY.MM.DD'),
-                    invoiceInfo: `${type}费`,
-                    quantity: tripDetailInvoices.length,
-                    money: v1.personalExpenditure,
-                    departCity: deptCity.name,
-                    arrivalCity: arrivalCity.name,
-                    remark: `${deptCity.name}-${arrivalCity.name}`,
-                    trafficType: `${trafficType}`,
-                    trafficInfo: `${trafficInfo}`
-                }
+
+                return tripDetailInvoices.map((invoice)=>{
+                    let type = InvoiceFeeTypeNames[invoice.type];
+                    let data = {
+                        type: type,
+                        date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
+                        invoiceInfo: `${type}费`,
+                        quantity: 1,
+                        money: invoice.totalMoney,
+                        departCity: deptCity.name,
+                        arrivalCity: arrivalCity.name,
+                        remark: `${deptCity.name}-${arrivalCity.name}`,
+                        trafficType: `${trafficType}`,
+                        trafficInfo: `${trafficInfo}`
+                    }
+
+                    return data;
+                });
             }
             if (v.type == ETripType.HOTEL) {
                 let v1 = <TripDetailHotel>v;
                 let city = await API.place.getCityInfo({cityCode: v1.city})
-                return {
-                    "type": "住宿",
-                    "date": moment(v1.checkInDate).format('YYYY.MM.DD'),
-                    "invoiceInfo": "住宿费",
-                    "quantity": tripDetailInvoices.length,
-                    "money": v1.personalExpenditure,
-                    "remark": `${moment(v1.checkInDate).format('YYYY.MM.DD')}-${moment(v1.checkOutDate).format('YYYY.MM.DD')} ${city.name} 共${moment(v1.checkOutDate).diff(v1.checkInDate, 'days')}日`,
-                    "duration": `${moment(v1.checkOutDate).diff(v1.checkInDate, 'days')}`
-                }
+
+                return tripDetailInvoices.map((invoice)=>{
+                    let type = InvoiceFeeTypeNames[invoice.type];
+                    let data = {
+                        type: type,
+                        date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
+                        invoiceInfo: `${type}费`,
+                        quantity: 1,
+                        money: invoice.totalMoney,
+                        "remark": `${moment(v1.checkInDate).format('YYYY.MM.DD')}-${moment(v1.checkOutDate).format('YYYY.MM.DD')} ${city.name} 共${moment(v1.checkOutDate).diff(v1.checkInDate, 'days')}日`,
+                        "duration": `${moment(v1.checkOutDate).diff(v1.checkInDate, 'days')}`
+                    }
+
+                    return data;
+                });
             }
             if (v.type == ETripType.SUBSIDY) {
-                let v1 = <TripDetailSubsidy>v;
-                return {
-                    "type": '补助',
-                    "date": moment(v1.startDateTime).format('YYYY.MM.DD'),
-                    "invoiceInfo": "补助费",
-                    quantity: tripDetailInvoices.length,
-                    money: v1.personalExpenditure,
-                    remark: '补助费'
-                }
+                return tripDetailInvoices.map((invoice)=>{
+                    let type = InvoiceFeeTypeNames[invoice.type];
+                    let data = {
+                        type: type,
+                        date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
+                        invoiceInfo: `${type}费`,
+                        quantity: 1,
+                        money: invoice.totalMoney,
+                        remark: `补助费`,
+                    }
+
+                    return data;
+                });
             }
             if (v.type == ETripType.SPECIAL_APPROVE) {
-                let v1 = <TripDetailSpecial>v;
-                return {
-                    "type": '出差费用',
-                    "date": moment(v1.deptDateTime).format('YYYY.MM.DD'),
-                    "invoiceInfo": "出差费",
-                    quantity: tripDetailInvoices.length,
-                    money: v1.personalExpenditure,
-                    remark: '特别审批出差费用'
-                }
+                return tripDetailInvoices.map((invoice)=>{
+                    let type = InvoiceFeeTypeNames[invoice.type];
+                    let data = {
+                        type: type,
+                        date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
+                        invoiceInfo: `${type}费`,
+                        quantity: 1,
+                        money: invoice.totalMoney,
+                        remark: `特别审批出差费用`,
+                    }
+
+                    return data;
+                });
             }
         })
         let financeCheckCode = Models.financeCheckCode.create({tripPlanId: tripPlanId, isValid: true});
@@ -1490,6 +1509,14 @@ class TripPlanModule {
         roundLine += tripPlan.isRoundTrip ? '-'+tripPlan.deptCity : '';
         console.info(roundLine);
         _tripDetails = await Promise.all(_tripDetails);
+
+        let invoiceDetail = [];
+        _tripDetails.map((item)=>{
+            invoiceDetail.push(...item);
+        });
+
+        _tripDetails = invoiceDetail;
+
         _tripDetails = _tripDetails.filter( (v) => {
             return v['money'] > 0;
         });
@@ -1548,6 +1575,7 @@ class TripPlanModule {
             "invoices": _tripDetails,
             "roundLine": roundLine,
         }
+
 
         let buf = await makeSpendReport(data);
         try {
