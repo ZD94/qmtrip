@@ -535,6 +535,38 @@ class CompanyModule {
 
     /*************************************企业行程点数变更日志end***************************************/
 
+    static async urgentResetTripPlanNum(){
+        let companies = await Models.company.all({where : {expiryDate : {$gt: moment().format('YYYY-MM-DD HH:mm:ss')}, type: ECompanyType.PAYED}});
+        await Promise.all(companies.map(async (co) => {
+            let tripBasicPackage = co.tripBasicPackage;
+            let num = co.tripPlanNumInBase;
+            co.tripPlanPassNum = 0;
+            if (tripBasicPackage) {
+                co.tripPlanNumLimit = parseInt(tripBasicPackage.tripNum + "");
+            }
+            await co.save();
+
+            if (num > 0) {
+                let log1 = TripPlanNumChange.create({
+                    companyId: co.id,
+                    type: NUM_CHANGE_TYPE.SYSTEM_REDUCE,
+                    number: 0 - num,
+                    remark: "套餐余额过期",
+                    content: "套餐包余额过期"
+                });
+                await log1.save();
+            }
+            let log2 = TripPlanNumChange.create({
+                companyId: co.id,
+                type: NUM_CHANGE_TYPE.SYSTEM_ADD,
+                number: co.tripPlanNumLimit,
+                remark: "套餐新增行程",
+                content: "套餐新增行程"
+            });
+            await log2.save();
+        }))
+    }
+
     static async resetTripPlanNum(){
         let companies = await Models.company.all({where : {expiryDate : {$gt: moment().format('YYYY-MM-DD HH:mm:ss')}, type: ECompanyType.PAYED}});
         await Promise.all(companies.map(async (co) => {

@@ -4,7 +4,7 @@
     padding: 16px 0 4px;"
 >
     <%=staff.name || '' %>(<%=staff.company.name || '' %>)
-    在<%=moment().format('YYYY-MM-DD HH:MM') || '' %>生成了新的出差预算：<br/>
+    在<%= date %>生成了新的出差预算：<br/>
 </p>
 
 <table width="422" border="1" cellpadding="8" style="
@@ -18,7 +18,7 @@
     <tr>
         <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">行程</td>
         <td style="padding-left: 20px;font-size: 16px;">
-            <%=cityMap[query.originPlace].name%>-
+            <%=query.originPlace && cityMap[query.originPlace].name%>-
             <% _.forEach(destinationPlacesInfo, function(item, index) { %>
             <%=cityMap[item.destinationPlace].name%>
             <%if(index != (destinationPlacesInfo.length - 1)){%>
