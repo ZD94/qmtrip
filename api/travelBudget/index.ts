@@ -179,7 +179,7 @@ export default class ApiTravelBudget {
         let budgets = [];
         for (let i = 0, ii = cities.length; i < ii; i++) {
             let city = cities[i];
-            //补助信息
+
             let placeInfo = destinationPlacesInfo[i];
 
             //交通
@@ -218,52 +218,54 @@ export default class ApiTravelBudget {
                 }
             }
 
-
-            let budget = await getSubsidyBudget(placeInfo);
+            let isHasBackSubsidy = false;
+            if (i == destLength-1 && !goBackPlace) {
+                isHasBackSubsidy = true;
+            }
+            let budget = await getSubsidyBudget(placeInfo, isHasBackSubsidy);
             if (budget) {
                 budget.city = city;
                 budget.price = budget.price * count;
                 if (budget) {
                     budgets.push(budget);
                 }
-                budget.city = city;
-                if (budget) {
-                    budgets.push(budget);
+            }
+        }
+
+        let obj: any = {};
+        obj.budgets = budgets;
+        obj.query = params;
+        obj.createAt = Date.now();
+        let _id = Date.now() + utils.getRndStr(6);
+        let key = `budgets:${staffId}:${_id}`;
+        await cache.write(key, JSON.stringify(obj));
+        await ApiTravelBudget.sendTripApproveNoticeToSystem({ cacheId: _id, staffId: staffId });
+        return _id;
+
+
+        function getSubsidyBudget(destination, isHasBackSubsidy: boolean = false) {
+            let { subsidy, leaveDate, goBackDate, reason } = destination;
+            let budget: any = null
+            if (subsidy && subsidy.template) {
+                let goBackDay = moment(goBackDate).format("YYYY-MM-DD");
+                let leaveDay = moment(leaveDate).format("YYYY-MM-DD");
+                let days = moment(goBackDay).diff(moment(leaveDay), 'days');
+                if (isHasBackSubsidy) { //解决如果只有住宿时最后一天补助无法加到返程目的地上
+                    days += 1;
+                }
+                if (days > 0) {
+                    budget = {};
+                    budget.fromDate = leaveDate;
+                    budget.endDate = (goBackDate == leaveDay || isHasBackSubsidy) ? goBackDate: moment(goBackDate).add(-1, 'days').format('YYYY-MM-DD');
+                    budget.tripType = ETripType.SUBSIDY;
+                    budget.type = EInvoiceType.SUBSIDY;
+                    budget.price = subsidy.template.subsidyMoney * days;
+                    budget.duringDays = days;
+                    budget.template = { id: subsidy.template.id, name: subsidy.template.name };
+                    budget.reason = reason;
                 }
             }
-
-            let obj: any = {};
-            obj.budgets = budgets;
-            obj.query = params;
-            obj.createAt = Date.now();
-            let _id = Date.now() + utils.getRndStr(6);
-            let key = `budgets:${staffId}:${_id}`;
-            await cache.write(key, JSON.stringify(obj));
-            await ApiTravelBudget.sendTripApproveNoticeToSystem({cacheId: _id, staffId: staffId});
-            return _id;
-
-
-            function getSubsidyBudget(destination) {
-                let {subsidy, leaveDate, goBackDate, reason} = destination;
-                let budget: any = null
-                if (subsidy && subsidy.template) {
-                    let goBackDay = moment(goBackDate).format("YYYY-MM-DD");
-                    let leaveDay = moment(leaveDate).format("YYYY-MM-DD");
-                    let days = moment(goBackDay).diff(moment(leaveDay), 'days');
-                    if (days > 0) {
-                        budget = {};
-                        budget.fromDate = leaveDate;
-                        budget.endDate = goBackDate;
-                        budget.tripType = ETripType.SUBSIDY;
-                        budget.type = EInvoiceType.SUBSIDY;
-                        budget.price = subsidy.template.subsidyMoney * days;
-                        budget.duringDays = days;
-                        budget.template = {id: subsidy.template.id, name: subsidy.template.name};
-                        budget.reason = reason;
-                    }
-                }
-                return budget;
-            }
+            return budget;
         }
     }
 

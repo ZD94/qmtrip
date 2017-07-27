@@ -219,7 +219,7 @@ class TripApproveModule {
             throw new Error("审批人不能为空");
 
         if (!tripApprove.isSpecialApprove && !budgetId){
-            throw new Error(`预算信息已失效请重新生成`);
+            // throw new Error(`预算信息已失效请重新生成`);   审批时预算拉取失败，使用提交时的预算数据
         }else if(approveResult != EApproveResult.PASS && approveResult != EApproveResult.REJECT) {
             throw L.ERR.PERMISSION_DENY(); //只能审批待审批的出差记录
         }else if(tripApprove.status != QMEApproveStatus.WAIT_APPROVE) {
@@ -233,7 +233,9 @@ class TripApproveModule {
         /*if(tripApprove.isSpecialApprove){
             number = 1;
         }*/
-        if(!tripApprove.isSpecialApprove){
+
+        //审批时预算拉取失败，使用提交时的预算数据
+        if(!tripApprove.isSpecialApprove && budgetId){
             budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
             if (!budgetInfo || !budgetInfo.budgets)
                 throw new Error(`预算信息已失效请重新生成`);
@@ -418,28 +420,27 @@ class TripApproveModule {
             let expectedApproveTime: Date;
             let interval = 0;
             let day = config.day ? config.day : 1;
-            let hour = config.hour ? config.hour :18;
+            let hour = config.hour ? config.hour :12;
             let defaultDelay = config.defaultDelay ? config.defaultDelay : 1;
 
             switch(type) {
                 case AutoApproveType.AfterSubmit:  // 审批提交时间
-                    expectedApproveTime = moment(submitAt).add(day, 'hours').hour(hour).minute(0).toDate();
-
+                    expectedApproveTime = moment(submitAt).add(day, 'days').hour(hour).minute(0).toDate();
                     interval = moment(tripStartAt).diff(expectedApproveTime, 'hours');
                     if(interval > 0 ) {
                         autoApproveDateTime = expectedApproveTime;
                     } else {
-                        autoApproveDateTime = moment(submitAt).add(defaultDelay, 'hours').minute(0).toDate();
+                        autoApproveDateTime = moment(submitAt).add(defaultDelay, 'hours').toDate();
                     }
 
                     break;
                 default:           //出行时间
-                    expectedApproveTime = moment(submitAt).subtract(day, 'days').hour(hour).minute(0).toDate();
-                    interval = moment(tripStartAt).diff(expectedApproveTime, 'hours');
+                    expectedApproveTime = moment(tripStartAt).subtract(day, 'days').hour(hour).minute(0).toDate();
+                    interval = moment(expectedApproveTime).diff(submitAt, 'hours');
                     if(interval > 0){
                         autoApproveDateTime = expectedApproveTime;
                     } else {
-                        autoApproveDateTime = moment(submitAt).add(defaultDelay, 'hours').minute(0).toDate();
+                        autoApproveDateTime = moment(submitAt).add(defaultDelay, 'hours').toDate();
                     }
                     break;
             }
