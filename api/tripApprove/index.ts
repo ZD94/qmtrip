@@ -253,6 +253,8 @@ class TripApproveModule {
             if (finalBudget > tripApprove.budget) {
                 tripApprove.budget = finalBudget;
                 tripApprove.budgetInfo = budgetInfo.budgets;
+            }else{
+                budgetInfo = tripApprove.budgetInfo;
             }
         }
 
