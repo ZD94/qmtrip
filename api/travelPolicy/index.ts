@@ -9,7 +9,7 @@ import L from '@jingli/language';
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {conditionDecorator, condition} from "../_decorator";
 import {Staff, EStaffStatus} from "_types/staff";
-import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
+import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion,CompanyRegion,RegionPlace } from '_types/travelPolicy';
 import { Models } from '_types';
 import { FindResult, PaginateInterface } from "common/model/interface";
 import setPrototypeOf = Reflect.setPrototypeOf;
@@ -17,6 +17,8 @@ import setPrototypeOf = Reflect.setPrototypeOf;
 const travalPolicyCols = TravelPolicy['$fieldnames'];
 const travalPolicyRegionCols = TravelPolicyRegion['$fieldnames'];
 const subsidyTemplateCols = SubsidyTemplate['$fieldnames'];
+const companyRegionCols = CompanyRegion['$fieldnames'];
+const regionPlaceCols = RegionPlace['$fieldnames'];
 
 let API = require("@jingli/dnode-api");
 import {DefaultRegion} from "_types/travelPolicy"
@@ -73,19 +75,21 @@ class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["travelPolicyId", "planeLevels","hotelLevels","regionId"], travalPolicyRegionCols)
-    static async createTravelPolicyRegion(params):Promise<any>{
-        let {travelPolicyId, planeLevels, trainLevels, hotelLevels,regionId } = params;
+    @requireParams(["travelPolicyId", "planeLevels","hotelLevels","companyRegionId"], travalPolicyRegionCols)
+    static async createTravelPolicyRegion(params):Promise<TravelPolicyRegion>{
+        let {travelPolicyId, planeLevels, trainLevels, hotelLevels,regionId,companyRegionId } = params;
+
         let detailPolicy = {
-            travelPolicyId: travelPolicyId,
             regionId: regionId,
-            planeLevels: tryConvertToArray(params.planeLevels),
-            trainLevels: tryConvertToArray(params.trainLevels),
-            hotelLevels: tryConvertToArray(params.hotelLevels)
+            travelPolicyId: travelPolicyId,
+            planeLevels: tryConvertToArray(planeLevels),
+            trainLevels: tryConvertToArray(trainLevels),
+            hotelLevels: tryConvertToArray(hotelLevels),
+            companyRegionId: companyRegionId
         }
-        let travelPolicyRegion = await Models.travelPolicyRegion.create(detailPolicy);
-        await travelPolicyRegion.save();
-        return travelPolicyRegion;
+        let travelPolicyRegion = TravelPolicyRegion.create(detailPolicy);
+        travelPolicyRegion.travelPolicy = await Models.travelPolicy.get(travelPolicyId);
+        return travelPolicyRegion.save();
     }
 
 
@@ -138,7 +142,6 @@ class TravelPolicyModule{
         await tp_delete.destroy();
         return true;
     }
-
     static async deleteTravelPolicyByTest(params){
         await DB.models.TravelPolicy.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}});
         return true;
@@ -193,6 +196,9 @@ class TravelPolicyModule{
         params.trainLevels = tryConvertToArray(params.trainLevels);
         params.hotelLevels = tryConvertToArray(params.hotelLevels);
 
+        for(var key in params){
+            tpr[key] = params[key];
+        }
         tpr.planeLevels = params.planeLevels;
         tpr.trainLevels = params.trainLevels;
         tpr.hotelLevels = params.hotelLevels;
@@ -456,7 +462,6 @@ class TravelPolicyModule{
     ])
     static async getTravelPolicyRegions(params): Promise<FindResult>{
         params.order = params.order || [['created_at', 'desc']];
-
         let paginate = await Models.travelPolicyRegion.find(params);
         let ids =  paginate.map(function(t){
             return t.id;
@@ -465,11 +470,95 @@ class TravelPolicyModule{
     }
 
 
+
     @clientExport
     @requireParams(["travelPolicyId"])
     async getAvaliableRegionIds(params: {where: any}) : Promise<TravelPolicyRegion[]>{
         return Models.travelPolicyRegion.find(params);
     }
+
+    /*************************************差旅标准的地区关系(CompanyRegion)begin***************************************/
+    /**
+     * 差旅标准的地区管理
+     * @param data
+     * @returns {*}
+     */
+
+    @clientExport
+    @requireParams(["id"])
+    static async getCompanyRegion(params: {id: string}) : Promise<CompanyRegion>{
+
+        let id = params.id;
+        return Models.companyRegion.get(id);
+    };
+
+    @clientExport
+    @requireParams(["where.companyId"],['attributes','where.name'])
+    static async getCompanyRegions(params) : Promise<FindResult>{
+        let paginate = await Models.companyRegion.find(params);
+        let ids =  paginate.map(function(t){
+            return t.id;
+        })
+        return {ids: ids, count: paginate['total']};
+    };
+
+    @clientExport
+    @requireParams(["companyId","name"], companyRegionCols)
+    static async createCompanyRegion(params) : Promise<CompanyRegion>{
+        let cRegionParam: {id: string, companyId: string, name: string} = {
+            id: params.id,
+            companyId: params.companyId,
+            name: params.name
+        }
+        let cRegion = CompanyRegion.create(cRegionParam);
+        cRegion.company = await Models.company.get(params.companyId);
+        return cRegion.save();
+    };
+
+    /*************************************差旅标准的地区关系(CompanyRegion)end***************************************/
+
+
+    /*************************************地区管理(RegionPlace)begin***************************************/
+    /**
+     * 创建地区管理
+     * @param data
+     * @returns {*}
+     */
+
+    @clientExport
+    @requireParams(["id"])
+    static async getRegionPlace(params: {id: string}) : Promise<RegionPlace>{
+        let id = params.id;
+        var cregion = await Models.regionPlace.get(id);
+        console.log("cregion: ", cregion);
+        return cregion;
+    };
+
+    @clientExport
+    @requireParams(["where.id","where.companyId","where.name"])
+    static async getRegionPlaces(params) : Promise<FindResult>{
+        let paginate = await Models.regionPlace.find(params);
+        let ids =  paginate.map(function(t){
+            return t.id;
+        })
+        return {ids: ids, count: paginate['total']};
+    };
+
+    @clientExport
+    @requireParams(["companyRegionId","placeId"], regionPlaceCols)
+    static async createRegionPlace(params) : Promise<RegionPlace>{
+        let rPlaceParam: {id: string, companyRegionId: string, placeId: string} = {
+            id: params.id,
+            companyRegionId: params.companyRegionId,
+            placeId: params.placeId
+        }
+        let cRegion = RegionPlace.create(rPlaceParam);
+        cRegion.companyRegion = await Models.companyRegion.get(params.companyRegionId);
+        return cRegion.save();
+    };
+
+
+    /*************************************地区设置(RegionPlace)end***************************************/
 
 }
 
