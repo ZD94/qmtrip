@@ -237,6 +237,7 @@ class TripApproveModule {
         //审批时预算拉取失败，使用提交时的预算数据
         if(!tripApprove.isSpecialApprove && budgetId){
             budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
+            
             if (!budgetInfo || !budgetInfo.budgets)
                 throw new Error(`预算信息已失效请重新生成`);
             let finalBudget = 0;
@@ -254,7 +255,7 @@ class TripApproveModule {
                 tripApprove.budget = finalBudget;
                 tripApprove.budgetInfo = budgetInfo.budgets;
             }else{
-                budgetInfo = tripApprove.budgetInfo;
+                budgetInfo = null;
             }
         }
 
