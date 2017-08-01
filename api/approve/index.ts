@@ -36,10 +36,10 @@ function oaEnum2Str(e: EApproveChannel) {
 class ApproveModule {
 
     @clientExport
-    @requireParams(["budgetId"], ["approveUser", "project"])
-    static async submitApprove(params: {budgetId: string, approveUser?: Staff}) :Promise<Approve>{
+    @requireParams(["budgetId"], ["approveUser", "project", "submitter"])
+    static async submitApprove(params: {budgetId: string, approveUser?: Staff, submitter?: Staff}) :Promise<Approve>{
         let {budgetId, approveUser} = params;
-        let submitter = await Staff.getCurrent();
+        let submitter = await Staff.getCurrent() || params.submitter;
         let company = submitter.company;
 
         //获取预算详情
