@@ -34,6 +34,9 @@ export class Offline {
         app.post("/offlineApprove", offlineApprove);
     }
 
+    /*
+     * content : 翻译参数
+    */
     async transOfflineParams(param : OfflineTranslateParam, staff : Staff) : Promise<any>{
         for(let key in param){
             param[key] = typeof param[key] == "string" ? param[key].toLowerCase() : param[key];
@@ -49,14 +52,12 @@ export class Offline {
             param.msg = "出发城市填写错误";
             return param;
         }
-            
 
         let destinationCity = await API.place.getCityInfoByName( param.destinationName );
         if(!destinationCity){
             param.msg = "目的城市填写错误";
             return param;
         }
-            
 
         let backCity;
         if(param.backCityName){
@@ -97,6 +98,9 @@ export class Offline {
         return { leaveCity, destinationCity, backCity, project:project[0], approveUser : approveUser && approveUser[0] };
     }
 
+    /*
+     * content : 验证身份
+    */
     async checkIdentity(param : CheckIdentityParam){
         let staffId = param.staffId;
         let authResponse : AuthResponse = await checkTokenAuth( param );
