@@ -213,13 +213,22 @@ export default class ApiTravelBudget {
                 let budget = hotel[0];
                 let maxPriceLimit = 0;
                 let minPriceLimit = 0;
+
+                let days:number = 0;
+                for(let jj = 0; jj < segments.length; jj++){
+                    if(city == segments[jj].city) {
+                        let beginTime = moment(segments[jj].beginTime).hour(12);
+                        let endTime = moment(segments[jj].endTime).hour(12);
+                        days = moment(endTime).diff(beginTime,'days');
+                    }
+                }
                 for(let jj = 0; jj < priceLimitSegments.length; jj++){
                     if(city == priceLimitSegments[jj].cityid) {
                         maxPriceLimit = priceLimitSegments[jj].maxPriceLimit;
                         minPriceLimit = priceLimitSegments[jj].minPriceLimit;
                     }
                 }
-                budget.price = limitHotelBudgetByPrefer(minPriceLimit,maxPriceLimit,budget.price);
+                budget.price = limitHotelBudgetByPrefer(minPriceLimit * days,maxPriceLimit * days,budget.price);
                 let cityObj = await API.place.getCityInfo({cityCode: city});
                 budget.hotelName = placeInfo ? placeInfo.hotelName : null;
                 budget.cityName = cityObj.name;
