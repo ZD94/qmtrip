@@ -109,7 +109,7 @@ export default class ApiTravelBudget {
             segment.city = placeInfo.destinationPlace;
             let city: Place = (await API.place.getCityInfo({cityCode: placeInfo.destinationPlace}));
 
-            console.log(placeInfo.destinationPlace,   city);
+            // console.log(placeInfo.destinationPlace,   city);
             let bestTravelPolicy = await staff.getBestTravelPolicys ({regionId: city.id})
             if(!bestTravelPolicy){
                 throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
@@ -162,7 +162,7 @@ export default class ApiTravelBudget {
             return segment;
         }));
 
-        console.log("segments===>", segments);
+        // console.log("segments===>", segments);
 
         let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
             policies,
