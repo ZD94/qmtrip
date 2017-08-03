@@ -8,7 +8,7 @@ import {Paginate} from 'common/paginate';
 import L from '@jingli/language';
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {conditionDecorator, condition} from "../_decorator";
-import {Staff, EStaffStatus} from "_types/staff";
+import {Staff, EStaffStatus,EStaffRole} from "_types/staff";
 import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion,CompanyRegion,RegionPlace } from '_types/travelPolicy';
 import { Models } from '_types';
 import { FindResult, PaginateInterface } from "common/model/interface";
@@ -204,6 +204,30 @@ class TravelPolicyModule{
         tpr.hotelLevels = params.hotelLevels;
 
         return tpr.save();
+    }
+
+    /**
+     * 删除差旅标准详情
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    static async deleteTravelPolicyRegion(params) : Promise<any>{
+        var staff = await Staff.getCurrent();
+        var id = params.id;
+        var tpr_delete = await Models.travelPolicyRegion.get(id);
+        var tp = await Models.travelPolicy.get(tpr_delete['travelPolicyId']);
+
+        if(staff["roleId"] != EStaffRole.ADMIN && staff["roleId"] != EStaffRole.OWNER){
+            throw {code: -2, msg: '不允许删除默认差旅标准'};
+        }
+
+        if(staff && tp["companyId"] != staff["companyId"]){
+            throw L.ERR.PERMISSION_DENY();
+        }
+        await tpr_delete.destroy();
+        return true;
     }
 
     @clientExport
