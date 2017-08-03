@@ -625,7 +625,7 @@ class CompanyModule {
 
     @clientExport
     static async getInvoiceTitles(params) : Promise<FindResult>{
-        params.order =params.order || [['created_at', 'desc']];
+        params.order =params.order || [['is_default', 'desc'], ['created_at', 'desc']];
         params.where = params.where || {};
         let invoices = await Models.invoiceTitle.find(params);
 
