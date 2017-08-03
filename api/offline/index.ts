@@ -203,8 +203,8 @@ export default offline;
 
 async function offlineApprove(req, res, next){
     res.header('Access-Control-Allow-Origin', '*');
-    req.clearTimeout();
-    req.setTimeout( 60 * 1000 );
+    /*req.clearTimeout();
+    req.setTimeout( 60 * 1000 );*/
     //验证身份
     let staff = await offline.checkIdentity( req.body.identity );
     if(!staff){
@@ -214,6 +214,11 @@ async function offlineApprove(req, res, next){
         });
         return;
     }
+
+    res.json({
+        "status" : 1,
+        "msg"    : "离线申请后台已接受"
+    });
 
     let params = req.body.params;
     params = await Promise.all(params.map(async (param)=>{
@@ -226,5 +231,5 @@ async function offlineApprove(req, res, next){
         return param;
     }));
 
-    res.json(params);
+    
 }
