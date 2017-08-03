@@ -120,6 +120,7 @@ async function initXAJHTravelPolicy(params: {companyId: string}): Promise<any[]>
                 trafficPrefer: -1,
                 hotelPrefer: -1,
             });
+            await abroadTpr.save();
         }
 
         if(subsidyTemplates && subsidyTemplates.length > 0){
