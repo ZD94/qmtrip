@@ -256,5 +256,13 @@
       ],
       "travelPolicyName": "高管级"
     }
+  ],
+  "regionPlace": {
+    "domestic_place_id": "CTW_5",
+    "abroad_place_id": "Global"
+  },
+  "companyRegion":[
+    {"name": "国内"},
+    {"name": "国际"}
   ]
 }
