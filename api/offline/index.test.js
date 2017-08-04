@@ -9,6 +9,7 @@ require('app-module-path').addPath(path.join(__dirname, "../../"));
 let request = require("request");
 let moment = require("moment");
 let md5 = require("md5");
+let uuid = require("uuid");
 let config = require("../../config/config");
 let expect = require("chai").expect;
 
@@ -30,7 +31,7 @@ function signToken(...args) {
 
 
 describe("测试web接口/offlineApprove", function(){
-    this.timeout(60 * 1000);
+    // this.timeout(60 * 1000);
 
     let param1 = {
         "accountId":"e3e79870-1b7c-11e7-a571-7fedc950bceb",
@@ -47,7 +48,7 @@ describe("测试web接口/offlineApprove", function(){
 
     let sign = signToken( param1.accountId, param.tokenId, param1.token, param.timestamp );
 
-    it("测试身份认证ff，验证失败", (done)=>{
+    it("测试身份认证，验证失败", (done)=>{
         request.post("http://localhost:4002/offlineApprove", {
             form : {
                 identity : {
@@ -86,18 +87,17 @@ describe("测试web接口/offlineApprove", function(){
                     sign,
                     staffId : param.staffId
                 },
-                params : [
-                    {
-                        projectName : "test乌台诗案",
-                        leaveCityName: "北京市",
-                        backCityName : "北京22",
-                        destinationName: "重庆",
-                        lastArrivalDate : moment().add(1, 'd').valueOf(),   //最晚到达
-                        mostLeaveDate  : moment().add(2, 'd').valueOf(),    //最早离开
-                        reason : "play, just play",
-                        approveName : 'Mr.He'
-                    }
-                ]
+                param : {
+                    projectName : "test乌台诗案",
+                    leaveCityName: "北京市",
+                    backCityName : "北京22",
+                    destinationName: "重庆",
+                    lastArrivalDate : moment().add(1, 'd').valueOf(),   //最晚到达
+                    mostLeaveDate  : moment().add(2, 'd').valueOf(),    //最早离开
+                    reason : "play, just play",
+                    approveName : 'Mr.He',
+                    signId : uuid.v1()
+                }
             }
         }, function(err, httpResponse, body){
 
@@ -112,13 +112,7 @@ describe("测试web接口/offlineApprove", function(){
                 result = body;
             }
 
-            let right = true;
-            for(let item of result){
-                if(item.status != 1)
-                    right = false;
-            }
-
-            expect(!right).to.be.ok;
+            expect(result.status == 1).to.be.ok;
             done();
         });
     });
@@ -134,18 +128,17 @@ describe("测试web接口/offlineApprove", function(){
                     sign,
                     staffId : param.staffId
                 },
-                params : [
-                    {
-                        projectName : "test乌台诗案",
-                        leaveCityName: "北京市",
-                        backCityName : "北京",
-                        destinationName: "重庆",
-                        lastArrivalDate : moment().add(1, 'd').valueOf(),   //最晚到达
-                        mostLeaveDate  : moment().add(2, 'd').valueOf(),    //最早离开
-                        reason : "play, just play",
-                        approveName : 'Mr.He'
-                    }
-                ]
+                param : {
+                    projectName : "test乌台诗案",
+                    leaveCityName: "北京市",
+                    backCityName : "北京",
+                    destinationName: "重庆",
+                    lastArrivalDate : moment().add(1, 'd').valueOf(),   //最晚到达
+                    mostLeaveDate  : moment().add(2, 'd').valueOf(),    //最早离开
+                    reason : "play, just play",
+                    approveName : '王亚丽',
+                    signId : uuid.v1()
+                }
             }
         }, function(err, httpResponse, body){
 
@@ -160,13 +153,7 @@ describe("测试web接口/offlineApprove", function(){
                 result = body;
             }
 
-            let right = true;
-            for(let item of result){
-                if(item.status != 1)
-                    right = false;
-            }
-
-            expect(right).to.be.ok;
+            expect(result.status == 1).to.be.ok;
             done();
         });
     })

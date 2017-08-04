@@ -2,10 +2,11 @@ import { checkTokenAuth } from "api/auth/authentication";
 import { AuthResponse, AuthRequest, signToken, LoginResponse } from '_types/auth/auth-cert';
 import {Models} from "_types/index";
 import {Staff} from "_types/staff";
-import {TripPlan, TripApprove, ESourceType, QMEApproveStatus, ICreateBudgetAndApproveParams} from '_types/tripPlan';
+import {TripPlan, TripApprove, ESourceType, QMEApproveStatus, ICreateBudgetAndApproveParams, Offline, OfflineStatus} from '_types/tripPlan';
 
 let API = require("@jingli/dnode-api");
 let moment = require("moment");
+let uuid = require("uuid");
 
 export interface CheckIdentityParam{
     staffId : string;
@@ -26,11 +27,13 @@ export interface OfflineTranslateParam {
     msg ? : string;
     status ? : number;
     approveId ? : string;
+    signId : string;
 }
 
-export class Offline {
+export class OfflineClass {
 
     __initHttpApp( app ){
+        console.log("what");
         app.post("/offlineApprove", offlineApprove);
     }
 
@@ -49,13 +52,13 @@ export class Offline {
 
         let leaveCity = await API.place.getCityInfoByName( param.leaveCityName );
         if(!leaveCity){
-            param.msg = "出发城市填写错误";
+            param.msg = "出发地城市填写错误";
             return param;
         }
 
         let destinationCity = await API.place.getCityInfoByName( param.destinationName );
         if(!destinationCity){
-            param.msg = "目的城市填写错误";
+            param.msg = "目的地城市填写错误";
             return param;
         }
 
@@ -64,7 +67,7 @@ export class Offline {
             param.backCityName = param.backCityName.replace(/city|市/ig, "");
             backCity = await API.place.getCityInfoByName( param.backCityName );
             if(!backCity){
-                param.msg = "返回到城市填写错误";
+                param.msg = "返回地城市填写错误";
                 return param;
             }
         }
@@ -198,13 +201,14 @@ export class Offline {
     }
 }
 
-const offline = new Offline();
+const offline = new OfflineClass();
 export default offline;
 
 async function offlineApprove(req, res, next){
     res.header('Access-Control-Allow-Origin', '*');
     /*req.clearTimeout();
     req.setTimeout( 60 * 1000 );*/
+    
     //验证身份
     let staff = await offline.checkIdentity( req.body.identity );
     if(!staff){
@@ -215,21 +219,45 @@ async function offlineApprove(req, res, next){
         return;
     }
 
+    let param : OfflineTranslateParam = req.body.param || {};
+    if(!param.signId){
+        res.status(500).json({ error: 'signId is required.' })
+        return;
+    }
+
+    let result = await Models.offline.find({
+        where : {
+            signId : param.signId
+        }
+    });
+    if(result.length){
+        res.json({
+            "status" : 0,
+            "msg"    : "重复提交"
+        });
+        return;
+    }else{
+        result = Offline.create({
+            signId : param.signId,
+            isProcessed : true
+        });
+        result = await result.save();
+    }
+
     res.json({
         "status" : 1,
-        "msg"    : "离线申请后台已接受"
+        "msg"    : "离线申请后台已接收"
     });
 
-    let params = req.body.params;
-    params = await Promise.all(params.map(async (param)=>{
-        try{
-            param = await offline.dealOffLine(param, staff);
-            await offline.sendInfo(param, staff);
-        }catch(e){
-            console.log(e);
-        }
-        return param;
-    }));
-
+    try{
+        param = await offline.dealOffLine(param, staff);
+        await offline.sendInfo(param, staff);
+    }catch(e){
+        console.error(e);
+    }
     
+    result.remark = param.msg;
+    result.status = param.status ? OfflineStatus.SUCCESS : OfflineStatus.FAIL;
+
+    await result.save();
 }
