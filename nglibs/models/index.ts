@@ -277,16 +277,11 @@ class ClientModels implements ModelsInterface {
         this.tripBasicPackage = createService<TripBasicPackage>(Services.tripBasicPackage, $cacheFactory);
         this.tripFuelAddPackage = createService<TripFuelAddPackage>(Services.tripFuelAddPackage, $cacheFactory);
         this.errorLog = createService<ErrorLog>(Services.errorLog, $cacheFactory);
-<<<<<<< HEAD
-        this.travelPolicyRegion = createService<TravelPolicyRegion>(Services.travelPolicyRegion, $cacheFactory);
         this.offline = createService<Offline>(Services.offline, $cacheFactory);
-=======
-        this.travelPolicyRegion = createService<TravelPolicyRegion>(Services.travelPolicyRegion, $cacheFactory)
         this.travelPolicyRegion = createService<TravelPolicyRegion>(Services.travelPolicyRegion, $cacheFactory);
         this.companyRegion = createService<CompanyRegion>(Services.companyRegion, $cacheFactory);
         this.regionPlace = createService<RegionPlace>(Services.regionPlace, $cacheFactory);
 
->>>>>>> 743a2dbf260c70db33d3b5d3329d18c4b5d4d197
         initModels(this);
 
         $rootScope.$on('$locationChangeSuccess', ()=>{
