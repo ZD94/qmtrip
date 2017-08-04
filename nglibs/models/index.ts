@@ -9,7 +9,7 @@ import { ModelCached } from 'common/model/cached';
 import {ModelRemote, ModelRemoteOld} from 'common/model/remote';
 import { ngService } from '../index';
 import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from '_types/staff';
-import { Company, MoneyChange, Supplier, TripPlanNumChange } from '_types/company';
+import { Company, MoneyChange, Supplier, TripPlanNumChange, InvoiceTitle } from '_types/company';
 import { PromoCode } from '_types/promoCode';
 import { Department, StaffDepartment } from '_types/department';
 import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
@@ -76,6 +76,9 @@ var Services = {
     },
     supplier: { type: Supplier, modname: 'company',
         funcs: ['getSupplier', 'getSuppliers', 'createSupplier', 'updateSupplier', 'deleteSupplier']
+    },
+    invoiceTitle: { type: InvoiceTitle, modname: 'company',
+        funcs: ['getInvoiceTitle', 'getInvoiceTitles', 'createInvoiceTitle', 'updateInvoiceTitle', 'deleteInvoiceTitle']
     },
     promoCode: { type: PromoCode, modname: 'promoCode',
         funcs: ['getPromoCode', 'getPromoCodes', 'createPromoCode', 'updatePromoCode', 'deletePromoCode']
@@ -186,6 +189,7 @@ class ClientModels implements ModelsInterface {
     staffSupplierInfo:ModelInterface<StaffSupplierInfo>;
     company: ModelInterface<Company>;
     supplier: ModelInterface<Supplier>;
+    invoiceTitle: ModelInterface<InvoiceTitle>;
     tripPlanNumChange: ModelInterface<TripPlanNumChange>;
     promoCode: ModelInterface<PromoCode>;
     department: ModelInterface<Department>;
@@ -240,6 +244,7 @@ class ClientModels implements ModelsInterface {
         this.credential = createService<Credential>(Services.credential, $cacheFactory);
         this.pointChange = createService<PointChange>(Services.pointChange, $cacheFactory);
         this.supplier = createService<Supplier>(Services.supplier, $cacheFactory);
+        this.invoiceTitle = createService<InvoiceTitle>(Services.invoiceTitle, $cacheFactory);
         this.tripPlanNumChange = createService<TripPlanNumChange>(Services.tripPlanNumChange, $cacheFactory);
         this.invitedLink = createService<InvitedLink>(Services.invitedLink, $cacheFactory);
         this.staffSupplierInfo = createService<StaffSupplierInfo>(Services.staffSupplierInfo, $cacheFactory);

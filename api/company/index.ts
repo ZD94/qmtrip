@@ -14,7 +14,7 @@ let schedule = require("node-schedule");
 let _ = require("lodash");
 import {requireParams, clientExport} from "@jingli/dnode-api/dist/src/helper";
 import {Models} from "_types";
-import {Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE} from '_types/company';
+import {Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE, InvoiceTitle} from '_types/company';
 import {Staff, EStaffRole} from "_types/staff";
 import {PromoCode} from "_types/promoCode";
 import {Agency, AgencyUser, EAgencyUserRole} from "_types/agency";
@@ -599,6 +599,101 @@ class CompanyModule {
             await log2.save();
         }))
     }
+
+
+    /* ============= company.invoiceTitle api ========== */
+
+    static async isRepeatInvoice( params: { companyId:string, name:string } ){
+        let invoices = await Models.invoiceTitle.find({
+            where : {
+                companyId : params.companyId,
+                name : params.name
+            }
+        });
+        return invoices.length ? true : false;
+    }
+
+
+    @clientExport
+    @requireParams(["id"])
+    static async getInvoiceTitle(params: { id:string }) : Promise<InvoiceTitle>{
+        let id = params.id;
+        let result = await Models.invoiceTitle.get(id);
+
+        return result;
+    }
+
+    @clientExport
+    static async getInvoiceTitles(params) : Promise<FindResult>{
+        params.order =params.order || [['created_at', 'desc']];
+        params.where = params.where || {};
+        let invoices = await Models.invoiceTitle.find(params);
+
+        let ids = invoices.map((s)=>s.id);
+
+        return { ids, count:invoices.total }
+    }
+
+    @clientExport
+    static async createInvoiceTitle (params) : Promise<InvoiceTitle>{
+
+        let isRepeat = await CompanyModule.isRepeatInvoice({
+            companyId : params.companyId,
+            name      : params.name
+        });
+
+        if(isRepeat){
+            throw L.DefineErrorCode("errorInvoiceName", -556, "发票名称重复" );
+        }
+
+        var tpc = InvoiceTitle.create(params);
+        return tpc.save();
+    }
+
+    @clientExport
+    @requireParams(["id"], InvoiceTitle['$fieldnames'])
+    static async updateInvoiceTitle(params) : Promise<InvoiceTitle>{
+        let id = params.id;
+        let staff = await Staff.getCurrent();
+
+        let sp = await Models.invoiceTitle.get(id);
+        if(sp.companyId != staff.company.id){
+            throw L.ERR.PERMISSION_DENY();
+        }
+
+        if(params.name){
+            let isRepeat = await CompanyModule.isRepeatInvoice({
+                companyId : staff.company.id,
+                name      : params.name
+            });
+
+            if(isRepeat){
+                throw L.DefineErrorCode("errorInvoiceName", -556, "发票名称重复" );
+            }
+        }
+
+        for(var key in params){
+            sp[key] = params[key];
+        }
+        return sp.save();
+    }
+
+    @clientExport
+    @requireParams(["id"])
+    static async deleteInvoiceTitle(params) : Promise<any>{
+        let id = params.id;
+        let staff = await Staff.getCurrent();
+        let st_delete = await Models.invoiceTitle.get(id);
+        if(st_delete.companyId != staff.company.id){
+            throw L.ERR.PERMISSION_DENY();
+        }
+
+        await st_delete.destroy();
+        return true;
+    }
+
+    /* ====================== END ======================= */
+
 
     static _scheduleTask () {
         let taskId = "resetTripPlanPassNum";
