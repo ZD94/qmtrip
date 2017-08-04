@@ -213,7 +213,7 @@ async function offlineApprove(req, res, next){
     let staff = await offline.checkIdentity( req.body.identity );
     if(!staff){
         res.json({
-            "status" : -1,
+            "status" : 500,
             "msg"    : "身份认证失败"
         });
         return;
@@ -232,7 +232,7 @@ async function offlineApprove(req, res, next){
     });
     if(result.length){
         res.json({
-            "status" : 0,
+            "status" : 403,
             "msg"    : "重复提交"
         });
         return;
@@ -245,7 +245,7 @@ async function offlineApprove(req, res, next){
     }
 
     res.json({
-        "status" : 1,
+        "status" : 200,
         "msg"    : "离线申请后台已接收"
     });
 

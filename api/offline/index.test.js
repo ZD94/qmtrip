@@ -69,7 +69,7 @@ describe("测试web接口/offlineApprove", function(){
             }catch(e){
                 result = body;
             }
-            expect(result.status).to.be.equal(-1); 
+            expect(result.status).to.be.equal(500); 
             done();          
         });
     });
@@ -112,7 +112,7 @@ describe("测试web接口/offlineApprove", function(){
                 result = body;
             }
 
-            expect(result.status == 1).to.be.ok;
+            expect(result.status == 200).to.be.ok;
             done();
         });
     });
@@ -153,7 +153,7 @@ describe("测试web接口/offlineApprove", function(){
                 result = body;
             }
 
-            expect(result.status == 1).to.be.ok;
+            expect(result.status == 200).to.be.ok;
             done();
         });
     })
