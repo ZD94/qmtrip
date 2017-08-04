@@ -16,7 +16,7 @@ import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelP
 import { AccordHotel } from '_types/accordHotel';
 import { Notice, NoticeAccount } from '_types/notice';
 import { Agency, AgencyUser } from '_types/agency';
-import {TripPlan, TripDetail, TripDetailStaff, Project, TripPlanLog, TripApprove, FinanceCheckCode} from '_types/tripPlan';
+import {TripPlan, TripDetail, TripDetailStaff, Project, TripPlanLog, TripApprove, FinanceCheckCode, Offline} from '_types/tripPlan';
 import {Account, Token} from '_types/auth';
 import { Seed } from '_types/seed';
 import {TravelBudgetLog} from "_types/travelbudget";
@@ -147,6 +147,7 @@ var Services = {
     tripFuelAddPackage:{type:TripFuelAddPackage, modname:'tripPackage',funcs:[]},
     errorLog: {},
     travelPolicyRegion:{},
+    offline: {},
 };
 
 function throwNotImplemented(){
@@ -213,6 +214,7 @@ class ClientModels implements ModelsInterface {
     token: ModelInterface<Token>;
     travelBudgetLog: ModelInterface<TravelBudgetLog>;
     financeCheckCode: ModelInterface<FinanceCheckCode>;
+    offline : ModelInterface<Offline>;
 
     ddtalkCorp: ModelInterface<DDTalkCorp>;
     ddtalkUser: ModelInterface<DDTalkUser>;
@@ -269,7 +271,8 @@ class ClientModels implements ModelsInterface {
         this.tripBasicPackage = createService<TripBasicPackage>(Services.tripBasicPackage, $cacheFactory);
         this.tripFuelAddPackage = createService<TripFuelAddPackage>(Services.tripFuelAddPackage, $cacheFactory);
         this.errorLog = createService<ErrorLog>(Services.errorLog, $cacheFactory);
-        this.travelPolicyRegion = createService<TravelPolicyRegion>(Services.travelPolicyRegion, $cacheFactory)
+        this.travelPolicyRegion = createService<TravelPolicyRegion>(Services.travelPolicyRegion, $cacheFactory);
+        this.offline = createService<Offline>(Services.offline, $cacheFactory);
         initModels(this);
 
         $rootScope.$on('$locationChangeSuccess', ()=>{
