@@ -225,12 +225,13 @@ async function offlineApprove(req, res, next){
         return;
     }
 
-    let result = await Models.offline.find({
+    let offlines = await Models.offline.find({
         where : {
             signId : param.signId
         }
     });
-    if(result.length){
+    let result;
+    if(offlines.length){
         res.json({
             "status" : 403,
             "msg"    : "重复提交"
@@ -240,7 +241,7 @@ async function offlineApprove(req, res, next){
         result = Offline.create({
             signId : param.signId,
             isProcessed : true
-        });
+        }) as Offline;
         result = await result.save();
     }
 
