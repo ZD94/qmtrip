@@ -1,0 +1,1 @@
+alter table company.invoice_titles drop column is_default;
