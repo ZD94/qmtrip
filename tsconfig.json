@@ -34,7 +34,8 @@
     "ionic",
     "tmp",
     "*.bak",
-    "JLTypes"
+    "JLTypes",
+    "tools/"
   ],
   "excludeNotUsing": [
   ]

@@ -27,6 +27,8 @@ import {Approve} from "_types/approve";
 import {AgencyOperateLog} from "_types/agency/agency-operate-log";
 import {TripBasicPackage} from "_types/tripPackage/tripBasicPackage";
 import {TripFuelAddPackage} from "_types/tripPackage/tripFuelAddPackage";
+import {CompanyRegion} from "_types/travelPolicy/companyRegion";
+import {RegionPlace} from "_types/travelPolicy/regionPlace";
 
 
 const API = require('@jingli/dnode-api');
@@ -148,6 +150,8 @@ var Services = {
     errorLog: {},
     travelPolicyRegion:{},
     offline: {},
+    regionPlace:{},
+    companyRegion:{},
 };
 
 function throwNotImplemented(){
@@ -230,6 +234,8 @@ class ClientModels implements ModelsInterface {
     errorLog: ModelInterface<ErrorLog>;
 
     travelPolicyRegion: ModelInterface<TravelPolicyRegion>;
+    companyRegion: ModelInterface<CompanyRegion>;
+    regionPlace: ModelInterface<RegionPlace>;
 
     constructor($cacheFactory: ng.ICacheFactoryService, $rootScope: ng.IRootScopeService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
@@ -271,8 +277,16 @@ class ClientModels implements ModelsInterface {
         this.tripBasicPackage = createService<TripBasicPackage>(Services.tripBasicPackage, $cacheFactory);
         this.tripFuelAddPackage = createService<TripFuelAddPackage>(Services.tripFuelAddPackage, $cacheFactory);
         this.errorLog = createService<ErrorLog>(Services.errorLog, $cacheFactory);
+<<<<<<< HEAD
         this.travelPolicyRegion = createService<TravelPolicyRegion>(Services.travelPolicyRegion, $cacheFactory);
         this.offline = createService<Offline>(Services.offline, $cacheFactory);
+=======
+        this.travelPolicyRegion = createService<TravelPolicyRegion>(Services.travelPolicyRegion, $cacheFactory)
+        this.travelPolicyRegion = createService<TravelPolicyRegion>(Services.travelPolicyRegion, $cacheFactory);
+        this.companyRegion = createService<CompanyRegion>(Services.companyRegion, $cacheFactory);
+        this.regionPlace = createService<RegionPlace>(Services.regionPlace, $cacheFactory);
+
+>>>>>>> 743a2dbf260c70db33d3b5d3329d18c4b5d4d197
         initModels(this);
 
         $rootScope.$on('$locationChangeSuccess', ()=>{

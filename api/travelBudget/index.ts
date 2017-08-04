@@ -16,6 +16,7 @@ import _ = require("lodash");
 import {Place} from "_types/place";
 import {DefaultRegion} from "_types/travelPolicy"
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
+export var NoCityPriceLimit = 0;
 
 interface SegmentsBudgetResult {
     id: string;
@@ -104,13 +105,27 @@ export default class ApiTravelBudget {
         }
         let staffs = [_staff];
         let goBackPlace = params['goBackPlace'];
+        let priceLimitSegments: any =[];
         let segments: any[] = await Promise.all(destinationPlacesInfo.map(async(placeInfo) => {
             var segment: any = {};
             segment.city = placeInfo.destinationPlace;
             let city: Place = (await API.place.getCityInfo({cityCode: placeInfo.destinationPlace}));
 
-            // console.log(placeInfo.destinationPlace,   city);
-            let bestTravelPolicy = await staff.getBestTravelPolicys ({regionId: city.id})
+            let bestTravelPolicy:any = {};
+
+            if(placeInfo.isNeedTraffic) {
+                bestTravelPolicy.trainLevels = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'trainLevels'});
+                bestTravelPolicy.planeLevels = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'planeLevels'});
+                bestTravelPolicy.trafficPrefer = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'trafficPrefer'});
+            }
+            if(placeInfo.isNeedHotel) {
+                bestTravelPolicy.hotelLevels = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'hotelLevels'});
+                bestTravelPolicy.hotelPrefer = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'hotelPrefer'});
+                let minPriceLimit = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'minPriceLimit'});
+                let maxPriceLimit = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'maxPriceLimit'});
+                priceLimitSegments.push({cityid:placeInfo.destinationPlace,maxPriceLimit:maxPriceLimit, minPriceLimit: minPriceLimit});
+            }
+
             if(!bestTravelPolicy){
                 throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
             }
@@ -199,6 +214,24 @@ export default class ApiTravelBudget {
             let hotel = _budgets[i].hotel;
             if (hotel && hotel.length) {
                 let budget = hotel[0];
+                let maxPriceLimit = 0;
+                let minPriceLimit = 0;
+
+                let days:number = 0;
+                for(let jj = 0; jj < segments.length; jj++){
+                    if(city == segments[jj].city) {
+                        let beginTime = moment(segments[jj].beginTime).hour(12);
+                        let endTime = moment(segments[jj].endTime).hour(12);
+                        days = moment(endTime).diff(beginTime,'days');
+                    }
+                }
+                for(let jj = 0; jj < priceLimitSegments.length; jj++){
+                    if(city == priceLimitSegments[jj].cityid) {
+                        maxPriceLimit = priceLimitSegments[jj].maxPriceLimit;
+                        minPriceLimit = priceLimitSegments[jj].minPriceLimit;
+                    }
+                }
+                budget.price = limitHotelBudgetByPrefer(minPriceLimit * days,maxPriceLimit * days,budget.price);
                 let cityObj = await API.place.getCityInfo({cityCode: city});
                 budget.hotelName = placeInfo ? placeInfo.hotelName : null;
                 budget.cityName = cityObj.name;
@@ -266,6 +299,28 @@ export default class ApiTravelBudget {
                 }
             }
             return budget;
+        }
+
+        function limitHotelBudgetByPrefer(min: number, max:number, hotelBudget: number){
+            if(hotelBudget == -1) {
+                if(max != NoCityPriceLimit) return max;
+                return hotelBudget;
+            }
+            if(min == NoCityPriceLimit && max == NoCityPriceLimit) return hotelBudget;
+
+            if(max != NoCityPriceLimit && min > max) {
+                let tmp = min;
+                min = max;
+                max = tmp;
+            }
+
+            if(hotelBudget > max ) {
+                if(max != NoCityPriceLimit) return max;
+            }
+            if(hotelBudget < min ) {
+                if(min != NoCityPriceLimit) return min;
+            }
+            return hotelBudget;
         }
     }
 
