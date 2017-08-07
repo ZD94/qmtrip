@@ -410,9 +410,9 @@ class TripPlanModule {
      * @param params
      */
     @clientExport
-    @requireParams(['id', 'auditResult'], ["reason", "expenditure"])
+    @requireParams(['id', 'auditResult'], ["reason", "expenditure", "invoiceId"])
     @modelNotNull('tripDetail')
-    static async auditPlanInvoice(params: {id: string, auditResult: EAuditStatus, expenditure?: number, reason?: string}): Promise<boolean> {
+    static async auditPlanInvoice(params: {id: string, auditResult: EAuditStatus, expenditure?: number, reason?: string, invoiceId?: string}): Promise<boolean> {
         const SAVED2SCORE = config.score_ratio;
         let {id, expenditure, reason, auditResult} = params;
         let tripDetail = await Models.tripDetail.get(params.id);
@@ -428,6 +428,25 @@ class TripPlanModule {
         let isNotify = false;
         let savedMoney = 0;
         let logResult = '';
+
+        if(audit != EAuditStatus.INVOICE_PASS && audit != EAuditStatus.INVOICE_NOT_PASS){
+            throw L.ERR.PERMISSION_DENY(); //代理商只能审核票据权限
+        }
+
+        //修改票据状态
+        if(params.invoiceId){
+            let invoice = await Models.tripDetailInvoice.get(params.invoiceId);
+            invoice.status = audit == EAuditStatus.INVOICE_PASS ? EInvoiceStatus.AUDIT_PASS : EInvoiceStatus.AUDIT_FAIL;
+            invoice.auditRemark = params.reason || '';
+            await invoice.save();
+        }else{
+            let invoices = await tripDetail.getInvoices();
+            await Promise.all(invoices.map(async (invoice)=>{
+                invoice.status = audit == EAuditStatus.INVOICE_PASS ? EInvoiceStatus.AUDIT_PASS : EInvoiceStatus.AUDIT_FAIL;
+                invoice.auditRemark = params.reason || '';
+                await invoice.save();
+            }));
+        }
 
         if(audit == EAuditStatus.INVOICE_PASS) {
             logResult = '通过';
@@ -473,20 +492,11 @@ class TripPlanModule {
                 isNotify = true;
                 templateName = 'qm_notify_invoice_not_pass';
             }
-        } else {
-            throw L.ERR.PERMISSION_DENY(); //代理商只能审核票据权限
         }
 
 
         //保存更改记录
         await Promise.all([tripPlan.save(), tripDetail.save()]);
-        //修改票据状态
-        let invoices = await tripDetail.getInvoices();
-        Promise.all(invoices.map(async (invoice)=>{
-            invoice.status = audit == EAuditStatus.INVOICE_PASS ? EInvoiceStatus.AUDIT_PASS : EInvoiceStatus.AUDIT_FAIL;
-            invoice.auditRemark = params.reason || '';
-            await invoice.save();
-        }));
 
         /*******************************************发送通知消息**********************************************/
         let staff = await Models.staff.get(tripPlan['accountId']);
