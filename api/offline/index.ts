@@ -33,7 +33,6 @@ export interface OfflineTranslateParam {
 export class OfflineClass {
 
     __initHttpApp( app ){
-        console.log("what");
         app.post("/offlineApprove", offlineApprove);
     }
 
