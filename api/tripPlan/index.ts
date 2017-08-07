@@ -181,7 +181,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['id'], ['isNeedTraffic', 'isNeedHotel', 'title', 'description', 'status', 'deptCity',
-        'deptCityCode', 'arrivalCity', 'arrivalCityCode', 'startAt', 'backAt', 'remark'])
+        'deptCityCode', 'arrivalCity', 'arrivalCityCode', 'startAt', 'backAt', 'remark', 'readNumber'])
     @modelNotNull('tripPlan')
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
     static async updateTripPlan(params): Promise<TripPlan> {
@@ -467,6 +467,8 @@ class TripPlanModule {
             tripDetail.status = EPlanStatus.AUDIT_NOT_PASS;
             tripPlan.status = EPlanStatus.AUDIT_NOT_PASS;
             tripPlan.auditStatus = EAuditStatus.INVOICE_NOT_PASS;
+
+            tripPlan.readNumber = 0;
             let waitApproveQuery = {where: {id: {$ne: tripDetail.id}, status: EPlanStatus.AUDITING}}
             let waitApproveDetails = await tripPlan.getTripDetails(waitApproveQuery); //获取所有未审核票据的detail
             if(!waitApproveDetails || waitApproveDetails.length == 0 ){
@@ -1137,6 +1139,8 @@ class TripPlanModule {
         tripPlan.isSpecialApprove = approve.isSpecialApprove;
         tripPlan.specialApproveRemark = approve.specialApproveRemark;
         tripPlan.staffList = query.staffList || [];
+
+        tripPlan.readNumber = 0;
 
         //计算总预算
         let totalBudget = budgets

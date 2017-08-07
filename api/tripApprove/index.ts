@@ -327,6 +327,7 @@ class TripApproveModule {
             log.approveStatus = EApproveResult.REJECT;
             log.remark = approveRemark;
             log.save();
+            tripApprove.readNumber = 0;
             tripApprove.approveRemark = approveRemark;
             tripApprove.status = QMEApproveStatus.REJECT;
         }
@@ -462,8 +463,12 @@ class TripApproveModule {
     }
 
     @clientExport
-    static updateTripApprove(params): Promise<TripApprove> {
-        return Models.tripApprove.update(params);
+    static async updateTripApprove(params): Promise<TripApprove> {
+        let tripApprove = await Models.tripApprove.get(params.id);
+        for(var key in params){
+            tripApprove[key] = params[key];
+        }
+        return tripApprove.save();
     }
 
     @clientExport
