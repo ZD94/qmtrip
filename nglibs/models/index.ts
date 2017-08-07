@@ -9,14 +9,14 @@ import { ModelCached } from 'common/model/cached';
 import {ModelRemote, ModelRemoteOld} from 'common/model/remote';
 import { ngService } from '../index';
 import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from '_types/staff';
-import { Company, MoneyChange, Supplier, TripPlanNumChange } from '_types/company';
+import { Company, MoneyChange, Supplier, TripPlanNumChange, InvoiceTitle } from '_types/company';
 import { PromoCode } from '_types/promoCode';
 import { Department, StaffDepartment } from '_types/department';
 import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
 import { AccordHotel } from '_types/accordHotel';
 import { Notice, NoticeAccount } from '_types/notice';
 import { Agency, AgencyUser } from '_types/agency';
-import {TripPlan, TripDetail, TripDetailStaff, Project, TripPlanLog, TripApprove, FinanceCheckCode} from '_types/tripPlan';
+import {TripPlan, TripDetail, TripDetailStaff, Project, TripPlanLog, TripApprove, FinanceCheckCode, Offline} from '_types/tripPlan';
 import {Account, Token} from '_types/auth';
 import { Seed } from '_types/seed';
 import {TravelBudgetLog} from "_types/travelbudget";
@@ -27,6 +27,8 @@ import {Approve} from "_types/approve";
 import {AgencyOperateLog} from "_types/agency/agency-operate-log";
 import {TripBasicPackage} from "_types/tripPackage/tripBasicPackage";
 import {TripFuelAddPackage} from "_types/tripPackage/tripFuelAddPackage";
+import {CompanyRegion} from "_types/travelPolicy/companyRegion";
+import {RegionPlace} from "_types/travelPolicy/regionPlace";
 
 
 const API = require('@jingli/dnode-api');
@@ -74,6 +76,9 @@ var Services = {
     },
     supplier: { type: Supplier, modname: 'company',
         funcs: ['getSupplier', 'getSuppliers', 'createSupplier', 'updateSupplier', 'deleteSupplier']
+    },
+    invoiceTitle: { type: InvoiceTitle, modname: 'company',
+        funcs: ['getInvoiceTitle', 'getInvoiceTitles', 'createInvoiceTitle', 'updateInvoiceTitle', 'deleteInvoiceTitle']
     },
     promoCode: { type: PromoCode, modname: 'promoCode',
         funcs: ['getPromoCode', 'getPromoCodes', 'createPromoCode', 'updatePromoCode', 'deletePromoCode']
@@ -147,6 +152,9 @@ var Services = {
     tripFuelAddPackage:{type:TripFuelAddPackage, modname:'tripPackage',funcs:[]},
     errorLog: {},
     travelPolicyRegion:{},
+    offline: {},
+    regionPlace:{},
+    companyRegion:{},
 };
 
 function throwNotImplemented(){
@@ -182,6 +190,7 @@ class ClientModels implements ModelsInterface {
     staffSupplierInfo:ModelInterface<StaffSupplierInfo>;
     company: ModelInterface<Company>;
     supplier: ModelInterface<Supplier>;
+    invoiceTitle: ModelInterface<InvoiceTitle>;
     tripPlanNumChange: ModelInterface<TripPlanNumChange>;
     promoCode: ModelInterface<PromoCode>;
     department: ModelInterface<Department>;
@@ -213,6 +222,7 @@ class ClientModels implements ModelsInterface {
     token: ModelInterface<Token>;
     travelBudgetLog: ModelInterface<TravelBudgetLog>;
     financeCheckCode: ModelInterface<FinanceCheckCode>;
+    offline : ModelInterface<Offline>;
 
     ddtalkCorp: ModelInterface<DDTalkCorp>;
     ddtalkUser: ModelInterface<DDTalkUser>;
@@ -228,12 +238,15 @@ class ClientModels implements ModelsInterface {
     errorLog: ModelInterface<ErrorLog>;
 
     travelPolicyRegion: ModelInterface<TravelPolicyRegion>;
+    companyRegion: ModelInterface<CompanyRegion>;
+    regionPlace: ModelInterface<RegionPlace>;
 
     constructor($cacheFactory: ng.ICacheFactoryService, $rootScope: ng.IRootScopeService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
         this.credential = createService<Credential>(Services.credential, $cacheFactory);
         this.pointChange = createService<PointChange>(Services.pointChange, $cacheFactory);
         this.supplier = createService<Supplier>(Services.supplier, $cacheFactory);
+        this.invoiceTitle = createService<InvoiceTitle>(Services.invoiceTitle, $cacheFactory);
         this.tripPlanNumChange = createService<TripPlanNumChange>(Services.tripPlanNumChange, $cacheFactory);
         this.invitedLink = createService<InvitedLink>(Services.invitedLink, $cacheFactory);
         this.staffSupplierInfo = createService<StaffSupplierInfo>(Services.staffSupplierInfo, $cacheFactory);
@@ -269,7 +282,11 @@ class ClientModels implements ModelsInterface {
         this.tripBasicPackage = createService<TripBasicPackage>(Services.tripBasicPackage, $cacheFactory);
         this.tripFuelAddPackage = createService<TripFuelAddPackage>(Services.tripFuelAddPackage, $cacheFactory);
         this.errorLog = createService<ErrorLog>(Services.errorLog, $cacheFactory);
-        this.travelPolicyRegion = createService<TravelPolicyRegion>(Services.travelPolicyRegion, $cacheFactory)
+        this.offline = createService<Offline>(Services.offline, $cacheFactory);
+        this.travelPolicyRegion = createService<TravelPolicyRegion>(Services.travelPolicyRegion, $cacheFactory);
+        this.companyRegion = createService<CompanyRegion>(Services.companyRegion, $cacheFactory);
+        this.regionPlace = createService<RegionPlace>(Services.regionPlace, $cacheFactory);
+
         initModels(this);
 
         $rootScope.$on('$locationChangeSuccess', ()=>{

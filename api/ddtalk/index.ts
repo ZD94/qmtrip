@@ -94,6 +94,7 @@ class DDTalk {
     static __initHttpApp(app) {
 
         app.get("/JLTesthello", (req, res, next)=>{
+
             let url = config.test_url.replace(/\/$/g, "");
             if(config.reg_go){
                 return DealEvent.transpond(req, res, next, null, url+"/JLTesthello");
