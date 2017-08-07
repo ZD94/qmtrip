@@ -16,7 +16,6 @@ export = async function transform(values: any): Promise<any>{
     values.MTrainLevel =  MTrainLevel;
     values.MHotelLevel =  MHotelLevel;
     let budgetInfo = await API.travelBudget.getBudgetInfo({id: values.cacheId, accountId : staff.id});
-
     let {budgets, query} = budgetInfo;
     let totalBudget = 0;
     budgets.forEach((b) => {totalBudget += Number(b.price);});
@@ -56,5 +55,7 @@ export = async function transform(values: any): Promise<any>{
         staffMap[item] = s;
     }))
     values.staffMap = staffMap;
+    values.date = moment().format('YYYY-MM-DD HH:mm');
+
     return values;
 }

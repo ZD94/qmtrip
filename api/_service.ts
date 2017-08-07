@@ -2,7 +2,7 @@
 import { initModels } from '_types';
 
 import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo, StaffProperty } from '_types/staff';
-import { Company, MoneyChange, Supplier, TripPlanNumChange, CompanyProperty } from '_types/company';
+import { Company, MoneyChange, Supplier, TripPlanNumChange, CompanyProperty, InvoiceTitle } from '_types/company';
 import { Department, StaffDepartment, DepartmentProperty } from '_types/department';
 import { PromoCode } from '_types/promoCode';
 import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
@@ -25,7 +25,8 @@ import {AgencyOperateLog} from "_types/agency/agency-operate-log";
 import {TripFuelAddPackage} from "../_types/tripPackage/tripFuelAddPackage";
 import {TripBasicPackage} from "../_types/tripPackage/tripBasicPackage";
 import {ErrorLog} from "../_types/errorLog";
-
+import {CompanyRegion} from "_types/travelPolicy/companyRegion";
+import {RegionPlace} from "_types/travelPolicy/regionPlace";
 initModels({
     staff: createServerService<Staff>(Staff),
     staffProperty: createServerService<StaffProperty>(StaffProperty),
@@ -36,6 +37,7 @@ initModels({
     company: createServerService<Company>(Company),
     companyProperty: createServerService<CompanyProperty>(CompanyProperty),
     supplier: createServerService<Supplier>(Supplier),
+    invoiceTitle: createServerService<InvoiceTitle>(InvoiceTitle),
     tripPlanNumChange: createServerService<TripPlanNumChange>(TripPlanNumChange),
     promoCode: createServerService<PromoCode>(PromoCode),
     department: createServerService<Department>(Department),
@@ -78,6 +80,7 @@ initModels({
     tripFuelAddPackage: createServerService<TripFuelAddPackage>(TripFuelAddPackage),
     tripBasicPackage: createServerService<TripBasicPackage>(TripBasicPackage),
     errorLog: createServerService<ErrorLog>(ErrorLog),
-    travelPolicyRegion: createServerService<TravelPolicyRegion>(TravelPolicyRegion)
-
+    travelPolicyRegion: createServerService<TravelPolicyRegion>(TravelPolicyRegion),
+    companyRegion: createServerService<CompanyRegion>(CompanyRegion),
+    regionPlace: createServerService<RegionPlace>(RegionPlace),
 });

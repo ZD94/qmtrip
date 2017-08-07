@@ -25,19 +25,19 @@ async function costCredit(req, res, next) {
     console.info("扣积分接口================");
     var params = req.query;
     var { uid, credits,appKey, timestamp, description, orderNum, actualPrice,sign } = params;
-    var staff = await Models.staff.get(uid);
-    staff.coinAccount = staff.$parents["account"]["coinAccount"];
+    var account = await Models.account.get(uid);
+    // staff.coinAccount = staff.$parents["account"]["coinAccount"];
     //资金账户不存在先创建
-    if(!staff.coinAccount){
+    if(!account.coinAccount){
         let ca = CoinAccount.create();
         await ca.save();
-        let account = await Models.account.get(staff.accountId);
+        // let account = await Models.account.get(staff.accountId);
         account.coinAccount = ca;
         await account.save();
         // staff.coinAccount = ca;
         // await staff.save();
     }
-    var coinAccount = staff.coinAccount;
+    var coinAccount = account.coinAccount;
     
     if(!appKey || appKey != config.duiba.appKey){
         res.json({
@@ -170,19 +170,19 @@ async function resultNotice(req, res, next) {
 async function addCredit(req, res, next) {
     var params = req.query;
     var { uid, credits,appKey,type, timestamp, description, orderNum, sign } = params;
-    var staff = await Models.staff.get(uid);
-    staff.coinAccount = staff.$parents["account"]["coinAccount"];
+    var account = await Models.account.get(uid);
+    // account.coinAccount = account.["coinAccount"];
     //资金账户不存在先创建
-    if(!staff.coinAccount){
+    if(!account.coinAccount){
         let ca = CoinAccount.create();
         await ca.save();
-        let account = await Models.account.get(staff.accountId);
+        // let account = await Models.account.get(staff.accountId);
         account.coinAccount = ca;
         await account.save();
         // staff.coinAccount = ca;
         // await staff.save();
     }
-    var coinAccount = staff.coinAccount;
+    var coinAccount = account.coinAccount;
 
     if(!appKey || appKey != config.duiba.appKey){
         res.json({
