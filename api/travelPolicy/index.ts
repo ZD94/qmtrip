@@ -77,17 +77,11 @@ class TravelPolicyModule{
     @clientExport
     @requireParams(["travelPolicyId", "planeLevels","hotelLevels","companyRegionId"], travalPolicyRegionCols)
     static async createTravelPolicyRegion(params):Promise<TravelPolicyRegion>{
-        let {travelPolicyId, planeLevels, trainLevels, hotelLevels,regionId,companyRegionId } = params;
-
-        let detailPolicy = {
-            regionId: regionId,
-            travelPolicyId: travelPolicyId,
-            planeLevels: tryConvertToArray(planeLevels),
-            trainLevels: tryConvertToArray(trainLevels),
-            hotelLevels: tryConvertToArray(hotelLevels),
-            companyRegionId: companyRegionId
-        }
-        let travelPolicyRegion = TravelPolicyRegion.create(detailPolicy);
+       let { travelPolicyId, planeLevels, trainLevels, hotelLevels} = params;
+        params['planeLevels'] = tryConvertToArray(planeLevels);
+        params['trainLevels'] = tryConvertToArray(trainLevels);
+        params['hotelLevels'] = tryConvertToArray(hotelLevels);
+        let travelPolicyRegion = TravelPolicyRegion.create(params);
         travelPolicyRegion.travelPolicy = await Models.travelPolicy.get(travelPolicyId);
         return travelPolicyRegion.save();
     }
