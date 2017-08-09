@@ -6,7 +6,7 @@
 
 import {Models} from "_types/index";
 import {md5} from "common/utils";
-import {Staff} from "_types/staff/staff";
+import {Staff, EStaffStatus} from "_types/staff/staff";
 import {DDTalkUser, DDTalkCorp} from "_types/ddtalk";
 import {getISVandCorp} from "api/ddtalk/lib/dealEvent";
 import Logger from '@jingli/logger';
@@ -141,6 +141,9 @@ export class ddCrud {
         let staff_id;
         if(ddtalkUser && ddtalkUser.length){
             staff_id = ddtalkUser[0].id;
+            let staff = await Models.staff.get(staff_id);
+            staff.staffStatus = EStaffStatus.QUIT_JOB;
+            await staff.save();
             await ddtalkUser[0].destroy();
         }
 
