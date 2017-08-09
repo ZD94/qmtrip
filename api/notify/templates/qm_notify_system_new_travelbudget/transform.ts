@@ -4,17 +4,63 @@ import {EApproveResult, ETripType} from "_types/tripPlan";
 import moment = require("moment");
 var API = require('@jingli/dnode-api');
 import {MPlaneLevel, MTrainLevel, MHotelLevel} from '_types/travelPolicy';
+import {Model, where} from "sequelize";
+import {DefaultRegion} from "_types/travelPolicy/travelPolicy";
 
 export = async function transform(values: any): Promise<any>{
     let cityMap = {};
     let staffMap = {};
     let staff = await Models.staff.get(values.staffId);
     let travelPolicy = await staff.getTravelPolicy();
+    let travelPolicyRegions = await travelPolicy.getTravelPolicyRegions();
+    let travelp: {
+        name: string,
+        planeLevels?: number[],
+        trainLevels?: number[],
+        hotelLevels?: number[],
+        isOpenAbroad?: boolean,
+        abroadPlaneLevels?: number[],
+        abroadHotelLevels?: number[]
+    }  = {
+        name: travelPolicy.name,
+        isOpenAbroad: travelPolicy.isOpenAbroad
+    };
     values.staff =  staff;
-    values.travelPolicy =  travelPolicy;
     values.MPlaneLevel =  MPlaneLevel;
     values.MTrainLevel =  MTrainLevel;
     values.MHotelLevel =  MHotelLevel;
+
+    let currentCompany = staff.company;
+    async function getAbroadPolicy() {
+        let policyRegions = await Models.companyRegion.find({where: {companyId: currentCompany.id, name: DefaultRegion.abroad}});
+        let abroadRegion = await Models.travelPolicyRegion.find({where: {travelPolicyId: travelPolicy.id, companyRegionId: policyRegions[0].id}});
+
+        if (abroadRegion && abroadRegion.length > 0) {
+            travelp.abroadPlaneLevels = abroadRegion[0].planeLevels;
+            travelp.abroadHotelLevels = abroadRegion[0].hotelLevels;
+        }
+    }
+
+    async function getDomesticPolicy() {
+        let policyRegions = await Models.companyRegion.find({where: {companyId: currentCompany.id, name: DefaultRegion.domestic}});
+        let domesticRegion = await Models.travelPolicyRegion.find({where: {travelPolicyId: travelPolicy.id, companyRegionId: policyRegions[0].id}});
+        if (domesticRegion && domesticRegion.length > 0) {
+            travelp.planeLevels = domesticRegion[0].planeLevels;
+            travelp.hotelLevels = domesticRegion[0].hotelLevels;
+            travelp.trainLevels = domesticRegion[0].trainLevels;
+        }
+    }
+
+    if (travelPolicyRegions && travelPolicyRegions.length > 0) {
+        travelp.isOpenAbroad = travelPolicy.isOpenAbroad;
+        await getAbroadPolicy();
+        await getDomesticPolicy();
+    }
+
+
+    values.travelPolicy =  travelp;
+
+
     let budgetInfo = await API.travelBudget.getBudgetInfo({id: values.cacheId, accountId : staff.id});
     let {budgets, query} = budgetInfo;
     let totalBudget = 0;
