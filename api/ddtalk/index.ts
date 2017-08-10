@@ -213,7 +213,11 @@ class DDTalk {
                 let ddtalkUser = ddtalkUsers[0];
                 // //自动登录
                 console.log("钉钉自动登录: API.auth.makeAuthenticateToken ", ddtalkUser.id);
-                let ret = await API.auth.makeAuthenticateToken(ddtalkUser.id, 'ddtalk');
+                let staff = await Models.staff.get(ddtalkUser.id);
+                if(!staff){
+                    throw L.ERR.USER_NOT_EXIST();
+                }
+                let ret = await API.auth.makeAuthenticateToken(staff.accountId, 'ddtalk');
                 return ret;
             }
             throw L.ERR.UNAUTHORIZED();
