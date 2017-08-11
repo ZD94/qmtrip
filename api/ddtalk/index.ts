@@ -26,7 +26,9 @@ const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 
 async function wait(number){
     return new Promise(function(resolve, reject) {
-        setTimeout(resolve(null), number)
+        setTimeout(() => {
+            resolve(null);
+        }, number)
     })
 }
 let ddTalkMsgHandle = {
