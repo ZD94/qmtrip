@@ -181,7 +181,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['id'], ['isNeedTraffic', 'isNeedHotel', 'title', 'description', 'status', 'deptCity',
-        'deptCityCode', 'arrivalCity', 'arrivalCityCode', 'startAt', 'backAt', 'remark'])
+        'deptCityCode', 'arrivalCity', 'arrivalCityCode', 'startAt', 'backAt', 'remark', 'readNumber'])
     @modelNotNull('tripPlan')
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
     static async updateTripPlan(params): Promise<TripPlan> {
@@ -406,16 +406,20 @@ class TripPlanModule {
 
     /**
      * 审核出差票据
+     * modified 票据审核改为仅对单张票据的审核
      *
      * @param params
      */
     @clientExport
-    @requireParams(['id', 'auditResult'], ["reason", "expenditure"])
+    @requireParams(['id', 'auditResult', "invoiceId"], ["reason", "expenditure"])
     @modelNotNull('tripDetail')
-    static async auditPlanInvoice(params: {id: string, auditResult: EAuditStatus, expenditure?: number, reason?: string}): Promise<boolean> {
+    static async auditPlanInvoice(params: {id: string, auditResult: EAuditStatus, expenditure?: number, reason?: string, invoiceId?: string}): Promise<boolean> {
+
         const SAVED2SCORE = config.score_ratio;
         let {id, expenditure, reason, auditResult} = params;
         let tripDetail = await Models.tripDetail.get(params.id);
+
+
 
         if((tripDetail.status != EPlanStatus.AUDITING) && (tripDetail.status != EPlanStatus.AUDIT_NOT_PASS)) {
             throw L.ERR.TRIP_PLAN_STATUS_ERR();
@@ -424,73 +428,127 @@ class TripPlanModule {
         let audit = params.auditResult;
         let tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
         let templateValue: any = {};
-        let templateName: any = '';
-        let isNotify = false;
-        let savedMoney = 0;
-        let logResult = '';
+        let logResult = '通过';
 
-        if(audit == EAuditStatus.INVOICE_PASS) {
-            logResult = '通过';
-            tripDetail.status = EPlanStatus.COMPLETE;
-            tripDetail.expenditure = expenditure;
-            let query = {where: {id: {$ne: tripDetail.id}, status: [EPlanStatus.AUDITING, EPlanStatus.AUDIT_NOT_PASS]}}
-            let noAuditDetails = await tripPlan.getTripDetails(query); //获取所有未经过审核的票据
-            let waitApproveQuery = {where: {id: {$ne: tripDetail.id}, status: EPlanStatus.AUDITING}}
-            let waitApproveDetails = await tripPlan.getTripDetails(waitApproveQuery); //获取所有未审核票据的detail
-            if(!noAuditDetails || noAuditDetails.length == 0 ) {
-                isNotify = true;
-                templateName = 'qm_notify_invoice_all_pass';
-                let details = await tripPlan.getTripDetails({ where: {}});
-                let expenditure = 0;
-                details.forEach( (detail) => {
-                    expenditure += Number(detail.expenditure);
-                });
-
-                tripPlan.expenditure = expenditure;
-                tripPlan.status = EPlanStatus.COMPLETE;
-                tripPlan.auditStatus = EAuditStatus.INVOICE_PASS;
-                tripPlan.allInvoicesPassTime = new Date();
-                savedMoney = (tripPlan.budget - tripPlan.expenditure);
-                savedMoney = savedMoney > 0 ? savedMoney : 0;
-                tripPlan.score = parseInt((savedMoney * SAVED2SCORE).toString());
-            }else if(!waitApproveDetails || waitApproveDetails.length == 0 ){
-                isNotify = true;
-                templateName = 'qm_notify_invoice_not_pass';
-                reason = noAuditDetails[0].auditRemark;
-            }
-            // templateValue.consume = '￥' + (tripDetail.expenditure || 0);
-            let detailSavedM = tripDetail.budget - tripDetail.expenditure;
-            detailSavedM = detailSavedM > 0 ? detailSavedM : 0;
-        } else if(audit == EAuditStatus.INVOICE_NOT_PASS) {
-            logResult = '未通过';
-            tripDetail.auditRemark = reason;
-            tripDetail.status = EPlanStatus.AUDIT_NOT_PASS;
-            tripPlan.status = EPlanStatus.AUDIT_NOT_PASS;
-            tripPlan.auditStatus = EAuditStatus.INVOICE_NOT_PASS;
-            let waitApproveQuery = {where: {id: {$ne: tripDetail.id}, status: EPlanStatus.AUDITING}}
-            let waitApproveDetails = await tripPlan.getTripDetails(waitApproveQuery); //获取所有未审核票据的detail
-            if(!waitApproveDetails || waitApproveDetails.length == 0 ){
-                isNotify = true;
-                templateName = 'qm_notify_invoice_not_pass';
-            }
-        } else {
+        if(audit != EAuditStatus.INVOICE_PASS && audit != EAuditStatus.INVOICE_NOT_PASS){
             throw L.ERR.PERMISSION_DENY(); //代理商只能审核票据权限
         }
 
 
-        //保存更改记录
-        await Promise.all([tripPlan.save(), tripDetail.save()]);
-        //修改票据状态
-        let invoices = await tripDetail.getInvoices();
-        Promise.all(invoices.map(async (invoice)=>{
-            invoice.status = audit == EAuditStatus.INVOICE_PASS ? EInvoiceStatus.AUDIT_PASS : EInvoiceStatus.AUDIT_FAIL;
-            invoice.auditRemark = params.reason || '';
-            await invoice.save();
-        }));
+        //处理这张票据
+        let invoice = await Models.tripDetailInvoice.get(params.invoiceId);
+        invoice.status = audit == EAuditStatus.INVOICE_PASS ? EInvoiceStatus.AUDIT_PASS : EInvoiceStatus.AUDIT_FAIL;
+        invoice.auditRemark = params.reason || '';
+        invoice = await invoice.save();
+
+        let allInvoicePass = true,
+            isNeedMsg = true;
+        let invoices = await tripPlan.getTripInvoices();
+        let tripDetailInvoices = [];
+        invoices.map(async (item)=>{
+            switch(item.status){
+                case EInvoiceStatus.WAIT_AUDIT:
+                    allInvoicePass = false;
+                    isNeedMsg = false;
+                    break;
+                case EInvoiceStatus.AUDIT_PASS:
+                    break;
+                case EInvoiceStatus.AUDIT_FAIL:
+                    allInvoicePass = false;
+
+                    //一张票据不过，对应的 tripPlan 不过
+                    tripPlan.status = EPlanStatus.AUDIT_NOT_PASS;
+                    tripPlan.auditStatus = EAuditStatus.INVOICE_NOT_PASS;
+                    break;
+            }
+
+            if(item["trip_detail_id"] == tripDetail.id){
+                tripDetailInvoices.push(item);
+            }
+        });
+
+        if(params.expenditure){
+            //重新计算 tripDetail 的实际金额
+            tripDetail.expenditure = tripDetail.expenditure - invoice.totalMoney + Number(params.expenditure);
+            //重新计算 tripPlan 的实际金额
+            tripPlan.expenditure = tripPlan.expenditure - invoice.totalMoney + Number(params.expenditure);
+            invoice.totalMoney = params.expenditure;
+        }
+        
+        /*================  处理tripPlan, tripDetail 状态  ============*/
+        let templateName : string;
+        if(allInvoicePass){
+            //所有票据都审核通过
+            tripPlan.status = EPlanStatus.COMPLETE;
+            tripPlan.auditStatus = EAuditStatus.INVOICE_PASS;
+            tripPlan.allInvoicesPassTime = new Date();
+            let savedMoney = tripPlan.budget - tripPlan.expenditure;
+            savedMoney = savedMoney > 0 ? savedMoney : 0;
+            tripPlan.score = parseInt((savedMoney * SAVED2SCORE).toString());
+
+            templateName = 'qm_notify_invoice_all_pass';          
+        }else{
+            templateName = 'qm_notify_invoice_not_pass';
+        }
+
+        //处理对应的tripDetail 的状态
+        
+        let tripDetailAllPass = true;
+
+        tripDetailInvoices.map((oneInvoice)=>{
+            switch (oneInvoice.status) {
+                case EInvoiceStatus.AUDIT_FAIL:
+                    logResult = '未通过';
+                    tripDetailAllPass = false;
+                    tripDetail.status = EPlanStatus.AUDIT_NOT_PASS;
+                    break;
+                case EInvoiceStatus.AUDIT_PASS:
+                    break;
+                case EInvoiceStatus.WAIT_AUDIT:
+                    tripDetailAllPass = false;
+                    break;
+            }
+        });
+
+        if(tripDetailAllPass){
+            tripDetail.status = EPlanStatus.COMPLETE; 
+        }
+
+        /* =================== END =================== */
+
+         await Promise.all([invoice.save(), tripPlan.save(), tripDetail.save()]);
+
 
         /*******************************************发送通知消息**********************************************/
         let staff = await Models.staff.get(tripPlan['accountId']);
+        if(isNeedMsg){
+            //所有票据都处理了,发送通知
+            
+            let self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
+            let finalUrl = `#/trip/list-detail?tripid=${tripPlan.id}`;
+            finalUrl = encodeURIComponent(finalUrl);
+            let appMessageUrl = `#/judge-permission/index?id=${tripPlan.id}&modelName=tripPlan&finalUrl=${finalUrl}`;
 
+            try {
+                await API.notify.submitNotify({
+                    key: templateName,
+                    userId: staff.id,
+                    values: {tripPlan: tripPlan, detailUrl: self_url, appMessageUrl: appMessageUrl,
+                        noticeType: ENoticeType.TRIP_APPROVE_NOTICE, reason: "图片不清楚"}
+                });
+
+            } catch(err) {
+                console.error(`发送通知失败:`, err);
+            }
+            try {
+                await API.ddtalk.sendLinkMsg({accountId: staff.id, text: '票据已审批结束', url: self_url})
+            } catch(err) {
+                console.error(`发送钉钉通知失败`, err);
+            }
+        }
+
+
+        /* ======================= 处理planlog ================= */
         switch (tripDetail.type) {
             case ETripType.OUT_TRIP:
                 templateValue.tripType = '去程';
@@ -510,33 +568,13 @@ class TripPlanModule {
             default:
                 templateValue.tripType = ''; break;
         }
-        if(isNotify) {
-            let self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
-            let finalUrl = `#/trip/list-detail?tripid=${tripPlan.id}`;
-            finalUrl = encodeURIComponent(finalUrl);
-            let appMessageUrl = `#/judge-permission/index?id=${tripPlan.id}&modelName=tripPlan&finalUrl=${finalUrl}`;
-
-            try {
-                await API.notify.submitNotify({
-                    key: templateName,
-                    userId: staff.id,
-                    values: {tripPlan: tripPlan, detailUrl: self_url, appMessageUrl: appMessageUrl,
-                        noticeType: ENoticeType.TRIP_APPROVE_NOTICE, reason: reason}
-                });
-
-            } catch(err) {
-                console.error(`发送通知失败:`, err);
-            }
-            try {
-                await API.ddtalk.sendLinkMsg({accountId: staff.id, text: '票据已审批通过', url: self_url})
-            } catch(err) {
-                console.error(`发送钉钉通知失败`, err);
-            }
-        }
-
+       
         let user = await AgencyUser.getCurrent();
         let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, tripDetailId: tripDetail.id, userId: user.id, remark: `${templateValue.tripType}票据审核${logResult}`});
         log.save();
+
+        /* ========================== END ===================== */
+
 
         //如果出差已经完成,并且有节省反积分,并且非特别审批，增加员工积分
         if (tripPlan.status == EPlanStatus.COMPLETE && tripPlan.score > 0 && !tripPlan.isSpecialApprove) {
@@ -1137,6 +1175,8 @@ class TripPlanModule {
         tripPlan.isSpecialApprove = approve.isSpecialApprove;
         tripPlan.specialApproveRemark = approve.specialApproveRemark;
         tripPlan.staffList = query.staffList || [];
+
+        tripPlan.readNumber = 0;
 
         //计算总预算
         let totalBudget = budgets

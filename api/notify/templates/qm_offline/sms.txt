@@ -1,0 +1,1 @@
+尊敬的<%=staff.name%>您的<%= moment(param.lastArrivalDate / 1).format("YYYY-MM-DD") %>从 <%= param.leaveCityName %> 到 <%= param.destinationName %>的离线申请，<%= param.status == 0 ? '因'+param.msg+'处理失败' : '处理成功' %>。

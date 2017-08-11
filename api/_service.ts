@@ -11,7 +11,7 @@ import { Notice, NoticeAccount } from '_types/notice';
 import { Agency, AgencyUser } from '_types/agency';
 import {
     TripPlan, TripDetail, TripDetailStaff, Project, TripPlanLog, TripApprove, FinanceCheckCode,
-    TripDetailInvoice, TripDetailTraffic, TripDetailHotel
+    TripDetailInvoice, TripDetailTraffic, TripDetailHotel, Offline
 } from '_types/tripPlan';
 import {Account, Token} from '_types/auth';
 import { Seed } from '_types/seed';
@@ -69,6 +69,7 @@ initModels({
     token: createServerService<Token>(Token),
     travelBudgetLog: createServerService<TravelBudgetLog>(TravelBudgetLog),
     financeCheckCode: createServerService<FinanceCheckCode>(FinanceCheckCode),
+    offline: createServerService<Offline>(Offline),
 
     ddtalkCorp: createServerService<DDTalkCorp>(DDTalkCorp),
     ddtalkUser: createServerService<DDTalkUser>(DDTalkUser),

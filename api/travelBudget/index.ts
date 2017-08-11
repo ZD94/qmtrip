@@ -110,6 +110,7 @@ export default class ApiTravelBudget {
             var segment: any = {};
             segment.city = placeInfo.destinationPlace;
             let city: Place = (await API.place.getCityInfo({cityCode: placeInfo.destinationPlace}));
+
             let bestTravelPolicy:any = {};
 
             if(placeInfo.isNeedTraffic) {
@@ -175,6 +176,8 @@ export default class ApiTravelBudget {
             }
             return segment;
         }));
+
+        // console.log("segments===>", segments);
 
         let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
             policies,
