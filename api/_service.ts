@@ -1,9 +1,9 @@
 
 import { initModels } from '_types';
 
-import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from '_types/staff';
-import { Company, MoneyChange, Supplier, TripPlanNumChange, InvoiceTitle } from '_types/company';
-import { Department, StaffDepartment } from '_types/department';
+import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo, StaffProperty } from '_types/staff';
+import { Company, MoneyChange, Supplier, TripPlanNumChange, CompanyProperty, InvoiceTitle } from '_types/company';
+import { Department, StaffDepartment, DepartmentProperty } from '_types/department';
 import { PromoCode } from '_types/promoCode';
 import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
 import { AccordHotel } from '_types/accordHotel';
@@ -29,16 +29,19 @@ import {CompanyRegion} from "_types/travelPolicy/companyRegion";
 import {RegionPlace} from "_types/travelPolicy/regionPlace";
 initModels({
     staff: createServerService<Staff>(Staff),
+    staffProperty: createServerService<StaffProperty>(StaffProperty),
     credential: createServerService<Credential>(Credential),
     pointChange: createServerService<PointChange>(PointChange),
     invitedLink: createServerService<InvitedLink>(InvitedLink),
     staffSupplierInfo: createServerService<StaffSupplierInfo>(StaffSupplierInfo),
     company: createServerService<Company>(Company),
+    companyProperty: createServerService<CompanyProperty>(CompanyProperty),
     supplier: createServerService<Supplier>(Supplier),
     invoiceTitle: createServerService<InvoiceTitle>(InvoiceTitle),
     tripPlanNumChange: createServerService<TripPlanNumChange>(TripPlanNumChange),
     promoCode: createServerService<PromoCode>(PromoCode),
     department: createServerService<Department>(Department),
+    departmentProperty: createServerService<DepartmentProperty>(DepartmentProperty),
     staffDepartment: createServerService<StaffDepartment>(StaffDepartment),
     travelPolicy: createServerService<TravelPolicy>(TravelPolicy),
     subsidyTemplate: createServerService<SubsidyTemplate>(SubsidyTemplate),
@@ -71,7 +74,7 @@ initModels({
     ddtalkCorp: createServerService<DDTalkCorp>(DDTalkCorp),
     ddtalkUser: createServerService<DDTalkUser>(DDTalkUser),
     ddtalkDepartment : createServerService<DDTalkDepartment>(DDTalkDepartment),
-    
+
     coinAccount: createServerService<CoinAccount>(CoinAccount),
     coinAccountChange: createServerService<CoinAccountChange>(CoinAccountChange),
     agencyOperateLog:createServerService<AgencyOperateLog>(AgencyOperateLog),

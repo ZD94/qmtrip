@@ -14,13 +14,23 @@ const config = C.ddconfig;
 import request = require('request');
 import ISVApi from "./lib/isvApi";
 import {Models} from "_types/index";
+import {SPropertyType, Staff} from "_types/staff";
 import {clientExport} from "@jingli/dnode-api/dist/src/helper";
 import {get_msg} from "./lib/msg-template/index";
+import syncData from "libs/asyncOrganization/syncData";
 
 import * as DealEvent from "./lib/dealEvent";
+import {CPropertyType} from "../../_types/company/company-property";
 
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 
+async function wait(number){
+    return new Promise(function(resolve, reject) {
+        setTimeout(() => {
+            resolve(null);
+        }, number)
+    })
+}
 let ddTalkMsgHandle = {
     /* * * * 临时授权码* * * * */
     tmp_auth_code: async function(msg , req , res , next) {
@@ -54,6 +64,18 @@ let ddTalkMsgHandle = {
 
     /* * 通讯录用户更改 * */
     user_modify_org : async function(msg){
+        let userIds = msg.UserId;
+        let corpId = msg.CorpId;
+        let execute = true;
+        await Promise.all(userIds.map(async (item) => {
+            let staffPro = await Models.staffProperty.find({where : {value: item}});
+            if(!(staffPro && staffPro.length)){
+                execute = false;
+            }
+        }))
+        if(!execute){
+            await wait(5000);
+        }
         return await DealEvent.userModifyOrg(msg);
     },
     /* * 通讯录用户离职 * */
@@ -106,10 +128,11 @@ class DDTalk {
         app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
             console.log("hello : ", msg);
             if(msg.CorpId){
-                let corps = await Models.ddtalkCorp.find({
+                /*let corps = await Models.ddtalkCorp.find({
                     where : { corpId : msg.CorpId }
-                });
-                if(!corps.length){
+                });*/
+                let comPros = await Models.companyProperty.find({where: {value: msg.CorpId, type: CPropertyType.DD_ID}});
+                if(config.test_url && config.reg_go && (!comPros || !comPros.length)){
                     return DealEvent.transpond(req, res, next, null);
                 }
             }
@@ -160,16 +183,20 @@ class DDTalk {
         let timestamp = Math.floor(Date.now() / 1000);
         let noncestr = getRndStr(6);
         //查询企业永久授权码
-        let corps = await Models.ddtalkCorp.find({ where: {corpId: orgid}, limit: 1});
-        if (corps && corps.length) {
-            let corp = corps[0];
-            if (corp.isSuiteRelieve) {
+        // let corps = await Models.ddtalkCorp.find({ where: {corpId: orgid}, limit: 1});
+        let comPros = await Models.companyProperty.find({where: {value: orgid, type: CPropertyType.DD_ID}});
+        if (comPros && comPros.length) {
+            let comPro = comPros[0];
+            let company = await Models.company.get(comPro.companyId);
+            if (company.isSuiteRelieve) {
                 let err = new Error(`企业还未授权或者已取消授权`);
                 throw err;
             }
+            let comPermanentCodePros = await Models.companyProperty.find({where: {companyId: company.id,
+                type: CPropertyType.DD_PERMANENT_CODE}});
             let tokenObj = await DealEvent._getSuiteToken();
             let suiteToken = tokenObj['suite_access_token']
-            let isvApi = new ISVApi(config.suiteid, suiteToken, orgid, corp.permanentCode);
+            let isvApi = new ISVApi(config.suiteid, suiteToken, orgid, comPermanentCodePros[0].value);
             let corpApi = await isvApi.getCorpApi();
             let ticketObj = await corpApi.getTicket();    //获取到了ticket
             let arr = [];
@@ -195,30 +222,44 @@ class DDTalk {
     static async loginByDdTalkCode(params) : Promise<any> {
         console.log("enter In loginByDdTalkCode" , params);
         let {corpid, code} = params;
-        let corps = await Models.ddtalkCorp.find({ where: {corpId: corpid}, limit: 1});
-        if (corps && corps.length) {
-            let corp = corps[0];
-            if (corp.isSuiteRelieve) {
+        // let corps = await Models.ddtalkCorp.find({ where: {corpId: corpid}, limit: 1});
+        let comPros = await Models.companyProperty.find({where: {value: corpid, type: CPropertyType.DD_ID}});
+        if (comPros && comPros.length) {
+            let comPro = comPros[0];
+            let company = await Models.company.get(comPro.companyId);
+            if (company.isSuiteRelieve) {
                 let err = new Error(`企业还未授权或者已取消授权`);
                 throw err;
             }
+            let comPermanentCodePros = await Models.companyProperty.find({where: {companyId: company.id,
+                type: CPropertyType.DD_PERMANENT_CODE}});
             let tokenObj = await DealEvent._getSuiteToken();
             let suiteToken = tokenObj['suite_access_token']
-            let isvApi = new ISVApi(config.suiteid, suiteToken, corpid, corp.permanentCode);
+            let isvApi = new ISVApi(config.suiteid, suiteToken, corpid, comPermanentCodePros[0].value);
             let corpApi = await isvApi.getCorpApi();
             let dingTalkUser = await corpApi.getUserInfoByOAuth(code);
             //查找是否已经绑定账号
-            let ddtalkUsers = await Models.ddtalkUser.find( { where: {corpid: corpid, ddUserId: dingTalkUser.userId}});
-            if (ddtalkUsers && ddtalkUsers.length) {
-                let ddtalkUser = ddtalkUsers[0];
-                // //自动登录
-                console.log("钉钉自动登录: API.auth.makeAuthenticateToken ", ddtalkUser.id);
-                let staff = await Models.staff.get(ddtalkUser.id);
-                if(!staff){
-                    throw L.ERR.USER_NOT_EXIST();
+            // let ddtalkUsers = await Models.ddtalkUser.find( { where: {corpid: corpid, ddUserId: dingTalkUser.userId}});
+            let staffPro = await Models.staffProperty.find({where : {value: dingTalkUser.userId, type: SPropertyType.DD_ID}});
+            let staff: Staff;
+            if (staffPro && staffPro.length) {
+                for(let s of staffPro){
+                    let st = await Models.staff.get(s.staffId);
+                    let staffCorpPro = await Models.staffProperty.find({where : {value: corpid, type: SPropertyType.DD_COMPANY_ID,
+                    staffId: st.id}});
+                    if(staffCorpPro && staffCorpPro.length){
+                        staff = st;
+                    }
                 }
-                let ret = await API.auth.makeAuthenticateToken(staff.accountId, 'ddtalk');
-                return ret;
+
+                if(staff){
+                    // //自动登录
+                    console.log("钉钉自动登录: API.auth.makeAuthenticateToken ", dingTalkUser.userId);
+                    let ret = await API.auth.makeAuthenticateToken(staff.accountId, 'ddtalk');
+                    return ret;
+                }else{
+                    throw L.ERR.UNAUTHORIZED();
+                }
             }
             throw L.ERR.UNAUTHORIZED();
         } else {
@@ -233,16 +274,28 @@ class DDTalk {
         picurl = picurl || 'http://j.jingli365.com/ionic/images/dingtalk-shareicon.png';
         let staff = await Models.staff.get(accountId);
         let company = staff.company;
-        let corp = await Models.ddtalkCorp.get(company.id);
-        let ddtalkUser = await Models.ddtalkUser.get(staff.id);
-        if (corp && ddtalkUser) {
+        /*let corp = await Models.ddtalkCorp.get(company.id);
+        let ddtalkUser = await Models.ddtalkUser.get(staff.id);*/
+
+        let comPros = await Models.companyProperty.find({where: {companyId: company.id, type:
+            [CPropertyType.DD_ID, CPropertyType.DD_PERMANENT_CODE, CPropertyType.DD_AGENT_ID]}});
+        let staffPros = await Models.staffProperty.find({where: {staffId: staff.id, type: SPropertyType.DD_ID}});
+        if (comPros && comPros.length && staffPros && staffPros.length) {
             let tokenObj = await DealEvent._getSuiteToken();
-            let isvApi = new ISVApi(config.suiteid, tokenObj['suite_access_token'], corp.corpId, corp.permanentCode);
+            let corpId = "";
+            let permanentCode = "";
+            let agentId = "";
+            for(let c of comPros){
+                if(c.type == CPropertyType.DD_ID) corpId = c.value;
+                if(c.type == CPropertyType.DD_PERMANENT_CODE) permanentCode = c.value;
+                if(c.type == CPropertyType.DD_AGENT_ID) agentId = c.value;
+            }
+            let isvApi = new ISVApi(config.suiteid, tokenObj['suite_access_token'], corpId, permanentCode);
             let corpApi = await isvApi.getCorpApi();
             let msg= await get_msg({
-                touser: ddtalkUser.ddUserId,
+                touser: staffPros[0].value,
                 content: text,
-                agentid: corp.agentid,
+                agentid: agentId,
                 picurl: picurl,
                 title: '鲸力商旅',
                 url: url,

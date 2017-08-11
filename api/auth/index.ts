@@ -1285,6 +1285,8 @@ export default class ApiAuth {
     @clientExport
     static login = authentication.login;
     @clientExport
+    static loginByLdap = authentication.loginByLdap;
+    @clientExport
     static logout = authentication.logout;
 
     @clientExport
