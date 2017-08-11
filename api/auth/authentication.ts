@@ -6,10 +6,14 @@ import moment = require('moment');
 import validator = require('validator');
 import { Token } from '_types/auth/token';
 import { ACCOUNT_STATUS } from "_types/auth";
+import { EStaffStatus, Staff, SPropertyType } from "_types/staff";
 import {OS_TYPE} from '_types/auth/token';
+import {CPropertyType} from '_types/company';
+import shareConnection from "../ldap/shareConnection";
+import{staffOpts} from "../ldap";
+import syncData from "libs/asyncOrganization/syncData";
+var API = require("@jingli/dnode-api");
 import { getSession } from "common/model";
-import {Staff} from "_types/staff/staff";
-let API = require("@jingli/dnode-api");
 
 //生成登录凭证
 export async function makeAuthenticateToken(accountId, os?: string, expireAt?: Date): Promise<LoginResponse> {
@@ -178,8 +182,8 @@ export async function login(data: {account?: string, pwd: string, type?: Number,
 
     //第三步查看是邮箱登录或手机号登录 查看有限干活手机号是否已验证
     /*if(loginAccount.mobile == account && !loginAccount.isValidateMobile) {
-        throw L.ERR.NO_VALIDATE_MOBILE();
-    }*/
+     throw L.ERR.NO_VALIDATE_MOBILE();
+     }*/
     if(loginAccount.email == account && !loginAccount.isValidateEmail) {
         throw L.ERR.NO_VALIDATE_EMAIL();
     }
@@ -217,6 +221,98 @@ export async function login(data: {account?: string, pwd: string, type?: Number,
 
 }
 
+export async function loginByLdap(data: {account?: string, pwd: string, companyId: string}): Promise<LoginResponse> {
+    if(!data) {
+        throw L.ERR.DATA_NOT_EXIST();
+    }
+
+    if(!data.account) {
+        throw L.ERR.USERNAME_EMPTY();
+    }
+
+    if(!data.pwd) {
+        throw L.ERR.PWD_EMPTY();
+    }
+    //ldap认证
+    let company = await Models.company.get(data.companyId);
+    if(!shareConnection.connectionMap[company.id]){
+        await shareConnection.initConnection({companyId: company.id});
+    }
+    let ldapApi = shareConnection.connectionMap[company.id];
+
+    let ldapProperty = await Models.companyProperty.find({where: {companyId: company.id, type: CPropertyType.LDAP}});
+    let ldapInfo = ldapProperty[0].value;
+    let ldapInfoJson = JSON.parse(ldapInfo);
+    await ldapApi.bindUser({entryDn: ldapInfoJson.ldapAdminDn, userPassword: ldapInfoJson.ldapAdminPassword});
+
+    let type = EAccountType.STAFF;
+    let account = data.account;
+
+    let accounts = await Models.account.find({
+        where:{
+            type: type,
+            $or: [
+                {email: account},
+                {mobile: account}
+            ],
+        },
+        limit: 1,
+    });
+    if(accounts.total == 0) {
+        throw L.ERR.ACCOUNT_NOT_EXIST()
+    }
+    let loginAccount = accounts[0];
+
+    let staffs = await Models.staff.find({where: {accountId: loginAccount.id, staffStatus: EStaffStatus.ON_JOB}});
+    if(staffs.total == 0) {
+        throw L.ERR.ACCOUNT_NOT_EXIST();
+    }
+    let loginStaff: Staff;
+    staffs.map((item) => {
+        if(item.company.id == company.id){
+            loginStaff = item;
+        }
+    });
+
+    let staffProperty = await Models.staffProperty.find({where: {staffId: loginStaff.id, type: SPropertyType.LDAP_DN}});
+    if(staffProperty.total == 0) {
+        throw L.ERR.INVALID_ARGUMENT("ldap相关设置");
+    }
+
+    let entryDn = staffProperty[0].value;
+    let bindResult = await ldapApi.bindUser({entryDn: entryDn, userPassword: data.pwd});
+    if(!bindResult){
+        throw L.ERR.ACCOUNT_FORBIDDEN();
+    }
+    let result = await ldapApi.searchDn({rootDn: entryDn, opts: {attributes: staffOpts.attributes}});
+
+    if(!result){
+        throw L.ERR.ACCOUNT_NOT_EXIST();
+    }
+
+    let departments = await loginStaff.getDepartments();
+    await Promise.all(departments.map(async (item) => {
+        await syncData.syncOrganization({company: company, department: item});
+    }));
+
+    var ret = await makeAuthenticateToken(loginAccount.id);
+    if (loginAccount.isNeedChangePwd) {
+        ret['is_need_change_pwd'] = true;
+    }
+    //判断是否首次登录
+    if(loginAccount.isFirstLogin) {
+        loginAccount.isFirstLogin = false;
+        return loginAccount.save()
+            .then(function() {
+                ret['is_first_login'] = true;
+                return ret;
+            })
+    }
+
+    ret['is_first_login'] = false;
+    return ret;
+
+}
 
 /**
  * 退出登录

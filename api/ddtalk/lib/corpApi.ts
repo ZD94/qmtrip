@@ -79,8 +79,11 @@ export default class CorpApi {
         })
     }
 
-    async getDepartments() :Promise<Array<DdTalkDepartment>> {
+    async getDepartments(parentId?: string) :Promise<Array<DdTalkDepartment>> {
         let url = `https://oapi.dingtalk.com/department/list?access_token=${this.accessToken.access_token}`;
+        if(parentId){
+            url = url + `&id=${parentId}`;
+        }
         let ret = await reqProxy(url, { name: '获取部门列表', method: 'GET', lang: 'zh_CN' });
         if (ret.errcode) throw new Error(JSON.stringify(ret));
         return ret.department;

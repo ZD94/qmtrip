@@ -14,7 +14,7 @@ let schedule = require("node-schedule");
 let _ = require("lodash");
 import {requireParams, clientExport} from "@jingli/dnode-api/dist/src/helper";
 import {Models} from "_types";
-import {Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE, InvoiceTitle} from '_types/company';
+import {Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE, InvoiceTitle, CompanyProperty, CPropertyType} from '_types/company';
 import {Staff, EStaffRole} from "_types/staff";
 import {PromoCode} from "_types/promoCode";
 import {Agency, AgencyUser, EAgencyUserRole} from "_types/agency";
@@ -26,6 +26,7 @@ import {CoinAccount} from "_types/coin";
 
 
 const supplierCols = Supplier['$fieldnames'];
+const companyCols = Staff['$getAllFieldNames']();
 
 const DEFAULT_EXPIRE_MONTH = 1;
 class CompanyModule {
@@ -64,9 +65,12 @@ class CompanyModule {
      * @returns {Promise<Company>}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'pwd', 'userName'], ['email', 'status', 'remark', 'description', 'isValidateMobile', 'promoCode', 'referrerMobile'])
-    static async registerCompany(params: {mobile: string, name: string, email?: string,
-        userName: string, pwd?: string, status?: number, remark?: string, description?: string, isValidateMobile?: boolean, promoCode?: string, referrerMobile?: string}): Promise<any>{
+    @requireParams(['mobile', 'name', 'pwd', 'userName'],
+        ['email', 'status', 'isValidateMobile', 'promoCode', 'referrerMobile', 'ldapUrl', 'ldapBaseDn'])
+    static async registerCompany(params: {mobile: string, name: string, email?: string, userName: string,
+                                         pwd?: string, status?: number, isValidateMobile?: boolean, promoCode?: string,
+                                         referrerMobile?: string, ldapUrl?: string, ldapBaseDn?: string, ldapStaffRootDn?: string,
+                                         ldapDepartmentRootDn?: string, ldapAdminPassword?: string, ldapAdminDn?: string}): Promise<any>{
         let session = Zone.current.get('session');
         let pwd = params.pwd;
         let defaultAgency = await Models.agency.find({where:{email:C.default_agency.email}});//Agency.__defaultAgencyId;
@@ -116,6 +120,13 @@ class CompanyModule {
             if(ac && ac.length > 0){
                 company.setReferrer(ac[0]);
             }
+        }
+        if(params.ldapUrl){
+            let jsonValue = {ldapUrl: params.ldapUrl, ldapBaseDn: params.ldapBaseDn,
+                ldapStaffRootDn: params.ldapStaffRootDn, ldapDepartmentRootDn: params.ldapDepartmentRootDn,
+                ldapAdminPassword: params.ldapAdminPassword, ldapAdminDn: params.ldapAdminDn };
+            let companyProperty = CompanyProperty.create({companyId: company.id, type: CPropertyType.LDAP, value: JSON.stringify(jsonValue)});
+            await companyProperty.save();
         }
 
         await Promise.all([staff.save(), company.save(), department.save(), staffDepartment.save()]);

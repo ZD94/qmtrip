@@ -26,6 +26,7 @@ export default class ISVApi {
                 // await this.corpTokenCache.remove(cacheKey);
                 corpAccessToken = null;
             }
+            corpAccessToken = null;
         }
         if (corpAccessToken && Boolean(corpAccessToken)) return corpAccessToken;
         let url = `https://oapi.dingtalk.com/service/get_corp_token?suite_access_token=${this.suiteToken}`;
