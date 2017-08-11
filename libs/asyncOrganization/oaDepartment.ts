@@ -91,20 +91,27 @@ export abstract class OaDepartment{
             }
         }
 
-        if(parentDepartment){
+        if(parentDepartment || (!parentDepartment && !defaultDepartment)){
             let alreadyDepartment = await self.getDepartment();
             if(alreadyDepartment){
                 if(company){
                     alreadyDepartment.company = company;
                 }
-                alreadyDepartment.parent = parentDepartment;
+                if(parentDepartment){
+                    alreadyDepartment.parent = parentDepartment;
+                }
                 alreadyDepartment.name = self.name;//同步已有部门信息
                 result = await alreadyDepartment.save();
             }else{
                 // 不存在，添加
                 let dept =  Department.create({name: self.name});
                 dept.company = company;
-                dept.parent = parentDepartment;
+                if(parentDepartment){
+                    dept.parent = parentDepartment;
+                }
+                if((!parentDepartment && !defaultDepartment)){
+                    dept.isDefault = true;
+                }
                 result = await dept.save();
                 await self.saveDepartmentProperty({departmentId: result.id});
             }

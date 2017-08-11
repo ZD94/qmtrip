@@ -344,7 +344,6 @@ export async function userModifyOrg(msg){
         throw new Error("该企业没有钉钉授权");
     }
     let company = await Models.company.get(comPro[0].companyId);
-    console.info(company);
     userIds.map(async (item)=>{
         let oaStaff = new DdStaff({id: item, corpId: corpId, isvApi: isvApi, corpApi: corpApi, company: company});
         let ddStaff = await oaStaff.getSelfById();

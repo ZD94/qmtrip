@@ -9,6 +9,7 @@ import L from '@jingli/language';
 import {OaStaff} from './oaStaff';
 import {OaDepartment} from './oaDepartment';
 let moment = require("moment");
+let C = require("@jingli/config");
 
 export abstract class OaCompany{
     constructor(public target: any){
@@ -37,6 +38,7 @@ export abstract class OaCompany{
     }
 
     async sync(): Promise<Company>{
+        console.info("company sync begin==================================");
         let self = this;
         let type = self.type;
         let result: Company;
@@ -50,6 +52,12 @@ export abstract class OaCompany{
         }else{
             // 不存在，添加
             let company = Company.create({name : self.name , expiryDate : moment().add(1 , "months").toDate()});
+            let defaultAgency = await Models.agency.find({where:{email:C.default_agency.email}});//Agency.__defaultAgencyId;
+            let agencyId:any;
+            if(defaultAgency && defaultAgency.length==1){
+                agencyId=defaultAgency[0].id;
+            }
+            company['agencyId'] = agencyId;
             result = await company.save();
             await self.saveCompanyProperty({companyId: result.id});
         }

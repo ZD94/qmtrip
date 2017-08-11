@@ -24,6 +24,11 @@ import {CPropertyType} from "../../_types/company/company-property";
 
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 
+async function wait(number){
+    return new Promise(function(resolve, reject) {
+        setTimeout(resolve(null), number)
+    })
+}
 let ddTalkMsgHandle = {
     /* * * * 临时授权码* * * * */
     tmp_auth_code: async function(msg , req , res , next) {
@@ -57,6 +62,18 @@ let ddTalkMsgHandle = {
 
     /* * 通讯录用户更改 * */
     user_modify_org : async function(msg){
+        let userIds = msg.UserId;
+        let corpId = msg.CorpId;
+        let execute = true;
+        await Promise.all(userIds.map(async (item) => {
+            let staffPro = await Models.staffProperty.find({where : {value: item}});
+            if(!(staffPro && staffPro.length)){
+                execute = false;
+            }
+        }))
+        if(!execute){
+            await wait(5000);
+        }
         return await DealEvent.userModifyOrg(msg);
     },
     /* * 通讯录用户离职 * */

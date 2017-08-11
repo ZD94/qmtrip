@@ -102,6 +102,7 @@ export  abstract class OaStaff{
             let oaDepartmentIds = await Promise.all(oaDepartments.map(async (item) => {
                 let department = await item.getDepartment();
                 if(!department){
+                    console.log("OA部门在我们系统内不存在！！！！！！！！！！！！！！");
                     // let dept = await item.sync({company: company});//此处需要验证
                     // newDepartments.push(dept);
                 }else{
@@ -110,6 +111,10 @@ export  abstract class OaStaff{
             }));
         }
 
+        if(!(newDepartments && newDepartments.length)){
+            console.log("没有部门放在跟部门下");
+            newDepartments.push(defaultDepartment);
+        }
         let alreadyStaff: Staff = await self.getStaff();
         let pwd = self.userPassword || DEFAULT_PWD;
         let roleId = EStaffRole.COMMON;
