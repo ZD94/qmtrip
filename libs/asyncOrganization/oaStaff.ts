@@ -3,7 +3,7 @@
  */
 import {OaDepartment} from "./OaDepartment";
 import {Models} from "_types/index";
-import {Staff, EStaffRole} from "_types/staff";
+import {Staff, EStaffRole, EStaffStatus, EAddWay} from "_types/staff";
 import {Company, CPropertyType} from "_types/company";
 import {Department} from "_types/department";
 import L from '@jingli/language';
@@ -52,17 +52,16 @@ export  abstract class OaStaff{
         return staff;
     }
 
-    async destroy(): Promise<boolean>{
+    async leaveOrg(): Promise<boolean>{
         let self = this;
         let staff = await self.getStaff();
         if(staff){
             await staff.deleteStaffProperty();
 
-            try{
-                await staff.destroy();
-            }catch (e){
-                console.info("删除员工失败", e);
-            }
+            staff.staffStatus = EStaffStatus.QUIT_JOB;
+            await staff.save();
+
+            await staff.deleteStaffDepartments();
         }
 
         return true;
@@ -127,6 +126,8 @@ export  abstract class OaStaff{
                 let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd)});
                 staff.setTravelPolicy(defaultTravelPolicy);
                 staff.company = company;
+                staff.staffStatus = EStaffStatus.ON_JOB;
+                staff.addWay = EAddWay.OA_SYNC;
                 staff = await staff.save();
                 await self.saveStaffProperty({staffId: staff.id});
 
@@ -143,6 +144,8 @@ export  abstract class OaStaff{
             alreadyStaff.email = self.email;
             alreadyStaff.pwd = utils.md5(pwd);
             // alreadyStaff.roleId = roleId;//ldap此处更新权限有问题 创建者被更新为了普通员工
+            alreadyStaff.staffStatus = EStaffStatus.ON_JOB;
+            alreadyStaff.addWay = EAddWay.OA_SYNC;
             await alreadyStaff.save();
 
             // 处理部门

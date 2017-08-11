@@ -363,7 +363,7 @@ export async function userLeaveOrg(msg){
 
     userIds.map(async (item)=>{
         let oaStaff = new DdStaff({id: item, corpId: corpId, isvApi: isvApi, corpApi: corpApi});
-        await oaStaff.destroy();
+        await oaStaff.leaveOrg();
 
         // let staff_id = await DDcrud.deleteDDuser( item );
         // await DDcrud.deleteStaffDepartment( "staff" , staff_id );
