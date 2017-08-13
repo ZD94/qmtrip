@@ -2,7 +2,7 @@
  * Created by wangyali on 2017/7/7.
  */
 import { OaDepartment } from 'libs/asyncOrganization/oaDepartment';
-import { OaStaff } from 'libs/asyncOrganization/oastaff';
+import { OaStaff } from 'libs/asyncOrganization/oaStaff';
 import LdapApi from "./ldapApi";
 import{staffOpts, departmentOpts} from "./index";
 import LdapDepartment from "./LdapDepartment";
