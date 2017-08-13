@@ -2,7 +2,7 @@
  * Created by wangyali on 2017/7/7.
  */
 import { OaDepartment } from 'libs/asyncOrganization/oaDepartment';
-import { OaStaff } from 'libs/asyncOrganization/oaStaff';
+import { OaStaff } from 'libs/asyncOrganization/oastaff';
 import {StaffProperty, SPropertyType, Staff} from "_types/staff";
 import {Models} from "_types/index";
 import L from '@jingli/language';

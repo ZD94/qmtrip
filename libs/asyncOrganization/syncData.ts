@@ -12,7 +12,7 @@ import LdapDepartment from "api/ldap/ldapDepartment";
 import DdDepartment from "api/ddtalk/lib/ddDepartment";
 import LdapStaff from "api/ldap/ldapStaff";
 import DdStaff from "api/ddtalk/lib/ddStaff";
-import shareConnection from "api/ldap/ShareConnection";
+import shareConnection from "api/ldap/shareConnection";
 import {departmentOpts} from "api/ldap";
 import L from '@jingli/language';
 import {getISVandCorp} from "api/ddtalk/lib/dealEvent"
