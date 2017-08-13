@@ -21,7 +21,7 @@ module.exports =async function(DB, t) {
                     ('${uuid.v1()}', ${companyId}, 'ddCompanyId', ${corpId} , now(), now());
                     update company.companies set is_suite_relieve = '${corp.is_suite_relieve}' where id = ${companyId};
                     `;
-
+            console.log(sql);
             await DB.query(sql);
         }));
     });
@@ -41,7 +41,7 @@ module.exports =async function(DB, t) {
                     (id, department_id, type, value, created_at, updated_at ) values
                     ('${uuid.v1()}', ${departmentId}, 'ddDepartmentId', ${ddDepartmentId} , now(), now());
                     `;
-
+            console.log(sql);
             await DB.query(sql);
         }));
     });
@@ -65,7 +65,7 @@ module.exports =async function(DB, t) {
                     (id, staff_id, type, value, created_at, updated_at ) values
                     ('${uuid.v1()}', ${staffId}, 'ddUserInfo', ${staffDdInfo} , now(), now());
                     `;
-
+            console.log(sql);
             await DB.query(sql);
         }));
     });
