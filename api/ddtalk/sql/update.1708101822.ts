@@ -7,13 +7,13 @@ module.exports =async function(DB, t) {
         await Promise.all(corps.map(async (corp)=>{
             let sql = `insert into company.company_properties 
                     (id, company_id, type, value, created_at, updated_at ) values
-                    ('${uuid.v1()}', '${corp.company_id}', 'ddAgentId', '${corp.agentid}' , '${corp.created_at}'::timestamp, '${corp.updated_at}'::timestamp);
+                    ('${uuid.v1()}', '${corp.company_id}', 'ddAgentId', '${corp.agentid}' , 'now()'::timestamp, 'now()'::timestamp);
                     insert into company.company_properties 
                     (id, company_id, type, value, created_at, updated_at ) values
-                    ('${uuid.v1()}', '${corp.company_id}', 'ddPermanentCode', '${corp.permanent_code}' , '${corp.created_at}'::timestamp, '${corp.updated_at}'::timestamp);
+                    ('${uuid.v1()}', '${corp.company_id}', 'ddPermanentCode', '${corp.permanent_code}' , 'now()'::timestamp, 'now()'::timestamp);
                     insert into company.company_properties 
                     (id, company_id, type, value, created_at, updated_at ) values
-                    ('${uuid.v1()}', '${corp.company_id}', 'ddCompanyId', '${corp.corp_id}' , '${corp.created_at}'::timestamp, '${corp.updated_at}');
+                    ('${uuid.v1()}', '${corp.company_id}', 'ddCompanyId', '${corp.corp_id}' , 'now()'::timestamp, 'now()');
                     update company.companies set is_suite_relieve = '${corp.is_suite_relieve}' where id = '${corp.company_id}';
                     `;
 
@@ -43,13 +43,13 @@ module.exports =async function(DB, t) {
         await Promise.all(staffs.map(async (staff)=>{
             let sql = `insert into staff.staff_properties 
                     (id, staff_id, type, value, created_at, updated_at ) values
-                    ('${uuid.v1()}', '${staff.id}', 'ddStaffId', '${staff.dd_user_id}' , '${staff.created_at}', '${staff.updated_at}');
+                    ('${uuid.v1()}', '${staff.id}', 'ddStaffId', '${staff.dd_user_id}' , 'now()', 'now()');
                     insert into staff.staff_properties 
                     (id, staff_id, type, value, created_at, updated_at ) values
-                    ('${uuid.v1()}', '${staff.id}', 'ddCompanyId', '${staff.corpid}' , '${staff.created_at}', '${staff.updated_at}');
+                    ('${uuid.v1()}', '${staff.id}', 'ddCompanyId', '${staff.corpid}' , 'now()', 'now()');
                     insert into staff.staff_properties 
                     (id, staff_id, type, value, created_at, updated_at ) values
-                    ('${uuid.v1()}', '${staff.id}', 'ddUserInfo', '${staff.dd_info}' , '${staff.created_at}', '${staff.updated_at}');
+                    ('${uuid.v1()}', '${staff.id}', 'ddUserInfo', '${staff.dd_info}' , 'now()', 'now()');
                     `;
 
             await DB.query(sql);
