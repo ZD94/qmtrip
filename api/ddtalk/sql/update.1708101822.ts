@@ -13,7 +13,7 @@ module.exports =async function(DB, t) {
                     ('${uuid.v1()}', '${corp.company_id}', 'ddPermanentCode', '${corp.permanent_code}' , '${corp.created_at}'::timestamp, '${corp.updated_at}'::timestamp);
                     insert into company.company_properties 
                     (id, company_id, type, value, created_at, updated_at ) values
-                    ('${uuid.v1()}', '${corp.company_id}', 'ddCompanyId', '${corp.corp_id}' , '${corp.created_at}'::timestamp, '${corp.updated_at}'::timestamp);
+                    ('${uuid.v1()}', '${corp.company_id}', 'ddCompanyId', '${corp.corp_id}' , '${corp.created_at}'::timestamp, '${corp.updated_at}');
                     update company.companies set is_suite_relieve = '${corp.is_suite_relieve}' where id = '${corp.company_id}';
                     `;
 
@@ -27,10 +27,10 @@ module.exports =async function(DB, t) {
         await Promise.all(departments.map(async (dept)=>{
             let sql = `insert into department.department_properties 
                     (id, department_id, type, value, created_at, updated_at ) values
-                    ('${uuid.v1()}', '${dept.department_id}', 'ddCompanyId', '${dept.corp_id}' , '${dept.created_at}'::timestamp, '${dept.updated_at}'::timestamp);
+                    ('${uuid.v1()}', '${dept.department_id}', 'ddCompanyId', '${dept.corp_id}' , '${dept.created_at}', '${dept.updated_at}');
                     insert into department.department_properties 
                     (id, department_id, type, value, created_at, updated_at ) values
-                    ('${uuid.v1()}', '${dept.department_id}', 'ddDepartmentId', '${dept.dd_department_id}' , '${dept.created_at}'::timestamp, '${dept.updated_at}'::timestamp);
+                    ('${uuid.v1()}', '${dept.department_id}', 'ddDepartmentId', '${dept.dd_department_id}' , '${dept.created_at}', '${dept.updated_at}');
                     `;
 
             await DB.query(sql);
@@ -43,13 +43,13 @@ module.exports =async function(DB, t) {
         await Promise.all(staffs.map(async (staff)=>{
             let sql = `insert into staff.staff_properties 
                     (id, staff_id, type, value, created_at, updated_at ) values
-                    ('${uuid.v1()}', '${staff.id}', 'ddStaffId', '${staff.dd_user_id}' , '${staff.created_at}'::timestamp, '${staff.updated_at}'::timestamp);
+                    ('${uuid.v1()}', '${staff.id}', 'ddStaffId', '${staff.dd_user_id}' , '${staff.created_at}', '${staff.updated_at}');
                     insert into staff.staff_properties 
                     (id, staff_id, type, value, created_at, updated_at ) values
-                    ('${uuid.v1()}', '${staff.id}', 'ddCompanyId', '${staff.corpid}' , '${staff.created_at}'::timestamp, '${staff.updated_at}'::timestamp);
+                    ('${uuid.v1()}', '${staff.id}', 'ddCompanyId', '${staff.corpid}' , '${staff.created_at}', '${staff.updated_at}');
                     insert into staff.staff_properties 
                     (id, staff_id, type, value, created_at, updated_at ) values
-                    ('${uuid.v1()}', '${staff.id}', 'ddUserInfo', '${staff.dd_info}' , '${staff.created_at}'::timestamp, '${staff.updated_at}'::timestamp);
+                    ('${uuid.v1()}', '${staff.id}', 'ddUserInfo', '${staff.dd_info}' , '${staff.created_at}', '${staff.updated_at}');
                     `;
 
             await DB.query(sql);
