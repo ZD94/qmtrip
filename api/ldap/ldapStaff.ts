@@ -5,7 +5,7 @@ import { OaDepartment } from 'libs/asyncOrganization/oaDepartment';
 import { OaStaff } from 'libs/asyncOrganization/oaStaff';
 import LdapApi from "./ldapApi";
 import{staffOpts, departmentOpts} from "./index";
-import LdapDepartment from "./LdapDepartment";
+import LdapDepartment from "./ldapDepartment";
 import {StaffProperty, SPropertyType} from "_types/staff";
 import {Models} from "_types/index";
 import L from '@jingli/language';
