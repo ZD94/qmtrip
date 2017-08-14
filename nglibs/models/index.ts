@@ -12,7 +12,7 @@ import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo, StaffPr
 import { Company, MoneyChange, Supplier, TripPlanNumChange, InvoiceTitle, CompanyProperty } from '_types/company';
 import { PromoCode } from '_types/promoCode';
 import { Department, StaffDepartment, DepartmentProperty } from '_types/department';
-import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
+// import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
 import { AccordHotel } from '_types/accordHotel';
 import { Notice, NoticeAccount } from '_types/notice';
 import { Agency, AgencyUser } from '_types/agency';
@@ -27,8 +27,8 @@ import {Approve} from "_types/approve";
 import {AgencyOperateLog} from "_types/agency/agency-operate-log";
 import {TripBasicPackage} from "_types/tripPackage/tripBasicPackage";
 import {TripFuelAddPackage} from "_types/tripPackage/tripFuelAddPackage";
-import {CompanyRegion} from "_types/travelPolicy/companyRegion";
-import {RegionPlace} from "_types/travelPolicy/regionPlace";
+// import {CompanyRegion} from "_types/travelPolicy/companyRegion";
+// import {RegionPlace} from "_types/travelPolicy/regionPlace";
 
 
 const API = require('@jingli/dnode-api');
@@ -98,12 +98,6 @@ var Services = {
     staffDepartment: { type: StaffDepartment, modname: 'department',
         funcs: ['getStaffDepartment', 'getStaffDepartments', 'createStaffDepartment', 'updateStaffDepartment', 'deleteStaffDepartment']
     },
-    travelPolicy: { type: TravelPolicy, modname: 'travelPolicy',
-        funcs: ['getTravelPolicy', 'getTravelPolicies', 'createTravelPolicy', 'updateTravelPolicy', 'deleteTravelPolicy']
-    },
-    subsidyTemplate: { type: SubsidyTemplate, modname: 'travelPolicy',
-        funcs: ['getSubsidyTemplate', 'getSubsidyTemplates', 'createSubsidyTemplate', 'updateSubsidyTemplate', 'deleteSubsidyTemplate']
-    },
     accordHotel: { type: AccordHotel, modname: 'accordHotel',
         funcs: ['getAccordHotel', 'getAccordHotels', 'createAccordHotel', 'updateAccordHotel', 'deleteAccordHotel']
     },
@@ -160,10 +154,16 @@ var Services = {
     tripBasicPackage:{type:TripBasicPackage, modname:'tripPackage',funcs:[]},
     tripFuelAddPackage:{type:TripFuelAddPackage, modname:'tripPackage',funcs:[]},
     errorLog: {},
-    travelPolicyRegion:{},
     offline: {},
-    regionPlace:{},
-    companyRegion:{},
+    // regionPlace:{},
+    // companyRegion:{},
+    // travelPolicy: { type: TravelPolicy, modname: 'travelPolicy',
+    //     funcs: ['getTravelPolicy', 'getTravelPolicies', 'createTravelPolicy', 'updateTravelPolicy', 'deleteTravelPolicy']
+    // },
+    // subsidyTemplate: { type: SubsidyTemplate, modname: 'travelPolicy',
+    //     funcs: ['getSubsidyTemplate', 'getSubsidyTemplates', 'createSubsidyTemplate', 'updateSubsidyTemplate', 'deleteSubsidyTemplate']
+    // },
+    // travelPolicyRegion:{},
 };
 
 function throwNotImplemented(){
@@ -207,8 +207,6 @@ class ClientModels implements ModelsInterface {
     department: ModelInterface<Department>;
     departmentProperty: ModelInterface<DepartmentProperty>;
     staffDepartment: ModelInterface<StaffDepartment>;
-    travelPolicy: ModelInterface<TravelPolicy>;
-    subsidyTemplate: ModelInterface<SubsidyTemplate>;
     accordHotel: ModelInterface<AccordHotel>;
     notice: ModelInterface<Notice>;
     noticeAccount: ModelInterface<NoticeAccount>;
@@ -249,9 +247,11 @@ class ClientModels implements ModelsInterface {
 
     errorLog: ModelInterface<ErrorLog>;
 
-    travelPolicyRegion: ModelInterface<TravelPolicyRegion>;
-    companyRegion: ModelInterface<CompanyRegion>;
-    regionPlace: ModelInterface<RegionPlace>;
+    // travelPolicyRegion: ModelInterface<TravelPolicyRegion>;
+    // companyRegion: ModelInterface<CompanyRegion>;
+    // regionPlace: ModelInterface<RegionPlace>;
+    // travelPolicy: ModelInterface<TravelPolicy>;
+    // subsidyTemplate: ModelInterface<SubsidyTemplate>;
 
     constructor($cacheFactory: ng.ICacheFactoryService, $rootScope: ng.IRootScopeService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
@@ -269,8 +269,6 @@ class ClientModels implements ModelsInterface {
         this.department = createService<Department>(Services.department, $cacheFactory);
         this.departmentProperty = createService<DepartmentProperty>(Services.departmentProperty, $cacheFactory);
         this.staffDepartment = createService<StaffDepartment>(Services.staffDepartment, $cacheFactory);
-        this.travelPolicy = createService<TravelPolicy>(Services.travelPolicy, $cacheFactory);
-        this.subsidyTemplate = createService<SubsidyTemplate>(Services.subsidyTemplate, $cacheFactory);
         this.accordHotel = createService<AccordHotel>(Services.accordHotel, $cacheFactory);
         this.notice = createService<Notice>(Services.notice, $cacheFactory);
         this.noticeAccount = createService<NoticeAccount>(Services.noticeAccount, $cacheFactory);
@@ -298,9 +296,11 @@ class ClientModels implements ModelsInterface {
         this.tripFuelAddPackage = createService<TripFuelAddPackage>(Services.tripFuelAddPackage, $cacheFactory);
         this.errorLog = createService<ErrorLog>(Services.errorLog, $cacheFactory);
         this.offline = createService<Offline>(Services.offline, $cacheFactory);
-        this.travelPolicyRegion = createService<TravelPolicyRegion>(Services.travelPolicyRegion, $cacheFactory);
-        this.companyRegion = createService<CompanyRegion>(Services.companyRegion, $cacheFactory);
-        this.regionPlace = createService<RegionPlace>(Services.regionPlace, $cacheFactory);
+        // this.travelPolicyRegion = createService<TravelPolicyRegion>(Services.travelPolicyRegion, $cacheFactory);
+        // this.companyRegion = createService<CompanyRegion>(Services.companyRegion, $cacheFactory);
+        // this.regionPlace = createService<RegionPlace>(Services.regionPlace, $cacheFactory);
+        // this.travelPolicy = createService<TravelPolicy>(Services.travelPolicy, $cacheFactory);
+        // this.subsidyTemplate = createService<SubsidyTemplate>(Services.subsidyTemplate, $cacheFactory);
 
         initModels(this);
 

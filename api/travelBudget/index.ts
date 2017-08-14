@@ -18,6 +18,7 @@ import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel, DefaultRegion} from 
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 export var NoCityPriceLimit = 0;
 
+
 interface SegmentsBudgetResult {
     id: string;
     cities: string[];
@@ -95,56 +96,56 @@ export default class ApiTravelBudget {
         let count = params.staffList.length;
 
         let destinationPlacesInfo = params.destinationPlacesInfo;
-        let policies = {
-            "domestic": {},
-            "abroad": {}
-        }
+        // let policies = {
+        //     "domestic": {},
+        //     "abroad": {}
+        // }
         let _staff: any = {
             gender: staff.sex,
             policy: 'domestic',
         }
         let staffs = [_staff];
         let goBackPlace = params['goBackPlace'];
-        let priceLimitSegments: any =[];
+        // let priceLimitSegments: any =[];
         let segments: any[] = await Promise.all(destinationPlacesInfo.map(async(placeInfo) => {
             var segment: any = {};
             segment.city = placeInfo.destinationPlace;
             let city: Place = (await API.place.getCityInfo({cityCode: placeInfo.destinationPlace}));
 
-            let bestTravelPolicy:any = {};
-
-            if(placeInfo.isNeedTraffic) {
-                bestTravelPolicy.trainLevels = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'trainLevels'});
-                bestTravelPolicy.planeLevels = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'planeLevels'});
-                bestTravelPolicy.trafficPrefer = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'trafficPrefer'});
-            }
-            if(placeInfo.isNeedHotel) {
-                bestTravelPolicy.hotelLevels = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'hotelLevels'});
-                bestTravelPolicy.hotelPrefer = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'hotelPrefer'});
-                let minPriceLimit = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'minPriceLimit'});
-                let maxPriceLimit = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'maxPriceLimit'});
-                priceLimitSegments.push({cityid:placeInfo.destinationPlace,maxPriceLimit:maxPriceLimit, minPriceLimit: minPriceLimit});
-            }
+            // let bestTravelPolicy:any = {};
+            //
+            // if(placeInfo.isNeedTraffic) {
+            //     bestTravelPolicy.trainLevels = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'trainLevels'});
+            //     bestTravelPolicy.planeLevels = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'planeLevels'});
+            //     bestTravelPolicy.trafficPrefer = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'trafficPrefer'});
+            // }
+            // if(placeInfo.isNeedHotel) {
+            //     bestTravelPolicy.hotelLevels = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'hotelLevels'});
+            //     bestTravelPolicy.hotelPrefer = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'hotelPrefer'});
+            //     let minPriceLimit = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'minPriceLimit'});
+            //     let maxPriceLimit = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'maxPriceLimit'});
+            //     priceLimitSegments.push({cityid:placeInfo.destinationPlace,maxPriceLimit:maxPriceLimit, minPriceLimit: minPriceLimit});
+            // }
 
             if(!bestTravelPolicy){
                 throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
             }
-            policies = {
-                "domestic": {
-                    hotelStar: bestTravelPolicy.hotelLevels,
-                    cabin: bestTravelPolicy.planeLevels,
-                    trainSeat: bestTravelPolicy.trainLevels,
-                    hotelPrefer: bestTravelPolicy.hotelPrefer,
-                    trafficPrefer: bestTravelPolicy.trafficPrefer
-                },
-                "abroad": {
-                    hotelStar: bestTravelPolicy.hotelLevels,
-                    cabin: bestTravelPolicy.planeLevels,
-                    trainSeat: bestTravelPolicy.trainLevels,
-                    hotelPrefer: bestTravelPolicy.hotelPrefer,
-                    trafficPrefer: bestTravelPolicy.trafficPrefer
-                }
-            }
+            // policies = {
+            //     "domestic": {
+            //         hotelStar: bestTravelPolicy.hotelLevels,
+            //         cabin: bestTravelPolicy.planeLevels,
+            //         trainSeat: bestTravelPolicy.trainLevels,
+            //         hotelPrefer: bestTravelPolicy.hotelPrefer,
+            //         trafficPrefer: bestTravelPolicy.trafficPrefer
+            //     },
+            //     "abroad": {
+            //         hotelStar: bestTravelPolicy.hotelLevels,
+            //         cabin: bestTravelPolicy.planeLevels,
+            //         trainSeat: bestTravelPolicy.trainLevels,
+            //         hotelPrefer: bestTravelPolicy.hotelPrefer,
+            //         trafficPrefer: bestTravelPolicy.trafficPrefer
+            //     }
+            // }
             if (city.isAbroad) {
                 let s = _.cloneDeep(_staff);
                 s.policy = 'abroad';
@@ -180,7 +181,7 @@ export default class ApiTravelBudget {
         // console.log("segments===>", segments);
 
         let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
-            policies,
+            // policies,
             staffs,
             segments,
             ret: params.isRoundTrip ? 1 : 0,
@@ -214,24 +215,7 @@ export default class ApiTravelBudget {
             let hotel = _budgets[i].hotel;
             if (hotel && hotel.length) {
                 let budget = hotel[0];
-                let maxPriceLimit = 0;
-                let minPriceLimit = 0;
 
-                let days:number = 0;
-                for(let jj = 0; jj < segments.length; jj++){
-                    if(city == segments[jj].city) {
-                        let beginTime = moment(segments[jj].beginTime).hour(12);
-                        let endTime = moment(segments[jj].endTime).hour(12);
-                        days = moment(endTime).diff(beginTime,'days');
-                    }
-                }
-                for(let jj = 0; jj < priceLimitSegments.length; jj++){
-                    if(city == priceLimitSegments[jj].cityid) {
-                        maxPriceLimit = priceLimitSegments[jj].maxPriceLimit;
-                        minPriceLimit = priceLimitSegments[jj].minPriceLimit;
-                    }
-                }
-                budget.price = limitHotelBudgetByPrefer(minPriceLimit * days,maxPriceLimit * days,budget.price);
                 let cityObj = await API.place.getCityInfo({cityCode: city});
                 budget.hotelName = placeInfo ? placeInfo.hotelName : null;
                 budget.cityName = cityObj.name;
@@ -300,7 +284,6 @@ export default class ApiTravelBudget {
             }
             return budget;
         }
-
         function limitHotelBudgetByPrefer(min: number, max:number, hotelBudget: number){
             if(hotelBudget == -1) {
                 if(max != NoCityPriceLimit) return max;
@@ -322,6 +305,8 @@ export default class ApiTravelBudget {
             }
             return hotelBudget;
         }
+
+
     }
 
     static async sendTripApproveNoticeToSystem(params: {cacheId: string, staffId: string}) {

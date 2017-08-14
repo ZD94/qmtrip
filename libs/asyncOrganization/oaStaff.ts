@@ -129,7 +129,7 @@ export  abstract class OaStaff{
             }else{
                 // 不存在，添加
                 let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd)});
-                staff.setTravelPolicy(defaultTravelPolicy);
+                staff.setTravelPolicy(defaultTravelPolicy.id);
                 staff.company = company;
                 staff.staffStatus = EStaffStatus.ON_JOB;
                 staff.addWay = EAddWay.OA_SYNC;
