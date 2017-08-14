@@ -6,7 +6,7 @@ import { ACCOUNT_STATUS } from '_types/auth';
 import { Company, ECompanyType } from '_types/company';
 import { Agency } from '_types/agency';
 import { Department, StaffDepartment } from '_types/department';
-import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion, CompanyRegion, RegionPlace } from '_types/travelPolicy';
+// import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion, CompanyRegion, RegionPlace } from '_types/travelPolicy';
 import {md5} from "common/utils";
 import {CoinAccount} from "_types/coin";
 import {EGender} from "_types";
@@ -23,11 +23,12 @@ export async function initDataForTest (params: {name: string, userName: string, 
         return null;
     }
 
-    let company = await initCompany(params);
-    let travelPolicies = await initXAJHTravelPolicy({companyId: company.id});
-    let departments = await initXAJHDepartments({companyId: company.id});
-    let staffs = await initXAJHStaffs({companyId: company.id});
-    return company;
+    // let company = await initCompany(params);
+    // let travelPolicies = await initXAJHTravelPolicy({companyId: company.id});
+    // let departments = await initXAJHDepartments({companyId: company.id});
+    // let staffs = await initXAJHStaffs({companyId: company.id});
+    // return company;
+    return null;
 }
 
 async function initCompany(params: {name: string, userName: string, mobile: string, email?: string, pwd?: string}): Promise<Company> {
@@ -64,78 +65,78 @@ async function initCompany(params: {name: string, userName: string, mobile: stri
 }
 
 
-async function initXAJHTravelPolicy(params: {companyId: string}): Promise<any[]> {
-    let companyId = params.companyId;
-    let company = await Models.company.get(companyId);
-    let tps = testData.travelPolicyes;
-
-    let companyRegion = testData.companyRegion;
-    let regionPlace = testData.regionPlace;
-
-    let abroadCR:any;
-    let domesticCR:any;
-
-    for(let i = 0; i < companyRegion.length; i++){
-        if(companyRegion[i].name == '国内') {
-            domesticCR = await CompanyRegion.create({name:companyRegion[i].name});
-            domesticCR.company = company;
-            domesticCR = await domesticCR.save();
-            let rp = await RegionPlace.create({placeId: regionPlace.domestic_place_id});
-            rp.companyRegion = domesticCR;
-            rp = await rp.save();
-        }
-        if(companyRegion[i].name == '国际') {
-            abroadCR = await CompanyRegion.create({name:companyRegion[i].name});
-            abroadCR.company = company;
-            abroadCR = await abroadCR.save();
-            let rp = await RegionPlace.create({placeId: regionPlace.abroad_place_id});
-            rp.companyRegion = abroadCR;
-            rp = await rp.save();
-        }
-    }
-
-    let travelPolicies = Promise.all(tps.map(async function(item){
-        let subsidyTemplates = item.subsidyTemplates;
-        let travelPolicy = TravelPolicy.create(item);
-        travelPolicy.company = company;
-        travelPolicy = await travelPolicy.save();
-
-        let domesticTpr = await TravelPolicyRegion.create({
-            "planeLevels": item.planeLevels,
-            "trainLevels": item.trainLevels,
-            "hotelLevels": item.hotelLevels,
-            travelPolicyId: travelPolicy.id,
-            companyRegionId: domesticCR.id,
-            trafficPrefer: -1,
-            hotelPrefer: -1,
-        });
-        await domesticTpr.save();
-
-        if(item.isOpenAbroad) {
-            let abroadTpr = await TravelPolicyRegion.create({
-                "planeLevels": item.abroadPlaneLevels,
-                "hotelLevels": item.abroadHotelLevels,
-                travelPolicyId: travelPolicy.id,
-                companyRegionId: abroadCR.id,
-                trafficPrefer: -1,
-                hotelPrefer: -1,
-            });
-            await abroadTpr.save();
-        }
-
-        if(subsidyTemplates && subsidyTemplates.length > 0){
-            for(let i = 0; i < subsidyTemplates.length; i++){
-                let st = subsidyTemplates[i];
-                let subTem = SubsidyTemplate.create(st);
-                subTem.travelPolicy = travelPolicy;
-                await subTem.save();
-            }
-        }
-        return travelPolicy;
-    }))
-
-    return travelPolicies;
-}
+// async function initXAJHTravelPolicy(params: {companyId: string}): Promise<any[]> {
+//     let companyId = params.companyId;
+//     let company = await Models.company.get(companyId);
+//     let tps = testData.travelPolicyes;
+//
+//     let companyRegion = testData.companyRegion;
+//     let regionPlace = testData.regionPlace;
+//
+//     let abroadCR:any;
+//     let domesticCR:any;
+//
+//     for(let i = 0; i < companyRegion.length; i++){
+//         if(companyRegion[i].name == '国内') {
+//             domesticCR = await CompanyRegion.create({name:companyRegion[i].name});
+//             domesticCR.company = company;
+//             domesticCR = await domesticCR.save();
+//             let rp = await RegionPlace.create({placeId: regionPlace.domestic_place_id});
+//             rp.companyRegion = domesticCR;
+//             rp = await rp.save();
+//         }
+//         if(companyRegion[i].name == '国际') {
+//             abroadCR = await CompanyRegion.create({name:companyRegion[i].name});
+//             abroadCR.company = company;
+//             abroadCR = await abroadCR.save();
+//             let rp = await RegionPlace.create({placeId: regionPlace.abroad_place_id});
+//             rp.companyRegion = abroadCR;
+//             rp = await rp.save();
+//         }
+//     }
+//
+//     let travelPolicies = Promise.all(tps.map(async function(item){
+//         let subsidyTemplates = item.subsidyTemplates;
+//         let travelPolicy = TravelPolicy.create(item);
+//         travelPolicy.company = company;
+//         travelPolicy = await travelPolicy.save();
+//
+//         let domesticTpr = await TravelPolicyRegion.create({
+//             "planeLevels": item.planeLevels,
+//             "trainLevels": item.trainLevels,
+//             "hotelLevels": item.hotelLevels,
+//             travelPolicyId: travelPolicy.id,
+//             companyRegionId: domesticCR.id,
+//             trafficPrefer: -1,
+//             hotelPrefer: -1,
+//         });
+//         await domesticTpr.save();
+//
+//         if(item.isOpenAbroad) {
+//             let abroadTpr = await TravelPolicyRegion.create({
+//                 "planeLevels": item.abroadPlaneLevels,
+//                 "hotelLevels": item.abroadHotelLevels,
+//                 travelPolicyId: travelPolicy.id,
+//                 companyRegionId: abroadCR.id,
+//                 trafficPrefer: -1,
+//                 hotelPrefer: -1,
+//             });
+//             await abroadTpr.save();
+//         }
+//
+//         if(subsidyTemplates && subsidyTemplates.length > 0){
+//             for(let i = 0; i < subsidyTemplates.length; i++){
+//                 let st = subsidyTemplates[i];
+//                 let subTem = SubsidyTemplate.create(st);
+//                 subTem.travelPolicy = travelPolicy;
+//                 await subTem.save();
+//             }
+//         }
+//         return travelPolicy;
+//     }))
+//
+//     return travelPolicies;
+// }
 
 async function initXAJHDepartments(params: {companyId: string}): Promise<any[]> {
     let companyId = params.companyId;

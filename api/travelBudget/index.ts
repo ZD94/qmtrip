@@ -4,7 +4,7 @@
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import {Models } from '_types'
 import {ETripType, EInvoiceType, ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan";
-import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel,TravelPolicyRegion, TravelPolicy} from "_types/travelPolicy";
+// import {TravelPolicyRegion, TravelPolicy} from "_types/travelPolicy";
 import {Staff} from "_types/staff";
 const API = require("@jingli/dnode-api");
 const validate = require("common/validate");
@@ -14,7 +14,7 @@ const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
 import {Place} from "_types/place";
-import {DefaultRegion} from "_types/travelPolicy"
+import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel, DefaultRegion} from "_types"
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 export var NoCityPriceLimit = 0;
 
