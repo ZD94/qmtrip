@@ -186,9 +186,16 @@ export default class DdStaff extends OaStaff {
         }*/
 
         let staffPro = await Models.staffProperty.find({where : {value: self.id, type: SPropertyType.DD_ID}});
-        console.info(staffPro.length);
         if(staffPro && staffPro.length > 0){
-            staff = await Models.staff.get(staffPro[0].staffId);
+            for(let s of staffPro){
+                let st = await Models.staff.get(s.staffId);
+                if(st){
+                    let stCorpPro = await Models.staffProperty.find({where : {value: self.corpId, type: SPropertyType.DD_COMPANY_ID, staffId: st.id}});
+                    if(stCorpPro && stCorpPro.length){
+                        staff = st;
+                    }
+                }
+            }
         }
         return staff;
     }

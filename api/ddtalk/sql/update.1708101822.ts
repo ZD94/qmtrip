@@ -30,7 +30,7 @@ module.exports =async function(DB, t) {
         let departments = rets[0];
         await Promise.all(departments.map(async (dept)=>{
             let corpId = dept.corp_id ? `'${dept.corp_id}'` : null;
-            let departmentId = dept.department_id ? `'${dept.department_id}'`: null;
+            let departmentId = dept.local_department_id ? `'${dept.local_department_id}'`: null;
             let ddDepartmentId = dept.dd_department_id ? `'${dept.dd_department_id}'`: null;
 
             let sql = `insert into department.department_properties 
