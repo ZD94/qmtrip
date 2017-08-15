@@ -97,7 +97,7 @@ export abstract class OaDepartment{
                 if(company){
                     alreadyDepartment.company = company;
                 }
-                if(parentDepartment){
+                if(parentDepartment && parentDepartment.id != alreadyDepartment.id){
                     alreadyDepartment.parent = parentDepartment;
                 }
                 alreadyDepartment.name = self.name;//同步已有部门信息
