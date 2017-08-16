@@ -233,84 +233,13 @@ export async function loginByLdap(data: {account?: string, pwd: string, companyI
     if(!data.pwd) {
         throw L.ERR.PWD_EMPTY();
     }
-    //ldap认证
-    let company = await Models.company.get(data.companyId);
-    if(!shareConnection.connectionMap[company.id]){
-        await shareConnection.initConnection({companyId: company.id});
-    }
-    let ldapApi = shareConnection.connectionMap[company.id];
 
-    let ldapProperty = await Models.companyProperty.find({where: {companyId: company.id, type: CPropertyType.LDAP}});
-    let ldapInfo = ldapProperty[0].value;
-    let ldapInfoJson = JSON.parse(ldapInfo);
-    await ldapApi.bindUser({entryDn: ldapInfoJson.ldapAdminDn, userPassword: ldapInfoJson.ldapAdminPassword});
-
-    let type = EAccountType.STAFF;
-    let account = data.account;
-
-    let accounts = await Models.account.find({
-        where:{
-            type: type,
-            $or: [
-                {email: account},
-                {mobile: account}
-            ],
-        },
-        limit: 1,
-    });
-    if(accounts.total == 0) {
-        throw L.ERR.ACCOUNT_NOT_EXIST()
-    }
-    let loginAccount = accounts[0];
-
-    let staffs = await Models.staff.find({where: {accountId: loginAccount.id, staffStatus: EStaffStatus.ON_JOB}});
-    if(staffs.total == 0) {
-        throw L.ERR.ACCOUNT_NOT_EXIST();
-    }
-    let loginStaff: Staff;
-    staffs.map((item) => {
-        if(item.company.id == company.id){
-            loginStaff = item;
-        }
-    });
-
-    let staffProperty = await Models.staffProperty.find({where: {staffId: loginStaff.id, type: SPropertyType.LDAP_DN}});
-    if(staffProperty.total == 0) {
-        throw L.ERR.INVALID_ARGUMENT("ldap相关设置");
+    if(!data.companyId) {
+        throw L.ERR.DATA_NOT_EXIST();
     }
 
-    let entryDn = staffProperty[0].value;
-    let bindResult = await ldapApi.bindUser({entryDn: entryDn, userPassword: data.pwd});
-    if(!bindResult){
-        throw L.ERR.ACCOUNT_FORBIDDEN();
-    }
-    let result = await ldapApi.searchDn({rootDn: entryDn, opts: {attributes: staffOpts.attributes}});
-
-    if(!result){
-        throw L.ERR.ACCOUNT_NOT_EXIST();
-    }
-
-    let departments = await loginStaff.getDepartments();
-    await Promise.all(departments.map(async (item) => {
-        await syncData.syncOrganization({company: company, department: item});
-    }));
-
-    var ret = await makeAuthenticateToken(loginAccount.id);
-    if (loginAccount.isNeedChangePwd) {
-        ret['is_need_change_pwd'] = true;
-    }
-    //判断是否首次登录
-    if(loginAccount.isFirstLogin) {
-        loginAccount.isFirstLogin = false;
-        return loginAccount.save()
-            .then(function() {
-                ret['is_first_login'] = true;
-                return ret;
-            })
-    }
-
-    ret['is_first_login'] = false;
-    return ret;
+    let result = await API.ldap.loginByLdapUser(data);
+    return result;
 
 }
 
