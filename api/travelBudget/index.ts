@@ -96,10 +96,10 @@ export default class ApiTravelBudget {
         let count = params.staffList.length;
 
         let destinationPlacesInfo = params.destinationPlacesInfo;
-        // let policies = {
-        //     "domestic": {},
-        //     "abroad": {}
-        // }
+        let policies = {
+            "domestic": {},
+            "abroad": {}
+        }
         let _staff: any = {
             gender: staff.sex,
             policy: 'domestic',
@@ -127,9 +127,9 @@ export default class ApiTravelBudget {
             //     priceLimitSegments.push({cityid:placeInfo.destinationPlace,maxPriceLimit:maxPriceLimit, minPriceLimit: minPriceLimit});
             // }
 
-            if(!bestTravelPolicy){
-                throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
-            }
+            // if(!bestTravelPolicy){
+            //     throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
+            // }
             // policies = {
             //     "domestic": {
             //         hotelStar: bestTravelPolicy.hotelLevels,
@@ -182,6 +182,7 @@ export default class ApiTravelBudget {
 
         let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
             // policies,
+            travelPolicyId: travelPolicy['id'],
             staffs,
             segments,
             ret: params.isRoundTrip ? 1 : 0,

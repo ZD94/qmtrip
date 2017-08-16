@@ -267,7 +267,7 @@ export default class TravelPolicyModule{
      */
     @clientExport
     // @requireParams(["id"])
-    static async deleteTravelPolicyRegion(params: {id: string}) : Promise<any>{
+    static async deleteTravelPolicyRegion(params: {id: string}) : Promise<boolean>{
         var staff = await Staff.getCurrent();
         var id = params.id;
         var tpr_delete = await API.policy.getTravelPolicyRegion(id);
@@ -308,7 +308,7 @@ export default class TravelPolicyModule{
     //     {if: condition.isTravelPolicyCompany("0.id")},
     //     {if: condition.isTravelPolicyAgency("0.id")}
     // ])
-    static async getTravelPolicy(params: {id: string}) : Promise<any>{
+    static async getTravelPolicy(params: {id: string}) : Promise<ITravelPolicy>{
 
         let id = params.id;
         // var tp = await API.policy.getTravelPolicy({id: id});
@@ -319,7 +319,7 @@ export default class TravelPolicyModule{
                 method: "getTravelPolicy"
             }
         });
-        return travelPolicy;
+        return new ITravelPolicy(travelPolicy);
     };
 
     /**
@@ -382,7 +382,7 @@ export default class TravelPolicyModule{
     //     {if: condition.isCompanyAgency("0.where.companyId")}
     // ])
     @clientExport
-    static async getTravelPolicies(params: {companyId: string}): Promise<any>{
+    static async getTravelPolicies(params: {companyId: string}): Promise<FindResult>{
         let {companyId } = params;
         var staff = await Staff.getCurrent();
 
@@ -404,7 +404,6 @@ export default class TravelPolicyModule{
                 method: "getTravelPolicies"
             }
         });
-
         // let travelPolicies = await TravelPolicyModule.operateOnPolicy({url: 'http://localhost:8080/policy/info'});
         console.log("=======>travelPolicies: ", travelPolicies);
         return travelPolicies;
@@ -602,6 +601,7 @@ export default class TravelPolicyModule{
                 method: "getSubsidyTemplates"
             }
         });
+        console.log("====>subsidies: ", subsidies);
         return subsidies;
     }
 
