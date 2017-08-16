@@ -438,7 +438,7 @@ class TripApproveModule {
                 if(isConfigured){
                     expectedApproveTime = moment(submitAt).add(day, 'days').hour(hour).minute(0).toDate();
                 } else {
-                    expectedApproveTime = moment(submitAt).add(day, 'days').add(defaultDelay, 'hours').minute(0).toDate();
+                    expectedApproveTime = moment(submitAt).add(day, 'days').add(defaultDelay, 'hours').toDate();
                 }
                 interval = moment(tripStartAt).diff(expectedApproveTime, 'hours');
                 if(interval > 0 ) {
@@ -452,7 +452,7 @@ class TripApproveModule {
                 if(isConfigured){
                     expectedApproveTime = moment(tripStartAt).subtract(day, 'days').hour(hour).minute(0).toDate();
                 } else {
-                    expectedApproveTime = moment(tripStartAt).subtract(day, 'days').add(defaultDelay, 'hours').minute(0).toDate();
+                    expectedApproveTime = moment(tripStartAt).subtract(day, 'days').add(defaultDelay, 'hours').toDate();
                 }
                 interval = moment(expectedApproveTime).diff(submitAt, 'hours');
                 if(interval > 0){
