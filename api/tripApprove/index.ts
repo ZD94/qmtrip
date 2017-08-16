@@ -417,37 +417,52 @@ class TripApproveModule {
         submitAt:Date,
         tripStartAt:Date
     }):Promise<Date> {
-            let {type, config, submitAt, tripStartAt} = params;
-            config = <AutoApproveConfig>config;
-            let autoApproveDateTime: Date;
-            let expectedApproveTime: Date;
-            let interval = 0;
-            let day = config.day ? config.day : 1;
-            let hour = config.hour ? config.hour :12;
-            let defaultDelay = config.defaultDelay ? config.defaultDelay : 1;
-
-            switch(type) {
-                case AutoApproveType.AfterSubmit:  // 审批提交时间
+        let {type, config, submitAt, tripStartAt} = params;
+        config = <AutoApproveConfig>config;
+        let autoApproveDateTime: Date;
+        let expectedApproveTime: Date;
+        let interval = 0;
+        let day = config.day ? config.day : 0;
+        let hour = config.hour;
+        let defaultDelay:number = config.defaultDelay;
+        if(!config.defaultDelay && config.defaultDelay != 0){
+            defaultDelay = 1;
+        }
+        let isConfigured: boolean = true;
+        //config.hour为null的情况
+        if(!config.hour && config.hour != 0){
+            isConfigured = false;
+        }
+        switch(type) {
+            case AutoApproveType.AfterSubmit:  // 审批提交时间
+                if(isConfigured){
                     expectedApproveTime = moment(submitAt).add(day, 'days').hour(hour).minute(0).toDate();
-                    interval = moment(tripStartAt).diff(expectedApproveTime, 'hours');
-                    if(interval > 0 ) {
-                        autoApproveDateTime = expectedApproveTime;
-                    } else {
-                        autoApproveDateTime = moment(submitAt).add(defaultDelay, 'hours').toDate();
-                    }
+                } else {
+                    expectedApproveTime = moment(submitAt).add(day, 'days').add(defaultDelay, 'hours').toDate();
+                }
+                interval = moment(tripStartAt).diff(expectedApproveTime, 'hours');
+                if(interval > 0 ) {
+                    autoApproveDateTime = expectedApproveTime;
+                } else {
+                    autoApproveDateTime = moment(submitAt).add(1, 'hours').toDate();
+                }
 
-                    break;
-                default:           //出行时间
+                break;
+            default:           //出行时间
+                if(isConfigured){
                     expectedApproveTime = moment(tripStartAt).subtract(day, 'days').hour(hour).minute(0).toDate();
-                    interval = moment(expectedApproveTime).diff(submitAt, 'hours');
-                    if(interval > 0){
-                        autoApproveDateTime = expectedApproveTime;
-                    } else {
-                        autoApproveDateTime = moment(submitAt).add(defaultDelay, 'hours').toDate();
-                    }
-                    break;
-            }
-            return autoApproveDateTime;
+                } else {
+                    expectedApproveTime = moment(tripStartAt).subtract(day, 'days').add(defaultDelay, 'hours').toDate();
+                }
+                interval = moment(expectedApproveTime).diff(submitAt, 'hours');
+                if(interval > 0){
+                    autoApproveDateTime = expectedApproveTime;
+                } else {
+                    autoApproveDateTime = moment(submitAt).add(1, 'hours').toDate();
+                }
+                break;
+        }
+        return autoApproveDateTime;
     }
 
     @clientExport
