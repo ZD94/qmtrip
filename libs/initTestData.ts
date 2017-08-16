@@ -16,6 +16,7 @@ const _ = require("lodash");
 const Models = require("_types").Models;
 let moment = require('moment');
 let testData = require('./test-data.json');
+var API = require("@jingli/dnode-api");
 
 export async function initDataForTest (params: {name: string, userName: string, mobile: string, email?: string, pwd?: string}){
     let co = await Models.company.find({where: {name: '笑傲江湖'}});
@@ -28,7 +29,6 @@ export async function initDataForTest (params: {name: string, userName: string, 
     let departments = await initXAJHDepartments({companyId: company.id});
     let staffs = await initXAJHStaffs({companyId: company.id});
     return company;
-    return null;
 }
 
 async function initCompany(params: {name: string, userName: string, mobile: string, email?: string, pwd?: string}): Promise<Company> {
