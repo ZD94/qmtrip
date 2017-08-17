@@ -750,12 +750,21 @@ export default class TravelPolicyModule{
         let {url, params} = options;
         console.log("=====> params: ", params);
         console.log("=====> url: ", url);
-        let result = await request({
-            uri: url,
-            body: params,  //JSON.stringify(params);
-            json:true,
-            method: "post"
-        });
+        // let result = await request({
+        //     uri: url,
+        //     body: params,  //JSON.stringify(params);
+        //     json:true,
+        //     method: "post"
+        // });
+        url = `http://localhost:8080/api/v1/travelPolicy/213412id`;
+        // url = `http://localhost:8080/api/v1/policy`;
+        console.log("=====> url", url);
+        let result = await request.get({uri: url});
+
+        // let result = await request({
+        //     uri: url,
+        // });
+        console.log("===> result: ", result);
         return result;
     }
 }
