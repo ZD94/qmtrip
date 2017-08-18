@@ -2,6 +2,7 @@
  * Created by wangyali on 2017/7/6.
  */
 import {Department} from "_types/department";
+import {EStaffStatus} from "_types/staff";
 import {Company} from "_types/company";
 import {Models} from "_types/index";
 import L from '@jingli/language';
@@ -132,10 +133,13 @@ export abstract class OaDepartment{
                 let staffProperty = await item.getOaStaffIdProperty();
                 let oaSt = oaStaffsMap[staffProperty.value];
                 if(!oaSt){
-                    await item.deleteStaffProperty();
-
                     try{
-                        await item.destroy();
+                        await item.deleteStaffProperty();
+
+                        item.staffStatus = EStaffStatus.QUIT_JOB;
+                        await item.save();
+
+                        await item.deleteStaffDepartments();
                     }catch (e){
                         console.info("删除员工失败", e);
                     }
