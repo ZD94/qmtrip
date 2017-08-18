@@ -45,17 +45,17 @@ export interface ITravelPolicyRegionParams {
 
 export default class TravelPolicyModule{
 
-    async getBestTravelPolicy(params:{travelPolicyId: string, placeId: string, type: string}): Promise<any>{
-        let {placeId,type, travelPolicyId} = params;
-        let policy = await TravelPolicyModule.operateOnPolicy({
-            url: BASE_URL,
-            params: {
-                fileds:params,
-                method: "getBestTravelPolicy",
-            },
-        });
-        return policy;
-    }
+    // async getBestTravelPolicy(params:{travelPolicyId: string, placeId: string, type: string}): Promise<any>{
+    //     let {placeId,type, travelPolicyId} = params;
+    //     let policy = await TravelPolicyModule.operateOnPolicy({
+    //         url: BASE_URL,
+    //         params: {
+    //             fileds:params
+    //         },
+    //         method:''
+    //     });
+    //     return policy;
+    // }
 
 
     @clientExport
@@ -71,6 +71,7 @@ export default class TravelPolicyModule{
                 fileds:params,
                 method: "getTravelPolicies",
             },
+            method: 'get'
         });
         if(defaultTp && typeof(defaultTp) == 'string') {
             defaultTp =JSON.parse(defaultTp);
@@ -747,24 +748,17 @@ export default class TravelPolicyModule{
         params?:any,
     }) {
 
-        let {url, params} = options;
+        let {url, params,method} = options;
         console.log("=====> params: ", params);
         console.log("=====> url: ", url);
-        // let result = await request({
-        //     uri: url,
-        //     body: params,  //JSON.stringify(params);
-        //     json:true,
-        //     method: "post"
-        // });
-        url = `http://localhost:8080/api/v1/travelPolicy/213412id`;
-        // url = `http://localhost:8080/api/v1/policy`;
-        console.log("=====> url", url);
-        let result = await request.get({uri: url});
+        let result = await request({
+            uri: url,
+            body: params,  //JSON.stringify(params);
+            json:true,
+            method: method
+        });
 
-        // let result = await request({
-        //     uri: url,
-        // });
-        console.log("===> result: ", result);
+        url = `http://localhost:8080/api/v1/travelPolicy/a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11`;
         return result;
     }
 }
@@ -776,3 +770,22 @@ function tryConvertToArray(val) {
     return val;
 }
 
+// url = `http://localhost:8080/api/v1/travelPolicy/213412id`;
+// url = `http://localhost:8080/api/v1/policy`;
+// let result = await request.get({uri: url});
+// params = {
+// 	name: "jack",
+// 	id: '12342341'
+// }
+
+// let result = await request({
+//           uri: url,
+//           body:  params, //JSON.stringify(params);
+//           json:true,
+//           method: "post"
+//       });
+
+// let result = await request({
+//     uri: url,
+// });
+// console.log("===> result: ", result);
