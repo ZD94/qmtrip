@@ -1829,7 +1829,25 @@ class TripPlanModule {
             tripApproves.map(async (approve) => {
 
                 let approveCompany = await approve.getCompany();
-                let content = approve.deptCity+"-"+approve.arrivalCity;
+                let query = approve.query;
+                let content = "";
+                let destinationPlacesInfo = query.destinationPlacesInfo;
+
+                if(query && query.originPlace){
+                    let originCity = await API.place.getCityInfo({cityCode: query.originPlace});
+                    content = content + originCity.name + "-";
+                }
+                if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
+                    for(let i = 0; i < destinationPlacesInfo.length; i++){
+                        let segment: ISegment = destinationPlacesInfo[i]
+                        let destinationCity = await API.place.getCityInfo({cityCode: segment.destinationPlace});
+                        if(i<destinationPlacesInfo.length-1){
+                            content = content + destinationCity.name+"-";
+                        }else{
+                            content = content + destinationCity.name;
+                        }
+                    }
+                }
                 let frozenNum = approve.query.frozenNum;
 
                 
