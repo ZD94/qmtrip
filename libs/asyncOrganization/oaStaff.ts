@@ -8,6 +8,7 @@ import {Company, CPropertyType} from "_types/company";
 import {Department} from "_types/department";
 import L from '@jingli/language';
 import utils = require("common/utils");
+import cache from "common/cache";
 
 const DEFAULT_PWD = '000000';
 export  abstract class OaStaff{
@@ -69,94 +70,107 @@ export  abstract class OaStaff{
 
     async sync(params?:{company: Company}): Promise<Staff>{
         let self = this;
-        let company = self.company;
-        if(params){
-            company = params.company;
-        }
-        if(!company){
-            company = await self.getCompany();
-        }
-        let type = await company.getOaType();
-        /*if(!company){
-            let staff = await Staff.getCurrent();
-            company = staff.company;
-        }*/
-        if(!company){
-            throw L.ERR.INVALID_ACCESS_ERR();
-        }
-
-        let defaultDepartment = await company.getDefaultDepartment();
-        let defaultTravelPolicy = await company.getDefaultTravelPolicy();
-
-        let companyCreateUser = await Models.staff.get(company.createUser);
-
+        let company = self.company || params.company;
+        let execute = true;
         let returnStaff: Staff;
-        let newDepartments: Department[] = [];
 
-        // 处理部门
-        let oaDepartments = await self.getDepartments();
-
-        if(!oaDepartments || !oaDepartments.length){
-            newDepartments.push(defaultDepartment)
-        }else{
-            let oaDepartmentIds = await Promise.all(oaDepartments.map(async (item) => {
-                let department = await item.getDepartment();
-                if(!department){
-                    console.log("OA部门在我们系统内不存在！！！！！！！！！！！！！！");
-                    // let dept = await item.sync({company: company});//此处需要验证
-                    // newDepartments.push(dept);
-                }else{
-                    newDepartments.push(department);
-                }
-            }));
+        let staffKey = "tmp_staff_code:" + self.id + "_" + company.id;
+        let isExist = await cache.read(staffKey);
+        if (isExist) {
+            console.log("on sync ing==========?");
+            execute = false;
         }
+        //暂时缓存，防止重复触发
+        await cache.write(staffKey, true, 5 * 1);
 
-        if(!(newDepartments && newDepartments.length)){
-            console.log("没有部门放在跟部门下");
-            newDepartments.push(defaultDepartment);
-        }
-        let alreadyStaff: Staff = await self.getStaff();
-        let pwd = self.userPassword || DEFAULT_PWD;
-        let roleId = EStaffRole.COMMON;
-        if(self.isAdmin) roleId = EStaffRole.ADMIN;
-        if(!alreadyStaff){
+        if(execute){
+            if(params){
+                company = params.company;
+            }
+            if(!company){
+                company = await self.getCompany();
+            }
+            let type = await company.getOaType();
+            /*if(!company){
+                let staff = await Staff.getCurrent();
+                company = staff.company;
+            }*/
+            if(!company){
+                throw L.ERR.INVALID_ACCESS_ERR();
+            }
 
-            if(type == CPropertyType.LDAP && companyCreateUser.mobile == self.mobile){
+            let defaultDepartment = await company.getDefaultDepartment();
+            let defaultTravelPolicy = await company.getDefaultTravelPolicy();
 
-                alreadyStaff = companyCreateUser;
-                await self.saveStaffProperty({staffId: alreadyStaff.id});
+            let companyCreateUser = await Models.staff.get(company.createUser);
 
+            let newDepartments: Department[] = [];
+
+            // 处理部门
+            let oaDepartments = await self.getDepartments();
+
+            if(!oaDepartments || !oaDepartments.length){
+                newDepartments.push(defaultDepartment)
             }else{
-                // 不存在，添加
-                let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd)});
-                staff.setTravelPolicy(defaultTravelPolicy);
-                staff.company = company;
-                staff.staffStatus = EStaffStatus.ON_JOB;
-                staff.addWay = EAddWay.OA_SYNC;
-                staff = await staff.save();
-                await self.saveStaffProperty({staffId: staff.id});
+                let oaDepartmentIds = await Promise.all(oaDepartments.map(async (item) => {
+                    let department = await item.getDepartment();
+                    if(!department){
+                        let dept = await item.sync({company: company, from: "addStaff"});//此处需要验证
+                        newDepartments.push(dept);
+                    }else{
+                        newDepartments.push(department);
+                    }
+                }));
+            }
+
+            if(!(newDepartments && newDepartments.length)){
+                console.log("没有部门放在跟部门下");
+                newDepartments.push(defaultDepartment);
+            }
+            let alreadyStaff: Staff = await self.getStaff();
+            let pwd = self.userPassword || DEFAULT_PWD;
+            let roleId = EStaffRole.COMMON;
+            if(self.isAdmin) roleId = EStaffRole.ADMIN;
+            if(!alreadyStaff){
+
+                if(type == CPropertyType.LDAP && companyCreateUser.mobile == self.mobile){
+
+                    alreadyStaff = companyCreateUser;
+                    await self.saveStaffProperty({staffId: alreadyStaff.id});
+
+                }else{
+                    // 不存在，添加
+                    let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd)});
+                    staff.setTravelPolicy(defaultTravelPolicy);
+                    staff.company = company;
+                    staff.staffStatus = EStaffStatus.ON_JOB;
+                    staff.addWay = EAddWay.OA_SYNC;
+                    staff = await staff.save();
+                    await self.saveStaffProperty({staffId: staff.id});
+
+                    // 处理部门
+                    await staff.addDepartment(newDepartments);
+                    returnStaff = staff;
+                }
+            }
+
+            if(alreadyStaff && alreadyStaff.id){
+                alreadyStaff.name = self.name;
+                // alreadyStaff.sex = self.sex;//类型有问题
+                alreadyStaff.mobile = self.mobile;
+                alreadyStaff.email = self.email;
+                alreadyStaff.pwd = utils.md5(pwd);
+                // alreadyStaff.roleId = roleId;//ldap此处更新权限有问题 创建者被更新为了普通员工
+                alreadyStaff.staffStatus = EStaffStatus.ON_JOB;
+                alreadyStaff.addWay = EAddWay.OA_SYNC;
+                await alreadyStaff.save();
 
                 // 处理部门
-                await staff.addDepartment(newDepartments);
-                returnStaff = staff;
+                await alreadyStaff.updateStaffDepartment(newDepartments);
+                returnStaff = alreadyStaff;
             }
         }
 
-        if(alreadyStaff && alreadyStaff.id){
-            alreadyStaff.name = self.name;
-            // alreadyStaff.sex = self.sex;//类型有问题
-            alreadyStaff.mobile = self.mobile;
-            alreadyStaff.email = self.email;
-            alreadyStaff.pwd = utils.md5(pwd);
-            // alreadyStaff.roleId = roleId;//ldap此处更新权限有问题 创建者被更新为了普通员工
-            alreadyStaff.staffStatus = EStaffStatus.ON_JOB;
-            alreadyStaff.addWay = EAddWay.OA_SYNC;
-            await alreadyStaff.save();
-
-            // 处理部门
-            await alreadyStaff.updateStaffDepartment(newDepartments);
-            returnStaff = alreadyStaff;
-        }
 
         return returnStaff;
     }
