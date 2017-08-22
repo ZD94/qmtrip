@@ -68,8 +68,9 @@ export  abstract class OaStaff{
         return true;
     }
 
-    async sync(params?:{company: Company}): Promise<Staff>{
+    async sync(params?:{company: Company, from?: string}): Promise<Staff>{
         let self = this;
+        let from  = params.from;
         let company = self.company || params.company;
         let execute = true;
         let returnStaff: Staff;
@@ -81,9 +82,9 @@ export  abstract class OaStaff{
             execute = false;
         }
         //暂时缓存，防止重复触发
-        await cache.write(staffKey, true, 5 * 1);
+        await cache.write(staffKey, true, 10 * 1);
 
-        if(execute){
+        if(execute && (!from || from != "createUser")){
             if(params){
                 company = params.company;
             }
