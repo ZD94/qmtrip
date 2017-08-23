@@ -145,6 +145,8 @@ export abstract class OaDepartment{
                         }catch (e){
                             console.info("删除员工失败", e);
                         }
+                    }else{
+                        oaStaffsMap[staffProperty.value] = null;
                     }
                 }));
 
@@ -169,6 +171,8 @@ export abstract class OaDepartment{
                         }catch(e) {
                             console.info("删除部门失败",e);
                         }
+                    }else{
+                        childrenDepartmentsMap[deptProperty.value] = null;
                     }
                 }));
 
