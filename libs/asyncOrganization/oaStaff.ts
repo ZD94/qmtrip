@@ -62,6 +62,9 @@ export  abstract class OaStaff{
             staff.staffStatus = EStaffStatus.QUIT_JOB;
             await staff.save();
 
+            let deleteAccount = await Models.account.get(staff.accountId);
+            await deleteAccount.destroy();
+
             await staff.deleteStaffDepartments();
         }
 
