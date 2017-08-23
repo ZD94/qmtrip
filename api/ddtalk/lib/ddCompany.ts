@@ -83,7 +83,7 @@ export default class DdCompany extends OaCompany {
         let authUserInfo = authInfo.auth_user_info;
         let userInfo: any = await self.corpApi.getUser(authUserInfo.userId);
         let oaStaff = new DdStaff({id: userInfo.userid, isAdmin: userInfo.isAdmin, name: userInfo.name, mobile: userInfo.mobile, email: userInfo.email,
-            departmentIds: userInfo.department, corpId: self.id, isvApi: self.isvApi, corpApi: self.corpApi});
+            departmentIds: userInfo.department, corpId: self.id, isvApi: self.isvApi, corpApi: self.corpApi, avatar: userInfo.avatar});
         return oaStaff;
     }
 

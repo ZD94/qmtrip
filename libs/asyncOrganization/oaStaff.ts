@@ -32,6 +32,9 @@ export  abstract class OaStaff{
     abstract get sex();
     abstract set sex(val: string);
 
+    abstract get avatar();
+    abstract set avatar(val: string);
+
     abstract get isAdmin();
     abstract set isAdmin(val: boolean);
 
@@ -141,7 +144,7 @@ export  abstract class OaStaff{
 
                 }else{
                     // 不存在，添加
-                    let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd)});
+                    let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd), avatar: self.avatar});
                     staff.setTravelPolicy(defaultTravelPolicy);
                     staff.company = company;
                     staff.staffStatus = EStaffStatus.ON_JOB;
@@ -161,6 +164,7 @@ export  abstract class OaStaff{
                 alreadyStaff.mobile = self.mobile;
                 alreadyStaff.email = self.email;
                 alreadyStaff.pwd = utils.md5(pwd);
+                if(self.avatar) alreadyStaff.avatar = self.avatar;
                 // alreadyStaff.roleId = roleId;//ldap此处更新权限有问题 创建者被更新为了普通员工
                 alreadyStaff.staffStatus = EStaffStatus.ON_JOB;
                 alreadyStaff.addWay = EAddWay.OA_SYNC;
