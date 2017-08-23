@@ -74,7 +74,7 @@ export abstract class OaCompany{
         let createUser = await self.getCreateUser();
         let createStaff: Staff;
         if(createUser){
-            createStaff = await createUser.sync({company: result});
+            createStaff = await createUser.sync({company: result, from: "createUser"});
         }
         if(createStaff){
             result.createUser = createStaff.id;

@@ -33,6 +33,9 @@ export  abstract class OaStaff{
     abstract get sex();
     abstract set sex(val: string);
 
+    abstract get avatar();
+    abstract set avatar(val: string);
+
     abstract get isAdmin();
     abstract set isAdmin(val: boolean);
 
@@ -72,8 +75,9 @@ export  abstract class OaStaff{
         return true;
     }
 
-    async sync(params?:{company: Company}): Promise<Staff>{
+    async sync(params?:{company: Company, from?: string}): Promise<Staff>{
         let self = this;
+        let from  = params.from;
         let company = self.company || params.company;
         let execute = true;
         let returnStaff: Staff;
@@ -85,9 +89,9 @@ export  abstract class OaStaff{
             execute = false;
         }
         //暂时缓存，防止重复触发
-        await cache.write(staffKey, true, 5 * 1);
+        await cache.write(staffKey, true, 10 * 1);
 
-        if(execute){
+        if(execute && (!from || from != "createUser")){
             if(params){
                 company = params.company;
             }
@@ -144,7 +148,7 @@ export  abstract class OaStaff{
 
                 }else{
                     // 不存在，添加
-                    let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd)});
+                    let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd), avatar: self.avatar});
                     staff.setTravelPolicy(defaultTravelPolicy);
                     staff.company = company;
                     staff.staffStatus = EStaffStatus.ON_JOB;
@@ -165,6 +169,7 @@ export  abstract class OaStaff{
                 alreadyStaff.mobile = self.mobile;
                 alreadyStaff.email = self.email;
                 alreadyStaff.pwd = utils.md5(pwd);
+                if(self.avatar) alreadyStaff.avatar = self.avatar;
                 // alreadyStaff.roleId = roleId;//ldap此处更新权限有问题 创建者被更新为了普通员工
                 alreadyStaff.staffStatus = EStaffStatus.ON_JOB;
                 alreadyStaff.addWay = EAddWay.OA_SYNC;

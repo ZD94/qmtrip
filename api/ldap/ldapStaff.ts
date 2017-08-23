@@ -79,6 +79,13 @@ export default class LdapStaff extends OaStaff {
         this.target.company = val;
     }
 
+    get avatar() {
+        return this.target.avatar;
+    }
+
+    set avatar(val: string) {
+        this.target.avatar = val;
+    }
     //Ldap特有属性
     get dn() {
         return this.target.dn;
