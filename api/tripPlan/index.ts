@@ -33,6 +33,7 @@ import {ENoticeType} from "_types/notice/notice";
 import TripApproveModule = require("../tripApprove/index");
 import {MPlaneLevel, MTrainLevel} from "_types/travelPolicy";
 import {ISegment, ICreateBudgetAndApproveParams} from '_types/tripPlan'
+import {EApproveStatus} from "../../_types/approve/types";
 const projectCols = Project['$fieldnames'];
 
 interface ReportInvoice {
@@ -1878,11 +1879,18 @@ class TripPlanModule {
                     if(approve.approveUser && approve.approveUser.id && /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(approve.approveUser.id)) {
                         let log = Models.tripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser.id, approveStatus: EApproveResult.AUTO_APPROVE, remark: '自动通过'});
                         await log.save();
+
                     }
                     await TripPlanModule.saveTripPlanByApprove({tripApproveId: approve.id});
 
+
                     approve.status = QMEApproveStatus.PASS;
                     approve = await approve.save();
+
+                    let _approve = await Models.approve.get(approve.id);
+                    _approve.status = EApproveStatus.SUCCESS;
+                    await _approve.save();
+
                 }catch(e){
                     logger.error(e.stack);
                     if(!approve.autoApproveNum){
