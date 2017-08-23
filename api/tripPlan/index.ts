@@ -34,6 +34,7 @@ import TripApproveModule = require("../tripApprove/index");
 import {MPlaneLevel, MTrainLevel} from "_types/travelPolicy";
 import {ISegment, ICreateBudgetAndApproveParams} from '_types/tripPlan'
 import {EApproveStatus} from "../../_types/approve/types";
+import {plugins} from "../../libs/oa/index";
 const projectCols = Project['$fieldnames'];
 
 interface ReportInvoice {
@@ -1903,15 +1904,24 @@ class TripPlanModule {
                         await log.save();
 
                     }
-                    await TripPlanModule.saveTripPlanByApprove({tripApproveId: approve.id});
+                    // await TripPlanModule.saveTripPlanByApprove({tripApproveId: approve.id});
 
 
                     approve.status = QMEApproveStatus.PASS;
                     approve = await approve.save();
 
-                    let _approve = await Models.approve.get(approve.id);
-                    _approve.status = EApproveStatus.SUCCESS;
-                    await _approve.save();
+                    plugins.qm.tripApproveUpdateNotify(null, {
+                        id: approve.id,
+                        status: EApproveStatus.SUCCESS,
+                        approveUser: approve.approveUser.id,
+                        outerId: approve.id,
+                        data: approve.budgetInfo,
+                        oa: 'qm'
+                    });
+
+                    // let _approve = await Models.approve.get(approve.id);
+                    // _approve.status = EApproveStatus.SUCCESS;
+                    // await _approve.save();
 
                 }catch(e){
                     logger.error(e.stack);
