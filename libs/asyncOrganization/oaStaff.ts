@@ -75,10 +75,14 @@ export  abstract class OaStaff{
         return true;
     }
 
-    async sync(params?:{company: Company, from?: string}): Promise<Staff>{
+    async sync(params?:{company?: Company, from?: string}): Promise<Staff>{
+        if(!params) params = {};
         let self = this;
         let from  = params.from;
-        let company = self.company || params.company;
+        let company = self.company;
+        if(params.company){
+            company = params.company;
+        }
         let execute = true;
         let returnStaff: Staff;
 
