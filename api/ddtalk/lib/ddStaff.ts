@@ -81,6 +81,14 @@ export default class DdStaff extends OaStaff {
         this.target.isAdmin = val;
     }
 
+    get avatar() {
+        return this.target.avatar;
+    }
+
+    set avatar(val: string) {
+        this.target.avatar = val;
+    }
+
     //钉钉特有属性
     get departmentIds() {
         return this.target.departmentIds;
@@ -96,14 +104,6 @@ export default class DdStaff extends OaStaff {
 
     set corpId(val: string) {
         this.target.corpId = val;
-    }
-
-    get avatar() {
-        return this.target.avatar;
-    }
-
-    set avatar(val: string) {
-        this.target.avatar = val;
     }
 
     get unionid() {
@@ -141,7 +141,7 @@ export default class DdStaff extends OaStaff {
         let userInfo: any = await self.corpApi.getUser(self.id);
         let oaStaff = new DdStaff({id: userInfo.userid, name: userInfo.name, mobile: userInfo.mobile,
             email: userInfo.email, departmentIds: userInfo.department, corpId: self.corpId, company: self.company,
-            isvApi: self.isvApi, corpApi: self.corpApi, isAdmin: self.isAdmin});
+            isvApi: self.isvApi, corpApi: self.corpApi, isAdmin: self.isAdmin, avatar: userInfo.avatar});
         return oaStaff;
     }
 
