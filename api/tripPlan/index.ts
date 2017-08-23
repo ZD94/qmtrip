@@ -489,6 +489,10 @@ class TripPlanModule {
             templateName = 'qm_notify_invoice_all_pass';          
         }else{
             templateName = 'qm_notify_invoice_not_pass';
+            /**
+             * *tripPlan为待传票据时已将票据设为已读,票据驳回时设为未读
+             * **/
+            tripPlan.readNumber = 0;
         }
 
         //处理对应的tripDetail 的状态
