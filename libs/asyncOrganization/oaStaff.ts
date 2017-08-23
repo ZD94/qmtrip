@@ -5,6 +5,7 @@ import {OaDepartment} from "./OaDepartment";
 import {Models} from "_types/index";
 import {Staff, EStaffRole, EStaffStatus, EAddWay} from "_types/staff";
 import {Company, CPropertyType} from "_types/company";
+import {ACCOUNT_STATUS} from "_types/auth";
 import {Department} from "_types/department";
 import L from '@jingli/language';
 import utils = require("common/utils");
@@ -64,6 +65,9 @@ export  abstract class OaStaff{
 
             staff.staffStatus = EStaffStatus.QUIT_JOB;
             await staff.save();
+
+            let deleteAccount = await Models.account.get(staff.accountId);
+            await deleteAccount.destroy();
 
             await staff.deleteStaffDepartments();
         }
@@ -153,6 +157,7 @@ export  abstract class OaStaff{
                     staff.company = company;
                     staff.staffStatus = EStaffStatus.ON_JOB;
                     staff.addWay = EAddWay.OA_SYNC;
+                    staff.status = ACCOUNT_STATUS.ACTIVE;
                     staff = await staff.save();
                     await self.saveStaffProperty({staffId: staff.id});
 
@@ -172,6 +177,7 @@ export  abstract class OaStaff{
                 // alreadyStaff.roleId = roleId;//ldap此处更新权限有问题 创建者被更新为了普通员工
                 alreadyStaff.staffStatus = EStaffStatus.ON_JOB;
                 alreadyStaff.addWay = EAddWay.OA_SYNC;
+                alreadyStaff.status = ACCOUNT_STATUS.ACTIVE;
                 await alreadyStaff.save();
 
                 // 处理部门
