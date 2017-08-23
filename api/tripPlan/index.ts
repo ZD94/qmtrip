@@ -1910,12 +1910,12 @@ class TripPlanModule {
                     approve.status = QMEApproveStatus.PASS;
                     approve = await approve.save();
 
-                    plugins.qm.tripApproveUpdateNotify(null, {
-                        id: approve.id,
+                    await plugins.qm.tripApproveUpdateNotify(null, {
+                        approveNo: approve.id,
                         status: EApproveStatus.SUCCESS,
                         approveUser: approve.approveUser.id,
                         outerId: approve.id,
-                        data: approve.budgetInfo,
+                        // data: approve.budgetInfo,
                         oa: 'qm'
                     });
 
