@@ -108,7 +108,7 @@ export class LdapModule {
         }
         let ldapInfo = ldapProperty[0].value;
         let ldapInfoJson = JSON.parse(ldapInfo);
-        await ldapApi.bindUser({entryDn: ldapInfoJson.ldapAdminDn, userPassword: ldapInfoJson.ldapAdminPassword});
+        // await ldapApi.bindUser({entryDn: ldapInfoJson.ldapAdminDn, userPassword: ldapInfoJson.ldapAdminPassword});
 
         let type = EAccountType.STAFF;
         let account = data.account;
@@ -147,9 +147,13 @@ export class LdapModule {
         }
 
         let entryDn = staffProperty[0].value;
-        let bindResult = await ldapApi.bindUser({entryDn: entryDn, userPassword: data.pwd});
-        if(!bindResult){
-            throw L.ERR.ACCOUNT_FORBIDDEN();
+
+        try{
+            let bindResult = await ldapApi.bindUser({entryDn: entryDn, userPassword: data.pwd});
+        }catch(e){
+            if(e){
+                throw L.ERR.ACCOUNT_NOT_EXIST();
+            }
         }
 
         let departments = await loginStaff.getDepartments();

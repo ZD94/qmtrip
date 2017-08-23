@@ -22,7 +22,7 @@ var API = require('@jingli/dnode-api');
 import config = require("@jingli/config");
 import _ = require("lodash");
 import {ENoticeType} from "_types/notice/notice";
-import {AutoApproveType, AutoApproveConfig} from "_types/tripPlan"
+import {AutoApproveType, AutoApproveConfig, ISegment} from "_types/tripPlan"
 
 
 class TripApproveModule {
@@ -267,7 +267,27 @@ class TripApproveModule {
             }
             let query = tripApprove.query;
             let frozenNum = query.frozenNum;
-            let content = tripApprove.deptCity+"-"+tripApprove.arrivalCity;
+            let content = "";
+            let destinationPlacesInfo = query.destinationPlacesInfo;
+
+            if(query && query.originPlace){
+                let originCity = await API.place.getCityInfo({cityCode: query.originPlace});
+                content = content + originCity.name + "-";
+            }
+            if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
+                for(let i = 0; i < destinationPlacesInfo.length; i++){
+                    let segment: ISegment = destinationPlacesInfo[i]
+                    let destinationCity = await API.place.getCityInfo({cityCode: segment.destinationPlace});
+                    if(i<destinationPlacesInfo.length-1){
+                        content = content + destinationCity.name+"-";
+                    }else{
+                        content = content + destinationCity.name;
+                    }
+                }
+            }
+
+
+
             if(tripApprove.createdAt.getMonth() == new Date().getMonth()){
                 //审批本月记录审批通过
                 if(approveResult == EApproveResult.PASS && !isNextApprove){
@@ -399,7 +419,26 @@ class TripApproveModule {
         if(!frozenNum){
             frozenNum = { extraFrozen: 0, limitFrozen: 0 };
         }
-        let content = tripApprove.deptCity+"-"+tripApprove.arrivalCity;
+
+        let content = "";
+        let destinationPlacesInfo = query.destinationPlacesInfo;
+
+        if(query && query.originPlace){
+            let originCity = await API.place.getCityInfo({cityCode: query.originPlace});
+            content = content + originCity.name + "-";
+        }
+        if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
+            for(let i = 0; i < destinationPlacesInfo.length; i++){
+                let segment: ISegment = destinationPlacesInfo[i]
+                let destinationCity = await API.place.getCityInfo({cityCode: segment.destinationPlace});
+                if(i<destinationPlacesInfo.length-1){
+                    content = content + destinationCity.name+"-";
+                }else{
+                    content = content + destinationCity.name;
+                }
+            }
+        }
+
         if(tripApprove.createdAt.getMonth() == new Date().getMonth()){
             await company.approveRejectFreeTripPlanNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
                 remark: "审批前撤销行程释放冻结行程点数", content: content, frozenNum: frozenNum});

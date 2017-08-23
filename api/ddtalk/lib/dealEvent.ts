@@ -136,10 +136,10 @@ export function transpond(req, res, next, options:any, urls?:string){
 export async function tmpAuthCode(msg , req , res , next) {
     const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
     let isExist = await cache.read(TMP_CODE_KEY);
-    /*if (isExist) {
+    if (isExist) {
         console.log("exist?");
         return;
-    }*/
+    }
 
     let suiteToken, permanentAuthMsg: any, permanentCode, corp_name;
     //暂时缓存，防止重复触发
