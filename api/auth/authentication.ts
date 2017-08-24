@@ -6,10 +6,14 @@ import moment = require('moment');
 import validator = require('validator');
 import { Token } from '_types/auth/token';
 import { ACCOUNT_STATUS } from "_types/auth";
+import { EStaffStatus, Staff, SPropertyType } from "_types/staff";
 import {OS_TYPE} from '_types/auth/token';
+import {CPropertyType} from '_types/company';
+import shareConnection from "../ldap/shareConnection";
+import{staffOpts} from "../ldap";
+import syncData from "libs/asyncOrganization/syncData";
+var API = require("@jingli/dnode-api");
 import { getSession } from "common/model";
-import {Staff} from "_types/staff/staff";
-let API = require("@jingli/dnode-api");
 
 //生成登录凭证
 export async function makeAuthenticateToken(accountId, os?: string, expireAt?: Date): Promise<LoginResponse> {
@@ -178,8 +182,8 @@ export async function login(data: {account?: string, pwd: string, type?: Number,
 
     //第三步查看是邮箱登录或手机号登录 查看有限干活手机号是否已验证
     /*if(loginAccount.mobile == account && !loginAccount.isValidateMobile) {
-        throw L.ERR.NO_VALIDATE_MOBILE();
-    }*/
+     throw L.ERR.NO_VALIDATE_MOBILE();
+     }*/
     if(loginAccount.email == account && !loginAccount.isValidateEmail) {
         throw L.ERR.NO_VALIDATE_EMAIL();
     }
@@ -217,6 +221,27 @@ export async function login(data: {account?: string, pwd: string, type?: Number,
 
 }
 
+export async function loginByLdap(data: {account?: string, pwd: string, companyId: string}): Promise<LoginResponse> {
+    if(!data) {
+        throw L.ERR.DATA_NOT_EXIST();
+    }
+
+    if(!data.account) {
+        throw L.ERR.USERNAME_EMPTY();
+    }
+
+    if(!data.pwd) {
+        throw L.ERR.PWD_EMPTY();
+    }
+
+    if(!data.companyId) {
+        throw L.ERR.DATA_NOT_EXIST();
+    }
+
+    let result = await API.ldap.loginByLdapUser(data);
+    return result;
+
+}
 
 /**
  * 退出登录

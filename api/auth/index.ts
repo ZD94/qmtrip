@@ -234,6 +234,9 @@ export default class ApiAuth {
         let accountId = params.accountId;
         let account = await ApiAuth.getPrivateInfo({id: accountId});
 
+        if (!account) {
+            throw L.ERR.USER_NOT_EXIST();
+        }
         if (!account.mobile) {
             throw L.ERR.MOBILE_NOT_CORRECT();
         }
@@ -1284,6 +1287,8 @@ export default class ApiAuth {
 
     @clientExport
     static login = authentication.login;
+    @clientExport
+    static loginByLdap = authentication.loginByLdap;
     @clientExport
     static logout = authentication.logout;
 

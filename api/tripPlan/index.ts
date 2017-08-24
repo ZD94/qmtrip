@@ -12,6 +12,7 @@ let logger = new Logger("tripPlan");
 import config = require("@jingli/config");
 
 let moment = require("moment");
+require("moment-timezone");
 let scheduler = require('common/scheduler');
 import _ = require('lodash');
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
@@ -33,6 +34,8 @@ import {ENoticeType} from "_types/notice/notice";
 import TripApproveModule = require("../tripApprove/index");
 import {MPlaneLevel, MTrainLevel} from "_types/travelPolicy";
 import {ISegment, ICreateBudgetAndApproveParams} from '_types/tripPlan'
+import {EApproveStatus} from "../../_types/approve/types";
+import {plugins} from "../../libs/oa/index";
 const projectCols = Project['$fieldnames'];
 
 interface ReportInvoice {
@@ -181,7 +184,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['id'], ['isNeedTraffic', 'isNeedHotel', 'title', 'description', 'status', 'deptCity',
-        'deptCityCode', 'arrivalCity', 'arrivalCityCode', 'startAt', 'backAt', 'remark'])
+        'deptCityCode', 'arrivalCity', 'arrivalCityCode', 'startAt', 'backAt', 'remark', 'readNumber'])
     @modelNotNull('tripPlan')
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
     static async updateTripPlan(params): Promise<TripPlan> {
@@ -365,7 +368,7 @@ class TripPlanModule {
         //更改状态
         tripPlan.isCommit = true;
         tripPlan = await tryUpdateTripPlanStatus(tripPlan, EPlanStatus.AUDITING);
-        let notifyUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
+        let notifyUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
         await TripPlanModule.notifyDesignatedAcount({notifyUrl: notifyUrl, staffId: staffId});
 
         let default_agency = config.default_agency;
@@ -489,6 +492,10 @@ class TripPlanModule {
             templateName = 'qm_notify_invoice_all_pass';          
         }else{
             templateName = 'qm_notify_invoice_not_pass';
+            /**
+             * *tripPlan为待传票据时已将票据设为已读,票据驳回时设为未读
+             * **/
+            tripPlan.readNumber = 0;
         }
 
         //处理对应的tripDetail 的状态
@@ -1176,6 +1183,8 @@ class TripPlanModule {
         tripPlan.specialApproveRemark = approve.specialApproveRemark;
         tripPlan.staffList = query.staffList || [];
 
+        tripPlan.readNumber = 0;
+
         //计算总预算
         let totalBudget = budgets
             .map( (item) => {
@@ -1447,6 +1456,14 @@ class TripPlanModule {
         if (!staff.email) {
             throw L.ERR.EMAIL_EMPTY();
         }
+        let cities  = JSON.parse(tripPlan.arrivalCityCodes);
+        let firstDept = cities[0];
+        let lastDept = cities[cities.length - 1];
+        firstDept = await API.place.getCityInfo({cityCode: firstDept});
+        lastDept = await API.place.getCityInfo({cityCode: lastDept});
+        let firstDeptTz = firstDept.timezone ? firstDept.timezone: "Asia/shanghai";
+        let lastDeptTz = lastDept.timezone ? lastDept.timezone: "Asia/shanghai";
+
         let title = moment(tripPlan.startAt).format('MM.DD') + '-'+ moment(tripPlan.backAt).format("MM.DD") + tripPlan.deptCity + "到" + tripPlan.arrivalCity + '报销单'
         let tripDetails = await Models.tripDetail.find({
             where: {tripPlanId: tripPlanId},
@@ -1619,8 +1636,8 @@ class TripPlanModule {
             "totalMoneyHZ": money2hanzi.toHanzi(_personalExpenditure),  //汉字大写金额
             "invoiceQuantity": invoiceQuantity, //票据数量
             "createAt": moment().format('YYYY年MM月DD日HH:mm'), //生成时间
-            "departDate": moment(tripPlan.startAt).format('YYYY.MM.DD'), //出差起始时间
-            "backDate": moment(tripPlan.backAt).format('YYYY.MM.DD'), //出差返回时间
+            "departDate": moment(tripPlan.startAt).tz(firstDeptTz).format('YYYY.MM.DD'), //出差起始时间
+            "backDate": moment(tripPlan.backAt).tz(lastDeptTz).format('YYYY.MM.DD'), //出差返回时间
             "reason": tripPlan.project ? tripPlan.project.name: '', //出差事由
             "approveUsers": approveUsers, //本次出差审批人
             "qrcode": `data:image/png;base64,${qrcodeCxt}`,
@@ -1827,7 +1844,25 @@ class TripPlanModule {
             tripApproves.map(async (approve) => {
 
                 let approveCompany = await approve.getCompany();
-                let content = approve.deptCity+"-"+approve.arrivalCity;
+                let query = approve.query;
+                let content = "";
+                let destinationPlacesInfo = query.destinationPlacesInfo;
+
+                if(query && query.originPlace){
+                    let originCity = await API.place.getCityInfo({cityCode: query.originPlace});
+                    content = content + originCity.name + "-";
+                }
+                if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
+                    for(let i = 0; i < destinationPlacesInfo.length; i++){
+                        let segment: ISegment = destinationPlacesInfo[i]
+                        let destinationCity = await API.place.getCityInfo({cityCode: segment.destinationPlace});
+                        if(i<destinationPlacesInfo.length-1){
+                            content = content + destinationCity.name+"-";
+                        }else{
+                            content = content + destinationCity.name;
+                        }
+                    }
+                }
                 let frozenNum = approve.query.frozenNum;
 
                 
@@ -1876,11 +1911,27 @@ class TripPlanModule {
                     if(approve.approveUser && approve.approveUser.id && /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(approve.approveUser.id)) {
                         let log = Models.tripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser.id, approveStatus: EApproveResult.AUTO_APPROVE, remark: '自动通过'});
                         await log.save();
+
                     }
-                    await TripPlanModule.saveTripPlanByApprove({tripApproveId: approve.id});
+                    // await TripPlanModule.saveTripPlanByApprove({tripApproveId: approve.id});
+
 
                     approve.status = QMEApproveStatus.PASS;
                     approve = await approve.save();
+
+                    await plugins.qm.tripApproveUpdateNotify(null, {
+                        approveNo: approve.id,
+                        status: EApproveStatus.SUCCESS,
+                        approveUser: approve.approveUser.id,
+                        outerId: approve.id,
+                        // data: approve.budgetInfo,
+                        oa: 'qm'
+                    });
+
+                    // let _approve = await Models.approve.get(approve.id);
+                    // _approve.status = EApproveStatus.SUCCESS;
+                    // await _approve.save();
+
                 }catch(e){
                     logger.error(e.stack);
                     if(!approve.autoApproveNum){

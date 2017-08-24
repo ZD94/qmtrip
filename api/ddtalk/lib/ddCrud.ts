@@ -22,7 +22,7 @@ export class ddCrud {
     constructor( public corpId : string ) {
     }
 
-    private async getCompany() {
+    /*private async getCompany() {
         let self = this;
         if (self.company){
             return self.company;
@@ -62,10 +62,10 @@ export class ddCrud {
         }
         let company = await this.getCompany();
         return this.travelPolicy = await company.getDefaultTravelPolicy();
-    }
+    }*/
 
     //update staff or create staff.
-    async createStaff(ddUserInfo) : Promise<Staff>{
+    /*async createStaff(ddUserInfo) : Promise<Staff>{
         let travelPolicy = await this.getTravelPolicy();
         let company      = await this.getCompany();
 
@@ -97,10 +97,10 @@ export class ddCrud {
             // console.log("staff 中新加入员工" , _staff.id);
             return _staff;
         }
-    }
+    }*/
 
     //ddtalkUser 中新加入员工 或者是更新
-    async createDDuser( staff , ddUserInfo ) : Promise<DDTalkUser>{
+    /*async createDDuser( staff , ddUserInfo ) : Promise<DDTalkUser>{
         let ddtalkUsers = await Models.ddtalkUser.find({
             where : { ddUserId : ddUserInfo.userid , corpid : this.corpId }
         });
@@ -130,10 +130,10 @@ export class ddCrud {
         }
 
         return ddtalkUser;
-    }
+    }*/
 
     //ddtalkUser delete
-    async deleteDDuser( dd_user_id ){
+    /*async deleteDDuser( dd_user_id ){
         let ddtalkUser = await Models.ddtalkUser.find({
             where : { ddUserId:dd_user_id , corpid : this.corpId }
         });
@@ -148,10 +148,10 @@ export class ddCrud {
         }
 
         return staff_id;
-    }
+    }*/
 
     //新增员工添加部门关系
-    async addStaffDeparts( staff : Staff , dd_departs : any[] ){
+    /*async addStaffDeparts( staff : Staff , dd_departs : any[] ){
         let self = this;
         let localDepart_ids = [];
 
@@ -199,7 +199,7 @@ export class ddCrud {
         }
 
         return localDepart_ids;
-    }
+    }*/
 
     /*
      *  清除  部门员工关系 staff_department
@@ -208,7 +208,7 @@ export class ddCrud {
      *  arr  : 依据staff唯一,传入department数组；依据department唯一，传入staff数组
      */
 
-    async deleteStaffDepartment ( type : string , key , arr ? : string[] ){
+    /*async deleteStaffDepartment ( type : string , key , arr ? : string[] ){
         let whereObj = {};
         if(type == "staff"){
             //依据staff 找部门
@@ -232,14 +232,14 @@ export class ddCrud {
         });
 
         await Promise.all(results.map((item)=>item.destroy()));
-    }
+    }*/
 
 
     /*
     *   钉钉添加一个部门 , 更新部门信息
     *   添加、更新
     */
-    async createDepartment ( ddDepartInfo : any , notAddParentid ? : boolean){
+    /*async createDepartment ( ddDepartInfo : any , notAddParentid ? : boolean){
         console.log("enter create department" , ddDepartInfo);
 
         let ddDeparts = await Models.ddtalkDepartment.find({
@@ -290,13 +290,13 @@ export class ddCrud {
         console.log("enter create department  over");
 
         return localDepart;
-    }
+    }*/
 
 
     /*
     *   获取一个钉钉部门 的 parentId 的本地部门id
     */
-    async getParentId( dd_parentId ){
+    /*async getParentId( dd_parentId ){
         let self = this;
         if(!dd_parentId){
             return null;
@@ -322,13 +322,13 @@ export class ddCrud {
             let localDepart = await self.createDepartment( ddDepartmentInfo );
             return localDepart.id;
         }
-    }
+    }*/
 
 
     /*
     *    企业在钉钉上删除了一个部门
     */
-    async ddDeleteDepart( dd_depart_id ){
+    /*async ddDeleteDepart( dd_depart_id ){
         //delete dd department
         let ddtalkDepartments = await Models.ddtalkDepartment.find({
             where : { DdDepartmentId : `${dd_depart_id}` , corpId : this.corpId }
@@ -350,5 +350,5 @@ export class ddCrud {
         if(localDepart){
             await localDepart.destroy();
         }
-    }
+    }*/
 }

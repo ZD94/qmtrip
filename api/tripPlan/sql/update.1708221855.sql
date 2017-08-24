@@ -1,0 +1,1 @@
+update company.trip_plan_num_changes set content = replace(content, '-', '') where content ~ '^-';

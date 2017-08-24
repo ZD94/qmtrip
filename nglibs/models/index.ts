@@ -8,15 +8,15 @@ import {ModelObjInterface, ModelInterface} from 'common/model/interface';
 import { ModelCached } from 'common/model/cached';
 import {ModelRemote, ModelRemoteOld} from 'common/model/remote';
 import { ngService } from '../index';
-import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo } from '_types/staff';
-import { Company, MoneyChange, Supplier, TripPlanNumChange, InvoiceTitle } from '_types/company';
+import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo, StaffProperty } from '_types/staff';
+import { Company, MoneyChange, Supplier, TripPlanNumChange, InvoiceTitle, CompanyProperty } from '_types/company';
 import { PromoCode } from '_types/promoCode';
-import { Department, StaffDepartment } from '_types/department';
+import { Department, StaffDepartment, DepartmentProperty } from '_types/department';
 import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
 import { AccordHotel } from '_types/accordHotel';
 import { Notice, NoticeAccount } from '_types/notice';
 import { Agency, AgencyUser } from '_types/agency';
-import {TripPlan, TripDetail, TripDetailStaff, Project, TripPlanLog, TripApprove, FinanceCheckCode} from '_types/tripPlan';
+import {TripPlan, TripDetail, TripDetailStaff, Project, TripPlanLog, TripApprove, FinanceCheckCode, Offline} from '_types/tripPlan';
 import {Account, Token} from '_types/auth';
 import { Seed } from '_types/seed';
 import {TravelBudgetLog} from "_types/travelbudget";
@@ -53,6 +53,9 @@ var Services = {
     staff: { type: Staff, modname: 'staff',
         funcs: ['getStaff', 'getStaffs', 'createStaff', 'updateStaff', 'deleteStaff']
     },
+    staffProperty: { type: StaffProperty, modname: 'staff',
+        funcs: []
+    },
     credential: { type: Credential, modname: 'staff',
         funcs: ['getPapersById', null, 'createPapers', 'updatePapers', 'deletePapers']
     },
@@ -67,6 +70,9 @@ var Services = {
     },
     company: { type: Company, modname: 'company',
         funcs: ['getCompany', 'listCompany', 'registerCompany', 'updateCompany', 'deleteCompany']
+    },
+    companyProperty: { type: CompanyProperty, modname: 'company',
+        funcs: []
     },
     moneyChange: { type: MoneyChange, modname: 'company',
         funcs: ['getMoneyChange', 'listMoneyChange', 'saveMoneyChange']
@@ -85,6 +91,9 @@ var Services = {
     },
     department: { type: Department, modname: 'department',
         funcs: ['getDepartment', 'getDepartments', 'createDepartment', 'updateDepartment', 'deleteDepartment']
+    },
+    departmentProperty: { type: DepartmentProperty, modname: 'department',
+        funcs: []
     },
     staffDepartment: { type: StaffDepartment, modname: 'department',
         funcs: ['getStaffDepartment', 'getStaffDepartments', 'createStaffDepartment', 'updateStaffDepartment', 'deleteStaffDepartment']
@@ -152,6 +161,7 @@ var Services = {
     tripFuelAddPackage:{type:TripFuelAddPackage, modname:'tripPackage',funcs:[]},
     errorLog: {},
     travelPolicyRegion:{},
+    offline: {},
     regionPlace:{},
     companyRegion:{},
 };
@@ -183,16 +193,19 @@ function createRemoteService<T extends ModelObjInterface>(options: any, cacheFac
 class ClientModels implements ModelsInterface {
 
     staff: ModelInterface<Staff>;
+    staffProperty: ModelInterface<StaffProperty>;
     credential: ModelInterface<Credential>;
     pointChange:ModelInterface<PointChange>;
     invitedLink:ModelInterface<InvitedLink>;
     staffSupplierInfo:ModelInterface<StaffSupplierInfo>;
     company: ModelInterface<Company>;
+    companyProperty: ModelInterface<CompanyProperty>;
     supplier: ModelInterface<Supplier>;
     invoiceTitle: ModelInterface<InvoiceTitle>;
     tripPlanNumChange: ModelInterface<TripPlanNumChange>;
     promoCode: ModelInterface<PromoCode>;
     department: ModelInterface<Department>;
+    departmentProperty: ModelInterface<DepartmentProperty>;
     staffDepartment: ModelInterface<StaffDepartment>;
     travelPolicy: ModelInterface<TravelPolicy>;
     subsidyTemplate: ModelInterface<SubsidyTemplate>;
@@ -221,6 +234,7 @@ class ClientModels implements ModelsInterface {
     token: ModelInterface<Token>;
     travelBudgetLog: ModelInterface<TravelBudgetLog>;
     financeCheckCode: ModelInterface<FinanceCheckCode>;
+    offline : ModelInterface<Offline>;
 
     ddtalkCorp: ModelInterface<DDTalkCorp>;
     ddtalkUser: ModelInterface<DDTalkUser>;
@@ -241,6 +255,7 @@ class ClientModels implements ModelsInterface {
 
     constructor($cacheFactory: ng.ICacheFactoryService, $rootScope: ng.IRootScopeService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
+        this.staffProperty = createService<StaffProperty>(Services.staffProperty, $cacheFactory);
         this.credential = createService<Credential>(Services.credential, $cacheFactory);
         this.pointChange = createService<PointChange>(Services.pointChange, $cacheFactory);
         this.supplier = createService<Supplier>(Services.supplier, $cacheFactory);
@@ -249,8 +264,10 @@ class ClientModels implements ModelsInterface {
         this.invitedLink = createService<InvitedLink>(Services.invitedLink, $cacheFactory);
         this.staffSupplierInfo = createService<StaffSupplierInfo>(Services.staffSupplierInfo, $cacheFactory);
         this.company = createService<Company>(Services.company, $cacheFactory);
+        this.companyProperty = createService<CompanyProperty>(Services.companyProperty, $cacheFactory);
         this.promoCode = createService<PromoCode>(Services.promoCode, $cacheFactory);
         this.department = createService<Department>(Services.department, $cacheFactory);
+        this.departmentProperty = createService<DepartmentProperty>(Services.departmentProperty, $cacheFactory);
         this.staffDepartment = createService<StaffDepartment>(Services.staffDepartment, $cacheFactory);
         this.travelPolicy = createService<TravelPolicy>(Services.travelPolicy, $cacheFactory);
         this.subsidyTemplate = createService<SubsidyTemplate>(Services.subsidyTemplate, $cacheFactory);
@@ -280,7 +297,7 @@ class ClientModels implements ModelsInterface {
         this.tripBasicPackage = createService<TripBasicPackage>(Services.tripBasicPackage, $cacheFactory);
         this.tripFuelAddPackage = createService<TripFuelAddPackage>(Services.tripFuelAddPackage, $cacheFactory);
         this.errorLog = createService<ErrorLog>(Services.errorLog, $cacheFactory);
-        this.travelPolicyRegion = createService<TravelPolicyRegion>(Services.travelPolicyRegion, $cacheFactory)
+        this.offline = createService<Offline>(Services.offline, $cacheFactory);
         this.travelPolicyRegion = createService<TravelPolicyRegion>(Services.travelPolicyRegion, $cacheFactory);
         this.companyRegion = createService<CompanyRegion>(Services.companyRegion, $cacheFactory);
         this.regionPlace = createService<RegionPlace>(Services.regionPlace, $cacheFactory);
