@@ -12,7 +12,7 @@ let logger = new Logger("tripPlan");
 import config = require("@jingli/config");
 
 let moment = require("moment");
-require("moment-timzone");
+require("moment-timezone");
 let scheduler = require('common/scheduler');
 import _ = require('lodash');
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
