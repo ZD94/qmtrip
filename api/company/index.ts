@@ -139,7 +139,7 @@ class CompanyModule {
         let ca = CoinAccount.create();
         await ca.save();
         company.coinAccount = ca;
-        await company.save();
+        company = await company.save();
 
         //为创建人设置资金账户
         let ca_staff = CoinAccount.create();
@@ -147,6 +147,9 @@ class CompanyModule {
         let account = await Models.account.get(staff.accountId);
         account.coinAccount = ca_staff;
         await account.save();
+
+        //默认开启所有公有预订服务商
+        await company.setDefaultSupplier();
 
         return {company: company, description: promoCode ? promoCode.description : ""};
     }

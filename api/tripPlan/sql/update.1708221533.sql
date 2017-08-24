@@ -45,6 +45,10 @@ set type = 1
 where type not in (1, 2, 3, 4, 8, 7, 6, 99) and trip_detail_id in
 (select id from trip_plan.trip_details where type = 1); --返程：1  除了 1，2，3，4，8，7，6，99 --> 1
 
+update trip_plan.trip_detail_invoices
+set type = 5
+where type not in (5, 4, 99) and trip_detail_id in
+(select id from trip_plan.trip_details where type = 2); --住宿：2  除了 5，4，99 --> 5
 
 update trip_plan.trip_detail_invoices
 set type = 99

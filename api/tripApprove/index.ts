@@ -377,7 +377,7 @@ class TripApproveModule {
         }
 
         //发送通知给监听程序
-        plugins.qm.tripApproveUpdateNotify(null, {
+        await plugins.qm.tripApproveUpdateNotify(null, {
             approveNo: tripApprove.id,
             status: tripApprove.status,
             approveUser: staff.id,

@@ -95,7 +95,7 @@ export  abstract class OaStaff{
         //暂时缓存，防止重复触发
         await cache.write(staffKey, true, 10 * 1);
 
-        if(execute && (!from || from != "createUser")){
+        if(execute || (from && from == "createUser")){
             if(params){
                 company = params.company;
             }
