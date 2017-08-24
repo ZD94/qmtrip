@@ -12,6 +12,7 @@ let logger = new Logger("tripPlan");
 import config = require("@jingli/config");
 
 let moment = require("moment");
+require("moment-timezone");
 let scheduler = require('common/scheduler');
 import _ = require('lodash');
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
@@ -1217,6 +1218,7 @@ class TripPlanModule {
                     budget.destination = await API.place.getCityInfo({cityCode: budget.destination});
                 }
             }
+            console.log("======>budget: ", budget);
 
             switch(tripType) {
                 case ETripType.OUT_TRIP:
@@ -1455,6 +1457,7 @@ class TripPlanModule {
         if (!staff.email) {
             throw L.ERR.EMAIL_EMPTY();
         }
+
         let title = moment(tripPlan.startAt).format('MM.DD') + '-'+ moment(tripPlan.backAt).format("MM.DD") + tripPlan.deptCity + "到" + tripPlan.arrivalCity + '报销单'
         let tripDetails = await Models.tripDetail.find({
             where: {tripPlanId: tripPlanId},
