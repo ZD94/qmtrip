@@ -751,6 +751,7 @@ export default class TravelPolicyModule{
         let {url, params,method} = options;
         console.log("=====> params: ", params);
         console.log("=====> url: ", url);
+        url = `http://localhost:8080/api/v1/travelPolicy`;
         let result = await request({
             uri: url,
             body: params,  //JSON.stringify(params);
