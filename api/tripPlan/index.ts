@@ -1457,13 +1457,13 @@ class TripPlanModule {
         if (!staff.email) {
             throw L.ERR.EMAIL_EMPTY();
         }
-        console.log("=====>tripPlan: ", tripPlan);
+        console.log("=====>tripPlan: ", tripPlan, tripPlan.arrivalCityCodes[0], tripPlan.arrivalCityCodes[tripPlan.arrivalCityCodes.length - 1]);
         let firstDept = tripPlan.arrivalCityCodes[0];
         let lastDept = tripPlan.arrivalCityCodes[tripPlan.arrivalCityCodes.length - 1];
         console.log("=====>place: ", firstDept, lastDept);
         firstDept = await API.place.getCityInfo({cityCode: firstDept});
         lastDept = await API.place.getCityInfo({cityCode: lastDept});
-        console.log("=====>place: ", firstDept, lastDept);
+        console.log("=====>cities: ", firstDept, lastDept);
 
         let firstDeptTz = firstDept.timezone ? firstDept.timezone: "Asia/shanghai";
         let lastDeptTz = lastDept.timezone ? lastDept.timezone: "Asia/shanghai";
