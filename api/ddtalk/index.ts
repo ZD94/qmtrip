@@ -64,18 +64,18 @@ let ddTalkMsgHandle = {
 
     /* * 通讯录用户更改 * */
     user_modify_org : async function(msg){
-        let userIds = msg.UserId;
-        let corpId = msg.CorpId;
-        let execute = true;
-        await Promise.all(userIds.map(async (item) => {
-            let staffPro = await Models.staffProperty.find({where : {value: item}});
-            if(!(staffPro && staffPro.length)){
-                execute = false;
-            }
-        }))
-        if(!execute){
-            await wait(5000);
-        }
+        // let userIds = msg.UserId;
+        // let corpId = msg.CorpId;
+        // let execute = true;
+        // await Promise.all(userIds.map(async (item) => {
+        //     let staffPro = await Models.staffProperty.find({where : {value: item}});
+        //     if(!(staffPro && staffPro.length)){
+        //         execute = false;
+        //     }
+        // }))
+        // if(!execute){
+        //     await wait(5000);
+        // }
         return await DealEvent.userModifyOrg(msg);
     },
     /* * 通讯录用户离职 * */
@@ -110,10 +110,15 @@ let ddTalkMsgHandle = {
 
 }
 
+let DDEventCorpId : any = {};
+
 
 class DDTalk {
     static __public: boolean = true;
+
     static __initHttpApp(app) {
+
+        let self = this;
 
         app.get("/JLTesthello", (req, res, next)=>{
 
@@ -179,7 +184,7 @@ class DDTalk {
                 return res.reply();
             }else{*/
 
-                if(!ddTalkMsgHandle[msg.EventType]){
+               /* if(!ddTalkMsgHandle[msg.EventType]){
                     return res.reply();
                 }
                 return ddTalkMsgHandle[msg.EventType](msg , req , res , next)
@@ -191,9 +196,29 @@ class DDTalk {
                     .catch((err) => {
                         console.error(err.stack);
                         next(err);
-                    });
+                    });*/
 
             // }
+
+
+            /* ======== 修改事件处理方式 ======== */
+            if(msg.CorpId){
+                await self.eventPush(msg);
+                res.reply();
+                return;
+            }
+            
+            return ddTalkMsgHandle[msg.EventType](msg , req , res , next)
+                .then((result) => {
+                    if(!(result && result.notReply)){
+                        res.reply();
+                    }
+                })
+                .catch((err) => {
+                    console.error(err.stack);
+                    next(err);
+                });
+
         }));
 
         app.post("/ddtalk/suite_ticket" , (req , res , next)=>{
@@ -204,31 +229,36 @@ class DDTalk {
         });
     }
 
-    /*static async dealEvent(corpId: string){
-        const COMPANY_EVENTS_KEY = `company_events:${corpId}`;
-        let isExist = await cache.read(COMPANY_EVENTS_KEY);
-        if(!isExist.isRunning){
-            isExist.isRunning = true;
-            await cache.write(COMPANY_EVENTS_KEY, isExist, 60 * 60 * 24);
-            let eventList = isExist.eventList;
-            let currentEvent = eventList.pop();
-            if(!ddTalkMsgHandle[currentEvent.EventType]){
-                return;
-            }
-            await ddTalkMsgHandle[currentEvent.EventType](currentEvent);
-            isExist.eventList = eventList;
-            await cache.write(COMPANY_EVENTS_KEY, isExist, 60 * 60 * 24);
-
-            let isExistRe = await cache.read(COMPANY_EVENTS_KEY);
-            let eventListRe = isExistRe.eventList;
-            if(eventListRe && eventListRe.length){
-                await DDTalk.dealEvent(corpId);
-            }else{
-                isExistRe.isRunning = false;
-                await cache.write(COMPANY_EVENTS_KEY, isExistRe, 60 * 60 * 24);
-            }
+    static async dealEvent(corpId: string){
+        let key = 'company_events:' + corpId;
+        let msg : { EventType : string } = await cache.lpop(key);
+        if(!msg){
+            DDEventCorpId[corpId] = false;
+            return;
         }
-    }*/
+
+        try{
+            await ddTalkMsgHandle[msg.EventType](msg);
+        }catch(e){
+            console.error(e);
+        }
+        
+        this.dealEvent( corpId );
+    }
+
+    static async eventPush( msg: any ){
+        let corpId = msg.CorpId;
+        let key = 'company_events:' + corpId;
+        let result = await cache.rpush( key, msg );
+        if(!DDEventCorpId[corpId]){
+            DDEventCorpId[corpId] = true;
+            this.dealEvent( corpId );
+        }else{
+            console.log("this key is running ===> ", corpId);
+        }
+
+        console.log("DDEventCorpId====>", DDEventCorpId);
+    }
 
     @clientExport
     static async getJSAPIConfig(params) {
@@ -377,6 +407,7 @@ function getRndStr(length) : string {
     }
     return ret;
 }
+
 
 
 export= DDTalk
