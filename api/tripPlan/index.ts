@@ -1218,7 +1218,6 @@ class TripPlanModule {
                     budget.destination = await API.place.getCityInfo({cityCode: budget.destination});
                 }
             }
-            console.log("======>budget: ", budget);
 
             switch(tripType) {
                 case ETripType.OUT_TRIP:
@@ -1457,6 +1456,13 @@ class TripPlanModule {
         if (!staff.email) {
             throw L.ERR.EMAIL_EMPTY();
         }
+        let cities  = JSON.parse(tripPlan.arrivalCityCodes);
+        let firstDept = cities[0];
+        let lastDept = cities[cities.length - 1];
+        firstDept = await API.place.getCityInfo({cityCode: firstDept});
+        lastDept = await API.place.getCityInfo({cityCode: lastDept});
+        let firstDeptTz = firstDept.timezone ? firstDept.timezone: "Asia/shanghai";
+        let lastDeptTz = lastDept.timezone ? lastDept.timezone: "Asia/shanghai";
 
         let title = moment(tripPlan.startAt).format('MM.DD') + '-'+ moment(tripPlan.backAt).format("MM.DD") + tripPlan.deptCity + "到" + tripPlan.arrivalCity + '报销单'
         let tripDetails = await Models.tripDetail.find({
@@ -1630,8 +1636,8 @@ class TripPlanModule {
             "totalMoneyHZ": money2hanzi.toHanzi(_personalExpenditure),  //汉字大写金额
             "invoiceQuantity": invoiceQuantity, //票据数量
             "createAt": moment().format('YYYY年MM月DD日HH:mm'), //生成时间
-            "departDate": moment(tripPlan.startAt).format('YYYY.MM.DD'), //出差起始时间
-            "backDate": moment(tripPlan.backAt).format('YYYY.MM.DD'), //出差返回时间
+            "departDate": moment(tripPlan.startAt).tz(firstDeptTz).format('YYYY.MM.DD'), //出差起始时间
+            "backDate": moment(tripPlan.backAt).tz(lastDeptTz).format('YYYY.MM.DD'), //出差返回时间
             "reason": tripPlan.project ? tripPlan.project.name: '', //出差事由
             "approveUsers": approveUsers, //本次出差审批人
             "qrcode": `data:image/png;base64,${qrcodeCxt}`,
