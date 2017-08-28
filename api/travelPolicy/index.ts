@@ -51,7 +51,7 @@ export default class TravelPolicyModule{
     //     let policy = await TravelPolicyModule.operateOnPolicy({
     //         url: BASE_URL,
     //         params: {
-    //             fileds:params
+    //             fields:params
     //         },
     //         method:''
     //     });
@@ -69,7 +69,7 @@ export default class TravelPolicyModule{
         let defaultTp = await TravelPolicyModule.operateOnPolicy({
             url: BASE_URL,
             params: {
-                fileds:params,
+                fields:params,
                 method: "getTravelPolicies",
             },
             method: 'get'
@@ -99,6 +99,7 @@ export default class TravelPolicyModule{
      */
     @clientExport
     static async createTravelPolicy (params: ITravelPolicyParams):Promise<ITravelPolicy>{
+        console.log("====>createTravelPolicy params: ", params);
         if(!params.companyId || !params.name){
             throw L.ERR.BAD_REQUEST();
         }
@@ -112,19 +113,18 @@ export default class TravelPolicyModule{
             throw L.ERR.PERMISSION_DENY();
         }
 
-        // let tp = await API.policy.createTravelPolicy(params);
-
         let tp = await TravelPolicyModule.operateOnPolicy({
-            url: BASE_URL,
+            model: "travelPolicy",
             params: {
-                fileds: params,
-                method: "createTravelPolicies",
+                fields: params,
+                method: "put",
             },
         });
+        if(typeof(tp) == 'string') tp = JSON.parse(tp);
         if(!tp) {
             throw L.ERR.SYSTEM_ERROR();
         }
-        return new ITravelPolicy(tp);
+        return tp;
     }
 
     /**
@@ -167,7 +167,14 @@ export default class TravelPolicyModule{
         let company = await Models.company.get(companyId);
         let agencyUser = await AgencyUser.getCurrent();
 
-        let tp_delete = await API.policy.getTravelPolicy({id: id});
+        let tp_delete = await TravelPolicyModule.operateOnPolicy({
+            model: "travelPolicy",
+            params:{
+                fields: params,
+                method: "get"
+            }
+        });
+
         if((staff && tp_delete && (staff['companyId'] != tp_delete['companyId'] || (staff['roleId'] != EStaffRole.ADMIN &&
             staff['roleId'] != EStaffRole.OWNER))) || (agencyUser['agencyId'] != company['agencyId'])) {
             throw L.ERR.PERMISSION_DENY();
@@ -184,10 +191,10 @@ export default class TravelPolicyModule{
 
         // let isDeleted = await API.policy.deleteTravelPolicy({id: id});
         let isDeleted = await TravelPolicyModule.operateOnPolicy({
-            url: BASE_URL,
+            model: "travelPolicy",
             params:{
                 fields: params,
-                method: "deleteTravelPolicy"
+                method: "delete"
             }
         });
         return isDeleted;
@@ -204,24 +211,33 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["id"])
+    // @requireParams(["id"])
     static async updateTravelPolicy(params: ITravelPolicyParams) : Promise<ITravelPolicy>{
         var {id, companyId} = params;
+        console.log("==>update travelPolicy: ", params);
 
         var staff = await Staff.getCurrent();
         if(!id || !companyId) {
             throw L.ERR.BAD_REQUEST();
         }
         let company = await Models.company.get(companyId);
-        let agencyUser = await AgencyUser.getCurrent();
+        // let agencyUser = await AgencyUser.getCurrent();
 
-        let tp_delete = await API.policy.getTravelPolicy({id: id});
-        if((staff && tp_delete && (staff['companyId'] != tp_delete['companyId'] || (staff['roleId'] != EStaffRole.ADMIN &&
-            staff['roleId'] != EStaffRole.OWNER))) || (agencyUser['agencyId'] != company['agencyId'])) {
+        let isUpdated = await TravelPolicyModule.operateOnPolicy({
+            model: "travelPolicy",
+            params:{
+                fields: params,
+                method: "get"
+            }
+        });
+        isUpdated = isUpdated.code.data[0];
+        console.log("====isUpdate: ", isUpdated);
+
+        if((staff && (staff['companyId'] != isUpdated['companyId'] || (staff['roleId'] != EStaffRole.ADMIN &&
+            staff['roleId'] != EStaffRole.OWNER))) ) {  //|| (agencyUser['agencyId'] != company['agencyId'])
             throw L.ERR.PERMISSION_DENY();
         }
 
-        // return API.policy.updateTravelPolicy(params);
         let tpr = await TravelPolicyModule.operateOnPolicy({
             model: "travelPolicy",
             params: {
@@ -229,7 +245,7 @@ export default class TravelPolicyModule{
                 method: "put"
             }
         });
-        return new ITravelPolicy(tpr);
+        return tpr;
     }
 
     @clientExport
@@ -241,7 +257,7 @@ export default class TravelPolicyModule{
                 method: "put"
             }
         });
-        return new ITravelPolicyRegion(tpr);
+        return tpr;
     }
 
     /**
@@ -288,7 +304,7 @@ export default class TravelPolicyModule{
      */
     @clientExport
     @requireParams(["id"])
-    static async getTravelPolicy(params: {id: string}) : Promise<ITravelPolicy>{
+    static async getTravelPolicy(params: {id: string, companyId: string}) : Promise<any>{
         let id = params.id;
         let travelPolicy = await TravelPolicyModule.operateOnPolicy({
             model: "travelPolicy",
@@ -297,7 +313,9 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
-        return new ITravelPolicy(travelPolicy);
+        if(typeof(travelPolicy) == 'string') travelPolicy = JSON.parse(travelPolicy);
+        console.log("===>getTravelPolicy: ", travelPolicy);
+        return travelPolicy;
     };
 
     /**
@@ -539,7 +557,6 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
-        console.log("====>subsidies: ", subsidies);
         return subsidies;
     }
 
@@ -611,7 +628,6 @@ export default class TravelPolicyModule{
     @clientExport
     @requireParams(["companyId"])
     static async getCompanyRegions(params) : Promise<any>{
-
         let cr = await TravelPolicyModule.operateOnPolicy({
             model: "companyRegion",
             params: {
@@ -656,7 +672,7 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
-        return API.policy.getRegionPlace(params);
+        return pr;
     };
 
     @clientExport
@@ -669,7 +685,7 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
-        return API.policy.getRegionPlaces(params)
+        return pc;
     };
 
     @clientExport
@@ -682,7 +698,7 @@ export default class TravelPolicyModule{
                 method: "post"
             }
         });
-        return API.policy.createRegionPlace(params);
+        return pr;
     };
 
     /*************************************地区设置(RegionPlace)end***************************************/
@@ -692,13 +708,10 @@ export default class TravelPolicyModule{
         model: string,
         params?:any,
     }) {
-
         let {params,model} = options;
         let {fields,method} = params;
-
         let url = Config.openApiUrl + `/${model}`;
-        console.log("======fields: ", fields);
-
+        let result: any;
         if(method == 'get') {
             if(!fields.hasOwnProperty("id")){
                 url = url + "?";
@@ -711,21 +724,19 @@ export default class TravelPolicyModule{
                 url = url + `${key}=${fields[key]}&`;
             }
             url = encodeURI(url);
+
+            if(url.lastIndexOf("&") == url.length -1 ){
+                url = url.slice(0, -1);
+            }
         }
-        if(url.lastIndexOf("&") == url.length -1 ){
-            url = url.slice(0, -1);
-        }
-
-
-        console.log("====>url: ", url);
-
-        let result = await request({
+        console.log("====>url: ", url, fields, method);
+        result = await request({
             uri: url,
-            // body: fields,  //JSON.stringify(params);
+            body: fields,  //JSON.stringify(params);
             json:true,
             method: method
-        });
-        console.log("====reuslt: ", result, JSON.stringify(result));
+        })
+        if(typeof(result) == 'string') result = JSON.parse(result);
         return result;
     }
 }
@@ -755,4 +766,32 @@ function tryConvertToArray(val) {
 // let result = await request({
 //     uri: url,
 // });
+//
+//
 // console.log("===> result: ", result);
+
+
+
+// if(method == 'put') {
+//     result = await request({
+//         uri: url,
+//         body: fields,  //JSON.stringify(params);
+//         json:true,
+//         method: 'put'
+//     });
+// }
+// if(method == 'post') {
+//     result = await request({
+//         uri: url,
+//         body: fields,  //JSON.stringify(params);
+//         json:true,
+//         method: 'post'
+//     });
+// }
+//
+// if(method == 'delete') {
+//     result = await request({
+//         uri: url,
+//         method: "delete"
+//     });
+// }
