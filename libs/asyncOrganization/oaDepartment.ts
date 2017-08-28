@@ -2,6 +2,7 @@
  * Created by wangyali on 2017/7/6.
  */
 import {Department} from "_types/department";
+import {EStaffStatus} from "_types/staff";
 import {Company} from "_types/company";
 import {Models} from "_types/index";
 import L from '@jingli/language';
@@ -59,10 +60,11 @@ export abstract class OaDepartment{
         return true;
     }
 
-    async sync(params?:{company?: Company, oaDepartment?: OaDepartment}): Promise<Department>{
+    async sync(params?:{company?: Company, oaDepartment?: OaDepartment, from?: string}): Promise<Department>{
         if(!params) params = {};
         let self = params.oaDepartment || this;
         let company = self.company;
+        let from = params.from;
         if(params.company){
             company = params.company;
         }
@@ -97,7 +99,7 @@ export abstract class OaDepartment{
                 if(company){
                     alreadyDepartment.company = company;
                 }
-                if(parentDepartment){
+                if(parentDepartment && parentDepartment.id != alreadyDepartment.id){
                     alreadyDepartment.parent = parentDepartment;
                 }
                 alreadyDepartment.name = self.name;//同步已有部门信息
@@ -116,61 +118,73 @@ export abstract class OaDepartment{
                 await self.saveDepartmentProperty({departmentId: result.id});
             }
 
-            //2、同步部门下员工
-            let oaStaffs = await self.getStaffs();
-            let oaStaffsMap = {};
-            if (oaStaffs && oaStaffs.length > 0) {
-                await Promise.all(oaStaffs.map(async (item) => {
-                    oaStaffsMap[item.id] = item;
-                    let ret = await item.sync({company: company});
-                }))
-            }
-
-            //3、删除被删除的员工
-            let childrenStaffs = await result.getAllStaffs();
-            await Promise.all(childrenStaffs.map(async (item) => {
-                let staffProperty = await item.getOaStaffIdProperty();
-                let oaSt = oaStaffsMap[staffProperty.value];
-                if(!oaSt){
-                    await item.deleteStaffProperty();
-
-                    try{
-                        await item.destroy();
-                    }catch (e){
-                        console.info("删除员工失败", e);
-                    }
+            if(!from){
+                //2、同步部门下员工
+                let oaStaffs = await self.getStaffs();
+                let oaStaffsMap = {};
+                if (oaStaffs && oaStaffs.length > 0) {
+                    await Promise.all(oaStaffs.map(async (item) => {
+                        oaStaffsMap[item.id] = item;
+                        let ret = await item.sync({company: company});
+                    }))
                 }
-            }));
 
-            //获取oa子部门
-            let childrenDepartments = await self.getChildrenDepartments();
-            let childrenDepartmentsMap = {};
-            for(let d = 0; d < childrenDepartments.length; d++){
-                let ld = childrenDepartments[d];
-                childrenDepartmentsMap[ld.id] = ld;
-            }
+                //3、删除被删除的员工
+                let childrenStaffs = await result.getAllStaffs();
+                await Promise.all(childrenStaffs.map(async (item) => {
+                    let staffProperty = await item.getOaStaffIdProperty();
+                    let oaSt = oaStaffsMap[staffProperty.value];
+                    if(!oaSt){
+                        try{
+                            await item.deleteStaffProperty();
 
-            //4、删除被删除的子部门
-            let childrenDepts = await Models.department.all({where: {parentId: result.id}});
-            await Promise.all(childrenDepts.map(async (item) => {
-                let deptProperty = await item.getOaDeptIdProperty();
-                let oaDept = childrenDepartmentsMap[deptProperty.value];
-                if(!oaDept){
-                    await item.deleteDepartmentProperty();
+                            item.staffStatus = EStaffStatus.QUIT_JOB;
+                            await item.save();
 
-                    try{
-                        await item.destroy();
-                    }catch(e) {
-                        console.info("删除部门失败",e);
+                            let deleteAccount = await Models.account.get(item.accountId);
+                            await deleteAccount.destroy();
+
+                            await item.deleteStaffDepartments();
+                        }catch (e){
+                            console.info("删除员工失败", e);
+                        }
+                    }else{
+                        oaStaffsMap[staffProperty.value] = null;
                     }
-                }
-            }));
+                }));
 
-            //5、递归同步子部门信息
-            if(childrenDepartments && childrenDepartments.length > 0){
-                await Promise.all(childrenDepartments.map(async (item) => {
-                    await this.sync({company: company, oaDepartment: item});
-                }))
+                //获取oa子部门
+                let childrenDepartments = await self.getChildrenDepartments();
+                let childrenDepartmentsMap = {};
+                for(let d = 0; d < childrenDepartments.length; d++){
+                    let ld = childrenDepartments[d];
+                    childrenDepartmentsMap[ld.id] = ld;
+                }
+
+                //4、删除被删除的子部门
+                let childrenDepts = await Models.department.all({where: {parentId: result.id}});
+                await Promise.all(childrenDepts.map(async (item) => {
+                    let deptProperty = await item.getOaDeptIdProperty();
+                    let oaDept = childrenDepartmentsMap[deptProperty.value];
+                    if(!oaDept){
+                        await item.deleteDepartmentProperty();
+
+                        try{
+                            await item.destroy();
+                        }catch(e) {
+                            console.info("删除部门失败",e);
+                        }
+                    }else{
+                        childrenDepartmentsMap[deptProperty.value] = null;
+                    }
+                }));
+
+                //5、递归同步子部门信息
+                if(childrenDepartments && childrenDepartments.length > 0){
+                    await Promise.all(childrenDepartments.map(async (item) => {
+                        await this.sync({company: company, oaDepartment: item});
+                    }))
+                }
             }
 
         }else{

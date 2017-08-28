@@ -114,7 +114,7 @@ export default class DdDepartment extends OaDepartment {
         let result: OaStaff[] = [];
         for(let u of dingUsers){
             let oaStaff = new DdStaff({id: u.userid, isAdmin: u.isAdmin, name: u.name, email: u.email, mobile: u.mobile, departmentIds: u.department,
-                corpId: self.corpId, isvApi: self.isvApi, corpApi: self.corpApi});
+                corpId: self.corpId, isvApi: self.isvApi, corpApi: self.corpApi, company: self.company, avatar: u.avatar});
             result.push(oaStaff);
         }
         return result;
@@ -167,9 +167,11 @@ export default class DdDepartment extends OaDepartment {
         if(deptPro && deptPro.length > 0){
             for(let d of deptPro){
                 let dept = await Models.department.get(d.departmentId);
-                let deptCorpPro = await Models.departmentProperty.find({where : {value: self.corpId, type: DPropertyType.DD_COMPANY_ID, departmentId: dept.id}});
-                if(deptCorpPro && deptCorpPro.length){//此处有待考证【是否可以再property表添加一个CorpId的属性】
-                    department = dept;
+                if(dept){
+                    let deptCorpPro = await Models.departmentProperty.find({where : {value: self.corpId, type: DPropertyType.DD_COMPANY_ID, departmentId: dept.id}});
+                    if(deptCorpPro && deptCorpPro.length){//此处有待考证【是否可以再property表添加一个CorpId的属性】
+                        department = dept;
+                    }
                 }
             }
         }

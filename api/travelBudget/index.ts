@@ -194,6 +194,7 @@ export default class ApiTravelBudget {
         let cities = segmentsBudget.cities;
         let _budgets = segmentsBudget.budgets;
         let budgets = [];
+        console.log("====cities: ",cities);
         for (let i = 0, ii = cities.length; i < ii; i++) {
             let city = cities[i];
 
@@ -240,7 +241,7 @@ export default class ApiTravelBudget {
             if (i == destLength-1 && !goBackPlace) {
                 isHasBackSubsidy = true;
             }
-            let budget = await getSubsidyBudget(placeInfo, isHasBackSubsidy);
+            let budget = await getSubsidyBudget(city, placeInfo, isHasBackSubsidy);
             if (budget) {
                 budget.city = city;
                 budget.price = budget.price * count;
@@ -261,19 +262,21 @@ export default class ApiTravelBudget {
         return _id;
 
 
-        function getSubsidyBudget(destination, isHasBackSubsidy: boolean = false) {
+        async function getSubsidyBudget(city, destination, isHasBackSubsidy: boolean = false) {
             let { subsidy, leaveDate, goBackDate, reason } = destination;
             let budget: any = null
             if (subsidy && subsidy.template) {
-                let goBackDay = moment(goBackDate).format("YYYY-MM-DD");
-                let leaveDay = moment(leaveDate).format("YYYY-MM-DD");
+                city = await API.place.getCityInfo({cityCode: city});
+                let timezone = city.timezone ? city.timezone : "Asia/shanghai";
+                let goBackDay = moment(goBackDate).tz(timezone).format("YYYY-MM-DD");
+                let leaveDay = moment(leaveDate).tz(timezone).format("YYYY-MM-DD");
                 let days = moment(goBackDay).diff(moment(leaveDay), 'days');
                 if (isHasBackSubsidy) { //解决如果只有住宿时最后一天补助无法加到返程目的地上
                     days += 1;
                 }
                 if (days > 0) {
                     budget = {};
-                    budget.fromDate = leaveDate;
+                    budget.fromDate = leaveDay;
                     budget.endDate = (goBackDate == leaveDay || isHasBackSubsidy) ? goBackDate: moment(goBackDate).add(-1, 'days').format('YYYY-MM-DD');
                     budget.tripType = ETripType.SUBSIDY;
                     budget.type = EInvoiceType.SUBSIDY;
