@@ -60,27 +60,23 @@ export default class TravelPolicyModule{
 
 
     @clientExport
-    async getDefaultTravelPolicy(params: {companyId: string, isDefault?: boolean}): Promise<ITravelPolicy> {
+    async getDefaultTravelPolicy(params: {companyId: string, isDefault?: boolean}): Promise<any> {
         // return API.policy.getDefaultTravelPolicy(params);
         if(params.companyId) {
             throw L.ERR.BAD_REQUEST();
         }
         if(!params.isDefault) params.isDefault = true;
         let defaultTp = await TravelPolicyModule.operateOnPolicy({
-            url: BASE_URL,
+            model: 'travelPolicy',
             params: {
                 fields:params,
                 method: "getTravelPolicies",
-            },
-            method: 'get'
+            }
         });
-        if(defaultTp && typeof(defaultTp) == 'string') {
-            defaultTp =JSON.parse(defaultTp);
-        }
         if(!defaultTp || defaultTp.length == 0){
             return null;
         }
-        return new ITravelPolicy(defaultTp[0]);
+        return defaultTp;
     }
 
 
@@ -141,7 +137,7 @@ export default class TravelPolicyModule{
 
         // let tpr = await API.policy.createTravelPolicyRegion(params);
         let tpr = await TravelPolicyModule.operateOnPolicy({
-            url: BASE_URL,
+            model: "travelPolicyRegion",
             params: {
                 fields: params,
                 method: "createTravelPolicyRegion"

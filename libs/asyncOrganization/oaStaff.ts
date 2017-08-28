@@ -125,6 +125,8 @@ export  abstract class OaStaff{
                 newDepartments.push(defaultDepartment)
             }else{
                 // 不存在，添加
+                let roleId;
+                let pwd;
                 let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd)});
                 staff.setTravelPolicy(defaultTravelPolicy.id);
                 staff.company = company;

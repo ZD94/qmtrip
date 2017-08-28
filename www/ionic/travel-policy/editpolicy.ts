@@ -1,8 +1,8 @@
 import { Staff } from '_types/staff/staff';
-import {TravelPolicy, EPlaneLevel, ETrainLevel, EHotelLevel, MPlaneLevel, MTrainLevel} from '_types/travelPolicy';
+import {EPlaneLevel, ETrainLevel, EHotelLevel, MPlaneLevel, MTrainLevel} from '_types';
 import { SubsidyTemplatesController } from './subsidy-templates';
 var msgbox = require('msgbox');
-
+var TravelPolicy;
 export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory, $ionicPopup, ngModalDlg, $window) {
     require('./editpolicy.scss');
     $scope.travelPolicy = {};

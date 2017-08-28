@@ -8,7 +8,7 @@ import {Staff} from "_types/staff/staff";
 import {
     MTrainLevel, MPlaneLevel, MHotelLevel, enumPlaneLevelToStr, enumTrainLevelToStr,
     enumHotelLevelToStr
-} from "_types/travelPolicy";
+} from "_types";
 
 
 angular

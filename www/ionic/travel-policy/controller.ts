@@ -2,7 +2,7 @@ import { Staff } from '_types/staff/staff';
 import {
     MHotelLevel, MPlaneLevel, MTrainLevel, enumHotelLevelToStr, enumPlaneLevelToStr,
     enumTrainLevelToStr
-} from '_types/travelPolicy';
+} from '_types';
 
 var msgbox = require('msgbox');
 
