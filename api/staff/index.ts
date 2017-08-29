@@ -547,7 +547,6 @@ class StaffModule{
      */
     @clientExport
     static async batchImportStaff(params){
-        return null;
         let staff = await Staff.getCurrent();
         let fileId = params.fileId;
         let travelPolicyMaps: any = {};
