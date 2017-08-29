@@ -87,7 +87,7 @@ class StaffModule{
                 staff.pwd = utils.md5(pwd);
                 let defaultTravelPolicy = await company.getDefaultTravelPolicy();
                 if(!staff["travelPolicyId"]){
-                    staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
+                    staff["travelPolicyId"] = defaultTravelPolicy && defaultTravelPolicy.length ? defaultTravelPolicy[0].id : null;
                 }
             }
 
@@ -147,7 +147,7 @@ class StaffModule{
         staff.company = company;
 
         if(!staff["travelPolicyId"]){
-            staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
+            staff["travelPolicyId"] = defaultTravelPolicy && defaultTravelPolicy.length ? defaultTravelPolicy[0].id : null;
         }
         await staff.save();
 
@@ -548,239 +548,239 @@ class StaffModule{
     @clientExport
     static async batchImportStaff(params){
         return null;
-        // let staff = await Staff.getCurrent();
-        // let fileId = params.fileId;
-        // let travelPolicyMaps: any = {};
-        // let departmentMaps: any = {};
-        // let addObj = [];
-        // let noAddObj = [];
-        // let downloadAddObj = [];
-        // let downloadNoAddObj = [];
-        // let emailAttr = [];
-        // let mobileAttr = [];
-        // let repeatEmail = [];
-        // let repeatMobile = [];
-        // let company = staff.company;
-        // let companyId = company.id;
-        // let xlsObj;
-        // let defaultDept = await company.getDefaultDepartment();
-        // let att = await API.attachment.getSelfAttachment({fileId: fileId, accountId: staff.id});
-        // if(att){
-        //     var content = new Buffer(att.content, 'base64');
-        //     xlsObj = nodeXlsx.parse(content);
-        // }else{
-        //     throw {code:-1, msg:"附件记录不存在"};
-        // }
-        // let departments = await Models.department.find({where: {companyId: companyId}});
-        // let travelPolicies = await Models.travelPolicy.find({where: {companyId: companyId}});
-        // for(let t=0;t<travelPolicies.length;t++){
-        //     let tp = travelPolicies[t];
-        //     travelPolicyMaps[tp.name] = tp.id;
-        // }
-        // for(let k=0;k<departments.length;k++){
-        //     let dep = departments[k];
-        //     departmentMaps[dep.name] = dep;
-        // }
-        // let data = xlsObj[1].data;
-        //
-        // let items = await Promise.all(data.map(async function(item, index){
-        //     let s = data[index];
-        //     let departments = [];
-        //     let departmentPass = true;
-        //     let staffObj: any = {name: s[0], mobile: s[1]+"", email: s[2]||'',sex: s[3]?((s[3] == '女') ? EGender.FEMALE : EGender.MALE) : null,
-        //         roleId: s[4] == '管理员' ? EStaffRole.ADMIN : EStaffRole.COMMON, travelPolicyId: travelPolicyMaps[s[5]]||'', companyId: companyId,
-        //         sexStr: s[3], role: s[4], travelPolicyName: s[5], departmentName: s[6]};
-        //     if(index>0 && index<201){//不取等于0的过滤抬头标题栏
-        //         if(_.trim(staffObj.name) == ""){
-        //             staffObj.reason = "姓名为空";
-        //             s[7] = "姓名为空";
-        //             noAddObj.push(staffObj);
-        //             downloadNoAddObj.push(s);
-        //             return;
-        //         }
-        //         if(_.trim(staffObj.mobile) != "" && !validate.isMobile(staffObj.mobile)){
-        //             staffObj.reason = "手机号格式不正确";
-        //             s[7] = "手机号格式不正确";
-        //             noAddObj.push(staffObj);
-        //             downloadNoAddObj.push(s);
-        //             return;
-        //         }
-        //         if(_.trim(staffObj.mobile) != "" && mobileAttr.join(",").indexOf(_.trim(s[1])) != -1){
-        //             staffObj.reason = "手机号与本次导入中手机号重复";
-        //             s[7] = "手机号与本次导入中手机号重复";
-        //             noAddObj.push(staffObj);
-        //             downloadNoAddObj.push(s);
-        //             repeatMobile.push(_.trim(s[1]));
-        //             return;
-        //         }
-        //         mobileAttr.push(s[1]);
-        //         if(_.trim(staffObj.email) && !validate.isEmail(staffObj.email)){
-        //             staffObj.reason = "邮箱不符合要求";
-        //             s[7] = "邮箱不符合要求";
-        //             noAddObj.push(staffObj);
-        //             downloadNoAddObj.push(s);
-        //             return;
-        //         }
-        //         if(staffObj.email && _.trim(staffObj.email) != "" && emailAttr.join(",").indexOf(_.trim(s[2])) != -1){
-        //             staffObj.reason = "邮箱与本次导入中邮箱重复";
-        //             s[7] = "邮箱与本次导入中邮箱重复";
-        //             noAddObj.push(staffObj);
-        //             downloadNoAddObj.push(s);
-        //             repeatEmail.push(_.trim(s[2]));
-        //             return;
-        //         }
-        //         emailAttr.push(s[2]);
-        //         if(!_.trim(staffObj.travelPolicyName)){
-        //             staffObj.reason = "差旅标准为空";
-        //             s[7] = "差旅标准为空";
-        //             noAddObj.push(staffObj);
-        //             downloadNoAddObj.push(s);
-        //             return;
-        //         }
-        //         if(s[5] && _.trim(s[5]) != "" && staffObj.travelPolicyId == ""){
-        //             staffObj.reason = "差旅标准不存在";
-        //             s[7] = "差旅标准不存在";
-        //             noAddObj.push(staffObj);
-        //             downloadNoAddObj.push(s);
-        //             return;
-        //         }
-        //         if(s[6]){
-        //             let departmentNames = s[6].split(",");
-        //             for(var i=0;i<departmentNames.length;i++){
-        //                 let _d = departmentNames[i];
-        //                 if(_d.indexOf('/') != -1){
-        //                     let dd = _d.split('/');
-        //                     let p_id = null;
-        //                     for(var j=0;j<dd.length;j++){
-        //                         let _dd = dd[j];
-        //                         if(j == 0){
-        //                             let one_d = await Models.department.find({where:{name: _dd, companyId: companyId, parentId: defaultDept.id}});
-        //                             if(one_d && one_d.length > 0){
-        //                                 p_id = one_d[0].id;
-        //                             }else{
-        //                                 staffObj.reason = _dd + "部门不存在";
-        //                                 s[7] = _dd + "部门不存在";
-        //                                 noAddObj.push(staffObj);
-        //                                 downloadNoAddObj.push(s);
-        //                                 departmentPass = false;
-        //                                 break;
-        //                             }
-        //                         }else{
-        //                             let next_d = await Models.department.find({where:{name: _dd, companyId: companyId, parentId: p_id}});
-        //                             if(!next_d || next_d.length <= 0){
-        //                                 staffObj.reason = _dd + "部门不存在";
-        //                                 s[7] = _dd + "部门不存在";
-        //                                 noAddObj.push(staffObj);
-        //                                 downloadNoAddObj.push(s);
-        //                                 departmentPass = false;
-        //                                 break;
-        //                             }else{
-        //                                 p_id = next_d[0].id;
-        //                             }
-        //
-        //                             if(j == (dd.length - 1)){
-        //                                 let lost_d = next_d[0];
-        //                                 departments.push(next_d[0]);
-        //                             }
-        //
-        //                         }
-        //                     }
-        //                 }else{
-        //                     if(departmentMaps[_d]){
-        //                         departments.push(departmentMaps[_d]);
-        //                     }else{
-        //                         staffObj.reason = _d + "部门不存在";
-        //                         s[7] = _d + "部门不存在";
-        //                         noAddObj.push(staffObj);
-        //                         downloadNoAddObj.push(s);
-        //                         departmentPass = false;
-        //                         break;
-        //                     }
-        //                 }
-        //
-        //             }
-        //             if(!departmentPass){
-        //                 return;
-        //             }
-        //         }else{
-        //             departments.push(defaultDept);
-        //         }
-        //         staffObj.departments = departments;
-        //         let staff1 = await API.auth.checkAccExist({where: {email: staffObj.email, type: 1}});
-        //         let staff2 = await API.auth.checkAccExist({where: {mobile: staffObj.mobile, type: 1}});
-        //         if(staff1 && staffObj.email && staffObj.email != ""){
-        //             staffObj.reason = "邮箱与已有用户重复";
-        //             s[7] = "邮箱与已有用户重复";
-        //             noAddObj.push(staffObj);
-        //             downloadNoAddObj.push(s);
-        //         }else if(staff2 && staffObj.mobile && staffObj.mobile != ""){
-        //             staffObj.reason = "手机号与已有用户重复";
-        //             s[7] = "手机号与已有用户重复";
-        //             noAddObj.push(staffObj);
-        //             downloadNoAddObj.push(s);
-        //         }else{
-        //             addObj.push(staffObj);
-        //             downloadAddObj.push(s);
-        //         }
-        //         return item;
-        //     }else if(index != 0){
-        //         staffObj.reason = "文件最多两百行";
-        //         s[7] = "文件最多两百行";
-        //         noAddObj.push(staffObj);
-        //         downloadNoAddObj.push(s);
-        //         return;
-        //     }
-        // }));
-        //
-        // //addObj中删除重复邮箱的用户
-        // let repeatEmailStr = repeatEmail.join(",");
-        // for(let i=0;i<addObj.length;i++){
-        //     let addStaff = addObj[i];
-        //     if(addStaff.email && repeatEmailStr.indexOf(_.trim(addStaff.email)) != -1 && _.trim(addStaff.email) != ""){
-        //         let obj = downloadAddObj[i];
-        //         addObj.splice(i, 1);
-        //         downloadAddObj.splice(i, 1);
-        //         addStaff.reason = "邮箱与本次导入中邮箱重复";
-        //         obj[7] = "邮箱与本次导入中邮箱重复";
-        //         noAddObj.push(addStaff);
-        //         downloadNoAddObj.push(obj);
-        //     }
-        // }
-        //
-        // //addObj中删除重复邮箱的用户
-        // let repeatMobileStr = repeatMobile.join(",");
-        // for(let i=0;i<addObj.length;i++){
-        //     let addStaff = addObj[i];
-        //     if(repeatMobileStr.indexOf(_.trim(addStaff.mobile)) != -1){
-        //         let obj = downloadAddObj[i];
-        //         addObj.splice(i, 1);
-        //         downloadAddObj.splice(i, 1);
-        //         addStaff.reason = "手机号与本次导入中手机号重复";
-        //         obj[7] = "手机号与本次导入中手机号重复";
-        //         noAddObj.push(addStaff);
-        //         downloadNoAddObj.push(obj);
-        //     }
-        // }
-        //
-        //
-        // await Promise.all(addObj.map(async function(item, index){
-        //     let depts = item.departments;
-        //     let staffObj: any = {name: item.name, mobile: item.mobile+"", email: item.email, sex: item.sex, roleId: item.roleId,
-        //         travelPolicyId: item.travelPolicyId, companyId: item.companyId, addWay: EAddWay.BATCH_IMPORT, isNeedChangePwd: true, };
-        //     if(_.trim(staffObj.mobile) == ""){
-        //         staffObj.mobile = null;
-        //     }
-        //     if(_.trim(staffObj.email) == ""){
-        //         staffObj.email = null;
-        //     }
-        //     let staffAdded = await StaffModule.createStaff(staffObj);
-        //     await staffAdded.addDepartment(depts);
-        //
-        // }));
-        //
-        // await API.attachments.removeFileAndAttach({id: fileId});
-        // return {addObj: JSON.stringify(addObj), downloadAddObj: JSON.stringify(downloadAddObj), noAddObj: JSON.stringify(noAddObj),
-        //     downloadNoAddObj: JSON.stringify(downloadNoAddObj)};
+        let staff = await Staff.getCurrent();
+        let fileId = params.fileId;
+        let travelPolicyMaps: any = {};
+        let departmentMaps: any = {};
+        let addObj = [];
+        let noAddObj = [];
+        let downloadAddObj = [];
+        let downloadNoAddObj = [];
+        let emailAttr = [];
+        let mobileAttr = [];
+        let repeatEmail = [];
+        let repeatMobile = [];
+        let company = staff.company;
+        let companyId = company.id;
+        let xlsObj;
+        let defaultDept = await company.getDefaultDepartment();
+        let att = await API.attachment.getSelfAttachment({fileId: fileId, accountId: staff.id});
+        if(att){
+            var content = new Buffer(att.content, 'base64');
+            xlsObj = nodeXlsx.parse(content);
+        }else{
+            throw {code:-1, msg:"附件记录不存在"};
+        }
+        let departments = await Models.department.find({where: {companyId: companyId}});
+        let travelPolicies = await API.travelPolicy.getTravelPolicies({companyId: companyId});
+        for(let t=0;t<travelPolicies.length;t++){
+            let tp = travelPolicies[t];
+            travelPolicyMaps[tp.name] = tp.id;
+        }
+        for(let k=0;k<departments.length;k++){
+            let dep = departments[k];
+            departmentMaps[dep.name] = dep;
+        }
+        let data = xlsObj[1].data;
+
+        let items = await Promise.all(data.map(async function(item, index){
+            let s = data[index];
+            let departments = [];
+            let departmentPass = true;
+            let staffObj: any = {name: s[0], mobile: s[1]+"", email: s[2]||'',sex: s[3]?((s[3] == '女') ? EGender.FEMALE : EGender.MALE) : null,
+                roleId: s[4] == '管理员' ? EStaffRole.ADMIN : EStaffRole.COMMON, travelPolicyId: travelPolicyMaps[s[5]]||'', companyId: companyId,
+                sexStr: s[3], role: s[4], travelPolicyName: s[5], departmentName: s[6]};
+            if(index>0 && index<201){//不取等于0的过滤抬头标题栏
+                if(_.trim(staffObj.name) == ""){
+                    staffObj.reason = "姓名为空";
+                    s[7] = "姓名为空";
+                    noAddObj.push(staffObj);
+                    downloadNoAddObj.push(s);
+                    return;
+                }
+                if(_.trim(staffObj.mobile) != "" && !validate.isMobile(staffObj.mobile)){
+                    staffObj.reason = "手机号格式不正确";
+                    s[7] = "手机号格式不正确";
+                    noAddObj.push(staffObj);
+                    downloadNoAddObj.push(s);
+                    return;
+                }
+                if(_.trim(staffObj.mobile) != "" && mobileAttr.join(",").indexOf(_.trim(s[1])) != -1){
+                    staffObj.reason = "手机号与本次导入中手机号重复";
+                    s[7] = "手机号与本次导入中手机号重复";
+                    noAddObj.push(staffObj);
+                    downloadNoAddObj.push(s);
+                    repeatMobile.push(_.trim(s[1]));
+                    return;
+                }
+                mobileAttr.push(s[1]);
+                if(_.trim(staffObj.email) && !validate.isEmail(staffObj.email)){
+                    staffObj.reason = "邮箱不符合要求";
+                    s[7] = "邮箱不符合要求";
+                    noAddObj.push(staffObj);
+                    downloadNoAddObj.push(s);
+                    return;
+                }
+                if(staffObj.email && _.trim(staffObj.email) != "" && emailAttr.join(",").indexOf(_.trim(s[2])) != -1){
+                    staffObj.reason = "邮箱与本次导入中邮箱重复";
+                    s[7] = "邮箱与本次导入中邮箱重复";
+                    noAddObj.push(staffObj);
+                    downloadNoAddObj.push(s);
+                    repeatEmail.push(_.trim(s[2]));
+                    return;
+                }
+                emailAttr.push(s[2]);
+                if(!_.trim(staffObj.travelPolicyName)){
+                    staffObj.reason = "差旅标准为空";
+                    s[7] = "差旅标准为空";
+                    noAddObj.push(staffObj);
+                    downloadNoAddObj.push(s);
+                    return;
+                }
+                if(s[5] && _.trim(s[5]) != "" && staffObj.travelPolicyId == ""){
+                    staffObj.reason = "差旅标准不存在";
+                    s[7] = "差旅标准不存在";
+                    noAddObj.push(staffObj);
+                    downloadNoAddObj.push(s);
+                    return;
+                }
+                if(s[6]){
+                    let departmentNames = s[6].split(",");
+                    for(var i=0;i<departmentNames.length;i++){
+                        let _d = departmentNames[i];
+                        if(_d.indexOf('/') != -1){
+                            let dd = _d.split('/');
+                            let p_id = null;
+                            for(var j=0;j<dd.length;j++){
+                                let _dd = dd[j];
+                                if(j == 0){
+                                    let one_d = await Models.department.find({where:{name: _dd, companyId: companyId, parentId: defaultDept.id}});
+                                    if(one_d && one_d.length > 0){
+                                        p_id = one_d[0].id;
+                                    }else{
+                                        staffObj.reason = _dd + "部门不存在";
+                                        s[7] = _dd + "部门不存在";
+                                        noAddObj.push(staffObj);
+                                        downloadNoAddObj.push(s);
+                                        departmentPass = false;
+                                        break;
+                                    }
+                                }else{
+                                    let next_d = await Models.department.find({where:{name: _dd, companyId: companyId, parentId: p_id}});
+                                    if(!next_d || next_d.length <= 0){
+                                        staffObj.reason = _dd + "部门不存在";
+                                        s[7] = _dd + "部门不存在";
+                                        noAddObj.push(staffObj);
+                                        downloadNoAddObj.push(s);
+                                        departmentPass = false;
+                                        break;
+                                    }else{
+                                        p_id = next_d[0].id;
+                                    }
+
+                                    if(j == (dd.length - 1)){
+                                        let lost_d = next_d[0];
+                                        departments.push(next_d[0]);
+                                    }
+
+                                }
+                            }
+                        }else{
+                            if(departmentMaps[_d]){
+                                departments.push(departmentMaps[_d]);
+                            }else{
+                                staffObj.reason = _d + "部门不存在";
+                                s[7] = _d + "部门不存在";
+                                noAddObj.push(staffObj);
+                                downloadNoAddObj.push(s);
+                                departmentPass = false;
+                                break;
+                            }
+                        }
+
+                    }
+                    if(!departmentPass){
+                        return;
+                    }
+                }else{
+                    departments.push(defaultDept);
+                }
+                staffObj.departments = departments;
+                let staff1 = await API.auth.checkAccExist({where: {email: staffObj.email, type: 1}});
+                let staff2 = await API.auth.checkAccExist({where: {mobile: staffObj.mobile, type: 1}});
+                if(staff1 && staffObj.email && staffObj.email != ""){
+                    staffObj.reason = "邮箱与已有用户重复";
+                    s[7] = "邮箱与已有用户重复";
+                    noAddObj.push(staffObj);
+                    downloadNoAddObj.push(s);
+                }else if(staff2 && staffObj.mobile && staffObj.mobile != ""){
+                    staffObj.reason = "手机号与已有用户重复";
+                    s[7] = "手机号与已有用户重复";
+                    noAddObj.push(staffObj);
+                    downloadNoAddObj.push(s);
+                }else{
+                    addObj.push(staffObj);
+                    downloadAddObj.push(s);
+                }
+                return item;
+            }else if(index != 0){
+                staffObj.reason = "文件最多两百行";
+                s[7] = "文件最多两百行";
+                noAddObj.push(staffObj);
+                downloadNoAddObj.push(s);
+                return;
+            }
+        }));
+
+        //addObj中删除重复邮箱的用户
+        let repeatEmailStr = repeatEmail.join(",");
+        for(let i=0;i<addObj.length;i++){
+            let addStaff = addObj[i];
+            if(addStaff.email && repeatEmailStr.indexOf(_.trim(addStaff.email)) != -1 && _.trim(addStaff.email) != ""){
+                let obj = downloadAddObj[i];
+                addObj.splice(i, 1);
+                downloadAddObj.splice(i, 1);
+                addStaff.reason = "邮箱与本次导入中邮箱重复";
+                obj[7] = "邮箱与本次导入中邮箱重复";
+                noAddObj.push(addStaff);
+                downloadNoAddObj.push(obj);
+            }
+        }
+
+        //addObj中删除重复邮箱的用户
+        let repeatMobileStr = repeatMobile.join(",");
+        for(let i=0;i<addObj.length;i++){
+            let addStaff = addObj[i];
+            if(repeatMobileStr.indexOf(_.trim(addStaff.mobile)) != -1){
+                let obj = downloadAddObj[i];
+                addObj.splice(i, 1);
+                downloadAddObj.splice(i, 1);
+                addStaff.reason = "手机号与本次导入中手机号重复";
+                obj[7] = "手机号与本次导入中手机号重复";
+                noAddObj.push(addStaff);
+                downloadNoAddObj.push(obj);
+            }
+        }
+
+
+        await Promise.all(addObj.map(async function(item, index){
+            let depts = item.departments;
+            let staffObj: any = {name: item.name, mobile: item.mobile+"", email: item.email, sex: item.sex, roleId: item.roleId,
+                travelPolicyId: item.travelPolicyId, companyId: item.companyId, addWay: EAddWay.BATCH_IMPORT, isNeedChangePwd: true, };
+            if(_.trim(staffObj.mobile) == ""){
+                staffObj.mobile = null;
+            }
+            if(_.trim(staffObj.email) == ""){
+                staffObj.email = null;
+            }
+            let staffAdded = await StaffModule.createStaff(staffObj);
+            await staffAdded.addDepartment(depts);
+
+        }));
+
+        await API.attachments.removeFileAndAttach({id: fileId});
+        return {addObj: JSON.stringify(addObj), downloadAddObj: JSON.stringify(downloadAddObj), noAddObj: JSON.stringify(noAddObj),
+            downloadNoAddObj: JSON.stringify(downloadNoAddObj)};
     }
 
     /**

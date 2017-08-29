@@ -6,7 +6,6 @@ import { ACCOUNT_STATUS } from '_types/auth';
 import { Company, ECompanyType } from '_types/company';
 import { Agency } from '_types/agency';
 import { Department, StaffDepartment } from '_types/department';
-// import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion, CompanyRegion, RegionPlace } from '_types/travelPolicy';
 import {md5} from "common/utils";
 import {CoinAccount} from "_types/coin";
 import {EGender} from "_types";
@@ -79,12 +78,10 @@ async function initXAJHTravelPolicy(params: {companyId: string}): Promise<any[]>
     for(let i = 0; i < companyRegion.length; i++){
         if(companyRegion[i].name == '国内') {
             domesticCR = await API.travelPolicy.createCompanyRegion({name:companyRegion[i].name, companyId: company["id"]});
-            domesticCR = await domesticCR.save();
             let rp = await API.travelPolicy.createRegionPlace({placeId: regionPlace.domestic_place_id, companyRegionId: domesticCR["id"]});
         }
         if(companyRegion[i].name == '国际') {
             abroadCR = await API.travelPolicy.createCompanyRegion({name:companyRegion[i].name, companyId: company["id"]});
-            abroadCR = await abroadCR.save();
             let rp = await API.travelPolicy.createRegionPlace({placeId: regionPlace.abroad_place_id, companyRegionId: abroadCR["id"]});
         }
     }
@@ -95,9 +92,9 @@ async function initXAJHTravelPolicy(params: {companyId: string}): Promise<any[]>
         let travelPolicy = await API.travelPolicy.createTravelPolicy(item);
 
         let domesticTpr = await API.travelPolicy.createTravelPolicyRegion({
-            "planeLevels": item.planeLevels,
-            "trainLevels": item.trainLevels,
-            "hotelLevels": item.hotelLevels,
+            planeLevels: item.planeLevels,
+            trainLevels: item.trainLevels,
+            hotelLevels: item.hotelLevels,
             travelPolicyId: travelPolicy["id"],
             companyRegionId: domesticCR["id"],
             trafficPrefer: -1,
@@ -107,8 +104,8 @@ async function initXAJHTravelPolicy(params: {companyId: string}): Promise<any[]>
 
         if(item.isOpenAbroad) {
             let abroadTpr = await API.travelPolicy.createTravelPolicyRegion({
-                "planeLevels": item.abroadPlaneLevels,
-                "hotelLevels": item.abroadHotelLevels,
+                planeLevels: item.abroadPlaneLevels,
+                hotelLevels: item.abroadHotelLevels,
                 travelPolicyId: travelPolicy["id"],
                 companyRegionId: abroadCR["id"],
                 trafficPrefer: -1,
@@ -121,7 +118,6 @@ async function initXAJHTravelPolicy(params: {companyId: string}): Promise<any[]>
                 let st = subsidyTemplates[i];
                 if(!st["travelPolicyId"]) st["travelPolicyId"] = travelPolicy["id"];
                 let subTem = await API.travelPolicy.createSubsidyTemplate(st);
-                subTem.travelPolicy = travelPolicy;
                 await subTem.save();
             }
         }
@@ -168,6 +164,7 @@ async function initXAJHStaffs(params: {companyId: string}): Promise<any[]> {
         let travelPolicy : any;
         if(staff.travelPolicyName){
             let tps = await API.travelPolicy.getTravelPolicies({companyId: companyId, name: staff.travelPolicyName});
+            tps = tps.data;
             if(tps && tps.length > 0){
                 travelPolicy = tps[0];
             }
@@ -202,8 +199,9 @@ async function initXAJHStaffs(params: {companyId: string}): Promise<any[]> {
     }));
     let create_user = await company.getCreateUser();
     let tp = await API.travelPolicy.getTravelPolicies({companyId: companyId, name: "高管级"});
+    tp = tp.data;
     if(tp && tp.length > 0){
-        create_user.setTravelPolicy(tp[0]);
+        create_user.setTravelPolicy(tp[0].id);
     }
     create_user = await create_user.save();
     result.push(create_user);

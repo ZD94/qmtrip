@@ -4,7 +4,6 @@
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import {Models } from '_types'
 import {ETripType, EInvoiceType, ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan";
-// import {TravelPolicyRegion, TravelPolicy} from "_types/travelPolicy";
 import {Staff} from "_types/staff";
 const API = require("@jingli/dnode-api");
 const validate = require("common/validate");
@@ -112,40 +111,6 @@ export default class ApiTravelBudget {
             segment.city = placeInfo.destinationPlace;
             let city: Place = (await API.place.getCityInfo({cityCode: placeInfo.destinationPlace}));
 
-            // let bestTravelPolicy:any = {};
-            //
-            // if(placeInfo.isNeedTraffic) {
-            //     bestTravelPolicy.trainLevels = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'trainLevels'});
-            //     bestTravelPolicy.planeLevels = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'planeLevels'});
-            //     bestTravelPolicy.trafficPrefer = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'trafficPrefer'});
-            // }
-            // if(placeInfo.isNeedHotel) {
-            //     bestTravelPolicy.hotelLevels = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'hotelLevels'});
-            //     bestTravelPolicy.hotelPrefer = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'hotelPrefer'});
-            //     let minPriceLimit = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'minPriceLimit'});
-            //     let maxPriceLimit = await travelPolicy.getBestTravelPolicys ({placeId: placeInfo.destinationPlace, type: 'maxPriceLimit'});
-            //     priceLimitSegments.push({cityid:placeInfo.destinationPlace,maxPriceLimit:maxPriceLimit, minPriceLimit: minPriceLimit});
-            // }
-
-            // if(!bestTravelPolicy){
-            //     throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
-            // }
-            // policies = {
-            //     "domestic": {
-            //         hotelStar: bestTravelPolicy.hotelLevels,
-            //         cabin: bestTravelPolicy.planeLevels,
-            //         trainSeat: bestTravelPolicy.trainLevels,
-            //         hotelPrefer: bestTravelPolicy.hotelPrefer,
-            //         trafficPrefer: bestTravelPolicy.trafficPrefer
-            //     },
-            //     "abroad": {
-            //         hotelStar: bestTravelPolicy.hotelLevels,
-            //         cabin: bestTravelPolicy.planeLevels,
-            //         trainSeat: bestTravelPolicy.trainLevels,
-            //         hotelPrefer: bestTravelPolicy.hotelPrefer,
-            //         trafficPrefer: bestTravelPolicy.trafficPrefer
-            //     }
-            // }
             if (city.isAbroad) {
                 let s = _.cloneDeep(_staff);
                 s.policy = 'abroad';
@@ -178,10 +143,7 @@ export default class ApiTravelBudget {
             return segment;
         }));
 
-        // console.log("segments===>", segments);
-
         let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
-            // policies,
             travelPolicyId: travelPolicy['id'],
             staffs,
             segments,
@@ -194,7 +156,6 @@ export default class ApiTravelBudget {
         let cities = segmentsBudget.cities;
         let _budgets = segmentsBudget.budgets;
         let budgets = [];
-        console.log("====cities: ",cities);
         for (let i = 0, ii = cities.length; i < ii; i++) {
             let city = cities[i];
 

@@ -11,7 +11,6 @@ export = async function transform(values: any): Promise<any>{
     let staffMap = {};
     let staff = await Models.staff.get(values.staffId);
     let travelPolicy = await staff.getTravelPolicy();
-    // let travelPolicyRegions = await travelPolicy.getTravelPolicyRegions();
 
     let travelp: {
         name: string,
@@ -31,31 +30,29 @@ export = async function transform(values: any): Promise<any>{
     values.MHotelLevel =  MHotelLevel;
 
     let currentCompany = staff.company;
-    // async function getAbroadPolicy() {
-    //     let policyRegions = await Models.companyRegion.find({where: {companyId: currentCompany.id, name: DefaultRegion.abroad}});
-    //     let abroadRegion = await Models.travelPolicyRegion.find({where: {travelPolicyId: travelPolicy.id, companyRegionId: policyRegions[0].id}});
-    //
-    //     if (abroadRegion && abroadRegion.length > 0) {
-    //         travelp.abroadPlaneLevels = abroadRegion[0].planeLevels;
-    //         travelp.abroadHotelLevels = abroadRegion[0].hotelLevels;
-    //     }
-    // }
-    //
-    // async function getDomesticPolicy() {
-    //     let policyRegions = await Models.companyRegion.find({where: {companyId: currentCompany.id, name: DefaultRegion.domestic}});
-    //     let domesticRegion = await Models.travelPolicyRegion.find({where: {travelPolicyId: travelPolicy.id, companyRegionId: policyRegions[0].id}});
-    //     if (domesticRegion && domesticRegion.length > 0) {
-    //         travelp.planeLevels = domesticRegion[0].planeLevels;
-    //         travelp.hotelLevels = domesticRegion[0].hotelLevels;
-    //         travelp.trainLevels = domesticRegion[0].trainLevels;
-    //     }
-    // }
+    async function getAbroadPolicy() {
+        let policyRegions = await API.travelPolicy.getCompanyRegion({companyId: currentCompany.id, name: DefaultRegion.abroad});
+        let abroadRegion = await API.travelPolicy.getTravelPolicyRegion({travelPolicyId: travelPolicy.id, companyRegionId: policyRegions[0].id});
 
-    // if (travelPolicyRegions && travelPolicyRegions.length > 0) {
-    //     travelp.isOpenAbroad = travelPolicy.isOpenAbroad;
-    //     await getAbroadPolicy();
-    //     await getDomesticPolicy();
-    // }
+        if (abroadRegion && abroadRegion.length > 0) {
+            travelp.abroadPlaneLevels = abroadRegion[0].planeLevels;
+            travelp.abroadHotelLevels = abroadRegion[0].hotelLevels;
+        }
+    }
+
+    async function getDomesticPolicy() {
+        let policyRegions = await API.travelPolicy.getCompanyRegion({companyId: currentCompany.id, name: DefaultRegion.domestic});
+        let domesticRegion = await API.travelPolicy.getTravelPolicyRegion({travelPolicyId: travelPolicy.id, companyRegionId: policyRegions[0].id});
+        if (domesticRegion && domesticRegion.length > 0) {
+            travelp.planeLevels = domesticRegion[0].planeLevels;
+            travelp.hotelLevels = domesticRegion[0].hotelLevels;
+            travelp.trainLevels = domesticRegion[0].trainLevels;
+        }
+    }
+
+    travelp.isOpenAbroad = travelPolicy.isOpenAbroad;
+    await getAbroadPolicy();
+    await getDomesticPolicy();
 
 
     values.travelPolicy =  travelp;

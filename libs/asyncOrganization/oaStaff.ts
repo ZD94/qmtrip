@@ -114,6 +114,9 @@ export  abstract class OaStaff{
             let defaultDepartment = await company.getDefaultDepartment();
             let defaultTravelPolicy = await company.getDefaultTravelPolicy();
 
+            if (!defaultTravelPolicy) {
+                throw L.ERR.ERROR_CODE_C(500, `企业默认差旅标准还未设置`);
+            }
             let companyCreateUser = await Models.staff.get(company.createUser);
 
             let newDepartments: Department[] = [];
@@ -163,7 +166,7 @@ export  abstract class OaStaff{
                 }else{
                     // 不存在，添加
                     let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd), avatar: self.avatar});
-                    staff.setTravelPolicy(defaultTravelPolicy);
+                    staff.setTravelPolicy(defaultTravelPolicy.id);
                     staff.company = company;
                     staff.staffStatus = EStaffStatus.ON_JOB;
                     staff.addWay = EAddWay.OA_SYNC;

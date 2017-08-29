@@ -12,7 +12,6 @@ import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo, StaffPr
 import { Company, MoneyChange, Supplier, TripPlanNumChange, InvoiceTitle, CompanyProperty } from '_types/company';
 import { PromoCode } from '_types/promoCode';
 import { Department, StaffDepartment, DepartmentProperty } from '_types/department';
-// import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
 import { AccordHotel } from '_types/accordHotel';
 import { Notice, NoticeAccount } from '_types/notice';
 import { Agency, AgencyUser } from '_types/agency';
@@ -27,8 +26,7 @@ import {Approve} from "_types/approve";
 import {AgencyOperateLog} from "_types/agency/agency-operate-log";
 import {TripBasicPackage} from "_types/tripPackage/tripBasicPackage";
 import {TripFuelAddPackage} from "_types/tripPackage/tripFuelAddPackage";
-// import {CompanyRegion} from "_types/travelPolicy/companyRegion";
-// import {RegionPlace} from "_types/travelPolicy/regionPlace";
+
 
 
 const API = require('@jingli/dnode-api');
@@ -155,15 +153,6 @@ var Services = {
     tripFuelAddPackage:{type:TripFuelAddPackage, modname:'tripPackage',funcs:[]},
     errorLog: {},
     offline: {},
-    // regionPlace:{},
-    // companyRegion:{},
-    // travelPolicy: { type: TravelPolicy, modname: 'travelPolicy',
-    //     funcs: ['getTravelPolicy', 'getTravelPolicies', 'createTravelPolicy', 'updateTravelPolicy', 'deleteTravelPolicy']
-    // },
-    // subsidyTemplate: { type: SubsidyTemplate, modname: 'travelPolicy',
-    //     funcs: ['getSubsidyTemplate', 'getSubsidyTemplates', 'createSubsidyTemplate', 'updateSubsidyTemplate', 'deleteSubsidyTemplate']
-    // },
-    // travelPolicyRegion:{},
 };
 
 function throwNotImplemented(){
@@ -247,12 +236,6 @@ class ClientModels implements ModelsInterface {
 
     errorLog: ModelInterface<ErrorLog>;
 
-    // travelPolicyRegion: ModelInterface<TravelPolicyRegion>;
-    // companyRegion: ModelInterface<CompanyRegion>;
-    // regionPlace: ModelInterface<RegionPlace>;
-    // travelPolicy: ModelInterface<TravelPolicy>;
-    // subsidyTemplate: ModelInterface<SubsidyTemplate>;
-
     constructor($cacheFactory: ng.ICacheFactoryService, $rootScope: ng.IRootScopeService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
         this.staffProperty = createService<StaffProperty>(Services.staffProperty, $cacheFactory);
@@ -296,12 +279,6 @@ class ClientModels implements ModelsInterface {
         this.tripFuelAddPackage = createService<TripFuelAddPackage>(Services.tripFuelAddPackage, $cacheFactory);
         this.errorLog = createService<ErrorLog>(Services.errorLog, $cacheFactory);
         this.offline = createService<Offline>(Services.offline, $cacheFactory);
-        // this.travelPolicyRegion = createService<TravelPolicyRegion>(Services.travelPolicyRegion, $cacheFactory);
-        // this.companyRegion = createService<CompanyRegion>(Services.companyRegion, $cacheFactory);
-        // this.regionPlace = createService<RegionPlace>(Services.regionPlace, $cacheFactory);
-        // this.travelPolicy = createService<TravelPolicy>(Services.travelPolicy, $cacheFactory);
-        // this.subsidyTemplate = createService<SubsidyTemplate>(Services.subsidyTemplate, $cacheFactory);
-
         initModels(this);
 
         $rootScope.$on('$locationChangeSuccess', ()=>{
