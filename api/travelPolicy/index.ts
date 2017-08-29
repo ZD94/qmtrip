@@ -224,25 +224,25 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
-        isUpdated = isUpdated.code.data[0];
+        isUpdated = isUpdated.data;
 
         if((staff && (staff['companyId'] != isUpdated['companyId'] || (staff['roleId'] != EStaffRole.ADMIN &&
             staff['roleId'] != EStaffRole.OWNER))) ) {  //|| (agencyUser['agencyId'] != company['agencyId'])
             throw L.ERR.PERMISSION_DENY();
         }
 
-        let tpr = await TravelPolicyModule.operateOnPolicy({
+        let tp = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params: {
                 fields: params,
                 method: "put"
             }
         });
-        return tpr;
+        return tp;
     }
 
     @clientExport
-    static async updateTravelPolicyRegion(params: ITravelPolicyRegionParams) : Promise<ITravelPolicyRegion>{
+    static async updateTravelPolicyRegion(params: ITravelPolicyRegionParams) : Promise<any>{
         let tpr = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicyregion",
             params: {
@@ -250,6 +250,7 @@ export default class TravelPolicyModule{
                 method: "put"
             }
         });
+        console.log("tpr: ", tpr);
         return tpr;
     }
 
@@ -297,7 +298,7 @@ export default class TravelPolicyModule{
      */
     @clientExport
     @requireParams(["id"])
-    static async getTravelPolicy(params: {id: string, companyId: string}) : Promise<any>{
+    static async getTravelPolicy(params: {id: string, companyId?: string}) : Promise<any>{
         let id = params.id;
         let travelPolicy = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
@@ -660,16 +661,16 @@ export default class TravelPolicyModule{
         model: string,
         params?:any,
     }) {
-        let {params,model} = options;
-        let {fields,method} = params;
+        let {params, model} = options;
+        let {fields, method} = params;
         let url = Config.openApiUrl + `/${model}`;
-        let result: any;
-        if(method == 'get') {
-            if(!fields.hasOwnProperty("id")){
+        let result:any;
+        if (method == 'get') {
+            if (!fields.hasOwnProperty("id")) {
                 url = url + "?";
             }
-            for (let key in fields){
-                if(key == 'id') {      //按照id查询
+            for (let key in fields) {
+                if (key == 'id') {      //按照id查询
                     url = url + `/${fields[key]}`;
                     break;
                 }
@@ -677,8 +678,16 @@ export default class TravelPolicyModule{
             }
             url = encodeURI(url);
 
-            if(url.lastIndexOf("&") == url.length -1 ){
+            if (url.lastIndexOf("&") == url.length - 1) {
                 url = url.slice(0, -1);
+            }
+        }
+        if (method == 'put') {
+            for (let key in fields) {
+                if (key == 'id') {      //按照id查询
+                    url = url + `/${fields[key]}`;
+                    break;
+                }
             }
         }
         console.log("====>url: ", url, fields, method);
