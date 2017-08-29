@@ -1456,7 +1456,11 @@ class TripPlanModule {
         if (!staff.email) {
             throw L.ERR.EMAIL_EMPTY();
         }
-        let cities  = JSON.parse(tripPlan.arrivalCityCodes);
+        let cities = tripPlan.arrivalCityCodes;
+        if (typeof cities == 'string') {
+            cities = JSON.parse(cities);
+        }
+
         let firstDept = cities[0];
         let lastDept = cities[cities.length - 1];
         firstDept = await API.place.getCityInfo({cityCode: firstDept});
