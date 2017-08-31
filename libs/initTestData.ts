@@ -6,7 +6,6 @@ import { ACCOUNT_STATUS } from '_types/auth';
 import { Company, ECompanyType } from '_types/company';
 import { Agency } from '_types/agency';
 import { Department, StaffDepartment } from '_types/department';
-import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion, CompanyRegion, RegionPlace } from '_types/travelPolicy';
 import {md5} from "common/utils";
 import {CoinAccount} from "_types/coin";
 import {EGender} from "_types";
@@ -16,6 +15,7 @@ const _ = require("lodash");
 const Models = require("_types").Models;
 let moment = require('moment');
 let testData = require('./test-data.json');
+var API = require("@jingli/dnode-api");
 
 export async function initDataForTest (params: {name: string, userName: string, mobile: string, email?: string, pwd?: string}){
     let co = await Models.company.find({where: {name: '笑傲江湖'}});
@@ -77,57 +77,47 @@ async function initXAJHTravelPolicy(params: {companyId: string}): Promise<any[]>
 
     for(let i = 0; i < companyRegion.length; i++){
         if(companyRegion[i].name == '国内') {
-            domesticCR = await CompanyRegion.create({name:companyRegion[i].name});
-            domesticCR.company = company;
-            domesticCR = await domesticCR.save();
-            let rp = await RegionPlace.create({placeId: regionPlace.domestic_place_id});
-            rp.companyRegion = domesticCR;
-            rp = await rp.save();
+            domesticCR = await API.travelPolicy.createCompanyRegion({name:companyRegion[i].name, companyId: company["id"]});
+            let rp = await API.travelPolicy.createRegionPlace({placeId: regionPlace.domestic_place_id, companyRegionId: domesticCR["id"]});
         }
         if(companyRegion[i].name == '国际') {
-            abroadCR = await CompanyRegion.create({name:companyRegion[i].name});
-            abroadCR.company = company;
-            abroadCR = await abroadCR.save();
-            let rp = await RegionPlace.create({placeId: regionPlace.abroad_place_id});
-            rp.companyRegion = abroadCR;
-            rp = await rp.save();
+            abroadCR = await API.travelPolicy.createCompanyRegion({name:companyRegion[i].name, companyId: company["id"]});
+            let rp = await API.travelPolicy.createRegionPlace({placeId: regionPlace.abroad_place_id, companyRegionId: abroadCR["id"]});
         }
     }
 
     let travelPolicies = Promise.all(tps.map(async function(item){
         let subsidyTemplates = item.subsidyTemplates;
-        let travelPolicy = TravelPolicy.create(item);
-        travelPolicy.company = company;
-        travelPolicy = await travelPolicy.save();
+        if(!item.companyId) item["companyId"] = company["id"];
+        let travelPolicy = await API.travelPolicy.createTravelPolicy(item);
 
-        let domesticTpr = await TravelPolicyRegion.create({
-            "planeLevels": item.planeLevels,
-            "trainLevels": item.trainLevels,
-            "hotelLevels": item.hotelLevels,
-            travelPolicyId: travelPolicy.id,
-            companyRegionId: domesticCR.id,
+        let domesticTpr = await API.travelPolicy.createTravelPolicyRegion({
+            planeLevels: item.planeLevels,
+            trainLevels: item.trainLevels,
+            hotelLevels: item.hotelLevels,
+            travelPolicyId: travelPolicy["id"],
+            companyRegionId: domesticCR["id"],
             trafficPrefer: -1,
             hotelPrefer: -1,
         });
-        await domesticTpr.save();
+
 
         if(item.isOpenAbroad) {
-            let abroadTpr = await TravelPolicyRegion.create({
-                "planeLevels": item.abroadPlaneLevels,
-                "hotelLevels": item.abroadHotelLevels,
-                travelPolicyId: travelPolicy.id,
-                companyRegionId: abroadCR.id,
+            let abroadTpr = await API.travelPolicy.createTravelPolicyRegion({
+                planeLevels: item.abroadPlaneLevels,
+                hotelLevels: item.abroadHotelLevels,
+                travelPolicyId: travelPolicy["id"],
+                companyRegionId: abroadCR["id"],
                 trafficPrefer: -1,
                 hotelPrefer: -1,
             });
-            await abroadTpr.save();
         }
 
         if(subsidyTemplates && subsidyTemplates.length > 0){
             for(let i = 0; i < subsidyTemplates.length; i++){
                 let st = subsidyTemplates[i];
-                let subTem = SubsidyTemplate.create(st);
-                subTem.travelPolicy = travelPolicy;
+                if(!st["travelPolicyId"]) st["travelPolicyId"] = travelPolicy["id"];
+                let subTem = await API.travelPolicy.createSubsidyTemplate(st);
                 await subTem.save();
             }
         }
@@ -171,9 +161,10 @@ async function initXAJHStaffs(params: {companyId: string}): Promise<any[]> {
     let result = await Promise.all(staffs.map(async function(staff){
         let deptNames = staff.departmentName;
         let depts = [];
-        let travelPolicy : TravelPolicy;
+        let travelPolicy : any;
         if(staff.travelPolicyName){
-            let tps = await Models.travelPolicy.find({where: {companyId: companyId, name: staff.travelPolicyName}});
+            let tps = await API.travelPolicy.getTravelPolicies({companyId: companyId, name: staff.travelPolicyName});
+            tps = tps.data;
             if(tps && tps.length > 0){
                 travelPolicy = tps[0];
             }
@@ -191,7 +182,7 @@ async function initXAJHStaffs(params: {companyId: string}): Promise<any[]> {
         staff.status = ACCOUNT_STATUS.ACTIVE;
 
         let st = Staff.create(staff);
-        st.setTravelPolicy(travelPolicy);
+        st.setTravelPolicy(travelPolicy["id"]);
         st.company = company;
         st = await st.save();
         for(let i = 0; i < deptNames.length; i++){
@@ -207,9 +198,10 @@ async function initXAJHStaffs(params: {companyId: string}): Promise<any[]> {
         return st;
     }));
     let create_user = await company.getCreateUser();
-    let tp = await Models.travelPolicy.find({where: {companyId: companyId, name: "高管级"}});
+    let tp = await API.travelPolicy.getTravelPolicies({companyId: companyId, name: "高管级"});
+    tp = tp.data;
     if(tp && tp.length > 0){
-        create_user.setTravelPolicy(tp[0]);
+        create_user.setTravelPolicy(tp[0].id);
     }
     create_user = await create_user.save();
     result.push(create_user);

@@ -3,16 +3,15 @@ import {Staff} from "_types/staff";
 import {EApproveResult, ETripType} from "_types/tripPlan";
 import moment = require("moment");
 var API = require('@jingli/dnode-api');
-import {MPlaneLevel, MTrainLevel, MHotelLevel} from '_types/travelPolicy';
+import {MPlaneLevel, MTrainLevel, MHotelLevel,DefaultRegion} from '_types';
 import {Model, where} from "sequelize";
-import {DefaultRegion} from "_types/travelPolicy/travelPolicy";
 
 export = async function transform(values: any): Promise<any>{
     let cityMap = {};
     let staffMap = {};
     let staff = await Models.staff.get(values.staffId);
     let travelPolicy = await staff.getTravelPolicy();
-    let travelPolicyRegions = await travelPolicy.getTravelPolicyRegions();
+
     let travelp: {
         name: string,
         planeLevels?: number[],
@@ -32,8 +31,8 @@ export = async function transform(values: any): Promise<any>{
 
     let currentCompany = staff.company;
     async function getAbroadPolicy() {
-        let policyRegions = await Models.companyRegion.find({where: {companyId: currentCompany.id, name: DefaultRegion.abroad}});
-        let abroadRegion = await Models.travelPolicyRegion.find({where: {travelPolicyId: travelPolicy.id, companyRegionId: policyRegions[0].id}});
+        let policyRegions = await API.travelPolicy.getCompanyRegion({companyId: currentCompany.id, name: DefaultRegion.abroad});
+        let abroadRegion = await API.travelPolicy.getTravelPolicyRegion({travelPolicyId: travelPolicy.id, companyRegionId: policyRegions[0].id});
 
         if (abroadRegion && abroadRegion.length > 0) {
             travelp.abroadPlaneLevels = abroadRegion[0].planeLevels;
@@ -42,8 +41,8 @@ export = async function transform(values: any): Promise<any>{
     }
 
     async function getDomesticPolicy() {
-        let policyRegions = await Models.companyRegion.find({where: {companyId: currentCompany.id, name: DefaultRegion.domestic}});
-        let domesticRegion = await Models.travelPolicyRegion.find({where: {travelPolicyId: travelPolicy.id, companyRegionId: policyRegions[0].id}});
+        let policyRegions = await API.travelPolicy.getCompanyRegion({companyId: currentCompany.id, name: DefaultRegion.domestic});
+        let domesticRegion = await API.travelPolicy.getTravelPolicyRegion({travelPolicyId: travelPolicy.id, companyRegionId: policyRegions[0].id});
         if (domesticRegion && domesticRegion.length > 0) {
             travelp.planeLevels = domesticRegion[0].planeLevels;
             travelp.hotelLevels = domesticRegion[0].hotelLevels;
@@ -51,11 +50,9 @@ export = async function transform(values: any): Promise<any>{
         }
     }
 
-    if (travelPolicyRegions && travelPolicyRegions.length > 0) {
-        travelp.isOpenAbroad = travelPolicy.isOpenAbroad;
-        await getAbroadPolicy();
-        await getDomesticPolicy();
-    }
+    travelp.isOpenAbroad = travelPolicy.isOpenAbroad;
+    await getAbroadPolicy();
+    await getDomesticPolicy();
 
 
     values.travelPolicy =  travelp;

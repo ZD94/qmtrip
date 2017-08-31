@@ -32,7 +32,8 @@ import fs = require("fs");
 import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice, InvoiceFeeTypeNames} from "_types/tripPlan";
 import {ENoticeType} from "_types/notice/notice";
 import TripApproveModule = require("../tripApprove/index");
-import {MPlaneLevel, MTrainLevel} from "_types/travelPolicy";
+import {MPlaneLevel, MTrainLevel} from "_types";
+
 import {ISegment, ICreateBudgetAndApproveParams} from '_types/tripPlan'
 import {EApproveStatus} from "../../_types/approve/types";
 import {plugins} from "../../libs/oa/index";

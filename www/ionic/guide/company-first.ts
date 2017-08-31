@@ -1,5 +1,5 @@
 import { Staff } from '_types/staff/staff';
-import {TravelPolicy, MPlaneLevel, MTrainLevel, EPlaneLevel, ETrainLevel, EHotelLevel} from '_types/travelPolicy';
+import { MPlaneLevel, MTrainLevel, EPlaneLevel, ETrainLevel, EHotelLevel} from '_types';
 var msgbox = require('msgbox');
 
 export async function CompanyFirstController ($scope, Models, $stateParams){
@@ -51,7 +51,7 @@ export async function CompanyFirstController ($scope, Models, $stateParams){
     if ($stateParams.policyId) {
         travelPolicy = await Models.travelPolicy.get($stateParams.policyId);
     } else {
-        travelPolicy = TravelPolicy.create();
+        // travelPolicy = TravelPolicy.create();
         travelPolicy.companyId = staff.company.id;
         travelPolicy.planeLevels = [EPlaneLevel.ECONOMY];
         travelPolicy.trainLevels = [ETrainLevel.SECOND_SEAT];
