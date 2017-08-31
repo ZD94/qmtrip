@@ -1254,11 +1254,17 @@ class TripPlanModule {
                     tripPlan.isNeedHotel = true;
                     break;
                 case ETripType.SUBSIDY:
+                    let templateId = null;
+                    if(budget.template && budget.template.id){
+                        templateId = budget.template.id;
+                    }else if(budget.templates && budget.templates.length){
+                        templateId = budget.templates[0].id;
+                    }
                     data.hasFirstDaySubsidy = budget.hasFirstDaySubsidy;
                     data.hasLastDaySubsidy = budget.hasLastDaySubsidy;
-                    data.template = budget.template.id;
+                    data.template = templateId;
                     data.subsidyMoney = budget.price;//此字段做什么
-                    data.subsidyTemplateId = budget.template.id;
+                    data.subsidyTemplateId = templateId;
                     data.startDateTime = budget.fromDate;
                     data.endDateTime = budget.endDate;
                     detail = Models.tripDetailSubsidy.create(data);

@@ -27,6 +27,7 @@ interface SegmentsBudgetResult {
     budgets: Array<{
         hotel: any[],   //数组每项为每个人的住宿预算
         traffic: any[]  //数组每项为每个人的交通预算
+        subsidy: any  //每个人的补助
     }>
 }
 
@@ -187,7 +188,7 @@ export default class ApiTravelBudget {
                 budgets.push(budget);
             }
 
-            let destLength = destinationPlacesInfo.length;
+            /*let destLength = destinationPlacesInfo.length;
             if (!placeInfo && i == destLength) {
                 let lastDest = destinationPlacesInfo[destLength - 1];
                 placeInfo = {
@@ -209,6 +210,19 @@ export default class ApiTravelBudget {
                 if (budget) {
                     budgets.push(budget);
                 }
+            }*/
+
+            //补助
+            let subsidy = _budgets[i].subsidy;
+            let destLength = destinationPlacesInfo.length;
+            let lastDest = destinationPlacesInfo[destLength - 1];
+            if (subsidy) {
+                let budget = subsidy;
+                budget.reason =placeInfo ? placeInfo.reason : lastDest.reason;
+                budget.tripType = ETripType.SUBSIDY;
+                budget.type = EInvoiceType.SUBSIDY;
+
+                budgets.push(budget);
             }
         }
 
@@ -223,7 +237,7 @@ export default class ApiTravelBudget {
         return _id;
 
 
-        async function getSubsidyBudget(city, destination, isHasBackSubsidy: boolean = false) {
+        /*async function getSubsidyBudget(city, destination, isHasBackSubsidy: boolean = false) {
             let { subsidy, leaveDate, goBackDate, reason } = destination;
             let budget: any = null
             if (subsidy && subsidy.template) {
@@ -248,7 +262,7 @@ export default class ApiTravelBudget {
                 }
             }
             return budget;
-        }
+        }*/
         function limitHotelBudgetByPrefer(min: number, max:number, hotelBudget: number){
             if(hotelBudget == -1) {
                 if(max != NoCityPriceLimit) return max;
