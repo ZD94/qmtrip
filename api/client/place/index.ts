@@ -122,6 +122,19 @@ class ApiPlace {
             })
     }
 
+    static getSuperiorCityInfo(params: {cityCode: string}) : Promise<Place> {
+        if (!params.cityCode) {
+            throw new Error("cityCode require but is " + params.cityCode);
+        }
+        return API.place.getSuperiorCityInfo(params)
+            .then(function(result: any) {
+                if(!result) {
+                    return null;
+                }
+                return new Place(result);
+            })
+    }
+
     /**
      * @method  getAirPortsByCity
      * 根据城市代码获取机场信息
