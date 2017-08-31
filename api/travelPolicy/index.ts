@@ -707,36 +707,33 @@ export default class TravelPolicyModule{
     }) {
         let {params, model} = options;
         let {fields, method} = params;
-        let url = Config.openApiUrl + `/${model}`;
+        let currentCompanyId = fields['companyId'];
+        if(!currentCompanyId || typeof(currentCompanyId) == 'undefined') {
+            let staff = await Staff.getCurrent();
+            currentCompanyId = staff["companyId"];
+        }
+
+        let url = Config.openApiUrl + `/company/${currentCompanyId}/${model}`;
         let result:any;
-        if (method == 'get' || method == 'delete') {
-            if (!fields.hasOwnProperty("id")) {
+
+        if (fields.hasOwnProperty("id")) {
+            url = url + `/${fields['id']}`;
+        }
+        if(!fields.hasOwnProperty("id")){
+            if(method == 'get'){
                 url = url + "?";
-            }
-            for (let key in fields) {
-                if (key == 'id') {      //按照id查询
-                    url = url + `/${fields[key]}`;
-                    break;
+                for (let key in fields) {
+                    url = url + `${key}=${fields[key]}&`;
                 }
-                url = url + `${key}=${fields[key]}&`;
+                if (url.lastIndexOf("&") == url.length - 1) {
+                    url = url.slice(0, -1);
+                }
             }
             url = encodeURI(url);
-
-            if (url.lastIndexOf("&") == url.length - 1) {
-                url = url.slice(0, -1);
-            }
-        }
-        if (method == 'put') {
-            for (let key in fields) {
-                if (key == 'id') {      //按照id查询
-                    url = url + `/${fields[key]}`;
-                    break;
-                }
-            }
         }
         result = await request({
             uri: url,
-            body: fields,  //JSON.stringify(params);
+            body: fields,
             json:true,
             method: method
         })
