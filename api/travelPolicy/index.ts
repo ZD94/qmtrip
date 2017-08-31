@@ -159,7 +159,7 @@ export default class TravelPolicyModule{
             throw L.ERR.BAD_REQUEST();
         }
         let company = await Models.company.get(companyId);
-        let agencyUser = await AgencyUser.getCurrent();
+        // let agencyUser = await AgencyUser.getCurrent();
 
         let tp_delete = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
@@ -168,9 +168,10 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
+        tp_delete = tp_delete.data;
 
         if((staff && tp_delete && (staff['companyId'] != tp_delete['companyId'] || (staff['roleId'] != EStaffRole.ADMIN &&
-            staff['roleId'] != EStaffRole.OWNER))) || (agencyUser['agencyId'] != company['agencyId'])) {
+            staff['roleId'] != EStaffRole.OWNER) )) ) {  //||(agencyUser['agencyId'] != company['agencyId'])
             throw L.ERR.PERMISSION_DENY();
         }
 
@@ -336,9 +337,6 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
-        if(typeof(travelPolicies) == 'string'){
-            travelPolicies = JSON.parse(travelPolicies)
-        }
         return travelPolicies;
     }
 
