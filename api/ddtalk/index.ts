@@ -126,6 +126,7 @@ class DDTalk {
         });
 
         app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
+
             console.log("hello : ", msg);
             if(msg.CorpId){
                 /*let corps = await Models.ddtalkCorp.find({
@@ -154,19 +155,45 @@ class DDTalk {
                     });
                 }
             }
-            if(!ddTalkMsgHandle[msg.EventType]){
-                return res.reply();
-            }
-            return ddTalkMsgHandle[msg.EventType](msg , req , res , next)
-                .then((result) => {
-                    if(!(result && result.notReply)){
-                        res.reply();
+
+            /*if(msg.EventType != "tmp_auth_code"){
+                const COMPANY_EVENTS_KEY = `company_events:${msg.CorpId}`;
+                let isExist = await cache.read(COMPANY_EVENTS_KEY);
+
+                let eventList = [];
+                if(!isExist){
+                    eventList.unshift(msg);
+                    let content = {isRunning: false, eventList: eventList};
+                    await cache.write(COMPANY_EVENTS_KEY, content, 60 * 60 * 24);
+                    await DDTalk.dealEvent(msg.CorpId);
+                }else{
+                    eventList = isExist.eventList;
+                    eventList.unshift(msg);
+                    isExist.eventList = eventList;
+                    await cache.write(COMPANY_EVENTS_KEY, isExist, 60 * 60 * 24);
+                    if(!isExist.isRunning){
+                        await DDTalk.dealEvent(msg.CorpId);
                     }
-                })
-                .catch((err) => {
-                    console.error(err.stack);
-                    next(err);
-                });
+
+                }
+                return res.reply();
+            }else{*/
+
+                if(!ddTalkMsgHandle[msg.EventType]){
+                    return res.reply();
+                }
+                return ddTalkMsgHandle[msg.EventType](msg , req , res , next)
+                    .then((result) => {
+                        if(!(result && result.notReply)){
+                            res.reply();
+                        }
+                    })
+                    .catch((err) => {
+                        console.error(err.stack);
+                        next(err);
+                    });
+
+            // }
         }));
 
         app.post("/ddtalk/suite_ticket" , (req , res , next)=>{
@@ -176,6 +203,32 @@ class DDTalk {
             res.send("ok");
         });
     }
+
+    /*static async dealEvent(corpId: string){
+        const COMPANY_EVENTS_KEY = `company_events:${corpId}`;
+        let isExist = await cache.read(COMPANY_EVENTS_KEY);
+        if(!isExist.isRunning){
+            isExist.isRunning = true;
+            await cache.write(COMPANY_EVENTS_KEY, isExist, 60 * 60 * 24);
+            let eventList = isExist.eventList;
+            let currentEvent = eventList.pop();
+            if(!ddTalkMsgHandle[currentEvent.EventType]){
+                return;
+            }
+            await ddTalkMsgHandle[currentEvent.EventType](currentEvent);
+            isExist.eventList = eventList;
+            await cache.write(COMPANY_EVENTS_KEY, isExist, 60 * 60 * 24);
+
+            let isExistRe = await cache.read(COMPANY_EVENTS_KEY);
+            let eventListRe = isExistRe.eventList;
+            if(eventListRe && eventListRe.length){
+                await DDTalk.dealEvent(corpId);
+            }else{
+                isExistRe.isRunning = false;
+                await cache.write(COMPANY_EVENTS_KEY, isExistRe, 60 * 60 * 24);
+            }
+        }
+    }*/
 
     @clientExport
     static async getJSAPIConfig(params) {
