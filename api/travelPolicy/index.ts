@@ -97,13 +97,30 @@ export default class TravelPolicyModule{
         if(!params.companyId || !params.name){
             throw L.ERR.BAD_REQUEST();
         }
+
+        let isExistedParams = {
+            name: params.name,
+            companyId: params.companyId
+        }
+
+        let isExisted = await TravelPolicyModule.operateOnPolicy({
+            model: "travelpolicy",
+            params: {
+                fields: isExistedParams,
+                method: "get",
+            },
+        });
+        isExisted = isExisted.data;
+        if(isExisted && isExisted.length) {
+            throw L.ERR.TRAVEL_POLICY_NAME_REPEAT();
+        }
+
         let staff = await Staff.getCurrent();
         let company = await Models.company.get(params.companyId);
         if(!company) company = staff.company;
-        let agencyUser = await AgencyUser.getCurrent();
 
-        if((staff && staff['roleId'] != EStaffRole.ADMIN && staff['roleId'] != EStaffRole.OWNER) ||
-            (agencyUser && agencyUser["companyId"] != company["id"])) {
+        if((staff && staff['roleId'] != EStaffRole.ADMIN && staff['roleId'] != EStaffRole.OWNER)) {
+            //(agencyUser && agencyUser["companyId"] != company["id"])
             throw L.ERR.PERMISSION_DENY();
         }
 
