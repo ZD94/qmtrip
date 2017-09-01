@@ -599,7 +599,6 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
-        console.log("====params; ", cr);
         return cr;
     };
 
@@ -730,7 +729,7 @@ export default class TravelPolicyModule{
             currentCompanyId = staff["companyId"];
         }
 
-        let url = Config.openApiUrl + `/company/${currentCompanyId}/${model}`;
+        let url = Config.cloudAPI + `/company/${currentCompanyId}/${model}`;
         let result:any;
 
         if (fields.hasOwnProperty("id")) {
@@ -752,7 +751,10 @@ export default class TravelPolicyModule{
             uri: url,
             body: fields,
             json:true,
-            method: method
+            method: method,
+            headers: {
+                key: Config.cloudKey
+            }
         })
         if(typeof(result) == 'string') result = JSON.parse(result);
         return result;
