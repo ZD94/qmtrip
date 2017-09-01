@@ -730,6 +730,7 @@ export default class TravelPolicyModule{
         }
 
         let url = Config.cloudAPI + `/company/${currentCompanyId}/${model}`;
+        console.log("URL:", url);
         let result:any;
         let qs: {
             [index: string]: string;
@@ -744,6 +745,7 @@ export default class TravelPolicyModule{
                 }
             }
         }
+        console.log("QS:", qs);
         result = await request({
             uri: url,
             body: fields,
