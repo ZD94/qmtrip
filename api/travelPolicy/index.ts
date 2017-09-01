@@ -718,11 +718,166 @@ export default class TravelPolicyModule{
     /*************************************地区设置(RegionPlace)end***************************************/
 
 
+    /*************************************补助类型管理(SubsidyType)begin***************************************/
+
+    @clientExport
+    @requireParams(["id"])
+    static async getSubsidyType(params: {id: string}) : Promise<any>{
+        let id = params.id;
+        let pr = await TravelPolicyModule.operateOnPolicy({
+            model: "subsidyType",
+            params: {
+                fields: params,
+                method: "get"
+            }
+        });
+        return pr;
+    };
+
+    @clientExport
+    static async getSubsidyTypes(params) : Promise<any>{
+        let pc = await TravelPolicyModule.operateOnPolicy({
+            model: "subsidyType",
+            params: {
+                fields: params,
+                method: "get"
+            }
+        });
+        return pc;
+    };
+
+    @clientExport
+    static async createSubsidyType(params) : Promise<any>{
+        let pr = await TravelPolicyModule.operateOnPolicy({
+            model: "subsidyType",
+            params: {
+                fields: params,
+                method: "post"
+            }
+        });
+        return pr;
+    };
+
+    @clientExport
+    static async updateSubsidyType(params) : Promise<any>{
+        let pr = await TravelPolicyModule.operateOnPolicy({
+            model: "subsidyType",
+            params: {
+                fields: params,
+                method: "put"
+            }
+        });
+        return pr;
+    };
+
+    @clientExport
+    @requireParams(["id"])
+    static async deleteSubsidyType(params) : Promise<any>{
+        let pr = await TravelPolicyModule.operateOnPolicy({
+            model: "subsidyType",
+            params: {
+                fields: params,
+                method: "delete"
+            }
+        });
+        return pr;
+    };
+
+    /*************************************补助类型管理(SubsidyType)end***************************************/
+
+
+    /*************************************地区补助金额管理(PolicyRegionSubsidy)begin***************************************/
+
+    @clientExport
+    @requireParams(["id"])
+    static async getPolicyRegionSubsidy(params: {id: string, companyId?: string}) : Promise<any>{
+        let id = params.id;
+        let pr = await TravelPolicyModule.operateOnPolicy({
+            model: "policyRegionSubsidy",
+            params: {
+                fields: params,
+                method: "get"
+            }
+        });
+        return pr;
+    };
+
+    @clientExport
+    static async getPolicyRegionSubsidies(params) : Promise<any>{
+        let pc = await TravelPolicyModule.operateOnPolicy({
+            model: "policyRegionSubsidy",
+            params: {
+                fields: params,
+                method: "get"
+            }
+        });
+        return pc;
+    };
+
+    @clientExport
+    static async getPolicyRegionSubsidiesByCity(params: {travelPolicyId?: string, cityId: string}) : Promise<any>{
+        if(!params.travelPolicyId){
+            let currentStaff = await Staff.getCurrent();
+            let policy = await currentStaff.getTravelPolicy();
+            params.travelPolicyId = policy.id;
+        }
+        let pc = await TravelPolicyModule.operateOnPolicy({
+            model: "policyRegionSubsidy",
+            params: {
+                fields: params,
+                method: "get"
+            },
+            addUrl: "getByCity"
+        });
+        return pc;
+    };
+
+    @clientExport
+    static async createPolicyRegionSubsidy(params) : Promise<any>{
+        let pr = await TravelPolicyModule.operateOnPolicy({
+            model: "policyRegionSubsidy",
+            params: {
+                fields: params,
+                method: "post"
+            }
+        });
+        return pr;
+    };
+
+    @clientExport
+    static async updatePolicyRegionSubsidy(params) : Promise<any>{
+        let pr = await TravelPolicyModule.operateOnPolicy({
+            model: "policyRegionSubsidy",
+            params: {
+                fields: params,
+                method: "put"
+            }
+        });
+        return pr;
+    };
+
+    @clientExport
+    @requireParams(["id"])
+    static async deletePolicyRegionSubsidy(params) : Promise<any>{
+        let pr = await TravelPolicyModule.operateOnPolicy({
+            model: "policyRegionSubsidy",
+            params: {
+                fields: params,
+                method: "delete"
+            }
+        });
+        return pr;
+    };
+
+    /*************************************地区补助金额管理(PolicyRegionSubsidy)end***************************************/
+
+
     static async operateOnPolicy(options: {
         model: string,
         params?:any,
+        addUrl?: string
     }) {
-        let {params, model} = options;
+        let {params, model, addUrl} = options;
         let {fields, method} = params;
         let currentCompanyId = fields['companyId'];
         if(!currentCompanyId || typeof(currentCompanyId) == 'undefined') {
@@ -731,6 +886,9 @@ export default class TravelPolicyModule{
         }
 
         let url = Config.openApiUrl + `/company/${currentCompanyId}/${model}`;
+        if(addUrl){
+            url = url + `/${addUrl}`
+        }
         let result:any;
 
         if (fields.hasOwnProperty("id")) {

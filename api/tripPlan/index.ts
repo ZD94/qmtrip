@@ -1255,16 +1255,20 @@ class TripPlanModule {
                     break;
                 case ETripType.SUBSIDY:
                     let templateId = null;
+                    let subsidyIds = [];
                     if(budget.template && budget.template.id){
                         templateId = budget.template.id;
                     }else if(budget.templates && budget.templates.length){
-                        templateId = budget.templates[0].id;
+                        budget.templates.forEach((tp) => {
+                            subsidyIds.push(tp.id);
+                        })
                     }
                     data.hasFirstDaySubsidy = budget.hasFirstDaySubsidy;
                     data.hasLastDaySubsidy = budget.hasLastDaySubsidy;
                     data.template = templateId;
-                    data.subsidyMoney = budget.price;//此字段做什么
+                    data.subsidyMoney = budget.price;
                     data.subsidyTemplateId = templateId;
+                    data.subsidyIds = subsidyIds;
                     data.startDateTime = budget.fromDate;
                     data.endDateTime = budget.endDate;
                     detail = Models.tripDetailSubsidy.create(data);
