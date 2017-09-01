@@ -58,7 +58,7 @@ deploy:master:
     name: dev
     url: https://l.jingli365.com
   variables:
-    JL_APP_CLOUDKEY: jinglicloud2017,
+    JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: http://l.jingli365.com/cloud/api/v1
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
@@ -76,7 +76,7 @@ deploy:test:
     name: test
     url: https://t.jingli365.com
   variables:
-    JL_APP_CLOUDKEY: jinglicloud2017,
+    JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: http://t.jingli365.com/cloud/api/v1
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
@@ -95,7 +95,7 @@ deploy:release:
     name: release
     url: https://j.jingli365.com
   variables:
-    JL_APP_CLOUDKEY: jinglicloud2017,
+    JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: http://j.jingli365.com/cloud/api/v1
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
