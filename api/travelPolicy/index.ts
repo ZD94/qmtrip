@@ -15,7 +15,6 @@ import { FindResult, PaginateInterface } from "common/model/interface";
 import setPrototypeOf = Reflect.setPrototypeOf;
 import {AgencyUser} from "_types/agency"
 var request = require("request-promise");
-import {ITravelPolicyRegion, IRegionPlace, ITravelPolicy, ICompanyRegion,ISubsidyTemplate} from "_types/travelPolicy";
 
 let API = require("@jingli/dnode-api");
 import {DefaultRegion} from "_types";
@@ -94,17 +93,34 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    static async createTravelPolicy (params: ITravelPolicyParams):Promise<ITravelPolicy>{
+    static async createTravelPolicy (params):Promise<any>{
         if(!params.companyId || !params.name){
             throw L.ERR.BAD_REQUEST();
         }
+
+        let isExistedParams = {
+            name: params.name,
+            companyId: params.companyId
+        }
+
+        let isExisted = await TravelPolicyModule.operateOnPolicy({
+            model: "travelpolicy",
+            params: {
+                fields: isExistedParams,
+                method: "get",
+            },
+        });
+        isExisted = isExisted.data;
+        if(isExisted && isExisted.length) {
+            throw L.ERR.TRAVEL_POLICY_NAME_REPEAT();
+        }
+
         let staff = await Staff.getCurrent();
         let company = await Models.company.get(params.companyId);
         if(!company) company = staff.company;
-        let agencyUser = await AgencyUser.getCurrent();
 
-        if((staff && staff['roleId'] != EStaffRole.ADMIN && staff['roleId'] != EStaffRole.OWNER) ||
-            (agencyUser && agencyUser["companyId"] != company["id"])) {
+        if((staff && staff['roleId'] != EStaffRole.ADMIN && staff['roleId'] != EStaffRole.OWNER)) {
+            //(agencyUser && agencyUser["companyId"] != company["id"])
             throw L.ERR.PERMISSION_DENY();
         }
 
@@ -112,7 +128,7 @@ export default class TravelPolicyModule{
             model: "travelpolicy",
             params: {
                 fields: params,
-                method: "put",
+                method: "post",
             },
         });
         if(typeof(tp) == 'string') tp = JSON.parse(tp);
@@ -128,7 +144,7 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    static async createTravelPolicyRegion(params: ITravelPolicyRegionParams): Promise<ITravelPolicy> {
+    static async createTravelPolicyRegion(params: ITravelPolicyRegionParams): Promise<any> {
         let {travelPolicyId, planeLevels, trainLevels, hotelLevels } = params;
         if(!travelPolicyId) {
             throw L.ERR.BAD_REQUEST();
@@ -136,13 +152,13 @@ export default class TravelPolicyModule{
 
         // let tpr = await API.policy.createTravelPolicyRegion(params);
         let tpr = await TravelPolicyModule.operateOnPolicy({
-            model: "travelpolicyegion",
+            model: "travelpolicyregion",
             params: {
                 fields: params,
-                method: "put"
+                method: "post"
             }
         });
-        return new ITravelPolicy(tpr);
+        return tpr;
     }
 
 
@@ -153,14 +169,14 @@ export default class TravelPolicyModule{
      */
     @clientExport
     // @requireParams(["id"], ["companyId"])
-    static async deleteTravelPolicy(params: ITravelPolicyParams) : Promise<boolean>{
+    static async deleteTravelPolicy(params) : Promise<boolean>{
         let {id, companyId} = params;
         var staff = await Staff.getCurrent();
         if(!id || !companyId) {
             throw L.ERR.BAD_REQUEST();
         }
         let company = await Models.company.get(companyId);
-        let agencyUser = await AgencyUser.getCurrent();
+        // let agencyUser = await AgencyUser.getCurrent();
 
         let tp_delete = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
@@ -169,9 +185,10 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
+        tp_delete = tp_delete.data;
 
         if((staff && tp_delete && (staff['companyId'] != tp_delete['companyId'] || (staff['roleId'] != EStaffRole.ADMIN &&
-            staff['roleId'] != EStaffRole.OWNER))) || (agencyUser['agencyId'] != company['agencyId'])) {
+            staff['roleId'] != EStaffRole.OWNER) )) ) {  //||(agencyUser['agencyId'] != company['agencyId'])
             throw L.ERR.PERMISSION_DENY();
         }
 
@@ -207,7 +224,7 @@ export default class TravelPolicyModule{
      */
     @clientExport
     // @requireParams(["id"])
-    static async updateTravelPolicy(params: ITravelPolicyParams) : Promise<ITravelPolicy>{
+    static async updateTravelPolicy(params) : Promise<any>{
         var {id, companyId} = params;
 
         var staff = await Staff.getCurrent();
@@ -242,7 +259,7 @@ export default class TravelPolicyModule{
     }
 
     @clientExport
-    static async updateTravelPolicyRegion(params: ITravelPolicyRegionParams) : Promise<any>{
+    static async updateTravelPolicyRegion(params) : Promise<any>{
         let tpr = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicyregion",
             params: {
@@ -250,7 +267,6 @@ export default class TravelPolicyModule{
                 method: "put"
             }
         });
-        console.log("tpr: ", tpr);
         return tpr;
     }
 
@@ -308,7 +324,6 @@ export default class TravelPolicyModule{
             }
         });
         if(typeof(travelPolicy) == 'string') travelPolicy = JSON.parse(travelPolicy);
-        console.log("===>getTravelPolicy: ", travelPolicy);
         return travelPolicy;
     }
 
@@ -339,10 +354,6 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
-        if(typeof(travelPolicies) == 'string'){
-            travelPolicies = JSON.parse(travelPolicies)
-        }
-        console.log("travelPolicy: ", travelPolicies);
         return travelPolicies;
     }
 
@@ -401,22 +412,23 @@ export default class TravelPolicyModule{
     @requireParams(["subsidyMoney","name","travelPolicyId"])
     static async createSubsidyTemplate (params) : Promise<any>{
         let {name, travelPolicyId, subsidyMondy} = params;
-        if(!name || !travelPolicyId || !subsidyMondy) {
-            throw L.ERR.BAD_REQUEST();
-        }
-        let staff = await Staff.getCurrent();
-        if(staff["roleId"] != EStaffRole.ADMIN && staff["roleId"] != EStaffRole.OWNER){
-            throw {code: -2, msg: '不允许删除默认差旅标准'};
-        }
-
-        if(staff && staff['roleId'] != EStaffRole.ADMIN && staff['roleId'] != EStaffRole.OWNER) {
-            throw L.ERR.PERMISSION_DENY();
-        }
+        // if(!name || !travelPolicyId || !subsidyMondy) {
+        //     throw L.ERR.BAD_REQUEST();
+        // }
+        // let staff = await Staff.getCurrent();
+        // if(staff["roleId"] != EStaffRole.ADMIN && staff["roleId"] != EStaffRole.OWNER){
+        //     throw {code: -2, msg: '不允许删除默认差旅标准'};
+        // }
+        //
+        // if(staff && staff['roleId'] != EStaffRole.ADMIN && staff['roleId'] != EStaffRole.OWNER) {
+        //     throw L.ERR.PERMISSION_DENY();
+        // }
 
         /*let result = await Models.subsidyTemplate.find({where: {travelPolicyId: params.travelPolicyId}});
          if(result && result.length>0){
          throw {msg: "该城市补助模板已设置"};
          }*/
+
         let subsidy = await TravelPolicyModule.operateOnPolicy({
             model: "subsidytemplate",
             params: {
@@ -533,6 +545,7 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
+
         return tpr;
     }
 
@@ -543,7 +556,6 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["travelPolicyId"])
     static async getTravelPolicyRegions(params): Promise<any>{
         let tprs = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicyregion",
@@ -579,7 +591,6 @@ export default class TravelPolicyModule{
     };
 
     @clientExport
-    @requireParams(["companyId"])
     static async getCompanyRegions(params) : Promise<any>{
         let cr = await TravelPolicyModule.operateOnPolicy({
             model: "companyregion",
@@ -588,6 +599,7 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
+        console.log("====params; ", cr);
         return cr;
     };
 
@@ -599,6 +611,30 @@ export default class TravelPolicyModule{
             params: {
                 fields: params,
                 method: "post"
+            }
+        });
+        return cr;
+    };
+
+    @clientExport
+    static async updateCompanyRegion(params) : Promise<any>{
+        let cr = await TravelPolicyModule.operateOnPolicy({
+            model: "companyregion",
+            params: {
+                fields: params,
+                method: "put"
+            }
+        });
+        return cr;
+    };
+    @clientExport
+    @requireParams(["id"])
+    static async deleteCompanyRegion(params) : Promise<any>{
+        let cr = await TravelPolicyModule.operateOnPolicy({
+            model: "companyregion",
+            params: {
+                fields: params,
+                method: "delete"
             }
         });
         return cr;
@@ -630,7 +666,7 @@ export default class TravelPolicyModule{
 
     @clientExport
     // @requireParams()
-    static async getResgionPlaces(params) : Promise<any>{
+    static async getRegionPlaces(params) : Promise<any>{
         let pc = await TravelPolicyModule.operateOnPolicy({
             model: "regionplace",
             params: {
@@ -654,6 +690,31 @@ export default class TravelPolicyModule{
         return pr;
     };
 
+    @clientExport
+    static async updateRegionPlace(params) : Promise<any>{
+        let pr = await TravelPolicyModule.operateOnPolicy({
+            model: "regionplace",
+            params: {
+                fields: params,
+                method: "put"
+            }
+        });
+        return pr;
+    };
+
+    @clientExport
+    @requireParams(["id"])
+    static async deleteRegionPlace(params) : Promise<any>{
+        let pr = await TravelPolicyModule.operateOnPolicy({
+            model: "regionplace",
+            params: {
+                fields: params,
+                method: "delete"
+            }
+        });
+        return pr;
+    };
+
     /*************************************地区设置(RegionPlace)end***************************************/
 
 
@@ -663,37 +724,33 @@ export default class TravelPolicyModule{
     }) {
         let {params, model} = options;
         let {fields, method} = params;
-        let url = Config.openApiUrl + `/${model}`;
+        let currentCompanyId = fields['companyId'];
+        if(!currentCompanyId || typeof(currentCompanyId) == 'undefined') {
+            let staff = await Staff.getCurrent();
+            currentCompanyId = staff["companyId"];
+        }
+
+        let url = Config.openApiUrl + `/company/${currentCompanyId}/${model}`;
         let result:any;
-        if (method == 'get') {
-            if (!fields.hasOwnProperty("id")) {
+
+        if (fields.hasOwnProperty("id")) {
+            url = url + `/${fields['id']}`;
+        }
+        if(!fields.hasOwnProperty("id")){
+            if(method == 'get'){
                 url = url + "?";
-            }
-            for (let key in fields) {
-                if (key == 'id') {      //按照id查询
-                    url = url + `/${fields[key]}`;
-                    break;
+                for (let key in fields) {
+                    url = url + `${key}=${fields[key]}&`;
                 }
-                url = url + `${key}=${fields[key]}&`;
+                if (url.lastIndexOf("&") == url.length - 1) {
+                    url = url.slice(0, -1);
+                }
             }
             url = encodeURI(url);
-
-            if (url.lastIndexOf("&") == url.length - 1) {
-                url = url.slice(0, -1);
-            }
         }
-        if (method == 'put') {
-            for (let key in fields) {
-                if (key == 'id') {      //按照id查询
-                    url = url + `/${fields[key]}`;
-                    break;
-                }
-            }
-        }
-        console.log("====>url: ", url, fields, method);
         result = await request({
             uri: url,
-            body: fields,  //JSON.stringify(params);
+            body: fields,
             json:true,
             method: method
         })
