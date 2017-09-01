@@ -731,27 +731,25 @@ export default class TravelPolicyModule{
 
         let url = Config.cloudAPI + `/company/${currentCompanyId}/${model}`;
         let result:any;
-
+        let qs: {
+            [index: string]: string;
+        } = {};
         if (fields.hasOwnProperty("id")) {
             url = url + `/${fields['id']}`;
         }
         if(!fields.hasOwnProperty("id")){
             if(method == 'get'){
-                url = url + "?";
                 for (let key in fields) {
-                    url = url + `${key}=${fields[key]}&`;
-                }
-                if (url.lastIndexOf("&") == url.length - 1) {
-                    url = url.slice(0, -1);
+                    qs[key] = fields[key];
                 }
             }
-            url = encodeURI(url);
         }
         result = await request({
             uri: url,
             body: fields,
             json:true,
             method: method,
+            qs: qs,
             headers: {
                 key: Config.cloudKey
             }
