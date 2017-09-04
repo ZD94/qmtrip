@@ -216,8 +216,13 @@ class StaffModule{
                 throw {code: -4, msg: "该员工为部门主管不能被删除"};
             }
         }
+        let otherStaff = await Models.staff.find({where: {accountId: deleteStaff.accountId, id: {$ne: deleteStaff.id}}});
+        let option: any = {};
+        if(otherStaff && otherStaff.length){
+            option.onlyDeleteSelf = true;
+        }
         await deleteStaff.deleteStaffDepartments();
-        await deleteStaff.destroy();
+        await deleteStaff.destroy(option);
         return true;
 
     }
