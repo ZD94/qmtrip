@@ -45,22 +45,8 @@ export interface ITravelPolicyRegionParams {
 
 export default class TravelPolicyModule{
 
-    // async getBestTravelPolicy(params:{travelPolicyId: string, placeId: string, type: string}): Promise<any>{
-    //     let {placeId,type, travelPolicyId} = params;
-    //     let policy = await TravelPolicyModule.operateOnPolicy({
-    //         url: BASE_URL,
-    //         params: {
-    //             fields:params
-    //         },
-    //         method:''
-    //     });
-    //     return policy;
-    // }
-
-
     @clientExport
     async getDefaultTravelPolicy(params: {companyId: string, isDefault?: boolean}): Promise<any> {
-        // return API.policy.getDefaultTravelPolicy(params);
         if(params.companyId) {
             throw L.ERR.BAD_REQUEST();
         }
@@ -80,10 +66,10 @@ export default class TravelPolicyModule{
 
 
     @clientExport
-    static async getStaffs(params:{travelPolicyId: string, companyId:string}){
+    static async getStaffs(params:{travelPolicyId: string, companyId:string}):Promise<PaginateInterface<Staff>>{
         let {companyId, travelPolicyId} = params;
         let staff = await Staff.getCurrent();
-        let query = {where: {companyId: companyId, travelPolicyId: travelPolicyId}}
+        let query = {where: {companyId: companyId, travelPolicyId: travelPolicyId,staffStatus: EStaffStatus.ON_JOB}}
         let pager = await Models.staff.find(query);
         return pager;
     }
@@ -334,9 +320,10 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
 
-    @requireParams(["companyId"])
+
     @clientExport
-    static async getTravelPolicies(params: {companyId: string}): Promise<any>{
+    @requireParams(["companyId"], ["companyId", "isDefault","name","p"])
+    static async getTravelPolicies(params): Promise<any>{
         let {companyId } = params;
         var staff = await Staff.getCurrent();
 
@@ -356,51 +343,6 @@ export default class TravelPolicyModule{
         });
         return travelPolicies;
     }
-
-    /**
-     * 分页查询差旅标准集合
-     * @param params 查询条件 params.company_id 企业id
-     * @param options options.perPage 每页条数 options.page当前页
-     */
-    @clientExport
-    // @requireParams(["companyId"],['columns','name', 'planeLevels', 'planeDiscount', 'trainLevels', 'hotelLevels', 'hotelPrice', 'companyId', 'isChangeLevel', 'createdAt'])
-    // @conditionDecorator([
-    //     {if: condition.isCompanyAdminOrOwner("0.companyId")},
-    //     {if: condition.isCompanyAgency("0.companyId")}
-    // ])
-    //
-    // static async listAndPaginateTravelPolicy(params){
-    //     var options: any = {};
-    //     if(params.options){
-    //         options = params.options;
-    //         delete params.options;
-    //     }
-    //     var page, perPage, limit, offset;
-    //     if (options.page && /^\d+$/.test(options.page)) {
-    //         page = options.page;
-    //     } else {
-    //         page = 1;
-    //     }
-    //     if (options.perPage && /^\d+$/.test(options.perPage)) {
-    //         perPage = options.perPage;
-    //     } else {
-    //         perPage = 6;
-    //     }
-    //     limit = perPage;
-    //     offset = (page - 1) * perPage;
-    //     if (!options.order) {
-    //         options.order = [["created_at", "desc"]]
-    //     }
-    //     options.limit = limit;
-    //     options.offset = offset;
-    //     options.where = params;
-    //
-    //     return DB.models.TravelPolicy.findAndCountAll(options)
-    //         .then(function(result){
-    //             return new Paginate(page, perPage, result.count, result.rows);
-    //         });
-    //
-    // }
 
     /*************************************补助模板begin***************************************/
     /**
@@ -467,7 +409,7 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["id"])
+    @requireParams(["id"], ["subsidyMoney","name", "travelPolicyId"])
     static async updateSubsidyTemplate(params) : Promise<any>{
         if(!params.id){
             throw L.ERR.BAD_REQUEST();
@@ -491,7 +433,7 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["id"])
+    @requireParams(["id"], ["subsidyMoney","name", "travelPolicyId"])
     static async getSubsidyTemplate(params: {id: string, travelPolicyId?: string}) : Promise<any>{
         if(!params.id){
             throw L.ERR.BAD_REQUEST();
@@ -513,7 +455,7 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["travelPolicyId"])
+    @requireParams(["travelPolicyId"], ["subsidyMoney","name", "travelPolicyId"])
     static async getSubsidyTemplates(params): Promise<any>{
         let subsidies = await TravelPolicyModule.operateOnPolicy({
             model: "subsidytemplate",
@@ -534,8 +476,8 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["id"], ["travelPolicyId"])
-    static async getTravelPolicyRegion(params:{id:string,travelPolicyId?:string}): Promise<any> {
+    @requireParams(["id"], ["travelPolicyId","hotelPrefer", "trafficPrefer", "hotelLevels", "planeLevels","trainLevels","companyRegionId"])
+    static async getTravelPolicyRegion(params): Promise<any> {
         let id = params.id;
         // return API.policy.getTravelPolicyRegion(params);
         let tpr = await TravelPolicyModule.operateOnPolicy({
@@ -664,7 +606,6 @@ export default class TravelPolicyModule{
     };
 
     @clientExport
-    // @requireParams()
     static async getRegionPlaces(params) : Promise<any>{
         let pc = await TravelPolicyModule.operateOnPolicy({
             model: "regionplace",
@@ -730,7 +671,6 @@ export default class TravelPolicyModule{
         }
 
         let url = Config.cloudAPI + `/company/${currentCompanyId}/${model}`;
-        console.log("URL:", url);
         let result:any;
         let qs: {
             [index: string]: string;
@@ -745,7 +685,6 @@ export default class TravelPolicyModule{
                 }
             }
         }
-        console.log("QS:", qs);
         result = await request({
             uri: url,
             body: fields,
