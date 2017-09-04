@@ -186,8 +186,6 @@ export default class TravelPolicyModule{
         if(staffs && staffs.length > 0){
             throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准请先移除'};
         }
-
-        // let isDeleted = await API.policy.deleteTravelPolicy({id: id});
         let isDeleted = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params:{
@@ -263,18 +261,12 @@ export default class TravelPolicyModule{
      */
     @clientExport
     // @requireParams(["id"])
-    static async deleteTravelPolicyRegion(params: {id: string}) : Promise<boolean>{
+    static async deleteTravelPolicyRegion(params) : Promise<boolean>{
         var staff = await Staff.getCurrent();
         var id = params.id;
-        var tpr_delete = await API.policy.getTravelPolicyRegion(id);
-        var tp = await API.policy.getTravelPolicy(tpr_delete['travelPolicyId']);
 
         if(staff["roleId"] != EStaffRole.ADMIN && staff["roleId"] != EStaffRole.OWNER){
             throw {code: -2, msg: '不允许删除默认差旅标准'};
-        }
-
-        if(staff && tp["companyId"] != staff["companyId"]){
-            throw L.ERR.PERMISSION_DENY();
         }
 
         let isDeleted = await TravelPolicyModule.operateOnPolicy({
