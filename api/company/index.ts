@@ -12,6 +12,7 @@ let promoCodeType = require('libs/promoCodeType');
 let scheduler = require('common/scheduler');
 let schedule = require("node-schedule");
 let _ = require("lodash");
+let Config = require('@jingli/config');
 import {requireParams, clientExport} from "@jingli/dnode-api/dist/src/helper";
 import {Models} from "_types";
 import {Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE, InvoiceTitle, CompanyProperty, CPropertyType} from '_types/company';
@@ -23,7 +24,7 @@ import {requirePermit, conditionDecorator, condition, modelNotNull} from "api/_d
 import {md5} from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
 import {CoinAccount} from "_types/coin";
-
+import RestfulAPIUtil from "../RestfulAPIUtil"
 
 const supplierCols = Supplier['$fieldnames'];
 const companyCols = Staff['$getAllFieldNames']();
@@ -416,6 +417,19 @@ class CompanyModule {
         return supplier.save();
     }
 
+    // @clientExport
+    // @requireParams(['name', 'companyId'])
+    // static async createSupplier (params): Promise<Supplier> {
+    //     let resCreate = await RestfulAPIUtil.operateOnModel({
+    //         model: 'supplier',
+    //         params: {
+    //             fields: params,
+    //             method: 'POST'
+    //         }
+    //     });
+    //     return resCreate;
+    // }
+
 
     /**
      * 删除供应商
@@ -434,6 +448,19 @@ class CompanyModule {
         await st_delete.destroy();
         return true;
     }
+
+    // @clientExport
+    // @requireParams(['id'])
+    // static async deleteSupplier(params): Promise<any> {
+    //     let resDelete = await RestfulAPIUtil.operateOnModel({
+    //         model: 'supplier',
+    //         params: {
+    //             fields: params,
+    //             method: 'DELETE'
+    //         }
+    //     });
+    //     return resDelete;
+    // }
 
 
     /**
@@ -457,6 +484,19 @@ class CompanyModule {
         return sp.save();
     }
 
+    // @clientExport
+    // @requireParams(['id'])
+    // static async updateSupplier(params): Promise<any> {
+    //     let resUpdate = await RestfulAPIUtil.operateOnModel({
+    //         model: 'supplier',
+    //         params: {
+    //             fields: params,
+    //             method: 'PUT'
+    //         }
+    //     });
+    //     return resUpdate;
+    // }
+
     /**
      * 根据id查询供应商
      * @param {String} params.id
@@ -470,6 +510,20 @@ class CompanyModule {
 
         return ah;
     };
+
+    // @clientExport
+    // @requireParams(['id'])
+    // static async getSupplier(params: {id: string}): Promise<Supplier> {
+    //     let resGet = await RestfulAPIUtil.operateOnModel({
+    //         model: 'supplier',
+    //         params: {
+    //             field: params,
+    //             method: 'GET'
+    //         }
+    //     });
+    //     return resGet;
+    // }
+
 
 
     /**
@@ -488,6 +542,21 @@ class CompanyModule {
         return {ids: ids, count: paginate['total']};
     }
 
+    // @clientExport
+    // @requireParams(['companyId'])
+    // static async getSuppliers(params): Promise<any> {
+    //     let resGets = await RestfulAPIUtil.operateOnModel({
+    //         model: 'supplier',
+    //         params: {
+    //             field: params,
+    //             method: 'GET'
+    //         }
+    //     });
+    //     return resGets;
+    // }
+
+
+
     /**
      * 查找系统公共供应商
      * @param params
@@ -505,7 +574,20 @@ class CompanyModule {
         return {ids: ids, count: paginate['total']};
     }
 
+    // @clientExport
+    // static async getPublicSuppliers(params): Promise<any> {
+    //     let resGetP = await RestfulAPIUtil.operateOnModel({
+    //         model: 'supplier',
+    //         params: {
+    //             field: params,
+    //             method: 'GET'
+    //         }
+    //     });
+    //     return resGetP;
+    // }
+
     /*************************************供应商end***************************************/
+
 
     /*************************************企业行程点数变更日志begin***************************************/
 
