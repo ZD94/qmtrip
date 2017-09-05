@@ -1999,6 +1999,20 @@ class TripPlanModule {
             return Models.project.create(p).save();
         }
     }
+
+    //approve, trip_approve, trip_plan保存travelPolicyId
+    @clientExport
+    @requireParams(['tripApproveId'])
+    static async saveTravelPolicyId( tripApproveId:string ) : Promise<any>{
+        let tripApprove = await Models.tripApprove.get( tripApproveId );
+        let submitUser = await Models.staff.get( tripApprove.accountId );
+
+        tripApprove.query.travelPolicyId = submitUser.travelPolicyId;
+        let approve = await Models.approve.get(tripApproveId);
+        approve.data.query.travelPolicyId = tripApproveId;
+
+        await Promise.all([await tripApprove.save(), await approve.save()]);
+    }
 }
 
 
