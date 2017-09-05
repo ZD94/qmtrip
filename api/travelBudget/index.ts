@@ -14,6 +14,7 @@ const utils = require("common/utils");
 import _ = require("lodash");
 import {Place} from "_types/place";
 import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel, DefaultRegion} from "_types"
+import {where} from "sequelize";
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 export var NoCityPriceLimit = 0;
 
@@ -180,6 +181,12 @@ export default class ApiTravelBudget {
                 let budget = hotel[0];
 
                 let cityObj = await API.place.getCityInfo({cityCode: city});
+                let currentStaff = await Staff.getCurrent();
+                let isAccordHotel = await Models.accordHotel.find({where: {cityCode: cityObj.id, companyId: currentStaff['companyId']}});
+                if (isAccordHotel && isAccordHotel.length) {
+                    budget.price = isAccordHotel[0].accordPrice;
+                }
+
                 budget.hotelName = placeInfo ? placeInfo.hotelName : null;
                 budget.cityName = cityObj.name;
                 budget.tripType = ETripType.HOTEL;
