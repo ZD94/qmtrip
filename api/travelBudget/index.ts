@@ -179,8 +179,8 @@ export default class ApiTravelBudget {
             if (hotel && hotel.length) {
                 let budget = hotel[0];
                 let cityObj = await API.place.getCityInfo({cityCode: city});
-                let currentStaff = await Staff.getCurrent();
-                let isAccordHotel = await Models.accordHotel.find({where: {cityCode: cityObj.id, companyId: currentStaff['companyId']}});
+                console.log(staff['companyId']);
+                let isAccordHotel = await Models.accordHotel.find({where: {cityCode: cityObj.id, companyId: staff['companyId']}});
                 if (isAccordHotel && isAccordHotel.length) {
                     budget.price = isAccordHotel[0].accordPrice;
                 }
