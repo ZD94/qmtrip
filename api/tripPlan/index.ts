@@ -2005,16 +2005,32 @@ class TripPlanModule {
 
     //approve, trip_approve, trip_plan保存travelPolicyId
     @clientExport
-    @requireParams(['tripApproveId'])
     static async saveTravelPolicyId( tripApproveId:string ) : Promise<any>{
         let tripApprove = await Models.tripApprove.get( tripApproveId );
-        let submitUser = await Models.staff.get( tripApprove.accountId );
-
-        tripApprove.query.travelPolicyId = submitUser.travelPolicyId;
         let approve = await Models.approve.get(tripApproveId);
-        approve.data.query.travelPolicyId = tripApproveId;
+        let submitUser = await Models.staff.get( tripApprove.accountId );
+        let travelPolicyId = submitUser.travelPolicyId;
 
-        await Promise.all([await tripApprove.save(), await approve.save()]);
+        if(typeof tripApprove.query == "string"){
+            tripApprove.query = JSON.parse(tripApprove.query);
+        }
+
+        if(typeof approve.data == "string"){
+            approve.data = JSON.parse(approve.data);
+        }
+
+        tripApprove.query.travelPolicyId = travelPolicyId;
+
+        tripApprove.query = JSON.stringify(tripApprove.query);
+
+        approve.data.query.travelPolicyId = travelPolicyId;
+
+        approve.data = JSON.stringify(approve.data);
+
+        await tripApprove.save();
+        await approve.save();
+
+        return true;
     }
 }
 
