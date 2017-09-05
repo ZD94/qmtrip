@@ -111,7 +111,6 @@ export default class ApiTravelBudget {
             var segment: any = {};
             segment.city = placeInfo.destinationPlace;
             let city: Place = (await API.place.getCityInfo({cityCode: placeInfo.destinationPlace}));
-
             if (city.isAbroad) {
                 let s = _.cloneDeep(_staff);
                 s.policy = 'abroad';
@@ -179,7 +178,6 @@ export default class ApiTravelBudget {
             let hotel = _budgets[i].hotel;
             if (hotel && hotel.length) {
                 let budget = hotel[0];
-
                 let cityObj = await API.place.getCityInfo({cityCode: city});
                 let currentStaff = await Staff.getCurrent();
                 let isAccordHotel = await Models.accordHotel.find({where: {cityCode: cityObj.id, companyId: currentStaff['companyId']}});
