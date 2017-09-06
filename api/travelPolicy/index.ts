@@ -14,7 +14,7 @@ import { Models } from '_types';
 import { FindResult, PaginateInterface } from "common/model/interface";
 import setPrototypeOf = Reflect.setPrototypeOf;
 import {AgencyUser} from "_types/agency"
-var request = require("request-promise");
+var request = require("request");
 
 let API = require("@jingli/dnode-api");
 import {DefaultRegion} from "_types";
@@ -45,45 +45,14 @@ export interface ITravelPolicyRegionParams {
 
 export default class TravelPolicyModule{
 
-    // async getBestTravelPolicy(params:{travelPolicyId: string, placeId: string, type: string}): Promise<any>{
-    //     let {placeId,type, travelPolicyId} = params;
-    //     let policy = await TravelPolicyModule.operateOnPolicy({
-    //         url: BASE_URL,
-    //         params: {
-    //             fields:params
-    //         },
-    //         method:''
-    //     });
-    //     return policy;
-    // }
+
 
 
     @clientExport
-    async getDefaultTravelPolicy(params: {companyId: string, isDefault?: boolean}): Promise<any> {
-        // return API.policy.getDefaultTravelPolicy(params);
-        if(params.companyId) {
-            throw L.ERR.BAD_REQUEST();
-        }
-        if(!params.isDefault) params.isDefault = true;
-        let defaultTp = await TravelPolicyModule.operateOnPolicy({
-            model: 'travelpolicy',
-            params: {
-                fields:params,
-                method: "get",
-            }
-        });
-        if(!defaultTp || defaultTp.length == 0){
-            return null;
-        }
-        return defaultTp;
-    }
-
-
-    @clientExport
-    static async getStaffs(params:{travelPolicyId: string, companyId:string}){
+    static async getStaffs(params:{travelPolicyId: string, companyId:string}):Promise<PaginateInterface<Staff>>{
         let {companyId, travelPolicyId} = params;
         let staff = await Staff.getCurrent();
-        let query = {where: {companyId: companyId, travelPolicyId: travelPolicyId}}
+        let query = {where: {companyId: companyId, travelPolicyId: travelPolicyId,staffStatus: EStaffStatus.ON_JOB}}
         let pager = await Models.staff.find(query);
         return pager;
     }
@@ -103,15 +72,14 @@ export default class TravelPolicyModule{
             companyId: params.companyId
         }
 
-        let isExisted = await TravelPolicyModule.operateOnPolicy({
+        let isExisted: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params: {
                 fields: isExistedParams,
                 method: "get",
             },
         });
-        isExisted = isExisted.data;
-        if(isExisted && isExisted.length) {
+        if(isExisted.data && isExisted.data.length) {
             throw L.ERR.TRAVEL_POLICY_NAME_REPEAT();
         }
 
@@ -144,7 +112,7 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    static async createTravelPolicyRegion(params: ITravelPolicyRegionParams): Promise<any> {
+    static async createTravelPolicyRegion(params): Promise<any> {
         let {travelPolicyId, planeLevels, trainLevels, hotelLevels } = params;
         if(!travelPolicyId) {
             throw L.ERR.BAD_REQUEST();
@@ -169,7 +137,7 @@ export default class TravelPolicyModule{
      */
     @clientExport
     // @requireParams(["id"], ["companyId"])
-    static async deleteTravelPolicy(params) : Promise<boolean>{
+    static async deleteTravelPolicy(params) : Promise<any>{
         let {id, companyId} = params;
         var staff = await Staff.getCurrent();
         if(!id || !companyId) {
@@ -178,7 +146,7 @@ export default class TravelPolicyModule{
         let company = await Models.company.get(companyId);
         // let agencyUser = await AgencyUser.getCurrent();
 
-        let tp_delete = await TravelPolicyModule.operateOnPolicy({
+        let tp_delete: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params:{
                 fields: params,
@@ -192,7 +160,7 @@ export default class TravelPolicyModule{
             throw L.ERR.PERMISSION_DENY();
         }
 
-        if(tp_delete.isDefault){
+        if(tp_delete["isDefault"]){
             throw {code: -2, msg: '不允许删除默认差旅标准'};
         }
 
@@ -201,8 +169,7 @@ export default class TravelPolicyModule{
             throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准请先移除'};
         }
 
-        // let isDeleted = await API.policy.deleteTravelPolicy({id: id});
-        let isDeleted = await TravelPolicyModule.operateOnPolicy({
+        let isDeleted: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params:{
                 fields: params,
@@ -234,7 +201,7 @@ export default class TravelPolicyModule{
         let company = await Models.company.get(companyId);
         // let agencyUser = await AgencyUser.getCurrent();
 
-        let isUpdated = await TravelPolicyModule.operateOnPolicy({
+        let isUpdated: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params:{
                 fields: params,
@@ -277,28 +244,22 @@ export default class TravelPolicyModule{
      */
     @clientExport
     // @requireParams(["id"])
-    static async deleteTravelPolicyRegion(params: {id: string}) : Promise<boolean>{
+    static async deleteTravelPolicyRegion(params) : Promise<any>{
         var staff = await Staff.getCurrent();
         var id = params.id;
-        var tpr_delete = await API.policy.getTravelPolicyRegion(id);
-        var tp = await API.policy.getTravelPolicy(tpr_delete['travelPolicyId']);
 
         if(staff["roleId"] != EStaffRole.ADMIN && staff["roleId"] != EStaffRole.OWNER){
             throw {code: -2, msg: '不允许删除默认差旅标准'};
         }
 
-        if(staff && tp["companyId"] != staff["companyId"]){
-            throw L.ERR.PERMISSION_DENY();
-        }
-
-        let isDeleted = await TravelPolicyModule.operateOnPolicy({
+        let isDeleted: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicyregion",
             params: {
                 fields: params,
                 method: "delete"
             }
-        });
-        return isDeleted;
+        }) ;
+        return !!isDeleted;
     }
 
     // @clientExport
@@ -334,9 +295,9 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
 
-    @requireParams(["companyId"])
     @clientExport
-    static async getTravelPolicies(params: {companyId: string}): Promise<any>{
+    @requireParams(["companyId"], ["companyId", "isDefault","name","p", "pz"])
+    static async getTravelPolicies(params: {companyId: string, p?: number, pz?: number,isDefault?: boolean, name?:string}): Promise<any>{
         let {companyId } = params;
         var staff = await Staff.getCurrent();
 
@@ -354,53 +315,9 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
+
         return travelPolicies;
     }
-
-    /**
-     * 分页查询差旅标准集合
-     * @param params 查询条件 params.company_id 企业id
-     * @param options options.perPage 每页条数 options.page当前页
-     */
-    @clientExport
-    // @requireParams(["companyId"],['columns','name', 'planeLevels', 'planeDiscount', 'trainLevels', 'hotelLevels', 'hotelPrice', 'companyId', 'isChangeLevel', 'createdAt'])
-    // @conditionDecorator([
-    //     {if: condition.isCompanyAdminOrOwner("0.companyId")},
-    //     {if: condition.isCompanyAgency("0.companyId")}
-    // ])
-    //
-    // static async listAndPaginateTravelPolicy(params){
-    //     var options: any = {};
-    //     if(params.options){
-    //         options = params.options;
-    //         delete params.options;
-    //     }
-    //     var page, perPage, limit, offset;
-    //     if (options.page && /^\d+$/.test(options.page)) {
-    //         page = options.page;
-    //     } else {
-    //         page = 1;
-    //     }
-    //     if (options.perPage && /^\d+$/.test(options.perPage)) {
-    //         perPage = options.perPage;
-    //     } else {
-    //         perPage = 6;
-    //     }
-    //     limit = perPage;
-    //     offset = (page - 1) * perPage;
-    //     if (!options.order) {
-    //         options.order = [["created_at", "desc"]]
-    //     }
-    //     options.limit = limit;
-    //     options.offset = offset;
-    //     options.where = params;
-    //
-    //     return DB.models.TravelPolicy.findAndCountAll(options)
-    //         .then(function(result){
-    //             return new Paginate(page, perPage, result.count, result.rows);
-    //         });
-    //
-    // }
 
     /*************************************补助模板begin***************************************/
     /**
@@ -467,8 +384,8 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["id"])
-    static async updateSubsidyTemplate(params) : Promise<any>{
+    @requireParams(["id"], ["subsidyMoney","name", "travelPolicyId"])
+    static async updateSubsidyTemplate(params): Promise<any>{
         if(!params.id){
             throw L.ERR.BAD_REQUEST();
         }
@@ -491,8 +408,8 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["id"])
-    static async getSubsidyTemplate(params: {id: string, travelPolicyId?: string}) : Promise<any>{
+    @requireParams(["id"], ["subsidyMoney","name", "travelPolicyId"])
+    static async getSubsidyTemplate(params): Promise<any>{
         if(!params.id){
             throw L.ERR.BAD_REQUEST();
         }
@@ -513,7 +430,7 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["travelPolicyId"])
+    @requireParams(["travelPolicyId"], ["subsidyMoney","name", "travelPolicyId"])
     static async getSubsidyTemplates(params): Promise<any>{
         let subsidies = await TravelPolicyModule.operateOnPolicy({
             model: "subsidytemplate",
@@ -534,8 +451,8 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["id"], ["travelPolicyId"])
-    static async getTravelPolicyRegion(params:{id:string,travelPolicyId?:string}): Promise<any> {
+    @requireParams(["id"], ["travelPolicyId","hotelPrefer", "trafficPrefer", "hotelLevels", "planeLevels","trainLevels","companyRegionId"])
+    static async getTravelPolicyRegion(params): Promise<any> {
         let id = params.id;
         // return API.policy.getTravelPolicyRegion(params);
         let tpr = await TravelPolicyModule.operateOnPolicy({
@@ -664,7 +581,6 @@ export default class TravelPolicyModule{
     };
 
     @clientExport
-    // @requireParams()
     static async getRegionPlaces(params) : Promise<any>{
         let pc = await TravelPolicyModule.operateOnPolicy({
             model: "regionplace",
@@ -720,7 +636,7 @@ export default class TravelPolicyModule{
     static async operateOnPolicy(options: {
         model: string,
         params?:any,
-    }) {
+    }):Promise<any> {
         let {params, model} = options;
         let {fields, method} = params;
         let currentCompanyId = fields['companyId'];
@@ -730,7 +646,6 @@ export default class TravelPolicyModule{
         }
 
         let url = Config.cloudAPI + `/company/${currentCompanyId}/${model}`;
-        console.log("URL:", url);
         let result:any;
         let qs: {
             [index: string]: string;
@@ -745,19 +660,26 @@ export default class TravelPolicyModule{
                 }
             }
         }
-        console.log("QS:", qs);
-        result = await request({
-            uri: url,
-            body: fields,
-            json:true,
-            method: method,
-            qs: qs,
-            headers: {
-                key: Config.cloudKey
-            }
+        return new Promise((resolve, reject) => {
+            return request({
+                uri: url,
+                body: fields,
+                json:true,
+                method: method,
+                qs: qs,
+                headers: {
+                    key: Config.cloudKey
+                }
+            }, (err, resp, result) => {
+                if (err) {
+                    return reject(err);
+                }
+                if(typeof(result) == 'string'){
+                    result = JSON.parse(result);
+                }
+                return resolve(result);
+            })
         })
-        if(typeof(result) == 'string') result = JSON.parse(result);
-        return result;
     }
 }
 
@@ -767,3 +689,5 @@ function tryConvertToArray(val) {
     }
     return val;
 }
+
+

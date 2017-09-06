@@ -1850,6 +1850,9 @@ class TripPlanModule {
 
                 let approveCompany = await approve.getCompany();
                 let query = approve.query;
+                if(typeof query == "string"){
+                    query = JSON.parse(query);
+                }
                 let content = "";
                 let destinationPlacesInfo = query.destinationPlacesInfo;
 
@@ -1868,7 +1871,7 @@ class TripPlanModule {
                         }
                     }
                 }
-                let frozenNum = approve.query.frozenNum;
+                let frozenNum = query.frozenNum;
 
                 
                 try{
@@ -1904,15 +1907,6 @@ class TripPlanModule {
 
                     await approveCompany.beforeApproveTrip({number: frozenNum});
 
-                    if(!approve.isSpecialApprove){
-                        if(approve.createdAt.getMonth() == new Date().getMonth()){
-                            await approveCompany.approvePassReduceTripPlanNum({accountId: approve.account.id, tripPlanId: approve.id,
-                                remark: "自动审批通过消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
-                        }else{
-                            await approveCompany.approvePassReduceBeforeNum({accountId: approve.account.id, tripPlanId: approve.id,
-                                remark: "自动审批通过上月申请消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
-                        }
-                    }
                     if(approve.approveUser && approve.approveUser.id && /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(approve.approveUser.id)) {
                         let log = Models.tripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser.id, approveStatus: EApproveResult.AUTO_APPROVE, remark: '自动通过'});
                         await log.save();
@@ -1923,6 +1917,16 @@ class TripPlanModule {
 
                     approve.status = QMEApproveStatus.PASS;
                     approve = await approve.save();
+
+                    if(!approve.isSpecialApprove && approve.status == QMEApproveStatus.PASS){
+                        if(approve.createdAt.getMonth() == new Date().getMonth()){
+                            await approveCompany.approvePassReduceTripPlanNum({accountId: approve.account.id, tripPlanId: approve.id,
+                                remark: "自动审批通过消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
+                        }else{
+                            await approveCompany.approvePassReduceBeforeNum({accountId: approve.account.id, tripPlanId: approve.id,
+                                remark: "自动审批通过上月申请消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
+                        }
+                    }
 
                     await plugins.qm.tripApproveUpdateNotify(null, {
                         approveNo: approve.id,
@@ -1950,13 +1954,15 @@ class TripPlanModule {
                         approve.approveRemark = "自动审批失败";
                         await approve.save();
 
-                        if(approve.createdAt.getMonth() == new Date().getMonth()){
-                            await approveCompany.approveRejectFreeTripPlanNum({accountId: approve.account.id, tripPlanId: approve.id,
-                                remark: "审批驳回释放冻结行程点数", content: content, frozenNum: frozenNum});
+                        if(!approve.isSpecialApprove && approve.status == QMEApproveStatus.REJECT){
+                            if(approve.createdAt.getMonth() == new Date().getMonth()){
+                                await approveCompany.approveRejectFreeTripPlanNum({accountId: approve.account.id, tripPlanId: approve.id,
+                                    remark: "审批驳回释放冻结行程点数", content: content, frozenNum: frozenNum});
 
-                        }else{
-                            await approveCompany.approveRejectFreeBeforeNum({accountId: approve.account.id, tripPlanId: approve.id,
-                                remark: "审批驳回上月申请释放冻结行程点数", content: content, frozenNum: frozenNum});
+                            }else{
+                                await approveCompany.approveRejectFreeBeforeNum({accountId: approve.account.id, tripPlanId: approve.id,
+                                    remark: "审批驳回上月申请释放冻结行程点数", content: content, frozenNum: frozenNum});
+                            }
                         }
 
                         //发送审核结果邮件
