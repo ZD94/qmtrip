@@ -45,25 +45,7 @@ export interface ITravelPolicyRegionParams {
 
 export default class TravelPolicyModule{
 
-    // @clientExport
-    // async getDefaultTravelPolicy(params: {companyId: string, isDefault?: boolean}): Promise<any> {
-    //     if(params.companyId) {
-    //         throw L.ERR.BAD_REQUEST();
-    //     }
-    //     if(!params.isDefault) params.isDefault = true;
-    //     let defaultTp = await TravelPolicyModule.operateOnPolicy({
-    //         model: 'travelpolicy',
-    //         params: {
-    //             fields:params,
-    //             method: "get",
-    //         }
-    //     });
-    //     defaultTp = defaultTp['data'];
-    //     if(!defaultTp || defaultTp.length == 0){
-    //         return null;
-    //     }
-    //     return defaultTp;
-    // }
+
 
 
     @clientExport
@@ -90,7 +72,7 @@ export default class TravelPolicyModule{
             companyId: params.companyId
         }
 
-        let isExisted = await TravelPolicyModule.operateOnPolicy({
+        let isExisted: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params: {
                 fields: isExistedParams,
@@ -164,7 +146,7 @@ export default class TravelPolicyModule{
         let company = await Models.company.get(companyId);
         // let agencyUser = await AgencyUser.getCurrent();
 
-        let tp_delete = await TravelPolicyModule.operateOnPolicy({
+        let tp_delete: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params:{
                 fields: params,
@@ -186,7 +168,8 @@ export default class TravelPolicyModule{
         if(staffs && staffs.length > 0){
             throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准请先移除'};
         }
-        let isDeleted = await TravelPolicyModule.operateOnPolicy({
+
+        let isDeleted: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params:{
                 fields: params,
@@ -218,7 +201,7 @@ export default class TravelPolicyModule{
         let company = await Models.company.get(companyId);
         // let agencyUser = await AgencyUser.getCurrent();
 
-        let isUpdated = await TravelPolicyModule.operateOnPolicy({
+        let isUpdated: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params:{
                 fields: params,
@@ -269,14 +252,14 @@ export default class TravelPolicyModule{
             throw {code: -2, msg: '不允许删除默认差旅标准'};
         }
 
-        let isDeleted = await TravelPolicyModule.operateOnPolicy({
+        let isDeleted: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicyregion",
             params: {
                 fields: params,
                 method: "delete"
             }
-        });
-        return isDeleted;
+        }) ;
+        return !!isDeleted;
     }
 
     // @clientExport
@@ -314,7 +297,7 @@ export default class TravelPolicyModule{
 
     @clientExport
     @requireParams(["companyId"], ["companyId", "isDefault","name","p", "pz"])
-    static async getTravelPolicies(params): Promise<any>{
+    static async getTravelPolicies(params: {companyId: string, p?: number, pz?: number,isDefault?: boolean, name?:string}): Promise<any>{
         let {companyId } = params;
         var staff = await Staff.getCurrent();
 
@@ -325,7 +308,6 @@ export default class TravelPolicyModule{
             (agencyUser && agencyUser['agencyId'] != company['agencyId'])) {
             throw L.ERR.PERMISSION_DENY();
         }
-        console.log("before==>", Zone.current.get("session"))
         let travelPolicies = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params: {
@@ -333,8 +315,6 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
-
-        console.log("after==>", Zone.current.get("session"))
 
         return travelPolicies;
     }
