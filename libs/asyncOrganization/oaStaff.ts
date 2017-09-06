@@ -86,14 +86,14 @@ export  abstract class OaStaff{
         let execute = true;
         let returnStaff: Staff;
 
-        let staffKey = "tmp_staff_code:" + self.id + "_" + company.id;
-        let isExist = await cache.read(staffKey);
-        if (isExist) {
-            console.log("on sync ing==========?");
-            execute = false;
-        }
-        //暂时缓存，防止重复触发
-        await cache.write(staffKey, true, 10 * 1);
+        // let staffKey = "tmp_staff_code:" + self.id + "_" + company.id;
+        // let isExist = await cache.read(staffKey);
+        // if (isExist) {
+        //     console.log("on sync ing==========?");
+        //     execute = false;
+        // }
+        // //暂时缓存，防止重复触发
+        // await cache.write(staffKey, true, 10 * 1);
 
         if(execute || (from && from == "createUser")){
             if(params){
