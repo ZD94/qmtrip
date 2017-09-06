@@ -572,6 +572,9 @@ class StaffModule{
         }
         let departments = await Models.department.find({where: {companyId: companyId}});
         let travelPolicies = await API.travelPolicy.getTravelPolicies({companyId: companyId});
+        if(travelPolicies && travelPolicies.data){
+            travelPolicies = travelPolicies.data;
+        }
         for(let t=0;t<travelPolicies.length;t++){
             let tp = travelPolicies[t];
             travelPolicyMaps[tp.name] = tp.id;

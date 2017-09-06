@@ -636,7 +636,7 @@ export default class TravelPolicyModule{
     static async operateOnPolicy(options: {
         model: string,
         params?:any,
-    }):Promise<any> {
+    }): Promise<any> {
         let {params, model} = options;
         let {fields, method} = params;
         let currentCompanyId = fields['companyId'];
