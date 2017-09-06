@@ -14,7 +14,7 @@ import { Models } from '_types';
 import { FindResult, PaginateInterface } from "common/model/interface";
 import setPrototypeOf = Reflect.setPrototypeOf;
 import {AgencyUser} from "_types/agency"
-var request = require("request-promise");
+var request = require("request");
 
 let API = require("@jingli/dnode-api");
 import {DefaultRegion} from "_types";
@@ -71,7 +71,7 @@ export default class TravelPolicyModule{
                 fields:params,
                 method: "get",
             }
-        });
+        }) as ITravelPolicyParams[];
         if(!defaultTp || defaultTp.length == 0){
             return null;
         }
@@ -103,7 +103,7 @@ export default class TravelPolicyModule{
             companyId: params.companyId
         }
 
-        let isExisted = await TravelPolicyModule.operateOnPolicy({
+        let isExisted: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params: {
                 fields: isExistedParams,
@@ -178,7 +178,7 @@ export default class TravelPolicyModule{
         let company = await Models.company.get(companyId);
         // let agencyUser = await AgencyUser.getCurrent();
 
-        let tp_delete = await TravelPolicyModule.operateOnPolicy({
+        let tp_delete: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params:{
                 fields: params,
@@ -202,7 +202,7 @@ export default class TravelPolicyModule{
         }
 
         // let isDeleted = await API.policy.deleteTravelPolicy({id: id});
-        let isDeleted = await TravelPolicyModule.operateOnPolicy({
+        let isDeleted: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params:{
                 fields: params,
@@ -234,7 +234,7 @@ export default class TravelPolicyModule{
         let company = await Models.company.get(companyId);
         // let agencyUser = await AgencyUser.getCurrent();
 
-        let isUpdated = await TravelPolicyModule.operateOnPolicy({
+        let isUpdated: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params:{
                 fields: params,
@@ -291,14 +291,14 @@ export default class TravelPolicyModule{
             throw L.ERR.PERMISSION_DENY();
         }
 
-        let isDeleted = await TravelPolicyModule.operateOnPolicy({
+        let isDeleted: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicyregion",
             params: {
                 fields: params,
                 method: "delete"
             }
-        });
-        return isDeleted;
+        }) ;
+        return !!isDeleted;
     }
 
     // @clientExport
@@ -334,9 +334,9 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
 
-    @requireParams(["companyId"])
+    @requireParams(["companyId"], ["p", "pz"])
     @clientExport
-    static async getTravelPolicies(params: {companyId: string}): Promise<any>{
+    static async getTravelPolicies(params: {companyId: string, p?: number, pz?: number}): Promise<any>{
         let {companyId } = params;
         var staff = await Staff.getCurrent();
 
@@ -354,6 +354,7 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
+
         return travelPolicies;
     }
 
@@ -599,7 +600,6 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
-        console.log("====params; ", cr);
         return cr;
     };
 
@@ -885,35 +885,45 @@ export default class TravelPolicyModule{
             currentCompanyId = staff["companyId"];
         }
 
-        let url = Config.openApiUrl + `/company/${currentCompanyId}/${model}`;
+        let url = Config.cloudAPI + `/company/${currentCompanyId}/${model}`;
         if(addUrl){
             url = url + `/${addUrl}`
         }
+        console.log("URL:", url);
         let result:any;
-
+        let qs: {
+            [index: string]: string;
+        } = {};
         if (fields.hasOwnProperty("id")) {
             url = url + `/${fields['id']}`;
         }
         if(!fields.hasOwnProperty("id")){
             if(method == 'get'){
-                url = url + "?";
                 for (let key in fields) {
-                    url = url + `${key}=${fields[key]}&`;
-                }
-                if (url.lastIndexOf("&") == url.length - 1) {
-                    url = url.slice(0, -1);
+                    qs[key] = fields[key];
                 }
             }
-            url = encodeURI(url);
         }
-        result = await request({
-            uri: url,
-            body: fields,
-            json:true,
-            method: method
+        return new Promise((resolve, reject) => {
+            return request({
+                uri: url,
+                body: fields,
+                json:true,
+                method: method,
+                qs: qs,
+                headers: {
+                    key: Config.cloudKey
+                }
+            }, (err, resp, result) => {
+                if (err) {
+                    return reject(err);
+                }
+                if(typeof(result) == 'string'){
+                    result = JSON.parse(result);
+                }
+                return resolve(result);
+            })
         })
-        if(typeof(result) == 'string') result = JSON.parse(result);
-        return result;
     }
 }
 
