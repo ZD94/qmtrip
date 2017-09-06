@@ -71,7 +71,7 @@ export default class TravelPolicyModule{
                 fields:params,
                 method: "get",
             }
-        });
+        }) as ITravelPolicyParams[];
         if(!defaultTp || defaultTp.length == 0){
             return null;
         }
@@ -103,7 +103,7 @@ export default class TravelPolicyModule{
             companyId: params.companyId
         }
 
-        let isExisted = await TravelPolicyModule.operateOnPolicy({
+        let isExisted: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params: {
                 fields: isExistedParams,
@@ -178,7 +178,7 @@ export default class TravelPolicyModule{
         let company = await Models.company.get(companyId);
         // let agencyUser = await AgencyUser.getCurrent();
 
-        let tp_delete = await TravelPolicyModule.operateOnPolicy({
+        let tp_delete: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params:{
                 fields: params,
@@ -202,7 +202,7 @@ export default class TravelPolicyModule{
         }
 
         // let isDeleted = await API.policy.deleteTravelPolicy({id: id});
-        let isDeleted = await TravelPolicyModule.operateOnPolicy({
+        let isDeleted: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params:{
                 fields: params,
@@ -234,7 +234,7 @@ export default class TravelPolicyModule{
         let company = await Models.company.get(companyId);
         // let agencyUser = await AgencyUser.getCurrent();
 
-        let isUpdated = await TravelPolicyModule.operateOnPolicy({
+        let isUpdated: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params:{
                 fields: params,
@@ -291,14 +291,14 @@ export default class TravelPolicyModule{
             throw L.ERR.PERMISSION_DENY();
         }
 
-        let isDeleted = await TravelPolicyModule.operateOnPolicy({
+        let isDeleted: any = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicyregion",
             params: {
                 fields: params,
                 method: "delete"
             }
-        });
-        return isDeleted;
+        }) ;
+        return !!isDeleted;
     }
 
     // @clientExport
@@ -337,7 +337,6 @@ export default class TravelPolicyModule{
     @requireParams(["companyId"], ["p", "pz"])
     @clientExport
     static async getTravelPolicies(params: {companyId: string, p?: number, pz?: number}): Promise<any>{
-        console.log("getTravelPolicies===>", params);
         let {companyId } = params;
         var staff = await Staff.getCurrent();
 
@@ -348,7 +347,6 @@ export default class TravelPolicyModule{
             (agencyUser && agencyUser['agencyId'] != company['agencyId'])) {
             throw L.ERR.PERMISSION_DENY();
         }
-        console.log("before==>", Zone.current.get("session"))
         let travelPolicies = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params: {
@@ -356,8 +354,6 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
-
-        console.log("after==>", Zone.current.get("session"))
 
         return travelPolicies;
     }
