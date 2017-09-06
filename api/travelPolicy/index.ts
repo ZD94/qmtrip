@@ -14,7 +14,7 @@ import { Models } from '_types';
 import { FindResult, PaginateInterface } from "common/model/interface";
 import setPrototypeOf = Reflect.setPrototypeOf;
 import {AgencyUser} from "_types/agency"
-var request = require("request-promise");
+var request = require("request");
 
 let API = require("@jingli/dnode-api");
 import {DefaultRegion} from "_types";
@@ -334,9 +334,10 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
 
-    @requireParams(["companyId"])
+    @requireParams(["companyId"], ["p", "pz"])
     @clientExport
-    static async getTravelPolicies(params: {companyId: string}): Promise<any>{
+    static async getTravelPolicies(params: {companyId: string, p?: number, pz?: number}): Promise<any>{
+        console.log("getTravelPolicies===>", params);
         let {companyId } = params;
         var staff = await Staff.getCurrent();
 
@@ -347,6 +348,7 @@ export default class TravelPolicyModule{
             (agencyUser && agencyUser['agencyId'] != company['agencyId'])) {
             throw L.ERR.PERMISSION_DENY();
         }
+        console.log("before==>", Zone.current.get("session"))
         let travelPolicies = await TravelPolicyModule.operateOnPolicy({
             model: "travelpolicy",
             params: {
@@ -354,6 +356,9 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
+
+        console.log("after==>", Zone.current.get("session"))
+
         return travelPolicies;
     }
 
@@ -745,19 +750,26 @@ export default class TravelPolicyModule{
                 }
             }
         }
-        console.log("QS:", qs);
-        result = await request({
-            uri: url,
-            body: fields,
-            json:true,
-            method: method,
-            qs: qs,
-            headers: {
-                key: Config.cloudKey
-            }
+        return new Promise((resolve, reject) => {
+            return request({
+                uri: url,
+                body: fields,
+                json:true,
+                method: method,
+                qs: qs,
+                headers: {
+                    key: Config.cloudKey
+                }
+            }, (err, resp, result) => {
+                if (err) {
+                    return reject(err);
+                }
+                if(typeof(result) == 'string'){
+                    result = JSON.parse(result);
+                }
+                return resolve(result);
+            })
         })
-        if(typeof(result) == 'string') result = JSON.parse(result);
-        return result;
     }
 }
 
