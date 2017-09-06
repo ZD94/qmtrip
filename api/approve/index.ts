@@ -187,7 +187,7 @@ class ApproveModule {
             submitter: submitter.id,
             data: budgetInfo,
             title: query.projectName,
-            channel: submitter.company.oa,
+            channel: EApproveChannel.QM,   //特殊审批，流程都一致
             type: EApproveType.TRAVEL_BUDGET,
             isSpecialApprove: true,
             specialApproveRemark: specialApproveRemark,
@@ -267,7 +267,7 @@ emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result) {
 
         let company = await Models.company.get(approve['companyId']);
         //OA流程已经切换,旧的处理渠道不再支持
-        if (company.oa != oaStr2Enum(oa)) {
+        if (company.oa != oaStr2Enum(oa) && !approve.isSpecialApprove) {
             return;
         }
 

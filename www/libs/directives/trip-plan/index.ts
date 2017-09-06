@@ -9,7 +9,7 @@ import {
     EPlanStatus, EInvoiceType, ETripType
 } from '_types/tripPlan';
 import moment = require("moment");
-import {MHotelLevel, MPlaneLevel, MTrainLevel} from "_types/travelPolicy";
+import {MHotelLevel, MPlaneLevel, MTrainLevel} from "_types";
 require("./trip-plan.scss");
 
 let statusTxt = {};

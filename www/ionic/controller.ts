@@ -3,7 +3,7 @@ import {Staff, EStaffRole} from '_types/staff';
 import {
     MHotelLevel, MPlaneLevel, MTrainLevel, enumHotelLevelToStr, enumPlaneLevelToStr,
     enumTrainLevelToStr
-} from "_types/travelPolicy";
+} from "_types";
 import moment = require('moment');
 import * as path from 'path';
 

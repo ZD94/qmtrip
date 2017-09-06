@@ -2,7 +2,7 @@ import { ETripType, EInvoiceType } from '_types/tripPlan';
 import moment = require('moment');
 import { Staff } from '_types/staff/staff';
 import {EApproveType, EApproveChannel} from "_types/approve/types";
-import {MPlaneLevel, MTrainLevel} from "_types/travelPolicy";
+import {MPlaneLevel, MTrainLevel} from "_types";
 var msgbox = require("msgbox");
 declare var API;
 

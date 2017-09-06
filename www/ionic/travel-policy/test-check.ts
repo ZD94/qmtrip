@@ -2,7 +2,7 @@
  * Created by seven on 2016/12/12.
  */
 "use strict";
-import {EPlaneLevel} from "_types/travelPolicy";
+import {EPlaneLevel} from "_types";
 
 export async function TestCheckController($scope){
     $scope.testmodel = [
