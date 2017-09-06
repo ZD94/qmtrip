@@ -2005,6 +2005,36 @@ class TripPlanModule {
             return Models.project.create(p).save();
         }
     }
+
+    //approve, trip_approve, trip_plan保存travelPolicyId
+    @clientExport
+    static async saveTravelPolicyId( tripApproveId:string ) : Promise<any>{
+        let tripApprove = await Models.tripApprove.get( tripApproveId );
+        let approve = await Models.approve.get(tripApproveId);
+        let submitUser = await Models.staff.get( tripApprove.accountId );
+        let travelPolicyId = submitUser.travelPolicyId;
+
+        if(typeof tripApprove.query == "string"){
+            tripApprove.query = JSON.parse(tripApprove.query);
+        }
+
+        if(typeof approve.data == "string"){
+            approve.data = JSON.parse(approve.data);
+        }
+
+        tripApprove.query.travelPolicyId = travelPolicyId;
+
+        tripApprove.query = JSON.stringify(tripApprove.query);
+
+        approve.data.query.travelPolicyId = travelPolicyId;
+
+        approve.data = JSON.stringify(approve.data);
+
+        await tripApprove.save();
+        await approve.save();
+
+        return true;
+    }
 }
 
 
