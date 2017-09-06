@@ -1850,6 +1850,9 @@ class TripPlanModule {
 
                 let approveCompany = await approve.getCompany();
                 let query = approve.query;
+                if(typeof query == "string"){
+                    query = JSON.parse(query);
+                }
                 let content = "";
                 let destinationPlacesInfo = query.destinationPlacesInfo;
 
@@ -1868,7 +1871,7 @@ class TripPlanModule {
                         }
                     }
                 }
-                let frozenNum = approve.query.frozenNum;
+                let frozenNum = query.frozenNum;
 
                 
                 try{
