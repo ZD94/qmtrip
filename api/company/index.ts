@@ -685,14 +685,17 @@ class CompanyModule {
                 });
                 await log1.save();
             }
-            let log2 = TripPlanNumChange.create({
-                companyId: co.id,
-                type: NUM_CHANGE_TYPE.SYSTEM_ADD,
-                number: co.tripPlanNumLimit,
-                remark: "本月套餐新增行程",
-                content: "本月套餐新增行程"
-            });
-            await log2.save();
+
+            if(co.tripPlanNumLimit > 0){
+                let log2 = TripPlanNumChange.create({
+                    companyId: co.id,
+                    type: NUM_CHANGE_TYPE.SYSTEM_ADD,
+                    number: co.tripPlanNumLimit,
+                    remark: "本月套餐新增行程",
+                    content: "本月套餐新增行程"
+                });
+                await log2.save();
+            }
         }))
     }
 

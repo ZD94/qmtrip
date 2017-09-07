@@ -216,8 +216,13 @@ class StaffModule{
                 throw {code: -4, msg: "该员工为部门主管不能被删除"};
             }
         }
+        let otherStaff = await Models.staff.find({where: {accountId: deleteStaff.accountId, id: {$ne: deleteStaff.id}}});
+        let option: any = {};
+        if(otherStaff && otherStaff.length){
+            option.onlyDeleteSelf = true;
+        }
         await deleteStaff.deleteStaffDepartments();
-        await deleteStaff.destroy();
+        await deleteStaff.destroy(option);
         return true;
 
     }
@@ -572,6 +577,9 @@ class StaffModule{
         }
         let departments = await Models.department.find({where: {companyId: companyId}});
         let travelPolicies = await API.travelPolicy.getTravelPolicies({companyId: companyId});
+        if(travelPolicies && travelPolicies.data){
+            travelPolicies = travelPolicies.data;
+        }
         for(let t=0;t<travelPolicies.length;t++){
             let tp = travelPolicies[t];
             travelPolicyMaps[tp.name] = tp.id;
