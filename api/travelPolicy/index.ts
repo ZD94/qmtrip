@@ -17,9 +17,16 @@ import {AgencyUser} from "_types/agency"
 var request = require("request");
 
 let API = require("@jingli/dnode-api");
-import {DefaultRegion} from "_types";
+import {DefaultRegion, DefaultRegionId} from "_types";
 var BASE_URL = 'http://localhost:8080/policy';
 var Config = require("@jingli/config");
+var subsidyRegions = [
+    {name:DefaultRegion.abroad, cityIds: [DefaultRegionId.abroad]},
+    {name:DefaultRegion.domestic, cityIds: [DefaultRegionId.domestic]},
+    {name:"中国一类地区", cityIds: ['CT_340','CT_257','CT_289','CT_131']},
+    {name:"中国二类地区", cityIds: ['CT_194','CT_179','CT_158','CT_317','CT_233','CT_058','CT_236','CT_315','CT_218','CT_167','CT_300','CT_075','CT_332','CT_288','CT_132']},
+    {name:"港澳台", cityIds: ['CT_2912','CT_9000','CT_2911']}
+    ];
 
 export interface ITravelPolicyParams {
     id?:string,
@@ -626,6 +633,43 @@ export default class TravelPolicyModule{
         });
         return pr;
     };
+
+    @clientExport
+    static async initSubsidyRegions(params) : Promise<any>{
+        if(!params) params = {};
+        if(!params.companyId){
+            let staff = await Staff.getCurrent();
+            params.companyId = staff.company.id;
+        }
+
+        let companyRegions = await Promise.all(subsidyRegions.map(async (regionGroup) => {
+            let cityIds = regionGroup.cityIds;
+            let name = regionGroup.name;
+            let companyRegion = await TravelPolicyModule.getCompanyRegions({companyId: params.companyId, name: name});
+            companyRegion = companyRegion.data;
+            if(companyRegion && companyRegion.length){
+                companyRegion = companyRegion[0];
+                return companyRegion;
+            }
+
+            companyRegion = await TravelPolicyModule.createCompanyRegion({companyId: params.companyId, name: name});
+            companyRegion = companyRegion.data;
+
+            await Promise.all(cityIds.map(async (cityId) => {
+                await TravelPolicyModule.createRegionPlace({
+                    placeId: cityId,
+                    companyRegionId: companyRegion.id,
+                });
+            }));
+
+            return companyRegion;
+        }))
+
+        console.info(companyRegions);
+        return companyRegions;
+    };
+
+
 
     /*************************************地区设置(RegionPlace)end***************************************/
 
