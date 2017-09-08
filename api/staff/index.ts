@@ -135,6 +135,7 @@ class StaffModule{
     @requireParams(["name", "mobile", "companyId"], staffAllCols)
     static async registerStaff (params): Promise<Staff> {
         let company = await Models.company.get(params.companyId);
+
         /*let staffNum = await company.getStaffNum();
         if(staffNum >= company.staffNumLimit){
             throw L.ERR.BEYOND_LIMIT_NUM("员工");
@@ -147,7 +148,12 @@ class StaffModule{
         staff.company = company;
 
         if(!staff["travelPolicyId"]){
-            staff["travelPolicyId"] = defaultTravelPolicy && defaultTravelPolicy.length ? defaultTravelPolicy[0].id : null;
+            if(_.isArray(defaultTravelPolicy) && defaultTravelPolicy.length){
+                staff["travelPolicyId"] =  defaultTravelPolicy[0].id;
+            } else {
+                staff["travelPolicyId"] =  defaultTravelPolicy.id;
+            }
+
         }
         await staff.save();
 
