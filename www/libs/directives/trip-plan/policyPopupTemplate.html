@@ -1,9 +1,0 @@
-<div>飞机: <span>{{MPlaneLevel[policy.planeLevel]}}</span></div>
-<div>火车: <span>{{MTrainLevel[policy.trainLevel]}}</span></div>
-<div>住宿: <span>{{MHotelLevel[policy.hotelLevel]}}</span></div>
-<div class="policySubsidy" ng-if="subsidies.length>0">
-    <span>补助: </span>
-    <div>
-        <p ng-repeat="subsidy in subsidies">&nbsp;{{subsidy.name}}: {{subsidy.subsidyMoney}}元/天</p>
-    </div>
-</div>
