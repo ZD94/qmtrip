@@ -96,10 +96,6 @@ export default class ApiTravelBudget {
         let count = params.staffList.length;
 
         let destinationPlacesInfo = params.destinationPlacesInfo;
-        let policies = {
-            "domestic": {},
-            "abroad": {}
-        }
         let _staff: any = {
             gender: staff.sex,
             policy: 'domestic',
