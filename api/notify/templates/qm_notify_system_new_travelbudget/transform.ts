@@ -32,21 +32,28 @@ export = async function transform(values: any): Promise<any>{
     let currentCompany = staff.company;
     async function getAbroadPolicy() {
         let policyRegions = await API.travelPolicy.getCompanyRegion({companyId: currentCompany.id, name: DefaultRegion.abroad});
-        let abroadRegion = await API.travelPolicy.getTravelPolicyRegion({travelPolicyId: travelPolicy.id, companyRegionId: policyRegions[0].id});
-
-        if (abroadRegion && abroadRegion.length > 0) {
-            travelp.abroadPlaneLevels = abroadRegion[0].planeLevels;
-            travelp.abroadHotelLevels = abroadRegion[0].hotelLevels;
+        policyRegions = policyRegions.data;
+        if(policyRegions && policyRegions.length) {
+            let abroadRegion = await API.travelPolicy.getTravelPolicyRegion({travelPolicyId: travelPolicy.id, companyRegionId: policyRegions[0].id});
+            abroadRegion = abroadRegion.data;
+            if (abroadRegion && abroadRegion.length > 0) {
+                travelp.abroadPlaneLevels = abroadRegion[0].planeLevels;
+                travelp.abroadHotelLevels = abroadRegion[0].hotelLevels;
+            }
         }
     }
 
     async function getDomesticPolicy() {
         let policyRegions = await API.travelPolicy.getCompanyRegion({companyId: currentCompany.id, name: DefaultRegion.domestic});
-        let domesticRegion = await API.travelPolicy.getTravelPolicyRegion({travelPolicyId: travelPolicy.id, companyRegionId: policyRegions[0].id});
-        if (domesticRegion && domesticRegion.length > 0) {
-            travelp.planeLevels = domesticRegion[0].planeLevels;
-            travelp.hotelLevels = domesticRegion[0].hotelLevels;
-            travelp.trainLevels = domesticRegion[0].trainLevels;
+        policyRegions = policyRegions.data;
+        if(policyRegions && policyRegions.length) {
+            let domesticRegion = await API.travelPolicy.getTravelPolicyRegion({travelPolicyId: travelPolicy.id, companyRegionId: policyRegions[0].id});
+            domesticRegion = domesticRegion.data;
+            if (domesticRegion && domesticRegion.length > 0) {
+                travelp.planeLevels = domesticRegion[0].planeLevels;
+                travelp.hotelLevels = domesticRegion[0].hotelLevels;
+                travelp.trainLevels = domesticRegion[0].trainLevels;
+            }
         }
     }
 
@@ -54,9 +61,7 @@ export = async function transform(values: any): Promise<any>{
     await getAbroadPolicy();
     await getDomesticPolicy();
 
-
     values.travelPolicy =  travelp;
-
 
     let budgetInfo = await API.travelBudget.getBudgetInfo({id: values.cacheId, accountId : staff.id});
     let {budgets, query} = budgetInfo;
