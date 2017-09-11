@@ -96,7 +96,7 @@ deploy:release:
     url: https://j.jingli365.com
   variables:
     JL_APP_CLOUDKEY: jinglicloud2017
-    JL_APP_CLOUDAPI: http://j.jingli365.com/cloud/api/v1
+    JL_APP_CLOUDAPI: https://j.jingli365.com/cloud/api/v1
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
