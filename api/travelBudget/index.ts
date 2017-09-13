@@ -222,6 +222,8 @@ export default class ApiTravelBudget {
 
         let obj: any = {};
         obj.budgets = budgets;
+        console.log("===>budet: ", budgets)
+        console.log("===>budet: ", JSON.stringify(budgets))
         obj.query = params;
         obj.createAt = Date.now();
         let _id = Date.now() + utils.getRndStr(6);
@@ -250,6 +252,7 @@ export default class ApiTravelBudget {
                     budget.tripType = ETripType.SUBSIDY;
                     budget.type = EInvoiceType.SUBSIDY;
                     budget.price = subsidy.template.subsidyMoney * days;
+                    budget.unit = preferedCurrency | DefaultCurrency,
                     budget.duringDays = days;
                     budget.template = { id: subsidy.template.id, name: subsidy.template.name };
                     budget.reason = reason;
