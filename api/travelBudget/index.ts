@@ -17,7 +17,7 @@ import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel, DefaultRegion} from 
 import {where} from "sequelize";
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 export var NoCityPriceLimit = 0;
-const DefaultCurrency = 'CNY';
+const DefaultCurrencyUnit = 'CNY';
 var request = require("request");
 
 const cloudAPI = require('@jingli/config').cloudAPI;
@@ -80,7 +80,8 @@ export default class ApiTravelBudget {
     @clientExport
     static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams) :Promise<string> {
         let staffId = params['staffId'];
-        let preferedCurrency = params["preferedCurrency"] || DefaultCurrency;
+        let preferedCurrency = params["preferedCurrency"];
+        preferedCurrency = preferedCurrency && typeof(preferedCurrency) != 'undefined' ? preferedCurrency :DefaultCurrencyUnit;
 
         if (!staffId || staffId == 'undefined') {
             let currentStaff = await Staff.getCurrent();
@@ -252,14 +253,14 @@ export default class ApiTravelBudget {
                     budget.tripType = ETripType.SUBSIDY;
                     budget.type = EInvoiceType.SUBSIDY;
                     budget.price = subsidy.template.subsidyMoney * days;
-                    budget.unit = preferedCurrency | DefaultCurrency,
+                    budget.unit = preferedCurrency && typeof(preferedCurrency) != 'undefined' ? preferedCurrency: DefaultCurrencyUnit,
                     budget.duringDays = days;
                     budget.template = { id: subsidy.template.id, name: subsidy.template.name };
                     budget.reason = reason;
                 }
             }
             let rate;
-            if(preferedCurrency != DefaultCurrency) {
+            if(preferedCurrency != DefaultCurrencyUnit) {
                 try{
                     rate = await new Promise<any>(async function(resolve,reject){
                         let qs = {
