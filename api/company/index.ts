@@ -407,28 +407,28 @@ class CompanyModule {
      * @param data
      * @returns {*}
      */
-    @clientExport
-    @requireParams(["name", "companyId"], supplierCols)
-    @conditionDecorator([
-        {if: condition.isCompanyAdminOrOwner("0.companyId")}
-    ])
-    static async createSupplier (params) : Promise<Supplier>{
-        var supplier = Supplier.create(params);
-        return supplier.save();
-    }
-
     // @clientExport
-    // @requireParams(['name', 'companyId'])
-    // static async createSupplier (params): Promise<Supplier> {
-    //     let resCreate = await RestfulAPIUtil.operateOnModel({
-    //         model: 'supplier',
-    //         params: {
-    //             fields: params,
-    //             method: 'POST'
-    //         }
-    //     });
-    //     return resCreate;
+    // @requireParams(["name", "companyId"], supplierCols)
+    // @conditionDecorator([
+    //     {if: condition.isCompanyAdminOrOwner("0.companyId")}
+    // ])
+    // static async createSupplier (params) : Promise<Supplier>{
+    //     var supplier = Supplier.create(params);
+    //     return supplier.save();
     // }
+
+    @clientExport
+    // @requireParams(['name', 'companyId'])
+    static async createSupplier (params): Promise<Supplier> {
+        let resCreate = await RestfulAPIUtil.operateOnModel({
+            model: 'supplier',
+            params: {
+                fields: params,
+                method: 'POST'
+            }
+        });
+        return resCreate.data;
+    }
 
 
     /**
@@ -436,31 +436,31 @@ class CompanyModule {
      * @param params
      * @returns {*}
      */
-    @clientExport
-    @requireParams(["id"])
-    @conditionDecorator([
-        {if: condition.isSupplierAdminOrOwner("0.id")}
-    ])
-    static async deleteSupplier(params) : Promise<any>{
-        var id = params.id;
-        var st_delete = await Models.supplier.get(id);
-
-        await st_delete.destroy();
-        return true;
-    }
-
     // @clientExport
-    // @requireParams(['id'])
-    // static async deleteSupplier(params): Promise<any> {
-    //     let resDelete = await RestfulAPIUtil.operateOnModel({
-    //         model: 'supplier',
-    //         params: {
-    //             fields: params,
-    //             method: 'DELETE'
-    //         }
-    //     });
-    //     return resDelete;
+    // @requireParams(["id"])
+    // @conditionDecorator([
+    //     {if: condition.isSupplierAdminOrOwner("0.id")}
+    // ])
+    // static async deleteSupplier(params) : Promise<any>{
+    //     var id = params.id;
+    //     var st_delete = await Models.supplier.get(id);
+    //
+    //     await st_delete.destroy();
+    //     return true;
     // }
+
+    @clientExport
+    // @requireParams(['id'])
+    static async deleteSupplier(params): Promise<any> {
+        let resDelete = await RestfulAPIUtil.operateOnModel({
+            model: 'supplier',
+            params: {
+                fields: params,
+                method: 'DELETE'
+            }
+        });
+        return resDelete.data;
+    }
 
 
     /**
@@ -469,60 +469,62 @@ class CompanyModule {
      * @param data
      * @returns {*}
      */
-    @clientExport
-    @requireParams(["id"], supplierCols)
-    @conditionDecorator([
-        {if: condition.isSupplierAdminOrOwner("0.id")}
-    ])
-    static async updateSupplier(params) : Promise<Supplier>{
-        var id = params.id;
-
-        var sp = await Models.supplier.get(id);
-        for(var key in params){
-            sp[key] = params[key];
-        }
-        return sp.save();
-    }
-
     // @clientExport
-    // @requireParams(['id'])
-    // static async updateSupplier(params): Promise<any> {
-    //     let resUpdate = await RestfulAPIUtil.operateOnModel({
-    //         model: 'supplier',
-    //         params: {
-    //             fields: params,
-    //             method: 'PUT'
-    //         }
-    //     });
-    //     return resUpdate;
+    // @requireParams(["id"], supplierCols)
+    // @conditionDecorator([
+    //     {if: condition.isSupplierAdminOrOwner("0.id")}
+    // ])
+    // static async updateSupplier(params) : Promise<Supplier>{
+    //     var id = params.id;
+    //
+    //     var sp = await Models.supplier.get(id);
+    //     for(var key in params){
+    //         sp[key] = params[key];
+    //     }
+    //     return sp.save();
     // }
+
+    @clientExport
+    // @requireParams(['id'])
+    static async updateSupplier(params): Promise<any> {
+        console.log('updateparams', params);
+        let resUpdate = await RestfulAPIUtil.operateOnModel({
+            model: 'supplier',
+            params: {
+                fields: params,
+                method: 'PUT'
+            }
+        });
+        return resUpdate.data;
+    }
 
     /**
      * 根据id查询供应商
      * @param {String} params.id
      * @returns {*}
      */
-    @clientExport
-    @requireParams(["id"])
-    static async getSupplier(params: {id: string}) : Promise<Supplier>{
-        let id = params.id;
-        var ah = await Models.supplier.get(id);
-
-        return ah;
-    };
-
     // @clientExport
+    // @requireParams(["id"])
+    // static async getSupplier(params: {id: string}) : Promise<Supplier>{
+    //     let id = params.id;
+    //     var ah = await Models.supplier.get(id);
+    //
+    //     return ah;
+    // };
+
+    @clientExport
     // @requireParams(['id'])
-    // static async getSupplier(params: {id: string}): Promise<Supplier> {
-    //     let resGet = await RestfulAPIUtil.operateOnModel({
-    //         model: 'supplier',
-    //         params: {
-    //             field: params,
-    //             method: 'GET'
-    //         }
-    //     });
-    //     return resGet;
-    // }
+    static async getSupplier(params: {id: string}): Promise<Supplier> {
+        // console.log('getsupplier', params);
+        let resGet = await RestfulAPIUtil.operateOnModel({
+            model: 'supplier',
+            params: {
+                fields: params,
+                method: 'GET'
+            }
+        });
+        return resGet.data;
+    }
 
 
 
@@ -531,29 +533,30 @@ class CompanyModule {
      * @param params
      * @returns {*}
      */
-    @clientExport
-    static async getSuppliers(params): Promise<FindResult>{
-        params.order = params.order || [['created_at', 'desc']];
-
-        let paginate = await Models.supplier.find(params);
-        let ids =  paginate.map(function(s){
-            return s.id;
-        })
-        return {ids: ids, count: paginate['total']};
-    }
-
     // @clientExport
-    // @requireParams(['companyId'])
-    // static async getSuppliers(params): Promise<any> {
-    //     let resGets = await RestfulAPIUtil.operateOnModel({
-    //         model: 'supplier',
-    //         params: {
-    //             field: params,
-    //             method: 'GET'
-    //         }
-    //     });
-    //     return resGets;
+    // static async getSuppliers(params): Promise<FindResult>{
+    //     params.order = params.order || [['created_at', 'desc']];
+    //
+    //     let paginate = await Models.supplier.find(params);
+    //     let ids =  paginate.map(function(s){
+    //         return s.id;
+    //     })
+    //     return {ids: ids, count: paginate['total']};
     // }
+
+    @clientExport
+    // @requireParams(['companyId'])
+    static async getSuppliers(params): Promise<any> {
+        console.log('getsuppliers', params);
+        let resGets = await RestfulAPIUtil.operateOnModel({
+            model: 'supplier',
+            params: {
+                fields: params,
+                method: 'GET'
+            }
+        });
+        return resGets.data;
+    }
 
 
 
@@ -562,29 +565,108 @@ class CompanyModule {
      * @param params
      * @returns {*}
      */
-    @clientExport
-    static async getPublicSuppliers(params): Promise<FindResult>{
-        params.order = params.order || [['created_at', 'desc']];
+    // @clientExport
+    // static async getPublicSuppliers(params): Promise<FindResult>{
+    //     params.order = params.order || [['created_at', 'desc']];
+    //
+    //     params.where.companyId = null;//查询companyId为空的公共供应商
+    //     let paginate = await Models.supplier.find(params);
+    //     let ids =  paginate.map(function(s){
+    //         return s.id;
+    //     })
+    //     return {ids: ids, count: paginate['total']};
+    // }
 
-        params.where.companyId = null;//查询companyId为空的公共供应商
-        let paginate = await Models.supplier.find(params);
-        let ids =  paginate.map(function(s){
-            return s.id;
-        })
-        return {ids: ids, count: paginate['total']};
+
+    /**
+     * get public suppliers' id
+     */
+    @clientExport
+    static async getPublicSuppliersId(params): Promise<any> {
+        // console.log('publicparams', params);
+        let resPublic = await RestfulAPIUtil.operateOnModel({
+            model: 'company',
+            params: {
+                fields: {
+                    id: params['companyId']
+                },
+                method: 'GET',
+            },
+            flag: true
+        });
+        let res = resPublic.data.appointedPubilcSuppliers;
+        console.log('publicres', res);
+        return res;
     }
 
-    // @clientExport
-    // static async getPublicSuppliers(params): Promise<any> {
-    //     let resGetP = await RestfulAPIUtil.operateOnModel({
-    //         model: 'supplier',
-    //         params: {
-    //             field: params,
-    //             method: 'GET'
-    //         }
-    //     });
-    //     return resGetP;
-    // }
+    /**
+     * get all suppliers' id
+     */
+    @clientExport
+    static async getAllSuppliers(params): Promise<any> {
+        console.log('allparams', params);
+        let resPri = await RestfulAPIUtil.operateOnModel({
+            model: 'supplier',
+            params: {
+                fields: params,
+                method: 'GET'
+            }
+        });
+
+        let resPub = await RestfulAPIUtil.operateOnModel({
+            model: 'supplier',
+            params: {
+                fields: {
+                    companyId: null
+                },
+                method: 'GET'
+            }
+        });
+
+        let res = _.concat(resPri.data, resPub.data)
+        console.log('res', res);
+        return res;
+    }
+
+
+    /**
+     * get all used suppliers' id
+     */
+    @clientExport
+    static async getAllUsedSuppliersId(params): Promise<any> {
+        // console.log('allusedparams',params);
+        console.log('id:', params['companyId']);
+        let resPublic = await RestfulAPIUtil.operateOnModel({
+            model: 'company',
+            params: {
+                fields: {
+                    id: params['companyId']
+                },
+                method:'GET',
+            },
+            flag: true
+        });
+        // console.log('resPublic', resPublic.data.appointedPubilcSuppliers);
+
+        let resPrivate = await RestfulAPIUtil.operateOnModel({
+            model: 'supplier',
+            params: {
+                fields: params,
+                method: 'GET'
+            }
+        });
+        // console.log('resPrivate', resPrivate.data);
+
+        let res = resPublic.data.appointedPubilcSuppliers;
+        let resPrivateData = resPrivate.data;
+        resPrivateData.map(function(item) {
+            res.push(item.id);
+            return ;
+        });
+        // console.log('res', res);
+        return res;
+    }
+
 
     /*************************************供应商end***************************************/
 

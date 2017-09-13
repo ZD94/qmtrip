@@ -5,15 +5,16 @@
 
 import {Staff} from "_types/staff";
 import setPrototypeOf = Reflect.setPrototypeOf;
-var request = require("request-promise");
+var request = require("request");
 var Config = require("@jingli/config");
 
 export default class RestfulAPIUtil {
     static async operateOnModel(options: {
         model: string,
-        params?: any
-    }) {
-        let {params, model} = options;
+        params?: any,
+        flag?: any
+    }):Promise<any> {
+        let {params, model, flag} = options;
         let {fields, method} = params;
         let currentCompanyId = fields['companyId'];
         if (!currentCompanyId || typeof(currentCompanyId) == 'undefined') {
@@ -21,32 +22,49 @@ export default class RestfulAPIUtil {
             currentCompanyId = staff["companyId"];
         }
 
-        let url = Config.openApiUrl + `/company/${currentCompanyId}/${model}`;
+        let url;
+        if (!flag) {
+            url = Config.cloudAPI + `/company/${currentCompanyId}/${model}`;
+        }
+        else {
+            url = Config.cloudAPI + `/company`
+        }
         let result: any;
 
-        if (fields.hasOwnProperty("id")) {
+        let qs: {
+            [index: string]: string;
+        } = {};
+        if (fields.hasOwnProperty('id')) {
             url = url + `/${fields['id']}`;
         }
         if (!fields.hasOwnProperty("id")) {
-            if (method == 'get') {
+            if (method == 'GET') {
                 url = url + "?";
                 for (let key in fields) {
-                    url = url + `${key}=${fields[key]}&`;
-                }
-                if (url.lastIndexOf("&") == url.length - 1) {
-                    url = url.slice(0, -1);
+                   qs[key] = fields[key];
                 }
             }
-            url = encodeURI(url);
         }
-        result = await request({
-            uri: url,
-            body: fields,
-            json: true,
-            method: method
+        return new Promise((resolve, reject) => {
+            return request({
+                uri: url,
+                body: fields,
+                json: true,
+                method: method,
+                qs: qs,
+                headers: {
+                    key: Config.cloudKey
+                }
+            }, (err, resp, result) => {
+                if (err) {
+                    return reject(err);
+                }
+                if (typeof(result) == 'string') {
+                    result = JSON.parse(result);
+                }
+                return resolve(result);
+            });
         })
-        if (typeof(result) == 'string') result = JSON.parse(result);
-        return result;
     }
 }
 
