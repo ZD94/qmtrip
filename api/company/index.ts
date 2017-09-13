@@ -24,7 +24,7 @@ import {requirePermit, conditionDecorator, condition, modelNotNull} from "api/_d
 import {md5} from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
 import {CoinAccount} from "_types/coin";
-import RestfulAPIUtil from "../RestfulAPIUtil"
+import RestfulAPIUtil from "../restfulAPIUtil"
 
 const supplierCols = Supplier['$fieldnames'];
 const companyCols = Staff['$getAllFieldNames']();
