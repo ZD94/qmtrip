@@ -145,9 +145,12 @@ export default class ApiTravelBudget {
             return segment;
         }));
 
+        let companyId = staff.company.id;
+
         let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
             preferedCurrency:preferedCurrency,
             travelPolicyId: travelPolicy['id'],
+            companyId,
             staffs,
             segments,
             ret: params.isRoundTrip ? 1 : 0,
