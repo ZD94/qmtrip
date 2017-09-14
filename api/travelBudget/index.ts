@@ -174,6 +174,7 @@ export default class ApiTravelBudget {
                 budget.tripType = ETripType.OUT_TRIP;
                 budget.price = budget.price * count;
                 budget.unit = budget.unit;
+                budget.rate = budget.rate;
                 budget.type = budget.trafficType;
                 budgets.push(budget);
             }
@@ -193,6 +194,7 @@ export default class ApiTravelBudget {
                 budget.tripType = ETripType.HOTEL;
                 budget.price = budget.price * count;
                 budget.unit = budget.unit;
+                budget.rate = budget.rate;
                 budgets.push(budget);
             }
 
@@ -223,8 +225,6 @@ export default class ApiTravelBudget {
 
         let obj: any = {};
         obj.budgets = budgets;
-        console.log("===>budet: ", budgets)
-        console.log("===>budet: ", JSON.stringify(budgets))
         obj.query = params;
         obj.createAt = Date.now();
         let _id = Date.now() + utils.getRndStr(6);
@@ -268,7 +268,7 @@ export default class ApiTravelBudget {
                             currencyTo: preferedCurrency
                         }
                         request({
-                            uri: cloudAPI + `/exchangeRate`,
+                            uri: cloudAPI + `/currencyRate`,
                             qs: qs,
                             method: 'get',
                             json: true
@@ -286,11 +286,13 @@ export default class ApiTravelBudget {
                     if(typeof(rate) == 'string') rate = JSON.parse(rate);
                     rate = rate.data;
                     if( typeof(rate) != 'undefined' && rate && rate.length ) {
-                        budget.price = Math.round(budget.price * rate[0].rate * 100) / 100;
+                        budget.rate = rate[0]['rate'];
                     }
                 } catch(err) {
                     console.log(err)
                 }
+            } else {
+                budget.rate = 1;
             }
             return budget;
         }
