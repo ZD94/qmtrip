@@ -659,13 +659,13 @@ export default class TravelPolicyModule{
                 await TravelPolicyModule.createRegionPlace({
                     placeId: cityId,
                     companyRegionId: companyRegion.id,
+                    companyId: params.companyId
                 });
             }));
 
             return companyRegion;
         }))
 
-        console.info(companyRegions);
         return companyRegions;
     };
 
