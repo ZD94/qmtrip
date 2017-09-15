@@ -261,41 +261,41 @@ export default class ApiTravelBudget {
                     budget.template = { id: subsidy.template.id, name: subsidy.template.name };
                     budget.reason = reason;
                 }
-            }
-            let rate;
-            if(preferedCurrency != DefaultCurrencyUnit) {
-                try{
-                    rate = await new Promise<any>(async function(resolve,reject){
-                        let qs = {
-                            key: cloudKey,
-                            currencyTo: preferedCurrency
-                        }
-                        request({
-                            uri: cloudAPI + `/currencyRate`,
-                            qs: qs,
-                            method: 'get',
-                            json: true
-                        },async (err, res) => {
-                            if(err){
-                                reject(err)
+                let rate;
+                if(preferedCurrency != DefaultCurrencyUnit) {
+                    try{
+                        rate = await new Promise<any>(async function(resolve,reject){
+                            let qs = {
+                                key: cloudKey,
+                                currencyTo: preferedCurrency
                             }
-                            let body = res.body;
-                            if(body && typeof(body) == 'string') {
-                                body = JSON.parse(body)
-                            }
-                            return resolve(body);
+                            request({
+                                uri: cloudAPI + `/currencyRate`,
+                                qs: qs,
+                                method: 'get',
+                                json: true
+                            },async (err, res) => {
+                                if(err){
+                                    reject(err)
+                                }
+                                let body = res.body;
+                                if(body && typeof(body) == 'string') {
+                                    body = JSON.parse(body)
+                                }
+                                return resolve(body);
+                            });
                         });
-                    });
-                    if(typeof(rate) == 'string') rate = JSON.parse(rate);
-                    rate = rate.data;
-                    if( typeof(rate) != 'undefined' && rate && rate.length ) {
-                        budget.rate = rate[0]['rate'];
+                        if(typeof(rate) == 'string') rate = JSON.parse(rate);
+                        rate = rate.data;
+                        if( typeof(rate) != 'undefined' && rate && rate.length ) {
+                            budget.rate = rate[0]['rate'];
+                        }
+                    } catch(err) {
+                        console.log(err)
                     }
-                } catch(err) {
-                    console.log(err)
+                } else {
+                    budget.rate = 1;
                 }
-            } else {
-                budget.rate = 1;
             }
             return budget;
         }
