@@ -17,8 +17,11 @@ import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel, DefaultRegion} from 
 import {where} from "sequelize";
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 export var NoCityPriceLimit = 0;
+const DefaultCurrencyUnit = 'CNY';
+var request = require("request");
 
-
+const cloudAPI = require('@jingli/config').cloudAPI;
+const cloudKey = require('@jingli/config').cloudKey;
 interface SegmentsBudgetResult {
     id: string;
     cities: string[];
@@ -77,6 +80,9 @@ export default class ApiTravelBudget {
     @clientExport
     static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams) :Promise<string> {
         let staffId = params['staffId'];
+        let preferedCurrency = params["preferedCurrency"];
+        preferedCurrency = preferedCurrency && typeof(preferedCurrency) != 'undefined' ? preferedCurrency :DefaultCurrencyUnit;
+
         if (!staffId || staffId == 'undefined') {
             let currentStaff = await Staff.getCurrent();
             staffId = currentStaff.id;
@@ -139,8 +145,12 @@ export default class ApiTravelBudget {
             return segment;
         }));
 
+        let companyId = staff.company.id;
+
         let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
+            preferedCurrency:preferedCurrency,
             travelPolicyId: travelPolicy['id'],
+            companyId,
             staffs,
             segments,
             ret: params.isRoundTrip ? 1 : 0,
@@ -165,7 +175,9 @@ export default class ApiTravelBudget {
                 budget.originPlace = budget.fromCity;
                 budget.destination = budget.toCity;
                 budget.tripType = ETripType.OUT_TRIP;
-                budget.price=budget.price * count;
+                budget.price = budget.price * count;
+                budget.unit = budget.unit;
+                budget.rate = budget.rate;
                 budget.type = budget.trafficType;
                 budgets.push(budget);
             }
@@ -175,7 +187,6 @@ export default class ApiTravelBudget {
             if (hotel && hotel.length) {
                 let budget = hotel[0];
                 let cityObj = await API.place.getCityInfo({cityCode: city});
-                console.log(staff['companyId']);
                 let isAccordHotel = await Models.accordHotel.find({where: {cityCode: cityObj.id, companyId: staff['companyId']}});
                 if (isAccordHotel && isAccordHotel.length) {
                     budget.price = isAccordHotel[0].accordPrice;
@@ -185,6 +196,8 @@ export default class ApiTravelBudget {
                 budget.cityName = cityObj.name;
                 budget.tripType = ETripType.HOTEL;
                 budget.price = budget.price * count;
+                budget.unit = budget.unit;
+                budget.rate = budget.rate;
                 budgets.push(budget);
             }
 
@@ -203,7 +216,7 @@ export default class ApiTravelBudget {
             if (i == destLength-1 && !goBackPlace) {
                 isHasBackSubsidy = true;
             }
-            let budget = await getSubsidyBudget(city, placeInfo, isHasBackSubsidy);
+            let budget = await getSubsidyBudget(city, placeInfo, isHasBackSubsidy, preferedCurrency);
             if (budget) {
                 budget.city = city;
                 budget.price = budget.price * count;
@@ -224,9 +237,9 @@ export default class ApiTravelBudget {
         return _id;
 
 
-        async function getSubsidyBudget(city, destination, isHasBackSubsidy: boolean = false) {
+        async function getSubsidyBudget(city, destination, isHasBackSubsidy: boolean = false, preferedCurrency: string) {
             let { subsidy, leaveDate, goBackDate, reason } = destination;
-            let budget: any = null
+            let budget: any = null;
             if (subsidy && subsidy.template) {
                 city = await API.place.getCityInfo({cityCode: city});
                 let timezone = city.timezone ? city.timezone : "Asia/shanghai";
@@ -243,13 +256,51 @@ export default class ApiTravelBudget {
                     budget.tripType = ETripType.SUBSIDY;
                     budget.type = EInvoiceType.SUBSIDY;
                     budget.price = subsidy.template.subsidyMoney * days;
+                    budget.unit = preferedCurrency && typeof(preferedCurrency) != 'undefined' ? preferedCurrency: DefaultCurrencyUnit,
                     budget.duringDays = days;
                     budget.template = { id: subsidy.template.id, name: subsidy.template.name };
                     budget.reason = reason;
                 }
+                let rate;
+                if(preferedCurrency != DefaultCurrencyUnit) {
+                    try{
+                        rate = await new Promise<any>(async function(resolve,reject){
+                            let qs = {
+                                key: cloudKey,
+                                currencyTo: preferedCurrency
+                            }
+                            request({
+                                uri: cloudAPI + `/currencyRate`,
+                                qs: qs,
+                                method: 'get',
+                                json: true
+                            },async (err, res) => {
+                                if(err){
+                                    reject(err)
+                                }
+                                let body = res.body;
+                                if(body && typeof(body) == 'string') {
+                                    body = JSON.parse(body)
+                                }
+                                return resolve(body);
+                            });
+                        });
+                        if(typeof(rate) == 'string') rate = JSON.parse(rate);
+                        rate = rate.data;
+                        if( typeof(rate) != 'undefined' && rate && rate.length ) {
+                            budget.rate = rate[0]['rate'];
+                        }
+                    } catch(err) {
+                        console.log(err)
+                    }
+                } else {
+                    budget.rate = 1;
+                }
             }
             return budget;
         }
+
+
         function limitHotelBudgetByPrefer(min: number, max:number, hotelBudget: number){
             if(hotelBudget == -1) {
                 if(max != NoCityPriceLimit) return max;
