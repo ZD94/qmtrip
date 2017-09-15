@@ -151,6 +151,8 @@ class CompanyModule {
         //默认开启所有公有预订服务商
         await company.setDefaultSupplier();
 
+        //默认添加 中国大陆(国内）、通用地区（国际）、港澳台 三个地区用于差旅、补助、限价等的管理
+        await initDefaultCompanyRegion(company.id);
         return {company: company, description: promoCode ? promoCode.description : ""};
     }
 
@@ -999,3 +1001,29 @@ class CompanyModule {
 
 CompanyModule._scheduleTask();
 export = CompanyModule;
+
+
+async function initDefaultCompanyRegion(companyId: string) {
+    let defaultRegion = ['国内', '国际', '港澳台'];
+    // let defaultRegion = ['中国大陆', '通用地区', '港澳台'];
+    let defaultPlaceId = [['CTW_5'], ['Global'], ['CT_2912', 'CT_2911', 'CT_9000']];
+
+    for (let i = 0; i < defaultRegion.length; i++) {
+        let companyRegion: any = await API.travelPolicy.createCompanyRegion({
+            companyId: companyId,
+            name: defaultRegion[i]
+        });
+        companyRegion = companyRegion.data;
+        if(companyRegion) {
+            for(let j = 0; defaultPlaceId[i] && j < defaultPlaceId[i].length; j++){
+                let regions = await API.travelPolicy.createRegionPlace({
+                    placeId: defaultPlaceId[i][j],
+                    companyRegionId: companyRegion['id'],
+                    companyId: companyId
+                });
+            }
+        }
+    }
+
+}
+
