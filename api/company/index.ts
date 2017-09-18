@@ -782,6 +782,13 @@ class CompanyModule {
         }))
     }
 
+    static async initCompanyRegion(){
+        let companies = await Models.company.all({where: {}});
+        await Promise.all(companies.map(async (co) => {
+            let subsidyRegions = await API.travelPolicy.initSubsidyRegions({companyId: co.id});
+        }))
+    }
+
 
     /* ============= company.invoiceTitle api ========== */
 

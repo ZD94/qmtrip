@@ -17,6 +17,13 @@ let moment = require('moment');
 let testData = require('./test-data.json');
 var API = require("@jingli/dnode-api");
 
+export async function initCompanyRegion(){
+    let companies = await Models.company.all({where: {}});
+    await Promise.all(companies.map(async (co) => {
+        let subsidyRegions = await API.travelPolicy.initSubsidyRegions({companyId: co.id});
+    }))
+}
+
 export async function initDataForTest (params: {name: string, userName: string, mobile: string, email?: string, pwd?: string}){
     let co = await Models.company.find({where: {name: '笑傲江湖'}});
     if(co && co.length > 0){
@@ -59,6 +66,8 @@ async function initCompany(params: {name: string, userName: string, mobile: stri
     await ca.save();
     company.coinAccount = ca;
     await company.save();
+
+    let subsidyRegions = await API.travelPolicy.initSubsidyRegions({companyId: company.id});
 
     return company;
 }
