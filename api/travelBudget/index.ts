@@ -9,6 +9,7 @@ const API = require("@jingli/dnode-api");
 const validate = require("common/validate");
 import L from '@jingli/language';
 const moment = require('moment');
+require("moment-timezone");
 const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
@@ -190,6 +191,14 @@ export default class ApiTravelBudget {
                 let isAccordHotel = await Models.accordHotel.find({where: {cityCode: cityObj.id, companyId: staff['companyId']}});
                 if (isAccordHotel && isAccordHotel.length) {
                     budget.price = isAccordHotel[0].accordPrice;
+                    let residentPlace = await API.place.getCityInfo({cityCode: budget.city});
+                    let timezone = residentPlace.timezone && typeof(residentPlace.timezone) != undefined ?
+                        residentPlace.timezone : 'Asia/shanghai';
+
+                    let beginTime = moment(budget.checkInDate).tz(timezone).hour(12);
+                    let endTime = moment(budget.checkOutDate).tz(timezone).hour(12);
+                    let days = moment(endTime).diff(beginTime,'days');
+                    budget.price = budget.price * days;
                 }
 
                 budget.hotelName = placeInfo ? placeInfo.hotelName : null;
