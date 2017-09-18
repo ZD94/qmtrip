@@ -1814,7 +1814,7 @@ class TripPlanModule {
         }
 
         tripDetailInvoice = await tripDetailInvoice.save()
-
+        console.log("good man it's here.");
         let tripDetail = await Models.tripDetail.get(tripDetailInvoice.tripDetailId);
         await updateTripDetailExpenditure(tripDetail);
         await tryUpdateTripDetailStatus(tripDetail, EPlanStatus.WAIT_COMMIT);
@@ -2036,7 +2036,7 @@ class TripPlanModule {
         return true;
     }
 }
-
+ 
 
 
 async function updateTripDetailExpenditure(tripDetail: TripDetail) {
@@ -2085,7 +2085,14 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: EPlanSt
         case EPlanStatus.WAIT_COMMIT:
             //如果票据不为空,则设置状态为可提交状态
             let invoices = await Models.tripDetailInvoice.find({where: {tripDetailId: tripDetail.id}});
-            if (invoices && invoices.length) {
+            let isInWaitCommit = true;
+            invoices.map((item)=>{
+                if(item.status == EInvoiceStatus.AUDIT_FAIL){
+                    isInWaitCommit = false;
+                }
+                return item;
+            });
+            if (invoices && invoices.length && isInWaitCommit) {
                 tripDetail.status = EPlanStatus.WAIT_COMMIT;
             }
             break;
@@ -2117,12 +2124,18 @@ async function tryUpdateTripPlanStatus(tripPlan: TripPlan, status: EPlanStatus) 
     let cannotStatus = {};
     //变tripPlan状态需要tripDetail不能包含状态
     cannotStatus[EPlanStatus.WAIT_UPLOAD] = [];
-    cannotStatus[EPlanStatus.WAIT_COMMIT] = _.concat([EPlanStatus.WAIT_UPLOAD],  cannotStatus[EPlanStatus.WAIT_UPLOAD]);
+
+    //tripPlan 进入等待上传状态，需要tripDetail中没有 审核不通过的单子
+    cannotStatus[EPlanStatus.WAIT_COMMIT] = _.concat([EPlanStatus.WAIT_UPLOAD, EPlanStatus.AUDIT_NOT_PASS],  cannotStatus[EPlanStatus.WAIT_UPLOAD]);
     cannotStatus[EPlanStatus.AUDITING] = _.concat([EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.WAIT_COMMIT], cannotStatus[EPlanStatus.WAIT_COMMIT]);
     cannotStatus[EPlanStatus.COMPLETE] = _.concat([EPlanStatus.AUDITING], cannotStatus[EPlanStatus.AUDITING]);
     //变tripPlan状态,只关注出发交通,返回交通,住宿,特殊审批类型
     let preTripTypeNeeds = [ETripType.BACK_TRIP, ETripType.OUT_TRIP, ETripType.HOTEL, ETripType.SPECIAL_APPROVE];
 
+    console.log("cannotStatus====>", cannotStatus);
+
+    console.log("status===>", status);
+    console.log(cannotStatus[status]);
     //更新行程状态
     let tripDetails = await Models.tripDetail.find({
         where: {
@@ -2132,6 +2145,8 @@ async function tryUpdateTripPlanStatus(tripPlan: TripPlan, status: EPlanStatus) 
         },
         order: [['created_at', 'asc']]
     });
+
+    console.log("tripDetails===>", tripDetails);
 
     if (!tripDetails || !tripDetails.length) {
         tripPlan.status = status;
