@@ -34,17 +34,18 @@ export default class RestfulAPIUtil {
         let qs: {
             [index: string]: string;
         } = {};
+
         if (fields.hasOwnProperty('id')) {
             url = url + `/${fields['id']}`;
-        }
-        if (!fields.hasOwnProperty("id")) {
-            if (method == 'GET') {
+        }else{
+            if (method.toUpperCase() == 'GET') {
                 url = url + "?";
                 for (let key in fields) {
                    qs[key] = fields[key];
                 }
             }
         }
+
         return new Promise((resolve, reject) => {
             return request({
                 uri: url,

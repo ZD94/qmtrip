@@ -121,6 +121,8 @@ export default class ApiTravelBudget {
             }
 
             segment.beginTime = placeInfo.latestArrivalDateTime;
+            segment.beginTime = new Date("2017-09-12");
+
             segment.endTime = placeInfo.earliestGoBackDateTime;
             segment.isNeedTraffic = placeInfo.isNeedTraffic;
             segment.isNeedHotel = placeInfo.isNeedHotel;
