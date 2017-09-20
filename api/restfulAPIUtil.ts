@@ -67,6 +67,36 @@ export default class RestfulAPIUtil {
             });
         })
     }
+
+    static async proxyHttp(params:{
+        url:string;
+        body:object;
+        method:string;
+        qs:object;
+    }){
+        let {url, body={}, method="get", qs={}} = params;
+        return new Promise((resolve, reject) => {
+            request({
+                uri: Config.cloudAPI + url,
+                body,
+                json: true,
+                method,
+                qs,
+                headers: {
+                    key: Config.cloudKey
+                }
+            }, (err, resp, result) => {
+                if (err) {
+                    return reject(err);
+                }
+
+                if (typeof result == 'string') {
+                    result = JSON.parse(result);
+                }
+                return resolve(result);
+            });
+        })
+    }
 }
 
 
