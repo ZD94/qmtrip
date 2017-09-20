@@ -16,10 +16,10 @@ export = async function(db, transaction) {
     for(let i =0; i < companies.length; i++ ){
         if(!companies[i].id || typeof(companies[i]) == undefined) continue;
 
-        let travelPolicy = await requestTravelPolicy(companies[0].id, true);
+        let travelPolicy = await requestTravelPolicy(companies[i].id, true);
         if(typeof(travelPolicy) == 'string')  travelPolicy = JSON.parse(travelPolicy);
         if(!travelPolicy || travelPolicy.length == 0) {
-            travelPolicy = await requestTravelPolicy(companies[0].id, false)
+            travelPolicy = await requestTravelPolicy(companies[i].id, false)
             if(typeof(travelPolicy) == 'string')  travelPolicy = JSON.parse(travelPolicy);
         }
         if(travelPolicy && travelPolicy.length) {
