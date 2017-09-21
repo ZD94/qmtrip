@@ -5,7 +5,7 @@
 var API = require("@jingli/dnode-api");
 import assert = require("assert");
 import {Models} from '_types';
-import {getSession} from 'common/model';
+import { getSession } from "@jingli/dnode-api";
 
 describe("api/agency", function() {
     var agencyDefault = {email: "agency.test@jingli.tech", userName: "喵喵", name: '喵喵的代理商', description: '代理商API测试用', mobile: "15269866811"};

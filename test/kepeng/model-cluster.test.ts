@@ -3,7 +3,6 @@ import { Company } from '_types/company';
 import { Staff, EStaffRole } from '_types/staff';
 import { Models } from '_types/index';
 
-require('@jingli/zone-setup');
 
 global.Promise = require('bluebird');
 Promise.promisifyAll(require("fs"));

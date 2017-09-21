@@ -25,7 +25,7 @@ import {Models} from "_types";
 import {FindResult, PaginateInterface} from "common/model/interface";
 import {Staff, EStaffRole, EStaffStatus} from "_types/staff";
 import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
-import {getSession} from "common/model";
+import { getSession } from "@jingli/dnode-api";
 import {AgencyUser} from "_types/agency";
 import {makeSpendReport} from './spendReport';
 import fs = require("fs");

@@ -2,8 +2,6 @@
 
 import 'api/_service';
 
-require('@jingli/zone-setup');
-
 global.Promise = require('bluebird');
 Promise.promisifyAll(require("fs"));
 Promise.config({longStackTraces: true});

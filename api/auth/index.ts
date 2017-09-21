@@ -22,6 +22,7 @@ var moment = require("moment");
 var API = require("@jingli/dnode-api");
 var utils = require("common/utils");
 var accountCols = Account['$fieldnames'];
+import { getSession } from "@jingli/dnode-api";
 
 let codeTicket = "checkcode:ticket:";
 
@@ -740,7 +741,7 @@ export default class ApiAuth {
      */
     @clientExport
     static async resetPwdByOldPwd(params: {oldPwd: string, newPwd: string}): Promise<boolean> {
-        let session = Zone.current.get("session");
+        let session = getSession();
         let oldPwd = params.oldPwd;
         let newPwd = params.newPwd;
         let accountId = session["accountId"];

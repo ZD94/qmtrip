@@ -5,6 +5,7 @@ import {DB} from '@jingli/database';
 import L from '@jingli/language';
 let C = require("@jingli/config");
 let API = require("@jingli/dnode-api");
+import { getSession } from "@jingli/dnode-api";
 import Logger from '@jingli/logger';
 let logger = new Logger('company');
 let moment = require('moment');
@@ -73,7 +74,7 @@ class CompanyModule {
                                          pwd?: string, status?: number, isValidateMobile?: boolean, promoCode?: string,
                                          referrerMobile?: string, ldapUrl?: string, ldapBaseDn?: string, ldapStaffRootDn?: string,
                                          ldapDepartmentRootDn?: string, ldapAdminPassword?: string, ldapAdminDn?: string}): Promise<any>{
-        let session = Zone.current.get('session');
+        let session = getSession();
         let pwd = params.pwd;
         let defaultAgency = await Models.agency.find({where:{email:C.default_agency.email}});//Agency.__defaultAgencyId;
         let agencyId:any;
@@ -703,7 +704,7 @@ class CompanyModule {
 
     @clientExport
     static async getSelfCompanies(params): Promise<Company[]> {
-        let session = Zone.current.get("session");
+        let session = getSession();
         let accountId = session["accountId"]
         let staffs = await Models.staff.all({where: {accountId: accountId}});
         let companies = staffs.map( (staff) => {

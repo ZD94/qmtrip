@@ -4,7 +4,7 @@ import {Company} from "_types/company";
  */
 var assert = require("assert");
 var API = require("@jingli/dnode-api");
-var getSession = require('common/model').getSession;
+import { getSession } from "@jingli/dnode-api";
 
 describe("api/company", function() {
     var agencyId = "";
