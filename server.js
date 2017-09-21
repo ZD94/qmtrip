@@ -88,10 +88,6 @@ server.on('init.api', function(API){
     }
     
     if(cluster.isMaster){
-        initData.initCompanyRegion();
-    }
-
-    if(cluster.isMaster){
         let replServer = new ReplServer(1337, {context: {API: API}});
         replServer.initReplServer();
     }
