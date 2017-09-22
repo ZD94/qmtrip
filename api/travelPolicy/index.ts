@@ -21,11 +21,11 @@ import {DefaultRegion, DefaultRegionId} from "_types";
 var BASE_URL = 'http://localhost:8080/policy';
 var Config = require("@jingli/config");
 var subsidyRegions = [
-    {name:DefaultRegion.abroad, cityIds: [DefaultRegionId.abroad]},
-    {name:DefaultRegion.domestic, cityIds: [DefaultRegionId.domestic]},
-    {name:"中国一类地区", cityIds: ['CT_340','CT_257','CT_289','CT_131']},
-    {name:"中国二类地区", cityIds: ['CT_194','CT_179','CT_158','CT_317','CT_233','CT_058','CT_236','CT_315','CT_218','CT_167','CT_300','CT_075','CT_332','CT_288','CT_132']},
-    {name:"港澳台", cityIds: ['CT_2912','CT_9000','CT_2911']}
+    {name:DefaultRegion.abroad, cityIds: [DefaultRegionId.abroad], group: 2, types: [1,2,3]},
+    {name:DefaultRegion.domestic, cityIds: [DefaultRegionId.domestic], group: 1, types: [1,2,3]},
+    {name:"中国一类地区", cityIds: ['CT_340','CT_257','CT_289','CT_131'], group: 1, types: [2,3]},
+    {name:"中国二类地区", cityIds: ['CT_194','CT_179','CT_158','CT_317','CT_233','CT_058','CT_236','CT_315','CT_218','CT_167','CT_300','CT_075','CT_332','CT_288','CT_132'], group: 1, types: [2,3]},
+    {name:"港澳台", cityIds: ['CT_2912','CT_9000','CT_2911'], group: 2, types: [1,2,3]}
     ];
 
 export interface ITravelPolicyParams {
@@ -645,6 +645,8 @@ export default class TravelPolicyModule{
         let companyRegions = await Promise.all(subsidyRegions.map(async (regionGroup) => {
             let cityIds = regionGroup.cityIds;
             let name = regionGroup.name;
+            let group = regionGroup.name;
+            let types = regionGroup.name;
             let companyRegion = await TravelPolicyModule.getCompanyRegions({companyId: params.companyId, name: name});
             companyRegion = companyRegion.data;
             if(companyRegion && companyRegion.length){
@@ -652,7 +654,7 @@ export default class TravelPolicyModule{
                 return companyRegion;
             }
 
-            companyRegion = await TravelPolicyModule.createCompanyRegion({companyId: params.companyId, name: name});
+            companyRegion = await TravelPolicyModule.createCompanyRegion({companyId: params.companyId, name: name, group: group, types: types});
             companyRegion = companyRegion.data;
 
             await Promise.all(cityIds.map(async (cityId) => {
