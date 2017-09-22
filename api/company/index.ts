@@ -153,6 +153,11 @@ class CompanyModule {
         //默认开启所有公有预订服务商
         await company.setDefaultSupplier();
 
+        //jlbudget create company record.
+
+
+        //jlbudget create account record.
+
         return {company: company, description: promoCode ? promoCode.description : ""};
     }
 
