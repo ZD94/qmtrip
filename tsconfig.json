@@ -16,7 +16,7 @@
     "paths": {
       "*": ["*", "*/index", "common/client/*", "common/client/*/index"]
     },
-    "lib": ["ES2015", "DOM"]
+    "lib": ["es2015", "dom"]
   },
   "compilerOptionsNotUsing": {
     "emitDecoratorMetadata": true,
@@ -35,7 +35,8 @@
     "tmp",
     "*.bak",
     "JLTypes",
-    "tools/"
+    "tools/",
+    "mytest"
   ],
   "excludeNotUsing": [
   ]

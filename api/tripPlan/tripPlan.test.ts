@@ -6,7 +6,7 @@
 var API = require("@jingli/dnode-api");
 import assert = require("assert");
 import {Models} from '_types';
-import {getSession} from 'common/model';
+import { getSession } from "@jingli/dnode-api";
 import {EInvoiceType, ETripType} from '_types/tripPlan'
 
 var agencyId = "";

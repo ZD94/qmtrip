@@ -9,6 +9,7 @@ const API = require("@jingli/dnode-api");
 const validate = require("common/validate");
 import L from '@jingli/language';
 const moment = require('moment');
+require("moment-timezone");
 const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
@@ -121,6 +122,7 @@ export default class ApiTravelBudget {
             }
 
             segment.beginTime = placeInfo.latestArrivalDateTime;
+
             segment.endTime = placeInfo.earliestGoBackDateTime;
             segment.isNeedTraffic = placeInfo.isNeedTraffic;
             segment.isNeedHotel = placeInfo.isNeedHotel;
@@ -191,6 +193,14 @@ export default class ApiTravelBudget {
                 let isAccordHotel = await Models.accordHotel.find({where: {cityCode: cityObj.id, companyId: staff['companyId']}});
                 if (isAccordHotel && isAccordHotel.length) {
                     budget.price = isAccordHotel[0].accordPrice;
+                    let residentPlace = await API.place.getCityInfo({cityCode: budget.city});
+                    let timezone = residentPlace.timezone && typeof(residentPlace.timezone) != undefined ?
+                        residentPlace.timezone : 'Asia/shanghai';
+
+                    let beginTime = moment(budget.checkInDate).tz(timezone).hour(12);
+                    let endTime = moment(budget.checkOutDate).tz(timezone).hour(12);
+                    let days = moment(endTime).diff(beginTime,'days');
+                    budget.price = budget.price * days;
                 }
 
                 budget.hotelName = placeInfo ? placeInfo.hotelName : null;
@@ -275,41 +285,41 @@ export default class ApiTravelBudget {
                     budget.template = { id: subsidy.template.id, name: subsidy.template.name };
                     budget.reason = reason;
                 }
-            }
-            let rate;
-            if(preferedCurrency != DefaultCurrencyUnit) {
-                try{
-                    rate = await new Promise<any>(async function(resolve,reject){
-                        let qs = {
-                            key: cloudKey,
-                            currencyTo: preferedCurrency
-                        }
-                        request({
-                            uri: cloudAPI + `/currencyRate`,
-                            qs: qs,
-                            method: 'get',
-                            json: true
-                        },async (err, res) => {
-                            if(err){
-                                reject(err)
+                let rate;
+                if(preferedCurrency != DefaultCurrencyUnit) {
+                    try{
+                        rate = await new Promise<any>(async function(resolve,reject){
+                            let qs = {
+                                key: cloudKey,
+                                currencyTo: preferedCurrency
                             }
-                            let body = res.body;
-                            if(body && typeof(body) == 'string') {
-                                body = JSON.parse(body)
-                            }
-                            return resolve(body);
+                            request({
+                                uri: cloudAPI + `/currencyRate`,
+                                qs: qs,
+                                method: 'get',
+                                json: true
+                            },async (err, res) => {
+                                if(err){
+                                    reject(err)
+                                }
+                                let body = res.body;
+                                if(body && typeof(body) == 'string') {
+                                    body = JSON.parse(body)
+                                }
+                                return resolve(body);
+                            });
                         });
-                    });
-                    if(typeof(rate) == 'string') rate = JSON.parse(rate);
-                    rate = rate.data;
-                    if( typeof(rate) != 'undefined' && rate && rate.length ) {
-                        budget.rate = rate[0]['rate'];
+                        if(typeof(rate) == 'string') rate = JSON.parse(rate);
+                        rate = rate.data;
+                        if( typeof(rate) != 'undefined' && rate && rate.length ) {
+                            budget.rate = rate[0]['rate'];
+                        }
+                    } catch(err) {
+                        console.log(err)
                     }
-                } catch(err) {
-                    console.log(err)
+                } else {
+                    budget.rate = 1;
                 }
-            } else {
-                budget.rate = 1;
             }
             return budget;
         }*/

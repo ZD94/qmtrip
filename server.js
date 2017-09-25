@@ -11,7 +11,6 @@ var ReplServer = require('libs/replServer');
 var Logger = require('@jingli/logger');
 
 Error.stackTraceLimit = 40;
-var zone = require('@jingli/zone-setup');
 
 //服务器启动性能日志
 //var perf = require('@jingli/perf');
@@ -88,10 +87,6 @@ server.on('init.api', function(API){
     }
     
     if(cluster.isMaster){
-        initData.initCompanyRegion();
-    }
-
-    if(cluster.isMaster){
         let replServer = new ReplServer(1337, {context: {API: API}});
         replServer.initReplServer();
     }
@@ -120,9 +115,7 @@ server.on('init.http', function(server){
     }
 });
 
-zone.forkStackTrace().run(function(){
-    server.start()
-});
+server.start();
 
 process.on('unhandledRejection', (reason, p) => {
     if (config.debug) {

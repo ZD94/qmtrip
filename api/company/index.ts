@@ -5,6 +5,7 @@ import {DB} from '@jingli/database';
 import L from '@jingli/language';
 let C = require("@jingli/config");
 let API = require("@jingli/dnode-api");
+import { getSession } from "@jingli/dnode-api";
 import Logger from '@jingli/logger';
 let logger = new Logger('company');
 let moment = require('moment');
@@ -24,7 +25,8 @@ import {requirePermit, conditionDecorator, condition, modelNotNull} from "api/_d
 import {md5} from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
 import {CoinAccount} from "_types/coin";
-import RestfulAPIUtil from "../restfulAPIUtil"
+// import {RestfulAPIUtil} from "../restfulAPIUtil"
+var RestfulAPIUtil = require('../restfulAPIUtil');
 
 const supplierCols = Supplier['$fieldnames'];
 const companyCols = Staff['$getAllFieldNames']();
@@ -72,7 +74,7 @@ class CompanyModule {
                                          pwd?: string, status?: number, isValidateMobile?: boolean, promoCode?: string,
                                          referrerMobile?: string, ldapUrl?: string, ldapBaseDn?: string, ldapStaffRootDn?: string,
                                          ldapDepartmentRootDn?: string, ldapAdminPassword?: string, ldapAdminDn?: string}): Promise<any>{
-        let session = Zone.current.get('session');
+        let session = getSession();
         let pwd = params.pwd;
         let defaultAgency = await Models.agency.find({where:{email:C.default_agency.email}});//Agency.__defaultAgencyId;
         let agencyId:any;
@@ -702,7 +704,7 @@ class CompanyModule {
 
     @clientExport
     static async getSelfCompanies(params): Promise<Company[]> {
-        let session = Zone.current.get("session");
+        let session = getSession();
         let accountId = session["accountId"]
         let staffs = await Models.staff.all({where: {accountId: accountId}});
         let companies = staffs.map( (staff) => {
@@ -878,6 +880,68 @@ class CompanyModule {
 
         await st_delete.destroy();
         return true;
+    }
+
+    /* 
+     * 获取企业 国内，国际偏好设置 (或者，中国大陆，通用地区)
+    */
+    @clientExport
+    static async getCompanyPrefer(companyId?: string) : Promise<any>{
+        if(!companyId){
+            let staff = await Staff.getCurrent();
+            companyId = staff.company.id;
+        }
+        //获取 国内，国际两个通用地区
+        let CompanyRegions = await RestfulAPIUtil.operateOnModel({
+            model: 'companyRegion',
+            params: {
+                fields: {
+                    companyId
+                },
+                method: 'get'
+            }
+        });
+        let result = {
+            "national" : null,
+            "nationalId": null,
+            "inland"    : null,
+            "inlandId"  : null
+        }
+
+        for(let companyRegion of CompanyRegions.data){
+            if(companyRegion.name == "国内"){
+                result.inlandId = companyRegion.id;
+            }
+            if(companyRegion.name == "国际"){
+                result.nationalId = companyRegion.id;
+            }
+        }
+
+        //获取两个地区对应prefer，没有创建
+        let preferRegionNation = await RestfulAPIUtil.operateOnModel({
+            model: 'prefer',
+            params: {
+                fields: {
+                    companyId,
+                    id : result.nationalId
+                },
+                method: 'get'
+            }
+        });
+        result.national = preferRegionNation.data && preferRegionNation.data.budgetConfig;
+        let preferRegionInland = await RestfulAPIUtil.operateOnModel({
+            model: 'prefer',
+            params: {
+                fields: {
+                    companyId,
+                    id : result.inlandId
+                },
+                method: 'get'
+            }
+        });
+        result.inland = preferRegionInland.data && preferRegionInland.data.budgetConfig;
+
+        return result;
     }
 
     /* ====================== END ======================= */
