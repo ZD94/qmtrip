@@ -122,6 +122,7 @@ export default class ApiTravelBudget {
             }
 
             segment.beginTime = placeInfo.latestArrivalDateTime;
+
             segment.endTime = placeInfo.earliestGoBackDateTime;
             segment.isNeedTraffic = placeInfo.isNeedTraffic;
             segment.isNeedHotel = placeInfo.isNeedHotel;

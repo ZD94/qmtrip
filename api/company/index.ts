@@ -881,6 +881,68 @@ class CompanyModule {
         return true;
     }
 
+    /* 
+     * 获取企业 国内，国际偏好设置 (或者，中国大陆，通用地区)
+    */
+    @clientExport
+    static async getCompanyPrefer(companyId?: string) : Promise<any>{
+        if(!companyId){
+            let staff = await Staff.getCurrent();
+            companyId = staff.company.id;
+        }
+        //获取 国内，国际两个通用地区
+        let CompanyRegions = await RestfulAPIUtil.operateOnModel({
+            model: 'companyRegion',
+            params: {
+                fields: {
+                    companyId
+                },
+                method: 'get'
+            }
+        });
+        let result = {
+            "national" : null,
+            "nationalId": null,
+            "inland"    : null,
+            "inlandId"  : null
+        }
+
+        for(let companyRegion of CompanyRegions.data){
+            if(companyRegion.name == "国内"){
+                result.inlandId = companyRegion.id;
+            }
+            if(companyRegion.name == "国际"){
+                result.nationalId = companyRegion.id;
+            }
+        }
+
+        //获取两个地区对应prefer，没有创建
+        let preferRegionNation = await RestfulAPIUtil.operateOnModel({
+            model: 'prefer',
+            params: {
+                fields: {
+                    companyId,
+                    id : result.nationalId
+                },
+                method: 'get'
+            }
+        });
+        result.national = preferRegionNation.data && preferRegionNation.data.budgetConfig;
+        let preferRegionInland = await RestfulAPIUtil.operateOnModel({
+            model: 'prefer',
+            params: {
+                fields: {
+                    companyId,
+                    id : result.inlandId
+                },
+                method: 'get'
+            }
+        });
+        result.inland = preferRegionInland.data && preferRegionInland.data.budgetConfig;
+
+        return result;
+    }
+
     /* ====================== END ======================= */
 
 
