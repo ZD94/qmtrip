@@ -23,7 +23,7 @@ import config = require("@jingli/config");
 import _ = require("lodash");
 import {ENoticeType} from "_types/notice/notice";
 import {AutoApproveType, AutoApproveConfig, ISegment} from "_types/tripPlan"
-
+import {DB} from "@jingli/database";
 
 class TripApproveModule {
 
@@ -259,122 +259,125 @@ class TripApproveModule {
             }
         }
 
+        await DB.transaction(async function(t){
+            // 特殊审批和非当月提交的审批不记录行程点数
+            if(!tripApprove.isSpecialApprove){
+                if(typeof tripApprove.query == 'string'){
+                    tripApprove.query = JSON.parse(tripApprove.query);
+                }
+                let query = tripApprove.query;
+                let frozenNum = query.frozenNum;
+                let content = "";
+                let destinationPlacesInfo = query.destinationPlacesInfo;
 
-        // 特殊审批和非当月提交的审批不记录行程点数
-        if(!tripApprove.isSpecialApprove){
-            if(typeof tripApprove.query == 'string'){
-                tripApprove.query = JSON.parse(tripApprove.query);
-            }
-            let query = tripApprove.query;
-            let frozenNum = query.frozenNum;
-            let content = "";
-            let destinationPlacesInfo = query.destinationPlacesInfo;
+                if(query && query.originPlace){
+                    let originCity = await API.place.getCityInfo({cityCode: query.originPlace});
+                    content = content + originCity.name + "-";
+                }
+                if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
+                    for(let i = 0; i < destinationPlacesInfo.length; i++){
+                        let segment: ISegment = destinationPlacesInfo[i]
+                        let destinationCity = await API.place.getCityInfo({cityCode: segment.destinationPlace});
+                        if(i<destinationPlacesInfo.length-1){
+                            content = content + destinationCity.name+"-";
+                        }else{
+                            content = content + destinationCity.name;
+                        }
+                    }
+                }
 
-            if(query && query.originPlace){
-                let originCity = await API.place.getCityInfo({cityCode: query.originPlace});
-                content = content + originCity.name + "-";
-            }
-            if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
-                for(let i = 0; i < destinationPlacesInfo.length; i++){
-                    let segment: ISegment = destinationPlacesInfo[i]
-                    let destinationCity = await API.place.getCityInfo({cityCode: segment.destinationPlace});
-                    if(i<destinationPlacesInfo.length-1){
-                        content = content + destinationCity.name+"-";
-                    }else{
-                        content = content + destinationCity.name;
+
+
+                if(tripApprove.createdAt.getMonth() == new Date().getMonth()){
+                    //审批本月记录审批通过
+                    if(approveResult == EApproveResult.PASS && !isNextApprove){
+                        await approveCompany.beforeApproveTrip({number : frozenNum});
+                        await approveCompany.approvePassReduceTripPlanNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                            remark: "审批通过消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
+                    }
+                    //审批本月记录审批驳回
+                    if(approveResult == EApproveResult.REJECT){
+                        await approveCompany.approveRejectFreeTripPlanNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                            remark: "审批驳回释放冻结行程点数", content: content, frozenNum: frozenNum});
+                    }
+                }else{
+                    //审批上月记录审批通过
+                    if(approveResult == EApproveResult.PASS && !isNextApprove){
+                        await approveCompany.beforeApproveTrip({number : frozenNum});
+                        await approveCompany.approvePassReduceBeforeNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                            remark: "审批通过上月申请消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
+                    }
+
+                    //审批上月记录审批驳回
+                    if(approveResult == EApproveResult.REJECT){
+                        await approveCompany.approveRejectFreeBeforeNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                            remark: "审批驳回上月申请释放冻结行程点数", content: content, frozenNum: frozenNum});
                     }
                 }
             }
 
+            // let tripPlan: TripPlan;
+            let notifyRemark = '';
+            let log = TripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id});
 
-
-            if(tripApprove.createdAt.getMonth() == new Date().getMonth()){
-                //审批本月记录审批通过
-                if(approveResult == EApproveResult.PASS && !isNextApprove){
-                    await approveCompany.beforeApproveTrip({number : frozenNum});
-                    await approveCompany.approvePassReduceTripPlanNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
-                        remark: "审批通过消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
+            if (approveResult == EApproveResult.PASS && !isNextApprove) {
+                notifyRemark = `审批通过，审批人：${staff.name}`;
+                log.approveStatus = EApproveResult.PASS;
+                log.remark = `审批通过`;
+                log.save();
+                tripApprove.status = QMEApproveStatus.PASS;
+                tripApprove.approveRemark = '审批通过';
+                tripApprove.approvedUsers += `,${staff.id}`;
+                //tripPlan = await TripPlanModule.saveTripPlanByApprove({tripApproveId: params.id});
+            }else if(isNextApprove){ //指定下一级审批人
+                log.approveStatus = EApproveResult.PASS;
+                log.save();
+                let nextApproveUser = await Models.staff.get(params.nextApproveUserId);
+                tripApprove.approvedUsers += `,${staff.id}`;
+                tripApprove.approveUser = nextApproveUser;
+            }else if(approveResult == EApproveResult.REJECT) {
+                let approveRemark = params.approveRemark;
+                if(!approveRemark) {
+                    await tripApprove.reload();
+                    throw {code: -2, msg: '拒绝原因不能为空'};
                 }
-                //审批本月记录审批驳回
-                if(approveResult == EApproveResult.REJECT){
-                    await approveCompany.approveRejectFreeTripPlanNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
-                        remark: "审批驳回释放冻结行程点数", content: content, frozenNum: frozenNum});
-                }
-            }else{
-                //审批上月记录审批通过
-                if(approveResult == EApproveResult.PASS && !isNextApprove){
-                    await approveCompany.beforeApproveTrip({number : frozenNum});
-                    await approveCompany.approvePassReduceBeforeNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
-                        remark: "审批通过上月申请消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
-                }
-
-                //审批上月记录审批驳回
-                if(approveResult == EApproveResult.REJECT){
-                    await approveCompany.approveRejectFreeBeforeNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
-                        remark: "审批驳回上月申请释放冻结行程点数", content: content, frozenNum: frozenNum});
-                }
-
+                notifyRemark = `审批未通过，原因：${approveRemark}`;
+                log.approveStatus = EApproveResult.REJECT;
+                log.remark = approveRemark;
+                log.save();
+                tripApprove.readNumber = 0;
+                tripApprove.approveRemark = approveRemark;
+                tripApprove.status = QMEApproveStatus.REJECT;
             }
+            await tripApprove.save();
 
-        }
-
-        // let tripPlan: TripPlan;
-        let notifyRemark = '';
-        let log = TripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id});
-
-        if (approveResult == EApproveResult.PASS && !isNextApprove) {
-            notifyRemark = `审批通过，审批人：${staff.name}`;
-            log.approveStatus = EApproveResult.PASS;
-            log.remark = `审批通过`;
-            log.save();
-            tripApprove.status = QMEApproveStatus.PASS;
-            tripApprove.approveRemark = '审批通过';
-            tripApprove.approvedUsers += `,${staff.id}`;
-            //tripPlan = await TripPlanModule.saveTripPlanByApprove({tripApproveId: params.id});
-        }else if(isNextApprove){ //指定下一级审批人
-            log.approveStatus = EApproveResult.PASS;
-            log.save();
-            let nextApproveUser = await Models.staff.get(params.nextApproveUserId);
-            tripApprove.approvedUsers += `,${staff.id}`;
-            tripApprove.approveUser = nextApproveUser;
-        }else if(approveResult == EApproveResult.REJECT) {
-            let approveRemark = params.approveRemark;
-            if(!approveRemark) {
-                await tripApprove.reload();
-                throw {code: -2, msg: '拒绝原因不能为空'};
+            if(isNextApprove){
+                await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: true});
+            }else if(approveResult == EApproveResult.REJECT){
+                //发送审核结果邮件
+                let self_url;
+                let appMessageUrl;
+                self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
+                let finalUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
+                finalUrl = encodeURIComponent(finalUrl);
+                appMessageUrl = `#/judge-permission/index?id=${tripApprove.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
+                let user = tripApprove.account;
+                if(!user) user = await Models.staff.get(tripApprove['accountId']);
+                try {
+                    self_url = await API.wechat.shorturl({longurl: self_url});
+                } catch(err) {
+                    console.error(err);
+                }
+                try {
+                    await API.notify.submitNotify({userId: user.id, key: 'qm_notify_approve_not_pass',
+                        values: { tripApprove: tripApprove, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
+                } catch(err) { console.error(err);}
             }
-            notifyRemark = `审批未通过，原因：${approveRemark}`;
-            log.approveStatus = EApproveResult.REJECT;
-            log.remark = approveRemark;
-            log.save();
-            tripApprove.readNumber = 0;
-            tripApprove.approveRemark = approveRemark;
-            tripApprove.status = QMEApproveStatus.REJECT;
-        }
-        await tripApprove.save();
-
-        if(isNextApprove){
-            await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: true});
-        }else if(approveResult == EApproveResult.REJECT){
-            //发送审核结果邮件
-            let self_url;
-            let appMessageUrl;
-            self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
-            let finalUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
-            finalUrl = encodeURIComponent(finalUrl);
-            appMessageUrl = `#/judge-permission/index?id=${tripApprove.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
-            let user = tripApprove.account;
-            if(!user) user = await Models.staff.get(tripApprove['accountId']);
-            try {
-                self_url = await API.wechat.shorturl({longurl: self_url});
-            } catch(err) {
-                console.error(err);
+        }).catch(async function(err){
+            if(err) {
+                throw L.ERR.INTERNAL_ERROR();
             }
-            try {
-                await API.notify.submitNotify({userId: user.id, key: 'qm_notify_approve_not_pass',
-                    values: { tripApprove: tripApprove, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
-            } catch(err) { console.error(err);}
-        }
+        });
 
         //发送通知给监听程序
         await plugins.qm.tripApproveUpdateNotify(null, {

@@ -36,6 +36,7 @@ interface SegmentsBudgetResult {
     }>
 }
 
+let sequelize = require('sequelize');
 export default class ApiTravelBudget {
 
     @clientExport
@@ -85,6 +86,7 @@ export default class ApiTravelBudget {
         let preferedCurrency = params["preferedCurrency"];
         preferedCurrency = preferedCurrency && typeof(preferedCurrency) != 'undefined' ? preferedCurrency :DefaultCurrencyUnit;
 
+        // console.log("=====> sequelize:", sequelize.cls)
         if (!staffId || staffId == 'undefined') {
             let currentStaff = await Staff.getCurrent();
             staffId = currentStaff.id;
