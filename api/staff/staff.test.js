@@ -5,7 +5,7 @@ var API = require('@jingli/dnode-api');
 var Q = require("q");
 var assert = require("assert");
 
-var getSession = require('common/model').getSession;
+var getSession = require('@jingli/dnode-api').getSession;
 
 
 var id = "";

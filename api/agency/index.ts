@@ -16,6 +16,9 @@ import {AgencyOperateLog} from "_types/agency/agency-operate-log";
 import validator = require('validator');
 let logger = new Logger("agency");
 
+import * as CLS from 'continuation-local-storage';
+let CLSNS = CLS.getNamespace('dnode-api-context');
+
 class AgencyModule {
     /**
      * @method createAgency
@@ -293,7 +296,6 @@ class AgencyModule {
             }
 
             let agencyId = agency.id;
-            let myZome = Zone.current.fork({name: 'updateCompany', properties: {session: {accountId: agencyId, tokenId: 'tokenId'}}});
 
             Agency.__defaultAgencyId = agencyId;
             
@@ -303,10 +305,13 @@ class AgencyModule {
                 return;
             }
 
-            await Promise.all(companies.map(async function(c) {
-                return myZome.run(API.company.updateCompany.bind(this, {id: c.id, agencyId: agencyId}));
-            }));
-
+            await CLSNS.runAndReturn(() => {
+                CLSNS.set('accountId', agencyId);
+                CLSNS.set('tokenId', 'tokenId');
+                return Promise.all(companies.map(function(c) {
+                    return API.company.updateCompany({id: c.id, agencyId: agencyId});
+                }));
+            })
         }catch(err) {
             logger.error("初始化系统默认代理商失败...");
             logger.error(err.stack);

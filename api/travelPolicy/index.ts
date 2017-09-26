@@ -5,6 +5,9 @@
 import {DB} from '@jingli/database';
 var _ = require('lodash');
 import {Paginate} from 'common/paginate';
+import Logger from '@jingli/logger';
+const logger = new Logger('travelPolicy');
+
 import L from '@jingli/language';
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {conditionDecorator, condition} from "../_decorator";
@@ -847,7 +850,7 @@ export default class TravelPolicyModule{
         if(addUrl){
             url = url + `/${addUrl}`
         }
-        console.log("URL:", url);
+        logger.log("URL:", url);
         let result:any;
         let qs: {
             [index: string]: string;
@@ -877,6 +880,7 @@ export default class TravelPolicyModule{
                     return reject(err);
                 }
                 if(typeof(result) == 'string'){
+                    logger.info(result);
                     result = JSON.parse(result);
                 }
                 return resolve(result);

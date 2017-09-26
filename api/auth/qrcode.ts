@@ -5,6 +5,7 @@ import { Models } from '_types/index';
 import { LoginResponse } from '_types/auth/auth-cert';
 import C = require("@jingli/config");
 var API = require("@jingli/dnode-api");
+import { getSession } from "@jingli/dnode-api";
 
 //拼接字符串
 function combineData(obj) {
@@ -140,7 +141,7 @@ export async function qrCodeLogin(params: {accountId: string, sign: string, time
  */
 //@clientExport
 export async function getQRCodeUrl(params: {backUrl: string}): Promise<string> {
-    let session = Zone.current.get("session");
+    let session = getSession();
     var accountId = session["accountId"];
     var backUrl = params.backUrl;
 

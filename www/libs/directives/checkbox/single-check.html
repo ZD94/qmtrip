@@ -1,6 +1,0 @@
-<div class="check-box" ng-click="checkOption(option)">
-    <!--<span class="checkbtn" ng-class="{checked: model.indexOf(option.value)>=0}" >{{option.name}}</span>-->
-    <span class="checkbtn checked" ng-transclude="selected" ng-if="model.indexOf(option.value)>=0">{{option.name}}</span>
-    <span class="checkbtn" ng-transclude="notSelected" ng-if="!(model.indexOf(option.value)>=0)">{{option.name}}</span>
-    <ng-transclude></ng-transclude>
-</div>
