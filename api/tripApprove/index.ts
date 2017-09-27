@@ -13,7 +13,7 @@ import {
 } from "_types/tripPlan/tripPlan";
 import moment = require("moment/moment");
 import {Staff, EStaffStatus, EStaffRole} from "_types/staff/staff";
-import {EVENT, plugins, emitter} from "libs/oa/index";
+import {EVENT, plugins} from "libs/oa/index";
 import {TripDetail} from "_types/tripPlan/tripDetail";
 import TripPlanModule = require("../tripPlan/index");
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
@@ -259,6 +259,17 @@ class TripApproveModule {
             }
         }
 
+        let originTripPlanFrozenNum = approveCompany.tripPlanFrozenNum;
+        let originTripPlanPassNum = approveCompany.tripPlanPassNum;
+        let originExtraTripPlanFrozenNum = approveCompany.extraTripPlanFrozenNum;
+        let originExtraTripPlanNum = approveCompany.extraTripPlanNum;
+
+        let originStatus = tripApprove.status;
+        let originRemark = tripApprove.approveRemark;
+        let originReadNumber = tripApprove.readNumber;
+        let originApprovedUsers = tripApprove.approvedUsers;
+        let originApprovedUser = tripApprove.approveUser;
+
         await DB.transaction(async function(t){
             // 特殊审批和非当月提交的审批不记录行程点数
             if(!tripApprove.isSpecialApprove){
@@ -285,8 +296,6 @@ class TripApproveModule {
                         }
                     }
                 }
-
-
 
                 if(tripApprove.createdAt.getMonth() == new Date().getMonth()){
                     //审批本月记录审批通过
@@ -351,43 +360,57 @@ class TripApproveModule {
             }
             await tripApprove.save();
 
-            if(isNextApprove){
-                await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: true});
-            }else if(approveResult == EApproveResult.REJECT){
-                //发送审核结果邮件
-                let self_url;
-                let appMessageUrl;
-                self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
-                let finalUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
-                finalUrl = encodeURIComponent(finalUrl);
-                appMessageUrl = `#/judge-permission/index?id=${tripApprove.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
-                let user = tripApprove.account;
-                if(!user) user = await Models.staff.get(tripApprove['accountId']);
-                try {
-                    self_url = await API.wechat.shorturl({longurl: self_url});
-                } catch(err) {
-                    console.error(err);
-                }
-                try {
-                    await API.notify.submitNotify({userId: user.id, key: 'qm_notify_approve_not_pass',
-                        values: { tripApprove: tripApprove, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
-                } catch(err) { console.error(err);}
-            }
+
+            //发送通知给监听程序
+            await plugins.qm.tripApproveUpdateNotify(null, {
+                approveNo: tripApprove.id,
+                status: tripApprove.status,
+                approveUser: staff.id,
+                outerId: tripApprove.id,
+                data: budgetInfo,
+                oa: 'qm'
+            });
         }).catch(async function(err){
             if(err) {
+                approveCompany.tripPlanFrozenNum = originTripPlanFrozenNum;
+                approveCompany.tripPlanPassNum = originTripPlanPassNum;
+                approveCompany.extraTripPlanFrozenNum = originExtraTripPlanFrozenNum;
+                approveCompany.extraTripPlanNum = originExtraTripPlanNum;
+                await approveCompany.save();
+
+                tripApprove.status = originStatus;
+                tripApprove.approveRemark = originRemark;
+                tripApprove.readNumber = originReadNumber;
+                tripApprove.approvedUsers = originApprovedUsers;
+                tripApprove.approveUser = originApprovedUser;
+                await tripApprove.save();
                 throw L.ERR.INTERNAL_ERROR();
             }
         });
 
-        //发送通知给监听程序
-        await plugins.qm.tripApproveUpdateNotify(null, {
-            approveNo: tripApprove.id,
-            status: tripApprove.status,
-            approveUser: staff.id,
-            outerId: tripApprove.id,
-            data: budgetInfo,
-            oa: 'qm'
-        });
+        if(isNextApprove){
+            await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: true});
+        }else if(approveResult == EApproveResult.REJECT){
+            //发送审核结果邮件
+            let self_url;
+            let appMessageUrl;
+            self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
+            let finalUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
+            finalUrl = encodeURIComponent(finalUrl);
+            appMessageUrl = `#/judge-permission/index?id=${tripApprove.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
+            let user = tripApprove.account;
+            if(!user) user = await Models.staff.get(tripApprove['accountId']);
+            try {
+                self_url = await API.wechat.shorturl({longurl: self_url});
+            } catch(err) {
+                console.error(err);
+            }
+            try {
+                await API.notify.submitNotify({userId: user.id, key: 'qm_notify_approve_not_pass',
+                    values: { tripApprove: tripApprove, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
+            } catch(err) { console.error(err);}
+        }
+
 
         return true;
     }

@@ -16,11 +16,11 @@ let Config = require('@jingli/config');
 var API = require("@jingli/dnode-api");
 import {ISegment, ICreateBudgetAndApproveParams} from '_types/tripPlan';
 import L from '@jingli/language';
-// import {Transaction} from "sequelize";
+import * as CLS from 'continuation-local-storage';
 
 import {DB} from "@jingli/database";
-import * as CLS from 'continuation-local-storage';
-let CLSNS = CLS.getNamespace('dnode-api-context');
+var CLSNS = CLS.getNamespace('dnode-api-context');
+CLSNS.bindEmitter(emitter);
 
 function oaStr2Enum(str: string) :EApproveChannel{
     let obj = {
@@ -70,6 +70,7 @@ class ApproveModule {
                 }
             }
         }
+
         if(budgetInfo.budgets && budgetInfo.budgets.length>0){
             budgetInfo.budgets.forEach(function(item){
                 if(item.tripType != ETripType.SUBSIDY){
@@ -82,10 +83,10 @@ class ApproveModule {
         }
 
         await company.beforeGoTrip({number: number});
-
         //冻结行程数
         let oldNum = company.tripPlanNumBalance;
-
+        let originTripPlanFrozenNum = company.tripPlanFrozenNum;
+        let extraTripPlanFrozenNum = company.extraTripPlanFrozenNum;
         return DB.transaction(async function(t){
             let result = await company.frozenTripPlanNum({accountId: submitter.id, number: number,
             remark: "提交出差申请消耗行程点数", content: content});
@@ -104,7 +105,6 @@ class ApproveModule {
             });
             //行程数第一次小于10或等于0时给管理员和创建人发通知
             let newNum = com.tripPlanNumBalance;
-            throw new Error();
             if(oldNum > 10 && newNum < 10 || newNum == 0){
                 // let detailUrl = Config.host + "/#/company-pay/buy-packages";
                 let host = Config.host;
@@ -124,7 +124,10 @@ class ApproveModule {
             return approve;
         }).catch(async function(err){
             if(err) {
-                throw L.ERR.INTERNAL_ERROR();
+                company.extraTripPlanFrozenNum = extraTripPlanFrozenNum;
+                company.tripPlanFrozenNum = originTripPlanFrozenNum;
+                await company.save();
+                throw new Error("提交审批失败");
             }
         });
 
@@ -224,7 +227,7 @@ class ApproveModule {
         specialApproveRemark?: string,
         staffList?:string[]
     }) {
-        let {submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark,staffList, transaction } = params;
+        let {submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark,staffList } = params;
         let staff = await Models.staff.get(submitter);
         let approve = Models.approve.create({
             submitter: submitter,
@@ -240,8 +243,7 @@ class ApproveModule {
         });
         approve = await approve.save();
 
-        //对接第三方OA
-        emitter.emit(EVENT.NEW_TRIP_APPROVE, {
+        await emitter.emitSerial(EVENT.NEW_TRIP_APPROVE, {
             approveNo: approve.id,
             approveUser: approveUser ? approveUser.id: null,
             submitter: submitter,
