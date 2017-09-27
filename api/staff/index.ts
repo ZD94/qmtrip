@@ -25,7 +25,7 @@ import {FindResult} from "common/model/interface";
 import {ENoticeType} from "_types/notice/notice";
 import {CoinAccount} from "_types/coin";
 import {StaffDepartment} from "_types/department/staffDepartment";
-import {getSession} from "common/model/index";
+import { getSession } from "@jingli/dnode-api";
 
 
 const invitedLinkCols = InvitedLink['$fieldnames'];
@@ -530,7 +530,7 @@ class StaffModule{
         // params.where.staffStatus = {$ne: EStaffStatus.FORBIDDEN}
 
         params.where.staffStatus = EStaffStatus.ON_JOB;
-        let { accountId } = Zone.current.get("session");
+        let { accountId } = getSession();
         if (!params.where) {
             params.where = {};
         }
@@ -804,7 +804,7 @@ class StaffModule{
      */
     @requireParams(['accountId', 'objAttr'])
     static downloadExcle (params){
-        let { accountId } = Zone.current.get("sessiom");
+        let { accountId } = getSession();
         params.accountId = accountId;
         fs.exists(config.upload.tmpDir, function (exists) {
             if(!exists){
@@ -938,7 +938,7 @@ class StaffModule{
         {if: condition.isStaffsAgency("0.where.staffId")}
     ])
     static async getPointChanges(params) :Promise<FindResult>{
-        let { accountId } = Zone.current.get("session");
+        let { accountId } = getSession();
         params.where = _.pick(params.where, Object.keys(DB.models.PointChange['attributes']));
         let role = await API.auth.judgeRoleById({id:accountId});
 
@@ -1063,7 +1063,7 @@ class StaffModule{
      */
     @clientExport
     static async getStaffPointsChangeByMonth(params) :Promise<any>{
-        let { accountId } = Zone.current.get("session");
+        let { accountId } = getSession();
         let staff = await DB.models.Staff.findById(accountId)
         params.companyId = staff.companyId;
         let count = params.count;
@@ -1083,7 +1083,7 @@ class StaffModule{
     @clientExport
     @requireParams(['staffId'], ["startTime", "endTime"])
     static async getStaffPointsChange(params){
-        let { accountId } = Zone.current.get("session");
+        let { accountId } = getSession();
         params.staffId = accountId;
         var staffId = params.staffId;
         var startTime = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
@@ -1149,7 +1149,7 @@ class StaffModule{
 
     @clientExport
     static async statisticStaffs(params){
-        let { accountId } = Zone.current.get("session");
+        let { accountId } = getSession();
         let user_id = accountId;
         let role = await API.auth.judgeRoleById({id:user_id});
 
@@ -1224,7 +1224,7 @@ class StaffModule{
      */
     @clientExport
     static async statisticStaffsRole(params){
-        let { accountId } = Zone.current.get("session");
+        let { accountId } = getSession();
         let user_id = accountId;
         let role = await API.auth.judgeRoleById({id:user_id});
 
@@ -1255,7 +1255,7 @@ class StaffModule{
     @clientExport
     @requireParams(['companyId'])
     static async getStaffCountByCompany(params: {companyId: string}){
-        let { accountId } = Zone.current.get("session");
+        let { accountId } = getSession();
         let user_id = accountId;
         let companyId = params.companyId;
         let role = await API.auth.judgeRoleById({id:user_id});
@@ -1337,7 +1337,7 @@ class StaffModule{
 
     @clientExport
     static async statStaffPoints(params) :Promise<any> {
-        let { accountId } = Zone.current.get("session");
+        let { accountId } = getSession();
         let role = await API.auth.judgeRoleById({id:accountId});
 
         if(role == EAccountType.STAFF){
@@ -1381,7 +1381,7 @@ class StaffModule{
     @clientExport
     @requireParams(['type', 'idNo', 'ownerId'], ['validData', 'birthday'])
     static async createPapers(params): Promise<Credential>{
-        let { accountId } = Zone.current.get("session");
+        let { accountId } = getSession();
         params.ownerId = accountId;
         //查询该用户该类型证件信息是否已经存在 不存在添加 存在则修改
         let result = await DB.models.Credential.findOne({where: {type: params.type, ownerId: params.ownerId}});
@@ -1401,7 +1401,7 @@ class StaffModule{
     @clientExport
     @requireParams(['id'])
     static async deletePapers(params): Promise<boolean>{
-        let { accountId } = Zone.current.get("session")
+        let { accountId } = getSession()
         params.ownerId = accountId;
         await DB.models.Credential.destroy({where: params});
         return true;
@@ -1415,7 +1415,7 @@ class StaffModule{
     @clientExport
     @requireParams(['id'], ['type', 'idNo', 'ownerId', 'validData', 'birthday'])
     static async updatePapers(params): Promise<Credential>{
-        let { accountId } = Zone.current.get("session");
+        let { accountId } = getSession();
         let ma = await StaffModule.getPapersById({id: params.id});
         if(ma["ownerId"] != accountId){
             throw L.ERR.PERMISSION_DENY();
@@ -1438,7 +1438,7 @@ class StaffModule{
     @clientExport
     @requireParams(['id'], ['attributes'])
     static async getPapersById(params): Promise<Credential>{
-        let { accountId } = Zone.current.get("session");
+        let { accountId } = getSession();
         var options: any = {};
         options.where = {id: params.id, ownerId: accountId};
         options.attributes = params.attributes? ['*'] :params.attributes;
@@ -1456,7 +1456,7 @@ class StaffModule{
     @clientExport
     @requireParams(['type'], ['attributes'])
     static async getOnesPapersByType(params: {where: {type: any}, attributes?: string[]}): Promise<Credential>{
-        let { accountId } = Zone.current.get("session");
+        let { accountId } = getSession();
         let options: any = params;
         options.where.ownerId = accountId;
         if (!options.attributes) {
@@ -1474,7 +1474,7 @@ class StaffModule{
     @clientExport
     @requireParams(['ownerId'], ['attributes'])
     static getPapersByOwner(params): PromiseLike<any[]>{
-        let { accountId } = Zone.current.get("session");
+        let { accountId } = getSession();
         var options: any = {};
         options.where = {ownerId: accountId};
         options.attributes = params.attributes? ['*'] :params.attributes;
@@ -1639,7 +1639,7 @@ class StaffModule{
     @clientExport
     static async getCompanyStaff(params: {companyId: string}) {
         let {companyId } = params;
-        let session = Zone.current.get("session");
+        let session = getSession();
         let accountId = session["accountId"];
         let pager = await Models.staff.find({where: {companyId: companyId, accountId: accountId}});
         if (pager && pager.length) {

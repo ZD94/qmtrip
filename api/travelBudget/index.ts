@@ -36,6 +36,7 @@ interface SegmentsBudgetResult {
     }>
 }
 
+let sequelize = require('sequelize');
 export default class ApiTravelBudget {
 
     @clientExport
@@ -81,6 +82,7 @@ export default class ApiTravelBudget {
     */
     @clientExport
     static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams) :Promise<string> {
+        console.log("====>models: ", Models.company);
         let staffId = params['staffId'];
         let preferedCurrency = params["preferedCurrency"];
         preferedCurrency = preferedCurrency && typeof(preferedCurrency) != 'undefined' ? preferedCurrency :DefaultCurrencyUnit;
@@ -122,6 +124,7 @@ export default class ApiTravelBudget {
             }
 
             segment.beginTime = placeInfo.latestArrivalDateTime;
+
             segment.endTime = placeInfo.earliestGoBackDateTime;
             segment.isNeedTraffic = placeInfo.isNeedTraffic;
             segment.isNeedHotel = placeInfo.isNeedHotel;

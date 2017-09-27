@@ -10,6 +10,7 @@ import {Staff, PointChange} from "_types/staff";
 import {CoinAccount, CoinAccountChange} from "_types/coin";
 import {FindResult} from "common/model/interface";
 import L from '@jingli/language';
+import {DB} from '@jingli/database';
 
 
 class CoinModule {
@@ -29,7 +30,9 @@ class CoinModule {
             company.coinAccount = coinAccount;
             await company.save();
         }
-        return await coinAccount.addCoin(coins, remark);
+
+        let result = await coinAccount.addCoin(coins, remark);
+        return result.coinAccount;
     }
 
     @clientExport
@@ -45,30 +48,38 @@ class CoinModule {
         // let coins = Math.floor(points * points2coinRate);
         let coins = points * points2coinRate;
 
+        let originalConsume = company.coinAccount.consume;
+        let originalBalancePoints = staff.balancePoints;
+        let originalIncome = staff.$parents["account"]["coinAccount"].income;
+
         if (!company.coinAccount || company.coinAccount.balance < coins) {
             throw L.ERR.COMPANY_SHORT_OF_MONEY_FUND();
         }
         // let orderNo = getOrderNo()
-        //减掉企业金币
-        let result:any;
-        try{
+        return DB.transaction(async function (t) {
+            //减掉企业金币
+            let result:any;
             result= await company.coinAccount.costCoin(coins, `员工${staff.name}(${staff.mobile})积分兑换`)
-        } catch(err){
-            throw new Error("余额不足");
-        }
-        //减掉员工积分
-        staff.balancePoints = staff.balancePoints - points;
-        staff = await staff.save();
-        let pc = PointChange.create({
-            currentPoints: staff.balancePoints, status: 1,
-            staff: staff, company: staff.company,
-            points: 0-points, remark: `${points}积分兑换鲸币`,
-            orderId: result.coinAccountChange.id});
-        await pc.save();
+            //减掉员工积分
+            staff.balancePoints = staff.balancePoints - points;
+            staff = await staff.save();
+            let pc = PointChange.create({
+                currentPoints: staff.balancePoints, status: 1,
+                staff: staff, company: staff.company,
+                points: 0-points, remark: `${points}积分兑换鲸币`,
+                orderId: result.coinAccountChange.id});
+            await pc.save();
 
-        //增加员工鲸币
-        // return staff.coinAccount.addCoin(coins, `${points}积分兑换${coins}`);
-        return staff.$parents["account"]["coinAccount"].addCoin(coins, `使用${points}元节省金额兑换${coins}鲸币`);
+            //增加员工鲸币
+            // return staff.coinAccount.addCoin(coins, `${points}积分兑换${coins}`);
+            return staff.$parents["account"]["coinAccount"].addCoin(coins, `使用${points}元节省金额兑换${coins}鲸币`);
+        }).catch(async function(err){
+            company.coinAccount.consume = originalConsume;
+            staff.balancePoints = originalBalancePoints;
+            staff.$parents["account"]["coinAccount"].income = originalIncome;
+            await Promise.all([company.save(), staff.save(), staff.$parents["account"]["coinAccount"].save()]);
+            throw new Error("兑换失败");
+        })
     }
 
     @requireParams(["staffId", "coins"], ["remark"])

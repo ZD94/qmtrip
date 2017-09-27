@@ -1,8 +1,7 @@
-import { getSession } from '../common/model/index';
+import { getSession } from "@jingli/dnode-api";
 import { Staff, EStaffRole } from '_types/staff';
 import { AgencyUser } from '_types/agency';
 import {EAccountType} from "_types";
-import Zone from '@jingli/zone-setup';
 /**
  * Created by wlh on 16/5/16.
  */
@@ -15,7 +14,6 @@ export function requirePermit(permits: string| string[], type?: number) {
     return function (target, key, desc) {
         let fn = desc.value;
         desc.value = async function (...args) {
-            //let context = Zone.current.get('context');
             let session = getSession();
             let account = Models.account.get(session.accountId);
             if(!account)
@@ -378,7 +376,7 @@ export var condition = {
     canGetTripPlan: function (idpath: string) {
         return async function (fn, self, args) {
             let id = _.get(args, idpath);
-            let session = Zone.current.get('session');
+            let session = getSession();
             
             if(!session || !session.accountId) {
                 throw L.ERR.PERMISSION_DENY();
@@ -415,7 +413,7 @@ export var condition = {
     },
     isSameAccount: function(idpath: string) {
         return async function (fn, self, args) {
-            let session = Zone.current.get('session');
+            let session = getSession();
             if(!session || !session.accountId) {
                 throw L.ERR.PERMISSION_DENY();
             }
