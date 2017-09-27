@@ -87,8 +87,6 @@ class ApproveModule {
         let oldNum = company.tripPlanNumBalance;
 
         return DB.transaction(async function(t){
-            // console.log("====> ", )
-
             let result = await company.frozenTripPlanNum({accountId: submitter.id, number: number,
             remark: "提交出差申请消耗行程点数", content: content});
             let com = result.company;
@@ -126,9 +124,6 @@ class ApproveModule {
             return approve;
         }).catch(async function(err){
             if(err) {
-               // console.log(CLSNS)
-               //  let tripApproveId = await CLSNS.get('newCreatedTripApprove');
-               //  console.log("===>tripApproveId: ", tripApproveId)
                 throw L.ERR.INTERNAL_ERROR();
             }
         });

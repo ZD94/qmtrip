@@ -28,7 +28,6 @@ export class QmPlugin extends AbstractOAPlugin {
 
     //实现qm创建审批单流程
     async createTripApproveFlow(params:createTripApproveParam):Promise<createTripApproveResult> {
-        console.log("获取环境变量： ", CLSNS.get('trans'))
         let {approveNo, submitter, approveUser} = params;
         let tripApprove = await Models.tripApprove.create({approveUserId: approveUser, id: approveNo});
         let staff = await Models.staff.get(submitter);
@@ -142,10 +141,7 @@ export class QmPlugin extends AbstractOAPlugin {
         tripApprove = await tripApprove.save();
         await API.tripApprove.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
         // await API.tripApprove.sendTripApproveNoticeToSystem({approveId: tripApprove.id});
-
-        CLSNS.set('newCreatedTripApprove', tripApprove.id);
-        CLSNS.set('newCreatedTripPlanLog', tripPlanLog.id);
-
+        
         return {
             approveNo: approveNo,
             outerId: tripApprove.id,
