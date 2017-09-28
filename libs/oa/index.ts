@@ -4,7 +4,7 @@
 
 'use strict';
 
-import {emitter, OAEmitter} from './emitter';
+const AsyncEmitter = require('carrack');
 import {QmPlugin, IOAPlugin} from './plugin';
 import {AutoPlugin} from "./plugin/auto";
 import {EApproveType} from "../../_types/approve/types";
@@ -19,11 +19,13 @@ export const EVENT = {
     APPROVE_FAIL: 'APPROVE_FAIL',
 }
 
-let plugins = {
+export let plugins = {
     auto: new AutoPlugin(),
     qm: new QmPlugin(),
     // ddtalk: new DDTalkPlugin(),
 }
+
+export var emitter = new AsyncEmitter();
 
 //新出差审批事件
 emitter.on(EVENT.NEW_TRIP_APPROVE, function(params) {
@@ -61,6 +63,3 @@ emitter.on(EVENT.APPROVE_FAIL, function(params: {approveId: string, oa: string, 
         return plugin.tripApproveFail({approveId, reason});
     }
 })
-
-export {emitter, OAEmitter}
-export {plugins}

@@ -15,6 +15,12 @@ import _ = require('lodash');
 let Config = require('@jingli/config');
 var API = require("@jingli/dnode-api");
 import {ISegment, ICreateBudgetAndApproveParams} from '_types/tripPlan';
+import L from '@jingli/language';
+import * as CLS from 'continuation-local-storage';
+
+import {DB} from "@jingli/database";
+var CLSNS = CLS.getNamespace('dnode-api-context');
+CLSNS.bindEmitter(emitter);
 
 function oaStr2Enum(str: string) :EApproveChannel{
     let obj = {
@@ -64,6 +70,7 @@ class ApproveModule {
                 }
             }
         }
+
         if(budgetInfo.budgets && budgetInfo.budgets.length>0){
             budgetInfo.budgets.forEach(function(item){
                 if(item.tripType != ETripType.SUBSIDY){
@@ -76,47 +83,54 @@ class ApproveModule {
         }
 
         await company.beforeGoTrip({number: number});
-
         //冻结行程数
         let oldNum = company.tripPlanNumBalance;
-        let result = await company.frozenTripPlanNum({accountId: submitter.id, number: number,
+        let originTripPlanFrozenNum = company.tripPlanFrozenNum;
+        let extraTripPlanFrozenNum = company.extraTripPlanFrozenNum;
+        return DB.transaction(async function(t){
+            let result = await company.frozenTripPlanNum({accountId: submitter.id, number: number,
             remark: "提交出差申请消耗行程点数", content: content});
+            let com = result.company;
+            let frozenNum = result.frozenNum;
+            budgetInfo.query.frozenNum = frozenNum;
 
-        let com = result.company;
-        let frozenNum = result.frozenNum;
-        budgetInfo.query.frozenNum = frozenNum;
-
-        let approve = await ApproveModule._submitApprove({
-            submitter: submitter.id,
-            data: budgetInfo,
-            title: query['projectName'],
-            channel: submitter.company.oa,
-            type: EApproveType.TRAVEL_BUDGET,
-            approveUser: approveUser,
-            staffList:budgetInfo.query.staffList
+            let approve = await ApproveModule._submitApprove({
+                submitter: submitter.id,
+                data: budgetInfo,
+                title: query['projectName'],
+                channel: submitter.company.oa,
+                type: EApproveType.TRAVEL_BUDGET,
+                approveUser: approveUser,
+                staffList:budgetInfo.query.staffList,
+            });
+            //行程数第一次小于10或等于0时给管理员和创建人发通知
+            let newNum = com.tripPlanNumBalance;
+            if(oldNum > 10 && newNum < 10 || newNum == 0){
+                // let detailUrl = Config.host + "/#/company-pay/buy-packages";
+                let host = Config.host;
+                let managers = await company.getManagers({withOwner: true});
+                let ps = managers.map( (manager) => {
+                    return API.notify.submitNotify({
+                        userId: manager.id,
+                        key: "qm_notify_trip_plan_num_short",
+                        values: {
+                            number: newNum,
+                            host: host
+                        }
+                    });
+                });
+                await Promise.all(ps);
+            }
+            return approve;
+        }).catch(async function(err){
+            if(err) {
+                company.extraTripPlanFrozenNum = extraTripPlanFrozenNum;
+                company.tripPlanFrozenNum = originTripPlanFrozenNum;
+                await company.save();
+                throw new Error("提交审批失败");
+            }
         });
 
-
-        //行程数第一次小于10或等于0时给管理员和创建人发通知
-        let newNum = com.tripPlanNumBalance;
-        if(oldNum > 10 && newNum < 10 || newNum == 0){
-            // let detailUrl = Config.host + "/#/company-pay/buy-packages";
-            let host = Config.host;
-            let managers = await company.getManagers({withOwner: true});
-            let ps = managers.map( (manager) => {
-                return API.notify.submitNotify({
-                    userId: manager.id,
-                    key: "qm_notify_trip_plan_num_short",
-                    values: {
-                        number: newNum,
-                        host: host
-                    }
-                });
-            });
-            await Promise.all(ps);
-        }
-        
-        return approve;
     }
 
     @clientExport
@@ -183,16 +197,22 @@ class ApproveModule {
             }
         }
 
-        return ApproveModule._submitApprove({
-            submitter: submitter.id,
-            data: budgetInfo,
-            title: query.projectName,
-            channel: EApproveChannel.QM,   //特殊审批，流程都一致
-            type: EApproveType.TRAVEL_BUDGET,
-            isSpecialApprove: true,
-            specialApproveRemark: specialApproveRemark,
-            approveUser: approveUser,
-            staffList:query.staffList,
+        return DB.transaction(async function(t){
+            return ApproveModule._submitApprove({
+                submitter: submitter.id,
+                data: budgetInfo,
+                title: query.projectName,
+                channel: EApproveChannel.QM,   //特殊审批，流程都一致
+                type: EApproveType.TRAVEL_BUDGET,
+                isSpecialApprove: true,
+                specialApproveRemark: specialApproveRemark,
+                approveUser: approveUser,
+                staffList:query.staffList,
+            });
+        }).catch(function(err){
+            if(err) {
+                throw L.ERR.INTERNAL_ERROR();
+            }
         });
     }
 
@@ -223,8 +243,7 @@ class ApproveModule {
         });
         approve = await approve.save();
 
-        //对接第三方OA
-        emitter.emit(EVENT.NEW_TRIP_APPROVE, {
+        await emitter.emitSerial(EVENT.NEW_TRIP_APPROVE, {
             approveNo: approve.id,
             approveUser: approveUser ? approveUser.id: null,
             submitter: submitter,
