@@ -303,7 +303,7 @@ export default class TravelPolicyModule{
      */
 
     @clientExport
-    @requireParams(["where.companyId"], ["where.companyId", "where.isDefault","where.name","p", "pz"])
+    @requireParams(["companyId"], ["companyId", "isDefault","name","p", "pz"])
     static async getTravelPolicies(params: {companyId: string, p?: number, pz?: number,isDefault?: boolean, name?:string}): Promise<any>{
         let {companyId } = params;
         var staff = await Staff.getCurrent();
