@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {emitter} from "../emitter";
+import {emitter} from "..";
 import {EVENT} from "../index";
 
 export interface createTripApproveParam {
@@ -55,16 +55,16 @@ export abstract class AbstractOAPlugin implements IOAPlugin {
 
     async tripApproveUpdateNotify(err, result) {
         if (err) {
-            return emitter.emit(EVENT.TRIP_APPROVE_UPDATE, err);
+            return emitter.emitSerial(EVENT.TRIP_APPROVE_UPDATE, err);
         }
-        return emitter.emit(EVENT.TRIP_APPROVE_UPDATE, result);
+        return emitter.emitSerial(EVENT.TRIP_APPROVE_UPDATE, result);
     }
 
     async tripInvoiceUpdateNotify(err, result) {
         if (err) {
-            return emitter.emit(EVENT.TRIP_INVOICE_AUDIT_UPDATE, err);
+            return emitter.emitSerial(EVENT.TRIP_INVOICE_AUDIT_UPDATE, err);
         }
-        return emitter.emit(EVENT.TRIP_INVOICE_AUDIT_UPDATE, result);
+        return emitter.emitSerial(EVENT.TRIP_INVOICE_AUDIT_UPDATE, result);
     }
 
     async tripApproveFail(params: {approveId: string, reason?: string}) {

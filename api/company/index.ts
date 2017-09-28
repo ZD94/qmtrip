@@ -5,6 +5,7 @@ import {DB} from '@jingli/database';
 import L from '@jingli/language';
 let C = require("@jingli/config");
 let API = require("@jingli/dnode-api");
+import { getSession } from "@jingli/dnode-api";
 import Logger from '@jingli/logger';
 let logger = new Logger('company');
 let moment = require('moment');
@@ -73,7 +74,7 @@ class CompanyModule {
                                          pwd?: string, status?: number, isValidateMobile?: boolean, promoCode?: string,
                                          referrerMobile?: string, ldapUrl?: string, ldapBaseDn?: string, ldapStaffRootDn?: string,
                                          ldapDepartmentRootDn?: string, ldapAdminPassword?: string, ldapAdminDn?: string}): Promise<any>{
-        let session = Zone.current.get('session');
+        let session = getSession();
         let pwd = params.pwd;
         let defaultAgency = await Models.agency.find({where:{email:C.default_agency.email}});//Agency.__defaultAgencyId;
         let agencyId:any;
@@ -154,10 +155,12 @@ class CompanyModule {
         await company.setDefaultSupplier();
 
         //jlbudget create company record.
-
+        
 
         //jlbudget create account record.
 
+        //默认添加 中国大陆(国内）、通用地区（国际）、港澳台 三个地区用于差旅、补助、限价等的管理
+        await initDefaultCompanyRegion(company.id);
         return {company: company, description: promoCode ? promoCode.description : ""};
     }
 
@@ -708,7 +711,7 @@ class CompanyModule {
 
     @clientExport
     static async getSelfCompanies(params): Promise<Company[]> {
-        let session = Zone.current.get("session");
+        let session = getSession();
         let accountId = session["accountId"]
         let staffs = await Models.staff.all({where: {accountId: accountId}});
         let companies = staffs.map( (staff) => {
@@ -884,6 +887,68 @@ class CompanyModule {
 
         await st_delete.destroy();
         return true;
+    }
+
+    /* 
+     * 获取企业 国内，国际偏好设置 (或者，中国大陆，通用地区)
+    */
+    @clientExport
+    static async getCompanyPrefer(companyId?: string) : Promise<any>{
+        if(!companyId){
+            let staff = await Staff.getCurrent();
+            companyId = staff.company.id;
+        }
+        //获取 国内，国际两个通用地区
+        let CompanyRegions = await RestfulAPIUtil.operateOnModel({
+            model: 'companyRegion',
+            params: {
+                fields: {
+                    companyId
+                },
+                method: 'get'
+            }
+        });
+        let result = {
+            "national" : null,
+            "nationalId": null,
+            "inland"    : null,
+            "inlandId"  : null
+        }
+
+        for(let companyRegion of CompanyRegions.data){
+            if(companyRegion.name == "国内"){
+                result.inlandId = companyRegion.id;
+            }
+            if(companyRegion.name == "国际"){
+                result.nationalId = companyRegion.id;
+            }
+        }
+
+        //获取两个地区对应prefer，没有创建
+        let preferRegionNation = await RestfulAPIUtil.operateOnModel({
+            model: 'prefer',
+            params: {
+                fields: {
+                    companyId,
+                    id : result.nationalId
+                },
+                method: 'get'
+            }
+        });
+        result.national = preferRegionNation.data && preferRegionNation.data.budgetConfig;
+        let preferRegionInland = await RestfulAPIUtil.operateOnModel({
+            model: 'prefer',
+            params: {
+                fields: {
+                    companyId,
+                    id : result.inlandId
+                },
+                method: 'get'
+            }
+        });
+        result.inland = preferRegionInland.data && preferRegionInland.data.budgetConfig;
+
+        return result;
     }
 
     /* ====================== END ======================= */
@@ -1176,3 +1241,29 @@ class CompanyModule {
 
 CompanyModule._scheduleTask();
 export = CompanyModule;
+
+
+async function initDefaultCompanyRegion(companyId: string) {
+    let defaultRegion = ['国内', '国际', '港澳台'];
+    // let defaultRegion = ['中国大陆', '通用地区', '港澳台'];
+    let defaultPlaceId = [['CTW_5'], ['Global'], ['CT_2912', 'CT_2911', 'CT_9000']];
+
+    for (let i = 0; i < defaultRegion.length; i++) {
+        let companyRegion: any = await API.travelPolicy.createCompanyRegion({
+            companyId: companyId,
+            name: defaultRegion[i]
+        });
+        companyRegion = companyRegion.data;
+        if(companyRegion) {
+            for(let j = 0; defaultPlaceId[i] && j < defaultPlaceId[i].length; j++){
+                let regions = await API.travelPolicy.createRegionPlace({
+                    placeId: defaultPlaceId[i][j],
+                    companyRegionId: companyRegion['id'],
+                    companyId: companyId
+                });
+            }
+        }
+    }
+
+}
+
