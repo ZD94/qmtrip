@@ -33,7 +33,7 @@ const companyCols = Staff['$getAllFieldNames']();
 
 const DEFAULT_EXPIRE_MONTH = 1;
 
-export enum HotelPriceLimitType  {
+enum HotelPriceLimitType  {
     NO_SET = 0,
     Min_Price_Limit = -1,
     Max_Price_Limit = 1,
