@@ -32,6 +32,14 @@ const supplierCols = Supplier['$fieldnames'];
 const companyCols = Staff['$getAllFieldNames']();
 
 const DEFAULT_EXPIRE_MONTH = 1;
+
+export enum HotelPriceLimitType  {
+    NO_SET = 0,
+    Min_Price_Limit = -1,
+    Max_Price_Limit = 1,
+    Price_Limit_Both = 2
+}
+
 class CompanyModule {
     /**
      * 创建企业
@@ -155,9 +163,21 @@ class CompanyModule {
         await company.setDefaultSupplier();
 
         //jlbudget create company record.
-        
+        try{
+            let jlBudgetCompany = await RestfulAPIUtil.proxyHttp({
+                url : "/company",
+                method:"post",
+                body:{
+                    id : company.id,
+                    name:company.name,
+                    priceLimitType: HotelPriceLimitType.NO_SET,
+                }
+            });
+        }catch(e){
+            console.error(e);
+        }
 
-        //jlbudget create account record.
+        //jlbudget create account record. Waiting jlbudget account identifie online.
 
         //默认添加 中国大陆(国内）、通用地区（国际）、港澳台 三个地区用于差旅、补助、限价等的管理
         await initDefaultCompanyRegion(company.id);

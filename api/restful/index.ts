@@ -69,9 +69,9 @@ export class RestfulAPIUtil {
 
     async proxyHttp(params:{
         url:string;
-        body:object;
+        body?:object;
         method:string;
-        qs:object;
+        qs?:object;
     }){
         let {url, body={}, method="get", qs={}} = params;
         return new Promise((resolve, reject) => {
