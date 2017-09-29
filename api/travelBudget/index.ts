@@ -82,7 +82,6 @@ export default class ApiTravelBudget {
     */
     @clientExport
     static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams) :Promise<string> {
-        console.log("====>models: ", Models.company);
         let staffId = params['staffId'];
         let preferedCurrency = params["preferedCurrency"];
         preferedCurrency = preferedCurrency && typeof(preferedCurrency) != 'undefined' ? preferedCurrency :DefaultCurrencyUnit;
@@ -104,7 +103,6 @@ export default class ApiTravelBudget {
             params.staffList.push(staffId);
         }
         let count = params.staffList.length;
-
         let destinationPlacesInfo = params.destinationPlacesInfo;
         let _staff: any = {
             gender: staff.sex,
@@ -151,7 +149,6 @@ export default class ApiTravelBudget {
         }));
 
         let companyId = staff.company.id;
-
         let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
             preferedCurrency:preferedCurrency,
             travelPolicyId: travelPolicy['id'],
@@ -244,6 +241,12 @@ export default class ApiTravelBudget {
             let lastDest = destinationPlacesInfo[destLength - 1];
             if (subsidy) {
                 let budget = subsidy;
+                budget.price = budget.price * count;
+                if(budget.templates){
+                    budget.templates.forEach((t) => {
+                        t.price = t.price * count;
+                    })
+                }
                 budget.reason =placeInfo ? placeInfo.reason : lastDest.reason;
                 budget.tripType = ETripType.SUBSIDY;
                 budget.type = EInvoiceType.SUBSIDY;
