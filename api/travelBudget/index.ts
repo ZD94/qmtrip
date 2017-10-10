@@ -149,7 +149,6 @@ export default class ApiTravelBudget {
         }));
 
         let companyId = staff.company.id;
-        console.log("travelBudget.getTravelPolicyBudget====>companyId : ", companyId);
         let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
             preferedCurrency:preferedCurrency,
             travelPolicyId: travelPolicy['id'],
@@ -162,7 +161,6 @@ export default class ApiTravelBudget {
             preferSet: staff.company.budgetConfig || {},
         });
 
-        console.log("API.budget.createBudget success");
         let cities = segmentsBudget.cities;
         let _budgets = segmentsBudget.budgets;
         let budgets = [];
