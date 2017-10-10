@@ -855,7 +855,7 @@ export default class TravelPolicyModule{
         let qs: {
             [index: string]: string;
         } = {};
-        if (fields.hasOwnProperty("id") && fields['id']) {
+        if (fields.hasOwnProperty("id") && fields['id'] && fields['id'] != "null") {
             url = url + `/${fields['id']}`;
         }
         if(!fields.hasOwnProperty("id")){
