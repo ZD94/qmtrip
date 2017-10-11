@@ -171,6 +171,7 @@ class CompanyModule {
                     id : company.id,
                     name:company.name,
                     priceLimitType: HotelPriceLimitType.NO_SET,
+                    appointedPubilcSuppliers: company.appointedPubilcSuppliers
                 }
             });
         }catch(e){
