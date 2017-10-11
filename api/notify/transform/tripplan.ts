@@ -21,15 +21,20 @@ export = async function transform(values: any): Promise<any>{
     let arrivalCityCodes = tripApprove.arrivalCityCodes;
     if(typeof arrivalCityCodes == 'string')arrivalCityCodes = JSON.parse(arrivalCityCodes);
     tripApprove.arrivalCityCodes = arrivalCityCodes;
-
     if(arrivalCityCodes && arrivalCityCodes.length > 0){
-        await Promise.all(arrivalCityCodes.map(async function(item, index){
+        let arrCityList = await Promise.all(arrivalCityCodes.map(async (item) => {
             let arrivalInfo = await API.place.getCityInfo({cityCode: item});
             cityMap[item] = arrivalInfo;
+            return arrivalInfo;
         }))
-    }
-    values.cityMap = cityMap;
 
+        let firstDeptTz =  arrCityList[0]["timezone"] ? arrCityList[0]["timezone"]: "Asia/shanghai";
+        let lastDeptTz =  arrCityList[arrCityList.length - 1]["timezone"] ? arrCityList[arrCityList.length - 1]["timezone"]: "Asia/shanghai";
+        values.startAt = moment(tripApprove.startAt).tz(firstDeptTz).format("MM-DD hh:mm");
+        values.backAt = moment(tripApprove.backAt).tz(lastDeptTz).format("MM-DD hh:mm");
+    }
+
+    values.cityMap = cityMap;
     if(tripApprove){
         let approvedUsers = tripApprove.approvedUsers.split(',');
         let agreeUserNames = "";
