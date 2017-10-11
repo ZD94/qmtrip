@@ -85,10 +85,6 @@ export = async function transform(values: any): Promise<any>{
     if(destinationPlacesInfo && destinationPlacesInfo.length > 0){
         await Promise.all(destinationPlacesInfo.map(async function(item, index){
             let arrivalInfo = await API.place.getCityInfo({cityCode: item.destinationPlace});
-            let a = moment(item.latestArrivalDateTime).tz(arrivalInfo.timezone).toDate();
-            let b = moment(item.earliestGoBackDateTime).tz(arrivalInfo.timezone).toDate();
-            console.info("a=====================", a);
-            console.info("b=====================", b);
             item.latestArrivalDateTime = moment(item.latestArrivalDateTime).tz(arrivalInfo.timezone).format("MM-DD HH:mm");
             item.earliestGoBackDateTime = moment(item.earliestGoBackDateTime).tz(arrivalInfo.timezone).format("MM-DD HH:mm");
             cityMap[item.destinationPlace] = arrivalInfo;
