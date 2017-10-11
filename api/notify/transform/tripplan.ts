@@ -30,8 +30,8 @@ export = async function transform(values: any): Promise<any>{
 
         let firstDeptTz =  arrCityList[0]["timezone"] ? arrCityList[0]["timezone"]: "Asia/shanghai";
         let lastDeptTz =  arrCityList[arrCityList.length - 1]["timezone"] ? arrCityList[arrCityList.length - 1]["timezone"]: "Asia/shanghai";
-        values.startAt = moment(tripApprove.startAt).tz(firstDeptTz).format("MM-DD hh:mm");
-        values.backAt = moment(tripApprove.backAt).tz(lastDeptTz).format("MM-DD hh:mm");
+        values.startAt = moment(tripApprove.startAt).tz(firstDeptTz).format("MM-DD HH:mm");
+        values.backAt = moment(tripApprove.backAt).tz(lastDeptTz).format("MM-DD HH:mm");
     }
 
     values.cityMap = cityMap;
