@@ -32,8 +32,8 @@
     <tr>
         <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">日期</td>
         <td style="padding-left: 20px;font-size: 16px;">
-            <%=moment(destinationPlacesInfo[0].leaveDate).format('MM月DD日 HH点') || ''%> 至
-            <%=moment(destinationPlacesInfo[destinationPlacesInfo.length - 1].goBackDate).format('MM月DD日 HH点') || ''%>
+            <%=moment(destinationPlacesInfo[0].latestArrivalDateTime).format('MM月DD日 HH点')  || ''%> 至
+            <%=moment(destinationPlacesInfo[destinationPlacesInfo.length - 1].earliestGoBackDateTime).format('MM月DD日 HH点')  || ''%>
         </td>
     </tr>
     <tr>

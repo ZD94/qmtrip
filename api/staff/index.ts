@@ -611,9 +611,16 @@ class StaffModule{
                     downloadNoAddObj.push(s);
                     return;
                 }
-                if(_.trim(staffObj.mobile) != "" && !validate.isMobile(staffObj.mobile)){
+                if(_.trim(staffObj.mobile) != "" && !validate.isMobile(staffObj.mobile) && _.trim(staffObj.mobile) != 'undefined'){
                     staffObj.reason = "手机号格式不正确";
                     s[7] = "手机号格式不正确";
+                    noAddObj.push(staffObj);
+                    downloadNoAddObj.push(s);
+                    return;
+                }
+                if (staffObj.mobile == 'undefined') {
+                    staffObj.reason = '手机号为空';
+                    s[7] = '手机号为空';
                     noAddObj.push(staffObj);
                     downloadNoAddObj.push(s);
                     return;
