@@ -25,13 +25,21 @@ import {requirePermit, conditionDecorator, condition, modelNotNull} from "api/_d
 import {md5} from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
 import {CoinAccount} from "_types/coin";
-// import {RestfulAPIUtil} from "../restfulAPIUtil"
-var RestfulAPIUtil = require('../restfulAPIUtil');
+import { restfulAPIUtil } from "api/restful";
+let RestfulAPIUtil = restfulAPIUtil;
 
 const supplierCols = Supplier['$fieldnames'];
 const companyCols = Staff['$getAllFieldNames']();
 
 const DEFAULT_EXPIRE_MONTH = 1;
+
+enum HotelPriceLimitType  {
+    NO_SET = 0,
+    Min_Price_Limit = -1,
+    Max_Price_Limit = 1,
+    Price_Limit_Both = 2
+}
+
 class CompanyModule {
     /**
      * 创建企业
@@ -153,6 +161,24 @@ class CompanyModule {
 
         //默认开启所有公有预订服务商
         await company.setDefaultSupplier();
+
+        //jlbudget create company record.
+        try{
+            let jlBudgetCompany = await RestfulAPIUtil.proxyHttp({
+                url : "/company",
+                method:"post",
+                body:{
+                    id : company.id,
+                    name:company.name,
+                    priceLimitType: HotelPriceLimitType.NO_SET,
+                    appointedPubilcSuppliers: company.appointedPubilcSuppliers
+                }
+            });
+        }catch(e){
+            console.error(e);
+        }
+
+        //jlbudget create account record. Waiting jlbudget account identifie online.
 
         //默认添加 中国大陆(国内）、通用地区（国际）、港澳台 三个地区用于差旅、补助、限价等的管理
         await initDefaultCompanyRegion(company.id);

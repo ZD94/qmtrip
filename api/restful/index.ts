@@ -4,12 +4,11 @@
 
 
 import {Staff} from "_types/staff";
-import setPrototypeOf = Reflect.setPrototypeOf;
 var request = require("request");
 var Config = require("@jingli/config");
 
-export default class RestfulAPIUtil {
-    static async operateOnModel(options: {
+export class RestfulAPIUtil {
+    async operateOnModel(options: {
         model: string,
         params?: any,
         flag?: any
@@ -68,11 +67,11 @@ export default class RestfulAPIUtil {
         })
     }
 
-    static async proxyHttp(params:{
+    async proxyHttp(params:{
         url:string;
-        body:object;
+        body?:object;
         method:string;
-        qs:object;
+        qs?:object;
     }){
         let {url, body={}, method="get", qs={}} = params;
         return new Promise((resolve, reject) => {
@@ -100,3 +99,4 @@ export default class RestfulAPIUtil {
 }
 
 
+export let restfulAPIUtil = new RestfulAPIUtil();

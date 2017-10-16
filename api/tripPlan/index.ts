@@ -1203,25 +1203,32 @@ class TripPlanModule {
         await Promise.all([tripPlan.save(), log.save()]);
 
         let tripDetails: any[] = [];
-
-        let ps = budgets.map(async function (budget) :Promise<TripDetail>{
+        let ps = [];
+        await Promise.all(budgets.map(async function (b){
+            if(b.originPlace){
+                if (typeof b.originPlace == 'string') {
+                    b.originPlace = await API.place.getCityInfo({cityCode: b.originPlace});
+                }
+            }
+            if(b.destination){
+                if (typeof b.destination == 'string') {
+                    b.destination = await API.place.getCityInfo({cityCode: b.destination});
+                }
+            }
+        }));
+        await Promise.all(budgets.map(async function (budget){
             let tripType = budget.tripType;
             let reason = budget.reason;
             let price = Number(budget.price);
             let detail;
             let data: any = {};
-            if(budget.originPlace){
 
-                if (typeof budget.originPlace == 'string') {
-                    budget.originPlace = await API.place.getCityInfo({cityCode: budget.originPlace});
-                }
-            }
-            if(budget.destination){
-                if (typeof budget.destination == 'string') {
-                    budget.destination = await API.place.getCityInfo({cityCode: budget.destination});
-                }
-            }
-
+            data.reason = reason;
+            data.type = tripType;
+            data.budget = price;
+            data.accountId= account.id;
+            data.status = EPlanStatus.WAIT_UPLOAD;
+            data.tripPlanId = tripPlan.id;
             switch(tripType) {
                 case ETripType.OUT_TRIP:
                     data.deptCity = budget.originPlace ? budget.originPlace.id : "";
@@ -1232,6 +1239,7 @@ class TripPlanModule {
                     data.cabin = budget.cabinClass;
                     data.invoiceType = budget.type;
                     detail = Models.tripDetailTraffic.create(data);
+                    ps.push(detail);
                     tripPlan.isNeedTraffic = true;
                     break;
                 case ETripType.BACK_TRIP:
@@ -1243,6 +1251,7 @@ class TripPlanModule {
                     data.cabin = budget.cabinClass;
                     data.invoiceType = budget.type;
                     detail = Models.tripDetailTraffic.create(data);
+                    ps.push(detail);
                     tripPlan.isNeedTraffic = true;
                     break;
                 case ETripType.HOTEL:
@@ -1253,29 +1262,44 @@ class TripPlanModule {
                     data.checkInDate = budget.checkInDate;
                     data.checkOutDate = budget.checkOutDate;
                     detail = Models.tripDetailHotel.create(data);
+                    ps.push(detail);
                     tripPlan.isNeedHotel = true;
                     break;
                 case ETripType.SUBSIDY:
                     let templateId = null;
-                    let subsidyIds = [];
-                    if(budget.template && budget.template.id){
-                        templateId = budget.template.id;
-                    }else if(budget.templates && budget.templates.length){
-                        budget.templates.forEach((tp) => {
-                            subsidyIds.push(tp.id);
-                        })
-                    }
+
                     data.hasFirstDaySubsidy = budget.hasFirstDaySubsidy;
                     data.hasLastDaySubsidy = budget.hasLastDaySubsidy;
                     data.template = templateId;
                     data.subsidyMoney = budget.price;
                     data.subsidyTemplateId = templateId;
-                    data.subsidyIds = subsidyIds;
                     data.startDateTime = budget.fromDate;
                     data.endDateTime = budget.endDate;
-                    detail = Models.tripDetailSubsidy.create(data);
-                    // detail.expenditure = price;
-                    // detail.status = EPlanStatus.COMPLETE;
+
+                    //补助类型
+                    let templates = budget.templates;
+                    if(templates && templates.length){
+                        templates.forEach((t) => {
+                            if(data.id){
+                                delete data.id;
+                            }
+                            data.template = t.id;
+                            data.subsidyMoney = t.price;
+                            data.budget = t.price;
+                            data.subsidyTemplateId = t.id;
+                            if(t.subsidyType && !t.subsidyType.isUploadInvoice){
+                                data.status = EPlanStatus.WAIT_COMMIT;
+                            }
+                            detail = Models.tripDetailSubsidy.create(data);
+                            ps.push(detail);
+                        })
+                    }else{
+                        detail = Models.tripDetailSubsidy.create(data);
+                        // detail.expenditure = price;
+                        // detail.status = EPlanStatus.COMPLETE;
+                        ps.push(detail);
+                    }
+
                     break;
                 case ETripType.SPECIAL_APPROVE:
                     data.deptCity = budget.originPlace ? budget.originPlace.id : "";
@@ -1283,19 +1307,14 @@ class TripPlanModule {
                     data.deptDateTime = budget.startAt;
                     data.arrivalDateTime = budget.backAt;
                     detail = Models.tripDetailSpecial.create(data);
+                    ps.push(detail);
                     break;
                 default:
                     throw new Error("not support tripDetail type!");
             }
-            detail.reason = reason;
-            detail.type = tripType;
-            detail.budget = price;
-            detail.accountId= account.id;
-            detail.status = EPlanStatus.WAIT_UPLOAD;
-            detail.tripPlanId = tripPlan.id;
+            return detail;
+        }));
 
-            return detail as TripDetail;
-        });
         tripDetails = await Promise.all(ps);
 
         let nums = tripPlan.staffList.length || 1;

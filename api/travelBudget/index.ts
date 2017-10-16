@@ -82,7 +82,6 @@ export default class ApiTravelBudget {
     */
     @clientExport
     static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams) :Promise<string> {
-        console.log("====>models: ", Models.company);
         let staffId = params['staffId'];
         let preferedCurrency = params["preferedCurrency"];
         preferedCurrency = preferedCurrency && typeof(preferedCurrency) != 'undefined' ? preferedCurrency :DefaultCurrencyUnit;
@@ -104,7 +103,6 @@ export default class ApiTravelBudget {
             params.staffList.push(staffId);
         }
         let count = params.staffList.length;
-
         let destinationPlacesInfo = params.destinationPlacesInfo;
         let _staff: any = {
             gender: staff.sex,
@@ -151,7 +149,6 @@ export default class ApiTravelBudget {
         }));
 
         let companyId = staff.company.id;
-
         let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
             preferedCurrency:preferedCurrency,
             travelPolicyId: travelPolicy['id'],
@@ -195,15 +192,17 @@ export default class ApiTravelBudget {
                 let isAccordHotel = await Models.accordHotel.find({where: {cityCode: cityObj.id, companyId: staff['companyId']}});
                 if (isAccordHotel && isAccordHotel.length) {
                     budget.price = isAccordHotel[0].accordPrice;
-                    let residentPlace = await API.place.getCityInfo({cityCode: budget.city});
-                    let timezone = residentPlace.timezone && typeof(residentPlace.timezone) != undefined ?
-                        residentPlace.timezone : 'Asia/shanghai';
-
-                    let beginTime = moment(budget.checkInDate).tz(timezone).hour(12);
-                    let endTime = moment(budget.checkOutDate).tz(timezone).hour(12);
-                    let days = moment(endTime).diff(beginTime,'days');
-                    budget.price = budget.price * days;
                 }
+
+                /* 出差时间计算 */
+                let residentPlace = await API.place.getCityInfo({cityCode: budget.city});
+                let timezone = residentPlace.timezone && typeof(residentPlace.timezone) != undefined ?
+                    residentPlace.timezone : 'Asia/shanghai';
+                let beginTime = moment(budget.checkInDate).tz(timezone).hour(12);
+                let endTime = moment(budget.checkOutDate).tz(timezone).hour(12);
+                let days = moment(endTime).diff(beginTime,'days');
+                budget.price = budget.price * days;
+                /* 出差时间计算 END */
 
                 budget.hotelName = placeInfo ? placeInfo.hotelName : null;
                 budget.cityName = cityObj.name;
@@ -244,6 +243,12 @@ export default class ApiTravelBudget {
             let lastDest = destinationPlacesInfo[destLength - 1];
             if (subsidy) {
                 let budget = subsidy;
+                budget.price = budget.price * count;
+                if(budget.templates){
+                    budget.templates.forEach((t) => {
+                        t.price = t.price * count;
+                    })
+                }
                 budget.reason =placeInfo ? placeInfo.reason : lastDest.reason;
                 budget.tripType = ETripType.SUBSIDY;
                 budget.type = EInvoiceType.SUBSIDY;
@@ -251,7 +256,6 @@ export default class ApiTravelBudget {
                 budgets.push(budget);
             }
         }
-
         let obj: any = {};
         obj.budgets = budgets;
         obj.query = params;

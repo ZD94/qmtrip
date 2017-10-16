@@ -648,8 +648,8 @@ export default class TravelPolicyModule{
         let companyRegions = await Promise.all(subsidyRegions.map(async (regionGroup) => {
             let cityIds = regionGroup.cityIds;
             let name = regionGroup.name;
-            let group = regionGroup.name;
-            let types = regionGroup.name;
+            let group = regionGroup.group;
+            let types = regionGroup.types;
             let companyRegion = await TravelPolicyModule.getCompanyRegions({companyId: params.companyId, name: name});
             companyRegion = companyRegion.data;
             if(companyRegion && companyRegion.length){
@@ -855,7 +855,7 @@ export default class TravelPolicyModule{
         let qs: {
             [index: string]: string;
         } = {};
-        if (fields.hasOwnProperty("id")) {
+        if (fields.hasOwnProperty("id") && fields['id'] && fields['id'] != "null") {
             url = url + `/${fields['id']}`;
         }
         if(!fields.hasOwnProperty("id")){
