@@ -40,16 +40,18 @@ export interface ISearchHotelParams {
     checkInDate: string;
     checkOutDate: string;
     cityId: string;
+    travelPolicyId: string;
     location?: {
         latitude: number,
         longitude: number,
-    },
+    }
 }
 
 export interface ISearchTicketParams {
     leaveDate: string;
     originPlaceId: string;
     destinationId: string;
+    travelPolicyId: string;
 }
 
 let sequelize = require('sequelize');
