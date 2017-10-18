@@ -36,6 +36,24 @@ interface SegmentsBudgetResult {
     }>
 }
 
+export interface ISearchHotelParams {
+    checkInDate: string;
+    checkOutDate: string;
+    cityId: string;
+    travelPolicyId: string;
+    location?: {
+        latitude: number,
+        longitude: number,
+    }
+}
+
+export interface ISearchTicketParams {
+    leaveDate: string;
+    originPlaceId: string;
+    destinationId: string;
+    travelPolicyId: string;
+}
+
 let sequelize = require('sequelize');
 export default class ApiTravelBudget {
 
@@ -56,6 +74,23 @@ export default class ApiTravelBudget {
         // return {};
     }
 
+    @clientExport
+    static async getHotelsData(params : ISearchHotelParams) : Promise<any>{
+        let result = await API.budget.getHotelsData(params);
+        return result;
+    }
+
+    @clientExport
+    static async getTrafficsData(params : ISearchTicketParams) : Promise<any>{
+        let result = await API.budget.getTrafficsData(params);
+        return result;
+    }
+
+    @clientExport
+    static async getTripTravelPolicy(travelPolicyId:string, destinationId:string){
+        let result = await API.budget.getTravelPolicy(travelPolicyId, destinationId);
+        return result;
+    }
 
     /**
     * @method getTravelPolicyBudget
