@@ -86,6 +86,12 @@ export default class ApiTravelBudget {
         return result;
     }
 
+    @clientExport
+    static async getTripTravelPolicy(travelPolicyId:string, destinationId:string){
+        let result = await API.budget.getTravelPolicy(travelPolicyId, destinationId);
+        return result;
+    }
+
     /**
     * @method getTravelPolicyBudget
     *
