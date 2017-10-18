@@ -26,7 +26,7 @@ export class RestfulAPIUtil {
             url = Config.cloudAPI + `/company/${currentCompanyId}/${model}`;
         }
         else {
-            url = Config.cloudAPI + `/company`
+            url = Config.cloudAPI + `/${model}`
         }
         let result: any;
 
