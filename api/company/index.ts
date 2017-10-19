@@ -698,6 +698,51 @@ class CompanyModule {
     }
 
 
+    /**
+     * get public common suppliers
+     */
+    @clientExport
+    static async getCommonSupplier(params): Promise<any> {
+        let commonSuppliers = await RestfulAPIUtil.operateOnModel({
+            model: 'supplierAlternateName',
+            params: {
+                fields: params,
+                method: 'GET',
+            },
+            flag: true
+        });
+
+        if(commonSuppliers.code == 0){
+            let res = commonSuppliers.data;
+            if(res && res.total > 0){
+                let commonSupplierId = res[0].commonSupplierId;
+                let commonSupplier = await RestfulAPIUtil.operateOnModel({
+                    model: 'commonSupplier',
+                    params: {
+                        fields: {id: commonSupplierId},
+                        method: 'GET',
+                    },
+                    flag: true
+                });
+
+                if(commonSupplier.code == 0){
+                    commonSupplier = commonSupplier.data;
+                    commonSupplier.logo = `${C.cloud}/${commonSupplier.logo}`;
+                    return commonSupplier;
+                }else{
+                    throw new Error(commonSuppliers.code);
+                }
+
+            }else{
+                throw new Error("供应商不存在");
+            }
+
+        }else{
+            throw new Error(commonSuppliers.code);
+        }
+
+    }
+
     /*************************************供应商end***************************************/
 
 
