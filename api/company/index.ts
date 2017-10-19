@@ -1323,7 +1323,7 @@ async function initDefaultCompanyRegion(companyId: string) {
         types: [1,2,3],
         group: 2
     }];
-    // let defaultRegion = ['中国大陆', '通用地区', '港澳台'];
+   
     let defaultPlaceId = [['CTW_5'], ['Global'], ['CT_2912', 'CT_2911', 'CT_9000']];
 
     for (let i = 0; i < defaultRegion.length; i++) {
