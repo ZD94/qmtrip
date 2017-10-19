@@ -1310,6 +1310,7 @@ export = CompanyModule;
 
 
 async function initDefaultCompanyRegion(companyId: string) {
+     // let defaultRegion = ['中国大陆', '通用地区', '港澳台'];
     let defaultRegion = [{
         name: '国内',
         types: [1,2,3],
