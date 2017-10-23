@@ -348,6 +348,7 @@ class StaffModule{
     @requireParams(['pwd', 'msgCode', 'msgTicket', 'accountId'])
     static async transferOwner(params: {pwd: string, msgCode: string, msgTicket: number, accountId: string}): Promise<boolean> {
         let staff = await Staff.getCurrent();
+        let company = staff.company;
         let pwd = params.pwd;
         let msgCode = params.msgCode;
         let msgTicket = params.msgTicket;
@@ -378,6 +379,10 @@ class StaffModule{
                 staff = await staff.save();
                 toStaff.roleId = EStaffRole.OWNER;
                 await toStaff.save();
+
+                company.createUser = params.accountId;
+                await company.save();
+
                 await API.notify.submitNotify({
                     key: 'qm_transfer_owner',
                     values: {url: config.host},
