@@ -1229,6 +1229,7 @@ class TripPlanModule {
             data.accountId= account.id;
             data.status = EPlanStatus.WAIT_UPLOAD;
             data.tripPlanId = tripPlan.id;
+            data.budgetInfo = budget;
             switch(tripType) {
                 case ETripType.OUT_TRIP:
                     data.deptCity = budget.originPlace ? budget.originPlace.id : "";
