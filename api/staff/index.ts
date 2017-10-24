@@ -1527,7 +1527,7 @@ class StaffModule{
         var timestamp = Date.now() + oneDay;  //失效时间2天
         var sign = makeLinkSign(linkToken, invitedLink.id, timestamp);
         // var url = goInvitedLink + "/"+invitedLink.id+"/"+timestamp+"/"+sign;
-        var url = `${goInvitedLink}/${invitedLink.id}&${timestamp}&${sign}`;
+        var url = `${goInvitedLink}/${invitedLink.id}/${timestamp}/${sign}`;
         try {
             url = await API.wechat.shorturl({longurl: url});
         } catch(err) {
