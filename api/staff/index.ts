@@ -1514,6 +1514,30 @@ class StaffModule{
     }
 
     @clientExport
+    static async createInvitedLinkV2(params): Promise<InvitedLink>{
+        let host = params.url || config.host;
+        let goInvitedLink = host + "#/login/invited-staff-one";
+        var staff = await Staff.getCurrent();
+        var invitedLink = InvitedLink.create();
+        invitedLink.staff = staff;
+        invitedLink.expiresTime = moment().add(24, 'h');
+        var linkToken = utils.getRndStr(6);
+        invitedLink.linkToken = linkToken;
+        var oneDay = 24 * 60 * 60 * 1000
+        var timestamp = Date.now() + oneDay;  //失效时间2天
+        var sign = makeLinkSign(linkToken, invitedLink.id, timestamp);
+        // var url = goInvitedLink + "/"+invitedLink.id+"/"+timestamp+"/"+sign;
+        var url = `${goInvitedLink}/${invitedLink.id}&${timestamp}&${sign}`;
+        try {
+            url = await API.wechat.shorturl({longurl: url});
+        } catch(err) {
+            console.warn('生成短连接错误', err)
+        }
+        invitedLink.goInvitedLink = url;
+        return  invitedLink.save();
+    }
+
+    @clientExport
     @requireParams(["id"], invitedLinkCols)
     @conditionDecorator([
         {if: condition.isSelfLink("0.id")}
