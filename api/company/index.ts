@@ -727,7 +727,7 @@ class CompanyModule {
 
                 if(commonSupplier.code == 0){
                     commonSupplier = commonSupplier.data;
-                    commonSupplier.logo = `${C.cloud}/${commonSupplier.logo}`;
+                    // commonSupplier.logo = `${C.cloud}/${commonSupplier.logo}`;
                     return commonSupplier;
                 }else{
                     throw new Error(commonSuppliers.code);
