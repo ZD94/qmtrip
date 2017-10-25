@@ -1611,7 +1611,7 @@ class TripPlanModule {
             let arrCity = await API.place.getCityInfo({ cityCode: item });
             if(arrCity){
                 roundLine = roundLine && roundLine != '' && typeof(roundLine) != "undefined"  ? roundLine + "-": '';
-                roundLine += arrCity.name;
+                roundLine += arrCity.name; 
             }
         }))
         roundLine += tripPlan.isRoundTrip ? '-'+tripPlan.deptCity : '';
