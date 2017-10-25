@@ -1614,7 +1614,8 @@ class TripPlanModule {
         await Promise.all(tripPlan.arrivalCityCodes.map(async function(item){
             let arrCity = await API.place.getCityInfo({ cityCode: item });
             if(arrCity){
-                roundLine = roundLine + "-" + arrCity.name;
+                roundLine = roundLine && roundLine != '' && typeof(roundLine) != "undefined"  ? roundLine + "-": '';
+                roundLine += arrCity.name;
             }
         }))
         roundLine += tripPlan.isRoundTrip ? '-'+tripPlan.deptCity : '';
