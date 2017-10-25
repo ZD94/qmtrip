@@ -490,7 +490,11 @@ class TripPlanModule {
                 let savedMoney = tripPlan.budget - tripPlan.expenditure;
                 savedMoney = savedMoney > 0 ? savedMoney : 0;
                 tripPlan.score = parseInt((savedMoney * SAVED2SCORE).toString());
-
+                if(tripPlan.isSpecialApprove){
+                    tripPlan.saved = 0;
+                }else{
+                    tripPlan.saved = savedMoney;
+                }
                 templateName = 'qm_notify_invoice_all_pass';
             }else{
                 templateName = 'qm_notify_invoice_not_pass';
