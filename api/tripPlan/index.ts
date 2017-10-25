@@ -490,7 +490,11 @@ class TripPlanModule {
                 let savedMoney = tripPlan.budget - tripPlan.expenditure;
                 savedMoney = savedMoney > 0 ? savedMoney : 0;
                 tripPlan.score = parseInt((savedMoney * SAVED2SCORE).toString());
-
+                if(tripPlan.isSpecialApprove){
+                    tripPlan.saved = 0;
+                }else{
+                    tripPlan.saved = savedMoney;
+                }
                 templateName = 'qm_notify_invoice_all_pass';
             }else{
                 templateName = 'qm_notify_invoice_not_pass';
@@ -1610,7 +1614,8 @@ class TripPlanModule {
         await Promise.all(tripPlan.arrivalCityCodes.map(async function(item){
             let arrCity = await API.place.getCityInfo({ cityCode: item });
             if(arrCity){
-                roundLine = roundLine + "-" + arrCity.name;
+                roundLine = roundLine && roundLine != '' && typeof(roundLine) != "undefined"  ? roundLine + "-": '';
+                roundLine += arrCity.name;
             }
         }))
         roundLine += tripPlan.isRoundTrip ? '-'+tripPlan.deptCity : '';
