@@ -13,7 +13,7 @@ export default async function update(DB: Sequelize, t: Transaction){
             allCreatorIds.push(creators[j].id);
         }
 
-        if(allCreatorIds.indexOf(allCorps[i]['create_user']) < 0){
+        if(allCreatorIds && allCreatorIds.length && allCreatorIds.indexOf(allCorps[i]['create_user']) < 0){
             let updateSql = `update company.companies set create_user = '${allCreatorIds[0]}' where id = '${allCorps[i].id}';`;
             await DB.query(updateSql, {transaction: t});
         }
