@@ -92,6 +92,11 @@ server.on('init.api', function(API){
     }
 });
 
+var httpModule = require('./http');
+server.on('init.http_handler', function(app) {
+    httpModule.initHttp(app);
+})
+
 server.on('init.http', function(server){
     if(config.debug){
         var shoe = require('shoe');

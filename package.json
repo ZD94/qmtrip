@@ -23,6 +23,7 @@
     "@jingli/logger": "^1.0.1",
     "@jingli/patch-dnode-scrub": "^1.0.0",
     "@jingli/perf": "^1.0.0",
+    "@jingli/restful": "^0.1.8",
     "@types/bluebird": "^3.5.2",
     "@types/bluebird-global": "^3.5.1",
     "@types/callsite": "^1.0.30",
