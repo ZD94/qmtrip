@@ -1266,6 +1266,8 @@ class TripPlanModule {
                     data.position = budget.hotelName;
                     data.checkInDate = budget.checkInDate;
                     data.checkOutDate = budget.checkOutDate;
+                    let [latitude,longitude] = query.destinationPlacesInfo[0].businessDistrict.split(',').map(parseFloat);
+                    data.landmark = {latitude,longitude};
                     detail = Models.tripDetailHotel.create(data);
                     ps.push(detail);
                     tripPlan.isNeedHotel = true;
