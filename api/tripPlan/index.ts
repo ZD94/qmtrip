@@ -1219,6 +1219,11 @@ class TripPlanModule {
                     b.destination = await API.place.getCityInfo({cityCode: b.destination});
                 }
             }
+            if(b.city){
+                if(typeof b.city == 'string'){
+                    b.city = await API.place.getCityInfo({cityCode:b.city});
+                }
+            }
         }));
         let destCount = 0;
         await Promise.all(budgets.map(async function (budget){
@@ -1267,8 +1272,13 @@ class TripPlanModule {
                     data.position = budget.hotelName;
                     data.checkInDate = budget.checkInDate;
                     data.checkOutDate = budget.checkOutDate;
-                    let [latitude,longitude] = query.destinationPlacesInfo[destCount].businessDistrict.split(',').map(parseFloat);
-                    data.landmark = {latitude,longitude};
+                    let dest = query.destinationPlacesInfo[destCount]
+                    if(dest && dest.businessDistrict){
+                        let [latitude,longitude] = dest.businessDistrict.split(',').map(parseFloat);
+                        data.landmark = { latitude, longitude };
+                    }else{
+                        data.landmark = {latitude:budget.city.latitude,longitude:budget.city.longitude};
+                    }
                     detail = Models.tripDetailHotel.create(data);
                     ps.push(detail);
                     tripPlan.isNeedHotel = true;
