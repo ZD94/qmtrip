@@ -1220,7 +1220,8 @@ class TripPlanModule {
                 }
             }
         }));
-        await Promise.all(budgets.map(async function (budget,idx){
+        let destCount = 0;
+        await Promise.all(budgets.map(async function (budget){
             let tripType = budget.tripType;
             let reason = budget.reason;
             let price = Number(budget.price);
@@ -1266,11 +1267,12 @@ class TripPlanModule {
                     data.position = budget.hotelName;
                     data.checkInDate = budget.checkInDate;
                     data.checkOutDate = budget.checkOutDate;
-                    let [latitude,longitude] = query.destinationPlacesInfo[idx].businessDistrict.split(',').map(parseFloat);
+                    let [latitude,longitude] = query.destinationPlacesInfo[destCount].businessDistrict.split(',').map(parseFloat);
                     data.landmark = {latitude,longitude};
                     detail = Models.tripDetailHotel.create(data);
                     ps.push(detail);
                     tripPlan.isNeedHotel = true;
+                    destCount++;
                     break;
                 case ETripType.SUBSIDY:
                     let templateId = null;
