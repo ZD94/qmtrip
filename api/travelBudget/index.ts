@@ -23,6 +23,9 @@ var request = require("request");
 
 const cloudAPI = require('@jingli/config').cloudAPI;
 const cloudKey = require('@jingli/config').cloudKey;
+
+import { restfulAPIUtil } from "api/restful";
+let RestfulAPIUtil = restfulAPIUtil;
 interface SegmentsBudgetResult {
     id: string;
     cities: string[];
@@ -437,6 +440,55 @@ export default class ApiTravelBudget {
         });
         await Promise.all(ps);
         return true;
+    }
+
+
+    static async createNewBudget(){
+        let result: any = {
+            code: 500,
+            msg: '',
+            data: null
+        };
+        try{
+            result = await RestfulAPIUtil.proxyHttp({
+                url: 'budget',
+                method: 'post',
+                body: {
+
+                }
+            })
+        }catch(err) {
+            console.log(err);
+        }
+
+        return result;
+    }
+
+    static async refreshBudgetByIdrefreshBudgetById(){
+
+        return ApiTravelBudget.getBudgetById();
+
+    }
+
+    static async getBudgetById(){
+        let result: any = {
+            code: 500,
+            msg: '',
+            data: null
+        };
+        try{
+            result = await RestfulAPIUtil.proxyHttp({
+                url: 'budget',
+                method: 'post',
+                body: {
+
+                }
+            })
+        }catch(err) {
+            console.log(err);
+        }
+
+        return result;
     }
 
     static __initHttpApp(app) {
