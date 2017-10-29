@@ -25,7 +25,7 @@ module.exports = function(app) {
         timeout: 180000,
     }));
     app.options(url, function(req, res, next) {
-        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Origin', req.hostname);
         res.sendStatus(200);
     })
     app.get("/attachment/temp/:id", resetTimeout, function(req, res, next) {
