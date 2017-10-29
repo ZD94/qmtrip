@@ -35,6 +35,7 @@ module.exports = function(app) {
             host = parseHost(url);
         }
         res.header('Access-Control-Allow-Origin', host);
+        res.header('Access-Control-Allow-Credentials', 'true');
         res.sendStatus(200);
     })
 
