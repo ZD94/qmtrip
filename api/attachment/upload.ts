@@ -7,6 +7,7 @@ import * as path from 'path';
 var API = require("@jingli/dnode-api");
 var requestProxy = require('express-request-proxy');
 import fs = require("fs");
+import { URL } from 'url'
 
 function resetTimeout(req, res, next){
     req.clearTimeout();
@@ -24,8 +25,16 @@ module.exports = function(app) {
         cache: false,
         timeout: 180000,
     }));
-    app.options(url, function(req, res, next) {
-        res.header('Access-Control-Allow-Origin', req.hostname);
+    app.options(url, function (req, res, next) {
+        let referer = req.headers['referer'];
+        let host;
+        if (!referer) {
+            host = req.protocol+'://' + req.hostname;
+        } else { 
+            let url = new URL(referer);
+            host = url.origin;
+        }
+        res.header('Access-Control-Allow-Origin', host);
         res.sendStatus(200);
     })
     app.get("/attachment/temp/:id", resetTimeout, function(req, res, next) {
