@@ -38,17 +38,14 @@ module.exports = function(app) {
         res.sendStatus(200);
     })
 
-    function parseHost(obj: { hostname?: string, protocol?: string, port?: string | number }): string { 
-        if (!obj.hostname) {
+    function parseHost(obj: { host?: string, protocol?: string}): string { 
+        if (!obj.host) {
             return '*';
         }
         if (!obj.protocol) { 
-            return obj.hostname;
+            return obj.host;
         }
-        var host = obj.protocol + '://' + obj.hostname;
-        if (obj.port && obj.port != '80' && obj.port != 80) { 
-            host += ':' + obj.port;
-        }
+        var host = obj.protocol.replace(":", "") + '://' + obj.host;
         return host;
     }
 
