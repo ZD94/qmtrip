@@ -216,7 +216,7 @@ export default class ApiTravelBudget {
         let companyId = staff.company.id;
 
         let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
-            preferedCurrency: preferedCurrency,
+            preferedCurrency:preferedCurrency,
             travelPolicyId: travelPolicy['id'],
             companyId,
             staffs,

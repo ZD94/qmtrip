@@ -9,7 +9,7 @@ import {Models} from "_types";
 // import {ApiTravelBudget} from "api/travelBudget/index";
 var ApiTravelBudget = require("api/travelBudget");
 
-@Restful('/qmbudget')
+@Restful('/budget')
 export class BudgetController extends AbstractController {
 
     constructor() {
