@@ -472,11 +472,7 @@ export default class ApiTravelBudget {
 
 
     static async createNewBudget(params: IQueryBudgetParams){
-        let result: any = {
-            code: 500,
-            msg: '',
-            data: null
-        };
+        let result;
         try{
             result = await RestfulAPIUtil.proxyHttp({
                 url: '/budget',
