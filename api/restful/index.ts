@@ -74,6 +74,7 @@ export class RestfulAPIUtil {
         qs?:object;
     }){
         let {url, body={}, method="get", qs={}} = params;
+        console.log(params)
         return new Promise((resolve, reject) => {
             request({
                 uri: Config.cloudAPI + url,

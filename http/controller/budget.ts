@@ -6,8 +6,10 @@
 import {AbstractController, Restful, Router} from "@jingli/restful";
 import API from '@jingli/dnode-api';
 import {Models} from "_types";
+// import {ApiTravelBudget} from "api/travelBudget/index";
+var ApiTravelBudget = require("api/travelBudget");
 
-@Restful('/budget/')
+@Restful('/qmbudget')
 export class BudgetController extends AbstractController {
 
     constructor() {
@@ -19,25 +21,26 @@ export class BudgetController extends AbstractController {
     }
 
     async get(req, res, next){
-        let {events} = req.body;
-        console.info(events);
-        //do something
-        res.json(this.reply(0, events));
+        let {id} = req.params;
+        if(!id)  return res.json(this.reply(0, null));
+        let result = await ApiTravelBudget.getBudgetById(req.params);
+        res.json(this.reply(0, result));
     }
 
 
     async post(req, res, next){
-        let {events} = req.body;
-        console.info(events);
-        //do something
-        res.json(this.reply(0, events));
+        let body = req.body;
+        if(!body)
+           return res.json(this.reply(0, null));
+        let result = await ApiTravelBudget.createNewBudget(body);
+        res.json(this.reply(0, result));
     }
 
     @Router('/:id/refresh', "GET")
     async refresh(req, res, next){
-        let {events} = req.body;
-        console.info(events);
-        //do something
-        res.json(this.reply(0, events));
+        let {id} = req.params;
+        if(!id)  return res.json(this.reply(0, null));
+        let result = await ApiTravelBudget.getBudgetById(req.params);
+        res.json(this.reply(0, result));
     }
 }
