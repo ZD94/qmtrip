@@ -11,6 +11,7 @@ import {Models} from "_types";
 import {ESendType, ENoticeType} from "_types/notice/notice";
 import {TripApprove} from "_types/tripPlan/tripPlan";
 import moment = require("moment");
+import url = require("url");
 
 const config = require('@jingli/config');
 let API = require('@jingli/dnode-api');
@@ -320,3 +321,8 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
     return true;
 }
 
+//v2Url的生成方式。
+export function v2UrlGenerator(baseUrl: string, params?: {[key: string]: string}): string {
+    let values = _.values(params).map(val => encodeURIComponent(val))
+    return (baseUrl + "/" + values.join("/")).replace("//","/")
+}

@@ -123,16 +123,26 @@ class TripApproveModule {
         return true;
     }*/
 
-    static async sendTripApproveNotice(params: {approveId: string, nextApprove?: boolean}) {
+    static async sendTripApproveNotice(params: {approveId: string, nextApprove?: boolean, version?: number}) {
         let tripApprove = await Models.tripApprove.get(params.approveId);
         let staff = tripApprove.account;
         let company = staff.company;
         let nextApprove = params.nextApprove || false;
 
-        let approve_url = `${config.host}/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
-        let finalUrl = `#/trip-approval/detail?approveId=${tripApprove.id}`;
-        finalUrl = encodeURIComponent(finalUrl);
-        let appMessageUrl = `#/judge-permission/index?id=${tripApprove.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
+        //#@template
+        let approve_url: string;
+        let appMessageUrl: string;
+        if (params.version && params.version == 2) {
+            approve_url = API.notify.v2UrlGenerator(`${config.v2_host}/index.html#/trip-approval/detail`,{approveId: tripApprove.id})
+            let finalUrl = API.notify.v2UrlGenerator("#/trip-approval/detail",{approveId: tripApprove.id})
+            appMessageUrl = API.notify.v2UrlGenerator("#/judge-permission/index",{id: tripApprove.id, modelName: "tripApprove", finalUrl: finalUrl})
+        } else {
+            approve_url = `${config.host}/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
+            let finalUrl = `#/trip-approval/detail?approveId=${tripApprove.id}`;
+            finalUrl = encodeURIComponent(finalUrl);
+            appMessageUrl = `#/judge-permission/index?id=${tripApprove.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
+        }
+
         let shortUrl = approve_url;
         try {
             shortUrl = await API.wechat.shorturl({longurl: approve_url});
@@ -203,7 +213,7 @@ class TripApproveModule {
     * @returns {boolean}
     */
     @clientExport
-    @requireParams(['id', 'approveResult', 'isNextApprove'], ['approveRemark', "budgetId", 'nextApproveUserId'])
+    @requireParams(['id', 'approveResult', 'isNextApprove'], ['approveRemark', "budgetId", 'nextApproveUserId', "version"])
     @modelNotNull('tripApprove')
     static async approveTripPlan(params): Promise<boolean> {
         let isNextApprove = params.isNextApprove;
@@ -389,15 +399,23 @@ class TripApproveModule {
         });
 
         if(isNextApprove){
-            await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: true});
+            //#@template
+            await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: true, version: params.version});
         }else if(approveResult == EApproveResult.REJECT){
             //发送审核结果邮件
             let self_url;
             let appMessageUrl;
-            self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
-            let finalUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
-            finalUrl = encodeURIComponent(finalUrl);
-            appMessageUrl = `#/judge-permission/index?id=${tripApprove.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
+            //#@template
+            if (params.version && params.version == 2) {
+                self_url = API.notify.v2UrlGenerator(`${config.host}/index.html#/trip-approval/detail`,{approveId: tripApprove.id})
+                let finalUrl = API.notify.v2UrlGenerator("#/trip-approval/detail",{approveId: tripApprove.id})
+                appMessageUrl = API.notify.v2UrlGenerator("#/judge-permission/index",{id: tripApprove.id, modelName: "tripApprove", finalUrl: finalUrl})
+            } else {
+                self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
+                let finalUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
+                finalUrl = encodeURIComponent(finalUrl);
+                appMessageUrl = `#/judge-permission/index?id=${tripApprove.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
+            }
             let user = tripApprove.account;
             if(!user) user = await Models.staff.get(tripApprove['accountId']);
             try {

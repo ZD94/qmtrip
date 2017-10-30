@@ -1109,8 +1109,8 @@ class TripPlanModule {
      * @returns {Promise<TripPlan>}
      */
     @clientExport
-    @requireParams(['tripApproveId'])
-    static async saveTripPlanByApprove(params: {tripApproveId: string}): Promise<TripPlan> {
+    @requireParams(['tripApproveId'], ["version"])
+    static async saveTripPlanByApprove(params: {tripApproveId: string, version?: number}): Promise<TripPlan> {
         let formatStr = 'YYYY-MM-DD';
         let approve = await Models.approve.get(params.tripApproveId);
         let account = await Models.staff.get(approve.submitter);
@@ -1351,10 +1351,19 @@ class TripPlanModule {
             }
         }
 
-        let self_url = config.host + '/index.html#/trip/list-detail?tripid=' + approve.id;
-        let finalUrl = `#/trip/list-detail?tripid=${approve.id}`;
-        finalUrl = encodeURIComponent(finalUrl);
-        let appMessageUrl = `#/judge-permission/index?id=${approve.id}&modelName=tripPlan&finalUrl=${finalUrl}`;
+        //#@template
+        let self_url
+        let appMessageUrl
+        if (params.version && params.version == 2) {
+            self_url = API.notify.v2UrlGenerator(`${config.v2_host}/index.html#/trip/list-detail`,{tripid: approve.id})
+            let finalUrl = API.notify.v2UrlGenerator("#/trip/list-detail",{tripid: approve.id})
+            appMessageUrl = API.notify.v2UrlGenerator("#/judge-permission/index",{id: approve.id, modelName: "tripPlan", finalUrl: finalUrl})
+        } else {
+            self_url = config.host + '/index.html#/trip/list-detail?tripid=' + approve.id;
+            let finalUrl = `#/trip/list-detail?tripid=${approve.id}`;
+            finalUrl = encodeURIComponent(finalUrl);
+            appMessageUrl = `#/judge-permission/index?id=${approve.id}&modelName=tripPlan&finalUrl=${finalUrl}`;
+        }
 
         try {
             self_url = await API.wechat.shorturl({longurl: self_url});
