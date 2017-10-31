@@ -7,7 +7,7 @@ export default class PlaceModule {
     @requireParams(['id'])
     static async getCityById(id) {
         const city = await restfulAPIUtil.proxyHttp({
-            url: `/city/${id}`,
+            url: `/place/${id}`,
             method: 'GET'
         });
         return city;
@@ -16,16 +16,15 @@ export default class PlaceModule {
     @clientExport
     static async findByKeyword(keyword: string) {
         return await restfulAPIUtil.proxyHttp({
-            url: `/city`,
-            method: 'GET',
-            qs: { keyword }
+            url: `/place/search/${encodeURIComponent(keyword)}`,
+            method: 'GET'
         })
     }
 
     @clientExport
     static async findSubCities(parentId: string) {
         return await restfulAPIUtil.proxyHttp({
-            url: `/city/${parentId}/children`,
+            url: `/place/${parentId}/children`,
             method: 'GET'
         })
     }
@@ -33,7 +32,7 @@ export default class PlaceModule {
     @clientExport
     static async findNearCitiesByGC(longitude: number, latitude: number) {
         return await restfulAPIUtil.proxyHttp({
-            url: `/city/nearby/${longitude}/${latitude}`,
+            url: `/place/nearby/${longitude}/${latitude}`,
             method: 'GET'
         })
     }

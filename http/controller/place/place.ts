@@ -8,7 +8,7 @@ import API from '@jingli/dnode-api';
 import { Models } from "_types";
 
 @Restful()
-export default class CityController extends AbstractController {
+export default class PlaceController extends AbstractController {
     constructor() {
         super();
     }
@@ -37,14 +37,12 @@ export default class CityController extends AbstractController {
         return res.send(this.resp(result));
     }
 
-    @Router('/nearby/:latitude/:longitude', 'GET')
+    @Router('/nearby/:longitude/:latitude', 'GET')
     async getNearCity(req, res, next) {
-        let { longitude, latitude } = req, params;
-        const isValid = latitude === void 0
-            || validator.isEmpty(latitude)
-            || longitude === void 0
-            || validator.isEmpty(longitude);
-        if (!!isValid) {
+        let { longitude, latitude } = req.params,
+            pattern = /^\d+\.?\d+$/;
+        const isValid = pattern.test(longitude) && pattern.test(latitude);
+        if (!isValid) {
             return res.send(this.reply(400, null));
         }
         const result = await API['qmplace'].findNearCitiesByGC(longitude, latitude);
