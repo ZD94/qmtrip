@@ -299,6 +299,10 @@ emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result) {
         }
         approve = await approve.save();
 
+        /*if(true){
+            await API.event.sendEventNotice({event: "new_trip_approve", data: {"s":"w"," value": "rrr"}, companyId: "1a1a4330-046b-11e7-b585-933198eebdaa"});
+        }*/
+
         //预算审批完成
         if (approve.type == EApproveType.TRAVEL_BUDGET && approve.status == EApproveStatus.SUCCESS) {
             await API.tripPlan.saveTripPlanByApprove({tripApproveId: approve.id})
