@@ -8,7 +8,7 @@ var iconv = require('iconv-lite');
 
 export default class SupplierCtripCT extends SupplierWebRobot{
     constructor(){
-        super('https://www.kiwi.com/cn/');
+        super('https://touch.qunar.com/h5');
     }
 
     async login(authDate: any): Promise<any>{
