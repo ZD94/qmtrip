@@ -34,7 +34,7 @@ import {ENoticeType} from "_types/notice/notice";
 import TripApproveModule = require("../tripApprove/index");
 import {MPlaneLevel, MTrainLevel} from "_types";
 
-import {ISegment, ICreateBudgetAndApproveParams} from '_types/tripPlan'
+import {ISegment, ICreateBudgetAndApproveParams, ExpendItem} from '_types/tripPlan'
 import {EApproveStatus} from "../../_types/approve/types";
 import {plugins} from "../../libs/oa/index";
 const projectCols = Project['$fieldnames'];
@@ -629,6 +629,135 @@ class TripPlanModule {
 
     }
 
+    /**
+     * 支持restful审核完成接口。
+     * @param params
+     * @returns {Promise<Project>}
+     * @author lei.liu
+     */
+    @clientExport
+    @requireParams(["id", "expenditure"])
+    static async finishTripPlan(params: {id: string, expendArray: Array<ExpendItem>}){
+
+        const SAVED2SCORE = config.score_ratio
+        let expendArray = params.expendArray
+        let tripPlan = await Models.tripPlan.get(params.id)
+
+        return DB.transaction(async function(t) {
+
+            let user = {id: ""} //agencyUser暂时获取不到，写死。
+
+            expendArray.forEach(async function(expend){ //根据提供的消费明细更新tripDetail
+                let tripDetail = await Models.tripDetail.get(expend.id)
+                tripDetail.expenditure = expend.expenditure
+                tripDetail.personalExpenditure = expend.personalExpenditure
+                tripDetail.status = EPlanStatus.COMPLETE //从oa系统中传递过来意味着报销完成。
+                tripDetail.save()
+                let templateValue: any = {}
+                switch (tripDetail.type) {  //根据tripType生成相应的log
+                    case ETripType.OUT_TRIP:
+                        templateValue.tripType = '去程'
+                        break;
+                    case ETripType.BACK_TRIP:
+                        templateValue.tripType = '回程'
+                        break;
+                    case ETripType.HOTEL:
+                        templateValue.tripType = '酒店'
+                        break;
+                    case ETripType.SUBSIDY:
+                        templateValue.tripType = '补助'
+                        break;
+                    case ETripType.SPECIAL_APPROVE:
+                        templateValue.tripType = '特殊审批'
+                        break;
+                    default:
+                        templateValue.tripType = ''
+                        break;
+                }
+
+                let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, tripDetailId: tripDetail.id, userId: user.id, remark: `${templateValue.tripType}票据审核通过`});
+                log.save();
+            })
+
+            await updateTripPlanExpenditure(tripPlan) //跟新tripPlan的消费信息。
+
+            let allDetailsPass = true
+            let isNeedMsg = true
+            let tripDetails = await tripPlan.getTripDetails({})
+
+            tripDetails.forEach(async (item) => { //判断是否tripPlan的所有的detail都审核完成。
+                if (item.status != EPlanStatus.COMPLETE) {
+                    allDetailsPass = false
+                    isNeedMsg = false
+                }
+            })
+
+            let templateName: string;
+
+            if (allDetailsPass) {
+                //所有的detail都审核完成。
+                tripPlan.status = EPlanStatus.COMPLETE
+                tripPlan.auditStatus = EAuditStatus.INVOICE_PASS
+                tripPlan.allInvoicesPassTime = new Date()
+                let savedMoney = tripPlan.budget - tripPlan.expenditure
+                savedMoney = savedMoney > 0 ? savedMoney : 0
+                tripPlan.score = parseInt((savedMoney * SAVED2SCORE).toString())
+                if(tripPlan.isSpecialApprove){
+                    tripPlan.saved = 0
+                }else{
+                    tripPlan.saved = savedMoney
+                }
+                templateName = "qm_notify_invoice_all_pass"
+            } else {
+                templateName = "qm_notify_invoice_not_pass"
+                tripPlan.readNumber = 0
+            }
+
+            await tripPlan.save()
+
+            //发送通知消息。
+            let staff = await Models.staff.get(tripPlan["accountId"])
+            if(isNeedMsg) {
+                //发送通知。
+            }
+
+            //如果出差已经完成，并且节省反积分，并且非特别审批，增加员工积分。
+            if (tripPlan.status == EPlanStatus.COMPLETE && tripPlan.score > 0 && !tripPlan.isSpecialApprove) {
+                let pc = Models.pointChange.create({
+                    currentPoints: staff.balancePoints, status: 1,
+                    staff: staff, company: staff.company,
+                    points: tripPlan.score, remark: `节省反积分${tripPlan.score}`,
+                    orderId: tripPlan.id});
+                await pc.save();
+                if(!staff.totalPoints){
+                    staff.totalPoints = 0;
+                }
+                if(!tripPlan.score){
+                    tripPlan.score = 0;
+                }
+                if(!staff.balancePoints){
+                    staff.balancePoints = 0;
+                }
+                if(typeof staff.totalPoints == 'string'){
+                    staff.totalPoints = Number(staff.totalPoints);
+                }
+                if(typeof tripPlan.score == 'string'){
+                    tripPlan.score = Number(tripPlan.score);
+                }
+                if(typeof staff.balancePoints == 'string'){
+                    staff.balancePoints = Number(staff.balancePoints);
+                }
+                staff.totalPoints = staff.totalPoints + tripPlan.score;
+                staff.balancePoints = staff.balancePoints + tripPlan.score;
+                let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: user.id, remark: `增加员工${tripPlan.score}积分`});
+                await Promise.all([staff.save(), log.save()]);
+            }
+
+        }).catch(err => {
+            logger.error("finish trip fail: " + err)
+            throw err
+        })
+    }
 
     @clientExport
     @requireParams(['name', 'createUser', 'companyId'], ['code'])
