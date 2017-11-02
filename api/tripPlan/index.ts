@@ -645,14 +645,18 @@ class TripPlanModule {
 
         return DB.transaction(async function(t) {
 
-            let user = {id: ""} //agencyUser暂时获取不到，写死。
+            let user = {id: "ef49eb60-4fb6-11e6-bc66-0db77219d51b"} //agencyUser暂时获取不到，写死默认的代理商
 
-            expendArray.forEach(async function(expend){ //根据提供的消费明细更新tripDetail
+            for (let expend of expendArray) {
+
                 let tripDetail = await Models.tripDetail.get(expend.id)
+
                 tripDetail.expenditure = expend.expenditure
                 tripDetail.personalExpenditure = expend.personalExpenditure
                 tripDetail.status = EPlanStatus.COMPLETE //从oa系统中传递过来意味着报销完成。
-                tripDetail.save()
+
+                await tripDetail.save()
+
                 let templateValue: any = {}
                 switch (tripDetail.type) {  //根据tripType生成相应的log
                     case ETripType.OUT_TRIP:
@@ -676,8 +680,8 @@ class TripPlanModule {
                 }
 
                 let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, tripDetailId: tripDetail.id, userId: user.id, remark: `${templateValue.tripType}票据审核通过`});
-                log.save();
-            })
+                await log.save();
+            }
 
             await updateTripPlanExpenditure(tripPlan) //跟新tripPlan的消费信息。
 
@@ -685,7 +689,7 @@ class TripPlanModule {
             let isNeedMsg = true
             let tripDetails = await tripPlan.getTripDetails({})
 
-            tripDetails.forEach(async (item) => { //判断是否tripPlan的所有的detail都审核完成。
+            tripDetails.map(async (item) => { //判断是否tripPlan的所有的detail都审核完成。
                 if (item.status != EPlanStatus.COMPLETE) {
                     allDetailsPass = false
                     isNeedMsg = false

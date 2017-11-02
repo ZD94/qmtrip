@@ -6,12 +6,9 @@
 
 import {AbstractController, Restful, Router} from "@jingli/restful"
 import API from '@jingli/dnode-api'
-import {Models} from "_types"
-import {EPlanStatus, ExpendItem} from "_types/tripPlan"
-import config = require("@jingli/config")
-var TripApproveModule= require("TripApproveModule")
+var TripApproveModule = require("../../api/tripPlan")
 
-@Restful('/approve')
+@Restful('/tripPolicy')
 export class TripController extends AbstractController {
 
     constructor() {
@@ -29,7 +26,7 @@ export class TripController extends AbstractController {
         let expenditure = req.body.expenditure
 
         try {
-            await TripApproveModule.finishTripPlan({id: id, expenditure: expenditure})
+            await TripApproveModule.finishTripPlan({id: id, expendArray: expenditure})
             res.json(this.reply(0,null))
         } catch (err) {
             res.json(this.reply(502, err))
