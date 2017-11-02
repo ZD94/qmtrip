@@ -6,35 +6,43 @@ export default class PlaceModule {
     @clientExport
     @requireParams(['id'])
     static async getCityById(id) {
-        const city = await restfulAPIUtil.proxyHttp({
-            url: `/place/${id}`,
-            method: 'GET'
+        const city = await restfulAPIUtil.operateOnModel({
+            model: `/place/${id}`,
+            params: {
+                method: 'GET'
+            }
         });
         return city;
     }
 
     @clientExport
     static async findByKeyword(keyword: string) {
-        return await restfulAPIUtil.proxyHttp({
-            url: `/place/search/${encodeURIComponent(keyword)}`,
-            method: 'GET'
-        })
+        return await restfulAPIUtil.operateOnModel({
+            model: `/place/search/${encodeURIComponent(keyword)}`,
+            params: {
+                method: 'GET'
+            }
+        });
     }
 
     @clientExport
     static async findSubCities(parentId: string) {
-        return await restfulAPIUtil.proxyHttp({
-            url: `/place/${parentId}/children`,
-            method: 'GET'
-        })
+        return await restfulAPIUtil.operateOnModel({
+            model: `/place/${parentId}/children`,
+            params: {
+                method: 'GET'
+            }
+        });
     }
 
     @clientExport
     static async findNearCitiesByGC(longitude: number, latitude: number) {
-        return await restfulAPIUtil.proxyHttp({
-            url: `/place/nearby/${longitude}/${latitude}`,
-            method: 'GET'
-        })
+        return await restfulAPIUtil.operateOnModel({
+            model: `/place/nearby/${longitude}/${latitude}`,
+            params: {
+                method: 'GET'
+            }
+        });
     }
 
 }

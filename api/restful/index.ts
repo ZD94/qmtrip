@@ -5,6 +5,7 @@
 
 import {Staff} from "_types/staff";
 var request = require("request");
+const rp = require('request-promise');
 import config = require("@jingli/config");
 import crypto = require("crypto");
 import cache from "common/cache";
@@ -23,16 +24,16 @@ export async function getAgentToken() {
         return token;
     }
     const timestamp = Date.now();
-    const resp: any = await request({
-        url: `${config.cloudAPI}/agent/gettoken`,
+    const resp: any = await rp({
+        uri:`${config.cloudAPI}/agent/gettoken`,
         method: 'POST',
         body: {
             appId,
             timestamp,
             sign: md5(`${config.agent.appSecret}|${timestamp}`)
-        },
-        json: true
+        }
     });
+
     if(resp.code === 0) {
         await cache.write(appId, resp.data.token, resp.data.expires);
         return resp.data.token;
@@ -50,8 +51,8 @@ export async function getCompanyTokenByAgent(companyId: string) {
     }
 
     const token = await getAgentToken();
-    const resp: any = await request({
-        url: `${config.cloudAPI}/agent/company/${companyId}/token`,
+    const resp: any = await rp({
+        uri: `${config.cloudAPI}/agent/company/${companyId}/token`,
         method: 'GET',
         headers: { token },
         json: true
@@ -68,27 +69,22 @@ export class RestfulAPIUtil {
     async operateOnModel(options: {
         model: string,
         params?: any,
-        flag?: any
+        addUrl?: string
     }):Promise<any> {
-        const token = await getAgentToken();
-        let {params, model, flag} = options;
+        let {params, model, addUrl = ''} = options;
         let {fields, method} = params;
         let currentCompanyId = fields['companyId'];
         if (!currentCompanyId || typeof(currentCompanyId) == 'undefined') {
             let staff = await Staff.getCurrent();
             currentCompanyId = staff["companyId"];
         }
-
         let companyToken = await getCompanyTokenByAgent(currentCompanyId);
         if (!companyToken) {
-
+            throw new Error('换取 token 失败！')
         }
-        let url;
-        if (!flag) {
-            url = config.cloudAPI + `/${model}`;
-        }
-        else {
-            url = config.cloudAPI + `/${model}`
+        let url = config.cloudAPI + `/${model}`;
+        if(addUrl){
+            url += `/${addUrl}`
         }
         let result: any;
 
