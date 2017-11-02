@@ -14,6 +14,10 @@ import{staffOpts} from "../ldap";
 import syncData from "libs/asyncOrganization/syncData";
 var API = require("@jingli/dnode-api");
 import { getSession } from "@jingli/dnode-api";
+import * as config from '@jingli/config';
+const request = require('request-promise');
+const md5 = require('md5');
+import cache from 'common/cache';
 
 //生成登录凭证
 export async function makeAuthenticateToken(accountId, os?: string, expireAt?: Date): Promise<LoginResponse> {

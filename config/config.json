@@ -107,5 +107,9 @@
   "perDayRegisterEmail": "",
   "cloud":"${JL_APP_CLOUD}",
   "cloudAPI":"${JL_APP_CLOUDAPI}",
-  "cloudKey":"${JL_APP_CLOUDKEY}"
+  "cloudKey":"${JL_APP_CLOUDKEY}",
+  "agent": {
+    "appId": "${{JL_APP_CLOUD_APP_ID}}",
+    "appSecret": "${{JL_APP_CLOUD_APP_SECRET}}"
+  }
 }
