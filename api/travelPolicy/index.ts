@@ -18,7 +18,7 @@ import { FindResult, PaginateInterface } from "common/model/interface";
 import setPrototypeOf = Reflect.setPrototypeOf;
 import {AgencyUser} from "_types/agency"
 var request = require("request");
-import { getToken } from 'api/auth/authentication';
+import { getAgentToken, getCompanyTokenByAgent } from 'api/restful';
 
 let API = require("@jingli/dnode-api");
 import {DefaultRegion, DefaultRegionId} from "_types";
@@ -847,7 +847,8 @@ export default class TravelPolicyModule{
             currentCompanyId = staff["companyId"];
         }
 
-        const token = await getToken();
+        const agentToken = await getAgentToken();
+        const token = await getCompanyTokenByAgent(currentCompanyId);
         let url = Config.cloudAPI + `/${model}`;
         if(addUrl){
             url = url + `/${addUrl}`

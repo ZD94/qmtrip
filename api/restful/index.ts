@@ -5,16 +5,72 @@
 
 import {Staff} from "_types/staff";
 var request = require("request");
-var Config = require("@jingli/config");
-import { getToken } from 'api/auth/authentication';
+import config = require("@jingli/config");
+import crypto = require("crypto");
+import cache from "common/cache";
+
+function md5(str) {
+    return crypto.createHash("md5").update(str).digest('hex')
+}
+
+export async function getAgentToken() {
+    const appId = config.agent.appId;
+    if(!appId) {
+        return null;
+    }
+    const token = await cache.read(appId);
+    if(token) {
+        return token;
+    }
+    const timestamp = Date.now();
+    const resp: any = await request({
+        url: `${config.cloudAPI}/agent/gettoken`,
+        method: 'POST',
+        body: {
+            appId,
+            timestamp,
+            sign: md5(`${config.agent.appSecret}|${timestamp}`)
+        },
+        json: true
+    });
+    if(resp.code === 0) {
+        await cache.write(appId, resp.data.token, resp.data.expires);
+        return resp.data.token;
+    }
+    return null;
+}
+
+export async function getCompanyTokenByAgent(companyId: string) {
+    if(!companyId) {
+        return null;
+    }
+    const agentToken = await cache.read(companyId);
+    if(agentToken) {
+        return agentToken;
+    }
+
+    const token = await getAgentToken();
+    const resp: any = await request({
+        url: `${config.cloudAPI}/agent/company/${companyId}/token`,
+        method: 'GET',
+        headers: { token },
+        json: true
+    });
+    if(resp.code === 0) {
+        await cache.write(companyId, resp.data.token, resp.data.expires);
+        return resp.data.token;
+    }
+    return null;
+}
 
 export class RestfulAPIUtil {
+
     async operateOnModel(options: {
         model: string,
         params?: any,
         flag?: any
     }):Promise<any> {
-        const token = await await getToken();
+        const token = await getAgentToken();
         let {params, model, flag} = options;
         let {fields, method} = params;
         let currentCompanyId = fields['companyId'];
@@ -23,12 +79,16 @@ export class RestfulAPIUtil {
             currentCompanyId = staff["companyId"];
         }
 
+        let companyToken = await getCompanyTokenByAgent(currentCompanyId);
+        if (!companyToken) {
+
+        }
         let url;
         if (!flag) {
-            url = Config.cloudAPI + `/${model}`;
+            url = config.cloudAPI + `/${model}`;
         }
         else {
-            url = Config.cloudAPI + `/${model}`
+            url = config.cloudAPI + `/${model}`
         }
         let result: any;
 
@@ -55,7 +115,7 @@ export class RestfulAPIUtil {
                 method: method,
                 qs: qs,
                 headers: {
-                    token
+                    token: companyToken
                 }
             }, (err, resp, result) => {
                 if (err) {
@@ -75,11 +135,11 @@ export class RestfulAPIUtil {
         method:string;
         qs?:object;
     }){
-        const token = await getToken();
+        const token = await getAgentToken();
         let {url, body={}, method="get", qs={}} = params;
         return new Promise((resolve, reject) => {
             request({
-                uri: Config.cloudAPI + url,
+                uri: config.cloudAPI + url,
                 body,
                 json: true,
                 method,

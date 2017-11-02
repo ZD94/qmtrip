@@ -6,7 +6,7 @@ import Sequelize = require('sequelize');
 import config = require('@jingli/config');
 var request = require("request");
 var path = require("path");
-import { getToken } from 'api/auth/authentication';
+import { getAgentToken, getCompanyTokenByAgent } from 'api/restful';
 
 export = async function(db, transaction) {
 
@@ -39,7 +39,7 @@ export = async function(db, transaction) {
 
 
 async function requestTravelPolicy(companyId, isDefault){
-    const token = await getToken();
+    const token = await getCompanyTokenByAgent(companyId);
     let result = await new Promise<any>((resolve, reject) => {
         let qs: { [index: string]: string} = {
             companyId: companyId,
