@@ -15,7 +15,7 @@ import syncData from "libs/asyncOrganization/syncData";
 var API = require("@jingli/dnode-api");
 import { getSession } from "@jingli/dnode-api";
 import * as config from '@jingli/config';
-import { restfulAPIUtil } from 'api/restful';
+const request = require('request-promise');
 const md5 = require('md5');
 import cache from 'common/cache';
 
@@ -276,14 +276,15 @@ export async function getToken() {
         return token;
     }
     const timestamp = Date.now();
-    const resp: any = await restfulAPIUtil.proxyHttp({
-        url: `/agent/gettoken`,
+    const resp: any = await request({
+        url: `${config['cloudAPI']}/agent/gettoken`,
         method: 'POST',
         body: {
             appId,
             timestamp,
             sign: md5(`${config['JL_APP_SECRET']}|${timestamp}`)
-        }
+        },
+        json: true
     });
     if(resp.code === 0) {
         await cache.write(appId, resp.data.token, resp.data.expires);
