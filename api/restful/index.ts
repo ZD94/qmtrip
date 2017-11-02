@@ -6,6 +6,7 @@
 import {Staff} from "_types/staff";
 var request = require("request");
 var Config = require("@jingli/config");
+import { getToken } from 'api/auth/authentication';
 
 export class RestfulAPIUtil {
     async operateOnModel(options: {
@@ -13,6 +14,7 @@ export class RestfulAPIUtil {
         params?: any,
         flag?: any
     }):Promise<any> {
+        const token = await await getToken();
         let {params, model, flag} = options;
         let {fields, method} = params;
         let currentCompanyId = fields['companyId'];
@@ -23,7 +25,7 @@ export class RestfulAPIUtil {
 
         let url;
         if (!flag) {
-            url = Config.cloudAPI + `/company/${currentCompanyId}/${model}`;
+            url = Config.cloudAPI + `/${model}`;
         }
         else {
             url = Config.cloudAPI + `/${model}`
@@ -53,7 +55,7 @@ export class RestfulAPIUtil {
                 method: method,
                 qs: qs,
                 headers: {
-                    key: Config.cloudKey
+                    token
                 }
             }, (err, resp, result) => {
                 if (err) {
@@ -73,6 +75,7 @@ export class RestfulAPIUtil {
         method:string;
         qs?:object;
     }){
+        const token = await getToken();
         let {url, body={}, method="get", qs={}} = params;
         return new Promise((resolve, reject) => {
             request({
@@ -82,7 +85,7 @@ export class RestfulAPIUtil {
                 method,
                 qs,
                 headers: {
-                    key: Config.cloudKey
+                    token
                 }
             }, (err, resp, result) => {
                 if (err) {

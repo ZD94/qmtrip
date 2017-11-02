@@ -18,6 +18,7 @@ import { FindResult, PaginateInterface } from "common/model/interface";
 import setPrototypeOf = Reflect.setPrototypeOf;
 import {AgencyUser} from "_types/agency"
 var request = require("request");
+import { getToken } from 'api/auth/authentication';
 
 let API = require("@jingli/dnode-api");
 import {DefaultRegion, DefaultRegionId} from "_types";
@@ -846,7 +847,8 @@ export default class TravelPolicyModule{
             currentCompanyId = staff["companyId"];
         }
 
-        let url = Config.cloudAPI + `/company/${currentCompanyId}/${model}`;
+        const token = await getToken();
+        let url = Config.cloudAPI + `/${model}`;
         if(addUrl){
             url = url + `/${addUrl}`
         }
@@ -873,7 +875,7 @@ export default class TravelPolicyModule{
                 method: method,
                 qs: qs,
                 headers: {
-                    key: Config.cloudKey
+                    token
                 }
             }, (err, resp, result) => {
                 if (err) {

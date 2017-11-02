@@ -14,6 +14,10 @@ import{staffOpts} from "../ldap";
 import syncData from "libs/asyncOrganization/syncData";
 var API = require("@jingli/dnode-api");
 import { getSession } from "@jingli/dnode-api";
+import * as config from '@jingli/config';
+import { restfulAPIUtil } from 'api/restful';
+const md5 = require('md5');
+import cache from 'common/cache';
 
 //生成登录凭证
 export async function makeAuthenticateToken(accountId, os?: string, expireAt?: Date): Promise<LoginResponse> {
@@ -261,3 +265,29 @@ export async function logout(params: {}): Promise<boolean> {
     }
     return true;
 };
+
+export async function getToken() {
+    const appId = config['JL_APP_ID'];
+    if(!appId) {
+        return null;
+    }
+    const token = await cache.read(appId);
+    if(token) {
+        return token;
+    }
+    const timestamp = Date.now();
+    const resp: any = await restfulAPIUtil.proxyHttp({
+        url: `/agent/gettoken`,
+        method: 'POST',
+        body: {
+            appId,
+            timestamp,
+            sign: md5(`${config['JL_APP_SECRET']}|${timestamp}`)
+        }
+    });
+    if(resp.code === 0) {
+        await cache.write(appId, resp.data.token, resp.data.expires);
+        return resp.data.token;
+    }
+    return null;    
+}
