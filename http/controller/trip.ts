@@ -29,7 +29,7 @@ export class TripController extends AbstractController {
             await TripApproveModule.finishTripPlan({id: id, expendArray: expenditure})
             res.json(this.reply(0,null))
         } catch (err) {
-            res.json(this.reply(502, err))
+            res.json(this.reply(502, err)) //暂时将code设置为502，之后完善错误信息。
         }
     }
 
