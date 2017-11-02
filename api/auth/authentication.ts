@@ -267,7 +267,7 @@ export async function logout(params: {}): Promise<boolean> {
 };
 
 export async function getToken() {
-    const appId = config['JL_APP_ID'];
+    const appId = config.company.appId;
     if(!appId) {
         return null;
     }
@@ -277,12 +277,12 @@ export async function getToken() {
     }
     const timestamp = Date.now();
     const resp: any = await request({
-        url: `${config['cloudAPI']}/agent/gettoken`,
+        url: `${config.cloudAPI}/agent/gettoken`,
         method: 'POST',
         body: {
             appId,
             timestamp,
-            sign: md5(`${config['JL_APP_SECRET']}|${timestamp}`)
+            sign: md5(`${config.company.appSecret}|${timestamp}`)
         },
         json: true
     });
@@ -291,4 +291,23 @@ export async function getToken() {
         return resp.data.token;
     }
     return null;    
+}
+
+export async function getAgentToken(companyId: string) {
+    if(!companyId) return null;
+    const agentToken = await cache.read(companyId);
+    if(agentToken) return agentToken;
+
+    const token = await getToken();
+    const resp: any = await request({
+        url: `${config.cloudAPI}/agent/company/${companyId}/token`,
+        method: 'GET',
+        headers: { token },
+        json: true
+    });
+    if(resp.code === 0) {
+        await cache.write(companyId, resp.data.token, resp.data.expires);
+        return resp.data.token;
+    }
+    return null;
 }
