@@ -114,7 +114,7 @@
     "fsevents": "^1.0.5"
   },
   "devDependencies": {
-    "@types/request-promise": "^4.1.35",
+    "@types/request-promise": "4.1.35",
     "angular-async-filter": "^1.0.1",
     "angular-bluebird-promises": "^1.0.2",
     "angular-chart.js": "^1.0.2",
