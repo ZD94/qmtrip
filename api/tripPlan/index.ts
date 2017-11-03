@@ -1934,14 +1934,21 @@ class TripPlanModule {
             checkInDate:  params.data['checkInDate'] || '',
             checkOutDate: params.data['checkOutDate'] || ''
         };
-        let staff = await Staff.getCurrent();
-        let companyId = staff.company.id;
 
-        let resGet = await RestfulAPIUtil.proxyHttp({
-            url: `/company/${companyId}/supplier/getBookLink`,
-            body: reqData,
-            method: 'POST'
-        });
+        // let resGet = await RestfulAPIUtil.proxyHttp({
+        //     url: `/company/${companyId}/supplier/getBookLink`,
+        //     body: reqData,
+        //     method: 'POST'
+        // });
+        let resGet = await RestfulAPIUtil.operateOnModel({
+            model: 'supplier',
+            params: {
+                fields: reqData,
+                method: 'POST'
+            },
+            addUrl: '/getBookLink'
+        })
+        console.log('res[data]', resGet['data']);
         return resGet['data'];
     }
 
