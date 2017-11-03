@@ -196,7 +196,7 @@ export default class ApiAuth {
      * @returns {boolean}
      */
     @clientExport
-    static async reSendActiveLink(params: {email: string, accountId?: string, origin?: string}): Promise<boolean> {
+    static async reSendActiveLink(params: {email: string, accountId?: string, origin?: string, version?: number}): Promise<boolean> {
         var mobileOrEmail = params.email;
         var accountId = params.accountId;
         var account: Account;
@@ -221,7 +221,7 @@ export default class ApiAuth {
         if(staff && staff.id){
             account_id = staff.id;
         }
-        await _sendActiveEmail(account_id, params.origin);
+        await _sendActiveEmail(account_id, params.origin, params.version);
         return true;
     }
 
@@ -930,7 +930,7 @@ export default class ApiAuth {
      * @returns {Promise} true|error
      */
     @clientExport
-    static async sendImportStaffEmail(params: {accountId: string}): Promise<boolean> {
+    static async sendImportStaffEmail(params: {accountId: string, version?: number}): Promise<boolean> {
         var accountId = params.accountId;
 
         if(!accountId) {
@@ -956,11 +956,18 @@ export default class ApiAuth {
         var oneDay = 24 * 60 * 60 * 1000
         var timestamp = Date.now() + oneDay;  //失效时间1天
         var sign = makeActiveSign(importStaffEmailToken, acc.id, timestamp);
-        var url = "accountId=" + acc.id + "&timeStamp=" + timestamp + "&sign=" + sign;
 
-        var vals: any = {
-            url: C.host + "/index.html#/admin/download-template?" + url
-        };
+        var url
+        var vals
+        if (params.version && params.version == 2) {
+            //#@template v2 url生成方式。
+        } else {
+            url = "accountId=" + acc.id + "&timeStamp=" + timestamp + "&sign=" + sign
+            vals = {
+                url: C.host + "/index.html#/admin/download-template?" + url
+            }
+        }
+
         let key = 'qm_import_staff';
 
         return API.notify.submitNotify({
@@ -998,7 +1005,7 @@ export default class ApiAuth {
      * @public
      */
     @requireParams(["email"], accountCols)
-    static async newAccount(data: {email: string, mobile?: string, pwd?: string, type?: Number, status?: Number, companyName?: string, id?: string}) {
+    static async newAccount(data: {email: string, mobile?: string, pwd?: string, type?: Number, status?: Number, companyName?: string, id?: string, version?: number}) {
         if(!data) {
             throw L.ERR.DATA_NOT_EXIST();
         }
@@ -1070,7 +1077,7 @@ export default class ApiAuth {
         }
 
         if(account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
-            return _sendActiveEmail(account.id)
+            return _sendActiveEmail(account.id, null, data.version)
                 .then(function() {
                     return account;
                 })
@@ -1316,7 +1323,7 @@ export default class ApiAuth {
     static removeByTest = byTest.removeByTest;
 }
 
-async function _sendActiveEmail(accountId: string, origin?: string) {
+async function _sendActiveEmail(accountId: string, origin?: string, version?: number) {
     let staff = await Models.staff.get(accountId);
     let account_id = accountId;
     if(staff && staff.accountId){
@@ -1328,8 +1335,14 @@ async function _sendActiveEmail(accountId: string, origin?: string) {
     var activeToken = utils.getRndStr(6);
     var sign = makeActiveSign(activeToken, account.id, expireAt);
     let host = origin ? origin : C.host;
-    var url = host + "/index.html#/login/active?accountId=" + account.id + "&sign=" + sign + "&timestamp=" + expireAt + "&email=" + account.email;
-    var appMessageUrl = "#/staff/staff-info";
+    var url
+    var appMessageUrl
+    if (version && version == 2) {
+        //#@template v2 url生成。
+    } else {
+        url = host + "/index.html#/login/active?accountId=" + account.id + "&sign=" + sign + "&timestamp=" + expireAt + "&email=" + account.email;
+        appMessageUrl = "#/staff/staff-info";
+    }
     try {
         url = await API.wechat.shorturl({longurl: url});
     } catch(err) {

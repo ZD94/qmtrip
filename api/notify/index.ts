@@ -322,7 +322,7 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
 }
 
 //v2Url的生成方式。
-export function v2UrlGenerator(baseUrl: string, params?: {[key: string]: string}): string {
-    let values = _.values(params).map(val => encodeURIComponent(val))
+export function v2UrlGenerator(baseUrl: string, params?: Array<string>): string {
+    let values = params.map(val => encodeURIComponent(val))
     return (baseUrl + "/" + values.join("/")).replace("//","/")
 }

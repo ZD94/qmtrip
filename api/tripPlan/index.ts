@@ -336,7 +336,7 @@ class TripPlanModule {
     @requireParams(['id'])
     @modelNotNull('tripPlan')
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
-    static async commitTripPlan(params: {id: string, staffId: string}): Promise<boolean> {
+    static async commitTripPlan(params: {id: string, staffId: string, version?: number}): Promise<boolean> {
         let {id, staffId} = params;
 
         let currentStaff = await Staff.getCurrent();
@@ -369,7 +369,14 @@ class TripPlanModule {
         //更改状态
         tripPlan.isCommit = true;
         tripPlan = await tryUpdateTripPlanStatus(tripPlan, EPlanStatus.AUDITING);
-        let notifyUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
+
+        let notifyUrl
+        if (params.version == 2) {
+            //#@template
+            notifyUrl = API.notify.v2UrlGenerator(`${config.host}/agency.html#/travelRecord/TravelDetail`, [tripPlan.id])
+        } else{
+            notifyUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
+        }
         await TripPlanModule.notifyDesignatedAcount({notifyUrl: notifyUrl, staffId: staffId});
 
         let default_agency = config.default_agency;
@@ -387,8 +394,17 @@ class TripPlanModule {
             }
             let staff = await Models.staff.get(staffId);
             let company = await tripPlan.getCompany();
-            let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
-            let appMessageUrl = `#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
+
+            let auditUrl;
+            let appMessageUrl;
+            if (params.version && params.version == 2) {
+                //#@template 支持v2
+                auditUrl = API.notify.v2UrlGenerator(`${config.host}/agency.html#/travelRecord/TravelDetail`,[tripPlan.id])
+                appMessageUrl = API.notify.v2UrlGenerator(`#/travelRecord/TravelDetail`,[tripPlan.id])
+            } else {
+                auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
+                appMessageUrl = `#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
+            }
             try{
                 await API.notify.submitNotify({
                     email: auditEmail,
@@ -417,7 +433,7 @@ class TripPlanModule {
     @clientExport
     @requireParams(['id', 'auditResult', "invoiceId"], ["reason", "expenditure"])
     @modelNotNull('tripDetail')
-    static async auditPlanInvoice(params: {id: string, auditResult: EAuditStatus, expenditure?: number, reason?: string, invoiceId?: string}): Promise<boolean> {
+    static async auditPlanInvoice(params: {id: string, auditResult: EAuditStatus, expenditure?: number, reason?: string, invoiceId?: string, version?: number}): Promise<boolean> {
 
         const SAVED2SCORE = config.score_ratio;
         let {id, expenditure, reason, auditResult} = params;
@@ -536,10 +552,17 @@ class TripPlanModule {
             if(isNeedMsg){
                 //所有票据都处理了,发送通知
 
-                let self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
-                let finalUrl = `#/trip/list-detail?tripid=${tripPlan.id}`;
-                finalUrl = encodeURIComponent(finalUrl);
-                let appMessageUrl = `#/judge-permission/index?id=${tripPlan.id}&modelName=tripPlan&finalUrl=${finalUrl}`;
+                let self_url: string = ""
+                let appMessageUrl: string = ""
+
+                if (params.version && params.version == 2) {
+                    //v2url
+                } else {
+                    self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
+                    let finalUrl = `#/trip/list-detail?tripid=${tripPlan.id}`;
+                    finalUrl = encodeURIComponent(finalUrl);
+                    appMessageUrl = `#/judge-permission/index?id=${tripPlan.id}&modelName=tripPlan&finalUrl=${finalUrl}`;
+                }
 
                 try {
                     await API.notify.submitNotify({
