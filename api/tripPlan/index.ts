@@ -39,6 +39,8 @@ import {EApproveStatus} from "../../_types/approve/types";
 import {plugins} from "../../libs/oa/index";
 import {Supplier} from "../../_types/company/supplier";
 const projectCols = Project['$fieldnames'];
+import {restfulAPIUtil} from "api/restful"
+let RestfulAPIUtil = restfulAPIUtil;
 
 interface ReportInvoice {
     type: string;
@@ -1901,7 +1903,7 @@ class TripPlanModule {
                 hotelBookLink:   'http://m.ctrip.com/webapp/hotel/'
             },
             qunar: {
-                supplierKey:     'qunar_com',
+                supplierKey:     'qunar_com_m',
                 trafficBookLink: 'https://touch.qunar.com/h5/flight',
                 hotelBookLink:   'https://touch.qunar.com/hotel'
             },
@@ -1921,7 +1923,7 @@ class TripPlanModule {
                 hotelBookLink:   'https://www.kiwi.com/cn/'
             }
         };
-        return await Supplier.getBookLink({
+        let reqData = {
             supplier:     transfer[params.data['agent']] || transfer['ctrip'],
             data:         params.data,
             reserveType:  params.reserveType,
@@ -1931,7 +1933,16 @@ class TripPlanModule {
             city:         params.data['city'] || '',
             checkInDate:  params.data['checkInDate'] || '',
             checkOutDate: params.data['checkOutDate'] || ''
+        };
+        let staff = await Staff.getCurrent();
+        let companyId = staff.company.id;
+
+        let resGet = await RestfulAPIUtil.proxyHttp({
+            url: `/company/${companyId}/supplier/getBookLink`,
+            body: reqData,
+            method: 'POST'
         });
+        return resGet['data'];
     }
 
 

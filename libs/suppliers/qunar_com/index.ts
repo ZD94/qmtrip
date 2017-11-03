@@ -28,7 +28,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         }
 
         if(reserveType == "travel_train"){
-            bookLink = await this.getTrainTicketReserveLink({fromCity: options.fromCity, toCity: options.toCity, leaveDate: options.leaveDate});
+            bookLink = await this.getTrainTicketReserveLink({data: options.data, fromCity: options.fromCity, toCity: options.toCity, leaveDate: options.leaveDate});
         }
 
         if(reserveType == "hotel"){
