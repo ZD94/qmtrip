@@ -5,7 +5,7 @@
 
 import {Staff} from "_types/staff";
 var request = require("request");
-const rp = require('request-promise');
+const axios = require('axios');
 import config = require("@jingli/config");
 import crypto = require("crypto");
 import cache from "common/cache";
@@ -24,15 +24,11 @@ export async function getAgentToken() {
         return token;
     }
     const timestamp = Date.now();
-    const resp: any = await rp({
-        uri:`${config.cloudAPI}/agent/gettoken`,
-        method: 'POST',
-        body: {
+    const resp: any = await axios.post(`${config.cloudAPI}/agent/gettoken`,{
             appId,
             timestamp,
             sign: md5(`${config.agent.appSecret}|${timestamp}`)
-        }
-    });
+        }).then(res => res.data)
 
     if(resp.code === 0) {
         await cache.write(appId, resp.data.token, resp.data.expires);
@@ -51,12 +47,10 @@ export async function getCompanyTokenByAgent(companyId: string) {
     }
 
     const token = await getAgentToken();
-    const resp: any = await rp({
-        uri: `${config.cloudAPI}/agent/company/${companyId}/token`,
-        method: 'GET',
-        headers: { token },
-        json: true
-    });
+    const resp: any = await axios.get(`${config.cloudAPI}/agent/company/${companyId}/token`,{
+        headers: { token } 
+    }).then(res => res.data);
+    
     if(resp.code === 0) {
         await cache.write(companyId, resp.data.token, resp.data.expires);
         return resp.data.token;
