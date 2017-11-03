@@ -23,6 +23,7 @@
     "@jingli/logger": "^1.0.1",
     "@jingli/patch-dnode-scrub": "^1.0.0",
     "@jingli/perf": "^1.0.0",
+    "@jingli/restful": "^0.1.8",
     "@types/bluebird": "^3.5.2",
     "@types/bluebird-global": "^3.5.1",
     "@types/callsite": "^1.0.30",
@@ -44,7 +45,6 @@
     "@types/orchestrator": "^0.3.0",
     "@types/redis": "^2.6.0",
     "@types/request": "0.0.45",
-    "@types/request-promise": "4.1.35",
     "@types/sequelize": "^4.0.74",
     "@types/serve-static": "^1.7.31",
     "@types/sockjs-node": "^0.3.28",
@@ -114,6 +114,7 @@
     "fsevents": "^1.0.5"
   },
   "devDependencies": {
+    "@types/request-promise": "4.1.35",
     "angular-async-filter": "^1.0.1",
     "angular-bluebird-promises": "^1.0.2",
     "angular-chart.js": "^1.0.2",
@@ -187,7 +188,7 @@
     "lessify": "^1.0.1",
     "load-script": "^1.0.0",
     "lunar-calendar": "^0.1.4",
-    "md5": "^2.1.0",
+    "md5": "^2.2.1",
     "merge2": "^1.0.2",
     "notie": "^3.9.2",
     "postcss": "^5.1.2",
