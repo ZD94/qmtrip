@@ -9,6 +9,7 @@ const axios = require('axios');
 import config = require("@jingli/config");
 import crypto = require("crypto");
 import cache from "common/cache";
+import {Models} from "_types"
 
 function md5(str) {
     return crypto.createHash("md5").update(str).digest('hex')
@@ -70,6 +71,11 @@ export class RestfulAPIUtil {
         let currentCompanyId = fields['companyId'];
         if (!currentCompanyId || typeof(currentCompanyId) == 'undefined') {
             let staff = await Staff.getCurrent();
+            if(!staff || typeof(staff) == 'undefined') {
+                //使用测试数据的staff-风清扬
+                let staffs = await Models.staff.find({where: {}});
+                staff = staffs[0];
+            }
             currentCompanyId = staff["companyId"];
         }
         let companyToken = await getCompanyTokenByAgent(currentCompanyId);
