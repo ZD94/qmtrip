@@ -61,6 +61,7 @@ export abstract class OaDepartment{
     }
 
     async sync(params?:{company?: Company, oaDepartment?: OaDepartment, from?: string}): Promise<Department>{
+        console.info(this.name, "department sync begin==================================");
         if(!params) params = {};
         let self = params.oaDepartment || this;
         let company = self.company;
@@ -191,6 +192,7 @@ export abstract class OaDepartment{
             //父级部门不存在同步父级部门
             // await oaParent.sync({company: company});
         }
+        console.info(this.name, "department sync end==================================");
 
         return result;
     }
