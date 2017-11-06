@@ -502,6 +502,9 @@ class TripApproveModule {
         tripStartAt:Date
     }):Promise<Date> {
         let {type, config, submitAt, tripStartAt} = params;
+        if(typeof(config) == 'string') {
+            config = JSON.parse(config)
+        }
         config = <AutoApproveConfig>config;
         let autoApproveDateTime: Date;
         let expectedApproveTime: Date;
@@ -544,7 +547,6 @@ class TripApproveModule {
                 } else {
                     autoApproveDateTime = moment(submitAt).add(1, 'hours').toDate();
                 }
-                break;
         }
         return autoApproveDateTime;
     }

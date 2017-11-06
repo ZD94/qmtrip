@@ -164,18 +164,20 @@ class CompanyModule {
 
         //jlbudget create company record.
         try{
-            let jlBudgetCompany = await RestfulAPIUtil.proxyHttp({
-                url : "/company",
-                method:"post",
-                body:{
-                    id : company.id,
-                    name:company.name,
-                    priceLimitType: HotelPriceLimitType.NO_SET,
-                    appointedPubilcSuppliers: company.appointedPubilcSuppliers
+            let jlBudgetCompany = await RestfulAPIUtil.operateOnModel({
+                model : "company",
+                params: {
+                    fields: {
+                        id : company.id,
+                        name:company.name,
+                        priceLimitType: HotelPriceLimitType.NO_SET,
+                        appointedPubilcSuppliers: company.appointedPubilcSuppliers
+                    },
+                    method:"post"
                 }
             });
         }catch(e){
-            console.error(e);
+            throw e;
         }
 
         //jlbudget create account record. Waiting jlbudget account identifie online.
@@ -621,8 +623,7 @@ class CompanyModule {
                     id: params['companyId']
                 },
                 method: 'GET',
-            },
-            flag: true
+            }
         });
         let res = resPublic.data.appointedPubilcSuppliers;
         console.log('publicres', res);
@@ -673,8 +674,7 @@ class CompanyModule {
                     id: params['companyId']
                 },
                 method:'GET',
-            },
-            flag: true
+            }
         });
         // console.log('resPublic', resPublic.data.appointedPubilcSuppliers);
 
@@ -708,8 +708,7 @@ class CompanyModule {
             params: {
                 fields: params,
                 method: 'GET',
-            },
-            flag: true
+            }
         });
 
         if(commonSuppliers.code == 0){
@@ -721,8 +720,7 @@ class CompanyModule {
                     params: {
                         fields: {id: commonSupplierId},
                         method: 'GET',
-                    },
-                    flag: true
+                    }
                 });
 
                 if(commonSupplier.code == 0){
