@@ -655,7 +655,7 @@ class TripPlanModule {
 
         return DB.transaction(async function(t) {
 
-            let user = {id: "ef49eb60-4fb6-11e6-bc66-0db77219d51b"} //agencyUser暂时获取不到，写死默认的代理商
+            let user = {id: "00000000-0000-0000-0000-000000000000"} //第三方审核使用的agencyUserId默认置为 00000000-0000-0000-0000-000000000000
 
             for (let expend of expendArray) {
 
