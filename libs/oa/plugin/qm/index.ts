@@ -135,7 +135,7 @@ export class QmPlugin extends AbstractOAPlugin {
                 tripApprove.autoApproveTime = await TripApproveModule.calculateAutoApproveTime({
                     type: company.autoApproveType,
                     config: company.autoApprovePreference,
-                    submitAt: tripApprove.createdAt,
+                    submitAt: new Date(),
                     tripStartAt: tripApprove.startAt,
                 });
             }
