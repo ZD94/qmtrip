@@ -45,4 +45,37 @@ export default class PlaceModule {
         });
     }
 
+    static async getCitiesByLetter(params: {isAbroad?: boolean, letter?: string, limit?: number, page?: number, type: number}){
+        return restfulAPIUtil.operateOnModel({
+            model: `/place/getCitiesByLetter`,
+            params: {
+                method: 'GET',
+                fields: params
+            }
+        });
+    }
+
+
+    static async getCityInfoByName(params){
+
+        return restfulAPIUtil.operateOnModel({
+            model: `/place/getCityInfoByName`,
+            params: {
+                method: 'GET',
+                fields: params
+            }
+        });
+    }
+
+    static async getAirPortsByCity(params){
+        
+        return restfulAPIUtil.operateOnModel({
+            model: `/place/getAirPortsByCity`,
+            params: {
+                method: 'GET',
+                fields: params
+            }
+        });
+    }
+
 }
