@@ -84,11 +84,10 @@ export abstract class OaDepartment{
         let parentDepartment: Department;
         let oaParent = await self.getParent();
 
-        if(!oaParent){
+        if(!oaParent || !oaParent.id){
             parentDepartment = defaultDepartment;
         }else{
             parentDepartment = await oaParent.getDepartment();
-            //此处怎么解决
             if(!parentDepartment){
                 parentDepartment = defaultDepartment;
             }

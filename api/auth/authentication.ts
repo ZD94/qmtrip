@@ -23,6 +23,7 @@ export async function makeAuthenticateToken(accountId, os?: string, expireAt?: D
     let type = 'auth:'+os;
 
     let tokens = await Models.token.find({where:{accountId, type}, limit: 1});
+    console.info(os, "<<==>>", tokens);
     let token: Token;
     if(tokens.total > 0) {
         if (os == OS_TYPE.TMP_CODE) {
