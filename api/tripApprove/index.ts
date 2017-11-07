@@ -133,9 +133,9 @@ class TripApproveModule {
         let approve_url: string;
         let appMessageUrl: string;
         if (params.version && params.version == 2) {
-            approve_url = API.notify.v2UrlGenerator(`${config.v2_host}/index.html#/trip-approval/detail`,{approveId: tripApprove.id})
-            let finalUrl = API.notify.v2UrlGenerator("#/trip-approval/detail",{approveId: tripApprove.id})
-            appMessageUrl = API.notify.v2UrlGenerator("#/judge-permission/index",{id: tripApprove.id, modelName: "tripApprove", finalUrl: finalUrl})
+            approve_url = API.notify.v2UrlGenerator(`${config.v2_host}/trip-approve/approve-detail`,[tripApprove.id,1]) //参数为tripApproveId和titleId；
+            let finalUrl = API.notify.v2UrlGenerator("/trip-approve/approve-detail",[tripApprove.id,1])
+            appMessageUrl = API.notify.v2UrlGenerator("/judge-permission/index",{id: tripApprove.id, modelName: "tripApprove", finalUrl: finalUrl})
         } else {
             approve_url = `${config.host}/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
             let finalUrl = `#/trip-approval/detail?approveId=${tripApprove.id}`;
@@ -407,9 +407,9 @@ class TripApproveModule {
             let appMessageUrl;
             //#@template
             if (params.version && params.version == 2) {
-                self_url = API.notify.v2UrlGenerator(`${config.host}/index.html#/trip-approval/detail`,{approveId: tripApprove.id})
-                let finalUrl = API.notify.v2UrlGenerator("#/trip-approval/detail",{approveId: tripApprove.id})
-                appMessageUrl = API.notify.v2UrlGenerator("#/judge-permission/index",{id: tripApprove.id, modelName: "tripApprove", finalUrl: finalUrl})
+                self_url = API.notify.v2UrlGenerator(`${config.v2_host}/trip-approve/approve-detail`,[tripApprove.id,1])
+                let finalUrl = API.notify.v2UrlGenerator("/trip-approve/approve-detail",[tripApprove.id,1])
+                appMessageUrl = API.notify.v2UrlGenerator("#/judge-permission/index",[tripApprove.id, "tripApprove", finalUrl])
             } else {
                 self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
                 let finalUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
