@@ -9,6 +9,8 @@ const axios = require('axios');
 import config = require("@jingli/config");
 import crypto = require("crypto");
 import cache from "common/cache";
+import Logger from '@jingli/logger';
+const logger = new Logger('restful');
 
 function md5(str) {
     return crypto.createHash("md5").update(str).digest('hex')
@@ -20,8 +22,10 @@ export async function getAgentToken() {
         return null;
     }
     let key = `token:agent:${appId}`;
+    logger.debug("KEY:", key)
     const token = await cache.read(key);
     if(token) {
+        logger.debug('TOKEN:', token);
         return token;
     }
     const timestamp = Date.now();
@@ -33,6 +37,7 @@ export async function getAgentToken() {
 
     if(resp.code === 0) {
         await cache.write(key, resp.data.token, resp.data.expires - 30);
+        logger.debug('TOKEN:', resp.data.token)
         return resp.data.token;
     }
     return null;
@@ -43,8 +48,10 @@ export async function getCompanyTokenByAgent(companyId: string) {
         return null;
     }
     let key = `token:company:${companyId}`
+    logger.debug('KEY:', key);
     const companyToken = await cache.read(key);
     if(companyToken) {
+        logger.debug('TOKEN:', companyToken);
         return companyToken;
     }
 
@@ -55,6 +62,7 @@ export async function getCompanyTokenByAgent(companyId: string) {
     
     if(resp.code === 0) {
         await cache.write(key, resp.data.token, resp.data.expires);
+        logger.debug('TOKEN:', resp.data.token)
         return resp.data.token;
     }
     return null;
