@@ -164,18 +164,20 @@ class CompanyModule {
 
         //jlbudget create company record.
         try{
-            let jlBudgetCompany = await RestfulAPIUtil.proxyHttp({
-                url : "/company",
-                method:"post",
-                body:{
-                    id : company.id,
-                    name:company.name,
-                    priceLimitType: HotelPriceLimitType.NO_SET,
-                    appointedPubilcSuppliers: company.appointedPubilcSuppliers
+            let jlBudgetCompany = await RestfulAPIUtil.operateOnModel({
+                model : "company",
+                params: {
+                    fields: {
+                        id : company.id,
+                        name:company.name,
+                        priceLimitType: HotelPriceLimitType.NO_SET,
+                        appointedPubilcSuppliers: company.appointedPubilcSuppliers
+                    },
+                    method:"post"
                 }
             });
         }catch(e){
-            console.error(e);
+            throw e;
         }
 
         //jlbudget create account record. Waiting jlbudget account identifie online.
@@ -621,8 +623,7 @@ class CompanyModule {
                     id: params['companyId']
                 },
                 method: 'GET',
-            },
-            flag: true
+            }
         });
         let res = resPublic.data.appointedPubilcSuppliers;
         console.log('publicres', res);
@@ -673,8 +674,7 @@ class CompanyModule {
                     id: params['companyId']
                 },
                 method:'GET',
-            },
-            flag: true
+            }
         });
         // console.log('resPublic', resPublic.data.appointedPubilcSuppliers);
 
@@ -697,6 +697,49 @@ class CompanyModule {
         return res;
     }
 
+
+    /**
+     * get public common suppliers
+     */
+    @clientExport
+    static async getCommonSupplier(params): Promise<any> {
+        let commonSuppliers = await RestfulAPIUtil.operateOnModel({
+            model: 'supplierAlternateName',
+            params: {
+                fields: params,
+                method: 'GET',
+            }
+        });
+
+        if(commonSuppliers.code == 0){
+            let res = commonSuppliers.data;
+            if(res && res.total > 0){
+                let commonSupplierId = res[0].commonSupplierId;
+                let commonSupplier = await RestfulAPIUtil.operateOnModel({
+                    model: 'commonSupplier',
+                    params: {
+                        fields: {id: commonSupplierId},
+                        method: 'GET',
+                    }
+                });
+
+                if(commonSupplier.code == 0){
+                    commonSupplier = commonSupplier.data;
+                    // commonSupplier.logo = `${C.cloud}/${commonSupplier.logo}`;
+                    return commonSupplier;
+                }else{
+                    throw new Error(commonSuppliers.code);
+                }
+
+            }else{
+                throw new Error("供应商不存在");
+            }
+
+        }else{
+            throw new Error(commonSuppliers.code);
+        }
+
+    }
 
     /*************************************供应商end***************************************/
 
@@ -1265,14 +1308,30 @@ export = CompanyModule;
 
 
 async function initDefaultCompanyRegion(companyId: string) {
-    let defaultRegion = ['国内', '国际', '港澳台'];
-    // let defaultRegion = ['中国大陆', '通用地区', '港澳台'];
+     // let defaultRegion = ['中国大陆', '通用地区', '港澳台'];
+    let defaultRegion = [{
+        name: '国内',
+        types: [1,2,3],
+        group: 1
+    }, {
+        name: '国际',
+        types: [1,2,3],
+        group: 2
+    }, {
+        name: '港澳台',
+        types: [1,2,3],
+        group: 2
+    }];
+   
     let defaultPlaceId = [['CTW_5'], ['Global'], ['CT_2912', 'CT_2911', 'CT_9000']];
 
     for (let i = 0; i < defaultRegion.length; i++) {
         let companyRegion: any = await API.travelPolicy.createCompanyRegion({
             companyId: companyId,
-            name: defaultRegion[i]
+            name: defaultRegion[i].name,
+            group: defaultRegion[i].group,
+            types: defaultRegion[i].types
+
         });
         companyRegion = companyRegion.data;
         if(companyRegion) {
@@ -1280,7 +1339,7 @@ async function initDefaultCompanyRegion(companyId: string) {
                 let regions = await API.travelPolicy.createRegionPlace({
                     placeId: defaultPlaceId[i][j],
                     companyRegionId: companyRegion['id'],
-                    companyId: companyId
+                    companyId: companyId,
                 });
             }
         }

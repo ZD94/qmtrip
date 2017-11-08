@@ -7,6 +7,8 @@ variables:
   JL_APP_DAEMON: "true"
   JL_APP_COMMAND: node server.js >/data/log/nohup.out 2>&1
   JL_APP_DAEMON_WAIT_INIT: log/nohup.out
+  JL_APP_CLOUD_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
+  JL_APP_CLOUD_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
 
 stages:
   - build
@@ -60,6 +62,7 @@ deploy:master:
   variables:
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: http://l.jingli365.com/cloud/api/v1
+    JL_APP_CLOUD: http://l.jingli365.com/cloud
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
@@ -78,6 +81,7 @@ deploy:test:
   variables:
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: http://t.jingli365.com/cloud/api/v1
+    JL_APP_CLOUD: http://t.jingli365.com/cloud
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
@@ -97,6 +101,7 @@ deploy:release:
   variables:
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: https://j.jingli365.com/cloud/api/v1
+    JL_APP_CLOUD: https://j.jingli365.com/cloud
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
@@ -118,6 +123,7 @@ deploy:tester:
     JL_APP_POSTGRES_INITDB: tester_$GITLAB_USER_ID
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: http://t.jingli365.com/cloud/api/v1
+    JL_APP_CLOUD: http://t.jingli365.com/cloud
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME

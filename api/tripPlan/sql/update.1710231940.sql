@@ -1,0 +1,2 @@
+update trip_plan.trip_plans as a set saved = (a.budget - a.expenditure) where a.deleted_at is null and status = 4 and is_special_approve = false;
+update trip_plan.trip_plans as a set saved = 0 where a.deleted_at is null and status = 4 and is_special_approve = true;
