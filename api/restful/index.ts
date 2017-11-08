@@ -19,7 +19,8 @@ export async function getAgentToken() {
     if(!appId) {
         return null;
     }
-    const token = await cache.read(appId);
+    let key = `token:agent:${appId}`;
+    const token = await cache.read(key);
     if(token) {
         return token;
     }
@@ -31,7 +32,7 @@ export async function getAgentToken() {
         }).then(res => res.data)
 
     if(resp.code === 0) {
-        await cache.write(appId, resp.data.token, resp.data.expires);
+        await cache.write(key, resp.data.token, resp.data.expires - 30);
         return resp.data.token;
     }
     return null;
@@ -41,18 +42,19 @@ export async function getCompanyTokenByAgent(companyId: string) {
     if(!companyId) {
         return null;
     }
-    const agentToken = await cache.read(companyId);
-    if(agentToken) {
-        return agentToken;
+    let key = `token:company:${companyId}`
+    const companyToken = await cache.read(key);
+    if(companyToken) {
+        return companyToken;
     }
 
-    const token = await getAgentToken();
+    let agentToken = await getAgentToken();
     const resp: any = await axios.get(`${config.cloudAPI}/agent/company/${companyId}/token`,{
-        headers: { token } 
+        headers: { agentToken }
     }).then(res => res.data);
     
     if(resp.code === 0) {
-        await cache.write(companyId, resp.data.token, resp.data.expires);
+        await cache.write(key, resp.data.token, resp.data.expires);
         return resp.data.token;
     }
     return null;
