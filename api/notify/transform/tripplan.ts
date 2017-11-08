@@ -13,9 +13,13 @@ export = async function transform(values: any): Promise<any>{
     let approveUserMap:any = {};
     if(tripPlan && tripPlan.id){
         tripApprove = await Models.tripApprove.get(values.tripPlan.id);
+        if(!tripApprove){
+            tripApprove = tripPlan;
+        }
         values.tripApprove = tripApprove;
     }
     if(!values.tripApprove || !values.tripApprove.id){
+        values.tripApprove = {};
         return values;
     }
     let arrivalCityCodes = tripApprove.arrivalCityCodes;
