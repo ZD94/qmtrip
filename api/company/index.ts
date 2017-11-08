@@ -171,7 +171,8 @@ class CompanyModule {
                         id : company.id,
                         name:company.name,
                         priceLimitType: HotelPriceLimitType.NO_SET,
-                        appointedPubilcSuppliers: company.appointedPubilcSuppliers
+                        appointedPubilcSuppliers: company.appointedPubilcSuppliers,
+                        companyId: company.id,
                     },
                     method:"post"
                 }
