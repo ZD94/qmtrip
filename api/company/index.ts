@@ -165,17 +165,18 @@ class CompanyModule {
         //jlbudget create company record.
         try{
             let jlBudgetCompany = await RestfulAPIUtil.operateOnModel({
-                model : "company",
+                model : "agent",
                 params: {
                     fields: {
-                        id : company.id,
                         name:company.name,
                         priceLimitType: HotelPriceLimitType.NO_SET,
                         appointedPubilcSuppliers: company.appointedPubilcSuppliers,
                         companyId: company.id,
                     },
                     method:"post"
-                }
+                },
+                addUrl: 'company/create',
+                useProxy: false
             });
         }catch(e){
             throw e;
