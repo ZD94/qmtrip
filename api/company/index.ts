@@ -172,6 +172,8 @@ class CompanyModule {
                         priceLimitType: HotelPriceLimitType.NO_SET,
                         appointedPubilcSuppliers: company.appointedPubilcSuppliers,
                         companyId: company.id,
+                        mobile: params.mobile,
+                        password: md5(pwd)
                     },
                     method:"post"
                 },
