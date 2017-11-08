@@ -57,7 +57,7 @@ export async function getCompanyTokenByAgent(companyId: string) {
 
     let agentToken = await getAgentToken();
     const resp: any = await axios.get(`${config.cloudAPI}/agent/company/${companyId}/token`,{
-        headers: { agentToken }
+        headers: { token: agentToken }
     }).then(res => res.data);
     
     if(resp.code === 0) {
