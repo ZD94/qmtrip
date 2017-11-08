@@ -8,6 +8,11 @@ var API = require("@jingli/dnode-api");
 var requestProxy = require('express-request-proxy');
 import fs = require("fs");
 import urlModule = require("url");
+var formidable = require('formidable');
+import Logger from '@jingli/logger';
+var logger = new Logger('attachments');
+import bluebird = require('bluebird');
+import url = require("url");
 
 function resetTimeout(req, res, next){
     req.clearTimeout();
@@ -15,16 +20,88 @@ function resetTimeout(req, res, next){
     //conn_timeout('180s')(req, res, next);
 }
 
+async function fs_exists(file): Promise<boolean>{
+    try{
+        var stat = await fs.statAsync(file);
+        return true;
+    }catch(e){
+        if(e.code != 'ENOENT')
+            throw e;
+        return false;
+    }
+}
+
+async function uploadActionFile(req, res, next) {
+    console.info("uploadActionFile===========");
+    req.clearTimeout();
+    var filePath;
+    res.header("")
+    try {
+        var type = req.query.type;
+        var form = new formidable.IncomingForm();
+        form.uploadDir = config.upload.tmpDir;
+        form.maxFieldsSize = config.upload.maxSize || 20*1024*1024;
+        form.keepExtensions = true;
+        var parseForm = bluebird.promisify<any[], any>(form.parse, {context: form, multiArgs:true});
+        var [fields, file] = await parseForm(req);
+        if(!file.tmpFile)
+            throw '文件不存在';
+        filePath = file.tmpFile.path;
+        var fileExt = path.extname(filePath);
+        if(type && type == 'xls' && ('.xls.xlsx').indexOf(fileExt.toLowerCase()) === -1) {//导入excle
+            throw '仅允许上传 xls/xlsx 格式文件';
+        }
+
+        var data = await fs.readFileAsync(filePath);
+        var file_type = file.tmpFile.type;
+        var isPublic = false;
+        if(type && type == 'avatar') {//上传头像
+            isPublic = true;
+        }
+
+        var content = data.toString("base64")
+        var contentType = file_type;
+        var obj = await API.attachment.saveAttachment({
+            content: content,
+            contentType: contentType,
+            isPublic: isPublic
+        });
+        console.info("obj===", obj);
+        res.send({
+            ret:0,
+            errMsg:"",
+            fileId: obj.fileId,
+            sign: obj.sign,
+            expireTime: obj.expireTime,
+        });
+    } catch(err) {
+        logger.error(err.stack || err);
+        res.send({
+            ret: -1,
+            errMsg: err.message || err
+        });
+    } finally {
+        if(filePath){
+            var exist = await fs_exists(filePath);
+            if(exist){
+                fs.unlink(filePath);
+                console.log("删除临时文件");
+            }
+        }
+    }
+}
+
 module.exports = function(app) {
     //app.post('/upload/ajax-upload-file', proxy('http://localhost:4001', { reqAsBuffer: true,reqBodyEncoding: false }));
     let url = '/upload/ajax-upload-file'
 
-    app.post(url, resetTimeout, requestProxy({
+    /*app.post(url, resetTimeout, requestProxy({
         url:config.hosts.main.www+'/upload/ajax-upload-file',
         reqAsBuffer: true,
         cache: false,
         timeout: 180000,
-    }));
+    }));*/
+    app.post(url, uploadActionFile);
     app.options(url, function (req, res, next) {
         let referer = req.headers['referer'];
         let host;

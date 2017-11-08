@@ -12,6 +12,10 @@ let logger = new Logger("attachment");
 import '@jingli/fs-promisify';
 import * as fs from 'fs';
 import * as path from 'path';
+var utils = require("common/utils");
+import {Models} from "_types/index";
+import {Attachment, RelateFile} from "_types/attachment";
+import {md5} from "common/utils";
 
 
 async function fs_exists(file): Promise<boolean>{
@@ -25,7 +29,59 @@ async function fs_exists(file): Promise<boolean>{
     }
 }
 
+function signFileId(fileid: string, expirttime: number) {
+    let key = 'wojiushibugaosuni';
+    let str = fileid + expirttime + key;
+    return md5(str);
+}
+
 class ApiAttachment {
+
+    /**
+     * @method saveAttachment
+     *
+     * 保存附件信息
+     *
+     * @param {Object} params
+     * @param {String} params.content   附件是base64字符串
+     * @param {boolean} params.isPublic  是否公共 true 是 false否
+     * @param {String} params.contentType http contentType 详情见http://tool.oschina.net/commons
+     * @return {Promise} "32位唯一串"
+     */
+    static async saveAttachment(params): Promise<any> {
+        var content = params.content;
+        var isPublic = params.isPublic || false;
+        var contentType = params.contentType;
+        var id:string;
+
+        if (!content) {
+            throw {code: -1, msg: "附件信息不能为空"};
+        }
+
+        if (!contentType) {
+            throw {code: -1, msg: "contentType不能为空"};
+        }
+
+        content = new Buffer(content, 'base64');
+        id = utils.md5(content);
+        var attachment = await Models.attachment.get(id, {attributes: {exclude: ['content']}});
+        if (!attachment) {
+            attachment = Attachment.create({id: id, content: content, contentType: contentType});
+            attachment = await attachment.save();
+        }
+        console.info("attachment==>>", attachment);
+        var file = RelateFile.create({isPublic: isPublic, key: id});
+        file = await file.save();
+        let expireTime = Date.now() + 24 * 60 * 60 * 1000;
+        let sign = signFileId(file.id, expireTime)
+        console.info("file==>>", file);
+        return {
+            fileId: file.id,
+            sign: sign,
+            expireTime: expireTime,
+        }
+    }
+
     /**
      * 绑定拥有者
      *

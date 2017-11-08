@@ -25,6 +25,7 @@ import {AgencyOperateLog} from "_types/agency/agency-operate-log";
 import {TripFuelAddPackage} from "../_types/tripPackage/tripFuelAddPackage";
 import {TripBasicPackage} from "../_types/tripPackage/tripBasicPackage";
 import {ErrorLog} from "../_types/errorLog";
+import {Attachment, RelateFile} from "../_types/attachment";
 // import {CompanyRegion} from "_types/travelPolicy/companyRegion";
 // import {RegionPlace} from "_types/travelPolicy/regionPlace";
 // import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
@@ -80,6 +81,8 @@ initModels({
     tripFuelAddPackage: createServerService<TripFuelAddPackage>(TripFuelAddPackage),
     tripBasicPackage: createServerService<TripBasicPackage>(TripBasicPackage),
     errorLog: createServerService<ErrorLog>(ErrorLog),
+    attachment: createServerService<Attachment>(Attachment),
+    relateFile: createServerService<RelateFile>(RelateFile),
 
     // travelPolicyRegion: createServerService<TravelPolicyRegion>(TravelPolicyRegion),
     // companyRegion: createServerService<CompanyRegion>(CompanyRegion),
