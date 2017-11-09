@@ -33,7 +33,6 @@ import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial
 import {ENoticeType} from "_types/notice/notice";
 import TripApproveModule = require("../tripApprove/index");
 import {MPlaneLevel, MTrainLevel} from "_types";
-
 import {ISegment, ICreateBudgetAndApproveParams, ExpendItem} from '_types/tripPlan'
 import {EApproveStatus} from "../../_types/approve/types";
 import {plugins} from "../../libs/oa/index";
