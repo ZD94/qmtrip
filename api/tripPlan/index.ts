@@ -2159,7 +2159,7 @@ class TripPlanModule {
                 fields: reqData,
                 method: 'POST'
             },
-            addUrl: '/getBookLink'
+            addUrl: 'getBookLink'
         })
         console.log('res[data]', resGet['data']);
         return resGet['data'];
