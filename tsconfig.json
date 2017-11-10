@@ -12,8 +12,8 @@
     "experimentalDecorators": true,
     "noImplicitUseStrict": false,
     "allowSyntheticDefaultImports": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
     "baseUrl": ".",
     "paths": {
       "*": ["*", "*/index", "common/client/*", "common/client/*/index"]
@@ -26,9 +26,6 @@
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true
   },
-  "include": [
-    "common"
-  ],
   "exclude": [
     "node_modules",
     "public",
@@ -41,8 +38,7 @@
     "*.bak",
     "JLTypes",
     "tools/",
-    "mytest",
-    "_types"
+    "mytest"
   ],
   "excludeNotUsing": [
   ]
