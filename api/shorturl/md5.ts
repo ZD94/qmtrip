@@ -14,7 +14,7 @@ export class Md5ShortUrl{
         let urls = await Models.url.find({ where: {id: key, url: long}})
         let urlObj;
         if(urls || urls.length == 0) {
-             urlObj = Url.create({ where: {id: key, url: long}});
+             urlObj = Url.Create({ where: {id: key, url: long}});
             await urlObj.save();
         }
         return key;

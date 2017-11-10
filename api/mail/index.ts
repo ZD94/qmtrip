@@ -33,7 +33,7 @@ function timerSendMail() {
                 var toUsr = email.toUser;
                 try{
                     //查询邮件主题内容
-                    let submits = await Models.emailSubmit.find({where: {id: email.submitId}});
+                    let submits = await Models.emailSubmit.find({where: {id: email["emailSubmitId"]}});
                     let submit = submits[0];
                     var subject = submit.subject;
                     var content = submit.content;
@@ -81,18 +81,15 @@ async function _recordEmailLog(id, status, error) {
                 return;
             }
 
-            var emailLog = {id: email.id, submitId: email["emailSubmitId"],
+            var emailLog = {id: email.id, emailQueueId: email["emailSubmitId"],
                 toUser: email.toUser, status: status, sendTimes: email.sendTime, errorMsg: error};
 
-
+            let emailLogObj = EmailLog.Create(emailLog);
             let update = await Promise.all([
                 // Models.emailQueue.destroy({where: {id: id}}),
-                await email.destroy(),
-                async function(){
-                    let emailLog = EmailLog.create(emailLog);
-                    await emailLog.save();
-                }()
-            ])
+                email.destroy(),
+                emailLogObj.save()
+            ]);
             return update;
         }catch(err){
             throw err;
@@ -250,13 +247,13 @@ export class Mail{
         html += '<br/><br/>' + footer;
 
         var submit = {id: uuid.v1(), subject: subject, content: html, toUser: toEmails, isHtml: true};
-        let submitObj = EmailSubmit.create(submit);
+        let submitObj = EmailSubmit.Create(submit);
         await submitObj.save();
 
         var promises = [];
         for(var i=0, ll: number =emails.length; i<ll; i++) {
-            var queue = {id: uuid.v1(), submitId: submit.id, toUser: emails[i], maxSendTimes: 1};
-            let emailQueueObj = EmailQueue.create(queue);
+            var queue = {id: uuid.v1(), emailQueueId: submit.id, toUser: emails[i], maxSendTimes: 1};
+            let emailQueueObj = EmailQueue.Create(queue);
             promises.push(emailQueueObj)
 
         }
@@ -286,13 +283,13 @@ export class Mail{
         let {subject, toEmails, content, attachments} = params;
         let emails = toEmails.split(/,/);
         var submit = {id: uuid.v1(), subject: subject, content: content, toUser: toEmails, isHtml: true, attachments: JSON.stringify(attachments)};
-        let submitObj = EmailSubmit.create(submit);
+        let submitObj = EmailSubmit.Create(submit);
         await submitObj.save();
 
         var promises = [];
         for(var i=0, ii=emails.length; i<ii; i++) {
-            var queue = {id: uuid.v1(), submitId: submit.id, toUser: emails[i], maxSendTimes: 1};
-            let emailQueue = EmailQueue.create(queue);
+            var queue = {id: uuid.v1(), emailQueueId: submit.id, toUser: emails[i], maxSendTimes: 1};
+            let emailQueue = EmailQueue.Create(queue);
             promises.push(emailQueue);
         }
 
