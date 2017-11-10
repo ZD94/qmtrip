@@ -300,8 +300,7 @@ export class Mail{
     }
 }
 
-
-function html_encode (str) {
+function html_encode (str: string) {
     var s = "";
     if (str.length == 0) return "";
     s = str.replace(/&/g, "&gt;");
