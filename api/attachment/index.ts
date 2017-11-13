@@ -187,9 +187,7 @@ class ApiAttachment {
                 if(!dir_exist){
                     await fs.mkdirAsync(cachePath, '755');
                 }
-                console.info(attachment.content, "attachment.content=====================");
                 var content = new Buffer(attachment.content, "base64");
-                console.info(content, "content=====================");
                 await fs.writeFileAsync(filepath+'.type', contentType, 'utf8');
                 await fs.writeFileAsync(filepath, content, {encoding: "binary"});
             }else{

@@ -61,7 +61,6 @@ async function uploadActionFile(req, res, next) {
         }
 
         var content = data.toString("base64")
-        console.info(content, filePath, "===============")
         var contentType = file_type;
         var obj = await API.attachment.saveAttachment({
             content: content,
@@ -134,7 +133,6 @@ function allowCrossDomain(req, res, next) {
     /*if (req.headers.origin && checkOrigin(req.headers.origin)) {
         res.header('Access-Control-Allow-Origin', req.headers.origin);
     }*/
-    console.info(req.method, "================");
     res.header('Access-Control-Allow-Origin', "*");
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -210,7 +208,6 @@ let pwd = process.cwd();
 async function getPublicFile(req, res, next) {
     req.clearTimeout();
     var cacheFile = await API.attachment.getFileCache({id:req.params.id, isPublic:true});
-    console.info(cacheFile, "cacheFile=========")
     if(!cacheFile) {
         return next(404);
     }
