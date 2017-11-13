@@ -13,6 +13,7 @@ import Logger from '@jingli/logger';
 var logger = new Logger('attachments');
 import bluebird = require('bluebird');
 import url = require("url");
+import {md5} from "common/utils";
 
 function resetTimeout(req, res, next){
     req.clearTimeout();
@@ -60,6 +61,7 @@ async function uploadActionFile(req, res, next) {
         }
 
         var content = data.toString("base64")
+        console.info(content, filePath, "===============")
         var contentType = file_type;
         var obj = await API.attachment.saveAttachment({
             content: content,
@@ -91,6 +93,59 @@ async function uploadActionFile(req, res, next) {
     }
 }
 
+function signFileId(fileid: string, expirttime: number) {
+    let key = 'wojiushibugaosuni';
+    let str = fileid + expirttime + key;
+    return md5(str);
+}
+
+async function getTmpAttachment(req, res, next) {
+    logger.info("call getTmpAttachment===>");
+    req.clearTimeout();
+    let {fileId } = req.params;
+    let {sign, expireTime} = req.query;
+    //参数不完全直接抛错
+    if (!fileId || !sign || !expireTime) {
+        logger.info("sign error");
+        return res.send(404);
+    }
+    //签名
+    let userSign = signFileId(fileId, expireTime);
+    if (userSign != sign) return res.send(403);
+    //附件
+    let attachment = await API.attachment.getAttachment({id: fileId});
+    if (!attachment) {
+        logger.info('can not find attachment');
+        return res.send(404);
+    }
+    //输出文件头信息
+    let headers = {}
+    if (attachment.contentType) {
+        headers['content-type'] =attachment.contentType
+    }
+    res.writeHead(200, headers);
+    let bfs = new Buffer(attachment.content, 'base64')
+    //内容
+    res.write(bfs);
+    res.end();
+}
+
+function allowCrossDomain(req, res, next) {
+    /*if (req.headers.origin && checkOrigin(req.headers.origin)) {
+        res.header('Access-Control-Allow-Origin', req.headers.origin);
+    }*/
+    console.info(req.method, "================");
+    res.header('Access-Control-Allow-Origin', "*");
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+    res.header('Access-Control-Allow-Headers', req.headers['access-control-request-headers']);
+    if (req.method == 'OPTIONS') {
+        return res.send("OK");
+    }
+    next();
+}
+
 module.exports = function(app) {
     //app.post('/upload/ajax-upload-file', proxy('http://localhost:4001', { reqAsBuffer: true,reqBodyEncoding: false }));
     let url = '/upload/ajax-upload-file'
@@ -101,7 +156,7 @@ module.exports = function(app) {
         cache: false,
         timeout: 180000,
     }));*/
-    app.post(url, uploadActionFile);
+    app.post(url, allowCrossDomain, uploadActionFile);
     app.options(url, function (req, res, next) {
         let referer = req.headers['referer'];
         let host;
@@ -111,7 +166,7 @@ module.exports = function(app) {
             let url = urlModule.parse(referer);
             host = parseHost(url);
         }
-        res.header('Access-Control-Allow-Origin', host);
+        res.header('Access-Control-Allow-Origin', "*");
         res.header('Access-Control-Allow-Credentials', 'true');
         res.sendStatus(200);
     })
@@ -127,7 +182,7 @@ module.exports = function(app) {
         return host;
     }
 
-    app.get("/attachment/temp/:id", resetTimeout, function(req, res, next) {
+    /*app.get("/attachment/temp/:id", resetTimeout, function(req, res, next) {
         let id = req.params.id;
         return requestProxy({
             url: config.hosts.main.www + '/attachment/temp/' + id ,
@@ -135,7 +190,9 @@ module.exports = function(app) {
             cache: false,
             timeout: 180000,
         })(req, res, next);
-    });
+    });*/
+
+    app.get("/attachment/temp/:id", getTmpAttachment);
 
     app.get("/attachments/:id", getPublicFile);
     //app.post('/upload/ajax-upload-file', uploadActionFile);
@@ -153,6 +210,7 @@ let pwd = process.cwd();
 async function getPublicFile(req, res, next) {
     req.clearTimeout();
     var cacheFile = await API.attachment.getFileCache({id:req.params.id, isPublic:true});
+    console.info(cacheFile, "cacheFile=========")
     if(!cacheFile) {
         return next(404);
     }

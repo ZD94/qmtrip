@@ -83,6 +83,33 @@ class ApiAttachment {
     }
 
     /**
+     * @method getAttachment 通过fileId获取附件
+     *
+     * @param {Object} params
+     * @param {String} params.id 文件ID
+     * @return {Promise} 附件信息 {id: "ID", content: "内容", "isPublic": "true|false"}
+     */
+    static async getAttachment(params): Promise<any> {
+        if (!params) {
+            params = {};
+        }
+        var id = params.id;
+        var width = params.width || 600;
+        var height = params.height || 600;
+
+        var file = await Models.relateFile.get(id)
+        if(!file)
+            throw {code:-1, msg:"文件不存在"};
+
+        var attachment = await Models.attachment.get(file.key)
+        if (!attachment || !attachment.content) {
+            return {};
+        }
+        var content = attachment.content.toString("base64");
+        return {id: attachment.id, content: content, isPublic: file.isPublic, contentType: attachment.contentType};
+    }
+
+    /**
      * 绑定拥有者
      *
      * @param {Object} params
@@ -148,7 +175,7 @@ class ApiAttachment {
 
             var cache_exist = await fs_exists(filepath);
             if(!cache_exist){
-                var attachment = await API.attachments.getAttachment({id: id});
+                var attachment = await ApiAttachment.getAttachment({id: id});
                 if(!attachment) {
                     return null;
                 }
@@ -160,7 +187,9 @@ class ApiAttachment {
                 if(!dir_exist){
                     await fs.mkdirAsync(cachePath, '755');
                 }
+                console.info(attachment.content, "attachment.content=====================");
                 var content = new Buffer(attachment.content, "base64");
+                console.info(content, "content=====================");
                 await fs.writeFileAsync(filepath+'.type', contentType, 'utf8');
                 await fs.writeFileAsync(filepath, content, {encoding: "binary"});
             }else{
