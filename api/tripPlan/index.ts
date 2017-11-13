@@ -33,11 +33,13 @@ import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial
 import {ENoticeType} from "_types/notice/notice";
 import TripApproveModule = require("../tripApprove/index");
 import {MPlaneLevel, MTrainLevel} from "_types";
-
 import {ISegment, ICreateBudgetAndApproveParams, ExpendItem} from '_types/tripPlan'
 import {EApproveStatus} from "../../_types/approve/types";
 import {plugins} from "../../libs/oa/index";
+import {Supplier} from "../../_types/company/supplier";
 const projectCols = Project['$fieldnames'];
+import {restfulAPIUtil} from "api/restful"
+let RestfulAPIUtil = restfulAPIUtil;
 
 interface ReportInvoice {
     type: string;
@@ -2134,6 +2136,68 @@ class TripPlanModule {
         }
         return true;
     }
+
+
+    //预订跳转
+    @clientExport
+    static async getBookLink(params: {reserveType: string, data: object}): Promise<any> {
+        let transfer = {
+            ctrip: {
+                supplierKey:     'ctrip_com',
+                trafficBookLink: 'http://m.ctrip.com/html5/flight/matrix.html',
+                hotelBookLink:   'http://m.ctrip.com/webapp/hotel/'
+            },
+            qunar: {
+                supplierKey:     'qunar_com_m',
+                trafficBookLink: 'https://touch.qunar.com/h5/flight',
+                hotelBookLink:   'https://touch.qunar.com/hotel'
+            },
+            flypig: {
+                supplierKey:     'taobao_com',
+                trafficBookLink: 'https://h5.m.taobao.com/trip/flight/search/index.html',
+                hotelBookLink:   'https://h5.m.taobao.com/trip/hotel/search/index.html'
+            },
+            jingzhong:{
+                supplierKey:     'jingzhong_com',
+                trafficBookLink: 'http://m.ctrip.com/html5/flight/matrix.html',
+                hotelBookLink:   'http://m.ctrip.com/webapp/hotel/'
+            },
+            kiwi: {
+                supplierKey:     'kiwi_com',
+                trafficBookLink: 'https://www.kiwi.com/cn/',
+                hotelBookLink:   'https://www.kiwi.com/cn/'
+            }
+        };
+        let reqData = {
+            supplier:     transfer[params.data['agent']] || transfer['ctrip'],
+            data:         params.data,
+            reserveType:  params.reserveType,
+            fromCity:     params.data['fromCity'] || '',
+            toCity:       params.data['toCity'] || '',
+            leaveDate:    params.data['leaveDate'] || '',
+            city:         params.data['city'] || '',
+            checkInDate:  params.data['checkInDate'] || '',
+            checkOutDate: params.data['checkOutDate'] || ''
+        };
+
+        // let resGet = await RestfulAPIUtil.proxyHttp({
+        //     url: `/company/${companyId}/supplier/getBookLink`,
+        //     body: reqData,
+        //     method: 'POST'
+        // });
+        let resGet = await RestfulAPIUtil.operateOnModel({
+            model: 'supplier',
+            params: {
+                fields: reqData,
+                method: 'POST'
+            },
+            addUrl: 'getBookLink'
+        })
+        console.log('res[data]', resGet['data']);
+        return resGet['data'];
+    }
+
+
 
     static __initHttpApp = require('./invoice');
 

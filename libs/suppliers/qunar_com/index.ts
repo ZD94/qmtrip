@@ -24,11 +24,11 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         var bookLink: any = {};
 
         if(reserveType == "travel_plane"){
-            bookLink = await this.getAirTicketReserveLink({fromCity: options.fromCity, toCity: options.toCity, leaveDate: options.leaveDate});
+            bookLink = await this.getAirTicketReserveLink({data: options.data, fromCity: options.fromCity, toCity: options.toCity, leaveDate: options.leaveDate});
         }
 
         if(reserveType == "travel_train"){
-            bookLink = await this.getTrainTicketReserveLink({fromCity: options.fromCity, toCity: options.toCity, leaveDate: options.leaveDate});
+            bookLink = await this.getTrainTicketReserveLink({data: options.data, fromCity: options.fromCity, toCity: options.toCity, leaveDate: options.leaveDate});
         }
 
         if(reserveType == "hotel"){
@@ -54,10 +54,13 @@ export default class SupplierCtripCT extends SupplierWebRobot{
     }
 
     async getTrainTicketReserveLink(options):Promise<ReserveLink> {
-        let startStation = encodeURI(options.fromCity),
-            endStation   = encodeURI(options.toCity),
-            date         = moment(options.leaveDate).format("YYYY-MM-DD");
-        let trafficBookLink = `http://touch.train.qunar.com/trainList.html?startStation=${startStation}&endStation=${endStation}&date=${date}`;
-        return {url:trafficBookLink, jsCode: ''};
+        let data = options.data;
+        let deeplinkData = data.deeplinkData;
+        let deeplink, jsCode;
+
+        deeplink = `http://touch.qunar.com/trainList_Card.html?startCity=${deeplinkData.startCity}&startStation=${deeplinkData.startStation}&endCity=${deeplinkData.endCity}&endStation=${deeplinkData.endStation}&date=${deeplinkData.date}&trainNum=${deeplinkData.trainNumber}&searchType=stasta&sort=&seatType=${deeplinkData.seatType}&searchArr=${deeplinkData.searchArr}&searchDep=${deeplinkData.searchDep}&needRecommondLess=1&bd_source=3w`
+        jsCode = '';
+
+        return {url:deeplink, jsCode: jsCode};
     }
 }

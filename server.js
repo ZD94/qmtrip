@@ -35,7 +35,7 @@ Logger.init(config.logger);
 var logger = new Logger('main');
 
 var cache = require("common/cache");
-cache.init({redis_conf: config.redis.url, prefix: 'times:cache'});
+cache.init({redis_conf: config.redis.url, prefix: 'times:cache:'+config.appName});
 
 var database = require('@jingli/database');
 database.init(config.postgres.url);
