@@ -6,6 +6,7 @@
 import {AbstractController, Restful, Router} from "@jingli/restful";
 import API from '@jingli/dnode-api';
 import {Models} from "_types";
+import { Request, Response, NextFunction} from 'express';
 
 @Restful()
 export class EventsController extends AbstractController {
@@ -19,7 +20,7 @@ export class EventsController extends AbstractController {
     }
 
     @Router('/registry-event-listener', "POST")
-    async registryEventListener(req, res, next){
+    async registryEventListener(req: Request, res: Response, next: NextFunction){
         let {events} = req.body;
         console.info(events);
         //do something

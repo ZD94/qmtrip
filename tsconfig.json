@@ -11,6 +11,8 @@
     "declarationDir": "JLTypes",
     "experimentalDecorators": true,
     "noImplicitUseStrict": false,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
