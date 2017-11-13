@@ -24,10 +24,6 @@
   "api": {
     "postgres": "${{postgres.url}}",
     "remotes": [
-      {
-        "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
-        "modules": "*"
-      }
     ]
   },
   "upload":{
