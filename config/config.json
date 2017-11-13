@@ -4,7 +4,6 @@
   "host": "${JL_APP_HOST}",
   "debug": false,
   "ts_node": true,
-
   "cluster": false,
   "port": 80,
   "apiPort": 4102,
