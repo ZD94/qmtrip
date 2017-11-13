@@ -1,8 +1,8 @@
 /**
- * Created by lei.liu on 2017/10/31
- */
+    * Created by lei.liu on 2017/10/31
+*/
 
-"use strict"
+    "use strict"
 
 import {AbstractController, Restful, Router} from "@jingli/restful"
 import API from '@jingli/dnode-api'
