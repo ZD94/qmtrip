@@ -69,12 +69,10 @@ class ApiAttachment {
             attachment = Attachment.create({id: id, content: content, contentType: contentType});
             attachment = await attachment.save();
         }
-        console.info("attachment==>>", attachment);
         var file = RelateFile.create({isPublic: isPublic, key: id});
         file = await file.save();
         let expireTime = Date.now() + 24 * 60 * 60 * 1000;
         let sign = signFileId(file.id, expireTime)
-        console.info("file==>>", file);
         return {
             fileId: file.id,
             sign: sign,
@@ -105,7 +103,9 @@ class ApiAttachment {
         if (!attachment || !attachment.content) {
             return {};
         }
-        var content = attachment.content.toString("base64");
+        // var content = attachment.content.toString("base64");
+        var contentBuffer = new Buffer(attachment.content);
+        var content = contentBuffer.toString("base64");
         return {id: attachment.id, content: content, isPublic: file.isPublic, contentType: attachment.contentType};
     }
 
@@ -152,7 +152,7 @@ class ApiAttachment {
         // if (!owner) {
         //     throw L.ERR.PERMISSION_DENY();
         // }
-        var attachment = await API.attachments.getAttachment({id: fileId, isZoom:'off'});
+        var attachment = await API.attachment.getAttachment({id: fileId, isZoom:'off'});
 
         // var filepath = path.join('tmp', attachment.id);
         // fs.writeFile(filepath, attachment.content, {encoding: "binary"});

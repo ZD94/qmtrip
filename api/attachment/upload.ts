@@ -67,7 +67,6 @@ async function uploadActionFile(req, res, next) {
             contentType: contentType,
             isPublic: isPublic
         });
-        console.info("obj===", obj);
         res.send({
             ret:0,
             errMsg:"",
