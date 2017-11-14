@@ -149,6 +149,8 @@ class TripApproveModule {
         } catch(err) {
             console.warn(`转换短链接失败`, err);
         }
+
+        console.error(`approve_url:${approve_url},appMessageUrl:${appMessageUrl}`);
         if(company.isApproveOpen) {
             //给审核人发审核邮件
             let approveUser = await Models.staff.get(tripApprove['approveUserId']);
