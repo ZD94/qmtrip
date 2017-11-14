@@ -6,10 +6,16 @@
 import {AbstractController, Restful, Router} from "@jingli/restful";
 import API from '@jingli/dnode-api';
 import {Models} from "_types";
-var TripApproveModule= require("api/tripApprove")
+var TripApproveModule= require("api/tripApprove");
+import {Request, Response} from "express-serve-static-core";
 
+/*
+ * 外部审批结束调用模块， 处理审批结果：
+ *   同意: 生成行程单
+ *   拒绝：修改申请单状态
+ */
 @Restful('/approve')
-export class TripController extends AbstractController {
+export class TripApproveController extends AbstractController {
 
     constructor() {
         super();
@@ -20,7 +26,7 @@ export class TripController extends AbstractController {
     }
 
     @Router("/trip/:id/approve", 'POST')
-    async updateTripApprove(req, res, next){
+    async updateTripApprove(req: Request, res: Response, next: Function){
         let {id, nextApproveUserId, status, reason} = req.body;
         if(!id)
             return res.json(this.reply(0, null));
@@ -43,9 +49,7 @@ export class TripController extends AbstractController {
         } catch(err) {
             return res.json(this.reply(500, null));
         }
-
-
         res.json(this.reply(0, result));
     }
-}
 
+}
