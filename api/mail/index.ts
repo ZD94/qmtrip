@@ -164,7 +164,7 @@ function send (options: {from: string, to: string, subject: string, text?: strin
         })
     });
 }
-export class Mail{
+export default class Mail{
     /**
      * 提交发送邮件请求
      *
@@ -271,7 +271,7 @@ export class Mail{
      * @param {string} params.content 邮件正文
      * @param {Array<any>} params.attachments 附件信息,格式为
      */
-    async sendEmail(params) {
+    async sendEmail(params: {toEmails: string, content: string, subject: string, attachments: any}) {
         let filenames = ['logo.png', 'logo_text.png', 'qrcode.png'];
         filenames.forEach( (filename) => {
             params.attachments.push({
@@ -312,6 +312,3 @@ function html_encode (str: string) {
     s = s.replace(/\n/g, "<br>");
     return s;
 }
-
-let mail = new Mail();
-export default mail;
