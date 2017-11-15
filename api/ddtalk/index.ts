@@ -243,7 +243,7 @@ class DDTalk {
             console.error(e);
         }
         
-        this.dealEvent( corpId );
+        await this.dealEvent( corpId );
     }
 
     static async eventPush( msg: any ){
@@ -252,7 +252,7 @@ class DDTalk {
         let result = await cache.rpush( key, msg );
         if(!DDEventCorpId[corpId]){
             DDEventCorpId[corpId] = true;
-            this.dealEvent( corpId );
+            await this.dealEvent( corpId );
         }else{
             console.log("this key is running ===> ", corpId);
         }
