@@ -48,6 +48,7 @@ gulplib.dist(function () {
         'common',
         'libs',
         'config',
+        'http'
     ];
     dirs.forEach(function(dir){
         var t = merge2(gulp.src(dir + '/**/*', {base:'.'}),
