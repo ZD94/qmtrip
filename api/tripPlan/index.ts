@@ -1740,8 +1740,8 @@ class TripPlanModule {
     }
 
     @clientExport
-    @requireParams(["tripPlanId"])
-    static async makeSpendReport(params: {tripPlanId: string}) {
+    @requireParams(["tripPlanId"],["version"])
+    static async makeSpendReport(params: {tripPlanId: string, version?: number}) {
         var money2hanzi = require("money2hanzi");
         let staff = await Staff.getCurrent()
         let {tripPlanId} = params;
@@ -1913,6 +1913,13 @@ class TripPlanModule {
                 return Number(prev) + Number(cur)
             });
 
+        let detailUrl: string;
+        if (params.version && params.version == 2) { //#@template
+            detailUrl = `${config.v2_host}/#/trip/make-expense/${tripPlan.id}/${financeCheckCode.code}`;
+        } else {
+            detailUrl = `${config.host}#/finance/trip-detail?id=${tripPlan.id}&code=${financeCheckCode.code}`;
+        }
+
         let content: any = [
             `出差人:${staff.name}`,
             `出差日期:${moment(tripPlan.startAt).format('YYYY.MM.DD')}-${moment(tripPlan.backAt).format('YYYY.MM.DD')}`,
@@ -1920,7 +1927,7 @@ class TripPlanModule {
             `出差预算:${tripPlan.budget}`,
             `实际支出:${_personalExpenditure}个人支付, ${(Number(tripPlan.expenditure)-_personalExpenditure).toFixed(2)}公司支付`,
             `出差记录编号:${tripPlan.planNo}`,
-            `校验地址: ${config.host}#/finance/trip-detail?id=${tripPlan.id}&code=${financeCheckCode.code}`
+            `校验地址: ${detailUrl}`
         ]
 
         let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')});
@@ -1951,7 +1958,6 @@ class TripPlanModule {
 
         let buf = await makeSpendReport(data);
         try {
-            let detailUrl = `${config.host}#/finance/trip-detail?id=${tripPlan.id}&code=${financeCheckCode.code}`;
             await API.notify.submitNotify({
                 key: 'qm_spend_report',
                 userId: staff.id,
