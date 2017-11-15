@@ -133,9 +133,9 @@ class TripApproveModule {
         let approve_url: string;
         let appMessageUrl: string;
         if (params.version && params.version == 2) {
-            approve_url = API.notify.v2UrlGenerator(`${config.v2_host}/trip-approve/approve-detail`,[tripApprove.id,1]) //参数为tripApproveId和titleId；
-            let finalUrl = API.notify.v2UrlGenerator("/trip-approve/approve-detail",[tripApprove.id,1])
-            appMessageUrl = API.notify.v2UrlGenerator("/judge-permission/index",{id: tripApprove.id, modelName: "tripApprove", finalUrl: finalUrl})
+            approve_url = await API.notify.v2UrlGenerator(`${config.v2_host}/#/trip-approval/approve-detail`,[tripApprove.id,1]) //参数为tripApproveId和titleId；
+            let finalUrl = await API.notify.v2UrlGenerator("/#/trip-approval/approve-detail",[tripApprove.id,1])
+            appMessageUrl = await API.notify.v2UrlGenerator("/judge-permission/index",[tripApprove.id, "tripApprove", finalUrl])
         } else {
             approve_url = `${config.host}/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
             let finalUrl = `#/trip-approval/detail?approveId=${tripApprove.id}`;
@@ -150,7 +150,7 @@ class TripApproveModule {
             console.warn(`转换短链接失败`, err);
         }
 
-        console.error(`approve_url:${approve_url},appMessageUrl:${appMessageUrl}`);
+        console.error(`++++++++++++++++++ approve_url:${approve_url},appMessageUrl:${appMessageUrl}`);
         if(company.isApproveOpen) {
             //给审核人发审核邮件
             let approveUser = await Models.staff.get(tripApprove['approveUserId']);
@@ -405,13 +405,13 @@ class TripApproveModule {
             await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: true, version: params.version});
         }else if(approveResult == EApproveResult.REJECT){
             //发送审核结果邮件
-            let self_url;
-            let appMessageUrl;
+            let self_url: string;
+            let appMessageUrl: string;
             //#@template
             if (params.version && params.version == 2) {
-                self_url = API.notify.v2UrlGenerator(`${config.v2_host}/trip-approve/approve-detail`,[tripApprove.id,1])
-                let finalUrl = API.notify.v2UrlGenerator("/trip-approve/approve-detail",[tripApprove.id,1])
-                appMessageUrl = API.notify.v2UrlGenerator("#/judge-permission/index",[tripApprove.id, "tripApprove", finalUrl])
+                self_url = await API.notify.v2UrlGenerator(`${config.v2_host}/#/trip-approve/approve-detail`,[tripApprove.id,1])
+                let finalUrl = await API.notify.v2UrlGenerator("/#/trip-approve/approve-detail",[tripApprove.id,1])
+                appMessageUrl = await API.notify.v2UrlGenerator("#/judge-permission/index",[tripApprove.id, "tripApprove", finalUrl])
             } else {
                 self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
                 let finalUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;

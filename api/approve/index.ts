@@ -125,6 +125,7 @@ class ApproveModule {
             return approve;
         }).catch(async function(err){
             if(err) {
+                console.log(err)
                 company.extraTripPlanFrozenNum = extraTripPlanFrozenNum;
                 company.tripPlanFrozenNum = originTripPlanFrozenNum;
                 await company.save();

@@ -150,6 +150,7 @@ export class QmPlugin extends AbstractOAPlugin {
                 submitter: submitter,
             } as createTripApproveResult;
         }).catch(async function(err){
+            console.log(err)
             if(err){
                 throw L.ERR.INTERNAL_ERROR();
             }
