@@ -8,6 +8,7 @@ import {scannerDecoration, registerControllerToRouter, Reply} from "@jingli/rest
 
 import path = require("path");
 import express = require("express");
+import { Request, Response, NextFunction, Express } from 'express';
 
 let router = express.Router();
 
@@ -19,7 +20,7 @@ let allowOrigin = [
     "jingli365"
 ];
 
-function checkOrigin( origin ){
+function checkOrigin( origin: Array<any> ){
     for(let item of allowOrigin){
         if(origin.indexOf(item) > -1){
             return true;
@@ -29,7 +30,7 @@ function checkOrigin( origin ){
     return false;
 }
 
-function allowCrossDomain(req, res, next) {
+function allowCrossDomain(req: Request, res: Response, next: NextFunction) {
     if (req.headers.origin && checkOrigin(req.headers.origin)) {
         res.header('Access-Control-Allow-Origin', req.headers.origin);
     }
@@ -42,7 +43,7 @@ function allowCrossDomain(req, res, next) {
 }
 
 
-export async function initHttp(app) {
+export async function initHttp(app: Express) {
     // router.param("companyId", validCompanyId);
     app.use('/api/v1', allowCrossDomain, router);
     // app.use('/api/v1', authenticate, router);

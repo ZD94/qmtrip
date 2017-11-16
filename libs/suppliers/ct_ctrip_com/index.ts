@@ -3,7 +3,7 @@ import {SupplierWebRobot, SupplierOrder, ReserveLink} from "../index";
 import {EPayType, EInvoiceFeeTypes} from "_types/tripPlan";
 import L from '@jingli/language';
 
-var MOrderType = {
+var MOrderType: { [key: string]: any} = {
     "F": EInvoiceFeeTypes.PLANE_TICKET,
     "H": EInvoiceFeeTypes.HOTEL,
     "T": EInvoiceFeeTypes.TRAIN_TICKET

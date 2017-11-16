@@ -21,6 +21,7 @@ import {ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan"
 import * as CLS from 'continuation-local-storage';
 let CLSNS = CLS.getNamespace('dnode-api-context');
 import {DB} from "@jingli/database";
+import { Place } from '_types/place';
 export class QmPlugin extends AbstractOAPlugin {
     constructor() {
         super();
@@ -51,7 +52,7 @@ export class QmPlugin extends AbstractOAPlugin {
             return v;
         });*/
 
-        let arrivalCityCodes = [];//目的地代码
+        let arrivalCityCodes: Array<string> = [];//目的地代码
         let project: Project;
         let projectName = query.projectName;
         if(projectName){
@@ -82,7 +83,8 @@ export class QmPlugin extends AbstractOAPlugin {
                         if (typeof placeCode != 'string') {
                             placeCode = placeCode['id'];
                         }
-                        let arrivalInfo = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
+
+                        let arrivalInfo: Place = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
                         arrivalCityCodes.push(arrivalInfo.id);
                         if(i == (destinationPlacesInfo.length - 1)){//目的地存放最后一个目的地
                             tripApprove.arrivalCityCode = arrivalInfo.id;

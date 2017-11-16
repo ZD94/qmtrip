@@ -14,7 +14,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         super('http://ct.ctrip.com');
     }
 
-    async login(authDate: any): Promise<any>{
+    async login(authDate?: any): Promise<any>{
         throw L.ERR.NOT_IMPLEMENTED();
     }
 
@@ -22,7 +22,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         throw L.ERR.NOT_IMPLEMENTED();
     }
 
-    async getBookLink(options): Promise<ReserveLink>{
+    async getBookLink(options: { [key: string]: any }): Promise<ReserveLink>{
         var reserveType = options.reserveType;
         var bookLink: any = {};
 
@@ -40,7 +40,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         return bookLink;
     }
 
-    async getAirTicketReserveLink(options):Promise<ReserveLink> {
+    async getAirTicketReserveLink(options: { [key: string]: any }):Promise<ReserveLink> {
         let data = options.data;
         let deeplinkData = data.deeplinkData;
         let deeplink, jsCode;
@@ -69,7 +69,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         }
     }
 
-    async getHotelReserveLink(options):Promise<ReserveLink> {
+    async getHotelReserveLink(options: { [key: string]: any }):Promise<ReserveLink> {
         let data = options.data;
         let deeplinkData = data.deeplinkData;
         let deeplink, jsCode;
@@ -95,7 +95,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         }
     }
 
-    async getTrainTicketReserveLink(options):Promise<ReserveLink> {
+    async getTrainTicketReserveLink(options: { [key: string]: any }):Promise<ReserveLink> {
         let trafficBookLink = "http://m.ctrip.com/webapp/train/v2/index#!/list";
         let indexBookLink = 'http://m.ctrip.com/webapp/train/v2/index';
         let param = {

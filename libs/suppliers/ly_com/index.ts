@@ -21,7 +21,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         throw L.ERR.NOT_IMPLEMENTED();
     }
 
-    async getBookLink(options): Promise<ReserveLink>{
+    async getBookLink(options: { [key: string]: any}): Promise<ReserveLink>{
         var reserveType = options.reserveType;
         var bookLink: any = {};
 
@@ -39,7 +39,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
 
         return bookLink;
     }
-    async getAirTicketReserveLink(options):Promise<ReserveLink> {
+    async getAirTicketReserveLink(options: { [key: string]: any}):Promise<ReserveLink> {
         let date = moment(options.leaveDate).format("YYYY-MM-DD");
         let from = CityName[options.fromCity].c,
             to   = CityName[options.toCity].c;
@@ -51,7 +51,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         return {url:link, jsCode: ''};
     }
 
-    async getHotelReserveLink(options):Promise<ReserveLink> {
+    async getHotelReserveLink(options: { [key: string]: any}):Promise<ReserveLink> {
         let checkInDate   = moment(options.leaveDate).format("YYYY-MM-DD"),
             checkOutDate  = moment(options.backDate).format("YYYY-MM-DD"),
             cityCode      = CityCodes[options.city];
@@ -76,7 +76,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         return {url:link, jsCode: jsCode};
     }
 
-    async getTrainTicketReserveLink(options):Promise<ReserveLink> {
+    async getTrainTicketReserveLink(options: { [key: string]: any}):Promise<ReserveLink> {
         let startStation = encodeURI(options.fromCity),
             endStation   = encodeURI(options.toCity),
             date         = moment(options.leaveDate).format("YYYY-MM-DD");

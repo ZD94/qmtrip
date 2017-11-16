@@ -19,7 +19,7 @@ var API = require("@jingli/dnode-api");
 
 export async function initCompanyRegion(){
     let companies = await Models.company.all({where: {}});
-    await Promise.all(companies.map(async (co) => {
+    await Promise.all(companies.map(async (co: Company) => {
         let subsidyRegions = await API.travelPolicy.initSubsidyRegions({companyId: co.id});
     }))
 }
@@ -95,7 +95,7 @@ async function initXAJHTravelPolicy(params: {companyId: string}): Promise<any[]>
         }
     }
 
-    let travelPolicies = Promise.all(tps.map(async function(item){
+    let travelPolicies = Promise.all(tps.map(async function(item: any){
         let subsidyTemplates = item.subsidyTemplates;
         if(!item.companyId) item["companyId"] = company["id"];
         let travelPolicy = await API.travelPolicy.createTravelPolicy(item);
@@ -167,7 +167,7 @@ async function initXAJHStaffs(params: {companyId: string}): Promise<any[]> {
     let defaultDepartment = await company.getDefaultDepartment();
     let staffs = testData.staffs;
 
-    let result = await Promise.all(staffs.map(async function(staff){
+    let result = await Promise.all(staffs.map(async function(staff: any){
         let deptNames = staff.departmentName;
         let depts = [];
         let travelPolicy : any;

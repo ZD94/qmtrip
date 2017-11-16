@@ -19,7 +19,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         throw L.ERR.NOT_IMPLEMENTED();
     }
 
-    async getBookLink(options): Promise<ReserveLink>{
+    async getBookLink(options: any): Promise<ReserveLink>{
         var reserveType = options.reserveType;
         var bookLink: any = {};
 
@@ -37,7 +37,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         return bookLink;
     }
 
-    async getAirTicketReserveLink(options):Promise<ReserveLink> {
+    async getAirTicketReserveLink(options: any):Promise<ReserveLink> {
         let data = options.data;
         let deeplinkData = data.deeplinkData;
         let deeplink, jsCode;
@@ -66,7 +66,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         }
     }
 
-    async getHotelReserveLink(options):Promise<ReserveLink> {
+    async getHotelReserveLink(options: any):Promise<ReserveLink> {
         let data = options.data;
         let deeplinkData = data.deeplinkData;
         let deeplink, jsCode;
@@ -92,7 +92,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         }
     }
 
-    async getTrainTicketReserveLink(options):Promise<ReserveLink> {
+    async getTrainTicketReserveLink(options: any):Promise<ReserveLink> {
         let trafficBookLink = "http://m.ctrip.com/webapp/train/v2/index#!/list";
         let indexBookLink = 'http://m.ctrip.com/webapp/train/v2/index';
         let param = {

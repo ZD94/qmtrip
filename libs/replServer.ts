@@ -4,6 +4,7 @@ import {port} from "_debugger";
  */
 var repl = require('repl')
 var net = require('net')
+import { Socket } from 'net';
 const API = require('@jingli/dnode-api');
 import Logger from '@jingli/logger';
 const logger = new Logger("replServer");
@@ -17,7 +18,9 @@ export interface ReplOptions {
 
 export default class ReplModel{
     private host: string;
-    private _context: Object;
+    private _context: {
+        [key:string]: any
+    };
 
     constructor(public port: number | string, options?: ReplOptions) {
         if (!options) { 
@@ -29,7 +32,7 @@ export default class ReplModel{
 
     initReplServer(){
         let self = this;
-        var server = net.createServer(function (socket) {
+        var server = net.createServer(function (socket: Socket) {
             var r = repl.start({
                 prompt: 'socket ' + socket.remoteAddress + ':' + socket.remotePort + '> '
                 , input: socket
