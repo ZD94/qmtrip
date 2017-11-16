@@ -6,7 +6,7 @@
 'use strict';
 import {
     AbstractOAPlugin, createTripApproveParam, createTripApproveResult,
-    createTripInvoiceAuditFlowParam, createTripInvoiceAuditFlowResult, IDestination, ITripApprove,
+    createTripInvoiceAuditFlowParam, createTripInvoiceAuditFlowResult,
 } from "../index";
 
 import TripPlanModule = require("api/tripPlan/index");
@@ -23,6 +23,7 @@ import * as CLS from 'continuation-local-storage';
 let CLSNS = CLS.getNamespace('dnode-api-context');
 import {DB} from "@jingli/database";
 
+import {IDestination, ITripApprove} from "../../../../_types/tripApprove"
 
 
 export class QmPlugin extends AbstractOAPlugin {

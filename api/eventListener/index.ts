@@ -9,7 +9,7 @@ import L from '@jingli/language';
 var request = require("request-promise");
 
 export class EventModule{
-    async sendEventNotice (params): Promise<any> {
+    async sendEventNotice (params: {eventName: string, data: any, companyId: string}): Promise<any> {
         let {eventName, data, companyId} = params;
         if(!eventName || !companyId){
             throw L.ERR.INVALID_ARGUMENT("eventName | companyId");
@@ -46,7 +46,8 @@ export class EventModule{
             }
 
         }else{
-            throw L.ERR.ERROR_CODE(503, "事件未被监听");
+            return null;
+            // throw L.ERR.ERROR_CODE(503, "事件未被监听");
         }
     }
 }

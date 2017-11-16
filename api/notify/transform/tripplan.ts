@@ -12,8 +12,15 @@ export = async function transform(values: any): Promise<any>{
     let cityMap:any = {};
     let approveUserMap:any = {};
     if(tripPlan && tripPlan.id){
-        tripApprove = await Models.tripApprove.get(values.tripPlan.id);
-        values.tripApprove = tripApprove;
+        tripApprove = await API.eventListener.sendEventNotice({
+            eventName: "",
+            data: {
+               id: tripPlan.id
+            },
+            companyId: tripPlan.companyId
+        });
+        if(tripApprove)
+            values.tripApprove = tripApprove;
     }
     if(!values.tripApprove || !values.tripApprove.id){
         return values;
