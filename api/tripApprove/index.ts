@@ -24,7 +24,7 @@ import _ = require("lodash");
 import {ENoticeType} from "_types/notice/notice";
 import {AutoApproveType, AutoApproveConfig, ISegment} from "_types/tripPlan"
 import {DB} from "@jingli/database";
-import {ITripApprove} from "../../libs/oa/plugin/index";
+import {ITripApprove} from "../../_types/tripApprove";
 
 class TripApproveModule {
 
@@ -192,7 +192,12 @@ class TripApproveModule {
             companyId: approve.companyId
         });
         if(!tripApprove) {
-            tripApprove = approve;
+            tripApprove = {
+                arrivalCityCodes: '',
+                id: "",
+                startAt: "",
+                backAt:
+            };
         }
 
         // let tripApprove = await Models.tripApprove.get(params.approveId);
