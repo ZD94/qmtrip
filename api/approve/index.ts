@@ -127,6 +127,7 @@ class ApproveModule {
                 company.extraTripPlanFrozenNum = extraTripPlanFrozenNum;
                 company.tripPlanFrozenNum = originTripPlanFrozenNum;
                 await company.save();
+                console.info(err);
                 throw new Error("提交审批失败");
             }
         });

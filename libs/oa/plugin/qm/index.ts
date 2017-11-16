@@ -2,10 +2,11 @@
  * Created by wlh on 2016/11/10.
  */
 
+
 'use strict';
 import {
     AbstractOAPlugin, createTripApproveParam, createTripApproveResult,
-    createTripInvoiceAuditFlowParam, createTripInvoiceAuditFlowResult,
+    createTripInvoiceAuditFlowParam, createTripInvoiceAuditFlowResult, IDestination, ITripApprove,
 } from "../index";
 
 import TripPlanModule = require("api/tripPlan/index");
@@ -21,6 +22,9 @@ import {ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan"
 import * as CLS from 'continuation-local-storage';
 let CLSNS = CLS.getNamespace('dnode-api-context');
 import {DB} from "@jingli/database";
+
+
+
 export class QmPlugin extends AbstractOAPlugin {
     constructor() {
         super();
@@ -51,110 +55,118 @@ export class QmPlugin extends AbstractOAPlugin {
             return v;
         });*/
 
-        let arrivalCityCodes = [];//目的地代码
+        let arrivalCityCodes: string[] = [];//目的地代码
+        let destinations: IDestination[] = [];
         let project: Project;
         let projectName = query.projectName;
         if(projectName){
             project = await API.tripPlan.getProjectByName({companyId: company.id, name: projectName,
                 userId: staff.id, isCreate: true});
         }
-
-        return DB.transaction(async function(t){
-            let tripApprove = await Models.tripApprove.create({approveUserId: approveUser, id: approveNo});
-            if(query.originPlace) {
-                let placeCode = query.originPlace;
-                if (typeof placeCode != 'string') {
-                    placeCode = placeCode['id']
-                }
-                let deptInfo = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
-                tripApprove.deptCityCode = deptInfo.id;
-                tripApprove.deptCity = deptInfo.name;
+        let tripApprove: any = {};
+        tripApprove.id = approveNo;
+        tripApprove.approveUserId = approveUser;
+        // let tripApprove = await Models.tripApprove.create({approveUserId: approveUser, id: approveNo});
+        if(query.originPlace) {
+            let placeCode = query.originPlace;
+            if (typeof placeCode != 'string') {
+                placeCode = placeCode['id']
             }
+            let deptInfo = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
+            tripApprove.deptCityCode = deptInfo.id;
+            tripApprove.deptCity = deptInfo.name;
+        }
 
-            tripApprove.isRoundTrip = query.isRoundTrip;
-            if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
-                for(let i = 0; i < destinationPlacesInfo.length; i++){
-                    let segment: ISegment = destinationPlacesInfo[i];
+        tripApprove.isRoundTrip = query.isRoundTrip;
+        if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
+            for(let i = 0; i < destinationPlacesInfo.length; i++){
+                let segment: ISegment = destinationPlacesInfo[i];
 
-                    //处理目的地 放入arrivalCityCodes
-                    if(segment.destinationPlace){
-                        let placeCode = segment.destinationPlace;
-                        if (typeof placeCode != 'string') {
-                            placeCode = placeCode['id'];
-                        }
-                        let arrivalInfo = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
-                        arrivalCityCodes.push(arrivalInfo.id);
-                        if(i == (destinationPlacesInfo.length - 1)){//目的地存放最后一个目的地
-                            tripApprove.arrivalCityCode = arrivalInfo.id;
-                            tripApprove.arrivalCity = arrivalInfo.name;
-                        }
+                //处理目的地 放入arrivalCityCodes
+                if(segment.destinationPlace){
+                    let placeCode = segment.destinationPlace;
+                    if (typeof placeCode != 'string') {
+                        placeCode = placeCode['id'];
                     }
-
-                    //处理其他数据
-                    if(i == 0){
-                        tripApprove.isNeedTraffic = segment.isNeedTraffic;
-                        tripApprove.isNeedHotel = segment.isNeedHotel;
-
-                        tripApprove.startAt = segment.leaveDate;
-                    }
-                    if(i == (destinationPlacesInfo.length - 1)){
-                        tripApprove.backAt = segment.goBackDate;
+                    let arrivalInfo = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
+                    let destination: IDestination = {city:arrivalInfo.id, arrivalDateTime: segment.leaveDate, leaveDateTime: segment.goBackDate};
+                    arrivalCityCodes.push(arrivalInfo.id);
+                    destinations.push(destination);
+                    if(i == (destinationPlacesInfo.length - 1)){//目的地存放最后一个目的地
+                        tripApprove.arrivalCityCode = arrivalInfo.id;
+                        tripApprove.arrivalCity = arrivalInfo.name;
                     }
                 }
+
+                //处理其他数据
+                if(i == 0){
+                    tripApprove.startAt = segment.leaveDate;
+                }
+                if(i == (destinationPlacesInfo.length - 1)){
+                    tripApprove.backAt = segment.goBackDate;
+                }
             }
+        }
 
-            // let tripApprove =  TripApprove.create(params);
+        if(params.approveUser) {
+            let approveUser = await Models.staff.get(params.approveUser);
+            if(!approveUser)
+                throw {code: -3, msg: '审批人不存在'}
+            tripApprove.approveUserId = approveUser.id;
+        }
 
-            if(params.approveUser) {
-                let approveUser = await Models.staff.get(params.approveUser);
-                if(!approveUser)
-                    throw {code: -3, msg: '审批人不存在'}
-                tripApprove.approveUser = approveUser;
-            }
-            tripApprove.isSpecialApprove = approve.isSpecialApprove;
-            tripApprove.specialApproveRemark = approve.specialApproveRemark;
-            tripApprove.status = QMEApproveStatus.WAIT_APPROVE;
-            tripApprove.account = staff;
-            tripApprove['companyId'] = company.id;
-            tripApprove.project = project;
-            tripApprove.title = approve.title;
+        tripApprove.isSpecialApprove = approve.isSpecialApprove;
+        tripApprove.specialApproveRemark = approve.specialApproveRemark;
+        tripApprove.status = QMEApproveStatus.WAIT_APPROVE;
+        tripApprove.accountId = staff.id;
+        tripApprove['companyId'] = company.id;
+        tripApprove.title = project.name;
+        tripApprove.projectId = project.id;
 
-            tripApprove.query = JSON.stringify(query);
-            tripApprove.arrivalCityCodes = JSON.stringify(arrivalCityCodes);
+        // tripApprove.query = query;
+        tripApprove.arrivalCityCodes = arrivalCityCodes;
+        tripApprove.destinations = destinations;
 
-            tripApprove.budgetInfo = budgets;
-            tripApprove.budget = totalBudget;
-            tripApprove.oldBudget = totalBudget;
-            tripApprove.status = totalBudget < 0 ? QMEApproveStatus.NO_BUDGET : QMEApproveStatus.WAIT_APPROVE;
+        // tripApprove.budgetInfo = budgets;
+        tripApprove.budget = totalBudget;
+        tripApprove.oldBudget = totalBudget;
+        tripApprove.status = totalBudget < 0 ? QMEApproveStatus.NO_BUDGET : QMEApproveStatus.WAIT_APPROVE;
+        tripApprove.staffList = approve.staffList;
 
-            tripApprove.staffList=approve.staffList;
-            let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, approveStatus: EApproveResult.WAIT_APPROVE, remark: '提交审批单，等待审批'});
+        //如果出差计划是待审批状态，增加自动审批时间
+        if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
+            tripApprove.autoApproveTime = await TripApproveModule.calculateAutoApproveTime({
+                type: company.autoApproveType,
+                config: company.autoApprovePreference,
+                submitAt: new Date(),
+                tripStartAt: tripApprove.startAt,
+            });
+        }
+        let returnApprove = await API.eventListener.sendEventNotice({eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: company.id});
+        if(returnApprove && returnApprove.code == 0){
+            return DB.transaction(async function(t){
+                approve.oaResult = returnApprove.code;
+                await approve.save();
+                let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, approveStatus: EApproveResult.WAIT_APPROVE, remark: '提交审批单，等待审批'});
 
-            //如果出差计划是待审批状态，增加自动审批时间
-            if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
-                tripApprove.autoApproveTime = await TripApproveModule.calculateAutoApproveTime({
-                    type: company.autoApproveType,
-                    config: company.autoApprovePreference,
-                    submitAt: new Date(),
-                    tripStartAt: tripApprove.startAt,
-                });
-            }
+                await tripPlanLog.save();
+                // await API.tripApprove.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});//暂时注掉统一修改通知信息
+                // await API.tripApprove.sendTripApproveNoticeToSystem({approveId: tripApprove.id});
 
-            await tripPlanLog.save();
-            tripApprove = await tripApprove.save();
-            await API.tripApprove.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
-            // await API.tripApprove.sendTripApproveNoticeToSystem({approveId: tripApprove.id});
-            return {
-                approveNo: approveNo,
-                outerId: tripApprove.id,
-                submitter: submitter,
-            } as createTripApproveResult;
-        }).catch(async function(err){
-            if(err){
-                throw L.ERR.INTERNAL_ERROR();
-            }
-        })
-
+            }).catch(async function(err){
+                if(err){
+                    throw L.ERR.INTERNAL_ERROR();
+                }
+            })
+        }else{
+            approve.oaResult = returnApprove.code;
+            await approve.save();
+        }
+        return {
+            approveNo: approveNo,
+            outerId: tripApprove.id,
+            submitter: submitter,
+        } as createTripApproveResult;
     }
 
     async tripApproveFail(params: {approveId: string, reason?: string}) {
