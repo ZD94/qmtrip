@@ -133,9 +133,9 @@ class TripApproveModule {
         let approve_url: string;
         let appMessageUrl: string;
         if (params.version && params.version == 2) {
-            approve_url = await API.notify.v2UrlGenerator(`${config.v2_host}/#/trip-approval/approve-detail`,[tripApprove.id,1]) //参数为tripApproveId和titleId；
-            let finalUrl = await API.notify.v2UrlGenerator("/#/trip-approval/approve-detail",[tripApprove.id,1])
-            appMessageUrl = await API.notify.v2UrlGenerator("/judge-permission/index",[tripApprove.id, "tripApprove", finalUrl])
+            approve_url = `${config.v2_host}/#/trip-approval/approve-detail/${tripApprove.id}/1` //参数为tripApproveId和titleId；
+            let finalUrl = `/#/trip-approval/approve-detail/${tripApprove.id}/1`
+            appMessageUrl = `/judge-permission/index/${tripApprove.id}/tripApprove/${finalUrl}`
         } else {
             approve_url = `${config.host}/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
             let finalUrl = `#/trip-approval/detail?approveId=${tripApprove.id}`;
@@ -409,9 +409,9 @@ class TripApproveModule {
             let appMessageUrl: string;
             //#@template
             if (params.version && params.version == 2) {
-                self_url = await API.notify.v2UrlGenerator(`${config.v2_host}/#/trip-approve/approve-detail`,[tripApprove.id,1])
-                let finalUrl = await API.notify.v2UrlGenerator("/#/trip-approve/approve-detail",[tripApprove.id,1])
-                appMessageUrl = await API.notify.v2UrlGenerator("#/judge-permission/index",[tripApprove.id, "tripApprove", finalUrl])
+                self_url = `${config.v2_host}/#/trip-approve/approve-detail/${tripApprove.id}/1`
+                let finalUrl = `/#/trip-approve/approve-detail/${tripApprove.id}/1`
+                appMessageUrl = `#/judge-permission/index/${tripApprove.id}/tripApprove/${finalUrl}`
             } else {
                 self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
                 let finalUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;

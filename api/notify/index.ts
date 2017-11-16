@@ -320,14 +320,3 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
     await tpl.send({ mobile: account.mobile, openId: openId, email: account.email, accountId: userId }, _values);
     return true;
 }
-
-//v2Url的生成方式。
-export async function v2UrlGenerator(baseUrl: string, params?: Array<string>): Promise<string> {
-    console.log(`________ ${JSON.stringify(params)}`)
-    params = params || []
-    console.log(`________ ${JSON.stringify(params)}`)
-    params = params.map(val => encodeURIComponent(val))
-    let result = (baseUrl + "/" + params.join("/")).replace("//","/")
-    console.log(`==============${result}`)
-    return result
-}

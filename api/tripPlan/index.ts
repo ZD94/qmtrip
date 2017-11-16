@@ -375,7 +375,7 @@ class TripPlanModule {
         let notifyUrl
         if (params.version == 2) {
             //#@template
-            notifyUrl = API.notify.v2UrlGenerator(`${config.host}/agency.html#/travelRecord/TravelDetail`, [tripPlan.id])
+            notifyUrl = `${config.v2_host}/agency.html#/travelRecord/TravelDetail/${tripPlan.id}`
         } else{
             notifyUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
         }
@@ -401,8 +401,8 @@ class TripPlanModule {
             let appMessageUrl;
             if (params.version && params.version == 2) {
                 //#@template 支持v2
-                auditUrl = API.notify.v2UrlGenerator(`${config.host}/agency.html#/travelRecord/TravelDetail`,[tripPlan.id])
-                appMessageUrl = API.notify.v2UrlGenerator(`#/travelRecord/TravelDetail`,[tripPlan.id])
+                auditUrl =`${config.v2_host}/agency.html#/travelRecord/TravelDetail/${tripPlan.id}`
+                appMessageUrl = `#/travelRecord/TravelDetail/${tripPlan.id}`
             } else {
                 auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
                 appMessageUrl = `#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
@@ -1594,9 +1594,9 @@ class TripPlanModule {
         let self_url
         let appMessageUrl
         if (params.version && params.version == 2) {
-            self_url = API.notify.v2UrlGenerator(`${config.v2_host}/index.html#/trip/list-detail`,{tripid: approve.id})
-            let finalUrl = API.notify.v2UrlGenerator("#/trip/list-detail",{tripid: approve.id})
-            appMessageUrl = API.notify.v2UrlGenerator("#/judge-permission/index",{id: approve.id, modelName: "tripPlan", finalUrl: finalUrl})
+            self_url = `${config.v2_host}/index.html#/trip/list-detail/${approve.id}`
+            let finalUrl = `${config.v2_host}#/trip/list-detail/${approve.id}`
+            appMessageUrl = `#/judge-permission/index/${approve.id}/tripPlan/${finalUrl}`
         } else {
             self_url = config.host + '/index.html#/trip/list-detail?tripid=' + approve.id;
             let finalUrl = `#/trip/list-detail?tripid=${approve.id}`;
