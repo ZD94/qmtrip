@@ -25,7 +25,6 @@ import _ = require("lodash");
 import {ENoticeType} from "_types/notice/notice";
 import {AutoApproveType, AutoApproveConfig, ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan"
 import {DB} from "@jingli/database";
-import {ITripApprove} from "libs/oa/plugin/index";
 
 class TripApproveModule {
 
@@ -185,8 +184,8 @@ class TripApproveModule {
         let approve = await Models.approve.get(params.approveId);
         let company = await Models.company.get(approve.companyId);
 
-        let tripApprove = await API.eventListener.sendEventNotice({
-            event: 'getTripApprove',
+        let tripApprove: ITripApprove = await API.eventListener.sendEventNotice({
+            eventName: 'getTripApprove',
             data: {
                 id: params.approveId
             },

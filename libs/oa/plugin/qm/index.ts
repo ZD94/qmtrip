@@ -6,13 +6,13 @@
 'use strict';
 import {
     AbstractOAPlugin, createTripApproveParam, createTripApproveResult,
-    createTripInvoiceAuditFlowParam, createTripInvoiceAuditFlowResult, IDestination, ITripApprove,
+    createTripInvoiceAuditFlowParam, createTripInvoiceAuditFlowResult,
 } from "../index";
 
 import TripPlanModule = require("api/tripPlan/index");
 import TripApproveModule = require("api/tripApprove/index");
 import {Models} from "_types/index";
-import {ETripType, TripApprove, QMEApproveStatus, EApproveResult, Project} from "_types/tripPlan/tripPlan";
+import {ETripType, QMEApproveStatus, EApproveResult, Project} from "_types/tripPlan/tripPlan";
 import _ = require('lodash');
 const L = require("@jingli/language");
 import moment = require("moment");
@@ -23,6 +23,7 @@ import * as CLS from 'continuation-local-storage';
 let CLSNS = CLS.getNamespace('dnode-api-context');
 import {DB} from "@jingli/database";
 
+import {IDestination, ITripApprove} from "_types/tripApprove"
 
 
 export class QmPlugin extends AbstractOAPlugin {
