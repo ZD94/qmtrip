@@ -183,7 +183,7 @@ class TripApproveModule {
         let approve = await Models.approve.get(params.approveId);
         let company = await Models.company.get(approve.companyId);
 
-        let tripApprove = await API.event.sendEventNotice({
+        let tripApprove = await API.eventListener.sendEventNotice({
             event: 'getTripApprove',
             data: {
                 id: params.approveId

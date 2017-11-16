@@ -51,5 +51,5 @@ export class EventModule{
     }
 }
 
-// let eventModule = new EventModule();
-// export default eventModule;
+let eventModule = new EventModule();
+export default eventModule;
