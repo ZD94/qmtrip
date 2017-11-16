@@ -380,7 +380,8 @@ class TripApproveModule {
                 approveUser: staff.id,
                 outerId: tripApprove.id,
                 data: budgetInfo,
-                oa: 'qm'
+                oa: 'qm',
+                version: params.version
             });
         }).catch(async function(err){
             if(err) {

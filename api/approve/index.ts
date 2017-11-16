@@ -136,7 +136,7 @@ class ApproveModule {
     }
 
     @clientExport
-    @requireParams(['query', 'budget'], ['project', 'specialApproveRemark', 'approveUser'])
+    @requireParams(['query', 'budget'], ['project', 'specialApproveRemark', 'approveUser', 'version'])
     static async submitSpecialApprove(params: {query: any, budget: number, specialApproveRemark?: string, approveUser?: Staff, version?: number}):Promise<Approve> {
         let {query, budget, specialApproveRemark, approveUser} = params;
         let submitter = await Staff.getCurrent();
@@ -306,7 +306,7 @@ emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result) {
 
         //预算审批完成
         if (approve.type == EApproveType.TRAVEL_BUDGET && approve.status == EApproveStatus.SUCCESS) {
-            await API.tripPlan.saveTripPlanByApprove({tripApproveId: approve.id})
+            await API.tripPlan.saveTripPlanByApprove({tripApproveId: approve.id, version: result.version})
         }
     })();
 

@@ -1339,6 +1339,8 @@ async function _sendActiveEmail(accountId: string, origin?: string, version?: nu
     var appMessageUrl
     if (version && version == 2) {
         //#@template v2 url生成。
+        url = `${C.v2_host}/#/login/active/${account.id}/${sign}/${expireAt}/${account.email}`
+        appMessageUrl = "#/staff/staff-info";
     } else {
         url = host + "/index.html#/login/active?accountId=" + account.id + "&sign=" + sign + "&timestamp=" + expireAt + "&email=" + account.email;
         appMessageUrl = "#/staff/staff-info";
