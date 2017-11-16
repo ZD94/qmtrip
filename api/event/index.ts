@@ -8,8 +8,8 @@ import {DB} from '@jingli/database';
 import L from '@jingli/language';
 var request = require("request");
 
-export class EventModule{
-    async sendEventNotice (params): Promise<any> {
+export default class EventModule{
+    static async sendEventNotice (params): Promise<any> {
         let {event, data, companyId} = params;
         if(!event || !companyId){
             throw L.ERR.INVALID_ARGUMENT("eventName | companyId");
@@ -27,7 +27,7 @@ export class EventModule{
         if(eventListeners && eventListeners.length){
             let url = eventListeners[0].url;
             let method = eventListeners[0].method;
-            let returnResult = await new Promise((resolve, reject) => {
+            let returnResult: {code: number, msg: string, data: any} = await new Promise((resolve, reject) => {
                 return request({
                     uri: url,
                     body: params,
@@ -44,12 +44,14 @@ export class EventModule{
                     return resolve(result);
                 })
             });
-            return returnResult;
+            if(returnResult && returnResult.code == 0)
+                return returnResult.data;
+            throw L.ERR.ERROR_CODE(returnResult.code, returnResult.msg)
         }else{
-            return {code: 503, msg: "事件未被监听"};
+            throw L.ERR.ERROR_CODE(503, "事件未被监听");
         }
     }
 }
 
-let eventModule = new EventModule();
-export default eventModule;
+// let eventModule = new EventModule();
+// export default eventModule;

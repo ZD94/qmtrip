@@ -9,7 +9,7 @@ import {Models} from "_types/index";
 import {FindResult} from "common/model/interface";
 import {
     QMEApproveStatus, EApproveResult, ETripType, EPlanStatus,
-    TripPlan, TripPlanLog, EApproveResult2Text, TripApprove
+    TripPlan, TripPlanLog, EApproveResult2Text
 } from "_types/tripPlan/tripPlan";
 import moment = require("moment/moment");
 import {Staff, EStaffStatus, EStaffRole} from "_types/staff/staff";
@@ -179,9 +179,24 @@ class TripApproveModule {
     }
 
     static async sendApprovePassNoticeToCompany(params: {approveId: string}) {
-        let tripApprove = await Models.tripApprove.get(params.approveId);
-        let staff = tripApprove.account;
-        let company = staff.company;
+
+        let approve = await Models.approve.get(params.approveId);
+        let company = await Models.company.get(approve.companyId);
+
+        let tripApprove = await API.event.sendEventNotice({
+            event: 'getTripApprove',
+            data: {
+                id: params.approveId
+            },
+            companyId: approve.companyId
+        });
+        if(!tripApprove) {
+            tripApprove = approve;
+        }
+
+        // let tripApprove = await Models.tripApprove.get(params.approveId);
+        // let staff = tripApprove.account;
+        // let company = staff.company;
 
         try {
             if(company.getNoticeEmail){
