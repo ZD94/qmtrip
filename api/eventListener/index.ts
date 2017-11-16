@@ -38,16 +38,18 @@ export class EventModule{
                 if(typeof(result) == 'string'){
                     result = JSON.parse(result);
                 }
-                return result;
+                if(result && result.code == 0)
+                    return result.data;
+                throw L.ERR.ERROR_CODE(result.code, result.msg)
             }catch (err){
                 throw err;
             }
 
         }else{
-            return {code: 503, msg: "事件未被监听"};
+            throw L.ERR.ERROR_CODE(503, "事件未被监听");
         }
     }
 }
 
-let eventModule = new EventModule();
-export default eventModule;
+// let eventModule = new EventModule();
+// export default eventModule;
