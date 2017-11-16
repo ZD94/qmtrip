@@ -73,16 +73,22 @@ export class RestfulAPIUtil {
     async operateOnModel(options: {
         model: string,
         params?: any,
-        addUrl?: string
+        addUrl?: string,
+        useProxy?: boolean
     }):Promise<any> {
-        let {params, model, addUrl = ''} = options;
+        let {params, model, addUrl = '', useProxy = true} = options;
         let {fields, method} = params;
         let currentCompanyId = fields['companyId'];
-        if (!currentCompanyId || typeof(currentCompanyId) == 'undefined') {
-            let staff = await Staff.getCurrent();
-            currentCompanyId = staff["companyId"];
+        let companyToken;
+        if(useProxy) {
+            if (!currentCompanyId || typeof(currentCompanyId) == 'undefined') {
+                let staff = await Staff.getCurrent();
+                currentCompanyId = staff["companyId"];
+            }
+            companyToken = await getCompanyTokenByAgent(currentCompanyId);
+        }else {
+            companyToken = await getAgentToken();
         }
-        let companyToken = await getCompanyTokenByAgent(currentCompanyId);
         if (!companyToken) {
             throw new Error('换取 token 失败！')
         }
