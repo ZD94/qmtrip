@@ -2,6 +2,7 @@
  * Created by wlh on 2016/11/14.
  */
 
+
 'use strict';
 import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
 import {modelNotNull} from "../_decorator";
@@ -22,8 +23,9 @@ var API = require('@jingli/dnode-api');
 import config = require("@jingli/config");
 import _ = require("lodash");
 import {ENoticeType} from "_types/notice/notice";
-import {AutoApproveType, AutoApproveConfig, ISegment} from "_types/tripPlan"
+import {AutoApproveType, AutoApproveConfig, ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan"
 import {DB} from "@jingli/database";
+import {ITripApprove} from "libs/oa/plugin/index";
 
 class TripApproveModule {
 
@@ -550,13 +552,23 @@ class TripApproveModule {
 
     @clientExport
     @requireParams(['id'])
-    static async getTripApprove(params: {id: string}): Promise<TripApprove> {
+    static async getTripApprove(params: {id: string}): Promise<ITripApprove> {
         let staff = await Staff.getCurrent();
         let staffId = staff.id;
-        let approve = await Models.tripApprove.get(params.id);
-        if(approve.account.id != staffId && approve.approveUser.id != staffId && approve.approvedUsers.indexOf(staffId) < 0)
+        let approve = await Models.approve.get(params.id);
+        let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
+        let {budgets, query} = budgetInfo;
+        let tripApprove: ITripApprove = await API.eventListener.sendEventNotice({
+            event: 'getTripApprove',
+            data: params,
+            companyId: staff.company.id
+        });
+
+        tripApprove.budgetInfo = budgets;
+        tripApprove.query = query;
+        if(tripApprove.accountId != staffId && tripApprove.approveUserId != staffId && tripApprove.approvedUsers.indexOf(staffId) < 0)
             throw L.ERR.PERMISSION_DENY();
-        return approve;
+        return tripApprove;
     }
 
     @clientExport
