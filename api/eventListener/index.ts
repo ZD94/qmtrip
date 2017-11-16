@@ -6,6 +6,7 @@
 import {Models} from "_types/index";
 import {DB} from '@jingli/database';
 import L from '@jingli/language';
+var _ = require("lodash");
 var request = require("request-promise");
 
 export class EventModule{
@@ -27,6 +28,9 @@ export class EventModule{
         if(eventListeners && eventListeners.length){
             try{
                 let url = eventListeners[0].url;
+                let templateUrl = _.template(url);
+                url = templateUrl(params);
+                console.info("url====>>>", url);
                 let method = eventListeners[0].method;
                 let result = await request({
                     uri: `${url}`,

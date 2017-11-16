@@ -30,7 +30,7 @@ import {ITripApprove} from "_types/tripApprove";
 class TripApproveModule {
 
     static async getDetailsFromApprove(params: {approveId: string}): Promise<TripDetail[]> {
-        let approve = await Models.tripApprove.get(params.approveId);
+        let approve = await TripApproveModule.getTripApprove({id: params.approveId});
         let account = approve.account;
         let budgets = approve.budgetInfo;
         return budgets.map(function (budget: any) {
@@ -99,7 +99,7 @@ class TripApproveModule {
     }
 
     /*static async sendTripApproveNoticeToSystem(params: {approveId: string}) {
-        let tripApprove = await Models.tripApprove.get(params.approveId);
+        let tripApprove = await TripApproveModule.getTripApprove({id: params.approveId});
         let staff = tripApprove.account;
         let company = staff.company;
 
@@ -126,7 +126,7 @@ class TripApproveModule {
     }*/
 
     static async sendTripApproveNotice(params: {approveId: string, nextApprove?: boolean}) {
-        let tripApprove = await Models.tripApprove.get(params.approveId);
+        let tripApprove = await TripApproveModule.getTripApprove({id: params.approveId});
         let staff = tripApprove.account;
         let company = staff.company;
         let nextApprove = params.nextApprove || false;
@@ -201,7 +201,7 @@ class TripApproveModule {
             };
         }
 
-        // let tripApprove = await Models.tripApprove.get(params.approveId);
+        // let tripApprove = await TripApproveModule.getTripApprove({id: params.approveId});
         // let staff = tripApprove.account;
         // let company = staff.company;
 
@@ -230,7 +230,7 @@ class TripApproveModule {
     static async approveTripPlan(params): Promise<boolean> {
         let isNextApprove = params.isNextApprove;
         let staff = await Staff.getCurrent();
-        let tripApprove = await Models.tripApprove.get(params.id);
+        let tripApprove = await TripApproveModule.getTripApprove({id: params.id});
         let approveResult = params.approveResult;
         let budgetId = params.budgetId;
         let approveUser = await Models.staff.get(tripApprove['approveUserId']);
@@ -447,7 +447,7 @@ class TripApproveModule {
     @clientExport
     @requireParams(['id'],['remark'])
     static async cancelTripApprove(params: {id: string, remark?: string}): Promise<boolean> {
-        let tripApprove = await Models.tripApprove.get(params.id);
+        let tripApprove = await TripApproveModule.getTripApprove({id: params.id});
         let company = tripApprove.account.company;
         if( tripApprove.status != QMEApproveStatus.WAIT_APPROVE && tripApprove.approvedUsers && tripApprove.approvedUsers.indexOf(",") != -1 ) {
             throw {code: -2, msg: "审批单状态不正确，该审批单不能撤销！"};
@@ -577,30 +577,36 @@ class TripApproveModule {
     }
 
     @clientExport
-    static async updateTripApprove(params): Promise<TripApprove> {
-        let tripApprove = await Models.tripApprove.get(params.id);
-        for(var key in params){
-            tripApprove[key] = params[key];
-        }
-        return tripApprove.save();
+    static async updateTripApprove(params): Promise<ITripApprove> {
+        let staff = await Staff.getCurrent();
+        let tripApprove: ITripApprove = await API.eventListener.sendEventNotice({
+            event: 'updateTripApprove',
+            data: params,
+            companyId: staff.company.id
+        });
+        return tripApprove;
     }
 
     @clientExport
-    static async getTripApproves(options: any): Promise<FindResult> {
-        //let staff = await Staff.getCurrent();
-        if(!options.where) options.where = {};
-        options.order = options.order || [['start_at', 'desc'], ['created_at', 'desc']];
-        let paginate = await Models.tripApprove.find(options);
-        return {ids: paginate.map((approve) => {return approve.id;}), count: paginate["total"]}
+    static async getTripApproves(options: any): Promise<ITripApprove[]> {
+        let staff = await Staff.getCurrent();
+        let tripApproves: ITripApprove[] = await API.eventListener.sendEventNotice({
+            event: 'getTripApproves',
+            data: options,
+            companyId: staff.company.id
+        });
+        return tripApproves;
     }
 
-    @clientExport
     @requireParams(['id'])
-    @modelNotNull('tripApprove')
     static async deleteTripApprove(params: {id: string}): Promise<boolean> {
-        let tripApprove = await Models.tripApprove.get(params.id);
-        await tripApprove.destroy();
-        return true;
+        let staff = await Staff.getCurrent();
+        let result: boolean = await API.eventListener.sendEventNotice({
+            event: 'deleteTripApprove',
+            data: params,
+            companyId: staff.company.id
+        });
+        return result;
     }
 }
 
