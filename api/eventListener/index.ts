@@ -29,7 +29,7 @@ export class EventModule{
             try{
                 let url = eventListeners[0].url;
                 let templateUrl = _.template(url);
-                url = templateUrl(params);
+                url = templateUrl(data);
                 console.info("url====>>>", url);
                 let method = eventListeners[0].method;
                 let result = await request({

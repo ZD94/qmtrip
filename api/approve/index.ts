@@ -85,8 +85,8 @@ class ApproveModule {
         await company.beforeGoTrip({number: number});
         //冻结行程数
         let oldNum = company.tripPlanNumBalance;
-        let originTripPlanFrozenNum = company.tripPlanFrozenNum;
-        let extraTripPlanFrozenNum = company.extraTripPlanFrozenNum;
+        // let originTripPlanFrozenNum = company.tripPlanFrozenNum;
+        // let extraTripPlanFrozenNum = company.extraTripPlanFrozenNum;
         return DB.transaction(async function(t){
             let result = await company.frozenTripPlanNum({accountId: submitter.id, number: number,
             remark: "提交出差申请消耗行程点数", content: content});
@@ -124,9 +124,9 @@ class ApproveModule {
             return approve;
         }).catch(async function(err){
             if(err) {
-                company.extraTripPlanFrozenNum = extraTripPlanFrozenNum;
-                company.tripPlanFrozenNum = originTripPlanFrozenNum;
-                await company.save();
+                // company.extraTripPlanFrozenNum = extraTripPlanFrozenNum;
+                // company.tripPlanFrozenNum = originTripPlanFrozenNum;
+                await company.reload();
                 console.info(err);
                 throw new Error("提交审批失败");
             }

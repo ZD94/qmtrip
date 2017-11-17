@@ -35,9 +35,9 @@ class TripApproveModule {
 
     static async retrieveDetailFromApprove(params: {approveNo: string, approveUser?: string, submitter?: string}):Promise<ITripApprove> {
         let {approveNo, approveUser, submitter} = params;
-        let tripApproveObj: any = await TripApproveModule.getTripApprove({id: approveNo});
-        if(tripApproveObj)
-            return tripApproveObj;
+        // let tripApproveObj: any = await TripApproveModule.getTripApprove({id: approveNo});
+        // if(tripApproveObj)
+        //     return tripApproveObj;
 
         let approve = await Models.approve.get(approveNo);
         let company = await Models.company.get(approve.companyId);
@@ -776,6 +776,8 @@ class TripApproveModule {
             data: params,
             companyId: approve.companyId
         });
+        if(!tripApprove)
+            return null;
 
         if(tripApprove){
             tripApprove.budgetInfo = budgets;
