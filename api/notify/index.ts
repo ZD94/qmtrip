@@ -9,7 +9,6 @@ const logger = new Logger('qm:notify');
 import redisClient = require("common/redis-client");
 import {Models} from "_types";
 import {ESendType, ENoticeType} from "_types/notice/notice";
-import {TripApprove} from "_types/tripPlan/tripPlan";
 import moment = require("moment");
 
 const config = require('@jingli/config');
@@ -281,7 +280,6 @@ export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean
     }
     let account: any = {};
     let openId;
-    let tripApprove: TripApprove;
     if(!userId){
         account = {email, mobile};
     }else{

@@ -173,10 +173,11 @@ export class QmPlugin extends AbstractOAPlugin {
 
     async tripApproveFail(params: {approveId: string, reason?: string}) {
         let {approveId, reason} = params;
-        let tripApprove = await Models.tripApprove.get(approveId);
+        let tripApprove: any = {};
+        tripApprove.id = approveId;
         tripApprove.status = QMEApproveStatus.REJECT;
         tripApprove.approveRemark = reason || '系统自动处理';
-        await tripApprove.save();
+        await API.tripApprove.updateTripApprove(tripApprove);
     }
 
     async createTripInvoiceAuditFlow(params:createTripInvoiceAuditFlowParam):Promise<createTripInvoiceAuditFlowResult> {

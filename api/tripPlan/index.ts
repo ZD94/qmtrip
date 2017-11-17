@@ -18,7 +18,7 @@ import _ = require('lodash');
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
-    TripApprove, QMEApproveStatus, EApproveResult, EApproveResult2Text,
+    QMEApproveStatus, EApproveResult, EApproveResult2Text,
     EPayType, ESourceType, EInvoiceFeeTypes, EInvoiceStatus, TrafficEInvoiceFeeTypes
 } from "_types/tripPlan";
 import {Models} from "_types";
@@ -1741,7 +1741,7 @@ class TripPlanModule {
             order: [["created_at", "asc"]]
         })
         // let tripDetails = await tripPlan.getTripDetails({where: {}, order: [["created_at", "asc"]]});
-        let tripApprove = await Models.tripApprove.get(tripPlanId);
+        let tripApprove = await API.tripApprove.getTripApprove({id: tripPlanId});
         let approveUsers: Array<any> = (tripApprove && tripApprove.approvedUsers ? tripApprove.approvedUsers:'').split(/,/g)
             .filter((v)=> {
                 return !!v;
@@ -2173,7 +2173,7 @@ class TripPlanModule {
         let taskId = "authApproveTrainPlan";
         logger.info('run task ' + taskId);
         scheduler('0 */5 * * * *', taskId, async function() {
-            let tripApproves = await Models.tripApprove.find({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
+            let tripApproves = await API.tripApprove.getTripApproves({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
             tripApproves.map(async (approve) => {
 
                 let approveCompany = await approve.getCompany();
@@ -2337,7 +2337,7 @@ class TripPlanModule {
     //approve, trip_approve, trip_plan保存travelPolicyId
     @clientExport
     static async saveTravelPolicyId( tripApproveId:string ) : Promise<any>{
-        let tripApprove = await Models.tripApprove.get( tripApproveId );
+        let tripApprove = await API.tripApprove.getTripApprove({id: tripApproveId});
         let approve = await Models.approve.get(tripApproveId);
         let submitUser = await Models.staff.get( tripApprove.accountId );
         let travelPolicyId = submitUser.travelPolicyId;
