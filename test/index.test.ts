@@ -3,10 +3,10 @@
  */
 "use strict";
 var path = require('path');
-
-global.Promise = require('bluebird');
-Promise.config({ longStackTraces: false });
-Promise.promisifyAll(require('fs'));
+import bluebird = require("bluebird");
+bluebird.config({ longStackTraces: false })
+bluebird.promisifyAll(require('fs'));
+global.Promise = bluebird;
 
 process.on('unhandledRejection', (reason: Error | any, p) => {
     throw reason;
@@ -17,7 +17,6 @@ process.on('unhandledRejection', (reason: Error | any, p) => {
 const config = require("@jingli/config");
 
 import Logger from '@jingli/logger';
-import { Promise } from 'q';
 
 Logger.init({
     path: path.join(__dirname, "../log"),
