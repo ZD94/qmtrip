@@ -33,9 +33,9 @@ class TripApproveModule {
 
     static async retrieveDetailFromApprove(params: {approveNo: string, approveUser?: string, submitter?: string}):Promise<ITripApprove> {
         let {approveNo, approveUser, submitter} = params;
-        let tripApproveObj: any = await TripApproveModule.getTripApprove({id: approveNo});
-        if(tripApproveObj)
-            return tripApproveObj;
+        // let tripApproveObj: any = await TripApproveModule.getTripApprove({id: approveNo});
+        // if(tripApproveObj)
+        //     return tripApproveObj;
 
         let approve = await Models.approve.get(approveNo);
         let company = await Models.company.get(approve.companyId);
@@ -638,10 +638,12 @@ class TripApproveModule {
         let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
         let {budgets, query} = budgetInfo;
         let tripApprove: ITripApprove = await API.eventListener.sendEventNotice({
-            event: 'getTripApprove',
+            eventName: 'getTripApprove',
             data: params,
             companyId: staff.company.id
         });
+        if(!tripApprove)
+            return null;
 
         tripApprove.budgetInfo = budgets;
         tripApprove.query = query;
@@ -654,7 +656,7 @@ class TripApproveModule {
     static async updateTripApprove(params): Promise<ITripApprove> {
         let staff = await Staff.getCurrent();
         let tripApprove: ITripApprove = await API.eventListener.sendEventNotice({
-            event: 'updateTripApprove',
+            eventName: 'updateTripApprove',
             data: params,
             companyId: staff.company.id
         });
@@ -664,8 +666,9 @@ class TripApproveModule {
     @clientExport
     static async getTripApproves(options: any): Promise<ITripApprove[]> {
         let staff = await Staff.getCurrent();
+        console.log("=====>staff:", staff)
         let tripApproves: ITripApprove[] = await API.eventListener.sendEventNotice({
-            event: 'getTripApproves',
+            eventName: 'getTripApproves',
             data: options,
             companyId: staff.company.id
         });
@@ -676,7 +679,7 @@ class TripApproveModule {
     static async deleteTripApprove(params: {id: string}): Promise<boolean> {
         let staff = await Staff.getCurrent();
         let result: boolean = await API.eventListener.sendEventNotice({
-            event: 'deleteTripApprove',
+            eventName: 'deleteTripApprove',
             data: params,
             companyId: staff.company.id
         });
