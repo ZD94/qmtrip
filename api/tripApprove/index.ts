@@ -28,6 +28,7 @@ import {DB} from "@jingli/database";
 import {ITripApprove, IDestination} from "../../_types/tripApprove";
 import {Project} from "../../_types/tripPlan";
 import tripplan = require("../notify/templates/qm_notify_new_travelbudget/transform");
+import {EApproveStatus, EApproveType} from "_types/approve/types";
 
 class TripApproveModule {
 
@@ -122,7 +123,7 @@ class TripApproveModule {
         tripApprove.specialApproveRemark = approve.specialApproveRemark;
         tripApprove.status = QMEApproveStatus.WAIT_APPROVE;
         tripApprove.accountId = submitter;
-        tripApprove['companyId'] = company.id;
+        tripApprove.companyId = company.id;
         tripApprove.title = project.name;
         tripApprove.projectId = project.id;
 
@@ -442,14 +443,14 @@ class TripApproveModule {
                 notifyRemark = `审批通过，审批人：${staff.name}`;
                 log.approveStatus = EApproveResult.PASS;
                 log.remark = `审批通过`;
-                log.save();
+                await log.save();
                 tripApprove.status = QMEApproveStatus.PASS;
                 tripApprove.approveRemark = '审批通过';
                 tripApprove.approvedUsers += `,${staff.id}`;
                 //tripPlan = await TripPlanModule.saveTripPlanByApprove({tripApproveId: params.id});
             }else if(isNextApprove){ //指定下一级审批人
                 log.approveStatus = EApproveResult.PASS;
-                log.save();
+                await log.save();
                 let nextApproveUser = await Models.staff.get(params.nextApproveUserId);
                 tripApprove.approvedUsers += `,${staff.id}`;
                 tripApprove.approveUserId = nextApproveUser.id;
@@ -461,13 +462,12 @@ class TripApproveModule {
                 notifyRemark = `审批未通过，原因：${approveRemark}`;
                 log.approveStatus = EApproveResult.REJECT;
                 log.remark = approveRemark;
-                log.save();
+                await log.save();
                 tripApprove.readNumber = 0;
                 tripApprove.approveRemark = approveRemark;
                 tripApprove.status = QMEApproveStatus.REJECT;
             }
             await TripApproveModule.updateTripApprove(tripApprove);
-
 
             //发送通知给监听程序
             await plugins.qm.tripApproveUpdateNotify(null, {
@@ -478,12 +478,14 @@ class TripApproveModule {
                 data: budgetInfo,
                 oa: 'qm'
             });
+
         }).catch(async function(err){
             if(err) {
                 await approveCompany.reload();
                 throw L.ERR.INTERNAL_ERROR();
             }
         });
+
 
         if(isNextApprove){
             await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: true});
@@ -511,6 +513,139 @@ class TripApproveModule {
         return true;
     }
 
+    /* 第三方审批结果处理
+    * @param params
+    * @returns {boolean}
+    */
+    @clientExport
+    @requireParams(['id', 'approveResult'], ['reason'])
+    static async oaApproveTripPlan(params): Promise<boolean> {
+        let approve = await Models.approve.get(params.id);
+        let approveResult = params.approveResult;
+        let approveUser = await Models.staff.get(approve.approveUser);
+        let approveCompany = approveUser.company;
+
+        let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
+        let {budgets, query} = budgetInfo;
+        let number = 0;
+
+        if(!approve.isSpecialApprove){
+            budgets.forEach((v) => {
+                if(v.tripType != ETripType.SUBSIDY){
+                    number = number + 1;
+                }
+            });
+        }
+
+        await DB.transaction(async function(t){
+            // 特殊审批和非当月提交的审批不记录行程点数
+            if(!approve.isSpecialApprove){
+                if(typeof query == 'string'){
+                    query = JSON.parse(query);
+                }
+                let frozenNum = query.frozenNum;
+                let content = "";
+                let destinationPlacesInfo = query.destinationPlacesInfo;
+
+                if(query && query.originPlace){
+                    let originCity = await API.place.getCityInfo({cityCode: query.originPlace});
+                    content = content + originCity.name + "-";
+                }
+                if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
+                    for(let i = 0; i < destinationPlacesInfo.length; i++){
+                        let segment: ISegment = destinationPlacesInfo[i]
+                        let destinationCity = await API.place.getCityInfo({cityCode: segment.destinationPlace});
+                        if(i<destinationPlacesInfo.length-1){
+                            content = content + destinationCity.name+"-";
+                        }else{
+                            content = content + destinationCity.name;
+                        }
+                    }
+                }
+
+                if(approve.createdAt.getMonth() == new Date().getMonth()){
+                    //审批本月记录审批通过
+                    if(approveResult == EApproveResult.PASS){
+                        await approveCompany.beforeApproveTrip({number : frozenNum});
+                        await approveCompany.approvePassReduceTripPlanNum({accountId: approve.submitter, tripPlanId: approve.id,
+                            remark: "审批通过消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
+                    }
+                    //审批本月记录审批驳回
+                    if(approveResult == EApproveResult.REJECT){
+                        await approveCompany.approveRejectFreeTripPlanNum({accountId: approve.submitter, tripPlanId: approve.id,
+                            remark: "审批驳回释放冻结行程点数", content: content, frozenNum: frozenNum});
+                    }
+                }else{
+                    //审批上月记录审批通过
+                    if(approveResult == EApproveResult.PASS){
+                        await approveCompany.beforeApproveTrip({number : frozenNum});
+                        await approveCompany.approvePassReduceBeforeNum({accountId: approve.submitter, tripPlanId: approve.id,
+                            remark: "审批通过上月申请消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
+                    }
+
+                    //审批上月记录审批驳回
+                    if(approveResult == EApproveResult.REJECT){
+                        await approveCompany.approveRejectFreeBeforeNum({accountId: approve.submitter, tripPlanId: approve.id,
+                            remark: "审批驳回上月申请释放冻结行程点数", content: content, frozenNum: frozenNum});
+                    }
+                }
+            }
+
+            let notifyRemark = '';
+            let log = TripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser});
+
+            if (approveResult == 1) {
+                log.approveStatus = EApproveResult.PASS;
+                log.remark = `审批通过`;
+                await log.save();
+                approve.status = EApproveStatus.SUCCESS;
+                approve.approveRemark = '审批通过';
+            }else if(approveResult == -1) {
+                let reason = params.reason;
+                notifyRemark = `审批未通过，原因：${reason}`;
+                log.approveStatus = EApproveResult.REJECT;
+                log.remark = notifyRemark;
+                await log.save();
+                approve.status = EApproveStatus.FAIL;
+                approve.approveRemark = notifyRemark;
+            }
+            approve.approveDateTime = new Date();
+            await approve.save();
+
+            if (approve.type == EApproveType.TRAVEL_BUDGET && approve.status == EApproveStatus.SUCCESS) {
+                await API.tripPlan.saveTripPlanByApprove({tripApproveId: approve.id})
+            }
+
+            if(approveResult == -1){
+                //发送审核结果邮件
+                let self_url;
+                let appMessageUrl;
+                self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + approve.id;
+                let finalUrl = '#/trip-approval/detail?approveId=' + approve.id;
+                finalUrl = encodeURIComponent(finalUrl);
+                appMessageUrl = `#/judge-permission/index?id=${approve.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
+                let user = await Models.staff.get(approve.submitter);
+                try {
+                    self_url = await API.wechat.shorturl({longurl: self_url});
+                } catch(err) {
+                    console.error(err);
+                }
+                try {
+                    await API.notify.submitNotify({userId: user.id, key: 'qm_notify_approve_not_pass',
+                        values: { tripApprove: approve, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
+                } catch(err) { console.error(err);}
+            }
+
+        }).catch(async function(err){
+            if(err) {
+                await approveCompany.reload();
+                throw L.ERR.INTERNAL_ERROR();
+            }
+        });
+
+        return true;
+    }
+
 
 
     /**
@@ -520,7 +655,7 @@ class TripApproveModule {
      */
     @clientExport
     @requireParams(['id'],['remark'])
-    /*static async cancelTripApprove(params: {id: string, remark?: string}): Promise<boolean> {
+    static async cancelTripApprove(params: {id: string, remark?: string}): Promise<boolean> {
         let tripApprove = await TripApproveModule.getTripApprove({id: params.id});
         let company = tripApprove.account.company;
         if( tripApprove.status != QMEApproveStatus.WAIT_APPROVE && tripApprove.approvedUsers && tripApprove.approvedUsers.indexOf(",") != -1 ) {
@@ -571,7 +706,7 @@ class TripApproveModule {
         }
 
         return true;
-    }*/
+    }
 
     static async calculateAutoApproveTime( params: {
         type: AutoApproveType,
@@ -632,56 +767,52 @@ class TripApproveModule {
     @clientExport
     @requireParams(['id'])
     static async getTripApprove(params: {id: string}): Promise<ITripApprove> {
-        let staff = await Staff.getCurrent();
-        let staffId = staff.id;
         let approve = await Models.approve.get(params.id);
         let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
         let {budgets, query} = budgetInfo;
         let tripApprove: ITripApprove = await API.eventListener.sendEventNotice({
             eventName: 'getTripApprove',
             data: params,
-            companyId: staff.company.id
+            companyId: approve.companyId
         });
         if(!tripApprove)
             return null;
 
-        tripApprove.budgetInfo = budgets;
-        tripApprove.query = query;
-        if(tripApprove.accountId != staffId && tripApprove.approveUserId != staffId && tripApprove.approvedUsers.indexOf(staffId) < 0)
-            throw L.ERR.PERMISSION_DENY();
+        if(tripApprove){
+            tripApprove.budgetInfo = budgets;
+            tripApprove.query = query;
+        }
         return tripApprove;
     }
 
     @clientExport
     static async updateTripApprove(params): Promise<ITripApprove> {
-        let staff = await Staff.getCurrent();
+        let approve = await Models.approve.get(params.id);
         let tripApprove: ITripApprove = await API.eventListener.sendEventNotice({
             eventName: 'updateTripApprove',
             data: params,
-            companyId: staff.company.id
+            companyId: approve.companyId
         });
         return tripApprove;
     }
 
     @clientExport
-    static async getTripApproves(options: any): Promise<ITripApprove[]> {
-        let staff = await Staff.getCurrent();
-        console.log("=====>staff:", staff)
+    static async getTripApproves(params: any): Promise<ITripApprove[]> {
         let tripApproves: ITripApprove[] = await API.eventListener.sendEventNotice({
             eventName: 'getTripApproves',
-            data: options,
-            companyId: staff.company.id
+            data: params,
+            companyId: params.companyId
         });
         return tripApproves;
     }
 
     @requireParams(['id'])
     static async deleteTripApprove(params: {id: string}): Promise<boolean> {
-        let staff = await Staff.getCurrent();
+        let approve = await Models.approve.get(params.id);
         let result: boolean = await API.eventListener.sendEventNotice({
             eventName: 'deleteTripApprove',
             data: params,
-            companyId: staff.company.id
+            companyId: approve.companyId
         });
         return result;
     }

@@ -1394,7 +1394,7 @@ class TripPlanModule {
         }
         tripPlan.arrivalCityCodes = JSON.stringify(arrivalCityCodes);
 
-        tripPlan['companyId'] = account.company.id;
+        tripPlan.setCompany(account.company);
         tripPlan.auditUser = tryObjId(approveUser);
         tripPlan.project = project;
         tripPlan.title = approve.title;//project名称
