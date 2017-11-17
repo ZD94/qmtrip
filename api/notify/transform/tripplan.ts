@@ -12,13 +12,7 @@ export = async function transform(values: any): Promise<any>{
     let cityMap:any = {};
     let approveUserMap:any = {};
     if(tripPlan && tripPlan.id){
-        tripApprove = await API.eventListener.sendEventNotice({
-            eventName: "",
-            data: {
-               id: tripPlan.id
-            },
-            companyId: tripPlan.companyId
-        });
+        tripApprove = await API.tripApprove.retrieveDetailFromApprove({approveNo: tripPlan.id})
         if(tripApprove)
             values.tripApprove = tripApprove;
     }

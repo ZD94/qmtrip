@@ -25,13 +25,127 @@ import _ = require("lodash");
 import {ENoticeType} from "_types/notice/notice";
 import {AutoApproveType, AutoApproveConfig, ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan"
 import {DB} from "@jingli/database";
-import {ITripApprove} from "_types/tripApprove";
+import {ITripApprove, IDestination} from "../../_types/tripApprove";
+import {Project} from "../../_types/tripPlan";
+import tripplan = require("../notify/templates/qm_notify_new_travelbudget/transform");
 
 class TripApproveModule {
 
+    static async retrieveDetailFromApprove(params: {approveNo: string, approveUser?: string, submitter?: string}):Promise<ITripApprove> {
+        let {approveNo, approveUser, submitter} = params;
+        let tripApproveObj: any = await TripApproveModule.getTripApprove({id: approveNo});
+        if(tripApproveObj)
+            return tripApproveObj;
+
+        let approve = await Models.approve.get(approveNo);
+        let company = await Models.company.get(approve.companyId);
+        approveUser = approveUser && typeof(approveUser) != 'undefined' ? approveUser : approve.approveUser;
+        submitter = submitter && typeof(submitter) != 'undefined' ? submitter: approve.submitter;
+
+        let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
+
+        if(!budgetInfo) {
+            throw L.ERR.TRAVEL_BUDGET_NOT_FOUND();
+        }
+        let {budgets, query} = budgetInfo;
+        let destinationPlacesInfo = query.destinationPlacesInfo;
+        let totalBudget = 0;
+        budgets.forEach((b) => {totalBudget += Number(b.price);});
+        /*budgets = budgets.map( (v) => {
+         if (v.type == ETripType.HOTEL) {
+         v.placeName = budgetInfo.query.hotelName;
+         }
+         return v;
+         });*/
+
+        let arrivalCityCodes: string[] = [];//目的地代码
+        let destinations: IDestination[] = [];
+        let project: Project;
+        let projectName = query.projectName;
+        if(projectName){
+            project = await API.tripPlan.getProjectByName({companyId: company.id, name: projectName,
+                userId: submitter, isCreate: true});
+        }
+        let tripApprove: any = {};
+        tripApprove.id = approveNo;
+        // tripApprove.approveUserId = approveUser;
+        // let tripApprove = await Models.tripApprove.create({approveUserId: approveUser, id: approveNo});
+        if(query.originPlace) {
+            let placeCode = query.originPlace;
+            if (typeof placeCode != 'string') {
+                placeCode = placeCode['id']
+            }
+            let deptInfo = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
+            tripApprove.deptCityCode = deptInfo.id;
+            tripApprove.deptCity = deptInfo.name;
+        }
+
+        tripApprove.isRoundTrip = query.isRoundTrip;
+        if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
+            for(let i = 0; i < destinationPlacesInfo.length; i++){
+                let segment: ISegment = destinationPlacesInfo[i];
+
+                //处理目的地 放入arrivalCityCodes
+                if(segment.destinationPlace){
+                    let placeCode = segment.destinationPlace;
+                    if (typeof placeCode != 'string') {
+                        placeCode = placeCode['id'];
+                    }
+                    let arrivalInfo = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
+                    let destination: IDestination = {city:arrivalInfo.id, arrivalDateTime: segment.leaveDate, leaveDateTime: segment.goBackDate};
+                    arrivalCityCodes.push(arrivalInfo.id);
+                    destinations.push(destination);
+                    if(i == (destinationPlacesInfo.length - 1)){//目的地存放最后一个目的地
+                        tripApprove.arrivalCityCode = arrivalInfo.id;
+                        tripApprove.arrivalCity = arrivalInfo.name;
+                    }
+                }
+
+                //处理其他数据
+                if(i == 0){
+                    tripApprove.startAt = segment.leaveDate;
+                }
+                if(i == (destinationPlacesInfo.length - 1)){
+                    tripApprove.backAt = segment.goBackDate;
+                }
+            }
+        }
+
+        if(params.approveUser) {
+            let approveUserObj = await Models.staff.get(approveUser);
+            if(!approveUserObj)
+                throw {code: -3, msg: '审批人不存在'}
+            tripApprove.approveUserId = approveUserObj.id;
+        }
+
+        tripApprove.isSpecialApprove = approve.isSpecialApprove;
+        tripApprove.specialApproveRemark = approve.specialApproveRemark;
+        tripApprove.status = QMEApproveStatus.WAIT_APPROVE;
+        tripApprove.accountId = submitter;
+        tripApprove['companyId'] = company.id;
+        tripApprove.title = project.name;
+        tripApprove.projectId = project.id;
+
+        tripApprove.query = query;
+        tripApprove.arrivalCityCodes = arrivalCityCodes;
+        tripApprove.destinations = destinations;
+
+        tripApprove.budgetInfo = budgets;
+        tripApprove.budget = totalBudget;
+        tripApprove.oldBudget = totalBudget;
+        tripApprove.status = totalBudget < 0 ? QMEApproveStatus.NO_BUDGET : QMEApproveStatus.WAIT_APPROVE;
+        tripApprove.staffList = approve.staffList;
+        return tripApprove;
+
+    }
+
     static async getDetailsFromApprove(params: {approveId: string}): Promise<TripDetail[]> {
-        let approve = await TripApproveModule.getTripApprove({id: params.approveId});
-        let account = approve.account;
+        // let approve = await TripApproveModule.getTripApprove({id: params.approveId});
+
+        let approve: ITripApprove = await TripApproveModule.retrieveDetailFromApprove({approveNo: params.approveId});
+        // let approve = await Models.approve.get(params.approveId);
+        let account = await Models.staff.get(approve.accountId);
+
         let budgets = approve.budgetInfo;
         return budgets.map(function (budget: any) {
             if (typeof budget == 'string') {
@@ -126,8 +240,8 @@ class TripApproveModule {
     }*/
 
     static async sendTripApproveNotice(params: {approveId: string, nextApprove?: boolean}) {
-        let tripApprove = await TripApproveModule.getTripApprove({id: params.approveId});
-        let staff = tripApprove.account;
+        let tripApprove: ITripApprove = await TripApproveModule.retrieveDetailFromApprove({approveNo: params.approveId});
+        let staff = await Models.staff.get(tripApprove.accountId);
         let company = staff.company;
         let nextApprove = params.nextApprove || false;
 
@@ -185,23 +299,8 @@ class TripApproveModule {
         let approve = await Models.approve.get(params.approveId);
         let company = await Models.company.get(approve.companyId);
 
-        let tripApprove: ITripApprove = await API.eventListener.sendEventNotice({
-            eventName: 'getTripApprove',
-            data: {
-                id: params.approveId
-            },
-            companyId: approve.companyId
-        });
-        if(!tripApprove) {
-            tripApprove = {
-                arrivalCityCodes: '',
-                id: "",
-                startAt: "",
-                backAt:
-            };
-        }
-
-        // let tripApprove = await TripApproveModule.getTripApprove({id: params.approveId});
+        let tripApprove = await TripApproveModule.retrieveDetailFromApprove({approveNo: params.approveId});
+        // let tripApprove = await Models.tripApprove.get(params.approveId);
         // let staff = tripApprove.account;
         // let company = staff.company;
 
@@ -259,7 +358,7 @@ class TripApproveModule {
         //审批时预算拉取失败，使用提交时的预算数据
         if(!tripApprove.isSpecialApprove && budgetId){
             budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
-            
+
             if (!budgetInfo || !budgetInfo.budgets)
                 throw new Error(`预算信息已失效请重新生成`);
             let finalBudget = 0;
