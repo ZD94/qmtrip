@@ -233,7 +233,7 @@ class TripApproveModule {
         let tripApprove = await TripApproveModule.getTripApprove({id: params.id});
         let approveResult = params.approveResult;
         let budgetId = params.budgetId;
-        let approveUser = await Models.staff.get(tripApprove['approveUserId']);
+        let approveUser = await Models.staff.get(tripApprove.approveUserId);
         let approveCompany = approveUser.company;
 
 
@@ -258,7 +258,7 @@ class TripApproveModule {
 
         //审批时预算拉取失败，使用提交时的预算数据
         if(!tripApprove.isSpecialApprove && budgetId){
-            budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
+            budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.accountId});
             
             if (!budgetInfo || !budgetInfo.budgets)
                 throw new Error(`预算信息已失效请重新生成`);
@@ -280,17 +280,6 @@ class TripApproveModule {
                 budgetInfo = null;
             }
         }
-
-        let originTripPlanFrozenNum = approveCompany.tripPlanFrozenNum;
-        let originTripPlanPassNum = approveCompany.tripPlanPassNum;
-        let originExtraTripPlanFrozenNum = approveCompany.extraTripPlanFrozenNum;
-        let originExtraTripPlanNum = approveCompany.extraTripPlanNum;
-
-        let originStatus = tripApprove.status;
-        let originRemark = tripApprove.approveRemark;
-        let originReadNumber = tripApprove.readNumber;
-        let originApprovedUsers = tripApprove.approvedUsers;
-        let originApprovedUser = tripApprove.approveUser;
 
         await DB.transaction(async function(t){
             // 特殊审批和非当月提交的审批不记录行程点数
@@ -323,31 +312,30 @@ class TripApproveModule {
                     //审批本月记录审批通过
                     if(approveResult == EApproveResult.PASS && !isNextApprove){
                         await approveCompany.beforeApproveTrip({number : frozenNum});
-                        await approveCompany.approvePassReduceTripPlanNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                        await approveCompany.approvePassReduceTripPlanNum({accountId: tripApprove.accountId, tripPlanId: tripApprove.id,
                             remark: "审批通过消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
                     }
                     //审批本月记录审批驳回
                     if(approveResult == EApproveResult.REJECT){
-                        await approveCompany.approveRejectFreeTripPlanNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                        await approveCompany.approveRejectFreeTripPlanNum({accountId: tripApprove.accountId, tripPlanId: tripApprove.id,
                             remark: "审批驳回释放冻结行程点数", content: content, frozenNum: frozenNum});
                     }
                 }else{
                     //审批上月记录审批通过
                     if(approveResult == EApproveResult.PASS && !isNextApprove){
                         await approveCompany.beforeApproveTrip({number : frozenNum});
-                        await approveCompany.approvePassReduceBeforeNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                        await approveCompany.approvePassReduceBeforeNum({accountId: tripApprove.accountId, tripPlanId: tripApprove.id,
                             remark: "审批通过上月申请消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
                     }
 
                     //审批上月记录审批驳回
                     if(approveResult == EApproveResult.REJECT){
-                        await approveCompany.approveRejectFreeBeforeNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
+                        await approveCompany.approveRejectFreeBeforeNum({accountId: tripApprove.accountId, tripPlanId: tripApprove.id,
                             remark: "审批驳回上月申请释放冻结行程点数", content: content, frozenNum: frozenNum});
                     }
                 }
             }
 
-            // let tripPlan: TripPlan;
             let notifyRemark = '';
             let log = TripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id});
 
@@ -365,11 +353,10 @@ class TripApproveModule {
                 log.save();
                 let nextApproveUser = await Models.staff.get(params.nextApproveUserId);
                 tripApprove.approvedUsers += `,${staff.id}`;
-                tripApprove.approveUser = nextApproveUser;
+                tripApprove.approveUserId = nextApproveUser.id;
             }else if(approveResult == EApproveResult.REJECT) {
                 let approveRemark = params.approveRemark;
                 if(!approveRemark) {
-                    await tripApprove.reload();
                     throw {code: -2, msg: '拒绝原因不能为空'};
                 }
                 notifyRemark = `审批未通过，原因：${approveRemark}`;
@@ -380,7 +367,7 @@ class TripApproveModule {
                 tripApprove.approveRemark = approveRemark;
                 tripApprove.status = QMEApproveStatus.REJECT;
             }
-            await tripApprove.save();
+            await TripApproveModule.updateTripApprove(tripApprove);
 
 
             //发送通知给监听程序
@@ -394,18 +381,7 @@ class TripApproveModule {
             });
         }).catch(async function(err){
             if(err) {
-                approveCompany.tripPlanFrozenNum = originTripPlanFrozenNum;
-                approveCompany.tripPlanPassNum = originTripPlanPassNum;
-                approveCompany.extraTripPlanFrozenNum = originExtraTripPlanFrozenNum;
-                approveCompany.extraTripPlanNum = originExtraTripPlanNum;
-                await approveCompany.save();
-
-                tripApprove.status = originStatus;
-                tripApprove.approveRemark = originRemark;
-                tripApprove.readNumber = originReadNumber;
-                tripApprove.approvedUsers = originApprovedUsers;
-                tripApprove.approveUser = originApprovedUser;
-                await tripApprove.save();
+                await approveCompany.reload();
                 throw L.ERR.INTERNAL_ERROR();
             }
         });
@@ -420,8 +396,7 @@ class TripApproveModule {
             let finalUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
             finalUrl = encodeURIComponent(finalUrl);
             appMessageUrl = `#/judge-permission/index?id=${tripApprove.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
-            let user = tripApprove.account;
-            if(!user) user = await Models.staff.get(tripApprove['accountId']);
+            let user = await Models.staff.get(tripApprove.accountId);
             try {
                 self_url = await API.wechat.shorturl({longurl: self_url});
             } catch(err) {

@@ -24,6 +24,7 @@ let CLSNS = CLS.getNamespace('dnode-api-context');
 import {DB} from "@jingli/database";
 
 import {IDestination, ITripApprove} from "_types/tripApprove"
+import {OAAddResult} from "../../../../_types/approve/index";
 
 
 export class QmPlugin extends AbstractOAPlugin {
@@ -144,9 +145,9 @@ export class QmPlugin extends AbstractOAPlugin {
             });
         }
         let returnApprove = await API.eventListener.sendEventNotice({eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: company.id});
-        if(returnApprove && returnApprove.code == 0){
+        if(returnApprove || returnApprove == 0){
             return DB.transaction(async function(t){
-                approve.oaResult = returnApprove.code;
+                approve.oaResult = OAAddResult.SUCCESS;
                 await approve.save();
                 let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, approveStatus: EApproveResult.WAIT_APPROVE, remark: '提交审批单，等待审批'});
 
@@ -160,7 +161,7 @@ export class QmPlugin extends AbstractOAPlugin {
                 }
             })
         }else{
-            approve.oaResult = returnApprove.code;
+            approve.oaAddResult = OAAddResult.FAILED;
             await approve.save();
         }
         return {

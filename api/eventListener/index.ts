@@ -44,7 +44,9 @@ export class EventModule{
                 }
                 if(result && result.code == 0)
                     return result.data;
-                throw L.ERR.ERROR_CODE(result.code, result.msg)
+                else
+                    return null;
+                // throw L.ERR.ERROR_CODE(result.code, result.msg)
             }catch (err){
                 throw err;
             }
