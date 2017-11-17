@@ -29,6 +29,7 @@ import {ITripApprove, IDestination} from "../../_types/tripApprove";
 import {Project} from "../../_types/tripPlan";
 import tripplan = require("../notify/templates/qm_notify_new_travelbudget/transform");
 import {EApproveStatus, EApproveType} from "_types/approve/types";
+import {tripApproveEvents} from "_types/tripApprove";
 
 class TripApproveModule {
 
@@ -656,7 +657,7 @@ class TripApproveModule {
     @clientExport
     @requireParams(['id'],['remark'])
     static async cancelTripApprove(params: {id: string, remark?: string}): Promise<boolean> {
-        let tripApprove = await TripApproveModule.getTripApprove({id: params.id});
+        /*let tripApprove = await TripApproveModule.getTripApprove({id: params.id});
         let company = tripApprove.account.company;
         if( tripApprove.status != QMEApproveStatus.WAIT_APPROVE && tripApprove.approvedUsers && tripApprove.approvedUsers.indexOf(",") != -1 ) {
             throw {code: -2, msg: "审批单状态不正确，该审批单不能撤销！"};
@@ -703,7 +704,7 @@ class TripApproveModule {
             await company.approveRejectFreeBeforeNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
                 remark: "审批前撤销上月行程释放冻结行程点数", content: content, frozenNum: frozenNum});
 
-        }
+        }*/
 
         return true;
     }
@@ -771,7 +772,7 @@ class TripApproveModule {
         let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
         let {budgets, query} = budgetInfo;
         let tripApprove: ITripApprove = await API.eventListener.sendEventNotice({
-            eventName: 'getTripApprove',
+            eventName: tripApproveEvents.GET_TRIP_APPROVE,
             data: params,
             companyId: approve.companyId
         });
@@ -787,7 +788,7 @@ class TripApproveModule {
     static async updateTripApprove(params): Promise<ITripApprove> {
         let approve = await Models.approve.get(params.id);
         let tripApprove: ITripApprove = await API.eventListener.sendEventNotice({
-            eventName: 'updateTripApprove',
+            eventName: tripApproveEvents.TRIP_APPROVE_CHANGE,
             data: params,
             companyId: approve.companyId
         });
@@ -797,7 +798,7 @@ class TripApproveModule {
     @clientExport
     static async getTripApproves(params: any): Promise<ITripApprove[]> {
         let tripApproves: ITripApprove[] = await API.eventListener.sendEventNotice({
-            eventName: 'getTripApproves',
+            eventName: tripApproveEvents.TRIP_APPROVE_LIST,
             data: params,
             companyId: params.companyId
         });
@@ -808,7 +809,7 @@ class TripApproveModule {
     static async deleteTripApprove(params: {id: string}): Promise<boolean> {
         let approve = await Models.approve.get(params.id);
         let result: boolean = await API.eventListener.sendEventNotice({
-            eventName: 'deleteTripApprove',
+            eventName: tripApproveEvents.TRIP_APPROVE_DELETE,
             data: params,
             companyId: approve.companyId
         });
