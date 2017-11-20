@@ -153,7 +153,7 @@ export class QmPlugin extends AbstractOAPlugin {
         let returnApprove = await API.eventListener.sendEventNotice({eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: company.id});
         if(returnApprove || returnApprove == 0){
             return DB.transaction(async function(t){
-                approve.oaResult = OAAddResult.SUCCESS;
+                approve.oaAddResult = OAAddResult.SUCCESS;
                 await approve.save();
                 let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, approveStatus: EApproveResult.WAIT_APPROVE, remark: '提交审批单，等待审批'});
 
