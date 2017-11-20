@@ -2358,7 +2358,7 @@ class TripPlanModule {
 
         approve.data = JSON.stringify(approve.data);
 
-        await tripApprove.save();
+        await API.tripApprove.updateTripApprove(tripApprove);
         await approve.save();
 
         return true;
