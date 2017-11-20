@@ -11,6 +11,7 @@ var request = require("request-promise");
 
 export class EventModule{
     async sendEventNotice (params: {eventName: string, data: any, companyId: string}): Promise<any> {
+        console.info("sendEventNotice===========", params)
         let {eventName, data, companyId} = params;
         if(!eventName || !companyId){
             throw L.ERR.INVALID_ARGUMENT("eventName | companyId");

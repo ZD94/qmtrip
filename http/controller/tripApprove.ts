@@ -26,8 +26,9 @@ export class TripApproveController extends AbstractController {
     }
 
     @Router("/:id/approve", 'POST')
-    async updateTripApprove(req: Request, res: Response, next: Function){
-        let {id, status, reason} = req.body;
+    async approveTripApprove(req: Request, res: Response, next: Function){
+        let {id, status, reason, isAutoApprove} = req.body;
+        if(!id) id = req.params.id;
         if(!id)
             return res.json(this.reply(0, null));
         let result;
@@ -36,7 +37,8 @@ export class TripApproveController extends AbstractController {
             result = await TripApproveModule.oaApproveTripPlan({
                 id: id,
                 approveResult: status,
-                reason: reason
+                reason: reason,
+                isAutoApprove: isAutoApprove
             });
         } catch(err) {
             return res.json(this.reply(500, null));

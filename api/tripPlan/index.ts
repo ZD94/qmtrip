@@ -2169,10 +2169,10 @@ class TripPlanModule {
 
     static __initHttpApp = require('./invoice');
 
-    static _scheduleTask () {
+    /*static _scheduleTask () {
         let taskId = "authApproveTrainPlan";
         logger.info('run task ' + taskId);
-        scheduler('0 */5 * * * *', taskId, async function() {
+        scheduler('0 *!/5 * * * *', taskId, async function() {
             let tripApproves = await API.tripApprove.getTripApproves({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
             tripApproves.map(async (approve) => {
 
@@ -2318,7 +2318,7 @@ class TripPlanModule {
                 }
             });
         });
-    }
+    }*/
 
     static async getProjectByName(params) {
         let projects = await Models.project.find({where: {name: params.name}});
@@ -2358,7 +2358,7 @@ class TripPlanModule {
 
         approve.data = JSON.stringify(approve.data);
 
-        await tripApprove.save();
+        await API.tripApprove.updateTripApprove(tripApprove);
         await approve.save();
 
         return true;
@@ -2482,6 +2482,6 @@ function tryObjId(obj) {
 }
 
 
-TripPlanModule._scheduleTask();
+// TripPlanModule._scheduleTask();
 
 export = TripPlanModule;

@@ -519,12 +519,19 @@ class TripApproveModule {
     * @returns {boolean}
     */
     @clientExport
-    @requireParams(['id', 'approveResult'], ['reason'])
+    @requireParams(['id', 'approveResult'], ['reason', 'isAutoApprove'])
     static async oaApproveTripPlan(params): Promise<boolean> {
         let approve = await Models.approve.get(params.id);
+        let isAutoApprove = params.isAutoApprove;
+        let extraStr = isAutoApprove ? '自动' : '';
         let approveResult = params.approveResult;
         let approveUser = await Models.staff.get(approve.approveUser);
         let approveCompany = approveUser.company;
+        if(approveResult == 1){
+            approveResult = EApproveResult.PASS;
+        }else{
+            approveResult = EApproveResult.REJECT;
+        }
 
         let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
         let {budgets, query} = budgetInfo;
@@ -569,25 +576,25 @@ class TripApproveModule {
                     if(approveResult == EApproveResult.PASS){
                         await approveCompany.beforeApproveTrip({number : frozenNum});
                         await approveCompany.approvePassReduceTripPlanNum({accountId: approve.submitter, tripPlanId: approve.id,
-                            remark: "审批通过消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
+                            remark: extraStr+"审批通过消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
                     }
                     //审批本月记录审批驳回
                     if(approveResult == EApproveResult.REJECT){
                         await approveCompany.approveRejectFreeTripPlanNum({accountId: approve.submitter, tripPlanId: approve.id,
-                            remark: "审批驳回释放冻结行程点数", content: content, frozenNum: frozenNum});
+                            remark: extraStr+"审批驳回释放冻结行程点数", content: content, frozenNum: frozenNum});
                     }
                 }else{
                     //审批上月记录审批通过
                     if(approveResult == EApproveResult.PASS){
                         await approveCompany.beforeApproveTrip({number : frozenNum});
                         await approveCompany.approvePassReduceBeforeNum({accountId: approve.submitter, tripPlanId: approve.id,
-                            remark: "审批通过上月申请消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
+                            remark: extraStr+"审批通过上月申请消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
                     }
 
                     //审批上月记录审批驳回
                     if(approveResult == EApproveResult.REJECT){
                         await approveCompany.approveRejectFreeBeforeNum({accountId: approve.submitter, tripPlanId: approve.id,
-                            remark: "审批驳回上月申请释放冻结行程点数", content: content, frozenNum: frozenNum});
+                            remark: extraStr+"审批驳回上月申请释放冻结行程点数", content: content, frozenNum: frozenNum});
                     }
                 }
             }
@@ -597,13 +604,14 @@ class TripApproveModule {
 
             if (approveResult == 1) {
                 log.approveStatus = EApproveResult.PASS;
-                log.remark = `审批通过`;
+                if(isAutoApprove) log.approveStatus = EApproveResult.AUTO_APPROVE;
+                log.remark = extraStr+`审批通过`;
                 await log.save();
                 approve.status = EApproveStatus.SUCCESS;
                 approve.approveRemark = '审批通过';
             }else if(approveResult == -1) {
                 let reason = params.reason;
-                notifyRemark = `审批未通过，原因：${reason}`;
+                notifyRemark = extraStr+`审批未通过，原因：${reason}`;
                 log.approveStatus = EApproveResult.REJECT;
                 log.remark = notifyRemark;
                 await log.save();
