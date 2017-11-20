@@ -327,7 +327,7 @@ class TripApproveModule {
     */
     @clientExport
     @requireParams(['id', 'approveResult', 'isNextApprove'], ['approveRemark', "budgetId", 'nextApproveUserId'])
-    @modelNotNull('tripApprove')
+    // @modelNotNull('tripApprove')
     static async approveTripPlan(params): Promise<boolean> {
         let isNextApprove = params.isNextApprove;
         let staff = await Staff.getCurrent();
@@ -787,10 +787,10 @@ class TripApproveModule {
         if(!tripApprove)
             return null;
 
-        if(tripApprove){
+        if(tripApprove)
             tripApprove.budgetInfo = budgets;
-            tripApprove.query = query;
-        }
+        //     tripApprove.query = query;
+        // }
         return tripApprove;
     }
 
