@@ -26,8 +26,7 @@ export class BudgetController extends AbstractController {
         let result = await ApiTravelBudget.getBudgetById(req.params);
         res.json(this.reply(0, result));
     }
-
-
+    
     async add(req, res, next){
         let body = req.body;
         if(!body)
