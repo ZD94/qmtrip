@@ -10,12 +10,16 @@ import {md5} from "common/utils";
 import {CoinAccount} from "_types/coin";
 import {EGender} from "_types";
 import utils = require("common/utils");
-
 const _ = require("lodash");
 const Models = require("_types").Models;
-let moment = require('moment');
+var moment = require('moment');
 let testData = require('./test-data.json');
 var API = require("@jingli/dnode-api");
+
+import { restfulAPIUtil } from "api/restful";
+let RestfulAPIUtil = restfulAPIUtil;
+
+import {HotelPriceLimitType} from 'api/company';
 
 export async function initCompanyRegion(){
     let companies = await Models.company.all({where: {}});
@@ -43,8 +47,11 @@ async function initCompany(params: {name: string, userName: string, mobile: stri
     let staff = Staff.create({name: params.userName, mobile: params.mobile,email: params.email, roleId: EStaffRole.OWNER, pwd: md5(pwd),
         status: ACCOUNT_STATUS.ACTIVE, isValidateMobile: true});
 
+    //需要将companyId固定，以便于jlbudget同步该companyId的appId, appSecret
+    params['id'] = '60294e10-1448-11e7-aa89-6b4a98eecf40';
+
     let company = Company.create(params);
-    company.expiryDate = moment().add(7, 'days').toDate();
+    company.expiryDate = moment().add(1, 'month').toDate();
     company.tripPlanNumLimit = 20;
     company.extraTripPlanNum = 5;
     company.extraExpiryDate = moment().add(10, 'days').toDate();
@@ -66,6 +73,25 @@ async function initCompany(params: {name: string, userName: string, mobile: stri
     await ca.save();
     company.coinAccount = ca;
     await company.save();
+    //jlbudget create company record.
+    // try{
+    //     let jlBudgetCompany = await RestfulAPIUtil.operateOnModel({
+    //         model : "company",
+    //         params: {
+    //             fields: {
+    //                 id : company.id,
+    //                 name:company.name,
+    //                 priceLimitType: HotelPriceLimitType.NO_SET,
+    //                 appointedPubilcSuppliers: company.appointedPubilcSuppliers,
+    //                 appId: '756b12b3-e243-41ae-982f-dbdfb7ea7e92',
+    //                 appSecret: '6c8f2cfd-7aa4-48c7-9d5e-913896acec12'
+    //             },
+    //             method:"post"
+    //         }
+    //     });
+    // }catch(e){
+    //     throw e;
+    // }
 
     let subsidyRegions = await API.travelPolicy.initSubsidyRegions({companyId: company.id});
 
@@ -104,21 +130,22 @@ async function initXAJHTravelPolicy(params: {companyId: string}): Promise<any[]>
             planeLevels: item.planeLevels,
             trainLevels: item.trainLevels,
             hotelLevels: item.hotelLevels,
-            travelPolicyId: travelPolicy["id"],
-            companyRegionId: domesticCR["id"],
+            travelPolicyId: travelPolicy.data["id"],
+            companyRegionId: domesticCR.data["id"],
             trafficPrefer: -1,
             hotelPrefer: -1,
+            companyId: item.companyId
         });
-
 
         if(item.isOpenAbroad) {
             let abroadTpr = await API.travelPolicy.createTravelPolicyRegion({
                 planeLevels: item.abroadPlaneLevels,
                 hotelLevels: item.abroadHotelLevels,
-                travelPolicyId: travelPolicy["id"],
-                companyRegionId: abroadCR["id"],
+                travelPolicyId: travelPolicy.data["id"],
+                companyRegionId: abroadCR.data["id"],
                 trafficPrefer: -1,
                 hotelPrefer: -1,
+                companyId: item.companyId
             });
         }
 
@@ -127,7 +154,7 @@ async function initXAJHTravelPolicy(params: {companyId: string}): Promise<any[]>
                 let st = subsidyTemplates[i];
                 if(!st["travelPolicyId"]) st["travelPolicyId"] = travelPolicy["id"];
                 let subTem = await API.travelPolicy.createSubsidyTemplate(st);
-                await subTem.save();
+                // await subTem.save();
             }
         }
         return travelPolicy;
@@ -164,6 +191,7 @@ async function initXAJHDepartments(params: {companyId: string}): Promise<any[]> 
 async function initXAJHStaffs(params: {companyId: string}): Promise<any[]> {
     let companyId = params.companyId;
     let company = await Models.company.get(companyId);
+    await initCompanyCreatorTravelPolicy(companyId)
     let defaultDepartment = await company.getDefaultDepartment();
     let staffs = testData.staffs;
 
@@ -189,10 +217,12 @@ async function initXAJHStaffs(params: {companyId: string}): Promise<any[]> {
         }
         staff.isNeedChangePwd = false;
         staff.status = ACCOUNT_STATUS.ACTIVE;
+        staff.travelPolicyId = travelPolicy.id;
 
         let st = Staff.create(staff);
         // st.setTravelPolicy(travelPolicy["id"]);
         st.travelPolicyId = travelPolicy["id"];
+
         st.company = company;
         st = await st.save();
         for(let i = 0; i < deptNames.length; i++){
@@ -266,4 +296,19 @@ function translateSex(str: string){
             sex = EGender.MALE;
     }
     return sex;
+}
+
+const CompanyCreator = 0;
+async function initCompanyCreatorTravelPolicy(companyId: string){
+    let staffs = await Models.staff.all({where: { companyId: companyId, roleId: CompanyCreator}});
+    if(staffs && staffs.length) {
+        let staff =staffs[0];
+        let defaultTp = await API.travelPolicy.getTravelPolicies({companyId: companyId, isDefault: true});
+        if(defaultTp && defaultTp.data && defaultTp.data.length) {
+            staff['travelPolicyId'] = defaultTp.data[0].id;
+            await staff.save();
+            return;
+        }
+    }
+    return;
 }
