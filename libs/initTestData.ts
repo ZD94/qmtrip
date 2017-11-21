@@ -12,7 +12,7 @@ import {EGender} from "_types";
 import utils = require("common/utils");
 const _ = require("lodash");
 const Models = require("_types").Models;
-let moment = require('moment');
+var moment = require('moment');
 let testData = require('./test-data.json');
 var API = require("@jingli/dnode-api");
 
@@ -20,7 +20,6 @@ import { restfulAPIUtil } from "api/restful";
 let RestfulAPIUtil = restfulAPIUtil;
 
 import {HotelPriceLimitType} from 'api/company';
-import defaultFormatUtc = moment.defaultFormatUtc;
 
 export async function initCompanyRegion(){
     let companies = await Models.company.all({where: {}});

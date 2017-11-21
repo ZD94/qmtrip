@@ -4,7 +4,6 @@
   "host": "${JL_APP_HOST}",
   "debug": false,
   "ts_node": true,
-
   "cluster": false,
   "port": 80,
   "apiPort": 4102,
@@ -24,10 +23,6 @@
   "api": {
     "postgres": "${{postgres.url}}",
     "remotes": [
-      {
-        "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
-        "modules": "*"
-      }
     ]
   },
   "upload":{
