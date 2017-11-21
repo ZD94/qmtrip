@@ -1,16 +1,14 @@
-/**
- * Created by ycl on 2017/10/30.
- */
-
 'use strict';
-import {AbstractController, Restful, Router} from "@jingli/restful";
-import {Request, Response} from "express-serve-static-core";
+import {AbstractModelController, Restful, Router} from "@jingli/restful";
+import {Approve} from "_types/approve";
+import {Models} from "_types";
 
+var subsidyTypeCols = Approve['$fieldnames'];
 @Restful()
-export class ApproveController extends AbstractController {
+export class ApproveController extends AbstractModelController {
 
     constructor() {
-        super();
+        super(Models.approve, subsidyTypeCols);
     }
 
     $isValidId(id: string) {

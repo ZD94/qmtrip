@@ -41,6 +41,7 @@ export class TripApproveController extends AbstractController {
                 isAutoApprove: isAutoApprove
             });
         } catch(err) {
+            console.info(err);
             return res.json(this.reply(500, null));
         }
         res.json(this.reply(0, result));
