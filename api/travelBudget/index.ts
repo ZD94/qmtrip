@@ -23,6 +23,36 @@ var request = require("request");
 
 const cloudAPI = require('@jingli/config').cloudAPI;
 const cloudKey = require('@jingli/config').cloudKey;
+
+import { restfulAPIUtil } from "api/restful";
+let RestfulAPIUtil = restfulAPIUtil;
+
+export interface ICity {
+    name: string;
+    id: string;
+    isAbroad: boolean;
+    letter: string;
+    timezone: string;
+    longitude: number;
+    latitude: number;
+    code?: string;  //三字码
+}
+
+export interface IQueryBudgetParams {
+    fromCity?: ICity| string;       //出发城市
+    backCity?: ICity| string;       //返回城市
+    segments: any;      //每段查询条件
+    ret: boolean;       //是否往返
+    staffs: any;  //出差员工
+    travelPolicyId?: string;
+    companyId? : string;
+    expiredBudget? : boolean;  //过期是否可以生成预算
+    combineRoom?: boolean;   //同性是否合并
+    isRetMarkedData?: boolean;
+    preferedCurrency?: string;
+}
+
+
 interface SegmentsBudgetResult {
     id: string;
     cities: string[];
@@ -183,6 +213,7 @@ export default class ApiTravelBudget {
             return segment;
         }));
         let companyId = staff.company.id;
+
         let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
             preferedCurrency:preferedCurrency,
             travelPolicyId: travelPolicy['id'],
@@ -438,6 +469,47 @@ export default class ApiTravelBudget {
         });
         await Promise.all(ps);
         return true;
+    }
+
+
+    static async createNewBudget(params: IQueryBudgetParams){
+        let result;
+        try{
+            result = await RestfulAPIUtil.proxyHttp({
+                url: '/budget',
+                method: 'post',
+                body: params
+            })
+        }catch(err) {
+            console.log(err);
+        }
+        return result.data;
+    }
+
+    static async refreshBudgetById(params: {id: string}){
+        let result;
+        try{
+            result = await RestfulAPIUtil.proxyHttp({
+                url: `/budget/${params.id}/refresh`,
+                method: 'GET'
+            })
+        }catch(err){
+            console.log(err);
+        }
+        return result.data;
+    }
+
+    static async getBudgetById(params: {id: string}){
+        let result;
+        try{
+            result = await RestfulAPIUtil.proxyHttp({
+                url: `/budget/${params.id}`,
+                method: 'GET'
+            })
+        }catch(err) {
+            console.log(err);
+        }
+        return result.data;
     }
 
     static __initHttpApp(app) {
