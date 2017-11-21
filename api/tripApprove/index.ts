@@ -133,9 +133,8 @@ class TripApproveModule {
         let approve_url: string;
         let appMessageUrl: string;
         if (params.version && params.version == 2) {
-            approve_url = `${config.v2_host}/#/trip-approval/approve-detail/${tripApprove.id}/1` //参数为tripApproveId和titleId；
-            let finalUrl = `/#/trip-approval/approve-detail/${tripApprove.id}/1`
-            appMessageUrl = `/judge-permission/index/${tripApprove.id}/tripApprove/${finalUrl}`
+            appMessageUrl = `#/trip-approval/approve-detail/${tripApprove.id}/1`
+            approve_url = `${config.v2_host}/${appMessageUrl}` //参数为tripApproveId和titleId；
         } else {
             approve_url = `${config.host}/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
             let finalUrl = `#/trip-approval/detail?approveId=${tripApprove.id}`;
@@ -410,9 +409,8 @@ class TripApproveModule {
             let appMessageUrl: string;
             //#@template
             if (params.version && params.version == 2) {
-                self_url = `${config.v2_host}/#/trip-approve/approve-detail/${tripApprove.id}/1`
-                let finalUrl = `/#/trip-approve/approve-detail/${tripApprove.id}/1`
-                appMessageUrl = `#/judge-permission/index/${tripApprove.id}/tripApprove/${finalUrl}`
+                appMessageUrl = `#/trip-approve/approve-detail/${tripApprove.id}/1`
+                self_url = `${config.v2_host}/${appMessageUrl}`
             } else {
                 self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
                 let finalUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;

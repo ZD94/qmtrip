@@ -1594,9 +1594,8 @@ class TripPlanModule {
         let self_url
         let appMessageUrl
         if (params.version && params.version == 2) {
-            self_url = `${config.v2_host}/#/trip/trip-list-detail/${tripPlan.id}`//'trip/trip-list-detail/:tripId'
-            let finalUrl = `${config.v2_host}/#/trip/trip-list-detail/${tripPlan.id}`
-            appMessageUrl = `#/judge-permission/index/${approve.id}/tripPlan/${finalUrl}`
+            appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}`
+            self_url = `${config.v2_host}/${appMessageUrl}`//'trip/trip-list-detail/:tripId'
         } else {
             self_url = config.host + '/index.html#/trip/list-detail?tripid=' + approve.id;
             let finalUrl = `#/trip/list-detail?tripid=${approve.id}`;
