@@ -12,10 +12,15 @@ export = async function transform(values: any): Promise<any>{
     let cityMap:any = {};
     let approveUserMap:any = {};
     if(tripPlan && tripPlan.id){
-        tripApprove = await Models.tripApprove.get(values.tripPlan.id);
+        /*tripApprove = await Models.tripApprove.get(values.tripPlan.id);
+        if(!tripApprove){
+            tripApprove = tripPlan;
+        }*/
+        tripApprove = tripPlan;
         values.tripApprove = tripApprove;
     }
     if(!values.tripApprove || !values.tripApprove.id){
+        values.tripApprove = {};
         return values;
     }
     let arrivalCityCodes = tripApprove.arrivalCityCodes;
@@ -35,7 +40,7 @@ export = async function transform(values: any): Promise<any>{
     }
 
     values.cityMap = cityMap;
-    if(tripApprove){
+    if(tripApprove && tripApprove.approvedUsers){
         let approvedUsers = tripApprove.approvedUsers.split(',');
         let agreeUserNames = "";
         await Promise.all(approvedUsers.map(async function(item){
