@@ -100,10 +100,12 @@ export default class DdDepartment extends OaDepartment {
 
     async getParent(): Promise<OaDepartment> {
         let self = this;
-        let result = await self.corpApi.getDepartmentInfo(self.parentId);
-        if(result){
-            return new DdDepartment({id: result.id, name: result.name, corpId: self.corpId, isvApi: self.isvApi, corpApi: self.corpApi,
-                company: self.company, parentId: result.parentid});
+        if(self.parentId){
+            let result = await self.corpApi.getDepartmentInfo(self.parentId);
+            if(result && result.id){
+                return new DdDepartment({id: result.id, name: result.name, corpId: self.corpId, isvApi: self.isvApi, corpApi: self.corpApi,
+                    company: self.company, parentId: result.parentid});
+            }
         }
         return null;
     }

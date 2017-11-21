@@ -1,3 +1,4 @@
-<%=tripApprove.approveUser.name || '' %> 拒绝了您的出差请求
-<%=moment(tripApprove.startAt).format('YYYY.MM.DD') || '' %>-<%=moment(tripApprove.backAt).format('YYYY.MM.DD') || '' %>
- 预算：￥<%=tripApprove.budget || '' %>
+<span style="margin-bottom: 10px;color: #757575;">审批人：<%=tripApprove.approveUser.name || '' %></span><br>
+<span style="margin-bottom: 10px;color: #757575;">日期：<%=moment(tripApprove.startAt).format('YYYY.MM.DD') || '' %> 至 <%=moment(tripApprove.backAt).format('YYYY.MM.DD') || '' %></span><br>
+<span style="margin-bottom: 10px;color: #757575;">行程：<%=tripApprove.deptCity || '' %> - <%=tripApprove.arrivalCity || '' %></span><br>
+<span style="margin-bottom: 10px;color: #757575;">预算：￥<%=tripApprove.budget || '' %></span>
