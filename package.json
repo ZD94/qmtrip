@@ -51,7 +51,7 @@
     "@types/through2": "^2.0.33",
     "@types/traverse": "^0.6.29",
     "app-module-path": "^1.1.0",
-    "axios": "^0.17.0",
+    "axios": "^0.17.1",
     "bindings": "^1.2.1",
     "bluebird": "^3.5.0",
     "body-parser": "^1.15.2",

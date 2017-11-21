@@ -29,7 +29,7 @@ export class EventsController extends AbstractController {
             let eventListener = EventListener.create({events, url, method, companyId});
             eventListener = await eventListener.save();
 
-            // let rest = await API.event.sendEventNotice({event: "new_trip_approve", data: {"s":"w"," value": "rrr"}, companyId: "1a1a4330-046b-11e7-b585-933198eebdaa"});
+            // let rest = await API.eventListener.sendEventNotice({eventName: "new_trip_approve", data: {"s":"w"," value": "rrr"}, companyId: "1a1a4330-046b-11e7-b585-933198eebdaa"});
             // res.json(this.reply(ERR.OK, rest));
 
             res.json(this.reply(ERR.OK, eventListener));
