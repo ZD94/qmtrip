@@ -28,7 +28,7 @@ export class BudgetController extends AbstractController {
     }
 
 
-    async post(req, res, next){
+    async add(req, res, next){
         let body = req.body;
         if(!body)
            return res.json(this.reply(0, null));
