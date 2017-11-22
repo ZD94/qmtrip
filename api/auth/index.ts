@@ -957,22 +957,19 @@ export default class ApiAuth {
         var timestamp = Date.now() + oneDay;  //失效时间1天
         var sign = makeActiveSign(importStaffEmailToken, acc.id, timestamp);
 
-        var url
-        var vals
-        if (params.version && params.version == 2) {
-            //#@template v2 url生成方式。
-        } else {
-            url = "accountId=" + acc.id + "&timeStamp=" + timestamp + "&sign=" + sign
-            vals = {
-                url: C.host + "/index.html#/admin/download-template?" + url
-            }
-        }
-
         let key = 'qm_import_staff';
-
+        var url: string
+        if (params.version && params.version == 2) {
+            //#@template v2 url生成方式,暂时没有找到，之后修改
+            url = ""
+        } else {
+            url = `${C.host}/index.html#/admin/download-template?accountId=${acc.id}&timeStamp=${timestamp}&sign=${sign}`
+        }
         return API.notify.submitNotify({
             key: key,
-            values: vals,
+            values: {
+                url: url
+            },
             email: acc.email
         });
     }
@@ -1335,12 +1332,10 @@ async function _sendActiveEmail(accountId: string, origin?: string, version?: nu
     var activeToken = utils.getRndStr(6);
     var sign = makeActiveSign(activeToken, account.id, expireAt);
     let host = origin ? origin : C.host;
-    var url
-    var appMessageUrl
-    console.log(`$$$$$$ version: ${version}, link_version: ${C.link_version}`)
+    var url: string = ""
+    var appMessageUrl: string = ""
     version = version || C.link_version || 2 //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
     if (version == 2) {
-        //#@template v2 url生成。
         url = `${C.v2_host}/#/login/active/${account.id}/${sign}/${expireAt}/${account.email}`
         appMessageUrl = "#/hom/staff-info";
     } else {
