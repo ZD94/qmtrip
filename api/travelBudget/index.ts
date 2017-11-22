@@ -487,10 +487,12 @@ export default class ApiTravelBudget {
     static async createNewBudget(params: any){
         let result;
         try{
-            result = await RestfulAPIUtil.proxyHttp({
-                url: '/budget',
-                method: 'post',
-                body: params
+            result = await RestfulAPIUtil.operateOnModel({
+                params: {
+                    method: 'post',
+                    fields: params
+                },
+                model:"budget"
             })
         }catch(err) {
             console.log(err);
@@ -498,25 +500,16 @@ export default class ApiTravelBudget {
         return result.data;
     }
 
-    static async refreshBudgetById(params: {id: string}){
-        let result;
-        try{
-            result = await RestfulAPIUtil.proxyHttp({
-                url: `/budget/${params.id}/refresh`,
-                method: 'GET'
-            })
-        }catch(err){
-            console.log(err);
-        }
-        return result.data;
-    }
 
     static async getBudgetById(params: {id: string}){
         let result;
         try{
-            result = await RestfulAPIUtil.proxyHttp({
-                url: `/budget/${params.id}`,
-                method: 'GET'
+            result = await RestfulAPIUtil.operateOnModel({
+                params: {
+                    method: 'GET',
+                    fields: params
+                },
+                model:"budget"
             })
         }catch(err) {
             console.log(err);
