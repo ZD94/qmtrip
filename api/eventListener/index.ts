@@ -8,6 +8,7 @@ import {DB} from '@jingli/database';
 import L from '@jingli/language';
 var _ = require("lodash");
 var request = require("request-promise");
+import config = require("@jingli/config");
 
 export class EventModule{
     async sendEventNotice (params: {eventName: string, data: any, companyId: string}): Promise<any> {
@@ -55,6 +56,30 @@ export class EventModule{
         }else{
             return null;
             // throw L.ERR.ERROR_CODE(503, "事件未被监听");
+        }
+    }
+
+    async sendRequestToApprove (params: {modelName: string, methodName: string, data: any, companyId: string}): Promise<any> {
+        try{
+            let company = await Models.company.get(params.companyId);
+            let url = company.approveServerUrl ? company.approveServerUrl : config.approveServerUrl;
+            let result = await request({
+                uri: `${url}`,
+                body: params,
+                json:true,
+                method: 'post',
+                qs: params
+            });
+            if(typeof(result) == 'string'){
+                result = JSON.parse(result);
+            }
+            if(result && result.code == 0)
+                return result.data;
+            else
+                return null;
+        }catch(err){
+            console.info(err);
+            throw err;
         }
     }
 }

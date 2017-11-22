@@ -780,6 +780,10 @@ class TripApproveModule {
     @requireParams(['id'])
     static async getTripApprove(params: {id: string}): Promise<ITripApprove> {
         let approve = await Models.approve.get(params.id);
+
+        if(typeof approve.data == "string"){
+            approve.data = JSON.parse(approve.data);
+        }
         let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
         let {budgets, query} = budgetInfo;
         let tripApprove: ITripApprove = await API.eventListener.sendEventNotice({
