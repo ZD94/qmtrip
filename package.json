@@ -51,6 +51,7 @@
     "@types/sockjs-node": "^0.3.28",
     "@types/through2": "^2.0.33",
     "@types/traverse": "^0.6.29",
+    "@types/uuid": "^3.4.3",
     "app-module-path": "^1.1.0",
     "axios": "^0.17.0",
     "bindings": "^1.2.1",
