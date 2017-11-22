@@ -93,8 +93,8 @@ export class BudgetController extends AbstractController {
 }
 
 
-function transform(budgetItems: Array<ITravelBudgetInfoTraffic | ITravelBudgetInfoHotel>, travelPolicyId: string){
-    let budgets: ITravelBudgetInfoTraffic[] = budgetItems.map(function(budget: ITravelBudgetInfoTraffic | ITravelBudgetInfoHotel){
+function transform(budgetItems: Array<ITravelBudgetInfo >, travelPolicyId: string){
+    let budgets: ITravelBudgetInfo[] = budgetItems.map(function(budget: ITravelBudgetInfo ){
         if(budget["tripType"] == ETripType.OUT_TRIP || budget["tripType"] == ETripType.BACK_TRIP){
             return {
                 id: budget.id,
@@ -106,12 +106,12 @@ function transform(budgetItems: Array<ITravelBudgetInfoTraffic | ITravelBudgetIn
                 trafficType: budget.tripType,
                 discount: budget.discount,
                 policy: travelPolicyId
-            }
+            } as ITravelBudgetInfo
         }
         if(budget["tripType"] == ETripType.HOTEL) {
             return {
                 id: budget.id,
-                no: budget.name,
+                name: budget.name,
                 budget: budget.price,
                 type: budget.type,
                 deepLink: budget.bookurl,
@@ -122,14 +122,12 @@ function transform(budgetItems: Array<ITravelBudgetInfoTraffic | ITravelBudgetIn
                 checkInDate: budget.checkInDate,
                 checkOutDate: budget.checkOutDate,
                 star: budget.star,
-                budget: budget.price,
-        }
-        return budget;
+        } as ITravelBudgetInfo;
     }});
     return budgets;
 }
 
-export interface ITravelBudgetInfoTraffic {
+export interface ITravelBudgetInfo {
     id?: string;
     no?: string;
     rate?: number;
@@ -155,22 +153,12 @@ export interface ITravelBudgetInfoTraffic {
     policy?: string;   //uuid， 员工的差旅标准
     deepLink?: string;  //预定链接
     budget?: number;  //即price， 对外开放的字段为budget，
-}
-
-export interface ITravelBudgetInfoHotel {
-    id?: string;
-    name?: string;
-    rate?: number;
     star?: number;
-    type?: number;  //类型，是交通还是酒店
-    unit?: string;
-    agent?: string;  //代理商
-    cabin?: number;
-    price?: number;
     city?: string;
     checkInDate?: string;
     checkOutDate?: string;
-    tripType?: number;
-    bookurl?: string;
-    budget?: number
+    name?: string;
+
 }
+
+
