@@ -29,6 +29,9 @@ import {EventListener} from "../_types/eventListener";
 // import {CompanyRegion} from "_types/travelPolicy/companyRegion";
 // import {RegionPlace} from "_types/travelPolicy/regionPlace";
 // import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
+import {Url} from "_types/shorturl";
+import {EmailQueue, EmailLog, EmailSubmit} from "_types/mail";
+
 initModels({
     staff: createServerService<Staff>(Staff),
     staffProperty: createServerService<StaffProperty>(StaffProperty),
@@ -82,6 +85,11 @@ initModels({
     tripBasicPackage: createServerService<TripBasicPackage>(TripBasicPackage),
     errorLog: createServerService<ErrorLog>(ErrorLog),
     eventListener: createServerService<EventListener>(EventListener),
+
+    url: createServerService<Url>(Url),
+    emailQueue: createServerService<EmailQueue>(EmailQueue),
+    emailLog: createServerService<EmailLog>(EmailLog),
+    emailSubmit: createServerService<EmailSubmit>(EmailSubmit),
 
     // travelPolicyRegion: createServerService<TravelPolicyRegion>(TravelPolicyRegion),
     // companyRegion: createServerService<CompanyRegion>(CompanyRegion),

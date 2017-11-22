@@ -214,7 +214,7 @@ export default class ApiTravelBudget {
         }));
         let companyId = staff.company.id;
 
-        let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
+        let segmentsBudget:any = await ApiTravelBudget.createNewBudget({
             preferedCurrency:preferedCurrency,
             travelPolicyId: travelPolicy['id'],
             companyId,
@@ -225,6 +225,18 @@ export default class ApiTravelBudget {
             backCity: params.goBackPlace,
             preferSet: staff.company.budgetConfig || {},
         });
+
+        // let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
+        //     preferedCurrency:preferedCurrency,
+        //     travelPolicyId: travelPolicy['id'],
+        //     companyId,
+        //     staffs,
+        //     segments,
+        //     ret: params.isRoundTrip ? 1 : 0,
+        //     fromCity: params.originPlace,
+        //     backCity: params.goBackPlace,
+        //     preferSet: staff.company.budgetConfig || {},
+        // });
 
         let cities = segmentsBudget.cities;
         let _budgets = segmentsBudget.budgets;
@@ -471,8 +483,8 @@ export default class ApiTravelBudget {
         return true;
     }
 
-
-    static async createNewBudget(params: IQueryBudgetParams){
+    // params: IQueryBudgetParams
+    static async createNewBudget(params: any){
         let result;
         try{
             result = await RestfulAPIUtil.proxyHttp({

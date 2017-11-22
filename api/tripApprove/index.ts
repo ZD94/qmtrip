@@ -408,6 +408,9 @@ class TripApproveModule {
                         }
                     }
                 }
+                if(typeof(tripApprove.createdAt) == 'string'){
+                    tripApprove.createdAt = new Date(tripApprove.createdAt);
+                }
 
                 if(tripApprove.createdAt.getMonth() == new Date().getMonth()){
                     //审批本月记录审批通过
@@ -797,6 +800,8 @@ class TripApproveModule {
     @clientExport
     static async updateTripApprove(params): Promise<ITripApprove> {
         let approve = await Models.approve.get(params.id);
+        if(params.budgetInfo)
+            delete params.budgetInfo;
         let tripApprove: ITripApprove = await API.eventListener.sendEventNotice({
             eventName: tripApproveEvents.TRIP_APPROVE_CHANGE,
             data: params,
