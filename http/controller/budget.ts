@@ -43,4 +43,33 @@ export class BudgetController extends AbstractController {
         let result = await ApiTravelBudget.getBudgetById(req.params);
         res.json(this.reply(0, result));
     }
+
+    @Router('/getBudgetInfo', "POST")
+    async getBudgetInfo(req, res, next){
+        let body = req.body;
+        if(!body)
+            return res.json(this.reply(0, null));
+        try{
+            let budgetsInfo = await API['travelBudget'].getBudgetInfo(body);
+            res.json(this.reply(0, budgetsInfo));
+        }catch(err){
+            res.json(this.reply(0, null));
+        }
+
+    }
+
+    @Router('/qmGetBudget', "POST")
+    async qmGetBudgetInfo(req, res, next){
+        let body = req.body;
+        if(!body)
+            return res.json(this.reply(0, null));
+
+        try{
+            let budgetsId = await API['travelBudget'].getTravelPolicyBudget(body);
+            res.json(this.reply(0, budgetsId));
+        }catch(err){
+            console.info(err);
+            res.json(this.reply(0, null));
+        }
+    }
 }
