@@ -1,8 +1,6 @@
 'use strict';
 
-let PromoCodeType = {
+export default {
     addExpiryDate: require('./addExpiryDate'),
     addCoin: require('./addCoin')
 }
-
-export default PromoCodeType;
