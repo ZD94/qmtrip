@@ -12,6 +12,8 @@
     "experimentalDecorators": true,
     "noImplicitUseStrict": false,
     "allowSyntheticDefaultImports": true,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
     "baseUrl": ".",
     "paths": {
       "*": ["*", "*/index", "common/client/*", "common/client/*/index"]
