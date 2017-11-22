@@ -301,7 +301,7 @@ export class Mail{
 }
 
 const mail = new Mail();
-export = mail;
+export default mail;
 function html_encode (str: string) {
     var s = "";
     if (str.length == 0) return "";
