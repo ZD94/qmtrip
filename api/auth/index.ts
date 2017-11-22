@@ -1337,10 +1337,12 @@ async function _sendActiveEmail(accountId: string, origin?: string, version?: nu
     let host = origin ? origin : C.host;
     var url
     var appMessageUrl
-    if (version && version == 2) {
+    console.log(`$$$$$$ version: ${version}, link_version: ${C.link_version}`)
+    version = version || C.link_version || 2 //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
+    if (version == 2) {
         //#@template v2 url生成。
         url = `${C.v2_host}/#/login/active/${account.id}/${sign}/${expireAt}/${account.email}`
-        appMessageUrl = "#/staff/staff-info";
+        appMessageUrl = "#/hom/staff-info";
     } else {
         url = host + "/index.html#/login/active?accountId=" + account.id + "&sign=" + sign + "&timestamp=" + expireAt + "&email=" + account.email;
         appMessageUrl = "#/staff/staff-info";

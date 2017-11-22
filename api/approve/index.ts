@@ -107,16 +107,26 @@ class ApproveModule {
             //行程数第一次小于10或等于0时给管理员和创建人发通知
             let newNum = com.tripPlanNumBalance;
             if(oldNum > 10 && newNum < 10 || newNum == 0){
+            // if (true) {
                 // let detailUrl = Config.host + "/#/company-pay/buy-packages";
-                let host = Config.host;
+                // let host = Config.host;
                 let managers = await company.getManagers({withOwner: true});
+                let detailUrl: string = ""
+
+                let version = params.version || Config.link_verion || 2 //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
+                if (version == 2) { //@#template
+                    detailUrl = Config.v2_host + "/#/manage/travel-number"
+                } else {
+                    detailUrl = Config.host + "/#/company-pay/buy-packages"
+                }
                 let ps = managers.map( (manager) => {
                     return API.notify.submitNotify({
-                        userId: manager.id,
+                        // userId: manager.id,
+                        userId: submitter.id,
                         key: "qm_notify_trip_plan_num_short",
                         values: {
                             number: newNum,
-                            host: host
+                            detailUrl: detailUrl
                         }
                     });
                 });

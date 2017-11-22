@@ -132,7 +132,8 @@ class TripApproveModule {
         //#@template
         let approve_url: string;
         let appMessageUrl: string;
-        if (params.version && params.version == 2) {
+        let version = params.version || config.link_version || 2  //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
+        if (version == 2) {
             appMessageUrl = `#/trip-approval/approve-detail/${tripApprove.id}/1`
             approve_url = `${config.v2_host}/${appMessageUrl}` //参数为tripApproveId和titleId；
         } else {
@@ -149,7 +150,6 @@ class TripApproveModule {
             console.warn(`转换短链接失败`, err);
         }
 
-        console.error(`++++++++++++++++++ approve_url:${approve_url},appMessageUrl:${appMessageUrl}`);
         if(company.isApproveOpen) {
             //给审核人发审核邮件
             let approveUser = await Models.staff.get(tripApprove['approveUserId']);
@@ -407,9 +407,9 @@ class TripApproveModule {
             //发送审核结果邮件
             let self_url: string;
             let appMessageUrl: string;
-            //#@template
-            if (params.version && params.version == 2) {
-                appMessageUrl = `#/trip-approve/approve-detail/${tripApprove.id}/1`
+            let version = params.version || config.link_version || 2 //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
+            if (version == 2) {
+                appMessageUrl = `#/trip-approval/approve-detail/${tripApprove.id}/1`
                 self_url = `${config.v2_host}/${appMessageUrl}`
             } else {
                 self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;

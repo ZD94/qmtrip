@@ -557,8 +557,10 @@ class TripPlanModule {
                 let self_url: string = ""
                 let appMessageUrl: string = ""
 
-                if (params.version && params.version == 2) {
-                    //v2url
+                let version = params.version || config.link_version || 2 //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
+                if (version == 2) {//@#template
+                    appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}`
+                    self_url = `${config.v2_host}/${appMessageUrl}`
                 } else {
                     self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
                     let finalUrl = `#/trip/list-detail?tripid=${tripPlan.id}`;
@@ -800,12 +802,9 @@ class TripPlanModule {
                 let self_url: string = ""
                 let appMessageUrl: string = ""
 
-                if (params.version == 2) {
-                    //v2对应的通知方式
-                    self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
-                    let finalUrl = `#/trip/list-detail?tripid=${tripPlan.id}`;
-                    finalUrl = encodeURIComponent(finalUrl);
-                    appMessageUrl = `#/judge-permission/index?id=${tripPlan.id}&modelName=tripPlan&finalUrl=${finalUrl}`;
+                if (params.version == 2) { //@#template v2的外链url。
+                    appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}`
+                    self_url = `${config.v2_host}/${appMessageUrl}`
                 } else {
                     self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
                     let finalUrl = `#/trip/list-detail?tripid=${tripPlan.id}`;
@@ -1593,7 +1592,8 @@ class TripPlanModule {
         //#@template
         let self_url
         let appMessageUrl
-        if (params.version && params.version == 2) {
+        let version = params.version || config.link_version || 2  //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
+        if (version == 2) {
             appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}`
             self_url = `${config.v2_host}/${appMessageUrl}`//'trip/trip-list-detail/:tripId'
         } else {
@@ -1912,8 +1912,9 @@ class TripPlanModule {
                 return Number(prev) + Number(cur)
             });
 
-        let detailUrl: string;
-        if (params.version && params.version == 2) { //#@template
+        let detailUrl: string
+        let version = params.version || config.link_version || 2 //#@template 外链版本的优先级：参数的版本 > 配置的外链版本 > 默认配置2
+        if (version == 2) {
             detailUrl = `${config.v2_host}/#/trip/make-expense/${tripPlan.id}/${financeCheckCode.code}`;
         } else {
             detailUrl = `${config.host}#/finance/trip-detail?id=${tripPlan.id}&code=${financeCheckCode.code}`;

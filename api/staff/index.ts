@@ -183,8 +183,9 @@ class StaffModule{
         let managers= await company.getManagers({withOwner:true});
         let staff: Staff;
         let detailUrl: string;
-        if (params.version && params.version == 2) {
-            //@#template v2的外链
+        let linkVersion = params.version || config.link_version || 2 //@#template
+        if (linkVersion == 2) {
+            detailUrl = `${config.v2_host}/#/department/staff-detail/${params.staffId}`
         } else {
             detailUrl = `${config.host}/#/department/staff-info?staffId=${params.staffId}`;
         }
