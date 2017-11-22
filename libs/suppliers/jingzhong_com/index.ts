@@ -1,3 +1,6 @@
+/**
+ * Created by lizeilin on 31/10/2017.
+ */
 
 import _ = require('lodash');
 import moment = require("moment");
@@ -97,18 +100,18 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         let indexBookLink = 'http://m.ctrip.com/webapp/train/v2/index';
         let param = {
             "value":
-            {
-                "from": {
-                    "name": "",
-                    "cityName": ""
+                {
+                    "from": {
+                        "name": "",
+                        "cityName": ""
+                    },
+                    "to": {
+                        "name": "",
+                        "cityName": ""
+                    },
+                    "date": "",
+                    "isGaotie": false
                 },
-                "to": {
-                    "name": "",
-                    "cityName": ""
-                },
-                "date": "",
-                "isGaotie": false
-            },
             "timeout":"",
             "savedate":""
         };
@@ -201,3 +204,5 @@ export default class SupplierCtripCT extends SupplierWebRobot{
     }
 
 }
+
+

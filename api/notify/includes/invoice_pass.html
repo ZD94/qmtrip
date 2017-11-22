@@ -1,0 +1,39 @@
+<table width="422" border="1" cellpadding="8" style="
+    border: 1px solid #dcdcdc;
+    margin-bottom: 20px;
+    color: #747474;
+    border-collapse: collapse;" >
+    <tr>
+        <td colspan="2" style="text-align: center;background-color: #f8f8f8;color: #393939; font-size: 16px;"><%=tripApprove.project ? tripApprove.project.name : '' %></td>
+    </tr>
+    <tr>
+        <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">行程</td>
+        <td style="padding-left: 20px;font-size: 16px;">
+            <%if(tripApprove.deptCity){%>
+            <%=tripApprove.deptCity%>-
+            <%}%>
+            <% _.forEach(tripApprove.arrivalCityCodes, function(cityCode, index) { %>
+            <%=cityMap[cityCode].name%>
+            <%if(index != (tripApprove.arrivalCityCodes.length - 1)){%>
+            -
+            <%}%>
+            <%}); %>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">总预算</td>
+        <td style="padding-left: 20px;font-size: 16px;"><%=tripApprove.budget %>元</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">实际支出</td>
+        <td style="padding-left: 20px;font-size: 16px;"><%=tripApprove.expenditure%>元</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">节省</td>
+        <td style="padding-left: 20px;font-size: 16px;"><%=tripApprove.saved == 0 ? (tripApprove.budget - tripApprove.expenditure) : tripApprove.saved%>元</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">出差人</td>
+        <td style="padding-left: 20px;font-size: 16px;"><%=tripApprove.account.name %></td>
+    </tr>
+</table>
