@@ -1,6 +1,9 @@
 'use strict';
+import * as addCoin from './addCoin';
+import * as addExpiryDate from './addExpiryDate';
 
 export default {
-    addExpiryDate: require('./addExpiryDate'),
-    addCoin: require('./addCoin')
+    addExpiryDate,
+    addCoin,
 }
+
