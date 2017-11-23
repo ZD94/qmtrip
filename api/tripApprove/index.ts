@@ -480,7 +480,8 @@ export default class TripApproveModule {
                 approveUser: staff.id,
                 outerId: tripApprove.id,
                 data: budgetInfo,
-                oa: 'qm'
+                oa: 'qm',
+                budget: tripApprove.budget
             });
 
         }).catch(async function(err){
