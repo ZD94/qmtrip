@@ -31,7 +31,7 @@ import tripplan = require("../notify/templates/qm_notify_new_travelbudget/transf
 import {EApproveStatus, EApproveType} from "_types/approve/types";
 import {tripApproveEvents} from "_types/tripApprove";
 
-class TripApproveModule {
+export default class TripApproveModule {
 
     static async retrieveDetailFromApprove(params: {approveNo: string, approveUser?: string, submitter?: string}):Promise<ITripApprove> {
         let {approveNo, approveUser, submitter} = params;
@@ -779,6 +779,7 @@ class TripApproveModule {
     @clientExport
     @requireParams(['id'])
     static async getTripApprove(params: {id: string}): Promise<ITripApprove> {
+
         let approve = await Models.approve.get(params.id);
 
         if(typeof approve.data == "string"){
@@ -786,56 +787,127 @@ class TripApproveModule {
         }
         let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
         let {budgets, query} = budgetInfo;
-        let tripApprove: ITripApprove = await API.eventListener.sendEventNotice({
-            eventName: tripApproveEvents.GET_TRIP_APPROVE,
-            data: params,
-            companyId: approve.companyId
-        });
-        if(!tripApprove)
-            return null;
+        //=====end 当budgetInfo可以获取到时，以上代码可以删除
+        let companyId = params['companyId'];
+        if(!companyId || typeof companyId == 'undefined') {
+            let currentStaff = await Staff.getCurrent();
+            companyId = currentStaff["companyId"];
+        }
 
-        if(tripApprove)
-            tripApprove.budgetInfo = budgets;
-        //     tripApprove.query = query;
-        // }
+        let tripApprove = await API.eventListener.sendRequestToApprove({
+            modelName: 'tripApprove',
+            methodName:'getTripApprove',
+            data: params,
+            companyId: companyId
+        });
+
+        //=====begin 当budgetInfo可以获取到时，以下代码可以删除
+        tripApprove.budgetInfo = budgets;
+        tripApprove.query = query;
+
         return tripApprove;
+
+
+        // let approve = await Models.approve.get(params.id);
+        //
+        // if(typeof approve.data == "string"){
+        //     approve.data = JSON.parse(approve.data);
+        // }
+        // let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
+
+        // let {budgets, query} = budgetInfo;
+        // let tripApprove: ITripApprove = await API.eventListener.sendEventNotice({
+        //     eventName: tripApproveEvents.GET_TRIP_APPROVE,
+        //     data: params,
+        //     companyId: approve.companyId
+        // });
+        // if(!tripApprove)
+        //     return null;
+        //
+        // if(tripApprove)
+        //     tripApprove.budgetInfo = budgets;
+        // //     tripApprove.query = query;
+        // // }
+        // return tripApprove;
     }
 
     @clientExport
     static async updateTripApprove(params): Promise<ITripApprove> {
-        let approve = await Models.approve.get(params.id);
+        let companyId = params['companyId'];
+        if(!companyId || typeof companyId == 'undefined') {
+            let currentStaff = await Staff.getCurrent();
+            companyId = currentStaff["companyId"];
+        }
+        //=====begin 当budgetInfo可以获取到时，以下代码可以删除
         if(params.budgetInfo)
             delete params.budgetInfo;
-        let tripApprove: ITripApprove = await API.eventListener.sendEventNotice({
-            eventName: tripApproveEvents.TRIP_APPROVE_CHANGE,
+        //=====end 当budgetInfo可以获取到时，以上代码可以删除
+
+        let tripApprove = await API.eventListener.sendRequestToApprove({
+            modelName: 'tripApprove',
+            methodName:'updateTripApprove',
             data: params,
-            companyId: approve.companyId
+            companyId: companyId
         });
         return tripApprove;
+        // let approve = await Models.approve.get(params.id);
+
+        // let tripApprove: ITripApprove = await API.eventListener.sendEventNotice({
+        //     eventName: tripApproveEvents.TRIP_APPROVE_CHANGE,
+        //     data: params,
+        //     companyId: approve.companyId
+        // });
+        // return tripApprove;
     }
 
     @clientExport
     static async getTripApproves(params: any): Promise<ITripApprove[]> {
-        let tripApproves: ITripApprove[] = await API.eventListener.sendEventNotice({
-            eventName: tripApproveEvents.TRIP_APPROVE_LIST,
+        let companyId = params['companyId'];
+        if(!companyId || typeof companyId == 'undefined') {
+            let currentStaff = await Staff.getCurrent();
+            companyId = currentStaff["companyId"];
+        }
+
+        let tripApprove = await API.eventListener.sendRequestToApprove({
+            modelName: 'tripApprove',
+            methodName:'getTripApproves',
             data: params,
-            companyId: params.companyId
+            companyId: companyId
         });
-        return tripApproves;
+        return tripApprove;
+
+        // let tripApproves: ITripApprove[] = await API.eventListener.sendEventNotice({
+        //     eventName: tripApproveEvents.TRIP_APPROVE_LIST,
+        //     data: params,
+        //     companyId: params.companyId
+        // });
+        // return tripApproves;
     }
 
     @requireParams(['id'])
     static async deleteTripApprove(params: {id: string}): Promise<boolean> {
-        let approve = await Models.approve.get(params.id);
-        let result: boolean = await API.eventListener.sendEventNotice({
-            eventName: tripApproveEvents.TRIP_APPROVE_DELETE,
+        let companyId = params['companyId'];
+        if(!companyId || typeof companyId == 'undefined') {
+            let currentStaff = await Staff.getCurrent();
+            companyId = currentStaff["companyId"];
+        }
+
+        let tripApprove = await API.eventListener.sendRequestToApprove({
+            modelName: 'tripApprove',
+            methodName:'deleteTripApprove',
             data: params,
-            companyId: approve.companyId
+            companyId: companyId
         });
-        return result;
+        return tripApprove;
+
+        // let approve = await Models.approve.get(params.id);
+        // let result: boolean = await API.eventListener.sendEventNotice({
+        //     eventName: tripApproveEvents.TRIP_APPROVE_DELETE,
+        //     data: params,
+        //     companyId: approve.companyId
+        // });
+        // return result;
     }
 }
 
 
-
-export= TripApproveModule
