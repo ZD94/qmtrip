@@ -184,7 +184,7 @@ class StaffModule{
         let staff: Staff;
         let detailUrl: string;
         let linkVersion = params.version || config.link_version || 2 //@#template
-        if (linkVersion == 2) {
+        if (linkVersion == 2) { //#@template
             detailUrl = `${config.v2_host}/#/department/staff-detail/${params.staffId}`
         } else {
             detailUrl = `${config.host}/#/department/staff-info?staffId=${params.staffId}`;

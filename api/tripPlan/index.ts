@@ -372,7 +372,7 @@ class TripPlanModule {
         tripPlan.isCommit = true;
         tripPlan = await tryUpdateTripPlanStatus(tripPlan, EPlanStatus.AUDITING);
 
-        let notifyUrl
+        let notifyUrl: string = ""
         if (params.version == 2) {
             //#@template
             notifyUrl = `${config.v2_host}/agency.html#/travelRecord/TravelDetail/${tripPlan.id}`
@@ -397,8 +397,8 @@ class TripPlanModule {
             let staff = await Models.staff.get(staffId);
             let company = await tripPlan.getCompany();
 
-            let auditUrl;
-            let appMessageUrl;
+            let auditUrl: string = ""
+            let appMessageUrl: string = ""
             if (params.version && params.version == 2) {
                 //#@template 支持v2
                 auditUrl =`${config.v2_host}/agency.html#/travelRecord/TravelDetail/${tripPlan.id}`
@@ -558,7 +558,7 @@ class TripPlanModule {
                 let appMessageUrl: string = ""
 
                 let version = params.version || config.link_version || 2 //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
-                if (version == 2) {//@#template
+                if (version == 2) {
                     appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}`
                     self_url = `${config.v2_host}/${appMessageUrl}`
                 } else {
@@ -1589,9 +1589,8 @@ class TripPlanModule {
             }
         }
 
-        //#@template
-        let self_url
-        let appMessageUrl
+        let self_url: string = ""
+        let appMessageUrl: string = ""
         let version = params.version || config.link_version || 2  //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
         if (version == 2) {
             appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}`
@@ -2239,7 +2238,8 @@ class TripPlanModule {
                 }
                 let frozenNum = query.frozenNum;
 
-                
+                let version = config.link_version || 2 //外链使用的版本。
+
                 try{
                     
                     if(typeof approve.query == 'string'){
@@ -2300,7 +2300,8 @@ class TripPlanModule {
                         approveUser: approve.approveUser.id,
                         outerId: approve.id,
                         // data: approve.budgetInfo,
-                        oa: 'qm'
+                        oa: 'qm',
+                        version: version
                     });
 
                     // let _approve = await Models.approve.get(approve.id);
@@ -2332,12 +2333,17 @@ class TripPlanModule {
                         }
 
                         //发送审核结果邮件
-                        let self_url;
-                        let appMessageUrl;
-                        self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + approve.id;
-                        let finalUrl = '#/trip-approval/detail?approveId=' + approve.id;
-                        finalUrl = encodeURIComponent(finalUrl);
-                        appMessageUrl = `#/judge-permission/index?id=${approve.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
+                        let self_url: string = ""
+                        let appMessageUrl: string = ""
+                        if (version == 2) {
+                            appMessageUrl = `#/trip-approval/approve-detail/${approve.id}/1`
+                            self_url = `${config.v2_host}/${appMessageUrl}`
+                        } else {
+                            self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + approve.id;
+                            let finalUrl = '#/trip-approval/detail?approveId=' + approve.id;
+                            finalUrl = encodeURIComponent(finalUrl);
+                            appMessageUrl = `#/judge-permission/index?id=${approve.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
+                        }
                         let user = approve.account;
                         if(!user) user = await Models.staff.get(approve['accountId']);
                         try {

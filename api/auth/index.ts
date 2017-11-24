@@ -959,9 +959,8 @@ export default class ApiAuth {
 
         let key = 'qm_import_staff';
         var url: string
-        if (params.version && params.version == 2) {
-            //#@template v2 url生成方式,暂时没有找到，之后修改
-            url = ""
+        if (params.version && params.version == 2) { //没有在v2中找到调用的地方，暂不修改。
+            url = `${C.host}/index.html#/admin/download-template?accountId=${acc.id}&timeStamp=${timestamp}&sign=${sign}`
         } else {
             url = `${C.host}/index.html#/admin/download-template?accountId=${acc.id}&timeStamp=${timestamp}&sign=${sign}`
         }

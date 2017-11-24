@@ -1072,7 +1072,7 @@ class CompanyModule {
                     let diffDays = moment(company.expiryDate).diff([now.getFullYear(), now.getMonth(), now.getDate()], 'days');
                     let key = null;
                     if (company.type == ECompanyType.PAYED
-                        && PAYED_COMPANY_EXPIRE_NOTIFY.indexOf(diffDays) >= 0) { //@#template
+                        && PAYED_COMPANY_EXPIRE_NOTIFY.indexOf(diffDays) >= 0) {
                         key = 'qm_notify_will_expire_company';
                     }
                     if (company.type != ECompanyType.PAYED
