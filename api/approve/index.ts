@@ -229,7 +229,8 @@ class ApproveModule {
         type?: EApproveType,
         isSpecialApprove?: boolean,
         specialApproveRemark?: string,
-        staffList?:string[]
+        staffList?:string[],
+        budget: number
     }) {
         let {submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark,staffList,budget } = params;
         let staff = await Models.staff.get(submitter);
