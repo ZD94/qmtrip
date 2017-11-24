@@ -241,7 +241,7 @@ export default class TripApproveModule {
         return true;
     }*/
 
-    static async sendTripApproveNotice(params: {approveId: string, nextApprove?: boolean}) {
+    static async sendTripApproveNotice(params: {approveId: string, nextApprove?: boolean, approveUserId?: string}) {
         let tripApprove: ITripApprove = await TripApproveModule.retrieveDetailFromApprove({approveNo: params.approveId});
         let staff = await Models.staff.get(tripApprove.accountId);
         let company = staff.company;
@@ -259,12 +259,13 @@ export default class TripApproveModule {
         }
         if(company.isApproveOpen) {
             //给审核人发审核邮件
-            let approveUser = await Models.staff.get(tripApprove['approveUserId']);
+            // let approveUser = await Models.staff.get(tripApprove['approveUserId']);
+            let approveUserId = params.approveUserId || tripApprove.approveUserId;
 
             try {
                 await API.notify.submitNotify({
                     key: 'qm_notify_new_travelbudget',
-                    userId: approveUser.id,
+                    userId: approveUserId,
                     values: {tripApprove: tripApprove, detailUrl: shortUrl, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPLY_NOTICE}
                 });
             } catch(err) {
@@ -272,7 +273,7 @@ export default class TripApproveModule {
             }
 
             try {
-                await API.ddtalk.sendLinkMsg({accountId: approveUser.id, text: '有新的出差申请需要您审批', url: shortUrl})
+                await API.ddtalk.sendLinkMsg({accountId: approveUserId, text: '有新的出差申请需要您审批', url: shortUrl})
             } catch(err) {
                 console.error(`发送钉钉通知失败`, err)
             }
@@ -536,6 +537,9 @@ export default class TripApproveModule {
             approveResult = EApproveResult.REJECT;
         }
 
+        if(typeof approve.data == 'string'){
+            approve.data = JSON.parse(approve.data);
+        }
         let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
         let {budgets, query} = budgetInfo;
         let number = 0;
@@ -605,14 +609,14 @@ export default class TripApproveModule {
             let notifyRemark = '';
             let log = TripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser});
 
-            if (approveResult == 1) {
+            if (approveResult == EApproveResult.PASS) {
                 log.approveStatus = EApproveResult.PASS;
                 if(isAutoApprove) log.approveStatus = EApproveResult.AUTO_APPROVE;
                 log.remark = extraStr+`审批通过`;
                 await log.save();
                 approve.status = EApproveStatus.SUCCESS;
                 approve.approveRemark = '审批通过';
-            }else if(approveResult == -1) {
+            }else if(approveResult == EApproveResult.REJECT) {
                 let reason = params.reason;
                 notifyRemark = extraStr+`审批未通过，原因：${reason}`;
                 log.approveStatus = EApproveResult.REJECT;
@@ -628,7 +632,7 @@ export default class TripApproveModule {
                 await API.tripPlan.saveTripPlanByApprove({tripApproveId: approve.id})
             }
 
-            if(approveResult == -1){
+            if(approveResult == EApproveResult.REJECT){
                 //发送审核结果邮件
                 let self_url;
                 let appMessageUrl;
@@ -664,15 +668,17 @@ export default class TripApproveModule {
     */
     @requireParams(['id', 'approveUserId', 'nextApproveUserId'])
     static async nextApprove(params): Promise<boolean> {
-        let approveUser = await Models.staff.get(params.nextApproveUserId);
-        let nextApproveUser = await Models.staff.get(params.app);
+        console.info("nextApprove begin============");
+        let approveUser = await Models.staff.get(params.approveUserId);
+        let nextApproveUser = await Models.staff.get(params.nextApproveUserId);
         let log = TripPlanLog.create({tripPlanId: params.id, userId: params.approveUserId});
 
         log.approveStatus = EApproveResult.PASS;
         log.remark = `${approveUser.name}审批通过并转给${nextApproveUser.name}`;
         await log.save();
 
-        await TripApproveModule.sendTripApproveNotice({approveId: params.id, nextApprove: true});
+        await TripApproveModule.sendTripApproveNotice({approveId: params.id, nextApprove: true, approveUserId: params.nextApproveUserId});
+        console.info("nextApprove end============");
         return true;
     }
 

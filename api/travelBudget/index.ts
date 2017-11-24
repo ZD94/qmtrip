@@ -206,6 +206,7 @@ export default class ApiTravelBudget {
         if (!travelPolicy) {
             throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
         }
+        params.travelPolicyId = travelPolicy.id;
 
         if (!params.staffList) {
             params.staffList = [];
