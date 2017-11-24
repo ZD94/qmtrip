@@ -10,7 +10,7 @@ import {
 } from "../index";
 
 import TripPlanModule = require("api/tripPlan/index");
-import TripApproveModule = require("api/tripApprove/index");
+import TripApproveModule from "api/tripApprove/index";
 import {Models} from "_types/index";
 import {ETripType, QMEApproveStatus, EApproveResult, Project} from "_types/tripPlan/tripPlan";
 import _ = require('lodash');
@@ -43,100 +43,6 @@ export class QmPlugin extends AbstractOAPlugin {
         let approve = await Models.approve.get(approveNo);
         let tripApprove = await API.tripApprove.retrieveDetailFromApprove(params);
 
-        // let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
-        //
-        // if(!budgetInfo) {
-        //     throw L.ERR.TRAVEL_BUDGET_NOT_FOUND();
-        // }
-        // let {budgets, query} = budgetInfo;
-        // let destinationPlacesInfo = query.destinationPlacesInfo;
-        // let totalBudget = 0;
-        // budgets.forEach((b) => {totalBudget += Number(b.price);});
-        // /*budgets = budgets.map( (v) => {
-        //     if (v.type == ETripType.HOTEL) {
-        //         v.placeName = budgetInfo.query.hotelName;
-        //     }
-        //     return v;
-        // });*/
-        //
-        // let arrivalCityCodes: string[] = [];//目的地代码
-        // let destinations: IDestination[] = [];
-        // let project: Project;
-        // let projectName = query.projectName;
-        // if(projectName){
-        //     project = await API.tripPlan.getProjectByName({companyId: company.id, name: projectName,
-        //         userId: staff.id, isCreate: true});
-        // }
-        // let tripApprove: any = {};
-        // tripApprove.id = approveNo;
-        // tripApprove.approveUserId = approveUser;
-        // // let tripApprove = await Models.tripApprove.create({approveUserId: approveUser, id: approveNo});
-        // if(query.originPlace) {
-        //     let placeCode = query.originPlace;
-        //     if (typeof placeCode != 'string') {
-        //         placeCode = placeCode['id']
-        //     }
-        //     let deptInfo = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
-        //     tripApprove.deptCityCode = deptInfo.id;
-        //     tripApprove.deptCity = deptInfo.name;
-        // }
-        //
-        // tripApprove.isRoundTrip = query.isRoundTrip;
-        // if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
-        //     for(let i = 0; i < destinationPlacesInfo.length; i++){
-        //         let segment: ISegment = destinationPlacesInfo[i];
-        //
-        //         //处理目的地 放入arrivalCityCodes
-        //         if(segment.destinationPlace){
-        //             let placeCode = segment.destinationPlace;
-        //             if (typeof placeCode != 'string') {
-        //                 placeCode = placeCode['id'];
-        //             }
-        //             let arrivalInfo = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
-        //             let destination: IDestination = {city:arrivalInfo.id, arrivalDateTime: segment.leaveDate, leaveDateTime: segment.goBackDate};
-        //             arrivalCityCodes.push(arrivalInfo.id);
-        //             destinations.push(destination);
-        //             if(i == (destinationPlacesInfo.length - 1)){//目的地存放最后一个目的地
-        //                 tripApprove.arrivalCityCode = arrivalInfo.id;
-        //                 tripApprove.arrivalCity = arrivalInfo.name;
-        //             }
-        //         }
-        //
-        //         //处理其他数据
-        //         if(i == 0){
-        //             tripApprove.startAt = segment.leaveDate;
-        //         }
-        //         if(i == (destinationPlacesInfo.length - 1)){
-        //             tripApprove.backAt = segment.goBackDate;
-        //         }
-        //     }
-        // }
-        //
-        // if(params.approveUser) {
-        //     let approveUser = await Models.staff.get(params.approveUser);
-        //     if(!approveUser)
-        //         throw {code: -3, msg: '审批人不存在'}
-        //     tripApprove.approveUserId = approveUser.id;
-        // }
-        //
-        // tripApprove.isSpecialApprove = approve.isSpecialApprove;
-        // tripApprove.specialApproveRemark = approve.specialApproveRemark;
-        // tripApprove.status = QMEApproveStatus.WAIT_APPROVE;
-        // tripApprove.accountId = staff.id;
-        // tripApprove['companyId'] = company.id;
-        // tripApprove.title = project.name;
-        // tripApprove.projectId = project.id;
-        //
-        // // tripApprove.query = query;
-        // tripApprove.arrivalCityCodes = arrivalCityCodes;
-        // tripApprove.destinations = destinations;
-        //
-        // // tripApprove.budgetInfo = budgets;
-        // tripApprove.budget = totalBudget;
-        // tripApprove.oldBudget = totalBudget;
-        // tripApprove.status = totalBudget < 0 ? QMEApproveStatus.NO_BUDGET : QMEApproveStatus.WAIT_APPROVE;
-        // tripApprove.staffList = approve.staffList;
-
         //如果出差计划是待审批状态，增加自动审批时间
         if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
             tripApprove.autoApproveTime = await TripApproveModule.calculateAutoApproveTime({
@@ -146,8 +52,8 @@ export class QmPlugin extends AbstractOAPlugin {
                 tripStartAt: tripApprove.startAt,
             });
         }
-        // if(tripApprove.query)
-            // delete tripApprove.query;
+        if(tripApprove.query)
+            delete tripApprove.query;
         if(tripApprove.budgetInfo)
             delete tripApprove.budgetInfo;
         let returnApprove = await API.eventListener.sendEventNotice({eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: company.id});

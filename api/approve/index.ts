@@ -70,12 +70,13 @@ class ApproveModule {
                 }
             }
         }
-
+        let totalBudget = 0;
         if(budgetInfo.budgets && budgetInfo.budgets.length>0){
             budgetInfo.budgets.forEach(function(item){
                 if(item.tripType != ETripType.SUBSIDY){
                     number = number + 1;
                 }
+                totalBudget += item.price;
             })
         }
         if(budgetInfo.query && budgetInfo.query.staffList){
@@ -102,6 +103,7 @@ class ApproveModule {
                 type: EApproveType.TRAVEL_BUDGET,
                 approveUser: approveUser,
                 staffList:budgetInfo.query.staffList,
+                budget: totalBudget
             });
             //行程数第一次小于10或等于0时给管理员和创建人发通知
             let newNum = com.tripPlanNumBalance;
@@ -209,6 +211,7 @@ class ApproveModule {
                 specialApproveRemark: specialApproveRemark,
                 approveUser: approveUser,
                 staffList:query.staffList,
+                budget: budget
             });
         }).catch(function(err){
             if(err) {
@@ -228,7 +231,7 @@ class ApproveModule {
         specialApproveRemark?: string,
         staffList?:string[]
     }) {
-        let {submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark,staffList } = params;
+        let {submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark,staffList,budget } = params;
         let staff = await Models.staff.get(submitter);
         let approve = Models.approve.create({
             submitter: submitter,
@@ -240,7 +243,8 @@ class ApproveModule {
             isSpecialApprove: isSpecialApprove,
             specialApproveRemark: specialApproveRemark,
             companyId: staff.company.id,
-            staffList:staffList
+            staffList:staffList,
+            budget: budget
         });
         approve = await approve.save();
 
@@ -279,7 +283,7 @@ class ApproveModule {
 //监听审批单变化
 emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result) {
     let p = (async function(){
-        let {approveNo, submitter, outerId, status, approveUser, data, oa} = result;
+        let {approveNo, submitter, outerId, status, approveUser, data, oa, budget} = result;
         let approve = await Models.approve.get(approveNo);
         if (approve.status == status) {
             return;
@@ -295,6 +299,8 @@ emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result) {
         approve.approveUser = approveUser;
         approve.approveDateTime = new Date();
         approve.outerId = outerId;
+        approve.oldBudget = approve.budget;
+        approve.budget = budget;
         if (data) {
             approve.data = data;
         }

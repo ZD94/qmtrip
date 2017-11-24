@@ -104,21 +104,67 @@ export default class ApiTravelBudget {
         // return {};
     }
 
+    static async (params: any){
+        let result;
+
+        return result.data;
+    }
+
     @clientExport
     static async getHotelsData(params : ISearchHotelParams) : Promise<any>{
-        let result = await API.budget.getHotelsData(params);
+        let result;
+        try{
+            result = await RestfulAPIUtil.operateOnModel({
+                params: {
+                    method: 'post',
+                    fields: params
+                },
+                addUrl: 'getHotelsData',
+                model:"budget"
+            })
+        }catch(err) {
+            console.log(err);
+        }
+
         return result;
     }
 
     @clientExport
     static async getTrafficsData(params : ISearchTicketParams) : Promise<any>{
-        let result = await API.budget.getTrafficsData(params);
+        let result;
+        try{
+            result = await RestfulAPIUtil.operateOnModel({
+                params: {
+                    method: 'post',
+                    fields: params
+                },
+                addUrl: 'getTrafficsData',
+                model:"budget"
+            })
+        }catch(err) {
+            console.log(err);
+        }
         return result;
     }
 
     @clientExport
     static async getTripTravelPolicy(travelPolicyId:string, destinationId:string){
-        let result = await API.budget.getTravelPolicy(travelPolicyId, destinationId);
+        let result;
+        try{
+            result = await RestfulAPIUtil.operateOnModel({
+                params: {
+                    method: 'post',
+                    fields: {
+                        travelPolicyId: travelPolicyId,
+                        destinationId: destinationId
+                    }
+                },
+                addUrl: 'getTripTravelPolicy',
+                model:"budget"
+            })
+        }catch(err) {
+            console.log(err);
+        }
         return result;
     }
 
@@ -487,25 +533,14 @@ export default class ApiTravelBudget {
     static async createNewBudget(params: any){
         let result;
         try{
-            result = await RestfulAPIUtil.proxyHttp({
-                url: '/budget',
-                method: 'post',
-                body: params
+            result = await RestfulAPIUtil.operateOnModel({
+                params: {
+                    method: 'post',
+                    fields: params
+                },
+                model:"budget"
             })
         }catch(err) {
-            console.log(err);
-        }
-        return result.data;
-    }
-
-    static async refreshBudgetById(params: {id: string}){
-        let result;
-        try{
-            result = await RestfulAPIUtil.proxyHttp({
-                url: `/budget/${params.id}/refresh`,
-                method: 'GET'
-            })
-        }catch(err){
             console.log(err);
         }
         return result.data;
@@ -514,9 +549,12 @@ export default class ApiTravelBudget {
     static async getBudgetById(params: {id: string}){
         let result;
         try{
-            result = await RestfulAPIUtil.proxyHttp({
-                url: `/budget/${params.id}`,
-                method: 'GET'
+            result = await RestfulAPIUtil.operateOnModel({
+                params: {
+                    method: 'GET',
+                    fields: params
+                },
+                model:"budget"
             })
         }catch(err) {
             console.log(err);

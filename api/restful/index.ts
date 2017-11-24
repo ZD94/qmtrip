@@ -140,7 +140,6 @@ export class RestfulAPIUtil {
                     return reject(err);
                 }
                 console.log("=====> url: ", url)
-                console.log("=====> result: ", result)
                 if (typeof(result) == 'string') {
                     result = JSON.parse(result);
                 }
