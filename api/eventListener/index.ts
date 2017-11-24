@@ -9,6 +9,7 @@ import L from '@jingli/language';
 var _ = require("lodash");
 var request = require("request-promise");
 import config = require("@jingli/config");
+import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
 
 export class EventModule{
     async sendEventNotice (params: {eventName: string, data: any, companyId: string}): Promise<any> {
@@ -59,6 +60,8 @@ export class EventModule{
         }
     }
 
+    @clientExport
+    @requireParams(['modelName', 'methodName', 'data', 'companyId'])
     async sendRequestToApprove (params: {modelName: string, methodName: string, data: any, companyId: string}): Promise<any> {
         try{
             let company = await Models.company.get(params.companyId);

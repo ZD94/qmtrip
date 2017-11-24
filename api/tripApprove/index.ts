@@ -521,7 +521,6 @@ class TripApproveModule {
     * @param params
     * @returns {boolean}
     */
-    @clientExport
     @requireParams(['id', 'approveResult'], ['reason', 'isAutoApprove'])
     static async oaApproveTripPlan(params): Promise<boolean> {
         let approve = await Models.approve.get(params.id);
@@ -655,6 +654,24 @@ class TripApproveModule {
             }
         });
 
+        return true;
+    }
+
+    /* 审批通过并转给下一个人
+    * @param params
+    * @returns {boolean}
+    */
+    @requireParams(['id', 'approveUserId', 'nextApproveUserId'])
+    static async nextApprove(params): Promise<boolean> {
+        let approveUser = await Models.staff.get(params.nextApproveUserId);
+        let nextApproveUser = await Models.staff.get(params.app);
+        let log = TripPlanLog.create({tripPlanId: params.id, userId: params.approveUserId});
+
+        log.approveStatus = EApproveResult.PASS;
+        log.remark = `${approveUser.name}审批通过并转给${nextApproveUser.name}`;
+        await log.save();
+
+        await TripApproveModule.sendTripApproveNotice({approveId: params.id, nextApprove: true});
         return true;
     }
 

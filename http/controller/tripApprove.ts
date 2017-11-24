@@ -47,4 +47,25 @@ export class TripApproveController extends AbstractController {
         res.json(this.reply(0, result));
     }
 
+    @Router("/:id/nextApprove", 'POST')
+    async nextApprove(req: Request, res: Response, next: Function){
+        let {id, approveUserId, nextApproveUserId} = req.body;
+        if(!id) id = req.params.id;
+        if(!id)
+            return res.json(this.reply(0, null));
+        let result;
+
+        try{
+            result = await TripApproveModule.nextApprove({
+                id: id,
+                approveUserId: approveUserId,
+                nextApproveUserId: nextApproveUserId
+            });
+        } catch(err) {
+            console.info(err);
+            return res.json(this.reply(500, null));
+        }
+        res.json(this.reply(0, result));
+    }
+
 }
