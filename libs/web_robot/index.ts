@@ -36,7 +36,7 @@ export class WebRobot{
 
     async downloadFile(uri: string): Promise<string>{
         var tmpfile = path.join(os.tmpdir(), 'webdownload_'+Date.now()+'_'+Math.random());
-        return new Promise<string>(function(resolve, reject){
+        return new Promise<string>((resolve, reject) => {
             this.client_orig.get({
                 uri: uri
             })

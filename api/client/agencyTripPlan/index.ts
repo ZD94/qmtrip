@@ -22,7 +22,7 @@ export function getConsumeInvoiceImg(params) {
  * 代理商获取员工计划单分页列表
  * @returns {*}
  */
-export function pageTripPlans(params){
+export function pageTripPlans(this: { accountId: string }, params){
     if(!params) {
         throw {code: -10, msg: '参数不能为空'};
     }
@@ -111,7 +111,7 @@ export function pageTripPlans(params){
  * @param params.userId 用户id
  * @returns {*|*|Promise}
  */
-export function approveInvoice(params){
+export function approveInvoice(this: { accountId: string }, params){
     let self = this;
     let user_id = self.accountId;
     params.userId = user_id;
@@ -308,7 +308,7 @@ export function approveInvoice(params){
  * @param params
  * @returns {*}
  */
-export async function countTripPlanNum(params){
+export async function countTripPlanNum(this: { accountId: string }, params){
     let self = this;
     let accountId = self.accountId; //代理商用户Id
 
@@ -331,7 +331,7 @@ export async function countTripPlanNum(params){
  * 统计计划单的动态预算/计划金额和实际支出
  * @param params
  */
-export async function statPlanOrderMoneyByAgency (params) {
+export async function statPlanOrderMoneyByAgency(this: { accountId: string }, params) {
     let self = this;
     if(!params.companyId){
         throw {code: -1, msg: '企业Id不能为空'};
