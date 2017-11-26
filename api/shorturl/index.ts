@@ -83,9 +83,10 @@ export class Service{
     async __initHttpApp(app) {
         app.get("/go", async function(req, res, next) {
             var key = req.query.key;
+            let shortUrl = new Service();
             var shortType = req.query.st || 'base64';
             try {
-                let url = await this.short2long({shorturl: key, shortType:shortType});
+                let url = await shortUrl.short2long({shorturl: key, shortType:shortType});
                 res.redirect(url);
             }catch(err){
                 res.send("网址不存在或者已被删除");
@@ -94,9 +95,10 @@ export class Service{
 
         app.get("/go/:st/:key", async function(req, res, next) {
             var key = req.params.key;
+            let shortUrl = new Service();
             var shortType = req.params.st;
             try {
-                let url = await this.short2long({shorturl: key, shortType: shortType});
+                let url = await shortUrl.short2long({shorturl: key, shortType: shortType});
                 res.redirect(url);
             }catch(err){
                 res.send("网址不存在或者已被删除");
