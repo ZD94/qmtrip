@@ -1547,7 +1547,6 @@ class TripPlanModule {
                 default:
                     throw new Error("not support tripDetail type!");
             }
-            console.log("=====detail ", detail)
             return detail;
         }));
 

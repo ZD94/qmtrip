@@ -523,8 +523,10 @@ export default class TripApproveModule {
     * @param params
     * @returns {boolean}
     */
+    @clientExport
     @requireParams(['id', 'approveResult'], ['reason', 'isAutoApprove'])
     static async oaApproveTripPlan(params): Promise<boolean> {
+        console.info("oaApproveTripPlan begin=====================");
         let approve = await Models.approve.get(params.id);
         let isAutoApprove = params.isAutoApprove;
         let extraStr = isAutoApprove ? '自动' : '';
@@ -658,7 +660,7 @@ export default class TripApproveModule {
                 throw L.ERR.INTERNAL_ERROR();
             }
         });
-
+        console.info("oaApproveTripPlan end==================");
         return true;
     }
 
@@ -666,6 +668,7 @@ export default class TripApproveModule {
     * @param params
     * @returns {boolean}
     */
+    @clientExport
     @requireParams(['id', 'approveUserId', 'nextApproveUserId'])
     static async nextApprove(params): Promise<boolean> {
         console.info("nextApprove begin============");
@@ -818,6 +821,7 @@ export default class TripApproveModule {
             companyId = currentStaff["companyId"];
         }
 
+        console.info(params, "params======");
         let tripApprove = await API.eventListener.sendRequestToApprove({
             modelName: 'tripApprove',
             methodName:'getTripApprove',
