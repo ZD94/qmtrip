@@ -104,12 +104,6 @@ export default class ApiTravelBudget {
         // return {};
     }
 
-    static async (params: any){
-        let result;
-
-        return result.data;
-    }
-
     @clientExport
     static async getHotelsData(params : ISearchHotelParams) : Promise<any>{
         let result;
@@ -125,7 +119,6 @@ export default class ApiTravelBudget {
         }catch(err) {
             console.log(err);
         }
-
         return result;
     }
 
@@ -159,7 +152,7 @@ export default class ApiTravelBudget {
                         destinationId: destinationId
                     }
                 },
-                addUrl: 'getTripTravelPolicy',
+                addUrl: 'getTravelPolicy',
                 model:"budget"
             })
         }catch(err) {
