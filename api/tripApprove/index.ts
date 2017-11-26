@@ -113,7 +113,7 @@ export default class TripApproveModule {
             }
         }
 
-        if(params.approveUser) {
+        if(approveUser) {
             let approveUserObj = await Models.staff.get(approveUser);
             if(!approveUserObj)
                 throw {code: -3, msg: '审批人不存在'}
@@ -806,6 +806,7 @@ export default class TripApproveModule {
     @clientExport
     @requireParams(['id'])
     static async getTripApprove(params: {id: string}): Promise<ITripApprove> {
+        if(!params.id) return null;
 
         let approve = await Models.approve.get(params.id);
 
@@ -828,6 +829,7 @@ export default class TripApproveModule {
             data: params,
             companyId: companyId
         });
+        if(!tripApprove) return null;
 
         //=====begin 当budgetInfo可以获取到时，以下代码可以删除
         tripApprove.budgetInfo = budgets;
