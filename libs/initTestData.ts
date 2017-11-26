@@ -38,6 +38,7 @@ export async function initDataForTest (params: {name: string, userName: string, 
     let travelPolicies = await initXAJHTravelPolicy({companyId: company.id});
     let departments = await initXAJHDepartments({companyId: company.id});
     let staffs = await initXAJHStaffs({companyId: company.id});
+    let subsidyRegions = await API.travelPolicy.initSubsidyRegions({companyId: company.id});
     return company;
 }
 
@@ -92,9 +93,6 @@ async function initCompany(params: {name: string, userName: string, mobile: stri
     // }catch(e){
     //     throw e;
     // }
-
-    let subsidyRegions = await API.travelPolicy.initSubsidyRegions({companyId: company.id});
-
     return company;
 }
 
@@ -113,11 +111,11 @@ async function initXAJHTravelPolicy(params: {companyId: string}): Promise<any[]>
     for(let i = 0; i < companyRegion.length; i++){
         if(companyRegion[i].name == '国内') {
             domesticCR = await API.travelPolicy.createCompanyRegion({name:companyRegion[i].name, companyId: company["id"]});
-            let rp = await API.travelPolicy.createRegionPlace({placeId: regionPlace.domestic_place_id, companyRegionId: domesticCR["id"]});
+            let rp = await API.travelPolicy.createRegionPlace({companyId: params.companyId, placeId: regionPlace.domestic_place_id, companyRegionId: domesticCR["id"]});
         }
         if(companyRegion[i].name == '国际') {
             abroadCR = await API.travelPolicy.createCompanyRegion({name:companyRegion[i].name, companyId: company["id"]});
-            let rp = await API.travelPolicy.createRegionPlace({placeId: regionPlace.abroad_place_id, companyRegionId: abroadCR["id"]});
+            let rp = await API.travelPolicy.createRegionPlace({companyId: params.companyId, placeId: regionPlace.abroad_place_id, companyRegionId: abroadCR["id"]});
         }
     }
 
@@ -152,7 +150,8 @@ async function initXAJHTravelPolicy(params: {companyId: string}): Promise<any[]>
         if(subsidyTemplates && subsidyTemplates.length > 0){
             for(let i = 0; i < subsidyTemplates.length; i++){
                 let st = subsidyTemplates[i];
-                if(!st["travelPolicyId"]) st["travelPolicyId"] = travelPolicy["id"];
+                if(!st["travelPolicyId"]) st["travelPolicyId"] = travelPolicy.data["id"];
+                if(!st["companyId"]) st["companyId"] = item.companyId;
                 let subTem = await API.travelPolicy.createSubsidyTemplate(st);
                 // await subTem.save();
             }
