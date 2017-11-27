@@ -173,15 +173,22 @@ class StaffModule{
         await StaffModule.sendNoticeToAdmins({
             companyId:params.companyId,
             staffId: staff.id,
-            noticeTemplate:"qm_notify_admins_add_staff"
+            noticeTemplate:"qm_notify_admins_add_staff",
+            version: params.version
         });
         return staff;
     }
-    static async  sendNoticeToAdmins(params:{companyId:string,noticeTemplate:string, staffId?: string}):Promise<any>{
+    static async  sendNoticeToAdmins(params:{companyId:string,noticeTemplate:string, staffId?: string, version?:number}):Promise<any>{
         let company = await Models.company.get(params.companyId);
         let managers= await company.getManagers({withOwner:true});
-       let staff: Staff;
-       let detailUrl = `${config.host}/#/department/staff-info?staffId=${params.staffId}`;
+        let staff: Staff;
+        let detailUrl: string;
+        let linkVersion = params.version || config.link_version || 2 //@#template
+        if (linkVersion == 2) { //#@template
+            detailUrl = `${config.v2_host}/#/department/staff-detail/${params.staffId}`
+        } else {
+            detailUrl = `${config.host}/#/department/staff-info?staffId=${params.staffId}`;
+        }
         if(params.staffId){
             staff = await Models.staff.get(params.staffId);
         }
