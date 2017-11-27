@@ -9,6 +9,7 @@ variables:
   JL_APP_DAEMON_WAIT_INIT: log/nohup.out
   JL_APP_CLOUD_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
   JL_APP_CLOUD_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+  JL_APP_LINK_VERSION: 1
 
 stages:
   - build
@@ -60,6 +61,7 @@ deploy:master:
     name: dev
     url: https://l.jingli365.com
   variables:
+    JL_APP_V2_HOST: https://l.jingli365.com/proj/web-jingli-v2
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: http://l.jingli365.com/cloud/api/v1
     JL_APP_CLOUD: http://l.jingli365.com/cloud
@@ -79,6 +81,7 @@ deploy:test:
     name: test
     url: https://t.jingli365.com
   variables:
+    JL_APP_V2_HOST: https://t.jingli365.com/proj/web-jingli-v2
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: http://t.jingli365.com/cloud/api/v1
     JL_APP_CLOUD: http://t.jingli365.com/cloud
@@ -99,6 +102,7 @@ deploy:release:
     name: release
     url: https://j.jingli365.com
   variables:
+    JL_APP_V2_HOST: https://j.jingli365.com/proj
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: https://j.jingli365.com/cloud/api/v1
     JL_APP_CLOUD: https://j.jingli365.com/cloud
@@ -118,6 +122,7 @@ deploy:tester:
     url: https://review.l.jingli365.com/vm/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
   variables:
     JL_APP_HOST: //review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
+    JL_APP_V2_HOST: //review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
     JL_APP_REDIS: redis://dockerhost:16379
     JL_APP_POSTGRES: postgres://test:JingliTest0418@dockerhost:15432/tester_$GITLAB_USER_ID
     JL_APP_POSTGRES_INITDB: tester_$GITLAB_USER_ID
@@ -140,6 +145,7 @@ deploy:vm:
     url: https://review.l.jingli365.com/vm/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
   variables:
     JL_APP_HOST: //review.l.jingli365.com/vm/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
+    JL_APP_V2_HOST: //review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
     JL_APP_REDIS: redis://l.jingli365.com:16379
     JL_APP_POSTGRES: postgres://test:JingliTest0418@l.jingli365.com:15432/tester_$GITLAB_USER_ID
     JL_APP_POSTGRES_INITDB: vm_$GITLAB_USER_ID
