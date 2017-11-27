@@ -1080,8 +1080,14 @@ export default class CompanyModule {
                         key = 'qm_notify_trying_will_expire_company'
                     }
                     if (key) {
-                        // let detailUrl = C.host + "/#/company-pay/service-pay";
-                        let host = C.host;
+                        let version = C.link_version || 2
+                        let detailUrl = ""
+                        if (version == 2) {
+                            detailUrl = C.v2_host + "/#/manage/expiry-date";
+                        } else {
+                            detailUrl = C.host + "/#/company-pay/service-pay";
+                        }
+                        // let host = C.host;
                         //查询公司管理员和创建人
                         let managers = await company.getManagers({withOwner: true});
                         let ps = managers.map( (manager) => {
@@ -1093,7 +1099,7 @@ export default class CompanyModule {
                                     company: company,
                                     expiryDate: moment(company.expiryDate).format('YYYY-MM-DD'),
                                     days: diffDays,
-                                    host: host
+                                    detailUrl: detailUrl
                                 }
                             });
                         });
@@ -1239,6 +1245,13 @@ export default class CompanyModule {
                     }
                 });
 
+                let linkVersion = C.link_version || 2
+                let detailUrl: string = ""
+                if (linkVersion == 2) {
+                    detailUrl = C.v2_host + '/#/statistics/stat-index'
+                } else {
+                    detailUrl = C.host + '/#/statistics/'
+                }
                 for(let company of companies) {
                     if (!company.expiryDate) {
                         continue;
@@ -1246,7 +1259,7 @@ export default class CompanyModule {
 
                     let staticData = await company.staticTripPlanInfo({beginTime: moment().subtract(7, 'days'), endTime: now});
                     let key =  'qm_notify_perweek_data_statistics';
-                    let host = C.host;
+
                     //查询公司管理员和创建人
                     let managers = await company.getManagers({withOwner: true});
                     let ps = managers.map( (manager) => {
@@ -1259,7 +1272,7 @@ export default class CompanyModule {
                                 sumBudget: staticData.sumBudget,
                                 sumTripPlanNum: staticData.sumTripPlanNum,
                                 staffNum: staticData.staffNum,
-                                host: host
+                                detailUrl: detailUrl
                             }
                         });
                     });

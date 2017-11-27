@@ -241,22 +241,35 @@ export default class TripApproveModule {
         return true;
     }*/
 
-    static async sendTripApproveNotice(params: {approveId: string, nextApprove?: boolean, approveUserId?: string}) {
+
+    static async sendTripApproveNotice(params: {approveId: string, nextApprove?: boolean, approveUserId?: string, version?: number}) {
         let tripApprove: ITripApprove = await TripApproveModule.retrieveDetailFromApprove({approveNo: params.approveId});
         let staff = await Models.staff.get(tripApprove.accountId);
+
         let company = staff.company;
         let nextApprove = params.nextApprove || false;
 
-        let approve_url = `${config.host}/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
-        let finalUrl = `#/trip-approval/detail?approveId=${tripApprove.id}`;
-        finalUrl = encodeURIComponent(finalUrl);
-        let appMessageUrl = `#/judge-permission/index?id=${tripApprove.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
+        //#@template
+        let approve_url: string;
+        let appMessageUrl: string;
+        let version = params.version || config.link_version || 2  //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
+        if (version == 2) {
+            appMessageUrl = `#/trip-approval/approve-detail/${tripApprove.id}/1`
+            approve_url = `${config.v2_host}/${appMessageUrl}` //参数为tripApproveId和titleId；
+        } else {
+            approve_url = `${config.host}/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
+            let finalUrl = `#/trip-approval/detail?approveId=${tripApprove.id}`;
+            finalUrl = encodeURIComponent(finalUrl);
+            appMessageUrl = `#/judge-permission/index?id=${tripApprove.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
+        }
+
         let shortUrl = approve_url;
         try {
             shortUrl = await API.wechat.shorturl({longurl: approve_url});
         } catch(err) {
             console.warn(`转换短链接失败`, err);
         }
+
         if(company.isApproveOpen) {
             //给审核人发审核邮件
             // let approveUser = await Models.staff.get(tripApprove['approveUserId']);
@@ -327,7 +340,7 @@ export default class TripApproveModule {
     * @returns {boolean}
     */
     @clientExport
-    @requireParams(['id', 'approveResult', 'isNextApprove'], ['approveRemark', "budgetId", 'nextApproveUserId'])
+    @requireParams(['id', 'approveResult', 'isNextApprove'], ['approveRemark', "budgetId", 'nextApproveUserId', "version"])
     // @modelNotNull('tripApprove')
     static async approveTripPlan(params): Promise<boolean> {
         let isNextApprove = params.isNextApprove;
@@ -482,7 +495,8 @@ export default class TripApproveModule {
                 outerId: tripApprove.id,
                 data: budgetInfo,
                 oa: 'qm',
-                budget: tripApprove.budget
+                budget: tripApprove.budget,
+                version: params.version
             });
 
         }).catch(async function(err){
@@ -494,16 +508,32 @@ export default class TripApproveModule {
 
 
         if(isNextApprove){
-            await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: true});
+            //#@template
+            await TripApproveModule.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: true, version: params.version});
         }else if(approveResult == EApproveResult.REJECT){
             //发送审核结果邮件
-            let self_url;
-            let appMessageUrl;
-            self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
-            let finalUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
-            finalUrl = encodeURIComponent(finalUrl);
-            appMessageUrl = `#/judge-permission/index?id=${tripApprove.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
-            let user = await Models.staff.get(tripApprove.accountId);
+//             let self_url;
+//             let appMessageUrl;
+//             self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
+//             let finalUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
+//             finalUrl = encodeURIComponent(finalUrl);
+//             appMessageUrl = `#/judge-permission/index?id=${tripApprove.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
+//             let user = await Models.staff.get(tripApprove.accountId);
+
+            let self_url: string;
+            let appMessageUrl: string;
+            let version = params.version || config.link_version || 2 //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
+            if (version == 2) {
+                appMessageUrl = `#/trip-approval/approve-detail/${tripApprove.id}/1`
+                self_url = `${config.v2_host}/${appMessageUrl}`
+            } else {
+                self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
+                let finalUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
+                finalUrl = encodeURIComponent(finalUrl);
+                appMessageUrl = `#/judge-permission/index?id=${tripApprove.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
+            }
+            let user = await Models.staff.get(tripApprove['accountId']);
+
             try {
                 self_url = await API.wechat.shorturl({longurl: self_url});
             } catch(err) {

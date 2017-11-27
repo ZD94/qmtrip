@@ -42,8 +42,8 @@ function oaEnum2Str(e: EApproveChannel) {
 class ApproveModule {
 
     @clientExport
-    @requireParams(["budgetId"], ["approveUser", "project", "submitter"])
-    static async submitApprove(params: {budgetId: string, approveUser?: Staff, submitter?: Staff}) :Promise<Approve>{
+    @requireParams(["budgetId"], ["approveUser", "project", "submitter", "version"])
+    static async submitApprove(params: {budgetId: string, approveUser?: Staff, submitter?: Staff, version: number}) :Promise<Approve>{
         let {budgetId, approveUser} = params;
         let submitter = await Staff.getCurrent() || params.submitter;
         let company = submitter.company;
@@ -103,21 +103,28 @@ class ApproveModule {
                 type: EApproveType.TRAVEL_BUDGET,
                 approveUser: approveUser,
                 staffList:budgetInfo.query.staffList,
-                budget: totalBudget
+                budget: totalBudget,
+                version: params.version
             });
             //行程数第一次小于10或等于0时给管理员和创建人发通知
             let newNum = com.tripPlanNumBalance;
             if(oldNum > 10 && newNum < 10 || newNum == 0){
-                // let detailUrl = Config.host + "/#/company-pay/buy-packages";
-                let host = Config.host;
+                let detailUrl: string = ""
                 let managers = await company.getManagers({withOwner: true});
+
+                let version = params.version || Config.link_verion || 2 //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
+                if (version == 2) {
+                    detailUrl = Config.v2_host + "/#/manage/travel-number"
+                } else {
+                    detailUrl = Config.host + "/#/company-pay/buy-packages"
+                }
                 let ps = managers.map( (manager) => {
                     return API.notify.submitNotify({
                         userId: manager.id,
                         key: "qm_notify_trip_plan_num_short",
                         values: {
                             number: newNum,
-                            host: host
+                            detailUrl: detailUrl
                         }
                     });
                 });
@@ -137,8 +144,8 @@ class ApproveModule {
     }
 
     @clientExport
-    @requireParams(['query', 'budget'], ['project', 'specialApproveRemark', 'approveUser'])
-    static async submitSpecialApprove(params: {query: any, budget: number, specialApproveRemark?: string, approveUser?: Staff}):Promise<Approve> {
+    @requireParams(['query', 'budget'], ['project', 'specialApproveRemark', 'approveUser', 'version'])
+    static async submitSpecialApprove(params: {query: any, budget: number, specialApproveRemark?: string, approveUser?: Staff, version?: number}):Promise<Approve> {
         let {query, budget, specialApproveRemark, approveUser} = params;
         let submitter = await Staff.getCurrent();
 
@@ -211,7 +218,8 @@ class ApproveModule {
                 specialApproveRemark: specialApproveRemark,
                 approveUser: approveUser,
                 staffList:query.staffList,
-                budget: budget
+                budget: budget,
+                version: params.version
             });
         }).catch(function(err){
             if(err) {
@@ -230,9 +238,10 @@ class ApproveModule {
         isSpecialApprove?: boolean,
         specialApproveRemark?: string,
         staffList?:string[],
-        budget: number
+        budget: number,
+        version?: number
     }) {
-        let {submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark,staffList,budget } = params;
+        let {submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark,staffList, budget, version} = params;
         let staff = await Models.staff.get(submitter);
         let approve = Models.approve.create({
             submitter: submitter,
@@ -254,7 +263,8 @@ class ApproveModule {
             approveUser: approveUser ? approveUser.id: null,
             submitter: submitter,
             status: EApproveStatus.WAIT_APPROVE,
-            oa: oaEnum2Str(channel) || 'qm'
+            oa: oaEnum2Str(channel) || 'qm',
+            version: version
         });
         return approve;
     }
@@ -309,7 +319,7 @@ emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result) {
 
         //预算审批完成
         if (approve.type == EApproveType.TRAVEL_BUDGET && approve.status == EApproveStatus.SUCCESS) {
-            await API.tripPlan.saveTripPlanByApprove({tripApproveId: approve.id})
+            await API.tripPlan.saveTripPlanByApprove({tripApproveId: approve.id, version: result.version})
         }
     })();
 
