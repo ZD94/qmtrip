@@ -102,7 +102,7 @@ deploy:release:
     name: release
     url: https://j.jingli365.com
   variables:
-    JL_APP_V2_HOST: https://j.jingli365.com/proj
+    JL_APP_V2_HOST: https://j.jingli365.com
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: https://j.jingli365.com/cloud/api/v1
     JL_APP_CLOUD: https://j.jingli365.com/cloud
