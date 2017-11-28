@@ -124,6 +124,7 @@ deploy:tester:
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: http://t.jingli365.com/cloud/api/v1
     JL_APP_CLOUD: http://t.jingli365.com/cloud
+    LINK_VERSION: 1
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
