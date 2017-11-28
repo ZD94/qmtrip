@@ -950,6 +950,7 @@ class TripPlanModule {
     @clientExport
     @requireParams(['where.tripPlanId'], ['where.tripDetailId'])
     static async getTripPlanLogs(options): Promise<FindResult> {
+        options.order = options.order || [['created_at', 'desc']];
         let paginate = await Models.tripPlanLog.find(options);
         return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}
     }
