@@ -20,7 +20,7 @@ let allowOrigin = [
     "jingli365"
 ];
 
-function checkOrigin( origin: Array<any> ){
+function checkOrigin( origin: string ){
     for(let item of allowOrigin){
         if(origin.indexOf(item) > -1){
             return true;
