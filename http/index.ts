@@ -10,7 +10,6 @@ import path = require("path");
 import express = require("express");
 
 let router = express.Router();
-
 scannerDecoration(path.join(__dirname, 'controller'));
 registerControllerToRouter(router);
 

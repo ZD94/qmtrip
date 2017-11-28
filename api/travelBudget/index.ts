@@ -23,6 +23,36 @@ var request = require("request");
 
 const cloudAPI = require('@jingli/config').cloudAPI;
 const cloudKey = require('@jingli/config').cloudKey;
+
+import { restfulAPIUtil } from "api/restful";
+let RestfulAPIUtil = restfulAPIUtil;
+
+export interface ICity {
+    name: string;
+    id: string;
+    isAbroad: boolean;
+    letter: string;
+    timezone: string;
+    longitude: number;
+    latitude: number;
+    code?: string;  //三字码
+}
+
+export interface IQueryBudgetParams {
+    fromCity?: ICity| string;       //出发城市
+    backCity?: ICity| string;       //返回城市
+    segments: any;      //每段查询条件
+    ret: boolean;       //是否往返
+    staffs: any;  //出差员工
+    travelPolicyId?: string;
+    companyId? : string;
+    expiredBudget? : boolean;  //过期是否可以生成预算
+    combineRoom?: boolean;   //同性是否合并
+    isRetMarkedData?: boolean;
+    preferedCurrency?: string;
+}
+
+
 interface SegmentsBudgetResult {
     id: string;
     cities: string[];
@@ -76,19 +106,58 @@ export default class ApiTravelBudget {
 
     @clientExport
     static async getHotelsData(params : ISearchHotelParams) : Promise<any>{
-        let result = await API.budget.getHotelsData(params);
+        let result;
+        try{
+            result = await RestfulAPIUtil.operateOnModel({
+                params: {
+                    method: 'post',
+                    fields: params
+                },
+                addUrl: 'getHotelsData',
+                model:"budget"
+            })
+        }catch(err) {
+            console.log(err);
+        }
         return result;
     }
 
     @clientExport
     static async getTrafficsData(params : ISearchTicketParams) : Promise<any>{
-        let result = await API.budget.getTrafficsData(params);
+        let result;
+        try{
+            result = await RestfulAPIUtil.operateOnModel({
+                params: {
+                    method: 'post',
+                    fields: params
+                },
+                addUrl: 'getTrafficsData',
+                model:"budget"
+            })
+        }catch(err) {
+            console.log(err);
+        }
         return result;
     }
 
     @clientExport
     static async getTripTravelPolicy(travelPolicyId:string, destinationId:string){
-        let result = await API.budget.getTravelPolicy(travelPolicyId, destinationId);
+        let result;
+        try{
+            result = await RestfulAPIUtil.operateOnModel({
+                params: {
+                    method: 'post',
+                    fields: {
+                        travelPolicyId: travelPolicyId,
+                        destinationId: destinationId
+                    }
+                },
+                addUrl: 'getTravelPolicy',
+                model:"budget"
+            })
+        }catch(err) {
+            console.log(err);
+        }
         return result;
     }
 
@@ -130,6 +199,7 @@ export default class ApiTravelBudget {
         if (!travelPolicy) {
             throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
         }
+        params.travelPolicyId = travelPolicy.id;
 
         if (!params.staffList) {
             params.staffList = [];
@@ -182,9 +252,9 @@ export default class ApiTravelBudget {
             }
             return segment;
         }));
-
         let companyId = staff.company.id;
-        let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
+
+        let segmentsBudget:any = await ApiTravelBudget.createNewBudget({
             preferedCurrency:preferedCurrency,
             travelPolicyId: travelPolicy['id'],
             companyId,
@@ -196,9 +266,22 @@ export default class ApiTravelBudget {
             preferSet: staff.company.budgetConfig || {},
         });
 
+        // let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
+        //     preferedCurrency:preferedCurrency,
+        //     travelPolicyId: travelPolicy['id'],
+        //     companyId,
+        //     staffs,
+        //     segments,
+        //     ret: params.isRoundTrip ? 1 : 0,
+        //     fromCity: params.originPlace,
+        //     backCity: params.goBackPlace,
+        //     preferSet: staff.company.budgetConfig || {},
+        // });
+
         let cities = segmentsBudget.cities;
         let _budgets = segmentsBudget.budgets;
         let budgets = [];
+
         for (let i = 0, ii = cities.length; i < ii; i++) {
             let city = cities[i];
 
@@ -291,6 +374,7 @@ export default class ApiTravelBudget {
                 budgets.push(budget);
             }
         }
+
         let obj: any = {};
         obj.budgets = budgets;
         obj.query = params;
@@ -437,6 +521,39 @@ export default class ApiTravelBudget {
         });
         await Promise.all(ps);
         return true;
+    }
+
+    // params: IQueryBudgetParams
+    static async createNewBudget(params: any){
+        let result;
+        try{
+            result = await RestfulAPIUtil.operateOnModel({
+                params: {
+                    method: 'post',
+                    fields: params
+                },
+                model:"budget"
+            })
+        }catch(err) {
+            console.log(err);
+        }
+        return result.data;
+    }
+
+    static async getBudgetById(params: {id: string}){
+        let result;
+        try{
+            result = await RestfulAPIUtil.operateOnModel({
+                params: {
+                    method: 'GET',
+                    fields: params
+                },
+                model:"budget"
+            })
+        }catch(err) {
+            console.log(err);
+        }
+        return result.data;
     }
 
     static __initHttpApp(app) {

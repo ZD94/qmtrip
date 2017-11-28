@@ -6,7 +6,6 @@
   "link_version": "${LINK_VERSION}",
   "debug": false,
   "ts_node": true,
-
   "cluster": false,
   "port": 80,
   "apiPort": 4102,
@@ -22,20 +21,17 @@
   },
   "hosts": {
     "main":{"addr":"api.t.jingli365.com", "port":14201, "www":"https://${{hosts.main.addr}}"},
-    "budget":{"addr": "t.jingli365.com", "port": 14203}
+    "budget":{"addr": "localhost", "port": 4003}
   },
   "api": {
     "postgres": "${{postgres.url}}",
     "remotes": [
       {
-        "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
-        "modules": "*"
-      },
-      {
-        "connect": {"host": "${{hosts.budget.addr}}", "port": "${{hosts.budget.port}}"},
-        "modules": ["budget"]
+      "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
+      "modules": "*"
       }
-    ]
+
+      ]
   },
   "upload":{
     "tmpDir": "${{rootDir}}/tmp/upload",
@@ -113,5 +109,12 @@
   "agent": {
     "appId": "${JL_APP_CLOUD_APP_ID}",
     "appSecret": "${JL_APP_CLOUD_APP_SECRET}"
+  },
+  "mail": {
+    "service": "QQex",
+    "auth": {
+      "user": "noreply@jingli365.com",
+      "pass": "Jingli_2016"
+    }
   }
 }

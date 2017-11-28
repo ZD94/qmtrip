@@ -10,7 +10,7 @@ import { AccordHotel } from '_types/accordHotel';
 import { Notice, NoticeAccount } from '_types/notice';
 import { Agency, AgencyUser } from '_types/agency';
 import {
-    TripPlan, TripDetail, TripDetailStaff, Project, TripPlanLog, TripApprove, FinanceCheckCode,
+    TripPlan, TripDetail, TripDetailStaff, Project, TripPlanLog, FinanceCheckCode,
     TripDetailInvoice, TripDetailTraffic, TripDetailHotel, Offline
 } from '_types/tripPlan';
 import {Account, Token} from '_types/auth';
@@ -25,9 +25,13 @@ import {AgencyOperateLog} from "_types/agency/agency-operate-log";
 import {TripFuelAddPackage} from "../_types/tripPackage/tripFuelAddPackage";
 import {TripBasicPackage} from "../_types/tripPackage/tripBasicPackage";
 import {ErrorLog} from "../_types/errorLog";
+import {EventListener} from "../_types/eventListener";
 // import {CompanyRegion} from "_types/travelPolicy/companyRegion";
 // import {RegionPlace} from "_types/travelPolicy/regionPlace";
 // import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
+import {Url} from "_types/shorturl";
+import {EmailQueue, EmailLog, EmailSubmit} from "_types/mail";
+
 initModels({
     staff: createServerService<Staff>(Staff),
     staffProperty: createServerService<StaffProperty>(StaffProperty),
@@ -61,7 +65,7 @@ initModels({
     tripPlanLog: createServerService<TripPlanLog>(TripPlanLog),
     moneyChange: createServerService<MoneyChange>(MoneyChange),
     project: createServerService<Project>(Project),
-    tripApprove: createServerService<TripApprove>(TripApprove),
+    // tripApprove: createServerService<TripApprove>(TripApprove),
     approve: createServerService<Approve>(Approve),
     account: createServerService<Account>(Account),
     seed: createServerService<Seed>(Seed),
@@ -80,6 +84,12 @@ initModels({
     tripFuelAddPackage: createServerService<TripFuelAddPackage>(TripFuelAddPackage),
     tripBasicPackage: createServerService<TripBasicPackage>(TripBasicPackage),
     errorLog: createServerService<ErrorLog>(ErrorLog),
+    eventListener: createServerService<EventListener>(EventListener),
+
+    url: createServerService<Url>(Url),
+    emailQueue: createServerService<EmailQueue>(EmailQueue),
+    emailLog: createServerService<EmailLog>(EmailLog),
+    emailSubmit: createServerService<EmailSubmit>(EmailSubmit),
 
     // travelPolicyRegion: createServerService<TravelPolicyRegion>(TravelPolicyRegion),
     // companyRegion: createServerService<CompanyRegion>(CompanyRegion),

@@ -33,14 +33,14 @@ const companyCols = Staff['$getAllFieldNames']();
 
 const DEFAULT_EXPIRE_MONTH = 1;
 
-enum HotelPriceLimitType  {
+export enum HotelPriceLimitType  {
     NO_SET = 0,
     Min_Price_Limit = -1,
     Max_Price_Limit = 1,
     Price_Limit_Both = 2
 }
 
-class CompanyModule {
+export default class CompanyModule {
     /**
      * 创建企业
      * @param {Object} params
@@ -1321,7 +1321,7 @@ class CompanyModule {
 
 
 CompanyModule._scheduleTask();
-export = CompanyModule;
+// export = CompanyModule;
 
 
 async function initDefaultCompanyRegion(companyId: string) {
