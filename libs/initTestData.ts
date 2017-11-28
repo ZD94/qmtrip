@@ -191,7 +191,8 @@ async function initXAJHStaffs(params: {companyId: string}): Promise<any[]> {
         staff.status = ACCOUNT_STATUS.ACTIVE;
 
         let st = Staff.create(staff);
-        st.setTravelPolicy(travelPolicy["id"]);
+        // st.setTravelPolicy(travelPolicy["id"]);
+        st.travelPolicyId = travelPolicy["id"];
         st.company = company;
         st = await st.save();
         for(let i = 0; i < deptNames.length; i++){
@@ -210,7 +211,8 @@ async function initXAJHStaffs(params: {companyId: string}): Promise<any[]> {
     let tp = await API.travelPolicy.getTravelPolicies({companyId: companyId, name: "高管级"});
     tp = tp.data;
     if(tp && tp.length > 0){
-        create_user.setTravelPolicy(tp[0].id);
+        // create_user.setTravelPolicy(tp[0].id);
+        create_user.travelPolicyId = tp[0].id;
     }
     create_user = await create_user.save();
     result.push(create_user);

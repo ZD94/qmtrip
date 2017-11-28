@@ -243,7 +243,7 @@ class DDTalk {
             console.error(e);
         }
         
-        this.dealEvent( corpId );
+        await this.dealEvent( corpId );
     }
 
     static async eventPush( msg: any ){
@@ -252,7 +252,7 @@ class DDTalk {
         let result = await cache.rpush( key, msg );
         if(!DDEventCorpId[corpId]){
             DDEventCorpId[corpId] = true;
-            this.dealEvent( corpId );
+            await this.dealEvent( corpId );
         }else{
             console.log("this key is running ===> ", corpId);
         }
@@ -317,10 +317,12 @@ class DDTalk {
             let comPermanentCodePros = await Models.companyProperty.find({where: {companyId: company.id,
                 type: CPropertyType.DD_PERMANENT_CODE}});
             let tokenObj = await DealEvent._getSuiteToken();
-            let suiteToken = tokenObj['suite_access_token']
+            let suiteToken = tokenObj['suite_access_token'];
+            console.info("suiteToken==>>", suiteToken);
             let isvApi = new ISVApi(config.suiteid, suiteToken, corpid, comPermanentCodePros[0].value);
             let corpApi = await isvApi.getCorpApi();
             let dingTalkUser = await corpApi.getUserInfoByOAuth(code);
+            console.info("dingTalkUser==>>", dingTalkUser);
             //查找是否已经绑定账号
             // let ddtalkUsers = await Models.ddtalkUser.find( { where: {corpid: corpid, ddUserId: dingTalkUser.userId}});
             let staffPro = await Models.staffProperty.find({where : {value: dingTalkUser.userId, type: SPropertyType.DD_ID}});
@@ -337,7 +339,7 @@ class DDTalk {
 
                 if(staff){
                     // //自动登录
-                    console.log("钉钉自动登录: API.auth.makeAuthenticateToken ", dingTalkUser.userId);
+                    console.log("钉钉自动登录: API.auth.makeAuthenticateToken ", dingTalkUser.userId, staff.accountId);
                     let ret = await API.auth.makeAuthenticateToken(staff.accountId, 'ddtalk');
                     return ret;
                 }else{

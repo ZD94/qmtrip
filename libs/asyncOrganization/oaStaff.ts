@@ -76,6 +76,7 @@ export  abstract class OaStaff{
     }
 
     async sync(params?:{company?: Company, from?: string}): Promise<Staff>{
+        console.info(this.name, "staff sync begin==================================");
         if(!params) params = {};
         let self = this;
         let from  = params.from;
@@ -127,16 +128,16 @@ export  abstract class OaStaff{
             if(!oaDepartments || !oaDepartments.length){
                 newDepartments.push(defaultDepartment)
             }else{
-                // 不存在，添加
-                let roleId;
+                /*let roleId;
                 let pwd;
                 let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd)});
-                staff.setTravelPolicy(defaultTravelPolicy.id);
+                // staff.setTravelPolicy(defaultTravelPolicy.id);
+                staff.travelPolicyId = defaultTravelPolicy.id;
                 staff.company = company;
                 staff.staffStatus = EStaffStatus.ON_JOB;
                 staff.addWay = EAddWay.OA_SYNC;
                 staff = await staff.save();
-                await self.saveStaffProperty({staffId: staff.id});
+                await self.saveStaffProperty({staffId: staff.id});*/
                 let oaDepartmentIds = await Promise.all(oaDepartments.map(async (item) => {
                     let department = await item.getDepartment();
                     if(!department){
@@ -166,7 +167,8 @@ export  abstract class OaStaff{
                 }else{
                     // 不存在，添加
                     let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd), avatar: self.avatar});
-                    staff.setTravelPolicy(defaultTravelPolicy.id);
+                    // staff.setTravelPolicy(defaultTravelPolicy.id);
+                    staff.travelPolicyId = defaultTravelPolicy.id;
                     staff.company = company;
                     staff.staffStatus = EStaffStatus.ON_JOB;
                     staff.addWay = EAddWay.OA_SYNC;
@@ -198,7 +200,7 @@ export  abstract class OaStaff{
                 returnStaff = alreadyStaff;
             }
         }
-
+        console.info(this.name, "staff sync end==================================");
 
         return returnStaff;
     }

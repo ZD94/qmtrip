@@ -1,19 +1,21 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "target": "es2016",
+    "target": "es2015",
     "module": "commonjs",
     "outDir": "tmp/tsreq",
     "noEmitHelpers": true,
     "importHelpers": true,
+    "experimentalDecorators": true,
     "sourceMap": true,
     "declaration": true,
     "declarationDir": "JLTypes",
-    "experimentalDecorators": true,
-    "noImplicitUseStrict": false,
+    "strict": true,
     "noImplicitAny": false,
-    "noImplicitThis": false,
+    "strictNullChecks": false,
+    "noUnusedLocals": false,
     "allowSyntheticDefaultImports": true,
+    "suppressImplicitAnyIndexErrors": true,
     "baseUrl": ".",
     "paths": {
       "*": ["*", "*/index", "common/client/*", "common/client/*/index"]
@@ -21,10 +23,8 @@
     "lib": ["es2015", "dom"]
   },
   "compilerOptionsNotUsing": {
-    "emitDecoratorMetadata": true,
-    "noImplicitAny": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "noUnusedLocals": true
+    "strictFunctionTypes": false,
+    "emitDecoratorMetadata": true
   },
   "exclude": [
     "node_modules",
@@ -40,6 +40,5 @@
     "tools/",
     "mytest"
   ],
-  "excludeNotUsing": [
-  ]
+  "excludeNotUsing": []
 }

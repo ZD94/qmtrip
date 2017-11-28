@@ -11,6 +11,7 @@ export interface createTripApproveParam {
     approveNo: string;  //审核单号
     submitter: string;      //员工ID
     approveUser?: string;    //审核人ID
+    version?: number //前端version
 }
 
 export interface createTripApproveResult {
