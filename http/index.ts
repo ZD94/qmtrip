@@ -31,12 +31,12 @@ function checkOrigin( origin: string){
 }
 
 function allowCrossDomain(req: Request, res: Response, next: NextFunction) {
-    const origin: any= req.headers['origin']
+    const origin: any = req.headers['origin']
     if (origin && checkOrigin(origin)) {
         res.header('Access-Control-Allow-Origin', origin);
     }
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', req.headers['access-control-request-headers']);
+    res.header('Access-Control-Allow-Headers', req.headers['access-control-request-headers'] as string);
     if (req.method == 'OPTIONS') {
         return res.send("OK");
     }
