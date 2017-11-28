@@ -42,7 +42,7 @@ export class TripApproveController extends AbstractController {
             });
         } catch(err) {
             console.info(err);
-            return res.json(this.reply(500, null));
+            res.json(this.reply(500, null));
         }
         res.json(this.reply(0, result));
     }
@@ -63,7 +63,27 @@ export class TripApproveController extends AbstractController {
             });
         } catch(err) {
             console.info(err);
-            return res.json(this.reply(500, null));
+            res.json(this.reply(503, null));
+        }
+        res.json(this.reply(0, result));
+    }
+
+    @Router("/:id/cancelApprove", 'POST')
+    async cancelApprove(req: Request, res: Response, next: Function){
+        let {id, reason} = req.body;
+        if(!id) id = req.params.id;
+        if(!id)
+            return res.json(this.reply(0, null));
+        let result;
+
+        try{
+            result = await TripApproveModule.oaCancelTripApprove({
+                id: id,
+                cancelRemark: reason
+            });
+        } catch(err) {
+            console.info(err);
+            res.json(this.reply(503, null));
         }
         res.json(this.reply(0, result));
     }

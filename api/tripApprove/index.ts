@@ -722,10 +722,10 @@ export default class TripApproveModule {
      * @param params
      * @returns {boolean}
      */
-    @clientExport
+    /*@clientExport
     @requireParams(['id'],['remark'])
     static async cancelTripApprove(params: {id: string, remark?: string}): Promise<boolean> {
-        /*let tripApprove = await TripApproveModule.getTripApprove({id: params.id});
+        let tripApprove = await TripApproveModule.getTripApprove({id: params.id});
         let company = tripApprove.account.company;
         if( tripApprove.status != QMEApproveStatus.WAIT_APPROVE && tripApprove.approvedUsers && tripApprove.approvedUsers.indexOf(",") != -1 ) {
             throw {code: -2, msg: "审批单状态不正确，该审批单不能撤销！"};
@@ -772,7 +772,70 @@ export default class TripApproveModule {
             await company.approveRejectFreeBeforeNum({accountId: tripApprove.account.id, tripPlanId: tripApprove.id,
                 remark: "审批前撤销上月行程释放冻结行程点数", content: content, frozenNum: frozenNum});
 
-        }*/
+        }
+
+        return true;
+    }*/
+
+    @clientExport
+    @requireParams(['id'],['cancelRemark'])
+    static async oaCancelTripApprove(params: {id: string, cancelRemark?: string}): Promise<boolean> {
+        console.info( "oaCancelTripApprove begin==============");
+        let tripApprove = await Models.approve.get(params.id);
+        let staff = await Models.staff.get(tripApprove.submitter);
+        let company = staff.company;
+        await DB.transaction(async function(t){
+            let log = Models.tripPlanLog.create({tripPlanId: params.id, userId: staff.id, remark: `撤销行程审批单`});
+            await log.save();
+
+            if(typeof tripApprove.data == "string"){
+                tripApprove.data = JSON.parse(tripApprove.data);
+            }
+            let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = tripApprove.data;
+            let {budgets, query} = budgetInfo;
+            if (typeof query == 'string') {
+                query = JSON.parse(query);
+            }
+            let frozenNum = query.frozenNum;
+            console.info(frozenNum);
+            if(!frozenNum){
+                frozenNum = { extraFrozen: 0, limitFrozen: 0 };
+            }
+
+            let content = "";
+            let destinationPlacesInfo = query.destinationPlacesInfo;
+
+            if(query && query.originPlace){
+                let originCity = await API.place.getCityInfo({cityCode: query.originPlace});
+                content = content + originCity.name + "-";
+            }
+            if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
+                for(let i = 0; i < destinationPlacesInfo.length; i++){
+                    let segment: ISegment = destinationPlacesInfo[i]
+                    let destinationCity = await API.place.getCityInfo({cityCode: segment.destinationPlace});
+                    if(i<destinationPlacesInfo.length-1){
+                        content = content + destinationCity.name+"-";
+                    }else{
+                        content = content + destinationCity.name;
+                    }
+                }
+            }
+
+            if(tripApprove.createdAt.getMonth() == new Date().getMonth()){
+                await company.approveRejectFreeTripPlanNum({accountId: staff.id, tripPlanId: tripApprove.id,
+                    remark: "审批前撤销行程释放冻结行程点数", content: content, frozenNum: frozenNum});
+            }else{
+                await company.approveRejectFreeBeforeNum({accountId: staff.id, tripPlanId: tripApprove.id,
+                    remark: "审批前撤销上月行程释放冻结行程点数", content: content, frozenNum: frozenNum});
+
+            }
+        }).catch(async function(err){
+            if(err) {
+                await company.reload();
+                throw L.ERR.INTERNAL_ERROR();
+            }
+        });
+        console.info( "oaCancelTripApprove end==============");
 
         return true;
     }
