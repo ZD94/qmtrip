@@ -31,7 +31,7 @@ function checkOrigin( origin: string){
 }
 
 function allowCrossDomain(req: Request, res: Response, next: NextFunction) {
-    const origin: string = req.headers['origin']
+    const origin: string= req.headers['origin']
     if (origin && checkOrigin(origin)) {
         res.header('Access-Control-Allow-Origin', origin);
     }
