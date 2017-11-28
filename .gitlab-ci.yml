@@ -9,7 +9,7 @@ variables:
   JL_APP_DAEMON_WAIT_INIT: log/nohup.out
   JL_APP_CLOUD_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
   JL_APP_CLOUD_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-  JL_APP_LINK_VERSION: 1
+  JL_APP_LINK_VERSION: 2
 
 stages:
   - build
