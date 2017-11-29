@@ -4,15 +4,17 @@
 
 
 "use strict"
-import {OaDepartment} from "../../../libs/asyncOrganization/oaDepartment";
-import { OaStaff } from 'libs/asyncOrganization/OaStaff';
-import { Department} from "_types/department";
-import {Company} from "_types/company";
+import {OaDepartment} from "../../../libs/asyncOrganization/oaDepartment"
+import {OaStaff} from 'libs/asyncOrganization/OaStaff'
+import {Department, DPropertyType} from "_types/department"
+import {Company} from "_types/company"
+import {Models} from "_types/index"
 
 export default class WangxDepartment extends OaDepartment {
 
     constructor(target: any) {
         super(target)
+        this.companyId = target.companyId
     }
 
     get id() {
@@ -55,6 +57,16 @@ export default class WangxDepartment extends OaDepartment {
         this.target.company = val;
     }
 
+    //网信独有属性
+
+    get companyId() {
+        return this.target.companyId
+    }
+
+    set companyId(companyId: string) {
+        this.target.companyId = companyId
+    }
+
     async getSelfById(): Promise<OaDepartment> {
         return null
     }
@@ -71,12 +83,25 @@ export default class WangxDepartment extends OaDepartment {
         return null
     }
 
-    async getDepartment(): Promise<Department> {
-        return null
-    }
-
     async saveDepartmentProperty(params: {departmentId: string}): Promise<boolean> {
         return true
     }
 
+    async getDepartment(): Promise<Department> {
+        let self = this
+        let department: Department = null
+        let deptPro = await Models.departmentProperty.find({where : {value: self.id, type: DPropertyType.WANGXIN_ID}});
+        if(deptPro && deptPro.length > 0){
+            for(let d of deptPro){
+                let dept = await Models.department.get(d.departmentId);
+                if(dept){
+                    let deptCorpPro = await Models.departmentProperty.find({where : {value: self.company.id, type: DPropertyType.WANGXIN_COMPANY_ID, departmentId: dept.id}});
+                    if(deptCorpPro && deptCorpPro.length){
+                        department = dept;
+                    }
+                }
+            }
+        }
+        return department
+    }
 }

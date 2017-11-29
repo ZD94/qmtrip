@@ -8,7 +8,8 @@ import WangxStaff from "./wangxStaff"
 import {Models} from "_types/index"
 import {Company, CPropertyType} from "_types/company"
 import WangxDepartment from "./wangxDepartment";
-import {OaDepartment} from "../../../libs/asyncOrganization/oaDepartment";
+import {OaDepartment} from "libs/asyncOrganization/oaDepartment";
+import {OaStaff} from "../../../libs/asyncOrganization/oaStaff";
 
 export const eventTypeArray: Array<string> = ["user_add_org", "user_modify_org", "user_leave_org",
     "org_dept_create", "org_dept_modify", "org_dept_remove"]
@@ -53,7 +54,7 @@ async function syncUsers (params: any) {
     let company: Company = await Models.company.get(comPro[0].companyId)
 
     userIds.map(async (userId) => {
-        let wangxStaff = new WangxStaff({id: userId, company: company})
+        let wangxStaff: OaStaff = new WangxStaff({id: userId, company: company})
         wangxStaff = await wangxStaff.getSelfById()
         await wangxStaff.sync()
     })

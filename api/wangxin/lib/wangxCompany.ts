@@ -47,6 +47,10 @@ export default class WangxCompany extends OaCompany{
         return null
     }
 
+    async saveCompanyProperty(params: {companyId: string}): Promise<boolean> {
+        return true
+    }
+
     /**
      * 根据网信绑定的companyId获取本地公司信息。
      * @returns {Promise<Company>}
@@ -62,9 +66,5 @@ export default class WangxCompany extends OaCompany{
         }
 
         return company
-    }
-
-    async saveCompanyProperty(params: {companyId: string}): Promise<boolean> {
-        return true
     }
 }

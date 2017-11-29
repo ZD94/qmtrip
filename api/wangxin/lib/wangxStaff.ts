@@ -4,10 +4,11 @@
 
 
 "use strict"
-import {OaStaff} from "../../../JLTypes/libs/asyncOrganization/oaStaff"
-import {OaDepartment} from "../../../libs/asyncOrganization/oaDepartment";
-import {Staff} from "_types/staff"
+import {OaStaff} from "../../../libs/asyncOrganization/oaStaff"
+import {OaDepartment} from "../../../libs/asyncOrganization/oaDepartment"
+import {Staff, SPropertyType} from "_types/staff"
 import {Company} from "_types/company"
+import {Models} from "_types/index"
 
 export default class WangxStaff extends OaStaff {
 
@@ -87,6 +88,15 @@ export default class WangxStaff extends OaStaff {
         this.target.avatar = val;
     }
 
+    //wangxinStaff的特殊属性
+    get companyId() {
+        return this.target.companyId
+    }
+
+    set companyId(companyId: string) {
+        this.target.companyId = companyId
+    }
+
     async getDepartments(): Promise<OaDepartment[]> {
         return null
     }
@@ -104,7 +114,21 @@ export default class WangxStaff extends OaStaff {
     }
 
     async getStaff(): Promise<Staff>{
-        return null
+        let self = this;
+        let staff: Staff = null;
+        let staffPros = await Models.staffProperty.find({where : {value: self.id, type: SPropertyType.WANGXIN_ID}});
+        if(staffPros && staffPros.length > 0){
+            for(let staffPro of staffPros){
+                let tempStaff = await Models.staff.get(staffPro.staffId);
+                if(tempStaff){
+                    let stCorpPro = await Models.staffProperty.find({where : {value: self.companyId, type: SPropertyType.WANGXIN_COMPANY_ID, staffId: tempStaff.id}});
+                    if(stCorpPro && stCorpPro.length){
+                        staff = tempStaff
+                    }
+                }
+            }
+        }
+        return staff;
     }
 
 }
