@@ -6,8 +6,8 @@
 "use strict"
 import {OaDepartment} from "../../../libs/asyncOrganization/oaDepartment";
 import { OaStaff } from 'libs/asyncOrganization/OaStaff';
-import { DepartmentProperty, DPropertyType, Department} from "_types/department";
-import {Company, CPropertyType} from "_types/company";
+import { Department} from "_types/department";
+import {Company} from "_types/company";
 
 export default class WangxDepartment extends OaDepartment {
 

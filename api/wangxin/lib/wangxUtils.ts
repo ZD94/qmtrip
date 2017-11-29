@@ -1,5 +1,6 @@
 /**
  * Created by lei.liu on 2017/11/28
+ * 网信相关工具类。包括token解析。
  */
 
 "use strict"
@@ -30,9 +31,14 @@ export default class WangxUtils {
         return publicKey
     }
 
+    /**
+     * 解析网信的LRToken。
+     * @param {string} token
+     * @returns {string}
+     */
     static parseLRToken (token: string): string {
 
-        logger.debug(`wangxin LRToken: ${token}`)
+        logger.info(`wangxin LRToken: ${token}`)
 
         let privateKey: Buffer = WangxUtils.getPrivateKey()
         let tokenBuffer = new Buffer(token,"hex")

@@ -6,8 +6,8 @@
 "use strict"
 import {OaStaff} from "../../../JLTypes/libs/asyncOrganization/oaStaff"
 import {OaDepartment} from "../../../libs/asyncOrganization/oaDepartment";
-import {StaffProperty, SPropertyType, Staff} from "_types/staff"
-import {Company, CPropertyType} from "_types/company"
+import {Staff} from "_types/staff"
+import {Company} from "_types/company"
 
 export default class WangxStaff extends OaStaff {
 
