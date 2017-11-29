@@ -101,14 +101,19 @@ export default class ApiTravelBudget {
         if (!needMeiya) {
             return commonData;
         }
-        let meiyaTrain = await getMeiyaTrainData(params);
-        let meiyaFlight = await getMeiyaFlightData(params);
+
+        let arr = await Promise.all([
+            await getMeiyaTrainData(params),
+            await getMeiyaFlightData(params)
+        ]);
+        let meiyaTrain = arr[0];
+        let meiyaFlight = arr[1];
         compareFlightData(commonData, meiyaFlight);
         compareTrainData(commonData, meiyaTrain);
         // writeData("meiyaTrain.json", meiyaTrain);
         // writeData("meiyaFlight.json", meiyaFlight);
 
-        // writeData("finallyData.json", commonData);
+        // writeData("finallyTraffic.json", commonData);
         return commonData;
     }
 
