@@ -66,6 +66,7 @@ export class EventModule{
         try{
             let company = await Models.company.get(params.companyId);
             let url = company.approveServerUrl ? company.approveServerUrl : config.approveServerUrl;
+            url = url + `/tripApprove/receiveRequest`;
             let result = await request({
                 uri: `${url}`,
                 body: params,

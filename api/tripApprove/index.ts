@@ -49,14 +49,14 @@ export default class TripApproveModule {
         if(!budgetInfo) {
             throw L.ERR.TRAVEL_BUDGET_NOT_FOUND();
         }
-        if(typeof budgetInfo == 'undefined') {
+        if(typeof budgetInfo == 'string') {
             budgetInfo = JSON.parse(budgetInfo);
         }
         let {budgets, query} = budgetInfo;
-        if(typeof query == 'undefined') {
+        if(typeof query == 'string') {
             query = JSON.parse(query);
         }
-        if(typeof budgets == 'undefined') {
+        if(typeof budgets == 'string') {
             budgets = JSON.parse(budgets);
         }
         let destinationPlacesInfo = query.destinationPlacesInfo;
