@@ -35,9 +35,9 @@ export default class TripApproveModule {
 
     static async retrieveDetailFromApprove(params: {approveNo: string, approveUser?: string, submitter?: string}):Promise<ITripApprove> {
         let {approveNo, approveUser, submitter} = params;
-        // let tripApproveObj: any = await TripApproveModule.getTripApprove({id: approveNo});
-        // if(tripApproveObj)
-        //     return tripApproveObj;
+        let tripApproveObj: any = await TripApproveModule.getTripApprove({id: approveNo});
+        if(tripApproveObj)
+            return tripApproveObj;
 
         let approve = await Models.approve.get(approveNo);
         let company = await Models.company.get(approve.companyId);
@@ -49,7 +49,16 @@ export default class TripApproveModule {
         if(!budgetInfo) {
             throw L.ERR.TRAVEL_BUDGET_NOT_FOUND();
         }
+        if(typeof budgetInfo == 'undefined') {
+            budgetInfo = JSON.parse(budgetInfo);
+        }
         let {budgets, query} = budgetInfo;
+        if(typeof query == 'undefined') {
+            query = JSON.parse(query);
+        }
+        if(typeof budgets == 'undefined') {
+            budgets = JSON.parse(budgets);
+        }
         let destinationPlacesInfo = query.destinationPlacesInfo;
         let totalBudget = 0;
         budgets.forEach((b) => {totalBudget += Number(b.price);});
