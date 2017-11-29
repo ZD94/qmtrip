@@ -116,5 +116,6 @@
       "user": "noreply@jingli365.com",
       "pass": "Jingli_2016"
     }
-  }
+  },
+  "approveServerUrl": "${APPROVE_SERVER_URL}"
 }
