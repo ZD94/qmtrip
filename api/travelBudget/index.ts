@@ -1,10 +1,11 @@
 /**
  * Created by wlh on 15/12/12.
  */
+import { Headers } from 'request';
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
-import {Models } from '_types'
-import {ETripType, EInvoiceType, ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan";
-import {Staff} from "_types/staff";
+import { Models } from '_types'
+import { ETripType, EInvoiceType, ISegment, ICreateBudgetAndApproveParams } from "_types/tripPlan";
+import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
 const validate = require("common/validate");
 import L from '@jingli/language';
@@ -12,14 +13,15 @@ const moment = require('moment');
 require("moment-timezone");
 const cache = require("common/cache");
 const utils = require("common/utils");
-import _ = require("lodash");
-import {Place} from "_types/place";
-import {EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel, DefaultRegion} from "_types"
-import {where} from "sequelize";
+import _ = require('lodash');
+import { Place } from "_types/place";
+import { EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel, DefaultRegion } from "_types"
+import { where } from "sequelize";
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 export var NoCityPriceLimit = 0;
 const DefaultCurrencyUnit = 'CNY';
-var request = require("request");
+import { restfulAPIUtil } from "api/restful";
+import { meiyaJudge, getMeiyaFlightData, getMeiyaTrainData, writeData, compareFlightData, compareTrainData, getMeiyaHotelData, compareHotelData } from "./meiya";
 
 const cloudAPI = require('@jingli/config').cloudAPI;
 const cloudKey = require('@jingli/config').cloudKey;
@@ -58,8 +60,8 @@ let sequelize = require('sequelize');
 export default class ApiTravelBudget {
 
     @clientExport
-    static async getBudgetInfo(params: {id: string, accountId? : string}) {
-        let { id, accountId }= params;
+    static async getBudgetInfo(params: { id: string, accountId?: string }) {
+        let { id, accountId } = params;
         if (!accountId || accountId == 'undefined') {
             let staff = await Staff.getCurrent();
             accountId = staff.id;
@@ -75,19 +77,43 @@ export default class ApiTravelBudget {
     }
 
     @clientExport
-    static async getHotelsData(params : ISearchHotelParams) : Promise<any>{
-        let result = await API.budget.getHotelsData(params);
-        return result;
+    static async getHotelsData(params: ISearchHotelParams): Promise<any> {
+        let commonData = await API.budget.getHotelsData(params);
+        // writeData("commonHotelData.json", commonData);
+        //检查是否需要美亚数据，返回美亚数据
+        let needMeiya = await meiyaJudge();
+        if (!needMeiya) {
+            return commonData;
+        }
+
+        let meiyaHotel = await getMeiyaHotelData(params);
+        compareHotelData(commonData, meiyaHotel);
+        writeData("finallyHotel.json", commonData);
+        return commonData;
     }
 
     @clientExport
-    static async getTrafficsData(params : ISearchTicketParams) : Promise<any>{
-        let result = await API.budget.getTrafficsData(params);
-        return result;
+    static async getTrafficsData(params: ISearchTicketParams): Promise<any> {
+        let commonData = await API.budget.getTrafficsData(params);
+        // writeData("commonData.json", commonData);
+
+        let needMeiya = await meiyaJudge();
+        if (!needMeiya) {
+            return commonData;
+        }
+        let meiyaTrain = await getMeiyaTrainData(params);
+        let meiyaFlight = await getMeiyaFlightData(params);
+        compareFlightData(commonData, meiyaFlight);
+        compareTrainData(commonData, meiyaTrain);
+        // writeData("meiyaTrain.json", meiyaTrain);
+        // writeData("meiyaFlight.json", meiyaFlight);
+
+        // writeData("finallyData.json", commonData);
+        return commonData;
     }
 
     @clientExport
-    static async getTripTravelPolicy(travelPolicyId:string, destinationId:string){
+    static async getTripTravelPolicy(travelPolicyId: string, destinationId: string) {
         let result = await API.budget.getTravelPolicy(travelPolicyId, destinationId);
         return result;
     }
@@ -116,10 +142,12 @@ export default class ApiTravelBudget {
     * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
     */
     @clientExport
-    static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams) :Promise<string> {
+    static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams): Promise<string> {
+        // console.log("params===>", params);
+
         let staffId = params['staffId'];
         let preferedCurrency = params["preferedCurrency"];
-        preferedCurrency = preferedCurrency && typeof(preferedCurrency) != 'undefined' ? preferedCurrency :DefaultCurrencyUnit;
+        preferedCurrency = preferedCurrency && typeof (preferedCurrency) != 'undefined' ? preferedCurrency : DefaultCurrencyUnit;
 
         if (!staffId || staffId == 'undefined') {
             let currentStaff = await Staff.getCurrent();
@@ -146,10 +174,10 @@ export default class ApiTravelBudget {
         let staffs = [_staff];
         let goBackPlace = params['goBackPlace'];
         // let priceLimitSegments: any =[];
-        let segments: any[] = await Promise.all(destinationPlacesInfo.map(async(placeInfo) => {
+        let segments: any[] = await Promise.all(destinationPlacesInfo.map(async (placeInfo) => {
             var segment: any = {};
             segment.city = placeInfo.destinationPlace;
-            let city: Place = (await API.place.getCityInfo({cityCode: placeInfo.destinationPlace}));
+            let city: Place = (await API.place.getCityInfo({ cityCode: placeInfo.destinationPlace }));
             if (city.isAbroad) {
                 let s = _.cloneDeep(_staff);
                 s.policy = 'abroad';
@@ -169,7 +197,7 @@ export default class ApiTravelBudget {
             } else {
                 let obj;
                 if (businessDistrict) {
-                    obj = API.place.getCityInfo({cityCode: businessDistrict});
+                    obj = API.place.getCityInfo({ cityCode: businessDistrict });
                 }
                 if (!obj || !obj.latitude || !obj.longitude) {
                     obj = city;
@@ -185,7 +213,7 @@ export default class ApiTravelBudget {
 
         let companyId = staff.company.id;
         let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
-            preferedCurrency:preferedCurrency,
+            preferedCurrency: preferedCurrency,
             travelPolicyId: travelPolicy['id'],
             companyId,
             staffs,
@@ -223,18 +251,18 @@ export default class ApiTravelBudget {
             let hotel = _budgets[i].hotel;
             if (hotel && hotel.length) {
                 let budget = hotel[0];
-                let cityObj = await API.place.getCityInfo({cityCode: city});
-                let isAccordHotel = await Models.accordHotel.find({where: {cityCode: cityObj.id, companyId: staff['companyId']}});
+                let cityObj = await API.place.getCityInfo({ cityCode: city });
+                let isAccordHotel = await Models.accordHotel.find({ where: { cityCode: cityObj.id, companyId: staff['companyId'] } });
                 if (isAccordHotel && isAccordHotel.length) {
                     budget.price = isAccordHotel[0].accordPrice;
 
-                     /* 出差时间计算 */
-                    let residentPlace = await API.place.getCityInfo({cityCode: budget.city});
-                    let timezone = residentPlace.timezone && typeof(residentPlace.timezone) != undefined ?
+                    /* 出差时间计算 */
+                    let residentPlace = await API.place.getCityInfo({ cityCode: budget.city });
+                    let timezone = residentPlace.timezone && typeof (residentPlace.timezone) != undefined ?
                         residentPlace.timezone : 'Asia/shanghai';
                     let beginTime = moment(budget.checkInDate).tz(timezone).hour(12);
                     let endTime = moment(budget.checkOutDate).tz(timezone).hour(12);
-                    let days = moment(endTime).diff(beginTime,'days');
+                    let days = moment(endTime).diff(beginTime, 'days');
                     budget.price = budget.price * days;
                     /* 出差时间计算 END */
                 }
@@ -279,12 +307,12 @@ export default class ApiTravelBudget {
             if (subsidy) {
                 let budget = subsidy;
                 budget.price = budget.price * count;
-                if(budget.templates){
+                if (budget.templates) {
                     budget.templates.forEach((t) => {
                         t.price = t.price * count;
                     })
                 }
-                budget.reason =placeInfo ? placeInfo.reason : lastDest.reason;
+                budget.reason = placeInfo ? placeInfo.reason : lastDest.reason;
                 budget.tripType = ETripType.SUBSIDY;
                 budget.type = EInvoiceType.SUBSIDY;
 
@@ -365,24 +393,24 @@ export default class ApiTravelBudget {
             return budget;
         }*/
 
-        function limitHotelBudgetByPrefer(min: number, max:number, hotelBudget: number){
-            if(hotelBudget == -1) {
-                if(max != NoCityPriceLimit) return max;
+        function limitHotelBudgetByPrefer(min: number, max: number, hotelBudget: number) {
+            if (hotelBudget == -1) {
+                if (max != NoCityPriceLimit) return max;
                 return hotelBudget;
             }
-            if(min == NoCityPriceLimit && max == NoCityPriceLimit) return hotelBudget;
+            if (min == NoCityPriceLimit && max == NoCityPriceLimit) return hotelBudget;
 
-            if(max != NoCityPriceLimit && min > max) {
+            if (max != NoCityPriceLimit && min > max) {
                 let tmp = min;
                 min = max;
                 max = tmp;
             }
 
-            if(hotelBudget > max ) {
-                if(max != NoCityPriceLimit) return max;
+            if (hotelBudget > max) {
+                if (max != NoCityPriceLimit) return max;
             }
-            if(hotelBudget < min ) {
-                if(min != NoCityPriceLimit) return min;
+            if (hotelBudget < min) {
+                if (min != NoCityPriceLimit) return min;
             }
             return hotelBudget;
         }
@@ -390,31 +418,31 @@ export default class ApiTravelBudget {
 
     }
 
-    static async sendTripApproveNoticeToSystem(params: {cacheId: string, staffId: string}) {
-        let {cacheId, staffId } = params;
-        if(!staffId || staffId == 'undefined'){
+    static async sendTripApproveNoticeToSystem(params: { cacheId: string, staffId: string }) {
+        let { cacheId, staffId } = params;
+        if (!staffId || staffId == 'undefined') {
             let currentStaff = await Staff.getCurrent();
             staffId = currentStaff.id;
         }
         let staff = await Models.staff.get(staffId);
         let company = staff.company;
 
-        if(company.name != "鲸力智享"){
+        if (company.name != "鲸力智享") {
 
             try {
-                await Promise.all(systemNoticeEmails.map(async function(s) {
+                await Promise.all(systemNoticeEmails.map(async function (s) {
                     try {
                         await API.notify.submitNotify({
                             key: 'qm_notify_system_new_travelbudget',
                             email: s.email,
-                            values: {cacheId: cacheId, name: s.name, staffId: staffId}
+                            values: { cacheId: cacheId, name: s.name, staffId: staffId }
                         })
 
-                    } catch(err) {
+                    } catch (err) {
                         console.error(err);
                     }
                 }));
-            } catch(err) {
+            } catch (err) {
                 console.error('发送系统通知失败', err)
             }
         }
@@ -422,12 +450,12 @@ export default class ApiTravelBudget {
     }
 
     @clientExport
-    static async reportBudgetError(params: { budgetId: string}) {
+    static async reportBudgetError(params: { budgetId: string }) {
         let staff = await Staff.getCurrent();
-        let {budgetId} = params;
-        let content = await ApiTravelBudget.getBudgetInfo({id: budgetId, accountId: staff.id});
+        let { budgetId } = params;
+        let content = await ApiTravelBudget.getBudgetInfo({ id: budgetId, accountId: staff.id });
         let budgets = content.budgets;
-        let ps = budgets.map( async (budget): Promise<any> => {
+        let ps = budgets.map(async (budget): Promise<any> => {
             if (!budget.id) {
                 return true;
             }
@@ -449,31 +477,31 @@ export default class ApiTravelBudget {
             next();
         }
 
-        app.get("/api/budgets", _auth_middleware, function(req, res, next) {
-            let {p, pz, type} = req.query;
-            if (!p || !/^\d+$/.test(p) || p< 1) {
+        app.get("/api/budgets", _auth_middleware, function (req, res, next) {
+            let { p, pz, type } = req.query;
+            if (!p || !/^\d+$/.test(p) || p < 1) {
                 p = 1;
             }
             if (!pz || !/^\d+$/.test(pz) || pz < 1) {
                 pz = 5;
             }
 
-            API.budget.getBudgetItems({page: p, pageSize: pz, type: type,})
-                .then( (data) => {
+            API.budget.getBudgetItems({ page: p, pageSize: pz, type: type, })
+                .then((data) => {
                     res.header('Access-Control-Allow-Origin', '*');
                     res.json(data);
                 })
                 .catch(next);
         })
 
-        app.post('/api/budgets', _auth_middleware, function(req, res, next) {
-            let {query, prefers, policy, originData, type} = req.body;
+        app.post('/api/budgets', _auth_middleware, function (req, res, next) {
+            let { query, prefers, policy, originData, type } = req.body;
             originData = JSON.parse(originData);
             query = JSON.parse(query);
             prefers = JSON.parse(prefers);
 
-            return API.budget.debugBudgetItem({query, originData, type, prefers})
-                .then( (result) => {
+            return API.budget.debugBudgetItem({ query, originData, type, prefers })
+                .then((result) => {
                     res.header('Access-Control-Allow-Origin', '*');
                     res.json(result);
                 })
