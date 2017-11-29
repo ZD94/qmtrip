@@ -119,7 +119,11 @@ export default class ApiTravelBudget {
         }catch(err) {
             console.log(err);
         }
-        return result;
+        if(result.code == 0){
+            return result.data;
+        }else{
+            return null;
+        }
     }
 
     @clientExport
@@ -137,7 +141,11 @@ export default class ApiTravelBudget {
         }catch(err) {
             console.log(err);
         }
-        return result;
+        if(result.code == 0){
+            return result.data;
+        }else{
+            return null;
+        }
     }
 
     @clientExport
@@ -158,7 +166,11 @@ export default class ApiTravelBudget {
         }catch(err) {
             console.log(err);
         }
-        return result;
+        if(result.code == 0){
+            return result.data;
+        }else{
+            return null;
+        }
     }
 
     /**
