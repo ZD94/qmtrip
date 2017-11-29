@@ -88,7 +88,7 @@ export default class ApiTravelBudget {
 
         let meiyaHotel = await getMeiyaHotelData(params);
         compareHotelData(commonData, meiyaHotel);
-        writeData("finallyHotel.json", commonData);
+        // writeData("finallyHotel.json", commonData);
         return commonData;
     }
 
