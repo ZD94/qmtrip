@@ -1,29 +1,50 @@
 import { requireParams, clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { restfulAPIUtil } from '../restful'
-
+var _ = require("lodash");
 export default class PlaceModule {
 
     @clientExport
     @requireParams(['id'])
     static async getCityById(id) {
-        let city = await restfulAPIUtil.operateOnModel({
-            model: `/place/${id}`,
+        console.log('==============getCityById: ', id)
+        let city :any = {};
+        if(/^[a-zA-Z0-9_]+$/.test(id)){
+            city = await restfulAPIUtil.operateOnModel({
+                model: `place`,
+                params: {
+                    method: 'GET',
+                    fields: {id}
+                }
+            });
+            console.log('=======hello==============================:', city.data)
+            return city.data;
+        } 
+
+        city = await restfulAPIUtil.operateOnModel({
+            model: `place`,
             params: {
                 method: 'GET',
-                fields: {}
-            }
+                fields: {name: id}
+            },
+            addUrl: "getCityInfoByName"
         });
+        console.log('==result============getCityById: ', city.data)
+        if(_.isArray(city.data)){
+            return city.data[0];
+        } 
         return city.data;
+
     }
 
     @clientExport
     static async findByKeyword(keyword: string) {
         let city = await restfulAPIUtil.operateOnModel({
-            model: `/place/search/${encodeURIComponent(keyword)}`,
+            model: `place`,
             params: {
                 method: 'GET',
                 fields: {}
-            }
+            },
+            addUrl: 'search/${encodeURIComponent(keyword)}'
         });
         return city.data;
     }
@@ -31,11 +52,12 @@ export default class PlaceModule {
     @clientExport
     static async findSubCities(parentId: string) {
         let subcities = await restfulAPIUtil.operateOnModel({
-            model: `/place/${parentId}/children`,
+            model: `place`,
             params: {
                 method: 'GET',
                 fields: {}
-            }
+            },
+            addUrl: `${parentId}/children`
         });
         return subcities.data;
     }
@@ -43,11 +65,12 @@ export default class PlaceModule {
     @clientExport
     static async findNearCitiesByGC(longitude: number, latitude: number) {
         let neighbors = await restfulAPIUtil.operateOnModel({
-            model: `/place/nearby/${longitude}/${latitude}`,
+            model: `place`,
             params: {
                 method: 'GET',
                 fields: {}
-            }
+            },
+            addUrl: `nearby/${longitude}/${latitude}`
         });
 
         return neighbors.data;
@@ -56,36 +79,44 @@ export default class PlaceModule {
     @clientExport
     static async getCitiesByLetter(params: {isAbroad?: boolean, letter?: string, limit?: number, page?: number, type: number}){
         let cities = await restfulAPIUtil.operateOnModel({
-            model: `/place/getCitiesByLetter`,
+            model: `place`,
             params: {
                 method: 'GET',
                 fields: params
-            }
+            },
+            addUrl: 'getCitiesByLetter'
         });
         return cities.data;
     }
 
     @clientExport
     static async getCityInfoByName(params){
-
         let cities = await restfulAPIUtil.operateOnModel({
-            model: `/place/getCityInfoByName`,
+            model: `place`,
             params: {
                 method: 'GET',
                 fields: params
-            }
+            },
+            addUrl: `getCityInfoByName`
         });
+        if(typeof cities.data == 'string'){
+            cities.data = JSON.parse(cities.data);
+        }
+        if(_.isArray(cities.data)){
+            return cities.data[0]
+        }
         return cities.data;
     }
 
     @clientExport
     static async getAirPortsByCity(params){
         let airports = await restfulAPIUtil.operateOnModel({
-            model: `/place/getAirPortsByCity`,
+            model: `place`,
             params: {
                 method: 'GET',
                 fields: params
-            }
+            },
+            addUrl: 'getAirPortsByCity'
         });
         return airports.data;
     }
@@ -94,7 +125,6 @@ export default class PlaceModule {
     static async getCityInfo(params){
         let {cityCode } = params;
         let city = await  PlaceModule.getCityById(cityCode);
-        console.log("city: ", city);
         return city;
 
     }
@@ -102,23 +132,37 @@ export default class PlaceModule {
     @clientExport
     static async queryHotCity(params: {limit?: number, isAbroad: boolean }){
         let cities = await  restfulAPIUtil.operateOnModel({
-            model: `/place`,
+            model: `place`,
             params: {
                 method: 'GET',
-                fields: params
-            }
+                fields: {}
+            },
+            addUrl: 'search/null'
         });
         return cities.data;
     }
 
-    @clientExport
-    static async queryCity(params: {keyword?: number, isAbroad: boolean, max?: number }){
+    @clientExport 
+    static async queryCity(params: {keyword?: number|string, isAbroad: boolean, max?: number }){
+   
+        let {keyword, isAbroad, max} = params;
+        let addUrl = '';
+        let query: {[index: string]: any} = {};
+        if(/[a-zA-Z0-9]+/.test(JSON.stringify(keyword))){
+            addUrl = `getCitiesByLetter`;
+            query.keyword = keyword;
+        } else {
+            addUrl = `getCityInfoByName`;
+            query.name = keyword;
+        }
+
         let cities = await  restfulAPIUtil.operateOnModel({
-            model: `/place`,
+            model: `place`,
             params: {
                 method: 'GET',
-                fields: params
-            }
+                fields: query
+            },
+            addUrl: addUrl
         });
         return cities.data;
     }
