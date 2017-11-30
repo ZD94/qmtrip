@@ -134,7 +134,7 @@ export default class PlaceModule {
                 method: 'GET',
                 fields: {}
             },
-            addUrl: 'search/null'
+            addUrl: 'search/='  //=等字符表示不设，用于匹配find的路径
         });
         return cities.data;
     }
