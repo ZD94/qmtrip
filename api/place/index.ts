@@ -6,7 +6,6 @@ export default class PlaceModule {
     @clientExport
     @requireParams(['id'])
     static async getCityById(id) {
-        console.log('==============getCityById: ', id)
         let city :any = {};
         if(/^[a-zA-Z0-9_]+$/.test(id)){
             city = await restfulAPIUtil.operateOnModel({
@@ -16,7 +15,6 @@ export default class PlaceModule {
                     fields: {id}
                 }
             });
-            console.log('=======hello==============================:', city.data)
             return city.data;
         } 
 
@@ -28,7 +26,6 @@ export default class PlaceModule {
             },
             addUrl: "getCityInfoByName"
         });
-        console.log('==result============getCityById: ', city.data)
         if(_.isArray(city.data)){
             return city.data[0];
         } 

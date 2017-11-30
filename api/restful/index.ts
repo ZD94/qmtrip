@@ -118,7 +118,6 @@ export class RestfulAPIUtil {
             url = url + `/${fields['id']}`;
         }else{
             if (method.toUpperCase() == 'GET') {
-                url = url + "?";
                 for (let key in fields) {
                    qs[key] = fields[key];
                 }

@@ -25,13 +25,10 @@
   },
   "api": {
     "postgres": "${{postgres.url}}",
-    "remotes": [
-      {
+    "remotes": [{
       "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
-      "modules": ["attachments", "checkcode", "client", "ctripapi", "dida", "flight", "jpush", "wechat", "sms"]
-      }
-
-      ]
+      "modules": ["attachments", "checkcode", "ctripapi", "dida", "flight", "jpush", "wechat", "sms"]
+      }]
   },
   "upload":{
     "tmpDir": "${{rootDir}}/tmp/upload",
