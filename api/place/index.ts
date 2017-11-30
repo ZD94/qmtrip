@@ -17,7 +17,6 @@ export default class PlaceModule {
             });
             return city.data;
         } 
-
         city = await restfulAPIUtil.operateOnModel({
             model: `place`,
             params: {
@@ -41,7 +40,8 @@ export default class PlaceModule {
                 method: 'GET',
                 fields: {}
             },
-            addUrl: 'search/${encodeURIComponent(keyword)}'
+            addUrl: `search/${keyword}`
+            // addUrl: `search/${encodeURIComponent(keyword)}`
         });
         return city.data;
     }

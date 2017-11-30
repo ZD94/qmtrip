@@ -123,7 +123,6 @@ export class RestfulAPIUtil {
                 }
             }
         }
-
         return new Promise((resolve, reject) => {
             return request({
                 uri: url,
@@ -138,7 +137,7 @@ export class RestfulAPIUtil {
                 if (err) {
                     return reject(err);
                 }
-                console.log("=====> url: ", url)
+         
                 if (typeof(result) == 'string') {
                     result = JSON.parse(result);
                 }
