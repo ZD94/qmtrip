@@ -28,7 +28,7 @@
     "remotes": [
       {
       "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
-      "modules": "*"
+      "modules": ["attachments", "checkcode", "client", "ctripapi", "dida", "flight", "jpush", "wechat", "sms"]
       }
 
       ]
