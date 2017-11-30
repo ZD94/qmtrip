@@ -88,7 +88,7 @@ export default class ApiTravelBudget {
 
         let meiyaHotel = await getMeiyaHotelData(params);
         compareHotelData(commonData, meiyaHotel);
-        // writeData("finallyHotel.json", commonData);
+        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss")+".finallyHotel.json", commonData);
         return commonData;
     }
 
@@ -113,7 +113,7 @@ export default class ApiTravelBudget {
         // writeData("meiyaTrain.json", meiyaTrain);
         // writeData("meiyaFlight.json", meiyaFlight);
 
-        // writeData("finallyTraffic.json", commonData);
+        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") +".finallyTraffic.json", commonData);
         return commonData;
     }
 

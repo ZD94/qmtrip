@@ -189,6 +189,7 @@ export function compareFlightData(origin, meiyaData) {
 }
 
 export function compareTrainData(origin, meiyaData) {
+    console.log("compareTrainData meiyaData.length===>", meiyaData.length);
     for (let item of origin) {
         if (item.type != 0) {
             continue;
@@ -209,6 +210,8 @@ export function compareTrainData(origin, meiyaData) {
             if (!trian.SeatList) {
                 continue;
             }
+
+            console.log("meiyaTrain in:", item.No);
             for (let trianSeat of trian.SeatList) {
                 agentMeiya.cabins.push({
                     name: 2,
@@ -229,12 +232,13 @@ export function compareTrainData(origin, meiyaData) {
 
 
 export function compareHotelData(origin, meiyaData) {
+    console.log("compareHotelData meiyaData.length==== >  ", meiyaData.length);
     for (let item of origin) {
         for (let meiya of meiyaData) {
             if (meiya.cnName != item.name) {
                 continue;
             }
-
+            console.log("meiyaHotel in:", meiya.cnName);
             let agentMeiya = {
                 name: "meiya",
                 price: 0,
