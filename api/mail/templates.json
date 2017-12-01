@@ -1,0 +1,75 @@
+{
+  "templates": {
+    "qm_active_email": {
+      "subject": "鲸力商旅注册",
+      "content": "感谢您注册鲸力商旅！ 您的登录账号邮箱为：<%=username%><br/><a href=\"<%=url%>\">点击此处激活您的账号</a><br/><br/>如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅（该链接在48小时内有效）：&nbsp;<%=url%>"
+    },
+    "qm_invite_join_email": {
+      "subject": "鲸力商旅账号激活",
+      "content": "<%=name%>你好,<br/><%=managerName || ''%>邀请您加入企业:<%=companyName%>,<a href=\"<%=url%>\"><br/>您的登录账号是:<%=username%><br/>点击此处激活您的账号</a><br/><br/>如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅（该链接在48小时内有效，如果链接失效请联系企业管理员）：&nbsp;<%=url%>"
+    },
+    "qm_reset_pwd_email": {
+      "subject": "鲸力商旅——找回密码",
+      "content": "<%=name%>，您好！<br/>您在<%=time%>发起密码找回请求，如非本人操作，请忽略此邮件。<br/><a href=\"<%=url%>\">请点击此处设置重置密码</a><br/><br/>如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅（该链接在30分钟内有效，如果链接失效请重新找回密码）&nbsp;&nbsp;<%=url%>"
+    },
+    "qm_first_set_pwd_email": {
+      "subject": "鲸力商旅账号激活",
+      "content": "\"<%=companyName%>\"公司在<%=time%>邀请您加入鲸力商旅,<br/>您的登录账号是:<%=username%>,<br/><a href=\"<%=url%>\">点击此处设置您的密码</a><br/><br/>如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅（该链接在48小时内有效，如果链接失效请联系企业管理员）：&nbsp;<%=url%>"
+    },
+    "qm_notify_new_travelbudget": {
+      "subject": "鲸力商旅-员工<%=username%>生成了新的出差预算",
+      "content": "<%=managerName%>，您好<br/>您企业员工<%=username%>(<%=email%>)在<%=time%>生成了新的出差预算，具体内容如下：<br/>项目名称：<%=projectName%><br/>去程交通：<%=goTrafficBudget%><br/>回程交通：<%=backTrafficBudget%><br/>住宿：<%=hotelBudget%><br/>其他补助：<%=otherBudget%><br/>总预算：<%=totalBudget%><br/><a href=<%=url%>>点击此处查看出差详情</a><br/>如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅：<br/><%=detailUrl%>"
+    },
+    "qm_notify_self_traveludget": {
+      "subject": "鲸力商旅-您生成了新的出差预算",
+      "content": "<%=staffName%>，您好<br/>您在<%=time%>生成了新的出差预算，具体内容如下：<br/>项目名称：<%=projectName%><br/>去程交通：<%=goTrafficBudget%><br/>回程交通：<%=backTrafficBudget%><br/>住宿：<%=hotelBudget%><br/>其他补助：<%=otherBudget%><br/>总预算：<%=totalBudget%><br/><a href=<%=url%>>点击此处查看出差详情</a><br/>如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅：<br/><%=detailUrl%>"
+    },
+    "qm_notify_remove_staff": {
+      "subject": "鲸力商旅通知邮件",
+      "content": "<%=name%>你好,<br/>您已被企业管理员在<%=time%> 从【<%=companyName%>】移除,感谢您使用鲸力商旅！如有疑问，请联系企业管理员。"
+    },
+    "qm_notify_invoice_wait_audit": {
+      "subject": "鲸力商旅——出差票据待审核",
+      "content": "<%=auditUserName%>，您好<br/>企业 <%=companyName%> 员工 <%=staffName%> 的出差票据已提交待您审核<br/>关联出差记录如下：<br/>项目名称:<%=projectName%><br/>去程交通:<%=goTrafficBudget%><br/>回程交通:<%=backTrafficBudget%><br/>住宿:<%=hotelBudget%><br/>其他补助：<%=otherBudget%><br/>总计：<%=totalBudget%><br/><a href=<%=url%>>点击此处查看出差详情</a><br/>如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅：<br/><%=detailUrl%>"
+    },
+    "qm_notify_invoice_not_pass": {
+      "subject": "鲸力商旅——上传票据审核未通过",
+      "content": "<%=username%>,您好<br/>您有1张<%=ticket%>票据审核未通过，原因：<%=reason%>。请调整后重新上传。<br/>关联出差记录如下：<br/>项目名称：<%=projectName%><br/>去程交通：<%=goTrafficBudget%><br/>回程交通：<%=backTrafficBudget%><br/>住宿：<%=hotelBudget%><br/>其他补助：<%=otherBudget%><br/>总计：<%=totalBudget%><br/><a href=<%=url%>>点击此处查看出差详情</a><br/>如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅：<br/><%=detailUrl%>"
+    },
+    "qm_notify_invoice_all_pass": {
+      "subject": "鲸力商旅——出差记录完成",
+      "content": "<%=username%>,您好<br/>您<%=time%>出差记录的相关票据已全部审核通过，具体内容如下<br/>项目名称:<%=projectName%><br/>去程交通:<%=goTrafficBudget%><br/>回程交通:<%=backTrafficBudget%><br/>住宿:<%=hotelBudget%><br/>其他补助：<%=otherBudget%><br/>总计：<%=totalBudget%><br/>获取积分：<%=score%><br/><a href=<%=url%>>点击此处查看出差详情</a><br/>如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅：<br/><%=detailUrl%>"
+    },
+    "qm_notify_invoice_one_pass": {
+      "subject": "鲸力商旅——上传票据被审核通过",
+      "content": "<%=username%>,您好<br/>您有1张<%=ticket%>票据被审核通过，实际支出为<%=consume%>，关联出差记录如下：<br/>项目名称:<%=projectName%><br/>出差时间：<%=time%><br/>去程交通:<%=goTrafficBudget%><br/>回程交通:<%=backTrafficBudget%><br/>住宿:<%=hotelBudget%><br/>其他补助：<%=otherBudget%><br/>总计：<%=totalBudget%><br/><a href=<%=url%>>点击此处查看出差详情</a><br/>如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅：<br/><%=detailUrl%>"
+    },
+    "qm_feedback_email": {
+      "subject": "【<%=username%>】<%=time%>邮件",
+      "content": "反馈内容：<%=content%><br/>反馈人姓名：<%=username%><br/>反馈时间：<%=time%><br/>反馈人所在公司：<%=companyName%><br/>"
+    },
+    "staff_update_email": {
+      "subject": "鲸力商旅账号信息更新",
+      "content": "<%=username%>，您好<br/>【<%=companyName%>】在<%=time%>更新了您的鲸力商旅账号信息<br/>更新内容如下：<br/>姓名：<%=username%><br/>手机号：<%=mobile%><br/>部门：<%=department%><br/>差旅标准：<%=travelPolicy%><br/>权限：<%=permission%><br/>状态：<%=staffStatus%><br/>"
+    },
+    "qm_notify_agency_budget": {
+      "subject": "鲸力商旅——您<%=subjectTime%>的出差记录已出动态预算",
+      "content": "<%=username%>,您好<br/>您在<%=time%>生成的出差记录已出动态预算，具体内容如下：<br/>项目/会议名称:<%=projectName%><br/>去程交通:<%=goTrafficBudget%><br/>回程交通:<%=backTrafficBudget%><br/>住宿:<%=hotelBudget%><br/>其他补助：<%=otherBudget%><br/>总计：<%=totalBudget%><br/><a href=<%=url%>>点击此处查看出差详情</a><br/>如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅：<br/><%=detailUrl%>"
+    },
+    "qm_notify_approve_not_pass": {
+      "subject": "鲸力商旅——出差计划审批未通过",
+      "content": "<%=username%>,您好<br/>您的出差计划<%=planNo%>审批未通过，原因：<%=reason%>，审批人：<%=approveUser%>，审批时间：<%=approveTime%>。请调整后重新生成。<br/>关联出差记录如下：<br/>项目名称:<%=projectName%><br/>去程交通:<%=goTrafficBudget%><br/>回程交通:<%=backTrafficBudget%><br/>住宿:<%=hotelBudget%><br/>其他补助：<%=otherBudget%><br/>总计：<%=totalBudget%><br/><a href=<%=url%>>点击此处查看出差详情</a><br/>如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅：<br/><%=detailUrl%>"
+    },
+    "qm_notify_approve_pass": {
+      "subject": "鲸力商旅——出差计划审批通过",
+      "content": "<%=username%>,您好<br/>您的出差计划<%=planNo%>已经审批通过，审批人：<%=approveUser%>，审批时间：<%=approveTime%>。<br/>关联出差记录如下：<br/>项目名称:<%=projectName%><br/>去程交通:<%=goTrafficBudget%><br/>回程交通:<%=backTrafficBudget%><br/>住宿:<%=hotelBudget%><br/>其他补助：<%=otherBudget%><br/>总计：<%=totalBudget%><br/><a href=<%=url%>>点击此处查看出差详情</a><br/>如果以上链接无法点击，请将下面的地址复制到浏览器的地址栏进入鲸力商旅：<br/><%=detailUrl%>"
+    },
+    "qm_www_tobe_partner": {
+      "subject": "鲸力商旅——伙伴申请",
+      "content": "<%=type%>申请：<br/>公司：<%=companyName%><br>姓名：<%=userName%><br>QQ：<%=qq%><br>手机：<%=mobile%><br>邮箱：<%=email%><br>申请成为<%=type%><br>"
+    }
+  },
+  "footer": {
+    "qm": "聪明的选择,快乐出差----鲸力商旅<br/>鲸力商旅致力更加智能化、人性化、便捷化的差旅服务<br/><a href=\"http://www.jingli365.com\">查看鲸力商旅介绍</a><br/>http://www.jingli365.com"
+  }
+}

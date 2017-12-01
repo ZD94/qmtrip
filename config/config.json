@@ -2,8 +2,8 @@
   "appName": "${JL_APP_NAME}",
   "rootDir": "${JL_APP_DATA_DIR}",
   "host": "${JL_APP_HOST}",
-  "v2_host": "${JL_V2_HOST}",
-  "link_version": "${LINK_VERSION}",
+  "v2_host": "${JL_APP_V2_HOST}",
+  "link_version": "${JL_APP_LINK_VERSION}",
   "debug": false,
   "ts_node": true,
   "cluster": false,
@@ -19,6 +19,7 @@
     "url": "${JL_APP_REDIS}"
   },
   "hosts": {
+<<<<<<< HEAD
     "main": {
       "addr": "api.t.jingli365.com",
       "port": 14201,
@@ -49,6 +50,17 @@
         ]
       }
     ]
+=======
+    "main":{"addr":"api.t.jingli365.com", "port":14201, "www":"https://${{hosts.main.addr}}"},
+    "budget":{"addr": "localhost", "port": 4003}
+  },
+  "api": {
+    "postgres": "${{postgres.url}}",
+    "remotes": [{
+      "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
+      "modules": ["attachments", "checkcode", "ctripapi", "dida", "flight", "jpush", "wechat", "sms"]
+      }]
+>>>>>>> a447256987483b4cd9d47d904fdf4ac62434dfb3
   },
   "upload": {
     "tmpDir": "${{rootDir}}/tmp/upload",
@@ -135,5 +147,13 @@
     "appId": "${JL_APP_CLOUD_APP_ID}",
     "appSecret": "${JL_APP_CLOUD_APP_SECRET}"
   },
-  "tmcUrl": "http://l.jingli365.com/proj/svr-tmc"
+  "tmcUrl": "http://l.jingli365.com/proj/svr-tmc",
+  "mail": {
+    "service": "QQex",
+    "auth": {
+      "user": "noreply@jingli365.com",
+      "pass": "Jingli_2016"
+    }
+  },
+  "approveServerUrl": "${JL_APP_APPROVE_SERVER_URL}"
 }

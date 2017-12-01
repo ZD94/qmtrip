@@ -70,12 +70,13 @@ class ApproveModule {
                 }
             }
         }
-
+        let totalBudget = 0;
         if(budgetInfo.budgets && budgetInfo.budgets.length>0){
             budgetInfo.budgets.forEach(function(item){
                 if(item.tripType != ETripType.SUBSIDY){
                     number = number + 1;
                 }
+                totalBudget += item.price;
             })
         }
         if(budgetInfo.query && budgetInfo.query.staffList){
@@ -85,8 +86,8 @@ class ApproveModule {
         await company.beforeGoTrip({number: number});
         //冻结行程数
         let oldNum = company.tripPlanNumBalance;
-        let originTripPlanFrozenNum = company.tripPlanFrozenNum;
-        let extraTripPlanFrozenNum = company.extraTripPlanFrozenNum;
+        // let originTripPlanFrozenNum = company.tripPlanFrozenNum;
+        // let extraTripPlanFrozenNum = company.extraTripPlanFrozenNum;
         return DB.transaction(async function(t){
             let result = await company.frozenTripPlanNum({accountId: submitter.id, number: number,
             remark: "提交出差申请消耗行程点数", content: content});
@@ -102,6 +103,7 @@ class ApproveModule {
                 type: EApproveType.TRAVEL_BUDGET,
                 approveUser: approveUser,
                 staffList:budgetInfo.query.staffList,
+                budget: totalBudget,
                 version: params.version
             });
             //行程数第一次小于10或等于0时给管理员和创建人发通知
@@ -131,9 +133,10 @@ class ApproveModule {
             return approve;
         }).catch(async function(err){
             if(err) {
-                company.extraTripPlanFrozenNum = extraTripPlanFrozenNum;
-                company.tripPlanFrozenNum = originTripPlanFrozenNum;
-                await company.save();
+                // company.extraTripPlanFrozenNum = extraTripPlanFrozenNum;
+                // company.tripPlanFrozenNum = originTripPlanFrozenNum;
+                await company.reload();
+                console.info(err);
                 throw new Error("提交审批失败");
             }
         });
@@ -215,6 +218,7 @@ class ApproveModule {
                 specialApproveRemark: specialApproveRemark,
                 approveUser: approveUser,
                 staffList:query.staffList,
+                budget: budget,
                 version: params.version
             });
         }).catch(function(err){
@@ -233,10 +237,11 @@ class ApproveModule {
         type?: EApproveType,
         isSpecialApprove?: boolean,
         specialApproveRemark?: string,
-        staffList?:string[]
+        staffList?:string[],
+        budget: number,
         version?: number
     }) {
-        let {submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark,staffList, version} = params;
+        let {submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark,staffList, budget, version} = params;
         let staff = await Models.staff.get(submitter);
         let approve = Models.approve.create({
             submitter: submitter,
@@ -248,7 +253,8 @@ class ApproveModule {
             isSpecialApprove: isSpecialApprove,
             specialApproveRemark: specialApproveRemark,
             companyId: staff.company.id,
-            staffList:staffList
+            staffList:staffList,
+            budget: budget
         });
         approve = await approve.save();
 
@@ -288,7 +294,7 @@ class ApproveModule {
 //监听审批单变化
 emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result) {
     let p = (async function(){
-        let {approveNo, submitter, outerId, status, approveUser, data, oa} = result;
+        let {approveNo, submitter, outerId, status, approveUser, data, oa, budget} = result;
         let approve = await Models.approve.get(approveNo);
         if (approve.status == status) {
             return;
@@ -304,6 +310,8 @@ emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result) {
         approve.approveUser = approveUser;
         approve.approveDateTime = new Date();
         approve.outerId = outerId;
+        approve.oldBudget = approve.budget;
+        approve.budget = budget;
         if (data) {
             approve.data = data;
         }
