@@ -145,9 +145,11 @@ export default class PlaceModule {
         let {keyword, isAbroad, max} = params;
         let addUrl = '';
         let query: {[index: string]: any} = {};
+        query.isAbroad = isAbroad;
+        query.limit = max;
         if(/[a-zA-Z0-9]+/.test(JSON.stringify(keyword))){
             addUrl = `getCitiesByLetter`;
-            query.keyword = keyword;
+            query.letter = keyword;
         } else {
             addUrl = `getCityInfoByName`;
             query.name = keyword;
@@ -160,8 +162,12 @@ export default class PlaceModule {
                 fields: query
             },
             addUrl: addUrl
-        });
-        return cities.data;
+        }); 
+        //兼容老版common-api的getCitiesbyLetter返回的数据结构为 {total: number, cities: []}
+        if(_.isArray(cities.data)){
+            return cities.data;
+        }
+        return cities.data.cities;
     }
 
 }
