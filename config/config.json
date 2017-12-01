@@ -114,5 +114,5 @@
       "pass": "Jingli_2016"
     }
   },
-  "approveServerUrl": "${APPROVE_SERVER_URL}"
+  "approveServerUrl": "${JL_APP_APPROVE_SERVER_URL}"
 }
