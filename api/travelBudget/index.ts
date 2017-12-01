@@ -90,12 +90,14 @@ export default class ApiTravelBudget {
         compareHotelData(commonData, meiyaHotel);
         // writeData(moment().format("YYYY_MM_DD_hh_mm_ss")+".finallyHotel.json", commonData);
         return commonData;
+
+        // return require("mytest/data/2017_11_30_04_16_08.finallyHotel");
     }
 
     @clientExport
     static async getTrafficsData(params: ISearchTicketParams): Promise<any> {
         let commonData = await API.budget.getTrafficsData(params);
-        // writeData("commonData.json", commonData);
+        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") +".commonTraffic.json", commonData);
 
         let needMeiya = await meiyaJudge();
         if (!needMeiya) {
@@ -110,8 +112,8 @@ export default class ApiTravelBudget {
         let meiyaFlight = arr[1];
         compareFlightData(commonData, meiyaFlight);
         compareTrainData(commonData, meiyaTrain);
-        // writeData("meiyaTrain.json", meiyaTrain);
-        // writeData("meiyaFlight.json", meiyaFlight);
+        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") +".meiyaTrain.json", meiyaTrain);
+        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") +".meiyaFlight.json", meiyaFlight);
 
         // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") +".finallyTraffic.json", commonData);
         return commonData;

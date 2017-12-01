@@ -6,6 +6,7 @@ const config = require("@jingli/config");
 import { ISearchHotelParams, ISearchTicketParams } from "./index";
 var request = require("request-promise");
 let moment = require("moment");
+import { MTrainLevel, MPlaneLevel } from "_types";
 
 /* 判断是否需要美亚数据 */
 export async function meiyaJudge() {
@@ -170,7 +171,7 @@ export function compareFlightData(origin, meiyaData) {
                 continue;
             }
             for (let flightPrice of meiya.flightPriceInfoList) {
-                agentMeiya.cabins.push({
+                let agentCabin = {
                     name: 2,
                     price: flightPrice.price,
                     cabin: flightPrice.cabin,
@@ -178,7 +179,15 @@ export function compareFlightData(origin, meiyaData) {
                         No: meiya.flightNo,
                         priceId: flightPrice.priceID
                     }
-                })
+                };
+
+                for (let key in MPlaneLevel){
+                    if (MPlaneLevel[key] == flightPrice.cabin){
+                        agentCabin.name = Number(key);
+                    }
+                }
+
+                agentMeiya.cabins.push(agentCabin);
             }
 
             item.agents.push(agentMeiya);
@@ -213,8 +222,8 @@ export function compareTrainData(origin, meiyaData) {
 
             console.log("meiyaTrain in:", item.No);
             for (let trianSeat of trian.SeatList) {
-                agentMeiya.cabins.push({
-                    name: 2,
+                let agentCabin = {
+                    name: 3,
                     price: trianSeat.SeatPrice,
                     cabin: trianSeat.SeatName,
                     urlParams: {
@@ -222,7 +231,14 @@ export function compareTrainData(origin, meiyaData) {
                         seatName: trianSeat.SeatName,
                         price: trianSeat.SeatPrice
                     }
-                })
+                };
+
+                for (let key in MTrainLevel){
+                    if (MTrainLevel[key] == trianSeat.SeatName){
+                        agentCabin.name = Number(key);
+                    }
+                }
+                agentMeiya.cabins.push(agentCabin);
             }
 
             item.agents.push(agentMeiya);
@@ -239,9 +255,10 @@ export function compareHotelData(origin, meiyaData) {
                 continue;
             }
             console.log("meiyaHotel in:", meiya.cnName);
+            let price = Math.ceil(Math.random() * 500) + 300;
             let agentMeiya = {
                 name: "meiya",
-                price: 0,
+                price,
                 urlParams: {
                     hotelId: meiya.hotelId
                 }
