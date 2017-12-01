@@ -20,6 +20,7 @@ let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 export var NoCityPriceLimit = 0;
 const DefaultCurrencyUnit = 'CNY';
 var request = require("request");
+import { meiyaJudge, getMeiyaFlightData, getMeiyaTrainData, writeData, compareFlightData, compareTrainData, getMeiyaHotelData, compareHotelData } from "./meiya";
 
 const cloudAPI = require('@jingli/config').cloudAPI;
 const cloudKey = require('@jingli/config').cloudKey;
@@ -75,15 +76,46 @@ export default class ApiTravelBudget {
     }
 
     @clientExport
-    static async getHotelsData(params : ISearchHotelParams) : Promise<any>{
-        let result = await API.budget.getHotelsData(params);
-        return result;
+    static async getHotelsData(params: ISearchHotelParams): Promise<any> {
+        let commonData = await API.budget.getHotelsData(params);
+        // writeData("commonHotelData.json", commonData);
+        //检查是否需要美亚数据，返回美亚数据
+        let needMeiya = await meiyaJudge();
+        if (!needMeiya) {
+            return commonData;
+        }
+
+        let meiyaHotel = await getMeiyaHotelData(params);
+        compareHotelData(commonData, meiyaHotel);
+        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss")+".finallyHotel.json", commonData);
+        return commonData;
+
+        // return require("mytest/data/2017_11_30_04_16_08.finallyHotel");
     }
 
     @clientExport
-    static async getTrafficsData(params : ISearchTicketParams) : Promise<any>{
-        let result = await API.budget.getTrafficsData(params);
-        return result;
+    static async getTrafficsData(params: ISearchTicketParams): Promise<any> {
+        let commonData = await API.budget.getTrafficsData(params);
+        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") +".commonTraffic.json", commonData);
+
+        let needMeiya = await meiyaJudge();
+        if (!needMeiya) {
+            return commonData;
+        }
+
+        let arr = await Promise.all([
+            await getMeiyaTrainData(params),
+            await getMeiyaFlightData(params)
+        ]);
+        let meiyaTrain = arr[0];
+        let meiyaFlight = arr[1];
+        compareFlightData(commonData, meiyaFlight);
+        compareTrainData(commonData, meiyaTrain);
+        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") +".meiyaTrain.json", meiyaTrain);
+        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") +".meiyaFlight.json", meiyaFlight);
+
+        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") +".finallyTraffic.json", commonData);
+        return commonData;
     }
 
     @clientExport
