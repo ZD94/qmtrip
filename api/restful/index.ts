@@ -11,6 +11,7 @@ import crypto = require("crypto");
 import cache from "common/cache";
 import Logger from '@jingli/logger';
 const logger = new Logger('restful');
+import {Models} from "_types"
 
 function md5(str) {
     return crypto.createHash("md5").update(str).digest('hex')
@@ -79,6 +80,17 @@ export class RestfulAPIUtil {
         let {params, model, addUrl = '', useProxy = true} = options;
         let {fields, method} = params;
         let currentCompanyId = fields['companyId'];
+
+        // if (!currentCompanyId || typeof(currentCompanyId) == 'undefined') {
+        //     let staff = await Staff.getCurrent();
+        //     if (!staff || typeof(staff) == 'undefined') {
+        //         //使用测试数据的staff-风清扬
+        //         let staffs = await Models.staff.find({where: {}});
+        //         staff = staffs[0];
+        //     }
+        //     currentCompanyId = staff["companyId"];
+        // }
+
         let companyToken;
         if(useProxy) {
             if (!currentCompanyId || typeof(currentCompanyId) == 'undefined') {
@@ -106,13 +118,11 @@ export class RestfulAPIUtil {
             url = url + `/${fields['id']}`;
         }else{
             if (method.toUpperCase() == 'GET') {
-                url = url + "?";
                 for (let key in fields) {
                    qs[key] = fields[key];
                 }
             }
         }
-
         return new Promise((resolve, reject) => {
             return request({
                 uri: url,
@@ -127,6 +137,7 @@ export class RestfulAPIUtil {
                 if (err) {
                     return reject(err);
                 }
+         
                 if (typeof(result) == 'string') {
                     result = JSON.parse(result);
                 }
