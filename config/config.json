@@ -19,40 +19,7 @@
     "url": "${JL_APP_REDIS}"
   },
   "hosts": {
-<<<<<<< HEAD
-    "main": {
-      "addr": "api.t.jingli365.com",
-      "port": 14201,
-      "www": "https://${{hosts.main.addr}}"
-    },
-    "budget": {
-      "addr": "t.jingli365.com",
-      "port": 14203
-    }
-  },
-  "api": {
-    "postgres": "${{postgres.url}}",
-    "remotes": [
-      {
-        "connect": {
-          "host": "${{hosts.main.addr}}",
-          "port": "${{hosts.main.port}}"
-        },
-        "modules": "*"
-      },
-      {
-        "connect": {
-          "host": "${{hosts.budget.addr}}",
-          "port": "${{hosts.budget.port}}"
-        },
-        "modules": [
-          "budget"
-        ]
-      }
-    ]
-=======
-    "main":{"addr":"api.t.jingli365.com", "port":14201, "www":"https://${{hosts.main.addr}}"},
-    "budget":{"addr": "localhost", "port": 4003}
+    "main":{"addr":"api.t.jingli365.com", "port":14201, "www":"https://${{hosts.main.addr}}"}
   },
   "api": {
     "postgres": "${{postgres.url}}",
@@ -60,7 +27,6 @@
       "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
       "modules": ["attachments", "checkcode", "ctripapi", "dida", "flight", "jpush", "wechat", "sms"]
       }]
->>>>>>> a447256987483b4cd9d47d904fdf4ac62434dfb3
   },
   "upload": {
     "tmpDir": "${{rootDir}}/tmp/upload",
