@@ -114,5 +114,5 @@
     "appId": "${JL_APP_CLOUD_APP_ID}",
     "appSecret": "${JL_APP_CLOUD_APP_SECRET}"
   },
-  "tmcUrl":"${JL_TMC}"
+  "tmcUrl":"${JL_APP_TMC}"
 }
