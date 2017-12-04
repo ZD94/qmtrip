@@ -148,8 +148,9 @@ export default class PlaceModule {
         query.isAbroad = isAbroad;
         query.limit = max;
         if(/[a-zA-Z0-9]+/.test(JSON.stringify(keyword))){
-            addUrl = `getCitiesByLetter`;
-            query.letter = keyword;
+            addUrl = `search/${keyword}`;
+            // query.letter = keyword;   //老版的place会调用common-api中的queryCity,只需要传一个keyword, 新版需要分开传
+            // query.pinyin = keyword;
         } else {
             addUrl = `getCityInfoByName`;
             query.name = keyword;
@@ -167,7 +168,7 @@ export default class PlaceModule {
         if(_.isArray(cities.data)){
             return cities.data;
         }
-        return cities.data.cities;
+        return [cities.data];
     }
 
 }
