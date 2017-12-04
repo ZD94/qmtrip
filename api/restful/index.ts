@@ -128,7 +128,12 @@ export class RestfulAPIUtil {
                     return reject(err);
                 }
                 if (typeof(result) == 'string') {
-                    result = JSON.parse(result);
+                    try{
+                        result = JSON.parse(result);
+                    }catch(e){
+                        console.error(e);
+                        return reject(e);
+                    }                    
                 }
                 return resolve(result);
             });
