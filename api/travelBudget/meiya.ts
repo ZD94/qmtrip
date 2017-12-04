@@ -52,6 +52,7 @@ export async function getMeiyaFlightData(params: ISearchTicketParams) {
         depDate: moment(params.leaveDate).format("YYYY-MM-DD")
     };
     let urlFlight = config.tmcUrl + "/searchflight/getlist/" + `${departureCode}/${arrivalCode}/${meiyaParam.depDate}`;
+    console.log("urlFlight====>", urlFlight);
     let meiyaResult = await request({
         url: urlFlight,
         method: "get",
@@ -83,7 +84,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams) {
         depDate: moment(params.leaveDate).format("YYYY-MM-DD")
     };
     let urlTrain = config.tmcUrl + "/searchTrains/getlist" + `/${meiyaParam.depCity}/${meiyaParam.arrCity}/${meiyaParam.depDate}`;
-
+    console.log("urlTrain=====>", urlTrain);
     let meiyaResult = await request({
         url: urlTrain,
         method: "get",
@@ -145,7 +146,8 @@ export function writeData(filename, data) {
 }
 
 
-/* 匹配数据 */
+/* 匹配数据，以原始数据为基础，meiya不一定都有 */
+
 export function compareFlightData(origin, meiyaData) {
     for (let item of origin) {
         if (item.type != 1) {
@@ -168,6 +170,8 @@ export function compareFlightData(origin, meiyaData) {
             };
 
             if (!meiya.flightPriceInfoList) {
+
+                console.log("not have flightPriceInfoList");
                 continue;
             }
             for (let flightPrice of meiya.flightPriceInfoList) {
@@ -181,8 +185,8 @@ export function compareFlightData(origin, meiyaData) {
                     }
                 };
 
-                for (let key in MPlaneLevel){
-                    if (MPlaneLevel[key] == flightPrice.cabin){
+                for (let key in MPlaneLevel) {
+                    if (MPlaneLevel[key] == flightPrice.cabin) {
                         agentCabin.name = Number(key);
                     }
                 }
@@ -196,6 +200,12 @@ export function compareFlightData(origin, meiyaData) {
 
     return origin;
 }
+
+/* 机票数据匹配，以meiya为基础数据 */
+export function compareFlightData2( meiyaData, origin ) {
+    
+}
+
 
 export function compareTrainData(origin, meiyaData) {
     console.log("compareTrainData meiyaData.length===>", meiyaData.length);
@@ -233,8 +243,8 @@ export function compareTrainData(origin, meiyaData) {
                     }
                 };
 
-                for (let key in MTrainLevel){
-                    if (MTrainLevel[key] == trianSeat.SeatName){
+                for (let key in MTrainLevel) {
+                    if (MTrainLevel[key] == trianSeat.SeatName) {
                         agentCabin.name = Number(key);
                     }
                 }

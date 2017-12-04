@@ -76,6 +76,20 @@ export default class ApiTravelBudget {
     }
 
     @clientExport
+    static async sendSaleSteam(params:any){
+        try {
+            await API.notify.submitNotify({
+                key: 'qm_tmc',
+                email: "salesteam@jingli365.com",
+                values: { orderTyp: params.orderType  }
+            });
+            console.log("qm_tmc is ok");
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    @clientExport
     static async getHotelsData(params: ISearchHotelParams): Promise<any> {
         let commonData = await API.budget.getHotelsData(params);
         // writeData("commonHotelData.json", commonData);
