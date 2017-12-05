@@ -52,10 +52,9 @@ export class QmPlugin extends AbstractOAPlugin {
                 tripStartAt: tripApprove.startAt,
             });
         }
-        if(typeof tripApprove.query == 'string')
-            tripApprove.query = JSON.parse(tripApprove.query);
-        if(typeof tripApprove.budgetInfo == 'string')
-            tripApprove.budgetInfo = JSON.parse(tripApprove.budgetInfo);
+
+        if(tripApprove.budgetInfo)
+            delete tripApprove.budgetInfo;
         let returnApprove = await API.eventListener.sendEventNotice({eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: company.id});
         if(returnApprove || returnApprove == 0){
             return DB.transaction(async function(t){
