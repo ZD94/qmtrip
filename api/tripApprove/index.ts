@@ -941,7 +941,7 @@ export default class TripApproveModule {
         if(tripApprove.query && typeof tripApprove.query == 'string') {
             tripApprove.query = JSON.parse(tripApprove.query);
         }
-        if(tripApprove.budgetInfo && tripApprove.budgetInfo.length)
+        if(!tripApprove.budgetInfo || (tripApprove.budgetInfo && tripApprove.budgetInfo.length == 0))
             tripApprove.budgetInfo = budgets;
         tripApprove.query = query;
 
