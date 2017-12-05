@@ -12,13 +12,22 @@ export = async function transform(values: any): Promise<any>{
     let cityMap:any = {};
     let approveUserMap:any = {};
     if(tripPlan && tripPlan.id){
+        tripApprove = await API.tripApprove.retrieveDetailFromApprove({approveNo: tripPlan.id})
+        if(tripApprove)
+            values.tripApprove = tripApprove;
+        else
+            values.tripApprove = tripPlan;
+
+
         /*tripApprove = await Models.tripApprove.get(values.tripPlan.id);
         if(!tripApprove){
             tripApprove = tripPlan;
         }*/
         // tripApprove = tripPlan
-        tripApprove = await Models.tripApprove.get(values.tripPlan.id);
-        values.tripApprove = tripApprove;
+
+        // tripApprove = await Models.tripApprove.get(values.tripPlan.id);
+
+
     }
     if(!values.tripApprove || !values.tripApprove.id){
         values.tripApprove = {};

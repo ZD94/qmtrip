@@ -65,6 +65,7 @@ deploy:master:
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: http://l.jingli365.com/cloud/api/v1
     JL_APP_CLOUD: http://l.jingli365.com/cloud
+    JL_APP_APPROVE_SERVER_URL: https://l.jingli365.com/proj/svr-trip-approve/api/v1
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
@@ -85,6 +86,7 @@ deploy:test:
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: http://t.jingli365.com/cloud/api/v1
     JL_APP_CLOUD: http://t.jingli365.com/cloud
+    JL_APP_APPROVE_SERVER_URL: https://t.jingli365.com/proj/svr-trip-approve/api/v1
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
@@ -106,6 +108,7 @@ deploy:release:
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: https://j.jingli365.com/cloud/api/v1
     JL_APP_CLOUD: https://j.jingli365.com/cloud
+    JL_APP_APPROVE_SERVER_URL: https://j.jingli365.com/proj/svr-trip-approve/api/v1
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
