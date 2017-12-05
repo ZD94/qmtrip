@@ -35,7 +35,9 @@ export default class TripApproveModule {
 
     static async retrieveDetailFromApprove(params: {approveNo: string, approveUser?: string, submitter?: string}):Promise<ITripApprove> {
         let {approveNo, approveUser, submitter} = params;
-        let tripApproveObj: any = await TripApproveModule.getTripApprove({id: approveNo});
+        let tripApproveObj: any
+        if(!approveUser && !submitter)
+            tripApproveObj = await TripApproveModule.getTripApprove({id: approveNo});
         if(tripApproveObj)
             return tripApproveObj;
 
@@ -910,13 +912,13 @@ export default class TripApproveModule {
     static async getTripApprove(params: {id: string}): Promise<ITripApprove> {
         if(!params.id) return null;
 
-        // let approve = await Models.approve.get(params.id);
+        let approve = await Models.approve.get(params.id);
 
-        // if(typeof approve.data == "string"){
-        //     approve.data = JSON.parse(approve.data);
-        // }
-        // let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
-        // let {budgets, query} = budgetInfo;
+        if(typeof approve.data == "string"){
+            approve.data = JSON.parse(approve.data);
+        }
+        let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
+        let {budgets, query} = budgetInfo;
         //=====end 当budgetInfo可以获取到时，以上代码可以删除
         let companyId = params['companyId'];
         if(!companyId || typeof companyId == 'undefined') {
@@ -931,10 +933,17 @@ export default class TripApproveModule {
             companyId: companyId
         });
         if(!tripApprove) return null;
-        
+
         //=====begin 当budgetInfo可以获取到时，以下代码可以删除
-        // tripApprove.budgetInfo = budgets;
-        // tripApprove.query = query;
+        if(tripApprove.budgetInfo && typeof tripApprove.budgetInfo == 'string') {
+            tripApprove.budgetInfo = JSON.parse(tripApprove.budgetInfo);
+        }
+        if(tripApprove.query && typeof tripApprove.query == 'string') {
+            tripApprove.query = JSON.parse(tripApprove.query);
+        }
+        if(tripApprove.budgetInfo && tripApprove.budgetInfo.length)
+            tripApprove.budgetInfo = budgets;
+        tripApprove.query = query;
 
         return tripApprove;
     }
@@ -947,8 +956,8 @@ export default class TripApproveModule {
             companyId = currentStaff["companyId"];
         }
         //=====begin 当budgetInfo可以获取到时，以下代码可以删除
-        // if(params.budgetInfo)
-        //     delete params.budgetInfo;
+        if(params.budgetInfo)
+            delete params.budgetInfo;
         //=====end 当budgetInfo可以获取到时，以上代码可以删除
 
         let tripApprove = await API.eventListener.sendRequestToApprove({

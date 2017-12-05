@@ -52,10 +52,10 @@ export class QmPlugin extends AbstractOAPlugin {
                 tripStartAt: tripApprove.startAt,
             });
         }
-        // if(tripApprove.query)
-        //     delete tripApprove.query;
-        // if(tripApprove.budgetInfo)
-        //     delete tripApprove.budgetInfo;
+        if(typeof tripApprove.query == 'string')
+            tripApprove.query = JSON.parse(tripApprove.query);
+        if(typeof tripApprove.budgetInfo == 'string')
+            tripApprove.budgetInfo = JSON.parse(tripApprove.budgetInfo);
         let returnApprove = await API.eventListener.sendEventNotice({eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: company.id});
         if(returnApprove || returnApprove == 0){
             return DB.transaction(async function(t){
@@ -81,98 +81,6 @@ export class QmPlugin extends AbstractOAPlugin {
             outerId: tripApprove.id,
             submitter: submitter,
         } as createTripApproveResult;
-
-//                 let deptInfo = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
-//                 tripApprove.deptCityCode = deptInfo.id;
-//                 tripApprove.deptCity = deptInfo.name;
-//             }
-//
-//             tripApprove.isRoundTrip = query.isRoundTrip;
-//             if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
-//                 for(let i = 0; i < destinationPlacesInfo.length; i++){
-//                     let segment: ISegment = destinationPlacesInfo[i];
-//
-//                     //处理目的地 放入arrivalCityCodes
-//                     if(segment.destinationPlace){
-//                         let placeCode = segment.destinationPlace;
-//                         if (typeof placeCode != 'string') {
-//                             placeCode = placeCode['id'];
-//                         }
-//                         let arrivalInfo = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
-//                         arrivalCityCodes.push(arrivalInfo.id);
-//                         if(i == (destinationPlacesInfo.length - 1)){//目的地存放最后一个目的地
-//                             tripApprove.arrivalCityCode = arrivalInfo.id;
-//                             tripApprove.arrivalCity = arrivalInfo.name;
-//                         }
-//                     }
-//
-//                     //处理其他数据
-//                     if(i == 0){
-//                         tripApprove.isNeedTraffic = segment.isNeedTraffic;
-//                         tripApprove.isNeedHotel = segment.isNeedHotel;
-//
-//                         tripApprove.startAt = segment.leaveDate;
-//                     }
-//                     if(i == (destinationPlacesInfo.length - 1)){
-//                         tripApprove.backAt = segment.goBackDate;
-//                     }
-//                 }
-//             }
-//
-//             // let tripApprove =  TripApprove.create(params);
-//
-//             if(params.approveUser) {
-//                 let approveUser = await Models.staff.get(params.approveUser);
-//                 if(!approveUser)
-//                     throw {code: -3, msg: '审批人不存在'}
-//                 tripApprove.approveUser = approveUser;
-//             }
-//             tripApprove.isSpecialApprove = approve.isSpecialApprove;
-//             tripApprove.specialApproveRemark = approve.specialApproveRemark;
-//             tripApprove.status = QMEApproveStatus.WAIT_APPROVE;
-//             tripApprove.account = staff;
-//             tripApprove['companyId'] = company.id;
-//             tripApprove.project = project;
-//             tripApprove.title = approve.title;
-//
-//             tripApprove.query = JSON.stringify(query);
-//             tripApprove.arrivalCityCodes = JSON.stringify(arrivalCityCodes);
-//
-//             tripApprove.budgetInfo = budgets;
-//             tripApprove.budget = totalBudget;
-//             tripApprove.oldBudget = totalBudget;
-//             tripApprove.status = totalBudget < 0 ? QMEApproveStatus.NO_BUDGET : QMEApproveStatus.WAIT_APPROVE;
-//
-//             tripApprove.staffList=approve.staffList;
-//             let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, approveStatus: EApproveResult.WAIT_APPROVE, remark: '提交审批单，等待审批'});
-//
-//             //如果出差计划是待审批状态，增加自动审批时间
-//             if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
-//                 tripApprove.autoApproveTime = await TripApproveModule.calculateAutoApproveTime({
-//                     type: company.autoApproveType,
-//                     config: company.autoApprovePreference,
-//                     submitAt: new Date(),
-//                     tripStartAt: tripApprove.startAt,
-//                 });
-//             }
-//
-//             await tripPlanLog.save();
-//             tripApprove = await tripApprove.save();
-//             await API.tripApprove.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false, version: version});
-//             // await API.tripApprove.sendTripApproveNoticeToSystem({approveId: tripApprove.id});
-//             return {
-//                 approveNo: approveNo,
-//                 outerId: tripApprove.id,
-//                 submitter: submitter,
-//             } as createTripApproveResult;
-//         }).catch(async function(err){
-//             console.log(err)
-//             if(err){
-//                 throw L.ERR.INTERNAL_ERROR();
-//             }
-//         })
-//
-// >>>>>>> 57911eceee6a88d250a49cf9cead2ccba0f14662
     }
 
     async tripApproveFail(params: {approveId: string, reason?: string}) {
