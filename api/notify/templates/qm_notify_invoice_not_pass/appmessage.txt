@@ -1,4 +1,4 @@
 <span style="margin-bottom: 10px;color: #757575;">申请人：<%=account.name || '' %></span><br>
 <span style="margin-bottom: 10px;color: #757575;">日期：<%=moment(tripPlan.startAt).format('YYYY.MM.DD') || '' %> 至 <%=moment(tripPlan.backAt).format('YYYY.MM.DD') || '' %></span><br>
-<span style="margin-bottom: 10px;color: #757575;">行程：<%=tripPlan.deptCity || '' %> <span *ngIf = "!tripPlan.deptCity"> - </span> <%=tripPlan.arrivalCity || '' %></span><br>
+<span style="margin-bottom: 10px;color: #757575;">行程：<%=tripPlan.deptCity || '' %> <%=(tripPlan.deptCity) ? '-' : ''%> <%=tripPlan.arrivalCity || '' %></span><br>
 <span style="margin-bottom: 10px;color: #757575;">预算：￥<%=tripPlan.budget || '' %></span>
