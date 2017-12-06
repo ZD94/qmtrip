@@ -5,14 +5,14 @@ export default class PlaceModule {
 
     @clientExport
     @requireParams(['id'])
-    static async getCityById(id) {
+    static async getCityById(id: string, companyId?: string) {
         let city :any = {};
         if(/^[a-zA-Z0-9_]+$/.test(id)){
             city = await restfulAPIUtil.operateOnModel({
                 model: `place`,
                 params: {
                     method: 'GET',
-                    fields: {id}
+                    fields: {id, companyId}
                 }
             });
             return city.data;
@@ -21,7 +21,7 @@ export default class PlaceModule {
             model: `place`,
             params: {
                 method: 'GET',
-                fields: {name: id}
+                fields: {name: id, companyId: companyId}
             },
             addUrl: "getCityInfoByName"
         });
@@ -120,8 +120,8 @@ export default class PlaceModule {
 
     @clientExport
     static async getCityInfo(params){
-        let {cityCode } = params;
-        let city = await  PlaceModule.getCityById(cityCode);
+        let {cityCode, companyId } = params;
+        let city = await  PlaceModule.getCityById(cityCode, companyId);
         return city;
 
     }

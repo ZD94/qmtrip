@@ -75,16 +75,16 @@ export = async function transform(values: any): Promise<any>{
         destinationPlacesInfo = JSON.parse(destinationPlacesInfo);
     }
     if(query.originPlace){
-        let originPlace = await API.place.getCityInfo({cityCode: query.originPlace});
+        let originPlace = await API.place.getCityInfo({cityCode: query.originPlace, companyId: currentCompany.id});
         cityMap[query.originPlace] = originPlace;
     }
     if(query.goBackPlace){
-        let goBackPlace = await API.place.getCityInfo({cityCode: query.goBackPlace});
+        let goBackPlace = await API.place.getCityInfo({cityCode: query.goBackPlace, companyId: currentCompany.id});
         cityMap[query.goBackPlace] = goBackPlace;
     }
     if(destinationPlacesInfo && destinationPlacesInfo.length > 0){
         await Promise.all(destinationPlacesInfo.map(async function(item, index){
-            let arrivalInfo = await API.place.getCityInfo({cityCode: item.destinationPlace});
+            let arrivalInfo = await API.place.getCityInfo({cityCode: item.destinationPlace, companyId: currentCompany.id});
             item.latestArrivalDateTime = moment(item.latestArrivalDateTime).tz(arrivalInfo.timezone).format("MM-DD HH:mm");
             item.earliestGoBackDateTime = moment(item.earliestGoBackDateTime).tz(arrivalInfo.timezone).format("MM-DD HH:mm");
             cityMap[item.destinationPlace] = arrivalInfo;
