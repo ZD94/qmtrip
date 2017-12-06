@@ -129,7 +129,7 @@ class DDTalk {
             res.send("ok");
         });
 
-        app.post("/ddtalk/isv/receive", dingSuiteCallback(config, async function (msg: any, req: Request, res: Response, next: NextFunction) {
+        app.post("/ddtalk/isv/receive", dingSuiteCallback(config, async function (msg: any, req: Request, res: any, next: NextFunction) {
 
             console.log("hello : ", msg);
             if(msg.CorpId){

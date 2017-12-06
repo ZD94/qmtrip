@@ -1199,7 +1199,7 @@ export default class CompanyModule {
                     })
 
                     let _companies = await Promise.all(ps);
-                    _companies.forEach((company: Company) => {
+                    _companies.forEach((company: any) => {
                         companies.push({
                             name: company.name,
                             createUser: {

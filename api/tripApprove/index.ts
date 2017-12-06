@@ -458,7 +458,6 @@ export default class TripApproveModule {
             let log = TripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id});
 
             if (approveResult == EApproveResult.PASS && !isNextApprove) {
-                notifyRemark = `审批通过，审批人：${staff.name}`;
                 log.approveStatus = EApproveResult.PASS;
                 log.remark = `审批通过`;
                 await log.save();
@@ -477,7 +476,6 @@ export default class TripApproveModule {
                 if(!approveRemark) {
                     throw {code: -2, msg: '拒绝原因不能为空'};
                 }
-                notifyRemark = `审批未通过，原因：${approveRemark}`;
                 log.approveStatus = EApproveResult.REJECT;
                 log.remark = approveRemark;
                 await log.save();
