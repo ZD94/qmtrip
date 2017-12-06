@@ -239,7 +239,6 @@ export default class ApiTravelBudget {
         // console.log("params===>", params);
 
         let staffId = params['staffId'];
-        console.info(staffId, "staffId===============");
         let preferedCurrency = params["preferedCurrency"];
         preferedCurrency = preferedCurrency && typeof (preferedCurrency) != 'undefined' ? preferedCurrency : DefaultCurrencyUnit;
 
@@ -306,8 +305,6 @@ export default class ApiTravelBudget {
             }
             return segment;
         }));
-
-        console.info(companyId, "companyId===============");
 
         let segmentsBudget:any = await ApiTravelBudget.createNewBudget({
             preferedCurrency:preferedCurrency,
@@ -581,9 +578,6 @@ export default class ApiTravelBudget {
     // params: IQueryBudgetParams
     static async createNewBudget(params: any){
         let result;
-        console.info(params);
-        console.info(params.companyId);
-        console.info("===========================zzzzz");
         try{
             result = await RestfulAPIUtil.operateOnModel({
                 params: {
