@@ -199,6 +199,7 @@ export default class ApiTravelBudget {
     @clientExport
     static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams) :Promise<string> {
         let staffId = params['staffId'];
+        console.info(staffId, "staffId===============");
         let preferedCurrency = params["preferedCurrency"];
         preferedCurrency = preferedCurrency && typeof(preferedCurrency) != 'undefined' ? preferedCurrency :DefaultCurrencyUnit;
 
@@ -207,6 +208,7 @@ export default class ApiTravelBudget {
             staffId = currentStaff.id;
         }
         let staff = await Models.staff.get(staffId);
+        let companyId = staff.company.id;
         let travelPolicy = await staff.getTravelPolicy();
         if (!travelPolicy) {
             throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
@@ -231,7 +233,7 @@ export default class ApiTravelBudget {
         let segments: any[] = await Promise.all(destinationPlacesInfo.map(async(placeInfo) => {
             var segment: any = {};
             segment.city = placeInfo.destinationPlace;
-            let city: Place = (await API.place.getCityInfo({cityCode: placeInfo.destinationPlace}));
+            let city: Place = (await API.place.getCityInfo({cityCode: placeInfo.destinationPlace, companyId: companyId}));
             if (city.isAbroad) {
                 let s = _.cloneDeep(_staff);
                 s.policy = 'abroad';
@@ -251,7 +253,7 @@ export default class ApiTravelBudget {
             } else {
                 let obj;
                 if (businessDistrict) {
-                    obj = API.place.getCityInfo({cityCode: businessDistrict});
+                    obj = API.place.getCityInfo({cityCode: businessDistrict, companyId: companyId});
                 }
                 if (!obj || !obj.latitude || !obj.longitude) {
                     obj = city;
@@ -264,7 +266,8 @@ export default class ApiTravelBudget {
             }
             return segment;
         }));
-        let companyId = staff.company.id;
+
+        console.info(companyId, "companyId===============");
 
         let segmentsBudget:any = await ApiTravelBudget.createNewBudget({
             preferedCurrency:preferedCurrency,
@@ -318,13 +321,13 @@ export default class ApiTravelBudget {
             let hotel = _budgets[i].hotel;
             if (hotel && hotel.length) {
                 let budget = hotel[0];
-                let cityObj = await API.place.getCityInfo({cityCode: city});
+                let cityObj = await API.place.getCityInfo({cityCode: city, companyId: companyId});
                 let isAccordHotel = await Models.accordHotel.find({where: {cityCode: cityObj.id, companyId: staff['companyId']}});
                 if (isAccordHotel && isAccordHotel.length) {
                     budget.price = isAccordHotel[0].accordPrice;
 
                      /* 出差时间计算 */
-                    let residentPlace = await API.place.getCityInfo({cityCode: budget.city});
+                    let residentPlace = await API.place.getCityInfo({cityCode: budget.city, companyId: companyId});
                     let timezone = residentPlace.timezone && typeof(residentPlace.timezone) != undefined ?
                         residentPlace.timezone : 'Asia/shanghai';
                     let beginTime = moment(budget.checkInDate).tz(timezone).hour(12);
@@ -538,6 +541,9 @@ export default class ApiTravelBudget {
     // params: IQueryBudgetParams
     static async createNewBudget(params: any){
         let result;
+        console.info(params);
+        console.info(params.companyId);
+        console.info("===========================zzzzz");
         try{
             result = await RestfulAPIUtil.operateOnModel({
                 params: {
