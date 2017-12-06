@@ -1,3 +1,4 @@
+import {AgencyUser} from '../../_types/agency/agency-user';
 /**
  * Created by mr_squirrel on 01/09/2017.
  */
@@ -80,27 +81,20 @@ export class RestfulAPIUtil {
         let { params, model, addUrl = '', useProxy = true } = options;
         let { fields, method } = params;
         let currentCompanyId = fields['companyId'];
-
-        // if (!currentCompanyId || typeof(currentCompanyId) == 'undefined') {
-        //     let staff = await Staff.getCurrent();
-        //     if (!staff || typeof(staff) == 'undefined') {
-        //         //使用测试数据的staff-风清扬
-        //         let staffs = await Models.staff.find({where: {}});
-        //         staff = staffs[0];
-        //     }
-        //     currentCompanyId = staff["companyId"];
-        // }
-
         let companyToken;
-        if (useProxy) {
+        let currentAgency: AgencyUser = await AgencyUser.getCurrent();
+
+        if(!useProxy || currentAgency) {
+            companyToken = await getAgentToken();
+        }
+        if (useProxy && !currentAgency) {
             if (!currentCompanyId || typeof (currentCompanyId) == 'undefined') {
                 let staff = await Staff.getCurrent();
                 currentCompanyId = staff["companyId"];
             }
             companyToken = await getCompanyTokenByAgent(currentCompanyId);
-        } else {
-            companyToken = await getAgentToken();
-        }
+        } 
+
         if (!companyToken) {
             throw new Error('换取 token 失败！')
         }
