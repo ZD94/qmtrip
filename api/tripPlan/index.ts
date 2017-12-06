@@ -1380,7 +1380,7 @@ class TripPlanModule {
         }
 
         if(query.originPlace) {
-            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace}) || {name: null};
+            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace, companyId: company.id}) || {name: null};
             tripPlan.deptCityCode = deptInfo.id;
             tripPlan.deptCity = deptInfo.name;
         }
@@ -1395,7 +1395,7 @@ class TripPlanModule {
                     if (typeof place != 'string') {
                         place = place['id']
                     }
-                    let arrivalInfo = await API.place.getCityInfo({cityCode: place}) || {name: null};
+                    let arrivalInfo = await API.place.getCityInfo({cityCode: place, companyId: company.id}) || {name: null};
                     arrivalCityCodes.push(arrivalInfo.id);
                     if(i == (destinationPlacesInfo.length - 1)){
                         tripPlan.arrivalCityCode = arrivalInfo.id;
@@ -1450,17 +1450,17 @@ class TripPlanModule {
         await Promise.all(budgets.map(async function (b){
             if(b.originPlace){
                 if (typeof b.originPlace == 'string') {
-                    b.originPlace = await API.place.getCityInfo({cityCode: b.originPlace});
+                    b.originPlace = await API.place.getCityInfo({cityCode: b.originPlace, companyId: company.id});
                 }
             }
             if(b.destination){
                 if (typeof b.destination == 'string') {
-                    b.destination = await API.place.getCityInfo({cityCode: b.destination});
+                    b.destination = await API.place.getCityInfo({cityCode: b.destination, companyId: company.id});
                 }
             }
             if(b.city){
                 if(typeof b.city == 'string'){
-                    b.city = await API.place.getCityInfo({cityCode:b.city});
+                    b.city = await API.place.getCityInfo({cityCode:b.city, companyId: company.id});
                 }
             }
         }));

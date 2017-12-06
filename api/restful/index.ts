@@ -80,7 +80,6 @@ export class RestfulAPIUtil {
         let { params, model, addUrl = '', useProxy = true } = options;
         let { fields, method } = params;
         let currentCompanyId = fields['companyId'];
-
         // if (!currentCompanyId || typeof(currentCompanyId) == 'undefined') {
         //     let staff = await Staff.getCurrent();
         //     if (!staff || typeof(staff) == 'undefined') {

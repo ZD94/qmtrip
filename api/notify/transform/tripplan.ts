@@ -11,6 +11,7 @@ export = async function transform(values: any): Promise<any>{
     let tripPlan = values.tripPlan;
     let cityMap:any = {};
     let approveUserMap:any = {};
+    let companyId = values.companyId;
     if(tripPlan && tripPlan.id){
         tripApprove = await API.tripApprove.retrieveDetailFromApprove({approveNo: tripPlan.id})
         if(tripApprove)
@@ -33,12 +34,15 @@ export = async function transform(values: any): Promise<any>{
         values.tripApprove = {};
         return values;
     }
+    if(!companyId){
+        companyId = tripApprove.companyId;
+    }
     let arrivalCityCodes = tripApprove.arrivalCityCodes;
     if(typeof arrivalCityCodes == 'string')arrivalCityCodes = JSON.parse(arrivalCityCodes);
     tripApprove.arrivalCityCodes = arrivalCityCodes;
     if(arrivalCityCodes && arrivalCityCodes.length > 0){
         let arrCityList = await Promise.all(arrivalCityCodes.map(async (item) => {
-            let arrivalInfo = await API.place.getCityInfo({cityCode: item});
+            let arrivalInfo = await API.place.getCityInfo({cityCode: item, companyId: companyId});
             cityMap[item] = arrivalInfo;
             return arrivalInfo;
         }))
@@ -65,7 +69,7 @@ export = async function transform(values: any): Promise<any>{
     }
     values.approveUserMap = approveUserMap;
 
-    let logs = await Models.tripPlanLog.find({where: {tripPlanId: tripApprove.id, approveStatus: EApproveResult.AUTO_APPROVE, remark: '自动通过'}});
+    let logs = await Models.tripPlanLog.find({where: {tripPlanId: tripApprove.id, approveStatus: EApproveResult.AUTO_APPROVE}});
     if(logs && logs.length > 0){
         values.isAutoApprove = true;
     }else{

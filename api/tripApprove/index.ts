@@ -88,7 +88,7 @@ export default class TripApproveModule {
             if (typeof placeCode != 'string') {
                 placeCode = placeCode['id']
             }
-            let deptInfo = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
+            let deptInfo = await API.place.getCityInfo({cityCode: placeCode, companyId: approve.companyId}) || {name: null};
             tripApprove.deptCityCode = deptInfo.id;
             tripApprove.deptCity = deptInfo.name;
         }
@@ -104,7 +104,7 @@ export default class TripApproveModule {
                     if (typeof placeCode != 'string') {
                         placeCode = placeCode['id'];
                     }
-                    let arrivalInfo = await API.place.getCityInfo({cityCode: placeCode}) || {name: null};
+                    let arrivalInfo = await API.place.getCityInfo({cityCode: placeCode, companyId: approve.companyId}) || {name: null};
                     let destination: IDestination = {city:arrivalInfo.id, arrivalDateTime: segment.leaveDate, leaveDateTime: segment.goBackDate};
                     arrivalCityCodes.push(arrivalInfo.id);
                     destinations.push(destination);
@@ -606,13 +606,13 @@ export default class TripApproveModule {
                 let destinationPlacesInfo = query.destinationPlacesInfo;
 
                 if(query && query.originPlace){
-                    let originCity = await API.place.getCityInfo({cityCode: query.originPlace});
+                    let originCity = await API.place.getCityInfo({cityCode: query.originPlace, companyId: approveCompany.id});
                     content = content + originCity.name + "-";
                 }
                 if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
                     for(let i = 0; i < destinationPlacesInfo.length; i++){
                         let segment: ISegment = destinationPlacesInfo[i]
-                        let destinationCity = await API.place.getCityInfo({cityCode: segment.destinationPlace});
+                        let destinationCity = await API.place.getCityInfo({cityCode: segment.destinationPlace, companyId: approveCompany.id});
                         if(i<destinationPlacesInfo.length-1){
                             content = content + destinationCity.name+"-";
                         }else{
@@ -920,7 +920,7 @@ export default class TripApproveModule {
         let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
         let {budgets, query} = budgetInfo;
         //=====end 当budgetInfo可以获取到时，以上代码可以删除
-        let companyId = params['companyId'];
+        let companyId = params['companyId'] || approve.companyId;
         if(!companyId || typeof companyId == 'undefined') {
             let currentStaff = await Staff.getCurrent();
             companyId = currentStaff["companyId"];
