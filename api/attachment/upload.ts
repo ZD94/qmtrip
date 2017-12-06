@@ -27,7 +27,7 @@ module.exports = function(app: Application) {
         timeout: 180000,
     }));
     app.options(url, function (req, res, next) {
-        let referer: string = req.headers['referer'];
+        let referer = req.headers['referer'] as string;
         let host;
         if (!referer) {
             host = parseHost(req);
