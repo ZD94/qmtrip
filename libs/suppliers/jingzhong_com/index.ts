@@ -2,12 +2,10 @@
  * Created by lizeilin on 31/10/2017.
  */
 
-import _ = require('lodash');
 import moment = require("moment");
 import { SupplierWebRobot, SupplierOrder, ReserveLink } from '../index';
 import L from '@jingli/language';
 
-var iconv = require('iconv-lite');
 
 export default class SupplierCtripCT extends SupplierWebRobot{
     constructor(){
@@ -122,7 +120,6 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         param.timeout = moment().add(1, 'month').format("YYYY/MM/DD HH:mm:ss");
 
         var param_str = JSON.stringify(param);
-        var linkJS = "localStorage.setItem('TRAIN_SEARCH_STORE_LIGHT', \'"+param_str+"\');console.log('train_search_param');";
 
         let date = moment(options.leaveDate).format("YYYY-MM-DD");
         let jsCode = `
@@ -181,7 +178,6 @@ export default class SupplierCtripCT extends SupplierWebRobot{
     }
 
     async queryHotelCityCode(city: string): Promise<string>{
-        var requestPromise = require('request-promise');
         var res = await this.client.post({
             uri: 'http://m.ctrip.com/restapi/soa2/10932/hotel/static/destinationget?_fxpcqlniredt=09031117210396050637',
             json: true,

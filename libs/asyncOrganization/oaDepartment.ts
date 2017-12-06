@@ -125,7 +125,7 @@ export abstract class OaDepartment{
                 if (oaStaffs && oaStaffs.length > 0) {
                     await Promise.all(oaStaffs.map(async (item) => {
                         oaStaffsMap[item.id] = item;
-                        let ret = await item.sync({company: company});
+                        await item.sync({company: company});
                     }))
                 }
 

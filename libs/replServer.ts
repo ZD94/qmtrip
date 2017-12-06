@@ -1,11 +1,9 @@
-import {port} from "_debugger";
 /**
  * Created by wangyali on 2017/7/10.
  */
 var repl = require('repl')
 var net = require('net')
 import { Socket } from 'net';
-const API = require('@jingli/dnode-api');
 import Logger from '@jingli/logger';
 const logger = new Logger("replServer");
 

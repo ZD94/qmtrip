@@ -3,15 +3,13 @@
  */
 import {Models} from "_types/index";
 import {Company, CPropertyType} from "_types/company";
-import {Staff, StaffProperty, SPropertyType} from "_types/staff";
-import {Department, DepartmentProperty, StaffDepartment, DPropertyType} from "_types/department";
+import {Staff, SPropertyType} from "_types/staff";
+import {Department, DPropertyType} from "_types/department";
 import { OaDepartment } from './oaDepartment';
 import { OaStaff } from './oaStaff';
-import { OaCompany } from './oaCompany';
 import LdapDepartment from "api/ldap/ldapDepartment";
 import DdDepartment from "api/ddtalk/lib/ddDepartment";
 import LdapStaff from "api/ldap/ldapStaff";
-import DdStaff from "api/ddtalk/lib/ddStaff";
 import shareConnection from "api/ldap/shareConnection";
 import {departmentOpts} from "api/ldap";
 import L from '@jingli/language';

@@ -16,10 +16,6 @@ export abstract class SupplierWebRobot extends WebRobot{
     }
 }
 
-interface ReserveLinkObject{
-    url: string
-}
-
 interface SupplierWebRobotConstructor{
     new(): SupplierWebRobot
 }

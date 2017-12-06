@@ -4,7 +4,7 @@
 
 'use strict';
 
-import {scannerDecoration, registerControllerToRouter, Reply} from "@jingli/restful";
+import {scannerDecoration, registerControllerToRouter} from "@jingli/restful";
 
 import path = require("path");
 import express = require("express");

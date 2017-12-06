@@ -2,10 +2,8 @@
 import _ = require('lodash');
 import { SupplierWebRobot, SupplierOrder , ReserveLink } from '../index';
 import { EPayType, EInvoiceFeeTypes } from '../../../_types/tripPlan/index';
-import L from '@jingli/language';
 import moment = require("moment");
 
-var iconv = require('iconv-lite');
 
 export default class SupplierCtripCT extends SupplierWebRobot{
     constructor(){
@@ -178,7 +176,6 @@ export default class SupplierCtripCT extends SupplierWebRobot{
     }
 
     async queryHotelCityCode(city: string): Promise<string>{
-        var requestPromise = require('request-promise');
         var res = await this.client.post({
             uri: 'http://m.ctrip.com/restapi/soa2/10932/hotel/static/destinationget?_fxpcqlniredt=09031117210396050637',
             json: true,

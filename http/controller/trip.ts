@@ -5,7 +5,6 @@
 "use strict"
 
 import {AbstractController, Restful, Router} from "@jingli/restful"
-import API from '@jingli/dnode-api'
 import { Request, Response, NextFunction } from 'express';
 var TripApproveModule = require("../../api/tripPlan")
 

@@ -5,7 +5,6 @@
 'use strict';
 import { AbstractController, Restful, Router } from "@jingli/restful";
 const API = require('@jingli/dnode-api');
-import { Models } from "_types";
 import { Request, Response, NextFunction } from 'express-serve-static-core';
 
 @Restful()

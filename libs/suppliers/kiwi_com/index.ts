@@ -3,12 +3,9 @@
  */
 
 
-import _ = require('lodash');
-import moment = require("moment");
 import { SupplierWebRobot, SupplierOrder, ReserveLink } from '../index';
 import L from '@jingli/language';
 
-var iconv = require('iconv-lite');
 
 export default class SupplierCtripCT extends SupplierWebRobot{
     constructor(){
