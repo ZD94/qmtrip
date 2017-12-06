@@ -35,7 +35,9 @@ export default class TripApproveModule {
 
     static async retrieveDetailFromApprove(params: {approveNo: string, approveUser?: string, submitter?: string}):Promise<ITripApprove> {
         let {approveNo, approveUser, submitter} = params;
-        let tripApproveObj: any = await TripApproveModule.getTripApprove({id: approveNo});
+        let tripApproveObj: any
+        if(!approveUser && !submitter)
+            tripApproveObj = await TripApproveModule.getTripApprove({id: approveNo});
         if(tripApproveObj)
             return tripApproveObj;
 
@@ -924,7 +926,6 @@ export default class TripApproveModule {
             companyId = currentStaff["companyId"];
         }
 
-        console.info(params, "params======");
         let tripApprove = await API.eventListener.sendRequestToApprove({
             modelName: 'tripApprove',
             methodName:'getTripApprove',
@@ -934,33 +935,17 @@ export default class TripApproveModule {
         if(!tripApprove) return null;
 
         //=====begin 当budgetInfo可以获取到时，以下代码可以删除
-        tripApprove.budgetInfo = budgets;
+        if(tripApprove.budgetInfo && typeof tripApprove.budgetInfo == 'string') {
+            tripApprove.budgetInfo = JSON.parse(tripApprove.budgetInfo);
+        }
+        if(tripApprove.query && typeof tripApprove.query == 'string') {
+            tripApprove.query = JSON.parse(tripApprove.query);
+        }
+        if(!tripApprove.budgetInfo || (tripApprove.budgetInfo && tripApprove.budgetInfo.length == 0))
+            tripApprove.budgetInfo = budgets;
         tripApprove.query = query;
 
         return tripApprove;
-
-
-        // let approve = await Models.approve.get(params.id);
-        //
-        // if(typeof approve.data == "string"){
-        //     approve.data = JSON.parse(approve.data);
-        // }
-        // let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
-
-        // let {budgets, query} = budgetInfo;
-        // let tripApprove: ITripApprove = await API.eventListener.sendEventNotice({
-        //     eventName: tripApproveEvents.GET_TRIP_APPROVE,
-        //     data: params,
-        //     companyId: approve.companyId
-        // });
-        // if(!tripApprove)
-        //     return null;
-        //
-        // if(tripApprove)
-        //     tripApprove.budgetInfo = budgets;
-        // //     tripApprove.query = query;
-        // // }
-        // return tripApprove;
     }
 
     @clientExport
@@ -982,14 +967,6 @@ export default class TripApproveModule {
             companyId: companyId
         });
         return tripApprove;
-        // let approve = await Models.approve.get(params.id);
-
-        // let tripApprove: ITripApprove = await API.eventListener.sendEventNotice({
-        //     eventName: tripApproveEvents.TRIP_APPROVE_CHANGE,
-        //     data: params,
-        //     companyId: approve.companyId
-        // });
-        // return tripApprove;
     }
 
     @clientExport
@@ -1007,13 +984,6 @@ export default class TripApproveModule {
             companyId: companyId
         });
         return tripApprove;
-
-        // let tripApproves: ITripApprove[] = await API.eventListener.sendEventNotice({
-        //     eventName: tripApproveEvents.TRIP_APPROVE_LIST,
-        //     data: params,
-        //     companyId: params.companyId
-        // });
-        // return tripApproves;
     }
 
     @requireParams(['id'])
@@ -1031,14 +1001,6 @@ export default class TripApproveModule {
             companyId: companyId
         });
         return tripApprove;
-
-        // let approve = await Models.approve.get(params.id);
-        // let result: boolean = await API.eventListener.sendEventNotice({
-        //     eventName: tripApproveEvents.TRIP_APPROVE_DELETE,
-        //     data: params,
-        //     companyId: approve.companyId
-        // });
-        // return result;
     }
 }
 

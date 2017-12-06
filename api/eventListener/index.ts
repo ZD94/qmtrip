@@ -13,7 +13,7 @@ import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
 
 export class EventModule{
     async sendEventNotice (params: {eventName: string, data: any, companyId: string}): Promise<any> {
-        console.info("sendEventNotice===========", params)
+        console.info("sendEventNotice===========", params.eventName, params.companyId)
         let {eventName, data, companyId} = params;
         if(!eventName || !companyId){
             throw L.ERR.INVALID_ARGUMENT("eventName | companyId");
