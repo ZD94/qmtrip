@@ -4,7 +4,7 @@
 var uuid = require("node-uuid");
 var now = require("common/utils").now;
 
-export= function (Db, DataType) {
+export= function (Db: any, DataType: any) {
 
     return Db.define("Feedback", {
         id           : {type: DataType.UUID,        defaultValue: uuid.v1, primaryKey: true},

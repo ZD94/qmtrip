@@ -1,6 +1,6 @@
 import uuid = require("node-uuid");
 
-module.exports =async function(DB, t) {
+module.exports =async function(DB: any, t: any) {
     let sql = 'select * from department.department_properties where department_id is null';
     await DB.query(sql).then(async (properties: any)=> {
         let prop = properties[0];

@@ -1,5 +1,5 @@
 let moment = require('moment');
-export default  async function updateTripDetailSubsidies(DB, t) {
+export default  async function updateTripDetailSubsidies(DB: any, t: any) {
     let sql = `select s.id as id, s.subsidy_money as "subsidyMoney",start_date_time as "startDateTime", 
     t.trip_plan_id as "tripPlanId" from trip_plan.trip_detail_subsidies s join trip_plan.trip_details t 
     on t.id = s.id where s.subsidy_template_id is null and s.deleted_at is null`;
