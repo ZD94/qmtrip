@@ -18,7 +18,7 @@ import _ = require('lodash');
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
-    TripApprove, QMEApproveStatus, EApproveResult, EApproveResult2Text,
+    QMEApproveStatus, EApproveResult, EApproveResult2Text,
     EPayType, ESourceType, EInvoiceFeeTypes, EInvoiceStatus, TrafficEInvoiceFeeTypes
 } from "_types/tripPlan";
 import {Models} from "_types";
@@ -950,6 +950,7 @@ class TripPlanModule {
     @clientExport
     @requireParams(['where.tripPlanId'], ['where.tripDetailId'])
     static async getTripPlanLogs(options): Promise<FindResult> {
+        options.order = options.order || [['created_at', 'desc']];
         let paginate = await Models.tripPlanLog.find(options);
         return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}
     }
@@ -1416,7 +1417,7 @@ class TripPlanModule {
         }
         tripPlan.arrivalCityCodes = JSON.stringify(arrivalCityCodes);
 
-        tripPlan['companyId'] = account.company.id;
+        tripPlan.setCompany(account.company);
         tripPlan.auditUser = tryObjId(approveUser);
         tripPlan.project = project;
         tripPlan.title = approve.title;//project名称
@@ -1771,7 +1772,7 @@ class TripPlanModule {
             order: [["created_at", "asc"]]
         })
         // let tripDetails = await tripPlan.getTripDetails({where: {}, order: [["created_at", "asc"]]});
-        let tripApprove = await Models.tripApprove.get(tripPlanId);
+        let tripApprove = await API.tripApprove.getTripApprove({id: tripPlanId});
         let approveUsers: Array<any> = (tripApprove && tripApprove.approvedUsers ? tripApprove.approvedUsers:'').split(/,/g)
             .filter((v)=> {
                 return !!v;
@@ -2206,11 +2207,11 @@ class TripPlanModule {
 
     static __initHttpApp = require('./invoice');
 
-    static _scheduleTask () {
+    /*static _scheduleTask () {
         let taskId = "authApproveTrainPlan";
         logger.info('run task ' + taskId);
-        scheduler('0 */5 * * * *', taskId, async function() {
-            let tripApproves = await Models.tripApprove.find({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
+        scheduler('0 *!/5 * * * *', taskId, async function() {
+            let tripApproves = await API.tripApprove.getTripApproves({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
             tripApproves.map(async (approve) => {
 
                 let approveCompany = await approve.getCompany();
@@ -2362,7 +2363,7 @@ class TripPlanModule {
                 }
             });
         });
-    }
+    }*/
 
     static async getProjectByName(params) {
         let projects = await Models.project.find({where: {name: params.name}});
@@ -2381,7 +2382,7 @@ class TripPlanModule {
     //approve, trip_approve, trip_plan保存travelPolicyId
     @clientExport
     static async saveTravelPolicyId( tripApproveId:string ) : Promise<any>{
-        let tripApprove = await Models.tripApprove.get( tripApproveId );
+        let tripApprove = await API.tripApprove.getTripApprove({id: tripApproveId});
         let approve = await Models.approve.get(tripApproveId);
         let submitUser = await Models.staff.get( tripApprove.accountId );
         let travelPolicyId = submitUser.travelPolicyId;
@@ -2402,7 +2403,7 @@ class TripPlanModule {
 
         approve.data = JSON.stringify(approve.data);
 
-        await tripApprove.save();
+        await API.tripApprove.updateTripApprove(tripApprove);
         await approve.save();
 
         return true;
@@ -2526,6 +2527,6 @@ function tryObjId(obj) {
 }
 
 
-TripPlanModule._scheduleTask();
+// TripPlanModule._scheduleTask();
 
 export = TripPlanModule;

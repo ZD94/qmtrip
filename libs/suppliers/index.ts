@@ -37,8 +37,7 @@ function initSuppliers(){
         taobao_com :     require('./taobao_com'),
         ly_com :         require('./ly_com'),
         jingzhong_com:   require('./jingzhong_com'),
-        kiwi_com:        require('./kiwi_com'),
-        sky_scanner_com: require('./sky_scanner_com')
+        kiwi_com:        require('./kiwi_com')
     }
 }
 

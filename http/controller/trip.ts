@@ -35,4 +35,3 @@ export class TripController extends AbstractController {
     }
 
 }
-

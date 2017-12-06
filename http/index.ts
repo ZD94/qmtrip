@@ -11,7 +11,6 @@ import express = require("express");
 import { Request, Response, NextFunction, Express } from 'express';
 
 let router = express.Router();
-
 scannerDecoration(path.join(__dirname, 'controller'));
 registerControllerToRouter(router);
 

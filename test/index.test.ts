@@ -8,7 +8,7 @@ bluebird.config({ longStackTraces: false })
 bluebird.promisifyAll(require('fs'));
 global.Promise = bluebird;
 
-process.on('unhandledRejection', (reason: Error | any, p) => {
+process.on('unhandledRejection', (reason: Error | any) => {
     throw reason;
 });
 
