@@ -4,8 +4,6 @@
 
 let moment = require("moment");
 import {DB} from '@jingli/database';
-import Logger from '@jingli/logger';
-let logger = new Logger("seeds");
 let typeString = ['TripPlanNo', 'AgencyNo', 'CompanyNo', 'CoinAccountNo'];
 
 class SeedModule {
@@ -15,7 +13,7 @@ class SeedModule {
      * @param params.type goods_no:商品编号 goods_order_no:实物商品订单编号
      * @param cb
      */
-    static async getSingleSeedCode(type, options){
+    static async getSingleSeedCode(type: any, options: {minNo?: number, maxNo?: number}){
         if (!options) {
             options = {};
         }
@@ -46,11 +44,11 @@ class SeedModule {
             nowNo = parseInt(seeds.nowNo) + 1;
         }
 
-        let [affect, rows] = await DB.models.Seed.update({nowNo: nowNo}, {returning: true, where: {type: type}})
+        let rows = (await DB.models.Seed.update({nowNo: nowNo}, {returning: true, where: {type: type}}))[1]
         return rows[0].nowNo;
     }
 
-    static getSeedNo(type, options){
+    static getSeedNo(type: any, options: any){
         if (!options) {
             options = {};
         }

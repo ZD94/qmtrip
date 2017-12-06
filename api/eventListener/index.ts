@@ -8,7 +8,7 @@ import {DB} from '@jingli/database';
 import L from '@jingli/language';
 var _ = require("lodash");
 var request = require("request-promise");
-import config = require("@jingli/config");
+const config = require("@jingli/config");
 import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
 
 export class EventModule{

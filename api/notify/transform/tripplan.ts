@@ -41,7 +41,7 @@ export = async function transform(values: any): Promise<any>{
     if(typeof arrivalCityCodes == 'string')arrivalCityCodes = JSON.parse(arrivalCityCodes);
     tripApprove.arrivalCityCodes = arrivalCityCodes;
     if(arrivalCityCodes && arrivalCityCodes.length > 0){
-        let arrCityList = await Promise.all(arrivalCityCodes.map(async (item) => {
+        let arrCityList = await Promise.all(arrivalCityCodes.map(async (item: string) => {
             let arrivalInfo = await API.place.getCityInfo({cityCode: item, companyId: companyId});
             cityMap[item] = arrivalInfo;
             return arrivalInfo;
@@ -56,8 +56,7 @@ export = async function transform(values: any): Promise<any>{
     values.cityMap = cityMap;
     if(tripApprove && tripApprove.approvedUsers != null){
         let approvedUsers = tripApprove.approvedUsers.split(',');
-        let agreeUserNames = "";
-        await Promise.all(approvedUsers.map(async function(item){
+        await Promise.all(approvedUsers.map(async function(item: string){
             if(item && item != ''){
                 let staff = await Models.staff.get(item);
                 approveUserMap[item] = staff;

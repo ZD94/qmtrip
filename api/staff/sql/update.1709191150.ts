@@ -3,17 +3,15 @@
  */
 'use strict';
 import Sequelize = require('sequelize');
-import config = require('@jingli/config');
+const config = require('@jingli/config');
 var request = require("request");
-var path = require("path");
-import { getAgentToken, getCompanyTokenByAgent } from 'api/restful';
+import { getCompanyTokenByAgent } from 'api/restful';
 
 export = async function(db, transaction) {
 
     let companySql  = 'select * from company.companies where deleted_at is null';
     let companies = await db.query(companySql, {type: Sequelize.QueryTypes.SELECT});
     console.log("companies'length: ", companies.length)
-    let count = 0;
     for(let i =0; i < companies.length; i++ ){
         if(!companies[i].id || typeof(companies[i]) == undefined) continue;
 
@@ -38,10 +36,10 @@ export = async function(db, transaction) {
 }
 
 
-async function requestTravelPolicy(companyId, isDefault){
+async function requestTravelPolicy(companyId: string, isDefault: boolean){
     const token = await getCompanyTokenByAgent(companyId);
     let result = await new Promise<any>((resolve, reject) => {
-        let qs: { [index: string]: string} = {
+        let qs: { companyId: string, isDefault: boolean} = {
             companyId: companyId,
             isDefault: isDefault
         };
@@ -54,7 +52,7 @@ async function requestTravelPolicy(companyId, isDefault){
             headers: {
                 token
             }
-        }, function(err,res){
+        }, function(err: Error, res: any){
             if(err) {
                 console.log(err)
                 return resolve(null)

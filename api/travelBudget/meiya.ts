@@ -133,7 +133,7 @@ export async function getMeiyaHotelData(params: ISearchHotelParams) {
 }
 
 
-export function writeData(filename, data) {
+export function writeData(filename: string, data: any) {
     let dirPath = path.join(process.cwd(), "./mytest", "data");
     let source = fs.createWriteStream(path.join(dirPath, filename));
     let result = JSON.stringify(data, null, 4);
@@ -146,7 +146,7 @@ export function writeData(filename, data) {
 
 
 /* 匹配数据 */
-export function compareFlightData(origin, meiyaData) {
+export function compareFlightData(origin: any, meiyaData: any) {
     for (let item of origin) {
         if (item.type != 1) {
             continue;
@@ -157,7 +157,7 @@ export function compareFlightData(origin, meiyaData) {
                 continue;
             }
 
-            let agentMeiya = {
+            let agentMeiya: {[key: string]: any} = {
                 name: "meiya",
                 cabins: [],
                 other: {
@@ -197,7 +197,7 @@ export function compareFlightData(origin, meiyaData) {
     return origin;
 }
 
-export function compareTrainData(origin, meiyaData) {
+export function compareTrainData(origin: any, meiyaData: any) {
     console.log("compareTrainData meiyaData.length===>", meiyaData.length);
     for (let item of origin) {
         if (item.type != 0) {
@@ -209,7 +209,7 @@ export function compareTrainData(origin, meiyaData) {
                 continue;
             }
 
-            let agentMeiya = {
+            let agentMeiya: {[key: string]: any} = {
                 name: "meiya",
                 cabins: [],
                 other: {
@@ -247,7 +247,7 @@ export function compareTrainData(origin, meiyaData) {
 }
 
 
-export function compareHotelData(origin, meiyaData) {
+export function compareHotelData(origin: any, meiyaData: any) {
     console.log("compareHotelData meiyaData.length==== >  ", meiyaData.length);
     for (let item of origin) {
         for (let meiya of meiyaData) {

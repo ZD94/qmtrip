@@ -11,9 +11,9 @@ import L from '@jingli/language';
 const Models = require("_types").Models;
 
 export function requirePermit(permits: string| string[], type?: number) {
-    return function (target, key, desc) {
+    return function (target: any, key: string, desc: PropertyDescriptor) {
         let fn = desc.value;
-        desc.value = async function (...args) {
+        desc.value = async function (...args: any[]) {
             let session = getSession();
             let account = Models.account.get(session.accountId);
             if(!account)
@@ -34,12 +34,12 @@ export interface CheckInterface {
 
 //筛选返回结果
 export function filterResultColumn(columns: string[]) {
-    return function (target, key, desc) {
+    return function (target: any, key: string, desc: PropertyDescriptor) {
         let fn = desc.value;
-        desc.value = function(...args) {
+        desc.value = function(...args: any[]) {
             let self = this;
             return fn.apply(self, args)
-                .then(function(result) {
+                .then(function(result: any) {
                     for(let k in result) {
                         if (columns.indexOf(k) < 0) {
                             delete result[k];
@@ -53,10 +53,10 @@ export function filterResultColumn(columns: string[]) {
 }
 
 //追加函数参数
-export function addFuncParams(params) {
-    return function(target, key, desc) {
+export function addFuncParams(params: any) {
+    return function(target: any, key: string, desc: PropertyDescriptor) {
         let fn = desc.value;
-        desc.value = function(...args) {
+        desc.value = function(...args: any[]) {
             let self = this;
             for(let key of params) {
                 args[0][key] = params[key];
@@ -73,9 +73,9 @@ export function addFuncParams(params) {
  * @constructor
  */
 export function modelNotNull(modname: string, keyName?: string) {
-    return function(target, key, desc) {
+    return function(target: any, key: string, desc: PropertyDescriptor) {
         let fn = desc.value;
-        desc.value = async function(...args) {
+        desc.value = async function(...args: any[]) {
             let self = this;
             keyName = keyName || 'id';
             let entity = await Models[modname].get(args[0][keyName]);
@@ -91,9 +91,9 @@ export function modelNotNull(modname: string, keyName?: string) {
 }
 
 export function conditionDecorator(checkFnList: CheckInterface[]) {
-    return function (target, key, desc) {
+    return function (target: any, key: string, desc: PropertyDescriptor) {
         let fn = desc.value;
-        desc.value = async function(...args) {
+        desc.value = async function(...args: any[]) {
             //在这里才能拿到参数
             let self = this;
             let thenFn;
@@ -121,35 +121,35 @@ export function conditionDecorator(checkFnList: CheckInterface[]) {
 
 export var condition = {
     isMySelf: function (idpath: string) {
-        return async function (fn, self, args) {
+        return async function (fn: any, self: any, args: any) {
             let session = getSession();
             let id = _.get(args, idpath);
             return id && session.accountId && id == session.accountId;
         }
     },
     isMyCompany: function (idpath: string) {
-        return async function(fn, self, args) {
+        return async function(fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let staff = await Staff.getCurrent();
             return id && staff && staff.company && staff.company.id == id;
         }
     },
     isMyCompanyAgency: function (idpath: string) {
-        return async function(fn, self, args) {
+        return async function(fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let staff = await Staff.getCurrent();
             return id && staff && staff.company && staff.company["agencyId"] == id;
         }
     },
     isMyAgency: function (idpath: string) {
-        return async function(fn, self, args) {
+        return async function(fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let agencyUser = await AgencyUser.getCurrent();
             return id && agencyUser && agencyUser.agency.id == id;
         }
     },
     isStaffsAgency: function (idpath: string) {
-        return async function(fn, self, args) {
+        return async function(fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let staff = await Models.staff.get(id);
             // let company = staff.company;
@@ -162,7 +162,7 @@ export var condition = {
         }
     },
     isSameCompany: function (idpath:string) {
-        return async function(fn, self, args) {
+        return async function(fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let staff = await Staff.getCurrent();
             let other = await Models.staff.get(id);
@@ -170,7 +170,7 @@ export var condition = {
         }
     },
     isSameAgency: function (idpath: string) {
-        return async function(fn, self, args) {
+        return async function(fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let user = await AgencyUser.getCurrent();
             let other = await Models.agencyUser.get(id);
@@ -181,7 +181,7 @@ export var condition = {
         }
     },
     isTravelPolicyAdminOrOwner: function(idpath: string) {
-        return async function (fn ,self, args) {
+        return async function (fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             if(id == 'dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a'){
                 return true;
@@ -193,7 +193,7 @@ export var condition = {
         }
     },
     isSupplierAdminOrOwner: function(idpath: string) {
-        return async function (fn ,self, args) {
+        return async function (fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let staff = await Staff.getCurrent();
             let sp = await Models.supplier.get(id);
@@ -201,7 +201,7 @@ export var condition = {
         }
     },
     isStaffSupplierInfoOwner: function(idpath: string) {
-        return async function (fn ,self, args) {
+        return async function (fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let staff = await Staff.getCurrent();
             let sp = await Models.staffSupplierInfo.get(id);
@@ -209,7 +209,7 @@ export var condition = {
         }
     },
     isAccordHotelAdminOrOwner: function(idpath: string) {
-        return async function (fn ,self, args) {
+        return async function (fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let staff = await Staff.getCurrent();
             let ah = await Models.accordHotel.get(id);
@@ -217,14 +217,14 @@ export var condition = {
         }
     },
     isSelfTravelPolicy: function (idpath:string) {
-        return async function(fn, self, args) {
+        return async function(fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let staff = await Staff.getCurrent();
             return id && staff && (staff["travelPolicyId"] == id || !staff["travelPolicyId"]);
         }
     },
     isTravelPolicyCompany: function (idpath:string) {
-        return async function(fn, self, args) {
+        return async function(fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let tp = await Models.travelPolicy.get(id);
             let staff = await Staff.getCurrent();
@@ -232,7 +232,7 @@ export var condition = {
         }
     },
     isTravelPolicyAgency: function(idpath: string) {
-        return async function (fn ,self, args) {
+        return async function (fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let user = await AgencyUser.getCurrent();
             let tp = await Models.travelPolicy.get(id);
@@ -241,7 +241,7 @@ export var condition = {
         }
     },
     isAccordHotelAgency: function(idpath: string) {
-        return async function (fn ,self, args) {
+        return async function (fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let user = await AgencyUser.getCurrent();
             let ah = await Models.accordHotel.get(id);
@@ -250,7 +250,7 @@ export var condition = {
         }
     },
     isDepartmentAdminOrOwner: function(idpath: string) {
-        return async function (fn ,self, args) {
+        return async function (fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let staff = await Staff.getCurrent();
             let dept = await Models.department.get(id);
@@ -258,7 +258,7 @@ export var condition = {
         }
     },
     isDepartmentCompany: function(idpath: string) {
-        return async function (fn ,self, args) {
+        return async function (fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let staff = await Staff.getCurrent();
             let dept = await Models.department.get(id);
@@ -266,14 +266,14 @@ export var condition = {
         }
     },
     isSelfDepartment: function (idpath:string) {
-        return async function(fn, self, args) {
+        return async function(fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let staff = await Staff.getCurrent();
             return id && staff && (staff["departmentId"] == id || !staff["departmentId"]);
         }
     },
     isDepartmentAgency: function(idpath: string) {
-        return async function (fn ,self, args) {
+        return async function (fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let user = await AgencyUser.getCurrent();
             let dept = await Models.department.get(id);
@@ -282,7 +282,7 @@ export var condition = {
         }
     },
     isSelfLink: function (idpath:string) {
-        return async function(fn, self, args) {
+        return async function(fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let staff = await Staff.getCurrent();
             let link = await Models.invitedLink.get(id);
@@ -290,7 +290,7 @@ export var condition = {
         }
     },
     isCompanyAgency: function(idpath: string) {
-        return async function (fn ,self, args) {
+        return async function (fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let user = await AgencyUser.getCurrent();
             let company = await Models.company.get(id);
@@ -298,14 +298,14 @@ export var condition = {
         }
     },
     isCompanyStaff: function(idpath: string) {
-        return async function (fn ,self, args) {
+        return async function (fn: any, self: any, args: any) {
             let companyId = _.get(args, idpath);
             let staff = await Staff.getCurrent();
             return companyId && staff && staff["companyId"] == companyId;
         }
     },
     isCompanyAdminOrOwner: function(idpath: string) {
-        return async function (fn ,self, args) {
+        return async function (fn: any, self: any, args: any) {
             let companyId = _.get(args, idpath);
             let staff = await Staff.getCurrent();
             if(companyId){
@@ -317,7 +317,7 @@ export var condition = {
         }
     },
     isCompanyDepartment: function(idpath: string) {
-        return async function (fn ,self, args) {
+        return async function (fn: any, self: any, args: any) {
             let parentId = _.get(args, idpath);
             let department = await Models.department.get(parentId);
             let staff = await Staff.getCurrent();
@@ -326,7 +326,7 @@ export var condition = {
         }
     },
     isMyTripPlan: function(idpath: string) {
-        return async function (fn, self, args) {
+        return async function (fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let staff = await Staff.getCurrent();
             let tripPlan = await Models.tripPlan.get(id);
@@ -334,7 +334,7 @@ export var condition = {
         }
     },
     isAgencyTripPlan: function(idpath: string) {
-        return async function (fn, self, args) {
+        return async function (fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let user = await AgencyUser.getCurrent();
             let tripPlan = await Models.tripPlan.get(id);
@@ -353,7 +353,7 @@ export var condition = {
         }
     },
     isAgencyTripDetail: function(idpath: string) {
-        return async function (fn, self, args) {
+        return async function (fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let user = await AgencyUser.getCurrent();
             let tripDetail = await Models.tripDetail.get(id);
@@ -374,7 +374,7 @@ export var condition = {
         }
     },
     canGetTripPlan: function (idpath: string) {
-        return async function (fn, self, args) {
+        return async function (fn: any, self: any, args: any) {
             let id = _.get(args, idpath);
             let session = getSession();
             
@@ -412,7 +412,7 @@ export var condition = {
         }
     },
     isSameAccount: function(idpath: string) {
-        return async function (fn, self, args) {
+        return async function (fn: any, self: any, args: any) {
             let session = getSession();
             if(!session || !session.accountId) {
                 throw L.ERR.PERMISSION_DENY();

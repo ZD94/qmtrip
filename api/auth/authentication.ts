@@ -6,17 +6,13 @@ import moment = require('moment');
 import validator = require('validator');
 import { Token } from '_types/auth/token';
 import { ACCOUNT_STATUS } from "_types/auth";
-import { EStaffStatus, Staff, SPropertyType } from "_types/staff";
+import { Staff } from "_types/staff";
 import {OS_TYPE} from '_types/auth/token';
-import {CPropertyType} from '_types/company';
-import shareConnection from "../ldap/shareConnection";
-import{staffOpts} from "../ldap";
-import syncData from "libs/asyncOrganization/syncData";
 var API = require("@jingli/dnode-api");
 import { getSession } from "@jingli/dnode-api";
 
 //生成登录凭证
-export async function makeAuthenticateToken(accountId, os?: string, expireAt?: Date): Promise<LoginResponse> {
+export async function makeAuthenticateToken(accountId: string, os?: string, expireAt?: Date): Promise<LoginResponse> {
     if(!os) {
         os = OS_TYPE.WEB;
     }

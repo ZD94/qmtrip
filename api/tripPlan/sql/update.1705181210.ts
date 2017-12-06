@@ -1,8 +1,7 @@
 module.exports = function(DB, t) {
-    let i=0, n=0;
     let sql = `SELECT * FROM trip_plan.trip_approves where deleted_at is null`;
     return DB.query(sql)
-    .then(async (rets) => {
+    .then(async (rets: any) => {
         for(let item of rets[0]){
             if(item.oldBudget){
                 continue;
@@ -24,7 +23,7 @@ module.exports = function(DB, t) {
                 oldBudget = 0;
             }
 
-            let ggg = await DB.query(`update trip_plan.trip_approves set old_budget=${oldBudget} where id = '${item.id}'`);
+            await DB.query(`update trip_plan.trip_approves set old_budget=${oldBudget} where id = '${item.id}'`);
         }
     })
 }

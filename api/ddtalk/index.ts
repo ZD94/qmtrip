@@ -6,9 +6,8 @@
 
 const API = require('@jingli/dnode-api');
 let dingSuiteCallback = require("dingtalk_suite_callback");
-import fs = require("fs");
 import cache from "common/cache";
-import C = require("@jingli/config");
+const C = require("@jingli/config");
 import L from '@jingli/language';
 const config = C.ddconfig;
 import request = require('request');
@@ -17,40 +16,40 @@ import {Models} from "_types/index";
 import {SPropertyType, Staff} from "_types/staff";
 import {clientExport} from "@jingli/dnode-api/dist/src/helper";
 import {get_msg} from "./lib/msg-template/index";
-import syncData from "libs/asyncOrganization/syncData";
 
 import * as DealEvent from "./lib/dealEvent";
 import {CPropertyType} from "../../_types/company/company-property";
+import { Request, Response, NextFunction, Application } from 'express-serve-static-core';
 
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 
-async function wait(number){
-    return new Promise(function(resolve, reject) {
-        setTimeout(() => {
-            resolve(null);
-        }, number)
-    })
-}
+// async function wait(number){
+//     return new Promise(function(resolve, reject) {
+//         setTimeout(() => {
+//             resolve(null);
+//         }, number)
+//     })
+// }
 let ddTalkMsgHandle = {
     /* * * * 临时授权码* * * * */
-    tmp_auth_code: async function(msg , req , res , next) {
+    tmp_auth_code: async function(msg: any , req: Request , res: Response , next: NextFunction) {
         return await DealEvent.tmpAuthCode(msg , req , res , next);
     },
 
     /* * * * * 授权变更* * * * * * */
-    change_auth: async function(msg) {
+    change_auth: async function(msg: any) {
         return msg;
     },
-    check_url: async function(msg) {
+    check_url: async function(msg: any) {
         return msg;
     },
     /* * * * 解除授权信息 * * * */
-    suite_relieve: async function(msg) {
+    suite_relieve: async function(msg: any) {
         return await DealEvent.suiteRelieve(msg);
     },
 
     /* * * 保存授权信息 , 每20分钟钉钉会请求一次 * * */
-    suite_ticket: async function(msg) {
+    suite_ticket: async function(msg: any) {
         let ticket = msg.SuiteTicket;
         return await cache.write(CACHE_KEY, JSON.stringify({
             ticket: ticket, timestamp: msg.TimeStamp
@@ -58,12 +57,12 @@ let ddTalkMsgHandle = {
     },
 
     /* * * 企业增加员工 * * */
-    user_add_org: async function(msg) {
+    user_add_org: async function(msg: any) {
         return await DealEvent.userModifyOrg(msg);
     },
 
     /* * 通讯录用户更改 * */
-    user_modify_org : async function(msg){
+    user_modify_org : async function(msg: any){
         // let userIds = msg.UserId;
         // let corpId = msg.CorpId;
         // let execute = true;
@@ -79,7 +78,7 @@ let ddTalkMsgHandle = {
         return await DealEvent.userModifyOrg(msg);
     },
     /* * 通讯录用户离职 * */
-    user_leave_org : async function(msg){
+    user_leave_org : async function(msg: any){
         return await DealEvent.userLeaveOrg(msg);
     },
     /* * 通讯录用户被设为管理员 * */
@@ -91,19 +90,19 @@ let ddTalkMsgHandle = {
     //     return msg;
     // },
     /* * *  通讯录企业部门创建 * * */
-    org_dept_create : async function(msg){
+    org_dept_create : async function(msg: any){
         return await DealEvent.orgDeptCreate(msg);
     },
     /* * *  通讯录企业部门修改 * * */
-    org_dept_modify : async function(msg){
+    org_dept_modify : async function(msg: any){
         return await DealEvent.orgDeptCreate(msg);
     },
     /* * *  通讯录企业部门删除 * * */
-    org_dept_remove : async function(msg){
+    org_dept_remove : async function(msg: any){
         return await DealEvent.orgDeptRemove(msg);
     },
     /* * *  企业被解散 * * */
-    org_remove : async function(msg){
+    org_remove : async function(msg: any){
         // return await DealEvent.orgDeptRemove(msg);
         return msg;
     }
@@ -116,7 +115,7 @@ let DDEventCorpId : any = {};
 class DDTalk {
     static __public: boolean = true;
 
-    static __initHttpApp(app) {
+    static __initHttpApp(app: Application) {
 
         let self = this;
 
@@ -130,7 +129,7 @@ class DDTalk {
             res.send("ok");
         });
 
-        app.post("/ddtalk/isv/receive", dingSuiteCallback(config,async function (msg, req, res, next) {
+        app.post("/ddtalk/isv/receive", dingSuiteCallback(config, async function (msg: any, req: Request, res: Response, next: NextFunction) {
 
             console.log("hello : ", msg);
             if(msg.CorpId){
@@ -209,12 +208,12 @@ class DDTalk {
             }
             
             return ddTalkMsgHandle[msg.EventType](msg , req , res , next)
-                .then((result) => {
+                .then((result: any) => {
                     if(!(result && result.notReply)){
                         res.reply();
                     }
                 })
-                .catch((err) => {
+                .catch((err: Error) => {
                     console.error(err.stack);
                     next(err);
                 });
@@ -249,7 +248,7 @@ class DDTalk {
     static async eventPush( msg: any ){
         let corpId = msg.CorpId;
         let key = 'company_events:' + corpId;
-        let result = await cache.rpush( key, msg );
+        await cache.rpush( key, msg );
         if(!DDEventCorpId[corpId]){
             DDEventCorpId[corpId] = true;
             await this.dealEvent( corpId );
@@ -261,7 +260,7 @@ class DDTalk {
     }
 
     @clientExport
-    static async getJSAPIConfig(params) {
+    static async getJSAPIConfig(params: any) {
         let {orgid, agentid, url} = params;
         let timestamp = Math.floor(Date.now() / 1000);
         let noncestr = getRndStr(6);
@@ -302,7 +301,7 @@ class DDTalk {
     }
 
     @clientExport
-    static async loginByDdTalkCode(params) : Promise<any> {
+    static async loginByDdTalkCode(params: any) : Promise<any> {
         console.log("enter In loginByDdTalkCode" , params);
         let {corpid, code} = params;
         // let corps = await Models.ddtalkCorp.find({ where: {corpId: corpid}, limit: 1});
@@ -352,7 +351,7 @@ class DDTalk {
         }
     }
 
-    static async sendLinkMsg(params): Promise<any> {
+    static async sendLinkMsg(params: any): Promise<any> {
         let {accountId, text, url, picurl} = params;
         text = text || '您有一条新消息'
         url = url || '#';
@@ -402,7 +401,7 @@ class DDTalk {
     }
 }
 
-function getRndStr(length) : string {
+function getRndStr(length: number) : string {
     let ret = '';
     for(var i=0, ii=length; i<ii; i++) {
         ret += Math.ceil(Math.random() * 9);

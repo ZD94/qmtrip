@@ -3,7 +3,6 @@
  */
 import {Models} from "_types/index";
 import {CPropertyType} from "_types/company";
-import L from '@jingli/language';
 import LdapApi from "./ldapApi";
 export default class ShareConnection {
 

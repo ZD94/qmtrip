@@ -5,7 +5,7 @@ export default  async function updateTripDetailSubsidies(DB, t) {
     on t.id = s.id where s.subsidy_template_id is null and s.deleted_at is null`;
     let rets = await DB.query(sql);
     if(rets && rets[0] && rets[0].length > 0){
-        await Promise.all(rets[0].map(async (item) => {
+        await Promise.all(rets[0].map(async (item: any) => {
             let sql1 = `select query as query from trip_plan.trip_plans where deleted_at is null and id = '${item.tripPlanId}'`;
             let ret1 = await DB.query(sql1);
             if(ret1 && ret1[0] && ret1[0].length > 0){
@@ -14,7 +14,7 @@ export default  async function updateTripDetailSubsidies(DB, t) {
                 if(query.destinationPlacesInfo){
                     if(typeof query.destinationPlacesInfo == 'string') query.destinationPlacesInfo = JSON.parse(query.destinationPlacesInfo);
                     let destinationPlacesInfo = query.destinationPlacesInfo;
-                    await Promise.all(destinationPlacesInfo.map(async (des) => {
+                    await Promise.all(destinationPlacesInfo.map(async (des: any) => {
                         if(moment(item.startDateTime).format("YYYY-MM-DD") == moment(des.leaveDate).format("YYYY-MM-DD")){
                             if(des.subsidy && des.subsidy.template){
                                 let tar:any = {};
@@ -29,7 +29,7 @@ export default  async function updateTripDetailSubsidies(DB, t) {
                                     if(typeof des.template == 'string') des.template = JSON.parse(des.template);
                                     let sql2 = `update trip_plan.trip_detail_subsidies set subsidy_template_id = 
                                 '${subsidyTemplateId}' where id = '${item.id}'`;
-                                    let ret2 = await DB.query(sql2);
+                                    await DB.query(sql2);
                                 }
                             }
                         }

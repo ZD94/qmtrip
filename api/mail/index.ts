@@ -12,7 +12,7 @@ var scheduler = require("common/scheduler");
 var validate = require("common/validate");
 var nodemailer = require("nodemailer")
 import L from '@jingli/language';
-import C = require("@jingli/config");
+const C = require("@jingli/config");
 var format = require("js-format");
 var uuid = require("node-uuid");
 var shortUrlService = require("../shorturl");
@@ -68,7 +68,7 @@ timerSendMail();
  * @returns {*}
  * @private
  */
-async function _recordEmailLog(id, status, error) {
+async function _recordEmailLog(id: any, status: any, error: any) {
     if (!error && status == 1) {
         error = 'ok';
     }
@@ -106,7 +106,7 @@ async function _recordEmailLog(id, status, error) {
  * @param {Boolean} isHtml
  * @private
  */
-function _sendEmail(toUser, subject, content, isHtml, attachments) {
+function _sendEmail(toUser: any, subject: any, content: any, isHtml: any, attachments: any) {
     if (!toUser) {
         throw L.ERR.EMAIL_EMPTY;
     }
@@ -138,7 +138,7 @@ function send (options: {from: string, to: string, subject: string, text?: strin
         attachments = JSON.parse(attachments);
     }
 
-    attachments = attachments.map( (v) => {
+    attachments = attachments.map( (v: any) => {
         if (v.path) {
             v.path = path.join(process.cwd(), v.path);
         }
@@ -155,7 +155,7 @@ function send (options: {from: string, to: string, subject: string, text?: strin
     };
 
     return new Promise(function(resolve, reject){
-        transporter.sendMail(mailOptions, function(err, resp) {
+        transporter.sendMail(mailOptions, function(err: any, resp: any) {
             if (err) {
                 reject(err);
             } else {
@@ -173,8 +173,8 @@ export class Mail{
      * @param {String} params.templateName 邮件类型
      * @param {Object} params.values 邮件模板占位符中值
      */
-    async sendMailRequest(params) {
-        let {toEmails, templateName, values, content} = params;
+    async sendMailRequest(params: {[key: string]: any}) {
+        let {toEmails, templateName, values} = params;
         values.html_encode = html_encode;
 
         if (typeof values != 'object') {

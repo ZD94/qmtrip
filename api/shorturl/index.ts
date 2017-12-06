@@ -8,6 +8,7 @@ var SERVICE_URL = C.host + '/go';
 import base64 from "./base64";
 import dwz from "./dwz";
 import md5 from "./md5";
+import { Application } from 'express';
 
 export class Service{
     /**
@@ -18,7 +19,7 @@ export class Service{
      * @param {String} params.shortType 目前仅支持,'base64'
      * @returns {Promise}
      */
-    async long2short(params) {
+    async long2short(params: { longurl: string, shortType: string}) {
         var longurl = params.longurl;
         var shortType = params.shortType || 'md5';
         let url = "";
@@ -52,7 +53,7 @@ export class Service{
      * @param {String} params.shortType base64
      * @returns {Promise}
      */
-    async short2long(params) {
+    async short2long(params: { shorturl: string, shortType: string}) {
         var shorturl = params.shorturl;
         var shortType = params.shortType || 'base64';
         if (!shorturl) {
@@ -80,7 +81,7 @@ export class Service{
         }
     }
 
-    async __initHttpApp(app) {
+    async __initHttpApp(app: Application) {
         app.get("/go", async function(req, res, next) {
             var key = req.query.key;
             let shortUrl = new Service();
@@ -94,9 +95,9 @@ export class Service{
         });
 
         app.get("/go/:st/:key", async function(req, res, next) {
-            var key = req.params.key;
+            var key: string = req.params.key;
             let shortUrl = new Service();
-            var shortType = req.params.st;
+            var shortType: string = req.params.st;
             try {
                 let url = await shortUrl.short2long({shorturl: key, shortType: shortType});
                 res.redirect(url);

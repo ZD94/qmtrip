@@ -18,13 +18,13 @@ export = async function transform(values: any): Promise<any>{
     }
     return values;
 }
-function getWeekOfMonth(time) {
+function getWeekOfMonth(time: any) {
     let dayOfWeek = time.get('d');
     let day = time.get('D');
     return Math.ceil((day - dayOfWeek) / 7) + 1;
 }
 
-function formatMoney(number, places, symbol) {
+function formatMoney(number: any, places: any, symbol: any) {
     places = !isNaN(places = Math.abs(places)) ? places : 2;
     symbol = symbol !== undefined ? symbol : "";
     let thousand = ",";

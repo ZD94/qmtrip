@@ -2,9 +2,7 @@
  * Created by wyl on 16-01-20.
  */
 'use strict';
-var _ = require("lodash");
 import {DB} from '@jingli/database';
-let API = require("@jingli/dnode-api");
 import L from '@jingli/language';
 import {Department, StaffDepartment} from "_types/department";
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
@@ -28,7 +26,7 @@ class DepartmentModule{
         {if: condition.isCompanyAgency("0.companyId")},
         {if: condition.isCompanyDepartment("0.parentId")}
     ])
-    static async createDepartment (params): Promise<Department>{
+    static async createDepartment (params: any): Promise<Department>{
 
         let result = await Models.department.find({where: {name: params.name, companyId: params.companyId}});
 
@@ -58,8 +56,7 @@ class DepartmentModule{
         {if: condition.isDepartmentAdminOrOwner("0.id")},
         {if: condition.isDepartmentAgency("0.id")}
     ])
-    static async deleteDepartment(params): Promise<any>{
-        var id = params.id;
+    static async deleteDepartment(params: any): Promise<any>{
         var department = await Models.department.get(params.id);
         let staffs = await department.getStaffs();
         if(staffs && staffs.length > 0){
@@ -88,7 +85,7 @@ class DepartmentModule{
         {if: condition.isDepartmentAdminOrOwner("0.id")},
         {if: condition.isDepartmentAgency("0.id")}
     ])
-    static async updateDepartment(params): Promise<Department>{
+    static async updateDepartment(params: any): Promise<Department>{
         if(params.parentId){
             let ids = await DepartmentModule.getAllChildDepartmentsId({parentId: params.id});
             if(ids.indexOf(params.parentId) >= 0){
@@ -135,13 +132,13 @@ class DepartmentModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["where.companyId"], departmentCols.map((v) => 'where.'+ v))
+    @requireParams(["where.companyId"], departmentCols.map((v: string) => 'where.'+ v))
     @conditionDecorator([
         {if: condition.isCompanyAdminOrOwner("0.where.companyId")},
         {if: condition.isCompanyAgency("0.where.companyId")},
         {if: condition.isCompanyStaff("0.where.companyId")}
     ])
-    static async getDepartments(params) :Promise<FindResult>{
+    static async getDepartments(params: any) :Promise<FindResult>{
         params.order = params.order || [['createdAt', 'desc']];
 
         let paginate = await Models.department.find(params);
@@ -216,7 +213,7 @@ class DepartmentModule{
             "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id " +
             "where k.deleted_at is null) " +
             "select * from cte";
-        let [children, row] = await DB.query(sql);
+        let [children] = await DB.query(sql);
         return children;
     }
 
@@ -252,7 +249,7 @@ class DepartmentModule{
             "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id " +
             "where k.deleted_at is null) " +
             "select * from cte";
-        let [children, row] = await DB.query(sql);
+        let [children] = await DB.query(sql);
         for(var i=0;i<children.length;i++)
             ids.push(children[i].id);
         return ids;
@@ -286,7 +283,7 @@ class DepartmentModule{
 
         let pagers = await Models.staffDepartment.find({where: {departmentId: params.id}, order: [['createdAt', 'desc']]});
 
-        let departmentStaffs = [];
+        let departmentStaffs: any[] = [];
         departmentStaffs.push.apply(departmentStaffs, pagers);
         while(pagers.hasNextPage()){
             let nextPager = await pagers.nextPage();
@@ -326,7 +323,6 @@ class DepartmentModule{
             }];
             options.order = '"' + 'Account' + '"' + '.status asc';
          }*/
-        let _order = options.order;
         if(options.order == 'status'){
             delete options.order;
         }
@@ -345,7 +341,7 @@ class DepartmentModule{
         return staffs;
     }
 
-    static async deleteDepartmentByTest(params){
+    static async deleteDepartmentByTest(params: any){
         await DB.models.Department.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}});
         return true;
     }
@@ -359,7 +355,7 @@ class DepartmentModule{
      */
     @clientExport
     @requireParams(["departmentId", "staffId"], staffDepartmentCols)
-    static async createStaffDepartment (params) : Promise<StaffDepartment>{
+    static async createStaffDepartment (params: any) : Promise<StaffDepartment>{
         var staffDepartment = StaffDepartment.create(params);
         var already = await Models.staffDepartment.find({where: {departmentId: params.departmentId, staffId: params.staffId}});
         if(already && already.length>0){
@@ -377,7 +373,7 @@ class DepartmentModule{
      */
     @clientExport
     @requireParams(["id"])
-    static async deleteStaffDepartment(params) : Promise<any>{
+    static async deleteStaffDepartment(params: any) : Promise<any>{
         var id = params.id;
         var ah_delete = await Models.staffDepartment.get(id);
 
@@ -394,7 +390,7 @@ class DepartmentModule{
      */
     @clientExport
     @requireParams(["id"], staffDepartmentCols)
-    static async updateStaffDepartment(params) : Promise<StaffDepartment>{
+    static async updateStaffDepartment(params: any) : Promise<StaffDepartment>{
         var id = params.id;
 
         var ah = await Models.staffDepartment.get(id);
@@ -425,8 +421,7 @@ class DepartmentModule{
      * @returns {*}
      */
     @clientExport
-    static async getStaffDepartments(params): Promise<FindResult>{
-        var staff = await Staff.getCurrent();
+    static async getStaffDepartments(params: any): Promise<FindResult>{
         let paginate = await Models.staffDepartment.find(params);
         let ids =  paginate.map(function(t){
             return t.id;

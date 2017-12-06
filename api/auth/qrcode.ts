@@ -3,12 +3,13 @@ import L from '@jingli/language';
 import { makeAuthenticateToken } from './authentication';
 import { Models } from '_types/index';
 import { LoginResponse } from '_types/auth/auth-cert';
-import C = require("@jingli/config");
+const C = require("@jingli/config");
 var API = require("@jingli/dnode-api");
 import { getSession } from "@jingli/dnode-api";
+import { Application } from 'express-serve-static-core';
 
 //拼接字符串
-function combineData(obj) {
+function combineData(obj: object) {
     if(typeof obj != 'object') {
         throw new Error("combineStr params must be object");
     }
@@ -23,7 +24,7 @@ function combineData(obj) {
 }
 
 //加密对象
-function cryptoData(obj) {
+function cryptoData(obj: object | string) {
     if(typeof obj == 'string') {
         return utils.md5(obj);
     }
@@ -35,7 +36,7 @@ function cryptoData(obj) {
 var QRCODE_LOGIN_URL = '/auth/qrcode-login';
 
 //二维码自动登录
-export function __initHttp(app) {
+export function __initHttp(app: Application) {
     app.all(QRCODE_LOGIN_URL, function(req, res, next) {
         var storageSetUrl = C.host + "/index.html#/login/storageSet";
         var accountId = req.query.accountId;

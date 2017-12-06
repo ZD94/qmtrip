@@ -7,7 +7,6 @@ const API = require('@jingli/dnode-api');
 import {Models} from "_types/index";
 import {clientExport} from "@jingli/dnode-api/dist/src/helper";
 import { ACCOUNT_STATUS } from "_types/auth";
-import utils = require("common/utils");
 import syncData from "libs/asyncOrganization/syncData";
 import shareConnection from "./shareConnection";
 import L from '@jingli/language';
@@ -15,6 +14,7 @@ import { EStaffStatus, Staff, SPropertyType, EStaffRole } from "_types/staff";
 import {CPropertyType} from "_types/company";
 import { EAccountType } from '_types/index';
 import {Department} from "../../_types/department/department";
+import { Application } from 'express';
 
 export let staffOpts = {
     scope: 'sub',
@@ -26,7 +26,7 @@ export let departmentOpts = {
 };
 export class LdapModule {
     static __public: boolean = true;
-    __initHttpApp(app) {
+    __initHttpApp(app: Application) {
 
         app.get("/initLdap", async (req, res, next)=>{
             console.info(req.query, "==============================");
@@ -74,7 +74,7 @@ export class LdapModule {
      * @returns {Promise<Promise<any>|Promise<Promise<any>|Promise<any>>>}
      */
     @clientExport
-    async registerLdapCompany(params){
+    async registerLdapCompany(params: any){
         var result = await API.company.registerCompany(params);
         return result;
     }
@@ -106,8 +106,6 @@ export class LdapModule {
         if(!(ldapProperty && ldapProperty.length)){
             throw L.ERR.DATA_NOT_EXIST();
         }
-        let ldapInfo = ldapProperty[0].value;
-        let ldapInfoJson = JSON.parse(ldapInfo);
         // await ldapApi.bindUser({entryDn: ldapInfoJson.ldapAdminDn, userPassword: ldapInfoJson.ldapAdminPassword});
 
         let type = EAccountType.STAFF;
@@ -149,7 +147,7 @@ export class LdapModule {
         let entryDn = staffProperty[0].value;
 
         try{
-            let bindResult = await ldapApi.bindUser({entryDn: entryDn, userPassword: data.pwd});
+            await ldapApi.bindUser({entryDn: entryDn, userPassword: data.pwd});
         }catch(e){
             if(e){
                 throw L.ERR.ACCOUNT_NOT_EXIST();
@@ -189,7 +187,7 @@ export class LdapModule {
         let department: Department;
         if(params)
             department = params.department;
-        let depts = await syncData.syncOrganization({company: company, department: department});
+        await syncData.syncOrganization({company: company, department: department});
         return true;
     }
 }

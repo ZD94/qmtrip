@@ -7,7 +7,7 @@ module.exports =async function(DB, t) {
         accounts = accounts[0];
     }
 
-    await Promise.all(accounts.map(async (item) => {
+    await Promise.all(accounts.map(async (item: any) => {
         let sql1 = `select * from coin.coin_accounts where id = '${item.coin_account_id}'`;
         let old_obj = await DB.query(sql1);
         if(old_obj){
@@ -28,7 +28,7 @@ module.exports =async function(DB, t) {
         }
 
         if(old_changes && old_changes.length){
-            await Promise.all(old_changes.map(async (ch) => {
+            await Promise.all(old_changes.map(async (ch: any) => {
                 let sql4 = `select * from coin.coin_account_changes where id = '${ch.id}'`;
                 let old_ch = await DB.query(sql4);
 

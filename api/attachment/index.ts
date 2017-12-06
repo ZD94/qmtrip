@@ -4,7 +4,6 @@
 'use strict';
 var sequelize = require("common/model").importModel("./models");
 var Owner = sequelize.models.Owner;
-import L from '@jingli/language';
 var API = require("@jingli/dnode-api");
 var config = require('@jingli/config');
 import Logger from '@jingli/logger';
@@ -14,7 +13,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 
-async function fs_exists(file): Promise<boolean>{
+async function fs_exists(file: string): Promise<boolean>{
     try{
         await fs.statAsync(file);
         return true;
@@ -33,7 +32,7 @@ class ApiAttachment {
      * @param {String} params.fileId
      * @param {UUID} params.accountId
      */
-    static bindOwner(params) {
+    static bindOwner(params: any) {
         var fileId = params.fileId;
         var accountId = params.accountId;
         return Owner.create({
@@ -42,11 +41,11 @@ class ApiAttachment {
         })
     }
 
-    static getOwner(params) {
+    static getOwner(params: any) {
         var fileId = params.fileId;
         var accountId = params.user_id;
         return Owner.findOne({where:{accountId: accountId, fileId: fileId}})
-            .then(function(owner){
+            .then(function(owner: any){
                 if(owner){
                     return true;
                 }else{
@@ -62,9 +61,8 @@ class ApiAttachment {
      * @param {String} params.fileId
      * @param {UUID} params.accountId
      */
-    static async getSelfAttachment(params) {
+    static async getSelfAttachment(params: any) {
         var fileId = params.fileId;
-        var accountId = params.accountId;
         // var owner = await Owner.findOne({where: {fileId: fileId, accountId: accountId}});
         // if (!owner) {
         //     throw L.ERR.PERMISSION_DENY();
@@ -77,7 +75,7 @@ class ApiAttachment {
         return attachment;
     }
 
-    static async getFileCache(params) {
+    static async getFileCache(params: any) {
         try{
             var id = params.id;
             var isPublic = params.isPublic;

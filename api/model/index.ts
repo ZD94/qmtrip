@@ -2,7 +2,7 @@
 import L from '@jingli/language';
 import { Models } from '_types';
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
-import { ModelInterface, PaginateInterface, ModelObjInterface, FindResult } from 'common/model/interface';
+import { ModelInterface, ModelObjInterface, FindResult } from 'common/model/interface';
 
 export default class ModelForClient{
     @clientExport

@@ -1,12 +1,12 @@
 import { checkTokenAuth } from "api/auth/authentication";
-import { AuthResponse, AuthRequest, signToken, LoginResponse } from '_types/auth/auth-cert';
+import { AuthResponse } from '_types/auth/auth-cert';
 import {Models} from "_types/index";
 import {Staff} from "_types/staff";
-import {TripPlan, ESourceType, QMEApproveStatus, ICreateBudgetAndApproveParams, Offline, OfflineStatus} from '_types/tripPlan';
+import { Offline, OfflineStatus} from '_types/tripPlan';
+import { Application, Request, Response, NextFunction } from 'express-serve-static-core';
 
 let API = require("@jingli/dnode-api");
 let moment = require("moment");
-let uuid = require("uuid");
 
 export interface CheckIdentityParam{
     staffId : string;
@@ -32,7 +32,7 @@ export interface OfflineTranslateParam {
 
 export class OfflineClass {
 
-    __initHttpApp( app ){
+    __initHttpApp( app: Application ){
         app.post("/offlineApprove", offlineApprove);
     }
 
@@ -44,7 +44,6 @@ export class OfflineClass {
             param[key] = typeof param[key] == "string" ? param[key].toLowerCase() : param[key];
         }
 
-        let result = {};
         param.leaveCityName = param.leaveCityName.replace(/city|市/ig, "");
         param.destinationName = param.destinationName.replace(/city|市/ig, "");
         param.status = 0;
@@ -203,7 +202,7 @@ export class OfflineClass {
 const offline = new OfflineClass();
 export default offline;
 
-async function offlineApprove(req, res, next){
+async function offlineApprove(req: Request, res: Response, next: NextFunction){
     res.header('Access-Control-Allow-Origin', '*');
     /*req.clearTimeout();
     req.setTimeout( 60 * 1000 );*/

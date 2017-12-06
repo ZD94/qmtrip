@@ -6,7 +6,7 @@
 import {ICompanyChargeParam, IStaffPoint2CoinParam, IStaffCostCoinParam} from "./_types";
 import {Models} from "_types/index";
 import {requireParams, clientExport} from "@jingli/dnode-api/dist/src/helper";
-import {Staff, PointChange} from "_types/staff";
+import {PointChange} from "_types/staff";
 import {CoinAccount, CoinAccountChange} from "_types/coin";
 import {FindResult} from "common/model/interface";
 import L from '@jingli/language';
@@ -96,20 +96,20 @@ class CoinModule {
         return await coinAccount.costCoin(coins, remark)
     }
 
-    static async createCoinAccount (params) : Promise<CoinAccount>{
+    static async createCoinAccount (params: any) : Promise<CoinAccount>{
         var ca = CoinAccount.create(params);
         return ca.save();
     }
 
     @clientExport
     @requireParams(["id"])
-    static async getCoinAccount(params) :Promise<CoinAccount> {
+    static async getCoinAccount(params: {id: string}) :Promise<CoinAccount> {
         return Models.coinAccount.get(params.id);
     }
 
     @clientExport
     @requireParams(["id"])
-    static async getCoinAccountChange(params) :Promise<CoinAccountChange> {
+    static async getCoinAccountChange(params: {id: string}) :Promise<CoinAccountChange> {
         return Models.coinAccountChange.get(params.id);
     }
 
@@ -119,7 +119,7 @@ class CoinModule {
      * @returns {*}
      */
     @clientExport
-    static async getCoinAccountChanges(params): Promise<FindResult>{
+    static async getCoinAccountChanges(params: any): Promise<FindResult>{
         params.order = params.order || [['createdAt', 'desc']];
         let paginate = await Models.coinAccountChange.find(params);
         let ids =  paginate.map(function(t){

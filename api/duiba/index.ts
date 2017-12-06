@@ -3,9 +3,8 @@
  */
 
 'use strict';
-import {requireParams, clientExport} from "@jingli/dnode-api/dist/src/helper";
+import {clientExport} from "@jingli/dnode-api/dist/src/helper";
 import {Staff} from "_types/staff/staff";
-import {CoinAccount} from "_types/coin";
 var config = require('@jingli/config');
 import {Models} from "_types/index";
 
@@ -22,7 +21,7 @@ class DuiBa {
      * @returns {string}
      */
     @clientExport
-    static async getLoginUrl(params) :Promise<string>{
+    static async getLoginUrl(params: any) :Promise<string>{
         var staff = await Staff.getCurrent();
         if(!params) params = {};
         params.uid = staff.accountId;
@@ -51,7 +50,7 @@ class DuiBa {
         return url;
     }
 
-    static async getSign(params) :Promise<string>{
+    static async getSign(params: any) :Promise<string>{
         if(params.hasOwnProperty("sign")){
             delete params.sign;
         }

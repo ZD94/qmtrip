@@ -56,8 +56,8 @@ class ApiPlace {
      */
     static queryBusinessDistrict(params: {keyword?: string, code?: string}) :Promise<Place> {
         return API.place.queryBusinessDistrict(params)
-            .then(function(places) {
-                let arr:Array<Place> = places.map(function(place) {
+            .then(function(places: Place[]) {
+                let arr = places.map(function(place) {
                     return new Place(place);
                 })
                 return arr;
@@ -75,7 +75,7 @@ class ApiPlace {
      */
     static hotCities(params: {limit?: number, isAbroad?: boolean}) :Promise<Array<Place>> {
         return API.place.queryHotCity(params)
-            .then(function(places) {
+            .then(function(places: Place[]) {
                 let arr:Array<Place> = places.map(function(place) {
                     return new Place(place);
                 })
@@ -94,7 +94,7 @@ class ApiPlace {
      */
     static hotBusinessDistricts(params: {cityId: string, limit?: number}) :Promise<Array<Place>> {
         return API.place.hotBusinessDistricts(params)
-            .then(function(places) {
+            .then(function(places: Place[]) {
                 var arr: Array<Place> = places.map(function(place) {
                     return new Place(place);
                 })
@@ -133,8 +133,8 @@ class ApiPlace {
             throw new Error("cityCode require but is empty!");
         }
         return API.place.getAirPortsByCity(params)
-            .then(function(airports) {
-                let arr: Array<Airport> = airports.map(function(airport) {
+            .then(function(airports: Airport[]) {
+                let arr = airports.map(function(airport) {
                     return new Airport(airport);
                 })
                 return arr;
@@ -148,7 +148,7 @@ class ApiPlace {
      */
     static getAirportById(params: {id: string}) :Promise<Airport> {
         return API.place.getAirportById(params)
-            .then(function(airport) {
+            .then(function(airport: Airport) {
                 return new Airport(airport);
             })
     }
@@ -161,14 +161,14 @@ class ApiPlace {
      */
     static getAirportByCode(params: {code: string}) :Promise<Airport> {
         return API.place.getAirportBySkyCode(params)
-            .then(function(airport) {
+            .then(function(airport: Airport) {
                 return new Airport(airport);
             })
     }
 
     static getAirCompanyById(params: {id: string}) : Promise<AirCompany> {
         return API.place.getAirCompanyById(params)
-            .then(function(airCompany) {
+            .then(function(airCompany: AirCompany) {
                 return new AirCompany(airCompany);
             })
     }
@@ -179,7 +179,7 @@ class ApiPlace {
      */
     static getAirCompanyByCode(params: {code: string}) :Promise<AirCompany> {
         return API.place.getAirCompanyByCode(params)
-            .then(function(airCompany) {
+            .then(function(airCompany: AirCompany) {
                 return new AirCompany(airCompany)
             })
     }

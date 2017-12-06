@@ -10,7 +10,6 @@ import {Models} from "_types/index";
 import {emitter, EVENT} from "libs/oa";
 import {EApproveStatus, EApproveChannel, EApproveType} from "_types/approve/types";
 import {ETripType} from "_types/tripPlan/tripPlan";
-import TripPlanModule = require("../tripPlan/index");
 import _ = require('lodash');
 let Config = require('@jingli/config');
 var API = require("@jingli/dnode-api");
@@ -72,7 +71,7 @@ class ApproveModule {
         }
         let totalBudget = 0;
         if(budgetInfo.budgets && budgetInfo.budgets.length>0){
-            budgetInfo.budgets.forEach(function(item){
+            budgetInfo.budgets.forEach(function(item: any){
                 if(item.tripType != ETripType.SUBSIDY){
                     number = number + 1;
                 }
@@ -149,7 +148,6 @@ class ApproveModule {
         let {query, budget, specialApproveRemark, approveUser} = params;
         let submitter = await Staff.getCurrent();
 
-        let company = submitter.company;
         //特殊审批不记录行程数
         // await company.beforeGoTrip();
         // await company.frozenTripPlanNum({number: 1});
@@ -162,7 +160,7 @@ class ApproveModule {
             query.staffList=[submitter.id];
         }
 
-        let budgetInfo = {
+        let budgetInfo: {[key: string]: any} = {
             query: query,
             budgets: [
                 {
@@ -274,7 +272,7 @@ class ApproveModule {
         let {oaName, oaUrl} = params;
         let staff = await Staff.getCurrent();
         try {
-            let ret = await API.notify.submitNotify({
+            await API.notify.submitNotify({
                 email: Config.reportHimOAReceive,
                 key: 'qm_report_him_oa',
                 values: {
@@ -292,9 +290,9 @@ class ApproveModule {
 }
 
 //监听审批单变化
-emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result) {
+emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result: any) {
     let p = (async function(){
-        let {approveNo, submitter, outerId, status, approveUser, data, oa, budget} = result;
+        let {approveNo, outerId, status, approveUser, data, oa, budget} = result;
         let approve = await Models.approve.get(approveNo);
         if (approve.status == status) {
             return;

@@ -1,13 +1,11 @@
 /**
  * Created by wlh on 15/12/12.
  */
-import { Headers } from 'request';
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { Models } from '_types'
-import { ETripType, EInvoiceType, ISegment, ICreateBudgetAndApproveParams } from "_types/tripPlan";
+import { ETripType, EInvoiceType, ICreateBudgetAndApproveParams } from "_types/tripPlan";
 import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
-const validate = require("common/validate");
 import L from '@jingli/language';
 const moment = require('moment');
 require("moment-timezone");
@@ -15,16 +13,12 @@ const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require('lodash');
 import { Place } from "_types/place";
-import { EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel, DefaultRegion } from "_types"
-import { where } from "sequelize";
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 export var NoCityPriceLimit = 0;
 const DefaultCurrencyUnit = 'CNY';
 import { restfulAPIUtil } from "api/restful";
-import { meiyaJudge, getMeiyaFlightData, getMeiyaTrainData, writeData, compareFlightData, compareTrainData, getMeiyaHotelData, compareHotelData } from "./meiya";
-
-const cloudAPI = require('@jingli/config').cloudAPI;
-const cloudKey = require('@jingli/config').cloudKey;
+import { meiyaJudge, getMeiyaFlightData, getMeiyaTrainData, compareFlightData, compareTrainData, getMeiyaHotelData, compareHotelData } from "./meiya";
+import { Application, Request, Response, NextFunction } from 'express';
 
 let RestfulAPIUtil = restfulAPIUtil;
 
@@ -54,18 +48,18 @@ export interface IQueryBudgetParams {
 }
 
 
-interface SegmentsBudgetResult {
-    id: string;
-    cities: string[];
-    /**
-     * 数组每一项为多人每段预算信息,分为交通与住宿
-     */
-    budgets: Array<{
-        hotel: any[],   //数组每项为每个人的住宿预算
-        traffic: any[]  //数组每项为每个人的交通预算
-        subsidy: any  //每个人的补助
-    }>
-}
+// interface SegmentsBudgetResult {
+//     id: string;
+//     cities: string[];
+//     /**
+//      * 数组每一项为多人每段预算信息,分为交通与住宿
+//      */
+//     budgets: Array<{
+//         hotel: any[],   //数组每项为每个人的住宿预算
+//         traffic: any[]  //数组每项为每个人的交通预算
+//         subsidy: any  //每个人的补助
+//     }>
+// }
 
 export interface ISearchHotelParams {
     checkInDate: string;
@@ -85,7 +79,6 @@ export interface ISearchTicketParams {
     travelPolicyId: string;
 }
 
-let sequelize = require('sequelize');
 export default class ApiTravelBudget {
 
     @clientExport
@@ -267,7 +260,6 @@ export default class ApiTravelBudget {
             policy: 'domestic',
         }
         let staffs = [_staff];
-        let goBackPlace = params['goBackPlace'];
         // let priceLimitSegments: any =[];
         let segments: any[] = await Promise.all(destinationPlacesInfo.map(async (placeInfo) => {
             var segment: any = {};
@@ -415,7 +407,7 @@ export default class ApiTravelBudget {
                 let budget = subsidy;
                 budget.price = budget.price * count;
                 if (budget.templates) {
-                    budget.templates.forEach((t) => {
+                    budget.templates.forEach((t: any) => {
                         t.price = t.price * count;
                     })
                 }
@@ -501,27 +493,27 @@ export default class ApiTravelBudget {
             return budget;
         }*/
 
-        function limitHotelBudgetByPrefer(min: number, max: number, hotelBudget: number) {
-            if (hotelBudget == -1) {
-                if (max != NoCityPriceLimit) return max;
-                return hotelBudget;
-            }
-            if (min == NoCityPriceLimit && max == NoCityPriceLimit) return hotelBudget;
+        // function limitHotelBudgetByPrefer(min: number, max: number, hotelBudget: number) {
+        //     if (hotelBudget == -1) {
+        //         if (max != NoCityPriceLimit) return max;
+        //         return hotelBudget;
+        //     }
+        //     if (min == NoCityPriceLimit && max == NoCityPriceLimit) return hotelBudget;
 
-            if (max != NoCityPriceLimit && min > max) {
-                let tmp = min;
-                min = max;
-                max = tmp;
-            }
+        //     if (max != NoCityPriceLimit && min > max) {
+        //         let tmp = min;
+        //         min = max;
+        //         max = tmp;
+        //     }
 
-            if (hotelBudget > max) {
-                if (max != NoCityPriceLimit) return max;
-            }
-            if (hotelBudget < min) {
-                if (min != NoCityPriceLimit) return min;
-            }
-            return hotelBudget;
-        }
+        //     if (hotelBudget > max) {
+        //         if (max != NoCityPriceLimit) return max;
+        //     }
+        //     if (hotelBudget < min) {
+        //         if (min != NoCityPriceLimit) return min;
+        //     }
+        //     return hotelBudget;
+        // }
 
 
     }
@@ -538,7 +530,7 @@ export default class ApiTravelBudget {
         if (company.name != "鲸力智享") {
 
             try {
-                await Promise.all(systemNoticeEmails.map(async function (s) {
+                await Promise.all(systemNoticeEmails.map(async function (s: any) {
                     try {
                         await API.notify.submitNotify({
                             key: 'qm_notify_system_new_travelbudget',
@@ -563,7 +555,7 @@ export default class ApiTravelBudget {
         let { budgetId } = params;
         let content = await ApiTravelBudget.getBudgetInfo({ id: budgetId, accountId: staff.id });
         let budgets = content.budgets;
-        let ps = budgets.map(async (budget): Promise<any> => {
+        let ps = budgets.map(async (budget: any): Promise<any> => {
             if (!budget.id) {
                 return true;
             }
@@ -608,9 +600,9 @@ export default class ApiTravelBudget {
         return result.data;
     }
 
-    static __initHttpApp(app) {
+    static __initHttpApp(app: Application) {
 
-        function _auth_middleware(req, res, next) {
+        function _auth_middleware(req: Request, res: Response, next: NextFunction) {
             let key = req.query.key;
             if (!key || key != 'jingli2016') {
                 return res.send(403)
@@ -628,7 +620,7 @@ export default class ApiTravelBudget {
             }
 
             API.budget.getBudgetItems({ page: p, pageSize: pz, type: type, })
-                .then((data) => {
+                .then((data: any) => {
                     res.header('Access-Control-Allow-Origin', '*');
                     res.json(data);
                 })
@@ -636,13 +628,13 @@ export default class ApiTravelBudget {
         })
 
         app.post('/api/budgets', _auth_middleware, function (req, res, next) {
-            let { query, prefers, policy, originData, type } = req.body;
+            let { query, prefers, originData, type } = req.body;
             originData = JSON.parse(originData);
             query = JSON.parse(query);
             prefers = JSON.parse(prefers);
 
             return API.budget.debugBudgetItem({ query, originData, type, prefers })
-                .then((result) => {
+                .then((result: any) => {
                     res.header('Access-Control-Allow-Origin', '*');
                     res.json(result);
                 })

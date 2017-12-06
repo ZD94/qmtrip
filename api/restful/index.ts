@@ -7,14 +7,11 @@ import {AgencyUser} from '../../_types/agency/agency-user';
 import { Staff } from "_types/staff";
 var request = require("request");
 const axios = require('axios');
-import config = require("@jingli/config");
+const config = require("@jingli/config");
 import crypto = require("crypto");
 import cache from "common/cache";
-import Logger from '@jingli/logger';
-const logger = new Logger('restful');
-import {Models} from "_types"
 
-function md5(str) {
+function md5(str: string) {
     return crypto.createHash("md5").update(str).digest('hex')
 }
 
@@ -35,7 +32,7 @@ export async function getAgentToken() {
         appId,
         timestamp,
         sign: md5(`${config.agent.appSecret}|${timestamp}`)
-    }).then(res => res.data)
+    }).then((res: any) => res.data)
 
     if (resp.code === 0) {
         await cache.write(key, resp.data.token, resp.data.expires - 30);
@@ -60,7 +57,7 @@ export async function getCompanyTokenByAgent(companyId: string) {
     let agentToken = await getAgentToken();
     const resp: any = await axios.get(`${config.cloudAPI}/agent/company/${companyId}/token`, {
         headers: { token: agentToken }
-    }).then(res => res.data);
+    }).then((res: any) => res.data);
 
     if (resp.code === 0) {
         await cache.write(key, resp.data.token, resp.data.expires);
@@ -81,7 +78,7 @@ export class RestfulAPIUtil {
         let { params, model, addUrl = '', useProxy = true } = options;
         let { fields, method } = params;
         let currentCompanyId = fields['companyId'];
-        let companyToken;
+        let companyToken: string;
         let currentAgency: AgencyUser = await AgencyUser.getCurrent();
 
         if(!useProxy || currentAgency) {
@@ -102,7 +99,6 @@ export class RestfulAPIUtil {
         if (addUrl) {
             url += `/${addUrl}`
         }
-        let result: any;
 
         let qs: {
             [index: string]: string;
@@ -127,7 +123,7 @@ export class RestfulAPIUtil {
                 headers: {
                     token: companyToken
                 }
-            }, (err, resp, result) => {
+            }, (err: Error, resp: any, result: any) => {
                 if (err) {
                     return reject(err);
                 }
@@ -163,7 +159,7 @@ export class RestfulAPIUtil {
                 headers: {
                     token
                 }
-            }, (err, resp, result) => {
+            }, (err: Error, resp: any, result: any) => {
                 if (err) {
                     return reject(err);
                 }

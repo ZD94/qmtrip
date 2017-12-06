@@ -4,12 +4,12 @@
 
 'use strict';
 import request = require("request");
-import C = require("@jingli/config");
+const C = require("@jingli/config");
 var Agent = require('socks5-https-client/lib/Agent');
 
 let ddConfig = C.ddconfig;
 
-export function reqProxy(url, options): Promise<any> {
+export function reqProxy(url: string, options: any): Promise<any> {
     return new Promise<any>( (resolve, reject) => {
         let method = options.method || 'POST';
         let qs = options.qs || {};

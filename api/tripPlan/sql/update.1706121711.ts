@@ -7,9 +7,9 @@ module.exports =async function(DB, t) {
 
     for(let i=0;i<pages;i++){
         let sql = `select * from trip_plan.trip_details where deleted_at is null limit 200 offset ${i*200}`;
-        await DB.query(sql).then(async (rets)=>{
+        await DB.query(sql).then(async (rets: any)=>{
             let tripDetails = rets[0];
-            await Promise.all(tripDetails.map((tripDetail)=>{
+            await Promise.all(tripDetails.map((tripDetail: any)=>{
                 let budget = tripDetail.budget || 0;
                 let expenditure = tripDetail.expenditure || 0;
                 let sql = `insert into trip_plan.trip_detail_staffs 

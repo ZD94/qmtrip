@@ -1,6 +1,6 @@
 import _ = require("lodash");
 
-function dealBudget(obj){
+function dealBudget(obj: object){
     let keys = Object.keys(obj);
     for(let key of keys){
         let arr = obj[key];

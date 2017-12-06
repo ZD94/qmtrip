@@ -16,7 +16,7 @@ export default class LdapApi {
 
     async bindUser(params:{entryDn: string, userPassword: string}){
         return new Promise<any>( (resolve, reject) => {
-            return this.client.bind(params.entryDn, params.userPassword, function (err) {
+            return this.client.bind(params.entryDn, params.userPassword, function (err: any) {
                 if (err) return reject(err);
                 return resolve(true);
             })
@@ -24,19 +24,19 @@ export default class LdapApi {
     }
 
     async searchDn(params: {rootDn: string, opts: any}){
-        let result = [];
+        let result: any[] = [];
         return new Promise<any>( (resolve, reject) => {
-            return this.client.search(params.rootDn, params.opts, function (err, search) {
-                search.on('searchEntry', function (entry) {
+            return this.client.search(params.rootDn, params.opts, function (err: any, search: any) {
+                search.on('searchEntry', function (entry: any) {
                     var user = entry.object;
                     result.push(user);
                 });
 
-                search.on('end', function (res) {
+                search.on('end', function () {
                     return resolve(result);
                 });
 
-                search.on('error', function (err) {
+                search.on('error', function (err: any) {
                     return reject(err);
                 });
             })
@@ -52,7 +52,7 @@ export default class LdapApi {
 
     async unBind(){
         return new Promise<any>( (resolve, reject) => {
-            return this.client.unbind(function (err) {
+            return this.client.unbind(function (err: any) {
                 if (err) return reject(err);
                 return resolve(true);
             })
