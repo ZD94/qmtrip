@@ -3,7 +3,6 @@
  */
 'use strict';
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
-import {Staff} from "_types/staff";
 import { PromoCode } from '_types/promoCode';
 import { Models } from '_types';
 import {FindResult} from "common/model/interface";

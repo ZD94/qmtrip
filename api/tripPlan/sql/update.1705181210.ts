@@ -1,4 +1,4 @@
-module.exports = function(DB, t) {
+module.exports = function(DB: any, t: any) {
     let sql = `SELECT * FROM trip_plan.trip_approves where deleted_at is null`;
     return DB.query(sql)
     .then(async (rets: any) => {

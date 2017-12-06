@@ -1,5 +1,5 @@
 let uuid = require("uuid");
-module.exports =async function(DB, t) {
+module.exports =async function(DB: any, t: any) {
     let sql = `select count(*) from trip_plan.trip_details where deleted_at is null`;
     let count = await DB.query(sql);
     count = Number(count[0][0].count);

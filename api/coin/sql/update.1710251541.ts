@@ -1,6 +1,6 @@
 let uid = require("uuid");
 
-module.exports =async function(DB, t) {
+module.exports =async function(DB: any, t: any) {
     let sql = `select * from auth.accounts where coin_account_id in (select coin_account_id from company.companies) order by created_at desc`;
     let accounts = await DB.query(sql);
     if(accounts){

@@ -1,6 +1,6 @@
 import uuid = require('node-uuid')
 
-module.exports =async function(DB, t) {
+module.exports =async function(DB: any, t: any) {
     let sql1 = `select * from ddtalk.corps where deleted_at is null`;
     await DB.query(sql1).then(async (rets: any)=>{
         let corps = rets[0];

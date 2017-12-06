@@ -7,7 +7,7 @@ const config = require('@jingli/config');
 var request = require("request");
 import { getCompanyTokenByAgent } from 'api/restful';
 
-export = async function(db, transaction) {
+export = async function(db: any, transaction: any) {
 
     let companySql  = 'select * from company.companies where deleted_at is null';
     let companies = await db.query(companySql, {type: Sequelize.QueryTypes.SELECT});
