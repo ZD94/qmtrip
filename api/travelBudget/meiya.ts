@@ -135,7 +135,7 @@ export async function getMeiyaHotelData(params: ISearchHotelParams) {
 
 
 export function writeData(filename, data) {
-    let dirPath = path.join(process.cwd(), "./mytest", "data");
+    let dirPath = path.join(process.cwd(), "./meiyaData");
     let source = fs.createWriteStream(path.join(dirPath, filename));
     let result = JSON.stringify(data, null, 4);
 
