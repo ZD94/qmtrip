@@ -14,7 +14,7 @@ dealTraffic();
 
 
 function dealHotel(){
-    let hotelData = require("../../meiyaData/2017_12_06_05_28_07.finallyHotel");
+    let hotelData = require("../meiyaData/2017_12_06_05_28_07.finallyHotel");
 
     for (let hotel of hotelData) {
         if (checkHasMeiya(hotel.agents)) {
@@ -37,7 +37,7 @@ function dealHotel(){
 
 
 function dealTraffic(){
-    let trafficData = require("../../meiyaData/2017_12_06_05_11_24.finallyTraffic");
+    let trafficData = require("../meiyaData/2017_12_06_05_11_24.finallyTraffic");
     for (let ticket of trafficData){
         if (checkHasMeiya(ticket.agents)){
             continue;
@@ -91,8 +91,8 @@ function dealTraffic(){
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": ticket.agents[0].name,
-                        "price": ticket.agents[0].price,
+                        "name": 2,
+                        "price": ticket.agents[0].cabins[0].price,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",

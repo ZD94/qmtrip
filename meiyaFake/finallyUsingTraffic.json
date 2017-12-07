@@ -961,7 +961,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 610,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -1452,7 +1453,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 620,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -1533,7 +1535,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 1540,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -1778,7 +1781,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 680,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -1859,7 +1863,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 680,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -2432,7 +2437,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 700,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -2513,7 +2519,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 700,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -2758,7 +2765,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 700,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -2921,7 +2929,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 710,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -3002,7 +3011,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 1270,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -3411,7 +3421,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 730,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -3492,7 +3503,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 730,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -3573,7 +3585,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 750,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -3654,7 +3667,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 770,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -3735,7 +3749,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 770,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -4882,7 +4897,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 890,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -4963,7 +4979,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 890,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -6192,7 +6209,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 1030,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -6273,7 +6291,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 2210,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -6354,7 +6373,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 1030,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -6435,7 +6455,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 2210,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -6762,7 +6783,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 1080,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -7253,7 +7275,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 1360,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
@@ -7416,7 +7439,8 @@
                 "name": "meiya",
                 "cabins": [
                     {
-                        "name": "ctrip",
+                        "name": 2,
+                        "price": 1400,
                         "cabin": "经济舱",
                         "urlParams": {
                             "No": "FM9319",
