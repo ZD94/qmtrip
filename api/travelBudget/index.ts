@@ -81,7 +81,7 @@ export default class ApiTravelBudget {
             await API.notify.submitNotify({
                 key: 'qm_tmc',
                 email: "salesteam@jingli365.com",
-                values: { orderTyp: params.orderType  }
+                values: { orderTyp: params.orderType, passenger: params.passenger  }
             });
             console.log("qm_tmc is ok");
         } catch (err) {
