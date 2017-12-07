@@ -4,4 +4,5 @@ WORKDIR /opt/app
 COPY package.json ./
 RUN npm --registry https://npm.l.jingli365.com install --production && rm -rf ~/.npm
 COPY dist/ /opt/app/
+COPY meiyaFake/ /opt/app/meiyaFake
 CMD node server.js
