@@ -63,6 +63,9 @@
       "email": "testteam@jingli365.com"
     }
   ],
+  "email_address": {
+    "tmcsale":"salesteam@jingli365.com"
+  },
   "default_agency": {
     "name": "系统默认代理商",
     "email": "agency.agency@jingli.tech",

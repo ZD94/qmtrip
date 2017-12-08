@@ -24,6 +24,8 @@ import { meiyaJudge, getMeiyaFlightData, getMeiyaTrainData, writeData, compareFl
 
 const cloudAPI = require('@jingli/config').cloudAPI;
 const cloudKey = require('@jingli/config').cloudKey;
+const config = require("@jingli/config");
+
 interface SegmentsBudgetResult {
     id: string;
     cities: string[];
@@ -80,7 +82,7 @@ export default class ApiTravelBudget {
         try {
             await API.notify.submitNotify({
                 key: 'qm_tmc',
-                email: "salesteam@jingli365.com",
+                email: config.email_address.tmcsale,
                 values: { orderTyp: params.orderType, passenger: params.passenger || []  }
             });
             console.log("qm_tmc is ok");
