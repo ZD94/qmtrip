@@ -25,8 +25,7 @@ import {DB} from "@jingli/database";
 
 import {IDestination, ITripApprove} from "_types/tripApprove"
 import {OAAddResult} from "../../../../_types/approve/index";
-
-
+import {ERejectApproveTypes} from "_types/tripApprove";
 export class QmPlugin extends AbstractOAPlugin {
     constructor() {
         super();
@@ -89,7 +88,13 @@ export class QmPlugin extends AbstractOAPlugin {
         tripApprove.id = approveId;
         tripApprove.status = QMEApproveStatus.REJECT;
         tripApprove.approveRemark = reason || '系统自动处理';
-        let result = await API.eventListener.sendEventNotice({eventName: "APPROVE_FAIL", data: tripApprove, companyId: approve.companyId});//数据库增加该事件注册
+        tripApprove.rejectType = ERejectApproveTypes.BySystem;
+        let result = await API.eventListener.sendRequestToApprove({
+            modelName: "tripApprove",
+            methodName: "approveReject", 
+            data: tripApprove, 
+            companyId: approve.companyId
+        }); 
         if(result){
             let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: approve.submitter, approveStatus: EApproveResult.REJECT, remark: tripApprove.approveRemark});
             await tripPlanLog.save();
