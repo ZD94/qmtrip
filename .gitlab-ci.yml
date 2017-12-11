@@ -136,6 +136,7 @@ deploy:tester:
     JL_APP_CLOUDAPI: http://t.jingli365.com/cloud/api/v1
     JL_APP_CLOUD: http://t.jingli365.com/cloud
     JL_APP_TMC: http://t.jingli365.com/proj/svr-tmc
+    JL_APP_TMC_FAKE: false
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
