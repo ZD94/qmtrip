@@ -102,7 +102,8 @@ export default class ApiTravelBudget {
             return commonData;
         }
 
-        if (config.tmcFake) {
+        if (config.tmcFake == 1) {
+            console.log("getHotelsData ===> fake data.")
             return require("meiyaFake/finallyUsingHotel");
         } else {
             let meiyaHotel = await getMeiyaHotelData(params);
@@ -123,7 +124,8 @@ export default class ApiTravelBudget {
             return commonData;
         }
 
-        if (config.tmcFake) {
+        if (config.tmcFake == 1) {
+            console.log("getTrafficsData ===> fake data.")
             return require("meiyaFake/finallyUsingTraffic");
         } else {
             let arr = await Promise.all([

@@ -66,7 +66,7 @@ deploy:master:
     JL_APP_CLOUDAPI: http://l.jingli365.com/cloud/api/v1
     JL_APP_CLOUD: http://l.jingli365.com/cloud
     JL_APP_TMC: http://l.jingli365.com/proj/svr-tmc 
-    JL_APP_TMC_FAKE: false
+    JL_APP_TMC_FAKE: 0
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
@@ -88,7 +88,7 @@ deploy:test:
     JL_APP_CLOUDAPI: http://t.jingli365.com/cloud/api/v1
     JL_APP_CLOUD: http://t.jingli365.com/cloud
     JL_APP_TMC: http://t.jingli365.com/proj/svr-tmc
-    JL_APP_TMC_FAKE: true
+    JL_APP_TMC_FAKE: 1
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
@@ -111,7 +111,7 @@ deploy:release:
     JL_APP_CLOUDAPI: https://j.jingli365.com/cloud/api/v1
     JL_APP_CLOUD: https://j.jingli365.com/cloud
     JL_APP_TMC: http://j.jingli365.com/proj/svr-tmc
-    JL_APP_TMC_FAKE: false
+    JL_APP_TMC_FAKE: 0
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
@@ -136,7 +136,7 @@ deploy:tester:
     JL_APP_CLOUDAPI: http://t.jingli365.com/cloud/api/v1
     JL_APP_CLOUD: http://t.jingli365.com/cloud
     JL_APP_TMC: http://t.jingli365.com/proj/svr-tmc
-    JL_APP_TMC_FAKE: false
+    JL_APP_TMC_FAKE: 0
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
