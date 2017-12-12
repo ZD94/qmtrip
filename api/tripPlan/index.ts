@@ -1,6 +1,7 @@
 /**
  * Created by yumiao on 15-12-10.
  */
+
 "use strict";
 import {DB} from '@jingli/database';
 let uuid = require("node-uuid");
@@ -29,7 +30,7 @@ import { getSession } from "@jingli/dnode-api";
 import {AgencyUser} from "_types/agency";
 import {makeSpendReport} from './spendReport';
 import fs = require("fs");
-import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice, InvoiceFeeTypeNames} from "_types/tripPlan";
+import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice, InvoiceFeeTypeNames, ProjectStaff, ProjectBudgetLog} from "_types/tripPlan";
 import {ENoticeType} from "_types/notice/notice";
 import TripApproveModule = require("../tripApprove/index");
 import {MPlaneLevel, MTrainLevel} from "_types";
@@ -39,6 +40,7 @@ import {plugins} from "../../libs/oa/index";
 import {Supplier} from "../../_types/company/supplier";
 const projectCols = Project['$fieldnames'];
 import {restfulAPIUtil} from "api/restful"
+import {EBudgetCollectionType} from "../../_types/tripPlan/tripPlan";
 let RestfulAPIUtil = restfulAPIUtil;
 
 interface ReportInvoice {
@@ -915,6 +917,173 @@ class TripPlanModule {
     }
 
 
+    /****************************************ProjectStaff begin************************************************/
+
+    /**
+     * 创建项目员工记录
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["projectId", "staffId"])
+    static async createProjectStaff (params) : Promise<ProjectStaff>{
+        var projectStaff = ProjectStaff.create(params);
+        var already = await Models.projectStaff.find({where: {projectId: params.projectId, staffId: params.staffId}});
+        if(already && already.length>0){
+            return already[0];
+        }
+        var result = await projectStaff.save();
+        return result;
+    }
+
+
+    /**
+     * 删除项目员工记录
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    static async deleteProjectStaff(params) : Promise<any>{
+        var id = params.id;
+        var ah_delete = await Models.projectStaff.get(id);
+
+        await ah_delete.destroy();
+        return true;
+    }
+
+
+    /**
+     * 更新项目员工记录
+     * @param id
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"], ["projectId", "staffId"])
+    static async updateProjectStaff(params) : Promise<ProjectStaff>{
+        var id = params.id;
+
+        var ah = await Models.projectStaff.get(id);
+        for(var key in params){
+            ah[key] = params[key];
+        }
+        return ah.save();
+    }
+
+    /**
+     * 根据id查询项目员工记录
+     * @param {String} params.id
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    static async getProjectStaff(params: {id: string}) : Promise<ProjectStaff>{
+        let id = params.id;
+        var ah = await Models.projectStaff.get(id);
+
+        return ah;
+    };
+
+
+    /**
+     * 根据属性查找项目员工记录
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    static async getProjectStaffs(params): Promise<FindResult>{
+        var staff = await Staff.getCurrent();
+        let paginate = await Models.projectStaff.find(params);
+        let ids =  paginate.map(function(t){
+            return t.id;
+        })
+        return {ids: ids, count: paginate['total']};
+    }
+
+    /****************************************ProjectStaff end************************************************/
+
+    /****************************************ProjectBudgetLog begin************************************************/
+
+    /**
+     * 创建项目预算记录
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    static async createProjectBudgetLog (params) : Promise<ProjectBudgetLog>{
+        var projectBudgetLog = ProjectBudgetLog.create(params);
+        var result = await projectBudgetLog.save();
+        return result;
+    }
+
+
+    /**
+     * 删除项目预算记录
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    static async deleteProjectBudgetLog(params) : Promise<any>{
+        var id = params.id;
+        var ah_delete = await Models.projectBudgetLog.get(id);
+
+        await ah_delete.destroy();
+        return true;
+    }
+
+
+    /**
+     * 更新项目预算记录
+     * @param id
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    static async updateProjectBudgetLog(params) : Promise<ProjectBudgetLog>{
+        var id = params.id;
+
+        var ah = await Models.projectBudgetLog.get(id);
+        for(var key in params){
+            ah[key] = params[key];
+        }
+        return ah.save();
+    }
+
+    /**
+     * 根据id查询项目预算记录
+     * @param {String} params.id
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    static async getProjectBudgetLog(params: {id: string}) : Promise<ProjectBudgetLog>{
+        let id = params.id;
+        var ah = await Models.projectBudgetLog.get(id);
+
+        return ah;
+    };
+
+
+    /**
+     * 根据属性查找项目预算记录
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    static async getProjectBudgetLogs(params): Promise<FindResult>{
+        var staff = await Staff.getCurrent();
+        let paginate = await Models.projectBudgetLog.find(params);
+        let ids =  paginate.map(function(t){
+            return t.id;
+        })
+        return {ids: ids, count: paginate['total']};
+    }
+
+    /****************************************ProjectBudgetLog end************************************************/
+
+
     /**
      * @method saveTripPlanLog
      * 保存出差计划改动日志
@@ -1417,6 +1586,9 @@ class TripPlanModule {
         }
         tripPlan.arrivalCityCodes = JSON.stringify(arrivalCityCodes);
 
+        if(query.budgetCollectionType && query.budgetCollectionType == "project"){
+            tripPlan.budgetCollectionType = EBudgetCollectionType.PROJECT;
+        }
         tripPlan.setCompany(account.company);
         tripPlan.auditUser = tryObjId(approveUser);
         tripPlan.project = project;

@@ -254,6 +254,13 @@ export default class ApiTravelBudget {
         }
         params.travelPolicyId = travelPolicy.id;
 
+        if(params.budgetCollectionType && params.budgetCollectionType == "project"){
+            let pts = await Models.projectStaffTravelPolicy.all({where: {staffId: staffId, projectId: params.projectId}, order: [['createdAt', 'desc']]});
+            if(pts && pts.length){
+                params.travelPolicyId = pts[0].travelPolicyId;
+            }
+        }
+
         if (!params.staffList) {
             params.staffList = [];
         }

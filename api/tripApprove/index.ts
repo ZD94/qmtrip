@@ -74,10 +74,13 @@ export default class TripApproveModule {
         let arrivalCityCodes: string[] = [];//目的地代码
         let destinations: IDestination[] = [];
         let project: Project;
+        let projectId = query.projectId;
         let projectName = query.projectName;
-        if(projectName){
+        if(projectId){
+            project = await Models.project.get(projectId);
+        }else if(projectName){
             project = await API.tripPlan.getProjectByName({companyId: company.id, name: projectName,
-                userId: submitter, isCreate: true});
+                userId: submitter});
         }
         let tripApprove: any = {};
         tripApprove.id = approveNo;
