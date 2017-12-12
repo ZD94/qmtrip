@@ -1,1 +1,1 @@
-您好，兑换了<%=orderTyp || '升舱劵' %>
+您好，员工：<% _.forEach(passenger, function(person, index) {  %>  <%=person.name %>  <% }) %>。兑换了<%=orderTyp || '升舱劵' %>
