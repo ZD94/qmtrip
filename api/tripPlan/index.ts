@@ -2,6 +2,7 @@
  * Created by yumiao on 15-12-10.
  */
 
+
 "use strict";
 import {DB} from '@jingli/database';
 let uuid = require("node-uuid");
@@ -40,7 +41,7 @@ import {plugins} from "../../libs/oa/index";
 import {Supplier} from "../../_types/company/supplier";
 const projectCols = Project['$fieldnames'];
 import {restfulAPIUtil} from "api/restful"
-import {EBudgetCollectionType} from "../../_types/tripPlan/tripPlan";
+import {EBudgetCollectionType, EProjectStatus} from "../../_types/tripPlan/tripPlan";
 let RestfulAPIUtil = restfulAPIUtil;
 
 interface ReportInvoice {
@@ -881,6 +882,9 @@ class TripPlanModule {
     static async updateProject(params): Promise<Project> {
         let project = await Models.project.get(params.id);
 
+        if(project.status == EProjectStatus.START){
+            throw new Error(`{code: -1, msg: "修改项目信息 需停用项目"}`);
+        }
         for(let key in params){
             project[key] = params[key];
         }
