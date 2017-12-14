@@ -84,7 +84,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams) {
         depDate: moment(params.leaveDate).format("YYYY-MM-DD")
     };
     let urlTrain = config.orderSysConfig.orderLink + "/searchTrains/getlist" + `/${meiyaParam.depCity}/${meiyaParam.arrCity}/${meiyaParam.depDate}`;
-    console.log("urlTrain=====>", urlTrain);
+    console.log("urlTrain===================>", urlTrain);
     let meiyaResult = await request({
         url: urlTrain,
         method: "get",
@@ -149,16 +149,20 @@ export function writeData(filename, data) {
 /* 匹配数据，以原始数据为基础，meiya不一定都有 */
 
 export function compareFlightData(origin, meiyaData) {
+    if(!origin || typeof(origin) == 'undefined'){
+        return [];
+    }
+    if(!meiyaData || typeof(meiyaData) == 'undefined'){
+        return origin;
+    }
     for (let item of origin) {
         if (item.type != 1) {
             continue;
         }
-
         for (let meiya of meiyaData) {
             if (item.No != meiya.flightNo) {
                 continue;
             }
-
             let agentMeiya = {
                 name: "meiya",
                 cabins: [],
@@ -168,9 +172,7 @@ export function compareFlightData(origin, meiyaData) {
                     yAmount: item.yAmount   //经济舱全价
                 }
             };
-
             if (!meiya.flightPriceInfoList) {
-
                 console.log("not have flightPriceInfoList");
                 continue;
             }
@@ -184,20 +186,17 @@ export function compareFlightData(origin, meiyaData) {
                         priceId: flightPrice.priceID
                     }
                 };
-
                 for (let key in MPlaneLevel) {
                     if (MPlaneLevel[key] == flightPrice.cabin) {
                         agentCabin.name = Number(key);
                     }
                 }
-
                 agentMeiya.cabins.push(agentCabin);
             }
 
             item.agents.push(agentMeiya);
         }
     }
-
     return origin;
 }
 
@@ -209,27 +208,29 @@ export function compareFlightData2( meiyaData, origin ) {
 
 export function compareTrainData(origin, meiyaData) {
     console.log("compareTrainData meiyaData.length===>", meiyaData.length);
+    if(!origin || typeof(origin) == 'undefined'){
+        return [];
+    }
+    if(!meiyaData || typeof(meiyaData) == 'undefined'){
+        return origin;
+    }
     for (let item of origin) {
         if (item.type != 0) {
             continue;
         }
-
         for (let trian of meiyaData) {
             if (item.No != trian.TrainNumber) {
                 continue;
             }
-
             let agentMeiya = {
                 name: "meiya",
                 cabins: [],
                 other: {
                 }
             };
-
             if (!trian.SeatList) {
                 continue;
             }
-
             console.log("meiyaTrain in:", item.No);
             for (let trianSeat of trian.SeatList) {
                 let agentCabin = {
@@ -259,7 +260,29 @@ export function compareTrainData(origin, meiyaData) {
 
 export function compareHotelData(origin, meiyaData) {
     console.log("compareHotelData meiyaData.length==== >  ", meiyaData.length);
+    if(!origin || typeof(origin) == 'undefined'){
+        return [];
+    }
+    if(!meiyaData || typeof(meiyaData) == 'undefined'){
+        return origin;
+    }
+    let i = 0;
     for (let item of origin) {
+        // for( i = 0; i < meiyaData; i++) {
+        //     let meiya = meiyaData[i];
+        //     if (meiya.cnName != item.name) {
+        //         continue;
+        //     }
+        //     console.log("meiyaHotel in:", meiya.cnName);
+        //     let price = Math.ceil(Math.random() * 500) + 300;
+        //     let agentMeiya = {
+        //         name: "meiya",
+        //         price,
+        //         urlParams: {
+        //             hotelId: meiya.hotelId
+        //         }
+        //     }
+        // }
         for (let meiya of meiyaData) {
             if (meiya.cnName != item.name) {
                 continue;

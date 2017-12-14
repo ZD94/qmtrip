@@ -6,8 +6,10 @@ import { Models } from "_types";
 var request = require("request-promise");
 var path = require("path");
 var _ = require("lodash");
+var cors = require('cors');
 const config = require("@jingli/config");
 const API = require("@jingli/dnode-api");
+const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST']} 
 class Proxy {
     /**
      * @method 注册获取订单详情事件
@@ -15,7 +17,13 @@ class Proxy {
      * @return {}
      */
     static __initHttpApp(app: Express){
-        app.all(/order.*/, async (req: Request, res: Response, next: Function) => {
+        app.options(/order*/, cors(corsOptions), (req: Request, res: Response, next: Function) => {         
+            return res.sendStatus(200);
+        })
+        app.all(/order.*/, cors(corsOptions), async (req: Request, res: Response, next: Function) => {
+            if(req.method == 'OPTIONS') {
+                next();
+            }
             let authstr = req.query.authstr;
             if(!authstr || typeof authstr == 'undefined') 
                 authstr = req.body.authstr;
@@ -26,12 +34,7 @@ class Proxy {
                 res.sendStatus(401);
                 return; 
             }
-            if(req.method == 'OPTIONS') {
-                // let referer = req.headers['referer'];
-                // res.header('Access-Control-Allow-Origin', referer);
-                // res.header('Access-Control-Allow-Credentials', 'true');
-                return res.sendStatus(200);
-            }
+
             let {tripDetailId} = req.query;
             if(!tripDetailId || typeof tripDetailId == undefined)
                 tripDetailId = req.body.tripDetailId;
@@ -49,7 +52,7 @@ class Proxy {
             let addon:{[index: string]: any} = {
                 staffID: staff.id,
                 companyID: staff.companyId,
-                listeningOn: `${config.orderSysConfig.tripDetailMonitorUrl}${tripDetail.id}`
+                listeningon: `${config.orderSysConfig.tripDetailMonitorUrl}${tripDetail.id}`
             };
             let headers: {[index: string]: any} = {
                auth: req.headers['auth'],

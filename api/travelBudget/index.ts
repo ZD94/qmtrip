@@ -96,9 +96,10 @@ export default class ApiTravelBudget {
 
         //检查是否需要美亚数据，返回美亚数据
         let needMeiya = await meiyaJudge();
-        let commonData;
-        if (!needMeiya) {
-            commonData = await API.budget.getHotelsData(params);
+        let commonData = await API.budget.getHotelsData(params); 
+        if(!commonData || typeof commonData == 'undefined')
+            return [];
+        if (!needMeiya) {            
             return commonData;
         }
 
@@ -107,7 +108,8 @@ export default class ApiTravelBudget {
             return require("meiyaFake/finallyUsingHotel");
         } else {
             let meiyaHotel = await getMeiyaHotelData(params);
-            compareHotelData(commonData, meiyaHotel);
+            if(meiyaHotel && meiyaHotel.length)
+                commonData = compareHotelData(commonData, meiyaHotel);
             // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".finallyHotel.json", commonData);
             return commonData;
         }
@@ -118,9 +120,10 @@ export default class ApiTravelBudget {
 
         //检查是否需要美亚数据，返回美亚数据
         let needMeiya = await meiyaJudge();
-        let commonData;
-        if (!needMeiya) {
-            commonData = await API.budget.getTrafficsData(params);
+        let commonData = await API.budget.getTrafficsData(params);
+        if(!commonData || typeof commonData == 'undefined')
+            return [];
+        if (!needMeiya) {   
             return commonData;
         }
 
@@ -134,8 +137,10 @@ export default class ApiTravelBudget {
             ]);
             let meiyaTrain = arr[0];
             let meiyaFlight = arr[1];
-            compareFlightData(commonData, meiyaFlight);
-            compareTrainData(commonData, meiyaTrain);
+            if(meiyaFlight && meiyaFlight.length)
+                commonData = compareFlightData(commonData, meiyaFlight);
+            if(meiyaTrain && meiyaTrain.length)
+                commonData = compareTrainData(commonData, meiyaTrain);
             // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".meiyaTrain.json", meiyaTrain);
             // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".meiyaFlight.json", meiyaFlight);
             // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".finallyTraffic.json", commonData);
