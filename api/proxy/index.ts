@@ -27,9 +27,9 @@ class Proxy {
                 return; 
             }
             if(req.method == 'OPTIONS') {
-                let referer = req.headers['referer'];
-                res.header('Access-Control-Allow-Origin', referer);
-                res.header('Access-Control-Allow-Credentials', 'true');
+                // let referer = req.headers['referer'];
+                // res.header('Access-Control-Allow-Origin', referer);
+                // res.header('Access-Control-Allow-Credentials', 'true');
                 return res.sendStatus(200);
             }
             let {tripDetailId} = req.query;
