@@ -31,7 +31,7 @@ import { getSession } from "@jingli/dnode-api";
 import {AgencyUser} from "_types/agency";
 import {makeSpendReport} from './spendReport';
 import fs = require("fs");
-import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice, InvoiceFeeTypeNames, ProjectStaff, ProjectBudgetLog} from "_types/tripPlan";
+import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice, InvoiceFeeTypeNames, ProjectStaff} from "_types/tripPlan";
 import {ENoticeType} from "_types/notice/notice";
 import TripApproveModule = require("../tripApprove/index");
 import {MPlaneLevel, MTrainLevel} from "_types";
@@ -1006,86 +1006,6 @@ class TripPlanModule {
     }
 
     /****************************************ProjectStaff end************************************************/
-
-    /****************************************ProjectBudgetLog begin************************************************/
-
-    /**
-     * 创建项目预算记录
-     * @param data
-     * @returns {*}
-     */
-    @clientExport
-    static async createProjectBudgetLog (params) : Promise<ProjectBudgetLog>{
-        var projectBudgetLog = ProjectBudgetLog.create(params);
-        var result = await projectBudgetLog.save();
-        return result;
-    }
-
-
-    /**
-     * 删除项目预算记录
-     * @param params
-     * @returns {*}
-     */
-    @clientExport
-    @requireParams(["id"])
-    static async deleteProjectBudgetLog(params) : Promise<any>{
-        var id = params.id;
-        var ah_delete = await Models.projectBudgetLog.get(id);
-
-        await ah_delete.destroy();
-        return true;
-    }
-
-
-    /**
-     * 更新项目预算记录
-     * @param id
-     * @param data
-     * @returns {*}
-     */
-    @clientExport
-    static async updateProjectBudgetLog(params) : Promise<ProjectBudgetLog>{
-        var id = params.id;
-
-        var ah = await Models.projectBudgetLog.get(id);
-        for(var key in params){
-            ah[key] = params[key];
-        }
-        return ah.save();
-    }
-
-    /**
-     * 根据id查询项目预算记录
-     * @param {String} params.id
-     * @returns {*}
-     */
-    @clientExport
-    @requireParams(["id"])
-    static async getProjectBudgetLog(params: {id: string}) : Promise<ProjectBudgetLog>{
-        let id = params.id;
-        var ah = await Models.projectBudgetLog.get(id);
-
-        return ah;
-    };
-
-
-    /**
-     * 根据属性查找项目预算记录
-     * @param params
-     * @returns {*}
-     */
-    @clientExport
-    static async getProjectBudgetLogs(params): Promise<FindResult>{
-        var staff = await Staff.getCurrent();
-        let paginate = await Models.projectBudgetLog.find(params);
-        let ids =  paginate.map(function(t){
-            return t.id;
-        })
-        return {ids: ids, count: paginate['total']};
-    }
-
-    /****************************************ProjectBudgetLog end************************************************/
 
 
     /**
