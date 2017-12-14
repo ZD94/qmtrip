@@ -29,6 +29,13 @@
       "port": 14203
     }
   },
+  "api_test": {
+    "postgres": "${{postgres.url}}",
+    "remotes": [{
+      "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
+      "modules": ["attachments", "checkcode", "ctripapi", "dida", "flight", "jpush", "wechat", "sms"]
+      }]
+  },
   "api": {
     "postgres": "${{postgres.url}}",
     "remotes": [
@@ -139,5 +146,10 @@
     "appSecret": "${JL_APP_CLOUD_APP_SECRET}"
   },
   "tmcUrl": "${JL_APP_TMC}",
-  "tmcFake": "${JL_APP_TMC_FAKE}"
+  "tmcFake": "${JL_APP_TMC_FAKE}",
+  "orderSysConfig": {
+    "tripDetailMonitorUrl": "${JL_APP_TD_MONITORURL}",
+    "orderLink": "${JL_APP_ORDER_LINK}"
+  }
+
 }

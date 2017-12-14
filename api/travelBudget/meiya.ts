@@ -51,12 +51,12 @@ export async function getMeiyaFlightData(params: ISearchTicketParams) {
         arrivalCode,
         depDate: moment(params.leaveDate).format("YYYY-MM-DD")
     };
-    let urlFlight = config.tmcUrl + "/searchflight/getlist/" + `${departureCode}/${arrivalCode}/${meiyaParam.depDate}`;
+    let urlFlight = config.orderSysConfig.orderLink + "/searchflight/getlist/" + `${departureCode}/${arrivalCode}/${meiyaParam.depDate}`;
     console.log("urlFlight====>", urlFlight);
     let meiyaResult = await request({
         url: urlFlight,
         method: "get",
-        qs: meiyaParam,
+        // qs: meiyaParam,
         headers: {
             auth: meiyaAuth(),
             supplier: "meiya"
@@ -83,12 +83,12 @@ export async function getMeiyaTrainData(params: ISearchTicketParams) {
         arrCity: encodeURIComponent(arrival.name),
         depDate: moment(params.leaveDate).format("YYYY-MM-DD")
     };
-    let urlTrain = config.tmcUrl + "/searchTrains/getlist" + `/${meiyaParam.depCity}/${meiyaParam.arrCity}/${meiyaParam.depDate}`;
+    let urlTrain = config.orderSysConfig.orderLink + "/searchTrains/getlist" + `/${meiyaParam.depCity}/${meiyaParam.arrCity}/${meiyaParam.depDate}`;
     console.log("urlTrain=====>", urlTrain);
     let meiyaResult = await request({
         url: urlTrain,
         method: "get",
-        qs: meiyaParam,
+        // qs: meiyaParam,
         headers: {
             auth: meiyaAuth(),
             supplier: "meiya"
@@ -111,7 +111,7 @@ export async function getMeiyaHotelData(params: ISearchHotelParams) {
     params.checkInDate = moment(params.checkInDate).format("YYYY-MM-DD");
     params.checkOutDate = moment(params.checkOutDate).format("YYYY-MM-DD");
     let urlHotel = `${encodeURIComponent(destination.name)}/${params.checkInDate}/${params.checkOutDate}`;
-    urlHotel = config.tmcUrl + "/searchhotel/getList/" + urlHotel;
+    urlHotel = config.orderSysConfig.orderLink + "/searchhotel/getList/" + urlHotel;
     let meiyaResult = await request({
         url: urlHotel,
         method: "get",
