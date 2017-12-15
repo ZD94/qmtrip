@@ -335,3 +335,101 @@ export function compareHotelData(origin, meiyaData) {
         //         }
         //     }
         // }
+
+export interface IMeiyaFlightPriceInfo {
+    airPortFree?: number;
+    airlineYouHui?: number;
+    airlineYouHuiAmount?: number;
+    amount?: number;
+    cabin?: string;
+    cabinType?: string;
+    discount?: number,
+    flightID?: string;
+    meiYaYouHui?: number;
+    oilFree?: number;
+    policyList?: any;
+    priceID?: string;
+    protocolType?: number;
+    refundChangeInfo?: string;
+    seatNum?: string;
+    serviceAmount?: number;
+    ticketPrice?: number;
+    violate?: number;
+    price?: number;
+}
+export interface IMeiyaFlight {
+    airlineCode?: string;
+    arrDate?: string;
+    arrTerm?: string;
+    arrTime?: string;
+    cAmount?: number;
+    carrier?: string;
+    depDate?: string;
+    depTime?: string;
+    desAirport?: string;
+    fAmount?: number;
+    flightNo: number;
+    flightPriceInfoList?: Array<IMeiyaFlightPriceInfo>;
+    isCodeShare?: boolean;
+    meal?: boolean;
+    orgAirport?: string;
+    planeMode?: string;
+    resultID?: string;
+    segmentID?: string;
+    stopNumber?: number;
+    yAmount?: number;
+    airline?: string;
+    arrival?: string;
+    arrivalCode?: string;
+    departure?: string;
+    departureCode?: string;
+}
+
+export interface IMeiyaTrainSeat {
+    SeatName: string;
+    SeatPrice: string;
+    IsBookable: boolean
+}
+
+export interface IMeiyaTrain {
+    TrainNumber: string;
+    SeatList: Array<IMeiyaTrainSeat>;
+    ServicePrice?: number;
+    DepDate?: string;
+    ArrDate?: string;
+    DepStation?: string;
+    ArrStation?: string;
+}
+
+export interface IMeiyaHotel {
+    cnName: string;
+    hotelId: string;
+    enName?: string;
+    address?: string;
+    starRating?: number
+    mobile?: string
+    otherName?: string;
+    hotelUrl?: string;
+    hotelOpeningTime?: string|Date;
+    hotelDecorationTime?: string|Date;
+    RecommendCode?: string;
+    hotelBusinessCircle?: any;
+    hotelPictureList?: any;
+    postalCode?: string;
+    longitude?: string;
+    latitude?: string;
+    hotelFax?: string;
+    groupName?: string;
+    hotelBrand?: null
+    supportCARDSCodeList?: any;
+    generalAmenities?: any;
+    roomAmenities?: any;
+    recreationAmenities?: any;
+    conferenceAmenities?: any
+    diningAmenities?: any;
+    description?: string;
+    location?: any; 
+    hotelRoomList?: any;
+    strHotelTrafficInformation?: any;
+
+}
