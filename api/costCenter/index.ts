@@ -2,7 +2,7 @@
 import {Models} from "_types/index";
 var request = require("request-promise");
 import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
-import { BudgetLog, CostCenter } from "_types/costCenter";
+import { BudgetLog, CostCenter, CostCenterDeploy } from "_types/costCenter";
 import {FindResult} from "common/model/interface";
 
 export class CostCenterModule{
@@ -81,6 +81,85 @@ export class CostCenterModule{
         })
         return {ids: ids, count: paginate['total']};
     }
+
+    /****************************************CostCenterDeploy begin************************************************/
+
+    /**
+     * 创建成本中心配置记录
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    async createCostCenterDeploy (params) : Promise<CostCenterDeploy>{
+        var costCenterDeploy = CostCenterDeploy.create(params);
+        var result = await costCenterDeploy.save();
+        return result;
+    }
+
+
+    /**
+     * 删除成本中心配置记录
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    async deleteCostCenterDeploy(params) : Promise<any>{
+        var id = params.id;
+        var ah_delete = await Models.costCenterDeploy.get(id);
+
+        await ah_delete.destroy();
+        return true;
+    }
+
+
+    /**
+     * 更新成本中心配置记录
+     * @param id
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    async updateCostCenterDeploy(params) : Promise<CostCenterDeploy>{
+        var id = params.id;
+
+        var ah = await Models.costCenterDeploy.get(id);
+        for(var key in params){
+            ah[key] = params[key];
+        }
+        return ah.save();
+    }
+
+    /**
+     * 根据id查询成本中心配置记录
+     * @param {String} params.id
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    async getCostCenterDeploy(params: {id: string}) : Promise<CostCenterDeploy>{
+        let id = params.id;
+        var ah = await Models.costCenterDeploy.get(id);
+
+        return ah;
+    };
+
+
+    /**
+     * 根据属性查找成本中心配置记录
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    async getCostCenterDeploys(params): Promise<FindResult>{
+        let paginate = await Models.costCenterDeploy.find(params);
+        let ids =  paginate.map(function(t){
+            return t.id;
+        })
+        return {ids: ids, count: paginate['total']};
+    }
+
+    /****************************************CostCenterDeploy end************************************************/
 
     /****************************************BudgetLog begin************************************************/
 
