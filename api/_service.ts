@@ -9,7 +9,7 @@ import { PromoCode } from '_types/promoCode';
 import { AccordHotel } from '_types/accordHotel';
 import { Notice, NoticeAccount } from '_types/notice';
 import { Agency, AgencyUser } from '_types/agency';
-import { CostCenter, BudgetLog } from '_types/costCenter';
+import { CostCenter, BudgetLog, CostCenterDeploy } from '_types/costCenter';
 import {
     TripPlan, TripDetail, TripDetailStaff, Project, TripPlanLog, FinanceCheckCode,
     TripDetailInvoice, TripDetailTraffic, TripDetailHotel, Offline
@@ -88,6 +88,7 @@ initModels({
     eventListener: createServerService<EventListener>(EventListener),
     budgetLog: createServerService<BudgetLog>(BudgetLog),
     costCenter: createServerService<CostCenter>(CostCenter),
+    costCenterDeploy: createServerService<CostCenterDeploy>(CostCenterDeploy),
 
     url: createServerService<Url>(Url),
     emailQueue: createServerService<EmailQueue>(EmailQueue),
