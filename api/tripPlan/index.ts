@@ -1510,8 +1510,8 @@ class TripPlanModule {
         }
         tripPlan.arrivalCityCodes = JSON.stringify(arrivalCityCodes);
 
-        if(query.budgetCollectionType && query.budgetCollectionType == "project"){
-            tripPlan.budgetCollectionType = EBudgetCollectionType.PROJECT;
+        if(query.costCenterId){
+            tripPlan.costCenterId = query.costCenterId;
         }
         tripPlan.setCompany(account.company);
         tripPlan.auditUser = tryObjId(approveUser);

@@ -22,6 +22,7 @@ export var NoCityPriceLimit = 0;
 const DefaultCurrencyUnit = 'CNY';
 import { restfulAPIUtil } from "api/restful";
 import { meiyaJudge, getMeiyaFlightData, getMeiyaTrainData, writeData, compareFlightData, compareTrainData, getMeiyaHotelData, compareHotelData } from "./meiya";
+import {ECostCenterType} from "../../_types/costCenter/costCenter";
 
 const cloudAPI = require('@jingli/config').cloudAPI;
 const cloudKey = require('@jingli/config').cloudKey;
@@ -254,11 +255,15 @@ export default class ApiTravelBudget {
         }
         params.travelPolicyId = travelPolicy.id;
 
-        if(params.budgetCollectionType && params.budgetCollectionType == "project"){
-            let pts = await Models.projectStaffTravelPolicy.all({where: {staffId: staffId, projectId: params.projectId}, order: [['createdAt', 'desc']]});
-            if(pts && pts.length){
-                params.travelPolicyId = pts[0].travelPolicyId;
+        if(params.costCenterId){
+            let cc = await Models.costCenter.get(params.costCenterId);
+            if(cc.type == ECostCenterType.PROJECT){
+                let pts = await Models.projectStaffTravelPolicy.all({where: {staffId: staffId, projectId: params.projectId}, order: [['createdAt', 'desc']]});
+                if(pts && pts.length){
+                    params.travelPolicyId = pts[0].travelPolicyId;
+                }
             }
+
         }
 
         if (!params.staffList) {
