@@ -126,7 +126,7 @@ export default class ApiTravelBudget {
         if (!needMeiya) {   
             return commonData;
         }
-
+        console.log("commonData ===> commonData data.", commonData.length)
         if (config.tmcFake == 1) {
             console.log("getTrafficsData ===> fake data.")
             return require("meiyaFake/finallyUsingTraffic");
@@ -137,6 +137,12 @@ export default class ApiTravelBudget {
             ]);
             let meiyaTrain = arr[0];
             let meiyaFlight = arr[1];
+            console.log("meiyaFlight ===> meiyaFlight data.", meiyaFlight.length)
+            console.log("meiyaTrain ===> meiyaTrain data.", meiyaTrain.length)
+            var fs = require("fs");
+            fs.writeFileSync("./common.json", JSON.stringify(commonData), 'utf-8')
+            fs.writeFileSync("./flight.json", JSON.stringify(meiyaFlight), 'utf-8')
+            fs.writeFileSync("./train.json", JSON.stringify(meiyaTrain), 'utf-8')
             if(meiyaFlight && meiyaFlight.length)
                 commonData = compareFlightData(commonData, meiyaFlight);
             if(meiyaTrain && meiyaTrain.length)
@@ -144,6 +150,7 @@ export default class ApiTravelBudget {
             // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".meiyaTrain.json", meiyaTrain);
             // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".meiyaFlight.json", meiyaFlight);
             // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".finallyTraffic.json", commonData);
+            console.log("commonData ===> commonData data.", typeof(commonData))
             return commonData;
         }
     }

@@ -76,6 +76,9 @@ class Proxy {
             pathstring = pathstring.replace("/order", '');
             let url = `${config.orderSysConfig.orderLink}${pathstring}`;
             let result:any;
+            console.log("===========url: ", url);
+            console.log("==========method, ", req.method)
+            console.log("==========method, ", req.body)
             try{
                 result = await request(url, {
                     headers,
@@ -86,12 +89,13 @@ class Proxy {
             }catch(err) {
                 if(err) {
                     console.log("请求预定错误: ", err)
-                    return res.sendStatus(500);
+                    return null;
                 }  
             }
+            console.log("========================> result.", result)
             if(!result) 
                 res.json(null);
-            res.json(result.data);
+            res.json(result);
 
         }); 
     }
