@@ -4,11 +4,12 @@ var request = require("request-promise");
 import { clientExport, requireParams } from "@jingli/dnode-api/dist/src/helper";
 import { BudgetLog, CostCenter, CostCenterDeploy, ECostCenterType } from "_types/costCenter";
 import { FindResult } from "common/model/interface";
-import { findParentManagers } from 'api/department';
+import { findParentManagers, findChildren } from 'api/department';
 import { Department } from '_types/department';
 import { EStaffRole } from '_types/staff';
 import { DB } from '@jingli/database';
 const API = require('@jingli/dnode-api');
+const _ = require('lodash/fp')
 
 export default class CostCenterModule {
 
@@ -266,15 +267,37 @@ export default class CostCenterModule {
     }
 
     @clientExport
-    static async changeBudget(budgets: any[]) {
-        for (let budget of budgets) {
-            const cost = await Models.costCenterDeploy.get(budget.id)
-            const childrenExpend = await getChildrenExpend(budget.id)
-            if (cost.selfBudget + childrenExpend == cost.totalBudget) {
-                cost.selfTempBudget = budget.selfTempBudget
-                await cost.save()
-            }
+    static async changeBudget(root: string, budgets: any[]) {
+        const tempSum = _.sum(_.map(_.prop('selfTempBudget'), budgets))
+        const rootCost = await Models.costCenterDeploy.get(root)
+        if (tempSum != rootCost.totalTempBudget) return
+
+        for (let b of budgets) {
+            const cost = await Models.costCenterDeploy.get(b.id)
+            cost.selfTempBudget = b.selfTempBudget
+            await cost.save()
         }
+    }
+
+    @clientExport
+    static async applyConf(costId: string) {
+        const root = await Models.costCenterDeploy.get(costId)
+        let totalBudget = 0
+        const children = await findChildren(costId)
+        for (let c of children) {
+            const cost = await Models.costCenterDeploy.get(c.id)
+            cost.selfBudget = cost.selfTempBudget
+            const cs = await c.getChildDepartments()
+            if (cs.length <= 0) {
+                cost.totalBudget = cost.selfTempBudget
+            } else {
+                cost.totalBudget = await getSelfTempBudgetSumOf(cs.map(c => c.id)) + cost.selfTempBudget
+            }
+            totalBudget += cost.totalBudget
+            await cost.save()
+        }
+        root.totalBudget = totalBudget
+        await root.save()
     }
 
     @clientExport
@@ -293,13 +316,21 @@ export default class CostCenterModule {
 }
 
 async function getChildrenExpend(deptId: string) {
-    const childrenIds = await await getChildrenDeptIds(deptId)
+    const childrenIds = await await getChildrenDeptIds(deptId, )
     return await getSelfTempBudgetSumOf(childrenIds)
 }
 
-async function getChildrenDeptIds(deptId: string): Promise<string[]> {
-    const sql = `select id from department.departments where parent_id = '${deptId}'`
-    return (await DB.query(sql))[0].map(d => d.id)
+
+async function getChildrenDeptIds(parentId: string, except?: string): Promise<string[]> {
+    const $and = except && { id: { $ne: except } }
+    const departments = await Models.department.find({
+        where: {
+            parent_id: parentId,
+            $and
+        },
+        attributes: ['id']
+    })
+    return departments.map(d => d.id)
 }
 
 async function getSelfTempBudgetSumOf(costIds: string[]) {
