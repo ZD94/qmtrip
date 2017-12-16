@@ -11,6 +11,7 @@ var _ = require("lodash");
 var cors = require('cors');
 const config = require("@jingli/config");
 const API = require("@jingli/dnode-api");
+var timeout = require('connect-timeout')
 const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'Content-Type,auth,supplier'} 
 function resetTimeout(req, res, next){
     req.clearTimeout();
@@ -27,7 +28,7 @@ class Proxy {
         app.options(/order*/, cors(corsOptions), (req: Request, res: Response, next: Function) => {         
             return res.sendStatus(200);
         })
-        app.all(/order.*/, cors(corsOptions),resetTimeout, async (req: Request, res: Response, next: Function) => {
+        app.all(/order.*/, cors(corsOptions),timeout('120s'), async (req: Request, res: Response, next: Function) => {
             if(req.method == 'OPTIONS') {
                 return next();
             }
