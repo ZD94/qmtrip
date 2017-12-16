@@ -99,6 +99,7 @@ class Proxy {
             console.log("========================> result.", result)
             if(!result) 
                 res.json(null);
+            //一下可要，可不要，具体需要对是否回调，哪些接口会回调做判断
             if(result.code == 0 && result.data && result.data.orderNos && !tripDetail.orderNo){  //&& result.data.orderN
                 if(result.data.orderNos instanceof Array) {  
                     tripDetail.reserveStatus = EOrderStatus.await_auditing;  //飞机的orderNos为数组
