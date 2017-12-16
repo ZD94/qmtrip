@@ -5,6 +5,7 @@ import { Staff } from "_types/staff";
 import { Models } from "_types";
 import { EOrderStatus } from "_types/tripPlan";
 var request = require("request-promise");
+var requestp = require("request");
 var path = require("path");
 var _ = require("lodash");
 var cors = require('cors');
@@ -84,12 +85,31 @@ class Proxy {
             console.log("==========method, ", req.method)
             console.log("==========method, ", req.body)
             try{
-                result = await request(url, {
-                    headers,
-                    body,
-                    json: true,
-                    method: req.method
+                result = await new Promise((resolve,reject) => {  //request-promise 无法设置超时
+                    requestp({
+                        url,
+                        headers,
+                        body,
+                        json: true,
+                        method: req.method,
+                        timeout: 300*1000
+                    }, (err, res, body) => {
+                        if(err) {
+                            console.log("-=========>err: ", err);
+                            reject(err)
+                        }
+                        resolve(body);
+                    })
+
                 });
+
+                // result = await request(url, {
+                //     headers,
+                //     body,
+                //     json: true,
+                //     method: req.method,
+                //     timeout: 500*1000
+                // });
             }catch(err) {
                 if(err) {
                     console.log("请求预定错误: ", err)
@@ -98,7 +118,7 @@ class Proxy {
             }
             console.log("========================> result.", result)
             if(!result) 
-                res.json(null);
+                return res.json(null);
             //一下可要，可不要，具体需要对是否回调，哪些接口会回调做判断
             if(result.code == 0 && result.data && result.data.orderNos && !tripDetail.orderNo){  //&& result.data.orderN
                 if(result.data.orderNos instanceof Array) {  
@@ -111,12 +131,7 @@ class Proxy {
   
                 await tripDetail.save();
             }
-            // if(result.code == 0 && result.data && result.data.orderNos && !tripDetail.orderNo){  //&& result.data.orderN
-               
-            //     await tripDetail.save();
-            // }
-
-            res.json(result);
+            return res.json(result);
 
         }); 
     }
