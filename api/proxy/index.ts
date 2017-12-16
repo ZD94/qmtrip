@@ -12,6 +12,11 @@ var cors = require('cors');
 const config = require("@jingli/config");
 const API = require("@jingli/dnode-api");
 const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'Content-Type,auth,supplier'} 
+function resetTimeout(req, res, next){
+    req.clearTimeout();
+    next();
+    //conn_timeout('180s')(req, res, next);
+}
 class Proxy {
     /**
      * @method 注册获取订单详情事件
@@ -22,7 +27,7 @@ class Proxy {
         app.options(/order*/, cors(corsOptions), (req: Request, res: Response, next: Function) => {         
             return res.sendStatus(200);
         })
-        app.all(/order.*/, cors(corsOptions), async (req: Request, res: Response, next: Function) => {
+        app.all(/order.*/, cors(corsOptions),resetTimeout, async (req: Request, res: Response, next: Function) => {
             if(req.method == 'OPTIONS') {
                 return next();
             }
@@ -101,7 +106,7 @@ class Proxy {
                         body,
                         json: true,
                         method: req.method,
-                        timeout: 300*1000
+                        timeout: 120*1000
                     }, (err, res, body) => {
                         if(err) {
                             console.log("-=========>err: ", err);
