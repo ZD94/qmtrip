@@ -87,6 +87,13 @@ class Proxy {
             console.log("==========method, ", req.method)
             console.log("==========method, ", req.body)
             try{
+                // result = await request(url, {
+                //     headers,
+                //     body,
+                //     json: true,
+                //     method: req.method,
+                //     timeout: 500*1000
+                // });
                 result = await new Promise((resolve,reject) => {  //request-promise 无法设置超时
                     requestp({
                         url,
@@ -102,14 +109,6 @@ class Proxy {
                         }
                         resolve(body);
                     });
-                // result = await request(url, {
-                //     headers,
-                //     body,
-                //     json: true,
-                //     method: req.method,
-                //     timeout: 500*1000
-                // });
-
                 });
             }catch(err) {
                 if(err) {
@@ -120,16 +119,23 @@ class Proxy {
             console.log("========================> result.", result)
             if(!result) 
                 return res.json(null);
-            //一下可要，可不要，具体需要对是否回调，哪些接口会回调做判断
-            if(result.code == 0 && result.data && result.data.orderNos && !tripDetail.orderNo){  //&& result.data.orderN
-                if(result.data.orderNos instanceof Array) {  
+            //以下可要，可不要，具体需要对是否回调，哪些接口会回调做判断
+            if(typeof result == 'string') {
+                result = JSON.parse(result);
+            }
+            if(result.code == 0 && result.data && !tripDetail.orderNo){  //&& result.data.orderN
+                if(result.data.orderNos && typeof(result.data.orderNos) != 'undefined'){
                     tripDetail.reserveStatus = EOrderStatus.await_auditing;  //飞机的orderNos为数组
                     tripDetail.orderNo = result.data.orderNos[0];
-                } else {
-                    tripDetail.reserveStatus = EOrderStatus.await_auditing;   //酒店的orderNo为string
-                    tripDetail.orderNo = result.data.orderNos;
                 }
-  
+                if(result.data.OrderNo && typeof(result.data.OrderNo) != 'undefined') {  
+                    tripDetail.reserveStatus = EOrderStatus.await_auditing;  //飞机的orderNos为数组
+                    tripDetail.orderNo = result.data.OrderNo;
+                }  
+                if(result.data.orderNo && typeof(result.data.orderNo) != 'undefined') {  
+                    tripDetail.reserveStatus = EOrderStatus.await_auditing;   //酒店的orderNo为string
+                    tripDetail.orderNo = result.data.orderNo;
+                }
                 await tripDetail.save();
             }
             return res.json(result);
