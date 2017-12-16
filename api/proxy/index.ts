@@ -10,7 +10,7 @@ var _ = require("lodash");
 var cors = require('cors');
 const config = require("@jingli/config");
 const API = require("@jingli/dnode-api");
-const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST'], allowedHeaders: 'Content-Type,auth,supplier'} 
+const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'Content-Type,auth,supplier'} 
 class Proxy {
     /**
      * @method 注册获取订单详情事件
@@ -23,7 +23,7 @@ class Proxy {
         })
         app.all(/order.*/, cors(corsOptions), async (req: Request, res: Response, next: Function) => {
             if(req.method == 'OPTIONS') {
-                next();
+                return next();
             }
             let authstr = req.query.authstr;
             if(!authstr || typeof authstr == 'undefined') 
