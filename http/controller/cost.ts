@@ -19,9 +19,15 @@ export default class CostController extends AbstractController {
         res.json(this.reply(0, null))
     }
 
-    @Router('/change', 'PUT')
+    @Router('/change/:id', 'PUT')
     async changeCost(req, res, next) {
-        await API['costCenter'].changeBudget(req.body)
+        await API['costCenter'].changeBudget(req.params.id, req.body)
+        res.json(this.reply(0, null))
+    }
+
+    @Router('/apply/:id', 'PUT')
+    async applyConf(req, res, next) {
+        await API['costCenter'].applyConf(req.params.id)
         res.json(this.reply(0, null))
     }
 
