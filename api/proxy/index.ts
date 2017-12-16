@@ -28,7 +28,7 @@ class Proxy {
         app.options(/order*/, cors(corsOptions), (req: Request, res: Response, next: Function) => {         
             return res.sendStatus(200);
         })
-        app.all(/order.*/, cors(corsOptions),timeout('120s'), async (req: Request, res: Response, next: Function) => {
+        app.all(/order.*/, cors(corsOptions),resetTimeout, timeout('120s'), async (req: Request, res: Response, next: Function) => {
             if(req.method == 'OPTIONS') {
                 return next();
             }
