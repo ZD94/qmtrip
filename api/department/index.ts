@@ -12,6 +12,7 @@ import { Models } from '_types/index';
 import { FindResult, PaginateInterface } from "common/model/interface";
 import { Staff, EStaffStatus, EStaffRole } from "_types/staff";
 import { conditionDecorator, condition } from "../_decorator";
+import { EAudienceType } from 'api/costCenter';
 
 const departmentCols = Department['$fieldnames'];
 const staffDepartmentCols = StaffDepartment['$fieldnames'];
@@ -451,42 +452,6 @@ export default class DepartmentModule {
     }
 
     @clientExport
-    static async setDeptBudget(deptId: string, budget: number, operator: string) {
-        const dept = await Models.department.get(deptId)
-        if (!dept) throw new L.ERROR_CODE_C(404, '未找到该部门')
-
-        const budgetChange = BudgetChange.create({
-            operator,
-            department: deptId,
-            oldBudget: dept.budget || 0,
-            newBudget: budget
-        })
-
-        if (dept.parent && dept.parent.budget) {
-            // 兄弟部门的预算
-            const siblingBudget = await DepartmentModule.getChildrenDeptBudget(dept.parent.id)
-            // 超出上级部门预算
-            if (budget > dept.parent.budget - siblingBudget)
-                throw new L.ERROR_CODE_C(400, '超出上级部门预算')
-        }
-
-        // 子部门预算
-        const subBudget = await DepartmentModule.getChildrenDeptBudget(deptId)
-
-        if (budget >= subBudget) {
-            dept.budget = budget
-            await budgetChange.save()
-            await dept.save()
-            return
-        }
-
-        dept.budget = subBudget
-        budgetChange.newBudget = subBudget
-        await budgetChange.save()
-        await dept.save()
-    }
-
-    @clientExport
     static async setDeptBudgetEarlyWarning(deptId: string, limitedUse: number, type: number, audienceTypes: number[]) {
         const dept = await Models.department.get(deptId)
         if (!dept) throw new L.ERROR_CODE_C(404, '未找到该部门')
@@ -509,13 +474,6 @@ export default class DepartmentModule {
                 audiences.push(finances[0].id)
             }
         }
-
-        const earlyWarning: EarlyWarning = {
-            type, limitedUse, audiences, hasSent: false
-        }
-
-        dept.earlyWarning = earlyWarning
-        await dept.save()
     }
 
     @clientExport
