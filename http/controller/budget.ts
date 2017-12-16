@@ -62,6 +62,16 @@ export class BudgetController extends AbstractController {
         res.json(this.reply(0, result));
     }
 
+    @Router('/updateBudget/:approveId', 'POST') 
+    async updateBudget(req, res, next) {
+        let _budgets = req.body.budgets;
+
+        let approveId = req.params.approveId;
+        let updateBudget = await API['travelBudget'].updateBudget({approveId: approveId, budgets: _budgets});
+        return res.json(this.reply(0, updateBudget));
+
+    }
+
     @Router('/getBudgetInfo', "POST")
     async getBudgetInfo(req, res, next){
         let body = req.body;
