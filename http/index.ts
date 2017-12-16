@@ -54,6 +54,7 @@ export async function initHttp(app) {
     // router.param("companyId", validCompanyId);
     // app.use('/api/v1', allowCrossDomain, router);
     // app.use('/api/v1', authenticate, router);
+
     conf.setConfig(5 * 60 * 1000, [], cache, getAppSecretByAppId)
     app.use('/api/v1', jlReply)
     app.use('/api/v1', allowCrossDomain);
