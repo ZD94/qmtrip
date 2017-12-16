@@ -240,10 +240,10 @@ export function compareTrainData(origin, meiyaData) {
         for(let train of meiyaData) {
             if(!train.TrainNumber) continue;
             //用于测试，需要删除
-            if(train.No && train.TrainNumber && train.No.trim() != train.TrainNumber.trim()) 
-                continue ;
-            // if(item.No && train.TrainNumber && item.No.trim() != train.TrainNumber.trim()) 
+            // if(train.No && train.TrainNumber && train.No.trim() != train.TrainNumber.trim()) 
             //     continue ;
+            if(item.No && train.TrainNumber && item.No.trim() != train.TrainNumber.trim()) 
+                continue ;
             if (!train.SeatList || typeof(train.SeatList) == 'undefined') {
                 continue;
             }
