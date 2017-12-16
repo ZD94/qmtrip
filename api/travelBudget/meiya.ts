@@ -293,6 +293,10 @@ export function compareTrainData(origin, meiyaData) {
 
 /**
  * @method 酒店数据匹配，以meiya为基础数据 
+ *    3km范围内的模糊匹配，和3km范围外的严格匹配
+ * @param origin {Array} 来自jlbudget的数据
+ * @param meiyaData {Array} 来自tmc数据
+ * @return {Array}
  */ 
 export function compareHotelData(origin, meiyaData) {
     console.log("compareHotelData meiyaData.length==== >  ", meiyaData.length);
@@ -307,12 +311,18 @@ export function compareHotelData(origin, meiyaData) {
         for (let meiya of meiyaData) {
             if(!meiya.cnName) continue;
             let agentMeiya: {[index: string]: any};
-            if(!item.latitude && !item.longitude && meiya.latitude && meiya.longitude){ //若存在等于0等情况，此时精确度已超过允许范围，直接跳过模糊匹配      
+            if(item.latitude && item.longitude && meiya.latitude && meiya.longitude){ //若存在等于0等情况，此时精确度已超过允许范围，直接跳过模糊匹配      
                 let end = {latitude: meiya.latitude, longitude: meiya.longitude};
                 isNearby = haversine(start, end, {threshold: 3, unit: 'km'}); //距离不超过3km，return true
             } 
             if(isNearby) {
                 //添加模糊匹配逻辑
+                let isMatched = similarityMatch({
+                    base: item.name,
+                    target: meiya.cnName, 
+                    ignores:['酒店', '旅店', '{}']
+                });
+                if(!isMatched) continue;
                 console.log("meiyaHotel in:", meiya.cnName);
                 let price = Math.ceil(Math.random() * 500) + 300;
                 agentMeiya = {
@@ -347,22 +357,70 @@ export function compareHotelData(origin, meiyaData) {
     console.log("after ===============compareHotelData meiyaData.length===>", meiyaData.length);
     return origin;
 }
-// for( i = 0; i < meiyaData; i++) {
-//     let meiya = meiyaData[i];
-//     if (meiya.cnName != item.name) {
-//         continue;
-//     }
-//     console.log("meiyaHotel in:", meiya.cnName);
-//     let price = Math.ceil(Math.random() * 500) + 300;
-//     let agentMeiya = {
-//         name: "meiya",
-//         price,
-//         urlParams: {
-//             hotelId: meiya.hotelId
-//         }
-//     }
-// }
 
+/**
+ * @method 中文相似度匹配-初用于酒店名
+ *    考虑因素(暂定)：去掉特定字符，两字符长度对比，是否为子字符, 是否为
+ * @param base {string} 基准字符 
+ * @param target {string} 目标字符 
+ * @return {boolean} 成功匹配-true， 反之-false
+ */
+export function similarityMatch(params: {
+    base: string, 
+    target: string, 
+    ignores?: Array<string>,
+    minimalLength?: number
+}): boolean {
+    let {base, target, minimalLength = 8, ignores } = params;
+    if(!base || !target) return false;
+    if(ignores) {
+        ignores.forEach((ignoreString: any) => {
+            if(ignoreString == '()') {
+                base = base.replace(/\(.*\)/g, '');
+                target = target.replace(/\(.*\)/g, '');
+            } else {
+                base = base.replace(ignoreString, '');
+                target = target.replace(ignoreString, '');
+            }
+        });
+    }
+    //互换，设置base为较长的字符
+    if(base.length - target.length < 0){
+        let temp = target;
+        target = base;
+        base = temp;
+    }
+    let similarity = 0;
+    if(base.length < minimalLength || target.length < minimalLength) {
+        //两字符串长度关系，相似度加(减)0.1
+        if(target.length/base.length >= 0.7) {
+            similarity += 0.05;   
+        } else {
+            similarity -= 0.05;
+        }
+    }
+    //满足子字符串关系，相似度添加0.8
+    if(base.indexOf(target) > -1)
+        similarity += 0.8;
+
+    //单个字符进行位置匹配, 总相似度不超过0.2
+    for(let i = 0; i < target.length; i++){
+        let actualPos = (base.indexOf(target.charAt(i)) +1)/base.length; 
+        if(actualPos <= 0) continue;
+        let expectedPos = (i+1)/target.length;
+        if(Math.abs(actualPos - expectedPos) <= 0.4){
+            similarity += 0.6/target.length;
+        }
+        if(Math.abs(actualPos - expectedPos) > 0.4){
+            similarity -= 0.2/target.length;
+            
+        }
+    }
+    console.log("=====hotelmatch========similarity: ", similarity)
+    if(similarity >= 0.5) //暂定0.5，则返回
+        return true;
+    return false;
+}
 export interface IMeiyaFlightPriceInfo {
     airPortFree?: number;
     airlineYouHui?: number;
