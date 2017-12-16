@@ -12,7 +12,7 @@ import { Models } from '_types/index';
 import { FindResult, PaginateInterface } from "common/model/interface";
 import { Staff, EStaffStatus, EStaffRole } from "_types/staff";
 import { conditionDecorator, condition } from "../_decorator";
-import { EAudienceType } from 'api/costCenter';
+import { EAudienceType } from '_types/costCenter';
 
 const departmentCols = Department['$fieldnames'];
 const staffDepartmentCols = StaffDepartment['$fieldnames'];
