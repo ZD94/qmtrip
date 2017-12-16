@@ -7,6 +7,7 @@ import { FindResult } from "common/model/interface";
 import { findParentManagers } from 'api/department';
 import { Department } from '_types/department';
 import { EStaffRole } from '_types/staff';
+import { DB } from '@jingli/database';
 const API = require('@jingli/dnode-api');
 
 export default class CostCenterModule {
@@ -268,8 +269,11 @@ export default class CostCenterModule {
     static async changeBudget(budgets: any[]) {
         for (let budget of budgets) {
             const cost = await Models.costCenterDeploy.get(budget.id)
-            cost.selfTempBudget = budget.selfTempBudget
-            await cost.save()
+            const childrenExpend = await getChildrenExpend(budget.id)
+            if (cost.selfBudget + childrenExpend == cost.totalBudget) {
+                cost.selfTempBudget = budget.selfTempBudget
+                await cost.save()
+            }
         }
     }
 
@@ -288,6 +292,23 @@ export default class CostCenterModule {
     }
 }
 
+async function getChildrenExpend(deptId: string) {
+    const childrenIds = await await getChildrenDeptIds(deptId)
+    return await getSelfTempBudgetSumOf(childrenIds)
+}
+
+async function getChildrenDeptIds(deptId: string): Promise<string[]> {
+    const sql = `select id from department.departments where parent_id = '${deptId}'`
+    return (await DB.query(sql))[0].map(d => d.id)
+}
+
+async function getSelfTempBudgetSumOf(costIds: string[]) {
+    const ids = costIds.map(id => `'${id}'`).join(',')
+    const sql = `select sum(self_temp_budget) as sum from 
+        cost_center.cost_center_deploy where id in (${ids})`
+    const res = (await DB.query(sql))[0][0]
+    return (res && res.sum) || 0
+}
 
 async function getPerMonthExpenditure(costId: string) {
 
