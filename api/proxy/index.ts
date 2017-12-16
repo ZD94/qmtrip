@@ -101,10 +101,7 @@ class Proxy {
                             reject(err)
                         }
                         resolve(body);
-                    })
-
-                });
-
+                    });
                 // result = await request(url, {
                 //     headers,
                 //     body,
@@ -112,6 +109,8 @@ class Proxy {
                 //     method: req.method,
                 //     timeout: 500*1000
                 // });
+
+                });
             }catch(err) {
                 if(err) {
                     console.log("请求预定错误: ", err)
