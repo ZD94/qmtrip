@@ -108,6 +108,7 @@ export default class ApiTravelBudget {
             return require("meiyaFake/finallyUsingHotel");
         } else {
             let meiyaHotel = await getMeiyaHotelData(params);
+            console.log("meiyaHotel ===> meiyaHotel data.", meiyaHotel.length)
             if(meiyaHotel && meiyaHotel.length)
                 commonData = compareHotelData(commonData, meiyaHotel);
             // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".finallyHotel.json", commonData);
