@@ -10,7 +10,7 @@ import { Department, StaffDepartment } from "_types/department";
 import { requireParams, clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { Models } from '_types/index';
 import { FindResult, PaginateInterface } from "common/model/interface";
-import { Staff, EStaffStatus } from "_types/staff";
+import { Staff, EStaffStatus, EStaffRole } from "_types/staff";
 import { conditionDecorator, condition } from "../_decorator";
 
 const departmentCols = Department['$fieldnames'];

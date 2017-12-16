@@ -1,10 +1,11 @@
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { Models } from '_types';
-import { findChildren, findParentManagers, findFinances } from 'api/department';
+import { findChildren, findParentManagers } from 'api/department';
 import { DB } from '@jingli/database';
 import * as _ from 'lodash';
 import { Department } from '_types/department';
-import { CostCenterDeploy } from '_types/costCenter';
+import { CostCenterDeploy, ECostCenterType } from '_types/costCenter';
+import { EStaffRole } from '_types/staff';
 const API = require('@jingli/dnode-api')
 
 
@@ -15,6 +16,7 @@ export default class CostCenterDeployModule {
 
     @clientExport
     static async initBudget(budgets) {
+        await Promise.all(budgets.map(b => Models.costCenter.create({ id: b.id, type: ECostCenterType.DEPARTMENT })))
         await Promise.all(budgets.map(b => Models.costCenterDeploy.create(b).save()))
     }
 
@@ -68,6 +70,12 @@ async function sendNotice(audiences: string[]) {
             userId: audience
         })
     ))
+}
+
+async function findFinances() {
+    return await Models.staff.find({
+        where: { roleId: EStaffRole.FINANCE }
+    })
 }
 
 async function getWarningPerson(dept: Department, audienceTypes: number[]) {
