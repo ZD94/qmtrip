@@ -358,15 +358,13 @@ export default class ApiTravelBudget {
             let hotel = _budgets[i].hotel;
             if (hotel && hotel.length) {
                 let budget = hotel[0];
-                let cityObj = await API.place.getCityInfo({cityCode: city, companyId: companyId});
+                let cityObj = await API.place.getCityInfo({cityCode: budget.city, companyId: companyId});
                 let isAccordHotel = await Models.accordHotel.find({ where: { cityCode: cityObj.id, companyId: staff['companyId'] } });
                 if (isAccordHotel && isAccordHotel.length) {
                     budget.price = isAccordHotel[0].accordPrice;
 
                     /* 出差时间计算 */
-                    let residentPlace = await API.place.getCityInfo({ cityCode: budget.city });
-                    let timezone = residentPlace.timezone && typeof (residentPlace.timezone) != undefined ?
-                        residentPlace.timezone : 'Asia/shanghai';
+                    let timezone = cityObj.timezone || 'Asia/shanghai';
                     let beginTime = moment(budget.checkInDate).tz(timezone).hour(12);
                     let endTime = moment(budget.checkOutDate).tz(timezone).hour(12);
                     let days = moment(endTime).diff(beginTime, 'days');
