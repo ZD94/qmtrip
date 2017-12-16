@@ -55,7 +55,7 @@ class Proxy {
             let addon:{[index: string]: any} = {
                 staffID: staff.id,
                 companyID: staff.companyId,
-                listeningon: `${config.orderSysConfig.tripDetailMonitorUrl}${tripDetail.id}`
+                listeningon: `${config.orderSysConfig.tripDetailMonitorUrl}/${tripDetail.id}`
             };
             let headers: {[index: string]: any} = {
                auth: req.headers['auth'],
