@@ -247,8 +247,21 @@ export default class CostCenterModule {
 
     @clientExport
     static async initBudget(budgets) {
-        await Promise.all(budgets.map(b => Models.costCenter.create({ id: b.id, type: ECostCenterType.DEPARTMENT }).save()))
-        await Promise.all(budgets.map(b => Models.costCenterDeploy.create({ ...b, beginDate: new Date, endDate: new Date }).save()))
+        const promiseAry = []
+        for (let budget of budgets) {
+            if (!await Models.costCenter.get(budget.id)) {
+                promiseAry.push(CostCenter.create({ id: budget.id, type: ECostCenterType.DEPARTMENT }).save())
+            }
+            const costCenterDeploy = await Models.costCenterDeploy.get(budget.id)
+            if (costCenterDeploy == void 0) {
+                promiseAry.push(CostCenterDeploy.create({ ...budget, beginDate: new Date, endDate: new Date }).save())
+            } else {
+                Object.keys(budget)
+                    .forEach(key => { costCenterDeploy[key] = budget[key] })
+                promiseAry.push(costCenterDeploy.save())
+            }
+        }
+        await Promise.all(promiseAry)
     }
 
     @clientExport
@@ -271,64 +284,11 @@ export default class CostCenterModule {
     @clientExport
     static async f(costId: string) {
         const cost = await Models.costCenterDeploy.get(costId)
-        const dept = await Models.department.get(costId)
-        if (cost.isSendNotice) return
-        const audiences = await getWarningPerson(dept, cost.warningPerson)
-
-        if (cost.warningRule.type == 0) {
-            if (cost.warningRule.rate * cost.selfBudget < cost.expendBudget + getPlanExpend()) {
-                await sendNotice(audiences)
-                cost.isSendNotice = true
-                await cost.save()
-            }
-        } else {
-            if (cost.warningRule.rate * cost.totalBudget < cost.expendBudget + getPlanExpend()) {
-                await sendNotice(audiences)
-                cost.earlyWarning.hasSent = true
-                await cost.save()
-            }
-        }
+        await cost.checkoutBudget()
     }
 }
 
 
-function getPlanExpend(): number { return 0 }
+async function getPerMonthExpenditure(costId: string) {
 
-async function sendNotice(audiences: string[]) {
-    await Promise.all(audiences.map(audience =>
-        API.notify.submitNotify({
-            key: 'qm_budget_early_warning',
-            userId: audience
-        })
-    ))
-}
-
-async function findFinances() {
-    return await Models.staff.find({
-        where: { roleId: EStaffRole.FINANCE }
-    })
-}
-
-async function getWarningPerson(dept: Department, audienceTypes: number[]) {
-    const audiences: string[] = []
-    for (let type of audienceTypes) {
-        if (type == EAudienceType.MANAGER) {
-            if (dept.manager)
-                audiences.push(dept.manager.id)
-        } else if (type == EAudienceType.PARENT_MANAGER) {
-            const pms = await findParentManagers(dept.parent.id)
-            audiences.push(...pms)
-        } else if (type == EAudienceType.FINANCE) {
-            const finances = await findFinances()
-            if (finances.length < 1) continue
-            audiences.push(finances[0].id)
-        }
-    }
-    return audiences
-}
-
-export enum EAudienceType {
-    MANAGER = 0,
-    PARENT_MANAGER = 1,
-    FINANCE = 2
 }
