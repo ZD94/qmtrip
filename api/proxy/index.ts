@@ -60,7 +60,8 @@ class Proxy {
             };
             let headers: {[index: string]: any} = {
                auth: req.headers['auth'],
-               supplier: req.headers['supplier']
+               supplier: req.headers['supplier'],
+               listeningon: `${config.orderSysConfig.tripDetailMonitorUrl}/${tripDetail.id}`
             }
             //headers的测试数据
             // let headers:{[index: string]: any}={
@@ -74,6 +75,7 @@ class Proxy {
                 _.assign(headers, addon)
             }
             if(req.method == 'POST') {
+                _.assign(headers, addon)
                 _.assign(body, addon);
             }
             let pathstring = req.path;
