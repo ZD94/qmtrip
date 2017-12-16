@@ -74,7 +74,7 @@
     "express-http-proxy": "^0.11.0",
     "express-request-proxy": "^2.0.0",
     "formidable": "^1.0.17",
-    "haversine": "^1.0.2",
+    "haversine": "^1.1.0",
     "html-pdf": "^2.1.0",
     "http-proxy": "^1.16.2",
     "iconv-lite": "^0.4.13",

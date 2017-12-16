@@ -3,6 +3,7 @@ import * as path from "path";
 import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
 const config = require("@jingli/config");
+var haversine = require("haversine");
 import { ISearchHotelParams, ISearchTicketParams } from "./index";
 var request = require("request-promise");
 let moment = require("moment");
@@ -231,14 +232,13 @@ export function compareTrainData(origin, meiyaData) {
         return [];
     if(!meiyaData || typeof(meiyaData) == 'undefined' || !meiyaData.length)
         return origin;
-
     origin = origin.map((item:any) => {
         if(!item) return null;
         if(item.type != 0) {
             return item;
         }
         for(let train of meiyaData) {
-            if(train.TrainNumber) continue;
+            if(!train.TrainNumber) continue;
             //用于测试，需要删除
             if(train.No && train.TrainNumber && train.No.trim() != train.TrainNumber.trim()) 
                 continue ;
@@ -271,6 +271,7 @@ export function compareTrainData(origin, meiyaData) {
                 if(!agentCabin || typeof(agentCabin) == 'undefined') return false;
                 return true;
             });
+       
 
             if(!item.agents) 
                 item.agents = [{ name: "meiya", cabins: cabins,other: {}}];
@@ -301,40 +302,66 @@ export function compareHotelData(origin, meiyaData) {
         return origin;
     let i = 0;
     for (let item of origin) {
+        let start = {latitude: item.latitude, longitude: item.longitude};
+        let isNearby = false;
         for (let meiya of meiyaData) {
             if(!meiya.cnName) continue;
-            if (meiya.cnName && item.name && meiya.cnName.trim() != item.name.trim())
-                continue;
-            console.log("meiyaHotel in:", meiya.cnName);
-            let price = Math.ceil(Math.random() * 500) + 300;
-            let agentMeiya = {
-                name: "meiya",
-                price,
-                urlParams: {
-                    hotelId: meiya.hotelId
-                }
+            let agentMeiya: {[index: string]: any};
+            if(!item.latitude && !item.longitude && meiya.latitude && meiya.longitude){ //若存在等于0等情况，此时精确度已超过允许范围，直接跳过模糊匹配      
+                let end = {latitude: meiya.latitude, longitude: meiya.longitude};
+                isNearby = haversine(start, end, {threshold: 3, unit: 'km'}); //距离不超过3km，return true
+            } 
+            if(isNearby) {
+                //添加模糊匹配逻辑
+                console.log("meiyaHotel in:", meiya.cnName);
+                let price = Math.ceil(Math.random() * 500) + 300;
+                agentMeiya = {
+                    name: "meiya",
+                    price,
+                    urlParams: {
+                        hotelId: meiya.hotelId
+                    }
+                }  
             }
-            item.agents.push(agentMeiya);
+            if(!isNearby) {
+                if (meiya.cnName && item.name && meiya.cnName.trim() != item.name.trim())
+                    continue;
+                console.log("meiyaHotel in:", meiya.cnName);
+                let price = Math.ceil(Math.random() * 500) + 300;
+                agentMeiya = {
+                    name: "meiya",
+                    price,
+                    urlParams: {
+                        hotelId: meiya.hotelId
+                    }
+                }  
+            }
+            if(agentMeiya && typeof agentMeiya != 'undefined') {
+                if(!item.agents) 
+                    item.agents = [agentMeiya];
+                if(item.agents)
+                    item.agents.push(agentMeiya);  
+            }
         }
     }
     console.log("after ===============compareHotelData meiyaData.length===>", meiyaData.length);
     return origin;
 }
-        // for( i = 0; i < meiyaData; i++) {
-        //     let meiya = meiyaData[i];
-        //     if (meiya.cnName != item.name) {
-        //         continue;
-        //     }
-        //     console.log("meiyaHotel in:", meiya.cnName);
-        //     let price = Math.ceil(Math.random() * 500) + 300;
-        //     let agentMeiya = {
-        //         name: "meiya",
-        //         price,
-        //         urlParams: {
-        //             hotelId: meiya.hotelId
-        //         }
-        //     }
-        // }
+// for( i = 0; i < meiyaData; i++) {
+//     let meiya = meiyaData[i];
+//     if (meiya.cnName != item.name) {
+//         continue;
+//     }
+//     console.log("meiyaHotel in:", meiya.cnName);
+//     let price = Math.ceil(Math.random() * 500) + 300;
+//     let agentMeiya = {
+//         name: "meiya",
+//         price,
+//         urlParams: {
+//             hotelId: meiya.hotelId
+//         }
+//     }
+// }
 
 export interface IMeiyaFlightPriceInfo {
     airPortFree?: number;

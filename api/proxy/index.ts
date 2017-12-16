@@ -3,13 +3,14 @@ import {Request, Response} from "express-serve-static-core";
 import {parseAuthString} from "_types/auth/auth-cert";
 import { Staff } from "_types/staff";
 import { Models } from "_types";
+import { EOrderStatus } from "_types/tripPlan";
 var request = require("request-promise");
 var path = require("path");
 var _ = require("lodash");
 var cors = require('cors');
 const config = require("@jingli/config");
 const API = require("@jingli/dnode-api");
-const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST']} 
+const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST'], allowedHeaders: 'Content-Type,auth,supplier'} 
 class Proxy {
     /**
      * @method 注册获取订单详情事件
@@ -27,6 +28,8 @@ class Proxy {
             let authstr = req.query.authstr;
             if(!authstr || typeof authstr == 'undefined') 
                 authstr = req.body.authstr;
+            console.log("======> query ", req.query)
+            console.log("======> body ", req.body)
             let token = parseAuthString(authstr);
             let verification = await API.auth.authentication(token);
             if(!verification) {
@@ -77,6 +80,7 @@ class Proxy {
             let url = `${config.orderSysConfig.orderLink}${pathstring}`;
             let result:any;
             console.log("===========url: ", url);
+            console.log("===========tripDetailId: ", tripDetailId);
             console.log("==========method, ", req.method)
             console.log("==========method, ", req.body)
             try{
@@ -95,6 +99,22 @@ class Proxy {
             console.log("========================> result.", result)
             if(!result) 
                 res.json(null);
+            if(result.code == 0 && result.data && result.data.orderNos && !tripDetail.orderNo){  //&& result.data.orderN
+                if(result.data.orderNos instanceof Array) {  
+                    tripDetail.reserveStatus = EOrderStatus.await_auditing;  //飞机的orderNos为数组
+                    tripDetail.orderNo = result.data.orderNos[0];
+                } else {
+                    tripDetail.reserveStatus = EOrderStatus.await_auditing;   //酒店的orderNo为string
+                    tripDetail.orderNo = result.data.orderNos;
+                }
+  
+                await tripDetail.save();
+            }
+            // if(result.code == 0 && result.data && result.data.orderNos && !tripDetail.orderNo){  //&& result.data.orderN
+               
+            //     await tripDetail.save();
+            // }
+
             res.json(result);
 
         }); 
