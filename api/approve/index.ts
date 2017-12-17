@@ -40,6 +40,11 @@ function oaEnum2Str(e: EApproveChannel) {
 }
 
 class ApproveModule {
+    @clientExport
+    @requireParams(['id'])
+    static async getApprove(params: {id: string}) {
+        return Models.approve.get(params.id);
+    }
 
     @clientExport
     @requireParams(["budgetId"], ["approveUser", "project", "submitter", "version"])
@@ -143,15 +148,18 @@ class ApproveModule {
 
     }
     @clientExport
-    @requireParams(["budgetId"], ["approveUser", "project", "submitter", "version"])
-    static async submitApproveNew(params: {approveId: string, budgetId: string, approveUser?: Staff, submitter?: Staff, version: number}) :Promise<Approve>{
-        let {budgetId, approveUser} = params;
+    @requireParams(["approveId"], ["approveUser", "project", "submitter", "version"])
+    static async submitApproveNew(params: {approveId: string, budgetId?: string, approveUser?: Staff, submitter?: Staff, version: number}) :Promise<Approve>{
+        let {approveUser} = params;
         let submitter = await Staff.getCurrent() || params.submitter;
         let company = submitter.company;
 
         //获取预算详情
         // let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: submitter.id});
         let budgetInfoData = await Models.approve.get(params.approveId);
+        if (typeof budgetInfoData == 'string') {
+            budgetInfoData = JSON.parse(budgetInfoData);
+        }
         let budgetInfo = budgetInfoData.data;
         let number = 0;
         let content = "";
@@ -347,6 +355,7 @@ class ApproveModule {
     }) {
         let {submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark,staffList, budget, version} = params;
         let staff = await Models.staff.get(submitter);
+        console.log('meiyou diao===============');
         let approve = Models.approve.create({
             submitter: submitter,
             data: data,
@@ -404,14 +413,14 @@ class ApproveModule {
         //     budget: budget
         // });
 
-        await emitter.emitSerial(EVENT.NEW_TRIP_APPROVE, {
-            approveNo: approve.id,
-            approveUser: approveUser ? approveUser.id: null,
-            submitter: submitter,
-            status: EApproveStatus.WAIT_APPROVE,
-            oa: oaEnum2Str(channel) || 'qm',
-            version: version
-        });
+        // await emitter.emitSerial(EVENT.NEW_TRIP_APPROVE, {
+        //     approveNo: approve.id,
+        //     approveUser: approveUser ? approveUser.id: null,
+        //     submitter: submitter,
+        //     status: EApproveStatus.WAIT_APPROVE,
+        //     oa: oaEnum2Str(channel) || 'qm',
+        //     version: version
+        // });
         return approve;
     }
 

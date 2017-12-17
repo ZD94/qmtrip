@@ -35,12 +35,17 @@ export class EventModule{
                 url = templateUrl(data);
                 console.info("url====>>>", url);
                 let method = eventListeners[0].method;
+                let qs = null;
+                if (method.toLowerCase() != 'post') { 
+                    qs = params;
+                    params = null;
+                }
                 let result = await request({
                     uri: `${url}`,
                     body: params,
                     json:true,
                     method: `${method}`,
-                    qs: params
+                    qs: qs
                 });
                 if(typeof(result) == 'string'){
                     result = JSON.parse(result);

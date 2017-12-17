@@ -35,11 +35,12 @@ export default class TripApproveModule {
 
     static async retrieveDetailFromApprove(params: {approveNo: string, approveUser?: string, submitter?: string}):Promise<ITripApprove> {
         let {approveNo, approveUser, submitter} = params;
-        let tripApproveObj: any
+        console.log('retrieveID', params.approveNo);
+        let tripApproveObj: any;
         if(!approveUser && !submitter)
             tripApproveObj = await TripApproveModule.getTripApprove({id: approveNo});
-        if(tripApproveObj)
-            return tripApproveObj;
+        // if(tripApproveObj)
+        //     return tripApproveObj;
 
         let approve = await Models.approve.get(approveNo);
         let company = await Models.company.get(approve.companyId);
@@ -47,6 +48,8 @@ export default class TripApproveModule {
         submitter = submitter && typeof(submitter) != 'undefined' ? submitter: approve.submitter;
 
         let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
+
+
 
         if(!budgetInfo) {
             throw L.ERR.TRAVEL_BUDGET_NOT_FOUND();
@@ -64,6 +67,7 @@ export default class TripApproveModule {
         let destinationPlacesInfo = query.destinationPlacesInfo;
         let totalBudget = 0;
         budgets.forEach((b) => {totalBudget += Number(b.price);});
+        console.log('retrieveDetailFromTotal', totalBudget);
         /*budgets = budgets.map( (v) => {
          if (v.type == ETripType.HOTEL) {
          v.placeName = budgetInfo.query.hotelName;
@@ -136,8 +140,8 @@ export default class TripApproveModule {
         tripApprove.status = QMEApproveStatus.WAIT_APPROVE;
         tripApprove.accountId = submitter;
         tripApprove.companyId = company.id;
-        tripApprove.title = project.name;
-        tripApprove.projectId = project.id;
+        // tripApprove.title = project.name;
+        // tripApprove.projectId = project.id;//TODO  费用归集
 
         tripApprove.query = query;
         tripApprove.arrivalCityCodes = arrivalCityCodes;
