@@ -39,8 +39,8 @@ export default class TripApproveModule {
         let tripApproveObj: any;
         if(!approveUser && !submitter)
             tripApproveObj = await TripApproveModule.getTripApprove({id: approveNo});
-        // if(tripApproveObj)
-        //     return tripApproveObj;
+        if(tripApproveObj)
+            return tripApproveObj;
 
         let approve = await Models.approve.get(approveNo);
         let company = await Models.company.get(approve.companyId);
@@ -918,11 +918,11 @@ export default class TripApproveModule {
 
         let approve = await Models.approve.get(params.id);
 
-        if(typeof approve.data == "string"){
-            approve.data = JSON.parse(approve.data);
-        }
-        let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
-        let {budgets, query} = budgetInfo;
+        // if(typeof approve.data == "string"){
+        //     approve.data = JSON.parse(approve.data);
+        // }
+        // let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
+        // let {budgets, query} = budgetInfo;
         //=====end 当budgetInfo可以获取到时，以上代码可以删除
         let companyId = params['companyId'] || approve.companyId;
         if(!companyId || typeof companyId == 'undefined') {
@@ -939,15 +939,15 @@ export default class TripApproveModule {
         if(!tripApprove) return null;
 
         //=====begin 当budgetInfo可以获取到时，以下代码可以删除
-        if(tripApprove.budgetInfo && typeof tripApprove.budgetInfo == 'string') {
-            tripApprove.budgetInfo = JSON.parse(tripApprove.budgetInfo);
-        }
-        if(tripApprove.query && typeof tripApprove.query == 'string') {
-            tripApprove.query = JSON.parse(tripApprove.query);
-        }
-        if(!tripApprove.budgetInfo || (tripApprove.budgetInfo && tripApprove.budgetInfo.length == 0))
-            tripApprove.budgetInfo = budgets;
-        tripApprove.query = query;
+        // if(tripApprove.budgetInfo && typeof tripApprove.budgetInfo == 'string') {
+        //     tripApprove.budgetInfo = JSON.parse(tripApprove.budgetInfo);
+        // }
+        // if(tripApprove.query && typeof tripApprove.query == 'string') {
+        //     tripApprove.query = JSON.parse(tripApprove.query);
+        // }
+        // if(!tripApprove.budgetInfo || (tripApprove.budgetInfo && tripApprove.budgetInfo.length == 0))
+        //     tripApprove.budgetInfo = budgets;
+        // tripApprove.query = query;
 
         return tripApprove;
     }

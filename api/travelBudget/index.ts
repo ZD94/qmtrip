@@ -16,7 +16,7 @@ const utils = require("common/utils");
 import _ = require('lodash');
 import { Place } from "_types/place";
 import { EPlaneLevel, ETrainLevel, MTrainLevel, EHotelLevel, DefaultRegion } from "_types"
-import { where } from "sequelize";
+import { where, Transaction } from "sequelize";
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 export var NoCityPriceLimit = 0;
 const DefaultCurrencyUnit = 'CNY';
@@ -28,7 +28,10 @@ const cloudAPI = require('@jingli/config').cloudAPI;
 const cloudKey = require('@jingli/config').cloudKey;
 import * as Bluebird from 'bluebird';
 let RestfulAPIUtil = restfulAPIUtil;
-
+import * as CLS from 'continuation-local-storage';
+import {DB} from "@jingli/database";
+import { Company } from "_types/company";
+var CLSNS = CLS.getNamespace('dnode-api-context');
 export interface ICity {
     name: string;
     id: string;
@@ -608,12 +611,16 @@ export default class ApiTravelBudget {
         let preferedCurrency = params["preferedCurrency"];
         preferedCurrency = preferedCurrency && typeof (preferedCurrency) != 'undefined' ? preferedCurrency : DefaultCurrencyUnit;
 
+        let tripNumCost = 0;  //企业行程点数花费
+        let content = '';     //企业行程点数扣除，行程地
+
         if (!staffId || staffId == 'undefined') {
             let currentStaff = await Staff.getCurrent();
             staffId = currentStaff.id;
         }
         let staff = await Models.staff.get(staffId);
         let companyId = staff.companyId;
+        let company = await Models.company.get(companyId);
         let travelPolicy = await staff.getTravelPolicy();
         if (!travelPolicy) {
             throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
@@ -692,7 +699,6 @@ export default class ApiTravelBudget {
             approve = Models.approve.create({
                 approveUser: params.approveUser.id,
                 type: EApproveType.TRAVEL_BUDGET,
-                data: params,
                 companyId: companyId,
                 staffList: params.staffList
             });
@@ -797,9 +803,52 @@ export default class ApiTravelBudget {
         //计算总预算用于更新approve
         let totalBudget = 0;
         budgets.forEach(function(item) {
+            if(item.tripType != ETripType.SUBSIDY){
+                tripNumCost = tripNumCost + 1;
+            }
             totalBudget += item.price;
         })
+        if(params.query && params.staffList){
+            tripNumCost *= params.staffList.length;
+        }
+        let obj: any = {};
+        obj.budgets = budgets;
+        obj.query = params;
+        obj.createAt = Date.now();
 
+        await DB.transaction(async function(t: Transaction){
+            let result = await ApiTravelBudget.verifyCompanyTripNum({        
+                tripNum: tripNumCost, 
+                company: company, 
+                accountId: staff.id,
+                query: params
+            });
+            console.log('-----updateBudget-------', budgets);
+            
+            obj.query['frozenNum'] = result.frozenNum;
+            //拿到预算后更新approve表
+            let updateBudget = await Models.approve.get(approveId);
+            let submitter = await Staff.getCurrent();
+            updateBudget.submitter = submitter.id;
+            updateBudget.data = obj;
+            updateBudget.title = obj.query['projectName'];
+            updateBudget.channel = submitter.company.oa;
+            updateBudget.type = EApproveType.TRAVEL_BUDGET;
+            updateBudget.approveUser = approveUser ? approveUser.id : null;
+            updateBudget.staffList = obj.query.staffList;
+            updateBudget.budget = totalBudget;
+            await updateBudget.save();
+    
+            console.log('UPDATE-----BUDGET----', );
+        }).catch(async function(err: Error){
+            if(err) {
+                // company.extraTripPlanFrozenNum = extraTripPlanFrozenNum;
+                // company.tripPlanFrozenNum = originTripPlanFrozenNum;
+                await company.reload();
+                console.info(err);
+                throw new Error("提交审批失败");
+            }
+        });
 
         //get approveId from returned budget
         // let approveIdFromBudget; 
@@ -811,31 +860,6 @@ export default class ApiTravelBudget {
         //     console.log(' ---------------NO hotel or traffic return from jlbudget to qm-------------- ');
         // }
         
-        let obj: any = {};
-        obj.budgets = budgets;
-        obj.query = params;
-        obj.createAt = Date.now();
-
-        console.log('-----updateBudget-------', budgets);
-        
-        //拿到预算后更新approve表
-        let updateBudget = await Models.approve.get(approveId);
-        let submitter = await Staff.getCurrent();
-        updateBudget.submitter = submitter.id;
-        updateBudget.data = obj;
-        updateBudget.title = obj.query['projectName'];
-        updateBudget.channel = submitter.company.oa;
-        updateBudget.type = EApproveType.TRAVEL_BUDGET;
-        updateBudget.approveUser = approveUser ? approveUser.id : null;
-        updateBudget.staffList = obj.query.staffList;
-        updateBudget.budget = totalBudget;
-        await updateBudget.save();
-
-        console.log('UPDATE-----BUDGET----', );
-        
-
-
-
 
         
         let _id = Date.now() + utils.getRndStr(6);
@@ -853,8 +877,6 @@ export default class ApiTravelBudget {
         // };
         // await API.approve.submmitApproveNew(approveParams);
         return {approveId: approveId, budgetId: _id};
-
-
 
         function limitHotelBudgetByPrefer(min: number, max: number, hotelBudget: number) {
             if (hotelBudget == -1) {
@@ -879,6 +901,40 @@ export default class ApiTravelBudget {
         }
 
 
+    }
+
+
+    static async verifyCompanyTripNum(params: {
+        tripNum: number, 
+        company: Company, 
+        accountId: string,
+        query: any,
+    }): Promise<{company: Company, frozenNum: {limitFrozen: number, extraFrozen: number}}>{
+        let {tripNum, company, accountId, query} = params;
+        await company.beforeGoTrip({number: tripNum});
+
+        let destinationPlaces = query.destinationPlacesInfo;
+        let content = '';
+        
+        if(query && query.originPlace){
+            let originCity = await API.place.getCityInfo({cityCode: query.originPlace});
+            content = content + originCity.name + "-";
+        }
+        if(destinationPlaces &&  _.isArray(destinationPlaces) && destinationPlaces.length > 0){
+            for(let i = 0; i < destinationPlaces.length; i++){
+                let segment: ISegment = destinationPlaces[i]
+                let destinationCity = await API.place.getCityInfo({cityCode: segment.destinationPlace});
+                if(i<destinationPlaces.length-1){
+                    content = content + destinationCity.name+"-";
+                }else{
+                    content = content + destinationCity.name;
+                }
+            }
+        }
+
+        let result = await company.frozenTripPlanNum({accountId: accountId, number: tripNum,
+            remark: "提交出差申请消耗行程点数", content: content});
+        return result;
     }
 
     static async sendTripApproveNoticeToSystem(params: { cacheId: string, staffId: string }) {
