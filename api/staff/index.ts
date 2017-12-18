@@ -16,17 +16,17 @@ import L from '@jingli/language';
 import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
-import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo, EAddWay } from "_types/staff";
+import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo, EAddWay, LinkMan } from "_types/staff";
 import { Notice } from "_types/notice";
 import { EAgencyUserRole, AgencyUser } from "_types/agency";
 import { Models, EAccountType, EGender } from '_types';
 import {conditionDecorator, condition} from "../_decorator";
-import {FindResult} from "common/model/interface";
+import { FindResult, PaginateInterface } from "common/model/interface";
 import {ENoticeType} from "_types/notice/notice";
 import {CoinAccount} from "_types/coin";
 import {StaffDepartment} from "_types/department/staffDepartment";
 import { getSession } from "@jingli/dnode-api";
-
+const linkManCols = LinkMan['$fieldnames'];
 
 const invitedLinkCols = InvitedLink['$fieldnames'];
 const staffSupplierInfoCols = StaffSupplierInfo['$fieldnames'];
@@ -1687,6 +1687,93 @@ class StaffModule{
             return pager[0];
         }
         return null;
+    }
+
+
+    /**
+     * @method 创建外部联系人
+     * @param data
+     * @param data.accountId 已经有登录账号
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id","name", "mobile", "companyId", "travelPolicyId", "operatorId"], linkManCols)
+    static async createLinkMan(params: {name?: string, mobile?: string, companyId: string, travelPolicyId: string, sex?: number}): Promise<LinkMan> {
+        let linkman = LinkMan.create(params);
+        await linkman.save();
+        return linkman;
+    }
+
+    /**
+     * @method 更新外部联系人
+     * @param params
+     * @returns {LinkMan}
+     */
+    @clientExport
+    @requireParams(["id"], linkManCols)
+    static async updateLinkMan(params: {
+        id: string,
+        name?: string, 
+        mobile?: string, 
+        companyId?: string, 
+        travelPolicyId?: string, 
+        sex?: number,
+        operatorId?: string,
+        type?: number
+    }): Promise<LinkMan> {
+
+        let linkman = await Models.linkMan.get(params.id);
+        for(let key in params) {
+            linkman[key] = params[key];
+        }
+        await linkman.save();
+        return linkman;
+    }
+
+        /**
+     * @method 删除外部联系人
+     * @param id {string} 外部联系人id
+     * @returns {boolean}
+     */
+    @clientExport
+    @requireParams(["id"], linkManCols)
+    static async deleteLinkMan(params: {
+        id: string
+    }): Promise<boolean> {
+        let linkman = await Models.linkMan.get(params.id);
+        await linkman.destroy();
+        return true;
+    }
+
+    /**
+     * @method 获取外部联系人
+     * @param params
+     * @returns {LinkMan}
+     */
+    @clientExport
+    @requireParams(["id"], linkManCols)
+    static async getLinkMan(params: {id: string}): Promise<LinkMan> {
+        let linkmans = await Models.linkMan.get(params.id);
+        return linkmans;
+    }
+
+    /**
+     * @method 获取外部联系人列表
+     * @param data
+     * @param data.accountId 已经有登录账号
+     * @returns {LinkMan}
+     */
+    @clientExport
+    @requireParams(["where.operatorId"], ["where.name","where.mobile","where.sex", "where.travelPolicyId", 
+    "order", "companyId", "type"])
+    static async getLinkMans(params: {
+        where: any,
+        order: any,
+        attributes?: any,
+    }): Promise<PaginateInterface<LinkMan>> {
+
+        let linkmans = await Models.linkMan.find(params);
+        return linkmans;
     }
 
 }
