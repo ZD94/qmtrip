@@ -808,7 +808,7 @@ export default class ApiTravelBudget {
             }
             totalBudget += item.price;
         })
-        if(params.query && params.staffList){
+        if(params && params.staffList){
             tripNumCost *= params.staffList.length;
         }
         let obj: any = {};
