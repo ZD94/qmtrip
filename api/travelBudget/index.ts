@@ -827,18 +827,20 @@ export default class ApiTravelBudget {
             
             obj.query['frozenNum'] = result.frozenNum;
             //拿到预算后更新approve表
-            let updateBudget = await Models.approve.get(approveId);
-            let submitter = await Staff.getCurrent();
-            updateBudget.submitter = submitter.id;
-            updateBudget.data = obj;
-            updateBudget.title = obj.query['projectName'];
-            updateBudget.channel = submitter.company.oa;
-            updateBudget.type = EApproveType.TRAVEL_BUDGET;
-            updateBudget.approveUser = approveUser ? approveUser.id : null;
-            updateBudget.staffList = obj.query.staffList;
-            updateBudget.budget = totalBudget;
-            await updateBudget.save();
-    
+            if (!isIntoApprove) {//判断是否是审批人查看审批单时进行的第二次拉取数据
+                let updateBudget = await Models.approve.get(approveId);
+                let submitter = await Staff.getCurrent();
+                updateBudget.submitter = submitter.id;
+                updateBudget.data = obj;
+                updateBudget.title = obj.query['projectName'];
+                updateBudget.channel = submitter.company.oa;
+                updateBudget.type = EApproveType.TRAVEL_BUDGET;
+                updateBudget.approveUser = approveUser ? approveUser.id : null;
+                updateBudget.staffList = obj.query.staffList;
+                updateBudget.budget = totalBudget;
+                await updateBudget.save();
+            }
+   
             console.log('UPDATE-----BUDGET----', );
         }).catch(async function(err: Error){
             if(err) {
@@ -850,15 +852,6 @@ export default class ApiTravelBudget {
             }
         });
 
-        //get approveId from returned budget
-        // let approveIdFromBudget; 
-        // if (_budgets[0].traffic) {
-        //     approveIdFromBudget = _budgets[0].traffic.request.approveId;
-        // } else if (_budgets[0].hotel) {
-        //     approveIdFromBudget = _budgets[0].hotel.request.approveId;
-        // } else {
-        //     console.log(' ---------------NO hotel or traffic return from jlbudget to qm-------------- ');
-        // }
         
 
         
