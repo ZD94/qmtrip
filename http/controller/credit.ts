@@ -38,7 +38,13 @@ export class CreditController extends AbstractController {
         var coinAccountChanges = await Models.coinAccountChange.find({where: {relateOrderNum: orderNum}});
         //防止订单重复处理
         if(!coinAccountChanges || coinAccountChanges.length <= 0){
-            var result = await coinAccount.lockCoin(credits, description, orderNum);
+            var result;
+            try{
+                result = await coinAccount.lockCoin(credits, description, orderNum);
+            }catch(e){
+                res.json(this.reply(503,{message: e.message}));
+            }
+
             res.json(this.reply(0,{'credits': result.coinAccount.balance}));
         }else {
             res.json(this.reply(0,{'credits': coinAccount.balance}));
