@@ -1697,10 +1697,19 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["id","name", "mobile", "companyId", "operatorId"], linkmanCols)
-    static async createLinkman(params: {name?: string, mobile?: string, companyId: string, sex?: number}): Promise<Linkman> {
+    @requireParams(["name", "mobile", "companyId", "operatorId"], linkmanCols)
+    static async createLinkman(params: {
+        id: string, 
+        name: string, 
+        mobile: string, 
+        companyId: string, 
+        sex?: number, 
+        companyName?: string,
+        operatorId: string,
+        type: number
+    }): Promise<Linkman> {
         let linkman = Linkman.create(params);
-        await linkman.save();
+        linkman = await linkman.save();
         return linkman;
     }
 
@@ -1717,6 +1726,7 @@ class StaffModule{
         mobile?: string, 
         companyId?: string, 
         sex?: number,
+        companyName?: string,
         operatorId?: string,
         type?: number
     }): Promise<Linkman> {
