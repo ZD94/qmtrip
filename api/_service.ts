@@ -91,7 +91,7 @@ initModels({
     emailQueue: createServerService<EmailQueue>(EmailQueue),
     emailLog: createServerService<EmailLog>(EmailLog),
     emailSubmit: createServerService<EmailSubmit>(EmailSubmit),
-    linkMan: createServerService<Linkman>(Linkman)
+    linkman: createServerService<Linkman>(Linkman)
  
     // travelPolicyRegion: createServerService<TravelPolicyRegion>(TravelPolicyRegion),
     // companyRegion: createServerService<CompanyRegion>(CompanyRegion),

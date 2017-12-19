@@ -1697,8 +1697,8 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["id","name", "mobile", "companyId", "travelPolicyId", "operatorId"], linkmanCols)
-    static async createLinkMan(params: {name?: string, mobile?: string, companyId: string, travelPolicyId: string, sex?: number}): Promise<Linkman> {
+    @requireParams(["id","name", "mobile", "companyId", "operatorId"], linkmanCols)
+    static async createLinkman(params: {name?: string, mobile?: string, companyId: string, sex?: number}): Promise<Linkman> {
         let linkman = Linkman.create(params);
         await linkman.save();
         return linkman;
@@ -1707,16 +1707,15 @@ class StaffModule{
     /**
      * @method 更新外部联系人
      * @param params
-     * @returns {LinkMan}
+     * @returns {Linkman}
      */
     @clientExport
     @requireParams(["id"], linkmanCols)
-    static async updateLinkMan(params: {
+    static async updateLinkman(params: {
         id: string,
         name?: string, 
         mobile?: string, 
         companyId?: string, 
-        travelPolicyId?: string, 
         sex?: number,
         operatorId?: string,
         type?: number
@@ -1726,7 +1725,7 @@ class StaffModule{
         for(let key in params) {
             linkman[key] = params[key];
         }
-        await linkman.save();
+        linkman = await linkman.save();
         return linkman;
     }
 
@@ -1737,9 +1736,9 @@ class StaffModule{
      */
     @clientExport
     @requireParams(["id"], linkmanCols)
-    static async deleteLinkMan(params: {
+    static async deleteLinkman(params: {
         id: string
-    }): Promise<boolean> {
+    }): Promise<Boolean> {
         let linkman = await Models.linkman.get(params.id);
         await linkman.destroy();
         return true;
@@ -1752,7 +1751,7 @@ class StaffModule{
      */
     @clientExport
     @requireParams(["id"], linkmanCols)
-    static async getLinkMan(params: {id: string}): Promise<Linkman> {
+    static async getLinkman(params: {id: string}): Promise<Linkman> {
         let linkmans = await Models.linkman.get(params.id);
         return linkmans;
     }
@@ -1764,9 +1763,9 @@ class StaffModule{
      * @returns {LinkMan}
      */
     @clientExport
-    @requireParams([], ["where.name","where.mobile","where.sex", "where.travelPolicyId", "where.companyId", "where.operatorId",
+    @requireParams([], ["where.name","where.mobile","where.sex", "where.companyId", "where.operatorId","where.companyName",
     "order", "type"])
-    static async getLinkMans(params: {
+    static async getLinkmans(params: {
         where: any,
         order: any,
         attributes?: any,
