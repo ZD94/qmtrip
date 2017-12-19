@@ -24,7 +24,7 @@ function getWeekOfMonth(time: any) {
     return Math.ceil((day - dayOfWeek) / 7) + 1;
 }
 
-function formatMoney(number: any, places: any, symbol: any) {
+function formatMoney(number: any, places: number, symbol: string) {
     places = !isNaN(places = Math.abs(places)) ? places : 2;
     symbol = symbol !== undefined ? symbol : "";
     let thousand = ",";

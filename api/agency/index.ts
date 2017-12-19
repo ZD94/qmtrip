@@ -7,7 +7,7 @@ let API = require("@jingli/dnode-api");
 import L from '@jingli/language';
 import Logger from '@jingli/logger';
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
-import {Agency, AgencyUser, EAgencyStatus, EAgencyUserRole} from "_types/agency";
+import {Agency, AgencyUser, EAgencyStatus, EAgencyUserRole, IAgency, IAgencyUser} from "_types/agency";
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "../_decorator";
 import { Models, EGender, EAccountType } from '_types/index';
 import {md5} from "common/utils";
@@ -54,7 +54,7 @@ class AgencyModule {
      */
     @clientExport
     @requireParams(['name', 'email', 'mobile', 'userName'], ['description', 'remark', 'pwd', 'sex'])
-    static async registerAgency(params: any): Promise<Agency> {
+    static async registerAgency(params: IAgency): Promise<Agency> {
         let email = params.email;
         let mobile = params.mobile;
         let password = params.pwd || "123456";
@@ -104,7 +104,7 @@ class AgencyModule {
     @conditionDecorator([{if: condition.isMyAgency('0.id')}])
     @requirePermit('user.edit', 2)
     @modelNotNull('agency')
-    static async updateAgency(params: any): Promise<Agency> {
+    static async updateAgency(params: IAgency): Promise<Agency> {
         let agency = await Models.agency.get(params.id);
 
         for(let key in params) {
@@ -153,7 +153,7 @@ class AgencyModule {
      */
     @clientExport
     @requireParams(['mobile', 'name'], ['email', 'sex', 'avatar', 'roleId', 'pwd'])
-    static async createAgencyUser(params: {email?: string, name: string, mobile: string, sex?: number, avatar?: string, roleId?: number, pwd?: string}): Promise<AgencyUser> {
+    static async createAgencyUser(params: IAgencyUser): Promise<AgencyUser> {
         let curUser = await AgencyUser.getCurrent();
 
         if(!curUser) {
@@ -250,7 +250,7 @@ class AgencyModule {
      * @param options options.perPage 每页条数 options.page当前页
      */
     @clientExport
-    static async listAgencyUser(options: any) :Promise<FindResult> {
+    static async listAgencyUser(options: {where: {[key: string]: any}, perPage?: number, page?: number}) :Promise<FindResult> {
         let curUser = await AgencyUser.getCurrent();
         if(!options.where) {
             options.where = {}
@@ -266,7 +266,7 @@ class AgencyModule {
      * 测试用例使用删除代理商和用户的操作，不在client里调用
      * @param params
      */
-    static async deleteAgencyByTest(params: any) {
+    static async deleteAgencyByTest(params: IAgency) {
         let email = params.email;
         let mobile = params.mobile;
         let name = params.name;

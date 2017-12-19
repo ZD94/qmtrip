@@ -68,7 +68,7 @@ timerSendMail();
  * @returns {*}
  * @private
  */
-async function _recordEmailLog(id: any, status: any, error: any) {
+async function _recordEmailLog(id: string, status: number, error: string) {
     if (!error && status == 1) {
         error = 'ok';
     }
@@ -106,7 +106,7 @@ async function _recordEmailLog(id: any, status: any, error: any) {
  * @param {Boolean} isHtml
  * @private
  */
-function _sendEmail(toUser: any, subject: any, content: any, isHtml: any, attachments: any) {
+function _sendEmail(toUser: string, subject: string, content: string, isHtml: boolean, attachments: string | EmailAttachment[]) {
     if (!toUser) {
         throw L.ERR.EMAIL_EMPTY;
     }
@@ -125,20 +125,20 @@ function _sendEmail(toUser: any, subject: any, content: any, isHtml: any, attach
 }
 
 
-function send (options: {from: string, to: string, subject: string, text?: string, html?: string, attachments?: Array<EmailAttachment>}) {
+function send (options: {from: string, to: string, subject: string, text?: string, html?: string, attachments?: string | Array<EmailAttachment>}) {
     var from = options.from || '鲸力商旅 '+ C.mail.auth.user;
     var to = options.to;
     var subject = options.subject;
     var text = options.text || options.html;
     var html = options.html;
-    let attachments: any = options.attachments;
+    let attachments: EmailAttachment[]
     var transporter = nodemailer.createTransport(C.mail);
 
-    if (typeof attachments == 'string') {
-        attachments = JSON.parse(attachments);
+    if (typeof options.attachments == 'string') {
+        attachments = JSON.parse(options.attachments);
     }
 
-    attachments = attachments.map( (v: any) => {
+    attachments = attachments.map( (v) => {
         if (v.path) {
             v.path = path.join(process.cwd(), v.path);
         }
@@ -155,7 +155,7 @@ function send (options: {from: string, to: string, subject: string, text?: strin
     };
 
     return new Promise(function(resolve, reject){
-        transporter.sendMail(mailOptions, function(err: any, resp: any) {
+        transporter.sendMail(mailOptions, function(err: Error, resp: any) {
             if (err) {
                 reject(err);
             } else {

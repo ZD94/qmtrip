@@ -45,7 +45,7 @@ export default class CompanyModule {
      * @returns {Promise<Company>}
      */
     @requireParams(['createUser', 'name', 'domainName', 'mobile', 'email', 'agencyId'], ['id', 'description', 'telephone', 'remark'])
-    static async createCompany(params: any): Promise<Company> {
+    static async createCompany(params: Company): Promise<Company> {
         let results = await Models.company.find({ where: { $or: [{ email: params.email }, { mobile: params.mobile }] } });
 
         if (results && results.length > 0) {
@@ -82,7 +82,7 @@ export default class CompanyModule {
         let session = getSession();
         let pwd = params.pwd;
         let defaultAgency = await Models.agency.find({ where: { email: C.default_agency.email } });//Agency.__defaultAgencyId;
-        let agencyId: any;
+        let agencyId: string;
         if (defaultAgency && defaultAgency.length == 1) {
             agencyId = defaultAgency[0].id;
         }
@@ -200,7 +200,7 @@ export default class CompanyModule {
     @requirePermit('company.edit', 2)
     @requireParams(['id'], ['agencyId', 'name', 'description', 'mobile', 'remark', 'status'])
     @modelNotNull('company')
-    static async updateCompany(params: any): Promise<Company> {
+    static async updateCompany(params: Company): Promise<Company> {
         let companyId = params.id;
         let company = await Models.company.get(companyId);
 
@@ -235,7 +235,9 @@ export default class CompanyModule {
      */
     @clientExport
     @requireParams([], ['where.status'])
-    static async listCompany(options: any): Promise<FindResult> {
+    static async listCompany(options: {
+        order: any, where: any
+    }): Promise<FindResult> {
         let agencyUser = await AgencyUser.getCurrent();
         options.order = options.order || [['created_at', 'desc']];
         if (!options.where) {
@@ -276,7 +278,7 @@ export default class CompanyModule {
      * @param params.companyId 企业id
      */
     @requireParams(['companyId', 'userId'])
-    static async checkAgencyCompany(params: any): Promise<boolean> {
+    static async checkAgencyCompany(params: {companyId: string, userId: string}): Promise<boolean> {
         var c = await Models.company.get(params.companyId);
         var user = await Models.agencyUser.get(params.userId);
 
@@ -320,7 +322,7 @@ export default class CompanyModule {
      * @returns {Promise<string[]>}
      */
     @clientExport
-    static async listMoneyChange(options: any): Promise<FindResult> {
+    static async listMoneyChange(options: {where: any}): Promise<FindResult> {
         let staff = await Staff.getCurrent();
         if (!options.where) {
             options.where = {}
@@ -377,7 +379,9 @@ export default class CompanyModule {
      * @param params
      * @returns {Promise}
      */
-    static consumeMoney(params: any) {
+    static consumeMoney(params: { userId: string, type: number,
+        channel: string, remark: string
+    }) {
         let self: any = this;
         params.userId = self.accountId;
         params.type = -1;
@@ -396,7 +400,7 @@ export default class CompanyModule {
      * @return {Promise} true|false
      */
     @requireParams(['domain'])
-    static async domainIsExist(params: any) {
+    static async domainIsExist(params: {domain: string}) {
         if (C.is_allow_domain_repeat) {
             return false;
         }
@@ -454,7 +458,7 @@ export default class CompanyModule {
 
     @clientExport
     // @requireParams(['name', 'companyId'])
-    static async createSupplier(params: any): Promise<Supplier> {
+    static async createSupplier(params: object): Promise<Supplier> {
         let resCreate = await RestfulAPIUtil.operateOnModel({
             model: 'supplier',
             params: {
@@ -486,7 +490,7 @@ export default class CompanyModule {
 
     @clientExport
     // @requireParams(['id'])
-    static async deleteSupplier(params: any): Promise<any> {
+    static async deleteSupplier(params: object): Promise<any> {
         let resDelete = await RestfulAPIUtil.operateOnModel({
             model: 'supplier',
             params: {
@@ -521,7 +525,7 @@ export default class CompanyModule {
 
     @clientExport
     // @requireParams(['id'])
-    static async updateSupplier(params: any): Promise<any> {
+    static async updateSupplier(params: object): Promise<any> {
         console.log('updateparams', params);
         let resUpdate = await RestfulAPIUtil.operateOnModel({
             model: 'supplier',
@@ -581,7 +585,7 @@ export default class CompanyModule {
 
     @clientExport
     // @requireParams(['companyId'])
-    static async getSuppliers(params: any): Promise<any> {
+    static async getSuppliers(params: object): Promise<any> {
         // console.log('getsuppliers', params);
         let resGets = await RestfulAPIUtil.operateOnModel({
             model: 'supplier',
@@ -617,7 +621,7 @@ export default class CompanyModule {
      * get public suppliers' id
      */
     @clientExport
-    static async getPublicSuppliersId(params: any): Promise<any> {
+    static async getPublicSuppliersId(params: {companyId: string}): Promise<any> {
         // console.log('publicparams', params);
         let resPublic = await RestfulAPIUtil.operateOnModel({
             model: 'company',
@@ -637,7 +641,7 @@ export default class CompanyModule {
      * get all suppliers' id
      */
     @clientExport
-    static async getAllSuppliers(params: any): Promise<any> {
+    static async getAllSuppliers(params: object): Promise<any> {
         console.log('allparams', params);
         let resPri = await RestfulAPIUtil.operateOnModel({
             model: 'supplier',
@@ -667,7 +671,7 @@ export default class CompanyModule {
      * get all used suppliers' id
      */
     @clientExport
-    static async getAllUsedSuppliersId(params: any): Promise<any> {
+    static async getAllUsedSuppliersId(params: {companyId: string}): Promise<any> {
         // console.log('allusedparams',params);
         console.log('id:', params['companyId']);
         let resPublic = await RestfulAPIUtil.operateOnModel({
@@ -692,7 +696,7 @@ export default class CompanyModule {
 
         let res = resPublic.data.appointedPubilcSuppliers;
         let resPrivateData = resPrivate.data;
-        resPrivateData.map(function (item: any) {
+        resPrivateData.map(function (item: {id: string}) {
             res.push(item.id);
             return;
         });
@@ -705,7 +709,7 @@ export default class CompanyModule {
      * get public common suppliers
      */
     @clientExport
-    static async getCommonSupplier(params: any): Promise<any> {
+    static async getCommonSupplier(params: object): Promise<any> {
         let commonSuppliers = await RestfulAPIUtil.operateOnModel({
             model: 'supplierAlternateName',
             params: {
@@ -750,14 +754,14 @@ export default class CompanyModule {
     /*************************************企业行程点数变更日志begin***************************************/
 
     @clientExport
-    static async createTripPlanNumChange(params: any): Promise<TripPlanNumChange> {
+    static async createTripPlanNumChange(params: object): Promise<TripPlanNumChange> {
         var tpc = TripPlanNumChange.create(params);
         return tpc.save();
     }
 
     @clientExport
     @requireParams(["id"])
-    static async getTripPlanNumChange(params: any): Promise<TripPlanNumChange> {
+    static async getTripPlanNumChange(params: {id: string}): Promise<TripPlanNumChange> {
         return Models.tripPlanNumChange.get(params.id);
     }
 
@@ -767,7 +771,9 @@ export default class CompanyModule {
      * @returns {*}
      */
     @clientExport
-    static async getTripPlanNumChanges(params: any): Promise<FindResult> {
+    static async getTripPlanNumChanges(params: {
+        order: any
+    }): Promise<FindResult> {
         params.order = params.order || [['createdAt', 'desc']];
         let paginate = await Models.tripPlanNumChange.find(params);
         let ids = paginate.map(function (t) {
@@ -777,7 +783,7 @@ export default class CompanyModule {
     }
 
     @clientExport
-    static async getSelfCompanies(params: any): Promise<Company[]> {
+    static async getSelfCompanies(): Promise<Company[]> {
         let session = getSession();
         let accountId = session["accountId"]
         let staffs = await Models.staff.all({ where: { accountId: accountId } });
@@ -888,7 +894,7 @@ export default class CompanyModule {
     }
 
     @clientExport
-    static async getInvoiceTitles(params: any): Promise<FindResult> {
+    static async getInvoiceTitles(params: {order: any, where: any}): Promise<FindResult> {
         params.order = params.order || [['created_at', 'desc']];
         params.where = params.where || {};
         let invoices = await Models.invoiceTitle.find(params);
@@ -899,7 +905,7 @@ export default class CompanyModule {
     }
 
     @clientExport
-    static async createInvoiceTitle(params: any): Promise<InvoiceTitle> {
+    static async createInvoiceTitle(params: InvoiceTitle): Promise<InvoiceTitle> {
 
         let isRepeat = await CompanyModule.isRepeatInvoice({
             companyId: params.companyId,
@@ -916,7 +922,7 @@ export default class CompanyModule {
 
     @clientExport
     @requireParams(["id"], InvoiceTitle['$fieldnames'])
-    static async updateInvoiceTitle(params: any): Promise<InvoiceTitle> {
+    static async updateInvoiceTitle(params: {id: string, name: string}): Promise<InvoiceTitle> {
         let id = params.id;
         let staff = await Staff.getCurrent();
 
@@ -944,7 +950,7 @@ export default class CompanyModule {
 
     @clientExport
     @requireParams(["id"])
-    static async deleteInvoiceTitle(params: any): Promise<any> {
+    static async deleteInvoiceTitle(params: {id: string}): Promise<any> {
         let id = params.id;
         let staff = await Staff.getCurrent();
         let st_delete = await Models.invoiceTitle.get(id);
@@ -1199,7 +1205,7 @@ export default class CompanyModule {
                     })
 
                     let _companies = await Promise.all(ps);
-                    _companies.forEach((company: any) => {
+                    _companies.forEach((company) => {
                         companies.push({
                             name: company.name,
                             createUser: {

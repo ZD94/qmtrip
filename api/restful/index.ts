@@ -1,4 +1,4 @@
-import {AgencyUser} from '../../_types/agency/agency-user';
+import { AgencyUser } from '../../_types/agency/agency-user';
 /**
  * Created by mr_squirrel on 01/09/2017.
  */
@@ -16,23 +16,23 @@ function md5(str: string) {
 }
 
 export async function getAgentToken() {
-    const appId = config.agent.appId;
+    const appId: string = config.agent.appId;
     if (!appId) {
         return null;
     }
     let key = `token:agent:${appId}`;
     // logger.debug("KEY:", key)
-    const token = await cache.read(key);
+    const token: string = await cache.read(key);
     if (token) {
         // logger.debug('TOKEN:', token);
         return token;
     }
     const timestamp = Date.now();
-    const resp: any = await axios.post(`${config.cloudAPI}/agent/gettoken`, {
+    const resp: IResponseEntity<IToken> = await axios.post(`${config.cloudAPI}/agent/gettoken`, {
         appId,
         timestamp,
         sign: md5(`${config.agent.appSecret}|${timestamp}`)
-    }).then((res: any) => res.data)
+    }).then((res: { data: IToken }) => res.data)
 
     if (resp.code === 0) {
         await cache.write(key, resp.data.token, resp.data.expires - 30);
@@ -48,16 +48,16 @@ export async function getCompanyTokenByAgent(companyId: string) {
     }
     let key = `token:company:${companyId}`
     // logger.debug('KEY:', key);
-    const companyToken = await cache.read(key);
+    const companyToken: string = await cache.read(key);
     if (companyToken) {
         // logger.debug('TOKEN:', companyToken);
         return companyToken;
     }
 
     let agentToken = await getAgentToken();
-    const resp: any = await axios.get(`${config.cloudAPI}/agent/company/${companyId}/token`, {
+    const resp: IResponseEntity<IToken> = await axios.get(`${config.cloudAPI}/agent/company/${companyId}/token`, {
         headers: { token: agentToken }
-    }).then((res: any) => res.data);
+    }).then((res: {data: IToken}) => res.data);
 
     if (resp.code === 0) {
         await cache.write(key, resp.data.token, resp.data.expires);
@@ -81,7 +81,7 @@ export class RestfulAPIUtil {
         let companyToken: string;
         let currentAgency: AgencyUser = await AgencyUser.getCurrent();
 
-        if(!useProxy || currentAgency) {
+        if (!useProxy || currentAgency) {
             companyToken = await getAgentToken();
         }
         if (useProxy && !currentAgency) {
@@ -90,7 +90,7 @@ export class RestfulAPIUtil {
                 currentCompanyId = staff["companyId"];
             }
             companyToken = await getCompanyTokenByAgent(currentCompanyId);
-        } 
+        }
 
         if (!companyToken) {
             throw new Error('换取 token 失败！')
@@ -123,18 +123,18 @@ export class RestfulAPIUtil {
                 headers: {
                     token: companyToken
                 }
-            }, (err: Error, resp: any, result: any) => {
+            }, (err: Error, resp: never, result: string | object) => {
                 if (err) {
                     return reject(err);
                 }
-         
-                if (typeof(result) == 'string') {
-                    try{
+
+                if (typeof (result) == 'string') {
+                    try {
                         result = JSON.parse(result);
-                    }catch(e){
+                    } catch (e) {
                         console.error(e);
                         return reject(e);
-                    }                    
+                    }
                 }
                 return resolve(result);
             });
@@ -159,7 +159,7 @@ export class RestfulAPIUtil {
                 headers: {
                     token
                 }
-            }, (err: Error, resp: any, result: any) => {
+            }, (err: Error, resp: never, result: string | object) => {
                 if (err) {
                     return reject(err);
                 }
@@ -175,3 +175,14 @@ export class RestfulAPIUtil {
 
 
 export let restfulAPIUtil = new RestfulAPIUtil();
+
+export interface IToken {
+    token: string,
+    expires: number
+}
+
+export interface IResponseEntity<T> {
+    code: number,
+    msg: string,
+    data: T
+}

@@ -21,7 +21,14 @@ class DuiBa {
      * @returns {string}
      */
     @clientExport
-    static async getLoginUrl(params: any) :Promise<string>{
+    static async getLoginUrl(params?: {
+        uid?: string,
+        credits?: number,
+        appKey?: string,
+        appSecret?: string,
+        timestamp?: number,
+        sign?: string
+    }) :Promise<string>{
         var staff = await Staff.getCurrent();
         if(!params) params = {};
         params.uid = staff.accountId;
@@ -50,7 +57,7 @@ class DuiBa {
         return url;
     }
 
-    static async getSign(params: any) :Promise<string>{
+    static async getSign(params: {[key: string]: any}) :Promise<string>{
         if(params.hasOwnProperty("sign")){
             delete params.sign;
         }

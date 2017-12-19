@@ -18,6 +18,7 @@ import L from '@jingli/language';
 import * as CLS from 'continuation-local-storage';
 
 import {DB} from "@jingli/database";
+import { ITravelBudgetInfo } from 'http/controller/budget';
 var CLSNS = CLS.getNamespace('dnode-api-context');
 CLSNS.bindEmitter(emitter);
 
@@ -71,7 +72,7 @@ class ApproveModule {
         }
         let totalBudget = 0;
         if(budgetInfo.budgets && budgetInfo.budgets.length>0){
-            budgetInfo.budgets.forEach(function(item: any){
+            budgetInfo.budgets.forEach(function(item: ITravelBudgetInfo){
                 if(item.tripType != ETripType.SUBSIDY){
                     number = number + 1;
                 }
@@ -290,7 +291,8 @@ class ApproveModule {
 }
 
 //监听审批单变化
-emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result: any) {
+emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result: {approveNo: string, outerId: string, status:EApproveStatus,
+    approveUser:string, data: any, oa: string, budget: number, version: string}) {
     let p = (async function(){
         let {approveNo, outerId, status, approveUser, data, oa, budget} = result;
         let approve = await Models.approve.get(approveNo);
@@ -322,7 +324,7 @@ emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result: any) {
     })();
 
     //捕获事件中错误
-    p.catch((err) => {
+    p.catch((err: Error) => {
         console.error(err.stack);
     });
 })

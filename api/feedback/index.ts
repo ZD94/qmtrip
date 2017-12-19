@@ -17,7 +17,7 @@ var API = require("@jingli/dnode-api");
  * @returns {*}
  */
 class FeedBackModule {
-    static sendFeedback(data: any) {
+    static sendFeedback(data: {content: string, companyName: string, userName?: string}) {
         var content = data.content;
         if(!content){
             throw {code: -1, msg:"content不能为空"};

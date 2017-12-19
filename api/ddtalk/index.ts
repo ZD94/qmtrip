@@ -32,24 +32,24 @@ const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 // }
 let ddTalkMsgHandle = {
     /* * * * 临时授权码* * * * */
-    tmp_auth_code: async function(msg: any , req: Request , res: Response , next: NextFunction) {
+    tmp_auth_code: async function(msg: IMsg , req: Request , res: Response , next: NextFunction) {
         return await DealEvent.tmpAuthCode(msg , req , res , next);
     },
 
     /* * * * * 授权变更* * * * * * */
-    change_auth: async function(msg: any) {
+    change_auth: async function(msg: IMsg) {
         return msg;
     },
-    check_url: async function(msg: any) {
+    check_url: async function(msg: IMsg) {
         return msg;
     },
     /* * * * 解除授权信息 * * * */
-    suite_relieve: async function(msg: any) {
+    suite_relieve: async function(msg: IMsg) {
         return await DealEvent.suiteRelieve(msg);
     },
 
     /* * * 保存授权信息 , 每20分钟钉钉会请求一次 * * */
-    suite_ticket: async function(msg: any) {
+    suite_ticket: async function(msg: IMsg) {
         let ticket = msg.SuiteTicket;
         return await cache.write(CACHE_KEY, JSON.stringify({
             ticket: ticket, timestamp: msg.TimeStamp
@@ -57,12 +57,12 @@ let ddTalkMsgHandle = {
     },
 
     /* * * 企业增加员工 * * */
-    user_add_org: async function(msg: any) {
+    user_add_org: async function(msg: IMsg) {
         return await DealEvent.userModifyOrg(msg);
     },
 
     /* * 通讯录用户更改 * */
-    user_modify_org : async function(msg: any){
+    user_modify_org : async function(msg: IMsg){
         // let userIds = msg.UserId;
         // let corpId = msg.CorpId;
         // let execute = true;
@@ -78,7 +78,7 @@ let ddTalkMsgHandle = {
         return await DealEvent.userModifyOrg(msg);
     },
     /* * 通讯录用户离职 * */
-    user_leave_org : async function(msg: any){
+    user_leave_org : async function(msg: IMsg){
         return await DealEvent.userLeaveOrg(msg);
     },
     /* * 通讯录用户被设为管理员 * */
@@ -90,19 +90,19 @@ let ddTalkMsgHandle = {
     //     return msg;
     // },
     /* * *  通讯录企业部门创建 * * */
-    org_dept_create : async function(msg: any){
+    org_dept_create : async function(msg: IMsg){
         return await DealEvent.orgDeptCreate(msg);
     },
     /* * *  通讯录企业部门修改 * * */
-    org_dept_modify : async function(msg: any){
+    org_dept_modify : async function(msg: IMsg){
         return await DealEvent.orgDeptCreate(msg);
     },
     /* * *  通讯录企业部门删除 * * */
-    org_dept_remove : async function(msg: any){
+    org_dept_remove : async function(msg: IMsg){
         return await DealEvent.orgDeptRemove(msg);
     },
     /* * *  企业被解散 * * */
-    org_remove : async function(msg: any){
+    org_remove : async function(msg: IMsg){
         // return await DealEvent.orgDeptRemove(msg);
         return msg;
     }
@@ -112,7 +112,7 @@ let ddTalkMsgHandle = {
 let DDEventCorpId : any = {};
 
 
-class DDTalk {
+export class DDTalk {
     static __public: boolean = true;
 
     static __initHttpApp(app: Application) {
@@ -129,7 +129,7 @@ class DDTalk {
             res.send("ok");
         });
 
-        app.post("/ddtalk/isv/receive", dingSuiteCallback(config, async function (msg: any, req: Request, res: any, next: NextFunction) {
+        app.post("/ddtalk/isv/receive", dingSuiteCallback(config, async function (msg: IMsg, req: Request, res: any, next: NextFunction) {
 
             console.log("hello : ", msg);
             if(msg.CorpId){
@@ -245,7 +245,7 @@ class DDTalk {
         await this.dealEvent( corpId );
     }
 
-    static async eventPush( msg: any ){
+    static async eventPush( msg: IMsg ){
         let corpId = msg.CorpId;
         let key = 'company_events:' + corpId;
         await cache.rpush( key, msg );
@@ -409,6 +409,14 @@ function getRndStr(length: number) : string {
     return ret;
 }
 
-
-
-export= DDTalk
+export interface IMsg {
+    SuiteTicket?: string,
+    AuthCorpId?: string,
+    AuthCode?: string,
+    EventType: string,
+    SuiteKey: string,
+    TimeStamp: number,
+    CorpId?: string,
+    UserId?: string[],
+    DeptId?: string[]
+}

@@ -6,7 +6,7 @@ import {CPropertyType} from "_types/company";
 import LdapApi from "./ldapApi";
 export default class ShareConnection {
 
-    static connectionMap: any = {};
+    static connectionMap: {[key: string]: any} = {};
 
     static async initConnection(params: {companyId: string}){
         let ldapProperty = await Models.companyProperty.find({where: {companyId: params.companyId, type: CPropertyType.LDAP}});

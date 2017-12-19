@@ -24,6 +24,8 @@ import {FindResult} from "common/model/interface";
 import {CoinAccount} from "_types/coin";
 import {StaffDepartment} from "_types/department/staffDepartment";
 import { getSession } from "@jingli/dnode-api";
+import { Department } from '_types/department';
+import { FindOptions } from 'sequelize';
 
 
 const invitedLinkCols = InvitedLink['$fieldnames'];
@@ -42,7 +44,9 @@ class StaffModule{
      */
     @clientExport
     @requireParams(["name", "mobile"], staffAllCols)
-    static async createStaff (params: any): Promise<Staff> {
+    static async createStaff (params: {roleId: number, accountId: string, name: string,
+        travelPolicyId: string, email: string, mobile: string, isNeedChangePwd: boolean
+    }): Promise<Staff> {
         let currentStaff = await Staff.getCurrent();
         let company = currentStaff.company;
         if(params.roleId && params.roleId == EStaffRole.OWNER){
@@ -131,7 +135,7 @@ class StaffModule{
      */
     @clientExport
     @requireParams(["name", "mobile", "companyId"], staffAllCols)
-    static async registerStaff (params: any): Promise<Staff> {
+    static async registerStaff (params: Staff): Promise<Staff> {
         let company = await Models.company.get(params.companyId);
 
         /*let staffNum = await company.getStaffNum();
@@ -209,7 +213,7 @@ class StaffModule{
         {if: condition.isSameCompany("0.id")},
         {if: condition.isStaffsAgency("0.id")}
     ])
-    static async deleteStaff(params: any): Promise<any> {
+    static async deleteStaff(params: {id: string}): Promise<any> {
         let deleteStaff = await Models.staff.get(params.id);
         let departmentManger = await Models.department.$find({where: {managerId: deleteStaff.id}});
         let staff = await Staff.getCurrent();
@@ -245,7 +249,9 @@ class StaffModule{
      */
     @clientExport
     @requireParams(["id", "msgCode", "msgTicket", "mobile", "pwd"])
-    static async modifyMobile(params: any): Promise<Staff>{
+    static async modifyMobile(params: {
+        id: string, msgCode: string, pwd: string, msgTicket: string, mobile: string
+    }): Promise<Staff>{
         let pwd = params.pwd;
         let msgCode = params.msgCode;
         let msgTicket = params.msgTicket;
@@ -285,7 +291,9 @@ class StaffModule{
      */
     @clientExport
     @requireParams(["id", "email", "pwd"])
-    static async modifyEmail(params: any): Promise<Staff>{
+    static async modifyEmail(params: {
+        id: string, email: string, pwd: string
+    }): Promise<Staff>{
         let pwd = params.pwd;
         let email = params.email;
         let id = params.id;
@@ -319,7 +327,9 @@ class StaffModule{
      */
     @clientExport
     @requireParams(["id", "newPwd", "pwd"])
-    static async modifyPwd(params: any): Promise<Staff>{
+    static async modifyPwd(params: {
+        id: string, newPwd: string, pwd: string
+    }): Promise<Staff>{
         let pwd = params.pwd;
         let newPwd = params.newPwd;
         let id = params.id;
@@ -413,7 +423,10 @@ class StaffModule{
         {if: condition.isSameCompany("0.id")},
         {if: condition.isStaffsAgency("0.id")}
     ])
-    static async updateStaff(params: any) : Promise<Staff>{
+    static async updateStaff(params: {
+        id: string, msgCode?: string, pwd?: string, msgTicket?: string, mobile: string,
+        email?: string, staffStatus?: number, isValidateMobile?: boolean
+    }) : Promise<Staff>{
 
         let updateStaff = await Models.staff.get(params.id);
         let staff = await Staff.getCurrent();
@@ -487,7 +500,7 @@ class StaffModule{
                     accountId : session.accountId
                 }
             });
-            let resultStaffs: any[] = [];
+            let resultStaffs: Staff[] = [];
 
             staffs.map((staff)=>{
                 resultStaffs.push(staff);
@@ -564,7 +577,9 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    static async batchImportStaff(params: any){
+    static async batchImportStaff(params: {
+        fileId: string
+    }){
         let staff = await Staff.getCurrent();
         let fileId = params.fileId;
         let travelPolicyMaps: any = {};
@@ -693,7 +708,7 @@ class StaffModule{
                                         break;
                                     }
                                 }else{
-                                    let next_d: any = await Models.department.find({where:{name: _dd, companyId: companyId, parentId: p_id}});
+                                    let next_d: Department[] = await Models.department.find({where:{name: _dd, companyId: companyId, parentId: p_id}});
                                     if(!next_d || next_d.length <= 0){
                                         staffObj.reason = _dd + "部门不存在";
                                         s[7] = _dd + "部门不存在";
@@ -816,7 +831,9 @@ class StaffModule{
      * @returns {*}
      */
     @requireParams(['accountId', 'objAttr'])
-    static downloadExcle (params: any){
+    static downloadExcle (params: {
+        accountId: string, objAttr: string
+    }){
         let { accountId } = getSession();
         params.accountId = accountId;
         fs.exists(config.upload.tmpDir, function (exists: boolean) {
@@ -824,11 +841,10 @@ class StaffModule{
                 fs.mkdir(config.upload.tmpDir);
             }
         });
-        var data = params.objAttr;
+        var data = JSON.parse(params.objAttr)
         var nowStr = moment().format('YYYYMMDDHHmm');
         var md5 = crypto.createHash("md5");
         var fileName = md5.update(params.accountId+nowStr).digest("hex");
-        data = JSON.parse(data);
         if(!(data instanceof Array)){
             throw {code: -1, msg: "params.objAttr类型错误"};
         }
@@ -844,7 +860,7 @@ class StaffModule{
      * @param params
      * @returns {*}
      */
-    static async findOneStaff(params: any){
+    static async findOneStaff(params: FindOptions<Staff>){
         var options: any = {};
         options.where = params;
         let data = await DB.models.Staff.findOne(options);
@@ -869,7 +885,10 @@ class StaffModule{
      */
     @clientExport
     @requireParams(['id', 'companyId', 'accountId', 'increasePoint'], ["orderId", "remark"])
-    static async increaseStaffPoint(params: any) {
+    static async increaseStaffPoint(params: {
+        id: string, accountId: string, increasePoint: number, 
+        orderId: string, companyId: string, remark: string
+    }) {
         var id = params.id;
         var operatorId = params.accountId;
         var increasePoint = params.increasePoint;
@@ -898,7 +917,10 @@ class StaffModule{
      */
     @clientExport
     @requireParams(['id', 'decreasePoint'], ["accountId", "companyId", "remark"])
-    static async decreaseStaffPoint(params: any) {
+    static async decreaseStaffPoint(params: {
+        id: string, decreasePoint: number, accountId?: string,
+        companyId?: string, remark?: string
+    }) {
         var id = params.id;
         var decreasePoint = params.decreasePoint;
         var operatorId = params.accountId;
@@ -926,7 +948,7 @@ class StaffModule{
      */
     @clientExport
     @requireParams(["id"], ["columns"])
-    static async getPointChange(params: any): Promise<PointChange> {
+    static async getPointChange(params: {id: string}): Promise<PointChange> {
         let staff = await Staff.getCurrent();
         let id = params.id;
         let log = await Models.pointChange.get(id);
@@ -950,7 +972,9 @@ class StaffModule{
         {if: condition.isSameCompany("0.where.staffId")},
         {if: condition.isStaffsAgency("0.where.staffId")}
     ])
-    static async getPointChanges(params: any) :Promise<FindResult>{
+    static async getPointChanges(params: {
+        where: any, companyId: string
+    }) :Promise<FindResult>{
         let { accountId } = getSession();
         params.where = _.pick(params.where, Object.keys(DB.models.PointChange['attributes']));
         let role = await API.auth.judgeRoleById({id:accountId});
@@ -985,7 +1009,12 @@ class StaffModule{
         {if: condition.isSameCompany("0.staffId")},
         {if: condition.isStaffsAgency("0.staffId")}
     ])
-    static async listAndPaginatePointChange(params: any){
+    static async listAndPaginatePointChange(params: {
+        options: {
+            page: number, perPage: number, order: any,
+            where: any, limit: number, offset: number
+        }
+    }){
         var options: any = {};
         if(params.options){
             options = params.options;
@@ -1020,7 +1049,9 @@ class StaffModule{
      * @param options
      * @returns {*}
      */
-    static async staffPointsChangeByMonth (params: any) :Promise<any> {
+    static async staffPointsChangeByMonth (params: {
+        count: number, companyId: string, staffId: string
+    }) :Promise<any> {
         var q1: any  = _.pick(params, ['companyId', 'staffId']);
         var q2: any   = _.pick(params, ['companyId', 'staffId']);
         var q3: any  = _.pick(params, ['companyId', 'staffId']);
@@ -1034,11 +1065,11 @@ class StaffModule{
         var count = params.count;
         var dateArr = [];
         for(var i=0; i< count; i++){
-            var month = moment().subtract(i, 'months').format('YYYY-MM');
+            var month: string = moment().subtract(i, 'months').format('YYYY-MM');
             dateArr.push(month);
         }
 
-        return Promise.all(dateArr.map(async function(month: any){
+        return Promise.all(dateArr.map(async function(month){
             var start_time = moment(month + '-01').format('YYYY-MM-DD HH:mm:ss');
             var end_time = moment(month + '-01').endOf('month').format("YYYY-MM-DD")+" 23:59:59";
             q1.createdAt = {$gte: start_time, $lte: end_time};
@@ -1046,7 +1077,7 @@ class StaffModule{
             q3.createdAt = {$lte: end_time};
             q4.createdAt = {$lte: end_time};
 
-            let a: any, b: any, c: any, d:any;
+            let a: number, b: number, c: number, d: number;
             [a, b, c, d] = await Promise.all([
                     DB.models.PointChange.sum('points', {where: q1}),
                     DB.models.PointChange.sum('points', {where: q2}),
@@ -1075,7 +1106,9 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    static async getStaffPointsChangeByMonth(params: any) :Promise<any>{
+    static async getStaffPointsChangeByMonth(params: {
+        companyId: string, count: number, staffId: string
+    }) :Promise<any>{
         let { accountId } = getSession();
         let staff = await DB.models.Staff.findById(accountId)
         params.companyId = staff.companyId;
@@ -1095,7 +1128,9 @@ class StaffModule{
      */
     @clientExport
     @requireParams(['staffId'], ["startTime", "endTime"])
-    static async getStaffPointsChange(params: any){
+    static async getStaffPointsChange(params: {
+        staffId: string, startTime: string, endTime: string
+    }){
         let { accountId } = getSession();
         params.staffId = accountId;
         var staffId = params.staffId;
@@ -1142,7 +1177,9 @@ class StaffModule{
      * @returns {*}
      */
     @requireParams(['companyId'], ['startTime', 'endTime'])
-    static async statisticStaffsByTime(params: any) :Promise<any> {
+    static async statisticStaffsByTime(params: {
+        companyId: string, startTime: string, endTime: string
+    }) :Promise<any> {
         var companyId = params.companyId;
         var start = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
         var end = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
@@ -1161,7 +1198,9 @@ class StaffModule{
     }
 
     @clientExport
-    static async statisticStaffs(params: any){
+    static async statisticStaffs(params: {
+        companyId: string, startTime: string, endTime: string
+    }){
         let { accountId } = getSession();
         let user_id = accountId;
         let role = await API.auth.judgeRoleById({id:user_id});
@@ -1236,7 +1275,9 @@ class StaffModule{
      * @returns {promise} {adminNum: '管理员人数', commonStaffNum: '普通员工人数', unActiveNum: '未激活人数'};
      */
     @clientExport
-    static async statisticStaffsRole(params: any){
+    static async statisticStaffsRole(params: {
+        companyId: string, startTime: string, endTime: string
+    }){
         let { accountId } = getSession();
         let user_id = accountId;
         let role = await API.auth.judgeRoleById({id:user_id});
@@ -1349,7 +1390,9 @@ class StaffModule{
     }
 
     @clientExport
-    static async statStaffPoints(params: any) :Promise<any> {
+    static async statStaffPoints(params: {
+        companyId: string
+    }) :Promise<any> {
         let { accountId } = getSession();
         let role = await API.auth.judgeRoleById({id:accountId});
 
@@ -1369,7 +1412,9 @@ class StaffModule{
 
     }
 
-    static async deleteAllStaffByTest(params: any){
+    static async deleteAllStaffByTest(params: {
+        mobile: string, email: string
+    }){
         //var companyId = params.companyId;
         var mobile = params.mobile;
         var email = params.email;
@@ -1393,7 +1438,9 @@ class StaffModule{
      */
     @clientExport
     @requireParams(['type', 'idNo', 'ownerId'], ['validData', 'birthday'])
-    static async createPapers(params: any): Promise<Credential>{
+    static async createPapers(params: {
+        ownerId: string, type: number
+    }): Promise<Credential>{
         let { accountId } = getSession();
         params.ownerId = accountId;
         //查询该用户该类型证件信息是否已经存在 不存在添加 存在则修改
@@ -1413,7 +1460,7 @@ class StaffModule{
      */
     @clientExport
     @requireParams(['id'])
-    static async deletePapers(params: any): Promise<boolean>{
+    static async deletePapers(params: {id: string, ownerId: string}): Promise<boolean>{
         let { accountId } = getSession()
         params.ownerId = accountId;
         await DB.models.Credential.destroy({where: params});
@@ -1427,7 +1474,9 @@ class StaffModule{
      */
     @clientExport
     @requireParams(['id'], ['type', 'idNo', 'ownerId', 'validData', 'birthday'])
-    static async updatePapers(params: any): Promise<Credential>{
+    static async updatePapers(params: {
+        id: string, ownerId: string
+    }): Promise<Credential>{
         let { accountId } = getSession();
         let ma = await StaffModule.getPapersById({id: params.id});
         if(ma["ownerId"] != accountId){
@@ -1450,7 +1499,9 @@ class StaffModule{
      */
     @clientExport
     @requireParams(['id'], ['attributes'])
-    static async getPapersById(params: any): Promise<Credential>{
+    static async getPapersById(params: {
+        id: string, attributes?: string[]
+    }): Promise<Credential>{
         let { accountId } = getSession();
         var options: any = {};
         options.where = {id: params.id, ownerId: accountId};
@@ -1468,7 +1519,7 @@ class StaffModule{
      */
     @clientExport
     @requireParams(['type'], ['attributes'])
-    static async getOnesPapersByType(params: {where: {type: any}, attributes?: string[]}): Promise<Credential>{
+    static async getOnesPapersByType(params: {where: {type: number}, attributes?: string[]}): Promise<Credential>{
         let { accountId } = getSession();
         let options: any = params;
         options.where.ownerId = accountId;
@@ -1486,7 +1537,7 @@ class StaffModule{
      */
     @clientExport
     @requireParams(['ownerId'], ['attributes'])
-    static getPapersByOwner(params: any): PromiseLike<any[]>{
+    static getPapersByOwner(params: {attributes: string[]}): PromiseLike<any[]>{
         let { accountId } = getSession();
         var options: any = {};
         options.where = {ownerId: accountId};
@@ -1497,7 +1548,7 @@ class StaffModule{
 
     /*************************************邀请链接begin***************************************/
     @clientExport
-    static async createInvitedLink(params: any): Promise<InvitedLink>{
+    static async createInvitedLink(params: {url: string}): Promise<InvitedLink>{
         let host = params.url || config.host;
         let goInvitedLink = host + "#/login/invited-staff-one";
         var staff = await Staff.getCurrent();
@@ -1520,7 +1571,7 @@ class StaffModule{
     }
 
     @clientExport
-    static async createInvitedLinkV2(params: any): Promise<InvitedLink>{
+    static async createInvitedLinkV2(params: {url: string}): Promise<InvitedLink>{
         let host = params.url || config.host;
         let goInvitedLink = host + "#/login/invited-staff-one";
         var staff = await Staff.getCurrent();
@@ -1548,7 +1599,7 @@ class StaffModule{
     @conditionDecorator([
         {if: condition.isSelfLink("0.id")}
     ])
-    static async updateInvitedLink(params: any): Promise<InvitedLink>{
+    static async updateInvitedLink(params: {id: string}): Promise<InvitedLink>{
         var updateInvitedLink = await Models.invitedLink.get(params.id);
         for(var key in params){
             updateInvitedLink[key] = params[key];
@@ -1562,7 +1613,7 @@ class StaffModule{
     @conditionDecorator([
         {if: condition.isSelfLink("0.id")}
     ])
-    static async getInvitedLink(params: any): Promise<InvitedLink>{
+    static async getInvitedLink(params: {id: string}): Promise<InvitedLink>{
         var invitedLink = await Models.invitedLink.get(params.id)
         return  invitedLink;
     }
@@ -1593,7 +1644,7 @@ class StaffModule{
      */
     @clientExport
     @requireParams(["staffId", "supplierId", "loginInfo"], staffSupplierInfoCols)
-    static async createStaffSupplierInfo (params: any) : Promise<StaffSupplierInfo>{
+    static async createStaffSupplierInfo (params: StaffSupplierInfo) : Promise<StaffSupplierInfo>{
         let staff = await Staff.getCurrent();
         params.staffId = staff.id;
         var staffSupplierInfo = StaffSupplierInfo.create(params);
@@ -1611,7 +1662,7 @@ class StaffModule{
     @conditionDecorator([
         {if: condition.isStaffSupplierInfoOwner("0.id")}
     ])
-    static async deleteStaffSupplierInfo(params: any) : Promise<any>{
+    static async deleteStaffSupplierInfo(params: {id: string}) : Promise<any>{
         var id = params.id;
         var st_delete = await Models.staffSupplierInfo.get(id);
 
@@ -1631,7 +1682,7 @@ class StaffModule{
     @conditionDecorator([
         {if: condition.isStaffSupplierInfoOwner("0.id")}
     ])
-    static async updateStaffSupplierInfo(params: any) : Promise<StaffSupplierInfo>{
+    static async updateStaffSupplierInfo(params: {id: string}) : Promise<StaffSupplierInfo>{
         var id = params.id;
         var sp = await Models.staffSupplierInfo.get(id);
         for(var key in params){
@@ -1661,7 +1712,7 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    static async getStaffSupplierInfos(params: any): Promise<FindResult>{
+    static async getStaffSupplierInfos(params: FindOptions<StaffSupplierInfo>): Promise<FindResult>{
         params.order = params.order || [['created_at', 'desc']];
 
         let paginate = await Models.staffSupplierInfo.find(params);

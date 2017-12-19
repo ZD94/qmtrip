@@ -13,5 +13,5 @@ export interface CorpAccessToken {
 export interface DDTalkCache {
     set(key: string, data: any): Promise<any>;
     get(key: string): Promise<any>;
-    remove(key: any): Promise<any>;
+    remove(key: string): Promise<any>;
 }

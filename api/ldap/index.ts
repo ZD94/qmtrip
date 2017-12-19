@@ -74,7 +74,21 @@ export class LdapModule {
      * @returns {Promise<Promise<any>|Promise<Promise<any>|Promise<any>>>}
      */
     @clientExport
-    async registerLdapCompany(params: any){
+    async registerLdapCompany(params: {
+        mobile: string,
+        email: string,
+        name: string,
+        userName: string,
+        pwd: string,
+        status: number,
+        isValidateMobile: boolean,
+        ldapBaseDn: string,
+        ldapStaffRootDn: string,
+        ldapDepartmentRootDn: string,
+        ldapUrl: string,
+        ldapAdminDn: string,
+        ldapAdminPassword: string
+    }){
         var result = await API.company.registerCompany(params);
         return result;
     }

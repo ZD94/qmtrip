@@ -32,7 +32,7 @@ class ApiAttachment {
      * @param {String} params.fileId
      * @param {UUID} params.accountId
      */
-    static bindOwner(params: any) {
+    static bindOwner(params: {fileId: string, accountId: string}) {
         var fileId = params.fileId;
         var accountId = params.accountId;
         return Owner.create({
@@ -41,11 +41,11 @@ class ApiAttachment {
         })
     }
 
-    static getOwner(params: any) {
+    static getOwner(params: {fileId: string, user_id: string}) {
         var fileId = params.fileId;
         var accountId = params.user_id;
         return Owner.findOne({where:{accountId: accountId, fileId: fileId}})
-            .then(function(owner: any){
+            .then(function(owner: object){
                 if(owner){
                     return true;
                 }else{
@@ -61,7 +61,7 @@ class ApiAttachment {
      * @param {String} params.fileId
      * @param {UUID} params.accountId
      */
-    static async getSelfAttachment(params: any) {
+    static async getSelfAttachment(params: {fileId: string}) {
         var fileId = params.fileId;
         // var owner = await Owner.findOne({where: {fileId: fileId, accountId: accountId}});
         // if (!owner) {
@@ -75,7 +75,7 @@ class ApiAttachment {
         return attachment;
     }
 
-    static async getFileCache(params: any) {
+    static async getFileCache(params: {id: string, isPublic: boolean}) {
         try{
             var id = params.id;
             var isPublic = params.isPublic;

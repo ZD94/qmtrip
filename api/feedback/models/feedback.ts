@@ -1,10 +1,12 @@
+import { DataTypes } from 'sequelize';
+
 /**
  * Created by wyl on 16-1-21.
  */
 var uuid = require("node-uuid");
 var now = require("common/utils").now;
 
-export= function (Db: any, DataType: any) {
+export= function (Db: any, DataType: DataTypes) {
 
     return Db.define("Feedback", {
         id           : {type: DataType.UUID,        defaultValue: uuid.v1, primaryKey: true},

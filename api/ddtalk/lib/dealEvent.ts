@@ -21,6 +21,8 @@ import L from '@jingli/language';
 import DdCompany from "./ddCompany";
 import DdDepartment from "./ddDepartment";
 import DdStaff from "./ddStaff";
+import { Request,Response, NextFunction } from 'express-serve-static-core';
+import { IMsg } from 'api/ddtalk';
 
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 
@@ -73,7 +75,7 @@ export async function _getSuiteToken(): Promise<any> {
     // return {"suite_access_token": "9761c575f39c3505b5478e98bf28e705", "expire_at": 1489560379128}
 }
 
-async function _getPermanentCode(suiteToken: any, tmpAuthCode: any) {
+async function _getPermanentCode(suiteToken: string, tmpAuthCode: string) {
     let url = 'https://oapi.dingtalk.com/service/get_permanent_code';
     return reqProxy(url, {
         name: '获取永久授权码',
@@ -107,7 +109,7 @@ export async function getISVandCorp(corp : {corpId: string, permanentCode: strin
 }
 
 /* transpond */
-export function transpond(req: any, res: any, next: any, options:any, urls?:string){
+export function transpond(req: Request, res: Response, next: NextFunction, options?: {timeout: number, decorateRequest?: Function}, urls?:string){
     let url = config.test_url.replace(/\/$/g, "");
     url = url + "/ddtalk/isv/receive";
     if(urls){
@@ -122,7 +124,7 @@ export function transpond(req: any, res: any, next: any, options:any, urls?:stri
     proxy(url, options)(req, res, next);
 }
 
-export async function tmpAuthCode(msg: any, req: any, res: any, next: any) {
+export async function tmpAuthCode(msg: IMsg, req: Request, res: Response, next: NextFunction) {
     const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
     let isExist = await cache.read(TMP_CODE_KEY);
     if (isExist) {
@@ -254,7 +256,7 @@ export async function synchroDDorganization() : Promise<boolean> {
  *   解除授权信息 处理事件
  */
 
-export async function suiteRelieve(msg: any) {
+export async function suiteRelieve(msg: IMsg) {
     let corpId = msg.AuthCorpId;
     // let corps = await Models.ddtalkCorp.find({where: {corpId: corpId}});
     let comPro = await Models.companyProperty.find({where: {value: corpId, type: CPropertyType.DD_ID}});
@@ -292,7 +294,7 @@ export async function suiteRelieve(msg: any) {
  *    }
  */
 
-async function ddEventCommon(msg: any){
+async function ddEventCommon(msg: IMsg){
     let corpId = msg.CorpId;
 
     let comPro = await Models.companyProperty.find({where: {value: corpId, type: CPropertyType.DD_ID}});
@@ -322,7 +324,7 @@ async function ddEventCommon(msg: any){
  *   EventType : user_modify_org , user_add_org
  *   通讯录用户更改 ， 企业增加员工
  */
-export async function userModifyOrg(msg: any){
+export async function userModifyOrg(msg: IMsg){
     let {corpApi, isvApi} = await ddEventCommon(msg);
     let userIds = msg.UserId;
     let corpId = msg.CorpId;
@@ -332,7 +334,7 @@ export async function userModifyOrg(msg: any){
         throw new Error("该企业没有钉钉授权");
     }
     let company = await Models.company.get(comPro[0].companyId);
-    userIds.map(async (item: any)=>{
+    userIds.map(async (item)=>{
         let oaStaff = new DdStaff({id: item, corpId: corpId, isvApi: isvApi, corpApi: corpApi, company: company});
         let ddStaff = await oaStaff.getSelfById();
         await ddStaff.sync();
@@ -343,12 +345,12 @@ export async function userModifyOrg(msg: any){
  *  EventType : user_leave_org
  *  钉钉删除员工
  */
-export async function userLeaveOrg(msg: any){
+export async function userLeaveOrg(msg: IMsg){
     let {corpApi, isvApi} = await ddEventCommon(msg);
     let userIds = msg.UserId;
     let corpId = msg.CorpId;
 
-    userIds.map(async (item: any)=>{
+    userIds.map(async (item)=>{
         let oaStaff = new DdStaff({id: item, corpId: corpId, isvApi: isvApi, corpApi: corpApi});
         await oaStaff.leaveOrg();
 
@@ -361,7 +363,7 @@ export async function userLeaveOrg(msg: any){
  *  EventType : org_dept_create , org_dept_modify
  *  通讯录企业部门创建 , 通讯录企业部门修改
  */
-export async function orgDeptCreate(msg: any) : Promise<void>{
+export async function orgDeptCreate(msg: IMsg) : Promise<void>{
     let {corpApi, isvApi} = await ddEventCommon(msg);
     let ddDeparts = msg.DeptId;
     let corpId = msg.CorpId;
@@ -372,7 +374,7 @@ export async function orgDeptCreate(msg: any) : Promise<void>{
     }
     let company = await Models.company.get(comPro[0].companyId);
 
-    ddDeparts.map(async (item: any)=>{
+    ddDeparts.map(async (item)=>{
         let oaDepartment = new DdDepartment({id: item, corpId: corpId, isvApi: isvApi, corpApi: corpApi, company: company});
         let ddDept = await oaDepartment.getSelfById();
         await ddDept.sync();
@@ -383,12 +385,12 @@ export async function orgDeptCreate(msg: any) : Promise<void>{
  *  EventType : org_dept_remove
  *  通讯录企业部门删除
  */
-export async function orgDeptRemove(msg: any) : Promise<any> {
+export async function orgDeptRemove(msg: IMsg) : Promise<any> {
     let {corpApi, isvApi} = await ddEventCommon(msg);
     let ddDeparts = msg.DeptId;
     let corpId = msg.CorpId;
 
-    ddDeparts.map(async (item: any)=>{
+    ddDeparts.map(async (item)=>{
         let oaDepartment = new DdDepartment({id: item, corpId: corpId, isvApi: isvApi, corpApi: corpApi});
         await oaDepartment.destroy();
     });

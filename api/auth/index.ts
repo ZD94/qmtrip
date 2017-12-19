@@ -3,7 +3,7 @@
  */
 "use strict";
 import { requireParams, clientExport } from "@jingli/dnode-api/dist/src/helper";
-import { Models, EAccountType } from "_types";
+import { Models, EAccountType, EGender } from "_types";
 import { Account, ACCOUNT_STATUS } from "_types/auth";
 import { Staff, EInvitedLinkStatus, EAddWay, EStaffRole } from "_types/staff";
 import validator = require('validator');
@@ -22,6 +22,7 @@ var API = require("@jingli/dnode-api");
 var utils = require("common/utils");
 var accountCols = Account['$fieldnames'];
 import { getSession } from "@jingli/dnode-api";
+import { Application } from 'express-serve-static-core';
 
 let codeTicket = "checkcode:ticket:";
 
@@ -461,7 +462,11 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(['mobile', 'name', 'companyId', 'msgCode', 'msgTicket', 'pwd'], ['avatarColor'])
-    static async invitedStaffRegister(data: any): Promise<any> {
+    static async invitedStaffRegister(data: {
+        msgCode: string, msgTicket: string,
+        mobile: string, name: string, pwd: string, 
+        companyId: string, avatarColor?: string
+    }): Promise<any> {
         var msgCode = data.msgCode;
         var msgTicket = data.msgTicket;
         var mobile = data.mobile;
@@ -523,7 +528,11 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(['mobile', 'name', 'companyId', 'msgTicket', 'pwd'], ['avatarColor', 'sex'])
-    static async invitedNewStaffRegister(data: any): Promise<any> {
+    static async invitedNewStaffRegister(data: {
+        sex: EGender, msgTicket: string,
+        mobile: string, name: string, pwd: string, 
+        companyId: string, avatarColor?: string
+    }): Promise<any> {
         let msgTicket = data.msgTicket;
         let mobile = data.mobile;
         let name = data.name;
@@ -541,7 +550,7 @@ export default class ApiAuth {
             throw L.ERR.MOBILE_NOT_CORRECT();
         }
 
-        let staff = await API.staff.registerStaff({
+        let staff: Staff = await API.staff.registerStaff({
             mobile: mobile,
             name: name,
             sex: sex,
@@ -561,7 +570,9 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(['mobile', 'msgCode', 'msgTicket'])
-    static async inviteStaffone( params: any ) : Promise<any>{
+    static async inviteStaffone( params: {
+        mobile: string, msgCode: string, msgTicket: string
+    }) : Promise<any>{
         let mobile = params.mobile && params.mobile.toString(),
             msgCode= params.msgCode && params.msgCode.toString(),
             msgTicket=params.msgTicket;
@@ -609,7 +620,7 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(["msgTicket", "mobile", "companyId"])
-    static async joinAnCompany( params: any ) : Promise<any>{
+    static async joinAnCompany( params: {mobile: string, msgTicket: string, companyId: string} ) : Promise<any>{
         let mobile = params.mobile,
             msgTicket=params.msgTicket,
             companyId=params.companyId;
@@ -888,7 +899,7 @@ export default class ApiAuth {
         var sign = makeActiveSign(acc.pwdToken, acc.id, timestamp);
         var url = "accountId=" + acc.id + "&timestamp=" + timestamp + "&sign=" + sign + "&email=" + acc.email;
 
-        var vals: any = {
+        var vals: {[key: string]: any} = {
             name: staff.name || acc.mobile,
             username: acc.email,
             time: new Date(),
@@ -1096,7 +1107,7 @@ export default class ApiAuth {
      * @returns {*}
      */
     @clientExport
-    static async updateAccount(params: any) : Promise<Account>{
+    static async updateAccount(params: Account) : Promise<Account>{
         var id = params.id;
         console.log("更新字段:====>", params);
         var ah = await Models.account.get(id);
@@ -1113,7 +1124,7 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(["id"])
-    static async getAccount(params: any) {
+    static async getAccount(params: {id: string}) {
         var id = params.id;
         var options: any = {};
         var acc = await Models.account.get(id, options);
@@ -1126,7 +1137,7 @@ export default class ApiAuth {
      * @returns {*}
      */
     @requireParams(["id"])
-    static async getPrivateInfo(params: any) {
+    static async getPrivateInfo(params: {id: string}) {
         var id = params.id;
         var acc = await Models.account.get(id);
         return acc;
@@ -1213,7 +1224,7 @@ export default class ApiAuth {
      * @param params
      * @returns {*}
      */
-    static async checkAccExist(params: any) {
+    static async checkAccExist(params: {[key: string]: any}) {
         var accounts = await Models.account.find(params);
         return accounts.total > 0;
     };
@@ -1265,7 +1276,7 @@ export default class ApiAuth {
     }
 
 
-    static __initHttpApp(app: any) {
+    static __initHttpApp(app: Application) {
         wechat.__initHttpApp(app);
         qrcode.__initHttp(app);
     }

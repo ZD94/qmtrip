@@ -255,14 +255,19 @@ export default class ApiTravelBudget {
         }
         let count = params.staffList.length;
         let destinationPlacesInfo = params.destinationPlacesInfo;
-        let _staff: any = {
+        let _staff = {
             gender: staff.sex,
             policy: 'domestic',
         }
         let staffs = [_staff];
         // let priceLimitSegments: any =[];
-        let segments: any[] = await Promise.all(destinationPlacesInfo.map(async (placeInfo) => {
-            var segment: any = {};
+        let segments = await Promise.all(destinationPlacesInfo.map(async (placeInfo) => {
+            var segment: {
+                city: string, staffs: object, beginTime: Date, endTime: Date,
+                isNeedTraffic: boolean, isNeedHotel: boolean, location:{
+                    latitude: number, longitude: number
+                }
+            }
             segment.city = placeInfo.destinationPlace;
             let city: Place = (await API.place.getCityInfo({cityCode: placeInfo.destinationPlace, companyId: companyId}));
             if (city.isAbroad) {
@@ -407,7 +412,7 @@ export default class ApiTravelBudget {
                 let budget = subsidy;
                 budget.price = budget.price * count;
                 if (budget.templates) {
-                    budget.templates.forEach((t: any) => {
+                    budget.templates.forEach((t: {price: number}) => {
                         t.price = t.price * count;
                     })
                 }
@@ -530,7 +535,9 @@ export default class ApiTravelBudget {
         if (company.name != "鲸力智享") {
 
             try {
-                await Promise.all(systemNoticeEmails.map(async function (s: any) {
+                await Promise.all(systemNoticeEmails.map(async function (s: {
+                    email: string, name: string
+                }) {
                     try {
                         await API.notify.submitNotify({
                             key: 'qm_notify_system_new_travelbudget',

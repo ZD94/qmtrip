@@ -10,6 +10,7 @@ import { Models } from '_types/index';
 import { FindResult, PaginateInterface } from "common/model/interface";
 import {Staff, EStaffStatus} from "_types/staff";
 import {conditionDecorator, condition} from "../_decorator";
+import { FindOptions } from 'sequelize';
 
 const departmentCols = Department['$fieldnames'];
 const staffDepartmentCols = StaffDepartment['$fieldnames'];
@@ -26,7 +27,7 @@ class DepartmentModule{
         {if: condition.isCompanyAgency("0.companyId")},
         {if: condition.isCompanyDepartment("0.parentId")}
     ])
-    static async createDepartment (params: any): Promise<Department>{
+    static async createDepartment (params: Department): Promise<Department>{
 
         let result = await Models.department.find({where: {name: params.name, companyId: params.companyId}});
 
@@ -56,7 +57,7 @@ class DepartmentModule{
         {if: condition.isDepartmentAdminOrOwner("0.id")},
         {if: condition.isDepartmentAgency("0.id")}
     ])
-    static async deleteDepartment(params: any): Promise<any>{
+    static async deleteDepartment(params: {id: string}): Promise<any>{
         var department = await Models.department.get(params.id);
         let staffs = await department.getStaffs();
         if(staffs && staffs.length > 0){
@@ -85,7 +86,7 @@ class DepartmentModule{
         {if: condition.isDepartmentAdminOrOwner("0.id")},
         {if: condition.isDepartmentAgency("0.id")}
     ])
-    static async updateDepartment(params: any): Promise<Department>{
+    static async updateDepartment(params: Department): Promise<Department>{
         if(params.parentId){
             let ids = await DepartmentModule.getAllChildDepartmentsId({parentId: params.id});
             if(ids.indexOf(params.parentId) >= 0){
@@ -138,7 +139,7 @@ class DepartmentModule{
         {if: condition.isCompanyAgency("0.where.companyId")},
         {if: condition.isCompanyStaff("0.where.companyId")}
     ])
-    static async getDepartments(params: any) :Promise<FindResult>{
+    static async getDepartments(params: FindOptions<any>) :Promise<FindResult>{
         params.order = params.order || [['createdAt', 'desc']];
 
         let paginate = await Models.department.find(params);
@@ -341,7 +342,7 @@ class DepartmentModule{
         return staffs;
     }
 
-    static async deleteDepartmentByTest(params: any){
+    static async deleteDepartmentByTest(params: {name: string, companyId: string}){
         await DB.models.Department.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}});
         return true;
     }
@@ -355,7 +356,7 @@ class DepartmentModule{
      */
     @clientExport
     @requireParams(["departmentId", "staffId"], staffDepartmentCols)
-    static async createStaffDepartment (params: any) : Promise<StaffDepartment>{
+    static async createStaffDepartment (params: StaffDepartment) : Promise<StaffDepartment>{
         var staffDepartment = StaffDepartment.create(params);
         var already = await Models.staffDepartment.find({where: {departmentId: params.departmentId, staffId: params.staffId}});
         if(already && already.length>0){
@@ -373,7 +374,7 @@ class DepartmentModule{
      */
     @clientExport
     @requireParams(["id"])
-    static async deleteStaffDepartment(params: any) : Promise<any>{
+    static async deleteStaffDepartment(params: {id: string}) : Promise<any>{
         var id = params.id;
         var ah_delete = await Models.staffDepartment.get(id);
 
@@ -390,7 +391,7 @@ class DepartmentModule{
      */
     @clientExport
     @requireParams(["id"], staffDepartmentCols)
-    static async updateStaffDepartment(params: any) : Promise<StaffDepartment>{
+    static async updateStaffDepartment(params: StaffDepartment) : Promise<StaffDepartment>{
         var id = params.id;
 
         var ah = await Models.staffDepartment.get(id);
@@ -421,7 +422,7 @@ class DepartmentModule{
      * @returns {*}
      */
     @clientExport
-    static async getStaffDepartments(params: any): Promise<FindResult>{
+    static async getStaffDepartments(params: FindOptions<any>): Promise<FindResult>{
         let paginate = await Models.staffDepartment.find(params);
         let ids =  paginate.map(function(t){
             return t.id;

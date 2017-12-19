@@ -114,7 +114,7 @@ class ApiPlace {
             throw new Error("cityCode require but is " + params.cityCode);
         }
         return API.place.getCityInfo(params)
-            .then(function(result: any) {
+            .then(function(result: object) {
                 if(!result) {
                     return null;
                 }

@@ -96,7 +96,7 @@ class CoinModule {
         return await coinAccount.costCoin(coins, remark)
     }
 
-    static async createCoinAccount (params: any) : Promise<CoinAccount>{
+    static async createCoinAccount (params: {[key: string]: any}) : Promise<CoinAccount>{
         var ca = CoinAccount.create(params);
         return ca.save();
     }
@@ -119,7 +119,9 @@ class CoinModule {
      * @returns {*}
      */
     @clientExport
-    static async getCoinAccountChanges(params: any): Promise<FindResult>{
+    static async getCoinAccountChanges(params: {
+        order: any
+    }): Promise<FindResult>{
         params.order = params.order || [['createdAt', 'desc']];
         let paginate = await Models.coinAccountChange.find(params);
         let ids =  paginate.map(function(t){

@@ -53,7 +53,7 @@ export function filterResultColumn(columns: string[]) {
 }
 
 //追加函数参数
-export function addFuncParams(params: any) {
+export function addFuncParams(params: {[key: string]: any, [Symbol.iterator](): any}) {
     return function(target: any, key: string, desc: PropertyDescriptor) {
         let fn = desc.value;
         desc.value = function(...args: any[]) {

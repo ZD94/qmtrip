@@ -12,7 +12,7 @@ import { Staff } from '_types/staff';
 import { Company } from '_types/company';
 
 
-export function getConsumeInvoiceImg(params: any) {
+export function getConsumeInvoiceImg(params: {consumeId: string}) {
     let consumeId = params.consumeId;
     return API.tripPlan.getConsumeInvoiceImg({
         consumeId: consumeId
@@ -24,7 +24,11 @@ export function getConsumeInvoiceImg(params: any) {
  * 代理商获取员工计划单分页列表
  * @returns {*}
  */
-export function pageTripPlans(this: { accountId: string }, params: any){
+export function pageTripPlans(this: { accountId: string }, params: {
+    audit: string, status: number | object, auditStatus: number,
+    isHasBudget: boolean, budget: any, agencyAll: boolean, page: number,
+    perPage: number, order: any
+}){
     if(!params) {
         throw {code: -10, msg: '参数不能为空'};
     }
@@ -113,7 +117,9 @@ export function pageTripPlans(this: { accountId: string }, params: any){
  * @param params.userId 用户id
  * @returns {*|*|Promise}
  */
-export function approveInvoice(this: { accountId: string }, params: any){
+export function approveInvoice(this: { accountId: string }, params: {
+    userId: string, remark: string, consumeId: string, status: number
+}){
     let self = this;
     let user_id = self.accountId;
     params.userId = user_id;
@@ -127,7 +133,7 @@ export function approveInvoice(this: { accountId: string }, params: any){
     let reason = "";
 
     return API.tripPlan.getTripDetail({consumeId: consumeId, columns: ['accountId', 'orderId', 'type', 'startTime']})
-        .then(function(consumeDetail: any){
+        .then(function(consumeDetail: {accountId: string, orderId: string, type: number, startTime: string}){
             if(!consumeDetail.accountId){
                 throw {code: -6, msg: '消费记录异常'};
             }
@@ -160,7 +166,7 @@ export function approveInvoice(this: { accountId: string }, params: any){
                 API.agency.getAgencyUser({id: user_id, columns: ['agencyId']})
             ])
         })
-        .spread(function(company: Company, user: any){
+        .spread(function(company: Company, user: {agencyId: string}){
             if(!company.target.agencyId){
                 throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
             }
@@ -171,7 +177,7 @@ export function approveInvoice(this: { accountId: string }, params: any){
 
             return API.tripPlan.approveInvoice(params);
         })
-        .then(function(isSuccess: any){
+        .then(function(isSuccess: boolean){
             //判断审核操作是否完成，完成则执行后续操作
             if(!isSuccess){
                 return isSuccess;
@@ -179,7 +185,7 @@ export function approveInvoice(this: { accountId: string }, params: any){
 
             return API.tripPlan.getTripPlanOrder({orderId: orderId, columns: ['id', 'status', 'score', 'budget', 'expenditure', 'description', 'startAt']});
         })
-        .then(function(ret: any){
+        .then(function(ret: boolean | {[key: string]: any}){
             //判断ret类型，如果是Boolean则直接返回
             if(typeof ret == 'boolean'){
                 return ret;
@@ -304,7 +310,9 @@ export function approveInvoice(this: { accountId: string }, params: any){
  * @param params
  * @returns {*}
  */
-export async function countTripPlanNum(this: { accountId: string }, params: any){
+export async function countTripPlanNum(this: { accountId: string }, params: {
+    companyId: string,
+}){
     let self = this;
     let accountId = self.accountId; //代理商用户Id
 
@@ -327,13 +335,15 @@ export async function countTripPlanNum(this: { accountId: string }, params: any)
  * 统计计划单的动态预算/计划金额和实际支出
  * @param params
  */
-export async function statPlanOrderMoneyByAgency(this: { accountId: string }, params: any) {
+export async function statPlanOrderMoneyByAgency(this: { accountId: string }, params: {
+    companyId: string, startTime: string, endTime: string
+}) {
     let self = this;
     if(!params.companyId){
         throw {code: -1, msg: '企业Id不能为空'};
     }
     let companyId = params.companyId;
-    params = _.pick(params, ['companyId', 'startTime', 'endTime']);
+    let p = _.pick(params, ['companyId', 'startTime', 'endTime']);
 
     let [u, c] = await Promise.all([
         API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']}),
@@ -342,6 +352,6 @@ export async function statPlanOrderMoneyByAgency(this: { accountId: string }, pa
     if(u.agencyId != c.agencyId){
         throw L.ERR.PERMISSION_DENY();
     }
-    params.companyId = companyId;
-    return API.tripPlan.statPlanOrderMoney(params);
+    p.companyId = companyId;
+    return API.tripPlan.statPlanOrderMoney(p);
 }

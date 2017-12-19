@@ -27,7 +27,7 @@ export default class ModelForClient{
         return model.$find(options);
     }
     @clientExport
-    static async update<T extends ModelObjInterface>(modelType: string, id: string, props: any, options: any): Promise<T>{
+    static async update<T extends ModelObjInterface>(modelType: string, id: string, props: object, options: any): Promise<T>{
         let model = Models[modelType] as ModelInterface<T>;
         if(!model)
             throw L.ERR.INVALID_ARGUMENT('modelType');
