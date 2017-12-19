@@ -16,7 +16,7 @@ import L from '@jingli/language';
 import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
-import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo, EAddWay, Linkman } from "_types/staff";
+import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo, EAddWay, Linkman} from "_types/staff";
 import { Notice } from "_types/notice";
 import { EAgencyUserRole, AgencyUser } from "_types/agency";
 import { Models, EAccountType, EGender } from '_types';
@@ -1708,7 +1708,7 @@ class StaffModule{
         operatorId: string,
         type: number
     }): Promise<Linkman> {
-        let linkman = Linkman.create(params);
+        let linkman = Models.linkman.create(params);
         linkman = await linkman.save();
         return linkman;
     }
