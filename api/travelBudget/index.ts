@@ -593,7 +593,8 @@ export default class ApiTravelBudget {
                     let tripApproveUpdate = await API.tripApprove.updateTripApprove({
                         id: approve.id,
                         budget: totalBudget,
-                        companyId: companyId
+                        companyId: companyId,
+                        budgetInfo: budgets
                     });
                     console.log('asdfadfasdfbroadcast===========');
                     console.log(`'tripApproveBudgetUpdate:'${approve.id}`);

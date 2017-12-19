@@ -960,8 +960,8 @@ export default class TripApproveModule {
             companyId = currentStaff["companyId"];
         }
         //=====begin 当budgetInfo可以获取到时，以下代码可以删除
-        if(params.budgetInfo)
-            delete params.budgetInfo;
+        // if(params.budgetInfo)
+        //     delete params.budgetInfo;
         //=====end 当budgetInfo可以获取到时，以上代码可以删除
 
         let tripApprove = await API.eventListener.sendRequestToApprove({

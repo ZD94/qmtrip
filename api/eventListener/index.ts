@@ -76,8 +76,7 @@ export class EventModule{
                 uri: `${url}`,
                 body: params,
                 json:true,
-                method: 'post',
-                qs: params
+                method: 'post'
             });
             if(typeof(result) == 'string'){
                 result = JSON.parse(result);
