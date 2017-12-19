@@ -695,7 +695,6 @@ export default class ApiTravelBudget {
         let approve;
         if (!isIntoApprove) {  //判断是否是审批人查看审批单时进行的第二次拉取数据 
             //创建approve，获得approveId用于URL和更新
-            console.log('approveParams', params);
             approve = Models.approve.create({
                 approveUser: params.approveUser.id,
                 type: EApproveType.TRAVEL_BUDGET,
@@ -754,19 +753,19 @@ export default class ApiTravelBudget {
             let hotel = _budgets[i].hotel;
             if (hotel && hotel.length) {
                 let budget = hotel[0];
-                let cityObj = await API.place.getCityInfo({cityCode: city, companyId: companyId});
+                let cityObj = await API.place.getCityInfo({cityCode: budget.city, companyId: companyId});
                 let isAccordHotel = await Models.accordHotel.find({ where: { cityCode: cityObj.id, companyId: staff['companyId'] } });
                 if (isAccordHotel && isAccordHotel.length) {
                     budget.price = isAccordHotel[0].accordPrice;
 
+
                     /* 出差时间计算 */
-                    let residentPlace = await API.place.getCityInfo({ cityCode: budget.city });
-                    let timezone = residentPlace.timezone && typeof (residentPlace.timezone) != undefined ?
-                        residentPlace.timezone : 'Asia/shanghai';
+                    let timezone = cityObj.timezone || 'Asia/shanghai';
                     let beginTime = moment(budget.checkInDate).tz(timezone).hour(12);
                     let endTime = moment(budget.checkOutDate).tz(timezone).hour(12);
                     let days = moment(endTime).diff(beginTime, 'days');
                     budget.price = budget.price * days;
+
                     /* 出差时间计算 END */
                 }
 
@@ -823,13 +822,13 @@ export default class ApiTravelBudget {
                 accountId: staff.id,
                 query: params
             });
-            console.log('-----updateBudget-------', budgets);
             
             obj.query['frozenNum'] = result.frozenNum;
             //拿到预算后更新approve表
             if (!isIntoApprove) {//判断是否是审批人查看审批单时进行的第二次拉取数据
                 let updateBudget = await Models.approve.get(approveId);
-                let submitter = await Staff.getCurrent();
+                // let submitter = await Staff.getCurrent();
+                let submitter = await Models.staff.get(staff.id);
                 updateBudget.submitter = submitter.id;
                 updateBudget.data = obj;
                 updateBudget.title = obj.query['projectName'];
@@ -910,13 +909,13 @@ export default class ApiTravelBudget {
         let content = '';
         
         if(query && query.originPlace){
-            let originCity = await API.place.getCityInfo({cityCode: query.originPlace});
+            let originCity = await API.place.getCityInfo({cityCode: query.originPlace, companyId: company.id});
             content = content + originCity.name + "-";
         }
         if(destinationPlaces &&  _.isArray(destinationPlaces) && destinationPlaces.length > 0){
             for(let i = 0; i < destinationPlaces.length; i++){
                 let segment: ISegment = destinationPlaces[i]
-                let destinationCity = await API.place.getCityInfo({cityCode: segment.destinationPlace});
+                let destinationCity = await API.place.getCityInfo({cityCode: segment.destinationPlace, companyId: company.id});
                 if(i<destinationPlaces.length-1){
                     content = content + destinationCity.name+"-";
                 }else{
