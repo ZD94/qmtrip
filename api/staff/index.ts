@@ -16,7 +16,7 @@ import L from '@jingli/language';
 import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
-import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo, EAddWay, LinkMan } from "_types/staff";
+import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo, EAddWay, Linkman } from "_types/staff";
 import { Notice } from "_types/notice";
 import { EAgencyUserRole, AgencyUser } from "_types/agency";
 import { Models, EAccountType, EGender } from '_types';
@@ -26,7 +26,7 @@ import {ENoticeType} from "_types/notice/notice";
 import {CoinAccount} from "_types/coin";
 import {StaffDepartment} from "_types/department/staffDepartment";
 import { getSession } from "@jingli/dnode-api";
-const linkManCols = LinkMan['$fieldnames'];
+const linkmanCols = Linkman['$fieldnames'];
 
 const invitedLinkCols = InvitedLink['$fieldnames'];
 const staffSupplierInfoCols = StaffSupplierInfo['$fieldnames'];
@@ -1697,9 +1697,9 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["id","name", "mobile", "companyId", "travelPolicyId", "operatorId"], linkManCols)
-    static async createLinkMan(params: {name?: string, mobile?: string, companyId: string, travelPolicyId: string, sex?: number}): Promise<LinkMan> {
-        let linkman = LinkMan.create(params);
+    @requireParams(["id","name", "mobile", "companyId", "travelPolicyId", "operatorId"], linkmanCols)
+    static async createLinkMan(params: {name?: string, mobile?: string, companyId: string, travelPolicyId: string, sex?: number}): Promise<Linkman> {
+        let linkman = Linkman.create(params);
         await linkman.save();
         return linkman;
     }
@@ -1710,7 +1710,7 @@ class StaffModule{
      * @returns {LinkMan}
      */
     @clientExport
-    @requireParams(["id"], linkManCols)
+    @requireParams(["id"], linkmanCols)
     static async updateLinkMan(params: {
         id: string,
         name?: string, 
@@ -1720,9 +1720,9 @@ class StaffModule{
         sex?: number,
         operatorId?: string,
         type?: number
-    }): Promise<LinkMan> {
+    }): Promise<Linkman> {
 
-        let linkman = await Models.linkMan.get(params.id);
+        let linkman = await Models.linkman.get(params.id);
         for(let key in params) {
             linkman[key] = params[key];
         }
@@ -1736,11 +1736,11 @@ class StaffModule{
      * @returns {boolean}
      */
     @clientExport
-    @requireParams(["id"], linkManCols)
+    @requireParams(["id"], linkmanCols)
     static async deleteLinkMan(params: {
         id: string
     }): Promise<boolean> {
-        let linkman = await Models.linkMan.get(params.id);
+        let linkman = await Models.linkman.get(params.id);
         await linkman.destroy();
         return true;
     }
@@ -1751,9 +1751,9 @@ class StaffModule{
      * @returns {LinkMan}
      */
     @clientExport
-    @requireParams(["id"], linkManCols)
-    static async getLinkMan(params: {id: string}): Promise<LinkMan> {
-        let linkmans = await Models.linkMan.get(params.id);
+    @requireParams(["id"], linkmanCols)
+    static async getLinkMan(params: {id: string}): Promise<Linkman> {
+        let linkmans = await Models.linkman.get(params.id);
         return linkmans;
     }
 
@@ -1764,15 +1764,15 @@ class StaffModule{
      * @returns {LinkMan}
      */
     @clientExport
-    @requireParams(["where.operatorId"], ["where.name","where.mobile","where.sex", "where.travelPolicyId", 
-    "order", "companyId", "type"])
+    @requireParams([], ["where.name","where.mobile","where.sex", "where.travelPolicyId", "where.companyId", "where.operatorId",
+    "order", "type"])
     static async getLinkMans(params: {
         where: any,
         order: any,
         attributes?: any,
-    }): Promise<PaginateInterface<LinkMan>> {
+    }): Promise<PaginateInterface<Linkman>> {
 
-        let linkmans = await Models.linkMan.find(params);
+        let linkmans = await Models.linkman.find(params);
         return linkmans;
     }
 

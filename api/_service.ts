@@ -1,7 +1,7 @@
 
 import { initModels } from '_types';
 
-import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo, StaffProperty, LinkMan} from '_types/staff';
+import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo, StaffProperty, Linkman} from '_types/staff';
 import { Company, MoneyChange, Supplier, TripPlanNumChange, CompanyProperty, InvoiceTitle } from '_types/company';
 import { Department, StaffDepartment, DepartmentProperty } from '_types/department';
 import { PromoCode } from '_types/promoCode';
@@ -91,7 +91,7 @@ initModels({
     emailQueue: createServerService<EmailQueue>(EmailQueue),
     emailLog: createServerService<EmailLog>(EmailLog),
     emailSubmit: createServerService<EmailSubmit>(EmailSubmit),
-    linkMan: createServerService<LinkMan>(LinkMan)
+    linkMan: createServerService<Linkman>(Linkman)
  
     // travelPolicyRegion: createServerService<TravelPolicyRegion>(TravelPolicyRegion),
     // companyRegion: createServerService<CompanyRegion>(CompanyRegion),
