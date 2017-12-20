@@ -4,10 +4,14 @@ import {parseAuthString} from "_types/auth/auth-cert";
 import { Staff } from "_types/staff";
 import { Models } from "_types";
 import { EOrderStatus } from "_types/tripPlan";
+<<<<<<< HEAD
 import { AuthRequest } from '_types/auth';
 import {getCompanyTokenByAgent} from '../restful';
 var request = require("request-promise");
 var requestp = require("request");
+=======
+var request = require("request");
+>>>>>>> 4bdfc8ee564d7e1b8403b10286cc30282dd87bd6
 var path = require("path");
 var _ = require("lodash");
 var cors = require('cors');
@@ -19,7 +23,6 @@ const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OP
 function resetTimeout(req, res, next){
     req.clearTimeout();
     next();
-    //conn_timeout('180s')(req, res, next);
 }
 class Proxy {
     /**
@@ -99,6 +102,7 @@ class Proxy {
             }
         })
 
+
         app.all(/order.*/, cors(corsOptions),resetTimeout, timeout('120s'), async (req: Request, res: Response, next: Function) => {
             if(req.method == 'OPTIONS') {
                 return next();
@@ -106,8 +110,7 @@ class Proxy {
             let authstr = req.query.authstr;
             if(!authstr || typeof authstr == 'undefined') 
                 authstr = req.body.authstr;
-            console.log("======> query ", req.query)
-            console.log("======> body ", req.body)
+            console.log("======> authstr ", authstr)
             let token = parseAuthString(authstr);
             let verification = await API.auth.authentication(token);
             if(!verification) {
@@ -140,11 +143,6 @@ class Proxy {
                supplier: req.headers['supplier'],
                listeningon: `${config.orderSysConfig.tripDetailMonitorUrl}/${tripDetail.id}`
             }
-            //headers的测试数据
-            // let headers:{[index: string]: any}={
-            //     auth: '%7B%22username%22%3A%22JingLiZhiXiang%22%2C%22password%22%3A%22123456%22%7D',
-            //     supplier: 'meiya'
-            // }
 
             let body: {[index: string]: any} = req.body;
 
@@ -159,27 +157,14 @@ class Proxy {
             pathstring = pathstring.replace("/order", '');
             let url = `${config.orderSysConfig.orderLink}${pathstring}`;
             let result:any;
-            console.log("===========url: ", url);
-            console.log("===========tripDetailId: ", tripDetailId);
-            console.log("==========method, ", req.method)
-            console.log("==========method, ", req.body)
+            console.log("===========url: ", url, '===tripDetailId: ', tripDetailId, '====>method:', req.method, '=======> body: ', req.body);
             try{
-                // result = await request(url, {
-                //     headers,
-                //     body,
-                //     json: true,
-                //     method: req.method,
-                //     timeout: 500*1000
-                // });
-                result = await new Promise((resolve,reject) => {  //request-promise 无法设置超时
-                    requestp({
-                        url,
-                        headers,
-                        body,
+                result = await new Promise((resolve,reject) => {  
+                    request({ url, headers, body, 
                         json: true,
                         method: req.method,
                         timeout: 120*1000
-                    }, (err, res, body) => {
+                    }, (err: Error, res: any, body: any) => {
                         if(err) {
                             console.log("-=========>err: ", err);
                             reject(err)
@@ -196,21 +181,21 @@ class Proxy {
             console.log("========================> result.", result)
             if(!result) 
                 return res.json(null);
-            //以下可要，可不要，具体需要对是否回调，哪些接口会回调做判断
+            //以下提交订单成功后，更新订单状态和订单号
             if(typeof result == 'string') {
                 result = JSON.parse(result);
             }
             if(result.code == 0 && result.data && !tripDetail.orderNo){  //&& result.data.orderN
                 if(result.data.orderNos && typeof(result.data.orderNos) != 'undefined'){
-                    tripDetail.reserveStatus = EOrderStatus.await_auditing;  //飞机的orderNos为数组
+                    tripDetail.reserveStatus = EOrderStatus.AUDITING;  //飞机的orderNos为数组
                     tripDetail.orderNo = result.data.orderNos[0];
                 }
                 if(result.data.OrderNo && typeof(result.data.OrderNo) != 'undefined') {  
-                    tripDetail.reserveStatus = EOrderStatus.await_auditing;  //飞机的orderNos为数组
+                    tripDetail.reserveStatus = EOrderStatus.AUDITING;  //飞机的orderNos为数组
                     tripDetail.orderNo = result.data.OrderNo;
                 }  
                 if(result.data.orderNo && typeof(result.data.orderNo) != 'undefined') {  
-                    tripDetail.reserveStatus = EOrderStatus.await_auditing;   //酒店的orderNo为string
+                    tripDetail.reserveStatus = EOrderStatus.AUDITING;   //酒店的orderNo为string
                     tripDetail.orderNo = result.data.orderNo;
                 }
                 await tripDetail.save();
