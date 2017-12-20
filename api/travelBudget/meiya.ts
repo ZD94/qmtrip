@@ -424,7 +424,8 @@ export function similarityMatch(params: {
 
 export function matchMeiyaHotel(origin, meiyaData) {
     let names = [];
-    origin = origin.map((hotel, index) => {
+    let result = [];
+    origin.map((hotel, index) => {
         let hasMeiya = false;
         for (let agent of hotel.agents) {
             if (agent.name == "meiya") {
@@ -433,8 +434,10 @@ export function matchMeiyaHotel(origin, meiyaData) {
                 break;
             }
         }
-
-        origin.splice(index, 1);
+        
+        if (hasMeiya){
+            result.push(hotel);
+        }
     });
 
     let checkInDate = origin[0].checkInDate,
@@ -464,10 +467,10 @@ export function matchMeiyaHotel(origin, meiyaData) {
             "commentScore": Math.ceil(Math.random() * 2) + 8,
             "distance": 2000
         }
-        origin.push(data);
+        result.push(data);
     }
 
-    return origin;
+    return result;
 }
 
 export interface IMeiyaFlightPriceInfo {
