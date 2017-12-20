@@ -119,8 +119,6 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         param.savedate = moment().format("YYYY/MM/DD HH:mm:ss");
         param.timeout = moment().add(1, 'month').format("YYYY/MM/DD HH:mm:ss");
 
-        var param_str = JSON.stringify(param);
-
         let date = moment(options.leaveDate).format("YYYY-MM-DD");
         let jsCode = `
             var canGo = sessionStorage.getItem("canGo");
