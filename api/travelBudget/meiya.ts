@@ -355,7 +355,7 @@ export function compareHotelData(origin, meiyaData) {
         }
     }
     console.log("after ===============compareHotelData meiyaData.length===>", meiyaData.length);
-    return origin;
+    return matchMeiyaHotel(origin, meiyaData);
 }
 
 /**
@@ -421,6 +421,55 @@ export function similarityMatch(params: {
         return true;
     return false;
 }
+
+export function matchMeiyaHotel(origin, meiyaData) {
+    let names = [];
+    origin = origin.map((hotel, index) => {
+        let hasMeiya = false;
+        for (let agent of hotel.agents) {
+            if (agent.name == "meiya") {
+                names.push(hotel.name);
+                hasMeiya = true;
+                break;
+            }
+        }
+
+        origin.splice(index, 1);
+    });
+
+    let checkInDate = origin[0].checkInDate,
+        checkOutDate = origin[0].checkOutDate;
+
+    for (let meiya of meiyaData) {
+        if (names.indexOf(meiya.name) > -1) {
+            continue;
+        }
+
+        let data = {
+            "name": meiya.cnName,
+            "star": meiya.starRating,
+            "agents": [
+                {
+                    "name": "meiya",
+                    "price": Math.ceil(Math.random() * 500) + 300,
+                    urlParams: {
+                        hotelId: meiya.hotelId
+                    }
+                }
+            ],
+            "latitude": meiya.latitude,
+            "longitude": meiya.longitude,
+            "checkInDate": checkInDate,
+            "checkOutDate": checkOutDate,
+            "commentScore": Math.ceil(Math.random() * 2) + 8,
+            "distance": 2000
+        }
+        origin.push(data);
+    }
+
+    return origin;
+}
+
 export interface IMeiyaFlightPriceInfo {
     airPortFree?: number;
     airlineYouHui?: number;
