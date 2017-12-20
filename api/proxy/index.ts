@@ -4,21 +4,16 @@ import {parseAuthString} from "_types/auth/auth-cert";
 import { Staff } from "_types/staff";
 import { Models } from "_types";
 import { EOrderStatus } from "_types/tripPlan";
-<<<<<<< HEAD
 import { AuthRequest } from '_types/auth';
 import {getCompanyTokenByAgent} from '../restful';
-var request = require("request-promise");
-var requestp = require("request");
-=======
+var requestp = require("request-promise");
 var request = require("request");
->>>>>>> 4bdfc8ee564d7e1b8403b10286cc30282dd87bd6
 var path = require("path");
 var _ = require("lodash");
 var cors = require('cors');
 const config = require("@jingli/config");
 const API = require("@jingli/dnode-api");
 var timeout = require('connect-timeout');
-let req = require('request');
 const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'Content-Type,auth,supplier'} 
 function resetTimeout(req, res, next){
     req.clearTimeout();
@@ -70,7 +65,7 @@ class Proxy {
 
             try {
                 result = await new Promise((resolve, reject) => {
-                    return req({
+                    return request({
                         uri: url,
                         body: req.body,
                         json: true,
