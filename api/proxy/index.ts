@@ -4,6 +4,8 @@ import {parseAuthString} from "_types/auth/auth-cert";
 import { Staff } from "_types/staff";
 import { Models } from "_types";
 import { EOrderStatus } from "_types/tripPlan";
+import { AuthRequest } from '_types/auth';
+import {getCompanyTokenByAgent} from '../restful';
 var request = require("request-promise");
 var requestp = require("request");
 var path = require("path");
@@ -11,7 +13,8 @@ var _ = require("lodash");
 var cors = require('cors');
 const config = require("@jingli/config");
 const API = require("@jingli/dnode-api");
-var timeout = require('connect-timeout')
+var timeout = require('connect-timeout');
+let req = require('request');
 const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'Content-Type,auth,supplier'} 
 function resetTimeout(req, res, next){
     req.clearTimeout();
@@ -28,6 +31,74 @@ class Proxy {
         app.options(/order*/, cors(corsOptions), (req: Request, res: Response, next: Function) => {         
             return res.sendStatus(200);
         })
+        app.all(/travel.*/, cors(corsOptions), resetTimeout, timeout('120s'), async (req: any, res: Response, next: Function) => {
+            if (req.method == 'OPTIONS') {
+                return next();
+            }
+            console.log('---------query--------->', req.query);
+            console.log('---------body---------->', req.body);
+            
+            //qmtrip验证
+            let {authstr}  = req.headers;
+            let token: AuthRequest = parseAuthString(authstr);
+            let verification = await API.auth.authentication(token);
+            if (!verification) {
+                console.log('authentic failed!', JSON.stringify(req.cookies));
+                res.sendStatus(401);
+                return;
+            }
+
+            //公有云验证
+            let staff: Staff = await Staff.getCurrent();
+            console.log('companyId in cloud authentic');
+            let companyId: string = staff['companyId'];
+            let companyToken: string = await getCompanyTokenByAgent(companyId);
+            if (!companyToken) {
+                throw new Error('换取 token 失败！');
+            }
+            
+            //request to JLCloud(jlbudget) 
+            let result: any;
+            let pathstr: string = req.path;
+            pathstr = pathstr.replace('/travel', '');
+            let JLOpenApi: string = config.cloud;
+            JLOpenApi.replace('/cloud', '');
+            let url: string = `${JLOpenApi}${pathstr}`;
+
+            try {
+                result = await new Promise((resolve, reject) => {
+                    return req({
+                        uri: url,
+                        body: req.body,
+                        json: true,
+                        method: req.method,
+                        qs: req.query,
+                        headers: {
+                            token: companyToken
+                        }
+                    }, (err, resp, result) => {
+                        if (err) {
+                            return reject(err);
+                        }
+                        if (typeof result == 'string') {
+                            try {
+                                result = JSON.parse(result);
+                            } catch(e) {
+                                console.error(e);
+                                return reject(e);
+                            }
+                        }
+                        return resolve(result);
+                    });
+                });
+            } catch(err) {
+                if (err) {
+                    console.error('ERROR TRAVEL In api/proxy/index:   ', err);
+                    return null;
+                }
+            }
+        })
+
         app.all(/order.*/, cors(corsOptions),resetTimeout, timeout('120s'), async (req: Request, res: Response, next: Function) => {
             if(req.method == 'OPTIONS') {
                 return next();
