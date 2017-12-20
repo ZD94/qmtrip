@@ -563,7 +563,7 @@ export default class ApiTravelBudget {
             }
             approve.data = {budgets: budgets, query: approve.data.query};
             approve = await approve.save();
-            console.log('approve.step---------------->', approve.step)
+            console.log('approve.step---------------->', approve.step);
             if (approve.step === 'FIN') {
                 console.log('------------enter FIN---------');
                 let params = {approveNo: approve.id};
