@@ -34,7 +34,7 @@ export = async function transform(values: any): Promise<any>{
         let policyRegions = await API.travelPolicy.getCompanyRegion({companyId: currentCompany.id, name: DefaultRegion.abroad});
         policyRegions = policyRegions.data;
         if(policyRegions && policyRegions.length) {
-            let abroadRegion = await API.travelPolicy.getTravelPolicyRegion({travelPolicyId: travelPolicy.id, companyRegionId: policyRegions[0].id});
+            let abroadRegion = await API.travelPolicy.getTravelPolicyRegions({travelPolicyId: travelPolicy.id, companyRegionId: policyRegions[0].id, companyId: currentCompany.id});
             abroadRegion = abroadRegion.data;
             if (abroadRegion && abroadRegion.length > 0) {
                 travelp.abroadPlaneLevels = abroadRegion[0].planeLevels;
@@ -47,7 +47,7 @@ export = async function transform(values: any): Promise<any>{
         let policyRegions = await API.travelPolicy.getCompanyRegion({companyId: currentCompany.id, name: DefaultRegion.domestic});
         policyRegions = policyRegions.data;
         if(policyRegions && policyRegions.length) {
-            let domesticRegion = await API.travelPolicy.getTravelPolicyRegion({travelPolicyId: travelPolicy.id, companyRegionId: policyRegions[0].id});
+            let domesticRegion = await API.travelPolicy.getTravelPolicyRegions({travelPolicyId: travelPolicy.id, companyRegionId: policyRegions[0].id, companyId: currentCompany.id});
             domesticRegion = domesticRegion.data;
             if (domesticRegion && domesticRegion.length > 0) {
                 travelp.planeLevels = domesticRegion[0].planeLevels;
@@ -75,16 +75,16 @@ export = async function transform(values: any): Promise<any>{
         destinationPlacesInfo = JSON.parse(destinationPlacesInfo);
     }
     if(query.originPlace){
-        let originPlace = await API.place.getCityInfo({cityCode: query.originPlace});
+        let originPlace = await API.place.getCityInfo({cityCode: query.originPlace, companyId: currentCompany.id});
         cityMap[query.originPlace] = originPlace;
     }
     if(query.goBackPlace){
-        let goBackPlace = await API.place.getCityInfo({cityCode: query.goBackPlace});
+        let goBackPlace = await API.place.getCityInfo({cityCode: query.goBackPlace, companyId: currentCompany.id});
         cityMap[query.goBackPlace] = goBackPlace;
     }
     if(destinationPlacesInfo && destinationPlacesInfo.length > 0){
         await Promise.all(destinationPlacesInfo.map(async function(item, index){
-            let arrivalInfo = await API.place.getCityInfo({cityCode: item.destinationPlace});
+            let arrivalInfo = await API.place.getCityInfo({cityCode: item.destinationPlace, companyId: currentCompany.id});
             item.latestArrivalDateTime = moment(item.latestArrivalDateTime).tz(arrivalInfo.timezone).format("MM-DD HH:mm");
             item.earliestGoBackDateTime = moment(item.earliestGoBackDateTime).tz(arrivalInfo.timezone).format("MM-DD HH:mm");
             cityMap[item.destinationPlace] = arrivalInfo;

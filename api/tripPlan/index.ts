@@ -18,7 +18,7 @@ import _ = require('lodash');
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
-    TripApprove, QMEApproveStatus, EApproveResult, EApproveResult2Text,
+    QMEApproveStatus, EApproveResult, EApproveResult2Text,
     EPayType, ESourceType, EInvoiceFeeTypes, EInvoiceStatus, TrafficEInvoiceFeeTypes
 } from "_types/tripPlan";
 import {Models} from "_types";
@@ -338,7 +338,7 @@ class TripPlanModule {
     @requireParams(['id'])
     @modelNotNull('tripPlan')
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
-    static async commitTripPlan(params: {id: string, staffId: string}): Promise<boolean> {
+    static async commitTripPlan(params: {id: string, staffId: string, version?: number}): Promise<boolean> {
         let {id, staffId} = params;
 
         let currentStaff = await Staff.getCurrent();
@@ -371,7 +371,14 @@ class TripPlanModule {
         //更改状态
         tripPlan.isCommit = true;
         tripPlan = await tryUpdateTripPlanStatus(tripPlan, EPlanStatus.AUDITING);
-        let notifyUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
+
+        let notifyUrl: string = ""
+        if (params.version == 2) {
+            //#@template
+            notifyUrl = `${config.v2_host}/agency.html#/travelRecord/TravelDetail/${tripPlan.id}`
+        } else{
+            notifyUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
+        }
         await TripPlanModule.notifyDesignatedAcount({notifyUrl: notifyUrl, staffId: staffId});
 
         let default_agency = config.default_agency;
@@ -389,8 +396,17 @@ class TripPlanModule {
             }
             let staff = await Models.staff.get(staffId);
             let company = await tripPlan.getCompany();
-            let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
-            let appMessageUrl = `#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
+
+            let auditUrl: string = ""
+            let appMessageUrl: string = ""
+            if (params.version && params.version == 2) {
+                //#@template 支持v2
+                auditUrl =`${config.v2_host}/agency.html#/travelRecord/TravelDetail/${tripPlan.id}`
+                appMessageUrl = `#/travelRecord/TravelDetail/${tripPlan.id}`
+            } else {
+                auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
+                appMessageUrl = `#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
+            }
             try{
                 await API.notify.submitNotify({
                     email: auditEmail,
@@ -419,7 +435,7 @@ class TripPlanModule {
     @clientExport
     @requireParams(['id', 'auditResult', "invoiceId"], ["reason", "expenditure"])
     @modelNotNull('tripDetail')
-    static async auditPlanInvoice(params: {id: string, auditResult: EAuditStatus, expenditure?: number, reason?: string, invoiceId?: string}): Promise<boolean> {
+    static async auditPlanInvoice(params: {id: string, auditResult: EAuditStatus, expenditure?: number, reason?: string, invoiceId?: string, version?: number}): Promise<boolean> {
 
         const SAVED2SCORE = config.score_ratio;
         let {id, expenditure, reason, auditResult} = params;
@@ -538,10 +554,19 @@ class TripPlanModule {
             if(isNeedMsg){
                 //所有票据都处理了,发送通知
 
-                let self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
-                let finalUrl = `#/trip/list-detail?tripid=${tripPlan.id}`;
-                finalUrl = encodeURIComponent(finalUrl);
-                let appMessageUrl = `#/judge-permission/index?id=${tripPlan.id}&modelName=tripPlan&finalUrl=${finalUrl}`;
+                let self_url: string = ""
+                let appMessageUrl: string = ""
+
+                let version = params.version || config.link_version || 2 //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
+                if (version == 2) {
+                    appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}`
+                    self_url = `${config.v2_host}/${appMessageUrl}`
+                } else {
+                    self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
+                    let finalUrl = `#/trip/list-detail?tripid=${tripPlan.id}`;
+                    finalUrl = encodeURIComponent(finalUrl);
+                    appMessageUrl = `#/judge-permission/index?id=${tripPlan.id}&modelName=tripPlan&finalUrl=${finalUrl}`;
+                }
 
                 try {
                     await API.notify.submitNotify({
@@ -777,12 +802,9 @@ class TripPlanModule {
                 let self_url: string = ""
                 let appMessageUrl: string = ""
 
-                if (params.version == 2) {
-                    //v2对应的通知方式
-                    self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
-                    let finalUrl = `#/trip/list-detail?tripid=${tripPlan.id}`;
-                    finalUrl = encodeURIComponent(finalUrl);
-                    appMessageUrl = `#/judge-permission/index?id=${tripPlan.id}&modelName=tripPlan&finalUrl=${finalUrl}`;
+                if (params.version == 2) { //@#template v2的外链url。
+                    appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}`
+                    self_url = `${config.v2_host}/${appMessageUrl}`
                 } else {
                     self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
                     let finalUrl = `#/trip/list-detail?tripid=${tripPlan.id}`;
@@ -928,6 +950,7 @@ class TripPlanModule {
     @clientExport
     @requireParams(['where.tripPlanId'], ['where.tripDetailId'])
     static async getTripPlanLogs(options): Promise<FindResult> {
+        options.order = options.order || [['created_at', 'desc']];
         let paginate = await Models.tripPlanLog.find(options);
         return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}
     }
@@ -1325,8 +1348,8 @@ class TripPlanModule {
      * @returns {Promise<TripPlan>}
      */
     @clientExport
-    @requireParams(['tripApproveId'])
-    static async saveTripPlanByApprove(params: {tripApproveId: string}): Promise<TripPlan> {
+    @requireParams(['tripApproveId'], ["version"])
+    static async saveTripPlanByApprove(params: {tripApproveId: string, version?: number}): Promise<TripPlan> {
         let formatStr = 'YYYY-MM-DD';
         let approve = await Models.approve.get(params.tripApproveId);
         let account = await Models.staff.get(approve.submitter);
@@ -1357,7 +1380,7 @@ class TripPlanModule {
         }
 
         if(query.originPlace) {
-            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace}) || {name: null};
+            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace, companyId: company.id}) || {name: null};
             tripPlan.deptCityCode = deptInfo.id;
             tripPlan.deptCity = deptInfo.name;
         }
@@ -1372,7 +1395,7 @@ class TripPlanModule {
                     if (typeof place != 'string') {
                         place = place['id']
                     }
-                    let arrivalInfo = await API.place.getCityInfo({cityCode: place}) || {name: null};
+                    let arrivalInfo = await API.place.getCityInfo({cityCode: place, companyId: company.id}) || {name: null};
                     arrivalCityCodes.push(arrivalInfo.id);
                     if(i == (destinationPlacesInfo.length - 1)){
                         tripPlan.arrivalCityCode = arrivalInfo.id;
@@ -1394,7 +1417,7 @@ class TripPlanModule {
         }
         tripPlan.arrivalCityCodes = JSON.stringify(arrivalCityCodes);
 
-        tripPlan['companyId'] = account.company.id;
+        tripPlan.setCompany(account.company);
         tripPlan.auditUser = tryObjId(approveUser);
         tripPlan.project = project;
         tripPlan.title = approve.title;//project名称
@@ -1427,17 +1450,17 @@ class TripPlanModule {
         await Promise.all(budgets.map(async function (b){
             if(b.originPlace){
                 if (typeof b.originPlace == 'string') {
-                    b.originPlace = await API.place.getCityInfo({cityCode: b.originPlace});
+                    b.originPlace = await API.place.getCityInfo({cityCode: b.originPlace, companyId: company.id});
                 }
             }
             if(b.destination){
                 if (typeof b.destination == 'string') {
-                    b.destination = await API.place.getCityInfo({cityCode: b.destination});
+                    b.destination = await API.place.getCityInfo({cityCode: b.destination, companyId: company.id});
                 }
             }
             if(b.city){
                 if(typeof b.city == 'string'){
-                    b.city = await API.place.getCityInfo({cityCode:b.city});
+                    b.city = await API.place.getCityInfo({cityCode:b.city, companyId: company.id});
                 }
             }
         }));
@@ -1567,10 +1590,18 @@ class TripPlanModule {
             }
         }
 
-        let self_url = config.host + '/index.html#/trip/list-detail?tripid=' + approve.id;
-        let finalUrl = `#/trip/list-detail?tripid=${approve.id}`;
-        finalUrl = encodeURIComponent(finalUrl);
-        let appMessageUrl = `#/judge-permission/index?id=${approve.id}&modelName=tripPlan&finalUrl=${finalUrl}`;
+        let self_url: string = ""
+        let appMessageUrl: string = ""
+        let version = params.version || config.link_version || 2  //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
+        if (version == 2) {
+            appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}`
+            self_url = `${config.v2_host}/${appMessageUrl}`//'trip/trip-list-detail/:tripId'
+        } else {
+            self_url = config.host + '/index.html#/trip/list-detail?tripid=' + approve.id;
+            let finalUrl = `#/trip/list-detail?tripid=${approve.id}`;
+            finalUrl = encodeURIComponent(finalUrl);
+            appMessageUrl = `#/judge-permission/index?id=${approve.id}&modelName=tripPlan&finalUrl=${finalUrl}`;
+        }
 
         try {
             self_url = await API.wechat.shorturl({longurl: self_url});
@@ -1708,8 +1739,8 @@ class TripPlanModule {
     }
 
     @clientExport
-    @requireParams(["tripPlanId"])
-    static async makeSpendReport(params: {tripPlanId: string}) {
+    @requireParams(["tripPlanId"],["version"])
+    static async makeSpendReport(params: {tripPlanId: string, version?: number}) {
         var money2hanzi = require("money2hanzi");
         let staff = await Staff.getCurrent()
         let {tripPlanId} = params;
@@ -1741,7 +1772,7 @@ class TripPlanModule {
             order: [["created_at", "asc"]]
         })
         // let tripDetails = await tripPlan.getTripDetails({where: {}, order: [["created_at", "asc"]]});
-        let tripApprove = await Models.tripApprove.get(tripPlanId);
+        let tripApprove = await API.tripApprove.getTripApprove({id: tripPlanId});
         let approveUsers: Array<any> = (tripApprove && tripApprove.approvedUsers ? tripApprove.approvedUsers:'').split(/,/g)
             .filter((v)=> {
                 return !!v;
@@ -1881,6 +1912,14 @@ class TripPlanModule {
                 return Number(prev) + Number(cur)
             });
 
+        let detailUrl: string
+        let version = params.version || config.link_version || 2 //#@template 外链版本的优先级：参数的版本 > 配置的外链版本 > 默认配置2
+        if (version == 2) {
+            detailUrl = `${config.v2_host}/#/trip/make-expense/${tripPlan.id}/${financeCheckCode.code}`;
+        } else {
+            detailUrl = `${config.host}#/finance/trip-detail?id=${tripPlan.id}&code=${financeCheckCode.code}`;
+        }
+
         let content: any = [
             `出差人:${staff.name}`,
             `出差日期:${moment(tripPlan.startAt).format('YYYY.MM.DD')}-${moment(tripPlan.backAt).format('YYYY.MM.DD')}`,
@@ -1888,7 +1927,7 @@ class TripPlanModule {
             `出差预算:${tripPlan.budget}`,
             `实际支出:${_personalExpenditure}个人支付, ${(Number(tripPlan.expenditure)-_personalExpenditure).toFixed(2)}公司支付`,
             `出差记录编号:${tripPlan.planNo}`,
-            `校验地址: ${config.host}#/finance/trip-detail?id=${tripPlan.id}&code=${financeCheckCode.code}`
+            `校验地址: ${detailUrl}`
         ]
 
         let qrcodeCxt = await API.qrcode.makeQrcode({content: content.join('\n\r')});
@@ -1919,7 +1958,6 @@ class TripPlanModule {
 
         let buf = await makeSpendReport(data);
         try {
-            let detailUrl = `${config.host}#/finance/trip-detail?id=${tripPlan.id}&code=${financeCheckCode.code}`;
             await API.notify.submitNotify({
                 key: 'qm_spend_report',
                 userId: staff.id,
@@ -2169,11 +2207,11 @@ class TripPlanModule {
 
     static __initHttpApp = require('./invoice');
 
-    static _scheduleTask () {
+    /*static _scheduleTask () {
         let taskId = "authApproveTrainPlan";
         logger.info('run task ' + taskId);
-        scheduler('0 */5 * * * *', taskId, async function() {
-            let tripApproves = await Models.tripApprove.find({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
+        scheduler('0 *!/5 * * * *', taskId, async function() {
+            let tripApproves = await API.tripApprove.getTripApproves({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
             tripApproves.map(async (approve) => {
 
                 let approveCompany = await approve.getCompany();
@@ -2201,7 +2239,8 @@ class TripPlanModule {
                 }
                 let frozenNum = query.frozenNum;
 
-                
+                let version = config.link_version || 2 //外链使用的版本。
+
                 try{
                     
                     if(typeof approve.query == 'string'){
@@ -2262,7 +2301,8 @@ class TripPlanModule {
                         approveUser: approve.approveUser.id,
                         outerId: approve.id,
                         // data: approve.budgetInfo,
-                        oa: 'qm'
+                        oa: 'qm',
+                        version: version
                     });
 
                     // let _approve = await Models.approve.get(approve.id);
@@ -2294,12 +2334,17 @@ class TripPlanModule {
                         }
 
                         //发送审核结果邮件
-                        let self_url;
-                        let appMessageUrl;
-                        self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + approve.id;
-                        let finalUrl = '#/trip-approval/detail?approveId=' + approve.id;
-                        finalUrl = encodeURIComponent(finalUrl);
-                        appMessageUrl = `#/judge-permission/index?id=${approve.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
+                        let self_url: string = ""
+                        let appMessageUrl: string = ""
+                        if (version == 2) {
+                            appMessageUrl = `#/trip-approval/approve-detail/${approve.id}/1`
+                            self_url = `${config.v2_host}/${appMessageUrl}`
+                        } else {
+                            self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + approve.id;
+                            let finalUrl = '#/trip-approval/detail?approveId=' + approve.id;
+                            finalUrl = encodeURIComponent(finalUrl);
+                            appMessageUrl = `#/judge-permission/index?id=${approve.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
+                        }
                         let user = approve.account;
                         if(!user) user = await Models.staff.get(approve['accountId']);
                         try {
@@ -2318,7 +2363,7 @@ class TripPlanModule {
                 }
             });
         });
-    }
+    }*/
 
     static async getProjectByName(params) {
         let projects = await Models.project.find({where: {name: params.name}});
@@ -2337,7 +2382,7 @@ class TripPlanModule {
     //approve, trip_approve, trip_plan保存travelPolicyId
     @clientExport
     static async saveTravelPolicyId( tripApproveId:string ) : Promise<any>{
-        let tripApprove = await Models.tripApprove.get( tripApproveId );
+        let tripApprove = await API.tripApprove.getTripApprove({id: tripApproveId});
         let approve = await Models.approve.get(tripApproveId);
         let submitUser = await Models.staff.get( tripApprove.accountId );
         let travelPolicyId = submitUser.travelPolicyId;
@@ -2358,7 +2403,7 @@ class TripPlanModule {
 
         approve.data = JSON.stringify(approve.data);
 
-        await tripApprove.save();
+        await API.tripApprove.updateTripApprove(tripApprove);
         await approve.save();
 
         return true;
@@ -2482,6 +2527,6 @@ function tryObjId(obj) {
 }
 
 
-TripPlanModule._scheduleTask();
+// TripPlanModule._scheduleTask();
 
 export = TripPlanModule;

@@ -2,40 +2,33 @@
   "appName": "${JL_APP_NAME}",
   "rootDir": "${JL_APP_DATA_DIR}",
   "host": "${JL_APP_HOST}",
+  "v2_host": "${JL_APP_V2_HOST}",
+  "link_version": "${JL_APP_LINK_VERSION}",
   "debug": false,
   "ts_node": true,
-
   "cluster": false,
   "port": 80,
   "apiPort": 4102,
   "socket_file": "${{rootDir}}/web.sock",
   "pid_file": "${{rootDir}}/tmp/server.pid",
-
-  "postgres":{
+  "postgres": {
     "url": "${JL_APP_POSTGRES}",
     "debug": true
   },
-  "redis":{
+  "redis": {
     "url": "${JL_APP_REDIS}"
   },
   "hosts": {
-    "main":{"addr":"api.t.jingli365.com", "port":14201, "www":"https://${{hosts.main.addr}}"},
-    "budget":{"addr": "t.jingli365.com", "port": 14203}
+    "main":{"addr":"api.t.jingli365.com", "port":14201, "www":"https://${{hosts.main.addr}}"}
   },
   "api": {
     "postgres": "${{postgres.url}}",
-    "remotes": [
-      {
-        "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
-        "modules": "*"
-      },
-      {
-        "connect": {"host": "${{hosts.budget.addr}}", "port": "${{hosts.budget.port}}"},
-        "modules": ["budget"]
-      }
-    ]
+    "remotes": [{
+      "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
+      "modules": ["attachments", "checkcode", "ctripapi", "dida", "flight", "jpush", "wechat", "sms"]
+      }]
   },
-  "upload":{
+  "upload": {
     "tmpDir": "${{rootDir}}/tmp/upload",
     "publicDir": "${{rootDir}}/tmp/attachments",
     "privateDir": "${{rootDir}}/tmp/files"
@@ -45,11 +38,19 @@
     "prefix": "${{appName}}_",
     "httptype": "short",
     "mods": {
-      "sequelize": { "prefix": "${{appName}}_sql_", "console": false },
-      "sqlinit": { "prefix": "${{appName}}_sql_", "console": false },
+      "sequelize": {
+        "prefix": "${{appName}}_sql_",
+        "console": false
+      },
+      "sqlinit": {
+        "prefix": "${{appName}}_sql_",
+        "console": false
+      },
       "http": {
         "mods": {
-          "access": { "console": false }
+          "access": {
+            "console": false
+          }
         }
       }
     }
@@ -89,27 +90,36 @@
   },
   "reportHimOAReceive": "peng.wang@jingli.tech",
   "duiba": {
-    "appKey" : "3fFDdkKxibDiRjwy9DqaPwasvAup",
-    "appSecret" : "2FaLAocgDodNqCFa9PU8cyCk4Fnw"
+    "appKey": "3fFDdkKxibDiRjwy9DqaPwasvAup",
+    "appSecret": "2FaLAocgDodNqCFa9PU8cyCk4Fnw"
   },
   "is_init_test_company": true,
-  "ddconfig" : {
+  "ddconfig": {
     "token": "jingli2016",
     "encodingAESKey": "8nf2df6n0hiifsgg521mmjl6euyxoy3y6d9d3mt1laq",
     "suiteid": "suitezutlhpvgyvgakcdo",
     "secret": "pV--T2FZj-3QCjJzcQd5OnzDBAe6rRKRQGEmc8iVCvdtc2FUOS5icq1gVfkbqiTx",
     "appid": "2156",
-    "test_url" : "https://t.jingli365.com/",
-    "name_reg" : "^jl0418",
+    "test_url": "https://t.jingli365.com/",
+    "name_reg": "^jl0418",
     "reg_go": true,
     "dd_online_url": "https://j.jingli365.com"
   },
   "perDayRegisterEmail": "",
-  "cloud":"${JL_APP_CLOUD}",
-  "cloudAPI":"${JL_APP_CLOUDAPI}",
-  "cloudKey":"${JL_APP_CLOUDKEY}",
+  "cloud": "${JL_APP_CLOUD}",
+  "cloudAPI": "${JL_APP_CLOUDAPI}",
+  "cloudKey": "${JL_APP_CLOUDKEY}",
   "agent": {
     "appId": "${JL_APP_CLOUD_APP_ID}",
     "appSecret": "${JL_APP_CLOUD_APP_SECRET}"
-  }
+  },
+  "tmcUrl": "http://l.jingli365.com/proj/svr-tmc",
+  "mail": {
+    "service": "QQex",
+    "auth": {
+      "user": "noreply@jingli365.com",
+      "pass": "Jingli_2016"
+    }
+  },
+  "approveServerUrl": "${JL_APP_APPROVE_SERVER_URL}"
 }

@@ -2,7 +2,7 @@ import { checkTokenAuth } from "api/auth/authentication";
 import { AuthResponse, AuthRequest, signToken, LoginResponse } from '_types/auth/auth-cert';
 import {Models} from "_types/index";
 import {Staff} from "_types/staff";
-import {TripPlan, TripApprove, ESourceType, QMEApproveStatus, ICreateBudgetAndApproveParams, Offline, OfflineStatus} from '_types/tripPlan';
+import {TripPlan, ESourceType, QMEApproveStatus, ICreateBudgetAndApproveParams, Offline, OfflineStatus} from '_types/tripPlan';
 
 let API = require("@jingli/dnode-api");
 let moment = require("moment");
