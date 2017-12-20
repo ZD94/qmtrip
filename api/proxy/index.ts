@@ -14,7 +14,7 @@ var cors = require('cors');
 const config = require("@jingli/config");
 const API = require("@jingli/dnode-api");
 var timeout = require('connect-timeout');
-const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'Content-Type,auth,supplier'} 
+const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'Content-Type,auth,supplier, authstr, staffid'} 
 function resetTimeout(req, res, next){
     req.clearTimeout();
     next();
@@ -37,7 +37,7 @@ class Proxy {
             console.log('---------body---------->', req.body);
             
             //qmtrip验证
-            let {authstr}  = req.headers;
+            let {authstr, staffid}  = req.headers;
             let token: AuthRequest = parseAuthString(authstr);
             let verification = await API.auth.authentication(token);
             if (!verification) {
@@ -47,9 +47,9 @@ class Proxy {
             }
 
             //公有云验证
-            let staff: Staff = await Staff.getCurrent();
-            console.log('companyId in cloud authentic');
-            let companyId: string = staff['companyId'];
+            // let staff: Staff = await Staff.getCurrent();
+            let staff: Staff = await Models.staff.get(staffid);
+            let companyId: string = staff.company.id;
             let companyToken: string = await getCompanyTokenByAgent(companyId);
             if (!companyToken) {
                 throw new Error('换取 token 失败！');
@@ -76,19 +76,12 @@ class Proxy {
                         }
                     }, (err, resp, result) => {
                         if (err) {
-                            return reject(err);
+                            reject(err);
                         }
-                        if (typeof result == 'string') {
-                            try {
-                                result = JSON.parse(result);
-                            } catch(e) {
-                                console.error(e);
-                                return reject(e);
-                            }
-                        }
-                        return resolve(result);
+                        resolve(result);
                     });
                 });
+                return res.json(result);
             } catch(err) {
                 if (err) {
                     console.error('ERROR TRAVEL In api/proxy/index:   ', err);
