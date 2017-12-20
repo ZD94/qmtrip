@@ -1699,7 +1699,7 @@ class StaffModule{
     @clientExport
     @requireParams(["name", "mobile", "companyId", "operatorId"], linkmanCols)
     static async createLinkman(params: {
-        id: string, 
+        id?: string, 
         name: string, 
         mobile: string, 
         companyId: string, 
@@ -1777,12 +1777,11 @@ class StaffModule{
     "order", "type"])
     static async getLinkmans(params: {
         where: any,
-        order: any,
+        order?: any,
         attributes?: any,
-    }): Promise<PaginateInterface<Linkman>> {
-
+    }): Promise<FindResult> {
         let linkmans = await Models.linkman.find(params);
-        return linkmans;
+        return {ids: linkmans.map((s)=> {return s.id;}), count: linkmans['total']};
     }
 
 }
