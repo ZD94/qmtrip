@@ -1,7 +1,7 @@
 import {Models} from "_types";
 import {Staff} from "_types/staff";
 import {EApproveResult, ETripType} from "_types/tripPlan";
-import moment = require("moment");
+const moment = require("moment");
 var API = require('@jingli/dnode-api');
 import {MPlaneLevel, MTrainLevel, MHotelLevel,DefaultRegion} from '_types';
 import {Model, where} from "sequelize";
