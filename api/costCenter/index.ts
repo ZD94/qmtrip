@@ -249,6 +249,12 @@ export default class CostCenterModule {
 
 
     @clientExport
+    static async listDeptBudget(deptId: string) {
+        const children = await findChildren(deptId)
+        return [...await Promise.all(children.map(c => Models.costCenterDeploy.get(c.id))), await Models.costCenterDeploy.get(deptId)]
+    }
+
+    @clientExport
     static async initBudget(budgets) {
         const promiseAry = []
         for (let budget of budgets) {

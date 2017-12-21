@@ -1,6 +1,5 @@
-import {AbstractController, Restful, Router} from "@jingli/restful";
-import API from '@jingli/dnode-api';
-import { getAllChildren } from '_types/department';
+import { AbstractController, Restful, Router } from "@jingli/restful";
+const API = require('@jingli/dnode-api');
 
 @Restful()
 export class CostController extends AbstractController {
@@ -9,8 +8,8 @@ export class CostController extends AbstractController {
     }
 
     async get(req, res, next) {
-        const children = await getAllChildren(req.params.id)
-        res.json(children)
+        const budgets = await API['costCenter'].listDeptBudget(req.params.id)
+        res.json(budgets)
     }
-    
+
 }
