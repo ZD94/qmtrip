@@ -135,6 +135,18 @@ export default class WangXinApi {
         return null;
     }
 
+    async getUserById(userId) :Promise<IWangxDepartment> {
+        let url = `http://netsense.com.cn/rest/open/user/find`;
+        let result = await pushRequest(url, {syscode: this.sysCode, userId: userId});
+        if(result["result"] && result["result"]["total"]){
+            if(result["rows"][0] && result["rows"][0].status == 0){
+                return result["rows"][0];
+            }
+        }
+
+        return null;
+    }
+
 }
 
 async function pushRequest(url, params){
