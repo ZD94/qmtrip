@@ -318,7 +318,7 @@ export default class CostCenterModule {
 }
 
 async function getChildrenExpend(deptId: string) {
-    const childrenIds = await await getChildrenDeptIds(deptId, )
+    const childrenIds = await getChildrenDeptIds(deptId, )
     return await getSelfTempBudgetSumOf(childrenIds)
 }
 
