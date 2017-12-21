@@ -18,8 +18,7 @@ var API = require("@jingli/dnode-api");
 import {DB} from "@jingli/database";
 
 import {OAAddResult} from "../../../../_types/approve/index";
-
-
+import {ERejectApproveTypes} from "_types/tripApprove";
 export class QmPlugin extends AbstractOAPlugin {
     constructor() {
         super();
@@ -77,11 +76,23 @@ export class QmPlugin extends AbstractOAPlugin {
 
     async tripApproveFail(params: {approveId: string, reason?: string}) {
         let {approveId, reason} = params;
+        let approve = await Models.approve.get(approveId);
         let tripApprove: any = {};
         tripApprove.id = approveId;
         tripApprove.status = QMEApproveStatus.REJECT;
         tripApprove.approveRemark = reason || '系统自动处理';
-        await API.tripApprove.updateTripApprove(tripApprove);
+        tripApprove.rejectType = ERejectApproveTypes.BySystem;
+        let result = await API.eventListener.sendRequestToApprove({
+            modelName: "tripApprove",
+            methodName: "approveReject", 
+            data: tripApprove, 
+            companyId: approve.companyId
+        }); 
+        if(result){
+            let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: approve.submitter, approveStatus: EApproveResult.REJECT, remark: tripApprove.approveRemark});
+            await tripPlanLog.save();
+        }
+        // await API.tripApprove.updateTripApprove(tripApprove);
     }
 
     async createTripInvoiceAuditFlow(params:createTripInvoiceAuditFlowParam):Promise<createTripInvoiceAuditFlowResult> {
