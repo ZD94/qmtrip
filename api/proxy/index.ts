@@ -113,19 +113,19 @@ class Proxy {
                 if(result.data.orderNos && typeof(result.data.orderNos) != 'undefined'){
                     tripDetail.reserveStatus = EOrderStatus.AUDITING;  //飞机的orderNos为数组
                     tripDetail.orderNo = result.data.orderNos[0];
-                    tripDetail.orderType = EOrderType.PLANE;
+                    // tripDetail.orderType = EOrderType.PLANE;
                 }
                 if(result.data.OrderNo && typeof(result.data.OrderNo) != 'undefined') {  
                     tripDetail.reserveStatus = EOrderStatus.AUDITING;  //火车的OrderNo为string
                     tripDetail.orderNo = result.data.OrderNo;
-                    tripDetail.orderType = EOrderType.TRAIN;
+                    // tripDetail.orderType = EOrderType.TRAIN;
                 }  
                 if(result.data.orderNo && typeof(result.data.orderNo) != 'undefined') {  
                     tripDetail.reserveStatus = EOrderStatus.AUDITING;   //酒店的orderNo为string
                     tripDetail.orderNo = result.data.orderNo;
-                    tripDetail.orderType = EOrderType.HOTEL;
+                    // tripDetail.orderType = EOrderType.HOTEL;
                 }
-                // tripDetail.orderType = body.orderType? body.orderType: null;  //后期返回的orderNo统一后，使用此确定订单类型
+                tripDetail.orderType = body.orderType? body.orderType: null;  //后期返回的orderNo统一后，使用此确定订单类型
                 await tripDetail.save();
             }
             return res.json(result);
