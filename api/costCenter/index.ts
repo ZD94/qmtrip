@@ -251,7 +251,7 @@ export default class CostCenterModule {
     static async appendBudget(costId: string, budget: number) {
         const cost = await Models.costCenterDeploy.get(costId)
         if (!cost) throw new L.ERROR_CODE_C(404, '该部门尚未设置预算')
-        cost.totalBudget += budget
+        cost.totalTempBudget = cost.totalBudget += budget
         await cost.save()
     }
 
