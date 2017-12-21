@@ -344,7 +344,7 @@ async function getChildrenDeptIds(parentId: string, except?: string): Promise<st
 async function getSelfTempBudgetSumOf(costIds: string[]) {
     const ids = costIds.map(id => `'${id}'`).join(',')
     const sql = `select sum(self_temp_budget) as sum from 
-        cost_center.cost_center_deploy where id in (${ids})`
+        cost_center.cost_center_deploys where id in (${ids})`
     const res = (await DB.query(sql))[0][0]
     return (res && res.sum) || 0
 }
