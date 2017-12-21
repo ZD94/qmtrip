@@ -9,14 +9,17 @@ import {OaDepartment} from "libs/asyncOrganization/oaDepartment"
 import {OaStaff} from "libs/asyncOrganization/oaStaff"
 import {Company, CPropertyType, CompanyProperty} from "_types/company";
 import {Models} from "../../../_types/index";
+import WangXinApi from "./wangxApi";
+import WangxDepartment from "./wangxDepartment";
+import WangxStaff from "./wangxStaff";
 
 export default class WangxCompany extends OaCompany{
 
-    private customPro: any //网信所需的自定义的属性，用于接口认证等操作
+    private wangxAPi: WangXinApi;
 
     constructor(target: any) {
         super(target)
-        this.customPro = target.customPro
+        this.wangxAPi = target.wangxAPi
     }
 
     get id() {
@@ -36,19 +39,44 @@ export default class WangxCompany extends OaCompany{
     }
 
     async getDepartments(): Promise<OaDepartment[]> {
-        return null
+        let self = this;
+        let departments = await self.wangxAPi.getDepartments();
+        let result: OaDepartment[];
+        departments.forEach((item) => {
+            let ddDept = new WangxDepartment({name: item.name, parentId: item.pid, id: item.id});
+            result.push(ddDept);
+        })
+        return result;
     }
 
     async getRootDepartment(): Promise<OaDepartment> {
-        return null
+        let self = this;
+        let departments = await self.wangxAPi.getDepartments();
+        let result: OaDepartment;
+        departments.forEach((item) => {
+            if(item.id == 1){
+                result = new WangxDepartment({name: item.name, parentId: item.pid, id: item.id});
+            }
+        })
+        return result;
     }
 
     async getCreateUser(): Promise<OaStaff> {
-        return null
+        let self = this;
+        let users = await self.wangxAPi.getUsers();
+        let result: OaStaff;
+        users.forEach((item) => {
+            if(item.id == 1){
+                result = new WangxStaff({name: item.name, id: item.id, mobile: item.tel || item.phone, email: item.email, sex: item.sex, isAdmin: true});
+            }
+        })
+        return result;
     }
 
     async saveCompanyProperty(params: {companyId: string}): Promise<boolean> {
-        return true
+        let companyUuidProperty = CompanyProperty.create({companyId: params.companyId, type: CPropertyType.WANGXIN_ID, value: this.id});
+        await companyUuidProperty.save();
+        return true;
     }
 
     /**
