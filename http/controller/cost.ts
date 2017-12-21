@@ -12,4 +12,15 @@ export class CostController extends AbstractController {
         res.json(budgets)
     }
 
+    async add(req, res, next) {
+        await API['costCenter'].initBudget(req.body)
+        res.send(200)
+    }
+
+    @Router('/apply/:id', 'PUT')
+    async apply(req, res, next) {
+        await API['costCenter'].applyConf(req.params.id)
+        res.send(200)
+    }
+
 }

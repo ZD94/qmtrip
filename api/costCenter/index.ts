@@ -7,7 +7,7 @@ import { FindResult } from "common/model/interface";
 import { findParentManagers, findChildren } from 'api/department';
 import { Department } from '_types/department';
 import { EStaffRole } from '_types/staff';
-import { DB } from '@jingli/database';  
+import { DB } from '@jingli/database';
 import { L } from '@jingli/language';
 const API = require('@jingli/dnode-api');
 const _ = require('lodash/fp')
@@ -247,12 +247,19 @@ export default class CostCenterModule {
 
     /****************************************BudgetLog end************************************************/
 
+    @clientExport
+    static async appendBudget(costId: string, budget: number) {
+        const cost = await Models.costCenterDeploy.get(costId)
+        if (!cost) throw new L.ERROR_CODE_C(404, '该部门尚未设置预算')
+        cost.totalBudget += budget
+        await cost.save()
+    }
 
     @clientExport
     static async listDeptBudget(deptId: string) {
         const children = await findChildren(deptId)
-        const costs = [...await Promise.all(children.map(c => Models.costCenterDeploy.get(c.id))), await Models.costCenterDeploy.get(deptId)]
-        return costs
+        const costs = [... await Promise.all(children.map(c => Models.costCenterDeploy.get(c.id))), await Models.costCenterDeploy.get(deptId)]
+        return costs.filter(_.identity)
     }
 
     @clientExport
@@ -275,14 +282,19 @@ export default class CostCenterModule {
     }
 
     @clientExport
-    static async changeBudget(root: string, budgets: any[]) {
+    static async changeBudget(costId: string, budgets: any[], companyId: string) {
+        const root = await Models.costCenterDeploy.get(companyId)
         const tempSum = _.sum(_.map(_.prop('selfTempBudget'), budgets))
-        const rootCost = await Models.costCenterDeploy.get(root)
+        const rootCost = await Models.costCenterDeploy.get(costId)
+
+        // root.totalBudget 
+
         if (tempSum != rootCost.totalTempBudget) throw new L.ERROR_CODE_C(400, '超出总预算')
 
         for (let b of budgets) {
             const cost = await Models.costCenterDeploy.get(b.id)
             cost.selfTempBudget = b.selfTempBudget
+            cost.totalTempBudget = b.totalTempBudget
             await cost.save()
         }
     }
@@ -294,13 +306,13 @@ export default class CostCenterModule {
         const children = await findChildren(costId)
         for (let c of children) {
             const cost = await Models.costCenterDeploy.get(c.id)
-            if(!cost) continue
+            if (!cost) continue
             cost.selfBudget = cost.selfTempBudget
             const cs = await c.getChildDepartments()
             if (cs.length <= 0) {
                 cost.totalBudget = cost.selfTempBudget
             } else {
-                cost.totalBudget = await getSelfTempBudgetSumOf(cs.map(c => c.id)) + cost.selfTempBudget
+                cost.totalBudget = await getTotalTempBudgetSumOf(cs.map(c => c.id)) + cost.selfTempBudget
             }
             totalBudget += cost.selfBudget
             await cost.save()
@@ -327,7 +339,7 @@ export default class CostCenterModule {
 
 async function getChildrenExpend(deptId: string) {
     const childrenIds = await getChildrenDeptIds(deptId, )
-    return await getSelfTempBudgetSumOf(childrenIds)
+    return await getTotalTempBudgetSumOf(childrenIds)
 }
 
 
@@ -343,9 +355,9 @@ async function getChildrenDeptIds(parentId: string, except?: string): Promise<st
     return departments.map(d => d.id)
 }
 
-async function getSelfTempBudgetSumOf(costIds: string[]) {
+async function getTotalTempBudgetSumOf(costIds: string[]) {
     const ids = costIds.map(id => `'${id}'`).join(',')
-    const sql = `select sum(self_temp_budget) as sum from 
+    const sql = `select sum(total_temp_budget) as sum from 
         cost_center.cost_center_deploys where id in (${ids})`
     const res = (await DB.query(sql))[0][0]
     return (res && res.sum) || 0
