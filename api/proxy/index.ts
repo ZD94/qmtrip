@@ -116,7 +116,7 @@ class Proxy {
                     tripDetail.orderType = EOrderType.PLANE;
                 }
                 if(result.data.OrderNo && typeof(result.data.OrderNo) != 'undefined') {  
-                    tripDetail.reserveStatus = EOrderStatus.AUDITING;  //火车的OrderNo为数组
+                    tripDetail.reserveStatus = EOrderStatus.AUDITING;  //火车的OrderNo为string
                     tripDetail.orderNo = result.data.OrderNo;
                     tripDetail.orderType = EOrderType.TRAIN;
                 }  
