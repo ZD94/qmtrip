@@ -467,8 +467,11 @@ export function matchMeiyaHotel(origin, meiyaData) {
             "commentScore": Math.ceil(Math.random() * 2) + 8,
             "distance": 2000
         }
+        console.log("add one in meiya");
         result.push(data);
     }
+
+    console.log("matchMeiyaHotel matchMeiyaHotel matchMeiyaHotel===>", result.length)
 
     return result;
 }
