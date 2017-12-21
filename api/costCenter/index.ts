@@ -7,7 +7,7 @@ import { FindResult } from "common/model/interface";
 import { findParentManagers, findChildren } from 'api/department';
 import { Department } from '_types/department';
 import { EStaffRole } from '_types/staff';
-import { DB } from '@jingli/database';
+import { DB } from '@jingli/database';  
 import { L } from '@jingli/language';
 const API = require('@jingli/dnode-api');
 const _ = require('lodash/fp')
@@ -251,7 +251,8 @@ export default class CostCenterModule {
     @clientExport
     static async listDeptBudget(deptId: string) {
         const children = await findChildren(deptId)
-        return [...await Promise.all(children.map(c => Models.costCenterDeploy.get(c.id))), await Models.costCenterDeploy.get(deptId)]
+        const costs = [...await Promise.all(children.map(c => Models.costCenterDeploy.get(c.id))), await Models.costCenterDeploy.get(deptId)]
+        costs.map
     }
 
     @clientExport
@@ -293,6 +294,7 @@ export default class CostCenterModule {
         const children = await findChildren(costId)
         for (let c of children) {
             const cost = await Models.costCenterDeploy.get(c.id)
+            if(!cost) continue
             cost.selfBudget = cost.selfTempBudget
             const cs = await c.getChildDepartments()
             if (cs.length <= 0) {
@@ -300,7 +302,7 @@ export default class CostCenterModule {
             } else {
                 cost.totalBudget = await getSelfTempBudgetSumOf(cs.map(c => c.id)) + cost.selfTempBudget
             }
-            totalBudget += cost.totalBudget
+            totalBudget += cost.selfBudget
             await cost.save()
         }
         root.selfBudget = root.selfTempBudget
