@@ -2,7 +2,7 @@
 import { initModels } from '_types';
 
 import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo, StaffProperty } from '_types/staff';
-import { Company, MoneyChange, Supplier, TripPlanNumChange, CompanyProperty, InvoiceTitle } from '_types/company';
+import { Company, MoneyChange, Supplier, TripPlanNumChange, CompanyProperty, InvoiceTitle, CompanyScoreRatioChange } from '_types/company';
 import { Department, StaffDepartment, DepartmentProperty } from '_types/department';
 import { PromoCode } from '_types/promoCode';
 
@@ -64,6 +64,7 @@ initModels({
 
     tripPlanLog: createServerService<TripPlanLog>(TripPlanLog),
     moneyChange: createServerService<MoneyChange>(MoneyChange),
+    companyScoreRatioChange: createServerService<CompanyScoreRatioChange>(CompanyScoreRatioChange),
     project: createServerService<Project>(Project),
     // tripApprove: createServerService<TripApprove>(TripApprove),
     approve: createServerService<Approve>(Approve),

@@ -24,8 +24,9 @@ import { Department, StaffDepartment } from "_types/department";
 import { requirePermit, conditionDecorator, condition, modelNotNull } from "api/_decorator";
 import { md5 } from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
-import { CoinAccount } from "_types/coin";
+import { CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE } from "_types/coin";
 import { restfulAPIUtil } from "api/restful";
+import { TripPlan } from '_types/tripPlan';
 let RestfulAPIUtil = restfulAPIUtil;
 
 const supplierCols = Supplier['$fieldnames'];
@@ -294,6 +295,60 @@ export default class CompanyModule {
         }
 
         return true;
+    }
+
+    /**
+     * 企业福利账户余额自动兑换员工未结算的出差奖励
+     * @param params
+     * @param params.companyId 企业id
+     */
+    @clientExport
+    static async autoSettleReward(params): Promise<any> {
+        let result;
+        //get所有未结算奖励 时间正序
+        let unSettledReward: TripPlan[] = await Models.tripPlan.all({
+            where: {
+                companyId: params.companyId, 
+                isSettled: false, 
+                saved: {$gt: 0}
+            }, 
+            order: [['updated_at', 'asc']]});
+        
+        let company: Company = await Models.company.get(params.companyId);
+        let points2coinRate: number = company.points2coinRate;  //企业余额可转为鲸币的比例
+        let scoreRatio: number = company.scoreRatio;  //企业奖励节省比例
+        let moneyChange: MoneyChange = await Models.moneyChange.get(params.companyId);
+        let companyBalance: number = moneyChange.money;  //企业余额
+        // let companyBalanceToCoin: number = companyBalance * points2coinRate;  //企业余额可转换为的鲸币数
+        if (companyBalance > 0) {   
+            for (let i = 0; i < unSettledReward.length; i++) {
+                if (companyBalance > (unSettledReward[i].saved * scoreRatio)){  //企业余额足够兑换该员工的节省奖励
+                    unSettledReward[i].isSettled = true;  //结算flag更改
+                    moneyChange.money -= unSettledReward[i].saved * scoreRatio;  //企业余额扣除相应的奖励金额
+                    await moneyChange.save();
+                    
+                    let coinAccount: CoinAccount = await Models.coinAccount.get(unSettledReward[i].accountId);  
+                    coinAccount.income += unSettledReward[i].saved * scoreRatio * points2coinRate;  //员工account增加鲸币
+                    await coinAccount.save();
+
+                    let coins: number = unSettledReward[i].saved * scoreRatio * points2coinRate;
+                    let coinAccountChange: CoinAccountChange = await Models.coinAccountChange.create({  //coin_account增加鲸币变动记录
+                        coinAccountId: coinAccount.id,
+                        remark: `员工${coinAccount.id}增加奖励鲸币${coins}`,
+                        type: COIN_CHANGE_TYPE.AWARD,
+                        coins: coins
+                    });
+                    await coinAccountChange.save();
+                } else {
+                    break;
+                }
+            }
+            //企业余额不足继续兑换，提示充值
+            console.log('企业余额不足')
+        } else {
+            //企业余额不足继续兑换，提示充值 
+            console.log('企业余额不足')
+        }
     }
 
 
