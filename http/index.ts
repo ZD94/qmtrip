@@ -59,7 +59,9 @@ export async function initHttp(app) {
     app.use('/api/v1', jlReply)
     app.use('/api/v1', allowCrossDomain);
     app.use('/api/v1', (req, res, next) => {
+        console.log("=====>hello world")
         auth(req, res, next, async (err, isValid, data) => {
+            console.log("=====isValid: ", isValid, data)
             if (isValid) {
                 const companies = await Models.company.find({
                     where: { appId: data.appId }
@@ -67,6 +69,7 @@ export async function initHttp(app) {
                 res.session = { ...data, companyId: companies[0] && companies[0].id }
                 return next()
             }
+            console.log("====错误=======isValid: ")
             return res.sendStatus(403)
         })
     }, router);
