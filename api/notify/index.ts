@@ -10,6 +10,7 @@ import redisClient = require("common/redis-client");
 import {Models} from "_types";
 import {ESendType, ENoticeType} from "_types/notice/notice";
 let moment = require("moment");
+require('moment-timezone');
 
 const config = require('@jingli/config');
 let API = require('@jingli/dnode-api');
