@@ -256,12 +256,8 @@ export default class CostCenterModule {
     }
 
     @clientExport
-    static async appendBudget(costId: string, budget: number) {
-        // const cost = await Models.costCenterDeploy.get(costId)
-        const log = BudgetLog.create({ costCenterId: costId, value: budget, type: BUDGET_CHANGE_TYPE.APPEND_BUDGET })
-        // if (!cost) throw new L.ERROR_CODE_C(404, '该部门尚未设置预算')
-        // cost.totalTempBudget = cost.totalBudget += budget
-        // await cost.save()
+    static async appendBudget(costId: string, operator: string, budget: number) {
+        const log = BudgetLog.create({ costCenterId: costId, value: budget, type: BUDGET_CHANGE_TYPE.APPEND_BUDGET, staffId: operator })
         await log.save()
     }
 
@@ -270,8 +266,8 @@ export default class CostCenterModule {
         const children = await findChildren(deptId)
         const where = { beginDate: { $lte: period.start }, endDate: { $gte: period.end } }
         const costs = await Promise.all([...children.map(c => Models.costCenterDeploy.find({ where: { ...where, costCenterId: c.id } })),
-        Models.costCenterDeploy.find({ where: { ...where, costCenterId: deptId } })])
-        return costs.map(_.first).filter(_.identity)
+            Models.costCenterDeploy.find({ where: { ...where, costCenterId: deptId } })])
+        return _.compose(_.filter(_.identity), _.map(_.first))(costs)
     }
 
     @clientExport
@@ -298,7 +294,7 @@ export default class CostCenterModule {
 
     @clientExport
     static async changeBudget(costId: string, budgets: IBudget[], appendBudget: number = 0, period: { start: Date, end: Date }) {
-        const tempSum = _.sum(_.map(_.prop('selfTempBudget'), budgets)),
+        const tempSum = _.compose(_.sum, _.map(_.prop('selfTempBudget')))(budgets),
             where = { costCenterId: costId, beginDate: { $lte: period.start }, endDate: { $gte: period.end } }
         const rootCost = _.first(await Models.costCenterDeploy.find({ where }))
 
