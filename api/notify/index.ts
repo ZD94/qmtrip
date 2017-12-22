@@ -9,7 +9,7 @@ const logger = new Logger('qm:notify');
 import redisClient = require("common/redis-client");
 import {Models} from "_types";
 import {ESendType, ENoticeType} from "_types/notice/notice";
-import moment = require("moment");
+let moment = require("moment");
 
 const config = require('@jingli/config');
 let API = require('@jingli/dnode-api');
