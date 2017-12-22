@@ -30,7 +30,7 @@ export class PrivilegeController extends AbstractController {
 
     //获取企业福利账户余额变动记录
     @Router('/:id/getBalanceRecords', 'POST')
-    async getBalanceRecores(req, res, next) {
+    async getBalanceRecords(req, res, next) {
         let {id} = req.params;
         if (!id) {
             return res.json(this.reply(400, null));
@@ -48,9 +48,20 @@ export class PrivilegeController extends AbstractController {
         res.json(this.reply(0, balanceRecords));
     }
 
-    //企业节省奖励比例设置
+    //获取企业节省奖励比例
     @Router('/:id/getCompanyScoreRatio', 'GET')
     async getCompanyScoreRatio(req, res, next) {
+        let {id} = req.params;
+        if (!id) {
+            return res.json(this.reply(400, null));
+        }
+        let result = await ApiPrivilege.getCompanyScoreRatio(id);
+        res.json(this.reply(0, result));
+    }
+
+    //企业节省奖励比例设置
+    @Router('/:id/setCompanyScoreRatio', 'POST')
+    async setCompanyScoreRatio(req, res, next) {
         let {id} = req.params;
         if (!id) {
             return res.json(this.reply(400, null));
@@ -60,7 +71,7 @@ export class PrivilegeController extends AbstractController {
         if (typeof body == 'string') {
             body = JSON.parse(body);
         }
-        let result = await ApiPrivilege.getCompanyScoreRatio(id);
+        let result = await ApiPrivilege.setCompanyScoreRatio({id: id, data: body});
         res.json(this.reply(0, result));
     }
 
