@@ -249,6 +249,13 @@ export default class CostCenterModule {
     /****************************************BudgetLog end************************************************/
 
     @clientExport
+    static async getAppendBudget(costId: string) {
+        return _.first(await Models.budgetLog.find({
+            where: { costCenterId: costId, type: BUDGET_CHANGE_TYPE.APPEND_BUDGET }
+        }))
+    }
+
+    @clientExport
     static async appendBudget(costId: string, budget: number) {
         // const cost = await Models.costCenterDeploy.get(costId)
         const log = BudgetLog.create({ costCenterId: costId, value: budget, type: BUDGET_CHANGE_TYPE.APPEND_BUDGET })
@@ -268,7 +275,7 @@ export default class CostCenterModule {
     }
 
     @clientExport
-    static async initBudget(budgets: any[], period: { start: Date, end: Date }) {
+    static async initBudget(budgets: IBudget[], period: { start: Date, end: Date }) {
         const promiseAry = []
         for (let budget of budgets) {
             const { id } = budget
@@ -290,7 +297,7 @@ export default class CostCenterModule {
     }
 
     @clientExport
-    static async changeBudget(costId: string, budgets: any[], appendBudget: number = 0, period: { start: Date, end: Date }) {
+    static async changeBudget(costId: string, budgets: IBudget[], appendBudget: number = 0, period: { start: Date, end: Date }) {
         const tempSum = _.sum(_.map(_.prop('selfTempBudget'), budgets)),
             where = { costCenterId: costId, beginDate: { $lte: period.start }, endDate: { $gte: period.end } }
         const rootCost = _.first(await Models.costCenterDeploy.find({ where }))
@@ -384,4 +391,10 @@ async function getTotalTempBudgetSumOf(costIds: string[], period?) {
 
 async function getPerMonthExpenditure(costId: string) {
 
+}
+
+export interface IBudget {
+    id: string,
+    totalTempBudget: number,
+    selfTempBudget: number
 }
