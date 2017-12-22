@@ -12,6 +12,7 @@ import { L } from '@jingli/language';
 import { when } from 'q';
 const API = require('@jingli/dnode-api');
 const _ = require('lodash/fp')
+const moment = require('moment')
 
 export default class CostCenterModule {
 
@@ -251,7 +252,8 @@ export default class CostCenterModule {
     @clientExport
     static async getAppendBudget(costId: string) {
         return _.first(await Models.budgetLog.find({
-            where: { costCenterId: costId, type: BUDGET_CHANGE_TYPE.APPEND_BUDGET }
+            where: { costCenterId: costId, type: BUDGET_CHANGE_TYPE.APPEND_BUDGET },
+            order: [['created_at', 'desc']]
         }))
     }
 
@@ -264,14 +266,17 @@ export default class CostCenterModule {
     @clientExport
     static async listDeptBudget(deptId: string, period: { start: Date, end: Date }) {
         const children = await findChildren(deptId)
-        const where = { beginDate: { $lte: period.start }, endDate: { $gte: period.end } }
-        const costs = await Promise.all([...children.map(c => Models.costCenterDeploy.find({ where: { ...where, costCenterId: c.id } })),
-            Models.costCenterDeploy.find({ where: { ...where, costCenterId: deptId } })])
+        const where = { beginDate: { $gte: moment(period.start).add(8, 'h').format() }, endDate: { $lte: moment(period.end).add(8, 'h').format() } }
+        const costs = await Promise.all([...children.map(c =>
+            Models.costCenterDeploy.find({
+                where: { ...where, costCenterId: c.id }
+            })), Models.costCenterDeploy.find({ where: { ...where, costCenterId: deptId } })])
         return _.compose(_.filter(_.identity), _.map(_.first))(costs)
     }
 
     @clientExport
     static async initBudget(budgets: IBudget[], period: { start: Date, end: Date }) {
+        console.log(period.start)
         const promiseAry = []
         for (let budget of budgets) {
             const { id } = budget
@@ -283,7 +288,11 @@ export default class CostCenterModule {
             }
 
             const costCenterDeploy = await Models.costCenterDeploy.find({
-                where: { costCenterId: id, beginDate: period.start, endDate: period.end }
+                where: {
+                    costCenterId: id,
+                    beginDate: { $gte: moment(period.start).add(8, 'h').format() },
+                    endDate: { $lte: moment(period.end).add(8, 'h').format() }
+                }
             })
             if (costCenterDeploy.length < 1) {
                 promiseAry.push(CostCenterDeploy.create({ costCenterId: id, ...budget, beginDate: period.start, endDate: period.end }).save())
@@ -295,7 +304,11 @@ export default class CostCenterModule {
     @clientExport
     static async changeBudget(costId: string, budgets: IBudget[], appendBudget: number = 0, period: { start: Date, end: Date }) {
         const tempSum = _.compose(_.sum, _.map(_.prop('selfTempBudget')))(budgets),
-            where = { costCenterId: costId, beginDate: { $lte: period.start }, endDate: { $gte: period.end } }
+            where = {
+                costCenterId: costId,
+                beginDate: { $gte: moment(period.start).add(8, 'h').format() },
+                endDate: { $lte: moment(period.end).add(8, 'h').format() }
+            }
         const rootCost = _.first(await Models.costCenterDeploy.find({ where }))
 
         if (tempSum != rootCost.totalTempBudget + appendBudget) throw new L.ERROR_CODE_C(400, '超出总预算')
@@ -313,7 +326,7 @@ export default class CostCenterModule {
 
     @clientExport
     static async applyConf(costId: string, period: { start: Date, end: Date }) {
-        const where = { costCenterId: costId, beginDate: { $lte: period.start }, endDate: { $gte: period.end } }
+        const where = { costCenterId: costId, beginDate: { $gte: moment(period.start).add(8, 'h').format() }, endDate: { $lte: moment(period.end).add(8, 'h').format() } }
         const root = _.first(await Models.costCenterDeploy.find({ where }))
         let totalBudget = 0
         const children = await findChildren(costId)
@@ -342,8 +355,8 @@ export default class CostCenterModule {
         const cost = _.first(await Models.costCenterDeploy.find({
             where: {
                 costCenterId: costId,
-                beginDate: { $lte: period.start },
-                endDate: { $gte: period.end }
+                beginDate: { $gte: moment(period.start).add(8, 'h').format() },
+                endDate: { $lte: moment(period.end).add(8, 'h').format() }
             }
         }))
         cost.warningPerson = setting.audienceTypes
