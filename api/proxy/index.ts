@@ -198,11 +198,11 @@ class Proxy {
         app.all(/mall.*/ , async (req: Request, res: Response, next: Function)=> {
             console.log("======hello world, ", req.body)
             let params =  req.body;
-            let appSerect = config.mall.appSerect;
-
+            let appSecret = config.mall.appSecret;
+            console.log('secret:', appSecret)
             let pathstring = req.path;
             pathstring = pathstring.replace("/mall", '');
-            let sign = genSign(params, Math.floor(Date.now()/1000), appSerect)
+            let sign = genSign(params, Math.floor(Date.now()/1000), appSecret)
             let url = `${config.mall.orderLink}${pathstring}`;
             console.log("======hello world, sign", sign) 
             let result = await new Promise((resolve, reject) => {
