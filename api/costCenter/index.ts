@@ -264,7 +264,7 @@ export default class CostCenterModule {
         const where = { beginDate: { $lte: period.start }, endDate: { $gte: period.end } }
         const costs = await Promise.all([...children.map(c => Models.costCenterDeploy.find({ where: { ...where, costCenterId: c.id } })),
         Models.costCenterDeploy.find({ where: { ...where, costCenterId: deptId } })])
-        return _.map(_.compose(_.first, _.filter(_.identity)), costs)
+        return _.compose(_.first, _.filter(_.identity))(costs)
     }
 
     @clientExport
