@@ -393,7 +393,7 @@ async function getTotalTempBudgetSumOf(costIds: string[], period?) {
     const ids = costIds.map(id => `'${id}'`).join(',')
     const sql = `select sum(total_temp_budget) as sum from 
         cost_center.cost_center_deploys where id in (${ids}) 
-        and begin_date <= '${period.start}' and end_date >= '${period.end}'`
+        and begin_date >= '${ moment(period.start).add(8, 'h').format()}' and end_date <= '${moment(period.end).add(8, 'h').format()}'`
     const res = (await DB.query(sql))[0][0]
     return (res && res.sum) || 0
 }
