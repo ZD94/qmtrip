@@ -2,7 +2,7 @@
 import { Models } from "_types/index";
 var request = require("request-promise");
 import { clientExport, requireParams } from "@jingli/dnode-api/dist/src/helper";
-import { BudgetLog, CostCenter, CostCenterDeploy, ECostCenterType } from "_types/costCenter";
+import { BudgetLog, CostCenter, CostCenterDeploy, ECostCenterType, BUDGET_CHANGE_TYPE } from "_types/costCenter";
 import { FindResult } from "common/model/interface";
 import { findParentManagers, findChildren } from 'api/department';
 import { Department } from '_types/department';
@@ -249,10 +249,12 @@ export default class CostCenterModule {
 
     @clientExport
     static async appendBudget(costId: string, budget: number) {
-        const cost = await Models.costCenterDeploy.get(costId)
-        if (!cost) throw new L.ERROR_CODE_C(404, '该部门尚未设置预算')
-        cost.totalTempBudget = cost.totalBudget += budget
-        await cost.save()
+        // const cost = await Models.costCenterDeploy.get(costId)
+        const log = BudgetLog.create({ costCenterId: costId, value: budget, type: BUDGET_CHANGE_TYPE.APPEND_BUDGET })
+        // if (!cost) throw new L.ERROR_CODE_C(404, '该部门尚未设置预算')
+        // cost.totalTempBudget = cost.totalBudget += budget
+        // await cost.save()
+        await log.save()
     }
 
     @clientExport
@@ -282,14 +284,11 @@ export default class CostCenterModule {
     }
 
     @clientExport
-    static async changeBudget(costId: string, budgets: any[], companyId: string) {
-        const root = await Models.costCenterDeploy.get(companyId)
+    static async changeBudget(costId: string, budgets: any[], appendBudget: number = 0) {
         const tempSum = _.sum(_.map(_.prop('selfTempBudget'), budgets))
         const rootCost = await Models.costCenterDeploy.get(costId)
 
-        // root.totalBudget 
-
-        if (tempSum != rootCost.totalTempBudget) throw new L.ERROR_CODE_C(400, '超出总预算')
+        if (tempSum != rootCost.totalTempBudget + appendBudget) throw new L.ERROR_CODE_C(400, '超出总预算')
 
         for (let b of budgets) {
             const cost = await Models.costCenterDeploy.get(b.id)
