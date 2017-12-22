@@ -259,7 +259,7 @@ export default class CostCenterModule {
     }
 
     @clientExport
-    static async listDeptBudget(deptId: string, period: { start: Date, end: Date }): Promise<CostCenterDeploy[]> {
+    static async listDeptBudget(deptId: string, period: { start: Date, end: Date }): Promise<CostCenterDeploy> {
         const children = await findChildren(deptId)
         const where = { beginDate: { $lte: period.start }, endDate: { $gte: period.end } }
         const costs = await Promise.all([...children.map(c => Models.costCenterDeploy.find({ where: { ...where, costCenterId: c.id } })),
