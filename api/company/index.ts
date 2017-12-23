@@ -313,7 +313,7 @@ export default class CompanyModule {
                 saved: {$gt: 0}
             }, 
             order: [['updated_at', 'asc']]});
-        
+        //TODO staff表里的员工剩余积分更新 
         let company: Company = await Models.company.get(params.companyId);
         let points2coinRate: number = company.points2coinRate;  //企业余额可转为鲸币的比例
         let scoreRatio: number = company.scoreRatio;  //企业奖励节省比例

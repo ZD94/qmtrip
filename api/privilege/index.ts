@@ -15,13 +15,13 @@ export default class Privilege {
     @clientExport
     static async getCompanyBalance(companyId: string): Promise<number> {
         let company: Company = await Models.company.get(companyId);
-        let companyBalance = company.balance;
+        let companyBalance: number = company.balance;
         return companyBalance;
     }
 
     //获取企业福利账户余额变动记录
     @clientExport
-    static async getCompanyBalanceRecords(params: {id: string, data?: object}): Promise<any> {
+    static async getCompanyBalanceRecords(params: {id: string, data?: any}): Promise<any> {
         let {id, data} = params;
         let companyId: string = id;
         let queryDateData: any = data;
@@ -35,6 +35,8 @@ export default class Privilege {
         if (queryDateData) {
             checkFromDate = queryDateData.beginDate;
             checkToDate = queryDateData.endDate;
+            console.log('checkFrom', checkFromDate);
+            console.log('checkTo', checkToDate);
             for (let i = 0; i < moneyChanges.length; i++) {
                 if (moment(moneyChanges[i].createdAt).isAfter(checkFromDate) || moment(moneyChanges[i].createdAt).isBefore(checkToDate)) {
                     dataDuringTheQueryDate.push(moneyChanges[i]);
@@ -61,7 +63,6 @@ export default class Privilege {
         let staffId: string = setData.staffId;
         let staff: Staff = await Models.staff.get(staffId);
         
-        console.log('asdfasdf', setData);
         let companyId: string = staff.company.id;
         let scoreRatio: number = setData.scoreRatio;
         let company: Company = await Models.company.get(companyId);
@@ -79,7 +80,6 @@ export default class Privilege {
             operator: operator
         });
         await updateScoreRatioChange.save();
-        console.log('companyScoreRatio', scoreRatio);
         company.scoreRatio = scoreRatio;
         let updated: any = await company.save();
         return updated;
@@ -98,29 +98,14 @@ export default class Privilege {
      //查询全部未结算奖励按出差人展示
      @clientExport
      static async getAllUnsettledRewardByStaff(companyId: string): Promise<any> {
-         let staffs: Staff[] = await Models.staff.all({where: {companyId: companyId}});
-         let staffsHaveUnsettledReward: Staff[];
+         let staffs: Staff[] = await Models.staff.all({where: {companyId: companyId, balancePoints: {$gt: 0}}});
+         let staffsHaveUnsettledReward: Staff[] = [];
          for (let i = 0; i < staffs.length; i++) {
              if (staffs[i].balancePoints > 0) {
                  staffsHaveUnsettledReward.push(staffs[i]);
              }
          }
-
-         staffsHaveUnsettledReward = bubbleSort(staffsHaveUnsettledReward);
          return staffsHaveUnsettledReward;
-
-        function bubbleSort(arr) {
-            for (let i = 0; i < arr.length - 1; i++) {
-                for (let j = i + 1; j < arr.length; j++) {
-                    if (arr[i].balancePoints > arr[j].balancePoints) {
-                        let temp = arr[i];
-                        arr[i] = arr[j];
-                        arr[j] = temp;
-                    }
-                }
-            }
-            return arr;
-        }
      }
 
      //查询全部未结算奖励按tripPlan展示
@@ -134,7 +119,4 @@ export default class Privilege {
                 });
          return tripPlansHaveUnsettledReward;
      }
-
-
-     
 }

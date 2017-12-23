@@ -40,8 +40,8 @@ export class PrivilegeController extends AbstractController {
         if (body) {
             if (typeof body == 'string') {
                 body = JSON.parse(body);
-            } 
-            balanceRecords =  await ApiPrivilege.getCompanyBalanceRecords(id, body);
+            }
+            balanceRecords =  await ApiPrivilege.getCompanyBalanceRecords({id, body});
         } else {
             balanceRecords = await ApiPrivilege.getCompanyBalanceRecords(id);
         }
@@ -92,18 +92,18 @@ export class PrivilegeController extends AbstractController {
         if (!id) {
             return res.json(this.reply(400, null));
         }
-        let result = ApiPrivilege.getAllUnsettledRewardByStaff(id);
+        let result = await ApiPrivilege.getAllUnsettledRewardByStaff(id);
         res.json(this.reply(0, result));
     }
 
-    //查询全部未结算奖励按出差人展示
+    //查询全部未结算奖励按行程展示
     @Router('/:id/getAllUnsettledRewardByTripplan', 'GET')
     async getAllUnsettledRewardByTripplan(req, res, next) {
         let {id} = req.params;
         if (!id) {
             return res.json(this.reply(400, null));
         }
-        let result = ApiPrivilege.getAllUnsettledRewardByTripplan(id);
+        let result = await ApiPrivilege.getAllUnsettledRewardByTripplan(id);
         res.json(this.reply(0, result));
     }
 }
