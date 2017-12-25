@@ -15,15 +15,15 @@ import WangxStaff from "./wangxStaff";
 
 export default class WangxCompany extends OaCompany{
 
-    private wangxAPi: WangXinApi;
+    private wangXinApi: WangXinApi;
 
     constructor(target: any) {
         super(target)
-        this.wangxAPi = target.wangxAPi
+        this.wangXinApi = target.wangXinApi
     }
 
     get id() {
-        return this.target.id
+        return this.target.id as string;
     }
 
     set id(val: string) {
@@ -40,10 +40,10 @@ export default class WangxCompany extends OaCompany{
 
     async getDepartments(): Promise<OaDepartment[]> {
         let self = this;
-        let departments = await self.wangxAPi.getDepartments();
+        let departments = await self.wangXinApi.getDepartments();
         let result: OaDepartment[];
         departments.forEach((item) => {
-            let ddDept = new WangxDepartment({name: item.name, parentId: item.pid, id: item.id});
+            let ddDept = new WangxDepartment({name: item.name, parentId: item.pid, id: item.id, wangXinApi: self.wangXinApi});
             result.push(ddDept);
         })
         return result;
@@ -51,11 +51,11 @@ export default class WangxCompany extends OaCompany{
 
     async getRootDepartment(): Promise<OaDepartment> {
         let self = this;
-        let departments = await self.wangxAPi.getDepartments();
+        let departments = await self.wangXinApi.getDepartments();
         let result: OaDepartment;
         departments.forEach((item) => {
-            if(item.id == 1){
-                result = new WangxDepartment({name: item.name, parentId: item.pid, id: item.id});
+            if(item.id == "1"){
+                result = new WangxDepartment({name: item.name, parentId: item.pid, id: item.id, wangXinApi: self.wangXinApi});
             }
         })
         return result;
@@ -63,18 +63,20 @@ export default class WangxCompany extends OaCompany{
 
     async getCreateUser(): Promise<OaStaff> {
         let self = this;
-        let users = await self.wangxAPi.getUsers();
+        let users = await self.wangXinApi.getUsers();
         let result: OaStaff;
         users.forEach((item) => {
-            if(item.id == 1){
-                result = new WangxStaff({name: item.name, id: item.id, mobile: item.tel || item.phone, email: item.email, sex: item.sex, isAdmin: true});
+            if(item.id == "1"){
+                let mobile = (item.tel || item.phone) ? (item.tel || item.phone) : null;
+                result = new WangxStaff({name: item.name, id: item.id, mobile: mobile, email: item.email, sex: item.sex,
+                    isAdmin: true, wangXinApi: self.wangXinApi});
             }
         })
         return result;
     }
 
     async saveCompanyProperty(params: {companyId: string}): Promise<boolean> {
-        let companyUuidProperty = CompanyProperty.create({companyId: params.companyId, type: CPropertyType.WANGXIN_ID, value: this.id});
+        let companyUuidProperty = CompanyProperty.create({companyId: params.companyId, type: CPropertyType.WANGXIN_ID, value: this.id+""});
         await companyUuidProperty.save();
         return true;
     }

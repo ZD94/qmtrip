@@ -112,7 +112,7 @@ export default class CompanyModule {
             }
         }
 
-        let staff = Staff.create({ email: params.email, name: params.userName, mobile: params.mobile, roleId: EStaffRole.OWNER, pwd: md5(pwd), status: params.status, isValidateMobile: params.isValidateMobile });
+        let staff = Staff.create({ email: params.email, name: params.userName, mobile: params.mobile || null, roleId: EStaffRole.OWNER, pwd: md5(pwd), status: params.status, isValidateMobile: params.isValidateMobile });
         let company = Company.create(params);
         company.domainName = domain;
         company.expiryDate = moment().add(DEFAULT_EXPIRE_MONTH, 'months').toDate();
@@ -166,6 +166,7 @@ export default class CompanyModule {
         //默认开启所有公有预订服务商
         await company.setDefaultSupplier();
 
+        console.info("1111111111111111111111111111111111111111");
         //jlbudget create company record.
         try {
             let jlBudgetCompany = await RestfulAPIUtil.operateOnModel({
@@ -184,7 +185,10 @@ export default class CompanyModule {
                 addUrl: 'company/create',
                 useProxy: false
             });
+
+            console.info("222222222222222222222222222222222", jlBudgetCompany);
         } catch (e) {
+            console.info("e==>>", e);
             throw e;
         }
 

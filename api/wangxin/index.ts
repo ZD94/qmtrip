@@ -15,6 +15,10 @@ import {OaStaff} from 'libs/asyncOrganization/oaStaff';
 import {SPropertyType, Staff} from "_types/staff";
 import {Models} from "../../_types/index";
 import L from "@jingli/language"
+import WangXinApi from "./lib/wangxApi";
+import C = require("@jingli/config");
+import WangxDepartment from "./lib/wangxDepartment";
+import {Company} from "../../_types/company/company";
 
 const logger = new Logger("wangxin")
 
@@ -54,4 +58,46 @@ export default class WangXin {
             throw L.ERR.COMPANY_NOT_EXIST();
         }
     }
+
+    /*
+    *  同步组织架构
+    */
+    @clientExport
+    static async syncOrganization(){
+        console.info("同步网信通讯录begin================================");
+        let sysCode = C.wxSysCode;
+        let name = "网信演示企业";
+        if(sysCode){
+            let company: Company;
+            let wangXinApi = new WangXinApi(sysCode);
+            let wxDepartment = await wangXinApi.getDepartments("0");
+
+            let com = await Models.company.find({where: {name: name}});
+            if(com && com.length){
+                if(wxDepartment && wxDepartment.length){
+                    company = com[0];
+                }
+
+            }else{
+                let wxSuperAdmin = await wangXinApi.getUserById("1");
+                if(wxDepartment && wxDepartment.length && wxSuperAdmin){
+                    let mobile = wxSuperAdmin.tel || wxSuperAdmin.phone;
+                    let userName = wxSuperAdmin.name;
+                    let pwd = "123456";
+                    let result = await API.company.registerCompany({mobile, name, pwd, userName});
+                    company = result.company;
+                }
+            }
+            for(let item of wxDepartment){
+                let pid = item.pid;
+                let wxDept = new WangxDepartment({name: item.name, parentId: item.pid, id: item.id, company: company, wangXinApi: wangXinApi});
+                await wxDept.sync({company: company});
+            }
+            console.info("同步网信通讯录end================================");
+            return true;
+        }
+        console.info("同步网信通讯录end2222222================================");
+        return false;
+    }
+
 }

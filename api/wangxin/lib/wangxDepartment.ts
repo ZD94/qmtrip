@@ -14,15 +14,15 @@ import WangxStaff from "./wangxStaff";
 import {DepartmentProperty} from "../../../_types/department/department-property";
 
 export default class WangxDepartment extends OaDepartment {
-    private wangxAPi: WangXinApi;
+    private wangXinApi: WangXinApi;
 
     constructor(target: any) {
         super(target)
-        this.wangxAPi = target.wangxAPi
+        this.wangXinApi = target.wangXinApi
     }
 
     get id() {
-        return this.target.id
+        return this.target.id as string;
     }
 
     set id(val: string) {
@@ -63,9 +63,9 @@ export default class WangxDepartment extends OaDepartment {
 
     async getSelfById(): Promise<OaDepartment> {
         let self = this;
-        let result = await self.wangxAPi.getDepartmentById(self.id);
+        let result = await self.wangXinApi.getDepartmentById(self.id);
         if(result){
-            return new WangxDepartment({name: self.name, parentId: self.parentId, id: self.id, company: self.company});
+            return new WangxDepartment({name: self.name, parentId: self.parentId, id: self.id, company: self.company, wangXinApi: self.wangXinApi});
         }
         return null;
     }
@@ -73,21 +73,23 @@ export default class WangxDepartment extends OaDepartment {
     async getChildrenDepartments(): Promise<OaDepartment[]> {
         let self = this;
 
-        let departments = await self.wangxAPi.getDepartments(self.id);
+        let departments = await self.wangXinApi.getDepartments(self.id);
         let result: OaDepartment[] = [];
-        departments.forEach((d) => {
-            let oaDept =  new WangxDepartment({name: d.name, parentId: self.id, id: d.id, company: self.company});
-            result.push(oaDept);
-        })
+        if(departments && departments.length){
+            departments.forEach((d) => {
+                let oaDept =  new WangxDepartment({name: d.name, parentId: self.id, id: d.id, company: self.company, wangXinApi: self.wangXinApi});
+                result.push(oaDept);
+            })
+        }
         return result;
     }
 
     async getParent(): Promise<OaDepartment> {
         let self = this;
         if(self.parentId){
-            let result = await self.wangxAPi.getDepartmentById(self.parentId);
+            let result = await self.wangXinApi.getDepartmentById(self.parentId);
             if(result && result.id){
-                return new WangxDepartment({id: result.id, name: result.name, parentId: result.pid, company: self.company});
+                return new WangxDepartment({id: result.id, name: result.name, parentId: result.pid, company: self.company, wangXinApi: self.wangXinApi});
             }
         }
         return null;
@@ -95,10 +97,11 @@ export default class WangxDepartment extends OaDepartment {
 
     async getStaffs(): Promise<OaStaff[]> {
         let self = this;
-        let users = await self.wangxAPi.getUsersBydept(self.id);
+        let users = await self.wangXinApi.getUsersBydept(self.id);
         let result: OaStaff[] = [];
         for(let u of users){
-            let oaStaff = new WangxStaff({id: u.id, name: u.name, email: u.email, mobile: u.tel || u.phone, company: self.company});
+            let mobile = (u.tel || u.phone) ? (u.tel || u.phone) : null;
+            let oaStaff = new WangxStaff({id: u.id, name: u.name, email: u.email, mobile: mobile, company: self.company, wangXinApi: self.wangXinApi});
             result.push(oaStaff);
         }
         return result;
@@ -114,7 +117,7 @@ export default class WangxDepartment extends OaDepartment {
 
     async getDepartment(): Promise<Department> {
         let self = this
-        let deptPro = await Models.departmentProperty.find({where : {value: self.id, type: DPropertyType.WANGXIN_ID}});
+        let deptPro = await Models.departmentProperty.find({where : {value: self.id+"", type: DPropertyType.WANGXIN_ID}});
         if(deptPro && deptPro.length > 0){
             let dept = await Models.department.get(deptPro[0].departmentId);
             return dept;

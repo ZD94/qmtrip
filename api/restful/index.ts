@@ -26,6 +26,7 @@ export async function getAgentToken() {
     let key = `token:agent:${appId}`;
     // logger.debug("KEY:", key)
     const token = await cache.read(key);
+    console.info("token===>>", token);
     if (token) {
         // logger.debug('TOKEN:', token);
         return token;
@@ -36,7 +37,7 @@ export async function getAgentToken() {
         timestamp,
         sign: md5(`${config.agent.appSecret}|${timestamp}`)
     }).then(res => res.data)
-
+    console.info("resp===>>", resp);
     if (resp.code === 0) {
         await cache.write(key, resp.data.token, resp.data.expires - 30);
         // logger.debug('TOKEN:', resp.data.token)
@@ -52,16 +53,19 @@ export async function getCompanyTokenByAgent(companyId: string) {
     let key = `token:company:${companyId}`
     // logger.debug('KEY:', key);
     const companyToken = await cache.read(key);
+    console.info("===>>>>", companyToken);
     if (companyToken) {
         // logger.debug('TOKEN:', companyToken);
         return companyToken;
     }
 
     let agentToken = await getAgentToken();
+    console.info("agentToken===***", agentToken);
     const resp: any = await axios.get(`${config.cloudAPI}/agent/company/${companyId}/token`, {
         headers: { token: agentToken }
     }).then(res => res.data);
 
+    console.info("resp=====", resp);
     if (resp.code === 0) {
         await cache.write(key, resp.data.token, resp.data.expires);
         // logger.debug('TOKEN:', resp.data.token)
