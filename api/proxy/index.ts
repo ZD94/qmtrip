@@ -3,7 +3,7 @@ import {Request, Response} from "express-serve-static-core";
 import {parseAuthString} from "_types/auth/auth-cert";
 import { Staff } from "_types/staff";
 import { Models } from "_types";
-import { AuthRequest } from '_types/auth';
+import { AuthRequest, AuthResponse } from '_types/auth';
 import {getCompanyTokenByAgent} from '../restful';
 var requestp = require("request-promise");
 import { EOrderStatus, EOrderType } from "_types/tripPlan";
@@ -14,6 +14,9 @@ var cors = require('cors');
 const config = require("@jingli/config");
 const API = require("@jingli/dnode-api");
 var timeout = require('connect-timeout');
+import * as CLS from 'continuation-local-storage';
+let CLSNS = CLS.getNamespace('dnode-api-context');
+import { genSign } from "@jingli/sign";
 const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'Content-Type,auth,supplier, authstr, staffid'} 
 function resetTimeout(req, res, next){
     req.clearTimeout();
@@ -26,13 +29,14 @@ class Proxy {
      * @return {}
      */
     static __initHttpApp(app: Express){
-        app.options(/order*/, cors(corsOptions), (req: Request, res: Response, next: Function) => {         
+
+        app.options(/^\/(order|travel|mall)*/, cors(corsOptions), (req: Request, res: Response, next: Function) => {         
             return res.sendStatus(200);
         })
-        app.all(/travel.*/, cors(corsOptions), resetTimeout, timeout('120s'), async (req: any, res: Response, next: Function) => {
-            if (req.method == 'OPTIONS') {
-                return next();
-            }
+
+        // verifyToken
+
+        app.all(/^\/travel.*$/, cors(corsOptions), resetTimeout, timeout('120s'), async (req: any, res: Response, next: Function) => {
             console.log('---------query--------->', req.query);
             console.log('---------body---------->', req.body);
             
@@ -90,22 +94,9 @@ class Proxy {
             }
         })
 
-
-        app.all(/order.*/, cors(corsOptions),resetTimeout, timeout('120s'), async (req: Request, res: Response, next: Function) => {
-            if(req.method == 'OPTIONS') {
-                return next();
-            }
-            let authstr = req.query.authstr;
-            if(!authstr || typeof authstr == 'undefined') 
-                authstr = req.body.authstr;
-            console.log("======> authstr ", authstr)
-            let token = parseAuthString(authstr);
-            let verification = await API.auth.authentication(token);
-            if(!verification) {
-                console.log("auth failed", JSON.stringify(req.cookies))
-                res.sendStatus(401);
-                return; 
-            }
+        // verifyToken
+        app.all(/^\/order.*$/, cors(corsOptions),resetTimeout, timeout('120s'), async (req: Request, res: Response, next: Function) => {
+            console.log("=====this is order")
 
             let {tripDetailId} = req.query;
             if(!tripDetailId || typeof tripDetailId == undefined)
@@ -173,31 +164,88 @@ class Proxy {
             if(typeof result == 'string') {
                 result = JSON.parse(result);
             }
-            if(result.code == 0 && result.data && !tripDetail.orderNo){  //&& result.data.orderN
+            if(result.code == 0 && result.data && tripDetail.orderNo == null){  //&& result.data.orderN
                 if(result.data.orderNos && typeof(result.data.orderNos) != 'undefined'){
                     tripDetail.reserveStatus = EOrderStatus.AUDITING;  //飞机的orderNos为数组
                     tripDetail.orderNo = result.data.orderNos[0];
-                    // tripDetail.orderType = EOrderType.PLANE;
                 }
                 if(result.data.OrderNo && typeof(result.data.OrderNo) != 'undefined') {  
                     tripDetail.reserveStatus = EOrderStatus.AUDITING;  //火车的OrderNo为string
                     tripDetail.orderNo = result.data.OrderNo;
-                    // tripDetail.orderType = EOrderType.TRAIN;
                 }  
                 if(result.data.orderNo && typeof(result.data.orderNo) != 'undefined') {  
                     tripDetail.reserveStatus = EOrderStatus.AUDITING;   //酒店的orderNo为string
                     tripDetail.orderNo = result.data.orderNo;
-                    // tripDetail.orderType = EOrderType.HOTEL;
                 }
-                tripDetail.orderType = body.orderType? body.orderType: null;  //后期返回的orderNo统一后，使用此确定订单类型
+                tripDetail.orderType = body.orderType != null? body.orderType: null;  //后期返回的orderNo统一后，使用此确定订单类型
                 await tripDetail.save();
             }
             return res.json(result);
 
-        }); 
+        });
+        
+        app.all(/^\/mall.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
+            let params =  req.body;
+            if(req.method == 'GET') {
+                params = req.query;
+            }
+            let appSecret = config.mall.appSecret;
+            let pathstring = req.path;
+            let timestamp = Math.floor(Date.now()/1000);
+            pathstring = pathstring.replace("/mall", '');
+            let sign = genSign(params, timestamp, appSecret)
+            let url = `${config.mall.orderLink}${pathstring}`;
+            console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.mall.appId, '===request params: ', params) 
+            let result = await new Promise((resolve, reject) => {
+                return request({
+                    uri: url,
+                    body: req.body,
+                    json: true,
+                    method: req.method,
+                    qs: req.query,
+                    headers: {
+                        sign: sign,
+                        appid: config.mall.appId
+                    }
+                }, (err, resp, result) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    resolve(result);
+                });
+            });
+            console.log("===mall===result: ", result)
+            return res.json(result);
+        });
     }
 }
 export default Proxy;
+
+async function verify(req: Request, res: Response, next: Function) {
+    if(req.method == 'OPTIONS') {
+        return next();
+    }
+    let {authstr, staffid} = req.headers;
+    console.log("======> authstr ", authstr, staffid)
+    let token = parseAuthString(authstr);
+    let verification: AuthResponse = await API.auth.authentication(token);
+    if(!verification) {
+        console.log("auth failed", JSON.stringify(req.cookies))
+        return res.sendStatus(401);
+    }
+    try{
+        await API.auth.setCurrentStaffId({
+            accountId : verification.accountId,
+            staffId   : staffid
+        })
+    } catch(err) {
+        if(err)
+            return res.sendStatus(401);
+    }
+    next();
+}
+var verifyToken = CLSNS.bind(verify, CLSNS.createContext())
+
 
 
 
