@@ -30,12 +30,7 @@ class Proxy {
      */
     static __initHttpApp(app: Express){
 
-        // app.options(/order*/, cors(corsOptions), (req: Request, res: Response, next: Function) => {  
-        
-        // });
-
-
-        app.options(/^\/order*/, cors(corsOptions), (req: Request, res: Response, next: Function) => {         
+        app.options(/^\/(order|travel|mall)*/, cors(corsOptions), (req: Request, res: Response, next: Function) => {         
             return res.sendStatus(200);
         })
 
@@ -194,7 +189,6 @@ class Proxy {
             return res.json(result);
 
         });
-
         
         app.all(/^\/mall.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
             console.log("======hello world, ", req.body)
@@ -229,9 +223,6 @@ class Proxy {
             console.log("======.result: ", result)
             return res.json(result);
         });
-        
-        
-
     }
 }
 export default Proxy;
@@ -258,12 +249,6 @@ async function verify(req: Request, res: Response, next: Function) {
 }
 var verifyToken = CLSNS.bind(verify, CLSNS.createContext())
 
-//  function getJLSign(params: any, appSerect: string) {
-//     const timestamp = Math.ceil(Date.now()/1000);
-//     console.log("======hello world, timestamp", timestamp) 
-//     let sign = genSign(params, timestamp, appSerect);
-//     return sign;
-// }
 
 
 
