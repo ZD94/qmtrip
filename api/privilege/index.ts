@@ -35,8 +35,6 @@ export default class Privilege {
         if (queryDateData) {
             checkFromDate = queryDateData.beginDate;
             checkToDate = queryDateData.endDate;
-            console.log('checkFrom', checkFromDate);
-            console.log('checkTo', checkToDate);
             for (let i = 0; i < moneyChanges.length; i++) {
                 if (moment(moneyChanges[i].createdAt).isAfter(checkFromDate) || moment(moneyChanges[i].createdAt).isBefore(checkToDate)) {
                     dataDuringTheQueryDate.push(moneyChanges[i]);
