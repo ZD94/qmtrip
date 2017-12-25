@@ -6,6 +6,7 @@ import {clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {MoneyChange, Company, CompanyScoreRatioChange} from '_types/company';
 import {PaginateInterface} from 'common/model/interface';
 import { TripPlan } from '_types/tripPlan';
+import { CoinAccount } from '_types/coin';
 let moment = require('moment');
 
 
@@ -15,7 +16,9 @@ export default class Privilege {
     @clientExport
     static async getCompanyBalance(companyId: string): Promise<number> {
         let company: Company = await Models.company.get(companyId);
-        let companyBalance: number = company.balance;
+        let coinAccount: CoinAccount = await Models.coinAccount.get(company.coinAccountId);
+        let points2coinRate: number = company.points2coinRate;
+        let companyBalance: number = Math.floor((coinAccount.income - coinAccount.consume - coinAccount.locks) / points2coinRate);
         return companyBalance;
     }
 
