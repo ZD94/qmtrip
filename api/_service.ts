@@ -1,14 +1,18 @@
 
 import { initModels } from '_types';
 
-import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo, StaffProperty } from '_types/staff';
+
+
+import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo, StaffProperty, Linkman} from '_types/staff';
 import { Company, MoneyChange, Supplier, TripPlanNumChange, CompanyProperty, InvoiceTitle, CompanyScoreRatioChange } from '_types/company';
+
 import { Department, StaffDepartment, DepartmentProperty } from '_types/department';
 import { PromoCode } from '_types/promoCode';
 
 import { AccordHotel } from '_types/accordHotel';
 import { Notice, NoticeAccount } from '_types/notice';
 import { Agency, AgencyUser } from '_types/agency';
+import { CostCenter, BudgetLog, CostCenterDeploy } from '_types/costCenter';
 import {
     TripPlan, TripDetail, TripDetailStaff, Project, TripPlanLog, FinanceCheckCode,
     TripDetailInvoice, TripDetailTraffic, TripDetailHotel, Offline
@@ -31,6 +35,7 @@ import {EventListener} from "../_types/eventListener";
 // import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
 import {Url} from "_types/shorturl";
 import {EmailQueue, EmailLog, EmailSubmit} from "_types/mail";
+
 
 initModels({
     staff: createServerService<Staff>(Staff),
@@ -86,12 +91,16 @@ initModels({
     tripBasicPackage: createServerService<TripBasicPackage>(TripBasicPackage),
     errorLog: createServerService<ErrorLog>(ErrorLog),
     eventListener: createServerService<EventListener>(EventListener),
+    budgetLog: createServerService<BudgetLog>(BudgetLog),
+    costCenter: createServerService<CostCenter>(CostCenter),
+    costCenterDeploy: createServerService<CostCenterDeploy>(CostCenterDeploy),
 
     url: createServerService<Url>(Url),
     emailQueue: createServerService<EmailQueue>(EmailQueue),
     emailLog: createServerService<EmailLog>(EmailLog),
     emailSubmit: createServerService<EmailSubmit>(EmailSubmit),
-
+    linkman: createServerService<Linkman>(Linkman)
+ 
     // travelPolicyRegion: createServerService<TravelPolicyRegion>(TravelPolicyRegion),
     // companyRegion: createServerService<CompanyRegion>(CompanyRegion),
     // regionPlace: createServerService<RegionPlace>(RegionPlace),
