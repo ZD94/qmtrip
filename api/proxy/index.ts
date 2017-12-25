@@ -191,24 +191,26 @@ class Proxy {
         });
         
         app.all(/^\/mall.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
-            console.log("======hello world, ", req.body)
-            let params =  req.body;
-            if(req.method == 'GET') 
-                params = req.query;
+            let params =  req.query;
+            if(req.method == 'POST') {
+                params = req.body;
+            }
             let appSecret = config.mall.appSecret;
-            console.log('secret:', appSecret)
             let pathstring = req.path;
             pathstring = pathstring.replace("/mall", '');
             let sign = genSign(params, Math.floor(Date.now()/1000), appSecret)
             let url = `${config.mall.orderLink}${pathstring}`;
-            console.log("===>sign", sign, '====>url', url, 'appid: ', config.mall.appId) 
+            console.log("===>sign", sign, '====>url', url, 'appid: ', config.mall.appId, '===body: ', req.body) 
+            if(req.method == 'POST') {
+                params =  {};
+            }
             let result = await new Promise((resolve, reject) => {
                 return request({
                     uri: url,
                     body: req.body,
                     json: true,
                     method: req.method,
-                    qs: req.query,
+                    qs: params,
                     headers: {
                         sign: sign,
                         appid: config.mall.appId
@@ -220,7 +222,7 @@ class Proxy {
                     resolve(result);
                 });
             });
-            console.log("======.result: ", result)
+            console.log("===mall===result: ", result)
             return res.json(result);
         });
     }
@@ -228,6 +230,9 @@ class Proxy {
 export default Proxy;
 
 async function verify(req: Request, res: Response, next: Function) {
+    if(req.method == 'OPTIONS') {
+        return next();
+    }
     let {authstr, staffid} = req.headers;
     console.log("======> authstr ", authstr, staffid)
     let token = parseAuthString(authstr);
