@@ -7,7 +7,11 @@ require('app-module-path').addPath(__dirname);
 require('common/node_ts').install();
 var initData = require('libs/initTestData');
 var ReplServer = require('libs/replServer');
+const httpProxy = require('http-proxy')
 
+httpProxy.createProxyServer({
+    target: 'http://192.168.1.242:3000'
+}).listen(3001)
 var Logger = require('@jingli/logger');
 
 Error.stackTraceLimit = 40;
