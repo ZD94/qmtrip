@@ -166,7 +166,6 @@ export default class CompanyModule {
         //默认开启所有公有预订服务商
         await company.setDefaultSupplier();
 
-        console.info("1111111111111111111111111111111111111111");
         //jlbudget create company record.
         try {
             let jlBudgetCompany = await RestfulAPIUtil.operateOnModel({
@@ -186,9 +185,7 @@ export default class CompanyModule {
                 useProxy: false
             });
 
-            console.info("222222222222222222222222222222222", jlBudgetCompany);
         } catch (e) {
-            console.info("e==>>", e);
             throw e;
         }
 
