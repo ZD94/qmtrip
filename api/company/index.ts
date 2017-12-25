@@ -1321,25 +1321,6 @@ export default class CompanyModule {
                 })
         });
 
-        let taskId8 = 'corpAutoSettleRewards';
-        scheduler('0 1 * * * *', taskId8, function() {
-            //每天凌晨一点兑换未结算奖励
-            (async() => {
-                let companies: Company[] = await Models.company.all({
-                    where: {
-                        id: {
-                            $not: null
-                        }
-                    }});
-                for (let i = 0; i < companies.length; i++) {
-                    CompanyModule.autoSettleReward({companyId: companies[i].id});
-                }
-                logger.info(`成功执行任务${taskId8}`)
-            })()
-                .catch((err) => {
-                    logger.error(`执行任务${taskId8}错误: ${err.stack}`);
-                });
-            });
         }
 
 }
