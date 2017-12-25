@@ -1,6 +1,7 @@
 "use strict"
 
 import {AbstractController, Restful, Router} from "@jingli/restful";
+import { TripDetail } from "_types/tripPlan";
 var API = require('@jingli/dnode-api');
 
 @Restful()
@@ -21,7 +22,14 @@ export class TripDetailController extends AbstractController {
             return res.json(this.reply(0, null));
         }
         params.id = id;
-        let obj = await API.tripPlan.updateTripDetail(params);
+        console.log("=======update tripDetail: ", params)
+        let obj: {[index: string]: string} = {};
+        try{
+            obj = await API.tripPlan.updateTripDetail(params);
+        } catch(err) {
+            if(err)
+                return res.json(this.reply(502, null));
+        }
         res.json(this.reply(0, obj));
     }
 }
