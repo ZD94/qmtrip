@@ -304,6 +304,11 @@ export default class CompanyModule {
      */
     @clientExport
     static async autoSettleReward(params): Promise<any> {
+        if (typeof params == 'string') {
+            params = JSON.parse(params);
+        }
+        console.log('paramsssssssssssss', params);
+        console.log('paramsssssssssssssId', params.companyId);
         let result;
         //get所有未结算奖励 时间正序
         let unSettledReward: TripPlan[] = await Models.tripPlan.all({
@@ -328,8 +333,11 @@ export default class CompanyModule {
                     await moneyChange.save();
 
                     let staff: Staff = await Models.staff.get(unSettledReward[i].accountId);
-                    staff.isSettled = true;
-                    await staff.save();  //将该员工的是否结算奖励标志设为true
+                    staff.balancePoints = 0;  //员工将剩余奖励金额（原积分）全部兑换，置为0
+                    staff.save();
+
+                    unSettledReward[i].isSettled = true;
+                    await unSettledReward[i].save();  //将该tripPlan的是否结算奖励标志设为true
                     
                     let coinAccount: CoinAccount = await Models.coinAccount.get(unSettledReward[i].accountId);  
                     coinAccount.income += unSettledReward[i].saved * scoreRatio * points2coinRate;  //员工account增加鲸币
@@ -1389,9 +1397,9 @@ export default class CompanyModule {
                             $not: null
                         }
                     }});
-                for (let i = 0; i < companies.length; i++) {
-                    CompanyModule.autoSettleReward(companies[i].id);
-                }
+                // for (let i = 0; i < companies.length; i++) {
+                    CompanyModule.autoSettleReward({companyId: 'f6350f90-4fbb-11e6-81af-4b3384f7a2a9'});
+                // }
             })()
                 .catch((err) => {
                     logger.error(`执行任务${taskId8}错误: ${err.stack}`);
