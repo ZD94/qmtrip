@@ -69,6 +69,9 @@ deploy:master:
     JL_APP_TMC_FAKE: 0
     JL_APP_TD_MONITORURL: https://l.jingli365.com/proj/old-qmtrip/api/v1/tripDetail
     JL_APP_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order/proxy
+    JL_APP_MALL_ORDER_LINK: https://l.jingli365.com/svc
+    JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
+    JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
@@ -95,6 +98,9 @@ deploy:test:
     JL_APP_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order/proxy
     JL_APP_CLOUD_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_CLOUD_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_MALL_ORDER_LINK: https://t.jingli365.com/svc
+    JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
+    JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
@@ -120,6 +126,9 @@ deploy:release:
     JL_APP_TMC_FAKE: 0
     JL_APP_TD_MONITORURL: https://j.jingli365.com/proj/old-qmtrip/api/v1/tripDetail
     JL_APP_ORDER_LINK: https://j.jingli365.com/svc/java-jingli-order/proxy
+    JL_APP_MALL_ORDER_LINK: https://j.jingli365.com/svc
+    JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
+    JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
