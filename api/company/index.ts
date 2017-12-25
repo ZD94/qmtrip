@@ -1380,7 +1380,7 @@ export default class CompanyModule {
         });
 
         let taskId8 = 'corpAutoSettleRewards';
-        schedule('0 0 1 * * *', taskId8, function() {
+        scheduler('0 0 1 * * *', taskId8, function() {
             //每天凌晨一点兑换未结算奖励
             (async() => {
                 let companies: Company[] = await Models.company.all({
