@@ -326,6 +326,10 @@ export default class CompanyModule {
                     unSettledReward[i].isSettled = true;  //结算flag更改
                     moneyChange.money -= unSettledReward[i].saved * scoreRatio;  //企业余额扣除相应的奖励金额
                     await moneyChange.save();
+
+                    let staff: Staff = await Models.staff.get(unSettledReward[i].accountId);
+                    staff.isSettled = true;
+                    await staff.save();  //将该员工的是否结算奖励标志设为true
                     
                     let coinAccount: CoinAccount = await Models.coinAccount.get(unSettledReward[i].accountId);  
                     coinAccount.income += unSettledReward[i].saved * scoreRatio * points2coinRate;  //员工account增加鲸币
@@ -1374,6 +1378,22 @@ export default class CompanyModule {
                     logger.error(`执行任务${taskId7}错误:${err.stack}`);
                 })
         });
+
+        let taskId8 = 'corpAutoSettleRewards';
+        schedule('0 0 1 * * *', taskId8, function() {
+            //每天凌晨一点兑换未结算奖励
+            (async() => {
+                let companies: Company[] = await Models.company.all({
+                    where: {
+                        id: {
+                            $not: null
+                        }
+                    }});
+                for (let i = 0; i < companies.length; i++) {
+                    CompanyModule.autoSettleReward(companies[i].id);
+                }
+            });
+        })
     }
 
 }
