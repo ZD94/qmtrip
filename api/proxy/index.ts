@@ -37,9 +37,6 @@ class Proxy {
         // verifyToken
 
         app.all(/^\/travel.*$/, cors(corsOptions), resetTimeout, timeout('120s'), async (req: any, res: Response, next: Function) => {
-            if (req.method == 'OPTIONS') {
-                return next();
-            }
             console.log('---------query--------->', req.query);
             console.log('---------body---------->', req.body);
             
@@ -99,9 +96,6 @@ class Proxy {
 
         // verifyToken
         app.all(/^\/order.*$/, cors(corsOptions),resetTimeout, timeout('120s'), async (req: Request, res: Response, next: Function) => {
-            if(req.method == 'OPTIONS') {
-                return next();
-            }
             console.log("=====this is order")
 
             let {tripDetailId} = req.query;
@@ -191,26 +185,24 @@ class Proxy {
         });
         
         app.all(/^\/mall.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
-            let params =  req.query;
-            if(req.method == 'POST') {
-                params = req.body;
+            let params =  req.body;
+            if(req.method == 'GET') {
+                params = req.query;
             }
             let appSecret = config.mall.appSecret;
             let pathstring = req.path;
+            let timestamp = Math.floor(Date.now()/1000);
             pathstring = pathstring.replace("/mall", '');
-            let sign = genSign(params, Math.floor(Date.now()/1000), appSecret)
+            let sign = genSign(params, timestamp, appSecret)
             let url = `${config.mall.orderLink}${pathstring}`;
-            console.log("===>sign", sign, '====>url', url, 'appid: ', config.mall.appId, '===body: ', req.body) 
-            if(req.method == 'POST') {
-                params =  {};
-            }
+            console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.mall.appId, '===request params: ', params) 
             let result = await new Promise((resolve, reject) => {
                 return request({
                     uri: url,
                     body: req.body,
                     json: true,
                     method: req.method,
-                    qs: params,
+                    qs: req.query,
                     headers: {
                         sign: sign,
                         appid: config.mall.appId
