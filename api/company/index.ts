@@ -1392,9 +1392,11 @@ export default class CompanyModule {
                 for (let i = 0; i < companies.length; i++) {
                     CompanyModule.autoSettleReward(companies[i].id);
                 }
+            })()
+                .catch((err) => {
+                    logger.error(`执行任务${taskId8}错误: ${err.stack}`);
+                });
             });
-        })
-    }
 
 }
 
