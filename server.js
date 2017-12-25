@@ -11,7 +11,7 @@ const httpProxy = require('http-proxy')
 
 httpProxy.createProxyServer({
     target: 'http://192.168.1.242:3000'
-}).listen(3001)
+}).listen(3005)
 var Logger = require('@jingli/logger');
 
 Error.stackTraceLimit = 40;
