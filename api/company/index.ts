@@ -1397,6 +1397,7 @@ export default class CompanyModule {
                     logger.error(`执行任务${taskId8}错误: ${err.stack}`);
                 });
             });
+        }
 
 }
 
