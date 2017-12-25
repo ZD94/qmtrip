@@ -271,12 +271,11 @@ export default class CostCenterModule {
             Models.costCenterDeploy.find({
                 where: { ...where, costCenterId: c.id }
             })), Models.costCenterDeploy.find({ where: { ...where, costCenterId: deptId } })])
-        return _.compose(_.filter(_.identity), _.map(_.first))(costs)
+        return _.compose(_.compact, _.map(_.first))(costs)
     }
 
     @clientExport
     static async initBudget(budgets: IBudget[], period: { start: Date, end: Date }) {
-        console.log(period.start)
         const promiseAry = []
         for (let budget of budgets) {
             const { id } = budget

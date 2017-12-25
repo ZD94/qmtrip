@@ -8,7 +8,7 @@ export class CostController extends AbstractController {
     }
 
     async get(req, res, next) {
-        const budgets = await API['costCenter'].listDeptBudget(req.params.id, { start: new Date, end: new Date })
+        const budgets = await API['costCenter'].listDeptBudget(req.params.id, { start: '2017-01-01', end: '2017-12-31' })
         res.json(budgets)
     }
 
