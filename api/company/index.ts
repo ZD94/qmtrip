@@ -16,7 +16,7 @@ let _ = require("lodash");
 let Config = require('@jingli/config');
 import { requireParams, clientExport } from "@jingli/dnode-api/dist/src/helper";
 import { Models } from "_types";
-import { Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE, InvoiceTitle, CompanyProperty, CPropertyType } from '_types/company';
+import { Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE, InvoiceTitle, CompanyProperty, CPropertyType, MONEY_CHANGE_TYPE } from '_types/company';
 import { Staff, EStaffRole } from "_types/staff";
 import { PromoCode } from "_types/promoCode";
 import { Agency, AgencyUser, EAgencyUserRole } from "_types/agency";
@@ -322,16 +322,16 @@ export default class CompanyModule {
         let company: Company = await Models.company.get(params.companyId);
         let points2coinRate: number = company.points2coinRate;  //企业余额可转为鲸币的比例
         let scoreRatio: number = company.scoreRatio;  //企业奖励节省比例
-        let moneyChange: MoneyChange = await Models.moneyChange.get(params.companyId);
-        let companyBalance: number = moneyChange.money;  //企业余额
+        let companyBalance: number = company.balance;  //企业余额
         // let companyBalanceToCoin: number = companyBalance * points2coinRate;  //企业余额可转换为的鲸币数
         if (companyBalance > 0) {   
             for (let i = 0; i < unSettledReward.length; i++) {
                 if (companyBalance > (unSettledReward[i].saved * scoreRatio)){  //企业余额足够兑换该员工的节省奖励
                     unSettledReward[i].isSettled = true;  //结算flag更改
-                    moneyChange.money -= unSettledReward[i].saved * scoreRatio;  //企业余额扣除相应的奖励金额
-                    await moneyChange.save();
+                    company.balance -= unSettledReward[i].saved * scoreRatio;  //企业余额扣除相应的奖励金额
+                    await company.save();
 
+                    
                     let staff: Staff = await Models.staff.get(unSettledReward[i].accountId);
                     staff.balancePoints = 0;  //员工将剩余奖励金额（原积分）全部兑换，置为0
                     staff.save();
@@ -351,15 +351,25 @@ export default class CompanyModule {
                         coins: coins
                     });
                     await coinAccountChange.save();
+
+                    let rewardMoney: number = unSettledReward[i].saved * scoreRatio; //moenyChange表记录
+                    let moneyChange: MoneyChange = Models.moneyChange.create({
+                        companyId: params.companyId,
+                        money: unSettledReward[i].saved * scoreRatio,
+                        remark: `奖励员工${coinAccount.id} ${rewardMoney}元`,
+                        type: MONEY_CHANGE_TYPE.CONSUME
+                    });
+                    await moneyChange.save();
                 } else {
+                    //企业余额不足继续兑换，提示充值
+                    L.ERROR_CODE(502, '企业余额不足');
                     break;
                 }
             }
-            //企业余额不足继续兑换，提示充值
-            console.log('企业余额不足')
+            
         } else {
             //企业余额不足继续兑换，提示充值 
-            console.log('企业余额不足')
+            L.ERROR_CODE(502, '企业余额不足');
         }
     }
 
@@ -1388,7 +1398,7 @@ export default class CompanyModule {
         });
 
         let taskId8 = 'corpAutoSettleRewards';
-        scheduler('0 0 1 * * *', taskId8, function() {
+        scheduler('0 1 * * * *', taskId8, function() {
             //每天凌晨一点兑换未结算奖励
             (async() => {
                 let companies: Company[] = await Models.company.all({
@@ -1397,9 +1407,10 @@ export default class CompanyModule {
                             $not: null
                         }
                     }});
-                // for (let i = 0; i < companies.length; i++) {
-                    CompanyModule.autoSettleReward({companyId: 'f6350f90-4fbb-11e6-81af-4b3384f7a2a9'});
-                // }
+                for (let i = 0; i < companies.length; i++) {
+                    CompanyModule.autoSettleReward({companyId: companies[i].id});
+                }
+                logger.info(`成功执行任务${taskId8}`)
             })()
                 .catch((err) => {
                     logger.error(`执行任务${taskId8}错误: ${err.stack}`);
