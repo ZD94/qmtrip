@@ -127,6 +127,7 @@ deploy:demo:
     name: demo
     url: https://demo.jingli365.com
   variables:
+    JL_APP_HOST: http://demo.jingli365.com
     JL_APP_V2_HOST: https://demo.jingli365.com
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: https://demo.jingli365.com/proj/svr-jlbudget/
