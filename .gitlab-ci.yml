@@ -117,6 +117,28 @@ deploy:release:
     - echo deploy to https://j.jingli365.com
     - ssh test@j.jingli365.com /home/test/bin/docker_start.sh $DOCKER_REG $DOCKER_NAME $CI_COMMIT_REF_SLUG
 
+deploy:demo:
+  stage: deploy
+  only:
+    - /^master|test|release|demo$/
+  when: manual
+  environment:
+    name: demo
+    url: https://demo.jingli365.com
+  variables:
+    JL_APP_V2_HOST: https://demo.jingli365.com
+    JL_APP_CLOUDKEY: jinglicloud2017
+    JL_APP_CLOUDAPI: https://demo.jingli365.com/proj/svr-jlbudget/
+    JL_APP_CLOUD: https://demo.jingli365.com/pro/web-cloud-mgr/
+    JL_APP_APPROVE_SERVER_URL: https://demo.jingli365.com/proj/svr-trip-approve/api/v1
+  script:
+    - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
+    - docker pull $DOCKER_CI_NAME
+    - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
+    - docker push $DOCKER_BRANCH_NAME
+    - echo deploy to https://demo.jingli365.com
+    - ssh test@demo.jingli365.com /home/test/bin/docker_start.sh $DOCKER_REG $DOCKER_NAME $CI_COMMIT_REF_SLUG
+
 deploy:tester:
   stage: deploy
   when: manual
