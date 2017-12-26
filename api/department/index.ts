@@ -447,7 +447,7 @@ export default class DepartmentModule {
 
         return manager && parent == null
             ? [manager.id]
-            : [manager.id, ... await findParentManagers(parent.id)]
+            : [manager.id, ... await DepartmentModule.findParentManagers(parent.id)]
     }
 }
 
