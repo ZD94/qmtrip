@@ -15,7 +15,7 @@ export default class WeChatController extends AbstractController {
         proxy.web(req, res, proxyTarget)
     }
 
-    @Router('/data/callback')
+    @Router('/data/callback', 'ALL')
     async dataCallback(req, res, next) {
         proxy.web(req, res, proxyTarget)
     }
