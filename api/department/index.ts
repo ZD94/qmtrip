@@ -492,6 +492,7 @@ async function findParents(deptId: string): Promise<Array<Department>> {
  * 查询上级部门管理
  * @param deptId 
  */
+@clientExport
 export async function findParentManagers(deptId: string) {
     const dept = await Models.department.get(deptId)
     const { manager, parent } = dept
