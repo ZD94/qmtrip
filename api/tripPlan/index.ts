@@ -872,8 +872,58 @@ class TripPlanModule {
     }
 
     @clientExport
+    @requireParams(['emails', 'projectId'])
+    static async sendProjectReport(params: {emails: string[], projectId: string}): Promise<boolean>{
+        let data: any = {project: {}, costCenter: {}, projectStaffs: []};
+        let project = await Models.project.get(params.projectId);
+        data.project = project;
+        if(project){
+            let costCenter = await Models.costCenter.get(project.id);
+            if(costCenter){
+                let costCenterDeploies = await Models.costCenterDeploy.find({where: {costCenterId: costCenter.id}});
+                if(costCenterDeploies && costCenterDeploies.length){
+                    let costCenterDeploy = costCenterDeploies[0];
+                    data.costCenter = costCenterDeploy;
+                    let budgetCollectInfo = await costCenterDeploy.getCollectedBudget();
+                    data.budgetCollectInfo = budgetCollectInfo;
+                }
+            }
+            let staffs = await project.getStaffs();
+            if(staffs && staffs.length){
+                let projectStaffs = await Promise.all(staffs.map(async (s) => {
+                    let travelPolicy = await s.getProjectTravelPolicy({projectId: project.id});
+                    s.tp = travelPolicy;
+                    return s;
+                }))
+                data.projectStaffs = projectStaffs;
+            }
+        }
+        let buf = await makeSpendReport(data, "project");
+        try {
+            for(let item of params.emails){
+                await API.notify.submitNotify({
+                    key: 'qm_spend_project_report',
+                    email: item,
+                    values: {
+                        project: project,
+                        attachments: [{
+                            filename: project.name + '.pdf',
+                            content: buf.toString("base64"),
+                            encoding: 'base64'
+                        }]
+                    },
+                });
+            }
+
+        } catch(err) {
+            console.error(err.stack);
+        }
+        return true;
+    }
+
+    @clientExport
     @requireParams(['name', 'companyId'], projectCols)
-    static createProject(params): Promise<Project> {
+    static async createProject(params): Promise<Project> {
         return Project.create(params).save();
     }
 
