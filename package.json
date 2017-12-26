@@ -63,7 +63,7 @@
     "co": "^4.6.0",
     "colors": "^1.1.2",
     "connect-timeout": "^1.8.0",
-    "continuation-local-storage": "git+https://github.com/wanglihui/node-continuation-local-storage.git",
+    "continuation-local-storage": "^3.2.0",
     "cookie-parser": "^1.4.3",
     "core-decorators": "^0.12.3",
     "dingtalk_suite_callback": "0.0.3",
@@ -72,6 +72,7 @@
     "express": "^4.14.0",
     "express-http-proxy": "^0.11.0",
     "express-request-proxy": "^2.0.0",
+    "express-serve-static-core": "^0.1.1",
     "formidable": "^1.0.17",
     "haversine": "^1.0.2",
     "html-pdf": "^2.1.0",
@@ -98,7 +99,7 @@
     "reflect-metadata": "^0.1.8",
     "request": "^2.69.0",
     "request-promise": "4.1.1",
-    "sequelize": "git+https://github.com/wangyaxu/sequelize.git",
+    "sequelize": "^3.30.4",
     "serve-favicon": "^2.3.0",
     "shimmer": "^1.1.0",
     "shoe": "0.0.15",
@@ -110,7 +111,8 @@
     "uuid": "^2.0.3",
     "validator": "^5.5.0",
     "weak": "^1.0.1",
-    "wechat-oauth": "^1.1.1"
+    "wechat-oauth": "^1.1.1",
+    "express-serve-static-core": "^0.1.1"
   },
   "optionalDependency": {
     "bufferutil": "^1.2.1",

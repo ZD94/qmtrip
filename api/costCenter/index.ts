@@ -2,15 +2,17 @@
 import { Models } from "_types/index";
 var request = require("request-promise");
 import { clientExport, requireParams } from "@jingli/dnode-api/dist/src/helper";
-import { BudgetLog, CostCenter, CostCenterDeploy, ECostCenterType } from "_types/costCenter";
-import { FindResult } from "common/model/interface";
+import { BudgetLog, CostCenter, CostCenterDeploy, ECostCenterType, BUDGET_CHANGE_TYPE } from "_types/costCenter";
+import { FindResult, PaginateInterface } from "common/model/interface";
 import { findParentManagers, findChildren } from 'api/department';
 import { Department } from '_types/department';
 import { EStaffRole } from '_types/staff';
 import { DB } from '@jingli/database';
 import { L } from '@jingli/language';
+import { when } from 'q';
 const API = require('@jingli/dnode-api');
 const _ = require('lodash/fp')
+const moment = require('moment')
 
 export default class CostCenterModule {
 
@@ -247,54 +249,98 @@ export default class CostCenterModule {
 
     /****************************************BudgetLog end************************************************/
 
+    @clientExport
+    static async getAppendBudget(costId: string) {
+        return _.first(await Models.budgetLog.find({
+            where: { costCenterId: costId, type: BUDGET_CHANGE_TYPE.APPEND_BUDGET },
+            order: [['created_at', 'desc']]
+        }))
+    }
 
     @clientExport
-    static async initBudget(budgets) {
+    static async appendBudget(costId: string, operator: string, budget: number) {
+        const log = BudgetLog.create({ costCenterId: costId, value: budget, type: BUDGET_CHANGE_TYPE.APPEND_BUDGET, staffId: operator })
+        await log.save()
+    }
+
+    @clientExport
+    static async listDeptBudget(deptId: string, period: { start: Date, end: Date }) {
+        const children = await findChildren(deptId)
+        const where = { beginDate: { $gte: moment(period.start).add(8, 'h').format() }, endDate: { $lte: moment(period.end).add(8, 'h').format() } }
+        const costs = await Promise.all([...children.map(c =>
+            Models.costCenterDeploy.find({
+                where: { ...where, costCenterId: c.id }
+            })), Models.costCenterDeploy.find({ where: { ...where, costCenterId: deptId } })])
+        return _.compose(_.filter(_.identity), _.map(_.first))(costs)
+    }
+
+    @clientExport
+    static async initBudget(budgets: IBudget[], period: { start: Date, end: Date }) {
+        console.log(period.start)
         const promiseAry = []
         for (let budget of budgets) {
-            if (!await Models.costCenter.get(budget.id)) {
-                promiseAry.push(CostCenter.create({ id: budget.id, type: ECostCenterType.DEPARTMENT }).save())
+            const { id } = budget
+            delete budget.id
+
+            const isCreated = (await Models.costCenter.get(id)) == void 0
+            if (isCreated) {
+                promiseAry.push(CostCenter.create({ id, type: ECostCenterType.DEPARTMENT }).save())
             }
-            const costCenterDeploy = await Models.costCenterDeploy.get(budget.id)
-            if (costCenterDeploy == void 0) {
-                promiseAry.push(CostCenterDeploy.create({ ...budget, beginDate: new Date, endDate: new Date }).save())
-            } else {
-                Object.keys(budget)
-                    .forEach(key => { costCenterDeploy[key] = budget[key] })
-                promiseAry.push(costCenterDeploy.save())
+
+            const costCenterDeploy = await Models.costCenterDeploy.find({
+                where: {
+                    costCenterId: id,
+                    beginDate: { $gte: moment(period.start).add(8, 'h').format() },
+                    endDate: { $lte: moment(period.end).add(8, 'h').format() }
+                }
+            })
+            if (costCenterDeploy.length < 1) {
+                promiseAry.push(CostCenterDeploy.create({ costCenterId: id, ...budget, beginDate: period.start, endDate: period.end }).save())
             }
         }
         await Promise.all(promiseAry)
     }
 
     @clientExport
-    static async changeBudget(root: string, budgets: any[]) {
-        const tempSum = _.sum(_.map(_.prop('selfTempBudget'), budgets))
-        const rootCost = await Models.costCenterDeploy.get(root)
-        if (tempSum != rootCost.totalTempBudget) throw new L.ERROR_CODE_C(400, '超出总预算')
+    static async changeBudget(costId: string, budgets: IBudget[], appendBudget: number = 0, period: { start: Date, end: Date }) {
+        const tempSum = _.compose(_.sum, _.map(_.prop('selfTempBudget')))(budgets),
+            where = {
+                costCenterId: costId,
+                beginDate: { $gte: moment(period.start).add(8, 'h').format() },
+                endDate: { $lte: moment(period.end).add(8, 'h').format() }
+            }
+        const rootCost = _.first(await Models.costCenterDeploy.find({ where }))
+
+        if (tempSum != rootCost.totalTempBudget + appendBudget) throw new L.ERROR_CODE_C(400, '超出总预算')
 
         for (let b of budgets) {
-            const cost = await Models.costCenterDeploy.get(b.id)
-            cost.selfTempBudget = b.selfTempBudget
+            const cost = _.first(await Models.costCenterDeploy.find({ where: { ...where, costCenterId: b.id } }))
+            if (cost.selfTempBudget != b.selfTempBudget) {
+                cost.selfTempBudget = b.selfTempBudget
+                // log
+            }
+            cost.totalTempBudget = b.totalTempBudget
             await cost.save()
         }
     }
 
     @clientExport
-    static async applyConf(costId: string) {
-        const root = await Models.costCenterDeploy.get(costId)
+    static async applyConf(costId: string, period: { start: Date, end: Date }) {
+        const where = { costCenterId: costId, beginDate: { $gte: moment(period.start).add(8, 'h').format() }, endDate: { $lte: moment(period.end).add(8, 'h').format() } }
+        const root = _.first(await Models.costCenterDeploy.find({ where }))
         let totalBudget = 0
         const children = await findChildren(costId)
         for (let c of children) {
-            const cost = await Models.costCenterDeploy.get(c.id)
+            const cost = _.first(await Models.costCenterDeploy.find({ where: { ...where, costCenterId: c.id } }))
+            if (!cost) continue
             cost.selfBudget = cost.selfTempBudget
             const cs = await c.getChildDepartments()
             if (cs.length <= 0) {
                 cost.totalBudget = cost.selfTempBudget
             } else {
-                cost.totalBudget = await getSelfTempBudgetSumOf(cs.map(c => c.id)) + cost.selfTempBudget
+                cost.totalBudget = await getTotalTempBudgetSumOf(cs.map(c => c.id), period) + cost.selfTempBudget
             }
-            totalBudget += cost.totalBudget
+            totalBudget += cost.selfBudget
             await cost.save()
         }
         root.selfBudget = root.selfTempBudget
@@ -303,10 +349,18 @@ export default class CostCenterModule {
     }
 
     @clientExport
-    static async setEarlyWarning(costId: string, type: number, rate: number, audienceTypes: number[]) {
-        const cost = await Models.costCenterDeploy.get(costId)
-        cost.warningRule = { type, rate }
-        cost.warningPerson = audienceTypes
+    static async setEarlyWarning(costId: string,
+        setting: { type: number, rate: number, audienceTypes: number[] },
+        period: { start: Date, end: Date }) {
+        const cost = _.first(await Models.costCenterDeploy.find({
+            where: {
+                costCenterId: costId,
+                beginDate: { $gte: moment(period.start).add(8, 'h').format() },
+                endDate: { $lte: moment(period.end).add(8, 'h').format() }
+            }
+        }))
+        cost.warningPerson = setting.audienceTypes
+        cost.warningRule = { type: setting.type, rate: setting.rate }
         await cost.save()
     }
 
@@ -318,8 +372,8 @@ export default class CostCenterModule {
 }
 
 async function getChildrenExpend(deptId: string) {
-    const childrenIds = await await getChildrenDeptIds(deptId, )
-    return await getSelfTempBudgetSumOf(childrenIds)
+    const childrenIds = await getChildrenDeptIds(deptId, )
+    return await getTotalTempBudgetSumOf(childrenIds)
 }
 
 
@@ -335,14 +389,21 @@ async function getChildrenDeptIds(parentId: string, except?: string): Promise<st
     return departments.map(d => d.id)
 }
 
-async function getSelfTempBudgetSumOf(costIds: string[]) {
+async function getTotalTempBudgetSumOf(costIds: string[], period?) {
     const ids = costIds.map(id => `'${id}'`).join(',')
-    const sql = `select sum(self_temp_budget) as sum from 
-        cost_center.cost_center_deploy where id in (${ids})`
+    const sql = `select sum(total_temp_budget) as sum from 
+        cost_center.cost_center_deploys where cost_center_id in (${ids}) 
+        and begin_date >= '${moment(period.start).add(8, 'h').format()}' and end_date <= '${moment(period.end).add(8, 'h').format()}'`
     const res = (await DB.query(sql))[0][0]
     return (res && res.sum) || 0
 }
 
 async function getPerMonthExpenditure(costId: string) {
 
+}
+
+export interface IBudget {
+    id: string,
+    totalTempBudget: number,
+    selfTempBudget: number
 }

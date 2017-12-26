@@ -434,96 +434,13 @@ export default class DepartmentModule {
         })
         return { ids: ids, count: paginate['total'] };
     }
-
-
-
-
-
-
-
-
-
-
-    @clientExport
-    static async getChildrenDeptBudget(deptId: string) {
-        const dept = _.first(await DB.query(`select sum(total_budget) as "budgetSum" from 
-        costCenter.costCenterDeploy where parent_id = '${deptId}'`))
-        return (dept[0].budgetSum == null ? 0 : dept[0].budgetSum) as number
-    }
-
-    @clientExport
-    static async setDeptBudgetEarlyWarning(deptId: string, limitedUse: number, type: number, audienceTypes: number[]) {
-        const dept = await Models.department.get(deptId)
-        if (!dept) throw new L.ERROR_CODE_C(404, '未找到该部门')
-
-        if (type == 0) {
-            limitedUse = dept.budget * limitedUse
-        }
-
-        const audiences: string[] = []
-        for (let type of audienceTypes) {
-            if (type == EAudienceType.MANAGER) {
-                if (dept.manager)
-                    audiences.push(dept.manager.id)
-            } else if (type == EAudienceType.PARENT_MANAGER) {
-                const pms = await findParentManagers(dept.parent.id)
-                audiences.push(...pms)
-            } else if (type == EAudienceType.FINANCE) {
-                const finances = await findFinances()
-                if (finances.length < 1) continue
-                audiences.push(finances[0].id)
-            }
-        }
-    }
-
-    @clientExport
-    static async notice(deptId: string) {
-        // const dept = await Models.department.get(deptId)
-        // const parents = await findParents(dept.parent.id)
-        // await Promise.all(parents.concat(dept).map(notice))
-        return await g(deptId)
-    }
-
-    /****************************************StaffDepartment end************************************************/
 }
 
 
-async function notice(dept: Department) {
-    if (!dept.earlyWarning) return
-    if (dept.earlyWarning.hasSent) return
-
-    if (dept.earlyWarning.type == 0) {
-        const expenditure = await getPerYearExpenditure(dept.id)
-        if (dept.earlyWarning.limitedUse < expenditure) {
-            await sendNotice(dept)
-            dept.earlyWarning.hasSent = true
-            await dept.save()
-        }
-    } else {
-        const expenditure = await getPerMonthExpenditure()
-
-        if (dept.earlyWarning.limitedUse < expenditure) {
-            await sendNotice(dept)
-            dept.earlyWarning.hasSent = true
-            await dept.save()
-        }
-    }
-}
-
-async function sendNotice(dept: Department) {
-    await Promise.all(dept.earlyWarning.audiences.map(audience =>
-        API.notify.submitNotify({
-            key: 'qm_budget_early_warning',
-            userId: audience
-        })
-    ))
-}
-
-async function getPerMonthExpenditure() {
-    return 0
-}
-
-
+/**
+ * 获取部门树形机构            
+ * @param deptId 根部门 Id
+ */
 async function getChildren(deptId: string) {
     const children = await Models.department.find({
         where: { parent_id: deptId }
@@ -539,6 +456,10 @@ async function g(deptId) {
     }
 }
 
+/**
+ *  获取该部门下的所有子部门
+ * @param deptId 部门 Id
+ */
 export async function findChildren(deptId: string): Promise<Array<Department>> {
     const children = await Models.department.find({
         where: { parent_id: deptId }
@@ -554,21 +475,10 @@ async function f([x, ...xs]) {
         : [... await findChildren(x.id), ... await f(xs)]
 }
 
-async function getChildrenPerYearExpenditure(deptId: string) {
-    const children = await findChildren(deptId)
-    return _.sum(await Promise.all(children.map(c => getPerYearExpenditure(c.id))))
-}
-
-async function getPerYearExpenditure(deptId: string) {
-    const year = new Date().getFullYear()
-    const sql = `select sum(expenditure) expenditure from trip_plan.trip_plans 
-    where created_at >= '${year}-01-01' and created_at < '${year + 1}-01-01' 
-    and project_id = '${deptId}'`
-
-    const { expenditure } = (await DB.query(sql))[0][0]
-    return expenditure || 0
-}
-
+/**
+ * 查询该部门的所有上级部门
+ * @param deptId 
+ */
 async function findParents(deptId: string): Promise<Array<Department>> {
     const dept = await Models.department.get(deptId)
     if (!dept) return []
@@ -578,6 +488,10 @@ async function findParents(deptId: string): Promise<Array<Department>> {
         : [... await findParents(dept.parent.id)]
 }
 
+/**
+ * 查询上级部门管理
+ * @param deptId 
+ */
 export async function findParentManagers(deptId: string) {
     const dept = await Models.department.get(deptId)
     const { manager, parent } = dept
@@ -587,12 +501,3 @@ export async function findParentManagers(deptId: string) {
         ? [manager.id]
         : [manager.id, ... await findParentManagers(parent.id)]
 }
-
-export async function findFinances() {
-    return await Models.staff.find({
-        where: { roleId: EStaffRole.FINANCE }
-    })
-}
-
-// 预警通知人类型
-
