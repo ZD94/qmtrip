@@ -3,7 +3,7 @@ import {Staff} from "_types/staff";
 import {EApproveResult, ETripType} from "_types/tripPlan";
 
 var moment = require("moment");
-require("moment-timezone");
+require('moment-timezone');
 var API = require('@jingli/dnode-api');
 import {MPlaneLevel, MTrainLevel, MHotelLevel,DefaultRegion} from '_types';
 import {Model, where} from "sequelize";
