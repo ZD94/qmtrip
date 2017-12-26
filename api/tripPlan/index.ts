@@ -40,7 +40,7 @@ import {Supplier} from "../../_types/company/supplier";
 const projectCols = Project['$fieldnames'];
 import {restfulAPIUtil} from "api/restful"
 let RestfulAPIUtil = restfulAPIUtil;
-
+import * as error from "@jingli/error";
 interface ReportInvoice {
     type: string;
     date: Date;
@@ -293,11 +293,11 @@ class TripPlanModule {
     @modelNotNull('tripDetail')
     static async updateTripDetail(params): Promise<TripDetail> {
         let tripDetail =  await Models.tripDetail.get(params.id);
-
+        if(!tripDetail) 
+            throw new error.ParamsNotValidError("指定tripDetail不存在, id: ", params.id);
         for(let key in params) {
             tripDetail[key] = params[key];
         }
-
         return tripDetail.save();
     }
 

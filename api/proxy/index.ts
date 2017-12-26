@@ -36,7 +36,7 @@ class Proxy {
 
         // verifyToken
 
-        app.all(/^\/travel.*$/, cors(corsOptions), resetTimeout, timeout('120s'), async (req: any, res: Response, next: Function) => {
+        app.all(/^\/travel.*$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: any, res: Response, next: Function) => {
             console.log('---------query--------->', req.query);
             console.log('---------body---------->', req.body);
             
@@ -95,7 +95,7 @@ class Proxy {
         })
 
         // verifyToken
-        app.all(/^\/order.*$/, cors(corsOptions),resetTimeout, timeout('120s'), async (req: Request, res: Response, next: Function) => {
+        app.all(/^\/order.*$/, cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function) => {
             console.log("=====this is order")
 
             let {tripDetailId} = req.query;
