@@ -52,6 +52,7 @@ build:image:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - echo $DOCKER_CI_NAME
     - ls -al
+    - docker build . -t test-docker
     - docker build . -t $DOCKER_CI_NAME  --build-arg NPM_TOKEN ${NPM_TOKEN}
     - docker push $DOCKER_CI_NAME
 
