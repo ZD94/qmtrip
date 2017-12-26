@@ -18,6 +18,7 @@
     "@jingli/config": "^1.1.1",
     "@jingli/database": "^1.0.1",
     "@jingli/dnode-api": "^2.0.0",
+    "@jingli/error": "0.0.1",
     "@jingli/fs-promisify": "^1.0.0",
     "@jingli/language": "^1.0.2",
     "@jingli/logger": "^1.0.1",

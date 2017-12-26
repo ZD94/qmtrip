@@ -22,13 +22,15 @@ export class TripDetailController extends AbstractController {
             return res.json(this.reply(0, null));
         }
         params.id = id;
-        console.log("=======update tripDetail: ", params)
         let obj: {[index: string]: string} = {};
         try{
             obj = await API.tripPlan.updateTripDetail(params);
         } catch(err) {
-            if(err)
+            if(err) {
+                console.log("====update tripDetail error: ", err);
                 return res.json(this.reply(502, null));
+            }
+
         }
         res.json(this.reply(0, obj));
     }
