@@ -434,6 +434,21 @@ export default class DepartmentModule {
         })
         return { ids: ids, count: paginate['total'] };
     }
+
+    /**
+     * 查询上级部门管理
+     * @param deptId
+     */
+    @clientExport
+    static async findParentManagers(deptId: string) {
+        const dept = await Models.department.get(deptId)
+        const { manager, parent } = dept
+        if (parent == null && manager == null) return []
+
+        return manager && parent == null
+            ? [manager.id]
+            : [manager.id, ... await findParentManagers(parent.id)]
+    }
 }
 
 
@@ -488,17 +503,4 @@ async function findParents(deptId: string): Promise<Array<Department>> {
         : [... await findParents(dept.parent.id)]
 }
 
-/**
- * 查询上级部门管理
- * @param deptId 
- */
-@clientExport
-export async function findParentManagers(deptId: string) {
-    const dept = await Models.department.get(deptId)
-    const { manager, parent } = dept
-    if (parent == null && manager == null) return []
 
-    return manager && parent == null
-        ? [manager.id]
-        : [manager.id, ... await findParentManagers(parent.id)]
-}
