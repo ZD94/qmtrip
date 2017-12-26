@@ -117,6 +117,7 @@
     "fsevents": "^1.0.5"
   },
   "devDependencies": {
+    "@types/express-serve-static-core": "^4.11.0",
     "@types/request-promise": "4.1.35",
     "angular-async-filter": "^1.0.1",
     "angular-bluebird-promises": "^1.0.2",
