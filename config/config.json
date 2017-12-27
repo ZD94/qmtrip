@@ -146,7 +146,7 @@
       "pass": "Jingli_2016"
     }
   },
-  "approveServerUrl": "${JL_APP_APPROVE_SERVER_URL}"
+  "approveServerUrl": "${JL_APP_APPROVE_SERVER_URL}",
   "tmcUrl": "${JL_APP_TMC}",
   "tmcFake": "${JL_APP_TMC_FAKE}",
   "orderSysConfig": {
