@@ -10,7 +10,7 @@ export default class WeChatController extends AbstractController {
         return true
     }
 
-    @Router('/receive')
+    @Router('/receive', 'ALL')
     async receive(req, res) {
         proxy.web(req, res, proxyTarget)
     }
