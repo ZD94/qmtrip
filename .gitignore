@@ -35,3 +35,4 @@ wyl_test/
 mytest/
 nglibs/**/*.js
 package-lock.json
+meiyaData/

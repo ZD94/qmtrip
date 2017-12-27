@@ -43,7 +43,7 @@ const projectCols = Project['$fieldnames'];
 import {restfulAPIUtil} from "api/restful"
 import { Account } from '_types/auth';
 let RestfulAPIUtil = restfulAPIUtil;
-
+import * as error from "@jingli/error";
 interface ReportInvoice {
     type: string;
     date: Date;
@@ -379,11 +379,11 @@ class TripPlanModule {
     @modelNotNull('tripDetail')
     static async updateTripDetail(params): Promise<TripDetail> {
         let tripDetail =  await Models.tripDetail.get(params.id);
-
+        if(!tripDetail) 
+            throw new error.ParamsNotValidError("指定tripDetail不存在, id: ", params.id);
         for(let key in params) {
             tripDetail[key] = params[key];
         }
-
         return tripDetail.save();
     }
 
@@ -2303,7 +2303,7 @@ class TripPlanModule {
         let taskId = "authApproveTrainPlan";
         logger.info('run task ' + taskId);
         scheduler('0 *!/5 * * * *', taskId, async function() {
-            let tripApproves = await API.tripApprove.getTripApproves({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
+            let tripApproves = await Models.tripApprove.find({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: [['auto_approve_time', 'desc']]});
             tripApproves.map(async (approve) => {
 
                 let approveCompany = await approve.getCompany();
@@ -2334,7 +2334,7 @@ class TripPlanModule {
                 let version = config.link_version || 2 //外链使用的版本。
 
                 try{
-                    
+
                     if(typeof approve.query == 'string'){
                         approve.query = JSON.parse(approve.query);
                     }
