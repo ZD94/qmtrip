@@ -32,6 +32,7 @@ import * as CLS from 'continuation-local-storage';
 import {DB} from "@jingli/database";
 import { Company } from "_types/company";
 var CLSNS = CLS.getNamespace('dnode-api-context');
+var request = require("request");
 export interface ICity {
     name: string;
     id: string;
@@ -56,7 +57,6 @@ export interface IQueryBudgetParams {
     isRetMarkedData?: boolean;
     preferedCurrency?: string;
 }
-
 
 interface SegmentsBudgetResult {
     id: string;
@@ -110,6 +110,20 @@ export default class ApiTravelBudget {
     }
 
     @clientExport
+    static async sendSaleSteam(params: any) {
+        try {
+            await API.notify.submitNotify({
+                key: 'qm_tmc',
+                email: config.email_address.tmcsale,
+                values: { orderTyp: params.orderType, passenger: params.passenger || [] }
+            });
+            console.log("qm_tmc is ok");
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    @clientExport
     static async getHotelsData(params: ISearchHotelParams): Promise<any> {
         let commonData;
         let result;
@@ -127,27 +141,32 @@ export default class ApiTravelBudget {
         }
         if (result.code == 0) {
             commonData = result.data;
-        } else {
-            return null;
         }
 
-        // writeData("commonHotelData.json", commonData);
+        if(!commonData || typeof commonData == 'undefined')
+            return [];
         //检查是否需要美亚数据，返回美亚数据
         let needMeiya = await meiyaJudge();
-        if (!needMeiya) {
+        if (!needMeiya) {            
             return commonData;
         }
 
-        let meiyaHotel = await getMeiyaHotelData(params);
-        compareHotelData(commonData, meiyaHotel);
-        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss")+".finallyHotel.json", commonData);
-        return commonData;
-
-        // return require("mytest/data/2017_11_30_04_16_08.finallyHotel");
+        if (config.tmcFake == 1) {
+            console.log("getHotelsData ===> fake data.")
+            return require("meiyaFake/finallyUsingHotel");
+        } else {
+            let meiyaHotel = await getMeiyaHotelData(params);
+            console.log("meiyaHotel ===> meiyaHotel data.", meiyaHotel.length)
+            if(meiyaHotel && meiyaHotel.length)
+                commonData = compareHotelData(commonData, meiyaHotel);
+            // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".finallyHotel.json", commonData);
+            return commonData;
+        }
     }
 
     @clientExport
     static async getTrafficsData(params: ISearchTicketParams): Promise<any> {
+
         let commonData;
         let result;
         try {
@@ -164,34 +183,42 @@ export default class ApiTravelBudget {
         }
         if (result.code == 0) {
             commonData = result.data;
-        } else {
-            return null;
         }
 
-        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") +".commonTraffic.json", commonData);
-
+        if(!commonData || typeof commonData == 'undefined')
+            return [];
+        //检查是否需要美亚数据，返回美亚数据
         let needMeiya = await meiyaJudge();
-        if (!needMeiya) {
+        if (!needMeiya) {   
             return commonData;
         }
-
-        let arr = await Promise.all([
-            await getMeiyaTrainData(params),
-            await getMeiyaFlightData(params)
-        ]);
-        let meiyaTrain = arr[0];
-        let meiyaFlight = arr[1];
-        compareFlightData(commonData, meiyaFlight);
-        compareTrainData(commonData, meiyaTrain);
-        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") +".meiyaTrain.json", meiyaTrain);
-        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") +".meiyaFlight.json", meiyaFlight);
-
-        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") +".finallyTraffic.json", commonData);
-        return commonData;
+        console.log("commonData ===> commonData data.", commonData.length)
+        if (config.tmcFake == 1) {
+            console.log("getTrafficsData ===> fake data.")
+            return require("meiyaFake/finallyUsingTraffic");
+        } else {
+            let arr = await Promise.all([
+                await getMeiyaTrainData(params),
+                await getMeiyaFlightData(params)
+            ]);
+            let meiyaTrain = arr[0];
+            let meiyaFlight = arr[1];
+            console.log("meiyaFlight ===> meiyaFlight data.", meiyaFlight.length)
+            console.log("meiyaTrain ===> meiyaTrain data.", meiyaTrain.length)
+            if(meiyaFlight && meiyaFlight.length)
+                commonData = compareFlightData(commonData, meiyaFlight);
+            if(meiyaTrain && meiyaTrain.length)
+                commonData = compareTrainData(commonData, meiyaTrain);
+            // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".meiyaTrain.json", meiyaTrain);
+            // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".meiyaFlight.json", meiyaFlight);
+            // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".finallyTraffic.json", commonData);
+            console.log("commonData ===> commonData data.", typeof(commonData))
+            return commonData;
+        }
     }
 
     @clientExport
-    static async getTripTravelPolicy(travelPolicyId:string, destinationId:string){
+    static async getTripTravelPolicy(travelPolicyId: string, destinationId: string) {
         let result;
         try{
             result = await RestfulAPIUtil.operateOnModel({
@@ -240,8 +267,6 @@ export default class ApiTravelBudget {
     */
     @clientExport
     static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams): Promise<string> {
-        // console.log("params===>", params);
-
         let staffId = params['staffId'];
         let preferedCurrency = params["preferedCurrency"];
         preferedCurrency = preferedCurrency && typeof (preferedCurrency) != 'undefined' ? preferedCurrency : DefaultCurrencyUnit;
@@ -311,7 +336,7 @@ export default class ApiTravelBudget {
         }));
 
         let segmentsBudget:any = await ApiTravelBudget.createNewBudget({
-            preferedCurrency:preferedCurrency,
+            preferedCurrency: preferedCurrency,
             travelPolicyId: travelPolicy['id'],
             companyId,
             staffs,
@@ -871,6 +896,69 @@ export default class ApiTravelBudget {
         // await API.approve.submmitApproveNew(approveParams);
         return {approveId: approveId, budgetId: _id};
 
+        /*async function getSubsidyBudget(city, destination, isHasBackSubsidy: boolean = false, preferedCurrency: string) {
+            let { subsidy, leaveDate, goBackDate, reason } = destination;
+            let budget: any = null;
+            if (subsidy && subsidy.template) {
+                city = await API.place.getCityInfo({cityCode: city});
+                let timezone = city.timezone ? city.timezone : "Asia/shanghai";
+                let goBackDay = moment(goBackDate).tz(timezone).format("YYYY-MM-DD");
+                let leaveDay = moment(leaveDate).tz(timezone).format("YYYY-MM-DD");
+                let days = moment(goBackDay).diff(moment(leaveDay), 'days');
+                if (isHasBackSubsidy) { //解决如果只有住宿时最后一天补助无法加到返程目的地上
+                    days += 1;
+                }
+                if (days > 0) {
+                    budget = {};
+                    budget.fromDate = leaveDay;
+                    budget.endDate = (goBackDate == leaveDay || isHasBackSubsidy) ? goBackDate: moment(goBackDate).add(-1, 'days').format('YYYY-MM-DD');
+                    budget.tripType = ETripType.SUBSIDY;
+                    budget.type = EInvoiceType.SUBSIDY;
+                    budget.price = subsidy.template.subsidyMoney * days;
+                    budget.unit = preferedCurrency && typeof(preferedCurrency) != 'undefined' ? preferedCurrency: DefaultCurrencyUnit,
+                    budget.duringDays = days;
+                    budget.template = { id: subsidy.template.id, name: subsidy.template.name };
+                    budget.reason = reason;
+                }
+                let rate;
+                if(preferedCurrency != DefaultCurrencyUnit) {
+                    try{
+                        rate = await new Promise<any>(async function(resolve,reject){
+                            let qs = {
+                                key: cloudKey,
+                                currencyTo: preferedCurrency
+                            }
+                            request({
+                                uri: cloudAPI + `/currencyRate`,
+                                qs: qs,
+                                method: 'get',
+                                json: true
+                            },async (err, res) => {
+                                if(err){
+                                    reject(err)
+                                }
+                                let body = res.body;
+                                if(body && typeof(body) == 'string') {
+                                    body = JSON.parse(body)
+                                }
+                                return resolve(body);
+                            });
+                        });
+                        if(typeof(rate) == 'string') rate = JSON.parse(rate);
+                        rate = rate.data;
+                        if( typeof(rate) != 'undefined' && rate && rate.length ) {
+                            budget.rate = rate[0]['rate'];
+                        }
+                    } catch(err) {
+                        console.log(err)
+                    }
+                } else {
+                    budget.rate = 1;
+                }
+            }
+            return budget;
+        }*/
+
         function limitHotelBudgetByPrefer(min: number, max: number, hotelBudget: number) {
             if (hotelBudget == -1) {
                 if (max != NoCityPriceLimit) return max;
@@ -895,7 +983,6 @@ export default class ApiTravelBudget {
 
 
     }
-
 
     static async verifyCompanyTripNum(params: {
         tripNum: number, 
