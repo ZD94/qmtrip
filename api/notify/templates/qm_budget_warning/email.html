@@ -1,0 +1,29 @@
+<p style="border-top: 1px solid #EEEEEE;padding-top: 25px;color: #4A4A4A">
+    尊敬的领导</br>
+</p>
+截至<%=moment().formate("MM月DD日")%>，<%=type == "project" ? "项目" : "部门" %><%=costCenter.name%>的<%=noticeType == "monthly" ? "月度" : "总"%>差旅预算支出(包括已计划支出)已经超过预警值。
+<table width="300px" height="140px" style="border-collapse:collapse;padding-bottom: 20px">
+    <tr style="background-color: #F8F8F8;padding-left: 10px">
+        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B"><%=type == "project" ? "项目" : "部门" %></td>
+        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B"><%=costCenter.name%></td>
+    </tr>
+    <tr>
+        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A"><%=noticeType == "monthly" ? "月度" : "总"%>预算</td>
+        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A"><%=totalBudget%></td>
+    </tr>
+    <tr>
+        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A">周期</td>
+        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A">
+            <%=costCenter.beginDate ? moment(costCenter.beginDate).format('MM月DD日') : ""%>-
+            <%=costCenter.endDate ? moment(costCenter.endDate).format('MM月DD日') : ""%>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A">预算支出</td>
+        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A"><%= expendBudget%></td>
+    </tr>
+    <tr>
+        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A">支出比例</td>
+        <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A"><%= expendBudget/totalBudget%></td>
+    </tr>
+</table>
