@@ -111,6 +111,7 @@
     "uuid": "^2.0.3",
     "validator": "^5.5.0",
     "weak": "^1.0.1",
+    "wechat-crypto": "0.0.2",
     "wechat-oauth": "^1.1.1"
   },
   "optionalDependency": {
