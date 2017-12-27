@@ -8,6 +8,7 @@ require('common/node_ts').install();
 var initData = require('libs/initTestData');
 var ReplServer = require('libs/replServer');
 var WX = require('api/wangxin');
+var WangxUtils = require('api/wangxin/lib/wangxUtils');
 
 var Logger = require('@jingli/logger');
 
@@ -88,7 +89,11 @@ server.on('init.api', function(API){
     }
 
     if(cluster.isMaster && config.wxSysCode){
-        WX.syncOrganization();
+        // WX.syncOrganization();
+        let UUID = "aaaabbbbaaaabbbbaaaabbbbaaaabbbb"
+        // let result = WangxUtils.createLRToken("lei.liu", UUID);
+        let result = WangxUtils.parseLRToken("469de9b382921ddeb320ade54f3125563389248e3dc9675e08997fe942ba1446ca79d5f2e819cab50f7c46212400b1c5d35b959a6be42609bd220f2b01b4d417160527776948585ba872bd7b644c119dcb3534479021e747cb4bac34317987a2b279b610881cb53f08c6a68fcb8d5e94be705604e8d47009c3c8f5bf0181ee1f");
+        console.info("result---====....>>", result);
     }
 
     if(cluster.isMaster){

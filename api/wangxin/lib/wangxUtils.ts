@@ -18,7 +18,7 @@ export default class WangxUtils {
     static getPrivateKey(): Buffer {
 
         if(privateKey == null)
-            privateKey = fs.readFileSync(`${__dirname}/api/wangxin/lib/rsaprivatekey.pem`)
+            privateKey = fs.readFileSync(`${__dirname}/rsaprivatekey.pem`)
 
         return privateKey
     }
@@ -26,7 +26,7 @@ export default class WangxUtils {
     static getPublicKey(): Buffer {
 
         if(publicKey == null)
-            publicKey = fs.readFileSync(`${__dirname}/api/wangxin/lib/rsapublickey.pem`)
+            publicKey = fs.readFileSync(`${__dirname}/rsapublickey.pem`)
 
         return publicKey
     }
@@ -46,6 +46,7 @@ export default class WangxUtils {
         let date = crypto.privateDecrypt(privateKey.toString(),tokenBuffer).toString()
         let UUID = date.slice(-32) //data的最后32位为uuid
         let expTimeStr = date.slice(-46,-32)
+        let name = date.slice(14,-46)
         let expTime = moment(expTimeStr,"YYYYMMDDHHmmss")
 
         if (expTime.valueOf() < Date.now())
