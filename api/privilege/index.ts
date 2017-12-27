@@ -3,10 +3,10 @@ import {Models} from '_types/';
 import L from '@jingli/language';
 import {Staff} from '_types/staff';
 import {clientExport} from '@jingli/dnode-api/dist/src/helper';
-import {MoneyChange, Company, CompanyScoreRatioChange} from '_types/company';
+import {Company, CompanyScoreRatioChange} from '_types/company';
 import {PaginateInterface} from 'common/model/interface';
 import { TripPlan } from '_types/tripPlan';
-import { CoinAccount } from '_types/coin';
+import { CoinAccount, CoinAccountChange } from '_types/coin';
 let moment = require('moment');
 
 
@@ -29,8 +29,10 @@ export default class Privilege {
         let companyId: string = id;
         let queryDateData: any = data;
 
-        let moneyChanges: MoneyChange[] = await Models.moneyChange.all({where: {companyId: companyId}});
-        let dataDuringTheQueryDate: MoneyChange[];
+        let company: Company = await Models.company.get(companyId);
+        let coinAccountId: string = company.coinAccountId;
+        let coinAccountChanges:  CoinAccountChange[] = await Models.coinAccountChange.all({where: {coinAccountId: coinAccountId}});
+        let dataDuringTheQueryDate: CoinAccountChange[];
         
         let checkFromDate: string = null;
         let checkToDate: string = null;
@@ -38,14 +40,14 @@ export default class Privilege {
         if (queryDateData) {
             checkFromDate = queryDateData.beginDate;
             checkToDate = queryDateData.endDate;
-            for (let i = 0; i < moneyChanges.length; i++) {
-                if (moment(moneyChanges[i].createdAt).isAfter(checkFromDate) || moment(moneyChanges[i].createdAt).isBefore(checkToDate)) {
-                    dataDuringTheQueryDate.push(moneyChanges[i]);
+            for (let i = 0; i < coinAccountChanges.length; i++) {
+                if (moment(coinAccountChanges[i].createdAt).isAfter(checkFromDate) || moment(coinAccountChanges[i].createdAt).isBefore(checkToDate)) {
+                    dataDuringTheQueryDate.push(coinAccountChanges[i]);
                 }
             }
             return dataDuringTheQueryDate;
         }
-        return moneyChanges;
+        return coinAccountChanges;
     }
 
     //获得企业节省奖励比例
@@ -67,8 +69,6 @@ export default class Privilege {
         let companyId: string = staff.company.id;
         let scoreRatio: number = setData.scoreRatio;
         let company: Company = await Models.company.get(companyId);
-
-        
 
         //更新企业节省奖励比例记录表 companyScoreRatioChange
         let latestScoreRatio: number = company.scoreRatio;
