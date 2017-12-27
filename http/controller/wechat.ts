@@ -37,6 +37,9 @@ export default class WeChatController extends AbstractController {
             rawBody += chunk
         })
         req.on('end', () => {
+            if(rawBody.length < 1) {
+                return res.send('success')
+            }
             new Parser().parseString(rawBody, (err, data) => {
                 const resp = crypto.decrypt(data.xml['Encrypt'])
                 new Parser().parseString(resp.message, async (err, data) => {
