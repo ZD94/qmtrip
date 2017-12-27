@@ -15,7 +15,7 @@ import request = require('request');
 import ISVApi from "./lib/isvApi";
 import {Models} from "_types/index";
 import {SPropertyType, Staff} from "_types/staff";
-import {clientExport} from "@jingli/dnode-api/dist/src/helper";
+import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
 import {get_msg} from "./lib/msg-template/index";
 import syncData from "libs/asyncOrganization/syncData";
 
@@ -399,6 +399,17 @@ class DDTalk {
     @clientExport
     static async synchroDDorganization(){
         return DealEvent.synchroDDorganization();
+    }
+
+    @clientExport
+    @requireParams(['code'])
+    static async loginByWechatCode(code: string) {
+        const userId = await API.sso.getUserInfo(code)
+        const staffs = await Models.staffProperty.find({
+            where: { type: '', value: userId}
+        })
+        if(staffs.length < 1) throw L.ERR.USER_NOT_EXIST()
+        return await API.auth.makeAuthenticateToken(staffs[0].staffId, 'wechat')
     }
 }
 
