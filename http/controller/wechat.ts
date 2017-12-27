@@ -26,32 +26,32 @@ export default class WeChatController extends AbstractController {
 
     @Router('/data/callback', 'ALL')
     async dataCallback(req: Request, res: Response, next: NextFunction) {
-        if (req.method.toUpperCase() == 'GET') {
-            return res.send('success')
-        }
+        // if (req.method.toUpperCase() == 'GET') {
+        //     return res.send('success')
+        // }
 
-        let rawBody = ''
-        req.setEncoding('utf8')
+        // let rawBody = ''
+        // req.setEncoding('utf8')
 
-        req.on('data', chunk => {
-            rawBody += chunk
-        })
-        req.on('end', () => {
-            if(rawBody.length < 1) {
-                return res.send('success')
-            }
-            new Parser().parseString(rawBody, (err, data) => {
-                const resp = crypto.decrypt(data.xml['Encrypt'])
-                new Parser().parseString(resp.message, async (err, data) => {
-                    if (data.xml['InfoType'] == 'suite_ticket')
-                        await cache.write('suite_ticket', data.xml['SuiteTicket'])
-                    // if (data.xml['InfoType'] == 'create_auth')
-                    //     await cache.write('create_auth', data.xml['AuthCode'])
-                    res.send('success')
-                })
-            })
-        })
-        // proxy.web(req, res, proxyTarget)
+        // req.on('data', chunk => {
+        //     rawBody += chunk
+        // })
+        // req.on('end', () => {
+        //     if(rawBody.length < 1) {
+        //         return res.send('success')
+        //     }
+        //     new Parser().parseString(rawBody, (err, data) => {
+        //         const resp = crypto.decrypt(data.xml['Encrypt'])
+        //         new Parser().parseString(resp.message, async (err, data) => {
+        //             if (data.xml['InfoType'] == 'suite_ticket')
+        //                 await cache.write('suite_ticket', data.xml['SuiteTicket'])
+        //             // if (data.xml['InfoType'] == 'create_auth')
+        //             //     await cache.write('create_auth', data.xml['AuthCode'])
+        //             res.send('success')
+        //         })
+        //     })
+        // })
+        proxy.web(req, res, proxyTarget)
     }
 }
 
