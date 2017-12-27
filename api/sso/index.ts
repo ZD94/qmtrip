@@ -29,6 +29,7 @@ export default class SSOModule {
         if (suite_token) return suite_token
 
         const suite_ticket = await cache.read('suite_ticket')
+        if(!suite_ticket) throw new L.ERROR_CODE_C(500, '数据回调处理异常')
         const res = await axios.post(SUITE_TOKEN_URL, {
             suite_id: config.workWechat.suiteId,
             suite_secret: config.workWechat.suiteSecret,
