@@ -61,7 +61,7 @@ export async function initHttp(app) {
     app.use('/api/v1', (req, res, next) => {
         console.log("======request path: ", req.path)
         auth(req, res, next, async (err, isValid, data) => {
-               console.log("======auth request: ", isValid)
+               console.log("======auth request: ", err, isValid, data)
             if (isValid) {
                 const companies = await Models.company.find({
                     where: { appId: data.appId }
