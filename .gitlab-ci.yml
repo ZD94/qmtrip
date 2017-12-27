@@ -75,7 +75,7 @@ deploy:master:
     JL_APP_PERMISSION_ORDER_LINK: https://l.jingli365.com/svc
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
- script:
+  script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
     - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
@@ -107,7 +107,7 @@ deploy:test:
     JL_APP_PERMISSION_ORDER_LINK: https://t.jingli365.com/svc
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
- script:
+  script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
     - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
@@ -138,7 +138,7 @@ deploy:release:
     JL_APP_PERMISSION_ORDER_LINK: https://j.jingli365.com/svc
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
- script:
+  script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
     - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
@@ -171,7 +171,7 @@ deploy:tester:
     JL_APP_PERMISSION_ORDER_LINK: https://t.jingli365.com/svc
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
- script:
+  script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
     - docker tag $DOCKER_CI_NAME $DOCKER_REG/$DOCKER_NAME:tester-$GITLAB_USER_ID
