@@ -20,7 +20,6 @@ export default class WeChatController extends AbstractController {
 
     @Router('/receive', 'ALL')
     async receive(req: Request, res: Response) {
-        const crypto = new wxCrypto(TOKEN, AESKEY, CORP_ID)
         res.send(crypto.decrypt(req.query.echostr).message)
         // proxy.web(req, res, proxyTarget)
     }
