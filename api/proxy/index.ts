@@ -17,7 +17,7 @@ var timeout = require('connect-timeout');
 import * as CLS from 'continuation-local-storage';
 let CLSNS = CLS.getNamespace('dnode-api-context');
 import { genSign } from "@jingli/sign";
-const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'Content-Type,auth,supplier, authstr, staffid'} 
+const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'Content-Type, auth, supplier, authstr, staffid, companyid, accountid'} 
 function resetTimeout(req, res, next){
     req.clearTimeout();
     next();
@@ -37,21 +37,10 @@ class Proxy {
         // verifyToken
 
         app.all(/^\/travel.*$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: any, res: Response, next: Function) => {
-            console.log('---------query--------->', req.query);
-            console.log('---------body---------->', req.body);
-            
-            //qmtrip验证
-            let {authstr, staffid}  = req.headers;
-            let token: AuthRequest = parseAuthString(authstr);
-            let verification = await API.auth.authentication(token);
-            if (!verification) {
-                console.log('authentic failed!', JSON.stringify(req.cookies));
-                res.sendStatus(401);
-                return;
-            }
 
             //公有云验证
             // let staff: Staff = await Staff.getCurrent();
+            let {authstr, staffid}  = req.headers;
             let staff: Staff = await Models.staff.get(staffid);
             let companyId: string = staff.company.id;
             let companyToken: string = await getCompanyTokenByAgent(companyId);
@@ -92,7 +81,54 @@ class Proxy {
                     return null;
                 }
             }
-        })
+        });
+
+
+        app.all(/^\/supplier.*$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: any, res: Response, next: Function) => {
+
+            //公有云验证
+            let {authstr, staffid}  = req.headers;
+            let staff: Staff = await Models.staff.get(staffid);
+            let companyId: string = staff.company.id;
+            let companyToken: string = await getCompanyTokenByAgent(companyId);
+            if (!companyToken) {
+                throw new Error('换取 token 失败！');
+            }
+            
+            //request to JLCloud(jlbudget) 
+            let result: any;
+            let pathstr: string = req.path;
+            pathstr = pathstr.replace('/supplier', '');
+            let JLOpenApi: string = config.cloud;
+            JLOpenApi.replace('/cloud', '');
+            let url: string = `${JLOpenApi}${pathstr}`;
+
+            try {
+                result = await new Promise((resolve, reject) => {
+                    return request({
+                        uri: url,
+                        body: req.body,
+                        json: true,
+                        method: req.method,
+                        qs: req.query,
+                        headers: {
+                            token: companyToken
+                        }
+                    }, (err, resp, result) => {
+                        if (err) {
+                            reject(err);
+                        }
+                        resolve(result);
+                    });
+                });
+                return res.json(result);
+            } catch(err) {
+                if (err) {
+                    console.error('ERROR SUPPLIER In api/proxy/index:   ', err);
+                    return null;
+                }
+            }
+        });
 
         // verifyToken
         app.all(/^\/order.*$/, cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function) => {
@@ -127,8 +163,7 @@ class Proxy {
 
             if(req.method == 'GET') {
                 _.assign(headers, addon)
-            }
-            if(req.method == 'POST') {
+            } else {
                 _.assign(headers, addon)
                 _.assign(body, addon);
             }
@@ -185,6 +220,7 @@ class Proxy {
         });
         
         app.all(/^\/mall.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
+            let {staffid, companyid, accountid} = req.headers;
             let params =  req.body;
             if(req.method == 'GET') {
                 params = req.query;
@@ -205,7 +241,10 @@ class Proxy {
                     qs: req.query,
                     headers: {
                         sign: sign,
-                        appid: config.mall.appId
+                        appid: config.mall.appId,
+                        staffid, 
+                        companyid,
+                        accountid
                     }
                 }, (err, resp, result) => {
                     if (err) {
@@ -215,6 +254,45 @@ class Proxy {
                 });
             });
             console.log("===mall===result: ", result)
+            return res.json(result);
+        });
+
+        
+        app.all(/^\/permission.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
+            let {staffid, companyid, accountid} = req.headers;
+            let params =  req.body;
+            if(req.method == 'GET') {
+                params = req.query;
+            }
+            let appSecret = config.permission.appSecret;
+            let pathstring = req.path;
+            let timestamp = Math.floor(Date.now()/1000);
+            pathstring = pathstring.replace("/permission", '');
+            let sign = genSign(params, timestamp, appSecret);
+            let url = `${config.permission.orderLink}${pathstring}`;
+            console.log("==timestamp:  ", timestamp, "===>sign:  ", sign, '====>url:  ', url, 'appid: ', config.permission.appId, '===request params: ', params);
+            let result = await new Promise((resolve, reject) => {
+                return request({
+                    uri: url,
+                    body: req.body,
+                    json: true,
+                    method: req.method,
+                    qs: req.query,
+                    headers: {
+                        sign: sign,
+                        appid: config.permission.appId,
+                        staffid, 
+                        companyid,
+                        accountid
+                    }
+                }, (err, resp, result) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    resolve(result);
+                });
+            });
+            console.log("===permission===result: ", result);
             return res.json(result);
         });
     }

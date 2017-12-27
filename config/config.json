@@ -130,6 +130,11 @@
     "appId": "${JL_APP_MALL_APP_ID}",
     "appSecret": "${JL_APP_MALL_APP_SECRET}"
   },
+  "permission": {
+    "orderLink": "${JL_APP_PERMISSION_ORDER_LINK}",
+    "appId": "${JL_APP_PERMISSION_APP_ID}",
+    "appSecret": "${JL_APP_PERMISSION_APP_SECRET}"
+  },
   "is_init_test_company": true,
   "ddconfig": {
     "token": "jingli2016",
