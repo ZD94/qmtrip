@@ -1,22 +1,54 @@
 import { L } from '@jingli/language';
-import { clientExport } from '@jingli/dnode-api/dist/src/helper';
+import { clientExport, requireParams } from '@jingli/dnode-api/dist/src/helper';
+import cache from 'common/cache'
+const API = require('@jingli/dnode-api')
+const config = require('@jingli/config')
 
 const axios = require('axios')
 const PROVIDER_TOKEN_URL = `https://qyapi.weixin.qq.com/cgi-bin/service/get_provider_token`
-const CORP_ID = 'wwb398745b82d67068'
-const PROVIDER_SECRET = 'kGNDfdXSuzdvAgHC5AC8jaRUjnybKH0LnVK05NPvCV4'
-const login = `https://open.work.weixin.qq.com/wwopen/sso/3rd_qrConnect?appid=wwb398745b82d67068&redirect_uri=https%3A%2F%2Fj.jingli365.com%2F&state=web_login@gyoss9&usertype=admin`
+const SUITE_TOKEN_URL = 'https://qyapi.weixin.qq.com/cgi-bin/service/get_suite_token'
+const USER_INFO_URL = 'https://qyapi.weixin.qq.com/cgi-bin/service/getuserinfo3rd'
+
 export default class SSOModule {
 
     @clientExport
     static async getProviderToken() {
         const res = await axios.post(PROVIDER_TOKEN_URL, {
-            corpid: CORP_ID,
-            provider_secret: PROVIDER_SECRET
+            corpid: config.workWechat.corpId,
+            provider_secret: config.workWechat.providerSecret
         })
         if (res.status == 200 && res.data.errcode == 0) {
             return res.data.provider_access_token
         }
-        throw new L.ERROR_CODE_C(500, '微信返回错误')
+        throw new L.ERROR_CODE_C(500, '获取服务商 token 失败')
+    }
+
+    @clientExport
+    static async getSuiteToken() {
+        const suite_token = await cache.read('suite_token')
+        if (suite_token) return suite_token
+
+        const suite_ticket = await cache.read('suite_ticket')
+        if(!suite_ticket) throw new L.ERROR_CODE_C(500, '数据回调处理异常')
+        const res = await axios.post(SUITE_TOKEN_URL, {
+            suite_id: config.workWechat.suiteId,
+            suite_secret: config.workWechat.suiteSecret,
+            suite_ticket
+        })
+        if (res.status == 200) {
+            await cache.write('suite_token', res.data.suite_access_token, 7200)
+        }
+    }
+
+    @clientExport
+    @requireParams(['code'])
+    static async getUserInfo(code: string): Promise<string> {
+        const suite_token = await API.sso.getSuiteToken()
+        
+        const res = await axios.get(`${USER_INFO_URL}?access_token=${suite_token}&code=${code}`)
+        if (res.status == 200 && res.data.errcode == 0) {
+            return res.data.UserId
+        }
+        throw new L.ERROR_CODE_C(500, "获取用户信息失败")
     }
 }

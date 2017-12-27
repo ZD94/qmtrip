@@ -147,6 +147,14 @@
     }
   },
   "approveServerUrl": "${JL_APP_APPROVE_SERVER_URL}",
+  "workWechat": {
+    "corpId": "wwb398745b82d67068",
+    "token": "xtz1KPDEbycN",
+    "encodingAESKey": "EktZ5eATCYwLsROXmvdNPfGayxUO6wjAS9juWxalZSB",
+    "providerSecret": "kGNDfdXSuzdvAgHC5AC8jaRUjnybKH0LnVK05NPvCV4",
+    "suiteId": "wwdb6efe49f6e236d3",
+    "suiteSecret": "7GnoFq32hgkE27kkBFPZxeetnhyQxtFk2OvHFjtrW4I"
+  },
   "tmcUrl": "${JL_APP_TMC}",
   "tmcFake": "${JL_APP_TMC_FAKE}",
   "orderSysConfig": {

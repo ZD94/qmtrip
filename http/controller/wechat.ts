@@ -1,4 +1,12 @@
 import { AbstractController, Restful, Router } from '@jingli/restful';
+import { Request, NextFunction, Response } from 'express-serve-static-core';
+import cache from 'common/cache'
+const config = require('@jingli/config')
+
+const { Parser } = require('xml2js')
+const wxCrypto = require('wechat-crypto')
+
+const crypto = new wxCrypto(config.workWechat.token, config.workWechat.encodingAESKey, config.workWechat.corpId)
 
 const httpProxy = require('http-proxy')
 
@@ -10,19 +18,37 @@ export default class WeChatController extends AbstractController {
         return true
     }
 
-    @Router('/receive')
-    async receive(req, res) {
-        proxy.web(req, res, proxyTarget)
+    @Router('/receive', 'ALL')
+    async receive(req: Request, res: Response) {
+        res.send(crypto.decrypt(req.query.echostr).message)
+        // proxy.web(req, res, proxyTarget)
     }
 
     @Router('/data/callback', 'ALL')
-    async dataCallback(req, res, next) {
-        proxy.web(req, res, proxyTarget)
-    }
+    async dataCallback(req: Request, res: Response, next: NextFunction) {
+        if (req.method.toUpperCase() == 'GET') {
+            return res.send('success')
+        }
 
-    @Router('/success')
-    async installSuccess(req, res) {
-        proxy.web(req, res, proxyTarget)
+        let rawBody = ''
+        req.setEncoding('utf8')
+
+        req.on('data', chunk => {
+            rawBody += chunk
+        })
+        req.on('end', () => {
+            new Parser().parseString(rawBody, (err, data) => {
+                const resp = crypto.decrypt(data.xml['Encrypt'])
+                new Parser().parseString(resp.message, async (err, data) => {
+                    if (data.xml['InfoType'] == 'suite_ticket')
+                        await cache.write('suite_ticket', data.xml['SuiteTicket'])
+                    // if (data.xml['InfoType'] == 'create_auth')
+                    //     await cache.write('create_auth', data.xml['AuthCode'])
+                })
+                res.send('success')
+            })
+        })
+        // proxy.web(req, res, proxyTarget)
     }
 }
 
