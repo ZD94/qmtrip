@@ -21,6 +21,7 @@ import syncData from "libs/asyncOrganization/syncData";
 
 import * as DealEvent from "./lib/dealEvent";
 import {CPropertyType} from "../../_types/company/company-property";
+import { getSession } from '@jingli/dnode-api';
 
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 
@@ -409,7 +410,10 @@ class DDTalk {
             where: { type: SPropertyType.WX_ID, value: userId}
         })
         if(staffs.length < 1) throw L.ERR.USER_NOT_EXIST()
-        return await API.auth.makeAuthenticateToken(staffs[0].staffId, 'wechat')
+        const resp = await API.auth.makeAuthenticateToken(staffs[0].staffId, 'wechat')
+        const session = getSession()
+        session.accountId = resp.accountId
+        return resp
     }
 }
 
