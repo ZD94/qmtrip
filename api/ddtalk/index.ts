@@ -403,7 +403,7 @@ class DDTalk {
 
     @clientExport
     @requireParams(['code'])
-    static async loginByWechatCode(code: string) {
+    static async loginByWechatCode({ code }: { code: string }) {
         const userId = await API.sso.getUserInfo(code)
         const staffs = await Models.staffProperty.find({
             where: { type: SPropertyType.WX_ID, value: userId}

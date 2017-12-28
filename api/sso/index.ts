@@ -42,7 +42,7 @@ export default class SSOModule {
 
     @clientExport
     @requireParams(['code'])
-    static async getUserInfo(code: string): Promise<string> {
+    static async getUserInfo({ code }: { code: string }): Promise<string> {
         const suite_token = await API.sso.getSuiteToken()
         
         const res = await axios.get(`${USER_INFO_URL}?access_token=${suite_token}&code=${code}`)
