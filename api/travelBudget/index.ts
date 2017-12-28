@@ -64,15 +64,8 @@ export interface IQueryBudgetParams {
     preferedCurrency?: string;
 }
 
-<<<<<<< Updated upstream
-=======
 
 
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
-
->>>>>>> Stashed changes
 interface SegmentsBudgetResult {
     id: string;
     cities: string[];
@@ -281,195 +274,6 @@ export default class ApiTravelBudget {
     * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
     */
     @clientExport
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams): Promise<string> {
-        let staffId = params['staffId'];
-        let preferedCurrency = params["preferedCurrency"];
-        preferedCurrency = preferedCurrency && typeof (preferedCurrency) != 'undefined' ? preferedCurrency : DefaultCurrencyUnit;
-
-        if (!staffId || staffId == 'undefined') {
-            let currentStaff = await Staff.getCurrent();
-            staffId = currentStaff.id;
-        }
-        let staff = await Models.staff.get(staffId);
-        let companyId = staff.company.id;
-        let travelPolicy = await staff.getTravelPolicy();
-        if (!travelPolicy) {
-            throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
-        }
-        params.travelPolicyId = travelPolicy.id;
-
-        if (!params.staffList) {
-            params.staffList = [];
-        }
-        if (params.staffList.indexOf(staffId) < 0) {
-            params.staffList.push(staffId);
-        }
-        let count = params.staffList.length;
-        let destinationPlacesInfo = params.destinationPlacesInfo;
-        let _staff: any = {
-            gender: staff.sex,
-            policy: 'domestic',
-        }
-        let staffs = [_staff];
-        let goBackPlace = params['goBackPlace'];
-        // let priceLimitSegments: any =[];
-        let segments: any[] = await Promise.all(destinationPlacesInfo.map(async (placeInfo) => {
-            var segment: any = {};
-            segment.city = placeInfo.destinationPlace;
-            let city: Place = (await API.place.getCityInfo({cityCode: placeInfo.destinationPlace, companyId: companyId}));
-            if (city.isAbroad) {
-                let s = _.cloneDeep(_staff);
-                s.policy = 'abroad';
-                segment.staffs = [s];
-            }
-
-            segment.beginTime = placeInfo.latestArrivalDateTime;
-
-            segment.endTime = placeInfo.earliestGoBackDateTime;
-            segment.isNeedTraffic = placeInfo.isNeedTraffic;
-            segment.isNeedHotel = placeInfo.isNeedHotel;
-
-            let businessDistrict = placeInfo.businessDistrict;
-            let gps = [];
-            if (businessDistrict && /,/g.test(businessDistrict)) {
-                gps = businessDistrict.split(/,/);
-            } else {
-                let obj;
-                if (businessDistrict) {
-                    obj = API.place.getCityInfo({cityCode: businessDistrict, companyId: companyId});
-                }
-                if (!obj || !obj.latitude || !obj.longitude) {
-                    obj = city;
-                }
-                gps = [obj.latitude, obj.longitude];
-            }
-            segment.location = {
-                longitude: gps[1],
-                latitude: gps[0]
-            }
-            return segment;
-        }));
-
-        let segmentsBudget:any = await ApiTravelBudget.createNewBudget({
-            preferedCurrency: preferedCurrency,
-            travelPolicyId: travelPolicy['id'],
-            companyId,
-            staffs,
-            segments,
-            ret: params.isRoundTrip ? 1 : 0,
-            fromCity: params.originPlace,
-            backCity: params.goBackPlace,
-            preferSet: staff.company.budgetConfig || {},
-        });
-
-        let cities = segmentsBudget.cities;
-        let _budgets = segmentsBudget.budgets;
-        let budgets = [];
-
-        for (let i = 0, ii = cities.length; i < ii; i++) {
-            let city = cities[i];
-
-            let placeInfo = destinationPlacesInfo[i];
-
-            //交通
-            let traffic = _budgets[i].traffic;
-            if (traffic && traffic.length) {
-                let budget = traffic[0];
-                budget.cabinClass = budget.cabin;
-                budget.originPlace = budget.fromCity;
-                budget.destination = budget.toCity;
-                budget.tripType = ETripType.OUT_TRIP;
-                budget.price = budget.price * count;
-                budget.unit = budget.unit;
-                budget.rate = budget.rate;
-                budget.type = budget.trafficType;
-                budgets.push(budget);
-            }
-
-            //住宿
-            let hotel = _budgets[i].hotel;
-            if (hotel && hotel.length) {
-                let budget = hotel[0];
-                let cityObj = await API.place.getCityInfo({cityCode: budget.city, companyId: companyId});
-                let isAccordHotel = await Models.accordHotel.find({ where: { cityCode: cityObj.id, companyId: staff['companyId'] } });
-                if (isAccordHotel && isAccordHotel.length) {
-                    budget.price = isAccordHotel[0].accordPrice;
-
-                    /* 出差时间计算 */
-                    let timezone = cityObj.timezone || 'Asia/shanghai';
-                    let beginTime = moment(budget.checkInDate).tz(timezone).hour(12);
-                    let endTime = moment(budget.checkOutDate).tz(timezone).hour(12);
-                    let days = moment(endTime).diff(beginTime, 'days');
-                    budget.price = budget.price * days;
-                    /* 出差时间计算 END */
-                }
-
-                budget.hotelName = placeInfo ? placeInfo.hotelName : null;
-                budget.cityName = cityObj.name;
-                budget.tripType = ETripType.HOTEL;
-                budget.price = budget.price * count;
-                budget.unit = budget.unit;
-                budget.rate = budget.rate;
-                budgets.push(budget);
-            }
-
-
-            //补助
-            let subsidy = _budgets[i].subsidy;
-            let destLength = destinationPlacesInfo.length;
-            let lastDest = destinationPlacesInfo[destLength - 1];
-            if (subsidy) {
-                let budget = subsidy;
-                budget.price = budget.price * count;
-                if (budget.templates) {
-                    budget.templates.forEach((t) => {
-                        t.price = t.price * count;
-                    })
-                }
-                budget.reason = placeInfo ? placeInfo.reason : lastDest.reason;
-                budget.tripType = ETripType.SUBSIDY;
-                budget.type = EInvoiceType.SUBSIDY;
-
-                budgets.push(budget);
-            }
-        }
-
-        let obj: any = {};
-        obj.budgets = budgets;
-        obj.query = params;
-        obj.createAt = Date.now();
-        let _id = Date.now() + utils.getRndStr(6);
-        let key = `budgets:${staffId}:${_id}`;
-        await cache.write(key, JSON.stringify(obj));
-        await ApiTravelBudget.sendTripApproveNoticeToSystem({ cacheId: _id, staffId: staffId });
-        return _id;
-
-
-
-        function limitHotelBudgetByPrefer(min: number, max: number, hotelBudget: number) {
-            if (hotelBudget == -1) {
-                if (max != NoCityPriceLimit) return max;
-                return hotelBudget;
-            }
-            if (min == NoCityPriceLimit && max == NoCityPriceLimit) return hotelBudget;
-
-            if (max != NoCityPriceLimit && min > max) {
-                let tmp = min;
-                min = max;
-                max = tmp;
-            }
-
-            if (hotelBudget > max) {
-                if (max != NoCityPriceLimit) return max;
-            }
-            if (hotelBudget < min) {
-                if (min != NoCityPriceLimit) return min;
-            }
-            return hotelBudget;
-        }
-=======
     static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams){
         //     // console.log("params===>", params);
 
@@ -506,44 +310,6 @@ export default class ApiTravelBudget {
         //     // let priceLimitSegments: any =[];
 
 
-=======
-    static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams){
-        //     // console.log("params===>", params);
-
-        //     let staffId = params['staffId'];
-        //     let preferedCurrency = params["preferedCurrency"];
-        //     preferedCurrency = preferedCurrency && typeof (preferedCurrency) != 'undefined' ? preferedCurrency : DefaultCurrencyUnit;
-
-        //     if (!staffId || staffId == 'undefined') {
-        //         let currentStaff = await Staff.getCurrent();
-        //         staffId = currentStaff.id;
-        //     }
-        //     let staff = await Models.staff.get(staffId);
-        //     let companyId = staff.company.id;
-        //     let travelPolicy = await staff.getTravelPolicy();
-        //     if (!travelPolicy) {
-        //         throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
-        //     }
-        //     params.travelPolicyId = travelPolicy.id;
-
-        //     if (!params.staffList) {
-        //         params.staffList = [];
-        //     }
-        //     if (params.staffList.indexOf(staffId) < 0) {
-        //         params.staffList.push(staffId);
-        //     }
-        //     let count = params.staffList.length;
-        //     let destinationPlacesInfo = params.destinationPlacesInfo;
-        //     let _staff: any = {
-        //         gender: staff.sex,
-        //         policy: 'domestic',
-        //     }
-        //     let staffs = [_staff];
-        //     let goBackPlace = params['goBackPlace'];
-        //     // let priceLimitSegments: any =[];
-
-
->>>>>>> Stashed changes
             
         //     let segments: any[] = await Promise.all(destinationPlacesInfo.map(async (placeInfo) => {
         //         var segment: any = {};
@@ -699,10 +465,6 @@ export default class ApiTravelBudget {
         //         }
         //         return hotelBudget;
         //     }
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
 
     }
@@ -739,6 +501,7 @@ export default class ApiTravelBudget {
             return await ApiTravelBudget.transformBudgetData(item, companyId, count);
         });
         let budgets = await Promise.all(ps);
+        // console.log("budgets budgets budgets ====>", budgets.length, budgets);
         let totalBudget = 0;
         if (budgets && budgets.length > 0) {
             budgets.forEach(function(item) {
@@ -746,7 +509,7 @@ export default class ApiTravelBudget {
             })
         }
 
-        console.log('--------update totalBudget------', totalBudget);
+        // console.log('--------update totalBudget------', totalBudget);
         //TODO 如果分段 有一段是FIN 要走那一条 ？？？lizeilin
         if (!isFinalInApprove) {  //看表中的budget是否是最终结果，最终结果还没返回过，则更新approve表，表示还不可以进行审批
             console.log('first time--------------');
@@ -828,9 +591,8 @@ export default class ApiTravelBudget {
         let content = '';     //企业行程点数扣除，行程地
 
         if (!staffId || staffId == 'undefined') {
-            // let currentStaff = await Staff.getCurrent();
-            // staffId = currentStaff.id;
-            staffId = '80fee190-87d9-11e7-a399-7f0d5a3787d9';
+            let currentStaff = await Staff.getCurrent();
+            staffId = currentStaff.id;
         }
         let staff = await Models.staff.get(staffId);
         let companyId = staff.companyId;
@@ -886,7 +648,6 @@ export default class ApiTravelBudget {
         console.log('approve--------, created, save', approveId);
         let budgetResult:any = await ApiTravelBudget.createNewBudget({
             callbackUrl: `${config.host}/api/v1/budget/${approveId}/updateBudget`,
-            // callbackUrl: `${config.host}/api/v1/budget/80fee190-87d9-11e7-a399-7f0d5a3787d9/updateBudget`,
             preferedCurrency:preferedCurrency,
             travelPolicyId: travelPolicy['id'],
             companyId,
@@ -971,82 +732,7 @@ export default class ApiTravelBudget {
 
         return {approveId: approveId, budgetId: _id};
     }
-<<<<<<< Updated upstream
 
-<<<<<<< Updated upstream
-        /*async function getSubsidyBudget(city, destination, isHasBackSubsidy: boolean = false, preferedCurrency: string) {
-            let { subsidy, leaveDate, goBackDate, reason } = destination;
-            let budget: any = null;
-            if (subsidy && subsidy.template) {
-                city = await API.place.getCityInfo({cityCode: city});
-                let timezone = city.timezone ? city.timezone : "Asia/shanghai";
-                let goBackDay = moment(goBackDate).tz(timezone).format("YYYY-MM-DD");
-                let leaveDay = moment(leaveDate).tz(timezone).format("YYYY-MM-DD");
-                let days = moment(goBackDay).diff(moment(leaveDay), 'days');
-                if (isHasBackSubsidy) { //解决如果只有住宿时最后一天补助无法加到返程目的地上
-                    days += 1;
-                }
-                if (days > 0) {
-                    budget = {};
-                    budget.fromDate = leaveDay;
-                    budget.endDate = (goBackDate == leaveDay || isHasBackSubsidy) ? goBackDate: moment(goBackDate).add(-1, 'days').format('YYYY-MM-DD');
-                    budget.tripType = ETripType.SUBSIDY;
-                    budget.type = EInvoiceType.SUBSIDY;
-                    budget.price = subsidy.template.subsidyMoney * days;
-                    budget.unit = preferedCurrency && typeof(preferedCurrency) != 'undefined' ? preferedCurrency: DefaultCurrencyUnit,
-                    budget.duringDays = days;
-                    budget.template = { id: subsidy.template.id, name: subsidy.template.name };
-                    budget.reason = reason;
-                }
-                let rate;
-                if(preferedCurrency != DefaultCurrencyUnit) {
-                    try{
-                        rate = await new Promise<any>(async function(resolve,reject){
-                            let qs = {
-                                key: cloudKey,
-                                currencyTo: preferedCurrency
-                            }
-                            request({
-                                uri: cloudAPI + `/currencyRate`,
-                                qs: qs,
-                                method: 'get',
-                                json: true
-                            },async (err, res) => {
-                                if(err){
-                                    reject(err)
-                                }
-                                let body = res.body;
-                                if(body && typeof(body) == 'string') {
-                                    body = JSON.parse(body)
-                                }
-                                return resolve(body);
-                            });
-                        });
-                        if(typeof(rate) == 'string') rate = JSON.parse(rate);
-                        rate = rate.data;
-                        if( typeof(rate) != 'undefined' && rate && rate.length ) {
-                            budget.rate = rate[0]['rate'];
-                        }
-                    } catch(err) {
-                        console.log(err)
-                    }
-                } else {
-                    budget.rate = 1;
-                }
-            }
-            return budget;
-        }*/
-
-        function limitHotelBudgetByPrefer(min: number, max: number, hotelBudget: number) {
-            if (hotelBudget == -1) {
-                if (max != NoCityPriceLimit) return max;
-                return hotelBudget;
-            }
-            if (min == NoCityPriceLimit && max == NoCityPriceLimit) return hotelBudget;
-=======
-=======
-
->>>>>>> Stashed changes
     static async transformBudgetData(budget, companyId:string, count:number){
         budget.index = budget.index;
         delete budget.markedScoreData;
@@ -1057,10 +743,6 @@ export default class ApiTravelBudget {
                 let isAccordHotel = await Models.accordHotel.find({ where: { cityCode: cityObj.id, companyId} });
                 if (isAccordHotel && isAccordHotel.length) {
                     budget.price = isAccordHotel[0].accordPrice;
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
                     /* 出差时间计算 */
                     let timezone = cityObj.timezone || 'Asia/shanghai';
