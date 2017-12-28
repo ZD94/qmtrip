@@ -6,7 +6,7 @@ import { Models } from "_types";
 import { AuthRequest, AuthResponse } from '_types/auth';
 import {getCompanyTokenByAgent} from '../restful';
 var requestp = require("request-promise");
-import { EOrderStatus, EOrderType } from "_types/tripPlan";
+import { EOrderStatus, EOrderType, TripDetail } from "_types/tripPlan";
 var request = require("request");
 var path = require("path");
 var _ = require("lodash");
@@ -132,34 +132,45 @@ class Proxy {
 
         // verifyToken
         app.all(/^\/order.*$/, cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function) => {
-            console.log("=====this is order")
+            
+            let staff: Staff = await Staff.getCurrent();
+            console.log("=====staff: ", staff)
 
             let {tripDetailId} = req.query;
-            if(!tripDetailId || typeof tripDetailId == undefined)
-                tripDetailId = req.body.tripDetailId;
-            let tripDetail = await Models.tripDetail.get(tripDetailId)
-            if(!tripDetail) {
-                console.log("tripDetail not found");
-                return res.sendStatus(403);
+
+            let listeningon: string;
+            if(!tripDetailId || typeof tripDetailId == undefined){
+                if(req.body.tripDetailId) {
+                    tripDetailId = req.body.tripDetailId;
+                }
+            }
+            let tripDetail: TripDetail;
+            if(tripDetailId) {
+                tripDetail = await Models.tripDetail.get(tripDetailId)
+                if(!tripDetail) {
+                    console.log("tripDetail not found");
+                    return res.sendStatus(403);
+                }       
+                if(!staff) {
+                    staff = await Models.staff.get(tripDetail.accountId);
+                }
+                listeningon = `${config.orderSysConfig.tripDetailMonitorUrl}/${tripDetail.id}`;
             }
 
-            let staff: Staff = await Staff.getCurrent();
-            if(!staff) {
-                staff = await Models.staff.get(tripDetail.accountId);
-            }
-      
             let addon:{[index: string]: any} = {
-                staffID: staff.id,
-                companyID: staff.companyId,
-                listeningon: `${config.orderSysConfig.tripDetailMonitorUrl}/${tripDetail.id}`
+                listeningon: listeningon     
             };
+            
             let headers: {[index: string]: any} = {
                auth: req.headers['auth'],
                supplier: req.headers['supplier'],
-               listeningon: `${config.orderSysConfig.tripDetailMonitorUrl}/${tripDetail.id}`
+               accountid: staff.accountId,
+               staffid: staff.id,
+               companyID: staff.companyId,    
             }
 
             let body: {[index: string]: any} = req.body;
+            let qs: {[index: string]: any} = req.query;
 
             if(req.method == 'GET') {
                 _.assign(headers, addon)
@@ -167,6 +178,7 @@ class Proxy {
                 _.assign(headers, addon)
                 _.assign(body, addon);
             }
+
             let pathstring = req.path;
             pathstring = pathstring.replace("/order", '');
             let url = `${config.orderSysConfig.orderLink}${pathstring}`;
@@ -174,7 +186,7 @@ class Proxy {
             console.log("===========url: ", url, '===tripDetailId: ', tripDetailId, '====>method:', req.method, '=======> body: ', req.body);
             try{
                 result = await new Promise((resolve,reject) => {  
-                    request({ url, headers, body, 
+                    request({ url, headers, body, qs,
                         json: true,
                         method: req.method,
                         timeout: 120*1000
@@ -199,7 +211,7 @@ class Proxy {
             if(typeof result == 'string') {
                 result = JSON.parse(result);
             }
-            if(result.code == 0 && result.data && tripDetail.orderNo == null){  //&& result.data.orderN
+            if(tripDetail && result.code == 0 && result.data && tripDetail.orderNo == null){  //&& result.data.orderN
                 if(result.data.orderNos && typeof(result.data.orderNos) != 'undefined'){
                     tripDetail.reserveStatus = EOrderStatus.AUDITING;  //飞机的orderNos为数组
                     tripDetail.orderNo = result.data.orderNos[0];
@@ -307,6 +319,7 @@ async function verify(req: Request, res: Response, next: Function) {
     console.log("======> authstr ", authstr, staffid)
     let token = parseAuthString(authstr);
     let verification: AuthResponse = await API.auth.authentication(token);
+    console.log("-======>verification:  ", verification)
     if(!verification) {
         console.log("auth failed", JSON.stringify(req.cookies))
         return res.sendStatus(401);
