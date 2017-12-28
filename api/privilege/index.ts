@@ -8,7 +8,19 @@ import {PaginateInterface} from 'common/model/interface';
 import { TripPlan } from '_types/tripPlan';
 import { CoinAccount, CoinAccountChange } from '_types/coin';
 let moment = require('moment');
-
+import {Request, Response} from "express-serve-static-core";
+import {parseAuthString} from "_types/auth/auth-cert";
+var cors = require('cors');
+import { AuthRequest, AuthResponse } from '_types/auth';
+const API = require("@jingli/dnode-api");
+var timeout = require('connect-timeout');
+import * as CLS from 'continuation-local-storage';
+let CLSNS = CLS.getNamespace('dnode-api-context');
+const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'Content-Type, auth, supplier, authstr, staffid, companyid, accountid'};
+function resetTimeout(req, res, next){
+    req.clearTimeout();
+    next();
+}
 
 class Privilege {
     static __public: boolean = true;
@@ -17,47 +29,86 @@ class Privilege {
         
         let self = this;
 
-        app.get('/privilege/:id/getBalance', async function(req, res, next) {
+        app.get('/privilege/:id/getBalance', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req, res, next) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`获取企业余额id为空`)
                 throw err;
             }
-            let balance = await Privilege.getCompanyBalance(id);
-             res.json(balance);
+            let balance: number;
+            try {
+                balance = await Privilege.getCompanyBalance(id);
+            } catch(err) {
+                return res.json({
+                    msg: err, 
+                    code: 502,
+                    data: null
+                });
+            }
+            
+            return res.json({
+                data: balance,
+                code: 0,
+                msg: 'OK'
+            });
         });
 
-        app.post('/privilege/:id/getBalanceRecords', async function(req, res, next) {
+        app.post('/privilege/:id/getBalanceRecords', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req, res, next) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`获取企业资金变动记录id为空`)
                 throw err;
-
             }
             let body = req.body;
             let balanceRecords = [];
-            if (body) {
-                if (typeof body == 'string') {
-                    body = JSON.parse(body);
+            try {
+                if (body) {
+                    if (typeof body == 'string') {
+                        body = JSON.parse(body);
+                    }
+                    balanceRecords =  await Privilege.getCompanyBalanceRecords({id, body});
+                } else {
+                    balanceRecords = await Privilege.getCompanyBalanceRecords(id);
                 }
-                balanceRecords =  await Privilege.getCompanyBalanceRecords({id, body});
-            } else {
-                balanceRecords = await Privilege.getCompanyBalanceRecords(id);
+            } catch(err) {
+                return res.json({
+                    data: null,
+                    code: 502,
+                    msg: err
+                });
             }
-            res.json(balanceRecords);
+            
+            return res.json({
+                data: balanceRecords,
+                code: 0,
+                msg: 'OK'
+            });
         });
 
-        app.get('/privilege/:id/getCompanyScoreRatio', async function(req, res, next) {
+        app.get('/privilege/:id/getCompanyScoreRatio', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req, res, next) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`获取企业奖励比例id为空`)
                 throw err;
             }
-            let result = await Privilege.getCompanyScoreRatio(id);
-            res.json(result);
+            let result;
+            try {
+                result = await Privilege.getCompanyScoreRatio(id);
+            } catch(err) {
+                return res.json({
+                    data: null,
+                    code: 502,
+                    msg: err
+                });
+            }
+            return res.json({
+                data: result,
+                code: 0,
+                msg: 'OK'
+            });
         });
 
-        app.post('/privilege/:id/setCompanyScoreRatio', async function(req, res, next) {
+        app.post('/privilege/:id/setCompanyScoreRatio', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req, res, next) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`设置企业奖励比例id为空`);
@@ -68,37 +119,89 @@ class Privilege {
             if (typeof body == 'string') {
                 body = JSON.parse(body);
             }
-            let result = await Privilege.setCompanyScoreRatio({id: id, data: body});
-            res.json(result);
+            let result;
+            try {
+                result = await Privilege.setCompanyScoreRatio({id: id, data: body});
+            } catch(err) {
+                return res.json({
+                    data: null,
+                    code: 502, 
+                    msg: err
+                });
+            }
+            return res.json({
+                data: result,
+                code: 0,
+                msg: 'OK'
+            });
         });
 
-        app.get('/privilege/:id/getCompanyScoreRatioChange', async function(req, res, next) {
+        app.get('/privilege/:id/getCompanyScoreRatioChange', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req, res, next) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`获取企业奖励比例变动id为空`);
                 throw err;
             }
-            let result = await Privilege.getCompanyScoreRatioChange(id);
-            res.json(result);
+            let result;
+            try {
+                result = await Privilege.getCompanyScoreRatioChange(id);
+            } catch(err) {
+                return res.json({
+                    data: null,
+                    code: 502,
+                    msg: err
+                });
+            }
+            return res.json({
+                data: result,
+                code: 0,
+                msg: 'OK'
+            });
         });
 
-        app.get('/privilege/:id/getAllUnsettledRewardByStaff', async function(req, res, next) {
+        app.get('/privilege/:id/getAllUnsettledRewardByStaff', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req, res, next) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`获取未结算奖励按照员工排名id为空`)
                 throw err;
             }
-            let result = await Privilege.getAllUnsettledRewardByStaff(id);
-            res.json(result);
+            let result;
+            try {
+                result = await Privilege.getAllUnsettledRewardByStaff(id);
+            } catch(err) {
+                return res.json({
+                    data: null,
+                    code: 502,
+                    msg: err
+                });
+            }
+            return res.json({
+                data: result,
+                code: 0,
+                msg: 'OK'
+            });
         });
 
-        app.get('/privilege/:id/getAllUnsettledRewardByTripplan', async function(req, res, next) {
+        app.get('/privilege/:id/getAllUnsettledRewardByTripplan', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req, res, next) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`获取未结算奖励按照tripplan id为空`);
             }
-            let result = await Privilege.getAllUnsettledRewardByTripplan(id);
-            res.json(result);
+            let result;
+            try {
+                result = await Privilege.getAllUnsettledRewardByTripplan(id);
+            } catch(err) {
+                return res.json({
+                    data: null,
+                    code: 502, 
+                    msg: err
+                });
+            }
+            return res.json({
+                data: result,
+                code: 0,
+                msg: 'OK'
+            });
         });
     }
 
@@ -127,8 +230,8 @@ class Privilege {
         
         let checkFromDate: string = null;
         let checkToDate: string = null;
-        
-        if (queryDateData) {
+    
+        if (queryDateData['beginDate']) {
             checkFromDate = queryDateData.beginDate;
             checkToDate = queryDateData.endDate;
             for (let i = 0; i < coinAccountChanges.length; i++) {
@@ -214,3 +317,28 @@ class Privilege {
 }
 
 export = Privilege;
+
+async function verify(req: Request, res: Response, next: Function) {
+    if(req.method == 'OPTIONS') {
+        return next();
+    }
+    let {authstr, staffid} = req.headers;
+    console.log("======> authstr ", authstr, staffid)
+    let token = parseAuthString(authstr);
+    let verification: AuthResponse = await API.auth.authentication(token);
+    if(!verification) {
+        console.log("auth failed", JSON.stringify(req.cookies))
+        return res.sendStatus(401);
+    }
+    try{
+        await API.auth.setCurrentStaffId({
+            accountId : verification.accountId,
+            staffId   : staffid
+        })
+    } catch(err) {
+        if(err)
+            return res.sendStatus(401);
+    }
+    next();
+}
+var verifyToken = CLSNS.bind(verify, CLSNS.createContext())
