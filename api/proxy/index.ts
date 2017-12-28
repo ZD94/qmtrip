@@ -53,7 +53,7 @@ class Proxy {
             let pathstr: string = req.path;
             pathstr = pathstr.replace('/travel', '');
             let JLOpenApi: string = config.cloud;
-            JLOpenApi.replace('/cloud', '');
+            JLOpenApi = JLOpenApi.replace('/cloud', '');
             let url: string = `${JLOpenApi}${pathstr}`;
 
             try {

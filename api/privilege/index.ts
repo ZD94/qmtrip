@@ -10,7 +10,98 @@ import { CoinAccount, CoinAccountChange } from '_types/coin';
 let moment = require('moment');
 
 
-export default class Privilege {
+class Privilege {
+    static __public: boolean = true;
+
+    static __initHttpApp(app) {
+        
+        let self = this;
+
+        app.get('/privilege/:id/getBalance', async function(req, res, next) {
+            let {id} = req.params;
+            if (!id) {
+                let err = new Error(`获取企业余额id为空`)
+                throw err;
+            }
+            let balance = await Privilege.getCompanyBalance(id);
+             res.json(balance);
+        });
+
+        app.post('/privilege/:id/getBalanceRecords', async function(req, res, next) {
+            let {id} = req.params;
+            if (!id) {
+                let err = new Error(`获取企业资金变动记录id为空`)
+                throw err;
+
+            }
+            let body = req.body;
+            let balanceRecords = [];
+            if (body) {
+                if (typeof body == 'string') {
+                    body = JSON.parse(body);
+                }
+                balanceRecords =  await Privilege.getCompanyBalanceRecords({id, body});
+            } else {
+                balanceRecords = await Privilege.getCompanyBalanceRecords(id);
+            }
+            res.json(balanceRecords);
+        });
+
+        app.get('/privilege/:id/getCompanyScoreRatio', async function(req, res, next) {
+            let {id} = req.params;
+            if (!id) {
+                let err = new Error(`获取企业奖励比例id为空`)
+                throw err;
+            }
+            let result = await Privilege.getCompanyScoreRatio(id);
+            res.json(result);
+        });
+
+        app.post('/privilege/:id/setCompanyScoreRatio', async function(req, res, next) {
+            let {id} = req.params;
+            if (!id) {
+                let err = new Error(`设置企业奖励比例id为空`);
+                throw err;
+            }
+            let body = req.body;
+            let scoreRatio: number = 0.50; //默认为50%
+            if (typeof body == 'string') {
+                body = JSON.parse(body);
+            }
+            let result = await Privilege.setCompanyScoreRatio({id: id, data: body});
+            res.json(result);
+        });
+
+        app.get('/privilege/:id/getCompanyScoreRatioChange', async function(req, res, next) {
+            let {id} = req.params;
+            if (!id) {
+                let err = new Error(`获取企业奖励比例变动id为空`);
+                throw err;
+            }
+            let result = await Privilege.getCompanyScoreRatioChange(id);
+            res.json(result);
+        });
+
+        app.get('/privilege/:id/getAllUnsettledRewardByStaff', async function(req, res, next) {
+            let {id} = req.params;
+            if (!id) {
+                let err = new Error(`获取未结算奖励按照员工排名id为空`)
+                throw err;
+            }
+            let result = await Privilege.getAllUnsettledRewardByStaff(id);
+            res.json(result);
+        });
+
+        app.get('/privilege/:id/getAllUnsettledRewardByTripplan', async function(req, res, next) {
+            let {id} = req.params;
+            if (!id) {
+                let err = new Error(`获取未结算奖励按照tripplan id为空`);
+            }
+            let result = await Privilege.getAllUnsettledRewardByTripplan(id);
+            res.json(result);
+        });
+    }
+
 
     //获取企业福利账户余额
     @clientExport
@@ -24,10 +115,10 @@ export default class Privilege {
 
     //获取企业福利账户余额变动记录
     @clientExport
-    static async getCompanyBalanceRecords(params: {id: string, data?: any}): Promise<any> {
-        let {id, data} = params;
+    static async getCompanyBalanceRecords(params: {id: string, body?: any}): Promise<any> {
+        let {id, body} = params;
         let companyId: string = id;
-        let queryDateData: any = data;
+        let queryDateData: any = body;
 
         let company: Company = await Models.company.get(companyId);
         let coinAccountId: string = company.coinAccountId;
@@ -50,15 +141,15 @@ export default class Privilege {
         return coinAccountChanges;
     }
 
-    //获得企业节省奖励比例
-    @clientExport
-    static async getCompanyScoreRatio(companyId: string): Promise<any> {
-        let company: Company = await Models.company.get(companyId);
-        let scoreRatio: number = company.scoreRatio;
-        return scoreRatio;
-    }
+     //获得企业节省奖励比例
+     @clientExport
+     static async getCompanyScoreRatio(companyId: string): Promise<any> {
+         let company: Company = await Models.company.get(companyId);
+         let scoreRatio: number = company.scoreRatio;
+         return scoreRatio;
+     }
 
-    //企业节省奖励比例设置
+     //企业节省奖励比例设置
     @clientExport
     static async setCompanyScoreRatio(params: {id: string, data: object}): Promise<any> {
         let {id, data} = params;
@@ -121,3 +212,5 @@ export default class Privilege {
          return tripPlansHaveUnsettledReward;
      }
 }
+
+export = Privilege;
