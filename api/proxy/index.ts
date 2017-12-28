@@ -135,6 +135,10 @@ class Proxy {
             
             let staff: Staff = await Staff.getCurrent();
             console.log("=====staff: ", staff)
+            let staffId = req.headers.staffid;
+            if(staffId && !staff) {
+                staff = await Models.staff.get(staffId);
+            }
 
             let {tripDetailId} = req.query;
 
