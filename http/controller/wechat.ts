@@ -1,6 +1,7 @@
 import { AbstractController, Restful, Router } from '@jingli/restful';
 import { Request, NextFunction, Response } from 'express-serve-static-core';
 import cache from 'common/cache'
+const API = require('@jingli/dnode-api');
 const config = require('@jingli/config')
 
 const { Parser } = require('xml2js')
@@ -53,6 +54,12 @@ export default class WeChatController extends AbstractController {
             })
         })
         // proxy.web(req, res, proxyTarget)
+    }
+
+    @Router('/loginByWechatCode', 'POST')
+    async loginByWechatCode(req: Request, res: Response, next: NextFunction) {
+        const data = await API['ddtalk'].loginByWechatCode(req.body)
+        res.json(data)
     }
 }
 
