@@ -15,6 +15,7 @@ class Privilege {
 
     static __initHttpApp(app) {
         
+        let self = this;
 
         app.get('/privilege/:id/getBalance', async function(req, res, next) {
             let {id} = req.params;
@@ -211,3 +212,5 @@ class Privilege {
          return tripPlansHaveUnsettledReward;
      }
 }
+
+export = Privilege;
