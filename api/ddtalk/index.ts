@@ -411,8 +411,7 @@ class DDTalk {
         })
         if(staffs.length < 1) throw L.ERR.USER_NOT_EXIST()
         const resp = await API.auth.makeAuthenticateToken(staffs[0].staffId, 'wechat')
-        const session = getSession()
-        session.accountId = resp.accountId
+        resp['is_first_login'] = false
         return resp
     }
 }
