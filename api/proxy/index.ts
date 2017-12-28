@@ -273,6 +273,45 @@ class Proxy {
             return res.json(result);
         });
 
+
+        app.all(/^\/bill.*$/ ,cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
+            let {staffid, companyid, accountid} = req.headers;
+            let params =  req.body;
+            if(req.method == 'GET') {
+                params = req.query;
+            }
+            let appSecret = config.bill.appSecret;
+            let pathstring = req.path;
+            let timestamp = Math.floor(Date.now()/1000);
+            pathstring = pathstring.replace("/bill", '');
+            let sign = genSign(params, timestamp, appSecret)
+            let url = `${config.bill.orderLink}${pathstring}`;
+            console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.bill.appId, '===request params: ', params) 
+            let result = await new Promise((resolve, reject) => {
+                return request({
+                    uri: url,
+                    body: req.body,
+                    json: true,
+                    method: req.method,
+                    qs: req.query,
+                    headers: {
+                        sign: sign,
+                        appid: config.bill.appId,
+                        staffid, 
+                        companyid,
+                        accountid
+                    }
+                }, (err, resp, result) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    resolve(result);
+                });
+            });
+            console.log("===bill===result: ", result)
+            return res.json(result);
+        });
+
         
         app.all(/^\/permission.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
             let {staffid, companyid, accountid} = req.headers;

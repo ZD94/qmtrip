@@ -73,6 +73,9 @@ deploy:master:
     JL_APP_MALL_ORDER_LINK: https://l.jingli365.com/svc
     JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_BILL_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1
+    JL_APP_BILL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92  
+    JL_APP_BILL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
     JL_APP_PERMISSION_ORDER_LINK: https://l.jingli365.com/svc
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
@@ -106,6 +109,9 @@ deploy:test:
     JL_APP_MALL_ORDER_LINK: https://t.jingli365.com/svc
     JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_BILL_ORDER_LINK: https://t.jingli365.com/svc/java-jingli-order1
+    JL_APP_BILL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92  
+    JL_APP_BILL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
     JL_APP_PERMISSION_ORDER_LINK: https://t.jingli365.com/svc
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
@@ -138,6 +144,9 @@ deploy:release:
     JL_APP_MALL_ORDER_LINK: https://j.jingli365.com/svc
     JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_BILL_ORDER_LINK: https://j.jingli365.com/svc/java-jingli-order1
+    JL_APP_BILL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92  
+    JL_APP_BILL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
     JL_APP_PERMISSION_ORDER_LINK: https://j.jingli365.com/svc
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
@@ -172,6 +181,9 @@ deploy:tester:
     JL_APP_MALL_ORDER_LINK: https://t.jingli365.com/svc
     JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_BILL_ORDER_LINK: https://t.jingli365.com/svc/java-jingli-order1
+    JL_APP_BILL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92  
+    JL_APP_BILL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
     JL_APP_PERMISSION_ORDER_LINK: https://t.jingli365.com/svc
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
