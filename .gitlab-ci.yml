@@ -131,7 +131,7 @@ deploy:demo:
     JL_APP_HOST: http://demo.jingli365.com
     JL_APP_V2_HOST: https://demo.jingli365.com
     JL_APP_CLOUDKEY: jinglicloud2017
-    JL_APP_CLOUDAPI: https://demo.jingli365.com/proj/svr-jlbudget/
+    JL_APP_CLOUDAPI: https://demo.jingli365.com/proj/svr-jlbudget/api/v1/
     JL_APP_CLOUD: https://demo.jingli365.com/pro/web-cloud-mgr/
     JL_APP_APPROVE_SERVER_URL: https://demo.jingli365.com/proj/svr-trip-approve/api/v1
     JL_APP_POSTGRES: postgres://demo:d3m0jingli365@dockerhost/qmtrip
