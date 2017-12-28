@@ -483,7 +483,7 @@ class StaffModule{
     @clientExport
     static async getStaffsByAccountId() : Promise<Staff[]>{
 
-        let session = getSession();
+        let session = getSession(); 
         if(session && session.accountId){
             let staffs = await Models.staff.find({
                 where : {
