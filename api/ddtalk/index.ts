@@ -406,11 +406,12 @@ class DDTalk {
     @requireParams(['code'])
     static async loginByWechatCode(params: { code: string }) {
         const userId = await API.sso.getUserInfo(params)
-        const staffs = await Models.staffProperty.find({
+        const staffProperties = await Models.staffProperty.find({
             where: { type: SPropertyType.WX_ID, value: userId}
         })
-        if(staffs.length < 1) throw L.ERR.USER_NOT_EXIST()
-        const resp = await API.auth.makeAuthenticateToken(staffs[0].staffId, 'wechat')
+        if(staffProperties.length < 1) throw L.ERR.USER_NOT_EXIST()
+        const staff = await Models.staff.get(staffProperties[0].staffId)
+        const resp = await API.auth.makeAuthenticateToken(staff.accountId, 'corp_wechat')
         resp['is_first_login'] = false
         return resp
     }
