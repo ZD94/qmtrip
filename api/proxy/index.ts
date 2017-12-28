@@ -55,6 +55,7 @@ class Proxy {
             let JLOpenApi: string = config.cloud;
             JLOpenApi = JLOpenApi.replace('/cloud', '');
             let url: string = `${JLOpenApi}${pathstr}`;
+            console.log('url-----> ', url);
 
             try {
                 result = await new Promise((resolve, reject) => {
@@ -74,6 +75,7 @@ class Proxy {
                         resolve(result);
                     });
                 });
+                console.log('resultttttt---->', result);
                 return res.json(result);
             } catch(err) {
                 if (err) {
@@ -186,6 +188,9 @@ class Proxy {
             let pathstring = req.path;
             pathstring = pathstring.replace("/order", '');
             let url = `${config.orderSysConfig.orderLink}${pathstring}`;
+            if(pathstring.indexOf("manage")){
+                url = url.replace("/tmc", "");
+            }
             let result:any;
             console.log("===========url: ", url, '===tripDetailId: ', tripDetailId, '====>method:', req.method, '=======> body: ', req.body);
             try{
