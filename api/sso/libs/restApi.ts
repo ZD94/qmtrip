@@ -3,16 +3,20 @@ import { IWDepartment } from "api/sso/libs/wechat-department";
 
 var request = require("request-promise");
 
+
+const enum EIteratorSwitch {
+    ACCESS_ITERATABLE = 1,  //表示迭代获取
+    ACCESS_NO_ITERATOR = 0  //不使用迭代获取，只获取当前
+}
 export class RestApi {
 
     access_token: string;
-    constructor(access_token: string){
-
-    }
+    constructor(access_token: string){}
 
     /**根据corpid和secret获取该公司的access_token */
     static async getAccessToken(corpid: string, secret: string): Promise<IAccessToken>{
-        let url = `https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=${corpid}&corpsecret==${secret}`;
+        // let url = `https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=${corpid}&corpsecret==${secret}`;
+        let url = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=wwb398745b82d67068&corpsecret=x51OLfe5UWqI5VEW2nXg6tAph5P8kPqmJ_RxtgnbPBE'
         let result: IAccessToken = await reqProxy({
             url,
             method: 'GET'
@@ -25,11 +29,26 @@ export class RestApi {
     /**根据该公司的access_token获取某个staff的信息 */
     async getStaff(userid?: string){
         let url = `https://qyapi.weixin.qq.com/cgi-bin/user/get?access_token=${this.access_token}&userid=${userid}`;
-        let result = await reqProxy({
+        let result: IWStaffResult = await reqProxy({
             url,
             method: 'GET'
         });
-        return result;
+        return {
+            userid: result.userid,
+            name: result.name,
+            mobile: result.mobile,
+            email: result.email,
+            english_name: result.english_name,
+            gender: result.gender,
+            avatar_mediaid: result.avatar_mediaid,
+            isleader: result.isleader,
+            department: result.department,
+            order: result.order,
+            position: result.position,
+            telephone: result.telephone,
+            enable: result.enable,
+            extattr: result.extattr
+        } as IWStaff;
     }
 
     /**根据该公司的access_token更新某个staff的信息 */
@@ -49,7 +68,7 @@ export class RestApi {
          * @param.id {string} 可选， 获取指定部门及其子部门。若不填，默认获取全量组织架构
          * @return {IDepartmentResult}
          */
-        async getDepartments(id?: string): Promise<IDepartmentResult>{
+        async getDepartments(id?: string): Promise<Array<IWDepartment>>{
             let url = `https://qyapi.weixin.qq.com/cgi-bin/department/list`;
             let qs: {access_token: string, id?: string} = {
                 access_token: this.access_token
@@ -60,16 +79,17 @@ export class RestApi {
                 method: 'GET',
                 qs: qs
             });
-            return result;
+            if(!result) return null;
+            return result.department;
         }
 
         /**
          * @method 根据该公司的access_token获取部门成员信息
          * @param.departmentId {string} 部门id
-         * @param.fetchChild {number} 是否递归获取子部门下面的成员
+         * @param.fetchChild {number} 0: 关闭递归获取子部门下面的成员 1: 递归获取所有部门成员
          * @return {IMemberListResult}
          */
-        async getMembersOfDepartment(departmentId?: string, fetchChild?: number): Promise<IMemberListResult>{
+        async getDetailedStaffsByDepartment(departmentId?: string, fetchChild?: number): Promise<Array<IWStaff>>{
             let url = 'https://qyapi.weixin.qq.com/cgi-bin/user/list';
             let qs: {
                 access_token: string,
@@ -85,7 +105,9 @@ export class RestApi {
                 method: 'GET',
                 qs
             });
-            return result;
+            if(!result || !result.userlist)
+                return null;
+            return result.userlist;
         }
 
         /**
@@ -94,7 +116,7 @@ export class RestApi {
          * @param.fetchChild {number} 是否递归获取子部门下面的成员
          * @return {IConciseMemberListResult}
          */
-        async getConciseStaffList(departmentId?: string, fetchChild?: number): Promise<IConciseMemberListResult>{
+        async getConciseStaffsByDepartment(departmentId?: string, fetchChild?: number): Promise<IConciseMemberListResult>{
             let url = 'https://qyapi.weixin.qq.com/cgi-bin/user/simplelist';
             let qs: {
                 access_token: string,
@@ -123,12 +145,17 @@ async function reqProxy(params: {
 }): Promise<any>{
     let {url, method, body = {}, qs = {}} = params;
     let result;
+    let options
     try{
+        console.log("=====url: ", url)
         result = await request({ url, method, body, qs, json: true});
+        console.log("=====result: ", result)
     }catch(err) {
         if(err)
-            return null;
+            throw new Error(err);
     }
+    if(typeof result == 'string')
+        result = JSON.parse(result);
     if(!result) 
         return null;
     return result;
@@ -163,4 +190,9 @@ export interface IAccessToken {
     errmsg: string;
     access_token: string;
     expires_in: number;
+}
+
+export interface IWStaffResult extends IWStaff {
+    errcode: number,
+    errmsg: string
 }

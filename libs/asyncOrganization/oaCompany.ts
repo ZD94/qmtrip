@@ -65,16 +65,17 @@ export abstract class OaCompany{
 
         //处理企业组织架构
         let rootDepartment = await self.getRootDepartment();
+        console.log("=======> rootDepartment: ", rootDepartment)
         let department: Department;
         if(rootDepartment){
-            department = await rootDepartment.sync({company: result});
+            // department = await rootDepartment.sync({company: result});
         }
 
         //处理企业创建者
         let createUser = await self.getCreateUser();
         let createStaff: Staff;
         if(createUser){
-            createStaff = await createUser.sync({company: result, from: "createUser"});
+            // createStaff = await createUser.sync({company: result, from: "createUser"});
         }
         if(createStaff){
             result.createUser = createStaff.id;

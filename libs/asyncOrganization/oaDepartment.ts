@@ -60,6 +60,10 @@ export abstract class OaDepartment{
         return true;
     }
 
+    /**
+     * @method 
+     * @param params 
+     */
     async sync(params?:{company?: Company, oaDepartment?: OaDepartment, from?: string}): Promise<Department>{
         console.info(this.name, "department sync begin==================================");
         if(!params) params = {};
@@ -81,7 +85,7 @@ export abstract class OaDepartment{
 
         let defaultDepartment = await company.getDefaultDepartment();
 
-        let parentDepartment: Department;
+        let parentDepartment: Department;    //极端情况：parentDepartment 记录根部门的上级，若不存在，则为本系统的默认部门
         let oaParent = await self.getParent();
 
         if(!oaParent || !oaParent.id){
