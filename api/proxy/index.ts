@@ -66,7 +66,8 @@ class Proxy {
                         method: req.method,
                         qs: req.query,
                         headers: {
-                            token: companyToken
+                            token: companyToken,
+                            companyId: companyId
                         }
                     }, (err, resp, result) => {
                         if (err) {
@@ -114,7 +115,8 @@ class Proxy {
                         method: req.method,
                         qs: req.query,
                         headers: {
-                            token: companyToken
+                            token: companyToken,
+                            companyId: companyId
                         }
                     }, (err, resp, result) => {
                         if (err) {
