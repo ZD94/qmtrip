@@ -109,16 +109,6 @@
     "appKey": "3fFDdkKxibDiRjwy9DqaPwasvAup",
     "appSecret": "2FaLAocgDodNqCFa9PU8cyCk4Fnw"
   },
-  "mall": {
-    "orderLink": "${JL_APP_MALL_ORDER_LINK}",
-    "appId": "${JL_APP_MALL_APP_ID}",
-    "appSecret": "${JL_APP_MALL_APP_SECRET}"
-  },
-  "permission": {
-    "orderLink": "${JL_APP_PERMISSION_ORDER_LINK}",
-    "appId": "${JL_APP_PERMISSION_APP_ID}",
-    "appSecret": "${JL_APP_PERMISSION_APP_SECRET}"
-  },
   "is_init_test_company": true,
   "ddconfig": {
     "token": "jingli2016",
@@ -146,7 +136,6 @@
       "pass": "Jingli_2016"
     }
   },
-  "approveServerUrl": "${JL_APP_APPROVE_SERVER_URL}",
   "workWechat": {
     "corpId": "wwb398745b82d67068",
     "token": "xtz1KPDEbycN",
@@ -154,12 +143,6 @@
     "providerSecret": "kGNDfdXSuzdvAgHC5AC8jaRUjnybKH0LnVK05NPvCV4",
     "suiteId": "wwdb6efe49f6e236d3",
     "suiteSecret": "7GnoFq32hgkE27kkBFPZxeetnhyQxtFk2OvHFjtrW4I"
-  },
-  "tmcUrl": "${JL_APP_TMC}",
-  "tmcFake": "${JL_APP_TMC_FAKE}",
-  "orderSysConfig": {
-    "tripDetailMonitorUrl": "${JL_APP_TD_MONITORURL}",
-    "orderLink": "${JL_APP_ORDER_LINK}"
   },
   "isVerify": false
 }
