@@ -36,12 +36,14 @@ export default class WeChatController extends AbstractController {
             rawBody += chunk
         })
         req.on('end', () => {
+            if(rawBody == '') {
+                return res.sendStatus(403)
+            }
             new Parser().parseString(rawBody, (err, data) => {
                 const resp = crypto.decrypt(data.xml['Encrypt'][0])
                 return res.send(resp.message)
             })
         })
-        res.send(crypto.decrypt(echostr).message)
         // proxy.web(req, res, proxyTarget)
     }
 
@@ -62,6 +64,9 @@ export default class WeChatController extends AbstractController {
             rawBody += chunk
         })
         req.on('end', () => {
+            if(rawBody == '') {
+                return res.sendStatus(403)
+            }
             new Parser().parseString(rawBody, (err, data) => {
                 const resp = crypto.decrypt(data.xml['Encrypt'][0])
                 new Parser().parseString(resp.message, async (err, data) => {
