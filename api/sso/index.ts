@@ -2,15 +2,17 @@ import {Express} from "express";
 import {Request, Response} from "express-serve-static-core";
 import RedisCache from "../ddtalk/lib/redisCache";
 import { L } from '@jingli/language';
-import { Staff } from "_types/staff";
+import { Staff, EStaffStatus } from "_types/staff";
 import { Models } from "_types";
-import { CPropertyType } from "_types/company";
+import { CPropertyType, CompanyProperty, Company } from "_types/company";
 import * as error from "@jingli/error";
 import { RestApi } from "api/sso/libs/restApi";
-import {IAccessToken} from "./libs/restApi";
+import { IAccessToken, IWPermanentCode } from "./libs/restApi";
 import { WCompany } from "api/sso/libs/wechat-company";
 import { clientExport, requireParams } from '@jingli/dnode-api/dist/src/helper';
-import cache from 'common/cache'
+import cache from 'common/cache';
+import { Department } from "_types/department";
+let moment = require("moment");
 const API = require('@jingli/dnode-api')
 const config = require('@jingli/config')
 const axios = require('axios')
@@ -150,15 +152,61 @@ export class SSOModule {
             accessToken = result.access_token;
             await this.cache.set(cacheKey, value)
         }
-        if(!accessToken) throw("获取微信企业通讯录的access_token失败");
+        if(!accessToken) throw new error.NotFoundError("===>该企业不存在企业微信corpid或secret")
         return accessToken;
+    }
+
+
+    static async getPermanentCode(authCode) {
+        let suiteToken = await SSOModule.getSuiteToken();
+        let result: IWPermanentCode = await RestApi.getPermanentCode(suiteToken, authCode)
+        if(!result)
+            throw new error.NotFoundError("===>获取永久授权码失败")
+        let cacheKey = `wechat:contact:${result.corpId}:access_token`;  //企业通讯录的access_token
+        let staff: Staff = Staff.create({
+            name: result.authUserInfo.name,
+            staffStatus: EStaffStatus.ON_JOB
+        });
+        staff = await staff.save();
+        let company = Company.create({
+            name: result.corpName,
+            expiryDate : moment().add(1 , "months").toDate(),
+            mobile: result.authUserInfo.mobile,
+            createUser: staff.id
+        })
+        company = await company.save();
+        staff.companyId = company.id;
+        staff = await staff.save();
+
+        let department = Department.create({
+            name: result.corpName,
+            companyId: company.id
+        })
+        department = await department.save();
+        let companyProperty = CompanyProperty.create({
+            value: result.corpId,
+            type: CPropertyType.WECHAT_CORPID
+        })
+        companyProperty = await companyProperty.save();
     }
 }
 
 let sso = new SSOModule()
 export default sso;
 
-
+export interface IWPermanentCode {
+    accessToken: string,
+    permanentCode: string,
+    corpId: string, 
+    corpName: string,
+    authUserInfo: {
+        email: string,
+        mobile: string,
+        userId: string,
+        name: string,
+        avatar: string
+    }
+}
 
 // setTimeout(async () => {
 //     sso.syncOrganization();

@@ -1,6 +1,6 @@
 import { WStaff, IWStaff } from "api/sso/libs/wechat-staff";
 import { IWDepartment } from "api/sso/libs/wechat-department";
-
+import {Express} from "express-serve-static-core";
 var request = require("request-promise");
 
 
@@ -8,6 +8,8 @@ const enum EIteratorSwitch {
     ACCESS_ITERATABLE = 1,  //表示迭代获取
     ACCESS_NO_ITERATOR = 0  //不使用迭代获取，只获取当前
 }
+
+
 export class RestApi {
 
     access_token: string;
@@ -15,10 +17,37 @@ export class RestApi {
         this.access_token = access_token;
     }
 
+    /**
+     * @method 获取永久授权码
+     */
+    static async getPermanentCode(suiteToken: string, authCode: string): Promise<IWPermanentCode> {
+        let url = `https://qyapi.weixin.qq.com/cgi-bin/service/get_permanent_code?suite_access_token=${suiteToken}`;
+        let result: IWPermanentCodeResult = await reqProxy({
+            url,
+            method: 'POST',
+            body: {
+                auth_code: authCode 
+            }
+        });
+        return {
+            accessToken: result.access_token,
+            permanentCode: result.permanent_code,
+            corpId: result.auth_corp_info.corpid,
+            corpName: result.auth_corp_info.corp_name,
+            authUserInfo: {
+                email: result.auth_user_info.email,
+                mobile: result.auth_user_info.mobile,
+                userId: result.auth_user_info.userid,
+                name: result.auth_user_info.name,
+                avatar: result.auth_user_info.avatar,
+            }
+        } as IWPermanentCode;
+    }
+
     /**根据corpid和secret获取该公司的access_token */
     static async getAccessToken(corpid: string, secret: string): Promise<IAccessToken>{
-        // let url = `https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=${corpid}&corpsecret==${secret}`;
-        let url = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=wwb398745b82d67068&corpsecret=x51OLfe5UWqI5VEW2nXg6tAph5P8kPqmJ_RxtgnbPBE'
+        let url = `https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=${corpid}&corpsecret==${secret}`;
+        // let url = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=wwb398745b82d67068&corpsecret=x51OLfe5UWqI5VEW2nXg6tAph5P8kPqmJ_RxtgnbPBE'
         let result: IAccessToken = await reqProxy({
             url,
             method: 'GET'
@@ -196,4 +225,48 @@ export interface IAccessToken {
 export interface IWStaffResult extends IWStaff {
     errcode: number,
     errmsg: string
+}
+
+
+export interface IWPermanentCodeResult {
+    errcode: number,
+    errmsg: string,
+    access_token: string;
+    expires_in: number;
+    permanent_code: string;
+    auth_corp_info : {
+        corpid: string,
+        corp_name: string,
+        corp_type: string,
+        corp_square_logo_url: string,
+        corp_user_max: number,
+        corp_agent_max: number,
+        verified_end_time: number,
+        subject_type: number,
+        corp_wxqrcode: string
+    },
+    auth_info: {
+        agent: any
+    }
+    auth_user_info: {
+        email: string,
+        mobile: string,
+        userid: string,
+        name: string,
+        avatar: string
+    }
+}
+
+export interface IWPermanentCode {
+    accessToken: string,
+    permanentCode: string,
+    corpId: string, 
+    corpName: string,
+    authUserInfo: {
+        email: string,
+        mobile: string,
+        userId: string,
+        name: string,
+        avatar: string
+    }
 }
