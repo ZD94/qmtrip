@@ -3,7 +3,7 @@
  * 网信组织架构修改通知接口。
  */
 
-"use strict"
+/*"use strict"
 
 import {AbstractController, Restful, Router} from "@jingli/restful"
 import wangxEventHandFactory from "api/wangxin/lib/wangxEventHandler"
@@ -30,4 +30,4 @@ export class wangxinController extends AbstractController {
 
         }
     }
-}
+}*/

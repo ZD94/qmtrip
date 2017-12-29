@@ -69,7 +69,7 @@ export default class WangxCompany extends OaCompany{
             if(item.id == "1"){
                 let mobile = (item.tel || item.phone) ? (item.tel || item.phone) : null;
                 result = new WangxStaff({name: item.name, id: item.id, mobile: mobile, email: item.email, sex: item.sex,
-                    isAdmin: true, wangXinApi: self.wangXinApi});
+                    isAdmin: true, wangXinApi: self.wangXinApi, userCode: item.usercode});
             }
         })
         return result;

@@ -101,7 +101,8 @@ export default class WangxDepartment extends OaDepartment {
         let result: OaStaff[] = [];
         for(let u of users){
             let mobile = (u.tel || u.phone) ? (u.tel || u.phone) : null;
-            let oaStaff = new WangxStaff({id: u.id, name: u.name, email: u.email, mobile: mobile, company: self.company, wangXinApi: self.wangXinApi});
+            let oaStaff = new WangxStaff({id: u.id, name: u.name, email: u.email, mobile: mobile, company: self.company,
+                wangXinApi: self.wangXinApi, userCode: u.usercode});
             result.push(oaStaff);
         }
         return result;

@@ -92,6 +92,15 @@ export default class WangxStaff extends OaStaff {
         this.target.avatar = val;
     }
 
+    //网信特有属性
+    get userCode() {
+        return this.target.userCode;
+    }
+
+    set userCode(val: string) {
+        this.target.userCode = val;
+    }
+
     async getDepartments(): Promise<OaDepartment[]> {
         let self = this;
         let departments = await self.wangXinApi.getDeptByUser(self.id);
@@ -110,7 +119,8 @@ export default class WangxStaff extends OaStaff {
         let user = await self.wangXinApi.getUserById(self.id);
         if(user){
             let mobile = (user.tel || user.phone) ? (user.tel || user.phone) : null;
-            return new WangxStaff({id: user.id, name: user.name, email: user.email, mobile: mobile, company: self.company, wangXinApi: self.wangXinApi});
+            return new WangxStaff({id: user.id, name: user.name, email: user.email, mobile: mobile,
+                company: self.company, wangXinApi: self.wangXinApi, userCode: user.usercode});
         }
         return null
     }
@@ -121,8 +131,10 @@ export default class WangxStaff extends OaStaff {
         let wxUser = await self.wangXinApi.getUserById(self.id);
         let userInfo = JSON.stringify(wxUser);
         let staffWxInfoProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WANGXIN_USER_INFO, value: userInfo});
+        let userCodeProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WANGXIN_USER_CODE, value: self.userCode});
         await staffUuidProperty.save();
         await staffWxInfoProperty.save();
+        await userCodeProperty.save();
         return true;
     }
 

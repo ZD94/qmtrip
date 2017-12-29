@@ -1,70 +1,67 @@
-/**
- * Created by lei.liu on 2017/11/28
- * 网信相关工具类。包括token解析。
- */
-
 "use strict"
-import * as moment from "moment"
 import * as crypto from "crypto"
-import * as fs from "fs"
-import Logger from "@jingli/logger"
 
-const logger = new Logger("wangxinUtils")
-let privateKey: Buffer
-let publicKey: Buffer
 
 export default class WangxUtils {
 
-    static getPrivateKey(): Buffer {
+    static createLtpaToken(userName, expireHour, sharedSecret) {
+        let userNameBuf = new Buffer(userName);
+        let start = Math.floor(Date.now() / 1000);
+        let size = userNameBuf.length + 20;
 
-        if(privateKey == null)
-            privateKey = fs.readFileSync(`${__dirname}/rsaprivatekey.pem`)
+        let timeCreation = (start).toString(16).toUpperCase();
+        let timeExpiration = (start + expireHour * 60 * 60).toString(16).toUpperCase();
 
-        return privateKey
+        let ltpaToken = new Buffer(size);
+
+        ltpaToken.write("01020304", 0, 4,"hex");
+        ltpaToken.write(timeCreation, 4);
+        ltpaToken.write(timeExpiration, 12);
+        userNameBuf.copy(ltpaToken, 20);
+
+        console.info("ltpaToken===>>", ltpaToken);
+        console.info("ltpaToken===>>", ltpaToken.toString());
+        let kbts = new Buffer(sharedSecret, "base64");
+        let hash = crypto.createHash("sha1");
+        hash.update(ltpaToken);
+        hash.update(kbts);
+
+        let _ltpaToken = new Buffer(size + 20);
+        // Append the token hash
+        // _ltpaToken.write(ltpaToken.toString(), 0, size,"hex");
+        _ltpaToken.write("01020304", 0, 4,"hex");
+        _ltpaToken.write(timeCreation, 4);
+        _ltpaToken.write(timeExpiration, 12);
+        userNameBuf.copy(_ltpaToken, 20);
+        _ltpaToken.write(hash.digest("hex"), size, 20,"hex");
+        console.info("_ltpaToken===>>", _ltpaToken);
+        console.info("_ltpaToken===>>", _ltpaToken.toString());
+        return _ltpaToken.toString("base64");
     }
 
-    static getPublicKey(): Buffer {
-
-        if(publicKey == null)
-            publicKey = fs.readFileSync(`${__dirname}/rsapublickey.pem`)
-
-        return publicKey
-    }
-
-    /**
-     * 解析网信的LRToken。
-     * @param {string} token
-     * @returns {string}
-     */
-    static parseLRToken (token: string): string {
-
-        logger.info(`wangxin LRToken: ${token}`)
-
-        let privateKey: Buffer = WangxUtils.getPrivateKey()
-        let tokenBuffer = new Buffer(token,"hex")
-        //data的格式 creationTime(14位）+ username(长度可变）+ expirationTime(14位）+ uuid（32位）
-        let date = crypto.privateDecrypt(privateKey.toString(),tokenBuffer).toString()
-        let UUID = date.slice(-32) //data的最后32位为uuid
-        let expTimeStr = date.slice(-46,-32)
-        let name = date.slice(14,-46)
-        let expTime = moment(expTimeStr,"YYYYMMDDHHmmss")
-
-        if (expTime.valueOf() < Date.now())
-            throw new Error("token已经过期")
-
-        return UUID
-    }
-
-
-    static createLRToken (userName: string, UUID: string, expirationTime?: string): string {
+    static parseLtpaToken(token: string, key: string): string {
         try {
-            let publicKey: Buffer = WangxUtils.getPublicKey()
-            let creationTime = moment().format("YYYYMMDDHHmmss")
-            expirationTime = expirationTime || moment().add(1,"days").format("YYYYMMDDHHmmss")
-            let data = creationTime + userName + expirationTime + UUID
-            let encryptBuffer = crypto.publicEncrypt(publicKey.toString(),new Buffer(data))
-            let token = encryptBuffer.toString("hex");
-            return token
+            token = new Buffer(token,"base64").toString()
+
+            let dateStr = token.slice(0,-20)
+            let expirationTime = parseInt(dateStr.slice(12,20),16)
+            if (expirationTime * 1000 < Date.now())
+                throw new Error("token过期")
+
+            let hash1 = token.slice(-20)
+            let kbts = new Buffer(key, "base64");
+            let hash = crypto.createHash("sha1");
+            hash.update(new Buffer(dateStr));
+            hash.update(kbts);
+            let hash2 = new Buffer(20);
+            hash2.write(hash.digest("hex"), 0, 20,"hex");
+
+            console.info("_ltpaToken==", hash2.toString());
+            console.info(hash1 == hash2.toString());
+            if (hash1 != hash2.toString())
+                throw new Error("token不正确")
+
+            return dateStr.slice(20)
         } catch (err) {
             console.error(err)
             throw err

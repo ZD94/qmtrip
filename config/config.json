@@ -122,5 +122,6 @@
     }
   },
   "approveServerUrl": "${JL_APP_APPROVE_SERVER_URL}",
-  "wxSysCode": "30b3e212-2821-4039-b711-40624201cbeb"
+  "wxSysCode": "30b3e212-2821-4039-b711-40624201cbeb",
+  "wxSharedSecret": "ZjBmMjU0NzAtMWI3Yi0xMWU3LTk4NzUtYTdkOWQ4MmY="
 }

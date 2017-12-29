@@ -36,23 +36,16 @@ export default class WangXin {
         let wangxCompany = new WangxCompany({id: companyId})
         let company = await wangxCompany.getCompany()
         if (company) {
-            let UUID = WangxUtils.parseLRToken(token) //解析token获取UUID，根据uuId通过staffPro获取用户信息。
-            let staffPro = await Models.staffProperty.find({where: {value: UUID, type: SPropertyType.WANGXIN_ID}})
+            let userCode = WangxUtils.parseLtpaToken(token, C.wxSharedSecret) //解析token获取用户信息。
+            let staffPro = await Models.staffProperty.find({where: {value: userCode, type: SPropertyType.WANGXIN_USER_CODE}})
             let staff: Staff
             if (staffPro && staffPro.length > 0) {
-                for(let sp of staffPro) { // 针对一个UUID对应多个company的情况，钉钉会存在，网信不确定。
-                    let temStaff = await Models.staff.get(sp.staffId)
-                    let staffComPro = await Models.staffProperty.find({where: {value: companyId, type: SPropertyType.WANGXIN_COMPANY_ID}})
-                    if (staffComPro && staffComPro.length) {
-                        staff = temStaff
-                        break;
-                    }
-                }
+                staff = await Models.staff.get(staffPro[0].staffId)
             }
-            if (staff == null) {
+            if (!staff) {
                 throw L.ERR.UNAUTHORIZED()
             }
-            logger.info(`网信自动登录，uuid: ${UUID}, accountId: ${staff.accountId}`)
+            logger.info(`网信自动登录，uuid: ${userCode}, accountId: ${staff.accountId}`)
             return await API.auth.makeAuthenticateToken(staff.accountId, "wangxin")
         } else {
             throw L.ERR.COMPANY_NOT_EXIST();
@@ -79,11 +72,11 @@ export default class WangXin {
                 }
 
             }else{
-                let wxSuperAdmin = await wangXinApi.getUserById("1");
+                let wxSuperAdmin = await wangXinApi.getUserById("91484");
                 if(wxDepartment && wxDepartment.length && wxSuperAdmin){
                     let mobile = wxSuperAdmin.tel || wxSuperAdmin.phone;
                     let userName = wxSuperAdmin.name;
-                    let pwd = "123456";
+                    let pwd = "000000";
                     let result = await API.company.registerCompany({mobile, name, pwd, userName});
                     company = result.company;
                 }
