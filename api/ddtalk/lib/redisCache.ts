@@ -28,4 +28,4 @@ class RedisCache implements DDTalkCache {
     }
 }
 
-export= RedisCache
+export default RedisCache

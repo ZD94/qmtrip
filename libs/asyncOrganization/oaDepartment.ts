@@ -37,6 +37,8 @@ export abstract class OaDepartment{
     async getDepartment(): Promise<Department>{
         let self = this;
         let department: Department = null;
+        if(typeof self.id != 'string')
+            self.id = self.id + '';
         let deptPro = await Models.departmentProperty.find({where : {value: self.id}});
         if(deptPro && deptPro.length > 0){
             department = await Models.department.get(deptPro[0].departmentId);
@@ -60,11 +62,18 @@ export abstract class OaDepartment{
         return true;
     }
 
+    /**
+     * @method 
+     * @param params 
+     */
     async sync(params?:{company?: Company, oaDepartment?: OaDepartment, from?: string}): Promise<Department>{
         console.info(this.name, "department sync begin==================================");
         if(!params) params = {};
         let self = params.oaDepartment || this;
         let company = self.company;
+
+        company = await Models.company.get(company.id);
+   
         let from = params.from;
         if(params.company){
             company = params.company;
@@ -80,8 +89,14 @@ export abstract class OaDepartment{
         let result: Department;
 
         let defaultDepartment = await company.getDefaultDepartment();
+        
+        // let defaultDepartment = {
+        //     id: '2b957be0-ec5d-11e7-8e63-578dfebe62c6'
+        // }
+        let parentDepartment: Department;    //极端情况：parentDepartment 记录根部门的上级，若不存在，则为本系统的默认部门
 
-        let parentDepartment: Department;
+        // let parentDepartment: any; 
+
         let oaParent = await self.getParent();
 
         if(!oaParent || !oaParent.id){
@@ -92,7 +107,6 @@ export abstract class OaDepartment{
                 parentDepartment = defaultDepartment;
             }
         }
-
         if(parentDepartment || (!parentDepartment && !defaultDepartment)){
             let alreadyDepartment = await self.getDepartment();
             if(alreadyDepartment){
@@ -105,8 +119,19 @@ export abstract class OaDepartment{
                 alreadyDepartment.name = self.name;//同步已有部门信息
                 result = await alreadyDepartment.save();
             }else{
-                // 不存在，添加
-                let dept =  Department.create({name: self.name});
+                /**
+                 * 鲸力系统不存在第三方系统的部门， 则创建，同时注意对于在鲸力系统已经注册的公司，
+                 * 此时的根部门及为公司名，同步微信通讯录时无需创建多个根部门
+                 */ 
+                let dept: Department;
+                let depts = await Models.department.find({
+                    where: {
+                        companyId: company.id,
+                        name: self.name
+                    }
+                });
+                if(depts && depts.length) dept = depts[0];
+                if (!dept) dept =  Department.create({name: self.name});
                 dept.company = company;
                 if(parentDepartment){
                     dept.parent = parentDepartment;
@@ -186,13 +211,10 @@ export abstract class OaDepartment{
                     }
                 }
             }
-
         }else{
             //父级部门不存在同步父级部门
             // await oaParent.sync({company: company});
         }
-        console.info(this.name, "department sync end==================================");
-
         return result;
     }
 
