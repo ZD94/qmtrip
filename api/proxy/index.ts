@@ -246,11 +246,13 @@ class Proxy {
                         companyid,
                         accountid
                     }
-                }, (err, resp, result) => {
+                }, (err, resp, body) => {
                     if (err) {
+                        console.log("-=========>err: ", err);
                         reject(err);
                     }
-                    resolve(result);
+                    console.log("-=========>body: ", body);
+                    resolve(body);
                 });
             });
             console.log("===mall===result: ", result)
