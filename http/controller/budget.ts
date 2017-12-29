@@ -18,6 +18,7 @@ export class BudgetController extends AbstractController {
     }
 
     $isValidId(id: string) {
+        console.log("here .. ");
         return /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(id);
     }
 
@@ -65,17 +66,10 @@ export class BudgetController extends AbstractController {
     @Router('/:approveId/updateBudget', 'POST') 
     async updateBudget(req, res, next) {
         let _budgets = req.body;
-
         let approveId = req.params.approveId;
-        res.json(this.reply(0, null));
          
-        try{
-            let updateBudget = await API['travelBudget'].updateBudget({approveId: approveId, budgets: _budgets});
-
-        }catch(err){
-            console.log('err', err);
-        }
-
+        let updateBudget = await API['travelBudget'].updateBudget({approveId: approveId, budgetResult: _budgets});
+        res.json(this.reply(0, null));
     }
 
     @Router('/getBudgetInfo', "POST")

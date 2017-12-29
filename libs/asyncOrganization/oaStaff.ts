@@ -104,20 +104,16 @@ export  abstract class OaStaff{
                 company = await self.getCompany();
             }
             let type = await company.getOaType();
-            /*if(!company){
-                let staff = await Staff.getCurrent();
-                company = staff.company;
-            }*/
             if(!company){
                 throw L.ERR.INVALID_ACCESS_ERR();
             }
 
             let defaultDepartment = await company.getDefaultDepartment();
-            let defaultTravelPolicy = await company.getDefaultTravelPolicy();
+            /*let defaultTravelPolicy = await company.getDefaultTravelPolicy();
 
             if (!defaultTravelPolicy) {
                 throw L.ERR.ERROR_CODE_C(500, `企业默认差旅标准还未设置`);
-            }
+            }*/
             let companyCreateUser = await Models.staff.get(company.createUser);
 
             let newDepartments: Department[] = [];
@@ -128,16 +124,6 @@ export  abstract class OaStaff{
             if(!oaDepartments || !oaDepartments.length){
                 newDepartments.push(defaultDepartment)
             }else{
-                /*let roleId;
-                let pwd;
-                let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd)});
-                // staff.setTravelPolicy(defaultTravelPolicy.id);
-                staff.travelPolicyId = defaultTravelPolicy.id;
-                staff.company = company;
-                staff.staffStatus = EStaffStatus.ON_JOB;
-                staff.addWay = EAddWay.OA_SYNC;
-                staff = await staff.save();
-                await self.saveStaffProperty({staffId: staff.id});*/
                 let oaDepartmentIds = await Promise.all(oaDepartments.map(async (item) => {
                     let department = await item.getDepartment();
                     if(!department){
@@ -159,7 +145,8 @@ export  abstract class OaStaff{
             if(self.isAdmin) roleId = EStaffRole.ADMIN;
             if(!alreadyStaff){
 
-                if(type == CPropertyType.LDAP && companyCreateUser.mobile == self.mobile){
+                if((self.mobile && type == CPropertyType.LDAP && companyCreateUser.mobile == self.mobile) ||
+                    (type == CPropertyType.WANGXIN_ID && companyCreateUser.mobile == self.mobile)){
 
                     alreadyStaff = companyCreateUser;
                     await self.saveStaffProperty({staffId: alreadyStaff.id});
@@ -167,8 +154,7 @@ export  abstract class OaStaff{
                 }else{
                     // 不存在，添加
                     let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd), avatar: self.avatar});
-                    // staff.setTravelPolicy(defaultTravelPolicy.id);
-                    staff.travelPolicyId = defaultTravelPolicy.id;
+                    // staff.travelPolicyId = defaultTravelPolicy.id;
                     staff.company = company;
                     staff.staffStatus = EStaffStatus.ON_JOB;
                     staff.addWay = EAddWay.OA_SYNC;
