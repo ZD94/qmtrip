@@ -158,6 +158,7 @@ deploy:release:
     - echo deploy to https://j.jingli365.com
     - ssh test@j.jingli365.com /home/test/bin/docker_start.sh $DOCKER_REG $DOCKER_NAME $CI_COMMIT_REF_SLUG
 
+
 deploy:tester:
   stage: deploy
   when: manual
