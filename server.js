@@ -133,3 +133,4 @@ process.on('unhandledRejection', (reason, p) => {
     logger.error(reason);
 });
 
+require("./libs/patch-scrub-error");

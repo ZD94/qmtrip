@@ -49,6 +49,14 @@ export default class DdDepartment extends OaDepartment {
         this.target.company = val;
     }
 
+    get manager() {
+        return this.target.company;
+    }
+
+    set manager(val: any) {
+        this.target.manager = val;
+    }
+
     //钉钉特有属性
     get corpId() {
         return this.target.corpId;

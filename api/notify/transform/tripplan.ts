@@ -3,9 +3,7 @@
  */
 import {Models} from "_types";
 import {EApproveResult} from "_types/tripPlan";
-
-var moment = require("moment");
-require('moment-timezone');
+import moment = require("moment-timezone");
 var API = require('@jingli/dnode-api');
 
 export = async function transform(values: any): Promise<any>{
