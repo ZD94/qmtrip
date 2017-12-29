@@ -109,8 +109,6 @@
     "appKey": "3fFDdkKxibDiRjwy9DqaPwasvAup",
     "appSecret": "2FaLAocgDodNqCFa9PU8cyCk4Fnw"
   },
-<<<<<<< HEAD
-=======
   "mall": {
     "orderLink": "${JL_APP_MALL_ORDER_LINK}",
     "appId": "${JL_APP_MALL_APP_ID}",
@@ -126,7 +124,6 @@
     "appId": "${JL_APP_PERMISSION_APP_ID}",
     "appSecret": "${JL_APP_PERMISSION_APP_SECRET}"
   },
->>>>>>> 15d101ae77808b66f450673cd8bb824eef32836d
   "is_init_test_company": true,
   "ddconfig": {
     "token": "jingli2016",
@@ -154,12 +151,9 @@
       "pass": "Jingli_2016"
     }
   },
-<<<<<<< HEAD
-=======
   "approveServerUrl": "${JL_APP_APPROVE_SERVER_URL}",
   "wxSysCode": "30b3e212-2821-4039-b711-40624201cbeb",
   "wxSharedSecret": "ZjBmMjU0NzAtMWI3Yi0xMWU3LTk4NzUtYTdkOWQ4MmY=",
->>>>>>> 15d101ae77808b66f450673cd8bb824eef32836d
   "workWechat": {
     "corpId": "wwb398745b82d67068",
     "token": "xtz1KPDEbycN",

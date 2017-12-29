@@ -407,7 +407,7 @@ class DDTalk {
     static async loginByWechatCode(params: { code: string }) {
         const userId = await API.sso.getUserInfo(params)
         const staffProperties = await Models.staffProperty.find({
-            where: { type: SPropertyType.WX_ID, value: userId}
+            where: { type: SPropertyType.WECHAT_UID, value: userId}
         })
         if(staffProperties.length < 1) throw L.ERR.USER_NOT_EXIST()
         const staff = await Models.staff.get(staffProperties[0].staffId)
