@@ -287,6 +287,7 @@ class Proxy {
                     }
                 }, (err, resp, result) => {
                     if (err) {
+                        console.log(err)
                         reject(err);
                     }
                     resolve(result);
