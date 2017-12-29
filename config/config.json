@@ -162,11 +162,5 @@
     "suiteId": "wwdb6efe49f6e236d3",
     "suiteSecret": "7GnoFq32hgkE27kkBFPZxeetnhyQxtFk2OvHFjtrW4I"
   },
-  "tmcUrl": "${JL_APP_TMC}",
-  "tmcFake": "${JL_APP_TMC_FAKE}",
-  "orderSysConfig": {
-    "tripDetailMonitorUrl": "${JL_APP_TD_MONITORURL}",
-    "orderLink": "${JL_APP_ORDER_LINK}"
-  },
   "isVerify": false
 }
