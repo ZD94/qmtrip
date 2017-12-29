@@ -148,10 +148,10 @@ export abstract class OaDepartment{
                 let oaStaffs = await self.getStaffs();
                 let oaStaffsMap = {};
                 if (oaStaffs && oaStaffs.length > 0) {
-                    await Promise.all(oaStaffs.map(async (item) => {
+                    for(let item of oaStaffs){
                         oaStaffsMap[item.id] = item;
-                        let ret = await item.sync({company: company});
-                    }))
+                        await item.sync({company: company});
+                    }
                 }
 
                 //3、删除被删除的员工
@@ -206,9 +206,9 @@ export abstract class OaDepartment{
 
                 //5、递归同步子部门信息
                 if(childrenDepartments && childrenDepartments.length > 0){
-                    await Promise.all(childrenDepartments.map(async (item) => {
-                        await this.sync({company: company, oaDepartment: item});
-                    }))
+                    for(let child of childrenDepartments){
+                        await child.sync({company: company});
+                    }
                 }
             }
         }else{
