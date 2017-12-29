@@ -7,31 +7,59 @@ import { RestApi } from "api/sso/libs/restApi";
 import { Company, CPropertyType, CompanyProperty } from "_types/company";
 import { WDepartment, IWDepartment } from "api/sso/libs/wechat-department";
 import { Staff } from "_types/staff";
+import { Models } from "_types";
 
 const RootDepartment = 1;
 export class WCompany extends OaCompany {
     id: string;
     name: string;
     restApi: RestApi;
+    company: Company;
 
     constructor(target: any) {
         super(target);
+        this.name = target.name;
+        this.id = target.id
         this.restApi = target.restApi;
+        this.company = target.company;
     }
     
     get secret() {
         return this.target.secret;
     }
 
+    async getCompany(): Promise<Company>{
+        let self = this;
+        let com: Company = null;
+        if(typeof self.id != 'string') 
+            self.id = self.id + '';
+        let comPro = await Models.companyProperty.find({where : {value: self.id}});
+        if(comPro && comPro.length > 0){
+            com = await Models.company.get(comPro[0].companyId);
+        }
+        return com;
+    }
+
     async getDepartments(): Promise<OaDepartment[]> {
         let self = this;
         let staff = await Staff.getCurrent();
+
+        // if(!staff) staff = await Models.staff.get("2eaf0b60-ec72-11e7-a61b-6dc8f39f777e");   //测试
         let wDepartments: Array<IWDepartment> = await self.restApi.getDepartments();
         let result: OaDepartment[];
+
         wDepartments.forEach((item: IWDepartment) => {
-            let wDept = new WDepartment({name: item.name, parentId: item.parentid, id: item.id,company: staff.company, restApi: self.restApi});
+            let wDept = new WDepartment({
+                name: item.name, 
+                parentId: item.parentid + '', 
+                id: item.id + '',
+                corpId: self.id,
+                company: staff.company, 
+                restApi: self.restApi
+            });
             result.push(wDept);
         });
+        if(!result) return null;
         return result;
     }
 
@@ -43,13 +71,22 @@ export class WCompany extends OaCompany {
     async getRootDepartment(): Promise<OaDepartment> {
         let self = this;
         let staff = await Staff.getCurrent();
+        // if(!staff) staff = await Models.staff.get("2eaf0b60-ec72-11e7-a61b-6dc8f39f777e");   //测试
         let wDepartments: Array<IWDepartment> = await self.restApi.getDepartments();
         let result: OaDepartment;
-        wDepartments.forEach((item: IWDepartment) => {
-            if(item.id == RootDepartment){
-                result = new WDepartment({name: item.name, parentId: null, id: item.id, company: staff.company, restApi: self.restApi});
+        for(let i = 0; i < wDepartments.length; i++) {
+            if(wDepartments[i].id == RootDepartment){
+                result = new WDepartment({
+                    name: wDepartments[i].name, 
+                    parentId: null, 
+                    id: wDepartments[i].id + '', 
+                    corpId: self.id,
+                    company: staff.company, 
+                    restApi: self.restApi,
+                });
+                return result;
             }
-        })
+        }
         if(!result) return null;
         return result;
     }

@@ -13,55 +13,62 @@ export interface IWDepartment {
 }
 
 export class WDepartment extends OaDepartment {
-    get id() {
-        return this.target.id;
-    }
+    id: string;
+    name: string;
+    parentId: string;
+    company: Company;
 
-    set id(val: string) {
-        this.target.id = val;
-    }
+    // get id() {
+    //     return this.target.id;
+    // }
 
-    get name() {
-        return this.target.name;
-    }
+    // set id(val: string) {
+    //     this.target.id = val;
+    // }
 
-    set name(val: string) {
-        this.target.name = val;
-    }
+    // get name() {
+    //     return this.target.name;
+    // }
 
-    get manager() {
-        return this.target.manager;
-    }
+    // set name(val: string) {
+    //     this.target.name = val;
+    // }
 
-    set manager(val: string) {
-        this.target.manager = val;
-    }
+    // get parentId() {
+    //     return this.target.parentId;
+    // }
 
-    get parentId() {
-        return this.target.parentId;
-    }
+    // set parentId(val: string) {
+    //     this.target.parentId = val;
+    // }
 
-    set parentId(val: string) {
-        this.target.parentId = val;
-    }
+    // get company() {
+    //     return this.target.company;
+    // }
 
-    get company() {
-        return this.target.company;
-    }
+    // set company(val: Company) {
+    //     this.target.company = val;
+    // }
 
-    set company(val: Company) {
-        this.target.company = val;
-    }
+    // get corpId(){
+    //     return this.target.corpId;
+    // }
+
+    // set corpId(val: string){
+    //     this.target.corpId = val;
+    // }
 
     restApi: RestApi;
-
-    get corpId(){
-        return this.target.corpId;
-    }
-
+    manager: string;
+    corpId: string;
     constructor(target: any) {
         super(target);
-        this.restApi = target.id;
+        this.restApi = target.restApi;
+        this.corpId = target.corpId;
+        this.company = target.company;
+        this.parentId = target.parentId;
+        this.name = target.name;
+        this.id = target.id;
     }
 
     async getChildrenDepartments(): Promise<OaDepartment[]> {
@@ -72,8 +79,14 @@ export class WDepartment extends OaDepartment {
         if(result && result.length){
             for(let i = 0; i < result.length; i++) {
                 if(result[i].id && result[i].id.toString() != self.parentId) {
-                    childDepartments.push(new WDepartment({id: result[i].id, name: result[i].name, corpId: self.corpId, restApi: self.restApi, 
-                           company: self.company, parentId: result[i].parentid}));
+                    childDepartments.push(new WDepartment({
+                        id: result[i].id, 
+                        name: result[i].name, 
+                        corpId: self.corpId, 
+                        restApi: self.restApi,      
+                        company: self.company, 
+                        parentId: result[i].parentid
+                    }));
                 }
             }
         }
@@ -85,15 +98,24 @@ export class WDepartment extends OaDepartment {
      */
     async getParent(): Promise<OaDepartment> {
         let self = this;
+        let dept: WDepartment;
         if(self.parentId){
             let result: Array<IWDepartment> = await self.restApi.getDepartments(self.parentId);
-            if(result && result.length){
-                for(let i = 0; i < result.length; i++) {
-                    if(result[i].id && result[i].id.toString() == self.parentId) {
-                        return new WDepartment({id: result[i].id, name: result[i].name, corpId: self.corpId, restApi: self.restApi,
-                            company: self.company, parentId: result[i].parentid});
-                    }  
-                }
+            if(!result || result.length == 0){
+                return null;
+            }
+            for(let i = 0; i < result.length; i++) {
+                if(result[i].id && result[i].id.toString() == self.parentId) {
+                    dept =  new WDepartment({
+                        id: result[i].id, 
+                        name: result[i].name, 
+                        corpId: self.corpId, 
+                        restApi: self.restApi,
+                        company: self.company, 
+                        parentId: result[i].parentid
+                    });
+                    return dept;
+                }  
             }
         }
         return null;
@@ -108,10 +130,17 @@ export class WDepartment extends OaDepartment {
         let result: OaStaff[] = [];
         for(let u of wStaffs){
             if(u.enable == EStaffStatus.ENABLE) {
-                let wstaff = new WStaff({id: u.userid, name: u.name, email: u.email, mobile: u.mobile, departmentIds: u.department, corpId: self.corpId,
-                    restApi: self.restApi, company: self.company, avatar: u. avatar_mediaid});
-             // let oaStaff = new WStaff({id: u.userid, isAdmin: u.isAdmin, name: u.name, email: u.email, mobile: u.mobile, departmentIds: u.department,
-             //     corpId: self.corpId, isvApi: self.isvApi, corpApi: self.corpApi, company: self.company, avatar: u.avatar});
+                let wstaff = new WStaff({
+                    id: u.userid, 
+                    name: u.name, 
+                    email: u.email, 
+                    mobile: u.mobile, 
+                    departmentIds: u.department, 
+                    corpId: self.corpId,
+                    restApi: self.restApi, 
+                    company: self.company,
+                    avatar: u. avatar_mediaid
+                });
                  result.push(wstaff);
             }
         }

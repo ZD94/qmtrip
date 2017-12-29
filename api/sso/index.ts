@@ -11,13 +11,6 @@ import { RestApi } from "api/sso/libs/restApi";
 import {IAccessToken} from "./libs/restApi";
 import { WCompany } from "api/sso/libs/wechat-company";
 
-
-import * as CLS from 'continuation-local-storage';
-let CLSNS = CLS.getNamespace('dnode-api-context');
-var API = require("@jingli/dnode-api");
-var events = require("events");
-
-
 const axios = require('axios')
 const PROVIDER_TOKEN_URL = `https://qyapi.weixin.qq.com/cgi-bin/service/get_provider_token`
 const CORP_ID = 'wwb398745b82d67068'
@@ -49,16 +42,15 @@ var EXPIREDATE = 7200; //微信access_token的失效时间是7200秒
      * @method 同步微信企业组织架构
      */
     async syncOrganization() {
-        console.log("========同步微信企业通讯录")
         let {corpId, secret} = await  this.verifyWechatCompany();
         let accessToken = await this.getAccessToken(corpId, secret);
-
         let restApi = new RestApi(accessToken);
-        
         let staff = await Staff.getCurrent();
-        if(!staff) staff = await Models.staff.get("a9df54d0-ec3f-11e7-9662-7d53e2954166");  
+
+
+        // if(!staff) staff = await Models.staff.get("2eaf0b60-ec72-11e7-a61b-6dc8f39f777e");   //测试
         let company = await Models.company.get(staff.companyId);
-        let wCompany = new WCompany({ id: corpId, name: company.name, restApi,});
+        let wCompany = new WCompany({ id: corpId, name: company.name, restApi, company: company});
         await wCompany.sync();
     }
 
@@ -69,7 +61,7 @@ var EXPIREDATE = 7200; //微信access_token的失效时间是7200秒
     async verifyWechatCompany(): Promise<{corpId: string, secret: string}> {
         let staff = await Staff.getCurrent();
         //forTest
-        if(!staff) staff = await Models.staff.get("a9df54d0-ec3f-11e7-9662-7d53e2954166");  
+        // if(!staff) staff = await Models.staff.get("2eaf0b60-ec72-11e7-a61b-6dc8f39f777e");  //测试
 
         let company = staff.company;
         let wechatProperty = await Models.companyProperty.find({
@@ -78,7 +70,7 @@ var EXPIREDATE = 7200; //微信access_token的失效时间是7200秒
             }
         });
         if(!wechatProperty || !wechatProperty.length)
-            throw new error.NotPermitError("该企业暂未绑定企业微信");
+            throw new error.NotFoundError("===>该企业不存在企业微信corpid或secret")
         let corpid: string;
         let secret: string;
         for(let i =0; i < wechatProperty.length; i++){
@@ -90,7 +82,7 @@ var EXPIREDATE = 7200; //微信access_token的失效时间是7200秒
             }
         }
         if(!corpid || !secret) {
-            throw new Error("===>该企业暂未绑定企业微信")
+            throw new error.NotFoundError("===>该企业不存在企业微信corpid或secret")
         }
         return {
             corpId:corpid,
@@ -114,9 +106,7 @@ var EXPIREDATE = 7200; //微信access_token的失效时间是7200秒
         let accessToken: string;
         if(cacheResult) accessToken = cacheResult.accessToken;
         if(!cacheResult || (Date.now() - cacheResult.expired > 0)) {
-            console.log("-=======>token: ", corpId, secret)
             let result: IAccessToken = await RestApi.getAccessToken(corpId, secret);
-            console.log("-=======>token: ",result)
             if(!result) return null;
             let value = {
                 accessToken: result.access_token,
@@ -134,14 +124,7 @@ let sso = new SSOModule()
 export default sso;
 
 
-// let eventEmitter = new events.EventEmitter();
-// eventEmitter.once("syncOrganization", async () => {
+
+// setTimeout(async () => {
 //     sso.syncOrganization();
-// })
-
-// eventEmitter.emit("syncOrganization")
-
-
-setTimeout(async () => {
-    sso.syncOrganization();
-}, 30 * 1000)
+// }, 15 * 1000)

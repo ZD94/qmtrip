@@ -8,6 +8,7 @@ import { WDepartment, IWDepartment } from "api/sso/libs/wechat-department";
 var corpId = 'wwb398745b82d67068'
 var suiteId ='wwcd27af224b6e42e8';
 var secret = 'P2MJM1phbwSZiul9wE7XAjmEOqBHTOpUKulfI0gPKR0';
+
 export class WStaff extends OaStaff {
     get id() {
         return this.target.id;
@@ -104,15 +105,15 @@ export class WStaff extends OaStaff {
         let self = this;
         let departments: Array<WDepartment> = [];
         if(self.departmentIds) {
-            departments = self.departmentIds.map(async (deptId: string) => {
-                let wdept: Array<IWDepartment> = await self.restApi.getDepartments(deptId);
+            self.departmentIds.map(async (deptId: number) => {
+                let wdept: Array<IWDepartment> = await self.restApi.getDepartments(deptId.toString());
                 if(wdept && wdept.length) {
                     for(let i = 0; i < wdept.length; i++){
-                        if(wdept[i].id && wdept[i].id.toString() == deptId) {
-                            return new WDepartment({id: wdept[i].id, name: wdept[i].name, corpId: self.corpId, restApi: self.restApi,
+                        if(wdept[i].id && wdept[i].id.toString() == deptId.toString()) {
+                            let dept= new WDepartment({id: wdept[i].id, name: wdept[i].name, corpId: self.corpId, restApi: self.restApi,
                                 company: self.company, parentId: wdept[i].parentid})
+                            departments.push(dept);
                         }
-                        return null;
                     }
                 }
             });
@@ -121,11 +122,14 @@ export class WStaff extends OaStaff {
             if(dept) return true;
             return false;
         })
+        if(!departments) return null;
         return departments;
     }
 
     async getSelfById(): Promise<OaStaff> {
         let self = this;
+        if(typeof self.id != 'string')
+            self.id = self.id + '';
         let userInfo: IWStaff = await self.restApi.getStaff(self.id);
         let oaStaff = new WStaff({id: userInfo.userid, name: userInfo.name, mobile: userInfo.mobile,
             email: userInfo.email, departmentIds: userInfo.department, corpId: self.corpId, company: self.company,

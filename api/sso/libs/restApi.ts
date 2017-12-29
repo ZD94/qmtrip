@@ -11,7 +11,9 @@ const enum EIteratorSwitch {
 export class RestApi {
 
     access_token: string;
-    constructor(access_token: string){}
+    constructor(access_token: string){
+        this.access_token = access_token;
+    }
 
     /**根据corpid和secret获取该公司的access_token */
     static async getAccessToken(corpid: string, secret: string): Promise<IAccessToken>{
@@ -74,6 +76,7 @@ export class RestApi {
                 access_token: this.access_token
             }
             if(id) qs['id'] = id;
+            console.log("=====this department: ", qs, url)
             let result: IDepartmentResult = await reqProxy({
                 url,
                 method: 'GET',
@@ -147,9 +150,7 @@ async function reqProxy(params: {
     let result;
     let options
     try{
-        console.log("=====url: ", url)
         result = await request({ url, method, body, qs, json: true});
-        console.log("=====result: ", result)
     }catch(err) {
         if(err)
             throw new Error(err);
