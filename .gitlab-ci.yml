@@ -106,10 +106,10 @@ deploy:test:
     JL_APP_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1/tmc
     JL_APP_CLOUD_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_CLOUD_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_MALL_ORDER_LINK: https://t.jingli365.com/svc
+    JL_APP_MALL_ORDER_LINK: https://l.jingli365.com/svc
     JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_BILL_ORDER_LINK: https://t.jingli365.com/svc/java-jingli-order1
+    JL_APP_BILL_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1
     JL_APP_BILL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92  
     JL_APP_BILL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
     JL_APP_PERMISSION_ORDER_LINK: https://t.jingli365.com/svc
@@ -137,23 +137,20 @@ deploy:release:
     JL_APP_CLOUDAPI: https://j.jingli365.com/cloud/api/v1
     JL_APP_CLOUD: https://j.jingli365.com/cloud
     JL_APP_APPROVE_SERVER_URL: https://j.jingli365.com/proj/svr-trip-approve/api/v1
-<<<<<<< HEAD
     JL_APP_TMC: http://j.jingli365.com/proj/svr-tmc
     JL_APP_TMC_FAKE: 0
     JL_APP_TD_MONITORURL: https://j.jingli365.com/proj/old-qmtrip/api/v1/tripDetail
     JL_APP_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1/tmc
-    JL_APP_MALL_ORDER_LINK: https://j.jingli365.com/svc
+    JL_APP_MALL_ORDER_LINK: https://l.jingli365.com/svc
     JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_BILL_ORDER_LINK: https://j.jingli365.com/svc/java-jingli-order1
+    JL_APP_BILL_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1
     JL_APP_BILL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92  
     JL_APP_BILL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_PERMISSION_ORDER_LINK: https://j.jingli365.com/svc
+    JL_APP_PERMISSION_ORDER_LINK: https://l.jingli365.com/svc
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-=======
 
->>>>>>> demo
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
@@ -207,13 +204,13 @@ deploy:tester:
     JL_APP_TMC_FAKE: 0
     JL_APP_TD_MONITORURL: https://t.jingli365.com/proj/old-qmtrip/api/v1/tripDetail
     JL_APP_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1/tmc
-    JL_APP_MALL_ORDER_LINK: https://t.jingli365.com/svc
+    JL_APP_MALL_ORDER_LINK: https://l.jingli365.com/svc
     JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_BILL_ORDER_LINK: https://t.jingli365.com/svc/java-jingli-order1
+    JL_APP_BILL_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1
     JL_APP_BILL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92  
     JL_APP_BILL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_PERMISSION_ORDER_LINK: https://t.jingli365.com/svc
+    JL_APP_PERMISSION_ORDER_LINK: https://l.jingli365.com/svc
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
   script:
