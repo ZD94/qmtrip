@@ -289,6 +289,7 @@ class Proxy {
                 params = req.query;
             }
             let appSecret = config.bill.appSecret;
+            let staff = await Models.staff.get(staffid)
             let pathstring = req.path;
             let timestamp = Math.floor(Date.now()/1000);
             pathstring = pathstring.replace("/bill", '');
