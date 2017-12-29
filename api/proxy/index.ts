@@ -248,6 +248,7 @@ class Proxy {
             if(req.method == 'GET') {
                 params = req.query;
             }
+            let staff = await Models.staff.get(staffid);
             let appSecret = config.mall.appSecret;
             let pathstring = req.path;
             let timestamp = Math.floor(Date.now()/1000);
@@ -288,6 +289,7 @@ class Proxy {
                 params = req.query;
             }
             let appSecret = config.bill.appSecret;
+            let staff = await Models.staff.get(staffid)
             let pathstring = req.path;
             let timestamp = Math.floor(Date.now()/1000);
             pathstring = pathstring.replace("/bill", '');
@@ -304,9 +306,9 @@ class Proxy {
                     headers: {
                         sign: sign,
                         appid: config.bill.appId,
-                        staffid, 
-                        companyid,
-                        accountid
+                        staffid: staff.id, 
+                        companyid: staff.companyId,
+                        accountid: staff.accountId
                     }
                 }, (err, resp, result) => {
                     if (err) {
@@ -326,6 +328,7 @@ class Proxy {
             if(req.method == 'GET') {
                 params = req.query;
             }
+            let staff = await Models.staff.get(staffid);
             let appSecret = config.permission.appSecret;
             let pathstring = req.path;
             let timestamp = Math.floor(Date.now()/1000);
@@ -343,9 +346,9 @@ class Proxy {
                     headers: {
                         sign: sign,
                         appid: config.permission.appId,
-                        staffid, 
-                        companyid,
-                        accountid
+                        staffid: staff.id, 
+                        companyid: staff.companyId,
+                        accountid: staff.accountId
                     }
                 }, (err, resp, result) => {
                     if (err) {
