@@ -226,7 +226,7 @@ class Privilege {
         let company: Company = await Models.company.get(companyId);
         let coinAccountId: string = company.coinAccountId;
         let coinAccountChanges:  CoinAccountChange[] = await Models.coinAccountChange.all({where: {coinAccountId: coinAccountId}});
-        let dataDuringTheQueryDate: CoinAccountChange[];
+        let dataDuringTheQueryDate: CoinAccountChange[] = [];
         
         let checkFromDate: Date = null;
         let checkToDate: Date = null;
