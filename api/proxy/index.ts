@@ -226,6 +226,7 @@ class Proxy {
                 params = req.query;
             }
             let appSecret = config.mall.appSecret;
+            let staff = await Models.staff.get(staffid);
             let pathstring = req.path;
             let timestamp = Math.floor(Date.now()/1000);
             pathstring = pathstring.replace("/mall", '');
@@ -242,9 +243,9 @@ class Proxy {
                     headers: {
                         sign: sign,
                         appid: config.mall.appId,
-                        staffid, 
-                        companyid,
-                        accountid
+                        staffid: staff.id, 
+                        companyid: staff.companyId,
+                        accountid: staff.accountId
                     }
                 }, (err, resp, body) => {
                     if (err) {
