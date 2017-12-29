@@ -9,7 +9,11 @@ var initData = require('libs/initTestData');
 var ReplServer = require('libs/replServer');
 var WX = require('api/wangxin');
 var WangxUtils = require('api/wangxin/lib/wangxUtils');
+// const httpProxy = require('http-proxy')
 
+// httpProxy.createProxyServer({
+//     target: 'http://192.168.1.242:3000'
+// }).listen(55555)
 var Logger = require('@jingli/logger');
 
 Error.stackTraceLimit = 40;
@@ -140,3 +144,4 @@ process.on('unhandledRejection', (reason, p) => {
     logger.error(reason);
 });
 
+require("./libs/patch-scrub-error");
