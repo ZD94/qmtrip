@@ -70,13 +70,13 @@ deploy:master:
     JL_APP_TMC_FAKE: 0
     JL_APP_TD_MONITORURL: https://l.jingli365.com/proj/old-qmtrip/api/v1/tripDetail
     JL_APP_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1/tmc
-    JL_APP_MALL_ORDER_LINK: https://l.jingli365.com/svc
+    JL_APP_MALL_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-mall
     JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
     JL_APP_BILL_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1
     JL_APP_BILL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92  
     JL_APP_BILL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_PERMISSION_ORDER_LINK: https://l.jingli365.com/svc
+    JL_APP_PERMISSION_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-auth 
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
   script:
@@ -106,13 +106,13 @@ deploy:test:
     JL_APP_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1/tmc
     JL_APP_CLOUD_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_CLOUD_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_MALL_ORDER_LINK: https://l.jingli365.com/svc
+    JL_APP_MALL_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-mall
     JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
     JL_APP_BILL_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1
     JL_APP_BILL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92  
     JL_APP_BILL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_PERMISSION_ORDER_LINK: https://t.jingli365.com/svc
+    JL_APP_PERMISSION_ORDER_LINK: https://t.jingli365.com/svc/java-jingli-auth 
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
   script:
@@ -141,13 +141,13 @@ deploy:release:
     JL_APP_TMC_FAKE: 0
     JL_APP_TD_MONITORURL: https://j.jingli365.com/proj/old-qmtrip/api/v1/tripDetail
     JL_APP_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1/tmc
-    JL_APP_MALL_ORDER_LINK: https://l.jingli365.com/svc
+    JL_APP_MALL_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-mall
     JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
     JL_APP_BILL_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1
     JL_APP_BILL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92  
     JL_APP_BILL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_PERMISSION_ORDER_LINK: https://l.jingli365.com/svc
+    JL_APP_PERMISSION_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-auth 
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
 
@@ -204,13 +204,13 @@ deploy:tester:
     JL_APP_TMC_FAKE: 0
     JL_APP_TD_MONITORURL: https://t.jingli365.com/proj/old-qmtrip/api/v1/tripDetail
     JL_APP_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1/tmc
-    JL_APP_MALL_ORDER_LINK: https://l.jingli365.com/svc
+    JL_APP_MALL_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-mall  
     JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
     JL_APP_BILL_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1
     JL_APP_BILL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92  
     JL_APP_BILL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_PERMISSION_ORDER_LINK: https://l.jingli365.com/svc
+    JL_APP_PERMISSION_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-auth 
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
   script:
