@@ -77,8 +77,10 @@ export class SSOModule {
      * @method 同步微信企业组织架构
      */
     async syncOrganization() {
-        let {corpId, secret} = await  this.verifyWechatCompany();
-        let accessToken = await this.getAccessToken(corpId, secret);
+        let {corpId, permanentCode} = await  this.verifyWechatCompany();   
+        let suiteToken = await SSOModule.getSuiteToken();
+        let accessToken = await  RestApi.getAccessTokenByPermanentCode(corpId, permanentCode, suiteToken)
+
         let restApi = new RestApi(accessToken);
         let staff = await Staff.getCurrent();
 
@@ -93,7 +95,7 @@ export class SSOModule {
      * @method 验证企业是否注册微信企业参数，如corpId, secret
      * @return {{corpId: string, secret: string}}
      */
-    async verifyWechatCompany(): Promise<{corpId: string, secret: string}> {
+    async verifyWechatCompany(): Promise<{corpId: string, permanentCode}> {
         let staff = await Staff.getCurrent();
         //forTest
         // if(!staff) staff = await Models.staff.get("2eaf0b60-ec72-11e7-a61b-6dc8f39f777e");  //测试
@@ -105,24 +107,23 @@ export class SSOModule {
             }
         });
         if(!wechatProperty || !wechatProperty.length)
-            throw new error.NotFoundError("===>该企业不存在企业微信corpid或secret")
+            throw new error.NotFoundError("===>该企业不存在企业微信corpid")
+
         let corpid: string;
-        let secret: string;
+        let permanentCode: string;
         for(let i =0; i < wechatProperty.length; i++){
             if(wechatProperty[i].type == CPropertyType.WECHAT_CORPID) {
                 corpid = wechatProperty[i].value;
             }
-            if(wechatProperty[i].type == CPropertyType.WECHAT_SECRET) {
-                secret = wechatProperty[i].value;
+            if(wechatProperty[i].type == CPropertyType.WECHAT_PERMAENTCODE) {
+                permanentCode = wechatProperty[i].value;
             }
         }
-        if(!corpid || !secret) {
-            throw new error.NotFoundError("===>该企业不存在企业微信corpid或secret")
-        }
+
         return {
-            corpId:corpid,
-            secret: secret
-        }
+            corpId: wechatProperty[0].value,
+            permanentCode,
+        };
     }
 
     /**
@@ -155,13 +156,30 @@ export class SSOModule {
     }
 
 
+    /**
+     * @method 首次下载应用时，微信管理后台传回pernamentCode, accessToken
+     * @param authCode 
+     * @param compayId 
+     */
     static async getPermanentCode(authCode?: string, compayId?: string) {
         let suiteToken = await SSOModule.getSuiteToken();
         let result: IWPermanentCode = await RestApi.getPermanentCode(suiteToken, authCode)
         if(!result)
             throw new error.NotFoundError("===>获取永久授权码失败")
         let cacheKey = `wechat:contact:${result.corpId}:access_token`;  //企业通讯录的access_token
-
+        let redisCache = new RedisCache();
+        let cacheResult: {
+            accessToken: string,
+            expired: number
+        } = await redisCache.get(cacheKey);
+        if(!cacheResult || (Date.now() - cacheResult.expired > 0)) {
+            let cacheResult =  {
+                accessToken: result.accessToken,
+                expired: Date.now() + (result.expires_in - 30)* 1000   
+            };
+            await redisCache.set(cacheKey, cacheResult);
+        }
+  
         let companyProperty = await Models.companyProperty.find({
             where: {
                 value: result.permanentCode
@@ -194,33 +212,13 @@ export class SSOModule {
             })
             companyProperty = await companyProperty.save();
         }
-
+        let ssoInstance = new SSOModule();
+        await ssoInstance.syncOrganization();
     }
-
-    static async initializeCompany(result: IWPermanentCode) {
-
-
-
-    }
-
 }
 
 let sso = new SSOModule()
 export default sso;
-
-export interface IWPermanentCode {
-    accessToken: string,
-    permanentCode: string,
-    corpId: string, 
-    corpName: string,
-    authUserInfo: {
-        email: string,
-        mobile: string,
-        userId: string,
-        name: string,
-        avatar: string
-    }
-}
 
 // setTimeout(async () => {
 //     sso.syncOrganization();

@@ -52,6 +52,7 @@ export class RestApi {
             permanentCode: result.permanent_code,
             corpId: result.auth_corp_info.corpid,
             corpName: result.auth_corp_info.corp_name,
+            expires_in: result.expires_in,
             authUserInfo: {
                 email: result.auth_user_info.email,
                 mobile: result.auth_user_info.mobile,
@@ -280,6 +281,7 @@ export interface IWPermanentCode {
     permanentCode: string,
     corpId: string,
     corpName: string,
+    expires_in: number,
     authUserInfo: {
         email: string,
         mobile: string,
