@@ -19,6 +19,7 @@ import WangXinApi from "./lib/wangxApi";
 import C = require("@jingli/config");
 import WangxDepartment from "./lib/wangxDepartment";
 import {Company} from "../../_types/company/company";
+import {CompanyProperty, CPropertyType} from "../../_types/company/company-property";
 
 const logger = new Logger("wangxin")
 
@@ -79,6 +80,8 @@ export default class WangXin {
                     let pwd = "000000";
                     let result = await API.company.registerCompany({mobile, name, pwd, userName});
                     company = result.company;
+                    let companyProperty = CompanyProperty.create({ companyId: company.id, type: CPropertyType.WANGXIN_ID, value: `WX_${company.id}` });
+                    await companyProperty.save();
                 }
             }
             for(let item of wxDepartment){
