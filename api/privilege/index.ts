@@ -286,7 +286,7 @@ class Privilege {
         let staff: Staff = await Models.staff.get(staffId);
         let companyId: string = staff.company.id;
 
-        let result: CompanyScoreRatioChange[] = await Models.companyScoreRatioChange.all({where: {companyId: companyId}, order: [['updated_at' || 'DESC']]});
+        let result: CompanyScoreRatioChange[] = await Models.companyScoreRatioChange.all({where: {companyId: companyId}, order: [['updated_at', 'DESC']]});
         return result;
     }
 
