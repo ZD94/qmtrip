@@ -21,7 +21,27 @@ export default class WeChatController extends AbstractController {
 
     @Router('/receive', 'ALL')
     async receive(req: Request, res: Response) {
-        res.send(crypto.decrypt(req.query.echostr).message)
+        const { timestamp, nonce, msg_signature, echostr } = req.query
+        if (echostr) {
+            if (msg_signature != crypto.getSignature(timestamp, nonce, echostr)) {
+                return res.sendStatus(403)
+            }
+            return res.send(crypto.decrypt(echostr).message)
+        }
+
+        let rawBody = ''
+        req.setEncoding('utf8')
+
+        req.on('data', chunk => {
+            rawBody += chunk
+        })
+        req.on('end', () => {
+            new Parser().parseString(rawBody, (err, data) => {
+                const resp = crypto.decrypt(data.xml['Encrypt'][0])
+                return res.send(resp.message)
+            })
+        })
+        res.send(crypto.decrypt(echostr).message)
         // proxy.web(req, res, proxyTarget)
     }
 
