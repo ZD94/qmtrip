@@ -228,8 +228,8 @@ class Privilege {
         let coinAccountChanges:  CoinAccountChange[] = await Models.coinAccountChange.all({where: {coinAccountId: coinAccountId}});
         let dataDuringTheQueryDate: CoinAccountChange[];
         
-        let checkFromDate: string = null;
-        let checkToDate: string = null;
+        let checkFromDate: Date = null;
+        let checkToDate: Date = null;
     
         if (queryDateData['beginDate']) {
             checkFromDate = queryDateData.beginDate;
