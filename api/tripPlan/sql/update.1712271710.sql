@@ -1,0 +1,1 @@
+update trip_plan.trip_plans set is_settled = false where saved > 0

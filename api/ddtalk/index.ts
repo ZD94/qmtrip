@@ -21,6 +21,7 @@ import syncData from "libs/asyncOrganization/syncData";
 
 import * as DealEvent from "./lib/dealEvent";
 import {CPropertyType} from "../../_types/company/company-property";
+import { getSession } from '@jingli/dnode-api';
 
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
 
@@ -403,13 +404,16 @@ class DDTalk {
 
     @clientExport
     @requireParams(['code'])
-    static async loginByWechatCode(code: string) {
-        const userId = await API.sso.getUserInfo(code)
-        const staffs = await Models.staffProperty.find({
+    static async loginByWechatCode(params: { code: string }) {
+        const userId = await API.sso.getUserInfo(params)
+        const staffProperties = await Models.staffProperty.find({
             where: { type: SPropertyType.WX_ID, value: userId}
         })
-        if(staffs.length < 1) throw L.ERR.USER_NOT_EXIST()
-        return await API.auth.makeAuthenticateToken(staffs[0].staffId, 'wechat')
+        if(staffProperties.length < 1) throw L.ERR.USER_NOT_EXIST()
+        const staff = await Models.staff.get(staffProperties[0].staffId)
+        const resp = await API.auth.makeAuthenticateToken(staff.accountId, 'corp_wechat')
+        resp['is_first_login'] = false
+        return resp
     }
 }
 

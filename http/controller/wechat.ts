@@ -1,6 +1,7 @@
 import { AbstractController, Restful, Router } from '@jingli/restful';
 import { Request, NextFunction, Response } from 'express-serve-static-core';
 import cache from 'common/cache'
+const API = require('@jingli/dnode-api');
 const config = require('@jingli/config')
 
 const { Parser } = require('xml2js')
@@ -26,8 +27,12 @@ export default class WeChatController extends AbstractController {
 
     @Router('/data/callback', 'ALL')
     async dataCallback(req: Request, res: Response, next: NextFunction) {
+        const { timestamp, nonce, msg_signature, echostr } = req.query
         if (req.method.toUpperCase() == 'GET') {
-            return res.send('success')
+            if (msg_signature != crypto.getSignature(timestamp, nonce, echostr)) {
+                return res.sendStatus(403)
+            }
+            return res.send(crypto.decrypt(echostr).message)
         }
 
         let rawBody = ''
@@ -38,17 +43,23 @@ export default class WeChatController extends AbstractController {
         })
         req.on('end', () => {
             new Parser().parseString(rawBody, (err, data) => {
-                const resp = crypto.decrypt(data.xml['Encrypt'])
+                const resp = crypto.decrypt(data.xml['Encrypt'][0])
                 new Parser().parseString(resp.message, async (err, data) => {
                     if (data.xml['InfoType'] == 'suite_ticket')
-                        await cache.write('suite_ticket', data.xml['SuiteTicket'])
+                        await cache.write('suite_ticket', data.xml['SuiteTicket'][0])
                     // if (data.xml['InfoType'] == 'create_auth')
                     //     await cache.write('create_auth', data.xml['AuthCode'])
+                    res.send('success')
                 })
-                res.send('success')
             })
         })
         // proxy.web(req, res, proxyTarget)
+    }
+
+    @Router('/loginByWechatCode', 'POST')
+    async loginByWechatCode(req: Request, res: Response, next: NextFunction) {
+        const data = await API['ddtalk'].loginByWechatCode(req.body)
+        res.json(data)
     }
 }
 

@@ -41,6 +41,7 @@ import {Company, MoneyChange, MONEY_CHANGE_TYPE} from '_types/company';
 import {CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE} from "_types/coin";
 const projectCols = Project['$fieldnames'];
 import {restfulAPIUtil} from "api/restful"
+import { Account } from '_types/auth';
 let RestfulAPIUtil = restfulAPIUtil;
 import * as error from "@jingli/error";
 interface ReportInvoice {
@@ -210,13 +211,20 @@ class TripPlanModule {
         if (typeof params == 'string') {
             params = JSON.parse(params);
         }
+        let company: Company;
+        let companyCoinAccount: CoinAccount;
+        let staff: Staff;
+        let coinAccount: CoinAccount;
+        let coinAccountChange: CoinAccountChange;
+        let pointChange: PointChange;
 
-        let unSettledRewardTripPlan: TripPlan = await Models.tripPlan.get(params.id);  //该次行程
+        DB.transaction(async function(t) {
+            let unSettledRewardTripPlan: TripPlan = await Models.tripPlan.get(params.id);  //该次行程
 
-        let company: Company = await Models.company.get(unSettledRewardTripPlan.companyId);
+        company = await Models.company.get(unSettledRewardTripPlan.companyId);
         let points2coinRate: number = company.points2coinRate;  //企业余额可转为鲸币的比例
         let scoreRatio: number = company.scoreRatio;  //企业奖励节省比例
-        let companyCoinAccount: CoinAccount = await Models.coinAccount.get(company.coinAccountId);
+        companyCoinAccount = await Models.coinAccount.get(company.coinAccountId);
         let companyBalanceCoins: number = companyCoinAccount.income - companyCoinAccount.consume - companyCoinAccount.locks;  //企业账户余额(鲸币)
 
         if (companyBalanceCoins > 0) {   
@@ -227,27 +235,30 @@ class TripPlanModule {
                 companyCoinAccount.consume += rewardMoney * points2coinRate;  //企业余额扣除相应的奖励金额
                 await companyCoinAccount.save();
                 
-                let staff: Staff = await Models.staff.get(unSettledRewardTripPlan.accountId);
+                staff = await Models.staff.get(unSettledRewardTripPlan.accountId);
                 staff.balancePoints -= rewardMoney;  //员工将由该次行程节省的奖励积分兑换
-                staff.save();
+                await staff.save();
 
                 unSettledRewardTripPlan.isSettled = true;
                 await unSettledRewardTripPlan.save();  //将该tripPlan的是否结算奖励标志设为true
                 
-                let coinAccount: CoinAccount = await Models.coinAccount.get(unSettledRewardTripPlan.accountId);  
+                let accountId: string = unSettledRewardTripPlan.accountId;
+                let account: Account = await Models.account.get(accountId);
+                coinAccount = await Models.coinAccount.get(account.coinAccountId);  
                 coinAccount.income += rewardMoney * points2coinRate;  //员工account增加鲸币
                 await coinAccount.save();
 
                 let coins: number = rewardMoney * points2coinRate;
-                let coinAccountChange: CoinAccountChange = await Models.coinAccountChange.create({  //coin_account增加鲸币变动记录
+                coinAccountChange = Models.coinAccountChange.create({  //coin_account增加鲸币变动记录
                     coinAccountId: coinAccount.id,
                     remark: `员工${coinAccount.id}增加奖励鲸币${coins}`,
                     type: COIN_CHANGE_TYPE.AWARD,
-                    coins: coins
+                    coins: coins,
+                    orderNum: getOrderNo()
                 });
                 await coinAccountChange.save();
 
-                let pointChange: PointChange = Models.pointChange.create({
+                pointChange = Models.pointChange.create({
                     staffId: unSettledRewardTripPlan.accountId,
                     orderId: unSettledRewardTripPlan.id,
                     companyId: unSettledRewardTripPlan.companyId,
@@ -255,22 +266,22 @@ class TripPlanModule {
                     remark: `员工${coinAccount.id}兑换奖励积分${rewardMoney}`
                 });
                 await pointChange.save();
-
-                let moneyChange: MoneyChange = Models.moneyChange.create({  //moneyChange表记录
-                    companyId: params.companyId,
-                    money: rewardMoney,
-                    remark: `员工${coinAccount.id}得到奖励${rewardMoney}元`,
-                    type: MONEY_CHANGE_TYPE.CONSUME
-                });
-                await moneyChange.save();
             } else {
                 //企业余额不足继续兑换，提示充值
-                console.log('企业余额不足');
+                console.error('企业余额不足');
             }
         } else {
             //企业余额不足继续兑换，提示充值 
-            console.log('企业余额不足');
-        }
+            console.error('企业余额不足');
+            }
+        }).catch(async function(err) {
+            await companyCoinAccount.reload();
+            await staff.reload();
+            await coinAccount.reload();
+            await coinAccountChange.reload();
+            await pointChange.reload();
+            throw err;
+        });
     }
 
     /**
@@ -2605,6 +2616,13 @@ async function tryUpdateTripPlanStatus(tripPlan: TripPlan, status: EPlanStatus) 
 function tryObjId(obj) {
     if (obj && obj.id) return obj.id;
     return null;
+}
+
+function getOrderNo() : string {
+    var d = new Date();
+    var rnd =  (Math.ceil(Math.random() * 1000));
+    var str = `${d.getFullYear()}${d.getMonth()+1}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}-${rnd}`;
+    return str;
 }
 
 

@@ -54,7 +54,7 @@ export async function initHttp(app) {
     // app.use('/api/v1', allowCrossDomain, router);
     // app.use('/api/v1', authenticate, router);
 
-    conf.setConfig(5 * 60 * 1000, [], cache, getAppSecretByAppId)
+    conf.setConfig(5 * 60 * 1000, [/^\/wechat/], cache, getAppSecretByAppId)
     app.use('/api/v1', jlReply)
     app.use('/api/v1', allowCrossDomain);
     app.use('/api/v1', (req, res, next) => {

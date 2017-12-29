@@ -37,14 +37,16 @@ export default class SSOModule {
         })
         if (res.status == 200) {
             await cache.write('suite_token', res.data.suite_access_token, 7200)
+            return res.data.suite_access_token
         }
+        throw new L.ERROR_CODE_C(500, "获取 suite_token 失败")
     }
 
     @clientExport
     @requireParams(['code'])
-    static async getUserInfo(code: string): Promise<string> {
+    static async getUserInfo({ code }: { code: string }): Promise<string> {
         const suite_token = await API.sso.getSuiteToken()
-        
+        console.log('suite_token:', suite_token)
         const res = await axios.get(`${USER_INFO_URL}?access_token=${suite_token}&code=${code}`)
         if (res.status == 200 && res.data.errcode == 0) {
             return res.data.UserId
