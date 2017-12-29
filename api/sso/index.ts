@@ -49,6 +49,19 @@ export default class SSOModule {
         }
         throw new L.ERROR_CODE_C(500, "获取用户信息失败")
     }
+
+    @clientExport
+    static async getAccessToken() {
+        const permanent_code = ''
+        const url = ''
+        const res = await axios.post(url, {
+            auth_corpid: '',
+            permanent_code
+        })
+        if (res.status == 200)
+            return res.data
+        throw new L.ERROR_CODE_C(500, '获取企业 access_token  失败')
+    }
 }
 
 async function receive(req: Request, res: Response) {
