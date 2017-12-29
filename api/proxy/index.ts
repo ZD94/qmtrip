@@ -138,7 +138,6 @@ class Proxy {
         app.all(/^\/order.*$/, cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function) => {
             
             let staff: Staff = await Staff.getCurrent();
-            console.log("=====staff: ", staff)
             let staffId = req.headers.staffid;
             if(staffId && !staff) {
                 staff = await Models.staff.get(staffId);
@@ -174,7 +173,7 @@ class Proxy {
                supplier: req.headers['supplier'],
                accountid: staff.accountId,
                staffid: staff.id,
-               companyID: staff.companyId,    
+               companyid: staff.companyId,    
             }
 
             let body: {[index: string]: any} = req.body;
@@ -190,9 +189,6 @@ class Proxy {
             let pathstring = req.path;
             pathstring = pathstring.replace("/order", '');
             let url = `${config.orderSysConfig.orderLink}${pathstring}`;
-            if(pathstring.indexOf("manage")){
-                url = url.replace("/tmc", "");
-            }
             let result:any;
             console.log("===========url: ", url, '===tripDetailId: ', tripDetailId, '====>method:', req.method, '=======> body: ', req.body);
             try{
@@ -266,9 +262,9 @@ class Proxy {
                     headers: {
                         sign: sign,
                         appid: config.mall.appId,
-                        staffid, 
-                        companyid,
-                        accountid
+                        staffid: staff.id, 
+                        companyid: staff.companyId,
+                        accountid: staff.accountId
                     }
                 }, (err, resp, result) => {
                     if (err) {
