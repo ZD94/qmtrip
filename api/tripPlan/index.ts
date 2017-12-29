@@ -216,6 +216,7 @@ class TripPlanModule {
         let staff: Staff;
         let coinAccount: CoinAccount;
         let coinAccountChange: CoinAccountChange;
+        let companyCoinAccountChange: CoinAccountChange;
         let pointChange: PointChange;
 
         DB.transaction(async function(t) {
@@ -232,7 +233,7 @@ class TripPlanModule {
                 let rewardMoney: number = unSettledRewardTripPlan.saved * scoreRatio;  //企业对该员工的该次行程的奖励金额
                 
                 unSettledRewardTripPlan.isSettled = true;  //结算flag更改
-                companyCoinAccount.consume += rewardMoney * points2coinRate;  //企业余额扣除相应的奖励金额
+                companyCoinAccount.consume += rewardMoney * points2coinRate;  //企业余额扣除相应的奖励金额鲸币
                 await companyCoinAccount.save();
                 
                 staff = await Models.staff.get(unSettledRewardTripPlan.accountId);
@@ -249,12 +250,20 @@ class TripPlanModule {
                 await coinAccount.save();
 
                 let coins: number = rewardMoney * points2coinRate;
-                coinAccountChange = Models.coinAccountChange.create({  //coin_account增加鲸币变动记录
+                companyCoinAccountChange = Models.coinAccountChange.create({  //company coin_account增加鲸币变动记录
+                    coinAccountId: companyCoinAccount.id,
+                    remark: `员工${coinAccount.id}增加奖励鲸币${coins}`,
+                    type: COIN_CHANGE_TYPE.CONSUME,
+                    coins: -coins,
+                    orderNum: getOrderNo()
+                });
+                await companyCoinAccountChange.save();
+                coinAccountChange = Models.coinAccountChange.create({  //员工 coin_account增加鲸币变动记录
                     coinAccountId: coinAccount.id,
                     remark: `员工${coinAccount.id}增加奖励鲸币${coins}`,
                     type: COIN_CHANGE_TYPE.AWARD,
                     coins: coins,
-                    orderNum: getOrderNo()
+                    orderNum: getOrderNo() 
                 });
                 await coinAccountChange.save();
 
