@@ -233,7 +233,7 @@ class Proxy {
             let url = `${config.mall.orderLink}${pathstring}`;
             console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.mall.appId, '===request params: ', params) 
             let result = await new Promise((resolve, reject) => {
-                return request({
+                request({
                     uri: url,
                     body: req.body,
                     json: true,
