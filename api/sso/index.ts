@@ -327,8 +327,11 @@ async function dataCallback(req: Request, res: Response, next: NextFunction) {
         new Parser().parseString(rawBody, (err, data) => {
             const resp = crypto.decrypt(data.xml['Encrypt'][0])
             new Parser().parseString(resp.message, async (err, data) => {
-                if (data.xml['InfoType'] == 'suite_ticket')
+                if (data.xml['InfoType'] == 'suite_ticket'){
+                    console.log("======>suite_ticket:  ", data.xml['SuiteTicket'])
                     await cache.write('suite_ticket', data.xml['SuiteTicket'][0])
+                }
+                    
                 if (data.xml['InfoType'] == 'create_auth')
                     await cache.write('create_auth', data.xml['AuthCode'])
                 eventPush(data.xml['AuthCode']);
