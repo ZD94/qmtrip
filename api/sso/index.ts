@@ -333,11 +333,10 @@ async function dataCallback(req: Request, res: Response, next: NextFunction) {
                 }
                     
                 if (data.xml['InfoType'] == 'create_auth') {
-                     console.log("======>create_auth:  ", data.xml['AuthCode'])
-                     await cache.write('create_auth', data.xml['AuthCode'])
+                     console.log("======>create_auth:  ", data.xml['AuthCode']);
+                     await cache.write('create_auth', data.xml['AuthCode']);
+                     eventPush(data.xml['AuthCode']);
                 }
-                   
-                eventPush(data.xml['AuthCode']);
                 res.send('success')
             })
         })
