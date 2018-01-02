@@ -43,11 +43,8 @@ import {Company, MoneyChange, MONEY_CHANGE_TYPE} from '_types/company';
 import {CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE} from "_types/coin";
 const projectCols = Project['$fieldnames'];
 import {restfulAPIUtil} from "api/restful"
-<<<<<<< HEAD
 import {EBudgetCollectionType, EProjectStatus} from "../../_types/tripPlan/tripPlan";
-=======
 import { Account } from '_types/auth';
->>>>>>> 3c07919ba5da69d9f3c3a24cc978f527f0004071
 let RestfulAPIUtil = restfulAPIUtil;
 import * as error from "@jingli/error";
 interface ReportInvoice {
