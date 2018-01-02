@@ -11,6 +11,9 @@ import { IAccessToken, IWPermanentCode } from "./libs/restApi";
 import { WCompany } from "api/sso/libs/wechat-company";
 import { clientExport, requireParams } from '@jingli/dnode-api/dist/src/helper';
 import { Department } from "_types/department";
+import Logger from "@jingli/logger";
+var scheduler = require('common/scheduler');
+var logger = new Logger("wechat");
 let moment = require("moment");
 const API = require('@jingli/dnode-api')
 const config = require('@jingli/config')
@@ -25,7 +28,6 @@ import { Request, NextFunction, Response, Application } from 'express-serve-stat
 const { Parser } = require('xml2js')
 const wxCrypto = require('wechat-crypto')
 const crypto = new wxCrypto(config.workWechat.token, config.workWechat.encodingAESKey, config.workWechat.corpId)
-
 
 const SUITE_TOKEN_URL = 'https://qyapi.weixin.qq.com/cgi-bin/service/get_suite_token'
 const USER_INFO_URL = 'https://qyapi.weixin.qq.com/cgi-bin/service/getuserinfo3rd'
@@ -78,21 +80,54 @@ export class SSOModule {
 
     /**
      * @method 同步微信企业组织架构
+     *    1: 企业首次在企业部署鲸力应用，向鲸力系统推送authCode, 进而同步通讯录
+     *    2： 用户主动在鲸力app中主动触发同步通讯录
      */
+    @clientExport
     async syncOrganization(accessToken?: string) {
+        let hasComPropertySaved = false;
         let self = this;
-     
-        let authCode = await cache.read('create_auth');
+        let corpId: string;
         let company: Company;
-        let suiteToken = await SSOModule.getSuiteToken();
+        let permanentCode: string;
+        let suiteToken: string = await SSOModule.getSuiteToken();;
+        let staff = await Staff.getCurrent();
+        if(staff){
+            company = staff.company;
+            let comProperty = await Models.companyProperty.find({
+                where: {
+                    companyId: company.id
+                }
+            });
+            if(comProperty && comProperty.length){
+                hasComPropertySaved = true;
+            }
+            for(let i =0; i < comProperty.length; i++){
+                if(comProperty[i].type == CPropertyType.WECHAT_CORPID) {
+                    corpId = comProperty[i].value;
+                }
+                if(comProperty[i].type == CPropertyType.WECHAT_PERMAENTCODE) {
+                    permanentCode = comProperty[i].value;
+                }
+            }
 
-        let permanentResult: IWPermanentCode = await RestApi.getPermanentCode(suiteToken, authCode)
-        company =await self.initializeCompany(permanentResult);
-        let permanentCode = permanentResult.permanentCode;
-
-        let {corpId } = await  this.verifyWechatCompany();   
+        }
+        
+        if(!company) {
+            let authCode = await cache.read('create_auth');
+            console.log("======> authCode in cache is empty", authCode)
+            let permanentResult: IWPermanentCode = await RestApi.getPermanentCode(suiteToken, authCode)
+            if(!permanentCode) {
+                throw new error.NotPermitError("根据authCode获取permanentCode失败")
+            }
+          
+            let com =await self.initializeCompany(permanentResult);
+            company = com.company;
+            corpId = com.corpId;
+            permanentCode = permanentResult.permanentCode;
+        }
+ 
         if(!accessToken) {
-
             let result = await  RestApi.getAccessTokenByPermanentCode(corpId, permanentCode, suiteToken)
             let cacheKey = `wechat:contact:${corpId}:access_token`;  //企业通讯录的access_token
             let redisCache = new RedisCache();
@@ -105,152 +140,46 @@ export class SSOModule {
         }
 
         let restApi = new RestApi(accessToken);
-        if(!company){
-            let staff = await Staff.getCurrent();
-            company = await Models.company.get(staff.companyId);
-        }
 
-
-        // if(!staff) staff = await Models.staff.get("2eaf0b60-ec72-11e7-a61b-6dc8f39f777e");   //测试
-     
         let wCompany = new WCompany({ id: corpId, name: company.name, restApi, company: company});
+        if(!hasComPropertySaved)
+            await wCompany.saveCompanyProperty({companyId: company.id, permanentCode: permanentCode})
         await wCompany.sync();
     }
 
-    /**
-     * @method 验证企业是否注册微信企业参数，如corpId, secret
-     * @return {{corpId: string, secret: string}}
-     */
-    async verifyWechatCompany(): Promise<{corpId: string, permanentCode}> {
-        let staff = await Staff.getCurrent();
-        //forTest
-        // if(!staff) staff = await Models.staff.get("2eaf0b60-ec72-11e7-a61b-6dc8f39f777e");  //测试
 
-        let company = staff.company;
-        let wechatProperty = await Models.companyProperty.find({
-            where: {
-                companyId: company.id
-            }
-        });
-        if(!wechatProperty || !wechatProperty.length)
-            throw new error.NotFoundError("===>该企业不存在企业微信corpid")
-
-        let corpid: string;
-        let permanentCode: string;
-        for(let i =0; i < wechatProperty.length; i++){
-            if(wechatProperty[i].type == CPropertyType.WECHAT_CORPID) {
-                corpid = wechatProperty[i].value;
-            }
-            if(wechatProperty[i].type == CPropertyType.WECHAT_PERMAENTCODE) {
-                permanentCode = wechatProperty[i].value;
-            }
-        }
-
-        return {
-            corpId: wechatProperty[0].value,
-            permanentCode,
-        };
-    }
-
-    /**
-     * 
-     * @method 根据企业的corpid、secret生成企业的accessToken
-     * @param secret {string} 
-     * @param corpId
-     * @return {string} 
-     */
-    async getAccessToken(corpId: string, secret: string): Promise<string>{
-        let cacheKey = `wechat:contact:${corpId}:access_token`;  //企业通讯录的access_token
-        let cacheResult: {
-            accessToken: string,
-            expired: number
-        } = await this.cache.get(cacheKey);
-        let accessToken: string;
-        if(cacheResult) accessToken = cacheResult.accessToken;
-        if(!cacheResult || (Date.now() - cacheResult.expired > 0)) {
-            let result: IAccessToken = await RestApi.getAccessToken(corpId, secret);
-            if(!result) return null;
-            let value = {
-                accessToken: result.access_token,
-                expired: Date.now() + (result.expires_in - 30)* 1000   
-            };
-            accessToken = result.access_token;
-            await this.cache.set(cacheKey, value)
-        }
-        if(!accessToken) throw new error.NotFoundError("===>该企业不存在企业微信corpid或secret")
-        return accessToken;
-    }
 
 
     /**
-     * @method 首次下载应用时，微信管理后台传回pernamentCode, accessToken
-     * @param authCode 
-     * @param compayId 
+     * @method 根据permanentCode获取已注册公司，获取初始化新公司
+     * @param result 
      */
-    static async getPermanentCode(authCode?: string, compayId?: string) {
-        let suiteToken = await SSOModule.getSuiteToken();
-        let result: IWPermanentCode = await RestApi.getPermanentCode(suiteToken, authCode)
-        if(!result)
-            throw new error.NotFoundError("===>获取永久授权码失败")
-        let cacheKey = `wechat:contact:${result.corpId}:access_token`;  //企业通讯录的access_token
-        let redisCache = new RedisCache();
-        let cacheResult: {
-            accessToken: string,
-            expired: number
-        } = await redisCache.get(cacheKey);
-        if(!cacheResult || (Date.now() - cacheResult.expired > 0)) {
-            let caches =  {
-                accessToken: result.accessToken,
-                expired: Date.now() + (result.expires_in - 30)* 1000   
-            };
-            cacheResult.accessToken = caches.accessToken;
-            await redisCache.set(cacheKey, caches);
-        }
-  
+    async initializeCompany(result: IWPermanentCode | any): Promise<{company: Company, corpId: string, permanentCode: string}> {
+        let permanentCode = result.permanentCode;
+        if(!permanentCode) throw new error.ParamsNotValidError("永久授权码不存在");
         let companyProperty = await Models.companyProperty.find({
             where: {
                 value: result.permanentCode
             }
         })
-        if(!companyProperty || companyProperty.length == 0) {
-            let staff: Staff = Staff.create({
-                name: result.authUserInfo.name,
-                staffStatus: EStaffStatus.ON_JOB
+        let company: Company;
+        let corpId: string;
+       
+        if(companyProperty && companyProperty.length) {
+            company = await Models.company.get(companyProperty[0].companyId);
+            let corp = await Models.companyProperty.find({
+                where: {
+                    type: CPropertyType.WECHAT_CORPID,
+                    companyId: companyProperty[0].companyId,
+                }
             });
-            staff = await staff.save();
-            let company = Company.create({
-                name: result.corpName,
-                expiryDate : moment().add(1 , "months").toDate(),
-                mobile: result.authUserInfo.mobile,
-                createUser: staff.id
-            })
-            company = await company.save();
-            staff.companyId = company.id;
-            staff = await staff.save();
-    
-            let department = Department.create({
-                name: result.corpName,
-                companyId: company.id
-            })
-            department = await department.save();
-            let companyProperty = CompanyProperty.create({
-                value: result.corpId,
-                type: CPropertyType.WECHAT_CORPID
-            })
-            companyProperty = await companyProperty.save();
-        }
-        let ssoInstance = new SSOModule();
-        await ssoInstance.syncOrganization(cacheResult.accessToken);
-    }
-
-    async initializeCompany(result: IWPermanentCode): Promise<Company> {
-        let companyProperty = await Models.companyProperty.find({
-            where: {
-                value: result.permanentCode
+            if(corp && corp.length) {
+                corpId = corp[0].value;
             }
-        })
-        let company;
+     
+        }
         if(!companyProperty || companyProperty.length == 0) {
+            corpId = result.corpId;
             let staff: Staff = Staff.create({
                 name: result.authUserInfo.name,
                 staffStatus: EStaffStatus.ON_JOB
@@ -271,22 +200,63 @@ export class SSOModule {
                 companyId: company.id
             })
             department = await department.save();
-            let companyProperty = CompanyProperty.create({
-                value: result.corpId,
-                type: CPropertyType.WECHAT_CORPID
-            })
-            companyProperty = await companyProperty.save();
+            // let companyProperty = CompanyProperty.create({
+            //     value: result.corpId,
+            //     type: CPropertyType.WECHAT_CORPID
+            // })
+            // companyProperty = await companyProperty.save();
         }
-        return company;
+        return {
+            company,
+            corpId,
+            permanentCode
+        }
     }
+
+
+
+    static _scheduleTask() {
+        let taskId = "syncWechatEnterpriseOrganization";
+        logger.info('run task ' + taskId);
+        scheduler('0 0/10 0 * * *', taskId, async function () {
+            await dealEvent();
+        });
+    }
+
+    // /**
+    //  * @method 根据企业的corpid、secret生成企业的accessToken
+    //  * @param secret {string} 
+    //  * @param corpId
+    //  * @return {string} 
+    //  */
+    // async getAccessToken(corpId: string, secret: string): Promise<string>{
+    //     let cacheKey = `wechat:contact:${corpId}:access_token`;  //企业通讯录的access_token
+    //     let cacheResult: {
+    //         accessToken: string,
+    //         expired: number
+    //     } = await this.cache.get(cacheKey);
+    //     let accessToken: string;
+    //     if(cacheResult) accessToken = cacheResult.accessToken;
+    //     if(!cacheResult || (Date.now() - cacheResult.expired > 0)) {
+    //         let result: IAccessToken = await RestApi.getAccessToken(corpId, secret);
+    //         if(!result) return null;
+    //         let value = {
+    //             accessToken: result.access_token,
+    //             expired: Date.now() + (result.expires_in - 30)* 1000   
+    //         };
+    //         accessToken = result.access_token;
+    //         await this.cache.set(cacheKey, value)
+    //     }
+    //     if(!accessToken) throw new error.NotFoundError("===>该企业不存在企业微信corpid或secret")
+    //     return accessToken;
+    // }
+
+
 }
 
 let sso = new SSOModule()
 export default sso;
 
-// setTimeout(async () => {
-//     sso.syncOrganization();
-// }, 15 * 1000)
 
 
 async function receive(req: Request, res: Response) {
@@ -334,6 +304,7 @@ async function dataCallback(req: Request, res: Response, next: NextFunction) {
         if (rawBody == '') {
             return res.sendStatus(403)
         }
+   
         new Parser().parseString(rawBody, (err, data) => {
             const resp = crypto.decrypt(data.xml['Encrypt'][0])
             new Parser().parseString(resp.message, async (err, data) => {
@@ -341,9 +312,29 @@ async function dataCallback(req: Request, res: Response, next: NextFunction) {
                     await cache.write('suite_ticket', data.xml['SuiteTicket'][0])
                 if (data.xml['InfoType'] == 'create_auth')
                     await cache.write('create_auth', data.xml['AuthCode'])
+                eventPush(data.xml['AuthCode']);
                 res.send('success')
             })
         })
     })
 }
 
+async function eventPush(msg: string ){
+    let key = `sync:wechat:company` ;
+    let result = await cache.rpush( key, msg );
+}
+
+
+
+async function dealEvent(){
+    let key = 'sync:wechat:company';
+    let msg : { EventType : string } = await cache.lpop(key);
+    if(!msg){
+        return ;
+    }
+    try{
+        await sso.syncOrganization();
+    }catch(e){
+        console.error(e);
+    }
+}
