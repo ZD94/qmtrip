@@ -342,7 +342,8 @@ class Proxy {
                     headers: {
                         sign: sign,
                         appid: config.permission.appId,
-                        staffid: staff.id, 
+                        staffid: staff.id,
+                        staffname: staff.name,
                         companyid: staff.companyId,
                         accountid: staff.accountId
                     }
