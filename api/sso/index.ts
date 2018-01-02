@@ -99,28 +99,23 @@ export class SSOModule {
                     companyId: company.id
                 }
             });
-            if(comProperty && comProperty.length){
+            if(comProperty && comProperty.length)
                 hasComPropertySaved = true;
-            }
             for(let i =0; i < comProperty.length; i++){
-                if(comProperty[i].type == CPropertyType.WECHAT_CORPID) {
+                if(comProperty[i].type == CPropertyType.WECHAT_CORPID) 
                     corpId = comProperty[i].value;
-                }
-                if(comProperty[i].type == CPropertyType.WECHAT_PERMAENTCODE) {
+                if(comProperty[i].type == CPropertyType.WECHAT_PERMAENTCODE)
                     permanentCode = comProperty[i].value;
-                }
             }
-
         }
         
         if(!company) {
             let authCode = await cache.read('create_auth');
             console.log("======> authCode in cache is empty", authCode)
             let permanentResult: IWPermanentCode = await RestApi.getPermanentCode(suiteToken, authCode)
-            if(!permanentCode) {
+            if(!permanentCode)
                 throw new error.NotPermitError("根据authCode获取permanentCode失败")
-            }
-          
+
             let com =await self.initializeCompany(permanentResult);
             company = com.company;
             corpId = com.corpId;
@@ -140,7 +135,6 @@ export class SSOModule {
         }
 
         let restApi = new RestApi(accessToken);
-
         let wCompany = new WCompany({ id: corpId, name: company.name, restApi, company: company});
         if(!hasComPropertySaved)
             await wCompany.saveCompanyProperty({companyId: company.id, permanentCode: permanentCode})
@@ -173,10 +167,8 @@ export class SSOModule {
                     companyId: companyProperty[0].companyId,
                 }
             });
-            if(corp && corp.length) {
+            if(corp && corp.length)
                 corpId = corp[0].value;
-            }
-     
         }
         if(!companyProperty || companyProperty.length == 0) {
             corpId = result.corpId;
@@ -212,8 +204,6 @@ export class SSOModule {
             permanentCode
         }
     }
-
-
 
     static _scheduleTask() {
         let taskId = "syncWechatEnterpriseOrganization";
@@ -322,6 +312,8 @@ async function dataCallback(req: Request, res: Response, next: NextFunction) {
 async function eventPush(msg: string ){
     let key = `sync:wechat:company` ;
     let result = await cache.rpush( key, msg );
+    logger.log("产生新的微信企业同步组织架构事件")
+    return;
 }
 
 
