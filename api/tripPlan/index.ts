@@ -1,6 +1,8 @@
 /**
  * Created by yumiao on 15-12-10.
  */
+
+
 "use strict";
 import {DB} from '@jingli/database';
 let uuid = require("node-uuid");
@@ -29,7 +31,7 @@ import { getSession } from "@jingli/dnode-api";
 import {AgencyUser} from "_types/agency";
 import {makeSpendReport} from './spendReport';
 import fs = require("fs");
-import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice, InvoiceFeeTypeNames} from "_types/tripPlan";
+import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice, InvoiceFeeTypeNames, ProjectStaff} from "_types/tripPlan";
 import {ENoticeType} from "_types/notice/notice";
 import TripApproveModule = require("../tripApprove/index");
 import {MPlaneLevel, MTrainLevel} from "_types";
@@ -41,6 +43,7 @@ import {Company, MoneyChange, MONEY_CHANGE_TYPE} from '_types/company';
 import {CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE} from "_types/coin";
 const projectCols = Project['$fieldnames'];
 import {restfulAPIUtil} from "api/restful"
+import {EBudgetCollectionType, EProjectStatus} from "../../_types/tripPlan/tripPlan";
 import { Account } from '_types/auth';
 let RestfulAPIUtil = restfulAPIUtil;
 import * as error from "@jingli/error";
@@ -970,8 +973,58 @@ class TripPlanModule {
     }
 
     @clientExport
-    @requireParams(['name', 'createUser', 'companyId'], ['code'])
-    static createProject(params): Promise<Project> {
+    @requireParams(['emails', 'projectId'])
+    static async sendProjectReport(params: {emails: string[], projectId: string}): Promise<boolean>{
+        let data: any = {project: {}, costCenter: {}, projectStaffs: []};
+        let project = await Models.project.get(params.projectId);
+        data.project = project;
+        if(project){
+            let costCenter = await Models.costCenter.get(project.id);
+            if(costCenter){
+                let costCenterDeploies = await Models.costCenterDeploy.find({where: {costCenterId: costCenter.id}});
+                if(costCenterDeploies && costCenterDeploies.length){
+                    let costCenterDeploy = costCenterDeploies[0];
+                    data.costCenter = costCenterDeploy;
+                    let budgetCollectInfo = await costCenterDeploy.getCollectedBudget();
+                    data.budgetCollectInfo = budgetCollectInfo;
+                }
+            }
+            let staffs = await project.getStaffs();
+            if(staffs && staffs.length){
+                let projectStaffs = await Promise.all(staffs.map(async (s) => {
+                    let travelPolicy = await s.getProjectTravelPolicy({projectId: project.id});
+                    s.tp = travelPolicy;
+                    return s;
+                }))
+                data.projectStaffs = projectStaffs;
+            }
+        }
+        let buf = await makeSpendReport(data, "project");
+        try {
+            for(let item of params.emails){
+                await API.notify.submitNotify({
+                    key: 'qm_spend_project_report',
+                    email: item,
+                    values: {
+                        project: project,
+                        attachments: [{
+                            filename: project.name + '.pdf',
+                            content: buf.toString("base64"),
+                            encoding: 'base64'
+                        }]
+                    },
+                });
+            }
+
+        } catch(err) {
+            console.error(err.stack);
+        }
+        return true;
+    }
+
+    @clientExport
+    @requireParams(['name', 'companyId'], projectCols)
+    static async createProject(params): Promise<Project> {
         return Project.create(params).save();
     }
 
@@ -980,6 +1033,9 @@ class TripPlanModule {
     static async updateProject(params): Promise<Project> {
         let project = await Models.project.get(params.id);
 
+        if(project.status == EProjectStatus.START){
+            throw new Error(`{code: -1, msg: "修改项目信息 需停用项目"}`);
+        }
         for(let key in params){
             project[key] = params[key];
         }
@@ -1014,6 +1070,93 @@ class TripPlanModule {
         await project.destroy();
         return true;
     }
+
+
+    /****************************************ProjectStaff begin************************************************/
+
+    /**
+     * 创建项目员工记录
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["projectId", "staffId"])
+    static async createProjectStaff (params) : Promise<ProjectStaff>{
+        var projectStaff = ProjectStaff.create(params);
+        var already = await Models.projectStaff.find({where: {projectId: params.projectId, staffId: params.staffId}});
+        if(already && already.length>0){
+            return already[0];
+        }
+        var result = await projectStaff.save();
+        return result;
+    }
+
+
+    /**
+     * 删除项目员工记录
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    static async deleteProjectStaff(params) : Promise<any>{
+        var id = params.id;
+        var ah_delete = await Models.projectStaff.get(id);
+
+        await ah_delete.destroy();
+        return true;
+    }
+
+
+    /**
+     * 更新项目员工记录
+     * @param id
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"], ["projectId", "staffId"])
+    static async updateProjectStaff(params) : Promise<ProjectStaff>{
+        var id = params.id;
+
+        var ah = await Models.projectStaff.get(id);
+        for(var key in params){
+            ah[key] = params[key];
+        }
+        return ah.save();
+    }
+
+    /**
+     * 根据id查询项目员工记录
+     * @param {String} params.id
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    static async getProjectStaff(params: {id: string}) : Promise<ProjectStaff>{
+        let id = params.id;
+        var ah = await Models.projectStaff.get(id);
+
+        return ah;
+    };
+
+
+    /**
+     * 根据属性查找项目员工记录
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    static async getProjectStaffs(params): Promise<FindResult>{
+        var staff = await Staff.getCurrent();
+        let paginate = await Models.projectStaff.find(params);
+        let ids =  paginate.map(function(t){
+            return t.id;
+        })
+        return {ids: ids, count: paginate['total']};
+    }
+
+    /****************************************ProjectStaff end************************************************/
 
 
     /**
@@ -1518,6 +1661,9 @@ class TripPlanModule {
         }
         tripPlan.arrivalCityCodes = JSON.stringify(arrivalCityCodes);
 
+        if(query.costCenterId){
+            tripPlan.costCenterId = query.costCenterId;
+        }
         tripPlan.setCompany(account.company);
         tripPlan.auditUser = tryObjId(approveUser);
         tripPlan.project = project;

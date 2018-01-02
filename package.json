@@ -103,7 +103,7 @@
     "request-promise": "4.1.1",
     "sequelize": "^4.28.6",
     "serve-favicon": "^2.3.0",
-    "server-auth": "^1.0.2",
+    "server-auth": "^1.0.3",
     "shimmer": "^1.1.0",
     "shoe": "0.0.15",
     "socks5-https-client": "^1.2.0",

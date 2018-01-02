@@ -4,7 +4,7 @@ var request = require("request-promise");
 import { clientExport, requireParams } from "@jingli/dnode-api/dist/src/helper";
 import { BudgetLog, CostCenter, CostCenterDeploy, ECostCenterType, BUDGET_CHANGE_TYPE } from "_types/costCenter";
 import { FindResult, PaginateInterface } from "common/model/interface";
-import { findParentManagers, findChildren } from 'api/department';
+import { findChildren } from 'api/department';
 import { Department } from '_types/department';
 import { EStaffRole } from '_types/staff';
 import { DB } from '@jingli/database';
@@ -266,7 +266,7 @@ export default class CostCenterModule {
     @clientExport
     static async listDeptBudget(deptId: string, period: { start: Date, end: Date }) {
         const children = await findChildren(deptId)
-        const where = { beginDate: { $gte: moment(period.start).add(8, 'h').format() }, endDate: { $lte: moment(period.end).add(8, 'h').format() } }
+        const where = { beginDate: { $gte: add8Hours(period.start) }, endDate: { $lte: add8Hours(period.end) } }
         const costs = await Promise.all([...children.map(c =>
             Models.costCenterDeploy.find({
                 where: { ...where, costCenterId: c.id }
@@ -290,8 +290,8 @@ export default class CostCenterModule {
             const costCenterDeploy = await Models.costCenterDeploy.find({
                 where: {
                     costCenterId: id,
-                    beginDate: { $gte: moment(period.start).add(8, 'h').format() },
-                    endDate: { $lte: moment(period.end).add(8, 'h').format() }
+                    beginDate: { $gte: add8Hours(period.start) },
+                    endDate: { $lte: add8Hours(period.end) }
                 }
             })
             if (costCenterDeploy.length < 1) {
@@ -306,8 +306,8 @@ export default class CostCenterModule {
         const tempSum = _.compose(_.sum, _.map(_.prop('selfTempBudget')))(budgets),
             where = {
                 costCenterId: costId,
-                beginDate: { $gte: moment(period.start).add(8, 'h').format() },
-                endDate: { $lte: moment(period.end).add(8, 'h').format() }
+                beginDate: { $gte: add8Hours(period.start) },
+                endDate: { $lte: add8Hours(period.end) }
             }
         const rootCost = _.first(await Models.costCenterDeploy.find({ where }))
 
@@ -326,7 +326,7 @@ export default class CostCenterModule {
 
     @clientExport
     static async applyConf(costId: string, period: { start: Date, end: Date }) {
-        const where = { costCenterId: costId, beginDate: { $gte: moment(period.start).add(8, 'h').format() }, endDate: { $lte: moment(period.end).add(8, 'h').format() } }
+        const where = { costCenterId: costId, beginDate: { $gte: add8Hours(period.start) }, endDate: { $lte: add8Hours(period.end) } }
         const root = _.first(await Models.costCenterDeploy.find({ where }))
         let totalBudget = 0
         const children = await findChildren(costId)
@@ -355,8 +355,8 @@ export default class CostCenterModule {
         const cost = _.first(await Models.costCenterDeploy.find({
             where: {
                 costCenterId: costId,
-                beginDate: { $gte: moment(period.start).add(8, 'h').format() },
-                endDate: { $lte: moment(period.end).add(8, 'h').format() }
+                beginDate: { $gte: add8Hours(period.start) },
+                endDate: { $lte: add8Hours(period.end) }
             }
         }))
         cost.warningPerson = setting.audienceTypes
@@ -393,13 +393,17 @@ async function getTotalTempBudgetSumOf(costIds: string[], period?) {
     const ids = costIds.map(id => `'${id}'`).join(',')
     const sql = `select sum(total_temp_budget) as sum from 
         cost_center.cost_center_deploys where cost_center_id in (${ids}) 
-        and begin_date >= '${moment(period.start).add(8, 'h').format()}' and end_date <= '${moment(period.end).add(8, 'h').format()}'`
+        and begin_date >= '${add8Hours(period.start)}' and end_date <= '${add8Hours(period.end)}'`
     const res = (await DB.query(sql))[0][0]
     return (res && res.sum) || 0
 }
 
 async function getPerMonthExpenditure(costId: string) {
 
+}
+
+function add8Hours(time) {
+    return moment(time).add(8, 'h').format()
 }
 
 export interface IBudget {

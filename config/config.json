@@ -154,6 +154,12 @@
   "approveServerUrl": "${JL_APP_APPROVE_SERVER_URL}",
   "wxSysCode": "30b3e212-2821-4039-b711-40624201cbeb",
   "wxSharedSecret": "+lx/c62ImCuU6533C73RwOn1mA4=",
+  "tmcUrl": "${JL_APP_TMC}",
+  "tmcFake": "${JL_APP_TMC_FAKE}",
+  "orderSysConfig": {
+    "tripDetailMonitorUrl": "${JL_APP_TD_MONITORURL}",
+    "orderLink": "${JL_APP_ORDER_LINK}"
+  },
   "workWechat": {
     "corpId": "wwb398745b82d67068",
     "token": "xtz1KPDEbycN",
@@ -161,12 +167,6 @@
     "providerSecret": "kGNDfdXSuzdvAgHC5AC8jaRUjnybKH0LnVK05NPvCV4",
     "suiteId": "wwdb6efe49f6e236d3",
     "suiteSecret": "7GnoFq32hgkE27kkBFPZxeetnhyQxtFk2OvHFjtrW4I"
-  },
-  "tmcUrl": "${JL_APP_TMC}",
-  "tmcFake": "${JL_APP_TMC_FAKE}",
-  "orderSysConfig": {
-    "tripDetailMonitorUrl": "${JL_APP_TD_MONITORURL}",
-    "orderLink": "${JL_APP_ORDER_LINK}"
   },
   "isVerify": false
 }

@@ -15,7 +15,7 @@ import { Agency, AgencyUser } from '_types/agency';
 import { CostCenter, BudgetLog, CostCenterDeploy } from '_types/costCenter';
 import {
     TripPlan, TripDetail, TripDetailStaff, Project, TripPlanLog, FinanceCheckCode,
-    TripDetailInvoice, TripDetailTraffic, TripDetailHotel, Offline
+    TripDetailInvoice, TripDetailTraffic, TripDetailHotel, Offline, ProjectStaff, ProjectTravelPolicy
 } from '_types/tripPlan';
 import {Account, Token} from '_types/auth';
 import { Seed } from '_types/seed';
@@ -71,6 +71,8 @@ initModels({
     moneyChange: createServerService<MoneyChange>(MoneyChange),
     companyScoreRatioChange: createServerService<CompanyScoreRatioChange>(CompanyScoreRatioChange),
     project: createServerService<Project>(Project),
+    projectStaff: createServerService<ProjectStaff>(ProjectStaff),
+    projectStaffTravelPolicy: createServerService<ProjectTravelPolicy>(ProjectTravelPolicy),
     // tripApprove: createServerService<TripApprove>(TripApprove),
     approve: createServerService<Approve>(Approve),
     account: createServerService<Account>(Account),
