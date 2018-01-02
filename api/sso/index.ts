@@ -110,11 +110,15 @@ export default class SSOModule {
         }
         
         if(!company) {
-            let authCode = await cache.read('create_auth');
+            let authCode = await cache.read('create_auth'); 
             console.log("======> authCode in cache is empty", authCode)
+            if(authCode) return;
             let permanentResult: IWPermanentCode = await RestApi.getPermanentCode(suiteToken, authCode)
+            permanentCode = permanentResult.permanentCode;
             if(!permanentCode)
-                throw new error.NotPermitError("根据authCode获取permanentCode失败")
+                throw new error.NotPermitError(`永久授权码:  ${permanentCode}`)
+
+            console.log("======> authCode in cache is empty", authCode)
 
             let isCompanyRegistered = await self.checkCompanyRegistered(permanentCode);
             if(isCompanyRegistered)
@@ -232,7 +236,7 @@ export default class SSOModule {
     static _scheduleTask() {
         let taskId = "syncWechatEnterpriseOrganization";
         logger.info('run task ' + taskId);
-        scheduler('0 * * * * *', taskId, async function () {
+        scheduler('0 */10 * * * *', taskId, async function () {
             await dealEvent();
         });
     }
@@ -347,6 +351,7 @@ async function dealEvent(){
         return ;
     }
     try{
+
         await sso.syncOrganization();
     }catch(e){
         console.error(e);
