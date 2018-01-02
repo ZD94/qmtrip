@@ -32,7 +32,7 @@ const crypto = new wxCrypto(config.workWechat.token, config.workWechat.encodingA
 const SUITE_TOKEN_URL = 'https://qyapi.weixin.qq.com/cgi-bin/service/get_suite_token'
 const USER_INFO_URL = 'https://qyapi.weixin.qq.com/cgi-bin/service/getuserinfo3rd'
 var EXPIREDATE = 7200; //微信access_token的失效时间是7200秒
-export class SSOModule {
+export default class SSOModule {
     cache: RedisCache;
     constructor(){
         this.cache = new RedisCache();
@@ -42,9 +42,8 @@ export class SSOModule {
     static __initHttpApp(app: Application) {
         app.all('/wechat/receive', receive)
         app.all('/wechat/data/callback', dataCallback)
-        app.all('/wechat/mouse', async () =>{
-            let sso = new SSOModule();
-            await sso.syncOrganization()
+        app.all('/wechat/test', async (req, res, next) =>{
+            res.json("test callback successfully")
         })
     }
 
@@ -246,9 +245,6 @@ export class SSOModule {
 }
 
 let sso = new SSOModule()
-export default sso;
-
-
 
 async function receive(req: Request, res: Response) {
     const { timestamp, nonce, msg_signature, echostr } = req.query
