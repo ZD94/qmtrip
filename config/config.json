@@ -19,14 +19,27 @@
     "url": "${JL_APP_REDIS}"
   },
   "hosts": {
-    "main":{"addr":"api.t.jingli365.com", "port":14201, "www":"https://${{hosts.main.addr}}"}
+    "main": {
+      "addr": "api.t.jingli365.com",
+      "port": 14201,
+      "www": "https://${{hosts.main.addr}}"
+    },
+    "budget": {
+      "addr": "t.jingli365.com",
+      "port": 14203
+    }
   },
   "api": {
     "postgres": "${{postgres.url}}",
-    "remotes": [{
-      "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
-      "modules": ["attachments", "checkcode", "ctripapi", "dida", "flight", "jpush", "wechat", "sms"]
-      }]
+    "remotes": [
+      {
+        "connect": {
+          "host": "${{hosts.main.addr}}",
+          "port": "${{hosts.main.port}}"
+        },
+        "modules": ["attachments", "checkcode", "ctripapi", "dida", "flight", "jpush", "wechat", "sms"]
+      }
+    ]
   },
   "upload": {
     "tmpDir": "${{rootDir}}/tmp/upload",
@@ -62,6 +75,9 @@
       "email": "testteam@jingli365.com"
     }
   ],
+  "email_address": {
+    "tmcsale": "salesteam@jingli365.com"
+  },
   "default_agency": {
     "name": "系统默认代理商",
     "email": "agency.agency@jingli.tech",
@@ -93,6 +109,21 @@
     "appKey": "3fFDdkKxibDiRjwy9DqaPwasvAup",
     "appSecret": "2FaLAocgDodNqCFa9PU8cyCk4Fnw"
   },
+  "mall": {
+    "orderLink": "${JL_APP_MALL_ORDER_LINK}",
+    "appId": "${JL_APP_MALL_APP_ID}",
+    "appSecret": "${JL_APP_MALL_APP_SECRET}"
+  },
+  "bill": {
+    "orderLink": "${JL_APP_BILL_ORDER_LINK}",
+    "appId": "${JL_APP_BILL_APP_ID}",
+    "appSecret": "${JL_APP_BILL_APP_SECRET}"
+  },
+  "permission": {
+    "orderLink": "${JL_APP_PERMISSION_ORDER_LINK}",
+    "appId": "${JL_APP_PERMISSION_APP_ID}",
+    "appSecret": "${JL_APP_PERMISSION_APP_SECRET}"
+  },
   "is_init_test_company": true,
   "ddconfig": {
     "token": "jingli2016",
@@ -113,7 +144,6 @@
     "appId": "${JL_APP_CLOUD_APP_ID}",
     "appSecret": "${JL_APP_CLOUD_APP_SECRET}"
   },
-  "tmcUrl": "http://l.jingli365.com/proj/svr-tmc",
   "mail": {
     "service": "QQex",
     "auth": {
@@ -121,5 +151,22 @@
       "pass": "Jingli_2016"
     }
   },
-  "approveServerUrl": "${JL_APP_APPROVE_SERVER_URL}"
+  "approveServerUrl": "${JL_APP_APPROVE_SERVER_URL}",
+  "wxSysCode": "30b3e212-2821-4039-b711-40624201cbeb",
+  "wxSharedSecret": "ZjBmMjU0NzAtMWI3Yi0xMWU3LTk4NzUtYTdkOWQ4MmY=",
+  "tmcUrl": "${JL_APP_TMC}",
+  "tmcFake": "${JL_APP_TMC_FAKE}",
+  "orderSysConfig": {
+    "tripDetailMonitorUrl": "${JL_APP_TD_MONITORURL}",
+    "orderLink": "${JL_APP_ORDER_LINK}"
+  },
+  "workWechat": {
+    "corpId": "wwb398745b82d67068",
+    "token": "xtz1KPDEbycN",
+    "encodingAESKey": "EktZ5eATCYwLsROXmvdNPfGayxUO6wjAS9juWxalZSB",
+    "providerSecret": "kGNDfdXSuzdvAgHC5AC8jaRUjnybKH0LnVK05NPvCV4",
+    "suiteId": "wwdb6efe49f6e236d3",
+    "suiteSecret": "7GnoFq32hgkE27kkBFPZxeetnhyQxtFk2OvHFjtrW4I"
+  },
+  "isVerify": false
 }

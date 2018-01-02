@@ -30,6 +30,7 @@ export abstract class OaCompany{
     async getCompany(): Promise<Company>{
         let self = this;
         let com: Company = null;
+        console.log("self.id: ", self.id)
         let comPro = await Models.companyProperty.find({where : {value: self.id}});
         if(comPro && comPro.length > 0){
             com = await Models.company.get(comPro[0].companyId);
@@ -45,12 +46,14 @@ export abstract class OaCompany{
 
         //处理企业信息
         let alreadyCompany = await self.getCompany();
+        if(!alreadyCompany) return ;
         if(alreadyCompany){
             alreadyCompany.name = self.name;
             alreadyCompany.status = 1;
             result = await alreadyCompany.save();
         }else{
             // 不存在，添加
+      
             let company = Company.create({name : self.name , expiryDate : moment().add(1 , "months").toDate()});
             let defaultAgency = await Models.agency.find({where:{email:C.default_agency.email}});//Agency.__defaultAgencyId;
             let agencyId:any;

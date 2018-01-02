@@ -16,7 +16,7 @@ let _ = require("lodash");
 let Config = require('@jingli/config');
 import { requireParams, clientExport } from "@jingli/dnode-api/dist/src/helper";
 import { Models } from "_types";
-import { Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE, InvoiceTitle, CompanyProperty, CPropertyType } from '_types/company';
+import { Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE, InvoiceTitle, CompanyProperty, CPropertyType, MONEY_CHANGE_TYPE } from '_types/company';
 import { Staff, EStaffRole } from "_types/staff";
 import { PromoCode } from "_types/promoCode";
 import { Agency, AgencyUser, EAgencyUserRole } from "_types/agency";
@@ -24,8 +24,9 @@ import { Department, StaffDepartment } from "_types/department";
 import { requirePermit, conditionDecorator, condition, modelNotNull } from "api/_decorator";
 import { md5 } from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
-import { CoinAccount } from "_types/coin";
+import { CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE } from "_types/coin";
 import { restfulAPIUtil } from "api/restful";
+import { TripPlan } from '_types/tripPlan';
 let RestfulAPIUtil = restfulAPIUtil;
 
 const supplierCols = Supplier['$fieldnames'];
@@ -112,7 +113,7 @@ export default class CompanyModule {
             }
         }
 
-        let staff = Staff.create({ email: params.email, name: params.userName, mobile: params.mobile, roleId: EStaffRole.OWNER, pwd: md5(pwd), status: params.status, isValidateMobile: params.isValidateMobile });
+        let staff = Staff.create({ email: params.email, name: params.userName, mobile: params.mobile || null, roleId: EStaffRole.OWNER, pwd: md5(pwd), status: params.status, isValidateMobile: params.isValidateMobile });
         let company = Company.create(params);
         company.domainName = domain;
         company.expiryDate = moment().add(DEFAULT_EXPIRE_MONTH, 'months').toDate();
@@ -184,6 +185,7 @@ export default class CompanyModule {
                 addUrl: 'company/create',
                 useProxy: false
             });
+
         } catch (e) {
             throw e;
         }
@@ -1319,7 +1321,8 @@ export default class CompanyModule {
                     logger.error(`执行任务${taskId7}错误:${err.stack}`);
                 })
         });
-    }
+
+        }
 
 }
 

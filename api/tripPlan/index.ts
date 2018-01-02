@@ -25,7 +25,7 @@ import {
 } from "_types/tripPlan";
 import {Models} from "_types";
 import {FindResult, PaginateInterface} from "common/model/interface";
-import {Staff, EStaffRole, EStaffStatus} from "_types/staff";
+import {Staff, EStaffRole, EStaffStatus, PointChange} from "_types/staff";
 import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import { getSession } from "@jingli/dnode-api";
 import {AgencyUser} from "_types/agency";
@@ -39,11 +39,17 @@ import {ISegment, ICreateBudgetAndApproveParams, ExpendItem} from '_types/tripPl
 import {EApproveStatus} from "../../_types/approve/types";
 import {plugins} from "../../libs/oa/index";
 import {Supplier} from "../../_types/company/supplier";
+import {Company, MoneyChange, MONEY_CHANGE_TYPE} from '_types/company';
+import {CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE} from "_types/coin";
 const projectCols = Project['$fieldnames'];
 import {restfulAPIUtil} from "api/restful"
+<<<<<<< HEAD
 import {EBudgetCollectionType, EProjectStatus} from "../../_types/tripPlan/tripPlan";
+=======
+import { Account } from '_types/auth';
+>>>>>>> 3c07919ba5da69d9f3c3a24cc978f527f0004071
 let RestfulAPIUtil = restfulAPIUtil;
-
+import * as error from "@jingli/error";
 interface ReportInvoice {
     type: string;
     date: Date;
@@ -202,6 +208,98 @@ class TripPlanModule {
     }
 
     /**
+     * 企业福利账户余额(鲸币)自动兑换员工未结算的出差奖励
+     * @param params
+     * @param params.id tripPlan id
+     */
+    @clientExport
+    static async autoSettleReward(params): Promise<any> {
+        if (typeof params == 'string') {
+            params = JSON.parse(params);
+        }
+        let company: Company;
+        let companyCoinAccount: CoinAccount;
+        let staff: Staff;
+        let coinAccount: CoinAccount;
+        let coinAccountChange: CoinAccountChange;
+        let companyCoinAccountChange: CoinAccountChange;
+        let pointChange: PointChange;
+
+        DB.transaction(async function(t) {
+            let unSettledRewardTripPlan: TripPlan = await Models.tripPlan.get(params.id);  //该次行程
+
+        company = await Models.company.get(unSettledRewardTripPlan.companyId);
+        let points2coinRate: number = company.points2coinRate;  //企业余额可转为鲸币的比例
+        let scoreRatio: number = company.scoreRatio;  //企业奖励节省比例
+        companyCoinAccount = await Models.coinAccount.get(company.coinAccountId);
+        let companyBalanceCoins: number = companyCoinAccount.income - companyCoinAccount.consume - companyCoinAccount.locks;  //企业账户余额(鲸币)
+
+        if (companyBalanceCoins > 0) {   
+            if (companyBalanceCoins > (unSettledRewardTripPlan.saved * scoreRatio * points2coinRate)){  //企业余额足够兑换该员工的节省奖励
+                let rewardMoney: number = unSettledRewardTripPlan.saved * scoreRatio;  //企业对该员工的该次行程的奖励金额
+                
+                unSettledRewardTripPlan.isSettled = true;  //结算flag更改
+                companyCoinAccount.consume += rewardMoney * points2coinRate;  //企业余额扣除相应的奖励金额鲸币
+                await companyCoinAccount.save();
+                
+                staff = await Models.staff.get(unSettledRewardTripPlan.accountId);
+                staff.balancePoints -= rewardMoney;  //员工将由该次行程节省的奖励积分兑换
+                await staff.save();
+
+                unSettledRewardTripPlan.isSettled = true;
+                await unSettledRewardTripPlan.save();  //将该tripPlan的是否结算奖励标志设为true
+                
+                let accountId: string = unSettledRewardTripPlan.accountId;
+                let account: Account = await Models.account.get(accountId);
+                coinAccount = await Models.coinAccount.get(account.coinAccountId);  
+                coinAccount.income += rewardMoney * points2coinRate;  //员工account增加鲸币
+                await coinAccount.save();
+
+                let coins: number = rewardMoney * points2coinRate;
+                companyCoinAccountChange = Models.coinAccountChange.create({  //company coin_account增加鲸币变动记录
+                    coinAccountId: companyCoinAccount.id,
+                    remark: `员工${coinAccount.id}增加奖励鲸币${coins}`,
+                    type: COIN_CHANGE_TYPE.CONSUME,
+                    coins: -coins,
+                    orderNum: getOrderNo()
+                });
+                await companyCoinAccountChange.save();
+                coinAccountChange = Models.coinAccountChange.create({  //员工 coin_account增加鲸币变动记录
+                    coinAccountId: coinAccount.id,
+                    remark: `员工${coinAccount.id}增加奖励鲸币${coins}`,
+                    type: COIN_CHANGE_TYPE.AWARD,
+                    coins: coins,
+                    orderNum: getOrderNo() 
+                });
+                await coinAccountChange.save();
+
+                pointChange = Models.pointChange.create({
+                    staffId: unSettledRewardTripPlan.accountId,
+                    orderId: unSettledRewardTripPlan.id,
+                    companyId: unSettledRewardTripPlan.companyId,
+                    points: -rewardMoney,
+                    remark: `员工${coinAccount.id}兑换奖励积分${rewardMoney}`
+                });
+                await pointChange.save();
+            } else {
+                //企业余额不足继续兑换，提示充值
+                console.error('企业余额不足');
+            }
+        } else {
+            //企业余额不足继续兑换，提示充值 
+            console.error('企业余额不足');
+            }
+        }).catch(async function(err) {
+            await companyCoinAccount.reload();
+            await staff.reload();
+            await coinAccount.reload();
+            await coinAccountChange.reload();
+            await pointChange.reload();
+            throw err;
+        });
+    }
+
+    /**
      * 获取差旅计划单/预算单列表
      * @param params
      * @returns {*}
@@ -296,11 +394,11 @@ class TripPlanModule {
     @modelNotNull('tripDetail')
     static async updateTripDetail(params): Promise<TripDetail> {
         let tripDetail =  await Models.tripDetail.get(params.id);
-
+        if(!tripDetail) 
+            throw new error.ParamsNotValidError("指定tripDetail不存在, id: ", params.id);
         for(let key in params) {
             tripDetail[key] = params[key];
         }
-
         return tripDetail.save();
     }
 
@@ -669,10 +767,13 @@ class TripPlanModule {
     @requireParams(["id", "expenditure"],["version"])
     static async finishTripPlan(params: {id: string, expendArray: Array<ExpendItem>, version?: number}){
 
-        const SAVED2SCORE = config.score_ratio
-        let expendArray = params.expendArray
-        let tripPlan = await Models.tripPlan.get(params.id)
+        let expendArray = params.expendArray;
+        let tripPlan = await Models.tripPlan.get(params.id);
+        let company: Company = await Models.company.get(tripPlan.companyId);
+        let scoreRatio: number = company.scoreRatio;
 
+        let SAVED2SCORE = scoreRatio;
+        
         if (tripPlan == null) {
             logger.error(`tripPlan:${params.id} 不存在`)
             throw L.ERR.TRIP_PLAN_NOT_EXIST()
@@ -832,13 +933,15 @@ class TripPlanModule {
                     console.error(`发送钉钉通知失败`, err);
                 }
             }
-
-            //如果出差已经完成，并且节省反积分，并且非特别审批，增加员工积分。
+//TODO
+            //如果出差已经完成，并且节省反积分，并且非特别审批，增加员工积分；若企业账户有余额，直接兑换员工积分为鲸币
             if (tripPlan.status == EPlanStatus.COMPLETE && tripPlan.score > 0 && !tripPlan.isSpecialApprove) {
                 let pc = Models.pointChange.create({
                     currentPoints: staff.balancePoints, status: 1,
-                    staff: staff, company: staff.company,
-                    points: tripPlan.score, remark: `节省反积分${tripPlan.score}`,
+                    staff: staff, 
+                    company: staff.company,
+                    points: tripPlan.score, 
+                    remark: `节省反积分${tripPlan.score}`,
                     orderId: tripPlan.id});
                 await pc.save();
                 if(!staff.totalPoints){
@@ -863,6 +966,7 @@ class TripPlanModule {
                 staff.balancePoints = staff.balancePoints + tripPlan.score;
                 let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: user.id, remark: `增加员工${tripPlan.score}积分`});
                 await Promise.all([staff.save(), log.save()]);
+                await TripPlanModule.autoSettleReward({id: tripPlan.id});  //出差完成自动结算奖励 
             }
 
         }).catch(err => {
@@ -2357,7 +2461,7 @@ class TripPlanModule {
         let taskId = "authApproveTrainPlan";
         logger.info('run task ' + taskId);
         scheduler('0 *!/5 * * * *', taskId, async function() {
-            let tripApproves = await API.tripApprove.getTripApproves({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
+            let tripApproves = await Models.tripApprove.find({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: [['auto_approve_time', 'desc']]});
             tripApproves.map(async (approve) => {
 
                 let approveCompany = await approve.getCompany();
@@ -2388,7 +2492,7 @@ class TripPlanModule {
                 let version = config.link_version || 2 //外链使用的版本。
 
                 try{
-                    
+
                     if(typeof approve.query == 'string'){
                         approve.query = JSON.parse(approve.query);
                     }
@@ -2670,6 +2774,13 @@ async function tryUpdateTripPlanStatus(tripPlan: TripPlan, status: EPlanStatus) 
 function tryObjId(obj) {
     if (obj && obj.id) return obj.id;
     return null;
+}
+
+function getOrderNo() : string {
+    var d = new Date();
+    var rnd =  (Math.ceil(Math.random() * 1000));
+    var str = `${d.getFullYear()}${d.getMonth()+1}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}-${rnd}`;
+    return str;
 }
 
 
