@@ -142,6 +142,7 @@ export default class SSOModule {
             await redisCache.set(cacheKey, caches);
             accessToken = result.accessToken;
         }
+        console.log("=====accessToken", accessToken)
 
         let restApi = new RestApi(accessToken);
         let wCompany = new WCompany({ id: corpId, name: company.name, restApi, company: company});
@@ -237,7 +238,7 @@ export default class SSOModule {
     static _scheduleTask() {
         let taskId = "syncWechatEnterpriseOrganization";
         logger.info('run task ' + taskId);
-        scheduler('0 */10 * * * *', taskId, async function () {
+        scheduler('0 */2 * * * *', taskId, async function () {
             await dealEvent();
         });
     }
