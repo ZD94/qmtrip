@@ -24,7 +24,7 @@ export class CreditController extends AbstractController {
         var { uid, credits, orderNum, description } = params;
         var account = await Models.account.get(uid);
         if(!account){
-            res.json(this.reply(502,{}));
+            return res.json(this.reply(502,{}));
         }
         //资金账户不存在先创建
         if(!account.coinAccount){
@@ -42,12 +42,12 @@ export class CreditController extends AbstractController {
             try{
                 result = await coinAccount.lockCoin(credits, description, orderNum);
             }catch(e){
-                res.json(this.reply(503,{message: e.message}));
+                return res.json(this.reply(503,{message: e.message}));
             }
 
-            res.json(this.reply(0,{'credits': result.coinAccount.balance}));
+            return res.json(this.reply(0,{'credits': result.coinAccount.balance}));
         }else {
-            res.json(this.reply(0,{'credits': coinAccount.balance}));
+            return res.json(this.reply(0,{'credits': coinAccount.balance}));
         }
     }
 
@@ -84,7 +84,7 @@ export class CreditController extends AbstractController {
                     'errorMessage': errorMessage,
                 });*/
 
-                res.json(this.reply(0,{errorMessage: errorMessage}));
+                return res.json(this.reply(0,{errorMessage: errorMessage}));
 
             }else{
                 if (typeof coinAccount.locks == 'string') {
@@ -101,10 +101,10 @@ export class CreditController extends AbstractController {
                 await coinAccount.save();
                 coinAccountChange.type = COIN_CHANGE_TYPE.CONSUME;
                 await coinAccountChange.save();
-                res.json(this.reply(0,{}));
+                return res.json(this.reply(0,{}));
             }
         }else{
-            res.json(this.reply(502,{}));
+            return res.json(this.reply(502,{}));
         }
     }
 
