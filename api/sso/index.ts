@@ -85,11 +85,14 @@ export default class SSOModule {
     @clientExport
     async syncOrganization(accessToken?: string) {
         console.log("=======>同步企业通讯录开始", accessToken)
+        let authCode = await cache.read('create_auth'); 
+        console.log("======> authCode in cache is empty", authCode)
         let hasComPropertySaved = false;
         let self = this;
         let corpId: string;
         let company: Company;
         let permanentCode: string;
+        if(authCode) return;
         let suiteToken: string = await SSOModule.getSuiteToken();;
         let staff = await Staff.getCurrent();
         if(staff){
