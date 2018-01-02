@@ -154,6 +154,12 @@
   "approveServerUrl": "${JL_APP_APPROVE_SERVER_URL}",
   "wxSysCode": "30b3e212-2821-4039-b711-40624201cbeb",
   "wxSharedSecret": "ZjBmMjU0NzAtMWI3Yi0xMWU3LTk4NzUtYTdkOWQ4MmY=",
+  "tmcUrl": "${JL_APP_TMC}",
+  "tmcFake": "${JL_APP_TMC_FAKE}",
+  "orderSysConfig": {
+    "tripDetailMonitorUrl": "${JL_APP_TD_MONITORURL}",
+    "orderLink": "${JL_APP_ORDER_LINK}"
+  },
   "workWechat": {
     "corpId": "wwb398745b82d67068",
     "token": "xtz1KPDEbycN",

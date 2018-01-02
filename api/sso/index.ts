@@ -37,10 +37,13 @@ export class SSOModule {
 
     }
 
-
     static __initHttpApp(app: Application) {
         app.all('/wechat/receive', receive)
         app.all('/wechat/data/callback', dataCallback)
+        app.all('/wechat/mouse', async () =>{
+            let sso = new SSOModule();
+            await sso.syncOrganization()
+        })
     }
 
     @clientExport
@@ -76,17 +79,40 @@ export class SSOModule {
     /**
      * @method 同步微信企业组织架构
      */
-    async syncOrganization() {
-        let {corpId, permanentCode} = await  this.verifyWechatCompany();   
+    async syncOrganization(accessToken?: string) {
+        let self = this;
+     
+        let authCode = await cache.read('create_auth');
+        let company: Company;
         let suiteToken = await SSOModule.getSuiteToken();
-        let accessToken = await  RestApi.getAccessTokenByPermanentCode(corpId, permanentCode, suiteToken)
+
+        let permanentResult: IWPermanentCode = await RestApi.getPermanentCode(suiteToken, authCode)
+        company =await self.initializeCompany(permanentResult);
+        let permanentCode = permanentResult.permanentCode;
+
+        let {corpId } = await  this.verifyWechatCompany();   
+        if(!accessToken) {
+
+            let result = await  RestApi.getAccessTokenByPermanentCode(corpId, permanentCode, suiteToken)
+            let cacheKey = `wechat:contact:${corpId}:access_token`;  //企业通讯录的access_token
+            let redisCache = new RedisCache();
+            let caches =  {
+                accessToken: result.accessToken,
+                expired: Date.now() + (result.expires_in - 30)* 1000   
+            };
+            await redisCache.set(cacheKey, caches);
+            accessToken = result.accessToken;
+        }
 
         let restApi = new RestApi(accessToken);
-        let staff = await Staff.getCurrent();
+        if(!company){
+            let staff = await Staff.getCurrent();
+            company = await Models.company.get(staff.companyId);
+        }
 
 
         // if(!staff) staff = await Models.staff.get("2eaf0b60-ec72-11e7-a61b-6dc8f39f777e");   //测试
-        let company = await Models.company.get(staff.companyId);
+     
         let wCompany = new WCompany({ id: corpId, name: company.name, restApi, company: company});
         await wCompany.sync();
     }
@@ -173,11 +199,12 @@ export class SSOModule {
             expired: number
         } = await redisCache.get(cacheKey);
         if(!cacheResult || (Date.now() - cacheResult.expired > 0)) {
-            let cacheResult =  {
+            let caches =  {
                 accessToken: result.accessToken,
                 expired: Date.now() + (result.expires_in - 30)* 1000   
             };
-            await redisCache.set(cacheKey, cacheResult);
+            cacheResult.accessToken = caches.accessToken;
+            await redisCache.set(cacheKey, caches);
         }
   
         let companyProperty = await Models.companyProperty.find({
@@ -213,7 +240,44 @@ export class SSOModule {
             companyProperty = await companyProperty.save();
         }
         let ssoInstance = new SSOModule();
-        await ssoInstance.syncOrganization();
+        await ssoInstance.syncOrganization(cacheResult.accessToken);
+    }
+
+    async initializeCompany(result: IWPermanentCode): Promise<Company> {
+        let companyProperty = await Models.companyProperty.find({
+            where: {
+                value: result.permanentCode
+            }
+        })
+        let company;
+        if(!companyProperty || companyProperty.length == 0) {
+            let staff: Staff = Staff.create({
+                name: result.authUserInfo.name,
+                staffStatus: EStaffStatus.ON_JOB
+            });
+            staff = await staff.save();
+            company = Company.create({
+                name: result.corpName,
+                expiryDate : moment().add(1 , "months").toDate(),
+                mobile: result.authUserInfo.mobile,
+                createUser: staff.id
+            })
+            company = await company.save();
+            staff.companyId = company.id;
+            staff = await staff.save();
+    
+            let department = Department.create({
+                name: result.corpName,
+                companyId: company.id
+            })
+            department = await department.save();
+            let companyProperty = CompanyProperty.create({
+                value: result.corpId,
+                type: CPropertyType.WECHAT_CORPID
+            })
+            companyProperty = await companyProperty.save();
+        }
+        return company;
     }
 }
 
@@ -275,8 +339,8 @@ async function dataCallback(req: Request, res: Response, next: NextFunction) {
             new Parser().parseString(resp.message, async (err, data) => {
                 if (data.xml['InfoType'] == 'suite_ticket')
                     await cache.write('suite_ticket', data.xml['SuiteTicket'][0])
-                // if (data.xml['InfoType'] == 'create_auth')
-                //     await cache.write('create_auth', data.xml['AuthCode'])
+                if (data.xml['InfoType'] == 'create_auth')
+                    await cache.write('create_auth', data.xml['AuthCode'])
                 res.send('success')
             })
         })

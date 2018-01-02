@@ -30,7 +30,7 @@ export class RestApi {
         if (res.errcode == 0)
             return {
                 accessToken: res.access_token,
-                expiresIn: res.expires_in
+                expires_in: res.expires_in
             }
         return null
     }
