@@ -2,7 +2,7 @@ import {Express} from "express";
 
 import RedisCache from "../ddtalk/lib/redisCache";
 import { L } from '@jingli/language';
-import { Staff, EStaffStatus } from "_types/staff";
+import { Staff, EStaffStatus, EStaffRole } from "_types/staff";
 import { Models } from "_types";
 import { CPropertyType, CompanyProperty, Company } from "_types/company";
 import * as error from "@jingli/error";
@@ -174,7 +174,8 @@ export class SSOModule {
             corpId = result.corpId;
             let staff: Staff = Staff.create({
                 name: result.authUserInfo.name,
-                staffStatus: EStaffStatus.ON_JOB
+                staffStatus: EStaffStatus.ON_JOB,
+                roleId: EStaffRole.OWNER
             });
             staff = await staff.save();
             company = Company.create({
