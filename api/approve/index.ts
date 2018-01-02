@@ -99,11 +99,15 @@ class ApproveModule {
             let com = result.company;
             let frozenNum = result.frozenNum;
             budgetInfo.query.frozenNum = frozenNum;
+            if(query.projectId && !query.projectName){
+                let project = await Models.project.get(query.projectId);
+                query.projectName = project.name;
+            }
 
             let approve = await ApproveModule._submitApprove({
                 submitter: submitter.id,
                 data: budgetInfo,
-                title: query['projectName'],
+                title: query.projectName,
                 channel: submitter.company.oa,
                 type: EApproveType.TRAVEL_BUDGET,
                 approveUser: approveUser,
