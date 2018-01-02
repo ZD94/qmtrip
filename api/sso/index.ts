@@ -53,7 +53,7 @@ export default class SSOModule {
         if (suite_token) return suite_token
 
         const suite_ticket = await cache.read('suite_ticket')
-        if (!suite_ticket) throw new L.ERROR_CODE_C(500, '数据回调处理异常')
+        if (!suite_ticket) throw new L.ERROR_CODE_C(500, '数据回调处理异常')
         const res = await axios.post(SUITE_TOKEN_URL, {
             suite_id: config.workWechat.suiteId,
             suite_secret: config.workWechat.suiteSecret,
@@ -84,15 +84,12 @@ export default class SSOModule {
      */
     @clientExport
     async syncOrganization(accessToken?: string) {
-        console.log("=======>同步企业通讯录开始", accessToken)
-        let authCode = await cache.read('create_auth'); 
-        console.log("======> authCode in cache is empty", authCode)
+        console.log("=======>同步企业通讯录开始")
         let hasComPropertySaved = false;
         let self = this;
         let corpId: string;
         let company: Company;
         let permanentCode: string;
-        if(authCode) return;
         let suiteToken: string = await SSOModule.getSuiteToken();;
         let staff = await Staff.getCurrent();
         if(staff){
@@ -114,13 +111,14 @@ export default class SSOModule {
         
         if(!company) {
             let authCode = await cache.read('create_auth'); 
-            console.log("======> authCode in cache is empty", authCode)
+            console.log("======> authCode in redis", authCode)
             if(authCode) return;
             let permanentResult: IWPermanentCode = await RestApi.getPermanentCode(suiteToken, authCode)
-            permanentCode = permanentResult.permanentCode;
-            if(!permanentCode)
-                throw new error.NotPermitError(`永久授权码:  ${permanentCode}`)
+            console.log("======> permanentResult: ", permanentResult)
+            if(!permanentResult)
+                throw new error.NotPermitError(`永久授权码获取失败`)
 
+            permanentCode = permanentResult.permanentCode;
             console.log("======> authCode in cache is empty", authCode)
 
             let isCompanyRegistered = await self.checkCompanyRegistered(permanentCode);
@@ -144,6 +142,7 @@ export default class SSOModule {
             await redisCache.set(cacheKey, caches);
             accessToken = result.accessToken;
         }
+        console.log("=====accessToken", accessToken)
 
         let restApi = new RestApi(accessToken);
         let wCompany = new WCompany({ id: corpId, name: company.name, restApi, company: company});
@@ -239,7 +238,7 @@ export default class SSOModule {
     static _scheduleTask() {
         let taskId = "syncWechatEnterpriseOrganization";
         logger.info('run task ' + taskId);
-        scheduler('0 */10 * * * *', taskId, async function () {
+        scheduler('0 */2 * * * *', taskId, async function () {
             await dealEvent();
         });
     }
@@ -332,9 +331,11 @@ async function dataCallback(req: Request, res: Response, next: NextFunction) {
                     await cache.write('suite_ticket', data.xml['SuiteTicket'][0])
                 }
                     
-                if (data.xml['InfoType'] == 'create_auth')
-                    await cache.write('create_auth', data.xml['AuthCode'])
-                eventPush(data.xml['AuthCode']);
+                if (data.xml['InfoType'] == 'create_auth') {
+                     console.log("======>create_auth:  ", data.xml['AuthCode']);
+                     await cache.write('create_auth', data.xml['AuthCode']);
+                     eventPush(data.xml['AuthCode']);
+                }
                 res.send('success')
             })
         })
