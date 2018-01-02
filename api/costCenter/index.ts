@@ -4,7 +4,7 @@ var request = require("request-promise");
 import { clientExport, requireParams } from "@jingli/dnode-api/dist/src/helper";
 import { BudgetLog, CostCenter, CostCenterDeploy, ECostCenterType, BUDGET_CHANGE_TYPE } from "_types/costCenter";
 import { FindResult, PaginateInterface } from "common/model/interface";
-import { findParentManagers, findChildren } from 'api/department';
+import { findChildren } from 'api/department';
 import { Department } from '_types/department';
 import { EStaffRole } from '_types/staff';
 import { DB } from '@jingli/database';

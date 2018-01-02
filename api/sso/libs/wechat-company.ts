@@ -15,6 +15,19 @@ export class WCompany extends OaCompany {
     name: string;
     restApi: RestApi;
     company: Company;
+    get agentId() {
+        return this.target.agentId;
+    }
+    set agentId(val: string) {
+        this.target.agentId = val;
+    }
+
+    get permanentCode() {
+        return this.target.permanentCode;
+    }
+    set permanentCode(val: string) {
+        this.target.permanentCode = val;
+    }
 
     constructor(target: any) {
         super(target);
@@ -26,6 +39,9 @@ export class WCompany extends OaCompany {
     
     get secret() {
         return this.target.secret;
+    }
+    set secret(val: string) {
+        this.target.secret = val;
     }
 
     async getCompany(): Promise<Company>{
@@ -43,8 +59,10 @@ export class WCompany extends OaCompany {
     async getDepartments(): Promise<OaDepartment[]> {
         let self = this;
         let staff = await Staff.getCurrent();
+        let company: Company;
+        if(staff) 
+            company = staff.company;
 
-        // if(!staff) staff = await Models.staff.get("2eaf0b60-ec72-11e7-a61b-6dc8f39f777e");   //测试
         let wDepartments: Array<IWDepartment> = await self.restApi.getDepartments();
         let result: OaDepartment[];
 
@@ -71,6 +89,9 @@ export class WCompany extends OaCompany {
     async getRootDepartment(): Promise<OaDepartment> {
         let self = this;
         let staff = await Staff.getCurrent();
+        let company: Company;
+        if(staff) 
+            company = staff.company;
         // if(!staff) staff = await Models.staff.get("2eaf0b60-ec72-11e7-a61b-6dc8f39f777e");   //测试
         let wDepartments: Array<IWDepartment> = await self.restApi.getDepartments();
         let result: OaDepartment;
@@ -81,7 +102,7 @@ export class WCompany extends OaCompany {
                     parentId: null, 
                     id: wDepartments[i].id + '', 
                     corpId: self.id,
-                    company: staff.company, 
+                    company: company, 
                     restApi: self.restApi,
                 });
                 return result;
@@ -100,15 +121,27 @@ export class WCompany extends OaCompany {
     /**
      * @method 保存微信企业的认证属性
      */
-    async saveCompanyProperty(params: { companyId: string; }): Promise<boolean> {
+    async saveCompanyProperty(params: { companyId: string, permanentCode?: string}): Promise<boolean> {
         let self = this;
-        let companyUuidProperty = CompanyProperty.create({companyId: params.companyId, type: CPropertyType.WECHAT_CORPID, value: self.id});
-        let secretProperty = CompanyProperty.create({companyId: params.companyId, type: CPropertyType.WECHAT_SECRET, value: self.secret}); 
+        let comProperty = await Models.companyProperty.find({
+            where: {
+                companyId: params.companyId
+            }
+        })
+        if(!comProperty && comProperty.length) return true;
+        let companyUuidProperty = CompanyProperty.create({companyId: params.companyId, type: CPropertyType.WECHAT_CORPID, value: self.id}); 
         await companyUuidProperty.save();
-        await secretProperty.save();
+        let permanentCode = self.permanentCode ? self.permanentCode: params.permanentCode;
 
-        // let companyAgentProperty = CompanyProperty.create({companyId: params.companyId, type: CPropertyType.WECHAT_AGENTID, value: self.agentId});
-        // await companyAgentProperty.save();
+        if(permanentCode) {
+            let permanentCodeProperty = CompanyProperty.create({companyId: params.companyId, type: CPropertyType.WECHAT_PERMAENTCODE, value: permanentCode});
+            await permanentCodeProperty.save()
+        }
+
+        if(self.agentId) {
+            let companyAgentProperty = CompanyProperty.create({companyId: params.companyId, type: CPropertyType.WECHAT_AGENTID, value: self.agentId});
+            await companyAgentProperty.save();
+        }
         return true;
     }
 

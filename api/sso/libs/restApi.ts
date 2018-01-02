@@ -17,6 +17,12 @@ export class RestApi {
         this.access_token = access_token;
     }
 
+    /**
+     * @method 使用永久授权码和套件访问令牌和corpid获取访问服务的access_token
+     * @param corpId {string} 公司在企业微信中的id
+     * @param permanentCode {string} 永久授权码
+     * @param suiteAccessToken {string} 套件令牌
+     */
     static async getAccessTokenByPermanentCode(corpId: string, permanentCode: string, suiteAccessToken: string) {
         let url = 'https://qyapi.weixin.qq.com/cgi-bin/service/get_corp_token?suite_access_token=' + suiteAccessToken
         const res = await reqProxy({
@@ -37,6 +43,9 @@ export class RestApi {
 
     /**
      * @method 获取永久授权码
+     * @param suiteToken {string} 套件令牌
+     * @param authCode {string} 验证码
+     * @return {Promise<IWPermanentCode>}
      */
     static async getPermanentCode(suiteToken: string, authCode: string): Promise<IWPermanentCode> {
         let url = `https://qyapi.weixin.qq.com/cgi-bin/service/get_permanent_code?suite_access_token=${suiteToken}`;
@@ -47,6 +56,7 @@ export class RestApi {
                 auth_code: authCode
             }
         });
+        if(result.errcode != 0) return null;
         return {
             accessToken: result.access_token,
             permanentCode: result.permanent_code,
@@ -63,7 +73,10 @@ export class RestApi {
         } as IWPermanentCode;
     }
 
-    /**根据corpid和secret获取该公司的access_token */
+    /**
+     * @method 根据corpid和secret获取该公司的access_token 
+     *     不可用，无法获取微信企业的secret
+     */
     static async getAccessToken(corpid: string, secret: string): Promise<IAccessToken> {
         let url = `https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=${corpid}&corpsecret==${secret}`;
         // let url = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=wwb398745b82d67068&corpsecret=x51OLfe5UWqI5VEW2nXg6tAph5P8kPqmJ_RxtgnbPBE'
