@@ -332,8 +332,11 @@ async function dataCallback(req: Request, res: Response, next: NextFunction) {
                     await cache.write('suite_ticket', data.xml['SuiteTicket'][0])
                 }
                     
-                if (data.xml['InfoType'] == 'create_auth')
-                    await cache.write('create_auth', data.xml['AuthCode'])
+                if (data.xml['InfoType'] == 'create_auth') {
+                     console.log("======>create_auth:  ", data.xml['AuthCode'])
+                     await cache.write('create_auth', data.xml['AuthCode'])
+                }
+                   
                 eventPush(data.xml['AuthCode']);
                 res.send('success')
             })
