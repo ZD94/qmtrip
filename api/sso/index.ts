@@ -84,6 +84,7 @@ export default class SSOModule {
      */
     @clientExport
     async syncOrganization(accessToken?: string) {
+        console.log("=======>同步企业通讯录开始", accessToken)
         let hasComPropertySaved = false;
         let self = this;
         let corpId: string;
@@ -115,6 +116,10 @@ export default class SSOModule {
             if(!permanentCode)
                 throw new error.NotPermitError("根据authCode获取permanentCode失败")
 
+            let isCompanyRegistered = await self.checkCompanyRegistered(permanentCode);
+            if(isCompanyRegistered)
+                return ;
+            
             let com =await self.initializeCompany(permanentResult);
             company = com.company;
             corpId = com.corpId;
@@ -141,7 +146,21 @@ export default class SSOModule {
     }
 
 
-
+    /**
+     * @method 检查企业是否已经在鲸力系统注册
+     * @param permanentCode 
+     */
+    async checkCompanyRegistered(permanentCode): Promise<boolean> {
+        let comProperty = await Models.companyProperty.find({
+            where: {
+                value: permanentCode 
+            }
+        });
+        if(comProperty && comProperty.length) {
+            return true;
+        }
+        return false;
+    }
 
     /**
      * @method 根据permanentCode获取已注册公司，获取初始化新公司
@@ -183,6 +202,16 @@ export default class SSOModule {
                 mobile: result.authUserInfo.mobile,
                 createUser: staff.id
             })
+            let defaultAgency = await Models.agency.find({  //Agency.__defaultAgencyId;
+                where:{
+                    email: config.default_agency.email
+                }
+            });
+            let agencyId:any;
+            if(defaultAgency && defaultAgency.length==1){
+                agencyId=defaultAgency[0].id;
+            }
+            company['agencyId'] = agencyId;
             company = await company.save();
             staff.companyId = company.id;
             staff = await staff.save();
@@ -192,11 +221,6 @@ export default class SSOModule {
                 companyId: company.id
             })
             department = await department.save();
-            // let companyProperty = CompanyProperty.create({
-            //     value: result.corpId,
-            //     type: CPropertyType.WECHAT_CORPID
-            // })
-            // companyProperty = await companyProperty.save();
         }
         return {
             company,
@@ -208,7 +232,7 @@ export default class SSOModule {
     static _scheduleTask() {
         let taskId = "syncWechatEnterpriseOrganization";
         logger.info('run task ' + taskId);
-        scheduler('0 0/10 0 * * *', taskId, async function () {
+        scheduler('0 * * * * *', taskId, async function () {
             await dealEvent();
         });
     }
@@ -244,6 +268,7 @@ export default class SSOModule {
 
 }
 
+SSOModule._scheduleTask();
 let sso = new SSOModule()
 
 async function receive(req: Request, res: Response) {
