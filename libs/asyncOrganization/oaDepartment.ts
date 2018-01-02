@@ -72,8 +72,6 @@ export abstract class OaDepartment{
         let self = params.oaDepartment || this;
         let company = self.company;
 
-        company = await Models.company.get(company.id);
-   
         let from = params.from;
         if(params.company){
             company = params.company;
