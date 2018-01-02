@@ -37,21 +37,21 @@ export function meiyaAuth(info?: object) {
 /* 获取美亚数据 */
 let airCode = require("libs/suppliers/taobao_com/cityCode");
 export async function getMeiyaFlightData(params: ISearchTicketParams) {
-    let departure = await API.place.getCityInfo({ cityCode: params.originPlaceId });
-    let arrival = await API.place.getCityInfo({ cityCode: params.destinationId });
+    // let departure = await API.place.getCityInfo({ cityCode: params.originPlaceId });
+    // let arrival = await API.place.getCityInfo({ cityCode: params.destinationId });
 
-    let departureCode = airCode[departure.name] && airCode[departure.name].airCode;
-    let arrivalCode = airCode[arrival.name] && airCode[arrival.name].airCode;
-    if (!departureCode || !arrivalCode) {
-        return [];
-    }
+    // let departureCode = airCode[departure.name] && airCode[departure.name].airCode;
+    // let arrivalCode = airCode[arrival.name] && airCode[arrival.name].airCode;
+    // if (!departureCode || !arrivalCode) {
+    // return [];
+    // }
 
     let meiyaParam = {
-        departureCode,
-        arrivalCode,
+        // departureCode,
+        // arrivalCode,
         depDate: moment(params.leaveDate).format("YYYY-MM-DD")
     };
-    let urlFlight = config.orderSysConfig.orderLink + "/tmc/searchFlight/getList/" + `${departureCode}/${arrivalCode}/${meiyaParam.depDate}`;
+    let urlFlight = config.orderSysConfig.orderLink + "/tmc/searchFlight/getList/" + `${params.originPlaceId}/${params.destinationId}/${meiyaParam.depDate}`;
     console.log("urlFlight====>", urlFlight);
     let meiyaResult = await request({
         url: urlFlight,
