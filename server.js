@@ -7,8 +7,8 @@ require('app-module-path').addPath(__dirname);
 require('common/node_ts').install();
 var initData = require('libs/initTestData');
 var ReplServer = require('libs/replServer');
-var WX = require('api/wangxin');
-var WangxUtils = require('api/wangxin/lib/wangxUtils');
+var WX = require('api/wangXin');
+var WangxUtils = require('api/wangXin/lib/wangxUtils');
 // const httpProxy = require('http-proxy')
 
 // httpProxy.createProxyServer({
