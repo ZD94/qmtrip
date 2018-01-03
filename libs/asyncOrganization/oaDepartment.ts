@@ -151,7 +151,9 @@ export abstract class OaDepartment{
                 let childrenStaffs = await result.getAllStaffs();
                 await Promise.all(childrenStaffs.map(async (item) => {
                     let staffProperty = await item.getOaStaffIdProperty();
-                    let oaSt = oaStaffsMap[staffProperty.value];
+                    let oaSt;
+                    if(staffProperty)
+                        oaSt= oaStaffsMap[staffProperty.value];
                     if(!oaSt){
                         try{
                             await item.deleteStaffProperty();
@@ -167,7 +169,7 @@ export abstract class OaDepartment{
                             console.info("删除员工失败", e);
                         }
                     }else{
-                        oaStaffsMap[staffProperty.value] = null;
+                        // oaStaffsMap[staffProperty.value] = null;
                     }
                 }));
 
