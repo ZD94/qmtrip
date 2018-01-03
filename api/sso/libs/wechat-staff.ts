@@ -8,6 +8,11 @@ import { WDepartment, IWDepartment } from "api/sso/libs/wechat-department";
 var corpId = 'wwb398745b82d67068'
 var suiteId ='wwcd27af224b6e42e8';
 var secret = 'P2MJM1phbwSZiul9wE7XAjmEOqBHTOpUKulfI0gPKR0';
+export enum EWechatStaffStatus {
+    active = 1,  //已激活
+    disable = 2,  //已禁用
+    inactive = 4   //未激活
+}
 
 export class WStaff extends OaStaff {
     get id() {
@@ -173,12 +178,12 @@ export interface IWStaff {
     gender: EGender;
     avatar_mediaid?: string;
     isleader?: number;  //上级字段，标示是否是上级
+    status?: EWechatStaffStatus,
     
     department: string[];
     order?: number[];
     position?: string;
     telephone?: string;
-    enable?: EStaffStatus;
     extattr?: any
 }
 
