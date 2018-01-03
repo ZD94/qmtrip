@@ -32,7 +32,7 @@ const crypto = new wxCrypto(config.workWechat.token, config.workWechat.encodingA
 const SUITE_TOKEN_URL = 'https://qyapi.weixin.qq.com/cgi-bin/service/get_suite_token'
 const USER_INFO_URL = 'https://qyapi.weixin.qq.com/cgi-bin/service/getuserinfo3rd'
 var EXPIREDATE = 7200; //微信access_token的失效时间是7200秒
-export class SSOModule {
+export default class SSOModule {
     cache: RedisCache;
     constructor(){
         this.cache = new RedisCache();
@@ -42,9 +42,8 @@ export class SSOModule {
     static __initHttpApp(app: Application) {
         app.all('/wechat/receive', receive)
         app.all('/wechat/data/callback', dataCallback)
-        app.all('/wechat/mouse', async () =>{
-            let sso = new SSOModule();
-            await sso.syncOrganization()
+        app.all('/wechat/test', async (req, res, next) =>{
+            res.json("test callback successfully")
         })
     }
 
@@ -54,7 +53,7 @@ export class SSOModule {
         if (suite_token) return suite_token
 
         const suite_ticket = await cache.read('suite_ticket')
-        if (!suite_ticket) throw new L.ERROR_CODE_C(500, '数据回调处理异常')
+        if (!suite_ticket) throw new L.ERROR_CODE_C(500, '数据回调处理异常')
         const res = await axios.post(SUITE_TOKEN_URL, {
             suite_id: config.workWechat.suiteId,
             suite_secret: config.workWechat.suiteSecret,
@@ -85,6 +84,7 @@ export class SSOModule {
      */
     @clientExport
     async syncOrganization(accessToken?: string) {
+        console.log("=======>同步企业通讯录开始")
         let hasComPropertySaved = false;
         let self = this;
         let corpId: string;
@@ -110,12 +110,21 @@ export class SSOModule {
         }
         
         if(!company) {
-            let authCode = await cache.read('create_auth');
-            console.log("======> authCode in cache is empty", authCode)
+            let authCode = await cache.read('create_auth'); 
+            console.log("======> authCode in redis", authCode)
+            if(authCode) return;
             let permanentResult: IWPermanentCode = await RestApi.getPermanentCode(suiteToken, authCode)
-            if(!permanentCode)
-                throw new error.NotPermitError("根据authCode获取permanentCode失败")
+            console.log("======> permanentResult: ", permanentResult)
+            if(!permanentResult)
+                throw new error.NotPermitError(`永久授权码获取失败`)
 
+            permanentCode = permanentResult.permanentCode;
+            console.log("======> authCode in cache is empty", authCode)
+
+            let isCompanyRegistered = await self.checkCompanyRegistered(permanentCode);
+            if(isCompanyRegistered)
+                return ;
+            
             let com =await self.initializeCompany(permanentResult);
             company = com.company;
             corpId = com.corpId;
@@ -133,6 +142,7 @@ export class SSOModule {
             await redisCache.set(cacheKey, caches);
             accessToken = result.accessToken;
         }
+        console.log("=====accessToken", accessToken)
 
         let restApi = new RestApi(accessToken);
         let wCompany = new WCompany({ id: corpId, name: company.name, restApi, company: company});
@@ -142,7 +152,21 @@ export class SSOModule {
     }
 
 
-
+    /**
+     * @method 检查企业是否已经在鲸力系统注册
+     * @param permanentCode 
+     */
+    async checkCompanyRegistered(permanentCode): Promise<boolean> {
+        let comProperty = await Models.companyProperty.find({
+            where: {
+                value: permanentCode 
+            }
+        });
+        if(comProperty && comProperty.length) {
+            return true;
+        }
+        return false;
+    }
 
     /**
      * @method 根据permanentCode获取已注册公司，获取初始化新公司
@@ -184,6 +208,16 @@ export class SSOModule {
                 mobile: result.authUserInfo.mobile,
                 createUser: staff.id
             })
+            let defaultAgency = await Models.agency.find({  //Agency.__defaultAgencyId;
+                where:{
+                    email: config.default_agency.email
+                }
+            });
+            let agencyId:any;
+            if(defaultAgency && defaultAgency.length==1){
+                agencyId=defaultAgency[0].id;
+            }
+            company['agencyId'] = agencyId;
             company = await company.save();
             staff.companyId = company.id;
             staff = await staff.save();
@@ -193,11 +227,6 @@ export class SSOModule {
                 companyId: company.id
             })
             department = await department.save();
-            // let companyProperty = CompanyProperty.create({
-            //     value: result.corpId,
-            //     type: CPropertyType.WECHAT_CORPID
-            // })
-            // companyProperty = await companyProperty.save();
         }
         return {
             company,
@@ -209,7 +238,7 @@ export class SSOModule {
     static _scheduleTask() {
         let taskId = "syncWechatEnterpriseOrganization";
         logger.info('run task ' + taskId);
-        scheduler('0 0/10 0 * * *', taskId, async function () {
+        scheduler('0 */2 * * * *', taskId, async function () {
             await dealEvent();
         });
     }
@@ -245,10 +274,8 @@ export class SSOModule {
 
 }
 
+SSOModule._scheduleTask();
 let sso = new SSOModule()
-export default sso;
-
-
 
 async function receive(req: Request, res: Response) {
     const { timestamp, nonce, msg_signature, echostr } = req.query
@@ -299,11 +326,16 @@ async function dataCallback(req: Request, res: Response, next: NextFunction) {
         new Parser().parseString(rawBody, (err, data) => {
             const resp = crypto.decrypt(data.xml['Encrypt'][0])
             new Parser().parseString(resp.message, async (err, data) => {
-                if (data.xml['InfoType'] == 'suite_ticket')
+                if (data.xml['InfoType'] == 'suite_ticket'){
+                    console.log("======>suite_ticket:  ", data.xml['SuiteTicket'])
                     await cache.write('suite_ticket', data.xml['SuiteTicket'][0])
-                if (data.xml['InfoType'] == 'create_auth')
-                    await cache.write('create_auth', data.xml['AuthCode'])
-                eventPush(data.xml['AuthCode']);
+                }
+                    
+                if (data.xml['InfoType'] == 'create_auth') {
+                     console.log("======>create_auth:  ", data.xml['AuthCode']);
+                     await cache.write('create_auth', data.xml['AuthCode']);
+                     eventPush(data.xml['AuthCode']);
+                }
                 res.send('success')
             })
         })
@@ -326,6 +358,7 @@ async function dealEvent(){
         return ;
     }
     try{
+
         await sso.syncOrganization();
     }catch(e){
         console.error(e);

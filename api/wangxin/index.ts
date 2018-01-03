@@ -31,26 +31,27 @@ export default class WangXin {
      * @returns {Promise<any>}
      */
     @clientExport
-    static async loginByWangXin(params: {token: string, companyId: string}): Promise<any> {
+    static async loginByWangXin(params: {token: string, companyId?: string}): Promise<any> {
         let {token, companyId} = params
-        logger.debug(`loginByWangXin--> token: ${token}, companyId: ${companyId}`)
-        let wangxCompany = new WangxCompany({id: companyId})
+        console.info(`loginByWangXin--> token: ${token}, companyId: ${companyId}`)
+        /*let wangxCompany = new WangxCompany({id: companyId})
         let company = await wangxCompany.getCompany()
-        if (company) {
-            let userCode = WangxUtils.parseLtpaToken(token, C.wxSharedSecret) //解析token获取用户信息。
-            let staffPro = await Models.staffProperty.find({where: {value: userCode, type: SPropertyType.WANGXIN_USER_CODE}})
-            let staff: Staff
-            if (staffPro && staffPro.length > 0) {
-                staff = await Models.staff.get(staffPro[0].staffId)
-            }
-            if (!staff) {
-                throw L.ERR.UNAUTHORIZED()
-            }
-            logger.info(`网信自动登录，uuid: ${userCode}, accountId: ${staff.accountId}`)
-            return await API.auth.makeAuthenticateToken(staff.accountId, "wangxin")
-        } else {
-            throw L.ERR.COMPANY_NOT_EXIST();
+        if (company) {*/
+        let userCode = WangxUtils.parseLtpaToken(token, C.wxSharedSecret) //解析token获取用户信息。
+        console.info("wangXinAutoLogin===>>>", userCode);
+        let staffPro = await Models.staffProperty.find({where: {value: userCode, type: SPropertyType.WANGXIN_USER_CODE}})
+        let staff: Staff
+        if (staffPro && staffPro.length > 0) {
+            staff = await Models.staff.get(staffPro[0].staffId)
         }
+        if (!staff) {
+            throw L.ERR.UNAUTHORIZED()
+        }
+        logger.info(`网信自动登录，uuid: ${userCode}, accountId: ${staff.accountId}`)
+        return await API.auth.makeAuthenticateToken(staff.accountId, "wangxin")
+        /*} else {
+            throw L.ERR.COMPANY_NOT_EXIST();
+        }*/
     }
 
     /*
