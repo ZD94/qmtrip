@@ -33,14 +33,6 @@ export default class DdDepartment extends OaDepartment {
         this.target.name = val;
     }
 
-    get manager() {
-        return this.target.manager;
-    }
-
-    set manager(val: string) {
-        this.target.manager = val;
-    }
-
     get parentId() {
         return this.target.parentId;
     }
@@ -57,6 +49,14 @@ export default class DdDepartment extends OaDepartment {
         this.target.company = val;
     }
 
+    get manager() {
+        return this.target.company;
+    }
+
+    set manager(val: any) {
+        this.target.manager = val;
+    }
+
     //钉钉特有属性
     get corpId() {
         return this.target.corpId;
@@ -64,6 +64,12 @@ export default class DdDepartment extends OaDepartment {
 
     set corpId(val: string) {
         this.target.corpId = val;
+    }
+
+    constructor(target: any) {
+        super(target);
+        this.corpApi = target.corpApi;
+        this.isvApi = target.isvApi;
     }
 
     async getSelfById(): Promise<OaDepartment> {
@@ -90,7 +96,7 @@ export default class DdDepartment extends OaDepartment {
         let result: OaDepartment[] = [];
         DDdepartments.forEach((d) => {
             if(d.parentid+"" == self.id){
-                let oaDept = new DdDepartment({id: d.id, name: d.name, corpId: self.corpId, isvApi: self.isvApi, corpApi: self.corpApi,
+                let oaDept = new DdDepartment({id: d.id, name: d.name, corpId: self.corpId, isvApi: self.isvApi, 
                     company: self.company, parentId: d.parentid});
                 result.push(oaDept);
             }
@@ -178,11 +184,6 @@ export default class DdDepartment extends OaDepartment {
             }
         }
         return department;
-    }
-    constructor(target: any) {
-        super(target);
-        this.corpApi = target.corpApi;
-        this.isvApi = target.isvApi;
     }
 
 };

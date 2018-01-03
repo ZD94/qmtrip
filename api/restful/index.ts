@@ -36,7 +36,6 @@ export async function getAgentToken() {
         timestamp,
         sign: md5(`${config.agent.appSecret}|${timestamp}`)
     }).then(res => res.data)
-
     if (resp.code === 0) {
         await cache.write(key, resp.data.token, resp.data.expires - 30);
         // logger.debug('TOKEN:', resp.data.token)

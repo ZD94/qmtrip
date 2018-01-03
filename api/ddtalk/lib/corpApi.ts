@@ -5,7 +5,7 @@
 'use strict';
 import {CorpAccessToken} from "./interface";
 import {reqProxy} from "./reqProxy";
-import RedisCache = require('./redisCache');
+import RedisCache from './redisCache';
 import {DdTalkDepartment} from "./type";
 
 export interface CorpTicket {

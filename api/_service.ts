@@ -1,8 +1,11 @@
 
 import { initModels } from '_types';
 
+
+
 import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo, StaffProperty, Linkman} from '_types/staff';
-import { Company, MoneyChange, Supplier, TripPlanNumChange, CompanyProperty, InvoiceTitle } from '_types/company';
+import { Company, MoneyChange, Supplier, TripPlanNumChange, CompanyProperty, InvoiceTitle, CompanyScoreRatioChange } from '_types/company';
+
 import { Department, StaffDepartment, DepartmentProperty } from '_types/department';
 import { PromoCode } from '_types/promoCode';
 
@@ -12,7 +15,7 @@ import { Agency, AgencyUser } from '_types/agency';
 import { CostCenter, BudgetLog, CostCenterDeploy } from '_types/costCenter';
 import {
     TripPlan, TripDetail, TripDetailStaff, Project, TripPlanLog, FinanceCheckCode,
-    TripDetailInvoice, TripDetailTraffic, TripDetailHotel, Offline
+    TripDetailInvoice, TripDetailTraffic, TripDetailHotel, Offline, ProjectStaff, ProjectTravelPolicy
 } from '_types/tripPlan';
 import {Account, Token} from '_types/auth';
 import { Seed } from '_types/seed';
@@ -66,7 +69,10 @@ initModels({
 
     tripPlanLog: createServerService<TripPlanLog>(TripPlanLog),
     moneyChange: createServerService<MoneyChange>(MoneyChange),
+    companyScoreRatioChange: createServerService<CompanyScoreRatioChange>(CompanyScoreRatioChange),
     project: createServerService<Project>(Project),
+    projectStaff: createServerService<ProjectStaff>(ProjectStaff),
+    projectStaffTravelPolicy: createServerService<ProjectTravelPolicy>(ProjectTravelPolicy),
     // tripApprove: createServerService<TripApprove>(TripApprove),
     approve: createServerService<Approve>(Approve),
     account: createServerService<Account>(Account),
