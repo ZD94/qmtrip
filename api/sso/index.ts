@@ -359,8 +359,6 @@ async function eventPush(msg: string ){
     return;
 }
 
-
-
 async function dealEvent(){
     let key = 'sync:wechat:company';
     let msg : { EventType : string } = await cache.lpop(key);
