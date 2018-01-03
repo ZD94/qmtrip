@@ -93,7 +93,7 @@ server.on('init.api', function(API){
     }
 
     if(cluster.isMaster && config.wxSysCode){
-        WX.syncOrganization();
+        // WX.syncOrganization();
         /*let key = "ZjBmMjU0NzAtMWI3Yi0xMWU3LTk4NzUtYTdkOWQ4MmY=";
         // let result = WangxUtils.createLtpaToken("*shangguanzirui*", 12, key);
         let token = "AQIDBDVBNDVGNzBCNUE0NjlGQ0Iqc2hhbmdndWFuemlydWkq9G2GcWudAn8KpUHh8g9cRJEmtGc=";
