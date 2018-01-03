@@ -52,8 +52,8 @@ export default class SSOModule {
         const suite_token = await cache.read('suite_token')
         if (suite_token) return suite_token
 
-        const suite_ticket = await cache.read('suite_ticket')
-        if (!suite_ticket) throw new L.ERROR_CODE_C(500, '数据回调处理异常')
+        var suite_ticket = await cache.read('suite_ticket')
+        if (!suite_ticket) throw new L.ERROR_CODE_C(500, '数据回调处理异常,缓存中不存在suite_ticket')
         const res = await axios.post(SUITE_TOKEN_URL, {
             suite_id: config.workWechat.suiteId,
             suite_secret: config.workWechat.suiteSecret,
@@ -111,26 +111,28 @@ export default class SSOModule {
         
         if(!company) {
             let authCode = await cache.read('create_auth'); 
-            console.log("======> authCode in redis", authCode)
             if(authCode) return;
             let permanentResult: IWPermanentCode = await RestApi.getPermanentCode(suiteToken, authCode)
-            console.log("======> permanentResult: ", permanentResult)
+
             if(!permanentResult)
                 throw new error.NotPermitError(`永久授权码获取失败`)
 
             permanentCode = permanentResult.permanentCode;
-            console.log("======> authCode in cache is empty", authCode)
+            accessToken = permanentResult.accessToken;
 
-            let isCompanyRegistered = await self.checkCompanyRegistered(permanentCode);
-            if(isCompanyRegistered)
-                return ;
-            
-            let com =await self.initializeCompany(permanentResult);
-            company = com.company;
-            corpId = com.corpId;
+            let comProperty = await self.getRegisteredCompany(permanentCode);
+            if(!comProperty) {
+                let com =await self.initializeCompany(permanentResult);
+                company = com.company;
+                corpId = com.corpId;
+            }
+            if(comProperty) {
+                company = comProperty.company;
+                corpId = comProperty.corpId;
+            }
             permanentCode = permanentResult.permanentCode;
         }
- 
+
         if(!accessToken) {
             let result = await  RestApi.getAccessTokenByPermanentCode(corpId, permanentCode, suiteToken)
             let cacheKey = `wechat:contact:${corpId}:access_token`;  //企业通讯录的access_token
@@ -142,7 +144,6 @@ export default class SSOModule {
             await redisCache.set(cacheKey, caches);
             accessToken = result.accessToken;
         }
-        console.log("=====accessToken", accessToken)
 
         let restApi = new RestApi(accessToken);
         let wCompany = new WCompany({ id: corpId, name: company.name, restApi, company: company});
@@ -156,16 +157,26 @@ export default class SSOModule {
      * @method 检查企业是否已经在鲸力系统注册
      * @param permanentCode 
      */
-    async checkCompanyRegistered(permanentCode): Promise<boolean> {
+    async getRegisteredCompany(permanentCode): Promise<{company: Company, corpId: string}> {
         let comProperty = await Models.companyProperty.find({
             where: {
-                value: permanentCode 
+                value: permanentCode,
+                type: CPropertyType.WECHAT_PERMAENTCODE
             }
         });
         if(comProperty && comProperty.length) {
-            return true;
+            let company = await Models.company.get(comProperty[0].companyId)
+            if(!company) return null;
+            let com = await Models.companyProperty.find({
+                where: {
+                    companyId: company.id,
+                    type: CPropertyType.WECHAT_CORPID
+                }
+            });
+            let corpId = com && com.length ? com[0].value: null;
+            return { company, corpId};
         }
-        return false;
+        return null;
     }
 
     /**
@@ -224,7 +235,8 @@ export default class SSOModule {
     
             let department = Department.create({
                 name: result.corpName,
-                companyId: company.id
+                companyId: company.id,
+                isDefault: true
             })
             department = await department.save();
         }
@@ -238,7 +250,7 @@ export default class SSOModule {
     static _scheduleTask() {
         let taskId = "syncWechatEnterpriseOrganization";
         logger.info('run task ' + taskId);
-        scheduler('0 */2 * * * *', taskId, async function () {
+        scheduler('* */1 * * * *', taskId, async function () {
             await dealEvent();
         });
     }
@@ -327,12 +339,10 @@ async function dataCallback(req: Request, res: Response, next: NextFunction) {
             const resp = crypto.decrypt(data.xml['Encrypt'][0])
             new Parser().parseString(resp.message, async (err, data) => {
                 if (data.xml['InfoType'] == 'suite_ticket'){
-                    console.log("======>suite_ticket:  ", data.xml['SuiteTicket'])
                     await cache.write('suite_ticket', data.xml['SuiteTicket'][0])
                 }
                     
                 if (data.xml['InfoType'] == 'create_auth') {
-                     console.log("======>create_auth:  ", data.xml['AuthCode']);
                      await cache.write('create_auth', data.xml['AuthCode']);
                      eventPush(data.xml['AuthCode']);
                 }
@@ -358,7 +368,6 @@ async function dealEvent(){
         return ;
     }
     try{
-
         await sso.syncOrganization();
     }catch(e){
         console.error(e);

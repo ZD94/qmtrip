@@ -1,6 +1,6 @@
 import { OaDepartment } from "libs/asyncOrganization/oaDepartment";
 import { Company } from "_types/company";
-import { WStaff, IWStaff, EStaffStatus } from "api/sso/libs/wechat-staff";
+import { WStaff, IWStaff, EStaffStatus, EWechatStaffStatus } from "api/sso/libs/wechat-staff";
 import { OaStaff } from "libs/asyncOrganization/oaStaff";
 import { RestApi } from "api/sso/libs/restApi";
 import { DepartmentProperty, DPropertyType } from "_types/department";
@@ -11,6 +11,8 @@ export interface IWDepartment {
     parentid: number;
     order: number
 }
+
+
 
 export class WDepartment extends OaDepartment {
     id: string;
@@ -78,7 +80,7 @@ export class WDepartment extends OaDepartment {
 
         if(result && result.length){
             for(let i = 0; i < result.length; i++) {
-                if(result[i].id && result[i].id.toString() != self.parentId) {
+                if(result[i].id && result[i].id.toString() != self.id) {   //微信企业获取当前部门的子部门列表时，该列表包含该父集部门和其子部门
                     childDepartments.push(new WDepartment({
                         id: result[i].id, 
                         name: result[i].name, 
@@ -129,7 +131,7 @@ export class WDepartment extends OaDepartment {
         let wStaffs: Array<IWStaff> = await self.restApi.getDetailedStaffsByDepartment(self.id);
         let result: OaStaff[] = [];
         for(let u of wStaffs){
-            if(u.enable == EStaffStatus.ENABLE) {
+            if(u.status != EWechatStaffStatus.inactive) {
                 let wstaff = new WStaff({
                     id: u.userid, 
                     name: u.name, 

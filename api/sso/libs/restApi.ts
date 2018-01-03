@@ -33,12 +33,12 @@ export class RestApi {
                 permanent_code: permanentCode
             }
         })
-        if (res.errcode == 0)
-            return {
-                accessToken: res.access_token,
-                expires_in: res.expires_in
-            }
-        return null
+        if (res.errcode != 0)
+            return null
+        return {
+            accessToken: res.access_token,
+            expires_in: res.expires_in
+        }
     }
 
     /**
@@ -109,7 +109,7 @@ export class RestApi {
             order: result.order,
             position: result.position,
             telephone: result.telephone,
-            enable: result.enable,
+            status: result.status,
             extattr: result.extattr
         } as IWStaff;
     }
@@ -137,7 +137,6 @@ export class RestApi {
             access_token: this.access_token
         }
         if (id) qs['id'] = id;
-        console.log("=====this department: ", qs, url)
         let result: IDepartmentResult = await reqProxy({
             url,
             method: 'GET',
@@ -180,7 +179,7 @@ export class RestApi {
      * @param.fetchChild {number} 是否递归获取子部门下面的成员
      * @return {IConciseMemberListResult}
      */
-    async getConciseStaffsByDepartment(departmentId?: string, fetchChild?: number): Promise<IConciseMemberListResult> {
+    async getConciseStaffsByDepartment(departmentId?: string, fetchChild?: number): Promise<any> {
         let url = 'https://qyapi.weixin.qq.com/cgi-bin/user/simplelist';
         let qs: {
             access_token: string,
@@ -196,7 +195,8 @@ export class RestApi {
             method: 'GET',
             qs
         });
-        return result;
+        if(!result || !result.userlist) return null;
+        return result.userlist;
     }
 }
 
