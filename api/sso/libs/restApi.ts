@@ -56,8 +56,8 @@ export class RestApi {
                 auth_code: authCode
             }
         });
-        console.log("====getPermanentCode: ",suiteToken, authCode,  result)
-        if(result.errcode != 0) return null;
+        console.log("=====>result: ", result)
+        // if(result.errcode != 0) return null;
         return {
             accessToken: result.access_token,
             permanentCode: result.permanent_code,
