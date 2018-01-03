@@ -271,7 +271,10 @@ export default class CostCenterModule {
             Models.costCenterDeploy.find({
                 where: { ...where, costCenterId: c.id }
             })), Models.costCenterDeploy.find({ where: { ...where, costCenterId: deptId } })])
-        return _.compose(_.compact, _.map(_.first))(costs)
+        const uniqCosts: CostCenterDeploy[] = _.compose(_.compact, _.map(_.first))(costs)
+        const planExpends = await Promise.all(uniqCosts.map(cost => cost.getPlanBudget({ startDay: period.start, endDay: period.end })))
+        return _.zipWith((cost: CostCenterDeploy, planExpend: number) =>
+            ({ ...cost, expendBudget: cost.expendBudget + planExpend }), uniqCosts, planExpends)
     }
 
     @clientExport
