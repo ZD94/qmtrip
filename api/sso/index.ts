@@ -90,7 +90,7 @@ export default class SSOModule {
         let corpId: string;
         let company: Company;
         let permanentCode: string;
-        let suiteToken: string = await SSOModule.getSuiteToken();;
+        let suiteToken: string = await SSOModule.getSuiteToken();
         let staff = await Staff.getCurrent();
         if(staff){
             company = staff.company;
@@ -111,9 +111,8 @@ export default class SSOModule {
         
         if(!company) {
             let authCode = await cache.read('create_auth'); 
-            if(authCode) return;
             let permanentResult: IWPermanentCode = await RestApi.getPermanentCode(suiteToken, authCode)
-
+            console.log("======>permanentResult: ", permanentResult)
             if(!permanentResult)
                 throw new error.NotPermitError(`永久授权码获取失败`)
 
