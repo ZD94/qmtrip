@@ -52,7 +52,7 @@ export default class SSOModule {
         const suite_token = await cache.read('suite_token')
         if (suite_token) return suite_token
 
-        var suite_ticket = await cache.read('suite_ticket')
+        const suite_ticket = await cache.read('suite_ticket')
         if (!suite_ticket) throw new L.ERROR_CODE_C(500, '数据回调处理异常,缓存中不存在suite_ticket')
         const res = await axios.post(SUITE_TOKEN_URL, {
             suite_id: config.workWechat.suiteId,
