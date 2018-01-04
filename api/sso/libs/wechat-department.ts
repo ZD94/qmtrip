@@ -132,7 +132,8 @@ export class WDepartment extends OaDepartment {
         let wStaffs: Array<IWStaff> = await self.restApi.getDetailedStaffsByDepartment(self.id);
         let result: OaStaff[] = [];
         for(let u of wStaffs){
-            if(u.status != EWechatStaffStatus.inactive) {
+            console.log("员工", u.name, "的状态: ", u.status)
+            if(u.status != EWechatStaffStatus.disable) {
                 let wstaff = new WStaff({
                     id: u.userid, 
                     name: u.name, 
@@ -142,7 +143,8 @@ export class WDepartment extends OaDepartment {
                     corpId: self.corpId,
                     restApi: self.restApi, 
                     company: self.company,
-                    avatar: u. avatar_mediaid
+                    avatar: u. avatar_mediaid,
+                    status: u.status
                 });
                  result.push(wstaff);
             }

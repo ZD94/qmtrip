@@ -163,6 +163,7 @@ export class WStaff extends OaStaff {
                 type: SPropertyType.WECHAT_UID
             }
         })
+        console.log("======hasStaffId: ", hasStaffId)
         if(!hasStaffId || hasStaffId.length == 0) {
             let staffUuidProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WECHAT_UID, value: self.id});
             await staffUuidProperty.save();
@@ -183,7 +184,7 @@ export class WStaff extends OaStaff {
         let hasUserInfo = await Models.staffProperty.find({
             where: {
                 staffId: params.staffId,
-                type: SPropertyType.WECHAT_CORPID
+                type: SPropertyType.WECHAT_USER_INFO
             }
         })
         if(!hasUserInfo || hasUserInfo.length == 0) {
