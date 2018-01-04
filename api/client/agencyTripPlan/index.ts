@@ -343,7 +343,7 @@ export async function statPlanOrderMoneyByAgency(this: { accountId: string }, pa
         throw {code: -1, msg: '企业Id不能为空'};
     }
     let companyId = params.companyId;
-    let p = _.pick(params, ['companyId', 'startTime', 'endTime']);
+    let p: {companyId: string} = _.pick(params, ['companyId', 'startTime', 'endTime']);
 
     let [u, c] = await Promise.all([
         API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']}),
