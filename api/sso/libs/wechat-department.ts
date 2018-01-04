@@ -4,6 +4,7 @@ import { WStaff, IWStaff, EStaffStatus, EWechatStaffStatus } from "api/sso/libs/
 import { OaStaff } from "libs/asyncOrganization/oaStaff";
 import { RestApi } from "api/sso/libs/restApi";
 import { DepartmentProperty, DPropertyType } from "_types/department";
+import { Models } from '_types';
 
 export interface IWDepartment {
     id: number;
@@ -163,10 +164,28 @@ export class WDepartment extends OaDepartment {
 
     async saveDepartmentProperty(params: { departmentId: string; }): Promise<boolean> {
         let self = this;  
-        let departmentUuidProperty = DepartmentProperty.create({departmentId: params.departmentId, type: DPropertyType.WECHAT_DEPARTMENTID, value: self.id+""});
-        let departmentDnProperty = DepartmentProperty.create({departmentId: params.departmentId, type: DPropertyType.DD_COMPANY_ID, value: self.corpId});
-        await departmentUuidProperty.save();
-        await departmentDnProperty.save();
+        let hasDepartmentId = await Models.departmentProperty.find({
+            where: {
+                departmentId: params.departmentId,
+                type: DPropertyType.WECHAT_DEPARTMENTID
+            }
+        })
+        if(!hasDepartmentId || hasDepartmentId.length == 0) {
+            let departmentUuidProperty = DepartmentProperty.create({departmentId: params.departmentId, type: DPropertyType.WECHAT_DEPARTMENTID, value: self.id+""});
+            await departmentUuidProperty.save();
+        }
+
+        let hasCorpId = await Models.departmentProperty.find({
+            where: {
+                departmentId: params.departmentId,
+                type: DPropertyType.WECHAT_CORPID
+            }
+        })
+        if(!hasCorpId || hasCorpId.length == 0) {             
+            let departmentDnProperty = DepartmentProperty.create({departmentId: params.departmentId, type: DPropertyType.WECHAT_CORPID, value: self.corpId}); 
+            await departmentDnProperty.save();
+        }
+
         return true;
     }
 
