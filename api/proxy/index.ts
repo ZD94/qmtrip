@@ -30,7 +30,7 @@ class Proxy {
      */
     static __initHttpApp(app: Express){
 
-        app.options(/^\/(order|travel|mall)*/, cors(corsOptions), (req: Request, res: Response, next: Function) => {         
+        app.options(/^\/(order|travel|mall|supplier|bill|permission)*/, cors(corsOptions), (req: Request, res: Response, next: Function) => {         
             return res.sendStatus(200);
         })
 
@@ -103,7 +103,7 @@ class Proxy {
             let pathstr: string = req.path;
             pathstr = pathstr.replace('/supplier', '');
             let JLOpenApi: string = config.cloud;
-            JLOpenApi.replace('/cloud', '');
+            JLOpenApi = JLOpenApi.replace('/cloud', '');
             let url: string = `${JLOpenApi}${pathstr}`;
 
             try {
