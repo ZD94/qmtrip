@@ -15,7 +15,7 @@ import { Request, Response, NextFunction } from 'express-serve-static-core'
 export class BudgetController extends AbstractController {
 
     constructor() {
-        super();
+        super()
     }
 
     $isValidId(id: string) {

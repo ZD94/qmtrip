@@ -13,7 +13,7 @@ const config = require('@jingli/config')
 
 import path = require("path");
 import express = require("express");
-import { Request, Response, NextFunction, Express } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { Application } from 'express-serve-static-core';
 
 let router = express.Router();
@@ -25,7 +25,7 @@ let allowOrigin = [
     "jingli365"
 ];
 
-function checkOrigin( origin: string){
+function checkOrigin( origin ){
     for(let item of allowOrigin){
         if(origin.indexOf(item) > -1){
             return true;
@@ -44,13 +44,12 @@ function allowCrossDomain(req: Request, res: Response, next: NextFunction) {
         res.header('Access-Control-Allow-Origin', req.headers.origin);
     }
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', req.headers['access-control-request-headers'] as string);
+    res.header('Access-Control-Allow-Headers', req.headers['access-control-request-headers']);
     if (req.method == 'OPTIONS') {
         return res.send("OK");
     }
     next();
 }
-
 
 export async function initHttp(app: Application) {
     // router.param("companyId", validCompanyId);
@@ -60,7 +59,7 @@ export async function initHttp(app: Application) {
     conf.setConfig(5 * 60 * 1000, [/^\/wechat/], cache, getAppSecretByAppId)
     app.use('/api/v1', jlReply)
     app.use('/api/v1', allowCrossDomain);
-    app.use('/api/v1', (req, res: any, next) => {
+    app.use('/api/v1', (req: Request, res: any, next: NextFunction) => {
         auth(req, res, next, async (err, isValid, data) => {
             if (isValid) {
                 const companies = await Models.company.find({
@@ -74,7 +73,7 @@ export async function initHttp(app: Application) {
     }, router);
 }
 
-export function jlReply(req, res, next) {
+export function jlReply(req: any, res: any, next: NextFunction) {
     res.jlReply = function (data: any) {
         let { appId, appSecret } = req.session || { appId: '00000000', appSecret: '00000000' };
         let timestamp = Math.floor(Date.now() / 1000);
