@@ -1,4 +1,4 @@
 <span style="margin-bottom: 10px;color: #757575;">申请人：<%=tripApprove.account.name || '' %></span><br>
 <span style="margin-bottom: 10px;color: #757575;">日期：<%=moment(tripApprove.startAt).format('YYYY.MM.DD') || '' %> 至 <%=moment(tripApprove.backAt).format('YYYY.MM.DD') || '' %></span><br>
-<span style="margin-bottom: 10px;color: #757575;">行程：<%=tripApprove.deptCity || '' %> - <%=tripApprove.arrivalCity || '' %></span><br>
+<span style="margin-bottom: 10px;color: #757575;">行程：<%=tripApprove.deptCity || '' %> <%=(tripApprove.deptCity) ? '-' : ''%> <%=tripApprove.arrivalCity || '' %></span><br>
 <span style="margin-bottom: 10px;color: #757575;">预算：￥<%=tripApprove.budget || '' %></span>

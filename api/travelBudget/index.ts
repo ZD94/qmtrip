@@ -3,7 +3,7 @@
  */
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { Models } from '_types'
-import { ETripType, EInvoiceType, ICreateBudgetAndApproveParams } from "_types/tripPlan";
+import { ETripType, EInvoiceType, ICreateBudgetAndApproveParams, ICreateBudgetAndApproveParamsNew, ISegment } from "_types/tripPlan";
 import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
 import L from '@jingli/language';
@@ -21,7 +21,13 @@ import { meiyaJudge, getMeiyaFlightData, getMeiyaTrainData, compareFlightData, c
 import { Application, Request, Response, NextFunction } from 'express';
 
 let RestfulAPIUtil = restfulAPIUtil;
-
+import * as CLS from 'continuation-local-storage';
+import { DB } from "@jingli/database";
+import { Company } from "_types/company";
+import { EApproveType, STEP } from '_types/approve';
+import { Transaction } from 'sequelize';
+var CLSNS = CLS.getNamespace('dnode-api-context');
+var request = require("request");
 export interface ICity {
     name: string;
     id: string;
@@ -33,15 +39,21 @@ export interface ICity {
     code?: string;  //三字码
 }
 
+export enum EBudgetType {
+    TRAFFIC = 1,
+    HOTEL = 2,
+    SUBSIDY = 3
+}
+
 export interface IQueryBudgetParams {
-    fromCity?: ICity| string;       //出发城市
-    backCity?: ICity| string;       //返回城市
+    fromCity?: ICity | string;       //出发城市
+    backCity?: ICity | string;       //返回城市
     segments: any;      //每段查询条件
     ret: boolean;       //是否往返
     staffs: any;  //出差员工
     travelPolicyId?: string;
-    companyId? : string;
-    expiredBudget? : boolean;  //过期是否可以生成预算
+    companyId?: string;
+    expiredBudget?: boolean;  //过期是否可以生成预算
     combineRoom?: boolean;   //同性是否合并
     isRetMarkedData?: boolean;
     preferedCurrency?: string;
@@ -99,6 +111,20 @@ export default class ApiTravelBudget {
     }
 
     @clientExport
+    static async sendSaleSteam(params: any) {
+        try {
+            await API.notify.submitNotify({
+                key: 'qm_tmc',
+                email: config.email_address.tmcsale,
+                values: { orderTyp: params.orderType, passenger: params.passenger || [] }
+            });
+            console.log("qm_tmc is ok");
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    @clientExport
     static async getHotelsData(params: ISearchHotelParams): Promise<any> {
         let commonData;
         let result;
@@ -115,28 +141,33 @@ export default class ApiTravelBudget {
             console.log(err);
         }
         if (result.code == 0) {
-            commonData = result.data;
-        } else {
-            return null;
+            commonData = result.data.data;
         }
 
-        // writeData("commonHotelData.json", commonData);
+        if (!commonData || typeof commonData == 'undefined')
+            return [];
         //检查是否需要美亚数据，返回美亚数据
         let needMeiya = await meiyaJudge();
         if (!needMeiya) {
             return commonData;
         }
 
-        let meiyaHotel = await getMeiyaHotelData(params);
-        compareHotelData(commonData, meiyaHotel);
-        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss")+".finallyHotel.json", commonData);
-        return commonData;
-
-        // return require("mytest/data/2017_11_30_04_16_08.finallyHotel");
+        if (config.tmcFake == 1) {
+            console.log("getHotelsData ===> fake data.")
+            return require("meiyaFake/finallyUsingHotel");
+        } else {
+            let meiyaHotel = await getMeiyaHotelData(params);
+            console.log("meiyaHotel ===> meiyaHotel data.", meiyaHotel.length)
+            if (meiyaHotel && meiyaHotel.length)
+                commonData = compareHotelData(commonData, meiyaHotel);
+            // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".finallyHotel.json", commonData);
+            return commonData;
+        }
     }
 
     @clientExport
     static async getTrafficsData(params: ISearchTicketParams): Promise<any> {
+
         let commonData;
         let result;
         try {
@@ -148,41 +179,47 @@ export default class ApiTravelBudget {
                 addUrl: 'getTrafficsData',
                 model: "budget"
             })
+
         } catch (err) {
             console.log(err);
         }
         if (result.code == 0) {
-            commonData = result.data;
-        } else {
-            return null;
+            commonData = result.data.data;
         }
 
-        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") +".commonTraffic.json", commonData);
-
+        if (!commonData || typeof commonData == 'undefined')
+            return [];
+        //检查是否需要美亚数据，返回美亚数据
         let needMeiya = await meiyaJudge();
         if (!needMeiya) {
             return commonData;
         }
-
-        let arr = await Promise.all([
-            await getMeiyaTrainData(params),
-            await getMeiyaFlightData(params)
-        ]);
-        let meiyaTrain = arr[0];
-        let meiyaFlight = arr[1];
-        compareFlightData(commonData, meiyaFlight);
-        compareTrainData(commonData, meiyaTrain);
-        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") +".meiyaTrain.json", meiyaTrain);
-        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") +".meiyaFlight.json", meiyaFlight);
-
-        // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") +".finallyTraffic.json", commonData);
-        return commonData;
+        console.log("commonData ===> commonData data.", commonData.length)
+        if (config.tmcFake == 1) {
+            console.log("getTrafficsData ===> fake data.")
+            return require("meiyaFake/finallyUsingTraffic");
+        } else {
+            let arr = await Promise.all([
+                await getMeiyaTrainData(params),
+                await getMeiyaFlightData(params)
+            ]);
+            let meiyaTrain = arr[0];
+            let meiyaFlight = arr[1];
+            console.log("meiyaFlight ===> meiyaFlight data.", meiyaFlight.length)
+            console.log("meiyaTrain ===> meiyaTrain data.", meiyaTrain.length)
+            if (meiyaFlight && meiyaFlight.length)
+                commonData = compareFlightData(commonData, meiyaFlight);
+            if (meiyaTrain && meiyaTrain.length)
+                commonData = compareTrainData(commonData, meiyaTrain);
+            console.log("commonData ===> commonData data.", typeof (commonData))
+            return commonData;
+        }
     }
 
     @clientExport
-    static async getTripTravelPolicy(travelPolicyId:string, destinationId:string){
+    static async getTripTravelPolicy(travelPolicyId: string, destinationId: string) {
         let result;
-        try{
+        try {
             result = await RestfulAPIUtil.operateOnModel({
                 params: {
                     method: 'post',
@@ -192,14 +229,14 @@ export default class ApiTravelBudget {
                     }
                 },
                 addUrl: 'getTravelPolicy',
-                model:"budget"
+                model: "budget"
             })
-        }catch(err) {
+        } catch (err) {
             console.log(err);
         }
-        if(result.code == 0){
+        if (result.code == 0) {
             return result.data;
-        }else{
+        } else {
             return null;
         }
     }
@@ -231,7 +268,7 @@ export default class ApiTravelBudget {
     static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams): Promise<string> {
         // console.log("params===>", params);
 
-        let staffId = params['staffId'];
+        /*let staffId = params['staffId'];
         let preferedCurrency = params["preferedCurrency"];
         preferedCurrency = preferedCurrency && typeof (preferedCurrency) != 'undefined' ? preferedCurrency : DefaultCurrencyUnit;
 
@@ -246,6 +283,17 @@ export default class ApiTravelBudget {
             throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
         }
         params.travelPolicyId = travelPolicy.id;
+
+        if(params.costCenterId){
+            let cc = await Models.costCenter.get(params.costCenterId);
+            if(cc.type == ECostCenterType.PROJECT){
+                let pts = await Models.projectStaffTravelPolicy.all({where: {staffId: staffId, projectId: params.projectId}, order: [['createdAt', 'desc']]});
+                if(pts && pts.length){
+                    params.travelPolicyId = pts[0].travelPolicyId;
+                }
+            }
+
+        }
 
         if (!params.staffList) {
             params.staffList = [];
@@ -315,18 +363,6 @@ export default class ApiTravelBudget {
             preferSet: staff.company.budgetConfig || {},
         });
 
-        // let segmentsBudget: SegmentsBudgetResult = await API.budget.createBudget({
-        //     preferedCurrency:preferedCurrency,
-        //     travelPolicyId: travelPolicy['id'],
-        //     companyId,
-        //     staffs,
-        //     segments,
-        //     ret: params.isRoundTrip ? 1 : 0,
-        //     fromCity: params.originPlace,
-        //     backCity: params.goBackPlace,
-        //     preferSet: staff.company.budgetConfig || {},
-        // });
-
         let cities = segmentsBudget.cities;
         let _budgets = segmentsBudget.budgets;
         let budgets = [];
@@ -360,13 +396,13 @@ export default class ApiTravelBudget {
                 if (isAccordHotel && isAccordHotel.length) {
                     budget.price = isAccordHotel[0].accordPrice;
 
-                    /* 出差时间计算 */
+                    /!* 出差时间计算 *!/
                     let timezone = cityObj.timezone || 'Asia/shanghai';
                     let beginTime = moment(budget.checkInDate).tz(timezone).hour(12);
                     let endTime = moment(budget.checkOutDate).tz(timezone).hour(12);
                     let days = moment(endTime).diff(beginTime, 'days');
                     budget.price = budget.price * days;
-                    /* 出差时间计算 END */
+                    /!* 出差时间计算 END *!/
                 }
 
                 budget.hotelName = placeInfo ? placeInfo.hotelName : null;
@@ -378,29 +414,6 @@ export default class ApiTravelBudget {
                 budgets.push(budget);
             }
 
-            /*let destLength = destinationPlacesInfo.length;
-            if (!placeInfo && i == destLength) {
-                let lastDest = destinationPlacesInfo[destLength - 1];
-                placeInfo = {
-                    leaveDate: lastDest.earliestGoBackDateTime,
-                    goBackDate: moment(lastDest.earliestGoBackDateTime).add(1, 'days').toDate(),
-                    subsidy: lastDest.subsidy,
-                    reason: lastDest.reason,
-                }
-            }
-
-            let isHasBackSubsidy = false;
-            if (i == destLength-1 && !goBackPlace) {
-                isHasBackSubsidy = true;
-            }
-            let budget = await getSubsidyBudget(city, placeInfo, isHasBackSubsidy, preferedCurrency);
-            if (budget) {
-                budget.city = city;
-                budget.price = budget.price * count;
-                if (budget) {
-                    budgets.push(budget);
-                }
-            }*/
 
             //补助
             let subsidy = _budgets[i].subsidy;
@@ -430,95 +443,381 @@ export default class ApiTravelBudget {
         let key = `budgets:${staffId}:${_id}`;
         await cache.write(key, JSON.stringify(obj));
         await ApiTravelBudget.sendTripApproveNoticeToSystem({ cacheId: _id, staffId: staffId });
-        return _id;
+        return _id;*/
 
+        //     function limitHotelBudgetByPrefer(min: number, max: number, hotelBudget: number) {
+        //         if (hotelBudget == -1) {
+        //             if (max != NoCityPriceLimit) return max;
+        //             return hotelBudget;
+        //         }
+        //         if (min == NoCityPriceLimit && max == NoCityPriceLimit) return hotelBudget;
 
-        /*async function getSubsidyBudget(city, destination, isHasBackSubsidy: boolean = false, preferedCurrency: string) {
-            let { subsidy, leaveDate, goBackDate, reason } = destination;
-            let budget: any = null;
-            if (subsidy && subsidy.template) {
-                city = await API.place.getCityInfo({cityCode: city});
-                let timezone = city.timezone ? city.timezone : "Asia/shanghai";
-                let goBackDay = moment(goBackDate).tz(timezone).format("YYYY-MM-DD");
-                let leaveDay = moment(leaveDate).tz(timezone).format("YYYY-MM-DD");
-                let days = moment(goBackDay).diff(moment(leaveDay), 'days');
-                if (isHasBackSubsidy) { //解决如果只有住宿时最后一天补助无法加到返程目的地上
-                    days += 1;
-                }
-                if (days > 0) {
-                    budget = {};
-                    budget.fromDate = leaveDay;
-                    budget.endDate = (goBackDate == leaveDay || isHasBackSubsidy) ? goBackDate: moment(goBackDate).add(-1, 'days').format('YYYY-MM-DD');
-                    budget.tripType = ETripType.SUBSIDY;
-                    budget.type = EInvoiceType.SUBSIDY;
-                    budget.price = subsidy.template.subsidyMoney * days;
-                    budget.unit = preferedCurrency && typeof(preferedCurrency) != 'undefined' ? preferedCurrency: DefaultCurrencyUnit,
-                    budget.duringDays = days;
-                    budget.template = { id: subsidy.template.id, name: subsidy.template.name };
-                    budget.reason = reason;
-                }
-                let rate;
-                if(preferedCurrency != DefaultCurrencyUnit) {
-                    try{
-                        rate = await new Promise<any>(async function(resolve,reject){
-                            let qs = {
-                                key: cloudKey,
-                                currencyTo: preferedCurrency
-                            }
-                            request({
-                                uri: cloudAPI + `/currencyRate`,
-                                qs: qs,
-                                method: 'get',
-                                json: true
-                            },async (err, res) => {
-                                if(err){
-                                    reject(err)
-                                }
-                                let body = res.body;
-                                if(body && typeof(body) == 'string') {
-                                    body = JSON.parse(body)
-                                }
-                                return resolve(body);
-                            });
-                        });
-                        if(typeof(rate) == 'string') rate = JSON.parse(rate);
-                        rate = rate.data;
-                        if( typeof(rate) != 'undefined' && rate && rate.length ) {
-                            budget.rate = rate[0]['rate'];
-                        }
-                    } catch(err) {
-                        console.log(err)
-                    }
-                } else {
-                    budget.rate = 1;
-                }
-            }
-            return budget;
-        }*/
+        //         if (max != NoCityPriceLimit && min > max) {
+        //             let tmp = min;
+        //             min = max;
+        //             max = tmp;
+        //         }
 
-        // function limitHotelBudgetByPrefer(min: number, max: number, hotelBudget: number) {
-        //     if (hotelBudget == -1) {
-        //         if (max != NoCityPriceLimit) return max;
+        //         if (hotelBudget > max) {
+        //             if (max != NoCityPriceLimit) return max;
+        //         }
+        //         if (hotelBudget < min) {
+        //             if (min != NoCityPriceLimit) return min;
+        //         }
         //         return hotelBudget;
         //     }
-        //     if (min == NoCityPriceLimit && max == NoCityPriceLimit) return hotelBudget;
 
-        //     if (max != NoCityPriceLimit && min > max) {
-        //         let tmp = min;
-        //         min = max;
-        //         max = tmp;
-        //     }
+        return null;
 
-        //     if (hotelBudget > max) {
-        //         if (max != NoCityPriceLimit) return max;
-        //     }
-        //     if (hotelBudget < min) {
-        //         if (min != NoCityPriceLimit) return min;
-        //     }
-        //     return hotelBudget;
-        // }
+    }
+
+    //用于接收更新预算，并更新approve表和tripapprove上次
+    @clientExport
+    static async updateBudget(params: { approveId: string, budgetResult: any }) {
+
+        console.log('updateBudtetApproveId=======', params.approveId);
+        console.log('============update', params.budgetResult);
+        let approve = await Models.approve.get(params.approveId);
+        let isFinalInApprove: boolean = false;
+        let approveStep = approve.step;  //approve表中现有的是否为最终结果 budgetStep
+        if (approveStep == STEP.FINAL) {
+            isFinalInApprove = true;
+        }
+
+        let queryParams = approve.data;
+        if (typeof queryParams == 'string') {
+            queryParams = JSON.parse(approve.data);
+        }
+        let destinationPlacesInfo = queryParams.query.destinationPlacesInfo;
+
+        let count = queryParams.query.staffList.length;
+        let staffId = queryParams.query['staffId'];
+        if (!staffId || staffId == 'undefined') {
+            staffId = approve.submitter;
+        }
+        let staff = await Models.staff.get(staffId);
+        let companyId = staff.company.id;
+
+        let _budgets = params.budgetResult.budgets;
+        let ps: Promise<any>[] = _budgets.map(async (item) => {
+            return await ApiTravelBudget.transformBudgetData(item, companyId, count);
+        });
+        let budgets = await Promise.all(ps);
+        // console.log("budgets budgets budgets ====>", budgets.length, budgets);
+        let totalBudget = 0;
+        if (budgets && budgets.length > 0) {
+            budgets.forEach(function (item) {
+                totalBudget += item.price;
+            })
+        }
+
+        // console.log('--------update totalBudget------', totalBudget);
+        //TODO 如果分段 有一段是FIN 要走那一条 ？？？lizeilin
+        if (!isFinalInApprove) {  //看表中的budget是否是最终结果，最终结果还没返回过，则更新approve表，表示还不可以进行审批
+            console.log('first time--------------');
+            approve.budget = totalBudget;
+            approve.step = params.budgetResult.step;
+            if (typeof approve.data == 'string') {
+                approve.data = JSON.parse(approve.data);
+            }
+            approve.data = { budgets: budgets, query: approve.data.query };
+            approve = await approve.save();
+            console.log('approve.step---------------->', approve.step);
+            if (approve.step === STEP.FINAL) {
+                console.log('------------enter FIN---------');
+                let params = { approveNo: approve.id };
+                let tripApprove = await API.tripApprove.retrieveDetailFromApprove(params);
+                let returnApprove = await API.eventListener.sendEventNotice({ eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: approve.companyId });
+            }
+        } else {  //最终结果已经返回过，现在只用新预算中的最终结果进行比较，若大于现在显示的最终预算则更新，否则不更新
+            console.log('second time------------->');
+            if (approve.budget > totalBudget) {   //旧的预算大于新的预算，则不更新预算，显示现有预算
+                console.log('all little')
+                await approve.save();
+                API.broadcast(`tripApproveBudgetUpdate:${approve.id}`, 'FIN', 'SAME');
+                console.log('send to app============', `tripApproveBudgetUpdate:${approve.id}`);
+            } else {                    //旧的预算小于新的预算，则更新预算同时更新approve和tripApprove表
+                console.log('isFinalInBudget', params.budgetResult.step);
+                if (params.budgetResult.step == STEP.FINAL) {
+                    console.log('ENTER isFinalInBudget');
+                    // await Bluebird.delay(5000);
+                    approve.budget = totalBudget;
+                    await approve.save();
+                    console.log('-----------update traipApprove;,', totalBudget);
+                    let tripApproveUpdate = await API.tripApprove.updateTripApprove({
+                        id: approve.id,
+                        budget: totalBudget,
+                        companyId: companyId,
+                        budgetInfo: budgets
+                    });
+                    console.log('asdfadfasdfbroadcast===========');
+                    console.log(`'tripApproveBudgetUpdate:'${approve.id}`);
+                    API.broadcast('tripApproveBudgetUpdate:' + approve.id, 'FIN', 'UPDATED');
+                }
+            }
+        }
+    }
 
 
+    /**
+    * @method getTravelPolicyBudgetNew
+    *
+    * 获取合适差旅预算
+    *
+    * @param {Object} params 参数
+    * @param {String} params.originPlace 出发地
+    * @param {String} params.destinationPlace 目的地
+    * @param {String} params.leaveDate 出发时间 YYYY-MM-DD
+    * @param {String} [params.latestArriveTime] 最晚到达时间
+    * @param {String} [params.leaveTime] 出发最晚到达时间 HH:mm
+    * @param {String} [params.goBackDate] 返回时间(可选) YYYY-MM-DD
+    * @param {String} [params.goBackTime] 返程最晚时间
+    * @param {String} [params.checkInDate] 如果不传=leaveDate 入住时间
+    * @param {String} [params.checkOutDate] 如果不传=goBackDate 离开时间
+    * @param {String} [params.businessDistrict] 商圈ID
+    * @param {Boolean} [params.isNeedHotel] 是否需要酒店
+    * @param {Boolean} [params.isRoundTrip] 是否往返 [如果为true,goBackDate必须存在]
+    * @param {Boolean} [params.isNeedTraffic] 是否需要交通
+    * @param {Striing} [params.reason] 出差事由
+    * @param {String} [params.hotelName] 住宿地标名称
+    * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
+    */
+    @clientExport
+    static async getTravelPolicyBudgetNew(params: ICreateBudgetAndApproveParamsNew, isIntoApprove: boolean, approveId?: string): Promise<any> {
+
+        let staffId = params['staffId'];
+        let preferedCurrency = params["preferedCurrency"];
+        preferedCurrency = preferedCurrency && typeof (preferedCurrency) != 'undefined' ? preferedCurrency : DefaultCurrencyUnit;
+
+        let tripNumCost = 0;  //企业行程点数花费
+        let content = '';     //企业行程点数扣除，行程地
+
+        if (!staffId || staffId == 'undefined') {
+            let currentStaff = await Staff.getCurrent();
+            staffId = currentStaff.id;
+        }
+        let staff = await Models.staff.get(staffId);
+        let companyId = staff.companyId;
+        let company = await Models.company.get(companyId);
+        let travelPolicy = await staff.getTravelPolicy();
+        if (!travelPolicy) {
+            throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
+        }
+        params.travelPolicyId = travelPolicy.id;
+
+        if (!params.staffList) {
+            params.staffList = [];
+        }
+        if (params.staffList.indexOf(staffId) < 0) {
+            params.staffList.push(staffId);
+        }
+        let count = params.staffList.length;
+        let destinationPlacesInfo = params.destinationPlacesInfo;
+        let _staff: any = {
+            gender: staff.sex,
+            policy: 'domestic',
+        }
+        let staffs = [_staff];
+        let goBackPlace = params['goBackPlace'];
+
+        let feeCollectedType = params['feeCollectedType'];
+        let feeCollected = params['feeCollected'];
+        let departmentId: string = '';
+        let projectId: string = '';
+        if (feeCollectedType == 0) {
+            departmentId = feeCollected;
+        } else if (feeCollectedType == 1) {
+            projectId = feeCollected;
+        }
+        let approveUser: Staff = params['approveUser'];
+
+
+        let approve;
+        if (!isIntoApprove) {  //判断是否是审批人查看审批单时进行的第二次拉取数据 
+            //创建approve，获得approveId用于URL和更新
+            approve = Models.approve.create({
+                approveUser: params.approveUser.id,
+                type: EApproveType.TRAVEL_BUDGET,
+                companyId: companyId,
+                staffList: params.staffList
+            });
+            approve = await approve.save();
+            approveId = approve.id;
+            console.log('createApproveId', approveId);
+        }
+
+
+        console.log('approve--------, created, save', approveId);
+        let budgetResult: any = await ApiTravelBudget.createNewBudget({
+            callbackUrl: `${config.host}/api/v1/budget/${approveId}/updateBudget`,
+            preferedCurrency: preferedCurrency,
+            travelPolicyId: travelPolicy['id'],
+            companyId,
+            staffs,
+            destinationPlacesInfo: params.destinationPlacesInfo,
+            originPlace: params.originPlace,
+            isRoundTrip: params.isRoundTrip,        //是否为往返
+            goBackPlace: params.goBackPlace         //返回地
+        });
+
+        let segmentsBudget = budgetResult.budgets;
+
+        console.log('--------budgetResult', budgetResult.step);
+        let ps: Promise<any>[] = segmentsBudget.map(async (item) => {
+            return await ApiTravelBudget.transformBudgetData(item, companyId, count);
+        });
+        let budgets = await Promise.all(ps);
+
+
+        //计算总预算用于更新approve
+        let totalBudget = 0;
+        budgets.forEach(function (item) {
+            if (item.tripType != ETripType.SUBSIDY) {
+                tripNumCost = tripNumCost + 1;
+            }
+            totalBudget += item.price;
+        })
+        if (params && params.staffList) {
+            tripNumCost *= params.staffList.length;
+        }
+
+        console.log("======== ******************************** =====> ", budgets);
+        let obj: any = {};
+        obj.budgets = budgets;
+        obj.query = params;
+        obj.createAt = Date.now();
+
+        await DB.transaction(async function (t: Transaction) {
+            let result = await ApiTravelBudget.verifyCompanyTripNum({
+                tripNum: tripNumCost,
+                company: company,
+                accountId: staff.id,
+                query: params
+            });
+
+            obj.query['frozenNum'] = result.frozenNum;
+            //拿到预算后更新approve表
+            if (!isIntoApprove) {//判断是否是审批人查看审批单时进行的第二次拉取数据
+                let updateBudget = await Models.approve.get(approveId);
+                // let submitter = await Staff.getCurrent();
+                let submitter = await Models.staff.get(staff.id);
+                updateBudget.submitter = submitter.id;
+                updateBudget.data = obj;
+                updateBudget.title = obj.query['projectName'];
+                updateBudget.channel = submitter.company.oa;
+                updateBudget.type = EApproveType.TRAVEL_BUDGET;
+                updateBudget.approveUser = approveUser ? approveUser.id : null;
+                updateBudget.staffList = obj.query.staffList;
+                updateBudget.budget = totalBudget;
+                updateBudget.step = budgetResult.step;
+
+                console.log(updateBudget.data.budgets[0].index, '******* 11111111');
+                console.log("approveId =======>", updateBudget.id);
+                await updateBudget.save();
+            }
+
+            console.log('UPDATE-----BUDGET----', );
+        }).catch(async function (err: Error) {
+            if (err) {
+                // company.extraTripPlanFrozenNum = extraTripPlanFrozenNum;
+                // company.tripPlanFrozenNum = originTripPlanFrozenNum;
+                await company.reload();
+                console.info(err);
+                throw new Error("提交审批失败");
+            }
+        });
+
+        let _id = Date.now() + utils.getRndStr(6);
+        let key = `budgets:${staffId}:${_id}`;
+        await cache.write(key, JSON.stringify(obj));
+        await ApiTravelBudget.sendTripApproveNoticeToSystem({ cacheId: _id, staffId: staffId });
+
+        return { approveId: approveId, budgetId: _id };
+    }
+
+    static async transformBudgetData(budget, companyId: string, count: number) {
+        budget.index = budget.index;
+        delete budget.markedScoreData;
+        delete budget.prefers;
+        switch (budget.type) {
+            case EBudgetType.HOTEL:
+                let cityObj = await API.place.getCityInfo({ cityCode: budget.city, companyId: companyId });
+                let isAccordHotel = await Models.accordHotel.find({ where: { cityCode: cityObj.id, companyId } });
+                if (isAccordHotel && isAccordHotel.length) {
+                    budget.price = isAccordHotel[0].accordPrice;
+
+                    /* 出差时间计算 */
+                    let timezone = cityObj.timezone || 'Asia/shanghai';
+                    let beginTime = moment(budget.checkInDate).tz(timezone).hour(12);
+                    let endTime = moment(budget.checkOutDate).tz(timezone).hour(12);
+                    let days = moment(endTime).diff(beginTime, 'days');
+                    budget.price = budget.price * days;
+                    /* 出差时间计算 END */
+                }
+
+                budget.hotelName = budget.name;
+                budget.cityName = cityObj.name;
+                budget.tripType = ETripType.HOTEL;
+                budget.price = budget.price * count;
+                budget.unit = budget.unit;
+                budget.rate = budget.rate;
+                return budget;
+
+            case EBudgetType.TRAFFIC:
+                budget.cabinClass = budget.cabin;
+                budget.originPlace = budget.fromCity;
+                budget.destination = budget.toCity;
+                budget.tripType = ETripType.OUT_TRIP;
+                budget.price = budget.price * count;
+                budget.unit = budget.unit;
+                budget.rate = budget.rate;
+                budget.type = budget.trafficType;
+                return budget;
+
+            case EBudgetType.SUBSIDY:
+                budget.price = budget.price * count;
+                if (budget.templates) {
+                    budget.templates.forEach((t) => {
+                        t.price = t.price * count;
+                    })
+                }
+                return budget;
+        }
+    }
+
+    static async verifyCompanyTripNum(params: {
+        tripNum: number,
+        company: Company,
+        accountId: string,
+        query: any,
+    }): Promise<{ company: Company, frozenNum: { limitFrozen: number, extraFrozen: number } }> {
+        let { tripNum, company, accountId, query } = params;
+        await company.beforeGoTrip({ number: tripNum });
+
+        let destinationPlaces = query.destinationPlacesInfo;
+        let content = '';
+
+        if (query && query.originPlace) {
+            let originCity = await API.place.getCityInfo({ cityCode: query.originPlace, companyId: company.id });
+            content = content + originCity.name + "-";
+        }
+        if (destinationPlaces && _.isArray(destinationPlaces) && destinationPlaces.length > 0) {
+            for (let i = 0; i < destinationPlaces.length; i++) {
+                let segment: ISegment = destinationPlaces[i]
+                let destinationCity = await API.place.getCityInfo({ cityCode: segment.destinationPlace, companyId: company.id });
+                if (i < destinationPlaces.length - 1) {
+                    content = content + destinationCity.name + "-";
+                } else {
+                    content = content + destinationCity.name;
+                }
+            }
+        }
+
+        let result = await company.frozenTripPlanNum({
+            accountId: accountId, number: tripNum,
+            remark: "提交出差申请消耗行程点数", content: content
+        });
+        return result;
     }
 
     static async sendTripApproveNoticeToSystem(params: { cacheId: string, staffId: string }) {
@@ -573,33 +872,33 @@ export default class ApiTravelBudget {
     }
 
     // params: IQueryBudgetParams
-    static async createNewBudget(params: any){
+    static async createNewBudget(params: any) {
         let result;
-        try{
+        try {
             result = await RestfulAPIUtil.operateOnModel({
                 params: {
                     method: 'post',
                     fields: params
                 },
-                model:"budget"
+                model: "budget"
             })
-        }catch(err) {
+        } catch (err) {
             console.log(err);
         }
         return result.data;
     }
 
-    static async getBudgetById(params: {id: string}){
+    static async getBudgetById(params: { id: string }) {
         let result;
-        try{
+        try {
             result = await RestfulAPIUtil.operateOnModel({
                 params: {
                     method: 'GET',
                     fields: params
                 },
-                model:"budget"
+                model: "budget"
             })
-        }catch(err) {
+        } catch (err) {
             console.log(err);
         }
         return result.data;
@@ -647,3 +946,75 @@ export default class ApiTravelBudget {
         })
     }
 }
+
+
+
+
+
+let params = {
+    "originPlace": "CT_131",
+    "goBackPlace": "CT_131",
+    "isRoundTrip": true,
+    "projectName": "",
+    "destinationPlacesInfo": [
+        {
+            "destinationPlace": "CT_289",
+            "leaveDate": "2017-12-29T10:00:00.000Z",
+            "goBackDate": "2017-12-30T01:00:00.000Z",
+            "latestArrivalDateTime": "2017-12-29T10:00:00.000Z",
+            "earliestGoBackDateTime": "2017-12-30T01:00:00.000Z",
+            "isNeedTraffic": true,
+            "isNeedHotel": true,
+            "subsidy": {
+                "template": null
+            },
+            "reason": ""
+        },
+        {
+            "destinationPlace": "CT_179",
+            "leaveDate": "2017-12-30T10:00:00.000Z",
+            "goBackDate": "2017-12-31T01:00:00.000Z",
+            "latestArrivalDateTime": "2017-12-30T10:00:00.000Z",
+            "earliestGoBackDateTime": "2017-12-31T01:00:00.000Z",
+            "isNeedTraffic": true,
+            "isNeedHotel": true,
+            "subsidy": {
+                "template": null
+            },
+            "reason": ""
+        }
+    ],
+    "staffList": [
+        "80fee190-87d9-11e7-a399-7f0d5a3787d9"
+    ],
+    "feeCollectedType": 1,
+    "feeCollected": "c793ad60-8d25-11e7-b9c5-e927d64b16b5",
+    "approveUser": {
+        "id": "80fee190-87d9-11e7-a399-7f0d5a3787d9",
+        "name": "陈陈",
+        "sex": 1,
+        "avatar": "",
+        "avatarColor": "",
+        "staffStatus": 1,
+        "totalPoints": "0.00",
+        "balancePoints": "0.00",
+        "roleId": 0,
+        "operatorId": null,
+        "quitTime": null,
+        "isTiped": true,
+        "accountId": "80ff7dd0-87d9-11e7-af88-7bce2d8228de",
+        "invoiceId": "2a7e0100-937f-11e7-bbe8-9d47a42d91d3",
+        "companyId": "81010470-87d9-11e7-a399-7f0d5a3787d9",
+        "travelPolicyId": "c24363e0-8943-11e7-813b-5350f214cafd",
+        "addWay": 0,
+        "createdAt": "2017-08-23T08:03:10.017Z",
+        "updatedAt": "2017-10-29T02:10:05.835Z",
+        "deletedAt": null
+    }
+} /* as ICreateBudgetAndApproveParamsNew; */
+
+// setTimeout(async ()=>{
+//     console.log("test go go");
+//     let result = await ApiTravelBudget.getTravelPolicyBudgetNew(params, false);
+
+// }, 8000);

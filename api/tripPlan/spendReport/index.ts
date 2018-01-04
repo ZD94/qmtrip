@@ -7,11 +7,20 @@ import _ = require("lodash");
 
 import fs = require("fs");
 import path = require("path");
+import moment = require("moment");
 
-function compile(templatePath: any, data: any) {
+let common_imports = {
+    moment,
+    Math,
+    String,
+    Number,
+    Boolean,
+    Array
+};
+function compile(templatePath: string, data: object) {
     return getTemplateFromFile(templatePath)
         .then((template) => {
-            let _compile = _.template(template);
+            let _compile = _.template(template, {imports: common_imports});
             template = _compile(data);
             return template;
         })
@@ -48,10 +57,16 @@ function html2pdf(html: any, base: any): Promise<Buffer> {
 }
 
 const templatePath = path.normalize(path.join(__dirname, 'template.html'));
+const projectTemplatePath = path.normalize(path.join(__dirname, 'project_template.html'));
 var templateBase = 'file://' + templatePath;
 
-export async function makeSpendReport(data: any): Promise<Buffer> {
+export async function makeSpendReport(data: object, type?: string): Promise<Buffer> {
     console.info('data======================',data);
-    let html = await compile(templatePath, {data: data});
-    return html2pdf(html, templateBase);
+    let templateUrl = templatePath;
+    if(type && type == "project"){
+        templateUrl = projectTemplatePath;
+    }
+    let templateBaseUrl = 'file://' + templateUrl;
+    let html = await compile(templateUrl, {data: data});
+    return html2pdf(html, templateBaseUrl);
 }

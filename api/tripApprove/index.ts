@@ -41,6 +41,8 @@ export default class TripApproveModule {
 
         let budgetInfo: {budgets: ITravelBudgetInfo[], query: ICreateBudgetAndApproveParams} = approve.data;
 
+
+
         if(!budgetInfo) {
             throw L.ERR.TRAVEL_BUDGET_NOT_FOUND();
         }
@@ -57,6 +59,7 @@ export default class TripApproveModule {
         let destinationPlacesInfo = query.destinationPlacesInfo;
         let totalBudget = 0;
         budgets.forEach((b) => {totalBudget += Number(b.price);});
+        console.log('retrieveDetailFromTotal', totalBudget);
         /*budgets = budgets.map( (v) => {
          if (v.type == ETripType.HOTEL) {
          v.placeName = budgetInfo.query.hotelName;
@@ -67,10 +70,13 @@ export default class TripApproveModule {
         let arrivalCityCodes: string[] = [];//目的地代码
         let destinations: IDestination[] = [];
         let project: Project;
+        let projectId = query.projectId;
         let projectName = query.projectName;
-        if(projectName){
+        if(projectId){
+            project = await Models.project.get(projectId);
+        }else if(projectName){
             project = await API.tripPlan.getProjectByName({companyId: company.id, name: projectName,
-                userId: submitter, isCreate: true});
+                userId: submitter});
         }
         let tripApprove: ITripApprove;
         tripApprove.id = approveNo;
@@ -129,8 +135,8 @@ export default class TripApproveModule {
         tripApprove.status = QMEApproveStatus.WAIT_APPROVE;
         tripApprove.accountId = submitter;
         tripApprove.companyId = company.id;
-        tripApprove.title = project.name;
-        tripApprove.projectId = project.id;
+        // tripApprove.title = project.name;
+        // tripApprove.projectId = project.id;//TODO  费用归集
 
         tripApprove.query = query;
         tripApprove.arrivalCityCodes = arrivalCityCodes;
@@ -914,11 +920,11 @@ export default class TripApproveModule {
 
         let approve = await Models.approve.get(params.id);
 
-        if(typeof approve.data == "string"){
-            approve.data = JSON.parse(approve.data);
-        }
-        let budgetInfo: {budgets: ITravelBudgetInfo[], query: ICreateBudgetAndApproveParams} = approve.data;
-        let {budgets, query} = budgetInfo;
+        // if(typeof approve.data == "string"){
+        //     approve.data = JSON.parse(approve.data);
+        // }
+        // let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
+        // let {budgets, query} = budgetInfo;
         //=====end 当budgetInfo可以获取到时，以上代码可以删除
         let companyId = params['companyId'] || approve.companyId;
         if(!companyId || typeof companyId == 'undefined') {
@@ -935,15 +941,15 @@ export default class TripApproveModule {
         if(!tripApprove) return null;
 
         //=====begin 当budgetInfo可以获取到时，以下代码可以删除
-        if(tripApprove.budgetInfo && typeof tripApprove.budgetInfo == 'string') {
-            tripApprove.budgetInfo = JSON.parse(tripApprove.budgetInfo);
-        }
-        if(tripApprove.query && typeof tripApprove.query == 'string') {
-            tripApprove.query = JSON.parse(tripApprove.query);
-        }
-        if(!tripApprove.budgetInfo || (tripApprove.budgetInfo && tripApprove.budgetInfo.length == 0))
-            tripApprove.budgetInfo = budgets;
-        tripApprove.query = query;
+        // if(tripApprove.budgetInfo && typeof tripApprove.budgetInfo == 'string') {
+        //     tripApprove.budgetInfo = JSON.parse(tripApprove.budgetInfo);
+        // }
+        // if(tripApprove.query && typeof tripApprove.query == 'string') {
+        //     tripApprove.query = JSON.parse(tripApprove.query);
+        // }
+        // if(!tripApprove.budgetInfo || (tripApprove.budgetInfo && tripApprove.budgetInfo.length == 0))
+        //     tripApprove.budgetInfo = budgets;
+        // tripApprove.query = query;
 
         return tripApprove;
     }
@@ -956,8 +962,8 @@ export default class TripApproveModule {
             companyId = currentStaff["companyId"];
         }
         //=====begin 当budgetInfo可以获取到时，以下代码可以删除
-        if(params.budgetInfo)
-            delete params.budgetInfo;
+        // if(params.budgetInfo)
+        //     delete params.budgetInfo;
         //=====end 当budgetInfo可以获取到时，以上代码可以删除
 
         let tripApprove = await API.eventListener.sendRequestToApprove({

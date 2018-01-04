@@ -142,7 +142,7 @@ export async function login(data: {account?: string, pwd: string, type?: Number,
     if(!data.account) {
         throw L.ERR.USERNAME_EMPTY();
     }
-
+    data.account = data.account.toString();
     if(!validator.isEmail(data.account) && !validator.isMobilePhone(data.account, 'zh-CN')) {
         throw L.ERR.USERNAME_ERR_FORMAT();
     }

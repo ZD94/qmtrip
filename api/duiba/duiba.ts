@@ -59,7 +59,7 @@ async function costCredit(req: Request, res: Response, next: NextFunction) {
         });
     }
 
-    var coinAccountChanges = await Models.coinAccountChange.find({where: {duiBaOrderNum: orderNum}});
+    var coinAccountChanges = await Models.coinAccountChange.find({where: {relateOrderNum: orderNum}});
     //防止订单重复处理
     if(!coinAccountChanges || coinAccountChanges.length <= 0){
         var result = await coinAccount.lockCoin(credits, description, orderNum);
@@ -110,7 +110,7 @@ async function resultNotice(req: Request, res: Response, next: NextFunction) {
         });
     }
     //扣积分请求超时时兑吧也会发回失败通知 此时未携带bizId 所以查失败订单不能用bizId 要用orderNum
-    var coinAccountChanges = await Models.coinAccountChange.find({where: {duiBaOrderNum: orderNum, type: COIN_CHANGE_TYPE.LOCK}});
+    var coinAccountChanges = await Models.coinAccountChange.find({where: {relateOrderNum: orderNum, type: COIN_CHANGE_TYPE.LOCK}});
     var coinAccountChange: CoinAccountChange;
     
     if(coinAccountChanges && coinAccountChanges.length > 0){
@@ -204,7 +204,7 @@ async function addCredit(req: Request, res: Response, next: NextFunction) {
         });
     }
 
-    var coinAccountChanges = await Models.coinAccountChange.find({where: {duiBaOrderNum: orderNum}});
+    var coinAccountChanges = await Models.coinAccountChange.find({where: {relateOrderNum: orderNum}});
     //防止订单重复处理
     if(!coinAccountChanges || coinAccountChanges.length <= 0){
         var result = await coinAccount.addCoin(credits, "每日签到奖励", orderNum);

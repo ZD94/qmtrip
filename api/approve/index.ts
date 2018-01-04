@@ -40,6 +40,11 @@ function oaEnum2Str(e: EApproveChannel) {
 }
 
 class ApproveModule {
+    @clientExport
+    @requireParams(['id'])
+    static async getApprove(params: {id: string}) {
+        return Models.approve.get(params.id);
+    }
 
     @clientExport
     @requireParams(["budgetId"], ["approveUser", "project", "submitter", "version"])
@@ -94,8 +99,119 @@ class ApproveModule {
             let com = result.company;
             let frozenNum = result.frozenNum;
             budgetInfo.query.frozenNum = frozenNum;
+            if(query.projectId && !query.projectName){
+                let project = await Models.project.get(query.projectId);
+                query.projectName = project.name;
+            }
 
             let approve = await ApproveModule._submitApprove({
+                submitter: submitter.id,
+                data: budgetInfo,
+                title: query.projectName,
+                channel: submitter.company.oa,
+                type: EApproveType.TRAVEL_BUDGET,
+                approveUser: approveUser,
+                staffList:budgetInfo.query.staffList,
+                budget: totalBudget,
+                version: params.version
+            });
+            //行程数第一次小于10或等于0时给管理员和创建人发通知
+            let newNum = com.tripPlanNumBalance;
+            if(oldNum > 10 && newNum < 10 || newNum == 0){
+                let detailUrl: string = ""
+                let managers = await company.getManagers({withOwner: true});
+
+                let version = params.version || Config.link_verion || 2 //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
+                if (version == 2) {
+                    detailUrl = Config.v2_host + "/#/manage/travel-number"
+                } else {
+                    detailUrl = Config.host + "/#/company-pay/buy-packages"
+                }
+                let ps = managers.map( (manager) => {
+                    return API.notify.submitNotify({
+                        userId: manager.id,
+                        key: "qm_notify_trip_plan_num_short",
+                        values: {
+                            number: newNum,
+                            detailUrl: detailUrl
+                        }
+                    });
+                });
+                await Promise.all(ps);
+            }
+            return approve;
+        }).catch(async function(err){
+            if(err) {
+                // company.extraTripPlanFrozenNum = extraTripPlanFrozenNum;
+                // company.tripPlanFrozenNum = originTripPlanFrozenNum;
+                await company.reload();
+                console.info(err);
+                throw new Error("提交审批失败");
+            }
+        });
+
+    }
+    @clientExport
+    @requireParams(["approveId"], ["approveUser", "project", "submitter", "version"])
+    static async submitApproveNew(params: {approveId: string, budgetId?: string, approveUser?: Staff, submitter?: Staff, version: number}) :Promise<Approve>{
+        let {approveUser} = params;
+        let submitter = await Staff.getCurrent() || params.submitter;
+        let company = submitter.company;
+
+        //获取预算详情
+        // let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: submitter.id});
+        let budgetInfoData = await Models.approve.get(params.approveId);
+        if (typeof budgetInfoData == 'string') {
+            budgetInfoData = JSON.parse(budgetInfoData);
+        }
+        let budgetInfo = budgetInfoData.data;
+        let number = 0;
+        let content = "";
+        let query: ICreateBudgetAndApproveParams = budgetInfo.query;
+        let destinationPlacesInfo = query.destinationPlacesInfo;
+
+        if(query && query.originPlace){
+            let originCity = await API.place.getCityInfo({cityCode: query.originPlace});
+            content = content + originCity.name + "-";
+        }
+        if(destinationPlacesInfo &&  _.isArray(destinationPlacesInfo) && destinationPlacesInfo.length > 0){
+            for(let i = 0; i < destinationPlacesInfo.length; i++){
+                let segment: ISegment = destinationPlacesInfo[i]
+                let destinationCity = await API.place.getCityInfo({cityCode: segment.destinationPlace});
+                if(i<destinationPlacesInfo.length-1){
+                    content = content + destinationCity.name+"-";
+                }else{
+                    content = content + destinationCity.name;
+                }
+            }
+        }
+        let totalBudget = 0;
+        if(budgetInfo.budgets && budgetInfo.budgets.length>0){
+            budgetInfo.budgets.forEach(function(item){
+                if(item.tripType != ETripType.SUBSIDY){
+                    number = number + 1;
+                }
+                totalBudget += item.price;
+            })
+        }
+        if(budgetInfo.query && budgetInfo.query.staffList){
+            number *= budgetInfo.query.staffList.length;
+        }
+
+        await company.beforeGoTrip({number: number});
+        //冻结行程数
+        let oldNum = company.tripPlanNumBalance;
+        // let originTripPlanFrozenNum = company.tripPlanFrozenNum;
+        // let extraTripPlanFrozenNum = company.extraTripPlanFrozenNum;
+        return DB.transaction(async function(t){
+            let result = await company.frozenTripPlanNum({accountId: submitter.id, number: number,
+            remark: "提交出差申请消耗行程点数", content: content});
+            let com = result.company;
+            let frozenNum = result.frozenNum;
+            budgetInfo.query.frozenNum = frozenNum;
+
+            let approve = await ApproveModule._submitApproveNew({
+                approveId: params.approveId, 
                 submitter: submitter.id,
                 data: budgetInfo,
                 title: query['projectName'],
@@ -242,6 +358,7 @@ class ApproveModule {
     }) {
         let {submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark,staffList, budget, version} = params;
         let staff = await Models.staff.get(submitter);
+        console.log('meiyou diao===============');
         let approve = Models.approve.create({
             submitter: submitter,
             data: data,
@@ -265,6 +382,48 @@ class ApproveModule {
             oa: oaEnum2Str(channel) || 'qm',
             version: version
         });
+        return approve;
+    }
+
+    static async _submitApproveNew(params: {
+        approveId: string,
+        submitter: string,
+        data?: any,
+        approveUser?: Staff,
+        title?: string,
+        channel?: EApproveChannel,
+        type?: EApproveType,
+        isSpecialApprove?: boolean,
+        specialApproveRemark?: string,
+        staffList?:string[],
+        budget: number,
+        version?: number
+    }) {
+        let {approveId, submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark,staffList, budget, version} = params;
+        let staff = await Models.staff.get(submitter);
+        let approve = await Models.approve.get(approveId);
+        // let approve = Models.approve.create({
+        //     submitter: submitter,
+        //     data: data,
+        //     channel: channel,
+        //     title: title,
+        //     type: type,
+        //     approveUser: approveUser ? approveUser.id: null,
+        //     isSpecialApprove: isSpecialApprove,
+        //     specialApproveRemark: specialApproveRemark,
+        //     companyId: staff.company.id,
+        //     staffList:staffList,
+        //     budget: budget
+        // });
+
+        // await emitter.emitSerial(EVENT.NEW_TRIP_APPROVE, {
+        //     approveNo: approve.id,
+        //     approveUser: approveUser ? approveUser.id: null,
+        //     submitter: submitter,
+        //     status: EApproveStatus.WAIT_APPROVE,
+        //     oa: oaEnum2Str(channel) || 'qm',
+        //     version: version
+        // });
         return approve;
     }
 
