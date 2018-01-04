@@ -5,12 +5,12 @@
 'use strict';
 import {emitter} from "..";
 import {EVENT} from "../index";
-import {ICreateBudgetAndApproveParams} from "_types/tripPlan"
 
 
 
 
 export interface createTripApproveParam {
+    [key: string]: any;
     approveNo: string;  //审核单号
     submitter: string;      //员工ID
     approveUser?: string;    //审核人ID
@@ -24,10 +24,11 @@ export interface createTripApproveResult {
 }
 
 export interface regTripApproveUpdateCbParam {
-    (err, params): any;
+    (err: any, params: any): any;
 }
 
 export interface createTripInvoiceAuditFlowParam {
+    [key: string]: any;
     tripPlanId: string; //行程单ID
 }
 
@@ -37,7 +38,7 @@ export interface createTripInvoiceAuditFlowResult {
 }
 
 export interface regTripInvoiceAuditUpdateCbParam {
-    (err, params): any;
+    (err: any, params: any): any;
 }
 
 export interface IOAPlugin {
@@ -58,14 +59,14 @@ export abstract class AbstractOAPlugin implements IOAPlugin {
         return this.createTripInvoiceAuditFlow(params);
     }
 
-    async tripApproveUpdateNotify(err, result) {
+    async tripApproveUpdateNotify(err: any, result: any) {
         if (err) {
             return emitter.emitSerial(EVENT.TRIP_APPROVE_UPDATE, err);
         }
         return emitter.emitSerial(EVENT.TRIP_APPROVE_UPDATE, result);
     }
 
-    async tripInvoiceUpdateNotify(err, result) {
+    async tripInvoiceUpdateNotify(err: any, result: any) {
         if (err) {
             return emitter.emitSerial(EVENT.TRIP_INVOICE_AUDIT_UPDATE, err);
         }

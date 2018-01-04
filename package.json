@@ -86,6 +86,7 @@
     "lib-qqwry": "^1.0.0",
     "lodash": "^4.15.0",
     "moment": "^2.19.2",
+    "moment-timezone": "^0.5.14",
     "money2hanzi": "^1.0.8",
     "morgan": "^1.7.0",
     "nan": "^2.4.0",

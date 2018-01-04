@@ -12,7 +12,7 @@ var uuid = require('uuid');
 var path = require('path');
 var config = {
     "postgres": "postgres://clear:ste461@localhost:5432/test",
-    "remotes": []
+    "remotes": [] as string[]
 };
 
 import Logger from '@jingli/logger';
@@ -98,7 +98,7 @@ async function main_worker(){
 export = main;
 
 var waitobj:any = {};
-async function wait_obj(name){
+async function wait_obj(name: string){
     if(waitobj[name])
         return waitobj[name];
 
@@ -114,7 +114,7 @@ async function wait_obj(name){
         }, 100)
     })
 }
-function set_wait_obj(msg){
+function set_wait_obj(msg: { [key: string]: any }){
     if(msg.cmd == 'set_waitobj'){
         //console.log(cluster.isMaster?'master':'worker', 'recv message', msg);
         waitobj[msg.name] = msg.value;

@@ -12,7 +12,7 @@ var uuid = require('uuid');
 var path = require('path');
 var config = {
     "postgres": "postgres://clear:ste461@localhost:5432/times",
-    "remotes": []
+    "remotes": [] as string[]
 };
 
 import Logger from '@jingli/logger';

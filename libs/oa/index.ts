@@ -5,7 +5,7 @@
 'use strict';
 
 const AsyncEmitter = require('carrack');
-import {QmPlugin, IOAPlugin} from './plugin';
+import {QmPlugin, IOAPlugin, createTripApproveParam, createTripInvoiceAuditFlowParam} from './plugin';
 import {AutoPlugin} from "./plugin/auto";
 import {EApproveType} from "../../_types/approve/types";
 // import {DDTalkPlugin} from "./plugin/ddtalk/index";
@@ -19,7 +19,7 @@ export const EVENT = {
     APPROVE_FAIL: 'APPROVE_FAIL',
 }
 
-export let plugins = {
+export let plugins: { [key: string]: any} = {
     auto: new AutoPlugin(),
     qm: new QmPlugin(),
     // ddtalk: new DDTalkPlugin(),
@@ -28,7 +28,7 @@ export let plugins = {
 export var emitter = new AsyncEmitter();
 
 //新出差审批事件
-emitter.on(EVENT.NEW_TRIP_APPROVE, function(params) {
+emitter.on(EVENT.NEW_TRIP_APPROVE, function(params: createTripApproveParam) {
     let oa = params.oa;
     if (!oa) {
         oa = 'qm';
@@ -40,7 +40,7 @@ emitter.on(EVENT.NEW_TRIP_APPROVE, function(params) {
 });
 
 //新的票据审批申请事件
-emitter.on(EVENT.NEW_TRIP_INVOICE_AUDIT, function(err, params) {
+emitter.on(EVENT.NEW_TRIP_INVOICE_AUDIT, function(err: any, params: createTripInvoiceAuditFlowParam) {
     let oa = params.oa;
     if (!oa) {
         oa = 'qm';

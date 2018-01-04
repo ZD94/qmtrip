@@ -4,7 +4,7 @@
 
 'use strict';
 
-import {scannerDecoration, registerControllerToRouter, Reply} from "@jingli/restful";
+import {scannerDecoration, registerControllerToRouter} from "@jingli/restful";
 import { conf, auth } from 'server-auth';
 import { Models } from '_types';
 import { genSign } from '@jingli/sign';
@@ -13,6 +13,8 @@ const config = require('@jingli/config')
 
 import path = require("path");
 import express = require("express");
+import { Request, Response, NextFunction, Express } from 'express';
+import { Application } from 'express-serve-static-core';
 
 let router = express.Router();
 scannerDecoration(path.join(__dirname, 'controller'));
@@ -23,7 +25,7 @@ let allowOrigin = [
     "jingli365"
 ];
 
-function checkOrigin( origin ){
+function checkOrigin( origin: string){
     for(let item of allowOrigin){
         if(origin.indexOf(item) > -1){
             return true;
@@ -37,19 +39,20 @@ function getAppSecretByAppId(appId) {
     return config.agent.appSecret;
 }
 
-function allowCrossDomain(req, res, next) {
+function allowCrossDomain(req: Request, res: Response, next: NextFunction) {
     if (req.headers.origin && checkOrigin(req.headers.origin)) {
         res.header('Access-Control-Allow-Origin', req.headers.origin);
     }
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', req.headers['access-control-request-headers']);
+    res.header('Access-Control-Allow-Headers', req.headers['access-control-request-headers'] as string);
     if (req.method == 'OPTIONS') {
         return res.send("OK");
     }
     next();
 }
 
-export async function initHttp(app) {
+
+export async function initHttp(app: Application) {
     // router.param("companyId", validCompanyId);
     // app.use('/api/v1', allowCrossDomain, router);
     // app.use('/api/v1', authenticate, router);
@@ -57,7 +60,7 @@ export async function initHttp(app) {
     conf.setConfig(5 * 60 * 1000, [/^\/wechat/], cache, getAppSecretByAppId)
     app.use('/api/v1', jlReply)
     app.use('/api/v1', allowCrossDomain);
-    app.use('/api/v1', (req, res, next) => {
+    app.use('/api/v1', (req, res: any, next) => {
         auth(req, res, next, async (err, isValid, data) => {
             if (isValid) {
                 const companies = await Models.company.find({

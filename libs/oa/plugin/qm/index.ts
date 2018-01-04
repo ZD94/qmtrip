@@ -9,21 +9,14 @@ import {
     createTripInvoiceAuditFlowParam, createTripInvoiceAuditFlowResult,
 } from "../index";
 
-import TripPlanModule = require("api/tripPlan/index");
 import TripApproveModule from "api/tripApprove/index";
 import {Models} from "_types/index";
-import {ETripType, QMEApproveStatus, EApproveResult, Project} from "_types/tripPlan/tripPlan";
-import _ = require('lodash');
+import { QMEApproveStatus, EApproveResult } from "_types/tripPlan/tripPlan";
 const L = require("@jingli/language");
-import moment = require("moment");
 var API = require("@jingli/dnode-api");
-import {ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan"
 //鲸力商旅OA对接实现
-import * as CLS from 'continuation-local-storage';
-let CLSNS = CLS.getNamespace('dnode-api-context');
 import {DB} from "@jingli/database";
 
-import {IDestination, ITripApprove} from "_types/tripApprove"
 import {OAAddResult} from "../../../../_types/approve/index";
 import {ERejectApproveTypes} from "_types/tripApprove";
 export class QmPlugin extends AbstractOAPlugin {
@@ -34,7 +27,7 @@ export class QmPlugin extends AbstractOAPlugin {
     //实现qm创建审批单流程
     async createTripApproveFlow(params:createTripApproveParam):Promise<createTripApproveResult> {
 
-        let {approveNo, submitter, approveUser, version} = params;
+        let {approveNo, submitter } = params;
 
         let staff = await Models.staff.get(submitter);
         let company = staff.company;

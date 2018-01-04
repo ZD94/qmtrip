@@ -1,11 +1,9 @@
 /**
  * Created by wangyali on 2017/7/6.
  */
-import {Department} from "_types/department";
 import {Company} from "_types/company";
 import {Staff, EStaffRole} from "_types/staff";
 import {Models} from "_types/index";
-import L from '@jingli/language';
 import {OaStaff} from './oaStaff';
 import {OaDepartment} from './oaDepartment';
 let moment = require("moment");
@@ -41,8 +39,7 @@ export abstract class OaCompany{
     async sync(): Promise<Company>{
         console.info("company sync begin==================================");
         let self = this;
-        let type = self.type;
-        let result: Company;
+        let result;
 
         //处理企业信息
         let alreadyCompany = await self.getCompany();
@@ -68,9 +65,8 @@ export abstract class OaCompany{
 
         //处理企业组织架构
         let rootDepartment = await self.getRootDepartment();
-        let department: Department;
         if(rootDepartment){
-            department = await rootDepartment.sync({company: result});
+            await rootDepartment.sync({company: result});
         }
 
         //处理企业创建者

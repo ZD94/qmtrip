@@ -1,5 +1,5 @@
 'use strict';
-import {AbstractModelController, Restful, Router} from "@jingli/restful";
+import {AbstractModelController, Restful} from "@jingli/restful";
 import {Approve} from "_types/approve";
 import {Models} from "_types";
 
