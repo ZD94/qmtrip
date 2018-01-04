@@ -119,7 +119,7 @@ export default class SSOModule {
             permanentCode = permanentResult.permanentCode;
             accessToken = permanentResult.accessToken;
 
-            let comProperty = await self.getRegisteredCompany(permanentCode);
+            let comProperty = await self.getRegisteredCompany(permanentCode, corpId);
             if(!comProperty) {
                 let com =await self.initializeCompany(permanentResult);
                 company = com.company;
@@ -145,7 +145,7 @@ export default class SSOModule {
         }
 
         let restApi = new RestApi(accessToken);
-        let wCompany = new WCompany({ id: corpId, name: company.name, restApi, company: company});
+        let wCompany = new WCompany({ id: corpId, name: company.name, restApi, company: company, permanentCode: permanentCode});
         if(!hasComPropertySaved)
             await wCompany.saveCompanyProperty({companyId: company.id, permanentCode: permanentCode})
         await wCompany.sync();
@@ -156,23 +156,16 @@ export default class SSOModule {
      * @method 检查企业是否已经在鲸力系统注册
      * @param permanentCode 
      */
-    async getRegisteredCompany(permanentCode): Promise<{company: Company, corpId: string}> {
+    async getRegisteredCompany(permanentCode:string, corpId: string): Promise<{company: Company, corpId: string}> {
         let comProperty = await Models.companyProperty.find({
             where: {
-                value: permanentCode,
-                type: CPropertyType.WECHAT_PERMAENTCODE
+                value: corpId,
+                type: CPropertyType.WECHAT_CORPID
             }
         });
         if(comProperty && comProperty.length) {
             let company = await Models.company.get(comProperty[0].companyId)
             if(!company) return null;
-            let com = await Models.companyProperty.find({
-                where: {
-                    companyId: company.id,
-                    type: CPropertyType.WECHAT_CORPID
-                }
-            });
-            let corpId = com && com.length ? com[0].value: null;
             return { company, corpId};
         }
         return null;
@@ -187,7 +180,8 @@ export default class SSOModule {
         if(!permanentCode) throw new error.ParamsNotValidError("永久授权码不存在");
         let companyProperty = await Models.companyProperty.find({
             where: {
-                value: result.permanentCode
+                value: result.corpId,
+                type: CPropertyType.WECHAT_CORPID
             }
         })
         let company: Company;
@@ -195,14 +189,7 @@ export default class SSOModule {
        
         if(companyProperty && companyProperty.length) {
             company = await Models.company.get(companyProperty[0].companyId);
-            let corp = await Models.companyProperty.find({
-                where: {
-                    type: CPropertyType.WECHAT_CORPID,
-                    companyId: companyProperty[0].companyId,
-                }
-            });
-            if(corp && corp.length)
-                corpId = corp[0].value;
+            corpId = result.corpId;
         }
         if(!companyProperty || companyProperty.length == 0) {
             corpId = result.corpId;
