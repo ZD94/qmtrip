@@ -1,5 +1,5 @@
 variables:
-  DOCKER_REG: docker.l.jingli365.com
+  DOCKER_REG: dk.jingli365.com
   DOCKER_NAME: $CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
   DOCKER_CI_NAME: $DOCKER_REG/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME:$CI_COMMIT_SHA
   DOCKER_BRANCH_NAME: $DOCKER_REG/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME:$CI_COMMIT_REF_SLUG
@@ -27,7 +27,7 @@ build:dist:
   stage: build
   only:
     - branches
-  image: $DOCKER_REG/jl-build:v2
+  image: $DOCKER_REG/jl-build:v3
   tags:
     - serial
   cache:
@@ -38,7 +38,7 @@ build:dist:
     - mkdir -p $NPM_CACHE_DIR/`npmhash`/node_modules && ln -s $NPM_CACHE_DIR/`npmhash`/node_modules .
     - echo `npmhash`
     - git submodule update --init --checkout
-    - npm --registry https://npm.l.jingli365.com install
+    - npm install
     - gulp tarball -n $CI_COMMIT_REF_SLUG
     - scp $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-*.tar.gz test@git.l.jingli365.com:~/versions/
 
@@ -50,7 +50,8 @@ build:image:
       - dist/
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
-    - docker build -t $DOCKER_CI_NAME .
+    - echo $DOCKER_CI_NAME
+    - docker build . -t $DOCKER_CI_NAME  --build-arg NPM_TOKEN=$NPM_TOKEN
     - docker push $DOCKER_CI_NAME
 
 deploy:master:
@@ -65,6 +66,7 @@ deploy:master:
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: http://l.jingli365.com/cloud/api/v1
     JL_APP_CLOUD: http://l.jingli365.com/cloud
+    JL_APP_APPROVE_SERVER_URL: https://l.jingli365.com/proj/svr-trip-approve/api/v1
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
@@ -85,6 +87,7 @@ deploy:test:
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: http://t.jingli365.com/cloud/api/v1
     JL_APP_CLOUD: http://t.jingli365.com/cloud
+    JL_APP_APPROVE_SERVER_URL: https://t.jingli365.com/proj/svr-trip-approve/api/v1
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
@@ -106,6 +109,8 @@ deploy:release:
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: https://j.jingli365.com/cloud/api/v1
     JL_APP_CLOUD: https://j.jingli365.com/cloud
+    JL_APP_APPROVE_SERVER_URL: https://j.jingli365.com/proj/svr-trip-approve/api/v1
+
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
@@ -113,6 +118,31 @@ deploy:release:
     - docker push $DOCKER_BRANCH_NAME
     - echo deploy to https://j.jingli365.com
     - ssh test@j.jingli365.com /home/test/bin/docker_start.sh $DOCKER_REG $DOCKER_NAME $CI_COMMIT_REF_SLUG
+
+deploy:demo:
+  stage: deploy
+  only:
+    - /^master|test|release|demo$/
+  when: manual
+  environment:
+    name: demo
+    url: https://demo.jingli365.com
+  variables:
+    JL_APP_HOST: http://demo.jingli365.com
+    JL_APP_V2_HOST: https://demo.jingli365.com
+    JL_APP_CLOUDKEY: jinglicloud2017
+    JL_APP_CLOUDAPI: https://demo.jingli365.com/proj/svr-jlbudget/api/v1/
+    JL_APP_CLOUD: https://demo.jingli365.com/pro/web-cloud-mgr/
+    JL_APP_APPROVE_SERVER_URL: https://demo.jingli365.com/proj/svr-trip-approve/api/v1
+    JL_APP_POSTGRES: postgres://demo:d3m0jingli365@dockerhost/qmtrip
+    JL_APP_REDIS: redis://dockerhost
+  script:
+    - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
+    - docker pull $DOCKER_CI_NAME
+    - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
+    - docker push $DOCKER_BRANCH_NAME
+    - echo deploy to https://demo.jingli365.com
+    - ssh test@demo.jingli365.com /home/test/bin/docker_start.sh $DOCKER_REG $DOCKER_NAME $CI_COMMIT_REF_SLUG
 
 deploy:tester:
   stage: deploy
