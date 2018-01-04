@@ -161,7 +161,7 @@ export class WStaff extends OaStaff {
         let staffCorpProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WECHAT_CORPID, value: self.corpId});
         let ddUser = await self.restApi.getStaff(self.id);
         let userInfo = JSON.stringify(ddUser);
-        let staffDdInfoProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.DD_USER_INFO, value: userInfo});
+        let staffDdInfoProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WECHAT_USER_INFO, value: userInfo});
         await staffUuidProperty.save();
         await staffCorpProperty.save();
         await staffDdInfoProperty.save();
