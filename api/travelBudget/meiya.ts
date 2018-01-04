@@ -138,8 +138,8 @@ export async function getMeiyaHotelData(params: ISearchHotelParams) {
 }
 
 
-export function writeData(filename, data) {
-    let dirPath = path.join(process.cwd(), "./meiyaData");
+export function writeData(filename: string, data: any) {
+    let dirPath = path.join(process.cwd(), "./mytest", "data");
     let source = fs.createWriteStream(path.join(dirPath, filename));
     let result = JSON.stringify(data, null, 4);
 
@@ -153,7 +153,7 @@ export function writeData(filename, data) {
 /**
  * @method 匹配jlbudget飞机数据为基础，meiya不一定都有
  */
-export function compareFlightData(origin, meiyaData) {
+export function compareFlightData(origin: any[], meiyaData: any[]) {
     console.log("compareTrainData origin.length===>", origin.length);
     console.log("compareTrainData meiyaData.length===>", meiyaData.length);
     if (!origin || typeof (origin) == 'undefined')
@@ -228,7 +228,7 @@ export function compareFlightData(origin, meiyaData) {
 /**
  * @method 火车数据匹配，以meiya为基础数据 
  */
-export function compareTrainData(origin, meiyaData) {
+export function compareTrainData(origin: any[], meiyaData: any[]) {
     console.log("compareTrainData origin.length===>", origin.length);
     console.log("compareTrainData meiyaData.length===>", meiyaData.length);
     if (!origin || typeof (origin) == 'undefined')
@@ -301,7 +301,7 @@ export function compareTrainData(origin, meiyaData) {
  * @param meiyaData {Array} 来自tmc数据
  * @return {Array}
  */
-export function compareHotelData(origin, meiyaData) {
+export function compareHotelData(origin: any[], meiyaData: any[]) {
     console.log("compareHotelData meiyaData.length==== >  ", meiyaData.length);
     if (!origin || typeof (origin) == 'undefined')
         return [];

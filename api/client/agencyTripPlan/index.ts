@@ -4,13 +4,15 @@
 
 let API = require("@jingli/dnode-api");
 import L from '@jingli/language';
-import config = require("@jingli/config");
+const config = require("@jingli/config");
 import moment = require("moment");
 import _ = require('lodash');
 import {ENoticeType} from "_types/notice/notice";
+import { Staff } from '_types/staff';
+import { Company } from '_types/company';
 
 
-export function getConsumeInvoiceImg(params) {
+export function getConsumeInvoiceImg(params: {consumeId: string}) {
     let consumeId = params.consumeId;
     return API.tripPlan.getConsumeInvoiceImg({
         consumeId: consumeId
@@ -22,7 +24,11 @@ export function getConsumeInvoiceImg(params) {
  * 代理商获取员工计划单分页列表
  * @returns {*}
  */
-export function pageTripPlans(this: { accountId: string }, params){
+export function pageTripPlans(this: { accountId: string }, params: {
+    audit: string, status: number | object, auditStatus: number,
+    isHasBudget: boolean, budget: any, agencyAll: boolean, page: number,
+    perPage: number, order: any
+}){
     if(!params) {
         throw {code: -10, msg: '参数不能为空'};
     }
@@ -65,13 +71,13 @@ export function pageTripPlans(this: { accountId: string }, params){
 
 
     return API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
-        .then(function(user){
+        .then(function(user: any){
             return user.agencyId;
         })
-        .then(function(agencyId){
+        .then(function(agencyId: any){
             return API.company.listCompany({agencyId:agencyId});
         })
-        .then(function(companys){
+        .then(function(companys: Company[]){
             let companyIdList = companys.map(function(company){
                 return company.id;
             });
@@ -111,7 +117,9 @@ export function pageTripPlans(this: { accountId: string }, params){
  * @param params.userId 用户id
  * @returns {*|*|Promise}
  */
-export function approveInvoice(this: { accountId: string }, params){
+export function approveInvoice(this: { accountId: string }, params: {
+    userId: string, remark: string, consumeId: string, status: number
+}){
     let self = this;
     let user_id = self.accountId;
     params.userId = user_id;
@@ -120,15 +128,12 @@ export function approveInvoice(this: { accountId: string }, params){
     let orderId = "";
     let staffId = "";
     let companyId = "";
-    let staffEmail = "";
-    let staffName = "";
     // let invoiceName = "";
-    let expenditure = '0';
     let _startTime = "";
     let reason = "";
 
     return API.tripPlan.getTripDetail({consumeId: consumeId, columns: ['accountId', 'orderId', 'type', 'startTime']})
-        .then(function(consumeDetail){
+        .then(function(consumeDetail: {accountId: string, orderId: string, type: number, startTime: string}){
             if(!consumeDetail.accountId){
                 throw {code: -6, msg: '消费记录异常'};
             }
@@ -142,29 +147,26 @@ export function approveInvoice(this: { accountId: string }, params){
                 invoiceName = '回程交通';
             }*/
 
-            expenditure = '￥' + params.expenditure;
             _startTime = consumeDetail.startTime;
             return consumeDetail.accountId;
         })
-        .then(function(_staffId){
+        .then(function(_staffId: string){
             staffId = _staffId;
             return API.staff.getStaff({id: staffId, columns: ['companyId', 'name', 'email']})
         })
-        .then(function(staff){
+        .then(function(staff: Staff){
             if(!staff.target.companyId){
                 throw {msg:"该员工不存在或员工所在企业不存在"};
             }
 
             companyId = staff.target.companyId;
-            staffName = staff.name;
-            staffEmail = staff.email;
 
             return Promise.all([
                 API.company.getCompany({id: companyId, columns: ['agencyId']}),
                 API.agency.getAgencyUser({id: user_id, columns: ['agencyId']})
             ])
         })
-        .spread(function(company, user){
+        .spread(function(company: Company, user: {agencyId: string}){
             if(!company.target.agencyId){
                 throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
             }
@@ -175,7 +177,7 @@ export function approveInvoice(this: { accountId: string }, params){
 
             return API.tripPlan.approveInvoice(params);
         })
-        .then(function(isSuccess){
+        .then(function(isSuccess: boolean){
             //判断审核操作是否完成，完成则执行后续操作
             if(!isSuccess){
                 return isSuccess;
@@ -183,7 +185,7 @@ export function approveInvoice(this: { accountId: string }, params){
 
             return API.tripPlan.getTripPlanOrder({orderId: orderId, columns: ['id', 'status', 'score', 'budget', 'expenditure', 'description', 'startAt']});
         })
-        .then(function(ret){
+        .then(function(ret: boolean | {[key: string]: any}){
             //判断ret类型，如果是Boolean则直接返回
             if(typeof ret == 'boolean'){
                 return ret;
@@ -238,7 +240,7 @@ export function approveInvoice(this: { accountId: string }, params){
             let url = config.host + '/staff.html#/travelPlan/PlanDetail?tripPlanId=' + order.id;
             let appMessageUrl = '#/travelPlan/PlanDetail?tripPlanId=' + order.id;
 
-            let key;
+            let key = '';
             /*let values: any = {
                 username: staffName,
                 email: staffEmail,
@@ -284,7 +286,7 @@ export function approveInvoice(this: { accountId: string }, params){
                 return true;
             }
             return API.staff.increaseStaffPoint({id: staffId, accountId: user_id, increasePoint: ret.score, companyId: companyId})
-                .then(async function(ret) {
+                .then(async function(ret: any) {
                     if (key) {
                         //发送通知给用户
                         await API.notify.submitNotify({
@@ -308,7 +310,9 @@ export function approveInvoice(this: { accountId: string }, params){
  * @param params
  * @returns {*}
  */
-export async function countTripPlanNum(this: { accountId: string }, params){
+export async function countTripPlanNum(this: { accountId: string }, params: {
+    companyId: string,
+}){
     let self = this;
     let accountId = self.accountId; //代理商用户Id
 
@@ -331,13 +335,15 @@ export async function countTripPlanNum(this: { accountId: string }, params){
  * 统计计划单的动态预算/计划金额和实际支出
  * @param params
  */
-export async function statPlanOrderMoneyByAgency(this: { accountId: string }, params) {
+export async function statPlanOrderMoneyByAgency(this: { accountId: string }, params: {
+    companyId: string, startTime: string, endTime: string
+}) {
     let self = this;
     if(!params.companyId){
         throw {code: -1, msg: '企业Id不能为空'};
     }
     let companyId = params.companyId;
-    params = _.pick(params, ['companyId', 'startTime', 'endTime']);
+    let p = _.pick(params, ['companyId', 'startTime', 'endTime']);
 
     let [u, c] = await Promise.all([
         API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']}),
@@ -346,6 +352,6 @@ export async function statPlanOrderMoneyByAgency(this: { accountId: string }, pa
     if(u.agencyId != c.agencyId){
         throw L.ERR.PERMISSION_DENY();
     }
-    params.companyId = companyId;
-    return API.tripPlan.statPlanOrderMoney(params);
+    p.companyId = companyId;
+    return API.tripPlan.statPlanOrderMoney(p);
 }

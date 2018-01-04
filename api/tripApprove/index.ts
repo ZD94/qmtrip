@@ -5,38 +5,30 @@
 
 'use strict';
 import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
-import {modelNotNull} from "../_decorator";
 import {Models} from "_types/index";
-import {FindResult} from "common/model/interface";
-import {
-    QMEApproveStatus, EApproveResult, ETripType, EPlanStatus,
-    TripPlan, TripPlanLog, EApproveResult2Text
-} from "_types/tripPlan/tripPlan";
+import {QMEApproveStatus, EApproveResult, ETripType, EPlanStatus, TripPlanLog} from "_types/tripPlan/tripPlan";
 import moment = require("moment/moment");
 import {Staff, EStaffStatus, EStaffRole} from "_types/staff/staff";
-import {EVENT, plugins} from "libs/oa/index";
+import {plugins} from "libs/oa/index";
 import {TripDetail} from "_types/tripPlan/tripDetail";
-import TripPlanModule = require("../tripPlan/index");
-let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 const L = require('@jingli/language');
 var API = require('@jingli/dnode-api');
-import config = require("@jingli/config");
+const config = require("@jingli/config");
 import _ = require("lodash");
 import {ENoticeType} from "_types/notice/notice";
 import {AutoApproveType, AutoApproveConfig, ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan"
 import {DB} from "@jingli/database";
 import {ITripApprove, IDestination} from "../../_types/tripApprove";
 import {Project} from "../../_types/tripPlan";
-import tripplan = require("../notify/templates/qm_notify_new_travelbudget/transform");
 import {EApproveStatus, EApproveType} from "_types/approve/types";
-import {tripApproveEvents} from "_types/tripApprove";
+import { ITravelBudgetInfo } from 'http/controller/budget';
+import { Place } from '_types/place';
 
 export default class TripApproveModule {
 
     static async retrieveDetailFromApprove(params: {approveNo: string, approveUser?: string, submitter?: string}):Promise<ITripApprove> {
         let {approveNo, approveUser, submitter} = params;
-        console.log('retrieveID', params.approveNo);
-        let tripApproveObj: any;
+        let tripApproveObj: ITripApprove
         if(!approveUser && !submitter)
             tripApproveObj = await TripApproveModule.getTripApprove({id: approveNo});
         if(tripApproveObj)
@@ -47,7 +39,7 @@ export default class TripApproveModule {
         approveUser = approveUser && typeof(approveUser) != 'undefined' ? approveUser : approve.approveUser;
         submitter = submitter && typeof(submitter) != 'undefined' ? submitter: approve.submitter;
 
-        let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
+        let budgetInfo: {budgets: ITravelBudgetInfo[], query: ICreateBudgetAndApproveParams} = approve.data;
 
 
 
@@ -86,7 +78,7 @@ export default class TripApproveModule {
             project = await API.tripPlan.getProjectByName({companyId: company.id, name: projectName,
                 userId: submitter});
         }
-        let tripApprove: any = {};
+        let tripApprove: ITripApprove;
         tripApprove.id = approveNo;
         // tripApprove.approveUserId = approveUser;
         // let tripApprove = await Models.tripApprove.create({approveUserId: approveUser, id: approveNo});
@@ -167,7 +159,11 @@ export default class TripApproveModule {
         let account = await Models.staff.get(approve.accountId);
 
         let budgets = approve.budgetInfo;
-        return budgets.map(function (budget: any) {
+        return budgets.map(function (budget:{
+            tripType: number, price: number, originPlace: Place, destination: Place, leaveDate: Date,
+            cabinClass: number, cityName: string, hotelName: string, checkInDate: Date, checkOutDate: Date,
+            fromDate: Date, endDate: Date, hasFirstDaySubsidy: boolean, hasLastDaySubsidy: boolean
+        }) {
             if (typeof budget == 'string') {
                 budget = JSON.parse(budget);
             }
@@ -265,7 +261,6 @@ export default class TripApproveModule {
         let staff = await Models.staff.get(tripApprove.accountId);
 
         let company = staff.company;
-        let nextApprove = params.nextApprove || false;
 
         //#@template
         let approve_url: string;
@@ -360,7 +355,10 @@ export default class TripApproveModule {
     @clientExport
     @requireParams(['id', 'approveResult', 'isNextApprove'], ['approveRemark', "budgetId", 'nextApproveUserId', "version"])
     // @modelNotNull('tripApprove')
-    static async approveTripPlan(params): Promise<boolean> {
+    static async approveTripPlan(params: {
+        isNextApprove: boolean, id: string, approveResult: number, budgetId?: string,
+        nextApproveUserId?: string, approveRemark?: string, version?: number
+    }): Promise<boolean> {
         let isNextApprove = params.isNextApprove;
         let staff = await Staff.getCurrent();
         let tripApprove = await TripApproveModule.getTripApprove({id: params.id});
@@ -383,7 +381,7 @@ export default class TripApproveModule {
             throw L.ERR.PERMISSION_DENY();
         }
 
-        let budgetInfo;
+        let budgetInfo: any;
         let number = 0;
         /*if(tripApprove.isSpecialApprove){
             number = 1;
@@ -396,7 +394,7 @@ export default class TripApproveModule {
             if (!budgetInfo || !budgetInfo.budgets)
                 throw new Error(`预算信息已失效请重新生成`);
             let finalBudget = 0;
-            budgetInfo.budgets.forEach((v) => {
+            budgetInfo.budgets.forEach((v: any) => {
                 if(v.tripType != ETripType.SUBSIDY){
                     number = number + 1;
                 }
@@ -472,11 +470,9 @@ export default class TripApproveModule {
                 }
             }
 
-            let notifyRemark = '';
             let log = TripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id});
 
             if (approveResult == EApproveResult.PASS && !isNextApprove) {
-                notifyRemark = `审批通过，审批人：${staff.name}`;
                 log.approveStatus = EApproveResult.PASS;
                 log.remark = `审批通过`;
                 await log.save();
@@ -495,7 +491,6 @@ export default class TripApproveModule {
                 if(!approveRemark) {
                     throw {code: -2, msg: '拒绝原因不能为空'};
                 }
-                notifyRemark = `审批未通过，原因：${approveRemark}`;
                 log.approveStatus = EApproveResult.REJECT;
                 log.remark = approveRemark;
                 await log.save();
@@ -573,7 +568,9 @@ export default class TripApproveModule {
     */
     @clientExport
     @requireParams(['id', 'approveResult'], ['reason', 'isAutoApprove'])
-    static async oaApproveTripPlan(params): Promise<boolean> {
+    static async oaApproveTripPlan(params: {
+        id: string, approveResult: number, isAutoApprove?: boolean, reason?: string
+    }): Promise<boolean> {
         console.info("oaApproveTripPlan begin=====================");
         let approve = await Models.approve.get(params.id);
         let isAutoApprove = params.isAutoApprove;
@@ -590,7 +587,7 @@ export default class TripApproveModule {
         if(typeof approve.data == 'string'){
             approve.data = JSON.parse(approve.data);
         }
-        let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
+        let budgetInfo: {budgets: ITravelBudgetInfo[], query: ICreateBudgetAndApproveParams} = approve.data;
         let {budgets, query} = budgetInfo;
         let number = 0;
 
@@ -718,7 +715,9 @@ export default class TripApproveModule {
     */
     @clientExport
     @requireParams(['id', 'approveUserId', 'nextApproveUserId'])
-    static async nextApprove(params): Promise<boolean> {
+    static async nextApprove(params: {
+        id: string, approveUserId: string, nextApproveUserId: string
+    }): Promise<boolean> {
         console.info("nextApprove begin============");
         let approveUser = await Models.staff.get(params.approveUserId);
         let nextApproveUser = await Models.staff.get(params.nextApproveUserId);
@@ -809,8 +808,8 @@ export default class TripApproveModule {
             if(typeof tripApprove.data == "string"){
                 tripApprove.data = JSON.parse(tripApprove.data);
             }
-            let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = tripApprove.data;
-            let {budgets, query} = budgetInfo;
+            let budgetInfo: {budgets: ITravelBudgetInfo[], query: ICreateBudgetAndApproveParams} = tripApprove.data;
+            let {query} = budgetInfo;
             if (typeof query == 'string') {
                 query = JSON.parse(query);
             }
@@ -956,7 +955,7 @@ export default class TripApproveModule {
     }
 
     @clientExport
-    static async updateTripApprove(params): Promise<ITripApprove> {
+    static async updateTripApprove(params: any): Promise<ITripApprove> {
         let companyId = params['companyId'];
         if(!companyId || typeof companyId == 'undefined') {
             let currentStaff = await Staff.getCurrent();

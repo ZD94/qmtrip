@@ -23,7 +23,7 @@ class AccordHotelModule{
         {if: condition.isCompanyAdminOrOwner("0.companyId")},
         {if: condition.isCompanyAgency("0.companyId")}
     ])
-    static async createAccordHotel (params) : Promise<AccordHotel>{
+    static async createAccordHotel (params: {[key: string]: any}) : Promise<AccordHotel>{
 
         let result = await Models.accordHotel.find({where: {cityCode: params.cityCode, companyId: params.companyId}});
         if(result && result.length>0){
@@ -45,7 +45,7 @@ class AccordHotelModule{
         {if: condition.isAccordHotelAdminOrOwner("0.id")},
         {if: condition.isAccordHotelAgency("0.id")}
     ])
-    static async deleteAccordHotel(params) : Promise<any>{
+    static async deleteAccordHotel(params: {id: string}) : Promise<boolean>{
         var id = params.id;
         var ah_delete = await Models.accordHotel.get(id);
 
@@ -66,7 +66,7 @@ class AccordHotelModule{
         {if: condition.isAccordHotelAdminOrOwner("0.id")},
         {if: condition.isAccordHotelAgency("0.id")}
     ])
-    static async updateAccordHotel(params) : Promise<AccordHotel>{
+    static async updateAccordHotel(params: {[key: string]: any}) : Promise<AccordHotel>{
         var id = params.id;
 
         var ah = await Models.accordHotel.get(id);
@@ -132,7 +132,7 @@ class AccordHotelModule{
         {if: condition.isCompanyAdminOrOwner("0.where.companyId")},
         {if: condition.isCompanyAgency("0.where.companyId")}
     ])
-    static async getAccordHotels(params): Promise<FindResult>{
+    static async getAccordHotels(params: {order:any, where: any}): Promise<FindResult>{
         var staff = await Staff.getCurrent();
         params.order = params.order || [['createdAt', 'desc']];
 

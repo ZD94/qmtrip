@@ -6,14 +6,18 @@
 
 import _ = require("lodash");
 
-export function get_msg(qs: any, type?: string) {
+export function get_msg(qs: {
+    media_id?: string, content?: string, duration?: string | number,
+    url?: string, picurl?: string, title?: string, touser?: string,
+    agentid?: string
+}, type?: string) {
     if (!type) {
         type = 'text';
     }
     let template: any;
     try {
         template = require(`./${type}.json`);
-    } catch(err) {
+    } catch (err) {
         console.error(err);
     }
     if (!template) {
