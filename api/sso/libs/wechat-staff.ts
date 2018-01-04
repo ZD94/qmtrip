@@ -157,11 +157,11 @@ export class WStaff extends OaStaff {
     }
     async saveStaffProperty(params: { staffId: string; }): Promise<boolean> {
         let self = this;
-        let staffUuidProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.DD_ID, value: self.id});
-        let staffCorpProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.DD_COMPANY_ID, value: self.corpId});
+        let staffUuidProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WECHAT_UID, value: self.id});
+        let staffCorpProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WECHAT_CORPID, value: self.corpId});
         let ddUser = await self.restApi.getStaff(self.id);
         let userInfo = JSON.stringify(ddUser);
-        let staffDdInfoProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.DD_USER_INFO, value: userInfo});
+        let staffDdInfoProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WECHAT_USER_INFO, value: userInfo});
         await staffUuidProperty.save();
         await staffCorpProperty.save();
         await staffDdInfoProperty.save();
