@@ -36,7 +36,6 @@ export async function getAgentToken() {
         timestamp,
         sign: md5(`${config.agent.appSecret}|${timestamp}`)
     }).then(res => res.data)
-
     if (resp.code === 0) {
         await cache.write(key, resp.data.token, resp.data.expires - 30);
         // logger.debug('TOKEN:', resp.data.token)
@@ -78,6 +77,7 @@ export class RestfulAPIUtil {
         addUrl?: string,
         useProxy?: boolean
     }): Promise<any> {
+        let isSend = true;
         let { params, model, addUrl = '', useProxy = true } = options;
         let { fields, method } = params;
         let currentCompanyId = fields['companyId'];
@@ -109,13 +109,20 @@ export class RestfulAPIUtil {
         } = {};
 
         if (fields.hasOwnProperty('id')) {
-            url = url + `/${fields['id']}`;
+            if(fields['id']){
+                url = url + `/${fields['id']}`;
+            }else{
+                isSend = false;
+            }
         } else {
             if (method.toUpperCase() == 'GET') {
                 for (let key in fields) {
                     qs[key] = fields[key];
                 }
             }
+        }
+        if(!isSend){
+            return null;
         }
         return new Promise((resolve, reject) => {
             return request({
@@ -131,7 +138,7 @@ export class RestfulAPIUtil {
                 if (err) {
                     return reject(err);
                 }
-         
+
                 if (typeof(result) == 'string') {
                     try{
                         result = JSON.parse(result);

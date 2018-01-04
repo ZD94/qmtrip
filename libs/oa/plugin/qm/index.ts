@@ -31,7 +31,6 @@ export class QmPlugin extends AbstractOAPlugin {
 
         let staff = await Models.staff.get(submitter);
         let company = staff.company;
-        console.info(company.id, company.name, "0000000000009*****************");
         let approve = await Models.approve.get(approveNo);
         let tripApprove = await API.tripApprove.retrieveDetailFromApprove(params);
 
