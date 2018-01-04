@@ -13,7 +13,7 @@ var path = require('path');
 
 var config = {
     "postgres": "postgres://times:time0418@local.jingli.tech:5432/times?ssl=true",
-    "remotes": []
+    "remotes": [] as string[]
 };
 
 import Logger from '@jingli/logger';
@@ -38,11 +38,11 @@ scrubber.registerClass(
 );
 */
 var tmp = {
-    callbacks: []
+    callbacks: [] as Function[]
 }
 
 var cache = {
-    callbacks: {local: [], remote: tmp.callbacks}
+    callbacks: {local: [] as any[], remote: tmp.callbacks}
 }
 
 export default async function main(){

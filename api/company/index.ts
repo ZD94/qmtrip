@@ -1189,7 +1189,7 @@ export default class CompanyModule {
             //每天八点10分发送每日企业注册邮件
             (async () => {
                 let pager: PaginateInterface<Company>
-                let companies: any[] = [];
+                let companies: {name: string, createUser: object,createdAt: Date}[] = [];
                 do {
                     pager = await Models.company.find({
                         where: {

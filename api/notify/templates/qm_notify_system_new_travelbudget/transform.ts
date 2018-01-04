@@ -1,9 +1,12 @@
 import {Models} from "_types";
+import {Staff} from "_types/staff";
+import {EApproveResult, ETripType} from "_types/tripPlan";
 const moment = require("moment");
 var API = require('@jingli/dnode-api');
 import {MPlaneLevel, MTrainLevel, MHotelLevel,DefaultRegion} from '_types';
-import { Staff } from '_types/staff';
+import {Model, where} from "sequelize";
 import { ITravelBudgetInfo } from 'http/controller/budget';
+require("moment-timezone")
 
 export = async function transform(values: {staffId: string,
     staff: Staff, MPlaneLevel: object,   MTrainLevel: object, MHotelLevel: object,

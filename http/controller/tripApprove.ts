@@ -4,8 +4,6 @@
 
 'use strict';
 import {AbstractController, Restful, Router} from "@jingli/restful";
-import API from '@jingli/dnode-api';
-import {Models} from "_types";
 var TripApproveModule= require("api/tripApprove");
 import {Request, Response} from "express-serve-static-core";
 

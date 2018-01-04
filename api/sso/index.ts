@@ -219,12 +219,12 @@ export default class SSOModule {
             staff.companyId = company.id;
             staff = await staff.save();
     
-            let department = Department.create({
-                name: result.corpName,
-                companyId: company.id,
-                isDefault: true
-            })
-            department = await department.save();
+            // let department = Department.create({
+            //     name: result.corpName,
+            //     companyId: company.id,
+            //     isDefault: true
+            // })
+            // department = await department.save();
         }
         return {
             company,

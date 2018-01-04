@@ -5,7 +5,7 @@ import {Models} from "_types";
 import {EApproveResult} from "_types/tripPlan";
 const moment = require("moment");
 var API = require('@jingli/dnode-api');
-require("moment-timezone")
+require('moment-timezone')
 
 export = async function transform(values: any): Promise<any>{
     let tripApprove = values.tripApprove;

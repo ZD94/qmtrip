@@ -10,21 +10,16 @@ import {md5} from "common/utils";
 import {CoinAccount} from "_types/coin";
 import {EGender} from "_types";
 import utils = require("common/utils");
-const _ = require("lodash");
 const Models = require("_types").Models;
 var moment = require('moment');
 let testData = require('./test-data.json');
 var API = require("@jingli/dnode-api");
 
-import { restfulAPIUtil } from "api/restful";
-let RestfulAPIUtil = restfulAPIUtil;
-
-import {HotelPriceLimitType} from 'api/company';
 
 export async function initCompanyRegion(){
     let companies = await Models.company.all({where: {}});
-    await Promise.all(companies.map(async (co) => {
-        let subsidyRegions = await API.travelPolicy.initSubsidyRegions({companyId: co.id});
+    await Promise.all(companies.map(async (co: Company) => {
+        await API.travelPolicy.initSubsidyRegions({companyId: co.id});
     }))
 }
 
@@ -35,10 +30,10 @@ export async function initDataForTest (params: {name: string, userName: string, 
     }
 
     let company = await initCompany(params);
-    let travelPolicies = await initXAJHTravelPolicy({companyId: company.id});
-    let departments = await initXAJHDepartments({companyId: company.id});
-    let staffs = await initXAJHStaffs({companyId: company.id});
-    let subsidyRegions = await API.travelPolicy.initSubsidyRegions({companyId: company.id});
+    await initXAJHTravelPolicy({companyId: company.id});
+    await initXAJHDepartments({companyId: company.id});
+    await initXAJHStaffs({companyId: company.id});
+    await API.travelPolicy.initSubsidyRegions({companyId: company.id});
     return company;
 }
 
@@ -111,20 +106,20 @@ async function initXAJHTravelPolicy(params: {companyId: string}): Promise<any[]>
     for(let i = 0; i < companyRegion.length; i++){
         if(companyRegion[i].name == '国内') {
             domesticCR = await API.travelPolicy.createCompanyRegion({name:companyRegion[i].name, companyId: company["id"]});
-            let rp = await API.travelPolicy.createRegionPlace({companyId: params.companyId, placeId: regionPlace.domestic_place_id, companyRegionId: domesticCR["id"]});
+            await API.travelPolicy.createRegionPlace({companyId: params.companyId, placeId: regionPlace.domestic_place_id, companyRegionId: domesticCR["id"]});
         }
         if(companyRegion[i].name == '国际') {
             abroadCR = await API.travelPolicy.createCompanyRegion({name:companyRegion[i].name, companyId: company["id"]});
-            let rp = await API.travelPolicy.createRegionPlace({companyId: params.companyId, placeId: regionPlace.abroad_place_id, companyRegionId: abroadCR["id"]});
+            await API.travelPolicy.createRegionPlace({companyId: params.companyId, placeId: regionPlace.abroad_place_id, companyRegionId: abroadCR["id"]});
         }
     }
 
-    let travelPolicies = Promise.all(tps.map(async function(item){
+    let travelPolicies = Promise.all(tps.map(async function(item: any){
         let subsidyTemplates = item.subsidyTemplates;
         if(!item.companyId) item["companyId"] = company["id"];
         let travelPolicy = await API.travelPolicy.createTravelPolicy(item);
 
-        let domesticTpr = await API.travelPolicy.createTravelPolicyRegion({
+        await API.travelPolicy.createTravelPolicyRegion({
             planeLevels: item.planeLevels,
             trainLevels: item.trainLevels,
             hotelLevels: item.hotelLevels,
@@ -136,7 +131,7 @@ async function initXAJHTravelPolicy(params: {companyId: string}): Promise<any[]>
         });
 
         if(item.isOpenAbroad) {
-            let abroadTpr = await API.travelPolicy.createTravelPolicyRegion({
+            await API.travelPolicy.createTravelPolicyRegion({
                 planeLevels: item.abroadPlaneLevels,
                 hotelLevels: item.abroadHotelLevels,
                 travelPolicyId: travelPolicy.data["id"],
@@ -152,7 +147,7 @@ async function initXAJHTravelPolicy(params: {companyId: string}): Promise<any[]>
                 let st = subsidyTemplates[i];
                 if(!st["travelPolicyId"]) st["travelPolicyId"] = travelPolicy.data["id"];
                 if(!st["companyId"]) st["companyId"] = item.companyId;
-                let subTem = await API.travelPolicy.createSubsidyTemplate(st);
+                await API.travelPolicy.createSubsidyTemplate(st);
                 // await subTem.save();
             }
         }
@@ -194,7 +189,7 @@ async function initXAJHStaffs(params: {companyId: string}): Promise<any[]> {
     let defaultDepartment = await company.getDefaultDepartment();
     let staffs = testData.staffs;
 
-    let result = await Promise.all(staffs.map(async function(staff){
+    let result = await Promise.all(staffs.map(async function(staff: any){
         let deptNames = staff.departmentName;
         let depts = [];
         let travelPolicy : any;

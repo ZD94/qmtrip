@@ -139,7 +139,7 @@ export abstract class OaDepartment{
             if(!from){
                 //2、同步部门下员工
                 let oaStaffs = await self.getStaffs();
-                let oaStaffsMap = {};
+                let oaStaffsMap: { [key: string]: any } = {};
                 if (oaStaffs && oaStaffs.length > 0) {
                     for(let item of oaStaffs){
                         oaStaffsMap[item.id] = item;
@@ -175,8 +175,7 @@ export abstract class OaDepartment{
 
                 //获取oa子部门
                 let childrenDepartments = await self.getChildrenDepartments();
-         
-                let childrenDepartmentsMap = {};
+                let childrenDepartmentsMap: { [key: string]: any} = {};
                 for(let d = 0; d < childrenDepartments.length; d++){
                     let ld = childrenDepartments[d];
                     childrenDepartmentsMap[ld.id] = ld;
@@ -186,7 +185,9 @@ export abstract class OaDepartment{
                 let childrenDepts = await Models.department.all({where: {parentId: result.id}});
                 await Promise.all(childrenDepts.map(async (item) => {
                     let deptProperty = await item.getOaDeptIdProperty();
-                    let oaDept = childrenDepartmentsMap[deptProperty.value];
+                    let oaDept;
+                    if(deptProperty)
+                        oaDept= childrenDepartmentsMap[deptProperty.value];
                     if(!oaDept){
                         await item.deleteDepartmentProperty();
 
@@ -196,7 +197,7 @@ export abstract class OaDepartment{
                             console.info("删除部门失败",e);
                         }
                     }else{
-                        childrenDepartmentsMap[deptProperty.value] = null;
+                        // childrenDepartmentsMap[deptProperty.value] = null;
                     }
                 }));
 

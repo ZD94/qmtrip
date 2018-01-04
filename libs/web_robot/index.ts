@@ -35,16 +35,17 @@ export class WebRobot{
     }
 
     async downloadFile(uri: string): Promise<string>{
+        const self = this
         var tmpfile = path.join(os.tmpdir(), 'webdownload_'+Date.now()+'_'+Math.random());
-        return new Promise<string>((resolve, reject) => {
-            this.client_orig.get({
+        return new Promise<string>(function(resolve, reject){
+            self.client_orig.get({
                 uri: uri
             })
                 .pipe(fs.createWriteStream(tmpfile))
                 .on('close', function(){
                     resolve(tmpfile);
                 })
-                .on('error', function(err){
+                .on('error', function(err: any){
                     reject(err);
                 });
         })

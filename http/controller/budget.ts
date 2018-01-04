@@ -9,12 +9,13 @@ import {Models} from "_types";
 // import {ApiTravelBudget} from "api/travelBudget/index";
 var ApiTravelBudget = require("api/travelBudget");
 import {ETripType} from "../../_types/tripPlan";
+import { Request, Response, NextFunction } from 'express-serve-static-core'
 
 @Restful()
 export class BudgetController extends AbstractController {
 
     constructor() {
-        super();
+        super()
     }
 
     $isValidId(id: string) {
@@ -22,14 +23,14 @@ export class BudgetController extends AbstractController {
         return /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(id);
     }
 
-    async get(req, res, next){
+    async get(req: Request, res: Response, next: NextFunction){
         let {id} = req.params;
         if(!id)  return res.json(this.reply(0, null));
         let result = await ApiTravelBudget.getBudgetById(req.params);
         res.json(this.reply(0, result));
     }
     
-    async add(req, res, next){
+    async add(req: Request, res: Response, next: NextFunction){
         let body = req.body;
         if(!body)
            return res.json(this.reply(0, null));
@@ -43,7 +44,7 @@ export class BudgetController extends AbstractController {
      * @return BudgetItem[]
      */
     @Router('/:id/refresh', "GET")
-    async refresh(req, res, next){
+    async refresh(req: Request, res: Response, next: NextFunction){
         let {id} = req.params;
         if(!id)  return res.json(this.reply(400, null));
         let approve = await Models.approve.get(id);
@@ -73,7 +74,7 @@ export class BudgetController extends AbstractController {
     }
 
     @Router('/getBudgetInfo', "POST")
-    async getBudgetInfo(req, res, next){
+    async getBudgetInfo(req: Request, res: Response, next: NextFunction){
         let body = req.body;
         if(!body)
             return res.json(this.reply(0, null));
@@ -87,7 +88,7 @@ export class BudgetController extends AbstractController {
     }
 
     @Router('/qmGetBudget', "POST")
-    async qmGetBudgetInfo(req, res, next){
+    async qmGetBudgetInfo(req: Request, res: Response, next: NextFunction){
         let body = req.body;
         if(!body)
             return res.json(this.reply(0, null));

@@ -9,7 +9,6 @@ import {ACCOUNT_STATUS} from "_types/auth";
 import {Department} from "_types/department";
 import L from '@jingli/language';
 import utils = require("common/utils");
-import cache from "common/cache";
 
 const DEFAULT_PWD = '000000';
 export  abstract class OaStaff{
@@ -124,7 +123,7 @@ export  abstract class OaStaff{
             if(!oaDepartments || !oaDepartments.length){
                 newDepartments.push(defaultDepartment)
             }else{
-                let oaDepartmentIds = await Promise.all(oaDepartments.map(async (item) => {
+                await Promise.all(oaDepartments.map(async (item) => {
                     let department = await item.getDepartment();
                     if(!department){
                         let dept = await item.sync({company: company, from: "addStaff"});//此处需要验证
