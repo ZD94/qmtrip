@@ -33,12 +33,12 @@ export class RestApi {
                 permanent_code: permanentCode
             }
         })
-        if (res.errcode == 0)
-            return {
-                accessToken: res.access_token,
-                expires_in: res.expires_in
-            }
-        return null
+        if (res.errcode != 0)
+            return null
+        return {
+            accessToken: res.access_token,
+            expires_in: res.expires_in
+        }
     }
 
     /**
@@ -56,12 +56,13 @@ export class RestApi {
                 auth_code: authCode
             }
         });
-        if(result.errcode != 0) return null;
+        console.log("=====>result: ", result)
+        // if(result.errcode != 0) return null;
         return {
             accessToken: result.access_token,
             permanentCode: result.permanent_code,
             corpId: result.auth_corp_info.corpid,
-            corpName: result.auth_corp_info.corp_name,
+            corpName: result.auth_corp_info.corp_full_name,
             expires_in: result.expires_in,
             authUserInfo: {
                 email: result.auth_user_info.email,
@@ -109,7 +110,7 @@ export class RestApi {
             order: result.order,
             position: result.position,
             telephone: result.telephone,
-            enable: result.enable,
+            status: result.status,
             extattr: result.extattr
         } as IWStaff;
     }
@@ -137,7 +138,6 @@ export class RestApi {
             access_token: this.access_token
         }
         if (id) qs['id'] = id;
-        console.log("=====this department: ", qs, url)
         let result: IDepartmentResult = await reqProxy({
             url,
             method: 'GET',
@@ -180,7 +180,7 @@ export class RestApi {
      * @param.fetchChild {number} 是否递归获取子部门下面的成员
      * @return {IConciseMemberListResult}
      */
-    async getConciseStaffsByDepartment(departmentId?: string, fetchChild?: number): Promise<IConciseMemberListResult> {
+    async getConciseStaffsByDepartment(departmentId?: string, fetchChild?: number): Promise<any> {
         let url = 'https://qyapi.weixin.qq.com/cgi-bin/user/simplelist';
         let qs: {
             access_token: string,
@@ -196,7 +196,8 @@ export class RestApi {
             method: 'GET',
             qs
         });
-        return result;
+        if(!result || !result.userlist) return null;
+        return result.userlist;
     }
 }
 
@@ -271,6 +272,7 @@ export interface IWPermanentCodeResult {
         corp_name: string,
         corp_type: string,
         corp_square_logo_url: string,
+        corp_full_name: string,
         corp_user_max: number,
         corp_agent_max: number,
         verified_end_time: number,

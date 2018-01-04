@@ -1774,12 +1774,23 @@ class StaffModule{
      */
     @clientExport
     @requireParams([], ["where.name","where.mobile","where.sex", "where.companyId", "where.operatorId","where.companyName",
-    "order", "type"])
+    "order", "type", "offset", "limit"])
     static async getLinkmans(params: {
         where: any,
         order?: any,
         attributes?: any,
+        limit?: number,
+        offset?: number
     }): Promise<FindResult> {
+        let offset = 0;
+        let options: {[index: string]: any} = params;
+        if(!params.offset)
+            options.offset = 0;
+        if(!params.limit)
+            options.limit = 20;
+        if(!params.order)
+            options.order = [["created_at", "desc"]];
+        
         let linkmans = await Models.linkman.find(params);
         return {ids: linkmans.map((s)=> {return s.id;}), count: linkmans['total']};
     }

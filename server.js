@@ -7,8 +7,8 @@ require('app-module-path').addPath(__dirname);
 require('common/node_ts').install();
 var initData = require('libs/initTestData');
 var ReplServer = require('libs/replServer');
-var WX = require('api/wangxin');
-var WangxUtils = require('api/wangxin/lib/wangxUtils');
+var WX = require('api/wangXin');
+var WangxUtils = require('api/wangXin/lib/wangxUtils');
 // const httpProxy = require('http-proxy')
 
 // httpProxy.createProxyServer({
@@ -93,7 +93,7 @@ server.on('init.api', function(API){
     }
 
     if(cluster.isMaster && config.wxSysCode){
-        WX.syncOrganization();
+        // WX.syncOrganization();
         /*let key = "ZjBmMjU0NzAtMWI3Yi0xMWU3LTk4NzUtYTdkOWQ4MmY=";
         // let result = WangxUtils.createLtpaToken("*shangguanzirui*", 12, key);
         let token = "AQIDBDVBNDVGNzBCNUE0NjlGQ0Iqc2hhbmdndWFuemlydWkq9G2GcWudAn8KpUHh8g9cRJEmtGc=";

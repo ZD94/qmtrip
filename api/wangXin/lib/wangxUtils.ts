@@ -33,13 +33,51 @@ export default class WangxUtils {
         _ltpaToken.write(timeCreation, 4);
         _ltpaToken.write(timeExpiration, 12);
         userNameBuf.copy(_ltpaToken, 20);
-        _ltpaToken.write(hash.digest("hex"), size, 20,"hex");
-        console.info("_ltpaToken===>>", _ltpaToken);
-        console.info("_ltpaToken===>>", _ltpaToken.toString());
+        let keyHex= hash.digest("hex");
+        _ltpaToken.write(keyHex, size, 20,"hex");
         return _ltpaToken.toString("base64");
     }
 
     static parseLtpaToken(token: string, key: string): string {
+        let ltpaToken;
+        let gracePeriod = 300;
+        ltpaToken = new Buffer(token, "base64");
+
+        if (ltpaToken.length < 41) {
+            throw new Error("token too short")
+        }
+
+        let signature = ltpaToken.toString("hex", ltpaToken.length - 20);
+        let serverSecret = key;
+        ltpaToken.write(serverSecret, ltpaToken.length - 20, "base64");
+
+        let hash = crypto.createHash("sha1");
+        hash.update(ltpaToken);
+
+        let hexDigest = hash.digest("hex");
+        if (hexDigest !== signature) {
+            throw new Error("token 签名错误")
+        }
+        let version = ltpaToken.toString("hex", 0, 4);
+        if (version !== "01020304") {
+            throw new Error(`${version}不正确`)
+        }
+
+        let timeCreation = parseInt(ltpaToken.toString("utf8", 4, 12), 16);
+        let timeExpiration = parseInt(ltpaToken.toString("utf8", 12, 20), 16);
+        let now = Math.floor(Date.now() / 1000);
+
+        if (timeCreation > (now + gracePeriod)) {
+            throw new Error("token创建时间不正确")
+        }
+
+        if (timeExpiration < (now - gracePeriod)) {
+            throw new Error("token时间过期")
+        }
+        return getUserName(token);
+    }
+
+    static _parseLtpaToken(token: string, key: string): string {
         try {
             token = new Buffer(token,"base64").toString()
 
@@ -56,8 +94,6 @@ export default class WangxUtils {
             let hash2 = new Buffer(20);
             hash2.write(hash.digest("hex"), 0, 20,"hex");
 
-            console.info("_ltpaToken==", hash2.toString());
-            console.info(hash1 == hash2.toString());
             if (hash1 != hash2.toString())
                 throw new Error("token不正确")
 
@@ -68,3 +104,12 @@ export default class WangxUtils {
         }
     }
 }
+
+function getUserNameBuf(token) {
+    let ltpaToken = new Buffer(token, "base64");
+    return (ltpaToken.slice(20, ltpaToken.length - 20));
+};
+
+function getUserName(token) {
+    return getUserNameBuf(token).toString()
+};
