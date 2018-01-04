@@ -68,11 +68,11 @@ export default class SSOModule {
 
     @clientExport
     @requireParams(['code'])
-    static async getUserInfo({ code }: { code: string }): Promise<string> {
+    static async getUserInfo({ code }: { code: string }): Promise<WeChatUsrInfo> {
         const suite_token = await API.sso.getSuiteToken()
         const res = await axios.get(`${USER_INFO_URL}?access_token=${suite_token}&code=${code}`)
         if (res.status == 200 && res.data.errcode == 0) {
-            return res.data.UserId
+            return res.data
         }
         throw new L.ERROR_CODE_C(500, "获取用户信息失败")
     }
@@ -369,4 +369,10 @@ async function dealEvent(){
     }catch(e){
         console.error(e);
     }
+}
+
+export interface WeChatUsrInfo {
+    CorpId: string,
+    UserId: string,
+    DeviceId: string
 }
