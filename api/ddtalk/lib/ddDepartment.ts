@@ -5,12 +5,10 @@ import { OaDepartment } from 'libs/asyncOrganization/oaDepartment';
 import { OaStaff } from 'libs/asyncOrganization/OaStaff';
 import { DepartmentProperty, DPropertyType, Department} from "_types/department";
 import {Models} from "_types/index";
-import {Company, CPropertyType} from "_types/company";
-import L from '@jingli/language';
+import {Company} from "_types/company";
 import ISVApi from "./isvApi";
 import corpApi from "./corpApi";
 import DdStaff from "./ddStaff";
-import {DDTalkDepartment} from "_types/ddtalk";
 
 export default class DdDepartment extends OaDepartment {
 
@@ -146,7 +144,6 @@ export default class DdDepartment extends OaDepartment {
     }
 
     async getDepartmentProperty(params: {departmentId: string}): Promise<DepartmentProperty> {
-        let self = this;
        /* let ddDeparts = await Models.ddtalkDepartment.find({
             where : { corpId : this.corpId , DdDepartmentId : self.id }
         });

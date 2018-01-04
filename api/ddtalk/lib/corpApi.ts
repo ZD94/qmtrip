@@ -37,7 +37,7 @@ export default class CorpApi {
         })
     }
 
-    async getUser(userid) {
+    async getUser(userid: string | number) {
         let url = `https://oapi.dingtalk.com/user/get?access_token=${this.accessToken.access_token}`
         return reqProxy(url, {
             name: '获取用户基本信息',
@@ -68,7 +68,7 @@ export default class CorpApi {
         return ticketObj;
     }
 
-    async getUserInfoByOAuth(code) : Promise<any> {
+    async getUserInfoByOAuth(code: string) : Promise<any> {
         let url = `https://oapi.dingtalk.com/user/getuserinfo?access_token=${this.accessToken.access_token}&code=${code}`;
         return reqProxy(url, {
             name: '通过code换取用户信息',
@@ -89,7 +89,7 @@ export default class CorpApi {
         return ret.department;
     }
 
-    async getUserListByDepartment(departmentId): Promise<Array<any>> {
+    async getUserListByDepartment(departmentId: string | number): Promise<Array<any>> {
         let url = `https://oapi.dingtalk.com/user/list?access_token=${this.accessToken.access_token}&department_id=${departmentId}&lang=zh_CN`;
         let hasMore = true;
         let users: Array<any> = [];
@@ -101,14 +101,14 @@ export default class CorpApi {
             })
             if (result.errcode) throw new Error(JSON.stringify(result));
             hasMore = result.hasMore;
-            result.userlist.forEach( (u) => {
+            result.userlist.forEach( (u: any) => {
                 users.push(u);
             })
         }
         return users;
     }
 
-    async sendNotifyMsg(msg) {
+    async sendNotifyMsg(msg: any) {
         let url = `https://oapi.dingtalk.com/message/send?access_token=${this.accessToken.access_token}`;
         let result = await reqProxy(url, {
             name: '发送消息',
@@ -118,7 +118,7 @@ export default class CorpApi {
         return result;
     }
 
-    async getDepartmentInfo(departmentId): Promise<any> {
+    async getDepartmentInfo(departmentId: string | number): Promise<any> {
         let url = `https://oapi.dingtalk.com/department/get?access_token=${this.accessToken.access_token}&id=${departmentId}&lang=zh_CN`;
         let result = await reqProxy(url, {
             name: '获取部门详情',

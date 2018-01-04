@@ -7,8 +7,6 @@ import LdapApi from "./ldapApi";
 import{staffOpts, departmentOpts} from "./index";
 import LdapDepartment from "./ldapDepartment";
 import {StaffProperty, SPropertyType} from "_types/staff";
-import {Models} from "_types/index";
-import L from '@jingli/language';
 import {Company} from "_types/company";
 
 export default class LdapStaff extends OaStaff {

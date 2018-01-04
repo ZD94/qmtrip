@@ -2,10 +2,7 @@
  * Created by wangyali on 2017/5/4.
  */
 import {Models} from "_types";
-import {EApproveResult} from "_types/tripPlan";
-import moment = require("moment");
-import config = require("@jingli/config");
-var API = require('@jingli/dnode-api');
+const config = require("@jingli/config");
 
 export = async function transform(values: any): Promise<any>{
 

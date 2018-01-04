@@ -9,9 +9,7 @@ import {Models} from '_types';
 import { getSession } from "@jingli/dnode-api";
 import {EInvoiceType, ETripType} from '_types/tripPlan'
 
-var agencyId = "";
 var agencyUserId = "";
-var companyId = "";
 var staffId = "";
 var tripPlanId = "";
 var tripDetailId = '';
@@ -27,11 +25,11 @@ describe("api/tripPlan", function() {
             let companies = await Models.company.find({where: {agencyId: a.id}, paranoid: false});
 
             await Promise.all(agencyUsers.map((user)=>user.destroy({force: true})));
-            await Promise.all(companies.map(async function(c) {
+            await Promise.all(companies.map(async function(c: any) {
                 let staffs = await Models.staff.find({where: {companyId: c.id}, paranoid: false});
                 await Promise.all(staffs.map(async function (s) {
                     let plans = await Models.tripPlan.find({where: {accountId: s.id}, paranoid: false});
-                    await Promise.all(plans.map(async function(p){
+                    await Promise.all(plans.map(async function(p: any){
                         let tripDetails = await Models.tripDetail.find({where: {tripPlanId: p.id}, paranoid: false});
                         await Promise.all(tripDetails.map((t)=>t.destroy({force: true})));
                         await p.destroy({force: true});
@@ -44,21 +42,19 @@ describe("api/tripPlan", function() {
         }));
     }
 
-    before(function(done){
+    before(function(done: any){
         deleteTripPlanByTest()
             .then(function(){
                 return API.agency.registerAgency(agencyDefault);
             })
-            .then(function(agency){
-                agencyId = agency.id;
+            .then(function(agency: any){
                 agencyUserId = agency.createUser;
                 var session = getSession();
                 session.accountId = agencyUserId;
                 session.tokenId = 'tokenId';
                 return API.company.registerCompany(companyDefault);
             })
-            .then(function(company){
-                companyId = company.id;
+            .then(function(company: any){
                 staffId = company.createUser;
                 // staffId = 'd2a653f0-2251-11e6-b1f2-f5e5142d3f50';
 
@@ -69,7 +65,7 @@ describe("api/tripPlan", function() {
             .nodeify(done);
     });
     
-    after(function(done) {
+    after(function(done: any) {
         deleteTripPlanByTest()
             .nodeify(done);
     });
@@ -95,16 +91,16 @@ describe("api/tripPlan", function() {
         }]
     }
     describe("saveTripPlan", function(){
-        it("#saveTripPlan should be ok", function(done){
+        it("#saveTripPlan should be ok", function(done: any){
             //let budgetId = 'cache:budgets:ed4e1520-2234-11e6-89a0-43b37ebb0409:1464756130662p4xkW3';
             API.tripPlan.saveTripPlan({budgetId: '146416455072613g0yw', title: '新增出差计划测试'})
-                .then(function(ret) {
+                .then(function(ret: any) {
                     console.info("saveTripPlan success...");
                     // console.info(ret);
                     // assert.equal(ret.companyId, companyId);
                     // assert.equal(ret.accountId, staffId);
                 })
-                .catch(function(err) {
+                .catch(function(err: any) {
                     console.info(err);
                     assert.equal(err, null);
                 })
@@ -113,9 +109,9 @@ describe("api/tripPlan", function() {
     });
 
     describe('options based on tripPlan created', function() {
-        before(function(done) {
+        before(function(done: any) {
             API.tripPlan.saveTripPlanByTest(tripPlanOrder)
-                .then(async function(ret) {
+                .then(async function(ret: any) {
                     tripPlanId = ret.id;
                     let hotels = await ret.getHotel();
                     tripDetailId = hotels[0].id;
@@ -124,7 +120,7 @@ describe("api/tripPlan", function() {
         });
 
         it("#getTripPlan should be error when param is not uuid", function (done) {
-            API.tripPlan.getTripPlan({id: "123456"}, function (err, ret) {
+            API.tripPlan.getTripPlan({id: "123456"}, function (err: any, ret: any) {
                 assert(err != null);
                 assert.equal(ret, null);
                 done();
@@ -134,22 +130,22 @@ describe("api/tripPlan", function() {
         it("#getTripPlan should be ok by staff", function (done) {
             let session = getSession();
             session.accountId = staffId;
-            API.tripPlan.getTripPlan( {id: tripPlanId}, function (err, ret) {
+            API.tripPlan.getTripPlan( {id: tripPlanId}, function (err: any, ret: any) {
                 assert.equal(err, null);
                 assert.equal(ret.id, tripPlanId);
                 done();
             })
         });
 
-        it("#getTripPlan should be ok by agency", function(done) {
+        it("#getTripPlan should be ok by agency", function(done: any) {
             let session = getSession();
             session.accountId = agencyUserId;
             API.tripPlan.getTripPlan( {id: tripPlanId})
-                .then(function (ret) {
+                .then(function (ret: any) {
                     assert.equal(ret.id, tripPlanId);
                     done();
                 })
-                .catch(function (err) {
+                .catch(function (err: any) {
                     console.info(err);
                     assert.equal(err, null);
                 });
@@ -158,7 +154,7 @@ describe("api/tripPlan", function() {
         it("#updateTripPlan should be ok", function (done) {
             let session = getSession();
             session.accountId = staffId;
-            API.tripPlan.updateTripPlan({id: tripPlanId, description: 'test'}, function (err, ret) {
+            API.tripPlan.updateTripPlan({id: tripPlanId, description: 'test'}, function (err: any, ret: any) {
                 assert.equal(err, null);
                 assert.equal(ret.id, tripPlanId);
                 assert.equal(ret.description, 'test');
@@ -169,7 +165,7 @@ describe("api/tripPlan", function() {
         it("#listTripPlans should be ok", function (done) {
             let session = getSession();
             session.accountId = staffId;
-            API.tripPlan.listTripPlans({}, function (err, ret) {
+            API.tripPlan.listTripPlans({}, function (err: any, ret: any) {
                 assert.equal(err, null);
                 assert(ret.length >= 0);
                 done();
@@ -179,7 +175,7 @@ describe("api/tripPlan", function() {
         it("#editTripDetailBudget should be ok", function (done) {
             let session = getSession();
             session.accountId = agencyUserId;
-            API.tripPlan.editTripDetailBudget({id: tripDetailId}, function (err, ret) {
+            API.tripPlan.editTripDetailBudget({id: tripDetailId}, function (err: any, ret: any) {
                 assert.equal(err, null);
                 assert(ret.length >= 0);
                 done();
@@ -189,7 +185,7 @@ describe("api/tripPlan", function() {
         it("#deleteTripPlan should be ok", function (done) {
             let session = getSession();
             session.accountId = staffId;
-            API.tripPlan.deleteTripPlan({id: tripPlanId}, function (err, ret) {
+            API.tripPlan.deleteTripPlan({id: tripPlanId}, function (err: any, ret: any) {
                 assert.equal(err, null);
                 assert.equal(ret, true);
                 done();

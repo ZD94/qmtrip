@@ -3,27 +3,21 @@
  */
 'use strict';
 import {DB} from '@jingli/database';
-var _ = require('lodash');
-import {Paginate} from 'common/paginate';
 import Logger from '@jingli/logger';
 const logger = new Logger('travelPolicy');
 
 import L from '@jingli/language';
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
-import {conditionDecorator, condition} from "../_decorator";
 import {Staff, EStaffStatus,EStaffRole} from "_types/staff";
 // import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion,CompanyRegion,RegionPlace } from '_types/travelPolicy';
 import { Models } from '_types';
-import { FindResult, PaginateInterface } from "common/model/interface";
-import setPrototypeOf = Reflect.setPrototypeOf;
+import { PaginateInterface } from "common/model/interface";
 import {AgencyUser} from "_types/agency"
 var request = require("request");
-import { getAgentToken, getCompanyTokenByAgent } from 'api/restful';
+import { getCompanyTokenByAgent } from 'api/restful';
 import { restfulAPIUtil } from 'api/restful';
 
-let API = require("@jingli/dnode-api");
 import {DefaultRegion, DefaultRegionId} from "_types";
-var BASE_URL = 'http://localhost:8080/policy';
 var Config = require("@jingli/config");
 var subsidyRegions = [
     {name:DefaultRegion.abroad, cityIds: [DefaultRegionId.abroad], group: 2, types: [1,2,3]},
@@ -60,7 +54,6 @@ export default class TravelPolicyModule{
     @clientExport
     static async getStaffs(params:{travelPolicyId: string, companyId:string}):Promise<PaginateInterface<Staff>>{
         let {companyId, travelPolicyId} = params;
-        let staff = await Staff.getCurrent();
         let query = {where: {companyId: companyId, travelPolicyId: travelPolicyId,staffStatus: EStaffStatus.ON_JOB}}
         let pager = await Models.staff.find(query);
         return pager;
@@ -71,7 +64,7 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    static async createTravelPolicy (params):Promise<any>{
+    static async createTravelPolicy(params: {companyId: string, name: string}):Promise<any>{
         if(!params.companyId || !params.name){
             throw L.ERR.BAD_REQUEST();
         }
@@ -81,7 +74,9 @@ export default class TravelPolicyModule{
             companyId: params.companyId
         }
 
-        let isExisted: any = await restfulAPIUtil.operateOnModel({
+        let isExisted: {
+            data: any[]
+        } = await restfulAPIUtil.operateOnModel({
             model: "travelpolicy",
             params: {
                 fields: isExistedParams,
@@ -121,8 +116,8 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    static async createTravelPolicyRegion(params): Promise<any> {
-        let {travelPolicyId, planeLevels, trainLevels, hotelLevels } = params;
+    static async createTravelPolicyRegion(params: {travelPolicyId: string}): Promise<any> {
+        let {travelPolicyId} = params;
         if(!travelPolicyId) {
             throw L.ERR.BAD_REQUEST();
         }
@@ -146,13 +141,12 @@ export default class TravelPolicyModule{
      */
     @clientExport
     // @requireParams(["id"], ["companyId"])
-    static async deleteTravelPolicy(params) : Promise<any>{
+    static async deleteTravelPolicy(params: {id: string, companyId: string}) : Promise<any>{
         let {id, companyId} = params;
         var staff = await Staff.getCurrent();
         if(!id || !companyId) {
             throw L.ERR.BAD_REQUEST();
         }
-        let company = await Models.company.get(companyId);
         // let agencyUser = await AgencyUser.getCurrent();
 
         let tp_delete: any = await restfulAPIUtil.operateOnModel({
@@ -187,7 +181,7 @@ export default class TravelPolicyModule{
         });
         return isDeleted;
     }
-    static async deleteTravelPolicyByTest(params){
+    static async deleteTravelPolicyByTest(params: {companyId: string, name: string}){
         await DB.models.TravelPolicy.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}});
         return true;
     }
@@ -200,14 +194,13 @@ export default class TravelPolicyModule{
      */
     @clientExport
     // @requireParams(["id"])
-    static async updateTravelPolicy(params) : Promise<any>{
+    static async updateTravelPolicy(params: {id: string, companyId: string}) : Promise<any>{
         var {id, companyId} = params;
 
         var staff = await Staff.getCurrent();
         if(!id || !companyId) {
             throw L.ERR.BAD_REQUEST();
         }
-        let company = await Models.company.get(companyId);
         // let agencyUser = await AgencyUser.getCurrent();
 
         let isUpdated: any = await restfulAPIUtil.operateOnModel({
@@ -235,7 +228,7 @@ export default class TravelPolicyModule{
     }
 
     @clientExport
-    static async updateTravelPolicyRegion(params) : Promise<any>{
+    static async updateTravelPolicyRegion(params: object) : Promise<any>{
         let tpr = await restfulAPIUtil.operateOnModel({
             model: "travelpolicyregion",
             params: {
@@ -253,9 +246,8 @@ export default class TravelPolicyModule{
      */
     @clientExport
     // @requireParams(["id"])
-    static async deleteTravelPolicyRegion(params) : Promise<any>{
+    static async deleteTravelPolicyRegion(params: object) : Promise<any>{
         var staff = await Staff.getCurrent();
-        var id = params.id;
 
         if(staff["roleId"] != EStaffRole.ADMIN && staff["roleId"] != EStaffRole.OWNER){
             throw {code: -2, msg: '不允许删除默认差旅标准'};
@@ -285,7 +277,6 @@ export default class TravelPolicyModule{
     @clientExport
     @requireParams(["id"])
     static async getTravelPolicy(params: {id: string, companyId?: string}) : Promise<any>{
-        let id = params.id;
         let travelPolicy = await restfulAPIUtil.operateOnModel({
             model: "travelpolicy",
             params: {
@@ -336,8 +327,10 @@ export default class TravelPolicyModule{
      */
     @clientExport
     @requireParams(["subsidyMoney","name","travelPolicyId"])
-    static async createSubsidyTemplate (params) : Promise<any>{
-        let {name, travelPolicyId, subsidyMondy} = params;
+    static async createSubsidyTemplate(params: {
+        subsidyMondy: number, name: string, travelPolicyId: string
+    }) : Promise<any>{
+        // let {name, travelPolicyId, subsidyMondy} = params;
         // if(!name || !travelPolicyId || !subsidyMondy) {
         //     throw L.ERR.BAD_REQUEST();
         // }
@@ -373,7 +366,7 @@ export default class TravelPolicyModule{
      */
     @clientExport
     @requireParams(["id"])
-    static async deleteSubsidyTemplate(params) : Promise<any>{
+    static async deleteSubsidyTemplate(params: {id: string}) : Promise<any>{
         let isDeleted = await restfulAPIUtil.operateOnModel({
             model: "subsidytemplate",
             params: {
@@ -394,7 +387,9 @@ export default class TravelPolicyModule{
      */
     @clientExport
     @requireParams(["id"], ["subsidyMoney","name", "travelPolicyId"])
-    static async updateSubsidyTemplate(params): Promise<any>{
+    static async updateSubsidyTemplate(params: {
+        id: string, subsidyMoney?: number, name?: string, travelPolicyId?: string
+    }): Promise<any>{
         if(!params.id){
             throw L.ERR.BAD_REQUEST();
         }
@@ -418,7 +413,9 @@ export default class TravelPolicyModule{
      */
     @clientExport
     @requireParams(["id"], ["subsidyMoney","name", "travelPolicyId"])
-    static async getSubsidyTemplate(params): Promise<any>{
+    static async getSubsidyTemplate(params: {
+        id: string, subsidyMoney?: number, name?: string, travelPolicyId?: string
+    }): Promise<any>{
         if(!params.id){
             throw L.ERR.BAD_REQUEST();
         }
@@ -440,7 +437,9 @@ export default class TravelPolicyModule{
      */
     @clientExport
     @requireParams(["travelPolicyId"], ["subsidyMoney","name", "travelPolicyId"])
-    static async getSubsidyTemplates(params): Promise<any>{
+    static async getSubsidyTemplates(params: {
+        subsidyMoney?: number, name?: string, travelPolicyId: string
+    }): Promise<any>{
         let subsidies = await restfulAPIUtil.operateOnModel({
             model: "subsidytemplate",
             params: {
@@ -461,8 +460,7 @@ export default class TravelPolicyModule{
      */
     @clientExport
     @requireParams(["id"], ["travelPolicyId","hotelPrefer", "trafficPrefer", "hotelLevels", "planeLevels","trainLevels","companyRegionId"])
-    static async getTravelPolicyRegion(params): Promise<any> {
-        let id = params.id;
+    static async getTravelPolicyRegion(params: {id: string}): Promise<any> {
         // return API.policy.getTravelPolicyRegion(params);
         let tpr = await restfulAPIUtil.operateOnModel({
             model: "travelpolicyregion",
@@ -482,7 +480,7 @@ export default class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    static async getTravelPolicyRegions(params): Promise<any>{
+    static async getTravelPolicyRegions(params: object): Promise<any>{
         let tprs = await restfulAPIUtil.operateOnModel({
             model: "travelpolicyregion",
             params: {
@@ -504,7 +502,6 @@ export default class TravelPolicyModule{
     @clientExport
     @requireParams(["id"])
     static async getCompanyRegion(params: {id: string}) : Promise<any>{
-        let id = params.id;
         // return API.policy.getCompanyRegion(params);
         let cr = await restfulAPIUtil.operateOnModel({
             model: "companyregion",
@@ -517,7 +514,7 @@ export default class TravelPolicyModule{
     };
 
     @clientExport
-    static async getCompanyRegions(params) : Promise<any>{
+    static async getCompanyRegions(params: {companyId: string, name: string}) : Promise<any>{
         let cr = await restfulAPIUtil.operateOnModel({
             model: "companyregion",
             params: {
@@ -530,7 +527,9 @@ export default class TravelPolicyModule{
 
     @clientExport
     @requireParams(["companyId","name"])
-    static async createCompanyRegion(params) : Promise<any>{
+    static async createCompanyRegion(params: {
+        companyId: string, name: string, types?: any, group?: number
+    }) : Promise<any>{
         let cr = await restfulAPIUtil.operateOnModel({
             model: "companyregion",
             params: {
@@ -542,7 +541,7 @@ export default class TravelPolicyModule{
     };
 
     @clientExport
-    static async updateCompanyRegion(params) : Promise<any>{
+    static async updateCompanyRegion(params: object) : Promise<any>{
         let cr = await restfulAPIUtil.operateOnModel({
             model: "companyregion",
             params: {
@@ -554,7 +553,7 @@ export default class TravelPolicyModule{
     };
     @clientExport
     @requireParams(["id"])
-    static async deleteCompanyRegion(params) : Promise<any>{
+    static async deleteCompanyRegion(params: {id: string}) : Promise<any>{
         let cr = await restfulAPIUtil.operateOnModel({
             model: "companyregion",
             params: {
@@ -578,7 +577,6 @@ export default class TravelPolicyModule{
     @clientExport
     @requireParams(["id"])
     static async getRegionPlace(params: {id: string}) : Promise<any>{
-        let id = params.id;
         let pr = await restfulAPIUtil.operateOnModel({
             model: "regionplace",
             params: {
@@ -590,7 +588,7 @@ export default class TravelPolicyModule{
     };
 
     @clientExport
-    static async getRegionPlaces(params) : Promise<any>{
+    static async getRegionPlaces(params: object) : Promise<any>{
         let pc = await restfulAPIUtil.operateOnModel({
             model: "regionplace",
             params: {
@@ -603,7 +601,7 @@ export default class TravelPolicyModule{
 
     @clientExport
     @requireParams(["companyRegionId","placeId"])
-    static async createRegionPlace(params) : Promise<any>{
+    static async createRegionPlace(params: any) : Promise<any>{
         let pr = await restfulAPIUtil.operateOnModel({
             model: "regionplace",
             params: {
@@ -615,7 +613,7 @@ export default class TravelPolicyModule{
     };
 
     @clientExport
-    static async updateRegionPlace(params) : Promise<any>{
+    static async updateRegionPlace(params: object) : Promise<any>{
         let pr = await restfulAPIUtil.operateOnModel({
             model: "regionplace",
             params: {
@@ -628,7 +626,7 @@ export default class TravelPolicyModule{
 
     @clientExport
     @requireParams(["id"])
-    static async deleteRegionPlace(params) : Promise<any>{
+    static async deleteRegionPlace(params: {id: string}) : Promise<any>{
         let pr = await restfulAPIUtil.operateOnModel({
             model: "regionplace",
             params: {
@@ -640,8 +638,9 @@ export default class TravelPolicyModule{
     };
 
     @clientExport
-    static async initSubsidyRegions(params) : Promise<any>{
-        if(!params) params = {};
+    static async initSubsidyRegions(params: {
+        companyId: string
+    }) : Promise<any>{
         if(!params.companyId){
             let staff = await Staff.getCurrent();
             params.companyId = staff.company.id;
@@ -686,7 +685,6 @@ export default class TravelPolicyModule{
     @clientExport
     @requireParams(["id"])
     static async getSubsidyType(params: {id: string}) : Promise<any>{
-        let id = params.id;
         let pr = await restfulAPIUtil.operateOnModel({
             model: "subsidyType",
             params: {
@@ -698,7 +696,7 @@ export default class TravelPolicyModule{
     };
 
     @clientExport
-    static async getSubsidyTypes(params) : Promise<any>{
+    static async getSubsidyTypes(params: any) : Promise<any>{
         let pc = await restfulAPIUtil.operateOnModel({
             model: "subsidyType",
             params: {
@@ -710,7 +708,7 @@ export default class TravelPolicyModule{
     };
 
     @clientExport
-    static async createSubsidyType(params) : Promise<any>{
+    static async createSubsidyType(params: any) : Promise<any>{
         let pr = await restfulAPIUtil.operateOnModel({
             model: "subsidyType",
             params: {
@@ -722,7 +720,7 @@ export default class TravelPolicyModule{
     };
 
     @clientExport
-    static async updateSubsidyType(params) : Promise<any>{
+    static async updateSubsidyType(params: any) : Promise<any>{
         let pr = await restfulAPIUtil.operateOnModel({
             model: "subsidyType",
             params: {
@@ -735,7 +733,7 @@ export default class TravelPolicyModule{
 
     @clientExport
     @requireParams(["id"])
-    static async deleteSubsidyType(params) : Promise<any>{
+    static async deleteSubsidyType(params: any) : Promise<any>{
         let pr = await restfulAPIUtil.operateOnModel({
             model: "subsidyType",
             params: {
@@ -754,7 +752,6 @@ export default class TravelPolicyModule{
     @clientExport
     @requireParams(["id"])
     static async getPolicyRegionSubsidy(params: {id: string, companyId?: string}) : Promise<any>{
-        let id = params.id;
         let pr = await restfulAPIUtil.operateOnModel({
             model: "policyRegionSubsidy",
             params: {
@@ -766,7 +763,7 @@ export default class TravelPolicyModule{
     };
 
     @clientExport
-    static async getPolicyRegionSubsidies(params) : Promise<any>{
+    static async getPolicyRegionSubsidies(params: any) : Promise<any>{
         let pc = await restfulAPIUtil.operateOnModel({
             model: "policyRegionSubsidy",
             params: {
@@ -796,7 +793,7 @@ export default class TravelPolicyModule{
     };
 
     @clientExport
-    static async createPolicyRegionSubsidy(params) : Promise<any>{
+    static async createPolicyRegionSubsidy(params: object) : Promise<any>{
         let pr = await restfulAPIUtil.operateOnModel({
             model: "policyRegionSubsidy",
             params: {
@@ -808,7 +805,7 @@ export default class TravelPolicyModule{
     };
 
     @clientExport
-    static async updatePolicyRegionSubsidy(params) : Promise<any>{
+    static async updatePolicyRegionSubsidy(params: object) : Promise<any>{
         let pr = await restfulAPIUtil.operateOnModel({
             model: "policyRegionSubsidy",
             params: {
@@ -821,7 +818,7 @@ export default class TravelPolicyModule{
 
     @clientExport
     @requireParams(["id"])
-    static async deletePolicyRegionSubsidy(params) : Promise<any>{
+    static async deletePolicyRegionSubsidy(params: object) : Promise<any>{
         let pr = await restfulAPIUtil.operateOnModel({
             model: "policyRegionSubsidy",
             params: {
@@ -848,14 +845,12 @@ export default class TravelPolicyModule{
             currentCompanyId = staff["companyId"];
         }
 
-        const agentToken = await getAgentToken();
         const token = await getCompanyTokenByAgent(currentCompanyId);
         let url = Config.cloudAPI + `/${model}`;
         if(addUrl){
             url = url + `/${addUrl}`
         }
         logger.log("URL:", url);
-        let result:any;
         let qs: {
             [index: string]: string;
         } = {};
@@ -879,7 +874,7 @@ export default class TravelPolicyModule{
                 headers: {
                     token
                 }
-            }, (err, resp, result) => {
+            }, (err: Error, resp: any, result: string | object) => {
                 if (err) {
                     return reject(err);
                 }
@@ -893,11 +888,11 @@ export default class TravelPolicyModule{
     }
 }
 
-function tryConvertToArray(val) {
-    if (val && !_.isArray(val)) {
-        return [val];
-    }
-    return val;
-}
+// function tryConvertToArray(val: any) {
+//     if (val && !_.isArray(val)) {
+//         return [val];
+//     }
+//     return val;
+// }
 
 

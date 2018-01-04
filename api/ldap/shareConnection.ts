@@ -3,11 +3,10 @@
  */
 import {Models} from "_types/index";
 import {CPropertyType} from "_types/company";
-import L from '@jingli/language';
 import LdapApi from "./ldapApi";
 export default class ShareConnection {
 
-    static connectionMap: any = {};
+    static connectionMap: {[key: string]: any} = {};
 
     static async initConnection(params: {companyId: string}){
         let ldapProperty = await Models.companyProperty.find({where: {companyId: params.companyId, type: CPropertyType.LDAP}});
