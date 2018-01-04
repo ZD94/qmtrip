@@ -407,21 +407,22 @@ class DDTalk {
     @requireParams(['code'])
     static async loginByWechatCode(params: { code: string }) {
         const usrInfo: WeChatUsrInfo = await API.sso.getUserInfo(params)
-        
+
         const companyProperties = await Models.companyProperty.find({
             where: { type: SPropertyType.WECHAT_CORPID, value: usrInfo.CorpId }
         })
-        if(companyProperties.length < 1)
+        if (companyProperties.length < 1)
             throw new L.ERROR_CODE_C(404, "该企业尚未授权")
 
         const staffProperties = await Models.staffProperty.find({
             where: { type: SPropertyType.WECHAT_UID, value: usrInfo.UserId }
         })
-        if(staffProperties.length < 1)
+        if (staffProperties.length < 1)
             throw L.ERR.USER_NOT_EXIST()
 
         const staffs = await Promise.all(staffProperties.map(sp => Models.staff.get(sp.staffId)))
         const staff = staffs.filter(s => s.company.id == companyProperties[0].companyId)[0]
+        if (!staff) throw L.ERR.USER_NOT_EXIST()
         return await API.auth.makeAuthenticateToken(staff.accountId, 'corp_wechat')
     }
 }
