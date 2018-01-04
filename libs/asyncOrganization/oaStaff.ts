@@ -123,7 +123,7 @@ export  abstract class OaStaff{
             if(!oaDepartments || !oaDepartments.length){
                 newDepartments.push(defaultDepartment)
             }else{
-                let oaDepartmentIds = await Promise.all(oaDepartments.map(async (item) => {
+                await Promise.all(oaDepartments.map(async (item) => {
                     let department = await item.getDepartment();
                     if(!department){
                         let dept = await item.sync({company: company, from: "addStaff"});//此处需要验证

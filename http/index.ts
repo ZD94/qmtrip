@@ -4,7 +4,7 @@
 
 'use strict';
 
-import {scannerDecoration, registerControllerToRouter, Reply} from "@jingli/restful";
+import {scannerDecoration, registerControllerToRouter} from "@jingli/restful";
 import { conf, auth } from 'server-auth';
 import { Models } from '_types';
 import { genSign } from '@jingli/sign';
@@ -13,7 +13,7 @@ const config = require('@jingli/config')
 
 import path = require("path");
 import express = require("express");
-import { NextFunction, Request, Response } from 'express-serve-static-core';
+import { Request, Response, NextFunction } from 'express';
 import { Application } from 'express-serve-static-core';
 
 let router = express.Router();

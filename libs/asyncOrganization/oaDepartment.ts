@@ -185,7 +185,9 @@ export abstract class OaDepartment{
                 let childrenDepts = await Models.department.all({where: {parentId: result.id}});
                 await Promise.all(childrenDepts.map(async (item) => {
                     let deptProperty = await item.getOaDeptIdProperty();
-                    let oaDept = childrenDepartmentsMap[deptProperty.value];
+                    let oaDept;
+                    if(deptProperty)
+                        oaDept= childrenDepartmentsMap[deptProperty.value];
                     if(!oaDept){
                         await item.deleteDepartmentProperty();
 
@@ -195,7 +197,7 @@ export abstract class OaDepartment{
                             console.info("删除部门失败",e);
                         }
                     }else{
-                        childrenDepartmentsMap[deptProperty.value] = null;
+                        // childrenDepartmentsMap[deptProperty.value] = null;
                     }
                 }));
 
