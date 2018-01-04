@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import RedisCache = require("./redisCache");
+import RedisCache from "./redisCache";
 import {CorpAccessToken, DDTalkCache} from "./interface";
 import {reqProxy} from "./reqProxy";
 import CorpApi from "./corpApi";

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>项目详情</title>
+	<link rel="stylesheet" href="bootstrap.min.css">
+	<style>
+		html {
+			transform: scale(0.75);
+			-webkit-transform: scale(0.75);
+			transform-origin: 0 0;
+			-webkit-transform-origin: 0 0;
+			height: 0;
+		}
+	</style>
+</head>
+<body>
+<div class="content">
+	<p>
+		基本信息<br/>
+	</p>
+	<table>
+		<tbody>
+		<tr class="firstRow">
+			<td width="190" valign="top" style="word-break: break-all;">
+				项目编号
+			</td>
+			<td width="190" valign="top" style="word-break: break-all;">
+				项目名称
+			</td>
+			<td width="190" valign="top" style="word-break: break-all;">
+				<span style="color: rgb(51, 51, 51); font-size: 13px; text-align: center;">项目周期</span>
+			</td>
+			<td width="190" valign="top" style="word-break: break-all;">
+				项目状态
+			</td>
+		</tr>
+		<tr>
+			<td width="190" valign="top"><%=data.project.code%></td>
+			<td width="190" valign="top"><%=data.project.name%></td>
+			<td width="190" valign="top"><%=data.project.beginDate ? moment(data.project.beginDate).format('YYYY-MM-DD') : ""%>-
+				<%=data.project.endDate ? moment(data.project.endDate).format('YYYY-MM-DD') : ""%></td>
+			<td width="190" valign="top"><%=data.project.status == 1 ? '新建' : ((data.project.status == 2) ? '启动' : '停止')%></td>
+		</tr>
+		</tbody>
+	</table>项目预算<br/>
+	<p>
+	<table>
+		<tbody>
+		<tr class="firstRow">
+			<td width="401" valign="top" style="word-break: break-all;">
+				项目预算
+			</td>
+			<td width="401" valign="top" style="word-break: break-all;">
+				预算来源
+			</td>
+		</tr>
+		<tr>
+			<td width="401" valign="top"><%=data.costCenter.selfBudget%></td>
+			<td width="401" valign="top">
+				<%if(data.budgetCollectInfo && data.budgetCollectInfo.length) {%>
+				部门预算归集，包括：
+					<%_.forEach(data.budgetCollectInfo, function(deptInfo) {%>
+						<%=deptInfo.department.name%>: <%=deptInfo.budget%>
+					<%})%>
+				<%} else {%>
+					<%=data.costCenter.budgetSource%>
+				<%}%>
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	</p>
+	<p>
+		项目成员<br/>
+	<table>
+		<tbody>
+		<tr class="firstRow">
+			<td width="190" valign="top" style="word-break: break-all;">
+				项目成员
+			</td>
+			<td width="190" valign="top" style="word-break: break-all;">
+				手机号
+			</td>
+			<td width="190" valign="top" style="word-break: break-all;">
+				角色
+			</td>
+			<td width="190" valign="top" style="word-break: break-all;">
+				差旅政策
+			</td>
+		</tr>
+		<%_.forEach(data.projectStaffs, function(staff) {%>
+		<tr>
+			<td width="190" valign="top"><%=staff.name%></td>
+			<td width="190" valign="top"><%=staff.mobile%></td>
+			<td width="190" valign="top"><%=staff.roleId%></td>
+			<td width="190" valign="top"><%=staff.tp ? staff.tp.name : "暂无"%></td>
+		</tr>
+		<%})%>
+
+		</tbody>
+	</table>
+	</p>
+	<p>
+		<br/>
+	</p>
+</div>
+</body>
+</html>
