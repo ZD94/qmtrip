@@ -157,14 +157,41 @@ export class WStaff extends OaStaff {
     }
     async saveStaffProperty(params: { staffId: string; }): Promise<boolean> {
         let self = this;
-        let staffUuidProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WECHAT_UID, value: self.id});
-        let staffCorpProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WECHAT_CORPID, value: self.corpId});
-        let ddUser = await self.restApi.getStaff(self.id);
-        let userInfo = JSON.stringify(ddUser);
-        let staffDdInfoProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WECHAT_USER_INFO, value: userInfo});
-        await staffUuidProperty.save();
-        await staffCorpProperty.save();
-        await staffDdInfoProperty.save();
+        let hasStaffId = await Models.staffProperty.find({
+            where: {
+                staffId: params.staffId,
+                type: SPropertyType.WECHAT_UID
+            }
+        })
+        if(!hasStaffId || hasStaffId.length == 0) {
+            let staffUuidProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WECHAT_UID, value: self.id});
+            await staffUuidProperty.save();
+        }
+
+        let hasCorpId = await Models.staffProperty.find({
+            where: {
+                staffId: params.staffId,
+                type: SPropertyType.WECHAT_CORPID
+            }
+        })
+
+        if(!hasCorpId || hasCorpId.length == 0) {
+            let staffCorpProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WECHAT_CORPID, value: self.corpId});
+            await staffCorpProperty.save();
+        }
+
+        let hasUserInfo = await Models.staffProperty.find({
+            where: {
+                staffId: params.staffId,
+                type: SPropertyType.WECHAT_CORPID
+            }
+        })
+        if(!hasUserInfo || hasUserInfo.length == 0) {
+            let wechatUser = await self.restApi.getStaff(self.id);
+            let userInfo = JSON.stringify(wechatUser);
+            let staffDdInfoProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WECHAT_USER_INFO, value: userInfo});
+            await staffDdInfoProperty.save();
+        }
         return true;
     }
 }

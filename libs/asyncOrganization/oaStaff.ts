@@ -145,7 +145,8 @@ export  abstract class OaStaff{
             if(!alreadyStaff){
 
                 if((self.mobile && type == CPropertyType.LDAP && companyCreateUser.mobile == self.mobile) ||
-                    (type == CPropertyType.WANGXIN_ID && companyCreateUser.mobile == self.mobile)){
+                    (type == CPropertyType.WANGXIN_ID && companyCreateUser.mobile == self.mobile) || 
+                    (type == CPropertyType.WECHAT_CORPID && companyCreateUser.mobile == self.mobile)){
 
                     alreadyStaff = companyCreateUser;
                     await self.saveStaffProperty({staffId: alreadyStaff.id});
