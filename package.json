@@ -63,10 +63,10 @@
     "callsite": "^1.0.0",
     "carrack": "^0.5.0",
     "clarify": "^2.0.0",
-    "co": "^4.6.0",
+    "co": "4.6.0",
     "colors": "^1.1.2",
     "connect-timeout": "^1.8.0",
-    "continuation-local-storage": "^3.2.1",
+    "continuation-local-storage": "^3.2.1",s
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "core-decorators": "^0.12.3",
