@@ -119,7 +119,7 @@ export default class SSOModule {
             permanentCode = permanentResult.permanentCode;
             accessToken = permanentResult.accessToken;
 
-            let comProperty = await self.getRegisteredCompany(permanentCode, corpId);
+            let comProperty = await self.getRegisteredCompany(permanentCode, permanentResult.corpId);
             if(!comProperty) {
                 let com =await self.initializeCompany(permanentResult);
                 company = com.company;
