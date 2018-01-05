@@ -17,7 +17,7 @@ var timeout = require('connect-timeout');
 import * as CLS from 'continuation-local-storage';
 let CLSNS = CLS.getNamespace('dnode-api-context');
 import { genSign } from "@jingli/sign";
-const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'Content-Type, auth, supplier, authstr, staffid, companyid, accountid'} 
+const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'content-type, Content-Type, auth, supplier, authstr, staffid, companyid, accountid'} 
 function resetTimeout(req, res, next){
     req.clearTimeout();
     next();
@@ -40,6 +40,7 @@ class Proxy {
 
             //公有云验证
             // let staff: Staff = await Staff.getCurrent();
+            console.log("==client=====>headers: ", req.headers)
             let {authstr, staffid}  = req.headers;
             let staff: Staff = await Models.staff.get(staffid);
             let companyId: string = staff.company.id;
@@ -47,6 +48,8 @@ class Proxy {
             if (!companyToken) {
                 throw new Error('换取 token 失败！');
             }
+            
+            console.log("==server=====>headers: ", { token: companyToken,companyId: companyId})
             
             //request to JLCloud(jlbudget) 
             let result: any;
@@ -90,6 +93,7 @@ class Proxy {
         app.all(/^\/supplier.*$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: any, res: Response, next: Function) => {
 
             //公有云验证
+            console.log("==client=====>headers: ", req.headers)
             let {authstr, staffid}  = req.headers;
             let staff: Staff = await Models.staff.get(staffid);
             let companyId: string = staff.company.id;
@@ -106,6 +110,7 @@ class Proxy {
             JLOpenApi = JLOpenApi.replace('/cloud', '');
             let url: string = `${JLOpenApi}${pathstr}`;
 
+            console.log("==server=====>headers: ", { token: companyToken,companyId: companyId})
             try {
                 result = await new Promise((resolve, reject) => {
                     return request({
@@ -137,6 +142,7 @@ class Proxy {
         // verifyToken
         app.all(/^\/order.*$/, cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function) => {
             
+            console.log("==client=====>headers: ", req.headers)
             let staff: Staff = await Staff.getCurrent();
             let staffId = req.headers.staffid;
             if(staffId && !staff) {
@@ -190,6 +196,7 @@ class Proxy {
             pathstring = pathstring.replace("/order", '');
             let url = `${config.orderSysConfig.orderLink}${pathstring}`;
             let result:any;
+              console.log("==server=====>headers: ", headers)
             console.log("===========url: ", url, '===tripDetailId: ', tripDetailId, '====>method:', req.method, '=======> body: ', req.body);
             try{
                 result = await new Promise((resolve,reject) => {  
@@ -239,6 +246,7 @@ class Proxy {
         });
         
         app.all(/^\/mall.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
+            console.log("==client=====>headers: ", req.headers)
             let {staffid, companyid, accountid} = req.headers;
             let params =  req.body;
             if(req.method == 'GET') {
@@ -251,6 +259,13 @@ class Proxy {
             pathstring = pathstring.replace("/mall", '');
             let sign = genSign(params, timestamp, appSecret)
             let url = `${config.mall.orderLink}${pathstring}`;
+                    console.log("==server=====>headers: ", {
+                        sign: sign,
+                        appid: config.mall.appId,
+                        staffid: staff.id, 
+                        companyid: staff.companyId,
+                        accountid: staff.accountId
+                    })
             console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.mall.appId, '===request params: ', params) 
             let result = await new Promise((resolve, reject) => {
                 return request({
@@ -279,6 +294,7 @@ class Proxy {
 
 
         app.all(/^\/bill.*$/ ,cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
+               console.log("==client=====>headers: ", req.headers)
             let {staffid, companyid, accountid} = req.headers;
             let params =  req.body;
             if(req.method == 'GET') {
@@ -291,6 +307,14 @@ class Proxy {
             pathstring = pathstring.replace("/bill", '');
             let sign = genSign(params, timestamp, appSecret)
             let url = `${config.bill.orderLink}${pathstring}`;
+
+            console.log("==server=====>headers: ", {
+                        sign: sign,
+                        appid: config.bill.appId,
+                        staffid: staff.id, 
+                        companyid: staff.companyId,
+                        accountid: staff.accountId
+                    })
             console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.bill.appId, '===request params: ', params) 
             let result = await new Promise((resolve, reject) => {
                 return request({
@@ -319,6 +343,7 @@ class Proxy {
 
         
         app.all(/^\/permission.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
+               console.log("==client=====>headers: ", req.headers)
             let {staffid, companyid, accountid} = req.headers;
             let params =  req.body;
             if(req.method == 'GET') {
@@ -331,6 +356,14 @@ class Proxy {
             pathstring = pathstring.replace("/permission", '');
             let sign = genSign(params, timestamp, appSecret);
             let url = `${config.permission.orderLink}${pathstring}`;
+               console.log("==client=====>headers: ", {
+                        sign: sign,
+                        appid: config.permission.appId,
+                        staffid: staff.id,
+                        staffname: staff.name,
+                        companyid: staff.companyId,
+                        accountid: staff.accountId
+                    })
             console.log("==timestamp:  ", timestamp, "===>sign:  ", sign, '====>url:  ', url, 'appid: ', config.permission.appId, '===request params: ', params);
             let result = await new Promise((resolve, reject) => {
                 return request({
@@ -343,7 +376,6 @@ class Proxy {
                         sign: sign,
                         appid: config.permission.appId,
                         staffid: staff.id,
-                        staffname: staff.name,
                         companyid: staff.companyId,
                         accountid: staff.accountId
                     }
