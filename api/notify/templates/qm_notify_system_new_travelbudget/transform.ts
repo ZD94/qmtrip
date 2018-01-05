@@ -1,12 +1,18 @@
 import {Models} from "_types";
 import {Staff} from "_types/staff";
 import {EApproveResult, ETripType} from "_types/tripPlan";
-import moment = require("moment-timezone");
+const moment = require("moment");
 var API = require('@jingli/dnode-api');
 import {MPlaneLevel, MTrainLevel, MHotelLevel,DefaultRegion} from '_types';
 import {Model, where} from "sequelize";
+import { ITravelBudgetInfo } from 'http/controller/budget';
+require("moment-timezone")
 
-export = async function transform(values: any): Promise<any>{
+export = async function transform(values: {staffId: string,
+    staff: Staff, MPlaneLevel: object,   MTrainLevel: object, MHotelLevel: object,
+    travelPolicy: {[key: string]: any}, cacheId: string, totalBudget: number, budgets: ITravelBudgetInfo[],
+    query: object, destinationPlacesInfo: any, cityMap: any, date: string, staffMap: {[key: string]: Staff}
+}): Promise<any>{
     let cityMap = {};
     let staffMap = {};
     let staff = await Models.staff.get(values.staffId);
@@ -66,7 +72,7 @@ export = async function transform(values: any): Promise<any>{
     let budgetInfo = await API.travelBudget.getBudgetInfo({id: values.cacheId, accountId : staff.id});
     let {budgets, query} = budgetInfo;
     let totalBudget = 0;
-    budgets.forEach((b) => {totalBudget += Number(b.price);});
+    budgets.forEach((b: any) => {totalBudget += Number(b.price);});
     values.totalBudget =  totalBudget;
     values.budgets =  budgets;
     values.query =  query;
@@ -83,7 +89,9 @@ export = async function transform(values: any): Promise<any>{
         cityMap[query.goBackPlace] = goBackPlace;
     }
     if(destinationPlacesInfo && destinationPlacesInfo.length > 0){
-        await Promise.all(destinationPlacesInfo.map(async function(item, index){
+        await Promise.all(destinationPlacesInfo.map(async function(item: {
+            destinationPlace: string, latestArrivalDateTime: string, earliestGoBackDateTime: string
+        }, index: number){
             let arrivalInfo = await API.place.getCityInfo({cityCode: item.destinationPlace, companyId: currentCompany.id});
             item.latestArrivalDateTime = moment(item.latestArrivalDateTime).tz(arrivalInfo.timezone).format("MM-DD HH:mm");
             item.earliestGoBackDateTime = moment(item.earliestGoBackDateTime).tz(arrivalInfo.timezone).format("MM-DD HH:mm");
@@ -100,7 +108,7 @@ export = async function transform(values: any): Promise<any>{
     if(typeof staffIds == 'string'){
         staffIds = JSON.parse(staffIds);
     }
-    await Promise.all(staffIds.map(async function(item, index){
+    await Promise.all(staffIds.map(async function(item: string, index: number){
         let s = await Models.staff.get(item);
         staffMap[item] = s;
     }))

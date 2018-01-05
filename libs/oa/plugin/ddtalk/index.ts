@@ -4,8 +4,8 @@
 
 'use strict';
 import {
-    AbstractOAPlugin, createTripApproveParam, createTripApproveResult, regTripApproveUpdateCbParam,
-    createTripInvoiceAuditFlowParam, createTripInvoiceAuditFlowResult, regTripInvoiceAuditUpdateCbParam
+    AbstractOAPlugin, createTripApproveParam, createTripApproveResult,
+    createTripInvoiceAuditFlowParam, createTripInvoiceAuditFlowResult
 } from "../index";
 
 export class DDTalkPlugin extends AbstractOAPlugin {
@@ -13,11 +13,11 @@ export class DDTalkPlugin extends AbstractOAPlugin {
         super();
     }
 
-    async createTripApproveFlow(params:createTripApproveParam):Promise<createTripApproveResult> {
+    async createTripApproveFlow(params: createTripApproveParam): Promise<createTripApproveResult> {
         return null;
     }
 
-    async createTripInvoiceAuditFlow(params:createTripInvoiceAuditFlowParam):Promise<createTripInvoiceAuditFlowResult> {
+    async createTripInvoiceAuditFlow(params: createTripInvoiceAuditFlowParam): Promise<createTripInvoiceAuditFlowResult> {
         return null;
     }
 }

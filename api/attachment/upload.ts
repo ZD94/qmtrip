@@ -8,14 +8,15 @@ var API = require("@jingli/dnode-api");
 var requestProxy = require('express-request-proxy');
 import fs = require("fs");
 import urlModule = require("url");
+import { Request, Application, Response, NextFunction } from 'express-serve-static-core';
 
-function resetTimeout(req, res, next){
-    req.clearTimeout();
+function resetTimeout(req: Request, res: Response, next: NextFunction){
+    // req.clearTimeout();
     next();
-    //conn_timeout('180s')(req, res, next);
+    //conn_timeout('180s')(req: Request, res: Response, next: NextFunction);
 }
 
-module.exports = function(app) {
+module.exports = function(app: Application) {
     //app.post('/upload/ajax-upload-file', proxy('http://localhost:4001', { reqAsBuffer: true,reqBodyEncoding: false }));
     let url = '/upload/ajax-upload-file'
 
@@ -26,7 +27,7 @@ module.exports = function(app) {
         timeout: 180000,
     }));
     app.options(url, function (req, res, next) {
-        let referer = req.headers['referer'];
+        let referer = req.headers['referer'] as string;
         let host;
         if (!referer) {
             host = parseHost(req);
@@ -50,7 +51,7 @@ module.exports = function(app) {
         return host;
     }
 
-    app.get("/attachment/temp/:id", resetTimeout, function(req, res, next) {
+    app.get("/attachment/temp/:id", resetTimeout, function(req: Request, res: Response, next: NextFunction) {
         let id = req.params.id;
         return requestProxy({
             url: config.hosts.main.www + '/attachment/temp/' + id ,
@@ -73,8 +74,8 @@ module.exports = function(app) {
  * @returns {*}
  */
 let pwd = process.cwd();
-async function getPublicFile(req, res, next) {
-    req.clearTimeout();
+async function getPublicFile(req: Request, res: Response, next: NextFunction) {
+    // req.clearTimeout();
     var cacheFile = await API.attachment.getFileCache({id:req.params.id, isPublic:true});
     if(!cacheFile) {
         return next(404);

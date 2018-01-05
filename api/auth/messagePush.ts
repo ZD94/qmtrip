@@ -29,7 +29,7 @@ export async function destroyJpushId(params?: any): Promise<boolean> {
  * 用户绑定设备id
  * @type {saveOrUpdateJpushId}
  */
-export async function saveOrUpdateJpushId(params): Promise<Token>  {
+export async function saveOrUpdateJpushId(params: any): Promise<Token>  {
     let staff = await Staff.getCurrent();
     let list = await Models.token.find({where: {token: params.jpushId, type:'jpush_id', accountId: {$ne: staff.id}}});
 
@@ -60,7 +60,7 @@ export async function getJpushIdByAccount(params: {accountId: string}): Promise<
     if(!list || list.length <= 0) {
         return null;
     }
-    var result = [];
+    var result: any[] = [];
     list.forEach(function(item){
         result.push(item.token);
     })

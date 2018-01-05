@@ -3,9 +3,7 @@
  */
 
 let moment = require("moment");
-import {DB} from '@jingli/database';
-import Logger from '@jingli/logger';
-let logger = new Logger("seeds");
+import { DB } from '@jingli/database';
 let typeString = ['TripPlanNo', 'AgencyNo', 'CompanyNo', 'CoinAccountNo'];
 
 class SeedModule {
@@ -15,7 +13,7 @@ class SeedModule {
      * @param params.type goods_no:商品编号 goods_order_no:实物商品订单编号
      * @param cb
      */
-    static async getSingleSeedCode(type, options){
+    static async getSingleSeedCode(type: string, options: { minNo?: number, maxNo?: number, formatDate?: string }) {
         if (!options) {
             options = {};
         }
@@ -27,14 +25,14 @@ class SeedModule {
         if (!maxNo) {
             maxNo = 9999;
         }
-        if(typeString.indexOf(type) < 0){
-            throw {code: -1, msg: '编号类型不在配置中'};
+        if (typeString.indexOf(type) < 0) {
+            throw { code: -1, msg: '编号类型不在配置中' };
         }
 
-        let seeds = await DB.models.Seed.findOne({where: {type: type}});
+        let seeds = await DB.models.Seed.findOne({ where: { type: type } });
 
         if (!seeds) {
-            let en = await DB.models.Seed.create({type: type, minNo: minNo, maxNo: maxNo, nowNo: minNo});
+            let en = await DB.models.Seed.create({ type: type, minNo: minNo, maxNo: maxNo, nowNo: minNo });
             return en.nowNo;
         }
 
@@ -46,17 +44,17 @@ class SeedModule {
             nowNo = parseInt(seeds.nowNo) + 1;
         }
 
-        let [affect, rows] = await DB.models.Seed.update({nowNo: nowNo}, {returning: true, where: {type: type}})
+        let rows = (await DB.models.Seed.update({ nowNo: nowNo }, { returning: true, where: { type: type } }))[1]
         return rows[0].nowNo;
     }
 
-    static getSeedNo(type, options){
+    static getSeedNo(type: string, options: { formatDate?: string }) {
         if (!options) {
             options = {};
         }
         let formatDate = options.formatDate || "YYMMDDHHmmss";
         return SeedModule.getSingleSeedCode(type, options)
-            .then(function(seeds){
+            .then(function (seeds) {
                 let now = moment().format(formatDate);
                 return now + seeds;
             });

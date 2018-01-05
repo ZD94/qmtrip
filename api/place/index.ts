@@ -87,7 +87,7 @@ export default class PlaceModule {
     }
 
     @clientExport
-    static async getCityInfoByName(params){
+    static async getCityInfoByName(params: object){
         let cities = await restfulAPIUtil.operateOnModel({
             model: `place`,
             params: {
@@ -106,7 +106,7 @@ export default class PlaceModule {
     }
 
     @clientExport
-    static async getAirPortsByCity(params){
+    static async getAirPortsByCity(params: {id: string}){
         let airports = await restfulAPIUtil.operateOnModel({
             model: `place`,
             params: {
@@ -119,7 +119,7 @@ export default class PlaceModule {
     }
 
     @clientExport
-    static async getCityInfo(params){
+    static async getCityInfo(params: {cityCode: string, companyId: string}){
         let {cityCode, companyId } = params;
         let city = await  PlaceModule.getCityById(cityCode, companyId);
         return city;

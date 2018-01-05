@@ -58,21 +58,17 @@ export class WCompany extends OaCompany {
 
     async getDepartments(): Promise<OaDepartment[]> {
         let self = this;
-        let staff = await Staff.getCurrent();
-        let company: Company;
-        if(staff) 
-            company = staff.company;
+        let company: Company = await self.getCompany();
 
         let wDepartments: Array<IWDepartment> = await self.restApi.getDepartments();
         let result: OaDepartment[];
-
         wDepartments.forEach((item: IWDepartment) => {
             let wDept = new WDepartment({
                 name: item.name, 
                 parentId: item.parentid + '', 
                 id: item.id + '',
                 corpId: self.id,
-                company: staff.company, 
+                company: company, 
                 restApi: self.restApi
             });
             result.push(wDept);
@@ -88,11 +84,8 @@ export class WCompany extends OaCompany {
      */
     async getRootDepartment(): Promise<OaDepartment> {
         let self = this;
-        let staff = await Staff.getCurrent();
-        let company: Company;
-        if(staff) 
-            company = staff.company;
-        // if(!staff) staff = await Models.staff.get("2eaf0b60-ec72-11e7-a61b-6dc8f39f777e");   //测试
+        let company: Company = await self.getCompany();
+
         let wDepartments: Array<IWDepartment> = await self.restApi.getDepartments();
         let result: OaDepartment;
         for(let i = 0; i < wDepartments.length; i++) {
@@ -123,24 +116,43 @@ export class WCompany extends OaCompany {
      */
     async saveCompanyProperty(params: { companyId: string, permanentCode?: string}): Promise<boolean> {
         let self = this;
-        let comProperty = await Models.companyProperty.find({
+        let company = await self.getCompany();
+        if(company) params.companyId = company.id;
+        let permanentCode = params.permanentCode? params.permanentCode: self.permanentCode;
+
+        let hasCorpId = await Models.companyProperty.find({
             where: {
-                companyId: params.companyId
+                companyId: params.companyId,
+                type: CPropertyType.WECHAT_CORPID
             }
         })
-        if(!comProperty && comProperty.length) return true;
-        let companyUuidProperty = CompanyProperty.create({companyId: params.companyId, type: CPropertyType.WECHAT_CORPID, value: self.id}); 
-        await companyUuidProperty.save();
-        let permanentCode = self.permanentCode ? self.permanentCode: params.permanentCode;
-
-        if(permanentCode) {
+        if(!hasCorpId || hasCorpId.length == 0) {
+            let companyUuidProperty = CompanyProperty.create({companyId: params.companyId, type: CPropertyType.WECHAT_CORPID, value: self.id}); 
+            await companyUuidProperty.save();
+        }
+        
+        let hasPermanentCode = await Models.companyProperty.find({
+            where: {
+                companyId: params.companyId,
+                type: CPropertyType.WECHAT_PERMAENTCODE
+            }
+        })
+        if(!hasPermanentCode || hasPermanentCode.length ==0) {
             let permanentCodeProperty = CompanyProperty.create({companyId: params.companyId, type: CPropertyType.WECHAT_PERMAENTCODE, value: permanentCode});
             await permanentCodeProperty.save()
         }
 
         if(self.agentId) {
-            let companyAgentProperty = CompanyProperty.create({companyId: params.companyId, type: CPropertyType.WECHAT_AGENTID, value: self.agentId});
-            await companyAgentProperty.save();
+            let hasAgentId = await Models.companyProperty.find({
+                where: {
+                    companyId: params.companyId,
+                    type: CPropertyType.WECHAT_AGENTID
+                }
+            })
+            if(!hasAgentId || hasAgentId.length == 0 ) {
+                let companyAgentProperty = CompanyProperty.create({companyId: params.companyId, type: CPropertyType.WECHAT_AGENTID, value: self.agentId});
+                await companyAgentProperty.save();
+            }
         }
         return true;
     }

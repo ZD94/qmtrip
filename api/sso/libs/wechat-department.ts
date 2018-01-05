@@ -4,6 +4,7 @@ import { WStaff, IWStaff, EStaffStatus, EWechatStaffStatus } from "api/sso/libs/
 import { OaStaff } from "libs/asyncOrganization/oaStaff";
 import { RestApi } from "api/sso/libs/restApi";
 import { DepartmentProperty, DPropertyType } from "_types/department";
+import { Models } from '_types';
 
 export interface IWDepartment {
     id: number;
@@ -131,7 +132,8 @@ export class WDepartment extends OaDepartment {
         let wStaffs: Array<IWStaff> = await self.restApi.getDetailedStaffsByDepartment(self.id);
         let result: OaStaff[] = [];
         for(let u of wStaffs){
-            if(u.status != EWechatStaffStatus.inactive) {
+            console.log("员工", u.name, "的状态: ", u.status)
+            if(u.status != EWechatStaffStatus.disable) {
                 let wstaff = new WStaff({
                     id: u.userid, 
                     name: u.name, 
@@ -141,7 +143,8 @@ export class WDepartment extends OaDepartment {
                     corpId: self.corpId,
                     restApi: self.restApi, 
                     company: self.company,
-                    avatar: u. avatar_mediaid
+                    avatar: u. avatar_mediaid,
+                    status: u.status
                 });
                  result.push(wstaff);
             }
@@ -163,10 +166,28 @@ export class WDepartment extends OaDepartment {
 
     async saveDepartmentProperty(params: { departmentId: string; }): Promise<boolean> {
         let self = this;  
-        let departmentUuidProperty = DepartmentProperty.create({departmentId: params.departmentId, type: DPropertyType.WECHAT_DEPARTMENTID, value: self.id+""});
-        let departmentDnProperty = DepartmentProperty.create({departmentId: params.departmentId, type: DPropertyType.DD_COMPANY_ID, value: self.corpId});
-        await departmentUuidProperty.save();
-        await departmentDnProperty.save();
+        let hasDepartmentId = await Models.departmentProperty.find({
+            where: {
+                departmentId: params.departmentId,
+                type: DPropertyType.WECHAT_DEPARTMENTID
+            }
+        })
+        if(!hasDepartmentId || hasDepartmentId.length == 0) {
+            let departmentUuidProperty = DepartmentProperty.create({departmentId: params.departmentId, type: DPropertyType.WECHAT_DEPARTMENTID, value: self.id+""});
+            await departmentUuidProperty.save();
+        }
+
+        let hasCorpId = await Models.departmentProperty.find({
+            where: {
+                departmentId: params.departmentId,
+                type: DPropertyType.WECHAT_CORPID
+            }
+        })
+        if(!hasCorpId || hasCorpId.length == 0) {             
+            let departmentDnProperty = DepartmentProperty.create({departmentId: params.departmentId, type: DPropertyType.WECHAT_CORPID, value: self.corpId}); 
+            await departmentDnProperty.save();
+        }
+
         return true;
     }
 

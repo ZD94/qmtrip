@@ -4,8 +4,7 @@
 
 'use strict';
 import {AbstractController, Restful, Router, ERR} from "@jingli/restful";
-var API = require("@jingli/dnode-api");
-import {Models} from "_types";
+import { Request, Response, NextFunction} from 'express';
 import {EventListener} from "_types/eventListener";
 
 @Restful()
@@ -20,7 +19,7 @@ export class EventsController extends AbstractController {
     }
 
     @Router('/registry-event-listener', "POST")
-    async registryEventListener(req, res, next){
+    async registryEventListener(req: Request, res: Response, next: NextFunction){
         try{
             let {events, url, method, companyId} = req.body;
             if(typeof events == "string"){
@@ -40,7 +39,7 @@ export class EventsController extends AbstractController {
     }
 
     @Router('/trip_approve', "POST")
-    async tripApprove(req, res, next){
+    async tripApprove(req: Request, res: Response, next: NextFunction){
         try{
 
             console.info(req.body);

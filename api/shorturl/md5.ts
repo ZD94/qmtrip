@@ -7,9 +7,8 @@ var md5 = require("common/utils").md5;
 var Models = require("_types");
 import  {Url } from "_types/shorturl";
 
-var shorturl: any = {};
 export class Md5ShortUrl{
-    async long2short(long) {
+    async long2short(long: string) {
         var key = md5(long);
         let urls = await Models.url.find({ where: {id: key, url: long}})
         let urlObj;
@@ -20,7 +19,7 @@ export class Md5ShortUrl{
         return key;
     }
 
-    async short2long(short) {
+    async short2long(short: string) {
         let item = await Models.url.get(short);
         if (!item) {
             throw {code: -1, msg: "链接不存在或者已经失效"};

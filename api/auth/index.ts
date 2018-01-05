@@ -3,7 +3,7 @@
  */
 "use strict";
 import { requireParams, clientExport } from "@jingli/dnode-api/dist/src/helper";
-import { Models, EAccountType } from "_types";
+import { Models, EAccountType, EGender } from "_types";
 import { Account, ACCOUNT_STATUS } from "_types/auth";
 import { Staff, EInvitedLinkStatus, EAddWay, EStaffRole } from "_types/staff";
 import validator = require('validator');
@@ -14,26 +14,26 @@ import * as wechat from './wechat';
 import * as messagePush from './messagePush';
 import * as qrcode from './qrcode';
 import * as byTest from './by-test';
-import {condition, conditionDecorator} from "../_decorator";
 
 var uuid = require("node-uuid");
-import C = require("@jingli/config");
+const C = require("@jingli/config");
 var moment = require("moment");
 var API = require("@jingli/dnode-api");
 var utils = require("common/utils");
 var accountCols = Account['$fieldnames'];
 import { getSession } from "@jingli/dnode-api";
+import { Application } from 'express-serve-static-core';
 
 let codeTicket = "checkcode:ticket:";
 
 //生成激活链接参数
-function makeActiveSign(activeToken, accountId, timestamp) {
+function makeActiveSign(activeToken: string, accountId: string, timestamp: number) {
     var originStr = activeToken + accountId + timestamp;
     return utils.md5(originStr);
 }
 
 //生成邀请链接参数
-function makeLinkSign(linkToken, invitedLinkId, timestamp) {
+function makeLinkSign(linkToken: string, invitedLinkId: string, timestamp: number) {
     var originStr = linkToken + invitedLinkId + timestamp;
     return utils.md5(originStr);
 }
@@ -462,7 +462,11 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(['mobile', 'name', 'companyId', 'msgCode', 'msgTicket', 'pwd'], ['avatarColor'])
-    static async invitedStaffRegister(data): Promise<any> {
+    static async invitedStaffRegister(data: {
+        msgCode: string, msgTicket: string,
+        mobile: string, name: string, pwd: string, 
+        companyId: string, avatarColor?: string
+    }): Promise<any> {
         var msgCode = data.msgCode;
         var msgTicket = data.msgTicket;
         var mobile = data.mobile;
@@ -524,7 +528,11 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(['mobile', 'name', 'companyId', 'msgTicket', 'pwd'], ['avatarColor', 'sex'])
-    static async invitedNewStaffRegister(data): Promise<any> {
+    static async invitedNewStaffRegister(data: {
+        sex: EGender, msgTicket: string,
+        mobile: string, name: string, pwd: string, 
+        companyId: string, avatarColor?: string
+    }): Promise<any> {
         let msgTicket = data.msgTicket;
         let mobile = data.mobile;
         let name = data.name;
@@ -542,7 +550,7 @@ export default class ApiAuth {
             throw L.ERR.MOBILE_NOT_CORRECT();
         }
 
-        let staff = await API.staff.registerStaff({
+        let staff: Staff = await API.staff.registerStaff({
             mobile: mobile,
             name: name,
             sex: sex,
@@ -562,7 +570,9 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(['mobile', 'msgCode', 'msgTicket'])
-    static async inviteStaffone( params ) : Promise<any>{
+    static async inviteStaffone( params: {
+        mobile: string, msgCode: string, msgTicket: string
+    }) : Promise<any>{
         let mobile = params.mobile && params.mobile.toString(),
             msgCode= params.msgCode && params.msgCode.toString(),
             msgTicket=params.msgTicket;
@@ -578,7 +588,7 @@ export default class ApiAuth {
             throw L.ERR.CODE_ERROR();
         }
 
-        let Result = {
+        let Result: {[key: string]: any} = {
             isRegister : false,
             ticket     : null,
             staff      : null,
@@ -610,7 +620,7 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(["msgTicket", "mobile", "companyId"])
-    static async joinAnCompany( params ) : Promise<any>{
+    static async joinAnCompany( params: {mobile: string, msgTicket: string, companyId: string} ) : Promise<any>{
         let mobile = params.mobile,
             msgTicket=params.msgTicket,
             companyId=params.companyId;
@@ -889,20 +899,18 @@ export default class ApiAuth {
         var sign = makeActiveSign(acc.pwdToken, acc.id, timestamp);
         var url = "accountId=" + acc.id + "&timestamp=" + timestamp + "&sign=" + sign + "&email=" + acc.email;
 
-        var vals: any = {
+        var vals: {[key: string]: any} = {
             name: staff.name || acc.mobile,
             username: acc.email,
             time: new Date(),
             companyName: companyName
         };
-        let _mobile;    //如果_mobile存在,将发短信通知
         let key;
         if(isFirstSet) {
             //发邮件
             vals.url = C.host + "/index.html#/login/first-set-pwd?" + url;
             vals.appMessageUrl = "#/login/first-set-pwd?" + url;
             key = 'qm_first_set_pwd';
-            _mobile = acc.mobile;
             try {
                 vals.url = await API.wechat.shorturl({longurl: vals.url});
                 vals.appMessageUrl = await API.wechat.shorturl({longurl: vals.appMessageUrl});
@@ -1099,7 +1107,7 @@ export default class ApiAuth {
      * @returns {*}
      */
     @clientExport
-    static async updateAccount(params) : Promise<Account>{
+    static async updateAccount(params: Account) : Promise<Account>{
         var id = params.id;
         console.log("更新字段:====>", params);
         var ah = await Models.account.get(id);
@@ -1116,7 +1124,7 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(["id"])
-    static async getAccount(params) {
+    static async getAccount(params: {id: string}) {
         var id = params.id;
         var options: any = {};
         var acc = await Models.account.get(id, options);
@@ -1129,7 +1137,7 @@ export default class ApiAuth {
      * @returns {*}
      */
     @requireParams(["id"])
-    static async getPrivateInfo(params) {
+    static async getPrivateInfo(params: {id: string}) {
         var id = params.id;
         var acc = await Models.account.get(id);
         return acc;
@@ -1205,7 +1213,7 @@ export default class ApiAuth {
      */
     @clientExport
     // @requireParams(["id"])
-    static async deleteAccount(params): Promise<any> {
+    static async deleteAccount(params: any): Promise<any> {
         /*let deleteAcc = await Models.account.get(params.id);
          await deleteAcc.destroy();*/
         return true;
@@ -1216,7 +1224,7 @@ export default class ApiAuth {
      * @param params
      * @returns {*}
      */
-    static async checkAccExist(params: any) {
+    static async checkAccExist(params: {[key: string]: any}) {
         var accounts = await Models.account.find(params);
         return accounts.total > 0;
     };
@@ -1268,7 +1276,7 @@ export default class ApiAuth {
     }
 
 
-    static __initHttpApp(app: any) {
+    static __initHttpApp(app: Application) {
         wechat.__initHttpApp(app);
         qrcode.__initHttp(app);
     }

@@ -16,27 +16,27 @@ export default class LdapApi {
 
     async bindUser(params:{entryDn: string, userPassword: string}){
         return new Promise<any>( (resolve, reject) => {
-            return this.client.bind(params.entryDn, params.userPassword, function (err) {
+            return this.client.bind(params.entryDn, params.userPassword, function (err: Error) {
                 if (err) return reject(err);
                 return resolve(true);
             })
         })
     }
 
-    async searchDn(params: {rootDn: string, opts: any}){
-        let result = [];
+    async searchDn(params: {rootDn: string, opts: {[key: string]: any}}) {
+        let result: any[] = [];
         return new Promise<any>( (resolve, reject) => {
-            return this.client.search(params.rootDn, params.opts, function (err, search) {
-                search.on('searchEntry', function (entry) {
+            return this.client.search(params.rootDn, params.opts, function (err: Error, search: { on: Function }) {
+                search.on('searchEntry', function (entry: {object: object}) {
                     var user = entry.object;
                     result.push(user);
                 });
 
-                search.on('end', function (res) {
+                search.on('end', function () {
                     return resolve(result);
                 });
 
-                search.on('error', function (err) {
+                search.on('error', function (err: Error) {
                     return reject(err);
                 });
             })
@@ -52,7 +52,7 @@ export default class LdapApi {
 
     async unBind(){
         return new Promise<any>( (resolve, reject) => {
-            return this.client.unbind(function (err) {
+            return this.client.unbind(function (err: Error) {
                 if (err) return reject(err);
                 return resolve(true);
             })

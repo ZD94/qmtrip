@@ -6,7 +6,6 @@
 import _ = require('lodash');
 import Logger from '@jingli/logger';
 const logger = new Logger('qm:notify');
-import redisClient = require("common/redis-client");
 import {Models} from "_types";
 import {ESendType, ENoticeType} from "_types/notice/notice";
 let moment = require("moment");
@@ -33,7 +32,7 @@ export interface ISubmitNotifyParam{
     values?: any;
 }
 
-async function tryReadFile(filename): Promise<string>{
+async function tryReadFile(filename: string): Promise<string>{
     let content: string = undefined;
     try{
         content = await fs.readFileAsync(filename);
@@ -66,7 +65,7 @@ class NotifyTemplate{
         html?: Function;
         text?: Function;
     };
-    constructor(public name, sms_text, wechat_json, email_title, email_html, email_text, appmessage_title, appmessage_html, appmessage_text){
+    constructor(public name: string, sms_text: string, wechat_json: string, email_title: string, email_html: string, email_text: string, appmessage_title: string, appmessage_html: string, appmessage_text: string){
         if(sms_text)
             this.sms = _.template(sms_text, {imports: common_imports});
         if(wechat_json){
@@ -151,7 +150,7 @@ class NotifyTemplate{
         try {
             let subject = this.email.title(data);
             let context = Object.create(data);
-            context.include = function(incname){
+            context.include = function(incname: string){
                 return includes[incname](context);
             };
             let content = this.email.html(context);
@@ -192,7 +191,7 @@ class NotifyTemplate{
             let description = this.appmessage.text(data);
             if(this.appmessage.html){
                 let context = Object.create(data);
-                context.include = function(incname){
+                context.include = function(incname: string){
                     return includes[incname](context);
                 };
                 content = this.appmessage.html(context);
@@ -205,7 +204,7 @@ class NotifyTemplate{
     }
 }
 
-async function loadTemplate(name, dir) {
+async function loadTemplate(name: string, dir: string) {
     let loadqueue = [
         tryReadFile(path.join(dir, 'email.title')),
         tryReadFile(path.join(dir, 'email.html')),
@@ -237,7 +236,7 @@ async function loadTemplates(): Promise<NotifyTemplateMap> {
             throw e;
     }
     let ret:NotifyTemplateMap = {};
-    await Promise.all(dirs.map(async function(tplname){
+    await Promise.all(dirs.map(async function(tplname: string){
         let tpl = await loadTemplate(tplname, path.join(__dirname, 'templates', tplname));
         ret[tplname] = tpl;
     }));
@@ -253,7 +252,7 @@ async function loadIncludes(): Promise<any>{
             throw e;
     }
     let ret = {};
-    await Promise.all(dirs.map(async function(incname){
+    await Promise.all(dirs.map(async function(incname: string){
         let content = await tryReadFile(path.join(__dirname, 'includes', incname));
         ret[incname] = _.template(content, {imports: common_imports});
     }));
