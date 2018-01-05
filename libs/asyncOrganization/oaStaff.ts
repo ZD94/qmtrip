@@ -167,7 +167,7 @@ export  abstract class OaStaff{
             }
 
             if(alreadyStaff && alreadyStaff.id){
-                if(type == CPropertyType.WECHAT_CORPID && alreadyStaff.id == companyCreateUser.id) {
+                if(type == CPropertyType.WECHAT_CORPID && companyCreateUser && alreadyStaff.id == companyCreateUser.id) {
                     await self.saveStaffProperty({staffId: alreadyStaff.id});
                 }
                 alreadyStaff.name = self.name;
