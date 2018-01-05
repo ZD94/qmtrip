@@ -356,6 +356,14 @@ class Proxy {
             pathstring = pathstring.replace("/permission", '');
             let sign = genSign(params, timestamp, appSecret);
             let url = `${config.permission.orderLink}${pathstring}`;
+               console.log("==client=====>headers: ", {
+                        sign: sign,
+                        appid: config.permission.appId,
+                        staffid: staff.id,
+                        staffname: staff.name,
+                        companyid: staff.companyId,
+                        accountid: staff.accountId
+                    })
             console.log("==timestamp:  ", timestamp, "===>sign:  ", sign, '====>url:  ', url, 'appid: ', config.permission.appId, '===request params: ', params);
             let result = await new Promise((resolve, reject) => {
                 return request({
