@@ -59,7 +59,7 @@ export class RestApi {
         if(typeof result == 'string') 
             result = JSON.parse(result)
         console.log("=====>result: ", result)
-        if(result.errcode != 0) return null;
+        // if(result.errcode != 0) return null;
         return {
             accessToken: result.access_token,
             permanentCode: result.permanent_code,
