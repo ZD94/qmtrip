@@ -117,15 +117,18 @@ export abstract class OaDepartment{
                  * 此时的根部门及为公司名，同步微信通讯录时无需创建多个根部门
                  */ 
                 let dept: Department;
-                let depts = await Models.department.find({
+                let depts: Department[] = await Models.department.find({
                     where: {
                         companyId: company.id,
                         name: self.name
                     }
                 });
                 if(depts && depts.length) dept = depts[0];
-                if (!dept) dept =  Department.create({name: self.name});
-                dept.company = company;
+                if (!dept) {
+                    dept =  Department.create({name: self.name});
+                    dept.company = company;
+                }
+       
                 if(parentDepartment && parentDepartment.id != dept.id){
                     dept.parent = parentDepartment;
                 }
