@@ -376,7 +376,6 @@ class Proxy {
                         sign: sign,
                         appid: config.permission.appId,
                         staffid: staff.id,
-                        staffname: staff.name,
                         companyid: staff.companyId,
                         accountid: staff.accountId
                     }
