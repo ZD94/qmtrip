@@ -136,13 +136,12 @@ class Proxy {
 
         // verifyToken
         app.all(/^\/order.*$/, cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function) => {
-            
+  
             let staff: Staff = await Staff.getCurrent();
             let staffId = req.headers.staffid;
             if(staffId && !staff) {
                 staff = await Models.staff.get(staffId);
             }
-
             let {tripDetailId} = req.query;
 
             let listeningon: string;
