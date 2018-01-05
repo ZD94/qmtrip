@@ -234,10 +234,6 @@ class Privilege {
         if (queryDateData['beginDate']) {
             checkFromDate = queryDateData.beginDate;
             checkToDate = queryDateData.endDate;
-            console.log('beginDate---------->   ', checkFromDate);
-            console.log('endDate---------->   ', checkToDate);
-            console.log('IsSameOrAfter----->  ', moment(coinAccountChanges[0].createdAt).isSameOrAfter(checkFromDate, 'month'))
-            console.log('IsSameOrBefore----->  ', moment(coinAccountChanges[0].createdAt).isSameOrBefore(checkToDate, 'month'))
             for (let i = 0; i < coinAccountChanges.length; i++) {
                 if (moment(coinAccountChanges[i].createdAt).isSameOrAfter(checkFromDate, 'month') && moment(coinAccountChanges[i].createdAt).isSameOrBefore(checkToDate, 'month')) {
                     dataDuringTheQueryDate.push(coinAccountChanges[i]);
