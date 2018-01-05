@@ -2,11 +2,6 @@
 	path = common
 	url = git@git.l.jingli365.com:old/common.git
 	update = merge
-[submodule "JLTypes"]
-	path = JLTypes
-	url = git@git.l.jingli365.com:web/JLTypes.git
-	branch = master
-	update = merge
 [submodule "_types"]
 	path = _types
 	url = git@git.l.jingli365.com:libs/jl-model.git
