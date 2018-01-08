@@ -737,6 +737,9 @@ class TripPlanModule {
             }
             return true;
         }).catch(async function(err: Error){
+            console.log("审核票据失败", err)
+            await tripPlan.reload();
+            await tripDetail.reload();
             invoice.status = EInvoiceStatus.WAIT_AUDIT;
             await invoice.save();
             throw new Error("审核失败");
