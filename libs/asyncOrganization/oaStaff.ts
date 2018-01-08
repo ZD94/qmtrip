@@ -145,13 +145,11 @@ export  abstract class OaStaff{
             if(!alreadyStaff){
 
                 if((self.mobile && type == CPropertyType.LDAP && companyCreateUser.mobile == self.mobile) ||
-                    (type == CPropertyType.WANGXIN_ID && companyCreateUser.mobile == self.mobile) || 
-                    (type == CPropertyType.WECHAT_CORPID && companyCreateUser.mobile == self.mobile)){
+                    (type == CPropertyType.WANGXIN_ID && companyCreateUser.mobile == self.mobile)){
 
                     alreadyStaff = companyCreateUser;
                     await self.saveStaffProperty({staffId: alreadyStaff.id});
-
-                }else{
+                } else{
                     // 不存在，添加
                     let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd), avatar: self.avatar});
                     // staff.travelPolicyId = defaultTravelPolicy.id;
@@ -169,6 +167,9 @@ export  abstract class OaStaff{
             }
 
             if(alreadyStaff && alreadyStaff.id){
+                if(type == CPropertyType.WECHAT_CORPID && companyCreateUser && alreadyStaff.id == companyCreateUser.id) {
+                    await self.saveStaffProperty({staffId: alreadyStaff.id});
+                }
                 alreadyStaff.name = self.name;
                 // alreadyStaff.sex = self.sex;//类型有问题
                 alreadyStaff.mobile = self.mobile;

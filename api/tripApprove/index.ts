@@ -78,8 +78,8 @@ export default class TripApproveModule {
             project = await API.tripPlan.getProjectByName({companyId: company.id, name: projectName,
                 userId: submitter});
         }
-        let tripApprove: ITripApprove;
-        tripApprove.id = approveNo;
+        let tripApprove = {} as ITripApprove;
+        tripApprove['id'] = approveNo;
         // tripApprove.approveUserId = approveUser;
         // let tripApprove = await Models.tripApprove.create({approveUserId: approveUser, id: approveNo});
         if(query.originPlace) {

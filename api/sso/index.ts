@@ -2,7 +2,7 @@ import {Express} from "express";
 
 import RedisCache from "../ddtalk/lib/redisCache";
 import { L } from '@jingli/language';
-import { Staff, EStaffStatus, EStaffRole } from "_types/staff";
+import { Staff, EStaffStatus, EStaffRole, StaffProperty, SPropertyType } from "_types/staff";
 import { Models } from "_types";
 import { CPropertyType, CompanyProperty, Company } from "_types/company";
 import * as error from "@jingli/error";
@@ -146,8 +146,7 @@ export default class SSOModule {
 
         let restApi = new RestApi(accessToken);
         let wCompany = new WCompany({ id: corpId, name: company.name, restApi, company: company, permanentCode: permanentCode});
-        if(!hasComPropertySaved)
-            await wCompany.saveCompanyProperty({companyId: company.id, permanentCode: permanentCode})
+        await wCompany.saveCompanyProperty({companyId: company.id, permanentCode: permanentCode})
         await wCompany.sync();
     }
 
@@ -193,17 +192,11 @@ export default class SSOModule {
         }
         if(!companyProperty || companyProperty.length == 0) {
             corpId = result.corpId;
-            let staff: Staff = Staff.create({
-                name: result.authUserInfo.name,
-                staffStatus: EStaffStatus.ON_JOB,
-                roleId: EStaffRole.OWNER
-            });
-            staff = await staff.save();
+
             company = Company.create({
                 name: result.corpName,
                 expiryDate : moment().add(1 , "months").toDate(),
-                mobile: result.authUserInfo.mobile,
-                createUser: staff.id
+                mobile: result.authUserInfo.mobile
             })
             let defaultAgency = await Models.agency.find({  //Agency.__defaultAgencyId;
                 where:{
@@ -216,8 +209,27 @@ export default class SSOModule {
             }
             company['agencyId'] = agencyId;
             company = await company.save();
-            staff.companyId = company.id;
-            staff = await staff.save();
+ 
+            //授权时存在管理员id， 则保存
+            if(result && result.authUserInfo && result.authUserInfo.userid) {
+                let staff: Staff = Staff.create({
+                    name: result.authUserInfo.name,
+                    staffStatus: EStaffStatus.ON_JOB,
+                    roleId: EStaffRole.ADMIN
+                });
+                staff = await staff.save();
+                let staffProperty = StaffProperty.create({
+                    type: SPropertyType.WECHAT_UID,
+                    staffId: staff.id,
+                    value: result.authUserInfo.userId,  
+                })
+                staff.company = company;
+                staff = await staff.save();
+                
+                company.createUser = staff.id;
+                company = await company.save();
+            }
+
     
             // let department = Department.create({
             //     name: result.corpName,
@@ -269,6 +281,28 @@ export default class SSOModule {
     //     return accessToken;
     // }
 
+    @clientExport
+    @requireParams(['code'])
+    static async loginByWechatCode(params: { code: string }) {
+        const usrInfo: WeChatUsrInfo = await API.sso.getUserInfo(params)
+
+        const companyProperties = await Models.companyProperty.find({
+            where: { type: SPropertyType.WECHAT_CORPID, value: usrInfo.CorpId }
+        })
+        if (companyProperties.length < 1)
+            throw new L.ERROR_CODE_C(404, "该企业尚未授权")
+
+        const staffProperties = await Models.staffProperty.find({
+            where: { type: SPropertyType.WECHAT_UID, value: usrInfo.UserId }
+        })
+        if (staffProperties.length < 1)
+            throw L.ERR.USER_NOT_EXIST()
+
+        const staffs = await Promise.all(staffProperties.map(sp => Models.staff.get(sp.staffId)))
+        const staff = staffs.filter(s => s.company.id == companyProperties[0].companyId)[0]
+        if (!staff) throw L.ERR.USER_NOT_EXIST()
+        return await API.auth.makeAuthenticateToken(staff.accountId, 'corp_wechat')
+    }
 
 }
 

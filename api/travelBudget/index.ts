@@ -14,6 +14,7 @@ const utils = require("common/utils");
 import _ = require('lodash');
 import { Place } from "_types/place";
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
+let config = require('@jingli/config');
 export var NoCityPriceLimit = 0;
 const DefaultCurrencyUnit = 'CNY';
 import { restfulAPIUtil } from "api/restful";
@@ -473,86 +474,95 @@ export default class ApiTravelBudget {
 
     //用于接收更新预算，并更新approve表和tripapprove上次
     @clientExport
-    static async updateBudget(params: { approveId: string, budgetResult: any }) {
+    static async updateBudget(params: {approveId: string, budgetResult: any, isFinalFirstResponse?: boolean}) {
 
         console.log('updateBudtetApproveId=======', params.approveId);
         console.log('============update', params.budgetResult);
         let approve = await Models.approve.get(params.approveId);
-        let isFinalInApprove: boolean = false;
-        let approveStep = approve.step;  //approve表中现有的是否为最终结果 budgetStep
-        if (approveStep == STEP.FINAL) {
-            isFinalInApprove = true;
-        }
 
-        let queryParams = approve.data;
-        if (typeof queryParams == 'string') {
-            queryParams = JSON.parse(approve.data);
-        }
-        let destinationPlacesInfo = queryParams.query.destinationPlacesInfo;
-
-        let count = queryParams.query.staffList.length;
-        let staffId = queryParams.query['staffId'];
-        if (!staffId || staffId == 'undefined') {
-            staffId = approve.submitter;
-        }
-        let staff = await Models.staff.get(staffId);
-        let companyId = staff.company.id;
-
-        let _budgets = params.budgetResult.budgets;
-        let ps: Promise<any>[] = _budgets.map(async (item) => {
-            return await ApiTravelBudget.transformBudgetData(item, companyId, count);
-        });
-        let budgets = await Promise.all(ps);
-        // console.log("budgets budgets budgets ====>", budgets.length, budgets);
-        let totalBudget = 0;
-        if (budgets && budgets.length > 0) {
-            budgets.forEach(function (item) {
-                totalBudget += item.price;
-            })
-        }
-
-        // console.log('--------update totalBudget------', totalBudget);
-        //TODO 如果分段 有一段是FIN 要走那一条 ？？？lizeilin
-        if (!isFinalInApprove) {  //看表中的budget是否是最终结果，最终结果还没返回过，则更新approve表，表示还不可以进行审批
-            console.log('first time--------------');
-            approve.budget = totalBudget;
-            approve.step = params.budgetResult.step;
-            if (typeof approve.data == 'string') {
-                approve.data = JSON.parse(approve.data);
+        // check tripApprove status; if passed, rejected or locked, the budget will not be updated
+        let checkTripApproveStatus = await API.tripApprove.getTripApprove({id: approve.id});
+        let tripApproveStatus = checkTripApproveStatus ? checkTripApproveStatus['status'] : null;
+        if (tripApproveStatus && (tripApproveStatus == 1 || tripApproveStatus == -1 || tripApproveStatus == 2)) {
+            console.log('tripApproveStatus----->  ', tripApproveStatus);
+            console.log('NO UPDATE BUDGET ANY MORE');
+        } else {  // else update as usual
+            let isFinalInApprove: boolean = false;
+            let approveStep = approve.step;  //approve表中现有的是否为最终结果 budgetStep
+            if (approveStep == STEP.FINAL) {
+                isFinalInApprove = true;
             }
-            approve.data = { budgets: budgets, query: approve.data.query };
-            approve = await approve.save();
-            console.log('approve.step---------------->', approve.step);
-            if (approve.step === STEP.FINAL) {
-                console.log('------------enter FIN---------');
-                let params = { approveNo: approve.id };
-                let tripApprove = await API.tripApprove.retrieveDetailFromApprove(params);
-                let returnApprove = await API.eventListener.sendEventNotice({ eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: approve.companyId });
+
+            let queryParams = approve.data;
+            if (typeof queryParams == 'string') {
+                queryParams = JSON.parse(approve.data);
             }
-        } else {  //最终结果已经返回过，现在只用新预算中的最终结果进行比较，若大于现在显示的最终预算则更新，否则不更新
-            console.log('second time------------->');
-            if (approve.budget > totalBudget) {   //旧的预算大于新的预算，则不更新预算，显示现有预算
-                console.log('all little')
-                await approve.save();
-                API.broadcast(`tripApproveBudgetUpdate:${approve.id}`, 'FIN', 'SAME');
-                console.log('send to app============', `tripApproveBudgetUpdate:${approve.id}`);
-            } else {                    //旧的预算小于新的预算，则更新预算同时更新approve和tripApprove表
-                console.log('isFinalInBudget', params.budgetResult.step);
-                if (params.budgetResult.step == STEP.FINAL) {
-                    console.log('ENTER isFinalInBudget');
-                    // await Bluebird.delay(5000);
-                    approve.budget = totalBudget;
+            let destinationPlacesInfo = queryParams.query.destinationPlacesInfo;
+
+            let count = queryParams.query.staffList.length;
+            let staffId = queryParams.query['staffId'];
+            if (!staffId || staffId == 'undefined') {
+                staffId = approve.submitter;
+            }
+            let staff = await Models.staff.get(staffId);
+            let companyId = staff.company.id;
+
+            let _budgets = params.budgetResult.budgets;
+            let ps: Promise<any>[] = _budgets.map(async (item) => {
+                return await ApiTravelBudget.transformBudgetData(item, companyId, count);
+            });
+            let budgets = await Promise.all(ps);
+            // console.log("budgets budgets budgets ====>", budgets.length, budgets);
+            let totalBudget = 0;
+            if (budgets && budgets.length > 0) {
+                budgets.forEach(function (item) {
+                    totalBudget += item.price;
+                })
+            }
+
+            // console.log('--------update totalBudget------', totalBudget);
+            //TODO 如果分段 有一段是FIN 要走那一条 ？？？lizeilin
+                if (!isFinalInApprove || params.isFinalFirstResponse) {  //看表中的budget是否是最终结果，最终结果还没返回过，则更新approve表，表示还不可以进行审批，或者是第一次请求时候返回为最终结果
+                console.log('first time--------------');
+                approve.budget = totalBudget;
+                approve.step = params.budgetResult.step;
+                if (typeof approve.data == 'string') {
+                    approve.data = JSON.parse(approve.data);
+                }
+                approve.data = { budgets: budgets, query: approve.data.query };
+                approve = await approve.save();
+                console.log('approve.step---------------->', approve.step);
+                if (approve.step === STEP.FINAL) {
+                    console.log('------------enter FIN---------');
+                    let params = { approveNo: approve.id };
+                    let tripApprove = await API.tripApprove.retrieveDetailFromApprove(params);
+                    let returnApprove = await API.eventListener.sendEventNotice({ eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: approve.companyId });
+                }
+            } else {  //最终结果已经返回过，现在只用新预算中的最终结果进行比较，若大于现在显示的最终预算则更新，否则不更新
+                console.log('second time------------->');
+                if (approve.budget > totalBudget) {   //旧的预算大于新的预算，则不更新预算，显示现有预算
+                    console.log('all little')
                     await approve.save();
-                    console.log('-----------update traipApprove;,', totalBudget);
-                    let tripApproveUpdate = await API.tripApprove.updateTripApprove({
-                        id: approve.id,
-                        budget: totalBudget,
-                        companyId: companyId,
-                        budgetInfo: budgets
-                    });
-                    console.log('asdfadfasdfbroadcast===========');
-                    console.log(`'tripApproveBudgetUpdate:'${approve.id}`);
-                    API.broadcast('tripApproveBudgetUpdate:' + approve.id, 'FIN', 'UPDATED');
+                    API.broadcast(`tripApproveBudgetUpdate:${approve.id}`, 'FIN', 'SAME');
+                    console.log('send to app============', `tripApproveBudgetUpdate:${approve.id}`);
+                } else {                    //旧的预算小于新的预算，则更新预算同时更新approve和tripApprove表
+                    console.log('isFinalInBudget', params.budgetResult.step);
+                    if (params.budgetResult.step == STEP.FINAL) {
+                        console.log('ENTER isFinalInBudget');
+                        // await Bluebird.delay(5000);
+                        approve.budget = totalBudget;
+                        await approve.save();
+                        console.log('-----------update traipApprove;,', totalBudget);
+                        let tripApproveUpdate = await API.tripApprove.updateTripApprove({
+                            id: approve.id,
+                            budget: totalBudget,
+                            companyId: companyId,
+                            budgetInfo: budgets
+                        });
+                        console.log('asdfadfasdfbroadcast===========');
+                        console.log(`'tripApproveBudgetUpdate:'${approve.id}`);
+                        API.broadcast('tripApproveBudgetUpdate:' + approve.id, 'FIN', 'UPDATED');
+                    }
                 }
             }
         }
@@ -662,7 +672,7 @@ export default class ApiTravelBudget {
 
         let segmentsBudget = budgetResult.budgets;
 
-        console.log('--------budgetResult', budgetResult.step);
+        
         let ps: Promise<any>[] = segmentsBudget.map(async (item) => {
             return await ApiTravelBudget.transformBudgetData(item, companyId, count);
         });
@@ -714,6 +724,11 @@ export default class ApiTravelBudget {
                 console.log(updateBudget.data.budgets[0].index, '******* 11111111');
                 console.log("approveId =======>", updateBudget.id);
                 await updateBudget.save();
+            }
+            console.log('--------budgetResult', budgetResult.step);
+            if (budgetResult.step == 'FIN') {
+                console.log('updateBudget first time');
+                ApiTravelBudget.updateBudget({approveId: approveId, budgetResult: budgetResult, isFinalFirstResponse: (isIntoApprove ? false : true)});
             }
 
             console.log('UPDATE-----BUDGET----', );
@@ -781,6 +796,8 @@ export default class ApiTravelBudget {
                         t.price = t.price * count;
                     })
                 }
+                return budget;
+            default:
                 return budget;
         }
     }
