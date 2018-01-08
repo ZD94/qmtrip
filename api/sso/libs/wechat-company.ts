@@ -1,3 +1,4 @@
+import {WStaff, IWStaff} from './wechat-staff';
 
 
 import { OaCompany } from "libs/asyncOrganization/oaCompany";
@@ -6,7 +7,7 @@ import { OaStaff } from "libs/asyncOrganization/oaStaff";
 import { RestApi } from "api/sso/libs/restApi";
 import { Company, CPropertyType, CompanyProperty } from "_types/company";
 import { WDepartment, IWDepartment } from "api/sso/libs/wechat-department";
-import { Staff } from "_types/staff";
+import { Staff, SPropertyType } from "_types/staff";
 import { Models } from "_types";
 
 const RootDepartment = 1;
@@ -108,7 +109,28 @@ export class WCompany extends OaCompany {
      * @method 获取管理员(创建者), 微信企业无管理员
      */
     async getCreateUser(): Promise<OaStaff> {
-        return null;
+        let self = this;
+        let company = await self.getCompany();
+        let staff: Staff;
+        if(company && company.createUser)
+            staff = await Models.staff.get(company.createUser);
+        if(!staff) return null;
+
+        let staffProperty = await Models.staffProperty.find({
+            where: {
+                type: SPropertyType.WECHAT_UID,
+                staffId: staff.id
+            }
+        })
+        if(!staffProperty || staffProperty.length == 0 ) return null;
+
+        let userInfo: IWStaff = await self.restApi.getStaff(staffProperty[0].value);
+        if(!userInfo) return null;
+
+        let oaStaff = new WStaff({id: userInfo.userid, name: userInfo.name, mobile: userInfo.mobile,
+            email: userInfo.email, departmentIds: userInfo.department, corpId: self.id, company: self.company,
+            avatar: userInfo.avatar_mediaid});
+        return oaStaff;
     }
 
     /**

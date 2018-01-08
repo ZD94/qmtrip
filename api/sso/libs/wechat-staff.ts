@@ -163,24 +163,23 @@ export class WStaff extends OaStaff {
                 type: SPropertyType.WECHAT_UID
             }
         })
-        console.log("======hasStaffId: ", hasStaffId)
         if(!hasStaffId || hasStaffId.length == 0) {
             let staffUuidProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WECHAT_UID, value: self.id});
             await staffUuidProperty.save();
         }
-
+        
         let hasCorpId = await Models.staffProperty.find({
             where: {
                 staffId: params.staffId,
                 type: SPropertyType.WECHAT_CORPID
             }
         })
-
+        
         if(!hasCorpId || hasCorpId.length == 0) {
             let staffCorpProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WECHAT_CORPID, value: self.corpId});
             await staffCorpProperty.save();
         }
-
+        
         let hasUserInfo = await Models.staffProperty.find({
             where: {
                 staffId: params.staffId,
@@ -193,6 +192,15 @@ export class WStaff extends OaStaff {
             let staffDdInfoProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WECHAT_USER_INFO, value: userInfo});
             await staffDdInfoProperty.save();
         }
+
+        // let staffUuidProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WECHAT_UID, value: self.id});
+        // await staffUuidProperty.save();
+        // let staffCorpProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WECHAT_CORPID, value: self.corpId});
+        // await staffCorpProperty.save();
+        // let wechatUser = await self.restApi.getStaff(self.id);
+        // let userInfo = JSON.stringify(wechatUser);
+        // let staffDdInfoProperty = StaffProperty.create({staffId: params.staffId, type: SPropertyType.WECHAT_USER_INFO, value: userInfo});
+        // await staffDdInfoProperty.save();
         return true;
     }
 }

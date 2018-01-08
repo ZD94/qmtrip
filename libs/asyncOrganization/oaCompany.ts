@@ -1,7 +1,7 @@
 /**
  * Created by wangyali on 2017/7/6.
  */
-import {Company} from "_types/company";
+import {Company, CPropertyType} from "_types/company";
 import {Staff, EStaffRole} from "_types/staff";
 import {Models} from "_types/index";
 import {OaStaff} from './oaStaff';
@@ -29,7 +29,7 @@ export abstract class OaCompany{
         let self = this;
         let com: Company = null;
         console.log("self.id: ", self.id)
-        let comPro = await Models.companyProperty.find({where : {value: self.id}});
+        let comPro = await Models.companyProperty.find({where : {type: CPropertyType.WECHAT_CORPID, value: self.id}});
         if(comPro && comPro.length > 0){
             com = await Models.company.get(comPro[0].companyId);
         }
@@ -43,7 +43,6 @@ export abstract class OaCompany{
 
         //处理企业信息
         let alreadyCompany = await self.getCompany();
-        if(!alreadyCompany) return ;
         if(alreadyCompany){
             alreadyCompany.name = self.name;
             alreadyCompany.status = 1;
