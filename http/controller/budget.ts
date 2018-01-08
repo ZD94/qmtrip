@@ -69,7 +69,7 @@ export class BudgetController extends AbstractController {
         let _budgets = req.body;
         let approveId = req.params.approveId;
          
-        let updateBudget = await API['travelBudget'].updateBudget({approveId: approveId, budgetResult: _budgets});
+        let updateBudget = await API['travelBudget'].updateBudget({approveId: approveId, budgetResult: _budgets, isFinalFirstResponse: false});
         res.json(this.reply(0, null));
     }
 
