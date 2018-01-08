@@ -2,7 +2,7 @@ import { WStaff, IWStaff } from "api/sso/libs/wechat-staff";
 import { IWDepartment } from "api/sso/libs/wechat-department";
 import { Express } from "express-serve-static-core";
 var request = require("request-promise");
-
+import cache from 'common/cache';
 
 const enum EIteratorSwitch {
     ACCESS_ITERATABLE = 1,  //表示迭代获取
@@ -56,7 +56,7 @@ export class RestApi {
                 auth_code: authCode
             }
         });
-        if(typeof result == 'string') 
+        if (typeof result == 'string')
             result = JSON.parse(result)
         console.log("=====>result: ", result)
         // if(result.errcode != 0) return null;
@@ -198,8 +198,21 @@ export class RestApi {
             method: 'GET',
             qs
         });
-        if(!result || !result.userlist) return null;
+        if (!result || !result.userlist) return null;
         return result.userlist;
+    }
+
+    static async getJsApiTicket(accessToken: string): Promise<string> {
+        const ticket = await cache.read('jsapi-ticket')
+        if (ticket) return ticket
+        const result: JsApiTicket = await reqProxy({
+            url: '',
+            method: 'GET',
+            qs: { access_token: accessToken }
+        })
+        if (!result || result.errcode != 0) return null
+        await cache.write('jsapi-ticket', result.ticket, result.expires_in)
+        return result.ticket
     }
 }
 
@@ -306,4 +319,11 @@ export interface IWPermanentCode {
         name: string,
         avatar: string
     }
+}
+
+export interface JsApiTicket {
+    errcode: number,
+    errmsg: string,
+    ticket: string,
+    expires_in: number
 }
