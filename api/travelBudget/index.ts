@@ -728,7 +728,7 @@ export default class ApiTravelBudget {
             console.log('--------budgetResult', budgetResult.step);
             if (budgetResult.step == 'FIN') {
                 console.log('updateBudget first time');
-                ApiTravelBudget.updateBudget({approveId: approveId, budgetResult: budgetResult, isFinalFirstResponse: true});
+                ApiTravelBudget.updateBudget({approveId: approveId, budgetResult: budgetResult, isFinalFirstResponse: (isIntoApprove ? false : true)});
             }
 
             console.log('UPDATE-----BUDGET----', );
