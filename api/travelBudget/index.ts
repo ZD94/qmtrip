@@ -14,6 +14,7 @@ const utils = require("common/utils");
 import _ = require('lodash');
 import { Place } from "_types/place";
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
+let config = require('@jingli/config');
 export var NoCityPriceLimit = 0;
 const DefaultCurrencyUnit = 'CNY';
 import { restfulAPIUtil } from "api/restful";

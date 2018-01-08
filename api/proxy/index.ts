@@ -17,7 +17,7 @@ var timeout = require('connect-timeout');
 import * as CLS from 'continuation-local-storage';
 let CLSNS = CLS.getNamespace('dnode-api-context');
 import { genSign } from "@jingli/sign";
-const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'Content-Type, auth, supplier, authstr, staffid, companyid, accountid'} 
+const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'content-type, Content-Type, auth, supplier, authstr, staffid, companyid, accountid'} 
 function resetTimeout(req, res, next){
     req.clearTimeout();
     next();
@@ -136,13 +136,12 @@ class Proxy {
 
         // verifyToken
         app.all(/^\/order.*$/, cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function) => {
-            
+  
             let staff: Staff = await Staff.getCurrent();
             let staffId = req.headers.staffid;
             if(staffId && !staff) {
                 staff = await Models.staff.get(staffId);
             }
-
             let {tripDetailId} = req.query;
 
             let listeningon: string;
@@ -279,6 +278,7 @@ class Proxy {
 
 
         app.all(/^\/bill.*$/ ,cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
+    
             let {staffid, companyid, accountid} = req.headers;
             let params =  req.body;
             if(req.method == 'GET') {
@@ -319,6 +319,7 @@ class Proxy {
 
         
         app.all(/^\/permission.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
+      
             let {staffid, companyid, accountid} = req.headers;
             let params =  req.body;
             if(req.method == 'GET') {
@@ -343,7 +344,6 @@ class Proxy {
                         sign: sign,
                         appid: config.permission.appId,
                         staffid: staff.id,
-                        staffname: staff.name,
                         companyid: staff.companyId,
                         accountid: staff.accountId
                     }

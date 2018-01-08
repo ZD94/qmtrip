@@ -2,7 +2,7 @@ import {Express} from "express";
 
 import RedisCache from "../ddtalk/lib/redisCache";
 import { L } from '@jingli/language';
-import { Staff, EStaffStatus, EStaffRole, SPropertyType } from "_types/staff";
+import { Staff, EStaffStatus, EStaffRole, StaffProperty, SPropertyType } from "_types/staff";
 import { Models } from "_types";
 import { CPropertyType, CompanyProperty, Company } from "_types/company";
 import * as error from "@jingli/error";
@@ -146,8 +146,7 @@ export default class SSOModule {
 
         let restApi = new RestApi(accessToken);
         let wCompany = new WCompany({ id: corpId, name: company.name, restApi, company: company, permanentCode: permanentCode});
-        if(!hasComPropertySaved)
-            await wCompany.saveCompanyProperty({companyId: company.id, permanentCode: permanentCode})
+        await wCompany.saveCompanyProperty({companyId: company.id, permanentCode: permanentCode})
         await wCompany.sync();
     }
 
@@ -193,17 +192,11 @@ export default class SSOModule {
         }
         if(!companyProperty || companyProperty.length == 0) {
             corpId = result.corpId;
-            let staff: Staff = Staff.create({
-                name: result.authUserInfo.name,
-                staffStatus: EStaffStatus.ON_JOB,
-                roleId: EStaffRole.OWNER
-            });
-            staff = await staff.save();
+
             company = Company.create({
                 name: result.corpName,
                 expiryDate : moment().add(1 , "months").toDate(),
-                mobile: result.authUserInfo.mobile,
-                createUser: staff.id
+                mobile: result.authUserInfo.mobile
             })
             let defaultAgency = await Models.agency.find({  //Agency.__defaultAgencyId;
                 where:{
@@ -216,8 +209,27 @@ export default class SSOModule {
             }
             company['agencyId'] = agencyId;
             company = await company.save();
-            staff.companyId = company.id;
-            staff = await staff.save();
+ 
+            //授权时存在管理员id， 则保存
+            if(result && result.authUserInfo && result.authUserInfo.userid) {
+                let staff: Staff = Staff.create({
+                    name: result.authUserInfo.name,
+                    staffStatus: EStaffStatus.ON_JOB,
+                    roleId: EStaffRole.ADMIN
+                });
+                staff = await staff.save();
+                let staffProperty = StaffProperty.create({
+                    type: SPropertyType.WECHAT_UID,
+                    staffId: staff.id,
+                    value: result.authUserInfo.userId,  
+                })
+                staff.company = company;
+                staff = await staff.save();
+                
+                company.createUser = staff.id;
+                company = await company.save();
+            }
+
     
             // let department = Department.create({
             //     name: result.corpName,

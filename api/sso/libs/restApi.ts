@@ -56,6 +56,8 @@ export class RestApi {
                 auth_code: authCode
             }
         });
+        if(typeof result == 'string') 
+            result = JSON.parse(result)
         console.log("=====>result: ", result)
         // if(result.errcode != 0) return null;
         return {

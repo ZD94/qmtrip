@@ -235,7 +235,7 @@ class Privilege {
             checkFromDate = queryDateData.beginDate;
             checkToDate = queryDateData.endDate;
             for (let i = 0; i < coinAccountChanges.length; i++) {
-                if (moment(coinAccountChanges[i].createdAt).isAfter(checkFromDate) || moment(coinAccountChanges[i].createdAt).isBefore(checkToDate)) {
+                if (moment(coinAccountChanges[i].createdAt).isSameOrAfter(checkFromDate, 'month') && moment(coinAccountChanges[i].createdAt).isSameOrBefore(checkToDate, 'month')) {
                     dataDuringTheQueryDate.push(coinAccountChanges[i]);
                 }
             }
