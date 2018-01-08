@@ -25,7 +25,7 @@ import {FindResult} from "common/model/interface";
 import {Staff, PointChange} from "_types/staff";
 import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import { getSession } from "@jingli/dnode-api";
-import {AgencyUser} from "_types/agency";
+import {AgencyUser, Agency} from "_types/agency";
 import {makeSpendReport} from './spendReport';
 import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice} from "_types/tripPlan";
 import {ENoticeType} from "_types/notice/notice";
@@ -698,6 +698,21 @@ class TripPlanModule {
             }
 
             let user = await AgencyUser.getCurrent();
+            if(!user) {
+                let defaultAgency: Agency[] = await Models.agency.find({
+                    where: {
+                        email: config.default_agency.email
+                    }
+                })
+                if(defaultAgency && defaultAgency.length) {
+                    let users: AgencyUser[] = await Models.agencyUser.find({
+                        where: {
+                            agencyId: defaultAgency[0].id
+                        }
+                    });
+                    if(users && users.length) user = users[0];
+                }
+            }
             let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, tripDetailId: tripDetail.id, userId: user.id, remark: `${templateValue.tripType}票据审核${logResult}`});
             log.save();
 
@@ -740,6 +755,10 @@ class TripPlanModule {
             console.log("审核票据失败", err)
             await tripPlan.reload();
             await tripDetail.reload();
+            await invoice.reload();
+
+            tripDetail.status = EPlanStatus.AUDITING;
+            await tripDetail.save();
             invoice.status = EInvoiceStatus.WAIT_AUDIT;
             await invoice.save();
             throw new Error("审核失败");
