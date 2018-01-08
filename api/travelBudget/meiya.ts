@@ -323,7 +323,7 @@ export function compareHotelData(origin: any[], meiyaData: any[]) {
                 let isMatched = similarityMatch({
                     base: item.name,
                     target: meiya.cnName,
-                    ignores: ['酒店', '旅店', '{}']
+                    ignores: ['酒店', '旅店', '{}', '()']
                 });
                 if (!isMatched) continue;
                 console.log("meiyaHotel in:", meiya.cnName);
