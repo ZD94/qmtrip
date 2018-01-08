@@ -110,13 +110,13 @@ export class WStaff extends OaStaff {
         let self = this;
         let departments: Array<WDepartment> = [];
         if(self.departmentIds) {
-            self.departmentIds.map(async (deptId: number) => {
+            self.departmentIds.map(async (deptId: number|string) => {
                 let wdept: Array<IWDepartment> = await self.restApi.getDepartments(deptId.toString());
                 if(wdept && wdept.length) {
                     for(let i = 0; i < wdept.length; i++){
                         if(wdept[i].id && wdept[i].id.toString() == deptId.toString()) {
-                            let dept= new WDepartment({id: wdept[i].id, name: wdept[i].name, corpId: self.corpId, restApi: self.restApi,
-                                company: self.company, parentId: wdept[i].parentid})
+                            let dept= new WDepartment({id: wdept[i].id + '', name: wdept[i].name, corpId: self.corpId, restApi: self.restApi,
+                                company: self.company, parentId: wdept[i].parentid + ''})
                             departments.push(dept);
                         }
                     }
@@ -214,9 +214,9 @@ export interface IWStaff {
     gender: EGender;
     avatar_mediaid?: string;
     isleader?: number;  //上级字段，标示是否是上级
-    status?: EWechatStaffStatus,
+    status?: EWechatStaffStatus;
     
-    department: string[];
+    department: string[] | number[];
     order?: number[];
     position?: string;
     telephone?: string;
