@@ -110,19 +110,20 @@ export class WStaff extends OaStaff {
         let self = this;
         let departments: Array<WDepartment> = [];
         if(self.departmentIds) {
-            self.departmentIds.map(async (deptId: number|string) => {
+            await Promise.all(self.departmentIds.map(async (deptId: number) => {
                 let wdept: Array<IWDepartment> = await self.restApi.getDepartments(deptId.toString());
                 if(wdept && wdept.length) {
-                    for(let i = 0; i < wdept.length; i++){
-                        if(wdept[i].id && wdept[i].id.toString() == deptId.toString()) {
-                            let dept= new WDepartment({id: wdept[i].id + '', name: wdept[i].name, corpId: self.corpId, restApi: self.restApi,
-                                company: self.company, parentId: wdept[i].parentid + ''})
+                    for(let i = 0; i < wdept.length; i++){  
+                        if(wdept[i].id && wdept[i].id == deptId) {
+                            let dept= new WDepartment({id: wdept[i].id, name: wdept[i].name, corpId: self.corpId, restApi: self.restApi,
+                                company: self.company, parentId: wdept[i].parentid})
                             departments.push(dept);
                         }
                     }
                 }
-            });
+            }));
         }
+
         departments = departments.filter((dept: WDepartment) => {
             if(dept) return true;
             return false;
@@ -136,8 +137,10 @@ export class WStaff extends OaStaff {
         if(typeof self.id != 'string')
             self.id = self.id + '';
         let userInfo: IWStaff = await self.restApi.getStaff(self.id);
-        let oaStaff = new WStaff({id: userInfo.userid, name: userInfo.name, mobile: userInfo.mobile,
-            email: userInfo.email, departmentIds: userInfo.department, corpId: self.corpId, company: self.company,
+        let mobile = userInfo.mobile && userInfo.mobile != '' ? userInfo.mobile : null;
+        let email = userInfo.email && userInfo.email != '' ? userInfo.email : null;
+        let oaStaff = new WStaff({id: userInfo.userid, name: userInfo.name, mobile: mobile,
+            email: email, departmentIds: userInfo.department, corpId: self.corpId, company: self.company,
             avatar: userInfo.avatar_mediaid});
         return oaStaff;
     }

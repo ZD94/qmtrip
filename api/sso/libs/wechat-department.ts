@@ -81,7 +81,7 @@ export class WDepartment extends OaDepartment {
 
         if(result && result.length){
             for(let i = 0; i < result.length; i++) {
-                if(result[i].id && result[i].id.toString() != self.id) {   //微信企业获取当前部门的子部门列表时，该列表包含该父集部门和其子部门
+                if(result[i].id && result[i].id.toString() != self.id && result[i].parentid.toString() == self.id) {   //微信企业获取当前部门的子部门列表时，该列表包含该父集部门和其子部门
                     childDepartments.push(new WDepartment({
                         id: result[i].id + '', 
                         name: result[i].name, 
@@ -133,12 +133,14 @@ export class WDepartment extends OaDepartment {
         let result: OaStaff[] = [];
         for(let u of wStaffs){
             console.log("员工", u.name, "的状态: ", u.status)
+            let mobile = u.mobile && u.mobile != '' ? u.mobile : null;
+            let email = u.email && u.email != '' ? u.email : null;
             if(u.status != EWechatStaffStatus.disable) {
                 let wstaff = new WStaff({
                     id: u.userid, 
                     name: u.name, 
-                    email: u.email, 
-                    mobile: u.mobile, 
+                    email: email, 
+                    mobile: mobile, 
                     departmentIds: u.department, 
                     corpId: self.corpId,
                     restApi: self.restApi, 
