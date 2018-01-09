@@ -4,10 +4,10 @@ import {WStaff, IWStaff} from './wechat-staff';
 import { OaCompany } from "libs/asyncOrganization/oaCompany";
 import { OaDepartment } from "libs/asyncOrganization/oaDepartment";
 import { OaStaff } from "libs/asyncOrganization/oaStaff";
-import { RestApi } from "api/sso/libs/restApi";
+import { RestApi, IWAdminList } from "api/sso/libs/restApi";
 import { Company, CPropertyType, CompanyProperty } from "_types/company";
 import { WDepartment, IWDepartment } from "api/sso/libs/wechat-department";
-import { Staff, SPropertyType } from "_types/staff";
+import { Staff, SPropertyType, EStaffRole } from "_types/staff";
 import { Models } from "_types";
 
 const RootDepartment = 1;
@@ -55,6 +55,77 @@ export class WCompany extends OaCompany {
             com = await Models.company.get(comPro[0].companyId);
         }
         return com;
+    }
+
+    /**
+     * @method 微信企业获取员工信息时，不含权限信息，请求接口获取管理员列表，
+     *        同步新的管理员列表
+     * @param suiteToken 
+     * return {Promise<boolean>}
+     */
+    async syncAdminRole(suiteToken: string): Promise<boolean> {
+        let self = this;
+        if(!self.agentId) return false;
+        let result: Array<IWAdminList> = await self.restApi.getAdminList(self.id, self.agentId, suiteToken);  
+        if(!result || result.length == 0) return false;
+
+        let staffIds: string[] = await Promise.all(result.map(async (wstaff: IWAdminList) => {
+            let staffProperty = await Models.staffProperty.find({
+                where: {
+                    type: SPropertyType.WECHAT_UID,
+                    value: wstaff.userid
+                }
+            })
+            if(staffProperty && staffProperty.length) return staffProperty[0].staffId;
+            return null;
+        })).filter(async (staffId: string| null) => {
+            if(staffId) return true;
+            return false;
+        })
+        let company = await self.getCompany();
+        if(!company) return false;
+        let managers = await company.getManagers({withOwner: true});
+        if(managers && managers.length) {
+            await Promise.all(managers.map(async (staff: Staff) => {
+                let index: number = staffIds.indexOf(staff.id);
+                if(staff.roleId != EStaffRole.OWNER && index < 0) {
+                    staff.roleId = EStaffRole.COMMON;
+                    await staff.save();
+                }            
+                if(staff.roleId == EStaffRole.OWNER || index >= 0) {
+                    staffIds.splice(index, 1);
+                }
+            }));
+        }
+
+        if(staffIds && staffIds.length) {
+            await Promise.all(staffIds.map(async (staffId: string) => {
+                let staff = await Models.staff.get(staffId);
+                if(!staff) return null;
+                staff.roleId = EStaffRole.ADMIN;
+                await staff.save();
+            }))
+        }
+        return true;
+    }
+
+    /**
+     * @method 初始化公司时，随机在管理员列表中选中设置为创建人
+     * @return {Promise<boolean>}
+     */
+    async setCompanyCreator(): Promise<boolean> {
+        let self = this;
+        let company = await self.getCompany();
+        if(!company) return false;
+        let createUser = await company.getCreateUser();
+        if(createUser) 
+            return true;
+        let managers: Staff[] = await company.getManagers({withOwner: true});
+        if(!managers || managers.length)
+            return false;
+        managers[0].roleId = EStaffRole.OWNER;
+        await managers[0].save();
+        return true;
     }
 
     async getDepartments(): Promise<OaDepartment[]> {
