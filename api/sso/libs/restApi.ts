@@ -79,6 +79,7 @@ export class RestApi {
     /**
      * @method 根据corpid和secret获取该公司的access_token 
      *     不可用，无法获取微信企业的secret
+     *   secret: x51OLfe5UWqI5VEW2nXg6tAph5P8kPqmJ_RxtgnbPBE
      */
     static async getAccessToken(corpid: string, secret: string): Promise<IAccessToken> {
         let url = `https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=${corpid}&corpsecret==${secret}`;
