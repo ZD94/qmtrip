@@ -123,6 +123,7 @@ export class WStaff extends OaStaff {
                 }
             }));
         }
+        
         departments = departments.filter((dept: WDepartment) => {
             if(dept) return true;
             return false;
