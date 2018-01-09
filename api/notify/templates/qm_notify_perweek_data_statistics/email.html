@@ -1,6 +1,6 @@
 <p style="font-size: 20px;color: #74C7CD">数据统计</p>
 <p style="border-top: 1px solid #EEEEEE;padding-top: 25px;color: #4A4A4A">
-    尊敬的<%=account.name || '' %>,您的企业<%=beginTime.get('M') + 1%>月第<%=weekMap[weekNum]%>周(<%=beginTime.format('MM.DD')%>-<%=endTime.format('MM.DD')%>)使用鲸力商旅的情况如下：<br/></br>
+    尊敬的<%=account.name || '' %>,您的企业(<%=company.name%>)<%=beginTime.get('M') + 1%>月第<%=weekMap[weekNum]%>周(<%=beginTime.format('MM.DD')%>-<%=endTime.format('MM.DD')%>)使用鲸力商旅的情况如下：<br/></br>
 </p>
 <%= include('qm_notify_data_statistics_detail.html') %>
 <a href="<%=detailUrl%>" style="display:block;width: 100px;height: 36px;text-align: center;line-height: 36px; background-color: #28A7FF;color: #ffffff; text-decoration:none;border-radius: 3px;margin-top: 20px">查看详情</a><br/>

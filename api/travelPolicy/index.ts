@@ -300,14 +300,14 @@ export default class TravelPolicyModule{
     static async getTravelPolicies(params: {companyId: string, p?: number, pz?: number,isDefault?: boolean, name?:string}): Promise<any>{
         let {companyId } = params;
         var staff = await Staff.getCurrent();
-
         let company = await Models.company.get(companyId);
         let agencyUser = await AgencyUser.getCurrent();
 
-        if((staff && staff['roleId'] != EStaffRole.ADMIN && staff['roleId'] != EStaffRole.OWNER) ||
+        /*if((staff && staff['roleId'] != EStaffRole.ADMIN && staff['roleId'] != EStaffRole.OWNER) ||
             (agencyUser && agencyUser['agencyId'] != company['agencyId'])) {
             throw L.ERR.PERMISSION_DENY();
-        }
+        }*/
+
         let travelPolicies = await restfulAPIUtil.operateOnModel({
             model: "travelpolicy",
             params: {

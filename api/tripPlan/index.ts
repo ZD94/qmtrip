@@ -25,7 +25,7 @@ import {FindResult} from "common/model/interface";
 import {Staff, PointChange} from "_types/staff";
 import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import { getSession } from "@jingli/dnode-api";
-import {AgencyUser} from "_types/agency";
+import {AgencyUser, Agency} from "_types/agency";
 import {makeSpendReport} from './spendReport';
 import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice} from "_types/tripPlan";
 import {ENoticeType} from "_types/notice/notice";
@@ -214,79 +214,81 @@ class TripPlanModule {
         let coinAccountChange: CoinAccountChange;
         let companyCoinAccountChange: CoinAccountChange;
         let pointChange: PointChange;
+        let unSettledRewardTripPlan: TripPlan;
 
         DB.transaction(async function(t) {
-            let unSettledRewardTripPlan: TripPlan = await Models.tripPlan.get(params.id);  //该次行程
+            unSettledRewardTripPlan= await Models.tripPlan.get(params.id);  //该次行程
 
-        company = await Models.company.get(unSettledRewardTripPlan.companyId);
-        let points2coinRate: number = company.points2coinRate;  //企业余额可转为鲸币的比例
-        let scoreRatio: number = company.scoreRatio;  //企业奖励节省比例
-        companyCoinAccount = await Models.coinAccount.get(company.coinAccountId);
-        let companyBalanceCoins: number = companyCoinAccount.income - companyCoinAccount.consume - companyCoinAccount.locks;  //企业账户余额(鲸币)
+            company = await Models.company.get(unSettledRewardTripPlan.companyId);
+            let points2coinRate: number = company.points2coinRate;  //企业余额可转为鲸币的比例
+            let scoreRatio: number = company.scoreRatio;  //企业奖励节省比例
+            companyCoinAccount = await Models.coinAccount.get(company.coinAccountId);
+            let companyBalanceCoins: number = companyCoinAccount.income - companyCoinAccount.consume - companyCoinAccount.locks;  //企业账户余额(鲸币)
 
-        if (companyBalanceCoins > 0) {   
-            if (companyBalanceCoins > (unSettledRewardTripPlan.saved * scoreRatio * points2coinRate)){  //企业余额足够兑换该员工的节省奖励
-                let rewardMoney: number = unSettledRewardTripPlan.saved * scoreRatio;  //企业对该员工的该次行程的奖励金额
-                
-                unSettledRewardTripPlan.isSettled = true;  //结算flag更改
-                companyCoinAccount.consume += rewardMoney * points2coinRate;  //企业余额扣除相应的奖励金额鲸币
-                await companyCoinAccount.save();
-                
-                staff = await Models.staff.get(unSettledRewardTripPlan.accountId);
-                staff.balancePoints -= rewardMoney;  //员工将由该次行程节省的奖励积分兑换
-                await staff.save();
+            if (companyBalanceCoins > 0) {   
+                if (companyBalanceCoins > (unSettledRewardTripPlan.saved * scoreRatio * points2coinRate)){  //企业余额足够兑换该员工的节省奖励
+                    let rewardMoney: number = unSettledRewardTripPlan.saved * scoreRatio;  //企业对该员工的该次行程的奖励金额
+                    
+                    unSettledRewardTripPlan.isSettled = true;  //结算flag更改
+                    companyCoinAccount.consume = Number(companyCoinAccount.consume) + rewardMoney * points2coinRate;  //企业余额扣除相应的奖励金额鲸币
+                    await companyCoinAccount.save();
+                    
+                    staff = await Models.staff.get(unSettledRewardTripPlan.accountId);
+                    staff.balancePoints = Number(staff.balancePoints) - rewardMoney;  //员工将由该次行程节省的奖励积分兑换
+                    await staff.save();
 
-                unSettledRewardTripPlan.isSettled = true;
-                await unSettledRewardTripPlan.save();  //将该tripPlan的是否结算奖励标志设为true
-                
-                let accountId: string = unSettledRewardTripPlan.accountId;
-                let account = await Models.account.get(accountId);
-                coinAccount = await Models.coinAccount.get(account.coinAccountId);  
-                coinAccount.income += rewardMoney * points2coinRate;  //员工account增加鲸币
-                await coinAccount.save();
+                    unSettledRewardTripPlan.isSettled = true;
+                    await unSettledRewardTripPlan.save();  //将该tripPlan的是否结算奖励标志设为true
+                    
+                    let account = await Models.account.get(staff.accountId);
+                    coinAccount = await Models.coinAccount.get(account.coinAccountId);
+                    coinAccount.income = Number(coinAccount.income) + rewardMoney * points2coinRate;  //员工account增加鲸币
+                    console.log('coinAccount', coinAccount.income);
+                    await coinAccount.save();
 
-                let coins: number = rewardMoney * points2coinRate;
-                companyCoinAccountChange = Models.coinAccountChange.create({  //company coin_account增加鲸币变动记录
-                    coinAccountId: companyCoinAccount.id,
-                    remark: `员工${coinAccount.id}增加奖励鲸币${coins}`,
-                    type: COIN_CHANGE_TYPE.CONSUME,
-                    coins: -coins,
-                    orderNum: getOrderNo()
-                });
-                await companyCoinAccountChange.save();
-                coinAccountChange = Models.coinAccountChange.create({  //员工 coin_account增加鲸币变动记录
-                    coinAccountId: coinAccount.id,
-                    remark: `员工${coinAccount.id}增加奖励鲸币${coins}`,
-                    type: COIN_CHANGE_TYPE.AWARD,
-                    coins: coins,
-                    orderNum: getOrderNo() 
-                });
-                await coinAccountChange.save();
+                    let coins: number = rewardMoney * points2coinRate;
+                    companyCoinAccountChange = Models.coinAccountChange.create({  //company coin_account增加鲸币变动记录
+                        coinAccountId: companyCoinAccount.id,
+                        remark: `员工${coinAccount.id}增加奖励鲸币${coins}`,
+                        type: COIN_CHANGE_TYPE.CONSUME,
+                        coins: -coins,
+                        orderNum: getOrderNo()
+                    });
+                    await companyCoinAccountChange.save();
+                    coinAccountChange = Models.coinAccountChange.create({  //员工 coin_account增加鲸币变动记录
+                        coinAccountId: coinAccount.id,
+                        remark: `员工${coinAccount.id}增加奖励鲸币${coins}`,
+                        type: COIN_CHANGE_TYPE.AWARD,
+                        coins: coins,
+                        orderNum: getOrderNo() 
+                    });
+                    await coinAccountChange.save();
 
-                pointChange = Models.pointChange.create({
-                    staffId: unSettledRewardTripPlan.accountId,
-                    orderId: unSettledRewardTripPlan.id,
-                    companyId: unSettledRewardTripPlan.companyId,
-                    points: -rewardMoney,
-                    remark: `员工${coinAccount.id}兑换奖励积分${rewardMoney}`
-                });
-                await pointChange.save();
+                    pointChange = Models.pointChange.create({
+                        staffId: unSettledRewardTripPlan.accountId,
+                        orderId: unSettledRewardTripPlan.id,
+                        companyId: unSettledRewardTripPlan.companyId,
+                        points: -rewardMoney,
+                        remark: `员工${coinAccount.id}兑换奖励积分${rewardMoney}`
+                    });
+                    await pointChange.save();
+                } else {
+                    //企业余额不足继续兑换，提示充值
+                    console.error('企业余额不足');
+                }
             } else {
-                //企业余额不足继续兑换，提示充值
+                //企业余额不足继续兑换，提示充值 
                 console.error('企业余额不足');
-            }
-        } else {
-            //企业余额不足继续兑换，提示充值 
-            console.error('企业余额不足');
-            }
-        }).catch(async function(err) {
-            await companyCoinAccount.reload();
-            await staff.reload();
-            await coinAccount.reload();
-            await coinAccountChange.reload();
-            await pointChange.reload();
-            throw err;
-        });
+                }
+            }).catch(async function(err) {
+                await companyCoinAccount.reload();
+                await staff.reload();
+                await coinAccount.reload();
+                await coinAccountChange.reload();
+                await pointChange.reload();
+                await unSettledRewardTripPlan.reload();
+                throw err;
+            });
     }
 
     /**
@@ -527,8 +529,12 @@ class TripPlanModule {
     @modelNotNull('tripDetail')
     static async auditPlanInvoice(params: {id: string, auditResult: EAuditStatus, expenditure?: number, reason?: string, invoiceId?: string, version?: number}): Promise<boolean> {
 
-        const SAVED2SCORE = config.score_ratio;
         let tripDetail = await Models.tripDetail.get(params.id);
+        let tripPlanId = tripDetail.tripPlanId;
+        let getTripPlan = await Models.tripPlan.get(tripPlanId);
+        let companyId = getTripPlan.companyId;
+        let company = await Models.company.get(companyId);
+        let SAVED2SCORE = company.scoreRatio;
 
         if((tripDetail.status != EPlanStatus.AUDITING) && (tripDetail.status != EPlanStatus.AUDIT_NOT_PASS)) {
             throw L.ERR.TRIP_PLAN_STATUS_ERR();
@@ -698,6 +704,21 @@ class TripPlanModule {
             }
 
             let user = await AgencyUser.getCurrent();
+            if(!user) {
+                let defaultAgency: Agency[] = await Models.agency.find({
+                    where: {
+                        email: config.default_agency.email
+                    }
+                })
+                if(defaultAgency && defaultAgency.length) {
+                    let users: AgencyUser[] = await Models.agencyUser.find({
+                        where: {
+                            agencyId: defaultAgency[0].id
+                        }
+                    });
+                    if(users && users.length) user = users[0];
+                }
+            }
             let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, tripDetailId: tripDetail.id, userId: user.id, remark: `${templateValue.tripType}票据审核${logResult}`});
             log.save();
 
@@ -734,9 +755,17 @@ class TripPlanModule {
                 staff.balancePoints = staff.balancePoints + tripPlan.score;
                 let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: user.id, remark: `增加员工${tripPlan.score}积分`});
                 await Promise.all([staff.save(), log.save()]);
+                await TripPlanModule.autoSettleReward({id: tripPlan.id});  //出差完成自动结算奖励 
             }
             return true;
         }).catch(async function(err: Error){
+            console.log("审核票据失败", err)
+            await tripPlan.reload();
+            await tripDetail.reload();
+            await invoice.reload();
+
+            tripDetail.status = EPlanStatus.AUDITING;
+            await tripDetail.save();
             invoice.status = EInvoiceStatus.WAIT_AUDIT;
             await invoice.save();
             throw new Error("审核失败");
@@ -921,7 +950,7 @@ class TripPlanModule {
                     console.error(`发送钉钉通知失败`, err);
                 }
             }
-//TODO
+
             //如果出差已经完成，并且节省反积分，并且非特别审批，增加员工积分；若企业账户有余额，直接兑换员工积分为鲸币
             if (tripPlan.status == EPlanStatus.COMPLETE && tripPlan.score > 0 && !tripPlan.isSpecialApprove) {
                 let pc = Models.pointChange.create({
@@ -954,7 +983,6 @@ class TripPlanModule {
                 staff.balancePoints = staff.balancePoints + tripPlan.score;
                 let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: user.id, remark: `增加员工${tripPlan.score}积分`});
                 await Promise.all([staff.save(), log.save()]);
-                await TripPlanModule.autoSettleReward({id: tripPlan.id});  //出差完成自动结算奖励 
             }
 
         }).catch(err => {

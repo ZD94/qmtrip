@@ -81,14 +81,14 @@ export class WDepartment extends OaDepartment {
 
         if(result && result.length){
             for(let i = 0; i < result.length; i++) {
-                if(result[i].id && result[i].id.toString() != self.id) {   //微信企业获取当前部门的子部门列表时，该列表包含该父集部门和其子部门
+                if(result[i].id && result[i].id.toString() != self.id && result[i].parentid.toString() == self.id) {   //微信企业获取当前部门的子部门列表时，该列表包含该父集部门和其子部门
                     childDepartments.push(new WDepartment({
-                        id: result[i].id, 
+                        id: result[i].id + '', 
                         name: result[i].name, 
                         corpId: self.corpId, 
                         restApi: self.restApi,      
                         company: self.company, 
-                        parentId: result[i].parentid
+                        parentId: result[i].parentid + ''
                     }));
                 }
             }
@@ -110,12 +110,12 @@ export class WDepartment extends OaDepartment {
             for(let i = 0; i < result.length; i++) {
                 if(result[i].id && result[i].id.toString() == self.parentId) {
                     dept =  new WDepartment({
-                        id: result[i].id, 
+                        id: result[i].id + '', 
                         name: result[i].name, 
                         corpId: self.corpId, 
                         restApi: self.restApi,
                         company: self.company, 
-                        parentId: result[i].parentid
+                        parentId: result[i].parentid + ''
                     });
                     return dept;
                 }  
@@ -133,17 +133,19 @@ export class WDepartment extends OaDepartment {
         let result: OaStaff[] = [];
         for(let u of wStaffs){
             console.log("员工", u.name, "的状态: ", u.status)
+            let mobile = u.mobile && u.mobile != '' ? u.mobile : null;
+            let email = u.email && u.email != '' ? u.email : null;
             if(u.status != EWechatStaffStatus.disable) {
                 let wstaff = new WStaff({
                     id: u.userid, 
                     name: u.name, 
-                    email: u.email, 
-                    mobile: u.mobile, 
+                    email: email, 
+                    mobile: mobile, 
                     departmentIds: u.department, 
                     corpId: self.corpId,
                     restApi: self.restApi, 
                     company: self.company,
-                    avatar: u. avatar_mediaid,
+                    avatar: u.avatar_mediaid,
                     status: u.status
                 });
                  result.push(wstaff);
@@ -157,8 +159,8 @@ export class WDepartment extends OaDepartment {
         let departments: Array<IWDepartment> = await this.restApi.getDepartments(self.id);
         for(let i = 0; i < departments.length; i++) {
             if(departments[i].id && departments[i].id.toString() == self.id) {
-                return new WDepartment({id: departments[i].id, name: departments[i].name, corpId: self.corpId, restApi: self.restApi,
-                    company: self.company, parentId: departments[i].parentid})
+                return new WDepartment({id: departments[i].id + '', name: departments[i].name, corpId: self.corpId, restApi: self.restApi,
+                    company: self.company, parentId: departments[i].parentid + ''})
             }
         }
         return null;
