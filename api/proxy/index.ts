@@ -326,6 +326,7 @@ class Proxy {
                 params = req.query;
             }
             let staff = await Models.staff.get(staffid);
+            let role = staff.roleId;
             let appSecret = config.permission.appSecret;
             let pathstring = req.path;
             let timestamp = Math.floor(Date.now()/1000);
@@ -345,7 +346,8 @@ class Proxy {
                         appid: config.permission.appId,
                         staffid: staff.id,
                         companyid: staff.companyId,
-                        accountid: staff.accountId
+                        accountid: staff.accountId,
+                        role: role
                     }
                 }, (err, resp, result) => {
                     if (err) {
