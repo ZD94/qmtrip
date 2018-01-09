@@ -15,6 +15,7 @@ import Logger from "@jingli/logger";
 var scheduler = require('common/scheduler');
 var logger = new Logger("wechat");
 let moment = require("moment");
+const md5 = require("md5");
 const API = require('@jingli/dnode-api')
 const config = require('@jingli/config')
 const axios = require('axios')
@@ -24,6 +25,8 @@ const PROVIDER_SECRET = 'kGNDfdXSuzdvAgHC5AC8jaRUjnybKH0LnVK05NPvCV4'
 const login = `https://open.work.weixin.qq.com/wwopen/sso/3rd_qrConnect?appid=wwb398745b82d67068&redirect_uri=https%3A%2F%2Fj.jingli365.com%2F&state=web_login@gyoss9&usertype=admin`
 import cache from 'common/cache'
 import { Request, NextFunction, Response, Application } from 'express-serve-static-core';
+import {restfulAPIUtil } from 'api/restful';
+import CompanyModule, { HotelPriceLimitType } from 'api/company';
 
 const { Parser } = require('xml2js')
 const wxCrypto = require('wechat-crypto')
@@ -91,6 +94,7 @@ export default class SSOModule {
         let agentId: string;
         let company: Company;
         let permanentCode: string;
+        let hasJLCloudNotified = true;
         let suiteToken: string = await SSOModule.getSuiteToken();
         let staff = await Staff.getCurrent();
         if(staff){
@@ -124,6 +128,7 @@ export default class SSOModule {
             let comProperty = await self.getRegisteredCompany(permanentCode, permanentResult.corpId);
             if(!comProperty) {
                 let com =await self.initializeCompany(permanentResult);
+                hasJLCloudNotified = false;
                 company = com.company;
                 corpId = com.corpId;
             }
@@ -144,7 +149,15 @@ export default class SSOModule {
         await wCompany.sync();
         await wCompany.syncAdminRole(suiteToken); //同步企业管理员
         await wCompany.setCompanyCreator();  //随机选中设置创建者
+
+        //向jlbudget同步
+        if(!hasJLCloudNotified) {
+            await CompanyModule.syncCompanyToJLCloud(company,'123456');
+        }
+
     }
+
+
 
 
     /**
@@ -225,8 +238,6 @@ export default class SSOModule {
                 company.createUser = staff.id;
                 company = await company.save();
             }
-
-    
             // let department = Department.create({
             //     name: result.corpName,
             //     companyId: company.id,

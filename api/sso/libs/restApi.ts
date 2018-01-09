@@ -59,12 +59,14 @@ export class RestApi {
         if (typeof result == 'string')
             result = JSON.parse(result)
         console.log("=====>result: ", result)
+        let corpName = result.auth_corp_info.corp_full_name;
+        if(!corpName || corpName == '') corpName = result.auth_corp_info.corp_name;
         // if(result.errcode != 0) return null;
         return {
             accessToken: result.access_token,
             permanentCode: result.permanent_code,
             corpId: result.auth_corp_info.corpid,
-            corpName: result.auth_corp_info.corp_full_name,
+            corpName: corpName,
             expires_in: result.expires_in,
             authUserInfo: {
                 email: result.auth_user_info.email,
