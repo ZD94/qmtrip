@@ -529,8 +529,12 @@ class TripPlanModule {
     @modelNotNull('tripDetail')
     static async auditPlanInvoice(params: {id: string, auditResult: EAuditStatus, expenditure?: number, reason?: string, invoiceId?: string, version?: number}): Promise<boolean> {
 
-        const SAVED2SCORE = config.score_ratio;
         let tripDetail = await Models.tripDetail.get(params.id);
+        let tripPlanId = tripDetail.tripPlanId;
+        let getTripPlan = await Models.tripPlan.get(tripPlanId);
+        let companyId = getTripPlan.companyId;
+        let company = await Models.company.get(companyId);
+        let SAVED2SCORE = company.scoreRatio;
 
         if((tripDetail.status != EPlanStatus.AUDITING) && (tripDetail.status != EPlanStatus.AUDIT_NOT_PASS)) {
             throw L.ERR.TRIP_PLAN_STATUS_ERR();
