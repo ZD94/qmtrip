@@ -123,7 +123,7 @@ export class WStaff extends OaStaff {
                 }
             }));
         }
-        
+
         departments = departments.filter((dept: WDepartment) => {
             if(dept) return true;
             return false;
@@ -137,8 +137,10 @@ export class WStaff extends OaStaff {
         if(typeof self.id != 'string')
             self.id = self.id + '';
         let userInfo: IWStaff = await self.restApi.getStaff(self.id);
-        let oaStaff = new WStaff({id: userInfo.userid, name: userInfo.name, mobile: userInfo.mobile,
-            email: userInfo.email, departmentIds: userInfo.department, corpId: self.corpId, company: self.company,
+        let mobile = userInfo.mobile && userInfo.mobile != '' ? userInfo.mobile : null;
+        let email = userInfo.email && userInfo.email != '' ? userInfo.email : null;
+        let oaStaff = new WStaff({id: userInfo.userid, name: userInfo.name, mobile: mobile,
+            email: email, departmentIds: userInfo.department, corpId: self.corpId, company: self.company,
             avatar: userInfo.avatar_mediaid});
         return oaStaff;
     }
