@@ -17,12 +17,8 @@ export class WorkWechatController extends AbstractController {
 
     @Router('/login', 'POST')
     async loginByWechatCode(req: Request, res: Response) {
-        try {
-            const result = await API['sso'].loginByWechatCode(req.body)
-            return res.json(result)
-        } catch (e) {
-            throw new CustomerError(400, '登录失败')
-        }
+        const result = await API['sso'].loginByWechatCode(req.body)
+        return res.json(result)
     }
 
     @Router('/jssdk', 'POST')
