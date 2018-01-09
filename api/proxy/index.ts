@@ -326,7 +326,10 @@ class Proxy {
                 params = req.query;
             }
             let staff = await Models.staff.get(staffid);
-            let role = staff.roleId;
+            let role: any = null ;
+            if(staff.roleId == 0) {
+                role = 'root'; //表示创建者身份
+            }
             let appSecret = config.permission.appSecret;
             let pathstring = req.path;
             let timestamp = Math.floor(Date.now()/1000);
