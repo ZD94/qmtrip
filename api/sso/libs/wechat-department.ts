@@ -81,7 +81,7 @@ export class WDepartment extends OaDepartment {
 
         if(result && result.length){
             for(let i = 0; i < result.length; i++) {
-                if(result[i].id && result[i].id.toString() != self.id) {   //微信企业获取当前部门的子部门列表时，该列表包含该父集部门和其子部门
+                if(result[i].id && result[i].id.toString() != self.id && result[i].parentid.toString() == self.id) {   //微信企业获取当前部门的子部门列表时，该列表包含该父集部门和其子部门
                     childDepartments.push(new WDepartment({
                         id: result[i].id + '', 
                         name: result[i].name, 
