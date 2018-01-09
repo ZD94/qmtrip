@@ -3,6 +3,7 @@
  */
 import {Models} from "_types";
 import {EApproveResult} from "_types/tripPlan";
+import * as _ from 'lodash/fp';
 const moment = require("moment");
 var API = require('@jingli/dnode-api');
 require('moment-timezone')
@@ -75,5 +76,8 @@ export = async function transform(values: any): Promise<any>{
     }else{
         values.isAutoApprove = false;
     }
+
+    if (values.tripApprove)
+        values.tripApprove.staffs = (await Promise.all(values.tripApprove.staffList.map(Models.staff.get))).map(_.prop('name'))
     return values;
 }
