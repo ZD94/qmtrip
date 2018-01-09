@@ -110,15 +110,6 @@ export class WStaff extends OaStaff {
         let self = this;
         let departments: Array<WDepartment> = [];
         if(self.departmentIds) {
-<<<<<<< HEAD
-            self.departmentIds.map(async (deptId: number|string) => {
-                let wdept: Array<IWDepartment> = await self.restApi.getDepartments(deptId.toString());
-                if(wdept && wdept.length) {
-                    for(let i = 0; i < wdept.length; i++){
-                        if(wdept[i].id && wdept[i].id.toString() == deptId.toString()) {
-                            let dept= new WDepartment({id: wdept[i].id + '', name: wdept[i].name, corpId: self.corpId, restApi: self.restApi,
-                                company: self.company, parentId: wdept[i].parentid + ''})
-=======
             await Promise.all(self.departmentIds.map(async (deptId: number) => {
                 let wdept: Array<IWDepartment> = await self.restApi.getDepartments(deptId.toString());
                 if(wdept && wdept.length) {
@@ -126,7 +117,6 @@ export class WStaff extends OaStaff {
                         if(wdept[i].id && wdept[i].id == deptId) {
                             let dept= new WDepartment({id: wdept[i].id, name: wdept[i].name, corpId: self.corpId, restApi: self.restApi,
                                 company: self.company, parentId: wdept[i].parentid})
->>>>>>> feature/JLS1-310
                             departments.push(dept);
                         }
                     }
