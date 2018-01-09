@@ -9,7 +9,7 @@ import {ACCOUNT_STATUS} from "_types/auth";
 import {Department} from "_types/department";
 import L from '@jingli/language';
 import utils = require("common/utils");
-
+// import {Account} from "_types/auth";
 const DEFAULT_PWD = '000000';
 export  abstract class OaStaff{
     constructor(public target: any){
@@ -153,6 +153,27 @@ export  abstract class OaStaff{
                     // 不存在，添加
                     let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd), avatar: self.avatar});
                     // staff.travelPolicyId = defaultTravelPolicy.id;
+                    //补充逻辑: 当account信息已存在，无须再次创建
+                    // if((self.mobile && self.mobile != '') || (self.email && self.email != '')) {
+                    //     let accounts = await Models.account.find({
+                    //         where: {
+                    //             $or: {
+                    //                 email: self.email,
+                    //                 mobile: self.mobile
+                    //             }
+                    //         }
+                    //     })
+                    //     if(accounts && accounts.length) {
+                    //         staff.accountId = accounts[0].id;
+                    //     } else {
+                    //         let account = Account.create({
+                    //             mobile: self.mobile, 
+                    //             email: self.email
+                    //         });
+                    //         account = await account.save();
+                    //         if(account) staff.accountId = account.id;
+                    //     }
+                    // }
                     staff.company = company;
                     staff.staffStatus = EStaffStatus.ON_JOB;
                     staff.addWay = EAddWay.OA_SYNC;
