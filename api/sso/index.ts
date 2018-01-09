@@ -304,6 +304,18 @@ export default class SSOModule {
         return await API.auth.makeAuthenticateToken(staff.accountId, 'corp_wechat')
     }
 
+    @clientExport
+    @requireParams(['corpId'])
+    static async getPermanentCodeByCorpId({ corpId }: { corpId: string }) {
+        const companyProperties = await Models.companyProperty.find({
+            where: { type: CPropertyType.WECHAT_CORPID, value: corpId }
+        })
+        if (companyProperties.length < 1) throw new L.ERROR_CODE_C(404, '该企业尚未授权')
+        const companies = await Models.companyProperty.find({
+            where: { type: CPropertyType.WECHAT_PERMAENTCODE, company_id: companyProperties[0].companyId }
+        })
+        return companies[0].value
+    }
 }
 
 SSOModule._scheduleTask();
