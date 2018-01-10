@@ -603,6 +603,10 @@ class TripPlanModule {
                 let savedMoney = tripPlan.budget - tripPlan.expenditure;
                 savedMoney = savedMoney > 0 ? savedMoney : 0;
                 tripPlan.score = parseInt((savedMoney * SAVED2SCORE).toString());
+                let staffId = tripPlan.accountId;
+                let staff = await Models.staff.get(staffId);
+                let staffName = staff.name;
+                tripPlan.remark = `员工${staffName}节省${savedMoney}后企业奖励${tripPlan.score}元`;
                 if(tripPlan.isSpecialApprove){
                     tripPlan.saved = 0;
                 }else{
