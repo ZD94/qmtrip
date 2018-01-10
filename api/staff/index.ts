@@ -26,8 +26,9 @@ import {ENoticeType} from "_types/notice/notice";
 import {CoinAccount} from "_types/coin";
 import {StaffDepartment} from "_types/department/staffDepartment";
 import { getSession } from "@jingli/dnode-api";
+import { ACCOUNT_STATUS } from '_types/auth';
 const linkmanCols = Linkman['$fieldnames'];
-
+import * as error from "@jingli/error";
 const invitedLinkCols = InvitedLink['$fieldnames'];
 const staffSupplierInfoCols = StaffSupplierInfo['$fieldnames'];
 const staffAllCols = Staff['$getAllFieldNames']();
@@ -1708,6 +1709,36 @@ class StaffModule{
         operatorId: string,
         type: number
     }): Promise<Linkman> {
+
+        let linkmans = await Models.linkman.find({
+            where: {
+                companyId: params.companyId,
+                mobile: params.mobile
+            }
+        });
+        if(linkmans && linkmans.length)
+            throw new error.NotPermitError("外部联系人手机号已被目标公司的其他外部联系人使用");
+
+        let accounts: Account[] = await Models.accounts.find({
+            where: {
+                mobile: params.mobile,
+                status: {$ne: ACCOUNT_STATUS.FORBIDDEN}
+            }
+        });
+
+        let companyId: string = params.companyId;
+        if(accounts && accounts.length) {
+            let staffs = await Models.staff.find({
+                where: {
+                    companyId: companyId,
+                    accountId: {$in: accounts},
+                    status: EStaffStatus.ON_JOB
+                }
+            });
+            if(staffs && staffs.length)
+                throw new error.NotPermitError("外部联系人手机号已被目标公司的员工使用");
+        }
+        
         let linkman = Models.linkman.create(params);
         linkman = await linkman.save();
         return linkman;
@@ -1730,17 +1761,48 @@ class StaffModule{
         operatorId?: string,
         type?: number
     }): Promise<Linkman> {
-
         let linkman = await Models.linkman.get(params.id);
-        for(let key in params) {
-            linkman[key] = params[key];
+
+        if(params.mobile) {
+            let hasExisted = await Models.linkman.find({
+                where: {
+                    id: { $ne: linkman.id }, 
+                    mobile: params.mobile,
+                    companyId: linkman.companyId
+                }
+            });
+
+            if(hasExisted && hasExisted.length) 
+                throw new error.NotPermitError("外部联系人手机号已被目标公司的其他外部联系人使用");
+
+            let accounts: Account[] = await Models.accounts.find({
+                where: {
+                    mobile: params.mobile,
+                    status: {$ne: ACCOUNT_STATUS.FORBIDDEN}
+                }
+            });
+
+            let companyId: string = params && params.companyId ? params.companyId: linkman.companyId;
+            if(accounts && accounts.length) {
+                let staffs = await Models.staff.find({
+                    where: {
+                        companyId: companyId,
+                        accountId: {$in: accounts},
+                        status: EStaffStatus.ON_JOB
+                    }
+                });
+                if(staffs && staffs.length)
+                    throw new error.NotPermitError("外部联系人手机号已被目标公司的员工使用");
+            }  
         }
+        for(let key in params) 
+            linkman[key] = params[key];
         linkman = await linkman.save();
         return linkman;
     }
 
-        /**
-     * @method 删除外部联系人
+    /**
+     * @method 删除外部联系人, 
      * @param id {string} 外部联系人id
      * @returns {boolean}
      */
