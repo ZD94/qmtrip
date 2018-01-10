@@ -373,14 +373,7 @@ async function dataCallback(req: Request, res: Response, next: NextFunction) {
         new Parser().parseString(rawBody, (err, data) => {
             const resp = crypto.decrypt(data.xml['Encrypt'][0])
             new Parser().parseString(resp.message, async (err, data) => {
-                if (data.xml['InfoType'] == 'suite_ticket'){
-                    await cache.write('suite_ticket', data.xml['SuiteTicket'][0])
-                }
-                    
-                if (data.xml['InfoType'] == 'create_auth') {
-                     await cache.write('create_auth', data.xml['AuthCode']);
-                     eventPush(data.xml['AuthCode']);
-                }
+                await workWechatEventHandlers[data.xml['InfoType']](data.xml)
                 res.send('success')
             })
         })
@@ -411,4 +404,62 @@ export interface WeChatUsrInfo {
     CorpId: string,
     UserId: string,
     DeviceId: string
+}
+
+const workWechatEventHandlers = {
+    // 推送 suite_ticket 事件
+    async suite_ticket(xml: WorkWechatResponse) {
+        await cache.write('suite_ticket', xml.SuiteTicket)
+    },
+    // 授权变更事件
+    async create_auth(xml: WorkWechatResponse) {
+        await cache.write('create_auth',xml.AuthCode);
+        eventPush(xml.AuthCode);
+    },
+    async change_auth(xml: WorkWechatResponse) {
+
+    },
+    async cancel_auth(xml: WorkWechatResponse) {
+
+    },
+    // 通讯录变更事件
+    async change_contact(xml: WorkWechatResponse) {
+        await changeContactEventHandlers[xml['ChangeType']](xml)
+    }
+}
+
+const changeContactEventHandlers = {
+    // 员工变动事件
+    async create_user(xml: WorkWechatResponse) {
+
+    },
+    async update_user(xml: WorkWechatResponse) {
+
+    },
+    async delete_user(xml: WorkWechatResponse) {
+
+    },
+    // 部门变动事件
+    async create_party(xml: WorkWechatResponse) {
+
+    },
+    async update_party(xml: WorkWechatResponse) {
+
+    },
+    async delete_party(xml: WorkWechatResponse) {
+
+    },
+    // 标签成员变更事件
+    async update_tag(xml: WorkWechatResponse) {
+
+    }
+}
+
+export interface WorkWechatResponse {
+    SuiteId: string,
+    InfoType: string,
+    TimeStamp: number,
+    SuiteTicket?: string,
+    AuthCode?: string,
+    AuthCorpId?: string
 }
