@@ -22,7 +22,7 @@ function resetTimeout(req, res, next){
     next();
 }
 
-class Privilege {
+export class Privilege {
     static __public: boolean = true;
 
     static __initHttpApp(app) {
@@ -316,7 +316,7 @@ class Privilege {
      }
 }
 
-export = Privilege;
+
 
 async function verify(req: Request, res: Response, next: Function) {
     if(req.method == 'OPTIONS') {
