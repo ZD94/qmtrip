@@ -93,7 +93,7 @@
 		<tr>
 			<td width="190" valign="top"><%=staff.name%></td>
 			<td width="190" valign="top"><%=staff.mobile%></td>
-			<td width="190" valign="top"><%=staff.roleId%></td>
+			<td width="190" valign="top"><%=staff.id == data.project.manager.id ? "项目负责人" : "项目成员"%></td>
 			<td width="190" valign="top"><%=staff.tp ? staff.tp.name : "暂无"%></td>
 		</tr>
 		<%})%>
