@@ -162,9 +162,63 @@ export default class CompanyModule {
         //默认开启所有公有预订服务商
         await company.setDefaultSupplier();
 
+        await CompanyModule.syncCompanyToJLCloud(company, pwd, params.mobile);
+
         //jlbudget create company record.
+        // try {
+        //     await RestfulAPIUtil.operateOnModel({
+        //         model: "agent",
+        //         params: {
+        //             fields: {
+        //                 name: company.name,
+        //                 priceLimitType: HotelPriceLimitType.NO_SET,
+        //                 appointedPubilcSuppliers: company.appointedPubilcSuppliers,
+        //                 companyId: company.id,
+        //                 mobile: params.mobile,
+        //                 password: md5(pwd)
+        //             },
+        //             method: "post"
+        //         },
+        //         addUrl: 'company/create',
+        //         useProxy: false
+        //     });
+
+        // } catch (e) {
+        //     throw e;
+        // }
+
+        //jlbudget create account record. Waiting jlbudget account identifie online.
+
+        //默认添加 中国大陆(国内）、通用地区（国际）、港澳台 三个地区用于差旅、补助、限价等的管理
+        await initDefaultCompanyRegion(company.id);
+        return { company: company, description: promoCode ? promoCode.description : "" };
+    }
+
+
+    /**
+     * @method 同步新建企业到公有云后台
+     * @param company 
+     */
+    @clientExport
+    static async syncCompanyToJLCloud(company: Company, pwd: string, mobile?: string): Promise<boolean> {
+        let initPassword = '123456';
+        let staff: Staff;
+        if(!mobile) {
+            if(company.createUser)
+                staff = await Models.staff.get(company.createUser);
+            if(staff && staff.mobile && staff.mobile != '')
+                mobile = staff.mobile;
+            if(!mobile) {
+                let managers: Staff[] = await company.getManagers({withOwner: true})
+                let accountIds: string[];
+                if(!managers) mobile = null;
+                for(let staff of managers) {
+                    if(staff.mobile && staff.mobile != '') mobile = staff.mobile; 
+                }
+            }
+        }
         try {
-            await RestfulAPIUtil.operateOnModel({
+            await restfulAPIUtil.operateOnModel({
                 model: "agent",
                 params: {
                     fields: {
@@ -172,7 +226,7 @@ export default class CompanyModule {
                         priceLimitType: HotelPriceLimitType.NO_SET,
                         appointedPubilcSuppliers: company.appointedPubilcSuppliers,
                         companyId: company.id,
-                        mobile: params.mobile,
+                        mobile: mobile,
                         password: md5(pwd)
                     },
                     method: "post"
@@ -180,16 +234,10 @@ export default class CompanyModule {
                 addUrl: 'company/create',
                 useProxy: false
             });
-
         } catch (e) {
             throw e;
         }
-
-        //jlbudget create account record. Waiting jlbudget account identifie online.
-
-        //默认添加 中国大陆(国内）、通用地区（国际）、港澳台 三个地区用于差旅、补助、限价等的管理
-        await initDefaultCompanyRegion(company.id);
-        return { company: company, description: promoCode ? promoCode.description : "" };
+        return true;
     }
 
 

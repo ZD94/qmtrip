@@ -15,6 +15,7 @@ import Logger from "@jingli/logger";
 var scheduler = require('common/scheduler');
 var logger = new Logger("wechat");
 let moment = require("moment");
+const md5 = require("md5");
 const API = require('@jingli/dnode-api')
 const config = require('@jingli/config')
 const axios = require('axios')
@@ -24,6 +25,8 @@ const PROVIDER_SECRET = 'kGNDfdXSuzdvAgHC5AC8jaRUjnybKH0LnVK05NPvCV4'
 const login = `https://open.work.weixin.qq.com/wwopen/sso/3rd_qrConnect?appid=wwb398745b82d67068&redirect_uri=https%3A%2F%2Fj.jingli365.com%2F&state=web_login@gyoss9&usertype=admin`
 import cache from 'common/cache'
 import { Request, NextFunction, Response, Application } from 'express-serve-static-core';
+import {restfulAPIUtil } from 'api/restful';
+import CompanyModule, { HotelPriceLimitType } from 'api/company';
 
 const { Parser } = require('xml2js')
 const wxCrypto = require('wechat-crypto')
@@ -88,8 +91,10 @@ export default class SSOModule {
         let hasComPropertySaved = false;
         let self = this;
         let corpId: string;
+        let agentId: string;
         let company: Company;
         let permanentCode: string;
+        let hasJLCloudNotified = true;
         let suiteToken: string = await SSOModule.getSuiteToken();
         let staff = await Staff.getCurrent();
         if(staff){
@@ -118,10 +123,12 @@ export default class SSOModule {
 
             permanentCode = permanentResult.permanentCode;
             accessToken = permanentResult.accessToken;
+            agentId = permanentResult.authInfo.agentId;
 
             let comProperty = await self.getRegisteredCompany(permanentCode, permanentResult.corpId);
             if(!comProperty) {
                 let com =await self.initializeCompany(permanentResult);
+                hasJLCloudNotified = false;
                 company = com.company;
                 corpId = com.corpId;
             }
@@ -133,22 +140,24 @@ export default class SSOModule {
         }
 
         if(!accessToken) {
-            let result = await  RestApi.getAccessTokenByPermanentCode(corpId, permanentCode, suiteToken)
-            let cacheKey = `wechat:contact:${corpId}:access_token`;  //企业通讯录的access_token
-            let redisCache = new RedisCache();
-            let caches =  {
-                accessToken: result.accessToken,
-                expired: Date.now() + (result.expires_in - 30)* 1000   
-            };
-            await redisCache.set(cacheKey, caches);
-            accessToken = result.accessToken;
+            accessToken = await this.getAccessToken(corpId, permanentCode, suiteToken);
         }
 
         let restApi = new RestApi(accessToken);
-        let wCompany = new WCompany({ id: corpId, name: company.name, restApi, company: company, permanentCode: permanentCode});
+        let wCompany = new WCompany({ id: corpId, name: company.name, restApi, company: company, permanentCode: permanentCode, agentId: agentId});
         await wCompany.saveCompanyProperty({companyId: company.id, permanentCode: permanentCode})
         await wCompany.sync();
+        await wCompany.syncAdminRole(suiteToken); //同步企业管理员
+        await wCompany.setCompanyCreator();  //随机选中设置创建者
+
+        //向jlbudget同步
+        if(!hasJLCloudNotified) {
+            await CompanyModule.syncCompanyToJLCloud(company,'123456');
+        }
+
     }
+
+
 
 
     /**
@@ -229,8 +238,6 @@ export default class SSOModule {
                 company.createUser = staff.id;
                 company = await company.save();
             }
-
-    
             // let department = Department.create({
             //     name: result.corpName,
             //     companyId: company.id,
@@ -253,33 +260,34 @@ export default class SSOModule {
         });
     }
 
-    // /**
-    //  * @method 根据企业的corpid、secret生成企业的accessToken
-    //  * @param secret {string} 
-    //  * @param corpId
-    //  * @return {string} 
-    //  */
-    // async getAccessToken(corpId: string, secret: string): Promise<string>{
-    //     let cacheKey = `wechat:contact:${corpId}:access_token`;  //企业通讯录的access_token
-    //     let cacheResult: {
-    //         accessToken: string,
-    //         expired: number
-    //     } = await this.cache.get(cacheKey);
-    //     let accessToken: string;
-    //     if(cacheResult) accessToken = cacheResult.accessToken;
-    //     if(!cacheResult || (Date.now() - cacheResult.expired > 0)) {
-    //         let result: IAccessToken = await RestApi.getAccessToken(corpId, secret);
-    //         if(!result) return null;
-    //         let value = {
-    //             accessToken: result.access_token,
-    //             expired: Date.now() + (result.expires_in - 30)* 1000   
-    //         };
-    //         accessToken = result.access_token;
-    //         await this.cache.set(cacheKey, value)
-    //     }
-    //     if(!accessToken) throw new error.NotFoundError("===>该企业不存在企业微信corpid或secret")
-    //     return accessToken;
-    // }
+    /**
+     * @method 根据企业的corpid、secret生成企业的accessToken
+     * @param secret {string} 
+     * @param corpId
+     * @return {string} 
+     */
+    async getAccessToken(corpId: string, permanentCode: string, suiteToken: string): Promise<string>{
+        let cacheKey = `wechat:contact:${corpId}:access_token`;  //企业通讯录的access_token
+        let redisCache = new RedisCache();
+        let cacheResult: {
+            accessToken: string,
+            expired: number
+        } = await redisCache.get(cacheKey);
+        let accessToken: string;
+        if(cacheResult) accessToken = cacheResult.accessToken;
+        if(!cacheResult || (Date.now() - cacheResult.expired > 0)) {
+            let result = await RestApi.getAccessTokenByPermanentCode(corpId, permanentCode, suiteToken);
+            if(!result) return null;
+            let value = {
+                accessToken: result.accessToken,
+                expired: Date.now() + (result.expires_in - 30)* 1000   
+            };
+            accessToken = result.accessToken;
+            await this.cache.set(cacheKey, value)
+        }
+        if(!accessToken) throw new error.NotFoundError("获取通讯录的accessToken失败")
+        return accessToken;
+    }
 
     @clientExport
     @requireParams(['code'])
