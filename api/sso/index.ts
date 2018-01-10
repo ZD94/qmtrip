@@ -152,7 +152,7 @@ export default class SSOModule {
 
         //向jlbudget同步
         if(!hasJLCloudNotified) {
-            await CompanyModule.syncCompanyToJLCloud(company,'123456');
+            await API.company.syncCompanyToJLCloud(company,'123456');
         }
 
     }
@@ -314,6 +314,7 @@ export default class SSOModule {
         if (!staff) throw L.ERR.USER_NOT_EXIST()
         return await API.auth.makeAuthenticateToken(staff.accountId, 'corp_wechat')
     }
+
 
     @clientExport
     @requireParams(['corpId'])
