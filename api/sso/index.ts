@@ -304,7 +304,7 @@ export default class SSOModule {
         const staff = staffs.filter(s => s.company.id == companyProperties[0].companyId)[0]
         console.log('staff:', staff)
         if (!staff) throw L.ERR.USER_NOT_EXIST()
-        return await API.auth.makeAuthenticateToken(staff.accountId, 'corp_wechat')
+        return { data: await API.auth.makeAuthenticateToken(staff.accountId, 'corp_wechat'), corpId: usrInfo.CorpId }
     }
 
     @clientExport
