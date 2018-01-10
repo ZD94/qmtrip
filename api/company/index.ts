@@ -23,7 +23,7 @@ import { md5 } from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
 import { CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE } from "_types/coin";
 import { restfulAPIUtil } from "api/restful";
-import { TripPlan } from '_types/tripPlan';
+import { TripPlan, ISegment } from '_types/tripPlan';
 let RestfulAPIUtil = restfulAPIUtil;
 
 
@@ -341,6 +341,51 @@ export default class CompanyModule {
         }
 
         return true;
+    }
+
+    /**
+     * @method 验证公司
+     * @param params.tripNum {number} 此次出差需要的行程点数
+     * @param params.company {Company} 出差人所在公司
+     * @param params.acccountId {string} 出差人的staffId
+     * @param params.query {} 此次出差的参数，包括目的地列表、
+     */
+    @clientExport
+    @requireParams(['companyId', 'tripNum', 'query', 'accountId'])
+    static async verifyCompanyTripNum(params: {
+        tripNum: number,
+        companyId: string,
+        accountId: string,
+        query: any,
+    }): Promise<{ company: Company, frozenNum: { limitFrozen: number, extraFrozen: number } }> {
+        let { tripNum, companyId, accountId, query } = params;
+        let company = await Models.company.get(companyId);
+        await company.beforeGoTrip({ number: tripNum });
+
+        let destinationPlaces = query.destinationPlacesInfo;
+        let content = '';
+
+        if (query && query.originPlace) {
+            let originCity = await API.place.getCityInfo({ cityCode: query.originPlace, companyId: company.id });
+            content = content + originCity.name + "-";
+        }
+        if (destinationPlaces && _.isArray(destinationPlaces) && destinationPlaces.length > 0) {
+            for (let i = 0; i < destinationPlaces.length; i++) {
+                let segment: ISegment = destinationPlaces[i]
+                let destinationCity = await API.place.getCityInfo({ cityCode: segment.destinationPlace, companyId: company.id });
+                if (i < destinationPlaces.length - 1) {
+                    content = content + destinationCity.name + "-";
+                } else {
+                    content = content + destinationCity.name;
+                }
+            }
+        }
+
+        let result = await company.frozenTripPlanNum({
+            accountId: accountId, number: tripNum,
+            remark: "提交出差申请消耗行程点数", content: content
+        });
+        return result;
     }
 
 
