@@ -160,15 +160,8 @@ export default class ApiTravelBudget {
         } catch (err) {
             console.log(err);
         }
-        //获取城市ID
-        // let currentStaff = await Staff.getCurrent();
-        // let staffId = currentStaff.id;
-        // let staff = await Models.staff.get(staffId);
-        // let companyId = staff.company.id;
-        // console.log(companyId,"<=========================companyId")
-        await ApiTravelBudget.getCompanyInfo();
 
-
+        let companyInfo = await ApiTravelBudget.getCompanyInfo();
         if (result.code == 0) {
             commonData = result.data.data;
         }
@@ -774,8 +767,9 @@ export default class ApiTravelBudget {
         let staffId = currentStaff.id;
         let staff = await Models.staff.get(staffId);
         let companyId = staff.company.id;
+        let result;
         try {
-            let result = await RestfulAPIUtil.operateOnModel({
+             result = await RestfulAPIUtil.operateOnModel({
                 params: {
                     method: 'put',
                     fields: {
@@ -785,6 +779,7 @@ export default class ApiTravelBudget {
                 addUrl: `${companyId}/data`,
                 model: "TmcSupplier"
             })
+            return result
         } catch (err) {
             console.log(err);
         }
