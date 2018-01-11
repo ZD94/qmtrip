@@ -1717,7 +1717,8 @@ class StaffModule{
             }
         });
         if(linkmans && linkmans.length)
-            throw new error.NotPermitError("外部联系人手机号已被目标公司的其他外部联系人使用");
+            throw new Error("外部联系人手机号已被目标公司的其他外部联系人使用");
+            // throw new error.NotPermitError("外部联系人手机号已被目标公司的其他外部联系人使用");
 
         let accounts: Account[] = await Models.accounts.find({
             where: {
@@ -1736,7 +1737,8 @@ class StaffModule{
                 }
             });
             if(staffs && staffs.length)
-                throw new error.NotPermitError("外部联系人手机号已被目标公司的员工使用");
+                throw new Error("外部联系人手机号已被目标公司的员工使用");
+                // throw new error.NotPermitError("外部联系人手机号已被目标公司的员工使用");
         }
         
         let linkman = Models.linkman.create(params);
@@ -1773,7 +1775,8 @@ class StaffModule{
             });
 
             if(hasExisted && hasExisted.length) 
-                throw new error.NotPermitError("外部联系人手机号已被目标公司的其他外部联系人使用");
+                throw new Error("外部联系人手机号已被目标公司的其他外部联系人使用");
+                // throw new error.NotPermitError("外部联系人手机号已被目标公司的其他外部联系人使用");
 
             let accounts: Account[] = await Models.accounts.find({
                 where: {
@@ -1792,7 +1795,8 @@ class StaffModule{
                     }
                 });
                 if(staffs && staffs.length)
-                    throw new error.NotPermitError("外部联系人手机号已被目标公司的员工使用");
+                    throw new Error("外部联系人手机号已被目标公司的员工使用");
+                    // throw new error.NotPermitError("外部联系人手机号已被目标公司的员工使用");
             }  
         }
         for(let key in params) 
