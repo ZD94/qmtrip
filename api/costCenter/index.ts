@@ -247,6 +247,17 @@ export default class CostCenterModule {
         return { ids: ids, count: paginate['total'] };
     }
 
+    @clientExport
+    static async budgetLogList(params: {costId: string, limit: number, offset: number}) {
+        return await Models.budgetLog.find({
+            where: {
+                costCenterId: params.costId
+            },
+            limit: params.limit,
+            offset: params.limit * params.offset
+        })
+    }
+
     /****************************************BudgetLog end************************************************/
 
     @clientExport
