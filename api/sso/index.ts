@@ -119,7 +119,8 @@ export default class SSOModule {
             let permanentResult: IWPermanentCode = await RestApi.getPermanentCode(suiteToken, authCode)
             console.log("======>permanentResult: ", permanentResult)
             if(!permanentResult)
-                throw new error.NotPermitError(`永久授权码获取失败`)
+                throw new Error("永久授权码获取失败")
+                // throw new error.NotPermitError(`永久授权码获取失败`)
 
             permanentCode = permanentResult.permanentCode;
             accessToken = permanentResult.accessToken;
@@ -185,7 +186,9 @@ export default class SSOModule {
      */
     async initializeCompany(result: IWPermanentCode | any): Promise<{company: Company, corpId: string, permanentCode: string}> {
         let permanentCode = result.permanentCode;
-        if(!permanentCode) throw new error.ParamsNotValidError("永久授权码不存在");
+        if(!permanentCode)
+            throw new Error("永久授权码不存在")
+            // throw new error.ParamsNotValidError("永久授权码不存在");
         let companyProperty = await Models.companyProperty.find({
             where: {
                 value: result.corpId,
@@ -285,7 +288,9 @@ export default class SSOModule {
             accessToken = result.accessToken;
             await this.cache.set(cacheKey, value)
         }
-        if(!accessToken) throw new error.NotFoundError("获取通讯录的accessToken失败")
+        if(!accessToken) 
+            throw new Error("获取通讯录的accessToken失败")
+            // throw new error.NotFoundError("获取通讯录的accessToken失败")
         return accessToken;
     }
 

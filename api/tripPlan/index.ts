@@ -389,7 +389,8 @@ class TripPlanModule {
     static async updateTripDetail(params: TripDetail): Promise<TripDetail> {
         let tripDetail =  await Models.tripDetail.get(params.id);
         if(!tripDetail) 
-            throw new error.ParamsNotValidError("指定tripDetail不存在, id: ", params.id);
+            throw new Error(`指定tripDetail不存在, id: ${params.id}`)
+            // throw new error.ParamsNotValidError("指定tripDetail不存在, id: ", params.id);
         for(let key in params) {
             tripDetail[key] = params[key];
         }

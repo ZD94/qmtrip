@@ -164,7 +164,7 @@ export class WStaff extends OaStaff {
         let userInfo: IWStaff = await self.restApi.getStaff(self.id);
         let mobile = userInfo.mobile && userInfo.mobile != '' ? userInfo.mobile : null;
         let email = userInfo.email && userInfo.email != '' ? userInfo.email : null;
-        let oaStaff = new WStaff({id: userInfo.userid, name: userInfo.name, mobile: mobile,
+        let oaStaff = new WStaff({id: userInfo.userid, restApi: self.restApi, name: userInfo.name, mobile: mobile,
             email: email, departmentIds: userInfo.department, corpId: self.corpId, company: self.company,
             avatar: userInfo.avatar_mediaid});
         return oaStaff;
