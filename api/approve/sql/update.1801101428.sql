@@ -1,0 +1,1 @@
+update approve.approves set "trip_approve_status" = 1;

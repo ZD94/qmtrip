@@ -108,7 +108,6 @@ export class WCompany extends OaCompany {
         }
         return true;
     }
-
     /**
      * @method 初始化公司时，随机在管理员列表中选中设置为创建人
      * @return {Promise<boolean>}

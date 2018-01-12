@@ -30,17 +30,18 @@ module.exports = function(app: Application) {
         timeout: 180000,
     }));
     app.options(url, cors(corsOptions), function (req, res, next) {
-        let referer = req.headers['referer'] as string;
-        let host;
-        if (!referer) {
-            host = parseHost(req);
-        } else { 
-            let url = urlModule.parse(referer);
-            host = parseHost(url);
-        }
-        res.header('Access-Control-Allow-Origin', host);
-        res.header('Access-Control-Allow-Credentials', 'true');
-        res.sendStatus(200);
+        // let referer = req.headers['referer'] as string;
+        // let host;
+        // if (!referer) {
+        //     host = parseHost(req);
+        // } else { 
+        //     let url = urlModule.parse(referer);
+        //     host = parseHost(url);
+        // }
+        // res.header('Access-Control-Allow-Origin', host);
+        // res.header('Access-Control-Allow-Credentials', 'true');
+
+        return res.sendStatus(200);
     })
 
     function parseHost(obj: { host?: string, protocol?: string}): string { 

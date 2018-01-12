@@ -239,9 +239,8 @@ export class RestApi {
         const ticket = await cache.read('jsapi-ticket')
         if (ticket) return ticket
         const result: JsApiTicket = await reqProxy({
-            url: '',
-            method: 'GET',
-            qs: { access_token: accessToken }
+            url: 'https://qyapi.weixin.qq.com/cgi-bin/get_jsapi_ticket?access_token=' + accessToken,
+            method: 'GET'            
         })
         if (!result || result.errcode != 0) return null
         await cache.write('jsapi-ticket', result.ticket, result.expires_in)
