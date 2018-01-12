@@ -248,10 +248,16 @@ export default class CostCenterModule {
     }
 
     @clientExport
-    static async budgetLogList(params: {costId: string, limit: number, offset: number}) {
+    static async budgetLogList(params: { costId: string, limit: number, offset: number, period: { start: Date, end: Date } }) {
         return await Models.budgetLog.find({
             where: {
-                costCenterId: params.costId
+                costCenterId: params.costId,
+                createdAt: {
+                    $and: {
+                        $gte: add8Hours(params.period.start),
+                        $lte: add8Hours(params.period.end)
+                    }
+                }
             },
             limit: params.limit,
             offset: params.limit * params.offset
