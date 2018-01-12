@@ -200,7 +200,7 @@ export class WCompany extends OaCompany {
 
         let oaStaff = new WStaff({id: userInfo.userid, name: userInfo.name, mobile: userInfo.mobile,
             email: userInfo.email, departmentIds: userInfo.department, corpId: self.id, company: self.company,
-            avatar: userInfo.avatar_mediaid});
+            restApi: self.restApi, avatar: userInfo.avatar_mediaid});
         return oaStaff;
     }
 

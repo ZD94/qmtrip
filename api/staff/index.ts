@@ -26,7 +26,7 @@ import {ENoticeType} from "_types/notice/notice";
 import {CoinAccount} from "_types/coin";
 import {StaffDepartment} from "_types/department/staffDepartment";
 import { getSession } from "@jingli/dnode-api";
-import { ACCOUNT_STATUS } from '_types/auth';
+import { ACCOUNT_STATUS, Account } from '_types/auth';
 const linkmanCols = Linkman['$fieldnames'];
 import * as error from "@jingli/error";
 const invitedLinkCols = InvitedLink['$fieldnames'];
@@ -1720,20 +1720,23 @@ class StaffModule{
             throw new Error("外部联系人手机号已被目标公司的其他外部联系人使用");
             // throw new error.NotPermitError("外部联系人手机号已被目标公司的其他外部联系人使用");
 
-        let accounts: Account[] = await Models.accounts.find({
+        let accounts: Account[] = await Models.account.find({
             where: {
                 mobile: params.mobile,
                 status: {$ne: ACCOUNT_STATUS.FORBIDDEN}
             }
         });
 
+        let accountIds = await Promise.all(accounts.map(async (account: Account) => {
+            return account.id;
+        }))
         let companyId: string = params.companyId;
         if(accounts && accounts.length) {
             let staffs = await Models.staff.find({
                 where: {
                     companyId: companyId,
-                    accountId: {$in: accounts},
-                    status: EStaffStatus.ON_JOB
+                    accountId: {$in: accountIds},
+                    staffStatus: EStaffStatus.ON_JOB
                 }
             });
             if(staffs && staffs.length)
@@ -1778,20 +1781,24 @@ class StaffModule{
                 throw new Error("外部联系人手机号已被目标公司的其他外部联系人使用");
                 // throw new error.NotPermitError("外部联系人手机号已被目标公司的其他外部联系人使用");
 
-            let accounts: Account[] = await Models.accounts.find({
+            let accounts: Account[] = await Models.account.all({
                 where: {
                     mobile: params.mobile,
                     status: {$ne: ACCOUNT_STATUS.FORBIDDEN}
                 }
             });
 
+            let accountIds = await Promise.all(accounts.map(async (account: Account) => {
+                return account.id
+            }))
+
             let companyId: string = params && params.companyId ? params.companyId: linkman.companyId;
             if(accounts && accounts.length) {
                 let staffs = await Models.staff.find({
                     where: {
                         companyId: companyId,
-                        accountId: {$in: accounts},
-                        status: EStaffStatus.ON_JOB
+                        accountId: {$in: accountIds},
+                        staffStatus: EStaffStatus.ON_JOB
                     }
                 });
                 if(staffs && staffs.length)
