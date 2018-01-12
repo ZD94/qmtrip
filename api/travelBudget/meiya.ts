@@ -29,9 +29,10 @@ export function meiyaAuth(info?: object) {
     if (!info) {
         info = {
             username: "JingLiZhiXiang",
-            password: "123456"
+            password: "asdasdasdas"
         };
     }
+    console.log(info, "<================csdcsdcscs")
     let str = JSON.stringify(info);
     str = encodeURIComponent(str);
     return str;
@@ -57,15 +58,23 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData) 
     };
     let urlFlight = config.orderSysConfig.orderLink + "/tmc/searchFlight/getList/" + `${params.originPlaceId}/${params.destinationId}/${meiyaParam.depDate}`;
     console.log("urlFlight====>", urlFlight);
-    let meiyaResult = await request({
-        url: urlFlight,
-        method: "get",
-        // qs: meiyaParam,
-        headers: {
-            auth: meiyaAuth(),
-            supplier: "meiya"
-        }
-    });
+    let meiyaResult;
+    for (let item of authData) {
+        let info = item.identify;
+        let sname = item.sname;
+
+        meiyaResult = await request({
+            url: urlFlight,
+            method: "get",
+            // qs: meiyaParam,
+            headers: {
+                auth: meiyaAuth(info),
+                supplier: sname
+            }
+        }).catch(e => {
+            console.log(e)
+        });
+    }
 
     try {
         meiyaResult = JSON.parse(meiyaResult);
@@ -90,17 +99,23 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData) {
     };
     let urlTrain = config.orderSysConfig.orderLink + "/tmc/searchTrains/getList" + `/${meiyaParam.depCity}/${meiyaParam.arrCity}/${meiyaParam.depDate}`;
     console.log("urlTrain===================>", urlTrain);
+    let meiyaResult;
+    for (let item of authData) {
+        let info = item.identify;
+        let sname = item.sname;
 
-    let meiyaResult = await request({
-        url: urlTrain,
-        method: "get",
-        // qs: meiyaParam,
-        headers: {
-            auth: meiyaAuth(),
-            supplier: "meiya"
-        }
-    });
-
+        meiyaResult = await request({
+            url: urlTrain,
+            method: "get",
+            // qs: meiyaParam,
+            headers: {
+                auth: meiyaAuth(info),
+                supplier: sname
+            }
+        }).catch(e => {
+            console.log(e)
+        });
+    }
     try {
         meiyaResult = JSON.parse(meiyaResult);
     } catch (e) {
@@ -125,23 +140,24 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData) {
     console.log("urlHotel =====>", urlHotel);
     let meiyaResult;
     for (let item of authData) {
-        let info = item.identify
+        let info = item.identify;
         let sname = item.sname;
 
         meiyaResult = await request({
-            url: "http://t.jingli365.com/proj/svr-tmc/SearchHotel/getList/CT_131/2018-01-20/2018-01-21",
+            url: urlHotel,
             method: "get",
-            qs: {},
+            // qs: meiyaParam,
             headers: {
-                auth: meiyaAuth(),
+                auth: meiyaAuth(info),
                 supplier: sname
             }
+        }).catch(e => {
+            console.log(e)
         });
     }
 
     try {
         meiyaResult = JSON.parse(meiyaResult);
-        console.info(meiyaResult.code,"<===============meiyaResult")
     } catch (e) {
     }
 
