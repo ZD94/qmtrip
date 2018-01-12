@@ -3,7 +3,7 @@
  */
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { Models } from '_types'
-import { ETripType, EInvoiceType, ICreateBudgetAndApproveParams, ICreateBudgetAndApproveParamsNew, ISegment } from "_types/tripPlan";
+import { ETripType, EInvoiceType, ICreateBudgetAndApproveParams, ICreateBudgetAndApproveParamsNew, ISegment, QMEApproveStatus } from "_types/tripPlan";
 import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
 import L from '@jingli/language';
@@ -483,9 +483,12 @@ export default class ApiTravelBudget {
 
         // check tripApprove status; if passed, rejected or locked, the budget will not be updated
         let checkTripApproveStatus = await API.tripApprove.getTripApprove({id: approve.id});
+        let lockBudget: boolean = checkTripApproveStatus['lockBudget'];
         let tripApproveStatus = checkTripApproveStatus ? checkTripApproveStatus['status'] : null;
-        if (tripApproveStatus && (tripApproveStatus == 1 || tripApproveStatus == -1 || tripApproveStatus == 2)) {
+        if (lockBudget || (tripApproveStatus && (tripApproveStatus == QMEApproveStatus.PASS ||
+             tripApproveStatus == QMEApproveStatus.REJECT))) {
             console.log('tripApproveStatus----->  ', tripApproveStatus);
+            console.log('lockBudget------------->   ', lockBudget);
             console.log('NO UPDATE BUDGET ANY MORE');
         } else {  // else update as usual
             let isFinalInApprove: boolean = false;
@@ -642,6 +645,18 @@ export default class ApiTravelBudget {
         }
         let approveUser: Staff = params['approveUser'];
 
+        if (approveId) {
+            let tripApprove = await API.tripApprove.getTripApprove({id: approveId});
+            let lockBudget: boolean = tripApprove['lockBudget'];
+            let checkApprove = await Models.approve.get(approveId);
+            let approveStatus = checkApprove['tripApproveStatus'];
+            if (approveStatus == QMEApproveStatus.PASS || approveStatus == QMEApproveStatus.REJECT ||
+            approveStatus == QMEApproveStatus.CANCEL) {  //若审批已通过、驳回或已撤销，锁定budget不再更新
+                await API.tripApprove.updateBudget({id: approveId, lockBudget: true});
+            } else {   // 否则将lockBudget标示置回初始值，接受budget更新
+                await API.tripApprove.updateBudget({id: approveId, lockBudget: false});
+            }
+        }
 
         let approve;
         if (!isIntoApprove) {  //判断是否是审批人查看审批单时进行的第二次拉取数据 
@@ -650,9 +665,10 @@ export default class ApiTravelBudget {
                 approveUser: params.approveUser.id,
                 type: EApproveType.TRAVEL_BUDGET,
                 companyId: companyId,
-                staffList: params.staffList
+                staffList: params.staffList,
+                submitter: staffId,
+                tripApproveStatus: QMEApproveStatus.WAIT_APPROVE
             });
-            approve = await approve.save();
             approveId = approve.id;
             console.log('createApproveId', approveId);
         }
@@ -670,6 +686,8 @@ export default class ApiTravelBudget {
             isRoundTrip: params.isRoundTrip,        //是否为往返
             goBackPlace: params.goBackPlace         //返回地
         });
+        approve = await approve.save();
+        
 
         let segmentsBudget = budgetResult.budgets;
 
