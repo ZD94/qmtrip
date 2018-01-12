@@ -3,7 +3,7 @@
  */
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { Models } from '_types'
-import { ETripType, EInvoiceType, ICreateBudgetAndApproveParams, ICreateBudgetAndApproveParamsNew, ISegment, QMEApproveStatus } from "_types/tripPlan";
+import { ETripType, EInvoiceType, ICreateBudgetAndApproveParams, ICreateBudgetAndApproveParamsNew, ISegment, QMEApproveStatus, EApproveResult } from "_types/tripPlan";
 import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
 import L from '@jingli/language';
@@ -25,7 +25,7 @@ let RestfulAPIUtil = restfulAPIUtil;
 import * as CLS from 'continuation-local-storage';
 import { DB } from "@jingli/database";
 import { Company } from "_types/company";
-import { EApproveType, STEP } from '_types/approve';
+import { EApproveType, STEP, EApproveStatus } from '_types/approve';
 import { Transaction } from 'sequelize';
 import CompanyModule from 'api/company';
 var CLSNS = CLS.getNamespace('dnode-api-context');
@@ -541,6 +541,13 @@ export default class ApiTravelBudget {
                     let params = { approveNo: approve.id };
                     let tripApprove = await API.tripApprove.retrieveDetailFromApprove(params);
                     let returnApprove = await API.eventListener.sendEventNotice({ eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: approve.companyId });
+                    let tripPlanLog = Models.tripPlanLog.create({
+                        tripPlanId: approve.id,
+                        userId: approve.submitter,
+                        remark: '提交审批单，等待审批',
+                        approveStatus: EApproveResult.WAIT_APPROVE
+                    });
+                    await tripPlanLog.save();
                 }
             } else {  //最终结果已经返回过，现在只用新预算中的最终结果进行比较，若大于现在显示的最终预算则更新，否则不更新
                 console.log('second time------------->');
@@ -638,10 +645,16 @@ export default class ApiTravelBudget {
         let feeCollected = params['feeCollected'];
         let departmentId: string = '';
         let projectId: string = '';
+        let feeCollectedName = '';
         if (feeCollectedType == 0) {
             departmentId = feeCollected;
+            let department = await Models.department.get(departmentId);
+            feeCollectedName = department.name;
+
         } else if (feeCollectedType == 1) {
             projectId = feeCollected;
+            let project = await Models.project.get(projectId);
+            feeCollectedName = project.name;
         }
         let approveUser: Staff = params['approveUser'];
 
@@ -667,7 +680,8 @@ export default class ApiTravelBudget {
                 companyId: companyId,
                 staffList: params.staffList,
                 submitter: staffId,
-                tripApproveStatus: QMEApproveStatus.WAIT_APPROVE
+                tripApproveStatus: QMEApproveStatus.WAIT_APPROVE,
+                title: feeCollectedName
             });
             approveId = approve.id;
             console.log('createApproveId', approveId);
