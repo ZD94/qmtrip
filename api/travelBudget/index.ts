@@ -483,10 +483,10 @@ export default class ApiTravelBudget {
 
         // check tripApprove status; if passed, rejected or locked, the budget will not be updated
         let checkTripApproveStatus = await API.tripApprove.getTripApprove({id: approve.id});
-        let lockBudget: boolean = checkTripApproveStatus['lockBudget'];
+        let lockBudget: boolean = checkTripApproveStatus ? checkTripApproveStatus['lockBudget'] : null;
         let tripApproveStatus = checkTripApproveStatus ? checkTripApproveStatus['status'] : null;
-        if (lockBudget || (tripApproveStatus && (tripApproveStatus == QMEApproveStatus.PASS ||
-             tripApproveStatus == QMEApproveStatus.REJECT))) {
+        if ((tripApproveStatus && (tripApproveStatus == QMEApproveStatus.PASS ||
+             tripApproveStatus == QMEApproveStatus.REJECT)) || lockBudget) {
             console.log('tripApproveStatus----->  ', tripApproveStatus);
             console.log('lockBudget------------->   ', lockBudget);
             console.log('NO UPDATE BUDGET ANY MORE');
@@ -622,7 +622,7 @@ export default class ApiTravelBudget {
         let company = await Models.company.get(companyId);
         let travelPolicy = await staff.getTravelPolicy();
         if (!travelPolicy) {
-            throw L.ERR.ERROR_CODE_C(500, `差旅标准还未设置`);
+            throw L.ERR.ERROR_CODE(500, `差旅标准还未设置`);
         }
         params.travelPolicyId = travelPolicy.id;
 
