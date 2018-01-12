@@ -318,6 +318,7 @@ class Privilege {
 
 export = Privilege;
 
+
 async function verify(req: Request, res: Response, next: Function) {
     if(req.method == 'OPTIONS') {
         return next();

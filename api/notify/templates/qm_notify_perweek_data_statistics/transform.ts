@@ -5,7 +5,7 @@ let moment = require('moment');
 
 export = async function transform(values: any): Promise<any>{
     let beginTime = moment().subtract(7, 'days');
-    let endTime = moment();
+    let endTime = moment().subtract(1, 'days');
 
     let weekNum = getWeekOfMonth(beginTime);
     values.weekNum = weekNum;

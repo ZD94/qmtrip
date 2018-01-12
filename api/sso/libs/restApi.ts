@@ -2,7 +2,7 @@ import { WStaff, IWStaff } from "api/sso/libs/wechat-staff";
 import { IWDepartment } from "api/sso/libs/wechat-department";
 import { Express } from "express-serve-static-core";
 var request = require("request-promise");
-
+import cache from 'common/cache';
 
 const enum EIteratorSwitch {
     ACCESS_ITERATABLE = 1,  //表示迭代获取
@@ -56,15 +56,17 @@ export class RestApi {
                 auth_code: authCode
             }
         });
-        if(typeof result == 'string') 
+        if (typeof result == 'string')
             result = JSON.parse(result)
         console.log("=====>result: ", result)
+        let corpName = result.auth_corp_info.corp_full_name;
+        if(!corpName || corpName == '') corpName = result.auth_corp_info.corp_name;
         // if(result.errcode != 0) return null;
         return {
             accessToken: result.access_token,
             permanentCode: result.permanent_code,
             corpId: result.auth_corp_info.corpid,
-            corpName: result.auth_corp_info.corp_full_name,
+            corpName: corpName,
             expires_in: result.expires_in,
             authUserInfo: {
                 email: result.auth_user_info.email,
@@ -72,8 +74,38 @@ export class RestApi {
                 userId: result.auth_user_info.userid,
                 name: result.auth_user_info.name,
                 avatar: result.auth_user_info.avatar,
+            }, 
+            authInfo: {
+                agentId:   result.auth_info && result.auth_info.agent && result.auth_info.agent.length ? result.auth_info.agent[0].agentid: null,
+                appId: result.auth_info && result.auth_info.agent && result.auth_info.agent.length ? result.auth_info.agent[0].appid: null,            
+                name: result.auth_info && result.auth_info.agent && result.auth_info.agent.length ? result.auth_info.agent[0].name: null,
             }
         } as IWPermanentCode;
+    }
+
+
+   
+
+    /**
+     * @method 根据suiteToken获取该公司的管理员列表
+     * @param suiteToken {string} 套件令牌
+     * @param agentId {string} 应用id
+     */
+    async getAdminList(corpId: string, agentId: string, suiteToken: string): Promise<Array<IWAdminList>> {
+        let url = `https://qyapi.weixin.qq.com/cgi-bin/service/get_admin_list?suite_access_token=${suiteToken}`;
+       
+        let body = {
+            auth_corpid: corpId,
+            agentid: agentId
+        }
+        let result: IWAdminListResult = await reqProxy({
+            url,
+            method: 'POST',
+            body
+        });
+        if (!result || result.errcode != 0)
+            return null;
+        return result.admin
     }
 
     /**
@@ -199,8 +231,21 @@ export class RestApi {
             method: 'GET',
             qs
         });
-        if(!result || !result.userlist) return null;
+        if (!result || !result.userlist) return null;
         return result.userlist;
+    }
+
+    static async getJsApiTicket(accessToken: string): Promise<string> {
+        const ticket = await cache.read('jsapi-ticket')
+        if (ticket) return ticket
+        const result: JsApiTicket = await reqProxy({
+            url: '',
+            method: 'GET',
+            qs: { access_token: accessToken }
+        })
+        if (!result || result.errcode != 0) return null
+        await cache.write('jsapi-ticket', result.ticket, result.expires_in)
+        return result.ticket
     }
 }
 
@@ -283,7 +328,7 @@ export interface IWPermanentCodeResult {
         corp_wxqrcode: string
     },
     auth_info: {
-        agent: any
+        agent: any  //类型为IWAgent
     }
     auth_user_info: {
         email: string,
@@ -306,5 +351,46 @@ export interface IWPermanentCode {
         userId: string,
         name: string,
         avatar: string
+    },
+    authInfo: {
+        agentId: string,
+        appId: string,
+        name?: string
     }
 }
+
+export interface IWAgent {
+    agentid: number,
+    name?: string,
+    round_logo_url?: string,
+    square_logo_url?: string,
+    appid: number,
+    privilege?: {
+        level?: number,
+        allow_party?: Array<number>,
+        allow_user?: Array<string>,
+        allow_tag?: Array<number>,
+        extra_party?: Array<number>,
+        extra_user?: Array<string>,
+        extra_tag?: Array<number>
+    }
+}
+
+export interface IWAdminListResult {
+    errcode?: number,
+    errmsg?: string,
+    admin: Array<IWAdminList>
+}
+
+export interface IWAdminList {
+    userid: string,   //管理员的userid
+    auth_type: number, //管理员对应用的权限， 0表示发消息权限，1表示管理权限
+}
+
+export interface JsApiTicket {
+    errcode: number,
+    errmsg: string,
+    ticket: string,
+    expires_in: number
+}
+

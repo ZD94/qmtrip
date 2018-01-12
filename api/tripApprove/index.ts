@@ -130,6 +130,8 @@ export default class TripApproveModule {
             tripApprove.approveUserId = approveUserObj.id;
         }
 
+
+
         tripApprove.isSpecialApprove = approve.isSpecialApprove;
         tripApprove.specialApproveRemark = approve.specialApproveRemark;
         tripApprove.status = QMEApproveStatus.WAIT_APPROVE;
@@ -147,6 +149,15 @@ export default class TripApproveModule {
         tripApprove.oldBudget = totalBudget;
         tripApprove.status = totalBudget < 0 ? QMEApproveStatus.NO_BUDGET : QMEApproveStatus.WAIT_APPROVE;
         tripApprove.staffList = approve.staffList;
+
+        if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
+            tripApprove.autoApproveTime = await TripApproveModule.calculateAutoApproveTime({
+                type: company.autoApproveType,
+                config: company.autoApprovePreference,
+                submitAt: new Date(),
+                tripStartAt: tripApprove.startAt,
+            });
+        }
         return tripApprove;
 
     }

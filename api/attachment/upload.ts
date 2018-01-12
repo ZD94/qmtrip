@@ -9,6 +9,9 @@ var requestProxy = require('express-request-proxy');
 import fs = require("fs");
 import urlModule = require("url");
 import { Request, Application, Response, NextFunction } from 'express-serve-static-core';
+var cors = require('cors');
+const corsOptions = { origin: true, credentials: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'content-type, Content-Type, auth, authstr, staffid, companyid, accountid'} 
+
 
 function resetTimeout(req: Request, res: Response, next: NextFunction){
     // req.clearTimeout();
@@ -20,13 +23,13 @@ module.exports = function(app: Application) {
     //app.post('/upload/ajax-upload-file', proxy('http://localhost:4001', { reqAsBuffer: true,reqBodyEncoding: false }));
     let url = '/upload/ajax-upload-file'
 
-    app.post(url, resetTimeout, requestProxy({
+    app.post(url, cors(corsOptions), resetTimeout, requestProxy({
         url:config.hosts.main.www+'/upload/ajax-upload-file',
         reqAsBuffer: true,
         cache: false,
         timeout: 180000,
     }));
-    app.options(url, function (req, res, next) {
+    app.options(url, cors(corsOptions), function (req, res, next) {
         let referer = req.headers['referer'] as string;
         let host;
         if (!referer) {
@@ -51,7 +54,7 @@ module.exports = function(app: Application) {
         return host;
     }
 
-    app.get("/attachment/temp/:id", resetTimeout, function(req: Request, res: Response, next: NextFunction) {
+    app.get("/attachment/temp/:id", cors(corsOptions), resetTimeout, function(req: Request, res: Response, next: NextFunction) {
         let id = req.params.id;
         return requestProxy({
             url: config.hosts.main.www + '/attachment/temp/' + id ,
