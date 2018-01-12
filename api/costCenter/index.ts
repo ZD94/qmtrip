@@ -225,7 +225,7 @@ export default class CostCenterModule {
      */
     @clientExport
     @requireParams(["id"])
-    async getBudgetLog(params: { id: string }): Promise<BudgetLog> {
+    static async getBudgetLog(params: { id: string }): Promise<BudgetLog> {
         let id = params.id;
         var ah = await Models.budgetLog.get(id);
 
@@ -239,7 +239,7 @@ export default class CostCenterModule {
      * @returns {*}
      */
     @clientExport
-    async getBudgetLogs(params): Promise<FindResult> {
+    static async getBudgetLogs(params): Promise<FindResult> {
         let paginate = await Models.budgetLog.find(params);
         let ids = paginate.map(function (t) {
             return t.id;
