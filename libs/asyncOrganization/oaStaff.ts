@@ -151,7 +151,7 @@ export  abstract class OaStaff{
                     await self.saveStaffProperty({staffId: alreadyStaff.id});
                 } else{
                     // 不存在，添加
-                    let staff = Staff.create({name: self.name, sex: self.sex, email: self.email, mobile: self.mobile, roleId: roleId, pwd: utils.md5(pwd), avatar: self.avatar});
+                    let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd), avatar: self.avatar});
                     // staff.travelPolicyId = defaultTravelPolicy.id;
                     //补充逻辑: 当account信息已存在，无须再次创建
                     // if((self.mobile && self.mobile != '') || (self.email && self.email != '')) {
