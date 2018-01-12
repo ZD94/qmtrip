@@ -249,7 +249,7 @@ export default class CostCenterModule {
 
     @clientExport
     static async budgetLogList(params: { costId: string, limit: number, offset: number, period: { start: Date, end: Date } }) {
-        return await Models.budgetLog.find({
+        const res = await Models.budgetLog.find({
             where: {
                 costCenterId: params.costId,
                 createdAt: {
@@ -262,6 +262,7 @@ export default class CostCenterModule {
             limit: params.limit,
             offset: params.limit * params.offset
         })
+        return res.map(bl => bl.toJSON())
     }
 
     /****************************************BudgetLog end************************************************/
