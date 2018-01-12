@@ -76,9 +76,9 @@ export class RestApi {
                 avatar: result.auth_user_info.avatar,
             }, 
             authInfo: {
-                agentId:   result.auth_info && result.auth_info.agent && result.auth_info.agent.length ? result.auth_info[0].agentid: null,
-                appId: result.auth_info && result.auth_info.agent && result.auth_info.agent.length ? result.auth_info[0].appid: null,            
-                name: result.auth_info && result.auth_info.agent && result.auth_info.agent.length ? result.auth_info[0].name: null,
+                agentId:   result.auth_info && result.auth_info.agent && result.auth_info.agent.length ? result.auth_info.agent[0].agentid: null,
+                appId: result.auth_info && result.auth_info.agent && result.auth_info.agent.length ? result.auth_info.agent[0].appid: null,            
+                name: result.auth_info && result.auth_info.agent && result.auth_info.agent.length ? result.auth_info.agent[0].name: null,
             }
         } as IWPermanentCode;
     }

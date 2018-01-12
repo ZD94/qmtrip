@@ -119,7 +119,8 @@ export default class SSOModule {
             let permanentResult: IWPermanentCode = await RestApi.getPermanentCode(suiteToken, authCode)
             console.log("======>permanentResult: ", permanentResult)
             if(!permanentResult)
-                throw new error.NotPermitError(`永久授权码获取失败`)
+                throw new Error("永久授权码获取失败")
+                // throw new error.NotPermitError(`永久授权码获取失败`)
 
             permanentCode = permanentResult.permanentCode;
             accessToken = permanentResult.accessToken;
@@ -152,7 +153,7 @@ export default class SSOModule {
 
         //向jlbudget同步
         if(!hasJLCloudNotified) {
-            await CompanyModule.syncCompanyToJLCloud(company,'123456');
+            await API.company.syncCompanyToJLCloud(company,'123456');
         }
 
     }
@@ -185,7 +186,9 @@ export default class SSOModule {
      */
     async initializeCompany(result: IWPermanentCode | any): Promise<{company: Company, corpId: string, permanentCode: string}> {
         let permanentCode = result.permanentCode;
-        if(!permanentCode) throw new error.ParamsNotValidError("永久授权码不存在");
+        if(!permanentCode)
+            throw new Error("永久授权码不存在")
+            // throw new error.ParamsNotValidError("永久授权码不存在");
         let companyProperty = await Models.companyProperty.find({
             where: {
                 value: result.corpId,
@@ -285,7 +288,9 @@ export default class SSOModule {
             accessToken = result.accessToken;
             await this.cache.set(cacheKey, value)
         }
-        if(!accessToken) throw new error.NotFoundError("获取通讯录的accessToken失败")
+        if(!accessToken) 
+            throw new Error("获取通讯录的accessToken失败")
+            // throw new error.NotFoundError("获取通讯录的accessToken失败")
         return accessToken;
     }
 
@@ -312,8 +317,9 @@ export default class SSOModule {
         const staff = staffs.filter(s => s.company.id == companyProperties[0].companyId)[0]
         console.log('staff:', staff)
         if (!staff) throw L.ERR.USER_NOT_EXIST()
-        return await API.auth.makeAuthenticateToken(staff.accountId, 'corp_wechat')
+        return { data: await API.auth.makeAuthenticateToken(staff.accountId, 'corp_wechat'), corpId: usrInfo.CorpId }
     }
+
 
     @clientExport
     @requireParams(['corpId'])
@@ -381,14 +387,7 @@ async function dataCallback(req: Request, res: Response, next: NextFunction) {
         new Parser().parseString(rawBody, (err, data) => {
             const resp = crypto.decrypt(data.xml['Encrypt'][0])
             new Parser().parseString(resp.message, async (err, data) => {
-                if (data.xml['InfoType'] == 'suite_ticket'){
-                    await cache.write('suite_ticket', data.xml['SuiteTicket'][0])
-                }
-                    
-                if (data.xml['InfoType'] == 'create_auth') {
-                     await cache.write('create_auth', data.xml['AuthCode']);
-                     eventPush(data.xml['AuthCode']);
-                }
+                await workWechatEventHandlers[data.xml['InfoType']](data.xml)
                 res.send('success')
             })
         })
@@ -419,4 +418,62 @@ export interface WeChatUsrInfo {
     CorpId: string,
     UserId: string,
     DeviceId: string
+}
+
+const workWechatEventHandlers = {
+    // 推送 suite_ticket 事件
+    async suite_ticket(xml: WorkWechatResponse) {
+        await cache.write('suite_ticket', xml.SuiteTicket)
+    },
+    // 授权变更事件
+    async create_auth(xml: WorkWechatResponse) {
+        await cache.write('create_auth',xml.AuthCode);
+        eventPush(xml.AuthCode);
+    },
+    async change_auth(xml: WorkWechatResponse) {
+
+    },
+    async cancel_auth(xml: WorkWechatResponse) {
+
+    },
+    // 通讯录变更事件
+    async change_contact(xml: WorkWechatResponse) {
+        await changeContactEventHandlers[xml['ChangeType']](xml)
+    }
+}
+
+const changeContactEventHandlers = {
+    // 员工变动事件
+    async create_user(xml: WorkWechatResponse) {
+
+    },
+    async update_user(xml: WorkWechatResponse) {
+
+    },
+    async delete_user(xml: WorkWechatResponse) {
+
+    },
+    // 部门变动事件
+    async create_party(xml: WorkWechatResponse) {
+
+    },
+    async update_party(xml: WorkWechatResponse) {
+
+    },
+    async delete_party(xml: WorkWechatResponse) {
+
+    },
+    // 标签成员变更事件
+    async update_tag(xml: WorkWechatResponse) {
+
+    }
+}
+
+export interface WorkWechatResponse {
+    SuiteId: string,
+    InfoType: string,
+    TimeStamp: number,
+    SuiteTicket?: string,
+    AuthCode?: string,
+    AuthCorpId?: string
 }
