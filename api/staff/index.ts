@@ -1720,7 +1720,7 @@ class StaffModule{
             throw new Error("外部联系人手机号已被目标公司的其他外部联系人使用");
             // throw new error.NotPermitError("外部联系人手机号已被目标公司的其他外部联系人使用");
 
-        let accounts: Account[] = await Models.accounts.find({
+        let accounts: Account[] = await Models.account.find({
             where: {
                 mobile: params.mobile,
                 status: {$ne: ACCOUNT_STATUS.FORBIDDEN}
