@@ -121,7 +121,7 @@ export class WCompany extends OaCompany {
         if(createUser) 
             return true;
         let managers: Staff[] = await company.getManagers({withOwner: true});
-        if(!managers || managers.length)
+        if(!managers || managers.length == 0)
             return false;
         managers[0].roleId = EStaffRole.OWNER;
         await managers[0].save();
