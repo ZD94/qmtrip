@@ -3,7 +3,7 @@ import { OaStaff } from 'libs/asyncOrganization/oaStaff';
 import { Company, CPropertyType } from "_types/company";
 import { EGender, Models } from "_types";
 import { RestApi } from "api/sso/libs/restApi";
-import { StaffProperty, SPropertyType } from "_types/staff";
+import { StaffProperty, SPropertyType, Staff } from "_types/staff";
 import { WDepartment, IWDepartment } from "api/sso/libs/wechat-department";
 var corpId = 'wwb398745b82d67068'
 var suiteId ='wwcd27af224b6e42e8';
@@ -102,6 +102,31 @@ export class WStaff extends OaStaff {
         this.restApi = target.restApi;
         this.departmentIds = target.departmentIds;
     }
+
+    /**
+     * @method 企业微信同一人在不同的公司，userid可能相同，存在姓名为userid的情况
+     * @return {Staff}
+     */
+    async getStaff(): Promise<Staff>{
+        let self = this;
+        let staff: Staff = null;
+        
+        let staffPro = await Models.staffProperty.find({where : {value: self.id}});
+        if(staffPro && staffPro.length > 0){
+            staff = await Models.staff.get(staffPro[0].staffId);
+        }
+        if(!staff) return null;
+        let comPro = await Models.staffProperty.find({
+            where: {
+                staffId: staff.id,
+                type: SPropertyType.WECHAT_CORPID,
+                value: self.corpId
+            }
+        });
+        if(!comPro || comPro.length == 0) 
+            return null;
+        return staff;
+    }
     
     /**
      * @method 获取当前staff再微信企业系统存在的部门（数组）
@@ -110,19 +135,20 @@ export class WStaff extends OaStaff {
         let self = this;
         let departments: Array<WDepartment> = [];
         if(self.departmentIds) {
-            self.departmentIds.map(async (deptId: number) => {
+            await Promise.all(self.departmentIds.map(async (deptId: number) => {
                 let wdept: Array<IWDepartment> = await self.restApi.getDepartments(deptId.toString());
                 if(wdept && wdept.length) {
-                    for(let i = 0; i < wdept.length; i++){
-                        if(wdept[i].id && wdept[i].id.toString() == deptId.toString()) {
+                    for(let i = 0; i < wdept.length; i++){  
+                        if(wdept[i].id && wdept[i].id == deptId) {
                             let dept= new WDepartment({id: wdept[i].id, name: wdept[i].name, corpId: self.corpId, restApi: self.restApi,
                                 company: self.company, parentId: wdept[i].parentid})
                             departments.push(dept);
                         }
                     }
                 }
-            });
+            }));
         }
+
         departments = departments.filter((dept: WDepartment) => {
             if(dept) return true;
             return false;
@@ -136,8 +162,10 @@ export class WStaff extends OaStaff {
         if(typeof self.id != 'string')
             self.id = self.id + '';
         let userInfo: IWStaff = await self.restApi.getStaff(self.id);
-        let oaStaff = new WStaff({id: userInfo.userid, name: userInfo.name, mobile: userInfo.mobile,
-            email: userInfo.email, departmentIds: userInfo.department, corpId: self.corpId, company: self.company,
+        let mobile = userInfo.mobile && userInfo.mobile != '' ? userInfo.mobile : null;
+        let email = userInfo.email && userInfo.email != '' ? userInfo.email : null;
+        let oaStaff = new WStaff({id: userInfo.userid, restApi: self.restApi, name: userInfo.name, mobile: mobile,
+            email: email, departmentIds: userInfo.department, corpId: self.corpId, company: self.company,
             avatar: userInfo.avatar_mediaid});
         return oaStaff;
     }
@@ -214,9 +242,9 @@ export interface IWStaff {
     gender: EGender;
     avatar_mediaid?: string;
     isleader?: number;  //上级字段，标示是否是上级
-    status?: EWechatStaffStatus,
+    status?: EWechatStaffStatus;
     
-    department: string[];
+    department: string[] | number[];
     order?: number[];
     position?: string;
     telephone?: string;

@@ -212,7 +212,7 @@ class Privilege {
         let company: Company = await Models.company.get(companyId);
         let coinAccount: CoinAccount = await Models.coinAccount.get(company.coinAccountId);
         let points2coinRate: number = company.points2coinRate;
-        let companyBalance: number = Math.floor((coinAccount.income - coinAccount.consume - coinAccount.locks) / points2coinRate);
+        let companyBalance: number = coinAccount.income - coinAccount.consume - coinAccount.locks;
         return companyBalance;
     }
 
@@ -317,6 +317,7 @@ class Privilege {
 }
 
 export = Privilege;
+
 
 async function verify(req: Request, res: Response, next: Function) {
     if(req.method == 'OPTIONS') {

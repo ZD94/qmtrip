@@ -93,8 +93,8 @@ export = async function transform(values: {staffId: string,
             destinationPlace: string, latestArrivalDateTime: string, earliestGoBackDateTime: string
         }, index: number){
             let arrivalInfo = await API.place.getCityInfo({cityCode: item.destinationPlace, companyId: currentCompany.id});
-            item.latestArrivalDateTime = moment(item.latestArrivalDateTime).tz(arrivalInfo.timezone).format("MM-DD HH:mm");
-            item.earliestGoBackDateTime = moment(item.earliestGoBackDateTime).tz(arrivalInfo.timezone).format("MM-DD HH:mm");
+            item.latestArrivalDateTime = moment(item.latestArrivalDateTime).tz(arrivalInfo.timezone).format("YYYY-MM-DD HH:mm")  
+            item.earliestGoBackDateTime = moment(item.earliestGoBackDateTime).tz(arrivalInfo.timezone).format("YYYY-MM-DD HH:mm");
             cityMap[item.destinationPlace] = arrivalInfo;
         }))
     }

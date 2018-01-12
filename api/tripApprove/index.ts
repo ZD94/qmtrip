@@ -26,12 +26,12 @@ import { Place } from '_types/place';
 
 export default class TripApproveModule {
 
-    static async retrieveDetailFromApprove(params: {approveNo: string, approveUser?: string, submitter?: string}):Promise<ITripApprove> {
-        let {approveNo, approveUser, submitter} = params;
+    static async retrieveDetailFromApprove(params: {approveNo: string, approveUser?: string, submitter?: string, findTripApproveFirst?: boolean}):Promise<ITripApprove> {
+        let {approveNo, approveUser, submitter, findTripApproveFirst = true} = params;
         let tripApproveObj: ITripApprove
         if(!approveUser && !submitter)
             tripApproveObj = await TripApproveModule.getTripApprove({id: approveNo});
-        if(tripApproveObj)
+        if(tripApproveObj && findTripApproveFirst)
             return tripApproveObj;
 
         let approve = await Models.approve.get(approveNo);
@@ -78,8 +78,8 @@ export default class TripApproveModule {
             project = await API.tripPlan.getProjectByName({companyId: company.id, name: projectName,
                 userId: submitter});
         }
-        let tripApprove: ITripApprove;
-        tripApprove.id = approveNo;
+        let tripApprove = {} as ITripApprove;
+        tripApprove['id'] = approveNo;
         // tripApprove.approveUserId = approveUser;
         // let tripApprove = await Models.tripApprove.create({approveUserId: approveUser, id: approveNo});
         if(query.originPlace) {
@@ -130,9 +130,11 @@ export default class TripApproveModule {
             tripApprove.approveUserId = approveUserObj.id;
         }
 
+
+
         tripApprove.isSpecialApprove = approve.isSpecialApprove;
         tripApprove.specialApproveRemark = approve.specialApproveRemark;
-        tripApprove.status = QMEApproveStatus.WAIT_APPROVE;
+        tripApprove.status = approve.tripApproveStatus;
         tripApprove.accountId = submitter;
         tripApprove.companyId = company.id;
         // tripApprove.title = project.name;
@@ -145,8 +147,17 @@ export default class TripApproveModule {
         tripApprove.budgetInfo = budgets;
         tripApprove.budget = totalBudget;
         tripApprove.oldBudget = totalBudget;
-        tripApprove.status = totalBudget < 0 ? QMEApproveStatus.NO_BUDGET : QMEApproveStatus.WAIT_APPROVE;
+        tripApprove.status = totalBudget < 0 ? QMEApproveStatus.NO_BUDGET : approve.tripApproveStatus;
         tripApprove.staffList = approve.staffList;
+
+        if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
+            tripApprove.autoApproveTime = await TripApproveModule.calculateAutoApproveTime({
+                type: company.autoApproveType,
+                config: company.autoApprovePreference,
+                submitAt: new Date(),
+                tripStartAt: tripApprove.startAt,
+            });
+        }
         return tripApprove;
 
     }
@@ -580,9 +591,14 @@ export default class TripApproveModule {
         let approveCompany = approveUser.company;
         if(approveResult == 1){
             approveResult = EApproveResult.PASS;
+            approve.status = EApproveStatus.SUCCESS;
+            approve.tripApproveStatus = QMEApproveStatus.PASS;
         }else{
             approveResult = EApproveResult.REJECT;
+            approve.status = EApproveStatus.FAIL;
+            approve.tripApproveStatus = QMEApproveStatus.REJECT;
         }
+        await approve.save();
 
         if(typeof approve.data == 'string'){
             approve.data = JSON.parse(approve.data);
