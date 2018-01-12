@@ -1,17 +1,20 @@
 import * as fs from "fs";
 import * as path from "path";
-import { Staff } from "_types/staff";
+import {Staff} from "_types/staff";
+
 const API = require("@jingli/dnode-api");
 const config = require("@jingli/config");
 var haversine = require("haversine");
-import { ISearchHotelParams, ISearchTicketParams } from "./index";
+import {ISearchHotelParams, ISearchTicketParams} from "./index";
+
 var request = require("request-promise");
 let moment = require("moment");
-import { MTrainLevel, MPlaneLevel } from "_types";
+import {MTrainLevel, MPlaneLevel} from "_types";
+
 /* 判断是否需要美亚数据 */
 export async function meiyaJudge() {
     let currentStaff = await Staff.getCurrent();
-    let suppliers = await API.company.getAllSuppliers({ companyId: currentStaff.company.id });
+    let suppliers = await API.company.getAllSuppliers({companyId: currentStaff.company.id});
     for (let item of suppliers) {
         if (item.name == "meiya") {
             return true;
@@ -36,7 +39,8 @@ export function meiyaAuth(info?: object) {
 
 /* 获取美亚数据 */
 let airCode = require("libs/suppliers/taobao_com/cityCode");
-export async function getMeiyaFlightData(params: ISearchTicketParams) {
+
+export async function getMeiyaFlightData(params: ISearchTicketParams, authData) {
     // let departure = await API.place.getCityInfo({ cityCode: params.originPlaceId });
     // let arrival = await API.place.getCityInfo({ cityCode: params.destinationId });
 
@@ -65,7 +69,8 @@ export async function getMeiyaFlightData(params: ISearchTicketParams) {
 
     try {
         meiyaResult = JSON.parse(meiyaResult);
-    } catch (e) { }
+    } catch (e) {
+    }
 
     if (meiyaResult.code == 0) {
         return meiyaResult.data;
@@ -74,7 +79,7 @@ export async function getMeiyaFlightData(params: ISearchTicketParams) {
     }
 }
 
-export async function getMeiyaTrainData(params: ISearchTicketParams) {
+export async function getMeiyaTrainData(params: ISearchTicketParams, authData) {
     // let departure = await API.place.getCityInfo({ cityCode: params.originPlaceId });
     // let arrival = await API.place.getCityInfo({ cityCode: params.destinationId });
 
@@ -85,6 +90,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams) {
     };
     let urlTrain = config.orderSysConfig.orderLink + "/tmc/searchTrains/getList" + `/${meiyaParam.depCity}/${meiyaParam.arrCity}/${meiyaParam.depDate}`;
     console.log("urlTrain===================>", urlTrain);
+
     let meiyaResult = await request({
         url: urlTrain,
         method: "get",
@@ -97,7 +103,8 @@ export async function getMeiyaTrainData(params: ISearchTicketParams) {
 
     try {
         meiyaResult = JSON.parse(meiyaResult);
-    } catch (e) { }
+    } catch (e) {
+    }
 
     if (meiyaResult.code == 0) {
         return meiyaResult.data;
@@ -105,30 +112,38 @@ export async function getMeiyaTrainData(params: ISearchTicketParams) {
         return [];
     }
 }
+
 /**
  * @method 匹配jlbudget酒店数据为基础，meiya不一定都有
  */
-export async function getMeiyaHotelData(params: ISearchHotelParams) {
+export async function getMeiyaHotelData(params: ISearchHotelParams, authData) {
     // let destination = await API.place.getCityInfo({ cityCode: params.cityId });
     params.checkInDate = moment(params.checkInDate).format("YYYY-MM-DD");
     params.checkOutDate = moment(params.checkOutDate).format("YYYY-MM-DD");
     let urlHotel = `${params.cityId}/${params.checkInDate}/${params.checkOutDate}`;
     urlHotel = config.orderSysConfig.orderLink + "/tmc/searchHotel/getList/" + urlHotel;
-
     console.log("urlHotel =====>", urlHotel);
-    let meiyaResult = await request({
-        url: urlHotel,
-        method: "get",
-        qs: {},
-        headers: {
-            auth: meiyaAuth(),
-            supplier: "meiya"
-        }
-    });
+    let meiyaResult;
+    for (let item of authData) {
+        let info = item.identify
+        let sname = item.sname;
+
+        meiyaResult = await request({
+            url: "http://t.jingli365.com/proj/svr-tmc/SearchHotel/getList/CT_131/2018-01-20/2018-01-21",
+            method: "get",
+            qs: {},
+            headers: {
+                auth: meiyaAuth(),
+                supplier: sname
+            }
+        });
+    }
 
     try {
         meiyaResult = JSON.parse(meiyaResult);
-    } catch (e) { }
+        console.info(meiyaResult.code,"<===============meiyaResult")
+    } catch (e) {
+    }
 
     if (meiyaResult.code == 0) {
         return meiyaResult.data;
@@ -226,7 +241,7 @@ export function compareFlightData(origin: any[], meiyaData: any[]) {
 }
 
 /**
- * @method 火车数据匹配，以meiya为基础数据 
+ * @method 火车数据匹配，以meiya为基础数据
  */
 export function compareTrainData(origin: any[], meiyaData: any[]) {
     console.log("compareTrainData origin.length===>", origin.length);
@@ -277,9 +292,9 @@ export function compareTrainData(origin: any[], meiyaData: any[]) {
 
 
             if (!item.agents)
-                item.agents = [{ name: "meiya", cabins: cabins, other: {} }];
+                item.agents = [{name: "meiya", cabins: cabins, other: {}}];
             if (item.agents)
-                item.agents.push({ name: "meiya", cabins: cabins, other: {} });
+                item.agents.push({name: "meiya", cabins: cabins, other: {}});
 
         }
         return item;
@@ -295,7 +310,7 @@ export function compareTrainData(origin: any[], meiyaData: any[]) {
 }
 
 /**
- * @method 酒店数据匹配，以meiya为基础数据 
+ * @method 酒店数据匹配，以meiya为基础数据
  *    3km范围内的模糊匹配，和3km范围外的严格匹配
  * @param origin {Array} 来自jlbudget的数据
  * @param meiyaData {Array} 来自tmc数据
@@ -309,14 +324,14 @@ export function compareHotelData(origin: any[], meiyaData: any[]) {
         return origin;
     let i = 0;
     for (let item of origin) {
-        let start = { latitude: item.latitude, longitude: item.longitude };
+        let start = {latitude: item.latitude, longitude: item.longitude};
         let isNearby = false;
         for (let meiya of meiyaData) {
             if (!meiya.cnName) continue;
             let agentMeiya: { [index: string]: any };
             if (item.latitude && item.longitude && meiya.latitude && meiya.longitude) { //若存在等于0等情况，此时精确度已超过允许范围，直接跳过模糊匹配      
-                let end = { latitude: meiya.latitude, longitude: meiya.longitude };
-                isNearby = haversine(start, end, { threshold: 3, unit: 'km' }); //距离不超过3km，return true
+                let end = {latitude: meiya.latitude, longitude: meiya.longitude};
+                isNearby = haversine(start, end, {threshold: 3, unit: 'km'}); //距离不超过3km，return true
             }
             if (isNearby) {
                 //添加模糊匹配逻辑
@@ -364,8 +379,8 @@ export function compareHotelData(origin: any[], meiyaData: any[]) {
 /**
  * @method 中文相似度匹配-初用于酒店名
  *    考虑因素(暂定)：去掉特定字符，两字符长度对比，是否为子字符, 是否为
- * @param base {string} 基准字符 
- * @param target {string} 目标字符 
+ * @param base {string} 基准字符
+ * @param target {string} 目标字符
  * @return {boolean} 成功匹配-true， 反之-false
  */
 export function similarityMatch(params: {
@@ -374,7 +389,7 @@ export function similarityMatch(params: {
     ignores?: Array<string>,
     minimalLength?: number
 }): boolean {
-    let { base, target, minimalLength = 8, ignores } = params;
+    let {base, target, minimalLength = 8, ignores} = params;
     if (!base || !target) return false;
     if (ignores) {
         ignores.forEach((ignoreString: any) => {
@@ -419,7 +434,7 @@ export function similarityMatch(params: {
 
         }
     }
-    console.log("=====hotelmatch========similarity: ", similarity)
+    // console.log("=====hotelmatch========similarity: ", similarity)
     if (similarity >= 0.5) //暂定0.5，则返回
         return true;
     return false;
@@ -500,6 +515,7 @@ export interface IMeiyaFlightPriceInfo {
     violate?: number;
     price?: number;
 }
+
 export interface IMeiyaFlight {
     airlineCode?: string;
     arrDate?: string;

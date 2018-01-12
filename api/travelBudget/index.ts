@@ -111,8 +111,8 @@ export interface ISearchTicketParams {
     travelPolicyId: string;
 }
 
-export default class ApiTravelBudget {
 
+export default class ApiTravelBudget {
     @clientExport
     static async getBudgetInfo(params: { id: string, accountId?: string }) {
         let {id, accountId} = params;
@@ -144,6 +144,7 @@ export default class ApiTravelBudget {
         }
     }
 
+
     @clientExport
     static async getHotelsData(params: ISearchHotelParams): Promise<any> {
         let commonData;
@@ -160,15 +161,26 @@ export default class ApiTravelBudget {
         } catch (err) {
             console.log(err);
         }
-
         let companyInfo = await ApiTravelBudget.getCompanyInfo();
+        let data = companyInfo.data;
+        let authData = [];
+        data.map((item) => {
+            let obj = {};
+            let identify = item.identify;
+            let sname = item.sname;
+            obj["identify"] = identify;
+            obj["sname"] = sname;
+            authData.push(obj);
+            return authData
+        })
+
         if (result.code == 0) {
             commonData = result.data.data;
         }
 
         if (!commonData || typeof commonData == 'undefined')
             return [];
-        //检查是否需要美亚数据，返回美亚数据
+        // 检查是否需要美亚数据，返回美亚数据
         let needMeiya = await meiyaJudge();
         if (!needMeiya) {
             return commonData;
@@ -178,7 +190,7 @@ export default class ApiTravelBudget {
             console.log("getHotelsData ===> fake data.")
             return require("meiyaFake/finallyUsingHotel");
         } else {
-            let meiyaHotel = await getMeiyaHotelData(params);
+            let meiyaHotel = await getMeiyaHotelData(params, authData);
             console.log("meiyaHotel ===> meiyaHotel data.", meiyaHotel.length)
             if (meiyaHotel && meiyaHotel.length)
                 commonData = compareHotelData(commonData, meiyaHotel);
@@ -205,6 +217,19 @@ export default class ApiTravelBudget {
         } catch (err) {
             console.log(err);
         }
+        let companyInfo = await ApiTravelBudget.getCompanyInfo();
+        let data = companyInfo.data;
+        let authData = [];
+        data.map((item) => {
+            let obj = {}
+            let identify = item.identify;
+            let sname = item.sname;
+            obj["identify"] = identify;
+            obj["sname"] = sname
+            authData.push(obj)
+            return authData
+        })
+
         if (result.code == 0) {
             commonData = result.data.data;
         }
@@ -222,8 +247,8 @@ export default class ApiTravelBudget {
             return require("meiyaFake/finallyUsingTraffic");
         } else {
             let arr = await Promise.all([
-                await getMeiyaTrainData(params),
-                await getMeiyaFlightData(params)
+                await getMeiyaTrainData(params, authData),
+                await getMeiyaFlightData(params, authData)
             ]);
             let meiyaTrain = arr[0];
             let meiyaFlight = arr[1];
@@ -769,7 +794,7 @@ export default class ApiTravelBudget {
         let companyId = staff.company.id;
         let result;
         try {
-             result = await RestfulAPIUtil.operateOnModel({
+            result = await RestfulAPIUtil.operateOnModel({
                 params: {
                     method: 'put',
                     fields: {
@@ -999,8 +1024,17 @@ export default class ApiTravelBudget {
                 .catch(next);
         })
     }
-}
 
+}
+// let paramss = {
+//     checkInDate: "2018-01-20",
+//     checkOutDate: "2018-01-21",
+//     cityId: "CT_131",
+//     travelPolicyId: "dklfklsdklmfsmldfkdsmkfsdfs"
+// }
+// setTimeout(async () => {
+//     await  ApiTravelBudget.getHotelsData(paramss)
+// }, 8000);
 
 let params = {
     "originPlace": "CT_131",
