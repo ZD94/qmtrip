@@ -652,9 +652,9 @@ export default class ApiTravelBudget {
             let approveStatus = checkApprove['tripApproveStatus'];
             if (approveStatus == QMEApproveStatus.PASS || approveStatus == QMEApproveStatus.REJECT ||
             approveStatus == QMEApproveStatus.CANCEL) {  //若审批已通过、驳回或已撤销，锁定budget不再更新
-                await API.tripApprove.updateBudget({id: approveId, lockBudget: true});
+                await API.tripApprove.updateTripApprove({id: approveId, lockBudget: true});
             } else {   // 否则将lockBudget标示置回初始值，接受budget更新
-                await API.tripApprove.updateBudget({id: approveId, lockBudget: false});
+                await API.tripApprove.updateTripApprove({id: approveId, lockBudget: false});
             }
         }
 
