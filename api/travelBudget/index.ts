@@ -700,7 +700,6 @@ export default class ApiTravelBudget {
             isRoundTrip: params.isRoundTrip,        //是否为往返
             goBackPlace: params.goBackPlace         //返回地
         });
-        approve = await approve.save();
         
 
         let segmentsBudget = budgetResult.budgets;
@@ -713,16 +712,24 @@ export default class ApiTravelBudget {
 
 
         //计算总预算用于更新approve
+        let eachBudgetSegIsOk: boolean = true;
         let totalBudget = 0;
         budgets.forEach(function (item) {
             if (item.tripType != ETripType.SUBSIDY) {
                 tripNumCost = tripNumCost + 1;
+            }
+            if (item.price <= 0) {
+                eachBudgetSegIsOk = false;
             }
             totalBudget += item.price;
         })
         if (params && params.staffList) {
             tripNumCost *= params.staffList.length;
         }
+        if (eachBudgetSegIsOk) {
+            approve = await approve.save();
+        }
+        
 
         console.log("======== ******************************** =====> ", budgets);
         let obj: any = {};
