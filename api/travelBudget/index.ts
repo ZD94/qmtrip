@@ -726,8 +726,11 @@ export default class ApiTravelBudget {
         if (params && params.staffList) {
             tripNumCost *= params.staffList.length;
         }
+        console.log('eachBudgetSet-----------', eachBudgetSegIsOk);
         if (eachBudgetSegIsOk) {
             approve = await approve.save();
+        } else {
+            throw new Error('预算有负值,提交失败');
         }
         
 
@@ -747,7 +750,7 @@ export default class ApiTravelBudget {
 
             obj.query['frozenNum'] = result.frozenNum;
             //拿到预算后更新approve表
-            if (!isIntoApprove) {//判断是否是审批人查看审批单时进行的第二次拉取数据
+            if (!isIntoApprove && eachBudgetSegIsOk) {//判断是否是审批人查看审批单时进行的第二次拉取数据
                 let updateBudget = await Models.approve.get(approveId);
                 // let submitter = await Staff.getCurrent();
                 let submitter = await Models.staff.get(staff.id);
@@ -766,7 +769,7 @@ export default class ApiTravelBudget {
                 await updateBudget.save();
             }
             console.log('--------budgetResult', budgetResult.step);
-            if (budgetResult.step == 'FIN') {
+            if (budgetResult.step == 'FIN' && eachBudgetSegIsOk) {
                 console.log('updateBudget first time');
                 ApiTravelBudget.updateBudget({approveId: approveId, budgetResult: budgetResult, isFinalFirstResponse: (isIntoApprove ? false : true)});
             }

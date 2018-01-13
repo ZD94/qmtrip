@@ -149,6 +149,7 @@ export default class TripApproveModule {
         tripApprove.oldBudget = totalBudget;
         tripApprove.status = totalBudget < 0 ? QMEApproveStatus.NO_BUDGET : approve.tripApproveStatus;
         tripApprove.staffList = approve.staffList;
+        tripApprove.lockBudget = false;
 
         if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
             tripApprove.autoApproveTime = await TripApproveModule.calculateAutoApproveTime({

@@ -113,7 +113,7 @@ export default class CompanyModule {
         company.domainName = domain;
         company.expiryDate = moment().add(DEFAULT_EXPIRE_MONTH, 'months').toDate();
         company.isApproveOpen = true;
-        company.points2coinRate = 50;
+        company.points2coinRate = 100;
         let department = Department.create({ name: company.name, isDefault: true });
         let staffDepartment = StaffDepartment.create({ staffId: staff.id, departmentId: department.id });
 
@@ -123,6 +123,8 @@ export default class CompanyModule {
         company['agencyId'] = agencyId;
         //新注册企业默认套餐行程数为60
         company.tripPlanNumLimit = 60;
+
+        //注册
 
         if (params.referrerMobile) {
             let ac = await Models.account.find({ where: { mobile: params.referrerMobile } });
