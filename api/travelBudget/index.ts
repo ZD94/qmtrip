@@ -478,7 +478,7 @@ export default class ApiTravelBudget {
     static async updateBudget(params: {approveId: string, budgetResult: any, isFinalFirstResponse?: boolean}) {
 
         console.log('updateBudtetApproveId=======', params.approveId);
-        console.log('============update', params.budgetResult);
+        console.log('============update');
         let approve = await Models.approve.get(params.approveId);
 
         // check tripApprove status; if passed, rejected or locked, the budget will not be updated
