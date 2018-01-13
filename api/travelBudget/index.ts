@@ -728,7 +728,7 @@ export default class ApiTravelBudget {
         }
         console.log('eachBudgetSet-----------', eachBudgetSegIsOk);
         if (eachBudgetSegIsOk) {
-            approve = await approve.save();
+            await approve.save();
         } else {
             throw new Error('预算有负值,提交失败');
         }
