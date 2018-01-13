@@ -727,9 +727,10 @@ export default class ApiTravelBudget {
             tripNumCost *= params.staffList.length;
         }
         console.log('eachBudgetSet-----------', eachBudgetSegIsOk);
-        if (eachBudgetSegIsOk) {
+        if (eachBudgetSegIsOk && !isIntoApprove) {
             await approve.save();
-        } else {
+        } 
+        if (!eachBudgetSegIsOk) {
             throw new Error('预算有负值,提交失败');
         }
         
