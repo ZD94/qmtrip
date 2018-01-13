@@ -734,7 +734,7 @@ export default class ApiTravelBudget {
         }
         
 
-        console.log("======== ******************************** =====> ", budgets);
+        console.log("======== ******************************** =====> ");
         let obj: any = {};
         obj.budgets = budgets;
         obj.query = params;
