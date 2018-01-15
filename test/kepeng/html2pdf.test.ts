@@ -7,7 +7,7 @@ var html = fs.readFileSync(__dirname+'/html2pdf.html', 'utf-8');
 var base = 'file://'+path.normalize(__dirname+'/html2pdf.html');
 console.log(base);
 
-function html2pdf(html): Promise<string> {
+function html2pdf(html: string): Promise<string> {
     var pdf = require("html-pdf");
     return new Promise<string>( (resolve, reject) => {
         pdf.create(html, {
@@ -22,7 +22,7 @@ function html2pdf(html): Promise<string> {
                 }
             },
             zoomFactor: 1,
-        }).toBuffer(function(err, bfs) {
+        }).toBuffer(function(err: any, bfs: string) {
             if (err) return reject(err);
             return resolve(bfs);
         })

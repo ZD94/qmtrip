@@ -3,27 +3,48 @@
  */
 import {Models} from "_types";
 import {EApproveResult} from "_types/tripPlan";
-import moment = require("moment");
+import * as _ from 'lodash/fp';
+const moment = require("moment");
 var API = require('@jingli/dnode-api');
+require('moment-timezone')
 
 export = async function transform(values: any): Promise<any>{
     let tripApprove = values.tripApprove;
     let tripPlan = values.tripPlan;
     let cityMap:any = {};
     let approveUserMap:any = {};
+    let companyId = values.companyId;
     if(tripPlan && tripPlan.id){
-        tripApprove = await Models.tripApprove.get(values.tripPlan.id);
-        values.tripApprove = tripApprove;
+        tripApprove = await API.tripApprove.retrieveDetailFromApprove({approveNo: tripPlan.id})
+        if(tripApprove)
+            values.tripApprove = tripApprove;
+        else
+            values.tripApprove = tripPlan;
+
+
+        /*tripApprove = await Models.tripApprove.get(values.tripPlan.id);
+        if(!tripApprove){
+            tripApprove = tripPlan;
+        }*/
+        // tripApprove = tripPlan
+
+        // tripApprove = await Models.tripApprove.get(values.tripPlan.id);
+
+
     }
     if(!values.tripApprove || !values.tripApprove.id){
+        values.tripApprove = {};
         return values;
+    }
+    if(!companyId){
+        companyId = tripApprove.companyId;
     }
     let arrivalCityCodes = tripApprove.arrivalCityCodes;
     if(typeof arrivalCityCodes == 'string')arrivalCityCodes = JSON.parse(arrivalCityCodes);
     tripApprove.arrivalCityCodes = arrivalCityCodes;
     if(arrivalCityCodes && arrivalCityCodes.length > 0){
-        let arrCityList = await Promise.all(arrivalCityCodes.map(async (item) => {
-            let arrivalInfo = await API.place.getCityInfo({cityCode: item});
+        let arrCityList = await Promise.all(arrivalCityCodes.map(async (item: string) => {
+            let arrivalInfo = await API.place.getCityInfo({cityCode: item, companyId: companyId});
             cityMap[item] = arrivalInfo;
             return arrivalInfo;
         }))
@@ -35,10 +56,9 @@ export = async function transform(values: any): Promise<any>{
     }
 
     values.cityMap = cityMap;
-    if(tripApprove){
+    if(tripApprove && tripApprove.approvedUsers != null){
         let approvedUsers = tripApprove.approvedUsers.split(',');
-        let agreeUserNames = "";
-        await Promise.all(approvedUsers.map(async function(item){
+        await Promise.all(approvedUsers.map(async function(item: string){
             if(item && item != ''){
                 let staff = await Models.staff.get(item);
                 approveUserMap[item] = staff;
@@ -50,11 +70,14 @@ export = async function transform(values: any): Promise<any>{
     }
     values.approveUserMap = approveUserMap;
 
-    let logs = await Models.tripPlanLog.find({where: {tripPlanId: tripApprove.id, approveStatus: EApproveResult.AUTO_APPROVE, remark: '自动通过'}});
+    let logs = await Models.tripPlanLog.find({where: {tripPlanId: tripApprove.id, approveStatus: EApproveResult.AUTO_APPROVE}});
     if(logs && logs.length > 0){
         values.isAutoApprove = true;
     }else{
         values.isAutoApprove = false;
     }
+
+    if (values.tripApprove)
+        values.tripApprove.staffs = (await Promise.all(values.tripApprove.staffList.map(Models.staff.get))).map(_.prop('name'))
     return values;
 }

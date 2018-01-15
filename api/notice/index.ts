@@ -3,12 +3,12 @@
  */
 'use strict';
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
-import {conditionDecorator, condition} from "../_decorator";
 import {Staff} from "_types/staff";
 import { Notice, NoticeAccount, ESendType } from '_types/notice';
 import { Models } from '_types';
 import {FindResult} from "common/model/interface";
 import {DB} from '@jingli/database';
+import { FindOptions } from 'sequelize';
 
 var JPush = require("jpush-sdk");
 var API = require("@jingli/dnode-api");
@@ -24,7 +24,7 @@ class NoticeModule{
      */
     @clientExport
     @requireParams(["title","content","description", "sendType"], noticeCols)
-    static async createNotice (params) : Promise<Notice>{
+    static async createNotice (params: Notice) : Promise<Notice>{
         var notice = Notice.create(params);
         result = await notice.save();
         var result:Notice;
@@ -46,9 +46,8 @@ class NoticeModule{
             
         }else if(params.sendType == ESendType.MORE_ACCOUNT){
             
-            var accountIds = params.toUsers;
-            accountIds = JSON.parse(accountIds);
-            var jpushIds = [];
+            var accountIds: string[] = JSON.parse(params.toUsers);
+            var jpushIds: string[] = [];
             await Promise.all(accountIds.map(async function(item){
                 var noticeAccount = NoticeAccount.create();
                 noticeAccount.noticeId = result.id;
@@ -79,7 +78,7 @@ class NoticeModule{
      */
     @clientExport
     @requireParams(["id"])
-    static async deleteNotice(params) : Promise<any>{
+    static async deleteNotice(params: {id: string}) : Promise<any>{
         var id = params.id;
         var ah_delete = await Models.notice.get(id);
 
@@ -102,7 +101,7 @@ class NoticeModule{
      */
     @clientExport
     @requireParams(["id"], noticeCols)
-    static async updateNotice(params) : Promise<Notice>{
+    static async updateNotice(params: Notice) : Promise<Notice>{
         var id = params.id;
 
         var ah = await Models.notice.get(id);
@@ -134,8 +133,7 @@ class NoticeModule{
      * @returns {*}
      */
     @clientExport
-    static async getNotices(params): Promise<FindResult>{
-        var staff = await Staff.getCurrent();
+    static async getNotices(params: FindOptions<Notice>): Promise<FindResult>{
         params.order = params.order || [['createdAt', 'desc']];
         let paginate = await Models.notice.find(params);
         let ids =  paginate.map(function(t){
@@ -170,7 +168,7 @@ class NoticeModule{
      */
     @clientExport
     @requireParams(["accountId","noticeId",], noticeAccountCols)
-    static async createNoticeAccount (params) : Promise<NoticeAccount>{
+    static async createNoticeAccount (params: NoticeAccount) : Promise<NoticeAccount>{
         var noticeAccount = NoticeAccount.create(params);
         var already = await Models.noticeAccount.find({where: {noticeId: params.noticeId, accountId: params.accountId}});
         if(already && already.length>0){
@@ -188,7 +186,7 @@ class NoticeModule{
      */
     @clientExport
     @requireParams(["id"])
-    static async deleteNoticeAccount(params) : Promise<any>{
+    static async deleteNoticeAccount(params: {id: string}) : Promise<any>{
         var id = params.id;
         var ah_delete = await Models.noticeAccount.get(id);
         var notice = await Models.notice.get(ah_delete.noticeId);
@@ -209,7 +207,7 @@ class NoticeModule{
      */
     @clientExport
     @requireParams(["id"], noticeAccountCols)
-    static async updateNoticeAccount(params) : Promise<NoticeAccount>{
+    static async updateNoticeAccount(params: NoticeAccount) : Promise<NoticeAccount>{
         var id = params.id;
 
         var ah = await Models.noticeAccount.get(id);
@@ -240,8 +238,8 @@ class NoticeModule{
      * @returns {*}
      */
     @clientExport
-    static async getNoticeAccounts(params): Promise<FindResult>{
-        var staff = await Staff.getCurrent();
+    static async getNoticeAccounts(params: FindOptions<NoticeAccount>): Promise<FindResult>{
+        await Staff.getCurrent();
         let paginate = await Models.noticeAccount.find(params);
         let ids =  paginate.map(function(t){
             return t.id;

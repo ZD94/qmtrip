@@ -7,7 +7,7 @@ import _ = require('lodash');
 var rootdir = 'ionic';
 var default_route = 'index/index';
 
-function parseController(dir) {
+function parseController(dir: string) {
     //if (dir == undefined || dir == '')
     //    dir = default_route;
     if(dir[0] == '/' && dir.length > 1)

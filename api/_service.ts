@@ -1,17 +1,21 @@
 
 import { initModels } from '_types';
 
-import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo, StaffProperty } from '_types/staff';
-import { Company, MoneyChange, Supplier, TripPlanNumChange, CompanyProperty, InvoiceTitle } from '_types/company';
+
+
+import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo, StaffProperty, Linkman} from '_types/staff';
+import { Company, MoneyChange, Supplier, TripPlanNumChange, CompanyProperty, InvoiceTitle, CompanyScoreRatioChange } from '_types/company';
+
 import { Department, StaffDepartment, DepartmentProperty } from '_types/department';
 import { PromoCode } from '_types/promoCode';
 
 import { AccordHotel } from '_types/accordHotel';
 import { Notice, NoticeAccount } from '_types/notice';
 import { Agency, AgencyUser } from '_types/agency';
+import { CostCenter, BudgetLog, CostCenterDeploy } from '_types/costCenter';
 import {
-    TripPlan, TripDetail, TripDetailStaff, Project, TripPlanLog, TripApprove, FinanceCheckCode,
-    TripDetailInvoice, TripDetailTraffic, TripDetailHotel, Offline
+    TripPlan, TripDetail, TripDetailStaff, Project, TripPlanLog, FinanceCheckCode,
+    TripDetailInvoice, TripDetailTraffic, TripDetailHotel, Offline, ProjectStaff, ProjectTravelPolicy
 } from '_types/tripPlan';
 import {Account, Token} from '_types/auth';
 import { Seed } from '_types/seed';
@@ -26,9 +30,14 @@ import {TripFuelAddPackage} from "../_types/tripPackage/tripFuelAddPackage";
 import {TripBasicPackage} from "../_types/tripPackage/tripBasicPackage";
 import {ErrorLog} from "../_types/errorLog";
 import {Attachment, RelateFile} from "../_types/attachment";
+import {EventListener} from "../_types/eventListener";
 // import {CompanyRegion} from "_types/travelPolicy/companyRegion";
 // import {RegionPlace} from "_types/travelPolicy/regionPlace";
 // import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
+import {Url} from "_types/shorturl";
+import {EmailQueue, EmailLog, EmailSubmit} from "_types/mail";
+
+
 initModels({
     staff: createServerService<Staff>(Staff),
     staffProperty: createServerService<StaffProperty>(StaffProperty),
@@ -61,8 +70,11 @@ initModels({
 
     tripPlanLog: createServerService<TripPlanLog>(TripPlanLog),
     moneyChange: createServerService<MoneyChange>(MoneyChange),
+    companyScoreRatioChange: createServerService<CompanyScoreRatioChange>(CompanyScoreRatioChange),
     project: createServerService<Project>(Project),
-    tripApprove: createServerService<TripApprove>(TripApprove),
+    projectStaff: createServerService<ProjectStaff>(ProjectStaff),
+    projectStaffTravelPolicy: createServerService<ProjectTravelPolicy>(ProjectTravelPolicy),
+    // tripApprove: createServerService<TripApprove>(TripApprove),
     approve: createServerService<Approve>(Approve),
     account: createServerService<Account>(Account),
     seed: createServerService<Seed>(Seed),
@@ -83,7 +95,17 @@ initModels({
     errorLog: createServerService<ErrorLog>(ErrorLog),
     attachment: createServerService<Attachment>(Attachment),
     relateFile: createServerService<RelateFile>(RelateFile),
+    eventListener: createServerService<EventListener>(EventListener),
+    budgetLog: createServerService<BudgetLog>(BudgetLog),
+    costCenter: createServerService<CostCenter>(CostCenter),
+    costCenterDeploy: createServerService<CostCenterDeploy>(CostCenterDeploy),
 
+    url: createServerService<Url>(Url),
+    emailQueue: createServerService<EmailQueue>(EmailQueue),
+    emailLog: createServerService<EmailLog>(EmailLog),
+    emailSubmit: createServerService<EmailSubmit>(EmailSubmit),
+    linkman: createServerService<Linkman>(Linkman)
+ 
     // travelPolicyRegion: createServerService<TravelPolicyRegion>(TravelPolicyRegion),
     // companyRegion: createServerService<CompanyRegion>(CompanyRegion),
     // regionPlace: createServerService<RegionPlace>(RegionPlace),

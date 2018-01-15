@@ -1,0 +1,1 @@
+截至<%=moment().formate("MM月DD日")%>，<%=type == "project" ? "项目" : "部门" %><%=costCenter.name%>的<%=noticeType == "monthly" ? "月度" : "总"%>差旅预算支出(包括已计划支出)已经超过<%=rate%>，查看详情请点击<%=url%>

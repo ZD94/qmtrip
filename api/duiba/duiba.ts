@@ -3,12 +3,12 @@
  */
 'use strict';
 import {Models} from "_types/index";
-import L from '@jingli/language';
 import {CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE} from "_types/coin";
+import { Application, Request, Response, NextFunction } from 'express';
 var config = require('@jingli/config');
 var API = require("@jingli/dnode-api");
 
-module.exports = function(app) {
+module.exports = function(app: Application) {
     app.get("/duiba/costcredit", costCredit);
     app.get("/duiba/result/notice", resultNotice);
     app.get("/duiba/addcredit", addCredit);
@@ -21,10 +21,10 @@ module.exports = function(app) {
  * @param next
  * @returns {any}
  */
-async function costCredit(req, res, next) {
+async function costCredit(req: Request, res: Response, next: NextFunction) {
     console.info("扣积分接口================");
     var params = req.query;
-    var { uid, credits,appKey, timestamp, description, orderNum, actualPrice,sign } = params;
+    var { uid, credits,appKey, description, orderNum, sign } = params;
     var account = await Models.account.get(uid);
     // staff.coinAccount = staff.$parents["account"]["coinAccount"];
     //资金账户不存在先创建
@@ -59,7 +59,7 @@ async function costCredit(req, res, next) {
         });
     }
 
-    var coinAccountChanges = await Models.coinAccountChange.find({where: {duiBaOrderNum: orderNum}});
+    var coinAccountChanges = await Models.coinAccountChange.find({where: {relateOrderNum: orderNum}});
     //防止订单重复处理
     if(!coinAccountChanges || coinAccountChanges.length <= 0){
         var result = await coinAccount.lockCoin(credits, description, orderNum);
@@ -86,10 +86,10 @@ async function costCredit(req, res, next) {
  * @param next
  * @returns {any}
  */
-async function resultNotice(req, res, next) {
+async function resultNotice(req: Request, res: Response, next: NextFunction) {
     console.info("接收通知接口================");
     var params = req.query;
-    var { appKey, timestamp, success, errorMessage, orderNum, bizId,sign } = params;
+    var { appKey, success, errorMessage, orderNum, sign } = params;
 
     if(params.sign){
         delete params.sign;
@@ -110,7 +110,7 @@ async function resultNotice(req, res, next) {
         });
     }
     //扣积分请求超时时兑吧也会发回失败通知 此时未携带bizId 所以查失败订单不能用bizId 要用orderNum
-    var coinAccountChanges = await Models.coinAccountChange.find({where: {duiBaOrderNum: orderNum, type: COIN_CHANGE_TYPE.LOCK}});
+    var coinAccountChanges = await Models.coinAccountChange.find({where: {relateOrderNum: orderNum, type: COIN_CHANGE_TYPE.LOCK}});
     var coinAccountChange: CoinAccountChange;
     
     if(coinAccountChanges && coinAccountChanges.length > 0){
@@ -167,9 +167,9 @@ async function resultNotice(req, res, next) {
  * @param next
  * @returns {any}
  */
-async function addCredit(req, res, next) {
+async function addCredit(req: Request, res: Response, next: NextFunction) {
     var params = req.query;
-    var { uid, credits,appKey,type, timestamp, description, orderNum, sign } = params;
+    var { uid, credits,appKey, orderNum, sign } = params;
     var account = await Models.account.get(uid);
     // account.coinAccount = account.["coinAccount"];
     //资金账户不存在先创建
@@ -204,7 +204,7 @@ async function addCredit(req, res, next) {
         });
     }
 
-    var coinAccountChanges = await Models.coinAccountChange.find({where: {duiBaOrderNum: orderNum}});
+    var coinAccountChanges = await Models.coinAccountChange.find({where: {relateOrderNum: orderNum}});
     //防止订单重复处理
     if(!coinAccountChanges || coinAccountChanges.length <= 0){
         var result = await coinAccount.addCoin(credits, "每日签到奖励", orderNum);

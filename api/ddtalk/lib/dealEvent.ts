@@ -4,7 +4,6 @@
  */
 
 'use strict';
-import fs = require("fs");
 import cache from "common/cache";
 const C = require("@jingli/config");
 const proxy = require("express-http-proxy");
@@ -12,28 +11,20 @@ const config = C.ddconfig;
 
 import Logger from '@jingli/logger';
 var logger = new Logger('main');
-import request = require('request');
 import ISVApi from "./isvApi";
-import CorpApi from "./corpApi";
 import {reqProxy} from "./reqProxy";
-import {Company, CPropertyType} from "_types/company";
+import {CPropertyType} from "_types/company";
 import {Staff, EStaffRole} from "_types/staff";
 import {Models} from "_types/index";
 import L from '@jingli/language';
 
-import {md5} from "common/utils";
-import {DDTalkCorp , DDTalkDepartment , DDTalkUser} from "_types/ddtalk";
-import {ddCrud} from "./ddCrud";
 import DdCompany from "./ddCompany";
 import DdDepartment from "./ddDepartment";
 import DdStaff from "./ddStaff";
-import {OaStaff} from "libs/asyncOrganization/oaStaff";
-
+import { Request,Response, NextFunction } from 'express-serve-static-core';
+import { IMsg } from 'api/ddtalk';
 
 const CACHE_KEY = `ddtalk:ticket:${config.suiteid}`;
-const DEFAULT_PWD = '000000';
-
-let moment = require("moment");
 
 let reg = new RegExp( config.name_reg );
 
@@ -84,7 +75,7 @@ export async function _getSuiteToken(): Promise<any> {
     // return {"suite_access_token": "9761c575f39c3505b5478e98bf28e705", "expire_at": 1489560379128}
 }
 
-async function _getPermanentCode(suiteToken, tmpAuthCode) {
+async function _getPermanentCode(suiteToken: string, tmpAuthCode: string) {
     let url = 'https://oapi.dingtalk.com/service/get_permanent_code';
     return reqProxy(url, {
         name: '获取永久授权码',
@@ -118,7 +109,7 @@ export async function getISVandCorp(corp : {corpId: string, permanentCode: strin
 }
 
 /* transpond */
-export function transpond(req, res, next, options:any, urls?:string){
+export function transpond(req: Request, res: Response, next: NextFunction, options?: {timeout: number, decorateRequest?: Function}, urls?:string){
     let url = config.test_url.replace(/\/$/g, "");
     url = url + "/ddtalk/isv/receive";
     if(urls){
@@ -133,7 +124,7 @@ export function transpond(req, res, next, options:any, urls?:string){
     proxy(url, options)(req, res, next);
 }
 
-export async function tmpAuthCode(msg , req , res , next) {
+export async function tmpAuthCode(msg: IMsg, req: Request, res: Response, next: NextFunction) {
     const TMP_CODE_KEY = `tmp_auth_code:${msg.AuthCode}`;
     let isExist = await cache.read(TMP_CODE_KEY);
     if (isExist) {
@@ -170,7 +161,7 @@ export async function tmpAuthCode(msg , req , res , next) {
         //it's our test company.
         transpond( req, res, next, {
             timeout : 5000,
-            decorateRequest: (proxyReq, originalReq)=>{
+            decorateRequest: (proxyReq: any, originalReq: any)=>{
                 if(!originalReq.body){
                     originalReq.body = {};
                 }
@@ -191,7 +182,6 @@ export async function tmpAuthCode(msg , req , res , next) {
 
     //获取企业授权的授权数据 , 拿到管理员信息
     let authInfo: any = await isvApi.getCorpAuthInfo();
-    let authUserInfo = authInfo.auth_user_info;
 
     //agentID每次都会变,所以每次授权都要获取我们对应的agentid
     let agents = authInfo.auth_info.agent || [];
@@ -266,7 +256,7 @@ export async function synchroDDorganization() : Promise<boolean> {
  *   解除授权信息 处理事件
  */
 
-export async function suiteRelieve(msg) {
+export async function suiteRelieve(msg: IMsg) {
     let corpId = msg.AuthCorpId;
     // let corps = await Models.ddtalkCorp.find({where: {corpId: corpId}});
     let comPro = await Models.companyProperty.find({where: {value: corpId, type: CPropertyType.DD_ID}});
@@ -304,7 +294,7 @@ export async function suiteRelieve(msg) {
  *    }
  */
 
-async function ddEventCommon(msg){
+async function ddEventCommon(msg: IMsg){
     let corpId = msg.CorpId;
 
     let comPro = await Models.companyProperty.find({where: {value: corpId, type: CPropertyType.DD_ID}});
@@ -334,8 +324,8 @@ async function ddEventCommon(msg){
  *   EventType : user_modify_org , user_add_org
  *   通讯录用户更改 ， 企业增加员工
  */
-export async function userModifyOrg(msg){
-    let {corpApi, isvApi, corp} = await ddEventCommon(msg);
+export async function userModifyOrg(msg: IMsg){
+    let {corpApi, isvApi} = await ddEventCommon(msg);
     let userIds = msg.UserId;
     let corpId = msg.CorpId;
 
@@ -355,8 +345,8 @@ export async function userModifyOrg(msg){
  *  EventType : user_leave_org
  *  钉钉删除员工
  */
-export async function userLeaveOrg(msg){
-    let {corpApi, isvApi, corp} = await ddEventCommon(msg);
+export async function userLeaveOrg(msg: IMsg){
+    let {corpApi, isvApi} = await ddEventCommon(msg);
     let userIds = msg.UserId;
     let corpId = msg.CorpId;
 
@@ -373,8 +363,8 @@ export async function userLeaveOrg(msg){
  *  EventType : org_dept_create , org_dept_modify
  *  通讯录企业部门创建 , 通讯录企业部门修改
  */
-export async function orgDeptCreate(msg) : Promise<void>{
-    let {corpApi, isvApi, corp} = await ddEventCommon(msg);
+export async function orgDeptCreate(msg: IMsg) : Promise<void>{
+    let {corpApi, isvApi} = await ddEventCommon(msg);
     let ddDeparts = msg.DeptId;
     let corpId = msg.CorpId;
 
@@ -395,8 +385,8 @@ export async function orgDeptCreate(msg) : Promise<void>{
  *  EventType : org_dept_remove
  *  通讯录企业部门删除
  */
-export async function orgDeptRemove(msg) : Promise<any> {
-    let {corpApi, isvApi, corp} = await ddEventCommon(msg);
+export async function orgDeptRemove(msg: IMsg) : Promise<any> {
+    let {corpApi, isvApi} = await ddEventCommon(msg);
     let ddDeparts = msg.DeptId;
     let corpId = msg.CorpId;
 

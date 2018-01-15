@@ -1,16 +1,15 @@
 'use strict';
-import {Models} from '_types';
-import {CoinAccount} from "_types/coin";
-var moment = require("moment");
+import { Models } from '_types';
+import { CoinAccount } from "_types/coin";
 /**
  * 延长企业有效期
  * @type {{execute: (function(any): Promise<any>)}}
  */
-module.exports = {
-    execute: async function (params: {addNum: number, companyId: string}): Promise<boolean>{
-        let {addNum, companyId} = params;
+export default {
+    execute: async function (params: { addNum: number, companyId: string }): Promise<boolean> {
+        let { addNum, companyId } = params;
         let company = await Models.company.get(companyId);
-        if(!company.coinAccount){
+        if (!company.coinAccount) {
             let ca = CoinAccount.create();
             await ca.save();
             company.coinAccount = ca;

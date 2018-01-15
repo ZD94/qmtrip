@@ -1,9 +1,8 @@
 
-import {SupplierWebRobot, SupplierOrder, ReserveLink} from "../index";
+import {SupplierWebRobot, SupplierOrder } from "../index";
 import {EPayType, EInvoiceFeeTypes} from "_types/tripPlan";
-import L from '@jingli/language';
 
-var MOrderType = {
+var MOrderType: { [key: string]: any} = {
     "F": EInvoiceFeeTypes.PLANE_TICKET,
     "H": EInvoiceFeeTypes.HOTEL,
     "T": EInvoiceFeeTypes.TRAIN_TICKET
@@ -44,7 +43,6 @@ export default class SupplierCtripCT extends SupplierWebRobot{
     }
 
     async getOrderList(): Promise<SupplierOrder[]>{
-        let token = this.getCookie('token');
         let res = await this.client.post({
             uri: 'http://ct.ctrip.com/My/zh-cn/AllOrder/GetAllCorpOrder',
             headers: {

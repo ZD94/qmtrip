@@ -65,7 +65,7 @@ class FinanceModule {
 
 }
 
-async function isValidCode(tripPlanId, code) {
+async function isValidCode(tripPlanId: string, code: string) {
     let rows = await Models.financeCheckCode.find({where: { tripPlanId: tripPlanId, code: code, isValid: true}});
     if (rows && rows.length) return true;
     return false;

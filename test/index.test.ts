@@ -3,18 +3,18 @@
  */
 "use strict";
 var path = require('path');
+import bluebird = require("bluebird");
+bluebird.config({ longStackTraces: false })
+bluebird.promisifyAll(require('fs'));
+global.Promise = bluebird;
 
-global.Promise = require('bluebird');
-Promise.config({ longStackTraces: false });
-Promise.promisifyAll(require('fs'));
-
-process.on('unhandledRejection', (reason, p) => {
+process.on('unhandledRejection', (reason: Error | any) => {
     throw reason;
 });
 
 // require('./mocha-zone')(global);
 
-import config = require("@jingli/config");
+const config = require("@jingli/config");
 
 import Logger from '@jingli/logger';
 
@@ -42,7 +42,7 @@ Promise.resolve()
     })
     .then(API.loadTests.bind(API))
     .then(run)
-    .catch(function(e){
+    .catch(function(e: Error | any){
         logger.error(e.stack?e.stack:e);
         console.error(e.stack?e.stack:e);
         process.exit();

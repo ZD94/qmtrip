@@ -4,10 +4,17 @@
 
 'use strict';
 
-import {scannerDecoration, registerControllerToRouter, Reply} from "@jingli/restful";
+import {scannerDecoration, registerControllerToRouter} from "@jingli/restful";
+import { conf, auth } from 'server-auth';
+import { Models } from '_types';
+import { genSign } from '@jingli/sign';
+const cache = require('common/cache')
+const config = require('@jingli/config')
 
 import path = require("path");
 import express = require("express");
+import { Request, Response, NextFunction } from 'express';
+import { Application } from 'express-serve-static-core';
 
 let router = express.Router();
 scannerDecoration(path.join(__dirname, 'controller'));
@@ -28,7 +35,11 @@ function checkOrigin( origin ){
     return false;
 }
 
-function allowCrossDomain(req, res, next) {
+function getAppSecretByAppId(appId) {
+    return config.agent.appSecret;
+}
+
+function allowCrossDomain(req: Request, res: Response, next: NextFunction) {
     if (req.headers.origin && checkOrigin(req.headers.origin)) {
         res.header('Access-Control-Allow-Origin', req.headers.origin);
     }
@@ -40,9 +51,38 @@ function allowCrossDomain(req, res, next) {
     next();
 }
 
-
-export async function initHttp(app) {
+export async function initHttp(app: Application) {
     // router.param("companyId", validCompanyId);
-    app.use('/api/v1', allowCrossDomain, router);
+    // app.use('/api/v1', allowCrossDomain, router);
     // app.use('/api/v1', authenticate, router);
+
+    conf.setConfig(5 * 60 * 1000, [/^\/wechat/, /^\/workWechat/i], cache, getAppSecretByAppId)
+    app.use('/api/v1', jlReply)
+    app.use('/api/v1', allowCrossDomain);
+    app.use('/api/v1', (req: Request, res: any, next: NextFunction) => {
+        auth(req, res, next, async (err, isValid, data) => {
+            if (isValid) {
+                const companies = await Models.company.find({
+                    where: { appId: data.appId }
+                })
+                res.session = { ...data, companyId: companies[0] && companies[0].id }
+                return next()
+            }
+            return res.sendStatus(403)
+        })
+    }, router);
+}
+
+export function jlReply(req: any, res: any, next: NextFunction) {
+    res.jlReply = function (data: any) {
+        let { appId, appSecret } = req.session || { appId: '00000000', appSecret: '00000000' };
+        let timestamp = Math.floor(Date.now() / 1000);
+        let sign = genSign(data, timestamp, appSecret);
+        res.setHeader('appid', appId);
+        res.setHeader('sign', sign);
+        res.setHeader('Content-Type', 'application/json');
+        res.write(JSON.stringify(data));
+        res.end();
+    }
+     next();
 }

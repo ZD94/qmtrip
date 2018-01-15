@@ -14,11 +14,15 @@ var logger = new Logger('attachments');
 import bluebird = require('bluebird');
 import url = require("url");
 import {md5} from "common/utils";
+import { Request, Application, Response, NextFunction } from 'express-serve-static-core';
+var cors = require('cors');
+const corsOptions = { origin: true, credentials: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'content-type, Content-Type, auth, authstr, staffid, companyid, accountid'} 
 
-function resetTimeout(req, res, next){
-    req.clearTimeout();
+
+function resetTimeout(req: Request, res: Response, next: NextFunction){
+    // req.clearTimeout();
     next();
-    //conn_timeout('180s')(req, res, next);
+    //conn_timeout('180s')(req: Request, res: Response, next: NextFunction);
 }
 
 async function fs_exists(file): Promise<boolean>{
@@ -143,11 +147,11 @@ function allowCrossDomain(req, res, next) {
     next();
 }
 
-module.exports = function(app) {
+module.exports = function(app: Application) {
     //app.post('/upload/ajax-upload-file', proxy('http://localhost:4001', { reqAsBuffer: true,reqBodyEncoding: false }));
     let url = '/upload/ajax-upload-file'
 
-    /*app.post(url, resetTimeout, requestProxy({
+    /*app.post(url, cors(corsOptions), resetTimeout, requestProxy({
         url:config.hosts.main.www+'/upload/ajax-upload-file',
         reqAsBuffer: true,
         cache: false,
@@ -179,7 +183,7 @@ module.exports = function(app) {
         return host;
     }
 
-    /*app.get("/attachment/temp/:id", resetTimeout, function(req, res, next) {
+    /*app.get("/attachment/temp/:id", cors(corsOptions), resetTimeout, function(req: Request, res: Response, next: NextFunction) {
         let id = req.params.id;
         return requestProxy({
             url: config.hosts.main.www + '/attachment/temp/' + id ,
@@ -204,8 +208,8 @@ module.exports = function(app) {
  * @returns {*}
  */
 let pwd = process.cwd();
-async function getPublicFile(req, res, next) {
-    req.clearTimeout();
+async function getPublicFile(req: Request, res: Response, next: NextFunction) {
+    // req.clearTimeout();
     var cacheFile = await API.attachment.getFileCache({id:req.params.id, isPublic:true});
     if(!cacheFile) {
         return next(404);

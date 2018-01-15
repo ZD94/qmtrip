@@ -11,13 +11,9 @@ export abstract class SupplierWebRobot extends WebRobot{
     abstract login(authData: any): Promise<any>;
     abstract getOrderList(): Promise<SupplierOrder[]>;
     
-    getBookLink(options): Promise<ReserveLink>{
+    getBookLink(options: any): Promise<ReserveLink>{
         return Promise.resolve(null);
     }
-}
-
-interface ReserveLinkObject{
-    url: string
 }
 
 interface SupplierWebRobotConstructor{
@@ -37,12 +33,11 @@ function initSuppliers(){
         taobao_com :     require('./taobao_com'),
         ly_com :         require('./ly_com'),
         jingzhong_com:   require('./jingzhong_com'),
-        kiwi_com:        require('./kiwi_com'),
-        sky_scanner_com: require('./sky_scanner_com')
+        kiwi_com:        require('./kiwi_com')
     }
 }
 
-export function getSupplier(id): SupplierWebRobot {
+export function getSupplier(id: string): SupplierWebRobot {
     if(!suppliers){
         initSuppliers();
     }

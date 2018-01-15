@@ -1,0 +1,1 @@
+update trip_plan.trip_details set reserve_status = -3 where order_no is null or (reserve_status = 0 and order_no is null);

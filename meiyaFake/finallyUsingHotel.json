@@ -1,0 +1,3102 @@
+[
+    {
+        "name": "美豪丽致酒店(广州五羊新城店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 2488,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/371132.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 371132,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 2488,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.123769439908273,
+        "longitude": 113.30619094993872,
+        "shortName": "美豪丽致",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.6,
+        "distance": 440
+    },
+    {
+        "name": "柏高商务酒店(广州太古汇石牌桥地铁站店)(原天河城店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1512,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/431298.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 431298,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1512,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.136044006274318,
+        "longitude": 113.3261783852658,
+        "shortName": "柏高商务",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 2599
+    },
+    {
+        "name": "港润喜尔宾酒店(广州北京路店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1312,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/420095.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 420095,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1312,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.125262887611797,
+        "longitude": 113.27222159652517,
+        "shortName": "港润·喜尔宾",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.6,
+        "distance": 3669
+    },
+    {
+        "name": "星伦国际公寓(广州北京路店)(原凯迪国际公寓)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1472,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/9639837.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 9639837,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1472,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.12015936601071,
+        "longitude": 113.27385462157986,
+        "shortName": "星伦国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.6,
+        "distance": 3456
+    },
+    {
+        "name": "柏高酒店(广州龙口西岗顶地铁站店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1552,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/449125.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 449125,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1552,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.140915690282522,
+        "longitude": 113.33000871470648,
+        "shortName": "柏高酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.4,
+        "distance": 3257
+    },
+    {
+        "name": "迎商·雅兰酒店(广州北京路店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1392,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/647570.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 647570,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1392,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.132342540536953,
+        "longitude": 113.26091140956143,
+        "shortName": "迎商雅兰",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9,
+        "distance": 4971
+    },
+    {
+        "name": "桔子酒店·精选(广州天河岗顶店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1824,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/1732435.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 1732435,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1824,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.138998073087304,
+        "longitude": 113.33499888460764,
+        "shortName": "桔子精选",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.8,
+        "distance": 3502
+    },
+    {
+        "name": "广州马会酒店",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 2112,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/454857.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 454857,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 2112,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.12680753681994,
+        "longitude": 113.33956638614153,
+        "shortName": "马会酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 3349
+    },
+    {
+        "name": "星伦保利中汇国际公寓(广州火车东站店)(原伦凯保利国际公寓)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1452,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/4590350.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 4590350,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1452,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.151307735548095,
+        "longitude": 113.31751735116775,
+        "shortName": "星伦保利",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.4,
+        "distance": 3619
+    },
+    {
+        "name": "广州富豪酒店(北京路店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 916,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/468056.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 468056,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 916,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.12996093291618,
+        "longitude": 113.26644847905393,
+        "shortName": "方洁连锁",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.6,
+        "distance": 4355
+    },
+    {
+        "name": "伊莲·萨维尔国际酒店公寓(广州珠江新城店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1592,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/4657816.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 4657816,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1592,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.122141653808303,
+        "longitude": 113.33663728995629,
+        "shortName": "伊莲·萨维尔",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9,
+        "distance": 2973
+    },
+    {
+        "name": "柏高商务酒店(广州珠江新城赛马场店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1132,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/449138.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 449138,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1132,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.12362035441931,
+        "longitude": 113.34688644770137,
+        "shortName": "柏高商务",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 4032
+    },
+    {
+        "name": "佰合精选国际度假公寓(北京路方圆时光店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1376,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/7217270.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 7217270,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1376,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.120194147340182,
+        "longitude": 113.2736957377699,
+        "shortName": "佰合精选",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.6,
+        "distance": 3472
+    },
+    {
+        "name": "桔子水晶酒店(广州淘金店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 2088,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/345012.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 345012,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 2088,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.138636192394397,
+        "longitude": 113.28445765611802,
+        "shortName": "桔子水晶",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.6,
+        "distance": 3146
+    },
+    {
+        "name": "迎商酒店(广州客村地铁站敦和店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1012,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/2728682.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 2728682,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1012,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.0926413908688,
+        "longitude": 113.31060293586494,
+        "shortName": "迎商酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 3063
+    },
+    {
+        "name": "柏高商务酒店(广州天河北天平架地铁站店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1304,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/1934769.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 1934769,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1304,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.164524829353557,
+        "longitude": 113.31586128974021,
+        "shortName": "柏高商务酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 5016
+    },
+    {
+        "name": "迎商酒店(广州东山口地铁站店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1400,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/7054335.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 7054335,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1400,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.127801691339002,
+        "longitude": 113.28684289133375,
+        "shortName": "迎商酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9,
+        "distance": 2296
+    },
+    {
+        "name": "港润粤北酒店(广州世贸中心店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 944,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/512229.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 512229,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 944,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.1342464351135,
+        "longitude": 113.27808792219436,
+        "shortName": "港润粤北",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 3410
+    },
+    {
+        "name": "广东外商大酒店",
+        "star": 5,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1808,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/436011.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 436011,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1808,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.127864821661824,
+        "longitude": 113.30862192095535,
+        "shortName": "外商大酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 875
+    },
+    {
+        "name": "迎商方豪酒店(广州珠江新城赛马场店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1424,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/714905.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 714905,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1424,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.128152900373593,
+        "longitude": 113.35014318628252,
+        "shortName": "方豪酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9,
+        "distance": 4438
+    },
+    {
+        "name": "易成国际酒店公寓(广州正佳广场店)(原易成酒店服务公寓(正佳金殿店))",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1736,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/513050.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 513050,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1736,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.13603531625852,
+        "longitude": 113.3203036138603,
+        "shortName": "易成国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 2199
+    },
+    {
+        "name": "铂格国际设计公寓(广州北京路越秀时光店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1496,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/8357555.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 8357555,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1496,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.11995504650873,
+        "longitude": 113.27369062479698,
+        "shortName": "铂格国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.6,
+        "distance": 3473
+    },
+    {
+        "name": "柏高商务酒店(广州江泰路地铁站店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1088,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/449118.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 449118,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1088,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.086663943784345,
+        "longitude": 113.27381679056718,
+        "shortName": "柏高商务",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 5075
+    },
+    {
+        "name": "广州南国会·1站酒店",
+        "star": 5,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1816,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/6672193.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 6672193,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1816,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.139311099572698,
+        "longitude": 113.33566358568328,
+        "shortName": "南国会·1站",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9,
+        "distance": 3577
+    },
+    {
+        "name": "易成国际酒店公寓(广州东站保利中汇店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1472,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/471190.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 471190,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1472,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.151037552654156,
+        "longitude": 113.31767116171741,
+        "shortName": "易成国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 3595
+    },
+    {
+        "name": "桔树国际公寓(广州珠江新城店)(原锦馨屋公寓)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1180,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/6509939.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 6509939,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1180,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.126926225690216,
+        "longitude": 113.32798344098602,
+        "shortName": "桔树国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9,
+        "distance": 2215
+    },
+    {
+        "name": "嘻哈酒店公寓(广州保利中达广场店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 2212,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/1642814.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 1642814,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 2212,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.119515013672245,
+        "longitude": 113.32432836180523,
+        "shortName": "嘻哈酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 1707
+    },
+    {
+        "name": "柏高酒店(广州天河北水荫路店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1396,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/2582285.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 2582285,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1396,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.14588210307233,
+        "longitude": 113.3057692206755,
+        "shortName": "柏高酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 2879
+    },
+    {
+        "name": "星伦国际公寓(广州合生广场店)(原凯迪国际公寓)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1752,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/6547745.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 6547745,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1752,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.0885408422277,
+        "longitude": 113.30775152296378,
+        "shortName": "凯迪国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.6,
+        "distance": 3504
+    },
+    {
+        "name": "广州良友启程酒店",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 952,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/4105260.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 4105260,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 952,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.131867923937516,
+        "longitude": 113.33719937878826,
+        "shortName": "良友启程",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9,
+        "distance": 3295
+    },
+    {
+        "name": "广州华威达商务大酒店",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1504,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/450794.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 450794,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1504,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.13014504459878,
+        "longitude": 113.33709226307269,
+        "shortName": "华威达",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.4,
+        "distance": 3213
+    },
+    {
+        "name": "港润双城国际酒店公寓(广州珠江新城美国领事馆店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1432,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/3053327.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 3053327,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1432,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.123604047824035,
+        "longitude": 113.31185315743677,
+        "shortName": "双城国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.6,
+        "distance": 584
+    },
+    {
+        "name": "广州琶洲会展中心和颐酒店",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1120,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/3640653.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 3640653,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1120,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.101373477566057,
+        "longitude": 113.33114581989109,
+        "shortName": "和颐酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9,
+        "distance": 3176
+    },
+    {
+        "name": "柏高商务酒店(广州东站沙河服装城店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1272,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/511399.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 511399,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1272,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.158512726574163,
+        "longitude": 113.30221939378778,
+        "shortName": "柏高商务",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 4313
+    },
+    {
+        "name": "麗枫酒店式公寓(广州天河正佳广场店)(原丽枫酒店式公寓)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1648,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/2700958.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 2700958,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1648,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.134420232335817,
+        "longitude": 113.32720612022844,
+        "shortName": "麗枫酒店式",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9,
+        "distance": 2560
+    },
+    {
+        "name": "广州锐得保利中达公寓",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 2056,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/1581816.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 1581816,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 2056,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.119364633031157,
+        "longitude": 113.32372580649283,
+        "shortName": "锐得保利",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9,
+        "distance": 1646
+    },
+    {
+        "name": "寓米公寓酒店(广州富力东山新天地店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1816,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/9078273.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 9078273,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1816,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.130271271970553,
+        "longitude": 113.3086349040702,
+        "shortName": "寓米公寓",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.4,
+        "distance": 1141
+    },
+    {
+        "name": "易成酒店公寓(广州威尼国际店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1116,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/482661.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 482661,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1116,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.153924153169317,
+        "longitude": 113.31627987922874,
+        "shortName": "易成国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 3869
+    },
+    {
+        "name": "朵亚连锁酒店公寓(广州珠江新城美国领事馆店)(原珠江新城地铁站店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1036,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/7004970.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 7004970,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1036,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.12291718843223,
+        "longitude": 113.31077778447138,
+        "shortName": "朵亚连锁",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.4,
+        "distance": 452
+    },
+    {
+        "name": "怡尊阁国际公寓(广州保利中达广场店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 2236,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/8151862.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 8151862,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 2236,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.119422409213318,
+        "longitude": 113.32441693858624,
+        "shortName": "怡尊阁",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 1716
+    },
+    {
+        "name": "迎商酒店(广州岗顶龙口西店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 944,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/433214.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 433214,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 944,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.140375685996805,
+        "longitude": 113.33035777246141,
+        "shortName": "迎商酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 3240
+    },
+    {
+        "name": "广州柏秀公寓(广州广弘天琪店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1184,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/6406944.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 6406944,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1184,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.121711354853538,
+        "longitude": 113.31206086667797,
+        "shortName": "柏秀公寓",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.4,
+        "distance": 487
+    },
+    {
+        "name": "怡尊阁国际公寓(广州富力东山新天地店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1336,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/10214163.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 10214163,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1336,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.13012918146557,
+        "longitude": 113.30850704808982,
+        "shortName": "怡尊阁",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.4,
+        "distance": 1124
+    },
+    {
+        "name": "永客商务公寓(广州昌岗店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1104,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/6504736.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 6504736,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1104,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.092878013740748,
+        "longitude": 113.27093677849992,
+        "shortName": "永客商务",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.6,
+        "distance": 4819
+    },
+    {
+        "name": "广州瑞尔曼Omen国际公寓",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1392,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/7514116.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 7514116,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1392,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.121863580684693,
+        "longitude": 113.33681978129616,
+        "shortName": "瑞尔曼Omen",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.6,
+        "distance": 2990
+    },
+    {
+        "name": "嘻哈国际公寓(广州力达广场店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1164,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/8868655.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 8868655,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1164,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.16051821586744,
+        "longitude": 113.32159869791224,
+        "shortName": "嘻哈国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.4,
+        "distance": 4721
+    },
+    {
+        "name": "港寓国际酒店公寓(广州天河北火车东站店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1432,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/7517888.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 7517888,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1432,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.15167836990506,
+        "longitude": 113.3294900904313,
+        "shortName": "港寓国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.6,
+        "distance": 4166
+    },
+    {
+        "name": "广州展鸿琶洲酒店公寓",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1436,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/4649716.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 4649716,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1436,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.102847931601243,
+        "longitude": 113.3352124517069,
+        "shortName": "展鸿琶洲",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.2,
+        "distance": 3406
+    },
+    {
+        "name": "佰思特国际度假公寓(广州客村店)",
+        "star": 2,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1152,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/7088782.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 7088782,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1152,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.08962292961172,
+        "longitude": 113.30832678088812,
+        "shortName": "佰思特国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 3384
+    },
+    {
+        "name": "广州嗳尚渼国际公寓",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1064,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/7517209.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 7517209,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1064,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.0927461632974,
+        "longitude": 113.27062639050767,
+        "shortName": "嗳尚渼国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 4853
+    },
+    {
+        "name": "永客酒店公寓(广州保利中达广场店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 2192,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/6510047.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 6510047,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 2192,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.12033861798342,
+        "longitude": 113.32427756939911,
+        "shortName": "永客酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.6,
+        "distance": 1701
+    },
+    {
+        "name": "西尔曼连锁酒店公寓(广州先烈南路店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1112,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/6276714.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 6276714,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1112,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.134408509713012,
+        "longitude": 113.28138721319188,
+        "shortName": "西尔曼",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.6,
+        "distance": 3124
+    },
+    {
+        "name": "私享家连锁酒店公寓(广州珠江新城地铁站店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1096,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/11537482.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 11537482,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1096,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.12245600073921,
+        "longitude": 113.31002493060139,
+        "shortName": "私享家连锁",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9,
+        "distance": 361
+    },
+    {
+        "name": "帕斐乐国际公寓酒店(广州富力东山新天地店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1640,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/9545735.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 9545735,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1640,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.130157740739147,
+        "longitude": 113.30851212450655,
+        "shortName": "帕斐乐",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 1127
+    },
+    {
+        "name": "广州四季酒店",
+        "star": 5,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 8032,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/345010.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 345010,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 8032,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.121298619562506,
+        "longitude": 113.31735119399755,
+        "shortName": "四季酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.6,
+        "distance": 1002
+    },
+    {
+        "name": "广州W酒店",
+        "star": 5,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 5984,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/437873.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 437873,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 5984,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.12539432759595,
+        "longitude": 113.32248528042444,
+        "shortName": "W酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.4,
+        "distance": 1629
+    },
+    {
+        "name": "广州希尔顿逸林酒店",
+        "star": 5,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 3200,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/668102.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 668102,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 3200,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.134366672983777,
+        "longitude": 113.26507517118067,
+        "shortName": "希尔顿逸林",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 4636
+    },
+    {
+        "name": "广东大厦",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1592,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/434506.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 434506,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1592,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.134884065116534,
+        "longitude": 113.26128790967185,
+        "shortName": "广东大厦",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 5020
+    },
+    {
+        "name": "广州华轩里酒店",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 2320,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/8784327.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 8784327,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 2320,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.125875288339213,
+        "longitude": 113.31653332035769,
+        "shortName": "华轩里",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 1116
+    },
+    {
+        "name": "广州文华东方酒店",
+        "star": 5,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 7504,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/428547.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 428547,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 7504,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.137300990980027,
+        "longitude": 113.3275230481838,
+        "shortName": "文华东方",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.6,
+        "distance": 2795
+    },
+    {
+        "name": "广州海航威斯汀酒店",
+        "star": 5,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 3840,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/344998.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 344998,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 3840,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.14668944557556,
+        "longitude": 113.32032318091156,
+        "shortName": "威斯汀",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.4,
+        "distance": 3233
+    },
+    {
+        "name": "广州天河希尔顿酒店",
+        "star": 5,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 3732,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/345002.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 345002,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 3732,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.14928729732135,
+        "longitude": 113.31485565126212,
+        "shortName": "希尔顿",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 3334
+    },
+    {
+        "name": "广州鸿德国际酒店",
+        "star": 5,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 2400,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/1233759.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 1233759,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 2400,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.152481267829717,
+        "longitude": 113.32852207775062,
+        "shortName": "鸿德国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 4190
+    },
+    {
+        "name": "广州富力君悦大酒店",
+        "star": 5,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 4832,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/344853.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 344853,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 4832,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.12598584239478,
+        "longitude": 113.31762158517623,
+        "shortName": "君悦",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 1215
+    },
+    {
+        "name": "正佳金殿维福顿公寓(广州正佳广场店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1992,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/444918.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 444918,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1992,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.13603516305813,
+        "longitude": 113.32033136490939,
+        "shortName": "维福顿",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 2200
+    },
+    {
+        "name": "广州地中海国际酒店",
+        "star": 5,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1824,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/392495.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 392495,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1824,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.1358097203126,
+        "longitude": 113.33102449774802,
+        "shortName": "地中海国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9,
+        "distance": 2964
+    },
+    {
+        "name": "麗枫酒店(广州体育西路地铁站店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1616,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/9242589.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 9242589,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1616,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.132771826646813,
+        "longitude": 113.31527213920066,
+        "shortName": "麗枫酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.6,
+        "distance": 1615
+    },
+    {
+        "name": "广州国德国际大酒店",
+        "star": 5,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 2640,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/392499.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 392499,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 2640,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.139436331018597,
+        "longitude": 113.32628798111193,
+        "shortName": "国德国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9,
+        "distance": 2877
+    },
+    {
+        "name": "广州友和酒店",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1936,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/426941.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 426941,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1936,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.15464020001851,
+        "longitude": 113.32815750890497,
+        "shortName": "友和酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 4381
+    },
+    {
+        "name": "广州维多利酒店",
+        "star": 5,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 2108,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/396594.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 396594,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 2108,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.129672736566878,
+        "longitude": 113.33091068892436,
+        "shortName": "维多利",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 2608
+    },
+    {
+        "name": "广州圣丰索菲特大酒店",
+        "star": 5,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 4456,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/347024.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 347024,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 4456,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.14122291060036,
+        "longitude": 113.31002571931765,
+        "shortName": "索菲特",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 2367
+    },
+    {
+        "name": "广州华侨友谊酒店",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1472,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/1010098.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 1010098,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1472,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.13472668098003,
+        "longitude": 113.32745312414946,
+        "shortName": "华侨友谊",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9,
+        "distance": 2601
+    },
+    {
+        "name": "广州华厦国际商务酒店",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1784,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/434592.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 434592,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1784,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.1465516399263,
+        "longitude": 113.32322819208741,
+        "shortName": "华厦国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9,
+        "distance": 3350
+    },
+    {
+        "name": "广州嘉逸豪庭酒店",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1424,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/444043.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 444043,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1424,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.14887196661428,
+        "longitude": 113.32104968715713,
+        "shortName": "嘉逸豪庭",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 3486
+    },
+    {
+        "name": "广州天河亚朵酒店",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 2064,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/932263.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 932263,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 2064,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.139240997633646,
+        "longitude": 113.30989334809448,
+        "shortName": "亚朵酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.4,
+        "distance": 2146
+    },
+    {
+        "name": "麗枫酒店(广州体育中心火车东站店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1712,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/427596.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 427596,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1712,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.1475565136118,
+        "longitude": 113.32595791756073,
+        "shortName": "麗枫酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.4,
+        "distance": 3586
+    },
+    {
+        "name": "广州合晋帝苑酒店",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1380,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/450320.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 450320,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1380,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.098525979575644,
+        "longitude": 113.32119998510932,
+        "shortName": "合晋帝苑",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 2766
+    },
+    {
+        "name": "广州宾馆",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1392,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/397520.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 397520,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1392,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.119023219171094,
+        "longitude": 113.25977967780027,
+        "shortName": "广州宾馆",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.4,
+        "distance": 4897
+    },
+    {
+        "name": "广州方圆奥克伍德豪景",
+        "star": 5,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 3816,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/345008.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 345008,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 3816,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.133636965479997,
+        "longitude": 113.32232719487429,
+        "shortName": "奥克伍德",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 2130
+    },
+    {
+        "name": "广州金万丽商务酒店",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1476,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/5419747.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 5419747,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1476,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.151477038607908,
+        "longitude": 113.33066150334861,
+        "shortName": "金万丽商务",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 4213
+    },
+    {
+        "name": "广州同吉假日酒店",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1756,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/1418729.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 1418729,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1756,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.13016250027063,
+        "longitude": 113.3381338848222,
+        "shortName": "同吉假日",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 3314
+    },
+    {
+        "name": "迎商三茂大酒店(广州环市路淘金地铁站店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1316,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/1226103.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 1226103,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1316,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.137720704420875,
+        "longitude": 113.28243123813192,
+        "shortName": "迎商三茂",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 3242
+    },
+    {
+        "name": "广州木莲庄酒店",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1472,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/690117.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 690117,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1472,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.126881651426203,
+        "longitude": 113.33337767150826,
+        "shortName": "木莲庄",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 2738
+    },
+    {
+        "name": "一呆公寓·广州保利中达(原伊思德国际公寓·广州保利中达)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 2220,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/1717623.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 1717623,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 2220,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.119242459005243,
+        "longitude": 113.32348857616759,
+        "shortName": "一呆公寓",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9,
+        "distance": 1622
+    },
+    {
+        "name": "麗枫酒店(广州太古汇广场石牌桥地铁站店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1600,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/2611679.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 2611679,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1600,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.134453614628995,
+        "longitude": 113.32720623803775,
+        "shortName": "麗枫酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 2562
+    },
+    {
+        "name": "广州凯旋华美达大酒店",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 2080,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/429221.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 429221,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 2080,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.117855683858643,
+        "longitude": 113.30783580035983,
+        "shortName": "华美达",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 245
+    },
+    {
+        "name": "柏高商务酒店(广州体育西路地铁站店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1556,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/2981735.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 2981735,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1556,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.133681800221343,
+        "longitude": 113.31409126080895,
+        "shortName": "柏高商务",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 1653
+    },
+    {
+        "name": "广州莱福广武酒店",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1316,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/392493.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 392493,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1316,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.138614283744733,
+        "longitude": 113.33284639770613,
+        "shortName": "莱福广武",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 3302
+    },
+    {
+        "name": "广东迎宾馆",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 3064,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/429300.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 429300,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 3064,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.131358094648704,
+        "longitude": 113.25531832764577,
+        "shortName": "迎宾馆",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.4,
+        "distance": 5497
+    },
+    {
+        "name": "广州皇家国际饭店",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 2112,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/397388.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 397388,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 2112,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.137480867811714,
+        "longitude": 113.31167251134592,
+        "shortName": "皇家国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.6,
+        "distance": 1981
+    },
+    {
+        "name": "全季酒店(广州天河北路店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1484,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/708013.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 708013,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1484,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.143589721132415,
+        "longitude": 113.30994356866232,
+        "shortName": "全季酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9,
+        "distance": 2628
+    },
+    {
+        "name": "广州天美酒店",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1248,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/512678.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 512678,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1248,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.137168260963062,
+        "longitude": 113.32455080969184,
+        "shortName": "天美酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.6,
+        "distance": 2571
+    },
+    {
+        "name": "广州珠江国际酒店",
+        "star": 5,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1904,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/512583.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 512583,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1904,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.086143494197522,
+        "longitude": 113.29644862215895,
+        "shortName": "珠江国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 3940
+    },
+    {
+        "name": "御江苑维福顿公寓(广州北京路地铁站店)",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1384,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/926333.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 926333,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1384,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.118268290807688,
+        "longitude": 113.26387280522384,
+        "shortName": "御江苑",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 4481
+    },
+    {
+        "name": "广州大华酒店",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1432,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/441047.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 441047,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1432,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.138957174401728,
+        "longitude": 113.33440053072523,
+        "shortName": "大华酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 3450
+    },
+    {
+        "name": "麗枫酒店(广州珠江���城地铁站店)",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1772,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/8694736.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 8694736,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1772,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.126119159930308,
+        "longitude": 113.31051946348084,
+        "shortName": "麗枫酒店",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 736
+    },
+    {
+        "name": "广州中国市长大厦",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 2148,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/444040.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 444040,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 2148,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.145075706109598,
+        "longitude": 113.31686797056632,
+        "shortName": "市长大厦",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 9.2,
+        "distance": 2938
+    },
+    {
+        "name": "广州朗逸商务酒店",
+        "star": 3,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1344,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/559129.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 559129,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1344,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.099210960662635,
+        "longitude": 113.32906722177853,
+        "shortName": "朗逸商务",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.2,
+        "distance": 3189
+    },
+    {
+        "name": "广州鼎龙国际大酒店",
+        "star": 5,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1952,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/419889.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 419889,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1952,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.157828864190137,
+        "longitude": 113.30881416540119,
+        "shortName": "鼎龙国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.6,
+        "distance": 4203
+    },
+    {
+        "name": "广州达镖国际酒店",
+        "star": 4,
+        "agents": [
+            {
+                "name": "ctrip",
+                "price": 1676,
+                "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/374613.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                "deeplinkData": {
+                    "type": "domestic",
+                    "hotelId": 374613,
+                    "checkInDate": "2017-12-26",
+                    "checkOutDate": "2017-12-30"
+                }
+            },
+            {
+                "name": "meiya",
+                "price": 1676,
+                "urlParams": {
+                    "hotelId": "20421691"
+                }
+            }
+        ],
+        "latitude": 23.092690976400153,
+        "longitude": 113.27074933087846,
+        "shortName": "达镖国际",
+        "checkInDate": "2017-12-26",
+        "checkOutDate": "2017-12-30",
+        "commentScore": 8.8,
+        "distance": 4847
+    }
+]

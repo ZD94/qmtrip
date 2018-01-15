@@ -1,32 +1,32 @@
-import _ = require("lodash");
+// import _ = require("lodash");
 
-function dealBudget(obj){
-    let keys = Object.keys(obj);
-    for(let key of keys){
-        let arr = obj[key];
-        if(!arr[Symbol.iterator]){
-            continue;
-        }
-        for(let item of arr){
-            if(item.name == "planePricePrefer"){
-                item.name = "price";
-            }
-            if(item.options){
-                for(let k of Object.keys(item.options)){
-                    if(k == "cabins"){
-                        let result = item.options[k];
-                        item.options["level"] = _.cloneDeep(result);
-                        delete item.options[k];
-                    }
-                }
-            }
-        }
-    }
+// function dealBudget(obj: object){
+//     let keys = Object.keys(obj);
+//     for(let key of keys){
+//         let arr = obj[key];
+//         if(!arr[Symbol.iterator]){
+//             continue;
+//         }
+//         for(let item of arr){
+//             if(item.name == "planePricePrefer"){
+//                 item.name = "price";
+//             }
+//             if(item.options){
+//                 for(let k of Object.keys(item.options)){
+//                     if(k == "cabins"){
+//                         let result = item.options[k];
+//                         item.options["level"] = _.cloneDeep(result);
+//                         delete item.options[k];
+//                     }
+//                 }
+//             }
+//         }
+//     }
 
-    return obj;
-}
+//     return obj;
+// }
 
-module.exports = function(DB, t) {
+// module.exports = function(DB: any, t: any) {
 
     // let sql = `SELECT * FROM company.companies where deleted_at is null`;
     // return DB.query(sql)
@@ -43,4 +43,4 @@ module.exports = function(DB, t) {
     //         let result = await DB.query(`update company.companies set budget_config = '${configStr}'::jsonb where id = '${item.id}'`);
     //     }
     // })
-}
+// }

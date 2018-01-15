@@ -1,10 +1,10 @@
-import uuid = require("node-uuid");
+import uuid = require('node-uuid')
 
-module.exports =async function(DB, t) {
+module.exports =async function(DB: any, t: any) {
     let sql1 = `select * from ddtalk.corps where deleted_at is null`;
-    await DB.query(sql1).then(async (rets)=>{
+    await DB.query(sql1).then(async (rets: any)=>{
         let corps = rets[0];
-        await Promise.all(corps.map(async (corp)=>{
+        await Promise.all(corps.map(async (corp: any)=>{
             let companyId = corp.company_id ? `'${corp.company_id}'` : null;
             let agentid = corp.agentid ? `'${corp.agentid}'`: null;
             let permentCode = corp.permanent_code ? `'${corp.permanent_code}'` : null;
@@ -26,9 +26,9 @@ module.exports =async function(DB, t) {
     });
 
     let sql2 = `select * from ddtalk.departments where deleted_at is null`;
-    await DB.query(sql2).then(async (rets)=>{
+    await DB.query(sql2).then(async (rets: any)=>{
         let departments = rets[0];
-        await Promise.all(departments.map(async (dept)=>{
+        await Promise.all(departments.map(async (dept: any)=>{
             let corpId = dept.corp_id ? `'${dept.corp_id}'` : null;
             let departmentId = dept.local_department_id ? `'${dept.local_department_id}'`: null;
             let ddDepartmentId = dept.dd_department_id ? `'${dept.dd_department_id}'`: null;
@@ -45,9 +45,9 @@ module.exports =async function(DB, t) {
     });
 
     let sql3 = `select * from ddtalk.users where deleted_at is null`;
-    await DB.query(sql3).then(async (rets)=>{
+    await DB.query(sql3).then(async (rets: any)=>{
         let staffs = rets[0];
-        await Promise.all(staffs.map(async (staff)=>{
+        await Promise.all(staffs.map(async (staff: any)=>{
             let ddUserId = staff.dd_user_id ? `'${staff.dd_user_id}'` : null;
             let staffId = staff.id ? `'${staff.id}'`: null;
             let staffCorpId = staff.corpid ? `'${staff.corpid}'`: null;
