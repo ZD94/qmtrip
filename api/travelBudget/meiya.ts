@@ -32,7 +32,6 @@ export function meiyaAuth(info?: object) {
             password: "asdasdasdas"
         };
     }
-    console.log(info, "<================csdcsdcscs")
     let str = JSON.stringify(info);
     str = encodeURIComponent(str);
     return str;
@@ -339,35 +338,35 @@ export function handelHotelsData(meiyaHotelData,originalData){
 }
 function transferHotelData(meiyaHotelData,originalData){
     let model ={
-            "name": "美豪丽致酒店(广州五羊新城店)",
-            "star": 4,
+            "name": meiyaHotelData.cnName,
+            "star": meiyaHotelData.starRating,
             "agents": [
                 {
-                    "name": "ctrip",
-                    "price": 2488,
-                    "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/371132.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                    "name": "meiya",
+                    // "price": 2488,
+                    // "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/371132.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
                     "deeplinkData": {
                         "type": "domestic",
-                        "hotelId": 371132,
-                        "checkInDate": "2017-12-26",
-                        "checkOutDate": "2017-12-30"
+                        "hotelId": meiyaHotelData.hotelId,
+                        "checkInDate": originalData.checkInDate,
+                        "checkOutDate":originalData.checkOutDate
                     }
                 },
                 {
                     "name": "meiya",
-                    "price": 2488,
+                    // "price": 2488,
                     "urlParams": {
                         "hotelId": "20421691"
                     }
                 }
             ],
-            "latitude": 23.123769439908273,
-            "longitude": 113.30619094993872,
-            "shortName": "美豪丽致",
-            "checkInDate": "2017-12-26",
-            "checkOutDate": "2017-12-30",
-            "commentScore": 9.6,
-            "distance": 440
+            "latitude": meiyaHotelData.latitude,
+            "longitude": meiyaHotelData.longitude,
+            "shortName": meiyaHotelData.cnName,
+            "checkInDate":originalData.checkInDate,
+            "checkOutDate": originalData.checkOutDate,
+            // "commentScore": 9.6,
+            // "distance": 440
         }
         return model
 }

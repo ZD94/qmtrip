@@ -189,7 +189,6 @@ export default class ApiTravelBudget {
         // if (!needMeiya) {
         //     return commonData;
         // }
-
         if (config.tmcFake == 1) {
             console.log("getHotelsData ===> fake data.");
             return require("meiyaFake/finallyUsingHotel");
@@ -206,7 +205,6 @@ export default class ApiTravelBudget {
 
     @clientExport
     static async getTrafficsData(params: ISearchTicketParams): Promise<any> {
-        console.log(params, "<==========params")
         let commonData;
         // let result;
         // try {
@@ -832,11 +830,10 @@ export default class ApiTravelBudget {
 
     //获取公司信息
     static async getCompanyInfo() {
-        // let currentStaff = await Staff.getCurrent();
-        // let staffId = currentStaff.id;
-        // let staff = await Models.staff.get(staffId);
-        // let companyId = staff.company.id;
-        let companyId = "e3e7e690-1b7c-11e7-a571-7fedc950bceb"
+        let currentStaff = await Staff.getCurrent();
+        let staffId = currentStaff.id;
+        let staff = await Models.staff.get(staffId);
+        let companyId = staff.company.id;
         let result;
         try {
             result = await RestfulAPIUtil.operateOnModel({
@@ -1036,15 +1033,15 @@ export default class ApiTravelBudget {
     }
 
 }
-let paramss = {
-    checkInDate: "2018-01-20",
-    checkOutDate: "2018-01-21",
-    cityId: "CT_131",
-    travelPolicyId: "dklfklsdklmfsmldfkdsmkfsdfs"
-}
-setTimeout(async () => {
-    await  ApiTravelBudget.getHotelsData(paramss)
-}, 8000);
+// let paramss = {
+//     checkInDate: "2018-01-20",
+//     checkOutDate: "2018-01-21",
+//     cityId: "CT_131",
+//     travelPolicyId: "dklfklsdklmfsmldfkdsmkfsdfs"
+// }
+// setTimeout(async () => {
+//     await  ApiTravelBudget.getHotelsData(paramss)
+// }, 8000);
 
 let params = {
     "originPlace": "CT_131",
