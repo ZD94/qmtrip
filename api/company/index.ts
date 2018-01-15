@@ -353,16 +353,19 @@ export default class CompanyModule {
      * @param params.query {} 此次出差的参数，包括目的地列表、
      */
     @clientExport
-    @requireParams(['companyId', 'tripNum', 'query', 'accountId'])
+    @requireParams(['companyId', 'tripNum', 'query', 'accountId', 'isCheckTripNumStillLeft'])
     static async verifyCompanyTripNum(params: {
         tripNum: number,
         companyId: string,
         accountId: string,
         query: any,
+        isCheckTripNumStillLeft: boolean
     }): Promise<{ company: Company, frozenNum: { limitFrozen: number, extraFrozen: number } }> {
-        let { tripNum, companyId, accountId, query } = params;
+        let { tripNum, companyId, accountId, query, isCheckTripNumStillLeft } = params;
         let company = await Models.company.get(companyId);
-        await company.beforeGoTrip({ number: tripNum });
+        if (isCheckTripNumStillLeft) {
+            await company.beforeGoTrip({ number: tripNum });  //新版出差提交审批时不检查公司剩余流量数,领导审批时检查
+        }
 
         let destinationPlaces = query.destinationPlacesInfo;
         let content = '';
