@@ -138,7 +138,6 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData) {
     for (let item of authData) {
         let info = item.identify;
         let sname = item.sname;
-
         meiyaResult = await request({
             url: urlHotel,
             method: "get",
@@ -151,7 +150,6 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData) {
             console.log(e)
         });
     }
-
     try {
         meiyaResult = JSON.parse(meiyaResult);
     } catch (e) {
@@ -341,22 +339,22 @@ function transferHotelData(meiyaHotelData,originalData){
             "name": meiyaHotelData.cnName,
             "star": meiyaHotelData.starRating,
             "agents": [
-                {
-                    "name": "meiya",
-                    // "price": 2488,
-                    // "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/371132.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
-                    "deeplinkData": {
-                        "type": "domestic",
-                        "hotelId": meiyaHotelData.hotelId,
-                        "checkInDate": originalData.checkInDate,
-                        "checkOutDate":originalData.checkOutDate
-                    }
-                },
+                // {
+                //     "name": "meiya",
+                //     // "price": 2488,
+                //     // "bookUrl": "http://m.ctrip.com/webapp/hotel/hoteldetail/371132.html?daylater=20&days=4&contrl=0&pay=0&latlon=#fromList",
+                //     "deeplinkData": {
+                //         "type": "domestic",
+                //         "hotelId": meiyaHotelData.hotelId,
+                //         "checkInDate": originalData.checkInDate,
+                //         "checkOutDate":originalData.checkOutDate
+                //     }
+                // },
                 {
                     "name": "meiya",
                     // "price": 2488,
                     "urlParams": {
-                        "hotelId": "20421691"
+                        "hotelId": meiyaHotelData.hotelId
                     }
                 }
             ],
@@ -366,7 +364,7 @@ function transferHotelData(meiyaHotelData,originalData){
             "checkInDate":originalData.checkInDate,
             "checkOutDate": originalData.checkOutDate,
             // "commentScore": 9.6,
-            // "distance": 440
+            "distance": 440
         }
         return model
 }
@@ -388,6 +386,12 @@ export function handleFlightData(meiyaFlightData,originalData){
 }
 
 function transferFlightData(meiyaFlightData:any,originalData){
+    let cabin,price;
+    for(let item of meiyaFlightData.flightPriceInfoList){
+        cabin = item.cabin
+        price = item.price
+    }
+
     let model =    {
             "No": meiyaFlightData.flightNo,
             "segs": [
@@ -427,8 +431,9 @@ function transferFlightData(meiyaFlightData:any,originalData){
                     "cabins": [
                         {
                             "name": 2,
-                            "price": 910,
-                            "discount": 0.67
+                            "price": price,
+                            "discount": 0.67,
+                            "cabin":cabin
                         }
                     ],
                     // "bookUrl": "http://m.ctrip.com/html5/flight/swift/domestic/SHA/CAN/2017-12-26",
@@ -478,7 +483,9 @@ export function handleTrainData(meiyaTrainData: any[],originalData) {
 function transferTrainData(meiyaTrainData:any,originalData){
     let departDateTime = originalData.leaveDate + " " + meiyaTrainData.DepDate;
     let arrivalDateTime = originalData.leaveDate + " " + meiyaTrainData.ArrDate;
-
+    console.log(originalData,"<============日期")
+    console.log(meiyaTrainData.DepDate,"<=================时间")
+    console.log(typeof departDateTime,departDateTime,"<=====================返回时间");
     let cabin,price;
     for(let item of meiyaTrainData.SeatList){
         cabin = item.SeatName
@@ -511,8 +518,8 @@ function transferTrainData(meiyaTrainData:any,originalData){
         "originStation": {
         "name": meiyaTrainData.DepStation
     },
-        "departDateTime": departDateTime,
-        "arrivalDateTime":arrivalDateTime,
+        "departDateTime": "2017-12-26T02:23:00.000Z",
+        "arrivalDateTime":"2017-12-27T12:23:00.000Z",
         "destinationStation": {
         "name": meiyaTrainData.ArrStation
     }

@@ -158,6 +158,7 @@ export default class ApiTravelBudget {
         // }
         let companyInfo = await ApiTravelBudget.getCompanyInfo();
         let data = companyInfo.data;
+        console.log(data,"<=================公司信息")
         let authData = [];
         data.map((item) => {
             let obj = {};
@@ -189,6 +190,7 @@ export default class ApiTravelBudget {
             if (meiyaHotel && meiyaHotel.length)
                 // commonData = compareHotelData(commonData, meiyaHotel);
                 commonData = handelHotelsData(meiyaHotel,params);
+            console.log(commonData,"<=======================处理后美亚数据")
             // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".finallyHotel.json", commonData);
             return commonData;
         }
@@ -250,10 +252,11 @@ export default class ApiTravelBudget {
             console.log("meiyaTrain ===> meiyaTrain data.", meiyaTrain.length)
             if (meiyaFlight && meiyaFlight.length)
             //     commonData = compareFlightData(commonData, meiyaFlight);
-                commonData = handleFlightData(meiyaFlight,params)
+                commonData = handleFlightData(meiyaFlight,params);
             if (meiyaTrain && meiyaTrain.length)
             // commonData = compareTrainData(commonData, meiyaTrain);
-                commonData = handleTrainData(meiyaTrain, params)
+            //     commonData = handleTrainData(meiyaTrain, params)
+            // console.log(commonData,"<===========================火车数据")
                 console.log("commonData ===> commonData data.", typeof (commonData))
             return commonData;
         }
@@ -849,6 +852,7 @@ export default class ApiTravelBudget {
         let staffId = currentStaff.id;
         let staff = await Models.staff.get(staffId);
         let companyId = staff.company.id;
+        // let companyId = "935fbeb0-acd0-11e7-ab1e-bdc5d9f254d3"
         let result;
         try {
             result = await RestfulAPIUtil.operateOnModel({
@@ -1048,15 +1052,15 @@ export default class ApiTravelBudget {
     }
 
 }
-// let paramss = {
-//     checkInDate: "2018-01-20",
-//     checkOutDate: "2018-01-21",
-//     cityId: "CT_131",
-//     travelPolicyId: "dklfklsdklmfsmldfkdsmkfsdfs"
-// }
-// setTimeout(async () => {
-//     await  ApiTravelBudget.getHotelsData(paramss)
-// }, 8000);
+let paramss = {
+    checkInDate: "2018-01-20",
+    checkOutDate: "2018-01-21",
+    cityId: "CT_131",
+    travelPolicyId: "dklfklsdklmfsmldfkdsmkfsdfs"
+}
+setTimeout(async () => {
+    await  ApiTravelBudget.getHotelsData(paramss)
+}, 8000);
 
 let params = {
     "originPlace": "CT_131",
