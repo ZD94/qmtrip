@@ -225,7 +225,7 @@ export default class CostCenterModule {
      */
     @clientExport
     @requireParams(["id"])
-    async getBudgetLog(params: { id: string }): Promise<BudgetLog> {
+    static async getBudgetLog(params: { id: string }): Promise<BudgetLog> {
         let id = params.id;
         var ah = await Models.budgetLog.get(id);
 
@@ -239,7 +239,7 @@ export default class CostCenterModule {
      * @returns {*}
      */
     @clientExport
-    async getBudgetLogs(params): Promise<FindResult> {
+    static async getBudgetLogs(params): Promise<FindResult> {
         let paginate = await Models.budgetLog.find(params);
         let ids = paginate.map(function (t) {
             return t.id;
@@ -248,8 +248,8 @@ export default class CostCenterModule {
     }
 
     @clientExport
-    static async budgetLogList(params: { costId: string, limit: number, offset: number, period: { start: Date, end: Date } }) {
-        return await Models.budgetLog.find({
+    static async budgetLogList(params: { costId: string, limit: number, offset: number, period: { start: Date, end: Date } }): Promise<FindResult> {
+        const res = await Models.budgetLog.find({
             where: {
                 costCenterId: params.costId,
                 createdAt: {
@@ -262,6 +262,7 @@ export default class CostCenterModule {
             limit: params.limit,
             offset: params.limit * params.offset
         })
+        return { ids: _.map(_.prop('id'), res), count: _.prop('total', res) }
     }
 
     /****************************************BudgetLog end************************************************/

@@ -33,12 +33,12 @@ export class RestApi {
                 permanent_code: permanentCode
             }
         })
-        if (res.errcode != 0)
-            return null
-        return {
-            accessToken: res.access_token,
-            expires_in: res.expires_in
-        }
+        if (res.access_token)
+            return {
+                accessToken: res.access_token,
+                expires_in: res.expires_in
+            }
+        return null
     }
 
     /**
@@ -60,7 +60,7 @@ export class RestApi {
             result = JSON.parse(result)
         console.log("=====>result: ", result)
         let corpName = result.auth_corp_info.corp_full_name;
-        if(!corpName || corpName == '') corpName = result.auth_corp_info.corp_name;
+        if (!corpName || corpName == '') corpName = result.auth_corp_info.corp_name;
         // if(result.errcode != 0) return null;
         return {
             accessToken: result.access_token,
@@ -74,17 +74,17 @@ export class RestApi {
                 userId: result.auth_user_info.userid,
                 name: result.auth_user_info.name,
                 avatar: result.auth_user_info.avatar,
-            }, 
+            },
             authInfo: {
-                agentId:   result.auth_info && result.auth_info.agent && result.auth_info.agent.length ? result.auth_info.agent[0].agentid: null,
-                appId: result.auth_info && result.auth_info.agent && result.auth_info.agent.length ? result.auth_info.agent[0].appid: null,            
-                name: result.auth_info && result.auth_info.agent && result.auth_info.agent.length ? result.auth_info.agent[0].name: null,
+                agentId: result.auth_info && result.auth_info.agent && result.auth_info.agent.length ? result.auth_info.agent[0].agentid : null,
+                appId: result.auth_info && result.auth_info.agent && result.auth_info.agent.length ? result.auth_info.agent[0].appid : null,
+                name: result.auth_info && result.auth_info.agent && result.auth_info.agent.length ? result.auth_info.agent[0].name : null,
             }
         } as IWPermanentCode;
     }
 
 
-   
+
 
     /**
      * @method 根据suiteToken获取该公司的管理员列表
@@ -93,7 +93,7 @@ export class RestApi {
      */
     async getAdminList(corpId: string, agentId: string, suiteToken: string): Promise<Array<IWAdminList>> {
         let url = `https://qyapi.weixin.qq.com/cgi-bin/service/get_admin_list?suite_access_token=${suiteToken}`;
-       
+
         let body = {
             auth_corpid: corpId,
             agentid: agentId
@@ -239,9 +239,8 @@ export class RestApi {
         const ticket = await cache.read('jsapi-ticket')
         if (ticket) return ticket
         const result: JsApiTicket = await reqProxy({
-            url: '',
-            method: 'GET',
-            qs: { access_token: accessToken }
+            url: 'https://qyapi.weixin.qq.com/cgi-bin/get_jsapi_ticket?access_token=' + accessToken,
+            method: 'GET'            
         })
         if (!result || result.errcode != 0) return null
         await cache.write('jsapi-ticket', result.ticket, result.expires_in)

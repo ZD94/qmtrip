@@ -15,6 +15,7 @@ export default class PlaceModule {
                     fields: {id, companyId}
                 }
             });
+            if(!city || !city.data) return null;
             return city.data;
         } 
         city = await restfulAPIUtil.operateOnModel({
@@ -25,6 +26,7 @@ export default class PlaceModule {
             },
             addUrl: "getCityInfoByName"
         });
+        if(!city || !city.data) return null;
         if(_.isArray(city.data)){
             return city.data[0];
         } 
@@ -43,6 +45,7 @@ export default class PlaceModule {
             addUrl: `search/${keyword}`
             // addUrl: `search/${encodeURIComponent(keyword)}`
         });
+        if(!city || !city.data) return null;
         return city.data;
     }
 
@@ -56,6 +59,7 @@ export default class PlaceModule {
             },
             addUrl: `${parentId}/children`
         });
+        if(!subcities || !subcities.data) return null;
         return subcities.data;
     }
 
@@ -69,7 +73,7 @@ export default class PlaceModule {
             },
             addUrl: `nearby/${longitude}/${latitude}`
         });
-
+        if(!neighbors || !neighbors.data) return null;
         return neighbors.data;
     }
 
@@ -83,6 +87,7 @@ export default class PlaceModule {
             },
             addUrl: 'getCitiesByLetter'
         });
+        if(!cities || !cities.data) return null;
         return cities.data;
     }
 
@@ -99,7 +104,8 @@ export default class PlaceModule {
         if(typeof cities.data == 'string'){
             cities.data = JSON.parse(cities.data);
         }
-        if(_.isArray(cities.data)){
+        if(!cities || !cities.data) return null;
+        if( _.isArray(cities.data)){
             return cities.data[0]
         }
         return cities.data;
@@ -115,6 +121,7 @@ export default class PlaceModule {
             },
             addUrl: 'getAirPortsByCity'
         });
+        if(!airports || !airports.data) return null;
         return airports.data;
     }
 
@@ -136,6 +143,7 @@ export default class PlaceModule {
             },
             addUrl: 'search/'  //=等字符表示不设，用于匹配find的路径
         });
+        if(!cities || !cities.data) return null;
         return cities.data;
     }
 
@@ -165,6 +173,7 @@ export default class PlaceModule {
             addUrl: addUrl
         }); 
         //兼容老版common-api的getCitiesbyLetter返回的数据结构为 {total: number, cities: []}
+        if(!cities || !cities.data) return null;
         if(_.isArray(cities.data)){
             return cities.data;
         }
