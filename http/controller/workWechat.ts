@@ -7,7 +7,7 @@ import { CPropertyType } from '_types/company';
 import { JLResponse } from 'server-auth/lib/auth';
 import { RestApi } from 'api/sso/libs/restApi';
 import { sortData } from '@jingli/sign';
-import crypto from 'crypto';
+const crypto = require('crypto');
 
 @Restful()
 export class WorkWechatController extends AbstractController {

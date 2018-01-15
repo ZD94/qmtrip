@@ -108,7 +108,6 @@ export class WCompany extends OaCompany {
         }
         return true;
     }
-
     /**
      * @method 初始化公司时，随机在管理员列表中选中设置为创建人
      * @return {Promise<boolean>}
@@ -121,7 +120,7 @@ export class WCompany extends OaCompany {
         if(createUser) 
             return true;
         let managers: Staff[] = await company.getManagers({withOwner: true});
-        if(!managers || managers.length)
+        if(!managers || managers.length == 0)
             return false;
         managers[0].roleId = EStaffRole.OWNER;
         await managers[0].save();
