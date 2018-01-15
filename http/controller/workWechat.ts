@@ -39,8 +39,11 @@ export class WorkWechatController extends AbstractController {
         let tempStr = sortedKeys.map(k => `${k}=${obj[k]}`).join('&')
         const sha1 = crypto.createHash('sha1')
         sha1.update(tempStr)
+        const signature = sha1.digest('hex')
+        console.log('temp:', tempStr)
+        console.log('signature:', signature)
         delete obj.jsapi_ticket
-        res.send(this.reply(0, { ...obj, signature: sha1.digest('hex') }))
+        res.json({ ...obj, signature })
     }
 
 }
