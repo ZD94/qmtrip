@@ -225,7 +225,7 @@ export default class CostCenterModule {
      */
     @clientExport
     @requireParams(["id"])
-    static async getBudgetLog(params: { id: string }): Promise<BudgetLog> {
+    async getBudgetLog(params: { id: string }): Promise<BudgetLog> {
         let id = params.id;
         var ah = await Models.budgetLog.get(id);
 
@@ -239,30 +239,12 @@ export default class CostCenterModule {
      * @returns {*}
      */
     @clientExport
-    static async getBudgetLogs(params): Promise<FindResult> {
+    async getBudgetLogs(params): Promise<FindResult> {
         let paginate = await Models.budgetLog.find(params);
         let ids = paginate.map(function (t) {
             return t.id;
         })
         return { ids: ids, count: paginate['total'] };
-    }
-
-    @clientExport
-    static async budgetLogList(params: { costId: string, limit: number, offset: number, period: { start: Date, end: Date } }): Promise<FindResult> {
-        const res = await Models.budgetLog.find({
-            where: {
-                costCenterId: params.costId,
-                createdAt: {
-                    $and: {
-                        $gte: add8Hours(params.period.start),
-                        $lte: add8Hours(params.period.end)
-                    }
-                }
-            },
-            limit: params.limit,
-            offset: params.limit * params.offset
-        })
-        return { ids: _.map(_.prop('id'), res), count: _.prop('total', res) }
     }
 
     /****************************************BudgetLog end************************************************/
@@ -284,11 +266,11 @@ export default class CostCenterModule {
     @clientExport
     static async listDeptBudget(deptId: string, period: { start: Date, end: Date }) {
         const children = await findChildren(deptId)
-        const where = { beginDate: { $gte: add8Hours(period.start) }, endDate: { $lte: add8Hours(period.end) } }
-        const costs = await Promise.all([...children.map(c =>
-            Models.costCenterDeploy.find({
-                where: { ...where, costCenterId: c.id }
-            })), Models.costCenterDeploy.find({ where: { ...where, costCenterId: deptId } })])
+        const where = constructWhereCondition(deptId, period)
+        const costs = await Promise.all([
+            ...children.map(c => Models.costCenterDeploy.find({ where: { ...where, costCenterId: c.id } })),
+            Models.costCenterDeploy.find({ where })
+        ])
         const uniqCosts: CostCenterDeploy[] = _.compose(_.compact, _.map(_.first))(costs)
         const planExpends = await Promise.all(uniqCosts.map(cost => cost.getPlanBudget({ startDay: period.start, endDay: period.end })))
         return _.zipWith((cost: CostCenterDeploy, planExpend: number) => {
@@ -298,60 +280,67 @@ export default class CostCenterModule {
     }
 
     @clientExport
-    static async initBudget(budgets: IBudget[], period: { start: Date, end: Date }) {
+    static async initBudget({ budgets, period, operator, costId }: ICostCenterDeploy) {
         const promiseAry = []
+        const where = constructWhereCondition(null, period)
+        let totalBudget = 0;
         for (let budget of budgets) {
             const { id } = budget
             delete budget.id
-
+            totalBudget += budget.selfTempBudget;
             const isCreated = (await Models.costCenter.get(id)) == void 0
             if (isCreated) {
                 promiseAry.push(CostCenter.create({ id, type: ECostCenterType.DEPARTMENT }).save())
             }
 
-            const costCenterDeploy = await Models.costCenterDeploy.find({
-                where: {
-                    costCenterId: id,
-                    beginDate: { $gte: add8Hours(period.start) },
-                    endDate: { $lte: add8Hours(period.end) }
-                }
-            })
+            const costCenterDeploy = await Models.costCenterDeploy.find({ where: { ...where, costCenterId: id } })
             if (costCenterDeploy.length < 1) {
                 promiseAry.push(CostCenterDeploy.create({ costCenterId: id, ...budget, beginDate: period.start, endDate: period.end }).save())
             }
         }
+        promiseAry.push(BudgetLog.create({ costCenterId: costId, value: totalBudget, type: BUDGET_CHANGE_TYPE.ADD_BUDGET, staffId: operator }).save())
         await Promise.all(promiseAry)
     }
 
     @clientExport
-    static async changeBudget(costId: string, budgets: IBudget[], appendBudget: number = 0, period: { start: Date, end: Date }) {
+    static async changeBudget({ budgets, period, operator, costId, appendBudget }: ICostCenterDeploy) {
         const tempSum = _.compose(_.sum, _.map(_.prop('selfTempBudget')))(budgets),
-            where = {
-                costCenterId: costId,
-                beginDate: { $gte: add8Hours(period.start) },
-                endDate: { $lte: add8Hours(period.end) }
-            }
+            where = constructWhereCondition(costId, period)
         const rootCost = _.first(await Models.costCenterDeploy.find({ where }))
 
         if (tempSum != rootCost.totalTempBudget + appendBudget) throw new L.ERROR_CODE_C(400, '超出总预算')
 
-        for (let b of budgets) {
-            const cost = _.first(await Models.costCenterDeploy.find({ where: { ...where, costCenterId: b.id } }))
-            if (cost.selfTempBudget != b.selfTempBudget) {
-                cost.selfTempBudget = b.selfTempBudget
-                // log
+        for (let budget of budgets) {
+            const { id } = budget
+            const cost = _.first(await Models.costCenterDeploy.find({ where: { ...where, costCenterId: id } }))
+            if (!cost) {
+                delete budget.id
+                await CostCenterDeploy.create({ costCenterId: id, ...budget, beginDate: period.start, endDate: period.end }).save()
+                continue
             }
-            cost.totalTempBudget = b.totalTempBudget
+            if (cost.selfTempBudget != budget.selfTempBudget) {
+                cost.selfTempBudget = budget.selfTempBudget
+                // log
+                await BudgetLog.create({ costCenterId: id, value: budget.selfTempBudget, type: BUDGET_CHANGE_TYPE.CHANGE_BUDGET, staffId: operator }).save()
+            }
+            cost.totalTempBudget = budget.totalTempBudget
             await cost.save()
         }
     }
 
+    /**
+     * 启用预算设置
+     * @param costId 
+     * @param period 
+     * @param operator 
+     */
     @clientExport
-    static async applyConf(costId: string, period: { start: Date, end: Date }) {
-        const where = { costCenterId: costId, beginDate: { $gte: add8Hours(period.start) }, endDate: { $lte: add8Hours(period.end) } }
+    static async applyConf(costId: string, period: { start: Date, end: Date }, operator: string) {
+        const where = constructWhereCondition(costId, period)
         const root = _.first(await Models.costCenterDeploy.find({ where }))
         let totalBudget = 0
         const children = await findChildren(costId)
+        const promiseAry = []
         for (let c of children) {
             const cost = _.first(await Models.costCenterDeploy.find({ where: { ...where, costCenterId: c.id } }))
             if (!cost) continue
@@ -363,24 +352,20 @@ export default class CostCenterModule {
                 cost.totalBudget = await getTotalTempBudgetSumOf(cs.map(c => c.id), period) + cost.selfTempBudget
             }
             totalBudget += cost.selfBudget
-            await cost.save()
+            promiseAry.push(cost.save())
         }
         root.selfBudget = root.selfTempBudget
         root.totalBudget = totalBudget + root.selfBudget
-        await root.save()
+        promiseAry.push(BudgetLog.create({ costCenterId: costId, value: totalBudget + root.selfBudget, type: BUDGET_CHANGE_TYPE.APPLY_BUDGET, staffId: operator }).save())
+        promiseAry.push(root.save())
+        await Promise.all(promiseAry);
     }
 
     @clientExport
     static async setEarlyWarning(costId: string,
         setting: { type: number, rate: number, audienceTypes: number[] },
         period: { start: Date, end: Date }) {
-        const cost = _.first(await Models.costCenterDeploy.find({
-            where: {
-                costCenterId: costId,
-                beginDate: { $gte: add8Hours(period.start) },
-                endDate: { $lte: add8Hours(period.end) }
-            }
-        }))
+        const cost = _.first(await Models.costCenterDeploy.find({ where: constructWhereCondition(costId, period) }))
         cost.warningPerson = setting.audienceTypes
         cost.warningRule = { type: setting.type, rate: setting.rate }
         await cost.save()
@@ -424,6 +409,14 @@ async function getPerMonthExpenditure(costId: string) {
 
 }
 
+function constructWhereCondition(costId: string, period: { start: Date, end: Date }) {
+    return {
+        costCenterId: costId,
+        beginDate: { $gte: add8Hours(period.start) },
+        endDate: { $lte: add8Hours(period.end) }
+    }
+}
+
 function add8Hours(time) {
     return moment(time).add(8, 'h').format()
 }
@@ -432,4 +425,12 @@ export interface IBudget {
     id: string,
     totalTempBudget: number,
     selfTempBudget: number
+}
+
+export interface ICostCenterDeploy {
+    costId: string,
+    budgets: IBudget[],
+    period: { start: Date, end: Date },
+    operator: string,
+    appendBudget?: number
 }
