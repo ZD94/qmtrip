@@ -198,7 +198,7 @@ export class WCompany extends OaCompany {
         if(!userInfo) return null;
 
         let oaStaff = new WStaff({id: userInfo.userid, name: userInfo.name, mobile: userInfo.mobile,
-            email: userInfo.email, departmentIds: userInfo.department, corpId: self.id, company: self.company,
+            email: userInfo.email, departmentIds: userInfo.department, sex: userInfo.gender, corpId: self.id, company: self.company,
             restApi: self.restApi, avatar: userInfo.avatar_mediaid});
         return oaStaff;
     }
