@@ -2,12 +2,34 @@
  * Created by yuchanglong on 2018/01/15
  */
 const config = require("@jingli/config");
+var API = require("@jingli/dnode-api");
 
 export = async function transform(values: any): Promise<any>{
-    let detailUrl = config.v2_host + '';
-    if(values.result) 
-        values.msg = '已开通成功';
-    if(values.result) 
-        values.msg = '开通失败';
+
+    let detailUrl;
+    let appMessageUrl: string;
+    let shortUrl: string = '';
+    if(values.account.name)
+        values.staffName = values.account.name
+
+    if(config.version == 2) {
+        detailUrl = config.v2_host + '/index-v2.html#/card-coupons/card-coupons';    
+        appMessageUrl = '#/card-coupons/card-coupons';
+    } else {
+        detailUrl = config.host +'/index.html#/card-coupons/card-coupons';
+        let finalUrl = '#/card-coupons/card-coupons';
+        finalUrl = encodeURIComponent(finalUrl);
+        appMessageUrl = `#/judge-permission/index&finalUrl=${finalUrl}`;
+    }
+
+    try{
+        shortUrl = await API.wechat.shorturl({longurl: detailUrl});
+    } catch (err) {
+        console.log("errors in obtaining shorturl: ",err)
+    }
+
+    values.detailUrl = shortUrl;
+    values.appMessageUrl = appMessageUrl;
+
     return values;
 }
