@@ -10,14 +10,14 @@ import { Models } from '_types';
 var API = require("@jingli/dnode-api");
 
 @Restful()
-export class EventsController extends AbstractController {
+export class EmailController extends AbstractController {
 
     constructor() {
         super();
     }
 
     $isValidId(id: string) {
-        return /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(id);
+        return true;
     }
 
     /**
@@ -27,14 +27,18 @@ export class EventsController extends AbstractController {
      */
     async add(req: Request, res: Response, next: NextFunction){
         let {userId, key, email, mobile, values} = req.body;
+        if(typeof values == 'string') 
+            values = JSON.parse(values);
         let resp = false;
         if(!email && !mobile) {
             if(!userId)
                 return res.json(this.reply(502, resp));
             let account = await Models.staff.get(userId);
             if(!account) {
-                let agencyUser = await Models.agency.get(userId);
-                if(!agencyUser)  return res.json(this.reply(0, resp));
+                let agencyUser = await Models.agencyUser.get(userId);
+                let agency = await Models.agency.get(agencyUser['agentUser']);
+                if(!agency)  
+                    return res.json(this.reply(0, resp));
             }
         }
         try{
