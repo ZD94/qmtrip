@@ -43,7 +43,7 @@ export class WorkWechatController extends AbstractController {
         console.log('temp:', tempStr)
         console.log('signature:', signature)
         delete obj.jsapi_ticket
-        res.json({ ...obj, signature })
+        res.send(this.reply(0, { ...obj, signature }))
     }
 
 }
