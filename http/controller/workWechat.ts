@@ -29,7 +29,7 @@ export class WorkWechatController extends AbstractController {
         const result = await RestApi.getAccessTokenByPermanentCode(corpId, permanentCode, suiteToken)
         const ticket = await RestApi.getJsApiTicket(result.accessToken)
         const obj: WxConfigSignature = {
-            timestamp: Date.now(),
+            timestamp: Math.ceil(Date.now() / 1000),
             noncestr: Math.random().toString(36).slice(-7),
             url,
             jsapi_ticket: ticket
