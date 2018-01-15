@@ -37,14 +37,10 @@ export class WorkWechatController extends AbstractController {
 
         const sortedKeys = ['jsapi_ticket', 'noncestr', 'timestamp', 'url']
         let tempStr = sortedKeys.map(k => `${k}=${obj[k]}`).join('&')
-        delete obj.jsapi_ticket
-        res.send(this.reply(0, { ...obj, signature: this.encryptBySha1(tempStr) }))
-    }
-
-    encryptBySha1(str: string) {
         const sha1 = crypto.createHash('sha1')
-        sha1.update(str)
-        return sha1.digest('hex')
+        sha1.update(tempStr)
+        delete obj.jsapi_ticket
+        res.send(this.reply(0, { ...obj, signature: sha1.digest('hex') }))
     }
 
 }
