@@ -27,6 +27,8 @@ import cache from 'common/cache'
 import { Request, NextFunction, Response, Application } from 'express-serve-static-core';
 import {restfulAPIUtil } from 'api/restful';
 import CompanyModule, { HotelPriceLimitType } from 'api/company';
+import { IWCreateUser, IWCreateDepartment, IWUpdateDepartment, IWDeleteDepartment } from 'api/sso/libs/notice-event';
+import { IWUpdateUser, IWDeleteUser } from 'api/sso/libs/event-notice';
 
 const { Parser } = require('xml2js')
 const wxCrypto = require('wechat-crypto')
@@ -444,23 +446,23 @@ const workWechatEventHandlers = {
 
 const changeContactEventHandlers = {
     // 员工变动事件
-    async create_user(xml: WorkWechatResponse) {
+    async create_user(xml: IWCreateUser) {
 
     },
-    async update_user(xml: WorkWechatResponse) {
+    async update_user(xml: IWUpdateUser) {
 
     },
-    async delete_user(xml: WorkWechatResponse) {
+    async delete_user(xml: IWDeleteUser) {
 
     },
     // 部门变动事件
-    async create_party(xml: WorkWechatResponse) {
+    async create_party(xml: IWCreateDepartment) {
 
     },
-    async update_party(xml: WorkWechatResponse) {
+    async update_party(xml: IWUpdateDepartment) {
 
     },
-    async delete_party(xml: WorkWechatResponse) {
+    async delete_party(xml: IWDeleteDepartment) {
 
     },
     // 标签成员变更事件
@@ -475,5 +477,5 @@ export interface WorkWechatResponse {
     TimeStamp: number,
     SuiteTicket?: string,
     AuthCode?: string,
-    AuthCorpId?: string
+    AuthCorpId?: string,
 }
