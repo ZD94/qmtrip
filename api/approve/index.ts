@@ -88,7 +88,7 @@ class ApproveModule {
             number *= budgetInfo.query.staffList.length;
         }
 
-        await company.beforeGoTrip({number: number});
+        // await company.beforeGoTrip({number: number});
         //冻结行程数
         let oldNum = company.tripPlanNumBalance;
         // let originTripPlanFrozenNum = company.tripPlanFrozenNum;
@@ -198,7 +198,7 @@ class ApproveModule {
             number *= budgetInfo.query.staffList.length;
         }
 
-        await company.beforeGoTrip({number: number});
+        // await company.beforeGoTrip({number: number});
         //冻结行程数
         let oldNum = company.tripPlanNumBalance;
         // let originTripPlanFrozenNum = company.tripPlanFrozenNum;
