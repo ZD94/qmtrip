@@ -29,7 +29,7 @@ export default class DepartmentModule {
     ])
     static async createDepartment (params: Department): Promise<Department>{
 
-        let result = await Models.department.find({ where: { name: params.name, companyId: params.companyId } });
+        let result = await Models.department.find({ where: { name: params.name, companyId: params.company.id } });
 
         if (result && result.length > 0) {
             throw { code: -1, msg: "该部门名称已存在，请重新设置" };
