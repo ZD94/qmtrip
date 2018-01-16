@@ -168,5 +168,8 @@
     "suiteId": "wwdb6efe49f6e236d3",
     "suiteSecret": "7GnoFq32hgkE27kkBFPZxeetnhyQxtFk2OvHFjtrW4I"
   },
-  "isVerify": false
+  "isVerify": false,
+  "JLApproveSystem": {
+    "postgresUrl": "${JL_APP_APPROVE_DATABASE}"
+  }
 }
