@@ -15,6 +15,7 @@ var utils = require("common/utils");
 import {Models} from "_types/index";
 import {Attachment, RelateFile} from "_types/attachment";
 import {md5} from "common/utils";
+import {Staff} from "_types/staff/staff";
 
 
 async function fs_exists(file: string): Promise<boolean>{
@@ -52,6 +53,9 @@ class ApiAttachment {
         var isPublic = params.isPublic || false;
         var contentType = params.contentType;
         var id:string;
+        let staff = await Staff.getCurrent();
+        let staffId = null;
+        if(staff) staffId = staff.id;
 
         if (!content) {
             throw {code: -1, msg: "附件信息不能为空"};
@@ -63,9 +67,9 @@ class ApiAttachment {
 
         content = new Buffer(content, 'base64');
         id = utils.md5(content);
-        var attachment = await Models.attachment.get(id, {attributes: {exclude: ['content']}});
+        var attachment = await Models.attachment.get(id);
         if (!attachment) {
-            attachment = Attachment.create({id: id, content: content, contentType: contentType});
+            attachment = Attachment.create({id: id, content: content, contentType: contentType, staffId: staffId});
             attachment = await attachment.save();
         }
         var file = RelateFile.create({isPublic: isPublic, key: id});
@@ -77,6 +81,28 @@ class ApiAttachment {
             sign: sign,
             expireTime: expireTime,
         }
+    }
+
+    /**
+     * @methdo removeFile 删除文件表和附件记录
+     * @param params
+     * @param params.id uuid
+     * @returns {*|Boolean|Promise.<undefined>|Promise.<Integer>}
+     */
+    static async removeFileAndAttach(params): Promise<boolean> {
+        if (!params) {
+            params = {};
+        }
+
+        var id = params.id;
+        var file = await Models.relateFile.get(id);
+        let [relateFile, attachment] = await Promise.all([
+            Models.relateFile.get(file.id),
+            Models.attachment.get(file.key)
+        ])
+        await relateFile.destroy();
+        await attachment.destroy();
+        return true;
     }
 
     /**
@@ -146,14 +172,14 @@ class ApiAttachment {
      */
     static async getSelfAttachment(params: {fileId: string}) {
         var fileId = params.fileId;
-        // var owner = await Owner.findOne({where: {fileId: fileId, accountId: accountId}});
-        // if (!owner) {
-        //     throw L.ERR.PERMISSION_DENY();
-        // }
-        var attachment = await API.attachment.getAttachment({id: fileId, isZoom:'off'});
+        /*let staff = await Staff.getCurrent();
+        let attachments = await Models.attachment.find({where: {id: fileId, staffId: staff.id}});
+        let attachment = null;
+        if(attachments && attachments.length){
+            attachment = await API.attachment.getAttachment({id: fileId});
+        }*/
 
-        // var filepath = path.join('tmp', attachment.id);
-        // fs.writeFile(filepath, attachment.content, {encoding: "binary"});
+        let attachment = await API.attachment.getAttachment({id: fileId});
 
         return attachment;
     }
@@ -173,7 +199,7 @@ class ApiAttachment {
 
             var cache_exist = await fs_exists(filepath);
             if(!cache_exist){
-                var attachment = await ApiAttachment.getAttachment({id: id});
+                var attachment = await Models.attachment.get(id);
                 if(!attachment) {
                     return null;
                 }

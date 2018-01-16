@@ -1,6 +1,7 @@
 /**
  * Created by by wyl on 15-12-16.
  */
+
 'use strict';
 let config = require('@jingli/config');
 import * as path from 'path';
@@ -157,8 +158,8 @@ module.exports = function(app: Application) {
         cache: false,
         timeout: 180000,
     }));*/
-    app.post(url, allowCrossDomain, uploadActionFile);
-    app.options(url, function (req, res, next) {
+    app.post(url, cors(corsOptions), uploadActionFile);
+    app.options(url, cors(corsOptions), function (req, res, next) {
         let referer = req.headers['referer'];
         let host;
         if (!referer) {
