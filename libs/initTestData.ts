@@ -15,11 +15,6 @@ var moment = require('moment');
 let testData = require('./test-data.json');
 var API = require("@jingli/dnode-api");
 
-import { restfulAPIUtil } from "api/restful";
-let RestfulAPIUtil = restfulAPIUtil;
-
-// import {HotelPriceLimitType} from 'api/company';
-// import defaultFormatUtc = moment.defaultFormatUtc;
 
 export async function initCompanyRegion(){
     let companies = await Models.company.all({where: {}});
