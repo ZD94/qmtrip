@@ -386,12 +386,6 @@ export default class CostCenterModule {
         cost.warningRule = { type: setting.type, rate: setting.rate }
         await cost.save()
     }
-
-    @clientExport
-    static async f(costId: string) {
-        const cost = await Models.costCenterDeploy.get(costId)
-        await cost.checkoutBudget()
-    }
 }
 
 async function getChildrenExpend(deptId: string) {
@@ -419,10 +413,6 @@ async function getTotalTempBudgetSumOf(costIds: string[], period?) {
         and begin_date >= '${add8Hours(period.start)}' and end_date <= '${add8Hours(period.end)}'`
     const res = (await DB.query(sql))[0][0]
     return (res && res.sum) || 0
-}
-
-async function getPerMonthExpenditure(costId: string) {
-
 }
 
 function constructWhereCondition(costId: string, period: { start: Date, end: Date }) {
