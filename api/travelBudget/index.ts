@@ -248,8 +248,8 @@ export default class ApiTravelBudget {
             ]);
             let meiyaTrain = arr[0];
             let meiyaFlight = arr[1];
-            console.log("meiyaFlight ===> meiyaFlight data.", meiyaFlight.length)
-            console.log("meiyaTrain ===> meiyaTrain data.", meiyaTrain.length)
+            console.log("meiyaFlight ===> meiyaFlight data.", meiyaFlight.length);
+            console.log("meiyaTrain ===> meiyaTrain data.", meiyaTrain.length);
             if (meiyaFlight && meiyaFlight.length)
             //     commonData = compareFlightData(commonData, meiyaFlight);
                 commonData = handleFlightData(meiyaFlight,params);
@@ -257,7 +257,7 @@ export default class ApiTravelBudget {
             // commonData = compareTrainData(commonData, meiyaTrain);
             //     commonData = handleTrainData(meiyaTrain, params)
             // console.log(commonData,"<===========================火车数据")
-                console.log("commonData ===> commonData data.", typeof (commonData))
+                console.log("commonData ===> commonData data.", typeof (commonData));
             return commonData;
         }
     }
@@ -1050,17 +1050,17 @@ export default class ApiTravelBudget {
                 .catch(next);
         })
     }
+}
 
-}
-let paramss = {
-    checkInDate: "2018-01-20",
-    checkOutDate: "2018-01-21",
-    cityId: "CT_131",
-    travelPolicyId: "dklfklsdklmfsmldfkdsmkfsdfs"
-}
-setTimeout(async () => {
-    await  ApiTravelBudget.getHotelsData(paramss)
-}, 8000);
+// let paramss = {
+//     checkInDate: "2018-01-20",
+//     checkOutDate: "2018-01-21",
+//     cityId: "CT_131",
+//     travelPolicyId: "dklfklsdklmfsmldfkdsmkfsdfs"
+// }
+// setTimeout(async () => {
+//     await  ApiTravelBudget.getHotelsData(paramss)
+// }, 8000);
 
 let params = {
     "originPlace": "CT_131",

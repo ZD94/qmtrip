@@ -335,6 +335,7 @@ export function handelHotelsData(meiyaHotelData,originalData){
     }
 }
 function transferHotelData(meiyaHotelData,originalData){
+    var num = Math.round(Math.random()*1000)+1000
     let model ={
             "name": meiyaHotelData.cnName,
             "star": meiyaHotelData.starRating,
@@ -352,7 +353,7 @@ function transferHotelData(meiyaHotelData,originalData){
                 // },
                 {
                     "name": "meiya",
-                    // "price": 2488,
+                    "price": num,
                     "urlParams": {
                         "hotelId": meiyaHotelData.hotelId
                     }
@@ -386,10 +387,11 @@ export function handleFlightData(meiyaFlightData,originalData){
 }
 
 function transferFlightData(meiyaFlightData:any,originalData){
-    let cabin,price;
+    let cabin,price,priceID;
     for(let item of meiyaFlightData.flightPriceInfoList){
         cabin = item.cabin
         price = item.price
+        priceID = item.priceID
     }
 
     let model =    {
@@ -433,7 +435,11 @@ function transferFlightData(meiyaFlightData:any,originalData){
                             "name": 2,
                             "price": price,
                             "discount": 0.67,
-                            "cabin":cabin
+                            "cabin":cabin,
+                            "urlParams": {
+                                "No":meiyaFlightData.flightNo,
+                                "priceId":priceID
+                            }
                         }
                     ],
                     // "bookUrl": "http://m.ctrip.com/html5/flight/swift/domestic/SHA/CAN/2017-12-26",
