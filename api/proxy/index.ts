@@ -250,6 +250,7 @@ class Proxy {
             pathstring = pathstring.replace("/mall", '');
             let sign = genSign(params, timestamp, appSecret)
             let url = `${config.mall.orderLink}${pathstring}`;
+            console.log(url,"<==================商城url")
             console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.mall.appId, '===request params: ', params) 
             let result = await new Promise((resolve, reject) => {
                 return request({
