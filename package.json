@@ -194,7 +194,7 @@
     "jquery": "^3.1.0",
     "jquery-ui": "^1.12.0",
     "jsdom": "^9.4.2",
-    "less": "^2.7.1",
+    "less": "2.7.1",
     "less-plugin-autoprefix": "^1.5.1",
     "less-plugin-clean-css": "^1.5.1",
     "lessify": "^1.0.1",
