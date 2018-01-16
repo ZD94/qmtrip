@@ -794,10 +794,12 @@ export default class ApiTravelBudget {
                 tripNum: tripNumCost,
                 companyId: company.id,
                 accountId: staff.id,
-                query: params
+                query: params,
+                isCheckTripNumStillLeft: (isIntoApprove && eachBudgetSegIsOk) //领导查看审批单时，要检查企业剩余流量包数是否足够
             });
-
+            console.log('isCheckTripNumStillLeft', isIntoApprove && eachBudgetSegIsOk);
             obj.query['frozenNum'] = result.frozenNum;
+
             //拿到预算后更新approve表
             if (!isIntoApprove && eachBudgetSegIsOk) {//判断是否是审批人查看审批单时进行的第二次拉取数据
                 let updateBudget = await Models.approve.get(approveId);
@@ -805,7 +807,6 @@ export default class ApiTravelBudget {
                 let submitter = await Models.staff.get(staff.id);
                 updateBudget.submitter = submitter.id;
                 updateBudget.data = obj;
-                updateBudget.title = obj.query['projectName'];
                 updateBudget.channel = submitter.company.oa;
                 updateBudget.type = EApproveType.TRAVEL_BUDGET;
                 updateBudget.approveUser = approveUser ? approveUser.id : null;

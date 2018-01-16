@@ -29,7 +29,7 @@ export class WorkWechatController extends AbstractController {
         const result = await RestApi.getAccessTokenByPermanentCode(corpId, permanentCode, suiteToken)
         const ticket = await RestApi.getJsApiTicket(result.accessToken)
         const obj: WxConfigSignature = {
-            timestamp: Date.now(),
+            timestamp: Math.ceil(Date.now() / 1000),
             noncestr: Math.random().toString(36).slice(-7),
             url,
             jsapi_ticket: ticket
@@ -37,14 +37,13 @@ export class WorkWechatController extends AbstractController {
 
         const sortedKeys = ['jsapi_ticket', 'noncestr', 'timestamp', 'url']
         let tempStr = sortedKeys.map(k => `${k}=${obj[k]}`).join('&')
-        delete obj.jsapi_ticket
-        res.send(this.reply(0, { ...obj, signature: this.encryptBySha1(tempStr) }))
-    }
-
-    encryptBySha1(str: string) {
         const sha1 = crypto.createHash('sha1')
-        sha1.update(str)
-        return sha1.digest('hex')
+        sha1.update(tempStr)
+        const signature = sha1.digest('hex')
+        console.log('temp:', tempStr)
+        console.log('signature:', signature)
+        delete obj.jsapi_ticket
+        res.send(this.reply(0, { ...obj, signature }))
     }
 
 }
