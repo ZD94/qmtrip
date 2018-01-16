@@ -40,6 +40,7 @@ let RestfulAPIUtil = restfulAPIUtil;
 import * as error from "@jingli/error";
 import { Company } from '_types/company';
 import { CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE } from '_types/coin';
+const axios = require('axios')
 interface ReportInvoice {
     type: string;
     date: Date;
@@ -2674,8 +2675,33 @@ class TripPlanModule {
 
         return true;
     }
+
+    @clientExport
+    static async completeTrip(params) {
+        const tripPlan = await Models.tripPlan.get(params.id)
+        if (moment().milliseconds < moment(tripPlan.backAt).milliseconds)
+            throw new L.ERROR_CODE_C(400, '不可操作')
+        if (tripPlan.status != EPlanStatus.COMPLETE)
+            throw new L.ERROR_CODE_C(400, '')
+        const tripDetails = await tripPlan.getTripDetails({})
+        const orders = await Promise.all(tripDetails.map(td => getOrderInfo(td.orderNo)))
+        tripPlan.expenditure = _.sumBy(orders, _.property('price'))
+        tripPlan.status = EPlanStatus.COMPLETE
+        tripPlan.saved = tripPlan.budget - tripPlan.expenditure
+        await tripPlan.save()
+        if (tripPlan.isSpecialApprove) return
+        await TripPlanModule.autoSettleReward(params)
+    }
+
 }
  
+async function getOrderInfo(orderId: string) {
+    const res = await axios.get(`https://l.jingli365.com/svc/java-jingli-order1/tmc/order/getOrderInfo/${orderId}/order`)
+    if (res.status == 200 && res.data.code == 0) {
+        return res.data.data.detail.flightList
+    }
+    throw new L.ERROR_CODE_C(500, '获取订单详情失败：' + orderId)
+}
 
 
 async function updateTripDetailExpenditure(tripDetail: TripDetail) {
