@@ -3,10 +3,11 @@ import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
 import requestPromise = require('request-promise');
+import { CookieJar } from 'request';
 import request = require('request');
 
 export class WebRobot{
-    cookieJar: request.CookieJar;
+    cookieJar: CookieJar;
     client: typeof requestPromise;
     client_orig: typeof request;
     constructor(public origin: string){
