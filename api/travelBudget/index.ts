@@ -158,7 +158,6 @@ export default class ApiTravelBudget {
         // }
         let companyInfo = await ApiTravelBudget.getCompanyInfo();
         let data = companyInfo.data;
-        console.log(data,"<=================公司信息")
         let authData = [];
         data.map((item) => {
             let obj = {};
@@ -190,7 +189,6 @@ export default class ApiTravelBudget {
             if (meiyaHotel && meiyaHotel.length)
                 // commonData = compareHotelData(commonData, meiyaHotel);
                 commonData = handelHotelsData(meiyaHotel,params);
-            console.log(commonData,"<=======================处理后美亚数据")
             // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".finallyHotel.json", commonData);
             return commonData;
         }
@@ -522,7 +520,6 @@ export default class ApiTravelBudget {
     static async updateBudget(params: { approveId: string, budgetResult: any, isFinalFirstResponse?: boolean }) {
 
         console.log('updateBudtetApproveId=======', params.approveId);
-        console.log('============update');
         let approve = await Models.approve.get(params.approveId);
 
         // check tripApprove status; if passed, rejected or locked, the budget will not be updated
