@@ -119,7 +119,7 @@
     "weak": "^1.0.1",
     "wechat-crypto": "0.0.2",
     "wechat-oauth": "^1.1.1",
-    "xml2js": "^0.4.19"
+    "xml2js": "0.4.19"
   },
   "optionalDependency": {
     "bufferutil": "^1.2.1",
@@ -222,6 +222,6 @@
     "watchify": "^3.7.0",
     "ws": "^1.1.1",
     "xregexp": "^3.1.1",
-    "yargs": "^5.0.0"
+    "yargs": "5.0.0"
   }
 }
