@@ -200,8 +200,8 @@
     "lessify": "^1.0.1",
     "load-script": "^1.0.0",
     "lunar-calendar": "^0.1.4",
-    "md5": "^2.2.1",
-    "merge2": "^1.0.2",
+    "md5": "2.2.1",
+    "merge2": "1.0.2",
     "notie": "^3.9.2",
     "postcss": "^5.1.2",
     "printf": "^0.2.5",
@@ -210,7 +210,7 @@
     "scssify": "^2.1.0",
     "source-map": "^0.1.43",
     "source-map-support": "^0.4.2",
-    "stringify": "^5.1.0",
+    "stringify": "5.1.0",
     "swiper": "^3.3.1",
     "tiny-cookie": "^0.5.5",
     "ts-node": "^1.7.0",
@@ -222,6 +222,6 @@
     "watchify": "^3.7.0",
     "ws": "^1.1.1",
     "xregexp": "^3.1.1",
-    "yargs": "^5.0.0"
+    "yargs": "5.0.0"
   }
 }
