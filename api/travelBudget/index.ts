@@ -196,8 +196,8 @@ export default class ApiTravelBudget {
 
     @clientExport
     static async getTrafficsData(params: ISearchTicketParams): Promise<any> {
-        let commonData;
-        let commonData2;
+        let commonData = [];
+        let commonData2 = [];
         // let result;
         // try {
         //     result = await RestfulAPIUtil.operateOnModel({
