@@ -1078,6 +1078,10 @@ class TripPlanModule {
     @clientExport
     @requireParams(['name', 'companyId'], projectCols)
     static async createProject(params): Promise<Project> {
+        let _projects = await Models.project.find({where: {code: params.code, companyId: params.companyId}});
+        if(_projects && _projects.length){
+            return null;
+        }
         return Project.create(params).save();
     }
 
