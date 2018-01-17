@@ -646,6 +646,7 @@ class TripPlanModule {
                     tripPlan.saved = savedMoney;
                 }
                 templateName = 'qm_notify_invoice_all_pass';
+
             }else{
                 templateName = 'qm_notify_invoice_not_pass';
                 /**
@@ -680,6 +681,14 @@ class TripPlanModule {
             /* =================== END =================== */
 
             await Promise.all([invoice.save(), tripPlan.save(), tripDetail.save()]);
+
+            if(tripPlan.status == EPlanStatus.COMPLETE && tripPlan.auditStatus == EAuditStatus.INVOICE_PASS){
+                //扣除成本中心预算
+                let costCenter = await Models.costCenter.get(tripPlan.costCenterId);
+                if(costCenter){
+                    await costCenter.addExpendBudget({tripPlanId: tripPlan.id})
+                }
+            }
 
             /*******************************************发送通知消息**********************************************/
             let staff = await Models.staff.get(tripPlan['accountId']);
