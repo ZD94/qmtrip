@@ -230,11 +230,11 @@ class TripPlanModule {
                     let rewardMoney: number = unSettledRewardTripPlan.saved * scoreRatio;  //企业对该员工的该次行程的奖励金额
                     
                     unSettledRewardTripPlan.isSettled = true;  //结算flag更改
-                    companyCoinAccount.consume = Number(companyCoinAccount.consume) + rewardMoney * points2coinRate;  //企业余额扣除相应的奖励金额鲸币
+                    companyCoinAccount.consume = Math.floor(Number(companyCoinAccount.consume) + rewardMoney * points2coinRate);  //企业余额扣除相应的奖励金额鲸币
                     await companyCoinAccount.save();
                     
                     staff = await Models.staff.get(unSettledRewardTripPlan.accountId);
-                    staff.balancePoints = Number(staff.balancePoints) - rewardMoney;  //员工将由该次行程节省的奖励积分兑换
+                    staff.balancePoints = Math.floor(Number(staff.balancePoints) - rewardMoney);  //员工将由该次行程节省的奖励积分兑换
                     await staff.save();
 
                     unSettledRewardTripPlan.isSettled = true;
@@ -242,11 +242,10 @@ class TripPlanModule {
                     
                     let account = await Models.account.get(staff.accountId);
                     coinAccount = await Models.coinAccount.get(account.coinAccountId);
-                    coinAccount.income = Number(coinAccount.income) + rewardMoney * points2coinRate;  //员工account增加鲸币
-                    console.log('coinAccount', coinAccount.income);
+                    coinAccount.income = Math.floor(Number(coinAccount.income) + rewardMoney * points2coinRate);  //员工account增加鲸币
                     await coinAccount.save();
 
-                    let coins: number = rewardMoney * points2coinRate;
+                    let coins: number = Math.floor(rewardMoney * points2coinRate);
                     companyCoinAccountChange = Models.coinAccountChange.create({  //company coin_account增加鲸币变动记录
                         coinAccountId: companyCoinAccount.id,
                         remark: `员工${staff.name}增加奖励鲸币${coins}`,
@@ -269,7 +268,7 @@ class TripPlanModule {
                         orderId: unSettledRewardTripPlan.id,
                         companyId: unSettledRewardTripPlan.companyId,
                         points: -rewardMoney,
-                        remark: `员工${coinAccount.id}兑换奖励积分${rewardMoney}`
+                        remark: `员工${staff.name}兑换奖励积分${rewardMoney}`
                     });
                     await pointChange.save();
                 } else {
@@ -604,6 +603,7 @@ class TripPlanModule {
                 let savedMoney = tripPlan.budget - tripPlan.expenditure;
                 savedMoney = savedMoney > 0 ? savedMoney : 0;
                 tripPlan.score = parseInt((savedMoney * SAVED2SCORE).toString());
+                tripPlan.reward = Number(parseFloat((savedMoney * SAVED2SCORE).toString()).toFixed(2));
                 let staffId = tripPlan.accountId;
                 let staff = await Models.staff.get(staffId);
                 let staffName = staff.name;
