@@ -252,7 +252,7 @@ class TripPlanModule {
                     let coins: number = rewardMoney * points2coinRate;
                     companyCoinAccountChange = Models.coinAccountChange.create({  //company coin_account增加鲸币变动记录
                         coinAccountId: companyCoinAccount.id,
-                        remark: `员工${coinAccount.id}增加奖励鲸币${coins}`,
+                        remark: `员工${staff.name}增加奖励鲸币${coins}`,
                         type: COIN_CHANGE_TYPE.CONSUME,
                         coins: -coins,
                         orderNum: getOrderNo()
@@ -260,7 +260,7 @@ class TripPlanModule {
                     await companyCoinAccountChange.save();
                     coinAccountChange = Models.coinAccountChange.create({  //员工 coin_account增加鲸币变动记录
                         coinAccountId: coinAccount.id,
-                        remark: `员工${coinAccount.id}增加奖励鲸币${coins}`,
+                        remark: `员工${staff.name}增加奖励鲸币${coins}`,
                         type: COIN_CHANGE_TYPE.AWARD,
                         coins: coins,
                         orderNum: getOrderNo() 
@@ -610,7 +610,36 @@ class TripPlanModule {
                 let staffId = tripPlan.accountId;
                 let staff = await Models.staff.get(staffId);
                 let staffName = staff.name;
-                tripPlan.remark = `员工${staffName}节省, 行程 ${tripPlan.deptCity} - ${tripPlan.arrivalCity}`;
+                let query = tripPlan.query;
+                if (typeof query == 'string') {
+                    query = JSON.parse(query);
+                }
+                let destinationPlacesInfo = query.destinationPlacesInfo;
+                if (typeof destinationPlacesInfo == 'string') {
+                    destinationPlacesInfo = JSON.parse(destinationPlacesInfo);
+                }
+                let destinationArray = [];
+                for (let i = 0; i < destinationPlacesInfo.length; i++) {
+                    destinationArray.push(destinationPlacesInfo[i].destinationPlace);
+                }
+                if (query.isRoundTrip) {
+                    destinationArray.push(query.originPlace);
+                }
+                for (let j = 0; j < destinationArray.length; j++) {
+                    let destinationName = await API.place.getCityInfo({cityCode: destinationArray[j], companyId: staff.companyId});
+                    destinationArray.shift();
+                    destinationArray.push(destinationName);
+                }
+                if (!tripPlan.deptCity) {  // 仅住宿
+                    tripPlan.remark = `员工${staffName}节省, 行程 ${tripPlan.arrivalCity} (仅住宿)`;
+                } else {  //非仅住宿
+                    let tripFlow = `${tripPlan.deptCity}`;
+                    for (let n = 0; n < destinationArray.length; n++) {
+                        let cityName = destinationArray[n];
+                        tripFlow += ` - ${cityName}`
+                    }
+                    tripPlan.remark = `员工${staffName}节省, 行程 ${tripFlow}`;
+                }
                 if(tripPlan.isSpecialApprove){
                     tripPlan.saved = 0;
                 }else{
@@ -1052,6 +1081,10 @@ class TripPlanModule {
     @clientExport
     @requireParams(['name', 'companyId'], projectCols)
     static async createProject(params): Promise<Project> {
+        let _projects = await Models.project.find({where: {code: params.code, companyId: params.companyId}});
+        if(_projects && _projects.length){
+            return null;
+        }
         return Project.create(params).save();
     }
 
