@@ -250,9 +250,9 @@ export default class CostCenterModule {
     /****************************************BudgetLog end************************************************/
 
     @clientExport
-    static async getAppendBudget(costId: string) {
+    static async getAppendBudget(costId: string, showTime: Date) {
         return _.first(await Models.budgetLog.find({
-            where: { costCenterId: costId, type: BUDGET_CHANGE_TYPE.APPEND_BUDGET },
+            where: { costCenterId: costId, type: BUDGET_CHANGE_TYPE.APPEND_BUDGET, showTime },
             order: [['created_at', 'desc']]
         }))
     }
@@ -386,10 +386,10 @@ export default class CostCenterModule {
         setting: { type: number, rate: number, audienceTypes: number[] },
         period?: { start: Date, end: Date }) {
         let cost: CostCenterDeploy;
-        if(period){
+        if (period) {
             cost = _.first(await Models.costCenterDeploy.find({ where: constructWhereCondition(costId, period) }));
-        }else{
-            cost = _.first(await Models.costCenterDeploy.find({where: {costCenterId: costId}}));
+        } else {
+            cost = _.first(await Models.costCenterDeploy.find({ where: { costCenterId: costId } }));
         }
         cost.warningPerson = setting.audienceTypes
         cost.warningRule = { type: setting.type, rate: setting.rate }
