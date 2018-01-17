@@ -646,6 +646,7 @@ class TripPlanModule {
                     tripPlan.saved = savedMoney;
                 }
                 templateName = 'qm_notify_invoice_all_pass';
+
             }else{
                 templateName = 'qm_notify_invoice_not_pass';
                 /**
@@ -680,6 +681,14 @@ class TripPlanModule {
             /* =================== END =================== */
 
             await Promise.all([invoice.save(), tripPlan.save(), tripDetail.save()]);
+
+            if(tripPlan.status == EPlanStatus.COMPLETE && tripPlan.auditStatus == EAuditStatus.INVOICE_PASS){
+                //扣除成本中心预算
+                let costCenter = await Models.costCenter.get(tripPlan.costCenterId);
+                if(costCenter){
+                    await costCenter.addExpendBudget({tripPlanId: tripPlan.id})
+                }
+            }
 
             /*******************************************发送通知消息**********************************************/
             let staff = await Models.staff.get(tripPlan['accountId']);
@@ -1722,8 +1731,8 @@ class TripPlanModule {
         }
         tripPlan.arrivalCityCodes = JSON.stringify(arrivalCityCodes);
 
-        if(query.costCenterId){
-            tripPlan.costCenterId = query.costCenterId;
+        if(query.feeCollected){
+            tripPlan.costCenterId = query.feeCollected;
         }
         tripPlan.setCompany(account.company);
         tripPlan.auditUser = tryObjId(approveUser);
@@ -1931,6 +1940,17 @@ class TripPlanModule {
         }
         try {
             await API.ddtalk.sendLinkMsg({ accountId: account.id, text: '您的预算已审批完成', url: self_url});
+        } catch(err) {
+            console.error(err);
+        }
+
+        try {
+            if(tripPlan.costCenterId){
+                let costCenter = await Models.costCenter.get(tripPlan.costCenterId);
+                if(costCenter){
+                    await costCenter.checkoutBudgetNotice();
+                }
+            }
         } catch(err) {
             console.error(err);
         }
