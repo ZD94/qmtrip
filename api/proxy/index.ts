@@ -216,7 +216,7 @@ class Proxy {
             if(typeof result == 'string') {
                 result = JSON.parse(result);
             }
-            if(result.code == 0 && tripDetail.orderType) {
+            if(result.code == 0 && !tripDetail.orderType) {
                 tripDetail.orderType = body.orderType != null? body.orderType: null;  //后期返回的orderNo统一后，使用此确定订单类型
                 await tripDetail.save();
             }
