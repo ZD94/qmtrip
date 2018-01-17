@@ -380,8 +380,13 @@ export default class CostCenterModule {
     @clientExport
     static async setEarlyWarning(costId: string,
         setting: { type: number, rate: number, audienceTypes: number[] },
-        period: { start: Date, end: Date }) {
-        const cost = _.first(await Models.costCenterDeploy.find({ where: constructWhereCondition(costId, period) }))
+        period?: { start: Date, end: Date }) {
+        let cost: CostCenterDeploy;
+        if(period){
+            cost = _.first(await Models.costCenterDeploy.find({ where: constructWhereCondition(costId, period) }));
+        }else{
+            cost = _.first(await Models.costCenterDeploy.find({where: {costCenterId: costId}}));
+        }
         cost.warningPerson = setting.audienceTypes
         cost.warningRule = { type: setting.type, rate: setting.rate }
         await cost.save()
