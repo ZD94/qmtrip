@@ -39,6 +39,7 @@ import { Company } from "_types/company";
 import { EApproveType, STEP, EApproveStatus } from '_types/approve';
 import { Transaction } from 'sequelize';
 import CompanyModule from 'api/company';
+import {ECostCenterType} from "_types/costCenter/costCenter";
 
 var CLSNS = CLS.getNamespace('dnode-api-context');
 var request = require("request");
@@ -669,6 +670,17 @@ export default class ApiTravelBudget {
             throw L.ERR.ERROR_CODE(500, `差旅标准还未设置`);
         }
         params.travelPolicyId = travelPolicy.id;
+
+        if(params.feeCollected){
+            let cc = await Models.costCenter.get(params.feeCollected);
+            if(cc.type == ECostCenterType.PROJECT){
+                let pts = await Models.projectStaffTravelPolicy.all({where: {staffId: staffId, projectId: params.feeCollected}, order: [['createdAt', 'desc']]});
+                if(pts && pts.length){
+                    params.travelPolicyId = pts[0].travelPolicyId;
+                }
+            }
+
+        }
 
         if (!params.staffList) {
             params.staffList = [];

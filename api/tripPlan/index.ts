@@ -1719,8 +1719,8 @@ class TripPlanModule {
         }
         tripPlan.arrivalCityCodes = JSON.stringify(arrivalCityCodes);
 
-        if(query.costCenterId){
-            tripPlan.costCenterId = query.costCenterId;
+        if(query.feeCollected){
+            tripPlan.costCenterId = query.feeCollected;
         }
         tripPlan.setCompany(account.company);
         tripPlan.auditUser = tryObjId(approveUser);
@@ -1928,6 +1928,17 @@ class TripPlanModule {
         }
         try {
             await API.ddtalk.sendLinkMsg({ accountId: account.id, text: '您的预算已审批完成', url: self_url});
+        } catch(err) {
+            console.error(err);
+        }
+
+        try {
+            if(tripPlan.costCenterId){
+                let costCenter = await Models.costCenter.get(tripPlan.costCenterId);
+                if(costCenter){
+                    await costCenter.checkoutBudgetNotice();
+                }
+            }
         } catch(err) {
             console.error(err);
         }
