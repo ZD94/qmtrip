@@ -15,10 +15,11 @@ const config = require("@jingli/config");
 let moment = require("moment");
 require("moment-timezone");
 import _ = require('lodash');
+import R = require('lodash/fp')
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
-    EPayType, ESourceType, EInvoiceStatus, TrafficEInvoiceFeeTypes, ProjectStaff, EProjectStatus
+    EPayType, ESourceType, EInvoiceStatus, TrafficEInvoiceFeeTypes, ProjectStaff, EProjectStatus, EOrderStatus
 } from "_types/tripPlan";
 import {Models} from "_types";
 import {FindResult} from "common/model/interface";
@@ -40,6 +41,8 @@ let RestfulAPIUtil = restfulAPIUtil;
 import * as error from "@jingli/error";
 import { Company } from '_types/company';
 import { CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE } from '_types/coin';
+import { BUDGET_CHANGE_TYPE } from '_types/costCenter';
+const axios = require('axios')
 interface ReportInvoice {
     type: string;
     date: Date;
@@ -230,11 +233,11 @@ class TripPlanModule {
                     let rewardMoney: number = unSettledRewardTripPlan.saved * scoreRatio;  //企业对该员工的该次行程的奖励金额
                     
                     unSettledRewardTripPlan.isSettled = true;  //结算flag更改
-                    companyCoinAccount.consume = Number(companyCoinAccount.consume) + rewardMoney * points2coinRate;  //企业余额扣除相应的奖励金额鲸币
+                    companyCoinAccount.consume = Math.floor(Number(companyCoinAccount.consume) + rewardMoney * points2coinRate);  //企业余额扣除相应的奖励金额鲸币
                     await companyCoinAccount.save();
                     
                     staff = await Models.staff.get(unSettledRewardTripPlan.accountId);
-                    staff.balancePoints = Number(staff.balancePoints) - rewardMoney;  //员工将由该次行程节省的奖励积分兑换
+                    staff.balancePoints = Math.floor(Number(staff.balancePoints) - rewardMoney);  //员工将由该次行程节省的奖励积分兑换
                     await staff.save();
 
                     unSettledRewardTripPlan.isSettled = true;
@@ -242,11 +245,10 @@ class TripPlanModule {
                     
                     let account = await Models.account.get(staff.accountId);
                     coinAccount = await Models.coinAccount.get(account.coinAccountId);
-                    coinAccount.income = Number(coinAccount.income) + rewardMoney * points2coinRate;  //员工account增加鲸币
-                    console.log('coinAccount', coinAccount.income);
+                    coinAccount.income = Math.floor(Number(coinAccount.income) + rewardMoney * points2coinRate);  //员工account增加鲸币
                     await coinAccount.save();
 
-                    let coins: number = rewardMoney * points2coinRate;
+                    let coins: number = Math.floor(rewardMoney * points2coinRate);
                     companyCoinAccountChange = Models.coinAccountChange.create({  //company coin_account增加鲸币变动记录
                         coinAccountId: companyCoinAccount.id,
                         remark: `员工${staff.name}增加奖励鲸币${coins}`,
@@ -269,7 +271,7 @@ class TripPlanModule {
                         orderId: unSettledRewardTripPlan.id,
                         companyId: unSettledRewardTripPlan.companyId,
                         points: -rewardMoney,
-                        remark: `员工${coinAccount.id}兑换奖励积分${rewardMoney}`
+                        remark: `员工${staff.name}兑换奖励积分${rewardMoney}`
                     });
                     await pointChange.save();
                 } else {
@@ -563,7 +565,7 @@ class TripPlanModule {
             let allInvoicePass = true,
                 isNeedMsg = true;
             let invoices = await tripPlan.getTripInvoices();
-            let tripDetailInvoices: Array<{status: number}> = [];
+            let tripDetailInvoices: TripDetailInvoice[] = [];
             invoices.map(async (item)=>{
                 switch(item.status){
                     case EInvoiceStatus.WAIT_AUDIT:
@@ -604,6 +606,7 @@ class TripPlanModule {
                 let savedMoney = tripPlan.budget - tripPlan.expenditure;
                 savedMoney = savedMoney > 0 ? savedMoney : 0;
                 tripPlan.score = parseInt((savedMoney * SAVED2SCORE).toString());
+                tripPlan.reward = Number(parseFloat((savedMoney * SAVED2SCORE).toString()).toFixed(2));
                 let staffId = tripPlan.accountId;
                 let staff = await Models.staff.get(staffId);
                 let staffName = staff.name;
@@ -655,7 +658,7 @@ class TripPlanModule {
 
             let tripDetailAllPass = true;
 
-            tripDetailInvoices.map((oneInvoice: any)=>{
+            tripDetailInvoices.map((oneInvoice)=>{
                 switch (oneInvoice.status) {
                     case EInvoiceStatus.AUDIT_FAIL:
                         logResult = '未通过';
@@ -2718,8 +2721,64 @@ class TripPlanModule {
 
         return true;
     }
+
+    /**
+     * 完成行程
+     * @param params 
+     */
+    @clientExport
+    static async completeTrip(params:{ id: string}) {
+        // Filter inoperable status
+        const tripPlan = await Models.tripPlan.get(params.id)
+        if (moment().milliseconds < moment(tripPlan.backAt).milliseconds)
+            throw new L.ERROR_CODE_C(400, '该行程当前无法完成')
+        if (tripPlan.status != EPlanStatus.COMPLETE || tripPlan.auditStatus != EAuditStatus.PASS)
+            throw new L.ERROR_CODE_C(400, '该行程当前无法完成')
+        const tripDetails: TripDetail[] = await tripPlan.getTripDetails({ 
+            where: { status: 1, reserveStatus: {$in: [EOrderStatus.ENDORSEMENT_SUCCESS, EOrderStatus.SUCCESS]}}
+        })
+        // if (R.any((t: TripDetail) => t.status != -4, tripDetails))
+        //     throw new L.ERROR_CODE_C(400, '该行程需要上传票据')
+        const promiseAry = []
+
+        // Fetch orders and calculate saving
+        const orders = await Promise.all(tripDetails.map(td => getOrderInfo(td.orderNo)))
+        tripPlan.expenditure = R.sumBy(R.prop('price'), orders)
+        tripPlan.status = EPlanStatus.COMPLETE
+        tripPlan.saved = tripPlan.budget - tripPlan.expenditure
+
+        // Log budget changes
+        const costCenterDeploy = _.first(await Models.costCenterDeploy.find({
+            where: { costCenterId: tripPlan.costCenterId }
+        }))
+        if (costCenterDeploy) {
+            const budgetLog = Models.budgetLog.create({
+                costCenterId: tripPlan.costCenterId, type: BUDGET_CHANGE_TYPE.CONSUME_BUDGET, relateId: params.id, 
+                value: tripPlan.expendBudget, oldBudget: costCenterDeploy.expendBudget, remark: `完成行程花费预算`
+            });
+            promiseAry.push(budgetLog.save())
+            costCenterDeploy.expendBudget += tripPlan.expenditure
+            promiseAry.push(costCenterDeploy.save())
+        }
+        promiseAry.push(tripPlan.save())
+        await DB.transaction(async function() {
+            await Promise.all(promiseAry)
+            // Special approve can't settle reward
+            if (tripPlan.isSpecialApprove) return
+
+            await TripPlanModule.autoSettleReward(params)
+        })
+    }
+
 }
  
+async function getOrderInfo(orderId: string) {
+    const res = await axios.get(`https://l.jingli365.com/svc/java-jingli-order1/tmc/order/getOrderInfo/${orderId}/order`)
+    if (res.status == 200 && res.data.code == 0) {
+        return res.data.data.detail.flightList
+    }
+    throw new L.ERROR_CODE_C(500, '获取订单详情失败：' + orderId)
+}
 
 
 async function updateTripDetailExpenditure(tripDetail: TripDetail) {

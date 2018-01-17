@@ -258,11 +258,12 @@ export default class CostCenterModule {
     }
 
     @clientExport
-    static async appendBudget(costId: string, operator: string, budget: number) {
+    static async appendBudget({ costId, operator, budget, showTime }: { costId: string, operator: string, budget: number, showTime: Date }) {
         const rootDept = await Models.department.get(costId)
         const log = BudgetLog.create({
             companyId: rootDept.company.id, costCenterId: costId, value: budget,
-            type: BUDGET_CHANGE_TYPE.APPEND_BUDGET, staffId: operator, remark: '追加总预算'
+            type: BUDGET_CHANGE_TYPE.APPEND_BUDGET, staffId: operator, remark: '追加总预算',
+            showTime: moment(showTime).format()
         })
         await log.save()
     }
@@ -305,7 +306,8 @@ export default class CostCenterModule {
         const rootDept = await Models.department.get(costId)
         promiseAry.push(BudgetLog.create({
             companyId: rootDept.company.id, costCenterId: costId, value: totalBudget,
-            type: BUDGET_CHANGE_TYPE.ADD_BUDGET, staffId: operator, remark: '初始化预算'
+            type: BUDGET_CHANGE_TYPE.ADD_BUDGET, staffId: operator, remark: '初始化预算',
+            showTime: moment(period.start).format()
         }).save())
         await Promise.all(promiseAry)
     }
@@ -331,7 +333,8 @@ export default class CostCenterModule {
                 const dept = await Models.department.get(id)
                 await BudgetLog.create({
                     companyId: dept.company.id, costCenterId: id, value: budget.selfTempBudget - cost.selfTempBudget,
-                    type: BUDGET_CHANGE_TYPE.CHANGE_BUDGET, staffId: operator, remark: `${dept.name}调整预算`
+                    type: BUDGET_CHANGE_TYPE.CHANGE_BUDGET, staffId: operator, remark: `${dept.name}调整预算`,
+                    showTime: moment(period.start).format()
                 }).save()
                 cost.selfTempBudget = budget.selfTempBudget
             }
@@ -371,7 +374,8 @@ export default class CostCenterModule {
         const rootDept = await Models.department.get(costId)
         promiseAry.push(BudgetLog.create({
             companyId: rootDept.company.id, costCenterId: costId, value: totalBudget + root.selfBudget,
-            type: BUDGET_CHANGE_TYPE.APPLY_BUDGET, staffId: operator, remark: '新预算启用'
+            type: BUDGET_CHANGE_TYPE.APPLY_BUDGET, staffId: operator, remark: '新预算启用',
+            showTime: moment(period.start).format()
         }).save())
         promiseAry.push(root.save())
         await Promise.all(promiseAry);
