@@ -12,6 +12,7 @@ import Logger from '@jingli/logger';
 let logger = new Logger("tripPlan");
 const config = require("@jingli/config");
 
+let scheduler = require('common/scheduler');
 let moment = require("moment");
 require("moment-timezone");
 import _ = require('lodash');
@@ -2472,6 +2473,35 @@ class TripPlanModule {
 
 
     static __initHttpApp = require('./invoice');
+
+    //TODO add scheduleTask
+    static _scheduleTask() {
+        let taskId = "autoCheckTripPlanIsOverDate";
+        logger.info('run task  ' + taskId);
+        scheduler('0 0 0 * * *', taskId, function() {
+            (async() => {
+                let tripPlans: TripPlan[] = await Models.tripPlan.all({where: {status: EPlanStatus.WAIT_RESERVE}});
+                for (let i = 0; i < tripPlans.length; i++) {
+                    let tripEndTime = tripPlans[i].backAt;
+                    let dateNow = moment().unix();
+                    if (dateNow < moment(tripEndTime).unix()) {   //this tripPlan not reach the end Time
+                        //do nothing
+                    } else {  //this tripPlan just reach or overdue, change the tripDetails' and tripPlan its status
+                        //change the tripPlan's status
+                        tripPlans[i].status = EPlanStatus.RESERVED;
+                        let tripPlanId = tripPlans[i].id;
+                        //get tripDetails and find the unreserved ones then change their status
+                        let tripDetails: TripDetail[] = await Models.tripDetail.all({where: {tripPlanId: tripPlanId, status: ETripDetailStatus.WAIT_RESERVE}});
+                        for (let j = 0; j < tripDetails.length; j++) {
+                            tripDetails[j].status = ETripDetailStatus.WAIT_UPLOAD;
+                            await tripDetails[j].save();
+                        }
+                        await tripPlans[i].save();
+                    }
+                }
+            })
+        });
+    }
 
     /*static _scheduleTask () {
         let taskId = "authApproveTrainPlan";
