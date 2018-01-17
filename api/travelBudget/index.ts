@@ -197,6 +197,7 @@ export default class ApiTravelBudget {
     @clientExport
     static async getTrafficsData(params: ISearchTicketParams): Promise<any> {
         let commonData;
+        let commonData2;
         // let result;
         // try {
         //     result = await RestfulAPIUtil.operateOnModel({
@@ -253,10 +254,9 @@ export default class ApiTravelBudget {
                 commonData = handleFlightData(meiyaFlight,params);
             if (meiyaTrain && meiyaTrain.length)
             // commonData = compareTrainData(commonData, meiyaTrain);
-            //     commonData = handleTrainData(meiyaTrain, params)
-            // console.log(commonData,"<===========================火车数据")
-                console.log("commonData ===> commonData data.", typeof (commonData));
-            return commonData;
+                 commonData2 = handleTrainData(meiyaTrain, params)
+            console.log("commonData ===> commonData data.", typeof (commonData));
+            return [...commonData, ...commonData2];
         }
     }
 
