@@ -7,29 +7,42 @@ import { ETripType, EInvoiceType, ICreateBudgetAndApproveParams, ICreateBudgetAn
 import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
 import L from '@jingli/language';
+
 const moment = require('moment');
 require("moment-timezone");
 const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require('lodash');
-import { Place } from "_types/place";
+import {Place} from "_types/place";
+
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 let config = require('@jingli/config');
 export var NoCityPriceLimit = 0;
 const DefaultCurrencyUnit = 'CNY';
-import { restfulAPIUtil } from "api/restful";
-import { meiyaJudge, getMeiyaFlightData, getMeiyaTrainData, compareFlightData, compareTrainData, getMeiyaHotelData, compareHotelData } from "./meiya";
-import { Application, Request, Response, NextFunction } from 'express';
+import {restfulAPIUtil} from "api/restful";
+import {
+    meiyaJudge,
+    getMeiyaFlightData,
+    getMeiyaTrainData,
+    compareFlightData,
+    compareTrainData,
+    getMeiyaHotelData,
+    compareHotelData, handleTrainData, handleFlightData,handelHotelsData
+} from "./meiya";
+import {Application, Request, Response, NextFunction} from 'express';
 
 let RestfulAPIUtil = restfulAPIUtil;
 import * as CLS from 'continuation-local-storage';
+
 import { DB } from "@jingli/database";
 import { Company } from "_types/company";
 import { EApproveType, STEP, EApproveStatus } from '_types/approve';
 import { Transaction } from 'sequelize';
 import CompanyModule from 'api/company';
+
 var CLSNS = CLS.getNamespace('dnode-api-context');
 var request = require("request");
+
 export interface ICity {
     name: string;
     id: string;
@@ -93,11 +106,11 @@ export interface ISearchTicketParams {
     travelPolicyId: string;
 }
 
-export default class ApiTravelBudget {
 
+export default class ApiTravelBudget {
     @clientExport
     static async getBudgetInfo(params: { id: string, accountId?: string }) {
-        let { id, accountId } = params;
+        let {id, accountId} = params;
         if (!accountId || accountId == 'undefined') {
             let staff = await Staff.getCurrent();
             accountId = staff.id;
@@ -118,7 +131,7 @@ export default class ApiTravelBudget {
             await API.notify.submitNotify({
                 key: 'qm_tmc',
                 email: config.email_address.tmcsale,
-                values: { orderTyp: params.orderType, passenger: params.passenger || [] }
+                values: {orderTyp: params.orderType, passenger: params.passenger || []}
             });
             console.log("qm_tmc is ok");
         } catch (err) {
@@ -126,42 +139,56 @@ export default class ApiTravelBudget {
         }
     }
 
+
     @clientExport
     static async getHotelsData(params: ISearchHotelParams): Promise<any> {
         let commonData;
-        let result;
-        try {
-            result = await RestfulAPIUtil.operateOnModel({
-                params: {
-                    method: 'post',
-                    fields: params
-                },
-                addUrl: 'getHotelsData',
-                model: "budget"
-            })
-        } catch (err) {
-            console.log(err);
-        }
-        if (result.code == 0) {
-            commonData = result.data.data;
-        }
+        // let result;
+        // try {
+        //     result = await RestfulAPIUtil.operateOnModel({
+        //         params: {
+        //             method: 'post',
+        //             fields: params
+        //         },
+        //         addUrl: 'getHotelsData',
+        //         model: "budget"
+        //     })
+        // } catch (err) {
+        //     console.log(err);
+        // }
+        let companyInfo = await ApiTravelBudget.getCompanyInfo();
+        let data = companyInfo.data;
+        let authData = [];
+        data.map((item) => {
+            let obj = {};
+            let identify = item.identify;
+            let sname = item.sname;
+            obj["identify"] = identify;
+            obj["sname"] = sname;
+            authData.push(obj);
+            return authData
+        })
 
-        if (!commonData || typeof commonData == 'undefined')
-            return [];
-        //检查是否需要美亚数据，返回美亚数据
-        let needMeiya = await meiyaJudge();
-        if (!needMeiya) {
-            return commonData;
-        }
+        // if (result.code == 0) {
+        //     commonData = result.data.data;
+        // }
 
+        // if (!commonData || typeof commonData == 'undefined')
+        //     return [];
+        // 检查是否需要美亚数据，返回美亚数据
+        // let needMeiya = await meiyaJudge();
+        // if (!needMeiya) {
+        //     return commonData;
+        // }
         if (config.tmcFake == 1) {
-            console.log("getHotelsData ===> fake data.")
+            console.log("getHotelsData ===> fake data.");
             return require("meiyaFake/finallyUsingHotel");
         } else {
-            let meiyaHotel = await getMeiyaHotelData(params);
+            let meiyaHotel = await getMeiyaHotelData(params, authData);
             console.log("meiyaHotel ===> meiyaHotel data.", meiyaHotel.length)
             if (meiyaHotel && meiyaHotel.length)
-                commonData = compareHotelData(commonData, meiyaHotel);
+                // commonData = compareHotelData(commonData, meiyaHotel);
+                commonData = handelHotelsData(meiyaHotel,params);
             // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".finallyHotel.json", commonData);
             return commonData;
         }
@@ -169,52 +196,67 @@ export default class ApiTravelBudget {
 
     @clientExport
     static async getTrafficsData(params: ISearchTicketParams): Promise<any> {
-
         let commonData;
-        let result;
-        try {
-            result = await RestfulAPIUtil.operateOnModel({
-                params: {
-                    method: 'post',
-                    fields: params
-                },
-                addUrl: 'getTrafficsData',
-                model: "budget"
-            })
+        let commonData2;
+        // let result;
+        // try {
+        //     result = await RestfulAPIUtil.operateOnModel({
+        //         params: {
+        //             method: 'post',
+        //             fields: params
+        //         },
+        //         addUrl: 'getTrafficsData',
+        //         model: "budget"
+        //     })
+        //
+        // } catch (err) {
+        //     console.log(err);
+        // }
+        let companyInfo = await ApiTravelBudget.getCompanyInfo();
+        let data = companyInfo.data;
+        let authData = [];
+        data.map((item) => {
+            let obj = {};
+            let identify = item.identify;
+            let sname = item.sname;
+            obj["identify"] = identify;
+            obj["sname"] = sname;
+            authData.push(obj);
+            return authData
+        });
 
-        } catch (err) {
-            console.log(err);
-        }
-        if (result.code == 0) {
-            commonData = result.data.data;
-        }
-
-        if (!commonData || typeof commonData == 'undefined')
-            return [];
+        // if (result.code == 0) {
+        //     commonData = result.data.data;
+        // }
+        //
+        // if (!commonData || typeof commonData == 'undefined')
+        //     return [];
         //检查是否需要美亚数据，返回美亚数据
-        let needMeiya = await meiyaJudge();
-        if (!needMeiya) {
-            return commonData;
-        }
-        console.log("commonData ===> commonData data.", commonData.length)
+        // let needMeiya = await meiyaJudge();
+        // if (!needMeiya) {
+        //     return commonData;
+        // }
+        // console.log("commonData ===> commonData data.", commonData.length)
         if (config.tmcFake == 1) {
             console.log("getTrafficsData ===> fake data.")
             return require("meiyaFake/finallyUsingTraffic");
         } else {
             let arr = await Promise.all([
-                await getMeiyaTrainData(params),
-                await getMeiyaFlightData(params)
+                await getMeiyaTrainData(params, authData),
+                await getMeiyaFlightData(params, authData)
             ]);
             let meiyaTrain = arr[0];
             let meiyaFlight = arr[1];
-            console.log("meiyaFlight ===> meiyaFlight data.", meiyaFlight.length)
-            console.log("meiyaTrain ===> meiyaTrain data.", meiyaTrain.length)
+            console.log("meiyaFlight ===> meiyaFlight data.", meiyaFlight.length);
+            console.log("meiyaTrain ===> meiyaTrain data.", meiyaTrain.length);
             if (meiyaFlight && meiyaFlight.length)
-                commonData = compareFlightData(commonData, meiyaFlight);
+            //     commonData = compareFlightData(commonData, meiyaFlight);
+                commonData = handleFlightData(meiyaFlight,params);
             if (meiyaTrain && meiyaTrain.length)
-                commonData = compareTrainData(commonData, meiyaTrain);
-            console.log("commonData ===> commonData data.", typeof (commonData))
-            return commonData;
+            // commonData = compareTrainData(commonData, meiyaTrain);
+                 commonData2 = handleTrainData(meiyaTrain, params)
+            console.log("commonData ===> commonData data.", typeof (commonData));
+            return [...commonData, ...commonData2];
         }
     }
 
@@ -244,28 +286,28 @@ export default class ApiTravelBudget {
     }
 
     /**
-    * @method getTravelPolicyBudget
-    *
-    * 获取合适差旅预算
-    *
-    * @param {Object} params 参数
-    * @param {String} params.originPlace 出发地
-    * @param {String} params.destinationPlace 目的地
-    * @param {String} params.leaveDate 出发时间 YYYY-MM-DD
-    * @param {String} [params.latestArriveTime] 最晚到达时间
-    * @param {String} [params.leaveTime] 出发最晚到达时间 HH:mm
-    * @param {String} [params.goBackDate] 返回时间(可选) YYYY-MM-DD
-    * @param {String} [params.goBackTime] 返程最晚时间
-    * @param {String} [params.checkInDate] 如果不传=leaveDate 入住时间
-    * @param {String} [params.checkOutDate] 如果不传=goBackDate 离开时间
-    * @param {String} [params.businessDistrict] 商圈ID
-    * @param {Boolean} [params.isNeedHotel] 是否需要酒店
-    * @param {Boolean} [params.isRoundTrip] 是否往返 [如果为true,goBackDate必须存在]
-    * @param {Boolean} [params.isNeedTraffic] 是否需要交通
-    * @param {Striing} [params.reason] 出差事由
-    * @param {String} [params.hotelName] 住宿地标名称
-    * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
-    */
+     * @method getTravelPolicyBudget
+     *
+     * 获取合适差旅预算
+     *
+     * @param {Object} params 参数
+     * @param {String} params.originPlace 出发地
+     * @param {String} params.destinationPlace 目的地
+     * @param {String} params.leaveDate 出发时间 YYYY-MM-DD
+     * @param {String} [params.latestArriveTime] 最晚到达时间
+     * @param {String} [params.leaveTime] 出发最晚到达时间 HH:mm
+     * @param {String} [params.goBackDate] 返回时间(可选) YYYY-MM-DD
+     * @param {String} [params.goBackTime] 返程最晚时间
+     * @param {String} [params.checkInDate] 如果不传=leaveDate 入住时间
+     * @param {String} [params.checkOutDate] 如果不传=goBackDate 离开时间
+     * @param {String} [params.businessDistrict] 商圈ID
+     * @param {Boolean} [params.isNeedHotel] 是否需要酒店
+     * @param {Boolean} [params.isRoundTrip] 是否往返 [如果为true,goBackDate必须存在]
+     * @param {Boolean} [params.isNeedTraffic] 是否需要交通
+     * @param {Striing} [params.reason] 出差事由
+     * @param {String} [params.hotelName] 住宿地标名称
+     * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
+     */
     @clientExport
     static async getTravelPolicyBudget(params: ICreateBudgetAndApproveParams): Promise<string> {
         // console.log("params===>", params);
@@ -475,16 +517,16 @@ export default class ApiTravelBudget {
 
     //用于接收更新预算，并更新approve表和tripapprove上次
     @clientExport
-    static async updateBudget(params: {approveId: string, budgetResult: any, isFinalFirstResponse?: boolean}) {
+    static async updateBudget(params: { approveId: string, budgetResult: any, isFinalFirstResponse?: boolean }) {
 
         console.log('updateBudtetApproveId=======', params.approveId);
-        console.log('============update');
         let approve = await Models.approve.get(params.approveId);
 
         // check tripApprove status; if passed, rejected or locked, the budget will not be updated
         let checkTripApproveStatus = await API.tripApprove.getTripApprove({id: approve.id});
         let lockBudget: boolean = checkTripApproveStatus ? checkTripApproveStatus['lockBudget'] : null;
         let tripApproveStatus = checkTripApproveStatus ? checkTripApproveStatus['status'] : null;
+
         if ((tripApproveStatus && (tripApproveStatus == QMEApproveStatus.PASS ||
              tripApproveStatus == QMEApproveStatus.REJECT)) || lockBudget) {
             console.log('tripApproveStatus----->  ', tripApproveStatus);
@@ -508,6 +550,7 @@ export default class ApiTravelBudget {
             if (!staffId || staffId == 'undefined') {
                 staffId = approve.submitter;
             }
+
             let staff = await Models.staff.get(staffId);
             let companyId = staff.company.id;
 
@@ -526,20 +569,21 @@ export default class ApiTravelBudget {
 
             // console.log('--------update totalBudget------', totalBudget);
             //TODO 如果分段 有一段是FIN 要走那一条 ？？？lizeilin
-                if (!isFinalInApprove || params.isFinalFirstResponse) {  //看表中的budget是否是最终结果，最终结果还没返回过，则更新approve表，表示还不可以进行审批，或者是第一次请求时候返回为最终结果
+            if (!isFinalInApprove || params.isFinalFirstResponse) {  //看表中的budget是否是最终结果，最终结果还没返回过，则更新approve表，表示还不可以进行审批，或者是第一次请求时候返回为最终结果
                 console.log('first time--------------');
                 approve.budget = totalBudget;
                 approve.step = params.budgetResult.step;
                 if (typeof approve.data == 'string') {
                     approve.data = JSON.parse(approve.data);
                 }
-                approve.data = { budgets: budgets, query: approve.data.query };
+                approve.data = {budgets: budgets, query: approve.data.query};
                 approve = await approve.save();
                 console.log('approve.step---------------->', approve.step);
                 if (approve.step === STEP.FINAL) {
                     console.log('------------enter FIN---------');
-                    let params = { approveNo: approve.id };
+                    let params = {approveNo: approve.id};
                     let tripApprove = await API.tripApprove.retrieveDetailFromApprove(params);
+
                     let returnApprove = await API.eventListener.sendEventNotice({ eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: approve.companyId });
                     let tripPlanLog = Models.tripPlanLog.create({
                         tripPlanId: approve.id,
@@ -581,28 +625,28 @@ export default class ApiTravelBudget {
 
 
     /**
-    * @method getTravelPolicyBudgetNew
-    *
-    * 获取合适差旅预算
-    *
-    * @param {Object} params 参数
-    * @param {String} params.originPlace 出发地
-    * @param {String} params.destinationPlace 目的地
-    * @param {String} params.leaveDate 出发时间 YYYY-MM-DD
-    * @param {String} [params.latestArriveTime] 最晚到达时间
-    * @param {String} [params.leaveTime] 出发最晚到达时间 HH:mm
-    * @param {String} [params.goBackDate] 返回时间(可选) YYYY-MM-DD
-    * @param {String} [params.goBackTime] 返程最晚时间
-    * @param {String} [params.checkInDate] 如果不传=leaveDate 入住时间
-    * @param {String} [params.checkOutDate] 如果不传=goBackDate 离开时间
-    * @param {String} [params.businessDistrict] 商圈ID
-    * @param {Boolean} [params.isNeedHotel] 是否需要酒店
-    * @param {Boolean} [params.isRoundTrip] 是否往返 [如果为true,goBackDate必须存在]
-    * @param {Boolean} [params.isNeedTraffic] 是否需要交通
-    * @param {Striing} [params.reason] 出差事由
-    * @param {String} [params.hotelName] 住宿地标名称
-    * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
-    */
+     * @method getTravelPolicyBudgetNew
+     *
+     * 获取合适差旅预算
+     *
+     * @param {Object} params 参数
+     * @param {String} params.originPlace 出发地
+     * @param {String} params.destinationPlace 目的地
+     * @param {String} params.leaveDate 出发时间 YYYY-MM-DD
+     * @param {String} [params.latestArriveTime] 最晚到达时间
+     * @param {String} [params.leaveTime] 出发最晚到达时间 HH:mm
+     * @param {String} [params.goBackDate] 返回时间(可选) YYYY-MM-DD
+     * @param {String} [params.goBackTime] 返程最晚时间
+     * @param {String} [params.checkInDate] 如果不传=leaveDate 入住时间
+     * @param {String} [params.checkOutDate] 如果不传=goBackDate 离开时间
+     * @param {String} [params.businessDistrict] 商圈ID
+     * @param {Boolean} [params.isNeedHotel] 是否需要酒店
+     * @param {Boolean} [params.isRoundTrip] 是否往返 [如果为true,goBackDate必须存在]
+     * @param {Boolean} [params.isNeedTraffic] 是否需要交通
+     * @param {Striing} [params.reason] 出差事由
+     * @param {String} [params.hotelName] 住宿地标名称
+     * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
+     */
     @clientExport
     static async getTravelPolicyBudgetNew(params: ICreateBudgetAndApproveParamsNew, isIntoApprove: boolean, approveId?: string): Promise<any> {
 
@@ -664,7 +708,7 @@ export default class ApiTravelBudget {
             let checkApprove = await Models.approve.get(approveId);
             let approveStatus = checkApprove['tripApproveStatus'];
             if (approveStatus == QMEApproveStatus.PASS || approveStatus == QMEApproveStatus.REJECT ||
-            approveStatus == QMEApproveStatus.CANCEL) {  //若审批已通过、驳回或已撤销，锁定budget不再更新
+                approveStatus == QMEApproveStatus.CANCEL) {  //若审批已通过、驳回或已撤销，锁定budget不再更新
                 await API.tripApprove.updateTripApprove({id: approveId, lockBudget: true});
             } else {   // 否则将lockBudget标示置回初始值，接受budget更新
                 await API.tripApprove.updateTripApprove({id: approveId, lockBudget: false});
@@ -700,11 +744,12 @@ export default class ApiTravelBudget {
             isRoundTrip: params.isRoundTrip,        //是否为往返
             goBackPlace: params.goBackPlace         //返回地
         });
+
         
 
         let segmentsBudget = budgetResult.budgets;
 
-        
+
         let ps: Promise<any>[] = segmentsBudget.map(async (item) => {
             return await ApiTravelBudget.transformBudgetData(item, companyId, count);
         });
@@ -773,10 +818,14 @@ export default class ApiTravelBudget {
             console.log('--------budgetResult', budgetResult.step);
             if (budgetResult.step == 'FIN' && eachBudgetSegIsOk) {
                 console.log('updateBudget first time');
-                ApiTravelBudget.updateBudget({approveId: approveId, budgetResult: budgetResult, isFinalFirstResponse: (isIntoApprove ? false : true)});
+                ApiTravelBudget.updateBudget({
+                    approveId: approveId,
+                    budgetResult: budgetResult,
+                    isFinalFirstResponse: (isIntoApprove ? false : true)
+                });
             }
 
-            console.log('UPDATE-----BUDGET----', );
+            console.log('UPDATE-----BUDGET----',);
         }).catch(async function (err: Error) {
             if (err) {
                 // company.extraTripPlanFrozenNum = extraTripPlanFrozenNum;
@@ -790,9 +839,35 @@ export default class ApiTravelBudget {
         let _id = Date.now() + utils.getRndStr(6);
         let key = `budgets:${staffId}:${_id}`;
         await cache.write(key, JSON.stringify(obj));
-        await ApiTravelBudget.sendTripApproveNoticeToSystem({ cacheId: _id, staffId: staffId });
+        await ApiTravelBudget.sendTripApproveNoticeToSystem({cacheId: _id, staffId: staffId});
 
-        return { approveId: approveId, budgetId: _id };
+        return {approveId: approveId, budgetId: _id};
+    }
+
+    //获取公司信息
+    static async getCompanyInfo() {
+        let currentStaff = await Staff.getCurrent();
+        let staffId = currentStaff.id;
+        let staff = await Models.staff.get(staffId);
+        let companyId = staff.company.id;
+        // let companyId = "935fbeb0-acd0-11e7-ab1e-bdc5d9f254d3"
+        let result;
+        try {
+            result = await RestfulAPIUtil.operateOnModel({
+                params: {
+                    method: 'put',
+                    fields: {
+                        companyId: companyId
+                    }
+                },
+                addUrl: `${companyId}/data`,
+                model: "TmcSupplier"
+            })
+            return result
+        } catch (err) {
+            console.log(err);
+        }
+
     }
 
     static async transformBudgetData(budget, companyId: string, count: number) {
@@ -801,8 +876,8 @@ export default class ApiTravelBudget {
         delete budget.prefers;
         switch (budget.type) {
             case EBudgetType.HOTEL:
-                let cityObj = await API.place.getCityInfo({ cityCode: budget.city, companyId: companyId });
-                let isAccordHotel = await Models.accordHotel.find({ where: { cityCode: cityObj.id, companyId } });
+                let cityObj = await API.place.getCityInfo({cityCode: budget.city, companyId: companyId});
+                let isAccordHotel = await Models.accordHotel.find({where: {cityCode: cityObj.id, companyId}});
                 if (isAccordHotel && isAccordHotel.length) {
                     budget.price = isAccordHotel[0].accordPrice;
 
@@ -848,9 +923,8 @@ export default class ApiTravelBudget {
     }
 
 
-
     static async sendTripApproveNoticeToSystem(params: { cacheId: string, staffId: string }) {
-        let { cacheId, staffId } = params;
+        let {cacheId, staffId} = params;
         if (!staffId || staffId == 'undefined') {
             let currentStaff = await Staff.getCurrent();
             staffId = currentStaff.id;
@@ -868,7 +942,7 @@ export default class ApiTravelBudget {
                         await API.notify.submitNotify({
                             key: 'qm_notify_system_new_travelbudget',
                             email: s.email,
-                            values: { cacheId: cacheId, name: s.name, staffId: staffId }
+                            values: {cacheId: cacheId, name: s.name, staffId: staffId}
                         })
 
                     } catch (err) {
@@ -885,8 +959,8 @@ export default class ApiTravelBudget {
     @clientExport
     static async reportBudgetError(params: { budgetId: string }) {
         let staff = await Staff.getCurrent();
-        let { budgetId } = params;
-        let content = await ApiTravelBudget.getBudgetInfo({ id: budgetId, accountId: staff.id });
+        let {budgetId} = params;
+        let content = await ApiTravelBudget.getBudgetInfo({id: budgetId, accountId: staff.id});
         let budgets = content.budgets;
         let ps = budgets.map(async (budget: any): Promise<any> => {
             if (!budget.id) {
@@ -944,7 +1018,7 @@ export default class ApiTravelBudget {
         }
 
         app.get("/api/budgets", _auth_middleware, function (req, res, next) {
-            let { p, pz, type } = req.query;
+            let {p, pz, type} = req.query;
             if (!p || !/^\d+$/.test(p) || p < 1) {
                 p = 1;
             }
@@ -952,7 +1026,7 @@ export default class ApiTravelBudget {
                 pz = 5;
             }
 
-            API.budget.getBudgetItems({ page: p, pageSize: pz, type: type, })
+            API.budget.getBudgetItems({page: p, pageSize: pz, type: type,})
                 .then((data: any) => {
                     res.header('Access-Control-Allow-Origin', '*');
                     res.json(data);
@@ -961,12 +1035,12 @@ export default class ApiTravelBudget {
         })
 
         app.post('/api/budgets', _auth_middleware, function (req, res, next) {
-            let { query, prefers, originData, type } = req.body;
+            let {query, prefers, originData, type} = req.body;
             originData = JSON.parse(originData);
             query = JSON.parse(query);
             prefers = JSON.parse(prefers);
 
-            return API.budget.debugBudgetItem({ query, originData, type, prefers })
+            return API.budget.debugBudgetItem({query, originData, type, prefers})
                 .then((result: any) => {
                     res.header('Access-Control-Allow-Origin', '*');
                     res.json(result);
@@ -976,9 +1050,15 @@ export default class ApiTravelBudget {
     }
 }
 
-
-
-
+// let paramss = {
+//     checkInDate: "2018-01-20",
+//     checkOutDate: "2018-01-21",
+//     cityId: "CT_131",
+//     travelPolicyId: "dklfklsdklmfsmldfkdsmkfsdfs"
+// }
+// setTimeout(async () => {
+//     await  ApiTravelBudget.getHotelsData(paramss)
+// }, 8000);
 
 let params = {
     "originPlace": "CT_131",
@@ -1040,7 +1120,8 @@ let params = {
         "updatedAt": "2017-10-29T02:10:05.835Z",
         "deletedAt": null
     }
-} /* as ICreateBudgetAndApproveParamsNew; */
+}
+/* as ICreateBudgetAndApproveParamsNew; */
 
 // setTimeout(async ()=>{
 //     console.log("test go go");

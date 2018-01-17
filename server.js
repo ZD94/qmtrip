@@ -5,6 +5,7 @@
 //可以直接require服务器根目录下的模块
 require('app-module-path').addPath(__dirname);
 require('common/node_ts').install();
+
 var initData = require('libs/initTestData');
 var ReplServer = require('libs/replServer');
 var WX = require('api/wangXin');
@@ -33,6 +34,9 @@ require("common/redis-client").init(config.redis.url);
 Promise.config({ warnings: false });
 if(config.debug) {
     Promise.config({ longStackTraces: false });
+
+    require('trace');
+    require('clarify');
 }
 
 var path = require('path');

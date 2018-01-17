@@ -100,7 +100,6 @@ export class RestfulAPIUtil {
         if (addUrl) {
             url += `/${addUrl}`
         }
-
         let qs: {
             [index: string]: string;
         } = {};
@@ -135,8 +134,7 @@ export class RestfulAPIUtil {
                 if (err) {
                     return reject(err);
                 }
-
-                if (typeof(result) == 'string') {
+                if (typeof result == 'string') {
                     try{
                         result = JSON.parse(result);
                     } catch (e) {
