@@ -15,10 +15,11 @@ const config = require("@jingli/config");
 let moment = require("moment");
 require("moment-timezone");
 import _ = require('lodash');
+import R = require('lodash/fp')
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
-    EPayType, ESourceType, EInvoiceStatus, TrafficEInvoiceFeeTypes, ProjectStaff, EProjectStatus
+    EPayType, ESourceType, EInvoiceStatus, TrafficEInvoiceFeeTypes, ProjectStaff, EProjectStatus, EOrderStatus
 } from "_types/tripPlan";
 import {Models} from "_types";
 import {FindResult} from "common/model/interface";
@@ -2676,20 +2677,34 @@ class TripPlanModule {
         return true;
     }
 
+    /**
+     * 完成行程
+     * @param params 
+     */
     @clientExport
-    static async completeTrip(params) {
+    static async completeTrip(params:{ id: string}) {
+        // Filter inoperable status
         const tripPlan = await Models.tripPlan.get(params.id)
         if (moment().milliseconds < moment(tripPlan.backAt).milliseconds)
-            throw new L.ERROR_CODE_C(400, '不可操作')
-        if (tripPlan.status != EPlanStatus.COMPLETE)
-            throw new L.ERROR_CODE_C(400, '')
-        const tripDetails = await tripPlan.getTripDetails({})
+            throw new L.ERROR_CODE_C(400, '该行程当前无法完成')
+        if (tripPlan.status != EPlanStatus.COMPLETE || tripPlan.auditStatus != EAuditStatus.PASS)
+            throw new L.ERROR_CODE_C(400, '该行程当前无法完成')
+        const tripDetails: TripDetail[] = await tripPlan.getTripDetails({ 
+            where: { status: 1, reserveStatus: {$in: [EOrderStatus.ENDORSEMENT_SUCCESS, EOrderStatus.SUCCESS]}}
+        })
+        // if (R.any((t: TripDetail) => t.status != -4, tripDetails))
+        //     throw new L.ERROR_CODE_C(400, '该行程需要上传票据')
+
+        // Fetch orders and calculate saving
         const orders = await Promise.all(tripDetails.map(td => getOrderInfo(td.orderNo)))
-        tripPlan.expenditure = _.sumBy(orders, _.property('price'))
+        tripPlan.expenditure = R.sumBy(R.prop('price'), orders)
         tripPlan.status = EPlanStatus.COMPLETE
         tripPlan.saved = tripPlan.budget - tripPlan.expenditure
         await tripPlan.save()
+
+        // Special approve can't settle reward
         if (tripPlan.isSpecialApprove) return
+
         await TripPlanModule.autoSettleReward(params)
     }
 
