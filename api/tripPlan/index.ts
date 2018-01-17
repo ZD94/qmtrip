@@ -41,6 +41,7 @@ let RestfulAPIUtil = restfulAPIUtil;
 import * as error from "@jingli/error";
 import { Company } from '_types/company';
 import { CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE } from '_types/coin';
+import { BUDGET_CHANGE_TYPE } from '_types/costCenter';
 const axios = require('axios')
 interface ReportInvoice {
     type: string;
@@ -565,7 +566,7 @@ class TripPlanModule {
             let allInvoicePass = true,
                 isNeedMsg = true;
             let invoices = await tripPlan.getTripInvoices();
-            let tripDetailInvoices: Array<{status: number}> = [];
+            let tripDetailInvoices: TripDetailInvoice[] = [];
             invoices.map(async (item)=>{
                 switch(item.status){
                     case EInvoiceStatus.WAIT_AUDIT:
@@ -628,7 +629,7 @@ class TripPlanModule {
 
             let tripDetailAllPass = true;
 
-            tripDetailInvoices.map((oneInvoice: any)=>{
+            tripDetailInvoices.map((oneInvoice)=>{
                 switch (oneInvoice.status) {
                     case EInvoiceStatus.AUDIT_FAIL:
                         logResult = '未通过';
@@ -2694,18 +2695,35 @@ class TripPlanModule {
         })
         // if (R.any((t: TripDetail) => t.status != -4, tripDetails))
         //     throw new L.ERROR_CODE_C(400, '该行程需要上传票据')
+        const promiseAry = []
 
         // Fetch orders and calculate saving
         const orders = await Promise.all(tripDetails.map(td => getOrderInfo(td.orderNo)))
         tripPlan.expenditure = R.sumBy(R.prop('price'), orders)
         tripPlan.status = EPlanStatus.COMPLETE
         tripPlan.saved = tripPlan.budget - tripPlan.expenditure
-        await tripPlan.save()
 
-        // Special approve can't settle reward
-        if (tripPlan.isSpecialApprove) return
+        // Log budget changes
+        const costCenterDeploy = _.first(await Models.costCenterDeploy.find({
+            where: { costCenterId: tripPlan.costCenterId }
+        }))
+        if (costCenterDeploy) {
+            const budgetLog = Models.budgetLog.create({
+                costCenterId: tripPlan.costCenterId, type: BUDGET_CHANGE_TYPE.CONSUME_BUDGET, relateId: params.id, 
+                value: tripPlan.expendBudget, oldBudget: costCenterDeploy.expendBudget, remark: `完成行程花费预算`
+            });
+            promiseAry.push(budgetLog.save())
+            costCenterDeploy.expendBudget += tripPlan.expenditure
+            promiseAry.push(costCenterDeploy.save())
+        }
+        promiseAry.push(tripPlan.save())
+        await DB.transaction(async function() {
+            await Promise.all(promiseAry)
+            // Special approve can't settle reward
+            if (tripPlan.isSpecialApprove) return
 
-        await TripPlanModule.autoSettleReward(params)
+            await TripPlanModule.autoSettleReward(params)
+        })
     }
 
 }
