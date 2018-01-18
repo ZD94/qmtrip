@@ -6,7 +6,7 @@ import { Models } from "_types";
 import { AuthRequest, AuthResponse } from '_types/auth';
 import {getCompanyTokenByAgent} from '../restful';
 var requestp = require("request-promise");
-import { EOrderStatus, EOrderType, TripDetail } from "_types/tripPlan";
+import { EOrderStatus, EOrderType, TripDetail, ETripDetailStatus, EPayType } from "_types/tripPlan";
 var request = require("request");
 var path = require("path");
 var _ = require("lodash");
@@ -161,6 +161,14 @@ class Proxy {
                     staff = await Models.staff.get(tripDetail.accountId);
                 }
                 listeningon = `${config.orderSysConfig.tripDetailMonitorUrl}/${tripDetail.id}`;
+                if(req.body.payType == EPayType.PERSONAL_PAY) {
+                    await API.tripPlan.updateTripDetail({
+                        tripDetailId,
+                        payType: req.body.payType,
+                        status: ETripDetailStatus.WAIT_UPLOAD,
+                        reserveStatus: EOrderStatus.WAIT_SUBMIT
+                    });
+                }
             }
 
             let addon:{[index: string]: any} = {

@@ -21,7 +21,7 @@ import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
     EPayType, ESourceType, EInvoiceStatus, TrafficEInvoiceFeeTypes, ProjectStaff, EProjectStatus, ETripDetailStatus, EOrderStatus
 } from "_types/tripPlan";
-import {Models} from "_types";
+import {Models, enumPlaneLevelToStr} from "_types";
 import {FindResult} from "common/model/interface";
 import {Staff, PointChange} from "_types/staff";
 import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
@@ -56,8 +56,6 @@ interface ReportInvoice {
     trafficInfo?: string;
     duration? : string;
 }
-
-
 
 class TripPlanModule {
 
@@ -382,15 +380,13 @@ class TripPlanModule {
         return Models.tripDetailSpecial.get(params.id);
     }
 
-    /**
-     * 更新消费详情
-     * @param params
-     */
+
     @clientExport
     @requireParams(['id'], TripDetail['$fieldnames'])
     @modelNotNull('tripDetail')
     static async updateTripDetail(params: TripDetail): Promise<TripDetail> {
         let tripDetail =  await Models.tripDetail.get(params.id);
+
         if(!tripDetail) 
             throw new Error(`指定tripDetail不存在, id: ${params.id}`)
             // throw new error.ParamsNotValidError("指定tripDetail不存在, id: ", params.id);
@@ -399,6 +395,81 @@ class TripPlanModule {
         }
         return tripDetail.save();
     }
+
+    /**
+     * @method 更新tripDetail详情
+     *    1. app进行tripDetail的修改
+     *    2. 预定回调更新tripDetail的reserveStatus状态
+     * 
+     *  1. 待预定 ---> 待提交 ---> 待出票 ---> 出票成功
+     * @param params.reserveStatus {number} 订单状态
+     * @param params.expenditure {number} 订单费用
+     * @param params.orderNo {string} 订单号
+     * @return {Promise<boolan>}
+     */
+    @clientExport
+    static async updateTripDetailReserveStatus(params: TripDetail): Promise<boolean> {
+        let tripDetail =  await Models.tripDetail.get(params.id); 
+        if(!tripDetail) 
+            throw new Error(`指定tripDetail不存在, id: ${params.id}`)
+        for(let key in params) {
+            tripDetail[key] = params[key];
+        }
+
+        //酒店类型个人支付，只修改reserveStatus(预定状态)，status(状态)无需再根据预定状态进行修改
+        if(tripDetail.payType == EPayType.PERSONAL_PAY) {
+            await tripDetail.save();
+        }
+
+        let tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
+        let reserveStatus = params.reserveStatus;
+        let status = tripDetail.status;
+        let tripDetails: TripDetail[];
+        switch(reserveStatus) {
+            case EOrderStatus.WAIT_SUBMIT: //等待创建订单
+            case EOrderStatus.AUDITING:  //等待确认，提交订单
+                tripDetail.status = ETripDetailStatus.WAIT_RESERVE;
+                break;
+            case EOrderStatus.WAIT_TICKET:
+                tripDetail.status = ETripDetailStatus.WAIT_TICKET;
+                break;
+            
+            case EOrderStatus.SUCCESS:  //全部已出票，设置该tripPlan为已预定
+            case EOrderStatus.REFUND_SUCCESS: 
+            case EOrderStatus.ENDORSEMENT_SUCCESS: 
+                tripDetail.status = ETripDetailStatus.COMPLETE;
+         
+                tripDetails = await Models.tripDetail.all({where: {tripPlanId: tripDetail.tripPlanId, status: [ETripDetailStatus.WAIT_RESERVE, ETripDetailStatus.WAIT_TICKET]}});
+                if(!tripDetails || !tripDetails.length)
+                    tripPlan.status = EPlanStatus.RESERVED;
+                tripDetails = [];
+                break;
+            case EOrderStatus.FAILED: 
+                tripDetail.status = ETripDetailStatus.WAIT_RESERVE;
+                break;
+            case EOrderStatus.ENDORSEMENT_CREATED:  //改签单创建，为等待预定
+                tripDetail.status = ETripDetailStatus.WAIT_TICKET;
+                if(tripPlan.status == EPlanStatus.RESERVED || tripPlan.status == EPlanStatus.COMPLETE || tripPlan.status == EPlanStatus.EXPIRED) {
+                    tripPlan.status = EPlanStatus.WAIT_RESERVE;
+                }
+                break;     
+            case EOrderStatus.WAIT_REFUND: 
+                break;
+            case EOrderStatus.WAIT_PAYMENT:  //订单未支付，默认设置为等待预定
+                tripDetail.status = ETripDetailStatus.WAIT_RESERVE; 
+                break;
+            case EOrderStatus.NO_SUFFICIENT_MONEY:  //酒店订单余额不足，默认设置为等待预定
+                tripDetail.status = ETripDetailStatus.WAIT_RESERVE;
+                break;
+            default: 
+                break;     
+        }  
+        await tripDetail.save();
+        await tripPlan.save();
+        return true;
+    }
+
+ 
 
     /**
      * 根据出差记录id获取出差详情(包括已删除的)
