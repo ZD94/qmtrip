@@ -1284,6 +1284,20 @@ class TripPlanModule {
     //
     /********************************************统计相关API***********************************************/
 
+    /**
+     * @method 按月统计行程单
+     *      1. 某段时间内取消和无预算的行程单
+     *      2. 某段时间内完成的行程
+     * 
+     * @return {
+     *      momth: Date, 
+     *      staffNum: number, 
+     *      projectNum: number,
+     *      dynamicBudget: number,
+     *      savedMoney: number,
+     *      expenditure: number
+     * }
+     */
     @clientExport
     @requireParams(['companyId', 'month'])
     static async statisticTripPlanOfMonth(params: {companyId: string, month: string}) {
@@ -2750,21 +2764,25 @@ async function updateTripPlanExpenditure(tripPlan: TripPlan) {
     tripPlan.personalExpenditure = personalExpenditure;
     return tripPlan.save();
 }
-//尝试修改tripDetail状态
-async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDetailStatus) :Promise<TripDetail> {
-    /*if ([ETripType.SUBSIDY].indexOf(tripDetail.type) >= 0 ) {
-        tripDetail.status = status;
-    } else {
 
-    }*/
+/**
+ * @method 更新tripDetail的状态(status), 同时触发tripPlan的状态的检查并更新
+ * 触发情况：
+ *      1. 用户触发提交审核，
+ *      2. 预定回调，更新预定状态，同步更新status和tripPlan的状态
+ * @param tripDetail 
+ * @param status {ETripDetailStatus} 
+ * @return Promise<TripDetail>
+ */
+async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDetailStatus) :Promise<TripDetail> {
+
     let auditStatus: EAuditStatus = EAuditStatus.NO_NEED_AUDIT;
     switch(status) {
         case ETripDetailStatus.WAIT_UPLOAD:
             tripDetail.status = status;
             auditStatus = EAuditStatus.WAIT_UPLOAD;
             break;
-        case ETripDetailStatus.WAIT_COMMIT:
-            //如果票据不为空,则设置状态为可提交状态
+        case ETripDetailStatus.WAIT_COMMIT:   //如果票据不为空,则设置状态为可提交状态
             let invoices = await Models.tripDetailInvoice.find({where: {tripDetailId: tripDetail.id}});
             let isInWaitCommit = true;
             invoices.map((item: any)=>{
@@ -2780,8 +2798,7 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDe
             break;
         case ETripDetailStatus.AUDITING:
             if ([ ETripDetailStatus.AUDIT_NOT_PASS, ETripDetailStatus.WAIT_COMMIT].indexOf(tripDetail.status) >= 0) {
-                tripDetail.status = status;
-                
+                tripDetail.status = status;  
             }
             auditStatus = EAuditStatus.WAIT_COMMIT;
             break;
@@ -2793,6 +2810,13 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDe
             }
             auditStatus = EAuditStatus.WAIT_COMMIT;
             break;
+
+        case ETripDetailStatus.WAIT_RESERVE: 
+            tripDetail.status = status;
+            break;
+        case ETripDetailStatus.WAIT_TICKET:
+            tripDetail.status = status;  
+            break;    
     }
 
     //更改行程详情状态
