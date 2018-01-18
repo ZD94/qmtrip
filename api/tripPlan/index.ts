@@ -1413,9 +1413,9 @@ class TripPlanModule {
             completeSql += ` and account_id='${staff.id}'`;
         }
 
-        // let planSql = `${completeSql}  and auditStatus in (${EAuditStatus.WAIT_UPLOAD}, ${EAuditStatus.WAIT_COMMIT}, ${EAuditStatus.AUDITING}, ${EAuditStatus.INVOICE_NOT_PASS}, ${EAuditStatus.INVOICE_PASS})`;
-        let planSql = `${completeSql}  and auditStatus not in (${EAuditStatus.INVOICE_PASS}, ${EAuditStatus.WAIT_COMMIT}, ${EAuditStatus.AUDITING}, ${EAuditStatus.INVOICE_NOT_PASS}, ${EAuditStatus.INVOICE_PASS})`;
-        
+
+        // let planSql = `${completeSql}  and status in (${EPlanStatus.WAIT_UPLOAD}, ${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDITING}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.COMPLETE})`;
+        let planSql = `${completeSql}  and ((status not in (${EPlanStatus.CANCEL, EPlanStatus.NO_BUDGET}))`
         completeSql += ` and status=${EPlanStatus.COMPLETE}`;
 
         let savedMoneyCompleteSql = completeSql + ' and is_special_approve = false';
@@ -1535,11 +1535,11 @@ class TripPlanModule {
         let completeSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status=${EPlanStatus.COMPLETE} and all_invoices_pass_time>'${params.startTime}' and all_invoices_pass_time<'${params.endTime}'`;
         let savedMoneyCompleteSql = '';
         
-        let planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
+        let planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status not in (${EPlanStatus.CANCEL}, ${EPlanStatus.NO_BUDGET}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
         // let planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
         
         if(params.unComplete){
-            planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
+            planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status not in (${EPlanStatus.CANCEL}, , ${EPlanStatus.NO_BUDGET}, ${EPlanStatus.COMPLETE}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
             // planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
         }
 
@@ -1587,6 +1587,7 @@ class TripPlanModule {
             savedMoneyCompleteSql = '';
             planSql = `${completeSql}`;
             // planSql = `${completeSql} and p.status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE})`;
+            planSql = `${completeSql} and p.status not in (${EPlanStatus.CANCEL},${EPlanStatus.NO_BUDGET})`;
             completeSql += ` and p.status=${EPlanStatus.COMPLETE}`;
             if(params.keyWord) {
                 let pagers = await Models.department.find({where: {name: {$like: `%${params.keyWord}%`}, companyId: company.id}, order: [['created_at','desc']]});
