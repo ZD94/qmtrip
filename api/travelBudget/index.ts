@@ -673,7 +673,7 @@ export default class ApiTravelBudget {
 
         if(params.feeCollected){
             let cc = await Models.costCenter.get(params.feeCollected);
-            if(cc.type == ECostCenterType.PROJECT){
+            if(cc && cc.type == ECostCenterType.PROJECT){
                 let pts = await Models.projectStaffTravelPolicy.all({where: {staffId: staffId, projectId: params.feeCollected}, order: [['createdAt', 'desc']]});
                 if(pts && pts.length){
                     params.travelPolicyId = pts[0].travelPolicyId;
