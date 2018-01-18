@@ -393,6 +393,7 @@ export default class CostCenterModule {
         }
         cost.warningPerson = setting.audienceTypes
         cost.warningRule = { type: setting.type, rate: setting.rate }
+        cost.isSendNotice = false;
         await cost.save()
     }
 }
