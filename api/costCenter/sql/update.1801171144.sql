@@ -1,0 +1,1 @@
+ALTER TABLE cost_center.budget_logs ALTER COLUMN remark type text;
