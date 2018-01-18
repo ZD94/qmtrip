@@ -538,7 +538,6 @@ class TripPlanModule {
         let companyId = getTripPlan.companyId;
         let company = await Models.company.get(companyId);
         let SAVED2SCORE = company.scoreRatio;
-
         if((tripDetail.status != EPlanStatus.AUDITING) && (tripDetail.status != EPlanStatus.AUDIT_NOT_PASS)) {
             throw L.ERR.TRIP_PLAN_STATUS_ERR();
         }
@@ -551,7 +550,6 @@ class TripPlanModule {
         if(audit != EAuditStatus.INVOICE_PASS && audit != EAuditStatus.INVOICE_NOT_PASS){
             throw L.ERR.PERMISSION_DENY(); //代理商只能审核票据权限
         }
-
         let invoice = await Models.tripDetailInvoice.get(params.invoiceId);
         //处理这张票据
         console.info("params.invoiceId==>>", params.invoiceId);
@@ -626,8 +624,8 @@ class TripPlanModule {
                     destinationArray.push(query.originPlace);
                 }
                 for (let j = 0; j < destinationArray.length; j++) {
-                    let destinationName = await API.place.getCityInfo({cityCode: destinationArray[j], companyId: staff.companyId});
-                    destinationArray.shift();
+                    let cityCode = destinationArray.shift();
+                    let destinationName = await API.place.getCityInfo({cityCode: cityCode, companyId: staff.companyId});
                     destinationArray.push(destinationName);
                 }
                 if (!tripPlan.deptCity) {  // 仅住宿
@@ -689,7 +687,6 @@ class TripPlanModule {
                     await costCenter.addExpendBudget({tripPlanId: tripPlan.id})
                 }
             }
-
             /*******************************************发送通知消息**********************************************/
             let staff = await Models.staff.get(tripPlan['accountId']);
             if(isNeedMsg){
