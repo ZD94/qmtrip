@@ -2741,10 +2741,10 @@ class TripPlanModule {
         const tripPlan = await Models.tripPlan.get(params.id)
         if (moment().milliseconds < moment(tripPlan.backAt).milliseconds)
             throw new L.ERROR_CODE_C(400, '该行程当前无法完成')
-        if (tripPlan.status != EPlanStatus.COMPLETE || tripPlan.auditStatus != EAuditStatus.PASS)
+        if (tripPlan.status != EPlanStatus.COMPLETE || tripPlan.auditStatus != EAuditStatus.INVOICE_PASS)
             throw new L.ERROR_CODE_C(400, '该行程当前无法完成')
         const tripDetails: TripDetail[] = await tripPlan.getTripDetails({ 
-            where: { status: 1, reserveStatus: {$in: [EOrderStatus.ENDORSEMENT_SUCCESS, EOrderStatus.SUCCESS]}}
+            where: { status: EPlanStatus.COMPLETE, reserveStatus: {$in: [EOrderStatus.ENDORSEMENT_SUCCESS, EOrderStatus.SUCCESS]}}
         })
         // if (R.any((t: TripDetail) => t.status != -4, tripDetails))
         //     throw new L.ERROR_CODE_C(400, '该行程需要上传票据')
