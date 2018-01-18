@@ -166,8 +166,6 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData) {
             console.log(e)
         }
     }
-
-
     if (meiyaResult.code == 0) {
         return meiyaResult.data;
     } else {
@@ -350,7 +348,6 @@ export function handelHotelsData(meiyaHotelData, originalData) {
 }
 
 function transferHotelData(meiyaHotelData, originalData) {
-    var num = Math.round(Math.random() * 1000) + 1000
     let model = {
         "name": meiyaHotelData.cnName,
         "star": meiyaHotelData.starRating,
@@ -368,7 +365,7 @@ function transferHotelData(meiyaHotelData, originalData) {
             // },
             {
                 "name": "meiya",
-                "price": num,
+                "price": meiyaHotelData.hotelMinPrice,
                 "urlParams": {
                     "hotelId": meiyaHotelData.hotelId
                 }
@@ -501,11 +498,8 @@ export function handleTrainData(meiyaTrainData: any[], originalData) {
 
 
 function transferTrainData(meiyaTrainData: any, originalData) {
-    let date = new Date(originalData.leaveDate)
-    let leaveDate = date.getFullYear() + "-" + date.getMonth() + 1 + "-" + date.getDate();
-    let departDateTime = leaveDate + " " + meiyaTrainData.DepDate;
-    let arrivalDateTime = leaveDate + " " + meiyaTrainData.ArrDate;
-
+    let departDateTime = meiyaTrainData.StartTimeLong;
+    let arrivalDateTime = meiyaTrainData.EndTimeLong;
     let cabin, price;
     for (let item of meiyaTrainData.SeatList) {
         cabin = item.SeatName;
