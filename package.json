@@ -211,7 +211,7 @@
     "source-map": "^0.1.43",
     "source-map-support": "^0.4.2",
     "stringify": "5.1.0",
-    "swiper": "^3.3.1",
+    "swiper": "3.3.1",
     "tiny-cookie": "^0.5.5",
     "ts-node": "^1.7.0",
     "tsify": "^1.0.4",
