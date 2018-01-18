@@ -2777,6 +2777,7 @@ class TripPlanModule {
 
             await TripPlanModule.autoSettleReward(params)
         })
+        await costCenterDeploy.checkoutBudgetNotice()
     }
 
 }
