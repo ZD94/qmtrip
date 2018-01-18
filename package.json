@@ -118,13 +118,8 @@
     "validator": "^5.5.0",
     "weak": "^1.0.1",
     "wechat-crypto": "0.0.2",
-<<<<<<< HEAD
     "wechat-oauth": "^1.1.1",
     "xml2js": "^0.4.19"
-=======
-    "wechat-oauth": "1.1.1",
-    "xml2js": "0.4.19"
->>>>>>> bf46637fc5e1f443ec19190d21e78db582300df8
   },
   "optionalDependency": {
     "bufferutil": "^1.2.1",
