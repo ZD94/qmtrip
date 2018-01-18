@@ -279,8 +279,7 @@ export default class CostCenterModule {
         const uniqCosts: CostCenterDeploy[] = _.compose(_.compact, _.map(_.first))(costs)
         const planExpends = await Promise.all(uniqCosts.map(cost => cost.getPlanBudget({ startDay: period.start, endDay: period.end })))
         return _.zipWith((cost: CostCenterDeploy, planExpend: number) => {
-            cost.expendBudget += planExpend
-            return cost.toJSON()
+            return { ...cost.toJSON(), expendBudget: cost.expendBudget + planExpend }
         }, uniqCosts, planExpends)
     }
 
