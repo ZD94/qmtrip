@@ -681,7 +681,8 @@ export default class TripApproveModule {
                 approve.status = EApproveStatus.SUCCESS;
                 approve.approveRemark = '审批通过';
             }else if(approveResult == EApproveResult.REJECT) {
-                let reason = params.reason;
+                let tripApprove = await API.tripApprove.getTripApprove({id: approve.id});
+                let reason = tripApprove.approveRemark;
                 notifyRemark = extraStr+`审批未通过，原因：${reason}`;
                 log.approveStatus = EApproveResult.REJECT;
                 log.remark = notifyRemark;
