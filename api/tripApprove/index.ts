@@ -16,7 +16,7 @@ var API = require('@jingli/dnode-api');
 const config = require("@jingli/config");
 import _ = require("lodash");
 import {ENoticeType} from "_types/notice/notice";
-import {AutoApproveType, AutoApproveConfig, ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan"
+import {AutoApproveType, AutoApproveConfig, ISegment, ICreateBudgetAndApproveParams, ICreateBudgetAndApproveParamsNew} from "_types/tripPlan"
 import {DB} from "@jingli/database";
 import {ITripApprove, IDestination} from "../../_types/tripApprove";
 import {Project} from "../../_types/tripPlan";
@@ -599,12 +599,11 @@ export default class TripApproveModule {
             approve.status = EApproveStatus.FAIL;
             approve.tripApproveStatus = QMEApproveStatus.REJECT;
         }
-        await approve.save();
 
         if(typeof approve.data == 'string'){
             approve.data = JSON.parse(approve.data);
         }
-        let budgetInfo: {budgets: ITravelBudgetInfo[], query: ICreateBudgetAndApproveParams} = approve.data;
+        let budgetInfo: {budgets: ITravelBudgetInfo[], query: ICreateBudgetAndApproveParamsNew} = approve.data;
         let {budgets, query} = budgetInfo;
         let number = 0;
 
@@ -617,6 +616,7 @@ export default class TripApproveModule {
         }
 
         await DB.transaction(async function(t){
+            await approve.save();
             // 特殊审批和非当月提交的审批不记录行程点数
             if(!approve.isSpecialApprove){
                 if(typeof query == 'string'){
@@ -681,7 +681,8 @@ export default class TripApproveModule {
                 approve.status = EApproveStatus.SUCCESS;
                 approve.approveRemark = '审批通过';
             }else if(approveResult == EApproveResult.REJECT) {
-                let reason = params.reason;
+                let tripApprove = await API.tripApprove.getTripApprove({id: approve.id});
+                let reason = tripApprove.approveRemark;
                 notifyRemark = extraStr+`审批未通过，原因：${reason}`;
                 log.approveStatus = EApproveResult.REJECT;
                 log.remark = notifyRemark;
@@ -714,6 +715,11 @@ export default class TripApproveModule {
                     await API.notify.submitNotify({userId: user.id, key: 'qm_notify_approve_not_pass',
                         values: { tripApprove: approve, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
                 } catch(err) { console.error(err);}
+            }
+
+            if(approveResult == EApproveResult.PASS && query && query.feeCollected){
+                let costCenter = await Models.costCenter.get(query.feeCollected);
+                await costCenter.checkoutBudgetNotice();
             }
 
         }).catch(async function(err){
