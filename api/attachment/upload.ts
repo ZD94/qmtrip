@@ -194,7 +194,7 @@ module.exports = function(app: Application) {
         })(req, res, next);
     });*/
 
-    app.get("/attachment/temp/:id", getTmpAttachment);
+    app.get("/attachment/temp/:fileId", getTmpAttachment);
 
     app.get("/attachments/:id", getPublicFile);
     //app.post('/upload/ajax-upload-file', uploadActionFile);

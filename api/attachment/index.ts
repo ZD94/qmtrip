@@ -199,14 +199,13 @@ class ApiAttachment {
 
             var cache_exist = await fs_exists(filepath);
             if(!cache_exist){
-                var attachment = await Models.attachment.get(id);
+                var attachment = await ApiAttachment.getAttachment({id: id});
                 if(!attachment) {
                     return null;
                 }
                 if(attachment.isPublic !== isPublic)
                     return null;
                 contentType = attachment.contentType;
-
                 var dir_exist = await fs_exists(cachePath);
                 if(!dir_exist){
                     await fs.mkdirAsync(cachePath, '755');

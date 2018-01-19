@@ -9,7 +9,8 @@ var API = require("@jingli/dnode-api");
 import Logger from '@jingli/logger';
 import { Application, Request, Response, NextFunction } from 'express-serve-static-core';
 let logger = new Logger("tripPlan.invoice");
-
+import * as path from 'path';
+import fs = require("fs");
 
 module.exports = function(app: Application){
     //app.get('/consume/invoice/:consumeId', agentGetTripplanInvoice);
@@ -81,8 +82,18 @@ async function agentGetTripplanDetailInvoice(req: Request, res: Response, next: 
         if(!cacheFile) {
             return res.sendStatus(404);
         }
-        res.set("Content-Type", cacheFile.type);
-        return res.sendFile(cacheFile.file);
+        res.set("Content-Type", cacheFile.type)
+        let file = cacheFile.file;
+        let pwd = process.cwd();
+        if(!path.isAbsolute(file))
+            file = path.join(pwd, file);
+        let isExist = await new Promise((resolve, reject) => {
+            fs.exists(file, resolve);
+        });
+        if (!isExist) {
+            return next(404);
+        }
+        return res.sendFile(file);
     } catch(e) {
         logger.error(e.stack || e);
         res.sendStatus(500);
