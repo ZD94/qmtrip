@@ -38,7 +38,7 @@ export class EventModule{
                 // let templateUrl = _.template(url);
                 // url = templateUrl(data);
                 // let url = 'http://localhost:8040/api/v1/tripApprove/receive';
-                let url = 'https://l.jingli365.com/proj/svr-trip-approve/api/v1';
+                let url = 'https://l.jingli365.com/proj/svr-trip-approve/api/v1/tripApprove/receive';
                 console.info("url====>>>", url);
                 let method = eventListeners[0].method;
                 let qs = null;
