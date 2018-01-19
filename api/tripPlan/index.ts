@@ -2782,7 +2782,10 @@ class TripPlanModule {
             // Special approve can't settle reward
             if (tripPlan.isSpecialApprove) return
 
-            await TripPlanModule.autoSettleReward(params)
+            const isSuccess = await TripPlanModule.autoSettleReward(params)
+            if (!isSuccess) {
+                throw new L.ERROR_CODE_C(400, '企业余额不足')
+            }
         })
         if (costCenterDeploy)
             await costCenterDeploy.checkoutBudgetNotice()
