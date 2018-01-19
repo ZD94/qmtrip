@@ -60,7 +60,7 @@
     "bindings": "^1.2.1",
     "bluebird": "^3.5.0",
     "body-parser": "^1.15.2",
-    "callsite": "^1.0.0",
+    "callsite": "1.0.0",
     "carrack": "^0.5.0",
     "clarify": "^2.1.0",
     "co": "^4.6.0",
