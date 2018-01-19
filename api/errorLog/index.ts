@@ -4,11 +4,12 @@
 
 'use strict';
 import {Models} from "_types/index";
+import { Application } from 'express';
 
 
 export default class ErrorRecord {
 
-    static __initHttpApp(app) {
+    static __initHttpApp(app: Application) {
 
         app.use('/e', function(req, res, next) {
             let {s, u} = req.query || req.body;

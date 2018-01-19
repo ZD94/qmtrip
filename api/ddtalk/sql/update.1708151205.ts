@@ -1,17 +1,17 @@
 import uuid = require("node-uuid");
 
-module.exports =async function(DB, t) {
+module.exports =async function(DB: any, t: any) {
     let sql = 'select * from department.department_properties where department_id is null';
-    await DB.query(sql).then(async (properties)=> {
+    await DB.query(sql).then(async (properties: any)=> {
         let prop = properties[0];
         if(prop && prop.length){
             let sql1 = 'delete from department.department_properties where department_id is null';
             await DB.query(sql1);
 
             let sql2 = `select * from ddtalk.departments where deleted_at is null`;
-            await DB.query(sql2).then(async (rets)=>{
+            await DB.query(sql2).then(async (rets: any)=>{
                 let departments = rets[0];
-                await Promise.all(departments.map(async (dept)=>{
+                await Promise.all(departments.map(async (dept: any)=>{
                     let corpId = dept.corp_id ? `'${dept.corp_id}'` : null;
                     let departmentId = dept.local_department_id ? `'${dept.local_department_id}'`: null;
                     let ddDepartmentId = dept.dd_department_id ? `'${dept.dd_department_id}'`: null;

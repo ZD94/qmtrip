@@ -1,7 +1,6 @@
 'use strict';
 import { Models } from '_types';
 import { CoinAccount } from "_types/coin";
-import * as moment from "moment";
 /**
  * 延长企业有效期
  * @type {{execute: (function(any): Promise<any>)}}

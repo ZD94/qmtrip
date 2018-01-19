@@ -4,10 +4,8 @@
 import { OaCompany } from 'libs/asyncOrganization/oaCompany';
 import { OaDepartment } from 'libs/asyncOrganization/oaDepartment';
 import { OaStaff } from 'libs/asyncOrganization/oaStaff';
-import { DepartmentProperty, DPropertyType} from "_types/department";
 import {Models} from "_types/index";
 import {Company, CPropertyType, CompanyProperty} from "_types/company";
-import L from '@jingli/language';
 import ISVApi from "./isvApi";
 import corpApi from "./corpApi";
 import DdStaff from "./ddStaff";

@@ -2,7 +2,7 @@
 import L from '@jingli/language';
 import { Models } from '_types';
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
-import { ModelInterface, PaginateInterface, ModelObjInterface, FindResult } from 'common/model/interface';
+import { ModelInterface, ModelObjInterface, FindResult } from 'common/model/interface';
 
 export default class ModelForClient{
     @clientExport
@@ -27,7 +27,7 @@ export default class ModelForClient{
         return model.$find(options);
     }
     @clientExport
-    static async update<T extends ModelObjInterface>(modelType: string, id: string, props: any, options: any): Promise<T>{
+    static async update<T extends ModelObjInterface>(modelType: string, id: string, props: object, options: any): Promise<T>{
         let model = Models[modelType] as ModelInterface<T>;
         if(!model)
             throw L.ERR.INVALID_ARGUMENT('modelType');

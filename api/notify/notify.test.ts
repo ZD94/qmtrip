@@ -3,8 +3,6 @@
  */
 'use strict';
 
-import util = require("util")
-import assert = require("assert");
 import API = require("@jingli/dnode-api");
 
 describe('api/notify', function() {

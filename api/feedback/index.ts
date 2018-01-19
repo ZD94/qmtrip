@@ -4,7 +4,6 @@
 'use strict';
 var sequelize = require("common/model").importModel("./models");
 var feedbacktModel = sequelize.models.Feedback;
-var utils = require("common/utils");
 var API = require("@jingli/dnode-api");
 
 /**
@@ -18,7 +17,7 @@ var API = require("@jingli/dnode-api");
  * @returns {*}
  */
 class FeedBackModule {
-    static sendFeedback(data) {
+    static sendFeedback(data: {content: string, companyName: string, userName?: string}) {
         var content = data.content;
         if(!content){
             throw {code: -1, msg:"content不能为空"};
@@ -28,7 +27,7 @@ class FeedBackModule {
             throw {code: -1, msg:"companyName不能为空"};
         }
         return feedbacktModel.create(data)
-            .then(function(result){
+            .then(function(result: any){
                 var vals = {
                     time: new Date(),
                     content: content,

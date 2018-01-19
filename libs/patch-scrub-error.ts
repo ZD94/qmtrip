@@ -12,7 +12,7 @@ registerClass(
     Error,
     null,
     (err) => {
-        if (err['error@context']) {
+        if (err['error@context']) { 
             delete err['error@context'];
         }
         return err;

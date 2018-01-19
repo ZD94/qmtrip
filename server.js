@@ -5,9 +5,16 @@
 //可以直接require服务器根目录下的模块
 require('app-module-path').addPath(__dirname);
 require('common/node_ts').install();
+
 var initData = require('libs/initTestData');
 var ReplServer = require('libs/replServer');
+var WX = require('api/wangXin');
+var WangxUtils = require('api/wangXin/lib/wangxUtils');
+// const httpProxy = require('http-proxy')
 
+// httpProxy.createProxyServer({
+//     target: 'http://192.168.1.242:3000'
+// }).listen(55555)
 var Logger = require('@jingli/logger');
 
 Error.stackTraceLimit = 40;
@@ -27,6 +34,9 @@ require("common/redis-client").init(config.redis.url);
 Promise.config({ warnings: false });
 if(config.debug) {
     Promise.config({ longStackTraces: false });
+
+    require('trace');
+    require('clarify');
 }
 
 var path = require('path');
@@ -85,7 +95,16 @@ server.on('init.api', function(API){
     if(cluster.isMaster && config.is_init_test_company){
         initData.initDataForTest({id: "60294e10-1448-11e7-aa89-6b4a98eecf40", name: '笑傲江湖', userName: '风清扬', mobile: '13700000001', pwd: '123456', email: 'fq.yang@jingli.tech'});
     }
-    
+
+    if(cluster.isMaster && config.wxSysCode){
+        // WX.syncOrganization();
+        /*let key = "ZjBmMjU0NzAtMWI3Yi0xMWU3LTk4NzUtYTdkOWQ4MmY=";
+        // let result = WangxUtils.createLtpaToken("*shangguanzirui*", 12, key);
+        let token = "AQIDBDVBNDVGNzBCNUE0NjlGQ0Iqc2hhbmdndWFuemlydWkq9G2GcWudAn8KpUHh8g9cRJEmtGc=";
+        let result = WangxUtils.parseLtpaToken(token, key);
+        console.info("result---====....>>", result);*/
+    }
+
     if(cluster.isMaster){
         let replServer = new ReplServer(1337, {context: {API: API}});
         replServer.initReplServer();

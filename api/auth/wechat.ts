@@ -4,12 +4,12 @@ import ApiAuth from './index';
 import { makeAuthenticateToken } from './authentication';
 import { Staff } from '_types/staff/staff';
 import { Models } from '_types/index';
-import { requireParams } from '@jingli/dnode-api/dist/src/helper';
-import C = require("@jingli/config");
+import { Application } from 'express-serve-static-core';
+const C = require("@jingli/config");
 
 var API = require("@jingli/dnode-api");
 
-export function __initHttpApp(app: any) {
+export function __initHttpApp(app: Application) {
     //微信自动登录
     app.all("/auth/wx-login", async function(req, res, next) {
         let query = req.query;
@@ -75,7 +75,7 @@ export async function destroyWechatOpenId(params: {}): Promise<boolean> {
  * 保存openId关联的accountId
  * @type {saveOrUpdateOpenId}
  */
-export async function saveOrUpdateOpenId(params) {
+export async function saveOrUpdateOpenId(params: {code: string}) {
     let {code} = params;
     let val = await cache.readAs<{openid:string}>(`wechat:${code}`);
     let openid = val ? val.openid : '';

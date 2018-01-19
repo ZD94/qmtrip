@@ -16,18 +16,19 @@ import L from '@jingli/language';
 import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
-import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo, EAddWay } from "_types/staff";
+import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo, EAddWay, Linkman} from "_types/staff";
 import { Notice } from "_types/notice";
 import { EAgencyUserRole, AgencyUser } from "_types/agency";
 import { Models, EAccountType, EGender } from '_types';
 import {conditionDecorator, condition} from "../_decorator";
-import {FindResult} from "common/model/interface";
+import { FindResult, PaginateInterface } from "common/model/interface";
 import {ENoticeType} from "_types/notice/notice";
 import {CoinAccount} from "_types/coin";
 import {StaffDepartment} from "_types/department/staffDepartment";
 import { getSession } from "@jingli/dnode-api";
-
-
+import { ACCOUNT_STATUS, Account } from '_types/auth';
+const linkmanCols = Linkman['$fieldnames'];
+import * as error from "@jingli/error";
 const invitedLinkCols = InvitedLink['$fieldnames'];
 const staffSupplierInfoCols = StaffSupplierInfo['$fieldnames'];
 const staffAllCols = Staff['$getAllFieldNames']();
@@ -483,7 +484,7 @@ class StaffModule{
     @clientExport
     static async getStaffsByAccountId() : Promise<Staff[]>{
 
-        let session = getSession();
+        let session = getSession(); 
         if(session && session.accountId){
             let staffs = await Models.staff.find({
                 where : {
@@ -585,7 +586,7 @@ class StaffModule{
         let xlsObj;
         let defaultDept = await company.getDefaultDepartment();
         let att = await API.attachment.getSelfAttachment({fileId: fileId, accountId: staff.id});
-        if(att){
+        if(att && att.content){
             var content = new Buffer(att.content, 'base64');
             xlsObj = nodeXlsx.parse(content);
         }else{
@@ -605,7 +606,6 @@ class StaffModule{
             departmentMaps[dep.name] = dep;
         }
         let data = xlsObj[1].data;
-
         let items = await Promise.all(data.map(async function(item, index){
             let s = data[index];
             let departments = [];
@@ -761,7 +761,6 @@ class StaffModule{
                 return;
             }
         }));
-
         //addObj中删除重复邮箱的用户
         let repeatEmailStr = repeatEmail.join(",");
         for(let i=0;i<addObj.length;i++){
@@ -807,8 +806,7 @@ class StaffModule{
             await staffAdded.addDepartment(depts);
 
         }));
-
-        await API.attachments.removeFileAndAttach({id: fileId});
+        // await API.attachment.removeFileAndAttach({id: fileId});
         return {addObj: JSON.stringify(addObj), downloadAddObj: JSON.stringify(downloadAddObj), noAddObj: JSON.stringify(noAddObj),
             downloadNoAddObj: JSON.stringify(downloadNoAddObj)};
     }
@@ -1687,6 +1685,173 @@ class StaffModule{
             return pager[0];
         }
         return null;
+    }
+
+    /************************************外部联系人***************************************/
+    /**
+     * @method 创建外部联系人
+     * @param data
+     * @param data.accountId 已经有登录账号
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["name", "mobile", "companyId", "operatorId"], linkmanCols)
+    static async createLinkman(params: {
+        id?: string, 
+        name: string, 
+        mobile: string, 
+        companyId: string, 
+        sex?: number, 
+        companyName?: string,
+        operatorId: string,
+        type: number
+    }): Promise<Linkman> {
+
+        let linkmans = await Models.linkman.find({
+            where: {
+                companyId: params.companyId,
+                mobile: params.mobile
+            }
+        });
+        if(linkmans && linkmans.length)
+            throw new Error("外部联系人手机号已被目标公司的其他外部联系人使用");
+            // throw new error.NotPermitError("外部联系人手机号已被目标公司的其他外部联系人使用");
+
+        let accounts: Account[] = await Models.account.find({
+            where: {
+                mobile: params.mobile,
+                status: {$ne: ACCOUNT_STATUS.FORBIDDEN}
+            }
+        });
+
+        let accountIds = await Promise.all(accounts.map(async (account: Account) => {
+            return account.id;
+        }))
+        let companyId: string = params.companyId;
+        if(accounts && accounts.length) {
+            let staffs = await Models.staff.find({
+                where: {
+                    companyId: companyId,
+                    accountId: {$in: accountIds},
+                    staffStatus: EStaffStatus.ON_JOB
+                }
+            });
+            if(staffs && staffs.length)
+                throw new Error("外部联系人手机号已被目标公司的员工使用");
+                // throw new error.NotPermitError("外部联系人手机号已被目标公司的员工使用");
+        }
+        
+        let linkman = Models.linkman.create(params);
+        linkman = await linkman.save();
+        return linkman;
+    }
+
+    /**
+     * @method 更新外部联系人
+     * @param params
+     * @returns {Linkman}
+     */
+    @clientExport
+    @requireParams(["id"], linkmanCols)
+    static async updateLinkman(params: {
+        id: string,
+        name?: string, 
+        mobile?: string, 
+        companyId?: string, 
+        sex?: number,
+        companyName?: string,
+        operatorId?: string,
+        type?: number
+    }): Promise<Linkman> {
+        let linkman = await Models.linkman.get(params.id);
+
+        if(params.mobile) {
+            let hasExisted = await Models.linkman.find({
+                where: {
+                    id: { $ne: linkman.id }, 
+                    mobile: params.mobile,
+                    companyId: linkman.companyId
+                }
+            });
+
+            if(hasExisted && hasExisted.length) 
+                throw new Error("外部联系人手机号已被目标公司的其他外部联系人使用");
+                // throw new error.NotPermitError("外部联系人手机号已被目标公司的其他外部联系人使用");
+
+            let accounts: Account[] = await Models.account.all({
+                where: {
+                    mobile: params.mobile,
+                    status: {$ne: ACCOUNT_STATUS.FORBIDDEN}
+                }
+            });
+
+            let accountIds = await Promise.all(accounts.map(async (account: Account) => {
+                return account.id
+            }))
+
+            let companyId: string = params && params.companyId ? params.companyId: linkman.companyId;
+            if(accounts && accounts.length) {
+                let staffs = await Models.staff.find({
+                    where: {
+                        companyId: companyId,
+                        accountId: {$in: accountIds},
+                        staffStatus: EStaffStatus.ON_JOB
+                    }
+                });
+                if(staffs && staffs.length)
+                    throw new Error("外部联系人手机号已被目标公司的员工使用");
+                    // throw new error.NotPermitError("外部联系人手机号已被目标公司的员工使用");
+            }  
+        }
+        for(let key in params) 
+            linkman[key] = params[key];
+        linkman = await linkman.save();
+        return linkman;
+    }
+
+    /**
+     * @method 删除外部联系人, 
+     * @param id {string} 外部联系人id
+     * @returns {boolean}
+     */
+    @clientExport
+    @requireParams(["id"], linkmanCols)
+    static async deleteLinkman(params: {
+        id: string
+    }): Promise<Boolean> {
+        let linkman = await Models.linkman.get(params.id);
+        await linkman.destroy();
+        return true;
+    }
+
+    /**
+     * @method 获取外部联系人
+     * @param params
+     * @returns {LinkMan}
+     */
+    @clientExport
+    @requireParams(["id"], linkmanCols)
+    static async getLinkman(params: {id: string}): Promise<Linkman> {
+        let linkmans = await Models.linkman.get(params.id);
+        return linkmans;
+    }
+
+    /**
+     * @method 获取外部联系人列表
+     * @param data
+     * @param data.accountId 已经有登录账号
+     * @returns {LinkMan}
+     */
+    @clientExport
+    @requireParams([], ["where.name","where.mobile","where.sex", "where.companyId", "where.operatorId","where.companyName",
+    "order", "type"])
+    static async getLinkmans(params: {
+        where: any,
+        order?: any,
+        attributes?: any,
+    }): Promise<FindResult> {
+        let linkmans = await Models.linkman.find(params);
+        return {ids: linkmans.map((s)=> {return s.id;}), count: linkmans['total']};
     }
 
 }

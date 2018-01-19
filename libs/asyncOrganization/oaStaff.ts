@@ -9,8 +9,7 @@ import {ACCOUNT_STATUS} from "_types/auth";
 import {Department} from "_types/department";
 import L from '@jingli/language';
 import utils = require("common/utils");
-import cache from "common/cache";
-
+// import {Account} from "_types/auth";
 const DEFAULT_PWD = '000000';
 export  abstract class OaStaff{
     constructor(public target: any){
@@ -104,20 +103,16 @@ export  abstract class OaStaff{
                 company = await self.getCompany();
             }
             let type = await company.getOaType();
-            /*if(!company){
-                let staff = await Staff.getCurrent();
-                company = staff.company;
-            }*/
             if(!company){
                 throw L.ERR.INVALID_ACCESS_ERR();
             }
 
             let defaultDepartment = await company.getDefaultDepartment();
-            let defaultTravelPolicy = await company.getDefaultTravelPolicy();
+            /*let defaultTravelPolicy = await company.getDefaultTravelPolicy();
 
             if (!defaultTravelPolicy) {
                 throw L.ERR.ERROR_CODE_C(500, `企业默认差旅标准还未设置`);
-            }
+            }*/
             let companyCreateUser = await Models.staff.get(company.createUser);
 
             let newDepartments: Department[] = [];
@@ -128,17 +123,7 @@ export  abstract class OaStaff{
             if(!oaDepartments || !oaDepartments.length){
                 newDepartments.push(defaultDepartment)
             }else{
-                /*let roleId;
-                let pwd;
-                let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd)});
-                // staff.setTravelPolicy(defaultTravelPolicy.id);
-                staff.travelPolicyId = defaultTravelPolicy.id;
-                staff.company = company;
-                staff.staffStatus = EStaffStatus.ON_JOB;
-                staff.addWay = EAddWay.OA_SYNC;
-                staff = await staff.save();
-                await self.saveStaffProperty({staffId: staff.id});*/
-                let oaDepartmentIds = await Promise.all(oaDepartments.map(async (item) => {
+                await Promise.all(oaDepartments.map(async (item) => {
                     let department = await item.getDepartment();
                     if(!department){
                         let dept = await item.sync({company: company, from: "addStaff"});//此处需要验证
@@ -159,16 +144,36 @@ export  abstract class OaStaff{
             if(self.isAdmin) roleId = EStaffRole.ADMIN;
             if(!alreadyStaff){
 
-                if(type == CPropertyType.LDAP && companyCreateUser.mobile == self.mobile){
+                if((self.mobile && type == CPropertyType.LDAP && companyCreateUser.mobile == self.mobile) ||
+                    (type == CPropertyType.WANGXIN_ID && companyCreateUser.mobile == self.mobile)){
 
                     alreadyStaff = companyCreateUser;
                     await self.saveStaffProperty({staffId: alreadyStaff.id});
-
-                }else{
+                } else{
                     // 不存在，添加
                     let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd), avatar: self.avatar});
-                    // staff.setTravelPolicy(defaultTravelPolicy.id);
-                    staff.travelPolicyId = defaultTravelPolicy.id;
+                    // staff.travelPolicyId = defaultTravelPolicy.id;
+                    //补充逻辑: 当account信息已存在，无须再次创建
+                    // if((self.mobile && self.mobile != '') || (self.email && self.email != '')) {
+                    //     let accounts = await Models.account.find({
+                    //         where: {
+                    //             $or: {
+                    //                 email: self.email,
+                    //                 mobile: self.mobile
+                    //             }
+                    //         }
+                    //     })
+                    //     if(accounts && accounts.length) {
+                    //         staff.accountId = accounts[0].id;
+                    //     } else {
+                    //         let account = Account.create({
+                    //             mobile: self.mobile, 
+                    //             email: self.email
+                    //         });
+                    //         account = await account.save();
+                    //         if(account) staff.accountId = account.id;
+                    //     }
+                    // }
                     staff.company = company;
                     staff.staffStatus = EStaffStatus.ON_JOB;
                     staff.addWay = EAddWay.OA_SYNC;
@@ -183,6 +188,9 @@ export  abstract class OaStaff{
             }
 
             if(alreadyStaff && alreadyStaff.id){
+                if(type == CPropertyType.WECHAT_CORPID && companyCreateUser && alreadyStaff.id == companyCreateUser.id) {
+                    await self.saveStaffProperty({staffId: alreadyStaff.id});
+                }
                 alreadyStaff.name = self.name;
                 // alreadyStaff.sex = self.sex;//类型有问题
                 alreadyStaff.mobile = self.mobile;

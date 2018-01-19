@@ -5,7 +5,7 @@ let moment = require('moment');
 
 export = async function transform(values: any): Promise<any>{
     let beginTime = moment().subtract(7, 'days');
-    let endTime = moment();
+    let endTime = moment().subtract(1, 'days');
 
     let weekNum = getWeekOfMonth(beginTime);
     values.weekNum = weekNum;
@@ -18,13 +18,12 @@ export = async function transform(values: any): Promise<any>{
     }
     return values;
 }
-function getWeekOfMonth(time) {
-    let dayOfWeek = time.get('d');
+function getWeekOfMonth(time: any) {
     let day = time.get('D');
-    return Math.ceil((day - dayOfWeek) / 7) + 1;
+    return Math.ceil(day / 7)
 }
 
-function formatMoney(number, places, symbol) {
+function formatMoney(number: any, places: number, symbol: string) {
     places = !isNaN(places = Math.abs(places)) ? places : 2;
     symbol = symbol !== undefined ? symbol : "";
     let thousand = ",";

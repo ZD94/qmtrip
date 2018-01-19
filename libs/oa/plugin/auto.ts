@@ -4,27 +4,27 @@
 
 'use strict';
 import {
-    AbstractOAPlugin, createTripApproveParam, createTripApproveResult, regTripApproveUpdateCbParam,
-    createTripInvoiceAuditFlowParam, createTripInvoiceAuditFlowResult, regTripInvoiceAuditUpdateCbParam
+    AbstractOAPlugin, createTripApproveParam, createTripApproveResult,
+    createTripInvoiceAuditFlowParam, createTripInvoiceAuditFlowResult
 } from "./index";
 
-import {EApproveStatus} from "_types/approve";
-import {EInvoiceStatus} from "_types/tripPlan/index";
+import { EApproveStatus } from "_types/approve";
+import { EInvoiceStatus } from "_types/tripPlan/index";
 
 export class AutoPlugin extends AbstractOAPlugin {
-    
+
     constructor() {
         super();
     }
-    
-    async createTripApproveFlow(params:createTripApproveParam):Promise<createTripApproveResult> {
+
+    async createTripApproveFlow(params: createTripApproveParam): Promise<createTripApproveResult> {
         let self = this;
         //生成外部ID
         let outerId = 'auto' + Date.now() + Math.ceil(Math.random() * 100);
         params['outerId'] = outerId;
 
         //1秒以后返回结果
-        process.nextTick(function() {
+        process.nextTick(function () {
             params['status'] = EApproveStatus.SUCCESS;
             params['approveUser'] = null;
             params['oa'] = 'auto';
@@ -33,11 +33,11 @@ export class AutoPlugin extends AbstractOAPlugin {
         return params as createTripApproveResult;
     }
 
-    async createTripInvoiceAuditFlow(params:createTripInvoiceAuditFlowParam):Promise<createTripInvoiceAuditFlowResult> {
+    async createTripInvoiceAuditFlow(params: createTripInvoiceAuditFlowParam): Promise<createTripInvoiceAuditFlowResult> {
         let self = this;
         let outerId = 'auto' + Date.now() + Math.ceil(Math.random() * 100);
         params['outerId'] = outerId;
-        process.nextTick(function() {
+        process.nextTick(function () {
             params['status'] = EInvoiceStatus.AUDIT_PASS;
             params['auditUser'] = null;
             self.tripInvoiceUpdateNotify(null, params);

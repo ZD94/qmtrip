@@ -1,46 +1,48 @@
 /**
  * Created by yumiao on 15-12-10.
  */
+
+
 "use strict";
 import {DB} from '@jingli/database';
 let uuid = require("node-uuid");
 import L from '@jingli/language';
-import utils = require("common/utils");
 let API = require('@jingli/dnode-api');
 import Logger from '@jingli/logger';
 let logger = new Logger("tripPlan");
-import config = require("@jingli/config");
+const config = require("@jingli/config");
 
 let moment = require("moment");
 require("moment-timezone");
-let scheduler = require('common/scheduler');
 import _ = require('lodash');
+import R = require('lodash/fp')
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
-    TripApprove, QMEApproveStatus, EApproveResult, EApproveResult2Text,
-    EPayType, ESourceType, EInvoiceFeeTypes, EInvoiceStatus, TrafficEInvoiceFeeTypes
+    EPayType, ESourceType, EInvoiceStatus, TrafficEInvoiceFeeTypes, ProjectStaff, EProjectStatus, EOrderStatus
 } from "_types/tripPlan";
 import {Models} from "_types";
-import {FindResult, PaginateInterface} from "common/model/interface";
-import {Staff, EStaffRole, EStaffStatus} from "_types/staff";
+import {FindResult} from "common/model/interface";
+import {Staff, PointChange} from "_types/staff";
 import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import { getSession } from "@jingli/dnode-api";
-import {AgencyUser} from "_types/agency";
+import {AgencyUser, Agency} from "_types/agency";
 import {makeSpendReport} from './spendReport';
-import fs = require("fs");
-import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice, InvoiceFeeTypeNames} from "_types/tripPlan";
+import {TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice} from "_types/tripPlan";
 import {ENoticeType} from "_types/notice/notice";
-import TripApproveModule = require("../tripApprove/index");
 import {MPlaneLevel, MTrainLevel} from "_types";
-import {ISegment, ICreateBudgetAndApproveParams, ExpendItem} from '_types/tripPlan'
-import {EApproveStatus} from "../../_types/approve/types";
-import {plugins} from "../../libs/oa/index";
-import {Supplier} from "../../_types/company/supplier";
+import {ISegment, ExpendItem} from '_types/tripPlan'
 const projectCols = Project['$fieldnames'];
 import {restfulAPIUtil} from "api/restful"
+import { FindOptions } from 'sequelize';
+import { Department } from '_types/department';
+import { ITravelBudgetInfo } from 'http/controller/budget';
 let RestfulAPIUtil = restfulAPIUtil;
 import * as error from "@jingli/error";
+import { Company } from '_types/company';
+import { CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE } from '_types/coin';
+import { BUDGET_CHANGE_TYPE } from '_types/costCenter';
+const axios = require('axios')
 interface ReportInvoice {
     type: string;
     date: Date;
@@ -190,7 +192,7 @@ class TripPlanModule {
         'deptCityCode', 'arrivalCity', 'arrivalCityCode', 'startAt', 'backAt', 'remark', 'readNumber'])
     @modelNotNull('tripPlan')
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
-    static async updateTripPlan(params): Promise<TripPlan> {
+    static async updateTripPlan(params: TripPlan): Promise<TripPlan> {
         let tripPlan = await Models.tripPlan.get(params.id);
         for(let key in params) {
             tripPlan[key] = params[key];
@@ -199,12 +201,105 @@ class TripPlanModule {
     }
 
     /**
+     * 企业福利账户余额(鲸币)自动兑换员工未结算的出差奖励
+     * @param params
+     * @param params.id tripPlan id
+     */
+    @clientExport
+    static async autoSettleReward(params): Promise<any> {
+        if (typeof params == 'string') {
+            params = JSON.parse(params);
+        }
+        let company: Company;
+        let companyCoinAccount: CoinAccount;
+        let staff: Staff;
+        let coinAccount: CoinAccount;
+        let coinAccountChange: CoinAccountChange;
+        let companyCoinAccountChange: CoinAccountChange;
+        let pointChange: PointChange;
+        let unSettledRewardTripPlan: TripPlan;
+
+        DB.transaction(async function(t) {
+            unSettledRewardTripPlan= await Models.tripPlan.get(params.id);  //该次行程
+
+            company = await Models.company.get(unSettledRewardTripPlan.companyId);
+            let points2coinRate: number = company.points2coinRate;  //企业余额可转为鲸币的比例
+            let scoreRatio: number = company.scoreRatio;  //企业奖励节省比例
+            companyCoinAccount = await Models.coinAccount.get(company.coinAccountId);
+            let companyBalanceCoins: number = companyCoinAccount.income - companyCoinAccount.consume - companyCoinAccount.locks;  //企业账户余额(鲸币)
+
+            if (companyBalanceCoins > 0) {   
+                if (companyBalanceCoins > (unSettledRewardTripPlan.saved * scoreRatio * points2coinRate)){  //企业余额足够兑换该员工的节省奖励
+                    let rewardMoney: number = unSettledRewardTripPlan.saved * scoreRatio;  //企业对该员工的该次行程的奖励金额
+                    
+                    unSettledRewardTripPlan.isSettled = true;  //结算flag更改
+                    companyCoinAccount.consume = Math.floor(Number(companyCoinAccount.consume) + rewardMoney * points2coinRate);  //企业余额扣除相应的奖励金额鲸币
+                    await companyCoinAccount.save();
+                    
+                    staff = await Models.staff.get(unSettledRewardTripPlan.accountId);
+                    staff.balancePoints = Math.floor(Number(staff.balancePoints) - rewardMoney);  //员工将由该次行程节省的奖励积分兑换
+                    await staff.save();
+
+                    unSettledRewardTripPlan.isSettled = true;
+                    await unSettledRewardTripPlan.save();  //将该tripPlan的是否结算奖励标志设为true
+                    
+                    let account = await Models.account.get(staff.accountId);
+                    coinAccount = await Models.coinAccount.get(account.coinAccountId);
+                    coinAccount.income = Math.floor(Number(coinAccount.income) + rewardMoney * points2coinRate);  //员工account增加鲸币
+                    await coinAccount.save();
+
+                    let coins: number = Math.floor(rewardMoney * points2coinRate);
+                    companyCoinAccountChange = Models.coinAccountChange.create({  //company coin_account增加鲸币变动记录
+                        coinAccountId: companyCoinAccount.id,
+                        remark: `员工${staff.name}增加奖励鲸币${coins}`,
+                        type: COIN_CHANGE_TYPE.CONSUME,
+                        coins: -coins,
+                        orderNum: getOrderNo()
+                    });
+                    await companyCoinAccountChange.save();
+                    coinAccountChange = Models.coinAccountChange.create({  //员工 coin_account增加鲸币变动记录
+                        coinAccountId: coinAccount.id,
+                        remark: `员工${staff.name}增加奖励鲸币${coins}`,
+                        type: COIN_CHANGE_TYPE.AWARD,
+                        coins: coins,
+                        orderNum: getOrderNo() 
+                    });
+                    await coinAccountChange.save();
+
+                    pointChange = Models.pointChange.create({
+                        staffId: unSettledRewardTripPlan.accountId,
+                        orderId: unSettledRewardTripPlan.id,
+                        companyId: unSettledRewardTripPlan.companyId,
+                        points: -rewardMoney,
+                        remark: `员工${staff.name}兑换奖励积分${rewardMoney}`
+                    });
+                    await pointChange.save();
+                } else {
+                    //企业余额不足继续兑换，提示充值
+                    console.error('企业余额不足');
+                }
+            } else {
+                //企业余额不足继续兑换，提示充值 
+                console.error('企业余额不足');
+                }
+            }).catch(async function(err) {
+                await companyCoinAccount.reload();
+                await staff.reload();
+                await coinAccount.reload();
+                await coinAccountChange.reload();
+                await pointChange.reload();
+                await unSettledRewardTripPlan.reload();
+                throw err;
+            });
+    }
+
+    /**
      * 获取差旅计划单/预算单列表
      * @param params
      * @returns {*}
      */
     @clientExport
-    static async listTripPlans(options: any): Promise<FindResult> {
+    static async listTripPlans(options: FindOptions<TripPlan>): Promise<FindResult> {
         options.order = options.order || [['start_at', 'desc'], ['created_at', 'desc']];
         let paginate = await Models.tripPlan.find(options);
         return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}
@@ -219,11 +314,11 @@ class TripPlanModule {
     @requireParams(['id'])
     @modelNotNull('tripPlan')
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
-    static async deleteTripPlan(params): Promise<boolean> {
+    static async deleteTripPlan(params: {id: string}): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
         let tripDetails = await tripPlan.getTripDetails({where: {}});
         await tripPlan.destroy();
-        await Promise.all(tripDetails.map((detail)=> detail.destroy()));
+        await Promise.all(tripDetails.map((detail) => detail.destroy()));
         return true;
     }
 
@@ -234,7 +329,9 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['tripPlanId', 'type', 'startTime', 'invoiceType', 'budget'])
-    static saveTripDetail(params): Promise<TripDetail> {
+    static saveTripDetail(params: {
+        tripPlanId: string, type: number, startTime: string, invoiceType: number, budget: number
+    }): Promise<TripDetail> {
         return Models.tripDetail.create(params).save();
     }
 
@@ -291,10 +388,11 @@ class TripPlanModule {
     @clientExport
     @requireParams(['id'], TripDetail['$fieldnames'])
     @modelNotNull('tripDetail')
-    static async updateTripDetail(params): Promise<TripDetail> {
+    static async updateTripDetail(params: TripDetail): Promise<TripDetail> {
         let tripDetail =  await Models.tripDetail.get(params.id);
         if(!tripDetail) 
-            throw new error.ParamsNotValidError("指定tripDetail不存在, id: ", params.id);
+            throw new Error(`指定tripDetail不存在, id: ${params.id}`)
+            // throw new error.ParamsNotValidError("指定tripDetail不存在, id: ", params.id);
         for(let key in params) {
             tripDetail[key] = params[key];
         }
@@ -390,7 +488,7 @@ class TripPlanModule {
                 return true;
             }
 
-            let user:any = await Models.agencyUser.get(accounts[0].id);
+            let user: AgencyUser | Staff = await Models.agencyUser.get(accounts[0].id);
             if(!user) {
                 user = await Models.staff.get(accounts[0].id);
             }
@@ -398,14 +496,11 @@ class TripPlanModule {
             let company = await tripPlan.getCompany();
 
             let auditUrl: string = ""
-            let appMessageUrl: string = ""
             if (params.version && params.version == 2) {
                 //#@template 支持v2
                 auditUrl =`${config.v2_host}/agency.html#/travelRecord/TravelDetail/${tripPlan.id}`
-                appMessageUrl = `#/travelRecord/TravelDetail/${tripPlan.id}`
             } else {
                 auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
-                appMessageUrl = `#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
             }
             try{
                 await API.notify.submitNotify({
@@ -437,10 +532,12 @@ class TripPlanModule {
     @modelNotNull('tripDetail')
     static async auditPlanInvoice(params: {id: string, auditResult: EAuditStatus, expenditure?: number, reason?: string, invoiceId?: string, version?: number}): Promise<boolean> {
 
-        const SAVED2SCORE = config.score_ratio;
-        let {id, expenditure, reason, auditResult} = params;
         let tripDetail = await Models.tripDetail.get(params.id);
-
+        let tripPlanId = tripDetail.tripPlanId;
+        let getTripPlan = await Models.tripPlan.get(tripPlanId);
+        let companyId = getTripPlan.companyId;
+        let company = await Models.company.get(companyId);
+        let SAVED2SCORE = company.scoreRatio;
         if((tripDetail.status != EPlanStatus.AUDITING) && (tripDetail.status != EPlanStatus.AUDIT_NOT_PASS)) {
             throw L.ERR.TRIP_PLAN_STATUS_ERR();
         }
@@ -453,7 +550,6 @@ class TripPlanModule {
         if(audit != EAuditStatus.INVOICE_PASS && audit != EAuditStatus.INVOICE_NOT_PASS){
             throw L.ERR.PERMISSION_DENY(); //代理商只能审核票据权限
         }
-
         let invoice = await Models.tripDetailInvoice.get(params.invoiceId);
         //处理这张票据
         console.info("params.invoiceId==>>", params.invoiceId);
@@ -467,7 +563,7 @@ class TripPlanModule {
             let allInvoicePass = true,
                 isNeedMsg = true;
             let invoices = await tripPlan.getTripInvoices();
-            let tripDetailInvoices = [];
+            let tripDetailInvoices: TripDetailInvoice[] = [];
             invoices.map(async (item)=>{
                 switch(item.status){
                     case EInvoiceStatus.WAIT_AUDIT:
@@ -508,12 +604,47 @@ class TripPlanModule {
                 let savedMoney = tripPlan.budget - tripPlan.expenditure;
                 savedMoney = savedMoney > 0 ? savedMoney : 0;
                 tripPlan.score = parseInt((savedMoney * SAVED2SCORE).toString());
+                tripPlan.reward = Number(parseFloat((savedMoney * SAVED2SCORE).toString()).toFixed(2));
+                let staffId = tripPlan.accountId;
+                let staff = await Models.staff.get(staffId);
+                let staffName = staff.name;
+                let query = tripPlan.query;
+                if (typeof query == 'string') {
+                    query = JSON.parse(query);
+                }
+                let destinationPlacesInfo = query.destinationPlacesInfo;
+                if (typeof destinationPlacesInfo == 'string') {
+                    destinationPlacesInfo = JSON.parse(destinationPlacesInfo);
+                }
+                let destinationArray = [];
+                for (let i = 0; i < destinationPlacesInfo.length; i++) {
+                    destinationArray.push(destinationPlacesInfo[i].destinationPlace);
+                }
+                if (query.isRoundTrip) {
+                    destinationArray.push(query.originPlace);
+                }
+                for (let j = 0; j < destinationArray.length; j++) {
+                    let cityCode = destinationArray.shift();
+                    let destinationName = await API.place.getCityInfo({cityCode: cityCode, companyId: staff.companyId});
+                    destinationArray.push(destinationName.name);
+                }
+                if (!tripPlan.deptCity) {  // 仅住宿
+                    tripPlan.remark = `员工${staffName}节省, 行程 ${tripPlan.arrivalCity} (仅住宿)`;
+                } else {  //非仅住宿
+                    let tripFlow = `${tripPlan.deptCity}`;
+                    for (let n = 0; n < destinationArray.length; n++) {
+                        let cityName = destinationArray[n];
+                        tripFlow += ` - ${cityName}`
+                    }
+                    tripPlan.remark = `员工${staffName}节省, 行程 ${tripFlow}`;
+                }
                 if(tripPlan.isSpecialApprove){
                     tripPlan.saved = 0;
                 }else{
                     tripPlan.saved = savedMoney;
                 }
                 templateName = 'qm_notify_invoice_all_pass';
+
             }else{
                 templateName = 'qm_notify_invoice_not_pass';
                 /**
@@ -549,6 +680,13 @@ class TripPlanModule {
 
             await Promise.all([invoice.save(), tripPlan.save(), tripDetail.save()]);
 
+            if(tripPlan.status == EPlanStatus.COMPLETE && tripPlan.auditStatus == EAuditStatus.INVOICE_PASS){
+                //扣除成本中心预算
+                let costCenter = await Models.costCenter.get(tripPlan.costCenterId);
+                if(costCenter){
+                    await costCenter.addExpendBudget({tripPlanId: tripPlan.id})
+                }
+            }
             /*******************************************发送通知消息**********************************************/
             let staff = await Models.staff.get(tripPlan['accountId']);
             if(isNeedMsg){
@@ -609,6 +747,21 @@ class TripPlanModule {
             }
 
             let user = await AgencyUser.getCurrent();
+            if(!user) {
+                let defaultAgency: Agency[] = await Models.agency.find({
+                    where: {
+                        email: config.default_agency.email
+                    }
+                })
+                if(defaultAgency && defaultAgency.length) {
+                    let users: AgencyUser[] = await Models.agencyUser.find({
+                        where: {
+                            agencyId: defaultAgency[0].id
+                        }
+                    });
+                    if(users && users.length) user = users[0];
+                }
+            }
             let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, tripDetailId: tripDetail.id, userId: user.id, remark: `${templateValue.tripType}票据审核${logResult}`});
             log.save();
 
@@ -645,9 +798,17 @@ class TripPlanModule {
                 staff.balancePoints = staff.balancePoints + tripPlan.score;
                 let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: user.id, remark: `增加员工${tripPlan.score}积分`});
                 await Promise.all([staff.save(), log.save()]);
+                await TripPlanModule.autoSettleReward({id: tripPlan.id});  //出差完成自动结算奖励 
             }
             return true;
-        }).catch(async function(err){
+        }).catch(async function(err: Error){
+            console.log("审核票据失败", err)
+            await tripPlan.reload();
+            await tripDetail.reload();
+            await invoice.reload();
+
+            tripDetail.status = EPlanStatus.AUDITING;
+            await tripDetail.save();
             invoice.status = EInvoiceStatus.WAIT_AUDIT;
             await invoice.save();
             throw new Error("审核失败");
@@ -666,10 +827,13 @@ class TripPlanModule {
     @requireParams(["id", "expenditure"],["version"])
     static async finishTripPlan(params: {id: string, expendArray: Array<ExpendItem>, version?: number}){
 
-        const SAVED2SCORE = config.score_ratio
-        let expendArray = params.expendArray
-        let tripPlan = await Models.tripPlan.get(params.id)
+        let expendArray = params.expendArray;
+        let tripPlan = await Models.tripPlan.get(params.id);
+        let company: Company = await Models.company.get(tripPlan.companyId);
+        let scoreRatio: number = company.scoreRatio;
 
+        let SAVED2SCORE = scoreRatio;
+        
         if (tripPlan == null) {
             logger.error(`tripPlan:${params.id} 不存在`)
             throw L.ERR.TRIP_PLAN_NOT_EXIST()
@@ -731,7 +895,7 @@ class TripPlanModule {
                     await tripDetailInvoice.save()
                 }
 
-                let templateValue: any = {}
+                let templateValue: {tripType: string}
                 switch (tripDetail.type) {  //根据tripType生成相应的log
                     case ETripType.OUT_TRIP:
                         templateValue.tripType = '去程'
@@ -830,12 +994,14 @@ class TripPlanModule {
                 }
             }
 
-            //如果出差已经完成，并且节省反积分，并且非特别审批，增加员工积分。
+            //如果出差已经完成，并且节省反积分，并且非特别审批，增加员工积分；若企业账户有余额，直接兑换员工积分为鲸币
             if (tripPlan.status == EPlanStatus.COMPLETE && tripPlan.score > 0 && !tripPlan.isSpecialApprove) {
                 let pc = Models.pointChange.create({
                     currentPoints: staff.balancePoints, status: 1,
-                    staff: staff, company: staff.company,
-                    points: tripPlan.score, remark: `节省反积分${tripPlan.score}`,
+                    staff: staff, 
+                    company: staff.company,
+                    points: tripPlan.score, 
+                    remark: `节省反积分${tripPlan.score}`,
                     orderId: tripPlan.id});
                 await pc.save();
                 if(!staff.totalPoints){
@@ -869,16 +1035,73 @@ class TripPlanModule {
     }
 
     @clientExport
-    @requireParams(['name', 'createUser', 'companyId'], ['code'])
-    static createProject(params): Promise<Project> {
+    @requireParams(['emails', 'projectId'])
+    static async sendProjectReport(params: {emails: string[], projectId: string}): Promise<boolean>{
+        let data: any = {project: {}, costCenter: {}, projectStaffs: []};
+        let project = await Models.project.get(params.projectId);
+        data.project = project;
+        if(project){
+            let costCenter = await Models.costCenter.get(project.id);
+            if(costCenter){
+                let costCenterDeploies = await Models.costCenterDeploy.find({where: {costCenterId: costCenter.id}});
+                if(costCenterDeploies && costCenterDeploies.length){
+                    let costCenterDeploy = costCenterDeploies[0];
+                    data.costCenter = costCenterDeploy;
+                    let budgetCollectInfo = await costCenterDeploy.getCollectedBudget();
+                    data.budgetCollectInfo = budgetCollectInfo;
+                }
+            }
+            let staffs = await project.getStaffs();
+            if(staffs && staffs.length){
+                let projectStaffs = await Promise.all(staffs.map(async (s) => {
+                    let travelPolicy = await s.getProjectTravelPolicy({projectId: project.id});
+                    s.tp = travelPolicy;
+                    return s;
+                }))
+                data.projectStaffs = projectStaffs;
+            }
+        }
+        let buf = await makeSpendReport(data, "project");
+        try {
+            for(let item of params.emails){
+                await API.notify.submitNotify({
+                    key: 'qm_spend_project_report',
+                    email: item,
+                    values: {
+                        project: project,
+                        attachments: [{
+                            filename: project.name + '.pdf',
+                            content: buf.toString("base64"),
+                            encoding: 'base64'
+                        }]
+                    },
+                });
+            }
+
+        } catch(err) {
+            console.error(err.stack);
+        }
+        return true;
+    }
+
+    @clientExport
+    @requireParams(['name', 'companyId'], projectCols)
+    static async createProject(params): Promise<Project> {
+        let _projects = await Models.project.find({where: {code: params.code, companyId: params.companyId}});
+        if(_projects && _projects.length){
+            return null;
+        }
         return Project.create(params).save();
     }
 
     @clientExport
     @requireParams(["id"], projectCols)
-    static async updateProject(params): Promise<Project> {
+    static async updateProject(params: Project): Promise<Project> {
         let project = await Models.project.get(params.id);
 
+        if(project.status == EProjectStatus.START){
+            throw new Error(`{code: -1, msg: "修改项目信息 需停用项目"}`);
+        }
         for(let key in params){
             project[key] = params[key];
         }
@@ -894,7 +1117,7 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['where.companyId'], ['where.name'])
-    static async getProjectList(options): Promise<FindResult> {
+    static async getProjectList(options: FindOptions<Project>): Promise<FindResult> {
         options.order = options.order || [['weight', 'desc'], ['created_at', 'desc']];
         let projects = await Models.project.find(options);
         return {ids: projects.map((p)=> {return p.id}), count: projects['total']};
@@ -915,13 +1138,102 @@ class TripPlanModule {
     }
 
 
+    /****************************************ProjectStaff begin************************************************/
+
+    /**
+     * 创建项目员工记录
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["projectId", "staffId"])
+    static async createProjectStaff (params) : Promise<ProjectStaff>{
+        var projectStaff = ProjectStaff.create(params);
+        var already = await Models.projectStaff.find({where: {projectId: params.projectId, staffId: params.staffId}});
+        if(already && already.length>0){
+            return already[0];
+        }
+        var result = await projectStaff.save();
+        return result;
+    }
+
+
+    /**
+     * 删除项目员工记录
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    static async deleteProjectStaff(params) : Promise<any>{
+        var id = params.id;
+        var ah_delete = await Models.projectStaff.get(id);
+
+        await ah_delete.destroy();
+        return true;
+    }
+
+
+    /**
+     * 更新项目员工记录
+     * @param id
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"], ["projectId", "staffId"])
+    static async updateProjectStaff(params) : Promise<ProjectStaff>{
+        var id = params.id;
+
+        var ah = await Models.projectStaff.get(id);
+        for(var key in params){
+            ah[key] = params[key];
+        }
+        return ah.save();
+    }
+
+    /**
+     * 根据id查询项目员工记录
+     * @param {String} params.id
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    static async getProjectStaff(params: {id: string}) : Promise<ProjectStaff>{
+        let id = params.id;
+        var ah = await Models.projectStaff.get(id);
+
+        return ah;
+    };
+
+
+    /**
+     * 根据属性查找项目员工记录
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    static async getProjectStaffs(params): Promise<FindResult>{
+        var staff = await Staff.getCurrent();
+        let paginate = await Models.projectStaff.find(params);
+        let ids =  paginate.map(function(t){
+            return t.id;
+        })
+        return {ids: ids, count: paginate['total']};
+    }
+
+    /****************************************ProjectStaff end************************************************/
+
+
     /**
      * @method saveTripPlanLog
      * 保存出差计划改动日志
      * @type {saveTripPlanLog}
      */
     @requireParams(['tripPlanId', 'remark'], ['tripDetailId'])
-    static async saveTripPlanLog(params): Promise<TripPlanLog> {
+    static async saveTripPlanLog(params: {
+        tripPlanId: string, remark: string, userId?: string, tripDetailId?: string
+    }): Promise<TripPlanLog> {
         let staff = await Staff.getCurrent();
         params.userId = staff.id;
         return TripPlanLog.create(params).save();
@@ -943,13 +1255,14 @@ class TripPlanModule {
      * @method updateTripPlanLog
      * @param param
      */
-    static updateTripPlanLog(param): Promise<TripPlanLog> {
+    static updateTripPlanLog(): Promise<TripPlanLog> {
         throw {code: -1, msg: '不能更新日志'};
     }
 
     @clientExport
     @requireParams(['where.tripPlanId'], ['where.tripDetailId'])
-    static async getTripPlanLogs(options): Promise<FindResult> {
+    static async getTripPlanLogs(options: FindOptions<TripPlanLog>): Promise<FindResult> {
+        options.order = options.order || [['created_at', 'desc']];
         let paginate = await Models.tripPlanLog.find(options);
         return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}
     }
@@ -1052,7 +1365,7 @@ class TripPlanModule {
 
         if(groupProjectInfo && groupProjectInfo.length > 0 && groupProjectInfo[0].length > 0) {
             let projectInfo = groupProjectInfo[0];
-            projectInfo = await Promise.all(projectInfo.map(async (p) => {
+            projectInfo = await Promise.all(projectInfo.map(async (p: any) => {
                 p["project"] = await Models.project.get(p.projectId);
                 let peopleDays = 0;
                 let selectPeopleDaySql = `select back_at as "backAt", start_at as "startAt" from`;
@@ -1060,7 +1373,7 @@ class TripPlanModule {
                 let peopleDaySql = `${selectPeopleDaySql} ${wherePeopleDaySql};`;
                 let peopleDayInfo = await DB.query(peopleDaySql);
                 if(peopleDayInfo && peopleDayInfo.length > 0 && peopleDayInfo[0].length > 0) {
-                    peopleDayInfo[0].map((t) => {
+                    peopleDayInfo[0].map((t: {backAt: string, startAt: string}) => {
                         let peopleDay = moment(t.backAt).startOf('day').diff(moment(t.startAt).startOf('day'), 'days');
                         peopleDays += peopleDay;
                     })
@@ -1229,7 +1542,7 @@ class TripPlanModule {
             if(params.keyWord) {
                 let  pagers = await Models[modelName].find({where: {name: {$like: `%${params.keyWord}%`}, companyId: company.id}, order: [['created_at','desc']]});
 
-                let objs = [];
+                let objs: any = [];
                 objs.push.apply(objs, pagers);
                 while(pagers.hasNextPage()){
                     let nextPager = await pagers.nextPage();
@@ -1238,7 +1551,7 @@ class TripPlanModule {
                 }
 
                 let selectStr = '';
-                objs.map((s) => {
+                objs.map((s: {id: string}) => {
                     if(s && s.id) {
                         selectStr+= selectStr ? `,'${s.id}'` : `'${s.id}'`;
                     }
@@ -1268,7 +1581,7 @@ class TripPlanModule {
             if(params.keyWord) {
                 let pagers = await Models.department.find({where: {name: {$like: `%${params.keyWord}%`}, companyId: company.id}, order: [['created_at','desc']]});
 
-                let depts = [];
+                let depts: Department[] = [];
                 depts.push.apply(depts, pagers);
                 while(pagers.hasNextPage()){
                     let nextPager = await pagers.nextPage();
@@ -1301,7 +1614,7 @@ class TripPlanModule {
 
         let result = {};
         if(completeInfo && completeInfo.length > 0 && completeInfo[0].length > 0) {
-            completeInfo[0].map((ret) => {
+            completeInfo[0].map((ret: any) => {
                 result[ret[selectKey]] = {
                     typeKey: ret[selectKey],
                     completeTripNum: Number(ret.tripNum),
@@ -1312,7 +1625,7 @@ class TripPlanModule {
             });
         }
         if(savedMoneyCompleteInfo && savedMoneyCompleteInfo.length > 0 && savedMoneyCompleteInfo[0].length > 0) {
-            savedMoneyCompleteInfo[0].map((ret) => {
+            savedMoneyCompleteInfo[0].map((ret: any) => {
                 let key = ret[selectKey];
                 if(!result[key]){
                     result[key] = {};
@@ -1322,7 +1635,7 @@ class TripPlanModule {
         }
 
         if(planInfo && planInfo.length > 0 && planInfo[0].length > 0) {
-            planInfo[0].map((ret) => {
+            planInfo[0].map((ret: any) => {
                 let key = ret[selectKey];
                 if(!result[key]){
                     result[key] = {};
@@ -1349,7 +1662,6 @@ class TripPlanModule {
     @clientExport
     @requireParams(['tripApproveId'], ["version"])
     static async saveTripPlanByApprove(params: {tripApproveId: string, version?: number}): Promise<TripPlan> {
-        let formatStr = 'YYYY-MM-DD';
         let approve = await Models.approve.get(params.tripApproveId);
         let account = await Models.staff.get(approve.submitter);
         let approveUser = await Models.staff.get(approve.approveUser);
@@ -1366,12 +1678,12 @@ class TripPlanModule {
             query.destinationPlacesInfo = JSON.parse(query.destinationPlacesInfo);
 
         let destinationPlacesInfo = query.destinationPlacesInfo;
-        let budgets: any = approve.data.budgets;
+        let budgets: ITravelBudgetInfo[] = approve.data.budgets;
         if (typeof budgets == 'string')
             budgets = JSON.parse(budgets);
 
         let tripPlan = TripPlan.create({id: approve.id});
-        let arrivalCityCodes = [];//目的地代码
+        let arrivalCityCodes: any[] = [];//目的地代码
         let project: Project;
         if(query.projectName){
             project = await API.tripPlan.getProjectByName({companyId: company.id, name: query.projectName,
@@ -1379,7 +1691,7 @@ class TripPlanModule {
         }
 
         if(query.originPlace) {
-            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace}) || {name: null};
+            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace.id || query.originPlace, companyId: company.id}) || {name: null};
             tripPlan.deptCityCode = deptInfo.id;
             tripPlan.deptCity = deptInfo.name;
         }
@@ -1394,7 +1706,7 @@ class TripPlanModule {
                     if (typeof place != 'string') {
                         place = place['id']
                     }
-                    let arrivalInfo = await API.place.getCityInfo({cityCode: place}) || {name: null};
+                    let arrivalInfo = await API.place.getCityInfo({cityCode: place, companyId: company.id}) || {name: null};
                     arrivalCityCodes.push(arrivalInfo.id);
                     if(i == (destinationPlacesInfo.length - 1)){
                         tripPlan.arrivalCityCode = arrivalInfo.id;
@@ -1416,7 +1728,10 @@ class TripPlanModule {
         }
         tripPlan.arrivalCityCodes = JSON.stringify(arrivalCityCodes);
 
-        tripPlan['companyId'] = account.company.id;
+        if(query.feeCollected){
+            tripPlan.costCenterId = query.feeCollected;
+        }
+        tripPlan.setCompany(account.company);
         tripPlan.auditUser = tryObjId(approveUser);
         tripPlan.project = project;
         tripPlan.title = approve.title;//project名称
@@ -1431,11 +1746,11 @@ class TripPlanModule {
         tripPlan.readNumber = 0;
 
         //计算总预算
-        let totalBudget = budgets
-            .map( (item) => {
+        let totalBudget: number = budgets
+            .map((item) => {
                 return Number(item.price) || 0;
             })
-            .reduce( (total, cur) => {
+            .reduce( (total: number, cur: number) => {
                 return total + cur;
             }, 0);
 
@@ -1445,26 +1760,26 @@ class TripPlanModule {
         await Promise.all([tripPlan.save(), log.save()]);
 
         let tripDetails: any[] = [];
-        let ps = [];
-        await Promise.all(budgets.map(async function (b){
+        let ps: any[] = [];
+        await Promise.all(budgets.map(async function (b: any){
             if(b.originPlace){
                 if (typeof b.originPlace == 'string') {
-                    b.originPlace = await API.place.getCityInfo({cityCode: b.originPlace});
+                    b.originPlace = await API.place.getCityInfo({cityCode: b.originPlace, companyId: company.id});
                 }
             }
             if(b.destination){
                 if (typeof b.destination == 'string') {
-                    b.destination = await API.place.getCityInfo({cityCode: b.destination});
+                    b.destination = await API.place.getCityInfo({cityCode: b.destination, companyId: company.id});
                 }
             }
             if(b.city){
                 if(typeof b.city == 'string'){
-                    b.city = await API.place.getCityInfo({cityCode:b.city});
+                    b.city = await API.place.getCityInfo({cityCode:b.city, companyId: company.id});
                 }
             }
         }));
         let destCount = 0;
-        await Promise.all(budgets.map(async function (budget){
+        await Promise.all(budgets.map(async function (budget: any){
             let tripType = budget.tripType;
             let reason = budget.reason;
             let price = Number(budget.price);
@@ -1536,7 +1851,7 @@ class TripPlanModule {
                     //补助类型
                     let templates = budget.templates;
                     if(templates && templates.length){
-                        templates.forEach((t) => {
+                        templates.forEach((t: any) => {
                             if(data.id){
                                 delete data.id;
                             }
@@ -1626,6 +1941,17 @@ class TripPlanModule {
             console.error(err);
         }
 
+        try {
+            if(tripPlan.costCenterId){
+                let costCenter = await Models.costCenter.get(tripPlan.costCenterId);
+                if(costCenter){
+                    await costCenter.checkoutBudgetNotice();
+                }
+            }
+        } catch(err) {
+            console.error(err);
+        }
+
         return tripPlan;
     }
 
@@ -1653,7 +1979,7 @@ class TripPlanModule {
                 return result[0];
             });
 
-        ranks = await Promise.all(ranks.map((v: any) => {
+        ranks = await Promise.all(ranks.map((v: {account_id: string, save: number}) => {
             return Models.staff.get(v.account_id)
                 .then(function(staff) {
                     return {staff: staff, save: v.save};
@@ -1718,7 +2044,7 @@ class TripPlanModule {
         }
         let budgetId = await API.client.travelBudget.getTravelPolicyBudget(query);
         let budgetResult = await API.client.travelBudget.getBudgetInfo({id: budgetId});
-        let budgets = budgetResult.budgets;
+        let budgets: ITravelBudgetInfo[] = budgetResult.budgets;
 
         //计算总预算
         let totalBudget: number = 0;
@@ -1771,11 +2097,11 @@ class TripPlanModule {
             order: [["created_at", "asc"]]
         })
         // let tripDetails = await tripPlan.getTripDetails({where: {}, order: [["created_at", "asc"]]});
-        let tripApprove = await Models.tripApprove.get(tripPlanId);
-        let approveUsers: Array<any> = (tripApprove && tripApprove.approvedUsers ? tripApprove.approvedUsers:'').split(/,/g)
-            .filter((v)=> {
+        let tripApprove = await API.tripApprove.getTripApprove({id: tripPlanId});
+        let approveUsers: string[]= (tripApprove && tripApprove.approvedUsers ? tripApprove.approvedUsers:'').split(/,/g)
+            .filter((v: string)=> {
                 return !!v;
-            }).map( async (userId) => {
+            }).map( async (userId: string) => {
                 if (userId) {
                     let staff =  await Models.staff.get(userId)
                     return staff.name;
@@ -1788,8 +2114,8 @@ class TripPlanModule {
 
             if (v.type == ETripType.OUT_TRIP || v.type == ETripType.BACK_TRIP) {
                 let v1 = <TripDetailTraffic>v;
-                let trafficType;
-                let trafficInfo;
+                let trafficType: any;
+                let trafficInfo: any;
                 trafficType = v1.type == ETripType.OUT_TRIP ? 'GO': 'BACK';
                 trafficInfo = v1.invoiceType == EInvoiceType.TRAIN ? '火车': '飞机';
                 trafficInfo += v1.invoiceType == EInvoiceType.PLANE ? MPlaneLevel[v1.cabin] : MTrainLevel[v1.cabin];
@@ -1797,7 +2123,6 @@ class TripPlanModule {
                 let arrivalCity = await API.place.getCityInfo({cityCode: v1.arrivalCity});
 
                 return tripDetailInvoices.map((invoice)=>{
-                    let type = InvoiceFeeTypeNames[invoice.type];
                     let data: ReportInvoice = {
                         type: '交通',
                         date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
@@ -1819,7 +2144,6 @@ class TripPlanModule {
                 let city = await API.place.getCityInfo({cityCode: v1.city})
 
                 return tripDetailInvoices.map((invoice)=>{
-                    let type = InvoiceFeeTypeNames[invoice.type];
                     let data: ReportInvoice = {
                         type: '住宿',
                         date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
@@ -1835,7 +2159,6 @@ class TripPlanModule {
             }
             if (v.type == ETripType.SUBSIDY) {
                 return tripDetailInvoices.map((invoice)=>{
-                    let type = InvoiceFeeTypeNames[invoice.type];
                     let data: ReportInvoice = {
                         type: '补助',
                         date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
@@ -1850,7 +2173,6 @@ class TripPlanModule {
             }
             if (v.type == ETripType.SPECIAL_APPROVE) {
                 return tripDetailInvoices.map((invoice)=>{
-                    let type = InvoiceFeeTypeNames[invoice.type];
                     let data: ReportInvoice = {
                         type: '特殊审批',
                         date: moment(invoice.invoiceDateTime).format('YYYY.MM.DD'),
@@ -1871,7 +2193,7 @@ class TripPlanModule {
         if(typeof tripPlan.arrivalCityCodes == 'string'){
             tripPlan.arrivalCityCodes = JSON.parse(tripPlan.arrivalCityCodes);
         }
-        await Promise.all(tripPlan.arrivalCityCodes.map(async function(item){
+        await Promise.all(tripPlan.arrivalCityCodes.map(async function(item: string){
             let arrCity = await API.place.getCityInfo({ cityCode: item });
             if(arrCity){
                 roundLine = roundLine && roundLine != '' && typeof(roundLine) != "undefined"  ? roundLine + "-": '';
@@ -1881,21 +2203,21 @@ class TripPlanModule {
         roundLine += tripPlan.isRoundTrip ? '-'+tripPlan.deptCity : '';
         console.info(roundLine);
 
-        let invoiceDetail = [];
+        let invoiceDetail: any = [];
         _tripDetails.map((item)=>{
             invoiceDetail.push(...item);
         });
 
         _tripDetails = invoiceDetail;
 
-        _tripDetails = _tripDetails.filter( (v) => {
+        _tripDetails = _tripDetails.filter((v) => {
             return v['money'] > 0;
         });
         if (_tripDetails.length<= 0 ) {
             throw L.ERROR_CODE(500, '本次出差中无需要报销费用');
         }
         var invoiceQuantity = _tripDetails
-            .map( (v) => {
+            .map((v: any) => {
                 return v['quantity'] || 0;
             })
             .reduce(function(previousValue, currentValue) {
@@ -1904,7 +2226,7 @@ class TripPlanModule {
 
         //计算用户总花费
         let _personalExpenditure = _tripDetails
-            .map( (v) => {
+            .map((v: any) => {
                 return v['money'];
             })
             .reduce((prev, cur) => {
@@ -1991,7 +2313,7 @@ class TripPlanModule {
             qs.order = [['created_at', 'asc']];
         }
         let invoices = await Models.tripDetailInvoice.find(qs);
-        let ids = invoices.map( (v) => {
+        let ids = invoices.map((v) => {
             return v.id;
         });
         return {ids: ids, count: invoices.length};
@@ -2005,7 +2327,7 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['tripDetailId', 'totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark'], ['id', 'pictureFileId', 'accountId', 'orderId', 'sourceType','status', 'supplierId'])
-    static async saveTripDetailInvoice(params) :Promise<TripDetailInvoice> {
+    static async saveTripDetailInvoice(params: TripDetailInvoice) :Promise<TripDetailInvoice> {
         let tripDetailInvoice = Models.tripDetailInvoice.create(params);
         tripDetailInvoice = await tripDetailInvoice.save();
 
@@ -2026,10 +2348,6 @@ class TripPlanModule {
         }
         let staff = await Models.staff.get(staffId);
 
-
-        let companyName=staff.company.name;
-        let staffName=staff.name;
-
         try{
             await API.notify.submitNotify({
              mobile: '13810529805',
@@ -2048,8 +2366,10 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['detailId', 'orderIds', 'supplierId'])
-    static async relateOrders(params) :Promise<any> {
-        let result = {success: [], failed: []};
+    static async relateOrders(params: {
+        detailId: string, orderIds: string[], supplierId: string
+    }) :Promise<any> {
+        let result: {success: any[], failed: any[]} = {success: [], failed: []};
         let currentStaff = await Staff.getCurrent();
         let orders = await currentStaff.getOrders({supplierId: params.supplierId});
         let Morders: any = {};
@@ -2057,7 +2377,7 @@ class TripPlanModule {
             Morders[o.id] = o;
         })
         let orderIds = params.orderIds;
-        let ps = orderIds.map(async function(id){
+        let ps = orderIds.map(async function(id: any){
             let o = Morders[id];
             let detailInvoice = await Models.tripDetailInvoice.find({where: {orderId: id, accountId: currentStaff.id, sourceType: ESourceType.RELATE_ORDER}});
             if(detailInvoice && detailInvoice.length > 0){
@@ -2083,7 +2403,7 @@ class TripPlanModule {
             invoice.type = o.orderType;
             invoice.status = EInvoiceStatus.AUDIT_PASS;
             invoice.supplierId = params.supplierId;
-            let iv =  await TripPlanModule.saveTripDetailInvoice(invoice);
+            await TripPlanModule.saveTripDetailInvoice(invoice);
             result.success.push({desc: o.desc, remark: '关联成功'});
             return o.id;
         })
@@ -2093,7 +2413,7 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(["id"], ['totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark', 'pictureFileId'])
-    static async updateTripDetailInvoice(params) :Promise<TripDetailInvoice> {
+    static async updateTripDetailInvoice(params: any) :Promise<TripDetailInvoice> {
         let {id, totalMoney} = params;
         let oldMoney = 0;
         let newMoney = 0;
@@ -2126,7 +2446,7 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['id'])
-    static async deleteTripDetailInvoice(params):Promise<boolean> {
+    static async deleteTripDetailInvoice(params: {id: string}):Promise<boolean> {
         let {id } = params;
         let tripDetailInvoice = await Models.tripDetailInvoice.get(id);
         let tripDetailId = tripDetailInvoice.tripDetailId;
@@ -2206,10 +2526,10 @@ class TripPlanModule {
 
     static __initHttpApp = require('./invoice');
 
-    static _scheduleTask () {
+    /*static _scheduleTask () {
         let taskId = "authApproveTrainPlan";
         logger.info('run task ' + taskId);
-        scheduler('0 */5 * * * *', taskId, async function() {
+        scheduler('0 *!/5 * * * *', taskId, async function() {
             let tripApproves = await Models.tripApprove.find({where: {autoApproveTime: {$lte: new Date()}, status: QMEApproveStatus.WAIT_APPROVE}, limit: 10, order: [['auto_approve_time', 'desc']]});
             tripApproves.map(async (approve) => {
 
@@ -2241,7 +2561,7 @@ class TripPlanModule {
                 let version = config.link_version || 2 //外链使用的版本。
 
                 try{
-                    
+
                     if(typeof approve.query == 'string'){
                         approve.query = JSON.parse(approve.query);
                     }
@@ -2362,9 +2682,9 @@ class TripPlanModule {
                 }
             });
         });
-    }
+    }*/
 
-    static async getProjectByName(params) {
+    static async getProjectByName(params: any) {
         let projects = await Models.project.find({where: {name: params.name}});
 
         if(projects && projects.length > 0) {
@@ -2381,7 +2701,7 @@ class TripPlanModule {
     //approve, trip_approve, trip_plan保存travelPolicyId
     @clientExport
     static async saveTravelPolicyId( tripApproveId:string ) : Promise<any>{
-        let tripApprove = await Models.tripApprove.get( tripApproveId );
+        let tripApprove = await API.tripApprove.getTripApprove({id: tripApproveId});
         let approve = await Models.approve.get(tripApproveId);
         let submitUser = await Models.staff.get( tripApprove.accountId );
         let travelPolicyId = submitUser.travelPolicyId;
@@ -2402,13 +2722,70 @@ class TripPlanModule {
 
         approve.data = JSON.stringify(approve.data);
 
-        await tripApprove.save();
+        await API.tripApprove.updateTripApprove(tripApprove);
         await approve.save();
 
         return true;
     }
+
+    /**
+     * 完成行程
+     * @param params 
+     */
+    @clientExport
+    static async completeTrip(params:{ id: string}) {
+        // Filter inoperable status
+        const tripPlan = await Models.tripPlan.get(params.id)
+        if (moment().milliseconds < moment(tripPlan.backAt).milliseconds)
+            throw new L.ERROR_CODE_C(400, '该行程当前无法完成')
+        if (tripPlan.status != EPlanStatus.COMPLETE || tripPlan.auditStatus != EAuditStatus.INVOICE_PASS)
+            throw new L.ERROR_CODE_C(400, '该行程当前无法完成')
+        const tripDetails: TripDetail[] = await tripPlan.getTripDetails({ 
+            where: { status: EPlanStatus.COMPLETE, reserveStatus: {$in: [EOrderStatus.ENDORSEMENT_SUCCESS, EOrderStatus.SUCCESS]}}
+        })
+        // if (R.any((t: TripDetail) => t.status != -4, tripDetails))
+        //     throw new L.ERROR_CODE_C(400, '该行程需要上传票据')
+        const promiseAry = []
+
+        // Fetch orders and calculate saving
+        const orders = await Promise.all(tripDetails.map(td => getOrderInfo(td.orderNo)))
+        tripPlan.expenditure = R.sumBy(R.prop('price'), orders)
+        tripPlan.status = EPlanStatus.COMPLETE
+        tripPlan.saved = tripPlan.budget - tripPlan.expenditure
+
+        // Log budget changes
+        const costCenterDeploy = _.first(await Models.costCenterDeploy.find({
+            where: { costCenterId: tripPlan.costCenterId }
+        }))
+        if (costCenterDeploy) {
+            const budgetLog = Models.budgetLog.create({
+                costCenterId: tripPlan.costCenterId, type: BUDGET_CHANGE_TYPE.CONSUME_BUDGET, relateId: params.id, 
+                value: tripPlan.expendBudget, oldBudget: costCenterDeploy.expendBudget, remark: `完成行程花费预算`
+            });
+            promiseAry.push(budgetLog.save())
+            costCenterDeploy.expendBudget += tripPlan.expenditure
+            promiseAry.push(costCenterDeploy.save())
+        }
+        promiseAry.push(tripPlan.save())
+        await DB.transaction(async function() {
+            await Promise.all(promiseAry)
+            // Special approve can't settle reward
+            if (tripPlan.isSpecialApprove) return
+
+            await TripPlanModule.autoSettleReward(params)
+        })
+        await costCenterDeploy.checkoutBudgetNotice()
+    }
+
 }
  
+async function getOrderInfo(orderId: string) {
+    const res = await axios.get(`https://l.jingli365.com/svc/java-jingli-order1/tmc/order/getOrderInfo/${orderId}/order`)
+    if (res.status == 200 && res.data.code == 0) {
+        return res.data.data.detail.flightList
+    }
+    throw new L.ERROR_CODE_C(500, '获取订单详情失败：' + orderId)
+}
 
 
 async function updateTripDetailExpenditure(tripDetail: TripDetail) {
@@ -2434,7 +2811,7 @@ async function updateTripPlanExpenditure(tripPlan: TripPlan) {
     let tripDetails = await Models.tripDetail.find({where: {tripPlanId: tripPlan.id}});
     let expenditure = 0;
     let personalExpenditure = 0;
-    tripDetails.forEach( (v) => {
+    tripDetails.forEach((v: any) => {
         expenditure += Number(v.expenditure);
         personalExpenditure += Number(v.personalExpenditure);
     });
@@ -2458,7 +2835,7 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: EPlanSt
             //如果票据不为空,则设置状态为可提交状态
             let invoices = await Models.tripDetailInvoice.find({where: {tripDetailId: tripDetail.id}});
             let isInWaitCommit = true;
-            invoices.map((item)=>{
+            invoices.map((item: any)=>{
                 if(item.status == EInvoiceStatus.AUDIT_FAIL){
                     isInWaitCommit = false;
                 }
@@ -2520,12 +2897,19 @@ async function tryUpdateTripPlanStatus(tripPlan: TripPlan, status: EPlanStatus) 
     return tripPlan;
 }
 
-function tryObjId(obj) {
+function tryObjId(obj: any) {
     if (obj && obj.id) return obj.id;
     return null;
 }
 
+function getOrderNo() : string {
+    var d = new Date();
+    var rnd =  (Math.ceil(Math.random() * 1000));
+    var str = `${d.getFullYear()}${d.getMonth()+1}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}-${rnd}`;
+    return str;
+}
 
-TripPlanModule._scheduleTask();
+
+// TripPlanModule._scheduleTask();
 
 export = TripPlanModule;

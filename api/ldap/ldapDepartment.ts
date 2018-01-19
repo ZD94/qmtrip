@@ -83,7 +83,7 @@ export default class LdapDepartment extends OaDepartment {
             attributes: departmentOpts.attributes
         };
         let result = await this.ldapApi.searchDn({rootDn: this.dn, opts: opts});
-        let returnResult = result.map((item) => {
+        let returnResult = result.map((item: any) => {
             return new LdapDepartment({id: item.entryUUID, dn: item.dn, name: item.ou, parentId: self.id,
                 ldapApi: self.ldapApi, company: self.company});
         })
@@ -127,7 +127,7 @@ export default class LdapDepartment extends OaDepartment {
             attributes: departmentOpts.attributes
         };
         let result = await this.ldapApi.searchDn({rootDn: this.dn, opts: opts});
-        let returnResult = result.map((item) => {
+        let returnResult = result.map((item: any) => {
             return new LdapStaff({id: item.entryUUID, dn: item.dn, name: item.cn, mobile: item.mobile,
                 email: item.mail, sex: item.sex, userPassword: item.userPassword,
                 ldapApi: self.ldapApi, company: self.company});

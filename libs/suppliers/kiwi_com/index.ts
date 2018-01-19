@@ -3,12 +3,9 @@
  */
 
 
-import _ = require('lodash');
-import moment = require("moment");
 import { SupplierWebRobot, SupplierOrder, ReserveLink } from '../index';
 import L from '@jingli/language';
 
-var iconv = require('iconv-lite');
 
 export default class SupplierCtripCT extends SupplierWebRobot{
     constructor(){
@@ -23,7 +20,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         throw L.ERR.NOT_IMPLEMENTED();
     }
 
-    async getBookLink(options): Promise<ReserveLink>{
+    async getBookLink(options: { [key: string]: any }): Promise<ReserveLink>{
         var reserveType = options.reserveType;
         var bookLink: any = {};
 
@@ -41,7 +38,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
 
         return bookLink;
     }
-    async getAirTicketReserveLink(options):Promise<ReserveLink> {
+    async getAirTicketReserveLink(options: { [key: string]: any }):Promise<ReserveLink> {
         let data = options.data;
         let deeplinkData = data.deeplinkData;
         let deeplink, jsCode;
@@ -52,12 +49,12 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         return {url:deeplink, jsCode: jsCode};
     }
 
-    async getHotelReserveLink(options):Promise<ReserveLink> {
+    async getHotelReserveLink(options?: any):Promise<ReserveLink> {
         let link = `https://www.kiwi.com/cn/`;
         return {url:link, jsCode: ''};
     }
 
-    async getTrainTicketReserveLink(options):Promise<ReserveLink> {
+    async getTrainTicketReserveLink(options?: any):Promise<ReserveLink> {
         let deeplink, jsCode;
 
         deeplink = `https://www.kiwi.com/cn/`

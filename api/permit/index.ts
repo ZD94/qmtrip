@@ -26,7 +26,7 @@ class Role {
     }
 }
 
-var roles = {
+var roles: {[key: string]: any} = {
     staff: {
         name: '普通员工',
         permission: 'user.query'
@@ -71,11 +71,11 @@ var agency_roles = {
     }
 };
 
-function expandRoleInherit(role){
+function expandRoleInherit(role: any){
     if(!role.inherit)
         return;
     role.inherit
-        .forEach(function(parent_id){
+        .forEach(function(parent_id: string){
             var parent = roles[parent_id];
             if(!parent){
                 return;
@@ -87,7 +87,7 @@ function expandRoleInherit(role){
     delete role.inherit;
 }
 
-function updateRole(roles){
+function updateRole(roles: any){
     for(var role_id in roles){
         var role = roles[role_id];
         var permissions = {};
@@ -109,7 +109,7 @@ updateRole(agency_roles);
  * @param {Object} data
  * @param {UUID} data.accountId 账号ID
  */
-async function getRoleOfAccount(data) : Promise<Role>{
+async function getRoleOfAccount(data: any) : Promise<Role>{
     var accountId = data.accountId;
     var s: any = {}
     var staff = await Models.staff.get(accountId);
@@ -127,7 +127,7 @@ async function getRoleOfAccount(data) : Promise<Role>{
  * @param {Object}    params
  * @param {uuid}      params.accountId
  */
-async function getRoleOfAgency(params){
+async function getRoleOfAgency(params: any){
     var accountId = params.accountId;
     var u: any = {};
     var user = await Models.agencyUser.get(accountId);
@@ -139,13 +139,13 @@ async function getRoleOfAgency(params){
     return agency_roles.staff;
 }
 
-function getRoleList(roles){
+function getRoleList(roles: any){
     Object.keys(roles)
         .map(function(id){
             return {id:id, name:roles[id].name};
         });
 }
-export function listRoles( params, callback) {
+export function listRoles( params: any, callback: any) {
     var type = params.type || 1;
     var list;
     switch(type){
@@ -169,7 +169,7 @@ export function listRoles( params, callback) {
  * @param {String} params.permission 要检查的权限
  * @param {String} params.type 权限所属 1.企业 2.代理商 默认 1.企业
  */
-export async function checkPermission(params): Promise<boolean> {
+export async function checkPermission(params: any): Promise<boolean> {
     var accountId = params.accountId;
     var permissions = params.permission;
 
@@ -183,7 +183,7 @@ export async function checkPermission(params): Promise<boolean> {
     var type = params.type || EAccountType.STAFF;
     //如果要验证代理商权限,直接返回True
     //todo 实现代理商权限认证
-    var role;
+    var role: any;
     if (type == EAccountType.AGENCY) {
         role = await getRoleOfAgency({accountId: accountId});
     } else {

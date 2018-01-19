@@ -17,7 +17,7 @@ var timeout = require('connect-timeout');
 import * as CLS from 'continuation-local-storage';
 let CLSNS = CLS.getNamespace('dnode-api-context');
 import { genSign } from "@jingli/sign";
-const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'Content-Type, auth, supplier, authstr, staffid, companyid, accountid'} 
+const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'content-type, Content-Type, auth, supplier, authstr, staffid, companyid, accountid'} 
 function resetTimeout(req, res, next){
     req.clearTimeout();
     next();
@@ -30,7 +30,7 @@ class Proxy {
      */
     static __initHttpApp(app: Express){
 
-        app.options(/^\/(order|travel|mall)*/, cors(corsOptions), (req: Request, res: Response, next: Function) => {         
+        app.options(/^\/(order|travel|mall|supplier|bill|permission)*/, cors(corsOptions), (req: Request, res: Response, next: Function) => {         
             return res.sendStatus(200);
         })
 
@@ -53,8 +53,9 @@ class Proxy {
             let pathstr: string = req.path;
             pathstr = pathstr.replace('/travel', '');
             let JLOpenApi: string = config.cloud;
-            JLOpenApi.replace('/cloud', '');
+            JLOpenApi = JLOpenApi.replace('/cloud', '');
             let url: string = `${JLOpenApi}${pathstr}`;
+            console.log('url-----> ', url);
 
             try {
                 result = await new Promise((resolve, reject) => {
@@ -65,7 +66,8 @@ class Proxy {
                         method: req.method,
                         qs: req.query,
                         headers: {
-                            token: companyToken
+                            token: companyToken,
+                            companyId: companyId
                         }
                     }, (err, resp, result) => {
                         if (err) {
@@ -74,6 +76,7 @@ class Proxy {
                         resolve(result);
                     });
                 });
+                console.log('resultttttt---->', result);
                 return res.json(result);
             } catch(err) {
                 if (err) {
@@ -100,7 +103,7 @@ class Proxy {
             let pathstr: string = req.path;
             pathstr = pathstr.replace('/supplier', '');
             let JLOpenApi: string = config.cloud;
-            JLOpenApi.replace('/cloud', '');
+            JLOpenApi = JLOpenApi.replace('/cloud', '');
             let url: string = `${JLOpenApi}${pathstr}`;
 
             try {
@@ -112,7 +115,8 @@ class Proxy {
                         method: req.method,
                         qs: req.query,
                         headers: {
-                            token: companyToken
+                            token: companyToken,
+                            companyId: companyId
                         }
                     }, (err, resp, result) => {
                         if (err) {
@@ -137,7 +141,6 @@ class Proxy {
             if(staffId && !staff) {
                 staff = await Models.staff.get(staffId);
             }
-
             let {tripDetailId} = req.query;
 
             let listeningon: string;
@@ -192,12 +195,12 @@ class Proxy {
                         json: true,
                         method: req.method,
                         timeout: 120*1000
-                    }, (err: Error, res: any, body: any) => {
+                    }, (err: Error, res: any, result: any) => {
                         if(err) {
                             console.log("-=========>err: ", err);
                             reject(err)
                         }
-                        resolve(body);
+                        resolve(result);
                     });
                 });
             }catch(err) {
@@ -209,7 +212,6 @@ class Proxy {
             console.log("========================> result.", result)
             if(!result) 
                 return res.json(null);
-            //以下提交订单成功后，更新订单状态和订单号
             if(typeof result == 'string') {
                 result = JSON.parse(result);
             }
@@ -229,6 +231,7 @@ class Proxy {
                 tripDetail.orderType = body.orderType != null? body.orderType: null;  //后期返回的orderNo统一后，使用此确定订单类型
                 await tripDetail.save();
             }
+
             return res.json(result);
 
         });
@@ -239,13 +242,14 @@ class Proxy {
             if(req.method == 'GET') {
                 params = req.query;
             }
-            let appSecret = config.mall.appSecret;
             let staff = await Models.staff.get(staffid);
+            let appSecret = config.mall.appSecret;
             let pathstring = req.path;
             let timestamp = Math.floor(Date.now()/1000);
             pathstring = pathstring.replace("/mall", '');
             let sign = genSign(params, timestamp, appSecret)
             let url = `${config.mall.orderLink}${pathstring}`;
+            console.log(url,"<==================商城url")
             console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.mall.appId, '===request params: ', params) 
             let result = await new Promise((resolve, reject) => {
                 request({
@@ -274,14 +278,60 @@ class Proxy {
             return res.json(result);
         });
 
-        
-        app.all(/^\/permission.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
+
+        app.all(/^\/bill.*$/ ,cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
+    
             let {staffid, companyid, accountid} = req.headers;
             let params =  req.body;
             if(req.method == 'GET') {
                 params = req.query;
             }
+            let appSecret = config.bill.appSecret;
             let staff = await Models.staff.get(staffid)
+            let pathstring = req.path;
+            let timestamp = Math.floor(Date.now()/1000);
+            pathstring = pathstring.replace("/bill", '');
+            let sign = genSign(params, timestamp, appSecret)
+            let url = `${config.bill.orderLink}${pathstring}`;
+            console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.bill.appId, '===request params: ', params) 
+            let result = await new Promise((resolve, reject) => {
+                return request({
+                    uri: url,
+                    body: req.body,
+                    json: true,
+                    method: req.method,
+                    qs: req.query,
+                    headers: {
+                        sign: sign,
+                        appid: config.bill.appId,
+                        staffid: staff.id, 
+                        companyid: staff.companyId,
+                        accountid: staff.accountId
+                    }
+                }, (err, resp, result) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    resolve(result);
+                });
+            });
+            console.log("===bill===result: ", result)
+            return res.json(result);
+        });
+
+        
+        app.all(/^\/permission.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
+      
+            let {staffid, companyid, accountid} = req.headers;
+            let params =  req.body;
+            if(req.method == 'GET') {
+                params = req.query;
+            }
+            let staff = await Models.staff.get(staffid);
+            let role: any = null ;
+            if(staff.roleId == 0) {
+                role = 'root'; //表示创建者身份
+            }
             let appSecret = config.permission.appSecret;
             let pathstring = req.path;
             let timestamp = Math.floor(Date.now()/1000);
@@ -299,9 +349,10 @@ class Proxy {
                     headers: {
                         sign: sign,
                         appid: config.permission.appId,
-                        staffid: staff.id, 
+                        staffid: staff.id,
                         companyid: staff.companyId,
-                        accountid: staff.accountId
+                        accountid: staff.accountId,
+                        role: role
                     }
                 }, (err, resp, result) => {
                     if (err) {
@@ -326,6 +377,7 @@ async function verify(req: Request, res: Response, next: Function) {
     console.log("======> authstr ", authstr, staffid)
     let token = parseAuthString(authstr);
     let verification: AuthResponse = await API.auth.authentication(token);
+    console.log("-======>verification:  ", verification)
     if(!verification) {
         console.log("auth failed", JSON.stringify(req.cookies))
         return res.sendStatus(401);

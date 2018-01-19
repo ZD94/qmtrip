@@ -4,23 +4,15 @@
 *
 */
 
-import {Models} from "_types/index";
-import {md5} from "common/utils";
-import {Staff, EStaffStatus} from "_types/staff/staff";
-import {DDTalkUser, DDTalkCorp} from "_types/ddtalk";
-import {getISVandCorp} from "api/ddtalk/lib/dealEvent";
-import Logger from '@jingli/logger';
-var logger = new Logger('main');
-const DEFAULT_PWD = '000000';
+// import {DDTalkCorp} from "_types/ddtalk";
 
+// export class ddCrud {
+//     private company: any;
+//     private travelPolicy : any;
+//     private corp : DDTalkCorp;
 
-export class ddCrud {
-    private company: any;
-    private travelPolicy : any;
-    private corp : DDTalkCorp;
-
-    constructor( public corpId : string ) {
-    }
+//     constructor( public corpId : string ) {
+//     }
 
     /*private async getCompany() {
         let self = this;
@@ -351,4 +343,4 @@ export class ddCrud {
             await localDepart.destroy();
         }
     }*/
-}
+// }
