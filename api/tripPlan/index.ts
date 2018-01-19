@@ -1545,7 +1545,7 @@ class TripPlanModule {
 
 
         // let planSql = `${completeSql}  and status in (${EPlanStatus.WAIT_UPLOAD}, ${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDITING}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.COMPLETE})`;
-        let planSql = `${completeSql}  and ((status not in (${EPlanStatus.CANCEL, EPlanStatus.NO_BUDGET}))`
+        let planSql = `${completeSql}  and (status not in (${EPlanStatus.CANCEL, EPlanStatus.NO_BUDGET}));`
         completeSql += ` and status=${EPlanStatus.COMPLETE}`;
 
         let savedMoneyCompleteSql = completeSql + ' and is_special_approve = false';
@@ -1669,7 +1669,7 @@ class TripPlanModule {
         // let planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
         
         if(params.unComplete){
-            planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status not in (${EPlanStatus.CANCEL}, , ${EPlanStatus.NO_BUDGET}, ${EPlanStatus.COMPLETE}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
+            planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status not in (${EPlanStatus.CANCEL}, ${EPlanStatus.NO_BUDGET}, ${EPlanStatus.COMPLETE}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
             // planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
         }
 
@@ -1715,7 +1715,6 @@ class TripPlanModule {
             selectKey = 'departmentId';
             completeSql=`from trip_plan.trip_plans as p, department.staff_departments as s, department.departments as d where d.deleted_at is null and s.deleted_at is null and p.deleted_at is null and p.company_id ='${company.id}'  and s.staff_id=p.account_id and d.id=s.department_id and p.all_invoices_pass_time>'${params.startTime}' and p.all_invoices_pass_time<'${params.endTime}'`;
             savedMoneyCompleteSql = '';
-            planSql = `${completeSql}`;
             // planSql = `${completeSql} and p.status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE})`;
             planSql = `${completeSql} and p.status not in (${EPlanStatus.CANCEL},${EPlanStatus.NO_BUDGET})`;
             completeSql += ` and p.status=${EPlanStatus.COMPLETE}`;
