@@ -219,7 +219,7 @@
     "util": "^0.10.3",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.7.0",
+    "watchify": "3.7.0",
     "ws": "^1.1.1",
     "xregexp": "3.1.1",
     "yargs": "5.0.0"
