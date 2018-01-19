@@ -45,7 +45,7 @@
     "@types/morgan": "^1.7.32",
     "@types/node": "^7.0.12",
     "@types/node-schedule": "^1.2.0",
-    "@types/node-uuid": "0.0.28",
+    "@types/node-uuid": "^0.0.28",
     "@types/orchestrator": "^0.3.0",
     "@types/redis": "^2.6.0",
     "@types/request": "^0.0.45",
@@ -70,7 +70,7 @@
     "cookie-parser": "^1.4.3",
     "core-decorators": "^0.12.3",
     "cors": "^2.8.4",
-    "dingtalk_suite_callback": "0.0.3",
+    "dingtalk_suite_callback": "^0.0.3",
     "dnode": "^1.2.2",
     "exif-js": "^2.1.1",
     "express": "^4.14.0",
@@ -219,9 +219,9 @@
     "util": "^0.10.3",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.7.0",
+    "watchify": "3.7.0",
     "ws": "^1.1.1",
-    "xregexp": "^3.1.1",
-    "yargs": "^5.0.0"
+    "xregexp": "3.1.1",
+    "yargs": "5.0.0"
   }
 }
