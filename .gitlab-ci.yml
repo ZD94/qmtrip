@@ -201,8 +201,8 @@ deploy:tester:
     JL_APP_POSTGRES: postgres://test:JingliTest0418@dockerhost:15432/tester_$GITLAB_USER_ID
     JL_APP_POSTGRES_INITDB: tester_$GITLAB_USER_ID
     JL_APP_CLOUDKEY: jinglicloud2017
-    JL_APP_CLOUDAPI: http://l.jingli365.com/cloud/api/v1
-    JL_APP_CLOUD: http://l.jingli365.com/cloud
+    JL_APP_CLOUDAPI: https://l.jingli365.com/cloud/api/v1
+    JL_APP_CLOUD: https://l.jingli365.com/cloud
     JL_APP_APPROVE_SERVER_URL: https://l.jingli365.com/proj/svr-trip-approve/api/v1
     JL_APP_TMC: http://t.jingli365.com/proj/svr-tmc
     JL_APP_TMC_FAKE: 0
