@@ -206,7 +206,7 @@ class TripPlanModule {
      * @param params.id tripPlan id
      */
     @clientExport
-    static async autoSettleReward(params): Promise<any> {
+    static async autoSettleReward(params): Promise<boolean> {
         if (typeof params == 'string') {
             params = JSON.parse(params);
         }
@@ -277,10 +277,12 @@ class TripPlanModule {
                 } else {
                     //企业余额不足继续兑换，提示充值
                     console.error('企业余额不足');
+                    return false;
                 }
             } else {
                 //企业余额不足继续兑换，提示充值 
                 console.error('企业余额不足');
+                return false;
                 }
             }).catch(async function(err) {
                 await companyCoinAccount.reload();
@@ -291,6 +293,7 @@ class TripPlanModule {
                 await unSettledRewardTripPlan.reload();
                 throw err;
             });
+            return true;
     }
 
     /**
