@@ -36,8 +36,6 @@ import {EventListener} from "../_types/eventListener";
 // import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
 import {Url} from "_types/shorturl";
 import {EmailQueue, EmailLog, EmailSubmit} from "_types/mail";
-import { Attachment, RelateFile } from '_types/attachment';
-
 
 initModels({
     staff: createServerService<Staff>(Staff),
@@ -106,8 +104,6 @@ initModels({
     emailLog: createServerService<EmailLog>(EmailLog),
     emailSubmit: createServerService<EmailSubmit>(EmailSubmit),
     linkman: createServerService<Linkman>(Linkman),
-    attachment: createServerService<Attachment>(Attachment),
-    relateFile: createServerService<RelateFile>(RelateFile)
  
     // travelPolicyRegion: createServerService<TravelPolicyRegion>(TravelPolicyRegion),
     // companyRegion: createServerService<CompanyRegion>(CompanyRegion),
