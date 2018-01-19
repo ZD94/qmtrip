@@ -738,7 +738,7 @@ class TripPlanModule {
                 for (let j = 0; j < destinationArray.length; j++) {
                     let cityCode = destinationArray.shift();
                     let destinationName = await API.place.getCityInfo({cityCode: cityCode, companyId: staff.companyId});
-                    destinationArray.push(destinationName);
+                    destinationArray.push(destinationName.name);
                 }
                 if (!tripPlan.deptCity) {  // 仅住宿
                     tripPlan.remark = `员工${staffName}节省, 行程 ${tripPlan.arrivalCity} (仅住宿)`;
