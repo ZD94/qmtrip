@@ -325,7 +325,7 @@ class Proxy {
             let staff = await Models.staff.get(staffid);
             let role: any = null ;
             if(staff.roleId == 0) {
-                role = 'root'; //表示创建者身份
+                role = 'defaultCreater'; //表示创建者身份
             }
             let appSecret = config.permission.appSecret;
             let pathstring = req.path;
