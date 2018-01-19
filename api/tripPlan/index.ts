@@ -243,6 +243,17 @@ class TripPlanModule {
                     await unSettledRewardTripPlan.save();  //将该tripPlan的是否结算奖励标志设为true
                     
                     let account = await Models.account.get(staff.accountId);
+                    if(!account.coinAccountId) {
+                        let coinAccount: CoinAccount = CoinAccount.create({
+                            income: 0,
+                            consume: 0,
+                            locks: 0,
+                            isAllowOverCost: false
+                        });
+                        coinAccount = await coinAccount.save();
+                        account.coinAccount = coinAccount;
+                        account = await account.save();
+                    }
                     coinAccount = await Models.coinAccount.get(account.coinAccountId);
                     coinAccount.income = Math.floor(Number(coinAccount.income) + rewardMoney * points2coinRate);  //员工account增加鲸币
                     await coinAccount.save();
@@ -1990,6 +2001,7 @@ class TripPlanModule {
                                 data.status = ETripDetailStatus.COMPLETE;  //补助无需上传票据，此时原版设置为WAIT_COMMIT, 新版设置为COMPLETE
                             } else {
                                 data.status = ETripDetailStatus.WAIT_UPLOAD;
+                                tripPlan.auditStatus = EAuditStatus.WAIT_UPLOAD;
                             }
                             detail = Models.tripDetailSubsidy.create(data);
                             ps.push(detail);
@@ -2867,8 +2879,10 @@ class TripPlanModule {
         const tripPlan = await Models.tripPlan.get(params.id)
         if (moment().milliseconds < moment(tripPlan.backAt).milliseconds)
             throw new L.ERROR_CODE_C(400, '该行程当前无法完成')
-        if (tripPlan.status != EPlanStatus.COMPLETE || tripPlan.auditStatus != EAuditStatus.INVOICE_PASS)
+
+        if (tripPlan.status != EPlanStatus.RESERVED || tripPlan.auditStatus != EAuditStatus.NO_NEED_AUDIT)
             throw new L.ERROR_CODE_C(400, '该行程当前无法完成')
+
         const tripDetails: TripDetail[] = await tripPlan.getTripDetails({ 
             where: { status: EPlanStatus.COMPLETE, reserveStatus: {$in: [EOrderStatus.ENDORSEMENT_SUCCESS, EOrderStatus.SUCCESS]}}
         })
@@ -2878,7 +2892,7 @@ class TripPlanModule {
 
         // Fetch orders and calculate saving
         const orders = await Promise.all(tripDetails.map(td => getOrderInfo(td.orderNo)))
-        tripPlan.expenditure = R.sumBy(R.prop('price'), orders)
+        tripPlan.expenditure = R.sumBy(R.prop('price'), R.flatten(orders))
         tripPlan.status = EPlanStatus.COMPLETE
         tripPlan.saved = tripPlan.budget - tripPlan.expenditure
 
@@ -2903,8 +2917,10 @@ class TripPlanModule {
 
             await TripPlanModule.autoSettleReward(params)
         })
-        await costCenterDeploy.checkoutBudgetNotice()
+        if(costCenterDeploy)
+            await costCenterDeploy.checkoutBudgetNotice()
     }
+   
 
 }
  
