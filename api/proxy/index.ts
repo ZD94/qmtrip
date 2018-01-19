@@ -196,12 +196,12 @@ class Proxy {
                         json: true,
                         method: req.method,
                         timeout: 120*1000
-                    }, (err: Error, res: any, body: any) => {
+                    }, (err: Error, res: any, result: any) => {
                         if(err) {
                             console.log("-=========>err: ", err);
                             reject(err)
                         }
-                        resolve(body);
+                        resolve(result);
                     });
                 });
             }catch(err) {
@@ -213,26 +213,14 @@ class Proxy {
             console.log("========================> result.", result)
             if(!result) 
                 return res.json(null);
-            //以下提交订单成功后，更新订单状态和订单号
             if(typeof result == 'string') {
                 result = JSON.parse(result);
             }
-            if(tripDetail && result.code == 0 && result.data && tripDetail.orderNo == null){  //&& result.data.orderN
-                if(result.data.orderNos && typeof(result.data.orderNos) != 'undefined'){
-                    tripDetail.reserveStatus = EOrderStatus.AUDITING;  //飞机的orderNos为数组
-                    tripDetail.orderNo = result.data.orderNos[0];
-                }
-                if(result.data.OrderNo && typeof(result.data.OrderNo) != 'undefined') {  
-                    tripDetail.reserveStatus = EOrderStatus.AUDITING;  //火车的OrderNo为string
-                    tripDetail.orderNo = result.data.OrderNo;
-                }  
-                if(result.data.orderNo && typeof(result.data.orderNo) != 'undefined') {  
-                    tripDetail.reserveStatus = EOrderStatus.AUDITING;   //酒店的orderNo为string
-                    tripDetail.orderNo = result.data.orderNo;
-                }
+            if(result.code == 0 && tripDetail && tripDetail.orderType == null) {
                 tripDetail.orderType = body.orderType != null? body.orderType: null;  //后期返回的orderNo统一后，使用此确定订单类型
                 await tripDetail.save();
             }
+
             return res.json(result);
 
         });
@@ -250,6 +238,7 @@ class Proxy {
             pathstring = pathstring.replace("/mall", '');
             let sign = genSign(params, timestamp, appSecret)
             let url = `${config.mall.orderLink}${pathstring}`;
+            console.log(url,"<==================商城url")
             console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.mall.appId, '===request params: ', params) 
             let result = await new Promise((resolve, reject) => {
                 return request({
