@@ -292,13 +292,14 @@ export default class CostCenterModule {
             const { id } = budget
             delete budget.id
             totalBudget += budget.selfTempBudget;
-            const isCreated = (await Models.costCenter.get(id)) == void 0
-            if (isCreated) {
-                promiseAry.push(CostCenter.create({ id, type: ECostCenterType.DEPARTMENT }).save())
+            const nonCreated = (await Models.costCenter.get(id)) == void 0
+            if (nonCreated) {
+                const dept = await Models.department.get(id)
+                promiseAry.push(CostCenter.create({ id, type: ECostCenterType.DEPARTMENT, name: dept.name }).save())
             }
 
-            const costCenterDeploy = await Models.costCenterDeploy.find({ where: { ...where, costCenterId: id } })
-            if (costCenterDeploy.length < 1) {
+            const costCenterDeploys = await Models.costCenterDeploy.find({ where: { ...where, costCenterId: id } })
+            if (costCenterDeploys.length < 1) {
                 promiseAry.push(CostCenterDeploy.create({ costCenterId: id, ...budget, beginDate: period.start, endDate: period.end }).save())
             }
         }
@@ -322,14 +323,17 @@ export default class CostCenterModule {
         for (let budget of budgets) {
             const { id } = budget
             const cost: CostCenterDeploy = _.first(await Models.costCenterDeploy.find({ where: { ...where, costCenterId: id } }))
+            let dept: Department = null
             if (!cost) {
                 delete budget.id
+                dept = await Models.department.get(id)
+                await CostCenter.create({ id, type: ECostCenterType.DEPARTMENT, name: dept.name }).save()
                 await CostCenterDeploy.create({ costCenterId: id, ...budget, beginDate: period.start, endDate: period.end }).save()
                 continue
             }
             if (cost.selfTempBudget != budget.selfTempBudget) {
                 // log
-                const dept = await Models.department.get(id)
+                if (!dept) dept = await Models.department.get(id)
                 await BudgetLog.create({
                     companyId: dept.company.id, costCenterId: id, value: budget.selfTempBudget - cost.selfTempBudget,
                     type: BUDGET_CHANGE_TYPE.CHANGE_BUDGET, staffId: operator, remark: `${dept.name}调整预算`,
