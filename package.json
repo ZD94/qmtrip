@@ -70,7 +70,7 @@
     "cookie-parser": "^1.4.3",
     "core-decorators": "^0.12.3",
     "cors": "^2.8.4",
-    "dingtalk_suite_callback": "0.0.3",
+    "dingtalk_suite_callback": "^0.0.3",
     "dnode": "^1.2.2",
     "exif-js": "^2.1.1",
     "express": "^4.14.0",
