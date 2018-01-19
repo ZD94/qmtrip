@@ -249,9 +249,10 @@ class TripPlanModule {
                     await coinAccount.save();
 
                     let coins: number = Math.floor(rewardMoney * points2coinRate);
+                    let tripPlanRemark: string = unSettledRewardTripPlan.remark;
                     companyCoinAccountChange = Models.coinAccountChange.create({  //company coin_account增加鲸币变动记录
                         coinAccountId: companyCoinAccount.id,
-                        remark: `员工${staff.name}增加奖励鲸币${coins}`,
+                        remark: `${tripPlanRemark}, 奖励鲸币${coins}`,
                         type: COIN_CHANGE_TYPE.CONSUME,
                         coins: -coins,
                         orderNum: getOrderNo()
@@ -259,7 +260,7 @@ class TripPlanModule {
                     await companyCoinAccountChange.save();
                     coinAccountChange = Models.coinAccountChange.create({  //员工 coin_account增加鲸币变动记录
                         coinAccountId: coinAccount.id,
-                        remark: `员工${staff.name}增加奖励鲸币${coins}`,
+                        remark: `${tripPlanRemark}, 奖励鲸币${coins}`,
                         type: COIN_CHANGE_TYPE.AWARD,
                         coins: coins,
                         orderNum: getOrderNo() 
