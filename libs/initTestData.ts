@@ -48,7 +48,7 @@ async function initCompany(params: {name: string, userName: string, mobile: stri
 
     let company = Company.create(params);
     company.expiryDate = moment().add(1, 'month').toDate();
-    company.tripPlanNumLimit = 20;
+    company.tripPlanNumLimit = 100000;
     company.extraTripPlanNum = 5;
     company.extraExpiryDate = moment().add(10, 'days').toDate();
     company.type = ECompanyType.PAYED;
@@ -65,7 +65,9 @@ async function initCompany(params: {name: string, userName: string, mobile: stri
     await Promise.all([staff.save(), company.save(), department.save(), staffDepartment.save()]);
 
     //为企业设置资金账户
-    let ca = CoinAccount.create();
+    let ca = CoinAccount.create({
+        income: 100000000
+    });
     await ca.save();
     company.coinAccount = ca;
     await company.save();
