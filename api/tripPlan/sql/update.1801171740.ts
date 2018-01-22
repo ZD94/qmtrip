@@ -104,7 +104,7 @@ export default async function update(DB: Sequelize, t: Transaction){
                                     updateDetailSql = `update trip_plan.trip_details set status = 4  where id = '${tdetail.id}';`; //设置为完成，出票成功
                                     await DB.query(updateDetailSql);
                                 } else if(tdetail.reserve_status >= 0) {  //已出票
-                                    updateDetailSql = `update trip_plan.trip_details set status = 6  where id = '${tdetail.id}';`; //设置待预定 
+                                    updateDetailSql = `update trip_plan.trip_details set status = 1  where id = '${tdetail.id}';`; //设置待上传
                                     await DB.query(updateDetailSql);     
                                 } else if(tdetail.reserve_status == -3 || tdetail.reserve_status == -1) {  //未预定或者取消
                                     updateDetailSql = `update trip_plan.trip_details set status = 1  where id = '${tdetail.id}';`; //设置待上传
@@ -146,6 +146,8 @@ export default async function update(DB: Sequelize, t: Transaction){
                         if(new Date(tripPlan.back_at) > new Date()) {   //未预定，未超时，设置为待预定
                             updateSql = `update trip_plan.trip_plans set status = 5, "audit_status" = -4 where id = '${tripPlan.id}';`; //更新为待预定，无需审核
                             await DB.query(updateSql);
+                            let updateTripDetailSql = `update trip_plan.trip_details set status = 6, reserve_status = -3 where trip_plan_id = '${tripPlan.id}'`; //未预定，tripDetail的reserveStatus设置未待预定，status维持报销单状态不变， 
+                            await DB.query(updateTripDetailSql);
                         } else { //未预定，已超时，设置为待传票
                             updateSql = `update trip_plan.trip_plans set status = 7, "audit_status" = 3 where id = '${tripPlan.id}';`; //更新为已预定，待上传
                             await DB.query(updateSql);
@@ -158,10 +160,10 @@ export default async function update(DB: Sequelize, t: Transaction){
                                     updateDetailSql = `update trip_plan.trip_details set status = 4  where id = '${tdetail.id}';`; //设置为完成，出票成功
                                     await DB.query(updateDetailSql);
                                 } else if(tdetail.reserve_status >= 0) {
-                                    updateDetailSql = `update trip_plan.trip_details set status = 6  where id = '${tdetail.id}';`; //设置待预定 
+                                    updateDetailSql = `update trip_plan.trip_details set status = 1  where id = '${tdetail.id}';`; //设置待预定 
                                     await DB.query(updateDetailSql);     
                                 } else if(tdetail.reserve_status == -3 || tdetail.reserve_status == -1) {
-                                    updateDetailSql = `update trip_plan.trip_details set status = 6  where id = '${tdetail.id}';`; //设置待预定 
+                                    updateDetailSql = `update trip_plan.trip_details set status = 1  where id = '${tdetail.id}';`; //设置待预定 
                                     await DB.query(updateDetailSql);     
                                 }     
                             }));     
