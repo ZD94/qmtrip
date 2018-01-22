@@ -77,7 +77,6 @@ export default async function update(DB: Sequelize, t: Transaction){
                 break;
             case 1:   //EOldPlanStatus.WAIT_UPLOAD
                 if(!reservedExists) {  //未预定，
-                    console.log("=======超时： ", tripPlan.back_at, new Date(tripPlan.back_at) < new Date())
                     if(new Date(tripPlan.back_at) < new Date()) {   //未预定，且超时，设置为报销单
                         updateSql = `update trip_plan.trip_plans set status = 7, "audit_status" = 3 where id = '${tripPlan.id}';`; //更新失效，待上传, 
                         await DB.query(updateSql);
@@ -189,7 +188,7 @@ export default async function update(DB: Sequelize, t: Transaction){
                 updateSql = `` ;//行程单为失效， 报销单为待提交状态
                 break;
             case 4: 
-                updateSql = `update trip_plan.trip_plans set status = 7, audit_status = -2  where id = '${tripPlan.id}';` ;//行程单为失效， 报销单为完成状态
+                updateSql = `update trip_plan.trip_plans set status = 7, audit_status = 2  where id = '${tripPlan.id}';` ;//行程单为失效， 报销单为完成状态
                 await DB.query(updateSql);
                 await Promise.all(tripDetails.map(async (tdetail: any) => {
                     updateSql = `update trip_plan.trip_details set reserve_status = -3  where id = '${tdetail.id}';` ;//待预定
