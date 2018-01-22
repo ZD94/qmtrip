@@ -408,9 +408,14 @@ class TripPlanModule {
      * @param params
      * @returns {Promise<string[]>}
      */
-    @requireParams(['where.tripPlanId'], ['where.type', 'where.status', 'where.id'])
+    @requireParams([], ['where.tripPlanId', 'where.type', 'where.status', 'where.id', 'where.accountId', 
+    'where.orderNo', 'where.reserveStatus', 'where.orderType', 'where.expenditure'])
     @clientExport
     static async getTripDetails(options: {where: any, offset?: number, limit?: number}): Promise<FindResult> {
+        if(!options || !options.where)
+            throw L.ERR.INVALID_ARGUMENT("参数错误, 参数不能为空")
+        if(!options.where.tripPlanId && !options.where.accountId)
+            throw L.ERR.INVALID_ARGUMENT("参数错误, 参数accountId或者tripPlanId不能同时为空")
         let details = await Models.tripDetail.find(options);
         let ids = details.map(function (d) {
             return d.id;
