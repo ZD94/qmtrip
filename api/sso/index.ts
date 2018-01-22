@@ -28,7 +28,7 @@ import { Request, NextFunction, Response, Application } from 'express-serve-stat
 import {restfulAPIUtil } from 'api/restful';
 import CompanyModule, { HotelPriceLimitType } from 'api/company';
 import { IWCreateUser, IWCreateDepartment, IWUpdateDepartment, IWDeleteDepartment } from 'api/sso/libs/notice-event';
-import { IWUpdateUser, IWDeleteUser } from 'api/sso/libs/event-notice';
+import { IWUpdateUser, IWDeleteUser, EventNotice } from 'api/sso/libs/event-notice';
 
 const { Parser } = require('xml2js')
 const wxCrypto = require('wechat-crypto')
@@ -324,16 +324,22 @@ export default class SSOModule {
 
 
     @clientExport
-    @requireParams(['corpId'])
-    static async getPermanentCodeByCorpId({ corpId }: { corpId: string }) {
+    @requireParams(['corpId'])    
+    static async getPermanentCodeByCorpId(params: { corpId: string }): Promise<{ corpId?: string, permanentCode: string, companyId?: string }> {
+
+       let {corpId} = params;
         const companyProperties = await Models.companyProperty.find({
             where: { type: CPropertyType.WECHAT_CORPID, value: corpId }
         })
         if (companyProperties.length < 1) throw new L.ERROR_CODE_C(404, '该企业尚未授权')
+
         const companies = await Models.companyProperty.find({
-            where: { type: CPropertyType.WECHAT_PERMAENTCODE, company_id: companyProperties[0].companyId }
+            where: { type: CPropertyType.WECHAT_PERMAENTCODE, companyId: companyProperties[0].companyId }
         })
-        return companies[0].value
+        if(!companies || !companies.length) 
+            throw new Error("该永久授权码不存在鲸力系统中")
+        let permanentCode = companies[0].value;
+        return {corpId, permanentCode, companyId: companyProperties[0].companyId}
     }
 }
 
@@ -447,29 +453,80 @@ const workWechatEventHandlers = {
 const changeContactEventHandlers = {
     // 员工变动事件
     async create_user(xml: IWCreateUser) {
-
+        let suiteToken = await SSOModule.getSuiteToken();
+        let {permanentCode, companyId, corpId} = await SSOModule.getPermanentCodeByCorpId({corpId: xml.AuthCorpId});
+        let company = await Models.company.get(companyId);
+        let accessToken = await API.sso.getAccessToken(xml.AuthCorpId, permanentCode ,suiteToken)
+        let restApi = new RestApi(accessToken);
+        let eventNotice = new EventNotice({ company, restApi});
+        let hasUpdated = await eventNotice.create_user(xml);
+        return hasUpdated;
     },
     async update_user(xml: IWUpdateUser) {
+        let suiteToken = await SSOModule.getSuiteToken();
+        let {permanentCode, companyId, corpId} = await SSOModule.getPermanentCodeByCorpId({corpId: xml.AuthCorpId});
+        let company = await Models.company.get(companyId);
+        let accessToken = await API.sso.getAccessToken(xml.AuthCorpId, permanentCode ,suiteToken)
 
+        let restApi = new RestApi(accessToken);
+        let eventNotice = new EventNotice({ company, restApi});
+        let hasUpdated = await eventNotice.update_user(xml);
+        return hasUpdated;
     },
     async delete_user(xml: IWDeleteUser) {
+        let suiteToken = await SSOModule.getSuiteToken();
+        let {permanentCode, companyId, corpId} = await SSOModule.getPermanentCodeByCorpId({corpId: xml.AuthCorpId});
+        let company = await Models.company.get(companyId);
+        let accessToken = await API.sso.getAccessToken(xml.AuthCorpId, permanentCode ,suiteToken)
+        let restApi = new RestApi(accessToken);
+        let eventNotice = new EventNotice({ company, restApi});
+        let hasUpdated = await EventNotice.delete_user(xml);
+        return hasUpdated;
 
     },
     // 部门变动事件
     async create_party(xml: IWCreateDepartment) {
+        let suiteToken = await SSOModule.getSuiteToken();
+        let {permanentCode, companyId, corpId} = await SSOModule.getPermanentCodeByCorpId({corpId: xml.AuthCorpId});
+        let company = await Models.company.get(companyId);
+        let accessToken = await API.sso.getAccessToken(xml.AuthCorpId, permanentCode ,suiteToken)
+
+        let restApi = new RestApi(accessToken);
+        let eventNotice = new EventNotice({ company, restApi});
+        let hasUpdated = await eventNotice.create_party(xml);
+        return hasUpdated;
 
     },
     async update_party(xml: IWUpdateDepartment) {
+        let suiteToken = await SSOModule.getSuiteToken();
+        let {permanentCode, companyId, corpId} = await SSOModule.getPermanentCodeByCorpId({corpId: xml.AuthCorpId});
+        let company = await Models.company.get(companyId);
+        let accessToken = await API.sso.getAccessToken(xml.AuthCorpId, permanentCode ,suiteToken)
+        let restApi = new RestApi(accessToken);
+        let eventNotice = new EventNotice({ company, restApi});
+        let hasUpdated = await eventNotice.update_party(xml);
+        return hasUpdated;
 
     },
     async delete_party(xml: IWDeleteDepartment) {
 
+        let suiteToken = await SSOModule.getSuiteToken();
+        let {permanentCode, companyId, corpId} = await SSOModule.getPermanentCodeByCorpId({corpId: xml.AuthCorpId});
+        let company = await Models.company.get(companyId);
+        let accessToken = await API.sso.getAccessToken(xml.AuthCorpId, permanentCode ,suiteToken)
+
+        let restApi = new RestApi(accessToken);
+        let eventNotice = new EventNotice({ company, restApi});
+        let hasUpdated = await eventNotice.delete_party(xml);
+        return hasUpdated;
     },
     // 标签成员变更事件
     async update_tag(xml: WorkWechatResponse) {
 
     }
 }
+
+
 
 export interface WorkWechatResponse {
     SuiteId: string,

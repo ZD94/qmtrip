@@ -5,16 +5,16 @@ import { EGender } from '_types';
 import {WStaff} from "./wechat-staff";
 import {WDepartment} from "./wechat-department";
 import { RestApi } from 'api/sso/libs/restApi';
-import { Company } from '_types/company';
+import { Company, CPropertyType } from '_types/company';
 import { Models } from '_types';
 import { Account, ACCOUNT_STATUS } from '_types/auth';
-import { Staff, EStaffStatus, EAddWay, SPropertyType } from '_types/staff';
-import { StaffDepartment } from '_types/department';
+import { Staff, EStaffStatus, EAddWay, SPropertyType, StaffProperty } from '_types/staff';
+import { StaffDepartment, DPropertyType, Department, DepartmentProperty } from '_types/department';
 
 
 
 // 员工变动事件
-class EventNotice {
+export class EventNotice {
 
     restApi: RestApi;
     company: Company;
@@ -38,7 +38,10 @@ class EventNotice {
             company: self.company,
             restApi: self.restApi, 
         });
-        await wStaff.sync();  
+        await wStaff.sync({
+            company: self.company,
+            from: 'createUser'
+        });  
         return true;   
     }
     async update_user(xml: IWUpdateUser) {
@@ -70,11 +73,11 @@ class EventNotice {
         let {staffId} = comPro[0];
         let staff = await Models.staff.get(staffId);
 
-        let staffPro = await Models.staffProperty.find({ where: {
+        let staffPros = await Models.staffProperty.find({ where: {
             staffId: staffId,
             value: xml.UserId
         }});
-        if(!staffPro || !staffPro.length) 
+        if(!staffPros || !staffPros.length) 
             throw new Error("该staff不存在鲸力系统中")
         let staffDepts = await Models.staffDepartment.find({ where: {
             staffId: staffId
@@ -86,16 +89,84 @@ class EventNotice {
             return true;
         }));
         await staff.destroy();
+        await Promise.all(staffPros.map(async (staffPro: StaffProperty) => {
+            await staffPro.destroy();
+        }))
         return true;    
     }
     // 部门变动事件
     async create_party(xml: IWCreateDepartment) {
-    
+        let self = this;
+        let comPro = await Models.CompanyProperty.find({ where: {
+            type: CPropertyType.WECHAT_CORPID,
+            value: xml.AuthCorpId
+        }});
+        if(!comPro || !comPro.length) 
+            throw new Error("该AuthCorpId不存在鲸力系统中")
+        let companyId = comPro[0];
+        let company = await Models.company.get(companyId);
+
+        let wdepartment = new WDepartment({
+            name: xml.Name, 
+            parentId: xml.ParentId, 
+            id: xml.Id + '', 
+            corpId: xml.AuthCorpId,
+            company: self.company,
+            restApi: self.restApi
+        });
+        await wdepartment.sync({
+            company: self.company,
+            oaDepartment: null,
+            from: 'createDepartment'
+        }); 
+        return null;
     }
     async update_party(xml: IWUpdateDepartment) {
-    
+        let self = this;
+        let wdepartment = new WDepartment({
+            name: xml.Name, 
+            parentId: xml.ParentId, 
+            id: xml.Id + '', 
+            corpId: xml.AuthCorpId,
+            company: self.company,
+            restApi: self.restApi
+        });
+        await wdepartment.sync({
+            company: self.company,
+            oaDepartment: null,
+            from: 'createDepartment'
+        }); 
+        return true;
     }
     async delete_party(xml: IWDeleteDepartment) {
+        let comPro = await Models.departmentProperty.find({ where: {
+            type: DPropertyType.WECHAT_CORPID,
+            value: xml.AuthCorpId
+        }});
+
+        if(!comPro || !comPro.length) 
+            throw new Error("该AuthCorpId不存在鲸力系统中")
+        let {departmentId} = comPro[0];
+        let deptPros = await Models.departmentProperty.find({ where: {
+            departmentId: departmentId,
+            value: xml.Id
+        }});
+        if(!deptPros || !deptPros.length) 
+            throw new Error("该部门不存在鲸力系统中")
+      
+        let staffDepts = await Models.staffDepartment.find({ where: {
+            departmentId: departmentId
+        }});
+        if(staffDepts && staffDepts.length)
+            throw new Error("该部门下仍有员工，无法删除")
+        let dept = await Models.department.get(departmentId);
+        if(!dept) 
+            throw new Error("该部门不存在鲸力系统中")
+        await dept.destroy();
+        await Promise.all(deptPros.map(async (deptPro: DepartmentProperty) => {
+            await deptPro.destroy();
+        }))
+        return true;    
     
     }
     // 标签成员变更事件
