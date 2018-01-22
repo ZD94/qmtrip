@@ -688,7 +688,7 @@ class TripPlanModule {
                 //扣除成本中心预算
                 let costCenter = await Models.costCenter.get(tripPlan.costCenterId);
                 if (costCenter) {
-                    await costCenter.addExpendBudget({ tripPlanId: tripPlan.id })
+                    await costCenter.addExpendBudget({ tripPlanId: tripPlan.id, begin: tripPlan.startAt.getFullYear() })
                 }
             }
             /*******************************************发送通知消息**********************************************/
