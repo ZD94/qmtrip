@@ -408,7 +408,8 @@ class TripPlanModule {
      * @param params
      * @returns {Promise<string[]>}
      */
-    @requireParams([], ['where.tripPlanId', 'where.type', 'where.status', 'where.id', 'where.accountId'])
+    @requireParams([], ['where.tripPlanId', 'where.type', 'where.status', 'where.id', 'where.accountId', 
+    'where.orderNo', 'where.reserveStatus', 'where.orderType', 'where.expenditure'])
     @clientExport
     static async getTripDetails(options: {where: any, offset?: number, limit?: number}): Promise<FindResult> {
         if(!options || !options.where)
