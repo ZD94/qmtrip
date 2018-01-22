@@ -41,7 +41,7 @@ let RestfulAPIUtil = restfulAPIUtil;
 import * as error from "@jingli/error";
 import { Company } from '_types/company';
 import { CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE } from '_types/coin';
-import { BUDGET_CHANGE_TYPE } from '_types/costCenter';
+import { BUDGET_CHANGE_TYPE, ECostCenterType } from '_types/costCenter';
 const axios = require('axios')
 interface ReportInvoice {
     type: string;
@@ -688,7 +688,10 @@ class TripPlanModule {
                 //扣除成本中心预算
                 let costCenter = await Models.costCenter.get(tripPlan.costCenterId);
                 if (costCenter) {
-                    await costCenter.addExpendBudget({ tripPlanId: tripPlan.id, begin: tripPlan.startAt.getFullYear() })
+                    let begin = costCenter.type == ECostCenterType.DEPARTMENT
+                        ? tripPlan.startAt.getFullYear() 
+                        : undefined
+                    await costCenter.addExpendBudget({ tripPlanId: tripPlan.id, begin})
                 }
             }
             /*******************************************发送通知消息**********************************************/
