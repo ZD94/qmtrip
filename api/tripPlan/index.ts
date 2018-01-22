@@ -608,7 +608,7 @@ class TripPlanModule {
                 let savedMoney = tripPlan.budget - tripPlan.expenditure;
                 savedMoney = savedMoney > 0 ? savedMoney : 0;
                 tripPlan.score = parseInt((savedMoney * SAVED2SCORE).toString());
-          //TAG      tripPlan.reward = Number(parseFloat((savedMoney * SAVED2SCORE).toString()).toFixed(2));
+                tripPlan.reward = Number(parseFloat((savedMoney * SAVED2SCORE).toString()).toFixed(2));
                 let staffId = tripPlan.accountId;
                 let staff = await Models.staff.get(staffId);
                 let staffName = staff.name;
