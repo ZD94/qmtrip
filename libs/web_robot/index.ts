@@ -7,7 +7,7 @@ import { CookieJar } from 'request';
 import request = require('request');
 
 export class WebRobot{
-    cookieJar: CookieJar;
+    cookieJar: any;
     client: typeof requestPromise;
     client_orig: typeof request;
     constructor(public origin: string){
