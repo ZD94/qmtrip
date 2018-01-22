@@ -8,7 +8,8 @@ import { RestApi } from 'api/sso/libs/restApi';
 import { Company } from '_types/company';
 import { Models } from '_types';
 import { Account, ACCOUNT_STATUS } from '_types/auth';
-import { Staff, EStaffStatus, EAddWay } from '_types/staff';
+import { Staff, EStaffStatus, EAddWay, SPropertyType } from '_types/staff';
+import { StaffDepartment } from '_types/department';
 
 
 
@@ -21,7 +22,6 @@ class EventNotice {
     constructor(target: any) {
         this.restApi = target.restApi;
         this.company = target.company;
-
     }
 
     async create_user(xml: IWCreateUser) {
@@ -38,43 +38,55 @@ class EventNotice {
             company: self.company,
             restApi: self.restApi, 
         });
-        await wStaff.sync();
-        // let accounts: Account[];
-        // let account: Account;
-        // let staff: Staff;
-
-        // if(wStaff.mobile || wStaff.email) {
-        //     accounts = await Models.account.find({
-        //         where: {
-        //             $or: {
-        //                 email: wStaff.email,
-        //                 mobile: wStaff.mobile
-        //             }
-        //         }
-        //     });
-        //     if(accounts && accounts.length)
-        //         account = accounts[0];
-        // }
-        // //name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd), avatar: self.avatar
-        // if(account) {
-        //     staff = Staff.create({
-        //         name: wStaff.name,
-        //         sex: wStaff.sex,
-        //         company: self.company,
-        //         staffStatus: EStaffStatus.ON_JOB,
-        //         addWay: EAddWay.OA_SYNC,
-        //         status: ACCOUNT_STATUS.ACTIVE,
-
-        //     })
-        // }
-        
-    
+        await wStaff.sync();  
+        return true;   
     }
     async update_user(xml: IWUpdateUser) {
-    
+        let self = this;
+        let wStaff = new WStaff({
+            id: xml.UserId,         
+            name: xml.Name, 
+            mobile: xml.Mobile,
+            sex: xml.Gender,
+            email: xml.Email, 
+            departmentIds: xml.Department, 
+            corpId: xml.AuthCorpId, 
+            avatar: xml.Avatar,
+            company: self.company,
+            restApi: self.restApi, 
+        });
+        await wStaff.sync();
+        return true;
     }
-    async delete_user(xml: IWDeleteUser) {
-    
+    static async delete_user(xml: IWDeleteUser) {
+        
+        let comPro = await Models.staffProperty.find({ where: {
+            type: SPropertyType.WECHAT_CORPID,
+            value: xml.AuthCorpId
+        }});
+
+        if(!comPro || !comPro.length) 
+            throw new Error("该AuthCorpId不存在鲸力系统中")
+        let {staffId} = comPro[0];
+        let staff = await Models.staff.get(staffId);
+
+        let staffPro = await Models.staffProperty.find({ where: {
+            staffId: staffId,
+            value: xml.UserId
+        }});
+        if(!staffPro || !staffPro.length) 
+            throw new Error("该staff不存在鲸力系统中")
+        let staffDepts = await Models.staffDepartment.find({ where: {
+            staffId: staffId
+        }});
+        await Promise.all(staffDepts.map(async (staffDept: StaffDepartment) => {
+            let department = await Models.department.get(staffDept.departmentId);
+            await department.destroy();
+            await staffDept.destroy();
+            return true;
+        }));
+        await staff.destroy();
+        return true;    
     }
     // 部门变动事件
     async create_party(xml: IWCreateDepartment) {
