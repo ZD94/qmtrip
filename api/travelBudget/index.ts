@@ -171,7 +171,7 @@ export default class ApiTravelBudget {
         // })
         authData = [{
             identify: {"username":"JingLiZhiXiang","password":"123456"},
-            sname: "美亚"
+            sname: "meiya"
         }]
 
         // if (result.code == 0) {
@@ -234,7 +234,7 @@ export default class ApiTravelBudget {
         // });
         authData = [{
             identify: {"username":"JingLiZhiXiang","password":"123456"},
-            sname: "美亚"
+            sname: "meiya"
         }]
 
         // if (result.code == 0) {
@@ -1010,6 +1010,9 @@ export default class ApiTravelBudget {
             })
         } catch (err) {
             console.log(err);
+        }
+        if(!result || !result.data) {
+            throw new Error("拉取预算失败");
         }
         return result.data;
     }
