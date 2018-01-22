@@ -275,6 +275,7 @@ class TripPlanModule {
                         remark: `员工${staff.name}兑换奖励积分${rewardMoney}`
                     });
                     await pointChange.save();
+                    console.log('autoSettleRewardEndsssssssssssssssssss');
                 } else {
                     //企业余额不足继续兑换，提示充值
                     console.error('企业余额不足');
