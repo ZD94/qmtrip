@@ -229,8 +229,8 @@ class TripPlanModule {
             let companyBalanceCoins: number = companyCoinAccount.income - companyCoinAccount.consume - companyCoinAccount.locks;  //企业账户余额(鲸币)
 
             if (companyBalanceCoins > 0) {   
-                if (companyBalanceCoins > (unSettledRewardTripPlan.saved * scoreRatio * points2coinRate)){  //企业余额足够兑换该员工的节省奖励
-                    let rewardMoney: number = unSettledRewardTripPlan.saved * scoreRatio;  //企业对该员工的该次行程的奖励金额
+                if (companyBalanceCoins > (unSettledRewardTripPlan.reward * points2coinRate)){  //企业余额足够兑换该员工的节省奖励
+                    let rewardMoney: number = unSettledRewardTripPlan.reward;  //企业对该员工的该次行程的奖励金额
                     
                     unSettledRewardTripPlan.isSettled = true;  //结算flag更改
                     companyCoinAccount.consume = Math.floor(Number(companyCoinAccount.consume) + rewardMoney * points2coinRate);  //企业余额扣除相应的奖励金额鲸币
@@ -803,8 +803,8 @@ class TripPlanModule {
                 if(typeof staff.balancePoints == 'string'){
                     staff.balancePoints = Number(staff.balancePoints);
                 }
-                staff.totalPoints = staff.totalPoints + tripPlan.score;
-                staff.balancePoints = staff.balancePoints + tripPlan.score;
+                staff.totalPoints = staff.totalPoints + tripPlan.reward;
+                staff.balancePoints = staff.balancePoints + tripPlan.reward;
                 let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: user.id, remark: `增加员工${tripPlan.score}积分`});
                 await Promise.all([staff.save(), log.save()]);
                 await TripPlanModule.autoSettleReward({id: tripPlan.id});  //出差完成自动结算奖励 
