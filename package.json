@@ -72,7 +72,7 @@
     "cors": "^2.8.4",
     "dingtalk_suite_callback": "^0.0.3",
     "dnode": "^1.2.2",
-    "exif-js": "^2.1.1",
+    "exif-js": "2.1.1",
     "express": "^4.14.0",
     "express-http-proxy": "^0.11.0",
     "express-request-proxy": "^2.0.0",
@@ -220,7 +220,7 @@
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "3.7.0",
-    "ws": "^1.1.1",
+    "ws": "1.1.1",
     "xregexp": "3.1.1",
     "yargs": "5.0.0"
   }
