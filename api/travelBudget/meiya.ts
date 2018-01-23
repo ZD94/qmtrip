@@ -83,7 +83,7 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData) 
 
     }
 
-    if (meiyaResult.code == 0) {
+    if (meiyaResult && meiyaResult.code == 0) {
         return meiyaResult.data;
     } else {
         return [];
@@ -125,7 +125,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData) {
         }
     }
 
-    if (meiyaResult.code == 0) {
+    if (meiyaResult && meiyaResult.code == 0) {
         return meiyaResult.data;
     } else {
         return [];
@@ -166,7 +166,7 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData) {
             console.log(e)
         }
     }
-    if (meiyaResult.code == 0) {
+    if (meiyaResult && meiyaResult.code == 0) {
         return meiyaResult.data;
     } else {
         return [];
