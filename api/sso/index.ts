@@ -302,14 +302,12 @@ export default class SSOModule {
         const companyProperties = await Models.companyProperty.find({
             where: { type: SPropertyType.WECHAT_CORPID, value: usrInfo.CorpId }
         })
-        console.log('companyProps:', companyProperties)
         if (companyProperties.length < 1)
             throw new L.ERROR_CODE_C(404, "该企业尚未授权")
 
         const staffProperties = await Models.staffProperty.find({
             where: { type: SPropertyType.WECHAT_UID, value: usrInfo.UserId }
         })
-        console.log('staffProps:', staffProperties)
         if (staffProperties.length < 1)
             throw L.ERR.USER_NOT_EXIST()
 
