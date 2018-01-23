@@ -17,9 +17,7 @@ export = async function transform(values: any): Promise<any>{
         appMessageUrl = '#/card-coupons/card-coupons';
     } else {
         detailUrl = config.host +'/index.html#/card-coupons/card-coupons';
-        let finalUrl = '#/card-coupons/card-coupons';
-        finalUrl = encodeURIComponent(finalUrl);
-        appMessageUrl = `#/judge-permission/index&finalUrl=${finalUrl}`;
+        appMessageUrl = '#/card-coupons/card-coupons';
     }
 
     try{
