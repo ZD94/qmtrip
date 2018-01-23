@@ -219,7 +219,8 @@ class TripPlanModule {
         let pointChange: PointChange;
         let unSettledRewardTripPlan: TripPlan;
 
-        DB.transaction(async function (t) {
+        try {
+            await DB.transaction(async function (t) {
             unSettledRewardTripPlan = await Models.tripPlan.get(params.id);  //该次行程
 
             company = await Models.company.get(unSettledRewardTripPlan.companyId);
@@ -275,7 +276,6 @@ class TripPlanModule {
                         remark: `员工${staff.name}兑换奖励积分${rewardMoney}`
                     });
                     await pointChange.save();
-                    console.log('autoSettleRewardEndsssssssssssssssssss');
                 } else {
                     //企业余额不足继续兑换，提示充值
                     console.error('企业余额不足');
@@ -286,7 +286,9 @@ class TripPlanModule {
                 console.error('企业余额不足');
                 return false;
                 }
-            }).catch(async function(err) {
+            })
+            return true;
+        } catch(err) {
                 await companyCoinAccount.reload();
                 await staff.reload();
                 await coinAccount.reload();
@@ -294,8 +296,7 @@ class TripPlanModule {
                 await pointChange.reload();
                 await unSettledRewardTripPlan.reload();
                 throw err;
-            });
-            return true;
+        };
     }
 
     /**
