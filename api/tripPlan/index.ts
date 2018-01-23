@@ -438,6 +438,8 @@ class TripPlanModule {
 
         let tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
         let reserveStatus = params.reserveStatus;
+        if(typeof reserveStatus == 'string')
+            reserveStatus = Number(reserveStatus);
         let status = tripDetail.status;
         let tripDetails: TripDetail[];
         switch(reserveStatus) {
@@ -448,13 +450,22 @@ class TripPlanModule {
             case EOrderStatus.WAIT_TICKET:
                 tripDetail.status = ETripDetailStatus.WAIT_TICKET;
                 break;
-            
-            case EOrderStatus.SUCCESS:  //全部已出票，设置该tripPlan为已预定
+
             case EOrderStatus.REFUND_SUCCESS: 
+                tripDetail.status = ETripDetailStatus.WAIT_TICKET;
+                if(tripPlan.status == EPlanStatus.COMPLETE || tripPlan.status == EPlanStatus.RESERVED) {
+                    if(new Date(tripPlan.backAt) < new Date()){
+                        throw new Error("该行程时间已过，无法受理退款操作");
+                    } else {
+                        tripPlan.status = EPlanStatus.WAIT_RESERVE;
+                    }
+                }
+                break; 
+            case EOrderStatus.SUCCESS:  //全部已出票，设置该tripPlan为已预定
             case EOrderStatus.ENDORSEMENT_SUCCESS: 
                 tripDetail.status = ETripDetailStatus.COMPLETE;
-         
-                tripDetails = await Models.tripDetail.all({where: {tripPlanId: tripDetail.tripPlanId, status: [ETripDetailStatus.WAIT_RESERVE, ETripDetailStatus.WAIT_TICKET]}});
+                tripDetails = await Models.tripDetail.all({where: {id: {$ne: tripDetail.id}, tripPlanId: tripDetail.tripPlanId, 
+                    status: [ETripDetailStatus.WAIT_RESERVE, ETripDetailStatus.WAIT_TICKET]}});
                 if(!tripDetails || !tripDetails.length)
                     tripPlan.status = EPlanStatus.RESERVED;
                 tripDetails = [];
@@ -464,7 +475,7 @@ class TripPlanModule {
                 break;
             case EOrderStatus.ENDORSEMENT_CREATED:  //改签单创建，为等待预定
                 tripDetail.status = ETripDetailStatus.WAIT_TICKET;
-                if(tripPlan.status == EPlanStatus.RESERVED || tripPlan.status == EPlanStatus.COMPLETE || tripPlan.status == EPlanStatus.EXPIRED) {
+                if(tripPlan.status == EPlanStatus.RESERVED || tripPlan.status == EPlanStatus.COMPLETE) {
                     tripPlan.status = EPlanStatus.WAIT_RESERVE;
                 }
                 break;     
@@ -472,9 +483,23 @@ class TripPlanModule {
                 break;
             case EOrderStatus.WAIT_PAYMENT:  //订单未支付，默认设置为等待预定
                 tripDetail.status = ETripDetailStatus.WAIT_RESERVE; 
+                if(tripPlan.status == EPlanStatus.COMPLETE || tripPlan.status == EPlanStatus.RESERVED) {
+                    if(new Date(tripPlan.backAt) < new Date()){
+                        throw new Error("该行程时间已过，无法退款");
+                    } else {
+                        tripPlan.status = EPlanStatus.WAIT_RESERVE;
+                    }
+                }
                 break;
             case EOrderStatus.NO_SUFFICIENT_MONEY:  //酒店订单余额不足，默认设置为等待预定
                 tripDetail.status = ETripDetailStatus.WAIT_RESERVE;
+                if(tripPlan.status == EPlanStatus.COMPLETE || tripPlan.status == EPlanStatus.RESERVED) {
+                    if(new Date(tripPlan.backAt) < new Date()){
+                        throw new Error("该行程时间已过，无法退款");
+                    } else {
+                        tripPlan.status = EPlanStatus.WAIT_RESERVE;
+                    }
+                }
                 break;
             default: 
                 break;     
@@ -3112,17 +3137,17 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDe
  *   1. 目标状态为EAuditStatus.AUDITING: 查找所有tripDetail的status满足一定条件，且reserveStatus为WAIT_SUBMIT,
  *          
  * @param tripPlan {TripPlan}
- * @param status {EPlanStatus}
+ * @param status {EPlanStatus} 
  */
 async function tryUpdateTripPlanStatus(tripPlan: TripPlan, status: EAuditStatus) :Promise<TripPlan>{
     let cannotStatus = {};
     //变tripPlan状态需要tripDetail不能包含状态
-    cannotStatus[ETripDetailStatus.WAIT_UPLOAD] = [];
+    cannotStatus[EAuditStatus.WAIT_UPLOAD] = [];
 
     //tripPlan 进入等待上传状态，需要tripDetail中没有 审核不通过的单子
-    cannotStatus[ETripDetailStatus.WAIT_COMMIT] = _.concat([ETripDetailStatus.WAIT_UPLOAD, ETripDetailStatus.AUDIT_NOT_PASS],  cannotStatus[ETripDetailStatus.WAIT_UPLOAD]);
-    cannotStatus[ETripDetailStatus.AUDITING] = _.concat([ETripDetailStatus.AUDIT_NOT_PASS, ETripDetailStatus.WAIT_COMMIT], cannotStatus[ETripDetailStatus.WAIT_COMMIT]);
-    cannotStatus[ETripDetailStatus.COMPLETE] = _.concat([ETripDetailStatus.AUDITING], cannotStatus[ETripDetailStatus.AUDITING]);
+    cannotStatus[EAuditStatus.WAIT_COMMIT] = _.concat([ETripDetailStatus.WAIT_UPLOAD, ETripDetailStatus.AUDIT_NOT_PASS, ETripDetailStatus.CANCEL, ETripDetailStatus.NO_BUDGET],  cannotStatus[EAuditStatus.WAIT_UPLOAD]);
+    cannotStatus[EAuditStatus.AUDITING] = _.concat([ETripDetailStatus.AUDIT_NOT_PASS, ETripDetailStatus.WAIT_COMMIT], cannotStatus[EAuditStatus.WAIT_COMMIT]);
+    cannotStatus[EAuditStatus.INVOICE_PASS] = _.concat([ETripDetailStatus.AUDITING], cannotStatus[EAuditStatus.AUDITING]);
 
     //变tripPlan状态,只关注出发交通,返回交通,住宿,特殊审批类型
     let preTripTypeNeeds = [ETripType.BACK_TRIP, ETripType.OUT_TRIP, ETripType.HOTEL, ETripType.SPECIAL_APPROVE];
@@ -3132,7 +3157,6 @@ async function tryUpdateTripPlanStatus(tripPlan: TripPlan, status: EAuditStatus)
             tripPlanId: tripPlan.id,
             type: {$in: preTripTypeNeeds},
             status: {$in: cannotStatus[status]},    //无预算, 等待上传
-            reserveStatus: EOrderStatus.WAIT_SUBMIT,
         },
         order: [['created_at', 'asc']]
     });

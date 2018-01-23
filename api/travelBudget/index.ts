@@ -157,22 +157,18 @@ export default class ApiTravelBudget {
         // } catch (err) {
         //     console.log(err);
         // }
-        // let companyInfo = await ApiTravelBudget.getCompanyInfo();
-        // let data = companyInfo.data;
+        let companyInfo = await ApiTravelBudget.getCompanyInfo();
+        let data = companyInfo.data;
         let authData = [];
-        // data.map((item) => {
-        //     let obj = {};
-        //     let identify = item.identify;
-        //     let sname = item.sname;
-        //     obj["identify"] = identify;
-        //     obj["sname"] = sname;
-        //     authData.push(obj);
-        //     return authData
-        // })
-        authData = [{
-            identify: {"username":"JingLiZhiXiang","password":"123456"},
-            sname: "meiya"
-        }]
+        data.map((item) => {
+            let obj = {};
+            let identify = item.identify;
+            let sname = item.sname;
+            obj["identify"] = identify;
+            obj["sname"] = sname;
+            authData.push(obj);
+            return authData
+        })
 
         // if (result.code == 0) {
         //     commonData = result.data.data;
@@ -220,22 +216,18 @@ export default class ApiTravelBudget {
 
 
 
-        // let companyInfo = await ApiTravelBudget.getCompanyInfo();
-        // let data = companyInfo.data;
+        let companyInfo = await ApiTravelBudget.getCompanyInfo(); 
+        let data = companyInfo.data;
         let authData = [];
-        // data.map((item) => {
-        //     let obj = {};
-        //     let identify = item.identify;
-        //     let sname = item.sname;
-        //     obj["identify"] = identify;
-        //     obj["sname"] = sname;
-        //     authData.push(obj);
-        //     return authData
-        // });
-        authData = [{
-            identify: {"username":"JingLiZhiXiang","password":"123456"},
-            sname: "meiya"
-        }]
+        data.map((item) => {
+            let obj = {};
+            let identify = item.identify;
+            let sname = item.sname;
+            obj["identify"] = identify;
+            obj["sname"] = sname;
+            authData.push(obj);
+            return authData
+        });
 
         // if (result.code == 0) {
         //     commonData = result.data.data;
