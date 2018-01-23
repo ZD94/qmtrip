@@ -416,7 +416,7 @@ class StaffModule{
         {if: condition.isSameCompany("0.id")},
         {if: condition.isStaffsAgency("0.id")}
     ])
-    static async updateStaff(params: {id: string, email?: string, mobile?: string, staffStatus: number}) : Promise<Staff>{
+    static async updateStaff(params) : Promise<Staff>{
 
         let updateStaff = await Models.staff.get(params.id);
         let staff = await Staff.getCurrent();
