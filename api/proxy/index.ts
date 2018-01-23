@@ -176,13 +176,14 @@ class Proxy {
             let supplier =req.headers['supplier'] || 'meiya';
 
             let companyInfo = await ApiTravelBudget.getCompanyInfo(supplier);
-            let identify = companyInfo.identify;
+            let identify = companyInfo[0].identify;
             if (typeof identify == 'object') {
                 identify = JSON.stringify(identify);
             }
             identify = encodeURIComponent(identify);
             let isNeedAuth: string = req.headers['isneedauth'];
-            let auth: string = (isNeedAuth == '1') ? identify : '';
+            // let auth: string = (isNeedAuth == '1') ? identify : '';
+            let auth : string = identify;
             let headers: {[index: string]: any} = {
                auth: auth,
                supplier,

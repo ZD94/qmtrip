@@ -158,7 +158,7 @@ export default class ApiTravelBudget {
         //     console.log(err);
         // }
         let companyInfo = await ApiTravelBudget.getCompanyInfo();
-        let data = companyInfo.data;
+        let data = companyInfo;
         let authData = [];
         data.map((item) => {
             let obj = {};
@@ -214,7 +214,7 @@ export default class ApiTravelBudget {
         //     console.log(err);
         // }
         let companyInfo = await ApiTravelBudget.getCompanyInfo();
-        let data = companyInfo.data;
+        let data = companyInfo;
         let authData = [];
         data.map((item) => {
             let obj = {};
@@ -875,7 +875,7 @@ export default class ApiTravelBudget {
                 addUrl: `${companyId}/data`,
                 model: "TmcSupplier"
             })
-            return result
+            return result.data
         } catch (err) {
             console.log(err);
         }
