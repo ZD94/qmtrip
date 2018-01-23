@@ -5,6 +5,7 @@ import { Staff } from "_types/staff";
 import { Models } from "_types";
 import { AuthRequest, AuthResponse } from '_types/auth';
 import {getCompanyTokenByAgent} from '../restful';
+var ApiTravelBudget = require('api/travelBudget');
 var requestp = require("request-promise");
 import { EOrderStatus, EOrderType, TripDetail } from "_types/tripPlan";
 var request = require("request");
@@ -17,7 +18,7 @@ var timeout = require('connect-timeout');
 import * as CLS from 'continuation-local-storage';
 let CLSNS = CLS.getNamespace('dnode-api-context');
 import { genSign } from "@jingli/sign";
-const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'content-type, Content-Type, auth, supplier, authstr, staffid, companyid, accountid'} 
+const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'content-type, Content-Type, auth, supplier, authstr, staffid, companyid, accountid, isneedauth'} 
 function resetTimeout(req, res, next){
     req.clearTimeout();
     next();
@@ -89,49 +90,55 @@ class Proxy {
 
         app.all(/^\/supplier.*$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: any, res: Response, next: Function) => {
 
-            //公有云验证
-            let {authstr, staffid}  = req.headers;
-            let staff: Staff = await Models.staff.get(staffid);
-            let companyId: string = staff.company.id;
-            let companyToken: string = await getCompanyTokenByAgent(companyId);
-            if (!companyToken) {
-                throw new Error('换取 token 失败！');
+            let {staffid, companyid, accountid} = req.headers;
+            let params =  req.body;
+            if(req.method == 'GET') {
+                params = req.query;
             }
-            
-            //request to JLCloud(jlbudget) 
-            let result: any;
-            let pathstr: string = req.path;
-            pathstr = pathstr.replace('/supplier', '');
-            let JLOpenApi: string = config.cloud;
-            JLOpenApi = JLOpenApi.replace('/cloud', '');
-            let url: string = `${JLOpenApi}${pathstr}`;
+            let staff = await Models.staff.get(staffid);
+            let appSecret = config.supplier.appSecret;
+            let pathstring = req.path;
+            let timestamp = Math.floor(Date.now()/1000);
+            pathstring = pathstring.replace("/supplier", '');
+            let sign = genSign(params, timestamp, appSecret)
+            let url = `${config.supplier.orderLink}${pathstring}`;
 
-            try {
-                result = await new Promise((resolve, reject) => {
-                    return request({
-                        uri: url,
-                        body: req.body,
-                        json: true,
-                        method: req.method,
-                        qs: req.query,
-                        headers: {
-                            token: companyToken,
-                            companyId: companyId
-                        }
-                    }, (err, resp, result) => {
-                        if (err) {
-                            reject(err);
-                        }
-                        resolve(result);
-                    });
-                });
-                return res.json(result);
-            } catch(err) {
-                if (err) {
-                    console.error('ERROR SUPPLIER In api/proxy/index:   ', err);
-                    return null;
-                }
+            let companyInfo = await ApiTravelBudget.getCompanyInfo();
+            let identify = companyInfo.identify;
+            if (typeof identify == 'object') {
+                identify = JSON.stringify(identify);
             }
+            identify = encodeURIComponent(identify);
+            let isNeedAuth: string = req.headers['isneedauth'];
+            let auth: string = (isNeedAuth == '1') ? identify : '';
+
+            console.log("===>timestamp:  ", timestamp, "===>sign", sign, '====>url', url, '===>appid: ', config.supplier.appId, '===>request params: ', params) 
+            let result = await new Promise((resolve, reject) => {
+                return request({
+                    uri: url,
+                    body: req.body,
+                    json: true,
+                    method: req.method,
+                    qs: req.query,
+                    headers: {
+                        auth: auth,
+                        supplier: req.headers['supplier'] || 'meiya',
+                        sign: sign,
+                        appid: config.supplier.appId,
+                        staffid: staff.id, 
+                        companyid: staff.companyId,
+                        accountid: staff.accountId
+                    }
+                }, (err, resp, result) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    resolve(result);
+                });
+            });
+            console.log("===supplier===result: ", result)
+            return res.json(result);
+            
         });
 
         // verifyToken
@@ -167,9 +174,17 @@ class Proxy {
                 listeningon: listeningon     
             };
             
+            let companyInfo = await ApiTravelBudget.getCompanyInfo();
+            let identify = companyInfo.identify;
+            if (typeof identify == 'object') {
+                identify = JSON.stringify(identify);
+            }
+            identify = encodeURIComponent(identify);
+            let isNeedAuth: string = req.headers['isneedauth'];
+            let auth: string = (isNeedAuth == '1') ? identify : '';
             let headers: {[index: string]: any} = {
-               auth: req.headers['auth'],
-               supplier: req.headers['supplier'],
+               auth: auth,
+               supplier: req.headers['supplier'] || 'meiya',
                accountid: staff.accountId,
                staffid: staff.id,
                companyid: staff.companyId,    
@@ -238,7 +253,6 @@ class Proxy {
             pathstring = pathstring.replace("/mall", '');
             let sign = genSign(params, timestamp, appSecret)
             let url = `${config.mall.orderLink}${pathstring}`;
-            console.log(url,"<==================商城url")
             console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.mall.appId, '===request params: ', params) 
             let result = await new Promise((resolve, reject) => {
                 return request({
