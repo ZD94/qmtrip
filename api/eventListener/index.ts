@@ -24,33 +24,29 @@ export class EventModule{
         }
         let findSql = `SELECT * FROM "event"."event_listeners" where events ?& array['${eventName}'] and company_id='${companyId}';`;
 
-        // let eventListeners = await DB.query(findSql);
+        let eventListeners = await DB.query(findSql);
 
-        // if(eventListeners && eventListeners[0] && eventListeners[0].length){
-        //     eventListeners = eventListeners[0];
-        // }else{
-        //     let company = await Models.company.get(companyId);
-        //     if(company && (company.oa == EApproveChannel.QM || company.oa == EApproveChannel.DING_TALK)){
-        //         let approveServerUrl = C.approveServerUrl;
-        //         approveServerUrl = approveServerUrl + `/tripApprove/receive`;
-        //         let eventListener = EventListener.create({events: ["NEW_TRIP_APPROVE","TRIP_APPROVE_UPDATE","TRIP_APPROVE_CHANGE","TRIP_APPROVE_CANCLE"],
-        //             url: approveServerUrl, method: "post", companyId: companyId});
-        //         await eventListener.save();
-        //         eventListeners = [eventListener];
-        //     }else{
-        //         eventListeners = [];
-        //     }
-        // }
+        if(eventListeners && eventListeners[0] && eventListeners[0].length){
+            eventListeners = eventListeners[0];
+        }else{
+            let company = await Models.company.get(companyId);
+            if(company && (company.oa == EApproveChannel.QM || company.oa == EApproveChannel.DING_TALK)){
+                let approveServerUrl = C.approveServerUrl;
+                approveServerUrl = approveServerUrl + `/tripApprove/receive`;
+                let eventListener = EventListener.create({events: ["NEW_TRIP_APPROVE","TRIP_APPROVE_UPDATE","TRIP_APPROVE_CHANGE","TRIP_APPROVE_CANCLE"],
+                    url: approveServerUrl, method: "post", companyId: companyId});
+                await eventListener.save();
+                eventListeners = [eventListener];
+            }else{
+                eventListeners = [];
+            }
+        }
 
-        // if(eventListeners && eventListeners.length){
-        let eventListeners = [{method: 'post'}];
-        if(eventListeners){
+        if(eventListeners && eventListeners.length){
             try{
-                // let url = eventListeners[0].url;
-                // let templateUrl = _.template(url);
-                // url = templateUrl(data);
-                // let url = 'http://localhost:8040/api/v1/tripApprove/receive';
-                let url = 'https://l.jingli365.com/proj/svr-trip-approve/api/v1/tripApprove/receive';
+                let url = eventListeners[0].url;
+                let templateUrl = _.template(url);
+                url = templateUrl(data);
                 console.info("url====>>>", url);
                 let method = eventListeners[0].method;
                 let qs = null;
@@ -89,7 +85,6 @@ export class EventModule{
         try{
             let company = await Models.company.get(params.companyId);
             let url = company.approveServerUrl ? company.approveServerUrl : config.approveServerUrl;
-            // let url = 'http://localhost:8040/api/v1';
             url = url + `/tripApprove/receiveRequest`;
             let result = await request({
                 uri: `${url}`,
