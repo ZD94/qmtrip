@@ -2772,8 +2772,7 @@ class TripPlanModule {
         const promiseAry = []
 
         // Fetch orders and calculate saving
-        const orders = await Promise.all(tripDetails.map(td => getOrderInfo(td.orderNo)))
-        tripPlan.expenditure = R.sumBy(R.prop('price'), R.flatten(orders))
+        tripPlan.expenditure = R.sumBy(R.prop('expenditure'), tripDetails)
         tripPlan.status = EPlanStatus.COMPLETE
         tripPlan.saved = tripPlan.budget - tripPlan.expenditure
 
