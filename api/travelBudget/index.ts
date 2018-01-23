@@ -857,19 +857,19 @@ export default class ApiTravelBudget {
     }
 
     //获取公司信息
-    static async getCompanyInfo() {
+    static async getCompanyInfo(sname?:string) {
         let currentStaff = await Staff.getCurrent();
         let staffId = currentStaff.id;
         let staff = await Models.staff.get(staffId);
         let companyId = staff.company.id;
-        // let companyId = "935fbeb0-acd0-11e7-ab1e-bdc5d9f254d3"
         let result;
         try {
             result = await RestfulAPIUtil.operateOnModel({
                 params: {
                     method: 'put',
                     fields: {
-                        companyId: companyId
+                        companyId: companyId,
+                        sname
                     }
                 },
                 addUrl: `${companyId}/data`,
@@ -1061,16 +1061,6 @@ export default class ApiTravelBudget {
         })
     }
 }
-
-// let paramss = {
-//     checkInDate: "2018-01-20",
-//     checkOutDate: "2018-01-21",
-//     cityId: "CT_131",
-//     travelPolicyId: "dklfklsdklmfsmldfkdsmkfsdfs"
-// }
-// setTimeout(async () => {
-//     await  ApiTravelBudget.getHotelsData(paramss)
-// }, 8000);
 
 let params = {
     "originPlace": "CT_131",
