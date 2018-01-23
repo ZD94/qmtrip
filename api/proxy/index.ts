@@ -173,8 +173,9 @@ class Proxy {
             let addon:{[index: string]: any} = {
                 listeningon: listeningon     
             };
-            
-            let companyInfo = await ApiTravelBudget.getCompanyInfo();
+            let supplier =req.headers['supplier'] || 'meiya';
+
+            let companyInfo = await ApiTravelBudget.getCompanyInfo(supplier);
             let identify = companyInfo.identify;
             if (typeof identify == 'object') {
                 identify = JSON.stringify(identify);
@@ -184,10 +185,10 @@ class Proxy {
             let auth: string = (isNeedAuth == '1') ? identify : '';
             let headers: {[index: string]: any} = {
                auth: auth,
-               supplier: req.headers['supplier'] || 'meiya',
+               supplier,
                accountid: staff.accountId,
                staffid: staff.id,
-               companyid: staff.companyId,    
+               companyid: staff.companyId,
             }
 
             let body: {[index: string]: any} = req.body;
