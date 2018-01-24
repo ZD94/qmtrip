@@ -78,6 +78,6 @@ export = async function transform(values: any): Promise<any>{
     }
 
     if (values.tripApprove)
-        values.tripApprove.staffs = (await Promise.all(values.tripApprove.staffList.map(Models.staff.get))).map(_.prop('name'))
+        values.tripApprove.staffs = (await Promise.all(values.tripApprove.staffList.map(s => Models.staff.get(s)))).map(_.prop('name'))
     return values;
 }
