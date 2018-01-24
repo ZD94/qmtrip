@@ -24,7 +24,7 @@ export class TripDetailController extends AbstractController {
         params.id = id;
         let obj: {[index: string]: string} = {};
         try{
-            obj = await API.tripPlan.updateTripDetail(params);
+            obj = await API.tripPlan.updateTripDetailReserveStatus(params);
         } catch(err) {
             if(err) {
                 console.log("====update tripDetail error: ", err);

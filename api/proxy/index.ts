@@ -7,7 +7,7 @@ import { AuthRequest, AuthResponse } from '_types/auth';
 import {getCompanyTokenByAgent} from '../restful';
 var ApiTravelBudget = require('api/travelBudget');
 var requestp = require("request-promise");
-import { EOrderStatus, EOrderType, TripDetail } from "_types/tripPlan";
+import { EOrderStatus, EOrderType, TripDetail, ETripDetailStatus, EPayType } from "_types/tripPlan";
 var request = require("request");
 var path = require("path");
 var _ = require("lodash");
@@ -168,26 +168,36 @@ class Proxy {
                     staff = await Models.staff.get(tripDetail.accountId);
                 }
                 listeningon = `${config.orderSysConfig.tripDetailMonitorUrl}/${tripDetail.id}`;
+                if(req.body.payType == EPayType.PERSONAL_PAY) {
+                    await API.tripPlan.updateTripDetail({
+                        tripDetailId,
+                        payType: req.body.payType,
+                        status: ETripDetailStatus.WAIT_UPLOAD,
+                        reserveStatus: EOrderStatus.WAIT_SUBMIT
+                    });
+                }
             }
 
             let addon:{[index: string]: any} = {
                 listeningon: listeningon     
             };
-            
-            let companyInfo = await ApiTravelBudget.getCompanyInfo();
-            let identify = companyInfo.identify;
+            let supplier =req.headers['supplier'] || 'meiya';
+
+            let companyInfo = await ApiTravelBudget.getCompanyInfo(supplier);
+            let identify = companyInfo[0].identify;
             if (typeof identify == 'object') {
                 identify = JSON.stringify(identify);
             }
             identify = encodeURIComponent(identify);
             let isNeedAuth: string = req.headers['isneedauth'];
-            let auth: string = (isNeedAuth == '1') ? identify : '';
+            // let auth: string = (isNeedAuth == '1') ? identify : '';
+            let auth : string = identify;
             let headers: {[index: string]: any} = {
                auth: auth,
-               supplier: req.headers['supplier'] || 'meiya',
+               supplier,
                accountid: staff.accountId,
                staffid: staff.id,
-               companyid: staff.companyId,    
+               companyid: staff.companyId,
             }
 
             let body: {[index: string]: any} = req.body;
@@ -231,7 +241,7 @@ class Proxy {
             if(typeof result == 'string') {
                 result = JSON.parse(result);
             }
-            if(result.code == 0 && tripDetail && tripDetail.orderType == null) {
+            if(result.code == 0 && tripDetail && body.orderType == null) {
                 tripDetail.orderType = body.orderType != null? body.orderType: null;  //后期返回的orderNo统一后，使用此确定订单类型
                 await tripDetail.save();
             }
