@@ -321,7 +321,7 @@ class AgencyModule {
     @clientExport
     static async getAgencyOperateLogs(options: any) :Promise<FindResult> {
         options.where = options.where || {};
-        options.order = options.order || "created_at desc";
+        options.order = options.order || [["created_at", "desc"]];
         let agencyUser = await AgencyUser.getCurrent();
         let agency = agencyUser.agency;
         options.where.agencyId = agency.id;
