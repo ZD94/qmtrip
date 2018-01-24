@@ -351,6 +351,7 @@ export class DDTalk {
         }
     }
 
+    @clientExport
     static async sendLinkMsg(params: any): Promise<any> {
         let {accountId, text, url, picurl} = params;
         text = text || '您有一条新消息'

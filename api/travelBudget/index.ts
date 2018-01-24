@@ -213,7 +213,10 @@ export default class ApiTravelBudget {
         // } catch (err) {
         //     console.log(err);
         // }
-        let companyInfo = await ApiTravelBudget.getCompanyInfo();
+
+
+
+        let companyInfo = await ApiTravelBudget.getCompanyInfo(); 
         let data = companyInfo.data;
         let authData = [];
         data.map((item) => {
@@ -999,6 +1002,9 @@ export default class ApiTravelBudget {
             })
         } catch (err) {
             console.log(err);
+        }
+        if(!result || !result.data) {
+            throw new Error("拉取预算失败");
         }
         return result.data;
     }

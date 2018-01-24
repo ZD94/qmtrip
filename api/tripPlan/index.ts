@@ -19,12 +19,12 @@ import R = require('lodash/fp')
 import { requireParams, clientExport } from '@jingli/dnode-api/dist/src/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
-    EPayType, ESourceType, EInvoiceStatus, TrafficEInvoiceFeeTypes, ProjectStaff, EProjectStatus, EOrderStatus
+    EPayType, ESourceType, EInvoiceStatus, TrafficEInvoiceFeeTypes, ProjectStaff, EProjectStatus, ETripDetailStatus, EOrderStatus
 } from "_types/tripPlan";
-import { Models } from "_types";
-import { FindResult } from "common/model/interface";
-import { Staff, PointChange } from "_types/staff";
-import { conditionDecorator, condition, modelNotNull } from "api/_decorator";
+import {Models, enumPlaneLevelToStr} from "_types";
+import {FindResult} from "common/model/interface";
+import {Staff, PointChange} from "_types/staff";
+import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import { getSession } from "@jingli/dnode-api";
 import { AgencyUser, Agency } from "_types/agency";
 import { makeSpendReport } from './spendReport';
@@ -56,7 +56,6 @@ interface ReportInvoice {
     trafficInfo?: string;
     duration?: string;
 }
-
 
 class TripPlanModule {
 
@@ -245,6 +244,17 @@ class TripPlanModule {
                     await unSettledRewardTripPlan.save();  //将该tripPlan的是否结算奖励标志设为true
 
                     let account = await Models.account.get(staff.accountId);
+                    if(!account.coinAccountId) {
+                        let coinAccount: CoinAccount = CoinAccount.create({
+                            income: 0,
+                            consume: 0,
+                            locks: 0,
+                            isAllowOverCost: false
+                        });
+                        coinAccount = await coinAccount.save();
+                        account.coinAccount = coinAccount;
+                        account = await account.save();
+                    }
                     coinAccount = await Models.coinAccount.get(account.coinAccountId);
                     coinAccount.income = Math.floor(Number(coinAccount.income) + rewardMoney * points2coinRate);  //员工account增加鲸币
                     await coinAccount.save();
@@ -387,16 +397,13 @@ class TripPlanModule {
         return Models.tripDetailSpecial.get(params.id);
     }
 
-    /**
-     * 更新消费详情
-     * @param params
-     */
+
     @clientExport
     @requireParams(['id'], TripDetail['$fieldnames'])
     @modelNotNull('tripDetail')
     static async updateTripDetail(params: TripDetail): Promise<TripDetail> {
-        let tripDetail = await Models.tripDetail.get(params.id);
-        if (!tripDetail)
+        let tripDetail =  await Models.tripDetail.get(params.id);
+        if(!tripDetail) 
             throw new Error(`指定tripDetail不存在, id: ${params.id}`)
         // throw new error.ParamsNotValidError("指定tripDetail不存在, id: ", params.id);
         for (let key in params) {
@@ -404,6 +411,106 @@ class TripPlanModule {
         }
         return tripDetail.save();
     }
+
+    /**
+     * @method 更新tripDetail详情
+     *    1. app进行tripDetail的修改
+     *    2. 预定回调更新tripDetail的reserveStatus状态
+     * 
+     *  1. 待预定 ---> 待提交 ---> 待出票 ---> 出票成功
+     * @param params.reserveStatus {number} 订单状态
+     * @param params.expenditure {number} 订单费用
+     * @param params.orderNo {string} 订单号
+     * @return {Promise<boolan>}
+     */
+    @clientExport
+    static async updateTripDetailReserveStatus(params: TripDetail): Promise<boolean> {
+        let tripDetail =  await Models.tripDetail.get(params.id); 
+        if(!tripDetail) 
+            throw new Error(`指定tripDetail不存在, id: ${params.id}`)
+        for(let key in params) {
+            tripDetail[key] = params[key];
+        }
+
+        //酒店类型个人支付，只修改reserveStatus(预定状态)，status(状态)无需再根据预定状态进行修改
+        if(tripDetail.payType == EPayType.PERSONAL_PAY) {
+            await tripDetail.save();
+        }
+
+        let tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
+        let reserveStatus = params.reserveStatus;
+        if(typeof reserveStatus == 'string')
+            reserveStatus = Number(reserveStatus);
+        let status = tripDetail.status;
+        let tripDetails: TripDetail[];
+        switch(reserveStatus) {
+            case EOrderStatus.WAIT_SUBMIT: //等待创建订单
+            case EOrderStatus.AUDITING:  //等待确认，提交订单
+                tripDetail.status = ETripDetailStatus.WAIT_RESERVE;
+                break;
+            case EOrderStatus.WAIT_TICKET:
+                tripDetail.status = ETripDetailStatus.WAIT_TICKET;
+                break;
+
+            case EOrderStatus.REFUND_SUCCESS: 
+                tripDetail.status = ETripDetailStatus.WAIT_TICKET;
+                if(tripPlan.status == EPlanStatus.COMPLETE || tripPlan.status == EPlanStatus.RESERVED) {
+                    if(new Date(tripPlan.backAt) < new Date()){
+                        throw new Error("该行程时间已过，无法受理退款操作");
+                    } else {
+                        tripPlan.status = EPlanStatus.WAIT_RESERVE;
+                    }
+                }
+                break; 
+            case EOrderStatus.SUCCESS:  //全部已出票，设置该tripPlan为已预定
+            case EOrderStatus.ENDORSEMENT_SUCCESS: 
+                tripDetail.status = ETripDetailStatus.COMPLETE;
+                tripDetails = await Models.tripDetail.all({where: {id: {$ne: tripDetail.id}, tripPlanId: tripDetail.tripPlanId, 
+                    status: [ETripDetailStatus.WAIT_RESERVE, ETripDetailStatus.WAIT_TICKET]}});
+                if(!tripDetails || !tripDetails.length)
+                    tripPlan.status = EPlanStatus.RESERVED;
+                tripDetails = [];
+                break;
+            case EOrderStatus.FAILED: 
+                tripDetail.status = ETripDetailStatus.WAIT_RESERVE;
+                break;
+            case EOrderStatus.ENDORSEMENT_CREATED:  //改签单创建，为等待预定
+                tripDetail.status = ETripDetailStatus.WAIT_TICKET;
+                if(tripPlan.status == EPlanStatus.RESERVED || tripPlan.status == EPlanStatus.COMPLETE) {
+                    tripPlan.status = EPlanStatus.WAIT_RESERVE;
+                }
+                break;     
+            case EOrderStatus.WAIT_REFUND: 
+                break;
+            case EOrderStatus.WAIT_PAYMENT:  //订单未支付，默认设置为等待预定
+                tripDetail.status = ETripDetailStatus.WAIT_RESERVE; 
+                if(tripPlan.status == EPlanStatus.COMPLETE || tripPlan.status == EPlanStatus.RESERVED) {
+                    if(new Date(tripPlan.backAt) < new Date()){
+                        throw new Error("该行程时间已过，无法退款");
+                    } else {
+                        tripPlan.status = EPlanStatus.WAIT_RESERVE;
+                    }
+                }
+                break;
+            case EOrderStatus.NO_SUFFICIENT_MONEY:  //酒店订单余额不足，默认设置为等待预定
+                tripDetail.status = ETripDetailStatus.WAIT_RESERVE;
+                if(tripPlan.status == EPlanStatus.COMPLETE || tripPlan.status == EPlanStatus.RESERVED) {
+                    if(new Date(tripPlan.backAt) < new Date()){
+                        throw new Error("该行程时间已过，无法退款");
+                    } else {
+                        tripPlan.status = EPlanStatus.WAIT_RESERVE;
+                    }
+                }
+                break;
+            default: 
+                break;     
+        }  
+        await tripDetail.save();
+        await tripPlan.save();
+        return true;
+    }
+
+ 
 
     /**
      * 根据出差记录id获取出差详情(包括已删除的)
@@ -439,7 +546,12 @@ class TripPlanModule {
         return true;
     }
 
-    /* 提交计划单
+    /**
+     * @method 提交计划单
+     *  前提: 当所有的tripPlan的状态为 EAuditStatus.WAIT_COMMIT, 允许提交票据审核
+     *      1. 更新所有的tripDetail的状态为审核中， tripPlan状态同步更新到审核中
+     *      2. 补助类型： 无票据，状态为完成， 有票据，状态为审核中
+     *      3. 发送通知
      * @param params
      * @returns {*}
      */
@@ -454,8 +566,9 @@ class TripPlanModule {
         staffId = currentStaff.id;
 
         let tripPlan = await Models.tripPlan.get(id);
-        if (tripPlan.status != EPlanStatus.WAIT_COMMIT) {
-            throw { code: -2, msg: "该出差计划不能提交，请检查状态" };
+
+        if(tripPlan.auditStatus != EAuditStatus.WAIT_COMMIT) {
+            throw {code: -2, msg: "该出差计划不能提交，请检查状态"};
         }
 
         let tripDetails = await tripPlan.getTripDetails({ where: {} });
@@ -463,13 +576,13 @@ class TripPlanModule {
             let tripDetailPromise = tripDetails.map(async function (detail) {
                 if (detail.type == ETripType.SUBSIDY) {
                     let invoices = await detail.getInvoices();
-                    if (invoices && invoices.length > 0) {
-                        return tryUpdateTripDetailStatus(detail, EPlanStatus.AUDITING);
-                    } else {
-                        return tryUpdateTripDetailStatus(detail, EPlanStatus.COMPLETE);
+                    if(invoices && invoices.length > 0){
+                        return tryUpdateTripDetailStatus(detail, ETripDetailStatus.AUDITING);
+                    }else{
+                        return tryUpdateTripDetailStatus(detail, ETripDetailStatus.COMPLETE);
                     }
-                } else {
-                    return tryUpdateTripDetailStatus(detail, EPlanStatus.AUDITING);
+                }else{
+                    return tryUpdateTripDetailStatus(detail, ETripDetailStatus.AUDITING);
                 }
             });
             await (Promise.all(tripDetailPromise));
@@ -479,7 +592,7 @@ class TripPlanModule {
         await log.save();
         //更改状态
         tripPlan.isCommit = true;
-        tripPlan = await tryUpdateTripPlanStatus(tripPlan, EPlanStatus.AUDITING);
+        tripPlan = await tryUpdateTripPlanStatus(tripPlan, EAuditStatus.AUDITING);
 
         let notifyUrl: string = ""
         if (params.version == 2) {
@@ -535,6 +648,9 @@ class TripPlanModule {
     /**
      * 审核出差票据
      * modified 票据审核改为仅对单张票据的审核
+     * 新版预定系统和报销系统：
+     *  1. 所有的tripDetail都走报销流程，此时需要将tripPlan的status同步更新到完成状态
+     *  2. 部分tripDetail走报销流程， 此时tripPlan的status保持不变
      *
      * @param params
      */
@@ -545,16 +661,22 @@ class TripPlanModule {
 
         let tripDetail = await Models.tripDetail.get(params.id);
         let tripPlanId = tripDetail.tripPlanId;
-        let getTripPlan = await Models.tripPlan.get(tripPlanId);
-        let companyId = getTripPlan.companyId;
+        let tripPlan = await Models.tripPlan.get(tripPlanId);
+
+        
+        let companyId = tripPlan.companyId;
         let company = await Models.company.get(companyId);
         let SAVED2SCORE = company.scoreRatio;
-        if ((tripDetail.status != EPlanStatus.AUDITING) && (tripDetail.status != EPlanStatus.AUDIT_NOT_PASS)) {
+ 
+        // if((tripDetail.status != EPlanStatus.AUDITING) && (tripDetail.status != EPlanStatus.AUDIT_NOT_PASS)) {
+        //     throw L.ERR.TRIP_PLAN_STATUS_ERR();
+        // }
+        if((tripDetail.status != ETripDetailStatus.AUDITING) && (tripDetail.status != ETripDetailStatus.AUDIT_NOT_PASS)) {
             throw L.ERR.TRIP_PLAN_STATUS_ERR();
         }
 
         let audit = params.auditResult;
-        let tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
+        // let tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
         let templateValue: any = {};
         let logResult = '通过';
 
@@ -567,12 +689,16 @@ class TripPlanModule {
         invoice.status = audit == EAuditStatus.INVOICE_PASS ? EInvoiceStatus.AUDIT_PASS : EInvoiceStatus.AUDIT_FAIL;
         invoice.auditRemark = params.reason || '';
 
+
+
         return DB.transaction(async function (t) {
 
             invoice = await invoice.save();
 
+
             let allInvoicePass = true,
                 isNeedMsg = true;
+        
             let invoices = await tripPlan.getTripInvoices();
             let tripDetailInvoices: TripDetailInvoice[] = [];
             invoices.map(async (item) => {
@@ -587,7 +713,7 @@ class TripPlanModule {
                         allInvoicePass = false;
 
                         //一张票据不过，对应的 tripPlan 不过
-                        tripPlan.status = EPlanStatus.AUDIT_NOT_PASS;
+                        // tripPlan.status = EPlanStatus.AUDIT_NOT_PASS;
                         tripPlan.auditStatus = EAuditStatus.INVOICE_NOT_PASS;
                         break;
                 }
@@ -609,7 +735,16 @@ class TripPlanModule {
             let templateName: string;
             if (allInvoicePass) {
                 //所有票据都审核通过
-                tripPlan.status = EPlanStatus.COMPLETE;
+                let tripDetails = await tripPlan.getTripDetails({
+                    where: {
+                        type: [ETripType.BACK_TRIP, ETripType.HOTEL, ETripType.OUT_TRIP],
+                        reserveStatus: {$ne: EOrderStatus.WAIT_SUBMIT}
+                    }
+                });
+                //只有当所有的tripDetail都需要上传票据时，该tripPlan的状态置为完成
+                if(!tripDetails || tripDetails.length == 0)
+                    tripPlan.status = EPlanStatus.COMPLETE;
+                    
                 tripPlan.auditStatus = EAuditStatus.INVOICE_PASS;
                 tripPlan.allInvoicesPassTime = new Date();
                 let savedMoney = tripPlan.budget - tripPlan.expenditure;
@@ -665,15 +800,14 @@ class TripPlanModule {
             }
 
             //处理对应的tripDetail 的状态
-
             let tripDetailAllPass = true;
 
-            tripDetailInvoices.map((oneInvoice) => {
+            tripDetailInvoices.map((oneInvoice: any)=>{
                 switch (oneInvoice.status) {
                     case EInvoiceStatus.AUDIT_FAIL:
                         logResult = '未通过';
                         tripDetailAllPass = false;
-                        tripDetail.status = EPlanStatus.AUDIT_NOT_PASS;
+                        tripDetail.status = ETripDetailStatus.AUDIT_NOT_PASS;
                         break;
                     case EInvoiceStatus.AUDIT_PASS:
                         break;
@@ -683,8 +817,8 @@ class TripPlanModule {
                 }
             });
 
-            if (tripDetailAllPass) {
-                tripDetail.status = EPlanStatus.COMPLETE;
+            if(tripDetailAllPass){
+                tripDetail.status = ETripDetailStatus.COMPLETE;
             }
 
             /* =================== END =================== */
@@ -824,7 +958,7 @@ class TripPlanModule {
             await tripDetail.reload();
             await invoice.reload();
 
-            tripDetail.status = EPlanStatus.AUDITING;
+            tripDetail.status = ETripDetailStatus.AUDITING;
             await tripDetail.save();
             invoice.status = EInvoiceStatus.WAIT_AUDIT;
             await invoice.save();
@@ -874,14 +1008,14 @@ class TripPlanModule {
                     throw L.ERR.TRIP_DETAIL_FOUND()
                 }
 
-                if (tripDetail.status == EPlanStatus.COMPLETE) { //如果detail的状态是完成，不能再做处理。
+                if (tripDetail.status == ETripDetailStatus.COMPLETE) { //如果detail的状态是完成，不能再做处理。
                     logger.error(`tripDetail:${expend.id} 已经处于完成状态`)
                     throw L.ERR.TRIP_PLAN_STATUS_ERR()
                 }
 
                 tripDetail.expenditure = expend.expenditure
                 tripDetail.personalExpenditure = expend.personalExpenditure
-                tripDetail.status = EPlanStatus.COMPLETE //从oa系统中传递过来意味着报销完成。
+                tripDetail.status = ETripDetailStatus.COMPLETE //从oa系统中传递过来意味着报销完成。
 
                 await tripDetail.save()
 
@@ -945,7 +1079,7 @@ class TripPlanModule {
             let tripDetails = await tripPlan.getTripDetails({})
 
             tripDetails.map(async (item) => { //判断是否tripPlan的所有的detail都审核完成。
-                if (item.status != EPlanStatus.COMPLETE) {
+                if (item.status != ETripDetailStatus.COMPLETE) {
                     allDetailsPass = false
                     isNeedMsg = false
                 }
@@ -1288,7 +1422,8 @@ class TripPlanModule {
     }
 
     /**
-     * 撤销tripPlan
+     * @method 撤销tripPlan
+     *      仅无预算或者等待预定的行程可以取消
      * @param params
      * @returns {boolean}
      */
@@ -1296,14 +1431,15 @@ class TripPlanModule {
     @requireParams(['id'], ['remark'])
     static async cancelTripPlan(params: { id: string, remark?: string }): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
-        if (tripPlan.status != EPlanStatus.NO_BUDGET && tripPlan.status != EPlanStatus.WAIT_UPLOAD) {
-            throw { code: -2, msg: "出差记录状态不正确！" };
+
+        if( tripPlan.status != EPlanStatus.NO_BUDGET && tripPlan.status != EPlanStatus.WAIT_RESERVE) {
+            throw {code: -2, msg: "出差记录状态不正确！"};
         }
 
         let tripDetails = await tripPlan.getTripDetails({});
         if (tripDetails && tripDetails.length > 0) {
             await Promise.all(tripDetails.map((d) => {
-                d.status = EPlanStatus.CANCEL;
+                d.status = ETripDetailStatus.CANCEL;
                 return d.save();
             }));
         }
@@ -1319,6 +1455,20 @@ class TripPlanModule {
     //
     /********************************************统计相关API***********************************************/
 
+    /**
+     * @method 按月统计行程单
+     *      1. 某段时间内取消和无预算的行程单
+     *      2. 某段时间内完成的行程
+     * 
+     * @return {
+     *      momth: Date, 
+     *      staffNum: number, 
+     *      projectNum: number,
+     *      dynamicBudget: number,
+     *      savedMoney: number,
+     *      expenditure: number
+     * }
+     */
     @clientExport
     @requireParams(['companyId', 'month'])
     static async statisticTripPlanOfMonth(params: { companyId: string, month: string }) {
@@ -1408,6 +1558,10 @@ class TripPlanModule {
         return [];
     }
 
+    /**
+     * @method 统计审核通过时间在一定范围内的行程单信息：
+     *  包括: 总行程数、 行程完成总数、计划支出、累计支出、动态预算总金额、实际总支出，节省总额
+     */
     @clientExport
     @requireParams([], ['startTime', 'endTime', 'isStaff'])
     static async statisticTripBudget(params: { startTime?: Date, endTime?: Date, isStaff?: boolean }) {
@@ -1430,7 +1584,9 @@ class TripPlanModule {
             completeSql += ` and account_id='${staff.id}'`;
         }
 
-        let planSql = `${completeSql}  and status in (${EPlanStatus.WAIT_UPLOAD}, ${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDITING}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.COMPLETE})`;
+
+        // let planSql = `${completeSql}  and status in (${EPlanStatus.WAIT_UPLOAD}, ${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDITING}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.COMPLETE})`;
+        let planSql = `${completeSql}  and (status not in (${EPlanStatus.CANCEL, EPlanStatus.NO_BUDGET}));`
         completeSql += ` and status=${EPlanStatus.COMPLETE}`;
 
         let savedMoneyCompleteSql = completeSql + ' and is_special_approve = false';
@@ -1549,9 +1705,14 @@ class TripPlanModule {
         let company = staff.company;
         let completeSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status=${EPlanStatus.COMPLETE} and all_invoices_pass_time>'${params.startTime}' and all_invoices_pass_time<'${params.endTime}'`;
         let savedMoneyCompleteSql = '';
-        let planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
-        if (params.unComplete) {
-            planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
+
+        
+        let planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status not in (${EPlanStatus.CANCEL}, ${EPlanStatus.NO_BUDGET}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
+        // let planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
+        
+        if(params.unComplete){
+            planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status not in (${EPlanStatus.CANCEL}, ${EPlanStatus.NO_BUDGET}, ${EPlanStatus.COMPLETE}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
+            // planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
         }
 
         let type = params.type;
@@ -1596,7 +1757,8 @@ class TripPlanModule {
             selectKey = 'departmentId';
             completeSql = `from trip_plan.trip_plans as p, department.staff_departments as s, department.departments as d where d.deleted_at is null and s.deleted_at is null and p.deleted_at is null and p.company_id ='${company.id}'  and s.staff_id=p.account_id and d.id=s.department_id and p.all_invoices_pass_time>'${params.startTime}' and p.all_invoices_pass_time<'${params.endTime}'`;
             savedMoneyCompleteSql = '';
-            planSql = `${completeSql} and p.status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE})`;
+            // planSql = `${completeSql} and p.status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}, ${EPlanStatus.COMPLETE})`;
+            planSql = `${completeSql} and p.status not in (${EPlanStatus.CANCEL},${EPlanStatus.NO_BUDGET})`;
             completeSql += ` and p.status=${EPlanStatus.COMPLETE}`;
             if (params.keyWord) {
                 let pagers = await Models.department.find({ where: { name: { $like: `%${params.keyWord}%` }, companyId: company.id }, order: [['created_at', 'desc']] });
@@ -1758,7 +1920,7 @@ class TripPlanModule {
         tripPlan.project = project;
         tripPlan.title = approve.title;//project名称
         tripPlan.account = account;
-        tripPlan.status = EPlanStatus.WAIT_UPLOAD;
+        tripPlan.status = EPlanStatus.WAIT_RESERVE;    
         tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo'); //获取出差计划单号
         tripPlan.query = query;
         tripPlan.isSpecialApprove = approve.isSpecialApprove;
@@ -1811,8 +1973,9 @@ class TripPlanModule {
             data.reason = reason;
             data.type = tripType;
             data.budget = price;
-            data.accountId = account.id;
-            data.status = EPlanStatus.WAIT_UPLOAD;
+            data.accountId= account.id;
+            data.status = ETripDetailStatus.WAIT_RESERVE;
+            data.reserveStatus = EOrderStatus.WAIT_SUBMIT;
             data.tripPlanId = tripPlan.id;
             data.budgetInfo = budget;
             switch (tripType) {
@@ -1881,8 +2044,11 @@ class TripPlanModule {
                             data.subsidyMoney = t.price;
                             data.budget = t.price;
                             data.subsidyTemplateId = t.id;
-                            if (t.subsidyType && !t.subsidyType.isUploadInvoice) {
-                                data.status = EPlanStatus.WAIT_COMMIT;
+                            if(t.subsidyType && !t.subsidyType.isUploadInvoice){
+                                data.status = ETripDetailStatus.COMPLETE;  //补助无需上传票据，此时原版设置为WAIT_COMMIT, 新版设置为COMPLETE
+                            } else {
+                                data.status = ETripDetailStatus.WAIT_UPLOAD;
+                                tripPlan.auditStatus = EAuditStatus.WAIT_UPLOAD;
                             }
                             detail = Models.tripDetailSubsidy.create(data);
                             ps.push(detail);
@@ -2361,7 +2527,7 @@ class TripPlanModule {
             tripDetail.expenditure = 0;
         }
         await updateTripDetailExpenditure(tripDetail);
-        await tryUpdateTripDetailStatus(tripDetail, EPlanStatus.WAIT_COMMIT);
+        await tryUpdateTripDetailStatus(tripDetail, ETripDetailStatus.WAIT_COMMIT);
         return tripDetailInvoice;
     }
 
@@ -2464,7 +2630,7 @@ class TripPlanModule {
         tripDetailInvoice = await tripDetailInvoice.save()
         let tripDetail = await Models.tripDetail.get(tripDetailInvoice.tripDetailId);
         await updateTripDetailExpenditure(tripDetail);
-        await tryUpdateTripDetailStatus(tripDetail, EPlanStatus.WAIT_COMMIT);
+        await tryUpdateTripDetailStatus(tripDetail, ETripDetailStatus.WAIT_COMMIT);
         return tripDetailInvoice;
     }
 
@@ -2479,9 +2645,9 @@ class TripPlanModule {
         await updateTripDetailExpenditure(tripDetail);
         let invoices = await tripDetail.getInvoices();
         if (invoices && invoices.length) {
-            await tryUpdateTripDetailStatus(tripDetail, EPlanStatus.WAIT_COMMIT);
+            await tryUpdateTripDetailStatus(tripDetail, ETripDetailStatus.WAIT_COMMIT);
         } else {
-            await tryUpdateTripDetailStatus(tripDetail, EPlanStatus.WAIT_UPLOAD);
+            await tryUpdateTripDetailStatus(tripDetail, ETripDetailStatus.WAIT_UPLOAD);
         }
         return true;
     }
@@ -2762,10 +2928,12 @@ class TripPlanModule {
         const tripPlan = await Models.tripPlan.get(params.id)
         if (moment().milliseconds < moment(tripPlan.backAt).milliseconds)
             throw new L.ERROR_CODE_C(400, '该行程当前无法完成')
-        if (tripPlan.status != EPlanStatus.COMPLETE || tripPlan.auditStatus != EAuditStatus.INVOICE_PASS)
+
+        if (tripPlan.status != EPlanStatus.RESERVED || tripPlan.auditStatus != EAuditStatus.NO_NEED_AUDIT)
             throw new L.ERROR_CODE_C(400, '该行程当前无法完成')
-        const tripDetails: TripDetail[] = await tripPlan.getTripDetails({
-            where: { status: EPlanStatus.COMPLETE, reserveStatus: { $in: [EOrderStatus.ENDORSEMENT_SUCCESS, EOrderStatus.SUCCESS] } }
+
+        const tripDetails: TripDetail[] = await tripPlan.getTripDetails({ 
+            where: { status: EPlanStatus.COMPLETE, reserveStatus: {$in: [EOrderStatus.ENDORSEMENT_SUCCESS, EOrderStatus.SUCCESS]}}
         })
         // if (R.any((t: TripDetail) => t.status != -4, tripDetails))
         //     throw new L.ERROR_CODE_C(400, '该行程需要上传票据')
@@ -2803,6 +2971,7 @@ class TripPlanModule {
         if (costCenterDeploy)
             await costCenterDeploy.checkoutBudgetNotice()
     }
+   
 
 }
 
@@ -2847,20 +3016,27 @@ async function updateTripPlanExpenditure(tripPlan: TripPlan) {
     return tripPlan.save();
 }
 
-//尝试修改tripDetail状态
-async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: EPlanStatus): Promise<TripDetail> {
-    /*if ([ETripType.SUBSIDY].indexOf(tripDetail.type) >= 0 ) {
-        tripDetail.status = status;
-    } else {
 
-    }*/
-    switch (status) {
-        case EPlanStatus.WAIT_UPLOAD:
+/**
+ * @method 更新tripDetail的状态(status), 同时触发tripPlan的状态的检查并更新
+ * 触发情况：
+ *      1. 用户触发提交审核，
+ *      2. 预定回调，更新预定状态，同步更新status和tripPlan的状态
+ * @param tripDetail 
+ * @param status {ETripDetailStatus} 
+ * @return Promise<TripDetail>
+ */
+async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDetailStatus) :Promise<TripDetail> {
+
+    let auditStatus: EAuditStatus = EAuditStatus.NO_NEED_AUDIT;
+    switch(status) {
+        case ETripDetailStatus.WAIT_UPLOAD:
             tripDetail.status = status;
+            auditStatus = EAuditStatus.WAIT_UPLOAD;
             break;
-        case EPlanStatus.WAIT_COMMIT:
-            //如果票据不为空,则设置状态为可提交状态
-            let invoices = await Models.tripDetailInvoice.find({ where: { tripDetailId: tripDetail.id } });
+
+        case ETripDetailStatus.WAIT_COMMIT:   //如果票据不为空,则设置状态为可提交状态
+            let invoices = await Models.tripDetailInvoice.find({where: {tripDetailId: tripDetail.id}});
             let isInWaitCommit = true;
             invoices.map((item: any) => {
                 if (item.status == EInvoiceStatus.AUDIT_FAIL) {
@@ -2869,56 +3045,124 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: EPlanSt
                 return item;
             });
             if (invoices && invoices.length && isInWaitCommit) {
-                tripDetail.status = EPlanStatus.WAIT_COMMIT;
+                tripDetail.status = ETripDetailStatus.WAIT_COMMIT;
             }
+            auditStatus = EAuditStatus.WAIT_COMMIT;
             break;
-        case EPlanStatus.AUDITING:
-            if ([EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.WAIT_COMMIT].indexOf(tripDetail.status) >= 0) {
-                tripDetail.status = status;
+
+        case ETripDetailStatus.AUDITING:
+            if ([ ETripDetailStatus.AUDIT_NOT_PASS, ETripDetailStatus.WAIT_COMMIT].indexOf(tripDetail.status) >= 0) {
+                tripDetail.status = status;  
             }
+            auditStatus = EAuditStatus.WAIT_COMMIT;
             break;
-        case EPlanStatus.COMPLETE:
-            if (EPlanStatus.AUDITING == tripDetail.status) {
+        case ETripDetailStatus.COMPLETE:
+            if (ETripDetailStatus.AUDITING == tripDetail.status) {
                 tripDetail.status = status;
             } else if (tripDetail.type == ETripType.SUBSIDY) {
                 tripDetail.status = status;
             }
+            auditStatus = EAuditStatus.WAIT_COMMIT;
             break;
+
+        case ETripDetailStatus.WAIT_RESERVE: 
+            tripDetail.status = status;
+            break;
+        case ETripDetailStatus.WAIT_TICKET:
+            tripDetail.status = status;  
+            break;    
     }
 
     //更改行程详情状态
     tripDetail = await tripDetail.save()
     //尝试更改行程状态
     let tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
-    await tryUpdateTripPlanStatus(tripPlan, status);
+    
+
+    await tryUpdateTripPlanStatus(tripPlan, auditStatus);
 
     return tripDetail;
 }
 
-//尝试修改tripPlan状态
-async function tryUpdateTripPlanStatus(tripPlan: TripPlan, status: EPlanStatus): Promise<TripPlan> {
+// //尝试修改tripDetail状态
+// async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: EPlanStatus) :Promise<TripDetail> {
+//     /*if ([ETripType.SUBSIDY].indexOf(tripDetail.type) >= 0 ) {
+//         tripDetail.status = status;
+//     } else {
+
+//     }*/
+//     switch(status) {
+//         case EPlanStatus.WAIT_UPLOAD:
+//             tripDetail.status = status;
+//             break;
+//         case EPlanStatus.WAIT_COMMIT:
+//             //如果票据不为空,则设置状态为可提交状态
+//             let invoices = await Models.tripDetailInvoice.find({where: {tripDetailId: tripDetail.id}});
+//             let isInWaitCommit = true;
+//             invoices.map((item: any)=>{
+//                 if(item.status == EInvoiceStatus.AUDIT_FAIL){
+//                     isInWaitCommit = false;
+//                 }
+//                 return item;
+//             });
+//             if (invoices && invoices.length && isInWaitCommit) {
+//                 tripDetail.status = EPlanStatus.WAIT_COMMIT;
+//             }
+//             break;
+//         case EPlanStatus.AUDITING:
+//             if ([ EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.WAIT_COMMIT].indexOf(tripDetail.status) >= 0) {
+//                 tripDetail.status = status;
+//             }
+//             break;
+//         case EPlanStatus.COMPLETE:
+//             if (EPlanStatus.AUDITING == tripDetail.status) {
+//                 tripDetail.status = status;
+//             }else if(tripDetail.type == ETripType.SUBSIDY){
+//                 tripDetail.status = status;
+//             }
+//             break;
+//     }
+
+//     //更改行程详情状态
+//     tripDetail = await tripDetail.save()
+//     //尝试更改行程状态
+//     let tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
+//     await tryUpdateTripPlanStatus(tripPlan, status);
+
+//     return tripDetail;
+// }
+
+/**
+ * @method 更新tripPlan状态
+ *   1. 目标状态为EAuditStatus.AUDITING: 查找所有tripDetail的status满足一定条件，且reserveStatus为WAIT_SUBMIT,
+ *          
+ * @param tripPlan {TripPlan}
+ * @param status {EPlanStatus} 
+ */
+async function tryUpdateTripPlanStatus(tripPlan: TripPlan, status: EAuditStatus) :Promise<TripPlan>{
     let cannotStatus = {};
     //变tripPlan状态需要tripDetail不能包含状态
-    cannotStatus[EPlanStatus.WAIT_UPLOAD] = [];
+    cannotStatus[EAuditStatus.WAIT_UPLOAD] = [];
 
     //tripPlan 进入等待上传状态，需要tripDetail中没有 审核不通过的单子
-    cannotStatus[EPlanStatus.WAIT_COMMIT] = _.concat([EPlanStatus.WAIT_UPLOAD, EPlanStatus.AUDIT_NOT_PASS], cannotStatus[EPlanStatus.WAIT_UPLOAD]);
-    cannotStatus[EPlanStatus.AUDITING] = _.concat([EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.WAIT_COMMIT], cannotStatus[EPlanStatus.WAIT_COMMIT]);
-    cannotStatus[EPlanStatus.COMPLETE] = _.concat([EPlanStatus.AUDITING], cannotStatus[EPlanStatus.AUDITING]);
+    cannotStatus[EAuditStatus.WAIT_COMMIT] = _.concat([ETripDetailStatus.WAIT_UPLOAD, ETripDetailStatus.AUDIT_NOT_PASS, ETripDetailStatus.CANCEL, ETripDetailStatus.NO_BUDGET],  cannotStatus[EAuditStatus.WAIT_UPLOAD]);
+    cannotStatus[EAuditStatus.AUDITING] = _.concat([ETripDetailStatus.AUDIT_NOT_PASS, ETripDetailStatus.WAIT_COMMIT], cannotStatus[EAuditStatus.WAIT_COMMIT]);
+    cannotStatus[EAuditStatus.INVOICE_PASS] = _.concat([ETripDetailStatus.AUDITING], cannotStatus[EAuditStatus.AUDITING]);
+
     //变tripPlan状态,只关注出发交通,返回交通,住宿,特殊审批类型
     let preTripTypeNeeds = [ETripType.BACK_TRIP, ETripType.OUT_TRIP, ETripType.HOTEL, ETripType.SPECIAL_APPROVE];
     //更新行程状态
     let tripDetails = await Models.tripDetail.find({
         where: {
             tripPlanId: tripPlan.id,
-            type: { $in: preTripTypeNeeds },
-            status: { $in: cannotStatus[status] },    //无预算, 等待上传
+            type: {$in: preTripTypeNeeds},
+            status: {$in: cannotStatus[status]},    //无预算, 等待上传
         },
         order: [['created_at', 'asc']]
     });
 
     if (!tripDetails || !tripDetails.length) {
-        tripPlan.status = status;
+        tripPlan.auditStatus = status;
         await tripPlan.save();
     }
     return tripPlan;
