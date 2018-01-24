@@ -37,7 +37,7 @@
           "host": "${{hosts.main.addr}}",
           "port": "${{hosts.main.port}}"
         },
-        "modules": ["attachments", "checkcode", "ctripapi", "dida", "flight", "jpush", "wechat", "sms"]
+        "modules": ["checkcode", "ctripapi", "dida", "flight", "jpush", "wechat", "sms"]
       }
     ]
   },
@@ -123,6 +123,11 @@
     "orderLink": "${JL_APP_PERMISSION_ORDER_LINK}",
     "appId": "${JL_APP_PERMISSION_APP_ID}",
     "appSecret": "${JL_APP_PERMISSION_APP_SECRET}"
+  },
+  "supplier": {
+    "orderLink": "${JL_APP_PERMISSION_ORDER_LINK}",
+    "appId": "${JL_APP_SUPPLIER_APP_ID}",
+    "appSecret": "${JL_APP_SUPPLIER_APP_SECRET}"
   },
   "is_init_test_company": true,
   "ddconfig": {

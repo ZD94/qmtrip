@@ -4,6 +4,7 @@
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { Models } from '_types'
 import { ETripType, EInvoiceType, ICreateBudgetAndApproveParams, ICreateBudgetAndApproveParamsNew, ISegment, QMEApproveStatus, EApproveResult } from "_types/tripPlan";
+import {Approve} from '_types/approve';
 import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
 import L from '@jingli/language';
@@ -158,7 +159,7 @@ export default class ApiTravelBudget {
         //     console.log(err);
         // }
         let companyInfo = await ApiTravelBudget.getCompanyInfo();
-        let data = companyInfo.data;
+        let data = companyInfo;
         let authData = [];
         data.map((item) => {
             let obj = {};
@@ -213,8 +214,12 @@ export default class ApiTravelBudget {
         // } catch (err) {
         //     console.log(err);
         // }
-        let companyInfo = await ApiTravelBudget.getCompanyInfo();
-        let data = companyInfo.data;
+
+
+
+
+        let companyInfo = await ApiTravelBudget.getCompanyInfo(); 
+        let data = companyInfo;
         let authData = [];
         data.map((item) => {
             let obj = {};
@@ -730,7 +735,7 @@ export default class ApiTravelBudget {
         let approve;
         if (!isIntoApprove) {  //判断是否是审批人查看审批单时进行的第二次拉取数据 
             //创建approve，获得approveId用于URL和更新
-            approve = Models.approve.create({
+            approve = Approve.Create({
                 approveUser: params.approveUser.id,
                 type: EApproveType.TRAVEL_BUDGET,
                 companyId: companyId,
@@ -775,7 +780,7 @@ export default class ApiTravelBudget {
             if (item.tripType != ETripType.SUBSIDY) {
                 tripNumCost = tripNumCost + 1;
             }
-            if (item.price <= 0) {
+            if (item.price < 0) {
                 eachBudgetSegIsOk = false;
             }
             totalBudget += item.price;
@@ -857,25 +862,25 @@ export default class ApiTravelBudget {
     }
 
     //获取公司信息
-    static async getCompanyInfo() {
+    static async getCompanyInfo(sname?:string) {
         let currentStaff = await Staff.getCurrent();
         let staffId = currentStaff.id;
         let staff = await Models.staff.get(staffId);
         let companyId = staff.company.id;
-        // let companyId = "935fbeb0-acd0-11e7-ab1e-bdc5d9f254d3"
         let result;
         try {
             result = await RestfulAPIUtil.operateOnModel({
                 params: {
                     method: 'put',
                     fields: {
-                        companyId: companyId
+                        companyId: companyId,
+                        sname
                     }
                 },
                 addUrl: `${companyId}/data`,
                 model: "TmcSupplier"
             })
-            return result
+            return result.data
         } catch (err) {
             console.log(err);
         }
@@ -1000,6 +1005,9 @@ export default class ApiTravelBudget {
         } catch (err) {
             console.log(err);
         }
+        if(!result || !result.data) {
+            throw new Error("拉取预算失败");
+        }
         return result.data;
     }
 
@@ -1061,16 +1069,6 @@ export default class ApiTravelBudget {
         })
     }
 }
-
-// let paramss = {
-//     checkInDate: "2018-01-20",
-//     checkOutDate: "2018-01-21",
-//     cityId: "CT_131",
-//     travelPolicyId: "dklfklsdklmfsmldfkdsmkfsdfs"
-// }
-// setTimeout(async () => {
-//     await  ApiTravelBudget.getHotelsData(paramss)
-// }, 8000);
 
 let params = {
     "originPlace": "CT_131",

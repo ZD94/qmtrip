@@ -2,6 +2,7 @@
  * Created by wyl on 2017/10/30.
  */
 
+
 'use strict';
 import {Models} from "_types/index";
 import {DB} from '@jingli/database';
@@ -10,6 +11,9 @@ var _ = require("lodash");
 var request = require("request-promise");
 const config = require("@jingli/config");
 import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
+import {EventListener} from "_types/eventListener";
+import {EApproveChannel} from "_types/approve/types";
+var C = require("@jingli/config");
 
 export class EventModule{
     async sendEventNotice (params: {eventName: string, data: any, companyId: string}): Promise<any> {
@@ -25,7 +29,17 @@ export class EventModule{
         if(eventListeners && eventListeners[0] && eventListeners[0].length){
             eventListeners = eventListeners[0];
         }else{
-            eventListeners = [];
+            let company = await Models.company.get(companyId);
+            if(company && (company.oa == EApproveChannel.QM || company.oa == EApproveChannel.DING_TALK)){
+                let approveServerUrl = C.approveServerUrl;
+                approveServerUrl = approveServerUrl + `/tripApprove/receive`;
+                let eventListener = EventListener.create({events: ["NEW_TRIP_APPROVE","TRIP_APPROVE_UPDATE","TRIP_APPROVE_CHANGE","TRIP_APPROVE_CANCLE"],
+                    url: approveServerUrl, method: "post", companyId: companyId});
+                await eventListener.save();
+                eventListeners = [eventListener];
+            }else{
+                eventListeners = [];
+            }
         }
 
         if(eventListeners && eventListeners.length){
