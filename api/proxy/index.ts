@@ -7,7 +7,7 @@ import { AuthRequest, AuthResponse } from '_types/auth';
 import {getCompanyTokenByAgent} from '../restful';
 var ApiTravelBudget = require('api/travelBudget');
 var requestp = require("request-promise");
-import { EOrderStatus, EOrderType, TripDetail } from "_types/tripPlan";
+import { EOrderStatus, EOrderType, TripDetail, ETripDetailStatus, EPayType } from "_types/tripPlan";
 var request = require("request");
 var path = require("path");
 var _ = require("lodash");
@@ -168,6 +168,14 @@ class Proxy {
                     staff = await Models.staff.get(tripDetail.accountId);
                 }
                 listeningon = `${config.orderSysConfig.tripDetailMonitorUrl}/${tripDetail.id}`;
+                if(req.body.payType == EPayType.PERSONAL_PAY) {
+                    await API.tripPlan.updateTripDetail({
+                        tripDetailId,
+                        payType: req.body.payType,
+                        status: ETripDetailStatus.WAIT_UPLOAD,
+                        reserveStatus: EOrderStatus.WAIT_SUBMIT
+                    });
+                }
             }
 
             let addon:{[index: string]: any} = {
@@ -233,7 +241,7 @@ class Proxy {
             if(typeof result == 'string') {
                 result = JSON.parse(result);
             }
-            if(result.code == 0 && tripDetail && tripDetail.orderType == null) {
+            if(result.code == 0 && tripDetail && body.orderType == null) {
                 tripDetail.orderType = body.orderType != null? body.orderType: null;  //后期返回的orderNo统一后，使用此确定订单类型
                 await tripDetail.save();
             }
