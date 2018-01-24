@@ -218,7 +218,7 @@ export default class ApiTravelBudget {
 
 
         let companyInfo = await ApiTravelBudget.getCompanyInfo(); 
-        let data = companyInfo.data;
+        let data = companyInfo;
         let authData = [];
         data.map((item) => {
             let obj = {};
