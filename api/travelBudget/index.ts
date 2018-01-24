@@ -780,7 +780,7 @@ export default class ApiTravelBudget {
             if (item.tripType != ETripType.SUBSIDY) {
                 tripNumCost = tripNumCost + 1;
             }
-            if (item.price <= 0) {
+            if (item.price < 0) {
                 eachBudgetSegIsOk = false;
             }
             totalBudget += item.price;
