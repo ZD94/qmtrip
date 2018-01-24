@@ -168,10 +168,10 @@ class Proxy {
                     staff = await Models.staff.get(tripDetail.accountId);
                 }
                 listeningon = `${config.orderSysConfig.tripDetailMonitorUrl}/${tripDetail.id}`;
-                if(req.body.payType == EPayType.PERSONAL_PAY) {
+                if(req.body.jlPayType == EPayType.PERSONAL_PAY) {
                     await API.tripPlan.updateTripDetail({
-                        tripDetailId,
-                        payType: req.body.payType,
+                        id: tripDetailId,
+                        payType: req.body.jlPayType,
                         status: ETripDetailStatus.WAIT_UPLOAD,
                         reserveStatus: EOrderStatus.WAIT_SUBMIT
                     });
@@ -215,6 +215,10 @@ class Proxy {
             let url = `${config.orderSysConfig.orderLink}${pathstring}`;
             let result:any;
             console.log("===========url: ", url, '===tripDetailId: ', tripDetailId, '====>method:', req.method, '=======> body: ', req.body);
+            if(url == 'https://l.jingli365.com/svc/java-jingli-order1/tmc/orderHotel') {
+                console.log("=====result: ", url)
+                return null;
+            }
             try{
                 result = await new Promise((resolve,reject) => {  
                     request({ url, headers, body, qs,
