@@ -2937,7 +2937,7 @@ class TripPlanModule {
         })
         // if (R.any((t: TripDetail) => t.status != -4, tripDetails))
         //     throw new L.ERROR_CODE_C(400, '该行程需要上传票据')
-        const promiseAry = []
+        const promises = []
 
         // Fetch orders and calculate saving
         tripPlan.expenditure = R.sumBy(R.prop('expenditure'), tripDetails)
@@ -2953,13 +2953,13 @@ class TripPlanModule {
                 costCenterId: tripPlan.costCenterId, type: BUDGET_CHANGE_TYPE.CONSUME_BUDGET, relateId: params.id,
                 value: tripPlan.expendBudget, oldBudget: costCenterDeploy.expendBudget, remark: `完成行程花费预算`
             });
-            promiseAry.push(budgetLog.save())
+            promises.push(budgetLog.save())
             costCenterDeploy.expendBudget += tripPlan.expenditure
-            promiseAry.push(costCenterDeploy.save())
+            promises.push(costCenterDeploy.save())
         }
-        promiseAry.push(tripPlan.save())
+        promises.push(tripPlan.save())
         await DB.transaction(async function () {
-            await Promise.all(promiseAry)
+            await Promise.all(promises)
             // Special approve can't settle reward
             if (tripPlan.isSpecialApprove) return
 
