@@ -404,8 +404,9 @@ function transferFlightData(meiyaFlightData: any, originalData) {
         let agentCabin = {
             "name": 2,
             "price": item.price,
-            "discount": 0.67,
+            "discount": item.discount,
             "cabin": item.cabin,
+            "seatNum":item.seatNum,
             "urlParams": {
                 "No": meiyaFlightData.flightNo,
                 "priceId": item.priceID
