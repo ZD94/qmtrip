@@ -72,6 +72,7 @@ export default class TripApproveModule {
         let project: Project;
         let projectId = query.projectId;
         let projectName = query.projectName;
+        let goBackPlace = query.goBackPlace;
         if(projectId){
             project = await Models.project.get(projectId);
         }else if(projectName){
@@ -106,6 +107,9 @@ export default class TripApproveModule {
                     let arrivalInfo = await API.place.getCityInfo({cityCode: placeCode, companyId: approve.companyId}) || {name: null};
                     let destination: IDestination = {city:arrivalInfo.id, arrivalDateTime: segment.leaveDate, leaveDateTime: segment.goBackDate};
                     arrivalCityCodes.push(arrivalInfo.id);
+                    if (i == destinationPlacesInfo.length - 1) {
+                        arrivalCityCodes.push(goBackPlace);
+                    }
                     destinations.push(destination);
                     if(i == (destinationPlacesInfo.length - 1)){//目的地存放最后一个目的地
                         tripApprove.arrivalCityCode = arrivalInfo.id;
