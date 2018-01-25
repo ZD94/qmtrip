@@ -1839,7 +1839,8 @@ class TripPlanModule {
 
     /**
      * @method saveTripPlan
-     * 生成出差计划单
+     * 生成出差计划单:
+     *   注意，补助无需上传票据，此时直接status设置成完成wait_commit
      * @param params
      * @returns {Promise<TripPlan>}
      */
@@ -2051,7 +2052,7 @@ class TripPlanModule {
                             data.budget = t.price;
                             data.subsidyTemplateId = t.id;
                             if(t.subsidyType && !t.subsidyType.isUploadInvoice){
-                                data.status = ETripDetailStatus.COMPLETE;  //补助无需上传票据，此时原版设置为WAIT_COMMIT, 新版设置为COMPLETE
+                                data.status = ETripDetailStatus.WAIT_COMMIT;  //补助无需上传票据，此时原版设置为WAIT_COMMIT, 新版设置为WAIT_COMMIT
                             } else {
                                 data.status = ETripDetailStatus.WAIT_UPLOAD;
                                 tripPlan.auditStatus = EAuditStatus.WAIT_UPLOAD;
@@ -2750,9 +2751,9 @@ class TripPlanModule {
                             if(tdetail.type != ETripType.SUBSIDY && tdetail.status == ETripDetailStatus.COMPLETE){   //already reserved tripDetail exists
                                 hasReserved ++;
                             }
-                            if(tdetail.type == ETripType.SUBSIDY) {  //将补助全视为需要上传票据，无需上传票据的补助，其状态直接是complete
+                            if(tdetail.type == ETripType.SUBSIDY) {  //将补助全视为需要上传票据，无需上传票据的补助，
                                 needInvoiceUploaded ++;
-                                if(tdetail.status == ETripDetailStatus.COMPLETE) invoiceUploaded++;
+                                if(tdetail.status == ETripDetailStatus.WAIT_COMMIT) invoiceUploaded++;
                             }
                             if(tdetail.type == ETripType.HOTEL && tdetail.payType == EPayType.PAY_ON_ARRIVAL){//酒店到店付，此处不需要修改tripdetail的状态
                                 needInvoiceUploaded++;
