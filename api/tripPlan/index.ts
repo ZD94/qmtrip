@@ -2055,7 +2055,7 @@ class TripPlanModule {
                                 data.status = ETripDetailStatus.WAIT_COMMIT;  //补助无需上传票据，此时原版设置为WAIT_COMMIT, 新版设置为WAIT_COMMIT
                             } else {
                                 data.status = ETripDetailStatus.WAIT_UPLOAD;
-                                tripPlan.auditStatus = EAuditStatus.WAIT_UPLOAD;
+                                tripPlan.auditStatus = EAuditStatus.NO_NEED_AUDIT; //产品需求，行程未到期，不能进入待传票据按钮
                             }
                             detail = Models.tripDetailSubsidy.create(data);
                             ps.push(detail);
@@ -2725,6 +2725,7 @@ class TripPlanModule {
 
     /**
      * @method 定时器处理过期的行程单及其详情
+     *   支持行程未到期，无审核入口和显示审核入口
      *   注意：补助是否传票据，在tripPlan创建时已经确定tripPlan的auditStatus是否需要传票据
      *        酒店到店付需要上传票据，
      *        若全部在鲸力系统预定，且补助需要上传票据，且在行程结束前票据已完全提交，此时需要将tripPlan置为wait_commit
@@ -2778,7 +2779,7 @@ class TripPlanModule {
                         if(!hasReserved) {
                             tripPlans[i].status = EPlanStatus.EXPIRED;
                         }
-                        if(invoiceUploaded == needInvoiceUploaded) {
+                        if(invoiceUploaded == needInvoiceUploaded) { //支持行程未结束，上传票据，此时若票据上传完成，tripPlan的状态为待提交审核
                             tripPlans[i].auditStatus = EAuditStatus.WAIT_COMMIT;      
                         } else {
                             tripPlans[i].auditStatus = EAuditStatus.WAIT_UPLOAD;
