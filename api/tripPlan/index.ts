@@ -2721,7 +2721,10 @@ class TripPlanModule {
 
     static __initHttpApp = require('./invoice');
 
-    //TODO add scheduleTask
+    /**
+     * @method 定时器处理过期的行程单及其详情
+     *   注意：补助是否传票据，在tripPlan创建时已经确定tripPlan的auditStatus是否需要传票据
+     */
     static _scheduleTask() {
         let taskId = "autoCheckTripPlanIsOverDate";
         logger.info('run task  ' + taskId);
@@ -2730,18 +2733,37 @@ class TripPlanModule {
                 let tripPlans: TripPlan[] = await Models.tripPlan.all({where: {status: EPlanStatus.WAIT_RESERVE}});
                 for (let i = 0; i < tripPlans.length; i++) {
                     let tripEndTime = tripPlans[i].backAt;
-                    let dateNow = moment().unix();
-                    if (dateNow < moment(tripEndTime).unix()) {   //this tripPlan not reach the end Time
-                        //do nothing
-                    } else {  //this tripPlan just reach or overdue, change the tripDetails' and tripPlan its status
-                        //change the tripPlan's status
-                        tripPlans[i].status = EPlanStatus.RESERVED;
+                    if (new Date() > new Date(tripEndTime))  {  //this tripPlan just reach or overdue, change the tripDetails' and tripPlan its status, set tripPlan as expired, tripDetail as wait_upload
+                        //change the tripPlan's status                        
                         let tripPlanId = tripPlans[i].id;
                         //get tripDetails and find the unreserved ones then change their status
-                        let tripDetails: TripDetail[] = await Models.tripDetail.all({where: {tripPlanId: tripPlanId, status: ETripDetailStatus.WAIT_RESERVE}});
+                        let tripDetails: TripDetail[] = await Models.tripDetail.all({where: {tripPlanId: tripPlanId}});
+
+                        let hasBooked = false;
+                        let needInvoice = false;
+                        await Promise.all(tripDetails.map(async (tdetail: TripDetail) => {
+                            if(tdetail.type != ETripType.SUBSIDY &&tdetail.status == ETripDetailStatus.COMPLETE){   //already reserved tripDetail exists
+                                    hasBooked = true;
+                            }
+                            if(tdetail.status == ETripDetailStatus.WAIT_RESERVE || tdetail.status == ETripDetailStatus.WAIT_TICKET) {
+                                tdetail.status = ETripDetailStatus.WAIT_UPLOAD;
+                                needInvoice = true;
+                                await tdetail.save();
+                            }
+                        }));
+          
                         for (let j = 0; j < tripDetails.length; j++) {
                             tripDetails[j].status = ETripDetailStatus.WAIT_UPLOAD;
                             await tripDetails[j].save();
+                        }
+                        if(hasBooked) {
+                            tripPlans[i].status = EPlanStatus.RESERVED;
+                        }
+                        if(!hasBooked) {
+                            tripPlans[i].status = EPlanStatus.EXPIRED;
+                        }
+                        if(needInvoice) {
+                            tripPlans[i].auditStatus = EAuditStatus.WAIT_UPLOAD;
                         }
                         await tripPlans[i].save();
                     }
