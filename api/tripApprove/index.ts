@@ -596,12 +596,8 @@ export default class TripApproveModule {
         let approveCompany = approveUser.company;
         if(approveResult == 1){
             approveResult = EApproveResult.PASS;
-            approve.status = EApproveStatus.SUCCESS;
-            approve.tripApproveStatus = QMEApproveStatus.PASS;
         }else{
             approveResult = EApproveResult.REJECT;
-            approve.status = EApproveStatus.FAIL;
-            approve.tripApproveStatus = QMEApproveStatus.REJECT;
         }
 
         if(typeof approve.data == 'string'){
@@ -683,6 +679,7 @@ export default class TripApproveModule {
                 log.remark = extraStr+`审批通过`;
                 await log.save();
                 approve.status = EApproveStatus.SUCCESS;
+                approve.tripApproveStatus = QMEApproveStatus.PASS;
                 approve.approveRemark = '审批通过';
             }else if(approveResult == EApproveResult.REJECT) {
                 let tripApprove = await API.tripApprove.getTripApprove({id: approve.id});
@@ -692,6 +689,7 @@ export default class TripApproveModule {
                 log.remark = notifyRemark;
                 await log.save();
                 approve.status = EApproveStatus.FAIL;
+                approve.tripApproveStatus = QMEApproveStatus.REJECT;
                 approve.approveRemark = notifyRemark;
             }
             approve.approveDateTime = new Date();
@@ -728,6 +726,7 @@ export default class TripApproveModule {
 
         }).catch(async function(err){
             if(err) {
+                await approve.reload();
                 await approveCompany.reload();
                 throw L.ERR.INTERNAL_ERROR();
             }

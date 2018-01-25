@@ -1868,6 +1868,7 @@ class TripPlanModule {
         let tripPlan = TripPlan.create({ id: approve.id });
         let arrivalCityCodes: any[] = [];//目的地代码
         let project: Project;
+        let goBackPlace = query.goBackPlace;
         if (query.projectName) {
             project = await API.tripPlan.getProjectByName({
                 companyId: company.id, name: query.projectName,
@@ -1893,6 +1894,9 @@ class TripPlanModule {
                     }
                     let arrivalInfo = await API.place.getCityInfo({ cityCode: place, companyId: company.id }) || { name: null };
                     arrivalCityCodes.push(arrivalInfo.id);
+                    if (i == destinationPlacesInfo.length - 1) {
+                        arrivalCityCodes.push(goBackPlace);
+                    }
                     if (i == (destinationPlacesInfo.length - 1)) {
                         tripPlan.arrivalCityCode = arrivalInfo.id;
                         tripPlan.arrivalCity = arrivalInfo.name;
