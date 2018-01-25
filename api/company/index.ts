@@ -108,7 +108,16 @@ export default class CompanyModule {
             }
         }
 
-        let staff = Staff.create({ email: params.email, name: params.userName, mobile: params.mobile || null, roleId: EStaffRole.OWNER, pwd: md5(pwd), status: params.status, isValidateMobile: params.isValidateMobile });
+        let staff = Staff.create({ 
+            email: params.email, 
+            name: params.userName,
+            mobile: params.mobile || null, 
+            roleId: EStaffRole.OWNER, 
+            pwd: md5(pwd), 
+            status: params.status, 
+            isValidateMobile: params.isValidateMobile,
+            isNeedChangePwd: false
+        });
         let company = Company.create(params);
         company.domainName = domain;
         company.expiryDate = moment().add(DEFAULT_EXPIRE_MONTH, 'months').toDate();
