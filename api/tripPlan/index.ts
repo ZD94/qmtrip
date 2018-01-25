@@ -2742,7 +2742,7 @@ class TripPlanModule {
                         let hasBooked = false;
                         let needInvoice = false;
                         await Promise.all(tripDetails.map(async (tdetail: TripDetail) => {
-                            if(tdetail.status == ETripDetailStatus.COMPLETE){   //already reserved tripDetail exists
+                            if(tdetail.type != ETripType.SUBSIDY &&tdetail.status == ETripDetailStatus.COMPLETE){   //already reserved tripDetail exists
                                     hasBooked = true;
                             }
                             if(tdetail.status == ETripDetailStatus.WAIT_RESERVE || tdetail.status == ETripDetailStatus.WAIT_TICKET) {
