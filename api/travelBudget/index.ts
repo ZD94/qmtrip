@@ -4,6 +4,7 @@
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { Models } from '_types'
 import { ETripType, EInvoiceType, ICreateBudgetAndApproveParams, ICreateBudgetAndApproveParamsNew, ISegment, QMEApproveStatus, EApproveResult } from "_types/tripPlan";
+import {Approve} from '_types/approve';
 import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
 import L from '@jingli/language';
@@ -734,7 +735,7 @@ export default class ApiTravelBudget {
         let approve;
         if (!isIntoApprove) {  //判断是否是审批人查看审批单时进行的第二次拉取数据 
             //创建approve，获得approveId用于URL和更新
-            approve = Models.approve.create({
+            approve = Approve.Create({
                 approveUser: params.approveUser.id,
                 type: EApproveType.TRAVEL_BUDGET,
                 companyId: companyId,
@@ -779,7 +780,7 @@ export default class ApiTravelBudget {
             if (item.tripType != ETripType.SUBSIDY) {
                 tripNumCost = tripNumCost + 1;
             }
-            if (item.price <= 0) {
+            if (item.price < 0) {
                 eachBudgetSegIsOk = false;
             }
             totalBudget += item.price;

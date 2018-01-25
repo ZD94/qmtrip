@@ -141,7 +141,12 @@ class Proxy {
             
         });
 
-        // verifyToken
+        /**
+         * @method 提供中台、app端的订单转发请求
+         *  1. app端根据tripDetailId创、退、改一系列订单请求
+         *  2. app端根据staffid, 订单状态获取该员工的相应订单
+         *  3. 中台根据companyid获取该公司所有订单
+         */
         app.all(/^\/order.*$/, cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function) => {
   
             let staff: Staff = await Staff.getCurrent();
@@ -158,6 +163,7 @@ class Proxy {
                 }
             }
             let tripDetail: TripDetail;
+            //若tripDetailId存在，为创、退、改相关订单请求封装特殊请求参数
             if(tripDetailId) {
                 tripDetail = await Models.tripDetail.get(tripDetailId)
                 if(!tripDetail) {
@@ -168,10 +174,10 @@ class Proxy {
                     staff = await Models.staff.get(tripDetail.accountId);
                 }
                 listeningon = `${config.orderSysConfig.tripDetailMonitorUrl}/${tripDetail.id}`;
-                if(req.body.payType == EPayType.PERSONAL_PAY) {
+                if(req.body.jlPayType == EPayType.PERSONAL_PAY) {
                     await API.tripPlan.updateTripDetail({
-                        tripDetailId,
-                        payType: req.body.payType,
+                        id: tripDetailId,
+                        payType: req.body.jlPayType,
                         status: ETripDetailStatus.WAIT_UPLOAD,
                         reserveStatus: EOrderStatus.WAIT_SUBMIT
                     });
@@ -241,8 +247,8 @@ class Proxy {
             if(typeof result == 'string') {
                 result = JSON.parse(result);
             }
-            if(result.code == 0 && tripDetail && body.orderType == null) {
-                tripDetail.orderType = body.orderType != null? body.orderType: null;  //后期返回的orderNo统一后，使用此确定订单类型
+            if(result.code == 0 && tripDetail && (body.orderType || body.orderType == 0)) {
+                tripDetail.orderType = body.orderType;  //后期返回的orderNo统一后，使用此确定订单类型
                 await tripDetail.save();
             }
 
