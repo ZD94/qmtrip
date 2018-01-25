@@ -90,54 +90,50 @@ class Proxy {
 
         app.all(/^\/supplier.*$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: any, res: Response, next: Function) => {
 
-            let {staffid, companyid, accountid} = req.headers;
-            let params =  req.body;
-            if(req.method == 'GET') {
-                params = req.query;
+            //公有云验证
+            let {authstr, staffid}  = req.headers;
+            let staff: Staff = await Models.staff.get(staffid);
+            let companyId: string = staff.company.id;
+            let companyToken: string = await getCompanyTokenByAgent(companyId);
+            if (!companyToken) {
+                throw new Error('换取 token 失败！');
             }
-            let staff = await Models.staff.get(staffid);
-            let appSecret = config.supplier.appSecret;
-            let pathstring = req.path;
-            let timestamp = Math.floor(Date.now()/1000);
-            pathstring = pathstring.replace("/supplier", '');
-            let sign = genSign(params, timestamp, appSecret)
-            let url = `${config.supplier.orderLink}${pathstring}`;
+            
+            //request to JLCloud(jlbudget) 
+            let result: any;
+            let pathstr: string = req.path;
+            pathstr = pathstr.replace('/supplier', '');
+            let JLOpenApi: string = config.cloud;
+            JLOpenApi = JLOpenApi.replace('/cloud', '');
+            let url: string = `${JLOpenApi}${pathstr}`;
 
-            let companyInfo = await ApiTravelBudget.getCompanyInfo();
-            let identify = companyInfo.identify;
-            if (typeof identify == 'object') {
-                identify = JSON.stringify(identify);
-            }
-            identify = encodeURIComponent(identify);
-            let isNeedAuth: string = req.headers['isneedauth'];
-            let auth: string = (isNeedAuth == '1') ? identify : '';
-
-            console.log("===>timestamp:  ", timestamp, "===>sign", sign, '====>url', url, '===>appid: ', config.supplier.appId, '===>request params: ', params) 
-            let result = await new Promise((resolve, reject) => {
-                return request({
-                    uri: url,
-                    body: req.body,
-                    json: true,
-                    method: req.method,
-                    qs: req.query,
-                    headers: {
-                        auth: auth,
-                        supplier: req.headers['supplier'] || 'meiya',
-                        sign: sign,
-                        appid: config.supplier.appId,
-                        staffid: staff.id, 
-                        companyid: staff.companyId,
-                        accountid: staff.accountId
-                    }
-                }, (err, resp, result) => {
-                    if (err) {
-                        reject(err);
-                    }
-                    resolve(result);
+            try {
+                result = await new Promise((resolve, reject) => {
+                    return request({
+                        uri: url,
+                        body: req.body,
+                        json: true,
+                        method: req.method,
+                        qs: req.query,
+                        headers: {
+                            token: companyToken,
+                            companyId: companyId
+                        }
+                    }, (err, resp, result) => {
+                        if (err) {
+                            reject(err);
+                        }
+                        resolve(result);
+                    });
                 });
-            });
-            console.log("===supplier===result: ", result)
-            return res.json(result);
+                return res.json(result);
+            } catch(err) {
+                if (err) {
+                    console.error('ERROR SUPPLIER In api/proxy/index:   ', err);
+                    return null;
+                }
+            }
+
             
         });
 

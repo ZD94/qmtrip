@@ -12,6 +12,7 @@ import Logger from '@jingli/logger';
 let logger = new Logger("tripPlan");
 const config = require("@jingli/config");
 
+let scheduler = require('common/scheduler');
 let moment = require("moment");
 require("moment-timezone");
 import _ = require('lodash');
@@ -1867,6 +1868,7 @@ class TripPlanModule {
         let tripPlan = TripPlan.create({ id: approve.id });
         let arrivalCityCodes: any[] = [];//目的地代码
         let project: Project;
+        let goBackPlace = query.goBackPlace;
         if (query.projectName) {
             project = await API.tripPlan.getProjectByName({
                 companyId: company.id, name: query.projectName,
@@ -1892,6 +1894,9 @@ class TripPlanModule {
                     }
                     let arrivalInfo = await API.place.getCityInfo({ cityCode: place, companyId: company.id }) || { name: null };
                     arrivalCityCodes.push(arrivalInfo.id);
+                    if (i == destinationPlacesInfo.length - 1) {
+                        arrivalCityCodes.push(goBackPlace);
+                    }
                     if (i == (destinationPlacesInfo.length - 1)) {
                         tripPlan.arrivalCityCode = arrivalInfo.id;
                         tripPlan.arrivalCity = arrivalInfo.name;
@@ -2715,6 +2720,57 @@ class TripPlanModule {
 
 
     static __initHttpApp = require('./invoice');
+
+    /**
+     * @method 定时器处理过期的行程单及其详情
+     *   注意：补助是否传票据，在tripPlan创建时已经确定tripPlan的auditStatus是否需要传票据
+     */
+    static _scheduleTask() {
+        let taskId = "autoCheckTripPlanIsOverDate";
+        logger.info('run task  ' + taskId);
+        scheduler('0 0 0 * * *', taskId, function() {
+            (async() => {
+                let tripPlans: TripPlan[] = await Models.tripPlan.all({where: {status: EPlanStatus.WAIT_RESERVE}});
+                for (let i = 0; i < tripPlans.length; i++) {
+                    let tripEndTime = tripPlans[i].backAt;
+                    if (new Date() > new Date(tripEndTime))  {  //this tripPlan just reach or overdue, change the tripDetails' and tripPlan its status, set tripPlan as expired, tripDetail as wait_upload
+                        //change the tripPlan's status                        
+                        let tripPlanId = tripPlans[i].id;
+                        //get tripDetails and find the unreserved ones then change their status
+                        let tripDetails: TripDetail[] = await Models.tripDetail.all({where: {tripPlanId: tripPlanId}});
+
+                        let hasBooked = false;
+                        let needInvoice = false;
+                        await Promise.all(tripDetails.map(async (tdetail: TripDetail) => {
+                            if(tdetail.type != ETripType.SUBSIDY &&tdetail.status == ETripDetailStatus.COMPLETE){   //already reserved tripDetail exists
+                                    hasBooked = true;
+                            }
+                            if(tdetail.status == ETripDetailStatus.WAIT_RESERVE || tdetail.status == ETripDetailStatus.WAIT_TICKET) {
+                                tdetail.status = ETripDetailStatus.WAIT_UPLOAD;
+                                needInvoice = true;
+                                await tdetail.save();
+                            }
+                        }));
+          
+                        for (let j = 0; j < tripDetails.length; j++) {
+                            tripDetails[j].status = ETripDetailStatus.WAIT_UPLOAD;
+                            await tripDetails[j].save();
+                        }
+                        if(hasBooked) {
+                            tripPlans[i].status = EPlanStatus.RESERVED;
+                        }
+                        if(!hasBooked) {
+                            tripPlans[i].status = EPlanStatus.EXPIRED;
+                        }
+                        if(needInvoice) {
+                            tripPlans[i].auditStatus = EAuditStatus.WAIT_UPLOAD;
+                        }
+                        await tripPlans[i].save();
+                    }
+                }
+            })
+        });
+    }
 
     /*static _scheduleTask () {
         let taskId = "authApproveTrainPlan";
