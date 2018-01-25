@@ -400,12 +400,30 @@ export function handleFlightData(meiyaFlightData, originalData) {
 }
 
 function transferFlightData(meiyaFlightData: any, originalData) {
+    let name;
     let cabins = meiyaFlightData.flightPriceInfoList.map((item)=>{
+        switch (item.cabin){
+            case "经济舱":
+                name = 2
+            break;
+            case "头等舱":
+                name = 3
+            break;
+            case "商务舱":
+                name = 4
+            break;
+            case "高端经济舱":
+                name = 5
+            break;
+            default:
+                name = 0
+        }
         let agentCabin = {
-            "name": 2,
+            name,
             "price": item.price,
-            "discount": 0.67,
+            "discount": item.discount,
             "cabin": item.cabin,
+            "seatNum":item.seatNum,
             "urlParams": {
                 "No": meiyaFlightData.flightNo,
                 "priceId": item.priceID
@@ -506,8 +524,40 @@ function transferTrainData(meiyaTrainData: any, originalData) {
         price = item.SeatPrice
     }
     let cabins = meiyaTrainData.SeatList.map((item)=>{
+        let name:any ;
+        switch (item.SeatName){
+            case '商务座':
+                name = 1
+            break;
+            case '一等座':
+                name = 2
+            break;
+            case '二等座':
+                name = 3
+            break;
+            case '特等座':
+                name = 4
+            break;
+            case "高级软卧":
+                name = 5
+            break;
+            case "软卧":
+                name = 6
+            break;
+            case "硬卧":
+                name = 7
+            break;
+            case '软座':
+                name = 8
+            break;
+            case "硬座":
+                name = 9
+            break;
+            default:
+            name = 0
+        }
         let agentCabin = {
-            name: 3,
+            name,
             price: item.SeatPrice,
             cabin: item.SeatName,
             urlParams: {

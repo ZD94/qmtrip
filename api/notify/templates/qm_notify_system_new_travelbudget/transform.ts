@@ -11,7 +11,7 @@ require("moment-timezone")
 export = async function transform(values: {staffId: string,
     staff: Staff, MPlaneLevel: object,   MTrainLevel: object, MHotelLevel: object,
     travelPolicy: {[key: string]: any}, cacheId: string, totalBudget: number, budgets: ITravelBudgetInfo[],
-    query: object, destinationPlacesInfo: any, cityMap: any, date: string, staffMap: {[key: string]: Staff}
+    query: object, destinationPlacesInfo: any, cityMap: any, date: string, staffs: Staff[]
 }): Promise<any>{
     let cityMap = {};
     let staffMap = {};
@@ -104,15 +104,12 @@ export = async function transform(values: {staffId: string,
         query.staffList = [staff.id];
     }
 
-    let staffIds = query.staffList;
+    let staffIds: string[] = query.staffList;
     if(typeof staffIds == 'string'){
         staffIds = JSON.parse(staffIds);
     }
-    await Promise.all(staffIds.map(async function(item: string, index: number){
-        let s = await Models.staff.get(item);
-        staffMap[item] = s;
-    }))
-    values.staffMap = staffMap;
+
+    values.staffs = await Promise.all(staffIds.map(id => Models.staff.get(id)))
     values.date = moment().format('YYYY-MM-DD HH:mm');
 
     return values;
