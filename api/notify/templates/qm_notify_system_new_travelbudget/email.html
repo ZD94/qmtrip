@@ -42,14 +42,7 @@
     </tr>
     <tr>
         <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px; ">出差人</td>
-        <td style="padding-left: 20px;font-size: 16px;">
-            <% _.forEach(query.staffList, function(item, index) { %>
-            <%=staffMap[item].name%>
-            <%if(index != (query.staffList.length - 1)){%>
-            、
-            <%}%>
-            <%}) %>
-        </td>
+        <td style="padding-left: 20px;font-size: 16px;"><%= staffs.map(s => s.name).join('、') %></td>
     </tr>
 </table>
 
@@ -66,15 +59,7 @@
     border-collapse: collapse;" >
     <tr>
         <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">标准</td>
-        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">
-            <% _.forEach(query.staffList, function(item, index) { %>
-            <%=staffMap[item].name%>
-            <%if(index != (query.staffList.length - 1)){%>
-            、
-            <%}%>
-            <%}) %>
-        </td>
-
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;"><%= travelPolicy && travelPolicy.name%></td>
     </tr>
     <tr>
         <td width="80" style="padding-left: 20px;font-size: 16px;">国内飞机</td>
@@ -134,14 +119,7 @@
     </tr>
     <tr>
         <td width="80" style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">明细</td>
-        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;">
-            <% _.forEach(query.staffList, function(item, index) { %>
-            <%=staffMap[item].name%>
-            <%if(index != (query.staffList.length - 1)){%>
-            、
-            <%}%>
-            <%}) %>
-        </td>
+        <td style="padding-left: 20px; background-color: #f8f8f8;color: #9b9b9b;font-size: 16px;"></td>
     </tr>
     <% _.forEach(budgets, function(b, index) { %>
     <%if(b.tripType == 0 || b.tripType == 1 || b.tripType == 2){%>
