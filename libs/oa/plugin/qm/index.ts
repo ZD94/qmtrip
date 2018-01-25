@@ -48,14 +48,14 @@ export class QmPlugin extends AbstractOAPlugin {
         if(tripApprove.budgetInfo)
             delete tripApprove.budgetInfo;
         let returnApprove = await API.eventListener.sendEventNotice({eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: company.id});
-        if(returnApprove || returnApprove == 0){
+        if(returnApprove){
             return DB.transaction(async function(t){
                 approve.oaAddResult = OAAddResult.SUCCESS;
                 await approve.save();
                 let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, approveStatus: EApproveResult.WAIT_APPROVE, remark: '提交审批单，等待审批'});
 
                 await tripPlanLog.save();
-                // await API.tripApprove.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});//暂时注掉统一修改通知信息
+                await API.tripApprove.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
                 // await API.tripApprove.sendTripApproveNoticeToSystem({approveId: tripApprove.id});
 
             }).catch(async function(err){

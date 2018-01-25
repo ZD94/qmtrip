@@ -3,7 +3,7 @@
  */
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { Models } from '_types'
-import { ETripType, EInvoiceType, ICreateBudgetAndApproveParams, ICreateBudgetAndApproveParamsNew, ISegment, QMEApproveStatus, EApproveResult } from "_types/tripPlan";
+import { ETripType, EInvoiceType, ICreateBudgetAndApproveParams, ICreateBudgetAndApproveParamsNew, ISegment, QMEApproveStatus, EApproveResult, EBackOrGo } from "_types/tripPlan";
 import {Approve} from '_types/approve';
 import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
@@ -41,6 +41,7 @@ import { EApproveType, STEP, EApproveStatus } from '_types/approve';
 import { Transaction } from 'sequelize';
 import CompanyModule from 'api/company';
 import {ECostCenterType} from "_types/costCenter/costCenter";
+import {emitter, EVENT} from "libs/oa";
 
 var CLSNS = CLS.getNamespace('dnode-api-context');
 var request = require("request");
@@ -591,13 +592,17 @@ export default class ApiTravelBudget {
                     let tripApprove = await API.tripApprove.retrieveDetailFromApprove(params);
 
                     let returnApprove = await API.eventListener.sendEventNotice({ eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: approve.companyId });
-                    let tripPlanLog = Models.tripPlanLog.create({
-                        tripPlanId: approve.id,
-                        userId: approve.submitter,
-                        remark: '提交审批单，等待审批',
-                        approveStatus: EApproveResult.WAIT_APPROVE
-                    });
-                    await tripPlanLog.save();
+                    if(returnApprove){
+                        let tripPlanLog = Models.tripPlanLog.create({
+                            tripPlanId: approve.id,
+                            userId: approve.submitter,
+                            remark: '提交审批单，等待审批',
+                            approveStatus: EApproveResult.WAIT_APPROVE
+                        });
+                        await tripPlanLog.save();
+                        await API.tripApprove.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
+                    }
+
                 }
             } else {  //最终结果已经返回过，现在只用新预算中的最终结果进行比较，若大于现在显示的最终预算则更新，否则不更新
                 console.log('second time------------->');
@@ -835,7 +840,7 @@ export default class ApiTravelBudget {
             console.log('--------budgetResult', budgetResult.step);
             if (budgetResult.step == 'FIN' && eachBudgetSegIsOk) {
                 console.log('updateBudget first time');
-                ApiTravelBudget.updateBudget({
+                await ApiTravelBudget.updateBudget({
                     approveId: approveId,
                     budgetResult: budgetResult,
                     isFinalFirstResponse: (isIntoApprove ? false : true)
@@ -919,15 +924,20 @@ export default class ApiTravelBudget {
                 budget.cabinClass = budget.cabin;
                 budget.originPlace = budget.fromCity;
                 budget.destination = budget.toCity;
-                budget.tripType = ETripType.OUT_TRIP;
+
                 budget.price = budget.price * count;
                 budget.unit = budget.unit;
                 budget.rate = budget.rate;
                 budget.type = budget.trafficType;
+                budget.tripType = ETripType.OUT_TRIP;
+                if(budget.backOrGo == EBackOrGo.BACK_TRIP){
+                    budget.tripType = ETripType.BACK_TRIP;
+                }
                 return budget;
 
             case EBudgetType.SUBSIDY:
                 budget.price = budget.price * count;
+                budget.tripType = ETripType.SUBSIDY;
                 if (budget.templates) {
                     budget.templates.forEach((t) => {
                         t.price = t.price * count;
