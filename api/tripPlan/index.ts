@@ -2725,6 +2725,9 @@ class TripPlanModule {
     /**
      * @method 定时器处理过期的行程单及其详情
      *   注意：补助是否传票据，在tripPlan创建时已经确定tripPlan的auditStatus是否需要传票据
+     *        酒店到店付需要上传票据，
+     *        若全部在鲸力系统预定，且补助需要上传票据，且在行程结束前票据已完全提交，此时需要将tripPlan置为wait_commit
+     *        若全部在鲸力系统预定，且酒店是到店支付，且在行程结束前票据已完全提交，此时需要将tripPlan置为wait_commit
      */
     static _scheduleTask() {
         let taskId = "autoCheckTripPlanIsOverDate";
@@ -2740,30 +2743,43 @@ class TripPlanModule {
                         //get tripDetails and find the unreserved ones then change their status
                         let tripDetails: TripDetail[] = await Models.tripDetail.all({where: {tripPlanId: tripPlanId}});
 
-                        let hasBooked = false;
-                        let needInvoice = false;
+                        let hasReserved = 0;
+                        let needInvoiceUploaded = 0;
+                        let invoiceUploaded = 0;
                         await Promise.all(tripDetails.map(async (tdetail: TripDetail) => {
-                            if(tdetail.type != ETripType.SUBSIDY &&tdetail.status == ETripDetailStatus.COMPLETE){   //already reserved tripDetail exists
-                                    hasBooked = true;
+                            if(tdetail.type != ETripType.SUBSIDY && tdetail.status == ETripDetailStatus.COMPLETE){   //already reserved tripDetail exists
+                                hasReserved ++;
                             }
-                            if(tdetail.status == ETripDetailStatus.WAIT_RESERVE || tdetail.status == ETripDetailStatus.WAIT_TICKET) {
+                            if(tdetail.type == ETripType.SUBSIDY) {  //将补助全视为需要上传票据，无需上传票据的补助，其状态直接是complete
+                                needInvoiceUploaded ++;
+                                if(tdetail.status == ETripDetailStatus.COMPLETE) invoiceUploaded++;
+                            }
+                            if(tdetail.type == ETripType.HOTEL && tdetail.payType == EPayType.PAY_ON_ARRIVAL){//酒店到店付，此处不需要修改tripdetail的状态
+                                needInvoiceUploaded++;
+                                if(tdetail.status == ETripDetailStatus.COMPLETE) invoiceUploaded++;
+                                return tdetail;  
+                            } 
+                            if( (tdetail.status == ETripDetailStatus.WAIT_RESERVE || tdetail.status == ETripDetailStatus.WAIT_TICKET)) {  //对非到店支付、未成功预定的修改其状态      
                                 tdetail.status = ETripDetailStatus.WAIT_UPLOAD;
-                                needInvoice = true;
+                                needInvoiceUploaded++;
                                 await tdetail.save();
                             }
+                            return tdetail;
                         }));
           
                         for (let j = 0; j < tripDetails.length; j++) {
                             tripDetails[j].status = ETripDetailStatus.WAIT_UPLOAD;
                             await tripDetails[j].save();
                         }
-                        if(hasBooked) {
+                        if(hasReserved) {
                             tripPlans[i].status = EPlanStatus.RESERVED;
                         }
-                        if(!hasBooked) {
+                        if(!hasReserved) {
                             tripPlans[i].status = EPlanStatus.EXPIRED;
                         }
-                        if(needInvoice) {
+                        if(invoiceUploaded == needInvoiceUploaded) {
+                            tripPlans[i].auditStatus = EAuditStatus.WAIT_COMMIT;      
+                        } else {
                             tripPlans[i].auditStatus = EAuditStatus.WAIT_UPLOAD;
                         }
                         await tripPlans[i].save();
