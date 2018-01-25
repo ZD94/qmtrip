@@ -79,6 +79,9 @@ deploy:master:
     JL_APP_PERMISSION_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-auth 
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_SUPPLIER_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1
+    JL_APP_SUPPLIER_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
+    JL_APP_SUPPLIER_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
     JL_APP_APPROVE_DATABASE: postgres://times:time0418@l.jingli365.com:15432/trip_approve
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
@@ -116,6 +119,9 @@ deploy:test:
     JL_APP_PERMISSION_ORDER_LINK: https://t.jingli365.com/svc/java-jingli-auth 
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_SUPPLIER_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1
+    JL_APP_SUPPLIER_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
+    JL_APP_SUPPLIER_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
     JL_APP_APPROVE_DATABASE: postgres://times:time0418@l.jingli365.com:15432/trip_approve_test
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
@@ -152,6 +158,9 @@ deploy:release:
     JL_APP_PERMISSION_ORDER_LINK: https://j.jingli365.com/svc/java-jingli-auth 
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_SUPPLIER_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1
+    JL_APP_SUPPLIER_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
+    JL_APP_SUPPLIER_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
     JL_APP_APPROVE_DATABASE: postgres://times:time0418@l.jingli365.com:15432/trip_approve_test1
 
   script:
@@ -193,20 +202,20 @@ deploy:tester:
   when: manual
   environment:
     name: tester/$GITLAB_USER_ID
-    url: https://review.l.jingli365.com/vm/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
+    url: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
   variables:
-    JL_APP_HOST: //review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
-    JL_APP_V2_HOST: //review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
+    JL_APP_HOST: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
+    JL_APP_V2_HOST: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
     JL_APP_REDIS: redis://dockerhost:16379
     JL_APP_POSTGRES: postgres://test:JingliTest0418@dockerhost:15432/tester_$GITLAB_USER_ID
     JL_APP_POSTGRES_INITDB: tester_$GITLAB_USER_ID
     JL_APP_CLOUDKEY: jinglicloud2017
-    JL_APP_CLOUDAPI: http://l.jingli365.com/cloud/api/v1
-    JL_APP_CLOUD: http://l.jingli365.com/cloud
+    JL_APP_CLOUDAPI: https://l.jingli365.com/cloud/api/v1
+    JL_APP_CLOUD: https://l.jingli365.com/cloud
     JL_APP_APPROVE_SERVER_URL: https://l.jingli365.com/proj/svr-trip-approve/api/v1
     JL_APP_TMC: http://t.jingli365.com/proj/svr-tmc
     JL_APP_TMC_FAKE: 0
-    JL_APP_TD_MONITORURL: https://t.jingli365.com/proj/old-qmtrip/api/v1/tripDetail
+    JL_APP_TD_MONITORURL: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME/api/v1/tripDetail
     JL_APP_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1
     JL_APP_MALL_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-mall  
     JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
@@ -217,6 +226,9 @@ deploy:tester:
     JL_APP_PERMISSION_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-auth 
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_SUPPLIER_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1
+    JL_APP_SUPPLIER_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
+    JL_APP_SUPPLIER_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
     JL_APP_APPROVE_DATABASE: postgres://times:time0418@l.jingli365.com:15432/trip_approve_test1
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG

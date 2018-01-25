@@ -300,16 +300,15 @@ export default class SSOModule {
         const usrInfo: WeChatUsrInfo = await API.sso.getUserInfo(params)
         console.log('usr:', usrInfo)
         const companyProperties = await Models.companyProperty.find({
-            where: { type: SPropertyType.WECHAT_CORPID, value: usrInfo.CorpId }
+            where: { type: SPropertyType.WECHAT_CORPID, value: usrInfo.CorpId, deletedAt: null}
         })
-        console.log('companyProps:', companyProperties)
         if (companyProperties.length < 1)
             throw new L.ERROR_CODE_C(404, "该企业尚未授权")
-
+        console.log('company: ', companyProperties)
         const staffProperties = await Models.staffProperty.find({
             where: { type: SPropertyType.WECHAT_UID, value: usrInfo.UserId }
         })
-        console.log('staffProps:', staffProperties)
+        console.log('staffs:', staffProperties)
         if (staffProperties.length < 1)
             throw L.ERR.USER_NOT_EXIST()
 

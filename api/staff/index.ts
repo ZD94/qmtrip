@@ -586,7 +586,7 @@ class StaffModule{
         let xlsObj;
         let defaultDept = await company.getDefaultDepartment();
         let att = await API.attachment.getSelfAttachment({fileId: fileId, accountId: staff.id});
-        if(att){
+        if(att && att.content){
             var content = new Buffer(att.content, 'base64');
             xlsObj = nodeXlsx.parse(content);
         }else{
@@ -606,7 +606,6 @@ class StaffModule{
             departmentMaps[dep.name] = dep;
         }
         let data = xlsObj[1].data;
-
         let items = await Promise.all(data.map(async function(item, index){
             let s = data[index];
             let departments = [];
@@ -762,7 +761,6 @@ class StaffModule{
                 return;
             }
         }));
-
         //addObj中删除重复邮箱的用户
         let repeatEmailStr = repeatEmail.join(",");
         for(let i=0;i<addObj.length;i++){
@@ -808,8 +806,7 @@ class StaffModule{
             await staffAdded.addDepartment(depts);
 
         }));
-
-        await API.attachments.removeFileAndAttach({id: fileId});
+        // await API.attachment.removeFileAndAttach({id: fileId});
         return {addObj: JSON.stringify(addObj), downloadAddObj: JSON.stringify(downloadAddObj), noAddObj: JSON.stringify(noAddObj),
             downloadNoAddObj: JSON.stringify(downloadNoAddObj)};
     }

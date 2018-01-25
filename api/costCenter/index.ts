@@ -250,19 +250,20 @@ export default class CostCenterModule {
     /****************************************BudgetLog end************************************************/
 
     @clientExport
-    static async getAppendBudget(costId: string) {
+    static async getAppendBudget(costId: string, showTime: Date) {
         return _.first(await Models.budgetLog.find({
-            where: { costCenterId: costId, type: BUDGET_CHANGE_TYPE.APPEND_BUDGET },
+            where: { costCenterId: costId, type: BUDGET_CHANGE_TYPE.APPEND_BUDGET, showTime },
             order: [['created_at', 'desc']]
         }))
     }
 
     @clientExport
-    static async appendBudget(costId: string, operator: string, budget: number) {
+    static async appendBudget({ costId, operator, budget, showTime }: { costId: string, operator: string, budget: number, showTime: Date }) {
         const rootDept = await Models.department.get(costId)
         const log = BudgetLog.create({
             companyId: rootDept.company.id, costCenterId: costId, value: budget,
-            type: BUDGET_CHANGE_TYPE.APPEND_BUDGET, staffId: operator, remark: '追加总预算'
+            type: BUDGET_CHANGE_TYPE.APPEND_BUDGET, staffId: operator, remark: '追加总预算',
+            showTime: moment(showTime).format()
         })
         await log.save()
     }
@@ -278,8 +279,7 @@ export default class CostCenterModule {
         const uniqCosts: CostCenterDeploy[] = _.compose(_.compact, _.map(_.first))(costs)
         const planExpends = await Promise.all(uniqCosts.map(cost => cost.getPlanBudget({ startDay: period.start, endDay: period.end })))
         return _.zipWith((cost: CostCenterDeploy, planExpend: number) => {
-            cost.expendBudget += planExpend
-            return cost.toJSON()
+            return { ...cost.toJSON(), expendBudget: cost.expendBudget + planExpend }
         }, uniqCosts, planExpends)
     }
 
@@ -292,20 +292,22 @@ export default class CostCenterModule {
             const { id } = budget
             delete budget.id
             totalBudget += budget.selfTempBudget;
-            const isCreated = (await Models.costCenter.get(id)) == void 0
-            if (isCreated) {
-                promiseAry.push(CostCenter.create({ id, type: ECostCenterType.DEPARTMENT }).save())
+            const nonCreated = (await Models.costCenter.get(id)) == void 0
+            if (nonCreated) {
+                const dept = await Models.department.get(id)
+                promiseAry.push(CostCenter.create({ id, type: ECostCenterType.DEPARTMENT, name: dept.name }).save())
             }
 
-            const costCenterDeploy = await Models.costCenterDeploy.find({ where: { ...where, costCenterId: id } })
-            if (costCenterDeploy.length < 1) {
+            const costCenterDeploys = await Models.costCenterDeploy.find({ where: { ...where, costCenterId: id } })
+            if (costCenterDeploys.length < 1) {
                 promiseAry.push(CostCenterDeploy.create({ costCenterId: id, ...budget, beginDate: period.start, endDate: period.end }).save())
             }
         }
         const rootDept = await Models.department.get(costId)
         promiseAry.push(BudgetLog.create({
             companyId: rootDept.company.id, costCenterId: costId, value: totalBudget,
-            type: BUDGET_CHANGE_TYPE.ADD_BUDGET, staffId: operator, remark: '初始化预算'
+            type: BUDGET_CHANGE_TYPE.ADD_BUDGET, staffId: operator, remark: '初始化预算',
+            showTime: moment(period.start).format()
         }).save())
         await Promise.all(promiseAry)
     }
@@ -321,17 +323,21 @@ export default class CostCenterModule {
         for (let budget of budgets) {
             const { id } = budget
             const cost: CostCenterDeploy = _.first(await Models.costCenterDeploy.find({ where: { ...where, costCenterId: id } }))
+            let dept: Department = null
             if (!cost) {
                 delete budget.id
+                dept = await Models.department.get(id)
+                await CostCenter.create({ id, type: ECostCenterType.DEPARTMENT, name: dept.name }).save()
                 await CostCenterDeploy.create({ costCenterId: id, ...budget, beginDate: period.start, endDate: period.end }).save()
                 continue
             }
             if (cost.selfTempBudget != budget.selfTempBudget) {
                 // log
-                const dept = await Models.department.get(id)
+                if (!dept) dept = await Models.department.get(id)
                 await BudgetLog.create({
                     companyId: dept.company.id, costCenterId: id, value: budget.selfTempBudget - cost.selfTempBudget,
-                    type: BUDGET_CHANGE_TYPE.CHANGE_BUDGET, staffId: operator, remark: `${dept.name}调整预算`
+                    type: BUDGET_CHANGE_TYPE.CHANGE_BUDGET, staffId: operator, remark: `${dept.name}调整预算`,
+                    showTime: moment(period.start).format()
                 }).save()
                 cost.selfTempBudget = budget.selfTempBudget
             }
@@ -371,7 +377,8 @@ export default class CostCenterModule {
         const rootDept = await Models.department.get(costId)
         promiseAry.push(BudgetLog.create({
             companyId: rootDept.company.id, costCenterId: costId, value: totalBudget + root.selfBudget,
-            type: BUDGET_CHANGE_TYPE.APPLY_BUDGET, staffId: operator, remark: '新预算启用'
+            type: BUDGET_CHANGE_TYPE.APPLY_BUDGET, staffId: operator, remark: '新预算启用',
+            showTime: moment(period.start).format()
         }).save())
         promiseAry.push(root.save())
         await Promise.all(promiseAry);
@@ -380,10 +387,16 @@ export default class CostCenterModule {
     @clientExport
     static async setEarlyWarning(costId: string,
         setting: { type: number, rate: number, audienceTypes: number[] },
-        period: { start: Date, end: Date }) {
-        const cost = _.first(await Models.costCenterDeploy.find({ where: constructWhereCondition(costId, period) }))
+        period?: { start: Date, end: Date }) {
+        let cost: CostCenterDeploy;
+        if (period) {
+            cost = _.first(await Models.costCenterDeploy.find({ where: constructWhereCondition(costId, period) }));
+        } else {
+            cost = _.first(await Models.costCenterDeploy.find({ where: { costCenterId: costId } }));
+        }
         cost.warningPerson = setting.audienceTypes
         cost.warningRule = { type: setting.type, rate: setting.rate }
+        cost.isSendNotice = false;
         await cost.save()
     }
 }
