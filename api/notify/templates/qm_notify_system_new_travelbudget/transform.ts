@@ -11,7 +11,7 @@ require("moment-timezone")
 export = async function transform(values: {staffId: string,
     staff: Staff, MPlaneLevel: object,   MTrainLevel: object, MHotelLevel: object,
     travelPolicy: {[key: string]: any}, cacheId: string, totalBudget: number, budgets: ITravelBudgetInfo[],
-    query: object, destinationPlacesInfo: any, cityMap: any, date: string, staffs: Staff[]}
+    query: object, destinationPlacesInfo: any, cityMap: any, date: string, staffs: Staff[]
 }): Promise<any>{
     let cityMap = {};
     let staffMap = {};
