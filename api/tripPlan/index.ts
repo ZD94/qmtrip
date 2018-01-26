@@ -1896,7 +1896,7 @@ class TripPlanModule {
                     }
                     let arrivalInfo = await API.place.getCityInfo({ cityCode: place, companyId: company.id }) || { name: null };
                     arrivalCityCodes.push(arrivalInfo.id);
-                    if (i == destinationPlacesInfo.length - 1) {
+                    if (i == destinationPlacesInfo.length - 1 && goBackPlace) {
                         arrivalCityCodes.push(goBackPlace);
                     }
                     if (i == (destinationPlacesInfo.length - 1)) {
