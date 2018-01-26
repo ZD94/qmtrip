@@ -9,14 +9,11 @@ Promise.promisifyAll(require("fs"));
 Promise.config({longStackTraces: true});
 
 var uuid = require('uuid');
-var path = require('path');
 var config = {
     "postgres": "postgres://clear:ste461@localhost:5432/test",
     "remotes": [] as string[]
 };
 
-import Logger from '@jingli/logger';
-var logger = new Logger('test');
 
 var cluster = require('cluster');
 if(cluster.isMaster)

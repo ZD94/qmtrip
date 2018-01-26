@@ -1,8 +1,7 @@
 'use strict';
 
 import {AbstractController, Restful, Router} from '@jingli/restful';
-import API from '@jingli/dnode-api';
-import {Models} from '_types';
+import { Request, Response, NextFunction} from 'express-serve-static-core';
 let ApiPrivilege = require('api/privilege');
 
 
@@ -19,7 +18,7 @@ export class PrivilegeController extends AbstractController {
 
     //获取企业福利账户余额
     @Router('/:id/getBalance', 'GET')  
-    async getBalance(req, res, next) {
+    async getBalance(req: Request, res: Response, next: NextFunction) {
         let {id} = req.params;
         if (!id) {
             return res.json(this.reply(400, null));
@@ -30,7 +29,7 @@ export class PrivilegeController extends AbstractController {
 
     //获取企业福利账户余额变动记录
     @Router('/:id/getBalanceRecords', 'POST')
-    async getBalanceRecords(req, res, next) {
+    async getBalanceRecords(req: Request, res: Response, next: NextFunction) {
         let {id} = req.params;
         if (!id) {
             return res.json(this.reply(400, null));
@@ -50,7 +49,7 @@ export class PrivilegeController extends AbstractController {
 
     //获取企业节省奖励比例
     @Router('/:id/getCompanyScoreRatio', 'GET')
-    async getCompanyScoreRatio(req, res, next) {
+    async getCompanyScoreRatio(req: Request, res: Response, next: NextFunction) {
         let {id} = req.params;
         if (!id) {
             return res.json(this.reply(400, null));
@@ -61,13 +60,12 @@ export class PrivilegeController extends AbstractController {
 
     //企业节省奖励比例设置
     @Router('/:id/setCompanyScoreRatio', 'POST')
-    async setCompanyScoreRatio(req, res, next) {
+    async setCompanyScoreRatio(req: Request, res: Response, next: NextFunction) {
         let {id} = req.params;
         if (!id) {
             return res.json(this.reply(400, null));
         }
         let body = req.body;
-        let scoreRatio: number = 1;  //默认为100%
         if (typeof body == 'string') {
             body = JSON.parse(body);
         }
@@ -77,17 +75,17 @@ export class PrivilegeController extends AbstractController {
 
     //企业节省奖励比例设置记录查询
     @Router('/:id/getCompanyScoreRatioChange', 'GET')
-    async getCompanyScoreRatioChange(req, res, next) {
+    async getCompanyScoreRatioChange(req: Request, res: Response, next: NextFunction) {
         let {id} = req.params;
         if (!id) {
             return res.json(this.reply(400, null));
         }
-        let result = await ApiPrivilege.getCompanyScoreRatioChange(id);
+        await ApiPrivilege.getCompanyScoreRatioChange(id);
     }
 
     //查询全部未结算奖励按出差人展示
     @Router('/:id/getAllUnsettledRewardByStaff', 'GET')
-    async getAllUnsettledRewardByStaff(req, res, next) {
+    async getAllUnsettledRewardByStaff(req: Request, res: Response, next: NextFunction) {
         let {id} = req.params;
         if (!id) {
             return res.json(this.reply(400, null));
@@ -98,7 +96,7 @@ export class PrivilegeController extends AbstractController {
 
     //查询全部未结算奖励按行程展示
     @Router('/:id/getAllUnsettledRewardByTripplan', 'GET')
-    async getAllUnsettledRewardByTripplan(req, res, next) {
+    async getAllUnsettledRewardByTripplan(req: Request, res: Response, next: NextFunction) {
         let {id} = req.params;
         if (!id) {
             return res.json(this.reply(400, null));

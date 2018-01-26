@@ -25,7 +25,7 @@ let allowOrigin = [
     "jingli365"
 ];
 
-function checkOrigin( origin ){
+function checkOrigin( origin: any ){
     for(let item of allowOrigin){
         if(origin.indexOf(item) > -1){
             return true;
@@ -35,7 +35,7 @@ function checkOrigin( origin ){
     return false;
 }
 
-function getAppSecretByAppId(appId) {
+function getAppSecretByAppId(appId: string) {
     return config.agent.appSecret;
 }
 
