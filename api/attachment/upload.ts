@@ -26,7 +26,7 @@ function resetTimeout(req: Request, res: Response, next: NextFunction){
     //conn_timeout('180s')(req: Request, res: Response, next: NextFunction);
 }
 
-async function fs_exists(file): Promise<boolean>{
+async function fs_exists(file: string): Promise<boolean>{
     try{
         var stat = await fs.statAsync(file);
         return true;
@@ -37,7 +37,7 @@ async function fs_exists(file): Promise<boolean>{
     }
 }
 
-async function uploadActionFile(req, res, next) {
+async function uploadActionFile(req: any, res: Response, next: NextFunction) {
     console.info("uploadActionFile===========");
     req.clearTimeout();
     var filePath;
@@ -105,7 +105,7 @@ function signFileId(fileid: string, expirttime: number) {
     return md5(str);
 }
 
-async function getTmpAttachment(req, res, next) {
+async function getTmpAttachment(req: any, res: Response, next: NextFunction) {
     logger.info("call getTmpAttachment===>");
     req.clearTimeout();
     let {fileId } = req.params;
@@ -136,7 +136,7 @@ async function getTmpAttachment(req, res, next) {
     res.end();
 }
 
-function allowCrossDomain(req, res, next) {
+function allowCrossDomain(req: Request, res: Response, next: NextFunction) {
     /*if (req.headers.origin && checkOrigin(req.headers.origin)) {
         res.header('Access-Control-Allow-Origin', req.headers.origin);
     }*/
@@ -162,7 +162,7 @@ module.exports = function(app: Application) {
         timeout: 180000,
     }));*/
     app.post(url, cors(corsOptions), uploadActionFile);
-    app.options(url, cors(corsOptions), function (req, res, next) {
+    app.options(url, cors(corsOptions), function (req: Request, res: Response, next: NextFunction) {
         let referer = req.headers['referer'];
         let host;
         if (!referer) {

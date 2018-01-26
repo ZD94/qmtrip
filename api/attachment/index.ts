@@ -48,7 +48,7 @@ class ApiAttachment {
      * @param {String} params.contentType http contentType 详情见http://tool.oschina.net/commons
      * @return {Promise} "32位唯一串"
      */
-    static async saveAttachment(params): Promise<any> {
+    static async saveAttachment(params: {content: any, contentType: string, isPublic?: boolean}): Promise<any> {
         var content = params.content;
         var isPublic = params.isPublic || false;
         var contentType = params.contentType;
@@ -89,11 +89,7 @@ class ApiAttachment {
      * @param params.id uuid
      * @returns {*|Boolean|Promise.<undefined>|Promise.<Integer>}
      */
-    static async removeFileAndAttach(params): Promise<boolean> {
-        if (!params) {
-            params = {};
-        }
-
+    static async removeFileAndAttach(params: {id: string}): Promise<boolean> {
         var id = params.id;
         var file = await Models.relateFile.get(id);
         let [relateFile, attachment] = await Promise.all([
@@ -112,10 +108,7 @@ class ApiAttachment {
      * @param {String} params.id 文件ID
      * @return {Promise} 附件信息 {id: "ID", content: "内容", "isPublic": "true|false"}
      */
-    static async getAttachment(params): Promise<any> {
-        if (!params) {
-            params = {};
-        }
+    static async getAttachment(params: {id: string, width?: number, height?: number}): Promise<any> {
         var id = params.id;
         var width = params.width || 600;
         var height = params.height || 600;

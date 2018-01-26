@@ -22,7 +22,7 @@ export default class CostCenterModule {
      * @returns {*}
      */
     @clientExport
-    async createCostCenter(params): Promise<CostCenter> {
+    async createCostCenter(params: Object): Promise<CostCenter> {
         var costCenter = CostCenter.create(params);
         var result = await costCenter.save();
         return result;
@@ -36,7 +36,7 @@ export default class CostCenterModule {
      */
     @clientExport
     @requireParams(["id"])
-    async deleteCostCenter(params): Promise<boolean> {
+    async deleteCostCenter(params: {id: string}): Promise<boolean> {
         var id = params.id;
         var ah_delete = await Models.costCenter.get(id);
 
@@ -52,7 +52,7 @@ export default class CostCenterModule {
      * @returns {*}
      */
     @clientExport
-    async updateCostCenter(params): Promise<CostCenter> {
+    async updateCostCenter(params: any): Promise<CostCenter> {
         var id = params.id;
 
         var ah = await Models.costCenter.get(id);
@@ -83,7 +83,7 @@ export default class CostCenterModule {
      * @returns {*}
      */
     @clientExport
-    async getCostCenters(params): Promise<FindResult> {
+    async getCostCenters(params: any): Promise<FindResult> {
         let paginate = await Models.costCenter.find(params);
         let ids = paginate.map(function (t) {
             return t.id;
@@ -99,7 +99,7 @@ export default class CostCenterModule {
      * @returns {*}
      */
     @clientExport
-    async createCostCenterDeploy(params): Promise<CostCenterDeploy> {
+    async createCostCenterDeploy(params: Object): Promise<CostCenterDeploy> {
         var costCenterDeploy = CostCenterDeploy.create(params);
         var result = await costCenterDeploy.save();
         return result;
@@ -113,7 +113,7 @@ export default class CostCenterModule {
      */
     @clientExport
     @requireParams(["id"])
-    async deleteCostCenterDeploy(params): Promise<any> {
+    async deleteCostCenterDeploy(params: {id: string}): Promise<any> {
         var id = params.id;
         var ah_delete = await Models.costCenterDeploy.get(id);
 
@@ -129,7 +129,7 @@ export default class CostCenterModule {
      * @returns {*}
      */
     @clientExport
-    async updateCostCenterDeploy(params): Promise<CostCenterDeploy> {
+    async updateCostCenterDeploy(params: any): Promise<CostCenterDeploy> {
         var id = params.id;
 
         var ah = await Models.costCenterDeploy.get(id);
@@ -160,7 +160,7 @@ export default class CostCenterModule {
      * @returns {*}
      */
     @clientExport
-    async getCostCenterDeploys(params): Promise<FindResult> {
+    async getCostCenterDeploys(params: any): Promise<FindResult> {
         let paginate = await Models.costCenterDeploy.find(params);
         let ids = paginate.map(function (t) {
             return t.id;
@@ -178,7 +178,7 @@ export default class CostCenterModule {
      * @returns {*}
      */
     @clientExport
-    async createBudgetLog(params): Promise<BudgetLog> {
+    async createBudgetLog(params: Object): Promise<BudgetLog> {
         var budgetLog = BudgetLog.create(params);
         var result = await budgetLog.save();
         return result;
@@ -192,7 +192,7 @@ export default class CostCenterModule {
      */
     @clientExport
     @requireParams(["id"])
-    async deleteBudgetLog(params): Promise<any> {
+    async deleteBudgetLog(params: {id: string}): Promise<any> {
         var id = params.id;
         var ah_delete = await Models.budgetLog.get(id);
 
@@ -208,7 +208,7 @@ export default class CostCenterModule {
      * @returns {*}
      */
     @clientExport
-    async updateBudgetLog(params): Promise<BudgetLog> {
+    async updateBudgetLog(params: any): Promise<BudgetLog> {
         var id = params.id;
 
         var ah = await Models.budgetLog.get(id);
@@ -239,7 +239,7 @@ export default class CostCenterModule {
      * @returns {*}
      */
     @clientExport
-    static async getBudgetLogs(params): Promise<FindResult> {
+    static async getBudgetLogs(params: any): Promise<FindResult> {
         let paginate = await Models.budgetLog.find(params);
         let ids = paginate.map(function (t) {
             return t.id;
@@ -303,7 +303,7 @@ export default class CostCenterModule {
      */
     @clientExport
     static async initBudget({ budgets, period, operator, costId }: ICostCenterDeploy) {
-        const promiseAry = []
+        const promiseAry: Promise<any>[] = []
         const where = constructWhereCondition(null, period)
         let totalBudget = 0;
         for (let budget of budgets) {
@@ -447,7 +447,7 @@ async function getChildrenDeptIds(parentId: string, except?: string): Promise<st
     return departments.map(d => d.id)
 }
 
-async function getTotalTempBudgetSumOf(costIds: string[], period?) {
+async function getTotalTempBudgetSumOf(costIds: string[], period: { start: Date, end: Date } ) {
     const ids = costIds.map(id => `'${id}'`).join(',')
     const sql = `select sum(total_temp_budget) as sum from 
         cost_center.cost_center_deploys where cost_center_id in (${ids}) 
@@ -464,7 +464,7 @@ function constructWhereCondition(costId: string, period: { start: Date, end: Dat
     }
 }
 
-function add8Hours(time) {
+function add8Hours(time: Date) {
     return moment(time).add(8, 'h').format()
 }
 
