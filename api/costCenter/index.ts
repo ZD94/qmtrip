@@ -249,6 +249,9 @@ export default class CostCenterModule {
 
     /****************************************BudgetLog end************************************************/
 
+    /**
+     * 获取追加预算
+     */
     @clientExport
     static async getAppendBudget(costId: string, showTime: Date) {
         return _.first(await Models.budgetLog.find({
@@ -257,6 +260,12 @@ export default class CostCenterModule {
         }))
     }
 
+    /**
+     * 追加预算
+     * @param costId 
+     * @param operator 
+     * @param budget 
+     */
     @clientExport
     static async appendBudget({ costId, operator, budget, showTime }: { costId: string, operator: string, budget: number, showTime: Date }) {
         const rootDept = await Models.department.get(costId)
@@ -268,6 +277,11 @@ export default class CostCenterModule {
         await log.save()
     }
 
+    /**
+     * 根据部门获取预算列表
+     * @param deptId 
+     * @param period 
+     */
     @clientExport
     static async listDeptBudget(deptId: string, period: { start: Date, end: Date }) {
         const children = await findChildren(deptId)
@@ -283,6 +297,10 @@ export default class CostCenterModule {
         }, uniqCosts, planExpends)
     }
 
+    /**
+     * 初始化预算
+     * @param param0 
+     */
     @clientExport
     static async initBudget({ budgets, period, operator, costId }: ICostCenterDeploy) {
         const promiseAry = []
@@ -309,9 +327,15 @@ export default class CostCenterModule {
             type: BUDGET_CHANGE_TYPE.ADD_BUDGET, staffId: operator, remark: '初始化预算',
             showTime: moment(period.start).format()
         }).save())
-        await Promise.all(promiseAry)
+        await DB.transaction(async function () {
+            await Promise.all(promiseAry)
+        })
     }
 
+    /**
+     * 调整预算
+     * @param param0 
+     */
     @clientExport
     static async changeBudget({ budgets, period, operator, costId, appendBudget }: ICostCenterDeploy) {
         const tempSum = _.compose(_.sum, _.map(_.prop('selfTempBudget')))(budgets),
@@ -320,30 +344,32 @@ export default class CostCenterModule {
 
         if (tempSum != rootCost.totalTempBudget + appendBudget) throw new L.ERROR_CODE_C(400, '超出总预算')
 
-        for (let budget of budgets) {
-            const { id } = budget
-            const cost: CostCenterDeploy = _.first(await Models.costCenterDeploy.find({ where: { ...where, costCenterId: id } }))
-            let dept: Department = null
-            if (!cost) {
-                delete budget.id
-                dept = await Models.department.get(id)
-                await CostCenter.create({ id, type: ECostCenterType.DEPARTMENT, name: dept.name }).save()
-                await CostCenterDeploy.create({ costCenterId: id, ...budget, beginDate: period.start, endDate: period.end }).save()
-                continue
+        await DB.transaction(async function () {
+            for (let budget of budgets) {
+                const { id } = budget
+                const cost: CostCenterDeploy = _.first(await Models.costCenterDeploy.find({ where: { ...where, costCenterId: id } }))
+                let dept: Department = null
+                if (!cost) {
+                    delete budget.id
+                    dept = await Models.department.get(id)
+                    await CostCenter.create({ id, type: ECostCenterType.DEPARTMENT, name: dept.name }).save()
+                    await CostCenterDeploy.create({ costCenterId: id, ...budget, beginDate: period.start, endDate: period.end }).save()
+                    continue
+                }
+                if (cost.selfTempBudget != budget.selfTempBudget) {
+                    // log
+                    if (!dept) dept = await Models.department.get(id)
+                    await BudgetLog.create({
+                        companyId: dept.company.id, costCenterId: id, value: budget.selfTempBudget - cost.selfTempBudget,
+                        type: BUDGET_CHANGE_TYPE.CHANGE_BUDGET, staffId: operator, remark: `${dept.name}调整预算`,
+                        showTime: moment(period.start).format()
+                    }).save()
+                    cost.selfTempBudget = budget.selfTempBudget
+                }
+                cost.totalTempBudget = budget.totalTempBudget
+                await cost.save()
             }
-            if (cost.selfTempBudget != budget.selfTempBudget) {
-                // log
-                if (!dept) dept = await Models.department.get(id)
-                await BudgetLog.create({
-                    companyId: dept.company.id, costCenterId: id, value: budget.selfTempBudget - cost.selfTempBudget,
-                    type: BUDGET_CHANGE_TYPE.CHANGE_BUDGET, staffId: operator, remark: `${dept.name}调整预算`,
-                    showTime: moment(period.start).format()
-                }).save()
-                cost.selfTempBudget = budget.selfTempBudget
-            }
-            cost.totalTempBudget = budget.totalTempBudget
-            await cost.save()
-        }
+        })
     }
 
     /**
@@ -381,7 +407,9 @@ export default class CostCenterModule {
             showTime: moment(period.start).format()
         }).save())
         promiseAry.push(root.save())
-        await Promise.all(promiseAry);
+        await DB.transaction(async function () {
+            await Promise.all(promiseAry);
+        })
     }
 
     @clientExport
