@@ -366,6 +366,8 @@ export default class CostCenterModule {
                     }).save()
                     cost.selfTempBudget = budget.selfTempBudget
                 }
+                cost.totalTempBudget = budget.totalTempBudget
+                await cost.save()
             }
         })
     }
