@@ -454,7 +454,7 @@ class TripPlanModule {
                 break;
 
             case EOrderStatus.REFUND_SUCCESS: 
-                tripDetail.status = ETripDetailStatus.WAIT_TICKET;
+                tripDetail.status = ETripDetailStatus.WAIT_RESERVE;
            
                 if(tripPlan.status == EPlanStatus.COMPLETE || tripPlan.status == EPlanStatus.RESERVED) {
                     if(new Date(tripPlan.backAt) < new Date()){
