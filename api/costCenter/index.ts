@@ -447,11 +447,13 @@ async function getChildrenDeptIds(parentId: string, except?: string): Promise<st
     return departments.map(d => d.id)
 }
 
-async function getTotalTempBudgetSumOf(costIds: string[], period: { start: Date, end: Date } ) {
+async function getTotalTempBudgetSumOf(costIds: string[], period?: { start: Date, end: Date } ) {
     const ids = costIds.map(id => `'${id}'`).join(',')
-    const sql = `select sum(total_temp_budget) as sum from 
-        cost_center.cost_center_deploys where cost_center_id in (${ids}) 
-        and begin_date >= '${add8Hours(period.start)}' and end_date <= '${add8Hours(period.end)}'`
+    var sql = `select sum(total_temp_budget) as sum from 
+        cost_center.cost_center_deploys where cost_center_id in (${ids})`;
+    if(period) 
+        sql += ` and begin_date >= '${add8Hours(period.start)}' and end_date <= '${add8Hours(period.end)}'`;
+    
     const res = (await DB.query(sql))[0][0]
     return (res && res.sum) || 0
 }
