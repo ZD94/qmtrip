@@ -107,7 +107,7 @@ export default class TripApproveModule {
                     let arrivalInfo = await API.place.getCityInfo({cityCode: placeCode, companyId: approve.companyId}) || {name: null};
                     let destination: IDestination = {city:arrivalInfo.id, arrivalDateTime: segment.leaveDate, leaveDateTime: segment.goBackDate};
                     arrivalCityCodes.push(arrivalInfo.id);
-                    if (i == destinationPlacesInfo.length - 1) {
+                    if (i == destinationPlacesInfo.length - 1 && goBackPlace) {
                         arrivalCityCodes.push(goBackPlace);
                     }
                     destinations.push(destination);
