@@ -46,7 +46,7 @@ class CoinModule {
             throw L.ERR.SHORT_OF_POINT();
         }
         // let coins = Math.floor(points * points2coinRate);
-        let coins = points * points2coinRate;
+        let coins = Math.ceil(points * points2coinRate);
 
         let originalConsume = company.coinAccount.consume;
         let originalBalancePoints = staff.balancePoints;

@@ -11,6 +11,11 @@ let logger = new Logger("attachment");
 import '@jingli/fs-promisify';
 import * as fs from 'fs';
 import * as path from 'path';
+var utils = require("common/utils");
+import {Models} from "_types/index";
+import {Attachment, RelateFile} from "_types/attachment";
+import {md5} from "common/utils";
+import {Staff} from "_types/staff/staff";
 
 
 async function fs_exists(file: string): Promise<boolean>{
@@ -24,7 +29,111 @@ async function fs_exists(file: string): Promise<boolean>{
     }
 }
 
+function signFileId(fileid: string, expirttime: number) {
+    let key = 'wojiushibugaosuni';
+    let str = fileid + expirttime + key;
+    return md5(str);
+}
+
 class ApiAttachment {
+
+    /**
+     * @method saveAttachment
+     *
+     * 保存附件信息
+     *
+     * @param {Object} params
+     * @param {String} params.content   附件是base64字符串
+     * @param {boolean} params.isPublic  是否公共 true 是 false否
+     * @param {String} params.contentType http contentType 详情见http://tool.oschina.net/commons
+     * @return {Promise} "32位唯一串"
+     */
+    static async saveAttachment(params): Promise<any> {
+        var content = params.content;
+        var isPublic = params.isPublic || false;
+        var contentType = params.contentType;
+        var id:string;
+        let staff = await Staff.getCurrent();
+        let staffId = null;
+        if(staff) staffId = staff.id;
+
+        if (!content) {
+            throw {code: -1, msg: "附件信息不能为空"};
+        }
+
+        if (!contentType) {
+            throw {code: -1, msg: "contentType不能为空"};
+        }
+
+        content = new Buffer(content, 'base64');
+        id = utils.md5(content);
+        var attachment = await Models.attachment.get(id);
+        if (!attachment) {
+            attachment = Attachment.create({id: id, content: content, contentType: contentType, staffId: staffId});
+            attachment = await attachment.save();
+        }
+        var file = RelateFile.create({isPublic: isPublic, key: id});
+        file = await file.save();
+        let expireTime = Date.now() + 24 * 60 * 60 * 1000;
+        let sign = signFileId(file.id, expireTime)
+        return {
+            fileId: file.id,
+            sign: sign,
+            expireTime: expireTime,
+        }
+    }
+
+    /**
+     * @methdo removeFile 删除文件表和附件记录
+     * @param params
+     * @param params.id uuid
+     * @returns {*|Boolean|Promise.<undefined>|Promise.<Integer>}
+     */
+    static async removeFileAndAttach(params): Promise<boolean> {
+        if (!params) {
+            params = {};
+        }
+
+        var id = params.id;
+        var file = await Models.relateFile.get(id);
+        let [relateFile, attachment] = await Promise.all([
+            Models.relateFile.get(file.id),
+            Models.attachment.get(file.key)
+        ])
+        await relateFile.destroy();
+        await attachment.destroy();
+        return true;
+    }
+
+    /**
+     * @method getAttachment 通过fileId获取附件
+     *
+     * @param {Object} params
+     * @param {String} params.id 文件ID
+     * @return {Promise} 附件信息 {id: "ID", content: "内容", "isPublic": "true|false"}
+     */
+    static async getAttachment(params): Promise<any> {
+        if (!params) {
+            params = {};
+        }
+        var id = params.id;
+        var width = params.width || 600;
+        var height = params.height || 600;
+
+        var file = await Models.relateFile.get(id)
+        if(!file)
+            throw {code:-1, msg:"文件不存在"};
+
+        var attachment = await Models.attachment.get(file.key)
+        if (!attachment || !attachment.content) {
+            return {};
+        }
+        // var content = attachment.content.toString("base64");
+        var contentBuffer = new Buffer(attachment.content);
+        var content = contentBuffer.toString("base64");
+        return {id: attachment.id, content: content, isPublic: file.isPublic, contentType: attachment.contentType};
+    }
+
     /**
      * 绑定拥有者
      *
@@ -63,14 +172,14 @@ class ApiAttachment {
      */
     static async getSelfAttachment(params: {fileId: string}) {
         var fileId = params.fileId;
-        // var owner = await Owner.findOne({where: {fileId: fileId, accountId: accountId}});
-        // if (!owner) {
-        //     throw L.ERR.PERMISSION_DENY();
-        // }
-        var attachment = await API.attachments.getAttachment({id: fileId, isZoom:'off'});
+        /*let staff = await Staff.getCurrent();
+        let attachments = await Models.attachment.find({where: {id: fileId, staffId: staff.id}});
+        let attachment = null;
+        if(attachments && attachments.length){
+            attachment = await API.attachment.getAttachment({id: fileId});
+        }*/
 
-        // var filepath = path.join('tmp', attachment.id);
-        // fs.writeFile(filepath, attachment.content, {encoding: "binary"});
+        let attachment = await API.attachment.getAttachment({id: fileId});
 
         return attachment;
     }
@@ -90,14 +199,13 @@ class ApiAttachment {
 
             var cache_exist = await fs_exists(filepath);
             if(!cache_exist){
-                var attachment = await API.attachments.getAttachment({id: id});
+                var attachment = await ApiAttachment.getAttachment({id: id});
                 if(!attachment) {
                     return null;
                 }
                 if(attachment.isPublic !== isPublic)
                     return null;
                 contentType = attachment.contentType;
-
                 var dir_exist = await fs_exists(cachePath);
                 if(!dir_exist){
                     await fs.mkdirAsync(cachePath, '755');

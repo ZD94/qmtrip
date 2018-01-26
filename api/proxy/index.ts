@@ -5,8 +5,9 @@ import { Staff } from "_types/staff";
 import { Models } from "_types";
 import { AuthRequest, AuthResponse } from '_types/auth';
 import {getCompanyTokenByAgent} from '../restful';
+var ApiTravelBudget = require('api/travelBudget');
 var requestp = require("request-promise");
-import { EOrderStatus, EOrderType, TripDetail } from "_types/tripPlan";
+import { EOrderStatus, EOrderType, TripDetail, ETripDetailStatus, EPayType } from "_types/tripPlan";
 var request = require("request");
 var path = require("path");
 var _ = require("lodash");
@@ -17,7 +18,7 @@ var timeout = require('connect-timeout');
 import * as CLS from 'continuation-local-storage';
 let CLSNS = CLS.getNamespace('dnode-api-context');
 import { genSign } from "@jingli/sign";
-const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'content-type, Content-Type, auth, supplier, authstr, staffid, companyid, accountid'} 
+const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'content-type, Content-Type, auth, supplier, authstr, staffid, companyid, accountid, isneedauth'} 
 function resetTimeout(req, res, next){
     req.clearTimeout();
     next();
@@ -132,9 +133,16 @@ class Proxy {
                     return null;
                 }
             }
+
+            
         });
 
-        // verifyToken
+        /**
+         * @method 提供中台、app端的订单转发请求
+         *  1. app端根据tripDetailId创、退、改一系列订单请求
+         *  2. app端根据staffid, 订单状态获取该员工的相应订单
+         *  3. 中台根据companyid获取该公司所有订单
+         */
         app.all(/^\/order.*$/, cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function) => {
   
             let staff: Staff = await Staff.getCurrent();
@@ -151,6 +159,7 @@ class Proxy {
                 }
             }
             let tripDetail: TripDetail;
+            //若tripDetailId存在，为创、退、改相关订单请求封装特殊请求参数
             if(tripDetailId) {
                 tripDetail = await Models.tripDetail.get(tripDetailId)
                 if(!tripDetail) {
@@ -161,18 +170,36 @@ class Proxy {
                     staff = await Models.staff.get(tripDetail.accountId);
                 }
                 listeningon = `${config.orderSysConfig.tripDetailMonitorUrl}/${tripDetail.id}`;
+                if(req.body.jlPayType == EPayType.PERSONAL_PAY) {
+                    await API.tripPlan.updateTripDetail({
+                        id: tripDetailId,
+                        payType: req.body.jlPayType,
+                        status: ETripDetailStatus.WAIT_UPLOAD,
+                        reserveStatus: EOrderStatus.WAIT_SUBMIT
+                    });
+                }
             }
 
             let addon:{[index: string]: any} = {
                 listeningon: listeningon     
             };
-            
+            let supplier =req.headers['supplier'] || 'meiya';
+
+            let companyInfo = await ApiTravelBudget.getCompanyInfo(supplier);
+            let identify = companyInfo[0].identify;
+            if (typeof identify == 'object') {
+                identify = JSON.stringify(identify);
+            }
+            identify = encodeURIComponent(identify);
+            let isNeedAuth: string = req.headers['isneedauth'];
+            // let auth: string = (isNeedAuth == '1') ? identify : '';
+            let auth : string = identify;
             let headers: {[index: string]: any} = {
-               auth: req.headers['auth'],
-               supplier: req.headers['supplier'],
+               auth: auth,
+               supplier,
                accountid: staff.accountId,
                staffid: staff.id,
-               companyid: staff.companyId,    
+               companyid: staff.companyId,
             }
 
             let body: {[index: string]: any} = req.body;
@@ -196,12 +223,12 @@ class Proxy {
                         json: true,
                         method: req.method,
                         timeout: 120*1000
-                    }, (err: Error, res: any, body: any) => {
+                    }, (err: Error, res: any, result: any) => {
                         if(err) {
                             console.log("-=========>err: ", err);
                             reject(err)
                         }
-                        resolve(body);
+                        resolve(result);
                     });
                 });
             }catch(err) {
@@ -213,26 +240,14 @@ class Proxy {
             console.log("========================> result.", result)
             if(!result) 
                 return res.json(null);
-            //以下提交订单成功后，更新订单状态和订单号
             if(typeof result == 'string') {
                 result = JSON.parse(result);
             }
-            if(tripDetail && result.code == 0 && result.data && tripDetail.orderNo == null){  //&& result.data.orderN
-                if(result.data.orderNos && typeof(result.data.orderNos) != 'undefined'){
-                    tripDetail.reserveStatus = EOrderStatus.AUDITING;  //飞机的orderNos为数组
-                    tripDetail.orderNo = result.data.orderNos[0];
-                }
-                if(result.data.OrderNo && typeof(result.data.OrderNo) != 'undefined') {  
-                    tripDetail.reserveStatus = EOrderStatus.AUDITING;  //火车的OrderNo为string
-                    tripDetail.orderNo = result.data.OrderNo;
-                }  
-                if(result.data.orderNo && typeof(result.data.orderNo) != 'undefined') {  
-                    tripDetail.reserveStatus = EOrderStatus.AUDITING;   //酒店的orderNo为string
-                    tripDetail.orderNo = result.data.orderNo;
-                }
-                tripDetail.orderType = body.orderType != null? body.orderType: null;  //后期返回的orderNo统一后，使用此确定订单类型
+            if(result.code == 0 && tripDetail && (body.orderType || body.orderType == 0)) {
+                tripDetail.orderType = body.orderType;  //后期返回的orderNo统一后，使用此确定订单类型
                 await tripDetail.save();
             }
+
             return res.json(result);
 
         });
@@ -250,7 +265,6 @@ class Proxy {
             pathstring = pathstring.replace("/mall", '');
             let sign = genSign(params, timestamp, appSecret)
             let url = `${config.mall.orderLink}${pathstring}`;
-            console.log(url,"<==================商城url")
             console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.mall.appId, '===request params: ', params) 
             let result = await new Promise((resolve, reject) => {
                 return request({
@@ -329,7 +343,7 @@ class Proxy {
             let staff = await Models.staff.get(staffid);
             let role: any = null ;
             if(staff.roleId == 0) {
-                role = 'root'; //表示创建者身份
+                role = 'defaultCreater'; //表示创建者身份
             }
             let appSecret = config.permission.appSecret;
             let pathstring = req.path;

@@ -16,7 +16,7 @@ var API = require('@jingli/dnode-api');
 const config = require("@jingli/config");
 import _ = require("lodash");
 import {ENoticeType} from "_types/notice/notice";
-import {AutoApproveType, AutoApproveConfig, ISegment, ICreateBudgetAndApproveParams} from "_types/tripPlan"
+import {AutoApproveType, AutoApproveConfig, ISegment, ICreateBudgetAndApproveParams, ICreateBudgetAndApproveParamsNew} from "_types/tripPlan"
 import {DB} from "@jingli/database";
 import {ITripApprove, IDestination} from "../../_types/tripApprove";
 import {Project} from "../../_types/tripPlan";
@@ -72,6 +72,7 @@ export default class TripApproveModule {
         let project: Project;
         let projectId = query.projectId;
         let projectName = query.projectName;
+        let goBackPlace = query.goBackPlace;
         if(projectId){
             project = await Models.project.get(projectId);
         }else if(projectName){
@@ -106,6 +107,9 @@ export default class TripApproveModule {
                     let arrivalInfo = await API.place.getCityInfo({cityCode: placeCode, companyId: approve.companyId}) || {name: null};
                     let destination: IDestination = {city:arrivalInfo.id, arrivalDateTime: segment.leaveDate, leaveDateTime: segment.goBackDate};
                     arrivalCityCodes.push(arrivalInfo.id);
+                    if (i == destinationPlacesInfo.length - 1) {
+                        arrivalCityCodes.push(goBackPlace);
+                    }
                     destinations.push(destination);
                     if(i == (destinationPlacesInfo.length - 1)){//目的地存放最后一个目的地
                         tripApprove.arrivalCityCode = arrivalInfo.id;
@@ -592,19 +596,14 @@ export default class TripApproveModule {
         let approveCompany = approveUser.company;
         if(approveResult == 1){
             approveResult = EApproveResult.PASS;
-            approve.status = EApproveStatus.SUCCESS;
-            approve.tripApproveStatus = QMEApproveStatus.PASS;
         }else{
             approveResult = EApproveResult.REJECT;
-            approve.status = EApproveStatus.FAIL;
-            approve.tripApproveStatus = QMEApproveStatus.REJECT;
         }
-        await approve.save();
 
         if(typeof approve.data == 'string'){
             approve.data = JSON.parse(approve.data);
         }
-        let budgetInfo: {budgets: ITravelBudgetInfo[], query: ICreateBudgetAndApproveParams} = approve.data;
+        let budgetInfo: {budgets: ITravelBudgetInfo[], query: ICreateBudgetAndApproveParamsNew} = approve.data;
         let {budgets, query} = budgetInfo;
         let number = 0;
 
@@ -617,6 +616,7 @@ export default class TripApproveModule {
         }
 
         await DB.transaction(async function(t){
+            await approve.save();
             // 特殊审批和非当月提交的审批不记录行程点数
             if(!approve.isSpecialApprove){
                 if(typeof query == 'string'){
@@ -645,7 +645,7 @@ export default class TripApproveModule {
                 if(approve.createdAt.getMonth() == new Date().getMonth()){
                     //审批本月记录审批通过
                     if(approveResult == EApproveResult.PASS){
-                        await approveCompany.beforeApproveTrip({number : frozenNum});
+                        // await approveCompany.beforeApproveTrip({number : frozenNum}); //没有流量包，允许审批通过
                         await approveCompany.approvePassReduceTripPlanNum({accountId: approve.submitter, tripPlanId: approve.id,
                             remark: extraStr+"审批通过消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
                     }
@@ -657,7 +657,7 @@ export default class TripApproveModule {
                 }else{
                     //审批上月记录审批通过
                     if(approveResult == EApproveResult.PASS){
-                        await approveCompany.beforeApproveTrip({number : frozenNum});
+                        // await approveCompany.beforeApproveTrip({number : frozenNum});  //没有流量包，允许审批通过
                         await approveCompany.approvePassReduceBeforeNum({accountId: approve.submitter, tripPlanId: approve.id,
                             remark: extraStr+"审批通过上月申请消耗行程点数" , content: content, isShowToUser: false, frozenNum: frozenNum});
                     }
@@ -679,14 +679,17 @@ export default class TripApproveModule {
                 log.remark = extraStr+`审批通过`;
                 await log.save();
                 approve.status = EApproveStatus.SUCCESS;
+                approve.tripApproveStatus = QMEApproveStatus.PASS;
                 approve.approveRemark = '审批通过';
             }else if(approveResult == EApproveResult.REJECT) {
-                let reason = params.reason;
+                let tripApprove = await API.tripApprove.getTripApprove({id: approve.id});
+                let reason = tripApprove.approveRemark;
                 notifyRemark = extraStr+`审批未通过，原因：${reason}`;
                 log.approveStatus = EApproveResult.REJECT;
                 log.remark = notifyRemark;
                 await log.save();
                 approve.status = EApproveStatus.FAIL;
+                approve.tripApproveStatus = QMEApproveStatus.REJECT;
                 approve.approveRemark = notifyRemark;
             }
             approve.approveDateTime = new Date();
@@ -716,8 +719,14 @@ export default class TripApproveModule {
                 } catch(err) { console.error(err);}
             }
 
+            if(approveResult == EApproveResult.PASS && query && query.feeCollected){
+                let costCenter = await Models.costCenter.get(query.feeCollected);
+                await costCenter.checkoutBudgetNotice();
+            }
+
         }).catch(async function(err){
             if(err) {
+                await approve.reload();
                 await approveCompany.reload();
                 throw L.ERR.INTERNAL_ERROR();
             }

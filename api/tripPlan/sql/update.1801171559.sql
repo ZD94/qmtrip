@@ -1,0 +1,1 @@
+update trip_plan.trip_plans set reward = score where saved > 0 and score > 0 and is_settled = false;

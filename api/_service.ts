@@ -29,13 +29,13 @@ import {AgencyOperateLog} from "_types/agency/agency-operate-log";
 import {TripFuelAddPackage} from "../_types/tripPackage/tripFuelAddPackage";
 import {TripBasicPackage} from "../_types/tripPackage/tripBasicPackage";
 import {ErrorLog} from "../_types/errorLog";
+import {Attachment, RelateFile} from "../_types/attachment";
 import {EventListener} from "../_types/eventListener";
 // import {CompanyRegion} from "_types/travelPolicy/companyRegion";
 // import {RegionPlace} from "_types/travelPolicy/regionPlace";
 // import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion } from '_types/travelPolicy';
 import {Url} from "_types/shorturl";
 import {EmailQueue, EmailLog, EmailSubmit} from "_types/mail";
-
 
 initModels({
     staff: createServerService<Staff>(Staff),
@@ -92,6 +92,8 @@ initModels({
     tripFuelAddPackage: createServerService<TripFuelAddPackage>(TripFuelAddPackage),
     tripBasicPackage: createServerService<TripBasicPackage>(TripBasicPackage),
     errorLog: createServerService<ErrorLog>(ErrorLog),
+    attachment: createServerService<Attachment>(Attachment),
+    relateFile: createServerService<RelateFile>(RelateFile),
     eventListener: createServerService<EventListener>(EventListener),
     budgetLog: createServerService<BudgetLog>(BudgetLog),
     costCenter: createServerService<CostCenter>(CostCenter),
@@ -101,7 +103,7 @@ initModels({
     emailQueue: createServerService<EmailQueue>(EmailQueue),
     emailLog: createServerService<EmailLog>(EmailLog),
     emailSubmit: createServerService<EmailSubmit>(EmailSubmit),
-    linkman: createServerService<Linkman>(Linkman)
+    linkman: createServerService<Linkman>(Linkman),
  
     // travelPolicyRegion: createServerService<TravelPolicyRegion>(TravelPolicyRegion),
     // companyRegion: createServerService<CompanyRegion>(CompanyRegion),
