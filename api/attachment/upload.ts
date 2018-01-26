@@ -48,6 +48,10 @@ async function uploadActionFile(req, res, next) {
         form.uploadDir = config.upload.tmpDir;
         form.maxFieldsSize = config.upload.maxSize || 20*1024*1024;
         form.keepExtensions = true;
+        var dir_exist = await fs_exists(config.upload.tmpDir);
+        if(!dir_exist){
+            await fs.mkdirAsync(config.upload.tmpDir, '755');
+        }
         var parseForm = bluebird.promisify<any[], any>(form.parse, {context: form, multiArgs:true});
         var [fields, file] = await parseForm(req);
         if(!file.tmpFile)
@@ -64,7 +68,6 @@ async function uploadActionFile(req, res, next) {
         if(type && type == 'avatar') {//上传头像
             isPublic = true;
         }
-
         var content = data.toString("base64")
         var contentType = file_type;
         var obj = await API.attachment.saveAttachment({
