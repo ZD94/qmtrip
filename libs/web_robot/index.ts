@@ -45,7 +45,7 @@ export class WebRobot{
                 .on('close', function(){
                     resolve(tmpfile);
                 })
-                .on('error', function(err: any){
+                .on('error', function(err: any) {
                     reject(err);
                 });
         })
