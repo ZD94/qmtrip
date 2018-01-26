@@ -155,14 +155,15 @@ export default class TripApproveModule {
         tripApprove.staffList = approve.staffList;
         tripApprove.lockBudget = false;
 
-        if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
-            tripApprove.autoApproveTime = await TripApproveModule.calculateAutoApproveTime({
-                type: company.autoApproveType,
-                config: company.autoApprovePreference,
-                submitAt: new Date(),
-                tripStartAt: tripApprove.startAt,
-            });
-        }
+        //自动审批关闭
+        // if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
+        //     tripApprove.autoApproveTime = await TripApproveModule.calculateAutoApproveTime({
+        //         type: company.autoApproveType,
+        //         config: company.autoApprovePreference,
+        //         submitAt: new Date(),
+        //         tripStartAt: tripApprove.startAt,
+        //     });
+        // }
         return tripApprove;
 
     }
