@@ -1,12 +1,6 @@
 
-import * as os from 'os';
-import * as path from 'path';
-import { CookieJar } from 'request';
 import * as fs from 'fs';
-import requestPromise = require('request-promise');
-import request = require('request');
 import { getSupplier } from 'libs/suppliers';
-var iconv = require('iconv-lite');
 
 var account;
 var password;

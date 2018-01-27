@@ -3,9 +3,8 @@
  */
 
 'use strict';
-import {AbstractController, Restful, Router, ERR} from "@jingli/restful";
+import {AbstractController, Restful} from "@jingli/restful";
 import { Request, Response, NextFunction} from 'express-serve-static-core';
-import {EventListener} from "_types/eventListener";
 import { Models } from '_types';
 var API = require("@jingli/dnode-api");
 

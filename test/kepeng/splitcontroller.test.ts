@@ -1,11 +1,7 @@
 
-var fs = require('fs');
-var path = require('path');
-var glob = require('glob');
 import _ = require('lodash');
 
 var rootdir = 'ionic';
-var default_route = 'index/index';
 
 function parseController(dir: string) {
     //if (dir == undefined || dir == '')
