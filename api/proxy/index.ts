@@ -25,6 +25,7 @@ function resetTimeout(req: Request, res: Response, next: NextFunction){
     req['clearTimeout']();
     next();
 }
+const RolesArray = [];
 class Proxy {
     /**
      * @method 注册获取订单详情事件
@@ -343,12 +344,18 @@ class Proxy {
             }
             let staff = await Models.staff.get(staffid);
             let role: any = null ;
+
             if(staff.roleId == 0) {
                 role = 'defaultCreater'; //表示创建者身份
-            } else {
+            }
+
+            if(!role){
                 let managers: Department[] | Project[] = await Models.department.find({where: {managerId: staff.id}});
-                managers = managers && managers.length? managers : await Models.project.find({where: {managerId: staff.id}})
-                if(managers && managers.length) role = 'manager';
+                if(managers && managers.length) role = 'departmentManager';
+                if(!role){
+                    managers =  await Models.project.find({where: {managerId: staff.id}})
+                    if(managers && managers.length)  role = 'projectManager';
+                }
             }
          
             let appSecret = config.permission.appSecret;
