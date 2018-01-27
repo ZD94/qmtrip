@@ -532,7 +532,7 @@ export default class ApiTravelBudget {
                 isFinalInApprove = true;
             }
 
-            let queryParams;
+            let queryParams = approve.data;
             if (typeof approve.data == 'string') {
                 queryParams = JSON.parse(approve.data);
             }
