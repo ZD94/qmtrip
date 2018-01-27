@@ -4,11 +4,9 @@
 var ldap = require('ldapjs');
 export default class LdapApi {
 
-    private url: string;
     private client: any;
 
     constructor(url: string) {
-        this.url = url;
         this.client = ldap.createClient({
             url: url
         });

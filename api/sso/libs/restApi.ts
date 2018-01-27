@@ -1,14 +1,7 @@
-import { WStaff, IWStaff } from "api/sso/libs/wechat-staff";
+import { IWStaff } from "api/sso/libs/wechat-staff";
 import { IWDepartment } from "api/sso/libs/wechat-department";
-import { Express } from "express-serve-static-core";
 var request = require("request-promise");
 import cache from 'common/cache';
-
-const enum EIteratorSwitch {
-    ACCESS_ITERATABLE = 1,  //表示迭代获取
-    ACCESS_NO_ITERATOR = 0  //不使用迭代获取，只获取当前
-}
-
 
 export class RestApi {
 
@@ -257,7 +250,6 @@ async function reqProxy(params: {
 }): Promise<any> {
     let { url, method, body = {}, qs = {} } = params;
     let result;
-    let options
     try {
         result = await request({ url, method, body, qs, json: true });
     } catch (err) {

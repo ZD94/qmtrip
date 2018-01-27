@@ -9,14 +9,11 @@ const API = require("@jingli/dnode-api")
 import Logger from "@jingli/logger"
 import {clientExport} from "@jingli/dnode-api/dist/src/helper"
 import WangxUtils from "./lib/wangxUtils"
-import WangxCompany from "./lib/wangxCompany"
-import WangxStaff from "./lib/wangxStaff"
-import {OaStaff} from 'libs/asyncOrganization/oaStaff';
 import {SPropertyType, Staff} from "_types/staff";
 import {Models} from "../../_types/index";
 import L from "@jingli/language"
 import WangXinApi from "./lib/wangxApi";
-import C = require("@jingli/config");
+const C = require("@jingli/config");
 import WangxDepartment from "./lib/wangxDepartment";
 import {Company} from "../../_types/company/company";
 import {CompanyProperty, CPropertyType} from "../../_types/company/company-property";
@@ -87,7 +84,6 @@ export default class WangXinModule {
                 }
             }
             for(let item of wxDepartment){
-                let pid = item.pid;
                 let wxDept = new WangxDepartment({name: item.name, parentId: item.pid, id: item.id, company: company, wangXinApi: wangXinApi});
                 await wxDept.sync({company: company});
             }

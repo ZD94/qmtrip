@@ -5,9 +5,6 @@ import { EGender, Models } from "_types";
 import { RestApi } from "api/sso/libs/restApi";
 import { StaffProperty, SPropertyType, Staff } from "_types/staff";
 import { WDepartment, IWDepartment } from "api/sso/libs/wechat-department";
-var corpId = 'wwb398745b82d67068'
-var suiteId ='wwcd27af224b6e42e8';
-var secret = 'P2MJM1phbwSZiul9wE7XAjmEOqBHTOpUKulfI0gPKR0';
 export enum EWechatStaffStatus {
     active = 1,  //已激活
     disable = 2,  //已禁用

@@ -1,6 +1,6 @@
 import { OaDepartment } from "libs/asyncOrganization/oaDepartment";
 import { Company } from "_types/company";
-import { WStaff, IWStaff, EStaffStatus, EWechatStaffStatus } from "api/sso/libs/wechat-staff";
+import { WStaff, IWStaff, EWechatStaffStatus } from "api/sso/libs/wechat-staff";
 import { OaStaff } from "libs/asyncOrganization/oaStaff";
 import { RestApi } from "api/sso/libs/restApi";
 import { DepartmentProperty, DPropertyType } from "_types/department";

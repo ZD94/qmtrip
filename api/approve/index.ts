@@ -399,8 +399,7 @@ class ApproveModule {
         budget: number,
         version?: number
     }) {
-        let {approveId, submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark,staffList, budget, version} = params;
-        let staff = await Models.staff.get(submitter);
+        let {approveId} = params;
         let approve = await Models.approve.get(approveId);
         // let approve = Models.approve.create({
         //     submitter: submitter,

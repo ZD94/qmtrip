@@ -1,7 +1,6 @@
 
 import { Sequelize, Transaction } from 'sequelize';
 import { Approve, EApproveStatus } from '_types/approve';
-import { ERejectApproveTypes } from '_types/tripApprove';
 import { QMEApproveStatus } from '_types/tripPlan';
 const config = require("@jingli/config");
 var sequelize = require("sequelize");
