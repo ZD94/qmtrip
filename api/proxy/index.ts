@@ -6,7 +6,7 @@ import { Models } from "_types";
 import { AuthRequest, AuthResponse } from '_types/auth';
 import {getCompanyTokenByAgent} from '../restful';
 var requestp = require("request-promise");
-import { EOrderStatus, EOrderType, TripDetail } from "_types/tripPlan";
+import { EOrderStatus, EOrderType, TripDetail, Project } from "_types/tripPlan";
 var request = require("request");
 var path = require("path");
 var _ = require("lodash");
@@ -17,6 +17,7 @@ var timeout = require('connect-timeout');
 import * as CLS from 'continuation-local-storage';
 let CLSNS = CLS.getNamespace('dnode-api-context');
 import { genSign } from "@jingli/sign";
+import { Department } from '_types/department';
 const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'content-type, Content-Type, auth, supplier, authstr, staffid, companyid, accountid'} 
 function resetTimeout(req, res, next){
     req.clearTimeout();
@@ -318,7 +319,13 @@ class Proxy {
             let role: any = null ;
             if(staff.roleId == 0) {
                 role = 'defaultCreater'; //表示创建者身份
+            } else {
+                let managers: Department[] | Project[] = await Models.department.find({where: {managerId: staff.id}});
+                managers = managers && managers.length? managers : await Models.project.find({where: {managerId: staff.id}})
+                if(managers && managers.length) role = 'manager';
             }
+    
+            
             let appSecret = config.permission.appSecret;
             let pathstring = req.path;
             let timestamp = Math.floor(Date.now()/1000);
