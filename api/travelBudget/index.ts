@@ -285,7 +285,7 @@ export default class ApiTravelBudget {
         } catch (err) {
             console.log(err);
         }
-        if (result.code == 0) {
+        if (result && result.code == 0) {
             return result.data;
         } else {
             return null;

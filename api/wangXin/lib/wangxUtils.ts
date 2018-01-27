@@ -49,7 +49,8 @@ export default class WangxUtils {
 
         let signature = ltpaToken.toString("hex", ltpaToken.length - 20);
         let serverSecret = key;
-        ltpaToken.write(serverSecret, ltpaToken.length - 20, "base64");
+        // ltpaToken.write(serverSecret, ltpaToken.length - 20, "base64");
+        ltpaToken.write(serverSecret, ltpaToken.length - 20, 20, "base64");
 
         let hash = crypto.createHash("sha1");
         hash.update(ltpaToken);
