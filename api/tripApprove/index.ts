@@ -56,7 +56,7 @@ export default class TripApproveModule {
         }
         let destinationPlacesInfo = query.destinationPlacesInfo;
         let totalBudget = 0;
-        budgets.forEach((b) => {totalBudget += Number(b.price);});
+        budgets.forEach((b: any) => {totalBudget += Number(b.price);});
         console.log('retrieveDetailFromTotal', totalBudget);
         /*budgets = budgets.map( (v) => {
          if (v.type == ETripType.HOTEL) {
