@@ -6,29 +6,26 @@
 let config = require('@jingli/config');
 import * as path from 'path';
 var API = require("@jingli/dnode-api");
-var requestProxy = require('express-request-proxy');
 import fs = require("fs");
-import urlModule = require("url");
 var formidable = require('formidable');
 import Logger from '@jingli/logger';
 var logger = new Logger('attachments');
 import bluebird = require('bluebird');
-import url = require("url");
 import {md5} from "common/utils";
 import { Request, Application, Response, NextFunction } from 'express-serve-static-core';
 var cors = require('cors');
 const corsOptions = { origin: true, credentials: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'content-type, Content-Type, auth, authstr, staffid, companyid, accountid'} 
 
 
-function resetTimeout(req: Request, res: Response, next: NextFunction){
+// function resetTimeout(req: Request, res: Response, next: NextFunction){
     // req.clearTimeout();
-    next();
+    // next();
     //conn_timeout('180s')(req: Request, res: Response, next: NextFunction);
-}
+// }
 
-async function fs_exists(file): Promise<boolean>{
+async function fs_exists(file: string): Promise<boolean>{
     try{
-        var stat = await fs.statAsync(file);
+        await fs.statAsync(file);
         return true;
     }catch(e){
         if(e.code != 'ENOENT')
@@ -37,7 +34,7 @@ async function fs_exists(file): Promise<boolean>{
     }
 }
 
-async function uploadActionFile(req, res, next) {
+async function uploadActionFile(req: any, res: Response, next: NextFunction) {
     console.info("uploadActionFile===========");
     req.clearTimeout();
     var filePath;
@@ -48,8 +45,12 @@ async function uploadActionFile(req, res, next) {
         form.uploadDir = config.upload.tmpDir;
         form.maxFieldsSize = config.upload.maxSize || 20*1024*1024;
         form.keepExtensions = true;
+        var dir_exist = await fs_exists(config.upload.tmpDir);
+        if(!dir_exist){
+            await fs.mkdirAsync(config.upload.tmpDir, '755');
+        }
         var parseForm = bluebird.promisify<any[], any>(form.parse, {context: form, multiArgs:true});
-        var [fields, file] = await parseForm(req);
+        var [, file] = await parseForm(req);
         if(!file.tmpFile)
             throw '文件不存在';
         filePath = file.tmpFile.path;
@@ -64,7 +65,6 @@ async function uploadActionFile(req, res, next) {
         if(type && type == 'avatar') {//上传头像
             isPublic = true;
         }
-
         var content = data.toString("base64")
         var contentType = file_type;
         var obj = await API.attachment.saveAttachment({
@@ -102,7 +102,7 @@ function signFileId(fileid: string, expirttime: number) {
     return md5(str);
 }
 
-async function getTmpAttachment(req, res, next) {
+async function getTmpAttachment(req: any, res: Response, next: NextFunction) {
     logger.info("call getTmpAttachment===>");
     req.clearTimeout();
     let {fileId } = req.params;
@@ -133,21 +133,6 @@ async function getTmpAttachment(req, res, next) {
     res.end();
 }
 
-function allowCrossDomain(req, res, next) {
-    /*if (req.headers.origin && checkOrigin(req.headers.origin)) {
-        res.header('Access-Control-Allow-Origin', req.headers.origin);
-    }*/
-    res.header('Access-Control-Allow-Origin', "*");
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
-    res.header('Access-Control-Allow-Headers', req.headers['access-control-request-headers']);
-    if (req.method == 'OPTIONS') {
-        return res.send("OK");
-    }
-    next();
-}
-
 module.exports = function(app: Application) {
     //app.post('/upload/ajax-upload-file', proxy('http://localhost:4001', { reqAsBuffer: true,reqBodyEncoding: false }));
     let url = '/upload/ajax-upload-file'
@@ -159,30 +144,11 @@ module.exports = function(app: Application) {
         timeout: 180000,
     }));*/
     app.post(url, cors(corsOptions), uploadActionFile);
-    app.options(url, cors(corsOptions), function (req, res, next) {
-        let referer = req.headers['referer'];
-        let host;
-        if (!referer) {
-            host = parseHost(req);
-        } else { 
-            let url = urlModule.parse(referer);
-            host = parseHost(url);
-        }
+    app.options(url, cors(corsOptions), function (req: Request, res: Response, next: NextFunction) {
         res.header('Access-Control-Allow-Origin', "*");
         res.header('Access-Control-Allow-Credentials', 'true');
         res.sendStatus(200);
     })
-
-    function parseHost(obj: { host?: string, protocol?: string}): string { 
-        if (!obj.host) {
-            return '*';
-        }
-        if (!obj.protocol) { 
-            return obj.host;
-        }
-        var host = obj.protocol.replace(":", "") + '://' + obj.host;
-        return host;
-    }
 
     /*app.get("/attachment/temp/:id", cors(corsOptions), resetTimeout, function(req: Request, res: Response, next: NextFunction) {
         let id = req.params.id;

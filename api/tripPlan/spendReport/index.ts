@@ -58,7 +58,6 @@ function html2pdf(html: any, base: any): Promise<Buffer> {
 
 const templatePath = path.normalize(path.join(__dirname, 'template.html'));
 const projectTemplatePath = path.normalize(path.join(__dirname, 'project_template.html'));
-var templateBase = 'file://' + templatePath;
 
 export async function makeSpendReport(data: object, type?: string): Promise<Buffer> {
     console.info('data======================',data);

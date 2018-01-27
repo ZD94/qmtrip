@@ -3,11 +3,10 @@ import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
 import requestPromise = require('request-promise');
-import { CookieJar } from 'request';
 import request = require('request');
 
 export class WebRobot{
-    cookieJar: CookieJar;
+    cookieJar: any;
     client: typeof requestPromise;
     client_orig: typeof request;
     constructor(public origin: string){
@@ -45,7 +44,7 @@ export class WebRobot{
                 .on('close', function(){
                     resolve(tmpfile);
                 })
-                .on('error', function(err: any){
+                .on('error', function(err: any) {
                     reject(err);
                 });
         })
