@@ -29,6 +29,7 @@ import { getSession } from "@jingli/dnode-api";
 import { ACCOUNT_STATUS, Account } from '_types/auth';
 const linkmanCols = Linkman['$fieldnames'];
 import * as error from "@jingli/error";
+import { access } from 'fs';
 const invitedLinkCols = InvitedLink['$fieldnames'];
 const staffSupplierInfoCols = StaffSupplierInfo['$fieldnames'];
 const staffAllCols = Staff['$getAllFieldNames']();
@@ -423,7 +424,7 @@ class StaffModule{
         let company = staff.company;
 
         if(params.email){
-            if(updateStaff.staffStatus != 0){
+            if(staff.status == ACCOUNT_STATUS.ACTIVE && updateStaff.staffStatus != EStaffStatus.FORBIDDEN){
                 throw L.ERR.NOTALLOWED_MODIFY_EMAIL();
             }
 
