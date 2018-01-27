@@ -82,7 +82,7 @@ async function dealData(DB: Sequelize, t: Transaction) {
 
 async function updateTripDetail(tripDetail, DB) {
     let sql = `update trip_plan.trip_details set budget_info = '${JSON.stringify(tripDetail.budget_info)}' where id = '${tripDetail.id}'`;
-    let tripDetails = await DB.query(sql, { type: SEQUELIZE.QueryTypes.SELECT });
+    await DB.query(sql, { type: SEQUELIZE.QueryTypes.SELECT });
     console.log(`**********= ${num++} ==== update tripDetail ===>`, tripDetail.id);
 }
 
