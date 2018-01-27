@@ -29,7 +29,6 @@ import { getSession } from "@jingli/dnode-api";
 import { ACCOUNT_STATUS, Account } from '_types/auth';
 const linkmanCols = Linkman['$fieldnames'];
 import * as error from "@jingli/error";
-import { access } from 'fs';
 const invitedLinkCols = InvitedLink['$fieldnames'];
 const staffSupplierInfoCols = StaffSupplierInfo['$fieldnames'];
 const staffAllCols = Staff['$getAllFieldNames']();
