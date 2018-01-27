@@ -1,11 +1,11 @@
-import {Request, Response, NextFunction, Application} from "express-serve-static-core";
+import {Request, Response, Application, NextFunction} from "express-serve-static-core";
 import {parseAuthString} from "_types/auth/auth-cert";
 import { Staff } from "_types/staff";
 import { Models } from "_types";
 import { AuthResponse } from '_types/auth';
 import {getCompanyTokenByAgent} from '../restful';
 var ApiTravelBudget = require('api/travelBudget');
-import { EOrderStatus, TripDetail, ETripDetailStatus, EPayType } from "_types/tripPlan";
+import { EOrderStatus, TripDetail, ETripDetailStatus, EPayType, Project } from "_types/tripPlan";
 var request = require("request");
 var _ = require("lodash");
 var cors = require('cors');
@@ -15,6 +15,7 @@ var timeout = require('connect-timeout');
 import * as CLS from 'continuation-local-storage';
 let CLSNS = CLS.getNamespace('dnode-api-context');
 import { genSign } from "@jingli/sign";
+import { Department } from '_types/department';
 const corsOptions = { 
     origin: true, 
     methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], 
@@ -342,9 +343,20 @@ class Proxy {
             }
             let staff = await Models.staff.get(staffid);
             let role: any = null ;
+
             if(staff.roleId == 0) {
                 role = 'defaultCreater'; //表示创建者身份
             }
+
+            if(!role){
+                let managers: Department[] | Project[] = await Models.department.find({where: {managerId: staff.id}});
+                if(managers && managers.length) role = 'departmentManager';
+                if(!role){
+                    managers =  await Models.project.find({where: {managerId: staff.id}})
+                    if(managers && managers.length)  role = 'projectManager';
+                }
+            }
+         
             let appSecret = config.permission.appSecret;
             let pathstring = req.path;
             let timestamp = Math.floor(Date.now()/1000);
@@ -399,7 +411,7 @@ async function verify(req: Request, res: Response, next: Function) {
             accountId : verification.accountId,
             staffId   : staffid
         })
-    } catch(err) {
+    } catch(err) { 
         if(err)
             return res.sendStatus(401);
     }
