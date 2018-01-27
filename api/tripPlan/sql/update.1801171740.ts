@@ -2,29 +2,10 @@
 
 
 import { Sequelize, Transaction } from 'sequelize';
-import { TripPlan, TripDetail } from '_types/tripPlan';
+import { TripDetail } from '_types/tripPlan';
 
 var sequelize = require("sequelize");
 
-//老版的tripPlanStatus
-enum EOldPlanStatus {
-    CANCEL = -4,            //出差计划撤销状态
-    AUDIT_NOT_PASS = -3,    //票据未审核通过
-    NO_BUDGET = -1,         //没有预算
-    WAIT_UPLOAD = 1,        //待上传票据
-    WAIT_COMMIT = 2,        //待提交状态
-    AUDITING = 3,           //已提交待审核状态
-    COMPLETE = 4            //审核完，已完成状态
-}
-
-//老版的auditStatus
-enum EOldAuditStatus {
-    INVOICE_NOT_PASS = -2,  //票据未审核通过
-    NOT_PASS = -1,          //审批未通过
-    AUDITING = 0,           //审批中
-    PASS = 1,               //审批通过，待审核
-    INVOICE_PASS = 2,       //票据审核通过
-}
 export default async function update(DB: Sequelize, t: Transaction){
     let tripPlanSql = `select * from trip_plan.trip_plans where deleted_at is null;`
     let tripPlans = await DB.query(tripPlanSql, {type: sequelize.QueryTypes.SELECT});
@@ -32,7 +13,6 @@ export default async function update(DB: Sequelize, t: Transaction){
     let updateSql: string;
     await Promise.all(tripPlans.map(async (tripPlan: any) => {
         let status = tripPlan.status;
-        let auditStatus = tripPlan.audit_status;
         let tripDetailSql = `select * from trip_plan.trip_details where trip_plan_id = '${tripPlan.id}'`;
         let tripDetails = await DB.query(tripDetailSql, {type: sequelize.QueryTypes.SELECT});
         let reservedExists = false;

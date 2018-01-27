@@ -15,7 +15,7 @@ describe("api/proxy", async () => {
             request(url)
             .get(`/order/${tripDetail[0].id}`)
             .expect(200)
-            .end(async (err, res) => {
+            .end(async (err: Error, res: {body: any[]}) => {
                 if(err)
                     console.log(err);
                 let result = res.body;
@@ -28,7 +28,7 @@ describe("api/proxy", async () => {
             request(url)
             .post(`/order/${tripDetail[0].id}`)
             .expect(200)
-            .end(async (err, res) => {
+            .end(async (err: Error, res: {body: any[]}) => {
                 if(err)
                     console.log(err);
                 let result = res.body;

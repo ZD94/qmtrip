@@ -12,7 +12,6 @@ import {Staff, EStaffStatus,EStaffRole} from "_types/staff";
 // import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion,CompanyRegion,RegionPlace } from '_types/travelPolicy';
 import { Models } from '_types';
 import { PaginateInterface } from "common/model/interface";
-import {AgencyUser} from "_types/agency"
 var request = require("request");
 import { getCompanyTokenByAgent } from 'api/restful';
 import { restfulAPIUtil } from 'api/restful';
@@ -298,11 +297,6 @@ export default class TravelPolicyModule{
     @clientExport
     @requireParams(["companyId"], ["companyId", "isDefault","name","p", "pz"])
     static async getTravelPolicies(params: {companyId: string, p?: number, pz?: number,isDefault?: boolean, name?:string}): Promise<any>{
-        let {companyId } = params;
-        var staff = await Staff.getCurrent();
-        let company = await Models.company.get(companyId);
-        let agencyUser = await AgencyUser.getCurrent();
-
         /*if((staff && staff['roleId'] != EStaffRole.ADMIN && staff['roleId'] != EStaffRole.OWNER) ||
             (agencyUser && agencyUser['agencyId'] != company['agencyId'])) {
             throw L.ERR.PERMISSION_DENY();

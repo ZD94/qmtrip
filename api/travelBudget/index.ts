@@ -3,7 +3,7 @@
  */
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { Models } from '_types'
-import { ETripType, EInvoiceType, ICreateBudgetAndApproveParams, ICreateBudgetAndApproveParamsNew, ISegment, QMEApproveStatus, EApproveResult, EBackOrGo } from "_types/tripPlan";
+import { ETripType, ICreateBudgetAndApproveParams, ICreateBudgetAndApproveParamsNew, QMEApproveStatus, EApproveResult, EBackOrGo } from "_types/tripPlan";
 import {Approve} from '_types/approve';
 import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
@@ -13,8 +13,6 @@ const moment = require('moment');
 require("moment-timezone");
 const cache = require("common/cache");
 const utils = require("common/utils");
-import _ = require('lodash');
-import {Place} from "_types/place";
 
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 let config = require('@jingli/config');
@@ -22,29 +20,23 @@ export var NoCityPriceLimit = 0;
 const DefaultCurrencyUnit = 'CNY';
 import {restfulAPIUtil} from "api/restful";
 import {
-    meiyaJudge,
     getMeiyaFlightData,
     getMeiyaTrainData,
-    compareFlightData,
-    compareTrainData,
     getMeiyaHotelData,
-    compareHotelData, handleTrainData, handleFlightData,handelHotelsData
+    handleTrainData,
+    handleFlightData,
+    handelHotelsData,
+    IMeiyaAuthData
 } from "./meiya";
 import {Application, Request, Response, NextFunction} from 'express';
 
 let RestfulAPIUtil = restfulAPIUtil;
-import * as CLS from 'continuation-local-storage';
 
 import { DB } from "@jingli/database";
-import { Company } from "_types/company";
-import { EApproveType, STEP, EApproveStatus } from '_types/approve';
+import { EApproveType, STEP } from '_types/approve';
 import { Transaction } from 'sequelize';
-import CompanyModule from 'api/company';
 import {ECostCenterType} from "_types/costCenter/costCenter";
-import {emitter, EVENT} from "libs/oa";
-
-var CLSNS = CLS.getNamespace('dnode-api-context');
-var request = require("request");
+import { ISubsidyTemplate } from '_types/travelPolicy';
 
 export interface ICity {
     name: string;
@@ -161,14 +153,11 @@ export default class ApiTravelBudget {
         // }
         let companyInfo = await ApiTravelBudget.getCompanyInfo();
         let data = companyInfo;
-        let authData = [];
-        data.map((item) => {
-            let obj = {};
+        let authData: IMeiyaAuthData[] = [];
+        data.map((item: {identify: any, sname: string}) => {
             let identify = item.identify;
             let sname = item.sname;
-            obj["identify"] = identify;
-            obj["sname"] = sname;
-            authData.push(obj);
+            authData.push({identify, sname});
             return authData
         })
 
@@ -191,7 +180,7 @@ export default class ApiTravelBudget {
             console.log("meiyaHotel ===> meiyaHotel data.", meiyaHotel.length)
             if (meiyaHotel && meiyaHotel.length)
                 // commonData = compareHotelData(commonData, meiyaHotel);
-                commonData = handelHotelsData(meiyaHotel,params);
+                commonData = handelHotelsData(meiyaHotel, params);
             // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".finallyHotel.json", commonData);
             return commonData;
         }
@@ -221,14 +210,11 @@ export default class ApiTravelBudget {
 
         let companyInfo = await ApiTravelBudget.getCompanyInfo(); 
         let data = companyInfo;
-        let authData = [];
-        data.map((item) => {
-            let obj = {};
+        let authData: IMeiyaAuthData[] = [];
+        data.map((item: {identify: any, sname: string}) => {
             let identify = item.identify;
             let sname = item.sname;
-            obj["identify"] = identify;
-            obj["sname"] = sname;
-            authData.push(obj);
+            authData.push({identify, sname});
             return authData
         });
 
@@ -546,11 +532,10 @@ export default class ApiTravelBudget {
                 isFinalInApprove = true;
             }
 
-            let queryParams = approve.data;
-            if (typeof queryParams == 'string') {
+            let queryParams;
+            if (typeof approve.data == 'string') {
                 queryParams = JSON.parse(approve.data);
             }
-            let destinationPlacesInfo = queryParams.query.destinationPlacesInfo;
 
             let count = queryParams.query.staffList.length;
             let staffId = queryParams.query['staffId'];
@@ -562,7 +547,7 @@ export default class ApiTravelBudget {
             let companyId = staff.company.id;
 
             let _budgets = params.budgetResult.budgets;
-            let ps: Promise<any>[] = _budgets.map(async (item) => {
+            let ps: Promise<any>[] = _budgets.map(async (item: ICreateBudgetAndApproveParamsNew) => {
                 return await ApiTravelBudget.transformBudgetData(item, companyId, count);
             });
             let budgets = await Promise.all(ps);
@@ -619,7 +604,7 @@ export default class ApiTravelBudget {
                         approve.budget = totalBudget;
                         await approve.save();
                         console.log('-----------update traipApprove;,', totalBudget);
-                        let tripApproveUpdate = await API.tripApprove.updateTripApprove({
+                        await API.tripApprove.updateTripApprove({
                             id: approve.id,
                             budget: totalBudget,
                             companyId: companyId,
@@ -666,7 +651,6 @@ export default class ApiTravelBudget {
         preferedCurrency = preferedCurrency && typeof (preferedCurrency) != 'undefined' ? preferedCurrency : DefaultCurrencyUnit;
 
         let tripNumCost = 0;  //企业行程点数花费
-        let content = '';     //企业行程点数扣除，行程地
 
         if (!staffId || staffId == 'undefined') {
             let currentStaff = await Staff.getCurrent();
@@ -699,13 +683,11 @@ export default class ApiTravelBudget {
             params.staffList.push(staffId);
         }
         let count = params.staffList.length;
-        let destinationPlacesInfo = params.destinationPlacesInfo;
         let _staff: any = {
             gender: staff.sex,
             policy: 'domestic',
         }
         let staffs = [_staff];
-        let goBackPlace = params['goBackPlace'];
 
         let feeCollectedType = params['feeCollectedType'];
         let feeCollected = params['feeCollected'];
@@ -725,8 +707,6 @@ export default class ApiTravelBudget {
         let approveUser: Staff = params['approveUser'];
 
         if (approveId) {
-            let tripApprove = await API.tripApprove.getTripApprove({id: approveId});
-            let lockBudget: boolean = tripApprove['lockBudget'];
             let checkApprove = await Models.approve.get(approveId);
             let approveStatus = checkApprove['tripApproveStatus'];
             if (approveStatus == QMEApproveStatus.PASS || approveStatus == QMEApproveStatus.REJECT ||
@@ -772,7 +752,7 @@ export default class ApiTravelBudget {
         let segmentsBudget = budgetResult.budgets;
 
 
-        let ps: Promise<any>[] = segmentsBudget.map(async (item) => {
+        let ps: Promise<any>[] = segmentsBudget.map(async (item: any) => {
             return await ApiTravelBudget.transformBudgetData(item, companyId, count);
         });
         let budgets = await Promise.all(ps);
@@ -833,7 +813,6 @@ export default class ApiTravelBudget {
                 updateBudget.budget = totalBudget;
                 updateBudget.step = budgetResult.step;
 
-                console.log(updateBudget.data.budgets[0].index, '******* 11111111');
                 console.log("approveId =======>", updateBudget.id);
                 await updateBudget.save();
             }
@@ -867,7 +846,7 @@ export default class ApiTravelBudget {
     }
 
     //获取公司信息
-    static async getCompanyInfo(sname?:string) {
+    static async getCompanyInfo(sname?:string): Promise<any> {
         let currentStaff = await Staff.getCurrent();
         let staffId = currentStaff.id;
         let staff = await Models.staff.get(staffId);
@@ -892,7 +871,7 @@ export default class ApiTravelBudget {
 
     }
 
-    static async transformBudgetData(budget, companyId: string, count: number) {
+    static async transformBudgetData(budget: any, companyId: string, count: number) {
         budget.index = budget.index;
         delete budget.markedScoreData;
         delete budget.prefers;
@@ -939,7 +918,7 @@ export default class ApiTravelBudget {
                 budget.price = budget.price * count;
                 budget.tripType = ETripType.SUBSIDY;
                 if (budget.templates) {
-                    budget.templates.forEach((t) => {
+                    budget.templates.forEach((t: ISubsidyTemplate) => {
                         t.price = t.price * count;
                     })
                 }
@@ -1080,67 +1059,6 @@ export default class ApiTravelBudget {
     }
 }
 
-let params = {
-    "originPlace": "CT_131",
-    "goBackPlace": "CT_131",
-    "isRoundTrip": true,
-    "projectName": "",
-    "destinationPlacesInfo": [
-        {
-            "destinationPlace": "CT_289",
-            "leaveDate": "2017-12-29T10:00:00.000Z",
-            "goBackDate": "2017-12-30T01:00:00.000Z",
-            "latestArrivalDateTime": "2017-12-29T10:00:00.000Z",
-            "earliestGoBackDateTime": "2017-12-30T01:00:00.000Z",
-            "isNeedTraffic": true,
-            "isNeedHotel": true,
-            "subsidy": {
-                "template": null
-            },
-            "reason": ""
-        },
-        {
-            "destinationPlace": "CT_179",
-            "leaveDate": "2017-12-30T10:00:00.000Z",
-            "goBackDate": "2017-12-31T01:00:00.000Z",
-            "latestArrivalDateTime": "2017-12-30T10:00:00.000Z",
-            "earliestGoBackDateTime": "2017-12-31T01:00:00.000Z",
-            "isNeedTraffic": true,
-            "isNeedHotel": true,
-            "subsidy": {
-                "template": null
-            },
-            "reason": ""
-        }
-    ],
-    "staffList": [
-        "80fee190-87d9-11e7-a399-7f0d5a3787d9"
-    ],
-    "feeCollectedType": 1,
-    "feeCollected": "c793ad60-8d25-11e7-b9c5-e927d64b16b5",
-    "approveUser": {
-        "id": "80fee190-87d9-11e7-a399-7f0d5a3787d9",
-        "name": "陈陈",
-        "sex": 1,
-        "avatar": "",
-        "avatarColor": "",
-        "staffStatus": 1,
-        "totalPoints": "0.00",
-        "balancePoints": "0.00",
-        "roleId": 0,
-        "operatorId": null,
-        "quitTime": null,
-        "isTiped": true,
-        "accountId": "80ff7dd0-87d9-11e7-af88-7bce2d8228de",
-        "invoiceId": "2a7e0100-937f-11e7-bbe8-9d47a42d91d3",
-        "companyId": "81010470-87d9-11e7-a399-7f0d5a3787d9",
-        "travelPolicyId": "c24363e0-8943-11e7-813b-5350f214cafd",
-        "addWay": 0,
-        "createdAt": "2017-08-23T08:03:10.017Z",
-        "updatedAt": "2017-10-29T02:10:05.835Z",
-        "deletedAt": null
-    }
-}
 /* as ICreateBudgetAndApproveParamsNew; */
 
 // setTimeout(async ()=>{

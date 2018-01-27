@@ -1,15 +1,12 @@
-import {Express} from "express";
-import {Request, Response} from "express-serve-static-core";
+import {Request, Response, NextFunction, Application} from "express-serve-static-core";
 import {parseAuthString} from "_types/auth/auth-cert";
 import { Staff } from "_types/staff";
 import { Models } from "_types";
-import { AuthRequest, AuthResponse } from '_types/auth';
+import { AuthResponse } from '_types/auth';
 import {getCompanyTokenByAgent} from '../restful';
 var ApiTravelBudget = require('api/travelBudget');
-var requestp = require("request-promise");
-import { EOrderStatus, EOrderType, TripDetail, ETripDetailStatus, EPayType } from "_types/tripPlan";
+import { EOrderStatus, TripDetail, ETripDetailStatus, EPayType } from "_types/tripPlan";
 var request = require("request");
-var path = require("path");
 var _ = require("lodash");
 var cors = require('cors');
 const config = require("@jingli/config");
@@ -18,9 +15,13 @@ var timeout = require('connect-timeout');
 import * as CLS from 'continuation-local-storage';
 let CLSNS = CLS.getNamespace('dnode-api-context');
 import { genSign } from "@jingli/sign";
-const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'content-type, Content-Type, auth, supplier, authstr, staffid, companyid, accountid, isneedauth'} 
-function resetTimeout(req, res, next){
-    req.clearTimeout();
+const corsOptions = { 
+    origin: true, 
+    methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], 
+    allowedHeaders: 'content-type, Content-Type, auth, supplier, authstr, staffid, companyid, accountid, isneedauth'
+} 
+function resetTimeout(req: Request, res: Response, next: NextFunction){
+    req['clearTimeout']();
     next();
 }
 class Proxy {
@@ -29,7 +30,7 @@ class Proxy {
      * @param app {Express} 
      * @return {}
      */
-    static __initHttpApp(app: Express){
+    static __initHttpApp(app: Application){
 
         app.options(/^\/(order|travel|mall|supplier|bill|permission)*/, cors(corsOptions), (req: Request, res: Response, next: Function) => {         
             return res.sendStatus(200);
@@ -41,7 +42,7 @@ class Proxy {
 
             //公有云验证
             // let staff: Staff = await Staff.getCurrent();
-            let {authstr, staffid}  = req.headers;
+            let {staffid}  = req.headers;
             let staff: Staff = await Models.staff.get(staffid);
             let companyId: string = staff.company.id;
             let companyToken: string = await getCompanyTokenByAgent(companyId);
@@ -70,7 +71,7 @@ class Proxy {
                             token: companyToken,
                             companyId: companyId
                         }
-                    }, (err, resp, result) => {
+                    }, (err: Error, resp: any, result: object) => {
                         if (err) {
                             reject(err);
                         }
@@ -91,7 +92,7 @@ class Proxy {
         app.all(/^\/supplier.*$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: any, res: Response, next: Function) => {
 
             //公有云验证
-            let {authstr, staffid}  = req.headers;
+            let {staffid}  = req.headers;
             let staff: Staff = await Models.staff.get(staffid);
             let companyId: string = staff.company.id;
             let companyToken: string = await getCompanyTokenByAgent(companyId);
@@ -119,7 +120,7 @@ class Proxy {
                             token: companyToken,
                             companyId: companyId
                         }
-                    }, (err, resp, result) => {
+                    }, (err: Error, resp: any, result: object) => {
                         if (err) {
                             reject(err);
                         }
@@ -191,7 +192,6 @@ class Proxy {
                 identify = JSON.stringify(identify);
             }
             identify = encodeURIComponent(identify);
-            let isNeedAuth: string = req.headers['isneedauth'];
             // let auth: string = (isNeedAuth == '1') ? identify : '';
             let auth : string = identify;
             let headers: {[index: string]: any} = {
@@ -253,7 +253,7 @@ class Proxy {
         });
         
         app.all(/^\/mall.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
-            let {staffid, companyid, accountid} = req.headers;
+            let {staffid} = req.headers;
             let params =  req.body;
             if(req.method == 'GET') {
                 params = req.query;
@@ -280,7 +280,7 @@ class Proxy {
                         companyid: staff.companyId,
                         accountid: staff.accountId
                     }
-                }, (err, resp, result) => {
+                }, (err: Error, resp: any, result: object) => {
                     if (err) {
                         reject(err);
                     }
@@ -294,7 +294,7 @@ class Proxy {
 
         app.all(/^\/bill.*$/ ,cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
     
-            let {staffid, companyid, accountid} = req.headers;
+            let {staffid} = req.headers;
             let params =  req.body;
             if(req.method == 'GET') {
                 params = req.query;
@@ -321,7 +321,7 @@ class Proxy {
                         companyid: staff.companyId,
                         accountid: staff.accountId
                     }
-                }, (err, resp, result) => {
+                }, (err: Error, resp: any, result: object) => {
                     if (err) {
                         reject(err);
                     }
@@ -335,7 +335,7 @@ class Proxy {
         
         app.all(/^\/permission.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
       
-            let {staffid, companyid, accountid} = req.headers;
+            let {staffid} = req.headers;
             let params =  req.body;
             if(req.method == 'GET') {
                 params = req.query;
@@ -367,7 +367,7 @@ class Proxy {
                         accountid: staff.accountId,
                         role: role
                     }
-                }, (err, resp, result) => {
+                }, (err: Error, resp: any, result: object) => {
                     if (err) {
                         reject(err);
                     }

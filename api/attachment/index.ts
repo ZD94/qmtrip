@@ -110,8 +110,6 @@ class ApiAttachment {
      */
     static async getAttachment(params: {id: string, width?: number, height?: number}): Promise<any> {
         var id = params.id;
-        var width = params.width || 600;
-        var height = params.height || 600;
 
         var file = await Models.relateFile.get(id)
         if(!file)

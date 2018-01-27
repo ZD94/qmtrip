@@ -16,13 +16,13 @@ let scheduler = require('common/scheduler');
 let moment = require("moment");
 require("moment-timezone");
 import _ = require('lodash');
-import R = require('lodash/fp')
+const R = require('lodash/fp')
 import { requireParams, clientExport } from '@jingli/dnode-api/dist/src/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
     EPayType, ESourceType, EInvoiceStatus, TrafficEInvoiceFeeTypes, ProjectStaff, EProjectStatus, ETripDetailStatus, EOrderStatus
 } from "_types/tripPlan";
-import {Models, enumPlaneLevelToStr} from "_types";
+import {Models} from "_types";
 import {FindResult} from "common/model/interface";
 import {Staff, PointChange} from "_types/staff";
 import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
@@ -39,11 +39,11 @@ import { FindOptions } from 'sequelize';
 import { Department } from '_types/department';
 import { ITravelBudgetInfo } from 'http/controller/budget';
 let RestfulAPIUtil = restfulAPIUtil;
-import * as error from "@jingli/error";
 import { Company } from '_types/company';
 import { CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE } from '_types/coin';
 import { BUDGET_CHANGE_TYPE, ECostCenterType } from '_types/costCenter';
-const axios = require('axios')
+import { ICity } from 'api/travelBudget';
+
 interface ReportInvoice {
     type: string;
     date: Date;
@@ -206,7 +206,7 @@ class TripPlanModule {
      * @param params.id tripPlan id
      */
     @clientExport
-    static async autoSettleReward(params): Promise<boolean> {
+    static async autoSettleReward(params: {id: string,}): Promise<boolean> {
         if (typeof params == 'string') {
             params = JSON.parse(params);
         }
@@ -225,7 +225,6 @@ class TripPlanModule {
 
             company = await Models.company.get(unSettledRewardTripPlan.companyId);
             let points2coinRate: number = company.points2coinRate;  //企业余额可转为鲸币的比例
-            let scoreRatio: number = company.scoreRatio;  //企业奖励节省比例
             companyCoinAccount = await Models.coinAccount.get(company.coinAccountId);
             let companyBalanceCoins: number = companyCoinAccount.income - companyCoinAccount.consume - companyCoinAccount.locks;  //企业账户余额(鲸币)
 
@@ -442,7 +441,6 @@ class TripPlanModule {
         let reserveStatus = params.reserveStatus;
         if(typeof reserveStatus == 'string')
             reserveStatus = Number(reserveStatus);
-        let status = tripDetail.status;
         let tripDetails: TripDetail[];
         switch(reserveStatus) {
             case EOrderStatus.WAIT_SUBMIT: //等待创建订单
@@ -760,7 +758,7 @@ class TripPlanModule {
                 if (typeof destinationPlacesInfo == 'string') {
                     destinationPlacesInfo = JSON.parse(destinationPlacesInfo);
                 }
-                let destinationArray = [];
+                let destinationArray: string[] = [];
                 for (let i = 0; i < destinationPlacesInfo.length; i++) {
                     destinationArray.push(destinationPlacesInfo[i].destinationPlace);
                 }
@@ -769,7 +767,7 @@ class TripPlanModule {
                 }
                 for (let j = 0; j < destinationArray.length; j++) {
                     let cityCode = destinationArray.shift();
-                    let destinationName = await API.place.getCityInfo({cityCode: cityCode, companyId: staff.companyId});
+                    let destinationName: ICity = await API.place.getCityInfo({cityCode: cityCode, companyId: staff.companyId});
                     destinationArray.push(destinationName.name);
                 }
                 if (!tripPlan.deptCity) {  // 仅住宿
@@ -1238,7 +1236,7 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['name', 'companyId'], projectCols)
-    static async createProject(params): Promise<Project> {
+    static async createProject(params: {name: string, companyId: string, code?: string}): Promise<Project> {
         let _projects = await Models.project.find({ where: { code: params.code, companyId: params.companyId } });
         if (_projects && _projects.length) {
             return null;
@@ -1299,7 +1297,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(["projectId", "staffId"])
-    static async createProjectStaff(params): Promise<ProjectStaff> {
+    static async createProjectStaff(params: {projectId: string, staffId: string}): Promise<ProjectStaff> {
         var projectStaff = ProjectStaff.create(params);
         var already = await Models.projectStaff.find({ where: { projectId: params.projectId, staffId: params.staffId } });
         if (already && already.length > 0) {
@@ -1317,7 +1315,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(["id"])
-    static async deleteProjectStaff(params): Promise<any> {
+    static async deleteProjectStaff(params: {id: string}): Promise<any> {
         var id = params.id;
         var ah_delete = await Models.projectStaff.get(id);
 
@@ -1334,7 +1332,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(["id"], ["projectId", "staffId"])
-    static async updateProjectStaff(params): Promise<ProjectStaff> {
+    static async updateProjectStaff(params: {id: string}): Promise<ProjectStaff> {
         var id = params.id;
 
         var ah = await Models.projectStaff.get(id);
@@ -1365,8 +1363,7 @@ class TripPlanModule {
      * @returns {*}
      */
     @clientExport
-    static async getProjectStaffs(params): Promise<FindResult> {
-        var staff = await Staff.getCurrent();
+    static async getProjectStaffs(params: FindOptions<ProjectStaff>): Promise<FindResult> {
         let paginate = await Models.projectStaff.find(params);
         let ids = paginate.map(function (t) {
             return t.id;
@@ -1863,7 +1860,7 @@ class TripPlanModule {
             query.destinationPlacesInfo = JSON.parse(query.destinationPlacesInfo);
 
         let destinationPlacesInfo = query.destinationPlacesInfo;
-        let budgets: ITravelBudgetInfo[] = approve.data.budgets;
+        let budgets = approve.data.budgets;
         if (typeof budgets == 'string')
             budgets = JSON.parse(budgets);
 
@@ -2985,7 +2982,7 @@ class TripPlanModule {
 
         approve.data.query.travelPolicyId = travelPolicyId;
 
-        approve.data = JSON.stringify(approve.data);
+        // approve.data = JSON.stringify(approve.data);
 
         await API.tripApprove.updateTripApprove(tripApprove);
         await approve.save();
@@ -3012,7 +3009,7 @@ class TripPlanModule {
         })
         // if (R.any((t: TripDetail) => t.status != -4, tripDetails))
         //     throw new L.ERROR_CODE_C(400, '该行程需要上传票据')
-        const promises = []
+        const promises: Promise<any>[] = []
 
         // Fetch orders and calculate saving
         tripPlan.expenditure = R.sumBy(R.prop('expenditure'), tripDetails)
@@ -3049,15 +3046,6 @@ class TripPlanModule {
    
 
 }
-
-async function getOrderInfo(orderId: string) {
-    const res = await axios.get(`https://l.jingli365.com/svc/java-jingli-order1/tmc/order/getOrderInfo/${orderId}/order`)
-    if (res.status == 200 && res.data.code == 0) {
-        return res.data.data.detail.flightList
-    }
-    throw new L.ERROR_CODE_C(500, '获取订单详情失败：' + orderId)
-}
-
 
 async function updateTripDetailExpenditure(tripDetail: TripDetail) {
     //重新计算所有花费

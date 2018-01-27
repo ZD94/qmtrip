@@ -1,10 +1,8 @@
 import {Models} from "_types";
 import {Staff} from "_types/staff";
-import {EApproveResult, ETripType} from "_types/tripPlan";
 const moment = require("moment");
 var API = require('@jingli/dnode-api');
 import {MPlaneLevel, MTrainLevel, MHotelLevel,DefaultRegion} from '_types';
-import {Model, where} from "sequelize";
 import { ITravelBudgetInfo } from 'http/controller/budget';
 require("moment-timezone")
 
@@ -14,7 +12,6 @@ export = async function transform(values: {staffId: string,
     query: object, destinationPlacesInfo: any, cityMap: any, date: string, staffs: Staff[]
 }): Promise<any>{
     let cityMap = {};
-    let staffMap = {};
     let staff = await Models.staff.get(values.staffId);
     let travelPolicy = await staff.getTravelPolicy();
 

@@ -6,7 +6,7 @@
 'use strict';
 import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
 import {Models} from "_types/index";
-import {QMEApproveStatus, EApproveResult, ETripType, EPlanStatus, TripPlanLog} from "_types/tripPlan/tripPlan";
+import {QMEApproveStatus, EApproveResult, ETripType, TripPlanLog} from "_types/tripPlan/tripPlan";
 import moment = require("moment/moment");
 import {Staff, EStaffStatus, EStaffRole} from "_types/staff/staff";
 import {plugins} from "libs/oa/index";
@@ -16,12 +16,10 @@ var API = require('@jingli/dnode-api');
 const config = require("@jingli/config");
 import _ = require("lodash");
 import {ENoticeType} from "_types/notice/notice";
-import {AutoApproveType, AutoApproveConfig, ISegment, ICreateBudgetAndApproveParams, ICreateBudgetAndApproveParamsNew} from "_types/tripPlan"
+import {AutoApproveType, AutoApproveConfig, ISegment, ETripDetailStatus} from "_types/tripPlan"
 import {DB} from "@jingli/database";
 import {ITripApprove, IDestination} from "../../_types/tripApprove";
-import {Project} from "../../_types/tripPlan";
 import {EApproveStatus, EApproveType} from "_types/approve/types";
-import { ITravelBudgetInfo } from 'http/controller/budget';
 import { Place } from '_types/place';
 
 export default class TripApproveModule {
@@ -39,7 +37,7 @@ export default class TripApproveModule {
         approveUser = approveUser && typeof(approveUser) != 'undefined' ? approveUser : approve.approveUser;
         submitter = submitter && typeof(submitter) != 'undefined' ? submitter: approve.submitter;
 
-        let budgetInfo: {budgets: ITravelBudgetInfo[], query: ICreateBudgetAndApproveParams} = approve.data;
+        let budgetInfo = approve.data;
 
 
 
@@ -69,16 +67,7 @@ export default class TripApproveModule {
 
         let arrivalCityCodes: string[] = [];//目的地代码
         let destinations: IDestination[] = [];
-        let project: Project;
-        let projectId = query.projectId;
-        let projectName = query.projectName;
         let goBackPlace = query.goBackPlace;
-        if(projectId){
-            project = await Models.project.get(projectId);
-        }else if(projectName){
-            project = await API.tripPlan.getProjectByName({companyId: company.id, name: projectName,
-                userId: submitter});
-        }
         let tripApprove = {} as ITripApprove;
         tripApprove['id'] = approveNo;
         // tripApprove.approveUserId = approveUser;
@@ -224,7 +213,7 @@ export default class TripApproveModule {
                     detail.hasFirstDaySubsidy = budget.hasFirstDaySubsidy || true;
                     detail.hasLastDaySubsidy = budget.hasLastDaySubsidy || true;
                     // detail.expenditure = budget.price;
-                    detail.status = EPlanStatus.COMPLETE;
+                    detail.status = ETripDetailStatus.COMPLETE;
                     break;
                 case ETripType.SPECIAL_APPROVE:
                     detail = Models.tripDetailSpecial.create(data);
@@ -604,7 +593,7 @@ export default class TripApproveModule {
         if(typeof approve.data == 'string'){
             approve.data = JSON.parse(approve.data);
         }
-        let budgetInfo: {budgets: ITravelBudgetInfo[], query: ICreateBudgetAndApproveParamsNew} = approve.data;
+        let budgetInfo = approve.data;
         let {budgets, query} = budgetInfo;
         let number = 0;
 
@@ -835,7 +824,7 @@ export default class TripApproveModule {
             if(typeof tripApprove.data == "string"){
                 tripApprove.data = JSON.parse(tripApprove.data);
             }
-            let budgetInfo: {budgets: ITravelBudgetInfo[], query: ICreateBudgetAndApproveParams} = tripApprove.data;
+            let budgetInfo = tripApprove.data;
             let {query} = budgetInfo;
             if (typeof query == 'string') {
                 query = JSON.parse(query);

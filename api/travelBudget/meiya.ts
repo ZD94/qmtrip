@@ -10,6 +10,7 @@ import {ISearchHotelParams, ISearchTicketParams} from "./index";
 var request = require("request-promise");
 let moment = require("moment");
 import {MTrainLevel, MPlaneLevel} from "_types";
+import { IHotel, IFlightAgent } from '_types/travelbudget';
 
 /* 判断是否需要美亚数据 */
 export async function meiyaJudge() {
@@ -38,9 +39,7 @@ export function meiyaAuth(info?: object) {
 }
 
 /* 获取美亚数据 */
-let airCode = require("libs/suppliers/taobao_com/cityCode");
-
-export async function getMeiyaFlightData(params: ISearchTicketParams, authData) {
+export async function getMeiyaFlightData(params: ISearchTicketParams, authData: IMeiyaAuthData[]) {
     let data = [];
     // let departure = await API.place.getCityInfo({ cityCode: params.originPlaceId });
     // let arrival = await API.place.getCityInfo({ cityCode: params.destinationId });
@@ -70,7 +69,7 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData) 
                 auth: meiyaAuth(info),
                 supplier: sname
             }
-        }).catch(e => {
+        }).catch((e: Error) => {
             console.log(e)
         });
 
@@ -90,7 +89,7 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData) 
     }
 }
 
-export async function getMeiyaTrainData(params: ISearchTicketParams, authData) {
+export async function getMeiyaTrainData(params: ISearchTicketParams, authData: IMeiyaAuthData[]) {
     // let departure = await API.place.getCityInfo({ cityCode: params.originPlaceId });
     // let arrival = await API.place.getCityInfo({ cityCode: params.destinationId });
     let data = []
@@ -113,7 +112,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData) {
                 auth: meiyaAuth(info),
                 supplier: sname
             }
-        }).catch(e => {
+        }).catch((e: Error) => {
             console.log(e)
         });
         try {
@@ -135,7 +134,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData) {
 /**
  * @method 匹配jlbudget酒店数据为基础，meiya不一定都有
  */
-export async function getMeiyaHotelData(params: ISearchHotelParams, authData) {
+export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IMeiyaAuthData[]) {
     let data = [];
     // let destination = await API.place.getCityInfo({ cityCode: params.cityId });
     params.checkInDate = moment(params.checkInDate).format("YYYY-MM-DD");
@@ -155,7 +154,7 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData) {
                 auth: meiyaAuth(info),
                 supplier: sname
             }
-        }).catch(e => {
+        }).catch((e: Error) => {
             console.log(e)
         });
         try {
@@ -174,7 +173,7 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData) {
 }
 
 
-export function writeData(filename: string, data: any) {
+export function writeData(filename: string, data: object) {
     let dirPath = path.join(process.cwd(), "./mytest", "data");
     let source = fs.createWriteStream(path.join(dirPath, filename));
     let result = JSON.stringify(data, null, 4);
@@ -189,7 +188,7 @@ export function writeData(filename: string, data: any) {
 /**
  * @method 匹配jlbudget飞机数据为基础，meiya不一定都有
  */
-export function compareFlightData(origin: any[], meiyaData: any[]) {
+export function compareFlightData(origin: IFlightAgent[], meiyaData: IMeiyaFlight[]) {
     console.log("compareTrainData origin.length===>", origin.length);
     console.log("compareTrainData meiyaData.length===>", meiyaData.length);
     if (!origin || typeof (origin) == 'undefined')
@@ -264,14 +263,14 @@ export function compareFlightData(origin: any[], meiyaData: any[]) {
 /**
  * @method 火车数据匹配，以meiya为基础数据
  */
-export function compareTrainData(origin: any[], meiyaData: any[]) {
+export function compareTrainData(origin: any[], meiyaData: IMeiyaTrain[]) {
     console.log("compareTrainData origin.length===>", origin.length);
     console.log("compareTrainData meiyaData.length===>", meiyaData.length);
     if (!origin || typeof (origin) == 'undefined')
         return [];
     if (!meiyaData || typeof (meiyaData) == 'undefined' || !meiyaData.length)
         return origin;
-    origin = origin.map((item: any) => {
+    origin = origin.map((item) => {
         if (!item) return null;
         if (item.type != 0) {
             return item;
@@ -306,7 +305,7 @@ export function compareTrainData(origin: any[], meiyaData: any[]) {
                     }
                 }
                 return agentCabin;
-            }).filter((agentCabin: any) => {
+            }).filter((agentCabin) => {
                 if (!agentCabin || typeof (agentCabin) == 'undefined') return false;
                 return true;
             });
@@ -331,7 +330,7 @@ export function compareTrainData(origin: any[], meiyaData: any[]) {
 }
 
 //处理美亚酒店数据
-export function handelHotelsData(meiyaHotelData, originalData) {
+export function handelHotelsData(meiyaHotelData: IMeiyaHotel[], originalData: ISearchHotelParams) {
     let data: any[] = [];
     if (meiyaHotelData && meiyaHotelData.length) {
         let result: Array<any> = [];
@@ -347,7 +346,7 @@ export function handelHotelsData(meiyaHotelData, originalData) {
     }
 }
 
-function transferHotelData(meiyaHotelData, originalData) {
+function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHotelParams) {
     let model = {
         "name": meiyaHotelData.cnName,
         "star": meiyaHotelData.starRating,
@@ -383,7 +382,7 @@ function transferHotelData(meiyaHotelData, originalData) {
 }
 
 //处理美亚飞机数据
-export function handleFlightData(meiyaFlightData, originalData) {
+export function handleFlightData(meiyaFlightData: IMeiyaFlight[], originalData: ISearchTicketParams) {
     let data: any[] = [];
     if (meiyaFlightData && meiyaFlightData.length) {
         let result: Array<any> = [];
@@ -399,7 +398,7 @@ export function handleFlightData(meiyaFlightData, originalData) {
     }
 }
 
-function transferFlightData(meiyaFlightData: any, originalData) {
+function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearchTicketParams) {
     let name;
     let cabins = meiyaFlightData.flightPriceInfoList.map((item)=>{
         switch (item.cabin){
@@ -498,7 +497,7 @@ function transferFlightData(meiyaFlightData: any, originalData) {
 }
 
 //处理美亚火车数据
-export function handleTrainData(meiyaTrainData: any[], originalData) {
+export function handleTrainData(meiyaTrainData: any[], originalData: ISearchTicketParams) {
     let data: any[] = [];
     if (meiyaTrainData && meiyaTrainData.length) {
         let result: Array<any> = []
@@ -515,14 +514,9 @@ export function handleTrainData(meiyaTrainData: any[], originalData) {
 }
 
 
-function transferTrainData(meiyaTrainData: any, originalData) {
+function transferTrainData(meiyaTrainData: IMeiyaTrain, originalData: ISearchTicketParams) {
     let departDateTime = meiyaTrainData.StartTimeLong;
     let arrivalDateTime = meiyaTrainData.EndTimeLong;
-    let cabin, price;
-    for (let item of meiyaTrainData.SeatList) {
-        cabin = item.SeatName;
-        price = item.SeatPrice
-    }
     let cabins = meiyaTrainData.SeatList.map((item)=>{
         let name:any ;
         switch (item.SeatName){
@@ -607,7 +601,6 @@ export function compareHotelData(origin: any[], meiyaData: any[]) {
         return [];
     if (!meiyaData || typeof (meiyaData) == 'undefined')
         return origin;
-    let i = 0;
     for (let item of origin) {
         let start = {latitude: item.latitude, longitude: item.longitude};
         let isNearby = false;
@@ -725,10 +718,10 @@ export function similarityMatch(params: {
     return false;
 }
 
-export function matchMeiyaHotel(origin, meiyaData) {
-    let names = [];
-    let result = [];
-    origin.map((hotel, index) => {
+export function matchMeiyaHotel(origin: IHotel[], meiyaData: IMeiyaHotel[]) {
+    let names: string[] = [];
+    let result: IHotel[] = [];
+    origin.map((hotel, index: number) => {
         let hasMeiya = false;
         for (let agent of hotel.agents) {
             if (agent.name == "meiya") {
@@ -812,7 +805,7 @@ export interface IMeiyaFlight {
     depTime?: string;
     desAirport?: string;
     fAmount?: number;
-    flightNo: number;
+    flightNo: string;
     flightPriceInfoList?: Array<IMeiyaFlightPriceInfo>;
     isCodeShare?: boolean;
     meal?: boolean;
@@ -827,6 +820,7 @@ export interface IMeiyaFlight {
     arrivalCode?: string;
     departure?: string;
     departureCode?: string;
+    depTerm?: string | number
 }
 
 export interface IMeiyaTrainSeat {
@@ -843,6 +837,8 @@ export interface IMeiyaTrain {
     ArrDate?: string;
     DepStation?: string;
     ArrStation?: string;
+    StartTimeLong?: Date;
+    EndTimeLong?: Date;
 }
 
 export interface IMeiyaHotel {
@@ -875,5 +871,11 @@ export interface IMeiyaHotel {
     location?: any;
     hotelRoomList?: any;
     strHotelTrafficInformation?: any;
+    hotelMinPrice?: number;
+    name?: string;
+}
 
+export interface IMeiyaAuthData {
+    identify: object,
+    sname: string
 }
