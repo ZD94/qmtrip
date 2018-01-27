@@ -25,7 +25,6 @@ function resetTimeout(req: Request, res: Response, next: NextFunction){
     req['clearTimeout']();
     next();
 }
-const RolesArray = [];
 class Proxy {
     /**
      * @method 注册获取订单详情事件
