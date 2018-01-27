@@ -2,13 +2,14 @@ import { requireParams, clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { restfulAPIUtil } from '../restful'
 var _ = require("lodash");
 import cache from 'common/cache';
-const cityPrefix = 'city:info:'
+const cityPrefix = 'city:info'
 export default class PlaceModule {
 
     @clientExport
     @requireParams(['id'])
     static async getCityById(id: string, companyId?: string) {
-        let city :any = await cache.read(`${cityPrefix+id}`)
+        if(!id) return null;
+        let city :any = await cache.read(`${cityPrefix}:${id}`)
         if(city) return city;
         if(/^[a-zA-Z0-9_]+$/.test(id)){
             city = await restfulAPIUtil.operateOnModel({
@@ -19,7 +20,7 @@ export default class PlaceModule {
                 }
             });
             if(!city || !city.data) return null;
-            await cache.write(`${cityPrefix+id}`, city.data);
+            await cache.write(`${cityPrefix}:${id}`, city.data);
             return city.data;
         } 
         city = await restfulAPIUtil.operateOnModel({
@@ -32,10 +33,10 @@ export default class PlaceModule {
         });
         if(!city || !city.data) return null;
         if(_.isArray(city.data)){
-            await cache.write(`${cityPrefix+id}`, city.data[0]);
+            await cache.write(`${cityPrefix}:${id}`, city.data[0]);
             return city.data[0];
         } 
-        await cache.write(`${cityPrefix+id}`, city.data);
+        await cache.write(`${cityPrefix}:${id}`, city.data);
         return city.data;
 
     }
@@ -99,11 +100,6 @@ export default class PlaceModule {
 
     @clientExport
     static async getCityInfoByName(params?: {name?: string}){
-        if(params.name) {
-            let city :any = await cache.read(`${cityPrefix+params.name}`);
-            if(city) return city;
-        }    
-
         let cities = await restfulAPIUtil.operateOnModel({
             model: `place`,
             params: {
@@ -117,10 +113,8 @@ export default class PlaceModule {
         }
         if(!cities || !cities.data) return null;
         if( _.isArray(cities.data)){
-            await cache.write(`${cityPrefix+params.name}`, cities.data[0]);
             return cities.data[0]
         }
-        await cache.write(`${cityPrefix+params.name}`, cities.data);
         return cities.data;
     }
 
