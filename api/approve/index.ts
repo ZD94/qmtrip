@@ -187,7 +187,7 @@ class ApproveModule {
         }
         let totalBudget = 0;
         if(budgetInfo.budgets && budgetInfo.budgets.length>0){
-            budgetInfo.budgets.forEach(function(item){
+            budgetInfo.budgets.forEach(function(item: any){
                 if(item.tripType != ETripType.SUBSIDY){
                     number = number + 1;
                 }

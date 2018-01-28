@@ -36,7 +36,6 @@ import { DB } from "@jingli/database";
 import { EApproveType, STEP } from '_types/approve';
 import { Transaction } from 'sequelize';
 import {ECostCenterType} from "_types/costCenter/costCenter";
-import { ISubsidyTemplate } from '_types/travelPolicy';
 
 export interface ICity {
     name: string;
@@ -532,7 +531,7 @@ export default class ApiTravelBudget {
                 isFinalInApprove = true;
             }
 
-            let queryParams;
+            let queryParams = approve.data;
             if (typeof approve.data == 'string') {
                 queryParams = JSON.parse(approve.data);
             }
@@ -918,7 +917,7 @@ export default class ApiTravelBudget {
                 budget.price = budget.price * count;
                 budget.tripType = ETripType.SUBSIDY;
                 if (budget.templates) {
-                    budget.templates.forEach((t: ISubsidyTemplate) => {
+                    budget.templates.forEach((t: any) => {
                         t.price = t.price * count;
                     })
                 }
