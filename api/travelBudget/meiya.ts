@@ -554,6 +554,7 @@ function transferTrainData(meiyaTrainData: IMeiyaTrain, originalData: ISearchTic
             name,
             price: item.SeatPrice,
             cabin: item.SeatName,
+            isBookable:item.IsBookable,
             urlParams: {
                 No: meiyaTrainData.TrainNumber,
                 seatName: item.SeatName,
