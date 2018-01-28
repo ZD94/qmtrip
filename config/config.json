@@ -37,7 +37,7 @@
           "host": "${{hosts.main.addr}}",
           "port": "${{hosts.main.port}}"
         },
-        "modules": ["checkcode", "ctripapi", "dida", "flight", "jpush", "wechat", "sms"]
+        "modules": ["checkcode", "jpush", "wechat", "sms"]
       }
     ]
   },
