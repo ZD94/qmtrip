@@ -401,7 +401,7 @@ export function handleFlightData(meiyaFlightData: IMeiyaFlight[], originalData: 
 function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearchTicketParams) {
     let name;
     let cabins;
-    if(meiyaFlightData.flightPriceInfoList.length > 0){
+    if(meiyaFlightData.flightPriceInfoList && meiyaFlightData.flightPriceInfoList.length > 0){
         cabins = meiyaFlightData.flightPriceInfoList.map((item)=>{
             switch (item.cabin){
                 case "经济舱":
@@ -523,7 +523,7 @@ function transferTrainData(meiyaTrainData: IMeiyaTrain, originalData: ISearchTic
     let departDateTime = meiyaTrainData.StartTimeLong;
     let arrivalDateTime = meiyaTrainData.EndTimeLong;
     let cabins;
-    if(meiyaTrainData.SeatList.length >= 1){
+    if(meiyaTrainData.SeatList && meiyaTrainData.SeatList.length >= 1){
         cabins = meiyaTrainData.SeatList.map((item)=>{
             let name:any ;
             switch (item.SeatName){
