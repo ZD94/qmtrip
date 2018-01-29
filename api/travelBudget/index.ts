@@ -536,7 +536,6 @@ export default class ApiTravelBudget {
                 queryParams = JSON.parse(approve.data);
             }
 
-            let count = queryParams.query.staffList.length;
             let staffId = queryParams.query['staffId'];
             if (!staffId || staffId == 'undefined') {
                 staffId = approve.submitter;
