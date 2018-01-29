@@ -45,6 +45,7 @@ export class EmailController extends AbstractController {
                 userId,
                 key,
                 email,
+                mobile,
                 values
             });
         }catch(err) {

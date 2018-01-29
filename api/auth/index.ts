@@ -133,6 +133,7 @@ export default class ApiAuth {
         }
         pwd = utils.md5(pwd);
         account.isValidateMobile = true;
+        account.isNeedChangePwd = false;
         account.pwd = pwd;
         await account.save();
         return true;

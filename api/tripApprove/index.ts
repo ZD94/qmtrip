@@ -711,7 +711,9 @@ export default class TripApproveModule {
 
             if(approveResult == EApproveResult.PASS && query && query.feeCollected){
                 let costCenter = await Models.costCenter.get(query.feeCollected);
-                await costCenter.checkoutBudgetNotice();
+                if(costCenter){
+                    await costCenter.checkoutBudgetNotice();
+                }
             }
 
         }).catch(async function(err){

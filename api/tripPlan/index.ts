@@ -1585,7 +1585,7 @@ class TripPlanModule {
 
 
         // let planSql = `${completeSql}  and status in (${EPlanStatus.WAIT_UPLOAD}, ${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDITING}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.COMPLETE})`;
-        let planSql = `${completeSql}  and (status not in (${EPlanStatus.CANCEL, EPlanStatus.NO_BUDGET}));`
+        let planSql = `${completeSql}  and (status not in (${EPlanStatus.CANCEL}, ${EPlanStatus.NO_BUDGET}));`
         completeSql += ` and status=${EPlanStatus.COMPLETE}`;
 
         let savedMoneyCompleteSql = completeSql + ' and is_special_approve = false';
@@ -2733,7 +2733,7 @@ class TripPlanModule {
         logger.info('run task  ' + taskId);
         scheduler('0 0 0 * * *', taskId, function() {
             (async() => {
-                let tripPlans: TripPlan[] = await Models.tripPlan.all({where: {status: EPlanStatus.WAIT_RESERVE}});
+                let tripPlans: TripPlan[] = await Models.tripPlan.all({where: {status: EPlanStatus.WAIT_RESERVE, backAt: { $lte : new Date() } }});
                 for (let i = 0; i < tripPlans.length; i++) {
                     let tripEndTime = tripPlans[i].backAt;
                     if (new Date() > new Date(tripEndTime))  {  //this tripPlan just reach or overdue, change the tripDetails' and tripPlan its status, set tripPlan as expired, tripDetail as wait_upload
@@ -2784,7 +2784,10 @@ class TripPlanModule {
                         await tripPlans[i].save();
                     }
                 }
-            })
+            })()
+                .catch((err) => {
+                    logger.error(`run stark ${taskId} error:`, err.stack);
+                });
         });
     }
 
@@ -3248,6 +3251,6 @@ function getOrderNo(): string {
 }
 
 
-// TripPlanModule._scheduleTask();
+TripPlanModule._scheduleTask();
 
 export = TripPlanModule;

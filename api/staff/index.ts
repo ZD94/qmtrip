@@ -110,7 +110,8 @@ class StaffModule{
             let values  = {
                 name: account.mobile,
                 pwd: pwd,
-                url: config.host
+                url: config.host,
+                company: company
             }
 
             try{
@@ -423,7 +424,7 @@ class StaffModule{
         let staff = await Staff.getCurrent();
 
         if(params.email){
-            if(updateStaff.staffStatus != 0){
+            if(staff.status == ACCOUNT_STATUS.ACTIVE && updateStaff.staffStatus != EStaffStatus.FORBIDDEN){
                 throw L.ERR.NOTALLOWED_MODIFY_EMAIL();
             }
 
