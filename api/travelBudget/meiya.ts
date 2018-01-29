@@ -60,7 +60,6 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
     for (let item of authData) {
         let info = item.identify;
         let sname = item.sname;
-
         meiyaResult = await request({
             url: urlFlight,
             method: "get",
@@ -72,14 +71,16 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
         }).catch((e: Error) => {
             console.log(e)
         });
-
-        try {
-            meiyaResult = JSON.parse(meiyaResult);
-            data.push(...meiyaResult.data);
-            meiyaResult.data = data
-        } catch (e) {
-        }
-
+            try {
+                meiyaResult = JSON.parse(meiyaResult);
+                if(meiyaResult.code == 0){
+                    data.push(...meiyaResult.data);
+                    meiyaResult.data = data
+                }else {
+                    console.log(meiyaResult)
+                }
+            } catch (e) {
+            }
     }
 
     if (meiyaResult && meiyaResult.code == 0) {
@@ -115,13 +116,17 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
         }).catch((e: Error) => {
             console.log(e)
         });
-        try {
-            meiyaResult = JSON.parse(meiyaResult);
-            data.push(...meiyaResult.data);
-            meiyaResult.data = data
-        } catch (e) {
-            console.log(e)
-        }
+            try {
+                meiyaResult = JSON.parse(meiyaResult);
+                if(meiyaResult.code == 0){
+                    data.push(...meiyaResult.data);
+                    meiyaResult.data = data
+                }else{
+                    console.log(meiyaResult)
+                }
+            } catch (e) {
+                console.log(e)
+            }
     }
 
     if (meiyaResult && meiyaResult.code == 0) {
@@ -159,8 +164,12 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
         });
         try {
             meiyaResult = JSON.parse(meiyaResult);
-            data.push(...meiyaResult.data);
-            meiyaResult.data = data
+            if(meiyaResult.code == 0){
+                data.push(...meiyaResult.data);
+                meiyaResult.data = data
+            }else{
+                console.log(meiyaResult)
+            }
         } catch (e) {
             console.log(e)
         }
@@ -387,10 +396,10 @@ export function handleFlightData(meiyaFlightData: IMeiyaFlight[], originalData: 
     if (meiyaFlightData && meiyaFlightData.length) {
         let result: Array<any> = [];
         let handleData;
-        for (let item of meiyaFlightData) {
-            handleData = transferFlightData(item, originalData)
-            result.push(handleData)
-        }
+            for (let item of meiyaFlightData) {
+                handleData = transferFlightData(item, originalData)
+                result.push(handleData)
+            }
         data.push(...result);
         return data
     } else {
