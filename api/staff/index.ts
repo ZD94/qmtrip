@@ -110,7 +110,8 @@ class StaffModule{
             let values  = {
                 name: account.mobile,
                 pwd: pwd,
-                url: config.host
+                url: config.host,
+                company: company
             }
 
             try{
