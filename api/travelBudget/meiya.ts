@@ -400,36 +400,41 @@ export function handleFlightData(meiyaFlightData: IMeiyaFlight[], originalData: 
 
 function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearchTicketParams) {
     let name;
-    let cabins = meiyaFlightData.flightPriceInfoList.map((item)=>{
-        switch (item.cabin){
-            case "经济舱":
-                name = 2
-            break;
-            case "头等舱":
-                name = 3
-            break;
-            case "商务舱":
-                name = 4
-            break;
-            case "高端经济舱":
-                name = 5
-            break;
-            default:
-                name = 0
-        }
-        let agentCabin = {
-            name,
-            "price": item.price,
-            "discount": item.discount,
-            "cabin": item.cabin,
-            "seatNum":item.seatNum,
-            "urlParams": {
-                "No": meiyaFlightData.flightNo,
-                "priceId": item.priceID
+    let cabins;
+    if(meiyaFlightData.flightPriceInfoList.length > 0){
+        cabins = meiyaFlightData.flightPriceInfoList.map((item)=>{
+            switch (item.cabin){
+                case "经济舱":
+                    name = 2
+                break;
+                case "头等舱":
+                    name = 3
+                break;
+                case "商务舱":
+                    name = 4
+                break;
+                case "高端经济舱":
+                    name = 5
+                break;
+                default:
+                    name = 0
             }
-        }
-        return agentCabin
-    })
+            let agentCabin = {
+                name,
+                "price": item.price,
+                "discount": item.discount,
+                "cabin": item.cabin,
+                "seatNum":item.seatNum,
+                "urlParams": {
+                    "No": meiyaFlightData.flightNo,
+                    "priceId": item.priceID
+                }
+            }
+            return agentCabin
+        })
+    }else {
+        cabins = []
+    }
     let arriDateTime = meiyaFlightData.arrDate + " " + meiyaFlightData.arrTime;
     let deptDateTime = meiyaFlightData.depDate + " " + meiyaFlightData.depTime;
     let model = {
