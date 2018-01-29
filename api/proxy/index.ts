@@ -79,13 +79,12 @@ class Proxy {
                         resolve(result);
                     });
                 });
-                console.log('resultttttt---->', result);
                 return res.json(result);
             } catch(err) {
                 if (err) {
                     console.error('ERROR TRAVEL In api/proxy/index:   ', err);
-                    return null;
                 }
+                return res.json(500, null);
             }
         });
 
@@ -132,8 +131,8 @@ class Proxy {
             } catch(err) {
                 if (err) {
                     console.error('ERROR SUPPLIER In api/proxy/index:   ', err);
-                    return null;
                 }
+                return res.json(500, null);
             }
 
             
@@ -146,7 +145,6 @@ class Proxy {
          *  3. 中台根据companyid获取该公司所有订单
          */
         app.all(/^\/order.*$/, cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function) => {
-  
             let staff: Staff = await Staff.getCurrent();
             let staffId = req.headers.staffid;
             if(staffId && !staff) {
@@ -235,11 +233,10 @@ class Proxy {
             }catch(err) {
                 if(err) {
                     console.log("请求预定错误: ", err)
-                    return null;
-                }  
+                }
+                return res.json(500, null);
             }
-            console.log("========================> result.", result)
-            if(!result) 
+            if(!result)
                 return res.json(null);
             if(typeof result == 'string') {
                 result = JSON.parse(result);
@@ -268,7 +265,7 @@ class Proxy {
             let url = `${config.mall.orderLink}${pathstring}`;
             console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.mall.appId, '===request params: ', params) 
             let result = await new Promise((resolve, reject) => {
-                return request({
+                request({
                     uri: url,
                     body: req.body,
                     json: true,
@@ -283,12 +280,12 @@ class Proxy {
                     }
                 }, (err: Error, resp: any, result: object) => {
                     if (err) {
+                        console.log("-=========>err: ", err);
                         reject(err);
                     }
                     resolve(result);
                 });
             });
-            console.log("===mall===result: ", result)
             return res.json(result);
         });
 
@@ -329,7 +326,6 @@ class Proxy {
                     resolve(result);
                 });
             });
-            console.log("===bill===result: ", result)
             return res.json(result);
         });
 
@@ -381,12 +377,12 @@ class Proxy {
                     }
                 }, (err: Error, resp: any, result: object) => {
                     if (err) {
+                        console.log(err)
                         reject(err);
                     }
                     resolve(result);
                 });
             });
-            console.log("===permission===result: ", result);
             return res.json(result);
         });
     }
