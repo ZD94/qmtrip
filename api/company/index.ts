@@ -201,7 +201,7 @@ export default class CompanyModule {
         //jlbudget create account record. Waiting jlbudget account identifie online.
 
         //默认添加 中国大陆(国内）、通用地区（国际）、港澳台 三个地区用于差旅、补助、限价等的管理
-        await initDefaultCompanyRegion(company.id);
+        await API.travelPolicy.initDefaultCompanyRegion({companyId: company.id});
         return { company: company, description: promoCode ? promoCode.description : "" };
     }
 
@@ -1432,43 +1432,5 @@ CompanyModule._scheduleTask();
 // export = CompanyModule;
 
 
-async function initDefaultCompanyRegion(companyId: string) {
-    // let defaultRegion = ['中国大陆', '通用地区', '港澳台'];
-    let defaultRegion = [{
-        name: '国内',
-        types: [1, 2, 3],
-        group: 1
-    }, {
-        name: '国际',
-        types: [1, 2, 3],
-        group: 2
-    }, {
-        name: '港澳台',
-        types: [1, 2, 3],
-        group: 2
-    }];
 
-    let defaultPlaceId = [['CTW_5'], ['Global'], ['CT_2912', 'CT_2911', 'CT_9000']];
-
-    for (let i = 0; i < defaultRegion.length; i++) {
-        let companyRegion: any = await API.travelPolicy.createCompanyRegion({
-            companyId: companyId,
-            name: defaultRegion[i].name,
-            group: defaultRegion[i].group,
-            types: defaultRegion[i].types
-
-        });
-        companyRegion = companyRegion.data;
-        if (companyRegion) {
-            for (let j = 0; defaultPlaceId[i] && j < defaultPlaceId[i].length; j++) {
-                await API.travelPolicy.createRegionPlace({
-                    placeId: defaultPlaceId[i][j],
-                    companyRegionId: companyRegion['id'],
-                    companyId: companyId,
-                });
-            }
-        }
-    }
-
-}
 

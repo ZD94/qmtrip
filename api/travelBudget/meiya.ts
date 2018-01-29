@@ -60,7 +60,6 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
     for (let item of authData) {
         let info = item.identify;
         let sname = item.sname;
-
         meiyaResult = await request({
             url: urlFlight,
             method: "get",
@@ -72,21 +71,23 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
         }).catch((e: Error) => {
             console.log(e)
         });
-
         try {
             meiyaResult = JSON.parse(meiyaResult);
-            data.push(...meiyaResult.data);
-            meiyaResult.data = data
+            if(meiyaResult.code == 0){
+                data.push(...meiyaResult.data);
+                // meiyaResult.data = data
+            }else {
+                console.log(meiyaResult)
+            }
         } catch (e) {
         }
-
     }
-
-    if (meiyaResult && meiyaResult.code == 0) {
-        return meiyaResult.data;
-    } else {
-        return [];
-    }
+        return data;
+    // if (meiyaResult && meiyaResult.code == 0) {
+    //     return meiyaResult.data;
+    // } else {
+    //     return [];
+    // }
 }
 
 export async function getMeiyaTrainData(params: ISearchTicketParams, authData: IMeiyaAuthData[]) {
@@ -115,20 +116,24 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
         }).catch((e: Error) => {
             console.log(e)
         });
-        try {
-            meiyaResult = JSON.parse(meiyaResult);
-            data.push(...meiyaResult.data);
-            meiyaResult.data = data
-        } catch (e) {
-            console.log(e)
-        }
+            try {
+                meiyaResult = JSON.parse(meiyaResult);
+                if(meiyaResult.code == 0){
+                    data.push(...meiyaResult.data);
+                    // meiyaResult.data = data
+                }else{
+                    console.log(meiyaResult)
+                }
+            } catch (e) {
+                console.log(e)
+            }
     }
-
-    if (meiyaResult && meiyaResult.code == 0) {
-        return meiyaResult.data;
-    } else {
-        return [];
-    }
+        return data
+    // if (meiyaResult && meiyaResult.code == 0) {
+    //     return meiyaResult.data;
+    // } else {
+    //     return [];
+    // }
 }
 
 /**
@@ -159,17 +164,22 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
         });
         try {
             meiyaResult = JSON.parse(meiyaResult);
-            data.push(...meiyaResult.data);
-            meiyaResult.data = data
+            if(meiyaResult.code == 0){
+                data.push(...meiyaResult.data);
+                // meiyaResult.data = data
+            }else{
+                console.log(meiyaResult)
+            }
         } catch (e) {
             console.log(e)
         }
     }
-    if (meiyaResult && meiyaResult.code == 0) {
-        return meiyaResult.data;
-    } else {
-        return [];
-    }
+        return data
+    // if (meiyaResult && meiyaResult.code == 0) {
+    //     return meiyaResult.data;
+    // } else {
+    //     return [];
+    // }
 }
 
 
@@ -387,10 +397,10 @@ export function handleFlightData(meiyaFlightData: IMeiyaFlight[], originalData: 
     if (meiyaFlightData && meiyaFlightData.length) {
         let result: Array<any> = [];
         let handleData;
-        for (let item of meiyaFlightData) {
-            handleData = transferFlightData(item, originalData)
-            result.push(handleData)
-        }
+            for (let item of meiyaFlightData) {
+                handleData = transferFlightData(item, originalData)
+                result.push(handleData)
+            }
         data.push(...result);
         return data
     } else {
@@ -400,9 +410,7 @@ export function handleFlightData(meiyaFlightData: IMeiyaFlight[], originalData: 
 
 function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearchTicketParams) {
     let name;
-    let cabins;
-    if(meiyaFlightData.flightPriceInfoList && meiyaFlightData.flightPriceInfoList.length > 0){
-        cabins = meiyaFlightData.flightPriceInfoList.map((item)=>{
+       let cabins = meiyaFlightData.flightPriceInfoList.map((item)=>{
             switch (item.cabin){
                 case "经济舱":
                     name = 2
@@ -432,9 +440,6 @@ function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearch
             }
             return agentCabin
         })
-    }else {
-        cabins = []
-    }
     let arriDateTime = meiyaFlightData.arrDate + " " + meiyaFlightData.arrTime;
     let deptDateTime = meiyaFlightData.depDate + " " + meiyaFlightData.depTime;
     let model = {
