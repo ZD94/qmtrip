@@ -2,7 +2,7 @@ import { requireParams, clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { restfulAPIUtil } from '../restful'
 var _ = require("lodash");
 const cache = require("common/cache")
-const cityPrefix = 'city:info:id'
+const cityPrefix = 'city:info:id:v2'
 export default class PlaceModule {
 
     @clientExport
@@ -21,7 +21,7 @@ export default class PlaceModule {
                     fields: {id, companyId}
                 }
             });
-            if(!city || !city.data) return null;
+            if (!city || !city.data) return null;
             await cache.write(`${cityPrefix}:${id}`, JSON.stringify(city.data));
             return city.data;
         } 
@@ -136,7 +136,7 @@ export default class PlaceModule {
 
     @clientExport
     static async getCityInfo(params: {cityCode: string, companyId: string}){
-        let {cityCode, companyId } = params;
+        let { cityCode, companyId } = params;
         let city = await  PlaceModule.getCityById(cityCode, companyId);
         return city;
 
