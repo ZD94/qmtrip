@@ -4,6 +4,6 @@
 import * as moment from "moment";
 export = async function transform(values: any): Promise<any>{
     if(values.updateTime)
-        values.updateTime = moment(values.updateTime).format('YYYY-MM-DD');
+        values.updateTime = moment(new Date(values.updateTime)).format('YYYY-MM-DD');
     return values;
 }
