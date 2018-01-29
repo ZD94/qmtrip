@@ -71,23 +71,23 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
         }).catch((e: Error) => {
             console.log(e)
         });
-            try {
-                meiyaResult = JSON.parse(meiyaResult);
-                if(meiyaResult.code == 0){
-                    data.push(...meiyaResult.data);
-                    meiyaResult.data = data
-                }else {
-                    console.log(meiyaResult)
-                }
-            } catch (e) {
+        try {
+            meiyaResult = JSON.parse(meiyaResult);
+            if(meiyaResult.code == 0){
+                data.push(...meiyaResult.data);
+                // meiyaResult.data = data
+            }else {
+                console.log(meiyaResult)
             }
+        } catch (e) {
+        }
     }
-
-    if (meiyaResult && meiyaResult.code == 0) {
-        return meiyaResult.data;
-    } else {
-        return [];
-    }
+        return data;
+    // if (meiyaResult && meiyaResult.code == 0) {
+    //     return meiyaResult.data;
+    // } else {
+    //     return [];
+    // }
 }
 
 export async function getMeiyaTrainData(params: ISearchTicketParams, authData: IMeiyaAuthData[]) {
@@ -120,7 +120,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
                 meiyaResult = JSON.parse(meiyaResult);
                 if(meiyaResult.code == 0){
                     data.push(...meiyaResult.data);
-                    meiyaResult.data = data
+                    // meiyaResult.data = data
                 }else{
                     console.log(meiyaResult)
                 }
@@ -128,12 +128,12 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
                 console.log(e)
             }
     }
-
-    if (meiyaResult && meiyaResult.code == 0) {
-        return meiyaResult.data;
-    } else {
-        return [];
-    }
+        return data
+    // if (meiyaResult && meiyaResult.code == 0) {
+    //     return meiyaResult.data;
+    // } else {
+    //     return [];
+    // }
 }
 
 /**
@@ -166,7 +166,7 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
             meiyaResult = JSON.parse(meiyaResult);
             if(meiyaResult.code == 0){
                 data.push(...meiyaResult.data);
-                meiyaResult.data = data
+                // meiyaResult.data = data
             }else{
                 console.log(meiyaResult)
             }
@@ -174,11 +174,12 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
             console.log(e)
         }
     }
-    if (meiyaResult && meiyaResult.code == 0) {
-        return meiyaResult.data;
-    } else {
-        return [];
-    }
+        return data
+    // if (meiyaResult && meiyaResult.code == 0) {
+    //     return meiyaResult.data;
+    // } else {
+    //     return [];
+    // }
 }
 
 
