@@ -3113,10 +3113,13 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDe
             if (invoices && invoices.length && isInWaitCommit) {
                 tripDetail.status = ETripDetailStatus.WAIT_COMMIT;
             }
+
             let tripPlan = await Models.tripPlan.get(tripDetail["tripPlanId"]);
-            if(new Date(tripPlan.backAt) > new Date() && tripDetail.type == ETripType.SUBSIDY) {  //类型为补助，且为行程未失效，tripPlan的aduitStatus不能为wait_commmit   
+            let tripDetails = await tripPlan.getTripDetails({where: {
+                status: [ETripDetailStatus.WAIT_UPLOAD, ETripDetailStatus.AUDIT_NOT_PASS], id:{$ne: tripDetail.id}}});
+            if(new Date(tripPlan.backAt) > new Date() && tripDetail.type == ETripType.SUBSIDY) {  //类型为补助，且为行程未失效(此时只能上传补助)，tripPlan的aduitStatus不能为wait_commmit   
                 auditStatus = EAuditStatus.WAIT_UPLOAD;
-            } else {
+            } else if(!tripDetails || !tripDetails.length){
                 auditStatus = EAuditStatus.WAIT_COMMIT;
             }     
             break;
