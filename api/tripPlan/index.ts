@@ -863,11 +863,11 @@ class TripPlanModule {
                 } catch (err) {
                     console.error(`发送通知失败:`, err);
                 }
-                try {
+                /*try {
                     await API.ddtalk.sendLinkMsg({ accountId: staff.id, text: '票据已审批结束', url: self_url })
                 } catch (err) {
                     console.error(`发送钉钉通知失败`, err);
-                }
+                }*/
             }
 
 
@@ -1136,11 +1136,11 @@ class TripPlanModule {
                 } catch (err) {
                     console.error(`发送通知失败:`, err);
                 }
-                try {
+                /*try {
                     await API.ddtalk.sendLinkMsg({ accountId: staff.id, text: '票据已审批结束', url: self_url })
                 } catch (err) {
                     console.error(`发送钉钉通知失败`, err);
-                }
+                }*/
             }
 
             //如果出差已经完成，并且节省反积分，并且非特别审批，增加员工积分；若企业账户有余额，直接兑换员工积分为鲸币
@@ -2129,11 +2129,11 @@ class TripPlanModule {
         } catch (err) {
             console.error(err);
         }
-        try {
+        /*try {
             await API.ddtalk.sendLinkMsg({ accountId: account.id, text: '您的预算已审批完成', url: self_url });
         } catch (err) {
             console.error(err);
-        }
+        }*/
 
         try {
             if (tripPlan.costCenterId) {
