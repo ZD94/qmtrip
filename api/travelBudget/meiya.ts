@@ -400,9 +400,7 @@ export function handleFlightData(meiyaFlightData: IMeiyaFlight[], originalData: 
 
 function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearchTicketParams) {
     let name;
-    let cabins;
-    if(meiyaFlightData.flightPriceInfoList && meiyaFlightData.flightPriceInfoList.length > 0){
-        cabins = meiyaFlightData.flightPriceInfoList.map((item)=>{
+       let cabins = meiyaFlightData.flightPriceInfoList.map((item)=>{
             switch (item.cabin){
                 case "经济舱":
                     name = 2
@@ -432,9 +430,6 @@ function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearch
             }
             return agentCabin
         })
-    }else {
-        cabins = []
-    }
     let arriDateTime = meiyaFlightData.arrDate + " " + meiyaFlightData.arrTime;
     let deptDateTime = meiyaFlightData.depDate + " " + meiyaFlightData.depTime;
     let model = {
