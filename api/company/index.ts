@@ -1448,7 +1448,7 @@ async function initDefaultCompanyRegion(companyId: string) {
         group: 2
     }];
 
-    let defaultPlaceId = [['CTW_5'], ['Global'], ['CT_2912', 'CT_2911', 'CT_9000']];
+    let defaultPlaceId = [['1814991'], ['1'], ['800000921', '800000922', '800000901']];
 
     for (let i = 0; i < defaultRegion.length; i++) {
         let companyRegion: any = await API.travelPolicy.createCompanyRegion({
