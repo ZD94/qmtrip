@@ -258,8 +258,8 @@
     }
   ],
   "regionPlace": {
-    "domestic_place_id": "CTW_5",
-    "abroad_place_id": "Global"
+    "domestic_place_id": "1814991",
+    "abroad_place_id": "1"
   },
   "companyRegion":[
     {"name": "国内"},
