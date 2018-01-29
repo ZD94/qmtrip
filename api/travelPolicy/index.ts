@@ -21,9 +21,9 @@ var Config = require("@jingli/config");
 var subsidyRegions = [
     {name:DefaultRegion.abroad, cityIds: [DefaultRegionId.abroad], group: 2, types: [1,2,3]},
     {name:DefaultRegion.domestic, cityIds: [DefaultRegionId.domestic], group: 1, types: [1,2,3]},
-    {name:"中国一类地区", cityIds: ['1795563','1809857','1796231','2038349'], group: 1, types: [2,3]},  //深圳, 广州,上海, 北京
-    {name:"中国二类地区", cityIds: ['800000235','1808925','1815551','1790902','1790384','2034935','1797926','1799960','1791243','1814068','1810821','1815285','1792943','1805751','1814905'], group: 1, types: [2,3]}, //厦门,杭州,长沙,无锡,西安,沈阳,青岛,南京,武汉,大连,福州,成都,天津,济南,重庆
-    {name:"港澳台", cityIds: ['800000921','800000922','800000901'], group: 2, types: [1,2,3]}   // 香港、澳门、台湾
+    {name:DefaultRegion.firstClassPlace, cityIds: ['1795563','1809857','1796231','2038349'], group: 1, types: [2,3]},  //深圳, 广州,上海, 北京
+    {name:DefaultRegion.secondClassPlace, cityIds: ['800000235','1808925','1815551','1790902','1790384','2034935','1797926','1799960','1791243','1814068','1810821','1815285','1792943','1805751','1814905'], group: 1, types: [2,3]}, //厦门,杭州,长沙,无锡,西安,沈阳,青岛,南京,武汉,大连,福州,成都,天津,济南,重庆
+    {name: DefaultRegion.specialDistrict, cityIds: DefaultRegionId.specialDistrict, group: 2, types: [1,2,3]}   // 香港、澳门、台湾
     ];
 
 export interface ITravelPolicyParams {
@@ -786,20 +786,20 @@ export default class TravelPolicyModule{
         // let defaultRegion = ['中国大陆', '通用地区', '港澳台'];
         let {companyId} = params;
         let defaultRegion = [{
-            name: '国内',
+            name: DefaultRegion.domestic,
             types: [1, 2, 3],
             group: 1
         }, {
-            name: '国际',
+            name: DefaultRegion.abroad,
             types: [1, 2, 3],
             group: 2
         }, {
-            name: '港澳台',
+            name: DefaultRegion.specialDistrict,
             types: [1, 2, 3],
             group: 2
         }];
     
-        let defaultPlaceId = [['1814991'], ['1'], ['800000921', '800000922', '800000901']];
+        let defaultPlaceId = [[DefaultRegionId.domestic], [DefaultRegionId.aborad], DefaultRegionId.specialDistrict];
     
         for (let i = 0; i < defaultRegion.length; i++) {
             let companyRegion: any = await API.travelPolicy.createCompanyRegion({
