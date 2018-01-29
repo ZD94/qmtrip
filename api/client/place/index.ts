@@ -34,10 +34,10 @@ class ApiPlace {
         if (!_params) {
             _params = {};
         }
-        let {keyword, isAbroad} = _params;
+        let {keyword} = _params;
         let cities;
         if (!Boolean(keyword)) {
-            cities = await ApiPlace.hotCities({limit: 20, isAbroad: isAbroad})
+            cities = [];
         } else {
             cities = await API.place.queryCity(_params)
         }
