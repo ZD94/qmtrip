@@ -423,7 +423,7 @@ class StaffModule{
         let staff = await Staff.getCurrent();
 
         if(params.email){
-            if(staff.status == ACCOUNT_STATUS.ACTIVE && updateStaff.staffStatus != EStaffStatus.FORBIDDEN){
+            if(updateStaff.status == ACCOUNT_STATUS.ACTIVE && updateStaff.staffStatus != EStaffStatus.FORBIDDEN){
                 throw L.ERR.NOTALLOWED_MODIFY_EMAIL();
             }
 
