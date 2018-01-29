@@ -3,12 +3,24 @@
  */
 import {Models} from "_types";
 import {EApproveResult} from "_types/tripPlan";
-import moment = require("moment-timezone");
-import * as _ from 'lodash/fp';
+import { TripApprove } from '_types/tripApprove';
+import { Staff } from '_types/staff';
+const _ = require('lodash/fp');
+const moment = require("moment");
 var API = require('@jingli/dnode-api');
 require('moment-timezone')
 
-export = async function transform(values: any): Promise<any>{
+export = async function transform(values: {
+    tripApprove: TripApprove,
+    tripPlan: any,
+    companyId: string,
+    startAt: string,
+    backAt: string,
+    cityMap: any,
+    approveUserMap: {[key: string]: Staff},
+    isAutoApprove: boolean,
+    staffs: string[]
+}): Promise<any>{
     let tripApprove = values.tripApprove;
     let tripPlan = values.tripPlan;
     let cityMap:any = {};
@@ -33,7 +45,7 @@ export = async function transform(values: any): Promise<any>{
 
     }
     if(!values.tripApprove || !values.tripApprove.id){
-        values.tripApprove = {};
+        values.tripApprove = null
         return values;
     }
     if(!companyId){
@@ -78,6 +90,6 @@ export = async function transform(values: any): Promise<any>{
     }
 
     if (values.tripApprove)
-        values.tripApprove.staffs = (await Promise.all(values.tripApprove.staffList.map(Models.staff.get))).map(_.prop('name'))
+        values.staffs = (await Promise.all(values.tripApprove.staffList.map((s: string) => Models.staff.get(s)))).map(_.prop('name'))
     return values;
 }

@@ -1,20 +1,17 @@
 import {Models} from "_types";
 import {Staff} from "_types/staff";
-import {EApproveResult, ETripType} from "_types/tripPlan";
-import moment = require("moment-timezone");
+const moment = require("moment");
 var API = require('@jingli/dnode-api');
 import {MPlaneLevel, MTrainLevel, MHotelLevel,DefaultRegion} from '_types';
-import {Model, where} from "sequelize";
 import { ITravelBudgetInfo } from 'http/controller/budget';
 require("moment-timezone")
 
 export = async function transform(values: {staffId: string,
     staff: Staff, MPlaneLevel: object,   MTrainLevel: object, MHotelLevel: object,
     travelPolicy: {[key: string]: any}, cacheId: string, totalBudget: number, budgets: ITravelBudgetInfo[],
-    query: object, destinationPlacesInfo: any, cityMap: any, date: string, staffMap: {[key: string]: Staff}
+    query: object, destinationPlacesInfo: any, cityMap: any, date: string, staffs: Staff[]
 }): Promise<any>{
     let cityMap = {};
-    let staffMap = {};
     let staff = await Models.staff.get(values.staffId);
     let travelPolicy = await staff.getTravelPolicy();
 
@@ -104,15 +101,12 @@ export = async function transform(values: {staffId: string,
         query.staffList = [staff.id];
     }
 
-    let staffIds = query.staffList;
+    let staffIds: string[] = query.staffList;
     if(typeof staffIds == 'string'){
         staffIds = JSON.parse(staffIds);
     }
-    await Promise.all(staffIds.map(async function(item: string, index: number){
-        let s = await Models.staff.get(item);
-        staffMap[item] = s;
-    }))
-    values.staffMap = staffMap;
+
+    values.staffs = await Promise.all(staffIds.map(id => Models.staff.get(id)))
     values.date = moment().format('YYYY-MM-DD HH:mm');
 
     return values;

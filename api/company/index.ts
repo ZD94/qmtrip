@@ -13,7 +13,7 @@ let scheduler = require('common/scheduler');
 let _ = require("lodash");
 import { requireParams, clientExport } from "@jingli/dnode-api/dist/src/helper";
 import { Models } from "_types";
-import { Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE, InvoiceTitle, CompanyProperty, CPropertyType, MONEY_CHANGE_TYPE } from '_types/company';
+import { Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE, InvoiceTitle, CompanyProperty, CPropertyType } from '_types/company';
 import { Staff, EStaffRole } from "_types/staff";
 import { PromoCode } from "_types/promoCode";
 import { AgencyUser, EAgencyUserRole } from "_types/agency";
@@ -21,9 +21,9 @@ import { Department, StaffDepartment } from "_types/department";
 import { requirePermit, conditionDecorator, condition, modelNotNull } from "api/_decorator";
 import { md5 } from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
-import { CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE } from "_types/coin";
+import { CoinAccount } from "_types/coin";
 import { restfulAPIUtil } from "api/restful";
-import { TripPlan, ISegment } from '_types/tripPlan';
+import { ISegment } from '_types/tripPlan';
 let RestfulAPIUtil = restfulAPIUtil;
 
 
@@ -108,7 +108,16 @@ export default class CompanyModule {
             }
         }
 
-        let staff = Staff.create({ email: params.email, name: params.userName, mobile: params.mobile || null, roleId: EStaffRole.OWNER, pwd: md5(pwd), status: params.status, isValidateMobile: params.isValidateMobile });
+        let staff = Staff.create({ 
+            email: params.email, 
+            name: params.userName,
+            mobile: params.mobile || null, 
+            roleId: EStaffRole.OWNER, 
+            pwd: md5(pwd), 
+            status: params.status, 
+            isValidateMobile: params.isValidateMobile,
+            isNeedChangePwd: false
+        });
         let company = Company.create(params);
         company.domainName = domain;
         company.expiryDate = moment().add(DEFAULT_EXPIRE_MONTH, 'months').toDate();
@@ -203,7 +212,6 @@ export default class CompanyModule {
      */
     @clientExport
     static async syncCompanyToJLCloud(company: Company, pwd: string, mobile?: string): Promise<boolean> {
-        let initPassword = '123456';
         let staff: Staff;
         if(!mobile) {
             if(company.createUser)
@@ -212,7 +220,6 @@ export default class CompanyModule {
                 mobile = staff.mobile;
             if(!mobile) {
                 let managers: Staff[] = await company.getManagers({withOwner: true})
-                let accountIds: string[];
                 if(!managers) mobile = null;
                 for(let staff of managers) {
                     if(staff.mobile && staff.mobile != '') mobile = staff.mobile; 

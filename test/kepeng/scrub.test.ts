@@ -8,16 +8,12 @@ Promise.config({longStackTraces: true});
 
 import {Models} from '_types';
 import * as Sequelize from 'sequelize';
-import scrubber from '@jingli/patch-dnode-scrub';
-var path = require('path');
 
 var config = {
     "postgres": "postgres://times:time0418@local.jingli.tech:5432/times?ssl=true",
     "remotes": [] as string[]
 };
 
-import Logger from '@jingli/logger';
-var logger = new Logger('test');
 
 var model = require('common/model');
 model.init(config.postgres);
@@ -37,13 +33,13 @@ scrubber.registerClass(
     }
 );
 */
-var tmp = {
-    callbacks: [] as Function[]
-}
+// var tmp = {
+//     callbacks: [] as Function[]
+// }
 
-var cache = {
-    callbacks: {local: [] as any[], remote: tmp.callbacks}
-}
+// var cache = {
+//     callbacks: {local: [] as any[], remote: tmp.callbacks}
+// }
 
 export default async function main(){
     console.log('main start');

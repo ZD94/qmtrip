@@ -187,7 +187,7 @@ class ApproveModule {
         }
         let totalBudget = 0;
         if(budgetInfo.budgets && budgetInfo.budgets.length>0){
-            budgetInfo.budgets.forEach(function(item){
+            budgetInfo.budgets.forEach(function(item: any){
                 if(item.tripType != ETripType.SUBSIDY){
                     number = number + 1;
                 }
@@ -399,8 +399,7 @@ class ApproveModule {
         budget: number,
         version?: number
     }) {
-        let {approveId, submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark,staffList, budget, version} = params;
-        let staff = await Models.staff.get(submitter);
+        let {approveId} = params;
         let approve = await Models.approve.get(approveId);
         // let approve = Models.approve.create({
         //     submitter: submitter,

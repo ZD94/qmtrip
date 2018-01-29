@@ -64,8 +64,10 @@ async function initCompany(params: {name: string, userName: string, mobile: stri
 
     await Promise.all([staff.save(), company.save(), department.save(), staffDepartment.save()]);
 
-    //为企业设置资金账户
-    let ca = CoinAccount.create();
+    //为企业设置资金账户,
+    let ca = CoinAccount.create({
+        income: 0
+    });
     await ca.save();
     company.coinAccount = ca;
     await company.save();
