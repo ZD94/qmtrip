@@ -1,16 +1,15 @@
-import { AgencyUser } from '../../_types/agency/agency-user';
 /**
  * Created by mr_squirrel on 01/09/2017.
  */
-
-
+import { AgencyUser } from '_types/agency/agency-user';
 import { Staff } from "_types/staff";
 var request = require("request");
 const axios = require('axios');
 const config = require("@jingli/config");
 import crypto = require("crypto");
 import cache from "common/cache";
-
+import Logger from '@jingli/logger';
+const logger = new Logger("restful");
 function md5(str: string) {
     return crypto.createHash("md5").update(str).digest('hex')
 }
@@ -167,11 +166,17 @@ export class RestfulAPIUtil {
                 }
             }, (err: Error, resp: never, result: string | object) => {
                 if (err) {
+                    logger.error('url:', config.cloudAPI + url, err.stack);
                     return reject(err);
                 }
 
                 if (typeof result == 'string') {
-                    result = JSON.parse(result);
+                    try {
+                        result = JSON.parse(result);
+                    } catch (err) { 
+                        logger.error('url:', config.cloudAPI + url, err.stack);
+                        return reject(err);
+                    }
                 }
                 return resolve(result);
             });

@@ -16,6 +16,8 @@ import * as CLS from 'continuation-local-storage';
 let CLSNS = CLS.getNamespace('dnode-api-context');
 import { genSign } from "@jingli/sign";
 import { Department } from '_types/department';
+import Logger from '@jingli/logger';
+const logger = new Logger("proxy");
 const corsOptions = { 
     origin: true, 
     methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], 
@@ -58,35 +60,36 @@ class Proxy {
             let JLOpenApi: string = config.cloud;
             JLOpenApi = JLOpenApi.replace('/cloud', '');
             let url: string = `${JLOpenApi}${pathstr}`;
-            console.log('url-----> ', url);
 
-            try {
-                result = await new Promise((resolve, reject) => {
-                    return request({
-                        uri: url,
-                        body: req.body,
-                        json: true,
-                        method: req.method,
-                        qs: req.query,
-                        headers: {
-                            token: companyToken,
-                            companyId: companyId
+            result = await new Promise((resolve, reject) => {
+                return request({
+                    uri: url,
+                    body: req.body,
+                    json: true,
+                    method: req.method,
+                    qs: req.query,
+                    headers: {
+                        token: companyToken,
+                        companyId: companyId
+                    }
+                }, (err: Error, resp: any, result: object) => {
+                    if (err) {
+                        logger.error("url:", url, err.stack);
+                        return reject(err);
+                    }
+                    if (typeof result == 'string') { 
+                        try {
+                            result = JSON.parse(result);
+                        } catch (err) { 
+                            logger.error('url:', url, err.stack);
+                            return reject(err);
                         }
-                    }, (err: Error, resp: any, result: object) => {
-                        if (err) {
-                            reject(err);
-                        }
-                        resolve(result);
-                    });
+                    }
+                    resolve(result);
                 });
-                console.log('resultttttt---->', result);
-                return res.json(result);
-            } catch(err) {
-                if (err) {
-                    console.error('ERROR TRAVEL In api/proxy/index:   ', err);
-                    return null;
-                }
-            }
+            });
+            return res.json(result);
+
         });
 
 
@@ -109,34 +112,34 @@ class Proxy {
             JLOpenApi = JLOpenApi.replace('/cloud', '');
             let url: string = `${JLOpenApi}${pathstr}`;
 
-            try {
-                result = await new Promise((resolve, reject) => {
-                    return request({
-                        uri: url,
-                        body: req.body,
-                        json: true,
-                        method: req.method,
-                        qs: req.query,
-                        headers: {
-                            token: companyToken,
-                            companyId: companyId
+            result = await new Promise((resolve, reject) => {
+                return request({
+                    uri: url,
+                    body: req.body,
+                    json: true,
+                    method: req.method,
+                    qs: req.query,
+                    headers: {
+                        token: companyToken,
+                        companyId: companyId
+                    }
+                }, (err: Error, resp: any, result: object) => {
+                    if (err) {
+                        logger.error("url:", url, err.stack);
+                        return reject(err);
+                    }
+                    if (typeof result == 'string') { 
+                        try {
+                            result = JSON.parse(result);
+                        } catch (err) { 
+                            logger.error('url:', url, err.stack);
+                            return reject(err);
                         }
-                    }, (err: Error, resp: any, result: object) => {
-                        if (err) {
-                            reject(err);
-                        }
-                        resolve(result);
-                    });
+                    }
+                    resolve(result);
                 });
-                return res.json(result);
-            } catch(err) {
-                if (err) {
-                    console.error('ERROR SUPPLIER In api/proxy/index:   ', err);
-                    return null;
-                }
-            }
-
-            
+            });
+            return res.json(result);
         });
 
         /**
@@ -381,12 +384,11 @@ class Proxy {
                     }
                 }, (err: Error, resp: any, result: object) => {
                     if (err) {
-                        reject(err);
+                        return reject(err);
                     }
                     resolve(result);
                 });
             });
-            console.log("===permission===result: ", result);
             return res.json(result);
         });
     }
@@ -398,10 +400,8 @@ async function verify(req: Request, res: Response, next: Function) {
         return next();
     }
     let {authstr, staffid} = req.headers;
-    console.log("======> authstr ", authstr, staffid)
     let token = parseAuthString(authstr);
     let verification: AuthResponse = await API.auth.authentication(token);
-    console.log("-======>verification:  ", verification)
     if(!verification) {
         console.log("auth failed", JSON.stringify(req.cookies))
         return res.sendStatus(401);
@@ -412,8 +412,7 @@ async function verify(req: Request, res: Response, next: Function) {
             staffId   : staffid
         })
     } catch(err) { 
-        if(err)
-            return res.sendStatus(401);
+        return res.sendStatus(401);
     }
     next();
 }
