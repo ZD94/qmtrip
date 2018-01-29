@@ -9,7 +9,6 @@ import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
 import L from '@jingli/language';
 
-const moment = require('moment');
 require("moment-timezone");
 const cache = require("common/cache");
 const utils = require("common/utils");
@@ -536,7 +535,6 @@ export default class ApiTravelBudget {
                 queryParams = JSON.parse(approve.data);
             }
 
-            let count = queryParams.query.staffList.length;
             let staffId = queryParams.query['staffId'];
             if (!staffId || staffId == 'undefined') {
                 staffId = approve.submitter;
@@ -547,7 +545,7 @@ export default class ApiTravelBudget {
 
             let _budgets = params.budgetResult.budgets;
             let ps: Promise<any>[] = _budgets.map(async (item: ICreateBudgetAndApproveParamsNew) => {
-                return await ApiTravelBudget.transformBudgetData(item, companyId, count);
+                return await ApiTravelBudget.transformBudgetData(item, companyId);
             });
             let budgets = await Promise.all(ps);
             // console.log("budgets budgets budgets ====>", budgets.length, budgets);
@@ -682,11 +680,17 @@ export default class ApiTravelBudget {
             params.staffList.push(staffId);
         }
         let count = params.staffList.length;
-        let _staff: any = {
-            gender: staff.sex,
-            policy: 'domestic',
+        let staffs = [];
+        for (let i = 0; i < count; i++) {
+            let staff = params.staffList[i];
+            let _staff = await Models.staff.get(staff);
+            let __staff: any = {
+                gender: _staff.sex,
+                policy: 'domestic',
+            };
+            staffs.push(__staff);
         }
-        let staffs = [_staff];
+        
 
         let feeCollectedType = params['feeCollectedType'];
         let feeCollected = params['feeCollected'];
@@ -752,7 +756,7 @@ export default class ApiTravelBudget {
 
 
         let ps: Promise<any>[] = segmentsBudget.map(async (item: any) => {
-            return await ApiTravelBudget.transformBudgetData(item, companyId, count);
+            return await ApiTravelBudget.transformBudgetData(item, companyId);
         });
         let budgets = await Promise.all(ps);
 
@@ -870,7 +874,7 @@ export default class ApiTravelBudget {
 
     }
 
-    static async transformBudgetData(budget: any, companyId: string, count: number) {
+    static async transformBudgetData(budget: any, companyId: string) {
         budget.index = budget.index;
         delete budget.markedScoreData;
         delete budget.prefers;
@@ -880,20 +884,12 @@ export default class ApiTravelBudget {
                 let isAccordHotel = await Models.accordHotel.find({where: {cityCode: cityObj.id, companyId}});
                 if (isAccordHotel && isAccordHotel.length) {
                     budget.price = isAccordHotel[0].accordPrice;
-
-                    /* 出差时间计算 */
-                    let timezone = cityObj.timezone || 'Asia/shanghai';
-                    let beginTime = moment(budget.checkInDate).tz(timezone).hour(12);
-                    let endTime = moment(budget.checkOutDate).tz(timezone).hour(12);
-                    let days = moment(endTime).diff(beginTime, 'days');
-                    budget.price = budget.price * days;
-                    /* 出差时间计算 END */
-                }
+               }
 
                 budget.hotelName = budget.name;
                 budget.cityName = cityObj.name;
                 budget.tripType = ETripType.HOTEL;
-                budget.price = budget.price * count;
+                budget.price = budget.price;
                 budget.unit = budget.unit;
                 budget.rate = budget.rate;
                 return budget;
@@ -903,7 +899,7 @@ export default class ApiTravelBudget {
                 budget.originPlace = budget.fromCity;
                 budget.destination = budget.toCity;
 
-                budget.price = budget.price * count;
+                budget.price = budget.price;
                 budget.unit = budget.unit;
                 budget.rate = budget.rate;
                 budget.type = budget.trafficType;
@@ -914,11 +910,11 @@ export default class ApiTravelBudget {
                 return budget;
 
             case EBudgetType.SUBSIDY:
-                budget.price = budget.price * count;
+                budget.price = budget.price;
                 budget.tripType = ETripType.SUBSIDY;
                 if (budget.templates) {
                     budget.templates.forEach((t: any) => {
-                        t.price = t.price * count;
+                        t.price = t.price;
                     })
                 }
                 return budget;
