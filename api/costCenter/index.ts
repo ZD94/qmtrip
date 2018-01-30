@@ -343,11 +343,16 @@ export default class CostCenterModule {
         await DB.transaction(async function () {
             for (let budget of budgets) {
                 const { id } = budget
+                const costCenter = await Models.costCenter.get(id)
+                let dept: Department
+                if (!costCenter) {
+                    dept = !dept && await Models.department.get(id)
+                    CostCenter.create({ id, type: ECostCenterType.DEPARTMENT, name: dept.name }).save()
+                }
                 const cost: CostCenterDeploy = _.first(await Models.costCenterDeploy.find({ where: { ...where, costCenterId: id } }))
-                let dept: Department = null
                 if (!cost) {
                     delete budget.id
-                    dept = await Models.department.get(id)
+                    dept = !dept && await Models.department.get(id)
                     await CostCenter.create({ id, type: ECostCenterType.DEPARTMENT, name: dept.name }).save()
                     await CostCenterDeploy.create({ costCenterId: id, ...budget, beginDate: period.start, endDate: period.end }).save()
                     continue
