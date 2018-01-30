@@ -14,7 +14,7 @@ const logger = new Logger("restful");
 function md5(str: string) {
     return crypto.createHash("md5").update(str).digest('hex')
 }
-import L from '@jingli/language';
+// import L from '@jingli/language';
 
 export async function getAgentToken() {
     const appId: string = config.agent.appId;
