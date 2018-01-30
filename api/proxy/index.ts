@@ -17,6 +17,7 @@ let CLSNS = CLS.getNamespace('dnode-api-context');
 import { genSign } from "@jingli/sign";
 import { Department } from '_types/department';
 import Logger from '@jingli/logger';
+import { ITMCSupplier } from 'api/travelBudget';
 const logger = new Logger("proxy");
 const corsOptions = { 
     origin: true, 
@@ -188,16 +189,23 @@ class Proxy {
                 listeningon: listeningon     
             };
             let supplier =req.headers['supplier'] || 'meiya';
-
-            let companyInfo = await ApiTravelBudget.getCompanyInfo(supplier);
-            let identify = companyInfo[0].identify;
+            let companyInfo: Array<ITMCSupplier>;
+            try{
+                companyInfo = await ApiTravelBudget.getCompanyInfo(supplier, staff.id);
+            }catch(err){ return res.json(407, null) }
+            
+            let identify: string|{username:string, password: string} = companyInfo && companyInfo.length ?companyInfo[0].identify: null;
+            if(!identify) return res.json(407, null);
             if (typeof identify == 'object') {
                 identify = JSON.stringify(identify);
             }
             identify = encodeURIComponent(identify);
             // let auth: string = (isNeedAuth == '1') ? identify : '';
             let auth : string = identify;
+
             let headers: {[index: string]: any} = {
+               appid: config.orderSysConfig.appId,
+               sign: null,
                auth: auth,
                supplier,
                accountid: staff.accountId,
@@ -208,11 +216,17 @@ class Proxy {
             let body: {[index: string]: any} = req.body;
             let qs: {[index: string]: any} = req.query;
 
+            let timestamp = Math.floor(Date.now()/1000);       
+            let sign: string;
             if(req.method == 'GET') {
+                sign = genSign(qs, timestamp, config.orderSysConfig.appSecret);
+                headers['sign'] = sign;
                 _.assign(headers, addon)
             } else {
                 _.assign(headers, addon)
                 _.assign(body, addon);
+                sign = genSign(body, timestamp, config.orderSysConfig.appSecret);
+                headers['sign'] = sign;
             }
 
             let pathstring = req.path;

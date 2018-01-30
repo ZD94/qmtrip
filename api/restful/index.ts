@@ -9,10 +9,12 @@ const config = require("@jingli/config");
 import crypto = require("crypto");
 import cache from "common/cache";
 import Logger from '@jingli/logger';
+import { Response } from 'express-serve-static-core';
 const logger = new Logger("restful");
 function md5(str: string) {
     return crypto.createHash("md5").update(str).digest('hex')
 }
+import L from '@jingli/language';
 
 export async function getAgentToken() {
     const appId: string = config.agent.appId;
@@ -131,15 +133,18 @@ export class RestfulAPIUtil {
                 headers: {
                     token: companyToken
                 }
-            }, (err: Error, resp: never, result: string | object) => {
+            }, (err: Error, resp: Response, result: string | object) => {
                 if (err) {
                     return reject(err);
+                }
+                if (resp.statusCode != 200) { 
+                    throw new L.ERR.ERROR_CODE_C(resp.statusCode, '系统错误');
                 }
                 if (typeof result == 'string') {
                     try{
                         result = JSON.parse(result);
                     } catch (e) {
-                        console.error(e);
+                        console.error(result, e);
                         return reject(e);
                     }
                 }

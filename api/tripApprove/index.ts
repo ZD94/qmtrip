@@ -712,7 +712,7 @@ export default class TripApproveModule {
             if(approveResult == EApproveResult.PASS && query && query.feeCollected){
                 let costCenter = await Models.costCenter.get(query.feeCollected);
                 if(costCenter){
-                    await costCenter.checkoutBudgetNotice({startDay: approve.createdAt});
+                    await costCenter.checkoutBudgetNotice({startDay: approve.createdAt || new Date()});
                 }
             }
 
@@ -823,7 +823,7 @@ export default class TripApproveModule {
             let log = Models.tripPlanLog.create({tripPlanId: params.id, userId: staff.id, remark: `撤销行程审批单`});
             await log.save();
 
-            tripApprove.status = EApproveStatus.UNDO;
+            tripApprove.status = EApproveStatus.CANCEL;
             await tripApprove.save();
 
             if(typeof tripApprove.data == "string"){

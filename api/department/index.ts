@@ -434,16 +434,16 @@ export default class DepartmentModule {
      * 查询上级部门管理
      * @param deptId
      */
-    // @clientExport
-    // static async findParentManagers(deptId: string) {
-    //     const dept = await Models.department.get(deptId)
-    //     const { manager, parent } = dept
-    //     if (parent == null && manager == null) return []
+    @clientExport
+    static async findParentManagers(deptId: string) {
+        const dept = await Models.department.get(deptId)
+        const { manager, parent } = dept
+        if (parent == null && manager == null) return []
 
-    //     return manager && parent == null
-    //         ? [manager.id]
-    //         : [manager.id, ... await DepartmentModule.findParentManagers(parent.id)]
-    // }
+        return manager && parent == null
+            ? [manager.id]
+            : [manager.id, ... await DepartmentModule.findParentManagers(parent.id)]
+    }
 }
 
 

@@ -52,6 +52,20 @@ export enum EBudgetType {
     HOTEL = 2,
     SUBSIDY = 3
 }
+export interface ITMCSupplier {
+    id: string,
+    name: string, 
+    status: number,
+    identify: {
+        username: string,
+        password: string
+    },
+    startWay: string,
+    type: number,
+    service: any,
+    tmcType: string,
+    companyId?: string
+}
 
 export interface IQueryBudgetParams {
     fromCity?: ICity | string;       //出发城市
@@ -176,11 +190,14 @@ export default class ApiTravelBudget {
         } else {
             let meiyaHotel = await getMeiyaHotelData(params, authData);
             console.log("meiyaHotel ===> meiyaHotel data.", meiyaHotel.length)
-            if (meiyaHotel && meiyaHotel.length)
+            if (meiyaHotel && meiyaHotel.length != 0){
                 // commonData = compareHotelData(commonData, meiyaHotel);
                 commonData = handelHotelsData(meiyaHotel, params);
             // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".finallyHotel.json", commonData);
-            return commonData;
+                return commonData;
+            }else { 
+                return []
+            }            
         }
     }
 
@@ -518,7 +535,7 @@ export default class ApiTravelBudget {
         let lockBudget: boolean = checkTripApproveStatus ? checkTripApproveStatus['lockBudget'] : null;
         let tripApproveStatus = checkTripApproveStatus ? checkTripApproveStatus['status'] : null;
 
-        if (approve.status == EApproveStatus.UNDO ||(tripApproveStatus && (tripApproveStatus == QMEApproveStatus.PASS ||
+        if (approve.status == EApproveStatus.CANCEL ||(tripApproveStatus && (tripApproveStatus == QMEApproveStatus.PASS ||
              tripApproveStatus == QMEApproveStatus.REJECT)) || lockBudget) {
             console.log('tripApproveStatus----->  ', tripApproveStatus);
             console.log('lockBudget------------->   ', lockBudget);
@@ -850,11 +867,14 @@ export default class ApiTravelBudget {
     }
 
     //获取公司信息
-    static async getCompanyInfo(sname?:string): Promise<any> {
-        let currentStaff = await Staff.getCurrent();
-        let staffId = currentStaff.id;
-        let staff = await Models.staff.get(staffId);
-        let companyId = staff.company.id;
+    static async getCompanyInfo(sname?:string, staffId?: string): Promise<any> {
+        let staff: Staff;
+        if(staffId) staff = await Models.staff.get(staffId);
+        if(!staffId) {
+            staff = await Staff.getCurrent(); 
+        }    
+        let companyId = staff && staff.company ? staff.company.id: staff.companyId;
+        if(!companyId) throw L.ERR.HAS_NOT_BIND();
         let result;
         try {
             result = await RestfulAPIUtil.operateOnModel({
@@ -1056,9 +1076,14 @@ export default class ApiTravelBudget {
 }
 
 /* as ICreateBudgetAndApproveParamsNew; */
-
+// let param = {
+//     checkInDate: "2018-03-30",
+//     checkOutDate: "2018-03-31",
+//     cityId: "1814905",
+//     travelPolicyId: "asdasdlkaldaklslkdka",
+// }
 // setTimeout(async ()=>{
 //     console.log("test go go");
-//     let result = await ApiTravelBudget.getTravelPolicyBudgetNew(params, false);
-
+//     let result = await ApiTravelBudget.getHotelsData(param);
+//         console.log(result,"<=============")
 // }, 8000);
