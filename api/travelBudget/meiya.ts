@@ -435,7 +435,7 @@ function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearch
                 "seatNum":item.seatNum,
                 "urlParams": {
                     "No": meiyaFlightData.flightNo,
-                    "priceId": item.priceID
+                    "priceId": item.priceID,
                 }
             }
             return agentCabin

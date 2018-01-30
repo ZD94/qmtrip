@@ -710,9 +710,10 @@ export default class TripApproveModule {
             }
 
             if(approveResult == EApproveResult.PASS && query && query.feeCollected){
+                console.log('costCenterId==>', query.feeCollected)
                 let costCenter = await Models.costCenter.get(query.feeCollected);
                 if(costCenter){
-                    await costCenter.checkoutBudgetNotice({startDay: approve.createdAt});
+                    await costCenter.checkoutBudgetNotice({startDay: approve.createdAt || new Date()});
                 }
             }
 
