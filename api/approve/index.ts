@@ -151,6 +151,23 @@ class ApproveModule {
         });
 
     }
+
+    @clientExport
+    static async cancelApprove(params: {approveId: string}): Promise<any> {  //tripApprove未生成前取消行程，改变approve状态，和冻结点数(非必要)
+        try {
+            let approve = await Models.approve.get(params.approveId);
+            approve.status = EApproveStatus.UNDO;
+            let query = typeof approve.data == 'string' ? JSON.parse(approve.data) : approve.data;
+            let frozenNum = query.frozenNum;
+            frozenNum = typeof frozenNum == 'string' ? JSON.parse(frozenNum) : frozenNum;
+            frozenNum.extraFrozen = 0;
+            frozenNum.limitFrozen = 0;
+            await approve.save();
+        } catch(err) {
+            throw err;
+        }
+    }
+
     @clientExport
     @requireParams(["approveId"], ["approveUser", "project", "submitter", "version"])
     static async submitApproveNew(params: {approveId: string, budgetId?: string, approveUser?: Staff, submitter?: Staff, version: number}) :Promise<Approve>{
