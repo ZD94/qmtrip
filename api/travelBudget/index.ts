@@ -4,7 +4,7 @@
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { Models } from '_types'
 import { ETripType, ICreateBudgetAndApproveParams, ICreateBudgetAndApproveParamsNew, QMEApproveStatus, EApproveResult, EBackOrGo } from "_types/tripPlan";
-import {Approve} from '_types/approve';
+import {Approve, EApproveStatus} from '_types/approve';
 import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
 import L from '@jingli/language';
@@ -521,7 +521,7 @@ export default class ApiTravelBudget {
         let lockBudget: boolean = checkTripApproveStatus ? checkTripApproveStatus['lockBudget'] : null;
         let tripApproveStatus = checkTripApproveStatus ? checkTripApproveStatus['status'] : null;
 
-        if ((tripApproveStatus && (tripApproveStatus == QMEApproveStatus.PASS ||
+        if (approve.status == EApproveStatus.CANCEL ||(tripApproveStatus && (tripApproveStatus == QMEApproveStatus.PASS ||
              tripApproveStatus == QMEApproveStatus.REJECT)) || lockBudget) {
             console.log('tripApproveStatus----->  ', tripApproveStatus);
             console.log('lockBudget------------->   ', lockBudget);
@@ -661,7 +661,7 @@ export default class ApiTravelBudget {
         let company = await Models.company.get(companyId);
         let travelPolicy = await staff.getTravelPolicy();
         if (!travelPolicy) {
-            throw L.ERR.ERROR_CODE(500, `差旅标准还未设置`);
+            throw new L.ERROR_CODE_C(500, `差旅标准还未设置`);
         }
         params.travelPolicyId = travelPolicy.id;
 
@@ -804,6 +804,7 @@ export default class ApiTravelBudget {
             });
             console.log('isCheckTripNumStillLeft', isIntoApprove && eachBudgetSegIsOk);
             obj.query['frozenNum'] = result.frozenNum;
+            await company.frozenTripPlanNum(result.frozenNum); //企业冻结行程点数
 
             //拿到预算后更新approve表
             if (!isIntoApprove && eachBudgetSegIsOk) {//判断是否是审批人查看审批单时进行的第二次拉取数据

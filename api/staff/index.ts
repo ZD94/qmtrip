@@ -424,7 +424,7 @@ class StaffModule{
         let staff = await Staff.getCurrent();
 
         if(params.email){
-            if(staff.status == ACCOUNT_STATUS.ACTIVE && updateStaff.staffStatus != EStaffStatus.FORBIDDEN){
+            if(updateStaff.status == ACCOUNT_STATUS.ACTIVE && updateStaff.staffStatus != EStaffStatus.FORBIDDEN){
                 throw L.ERR.NOTALLOWED_MODIFY_EMAIL();
             }
 
@@ -1524,7 +1524,8 @@ class StaffModule{
 
     @clientExport
     static async createInvitedLinkV2(params: {url?: string}): Promise<InvitedLink>{
-        let host = params.url || config.host;
+        let host: string = params.url || config.host;
+        host = host.replace(/https?/, 'https')
         let goInvitedLink = host + "#/login/invited-staff-one";
         var staff = await Staff.getCurrent();
         var invitedLink = InvitedLink.create();
