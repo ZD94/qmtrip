@@ -176,11 +176,14 @@ export default class ApiTravelBudget {
         } else {
             let meiyaHotel = await getMeiyaHotelData(params, authData);
             console.log("meiyaHotel ===> meiyaHotel data.", meiyaHotel.length)
-            if (meiyaHotel && meiyaHotel.length)
+            if (meiyaHotel && meiyaHotel.length != 0){
                 // commonData = compareHotelData(commonData, meiyaHotel);
                 commonData = handelHotelsData(meiyaHotel, params);
             // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".finallyHotel.json", commonData);
-            return commonData;
+                return commonData;
+            }else { 
+                return []
+            }            
         }
     }
 
@@ -1055,9 +1058,14 @@ export default class ApiTravelBudget {
 }
 
 /* as ICreateBudgetAndApproveParamsNew; */
-
+// let param = {
+//     checkInDate: "2018-03-30",
+//     checkOutDate: "2018-03-31",
+//     cityId: "1814905",
+//     travelPolicyId: "asdasdlkaldaklslkdka",
+// }
 // setTimeout(async ()=>{
 //     console.log("test go go");
-//     let result = await ApiTravelBudget.getTravelPolicyBudgetNew(params, false);
-
+//     let result = await ApiTravelBudget.getHotelsData(param);
+//         console.log(result,"<=============")
 // }, 8000);
