@@ -197,7 +197,10 @@ class Proxy {
             identify = encodeURIComponent(identify);
             // let auth: string = (isNeedAuth == '1') ? identify : '';
             let auth : string = identify;
+
             let headers: {[index: string]: any} = {
+               appid: config.orderSysConfig.appId,
+               sign: null,
                auth: auth,
                supplier,
                accountid: staff.accountId,
@@ -208,11 +211,17 @@ class Proxy {
             let body: {[index: string]: any} = req.body;
             let qs: {[index: string]: any} = req.query;
 
+            let timestamp = Math.floor(Date.now()/1000);       
+            let sign: string;
             if(req.method == 'GET') {
+                sign = genSign(qs, timestamp, config.orderSysConfig.appSecret);
+                headers['sign'] = sign;
                 _.assign(headers, addon)
             } else {
                 _.assign(headers, addon)
                 _.assign(body, addon);
+                sign = genSign(body, timestamp, config.orderSysConfig.appSecret);
+                headers['sign'] = sign;
             }
 
             let pathstring = req.path;

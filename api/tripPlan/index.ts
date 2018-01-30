@@ -3117,7 +3117,9 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDe
             let tripPlan = await Models.tripPlan.get(tripDetail["tripPlanId"]);
             let tripDetails = await tripPlan.getTripDetails({where: {
                 status: [ETripDetailStatus.WAIT_UPLOAD, ETripDetailStatus.AUDIT_NOT_PASS], id:{$ne: tripDetail.id}}});
-            if((!tripDetails || !tripDetails.length) && tripDetail.status == ETripDetailStatus.WAIT_COMMIT){
+            if(new Date(tripPlan.backAt) > new Date() && tripDetail.type == ETripType.SUBSIDY) {  //类型为补助，且为行程未失效(此时只能上传补助)，tripPlan的aduitStatus不能为wait_commmit   
+                auditStatus = EAuditStatus.WAIT_UPLOAD;
+            } else if((!tripDetails || !tripDetails.length) && tripDetail.status == ETripDetailStatus.WAIT_COMMIT){
                 auditStatus = EAuditStatus.WAIT_COMMIT;
             }     
             break;
