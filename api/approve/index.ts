@@ -13,7 +13,7 @@ import {ETripType} from "_types/tripPlan/tripPlan";
 import _ = require('lodash');
 let Config = require('@jingli/config');
 var API = require("@jingli/dnode-api");
-import {ISegment, ICreateBudgetAndApproveParams} from '_types/tripPlan';
+import {ISegment, ICreateBudgetAndApproveParams, QMEApproveStatus} from '_types/tripPlan';
 import L from '@jingli/language';
 import * as CLS from 'continuation-local-storage';
 
@@ -157,12 +157,17 @@ class ApproveModule {
         try {
             let approve = await Models.approve.get(params.approveId);
             approve.status = EApproveStatus.CANCEL;
+            approve.tripApproveStatus = QMEApproveStatus.CANCEL;
             let query = typeof approve.data == 'string' ? JSON.parse(approve.data) : approve.data;
             let frozenNum = query.frozenNum;
             frozenNum = typeof frozenNum == 'string' ? JSON.parse(frozenNum) : frozenNum;
             frozenNum.extraFrozen = 0;
             frozenNum.limitFrozen = 0;
             await approve.save();
+
+            let staff = await Models.staff.get(approve.submitter);
+            let log = Models.tripPlanLog.create({tripPlanId: params.approveId, userId: staff.id, remark: `撤销行程审批单`});
+            await log.save();
         } catch(err) {
             throw err;
         }

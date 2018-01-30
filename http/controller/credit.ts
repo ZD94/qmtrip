@@ -40,7 +40,11 @@ export class CreditController extends AbstractController {
         if(!coinAccountChanges || coinAccountChanges.length <= 0){
             var result;
             try{
-                result = await coinAccount.lockCoin(credits, description, orderNum);
+                if(description && typeof description == 'string')
+                    description = JSON.parse(description);
+                let remark = `使用${description.price}换购${description.goodsName}`;
+
+                result = await coinAccount.lockCoin(credits, remark, orderNum);
             }catch(e){
                 return res.json(this.reply(503,{message: e.message}));
             }

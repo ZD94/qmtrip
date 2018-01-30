@@ -10,7 +10,7 @@ export = async function transform(values: any): Promise<any>{
     let appMessageUrl: string;
     let shortUrl: string = '';
     if(values.account.name)
-        values.staffName = values.account.name
+        values.staffName = values.account ? values.account.name : '';
 
     if(config.version == 2) {
         detailUrl = config.v2_host + '/index-v2.html#/card-coupons/card-coupons';    

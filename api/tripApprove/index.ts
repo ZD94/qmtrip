@@ -824,6 +824,7 @@ export default class TripApproveModule {
             await log.save();
 
             tripApprove.status = EApproveStatus.CANCEL;
+            tripApprove.tripApproveStatus = QMEApproveStatus.CANCEL;
             await tripApprove.save();
 
             if(typeof tripApprove.data == "string"){
