@@ -455,8 +455,7 @@ class StaffModule{
         updateStaff = await updateStaff.save();
 
         if(params.email){
-
-            return API.auth.sendResetPwdEmail({companyName: updateStaff.company.name, email: updateStaff.email, type: 1, isFirstSet: true});
+            return API.auth.sendResetPwdEmail({companyName: updateStaff.company.name, mobile: updateStaff.mobile, email: updateStaff.email, type: 1, isFirstSet: true});
         }else{
 
             /*let vals  = {

@@ -52,6 +52,20 @@ export enum EBudgetType {
     HOTEL = 2,
     SUBSIDY = 3
 }
+export interface ITMCSupplier {
+    id: string,
+    name: string, 
+    status: number,
+    identify: {
+        username: string,
+        password: string
+    },
+    startWay: string,
+    type: number,
+    service: any,
+    tmcType: string,
+    companyId?: string
+}
 
 export interface IQueryBudgetParams {
     fromCity?: ICity | string;       //出发城市
@@ -853,11 +867,14 @@ export default class ApiTravelBudget {
     }
 
     //获取公司信息
-    static async getCompanyInfo(sname?:string): Promise<any> {
-        let currentStaff = await Staff.getCurrent();
-        let staffId = currentStaff.id;
-        let staff = await Models.staff.get(staffId);
-        let companyId = staff.company.id;
+    static async getCompanyInfo(sname?:string, staffId?: string): Promise<any> {
+        let staff: Staff;
+        if(staffId) staff = await Models.staff.get(staffId);
+        if(!staffId) {
+            staff = await Staff.getCurrent(); 
+        }    
+        let companyId = staff && staff.company ? staff.company.id: staff.companyId;
+        if(!companyId) throw L.ERR.HAS_NOT_BIND();
         let result;
         try {
             result = await RestfulAPIUtil.operateOnModel({
