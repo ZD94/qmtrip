@@ -518,7 +518,7 @@ export default class ApiTravelBudget {
         let lockBudget: boolean = checkTripApproveStatus ? checkTripApproveStatus['lockBudget'] : null;
         let tripApproveStatus = checkTripApproveStatus ? checkTripApproveStatus['status'] : null;
 
-        if (approve.status == EApproveStatus.UNDO ||(tripApproveStatus && (tripApproveStatus == QMEApproveStatus.PASS ||
+        if (approve.status == EApproveStatus.CANCEL ||(tripApproveStatus && (tripApproveStatus == QMEApproveStatus.PASS ||
              tripApproveStatus == QMEApproveStatus.REJECT)) || lockBudget) {
             console.log('tripApproveStatus----->  ', tripApproveStatus);
             console.log('lockBudget------------->   ', lockBudget);
