@@ -274,6 +274,7 @@ export async function __init() {
 //通知模块
 export async function submitNotify(params: ISubmitNotifyParam) : Promise<boolean> {
     let {userId, key, email, mobile, values} = params;
+    console.info("key================", key);
     let _values: any = {};
     for(let k in values){
         _values[k] = values[k];

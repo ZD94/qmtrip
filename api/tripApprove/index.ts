@@ -304,11 +304,11 @@ export default class TripApproveModule {
                 console.error('发送通知失败', err.stack ? err.stack : err);
             }
 
-            try {
+            /*try {
                 await API.ddtalk.sendLinkMsg({accountId: approveUserId, text: '有新的出差申请需要您审批', url: shortUrl})
             } catch(err) {
                 console.error(`发送钉钉通知失败`, err)
-            }
+            }*/
         } else {
             let admins = await Models.staff.find({ where: {companyId: tripApprove['companyId'], roleId: [EStaffRole.OWNER,
                 EStaffRole.ADMIN], staffStatus: EStaffStatus.ON_JOB, id: {$ne: staff.id}}}); //获取激活状态的管理员

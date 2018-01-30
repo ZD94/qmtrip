@@ -14,7 +14,7 @@ var accountId = "";
 var obj= {
     accordPrice: 900,
     cityName: "经济舱" ,
-    cityCode: "CT_50",
+    cityCode: "1814991",
 }
 var company = {
     name: 'accordHotelTest的企业',
