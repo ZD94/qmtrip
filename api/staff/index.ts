@@ -455,8 +455,7 @@ class StaffModule{
         updateStaff = await updateStaff.save();
 
         if(params.email){
-
-            return API.auth.sendResetPwdEmail({companyName: updateStaff.company.name, email: updateStaff.email, type: 1, isFirstSet: true});
+            return API.auth.sendResetPwdEmail({companyName: updateStaff.company.name, mobile: updateStaff.mobile, email: updateStaff.email, type: 1, isFirstSet: true});
         }else{
 
             /*let vals  = {
@@ -1524,7 +1523,8 @@ class StaffModule{
 
     @clientExport
     static async createInvitedLinkV2(params: {url?: string}): Promise<InvitedLink>{
-        let host = params.url || config.host;
+        let host: string = params.url || config.host;
+        host = host.replace(/https?/, 'https')
         let goInvitedLink = host + "#/login/invited-staff-one";
         var staff = await Staff.getCurrent();
         var invitedLink = InvitedLink.create();

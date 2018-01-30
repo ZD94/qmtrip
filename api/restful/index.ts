@@ -121,6 +121,8 @@ export class RestfulAPIUtil {
         if(!isSend){
             return null;
         }
+
+        console.info("RestfulAPIUtil===>>>", url);
         return new Promise((resolve, reject) => {
             return request({
                 uri: url,
@@ -159,6 +161,7 @@ export class RestfulAPIUtil {
     }) {
         const token = await getAgentToken();
         let { url, body = {}, method = "get", qs = {} } = params;
+        console.info("proxyHttp===>>>", config.cloudAPI + url);
         return new Promise((resolve, reject) => {
             request({
                 uri: config.cloudAPI + url,

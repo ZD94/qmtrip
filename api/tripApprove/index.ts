@@ -304,11 +304,11 @@ export default class TripApproveModule {
                 console.error('发送通知失败', err.stack ? err.stack : err);
             }
 
-            try {
+            /*try {
                 await API.ddtalk.sendLinkMsg({accountId: approveUserId, text: '有新的出差申请需要您审批', url: shortUrl})
             } catch(err) {
                 console.error(`发送钉钉通知失败`, err)
-            }
+            }*/
         } else {
             let admins = await Models.staff.find({ where: {companyId: tripApprove['companyId'], roleId: [EStaffRole.OWNER,
                 EStaffRole.ADMIN], staffStatus: EStaffStatus.ON_JOB, id: {$ne: staff.id}}}); //获取激活状态的管理员
@@ -712,7 +712,7 @@ export default class TripApproveModule {
             if(approveResult == EApproveResult.PASS && query && query.feeCollected){
                 let costCenter = await Models.costCenter.get(query.feeCollected);
                 if(costCenter){
-                    await costCenter.checkoutBudgetNotice();
+                    await costCenter.checkoutBudgetNotice({startDay: approve.createdAt || new Date()});
                 }
             }
 
@@ -823,6 +823,9 @@ export default class TripApproveModule {
             let log = Models.tripPlanLog.create({tripPlanId: params.id, userId: staff.id, remark: `撤销行程审批单`});
             await log.save();
 
+            tripApprove.status = EApproveStatus.CANCEL;
+            await tripApprove.save();
+
             if(typeof tripApprove.data == "string"){
                 tripApprove.data = JSON.parse(tripApprove.data);
             }
@@ -867,6 +870,7 @@ export default class TripApproveModule {
         }).catch(async function(err){
             if(err) {
                 await company.reload();
+                await tripApprove.reload();
                 throw L.ERR.INTERNAL_ERROR();
             }
         });

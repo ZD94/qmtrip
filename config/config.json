@@ -158,7 +158,9 @@
   "tmcFake": "${JL_APP_TMC_FAKE}",
   "orderSysConfig": {
     "tripDetailMonitorUrl": "${JL_APP_TD_MONITORURL}",
-    "orderLink": "${JL_APP_ORDER_LINK}"
+    "orderLink": "${JL_APP_ORDER_LINK}",
+    "appId": "${JL_APP_ORDER_APP_ID}",
+    "appSecret": "${JL_APP_ORDER_APP_SECRET}"
   },
   "workWechat": {
     "corpId": "wwb398745b82d67068",

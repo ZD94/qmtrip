@@ -863,11 +863,11 @@ class TripPlanModule {
                 } catch (err) {
                     console.error(`发送通知失败:`, err);
                 }
-                try {
+                /*try {
                     await API.ddtalk.sendLinkMsg({ accountId: staff.id, text: '票据已审批结束', url: self_url })
                 } catch (err) {
                     console.error(`发送钉钉通知失败`, err);
-                }
+                }*/
             }
 
 
@@ -1136,11 +1136,11 @@ class TripPlanModule {
                 } catch (err) {
                     console.error(`发送通知失败:`, err);
                 }
-                try {
+                /*try {
                     await API.ddtalk.sendLinkMsg({ accountId: staff.id, text: '票据已审批结束', url: self_url })
                 } catch (err) {
                     console.error(`发送钉钉通知失败`, err);
-                }
+                }*/
             }
 
             //如果出差已经完成，并且节省反积分，并且非特别审批，增加员工积分；若企业账户有余额，直接兑换员工积分为鲸币
@@ -2129,11 +2129,11 @@ class TripPlanModule {
         } catch (err) {
             console.error(err);
         }
-        try {
+        /*try {
             await API.ddtalk.sendLinkMsg({ accountId: account.id, text: '您的预算已审批完成', url: self_url });
         } catch (err) {
             console.error(err);
-        }
+        }*/
 
         try {
             if (tripPlan.costCenterId) {
@@ -3092,9 +3092,10 @@ async function updateTripPlanExpenditure(tripPlan: TripPlan) {
  * @param status {ETripDetailStatus} 
  * @return Promise<TripDetail>
  */
-async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDetailStatus) :Promise<TripDetail> {
+async function tryUpdateTripDetailStatus(tripDetail : TripDetail, status: ETripDetailStatus) :Promise<TripDetail> {
 
-    let auditStatus: EAuditStatus = EAuditStatus.NO_NEED_AUDIT;
+    let auditStatus: EAuditStatus = null;
+    let tripPlan = await Models.tripPlan.get(tripDetail["tripPlanId"]);
     switch(status) {
         case ETripDetailStatus.WAIT_UPLOAD:
             tripDetail.status = status;
@@ -3114,7 +3115,7 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDe
                 tripDetail.status = ETripDetailStatus.WAIT_COMMIT;
             }
             let tripPlan = await Models.tripPlan.get(tripDetail["tripPlanId"]);
-            if(new Date(tripPlan.backAt) > new Date() && tripDetail.type == ETripType.SUBSIDY) {  //类型为补助，且为行程未失效，tripPlan的aduitStatus不能为wait_commmit   
+            if(new Date(tripPlan.backAt) > new Date() && tripDetail.type == ETripType.SUBSIDY) {  //类型为补助，且为行程未失效(此时只能上传补助)，tripPlan的aduitStatus不能为wait_commmit   
                 auditStatus = EAuditStatus.WAIT_UPLOAD;
             } else {
                 auditStatus = EAuditStatus.WAIT_COMMIT;
@@ -3124,7 +3125,7 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDe
             if ([ ETripDetailStatus.AUDIT_NOT_PASS, ETripDetailStatus.WAIT_COMMIT].indexOf(tripDetail.status) >= 0) {
                 tripDetail.status = status;  
             }
-            auditStatus = EAuditStatus.WAIT_COMMIT;
+            auditStatus = EAuditStatus.AUDITING;
             break;
         case ETripDetailStatus.COMPLETE:
             if (ETripDetailStatus.AUDITING == tripDetail.status) {
@@ -3132,7 +3133,7 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDe
             } else if (tripDetail.type == ETripType.SUBSIDY) {
                 tripDetail.status = status;
             }
-            auditStatus = EAuditStatus.WAIT_COMMIT;
+            auditStatus = EAuditStatus.INVOICE_PASS;
             break;
 
         case ETripDetailStatus.WAIT_RESERVE: 
@@ -3146,11 +3147,7 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDe
     //更改行程详情状态
     tripDetail = await tripDetail.save()
     //尝试更改行程状态
-    let tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
-    
-
     await tryUpdateTripPlanStatus(tripPlan, auditStatus);
-
     return tripDetail;
 }
 
@@ -3210,6 +3207,8 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDe
  * @param status {EPlanStatus} 
  */
 async function tryUpdateTripPlanStatus(tripPlan: TripPlan, status: EAuditStatus) :Promise<TripPlan>{
+    if (status == null) {return tripPlan};
+
     let cannotStatus = {};
     //变tripPlan状态需要tripDetail不能包含状态
     cannotStatus[EAuditStatus.WAIT_UPLOAD] = [];
