@@ -823,7 +823,7 @@ export default class TripApproveModule {
             let log = Models.tripPlanLog.create({tripPlanId: params.id, userId: staff.id, remark: `撤销行程审批单`});
             await log.save();
 
-            tripApprove.status = EApproveStatus.UNDO;
+            tripApprove.status = EApproveStatus.CANCEL;
             await tripApprove.save();
 
             if(typeof tripApprove.data == "string"){

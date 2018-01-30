@@ -156,7 +156,7 @@ class ApproveModule {
     static async cancelApprove(params: {approveId: string}): Promise<any> {  //tripApprove未生成前取消行程，改变approve状态，和冻结点数(非必要)
         try {
             let approve = await Models.approve.get(params.approveId);
-            approve.status = EApproveStatus.UNDO;
+            approve.status = EApproveStatus.CANCEL;
             let query = typeof approve.data == 'string' ? JSON.parse(approve.data) : approve.data;
             let frozenNum = query.frozenNum;
             frozenNum = typeof frozenNum == 'string' ? JSON.parse(frozenNum) : frozenNum;
