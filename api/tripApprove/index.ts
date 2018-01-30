@@ -712,7 +712,7 @@ export default class TripApproveModule {
             if(approveResult == EApproveResult.PASS && query && query.feeCollected){
                 let costCenter = await Models.costCenter.get(query.feeCollected);
                 if(costCenter){
-                    await costCenter.checkoutBudgetNotice();
+                    await costCenter.checkoutBudgetNotice({startDay: approve.createdAt.getFullYear()});
                 }
             }
 
