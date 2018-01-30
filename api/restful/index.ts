@@ -138,7 +138,7 @@ export class RestfulAPIUtil {
                     return reject(err);
                 }
                 if (resp.statusCode != 200) { 
-                    throw new L.ERR.ERROR_CODE_C(resp.statusCode, '系统错误');
+                    throw new L.ERROR_CODE_C(resp.statusCode, '系统错误');
                 }
                 if (typeof result == 'string') {
                     try{
