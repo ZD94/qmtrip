@@ -823,6 +823,9 @@ export default class TripApproveModule {
             let log = Models.tripPlanLog.create({tripPlanId: params.id, userId: staff.id, remark: `撤销行程审批单`});
             await log.save();
 
+            tripApprove.status = EApproveStatus.UNDO;
+            await tripApprove.save();
+
             if(typeof tripApprove.data == "string"){
                 tripApprove.data = JSON.parse(tripApprove.data);
             }
@@ -867,6 +870,7 @@ export default class TripApproveModule {
         }).catch(async function(err){
             if(err) {
                 await company.reload();
+                await tripApprove.reload();
                 throw L.ERR.INTERNAL_ERROR();
             }
         });

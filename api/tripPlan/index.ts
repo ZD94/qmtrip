@@ -3092,9 +3092,10 @@ async function updateTripPlanExpenditure(tripPlan: TripPlan) {
  * @param status {ETripDetailStatus} 
  * @return Promise<TripDetail>
  */
-async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDetailStatus) :Promise<TripDetail> {
+async function tryUpdateTripDetailStatus(tripDetail : TripDetail, status: ETripDetailStatus) :Promise<TripDetail> {
 
-    let auditStatus: EAuditStatus = EAuditStatus.NO_NEED_AUDIT;
+    let auditStatus: EAuditStatus = null;
+    let tripPlan = await Models.tripPlan.get(tripDetail["tripPlanId"]);
     switch(status) {
         case ETripDetailStatus.WAIT_UPLOAD:
             tripDetail.status = status;
@@ -3113,19 +3114,13 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDe
             if (invoices && invoices.length && isInWaitCommit) {
                 tripDetail.status = ETripDetailStatus.WAIT_COMMIT;
             }
-
-            let tripPlan = await Models.tripPlan.get(tripDetail["tripPlanId"]);
-            let tripDetails = await tripPlan.getTripDetails({where: {
-                status: [ETripDetailStatus.WAIT_UPLOAD, ETripDetailStatus.AUDIT_NOT_PASS], id:{$ne: tripDetail.id}}});
-            if((!tripDetails || !tripDetails.length) && tripDetail.status == ETripDetailStatus.WAIT_COMMIT){
-                auditStatus = EAuditStatus.WAIT_COMMIT;
-            }     
+            auditStatus = EAuditStatus.WAIT_COMMIT;
             break;
         case ETripDetailStatus.AUDITING:
             if ([ ETripDetailStatus.AUDIT_NOT_PASS, ETripDetailStatus.WAIT_COMMIT].indexOf(tripDetail.status) >= 0) {
                 tripDetail.status = status;  
             }
-            auditStatus = EAuditStatus.WAIT_COMMIT;
+            auditStatus = EAuditStatus.AUDITING;
             break;
         case ETripDetailStatus.COMPLETE:
             if (ETripDetailStatus.AUDITING == tripDetail.status) {
@@ -3133,7 +3128,7 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDe
             } else if (tripDetail.type == ETripType.SUBSIDY) {
                 tripDetail.status = status;
             }
-            auditStatus = EAuditStatus.WAIT_COMMIT;
+            auditStatus = EAuditStatus.INVOICE_PASS;
             break;
 
         case ETripDetailStatus.WAIT_RESERVE: 
@@ -3147,11 +3142,7 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDe
     //更改行程详情状态
     tripDetail = await tripDetail.save()
     //尝试更改行程状态
-    let tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
-    
-
     await tryUpdateTripPlanStatus(tripPlan, auditStatus);
-
     return tripDetail;
 }
 
@@ -3211,6 +3202,8 @@ async function tryUpdateTripDetailStatus(tripDetail: TripDetail, status: ETripDe
  * @param status {EPlanStatus} 
  */
 async function tryUpdateTripPlanStatus(tripPlan: TripPlan, status: EAuditStatus) :Promise<TripPlan>{
+    if (status == null) {return tripPlan};
+
     let cannotStatus = {};
     //变tripPlan状态需要tripDetail不能包含状态
     cannotStatus[EAuditStatus.WAIT_UPLOAD] = [];
