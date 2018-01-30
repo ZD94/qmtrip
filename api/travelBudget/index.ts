@@ -658,7 +658,7 @@ export default class ApiTravelBudget {
         let company = await Models.company.get(companyId);
         let travelPolicy = await staff.getTravelPolicy();
         if (!travelPolicy) {
-            throw L.ERR.ERROR_CODE(500, `差旅标准还未设置`);
+            throw new L.ERROR_CODE_C(500, `差旅标准还未设置`);
         }
         params.travelPolicyId = travelPolicy.id;
 
