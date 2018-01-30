@@ -17,6 +17,7 @@ let CLSNS = CLS.getNamespace('dnode-api-context');
 import { genSign } from "@jingli/sign";
 import { Department } from '_types/department';
 import Logger from '@jingli/logger';
+import { ITMCSupplier } from 'api/travelBudget';
 const logger = new Logger("proxy");
 const corsOptions = { 
     origin: true, 
@@ -188,9 +189,13 @@ class Proxy {
                 listeningon: listeningon     
             };
             let supplier =req.headers['supplier'] || 'meiya';
-
-            let companyInfo = await ApiTravelBudget.getCompanyInfo(supplier);
-            let identify = companyInfo[0].identify;
+            let companyInfo: Array<ITMCSupplier>;
+            try{
+                companyInfo = await ApiTravelBudget.getCompanyInfo(supplier, staff.id);
+            }catch(err){ return res.json(407, null) }
+            
+            let identify: string|{username:string, password: string} = companyInfo && companyInfo.length ?companyInfo[0].identify: null;
+            if(!identify) return res.json(407, null);
             if (typeof identify == 'object') {
                 identify = JSON.stringify(identify);
             }
