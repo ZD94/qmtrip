@@ -262,7 +262,7 @@ deploy:tester:
     JL_APP_TMC_FAKE: 0
     JL_APP_TD_MONITORURL: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME/api/v1/tripDetail
     JL_APP_CLOUDKEY: jinglicloud2017
-    JL_APP_CLOUDAPI: https://l.jingli365.com/cloud/api/v1
+    JL_APP_CLOUDAPI: https://l.jingli365.com/proj/svr-jlbudget/api/v1
     JL_APP_CLOUD: https://l.jingli365.com/cloud
     JL_APP_CLOUD_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_CLOUD_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
