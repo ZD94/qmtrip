@@ -72,7 +72,7 @@ deploy:master:
     JL_APP_BUDGET_HOST: l.jingli365.com
     JL_APP_BUDGET_PORT: 14103
     JL_APP_NOTICE_EMAIL: testteam@jingli365.com
-    JL_APP_V2_HOST: https://l.jingli365.com/proj/web-jingli-v2
+    JL_APP_V2_HOST: https://l.jingli365.com/proj/web-jingli-v2/index-v2.html
     JL_APP_APPROVE_SERVER_URL: https://l.jingli365.com/proj/svr-trip-approve/api/v1
     JL_APP_TMC: https://l.jingli365.com/proj/svr-tmc
     JL_APP_TMC_FAKE: 0
@@ -118,7 +118,7 @@ deploy:test:
     JL_APP_BUDGET_HOST: l.jingli365.com
     JL_APP_BUDGET_PORT: 14113
     JL_APP_NOTICE_EMAIL: testteam@jingli365.com
-    JL_APP_V2_HOST: https://t.jingli365.com/proj/web-jingli-v2
+    JL_APP_V2_HOST: https://t.jingli365.com/proj/web-jingli-v2/index-v2.html
     JL_APP_APPROVE_SERVER_URL: https://t.jingli365.com/proj/svr-trip-approve/api/v1
     JL_APP_TD_MONITORURL: https://t.jingli365.com/proj/old-qmtrip/api/v1/tripDetail
     JL_APP_TMC: https://t.jingli365.com/proj/svr-tmc
@@ -165,7 +165,7 @@ deploy:release:
     JL_APP_BUDGET_HOST: j.jingli365.com
     JL_APP_BUDGET_PORT: 4103
     JL_APP_NOTICE_EMAIL: tbudget@jingli365.com
-    JL_APP_V2_HOST: https://j.jingli365.com
+    JL_APP_V2_HOST: https://j.jingli365.com/index-v2.html
     JL_APP_APPROVE_SERVER_URL: https://j.jingli365.com/proj/svr-trip-approve/api/v1
     JL_APP_TMC: https://j.jingli365.com/proj/svr-tmc
     JL_APP_TMC_FAKE: 0
@@ -208,7 +208,7 @@ deploy:demo:
     JL_APP_HOST: $CI_ENVIRONMENT_URL
     JL_APP_POSTGRES: postgres://demo:d3m0jingli365@dockerhost/qmtrip
     JL_APP_REDIS: redis://dockerhost
-    JL_APP_V2_HOST: https://demo.jingli365.com
+    JL_APP_V2_HOST: https://demo.jingli365.com/index-v2.html
     JL_APP_APPROVE_SERVER_URL: https://demo.jingli365.com/proj/svr-trip-approve/api/v1
     JL_APP_TMC: http://l.jingli365.com/proj/svr-tmc
     JL_APP_TMC_FAKE: 0
@@ -251,7 +251,7 @@ deploy:tester:
     JL_APP_BUDGET_HOST: l.jingli365.com
     JL_APP_BUDGET_PORT: 14103
     JL_APP_NOTICE_EMAIL: testteam@jingli365.com
-    JL_APP_V2_HOST: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
+    JL_APP_V2_HOST: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME/index-v2.html
     JL_APP_APPROVE_SERVER_URL: https://l.jingli365.com/proj/svr-trip-approve/api/v1
     JL_APP_TMC: http://l.jingli365.com/proj/svr-tmc
     JL_APP_TMC_FAKE: 0
@@ -289,7 +289,7 @@ deploy:vm:
     url: https://review.l.jingli365.com/vm/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
   variables:
     JL_APP_HOST: https://review.l.jingli365.com/vm/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
-    JL_APP_V2_HOST: //review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
+    JL_APP_V2_HOST: //review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME/index-v2.html
     JL_APP_REDIS: redis://l.jingli365.com:16379
     JL_APP_POSTGRES: postgres://test:JingliTest0418@l.jingli365.com:15432/tester_$GITLAB_USER_ID
     JL_APP_POSTGRES_INITDB: vm_$GITLAB_USER_ID
