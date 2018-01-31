@@ -62,7 +62,7 @@ deploy:master:
     - /^master$/
   environment:
     name: dev
-    url: https://l.jingli365.com/proj/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
+    url: https://l.jingli365.com
   variables:
     JL_APP_HOST: $CI_ENVIRONMENT_URL
     JL_APP_POSTGRES: postgres://times:time0418@l.jingli365.com:15432/times
@@ -109,7 +109,7 @@ deploy:test:
     - /^test$/
   environment:
     name: test
-    url: https://t.jingli365.com/proj/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
+    url: https://t.jingli365.com
   variables:
     JL_APP_HOST: $CI_ENVIRONMENT_URL
     JL_APP_POSTGRES: postgres://times:time0418@t.jingli365.com:15432/time_test
@@ -157,7 +157,7 @@ deploy:release:
   when: manual
   environment:
     name: release
-    url: https://j.jingli365.com/proj/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
+    url: https://j.jingli365.com
   variables:
     JL_APP_HOST: $CI_ENVIRONMENT_URL
     JL_APP_POSTGRES: postgres://jingli:J1n9L1.t3ch@172.17.42.1:5432/qmtrip
@@ -246,7 +246,7 @@ deploy:tester:
     name: tester/$GITLAB_USER_ID
     url: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
   variables:
-    JL_APP_HOST: $CI_ENVIRONMENT_URL
+    JL_APP_HOST: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
     JL_APP_POSTGRES: postgres://test:JingliTest0418@dockerhost:15432/tester_$GITLAB_USER_ID
     JL_APP_POSTGRES_INITDB: tester_$GITLAB_USER_ID
     JL_APP_REDIS: redis://dockerhost:16379
@@ -293,7 +293,7 @@ deploy:vm:
     name: vm/$GITLAB_USER_ID
     url: https://review.l.jingli365.com/vm/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
   variables:
-    JL_APP_HOST: $CI_ENVIRONMENT_URL
+    JL_APP_HOST: https://review.l.jingli365.com/vm/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
     JL_APP_V2_HOST: //review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
     JL_APP_REDIS: redis://l.jingli365.com:16379
     JL_APP_POSTGRES: postgres://test:JingliTest0418@l.jingli365.com:15432/tester_$GITLAB_USER_ID
