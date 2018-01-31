@@ -344,6 +344,8 @@ class StaffModule{
         }
 
         newPwd = utils.md5(newPwd);
+        staff.isNeedChangePwd = false;
+        staff.status = ACCOUNT_STATUS.ACTIVE;
         staff.pwd = newPwd;
         staff = await staff.save();
         return staff;
