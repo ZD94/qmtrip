@@ -9,7 +9,6 @@
   "cluster": false,
   "port": "${JL_APP_PORT}",
   "apiPort": 4102,
-  "socket_file": "${{rootDir}}/web.sock",
   "pid_file": "${{rootDir}}/tmp/server.pid",
   "postgres": {
     "url": "${JL_APP_POSTGRES}",
