@@ -64,6 +64,7 @@ deploy:master:
     name: dev
     url: https://l.jingli365.com/proj/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
   variables:
+    JL_APP_HOST: $CI_ENVIRONMENT_URL
     JL_APP_POSTGRES: postgres://times:time0418@l.jingli365.com:15432/times
     JL_APP_REDIS: redis://l.jingli365.com:16379
     JL_APP_COMAPI_HOST: api.l.jingli365.com
@@ -110,6 +111,7 @@ deploy:test:
     name: test
     url: https://t.jingli365.com/proj/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
   variables:
+    JL_APP_HOST: $CI_ENVIRONMENT_URL
     JL_APP_POSTGRES: postgres://times:time0418@t.jingli365.com:15432/time_test
     JL_APP_REDIS: redis://t.jingli365.com:16379
     JL_APP_COMAPI_HOST: api.t.jingli365.com
@@ -157,6 +159,7 @@ deploy:release:
     name: release
     url: https://j.jingli365.com/proj/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
   variables:
+    JL_APP_HOST: $CI_ENVIRONMENT_URL
     JL_APP_POSTGRES: postgres://jingli:J1n9L1.t3ch@172.17.42.1:5432/qmtrip
     JL_APP_REDIS: redis://j.jingli365.com
     JL_APP_COMAPI_HOST: api.j.jingli365.com
@@ -205,9 +208,9 @@ deploy:demo:
     name: demo
     url: https://demo.jingli365.com
   variables:
+    JL_APP_HOST: $CI_ENVIRONMENT_URL
     JL_APP_POSTGRES: postgres://demo:d3m0jingli365@dockerhost/qmtrip
     JL_APP_REDIS: redis://dockerhost
-    JL_APP_HOST: http://demo.jingli365.com
     JL_APP_V2_HOST: https://demo.jingli365.com
     JL_APP_APPROVE_SERVER_URL: https://demo.jingli365.com/proj/svr-trip-approve/api/v1
     JL_APP_APPROVE_DATABASE: postgres://times:time0418@l.jingli365.com:15432/trip_approve_test1
@@ -243,7 +246,7 @@ deploy:tester:
     name: tester/$GITLAB_USER_ID
     url: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
   variables:
-    JL_APP_HOST: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
+    JL_APP_HOST: $CI_ENVIRONMENT_URL
     JL_APP_POSTGRES: postgres://test:JingliTest0418@dockerhost:15432/tester_$GITLAB_USER_ID
     JL_APP_POSTGRES_INITDB: tester_$GITLAB_USER_ID
     JL_APP_REDIS: redis://dockerhost:16379
@@ -290,7 +293,7 @@ deploy:vm:
     name: vm/$GITLAB_USER_ID
     url: https://review.l.jingli365.com/vm/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
   variables:
-    JL_APP_HOST: //review.l.jingli365.com/vm/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
+    JL_APP_HOST: $CI_ENVIRONMENT_URL
     JL_APP_V2_HOST: //review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
     JL_APP_REDIS: redis://l.jingli365.com:16379
     JL_APP_POSTGRES: postgres://test:JingliTest0418@l.jingli365.com:15432/tester_$GITLAB_USER_ID

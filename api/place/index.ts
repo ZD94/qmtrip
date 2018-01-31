@@ -135,7 +135,7 @@ export default class PlaceModule {
     }
 
     @clientExport
-    static async getCityInfo(params: {cityCode: string, companyId: string}){
+    static async getCityInfo(params: {cityCode: string, companyId?: string}){
         let { cityCode, companyId } = params;
         let city = await  PlaceModule.getCityById(cityCode, companyId);
         return city;
