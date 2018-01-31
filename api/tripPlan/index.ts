@@ -428,6 +428,10 @@ class TripPlanModule {
         let tripDetail =  await Models.tripDetail.get(params.id); 
         if(!tripDetail) 
             throw new Error(`指定tripDetail不存在, id: ${params.id}`)
+            
+        if([EOrderStatus.SUCCESS, EOrderStatus.ENDORSEMENT_SUCCESS, EOrderStatus.REFUND_SUCCESS, EOrderStatus.ENDORSEMENT_FAILED, EOrderStatus.REFUND_FAILED, EOrderStatus.DEAL_DONE].indexOf(params.reserveStatus) < 0){
+            if(params.expenditure) delete params.expenditure;
+        }
         for(let key in params) {
             tripDetail[key] = params[key];
         }
