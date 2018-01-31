@@ -7,7 +7,7 @@
   "debug": false,
   "ts_node": true,
   "cluster": false,
-  "port": 80,
+  "port": "${JL_APP_PORT}",
   "apiPort": 4102,
   "socket_file": "${{rootDir}}/web.sock",
   "pid_file": "${{rootDir}}/tmp/server.pid",
@@ -20,13 +20,13 @@
   },
   "hosts": {
     "main": {
-      "addr": "api.t.jingli365.com",
-      "port": 14201,
+      "addr": "${JL_APP_COMAPI_HOST}",
+      "port": "${JL_APP_COMAPI_PORT}",
       "www": "https://${{hosts.main.addr}}"
     },
     "budget": {
-      "addr": "t.jingli365.com",
-      "port": 14203
+      "addr": "${JL_APP_BUDGET_HOST}",
+      "port": "${JL_APP_BUDGET_PORT}"
     }
   },
   "api": {
@@ -68,11 +68,11 @@
       }
     }
   },
-  "is_allow_domain_repeat": false,
+  "is_allow_domain_repeat": true,
   "system_notice_emails": [
     {
       "name": "用户",
-      "email": "testteam@jingli365.com"
+      "email": "${JL_APP_NOTICE_EMAIL}"
     }
   ],
   "email_address": {
@@ -124,7 +124,7 @@
     "appId": "${JL_APP_PERMISSION_APP_ID}",
     "appSecret": "${JL_APP_PERMISSION_APP_SECRET}"
   },
-  "is_init_test_company": true,
+  "is_init_test_company": "JL_APP_INIT_TESTDATA",
   "ddconfig": {
     "token": "jingli2016",
     "encodingAESKey": "8nf2df6n0hiifsgg521mmjl6euyxoy3y6d9d3mt1laq",
