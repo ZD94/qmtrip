@@ -2271,7 +2271,7 @@ class TripPlanModule {
         if (tripPlan.account.id != staff.id) {
             throw L.ERR.PERMISSION_DENY();
         }
-        if (!tripPlan || tripPlan.status != EPlanStatus.COMPLETE) {
+        if (!tripPlan || tripPlan.backAt.getTime() > Date.now() || tripPlan.auditStatus != EAuditStatus.INVOICE_PASS) {
             throw L.ERR.TRIP_PLAN_STATUS_ERR();
         }
         if (!staff.email) {
