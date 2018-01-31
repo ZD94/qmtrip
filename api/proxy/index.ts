@@ -58,8 +58,7 @@ class Proxy {
             let result: any;
             let pathstr: string = req.path;
             pathstr = pathstr.replace('/travel', '');
-            let JLOpenApi: string = config.cloud;
-            JLOpenApi = JLOpenApi.replace('/cloud', '');
+            let JLOpenApi: string = config.cloudAPI;
             let url: string = `${JLOpenApi}${pathstr}`;
 
             result = await new Promise((resolve, reject) => {
@@ -109,8 +108,7 @@ class Proxy {
             let result: any;
             let pathstr: string = req.path;
             pathstr = pathstr.replace('/supplier', '');
-            let JLOpenApi: string = config.cloud;
-            JLOpenApi = JLOpenApi.replace('/cloud', '');
+            let JLOpenApi: string = config.cloudAPI;
             let url: string = `${JLOpenApi}${pathstr}`;
 
             result = await new Promise((resolve, reject) => {
