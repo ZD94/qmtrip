@@ -62,6 +62,7 @@ deploy:master:
     name: dev
     url: https://l.jingli365.com
   variables:
+    JL_APP_HOST: https://l.jingli365.com/proj/old-qmtrip
     JL_APP_V2_HOST: https://l.jingli365.com/proj/web-jingli-v2
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: https://l.jingli365.com/proj/svr-jlbudget/api/v1
@@ -100,6 +101,7 @@ deploy:test:
     name: test
     url: https://t.jingli365.com
   variables:
+    JL_APP_HOST: https://t.jingli365.com/proj/old-qmtrip
     JL_APP_V2_HOST: https://t.jingli365.com/proj/web-jingli-v2
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: https://t.jingli365.com/proj/svr-jlbudget/api/v1
@@ -141,6 +143,7 @@ deploy:release:
     name: release
     url: https://j.jingli365.com
   variables:
+    JL_APP_HOST: https://j.jingli365.com/proj/old-qmtrip
     JL_APP_V2_HOST: https://j.jingli365.com
     JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: https://j.jingli365.com/proj/svr-jlbudget/api/v1
