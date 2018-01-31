@@ -109,7 +109,7 @@ class ApiPlace {
      * @param {string} params.cityCode 城市代码
      * @return {Promise} {id: id, name: name}
      */
-    /*static getCityInfo(params: {cityCode: string, isAbroad?: boolean}) : Promise<Place> {
+    static getCityInfo(params: {cityCode: string, isAbroad?: boolean}) : Promise<Place> {
         if (!params.cityCode) {
             throw new Error("cityCode require but is " + params.cityCode);
         }
@@ -120,7 +120,7 @@ class ApiPlace {
                 }
                 return new Place(result);
             })
-    }*/
+    }
 
     /**
      * @method  getAirPortsByCity
