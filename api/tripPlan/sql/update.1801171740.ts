@@ -7,7 +7,18 @@ import { TripDetail } from '_types/tripPlan';
 var sequelize = require("sequelize");
 
 export default async function update(DB: Sequelize, t: Transaction){
+<<<<<<< Updated upstream
     let tripPlanSql = `select * from trip_plan.trip_plans where deleted_at is null;`
+=======
+
+    await updateByPage(DB, t);
+    return true;
+}
+
+async function updateByPage(DB: Sequelize, t: Transaction){
+    let page = 0;
+    let tripPlanSql = `select * from trip_plan.trip_plans where deleted_at is null and status != 5 and status != 6 and status != 7 limit 20 offset ${page * 20};`
+>>>>>>> Stashed changes
     let tripPlans = await DB.query(tripPlanSql, {type: sequelize.QueryTypes.SELECT});
  
     let updateSql: string;
@@ -181,7 +192,11 @@ export default async function update(DB: Sequelize, t: Transaction){
         }
     }));
 
-
+    if(tripPlans.length == 20) {
+        page++;
+        await updateByPage(DB, t);
+    }
+    return true;
 }
 
 
