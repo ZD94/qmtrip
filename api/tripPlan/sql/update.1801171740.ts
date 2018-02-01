@@ -1,6 +1,5 @@
 
 
-
 import { Sequelize, Transaction } from 'sequelize';
 import { TripDetail } from '_types/tripPlan';
 var sequelize = require("sequelize");
@@ -12,7 +11,7 @@ export default async function update(DB: Sequelize, t: Transaction){
 let page = 0;
 async function updateByPage(DB: Sequelize, t: Transaction){
 
-    let tripPlanSql = `select * from trip_plan.trip_plans where deleted_at is null limit 10 offset ${page * 10};`
+    let tripPlanSql = `select * from trip_plan.trip_plans where deleted_at is null order by created_at desc limit 10 offset ${page * 10};`
     let tripPlans = await DB.query(tripPlanSql, {type: sequelize.QueryTypes.SELECT});
  
     let updateSql: string;
