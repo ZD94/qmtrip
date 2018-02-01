@@ -491,11 +491,12 @@ class StaffModule{
             let staffs = await Models.staff.find({
                 where : {
                     accountId : session.accountId
-                }
+                },
+                order: [["createdAt", "desc"]]
             });
             let resultStaffs: Staff[] = [];
 
-            staffs.map((staff)=>{
+            staffs.forEach((staff)=>{
                 resultStaffs.push(staff);
             });
 
