@@ -199,34 +199,43 @@ deploy:release:
 deploy:demo:
   stage: deploy
   only:
-    - /^master|test|release|demo$/
+    - /^demo$/
   when: manual
   environment:
     name: demo
     url: https://demo.jingli365.com
   variables:
     JL_APP_HOST: $CI_ENVIRONMENT_URL
-    JL_APP_POSTGRES: postgres://demo:d3m0jingli365@dockerhost/qmtrip
-    JL_APP_REDIS: redis://dockerhost
+    JL_APP_POSTGRES: postgres://jingli:J1n9L1.t3ch@j.jingli365.com:5432/qmtrip-demo
+    JL_APP_REDIS: redis://demo.jingli365.com
+    JL_APP_COMAPI_HOST: api.j.jingli365.com
+    JL_APP_COMAPI_PORT: 4201
+    JL_APP_BUDGET_HOST: demo.jingli365.com
+    JL_APP_BUDGET_PORT: 24103
+    JL_APP_NOTICE_EMAIL: tbudget@jingli365.com
     JL_APP_V2_HOST: https://demo.jingli365.com/index-v2.html
     JL_APP_APPROVE_SERVER_URL: https://demo.jingli365.com/proj/svr-trip-approve/api/v1
-    JL_APP_TMC: http://l.jingli365.com/proj/svr-tmc
+    JL_APP_TMC: https://j.jingli365.com/proj/svr-tmc
     JL_APP_TMC_FAKE: 0
-    JL_APP_TD_MONITORURL: https://l.jingli365.com/proj/old-qmtrip/api/v1/tripDetail
+    JL_APP_TD_MONITORURL: https://demo.jingli365.com/proj/old-qmtrip/api/v1/tripDetail
     JL_APP_CLOUDKEY: jinglicloud2017
-    JL_APP_CLOUDAPI: https://demo.jingli365.com/proj/svr-jlbudget/api/v1/
-    JL_APP_CLOUD: https://demo.jingli365.com/pro/web-cloud-mgr/
+    JL_APP_CLOUDAPI: https://demo.jingli365.com/proj/svr-jlbudget/api/v1
+    JL_APP_CLOUD: https://demo.jingli365.com/proj/web-cloud-mgr
     JL_APP_CLOUD_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_CLOUD_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1
+    JL_APP_ORDER_LINK: https://demo.jingli365.com/svc/java-jingli-order1
     JL_APP_ORDER_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_ORDER_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_MALL_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-mall
+    JL_APP_MALL_ORDER_LINK: https://demo.jingli365.com/svc/java-jingli-mall
     JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_PERMISSION_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-auth
+    JL_APP_BILL_ORDER_LINK: https://demo.jingli365.com/svc/java-jingli-order1
+    JL_APP_BILL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
+    JL_APP_BILL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_PERMISSION_ORDER_LINK: https://demo.jingli365.com/svc/java-jingli-auth
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
