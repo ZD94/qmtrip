@@ -433,6 +433,7 @@ const workWechatEventHandlers = {
 const changeContactEventHandlers = {
     //新增员工
     async create_user(xml: IWCreateUser) {
+        console.log("事件通知-----新增员工")
         let suiteToken = await SSOModule.getSuiteToken();
         let {permanentCode, companyId} = await SSOModule.getPermanentCodeByCorpId({corpId: xml.AuthCorpId});
         let company = await Models.company.get(companyId);
@@ -445,6 +446,7 @@ const changeContactEventHandlers = {
     },
     //更新员工
     async update_user(xml: IWUpdateUser) {
+        console.log("事件通知-----更新员工")
         let suiteToken = await SSOModule.getSuiteToken();
         let {permanentCode, companyId} = await SSOModule.getPermanentCodeByCorpId({corpId: xml.AuthCorpId});
         let company = await Models.company.get(companyId);
@@ -458,12 +460,14 @@ const changeContactEventHandlers = {
     },
     //删除员工
     async delete_user(xml: IWDeleteUser) {
+        console.log("事件通知-----删除员工")
         let hasUpdated = await EventNotice.delete_user(xml);
         return hasUpdated;
 
     },
     //创建部门
     async create_party(xml: IWCreateDepartment) {
+        console.log("事件通知-----新增部门")
         let suiteToken = await SSOModule.getSuiteToken();
         let {permanentCode, companyId} = await SSOModule.getPermanentCodeByCorpId({corpId: xml.AuthCorpId});
         let company = await Models.company.get(companyId);
@@ -478,6 +482,7 @@ const changeContactEventHandlers = {
     },
     //更新部门
     async update_party(xml: IWUpdateDepartment) {
+        console.log("事件通知-----更新部门")
         let suiteToken = await SSOModule.getSuiteToken();
         let {permanentCode, companyId} = await SSOModule.getPermanentCodeByCorpId({corpId: xml.AuthCorpId});
         let company = await Models.company.get(companyId);
@@ -491,6 +496,7 @@ const changeContactEventHandlers = {
     },
     //删除
     async delete_party(xml: IWDeleteDepartment) {
+        console.log("事件通知-----删除部门")
         let hasUpdated = await EventNotice.delete_party(xml);
         return hasUpdated;
     },
