@@ -846,7 +846,7 @@ class TripPlanModule {
                 let version = params.version || config.link_version || 2 //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
                 if (version == 2) {
                     appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}`
-                    self_url = `${config.v2_host}/${appMessageUrl}`
+                    self_url = `${config.v2_host}${appMessageUrl}`
                 } else {
                     self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
                     let finalUrl = `#/trip/list-detail?tripid=${tripPlan.id}`;
@@ -1119,7 +1119,7 @@ class TripPlanModule {
 
                 if (params.version == 2) { //@#template v2的外链url。
                     appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}`
-                    self_url = `${config.v2_host}/${appMessageUrl}`
+                    self_url = `${config.v2_host}${appMessageUrl}`
                 } else {
                     self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
                     let finalUrl = `#/trip/list-detail?tripid=${tripPlan.id}`;
@@ -2105,7 +2105,7 @@ class TripPlanModule {
         let version = params.version || config.link_version || 2  //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
         if (version == 2) {
             appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}`
-            self_url = `${config.v2_host}/${appMessageUrl}`//'trip/trip-list-detail/:tripId'
+            self_url = `${config.v2_host}${appMessageUrl}`//'trip/trip-list-detail/:tripId'
         } else {
             self_url = config.host + '/index.html#/trip/list-detail?tripid=' + approve.id;
             let finalUrl = `#/trip/list-detail?tripid=${approve.id}`;
@@ -2434,7 +2434,7 @@ class TripPlanModule {
         let detailUrl: string
         let version = params.version || config.link_version || 2 //#@template 外链版本的优先级：参数的版本 > 配置的外链版本 > 默认配置2
         if (version == 2) {
-            detailUrl = `${config.v2_host}/#/trip/make-expense/${tripPlan.id}/${financeCheckCode.code}`;
+            detailUrl = `${config.v2_host}#/trip/make-expense/${tripPlan.id}/${financeCheckCode.code}`;
         } else {
             detailUrl = `${config.host}#/finance/trip-detail?id=${tripPlan.id}&code=${financeCheckCode.code}`;
         }
