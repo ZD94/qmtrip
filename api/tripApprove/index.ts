@@ -544,7 +544,7 @@ export default class TripApproveModule {
             let version = params.version || config.link_version || 2 //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
             if (version == 2) {
                 appMessageUrl = `#/trip-approval/approve-detail/${tripApprove.id}/1`
-                self_url = `${config.v2_host}/${appMessageUrl}`
+                self_url = `${config.v2_host}${appMessageUrl}`
             } else {
                 self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
                 let finalUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;
