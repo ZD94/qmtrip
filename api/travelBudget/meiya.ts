@@ -11,6 +11,8 @@ var request = require("request-promise");
 let moment = require("moment");
 import {MTrainLevel, MPlaneLevel} from "_types";
 import { IHotel, IFlightAgent } from '_types/travelbudget';
+import { async } from 'q';
+import { json } from 'express';
 
 /* 判断是否需要美亚数据 */
 export async function meiyaJudge() {
@@ -29,8 +31,8 @@ export async function meiyaJudge() {
 export function meiyaAuth(info?: object) {
     if (!info) {
         info = {
-            username: "JingLiZhiXiang",
-            password: "asdasdasdas"
+            username: "JLZX",
+            password: "my2018"
         };
     }
     let str = JSON.stringify(info);
@@ -392,13 +394,13 @@ function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHot
 }
 
 //处理美亚飞机数据
-export function handleFlightData(meiyaFlightData: IMeiyaFlight[], originalData: ISearchTicketParams) {
+export async function handleFlightData(meiyaFlightData: IMeiyaFlight[], originalData: ISearchTicketParams) {
     let data: any[] = [];
     if (meiyaFlightData && meiyaFlightData.length) {
         let result: Array<any> = [];
         let handleData;
             for (let item of meiyaFlightData) {
-                handleData = transferFlightData(item, originalData)
+                handleData =await transferFlightData(item, originalData)
                 result.push(handleData)
             }
         data.push(...result);
@@ -408,8 +410,24 @@ export function handleFlightData(meiyaFlightData: IMeiyaFlight[], originalData: 
     }
 }
 
-function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearchTicketParams) {
+ async function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearchTicketParams) {
     let name;
+    let stopItemList;
+    if( meiyaFlightData.stopNumber == 1){
+       let  urlStop = config.orderSysConfig.orderLink + "/tmc/stopItems/" + `${meiyaFlightData.flightNo}/${meiyaFlightData.depDate}`;
+       let  stopItem = await request({
+            url: urlStop,
+            method: "get",
+            json:true,
+            headers: {
+                auth: meiyaAuth(),
+                supplier: "meiya"
+            }
+        })
+        stopItemList = stopItem.data
+    }else{
+        stopItemList = []
+    }
        let cabins = meiyaFlightData.flightPriceInfoList.map((item)=>{
             switch (item.cabin){
                 case "经济舱":
@@ -444,6 +462,7 @@ function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearch
     let deptDateTime = meiyaFlightData.depDate + " " + meiyaFlightData.depTime;
     let model = {
         "No": meiyaFlightData.flightNo,
+        stopItemList,
         "segs": [
             {
                 "base": {
@@ -474,6 +493,7 @@ function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearch
             }
         ],
         "type": 1,
+        "stopNumber":meiyaFlightData.stopNumber,
         "carry": meiyaFlightData.airline,
         "agents": [
             {

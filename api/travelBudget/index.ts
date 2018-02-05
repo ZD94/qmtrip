@@ -232,7 +232,6 @@ export default class ApiTravelBudget {
             authData.push({identify, sname});
             return authData
         });
-
         // if (result.code == 0) {
         //     commonData = result.data.data;
         // }
@@ -259,7 +258,7 @@ export default class ApiTravelBudget {
             console.log("meiyaTrain ===> meiyaTrain data.", meiyaTrain.length);
             if (meiyaFlight && meiyaFlight.length)
             //     commonData = compareFlightData(commonData, meiyaFlight);
-                commonData = handleFlightData(meiyaFlight,params);
+                commonData = await handleFlightData(meiyaFlight,params);
             if (meiyaTrain && meiyaTrain.length)
             // commonData = compareTrainData(commonData, meiyaTrain);
                  commonData2 = handleTrainData(meiyaTrain, params)
@@ -1077,13 +1076,17 @@ export default class ApiTravelBudget {
 
 /* as ICreateBudgetAndApproveParamsNew; */
 // let param = {
-//     checkInDate: "2018-03-30",
-//     checkOutDate: "2018-03-31",
-//     cityId: "1814905",
+//     // checkInDate: "2018-02-21",
+//     // checkOutDate: "2018-02-22",
+//     // cityId: "1814905",
 //     travelPolicyId: "asdasdlkaldaklslkdka",
+
+//     leaveDate: "2018-04-21",
+//     originPlaceId: "CT_131",
+//     destinationId: "CT_289",
 // }
 // setTimeout(async ()=>{
 //     console.log("test go go");
-//     let result = await ApiTravelBudget.getHotelsData(param);
+//     let result = await ApiTravelBudget.getTrafficsData(param);
 //         console.log(result,"<=============")
 // }, 8000);
