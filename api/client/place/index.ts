@@ -34,10 +34,10 @@ class ApiPlace {
         if (!_params) {
             _params = {};
         }
-        let {keyword, isAbroad} = _params;
+        let {keyword} = _params;
         let cities;
         if (!Boolean(keyword)) {
-            cities = await ApiPlace.hotCities({limit: 20, isAbroad: isAbroad})
+            cities = [];
         } else {
             cities = await API.place.queryCity(_params)
         }
@@ -128,7 +128,7 @@ class ApiPlace {
      * @param   {string}    params.cityCode 城市代码
      * @type {Promise} array
      */
-    static getAirPortsByCity(params: {cityCode: string}) : Promise<Array<Airport>> {
+    /*static getAirPortsByCity(params: {cityCode: string}) : Promise<Array<Airport>> {
         if (!params.cityCode) {
             throw new Error("cityCode require but is empty!");
         }
@@ -139,7 +139,7 @@ class ApiPlace {
                 })
                 return arr;
             })
-    }
+    }*/
 
     /**
      * @method getAirportById
@@ -198,7 +198,7 @@ class ApiPlace {
      * 按照字母获取对应城市列表
      * @param
      * @returns []
-    */
+     */
     static getCitiesByLetter(params: {}) : Promise<Place>{
         return API.place.getCitiesByLetter(params);
     }

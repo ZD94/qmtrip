@@ -1,12 +1,8 @@
 import { AbstractController, Restful, Router } from "@jingli/restful";
 const API = require('@jingli/dnode-api');
 import { Request, Response } from 'express-serve-static-core';
-import { CustomerError } from '@jingli/error';
-import { Models } from '_types';
-import { CPropertyType } from '_types/company';
 import { JLResponse } from 'server-auth/lib/auth';
 import { RestApi } from 'api/sso/libs/restApi';
-import { sortData } from '@jingli/sign';
 const crypto = require('crypto');
 
 @Restful()

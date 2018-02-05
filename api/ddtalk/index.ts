@@ -14,7 +14,7 @@ import request = require('request');
 import ISVApi from "./lib/isvApi";
 import {Models} from "_types/index";
 import {SPropertyType, Staff} from "_types/staff";
-import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
+import {clientExport} from "@jingli/dnode-api/dist/src/helper";
 import {get_msg} from "./lib/msg-template/index";
 
 import * as DealEvent from "./lib/dealEvent";
@@ -351,6 +351,7 @@ export class DDTalk {
         }
     }
 
+    @clientExport
     static async sendLinkMsg(params: any): Promise<any> {
         let {accountId, text, url, picurl} = params;
         text = text || '您有一条新消息'

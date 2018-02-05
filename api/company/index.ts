@@ -13,7 +13,7 @@ let scheduler = require('common/scheduler');
 let _ = require("lodash");
 import { requireParams, clientExport } from "@jingli/dnode-api/dist/src/helper";
 import { Models } from "_types";
-import { Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE, InvoiceTitle, CompanyProperty, CPropertyType, MONEY_CHANGE_TYPE } from '_types/company';
+import { Company, MoneyChange, Supplier, TripPlanNumChange, ECompanyType, NUM_CHANGE_TYPE, InvoiceTitle, CompanyProperty, CPropertyType } from '_types/company';
 import { Staff, EStaffRole } from "_types/staff";
 import { PromoCode } from "_types/promoCode";
 import { AgencyUser, EAgencyUserRole } from "_types/agency";
@@ -21,9 +21,9 @@ import { Department, StaffDepartment } from "_types/department";
 import { requirePermit, conditionDecorator, condition, modelNotNull } from "api/_decorator";
 import { md5 } from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
-import { CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE } from "_types/coin";
+import { CoinAccount } from "_types/coin";
 import { restfulAPIUtil } from "api/restful";
-import { TripPlan, ISegment } from '_types/tripPlan';
+import { ISegment } from '_types/tripPlan';
 let RestfulAPIUtil = restfulAPIUtil;
 
 
@@ -108,7 +108,16 @@ export default class CompanyModule {
             }
         }
 
-        let staff = Staff.create({ email: params.email, name: params.userName, mobile: params.mobile || null, roleId: EStaffRole.OWNER, pwd: md5(pwd), status: params.status, isValidateMobile: params.isValidateMobile });
+        let staff = Staff.create({ 
+            email: params.email, 
+            name: params.userName,
+            mobile: params.mobile || null, 
+            roleId: EStaffRole.OWNER, 
+            pwd: md5(pwd), 
+            status: params.status, 
+            isValidateMobile: params.isValidateMobile,
+            isNeedChangePwd: false
+        });
         let company = Company.create(params);
         company.domainName = domain;
         company.expiryDate = moment().add(DEFAULT_EXPIRE_MONTH, 'months').toDate();
@@ -192,7 +201,7 @@ export default class CompanyModule {
         //jlbudget create account record. Waiting jlbudget account identifie online.
 
         //默认添加 中国大陆(国内）、通用地区（国际）、港澳台 三个地区用于差旅、补助、限价等的管理
-        await initDefaultCompanyRegion(company.id);
+        await API.travelPolicy.initDefaultCompanyRegion({companyId: company.id});
         return { company: company, description: promoCode ? promoCode.description : "" };
     }
 
@@ -203,7 +212,6 @@ export default class CompanyModule {
      */
     @clientExport
     static async syncCompanyToJLCloud(company: Company, pwd: string, mobile?: string): Promise<boolean> {
-        let initPassword = '123456';
         let staff: Staff;
         if(!mobile) {
             if(company.createUser)
@@ -212,7 +220,6 @@ export default class CompanyModule {
                 mobile = staff.mobile;
             if(!mobile) {
                 let managers: Staff[] = await company.getManagers({withOwner: true})
-                let accountIds: string[];
                 if(!managers) mobile = null;
                 for(let staff of managers) {
                     if(staff.mobile && staff.mobile != '') mobile = staff.mobile; 
@@ -1425,43 +1432,5 @@ CompanyModule._scheduleTask();
 // export = CompanyModule;
 
 
-async function initDefaultCompanyRegion(companyId: string) {
-    // let defaultRegion = ['中国大陆', '通用地区', '港澳台'];
-    let defaultRegion = [{
-        name: '国内',
-        types: [1, 2, 3],
-        group: 1
-    }, {
-        name: '国际',
-        types: [1, 2, 3],
-        group: 2
-    }, {
-        name: '港澳台',
-        types: [1, 2, 3],
-        group: 2
-    }];
 
-    let defaultPlaceId = [['CTW_5'], ['Global'], ['CT_2912', 'CT_2911', 'CT_9000']];
-
-    for (let i = 0; i < defaultRegion.length; i++) {
-        let companyRegion: any = await API.travelPolicy.createCompanyRegion({
-            companyId: companyId,
-            name: defaultRegion[i].name,
-            group: defaultRegion[i].group,
-            types: defaultRegion[i].types
-
-        });
-        companyRegion = companyRegion.data;
-        if (companyRegion) {
-            for (let j = 0; defaultPlaceId[i] && j < defaultPlaceId[i].length; j++) {
-                await API.travelPolicy.createRegionPlace({
-                    placeId: defaultPlaceId[i][j],
-                    companyRegionId: companyRegion['id'],
-                    companyId: companyId,
-                });
-            }
-        }
-    }
-
-}
 

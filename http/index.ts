@@ -25,7 +25,7 @@ let allowOrigin = [
     "jingli365"
 ];
 
-function checkOrigin( origin ){
+function checkOrigin( origin: any ){
     for(let item of allowOrigin){
         if(origin.indexOf(item) > -1){
             return true;
@@ -35,7 +35,7 @@ function checkOrigin( origin ){
     return false;
 }
 
-function getAppSecretByAppId(appId) {
+function getAppSecretByAppId(appId: string) {
     return config.agent.appSecret;
 }
 
@@ -61,6 +61,7 @@ export async function initHttp(app: Application) {
     app.use('/api/v1', allowCrossDomain);
     app.use('/api/v1', (req: Request, res: any, next: NextFunction) => {
         auth(req, res, next, async (err, isValid, data) => {
+               console.log("======auth request: ", err, isValid, data)
             if (isValid) {
                 const companies = await Models.company.find({
                     where: { appId: data.appId }

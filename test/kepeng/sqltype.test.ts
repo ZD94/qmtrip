@@ -1,21 +1,15 @@
 
-import { Company } from '_types/company';
-import { Staff, EStaffRole } from '_types/staff';
 import { Models } from '_types/index';
 
 global.Promise = require('bluebird');
 Promise.promisifyAll(require("fs"));
 Promise.config({longStackTraces: true});
 
-var uuid = require('uuid');
-var path = require('path');
 var config = {
     "postgres": "postgres://times:time0418@local.jingli.tech:5432/times?ssl=true",
     "remotes": [] as string[]
 };
 
-import Logger from '@jingli/logger';
-var logger = new Logger('test');
 
 var model = require('common/model');
 model.init(config.postgres);

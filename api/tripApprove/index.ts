@@ -6,7 +6,7 @@
 'use strict';
 import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
 import {Models} from "_types/index";
-import {QMEApproveStatus, EApproveResult, ETripType, EPlanStatus, TripPlanLog} from "_types/tripPlan/tripPlan";
+import {QMEApproveStatus, EApproveResult, ETripType, TripPlanLog} from "_types/tripPlan/tripPlan";
 import moment = require("moment/moment");
 import {Staff, EStaffStatus, EStaffRole} from "_types/staff/staff";
 import {plugins} from "libs/oa/index";
@@ -16,12 +16,10 @@ var API = require('@jingli/dnode-api');
 const config = require("@jingli/config");
 import _ = require("lodash");
 import {ENoticeType} from "_types/notice/notice";
-import {AutoApproveType, AutoApproveConfig, ISegment, ICreateBudgetAndApproveParams, ICreateBudgetAndApproveParamsNew} from "_types/tripPlan"
+import {AutoApproveType, AutoApproveConfig, ISegment, ETripDetailStatus} from "_types/tripPlan"
 import {DB} from "@jingli/database";
 import {ITripApprove, IDestination} from "../../_types/tripApprove";
-import {Project} from "../../_types/tripPlan";
 import {EApproveStatus, EApproveType} from "_types/approve/types";
-import { ITravelBudgetInfo } from 'http/controller/budget';
 import { Place } from '_types/place';
 
 export default class TripApproveModule {
@@ -39,7 +37,7 @@ export default class TripApproveModule {
         approveUser = approveUser && typeof(approveUser) != 'undefined' ? approveUser : approve.approveUser;
         submitter = submitter && typeof(submitter) != 'undefined' ? submitter: approve.submitter;
 
-        let budgetInfo: {budgets: ITravelBudgetInfo[], query: ICreateBudgetAndApproveParams} = approve.data;
+        let budgetInfo = approve.data;
 
 
 
@@ -58,7 +56,7 @@ export default class TripApproveModule {
         }
         let destinationPlacesInfo = query.destinationPlacesInfo;
         let totalBudget = 0;
-        budgets.forEach((b) => {totalBudget += Number(b.price);});
+        budgets.forEach((b: any) => {totalBudget += Number(b.price);});
         console.log('retrieveDetailFromTotal', totalBudget);
         /*budgets = budgets.map( (v) => {
          if (v.type == ETripType.HOTEL) {
@@ -69,15 +67,7 @@ export default class TripApproveModule {
 
         let arrivalCityCodes: string[] = [];//目的地代码
         let destinations: IDestination[] = [];
-        let project: Project;
-        let projectId = query.projectId;
-        let projectName = query.projectName;
-        if(projectId){
-            project = await Models.project.get(projectId);
-        }else if(projectName){
-            project = await API.tripPlan.getProjectByName({companyId: company.id, name: projectName,
-                userId: submitter});
-        }
+        let goBackPlace = query.goBackPlace;
         let tripApprove = {} as ITripApprove;
         tripApprove['id'] = approveNo;
         // tripApprove.approveUserId = approveUser;
@@ -106,6 +96,9 @@ export default class TripApproveModule {
                     let arrivalInfo = await API.place.getCityInfo({cityCode: placeCode, companyId: approve.companyId}) || {name: null};
                     let destination: IDestination = {city:arrivalInfo.id, arrivalDateTime: segment.leaveDate, leaveDateTime: segment.goBackDate};
                     arrivalCityCodes.push(arrivalInfo.id);
+                    if (i == destinationPlacesInfo.length - 1 && goBackPlace) {
+                        arrivalCityCodes.push(goBackPlace);
+                    }
                     destinations.push(destination);
                     if(i == (destinationPlacesInfo.length - 1)){//目的地存放最后一个目的地
                         tripApprove.arrivalCityCode = arrivalInfo.id;
@@ -151,14 +144,15 @@ export default class TripApproveModule {
         tripApprove.staffList = approve.staffList;
         tripApprove.lockBudget = false;
 
-        if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
-            tripApprove.autoApproveTime = await TripApproveModule.calculateAutoApproveTime({
-                type: company.autoApproveType,
-                config: company.autoApprovePreference,
-                submitAt: new Date(),
-                tripStartAt: tripApprove.startAt,
-            });
-        }
+        //自动审批关闭
+        // if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
+        //     tripApprove.autoApproveTime = await TripApproveModule.calculateAutoApproveTime({
+        //         type: company.autoApproveType,
+        //         config: company.autoApprovePreference,
+        //         submitAt: new Date(),
+        //         tripStartAt: tripApprove.startAt,
+        //     });
+        // }
         return tripApprove;
 
     }
@@ -219,7 +213,7 @@ export default class TripApproveModule {
                     detail.hasFirstDaySubsidy = budget.hasFirstDaySubsidy || true;
                     detail.hasLastDaySubsidy = budget.hasLastDaySubsidy || true;
                     // detail.expenditure = budget.price;
-                    detail.status = EPlanStatus.COMPLETE;
+                    detail.status = ETripDetailStatus.COMPLETE;
                     break;
                 case ETripType.SPECIAL_APPROVE:
                     detail = Models.tripDetailSpecial.create(data);
@@ -310,11 +304,11 @@ export default class TripApproveModule {
                 console.error('发送通知失败', err.stack ? err.stack : err);
             }
 
-            try {
+            /*try {
                 await API.ddtalk.sendLinkMsg({accountId: approveUserId, text: '有新的出差申请需要您审批', url: shortUrl})
             } catch(err) {
                 console.error(`发送钉钉通知失败`, err)
-            }
+            }*/
         } else {
             let admins = await Models.staff.find({ where: {companyId: tripApprove['companyId'], roleId: [EStaffRole.OWNER,
                 EStaffRole.ADMIN], staffStatus: EStaffStatus.ON_JOB, id: {$ne: staff.id}}}); //获取激活状态的管理员
@@ -592,18 +586,14 @@ export default class TripApproveModule {
         let approveCompany = approveUser.company;
         if(approveResult == 1){
             approveResult = EApproveResult.PASS;
-            approve.status = EApproveStatus.SUCCESS;
-            approve.tripApproveStatus = QMEApproveStatus.PASS;
         }else{
             approveResult = EApproveResult.REJECT;
-            approve.status = EApproveStatus.FAIL;
-            approve.tripApproveStatus = QMEApproveStatus.REJECT;
         }
 
         if(typeof approve.data == 'string'){
             approve.data = JSON.parse(approve.data);
         }
-        let budgetInfo: {budgets: ITravelBudgetInfo[], query: ICreateBudgetAndApproveParamsNew} = approve.data;
+        let budgetInfo = approve.data;
         let {budgets, query} = budgetInfo;
         let number = 0;
 
@@ -679,6 +669,7 @@ export default class TripApproveModule {
                 log.remark = extraStr+`审批通过`;
                 await log.save();
                 approve.status = EApproveStatus.SUCCESS;
+                approve.tripApproveStatus = QMEApproveStatus.PASS;
                 approve.approveRemark = '审批通过';
             }else if(approveResult == EApproveResult.REJECT) {
                 let tripApprove = await API.tripApprove.getTripApprove({id: approve.id});
@@ -688,6 +679,7 @@ export default class TripApproveModule {
                 log.remark = notifyRemark;
                 await log.save();
                 approve.status = EApproveStatus.FAIL;
+                approve.tripApproveStatus = QMEApproveStatus.REJECT;
                 approve.approveRemark = notifyRemark;
             }
             approve.approveDateTime = new Date();
@@ -719,11 +711,14 @@ export default class TripApproveModule {
 
             if(approveResult == EApproveResult.PASS && query && query.feeCollected){
                 let costCenter = await Models.costCenter.get(query.feeCollected);
-                await costCenter.checkoutBudgetNotice();
+                if(costCenter){
+                    await costCenter.checkoutBudgetNotice({startDay: approve.createdAt || new Date()});
+                }
             }
 
         }).catch(async function(err){
             if(err) {
+                await approve.reload();
                 await approveCompany.reload();
                 throw L.ERR.INTERNAL_ERROR();
             }
@@ -828,10 +823,14 @@ export default class TripApproveModule {
             let log = Models.tripPlanLog.create({tripPlanId: params.id, userId: staff.id, remark: `撤销行程审批单`});
             await log.save();
 
+            tripApprove.status = EApproveStatus.CANCEL;
+            tripApprove.tripApproveStatus = QMEApproveStatus.CANCEL;
+            await tripApprove.save();
+
             if(typeof tripApprove.data == "string"){
                 tripApprove.data = JSON.parse(tripApprove.data);
             }
-            let budgetInfo: {budgets: ITravelBudgetInfo[], query: ICreateBudgetAndApproveParams} = tripApprove.data;
+            let budgetInfo = tripApprove.data;
             let {query} = budgetInfo;
             if (typeof query == 'string') {
                 query = JSON.parse(query);
@@ -872,6 +871,7 @@ export default class TripApproveModule {
         }).catch(async function(err){
             if(err) {
                 await company.reload();
+                await tripApprove.reload();
                 throw L.ERR.INTERNAL_ERROR();
             }
         });

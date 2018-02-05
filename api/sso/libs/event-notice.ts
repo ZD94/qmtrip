@@ -5,13 +5,10 @@ import { EGender } from '_types';
 import {WStaff} from "./wechat-staff";
 import {WDepartment} from "./wechat-department";
 import { RestApi } from 'api/sso/libs/restApi';
-import { Company, CPropertyType } from '_types/company';
+import { Company } from '_types/company';
 import { Models } from '_types';
-import { Account, ACCOUNT_STATUS } from '_types/auth';
-import { Staff, EStaffStatus, EAddWay, SPropertyType, StaffProperty } from '_types/staff';
-import { StaffDepartment, DPropertyType, Department, DepartmentProperty } from '_types/department';
-
-
+import { SPropertyType, StaffProperty } from '_types/staff';
+import { StaffDepartment, DPropertyType, DepartmentProperty } from '_types/department';
 
 // 员工变动事件
 export class EventNotice {
@@ -58,7 +55,10 @@ export class EventNotice {
             company: self.company,
             restApi: self.restApi, 
         });
-        await wStaff.sync();
+        await wStaff.sync({
+            company: self.company,
+            from: 'updateUser'
+        });
         return true;
     }
     static async delete_user(xml: IWDeleteUser) {
@@ -70,8 +70,7 @@ export class EventNotice {
 
         if(!comPro || !comPro.length) 
             throw new Error("该AuthCorpId不存在鲸力系统中")
-        let {staffId} = comPro[0];
-        let staff = await Models.staff.get(staffId);
+        let staffId = comPro[0].staffId;
 
         let staffPros = await Models.staffProperty.find({ where: {
             staffId: staffId,
@@ -88,7 +87,8 @@ export class EventNotice {
             await staffDept.destroy();
             return true;
         }));
-        await staff.destroy();
+        let staff = await Models.staff.get(staffId);
+        if(staff) await staff.destroy();
         await Promise.all(staffPros.map(async (staffPro: StaffProperty) => {
             await staffPro.destroy();
         }))
@@ -96,16 +96,19 @@ export class EventNotice {
     }
     // 部门变动事件
     async create_party(xml: IWCreateDepartment) {
-        let self = this;
-        let comPro = await Models.CompanyProperty.find({ where: {
-            type: CPropertyType.WECHAT_CORPID,
-            value: xml.AuthCorpId
-        }});
-        if(!comPro || !comPro.length) 
-            throw new Error("该AuthCorpId不存在鲸力系统中")
-        let companyId = comPro[0];
-        let company = await Models.company.get(companyId);
+        // let self = this;
+        // let comPro = await Models.CompanyProperty.find({ where: {
+        //     type: CPropertyType.WECHAT_CORPID,
+        //     value: xml.AuthCorpId
+        // }});
+        // if(!comPro || !comPro.length) 
+        //     throw new Error("该AuthCorpId不存在鲸力系统中")
+        // if(!self.company) {
+        //     let companyId = comPro[0].companyId;
+        //     self.company = await Models.company.get(companyId);
+        // }
 
+        let self = this;
         let wdepartment = new WDepartment({
             name: xml.Name, 
             parentId: xml.ParentId, 
@@ -138,7 +141,7 @@ export class EventNotice {
         }); 
         return true;
     }
-    async delete_party(xml: IWDeleteDepartment) {
+    static async delete_party(xml: IWDeleteDepartment) {
         let comPro = await Models.departmentProperty.find({ where: {
             type: DPropertyType.WECHAT_CORPID,
             value: xml.AuthCorpId
@@ -146,7 +149,7 @@ export class EventNotice {
 
         if(!comPro || !comPro.length) 
             throw new Error("该AuthCorpId不存在鲸力系统中")
-        let {departmentId} = comPro[0];
+        let departmentId = comPro[0].departmentId;
         let deptPros = await Models.departmentProperty.find({ where: {
             departmentId: departmentId,
             value: xml.Id
@@ -160,9 +163,7 @@ export class EventNotice {
         if(staffDepts && staffDepts.length)
             throw new Error("该部门下仍有员工，无法删除")
         let dept = await Models.department.get(departmentId);
-        if(!dept) 
-            throw new Error("该部门不存在鲸力系统中")
-        await dept.destroy();
+        if(dept) await dept.destroy();
         await Promise.all(deptPros.map(async (deptPro: DepartmentProperty) => {
             await deptPro.destroy();
         }))

@@ -4,7 +4,7 @@ import * as crypto from "crypto"
 
 export default class WangxUtils {
 
-    static createLtpaToken(userName, expireHour, sharedSecret) {
+    static createLtpaToken(userName: string, expireHour: number, sharedSecret: string) {
         let userNameBuf = new Buffer(userName);
         let start = Math.floor(Date.now() / 1000);
         let size = userNameBuf.length + 20;
@@ -49,7 +49,8 @@ export default class WangxUtils {
 
         let signature = ltpaToken.toString("hex", ltpaToken.length - 20);
         let serverSecret = key;
-        ltpaToken.write(serverSecret, ltpaToken.length - 20, "base64");
+        // ltpaToken.write(serverSecret, ltpaToken.length - 20, "base64");
+        ltpaToken.write(serverSecret, ltpaToken.length - 20, 20, "base64");
 
         let hash = crypto.createHash("sha1");
         hash.update(ltpaToken);
@@ -105,11 +106,11 @@ export default class WangxUtils {
     }
 }
 
-function getUserNameBuf(token) {
+function getUserNameBuf(token: string) {
     let ltpaToken = new Buffer(token, "base64");
     return (ltpaToken.slice(20, ltpaToken.length - 20));
 };
 
-function getUserName(token) {
+function getUserName(token: string) {
     return getUserNameBuf(token).toString()
 };

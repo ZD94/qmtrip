@@ -1,10 +1,8 @@
 'use strict';
-import { RequestResponse } from 'request';
-var requestPromise = require('request-promise');
 var request = require('request');
 
 
-var res = request.post({
+request.post({
     json: true,
     uri: "http://ct.ctrip.com/m/City/SearchCities",
     form: {

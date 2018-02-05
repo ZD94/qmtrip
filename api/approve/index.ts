@@ -13,7 +13,7 @@ import {ETripType} from "_types/tripPlan/tripPlan";
 import _ = require('lodash');
 let Config = require('@jingli/config');
 var API = require("@jingli/dnode-api");
-import {ISegment, ICreateBudgetAndApproveParams} from '_types/tripPlan';
+import {ISegment, ICreateBudgetAndApproveParams, QMEApproveStatus} from '_types/tripPlan';
 import L from '@jingli/language';
 import * as CLS from 'continuation-local-storage';
 
@@ -151,6 +151,28 @@ class ApproveModule {
         });
 
     }
+
+    @clientExport
+    static async cancelApprove(params: {approveId: string}): Promise<any> {  //tripApprove未生成前取消行程，改变approve状态，和冻结点数(非必要)
+        try {
+            let approve = await Models.approve.get(params.approveId);
+            approve.status = EApproveStatus.CANCEL;
+            approve.tripApproveStatus = QMEApproveStatus.CANCEL;
+            let query = typeof approve.data == 'string' ? JSON.parse(approve.data) : approve.data;
+            let frozenNum = query.frozenNum;
+            frozenNum = typeof frozenNum == 'string' ? JSON.parse(frozenNum) : frozenNum;
+            frozenNum.extraFrozen = 0;
+            frozenNum.limitFrozen = 0;
+            await approve.save();
+
+            let staff = await Models.staff.get(approve.submitter);
+            let log = Models.tripPlanLog.create({tripPlanId: params.approveId, userId: staff.id, remark: `撤销行程审批单`});
+            await log.save();
+        } catch(err) {
+            throw err;
+        }
+    }
+
     @clientExport
     @requireParams(["approveId"], ["approveUser", "project", "submitter", "version"])
     static async submitApproveNew(params: {approveId: string, budgetId?: string, approveUser?: Staff, submitter?: Staff, version: number}) :Promise<Approve>{
@@ -187,7 +209,7 @@ class ApproveModule {
         }
         let totalBudget = 0;
         if(budgetInfo.budgets && budgetInfo.budgets.length>0){
-            budgetInfo.budgets.forEach(function(item){
+            budgetInfo.budgets.forEach(function(item: any){
                 if(item.tripType != ETripType.SUBSIDY){
                     number = number + 1;
                 }
@@ -399,8 +421,7 @@ class ApproveModule {
         budget: number,
         version?: number
     }) {
-        let {approveId, submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark,staffList, budget, version} = params;
-        let staff = await Models.staff.get(submitter);
+        let {approveId} = params;
         let approve = await Models.approve.get(approveId);
         // let approve = Models.approve.create({
         //     submitter: submitter,

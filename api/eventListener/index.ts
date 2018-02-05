@@ -40,7 +40,6 @@ export class EventModule{
             }else{
                 eventListeners = [];
             }
-
         }
 
         if(eventListeners && eventListeners.length){

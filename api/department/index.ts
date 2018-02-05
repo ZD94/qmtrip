@@ -451,14 +451,14 @@ export default class DepartmentModule {
  * 获取部门树形机构            
  * @param deptId 根部门 Id
  */
-async function getChildren(deptId: string) {
+async function getChildren(deptId: string): Promise<any> {
     const children = await Models.department.find({
         where: { parent_id: deptId }
     })
     return await Promise.all(children.map(c => g(c.id)))
 }
 
-async function g(deptId) {
+async function g(deptId: string) {
     const dept = await Models.department.get(deptId)
     return {
         dept,
@@ -479,7 +479,7 @@ export async function findChildren(deptId: string): Promise<Array<Department>> {
         : [...children, ... await f(children)]
 }
 
-async function f([x, ...xs]) {
+async function f([x, ...xs]: Department[]): Promise<Department[]> {
     return x == void 0
         ? []
         : [... await findChildren(x.id), ... await f(xs)]
@@ -489,13 +489,11 @@ async function f([x, ...xs]) {
  * 查询该部门的所有上级部门
  * @param deptId 
  */
-async function findParents(deptId: string): Promise<Array<Department>> {
-    const dept = await Models.department.get(deptId)
-    if (!dept) return []
+// async function findParents(deptId: string): Promise<Array<Department>> {
+//     const dept = await Models.department.get(deptId)
+//     if (!dept) return []
 
-    return dept.parent == void 0
-        ? [dept]
-        : [... await findParents(dept.parent.id)]
-}
-
-
+//     return dept.parent == void 0
+//         ? [dept]
+//         : [... await findParents(dept.parent.id)]
+// }

@@ -12,19 +12,18 @@ import {Staff, EStaffStatus,EStaffRole} from "_types/staff";
 // import { TravelPolicy, SubsidyTemplate,TravelPolicyRegion,CompanyRegion,RegionPlace } from '_types/travelPolicy';
 import { Models } from '_types';
 import { PaginateInterface } from "common/model/interface";
-import {AgencyUser} from "_types/agency"
 var request = require("request");
 import { getCompanyTokenByAgent } from 'api/restful';
 import { restfulAPIUtil } from 'api/restful';
-
+const API = require("@jingli/dnode-api");
 import {DefaultRegion, DefaultRegionId} from "_types";
 var Config = require("@jingli/config");
 var subsidyRegions = [
     {name:DefaultRegion.abroad, cityIds: [DefaultRegionId.abroad], group: 2, types: [1,2,3]},
     {name:DefaultRegion.domestic, cityIds: [DefaultRegionId.domestic], group: 1, types: [1,2,3]},
-    {name:"中国一类地区", cityIds: ['CT_340','CT_257','CT_289','CT_131'], group: 1, types: [2,3]},
-    {name:"中国二类地区", cityIds: ['CT_194','CT_179','CT_158','CT_317','CT_233','CT_058','CT_236','CT_315','CT_218','CT_167','CT_300','CT_075','CT_332','CT_288','CT_132'], group: 1, types: [2,3]},
-    {name:"港澳台", cityIds: ['CT_2912','CT_9000','CT_2911'], group: 2, types: [1,2,3]}
+    {name:DefaultRegion.firstClassPlace, cityIds: ['1795563','1809857','1796231','2038349'], group: 1, types: [2,3]},  //深圳, 广州,上海, 北京
+    {name:DefaultRegion.secondClassPlace, cityIds: ['800000235','1808925','1815551','1790902','1790384','2034935','1797926','1799960','1791243','1814068','1810821','1815285','1792943','1805751','1814905'], group: 1, types: [2,3]}, //厦门,杭州,长沙,无锡,西安,沈阳,青岛,南京,武汉,大连,福州,成都,天津,济南,重庆
+    {name: DefaultRegion.specialDistrict, cityIds: DefaultRegionId.specialDistrict, group: 2, types: [1,2,3]}   // 香港、澳门、台湾
     ];
 
 export interface ITravelPolicyParams {
@@ -47,8 +46,6 @@ export interface ITravelPolicyRegionParams {
     maxPriceLimit?: number,
     minPriceLimit?: number
 }
-
-
 export default class TravelPolicyModule{
 
     @clientExport
@@ -122,7 +119,6 @@ export default class TravelPolicyModule{
             throw L.ERR.BAD_REQUEST();
         }
 
-        // let tpr = await API.policy.createTravelPolicyRegion(params);
         let tpr = await restfulAPIUtil.operateOnModel({
             model: "travelpolicyregion",
             params: {
@@ -147,7 +143,6 @@ export default class TravelPolicyModule{
         if(!id || !companyId) {
             throw L.ERR.BAD_REQUEST();
         }
-        // let agencyUser = await AgencyUser.getCurrent();
 
         let tp_delete: any = await restfulAPIUtil.operateOnModel({
             model: "travelpolicy",
@@ -201,7 +196,6 @@ export default class TravelPolicyModule{
         if(!id || !companyId) {
             throw L.ERR.BAD_REQUEST();
         }
-        // let agencyUser = await AgencyUser.getCurrent();
 
         let isUpdated: any = await restfulAPIUtil.operateOnModel({
             model: "travelpolicy",
@@ -248,7 +242,6 @@ export default class TravelPolicyModule{
     // @requireParams(["id"])
     static async deleteTravelPolicyRegion(params: object) : Promise<any>{
         var staff = await Staff.getCurrent();
-
         if(staff["roleId"] != EStaffRole.ADMIN && staff["roleId"] != EStaffRole.OWNER){
             throw {code: -2, msg: '不允许删除默认差旅标准'};
         }
@@ -263,11 +256,6 @@ export default class TravelPolicyModule{
         return !!isDeleted;
     }
 
-    // @clientExport
-    // static async getDefaultTravelPolicy(): Promise<any>{
-    //     let dep = await Models.travelPolicy.get('dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a');
-    //     return dep;
-    // }
     /**
      * 根据id查询差旅标准
      * @param {String} params.id
@@ -288,26 +276,18 @@ export default class TravelPolicyModule{
         return travelPolicy;
     }
 
-
     /**
      * 根据属性查找差旅标准
      * @param params
      * @returns {*}
      */
-
     @clientExport
     @requireParams(["companyId"], ["companyId", "isDefault","name","p", "pz"])
     static async getTravelPolicies(params: {companyId: string, p?: number, pz?: number,isDefault?: boolean, name?:string}): Promise<any>{
-        let {companyId } = params;
-        var staff = await Staff.getCurrent();
-        let company = await Models.company.get(companyId);
-        let agencyUser = await AgencyUser.getCurrent();
-
         /*if((staff && staff['roleId'] != EStaffRole.ADMIN && staff['roleId'] != EStaffRole.OWNER) ||
             (agencyUser && agencyUser['agencyId'] != company['agencyId'])) {
             throw L.ERR.PERMISSION_DENY();
         }*/
-
         let travelPolicies = await restfulAPIUtil.operateOnModel({
             model: "travelpolicy",
             params: {
@@ -315,7 +295,6 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
-
         return travelPolicies;
     }
 
@@ -358,7 +337,6 @@ export default class TravelPolicyModule{
         return subsidy;
     }
 
-
     /**
      * 删除补助模板
      * @param params
@@ -375,9 +353,7 @@ export default class TravelPolicyModule{
             }
         });
         return isDeleted;
-
     }
-
 
     /**
      * 更新补助模板
@@ -393,7 +369,6 @@ export default class TravelPolicyModule{
         if(!params.id){
             throw L.ERR.BAD_REQUEST();
         }
-
         let subsidy = await restfulAPIUtil.operateOnModel({
             model: "subsidytemplate",
             params: {
@@ -402,7 +377,6 @@ export default class TravelPolicyModule{
             }
         });
         return subsidy;
-
     }
 
     /**
@@ -429,7 +403,6 @@ export default class TravelPolicyModule{
         return subsidy;
     };
 
-
     /**
      * 根据属性查找补助模板
      * @param params
@@ -450,8 +423,7 @@ export default class TravelPolicyModule{
         return subsidies;
     }
 
-    /*************************************补助模板end***************************************/
-
+    /*************************************区域差旅标准***************************************/
     /**
      * 根据id查询区域差旅标准
      * @param {String} params.id
@@ -469,10 +441,8 @@ export default class TravelPolicyModule{
                 method: "get"
             }
         });
-
         return tpr;
     }
-
 
     /**
      * 根据属性查找区域差旅标准
@@ -490,19 +460,15 @@ export default class TravelPolicyModule{
         });
         return tprs;
     }
-
-
     /*************************************差旅标准的地区关系(CompanyRegion)begin***************************************/
     /**
      * 差旅标准的地区管理
      * @param data
      * @returns {*}
      */
-
     @clientExport
     @requireParams(["id"])
     static async getCompanyRegion(params: {id: string}) : Promise<any>{
-        // return API.policy.getCompanyRegion(params);
         let cr = await restfulAPIUtil.operateOnModel({
             model: "companyregion",
             params: {
@@ -563,17 +529,12 @@ export default class TravelPolicyModule{
         });
         return cr;
     };
-
-    /*************************************差旅标准的地区关系(CompanyRegion)end***************************************/
-
-
     /*************************************地区管理(RegionPlace)begin***************************************/
     /**
      * 创建地区管理
      * @param data
      * @returns {*}
      */
-
     @clientExport
     @requireParams(["id"])
     static async getRegionPlace(params: {id: string}) : Promise<any>{
@@ -645,7 +606,6 @@ export default class TravelPolicyModule{
             let staff = await Staff.getCurrent();
             params.companyId = staff.company.id;
         }
-
         let companyRegions = await Promise.all(subsidyRegions.map(async (regionGroup) => {
             let cityIds = regionGroup.cityIds;
             let name = regionGroup.name;
@@ -657,7 +617,6 @@ export default class TravelPolicyModule{
                 companyRegion = companyRegion[0];
                 return companyRegion;
             }
-
             companyRegion = await TravelPolicyModule.createCompanyRegion({companyId: params.companyId, name: name, group: group, types: types});
             companyRegion = companyRegion.data;
 
@@ -668,20 +627,11 @@ export default class TravelPolicyModule{
                     companyId: params.companyId
                 });
             }));
-
             return companyRegion;
         }))
-
         return companyRegions;
     };
-
-
-
-    /*************************************地区设置(RegionPlace)end***************************************/
-
-
     /*************************************补助类型管理(SubsidyType)begin***************************************/
-
     @clientExport
     @requireParams(["id"])
     static async getSubsidyType(params: {id: string}) : Promise<any>{
@@ -743,12 +693,7 @@ export default class TravelPolicyModule{
         });
         return pr;
     };
-
-    /*************************************补助类型管理(SubsidyType)end***************************************/
-
-
     /*************************************地区补助金额管理(PolicyRegionSubsidy)begin***************************************/
-
     @clientExport
     @requireParams(["id"])
     static async getPolicyRegionSubsidy(params: {id: string, companyId?: string}) : Promise<any>{
@@ -829,8 +774,53 @@ export default class TravelPolicyModule{
         return pr;
     };
 
-    /*************************************地区补助金额管理(PolicyRegionSubsidy)end***************************************/
-
+    /************************************公共方法begin***************************************/
+    /**
+     * @method 创建公司，初始化其差旅标准相关的默认地区: 
+     *      中国大陆，通用地区，港澳台
+     * @params {params.companyId} 公司id
+     */
+    @clientExport
+    @requireParams(["companyId"])
+    static async initDefaultCompanyRegion(params: {companyId: string}) {
+        // let defaultRegion = ['中国大陆', '通用地区', '港澳台'];
+        let {companyId} = params;
+        let defaultRegion = [{
+            name: DefaultRegion.domestic,
+            types: [1, 2, 3],
+            group: 1
+        }, {
+            name: DefaultRegion.abroad,
+            types: [1, 2, 3],
+            group: 2
+        }, {
+            name: DefaultRegion.specialDistrict,
+            types: [1, 2, 3],
+            group: 2
+        }];
+    
+        let defaultPlaceId = [[DefaultRegionId.domestic], [DefaultRegionId.aborad], DefaultRegionId.specialDistrict];
+    
+        for (let i = 0; i < defaultRegion.length; i++) {
+            let companyRegion: any = await API.travelPolicy.createCompanyRegion({
+                companyId: companyId,
+                name: defaultRegion[i].name,
+                group: defaultRegion[i].group,
+                types: defaultRegion[i].types
+    
+            });
+            companyRegion = companyRegion.data;
+            if (companyRegion) {
+                for (let j = 0; defaultPlaceId[i] && j < defaultPlaceId[i].length; j++) {
+                    await API.travelPolicy.createRegionPlace({
+                        placeId: defaultPlaceId[i][j],
+                        companyRegionId: companyRegion['id'],
+                        companyId: companyId,
+                    });
+                }
+            }
+        } 
+    }
 
     static async operateOnPolicy(options: {
         model: string,
@@ -886,13 +876,8 @@ export default class TravelPolicyModule{
             })
         })
     }
+
 }
 
-// function tryConvertToArray(val: any) {
-//     if (val && !_.isArray(val)) {
-//         return [val];
-//     }
-//     return val;
-// }
 
 

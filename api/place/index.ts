@@ -1,12 +1,18 @@
 import { requireParams, clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { restfulAPIUtil } from '../restful'
 var _ = require("lodash");
+const cache = require("common/cache")
+const cityPrefix = 'city:info:id:v2'
 export default class PlaceModule {
 
     @clientExport
     @requireParams(['id'])
     static async getCityById(id: string, companyId?: string) {
-        let city :any = {};
+        if(!id) return null;
+        let city :any = await cache.read(`${cityPrefix}:${id}`)
+        if(typeof city == 'string') 
+            city = JSON.parse(city)
+        if(city) return city;
         if(/^[a-zA-Z0-9_]+$/.test(id)){
             city = await restfulAPIUtil.operateOnModel({
                 model: `place`,
@@ -15,7 +21,8 @@ export default class PlaceModule {
                     fields: {id, companyId}
                 }
             });
-            if(!city || !city.data) return null;
+            if (!city || !city.data) return null;
+            await cache.write(`${cityPrefix}:${id}`, JSON.stringify(city.data));
             return city.data;
         } 
         city = await restfulAPIUtil.operateOnModel({
@@ -28,8 +35,10 @@ export default class PlaceModule {
         });
         if(!city || !city.data) return null;
         if(_.isArray(city.data)){
+            await cache.write(`${cityPrefix}:${id}`, JSON.stringify(city.data[0]));
             return city.data[0];
         } 
+        await cache.write(`${cityPrefix}:${id}`, JSON.stringify(city.data));
         return city.data;
 
     }
@@ -92,7 +101,7 @@ export default class PlaceModule {
     }
 
     @clientExport
-    static async getCityInfoByName(params: object){
+    static async getCityInfoByName(params?: {name?: string}){
         let cities = await restfulAPIUtil.operateOnModel({
             model: `place`,
             params: {
@@ -126,8 +135,8 @@ export default class PlaceModule {
     }
 
     @clientExport
-    static async getCityInfo(params: {cityCode: string, companyId: string}){
-        let {cityCode, companyId } = params;
+    static async getCityInfo(params: {cityCode: string, companyId?: string}){
+        let { cityCode, companyId } = params;
         let city = await  PlaceModule.getCityById(cityCode, companyId);
         return city;
 

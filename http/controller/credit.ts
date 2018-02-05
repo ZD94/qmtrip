@@ -3,7 +3,7 @@
 import {AbstractController, Restful, Router} from "@jingli/restful"
 import {Models} from "_types";
 import {CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE} from "_types/coin";
-var config = require('@jingli/config');
+import { Request, Response, NextFunction } from 'express-serve-static-core'
 
 @Restful()
 export class CreditController extends AbstractController {
@@ -17,7 +17,7 @@ export class CreditController extends AbstractController {
     }
 
     @Router("/costcredit","POST")
-    async costCredit(req,res,next) {
+    async costCredit(req: Request, res: Response, next: NextFunction) {
         console.info("jl商城扣积分接口================");
         var params = req.body;
         console.info("costcredit==>", params);
@@ -40,7 +40,11 @@ export class CreditController extends AbstractController {
         if(!coinAccountChanges || coinAccountChanges.length <= 0){
             var result;
             try{
-                result = await coinAccount.lockCoin(credits, description, orderNum);
+                if(description && typeof description == 'string')
+                    description = JSON.parse(description);
+                let remark = `使用${description.price}换购${description.goodsName}`;
+
+                result = await coinAccount.lockCoin(credits, remark, orderNum);
             }catch(e){
                 return res.json(this.reply(503,{message: e.message}));
             }
@@ -52,7 +56,7 @@ export class CreditController extends AbstractController {
     }
 
     @Router("/resultnotice","POST")
-    async resultNotice(req, res, next) {
+    async resultNotice(req: Request, res: Response, next: NextFunction) {
         console.info("接收jl商城通知接口================");
         var params = req.body;
         console.info("resultNotice==>", params)

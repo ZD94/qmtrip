@@ -39,7 +39,7 @@ export default class WangXinApi {
             result = result["result"];
             if(result && result["total"]){
                 let totalNum = result["total"];
-                let departments = result["rows"];
+                let departments: IWangxDepartment[] = result["rows"];
                 if(totalNum > 10){
                     options.pageSize = totalNum;
                     let totalResult = await pushRequest(url, options);
@@ -60,12 +60,12 @@ export default class WangXinApi {
         return null;
     }
 
-    async getDeptByUser(userId){
+    async getDeptByUser(userId: string){
         let url = `http://netsense.com.cn:9003/rest/open/dept/find`;
         let options: any = {syscode: this.sysCode, userId: userId};
         let result = await pushRequest(url, options);
         if(result && result["status"] == 0){
-            let departments = result["result"];
+            let departments: IWangxDepartment[] = result["result"];
             let returnDept: IWangxDepartment[] = [];
             departments.map((item) => {
                 if(item.status == 0){
@@ -78,7 +78,7 @@ export default class WangXinApi {
         return null;
     }
 
-    async getDepartmentById(deptId) :Promise<IWangxDepartment> {
+    async getDepartmentById(deptId: string) :Promise<IWangxDepartment> {
         let url = `http://netsense.com.cn:9003/rest/open/dept/page`;
         let option: any = {syscode: this.sysCode, deptId: deptId};
         let result = await pushRequest(url, option);
@@ -99,7 +99,7 @@ export default class WangXinApi {
             result = result["result"];
             if(result && result["total"]){
                 let totalNum = result["total"];
-                let users = result["rows"];
+                let users: IWangxUser[] = result["rows"];
                 if(totalNum > 10){
                     let totalResult = await pushRequest(url, {syscode: this.sysCode, pageSize: totalNum});
                     if(totalResult["result"]["rows"] && totalResult["result"]["rows"]["length"]){
@@ -120,11 +120,11 @@ export default class WangXinApi {
         return null;
     }
 
-    async getUsersBydept(deptId) :Promise<Array<IWangxUser>> {
+    async getUsersBydept(deptId: string) :Promise<Array<IWangxUser>> {
         let url = `http://netsense.com.cn:9003/rest/open/user/find`;
         let result = await pushRequest(url, {syscode: this.sysCode, deptId: deptId});
         if(result && result["status"] == 0){
-            let users = result["result"];
+            let users: IWangxUser[] = result["result"];
             let returnUsers: IWangxUser[] = [];
             users.map((item) => {
                 if(item.status == 0){
@@ -137,7 +137,7 @@ export default class WangXinApi {
         return null;
     }
 
-    async getUserById(userId) :Promise<IWangxUser> {
+    async getUserById(userId: string) :Promise<IWangxUser> {
         let url = `http://netsense.com.cn:9003/rest/open/user/page`;
         let result = await pushRequest(url, {syscode: this.sysCode, userId: userId});
         if(result && result["status"] == 0){
@@ -152,14 +152,14 @@ export default class WangXinApi {
 
 }
 
-async function pushRequest(url, params){
+async function pushRequest(url: string, params: object){
     return new Promise((resolve, reject) => {
         return request({
             uri: url,
             body: params,
             json:true,
             method: "post",
-        }, (err, resp, result) => {
+        }, (err: Error, resp: any, result: object) => {
             console.log(url, '==>', JSON.stringify(result))
             if (err) {
                 return reject(err);
