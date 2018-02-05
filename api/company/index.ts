@@ -200,8 +200,9 @@ export default class CompanyModule {
 
         //jlbudget create account record. Waiting jlbudget account identifie online.
 
-        //默认添加 中国大陆(国内）、通用地区（国际）、港澳台 三个地区用于差旅、补助、限价等的管理
+        //默认添加 中国大陆(国内）、通用地区（国际）、港澳台 三个地区用于差旅、限价等的管理,  补助的一类、二类地区
         await API.travelPolicy.initDefaultCompanyRegion({companyId: company.id});
+        await API.travelPolicy.initSubsidyRegions({companyId: company.id});
         return { company: company, description: promoCode ? promoCode.description : "" };
     }
 
