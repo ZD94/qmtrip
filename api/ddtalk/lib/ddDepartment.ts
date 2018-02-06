@@ -93,7 +93,7 @@ export default class DdDepartment extends OaDepartment {
         let DDdepartments = await self.corpApi.getDepartments();
         let result: OaDepartment[] = [];
         DDdepartments.forEach((d) => {
-            if(d.parentid+"" == self.id){
+            if(d.id+"" != self.id && d.parentid+"" == self.id){
                 let oaDept = new DdDepartment({id: d.id, name: d.name, corpId: self.corpId, isvApi: self.isvApi, 
                     company: self.company, parentId: d.parentid});
                 result.push(oaDept);

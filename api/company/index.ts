@@ -200,8 +200,9 @@ export default class CompanyModule {
 
         //jlbudget create account record. Waiting jlbudget account identifie online.
 
-        //默认添加 中国大陆(国内）、通用地区（国际）、港澳台 三个地区用于差旅、补助、限价等的管理
+        //默认添加 中国大陆(国内）、通用地区（国际）、港澳台 三个地区用于差旅、限价等的管理,  补助的一类、二类地区
         await API.travelPolicy.initDefaultCompanyRegion({companyId: company.id});
+        await API.travelPolicy.initSubsidyRegions({companyId: company.id});
         return { company: company, description: promoCode ? promoCode.description : "" };
     }
 
@@ -1190,7 +1191,7 @@ export default class CompanyModule {
                         let version = C.link_version || 2
                         let detailUrl = ""
                         if (version == 2) {
-                            detailUrl = C.v2_host + "/#/manage/expiry-date";
+                            detailUrl = C.v2_host + "#/manage/expiry-date";
                         } else {
                             detailUrl = C.host + "/#/company-pay/service-pay";
                         }
@@ -1355,7 +1356,7 @@ export default class CompanyModule {
                 let linkVersion = C.link_version || 2
                 let detailUrl: string = ""
                 if (linkVersion == 2) {
-                    detailUrl = C.v2_host + '/#/statistics/stat-index'
+                    detailUrl = C.v2_host + '#/statistics/stat-index'
                 } else {
                     detailUrl = C.host + '/#/statistics/'
                 }
