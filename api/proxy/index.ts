@@ -150,10 +150,11 @@ class Proxy {
         app.all(/^\/order.*$/, cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function) => {
             let staff: Staff = await Staff.getCurrent();
             let staffId = req.headers.staffid;
+            let isNeedAuth = req.headers['isneedauth'] || '';
             if(staffId && !staff) {
                 staff = await Models.staff.get(staffId);
             }
-            let {tripDetailId} = req.query;
+            let {tripDetailId, authStr} = req.query;
 
             let listeningon: string;
             if(!tripDetailId || typeof tripDetailId == undefined){
@@ -198,8 +199,8 @@ class Proxy {
                 identify = JSON.stringify(identify);
             }
             identify = encodeURIComponent(identify);
-            // let auth: string = (isNeedAuth == '1') ? identify : '';
-            let auth : string = identify;
+            let auth: string = (isNeedAuth == '1') ? identify : authStr;
+            // let auth : string = identify;
 
             let headers: {[index: string]: any} = {
                appid: config.orderSysConfig.appId,
