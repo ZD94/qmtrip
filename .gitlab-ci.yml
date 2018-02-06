@@ -64,6 +64,7 @@ deploy:master:
     name: dev
     url: https://l.jingli365.com
   variables:
+    JL_APP_DEBUG: 1
     JL_APP_HOST: $CI_ENVIRONMENT_URL
     JL_APP_POSTGRES: postgres://times:time0418@l.jingli365.com:15432/times
     JL_APP_REDIS: redis://l.jingli365.com:16379
