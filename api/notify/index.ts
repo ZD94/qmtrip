@@ -151,6 +151,10 @@ class NotifyTemplate{
             let subject = this.email.title(data);
             let context = Object.create(data);
             context.include = function(incname: string){
+                console.info(includes);
+                console.info(includes[incname]);
+                console.info(incname);
+                console.info("=====================------------------------");
                 return includes[incname](context);
             };
             let content = this.email.html(context);
