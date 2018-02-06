@@ -1190,7 +1190,7 @@ export default class CompanyModule {
                         let version = C.link_version || 2
                         let detailUrl = ""
                         if (version == 2) {
-                            detailUrl = C.v2_host + "/#/manage/expiry-date";
+                            detailUrl = C.v2_host + "/manage/expiry-date";
                         } else {
                             detailUrl = C.host + "/#/company-pay/service-pay";
                         }
@@ -1355,7 +1355,7 @@ export default class CompanyModule {
                 let linkVersion = C.link_version || 2
                 let detailUrl: string = ""
                 if (linkVersion == 2) {
-                    detailUrl = C.v2_host + '/#/statistics/stat-index'
+                    detailUrl = C.v2_host + '/statistics/stat-index'
                 } else {
                     detailUrl = C.host + '/#/statistics/'
                 }

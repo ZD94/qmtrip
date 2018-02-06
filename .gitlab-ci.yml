@@ -72,7 +72,7 @@ deploy:master:
     JL_APP_BUDGET_HOST: l.jingli365.com
     JL_APP_BUDGET_PORT: 14103
     JL_APP_NOTICE_EMAIL: testteam@jingli365.com
-    JL_APP_V2_HOST: https://l.jingli365.com/proj/web-jingli-v2/index-v2.html
+    JL_APP_V2_HOST: https://l.jingli365.com/index-v2.html
     JL_APP_APPROVE_SERVER_URL: https://l.jingli365.com/proj/svr-trip-approve/api/v1
     JL_APP_TMC: https://l.jingli365.com/proj/svr-tmc
     JL_APP_TMC_FAKE: 0
@@ -118,7 +118,7 @@ deploy:test:
     JL_APP_BUDGET_HOST: l.jingli365.com
     JL_APP_BUDGET_PORT: 14113
     JL_APP_NOTICE_EMAIL: testteam@jingli365.com
-    JL_APP_V2_HOST: https://t.jingli365.com/proj/web-jingli-v2/index-v2.html
+    JL_APP_V2_HOST: https://t.jingli365.com/index-v2.html
     JL_APP_APPROVE_SERVER_URL: https://t.jingli365.com/proj/svr-trip-approve/api/v1
     JL_APP_TD_MONITORURL: https://t.jingli365.com/proj/old-qmtrip/api/v1/tripDetail
     JL_APP_TMC: https://t.jingli365.com/proj/svr-tmc

@@ -123,7 +123,7 @@ class ApproveModule {
 
                 let version = params.version || Config.link_verion || 2 //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
                 if (version == 2) {
-                    detailUrl = Config.v2_host + "/#/manage/travel-number"
+                    detailUrl = Config.v2_host + "/manage/travel-number"
                 } else {
                     detailUrl = Config.host + "/#/company-pay/buy-packages"
                 }
@@ -252,7 +252,7 @@ class ApproveModule {
 
                 let version = params.version || Config.link_verion || 2 //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
                 if (version == 2) {
-                    detailUrl = Config.v2_host + "/#/manage/travel-number"
+                    detailUrl = Config.v2_host + "/manage/travel-number"
                 } else {
                     detailUrl = Config.host + "/#/company-pay/buy-packages"
                 }

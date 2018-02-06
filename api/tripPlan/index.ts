@@ -2434,7 +2434,7 @@ class TripPlanModule {
         let detailUrl: string
         let version = params.version || config.link_version || 2 //#@template 外链版本的优先级：参数的版本 > 配置的外链版本 > 默认配置2
         if (version == 2) {
-            detailUrl = `${config.v2_host}/#/trip/make-expense/${tripPlan.id}/${financeCheckCode.code}`;
+            detailUrl = `${config.v2_host}/trip/make-expense/${tripPlan.id}/${financeCheckCode.code}`;
         } else {
             detailUrl = `${config.host}#/finance/trip-detail?id=${tripPlan.id}&code=${financeCheckCode.code}`;
         }
