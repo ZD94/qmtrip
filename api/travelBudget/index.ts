@@ -100,6 +100,8 @@ export interface ISearchHotelParams {
     checkOutDate: string;
     cityId: string;
     travelPolicyId: string;
+    lat?:string;
+    lon?:string;
     location?: {
         latitude: number,
         longitude: number,
@@ -873,6 +875,7 @@ export default class ApiTravelBudget {
             staff = await Staff.getCurrent(); 
         }    
         let companyId = staff && staff.company ? staff.company.id: staff.companyId;
+        // let companyId = "4a1f37e0-0a54-11e7-ad22-b1cccc4cc277";
         if(!companyId) throw L.ERR.HAS_NOT_BIND();
         let result;
         try {
@@ -1076,17 +1079,19 @@ export default class ApiTravelBudget {
 
 /* as ICreateBudgetAndApproveParamsNew; */
 // let param = {
-//     // checkInDate: "2018-02-21",
-//     // checkOutDate: "2018-02-22",
-//     // cityId: "1814905",
+//     checkInDate: "2018-02-21",
+//     checkOutDate: "2018-02-22",
+//     cityId: "1814905",
+//     lat:"29.560997000",
+//     lon:"106.583194000",
 //     travelPolicyId: "asdasdlkaldaklslkdka",
 
-//     leaveDate: "2018-04-21",
-//     originPlaceId: "CT_131",
-//     destinationId: "CT_289",
+//     // leaveDate: "2018-04-21",
+//     // originPlaceId: "CT_131",
+//     // destinationId: "CT_289",
 // }
 // setTimeout(async ()=>{
 //     console.log("test go go");
-//     let result = await ApiTravelBudget.getTrafficsData(param);
+//     let result = await ApiTravelBudget.getHotelsData(param);
 //         console.log(result,"<=============")
 // }, 8000);
