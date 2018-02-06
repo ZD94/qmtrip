@@ -8,7 +8,7 @@
     <tr>
         <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A;height: 36px"><%=staff.name%></td>
         <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A;height: 36px"><%=staff.mobile%></td>
-        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A;height: 36px"><%=staff.travelPolicy.name%></td>
+        <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A;height: 36px"><%=travelPolicy ? travelPolicy.name : ''%></td>
     </tr>
     <%}); %>
 </table>
