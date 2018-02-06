@@ -1344,7 +1344,7 @@ async function _sendActiveEmail(accountId: string, origin?: string, version?: nu
     var appMessageUrl: string = ""
     version = version || C.link_version || 2 //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
     if (version == 2) {
-        url = `${C.v2_host}/login/active/${account.id}/${sign}/${expireAt}/${account.email}`
+        url = `${C.v2_host}#/login/active/${account.id}/${sign}/${expireAt}/${account.email}`
         appMessageUrl = "#/hom/staff-info";
     } else {
         url = host + "/index.html#/login/active?accountId=" + account.id + "&sign=" + sign + "&timestamp=" + expireAt + "&email=" + account.email;
