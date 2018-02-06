@@ -4,7 +4,7 @@
   "host": "${JL_APP_HOST}",
   "v2_host": "${JL_APP_V2_HOST}",
   "link_version": "${JL_APP_LINK_VERSION}",
-  "debug": false,
+  "debug": "${JL_APP_DEBUG}",
   "ts_node": true,
   "cluster": false,
   "port": "${JL_APP_PORT}",
