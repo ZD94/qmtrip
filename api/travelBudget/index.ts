@@ -531,6 +531,8 @@ export default class ApiTravelBudget {
         console.log('updateBudtetApproveId=======', params.approveId);
         let approve = await Models.approve.get(params.approveId);
 
+        if(!approve || !approve.id)
+            return;
         // check tripApprove status; if passed, rejected or locked, the budget will not be updated
         let checkTripApproveStatus = await API.tripApprove.getTripApprove({id: approve.id});
         let lockBudget: boolean = checkTripApproveStatus ? checkTripApproveStatus['lockBudget'] : null;

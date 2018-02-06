@@ -128,7 +128,7 @@ class ApiPlace {
      * @param   {string}    params.cityCode 城市代码
      * @type {Promise} array
      */
-    /*static getAirPortsByCity(params: {cityCode: string}) : Promise<Array<Airport>> {
+    static getAirPortsByCity(params: {cityCode: string}) : Promise<Array<Airport>> {
         if (!params.cityCode) {
             throw new Error("cityCode require but is empty!");
         }
@@ -139,7 +139,7 @@ class ApiPlace {
                 })
                 return arr;
             })
-    }*/
+    }
 
     /**
      * @method getAirportById
