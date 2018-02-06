@@ -274,7 +274,7 @@ export default class TripApproveModule {
         let version = params.version || config.link_version || 2  //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
         if (version == 2) {
             appMessageUrl = `#/trip-approval/approve-detail/${tripApprove.id}/1`
-            approve_url = `${config.v2_host}/${appMessageUrl}` //参数为tripApproveId和titleId；
+            approve_url = `${config.v2_host}${appMessageUrl}` //参数为tripApproveId和titleId；
         } else {
             approve_url = `${config.host}/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
             let finalUrl = `#/trip-approval/detail?approveId=${tripApprove.id}`;
@@ -293,12 +293,16 @@ export default class TripApproveModule {
             //给审核人发审核邮件
             // let approveUser = await Models.staff.get(tripApprove['approveUserId']);
             let approveUserId = params.approveUserId || tripApprove.approveUserId;
+            let accountId = tripApprove.accountId;
+            let companyId = tripApprove.companyId;
+            let staff = Models.staff.all({where:{accountId: accountId, companyId: companyId}});
+            let staffName = staff[0].name;
 
             try {
                 await API.notify.submitNotify({
                     key: 'qm_notify_new_travelbudget',
                     userId: approveUserId,
-                    values: {tripApprove: tripApprove, detailUrl: shortUrl, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPLY_NOTICE}
+                    values: {tripApprove: tripApprove, staffName: staffName, detailUrl: shortUrl, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPLY_NOTICE}
                 });
             } catch(err) {
                 console.error('发送通知失败', err.stack ? err.stack : err);
@@ -544,7 +548,7 @@ export default class TripApproveModule {
             let version = params.version || config.link_version || 2 //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
             if (version == 2) {
                 appMessageUrl = `#/trip-approval/approve-detail/${tripApprove.id}/1`
-                self_url = `${config.v2_host}/${appMessageUrl}`
+                self_url = `${config.v2_host}${appMessageUrl}`
             } else {
                 self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + tripApprove.id;
                 let finalUrl = '#/trip-approval/detail?approveId=' + tripApprove.id;

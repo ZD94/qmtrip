@@ -188,7 +188,7 @@ class StaffModule{
         let detailUrl: string;
         let linkVersion = params.version || config.link_version || 2 //@#template
         if (linkVersion == 2) { //#@template
-            detailUrl = `${config.v2_host}/#/department/staff-detail/${params.staffId}`
+            detailUrl = `${config.v2_host}#/department/staff-detail/${params.staffId}`
         } else {
             detailUrl = `${config.host}/#/department/staff-info?staffId=${params.staffId}`;
         }
@@ -344,6 +344,8 @@ class StaffModule{
         }
 
         newPwd = utils.md5(newPwd);
+        staff.isNeedChangePwd = false;
+        staff.status = ACCOUNT_STATUS.ACTIVE;
         staff.pwd = newPwd;
         staff = await staff.save();
         return staff;
@@ -489,11 +491,12 @@ class StaffModule{
             let staffs = await Models.staff.find({
                 where : {
                     accountId : session.accountId
-                }
+                },
+                order: [["createdAt", "desc"]]
             });
             let resultStaffs: Staff[] = [];
 
-            staffs.map((staff)=>{
+            staffs.forEach((staff)=>{
                 resultStaffs.push(staff);
             });
 

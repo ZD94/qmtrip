@@ -13,7 +13,7 @@ export = async function transform(values: any): Promise<any>{
         values.staffName = values.account ? values.account.name : '';
 
     if(config.version == 2) {
-        detailUrl = config.v2_host + '/index-v2.html#/card-coupons/card-coupons';    
+        detailUrl = config.v2_host + '#/card-coupons/card-coupons';
         appMessageUrl = '#/card-coupons/card-coupons';
     } else {
         detailUrl = config.host +'/index.html#/card-coupons/card-coupons';

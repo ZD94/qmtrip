@@ -4,7 +4,7 @@
   "host": "${JL_APP_HOST}",
   "v2_host": "${JL_APP_V2_HOST}",
   "link_version": "${JL_APP_LINK_VERSION}",
-  "debug": false,
+  "debug": "${JL_APP_DEBUG}",
   "ts_node": true,
   "cluster": false,
   "port": "${JL_APP_PORT}",
@@ -169,8 +169,5 @@
     "suiteId": "wwdb6efe49f6e236d3",
     "suiteSecret": "7GnoFq32hgkE27kkBFPZxeetnhyQxtFk2OvHFjtrW4I"
   },
-  "isVerify": false,
-  "JLApproveSystem": {
-    "postgresUrl": "${JL_APP_APPROVE_DATABASE}"
-  }
+  "isVerify": false
 }
