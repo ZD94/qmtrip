@@ -12,6 +12,7 @@ let moment = require("moment");
 import {MTrainLevel, MPlaneLevel} from "_types";
 import { IHotel, IFlightAgent } from '_types/travelbudget';
 
+
 /* 判断是否需要美亚数据 */
 export async function meiyaJudge() {
     let currentStaff = await Staff.getCurrent();
@@ -29,8 +30,8 @@ export async function meiyaJudge() {
 export function meiyaAuth(info?: object) {
     if (!info) {
         info = {
-            username: "JingLiZhiXiang",
-            password: "asdasdasdas"
+            username: "JLZX",
+            password: "my2018"
         };
     }
     let str = JSON.stringify(info);
@@ -355,8 +356,27 @@ export function handelHotelsData(meiyaHotelData: IMeiyaHotel[], originalData: IS
         return data
     }
 }
+//坐标距离计算
+function getDistance(lat1, lng1, lat2, lng2) { 
+    var dis = 0;
+    var radLat1 = toRadians(lat1);
+    var radLat2 = toRadians(lat2);
+    var deltaLat = radLat1 - radLat2;
+    var deltaLng = toRadians(lng1) - toRadians(lng2);
+    var dis = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(deltaLat / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(deltaLng / 2), 2)));
+    return dis * 6378137;
+
+    function toRadians(d) {  return d * Math.PI / 180;}
+} 
 
 function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHotelParams) {
+    let distance;
+    if(originalData.lat && originalData.lon){
+        distance = getDistance(meiyaHotelData.latitude,meiyaHotelData.longitude,originalData.lat,originalData.lon)
+        distance = Math.ceil(distance)
+    }else{
+        distance = null
+    }
     let model = {
         "name": meiyaHotelData.cnName,
         "star": meiyaHotelData.starRating,
@@ -386,19 +406,19 @@ function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHot
         "checkInDate": originalData.checkInDate,
         "checkOutDate": originalData.checkOutDate,
         // "commentScore": 9.6,
-        "distance": 440
+        distance
     }
     return model
 }
 
 //处理美亚飞机数据
-export function handleFlightData(meiyaFlightData: IMeiyaFlight[], originalData: ISearchTicketParams) {
+export async function handleFlightData(meiyaFlightData: IMeiyaFlight[], originalData: ISearchTicketParams) {
     let data: any[] = [];
     if (meiyaFlightData && meiyaFlightData.length) {
         let result: Array<any> = [];
         let handleData;
             for (let item of meiyaFlightData) {
-                handleData = transferFlightData(item, originalData)
+                handleData =await transferFlightData(item, originalData)
                 result.push(handleData)
             }
         data.push(...result);
@@ -408,8 +428,24 @@ export function handleFlightData(meiyaFlightData: IMeiyaFlight[], originalData: 
     }
 }
 
-function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearchTicketParams) {
+ async function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearchTicketParams) {
     let name;
+    let stopItemList;
+    if( meiyaFlightData.stopNumber == 1){
+       let  urlStop = config.orderSysConfig.orderLink + "/tmc/stopItems/" + `${meiyaFlightData.flightNo}/${meiyaFlightData.depDate}`;
+       let  stopItem = await request({
+            url: urlStop,
+            method: "get",
+            json:true,
+            headers: {
+                auth: meiyaAuth(),
+                supplier: "meiya"
+            }
+        })
+        stopItemList = stopItem.data
+    }else{
+        stopItemList = []
+    }
        let cabins = meiyaFlightData.flightPriceInfoList.map((item)=>{
             switch (item.cabin){
                 case "经济舱":
@@ -444,6 +480,7 @@ function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearch
     let deptDateTime = meiyaFlightData.depDate + " " + meiyaFlightData.depTime;
     let model = {
         "No": meiyaFlightData.flightNo,
+        stopItemList,
         "segs": [
             {
                 "base": {
@@ -474,6 +511,7 @@ function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearch
             }
         ],
         "type": 1,
+        "stopNumber":meiyaFlightData.stopNumber,
         "carry": meiyaFlightData.airline,
         "agents": [
             {
