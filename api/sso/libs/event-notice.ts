@@ -95,7 +95,7 @@ export class EventNotice {
         return true;    
     }
     // 部门变动事件
-    async create_party(xml: IWCreateDepartment) {
+    async create_party(xml: IWCreateDepartment): Promise<boolean> {
         // let self = this;
         // let comPro = await Models.CompanyProperty.find({ where: {
         //     type: CPropertyType.WECHAT_CORPID,
@@ -122,7 +122,7 @@ export class EventNotice {
             oaDepartment: null,
             from: 'createDepartment'
         }); 
-        return null;
+        return true;
     }
     async update_party(xml: IWUpdateDepartment) {
         let self = this;

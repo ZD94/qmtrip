@@ -1,1 +1,1 @@
-export = val => val
+export = (val: any) => val

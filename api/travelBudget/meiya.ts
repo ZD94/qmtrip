@@ -357,7 +357,7 @@ export function handelHotelsData(meiyaHotelData: IMeiyaHotel[], originalData: IS
     }
 }
 //坐标距离计算
-function getDistance(lat1, lng1, lat2, lng2) { 
+function getDistance(lat1: string, lng1: string, lat2: string, lng2: string) {
     var dis = 0;
     var radLat1 = toRadians(lat1);
     var radLat2 = toRadians(lat2);
@@ -366,7 +366,7 @@ function getDistance(lat1, lng1, lat2, lng2) {
     var dis = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(deltaLat / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(deltaLng / 2), 2)));
     return dis * 6378137;
 
-    function toRadians(d) {  return d * Math.PI / 180;}
+    function toRadians(d: string) {  return Number(d) * Math.PI / 180;}
 } 
 
 function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHotelParams) {
@@ -565,7 +565,7 @@ export function handleTrainData(meiyaTrainData: any[], originalData: ISearchTick
 function transferTrainData(meiyaTrainData: IMeiyaTrain, originalData: ISearchTicketParams) {
     let departDateTime = meiyaTrainData.StartTimeLong;
     let arrivalDateTime = meiyaTrainData.EndTimeLong;
-    let cabins;
+    let cabins: any[];
     if(meiyaTrainData.SeatList && meiyaTrainData.SeatList.length >= 1){
         cabins = meiyaTrainData.SeatList.map((item)=>{
             let name:any ;
