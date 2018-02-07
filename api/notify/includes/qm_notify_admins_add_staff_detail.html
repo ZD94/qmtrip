@@ -4,13 +4,11 @@
         <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B;width: 110px;height: 36px">手机号</td>
         <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #9B9B9B;width: 110px;height: 36px">差旅标准</td>
     </tr>
-    <% _.forEach(staff, function(values) { %>
     <tr>
         <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A;height: 36px"><%=staff.name%></td>
         <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A;height: 36px"><%=staff.mobile%></td>
         <td style="text-align: center;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A;height: 36px"><%=travelPolicy ? travelPolicy.name : ''%></td>
     </tr>
-    <%}); %>
 </table>
 
 
