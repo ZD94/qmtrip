@@ -48,13 +48,13 @@ export class OfflineClass {
         param.destinationName = param.destinationName.replace(/city|市/ig, "");
         param.status = 0;
 
-        let leaveCity = await API.place.getCityInfoByName( param.leaveCityName );
+        let leaveCity = await API.place.getCityInfoByName( {name:param.leaveCityName} );
         if(!leaveCity){
             param.msg = "出发地城市填写错误";
             return param;
         }
 
-        let destinationCity = await API.place.getCityInfoByName( param.destinationName );
+        let destinationCity = await API.place.getCityInfoByName( {name: param.destinationName} );
         if(!destinationCity){
             param.msg = "目的地城市填写错误";
             return param;
@@ -63,7 +63,7 @@ export class OfflineClass {
         let backCity;
         if(param.backCityName){
             param.backCityName = param.backCityName.replace(/city|市/ig, "");
-            backCity = await API.place.getCityInfoByName( param.backCityName );
+            backCity = await API.place.getCityInfoByName( {name: param.backCityName} );
             if(!backCity){
                 param.msg = "返回地城市填写错误";
                 return param;
