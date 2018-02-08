@@ -199,7 +199,7 @@ class Proxy {
                 identify = JSON.stringify(identify);
             }
             identify = encodeURIComponent(identify);
-            let auth: string = (isNeedAuth == '1') ? identify : authStr;
+            let auth: string = (isNeedAuth == '1') ? authStr: identify;
             // let auth : string = identify;
 
             let headers: {[index: string]: any} = {

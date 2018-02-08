@@ -255,12 +255,14 @@ export default class ApiTravelBudget {
             ]);
             let meiyaTrain = arr[0];
             let meiyaFlight = arr[1];
-            if (meiyaFlight)
-            //     commonData = compareFlightData(commonData, meiyaFlight);
+            if (meiyaFlight) {
                 commonData = handleFlightData(meiyaFlight,params);
-            if (meiyaTrain)
-            // commonData = compareTrainData(commonData, meiyaTrain);
-                 commonData2 = handleTrainData(meiyaTrain, params)
+                // commonData = compareFlightData(commonData, meiyaFlight);
+            }    
+            if (meiyaTrain){      
+                commonData2 = handleTrainData(meiyaTrain, params)
+                // commonData = compareTrainData(commonData, meiyaTrain);
+            }        
             console.log("commonData ===> commonData data.", typeof (commonData));
             return [...commonData, ...commonData2];
         }
