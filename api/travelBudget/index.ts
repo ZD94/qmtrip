@@ -255,8 +255,6 @@ export default class ApiTravelBudget {
             ]);
             let meiyaTrain = arr[0];
             let meiyaFlight = arr[1];
-            console.log("meiyaFlight ===> meiyaFlight data.", meiyaFlight.length);
-            console.log("meiyaTrain ===> meiyaTrain data.", meiyaTrain.length);
             if (meiyaFlight)
             //     commonData = compareFlightData(commonData, meiyaFlight);
                 commonData = handleFlightData(meiyaFlight,params);
