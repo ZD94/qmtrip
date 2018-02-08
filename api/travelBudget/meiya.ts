@@ -348,10 +348,11 @@ export function compareTrainData(origin: any[], meiyaData: IMeiyaTrain[]) {
 //处理美亚酒店数据
 export function handelHotelsData(meiyaHotelData: {[index: string]: Array<IMeiyaHotel>}, originalData: ISearchHotelParams) {
     let data: any[] = [];
-    if (meiyaHotelData && meiyaHotelData.length) {
+    if (meiyaHotelData) {
         let result: Array<any> = [];
         let handleData;
         for (let index in meiyaHotelData) {
+            console.log(`供应商: ${index}: 航班数据长度 ===> ${meiyaHotelData[index].length}`);
             for (let item of meiyaHotelData[index]) {
                 handleData = transferHotelData(index, item, originalData);
                 result.push(handleData)
@@ -402,10 +403,11 @@ function transferHotelData(supplierName: string, meiyaHotelData: IMeiyaHotel, or
 //处理美亚飞机数据
 export function handleFlightData(meiyaFlightData: {[index: string]:Array<IMeiyaFlight>}, originalData: ISearchTicketParams) {
     let data: any[] = [];
-    if (meiyaFlightData && meiyaFlightData.length) {
+    if (meiyaFlightData) {
         let result: Array<any> = [];
         let handleData;
             for (let index in meiyaFlightData) {
+                console.log(`供应商: ${index}: 航班数据长度 ===> ${meiyaFlightData[index].length}`);
                 for(let item of meiyaFlightData[index]){
                     handleData = transferFlightData(index, item, originalData)
                     result.push(handleData)
@@ -519,10 +521,11 @@ function transferFlightData(supplierName: string, meiyaFlightData: IMeiyaFlight,
 //处理美亚火车数据
 export function handleTrainData(meiyaTrainData: {[index:string]: Array<IMeiyaTrain>}, originalData: ISearchTicketParams) {
     let data: any[] = [];
-    if (meiyaTrainData && meiyaTrainData.length) {
+    if (meiyaTrainData) {
         let result: Array<any> = []
         let handleData;
         for (let index in meiyaTrainData) {
+            console.log(`供应商: ${index}: 航班数据长度 ===> ${meiyaTrainData[index].length}`);
             for (let item of meiyaTrainData[index]) {
                 handleData = transferTrainData(index, item, originalData)
                 result.push(handleData)
