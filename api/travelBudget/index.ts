@@ -836,6 +836,7 @@ export default class ApiTravelBudget {
                 updateBudget.staffList = obj.query.staffList;
                 updateBudget.budget = totalBudget;
                 updateBudget.step = budgetResult.step;
+                updateBudget.startAt = obj.query.destinationPlacesInfo[0].leaveDate;
 
                 console.log("approveId =======>", updateBudget.id);
                 await updateBudget.save();
