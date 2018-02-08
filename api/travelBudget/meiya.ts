@@ -40,7 +40,8 @@ export function meiyaAuth(info?: object) {
 
 /* 获取美亚数据 */
 export async function getMeiyaFlightData(params: ISearchTicketParams, authData: IMeiyaAuthData[]) {
-    let data = [];
+    // let data = [];
+    let flightData: {[index: string]: Array<IMeiyaFlight>} = {};
     // let departure = await API.place.getCityInfo({ cityCode: params.originPlaceId });
     // let arrival = await API.place.getCityInfo({ cityCode: params.destinationId });
 
@@ -74,7 +75,8 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
         try {
             meiyaResult = JSON.parse(meiyaResult);
             if(meiyaResult.code == 0){
-                data.push(...meiyaResult.data);
+                flightData[sname] = meiyaResult.data;
+                // data.push(...meiyaResult.data);
                 // meiyaResult.data = data
             }else {
                 console.log(meiyaResult)
@@ -82,7 +84,7 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
         } catch (e) {
         }
     }
-        return data;
+        return flightData;
     // if (meiyaResult && meiyaResult.code == 0) {
     //     return meiyaResult.data;
     // } else {
@@ -93,7 +95,8 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
 export async function getMeiyaTrainData(params: ISearchTicketParams, authData: IMeiyaAuthData[]) {
     // let departure = await API.place.getCityInfo({ cityCode: params.originPlaceId });
     // let arrival = await API.place.getCityInfo({ cityCode: params.destinationId });
-    let data = []
+    // let data = []
+    let trainData: {[index: string]: Array<IMeiyaTrain>} = {};
     let meiyaParam = {
         depCity: params.originPlaceId,
         arrCity: params.destinationId,
@@ -119,7 +122,8 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
             try {
                 meiyaResult = JSON.parse(meiyaResult);
                 if(meiyaResult.code == 0){
-                    data.push(...meiyaResult.data);
+                    trainData[sname] = meiyaResult.data;
+                    // data.push(...meiyaResult.data);
                     // meiyaResult.data = data
                 }else{
                     console.log(meiyaResult)
@@ -128,7 +132,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
                 console.log(e)
             }
     }
-        return data
+        return trainData;
     // if (meiyaResult && meiyaResult.code == 0) {
     //     return meiyaResult.data;
     // } else {
@@ -140,7 +144,8 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
  * @method 匹配jlbudget酒店数据为基础，meiya不一定都有
  */
 export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IMeiyaAuthData[]) {
-    let data = [];
+    // let data = [];
+    let hotelData: {[index: string]: Array<IMeiyaHotel>} = {};
     // let destination = await API.place.getCityInfo({ cityCode: params.cityId });
     params.checkInDate = moment(params.checkInDate).format("YYYY-MM-DD");
     params.checkOutDate = moment(params.checkOutDate).format("YYYY-MM-DD");
@@ -165,7 +170,8 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
         try {
             meiyaResult = JSON.parse(meiyaResult);
             if(meiyaResult.code == 0){
-                data.push(...meiyaResult.data);
+                hotelData[sname] = meiyaResult.data;
+                // data.push(...meiyaResult.data);
                 // meiyaResult.data = data
             }else{
                 console.log(meiyaResult)
@@ -174,7 +180,7 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
             console.log(e)
         }
     }
-        return data
+        return hotelData;
     // if (meiyaResult && meiyaResult.code == 0) {
     //     return meiyaResult.data;
     // } else {
@@ -340,14 +346,16 @@ export function compareTrainData(origin: any[], meiyaData: IMeiyaTrain[]) {
 }
 
 //处理美亚酒店数据
-export function handelHotelsData(meiyaHotelData: IMeiyaHotel[], originalData: ISearchHotelParams) {
+export function handelHotelsData(meiyaHotelData: {[index: string]: Array<IMeiyaHotel>}, originalData: ISearchHotelParams) {
     let data: any[] = [];
     if (meiyaHotelData && meiyaHotelData.length) {
         let result: Array<any> = [];
         let handleData;
-        for (let item of meiyaHotelData) {
-            handleData = transferHotelData(item, originalData);
-            result.push(handleData)
+        for (let index in meiyaHotelData) {
+            for (let item of meiyaHotelData[index]) {
+                handleData = transferHotelData(index, item, originalData);
+                result.push(handleData)
+            }
         }
         data.push(...result);
         return data
@@ -356,7 +364,7 @@ export function handelHotelsData(meiyaHotelData: IMeiyaHotel[], originalData: IS
     }
 }
 
-function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHotelParams) {
+function transferHotelData(supplierName: string, meiyaHotelData: IMeiyaHotel, originalData: ISearchHotelParams) {
     let model = {
         "name": meiyaHotelData.cnName,
         "star": meiyaHotelData.starRating,
@@ -373,7 +381,7 @@ function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHot
             //     }
             // },
             {
-                "name": "meiya",
+                "name": supplierName,
                 "price": meiyaHotelData.hotelMinPrice,
                 "urlParams": {
                     "hotelId": meiyaHotelData.hotelId
@@ -392,14 +400,16 @@ function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHot
 }
 
 //处理美亚飞机数据
-export function handleFlightData(meiyaFlightData: IMeiyaFlight[], originalData: ISearchTicketParams) {
+export function handleFlightData(meiyaFlightData: {[index: string]:Array<IMeiyaFlight>}, originalData: ISearchTicketParams) {
     let data: any[] = [];
     if (meiyaFlightData && meiyaFlightData.length) {
         let result: Array<any> = [];
         let handleData;
-            for (let item of meiyaFlightData) {
-                handleData = transferFlightData(item, originalData)
-                result.push(handleData)
+            for (let index in meiyaFlightData) {
+                for(let item of meiyaFlightData[index]){
+                    handleData = transferFlightData(index, item, originalData)
+                    result.push(handleData)
+                }
             }
         data.push(...result);
         return data
@@ -408,7 +418,7 @@ export function handleFlightData(meiyaFlightData: IMeiyaFlight[], originalData: 
     }
 }
 
-function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearchTicketParams) {
+function transferFlightData(supplierName: string, meiyaFlightData: IMeiyaFlight, originalData: ISearchTicketParams) {
     let name;
        let cabins = meiyaFlightData.flightPriceInfoList.map((item)=>{
             switch (item.cabin){
@@ -477,7 +487,7 @@ function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearch
         "carry": meiyaFlightData.airline,
         "agents": [
             {
-                "name": "meiya",
+                "name": supplierName,
                 "cabins":cabins,
                 // "bookUrl": "http://m.ctrip.com/html5/flight/swift/domestic/SHA/CAN/2017-12-26",
                 "deeplinkData": {
@@ -507,14 +517,16 @@ function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearch
 }
 
 //处理美亚火车数据
-export function handleTrainData(meiyaTrainData: any[], originalData: ISearchTicketParams) {
+export function handleTrainData(meiyaTrainData: {[index:string]: Array<IMeiyaTrain>}, originalData: ISearchTicketParams) {
     let data: any[] = [];
     if (meiyaTrainData && meiyaTrainData.length) {
         let result: Array<any> = []
         let handleData;
-        for (let item of meiyaTrainData) {
-            handleData = transferTrainData(item, originalData)
-            result.push(handleData)
+        for (let index in meiyaTrainData) {
+            for (let item of meiyaTrainData[index]) {
+                handleData = transferTrainData(index, item, originalData)
+                result.push(handleData)
+            }
         }
         data.push(...result);
         return data
@@ -524,7 +536,7 @@ export function handleTrainData(meiyaTrainData: any[], originalData: ISearchTick
 }
 
 
-function transferTrainData(meiyaTrainData: IMeiyaTrain, originalData: ISearchTicketParams) {
+function transferTrainData(supplierName: string, meiyaTrainData: IMeiyaTrain, originalData: ISearchTicketParams) {
     let departDateTime = meiyaTrainData.StartTimeLong;
     let arrivalDateTime = meiyaTrainData.EndTimeLong;
     let cabins;
@@ -584,7 +596,7 @@ function transferTrainData(meiyaTrainData: IMeiyaTrain, originalData: ISearchTic
         "type": 0,
         "agents": [
             {
-                "name": "meiya",
+                "name": supplierName,
                 "cabins":cabins,
                 "other": {}
             }
