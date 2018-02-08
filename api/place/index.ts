@@ -32,7 +32,7 @@ export default class PlaceModule {
                 fields: {keyword: id, companyId: companyId}
             },
             addUrl: "search"
-        });
+        });    
         if(!city || !city.data) return null;
         if(_.isArray(city.data)){
             await cache.write(`${cityPrefix}:${id}`, JSON.stringify(city.data[0]));
@@ -49,9 +49,9 @@ export default class PlaceModule {
             model: `place`,
             params: {
                 method: 'GET',
-                fields: {}
+                fields: {keyword}
             },
-            addUrl: `search/${keyword}`
+            addUrl: `search`
         });
         if(!city || !city.data) return null;
         return city.data;
@@ -149,7 +149,7 @@ export default class PlaceModule {
                 method: 'GET',
                 fields: {}
             },
-            addUrl: 'search/'  //=等字符表示不设，用于匹配find的路径
+            addUrl: 'search'  //=等字符表示不设，用于匹配find的路径
         });
         if(!cities || !cities.data) return null;
         return cities.data;
@@ -157,21 +157,8 @@ export default class PlaceModule {
 
     @clientExport 
     static async queryCity(params: {keyword?: number|string, isAbroad: boolean, max?: number }){
-        // let {keyword, isAbroad, max} = params;  
-        // let query: {[index: string]: any} = {};
-        // query.isAbroad = isAbroad;
-        // query.limit = max;
-        // if(/[a-zA-Z0-9]+/.test(JSON.stringify(keyword))){
-        //     addUrl = `search/${keyword}`;
-        //     // query.letter = keyword;   //老版的place会调用common-api中的queryCity,只需要传一个keyword, 新版需要分开传
-        //     // query.pinyin = keyword;
-        // } else {
-            
-        // }
-        // query.keyword = keyword;
         let addUrl = 'search';
-
-        let cities = await  restfulAPIUtil.operateOnModel({
+        let cities = await restfulAPIUtil.operateOnModel({
             model: `place`,
             params: {
                 method: 'GET',
