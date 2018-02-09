@@ -333,7 +333,7 @@ class AgencyModule {
     }
 
     @clientExport
-    static async getAgencyOperateLog(params: {id: string}): Promise<AgencyOperateLog> {
+    static async getAgencyOperateLog(params: {id: string}): Promise<AgencyOperateLog|null> {
         let agencyUser = await AgencyUser.getCurrent();
         let {id} = params;
         let log = await Models.agencyOperateLog.get(id);

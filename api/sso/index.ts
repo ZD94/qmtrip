@@ -80,10 +80,10 @@ export default class SSOModule {
     async syncOrganization(accessToken?: string) {
         console.log("=======>同步企业通讯录开始")
         let self = this;
-        let corpId: string;
-        let agentId: string;
-        let company: Company;
-        let permanentCode: string;
+        let corpId: string = '';
+        let agentId: string = '';
+        let company: Company | undefined;
+        let permanentCode: string = '';
         let hasJLCloudNotified = true;
         let suiteToken: string = await SSOModule.getSuiteToken();
         let staff = await Staff.getCurrent();
@@ -118,15 +118,17 @@ export default class SSOModule {
         }
 
         if(!accessToken) {
-            accessToken = await this.getAccessToken(corpId, permanentCode, suiteToken);
+            accessToken = (await this.getAccessToken(corpId, permanentCode, suiteToken)) || '';
         }
 
         let restApi = new RestApi(accessToken);
-        let wCompany = new WCompany({ id: corpId, name: company.name, restApi, company: company, permanentCode: permanentCode, agentId: agentId});
-        await wCompany.saveCompanyProperty({companyId: company.id, permanentCode: permanentCode})
-        await wCompany.sync();
-        await wCompany.syncAdminRole(suiteToken); //同步企业管理员
-        await wCompany.setCompanyCreator();  //随机选中设置创建者
+        if (company) {
+            let wCompany = new WCompany({ id: corpId, name: company.name, restApi, company: company, permanentCode: permanentCode, agentId: agentId});
+            await wCompany.saveCompanyProperty({companyId: company.id, permanentCode: permanentCode})
+            await wCompany.sync();
+            await wCompany.syncAdminRole(suiteToken); //同步企业管理员
+            await wCompany.setCompanyCreator();  //随机选中设置创建者
+        }
 
         //向jlbudget同步
         if(!hasJLCloudNotified) {
@@ -177,8 +179,8 @@ export default class SSOModule {
      * @method 根据permanentCode获取已注册公司，获取初始化新公司
      * @param result 
      */
-    async initializeCompany(result: IWPermanentCode | any): Promise<{company: Company, corpId: string, permanentCode: string}> {
-        let permanentCode = result.permanentCode;
+    async initializeCompany(result: IWPermanentCode | any): Promise<{company: Company|undefined, corpId: string, permanentCode: string}> {
+        let permanentCode: string = result.permanentCode;
         if(!permanentCode)
             throw new Error("永久授权码不存在")
             // throw new error.ParamsNotValidError("永久授权码不存在");
@@ -188,8 +190,8 @@ export default class SSOModule {
                 type: CPropertyType.WECHAT_CORPID
             }
         })
-        let company: Company;
-        let corpId: string;
+        let company: Company | undefined;
+        let corpId: string = '';
        
         if(companyProperty && companyProperty.length) {
             company = await Models.company.get(companyProperty[0].companyId);
@@ -257,14 +259,14 @@ export default class SSOModule {
      * @param corpId
      * @return {string} 
      */
-    async getAccessToken(corpId: string, permanentCode: string, suiteToken: string): Promise<string>{
+    async getAccessToken(corpId: string, permanentCode: string, suiteToken: string): Promise<string|null>{
         let cacheKey = `wechat:contact:${corpId}:access_token`;  //企业通讯录的access_token
         let redisCache = new RedisCache();
         let cacheResult: {
             accessToken: string,
             expired: number
         } = await redisCache.get(cacheKey);
-        let accessToken: string;
+        let accessToken: string = '';
         if(cacheResult) accessToken = cacheResult.accessToken;
         if(!cacheResult || (Date.now() - cacheResult.expired > 0)) {
             let result = await RestApi.getAccessTokenByPermanentCode(corpId, permanentCode, suiteToken);
@@ -307,25 +309,6 @@ export default class SSOModule {
         return { data: await API.auth.makeAuthenticateToken(staff.accountId, 'corp_wechat'), corpId: usrInfo.CorpId }
     }
 
-
-    // @clientExport
-    // @requireParams(['corpId'])    
-    // static async getPermanentCodeByCorpId(params: { corpId: string }): Promise<{ corpId?: string, permanentCode: string, companyId?: string }> {
-
-    //    let {corpId} = params;
-    //     const companyProperties = await Models.companyProperty.find({
-    //         where: { type: CPropertyType.WECHAT_CORPID, value: corpId }
-    //     })
-    //     if (companyProperties.length < 1) throw new L.ERROR_CODE_C(404, '该企业尚未授权')
-
-    //     const companies = await Models.companyProperty.find({
-    //         where: { type: CPropertyType.WECHAT_PERMAENTCODE, companyId: companyProperties[0].companyId }
-    //     })
-    //     if(!companies || !companies.length) 
-    //         throw new Error("该永久授权码不存在鲸力系统中")
-    //     let permanentCode = companies[0].value;
-    //     return {corpId, permanentCode, companyId: companyProperties[0].companyId}
-    // }
 }
 
 SSOModule._scheduleTask();
@@ -357,7 +340,7 @@ async function receive(req: Request, res: Response) {
     })
 }
 
-async function dataCallback(req: Request, res: Response, next: NextFunction) {
+async function dataCallback(req: Request, res: Response, next?: NextFunction) {
     const { timestamp, nonce, msg_signature, echostr } = req.query
     if (req.method.toUpperCase() == 'GET') {
         if (msg_signature != crypto.getSignature(timestamp, nonce, echostr)) {
@@ -421,7 +404,7 @@ const workWechatEventHandlers = {
     // 授权变更事件
     async create_auth(xml: WorkWechatResponse) {
         await cache.write('create_auth',xml.AuthCode);
-        eventPush(xml.AuthCode);
+        xml.AuthCode && eventPush(xml.AuthCode);
     },
     async change_auth(xml: WorkWechatResponse) {
 

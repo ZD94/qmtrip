@@ -104,9 +104,9 @@ export class WStaff extends OaStaff {
      * @method 企业微信同一人在不同的公司，userid可能相同，存在姓名为userid的情况
      * @return {Staff}
      */
-    async getStaff(): Promise<Staff>{
+    async getStaff(): Promise<Staff | null>{
         let self = this;
-        let staff: Staff = null;
+        let staff: Staff | null = null;
         
         let staffPro = await Models.staffProperty.find({where : {value: self.id}});
         if(staffPro && staffPro.length > 0){
@@ -150,7 +150,7 @@ export class WStaff extends OaStaff {
             if(dept) return true;
             return false;
         })
-        if(!departments) return null;
+        if(!departments) return [];
         return departments;
     }
 
@@ -166,9 +166,9 @@ export class WStaff extends OaStaff {
             avatar: userInfo.avatar_mediaid});
         return oaStaff;
     }
-    async getCompany(): Promise<Company> {
+    async getCompany(): Promise<Company | undefined> {
         let self = this;
-        let company: Company;
+        let company: Company | undefined;
         /*let corps = await Models.ddtalkCorp.find({where: {corpId: self.corpId}});
         if(corps && corps.length){
             let corp = corps[0];

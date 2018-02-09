@@ -80,7 +80,7 @@ export class RestfulAPIUtil {
         let { params, model, addUrl = '', useProxy = true } = options;
         let { fields, method } = params;
         let currentCompanyId = fields['companyId'];
-        let companyToken: string;
+        let companyToken: string | null = null;
         let currentAgency: AgencyUser = await AgencyUser.getCurrent();
 
         if (!useProxy || currentAgency) {

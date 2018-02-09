@@ -370,7 +370,7 @@ class ApproveModule {
         data?: any,
         approveUser?: Staff,
         title?: string,
-        channel?: EApproveChannel,
+        channel: EApproveChannel,
         type?: EApproveType,
         isSpecialApprove?: boolean,
         specialApproveRemark?: string,

@@ -21,7 +21,7 @@ module.exports = function(app: Application) {
  * @param next
  * @returns {any}
  */
-async function costCredit(req: Request, res: Response, next: NextFunction) {
+async function costCredit(req: Request, res: Response, next?: NextFunction) {
     console.info("扣积分接口================");
     var params = req.query;
     var { uid, credits,appKey, description, orderNum, sign } = params;
@@ -86,7 +86,7 @@ async function costCredit(req: Request, res: Response, next: NextFunction) {
  * @param next
  * @returns {any}
  */
-async function resultNotice(req: Request, res: Response, next: NextFunction) {
+async function resultNotice(req: Request, res: Response, next?: NextFunction) {
     console.info("接收通知接口================");
     var params = req.query;
     var { appKey, success, errorMessage, orderNum, sign } = params;
@@ -167,7 +167,7 @@ async function resultNotice(req: Request, res: Response, next: NextFunction) {
  * @param next
  * @returns {any}
  */
-async function addCredit(req: Request, res: Response, next: NextFunction) {
+async function addCredit(req: Request, res: Response, next?: NextFunction) {
     var params = req.query;
     var { uid, credits,appKey, orderNum, sign } = params;
     var account = await Models.account.get(uid);

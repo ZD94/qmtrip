@@ -49,14 +49,13 @@ export class EventModule{
                 url = templateUrl(data);
                 console.info("url====>>>", url);
                 let method = eventListeners[0].method;
-                let qs = null;
+                let qs: object | null = null;
                 if (method.toLowerCase() != 'post') { 
                     qs = params;
-                    params = null;
                 }
                 let result = await request({
                     uri: `${url}`,
-                    body: params,
+                    body: null,
                     json:true,
                     method: `${method}`,
                     qs: qs

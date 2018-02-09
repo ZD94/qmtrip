@@ -33,7 +33,7 @@ export interface ISubmitNotifyParam{
 }
 
 async function tryReadFile(filename: string): Promise<string>{
-    let content: string = undefined;
+    let content: string = '';
     try{
         content = await fs.readFileAsync(filename);
     }catch(e){
@@ -148,12 +148,12 @@ class NotifyTemplate{
         if(!this.email)
             return;
         try {
-            let subject = this.email.title(data);
+            let subject = this.email.title ? this.email.title(data) : '';
             let context = Object.create(data);
             context.include = function(incname: string){
                 return includes[incname](context);
             };
-            let content = this.email.html(context);
+            let content = this.email.html ? this.email.html(context) : '';
 
             content = includes['email_frame.html']({content: content});
             let attachments = data.attachments || [];

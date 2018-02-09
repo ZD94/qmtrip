@@ -76,23 +76,24 @@ export default class CompanyModule {
         ['email', 'status', 'isValidateMobile', 'promoCode', 'referrerMobile', 'ldapUrl', 'ldapBaseDn'])
     static async registerCompany(params: {
         mobile: string, name: string, email?: string, userName: string,
-        pwd?: string, status?: number, isValidateMobile?: boolean, promoCode?: string,
+        pwd: string, status?: number, isValidateMobile?: boolean, promoCode?: string,
         referrerMobile?: string, ldapUrl?: string, ldapBaseDn?: string, ldapStaffRootDn?: string,
         ldapDepartmentRootDn?: string, ldapAdminPassword?: string, ldapAdminDn?: string
     }): Promise<any> {
         let session = getSession();
         let pwd = params.pwd;
         let defaultAgency = await Models.agency.find({ where: { email: C.default_agency.email } });//Agency.__defaultAgencyId;
-        let agencyId: string;
+        let agencyId: string | undefined;
         if (defaultAgency && defaultAgency.length == 1) {
             agencyId = defaultAgency[0].id;
         }
-        let domain = ""; //企业域名
+        let domain: string = ''; //企业域名
         if (params.email) {
-            domain = params.email.match(/.*\@(.*)/)[1];
+            let res = params.email.match(/.*\@(.*)/)
+            domain = res && res[1] || '';
         }
 
-        if (domain && domain != "" && params.email.indexOf(domain) == -1) {
+        if (domain && domain != "" && params.email && params.email.indexOf(domain) == -1) {
             throw { code: -6, msg: "邮箱格式不符合要求" };
         }
 
@@ -152,7 +153,7 @@ export default class CompanyModule {
         }
 
         await Promise.all([staff.save(), company.save(), department.save(), staffDepartment.save()]);
-        let promoCode: PromoCode;
+        let promoCode: PromoCode | undefined;
         if (params.promoCode) {
             promoCode = await company.doPromoCode({ code: params.promoCode });
         }
@@ -213,7 +214,7 @@ export default class CompanyModule {
      */
     @clientExport
     static async syncCompanyToJLCloud(company: Company, pwd: string, mobile?: string): Promise<boolean> {
-        let staff: Staff;
+        let staff: Staff | undefined;
         if(!mobile) {
             if(company.createUser)
                 staff = await Models.staff.get(company.createUser);
@@ -221,7 +222,7 @@ export default class CompanyModule {
                 mobile = staff.mobile;
             if(!mobile) {
                 let managers: Staff[] = await company.getManagers({withOwner: true})
-                if(!managers) mobile = null;
+                if(!managers) mobile = undefined;
                 for(let staff of managers) {
                     if(staff.mobile && staff.mobile != '') mobile = staff.mobile; 
                 }

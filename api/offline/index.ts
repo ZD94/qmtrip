@@ -104,7 +104,7 @@ export class OfflineClass {
     */
     async checkIdentity(param : CheckIdentityParam){
         let staffId = param.staffId;
-        let authResponse : AuthResponse = await checkTokenAuth( param );
+        let authResponse : AuthResponse|null = await checkTokenAuth( param );
         if(!authResponse){
             return null;
         }
@@ -202,7 +202,7 @@ export class OfflineClass {
 const offline = new OfflineClass();
 export default offline;
 
-async function offlineApprove(req: Request, res: Response, next: NextFunction){
+async function offlineApprove(req: Request, res: Response, next?: NextFunction){
     res.header('Access-Control-Allow-Origin', '*');
     /*req.clearTimeout();
     req.setTimeout( 60 * 1000 );*/

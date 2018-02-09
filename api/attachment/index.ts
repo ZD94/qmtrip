@@ -54,7 +54,7 @@ class ApiAttachment {
         var contentType = params.contentType;
         var id:string;
         let staff = await Staff.getCurrent();
-        let staffId = null;
+        let staffId = '';
         if(staff) staffId = staff.id;
 
         if (!content) {

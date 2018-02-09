@@ -15,9 +15,9 @@ var timeout = require('connect-timeout');
 import * as CLS from 'continuation-local-storage';
 let CLSNS = CLS.getNamespace('dnode-api-context');
 const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'Content-Type, auth, supplier, authstr, staffid, companyid, accountid'};
-function resetTimeout(req: Request, res: Response, next: NextFunction){
+function resetTimeout(req: Request, res: Response, next?: NextFunction){
     req['clearTimeout']();
-    next();
+    next && next();
 }
 
 class Privilege {
@@ -25,7 +25,7 @@ class Privilege {
 
     static __initHttpApp(app: Application) {
 
-        app.get('/privilege/:id/getBalance', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next: NextFunction) {
+        app.get('/privilege/:id/getBalance', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next?: NextFunction) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`获取企业余额id为空`)
@@ -49,7 +49,7 @@ class Privilege {
             });
         });
 
-        app.post('/privilege/:id/getBalanceRecords', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next: NextFunction) {
+        app.post('/privilege/:id/getBalanceRecords', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next?: NextFunction) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`获取企业资金变动记录id为空`)
@@ -81,7 +81,7 @@ class Privilege {
             });
         });
 
-        app.get('/privilege/:id/getCompanyScoreRatio', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next: NextFunction) {
+        app.get('/privilege/:id/getCompanyScoreRatio', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next?: NextFunction) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`获取企业奖励比例id为空`)
@@ -104,7 +104,7 @@ class Privilege {
             });
         });
 
-        app.post('/privilege/:id/setCompanyScoreRatio', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next: NextFunction) {
+        app.post('/privilege/:id/setCompanyScoreRatio', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next?: NextFunction) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`设置企业奖励比例id为空`);
@@ -131,7 +131,7 @@ class Privilege {
             });
         });
 
-        app.get('/privilege/:id/getCompanyScoreRatioChange', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next: NextFunction) {
+        app.get('/privilege/:id/getCompanyScoreRatioChange', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next?: NextFunction) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`获取企业奖励比例变动id为空`);
@@ -154,7 +154,7 @@ class Privilege {
             });
         });
 
-        app.get('/privilege/:id/getAllUnsettledRewardByStaff', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next: NextFunction) {
+        app.get('/privilege/:id/getAllUnsettledRewardByStaff', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next?: NextFunction) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`获取未结算奖励按照员工排名id为空`)
@@ -177,7 +177,7 @@ class Privilege {
             });
         });
 
-        app.get('/privilege/:id/getAllUnsettledRewardByTripplan', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next: NextFunction) {
+        app.get('/privilege/:id/getAllUnsettledRewardByTripplan', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next?: NextFunction) {
             let {id} = req.params;
             let result;
             try {
@@ -219,8 +219,8 @@ class Privilege {
         let coinAccountChanges:  CoinAccountChange[] = await Models.coinAccountChange.all({where: {coinAccountId: coinAccountId}});
         let dataDuringTheQueryDate: CoinAccountChange[] = [];
         
-        let checkFromDate: Date = null;
-        let checkToDate: Date = null;
+        let checkFromDate: Date | null = null;
+        let checkToDate: Date | null = null;
     
         if (queryDateData['beginDate']) {
             checkFromDate = queryDateData.beginDate;

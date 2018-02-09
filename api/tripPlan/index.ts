@@ -211,13 +211,13 @@ class TripPlanModule {
             params = JSON.parse(params);
         }
         let company: Company;
-        let companyCoinAccount: CoinAccount;
-        let staff: Staff;
-        let coinAccount: CoinAccount;
-        let coinAccountChange: CoinAccountChange;
-        let companyCoinAccountChange: CoinAccountChange;
-        let pointChange: PointChange;
-        let unSettledRewardTripPlan: TripPlan;
+        let companyCoinAccount: CoinAccount | undefined;
+        let staff: Staff | undefined;
+        let coinAccount: CoinAccount | undefined;
+        let coinAccountChange: CoinAccountChange | undefined;
+        let companyCoinAccountChange: CoinAccountChange | undefined;
+        let pointChange: PointChange | undefined;
+        let unSettledRewardTripPlan: TripPlan | undefined;
 
         try {
             await DB.transaction(async function (t) {
@@ -299,12 +299,12 @@ class TripPlanModule {
             })
             return true;
         } catch(err) {
-                await companyCoinAccount.reload();
-                await staff.reload();
-                await coinAccount.reload();
-                await coinAccountChange.reload();
-                await pointChange.reload();
-                await unSettledRewardTripPlan.reload();
+            companyCoinAccount && await companyCoinAccount.reload();
+            staff && await staff.reload();
+            coinAccount && await coinAccount.reload();
+            coinAccountChange && await coinAccountChange.reload();
+            pointChange && await pointChange.reload();
+            unSettledRewardTripPlan && await unSettledRewardTripPlan.reload();
                 throw err;
         };
     }
@@ -687,7 +687,7 @@ class TripPlanModule {
         if (audit != EAuditStatus.INVOICE_PASS && audit != EAuditStatus.INVOICE_NOT_PASS) {
             throw L.ERR.PERMISSION_DENY(); //代理商只能审核票据权限
         }
-        let invoice = await Models.tripDetailInvoice.get(params.invoiceId);
+        let invoice = await Models.tripDetailInvoice.get(params.invoiceId || '');
         //处理这张票据
         console.info("params.invoiceId==>>", params.invoiceId);
         invoice.status = audit == EAuditStatus.INVOICE_PASS ? EInvoiceStatus.AUDIT_PASS : EInvoiceStatus.AUDIT_FAIL;
@@ -1046,7 +1046,7 @@ class TripPlanModule {
                     await tripDetailInvoice.save()
                 }
 
-                let templateValue: { tripType: string }
+                let templateValue: { tripType: string } = { tripType: '' }
                 switch (tripDetail.type) {  //根据tripType生成相应的log
                     case ETripType.OUT_TRIP:
                         templateValue.tripType = '去程'
@@ -1240,7 +1240,7 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['name', 'companyId'], projectCols)
-    static async createProject(params: {name: string, companyId: string, code?: string}): Promise<Project> {
+    static async createProject(params: {name: string, companyId: string, code?: string}): Promise<Project | null> {
         let _projects = await Models.project.find({ where: { code: params.code, companyId: params.companyId } });
         if (_projects && _projects.length) {
             return null;
@@ -1870,7 +1870,7 @@ class TripPlanModule {
 
         let tripPlan = TripPlan.create({ id: approve.id });
         let arrivalCityCodes: any[] = [];//目的地代码
-        let project: Project;
+        let project: Project | undefined;
         let goBackPlace = query.goBackPlace;
         if (query.projectName) {
             project = await API.tripPlan.getProjectByName({
@@ -1908,13 +1908,13 @@ class TripPlanModule {
 
                 //处理其他数据
                 if (i == 0) {
-                    tripPlan.startAt = segment.leaveDate;
+                    tripPlan.startAt = segment.leaveDate || new Date();
                     //处理原始数据 用第一程数据
-                    tripPlan.isNeedTraffic = segment.isNeedTraffic;
-                    tripPlan.isNeedHotel = segment.isNeedHotel;
+                    tripPlan.isNeedTraffic = segment.isNeedTraffic || false;
+                    tripPlan.isNeedHotel = segment.isNeedHotel || false;
                 }
                 if (i == (destinationPlacesInfo.length - 1)) {
-                    tripPlan.backAt = segment.goBackDate;
+                    tripPlan.backAt = segment.goBackDate || new Date();
                 }
             }
         }
@@ -1925,7 +1925,7 @@ class TripPlanModule {
         }
         tripPlan.setCompany(account.company);
         tripPlan.auditUser = tryObjId(approveUser);
-        tripPlan.project = project;
+        tripPlan.project = project as Project;
         tripPlan.title = approve.title;//project名称
         tripPlan.account = account;
         tripPlan.status = EPlanStatus.WAIT_RESERVE;    
@@ -2188,7 +2188,7 @@ class TripPlanModule {
     }
 
     @clientExport
-    static async getTripPlanSave(params: { accountId?: string }) {
+    static async getTripPlanSave(params: { accountId: string }) {
         let staff = await Models.staff.get(params.accountId);
         let accountId = params.accountId;
         let companyId = staff.company.id;
@@ -2383,6 +2383,7 @@ class TripPlanModule {
                     return data;
                 });
             }
+            return []
         }))
         let financeCheckCode = Models.financeCheckCode.create({ tripPlanId: tripPlanId, isValid: true });
         financeCheckCode = await financeCheckCode.save();
@@ -3098,8 +3099,8 @@ async function updateTripPlanExpenditure(tripPlan: TripPlan) {
  */
 async function tryUpdateTripDetailStatus(tripDetail : TripDetail, status: ETripDetailStatus) :Promise<TripDetail> {
 
-    let auditStatus: EAuditStatus = null;
     let tripPlan = await Models.tripPlan.get(tripDetail["tripPlanId"]);
+    let auditStatus: EAuditStatus = tripPlan.auditStatus;
     switch(status) {
         case ETripDetailStatus.WAIT_UPLOAD:
             tripDetail.status = status;

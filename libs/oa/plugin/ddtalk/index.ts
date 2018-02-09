@@ -13,11 +13,11 @@ export class DDTalkPlugin extends AbstractOAPlugin {
         super();
     }
 
-    async createTripApproveFlow(params: createTripApproveParam): Promise<createTripApproveResult> {
+    async createTripApproveFlow(params: createTripApproveParam): Promise<createTripApproveResult|null> {
         return null;
     }
 
-    async createTripInvoiceAuditFlow(params: createTripInvoiceAuditFlowParam): Promise<createTripInvoiceAuditFlowResult> {
+    async createTripInvoiceAuditFlow(params: createTripInvoiceAuditFlowParam): Promise<createTripInvoiceAuditFlowResult|null> {
         return null;
     }
 }

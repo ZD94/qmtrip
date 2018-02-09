@@ -24,9 +24,9 @@ const corsOptions = {
     methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], 
     allowedHeaders: 'content-type, Content-Type, auth, supplier, authstr, staffid, companyid, accountid, isneedauth'
 } 
-function resetTimeout(req: Request, res: Response, next: NextFunction){
+function resetTimeout(req: Request, res: Response, next?: NextFunction){
     req['clearTimeout']();
-    next();
+    next && next();
 }
 class Proxy {
     /**
@@ -36,20 +36,20 @@ class Proxy {
      */
     static __initHttpApp(app: Application){
 
-        app.options(/^\/(order|travel|mall|supplier|bill|permission)*/, cors(corsOptions), (req: Request, res: Response, next: Function) => {         
+        app.options(/^\/(order|travel|mall|supplier|bill|permission)*/, cors(corsOptions), (req: Request, res: Response, next?: Function) => {         
             return res.sendStatus(200);
         })
 
         // verifyToken
 
-        app.all(/^\/travel.*$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: any, res: Response, next: Function) => {
+        app.all(/^\/travel.*$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: any, res: Response, next?: Function) => {
 
             //公有云验证
             // let staff: Staff = await Staff.getCurrent();
             let {staffid}  = req.headers;
             let staff: Staff = await Models.staff.get(staffid);
             let companyId: string = staff.company.id;
-            let companyToken: string = await getCompanyTokenByAgent(companyId);
+            let companyToken: string | null = await getCompanyTokenByAgent(companyId);
             if (!companyToken) {
                 throw new Error('换取 token 失败！');
             }
@@ -93,13 +93,13 @@ class Proxy {
         });
 
 
-        app.all(/^\/supplier.*$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: any, res: Response, next: Function) => {
+        app.all(/^\/supplier.*$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: any, res: Response, next?: Function) => {
 
             //公有云验证
             let {staffid}  = req.headers;
             let staff: Staff = await Models.staff.get(staffid);
             let companyId: string = staff.company.id;
-            let companyToken: string = await getCompanyTokenByAgent(companyId);
+            let companyToken: string | null = await getCompanyTokenByAgent(companyId);
             if (!companyToken) {
                 throw new Error('换取 token 失败！');
             }
@@ -147,7 +147,7 @@ class Proxy {
          *  2. app端根据staffid, 订单状态获取该员工的相应订单
          *  3. 中台根据companyid获取该公司所有订单
          */
-        app.all(/^\/order.*$/, cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function) => {
+        app.all(/^\/order.*$/, cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function) => {
             let staff: Staff = await Staff.getCurrent();
             let staffId = req.headers.staffid;
             let isNeedAuth = req.headers['isneedauth'] || '';
@@ -163,7 +163,7 @@ class Proxy {
                     tripDetailId = req.body.tripDetailId;
                 }
             }
-            let tripDetail: TripDetail;
+            let tripDetail: TripDetail | null = null;
             //若tripDetailId存在，为创、退、改相关订单请求封装特殊请求参数
             if(tripDetailId) {
                 tripDetail = await Models.tripDetail.get(tripDetailId)
@@ -275,7 +275,7 @@ class Proxy {
 
         });
         
-        app.all(/^\/mall.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
+        app.all(/^\/mall.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function)=> {
             let {staffid} = req.headers;
             let params =  req.body;
             if(req.method == 'GET') {
@@ -315,7 +315,7 @@ class Proxy {
         });
 
 
-        app.all(/^\/bill.*$/ ,cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
+        app.all(/^\/bill.*$/ ,cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function)=> {
     
             let {staffid} = req.headers;
             let params =  req.body;
@@ -355,7 +355,7 @@ class Proxy {
         });
 
         
-        app.all(/^\/permission.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
+        app.all(/^\/permission.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function)=> {
       
             let {staffid} = req.headers;
             let params =  req.body;
@@ -413,9 +413,9 @@ class Proxy {
 }
 export default Proxy;
 
-async function verify(req: Request, res: Response, next: Function) {
+async function verify(req: Request, res: Response, next?: Function) {
     if(req.method == 'OPTIONS') {
-        return next();
+        return next && next();
     }
     let {authstr, staffid} = req.headers;
     let token = parseAuthString(authstr);
@@ -432,7 +432,7 @@ async function verify(req: Request, res: Response, next: Function) {
     } catch(err) { 
         return res.sendStatus(401);
     }
-    next();
+    next && next();
 }
 var verifyToken = CLSNS.bind(verify, CLSNS.createContext())
 

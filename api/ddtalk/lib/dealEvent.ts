@@ -109,7 +109,7 @@ export async function getISVandCorp(corp : {corpId: string, permanentCode: strin
 }
 
 /* transpond */
-export function transpond(req: Request, res: Response, next: NextFunction, options?: {timeout: number, decorateRequest?: Function}, urls?:string){
+export function transpond(req: Request, res: Response, next?: NextFunction, options?: {timeout: number, decorateRequest?: Function}, urls?:string){
     let url = config.test_url.replace(/\/$/g, "");
     url = url + "/ddtalk/isv/receive";
     if(urls){
@@ -268,7 +268,7 @@ export async function suiteRelieve(msg: IMsg) {
 
         for(let c of comPros){
             if(c.type == CPropertyType.DD_PERMANENT_CODE){
-                c.value = null;
+                c.value = '';
                 await c.save();
             }
         }
@@ -295,7 +295,7 @@ export async function suiteRelieve(msg: IMsg) {
  */
 
 async function ddEventCommon(msg: IMsg){
-    let corpId = msg.CorpId;
+    let corpId = msg.CorpId || '';
 
     let comPro = await Models.companyProperty.find({where: {value: corpId, type: CPropertyType.DD_ID}});
     if (!comPro || !comPro.length) {
@@ -377,7 +377,7 @@ export async function orgDeptCreate(msg: IMsg) : Promise<void>{
     ddDeparts.map(async (item)=>{
         let oaDepartment = new DdDepartment({id: item, corpId: corpId, isvApi: isvApi, corpApi: corpApi, company: company});
         let ddDept = await oaDepartment.getSelfById();
-        await ddDept.sync();
+        ddDept && await ddDept.sync();
     });
 }
 

@@ -706,7 +706,7 @@ export function compareHotelData(origin: any[], meiyaData: any[]) {
         let isNearby = false;
         for (let meiya of meiyaData) {
             if (!meiya.cnName) continue;
-            let agentMeiya: { [index: string]: any };
+            let agentMeiya: { [index: string]: any } | undefined;
             if (item.latitude && item.longitude && meiya.latitude && meiya.longitude) { //若存在等于0等情况，此时精确度已超过允许范围，直接跳过模糊匹配      
                 let end = {latitude: meiya.latitude, longitude: meiya.longitude};
                 isNearby = haversine(start, end, {threshold: 3, unit: 'km'}); //距离不超过3km，return true
@@ -840,7 +840,7 @@ export function matchMeiyaHotel(origin: IHotel[], meiyaData: IMeiyaHotel[]) {
         checkOutDate = origin[0].checkOutDate;
 
     for (let meiya of meiyaData) {
-        if (names.indexOf(meiya.name) > -1) {
+        if (meiya.name && names.indexOf(meiya.name) > -1) {
             continue;
         }
 
@@ -864,7 +864,7 @@ export function matchMeiyaHotel(origin: IHotel[], meiyaData: IMeiyaHotel[]) {
             "distance": 2000
         }
         console.log("add one in meiya");
-        result.push(data);
+        result.push(data as IHotel);
     }
 
     console.log("matchMeiyaHotel matchMeiyaHotel matchMeiyaHotel===>", result.length)
@@ -906,7 +906,7 @@ export interface IMeiyaFlight {
     desAirport?: string;
     fAmount?: number;
     flightNo: string;
-    flightPriceInfoList?: Array<IMeiyaFlightPriceInfo>;
+    flightPriceInfoList: Array<IMeiyaFlightPriceInfo>;
     isCodeShare?: boolean;
     meal?: boolean;
     orgAirport?: string;

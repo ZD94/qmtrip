@@ -19,7 +19,7 @@ export default class ISVApi {
 
     async getCorpAccessToken() :Promise<CorpAccessToken> {
         let cacheKey = `${this.corpid}:access_token`;
-        let corpAccessToken = await this.corpTokenCache.get(cacheKey);
+        let corpAccessToken = this.corpTokenCache && await this.corpTokenCache.get(cacheKey);
         if (corpAccessToken) {
             //失效时间为创建时间+有效期+ 10秒
             if (Date.now() >= (corpAccessToken.expires_in * 1000 + corpAccessToken.create_at + 10 * 1000) ) {
@@ -47,13 +47,13 @@ export default class ISVApi {
             create_at: Date.now(),
         } as CorpAccessToken;
         //写入缓存
-        await this.corpTokenCache.set(cacheKey, corpAccessToken);
+        this.corpTokenCache && await this.corpTokenCache.set(cacheKey, corpAccessToken);
         return corpAccessToken;
     }
     
     async removeCorpAccessToken() :Promise<any> {
         let cacheKey = `${this.corpid}:access_token`;
-        this.corpTokenCache.remove(cacheKey);
+        this.corpTokenCache && this.corpTokenCache.remove(cacheKey);
     }
 
     async getCorpAuthInfo() {

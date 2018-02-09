@@ -611,7 +611,7 @@ class StaffModule{
         let data = xlsObj[1].data;
         await Promise.all(data.map(async function(item: never, index: number){
             let s = data[index];
-            let departments = [];
+            let departments: Department[] = [];
             let departmentPass = true;
             let staffObj: any = {name: s[0], mobile: s[1]+"", email: s[2]||'',sex: s[3]?((s[3] == '女') ? EGender.FEMALE : EGender.MALE) : null,
                 roleId: s[4] == '管理员' ? EStaffRole.ADMIN : EStaffRole.COMMON, travelPolicyId: travelPolicyMaps[s[5]]||'', companyId: companyId,
@@ -683,7 +683,7 @@ class StaffModule{
                         let _d = departmentNames[i];
                         if(_d.indexOf('/') != -1){
                             let dd = _d.split('/');
-                            let p_id = null;
+                            let p_id = '';
                             for(var j=0;j<dd.length;j++){
                                 let _dd = dd[j];
                                 if(j == 0){
@@ -1037,7 +1037,7 @@ class StaffModule{
         q4.status = -1;
 
         var count = params.count;
-        var dateArr = [];
+        var dateArr: string[] = [];
         for(var i=0; i< count; i++){
             var month = moment().subtract(i, 'months').format('YYYY-MM');
             dateArr.push(month);
@@ -1108,8 +1108,8 @@ class StaffModule{
         var endTime = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
         var changeNum = 0;
         var options: any = {};
-        var changeDate = [];
-        var changePoint = [];
+        var changeDate: string[] = [];
+        var changePoint: number[] = [];
         options.where = {staffId: staffId, createdAt: {$gte: startTime, $lte: endTime}};
         let result = await DB.models.PointChange.findAll(options)
         if(result && result.length > 0){
@@ -1321,7 +1321,7 @@ class StaffModule{
      */
     @requireParams(['accountId'])
     static async getInvoiceViewer (params: {accountId: string}){
-        var viewerId = [];
+        var viewerId: string[] = [];
         var id = params.accountId;
         let obj = await DB.models.Staff.findById(id)
         if(obj && obj.company.id){

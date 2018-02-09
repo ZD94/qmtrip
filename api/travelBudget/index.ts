@@ -204,8 +204,8 @@ export default class ApiTravelBudget {
 
     @clientExport
     static async getTrafficsData(params: ISearchTicketParams): Promise<any> {
-        let commonData = [];
-        let commonData2 = [];
+        let commonData: any[] = [];
+        let commonData2: any[] = [];
         // let result;
         // try {
         //     result = await RestfulAPIUtil.operateOnModel({
@@ -518,7 +518,7 @@ export default class ApiTravelBudget {
         //         return hotelBudget;
         //     }
 
-        return null;
+        return '';
 
     }
 
@@ -698,11 +698,11 @@ export default class ApiTravelBudget {
             params.staffList.push(staffId);
         }
         let count = params.staffList.length;
-        let staffs = [];
+        let staffs: {gender: number, policy: string}[] = [];
         for (let i = 0; i < count; i++) {
             let staff = params.staffList[i];
             let _staff = await Models.staff.get(staff);
-            let __staff: any = {
+            let __staff: {gender: number, policy: string} = {
                 gender: _staff.sex,
                 policy: 'domestic',
             };
@@ -716,16 +716,16 @@ export default class ApiTravelBudget {
         let projectId: string = '';
         let feeCollectedName = '';
         if (feeCollectedType == 0) {
-            departmentId = feeCollected;
+            departmentId = feeCollected || '';
             let department = await Models.department.get(departmentId);
             feeCollectedName = department.name;
 
         } else if (feeCollectedType == 1) {
-            projectId = feeCollected;
+            projectId = feeCollected || '';
             let project = await Models.project.get(projectId);
             feeCollectedName = project.name;
         }
-        let approveUser: Staff = params['approveUser'];
+        let approveUser: Staff | undefined = params['approveUser'];
 
         if (approveId) {
             let checkApprove = await Models.approve.get(approveId);
@@ -742,7 +742,7 @@ export default class ApiTravelBudget {
         if (!isIntoApprove) {  //判断是否是审批人查看审批单时进行的第二次拉取数据 
             //创建approve，获得approveId用于URL和更新
             approve = Approve.Create({
-                approveUser: params.approveUser.id,
+                approveUser: params.approveUser ? params.approveUser.id : '',
                 type: EApproveType.TRAVEL_BUDGET,
                 companyId: companyId,
                 staffList: params.staffList,
@@ -823,14 +823,14 @@ export default class ApiTravelBudget {
 
             //拿到预算后更新approve表
             if (!isIntoApprove && eachBudgetSegIsOk) {//判断是否是审批人查看审批单时进行的第二次拉取数据
-                let updateBudget = await Models.approve.get(approveId);
+                let updateBudget = await Models.approve.get(approveId || '');
                 // let submitter = await Staff.getCurrent();
                 let submitter = await Models.staff.get(staff.id);
                 updateBudget.submitter = submitter.id;
                 updateBudget.data = obj;
                 updateBudget.channel = submitter.company.oa;
                 updateBudget.type = EApproveType.TRAVEL_BUDGET;
-                updateBudget.approveUser = approveUser ? approveUser.id : null;
+                updateBudget.approveUser = approveUser ? approveUser.id : '';
                 updateBudget.staffList = obj.query.staffList;
                 updateBudget.budget = totalBudget;
                 updateBudget.step = budgetResult.step;
@@ -843,7 +843,7 @@ export default class ApiTravelBudget {
             if (budgetResult.step == 'FIN' && eachBudgetSegIsOk) {
                 console.log('updateBudget first time');
                 await ApiTravelBudget.updateBudget({
-                    approveId: approveId,
+                    approveId: approveId || '',
                     budgetResult: budgetResult,
                     isFinalFirstResponse: (isIntoApprove ? false : true)
                 });
@@ -870,7 +870,7 @@ export default class ApiTravelBudget {
 
     //获取公司信息
     static async getCompanyInfo(sname?:string, staffId?: string): Promise<any> {
-        let staff: Staff;
+        let staff: Staff | undefined;
         if(staffId) staff = await Models.staff.get(staffId);
         if(!staffId) {
             staff = await Staff.getCurrent(); 
@@ -1037,12 +1037,12 @@ export default class ApiTravelBudget {
 
     static __initHttpApp(app: Application) {
 
-        function _auth_middleware(req: Request, res: Response, next: NextFunction) {
+        function _auth_middleware(req: Request, res: Response, next?: NextFunction) {
             let key = req.query.key;
             if (!key || key != 'jingli2016') {
                 return res.send(403)
             }
-            next();
+            next && next();
         }
 
         app.get("/api/budgets", _auth_middleware, function (req, res, next) {

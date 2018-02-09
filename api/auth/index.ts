@@ -186,7 +186,7 @@ export default class ApiAuth {
             account.status = ACCOUNT_STATUS.ACTIVE;
         }
         account.isValidateEmail = true;
-        account.pwdToken = null;
+        account.pwdToken = '';
         await account.save();
         return true;
     }
@@ -201,7 +201,7 @@ export default class ApiAuth {
         var mobileOrEmail = params.email;
         var accountId = params.accountId;
         var account: Account;
-        let staff: Staff;
+        let staff: Staff|null = null;
         if(accountId) {
             staff = await Models.staff.get(accountId);
             account = await Models.account.get(staff.accountId, {notParent: true});
@@ -335,7 +335,7 @@ export default class ApiAuth {
         if(account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
             account.status = ACCOUNT_STATUS.ACTIVE;
         }
-        account.activeToken = null;
+        account.activeToken = '';
         account.isValidateEmail = true;
         account = await account.save()
         return account;
@@ -361,7 +361,7 @@ export default class ApiAuth {
             throw L.ERR.CODE_ERROR();
         }
         var accounts = await Models.account.find({where: {mobile: mobile}});
-        var account: Account;
+        var account: Account|undefined;
         if(accounts && accounts.length > 0) {
             account = accounts[0];
         }
@@ -983,8 +983,8 @@ export default class ApiAuth {
     }
 
     @clientExport
-    static async getAccountStatus(params: {id: string}): Promise<Account> {
-        let acc: Account;
+    static async getAccountStatus(params: {id: string}): Promise<Account|undefined> {
+        let acc: Account | undefined;
         let args: any = {attributes: ["status"]};
         args.where = {id: params.id};
         let result = await Models.account.find(args);
@@ -1028,7 +1028,7 @@ export default class ApiAuth {
         }
 
         if(data.pwd) {
-            var pwd = data.pwd;
+            var pwd: string | undefined;
             var password = data.pwd.toString();
             pwd = utils.md5(password);
             //throw L.ERR.PASSWORD_EMPTY();
@@ -1082,7 +1082,7 @@ export default class ApiAuth {
         }
 
         if(account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
-            return _sendActiveEmail(account.id, null, data.version)
+            return _sendActiveEmail(account.id, undefined, data.version)
                 .then(function() {
                     return account;
                 })
