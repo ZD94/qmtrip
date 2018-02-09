@@ -622,13 +622,25 @@ function transferTrainData(supplierName: string, meiyaTrainData: IMeiyaTrain, or
 /**
  * @method 根据指定的介质，进行比较，继而合并同类项
  * @param Data 
- * @param match {string} 指定相比较的项
+ * @param match {string} 指定相比较的项名
+ * @param mergeProperty {string} 指定需要合并属性名, 目前只支持该属性的值类型是数组类型
  */
-export function combineData(Data: Array<any>, match: string){
+export function combineData(Data: Array<any>, match: string, mergeProperty: string){
     for(let i = 0; i < Data.length; i++){
         for(let j = i+1; j < Data.length; j++) {
-            if(Data[i][match] == Data[j][match]){
-                Data[i]['agents'] = _.concat(Data[i]['agents'], Data[j]['agents']);
+            if(/[\u4e00-\u9fa5]/.test(Data[i][match]) && /[\u4e00-\u9fa5]/.test(Data[j][match])){  //包含中文使用相似度匹配
+                let isSame = similarityMatch({
+                    base: Data[i][match],
+                    target:Data[j][match],
+                    ignores: ['酒店', '旅店', '{}', '()']
+                });
+                if(isSame){
+                    Data[i]['agents'] = _.concat(Data[i][mergeProperty], Data[j][mergeProperty]);
+                    Data.splice(j,1);
+                    j--;
+                }
+            }else if(Data[i][match] == Data[j][match]){
+                Data[i]['agents'] = _.concat(Data[i][mergeProperty], Data[j][mergeProperty]);
                 Data.splice(j,1);
                 j--;
             }

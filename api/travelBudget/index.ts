@@ -192,9 +192,8 @@ export default class ApiTravelBudget {
             let meiyaHotel = await getMeiyaHotelData(params, authData);
             console.log("meiyaHotel ===> meiyaHotel data.", meiyaHotel.length)
             if (meiyaHotel){
-                // commonData = compareHotelData(commonData, meiyaHotel);
                 commonData = handelHotelsData(meiyaHotel, params);
-            // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".finallyHotel.json", commonData);
+                commonData = combineData(commonData, 'cnName', 'agents');
                 return commonData;
             }else { 
                 return []
@@ -258,11 +257,11 @@ export default class ApiTravelBudget {
             let meiyaFlight = arr[1];
             if (meiyaFlight) {
                 commonData = handleFlightData(meiyaFlight,params);
-                commonData = combineData(commonData, 'flightNo')
+                commonData = combineData(commonData, 'flightNo', 'agents')
             }    
             if (meiyaTrain){      
                 commonData2 = handleTrainData(meiyaTrain, params)
-                commonData2 = combineData(commonData2, 'TrainNumber')
+                commonData2 = combineData(commonData2, 'TrainNumber', 'agents')
             }        
             console.log("commonData ===> commonData data.", typeof (commonData));
             return [...commonData, ...commonData2];
