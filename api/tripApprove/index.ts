@@ -143,6 +143,7 @@ export default class TripApproveModule {
         tripApprove.status = totalBudget < 0 ? QMEApproveStatus.NO_BUDGET : approve.tripApproveStatus;
         tripApprove.staffList = approve.staffList;
         tripApprove.lockBudget = false;
+        tripApprove.startAt = approve.startAt;
 
         //自动审批关闭
         // if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
@@ -293,16 +294,12 @@ export default class TripApproveModule {
             //给审核人发审核邮件
             // let approveUser = await Models.staff.get(tripApprove['approveUserId']);
             let approveUserId = params.approveUserId || tripApprove.approveUserId;
-            let accountId = tripApprove.accountId;
-            let companyId = tripApprove.companyId;
-            let staff = Models.staff.all({where:{accountId: accountId, companyId: companyId}});
-            let staffName = staff[0].name;
 
             try {
                 await API.notify.submitNotify({
                     key: 'qm_notify_new_travelbudget',
                     userId: approveUserId,
-                    values: {tripApprove: tripApprove, staffName: staffName, detailUrl: shortUrl, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPLY_NOTICE}
+                    values: {tripApprove: tripApprove, detailUrl: shortUrl, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPLY_NOTICE}
                 });
             } catch(err) {
                 console.error('发送通知失败', err.stack ? err.stack : err);

@@ -11,7 +11,7 @@
     "declaration": true,
     "declarationDir": "JLTypes",
     "strict": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "strictNullChecks": false,

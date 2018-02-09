@@ -21,7 +21,14 @@ export class WorkWechatController extends AbstractController {
     async generateWxConfig(req: Request, res: JLResponse) {
         const { corpId, url } = req.body
         const suiteToken = await API['sso'].getSuiteToken()
-        const {permanentCode} = await API['sso'].getPermanentCodeByCorpId({ corpId })
+        let permanentCode: string;
+        try{
+            let result = await API['sso'].checkCompanyRegistered({ corpId });
+            permanentCode = result ? result.permanentCode: null;
+        } catch(err) {
+            return res.json(this.reply(500, null))
+        }
+        
         const result = await RestApi.getAccessTokenByPermanentCode(corpId, permanentCode, suiteToken)
         const ticket = await RestApi.getJsApiTicket(result && result.accessToken)
         const obj: WxConfigSignature = {

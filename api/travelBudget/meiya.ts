@@ -5,12 +5,14 @@ import {Staff} from "_types/staff";
 const API = require("@jingli/dnode-api");
 const config = require("@jingli/config");
 var haversine = require("haversine");
+const _ = require("lodash");
 import {ISearchHotelParams, ISearchTicketParams} from "./index";
 
 var request = require("request-promise");
 let moment = require("moment");
 import {MTrainLevel, MPlaneLevel} from "_types";
 import { IHotel, IFlightAgent } from '_types/travelbudget';
+
 
 /* 判断是否需要美亚数据 */
 export async function meiyaJudge() {
@@ -29,8 +31,8 @@ export async function meiyaJudge() {
 export function meiyaAuth(info?: object) {
     if (!info) {
         info = {
-            username: "JingLiZhiXiang",
-            password: "asdasdasdas"
+            username: "JLZX",
+            password: "my2018"
         };
     }
     let str = JSON.stringify(info);
@@ -40,7 +42,8 @@ export function meiyaAuth(info?: object) {
 
 /* 获取美亚数据 */
 export async function getMeiyaFlightData(params: ISearchTicketParams, authData: IMeiyaAuthData[]) {
-    let data: any[] = [];
+    // let data = [];
+    let flightData: {[index: string]: Array<IMeiyaFlight>} = {};
     // let departure = await API.place.getCityInfo({ cityCode: params.originPlaceId });
     // let arrival = await API.place.getCityInfo({ cityCode: params.destinationId });
 
@@ -74,7 +77,8 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
         try {
             meiyaResult = JSON.parse(meiyaResult);
             if(meiyaResult.code == 0){
-                data.push(...meiyaResult.data);
+                flightData[sname] = meiyaResult.data;
+                // data.push(...meiyaResult.data);
                 // meiyaResult.data = data
             }else {
                 console.log(meiyaResult)
@@ -82,7 +86,7 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
         } catch (e) {
         }
     }
-        return data;
+        return flightData;
     // if (meiyaResult && meiyaResult.code == 0) {
     //     return meiyaResult.data;
     // } else {
@@ -93,7 +97,8 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
 export async function getMeiyaTrainData(params: ISearchTicketParams, authData: IMeiyaAuthData[]) {
     // let departure = await API.place.getCityInfo({ cityCode: params.originPlaceId });
     // let arrival = await API.place.getCityInfo({ cityCode: params.destinationId });
-    let data: any[] = []
+    // let data = []
+    let trainData: {[index: string]: Array<IMeiyaTrain>} = {};
     let meiyaParam = {
         depCity: params.originPlaceId,
         arrCity: params.destinationId,
@@ -119,7 +124,8 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
             try {
                 meiyaResult = JSON.parse(meiyaResult);
                 if(meiyaResult.code == 0){
-                    data.push(...meiyaResult.data);
+                    trainData[sname] = meiyaResult.data;
+                    // data.push(...meiyaResult.data);
                     // meiyaResult.data = data
                 }else{
                     console.log(meiyaResult)
@@ -128,7 +134,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
                 console.log(e)
             }
     }
-        return data
+        return trainData;
     // if (meiyaResult && meiyaResult.code == 0) {
     //     return meiyaResult.data;
     // } else {
@@ -140,7 +146,8 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
  * @method 匹配jlbudget酒店数据为基础，meiya不一定都有
  */
 export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IMeiyaAuthData[]) {
-    let data: any[] = [];
+    // let data = [];
+    let hotelData: {[index: string]: Array<IMeiyaHotel>} = {};
     // let destination = await API.place.getCityInfo({ cityCode: params.cityId });
     params.checkInDate = moment(params.checkInDate).format("YYYY-MM-DD");
     params.checkOutDate = moment(params.checkOutDate).format("YYYY-MM-DD");
@@ -165,7 +172,8 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
         try {
             meiyaResult = JSON.parse(meiyaResult);
             if(meiyaResult.code == 0){
-                data.push(...meiyaResult.data);
+                hotelData[sname] = meiyaResult.data;
+                // data.push(...meiyaResult.data);
                 // meiyaResult.data = data
             }else{
                 console.log(meiyaResult)
@@ -174,7 +182,7 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
             console.log(e)
         }
     }
-        return data
+        return hotelData;
     // if (meiyaResult && meiyaResult.code == 0) {
     //     return meiyaResult.data;
     // } else {
@@ -193,7 +201,6 @@ export function writeData(filename: string, data: object) {
         console.log("数据记录结束 :", filename);
     });
 }
-
 
 /**
  * @method 匹配jlbudget飞机数据为基础，meiya不一定都有
@@ -340,14 +347,17 @@ export function compareTrainData(origin: any[], meiyaData: IMeiyaTrain[]) {
 }
 
 //处理美亚酒店数据
-export function handelHotelsData(meiyaHotelData: IMeiyaHotel[], originalData: ISearchHotelParams) {
+export function handelHotelsData(meiyaHotelData: {[index: string]: Array<IMeiyaHotel>}, originalData: ISearchHotelParams) {
     let data: any[] = [];
-    if (meiyaHotelData && meiyaHotelData.length) {
+    if (meiyaHotelData) {
         let result: Array<any> = [];
         let handleData;
-        for (let item of meiyaHotelData) {
-            handleData = transferHotelData(item, originalData);
-            result.push(handleData)
+        for (let index in meiyaHotelData) {
+            console.log(`供应商: ${index}: 酒店数据长度 ===> ${meiyaHotelData[index].length}`);
+            for (let item of meiyaHotelData[index]) {
+                handleData = transferHotelData(index, item, originalData);
+                result.push(handleData)
+            }
         }
         data.push(...result);
         return data
@@ -355,8 +365,27 @@ export function handelHotelsData(meiyaHotelData: IMeiyaHotel[], originalData: IS
         return data
     }
 }
+//坐标距离计算
+function getDistance(lat1: string, lng1: string, lat2: string, lng2: string) {
+    var dis = 0;
+    var radLat1 = toRadians(lat1);
+    var radLat2 = toRadians(lat2);
+    var deltaLat = radLat1 - radLat2;
+    var deltaLng = toRadians(lng1) - toRadians(lng2);
+    var dis = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(deltaLat / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(deltaLng / 2), 2)));
+    return dis * 6378137;
 
-function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHotelParams) {
+    function toRadians(d: string) {  return Number(d) * Math.PI / 180;}
+} 
+
+function transferHotelData(supplierName: string, meiyaHotelData: IMeiyaHotel, originalData: ISearchHotelParams): any {
+    let distance;
+    if(originalData.lat && originalData.lon){
+        distance = getDistance(meiyaHotelData.latitude,meiyaHotelData.longitude,originalData.lat,originalData.lon)
+        distance = Math.ceil(distance)
+    }else{
+        distance = null
+    }
     let model = {
         "name": meiyaHotelData.cnName,
         "star": meiyaHotelData.starRating,
@@ -373,7 +402,7 @@ function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHot
             //     }
             // },
             {
-                "name": "meiya",
+                "name": supplierName,
                 "price": meiyaHotelData.hotelMinPrice,
                 "urlParams": {
                     "hotelId": meiyaHotelData.hotelId
@@ -386,20 +415,23 @@ function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHot
         "checkInDate": originalData.checkInDate,
         "checkOutDate": originalData.checkOutDate,
         // "commentScore": 9.6,
-        "distance": 440
+        distance
     }
     return model
 }
 
 //处理美亚飞机数据
-export function handleFlightData(meiyaFlightData: IMeiyaFlight[], originalData: ISearchTicketParams) {
+export function handleFlightData(meiyaFlightData: {[index: string]:Array<IMeiyaFlight>}, originalData: ISearchTicketParams): any {
     let data: any[] = [];
-    if (meiyaFlightData && meiyaFlightData.length) {
+    if (meiyaFlightData) {
         let result: Array<any> = [];
         let handleData;
-            for (let item of meiyaFlightData) {
-                handleData = transferFlightData(item, originalData)
-                result.push(handleData)
+            for (let index in meiyaFlightData) {
+                console.log(`供应商: ${index}: 航班数据长度 ===> ${meiyaFlightData[index].length}`);
+                for(let item of meiyaFlightData[index]){
+                    handleData = transferFlightData(index, item, originalData)
+                    result.push(handleData)
+                }
             }
         data.push(...result);
         return data
@@ -408,8 +440,24 @@ export function handleFlightData(meiyaFlightData: IMeiyaFlight[], originalData: 
     }
 }
 
-function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearchTicketParams) {
+async function transferFlightData(supplierName: string, meiyaFlightData: IMeiyaFlight, originalData: ISearchTicketParams): Promise<any> {
     let name;
+    let stopItemList;
+    if( meiyaFlightData.stopNumber == 1){
+       let  urlStop = config.orderSysConfig.orderLink + "/tmc/stopItems/" + `${meiyaFlightData.flightNo}/${meiyaFlightData.depDate}`;
+       let  stopItem = await request({
+            url: urlStop,
+            method: "get",
+            json:true,
+            headers: {
+                auth: meiyaAuth(),
+                supplier: "meiya"
+            }
+        })
+        stopItemList = stopItem.data
+    }else{
+        stopItemList = []
+    }
        let cabins = meiyaFlightData.flightPriceInfoList.map((item)=>{
             switch (item.cabin){
                 case "经济舱":
@@ -433,6 +481,7 @@ function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearch
                 "discount": item.discount,
                 "cabin": item.cabin,
                 "seatNum":item.seatNum,
+                "refundChangeInfo":item.refundChangeInfo,
                 "urlParams": {
                     "No": meiyaFlightData.flightNo,
                     "priceId": item.priceID,
@@ -444,6 +493,7 @@ function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearch
     let deptDateTime = meiyaFlightData.depDate + " " + meiyaFlightData.depTime;
     let model = {
         "No": meiyaFlightData.flightNo,
+        stopItemList,
         "segs": [
             {
                 "base": {
@@ -474,10 +524,11 @@ function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearch
             }
         ],
         "type": 1,
+        "stopNumber":meiyaFlightData.stopNumber,
         "carry": meiyaFlightData.airline,
         "agents": [
             {
-                "name": "meiya",
+                "name": supplierName,
                 "cabins":cabins,
                 // "bookUrl": "http://m.ctrip.com/html5/flight/swift/domestic/SHA/CAN/2017-12-26",
                 "deeplinkData": {
@@ -507,14 +558,17 @@ function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: ISearch
 }
 
 //处理美亚火车数据
-export function handleTrainData(meiyaTrainData: any[], originalData: ISearchTicketParams) {
+export function handleTrainData(meiyaTrainData: {[index:string]: Array<IMeiyaTrain>}, originalData: ISearchTicketParams) {
     let data: any[] = [];
-    if (meiyaTrainData && meiyaTrainData.length) {
+    if (meiyaTrainData) {
         let result: Array<any> = []
         let handleData;
-        for (let item of meiyaTrainData) {
-            handleData = transferTrainData(item, originalData)
-            result.push(handleData)
+        for (let index in meiyaTrainData) {
+            console.log(`供应商: ${index}: 火车数据长度 ===> ${meiyaTrainData[index].length}`);
+            for (let item of meiyaTrainData[index]) {
+                handleData = transferTrainData(index, item, originalData)
+                result.push(handleData)
+            }
         }
         data.push(...result);
         return data
@@ -524,10 +578,10 @@ export function handleTrainData(meiyaTrainData: any[], originalData: ISearchTick
 }
 
 
-function transferTrainData(meiyaTrainData: IMeiyaTrain, originalData: ISearchTicketParams) {
+function transferTrainData(supplierName: string, meiyaTrainData: IMeiyaTrain, originalData: ISearchTicketParams) {
     let departDateTime = meiyaTrainData.StartTimeLong;
     let arrivalDateTime = meiyaTrainData.EndTimeLong;
-    let cabins;
+    let cabins: any[];
     if(meiyaTrainData.SeatList && meiyaTrainData.SeatList.length >= 1){
         cabins = meiyaTrainData.SeatList.map((item)=>{
             let name:any ;
@@ -584,7 +638,7 @@ function transferTrainData(meiyaTrainData: IMeiyaTrain, originalData: ISearchTic
         "type": 0,
         "agents": [
             {
-                "name": "meiya",
+                "name": supplierName,
                 "cabins":cabins,
                 "other": {}
             }
@@ -604,6 +658,35 @@ function transferTrainData(meiyaTrainData: IMeiyaTrain, originalData: ISearchTic
     return model
 }
 
+/**
+ * @method 根据指定的介质，进行比较，继而合并同类项
+ * @param Data 
+ * @param match {string} 指定相比较的项名
+ * @param mergeProperty {string} 指定需要合并属性名, 目前只支持该属性的值类型是数组类型
+ */
+export function combineData(Data: Array<any>, match: string, mergeProperty: string){
+    for(let i = 0; i < Data.length; i++){
+        for(let j = i+1; j < Data.length; j++) {
+            if(/[\u4e00-\u9fa5]/.test(Data[i][match]) && /[\u4e00-\u9fa5]/.test(Data[j][match])){  //包含中文使用相似度匹配
+                let isSame = similarityMatch({
+                    base: Data[i][match],
+                    target:Data[j][match],
+                    ignores: ['酒店', '旅店', '{}', '()']
+                });
+                if(isSame){
+                    Data[i][mergeProperty] = _.concat(Data[i][mergeProperty], Data[j][mergeProperty]);
+                    Data.splice(j,1);
+                    j--;
+                }
+            }else if(Data[i][match] === Data[j][match]){
+                Data[i][mergeProperty] = _.concat(Data[i][mergeProperty], Data[j][mergeProperty]);
+                Data.splice(j,1);
+                j--;
+            }
+        }
+    }
+    return Data;
+}
 
 /**
  * @method 酒店数据匹配，以meiya为基础数据

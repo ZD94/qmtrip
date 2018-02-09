@@ -25,7 +25,8 @@ import {
     handleTrainData,
     handleFlightData,
     handelHotelsData,
-    IMeiyaAuthData
+    IMeiyaAuthData,
+    combineData
 } from "./meiya";
 import {Application, Request, Response, NextFunction} from 'express';
 
@@ -100,6 +101,8 @@ export interface ISearchHotelParams {
     checkOutDate: string;
     cityId: string;
     travelPolicyId: string;
+    lat?:string;
+    lon?:string;
     location?: {
         latitude: number,
         longitude: number,
@@ -189,11 +192,9 @@ export default class ApiTravelBudget {
             return require("meiyaFake/finallyUsingHotel");
         } else {
             let meiyaHotel = await getMeiyaHotelData(params, authData);
-            console.log("meiyaHotel ===> meiyaHotel data.", meiyaHotel.length)
-            if (meiyaHotel && meiyaHotel.length != 0){
-                // commonData = compareHotelData(commonData, meiyaHotel);
+            if (meiyaHotel){
                 commonData = handelHotelsData(meiyaHotel, params);
-            // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".finallyHotel.json", commonData);
+                commonData = combineData(commonData, 'name', 'agents');
                 return commonData;
             }else { 
                 return []
@@ -232,7 +233,6 @@ export default class ApiTravelBudget {
             authData.push({identify, sname});
             return authData
         });
-
         // if (result.code == 0) {
         //     commonData = result.data.data;
         // }
@@ -255,15 +255,14 @@ export default class ApiTravelBudget {
             ]);
             let meiyaTrain = arr[0];
             let meiyaFlight = arr[1];
-            console.log("meiyaFlight ===> meiyaFlight data.", meiyaFlight.length);
-            console.log("meiyaTrain ===> meiyaTrain data.", meiyaTrain.length);
-            if (meiyaFlight && meiyaFlight.length)
-            //     commonData = compareFlightData(commonData, meiyaFlight);
+            if (meiyaFlight) {
                 commonData = handleFlightData(meiyaFlight,params);
-            if (meiyaTrain && meiyaTrain.length)
-            // commonData = compareTrainData(commonData, meiyaTrain);
-                 commonData2 = handleTrainData(meiyaTrain, params)
-            console.log("commonData ===> commonData data.", typeof (commonData));
+                commonData = combineData(commonData, 'No', 'agents')
+            }    
+            if (meiyaTrain){      
+                commonData2 = handleTrainData(meiyaTrain, params)
+                commonData2 = combineData(commonData2, 'No', 'agents')
+            }       
             return [...commonData, ...commonData2];
         }
     }
@@ -835,6 +834,7 @@ export default class ApiTravelBudget {
                 updateBudget.staffList = obj.query.staffList;
                 updateBudget.budget = totalBudget;
                 updateBudget.step = budgetResult.step;
+                updateBudget.startAt = obj.query.destinationPlacesInfo[0].leaveDate;
 
                 console.log("approveId =======>", updateBudget.id);
                 await updateBudget.save();
@@ -875,7 +875,8 @@ export default class ApiTravelBudget {
         if(!staffId) {
             staff = await Staff.getCurrent(); 
         }    
-        let companyId = staff && (staff.company ? staff.company.id : staff.companyId);
+        let companyId = staff && staff.company ? staff.company.id: staff.companyId;
+        // let companyId = "4a1f37e0-0a54-11e7-ad22-b1cccc4cc277";
         if(!companyId) throw L.ERR.HAS_NOT_BIND();
         let result;
         try {
@@ -1079,10 +1080,16 @@ export default class ApiTravelBudget {
 
 /* as ICreateBudgetAndApproveParamsNew; */
 // let param = {
-//     checkInDate: "2018-03-30",
-//     checkOutDate: "2018-03-31",
+//     checkInDate: "2018-02-21",
+//     checkOutDate: "2018-02-22",
 //     cityId: "1814905",
+//     lat:"29.560997000",
+//     lon:"106.583194000",
 //     travelPolicyId: "asdasdlkaldaklslkdka",
+
+//     // leaveDate: "2018-04-21",
+//     // originPlaceId: "CT_131",
+//     // destinationId: "CT_289",
 // }
 // setTimeout(async ()=>{
 //     console.log("test go go");
