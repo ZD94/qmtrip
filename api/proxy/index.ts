@@ -206,8 +206,9 @@ class Proxy {
                 }
                 identify = encodeURIComponent(identify);
             }
-            
-            let auth: string = (isNeedAuth == '1') ? authStr : identify;
+            identify = encodeURIComponent(identify);
+            let auth: string = (isNeedAuth == '1') ? authStr: identify;
+            // let auth : string = identify;
 
             let headers: {[index: string]: any} = {
                appid: config.orderSysConfig.appId,

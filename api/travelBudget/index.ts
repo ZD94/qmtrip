@@ -25,7 +25,8 @@ import {
     handleTrainData,
     handleFlightData,
     handelHotelsData,
-    IMeiyaAuthData
+    IMeiyaAuthData,
+    combineData
 } from "./meiya";
 import {Application, Request, Response, NextFunction} from 'express';
 
@@ -191,11 +192,9 @@ export default class ApiTravelBudget {
             return require("meiyaFake/finallyUsingHotel");
         } else {
             let meiyaHotel = await getMeiyaHotelData(params, authData);
-            console.log("meiyaHotel ===> meiyaHotel data.", meiyaHotel.length)
-            if (meiyaHotel && meiyaHotel.length != 0){
-                // commonData = compareHotelData(commonData, meiyaHotel);
+            if (meiyaHotel){
                 commonData = handelHotelsData(meiyaHotel, params);
-            // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".finallyHotel.json", commonData);
+                commonData = combineData(commonData, 'name', 'agents');
                 return commonData;
             }else { 
                 return []
@@ -256,15 +255,14 @@ export default class ApiTravelBudget {
             ]);
             let meiyaTrain = arr[0];
             let meiyaFlight = arr[1];
-            console.log("meiyaFlight ===> meiyaFlight data.", meiyaFlight.length);
-            console.log("meiyaTrain ===> meiyaTrain data.", meiyaTrain.length);
-            if (meiyaFlight && meiyaFlight.length)
-            //     commonData = compareFlightData(commonData, meiyaFlight);
-                commonData = await handleFlightData(meiyaFlight,params);
-            if (meiyaTrain && meiyaTrain.length)
-            // commonData = compareTrainData(commonData, meiyaTrain);
-                 commonData2 = handleTrainData(meiyaTrain, params)
-            console.log("commonData ===> commonData data.", typeof (commonData));
+            if (meiyaFlight) {
+                commonData = handleFlightData(meiyaFlight,params);
+                commonData = combineData(commonData, 'No', 'agents')
+            }    
+            if (meiyaTrain){      
+                commonData2 = handleTrainData(meiyaTrain, params)
+                commonData2 = combineData(commonData2, 'No', 'agents')
+            }       
             return [...commonData, ...commonData2];
         }
     }
@@ -836,6 +834,7 @@ export default class ApiTravelBudget {
                 updateBudget.staffList = obj.query.staffList;
                 updateBudget.budget = totalBudget;
                 updateBudget.step = budgetResult.step;
+                updateBudget.startAt = obj.query.destinationPlacesInfo[0].leaveDate;
 
                 console.log("approveId =======>", updateBudget.id);
                 await updateBudget.save();
