@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import { AbstractController, Restful, Router } from "@jingli/restful";
+import { AbstractController, Restful, Router, ReplyData } from "@jingli/restful";
 const API = require('@jingli/dnode-api');
 import { Request, Response, NextFunction } from 'express-serve-static-core';
 
@@ -49,7 +49,7 @@ export default class PlaceController extends AbstractController {
         return res.send(this.resp(result));
     }
 
-    resp(result: any) {
+    resp(result: any):ReplyData {
         return result.code === 0
             ? this.reply(0, result.data)
             : this.reply(result.code, null);

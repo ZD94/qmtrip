@@ -5,7 +5,7 @@ import {Models} from "_types";
 
 var subsidyTypeCols = Approve['$fieldnames'];
 @Restful()
-export class ApproveController extends AbstractModelController {
+export class ApproveController extends AbstractModelController<Approve> {
 
     constructor() {
         super(Models.approve, subsidyTypeCols);
