@@ -469,6 +469,7 @@ export async function handleFlightData(meiyaFlightData: IMeiyaFlight[], original
                 "discount": item.discount,
                 "cabin": item.cabin,
                 "seatNum":item.seatNum,
+                "refundChangeInfo":item.refundChangeInfo,
                 "urlParams": {
                     "No": meiyaFlightData.flightNo,
                     "priceId": item.priceID,
