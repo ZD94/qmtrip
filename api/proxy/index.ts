@@ -154,8 +154,9 @@ class Proxy {
             if(staffId && !staff) {
                 staff = await Models.staff.get(staffId);
             }
-            let {tripDetailId, authStr} = req.query;
-
+            let {tripDetailId} = req.query;
+            let {authStr} = req.body;
+           
             let listeningon: string;
             if(!tripDetailId || typeof tripDetailId == undefined){
                 if(req.body.tripDetailId) {
@@ -189,14 +190,21 @@ class Proxy {
             };
             let supplier =req.headers['supplier'] || 'meiya';
             let companyInfo: Array<ITMCSupplier>;
-            try{
-                companyInfo = await ApiTravelBudget.getCompanyInfo(supplier, staff.id);
-            }catch(err){ return res.json({code: 407, msg: "未绑定供应商", data: null}) }
-            
-            let identify: string|{username:string, password: string} = companyInfo && companyInfo.length ?companyInfo[0].identify: null;
-            if(!identify) return res.json({code: 407, msg: "未绑定供应商", data: null});
-            if (typeof identify == 'object') {
-                identify = JSON.stringify(identify);
+            let identify: any;
+   
+            if (isNeedAuth == '1') {
+                //no need to offer auth
+            } else {
+                try{
+                    companyInfo = await ApiTravelBudget.getCompanyInfo(supplier, staff.id);
+                }catch(err){ return res.json({code: 407, msg: "未绑定供应商", data: null}) }
+                
+                identify = companyInfo && companyInfo.length ?companyInfo[0].identify: null;
+                if(!identify) return res.json({code: 407, msg: "未绑定供应商1", data: null});
+                if (typeof identify == 'object') {
+                    identify = JSON.stringify(identify);
+                }
+                identify = encodeURIComponent(identify);
             }
             identify = encodeURIComponent(identify);
             let auth: string = (isNeedAuth == '1') ? authStr: identify;
