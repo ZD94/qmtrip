@@ -635,12 +635,12 @@ export function combineData(Data: Array<any>, match: string, mergeProperty: stri
                     ignores: ['酒店', '旅店', '{}', '()']
                 });
                 if(isSame){
-                    Data[i]['agents'] = _.concat(Data[i][mergeProperty], Data[j][mergeProperty]);
+                    Data[i][mergeProperty] = _.concat(Data[i][mergeProperty], Data[j][mergeProperty]);
                     Data.splice(j,1);
                     j--;
                 }
-            }else if(Data[i][match] == Data[j][match]){
-                Data[i]['agents'] = _.concat(Data[i][mergeProperty], Data[j][mergeProperty]);
+            }else if(Data[i][match] === Data[j][match]){
+                Data[i][mergeProperty] = _.concat(Data[i][mergeProperty], Data[j][mergeProperty]);
                 Data.splice(j,1);
                 j--;
             }
