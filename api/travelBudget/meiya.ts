@@ -629,7 +629,8 @@ export function combineData(Data: Array<any>, match: string){
         for(let j = i+1; j < Data.length; j++) {
             if(Data[i][match] == Data[j][match]){
                 Data[i]['agents'] = _.concat(Data[i]['agents'], Data[j]['agents']);
-                Data = Data.splice(j,1)
+                Data.splice(j,1);
+                j--;
             }
         }
     }

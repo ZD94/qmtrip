@@ -25,7 +25,8 @@ import {
     handleTrainData,
     handleFlightData,
     handelHotelsData,
-    IMeiyaAuthData
+    IMeiyaAuthData,
+    combineData
 } from "./meiya";
 import {Application, Request, Response, NextFunction} from 'express';
 
@@ -257,11 +258,11 @@ export default class ApiTravelBudget {
             let meiyaFlight = arr[1];
             if (meiyaFlight) {
                 commonData = handleFlightData(meiyaFlight,params);
-                // commonData = compareFlightData(commonData, meiyaFlight);
+                commonData = combineData(commonData, 'flightNo')
             }    
             if (meiyaTrain){      
                 commonData2 = handleTrainData(meiyaTrain, params)
-                // commonData = compareTrainData(commonData, meiyaTrain);
+                commonData2 = combineData(commonData2, 'TrainNumber')
             }        
             console.log("commonData ===> commonData data.", typeof (commonData));
             return [...commonData, ...commonData2];
