@@ -11,9 +11,9 @@ let C = require("@jingli/config");
 
 export abstract class OaCompany{
     constructor(public target: any){
-        this.type = target.type;
+        // this.type = target.type;
     }
-    private type: string;
+    // private type: string;
     abstract get id();
     abstract set id(val: string);
 
@@ -21,7 +21,7 @@ export abstract class OaCompany{
     abstract set name(val: string);
 
     abstract async getDepartments(): Promise<OaDepartment[]>;
-    abstract async getRootDepartment(): Promise<OaDepartment|undefined>;
+    abstract async getRootDepartment(): Promise<OaDepartment|null>;
     abstract async getCreateUser(): Promise<OaStaff | null>;
     abstract async saveCompanyProperty(params: {companyId: string}): Promise<boolean>;
 

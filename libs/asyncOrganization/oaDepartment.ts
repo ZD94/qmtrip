@@ -36,7 +36,7 @@ export abstract class OaDepartment{
 
     async getDepartment(): Promise<Department|null>{
         let self = this;
-        let department: Department|null = null;
+        let department: Department | null = null
         if(typeof self.id != 'string')
             self.id = self.id + '';
         let deptPro = await Models.departmentProperty.find({where : {value: self.id}});
@@ -88,7 +88,7 @@ export abstract class OaDepartment{
 
         let defaultDepartment = await company.getDefaultDepartment();
         
-        let parentDepartment: Department | null;    //极端情况：parentDepartment 记录根部门的上级，若不存在，则为本系统的默认部门
+        let parentDepartment: Department | undefined;    //极端情况：parentDepartment 记录根部门的上级，若不存在，则为本系统的默认部门
 
         let oaParent = await self.getParent();
 
@@ -165,7 +165,7 @@ export abstract class OaDepartment{
                             await item.save();
 
                             let deleteAccount = await Models.account.get(item.accountId);
-                            await deleteAccount.destroy();
+                            deleteAccount && await deleteAccount.destroy();
 
                             await item.deleteStaffDepartments();
                         }catch (e){

@@ -42,8 +42,8 @@ export interface regTripInvoiceAuditUpdateCbParam {
 }
 
 export interface IOAPlugin {
-    $createTripApproveFlow(params: createTripApproveParam): Promise<createTripApproveResult>;
-    $createTripInvoiceAuditFlow(params: createTripInvoiceAuditFlowParam):Promise<createTripInvoiceAuditFlowResult>;
+    $createTripApproveFlow(params: createTripApproveParam): Promise<createTripApproveResult|null>;
+    $createTripInvoiceAuditFlow(params: createTripInvoiceAuditFlowParam):Promise<createTripInvoiceAuditFlowResult|null>;
     tripApproveFail(params: {approveId: string, reason: string}): Promise<void>;
 }
 
@@ -51,11 +51,11 @@ export abstract class AbstractOAPlugin implements IOAPlugin {
     constructor() {
     }
 
-    $createTripApproveFlow(params: createTripApproveParam): Promise<createTripApproveResult> {
+    $createTripApproveFlow(params: createTripApproveParam): Promise<createTripApproveResult|null> {
         return this.createTripApproveFlow(params);
     }
 
-    $createTripInvoiceAuditFlow(params: createTripInvoiceAuditFlowParam) :Promise<createTripInvoiceAuditFlowResult> {
+    $createTripInvoiceAuditFlow(params: createTripInvoiceAuditFlowParam) :Promise<createTripInvoiceAuditFlowResult|null> {
         return this.createTripInvoiceAuditFlow(params);
     }
 
@@ -76,8 +76,8 @@ export abstract class AbstractOAPlugin implements IOAPlugin {
     async tripApproveFail(params: {approveId: string, reason?: string}) {
     }
     
-    abstract createTripApproveFlow(params:createTripApproveParam):Promise<createTripApproveResult>;
-    abstract createTripInvoiceAuditFlow(params:createTripInvoiceAuditFlowParam):Promise<createTripInvoiceAuditFlowResult>;
+    abstract createTripApproveFlow(params:createTripApproveParam):Promise<createTripApproveResult|null>;
+    abstract createTripInvoiceAuditFlow(params:createTripInvoiceAuditFlowParam):Promise<createTripInvoiceAuditFlowResult|null>;
 }
 
 export * from './qm';

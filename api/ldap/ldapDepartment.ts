@@ -64,7 +64,7 @@ export default class LdapDepartment extends OaDepartment {
         this.target.dn = val;
     }
 
-    async getSelfById(): Promise<OaDepartment|null> {
+    async getSelfById(): Promise<OaDepartment | null> {
         let self = this;
         let result = await this.getSelfEntry();
         if(result){

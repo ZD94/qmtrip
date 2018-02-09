@@ -48,7 +48,7 @@ export  abstract class OaStaff{
 
     async getStaff(): Promise<Staff|null>{
         let self = this;
-        let staff: Staff|null = null;
+        let staff: Staff|null = null
         let staffPro = await Models.staffProperty.find({where : {value: self.id}});
         if(staffPro && staffPro.length > 0){
             staff = await Models.staff.get(staffPro[0].staffId);
@@ -66,7 +66,7 @@ export  abstract class OaStaff{
             await staff.save();
 
             let deleteAccount = await Models.account.get(staff.accountId);
-            await deleteAccount.destroy();
+            deleteAccount && await deleteAccount.destroy();
 
             await staff.deleteStaffDepartments();
         }
@@ -144,11 +144,11 @@ export  abstract class OaStaff{
             if(self.isAdmin) roleId = EStaffRole.ADMIN;
             if(!alreadyStaff){
 
-                if((self.mobile && type == CPropertyType.LDAP && companyCreateUser.mobile == self.mobile) ||
-                    (type == CPropertyType.WANGXIN_ID && companyCreateUser.mobile == self.mobile)){
+                if(companyCreateUser && ((self.mobile && type == CPropertyType.LDAP && companyCreateUser.mobile == self.mobile) ||
+                    (type == CPropertyType.WANGXIN_ID && companyCreateUser.mobile == self.mobile))){
 
                     alreadyStaff = companyCreateUser;
-                    await self.saveStaffProperty({staffId: alreadyStaff.id});
+                    await self.saveStaffProperty({staffId: alreadyStaff ? alreadyStaff.id : ""});
                 } else{
                     // 不存在，添加
                     let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd), avatar: self.avatar});
