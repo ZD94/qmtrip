@@ -143,6 +143,7 @@ export default class TripApproveModule {
         tripApprove.status = totalBudget < 0 ? QMEApproveStatus.NO_BUDGET : approve.tripApproveStatus;
         tripApprove.staffList = approve.staffList;
         tripApprove.lockBudget = false;
+        tripApprove.startAt = approve.startAt;
 
         //自动审批关闭
         // if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
