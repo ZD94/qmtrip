@@ -64,7 +64,7 @@ export default class LdapDepartment extends OaDepartment {
         this.target.dn = val;
     }
 
-    async getSelfById(): Promise<OaDepartment> {
+    async getSelfById(): Promise<OaDepartment|null> {
         let self = this;
         let result = await this.getSelfEntry();
         if(result){
@@ -90,7 +90,7 @@ export default class LdapDepartment extends OaDepartment {
         return returnResult;
     }
 
-    async getParent(): Promise<OaDepartment> {
+    async getParent(): Promise<OaDepartment|null> {
         let self = this;
         let parentDn = await this.ldapApi.getParentDn({dn: this.dn});
         let opts = {
@@ -154,7 +154,7 @@ export default class LdapDepartment extends OaDepartment {
         return true;
     }
 
-    async getDepartmentProperty(params: {departmentId: string}): Promise<DepartmentProperty> {
+    async getDepartmentProperty(params: {departmentId: string}): Promise<DepartmentProperty|null> {
         let departmentUuidProperty = await Models.departmentProperty.find({where: {departmentId: params.departmentId, type: DPropertyType.LDAP_UUID}});
         if(departmentUuidProperty && departmentUuidProperty.length > 0){
             return departmentUuidProperty[0];

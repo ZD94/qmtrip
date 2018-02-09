@@ -144,7 +144,7 @@ export class LdapModule {
         if(staffs.total == 0) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
         }
-        let loginStaff: Staff;
+        let loginStaff: Staff|undefined;
         for(let s in staffs){
             let item = staffs[s];
             if(item.company.id == company.id){
@@ -153,7 +153,7 @@ export class LdapModule {
             }
         }
 
-        let staffProperty = await Models.staffProperty.find({where: {staffId: loginStaff.id, type: SPropertyType.LDAP_DN}});
+        let staffProperty = await Models.staffProperty.find({where: {staffId: loginStaff && loginStaff.id, type: SPropertyType.LDAP_DN}});
         if(staffProperty.total == 0) {
             throw L.ERR.INVALID_ARGUMENT("ldap相关设置");
         }
@@ -168,7 +168,7 @@ export class LdapModule {
             }
         }
 
-        let departments = await loginStaff.getDepartments();
+        let departments: Department[] = loginStaff ? await loginStaff.getDepartments() : [];
         await Promise.all(departments.map(async (item) => {
             await syncData.syncOrganization({company: company, department: item});
         }));
@@ -198,7 +198,7 @@ export class LdapModule {
             throw L.ERR.PERMISSION_DENY();
         }
         let company = current.company;
-        let department: Department;
+        let department: Department | undefined;
         if(params)
             department = params.department;
         await syncData.syncOrganization({company: company, department: department});

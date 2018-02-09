@@ -97,7 +97,7 @@ export async function saveOrUpdateOpenId(params: {code: string}) {
  * 获取数据库中openId关联的accountId
  * @type {getAccountIdByOpenId}
  */
-export async function getAccountIdByOpenId(params: {openId: string}): Promise<string> {
+export async function getAccountIdByOpenId(params: {openId: string}): Promise<string|null> {
     let list = await Models.token.find({where: {token: params.openId, type:'wx_openid'}});
 
     if(!list || list.length <= 0) {
@@ -112,7 +112,7 @@ export async function getAccountIdByOpenId(params: {openId: string}): Promise<st
  * 获取数据库中accountId关联的openId
  * @type {getOpenIdByAccount}
  */
-export async function getOpenIdByAccount(params: {accountId: string}): Promise<string> {
+export async function getOpenIdByAccount(params: {accountId: string}): Promise<string|null> {
     let list = await Models.token.find({where: {accountId: params.accountId, type:'wx_openid'}});
 
     if(!list || list.length <= 0) {

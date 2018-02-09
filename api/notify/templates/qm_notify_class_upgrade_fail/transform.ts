@@ -8,7 +8,7 @@ export = async function transform(values: any): Promise<any>{
 
     let detailUrl;
     let appMessageUrl: string;
-    let shortUrl: string;
+    let shortUrl: string = '';
     if(config.version == 2) {
         detailUrl = config.v2_host + '#/card-coupons/card-coupons';
         appMessageUrl = '#/card-coupons/card-coupons';

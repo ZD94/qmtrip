@@ -45,7 +45,6 @@ export = async function transform(values: {
 
     }
     if(!values.tripApprove || !values.tripApprove.id){
-        values.tripApprove = null
         return values;
     }
     if(!companyId){

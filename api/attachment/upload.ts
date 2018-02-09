@@ -34,7 +34,7 @@ async function fs_exists(file: string): Promise<boolean>{
     }
 }
 
-async function uploadActionFile(req: any, res: Response, next: NextFunction) {
+async function uploadActionFile(req: any, res: Response) {
     console.info("uploadActionFile===========");
     req.clearTimeout();
     var filePath;
@@ -102,7 +102,7 @@ function signFileId(fileid: string, expirttime: number) {
     return md5(str);
 }
 
-async function getTmpAttachment(req: any, res: Response, next: NextFunction) {
+async function getTmpAttachment(req: any, res: Response, next?: NextFunction): Promise<any> {
     logger.info("call getTmpAttachment===>");
     req.clearTimeout();
     let {fileId } = req.params;
@@ -144,7 +144,7 @@ module.exports = function(app: Application) {
         timeout: 180000,
     }));*/
     app.post(url, cors(corsOptions), uploadActionFile);
-    app.options(url, cors(corsOptions), function (req: Request, res: Response, next: NextFunction) {
+    app.options(url, cors(corsOptions), function (req: Request, res: Response) {
         res.header('Access-Control-Allow-Origin', "*");
         res.header('Access-Control-Allow-Credentials', 'true');
         res.sendStatus(200);
@@ -175,11 +175,11 @@ module.exports = function(app: Application) {
  * @returns {*}
  */
 let pwd = process.cwd();
-async function getPublicFile(req: Request, res: Response, next: NextFunction) {
+async function getPublicFile(req: Request, res: Response, next?: NextFunction) {
     // req.clearTimeout();
     var cacheFile = await API.attachment.getFileCache({id:req.params.id, isPublic:true});
     if(!cacheFile) {
-        return next(404);
+        return next && next(404);
     }
     res.set("Content-Type", cacheFile.type);
     let file = cacheFile.file;
@@ -190,7 +190,7 @@ async function getPublicFile(req: Request, res: Response, next: NextFunction) {
         fs.exists(file, resolve);
     });
     if (!isExist) {
-        return next(404);
+        return next && next(404);
     }
     return res.sendFile(file);
 }

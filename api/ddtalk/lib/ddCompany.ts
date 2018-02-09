@@ -52,7 +52,7 @@ export default class DdCompany extends OaCompany {
     async getDepartments(): Promise<OaDepartment[]> {
         let self = this;
         let DDdepartments = await self.corpApi.getDepartments();
-        let result: OaDepartment[];
+        let result: OaDepartment[] = [];
         DDdepartments.forEach((item) => {
             let ddDept = new DdDepartment({name: item.name, parentId: item.parentid, id: item.id, isvApi: self.isvApi,
                 corpApi: self.corpApi, corpId: self.id});
@@ -61,10 +61,10 @@ export default class DdCompany extends OaCompany {
         return result;
     }
 
-    async getRootDepartment(): Promise<OaDepartment> {
+    async getRootDepartment(): Promise<OaDepartment|undefined> {
         let self = this;
         let DDdepartments = await self.corpApi.getDepartments();
-        let result: OaDepartment;
+        let result: OaDepartment | undefined;
         DDdepartments.forEach((item) => {
             if(item.id == 1){
                 result = new DdDepartment({name: item.name, parentId: null, id: item.id, isvApi: self.isvApi,
@@ -106,9 +106,9 @@ export default class DdCompany extends OaCompany {
         return true;
     }
 
-    async getCompany(): Promise<Company>{
+    async getCompany(): Promise<Company|null>{
         let self = this;
-        let com: Company = null;
+        let com: Company | null = null;
 
         let companyPro = await Models.companyProperty.find({where : {value: self.id, type: CPropertyType.DD_ID}});
         if(companyPro && companyPro.length > 0){

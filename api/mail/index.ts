@@ -131,7 +131,7 @@ function send (options: {from: string, to: string, subject: string, text?: strin
     var subject = options.subject;
     var text = options.text || options.html;
     var html = options.html;
-    let attachments: EmailAttachment[]
+    let attachments: EmailAttachment[] = []
     var transporter = nodemailer.createTransport(C.mail);
 
     if (typeof options.attachments == 'string') {
@@ -223,8 +223,8 @@ export class Mail{
 
         var reg = /(http:\/\/[a-zA-Z0-9#_\-\/\.&\?=:@]+)/g;
         var groups;
-        var urls = [];
-        var shortUrls = [];
+        var urls: string[] = [];
+        var shortUrls: string[] = [];
         //找出所有需要转换的超链接
         do{
             groups = reg.exec(html);
@@ -250,7 +250,7 @@ export class Mail{
         let submitObj = EmailSubmit.Create(submit);
         await submitObj.save();
 
-        var promises = [];
+        var promises: EmailQueue[] = [];
         for(var i=0, ll: number =emails.length; i<ll; i++) {
             var queue = {id: uuid.v1(), emailQueueId: submit.id, toUser: emails[i], maxSendTimes: 1};
             let emailQueueObj = EmailQueue.Create(queue);
@@ -286,7 +286,7 @@ export class Mail{
         let submitObj = EmailSubmit.Create(submit);
         await submitObj.save();
 
-        var promises = [];
+        var promises: EmailQueue[] = [];
         for(var i=0, ii=emails.length; i<ii; i++) {
             var queue = {id: uuid.v1(), emailSubmitId: submit.id, toUser: emails[i], maxSendTime: 1};
             let emailQueue = EmailQueue.Create(queue);

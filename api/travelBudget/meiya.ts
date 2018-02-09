@@ -40,7 +40,7 @@ export function meiyaAuth(info?: object) {
 
 /* 获取美亚数据 */
 export async function getMeiyaFlightData(params: ISearchTicketParams, authData: IMeiyaAuthData[]) {
-    let data = [];
+    let data: any[] = [];
     // let departure = await API.place.getCityInfo({ cityCode: params.originPlaceId });
     // let arrival = await API.place.getCityInfo({ cityCode: params.destinationId });
 
@@ -93,7 +93,7 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
 export async function getMeiyaTrainData(params: ISearchTicketParams, authData: IMeiyaAuthData[]) {
     // let departure = await API.place.getCityInfo({ cityCode: params.originPlaceId });
     // let arrival = await API.place.getCityInfo({ cityCode: params.destinationId });
-    let data = []
+    let data: any[] = []
     let meiyaParam = {
         depCity: params.originPlaceId,
         arrCity: params.destinationId,
@@ -140,7 +140,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
  * @method 匹配jlbudget酒店数据为基础，meiya不一定都有
  */
 export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IMeiyaAuthData[]) {
-    let data = [];
+    let data: any[] = [];
     // let destination = await API.place.getCityInfo({ cityCode: params.cityId });
     params.checkInDate = moment(params.checkInDate).format("YYYY-MM-DD");
     params.checkOutDate = moment(params.checkOutDate).format("YYYY-MM-DD");
@@ -623,7 +623,7 @@ export function compareHotelData(origin: any[], meiyaData: any[]) {
         let isNearby = false;
         for (let meiya of meiyaData) {
             if (!meiya.cnName) continue;
-            let agentMeiya: { [index: string]: any };
+            let agentMeiya: { [index: string]: any } | undefined;
             if (item.latitude && item.longitude && meiya.latitude && meiya.longitude) { //若存在等于0等情况，此时精确度已超过允许范围，直接跳过模糊匹配      
                 let end = {latitude: meiya.latitude, longitude: meiya.longitude};
                 isNearby = haversine(start, end, {threshold: 3, unit: 'km'}); //距离不超过3km，return true
@@ -757,7 +757,7 @@ export function matchMeiyaHotel(origin: IHotel[], meiyaData: IMeiyaHotel[]) {
         checkOutDate = origin[0].checkOutDate;
 
     for (let meiya of meiyaData) {
-        if (names.indexOf(meiya.name) > -1) {
+        if (meiya.name && names.indexOf(meiya.name) > -1) {
             continue;
         }
 
@@ -781,7 +781,7 @@ export function matchMeiyaHotel(origin: IHotel[], meiyaData: IMeiyaHotel[]) {
             "distance": 2000
         }
         console.log("add one in meiya");
-        result.push(data);
+        result.push(data as IHotel);
     }
 
     console.log("matchMeiyaHotel matchMeiyaHotel matchMeiyaHotel===>", result.length)
@@ -823,7 +823,7 @@ export interface IMeiyaFlight {
     desAirport?: string;
     fAmount?: number;
     flightNo: string;
-    flightPriceInfoList?: Array<IMeiyaFlightPriceInfo>;
+    flightPriceInfoList: Array<IMeiyaFlightPriceInfo>;
     isCodeShare?: boolean;
     meal?: boolean;
     orgAirport?: string;

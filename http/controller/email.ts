@@ -35,7 +35,7 @@ export class EmailController extends AbstractController {
             let account = await Models.staff.get(userId);
             if(!account) {
                 let agencyUser = await Models.agencyUser.get(userId);
-                let agency = await Models.agency.get(agencyUser['agentUser']);
+                let agency = await Models.agency.get(agencyUser && agencyUser['agentUser']);
                 if(!agency)  
                     return res.json(this.reply(0, resp));
             }

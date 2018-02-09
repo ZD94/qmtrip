@@ -84,7 +84,7 @@ export class RestApi {
      * @param suiteToken {string} 套件令牌
      * @param agentId {string} 应用id
      */
-    async getAdminList(corpId: string, agentId: string, suiteToken: string): Promise<Array<IWAdminList>> {
+    async getAdminList(corpId: string, agentId: string, suiteToken: string): Promise<Array<IWAdminList>|null> {
         let url = `https://qyapi.weixin.qq.com/cgi-bin/service/get_admin_list?suite_access_token=${suiteToken}`;
 
         let body = {
@@ -106,7 +106,7 @@ export class RestApi {
      *     不可用，无法获取微信企业的secret
      *   secret: x51OLfe5UWqI5VEW2nXg6tAph5P8kPqmJ_RxtgnbPBE
      */
-    static async getAccessToken(corpid: string, secret: string): Promise<IAccessToken> {
+    static async getAccessToken(corpid: string, secret: string): Promise<IAccessToken|null> {
         let url = `https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=${corpid}&corpsecret==${secret}`;
         // let url = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=wwb398745b82d67068&corpsecret=x51OLfe5UWqI5VEW2nXg6tAph5P8kPqmJ_RxtgnbPBE'
         let result: IAccessToken = await reqProxy({
@@ -171,7 +171,7 @@ export class RestApi {
             method: 'GET',
             qs: qs
         });
-        if (!result) return null;
+        if (!result) return [];
         return result.department;
     }
 
@@ -181,7 +181,7 @@ export class RestApi {
      * @param.fetchChild {number} 0: 关闭递归获取子部门下面的成员 1: 递归获取所有部门成员
      * @return {IMemberListResult}
      */
-    async getDetailedStaffsByDepartment(departmentId?: string, fetchChild?: number): Promise<Array<IWStaff>> {
+    async getDetailedStaffsByDepartment(departmentId: string, fetchChild?: number): Promise<Array<IWStaff>> {
         let url = 'https://qyapi.weixin.qq.com/cgi-bin/user/list';
         let qs: {
             access_token: string,
@@ -198,7 +198,7 @@ export class RestApi {
             qs
         });
         if (!result || !result.userlist)
-            return null;
+            return [];
         return result.userlist;
     }
 
@@ -208,7 +208,7 @@ export class RestApi {
      * @param.fetchChild {number} 是否递归获取子部门下面的成员
      * @return {IConciseMemberListResult}
      */
-    async getConciseStaffsByDepartment(departmentId?: string, fetchChild?: number): Promise<any> {
+    async getConciseStaffsByDepartment(departmentId: string, fetchChild?: number): Promise<any> {
         let url = 'https://qyapi.weixin.qq.com/cgi-bin/user/simplelist';
         let qs: {
             access_token: string,
@@ -235,7 +235,7 @@ export class RestApi {
             url: 'https://qyapi.weixin.qq.com/cgi-bin/get_jsapi_ticket?access_token=' + accessToken,
             method: 'GET'            
         })
-        if (!result || result.errcode != 0) return null
+        if (!result || result.errcode != 0) return ''
         await cache.write('jsapi-ticket', result.ticket, result.expires_in)
         return result.ticket
     }

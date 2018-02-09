@@ -50,7 +50,7 @@ async function checkInvoicePermission(userId: string, tripDetailId: string){
     }
     return false;
 }
-async function agentGetTripplanDetailInvoice(req: Request, res: Response, next: NextFunction){
+async function agentGetTripplanDetailInvoice(req: Request, res: Response, next?: NextFunction){
     try{
         // req.clearTimeout();
         var authReq = parseAuthString(req.query.authstr);
@@ -91,7 +91,7 @@ async function agentGetTripplanDetailInvoice(req: Request, res: Response, next: 
             fs.exists(file, resolve);
         });
         if (!isExist) {
-            return next(404);
+            return next && next(404);
         }
         return res.sendFile(file);
     } catch(e) {

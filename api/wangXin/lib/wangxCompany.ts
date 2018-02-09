@@ -41,7 +41,7 @@ export default class WangxCompany extends OaCompany{
     async getDepartments(): Promise<OaDepartment[]> {
         let self = this;
         let departments = await self.wangXinApi.getDepartments();
-        let result: OaDepartment[];
+        let result: OaDepartment[]  = [];
         departments.forEach((item) => {
             let ddDept = new WangxDepartment({name: item.name, parentId: item.pid, id: item.id, wangXinApi: self.wangXinApi});
             result.push(ddDept);
@@ -49,10 +49,10 @@ export default class WangxCompany extends OaCompany{
         return result;
     }
 
-    async getRootDepartment(): Promise<OaDepartment> {
+    async getRootDepartment(): Promise<OaDepartment | undefined> {
         let self = this;
         let departments = await self.wangXinApi.getDepartments();
-        let result: OaDepartment;
+        let result: OaDepartment | undefined;
         departments.forEach((item) => {
             if(item.id == "1"){
                 result = new WangxDepartment({name: item.name, parentId: item.pid, id: item.id, wangXinApi: self.wangXinApi});
@@ -61,18 +61,18 @@ export default class WangxCompany extends OaCompany{
         return result;
     }
 
-    async getCreateUser(): Promise<OaStaff> {
+    async getCreateUser(): Promise<OaStaff | null> {
         let self = this;
         let users = await self.wangXinApi.getUsers();
-        let result: OaStaff;
+        let result: OaStaff | undefined;
         users.forEach((item) => {
             if(item.id == "1"){
                 let mobile = (item.tel || item.phone) ? (item.tel || item.phone) : null;
                 result = new WangxStaff({name: item.name, id: item.id, mobile: mobile, email: item.email, sex: item.sex,
-                    isAdmin: true, wangXinApi: self.wangXinApi, userCode: item.usercode});
+                    isAdmin: true, wangXinApi: self.wangXinApi, userCode: item.usercode}) as OaStaff;
             }
         })
-        return result;
+        return result || null;
     }
 
     async saveCompanyProperty(params: {companyId: string}): Promise<boolean> {
@@ -85,8 +85,8 @@ export default class WangxCompany extends OaCompany{
      * 根据网信绑定的companyId获取本地公司信息。
      * @returns {Promise<Company>}
      */
-    async getCompany(): Promise<Company> {
-        let company: Company = null
+    async getCompany(): Promise<Company | null> {
+        let company: Company | null = null
         let self = this
 
         let companyPros = await Models.companyProperty.find({where: {value: self.id, type: CPropertyType.WANGXIN_ID}})

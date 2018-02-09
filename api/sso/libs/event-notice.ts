@@ -119,7 +119,7 @@ export class EventNotice {
         });
         await wdepartment.sync({
             company: self.company,
-            oaDepartment: null,
+            oaDepartment: undefined,
             from: 'createDepartment'
         }); 
         return null;
@@ -136,7 +136,7 @@ export class EventNotice {
         });
         await wdepartment.sync({
             company: self.company,
-            oaDepartment: null,
+            oaDepartment: undefined,
             from: 'createDepartment'
         }); 
         return true;

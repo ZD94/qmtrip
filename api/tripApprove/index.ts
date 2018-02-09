@@ -26,7 +26,7 @@ export default class TripApproveModule {
 
     static async retrieveDetailFromApprove(params: {approveNo: string, approveUser?: string, submitter?: string, findTripApproveFirst?: boolean}):Promise<ITripApprove> {
         let {approveNo, approveUser, submitter, findTripApproveFirst = true} = params;
-        let tripApproveObj: ITripApprove
+        let tripApproveObj: ITripApprove | null = null
         if(!approveUser && !submitter)
             tripApproveObj = await TripApproveModule.getTripApprove({id: approveNo});
         if(tripApproveObj && findTripApproveFirst)
@@ -94,7 +94,7 @@ export default class TripApproveModule {
                         placeCode = placeCode['id'];
                     }
                     let arrivalInfo = await API.place.getCityInfo({cityCode: placeCode, companyId: approve.companyId}) || {name: null};
-                    let destination: IDestination = {city:arrivalInfo.id, arrivalDateTime: segment.leaveDate, leaveDateTime: segment.goBackDate};
+                    let destination: IDestination = {city:arrivalInfo.id, arrivalDateTime: segment.leaveDate, leaveDateTime: segment.goBackDate} as IDestination;
                     arrivalCityCodes.push(arrivalInfo.id);
                     if (i == destinationPlacesInfo.length - 1 && goBackPlace) {
                         arrivalCityCodes.push(goBackPlace);
@@ -108,10 +108,10 @@ export default class TripApproveModule {
 
                 //处理其他数据
                 if(i == 0){
-                    tripApprove.startAt = segment.leaveDate;
+                    tripApprove.startAt = segment.leaveDate || new Date();
                 }
                 if(i == (destinationPlacesInfo.length - 1)){
-                    tripApprove.backAt = segment.goBackDate;
+                    tripApprove.backAt = segment.goBackDate || new Date();
                 }
             }
         }
@@ -372,9 +372,10 @@ export default class TripApproveModule {
         let isNextApprove = params.isNextApprove;
         let staff = await Staff.getCurrent();
         let tripApprove = await TripApproveModule.getTripApprove({id: params.id});
+        if (!tripApprove) return false
         let approveResult = params.approveResult;
         let budgetId = params.budgetId;
-        let approveUser = await Models.staff.get(tripApprove.approveUserId);
+        let approveUser = await Models.staff.get(tripApprove.approveUserId || '');
         let approveCompany = approveUser.company;
 
 
@@ -423,6 +424,7 @@ export default class TripApproveModule {
         }
 
         await DB.transaction(async function(t){
+            if (!tripApprove) throw new Error('TripApprove is null')
             // 特殊审批和非当月提交的审批不记录行程点数
             if(!tripApprove.isSpecialApprove){
                 if(typeof tripApprove.query == 'string'){
@@ -493,7 +495,7 @@ export default class TripApproveModule {
             }else if(isNextApprove){ //指定下一级审批人
                 log.approveStatus = EApproveResult.PASS;
                 await log.save();
-                let nextApproveUser = await Models.staff.get(params.nextApproveUserId);
+                let nextApproveUser = await Models.staff.get(params.nextApproveUserId || '');
                 tripApprove.approvedUsers += `,${staff.id}`;
                 tripApprove.approveUserId = nextApproveUser.id;
             }else if(approveResult == EApproveResult.REJECT) {
@@ -942,7 +944,7 @@ export default class TripApproveModule {
 
     @clientExport
     @requireParams(['id'])
-    static async getTripApprove(params: {id: string}): Promise<ITripApprove> {
+    static async getTripApprove(params: {id: string}): Promise<ITripApprove|null> {
         if(!params.id) return null;
 
         let approve = await Models.approve.get(params.id);

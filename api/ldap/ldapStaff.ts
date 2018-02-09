@@ -108,7 +108,7 @@ export default class LdapStaff extends OaStaff {
         return oaDepartments;
     }
 
-    async getSelfById(): Promise<OaStaff> {
+    async getSelfById(): Promise<OaStaff|null> {
         let self = this;
         let opts = {
             attributes: staffOpts.attributes

@@ -70,14 +70,14 @@ export default class DdDepartment extends OaDepartment {
         this.isvApi = target.isvApi;
     }
 
-    async getSelfById(): Promise<OaDepartment> {
+    async getSelfById(): Promise<OaDepartment|null> {
         let self = this;
         let result = await self.corpApi.getDepartmentInfo(self.id);
         if(result){
             return new DdDepartment({id: result.id, name: result.name, parentId: result.parentid, corpId: self.corpId,
                 isvApi: self.isvApi, corpApi: self.corpApi, company: self.company});
         }
-        return null;
+        return null
     }
 
     async getChildrenDepartments(): Promise<OaDepartment[]> {
@@ -102,7 +102,7 @@ export default class DdDepartment extends OaDepartment {
         return result;
     }
 
-    async getParent(): Promise<OaDepartment> {
+    async getParent(): Promise<OaDepartment | null> {
         let self = this;
         if(self.parentId){
             let result = await self.corpApi.getDepartmentInfo(self.parentId);
@@ -143,7 +143,7 @@ export default class DdDepartment extends OaDepartment {
         return true;
     }
 
-    async getDepartmentProperty(params: {departmentId: string}): Promise<DepartmentProperty> {
+    async getDepartmentProperty(params: {departmentId: string}): Promise<DepartmentProperty | null> {
        /* let ddDeparts = await Models.ddtalkDepartment.find({
             where : { corpId : this.corpId , DdDepartmentId : self.id }
         });
@@ -157,7 +157,7 @@ export default class DdDepartment extends OaDepartment {
         return null;
     }
 
-    async getDepartment(): Promise<Department>{
+    async getDepartment(): Promise<Department | null>{
         let self = this;
         /*let department: Department = null;
         let ddDeparts = await Models.ddtalkDepartment.find({
@@ -167,7 +167,7 @@ export default class DdDepartment extends OaDepartment {
             department = await Models.department.get(ddDeparts[0].localDepartmentId);
         }*/
 
-        let department: Department = null;
+        let department: Department | null = null;
         let deptPro = await Models.departmentProperty.find({where : {value: self.id+"", type: DPropertyType.DD_ID}});
         if(deptPro && deptPro.length > 0){
             for(let d of deptPro){

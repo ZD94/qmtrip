@@ -39,7 +39,7 @@ function getAppSecretByAppId(appId: string) {
     return config.agent.appSecret;
 }
 
-function allowCrossDomain(req: Request, res: Response, next: NextFunction) {
+function allowCrossDomain(req: Request, res: Response, next?: NextFunction) {
     if (req.headers.origin && checkOrigin(req.headers.origin)) {
         res.header('Access-Control-Allow-Origin', req.headers.origin);
     }
@@ -48,7 +48,7 @@ function allowCrossDomain(req: Request, res: Response, next: NextFunction) {
     if (req.method == 'OPTIONS') {
         return res.send("OK");
     }
-    next();
+    next && next();
 }
 
 export async function initHttp(app: Application) {
@@ -59,7 +59,8 @@ export async function initHttp(app: Application) {
     conf.setConfig(5 * 60 * 1000, [/^\/wechat/, /^\/workWechat/i], cache, getAppSecretByAppId)
     app.use('/api/v1', jlReply)
     app.use('/api/v1', allowCrossDomain);
-    app.use('/api/v1', (req: Request, res: any, next: NextFunction) => {
+    app.use('/api/v1', (req: Request, res: any, next?: NextFunction) => {
+        if (!next) return
         auth(req, res, next, async (err, isValid, data) => {
                console.log("======auth request: ", err, isValid, data)
             if (isValid) {
@@ -74,7 +75,7 @@ export async function initHttp(app: Application) {
     }, router);
 }
 
-export function jlReply(req: any, res: any, next: NextFunction) {
+export function jlReply(req: any, res: any, next?: NextFunction) {
     res.jlReply = function (data: any) {
         let { appId, appSecret } = req.session || { appId: '00000000', appSecret: '00000000' };
         let timestamp = Math.floor(Date.now() / 1000);
@@ -85,5 +86,5 @@ export function jlReply(req: any, res: any, next: NextFunction) {
         res.write(JSON.stringify(data));
         res.end();
     }
-     next();
+    next && next();
 }
