@@ -5,6 +5,7 @@ import {Staff} from "_types/staff";
 const API = require("@jingli/dnode-api");
 const config = require("@jingli/config");
 var haversine = require("haversine");
+const _ = require("lodash");
 import {ISearchHotelParams, ISearchTicketParams} from "./index";
 
 var request = require("request-promise");
@@ -200,7 +201,6 @@ export function writeData(filename: string, data: object) {
     });
 }
 
-
 /**
  * @method 匹配jlbudget飞机数据为基础，meiya不一定都有
  */
@@ -352,7 +352,7 @@ export function handelHotelsData(meiyaHotelData: {[index: string]: Array<IMeiyaH
         let result: Array<any> = [];
         let handleData;
         for (let index in meiyaHotelData) {
-            console.log(`供应商: ${index}: 航班数据长度 ===> ${meiyaHotelData[index].length}`);
+            console.log(`供应商: ${index}: 酒店数据长度 ===> ${meiyaHotelData[index].length}`);
             for (let item of meiyaHotelData[index]) {
                 handleData = transferHotelData(index, item, originalData);
                 result.push(handleData)
@@ -525,7 +525,7 @@ export function handleTrainData(meiyaTrainData: {[index:string]: Array<IMeiyaTra
         let result: Array<any> = []
         let handleData;
         for (let index in meiyaTrainData) {
-            console.log(`供应商: ${index}: 航班数据长度 ===> ${meiyaTrainData[index].length}`);
+            console.log(`供应商: ${index}: 火车数据长度 ===> ${meiyaTrainData[index].length}`);
             for (let item of meiyaTrainData[index]) {
                 handleData = transferTrainData(index, item, originalData)
                 result.push(handleData)
@@ -619,6 +619,22 @@ function transferTrainData(supplierName: string, meiyaTrainData: IMeiyaTrain, or
     return model
 }
 
+/**
+ * @method 根据指定的介质，进行比较，继而合并同类项
+ * @param Data 
+ * @param match {string} 指定相比较的项
+ */
+export function combineData(Data: Array<any>, match: string){
+    for(let i = 0; i < Data.length; i++){
+        for(let j = i+1; j < Data.length; j++) {
+            if(Data[i][match] == Data[j][match]){
+                Data[i]['agents'] = _.concat(Data[i]['agents'], Data[j]['agents']);
+                Data = Data.splice(j,1)
+            }
+        }
+    }
+    return Data;
+}
 
 /**
  * @method 酒店数据匹配，以meiya为基础数据
