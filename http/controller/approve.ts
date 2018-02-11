@@ -1,15 +1,8 @@
 'use strict';
-import { AbstractModelController, Restful } from '@jingli/restful';
-import {Approve} from "_types/approve";
-import {Models} from "_types";
+import { Restful, AbstractController } from '@jingli/restful';
 
-var subsidyTypeCols = Approve['$fieldnames'];
 @Restful()
-export class ApproveController extends AbstractModelController {
-
-    constructor() {
-        super(Models.approve, subsidyTypeCols);
-    }
+export class ApproveController extends AbstractController {
 
     $isValidId(id: string) {
         return /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(id);
