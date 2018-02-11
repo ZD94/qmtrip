@@ -6,10 +6,10 @@ import moment = require('moment');
 import validator = require('validator');
 import { Token } from '_types/auth/token';
 import { ACCOUNT_STATUS } from "_types/auth";
-import { Staff } from "_types/staff";
 import {OS_TYPE} from '_types/auth/token';
 var API = require("@jingli/dnode-api");
 import { getSession } from "@jingli/dnode-api";
+import { Staff } from '_types/staff';
 
 //生成登录凭证
 export async function makeAuthenticateToken(accountId: string, os?: string, expireAt?: Date): Promise<LoginResponse> {
@@ -94,7 +94,7 @@ export async function checkTokenAuth(params: AuthRequest): Promise<AuthResponse|
 export async function setCurrentStaffId( params : {
     staffId : string,
     accountId ? : string
-} ) {
+} ): Promise<Staff | null> {
     let session = getSession();
     let { accountId, staffId } = params;
 
