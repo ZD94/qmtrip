@@ -113,6 +113,7 @@ async function getRoleOfAccount(data: any) : Promise<Role>{
     var accountId = data.accountId;
     var s: any = {}
     var staff = await Models.staff.get(accountId);
+    if (!staff) throw new Error('staff is null')
     if (staff.company.createUser == accountId) {
         return new Role(roles.owner);
     }else if(s.roleId == ROLE_ID.ADMIN){
@@ -131,6 +132,7 @@ async function getRoleOfAgency(params: any){
     var accountId = params.accountId;
     var u: any = {};
     var user = await Models.agencyUser.get(accountId);
+    if (!user) throw new Error('user is null')
     if(user.agency.createUser == accountId){
         return agency_roles.admin;
     }else if(u.roleId == ROLE_ID.ADMIN){

@@ -47,7 +47,8 @@ class Proxy {
             //公有云验证
             // let staff: Staff = await Staff.getCurrent();
             let {staffid}  = req.headers;
-            let staff: Staff = await Models.staff.get(staffid);
+            let staff = await Models.staff.get(staffid);
+            if (!staff) throw new Error('staff is null')
             let companyId: string = staff.company.id;
             let companyToken: string | null = await getCompanyTokenByAgent(companyId);
             if (!companyToken) {
@@ -97,7 +98,8 @@ class Proxy {
 
             //公有云验证
             let {staffid}  = req.headers;
-            let staff: Staff = await Models.staff.get(staffid);
+            let staff = await Models.staff.get(staffid);
+            if (!staff) throw new Error('staff is null')
             let companyId: string = staff.company.id;
             let companyToken: string | null = await getCompanyTokenByAgent(companyId);
             if (!companyToken) {
@@ -148,7 +150,7 @@ class Proxy {
          *  3. 中台根据companyid获取该公司所有订单
          */
         app.all(/^\/order.*$/, cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function) => {
-            let staff: Staff = await Staff.getCurrent();
+            let staff: Staff | null = await Staff.getCurrent();
             let staffId = req.headers.staffid;
             let isNeedAuth = req.headers['isneedauth'] || '';
             if(staffId && !staff) {
@@ -157,7 +159,7 @@ class Proxy {
             let {tripDetailId} = req.query;
             let {authStr} = req.body;
            
-            let listeningon: string;
+            let listeningon: string = '';
             if(!tripDetailId || typeof tripDetailId == undefined){
                 if(req.body.tripDetailId) {
                     tripDetailId = req.body.tripDetailId;
@@ -196,7 +198,7 @@ class Proxy {
                 //no need to offer auth
             } else {
                 try{
-                    companyInfo = await ApiTravelBudget.getCompanyInfo(supplier, staff.id);
+                    companyInfo = await ApiTravelBudget.getCompanyInfo(supplier, staff && staff.id);
                 }catch(err){ return res.json({code: 407, msg: "未绑定供应商", data: null}) }
                 
                 identify = companyInfo && companyInfo.length ?companyInfo[0].identify: null;
@@ -290,6 +292,7 @@ class Proxy {
             let url = `${config.mall.orderLink}${pathstring}`;
             console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.mall.appId, '===request params: ', params) 
             let result = await new Promise((resolve, reject) => {
+                if (!staff) return reject(new Error('staff is null'))
                 request({
                     uri: url,
                     body: req.body,
@@ -331,6 +334,7 @@ class Proxy {
             let url = `${config.bill.orderLink}${pathstring}`;
             console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.bill.appId, '===request params: ', params) 
             let result = await new Promise((resolve, reject) => {
+                if (!staff) return reject(new Error('staff is null'))
                 return request({
                     uri: url,
                     body: req.body,
@@ -363,6 +367,7 @@ class Proxy {
                 params = req.query;
             }
             let staff = await Models.staff.get(staffid);
+            if (!staff) return res.sendStatus(404)
             let role: any = null ;
 
             if(staff.roleId == 0) {
@@ -386,6 +391,7 @@ class Proxy {
             let url = `${config.permission.orderLink}${pathstring}`;
             console.log("==timestamp:  ", timestamp, "===>sign:  ", sign, '====>url:  ', url, 'appid: ', config.permission.appId, '===request params: ', params);
             let result = await new Promise((resolve, reject) => {
+                if (!staff) return reject(new Error('staff is null'))
                 return request({
                     uri: url,
                     body: req.body,

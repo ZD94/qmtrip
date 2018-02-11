@@ -38,7 +38,7 @@ export default class WangXinModule {
         let userCode = WangxUtils.parseLtpaToken(token, C.wxSharedSecret) //解析token获取用户信息。
         console.info("wangXinAutoLogin===>>>", userCode);
         let staffPro = await Models.staffProperty.find({where: {value: userCode, type: SPropertyType.WANGXIN_USER_CODE}})
-        let staff: Staff | undefined
+        let staff: Staff | null = null
         if (staffPro && staffPro.length > 0) {
             staff = await Models.staff.get(staffPro[0].staffId)
         }

@@ -11,7 +11,7 @@ export abstract class SupplierWebRobot extends WebRobot{
     abstract login(authData: any): Promise<any>;
     abstract getOrderList(): Promise<SupplierOrder[]>;
     
-    getBookLink(options: any): Promise<ReserveLink>{
+    getBookLink(options: any): Promise<ReserveLink|null>{
         return Promise.resolve(null);
     }
 }

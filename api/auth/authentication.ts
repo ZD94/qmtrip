@@ -94,7 +94,7 @@ export async function checkTokenAuth(params: AuthRequest): Promise<AuthResponse|
 export async function setCurrentStaffId( params : {
     staffId : string,
     accountId ? : string
-} ) :Promise<Staff> {
+} ) {
     let session = getSession();
     let { accountId, staffId } = params;
 
@@ -111,7 +111,7 @@ export async function setCurrentStaffId( params : {
         staff = staffs[0];
     }
 
-    session.staffId = staff.id;
+    session.staffId = staff && staff.id;
     return staff;
 }
 

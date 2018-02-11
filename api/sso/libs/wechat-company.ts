@@ -153,7 +153,7 @@ export class WCompany extends OaCompany {
      *     注意，微信企业部门可设置可见性，
      * @return {WDepartment}
      */
-    async getRootDepartment(): Promise<OaDepartment|undefined> {
+    async getRootDepartment(): Promise<OaDepartment|null> {
         let self = this;
         let company: Company | null = await self.getCompany();
 
@@ -172,7 +172,7 @@ export class WCompany extends OaCompany {
                 return result;
             }
         }
-        if(!result) return;
+        if(!result) return null;
         return result;
     }
     /**
@@ -181,7 +181,7 @@ export class WCompany extends OaCompany {
     async getCreateUser(): Promise<OaStaff | null> {
         let self = this;
         let company = await self.getCompany();
-        let staff: Staff | undefined;
+        let staff: Staff | null = null;
         if(company && company.createUser)
             staff = await Models.staff.get(company.createUser);
         if(!staff) return null;

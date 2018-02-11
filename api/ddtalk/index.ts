@@ -272,6 +272,7 @@ export class DDTalk {
         if (comPros && comPros.length) {
             let comPro = comPros[0];
             let company = await Models.company.get(comPro.companyId);
+            if (!company) throw new Error('company is null')
             if (company.isSuiteRelieve) {
                 let err = new Error(`企业还未授权或者已取消授权`);
                 throw err;
@@ -311,6 +312,7 @@ export class DDTalk {
         if (comPros && comPros.length) {
             let comPro = comPros[0];
             let company = await Models.company.get(comPro.companyId);
+            if (!company) throw new Error('company is null')
             if (company.isSuiteRelieve) {
                 let err = new Error(`企业还未授权或者已取消授权`);
                 throw err;
@@ -327,12 +329,12 @@ export class DDTalk {
             //查找是否已经绑定账号
             // let ddtalkUsers = await Models.ddtalkUser.find( { where: {corpid: corpid, ddUserId: dingTalkUser.userId}});
             let staffPro = await Models.staffProperty.find({where : {value: dingTalkUser.userId, type: SPropertyType.DD_ID}});
-            let staff: Staff | undefined;
+            let staff: Staff | null = null;
             if (staffPro && staffPro.length) {
                 for(let s of staffPro){
                     let st = await Models.staff.get(s.staffId);
                     let staffCorpPro = await Models.staffProperty.find({where : {value: corpid, type: SPropertyType.DD_COMPANY_ID,
-                    staffId: st.id}});
+                    staffId: st && st.id}});
                     if(staffCorpPro && staffCorpPro.length){
                         staff = st;
                     }
@@ -360,6 +362,7 @@ export class DDTalk {
         url = url || '#';
         picurl = picurl || 'http://j.jingli365.com/ionic/images/dingtalk-shareicon.png';
         let staff = await Models.staff.get(accountId);
+        if (!staff) throw new Error('staff is null')
         let company = staff.company;
         /*let corp = await Models.ddtalkCorp.get(company.id);
         let ddtalkUser = await Models.ddtalkUser.get(staff.id);*/

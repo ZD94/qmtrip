@@ -15,6 +15,7 @@ import {CPropertyType} from "_types/company";
 import { EAccountType } from '_types/index';
 import {Department} from "../../_types/department/department";
 import { Application } from 'express';
+import { Company } from '../../_types/company/company';
 
 export let staffOpts = {
     scope: 'sub',
@@ -110,6 +111,7 @@ export class LdapModule {
 
         //ldap认证
         let company = await Models.company.get(data.companyId);
+        if (!company) throw new Error('company is null')
         // let company = await Models.company.get("4438e4c0-686e-11e7-89aa-a14f4c6f4292");
         if(!shareConnection.connectionMap[company.id]){
             await shareConnection.initConnection({companyId: company.id});
@@ -170,7 +172,7 @@ export class LdapModule {
 
         let departments: Department[] = loginStaff ? await loginStaff.getDepartments() : [];
         await Promise.all(departments.map(async (item) => {
-            await syncData.syncOrganization({company: company, department: item});
+            await syncData.syncOrganization({company: company || {} as Company, department: item});
         }));
 
         var ret = await API.auth.makeAuthenticateToken(loginAccount.id, 'ldap');

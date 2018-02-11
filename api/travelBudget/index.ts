@@ -2,7 +2,7 @@
  * Created by wlh on 15/12/12.
  */
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
-import { Models } from '_types'
+import { Models, EGender } from '_types'
 import { ETripType, ICreateBudgetAndApproveParams, ICreateBudgetAndApproveParamsNew, QMEApproveStatus, EApproveResult, EBackOrGo } from "_types/tripPlan";
 import {Approve, EApproveStatus} from '_types/approve';
 import { Staff } from "_types/staff";
@@ -559,6 +559,7 @@ export default class ApiTravelBudget {
             }
 
             let staff = await Models.staff.get(staffId);
+            if (!staff) throw new Error('staff is null')
             let companyId = staff.company.id;
 
             let _budgets = params.budgetResult.budgets;
@@ -672,6 +673,7 @@ export default class ApiTravelBudget {
             staffId = currentStaff.id;
         }
         let staff = await Models.staff.get(staffId);
+        if (!staff) throw new Error('staff is null')
         let companyId = staff.companyId;
         let company = await Models.company.get(companyId);
         let travelPolicy = await staff.getTravelPolicy();
@@ -703,7 +705,7 @@ export default class ApiTravelBudget {
             let staff = params.staffList[i];
             let _staff = await Models.staff.get(staff);
             let __staff: {gender: number, policy: string} = {
-                gender: _staff.sex,
+                gender: _staff && _staff.sex || EGender.MALE,
                 policy: 'domestic',
             };
             staffs.push(__staff);
@@ -718,18 +720,18 @@ export default class ApiTravelBudget {
         if (feeCollectedType == 0) {
             departmentId = feeCollected || '';
             let department = await Models.department.get(departmentId);
-            feeCollectedName = department.name;
+            feeCollectedName = department && department.name || '';
 
         } else if (feeCollectedType == 1) {
             projectId = feeCollected || '';
             let project = await Models.project.get(projectId);
-            feeCollectedName = project.name;
+            feeCollectedName = project && project.name || '';
         }
         let approveUser: Staff | undefined = params['approveUser'];
 
         if (approveId) {
             let checkApprove = await Models.approve.get(approveId);
-            let approveStatus = checkApprove['tripApproveStatus'];
+            let approveStatus = checkApprove && checkApprove['tripApproveStatus'];
             if (approveStatus == QMEApproveStatus.PASS || approveStatus == QMEApproveStatus.REJECT ||
                 approveStatus == QMEApproveStatus.CANCEL) {  //若审批已通过、驳回或已撤销，锁定budget不再更新
                 await API.tripApprove.updateTripApprove({id: approveId, lockBudget: true});
@@ -796,7 +798,7 @@ export default class ApiTravelBudget {
         }
         console.log('eachBudgetSet-----------', eachBudgetSegIsOk);
         if (eachBudgetSegIsOk && !isIntoApprove) {
-            await approve.save();
+            approve && await approve.save();
         } 
         if (!eachBudgetSegIsOk) {
             throw new Error('预算有负值,提交失败');
@@ -810,6 +812,7 @@ export default class ApiTravelBudget {
         obj.createAt = Date.now();
 
         await DB.transaction(async function (t: Transaction) {
+            if (!company || !staff) throw new Error('company or staff is null')
             let result = await API.company.verifyCompanyTripNum({
                 tripNum: tripNumCost,
                 companyId: company.id,
@@ -826,6 +829,7 @@ export default class ApiTravelBudget {
                 let updateBudget = await Models.approve.get(approveId || '');
                 // let submitter = await Staff.getCurrent();
                 let submitter = await Models.staff.get(staff.id);
+                if (!submitter || !updateBudget) throw new Error('submitter or updateBudget is null')
                 updateBudget.submitter = submitter.id;
                 updateBudget.data = obj;
                 updateBudget.channel = submitter.company.oa;
@@ -854,7 +858,7 @@ export default class ApiTravelBudget {
             if (err) {
                 // company.extraTripPlanFrozenNum = extraTripPlanFrozenNum;
                 // company.tripPlanFrozenNum = originTripPlanFrozenNum;
-                await company.reload();
+                company && await company.reload();
                 console.info(err);
                 throw new Error("提交审批失败");
             }
@@ -870,12 +874,12 @@ export default class ApiTravelBudget {
 
     //获取公司信息
     static async getCompanyInfo(sname?:string, staffId?: string): Promise<any> {
-        let staff: Staff | undefined;
+        let staff: Staff | null = null;
         if(staffId) staff = await Models.staff.get(staffId);
         if(!staffId) {
             staff = await Staff.getCurrent(); 
         }    
-        let companyId = staff && staff.company ? staff.company.id: staff.companyId;
+        let companyId = staff && (staff.company ? staff.company.id: staff.companyId);
         // let companyId = "4a1f37e0-0a54-11e7-ad22-b1cccc4cc277";
         if(!companyId) throw L.ERR.HAS_NOT_BIND();
         let result;
@@ -955,6 +959,7 @@ export default class ApiTravelBudget {
             staffId = currentStaff.id;
         }
         let staff = await Models.staff.get(staffId);
+        if (!staff) throw new Error('staff is null')
         let company = staff.company;
 
         if (company.name != "鲸力智享") {
@@ -992,6 +997,7 @@ export default class ApiTravelBudget {
                 return true;
             }
             let log = await Models.travelBudgetLog.get(budget.id);
+            if (!log) return null
             log.status = -1;
             return log.save();
         });

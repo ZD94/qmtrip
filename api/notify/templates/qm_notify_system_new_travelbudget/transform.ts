@@ -13,6 +13,7 @@ export = async function transform(values: {staffId: string,
 }): Promise<any>{
     let cityMap = {};
     let staff = await Models.staff.get(values.staffId);
+    if (!staff) throw new Error('staff is null')
     let travelPolicy = await staff.getTravelPolicy();
 
     let travelp: {
@@ -106,7 +107,7 @@ export = async function transform(values: {staffId: string,
         staffIds = JSON.parse(staffIds);
     }
 
-    values.staffs = await Promise.all(staffIds.map(id => Models.staff.get(id)))
+    values.staffs = await Promise.all(staffIds.map(id => Models.staff.get(id))) as Staff[]
     values.date = moment().format('YYYY-MM-DD HH:mm');
 
     return values;

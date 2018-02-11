@@ -381,7 +381,7 @@ function getDistance(lat1: string, lng1: string, lat2: string, lng2: string) {
 function transferHotelData(supplierName: string, meiyaHotelData: IMeiyaHotel, originalData: ISearchHotelParams): any {
     let distance;
     if(originalData.lat && originalData.lon){
-        distance = getDistance(meiyaHotelData.latitude,meiyaHotelData.longitude,originalData.lat,originalData.lon)
+        distance = getDistance(meiyaHotelData.latitude || '', meiyaHotelData.longitude || '', originalData.lat, originalData.lon)
         distance = Math.ceil(distance)
     }else{
         distance = null

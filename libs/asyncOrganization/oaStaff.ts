@@ -43,7 +43,7 @@ export  abstract class OaStaff{
 
     abstract async getDepartments(): Promise<OaDepartment[]>;
     abstract async getSelfById(): Promise<OaStaff|null>;
-    abstract async getCompany(): Promise<Company|undefined>;
+    abstract async getCompany(): Promise<Company|null>;
     abstract async saveStaffProperty(params: {staffId: string}): Promise<boolean>;
 
     async getStaff(): Promise<Staff|null>{
@@ -79,7 +79,7 @@ export  abstract class OaStaff{
         if(!params) params = {};
         let self = this;
         let from  = params.from;
-        let company: Company | undefined = self.company;
+        let company: Company | null = self.company;
         if(params.company){
             company = params.company;
         }
@@ -97,7 +97,7 @@ export  abstract class OaStaff{
 
         if(execute || (from && from == "createUser")){
             if(params){
-                company = params.company;
+                company = params.company || null;
             }
             if(!company){
                 company = await self.getCompany();
@@ -126,7 +126,7 @@ export  abstract class OaStaff{
                 await Promise.all(oaDepartments.map(async (item) => {
                     let department = await item.getDepartment();
                     if(!department){
-                        let dept = await item.sync({company: company, from: "addStaff"});//此处需要验证
+                        let dept = await item.sync({company: company || undefined, from: "addStaff"});//此处需要验证
                         dept && newDepartments.push(dept);
                     }else{
                         newDepartments.push(department);

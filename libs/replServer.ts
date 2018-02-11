@@ -25,7 +25,7 @@ export default class ReplModel{
             options = {};
         }
         this.host = options.host || "127.0.0.1";
-        this._context = options.context;
+        this._context = options.context || {};
     }
 
     initReplServer(){

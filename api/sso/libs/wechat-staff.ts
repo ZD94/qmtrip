@@ -154,7 +154,7 @@ export class WStaff extends OaStaff {
         return departments;
     }
 
-    async getSelfById(): Promise<OaStaff> {
+    async getSelfById() {
         let self = this;
         if(typeof self.id != 'string')
             self.id = self.id + '';
@@ -166,9 +166,9 @@ export class WStaff extends OaStaff {
             avatar: userInfo.avatar_mediaid});
         return oaStaff;
     }
-    async getCompany(): Promise<Company | undefined> {
+    async getCompany() {
         let self = this;
-        let company: Company | undefined;
+        let company: Company | null = null;
         /*let corps = await Models.ddtalkCorp.find({where: {corpId: self.corpId}});
         if(corps && corps.length){
             let corp = corps[0];
