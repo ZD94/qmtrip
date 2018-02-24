@@ -88,7 +88,9 @@ export = async function transform(values: {
         values.isAutoApprove = false;
     }
 
-    if (values.tripApprove)
+    if (values.tripApprove) {
         values.staffs = (await Promise.all(values.tripApprove.staffList.map((s: string) => Models.staff.get(s)))).map(_.prop('name'))
+        values.tripApprove['account'] = await Models.account.get(values.tripApprove.accountId)
+    }
     return values;
 }
