@@ -40,7 +40,7 @@
 			<td width="190" valign="top"><%=data.project.name%></td>
 			<td width="190" valign="top"><%=data.project.beginDate ? moment(data.project.beginDate).format('YYYY-MM-DD') : ""%>-
 				<%=data.project.endDate ? moment(data.project.endDate).format('YYYY-MM-DD') : ""%></td>
-			<td width="190" valign="top"><%=(data.project.endDate.getTime() < Date.now()) ? '已失效' : (data.project.status == 1 ? '新建' : ((data.project.status == 2) ? '启动' : '停止'))%></td>
+			<td width="190" valign="top"><%=(!data.project.endDate || data.project.endDate.getTime() < Date.now()) ? '已失效' : (data.project.status == 1 ? '新建' : ((data.project.status == 2) ? '启动' : '停用'))%></td>
 		</tr>
 		</tbody>
 	</table>项目预算<br/>

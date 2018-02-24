@@ -1,11 +1,11 @@
 'use strict';
-import {AbstractModelController, Restful} from "@jingli/restful";
+import { AbstractModelController, Restful } from '@jingli/restful';
 import {Approve} from "_types/approve";
 import {Models} from "_types";
 
 var subsidyTypeCols = Approve['$fieldnames'];
 @Restful()
-export class ApproveController extends AbstractModelController {
+export class ApproveController extends AbstractModelController<Approve> {
 
     constructor() {
         super(Models.approve, subsidyTypeCols);

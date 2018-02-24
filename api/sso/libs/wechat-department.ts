@@ -142,6 +142,7 @@ export class WDepartment extends OaDepartment {
                     email: email, 
                     mobile: mobile, 
                     departmentIds: u.department, 
+                    sex: u.gender,
                     corpId: self.corpId,
                     restApi: self.restApi, 
                     company: self.company,

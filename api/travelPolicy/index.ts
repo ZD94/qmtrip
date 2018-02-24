@@ -620,7 +620,7 @@ export default class TravelPolicyModule{
             companyRegion = await TravelPolicyModule.createCompanyRegion({companyId: params.companyId, name: name, group: group, types: types});
             companyRegion = companyRegion.data;
 
-            await Promise.all(cityIds.map(async (cityId) => {
+            await Promise.all(cityIds.map(async (cityId: string) => {
                 await TravelPolicyModule.createRegionPlace({
                     placeId: cityId,
                     companyRegionId: companyRegion.id,

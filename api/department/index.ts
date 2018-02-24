@@ -435,7 +435,7 @@ export default class DepartmentModule {
      * @param deptId
      */
     @clientExport
-    static async findParentManagers(deptId: string) {
+    static async findParentManagers(deptId: string): Promise<string[]> {
         const dept = await Models.department.get(deptId)
         const { manager, parent } = dept
         if (parent == null && manager == null) return []

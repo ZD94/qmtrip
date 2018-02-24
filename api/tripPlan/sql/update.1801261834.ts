@@ -6,6 +6,7 @@
  * @content what is the content of this file. */
 
 import { Sequelize, Transaction } from 'sequelize';
+import {TripDetail} from "../../../_types/tripPlan/tripDetail";
 var SEQUELIZE = require("sequelize");
 
 export default async function update(DB: Sequelize, t: Transaction) {
@@ -80,7 +81,7 @@ async function dealData(DB: Sequelize, t: Transaction) {
 }
 
 
-async function updateTripDetail(tripDetail, DB) {
+async function updateTripDetail(tripDetail: TripDetail, DB: Sequelize) {
     let sql = `update trip_plan.trip_details set budget_info = '${JSON.stringify(tripDetail.budget_info)}' where id = '${tripDetail.id}'`;
     try {
         await DB.query(sql, { type: SEQUELIZE.QueryTypes.SELECT });
@@ -90,7 +91,7 @@ async function updateTripDetail(tripDetail, DB) {
     }
 }
 
-function sortFn(arr, attribute) {
+function sortFn(arr: TripDetail[], attribute: string) {
     return arr.sort((a, b) => {
         if (a[attribute] == b[attribute]) {
             return 0;
