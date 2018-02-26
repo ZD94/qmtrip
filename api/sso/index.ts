@@ -147,22 +147,23 @@ export default class SSOModule {
         if(!companyId && !corpId) throw new L.ERROR_CODE_C(404, '参数错误')
         let query: {where: any} = {where: {}};
         let permanentCode: string;
-        if(companyId) {
-            query.where.companyId = companyId;
-        }
+        let comProperties: CompanyProperty[] = [];
         if(corpId) {
             query.where.value = corpId;
             query.where.type = CPropertyType.WECHAT_CORPID;
+            let comProperty = await Models.companyProperty.find(query);
+            if(!comProperty || !comProperty.length) throw new L.ERROR_CODE_C(404, '该企业尚未授权')
+            comProperties = await Models.companyProperty.find({where: {companyId: comProperty[0].companyId}});
+        } else if(companyId) {
+            comProperties = await Models.companyProperty.find({where: {companyId: companyId}});
         }
-        let comProperty = await Models.companyProperty.find(query);
-        if(!comProperty || !comProperty.length) throw new L.ERROR_CODE_C(404, '该企业尚未授权')
-
-        for(let i = 0; i < comProperty.length; i++){
-            switch(comProperty[i].type) {
+       
+        for(let i = 0; i < comProperties.length; i++){
+            switch(comProperties[i].type) {
                 case CPropertyType.WECHAT_CORPID:
-                    companyId = companyId ? companyId: comProperty[i].companyId;
+                    companyId = companyId ? companyId: comProperties[i].companyId;
                     company = await Models.company.get(companyId)
-                    corpId = corpId? corpId: comProperty[i].value;
+                    corpId = corpId? corpId: comProperties[i].value;
                     break;
                 case CPropertyType.WECHAT_PERMAENTCODE:
                     permanentCode = CompanyProperty[i].value;
@@ -421,7 +422,7 @@ const workWechatEventHandlers = {
 const changeContactEventHandlers = {
     //新增员工
     async create_user(xml: IWCreateUser) {
-        console.log("事件通知-----新增员工")
+        console.log("事件通知-----新增员工, info: ", xml)
         let suiteToken = await SSOModule.getSuiteToken();
         let {permanentCode, company} = await SSOModule.checkCompanyRegistered({corpId: xml.AuthCorpId});
         let accessToken = await API.sso.getAccessToken(xml.AuthCorpId, permanentCode ,suiteToken)
@@ -433,7 +434,7 @@ const changeContactEventHandlers = {
     },
     //更新员工
     async update_user(xml: IWUpdateUser) {
-        console.log("事件通知-----更新员工")
+        console.log("事件通知-----更新员工, info: ", xml)
         let suiteToken = await SSOModule.getSuiteToken();
         let {permanentCode, company} = await SSOModule.checkCompanyRegistered({corpId: xml.AuthCorpId});
         let accessToken = await API.sso.getAccessToken(xml.AuthCorpId, permanentCode ,suiteToken)
@@ -446,14 +447,14 @@ const changeContactEventHandlers = {
     },
     //删除员工
     async delete_user(xml: IWDeleteUser) {
-        console.log("事件通知-----删除员工")
+        console.log("事件通知-----删除员工, info: ", xml)
         let hasUpdated = await EventNotice.delete_user(xml);
         return hasUpdated;
 
     },
     //创建部门
     async create_party(xml: IWCreateDepartment) {
-        console.log("事件通知-----新增部门")
+        console.log("事件通知-----新增部门 info: ", xml)
         let suiteToken = await SSOModule.getSuiteToken();
         let {permanentCode, company} = await SSOModule.checkCompanyRegistered({corpId: xml.AuthCorpId});
         let accessToken = await API.sso.getAccessToken(xml.AuthCorpId, permanentCode ,suiteToken)
@@ -467,7 +468,7 @@ const changeContactEventHandlers = {
     },
     //更新部门
     async update_party(xml: IWUpdateDepartment) {
-        console.log("事件通知-----更新部门")
+        console.log("事件通知-----更新部门 info: ", xml)
         let suiteToken = await SSOModule.getSuiteToken();
         let {permanentCode, company} = await SSOModule.checkCompanyRegistered({corpId: xml.AuthCorpId});
         let accessToken = await API.sso.getAccessToken(xml.AuthCorpId, permanentCode ,suiteToken)
@@ -480,7 +481,7 @@ const changeContactEventHandlers = {
     },
     //删除
     async delete_party(xml: IWDeleteDepartment) {
-        console.log("事件通知-----删除部门")
+        console.log("事件通知-----删除部门 info: ", xml)
         let hasUpdated = await EventNotice.delete_party(xml);
         return hasUpdated;
     },
