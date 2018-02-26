@@ -599,6 +599,9 @@ function transferTrainData(meiyaTrainData: IMeiyaTrain, originalData: ISearchTic
                 case "硬座":
                     name = 9
                 break;
+                case "动卧":
+                    name = 10
+                break;
                 default:
                 name = 0
             }
