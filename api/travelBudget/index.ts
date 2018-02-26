@@ -589,13 +589,9 @@ export default class ApiTravelBudget {
                 if (approve.step === STEP.FINAL) {
                     console.log('------------enter FIN---------');
                     let params = {approveNo: approve.id};
-                    console.log('------------enter FIN 222222222222222222222---------');
                     let tripApprove = await API.tripApprove.retrieveDetailFromApprove(params);
                     
-                    console.info("tripApprove=========>>", tripApprove);
-
                     let returnApprove = await API.eventListener.sendEventNotice({ eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: approve.companyId });
-                    console.info("returnApprove=========>>", returnApprove);
                     if(returnApprove){
                         let tripPlanLog = Models.tripPlanLog.create({
                             tripPlanId: approve.id,
