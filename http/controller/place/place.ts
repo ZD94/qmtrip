@@ -48,7 +48,7 @@ export default class PlaceController extends AbstractController {
         return res.send(this.resp(result));
     }
 
-    resp(result: any):ReplyData {
+    resp(result: any): ReplyData {
         return result.code === 0
             ? this.reply(0, result.data)
             : this.reply(result.code, null);
