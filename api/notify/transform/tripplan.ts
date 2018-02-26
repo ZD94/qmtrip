@@ -89,7 +89,12 @@ export = async function transform(values: {
         values.isAutoApprove = false;
     }
 
-    if (values.tripApprove)
-        values.staffs = (await Promise.all(values.tripApprove.staffList.map((s: string) => Models.staff.get(s)))).map(_.prop('name'))
+    if (values.tripApprove) {
+        const staffNames: string[] = (await Promise.all(values.tripApprove.staffList.map((s: string) => Models.staff.get(s)))).map(_.prop('name'))
+        values.staffs = staffNames
+        values.tripApprove['applicant'] = staffNames.length > 1
+            ? staffNames[0] + ` 等${staffNames.length}人`
+            : staffNames[0]
+    }
     return values;
 }
