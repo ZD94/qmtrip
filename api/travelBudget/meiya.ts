@@ -481,6 +481,7 @@ export async function handleFlightData(meiyaFlightData: IMeiyaFlight[], original
     let deptDateTime = meiyaFlightData.depDate + " " + meiyaFlightData.depTime;
     let model = {
         "No": meiyaFlightData.flightNo,
+        "carrier":meiyaFlightData.carrier,
         stopItemList,
         "segs": [
             {
