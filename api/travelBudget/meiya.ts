@@ -421,7 +421,7 @@ function transferHotelData(supplierName: string, meiyaHotelData: IMeiyaHotel, or
 }
 
 //处理美亚飞机数据
-export function handleFlightData(meiyaFlightData: {[index: string]:Array<IMeiyaFlight>}, originalData: ISearchTicketParams): any {
+export async function handleFlightData(meiyaFlightData: {[index: string]:Array<IMeiyaFlight>}, originalData: ISearchTicketParams): Promise<any> {
     let data: any[] = [];
     if (meiyaFlightData) {
         let result: Array<any> = [];
@@ -429,7 +429,7 @@ export function handleFlightData(meiyaFlightData: {[index: string]:Array<IMeiyaF
             for (let index in meiyaFlightData) {
                 console.log(`供应商: ${index}: 航班数据长度 ===> ${meiyaFlightData[index].length}`);
                 for(let item of meiyaFlightData[index]){
-                    handleData = transferFlightData(index, item, originalData)
+                    handleData = await transferFlightData(index, item, originalData)
                     result.push(handleData)
                 }
             }
