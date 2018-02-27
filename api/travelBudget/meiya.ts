@@ -421,7 +421,7 @@ function transferHotelData(supplierName: string, meiyaHotelData: IMeiyaHotel, or
 }
 
 //处理美亚飞机数据
-export async function handleFlightData(meiyaFlightData: {[index: string]:Array<IMeiyaFlight>}, originalData: ISearchTicketParams): any {
+export async function handleFlightData(meiyaFlightData: {[index: string]:Array<IMeiyaFlight>}, originalData: ISearchTicketParams): Promise<any> {
     let data: any[] = [];
     if (meiyaFlightData) {
         let result: Array<any> = [];
