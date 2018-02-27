@@ -30,8 +30,8 @@ export async function meiyaJudge() {
 export function meiyaAuth(info?: object) {
     if (!info) {
         info = {
-            username: "JLZX",
-            password: "my2018"
+            username: config.auth.username,
+            password: config.auth.password
         };
     }
     let str = JSON.stringify(info);
