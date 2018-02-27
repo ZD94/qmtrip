@@ -166,7 +166,7 @@ export default class SSOModule {
                     corpId = corpId? corpId: comProperties[i].value;
                     break;
                 case CPropertyType.WECHAT_PERMAENTCODE:
-                    permanentCode = CompanyProperty[i].value;
+                    permanentCode = comProperties[i].value;
                     break;
                 default: 
                     break;
@@ -405,7 +405,7 @@ const workWechatEventHandlers = {
     // 授权变更事件
     async create_auth(xml: WorkWechatResponse) {
         await cache.write('create_auth',xml.AuthCode);
-        xml.AuthCode && eventPush(xml.AuthCode);
+        xml.AuthCode && eventPush(xml.AuthCode[0]);
     },
     async change_auth(xml: WorkWechatResponse) {
 
@@ -424,8 +424,8 @@ const changeContactEventHandlers = {
     async create_user(xml: IWCreateUser) {
         console.log("事件通知-----新增员工, info: ", xml)
         let suiteToken = await SSOModule.getSuiteToken();
-        let {permanentCode, company} = await SSOModule.checkCompanyRegistered({corpId: xml.AuthCorpId});
-        let accessToken = await API.sso.getAccessToken(xml.AuthCorpId, permanentCode ,suiteToken)
+        let {permanentCode, company} = await SSOModule.checkCompanyRegistered({corpId: xml.AuthCorpId[0]});
+        let accessToken = await API.sso.getAccessToken(xml.AuthCorpId[0], permanentCode ,suiteToken)
         let restApi = new RestApi(accessToken);
         if(!company || !restApi) throw L.ERR.METHOD_NOT_SUPPORT();
         let eventNotice = new EventNotice({ company, restApi});
@@ -436,8 +436,8 @@ const changeContactEventHandlers = {
     async update_user(xml: IWUpdateUser) {
         console.log("事件通知-----更新员工, info: ", xml)
         let suiteToken = await SSOModule.getSuiteToken();
-        let {permanentCode, company} = await SSOModule.checkCompanyRegistered({corpId: xml.AuthCorpId});
-        let accessToken = await API.sso.getAccessToken(xml.AuthCorpId, permanentCode ,suiteToken)
+        let {permanentCode, company} = await SSOModule.checkCompanyRegistered({corpId: xml.AuthCorpId[0]});
+        let accessToken = await API.sso.getAccessToken(xml.AuthCorpId[0], permanentCode ,suiteToken)
 
         let restApi = new RestApi(accessToken);
         if(!company || !restApi) throw L.ERR.METHOD_NOT_SUPPORT();
@@ -456,8 +456,8 @@ const changeContactEventHandlers = {
     async create_party(xml: IWCreateDepartment) {
         console.log("事件通知-----新增部门 info: ", xml)
         let suiteToken = await SSOModule.getSuiteToken();
-        let {permanentCode, company} = await SSOModule.checkCompanyRegistered({corpId: xml.AuthCorpId});
-        let accessToken = await API.sso.getAccessToken(xml.AuthCorpId, permanentCode ,suiteToken)
+        let {permanentCode, company} = await SSOModule.checkCompanyRegistered({corpId: xml.AuthCorpId[0]});
+        let accessToken = await API.sso.getAccessToken(xml.AuthCorpId[0], permanentCode ,suiteToken)
 
         let restApi = new RestApi(accessToken);
         if(!company || !restApi) throw L.ERR.METHOD_NOT_SUPPORT();
@@ -470,8 +470,8 @@ const changeContactEventHandlers = {
     async update_party(xml: IWUpdateDepartment) {
         console.log("事件通知-----更新部门 info: ", xml)
         let suiteToken = await SSOModule.getSuiteToken();
-        let {permanentCode, company} = await SSOModule.checkCompanyRegistered({corpId: xml.AuthCorpId});
-        let accessToken = await API.sso.getAccessToken(xml.AuthCorpId, permanentCode ,suiteToken)
+        let {permanentCode, company} = await SSOModule.checkCompanyRegistered({corpId: xml.AuthCorpId[0]});
+        let accessToken = await API.sso.getAccessToken(xml.AuthCorpId[0], permanentCode ,suiteToken)
         let restApi = new RestApi(accessToken);
         if(!company || !restApi) throw L.ERR.METHOD_NOT_SUPPORT();
         let eventNotice = new EventNotice({ company, restApi});
@@ -494,10 +494,10 @@ const changeContactEventHandlers = {
 
 
 export interface WorkWechatResponse {
-    SuiteId: string,
-    InfoType: string,
-    TimeStamp: number,
-    SuiteTicket?: string,
-    AuthCode?: string,
-    AuthCorpId?: string,
+    SuiteId: Array<string>,
+    InfoType: Array<string>,
+    TimeStamp: Array<number>,
+    SuiteTicket?: Array<string>,
+    AuthCode?: Array<string>,
+    AuthCorpId?: Array<string>,
 }
