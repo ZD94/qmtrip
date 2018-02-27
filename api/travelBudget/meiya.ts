@@ -393,7 +393,7 @@ function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHot
             //     }
             // },
             {
-                "name": "meiya",
+                "name": meiyaHotelData.agent,
                 "price": meiyaHotelData.hotelMinPrice,
                 "urlParams": {
                     "hotelId": meiyaHotelData.hotelId
@@ -517,7 +517,7 @@ export async function handleFlightData(meiyaFlightData: IMeiyaFlight[], original
         "carry": meiyaFlightData.airline,
         "agents": [
             {
-                "name": "meiya",
+                "name": meiyaFlightData.agent,
                 "cabins":cabins,
                 // "bookUrl": "http://m.ctrip.com/html5/flight/swift/domestic/SHA/CAN/2017-12-26",
                 "deeplinkData": {
@@ -627,7 +627,7 @@ function transferTrainData(meiyaTrainData: IMeiyaTrain, originalData: ISearchTic
         "type": 0,
         "agents": [
             {
-                "name": "meiya",
+                "name": meiyaTrainData.agent,
                 "cabins":cabins,
                 "other": {}
             }
@@ -880,7 +880,8 @@ export interface IMeiyaFlight {
     arrivalCode?: string;
     departure?: string;
     departureCode?: string;
-    depTerm?: string | number
+    depTerm?: string | number;
+    agent?: string;
 }
 
 export interface IMeiyaTrainSeat {
@@ -899,6 +900,7 @@ export interface IMeiyaTrain {
     ArrStation?: string;
     StartTimeLong?: Date;
     EndTimeLong?: Date;
+    agent?: string;
 }
 
 export interface IMeiyaHotel {
@@ -933,6 +935,7 @@ export interface IMeiyaHotel {
     strHotelTrafficInformation?: any;
     hotelMinPrice?: number;
     name?: string;
+    agent?: string;
 }
 
 export interface IMeiyaAuthData {
