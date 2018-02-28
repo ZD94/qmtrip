@@ -3222,7 +3222,7 @@ async function tryUpdateTripPlanStatus(tripPlan: TripPlan, status: EAuditStatus)
     cannotStatus[EAuditStatus.AUDITING] = _.concat([ETripDetailStatus.AUDIT_NOT_PASS, ETripDetailStatus.WAIT_COMMIT], cannotStatus[EAuditStatus.WAIT_COMMIT]);
     cannotStatus[EAuditStatus.INVOICE_PASS] = _.concat([ETripDetailStatus.AUDITING], cannotStatus[EAuditStatus.AUDITING]);
 
-    //变tripPlan状态,只关注出发交通,返回交通,住宿,特殊审批类型
+    //变tripPlan状态,只关注出发交通,返回交通,住宿,特殊审批、补助类型
     let preTripTypeNeeds = [ETripType.BACK_TRIP, ETripType.OUT_TRIP, ETripType.HOTEL, ETripType.SPECIAL_APPROVE, ETripType.SUBSIDY];
     //更新行程状态
     let tripDetails = await Models.tripDetail.find({
