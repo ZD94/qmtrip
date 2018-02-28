@@ -5,6 +5,7 @@ import {Staff} from "_types/staff";
 const API = require("@jingli/dnode-api");
 const config = require("@jingli/config");
 var haversine = require("haversine");
+const _ = require("lodash");
 import {ISearchHotelParams, ISearchTicketParams} from "./index";
 
 var request = require("request-promise");
@@ -56,11 +57,12 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
         depDate: moment(params.leaveDate).format("YYYY-MM-DD")
     };
     let urlFlight = config.orderSysConfig.orderLink + "/tmc/searchFlight/getList/" + `${params.originPlaceId}/${params.destinationId}/${meiyaParam.depDate}`;
-    console.log("urlFlight====>", urlFlight);
+    console.log("urlFlight====>", urlFlight, authData);
     let meiyaResult;
     for (let item of authData) {
         let info = item.identify;
         let sname = item.sname;
+        console.log("supplier====>", sname);
         meiyaResult = await request({
             url: urlFlight,
             method: "get",
@@ -74,6 +76,7 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
         });
         try {
             meiyaResult = JSON.parse(meiyaResult);
+            console.log("meiyaResult====>", meiyaResult.code, meiyaResult.data.length);
             if(meiyaResult.code == 0){
                 data.push(...meiyaResult.data);
                 // meiyaResult.data = data
@@ -106,6 +109,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
     for (let item of authData) {
         let info = item.identify;
         let sname = item.sname;
+        console.log("supplier====>", sname);
         meiyaResult = await request({
             url: urlTrain,
             method: "get",
@@ -147,11 +151,13 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
     params.checkOutDate = moment(params.checkOutDate).format("YYYY-MM-DD");
     let urlHotel = `${params.cityId}/${params.checkInDate}/${params.checkOutDate}`;
     urlHotel = config.orderSysConfig.orderLink + "/tmc/searchHotel/getList/" + urlHotel;
+    console.log("authData =====>", authData);
     console.log("urlHotel =====>", urlHotel);
     let meiyaResult;
     for (let item of authData) {
         let info = item.identify;
         let sname = item.sname;
+        console.log("===supplier====>", sname);
         meiyaResult = await request({
             url: urlHotel,
             method: "get",
@@ -165,6 +171,7 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
         });
         try {
             meiyaResult = JSON.parse(meiyaResult);
+            console.log("supplier====>", sname, meiyaResult);
             if(meiyaResult.code == 0){
                 data.push(...meiyaResult.data);
                 // meiyaResult.data = data
@@ -646,6 +653,37 @@ function transferTrainData(meiyaTrainData: IMeiyaTrain, originalData: ISearchTic
     }
     return model
 }
+
+/**
+ * @method 根据指定的介质，进行比较，继而合并同类项
+ * @param Data 
+ * @param match {string} 指定相比较的项名
+ * @param mergeProperty {string} 指定需要合并属性名, 目前只支持该属性的值类型是数组类型
+ */
+export function combineData(Data: Array<any>, match: string, mergeProperty: string){
+    for(let i = 0; i < Data.length; i++){
+        for(let j = i+1; j < Data.length; j++) {
+            if(/[\u4e00-\u9fa5]/.test(Data[i][match]) && /[\u4e00-\u9fa5]/.test(Data[j][match])){  //包含中文使用相似度匹配
+                let isSame = similarityMatch({
+                    base: Data[i][match],
+                    target:Data[j][match],
+                    ignores: ['酒店', '旅店', '{}', '()']
+                });
+                if(isSame){
+                    Data[i][mergeProperty] = _.concat(Data[i][mergeProperty], Data[j][mergeProperty]);
+                    Data.splice(j,1);
+                    j--;
+                }
+            }else if(Data[i][match] === Data[j][match]){
+                Data[i][mergeProperty] = _.concat(Data[i][mergeProperty], Data[j][mergeProperty]);
+                Data.splice(j,1);
+                j--;
+            }
+        }
+    }
+    return Data;
+}
+
 
 
 /**
