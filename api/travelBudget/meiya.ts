@@ -461,6 +461,9 @@ export async function handleFlightData(meiyaFlightData: IMeiyaFlight[], original
                 case "高端经济舱":
                     name = 5
                 break;
+                case "豪华经济舱":
+                    name = 5
+                    break
                 default:
                     name = 0
             }
