@@ -5,6 +5,7 @@ import {Staff} from "_types/staff";
 const API = require("@jingli/dnode-api");
 const config = require("@jingli/config");
 var haversine = require("haversine");
+const _ = require("lodash");
 import {ISearchHotelParams, ISearchTicketParams} from "./index";
 
 var request = require("request-promise");
@@ -646,6 +647,37 @@ function transferTrainData(meiyaTrainData: IMeiyaTrain, originalData: ISearchTic
     }
     return model
 }
+
+/**
+ * @method 根据指定的介质，进行比较，继而合并同类项
+ * @param Data 
+ * @param match {string} 指定相比较的项名
+ * @param mergeProperty {string} 指定需要合并属性名, 目前只支持该属性的值类型是数组类型
+ */
+export function combineData(Data: Array<any>, match: string, mergeProperty: string){
+    for(let i = 0; i < Data.length; i++){
+        for(let j = i+1; j < Data.length; j++) {
+            if(/[\u4e00-\u9fa5]/.test(Data[i][match]) && /[\u4e00-\u9fa5]/.test(Data[j][match])){  //包含中文使用相似度匹配
+                let isSame = similarityMatch({
+                    base: Data[i][match],
+                    target:Data[j][match],
+                    ignores: ['酒店', '旅店', '{}', '()']
+                });
+                if(isSame){
+                    Data[i][mergeProperty] = _.concat(Data[i][mergeProperty], Data[j][mergeProperty]);
+                    Data.splice(j,1);
+                    j--;
+                }
+            }else if(Data[i][match] === Data[j][match]){
+                Data[i][mergeProperty] = _.concat(Data[i][mergeProperty], Data[j][mergeProperty]);
+                Data.splice(j,1);
+                j--;
+            }
+        }
+    }
+    return Data;
+}
+
 
 
 /**
