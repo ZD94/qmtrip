@@ -893,9 +893,11 @@ export default class ApiTravelBudget {
                 addUrl: `${companyId}/data`,
                 model: "TmcSupplier"
             })
+            if(result.code != 0) throw L.ERR.HAS_NOT_BIND();
             return result.data
         } catch (err) {
             console.log(err);
+            throw L.ERR.NOT_ACCEPTABLE();
         }
 
     }

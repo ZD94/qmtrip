@@ -200,7 +200,7 @@ class Proxy {
                 }catch(err){ return res.json({code: 407, msg: "未绑定供应商", data: null}) }
                 
                 identify = companyInfo && companyInfo.length ?companyInfo[0].identify: null;
-                if(!identify) return res.json({code: 407, msg: "未绑定供应商1", data: null});
+                if(!identify) return res.json({code: 407, msg: "未绑定供应商", data: null});
                 if (typeof identify == 'object') {
                     identify = JSON.stringify(identify);
                 }
