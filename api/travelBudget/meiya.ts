@@ -368,7 +368,7 @@ function getDistance(lat1: string, lng1: string, lat2: string, lng2: string) {
     return dis * 6378137;
 
     function toRadians(d: string) {  return Number(d) * Math.PI / 180;}
-} 
+}
 
 function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHotelParams) {
     let distance;
@@ -378,9 +378,15 @@ function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHot
     }else{
         distance = null
     }
-    let model = {
+    let star;
+    if(meiyaHotelData.starRating == 0 || meiyaHotelData.starRating == 1){
+        star = 2
+    }else {
+        star = meiyaHotelData.starRating
+    }
+        let model = {
         "name": meiyaHotelData.cnName,
-        "star": meiyaHotelData.starRating,
+        "star": star,
         "agents": [
             // {
             //     "name": "meiya",
@@ -625,7 +631,7 @@ function transferTrainData(meiyaTrainData: IMeiyaTrain, originalData: ISearchTic
     }else{
         cabins = []
     }
-    
+
     let model = {
         "No": meiyaTrainData.TrainNumber,
         "type": 0,
@@ -653,7 +659,7 @@ function transferTrainData(meiyaTrainData: IMeiyaTrain, originalData: ISearchTic
 
 /**
  * @method 根据指定的介质，进行比较，继而合并同类项
- * @param Data 
+ * @param Data
  * @param match {string} 指定相比较的项名
  * @param mergeProperty {string} 指定需要合并属性名, 目前只支持该属性的值类型是数组类型
  */
