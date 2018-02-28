@@ -192,7 +192,8 @@ export default class ApiTravelBudget {
             return require("meiyaFake/finallyUsingHotel");
         } else {
             let meiyaHotel = await getMeiyaHotelData(params, authData);
-            if (meiyaHotel){
+            console.log("meiyaHotel ===> meiyaHotel data.", meiyaHotel.length);
+            if (meiyaHotel && meiyaHotel.length){
                 commonData = handelHotelsData(meiyaHotel, params);
                 commonData = combineData(commonData, 'name', 'agents');
                 return commonData;
@@ -255,14 +256,17 @@ export default class ApiTravelBudget {
             ]);
             let meiyaTrain = arr[0];
             let meiyaFlight = arr[1];
-            if (meiyaFlight) {
-                commonData = handleFlightData(meiyaFlight,params);
+            console.log("meiyaFlight ===> meiyaFlight data.", meiyaFlight.length);
+            console.log("meiyaTrain ===> meiyaTrain data.", meiyaTrain.length);
+
+            if (meiyaFlight && meiyaFlight.length) {
+                commonData = await handleFlightData(meiyaFlight,params);
                 commonData = combineData(commonData, 'No', 'agents')
             }    
-            if (meiyaTrain){      
+            if (meiyaTrain && meiyaTrain.length){      
                 commonData2 = handleTrainData(meiyaTrain, params)
                 commonData2 = combineData(commonData2, 'No', 'agents')
-            }       
+            }   
             return [...commonData, ...commonData2];
         }
     }
@@ -590,7 +594,7 @@ export default class ApiTravelBudget {
                     console.log('------------enter FIN---------');
                     let params = {approveNo: approve.id};
                     let tripApprove = await API.tripApprove.retrieveDetailFromApprove(params);
-
+                    
                     let returnApprove = await API.eventListener.sendEventNotice({ eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: approve.companyId });
                     if(returnApprove){
                         let tripPlanLog = Models.tripPlanLog.create({
