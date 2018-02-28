@@ -603,6 +603,7 @@ export default class ApiTravelBudget {
                         });
                         await tripPlanLog.save();
                         await API.tripApprove.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
+                        await ApiTravelBudget.sendTripApproveNoticeToSystem({approveId: tripApprove.id, staffId: staffId});
                     }
 
                 }
@@ -865,7 +866,7 @@ export default class ApiTravelBudget {
         let _id = Date.now() + utils.getRndStr(6);
         let key = `budgets:${staffId}:${_id}`;
         await cache.write(key, JSON.stringify(obj));
-        await ApiTravelBudget.sendTripApproveNoticeToSystem({cacheId: _id, staffId: staffId});
+        // await ApiTravelBudget.sendTripApproveNoticeToSystem({cacheId: _id, staffId: staffId});
 
         return {approveId: approveId, budgetId: _id};
     }
@@ -950,8 +951,8 @@ export default class ApiTravelBudget {
     }
 
 
-    static async sendTripApproveNoticeToSystem(params: { cacheId: string, staffId: string }) {
-        let {cacheId, staffId} = params;
+    static async sendTripApproveNoticeToSystem(params: { staffId: string, cacheId?: string,  approveId?: string}) {
+        let {cacheId, staffId, approveId} = params;
         if (!staffId || staffId == 'undefined') {
             let currentStaff = await Staff.getCurrent();
             staffId = currentStaff.id;
@@ -969,7 +970,7 @@ export default class ApiTravelBudget {
                         await API.notify.submitNotify({
                             key: 'qm_notify_system_new_travelbudget',
                             email: s.email,
-                            values: {cacheId: cacheId, name: s.name, staffId: staffId}
+                            values: {cacheId: cacheId, name: s.name, staffId: staffId, approveId: approveId}
                         })
 
                     } catch (err) {

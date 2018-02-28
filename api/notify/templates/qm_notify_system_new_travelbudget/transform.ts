@@ -6,10 +6,10 @@ import {MPlaneLevel, MTrainLevel, MHotelLevel,DefaultRegion} from '_types';
 import { ITravelBudgetInfo } from 'http/controller/budget';
 require("moment-timezone")
 
-export = async function transform(values: {staffId: string,
-    staff: Staff, MPlaneLevel: object,   MTrainLevel: object, MHotelLevel: object,
-    travelPolicy: {[key: string]: any}, cacheId: string, totalBudget: number, budgets: ITravelBudgetInfo[],
-    query: object, destinationPlacesInfo: any, cityMap: any, date: string, staffs: Staff[]
+export = async function transform(values: {staffId: string, approveId?: string
+    staff?: Staff, MPlaneLevel?: object,   MTrainLevel?: object, MHotelLevel?: object,
+    travelPolicy?: {[key: string]: any}, cacheId?: string, totalBudget?: number, budgets?: ITravelBudgetInfo[],
+    query?: object, destinationPlacesInfo?: any, cityMap?: any, date?: string, staffs?: Staff[]
 }): Promise<any>{
     let cityMap = {};
     let staff = await Models.staff.get(values.staffId);
@@ -66,7 +66,18 @@ export = async function transform(values: {staffId: string,
 
     values.travelPolicy =  travelp;
 
-    let budgetInfo = await API.travelBudget.getBudgetInfo({id: values.cacheId, accountId : staff.id});
+    let budgetInfo: any;
+    if(values.cacheId){
+        budgetInfo = await API.travelBudget.getBudgetInfo({id: values.cacheId, accountId : staff.id});
+    }
+    if(values.approveId){
+        let approve = await Models.approve.get(values.approveId);
+        budgetInfo = approve.data;
+    }
+
+    if(typeof budgetInfo == 'string'){
+        budgetInfo = JSON.parse(budgetInfo);
+    }
     let {budgets, query} = budgetInfo;
     let totalBudget = 0;
     budgets.forEach((b: any) => {totalBudget += Number(b.price);});
