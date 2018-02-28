@@ -236,7 +236,6 @@ export default class ApiTravelBudget {
             authData.push({identify, sname});
             return authData
         });
-        console.log("======authData: ", authData)
         // if (result.code == 0) {
         //     commonData = result.data.data;
         // }
