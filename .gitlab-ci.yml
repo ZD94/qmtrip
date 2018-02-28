@@ -168,7 +168,7 @@ deploy:release:
     JL_APP_BUDGET_HOST: j.jingli365.com
     JL_APP_BUDGET_PORT: 4103
     JL_APP_NOTICE_EMAIL: tbudget@jingli365.com
-    JL_APP_V2_HOST: https://j.jingli365.com/index-v2.html
+    JL_APP_V2_HOST: https://j.jingli365.com/
     JL_APP_APPROVE_SERVER_URL: https://j.jingli365.com/proj/svr-trip-approve/api/v1
     JL_APP_TMC: https://j.jingli365.com/proj/svr-tmc
     JL_APP_TMC_FAKE: 0
