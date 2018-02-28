@@ -24,14 +24,14 @@ export class EventNotice {
     async create_user(xml: IWCreateUser) {
         let self = this;
         let wStaff = new WStaff({
-            id: xml.UserId,         
-            name: xml.Name, 
-            mobile: xml.Mobile,
-            sex: xml.Gender,
-            email: xml.Email, 
+            id: xml.UserId[0],         
+            name: xml.Name[0],  
+            mobile: xml.Mobile && xml.Mobile[0]? xml.Mobile[0]: null,
+            sex: xml.Gender[0], 
+            email: xml.Email && xml.Email[0]? xml.Email[0]: null, 
             departmentIds: xml.Department, 
-            corpId: xml.AuthCorpId, 
-            avatar: xml.Avatar,
+            corpId: xml.AuthCorpId[0],  
+            avatar: xml.Avatar && xml.Avatar[0]? xml.Avatar[0]: null,
             company: self.company,
             restApi: self.restApi, 
         });
@@ -44,14 +44,14 @@ export class EventNotice {
     async update_user(xml: IWUpdateUser) {
         let self = this;
         let wStaff = new WStaff({
-            id: xml.UserId,         
-            name: xml.Name, 
-            mobile: xml.Mobile,
-            sex: xml.Gender,
-            email: xml.Email, 
+            id: xml.UserId[0],         
+            name: xml.Name[0], 
+            mobile: xml.Mobile && xml.Mobile[0]? xml.Mobile[0]: null,
+            sex: xml.Gender[0],
+            email: xml.Email && xml.Email[0]? xml.Email[0]: null, 
             departmentIds: xml.Department, 
-            corpId: xml.AuthCorpId, 
-            avatar: xml.Avatar,
+            corpId: xml.AuthCorpId[0], 
+            avatar: xml.Avatar && xml.Avatar[0]? xml.Avatar[0]: null,
             company: self.company,
             restApi: self.restApi, 
         });
@@ -65,7 +65,7 @@ export class EventNotice {
         
         let comPro = await Models.staffProperty.find({ where: {
             type: SPropertyType.WECHAT_CORPID,
-            value: xml.AuthCorpId
+            value: xml.AuthCorpId[0]
         }});
 
         if(!comPro || !comPro.length) 
@@ -74,7 +74,7 @@ export class EventNotice {
 
         let staffPros = await Models.staffProperty.find({ where: {
             staffId: staffId,
-            value: xml.UserId
+            value: xml.UserId[0]
         }});
         if(!staffPros || !staffPros.length) 
             throw new Error("该staff不存在鲸力系统中")
@@ -110,10 +110,10 @@ export class EventNotice {
 
         let self = this;
         let wdepartment = new WDepartment({
-            name: xml.Name, 
-            parentId: xml.ParentId, 
-            id: xml.Id + '', 
-            corpId: xml.AuthCorpId,
+            name: xml.Name[0], 
+            parentId: xml.ParentId[0], 
+            id: xml.Id[0] + '', 
+            corpId: xml.AuthCorpId[0],
             company: self.company,
             restApi: self.restApi
         });
@@ -127,10 +127,10 @@ export class EventNotice {
     async update_party(xml: IWUpdateDepartment) {
         let self = this;
         let wdepartment = new WDepartment({
-            name: xml.Name, 
-            parentId: xml.ParentId, 
-            id: xml.Id + '', 
-            corpId: xml.AuthCorpId,
+            name: xml.Name[0], 
+            parentId: xml.ParentId[0], 
+            id: xml.Id[0] + '', 
+            corpId: xml.AuthCorpId[0],
             company: self.company,
             restApi: self.restApi
         });
@@ -144,7 +144,7 @@ export class EventNotice {
     static async delete_party(xml: IWDeleteDepartment) {
         let comPro = await Models.departmentProperty.find({ where: {
             type: DPropertyType.WECHAT_CORPID,
-            value: xml.AuthCorpId
+            value: xml.AuthCorpId[0]
         }});
 
         if(!comPro || !comPro.length) 
@@ -152,7 +152,7 @@ export class EventNotice {
         let departmentId = comPro[0].departmentId;
         let deptPros = await Models.departmentProperty.find({ where: {
             departmentId: departmentId,
-            value: xml.Id
+            value: xml.Id[0]
         }});
         if(!deptPros || !deptPros.length) 
             throw new Error("该部门不存在鲸力系统中")
@@ -180,23 +180,23 @@ export class EventNotice {
 
 /**添加新员工*/
 export interface IWCreateUser {
-   SuiteId?: string,
-   AuthCorpId?: string,
-   InfoType?: string,  //此处为change_contact
-   TimeStamp?: number,
-   ChangeType?: string,   //此处为create_user
-   UserId?: string,
-   Name?: string,
+   SuiteId?:  Array<string>,
+   AuthCorpId?:  Array<string>,
+   InfoType?:  Array<string>,  //此处为change_contact
+   TimeStamp?:  Array<string>,
+   ChangeType?:  Array<string>,   //此处为create_user
+   UserId?:  Array<string>,
+   Name?:  Array<string>,
    Department?: Array<number|string>,
-   Mobile?: string|number,    //仅通讯录管理应用可以获取
-   Position?: string|number,
-   Gender?: EGender,     //1表示男性， 2表示女性
-   Email?: string,
-   Status?: number,  //激活状态：1=激活或关注， 2=禁用， 4=退出企业
-   Avatar?: string,  //如果要获取小图将url最后的”/0”改成”/100”即可
-   EnglishName?: string,
-   IsLeader?: number,  //上级字段，标识是否为上级。0表示普通成员，1表示上级
-   Telephone?: number,  //座机，仅通讯录管理应用可获取
+   Mobile?:  Array<string|number>,    //仅通讯录管理应用可以获取
+   Position?:  Array<string|number>,
+   Gender?: EGender | Array<string|number>,     //1表示男性， 2表示女性
+   Email?:  Array<string>,
+   Status?:  Array<number>,  //激活状态：1=激活或关注， 2=禁用， 4=退出企业
+   Avatar?:  Array<string>,  //如果要获取小图将url最后的”/0”改成”/100”即可
+   EnglishName?: Array<string>,
+   IsLeader?:  Array<number>,  //上级字段，标识是否为上级。0表示普通成员，1表示上级
+   Telephone?: Array<number>,  //座机，仅通讯录管理应用可获取
    ExtAttr?: Array<{    //扩展属性，仅通讯录管理应用可获取
        Name?: string,
        Value?: string,
@@ -205,51 +205,50 @@ export interface IWCreateUser {
 
 /**修改员工 */
 export interface IWUpdateUser extends IWCreateUser {
-    NewUserID?: string,   //新的UserID，变更时推送（userid由系统生成时可更改一次）
-    ChangeType?: string,   //此处为update_user
+    NewUserID?:  Array<string>,   //新的UserID，变更时推送（userid由系统生成时可更改一次）
 }
 
 /**修改员工 */
 export interface IWDeleteUser {
-    SuiteId?: string,
-    AuthCorpId?: string,
-    InfoType?: string,  //此处为change_contact
-    TimeStamp?: number,
-    ChangeType?: string,   //此处为 delete_user
-    UserId?: string
+    SuiteId?: Array<string>,
+    AuthCorpId?:  Array<string>,
+    InfoType?:  Array<string>,  //此处为change_contact
+    TimeStamp?:  number | string |Array<number>,
+    ChangeType?: Array<string>,   //此处为 delete_user
+    UserId?:  Array<string>
 }
 
 /**添加部门 */
 export interface IWCreateDepartment {
-    SuiteId?: string,
-    AuthCorpId?: string,
-    InfoType?: string,  //此处为change_contact
-    TimeStamp?: number,
-    ChangeType?: string,   //此处为 create_party
-    Id?: string,
-    Name?: string,
-    ParentId?: number|string,
+    SuiteId?: Array<string>,
+    AuthCorpId?: Array<string>,
+    InfoType?:  Array<string>,  //此处为change_contact
+    TimeStamp?:  number | string | Array<string>,
+    ChangeType?:  Array<string>,   //此处为 create_party
+    Id?: Array<string>,
+    Name?:  Array<string>,
+    ParentId?: Array<string|number>,
     Order?: any  //部门排序
 }
 
 /**更新部门 */
 export interface IWUpdateDepartment {
-    SuiteId?: string,
-    AuthCorpId?: string,
-    InfoType?: string,  //此处为change_contact
-    TimeStamp?: number,
-    ChangeType?: string,   //此处为 update_party
-    Id?: string,
-    Name?: string, // 部门名称，仅当该字段发生变更时传递
-    ParentId?: number|string  //父部门id，仅当该字段发生变更时传递
+    SuiteId?: Array<string>,
+    AuthCorpId?: Array<string>,
+    InfoType?: Array<string>,  //此处为change_contact
+    TimeStamp?: number | string | Array<number|string>,
+    ChangeType?: Array<string>,   //此处为 update_party
+    Id?:  Array<string>,
+    Name?:  Array<string>, // 部门名称，仅当该字段发生变更时传递
+    ParentId?: Array<string|number>  //父部门id，仅当该字段发生变更时传递
 }
 
 /**删除部门 */
 export interface IWDeleteDepartment {
-    SuiteId?: string,
-    AuthCorpId?: string,
-    InfoType?: string,  //此处为change_contact
-    TimeStamp?: number,
-    ChangeType?: string,   //此处为 delete_party
-    Id?: string
+    SuiteId?:  Array<string>,
+    AuthCorpId?:  Array<string>,
+    InfoType?: Array<string>,  //此处为change_contact
+    TimeStamp?: Array<string>,
+    ChangeType?: Array<string>,   //此处为 delete_party
+    Id?: Array<string>
 }

@@ -6,7 +6,7 @@
   "link_version": "${JL_APP_LINK_VERSION}",
   "debug": "${JL_APP_DEBUG}",
   "ts_node": true,
-  "cluster": false,
+  "cluster": 4,
   "port": "${JL_APP_PORT}",
   "apiPort": 4102,
   "pid_file": "${{rootDir}}/tmp/server.pid",

@@ -55,7 +55,7 @@ export class EventModule{
                 }
                 let result = await request({
                     uri: `${url}`,
-                    body: null,
+                    body: params,
                     json:true,
                     method: `${method}`,
                     qs: qs
