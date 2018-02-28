@@ -845,7 +845,7 @@ class TripPlanModule {
 
                 let version = params.version || config.link_version || 2 //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
                 if (version == 2) {
-                    appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}`
+                    appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}/2`
                     self_url = `${config.v2_host}${appMessageUrl}`
                 } else {
                     self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
@@ -1118,7 +1118,7 @@ class TripPlanModule {
                 let appMessageUrl: string = ""
 
                 if (params.version == 2) { //@#template v2的外链url。
-                    appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}`
+                    appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}/2`
                     self_url = `${config.v2_host}${appMessageUrl}`
                 } else {
                     self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
@@ -2104,7 +2104,7 @@ class TripPlanModule {
         let appMessageUrl: string = ""
         let version = params.version || config.link_version || 2  //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
         if (version == 2) {
-            appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}`;
+            appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}/1`;
             self_url = `${config.v2_host}${appMessageUrl}`//'trip/trip-list-detail/:tripId'
         } else {
             self_url = config.host + '/index.html#/trip/list-detail?tripid=' + approve.id;
