@@ -188,13 +188,13 @@ class Proxy {
             let addon:{[index: string]: any} = {
                 listeningon: listeningon     
             };
-            let supplier =req.headers['supplier'] || 'meiya';
+            let supplier =req.headers['supplier'];
             let companyInfo: Array<ITMCSupplier>;
             let identify: any;
    
             if (isNeedAuth == '1') {
                 //no need to offer auth
-            } else {
+            } else if(supplier){
                 try{
                     companyInfo = await ApiTravelBudget.getCompanyInfo(supplier, staff.id);
                 }catch(err){ return res.json({code: 407, msg: "未绑定供应商", data: null}) }
