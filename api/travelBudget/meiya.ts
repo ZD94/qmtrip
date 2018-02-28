@@ -57,7 +57,7 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
         depDate: moment(params.leaveDate).format("YYYY-MM-DD")
     };
     let urlFlight = config.orderSysConfig.orderLink + "/tmc/searchFlight/getList/" + `${params.originPlaceId}/${params.destinationId}/${meiyaParam.depDate}`;
-    console.log("urlFlight====>", urlFlight, authData);
+    console.log("urlFlight====>", urlFlight);
     let meiyaResult;
     for (let item of authData) {
         let info = item.identify;
