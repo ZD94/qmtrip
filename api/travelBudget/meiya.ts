@@ -62,7 +62,6 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
     for (let item of authData) {
         let info = item.identify;
         let sname = item.sname;
-        console.log("supplier====>", sname);
         meiyaResult = await request({
             url: urlFlight,
             method: "get",
@@ -76,7 +75,6 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
         });
         try {
             meiyaResult = JSON.parse(meiyaResult);
-            console.log("meiyaResult====>", meiyaResult.code, meiyaResult.data.length);
             if(meiyaResult.code == 0){
                 data.push(...meiyaResult.data);
                 // meiyaResult.data = data
@@ -109,7 +107,6 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
     for (let item of authData) {
         let info = item.identify;
         let sname = item.sname;
-        console.log("supplier====>", sname);
         meiyaResult = await request({
             url: urlTrain,
             method: "get",
@@ -151,13 +148,11 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
     params.checkOutDate = moment(params.checkOutDate).format("YYYY-MM-DD");
     let urlHotel = `${params.cityId}/${params.checkInDate}/${params.checkOutDate}`;
     urlHotel = config.orderSysConfig.orderLink + "/tmc/searchHotel/getList/" + urlHotel;
-    console.log("authData =====>", authData);
     console.log("urlHotel =====>", urlHotel);
     let meiyaResult;
     for (let item of authData) {
         let info = item.identify;
         let sname = item.sname;
-        console.log("===supplier====>", sname);
         meiyaResult = await request({
             url: urlHotel,
             method: "get",
@@ -171,7 +166,6 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
         });
         try {
             meiyaResult = JSON.parse(meiyaResult);
-            console.log("supplier====>", sname, meiyaResult);
             if(meiyaResult.code == 0){
                 data.push(...meiyaResult.data);
                 // meiyaResult.data = data
