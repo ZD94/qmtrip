@@ -31,8 +31,8 @@ export async function meiyaJudge() {
 export function meiyaAuth(info?: object) {
     if (!info) {
         info = {
-            username: "JLZX",
-            password: "my2018"
+            username: config.auth.username,
+            password: config.auth.password
         };
     }
     let str = JSON.stringify(info);
@@ -376,7 +376,7 @@ function getDistance(lat1: string, lng1: string, lat2: string, lng2: string) {
     return dis * 6378137;
 
     function toRadians(d: string) {  return Number(d) * Math.PI / 180;}
-} 
+}
 
 function transferHotelData(supplierName: string, meiyaHotelData: IMeiyaHotel, originalData: ISearchHotelParams): any {
     let distance;
@@ -386,9 +386,15 @@ function transferHotelData(supplierName: string, meiyaHotelData: IMeiyaHotel, or
     }else{
         distance = null
     }
-    let model = {
+    let star;
+    if(meiyaHotelData.starRating == 0 || meiyaHotelData.starRating == 1){
+        star = 2
+    }else {
+        star = meiyaHotelData.starRating
+    }
+        let model = {
         "name": meiyaHotelData.cnName,
-        "star": meiyaHotelData.starRating,
+        "star": star,
         "agents": [
             // {
             //     "name": "meiya",
@@ -402,7 +408,7 @@ function transferHotelData(supplierName: string, meiyaHotelData: IMeiyaHotel, or
             //     }
             // },
             {
-                "name": supplierName,
+                "name": meiyaHotelData.agent,
                 "price": meiyaHotelData.hotelMinPrice,
                 "urlParams": {
                     "hotelId": meiyaHotelData.hotelId
@@ -472,6 +478,9 @@ async function transferFlightData(supplierName: string, meiyaFlightData: IMeiyaF
                 case "高端经济舱":
                     name = 5
                 break;
+                case "豪华经济舱":
+                    name = 5
+                    break
                 default:
                     name = 0
             }
@@ -493,6 +502,7 @@ async function transferFlightData(supplierName: string, meiyaFlightData: IMeiyaF
     let deptDateTime = meiyaFlightData.depDate + " " + meiyaFlightData.depTime;
     let model = {
         "No": meiyaFlightData.flightNo,
+        "carrier":meiyaFlightData.carrier,
         stopItemList,
         "segs": [
             {
@@ -528,7 +538,7 @@ async function transferFlightData(supplierName: string, meiyaFlightData: IMeiyaF
         "carry": meiyaFlightData.airline,
         "agents": [
             {
-                "name": supplierName,
+                "name": meiyaFlightData.agent,
                 "cabins":cabins,
                 // "bookUrl": "http://m.ctrip.com/html5/flight/swift/domestic/SHA/CAN/2017-12-26",
                 "deeplinkData": {
@@ -613,6 +623,9 @@ function transferTrainData(supplierName: string, meiyaTrainData: IMeiyaTrain, or
                 case "硬座":
                     name = 9
                 break;
+                case "动卧":
+                    name = 10
+                break;
                 default:
                 name = 0
             }
@@ -632,13 +645,13 @@ function transferTrainData(supplierName: string, meiyaTrainData: IMeiyaTrain, or
     }else{
         cabins = []
     }
-    
+
     let model = {
         "No": meiyaTrainData.TrainNumber,
         "type": 0,
         "agents": [
             {
-                "name": supplierName,
+                "name": meiyaTrainData.agent,
                 "cabins":cabins,
                 "other": {}
             }
@@ -660,7 +673,7 @@ function transferTrainData(supplierName: string, meiyaTrainData: IMeiyaTrain, or
 
 /**
  * @method 根据指定的介质，进行比较，继而合并同类项
- * @param Data 
+ * @param Data
  * @param match {string} 指定相比较的项名
  * @param mergeProperty {string} 指定需要合并属性名, 目前只支持该属性的值类型是数组类型
  */
@@ -920,7 +933,8 @@ export interface IMeiyaFlight {
     arrivalCode?: string;
     departure?: string;
     departureCode?: string;
-    depTerm?: string | number
+    depTerm?: string | number;
+    agent?: string;
 }
 
 export interface IMeiyaTrainSeat {
@@ -939,6 +953,7 @@ export interface IMeiyaTrain {
     ArrStation?: string;
     StartTimeLong?: Date;
     EndTimeLong?: Date;
+    agent?: string;
 }
 
 export interface IMeiyaHotel {
@@ -973,6 +988,7 @@ export interface IMeiyaHotel {
     strHotelTrafficInformation?: any;
     hotelMinPrice?: number;
     name?: string;
+    agent?: string;
 }
 
 export interface IMeiyaAuthData {

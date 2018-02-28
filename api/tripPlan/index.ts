@@ -845,7 +845,7 @@ class TripPlanModule {
 
                 let version = params.version || config.link_version || 2 //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
                 if (version == 2) {
-                    appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}`
+                    appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}/2`
                     self_url = `${config.v2_host}${appMessageUrl}`
                 } else {
                     self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
@@ -1118,7 +1118,7 @@ class TripPlanModule {
                 let appMessageUrl: string = ""
 
                 if (params.version == 2) { //@#template v2的外链url。
-                    appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}`
+                    appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}/2`
                     self_url = `${config.v2_host}${appMessageUrl}`
                 } else {
                     self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
@@ -2104,7 +2104,7 @@ class TripPlanModule {
         let appMessageUrl: string = ""
         let version = params.version || config.link_version || 2  //@#template 外链生成的版本选择优先级：参数传递的版本 > 配置文件中配置的版本 > 默认版本为2
         if (version == 2) {
-            appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}`;
+            appMessageUrl = `#/trip/trip-list-detail/${tripPlan.id}/1`;
             self_url = `${config.v2_host}${appMessageUrl}`//'trip/trip-list-detail/:tripId'
         } else {
             self_url = config.host + '/index.html#/trip/list-detail?tripid=' + approve.id;
@@ -3223,8 +3223,8 @@ async function tryUpdateTripPlanStatus(tripPlan: TripPlan, status: EAuditStatus)
     cannotStatus[EAuditStatus.AUDITING] = _.concat([ETripDetailStatus.AUDIT_NOT_PASS, ETripDetailStatus.WAIT_COMMIT], cannotStatus[EAuditStatus.WAIT_COMMIT]);
     cannotStatus[EAuditStatus.INVOICE_PASS] = _.concat([ETripDetailStatus.AUDITING], cannotStatus[EAuditStatus.AUDITING]);
 
-    //变tripPlan状态,只关注出发交通,返回交通,住宿,特殊审批类型
-    let preTripTypeNeeds = [ETripType.BACK_TRIP, ETripType.OUT_TRIP, ETripType.HOTEL, ETripType.SPECIAL_APPROVE];
+    //变tripPlan状态,只关注出发交通,返回交通,住宿,特殊审批、补助类型
+    let preTripTypeNeeds = [ETripType.BACK_TRIP, ETripType.OUT_TRIP, ETripType.HOTEL, ETripType.SPECIAL_APPROVE, ETripType.SUBSIDY];
     //更新行程状态
     let tripDetails = await Models.tripDetail.find({
         where: {

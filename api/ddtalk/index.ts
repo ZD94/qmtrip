@@ -112,7 +112,7 @@ let ddTalkMsgHandle = {
 let DDEventCorpId : any = {};
 
 
-export class DDTalk {
+export default class DDTalk {
     static __public: boolean = true;
 
     static __initHttpApp(app: Application) {
