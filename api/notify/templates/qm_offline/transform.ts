@@ -7,6 +7,7 @@ const config = require("@jingli/config");
 export = async function transform(values: any): Promise<any>{
 
     let account = await Models.account.get( values.staff.accountId );
+    if (!account) throw new Error('account is null')
     values.account.email = account.email;
     values.account.mobile = account.mobile;
 

@@ -158,9 +158,9 @@ export default class DdStaff extends OaStaff {
         return true;
     }
 
-    async getCompany(): Promise<Company|undefined>{
+    async getCompany() {
         let self = this;
-        let company: Company|undefined;
+        let company: Company| null = null;
         /*let corps = await Models.ddtalkCorp.find({where: {corpId: self.corpId}});
         if(corps && corps.length){
             let corp = corps[0];

@@ -88,7 +88,7 @@ export abstract class OaDepartment{
 
         let defaultDepartment = await company.getDefaultDepartment();
         
-        let parentDepartment: Department | undefined;    //极端情况：parentDepartment 记录根部门的上级，若不存在，则为本系统的默认部门
+        let parentDepartment: Department | null = null;    //极端情况：parentDepartment 记录根部门的上级，若不存在，则为本系统的默认部门
 
         let oaParent = await self.getParent();
 

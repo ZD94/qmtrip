@@ -109,6 +109,7 @@ export class OfflineClass {
             return null;
         }
         let staff = await Models.staff.get(staffId);
+        if (!staff) throw new Error('staff is null')
         if(staff.accountId == authResponse.accountId){
             return staff;
         }
@@ -255,7 +256,7 @@ async function offlineApprove(req: Request, res: Response, next?: NextFunction){
         console.error(e);
     }
     
-    result.remark = param.msg;
+    result.remark = param.msg || '';
     result.status = param.status ? OfflineStatus.SUCCESS : OfflineStatus.FAIL;
 
     await result.save();

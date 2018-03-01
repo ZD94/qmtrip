@@ -263,6 +263,7 @@ export async function suiteRelieve(msg: IMsg) {
     if (comPro && comPro.length) {
         let comCorp = comPro[0];
         let company = await Models.company.get(comCorp.companyId);
+        if (!company) throw new Error('company is null')
         let comPros = await Models.companyProperty.find({where: {companyId: company.id,
             type: [CPropertyType.DD_PERMANENT_CODE, CPropertyType.DD_AGENT_ID]}});
 

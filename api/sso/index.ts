@@ -82,12 +82,12 @@ export default class SSOModule {
         let self = this;
         let corpId: string = '';
         let agentId: string = '';
-        let company: Company | undefined;
+        let company: Company | null = null;
         let permanentCode: string = '';
         let hasJLCloudNotified = true;
         let suiteToken: string = await SSOModule.getSuiteToken();
         let staff = await Staff.getCurrent();
-        let comProperty: {company: Company, corpId?: string, permanentCode?: string};
+        let comProperty: {company: Company, corpId?: string, permanentCode?: string} | undefined;
         
         if(staff){
             try{
@@ -143,7 +143,7 @@ export default class SSOModule {
     @clientExport
     static async checkCompanyRegistered(params: {companyId?:string, corpId?: string}): Promise<{company: Company, corpId: string, permanentCode: string}> {
         let {companyId, corpId} = params;
-        let company: Company;
+        let company: Company | null = null;
         if(!companyId && !corpId) throw new L.ERROR_CODE_C(404, '参数错误')
         let query: {where: any} = {where: {}};
         let permanentCode: string;
@@ -180,7 +180,7 @@ export default class SSOModule {
      * @method 根据permanentCode获取已注册公司，获取初始化新公司
      * @param result 
      */
-    async initializeCompany(result: IWPermanentCode | any): Promise<{company: Company|undefined, corpId: string, permanentCode: string}> {
+    async initializeCompany(result: IWPermanentCode | any): Promise<{company: Company|null, corpId: string, permanentCode: string}> {
         let permanentCode: string = result.permanentCode;
         if(!permanentCode)
             throw new Error("永久授权码不存在")
@@ -191,7 +191,7 @@ export default class SSOModule {
                 type: CPropertyType.WECHAT_CORPID
             }
         })
-        let company: Company | undefined;
+        let company: Company | null = null;
         let corpId: string = '';
        
         if(companyProperty && companyProperty.length) {
@@ -304,7 +304,7 @@ export default class SSOModule {
             throw L.ERR.USER_NOT_EXIST()
 
         const staffs = await Promise.all(staffProperties.map(sp => Models.staff.get(sp.staffId)))
-        const staff = staffs.filter(s => s.company.id == companyProperties[0].companyId)[0]
+        const staff = staffs.filter(s => s && s.company.id == companyProperties[0].companyId)[0]
         console.log('staff:', staff)
         if (!staff) throw L.ERR.USER_NOT_EXIST()
         return { data: await API.auth.makeAuthenticateToken(staff.accountId, 'corp_wechat'), corpId: usrInfo.CorpId }

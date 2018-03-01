@@ -49,10 +49,10 @@ export default class WangxCompany extends OaCompany{
         return result;
     }
 
-    async getRootDepartment(): Promise<OaDepartment | undefined> {
+    async getRootDepartment(): Promise<OaDepartment | null> {
         let self = this;
         let departments = await self.wangXinApi.getDepartments();
-        let result: OaDepartment | undefined;
+        let result: OaDepartment | null = null;
         departments.forEach((item) => {
             if(item.id == "1"){
                 result = new WangxDepartment({name: item.name, parentId: item.pid, id: item.id, wangXinApi: self.wangXinApi});

@@ -101,7 +101,7 @@ class ApproveModule {
             budgetInfo.query.frozenNum = frozenNum;
             if(query.projectId && !query.projectName){
                 let project = await Models.project.get(query.projectId);
-                query.projectName = project.name;
+                query.projectName = project && project.name || '';
             }
 
             let approve = await ApproveModule._submitApprove({
@@ -156,6 +156,7 @@ class ApproveModule {
     static async cancelApprove(params: {approveId: string}): Promise<any> {  //tripApprove未生成前取消行程，改变approve状态，和冻结点数(非必要)
         try {
             let approve = await Models.approve.get(params.approveId);
+            if (!approve) throw new Error('approve is null')
             approve.status = EApproveStatus.CANCEL;
             approve.tripApproveStatus = QMEApproveStatus.CANCEL;
             let query = typeof approve.data == 'string' ? JSON.parse(approve.data) : approve.data;
@@ -166,7 +167,7 @@ class ApproveModule {
             await approve.save();
 
             let staff = await Models.staff.get(approve.submitter);
-            let log = Models.tripPlanLog.create({tripPlanId: params.approveId, userId: staff.id, remark: `撤销行程审批单`});
+            let log = Models.tripPlanLog.create({tripPlanId: params.approveId, userId: staff && staff.id, remark: `撤销行程审批单`});
             await log.save();
         } catch(err) {
             throw err;
@@ -186,6 +187,7 @@ class ApproveModule {
         if (typeof budgetInfoData == 'string') {
             budgetInfoData = JSON.parse(budgetInfoData);
         }
+        if (!budgetInfoData) throw new Error('budgetInfoData is null')
         let budgetInfo = budgetInfoData.data;
         let number = 0;
         let content = "";
@@ -380,6 +382,7 @@ class ApproveModule {
     }) {
         let {submitter, data, approveUser, title, channel, type, isSpecialApprove, specialApproveRemark,staffList, budget, version} = params;
         let staff = await Models.staff.get(submitter);
+        if (!staff) throw new Error('staff is null')
         console.log('meiyou diao===============');
         let approve = Models.approve.create({
             submitter: submitter,
@@ -476,13 +479,14 @@ emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result: {approveNo: string, outer
     let p = (async function(){
         let {approveNo, outerId, status, approveUser, data, oa, budget} = result;
         let approve = await Models.approve.get(approveNo);
+        if (!approve) throw new Error('approve is null')
         if (approve.status == status) {
             return;
         }
 
         let company = await Models.company.get(approve['companyId']);
         //OA流程已经切换,旧的处理渠道不再支持
-        if (company.oa != oaStr2Enum(oa) && !approve.isSpecialApprove) {
+        if (company && company.oa != oaStr2Enum(oa) && !approve.isSpecialApprove) {
             return;
         }
 

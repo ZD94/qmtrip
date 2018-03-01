@@ -83,7 +83,7 @@ export class EventNotice {
         }});
         await Promise.all(staffDepts.map(async (staffDept: StaffDepartment) => {
             let department = await Models.department.get(staffDept.departmentId);
-            await department.destroy();
+            department && await department.destroy();
             await staffDept.destroy();
             return true;
         }));

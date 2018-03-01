@@ -168,6 +168,7 @@ export default class CompanyModule {
         let ca_staff = CoinAccount.create();
         await ca_staff.save();
         let account = await Models.account.get(staff.accountId);
+        if (!account) throw new Error('account is null')
         account.coinAccount = ca_staff;
         await account.save();
 
@@ -214,7 +215,7 @@ export default class CompanyModule {
      */
     @clientExport
     static async syncCompanyToJLCloud(company: Company, pwd: string, mobile?: string): Promise<boolean> {
-        let staff: Staff | undefined;
+        let staff: Staff | null = null;
         if(!mobile) {
             if(company.createUser)
                 staff = await Models.staff.get(company.createUser);
@@ -264,7 +265,7 @@ export default class CompanyModule {
     static async updateCompany(params: Company): Promise<Company> {
         let companyId = params.id;
         let company = await Models.company.get(companyId);
-
+        if (!company) throw new Error('company is null')
         for (let key in params) {
             company[key] = params[key];
         }
@@ -285,7 +286,7 @@ export default class CompanyModule {
         { if: condition.isMyCompany("0.id") },
         { if: condition.isCompanyAgency("0.id") }
     ])
-    static getCompany(params: { id: string }): Promise<Company> {
+    static getCompany(params: { id: string }) {
         return Models.company.get(params.id);
     }
 
@@ -327,7 +328,7 @@ export default class CompanyModule {
     static async deleteCompany(params: { id: string }): Promise<boolean> {
         let companyId = params.id;
         let company = await Models.company.get(companyId);
-        await company.destroy();
+        company && await company.destroy();
         return true;
     }
 
@@ -342,7 +343,7 @@ export default class CompanyModule {
     static async checkAgencyCompany(params: {companyId: string, userId: string}): Promise<boolean> {
         var c = await Models.company.get(params.companyId);
         var user = await Models.agencyUser.get(params.userId);
-
+        if (!user) throw new Error('user is null')
         if (!c || c.status == -2) {
             return false;
         }
@@ -372,6 +373,7 @@ export default class CompanyModule {
     }): Promise<{ company: Company, frozenNum: { limitFrozen: number, extraFrozen: number } }> {
         let { tripNum, companyId, accountId, query, isCheckTripNumStillLeft } = params;
         let company = await Models.company.get(companyId);
+        if (!company) throw new Error('company is null')
         if (isCheckTripNumStillLeft) {
             await company.beforeGoTrip({ number: tripNum });  //新版出差提交审批时不检查公司剩余流量数,领导审批时检查
         }
@@ -420,7 +422,7 @@ export default class CompanyModule {
     @clientExport
     @requireParams(['id'])
     @modelNotNull('moneyChange')
-    static getMoneyChange(params: { id: string }): Promise<MoneyChange> {
+    static getMoneyChange(params: { id: string }) {
         return Models.moneyChange.get(params.id);
     }
 
@@ -870,7 +872,7 @@ export default class CompanyModule {
 
     @clientExport
     @requireParams(["id"])
-    static async getTripPlanNumChange(params: {id: string}): Promise<TripPlanNumChange> {
+    static async getTripPlanNumChange(params: {id: string}) {
         return Models.tripPlanNumChange.get(params.id);
     }
 
@@ -995,7 +997,7 @@ export default class CompanyModule {
 
     @clientExport
     @requireParams(["id"])
-    static async getInvoiceTitle(params: { id: string }): Promise<InvoiceTitle> {
+    static async getInvoiceTitle(params: { id: string }) {
         let id = params.id;
         let result = await Models.invoiceTitle.get(id);
 
@@ -1036,6 +1038,7 @@ export default class CompanyModule {
         let staff = await Staff.getCurrent();
 
         let sp = await Models.invoiceTitle.get(id);
+        if (!sp) throw new Error('sp is null')
         if (sp.companyId != staff.company.id) {
             throw L.ERR.PERMISSION_DENY();
         }
@@ -1063,6 +1066,7 @@ export default class CompanyModule {
         let id = params.id;
         let staff = await Staff.getCurrent();
         let st_delete = await Models.invoiceTitle.get(id);
+        if (!st_delete) throw new Error('st_delete is null')
         if (st_delete.companyId != staff.company.id) {
             throw L.ERR.PERMISSION_DENY();
         }

@@ -201,9 +201,9 @@ class Privilege {
     //获取企业福利账户余额
     @clientExport
     static async getCompanyBalance(companyId: string): Promise<number> {
-        let company: Company = await Models.company.get(companyId);
-        let coinAccount: CoinAccount = await Models.coinAccount.get(company.coinAccountId);
-        let companyBalance: number = coinAccount.income - coinAccount.consume - coinAccount.locks;
+        let company: Company | null = await Models.company.get(companyId);
+        let coinAccount: CoinAccount | null = await Models.coinAccount.get(company && company.coinAccountId);
+        let companyBalance: number = coinAccount && coinAccount.income - coinAccount.consume - coinAccount.locks || 0;
         return companyBalance;
     }
 
@@ -214,8 +214,8 @@ class Privilege {
         let companyId: string = id;
         let queryDateData: any = body;
 
-        let company: Company = await Models.company.get(companyId);
-        let coinAccountId: string = company.coinAccountId;
+        let company: Company | null = await Models.company.get(companyId);
+        let coinAccountId: string = company && company.coinAccountId;
         let coinAccountChanges:  CoinAccountChange[] = await Models.coinAccountChange.all({where: {coinAccountId: coinAccountId}});
         let dataDuringTheQueryDate: CoinAccountChange[] = [];
         
@@ -238,26 +238,26 @@ class Privilege {
      //获得企业节省奖励比例
      @clientExport
      static async getCompanyScoreRatio(companyId: string): Promise<any> {
-         let company: Company = await Models.company.get(companyId);
-         let scoreRatio: number = company.scoreRatio;
+         let company: Company | null = await Models.company.get(companyId);
+         let scoreRatio: number = company && company.scoreRatio || 0;
          return scoreRatio;
      }
 
      //企业节省奖励比例设置
     @clientExport
-    static async setCompanyScoreRatio(params: {id: string, data: object}): Promise<any> {
+    static async setCompanyScoreRatio(params: {id: string, data: object}) {
         let {data} = params;
         let setData: any = data;
         let staffId: string = setData.staffId;
-        let staff: Staff = await Models.staff.get(staffId);
+        let staff: Staff | null = await Models.staff.get(staffId);
         
-        let companyId: string = staff.company.id;
+        let companyId: string = staff && staff.company.id || '';
         let scoreRatio: number = setData.scoreRatio;
-        let company: Company = await Models.company.get(companyId);
-
+        let company: Company | null = await Models.company.get(companyId);
+        if (!company) return null
         //更新企业节省奖励比例记录表 companyScoreRatioChange
-        let latestScoreRatio: number = company.scoreRatio;
-        let operator: string = staff.name;
+        let latestScoreRatio: number = company && company.scoreRatio || 0;
+        let operator: string = staff && staff.name || '';
         let updateScoreRatioChange: CompanyScoreRatioChange = Models.companyScoreRatioChange.create({
             companyId: companyId,
             staffId: staffId,
@@ -267,14 +267,15 @@ class Privilege {
         });
         await updateScoreRatioChange.save();
         company.scoreRatio = scoreRatio;
-        let updated: any = await company.save();
+        let updated = await company.save();
         return updated;
     }
 
     //企业节省奖励比例设置记录
     @clientExport
-    static async getCompanyScoreRatioChange(staffId: string): Promise<any> {
-        let staff: Staff = await Models.staff.get(staffId);
+    static async getCompanyScoreRatioChange(staffId: string) {
+        let staff: Staff | null = await Models.staff.get(staffId);
+        if (!staff) return []
         let companyId: string = staff.company.id;
 
         let result: CompanyScoreRatioChange[] = await Models.companyScoreRatioChange.all({where: {companyId: companyId}, order: [['updated_at', 'DESC']]});
