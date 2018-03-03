@@ -353,7 +353,6 @@ export default class CostCenterModule {
                 if (!cost) {
                     delete budget.id
                     dept = dept || await Models.department.get(id)
-                    await CostCenter.create({ id, type: ECostCenterType.DEPARTMENT, name: dept.name }).save()
                     await CostCenterDeploy.create({ costCenterId: id, ...budget, beginDate: period.start, endDate: period.end }).save()
                     continue
                 }
