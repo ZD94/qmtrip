@@ -135,6 +135,7 @@
     "reg_go": true,
     "dd_online_url": "https://j.jingli365.com"
   },
+  "trainServicePrice":10,
   "perDayRegisterEmail": "",
   "cloud": "${JL_APP_CLOUD}",
   "cloudAPI": "${JL_APP_CLOUDAPI}",
