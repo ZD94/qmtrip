@@ -695,7 +695,7 @@ export default class TripApproveModule {
                 let self_url;
                 let appMessageUrl;
                 // self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + approve.id;
-                self_url = `${config.v2_host}#/trip/trip-list-detail/${approve.id}/1`;
+                self_url = `${config.v2_host}#/trip-approval/detail/${approve.id}/0`;
                 let finalUrl = '#/trip-approval/detail?approveId=' + approve.id;
                 finalUrl = encodeURIComponent(finalUrl);
                 appMessageUrl = `#/judge-permission/index?id=${approve.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
