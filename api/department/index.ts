@@ -11,6 +11,7 @@ import { FindResult, PaginateInterface } from "common/model/interface";
 import {Staff, EStaffStatus} from "_types/staff";
 import {conditionDecorator, condition} from "../_decorator";
 import { FindOptions } from 'sequelize';
+import * as sequelize from 'sequelize'
 
 const departmentCols = Department['$fieldnames'];
 const staffDepartmentCols = StaffDepartment['$fieldnames'];
