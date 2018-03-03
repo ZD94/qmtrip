@@ -11,6 +11,7 @@ import { FindResult, PaginateInterface } from "common/model/interface";
 import {Staff, EStaffStatus} from "_types/staff";
 import {conditionDecorator, condition} from "../_decorator";
 import { FindOptions } from 'sequelize';
+import * as sequelize from 'sequelize'
 
 const departmentCols = Department['$fieldnames'];
 const staffDepartmentCols = StaffDepartment['$fieldnames'];
@@ -301,11 +302,11 @@ export default class DepartmentModule {
         options.where.id = { $in: ids };
         //姓名Z-A
         if (options.order == 'nameDesc') {
-            options.order = [["convert_to(name,'gbk') as sname", "desc"]];
+            options.order = sequelize.literal("convert_to(name,'gbk') desc");
         }
         //姓名A-Z
         if (options.order == 'nameAsc') {
-            options.order = [["convert_to(name,'gbk') as sname", "asc"]];
+            options.order = sequelize.literal("convert_to(name,'gbk') asc");
         }
         //角色排序
         if (options.order == 'role') {
