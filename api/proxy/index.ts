@@ -1,6 +1,6 @@
 import {Request, Response, Application, NextFunction} from "express-serve-static-core";
 import {parseAuthString} from "_types/auth/auth-cert";
-import { Staff } from "_types/staff";
+import { Staff, EStaffRole } from "_types/staff";
 import { Models } from "_types";
 import { AuthResponse } from '_types/auth';
 import {getCompanyTokenByAgent} from '../restful';
@@ -370,8 +370,11 @@ class Proxy {
             if (!staff) return res.sendStatus(404)
             let role: any = null ;
 
-            if(staff.roleId == 0) {
+            if(staff.roleId == EStaffRole.OWNER) {
                 role = 'defaultCreater'; //表示创建者身份
+            }
+            if(staff.roleId == EStaffRole.ADMIN) {
+                role = 'manager'; //表示管理员身份
             }
 
             if(!role){
