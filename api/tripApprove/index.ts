@@ -694,7 +694,7 @@ export default class TripApproveModule {
                 //发送审核结果邮件
                 let self_url;
                 let appMessageUrl;
-                self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + approve.id;
+                self_url = config.host +'/index-v2.html#/trip-approval/detail?approveId=' + approve.id;
                 let finalUrl = '#/trip-approval/detail?approveId=' + approve.id;
                 finalUrl = encodeURIComponent(finalUrl);
                 appMessageUrl = `#/judge-permission/index?id=${approve.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
