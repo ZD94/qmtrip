@@ -249,14 +249,14 @@ export default class ApiAuth {
         let values  = {
             name: account.mobile,
             pwd:account.mobile.substr(account.mobile.length-6),
-            url: C.host
+            url: C.host,
+            company: currentStaff? currentStaff.company: null
         }
 
         await API.notify.submitNotify({
             key: 'qm_new_staff_active',
             values: values,
-            mobile: account.mobile,
-            company: currentStaff? currentStaff.company: null
+            mobile: account.mobile
         });
         return true;
     }
