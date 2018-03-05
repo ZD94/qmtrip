@@ -397,7 +397,6 @@ export default class ApiTravelBudget {
                         companyId: companyId,
                         budgetInfo: budgets
                     });
-                    console.log('asdfadfasdfbroadcast===========');
                     console.log(`'tripApproveBudgetUpdate:'${approve.id}`);
                     API.broadcast('tripApproveBudgetUpdate:' + approve.id, 'FIN', 'UPDATED');
                 }
