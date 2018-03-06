@@ -1340,7 +1340,7 @@ export default class CompanyModule {
         });
 
         let taskId6 = 'dataStatisticsPerWeek';
-        scheduler('0 0 1 * * 1', taskId6, function () {
+        scheduler('0 0 9 * * 1', taskId6, function () {
             //每周一晚上一点给管理员 创建者发送统计邮件
             (async function () {
                 let now = new Date();
