@@ -235,6 +235,7 @@ export default class ApiAuth {
     static async reSendActiveSms(params: {accountId: string}): Promise<boolean> {
         let accountId = params.accountId;
         let account = await ApiAuth.getPrivateInfo({id: accountId});
+        let currentStaff = await Staff.getCurrent();
 
         if (!account) {
             throw L.ERR.USER_NOT_EXIST();
@@ -243,17 +244,19 @@ export default class ApiAuth {
             throw L.ERR.MOBILE_NOT_CORRECT();
         }
 
+
         //发送短信通知
         let values  = {
             name: account.mobile,
             pwd:account.mobile.substr(account.mobile.length-6),
-            url: C.host
+            url: C.host,
+            company: currentStaff? currentStaff.company: null
         }
 
         await API.notify.submitNotify({
             key: 'qm_new_staff_active',
             values: values,
-            mobile: account.mobile,
+            mobile: account.mobile
         });
         return true;
     }
