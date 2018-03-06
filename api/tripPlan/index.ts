@@ -476,7 +476,7 @@ class TripPlanModule {
                 if(!tripDetails || !tripDetails.length)
                     tripPlan.status = EPlanStatus.RESERVED;
                     log.remark = `已预订`;
-                    log.save();
+                    await log.save();
                 tripDetails = [];
                 break;
             case EOrderStatus.FAILED: 
@@ -751,7 +751,7 @@ class TripPlanModule {
                 // Log tripPlan changes  票据审核都通过
                 let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: tripPlan.auditUser});
                 log.remark = `已完成`;
-                log.save();
+                await log.save();
                 
                 tripPlan.auditStatus = EAuditStatus.INVOICE_PASS;
                 tripPlan.allInvoicesPassTime = new Date();
@@ -2786,12 +2786,12 @@ class TripPlanModule {
                         if(hasReserved) {
                             tripPlans[i].status = EPlanStatus.RESERVED;
                             log.remark = `已预定`;
-                            log.save();
+                            await log.save();
                         }
                         if(!hasReserved) {
                             tripPlans[i].status = EPlanStatus.EXPIRED;
                             log.remark = `已失效`;
-                            log.save();
+                            await log.save();
                         }
                         if(invoiceUploaded == needInvoiceUploaded) { //支持行程未结束，上传票据，此时若票据上传完成，tripPlan的状态为待提交审核
                             tripPlans[i].auditStatus = EAuditStatus.WAIT_COMMIT;      
