@@ -252,6 +252,7 @@ export default class SSOModule {
      * @param corpId
      * @return {string} 
      */
+    @clientExport
     async getAccessToken(corpId: string, permanentCode: string, suiteToken: string): Promise<string>{
         let cacheKey = `wechat:contact:${corpId}:access_token`;  //企业通讯录的access_token
         let redisCache = new RedisCache();

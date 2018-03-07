@@ -478,11 +478,14 @@ export default class TripApproveModule {
             }
 
             let log = TripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id});
+            let logAfterPass = TripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id});
 
             if (approveResult == EApproveResult.PASS && !isNextApprove) {
                 log.approveStatus = EApproveResult.PASS;
                 log.remark = `审批通过`;
                 await log.save();
+                logAfterPass.remark = `待预定`;
+                await logAfterPass.save();
                 tripApprove.status = QMEApproveStatus.PASS;
                 tripApprove.approveRemark = '审批通过';
                 tripApprove.approvedUsers += `,${staff.id}`;
@@ -663,12 +666,15 @@ export default class TripApproveModule {
 
             let notifyRemark = '';
             let log = TripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser});
+            let logAfterPass = TripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser});
 
             if (approveResult == EApproveResult.PASS) {
                 log.approveStatus = EApproveResult.PASS;
                 if(isAutoApprove) log.approveStatus = EApproveResult.AUTO_APPROVE;
                 log.remark = extraStr+`审批通过`;
                 await log.save();
+                logAfterPass.remark = extraStr + `待预定`;
+                await logAfterPass.save();
                 approve.status = EApproveStatus.SUCCESS;
                 approve.tripApproveStatus = QMEApproveStatus.PASS;
                 approve.approveRemark = '审批通过';
@@ -694,7 +700,8 @@ export default class TripApproveModule {
                 //发送审核结果邮件
                 let self_url;
                 let appMessageUrl;
-                self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + approve.id;
+                // self_url = config.host +'/index.html#/trip-approval/detail?approveId=' + approve.id;
+                self_url = `${config.v2_host}#/trip-approval/approve-detail/${approve.id}/0`;
                 let finalUrl = '#/trip-approval/detail?approveId=' + approve.id;
                 finalUrl = encodeURIComponent(finalUrl);
                 appMessageUrl = `#/judge-permission/index?id=${approve.id}&modelName=tripApprove&finalUrl=${finalUrl}`;
