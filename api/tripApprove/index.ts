@@ -493,9 +493,8 @@ export default class TripApproveModule {
             }else if(isNextApprove){ //指定下一级审批人
                 log.approveStatus = EApproveResult.PASS;
                 await log.save();
-                let nextApproveUser = await Models.staff.get(params.nextApproveUserId);
                 tripApprove.approvedUsers += `,${staff.id}`;
-                tripApprove.approveUserId = nextApproveUser.id;
+                tripApprove.approveUserId = params.nextApproveUserId;
             }else if(approveResult == EApproveResult.REJECT) {
                 let approveRemark = params.approveRemark;
                 if(!approveRemark) {
@@ -752,7 +751,9 @@ export default class TripApproveModule {
         log.approveStatus = EApproveResult.PASS;
         log.remark = `${approveUser.name}审批通过并转给${nextApproveUser.name}`;
         await log.save();
-
+        let tripApprove = await TripApproveModule.getTripApprove({id: params.id});
+        tripApprove.approveUserId = params.nextApproveUserId
+        await TripApproveModule.updateTripApprove(tripApprove);
         await TripApproveModule.sendTripApproveNotice({approveId: params.id, nextApprove: true, approveUserId: params.nextApproveUserId});
         console.info("nextApprove end============");
         return true;
