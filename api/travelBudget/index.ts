@@ -639,6 +639,7 @@ export default class ApiTravelBudget {
     }
 
     //获取公司信息
+    @clientExport
     static async getCompanyInfo(sname?:string, staffId?: string): Promise<any> {
         let staff: Staff;
         if(staffId) staff = await Models.staff.get(staffId);
