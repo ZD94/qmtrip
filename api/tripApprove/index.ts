@@ -954,6 +954,28 @@ export default class TripApproveModule {
         return autoApproveDateTime;
     }
 
+    static async calculateAutoApproveTime2( params: {
+        type: AutoApproveType,
+        config: AutoApproveConfig,
+        submitAt:Date,
+        tripStartAt:Date
+    }):Promise<Date> {
+        let {type, config, submitAt, tripStartAt} = params;
+        if(typeof(config) == 'string') {
+            config = JSON.parse(config)
+        }
+        config = <AutoApproveConfig>config;
+
+        switch(type) {
+            case AutoApproveType.AfterSubmit:  // 审批提交时间
+                return moment(submitAt).add(config.hour, 'hours').toDate()
+            case AutoApproveType.BeforeDeparture:
+                return moment(tripStartAt).subtract(config.day, 'days').toDate()
+            default: //出行时间
+                return tripStartAt
+        }
+    }
+
     @clientExport
     @requireParams(['id'])
     static async getTripApprove(params: {id: string}): Promise<ITripApprove|null> {
