@@ -477,7 +477,7 @@ export default class TripApproveModule {
                 }
             }
 
-            let log = TripPlanLog.create({tripPlanId: tripApprove.id, userId: approveUser.id});
+            let log = TripPlanLog.create({tripPlanId: tripApprove.id, userId: tripApprove.approveUserId});
             let logAfterPass = TripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id});
 
             if (approveResult == EApproveResult.PASS && !isNextApprove) {
