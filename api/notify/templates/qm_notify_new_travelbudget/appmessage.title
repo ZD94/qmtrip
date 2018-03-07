@@ -1,0 +1,1 @@
+申请人：<%=tripApprove.applicant || ''%>
