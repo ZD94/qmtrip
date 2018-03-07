@@ -139,7 +139,7 @@ function send (options: {from: string, to: string, subject: string, text?: strin
     }
 
     attachments = attachments.map( (v) => {
-        if (v.path) {
+        if (v.path && v.path.indexOf('http') < 0) {
             v.path = path.join(process.cwd(), v.path);
         }
         return v;
