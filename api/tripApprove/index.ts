@@ -493,9 +493,8 @@ export default class TripApproveModule {
             }else if(isNextApprove){ //指定下一级审批人
                 log.approveStatus = EApproveResult.PASS;
                 await log.save();
-                let nextApproveUser = await Models.staff.get(params.nextApproveUserId);
                 tripApprove.approvedUsers += `,${staff.id}`;
-                tripApprove.approveUserId = nextApproveUser.id;
+                tripApprove.approveUserId = params.nextApproveUserId;
             }else if(approveResult == EApproveResult.REJECT) {
                 let approveRemark = params.approveRemark;
                 if(!approveRemark) {
