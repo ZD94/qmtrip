@@ -53,6 +53,24 @@ export enum EBudgetType {
     HOTEL = 2,
     SUBSIDY = 3
 }
+
+export enum TMCStatus {
+    NOT_CONNECT = 1,       //未开通，没有尝试过
+    TEST = 2,              //测试中
+    TEST_FAIL = 3,         //测试失败
+    WAIT_USE = 4,          //等待启用， 测试通过，人工配置结束
+    OK_USE = 5,            //正常使用
+    STOP_USE = 6           //停用
+}
+
+export enum TmcServiceType {
+    FLIGHT = 1,
+    TRAIN = 2,
+    HOTEL = 3,
+    FLIGHT_ABROAD = 4,
+    TRAIN_ABROAD = 5,
+    HOTEL_ABROAD = 6
+}
 export interface ITMCSupplier {
     id: string,
     name: string, 
@@ -166,7 +184,7 @@ export default class ApiTravelBudget {
         // } catch (err) {
         //     console.log(err);
         // }
-        let companyInfo = await ApiTravelBudget.getCompanyInfo();
+        let companyInfo = await ApiTravelBudget.getCompanyInfo(null, null, null, TMCStatus.OK_USE);
         let data = companyInfo;
         let authData: IMeiyaAuthData[] = [];
         data.map((item: {identify: any, sname: string}) => {
@@ -209,26 +227,13 @@ export default class ApiTravelBudget {
     static async getTrafficsData(params: ISearchTicketParams): Promise<any> {
         let commonData = [];
         let commonData2 = [];
-        // let result;
-        // try {
-        //     result = await RestfulAPIUtil.operateOnModel({
-        //         params: {
-        //             method: 'post',
-        //             fields: params
-        //         },
-        //         addUrl: 'getTrafficsData',
-        //         model: "budget"
-        //     })
-        //
-        // } catch (err) {
-        //     console.log(err);
-        // }
+      
 
 
 
 
-        let companyInfo = await ApiTravelBudget.getCompanyInfo(); 
-        let data = companyInfo;
+        let companyInfo = await ApiTravelBudget.getCompanyInfo(null, null, null, TMCStatus.OK_USE); 
+        let data = companyInfo
         let authData: IMeiyaAuthData[] = [];
         data.map((item: {identify: any, sname: string}) => {
             let identify = item.identify;
@@ -236,18 +241,7 @@ export default class ApiTravelBudget {
             authData.push({identify, sname});
             return authData
         });
-        // if (result.code == 0) {
-        //     commonData = result.data.data;
-        // }
-        //
-        // if (!commonData || typeof commonData == 'undefined')
-        //     return [];
-        //检查是否需要美亚数据，返回美亚数据
-        // let needMeiya = await meiyaJudge();
-        // if (!needMeiya) {
-        //     return commonData;
-        // }
-        // console.log("commonData ===> commonData data.", commonData.length)
+        
         if (config.tmcFake == 1) {
             console.log("getTrafficsData ===> fake data.")
             return require("meiyaFake/finallyUsingTraffic");
@@ -640,7 +634,7 @@ export default class ApiTravelBudget {
 
     //获取公司信息
     @clientExport
-    static async getCompanyInfo(sname?:string, staffId?: string): Promise<any> {
+    static async getCompanyInfo(sname?:string, staffId?: string, type?: number, status?: number): Promise<any> {
         let staff: Staff;
         if(staffId) staff = await Models.staff.get(staffId);
         if(!staffId) {
@@ -656,7 +650,9 @@ export default class ApiTravelBudget {
                     method: 'put',
                     fields: {
                         companyId: companyId,
-                        sname
+                        sname,
+                        type: type,
+                        status: status
                     }
                 },
                 addUrl: `${companyId}/data`,
