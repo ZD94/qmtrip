@@ -1,0 +1,12 @@
+问题描述：<%=feedback.content || '' %>
+<br>
+截图：
+见附件
+<br>
+发生故障时间：<%=moment(feedback.occurredTime).format('YYYY-MM-DD HH:mm') || '' %>
+<br>
+提交人信息：
+<br>
+企业：<%=feedback.staff.company.name || '' %><br>
+姓名：<%=feedback.staff.name || '' %><br>
+手机：<%=feedback.staff.mobile || '' %>

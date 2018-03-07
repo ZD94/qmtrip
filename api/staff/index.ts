@@ -1,6 +1,7 @@
 ﻿/**
  * Created by wyl on 15-12-9.
  */
+
 'use strict';
 var nodeXlsx = require("node-xlsx");
 var moment = require("moment");
@@ -16,7 +17,7 @@ import L from '@jingli/language';
 import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
-import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo, EAddWay, Linkman} from "_types/staff";
+import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo, EAddWay, Linkman, Feedback} from "_types/staff";
 import { EAgencyUserRole } from "_types/agency";
 import { Models, EAccountType, EGender } from '_types';
 import {conditionDecorator, condition} from "../_decorator";
@@ -31,6 +32,9 @@ const linkmanCols = Linkman['$fieldnames'];
 const invitedLinkCols = InvitedLink['$fieldnames'];
 const staffSupplierInfoCols = StaffSupplierInfo['$fieldnames'];
 const staffAllCols = Staff['$getAllFieldNames']();
+const feedbackCols = Feedback['$fieldnames'];
+let systemNoticeEmails = require('@jingli/config').system_notice_emails;
+
 if(staffAllCols.indexOf("departmentIds") < 0){
     staffAllCols.push("departmentIds");
 }
@@ -1856,6 +1860,86 @@ class StaffModule{
     }): Promise<FindResult> {
         let linkmans = await Models.linkman.find(params);
         return {ids: linkmans.map((s)=> {return s.id;}), count: linkmans['total']};
+    }
+
+
+    /************************************用户反馈begin***************************************/
+    /**
+     * 保存feedback
+     * @param {{id?: string; staffId: string; content: string; occurredTime?: Date; pictures?: string[]}} params
+     * @returns {Promise<Feedback>}
+     */
+    @clientExport
+    @requireParams(["staffId", "content"], feedbackCols)
+    static async createFeedback(params: {
+        id?: string,
+        staffId: string,
+        content: string,
+        occurredTime?: Date,
+        pictures?: string[],
+    }): Promise<Feedback> {
+
+        let feedback = Models.feedback.create(params);
+        let staff = await Staff.getCurrent();
+        feedback.staff = staff;
+        feedback = await feedback.save();
+
+        let attachments: {filename: string, path: string}[] = [];
+        if(feedback.pictures && feedback.pictures.length){
+            feedback.pictures.forEach(
+                (item, index) => {
+                    attachments.push({filename: `${index}.png`, path: `${config.host}/attachments/${item}`})
+                }
+            )
+        }
+
+        try {
+            await Promise.all(systemNoticeEmails.map(async function (s: {
+                email: string, name: string
+            }) {
+                await API.notify.submitNotify({
+                    key: 'qm_notify_feedback',
+                    email: s.email,
+                    values: {
+                        feedback: feedback,
+                        attachments: attachments
+                    }
+                })
+
+            }));
+        } catch (err) {
+            console.error('发送系统通知失败', err)
+        }
+
+        return feedback;
+    }
+
+    @clientExport
+    @requireParams(["id"], feedbackCols)
+    static async deleteFeedback(params: {
+        id: string
+    }): Promise<Boolean> {
+        let feedback = await Models.feedbackCols.get(params.id);
+        await feedback.destroy();
+        return true;
+    }
+
+    @clientExport
+    @requireParams(["id"], linkmanCols)
+    static async getFeedback(params: {id: string}): Promise<Feedback> {
+        let feedback = await Models.feedback.get(params.id);
+        return feedback;
+    }
+
+    @clientExport
+    @requireParams([], ["where.staffId", "where.occurredTime", "order"])
+    static async getFeedbacks(params: {
+        where: any,
+        order?: any,
+        attributes?: any,
+    }): Promise<FindResult> {
+        let feedbacks = await Models.feedback.find(params);
+        return {ids: feedbacks.map((s)=> {return s.id;}), count: feedbacks['total']};
     }
 
 }
