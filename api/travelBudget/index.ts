@@ -228,6 +228,21 @@ export default class ApiTravelBudget {
         let commonData = [];
         let commonData2 = [];
       
+         // let result;
+        // try {
+        //     result = await RestfulAPIUtil.operateOnModel({
+        //         params: {
+        //             method: 'post',
+        //             fields: params
+        //         },
+        //         addUrl: 'getTrafficsData',
+        //         model: "budget"
+        //     })
+        //
+        // } catch (err) {
+        //     console.log(err);
+        // }
+
 
 
 
@@ -241,6 +256,19 @@ export default class ApiTravelBudget {
             authData.push({identify, sname});
             return authData
         });
+        // if (result.code == 0) {
+        //     commonData = result.data.data;
+        // }
+        //
+        // if (!commonData || typeof commonData == 'undefined')
+        //     return [];
+        //检查是否需要美亚数据，返回美亚数据
+        // let needMeiya = await meiyaJudge();
+        // if (!needMeiya) {
+        //     return commonData;
+        // }
+        // console.log("commonData ===> commonData data.", commonData.length)
+
         
         if (config.tmcFake == 1) {
             console.log("getTrafficsData ===> fake data.")
