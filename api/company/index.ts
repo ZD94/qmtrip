@@ -1160,8 +1160,8 @@ export default class CompanyModule {
     }
 
     @clientExport
-    @requireParams(['companyId', 'mode'])
-    static async autoApproveSetting(params: {companyId: string, mode: number, time: number}) {
+    @requireParams(['companyId', 'mode'], ['time'])
+    static async autoApproveSetting(params: {companyId: string, mode: number, time?: number}) {
         let autoMode = toEnum(AutoApproveTypeObj, params.mode)
         if (!autoMode) throw new L.ERROR_CODE_C(400, '审批选项错误')
         let company = await Models.company.get(params.companyId)
