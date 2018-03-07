@@ -751,7 +751,9 @@ export default class TripApproveModule {
         log.approveStatus = EApproveResult.PASS;
         log.remark = `${approveUser.name}审批通过并转给${nextApproveUser.name}`;
         await log.save();
-
+        let tripApprove = await TripApproveModule.getTripApprove({id: params.id});
+        tripApprove.approveUserId = params.nextApproveUserId
+        await TripApproveModule.updateTripApprove(tripApprove);
         await TripApproveModule.sendTripApproveNotice({approveId: params.id, nextApprove: true, approveUserId: params.nextApproveUserId});
         console.info("nextApprove end============");
         return true;
