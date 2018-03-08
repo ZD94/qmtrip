@@ -1167,13 +1167,13 @@ export default class CompanyModule {
         company.autoApproveType = autoMode
         switch(autoMode) {
             case AutoApproveType.AfterSubmit:
-                company.autoApprovePreference = {day: 0, hour: params.time}
+                company.autoApprovePreference = {hour: params.time}
                 break;
             case AutoApproveType.BeforeDeparture:
-                company.autoApprovePreference = {day: params.time, hour: 0}
+                company.autoApprovePreference = {day: params.time}
                 break;
             default:
-                company.autoApprovePreference = {day: 0, hour: 0}
+                company.autoApprovePreference = {day: 1, hour: 2}
                 break;
         }
         await company.save()
