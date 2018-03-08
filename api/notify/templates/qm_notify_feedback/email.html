@@ -1,12 +1,10 @@
-问题描述：<%=feedback.content || '' %>
-<br>
-截图：
-见附件
-<br>
-发生故障时间：<%=moment(feedback.occurredTime).format('YYYY-MM-DD HH:mm') || '' %>
-<br>
-提交人信息：
-<br>
-企业：<%=feedback.staff.company.name || '' %><br>
-姓名：<%=feedback.staff.name || '' %><br>
-手机：<%=feedback.staff.mobile || '' %>
+<h2>问题描述：</h2>
+<p><%=feedback.content || '' %></p>
+<h2>截图：</h2>
+<p><a href="">点击查看截图</a></p>
+<h2>发生故障时间：</h2>
+<p><%=moment(feedback.accurredTime).format('YYYY-MM-DD HH:mm') || '' %></p>
+<h2>提交人信息：</h2>
+<p>企业：<%=feedback.staff.company.name || '' %></p>
+<p>姓名：<%=feedback.staff.name || '' %></p>
+<p>手机：<%=feedback.staff.mobile || '' %></p>
