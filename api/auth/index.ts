@@ -793,9 +793,9 @@ export default class ApiAuth {
      * @returns {Promise<TResult>|Promise<U>}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'userName', 'pwd', 'msgCode', 'msgTicket'], ['email', 'agencyId', 'remark', 'description', 'promoCode', 'referrerMobile'])
+    @requireParams(['mobile', 'name', 'userName', 'pwd', 'msgCode', 'msgTicket'], ['email', 'agencyId', 'remark', 'description', 'promoCode', 'referrerMobile', 'source'])
     static async registerCompany(params: {name: string, userName: string, email?: string, mobile: string, pwd: string,
-        msgCode: string, msgTicket: string, agencyId?: string, promoCode?: string, referrerMobile?: string}) {
+        msgCode: string, msgTicket: string, agencyId?: string, promoCode?: string, referrerMobile?: string, source?: number}) {
         var companyName = params.name;
         var name = params.userName;
         var email = params.email;
@@ -855,6 +855,9 @@ export default class ApiAuth {
             promoCode: params.promoCode,
             referrerMobile: referrerMobile,
         });
+        if (params.source == 1) {
+            
+        }
         return result;
     }
 
