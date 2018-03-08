@@ -23,7 +23,10 @@ import { md5 } from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
 import { CoinAccount } from "_types/coin";
 import { restfulAPIUtil } from "api/restful";
-import { ISegment } from '_types/tripPlan';
+import { ISegment, AutoApproveType } from '_types/tripPlan';
+import { EApproveChannel } from '_types/approve';
+import { EApproveChannelObj, toEnum } from '../../_types/approve/types';
+import { AutoApproveTypeObj } from '../../_types/company/company';
 let RestfulAPIUtil = restfulAPIUtil;
 
 
@@ -1130,6 +1133,50 @@ export default class CompanyModule {
         result.inland = preferRegionInland.data && preferRegionInland.data.budgetConfig;
 
         return result;
+    }
+
+    @clientExport
+    @requireParams(['companyId'])
+    static async getApproveRuleByCompanyId(params: {companyId: string}) {
+        let company = await Models.company.get(params.companyId)
+        return {
+            approveRule: 1,
+            approveMode: company.oa || EApproveChannel.QM,
+            detailSetting: {
+                mode: company.autoApproveType as number,
+                time: company.autoApprovePreference
+            }
+        }
+    }
+
+    @clientExport
+    @requireParams(['companyId', 'mode'])
+    static async setApproveMode(params: {companyId: string, mode: number}) {
+        let approveMode = toEnum(EApproveChannelObj, params.mode)
+        if (!approveMode) throw new L.ERROR_CODE_C(400, '审批选项错误')
+        let company = await Models.company.get(params.companyId)
+        company.oa = approveMode
+        await company.save()
+    }
+
+    @clientExport
+    @requireParams(['companyId', 'mode'], ['time'])
+    static async autoApproveSetting(params: {companyId: string, mode: number, time?: number}) {
+        let autoMode = toEnum(AutoApproveTypeObj, params.mode)
+        let company = await Models.company.get(params.companyId)
+        company.autoApproveType = autoMode
+        switch(autoMode) {
+            case AutoApproveType.AfterSubmit:
+                company.autoApprovePreference = {day: 0, hour: params.time}
+                break;
+            case AutoApproveType.BeforeDeparture:
+                company.autoApprovePreference = {day: params.time, hour: 0}
+                break;
+            default:
+                company.autoApprovePreference = {day: 0, hour: 0}
+                break;
+        }
+        await company.save()
     }
 
     /* ====================== END ======================= */
