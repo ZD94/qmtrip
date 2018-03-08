@@ -3,7 +3,7 @@
  */
 "use strict";
 import { requireParams, clientExport } from "@jingli/dnode-api/dist/src/helper";
-import { Models, EAccountType, EGender } from "_types";
+import { Models, EAccountType, EGender, EPlaneLevel, ETrainLevel, EHotelLevel } from "_types";
 import { Account, ACCOUNT_STATUS } from "_types/auth";
 import { Staff, EInvitedLinkStatus, EAddWay, EStaffRole } from "_types/staff";
 import validator = require('validator');
@@ -856,7 +856,26 @@ export default class ApiAuth {
             referrerMobile: referrerMobile,
         });
         if (params.source == 1) {
-            
+            const companyRegions = await API.travelPolicy.getCompanyRegions({id: result.id})
+            const travelPolicies = await Promise.all([API.travelPolicy.createTravelPolicy({companyId: result.id, name: '员工级', isDefault: true }),
+                API.travelPolicy.createTravelPolicy({companyId: result.id, name: '高管级' })])
+            const promises = [...companyRegions.map(cr =>
+                    API.travelPolicy.createTravelPolicyRegion({
+                        travelPolicyId: travelPolicies[0].id,
+                        companyRegionId: cr.id,
+                        planeLevels: [EPlaneLevel.ECONOMY],
+                        trainLevels: [ETrainLevel.SECOND_SEAT],
+                        hotelLevels: [EHotelLevel.THREE_STAR]
+                }))]
+            promises.push(...companyRegions.map(cr =>
+                API.travelPolicy.createTravelPolicyRegion({
+                    travelPolicyId: travelPolicies[1].id,
+                    companyRegionId: cr.id,
+                    planeLevels: [EPlaneLevel.BUSINESS],
+                    trainLevels: [ETrainLevel.BUSINESS_SEAT],
+                    hotelLevels: [EHotelLevel.FIVE_STAR]
+            })))
+            await Promise.all(promises)
         }
         return result;
     }
