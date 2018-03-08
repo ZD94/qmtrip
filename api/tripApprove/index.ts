@@ -898,7 +898,7 @@ export default class TripApproveModule {
         return true;
     }
 
-    static async calculateAutoApproveTime( params: {
+    static async calculateAutoApproveTime2( params: {
         type: AutoApproveType,
         config: AutoApproveConfig,
         submitAt:Date,
@@ -954,7 +954,7 @@ export default class TripApproveModule {
         return autoApproveDateTime;
     }
 
-    static async calculateAutoApproveTime2( params: {
+    static async calculateAutoApproveTime( params: {
         type: AutoApproveType,
         config: AutoApproveConfig,
         submitAt:Date,
@@ -964,7 +964,7 @@ export default class TripApproveModule {
         if(typeof(config) == 'string') {
             config = JSON.parse(config)
         }
-        config = <AutoApproveConfig>config;
+        // config = <AutoApproveConfig>config;
 
         switch(type) {
             case AutoApproveType.AfterSubmit:  // 审批提交时间
