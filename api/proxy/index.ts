@@ -96,6 +96,7 @@ class Proxy {
 
         app.all(/^\/supplier.*$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: any, res: Response, next?: Function) => {
 
+
             //公有云验证
             let {staffid}  = req.headers;
             let staff = await Models.staff.get(staffid);
@@ -113,6 +114,7 @@ class Proxy {
             let JLOpenApi: string = config.cloudAPI;
             let url: string = `${JLOpenApi}${pathstr}`;
 
+            console.info("qmtrip===============================", url)
             result = await new Promise((resolve, reject) => {
                 return request({
                     uri: url,
@@ -265,6 +267,8 @@ class Proxy {
             }
             if(!result)
                 return res.json(null);
+
+            console.info("result=============", result);
             if(typeof result == 'string') {
                 result = JSON.parse(result);
             }
