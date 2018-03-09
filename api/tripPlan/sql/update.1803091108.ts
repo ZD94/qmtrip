@@ -13,7 +13,6 @@ async function dealData(DB: Sequelize, t: Transaction) {
     let allCorpSql = `select * from trip_plan.trip_plans where deleted_at is null order by created_at desc limit 20 offset ${page * 20};`;
     let allCorps = await DB.query(allCorpSql, { type: SEQUELIZE.QueryTypes.SELECT });
     for (let item of allCorps) {
-        console.info("item======================", item)
         let submitterId = item.account_id;
         // let submitter = await Models.staff.get(submitterId)
         let submitterSnapshot = await dealStaffData(DB, t, submitterId);
