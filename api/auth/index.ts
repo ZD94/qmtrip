@@ -3,7 +3,7 @@
  */
 "use strict";
 import { requireParams, clientExport } from "@jingli/dnode-api/dist/src/helper";
-import { Models, EAccountType, EGender } from "_types";
+import { Models, EAccountType, EGender, EPlaneLevel, ETrainLevel, EHotelLevel } from "_types";
 import { Account, ACCOUNT_STATUS } from "_types/auth";
 import { Staff, EInvitedLinkStatus, EAddWay, EStaffRole } from "_types/staff";
 import validator = require('validator');
@@ -23,6 +23,8 @@ var utils = require("common/utils");
 var accountCols = Account['$fieldnames'];
 import { getSession } from "@jingli/dnode-api";
 import { Application } from 'express-serve-static-core';
+import { ICompanyRegion } from '_types/travelPolicy';
+const _ = require('lodash/fp')
 
 let codeTicket = "checkcode:ticket:";
 
@@ -793,9 +795,9 @@ export default class ApiAuth {
      * @returns {Promise<TResult>|Promise<U>}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'userName', 'pwd', 'msgCode', 'msgTicket'], ['email', 'agencyId', 'remark', 'description', 'promoCode', 'referrerMobile'])
+    @requireParams(['mobile', 'name', 'userName', 'pwd', 'msgCode', 'msgTicket'], ['email', 'agencyId', 'remark', 'description', 'promoCode', 'referrerMobile', 'source'])
     static async registerCompany(params: {name: string, userName: string, email?: string, mobile: string, pwd: string,
-        msgCode: string, msgTicket: string, agencyId?: string, promoCode?: string, referrerMobile?: string}) {
+        msgCode: string, msgTicket: string, agencyId?: string, promoCode?: string, referrerMobile?: string, source?: number}) {
         var companyName = params.name;
         var name = params.userName;
         var email = params.email;
@@ -855,6 +857,29 @@ export default class ApiAuth {
             promoCode: params.promoCode,
             referrerMobile: referrerMobile,
         });
+        if (params.source == 1) {
+            let companyId = result.company.id
+            const companyRegions: ICompanyRegion[] = _.filter((cr: ICompanyRegion) => !/(一|二)类/.test(cr.name), _.prop('data', await API.travelPolicy.getCompanyRegions({companyId})))
+            const travelPolicies = _.pluck('data', await Promise.all([API.travelPolicy.createTravelPolicy({companyId, name: '员工级', isDefault: true }),
+                API.travelPolicy.createTravelPolicy({companyId, name: '高管级' })]))
+            const promises = [...companyRegions.map(cr =>
+                    API.travelPolicy.createTravelPolicyRegion({
+                        travelPolicyId: travelPolicies[0].id,
+                        companyRegionId: cr.id,
+                        planeLevels: [EPlaneLevel.ECONOMY],
+                        trainLevels: [ETrainLevel.SECOND_SEAT],
+                        hotelLevels: [EHotelLevel.THREE_STAR]
+                }))]
+            promises.push(...companyRegions.map(cr =>
+                API.travelPolicy.createTravelPolicyRegion({
+                    travelPolicyId: travelPolicies[1].id,
+                    companyRegionId: cr.id,
+                    planeLevels: [EPlaneLevel.BUSINESS],
+                    trainLevels: [ETrainLevel.BUSINESS_SEAT],
+                    hotelLevels: [EHotelLevel.FIVE_STAR]
+            })))
+            await Promise.all(promises)
+        }
         return result;
     }
 
