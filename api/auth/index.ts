@@ -23,6 +23,7 @@ var utils = require("common/utils");
 var accountCols = Account['$fieldnames'];
 import { getSession } from "@jingli/dnode-api";
 import { Application } from 'express-serve-static-core';
+const _ = require('lodash/fp')
 
 let codeTicket = "checkcode:ticket:";
 
@@ -856,9 +857,10 @@ export default class ApiAuth {
             referrerMobile: referrerMobile,
         });
         if (params.source == 1) {
-            const companyRegions = await API.travelPolicy.getCompanyRegions({id: result.id})
-            const travelPolicies = await Promise.all([API.travelPolicy.createTravelPolicy({companyId: result.id, name: '员工级', isDefault: true }),
-                API.travelPolicy.createTravelPolicy({companyId: result.id, name: '高管级' })])
+            let companyId = result.company.id
+            const companyRegions = _.filter(cr => !/(一|二)类/.test(cr.name), _.prop('data', await API.travelPolicy.getCompanyRegions({companyId})))
+            const travelPolicies = _.pluck('data', await Promise.all([API.travelPolicy.createTravelPolicy({companyId, name: '员工级', isDefault: true }),
+                API.travelPolicy.createTravelPolicy({companyId, name: '高管级' })]))
             const promises = [...companyRegions.map(cr =>
                     API.travelPolicy.createTravelPolicyRegion({
                         travelPolicyId: travelPolicies[0].id,
