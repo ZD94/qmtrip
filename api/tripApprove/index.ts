@@ -983,7 +983,7 @@ export default class TripApproveModule {
             case AutoApproveType.BeforeDeparture:
                 return moment(tripStartAt).subtract(config.day, 'days').toDate()
             default: //出行时间
-                return tripStartAt
+                return null
         }
     }
 
