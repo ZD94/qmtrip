@@ -84,7 +84,6 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
         let type = item.type;
         let agentType = item.agentType;
         // console.log('agenttype---->   ', agentType, 'typeof------  ', typeof agentType);
-
         isBindService = (type == `${TmcServiceType.FLIGHT}` || type == `${TmcServiceType.FLIGHT_ABROAD}`) ? true : false;
         meiyaResult = isBindService ? await request({
             url: urlFlight,
@@ -946,13 +945,9 @@ export function matchMeiyaHotel(origin: IHotel[], meiyaData: IMeiyaHotel[]) {
  * 企业是否绑定供应商类型
  */
 export enum AgentType {
-<<<<<<< HEAD
     CORP = 1,
     JL = 2
-=======
-    isBind = 1,
-    notBind = 2
->>>>>>> 40909c88b... wanna merge to master
+
 }
 
 export interface IMeiyaFlightPriceInfo {
