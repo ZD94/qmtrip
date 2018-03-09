@@ -8,14 +8,9 @@ export = async function transform(values: any): Promise<any>{
 
     let detailUrl;
     let appMessageUrl: string;
-    let shortUrl: string = '';
-    if(config.version == 2) {
-        detailUrl = config.v2_host + '#/my/card-coupons/card-coupons';
-        appMessageUrl = '#/my/card-coupons/card-coupons';
-    } else {
-        detailUrl = config.host +'/index.html#/my/card-coupons/card-coupons';
-        appMessageUrl = '#/my/card-coupons/card-coupons';
-    }
+    let shortUrl: string;
+    detailUrl = config.v2_host + '#/my/card-coupons/card-coupons';
+    appMessageUrl = '#/my/card-coupons/card-coupons';
 
     try{
         shortUrl = await API.wechat.shortUrl({longurl: detailUrl});

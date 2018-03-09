@@ -208,7 +208,7 @@ export default class CompanyModule {
         //默认添加 中国大陆(国内）、通用地区（国际）、港澳台 三个地区用于差旅、限价等的管理,  补助的一类、二类地区
         await API.travelPolicy.initDefaultCompanyRegion({companyId: company.id});
         await API.travelPolicy.initSubsidyRegions({companyId: company.id});
-        return { company: company, description: promoCode ? promoCode.description : "" };
+        return { company: company, description: promoCode ? promoCode.description : "", staffId: staff.id };
     }
 
 
@@ -1392,7 +1392,7 @@ export default class CompanyModule {
         });
 
         let taskId6 = 'dataStatisticsPerWeek';
-        scheduler('0 0 1 * * 1', taskId6, function () {
+        scheduler('0 0 9 * * 1', taskId6, function () {
             //每周一晚上一点给管理员 创建者发送统计邮件
             (async function () {
                 let now = new Date();

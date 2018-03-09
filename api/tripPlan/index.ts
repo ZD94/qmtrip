@@ -446,6 +446,7 @@ class TripPlanModule {
         if(typeof reserveStatus == 'string')
             reserveStatus = Number(reserveStatus);
         let tripDetails: TripDetail[];
+        let log = Models.tripPlanLog.create({tripPlanId: tripDetail.tripPlanId, userId: tripPlan.auditUser});
         switch(reserveStatus) {
             case EOrderStatus.WAIT_SUBMIT: //等待创建订单
             case EOrderStatus.AUDITING:  //等待确认，提交订单
@@ -474,6 +475,8 @@ class TripPlanModule {
                     status: [ETripDetailStatus.WAIT_RESERVE, ETripDetailStatus.WAIT_TICKET]}});
                 if(!tripDetails || !tripDetails.length)
                     tripPlan.status = EPlanStatus.RESERVED;
+                    log.remark = `已预订`;
+                    await log.save();
                 tripDetails = [];
                 break;
             case EOrderStatus.FAILED: 
@@ -744,6 +747,11 @@ class TripPlanModule {
                 //只有当所有的tripDetail都需要上传票据时，该tripPlan的状态置为完成
                 // if(!tripDetails || tripDetails.length == 0)
                 //     tripPlan.status = EPlanStatus.COMPLETE;
+
+                // Log tripPlan changes  票据审核都通过
+                let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: tripPlan.auditUser});
+                log.remark = `已完成`;
+                await log.save();
                 
                 tripPlan.auditStatus = EAuditStatus.INVOICE_PASS;
                 tripPlan.allInvoicesPassTime = new Date();
@@ -1934,6 +1942,9 @@ class TripPlanModule {
         tripPlan.isSpecialApprove = approve.isSpecialApprove;
         tripPlan.specialApproveRemark = approve.specialApproveRemark;
         tripPlan.staffList = query.staffList || [];
+        tripPlan.submitterSnapshot = approve.submitterSnapshot;
+        tripPlan.auditUserSnapshot = approve.approveUserSnapshot;
+        tripPlan.staffListSnapshot = approve.staffListSnapshot;
 
         tripPlan.readNumber = 0;
 
@@ -2750,6 +2761,7 @@ class TripPlanModule {
                         let hasReserved = 0;
                         let needInvoiceUploaded = 0;
                         let invoiceUploaded = 0;
+                        let log = Models.tripPlanLog.create({tripPlanId: tripPlanId, userId: tripPlans[i].auditUser});
                         await Promise.all(tripDetails.map(async (tdetail: TripDetail) => {
                             if(tdetail.type != ETripType.SUBSIDY && tdetail.status == ETripDetailStatus.COMPLETE){   //already reserved tripDetail exists
                                 hasReserved ++;
@@ -2777,9 +2789,13 @@ class TripPlanModule {
                         }
                         if(hasReserved) {
                             tripPlans[i].status = EPlanStatus.RESERVED;
+                            log.remark = `已预定`;
+                            await log.save();
                         }
                         if(!hasReserved) {
                             tripPlans[i].status = EPlanStatus.EXPIRED;
+                            log.remark = `已失效`;
+                            await log.save();
                         }
                         if(invoiceUploaded == needInvoiceUploaded) { //支持行程未结束，上传票据，此时若票据上传完成，tripPlan的状态为待提交审核
                             tripPlans[i].auditStatus = EAuditStatus.WAIT_COMMIT;      
@@ -3023,6 +3039,11 @@ class TripPlanModule {
         tripPlan.expenditure = R.sumBy(R.prop('expenditure'), tripDetails)
         tripPlan.status = EPlanStatus.COMPLETE
         tripPlan.saved = tripPlan.budget - tripPlan.expenditure
+
+        // Log tripPlan changes
+        let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: tripPlan.auditUser});
+        log.remark = `已完成`;
+        promises.push(log.save());
 
         // Log budget changes
         const costCenterDeploy = _.first(await Models.costCenterDeploy.find({
