@@ -859,6 +859,7 @@ export default class ApiAuth {
         });
         if (params.source == 1) {
             let companyId = result.company.id
+            const staff = await Models.staff.get(result.staffId)
             const companyRegions: ICompanyRegion[] = _.filter((cr: ICompanyRegion) => !/(一|二)类/.test(cr.name), _.prop('data', await API.travelPolicy.getCompanyRegions({companyId})))
             const travelPolicies = _.pluck('data', await Promise.all([API.travelPolicy.createTravelPolicy({companyId, name: '员工级', isDefault: true }),
                 API.travelPolicy.createTravelPolicy({companyId, name: '高管级' })]))
@@ -878,6 +879,8 @@ export default class ApiAuth {
                     trainLevels: [ETrainLevel.BUSINESS_SEAT],
                     hotelLevels: [EHotelLevel.FIVE_STAR]
             })))
+            staff.travelPolicyId = travelPolicies[0].id
+            promises.push(staff.save())
             await Promise.all(promises)
         }
         return result;
