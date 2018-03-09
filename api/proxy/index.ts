@@ -156,6 +156,7 @@ class Proxy {
             let staffId = req.headers.staffid;
             let isNeedAuth = req.headers['isneedauth'] || '';
             let agentType = req.headers['agenttype'] || AgentType.CORP;
+
             if(staffId && !staff) {
                 staff = await Models.staff.get(staffId);
             }
