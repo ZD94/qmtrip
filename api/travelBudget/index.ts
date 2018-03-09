@@ -187,7 +187,7 @@ export default class ApiTravelBudget {
         // }
         let companyInfo = await ApiTravelBudget.getCompanyInfo(null, null, null, TMCStatus.OK_USE);
         let data = companyInfo ? companyInfo : await getJLAgents();
-        console.log('hoteldata ----->    ', data);
+        // console.log('hoteldata ----->    ', data);
         let authData: IMeiyaAuthData[] = [];
         data.map((item: {identify: any, sname: string, type: string, agentType: string}) => {
             let identify = item.identify ? item.identify : null;
@@ -253,7 +253,7 @@ export default class ApiTravelBudget {
 
         let companyInfo = await ApiTravelBudget.getCompanyInfo(null, null, null, TMCStatus.OK_USE); 
         let data = companyInfo ? companyInfo : await getJLAgents();
-        console.log('trafficdata ----->   ', data);
+        // console.log('trafficdata ----->   ', data);
         let authData: IMeiyaAuthData[] = [];
         data.map((item: {identify: any, sname: string, type: string, agentType: string}) => {
             let identify = item.identify ? item.identify : null;

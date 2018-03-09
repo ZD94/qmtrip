@@ -59,7 +59,7 @@ export async function getJLAgents() {
     if (typeof result == 'string') {
         result = JSON.parse(result);
     }
-    console.log('getJLAgents  ------>   ', result.data);
+    // console.log('getJLAgents  ------>   ', result.data);
     return result.data;
 }
 
@@ -79,7 +79,7 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
         let sname = item.sname;
         let type = item.type;
         let agentType = item.agentType;
-        console.log('agenttype---->   ', agentType, 'typeof------  ', typeof agentType);
+        // console.log('agenttype---->   ', agentType, 'typeof------  ', typeof agentType);
         isBindService = (type == `${TmcServiceType.FLIGHT}` || type == `${TmcServiceType.FLIGHT_ABROAD}`) ? true : false;
         meiyaResult = isBindService ? await request({
             url: urlFlight,
@@ -128,7 +128,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
         let sname = item.sname;
         let type = item.type;
         let agentType = item.agentType;
-        console.log('agenttype---->   ', agentType, 'typeof------  ', typeof agentType);
+        // console.log('agenttype---->   ', agentType, 'typeof------  ', typeof agentType);
         isBindService = (type == `${TmcServiceType.TRAIN}` || type == `${TmcServiceType.TRAIN_ABROAD}`) ? true : false;
         meiyaResult = isBindService ? await request({
             url: urlTrain,
@@ -178,7 +178,7 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
         let info = item.identify;
         let sname = item.sname;
         let agentType = item.agentType;
-        console.log('agenttype---->   ', agentType, 'typeof------  ', typeof agentType);
+        // console.log('agenttype---->   ', agentType, 'typeof------  ', typeof agentType);
         meiyaResult = await request({
             url: urlHotel,
             method: "get",
