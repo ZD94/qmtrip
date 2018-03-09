@@ -2785,7 +2785,7 @@ class TripPlanModule {
                         }
                         if(hasReserved) {
                             tripPlans[i].status = EPlanStatus.RESERVED;
-                            log.remark = `已预定`;
+                            log.remark = `已预订`;
                             await log.save();
                         }
                         if(!hasReserved) {
