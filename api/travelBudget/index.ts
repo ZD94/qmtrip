@@ -4,7 +4,7 @@
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { Models, EGender } from '_types'
 import { ETripType, ICreateBudgetAndApproveParamsNew, QMEApproveStatus, EApproveResult, EBackOrGo } from "_types/tripPlan";
-import {Approve, EApproveStatus} from '_types/approve';
+import {Approve, EApproveStatus, EApproveChannel} from '_types/approve';
 import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
 import L from '@jingli/language';
@@ -372,7 +372,7 @@ export default class ApiTravelBudget {
                     totalBudget += item.price;
                 })
             }
-
+            const company = await Models.company.get(companyId)
             // console.log('--------update totalBudget------', totalBudget);
             //TODO 如果分段 有一段是FIN 要走那一条 ？？？lizeilin
             if (!isFinalInApprove || params.isFinalFirstResponse) {  //看表中的budget是否是最终结果，最终结果还没返回过，则更新approve表，表示还不可以进行审批，或者是第一次请求时候返回为最终结果
@@ -385,7 +385,7 @@ export default class ApiTravelBudget {
                 approve.data = {budgets: budgets, query: approve.data.query};
                 approve = await approve.save();
                 console.log('approve.step---------------->', approve.step);
-                if (approve.step === STEP.FINAL) {
+                if (approve.step === STEP.FINAL && company.oa != EApproveChannel.AUTO) {
                     console.log('------------enter FIN---------');
                     let params = {approveNo: approve.id};
                     let tripApprove = await API.tripApprove.retrieveDetailFromApprove(params);
@@ -412,12 +412,14 @@ export default class ApiTravelBudget {
                     approve.budget = totalBudget;
                     await approve.save();
                     console.log('-----------update traipApprove;,', totalBudget);
-                    await API.tripApprove.updateTripApprove({
-                        id: approve.id,
-                        budget: totalBudget,
-                        companyId: companyId,
-                        budgetInfo: budgets
-                    });
+                    if (company.oa != EApproveChannel.AUTO) {
+                        await API.tripApprove.updateTripApprove({
+                            id: approve.id,
+                            budget: totalBudget,
+                            companyId: companyId,
+                            budgetInfo: budgets
+                        });
+                    }
                     console.log(`'tripApproveBudgetUpdate:'${approve.id}`);
                     API.broadcast('tripApproveBudgetUpdate:' + approve.id, 'FIN', 'UPDATED');
                 }
