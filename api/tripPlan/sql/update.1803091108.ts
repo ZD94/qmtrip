@@ -33,7 +33,7 @@ async function dealData(DB: Sequelize, t: Transaction) {
             }))
         }
         console.log(`********= approve.approves ${num++} =====>`, item.id);
-        let sql = `update approve.approves set submitter_snapshot = '${JSON.stringify(submitterSnapshot || {})}', 
+        let sql = `update trip_plan.trip_plans set submitter_snapshot = '${JSON.stringify(submitterSnapshot || {})}', 
         audit_user_snapshot = '${JSON.stringify(approveUserSnapshot || {})}', staff_list_snapshot = '${JSON.stringify(staffListSnapshot)}' 
         where id = '${item.id}'`;
         try {
