@@ -54,7 +54,7 @@ export async function saveOrUpdateJpushId(params: any): Promise<Token>  {
  * @param params
  * @returns {null}
  */
-export async function getJpushIdByAccount(params: {accountId: string}): Promise<string[]> {
+export async function getJpushIdByAccount(params: {accountId: string}): Promise<string[]|null> {
     let list = await Models.token.find({where: {accountId: params.accountId, type:'jpush_id'}});
 
     if(!list || list.length <= 0) {

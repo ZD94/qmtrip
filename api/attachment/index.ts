@@ -54,7 +54,7 @@ class ApiAttachment {
         var contentType = params.contentType;
         var id:string;
         let staff = await Staff.getCurrent();
-        let staffId = null;
+        let staffId = '';
         if(staff) staffId = staff.id;
 
         if (!content) {
@@ -92,12 +92,13 @@ class ApiAttachment {
     static async removeFileAndAttach(params: {id: string}): Promise<boolean> {
         var id = params.id;
         var file = await Models.relateFile.get(id);
+        if (!file) throw new Error('file is null')
         let [relateFile, attachment] = await Promise.all([
             Models.relateFile.get(file.id),
             Models.attachment.get(file.key)
         ])
-        await relateFile.destroy();
-        await attachment.destroy();
+        relateFile && await relateFile.destroy();
+        attachment && await attachment.destroy();
         return true;
     }
 

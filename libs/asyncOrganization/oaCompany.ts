@@ -11,9 +11,9 @@ let C = require("@jingli/config");
 
 export abstract class OaCompany{
     constructor(public target: any){
-        this.type = target.type;
+        // this.type = target.type;
     }
-    private type: string;
+    // private type: string;
     abstract get id();
     abstract set id(val: string);
 
@@ -21,13 +21,13 @@ export abstract class OaCompany{
     abstract set name(val: string);
 
     abstract async getDepartments(): Promise<OaDepartment[]>;
-    abstract async getRootDepartment(): Promise<OaDepartment>;
-    abstract async getCreateUser(): Promise<OaStaff>;
+    abstract async getRootDepartment(): Promise<OaDepartment|null>;
+    abstract async getCreateUser(): Promise<OaStaff | null>;
     abstract async saveCompanyProperty(params: {companyId: string}): Promise<boolean>;
 
-    async getCompany(): Promise<Company>{
+    async getCompany(): Promise<Company|null>{
         let self = this;
-        let com: Company = null;
+        let com: Company | null = null;
         console.log("self.id: ", self.id)
         let comPro = await Models.companyProperty.find({where : {type: CPropertyType.WECHAT_CORPID, value: self.id}});
         if(comPro && comPro.length > 0){
@@ -70,7 +70,7 @@ export abstract class OaCompany{
 
         //处理企业创建者
         let createUser = await self.getCreateUser();
-        let createStaff: Staff;
+        let createStaff: Staff | null = null;
         if(createUser){
             createStaff = await createUser.sync({company: result, from: "createUser"});
         }

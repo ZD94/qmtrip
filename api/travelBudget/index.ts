@@ -2,9 +2,9 @@
  * Created by wlh on 15/12/12.
  */
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
-import { Models } from '_types'
+import { Models, EGender } from '_types'
 import { ETripType, ICreateBudgetAndApproveParamsNew, QMEApproveStatus, EApproveResult, EBackOrGo } from "_types/tripPlan";
-import {Approve, EApproveStatus} from '_types/approve';
+import {Approve, EApproveStatus, EApproveChannel} from '_types/approve';
 import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
 import L from '@jingli/language';
@@ -37,6 +37,7 @@ import { DB } from "@jingli/database";
 import { EApproveType, STEP } from '_types/approve';
 import { Transaction } from 'sequelize';
 import {ECostCenterType} from "_types/costCenter/costCenter";
+import {IStaffSnapshot} from "../../_types/staff/staff";
 
 export interface ICity {
     name: string;
@@ -214,12 +215,10 @@ export default class ApiTravelBudget {
             return require("meiyaFake/finallyUsingHotel");
         } else {
             let meiyaHotel = await getMeiyaHotelData(params, authData);
-            console.log("meiyaHotel ===> meiyaHotel data.", meiyaHotel.length)
-            if (meiyaHotel && meiyaHotel.length != 0){
-                // commonData = compareHotelData(commonData, meiyaHotel);
+            console.log("meiyaHotel ===> meiyaHotel data.", meiyaHotel.length);
+            if (meiyaHotel && meiyaHotel.length){
                 commonData = handelHotelsData(meiyaHotel, params);
                 commonData = combineData(commonData, 'name', 'agents');
-            // writeData(moment().format("YYYY_MM_DD_hh_mm_ss") + ".finallyHotel.json", commonData);
                 return commonData;
             }else { 
                 return []
@@ -229,10 +228,9 @@ export default class ApiTravelBudget {
 
     @clientExport
     static async getTrafficsData(params: ISearchTicketParams): Promise<any> {
-        let commonData = [];
-        let commonData2 = [];
-      
-         // let result;
+        let commonData: any[] = [];
+        let commonData2: any[] = [];
+        // let result;
         // try {
         //     result = await RestfulAPIUtil.operateOnModel({
         //         params: {
@@ -289,15 +287,15 @@ export default class ApiTravelBudget {
             let meiyaFlight = arr[1];
             console.log("meiyaFlight ===> meiyaFlight data.", meiyaFlight.length);
             console.log("meiyaTrain ===> meiyaTrain data.", meiyaTrain.length);
-            if (meiyaFlight && meiyaFlight.length)
-            //     commonData = compareFlightData(commonData, meiyaFlight);
+
+            if (meiyaFlight && meiyaFlight.length) {
                 commonData = await handleFlightData(meiyaFlight,params);
                 commonData = combineData(commonData, 'No', 'agents')
-            if (meiyaTrain && meiyaTrain.length)
-            // commonData = compareTrainData(commonData, meiyaTrain);
-                 commonData2 = handleTrainData(meiyaTrain, params)
-                 commonData2 = combineData(commonData2, 'No', 'agents')
-            console.log("commonData ===> commonData data.", typeof (commonData));
+            }    
+            if (meiyaTrain && meiyaTrain.length){      
+                commonData2 = handleTrainData(meiyaTrain, params)
+                commonData2 = combineData(commonData2, 'No', 'agents')
+            }   
             return [...commonData, ...commonData2];
         }
     }
@@ -366,6 +364,7 @@ export default class ApiTravelBudget {
             }
 
             let staff = await Models.staff.get(staffId);
+            if (!staff) throw new Error('staff is null')
             let companyId = staff.company.id;
 
             let _budgets = params.budgetResult.budgets;
@@ -380,7 +379,7 @@ export default class ApiTravelBudget {
                     totalBudget += item.price;
                 })
             }
-
+            const company = await Models.company.get(companyId)
             // console.log('--------update totalBudget------', totalBudget);
             //TODO 如果分段 有一段是FIN 要走那一条 ？？？lizeilin
             if (!isFinalInApprove || params.isFinalFirstResponse) {  //看表中的budget是否是最终结果，最终结果还没返回过，则更新approve表，表示还不可以进行审批，或者是第一次请求时候返回为最终结果
@@ -393,11 +392,11 @@ export default class ApiTravelBudget {
                 approve.data = {budgets: budgets, query: approve.data.query};
                 approve = await approve.save();
                 console.log('approve.step---------------->', approve.step);
-                if (approve.step === STEP.FINAL) {
+                if (approve.step === STEP.FINAL && company.oa != EApproveChannel.AUTO) {
                     console.log('------------enter FIN---------');
                     let params = {approveNo: approve.id};
                     let tripApprove = await API.tripApprove.retrieveDetailFromApprove(params);
-
+                    
                     let returnApprove = await API.eventListener.sendEventNotice({ eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: approve.companyId });
                     if(returnApprove){
                         let tripPlanLog = Models.tripPlanLog.create({
@@ -420,12 +419,14 @@ export default class ApiTravelBudget {
                     approve.budget = totalBudget;
                     await approve.save();
                     console.log('-----------update traipApprove;,', totalBudget);
-                    await API.tripApprove.updateTripApprove({
-                        id: approve.id,
-                        budget: totalBudget,
-                        companyId: companyId,
-                        budgetInfo: budgets
-                    });
+                    if (company.oa != EApproveChannel.AUTO) {
+                        await API.tripApprove.updateTripApprove({
+                            id: approve.id,
+                            budget: totalBudget,
+                            companyId: companyId,
+                            budgetInfo: budgets
+                        });
+                    }
                     console.log(`'tripApproveBudgetUpdate:'${approve.id}`);
                     API.broadcast('tripApproveBudgetUpdate:' + approve.id, 'FIN', 'UPDATED');
                 }
@@ -471,6 +472,8 @@ export default class ApiTravelBudget {
             staffId = currentStaff.id;
         }
         let staff = await Models.staff.get(staffId);
+        let submitterSnapshot = await staff.getStaffSnapshot();
+        if (!staff) throw new Error('staff is null')
         let companyId = staff.companyId;
         let company = await Models.company.get(companyId);
         let travelPolicy = await staff.getTravelPolicy();
@@ -497,15 +500,18 @@ export default class ApiTravelBudget {
             params.staffList.push(staffId);
         }
         let count = params.staffList.length;
-        let staffs = [];
+        let staffListSnapshot: IStaffSnapshot[] = [];
+        let staffs: {gender: number, policy: string}[] = [];
         for (let i = 0; i < count; i++) {
             let staff = params.staffList[i];
             let _staff = await Models.staff.get(staff);
-            let __staff: any = {
-                gender: _staff.sex,
+            let __staff: {gender: number, policy: string} = {
+                gender: _staff && _staff.sex || EGender.MALE,
                 policy: 'domestic',
             };
             staffs.push(__staff);
+            let _staffSnapshot = await _staff.getStaffSnapshot();
+            staffListSnapshot.push(_staffSnapshot);
         }
         
 
@@ -515,25 +521,30 @@ export default class ApiTravelBudget {
         let projectId: string = '';
         let feeCollectedName = '';
         if (feeCollectedType == 0) {
-            departmentId = feeCollected;
+            departmentId = feeCollected || '';
             let department = await Models.department.get(departmentId);
-            feeCollectedName = department.name;
+            feeCollectedName = department && department.name || '';
 
         } else if (feeCollectedType == 1) {
-            projectId = feeCollected;
+            projectId = feeCollected || '';
             let project = await Models.project.get(projectId);
-            feeCollectedName = project.name;
+            feeCollectedName = project && project.name || '';
         }
-        let approveUser: Staff = params['approveUser'];
+        let approveUser: Staff | undefined = params['approveUser'];
+        let approveUserSnapshot: any = {}
+        if(approveUser && approveUser.id){
+            let s = await Models.staff.get(approveUser.id);
+            approveUserSnapshot = await s.getStaffSnapshot();
+        }
 
         if (approveId) {
             let checkApprove = await Models.approve.get(approveId);
-            let approveStatus = checkApprove['tripApproveStatus'];
+            let approveStatus = checkApprove && checkApprove['tripApproveStatus'];
             if (approveStatus == QMEApproveStatus.PASS || approveStatus == QMEApproveStatus.REJECT ||
                 approveStatus == QMEApproveStatus.CANCEL) {  //若审批已通过、驳回或已撤销，锁定budget不再更新
-                await API.tripApprove.updateTripApprove({id: approveId, lockBudget: true});
+                await API.tripApprove.updateTripApprove({id: approveId, lockBudget: true, companyId});
             } else {   // 否则将lockBudget标示置回初始值，接受budget更新
-                await API.tripApprove.updateTripApprove({id: approveId, lockBudget: false});
+                await API.tripApprove.updateTripApprove({id: approveId, lockBudget: false, companyId});
             }
         }
 
@@ -541,11 +552,14 @@ export default class ApiTravelBudget {
         if (!isIntoApprove) {  //判断是否是审批人查看审批单时进行的第二次拉取数据 
             //创建approve，获得approveId用于URL和更新
             approve = Approve.Create({
-                approveUser: params.approveUser.id,
+                approveUser: params.approveUser ? params.approveUser.id : '',
+                approveUserSnapshot: approveUserSnapshot,
                 type: EApproveType.TRAVEL_BUDGET,
                 companyId: companyId,
                 staffList: params.staffList,
+                staffListSnapshot: staffListSnapshot,
                 submitter: staffId,
+                submitterSnapshot: submitterSnapshot,
                 tripApproveStatus: QMEApproveStatus.WAIT_APPROVE,
                 title: feeCollectedName
             });
@@ -595,7 +609,7 @@ export default class ApiTravelBudget {
         }
         console.log('eachBudgetSet-----------', eachBudgetSegIsOk);
         if (eachBudgetSegIsOk && !isIntoApprove) {
-            await approve.save();
+            approve && await approve.save();
         } 
         if (!eachBudgetSegIsOk) {
             throw new Error('预算有负值,提交失败');
@@ -609,6 +623,7 @@ export default class ApiTravelBudget {
         obj.createAt = Date.now();
 
         await DB.transaction(async function (t: Transaction) {
+            if (!company || !staff) throw new Error('company or staff is null')
             let result = await API.company.verifyCompanyTripNum({
                 tripNum: tripNumCost,
                 companyId: company.id,
@@ -622,14 +637,15 @@ export default class ApiTravelBudget {
 
             //拿到预算后更新approve表
             if (!isIntoApprove && eachBudgetSegIsOk) {//判断是否是审批人查看审批单时进行的第二次拉取数据
-                let updateBudget = await Models.approve.get(approveId);
+                let updateBudget = await Models.approve.get(approveId || '');
                 // let submitter = await Staff.getCurrent();
                 let submitter = await Models.staff.get(staff.id);
+                if (!submitter || !updateBudget) throw new Error('submitter or updateBudget is null')
                 updateBudget.submitter = submitter.id;
                 updateBudget.data = obj;
                 updateBudget.channel = submitter.company.oa;
                 updateBudget.type = EApproveType.TRAVEL_BUDGET;
-                updateBudget.approveUser = approveUser ? approveUser.id : null;
+                updateBudget.approveUser = approveUser ? approveUser.id : '';
                 updateBudget.staffList = obj.query.staffList;
                 updateBudget.budget = totalBudget;
                 updateBudget.step = budgetResult.step;
@@ -642,7 +658,7 @@ export default class ApiTravelBudget {
             if (budgetResult.step == 'FIN' && eachBudgetSegIsOk) {
                 console.log('updateBudget first time');
                 await ApiTravelBudget.updateBudget({
-                    approveId: approveId,
+                    approveId: approveId || '',
                     budgetResult: budgetResult,
                     isFinalFirstResponse: (isIntoApprove ? false : true)
                 });
@@ -653,7 +669,7 @@ export default class ApiTravelBudget {
             if (err) {
                 // company.extraTripPlanFrozenNum = extraTripPlanFrozenNum;
                 // company.tripPlanFrozenNum = originTripPlanFrozenNum;
-                await company.reload();
+                company && await company.reload();
                 console.info(err);
                 throw new Error("提交审批失败");
             }
@@ -675,7 +691,7 @@ export default class ApiTravelBudget {
         if(!staffId) {
             staff = await Staff.getCurrent(); 
         }    
-        let companyId = staff && staff.company ? staff.company.id: staff.companyId;
+        let companyId = staff && (staff.company ? staff.company.id: staff.companyId);
         // let companyId = "4a1f37e0-0a54-11e7-ad22-b1cccc4cc277";
         if(!companyId) throw L.ERR.HAS_NOT_BIND();
         let result;
@@ -759,6 +775,7 @@ export default class ApiTravelBudget {
             staffId = currentStaff.id;
         }
         let staff = await Models.staff.get(staffId);
+        if (!staff) throw new Error('staff is null')
         let company = staff.company;
 
         if (company.name != "鲸力智享") {
@@ -796,6 +813,7 @@ export default class ApiTravelBudget {
                 return true;
             }
             let log = await Models.travelBudgetLog.get(budget.id);
+            if (!log) return null
             log.status = -1;
             return log.save();
         });
@@ -817,6 +835,7 @@ export default class ApiTravelBudget {
         } catch (err) {
             console.log(err);
         }
+        console.info("result============",result);
         if(!result || !result.data) {
             throw new Error("拉取预算失败");
         }
@@ -841,12 +860,12 @@ export default class ApiTravelBudget {
 
     static __initHttpApp(app: Application) {
 
-        function _auth_middleware(req: Request, res: Response, next: NextFunction) {
+        function _auth_middleware(req: Request, res: Response, next?: NextFunction) {
             let key = req.query.key;
             if (!key || key != 'jingli2016') {
                 return res.send(403)
             }
-            next();
+            next && next();
         }
 
         app.get("/api/budgets", _auth_middleware, function (req, res, next) {

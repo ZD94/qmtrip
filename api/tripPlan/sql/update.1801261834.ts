@@ -23,7 +23,7 @@ async function dealData(DB: Sequelize, t: Transaction) {
     for (let item of tripPlans) {
         let tripDetailsSql = `select * from trip_plan.trip_details where trip_plan_id = '${item.id}'`;
         let tripDetails = await DB.query(tripDetailsSql, { type: SEQUELIZE.QueryTypes.SELECT });
-        let traffics = [], hotels = [], subsidys = [];
+        let traffics: any[] = [], hotels: any[] = [], subsidys: any[] = [];
         for (let tripDetail of tripDetails) {
             if (!tripDetail.budget_info) {
                 continue;

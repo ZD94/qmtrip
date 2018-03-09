@@ -7,6 +7,7 @@ import {EStaffRole} from "_types/staff";
 export = async function transform(values: any): Promise<any>{
     if(values.staff && values.staff.id){
         let staff = await Models.staff.get(values.staff.id);
+        if (!staff) throw new Error('staff is null')
         let travelPolicy = await staff.getTravelPolicy();
         values.travelPolicy = travelPolicy;
         values.EStaffRole = EStaffRole;

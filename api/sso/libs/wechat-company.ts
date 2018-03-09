@@ -45,9 +45,9 @@ export class WCompany extends OaCompany {
         this.target.secret = val;
     }
 
-    async getCompany(): Promise<Company>{
+    async getCompany(): Promise<Company|null>{
         let self = this;
-        let com: Company = null;
+        let com: Company | null = null;
         if(typeof self.id != 'string') 
             self.id = self.id + '';
         let comPro = await Models.companyProperty.find({where : {value: self.id}});
@@ -66,10 +66,10 @@ export class WCompany extends OaCompany {
     async syncAdminRole(suiteToken: string): Promise<boolean> {
         let self = this;
         if(!self.agentId) return false;
-        let result: Array<IWAdminList> = await self.restApi.getAdminList(self.id, self.agentId, suiteToken);  
+        let result: Array<IWAdminList> | null = await self.restApi.getAdminList(self.id, self.agentId, suiteToken);  
         if(!result || result.length == 0) return false;
 
-        let staffIds: string[] = await Promise.all(result.map(async (wstaff: IWAdminList) => {
+        let staffIds: (string | null)[] = await Promise.all(result.map(async (wstaff: IWAdminList) => {
             let staffProperty = await Models.staffProperty.find({
                 where: {
                     type: SPropertyType.WECHAT_UID,
@@ -99,8 +99,8 @@ export class WCompany extends OaCompany {
         }
 
         if(staffIds && staffIds.length) {
-            await Promise.all(staffIds.map(async (staffId: string) => {
-                let staff = await Models.staff.get(staffId);
+            await Promise.all(staffIds.map(async (staffId: string | null) => {
+                let staff = await Models.staff.get(staffId || '');
                 if(!staff) return null;
                 staff.roleId = EStaffRole.ADMIN;
                 await staff.save();
@@ -129,11 +129,11 @@ export class WCompany extends OaCompany {
 
     async getDepartments(): Promise<OaDepartment[]> {
         let self = this;
-        let company: Company = await self.getCompany();
+        let company: Company | null = await self.getCompany();
 
-        let wDepartments: Array<IWDepartment> = await self.restApi.getDepartments();
-        let result: OaDepartment[];
-        wDepartments.forEach((item: IWDepartment) => {
+        let wDepartments: Array<IWDepartment> | null = await self.restApi.getDepartments();
+        let result: OaDepartment[] = [];
+        wDepartments && wDepartments.forEach((item: IWDepartment) => {
             let wDept = new WDepartment({
                 name: item.name, 
                 parentId: item.parentid + '', 
@@ -144,7 +144,7 @@ export class WCompany extends OaCompany {
             });
             result.push(wDept);
         });
-        if(!result) return null;
+        if(!result) return [];
         return result;
     }
 
@@ -153,12 +153,12 @@ export class WCompany extends OaCompany {
      *     注意，微信企业部门可设置可见性，
      * @return {WDepartment}
      */
-    async getRootDepartment(): Promise<OaDepartment> {
+    async getRootDepartment(): Promise<OaDepartment|null> {
         let self = this;
-        let company: Company = await self.getCompany();
+        let company: Company | null = await self.getCompany();
 
         let wDepartments: Array<IWDepartment> = await self.restApi.getDepartments();
-        let result: OaDepartment;
+        let result: OaDepartment | undefined;
         for(let i = 0; i < wDepartments.length; i++) {
             if(wDepartments[i].id == RootDepartment){
                 result = new WDepartment({
@@ -178,10 +178,10 @@ export class WCompany extends OaCompany {
     /**
      * @method 获取管理员(创建者), 微信企业无管理员
      */
-    async getCreateUser(): Promise<OaStaff> {
+    async getCreateUser(): Promise<OaStaff | null> {
         let self = this;
         let company = await self.getCompany();
-        let staff: Staff;
+        let staff: Staff | null = null;
         if(company && company.createUser)
             staff = await Models.staff.get(company.createUser);
         if(!staff) return null;

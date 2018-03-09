@@ -68,6 +68,7 @@ export class CreditController extends AbstractController {
         if(coinAccountChanges && coinAccountChanges.length > 0){
             coinAccountChange = coinAccountChanges[0];
             var coinAccount = await Models.coinAccount.get(coinAccountChange.coinAccountId);
+            if (!coinAccount) return res.sendStatus(404)
 
             if(!coinAccountChange.coins){
                 coinAccountChange.coins = 0;

@@ -3,7 +3,7 @@
  */
 "use strict";
 import { requireParams, clientExport } from "@jingli/dnode-api/dist/src/helper";
-import { Models, EAccountType, EGender } from "_types";
+import { Models, EAccountType, EGender, EPlaneLevel, ETrainLevel, EHotelLevel } from "_types";
 import { Account, ACCOUNT_STATUS } from "_types/auth";
 import { Staff, EInvitedLinkStatus, EAddWay, EStaffRole } from "_types/staff";
 import validator = require('validator');
@@ -23,6 +23,8 @@ var utils = require("common/utils");
 var accountCols = Account['$fieldnames'];
 import { getSession } from "@jingli/dnode-api";
 import { Application } from 'express-serve-static-core';
+import { ICompanyRegion } from '_types/travelPolicy';
+const _ = require('lodash/fp')
 
 let codeTicket = "checkcode:ticket:";
 
@@ -186,7 +188,7 @@ export default class ApiAuth {
             account.status = ACCOUNT_STATUS.ACTIVE;
         }
         account.isValidateEmail = true;
-        account.pwdToken = null;
+        account.pwdToken = '';
         await account.save();
         return true;
     }
@@ -201,7 +203,7 @@ export default class ApiAuth {
         var mobileOrEmail = params.email;
         var accountId = params.accountId;
         var account: Account;
-        let staff: Staff;
+        let staff: Staff|null = null;
         if(accountId) {
             staff = await Models.staff.get(accountId);
             account = await Models.account.get(staff.accountId, {notParent: true});
@@ -338,7 +340,7 @@ export default class ApiAuth {
         if(account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
             account.status = ACCOUNT_STATUS.ACTIVE;
         }
-        account.activeToken = null;
+        account.activeToken = '';
         account.isValidateEmail = true;
         account = await account.save()
         return account;
@@ -364,7 +366,7 @@ export default class ApiAuth {
             throw L.ERR.CODE_ERROR();
         }
         var accounts = await Models.account.find({where: {mobile: mobile}});
-        var account: Account;
+        var account: Account|undefined;
         if(accounts && accounts.length > 0) {
             account = accounts[0];
         }
@@ -793,9 +795,9 @@ export default class ApiAuth {
      * @returns {Promise<TResult>|Promise<U>}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'userName', 'pwd', 'msgCode', 'msgTicket'], ['email', 'agencyId', 'remark', 'description', 'promoCode', 'referrerMobile'])
+    @requireParams(['mobile', 'name', 'userName', 'pwd', 'msgCode', 'msgTicket'], ['email', 'agencyId', 'remark', 'description', 'promoCode', 'referrerMobile', 'source'])
     static async registerCompany(params: {name: string, userName: string, email?: string, mobile: string, pwd: string,
-        msgCode: string, msgTicket: string, agencyId?: string, promoCode?: string, referrerMobile?: string}) {
+        msgCode: string, msgTicket: string, agencyId?: string, promoCode?: string, referrerMobile?: string, source?: number}) {
         var companyName = params.name;
         var name = params.userName;
         var email = params.email;
@@ -855,6 +857,32 @@ export default class ApiAuth {
             promoCode: params.promoCode,
             referrerMobile: referrerMobile,
         });
+        if (params.source == 1) {
+            let companyId = result.company.id
+            const staff = await Models.staff.get(result.staffId)
+            const companyRegions: ICompanyRegion[] = _.filter((cr: ICompanyRegion) => !/(一|二)类/.test(cr.name), _.prop('data', await API.travelPolicy.getCompanyRegions({companyId})))
+            const travelPolicies = _.pluck('data', await Promise.all([API.travelPolicy.createTravelPolicy({companyId, name: '员工级', isDefault: true }),
+                API.travelPolicy.createTravelPolicy({companyId, name: '高管级' })]))
+            const promises = [...companyRegions.map(cr =>
+                    API.travelPolicy.createTravelPolicyRegion({
+                        travelPolicyId: travelPolicies[0].id,
+                        companyRegionId: cr.id,
+                        planeLevels: [EPlaneLevel.ECONOMY],
+                        trainLevels: [ETrainLevel.SECOND_SEAT],
+                        hotelLevels: [EHotelLevel.THREE_STAR]
+                }))]
+            promises.push(...companyRegions.map(cr =>
+                API.travelPolicy.createTravelPolicyRegion({
+                    travelPolicyId: travelPolicies[1].id,
+                    companyRegionId: cr.id,
+                    planeLevels: [EPlaneLevel.BUSINESS],
+                    trainLevels: [ETrainLevel.BUSINESS_SEAT],
+                    hotelLevels: [EHotelLevel.FIVE_STAR]
+            })))
+            staff.travelPolicyId = travelPolicies[0].id
+            promises.push(staff.save())
+            await Promise.all(promises)
+        }
         return result;
     }
 
@@ -986,8 +1014,8 @@ export default class ApiAuth {
     }
 
     @clientExport
-    static async getAccountStatus(params: {id: string}): Promise<Account> {
-        let acc: Account;
+    static async getAccountStatus(params: {id: string}): Promise<Account|undefined> {
+        let acc: Account | undefined;
         let args: any = {attributes: ["status"]};
         args.where = {id: params.id};
         let result = await Models.account.find(args);
@@ -1031,7 +1059,7 @@ export default class ApiAuth {
         }
 
         if(data.pwd) {
-            var pwd = data.pwd;
+            var pwd: string | undefined;
             var password = data.pwd.toString();
             pwd = utils.md5(password);
             //throw L.ERR.PASSWORD_EMPTY();
@@ -1085,7 +1113,7 @@ export default class ApiAuth {
         }
 
         if(account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
-            return _sendActiveEmail(account.id, null, data.version)
+            return _sendActiveEmail(account.id, undefined, data.version)
                 .then(function() {
                     return account;
                 })

@@ -24,16 +24,18 @@ import { Place } from '_types/place';
 
 export default class TripApproveModule {
 
-    static async retrieveDetailFromApprove(params: {approveNo: string, approveUser?: string, submitter?: string, findTripApproveFirst?: boolean}):Promise<ITripApprove> {
+    static async retrieveDetailFromApprove(params: {approveNo: string, approveUser?: string, submitter?: string, findTripApproveFirst?: boolean}) {
         let {approveNo, approveUser, submitter, findTripApproveFirst = true} = params;
-        let tripApproveObj: ITripApprove
+        let tripApproveObj: ITripApprove | null = null
         if(!approveUser && !submitter)
             tripApproveObj = await TripApproveModule.getTripApprove({id: approveNo});
         if(tripApproveObj && findTripApproveFirst)
             return tripApproveObj;
 
         let approve = await Models.approve.get(approveNo);
+        if (!approve) return null
         let company = await Models.company.get(approve.companyId);
+        if (!company) return null
         approveUser = approveUser && typeof(approveUser) != 'undefined' ? approveUser : approve.approveUser;
         submitter = submitter && typeof(submitter) != 'undefined' ? submitter: approve.submitter;
 
@@ -94,7 +96,7 @@ export default class TripApproveModule {
                         placeCode = placeCode['id'];
                     }
                     let arrivalInfo = await API.place.getCityInfo({cityCode: placeCode, companyId: approve.companyId}) || {name: null};
-                    let destination: IDestination = {city:arrivalInfo.id, arrivalDateTime: segment.leaveDate, leaveDateTime: segment.goBackDate};
+                    let destination: IDestination = {city:arrivalInfo.id, arrivalDateTime: segment.leaveDate, leaveDateTime: segment.goBackDate} as IDestination;
                     arrivalCityCodes.push(arrivalInfo.id);
                     if (i == destinationPlacesInfo.length - 1 && goBackPlace) {
                         arrivalCityCodes.push(goBackPlace);
@@ -108,10 +110,10 @@ export default class TripApproveModule {
 
                 //处理其他数据
                 if(i == 0){
-                    tripApprove.startAt = segment.leaveDate;
+                    tripApprove.startAt = segment.leaveDate || new Date();
                 }
                 if(i == (destinationPlacesInfo.length - 1)){
-                    tripApprove.backAt = segment.goBackDate;
+                    tripApprove.backAt = segment.goBackDate || new Date();
                 }
             }
         }
@@ -144,16 +146,19 @@ export default class TripApproveModule {
         tripApprove.staffList = approve.staffList;
         tripApprove.lockBudget = false;
         tripApprove.startAt = approve.startAt;
+        tripApprove.submitterSnapshot = approve.submitterSnapshot;
+        tripApprove.approveUserSnapshot = approve.approveUserSnapshot;
+        tripApprove.staffListSnapshot = approve.staffListSnapshot;
 
         //自动审批关闭
-        // if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
-        //     tripApprove.autoApproveTime = await TripApproveModule.calculateAutoApproveTime({
-        //         type: company.autoApproveType,
-        //         config: company.autoApprovePreference,
-        //         submitAt: new Date(),
-        //         tripStartAt: tripApprove.startAt,
-        //     });
-        // }
+        if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
+            tripApprove.autoApproveTime = await TripApproveModule.calculateAutoApproveTime({
+                type: company.autoApproveType,
+                config: company.autoApprovePreference,
+                submitAt: new Date(),
+                tripStartAt: tripApprove.startAt,
+            });
+        }
         return tripApprove;
 
     }
@@ -161,16 +166,18 @@ export default class TripApproveModule {
     static async getDetailsFromApprove(params: {approveId: string}): Promise<TripDetail[]> {
         // let approve = await TripApproveModule.getTripApprove({id: params.approveId});
 
-        let approve: ITripApprove = await TripApproveModule.retrieveDetailFromApprove({approveNo: params.approveId});
+        let approve = await TripApproveModule.retrieveDetailFromApprove({approveNo: params.approveId});
+        if (!approve) return []
         // let approve = await Models.approve.get(params.approveId);
         let account = await Models.staff.get(approve.accountId);
-
+        
         let budgets = approve.budgetInfo;
         return budgets.map(function (budget:{
             tripType: number, price: number, originPlace: Place, destination: Place, leaveDate: Date,
             cabinClass: number, cityName: string, hotelName: string, checkInDate: Date, checkOutDate: Date,
             fromDate: Date, endDate: Date, hasFirstDaySubsidy: boolean, hasLastDaySubsidy: boolean
         }) {
+            if (!approve) return null
             if (typeof budget == 'string') {
                 budget = JSON.parse(budget);
             }
@@ -229,7 +236,7 @@ export default class TripApproveModule {
             }
             detail.type = tripType;
             detail.budget = price;
-            detail.accountId = account.id;
+            detail.accountId = account && account.id || '';
             detail.tripPlanId = approve.id;
             return detail;
         });
@@ -264,9 +271,10 @@ export default class TripApproveModule {
 
 
     static async sendTripApproveNotice(params: {approveId: string, nextApprove?: boolean, approveUserId?: string, version?: number}) {
-        let tripApprove: ITripApprove = await TripApproveModule.retrieveDetailFromApprove({approveNo: params.approveId});
+        let tripApprove = await TripApproveModule.retrieveDetailFromApprove({approveNo: params.approveId});
+        if (!tripApprove) return false
         let staff = await Models.staff.get(tripApprove.accountId);
-
+        if (!staff) return false
         let company = staff.company;
 
         //#@template
@@ -333,8 +341,9 @@ export default class TripApproveModule {
     static async sendApprovePassNoticeToCompany(params: {approveId: string}) {
 
         let approve = await Models.approve.get(params.approveId);
+        if (!approve) return false
         let company = await Models.company.get(approve.companyId);
-
+        if (!company) return false
         let tripApprove = await TripApproveModule.retrieveDetailFromApprove({approveNo: params.approveId});
         // let tripApprove = await Models.tripApprove.get(params.approveId);
         // let staff = tripApprove.account;
@@ -369,9 +378,11 @@ export default class TripApproveModule {
         let isNextApprove = params.isNextApprove;
         let staff = await Staff.getCurrent();
         let tripApprove = await TripApproveModule.getTripApprove({id: params.id});
+        if (!tripApprove) return false
         let approveResult = params.approveResult;
         let budgetId = params.budgetId;
-        let approveUser = await Models.staff.get(tripApprove.approveUserId);
+        let approveUser = await Models.staff.get(tripApprove.approveUserId || '');
+        if (!approveUser) return false
         let approveCompany = approveUser.company;
 
 
@@ -420,6 +431,7 @@ export default class TripApproveModule {
         }
 
         await DB.transaction(async function(t){
+            if (!tripApprove) throw new Error('TripApprove is null')
             // 特殊审批和非当月提交的审批不记录行程点数
             if(!tripApprove.isSpecialApprove){
                 if(typeof tripApprove.query == 'string'){
@@ -493,8 +505,9 @@ export default class TripApproveModule {
             }else if(isNextApprove){ //指定下一级审批人
                 log.approveStatus = EApproveResult.PASS;
                 await log.save();
+                let nextApproveUser = await Models.staff.get(params.nextApproveUserId || '');
                 tripApprove.approvedUsers += `,${staff.id}`;
-                tripApprove.approveUserId = params.nextApproveUserId;
+                tripApprove.approveUserId = nextApproveUser && nextApproveUser.id || '';
             }else if(approveResult == EApproveResult.REJECT) {
                 let approveRemark = params.approveRemark;
                 if(!approveRemark) {
@@ -562,7 +575,7 @@ export default class TripApproveModule {
                 console.error(err);
             }
             try {
-                await API.notify.submitNotify({userId: user.id, key: 'qm_notify_approve_not_pass',
+                await API.notify.submitNotify({userId: user && user.id, key: 'qm_notify_approve_not_pass',
                     values: { tripApprove: tripApprove, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
             } catch(err) { console.error(err);}
         }
@@ -582,10 +595,12 @@ export default class TripApproveModule {
     }): Promise<boolean> {
         console.info("oaApproveTripPlan begin=====================");
         let approve = await Models.approve.get(params.id);
+        if (!approve) return false
         let isAutoApprove = params.isAutoApprove;
         let extraStr = isAutoApprove ? '自动' : '';
         let approveResult = params.approveResult;
         let approveUser = await Models.staff.get(approve.approveUser);
+        if (!approveUser) return false
         let approveCompany = approveUser.company;
         if(approveResult == 1){
             approveResult = EApproveResult.PASS;
@@ -609,6 +624,7 @@ export default class TripApproveModule {
         }
 
         await DB.transaction(async function(t){
+            if (!approve) throw new Error('approve is null')
             await approve.save();
             // 特殊审批和非当月提交的审批不记录行程点数
             if(!approve.isSpecialApprove){
@@ -711,7 +727,7 @@ export default class TripApproveModule {
                     console.error(err);
                 }
                 try {
-                    await API.notify.submitNotify({userId: user.id, key: 'qm_notify_approve_not_pass',
+                    await API.notify.submitNotify({userId: user && user.id, key: 'qm_notify_approve_not_pass',
                         values: { tripApprove: approve, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
                 } catch(err) { console.error(err);}
             }
@@ -725,7 +741,7 @@ export default class TripApproveModule {
 
         }).catch(async function(err){
             if(err) {
-                await approve.reload();
+                approve && await approve.reload();
                 await approveCompany.reload();
                 throw L.ERR.INTERNAL_ERROR();
             }
@@ -746,6 +762,7 @@ export default class TripApproveModule {
         console.info("nextApprove begin============");
         let approveUser = await Models.staff.get(params.approveUserId);
         let nextApproveUser = await Models.staff.get(params.nextApproveUserId);
+        if (!approveUser || !nextApproveUser) return false
         let log = TripPlanLog.create({tripPlanId: params.id, userId: params.approveUserId});
 
         log.approveStatus = EApproveResult.PASS;
@@ -826,12 +843,15 @@ export default class TripApproveModule {
     static async oaCancelTripApprove(params: {id: string, cancelRemark?: string}): Promise<boolean> {
         console.info( "oaCancelTripApprove begin==============");
         let tripApprove = await Models.approve.get(params.id);
+        if (!tripApprove) return false
         let staff = await Models.staff.get(tripApprove.submitter);
+        if (!staff) return false
         let company = staff.company;
         await DB.transaction(async function(t){
-            let log = Models.tripPlanLog.create({tripPlanId: params.id, userId: staff.id, remark: `撤销行程审批单`});
+            if (!staff) throw new Error('staff is null')
+            let log = Models.tripPlanLog.create({tripPlanId: params.id, userId: staff && staff.id, remark: `撤销行程审批单`});
             await log.save();
-
+            if (!tripApprove) throw new Error('tripApprove is null')
             tripApprove.status = EApproveStatus.CANCEL;
             tripApprove.tripApproveStatus = QMEApproveStatus.CANCEL;
             await tripApprove.save();
@@ -880,7 +900,7 @@ export default class TripApproveModule {
         }).catch(async function(err){
             if(err) {
                 await company.reload();
-                await tripApprove.reload();
+                tripApprove && await tripApprove.reload();
                 throw L.ERR.INTERNAL_ERROR();
             }
         });
@@ -889,7 +909,7 @@ export default class TripApproveModule {
         return true;
     }
 
-    static async calculateAutoApproveTime( params: {
+    static async calculateAutoApproveTime2( params: {
         type: AutoApproveType,
         config: AutoApproveConfig,
         submitAt:Date,
@@ -945,9 +965,31 @@ export default class TripApproveModule {
         return autoApproveDateTime;
     }
 
+    static async calculateAutoApproveTime( params: {
+        type: AutoApproveType,
+        config: AutoApproveConfig,
+        submitAt:Date,
+        tripStartAt:Date
+    }):Promise<Date> {
+        let {type, config, submitAt, tripStartAt} = params;
+        if(typeof(config) == 'string') {
+            config = JSON.parse(config)
+        }
+        // config = <AutoApproveConfig>config;
+
+        switch(type) {
+            case AutoApproveType.AfterSubmit:  // 审批提交时间
+                return moment(submitAt).add(config.hour, 'hours').toDate()
+            case AutoApproveType.BeforeDeparture:
+                return moment(tripStartAt).subtract(config.day, 'days').toDate()
+            default: //出行时间
+                return null
+        }
+    }
+
     @clientExport
     @requireParams(['id'])
-    static async getTripApprove(params: {id: string}): Promise<ITripApprove> {
+    static async getTripApprove(params: {id: string}): Promise<ITripApprove|null> {
         if(!params.id) return null;
 
         let approve = await Models.approve.get(params.id);
@@ -958,7 +1000,7 @@ export default class TripApproveModule {
         // let budgetInfo: {budgets: any[], query: ICreateBudgetAndApproveParams} = approve.data;
         // let {budgets, query} = budgetInfo;
         //=====end 当budgetInfo可以获取到时，以上代码可以删除
-        let companyId = params['companyId'] || approve.companyId;
+        let companyId = params['companyId'] || (approve && approve.companyId);
         if(!companyId || typeof companyId == 'undefined') {
             let currentStaff = await Staff.getCurrent();
             companyId = currentStaff["companyId"];

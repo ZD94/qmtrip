@@ -30,7 +30,7 @@ export class WebRobot{
             if(cookie['key'] === key)
                 return cookie['value'];
         }
-        return null;
+        return '';
     }
 
     async downloadFile(uri: string): Promise<string>{

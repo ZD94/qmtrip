@@ -19,8 +19,10 @@ module.exports = function(app: Application){
 
 async function checkInvoicePermission(userId: string, tripDetailId: string){
     var tripDetail = await Models.tripDetail.get(tripDetailId);
+    if (!tripDetail) return false
     var tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
     var account = await Models.account.get(userId);
+    if (!tripPlan || !account) return false
     if(account.type == EAccountType.STAFF){
 
         var staffs = await Models.staff.all({ where: {accountId: userId}});
@@ -50,7 +52,7 @@ async function checkInvoicePermission(userId: string, tripDetailId: string){
     }
     return false;
 }
-async function agentGetTripplanDetailInvoice(req: Request, res: Response, next: NextFunction){
+async function agentGetTripplanDetailInvoice(req: Request, res: Response, next?: NextFunction){
     try{
         // req.clearTimeout();
         var authReq = parseAuthString(req.query.authstr);
@@ -65,6 +67,7 @@ async function agentGetTripplanDetailInvoice(req: Request, res: Response, next: 
         var fileId = req.params.fileId;
 
         var tripDetail = await Models.tripDetail.get(tripDetailId);
+        if (!tripDetail) return res.sendStatus(404)
         var invoices = await Models.tripDetailInvoice.find({where: {tripDetailId: tripDetail.id}});
         let pictures = invoices.map( (invoice) => {
             return invoice.pictureFileId
@@ -91,7 +94,7 @@ async function agentGetTripplanDetailInvoice(req: Request, res: Response, next: 
             fs.exists(file, resolve);
         });
         if (!isExist) {
-            return next(404);
+            return next && next(404);
         }
         return res.sendFile(file);
     } catch(e) {

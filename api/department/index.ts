@@ -121,7 +121,7 @@ export default class DepartmentModule {
         { if: condition.isSelfDepartment("0.id") },
         { if: condition.isDepartmentAgency("0.id") }
     ])
-    static async getDepartment(params: { id?: string, companyId?: string }): Promise<Department> {
+    static async getDepartment(params: { id: string, companyId?: string }): Promise<Department> {
         let id = params.id;
         let dept = await Models.department.get(id);
         return dept;
@@ -245,7 +245,7 @@ export default class DepartmentModule {
         { if: condition.isDepartmentAgency("0.parentId") }
     ])
     static async getAllChildDepartmentsId(params: { parentId: string }): Promise<string[]> {
-        var ids = [];
+        var ids: string[] = [];
         var sql = "with RECURSIVE cte as " +
             "( select a.id,a.name,a.parent_id from department.departments a where id='" + params.parentId + "' " +
             "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id " +

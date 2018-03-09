@@ -21,11 +21,12 @@ module.exports = function(app: Application) {
  * @param next
  * @returns {any}
  */
-async function costCredit(req: Request, res: Response, next: NextFunction) {
+async function costCredit(req: Request, res: Response, next?: NextFunction) {
     console.info("扣积分接口================");
     var params = req.query;
     var { uid, credits,appKey, description, orderNum, sign } = params;
     var account = await Models.account.get(uid);
+    if (!account) throw new Error('account is null')
     // staff.coinAccount = staff.$parents["account"]["coinAccount"];
     //资金账户不存在先创建
     if(!account.coinAccount){
@@ -86,7 +87,7 @@ async function costCredit(req: Request, res: Response, next: NextFunction) {
  * @param next
  * @returns {any}
  */
-async function resultNotice(req: Request, res: Response, next: NextFunction) {
+async function resultNotice(req: Request, res: Response, next?: NextFunction) {
     console.info("接收通知接口================");
     var params = req.query;
     var { appKey, success, errorMessage, orderNum, sign } = params;
@@ -116,7 +117,7 @@ async function resultNotice(req: Request, res: Response, next: NextFunction) {
     if(coinAccountChanges && coinAccountChanges.length > 0){
         coinAccountChange = coinAccountChanges[0];
         var coinAccount = await Models.coinAccount.get(coinAccountChange.coinAccountId);
-
+        if (!coinAccount) throw new Error('coinAccount is null')
         if(!coinAccountChange.coins){
             coinAccountChange.coins = 0;
         }
@@ -167,10 +168,11 @@ async function resultNotice(req: Request, res: Response, next: NextFunction) {
  * @param next
  * @returns {any}
  */
-async function addCredit(req: Request, res: Response, next: NextFunction) {
+async function addCredit(req: Request, res: Response, next?: NextFunction) {
     var params = req.query;
     var { uid, credits,appKey, orderNum, sign } = params;
     var account = await Models.account.get(uid);
+    if (!account) throw new Error('account is null')
     // account.coinAccount = account.["coinAccount"];
     //资金账户不存在先创建
     if(!account.coinAccount){

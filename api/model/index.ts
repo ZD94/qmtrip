@@ -13,7 +13,7 @@ export default class ModelForClient{
         return model.create(obj);
     }
     @clientExport
-    static async get<T extends ModelObjInterface>(modelType: string, id: string, options?: any): Promise<T>{
+    static async get<T extends ModelObjInterface>(modelType: string, id: string, options?: any): Promise<T|null>{
         let model = Models[modelType] as ModelInterface<T>;
         if(!model)
             throw L.ERR.INVALID_ARGUMENT('modelType');

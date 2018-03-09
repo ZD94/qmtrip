@@ -42,13 +42,13 @@ export  abstract class OaStaff{
     abstract set company(val: Company);
 
     abstract async getDepartments(): Promise<OaDepartment[]>;
-    abstract async getSelfById(): Promise<OaStaff>;
-    abstract async getCompany(): Promise<Company>;
+    abstract async getSelfById(): Promise<OaStaff|null>;
+    abstract async getCompany(): Promise<Company|null>;
     abstract async saveStaffProperty(params: {staffId: string}): Promise<boolean>;
 
-    async getStaff(): Promise<Staff>{
+    async getStaff(): Promise<Staff|null>{
         let self = this;
-        let staff: Staff = null;
+        let staff: Staff|null = null
         let staffPro = await Models.staffProperty.find({where : {value: self.id}});
         if(staffPro && staffPro.length > 0){
             staff = await Models.staff.get(staffPro[0].staffId);
@@ -66,7 +66,7 @@ export  abstract class OaStaff{
             await staff.save();
 
             let deleteAccount = await Models.account.get(staff.accountId);
-            await deleteAccount.destroy();
+            deleteAccount && await deleteAccount.destroy();
 
             await staff.deleteStaffDepartments();
         }
@@ -74,17 +74,17 @@ export  abstract class OaStaff{
         return true;
     }
 
-    async sync(params?:{company?: Company, from?: string}): Promise<Staff>{
+    async sync(params?:{company?: Company, from?: string}): Promise<Staff|null>{
         console.info(this.name, "staff sync begin==================================");
         if(!params) params = {};
         let self = this;
         let from  = params.from;
-        let company = self.company;
+        let company: Company | null = self.company;
         if(params.company){
             company = params.company;
         }
         let execute = true;
-        let returnStaff: Staff;
+        let returnStaff: Staff | null = null;
 
         // let staffKey = "tmp_staff_code:" + self.id + "_" + company.id;
         // let isExist = await cache.read(staffKey);
@@ -97,12 +97,12 @@ export  abstract class OaStaff{
 
         if(execute || (from && from == "createUser")){
             if(params){
-                company = params.company;
+                company = params.company || null;
             }
             if(!company){
                 company = await self.getCompany();
             }
-            let type = await company.getOaType();
+            let type = company && await company.getOaType() || undefined;
             if(!company){
                 throw L.ERR.INVALID_ACCESS_ERR();
             }
@@ -126,8 +126,8 @@ export  abstract class OaStaff{
                 await Promise.all(oaDepartments.map(async (item) => {
                     let department = await item.getDepartment();
                     if(!department){
-                        let dept = await item.sync({company: company, from: "addStaff"});//此处需要验证
-                        newDepartments.push(dept);
+                        let dept = await item.sync({company: company || undefined, from: "addStaff"});//此处需要验证
+                        dept && newDepartments.push(dept);
                     }else{
                         newDepartments.push(department);
                     }
@@ -138,17 +138,17 @@ export  abstract class OaStaff{
                 console.log("没有部门放在跟部门下");
                 newDepartments.push(defaultDepartment);
             }
-            let alreadyStaff: Staff = await self.getStaff();
+            let alreadyStaff: Staff | null = await self.getStaff();
             let pwd = self.userPassword || DEFAULT_PWD;
             let roleId = EStaffRole.COMMON;
             if(self.isAdmin) roleId = EStaffRole.ADMIN;
             if(!alreadyStaff){
 
-                if((self.mobile && type == CPropertyType.LDAP && companyCreateUser.mobile == self.mobile) ||
-                    (type == CPropertyType.WANGXIN_ID && companyCreateUser.mobile == self.mobile)){
+                if(companyCreateUser && ((self.mobile && type == CPropertyType.LDAP && companyCreateUser.mobile == self.mobile) ||
+                    (type == CPropertyType.WANGXIN_ID && companyCreateUser.mobile == self.mobile))){
 
                     alreadyStaff = companyCreateUser;
-                    await self.saveStaffProperty({staffId: alreadyStaff.id});
+                    await self.saveStaffProperty({staffId: alreadyStaff ? alreadyStaff.id : ""});
                 } else{
                     // 不存在，添加
                     let staff = Staff.create({name: self.name, sex: self.sex, mobile: self.mobile, email: self.email, roleId: roleId, pwd: utils.md5(pwd), avatar: self.avatar});
