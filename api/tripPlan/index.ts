@@ -475,6 +475,7 @@ class TripPlanModule {
                     status: [ETripDetailStatus.WAIT_RESERVE, ETripDetailStatus.WAIT_TICKET]}});
                 if(!tripDetails || !tripDetails.length)
                     tripPlan.status = EPlanStatus.RESERVED;
+                    console.log('SUCCESS--------------------------------------->     ');
                     log.remark = `已预订`;
                     await log.save();
                 tripDetails = [];
@@ -2785,6 +2786,7 @@ class TripPlanModule {
                         }
                         if(hasReserved) {
                             tripPlans[i].status = EPlanStatus.RESERVED;
+                            console.log('hasReservedLog-------------------------->   ');
                             log.remark = `已预订`;
                             await log.save();
                         }
