@@ -36,6 +36,7 @@ import { DB } from "@jingli/database";
 import { EApproveType, STEP } from '_types/approve';
 import { Transaction } from 'sequelize';
 import {ECostCenterType} from "_types/costCenter/costCenter";
+import {IStaffSnapshot} from "../../_types/staff/staff";
 
 export interface ICity {
     name: string;
@@ -678,6 +679,7 @@ export default class ApiTravelBudget {
             staffId = currentStaff.id;
         }
         let staff = await Models.staff.get(staffId);
+        let submitterSnapshot = await staff.getStaffSnapshot();
         if (!staff) throw new Error('staff is null')
         let companyId = staff.companyId;
         let company = await Models.company.get(companyId);
@@ -705,6 +707,7 @@ export default class ApiTravelBudget {
             params.staffList.push(staffId);
         }
         let count = params.staffList.length;
+        let staffListSnapshot: IStaffSnapshot[] = [];
         let staffs: {gender: number, policy: string}[] = [];
         for (let i = 0; i < count; i++) {
             let staff = params.staffList[i];
@@ -714,6 +717,8 @@ export default class ApiTravelBudget {
                 policy: 'domestic',
             };
             staffs.push(__staff);
+            let _staffSnapshot = await _staff.getStaffSnapshot();
+            staffListSnapshot.push(_staffSnapshot);
         }
         
 
@@ -733,6 +738,11 @@ export default class ApiTravelBudget {
             feeCollectedName = project && project.name || '';
         }
         let approveUser: Staff | undefined = params['approveUser'];
+        let approveUserSnapshot: any = {}
+        if(approveUser && approveUser.id){
+            let s = await Models.staff.get(approveUser.id);
+            approveUserSnapshot = await s.getStaffSnapshot();
+        }
 
         if (approveId) {
             let checkApprove = await Models.approve.get(approveId);
@@ -750,10 +760,13 @@ export default class ApiTravelBudget {
             //创建approve，获得approveId用于URL和更新
             approve = Approve.Create({
                 approveUser: params.approveUser ? params.approveUser.id : '',
+                approveUserSnapshot: approveUserSnapshot,
                 type: EApproveType.TRAVEL_BUDGET,
                 companyId: companyId,
                 staffList: params.staffList,
+                staffListSnapshot: staffListSnapshot,
                 submitter: staffId,
+                submitterSnapshot: submitterSnapshot,
                 tripApproveStatus: QMEApproveStatus.WAIT_APPROVE,
                 title: feeCollectedName
             });
@@ -1026,6 +1039,7 @@ export default class ApiTravelBudget {
         } catch (err) {
             console.log(err);
         }
+        console.info("result============",result);
         if(!result || !result.data) {
             throw new Error("拉取预算失败");
         }

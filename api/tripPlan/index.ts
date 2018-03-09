@@ -1934,6 +1934,9 @@ class TripPlanModule {
         tripPlan.isSpecialApprove = approve.isSpecialApprove;
         tripPlan.specialApproveRemark = approve.specialApproveRemark;
         tripPlan.staffList = query.staffList || [];
+        tripPlan.submitterSnapshot = approve.submitterSnapshot;
+        tripPlan.auditUserSnapshot = approve.approveUserSnapshot;
+        tripPlan.staffListSnapshot = approve.staffListSnapshot;
 
         tripPlan.readNumber = 0;
 
