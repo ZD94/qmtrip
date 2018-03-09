@@ -58,7 +58,7 @@ export class BudgetController extends AbstractController {
 
         let {query} = oldBudgetInfo;
         query['staffId'] = approve["submitter"];
-        let budgetId = await ApiTravelBudget.getTravelPolicyBudget(query);
+        let {budgetId} = await ApiTravelBudget.getTravelPolicyBudgetNew(query, true, id);
         let budgetInfo = await ApiTravelBudget.getBudgetInfo({id: budgetId, accountId: approve['submitter']});
         let result = transform(budgetInfo.budgets, staff ? staff.travelPolicyId : '');
         res.json(this.reply(0, result));
