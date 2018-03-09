@@ -10,7 +10,7 @@ export default async function update(DB: Sequelize, t: Transaction) {
 let page = -1, num = 0;
 async function dealData(DB: Sequelize, t: Transaction) {
     page++;
-    let allCorpSql = `select * from approve.approves where deleted_at is null and submitter_snapshot is null order by created_at desc limit 20 offset ${page * 20};`;
+    let allCorpSql = `select * from approve.approves where deleted_at is null order by created_at desc limit 20 offset ${page * 20};`;
     let allCorps = await DB.query(allCorpSql, { type: SEQUELIZE.QueryTypes.SELECT });
     for (let item of allCorps) {
         console.info("item======================", item)
@@ -70,7 +70,7 @@ async function dealStaffData(DB: Sequelize, t: Transaction, staffId: string): Pr
             for (let deptId of departmentIds) {
                 let sql3 = `select name from department.departments where id = '${deptId.department_id}'`;
                 let dept = await DB.query(sql3, { type: SEQUELIZE.QueryTypes.SELECT });
-                departments.push({id: deptId.department_id, name: dept[0].name});
+                departments.push({id: deptId.department_id, name: dept[0] ? dept[0].name : ''});
             }
             _staffInfo.department = departments;
 
