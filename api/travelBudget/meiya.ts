@@ -50,7 +50,7 @@ export async function getJLAgents() {
         url: reqUrl,
         method: 'get',
         headers: {
-            agentType: AgentType.notBind
+            agentType: AgentType.JL
         }
     }).catch((e: Error) => {
         throw e;
@@ -88,7 +88,7 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
             headers: {
                 auth: meiyaAuth(info),
                 supplier: sname,
-                agentType: (agentType && agentType == '2') ? AgentType.notBind :AgentType.isBind
+                agentType: (agentType && agentType == '2') ? AgentType.JL :AgentType.CORP
             }
         }).catch((e: Error) => {
             console.log(e)
@@ -125,7 +125,6 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
     };
     let urlTrain = config.orderSysConfig.orderLink + "/tmc/searchTrains/getList" + `/${meiyaParam.depCity}/${meiyaParam.arrCity}/${meiyaParam.depDate}`;
     console.log("urlTrain===================>", urlTrain);
-    let meiyaResult;
     let isBindService: boolean = false;
     for (let item of authData) {
         let info = item.identify;
@@ -134,18 +133,20 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
         let agentType = item.agentType;
         // console.log('agenttype---->   ', agentType, 'typeof------  ', typeof agentType);
         isBindService = (type == `${TmcServiceType.TRAIN}` || type == `${TmcServiceType.TRAIN_ABROAD}`) ? true : false;
-        meiyaResult = isBindService ? await request({
+        let meiyaResult = isBindService 
+        ? await request({
             url: urlTrain,
             method: "get",
             // qs: meiyaParam,
             headers: {
                 auth: meiyaAuth(info),
                 supplier: sname,
-                agentType: (agentType && agentType == '2') ? AgentType.notBind : AgentType.isBind
+                agentType: (agentType && agentType == '2') ? AgentType.JL : AgentType.CORP
             }
         }).catch((e: Error) => {
             console.log(e)
-        }) : null;
+        }) 
+        : null;
             try {
                 meiyaResult = JSON.parse(meiyaResult);
                 if(meiyaResult && meiyaResult.code == 0){
@@ -193,7 +194,7 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
             headers: {
                 auth: meiyaAuth(info),
                 supplier: sname,
-                agentType: (agentType && agentType == '2') ? AgentType.notBind : AgentType.isBind
+                agentType: (agentType && agentType == '2') ? AgentType.JL : AgentType.CORP
             }
         }).catch((e: Error) => {
             console.log(e)
@@ -936,8 +937,8 @@ export function matchMeiyaHotel(origin: IHotel[], meiyaData: IMeiyaHotel[]) {
  * 企业是否绑定供应商类型
  */
 export enum AgentType {
-    isBind = 1,
-    notBind = 2
+    CORP = 1,
+    JL = 2
 }
 
 export interface IMeiyaFlightPriceInfo {
