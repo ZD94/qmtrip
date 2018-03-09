@@ -235,6 +235,16 @@ class StaffModule{
             if(departmentManger && departmentManger.count>0){
                 throw {code: -4, msg: "该员工为部门主管不能被删除"};
             }
+
+            let project = await Models.project.find({where: {managerId: params.id}});
+            if(project && project.total>0){
+                throw {code: -5, msg: "该员工为项目主管不能被删除"};
+            }
+
+            let waitApproveNumber = await deleteStaff.getWaitApproveTripNumber();
+            if(waitApproveNumber && waitApproveNumber>0){
+                throw {code: -6, msg: "该员工有未审批出差申请不能被删除"};
+            }
         }
         let otherStaff = await Models.staff.find({where: {accountId: deleteStaff.accountId, id: {$ne: deleteStaff.id}}});
         let option: any = {};

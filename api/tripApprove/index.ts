@@ -146,6 +146,9 @@ export default class TripApproveModule {
         tripApprove.staffList = approve.staffList;
         tripApprove.lockBudget = false;
         tripApprove.startAt = approve.startAt;
+        tripApprove.submitterSnapshot = approve.submitterSnapshot;
+        tripApprove.approveUserSnapshot = approve.approveUserSnapshot;
+        tripApprove.staffListSnapshot = approve.staffListSnapshot;
 
         //自动审批关闭
         if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
