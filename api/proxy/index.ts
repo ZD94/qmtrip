@@ -18,11 +18,12 @@ import { genSign } from "@jingli/sign";
 import { Department } from '_types/department';
 import Logger from '@jingli/logger';
 import { ITMCSupplier } from 'api/travelBudget';
+import { AgentType } from 'api/travelBudget/meiya';
 const logger = new Logger("proxy");
 const corsOptions = { 
     origin: true, 
     methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], 
-    allowedHeaders: 'content-type, Content-Type, auth, supplier, authstr, staffid, companyid, accountid, isneedauth'
+    allowedHeaders: 'content-type, Content-Type, auth, supplier, authstr, staffid, companyid, accountid, isneedauth, agenttype'
 } 
 function resetTimeout(req: Request, res: Response, next?: NextFunction){
     req['clearTimeout']();
@@ -96,6 +97,7 @@ class Proxy {
 
         app.all(/^\/supplier.*$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: any, res: Response, next?: Function) => {
 
+
             //公有云验证
             let {staffid}  = req.headers;
             let staff = await Models.staff.get(staffid);
@@ -113,6 +115,7 @@ class Proxy {
             let JLOpenApi: string = config.cloudAPI;
             let url: string = `${JLOpenApi}${pathstr}`;
 
+            console.info("qmtrip===============================", url)
             result = await new Promise((resolve, reject) => {
                 return request({
                     uri: url,
@@ -153,6 +156,7 @@ class Proxy {
             let staff: Staff | null = await Staff.getCurrent();
             let staffId = req.headers.staffid;
             let isNeedAuth = req.headers['isneedauth'] || '';
+            let agentType = req.headers['agenttype'] || AgentType.CORP;
             if(staffId && !staff) {
                 staff = await Models.staff.get(staffId);
             }
@@ -209,6 +213,7 @@ class Proxy {
                 identify = encodeURIComponent(identify);
             }
             identify = encodeURIComponent(identify);
+            console.info("isNeedAuth==============", isNeedAuth, isNeedAuth == '1');
             let auth: string = (isNeedAuth == '1') ? authStr: identify;
             // let auth : string = identify;
 
@@ -220,6 +225,7 @@ class Proxy {
                accountid: staff.accountId,
                staffid: staff.id,
                companyid: staff.companyId,
+               agenttype: agentType
             }
 
             let body: {[index: string]: any} = req.body;
@@ -265,6 +271,8 @@ class Proxy {
             }
             if(!result)
                 return res.json(null);
+
+            console.info("result=============", result);
             if(typeof result == 'string') {
                 result = JSON.parse(result);
             }
@@ -302,6 +310,45 @@ class Proxy {
                     headers: {
                         sign: sign,
                         appid: config.mall.appId,
+                        staffid: staff.id, 
+                        companyid: staff.companyId,
+                        accountid: staff.accountId
+                    }
+                }, (err: Error, resp: any, result: object) => {
+                    if (err) {
+                        console.log("-=========>err: ", err);
+                        reject(err);
+                    }
+                    resolve(result);
+                });
+            });
+            return res.json(result);
+        });
+
+        app.all(/^\/pay.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
+            let {staffid} = req.headers;
+            let params =  req.body;
+            if(req.method == 'GET') {
+                params = req.query;
+            }
+            let staff = await Models.staff.get(staffid);
+            let appSecret = config.pay.appSecret;
+            let pathstring = req.path;
+            let timestamp = Math.floor(Date.now()/1000);
+            pathstring = pathstring.replace("/pay", '');
+            let sign = genSign(params, timestamp, appSecret)
+            let url = `${config.pay.orderLink}${pathstring}`;
+            console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.pay.appId, '===request params: ', params) 
+            let result = await new Promise((resolve, reject) => {
+                request({
+                    uri: url,
+                    body: req.body,
+                    json: true,
+                    method: req.method,
+                    qs: req.query,
+                    headers: {
+                        sign: sign,
+                        appid: config.pay.appId,
                         staffid: staff.id, 
                         companyid: staff.companyId,
                         accountid: staff.accountId

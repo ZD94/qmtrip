@@ -424,7 +424,7 @@ class ApproveModule {
         budget: number,
         version?: number
     }) {
-        let {approveId} = params;
+        let {approveId, approveUser, submitter, version, channel} = params;
         let approve = await Models.approve.get(approveId);
         // let approve = Models.approve.create({
         //     submitter: submitter,
@@ -440,14 +440,16 @@ class ApproveModule {
         //     budget: budget
         // });
 
-        // await emitter.emitSerial(EVENT.NEW_TRIP_APPROVE, {
-        //     approveNo: approve.id,
-        //     approveUser: approveUser ? approveUser.id: null,
-        //     submitter: submitter,
-        //     status: EApproveStatus.WAIT_APPROVE,
-        //     oa: oaEnum2Str(channel) || 'qm',
-        //     version: version
-        // });
+        if (channel == EApproveChannel.AUTO) {
+            await emitter.emitSerial(EVENT.NEW_TRIP_APPROVE, {
+                approveNo: approve.id,
+                approveUser: approveUser ? approveUser.id: null,
+                submitter: submitter,
+                status: EApproveStatus.WAIT_APPROVE,
+                oa: oaEnum2Str(channel) || 'auto',
+                version: version
+            });
+        }
         return approve;
     }
 
@@ -491,6 +493,7 @@ emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result: {approveNo: string, outer
         }
 
         approve.status = status;
+        approve.tripApproveStatus = QMEApproveStatus.PASS
         approve.approveUser = approveUser;
         approve.approveDateTime = new Date();
         approve.outerId = outerId;

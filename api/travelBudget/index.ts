@@ -4,7 +4,7 @@
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { Models, EGender } from '_types'
 import { ETripType, ICreateBudgetAndApproveParamsNew, QMEApproveStatus, EApproveResult, EBackOrGo } from "_types/tripPlan";
-import {Approve, EApproveStatus} from '_types/approve';
+import {Approve, EApproveStatus, EApproveChannel} from '_types/approve';
 import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
 import L from '@jingli/language';
@@ -19,6 +19,7 @@ export var NoCityPriceLimit = 0;
 const DefaultCurrencyUnit = 'CNY';
 import {restfulAPIUtil} from "api/restful";
 import {
+    getJLAgents,
     getMeiyaFlightData,
     getMeiyaTrainData,
     getMeiyaHotelData,
@@ -168,7 +169,7 @@ export default class ApiTravelBudget {
         }
     }
 
-
+    
     @clientExport
     static async getHotelsData(params: ISearchHotelParams): Promise<any> {
         let commonData;
@@ -186,12 +187,15 @@ export default class ApiTravelBudget {
         //     console.log(err);
         // }
         let companyInfo = await ApiTravelBudget.getCompanyInfo(null, null, null, TMCStatus.OK_USE);
-        let data = companyInfo;
+        let data = companyInfo ? companyInfo : await getJLAgents();
+        // console.log('hoteldata ----->    ', data);
         let authData: IMeiyaAuthData[] = [];
-        data.map((item: {identify: any, sname: string}) => {
-            let identify = item.identify;
+        data.map((item: {identify: any, sname: string, type: string, agentType: string}) => {
+            let identify = item.identify ? item.identify : null;
             let sname = item.sname;
-            authData.push({identify, sname});
+            let type = item.type;
+            let agentType = item.agentType;
+            authData.push({identify, sname, type, agentType});
             return authData
         })
 
@@ -246,12 +250,15 @@ export default class ApiTravelBudget {
 
 
         let companyInfo = await ApiTravelBudget.getCompanyInfo(null, null, null, TMCStatus.OK_USE); 
-        let data = companyInfo
+        let data = companyInfo ? companyInfo : await getJLAgents();
+        // console.log('trafficdata ----->   ', data);
         let authData: IMeiyaAuthData[] = [];
-        data.map((item: {identify: any, sname: string}) => {
-            let identify = item.identify;
+        data.map((item: {identify: any, sname: string, type: string, agentType: string}) => {
+            let identify = item.identify ? item.identify : null;
             let sname = item.sname;
-            authData.push({identify, sname});
+            let type = item.type;
+            let agentType = item.agentType;
+            authData.push({identify, sname, type, agentType});
             return authData
         });
         // if (result.code == 0) {
@@ -371,7 +378,7 @@ export default class ApiTravelBudget {
                     totalBudget += item.price;
                 })
             }
-
+            const company = await Models.company.get(companyId)
             if (!isFinalInApprove || params.isFinalFirstResponse) {  //看表中的budget是否是最终结果，最终结果还没返回过，则更新approve表，表示还不可以进行审批，或者是第一次请求时候返回为最终结果
                 approve.budget = totalBudget;
                 approve.step = params.budgetResult.step;
@@ -380,7 +387,7 @@ export default class ApiTravelBudget {
                 }
                 approve.data = {budgets: budgets, query: approve.data.query};
                 approve = await approve.save();
-                if (approve.step === STEP.FINAL) {
+                if (approve.step === STEP.FINAL && company.oa != EApproveChannel.AUTO) {
                     let params = {approveNo: approve.id};
                     let tripApprove = await API.tripApprove.retrieveDetailFromApprove(params);
                     
@@ -402,12 +409,15 @@ export default class ApiTravelBudget {
                 if (params.budgetResult.step == STEP.FINAL) {
                     approve.budget = totalBudget;
                     await approve.save();
-                    await API.tripApprove.updateTripApprove({
-                        id: approve.id,
-                        budget: totalBudget,
-                        companyId: companyId,
-                        budgetInfo: budgets
-                    });
+                    if (company.oa != EApproveChannel.AUTO) {
+                        await API.tripApprove.updateTripApprove({
+                            id: approve.id,
+                            budget: totalBudget,
+                            companyId: companyId,
+                            budgetInfo: budgets
+                        });
+                    }
+                    console.log(`'tripApproveBudgetUpdate:'${approve.id}`);
                     API.broadcast('tripApproveBudgetUpdate:' + approve.id, 'FIN', 'UPDATED');
                 }
             }
