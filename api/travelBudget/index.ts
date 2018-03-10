@@ -599,9 +599,9 @@ export default class ApiTravelBudget {
         if (eachBudgetSegIsOk && !isIntoApprove) {
             approve && await approve.save();
         } 
-        // if (!eachBudgetSegIsOk) {
-        //     throw new Error('预算有负值,提交失败');
-        // }
+        if (!eachBudgetSegIsOk) {
+            throw L.ERR.ERROR_CODE_C(500, '获取预算失败，请稍后重试');
+        }
         
         let obj: any = {};
         obj.budgets = budgets;
