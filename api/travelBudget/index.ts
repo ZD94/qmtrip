@@ -19,6 +19,7 @@ export var NoCityPriceLimit = 0;
 const DefaultCurrencyUnit = 'CNY';
 import {restfulAPIUtil} from "api/restful";
 import {
+    getJLAgents,
     getMeiyaFlightData,
     getMeiyaTrainData,
     getMeiyaHotelData,
@@ -168,7 +169,7 @@ export default class ApiTravelBudget {
         }
     }
 
-
+    
     @clientExport
     static async getHotelsData(params: ISearchHotelParams): Promise<any> {
         let commonData;
@@ -186,12 +187,15 @@ export default class ApiTravelBudget {
         //     console.log(err);
         // }
         let companyInfo = await ApiTravelBudget.getCompanyInfo(null, null, null, TMCStatus.OK_USE);
-        let data = companyInfo;
+        let data = companyInfo ? companyInfo : await getJLAgents();
+        // console.log('hoteldata ----->    ', data);
         let authData: IMeiyaAuthData[] = [];
-        data.map((item: {identify: any, sname: string}) => {
-            let identify = item.identify;
+        data.map((item: {identify: any, sname: string, type: string, agentType: string}) => {
+            let identify = item.identify ? item.identify : null;
             let sname = item.sname;
-            authData.push({identify, sname});
+            let type = item.type;
+            let agentType = item.agentType;
+            authData.push({identify, sname, type, agentType});
             return authData
         })
 
@@ -246,12 +250,15 @@ export default class ApiTravelBudget {
 
 
         let companyInfo = await ApiTravelBudget.getCompanyInfo(null, null, null, TMCStatus.OK_USE); 
-        let data = companyInfo
+        let data = companyInfo ? companyInfo : await getJLAgents();
+        // console.log('trafficdata ----->   ', data);
         let authData: IMeiyaAuthData[] = [];
-        data.map((item: {identify: any, sname: string}) => {
-            let identify = item.identify;
+        data.map((item: {identify: any, sname: string, type: string, agentType: string}) => {
+            let identify = item.identify ? item.identify : null;
             let sname = item.sname;
-            authData.push({identify, sname});
+            let type = item.type;
+            let agentType = item.agentType;
+            authData.push({identify, sname, type, agentType});
             return authData
         });
         // if (result.code == 0) {
