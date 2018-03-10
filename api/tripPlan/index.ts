@@ -1935,7 +1935,7 @@ class TripPlanModule {
         tripPlan.auditUser = tryObjId(approveUser);
         tripPlan.project = project as Project;
         tripPlan.title = approve.title;//project名称
-        tripPlan.account = account;
+        tripPlan.accountId = account.id;
         tripPlan.status = EPlanStatus.WAIT_RESERVE;    
         tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo'); //获取出差计划单号
         tripPlan.query = query;
