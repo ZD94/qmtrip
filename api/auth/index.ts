@@ -135,6 +135,7 @@ export default class ApiAuth {
         account.isValidateMobile = true;
         account.isNeedChangePwd = false;
         account.pwd = pwd;
+        account.status = ACCOUNT_STATUS.ACTIVE;
         await account.save();
         return true;
     };
