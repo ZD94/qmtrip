@@ -115,7 +115,6 @@ class Proxy {
             let JLOpenApi: string = config.cloudAPI;
             let url: string = `${JLOpenApi}${pathstr}`;
 
-            console.info("qmtrip===============================", url)
             result = await new Promise((resolve, reject) => {
                 return request({
                     uri: url,
@@ -132,7 +131,7 @@ class Proxy {
                         logger.error("url:", url, err.stack);
                         return reject(err);
                     }
-                    if (typeof result == 'string') { 
+                    if (typeof result == 'string') {
                         try {
                             result = JSON.parse(result);
                         } catch (err) { 
@@ -213,7 +212,6 @@ class Proxy {
                 identify = encodeURIComponent(identify);
             }
             identify = encodeURIComponent(identify);
-            console.info("isNeedAuth==============", isNeedAuth, isNeedAuth == '1');
             let auth: string = (isNeedAuth == '1') ? authStr: identify;
             // let auth : string = identify;
 
@@ -271,8 +269,6 @@ class Proxy {
             }
             if(!result)
                 return res.json(null);
-
-            console.info("result=============", result);
             if(typeof result == 'string') {
                 result = JSON.parse(result);
             }
