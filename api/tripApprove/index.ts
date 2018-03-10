@@ -496,7 +496,7 @@ export default class TripApproveModule {
                 log.approveStatus = EApproveResult.PASS;
                 log.remark = `审批通过`;
                 await log.save();
-                logAfterPass.remark = `待预定`;
+                logAfterPass.remark = `待预订`;
                 await logAfterPass.save();
                 tripApprove.status = QMEApproveStatus.PASS;
                 tripApprove.approveRemark = '审批通过';
@@ -688,7 +688,7 @@ export default class TripApproveModule {
                 if(isAutoApprove) log.approveStatus = EApproveResult.AUTO_APPROVE;
                 log.remark = extraStr+`审批通过`;
                 await log.save();
-                logAfterPass.remark = extraStr + `待预定`;
+                logAfterPass.remark = extraStr + `待预订`;
                 await logAfterPass.save();
                 approve.status = EApproveStatus.SUCCESS;
                 approve.tripApproveStatus = QMEApproveStatus.PASS;

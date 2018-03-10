@@ -473,10 +473,11 @@ class TripPlanModule {
                 tripDetail.status = ETripDetailStatus.COMPLETE;
                 tripDetails = await Models.tripDetail.all({where: {id: {$ne: tripDetail.id}, tripPlanId: tripDetail.tripPlanId, 
                     status: [ETripDetailStatus.WAIT_RESERVE, ETripDetailStatus.WAIT_TICKET]}});
-                if(!tripDetails || !tripDetails.length)
+                if(!tripDetails || !tripDetails.length) {
                     tripPlan.status = EPlanStatus.RESERVED;
                     log.remark = `已预订`;
                     await log.save();
+                }
                 tripDetails = [];
                 break;
             case EOrderStatus.FAILED: 
@@ -2789,7 +2790,7 @@ class TripPlanModule {
                         }
                         if(hasReserved) {
                             tripPlans[i].status = EPlanStatus.RESERVED;
-                            log.remark = `已预定`;
+                            log.remark = `已预订`;
                             await log.save();
                         }
                         if(!hasReserved) {
