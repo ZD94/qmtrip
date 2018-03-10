@@ -211,6 +211,7 @@ class Proxy {
                 identify = encodeURIComponent(identify);
             }
             identify = encodeURIComponent(identify);
+            console.info("isNeedAuth==============", isNeedAuth, isNeedAuth == '1');
             let auth: string = (isNeedAuth == '1') ? authStr: identify;
             // let auth : string = identify;
 
