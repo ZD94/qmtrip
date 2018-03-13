@@ -1257,9 +1257,24 @@ export default class ApiAuth {
      * @param params
      * @returns {*}
      */
-    static async checkAccExist(params: {[key: string]: any}) {
+    @clientExport
+    static async checkAccExist(params: {[key: string]: any}, companyId: string): Promise<{isExist: boolean, accountId: string}> {
         var accounts = await Models.account.find(params);
-        return accounts.total > 0;
+        let isExist = false;
+        let accountId = '';
+        if(accounts.total > 0){
+            accountId = accounts[0].id;
+            let staff = await Models.staff.find({where: {accountId: accountId}});
+            if(staff && staff.length){
+                staff.forEach((item) => {
+                    if(item.company.id == companyId){
+                        isExist = true;
+                    }
+                })
+            }
+
+        }
+        return {isExist: isExist, accountId: accountId};
     };
 
 
