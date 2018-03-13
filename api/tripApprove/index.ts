@@ -680,7 +680,8 @@ export default class TripApproveModule {
             }
 
             let notifyRemark = '';
-            let log = TripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser});
+            const tripApprove = await TripApproveModule.getTripApprove({id: approve.id})
+            let log = TripPlanLog.create({tripPlanId: approve.id, userId: tripApprove.approveUserId});
             let logAfterPass = TripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser});
 
             if (approveResult == EApproveResult.PASS) {
