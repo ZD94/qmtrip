@@ -56,6 +56,12 @@ class StaffModule{
         if(params.roleId && params.roleId == EStaffRole.OWNER){
             throw L.ERR.PERMISSION_DENY("添加创建者");
         }
+        if(params.email)
+            params.email = params.email.replace(/\s/g,"");
+        if(params.mobile)
+            params.mobile = params.mobile.replace(/\s/g,"");
+        if(params.email == '') params.email = null;
+        if(params.mobile == '') params.mobile = null;
 
         let accountId = params.accountId;
         if(params.email){
@@ -66,7 +72,7 @@ class StaffModule{
                 accountId = staff1.accountId;
             }
         }
-        if(params.email){
+        if(params.mobile){
             let staff2 = await API.auth.checkAccExist({where: {mobile: params.mobile}, companyId: company.id});
             if(staff2.isExist){
                 throw L.ERR.MOBILE_HAS_REGISTRY();
@@ -107,6 +113,7 @@ class StaffModule{
             // await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
 
             let pwd = '';
+
             staff = Staff.create(params);
             staff.company = company;
 

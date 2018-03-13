@@ -1253,7 +1253,7 @@ export default class ApiAuth {
     }
 
     /**
-     * 检查账户是否存在
+     * 检查账户在当前企业是否存在
      * @param params
      * @returns {*}
      */
