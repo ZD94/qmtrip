@@ -300,7 +300,7 @@ export default class CostCenterModule {
     @clientExport
     static async initBudget({ budgets, period, operator, costId }: ICostCenterDeploy) {
         const promises: Promise<any>[] = []
-        const where = constructWhereCondition(null, period)
+        const where = constructWhereCondition('', period)
         let totalBudget = 0;
         for (let budget of budgets) {
             const { id } = budget
@@ -344,7 +344,7 @@ export default class CostCenterModule {
             for (let budget of budgets) {
                 const { id } = budget
                 const costCenter = await Models.costCenter.get(id)
-                let dept: Department
+                let dept: Department | undefined
                 if (!costCenter) {
                     dept = dept || await Models.department.get(id)
                     CostCenter.create({ id, type: ECostCenterType.DEPARTMENT, name: dept.name }).save()

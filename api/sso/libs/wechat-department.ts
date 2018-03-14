@@ -99,7 +99,7 @@ export class WDepartment extends OaDepartment {
     /**
      * @method 获取第三方系统中的父级部门对象
      */
-    async getParent(): Promise<OaDepartment> {
+    async getParent(): Promise<OaDepartment | null> {
         let self = this;
         let dept: WDepartment;
         if(self.parentId){
@@ -155,7 +155,7 @@ export class WDepartment extends OaDepartment {
         return result;
     }
 
-    async getSelfById(): Promise<OaDepartment> {
+    async getSelfById(): Promise<OaDepartment | null> {
         let self = this;
         let departments: Array<IWDepartment> = await this.restApi.getDepartments(self.id);
         for(let i = 0; i < departments.length; i++) {

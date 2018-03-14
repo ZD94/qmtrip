@@ -38,7 +38,7 @@ export default class WangXinModule {
         let userCode = WangxUtils.parseLtpaToken(token, C.wxSharedSecret) //解析token获取用户信息。
         console.info("wangXinAutoLogin===>>>", userCode);
         let staffPro = await Models.staffProperty.find({where: {value: userCode, type: SPropertyType.WANGXIN_USER_CODE}})
-        let staff: Staff
+        let staff: Staff | null = null
         if (staffPro && staffPro.length > 0) {
             staff = await Models.staff.get(staffPro[0].staffId)
         }
@@ -61,7 +61,7 @@ export default class WangXinModule {
         let sysCode = C.wxSysCode;
         let name = "网信演示企业";
         if(sysCode){
-            let company: Company;
+            let company: Company | undefined;
             let wangXinApi = new WangXinApi(sysCode);
             let wxDepartment = await wangXinApi.getDepartments("0");
 
@@ -79,7 +79,8 @@ export default class WangXinModule {
                     let pwd = "000000";
                     let result = await API.company.registerCompany({mobile, name, pwd, userName});
                     company = result.company;
-                    let companyProperty = CompanyProperty.create({ companyId: company.id, type: CPropertyType.WANGXIN_ID, value: `WX_${company.id}` });
+                    let companyId = company ? company.id : ''
+                    let companyProperty = CompanyProperty.create({ companyId, type: CPropertyType.WANGXIN_ID, value: `WX_${companyId}` });
                     await companyProperty.save();
                 }
             }

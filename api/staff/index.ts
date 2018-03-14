@@ -1,6 +1,7 @@
 ﻿/**
  * Created by wyl on 15-12-9.
  */
+
 'use strict';
 var nodeXlsx = require("node-xlsx");
 var moment = require("moment");
@@ -16,7 +17,7 @@ import L from '@jingli/language';
 import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
-import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo, EAddWay, Linkman} from "_types/staff";
+import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo, EAddWay, Linkman, Feedback} from "_types/staff";
 import { EAgencyUserRole } from "_types/agency";
 import { Models, EAccountType, EGender } from '_types';
 import {conditionDecorator, condition} from "../_decorator";
@@ -31,6 +32,9 @@ const linkmanCols = Linkman['$fieldnames'];
 const invitedLinkCols = InvitedLink['$fieldnames'];
 const staffSupplierInfoCols = StaffSupplierInfo['$fieldnames'];
 const staffAllCols = Staff['$getAllFieldNames']();
+const feedbackCols = Feedback['$fieldnames'];
+let systemNoticeEmails = require('@jingli/config').system_notice_emails;
+
 if(staffAllCols.indexOf("departmentIds") < 0){
     staffAllCols.push("departmentIds");
 }
@@ -52,13 +56,41 @@ class StaffModule{
         if(params.roleId && params.roleId == EStaffRole.OWNER){
             throw L.ERR.PERMISSION_DENY("添加创建者");
         }
+        if(params.email)
+            params.email = params.email.replace(/\s/g,"");
+        if(params.mobile)
+            params.mobile = params.mobile.replace(/\s/g,"");
+        if(params.email == '') params.email = null;
+        if(params.mobile == '') params.mobile = null;
+
+        let accountId = params.accountId;
+        if(params.email){
+            let staff1 = await API.auth.checkAccExist({where: {email: params.email}, companyId: company.id});
+            if(staff1.isExist){
+                throw L.ERR.EMAIL_HAS_REGISTRY();
+            }else{
+                accountId = staff1.accountId;
+            }
+        }
+        if(params.mobile){
+            let staff2 = await API.auth.checkAccExist({where: {mobile: params.mobile}, companyId: company.id});
+            if(staff2.isExist){
+                throw L.ERR.MOBILE_HAS_REGISTRY();
+            }else{
+                accountId = staff2.accountId;
+            }
+        }
 
         /*let staffNum = await company.getStaffNum();
         if(staffNum >= company.staffNumLimit){
             throw L.ERR.BEYOND_LIMIT_NUM("员工");
         }*/
+        if(!params.travelPolicyId){
+            let defaultTravelPolicy = await company.getDefaultTravelPolicy();
+            params.travelPolicyId = defaultTravelPolicy && defaultTravelPolicy.length ? defaultTravelPolicy[0].id : null;
+        }
         let staff;
-        if(params.accountId){
+        if(accountId && accountId != ''){
             let account = await Models.account.get(params.accountId);
             if(!account){
                 throw L.ERR.USER_NOT_EXIST();
@@ -78,19 +110,16 @@ class StaffModule{
             staff = await staff.save();
         }else{
             //检查邮箱 手机号码是否合法
-            await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
+            // await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
 
             let pwd = '';
+
             staff = Staff.create(params);
             staff.company = company;
 
             if(!staff.pwd){//设置员工默认密码为手机号后六位
                 pwd = staff.mobile.substr(staff.mobile.length - 6);
                 staff.pwd = utils.md5(pwd);
-                let defaultTravelPolicy = await company.getDefaultTravelPolicy();
-                if(!staff["travelPolicyId"]){
-                    staff["travelPolicyId"] = defaultTravelPolicy && defaultTravelPolicy.length ? defaultTravelPolicy[0].id : null;
-                }
             }
 
             if (params.isNeedChangePwd) {
@@ -230,6 +259,16 @@ class StaffModule{
             }
             if(departmentManger && departmentManger.count>0){
                 throw {code: -4, msg: "该员工为部门主管不能被删除"};
+            }
+
+            let project = await Models.project.find({where: {managerId: params.id}});
+            if(project && project.total>0){
+                throw {code: -5, msg: "该员工为项目主管不能被删除"};
+            }
+
+            let waitApproveNumber = await deleteStaff.getWaitApproveTripNumber();
+            if(waitApproveNumber && waitApproveNumber>0){
+                throw {code: -6, msg: "该员工有未审批出差申请不能被删除"};
             }
         }
         let otherStaff = await Models.staff.find({where: {accountId: deleteStaff.accountId, id: {$ne: deleteStaff.id}}});
@@ -611,7 +650,7 @@ class StaffModule{
         let data = xlsObj[1].data;
         await Promise.all(data.map(async function(item: never, index: number){
             let s = data[index];
-            let departments = [];
+            let departments: Department[] = [];
             let departmentPass = true;
             let staffObj: any = {name: s[0], mobile: s[1]+"", email: s[2]||'',sex: s[3]?((s[3] == '女') ? EGender.FEMALE : EGender.MALE) : null,
                 roleId: s[4] == '管理员' ? EStaffRole.ADMIN : EStaffRole.COMMON, travelPolicyId: travelPolicyMaps[s[5]]||'', companyId: companyId,
@@ -683,7 +722,7 @@ class StaffModule{
                         let _d = departmentNames[i];
                         if(_d.indexOf('/') != -1){
                             let dd = _d.split('/');
-                            let p_id = null;
+                            let p_id = '';
                             for(var j=0;j<dd.length;j++){
                                 let _dd = dd[j];
                                 if(j == 0){
@@ -738,19 +777,22 @@ class StaffModule{
                     departments.push(defaultDept);
                 }
                 staffObj.departments = departments;
-                let staff1 = await API.auth.checkAccExist({where: {email: staffObj.email, type: 1}});
-                let staff2 = await API.auth.checkAccExist({where: {mobile: staffObj.mobile, type: 1}});
-                if(staff1 && staffObj.email && staffObj.email != ""){
+                let staff1 = await API.auth.checkAccExist({where: {email: staffObj.email, type: 1}, companyId: companyId});
+                let staff2 = await API.auth.checkAccExist({where: {mobile: staffObj.mobile, type: 1}, companyId: companyId});
+                if(staff1.isExist && staffObj.email && staffObj.email != ""){
                     staffObj.reason = "邮箱与已有用户重复";
                     s[7] = "邮箱与已有用户重复";
                     noAddObj.push(staffObj);
                     downloadNoAddObj.push(s);
-                }else if(staff2 && staffObj.mobile && staffObj.mobile != ""){
+                }else if(staff2.isExist && staffObj.mobile && staffObj.mobile != ""){
                     staffObj.reason = "手机号与已有用户重复";
                     s[7] = "手机号与已有用户重复";
                     noAddObj.push(staffObj);
                     downloadNoAddObj.push(s);
                 }else{
+                    if(staff1.accountId || staff2.accountId){
+                        staffObj.accountId = staff1.accountId || staff2.accountId;
+                    }
                     addObj.push(staffObj);
                     downloadAddObj.push(s);
                 }
@@ -1037,7 +1079,7 @@ class StaffModule{
         q4.status = -1;
 
         var count = params.count;
-        var dateArr = [];
+        var dateArr: string[] = [];
         for(var i=0; i< count; i++){
             var month = moment().subtract(i, 'months').format('YYYY-MM');
             dateArr.push(month);
@@ -1108,8 +1150,8 @@ class StaffModule{
         var endTime = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
         var changeNum = 0;
         var options: any = {};
-        var changeDate = [];
-        var changePoint = [];
+        var changeDate: string[] = [];
+        var changePoint: number[] = [];
         options.where = {staffId: staffId, createdAt: {$gte: startTime, $lte: endTime}};
         let result = await DB.models.PointChange.findAll(options)
         if(result && result.length > 0){
@@ -1321,7 +1363,7 @@ class StaffModule{
      */
     @requireParams(['accountId'])
     static async getInvoiceViewer (params: {accountId: string}){
-        var viewerId = [];
+        var viewerId: string[] = [];
         var id = params.accountId;
         let obj = await DB.models.Staff.findById(id)
         if(obj && obj.company.id){
@@ -1856,6 +1898,86 @@ class StaffModule{
     }): Promise<FindResult> {
         let linkmans = await Models.linkman.find(params);
         return {ids: linkmans.map((s)=> {return s.id;}), count: linkmans['total']};
+    }
+
+
+    /************************************用户反馈begin***************************************/
+    /**
+     * 保存feedback
+     * @param {{id?: string; staffId: string; content: string; occurredTime?: Date; pictures?: string[]}} params
+     * @returns {Promise<Feedback>}
+     */
+    @clientExport
+    @requireParams(["staffId", "content"], feedbackCols)
+    static async createFeedback(params: {
+        id?: string,
+        staffId: string,
+        content: string,
+        occurredTime?: Date,
+        pictures?: string[],
+    }): Promise<Feedback> {
+
+        let feedback = Models.feedback.create(params);
+        let staff = await Staff.getCurrent();
+        feedback.staff = staff;
+        feedback = await feedback.save();
+
+        let attachments: {filename: string, path: string}[] = [];
+        if(feedback.pictures && feedback.pictures.length){
+            feedback.pictures.forEach(
+                (item, index) => {
+                    attachments.push({filename: `${index}.png`, path: `${config.host}/attachments/${item}`})
+                }
+            )
+        }
+
+        try {
+            await Promise.all(systemNoticeEmails.map(async function (s: {
+                email: string, name: string
+            }) {
+                await API.notify.submitNotify({
+                    key: 'qm_notify_feedback',
+                    email: s.email,
+                    values: {
+                        feedback: feedback,
+                        attachments: attachments
+                    }
+                })
+
+            }));
+        } catch (err) {
+            console.error('发送系统通知失败', err)
+        }
+
+        return feedback;
+    }
+
+    @clientExport
+    @requireParams(["id"], feedbackCols)
+    static async deleteFeedback(params: {
+        id: string
+    }): Promise<Boolean> {
+        let feedback = await Models.feedbackCols.get(params.id);
+        await feedback.destroy();
+        return true;
+    }
+
+    @clientExport
+    @requireParams(["id"], linkmanCols)
+    static async getFeedback(params: {id: string}): Promise<Feedback> {
+        let feedback = await Models.feedback.get(params.id);
+        return feedback;
+    }
+
+    @clientExport
+    @requireParams([], ["where.staffId", "where.occurredTime", "order"])
+    static async getFeedbacks(params: {
+        where: any,
+        order?: any,
+        attributes?: any,
+    }): Promise<FindResult> {
+        let feedbacks = await Models.feedback.find(params);
+        return {ids: feedbacks.map((s)=> {return s.id;}), count: feedbacks['total']};
     }
 
 }

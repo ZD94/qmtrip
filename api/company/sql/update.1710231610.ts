@@ -8,7 +8,7 @@ export default async function update(DB: Sequelize, t: Transaction){
     for(let i =0; i < allCorps.length; i++) {
         let creatorsSql = `select * from staff.staffs where deleted_at is null and role_id = 0 and company_id = '${allCorps[i].id}'`;
         let creators = await DB.query(creatorsSql, {type: SEQUELIZE.QueryTypes.SELECT});
-        let allCreatorIds = [];
+        let allCreatorIds: string[] = [];
         for(let j = 0; creators && j < creators.length; j++){
             allCreatorIds.push(creators[j].id);
         }

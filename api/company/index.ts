@@ -23,7 +23,10 @@ import { md5 } from "common/utils";
 import { FindResult, PaginateInterface } from "common/model/interface";
 import { CoinAccount } from "_types/coin";
 import { restfulAPIUtil } from "api/restful";
-import { ISegment } from '_types/tripPlan';
+import { ISegment, AutoApproveType } from '_types/tripPlan';
+import { EApproveChannel } from '_types/approve';
+import { EApproveChannelObj, toEnum } from '../../_types/approve/types';
+import { AutoApproveTypeObj } from '../../_types/company/company';
 let RestfulAPIUtil = restfulAPIUtil;
 
 
@@ -76,23 +79,24 @@ export default class CompanyModule {
         ['email', 'status', 'isValidateMobile', 'promoCode', 'referrerMobile', 'ldapUrl', 'ldapBaseDn'])
     static async registerCompany(params: {
         mobile: string, name: string, email?: string, userName: string,
-        pwd?: string, status?: number, isValidateMobile?: boolean, promoCode?: string,
+        pwd: string, status?: number, isValidateMobile?: boolean, promoCode?: string,
         referrerMobile?: string, ldapUrl?: string, ldapBaseDn?: string, ldapStaffRootDn?: string,
         ldapDepartmentRootDn?: string, ldapAdminPassword?: string, ldapAdminDn?: string
     }): Promise<any> {
         let session = getSession();
         let pwd = params.pwd;
         let defaultAgency = await Models.agency.find({ where: { email: C.default_agency.email } });//Agency.__defaultAgencyId;
-        let agencyId: string;
+        let agencyId: string | undefined;
         if (defaultAgency && defaultAgency.length == 1) {
             agencyId = defaultAgency[0].id;
         }
-        let domain = ""; //企业域名
+        let domain: string = ''; //企业域名
         if (params.email) {
-            domain = params.email.match(/.*\@(.*)/)[1];
+            let res = params.email.match(/.*\@(.*)/)
+            domain = res && res[1] || '';
         }
 
-        if (domain && domain != "" && params.email.indexOf(domain) == -1) {
+        if (domain && domain != "" && params.email && params.email.indexOf(domain) == -1) {
             throw { code: -6, msg: "邮箱格式不符合要求" };
         }
 
@@ -152,7 +156,7 @@ export default class CompanyModule {
         }
 
         await Promise.all([staff.save(), company.save(), department.save(), staffDepartment.save()]);
-        let promoCode: PromoCode;
+        let promoCode: PromoCode | undefined;
         if (params.promoCode) {
             promoCode = await company.doPromoCode({ code: params.promoCode });
         }
@@ -167,6 +171,7 @@ export default class CompanyModule {
         let ca_staff = CoinAccount.create();
         await ca_staff.save();
         let account = await Models.account.get(staff.accountId);
+        if (!account) throw new Error('account is null')
         account.coinAccount = ca_staff;
         await account.save();
 
@@ -203,7 +208,7 @@ export default class CompanyModule {
         //默认添加 中国大陆(国内）、通用地区（国际）、港澳台 三个地区用于差旅、限价等的管理,  补助的一类、二类地区
         await API.travelPolicy.initDefaultCompanyRegion({companyId: company.id});
         await API.travelPolicy.initSubsidyRegions({companyId: company.id});
-        return { company: company, description: promoCode ? promoCode.description : "" };
+        return { company: company, description: promoCode ? promoCode.description : "", staffId: staff.id };
     }
 
 
@@ -213,7 +218,7 @@ export default class CompanyModule {
      */
     @clientExport
     static async syncCompanyToJLCloud(company: Company, pwd: string, mobile?: string): Promise<boolean> {
-        let staff: Staff;
+        let staff: Staff | null = null;
         if(!mobile) {
             if(company.createUser)
                 staff = await Models.staff.get(company.createUser);
@@ -221,7 +226,7 @@ export default class CompanyModule {
                 mobile = staff.mobile;
             if(!mobile) {
                 let managers: Staff[] = await company.getManagers({withOwner: true})
-                if(!managers) mobile = null;
+                if(!managers) mobile = undefined;
                 for(let staff of managers) {
                     if(staff.mobile && staff.mobile != '') mobile = staff.mobile; 
                 }
@@ -263,7 +268,7 @@ export default class CompanyModule {
     static async updateCompany(params: Company): Promise<Company> {
         let companyId = params.id;
         let company = await Models.company.get(companyId);
-
+        if (!company) throw new Error('company is null')
         for (let key in params) {
             company[key] = params[key];
         }
@@ -284,7 +289,7 @@ export default class CompanyModule {
         { if: condition.isMyCompany("0.id") },
         { if: condition.isCompanyAgency("0.id") }
     ])
-    static getCompany(params: { id: string }): Promise<Company> {
+    static getCompany(params: { id: string }) {
         return Models.company.get(params.id);
     }
 
@@ -326,7 +331,7 @@ export default class CompanyModule {
     static async deleteCompany(params: { id: string }): Promise<boolean> {
         let companyId = params.id;
         let company = await Models.company.get(companyId);
-        await company.destroy();
+        company && await company.destroy();
         return true;
     }
 
@@ -341,7 +346,7 @@ export default class CompanyModule {
     static async checkAgencyCompany(params: {companyId: string, userId: string}): Promise<boolean> {
         var c = await Models.company.get(params.companyId);
         var user = await Models.agencyUser.get(params.userId);
-
+        if (!user) throw new Error('user is null')
         if (!c || c.status == -2) {
             return false;
         }
@@ -371,6 +376,7 @@ export default class CompanyModule {
     }): Promise<{ company: Company, frozenNum: { limitFrozen: number, extraFrozen: number } }> {
         let { tripNum, companyId, accountId, query, isCheckTripNumStillLeft } = params;
         let company = await Models.company.get(companyId);
+        if (!company) throw new Error('company is null')
         if (isCheckTripNumStillLeft) {
             await company.beforeGoTrip({ number: tripNum });  //新版出差提交审批时不检查公司剩余流量数,领导审批时检查
         }
@@ -419,7 +425,7 @@ export default class CompanyModule {
     @clientExport
     @requireParams(['id'])
     @modelNotNull('moneyChange')
-    static getMoneyChange(params: { id: string }): Promise<MoneyChange> {
+    static getMoneyChange(params: { id: string }) {
         return Models.moneyChange.get(params.id);
     }
 
@@ -869,7 +875,7 @@ export default class CompanyModule {
 
     @clientExport
     @requireParams(["id"])
-    static async getTripPlanNumChange(params: {id: string}): Promise<TripPlanNumChange> {
+    static async getTripPlanNumChange(params: {id: string}) {
         return Models.tripPlanNumChange.get(params.id);
     }
 
@@ -994,7 +1000,7 @@ export default class CompanyModule {
 
     @clientExport
     @requireParams(["id"])
-    static async getInvoiceTitle(params: { id: string }): Promise<InvoiceTitle> {
+    static async getInvoiceTitle(params: { id: string }) {
         let id = params.id;
         let result = await Models.invoiceTitle.get(id);
 
@@ -1035,6 +1041,7 @@ export default class CompanyModule {
         let staff = await Staff.getCurrent();
 
         let sp = await Models.invoiceTitle.get(id);
+        if (!sp) throw new Error('sp is null')
         if (sp.companyId != staff.company.id) {
             throw L.ERR.PERMISSION_DENY();
         }
@@ -1062,6 +1069,7 @@ export default class CompanyModule {
         let id = params.id;
         let staff = await Staff.getCurrent();
         let st_delete = await Models.invoiceTitle.get(id);
+        if (!st_delete) throw new Error('st_delete is null')
         if (st_delete.companyId != staff.company.id) {
             throw L.ERR.PERMISSION_DENY();
         }
@@ -1125,6 +1133,50 @@ export default class CompanyModule {
         result.inland = preferRegionInland.data && preferRegionInland.data.budgetConfig;
 
         return result;
+    }
+
+    @clientExport
+    @requireParams(['companyId'])
+    static async getApproveRuleByCompanyId(params: {companyId: string}) {
+        let company = await Models.company.get(params.companyId)
+        return {
+            approveRule: 1,
+            approveMode: company.oa || EApproveChannel.QM,
+            detailSetting: {
+                mode: company.autoApproveType as number,
+                time: company.autoApprovePreference
+            }
+        }
+    }
+
+    @clientExport
+    @requireParams(['companyId', 'mode'])
+    static async setApproveMode(params: {companyId: string, mode: number}) {
+        let approveMode = toEnum(EApproveChannelObj, params.mode)
+        if (!approveMode) throw new L.ERROR_CODE_C(400, '审批选项错误')
+        let company = await Models.company.get(params.companyId)
+        company.oa = approveMode
+        await company.save()
+    }
+
+    @clientExport
+    @requireParams(['companyId', 'mode'], ['time'])
+    static async autoApproveSetting(params: {companyId: string, mode: number, time?: number}) {
+        let autoMode = toEnum(AutoApproveTypeObj, params.mode)
+        let company = await Models.company.get(params.companyId)
+        company.autoApproveType = autoMode
+        switch(autoMode) {
+            case AutoApproveType.AfterSubmit:
+                company.autoApprovePreference = {hour: params.time}
+                break;
+            case AutoApproveType.BeforeDeparture:
+                company.autoApprovePreference = {day: params.time}
+                break;
+            default:
+                company.autoApprovePreference = {day: 1, hour: 2}
+                break;
+        }
+        await company.save()
     }
 
     /* ====================== END ======================= */
@@ -1340,7 +1392,7 @@ export default class CompanyModule {
         });
 
         let taskId6 = 'dataStatisticsPerWeek';
-        scheduler('0 0 1 * * 1', taskId6, function () {
+        scheduler('0 0 9 * * 1', taskId6, function () {
             //每周一晚上一点给管理员 创建者发送统计邮件
             (async function () {
                 let now = new Date();

@@ -104,11 +104,12 @@ export class OfflineClass {
     */
     async checkIdentity(param : CheckIdentityParam){
         let staffId = param.staffId;
-        let authResponse : AuthResponse = await checkTokenAuth( param );
+        let authResponse : AuthResponse|null = await checkTokenAuth( param );
         if(!authResponse){
             return null;
         }
         let staff = await Models.staff.get(staffId);
+        if (!staff) throw new Error('staff is null')
         if(staff.accountId == authResponse.accountId){
             return staff;
         }
@@ -202,7 +203,7 @@ export class OfflineClass {
 const offline = new OfflineClass();
 export default offline;
 
-async function offlineApprove(req: Request, res: Response, next: NextFunction){
+async function offlineApprove(req: Request, res: Response, next?: NextFunction){
     res.header('Access-Control-Allow-Origin', '*');
     /*req.clearTimeout();
     req.setTimeout( 60 * 1000 );*/
@@ -255,7 +256,7 @@ async function offlineApprove(req: Request, res: Response, next: NextFunction){
         console.error(e);
     }
     
-    result.remark = param.msg;
+    result.remark = param.msg || '';
     result.status = param.status ? OfflineStatus.SUCCESS : OfflineStatus.FAIL;
 
     await result.save();

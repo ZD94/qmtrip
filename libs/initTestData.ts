@@ -163,7 +163,7 @@ async function initXAJHDepartments(params: {companyId: string}): Promise<any[]> 
     let companyId = params.companyId;
     let company = await Models.company.get(companyId);
     let defaultDepartment = await company.getDefaultDepartment();
-    let departments = [];
+    let departments: any[] = [];
     departments.push(defaultDepartment);
     let names = ["业务发展部", "财务部", "行政部"];
     for(let i = 0; i < names.length; i++){
@@ -193,7 +193,7 @@ async function initXAJHStaffs(params: {companyId: string}): Promise<any[]> {
 
     let result = await Promise.all(staffs.map(async function(staff: any){
         let deptNames = staff.departmentName;
-        let depts = [];
+        let depts: any[] = [];
         let travelPolicy : any;
         if(staff.travelPolicyName){
             let tps = await API.travelPolicy.getTravelPolicies({companyId: companyId, name: staff.travelPolicyName});

@@ -49,10 +49,9 @@ export class EventModule{
                 url = templateUrl(data);
                 console.info("url====>>>", url);
                 let method = eventListeners[0].method;
-                let qs = null;
+                let qs: object | null = null;
                 if (method.toLowerCase() != 'post') { 
                     qs = params;
-                    params = null;
                 }
                 let result = await request({
                     uri: `${url}`,
@@ -84,6 +83,7 @@ export class EventModule{
     async sendRequestToApprove (params: {modelName: string, methodName: string, data: any, companyId: string}): Promise<any> {
         try{
             let company = await Models.company.get(params.companyId);
+            if (!company) throw new Error('company is null')
             let url = company.approveServerUrl ? company.approveServerUrl : config.approveServerUrl;
             url = url + `/tripApprove/receiveRequest`;
             let result = await request({

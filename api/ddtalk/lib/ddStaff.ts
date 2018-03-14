@@ -129,7 +129,7 @@ export default class DdStaff extends OaStaff {
             if(self.departmentIds.indexOf(item.id) >= 0){
                 let oaDept = new DdDepartment({name: item.name, parentId: item.parentid, id: item.id, corpId: self.corpId,
                     isvApi: self.isvApi, corpApi: self.corpApi});
-                result.push(oaDept);
+                result.push(oaDept as OaDepartment);
             }
         })
         return result;
@@ -158,9 +158,9 @@ export default class DdStaff extends OaStaff {
         return true;
     }
 
-    async getCompany(): Promise<Company>{
+    async getCompany() {
         let self = this;
-        let company: Company;
+        let company: Company| null = null;
         /*let corps = await Models.ddtalkCorp.find({where: {corpId: self.corpId}});
         if(corps && corps.length){
             let corp = corps[0];
@@ -174,9 +174,9 @@ export default class DdStaff extends OaStaff {
         return company;
     }
 
-    async getStaff(): Promise<Staff>{
+    async getStaff(): Promise<Staff|null>{
         let self = this;
-        let staff: Staff = null;
+        let staff: Staff|null = null;
         /*let ddtalkUser = await Models.ddtalkUser.find({
             where : { ddUserId : self.id , corpid : self.corpId }
         });

@@ -15,9 +15,9 @@ var timeout = require('connect-timeout');
 import * as CLS from 'continuation-local-storage';
 let CLSNS = CLS.getNamespace('dnode-api-context');
 const corsOptions = { origin: true, methods: ['GET', 'PUT', 'POST','DELETE', 'OPTIONS', 'HEAD'], allowedHeaders: 'Content-Type, auth, supplier, authstr, staffid, companyid, accountid'};
-function resetTimeout(req: Request, res: Response, next: NextFunction){
+function resetTimeout(req: Request, res: Response, next?: NextFunction){
     req['clearTimeout']();
-    next();
+    next && next();
 }
 
 class Privilege {
@@ -25,7 +25,7 @@ class Privilege {
 
     static __initHttpApp(app: Application) {
 
-        app.get('/privilege/:id/getBalance', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next: NextFunction) {
+        app.get('/privilege/:id/getBalance', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next?: NextFunction) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`获取企业余额id为空`)
@@ -49,7 +49,7 @@ class Privilege {
             });
         });
 
-        app.post('/privilege/:id/getBalanceRecords', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next: NextFunction) {
+        app.post('/privilege/:id/getBalanceRecords', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next?: NextFunction) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`获取企业资金变动记录id为空`)
@@ -81,7 +81,7 @@ class Privilege {
             });
         });
 
-        app.get('/privilege/:id/getCompanyScoreRatio', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next: NextFunction) {
+        app.get('/privilege/:id/getCompanyScoreRatio', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next?: NextFunction) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`获取企业奖励比例id为空`)
@@ -104,7 +104,7 @@ class Privilege {
             });
         });
 
-        app.post('/privilege/:id/setCompanyScoreRatio', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next: NextFunction) {
+        app.post('/privilege/:id/setCompanyScoreRatio', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next?: NextFunction) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`设置企业奖励比例id为空`);
@@ -131,7 +131,7 @@ class Privilege {
             });
         });
 
-        app.get('/privilege/:id/getCompanyScoreRatioChange', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next: NextFunction) {
+        app.get('/privilege/:id/getCompanyScoreRatioChange', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next?: NextFunction) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`获取企业奖励比例变动id为空`);
@@ -154,7 +154,7 @@ class Privilege {
             });
         });
 
-        app.get('/privilege/:id/getAllUnsettledRewardByStaff', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next: NextFunction) {
+        app.get('/privilege/:id/getAllUnsettledRewardByStaff', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next?: NextFunction) {
             let {id} = req.params;
             if (!id) {
                 let err = new Error(`获取未结算奖励按照员工排名id为空`)
@@ -177,7 +177,7 @@ class Privilege {
             });
         });
 
-        app.get('/privilege/:id/getAllUnsettledRewardByTripplan', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next: NextFunction) {
+        app.get('/privilege/:id/getAllUnsettledRewardByTripplan', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next?: NextFunction) {
             let {id} = req.params;
             let result;
             try {
@@ -201,9 +201,9 @@ class Privilege {
     //获取企业福利账户余额
     @clientExport
     static async getCompanyBalance(companyId: string): Promise<number> {
-        let company: Company = await Models.company.get(companyId);
-        let coinAccount: CoinAccount = await Models.coinAccount.get(company.coinAccountId);
-        let companyBalance: number = coinAccount.income - coinAccount.consume - coinAccount.locks;
+        let company: Company | null = await Models.company.get(companyId);
+        let coinAccount: CoinAccount | null = await Models.coinAccount.get(company && company.coinAccountId);
+        let companyBalance: number = coinAccount && coinAccount.income - coinAccount.consume - coinAccount.locks || 0;
         return companyBalance;
     }
 
@@ -214,13 +214,13 @@ class Privilege {
         let companyId: string = id;
         let queryDateData: any = body;
 
-        let company: Company = await Models.company.get(companyId);
-        let coinAccountId: string = company.coinAccountId;
+        let company: Company | null = await Models.company.get(companyId);
+        let coinAccountId: string = company && company.coinAccountId;
         let coinAccountChanges:  CoinAccountChange[] = await Models.coinAccountChange.all({where: {coinAccountId: coinAccountId}});
         let dataDuringTheQueryDate: CoinAccountChange[] = [];
         
-        let checkFromDate: Date = null;
-        let checkToDate: Date = null;
+        let checkFromDate: Date | null = null;
+        let checkToDate: Date | null = null;
     
         if (queryDateData['beginDate']) {
             checkFromDate = queryDateData.beginDate;
@@ -238,26 +238,26 @@ class Privilege {
      //获得企业节省奖励比例
      @clientExport
      static async getCompanyScoreRatio(companyId: string): Promise<any> {
-         let company: Company = await Models.company.get(companyId);
-         let scoreRatio: number = company.scoreRatio;
+         let company: Company | null = await Models.company.get(companyId);
+         let scoreRatio: number = company && company.scoreRatio || 0;
          return scoreRatio;
      }
 
      //企业节省奖励比例设置
     @clientExport
-    static async setCompanyScoreRatio(params: {id: string, data: object}): Promise<any> {
+    static async setCompanyScoreRatio(params: {id: string, data: object}) {
         let {data} = params;
         let setData: any = data;
         let staffId: string = setData.staffId;
-        let staff: Staff = await Models.staff.get(staffId);
+        let staff: Staff | null = await Models.staff.get(staffId);
         
-        let companyId: string = staff.company.id;
+        let companyId: string = staff && staff.company.id || '';
         let scoreRatio: number = setData.scoreRatio;
-        let company: Company = await Models.company.get(companyId);
-
+        let company: Company | null = await Models.company.get(companyId);
+        if (!company) return null
         //更新企业节省奖励比例记录表 companyScoreRatioChange
-        let latestScoreRatio: number = company.scoreRatio;
-        let operator: string = staff.name;
+        let latestScoreRatio: number = company && company.scoreRatio || 0;
+        let operator: string = staff && staff.name || '';
         let updateScoreRatioChange: CompanyScoreRatioChange = Models.companyScoreRatioChange.create({
             companyId: companyId,
             staffId: staffId,
@@ -267,14 +267,15 @@ class Privilege {
         });
         await updateScoreRatioChange.save();
         company.scoreRatio = scoreRatio;
-        let updated: any = await company.save();
+        let updated = await company.save();
         return updated;
     }
 
     //企业节省奖励比例设置记录
     @clientExport
-    static async getCompanyScoreRatioChange(staffId: string): Promise<any> {
-        let staff: Staff = await Models.staff.get(staffId);
+    static async getCompanyScoreRatioChange(staffId: string) {
+        let staff: Staff | null = await Models.staff.get(staffId);
+        if (!staff) return []
         let companyId: string = staff.company.id;
 
         let result: CompanyScoreRatioChange[] = await Models.companyScoreRatioChange.all({where: {companyId: companyId}, order: [['updated_at', 'DESC']]});
