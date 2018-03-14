@@ -469,7 +469,6 @@ class TripPlanModule {
                 break; 
 
             case EOrderStatus.SUCCESS:  //全部已出票，设置该tripPlan为已预定
-            case EOrderStatus.ENDORSEMENT_SUCCESS: 
                 tripDetail.status = ETripDetailStatus.COMPLETE;
                 tripDetails = await Models.tripDetail.all({where: {id: {$ne: tripDetail.id}, tripPlanId: tripDetail.tripPlanId, 
                     status: [ETripDetailStatus.WAIT_RESERVE, ETripDetailStatus.WAIT_TICKET]}});
@@ -477,6 +476,15 @@ class TripPlanModule {
                     tripPlan.status = EPlanStatus.RESERVED;
                     log.remark = `已预订`;
                     await log.save();
+                }
+                tripDetails = [];
+                break;
+            case EOrderStatus.ENDORSEMENT_SUCCESS: 
+                tripDetail.status = ETripDetailStatus.COMPLETE;
+                tripDetails = await Models.tripDetail.all({where: {id: {$ne: tripDetail.id}, tripPlanId: tripDetail.tripPlanId, 
+                    status: [ETripDetailStatus.WAIT_RESERVE, ETripDetailStatus.WAIT_TICKET]}});
+                if(!tripDetails || !tripDetails.length) {
+                    tripPlan.status = EPlanStatus.RESERVED;
                 }
                 tripDetails = [];
                 break;
