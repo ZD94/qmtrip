@@ -783,6 +783,13 @@ export default class ApiTravelBudget {
         return true;
     }
 
+    // 获取鲸力供应商信息
+    @clientExport 
+    static async getJLAgentSupplier() {
+        let agents = await getJLAgents();
+        return agents;
+    }
+
     @clientExport
     static async reportBudgetError(params: { budgetId: string }) {
         let staff = await Staff.getCurrent();
