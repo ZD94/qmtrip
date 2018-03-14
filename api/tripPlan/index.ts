@@ -2280,7 +2280,8 @@ class TripPlanModule {
         let staff = await Staff.getCurrent()
         let { tripPlanId } = params;
         let tripPlan = await Models.tripPlan.get(tripPlanId);
-        if (tripPlan.account.id != staff.id) {
+
+        if (tripPlan.accountId != staff.id) {
             throw L.ERR.PERMISSION_DENY();
         }
         if (!tripPlan || tripPlan.backAt.getTime() > Date.now() || tripPlan.auditStatus != EAuditStatus.INVOICE_PASS) {
