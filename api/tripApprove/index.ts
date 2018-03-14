@@ -727,12 +727,10 @@ export default class TripApproveModule {
                 } catch(err) {
                     console.error(err);
                 }
-                let arrivalCityCode = approve.data.query.destinationPlacesInfo[0].destinationPlace;
-                let arrivalCityObj = await API.place.getCityInfo({cityCode: arrivalCityCode});
-                let arrivalCity = arrivalCityObj.name;
+                let tripApprove = await TripApproveModule.getTripApprove({id: approve.id});
                 try {
                     await API.notify.submitNotify({userId: user && user.id, key: 'qm_notify_approve_not_pass',
-                        values: { tripApprove: approve, arrivalCity: arrivalCity, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
+                        values: { tripApprove: tripApprove, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
                 } catch(err) { console.error(err);}
             }
 
