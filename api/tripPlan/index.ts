@@ -2222,6 +2222,16 @@ class TripPlanModule {
         return ranks[0].save;
     }
 
+    /**
+     * 更改首页tripPlan展示状态 
+     */
+    @clientExport
+    static async changeTripPlanDisplayStatus(params: {tripPlanId: string, status: number}) {
+        let {tripPlanId, status} = params
+        let tripPlan = await Models.tripPlan.get(tripPlanId);
+        tripPlan.displayStatus = status;
+        await tripPlan.save();
+    }
 
     @clientExport
     @requireParams(["tripPlanId"])
