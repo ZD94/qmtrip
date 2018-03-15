@@ -9,7 +9,7 @@ import {Staff} from "_types/staff/staff";
 import {Models} from "_types/index";
 import {emitter, EVENT} from "libs/oa";
 import {EApproveStatus, EApproveChannel, EApproveType} from "_types/approve/types";
-import {ETripType, EApproveResult} from "_types/tripPlan/tripPlan";
+import {ETripType} from "_types/tripPlan/tripPlan";
 import _ = require('lodash');
 let Config = require('@jingli/config');
 var API = require("@jingli/dnode-api");
@@ -493,7 +493,7 @@ emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result: {approveNo: string, outer
         }
 
         approve.status = status;
-        approve.tripApproveStatus = EApproveResult.PASS
+        approve.tripApproveStatus = QMEApproveStatus.PASS
         approve.approveUser = approveUser;
         approve.approveDateTime = new Date();
         approve.outerId = outerId;

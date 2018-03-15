@@ -692,7 +692,7 @@ export default class TripApproveModule {
                 logAfterPass.remark = extraStr + `待预订`;
                 await logAfterPass.save();
                 approve.status = EApproveStatus.SUCCESS;
-                approve.tripApproveStatus = EApproveResult.PASS;
+                approve.tripApproveStatus = QMEApproveStatus.PASS;
                 approve.approveRemark = '审批通过';
             }else if(approveResult == EApproveResult.REJECT) {
                 let tripApprove = await API.tripApprove.getTripApprove({id: approve.id});
@@ -702,7 +702,7 @@ export default class TripApproveModule {
                 log.remark = notifyRemark;
                 await log.save();
                 approve.status = EApproveStatus.FAIL;
-                approve.tripApproveStatus = EApproveResult.REJECT;
+                approve.tripApproveStatus = QMEApproveStatus.REJECT;
                 approve.approveRemark = notifyRemark;
             }
             approve.approveDateTime = new Date();
