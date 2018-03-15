@@ -496,7 +496,7 @@ export default class TripApproveModule {
                 log.approveStatus = EApproveResult.PASS;
                 log.remark = `审批通过`;
                 await log.save();
-                logAfterPass.remark = `待预定`;
+                logAfterPass.remark = `待预订`;
                 await logAfterPass.save();
                 tripApprove.status = QMEApproveStatus.PASS;
                 tripApprove.approveRemark = '审批通过';
@@ -680,7 +680,8 @@ export default class TripApproveModule {
             }
 
             let notifyRemark = '';
-            let log = TripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser});
+            const tripApprove = await TripApproveModule.getTripApprove({id: approve.id})
+            let log = TripPlanLog.create({tripPlanId: approve.id, userId: tripApprove.approveUserId});
             let logAfterPass = TripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser});
 
             if (approveResult == EApproveResult.PASS) {
@@ -688,7 +689,7 @@ export default class TripApproveModule {
                 if(isAutoApprove) log.approveStatus = EApproveResult.AUTO_APPROVE;
                 log.remark = extraStr+`审批通过`;
                 await log.save();
-                logAfterPass.remark = extraStr + `待预定`;
+                logAfterPass.remark = extraStr + `待预订`;
                 await logAfterPass.save();
                 approve.status = EApproveStatus.SUCCESS;
                 approve.tripApproveStatus = EApproveResult.PASS;
@@ -726,9 +727,10 @@ export default class TripApproveModule {
                 } catch(err) {
                     console.error(err);
                 }
+                let tripApprove = await TripApproveModule.getTripApprove({id: approve.id});
                 try {
                     await API.notify.submitNotify({userId: user && user.id, key: 'qm_notify_approve_not_pass',
-                        values: { tripApprove: approve, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
+                        values: { tripApprove: tripApprove, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
                 } catch(err) { console.error(err);}
             }
 

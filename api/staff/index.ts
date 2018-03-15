@@ -56,13 +56,41 @@ class StaffModule{
         if(params.roleId && params.roleId == EStaffRole.OWNER){
             throw L.ERR.PERMISSION_DENY("添加创建者");
         }
+        if(params.email)
+            params.email = params.email.replace(/\s/g,"");
+        if(params.mobile)
+            params.mobile = params.mobile.replace(/\s/g,"");
+        if(params.email == '') params.email = null;
+        if(params.mobile == '') params.mobile = null;
+
+        let accountId = params.accountId;
+        if(params.email){
+            let staff1 = await API.auth.checkAccExist({where: {email: params.email}, companyId: company.id});
+            if(staff1.isExist){
+                throw L.ERR.EMAIL_HAS_REGISTRY();
+            }else{
+                accountId = staff1.accountId;
+            }
+        }
+        if(params.mobile){
+            let staff2 = await API.auth.checkAccExist({where: {mobile: params.mobile}, companyId: company.id});
+            if(staff2.isExist){
+                throw L.ERR.MOBILE_HAS_REGISTRY();
+            }else{
+                accountId = staff2.accountId;
+            }
+        }
 
         /*let staffNum = await company.getStaffNum();
         if(staffNum >= company.staffNumLimit){
             throw L.ERR.BEYOND_LIMIT_NUM("员工");
         }*/
+        if(!params.travelPolicyId){
+            let defaultTravelPolicy = await company.getDefaultTravelPolicy();
+            params.travelPolicyId = defaultTravelPolicy && defaultTravelPolicy.length ? defaultTravelPolicy[0].id : null;
+        }
         let staff;
-        if(params.accountId){
+        if(accountId && accountId != ''){
             let account = await Models.account.get(params.accountId);
             if(!account){
                 throw L.ERR.USER_NOT_EXIST();
@@ -82,19 +110,16 @@ class StaffModule{
             staff = await staff.save();
         }else{
             //检查邮箱 手机号码是否合法
-            await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
+            // await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
 
             let pwd = '';
+
             staff = Staff.create(params);
             staff.company = company;
 
             if(!staff.pwd){//设置员工默认密码为手机号后六位
                 pwd = staff.mobile.substr(staff.mobile.length - 6);
                 staff.pwd = utils.md5(pwd);
-                let defaultTravelPolicy = await company.getDefaultTravelPolicy();
-                if(!staff["travelPolicyId"]){
-                    staff["travelPolicyId"] = defaultTravelPolicy && defaultTravelPolicy.length ? defaultTravelPolicy[0].id : null;
-                }
             }
 
             if (params.isNeedChangePwd) {
@@ -752,19 +777,22 @@ class StaffModule{
                     departments.push(defaultDept);
                 }
                 staffObj.departments = departments;
-                let staff1 = await API.auth.checkAccExist({where: {email: staffObj.email, type: 1}});
-                let staff2 = await API.auth.checkAccExist({where: {mobile: staffObj.mobile, type: 1}});
-                if(staff1 && staffObj.email && staffObj.email != ""){
+                let staff1 = await API.auth.checkAccExist({where: {email: staffObj.email, type: 1}, companyId: companyId});
+                let staff2 = await API.auth.checkAccExist({where: {mobile: staffObj.mobile, type: 1}, companyId: companyId});
+                if(staff1.isExist && staffObj.email && staffObj.email != ""){
                     staffObj.reason = "邮箱与已有用户重复";
                     s[7] = "邮箱与已有用户重复";
                     noAddObj.push(staffObj);
                     downloadNoAddObj.push(s);
-                }else if(staff2 && staffObj.mobile && staffObj.mobile != ""){
+                }else if(staff2.isExist && staffObj.mobile && staffObj.mobile != ""){
                     staffObj.reason = "手机号与已有用户重复";
                     s[7] = "手机号与已有用户重复";
                     noAddObj.push(staffObj);
                     downloadNoAddObj.push(s);
                 }else{
+                    if(staff1.accountId || staff2.accountId){
+                        staffObj.accountId = staff1.accountId || staff2.accountId;
+                    }
                     addObj.push(staffObj);
                     downloadAddObj.push(s);
                 }

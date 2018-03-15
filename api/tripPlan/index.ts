@@ -469,14 +469,23 @@ class TripPlanModule {
                 break; 
 
             case EOrderStatus.SUCCESS:  //全部已出票，设置该tripPlan为已预定
+                tripDetail.status = ETripDetailStatus.COMPLETE;
+                tripDetails = await Models.tripDetail.all({where: {id: {$ne: tripDetail.id}, tripPlanId: tripDetail.tripPlanId, 
+                    status: [ETripDetailStatus.WAIT_RESERVE, ETripDetailStatus.WAIT_TICKET]}});
+                if(!tripDetails || !tripDetails.length) {
+                    tripPlan.status = EPlanStatus.RESERVED;
+                    log.remark = `已预订`;
+                    await log.save();
+                }
+                tripDetails = [];
+                break;
             case EOrderStatus.ENDORSEMENT_SUCCESS: 
                 tripDetail.status = ETripDetailStatus.COMPLETE;
                 tripDetails = await Models.tripDetail.all({where: {id: {$ne: tripDetail.id}, tripPlanId: tripDetail.tripPlanId, 
                     status: [ETripDetailStatus.WAIT_RESERVE, ETripDetailStatus.WAIT_TICKET]}});
-                if(!tripDetails || !tripDetails.length)
+                if(!tripDetails || !tripDetails.length) {
                     tripPlan.status = EPlanStatus.RESERVED;
-                    log.remark = `已预订`;
-                    await log.save();
+                }
                 tripDetails = [];
                 break;
             case EOrderStatus.FAILED: 
@@ -2279,7 +2288,8 @@ class TripPlanModule {
         let staff = await Staff.getCurrent()
         let { tripPlanId } = params;
         let tripPlan = await Models.tripPlan.get(tripPlanId);
-        if (tripPlan.account.id != staff.id) {
+
+        if (tripPlan.accountId != staff.id) {
             throw L.ERR.PERMISSION_DENY();
         }
         if (!tripPlan || tripPlan.backAt.getTime() > Date.now() || tripPlan.auditStatus != EAuditStatus.INVOICE_PASS) {
@@ -2789,7 +2799,7 @@ class TripPlanModule {
                         }
                         if(hasReserved) {
                             tripPlans[i].status = EPlanStatus.RESERVED;
-                            log.remark = `已预定`;
+                            log.remark = `已预订`;
                             await log.save();
                         }
                         if(!hasReserved) {

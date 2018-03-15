@@ -17,7 +17,7 @@ let CLSNS = CLS.getNamespace('dnode-api-context');
 import { genSign } from "@jingli/sign";
 import { Department } from '_types/department';
 import Logger from '@jingli/logger';
-import { ITMCSupplier } from 'api/travelBudget';
+import { ITMCSupplier, TMCStatus } from 'api/travelBudget';
 import { AgentType } from 'api/travelBudget/meiya';
 const logger = new Logger("proxy");
 const corsOptions = { 
@@ -156,6 +156,7 @@ class Proxy {
             let staffId = req.headers.staffid;
             let isNeedAuth = req.headers['isneedauth'] || '';
             let agentType = req.headers['agenttype'] || AgentType.CORP;
+
             if(staffId && !staff) {
                 staff = await Models.staff.get(staffId);
             }
@@ -196,16 +197,16 @@ class Proxy {
             let supplier =req.headers['supplier'];
             let companyInfo: Array<ITMCSupplier>;
             let identify: any;
-   
+            let allInUseSuppliers = await ApiTravelBudget.getCompanyInfo(null, staff && staff.id, null, TMCStatus.OK_USE);
             if (isNeedAuth == '1') {
                 //no need to offer auth
             } else if(supplier){
                 try{
-                    companyInfo = await ApiTravelBudget.getCompanyInfo(supplier, staff && staff.id);
+                    companyInfo = await ApiTravelBudget.getCompanyInfo(supplier, staff && staff.id, null, TMCStatus.OK_USE);
                 }catch(err){ return res.json({code: 407, msg: "未绑定供应商", data: null}) }
                 
                 identify = companyInfo && companyInfo.length ?companyInfo[0].identify: null;
-                if(!identify) return res.json({code: 407, msg: "未绑定供应商", data: null});
+                if(!identify && allInUseSuppliers) return res.json({code: 407, msg: "未绑定供应商", data: null});
                 if (typeof identify == 'object') {
                     identify = JSON.stringify(identify);
                 }

@@ -51,6 +51,7 @@ export async function getJLAgents() {
         method: 'get',
         headers: {
             agentType: AgentType.JL
+
         }
     }).catch((e: Error) => {
         throw e;
@@ -60,11 +61,13 @@ export async function getJLAgents() {
         result = JSON.parse(result);
     }
     // console.log('getJLAgents  ------>   ', result.data);
+
     return result.data;
 }
 
 /* 获取美亚数据 */
 export async function getMeiyaFlightData(params: ISearchTicketParams, authData: IMeiyaAuthData[]) {
+
 
     let data = [];
     let meiyaParam = {
@@ -89,6 +92,7 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
                 auth: meiyaAuth(info),
                 supplier: sname,
                 agentType: (agentType && agentType == '2') ? AgentType.JL :AgentType.CORP
+
             }
         }).catch((e: Error) => {
             console.log(e)
@@ -125,6 +129,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
     };
     let urlTrain = config.orderSysConfig.orderLink + "/tmc/searchTrains/getList" + `/${meiyaParam.depCity}/${meiyaParam.arrCity}/${meiyaParam.depDate}`;
     console.log("urlTrain===================>", urlTrain);
+
     let isBindService: boolean = false;
     for (let item of authData) {
         let info = item.identify;
@@ -135,6 +140,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
         isBindService = (type == `${TmcServiceType.TRAIN}` || type == `${TmcServiceType.TRAIN_ABROAD}`) ? true : false;
         let meiyaResult = isBindService 
         ? await request({
+
             url: urlTrain,
             method: "get",
             // qs: meiyaParam,
@@ -187,6 +193,7 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
         let sname = item.sname;
         let agentType = item.agentType;
         // console.log('agenttype---->   ', agentType, 'typeof------  ', typeof agentType);
+
         meiyaResult = await request({
             url: urlHotel,
             method: "get",
@@ -195,6 +202,7 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
                 auth: meiyaAuth(info),
                 supplier: sname,
                 agentType: (agentType && agentType == '2') ? AgentType.JL : AgentType.CORP
+
             }
         }).catch((e: Error) => {
             console.log(e)
@@ -939,6 +947,7 @@ export function matchMeiyaHotel(origin: IHotel[], meiyaData: IMeiyaHotel[]) {
 export enum AgentType {
     CORP = 1,
     JL = 2
+
 }
 
 export interface IMeiyaFlightPriceInfo {
