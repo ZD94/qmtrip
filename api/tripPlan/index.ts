@@ -2139,20 +2139,19 @@ class TripPlanModule {
             logger.error(err);
         }
 
-        try {
-            await API.tripApprove.sendApprovePassNoticeToCompany({ approveId: approve.id });
-        } catch (err) {
-            console.error(err);
-        }
+        API.tripApprove.sendApprovePassNoticeToCompany({ approveId: approve.id })
+        .catch((err: Error) => { 
+            logger.error('发送审批通过通知给企业时发生错误:', err);
+        })
+
         let tplName = 'qm_notify_approve_pass';
-        try {
-            await API.notify.submitNotify({
-                userId: account.id, key: tplName,
-                values: { tripPlan: tripPlan, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE }
-            });
-        } catch (err) {
-            console.error(err);
-        }
+        API.notify.submitNotify({
+            userId: account.id, key: tplName,
+            values: { tripPlan: tripPlan, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE }
+        }).catch((err: Error) => {
+            logger.error('发送审批通过通知给用户时发生错误:', err);
+        })
+
         /*try {
             await API.ddtalk.sendLinkMsg({ accountId: account.id, text: '您的预算已审批完成', url: self_url });
         } catch (err) {
