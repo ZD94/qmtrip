@@ -6,17 +6,13 @@
 import {ICompanyChargeParam, IStaffPoint2CoinParam, IStaffCostCoinParam} from "./_types";
 import {Models} from "_types/index";
 import {requireParams, clientExport} from "@jingli/dnode-api/dist/src/helper";
-import {PointChange} from "_types/staff";
+import {PointChange, Staff} from "_types/staff";
 import {CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE} from "_types/coin";
 import {FindResult} from "common/model/interface";
 import L from '@jingli/language';
 import {DB} from '@jingli/database';
 import { Company } from '_types/company';
-let crypto = require('crypto');
-// 增加鲸币接口用户名 密码 key用于md5校验
-const username: string = 'jingli2016';
-const pwd: string = 'jinglizhixiang';
-const key: string = 'JLZX';
+import { addCoinType } from 'http/controller/coin';
 
 
 class CoinModule {
@@ -24,55 +20,40 @@ class CoinModule {
     /**
      * 企业增加鲸币接口
      * @author lizeilin
-     * @param authData: {authStr, timestamp}, companyId: string, coins: number
-     * @description username,pwd,key,timestamp 通过md5加密校验
-     * @return
+     * @param {type: addCoinType, coins: number, id: string}
+     * @return {coinAccount, coinAccountChange}
      */
-    @clientExport
-    static async addCompanyJLCoin(params: {authData: any, companyId: string, coins: number}): Promise<CoinAccount> {
-        let {authData, companyId, coins} = params;
-        if (authData && typeof authData == 'string') {
-            authData = JSON.parse(authData);
+    static async addCompanyJLCoin(params: {type: addCoinType, coins: number, id: string}): Promise<any> {
+        let {type, coins, id} = params;
+        let result: any;
+        if (type == addCoinType.CORP) {
+            let company: Company = await Models.company.get(id);
+            let coinAccount: CoinAccount = await Models.coinAccount.get(company.coinAccountId);
+            let remark = `企业${company.name}增加鲸币${coins}`;
+            try {
+                await DB.transaction(async function(t) {
+                   result = await coinAccount.addCoin(coins, remark, null, COIN_CHANGE_TYPE.INCOME);
+                })
+            } catch(err) {
+                coinAccount && coinAccount.reload();
+                throw err;
+            }
         }
-
-        // 校验authStr  md5
-        let authStr: string = authData.authStr;
-        let timestamp: string = authData.timestamp;
+        if (type == addCoinType.STAFF) {
+            let staff: Staff = await Models.staff.get(id);
+            let coinAccount: CoinAccount = await Models.coinAccount.get(staff.coinAccountId);
+            let remark = `员工${staff.name}增加鲸币${coins}`;
+            try {
+                await DB.transaction(async function(t) {
+                    result = await coinAccount.addCoin(coins, remark, null, COIN_CHANGE_TYPE.INCOME);
+                })
+            } catch(err) {
+                coinAccount && coinAccount.reload();
+                throw err;
+            }
+        }
+        return result;
         
-        let plainText: string = username + pwd + key + timestamp;
-        let md5 = crypto.createHash("md5");
-        let cipherText: string = md5.update(plainText).digest('hex');
-        if (authStr != cipherText) {
-            throw Error('校验失败！请求失败！');
-        }
-
-        let company: Company | undefined;
-        let companyCoinAccount: CoinAccount | undefined;
-        let companyCoinAccountChange: CoinAccountChange | undefined;
-
-        try {
-            await DB.transaction(async function(t) {
-                company = await Models.company.get(companyId);
-                //增加鲸币
-                companyCoinAccount = await Models.coinAccount.get(company.coinAccountId);
-                companyCoinAccount.income += coins;
-                companyCoinAccount.save();
-
-                //增加记录
-                companyCoinAccountChange = await Models.coinAccountChange.create({
-                    coinAccountId: company.coinAccountId,
-                    remark: `企业充值鲸币${coins}`,
-                    type: COIN_CHANGE_TYPE.INCOME,
-                    coins: coins
-                });
-                companyCoinAccountChange.save();
-            })
-        } catch (err) {
-            companyCoinAccount && companyCoinAccount.reload();
-            companyCoinAccountChange && companyCoinAccountChange.reload();
-            throw err;
-        }
-        return await Models.coinAccount.get(company.coinAccountId);;
 
     }
 
