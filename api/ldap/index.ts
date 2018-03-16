@@ -15,6 +15,7 @@ import {CPropertyType} from "_types/company";
 import { EAccountType } from '_types/index';
 import {Department} from "../../_types/department/department";
 import { Application } from 'express';
+import { Company } from '../../_types/company/company';
 
 export let staffOpts = {
     scope: 'sub',
@@ -110,6 +111,7 @@ export class LdapModule {
 
         //ldap认证
         let company = await Models.company.get(data.companyId);
+        if (!company) throw new Error('company is null')
         // let company = await Models.company.get("4438e4c0-686e-11e7-89aa-a14f4c6f4292");
         if(!shareConnection.connectionMap[company.id]){
             await shareConnection.initConnection({companyId: company.id});
@@ -144,7 +146,7 @@ export class LdapModule {
         if(staffs.total == 0) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
         }
-        let loginStaff: Staff;
+        let loginStaff: Staff|undefined;
         for(let s in staffs){
             let item = staffs[s];
             if(item.company.id == company.id){
@@ -153,7 +155,7 @@ export class LdapModule {
             }
         }
 
-        let staffProperty = await Models.staffProperty.find({where: {staffId: loginStaff.id, type: SPropertyType.LDAP_DN}});
+        let staffProperty = await Models.staffProperty.find({where: {staffId: loginStaff && loginStaff.id, type: SPropertyType.LDAP_DN}});
         if(staffProperty.total == 0) {
             throw L.ERR.INVALID_ARGUMENT("ldap相关设置");
         }
@@ -168,9 +170,9 @@ export class LdapModule {
             }
         }
 
-        let departments = await loginStaff.getDepartments();
+        let departments: Department[] = loginStaff ? await loginStaff.getDepartments() : [];
         await Promise.all(departments.map(async (item) => {
-            await syncData.syncOrganization({company: company, department: item});
+            await syncData.syncOrganization({company: company || {} as Company, department: item});
         }));
 
         var ret = await API.auth.makeAuthenticateToken(loginAccount.id, 'ldap');
@@ -198,7 +200,7 @@ export class LdapModule {
             throw L.ERR.PERMISSION_DENY();
         }
         let company = current.company;
-        let department: Department;
+        let department: Department | undefined;
         if(params)
             department = params.department;
         await syncData.syncOrganization({company: company, department: department});

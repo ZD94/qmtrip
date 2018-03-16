@@ -52,29 +52,29 @@ export default class DdCompany extends OaCompany {
     async getDepartments(): Promise<OaDepartment[]> {
         let self = this;
         let DDdepartments = await self.corpApi.getDepartments();
-        let result: OaDepartment[];
+        let result: OaDepartment[] = [];
         DDdepartments.forEach((item) => {
             let ddDept = new DdDepartment({name: item.name, parentId: item.parentid, id: item.id, isvApi: self.isvApi,
                 corpApi: self.corpApi, corpId: self.id});
-            result.push(ddDept);
+            result.push(ddDept as OaDepartment);
         })
         return result;
     }
 
-    async getRootDepartment(): Promise<OaDepartment> {
+    async getRootDepartment(): Promise<OaDepartment|null> {
         let self = this;
         let DDdepartments = await self.corpApi.getDepartments();
-        let result: OaDepartment;
+        let result: OaDepartment | null = null;
         DDdepartments.forEach((item) => {
             if(item.id == 1){
                 result = new DdDepartment({name: item.name, parentId: null, id: item.id, isvApi: self.isvApi,
-                    corpApi: self.corpApi, corpId: self.id});
+                    corpApi: self.corpApi, corpId: self.id}) as OaDepartment;
             }
         })
         return result;
     }
 
-    async getCreateUser(): Promise<OaStaff> {
+    async getCreateUser(): Promise<OaStaff | null> {
         let self = this;
         //获取企业授权的授权数据 , 拿到管理员信息
         let authInfo: any = await self.isvApi.getCorpAuthInfo();
@@ -82,7 +82,7 @@ export default class DdCompany extends OaCompany {
         let userInfo: any = await self.corpApi.getUser(authUserInfo.userId);
         let oaStaff = new DdStaff({id: userInfo.userid, isAdmin: userInfo.isAdmin, name: userInfo.name, mobile: userInfo.mobile, email: userInfo.email,
             departmentIds: userInfo.department, corpId: self.id, isvApi: self.isvApi, corpApi: self.corpApi, avatar: userInfo.avatar});
-        return oaStaff;
+        return oaStaff as OaStaff;
     }
 
     async saveCompanyProperty(params: { companyId: string }): Promise<boolean> {
@@ -106,9 +106,9 @@ export default class DdCompany extends OaCompany {
         return true;
     }
 
-    async getCompany(): Promise<Company>{
+    async getCompany(): Promise<Company|null>{
         let self = this;
-        let com: Company = null;
+        let com: Company | null = null;
 
         let companyPro = await Models.companyProperty.find({where : {value: self.id, type: CPropertyType.DD_ID}});
         if(companyPro && companyPro.length > 0){

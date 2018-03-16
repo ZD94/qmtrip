@@ -22,6 +22,7 @@ class CoinModule {
             remark = '企业充值';
         }
         let company = await Models.company.get(companyId);
+        if (!company) throw new Error('company is null')
         let coinAccount = company.coinAccount;
         //如果企业资金账户不存在,先创建
         if (!coinAccount) {
@@ -40,6 +41,7 @@ class CoinModule {
     static async staffPoint2Coin(params: IStaffPoint2CoinParam) :Promise<CoinAccount> {
         let {staffId, points} = params;
         let staff = await Models.staff.get(staffId);
+        if (!staff) throw new Error('staff is null')
         let company = staff.company
         let points2coinRate = company.points2coinRate || 50;
         if (staff.balancePoints < points) {
@@ -57,6 +59,7 @@ class CoinModule {
         }
         // let orderNo = getOrderNo()
         return DB.transaction(async function (t) {
+            if (!staff) throw new Error('staff is null')
             //减掉企业金币
             let result:any;
             result= await company.coinAccount.costCoin(coins, `员工${staff.name}(${staff.mobile})积分兑换`)
@@ -74,6 +77,7 @@ class CoinModule {
             // return staff.coinAccount.addCoin(coins, `${points}积分兑换${coins}`);
             return staff.$parents["account"]["coinAccount"].addCoin(coins, `使用${points}元节省金额兑换${coins}鲸币`);
         }).catch(async function(err){
+            if (!staff) throw new Error('staff is null')
             company.coinAccount.consume = originalConsume;
             staff.balancePoints = originalBalancePoints;
             staff.$parents["account"]["coinAccount"].income = originalIncome;
@@ -89,6 +93,7 @@ class CoinModule {
             remark = `消费`;
         }
         let staff = await Models.staff.get(staffId);
+        if (!staff) throw new Error('staff is null')
         let coinAccount = staff.coinAccount;
         if (!coinAccount || coinAccount.balance < coins) {
             throw new Error('账户余额不足');
@@ -103,13 +108,13 @@ class CoinModule {
 
     @clientExport
     @requireParams(["id"])
-    static async getCoinAccount(params: {id: string}) :Promise<CoinAccount> {
+    static async getCoinAccount(params: {id: string}) {
         return Models.coinAccount.get(params.id);
     }
 
     @clientExport
     @requireParams(["id"])
-    static async getCoinAccountChange(params: {id: string}) :Promise<CoinAccountChange> {
+    static async getCoinAccountChange(params: {id: string}): Promise<CoinAccountChange | null> {
         return Models.coinAccountChange.get(params.id);
     }
 

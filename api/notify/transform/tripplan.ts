@@ -45,7 +45,6 @@ export = async function transform(values: {
 
     }
     if(!values.tripApprove || !values.tripApprove.id){
-        values.tripApprove = null
         return values;
     }
     if(!companyId){
@@ -78,6 +77,7 @@ export = async function transform(values: {
         }))
 
         let lastApproveUser = await Models.staff.get(tripApprove.approveUserId);
+        if (!lastApproveUser) throw new Error('lastApproveUser is null')
         approveUserMap[lastApproveUser.id] = lastApproveUser;
     }
     values.approveUserMap = approveUserMap;

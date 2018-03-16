@@ -38,7 +38,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         return bookLink;
     }
 
-    async getAirTicketReserveLink(options: { [key: string]: any }):Promise<ReserveLink> {
+    async getAirTicketReserveLink(options: { [key: string]: any }): Promise<ReserveLink|undefined> {
         let data = options.data;
         let deeplinkData = data.deeplinkData;
         let deeplink, jsCode;
@@ -67,7 +67,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         }
     }
 
-    async getHotelReserveLink(options: { [key: string]: any }):Promise<ReserveLink> {
+    async getHotelReserveLink(options: { [key: string]: any }): Promise<ReserveLink|undefined> {
         let data = options.data;
         let deeplinkData = data.deeplinkData;
         let deeplink, jsCode;

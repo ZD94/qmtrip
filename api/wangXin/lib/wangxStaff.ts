@@ -114,13 +114,13 @@ export default class WangxStaff extends OaStaff {
         return result;
     }
 
-    async getSelfById(): Promise<OaStaff> {
+    async getSelfById(): Promise<OaStaff | null> {
         let self = this;
         let user = await self.wangXinApi.getUserById(self.id);
         if(user){
             let mobile = (user.tel || user.phone) ? (user.tel || user.phone) : null;
             return new WangxStaff({id: user.id, name: user.name, email: user.email, mobile: mobile,
-                company: self.company, wangXinApi: self.wangXinApi, userCode: user.usercode});
+                company: self.company, wangXinApi: self.wangXinApi, userCode: user.usercode}) as OaStaff;
         }
         return null
     }
@@ -138,11 +138,11 @@ export default class WangxStaff extends OaStaff {
         return true;
     }
 
-    async getCompany(): Promise<Company>{
-        return null
+    async getCompany(): Promise<Company | undefined>{
+        return undefined
     }
 
-    async getStaff(): Promise<Staff>{
+    async getStaff(): Promise<Staff | null>{
         let self = this;
         let staffPros = await Models.staffProperty.find({where : {value: self.id+"", type: SPropertyType.WANGXIN_ID}});
         if(staffPros && staffPros.length > 0){

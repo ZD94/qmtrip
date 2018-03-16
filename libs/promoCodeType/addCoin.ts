@@ -9,6 +9,7 @@ export default {
     execute: async function (params: { addNum: number, companyId: string }): Promise<boolean> {
         let { addNum, companyId } = params;
         let company = await Models.company.get(companyId);
+        if (!company) return false
         if (!company.coinAccount) {
             let ca = CoinAccount.create();
             await ca.save();

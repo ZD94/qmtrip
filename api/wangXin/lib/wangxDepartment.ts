@@ -61,7 +61,7 @@ export default class WangxDepartment extends OaDepartment {
         this.target.company = val;
     }
 
-    async getSelfById(): Promise<OaDepartment> {
+    async getSelfById(): Promise<OaDepartment | null> {
         let self = this;
         let result = await self.wangXinApi.getDepartmentById(self.id);
         if(result){
@@ -84,7 +84,7 @@ export default class WangxDepartment extends OaDepartment {
         return result;
     }
 
-    async getParent(): Promise<OaDepartment> {
+    async getParent(): Promise<OaDepartment | null> {
         let self = this;
         if(self.parentId){
             let result = await self.wangXinApi.getDepartmentById(self.parentId);
@@ -116,7 +116,7 @@ export default class WangxDepartment extends OaDepartment {
         return true;
     }
 
-    async getDepartment(): Promise<Department> {
+    async getDepartment(): Promise<Department | null> {
         let self = this
         let deptPro = await Models.departmentProperty.find({where : {value: self.id+"", type: DPropertyType.WANGXIN_ID}});
         if(deptPro && deptPro.length > 0){

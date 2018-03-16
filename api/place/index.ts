@@ -2,7 +2,7 @@ import { requireParams, clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { restfulAPIUtil } from '../restful'
 var _ = require("lodash");
 const cache = require("common/cache")
-const cityPrefix = 'city:info:id:v2'
+const cityPrefix = 'city:info:id:v3'
 export default class PlaceModule {
 
     @clientExport
@@ -100,7 +100,7 @@ export default class PlaceModule {
     }
 
     @clientExport
-    static async getCityInfoByName(params?: {name?: string}){
+    static async getCityInfoByName(params: {name?: string}){
         let cities = await restfulAPIUtil.operateOnModel({
             model: `place`,
             params: {

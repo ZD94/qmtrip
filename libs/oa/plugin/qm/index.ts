@@ -26,12 +26,13 @@ export class QmPlugin extends AbstractOAPlugin {
     }
 
     //实现qm创建审批单流程
-    async createTripApproveFlow(params:createTripApproveParam):Promise<createTripApproveResult> {
+    async createTripApproveFlow(params:createTripApproveParam):Promise<createTripApproveResult|null> {
 
         let {approveNo, submitter } = params;
 
         let staff = await Models.staff.get(submitter);
-        let company = staff.company;
+        let company = staff && staff.company;
+        if (!company) return null
         let approve = await Models.approve.get(approveNo);
         let tripApprove = await API.tripApprove.retrieveDetailFromApprove(params);
 
@@ -50,9 +51,11 @@ export class QmPlugin extends AbstractOAPlugin {
         let returnApprove = await API.eventListener.sendEventNotice({eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: company.id});
         if(returnApprove){
             return DB.transaction(async function(t){
-                approve.oaAddResult = OAAddResult.SUCCESS;
-                await approve.save();
-                let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, approveStatus: EApproveResult.WAIT_APPROVE, remark: '提交审批单，等待审批'});
+                if (approve){
+                    approve.oaAddResult = OAAddResult.SUCCESS;
+                    await approve.save();
+                }
+                let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff && staff.id, approveStatus: EApproveResult.WAIT_APPROVE, remark: '提交审批单，等待审批'});
 
                 await tripPlanLog.save();
                 await API.tripApprove.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
@@ -64,8 +67,10 @@ export class QmPlugin extends AbstractOAPlugin {
                 }
         })
         }else{
-            approve.oaAddResult = OAAddResult.FAILED;
-            await approve.save();
+            if (approve) {
+                approve.oaAddResult = OAAddResult.FAILED;
+                await approve.save();
+            }
         }
         return {
             approveNo: approveNo,
@@ -77,6 +82,7 @@ export class QmPlugin extends AbstractOAPlugin {
     async tripApproveFail(params: {approveId: string, reason?: string}) {
         let {approveId, reason} = params;
         let approve = await Models.approve.get(approveId);
+        if (!approve) return
         let tripApprove: any = {};
         tripApprove.id = approveId;
         tripApprove.status = QMEApproveStatus.REJECT;
@@ -98,7 +104,7 @@ export class QmPlugin extends AbstractOAPlugin {
         // await API.tripApprove.updateTripApprove(tripApprove);
     }
 
-    async createTripInvoiceAuditFlow(params:createTripInvoiceAuditFlowParam):Promise<createTripInvoiceAuditFlowResult> {
+    async createTripInvoiceAuditFlow(params:createTripInvoiceAuditFlowParam):Promise<createTripInvoiceAuditFlowResult|null> {
         return null;
     }
 }

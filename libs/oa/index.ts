@@ -60,6 +60,6 @@ emitter.on(EVENT.APPROVE_FAIL, function(params: {approveId: string, oa: string, 
     let plugin: IOAPlugin = plugins[oa];
     console.info(plugin);
     if (type == EApproveType.TRAVEL_BUDGET) {
-        return plugin.tripApproveFail({approveId, reason});
+        return plugin.tripApproveFail({approveId, reason: reason || ''});
     }
 })

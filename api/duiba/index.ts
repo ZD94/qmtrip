@@ -34,6 +34,7 @@ class DuiBa {
         params.uid = staff.accountId;
         var credits = 0;
         let account = await Models.account.get(staff.accountId);
+        if (!account) throw new Error('account is null')
         if(account.coinAccount && account.coinAccount.balance){
             credits = account.coinAccount.balance;
         }

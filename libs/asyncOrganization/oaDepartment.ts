@@ -29,14 +29,14 @@ export abstract class OaDepartment{
     abstract set company(val: Company);
 
     abstract async getChildrenDepartments(): Promise<OaDepartment[]>;
-    abstract async getParent(): Promise<OaDepartment>;
+    abstract async getParent(): Promise<OaDepartment|null>;
     abstract async getStaffs(): Promise<OaStaff[]>;
-    abstract async getSelfById(): Promise<OaDepartment>;
+    abstract async getSelfById(): Promise<OaDepartment|null>;
     abstract async saveDepartmentProperty(params: {departmentId: string}): Promise<boolean>;
 
-    async getDepartment(): Promise<Department>{
+    async getDepartment(): Promise<Department|null>{
         let self = this;
-        let department: Department = null;
+        let department: Department | null = null
         if(typeof self.id != 'string')
             self.id = self.id + '';
         let deptPro = await Models.departmentProperty.find({where : {value: self.id}});
@@ -66,7 +66,7 @@ export abstract class OaDepartment{
      * @method 
      * @param params 
      */
-    async sync(params?:{company?: Company, oaDepartment?: OaDepartment, from?: string}): Promise<Department>{
+    async sync(params?:{company?: Company, oaDepartment?: OaDepartment, from?: string}): Promise<Department|null>{
         console.info(this.name, "department sync begin==================================", this.name);
         if(!params) params = {};
         let self = params.oaDepartment || this;
@@ -84,11 +84,11 @@ export abstract class OaDepartment{
         if(!company){
             throw L.ERR.INVALID_ACCESS_ERR();
         }
-        let result: Department;
+        let result: Department | null = null;
 
         let defaultDepartment = await company.getDefaultDepartment();
         
-        let parentDepartment: Department;    //极端情况：parentDepartment 记录根部门的上级，若不存在，则为本系统的默认部门
+        let parentDepartment: Department | null = null;    //极端情况：parentDepartment 记录根部门的上级，若不存在，则为本系统的默认部门
 
         let oaParent = await self.getParent();
 
@@ -116,7 +116,7 @@ export abstract class OaDepartment{
                  * 鲸力系统不存在第三方系统的部门， 则创建，同时注意对于在鲸力系统已经注册的公司，
                  * 此时的根部门及为公司名，同步微信通讯录时无需创建多个根部门
                  */ 
-                let dept: Department;
+                let dept: Department|undefined;
                 let depts: Department[] = await Models.department.find({
                     where: {
                         companyId: company.id,
@@ -165,7 +165,7 @@ export abstract class OaDepartment{
                             await item.save();
 
                             let deleteAccount = await Models.account.get(item.accountId);
-                            await deleteAccount.destroy();
+                            deleteAccount && await deleteAccount.destroy();
 
                             await item.deleteStaffDepartments();
                         }catch (e){

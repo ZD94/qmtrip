@@ -123,7 +123,7 @@ export default class DDTalk {
 
             let url = config.test_url.replace(/\/$/g, "");
             if(config.reg_go){
-                return DealEvent.transpond(req, res, next, null, url+"/JLTesthello");
+                return DealEvent.transpond(req, res, next, undefined, url+"/JLTesthello");
             }
             console.log("yes, it's the hello");
             res.send("ok");
@@ -138,7 +138,7 @@ export default class DDTalk {
                 });*/
                 let comPros = await Models.companyProperty.find({where: {value: msg.CorpId, type: CPropertyType.DD_ID}});
                 if(config.test_url && config.reg_go && (!comPros || !comPros.length)){
-                    return DealEvent.transpond(req, res, next, null);
+                    return DealEvent.transpond(req, res, next, undefined);
                 }
             }
 
@@ -247,13 +247,15 @@ export default class DDTalk {
 
     static async eventPush( msg: IMsg ){
         let corpId = msg.CorpId;
-        let key = 'company_events:' + corpId;
-        await cache.rpush( key, msg );
-        if(!DDEventCorpId[corpId]){
-            DDEventCorpId[corpId] = true;
-            await this.dealEvent( corpId );
-        }else{
-            console.log("this key is running ===> ", corpId);
+        if (corpId) {
+            let key = 'company_events:' + corpId;
+            await cache.rpush( key, msg );
+            if(!DDEventCorpId[corpId]){
+                DDEventCorpId[corpId] = true;
+                await this.dealEvent( corpId );
+            }else{
+                console.log("this key is running ===> ", corpId);
+            }
         }
 
         console.log("DDEventCorpId====>", DDEventCorpId);
@@ -270,6 +272,7 @@ export default class DDTalk {
         if (comPros && comPros.length) {
             let comPro = comPros[0];
             let company = await Models.company.get(comPro.companyId);
+            if (!company) throw new Error('company is null')
             if (company.isSuiteRelieve) {
                 let err = new Error(`企业还未授权或者已取消授权`);
                 throw err;
@@ -281,7 +284,7 @@ export default class DDTalk {
             let isvApi = new ISVApi(config.suiteid, suiteToken, orgid, comPermanentCodePros[0].value);
             let corpApi = await isvApi.getCorpApi();
             let ticketObj = await corpApi.getTicket();    //获取到了ticket
-            let arr = [];
+            let arr: string[] = [];
             arr.push('noncestr='+noncestr)
             arr.push('jsapi_ticket='+ticketObj.ticket);
             arr.push('url='+url);
@@ -309,6 +312,7 @@ export default class DDTalk {
         if (comPros && comPros.length) {
             let comPro = comPros[0];
             let company = await Models.company.get(comPro.companyId);
+            if (!company) throw new Error('company is null')
             if (company.isSuiteRelieve) {
                 let err = new Error(`企业还未授权或者已取消授权`);
                 throw err;
@@ -325,12 +329,12 @@ export default class DDTalk {
             //查找是否已经绑定账号
             // let ddtalkUsers = await Models.ddtalkUser.find( { where: {corpid: corpid, ddUserId: dingTalkUser.userId}});
             let staffPro = await Models.staffProperty.find({where : {value: dingTalkUser.userId, type: SPropertyType.DD_ID}});
-            let staff: Staff;
+            let staff: Staff | null = null;
             if (staffPro && staffPro.length) {
                 for(let s of staffPro){
                     let st = await Models.staff.get(s.staffId);
                     let staffCorpPro = await Models.staffProperty.find({where : {value: corpid, type: SPropertyType.DD_COMPANY_ID,
-                    staffId: st.id}});
+                    staffId: st && st.id}});
                     if(staffCorpPro && staffCorpPro.length){
                         staff = st;
                     }
@@ -358,6 +362,7 @@ export default class DDTalk {
         url = url || '#';
         picurl = picurl || 'http://j.jingli365.com/ionic/images/dingtalk-shareicon.png';
         let staff = await Models.staff.get(accountId);
+        if (!staff) throw new Error('staff is null')
         let company = staff.company;
         /*let corp = await Models.ddtalkCorp.get(company.id);
         let ddtalkUser = await Models.ddtalkUser.get(staff.id);*/
@@ -412,12 +417,12 @@ function getRndStr(length: number) : string {
 
 export interface IMsg {
     SuiteTicket?: string,
-    AuthCorpId?: string,
-    AuthCode?: string,
+    AuthCorpId: string,
+    AuthCode: string,
     EventType: string,
     SuiteKey: string,
     TimeStamp: number,
     CorpId?: string,
-    UserId?: string[],
-    DeptId?: string[]
+    UserId: string[],
+    DeptId: string[]
 }

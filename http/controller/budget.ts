@@ -58,9 +58,9 @@ export class BudgetController extends AbstractController {
 
         let {query} = oldBudgetInfo;
         query['staffId'] = approve["submitter"];
-        let budgetId = await ApiTravelBudget.getTravelPolicyBudget(query);
+        let {budgetId} = await ApiTravelBudget.getTravelPolicyBudgetNew(query, true, id);
         let budgetInfo = await ApiTravelBudget.getBudgetInfo({id: budgetId, accountId: approve['submitter']});
-        let result = transform(budgetInfo.budgets, staff.travelPolicyId);
+        let result = transform(budgetInfo.budgets, staff ? staff.travelPolicyId : '');
         res.json(this.reply(0, result));
     }
 
@@ -133,8 +133,10 @@ function transform(budgetItems: Array<ITravelBudgetInfo >, travelPolicyId: strin
                 checkInDate: budget.checkInDate,
                 checkOutDate: budget.checkOutDate,
                 star: budget.star,
-        } as ITravelBudgetInfo;
-    }});
+            } as ITravelBudgetInfo;
+        }
+        return budget
+    });
     return budgets;
 }
 
@@ -146,7 +148,7 @@ export interface ITravelBudgetInfo {
     unit?: string;
     agent?: string;  //代理商
     cabin?: number;
-    price?: number;
+    price: number;
     toCity?: string;
     bookurl?: string;
     prefers?: Array<any>;

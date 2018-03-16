@@ -18,7 +18,7 @@ import DdCompany from "../../api/ddtalk/lib/ddCompany";
 
 export class SyncData {
 
-    async createOaDepartment(params:{company: Company, department?: Department, type?: string}): Promise<OaDepartment>{
+    async createOaDepartment(params:{company: Company, department?: Department, type?: string}): Promise<OaDepartment | null>{
         let company = params.company;
         let department = params.department;
         let type = await company.getOaType();
@@ -97,7 +97,7 @@ export class SyncData {
         return null;
     }
 
-    static async createOaStaff(params:{staff: Staff}): Promise<OaStaff>{
+    static async createOaStaff(params:{staff: Staff}): Promise<OaStaff | null>{
         let staff = params.staff;
         let company = staff.company;
         let type = await company.getOaType();
@@ -136,7 +136,7 @@ export class SyncData {
 
     async syncOrganization(params: {company: Company, department?: Department}): Promise<boolean> {
         let oaDepartment = await this.createOaDepartment({company: params.company, department: params.department});
-        await oaDepartment.sync();
+        oaDepartment && await oaDepartment.sync();
         return true;
 
     }

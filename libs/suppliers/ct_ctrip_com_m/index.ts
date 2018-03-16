@@ -218,10 +218,10 @@ export default class SupplierCtripCT extends SupplierWebRobot{
             return item.OrderStatus[0] === '已成交';
         })
         //console.log(JSON.stringify(list, null, ' '));
-        let ps = list.map(async (item: any) :Promise<SupplierOrder> => {
+        let ps = list.map(async (item: any) :Promise<SupplierOrder|null> => {
             let res = await this.asyncCall('http://ct.ctrip.com/m/OrderDetail/Flight', { OrderNumber: item.OrderNumber });
             if(!res.body.Result)
-                return null as SupplierOrder;
+                return null;
             let order = res.body.Response.OrderDetailBase;
             return {
                 id: 'ct_ctrip_com_'+item.OrderNumber,
@@ -253,7 +253,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         let ret = await Promise.all(list.map(async (item: any) => {
             let res = await this.asyncCall('http://ct.ctrip.com/m/OrderDetail/Hotel', { OrderNumber: item.OrderNumber });
             if(!res.body.Result)
-                return null as SupplierOrder;
+                return null;
             let order = res.body.Response.OrderDetailBase;
             return {
                 id: 'ct_ctrip_com_'+item.OrderNumber,
@@ -280,7 +280,7 @@ export default class SupplierCtripCT extends SupplierWebRobot{
         let ret = await Promise.all(list.map(async (item: any) => {
             let res = await this.asyncCall('http://ct.ctrip.com/m/OrderDetail/Train', { OrderNumber: item.OrderNumber });
             if(!res.body.Result)
-                return null as SupplierOrder;
+                return null;
             let order = res.body.Response.OrderDetailBase;
             let passengers = order.Passenger ? order.Passenger.map((p: { [key: string]: any}) => p.name) : [];
             if (!passengers.length && order.Train.passenger) {
