@@ -2140,7 +2140,7 @@ class TripPlanModule {
         }
 
         API.tripApprove.sendApprovePassNoticeToCompany({ approveId: approve.id })
-        .catch((err) => { 
+        .catch((err: Error) => { 
             logger.error('发送审批通过通知给企业时发生错误:', err);
         })
 
@@ -2148,7 +2148,7 @@ class TripPlanModule {
         API.notify.submitNotify({
             userId: account.id, key: tplName,
             values: { tripPlan: tripPlan, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE }
-        }).catch((err) => {
+        }).catch((err: Error) => {
             logger.error('发送审批通过通知给用户时发生错误:', err);
         })
 
