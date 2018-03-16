@@ -7,13 +7,74 @@ import {ICompanyChargeParam, IStaffPoint2CoinParam, IStaffCostCoinParam} from ".
 import {Models} from "_types/index";
 import {requireParams, clientExport} from "@jingli/dnode-api/dist/src/helper";
 import {PointChange} from "_types/staff";
-import {CoinAccount, CoinAccountChange} from "_types/coin";
+import {CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE} from "_types/coin";
 import {FindResult} from "common/model/interface";
 import L from '@jingli/language';
 import {DB} from '@jingli/database';
+import { Company } from '_types/company';
+let crypto = require('crypto');
+// 增加鲸币接口用户名 密码 key用于md5校验
+const username: string = 'jingli2016';
+const pwd: string = 'jinglizhixiang';
+const key: string = 'JLZX';
 
 
 class CoinModule {
+
+    /**
+     * 企业增加鲸币接口
+     * @author lizeilin
+     * @param authData: {authStr, timestamp}, companyId: string, coins: number
+     * @description username,pwd,key,timestamp 通过md5加密校验
+     * @return
+     */
+    @clientExport
+    static async addCompanyJLCoin(params: {authData: any, companyId: string, coins: number}): Promise<CoinAccount> {
+        let {authData, companyId, coins} = params;
+        if (authData && typeof authData == 'string') {
+            authData = JSON.parse(authData);
+        }
+
+        // 校验authStr  md5
+        let authStr: string = authData.authStr;
+        let timestamp: string = authData.timestamp;
+        
+        let plainText: string = username + pwd + key + timestamp;
+        let md5 = crypto.createHash("md5");
+        let cipherText: string = md5.update(plainText).digest('hex');
+        if (authStr != cipherText) {
+            throw Error('校验失败！请求失败！');
+        }
+
+        let company: Company | undefined;
+        let companyCoinAccount: CoinAccount | undefined;
+        let companyCoinAccountChange: CoinAccountChange | undefined;
+
+        try {
+            await DB.transaction(async function(t) {
+                company = await Models.company.get(companyId);
+                //增加鲸币
+                companyCoinAccount = await Models.coinAccount.get(company.coinAccountId);
+                companyCoinAccount.income += coins;
+                companyCoinAccount.save();
+
+                //增加记录
+                companyCoinAccountChange = await Models.coinAccountChange.create({
+                    coinAccountId: company.coinAccountId,
+                    remark: `企业充值鲸币${coins}`,
+                    type: COIN_CHANGE_TYPE.INCOME,
+                    coins: coins
+                });
+                companyCoinAccountChange.save();
+            })
+        } catch (err) {
+            companyCoinAccount && companyCoinAccount.reload();
+            companyCoinAccountChange && companyCoinAccountChange.reload();
+            throw err;
+        }
+        return await Models.coinAccount.get(company.coinAccountId);;
+
+    }
 
     @requireParams(["companyId", "coins"], ['remark'])
     static async companyCharge(params: ICompanyChargeParam) :Promise<CoinAccount>{
