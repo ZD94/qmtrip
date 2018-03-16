@@ -23,7 +23,7 @@ export class CoinController extends AbstractController {
     /**
      * 增加企业或员工鲸币
      * @author lizeilin
-     * @param {req.params: staffId or companyId, req.body: {type, coins}}
+     * @param {req.params: staffId or companyId, req.body: {type, coins, remark}}
      * @return {coinAccount, coinAccountChange}
      */
     @Router('/:id/addCoin', 'POST')
@@ -38,8 +38,9 @@ export class CoinController extends AbstractController {
         }
         let type: addCoinType = body.type;
         let coins: number = body.coins;
+        let remark: string = body.remark;
 
-        let result = await API['coin'].addCompanyJLCoin({type: type, coins: coins, id: id});
+        let result = await API['coin'].addJLCoin({type: type, coins: coins, id: id, remark: remark});
         res.json(this.reply(0, result));
     }
 }

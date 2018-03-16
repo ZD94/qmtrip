@@ -18,39 +18,32 @@ import { addCoinType } from 'http/controller/coin';
 class CoinModule {
 
     /**
-     * 企业增加鲸币接口
+     * 企业或员工增加鲸币接口
      * @author lizeilin
-     * @param {type: addCoinType, coins: number, id: string}
+     * @param {type: addCoinType, coins: number, id: string, remark: string}
      * @return {coinAccount, coinAccountChange}
      */
-    static async addCompanyJLCoin(params: {type: addCoinType, coins: number, id: string}): Promise<any> {
-        let {type, coins, id} = params;
+    static async addJLCoin(params: {type: addCoinType, coins: number, id: string, remark: string}): Promise<any> {
+        let {type, coins, id, remark} = params;
         let result: any;
+        let idOfCompanyOrStaff: string;
         if (type == addCoinType.CORP) {
             let company: Company = await Models.company.get(id);
-            let coinAccount: CoinAccount = await Models.coinAccount.get(company.coinAccountId);
-            let remark = `企业${company.name}增加鲸币${coins}`;
-            try {
-                await DB.transaction(async function(t) {
-                   result = await coinAccount.addCoin(coins, remark, null, COIN_CHANGE_TYPE.INCOME);
-                })
-            } catch(err) {
-                coinAccount && coinAccount.reload();
-                throw err;
-            }
+            idOfCompanyOrStaff = company.coinAccountId;
+    
         }
         if (type == addCoinType.STAFF) {
             let staff: Staff = await Models.staff.get(id);
-            let coinAccount: CoinAccount = await Models.coinAccount.get(staff.coinAccountId);
-            let remark = `员工${staff.name}增加鲸币${coins}`;
-            try {
-                await DB.transaction(async function(t) {
-                    result = await coinAccount.addCoin(coins, remark, null, COIN_CHANGE_TYPE.INCOME);
-                })
-            } catch(err) {
-                coinAccount && coinAccount.reload();
-                throw err;
-            }
+            idOfCompanyOrStaff = staff.coinAccountId;
+        }
+        let coinAccount: CoinAccount | undefined = await Models.coinAccount.get(idOfCompanyOrStaff);
+        try {
+            await DB.transaction(async function(t) {
+                result = await coinAccount.addCoin(coins, remark, null, COIN_CHANGE_TYPE.INCOME);
+            })
+        } catch(err) {
+            coinAccount && coinAccount.reload();
+            throw err;
         }
         return result;
         
