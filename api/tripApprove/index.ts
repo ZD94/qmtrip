@@ -21,6 +21,7 @@ import {DB} from "@jingli/database";
 import {ITripApprove, IDestination} from "../../_types/tripApprove";
 import {EApproveStatus, EApproveType} from "_types/approve/types";
 import { Place } from '_types/place';
+import TripApproveEvent from 'api/eventListener/tripApproveEvent'
 
 export default class TripApproveModule {
 
@@ -1008,7 +1009,7 @@ export default class TripApproveModule {
             companyId = currentStaff["companyId"];
         }
 
-        let tripApprove = await API.eventListener.sendRequestToApprove({
+        let tripApprove = await TripApproveEvent.sendRequestToApprove({
             modelName: 'tripApprove',
             methodName:'getTripApprove',
             data: params,
@@ -1042,7 +1043,7 @@ export default class TripApproveModule {
         //     delete params.budgetInfo;
         //=====end 当budgetInfo可以获取到时，以上代码可以删除
 
-        let tripApprove = await API.eventListener.sendRequestToApprove({
+        let tripApprove = await TripApproveEvent.sendRequestToApprove({
             modelName: 'tripApprove',
             methodName:'updateTripApprove',
             data: params,
@@ -1059,7 +1060,7 @@ export default class TripApproveModule {
             companyId = currentStaff["companyId"];
         }
 
-        let tripApprove = await API.eventListener.sendRequestToApprove({
+        let tripApprove = await TripApproveEvent.sendRequestToApprove({
             modelName: 'tripApprove',
             methodName:'getTripApproves',
             data: params,
@@ -1076,7 +1077,7 @@ export default class TripApproveModule {
             companyId = currentStaff["companyId"];
         }
 
-        let tripApprove = await API.eventListener.sendRequestToApprove({
+        let tripApprove = await TripApproveEvent.sendRequestToApprove({
             modelName: 'tripApprove',
             methodName:'deleteTripApprove',
             data: params,
