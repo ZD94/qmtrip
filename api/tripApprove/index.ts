@@ -727,9 +727,10 @@ export default class TripApproveModule {
                 } catch(err) {
                     console.error(err);
                 }
+                let tripApprove = await TripApproveModule.getTripApprove({id: approve.id});
                 try {
                     await API.notify.submitNotify({userId: user && user.id, key: 'qm_notify_approve_not_pass',
-                        values: { tripApprove: approve, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
+                        values: { tripApprove: tripApprove, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
                 } catch(err) { console.error(err);}
             }
 
