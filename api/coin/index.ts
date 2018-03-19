@@ -31,11 +31,13 @@ class CoinModule {
             let company: Company = await Models.company.get(id);
             idOfCompanyOrStaff = company.coinAccountId;
     
-        }
-        if (type == addCoinType.STAFF) {
+        } else if (type == addCoinType.STAFF) {
             let staff: Staff = await Models.staff.get(id);
             idOfCompanyOrStaff = staff.coinAccountId;
+        } else {
+            throw Error('add coin type 类型错误!');
         }
+
         let coinAccount: CoinAccount | undefined = await Models.coinAccount.get(idOfCompanyOrStaff);
         try {
             await DB.transaction(async function(t) {
@@ -46,8 +48,6 @@ class CoinModule {
             throw err;
         }
         return result;
-        
-
     }
 
     @requireParams(["companyId", "coins"], ['remark'])
