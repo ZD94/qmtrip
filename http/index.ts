@@ -15,6 +15,7 @@ import path = require("path");
 import express = require("express");
 import { Request, Response, NextFunction } from 'express';
 import { Application } from 'express-serve-static-core';
+import { verifySign } from 'server-auth/node_modules/@jingli/sign';
 
 let router = express.Router();
 scannerDecoration(path.join(__dirname, 'controller'));
@@ -73,6 +74,20 @@ export async function initHttp(app: Application) {
             return res.sendStatus(403)
         })
     }, router);
+    app.use('/openapi/v1', jlReply);
+    app.use('/openapi/v1', (req: Request, res: Response, next?: NextFunction) => {
+        if (!next) return;
+        let appId: string = req.headers['appid'];
+        let sign: string = req.headers['sign'];
+        if (!appId || !sign || appId != config.openapi.appId) {
+            return res.sendStatus(403);
+        }
+        let appSecret: string = config.openapi.appSecret;
+        if (verifySign(getParams(req), sign, appSecret)) {
+            return next();
+        }
+        return res.sendStatus(403);
+    });
 }
 
 export function jlReply(req: any, res: any, next?: NextFunction) {
@@ -87,4 +102,18 @@ export function jlReply(req: any, res: any, next?: NextFunction) {
         res.end();
     }
     next && next();
+}
+
+export function getParams(req: Request) {
+    const { method } = req
+
+    switch (method.toUpperCase()) {
+        case 'GET':
+            return req.query;
+        case 'POST':
+        case 'PUT':
+            return req.body;
+        case 'DELETE':
+            return Object.create(null);
+    }
 }
