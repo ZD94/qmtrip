@@ -2,8 +2,11 @@
  * Created by wlh on 15/12/12.
  */
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
-import { Models, EGender } from '_types'
-import { ETripType, ICreateBudgetAndApproveParamsNew, QMEApproveStatus, EApproveResult, EBackOrGo } from "_types/tripPlan";
+import { Models, EGender, EModifyStatus } from '_types'
+import {
+    ETripType, ICreateBudgetAndApproveParamsNew, QMEApproveStatus, EApproveResult, EBackOrGo,
+    ISegment
+} from "_types/tripPlan";
 import {Approve, EApproveStatus, EApproveChannel} from '_types/approve';
 import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
@@ -30,7 +33,7 @@ import {
     combineData
 } from "./meiya";
 import {Application, Request, Response, NextFunction} from 'express';
-
+var moment = require('moment');
 let RestfulAPIUtil = restfulAPIUtil;
 
 import { DB } from "@jingli/database";
@@ -329,9 +332,11 @@ export default class ApiTravelBudget {
 
     //用于接收更新预算，并更新approve表和tripapprove上次
     @clientExport
-    static async updateBudget(params: { approveId: string, budgetResult: any, isFinalFirstResponse?: boolean }) {
+    static async updateBudget(params: { approveId: string, budgetResult: any, isFinalFirstResponse?: boolean, modifiedId?: string }) {
         let approve = await Models.approve.get(params.approveId);
 
+        let oldId = '';
+        if(params.modifiedId) oldId = params.modifiedId;
         if(!approve || !approve.id)
             return;
         // check tripApprove status; if passed, rejected or locked, the budget will not be updated
@@ -390,7 +395,8 @@ export default class ApiTravelBudget {
                 if (approve.step === STEP.FINAL && company.oa != EApproveChannel.AUTO) {
                     let params = {approveNo: approve.id};
                     let tripApprove = await API.tripApprove.retrieveDetailFromApprove(params);
-                    
+
+                    if(oldId) tripApprove.oldId = oldId;
                     let returnApprove = await API.eventListener.sendEventNotice({ eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: approve.companyId });
                     if(returnApprove){
                         let tripPlanLog = Models.tripPlanLog.create({
@@ -424,6 +430,114 @@ export default class ApiTravelBudget {
         }
     }
 
+    /**
+     * 修改行程处理参数和原预算结果
+     * @param {ICreateBudgetAndApproveParamsNew} params
+     * @param {string} approveId
+     * @returns {Promise<{params: any; oldBudgets: any; _index: number}>}
+     */
+    static async dealModifyParams(params: ICreateBudgetAndApproveParamsNew, approveId: string): Promise<{params: any, oldBudgets: any, _index: number}>{
+        let destinationPlacesInfo = params.destinationPlacesInfo;
+        let resultDestinationPlacesInfo: ISegment[] = [];
+        let oldBudgets: any = [];
+        let approve = await Models.approve.get(approveId);
+        let data = approve.data;
+        if(typeof data == 'string'){
+            data = JSON.parse(data);
+        }
+        let _index = -1;//You用重新拉回来的预算index从_index -1 开始判断
+        destinationPlacesInfo.forEach((item, index) => {
+            if(item.leaveDate && (item.leaveDate.getTime() - new Date().getTime()) > 0){
+                //该段行程未开始 用新参数拉取新预算
+                _index = index;
+                resultDestinationPlacesInfo.push(item);
+            }else{
+                if(item.goBackDate && (item.goBackDate.getTime() - new Date().getTime()) > 0){
+                    //该段行程已部分结束 保留部分原有预算结果 部分重新拉取预算
+                    let days = moment(new Date()).startOf('day').diff(moment(item.leaveDate).startOf('day'), "days");
+                    data.budgets.forEach((b => {
+                        if(b.index == index){
+                            //保留部分原有预算结果
+                            if(b.type == ETripType.OUT_TRIP){
+                                b.budgetSource = "oldBudgetComplete";
+                                oldBudgets.push(b);
+                            }
+
+                            if((b.type == ETripType.HOTEL || b.type == ETripType.SUBSIDY) && days > 0){
+                                b.budgetSource = "oldBudgetIncomplete";
+                                b.price = b.singlePrice * days;
+                                b.duringDays = days;
+                                oldBudgets.push(b);
+                            }
+                        }
+                    }))
+                    //部分重新拉取预算
+                    item.leaveDate = new Date();
+                    item.isNeedTraffic = false;
+                    resultDestinationPlacesInfo.push(item);
+
+                }else{
+                    //该段行程已完全结束 保留原有预算结果 不需重新拉取预算
+                    data.budgets.forEach((b => {
+                        if(b.index == index){
+                            b.budgetSource = "oldBudgetComplete";
+                            oldBudgets.push(b);
+                        }
+                    }))
+                }
+            }
+
+
+        })
+
+        params.destinationPlacesInfo = resultDestinationPlacesInfo;
+
+        return {params: params, oldBudgets: oldBudgets, _index: _index};
+
+    }
+
+    /**
+     * 修改行程后整合老预算与新预算
+     * @param {any[]} oldbudget
+     * @param {any[]} newBudget
+     * @returns {any[]}
+     */
+    static async mergeBudget(oldbudget: any[], newBudget: any[]){
+        let resultBudget: any[] = oldbudget;
+        let oldIndex = oldbudget[oldbudget.length -1].index + 1;
+        let mergeItem = false;
+        for(let budget of oldbudget){
+            if(budget.index == (oldIndex-1) && budget.budgetSource == 'oldBudgetIncomplete'){
+                oldIndex = oldIndex - 1;
+                mergeItem = true;
+                break;
+            }
+        }
+
+        newBudget.forEach((item) => {
+            if(item.index == 0 && mergeItem){
+                //拼接budgetItem
+                item.index = item.index + oldIndex;
+                oldbudget.forEach((oldItem, index) => {
+                    if(oldItem.index == oldIndex && oldItem.type == item.type && oldItem.budgetSource == 'oldBudgetIncomplete'){
+                        item.price = item.price + oldItem.price;
+                        item.duringDays = item.duringDays + oldItem.duringDays;
+                        if(item.type == ETripType.HOTEL) item.checkInDate = oldItem.checkInDate;
+                        if(item.type == ETripType.SUBSIDY) item.fromDate = oldItem.fromDate;
+                        resultBudget.splice(index, 1, item);
+                    }
+                })
+
+            }else{
+                item.index = item.index + oldIndex;
+                resultBudget.push(item);
+            }
+
+        })
+
+        return resultBudget;
+    }
+
 
     /**
      * @method getTravelPolicyBudgetNew
@@ -449,7 +563,10 @@ export default class ApiTravelBudget {
      * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
      */
     @clientExport
-    static async getTravelPolicyBudgetNew(params: ICreateBudgetAndApproveParamsNew, isIntoApprove: boolean, approveId?: string): Promise<any> {
+    static async getTravelPolicyBudgetNew(params: ICreateBudgetAndApproveParamsNew, isIntoApprove: boolean, approveId?: string, modifiedId?: string): Promise<any> {
+
+        let getBudgetParams = params;
+        let oldBudgets = [];
 
         let staffId = params['staffId'];
         let preferedCurrency = params["preferedCurrency"];
@@ -556,6 +673,14 @@ export default class ApiTravelBudget {
                 title: feeCollectedName
             });
             approveId = approve.id;
+            if(modifiedId) approve.oldId = modifiedId;
+
+        }
+
+        if(modifiedId){
+            let modifyParams = await ApiTravelBudget.dealModifyParams(params, modifiedId);
+            getBudgetParams = modifyParams.params;
+            oldBudgets = modifyParams.oldBudgets;
         }
 
         let budgetResult: any = await ApiTravelBudget.createNewBudget({
@@ -564,10 +689,10 @@ export default class ApiTravelBudget {
             travelPolicyId: travelPolicy['id'],
             companyId,
             staffs,
-            destinationPlacesInfo: params.destinationPlacesInfo,
-            originPlace: params.originPlace,
-            isRoundTrip: params.isRoundTrip,        //是否为往返
-            goBackPlace: params.goBackPlace         //返回地
+            destinationPlacesInfo: getBudgetParams.destinationPlacesInfo,
+            originPlace: getBudgetParams.originPlace,
+            isRoundTrip: getBudgetParams.isRoundTrip,        //是否为往返
+            goBackPlace: getBudgetParams.goBackPlace         //返回地
         });
 
         
@@ -580,12 +705,16 @@ export default class ApiTravelBudget {
         });
         let budgets = await Promise.all(ps);
 
+        if(modifiedId && oldBudgets && oldBudgets.length){
+            budgets = await ApiTravelBudget.mergeBudget(oldBudgets, budgets);
+        }
+
 
         //计算总预算用于更新approve
         let eachBudgetSegIsOk: boolean = true;
         let totalBudget = 0;
         budgets.forEach(function (item) {
-            if (item.tripType != ETripType.SUBSIDY) {
+            if (item.tripType != ETripType.SUBSIDY && !item.budgetSource) {
                 tripNumCost = tripNumCost + 1;
             }
             if (item.price < 0) {
@@ -598,7 +727,12 @@ export default class ApiTravelBudget {
         }
         if (eachBudgetSegIsOk && !isIntoApprove) {
             approve && await approve.save();
-        } 
+            if(modifiedId){
+                let modifiedApprove = await Models.approve.get(modifiedId);
+                modifiedApprove.modifyStatus = EModifyStatus.MODIFYING;
+                await modifiedApprove.save();
+            }
+        }
         if (!eachBudgetSegIsOk) {
             throw L.ERR.ERROR_CODE_C(500, '获取预算失败，请稍后重试');
         }
@@ -644,7 +778,8 @@ export default class ApiTravelBudget {
                 await ApiTravelBudget.updateBudget({
                     approveId: approveId || '',
                     budgetResult: budgetResult,
-                    isFinalFirstResponse: (isIntoApprove ? false : true)
+                    isFinalFirstResponse: (isIntoApprove ? false : true),
+                    modifiedId: modifiedId
                 });
             }
         }).catch(async function (err: Error) {
