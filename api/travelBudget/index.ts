@@ -41,6 +41,7 @@ import { EApproveType, STEP } from '_types/approve';
 import { Transaction } from 'sequelize';
 import {ECostCenterType} from "_types/costCenter/costCenter";
 import {IStaffSnapshot} from "../../_types/staff/staff";
+import _ = require('lodash');
 
 export interface ICity {
     name: string;
@@ -334,11 +335,10 @@ export default class ApiTravelBudget {
 
     //用于接收更新预算，并更新approve表和tripapprove上次
     @clientExport
-    static async updateBudget(params: { approveId: string, budgetResult: any, isFinalFirstResponse?: boolean, modifiedId?: string }) {
+    static async updateBudget(params: { approveId: string, budgetResult: any, isFinalFirstResponse?: boolean }) {
         let approve = await Models.approve.get(params.approveId);
 
-        let oldId = '';
-        if(params.modifiedId) oldId = params.modifiedId;
+        let oldId = approve.oldId;
         if(!approve || !approve.id)
             return;
         // check tripApprove status; if passed, rejected or locked, the budget will not be updated
@@ -375,6 +375,20 @@ export default class ApiTravelBudget {
             let companyId = staff.company.id;
 
             let _budgets = params.budgetResult.budgets;
+            //预算服务回调更新预算是也需要做新老预算合并
+            let oldBudgets = [];
+            if(oldId){
+                let data = approve.data;
+                if(typeof data == 'string') data = JSON.parse(data);
+                let params = data.query;
+                if(typeof params == 'string') params = JSON.parse(params);
+                let modifyParams = await ApiTravelBudget.dealModifyParams(params);
+                oldBudgets = modifyParams.oldBudgets;
+            }
+
+            if(oldId && oldBudgets && oldBudgets.length){
+                _budgets = await ApiTravelBudget.mergeBudget(oldBudgets, _budgets);
+            }
             let ps: Promise<any>[] = _budgets.map(async (item: ICreateBudgetAndApproveParamsNew) => {
                 return await ApiTravelBudget.transformBudgetData(item, companyId);
             });
@@ -438,7 +452,8 @@ export default class ApiTravelBudget {
      * @param {string} approveId
      * @returns {Promise<{params: any; oldBudgets: any; _index: number}>}
      */
-    static async dealModifyParams(params: ICreateBudgetAndApproveParamsNew): Promise<{params: any, oldBudgets: any, _index: number}>{
+    static async dealModifyParams(_params: ICreateBudgetAndApproveParamsNew): Promise<{params: any, oldBudgets: any, _index: number}>{
+        let params = _.cloneDeep(_params);
         let approveId = params.modifiedId;
         let destinationPlacesInfo = params.destinationPlacesInfo;
         let resultDestinationPlacesInfo: ISegment[] = [];
@@ -450,6 +465,8 @@ export default class ApiTravelBudget {
         }
         let _index = -1;//You用重新拉回来的预算index从_index -1 开始判断
         destinationPlacesInfo.forEach((item, index) => {
+            if(!(item.leaveDate instanceof Date)) item.leaveDate = moment(item.leaveDate).toDate();
+            if(!(item.goBackDate instanceof Date)) item.goBackDate = moment(item.goBackDate).toDate();
             if(item.leaveDate && (item.leaveDate.getTime() - new Date().getTime()) > 0){
                 //该段行程未开始 用新参数拉取新预算
                 _index = index;
@@ -461,7 +478,7 @@ export default class ApiTravelBudget {
                     data.budgets.forEach((b => {
                         if(b.index == index){
                             //保留部分原有预算结果
-                            if(b.type == ETripType.OUT_TRIP){
+                            if(b.tripType == ETripType.OUT_TRIP){
                                 b.budgetSource = "oldBudgetComplete";
                                 oldBudgets.push(b);
                             }
@@ -475,7 +492,7 @@ export default class ApiTravelBudget {
                         }
                     }))
                     //部分重新拉取预算
-                    item.leaveDate = new Date();
+                    item.leaveDate = moment().add(1, 'h').toDate();//不能直接用now()拉取预算时时间可能已经过了会报错
                     item.isNeedTraffic = false;
                     resultDestinationPlacesInfo.push(item);
 
@@ -494,7 +511,6 @@ export default class ApiTravelBudget {
         })
 
         params.destinationPlacesInfo = resultDestinationPlacesInfo;
-
         return {params: params, oldBudgets: oldBudgets, _index: _index};
 
     }
@@ -567,6 +583,13 @@ export default class ApiTravelBudget {
      */
     @clientExport
     static async getTravelPolicyBudgetNew(params: ICreateBudgetAndApproveParamsNew, isIntoApprove: boolean, approveId?: string): Promise<any> {
+        //测试
+        /*params.modifiedId = '4b8aec10-2b4a-11e8-a6d1-5f5b59e775c0';
+        params.destinationPlacesInfo.forEach((d, index) => {
+            d.leaveDate = moment(d.leaveDate).subtract(6, 'days').toDate();
+            d.goBackDate = moment(d.goBackDate).subtract(6, 'days').toDate();
+            params.destinationPlacesInfo[index] = d;
+        })*/
 
         let modifiedId = params.modifiedId;
         let getBudgetParams = params;
@@ -782,8 +805,7 @@ export default class ApiTravelBudget {
                 await ApiTravelBudget.updateBudget({
                     approveId: approveId || '',
                     budgetResult: budgetResult,
-                    isFinalFirstResponse: (isIntoApprove ? false : true),
-                    modifiedId: modifiedId
+                    isFinalFirstResponse: (isIntoApprove ? false : true)
                 });
             }
         }).catch(async function (err: Error) {
