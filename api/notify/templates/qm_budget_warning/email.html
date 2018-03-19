@@ -20,7 +20,7 @@
         #4A4A4A">
                             <%=noticeType == "monthly" ? "月度" : "总"%>预算</td>
                         <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A">
-                            <%=totalBudget.toFixed(2)%>
+                            <%= totalBudget && totalBudget.toFixed(2) || 0 %>
                         </td>
                     </tr>
                     <tr>
@@ -33,7 +33,7 @@
                     <tr>
                         <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A">预算支出</td>
                         <td style="padding-left: 15px;border: 1px solid #DCDCDC;font-size: 14px;color: #4A4A4A">
-                            <%= expendBudget.toFixed(2) %>
+                            <%= expendBudget && expendBudget.toFixed(2) || 0 %>
                         </td>
                     </tr>
                     <tr>
