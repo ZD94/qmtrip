@@ -438,7 +438,8 @@ export default class ApiTravelBudget {
      * @param {string} approveId
      * @returns {Promise<{params: any; oldBudgets: any; _index: number}>}
      */
-    static async dealModifyParams(params: ICreateBudgetAndApproveParamsNew, approveId: string): Promise<{params: any, oldBudgets: any, _index: number}>{
+    static async dealModifyParams(params: ICreateBudgetAndApproveParamsNew): Promise<{params: any, oldBudgets: any, _index: number}>{
+        let approveId = params.modifiedId;
         let destinationPlacesInfo = params.destinationPlacesInfo;
         let resultDestinationPlacesInfo: ISegment[] = [];
         let oldBudgets: any = [];
@@ -565,8 +566,9 @@ export default class ApiTravelBudget {
      * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
      */
     @clientExport
-    static async getTravelPolicyBudgetNew(params: ICreateBudgetAndApproveParamsNew, isIntoApprove: boolean, approveId?: string, modifiedId?: string): Promise<any> {
+    static async getTravelPolicyBudgetNew(params: ICreateBudgetAndApproveParamsNew, isIntoApprove: boolean, approveId?: string): Promise<any> {
 
+        let modifiedId = params.modifiedId;
         let getBudgetParams = params;
         let oldBudgets = [];
 
@@ -680,7 +682,7 @@ export default class ApiTravelBudget {
         }
 
         if(modifiedId){
-            let modifyParams = await ApiTravelBudget.dealModifyParams(params, modifiedId);
+            let modifyParams = await ApiTravelBudget.dealModifyParams(params);
             getBudgetParams = modifyParams.params;
             oldBudgets = modifyParams.oldBudgets;
         }
