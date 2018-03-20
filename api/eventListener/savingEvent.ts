@@ -1,5 +1,4 @@
 import { EventModule } from ".";
-import { Models } from '_types';
 import L from '@jingli/language';
 const _ = require('lodash');
 
@@ -12,13 +11,10 @@ export class SavingEvent extends EventModule {
         }
 
         const eventName = 'TRIP_SAVING'
-        const eventListeners = await Models.eventListener.find({
-            where: { event: eventName, companyId }
-        })
+        const eventListener = await super.findEventListener(eventName, companyId)
+        if (!eventListener) return null
 
-        if (!eventListeners || !eventListeners.length) return null
-
-        let url = _.template(eventListeners[0].url)(params.data)
+        let url = _.template(eventListener.url)(params.data)
         super.sendEventNotice({ url, body: { ...params, eventName } })
     }
 
