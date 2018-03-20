@@ -1984,6 +1984,10 @@ class StaffModule{
     @clientExport
     @requireParams(identityInfoCols)
     static async createIdentityInfo(params: IdentityInfo) {
+        const iis = await Models.identityInfo.find({
+            where: { staffId: params.staffId, certificateType: params.certificateType }
+        })
+        if (iis && iis.length > 0) throw new L.ERROR_CODE_C(400, '证件重复！')
         const entity = Models.identityInfo.create(params)
         return await entity.save()
     }
