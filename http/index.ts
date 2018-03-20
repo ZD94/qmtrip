@@ -87,7 +87,7 @@ export async function initHttp(app: Application) {
             return next();
         }
         return res.sendStatus(403);
-    });
+    }, router);
 }
 
 export function jlReply(req: any, res: any, next?: NextFunction) {
