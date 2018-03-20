@@ -1971,8 +1971,10 @@ class TripPlanModule {
         if(approve.oldId){
             tripPlan.oldId = approve.oldId;
             let modifiedTripPlan = await Models.tripPlan.get(approve.oldId);
-            modifiedTripPlan.modifyStatus = EModifyStatus.MODIFYING;
-            await modifiedTripPlan.save();
+            if(modifiedTripPlan){
+                modifiedTripPlan.modifyStatus = EModifyStatus.MODIFIED;
+                await modifiedTripPlan.save();
+            }
         }
         let log = TripPlanLog.create({ tripPlanId: tripPlan.id, userId: tryObjId(approveUser), remark: `出差审批通过，生成出差记录` });
         await Promise.all([tripPlan.save(), log.save()]);

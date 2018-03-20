@@ -412,9 +412,15 @@ export default class ApiTravelBudget {
                     let params = {approveNo: approve.id};
                     let tripApprove = await API.tripApprove.retrieveDetailFromApprove(params);
 
-                    if(oldId) tripApprove.oldId = oldId;
                     let returnApprove = await API.eventListener.sendEventNotice({ eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: approve.companyId });
                     if(returnApprove){
+                        if(oldId){
+                            let modifiedTripPlan = await Models.tripPlan.get(oldId);
+                            if(modifiedTripPlan){
+                                modifiedTripPlan.modifyStatus = EModifyStatus.MODIFYING;
+                                await modifiedTripPlan.save();
+                            }
+                        }
                         let tripPlanLog = Models.tripPlanLog.create({
                             tripPlanId: approve.id,
                             userId: approve.submitter,
