@@ -16,29 +16,24 @@ export class TripApproveEvent extends EventModule {
         }
 
         const eventName = 'NEW_TRIP_APPROVE'
+        let eventListener = await super.findEventListener(eventName, companyId)
 
-        const eventListeners = await Models.eventListener.find({
-            where: { event: eventName, companyId }
-        })
-
-        if (!eventListeners || !eventListeners.length) {
+        if (!eventListener) {
             let company = await Models.company.get(companyId);
             if (company && (company.oa == EApproveChannel.QM || company.oa == EApproveChannel.DING_TALK)) {
                 let approveServerUrl = config.approveServerUrl;
                 approveServerUrl = approveServerUrl + `/tripApprove/receive`;
-                let eventListener = EventListener.create({
+                eventListener = EventListener.create({
                     event: "NEW_TRIP_APPROVE",
                     url: approveServerUrl,
-                    method: "post",
                     companyId
                 });
                 await eventListener.save();
-                eventListeners.push(eventListener)
             } else {
                 return null
             }
         }
-        let url = _.template(eventListeners[0].url)(params.data)
+        let url = _.template(eventListener.url)(params.data)
         return await super.sendEventNotice({ url, body: { ...params, eventName } })
     }
 

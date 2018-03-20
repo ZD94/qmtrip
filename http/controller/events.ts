@@ -22,15 +22,15 @@ export class EventsController extends AbstractController {
     @Router('/registry-event-listener', "POST")
     async registryEventListener(req: Request, res: Response, next: NextFunction) {
         try {
-            let { event, url, companyId } = req.body;
+            let { event, url, companyId, startDate, endDate } = req.body;
             const eventListeners = await Models.eventListener.find({
-                where: { event, companyId }
+                where: { event, companyId, startDate, endDate }
             })
             if (eventListeners && eventListeners.length) {
                 res.json(this.reply(0, eventListeners[0]))
                 return
             }
-            let eventListener = EventListener.create({ event, url, companyId, expires: '' });
+            let eventListener = EventListener.create({ event, url, companyId, startDate, endDate });
             eventListener = await eventListener.save();
 
             res.json(this.reply(0, eventListener));
