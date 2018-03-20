@@ -1876,6 +1876,15 @@ class TripPlanModule {
         let query: any = approve.data.query;   //查询条件
         if (typeof query == 'string')
             query = JSON.parse(query);
+        
+        let budget: any = approve.data.budgets;
+        if (typeof budget == 'string') {
+            budget = JSON.parse(budget);
+        }
+        let companyTotalSaved: number = 0;
+        for (let i = 0; i < budget.length; i++) {
+            companyTotalSaved += (budget[i].highestPrice - budget[i].price);
+        }
 
         if (typeof query.destinationPlacesInfo == 'string')
             query.destinationPlacesInfo = JSON.parse(query.destinationPlacesInfo);
@@ -1954,6 +1963,7 @@ class TripPlanModule {
         tripPlan.submitterSnapshot = approve.submitterSnapshot;
         tripPlan.auditUserSnapshot = approve.approveUserSnapshot;
         tripPlan.staffListSnapshot = approve.staffListSnapshot;
+        tripPlan.companySaved = companyTotalSaved;
 
         tripPlan.readNumber = 0;
 
@@ -2988,6 +2998,21 @@ class TripPlanModule {
             });
         });
     }*/
+
+    /**
+     * 获取企业节省金额
+     * @author lizeilin
+     * @param {companyId: string}
+     * @return {companySaved: number}
+     */
+    static async getCompanySaved(companyId: string) {
+        let tripPlans: TripPlan[] = await Models.tripPlan.all({where: {companyId: companyId}});
+        let companySaved: number = 0;
+        for (let i = 0; i < tripPlans.length; i++) {
+            companySaved += tripPlans[i].companySaved;
+        }
+        return companySaved;
+    }
 
     static async getProjectByName(params: any) {
         let projects = await Models.project.find({ where: { name: params.name } });
