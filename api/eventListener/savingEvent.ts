@@ -1,8 +1,8 @@
-import { EventModule } from ".";
 import L from '@jingli/language';
+import { BaseEvent } from './baseEvent';
 const _ = require('lodash');
 
-export class SavingEvent extends EventModule {
+export class SavingEvent extends BaseEvent {
 
     async emitTripSaving(params: { data: any, companyId: string }): Promise<any> {
         let { companyId } = params;
