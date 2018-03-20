@@ -1,13 +1,14 @@
-import { EventModule } from ".";
 import { Models } from '_types';
 import { EventListener } from "_types/eventListener";
 import { EApproveChannel } from '_types/approve';
 import L from '@jingli/language';
 import { requireParams } from '@jingli/dnode-api/dist/src/helper';
+import { BaseEvent } from './baseEvent';
 const config = require("@jingli/config");
 const _ = require('lodash');
+const request = require('request-promise')
 
-export class TripApproveEvent extends EventModule {
+export class TripApproveEvent extends BaseEvent {
 
     async emitNewTripApprove(params: { data: any, companyId: string }): Promise<any> {
         let { companyId } = params;
