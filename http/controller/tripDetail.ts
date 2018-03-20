@@ -30,9 +30,9 @@ export class TripDetailController extends AbstractController {
             const staff = await Models.staff.get(tripDetail.accountId)
             const saving = tripDetail.budget - expenditure
             if (saving > 0) {
-                let points = saving * 0.05
-                points = points > 100 ? points : 100
-                await SavingEvent.emitTripSaving({ data: { points, tripDetailId: id, orderNo: params.orderNo }, companyId: staff.company.id })
+                let coins = saving * 0.05
+                coins = coins > 100 ? coins : 100
+                await SavingEvent.emitTripSaving({ data: { coins, orderNo: params.orderNo, staffId: staff.id }, companyId: staff.company.id })
             }
         }
         let obj: {[index: string]: string} = {};

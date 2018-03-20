@@ -3,7 +3,7 @@
 import { clientExport, requireParams } from '@jingli/dnode-api/dist/src/helper';
 import TripApproveEvent from './tripApproveEvent';
 
-export class EventModule {
+export default class EventModule {
 
     @clientExport
     @requireParams(['modelName', 'methodName', 'data', 'companyId'])
@@ -13,4 +13,4 @@ export class EventModule {
 
 }
 
-export default new EventModule();
+// export default new EventModule();
