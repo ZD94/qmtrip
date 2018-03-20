@@ -526,7 +526,7 @@ export default class TripApproveModule {
             await plugins.qm.tripApproveUpdateNotify(null, {
                 approveNo: tripApprove.id,
                 status: tripApprove.status,
-                approveUser: staff.id,
+                approveUser: approveUser.id,
                 outerId: tripApprove.id,
                 data: budgetInfo,
                 oa: 'qm',
