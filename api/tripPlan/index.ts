@@ -3197,11 +3197,10 @@ class TripPlanModule {
                 throw Error("type类型错误！");
             }
         } else if (type == null && departmentOrProjectId != null) {
-            let costCenterDeploy: CostCenterDeploy = await Models.costCenterDeploy.get(departmentOrProjectId);
-            let tripPlans: TripPlan[] = await Models.tripPlan.all({where: {costCenterId: costCenterDeploy.costCenterId, 
+            let tripPlans: TripPlan[] = await Models.tripPlan.all({where: {costCenterId: departmentOrProjectId, 
                 status: EPlanStatus.WAIT_RESERVE, auditStatus: EAuditStatus.NO_NEED_AUDIT, 
                 createdAt: {$gte: moment().startOf('Y').format().toString()}}});
-            let _tripPlans: TripPlan[] = await Models.tripPlan.all({where: {costCenterId: costCenterDeploy.costCenterId,
+            let _tripPlans: TripPlan[] = await Models.tripPlan.all({where: {costCenterId: departmentOrProjectId,
                 status: {$in: [EPlanStatus.EXPIRED, EPlanStatus.RESERVED]}, 
                 auditStatus: {$in: [EAuditStatus.WAIT_COMMIT, EAuditStatus.WAIT_UPLOAD, EAuditStatus.AUDITING]}, 
                 createdAt: {$gte: moment().startOf('Y').format().toString()}}});

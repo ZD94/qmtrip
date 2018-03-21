@@ -1,9 +1,10 @@
 'use strict';
-import {AbstractController, Restful, Router} from "@jingli/restful";
+import {AbstractController, Restful, Router, Group} from "@jingli/restful";
 import {Request, Response, NextFunction} from "express-serve-static-core";
 import { AnalysisType } from '_types/tripPlan';
 const API = require("@jingli/dnode-api");
 
+@Group('staffapi')
 @Restful()
 export class AnalysisController extends AbstractController {
 

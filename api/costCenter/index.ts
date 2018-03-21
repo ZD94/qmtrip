@@ -454,18 +454,40 @@ export default class CostCenterModule {
         allIds = departmentIds.concat(projectIds); 
 
         let analysisData: CostCenterAnalysis[] = [];
-        let temp: CostCenterAnalysis;
-        let costCentersAll: CostCenterDeploy[] = await Models.costCenterDeploy.all({where:{id: {$in: allIds}, createdAt: {$gte: moment().startOf('Y').format().toString()}}});
-        let costCentersDepart: CostCenterDeploy[] = await Models.costCenterDeploy.all({where: {id: {$in: departmentIds}, createdAt: {$gte: moment().startOf('Y').format().toString()}}});
-        let costCentersProj: CostCenterDeploy[] = await Models.costCenterDeploy.all({where: {id: {$in: projectIds}, createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+        let temp: CostCenterAnalysis = {costCenterName: '', budget: 0, budgetAndExpenditure: 0, budgetExecuteBias: 0, budgetExecuteRate: 0};
+        let costCentersAll: CostCenter[] = await Models.costCenter.all({where:{id: {$in: allIds}, createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+        let costCentersDepart: CostCenter[] = await Models.costCenter.all({where: {id: {$in: departmentIds}, createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+        let costCentersProj: CostCenter[] = await Models.costCenter.all({where: {id: {$in: projectIds}, createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+
+        let costCentersDeployAll: CostCenterDeploy[] = [];
+        let costCentersDeployDepart: CostCenterDeploy[] = [];
+        let costCentersDeployProj: CostCenterDeploy[] = [];
 
         let costCenters: CostCenterDeploy[] = [];
         if (type == AnalysisType.TOTAL) {
-            costCenters = costCentersAll;
+            for (let i = 0; i < costCentersAll.length; i++) {
+                let costCenterD = await Models.costCenterDeploy.all({where: {costCenterId: costCentersAll[i].id}});
+                if (!costCenterD)
+                    continue;
+                costCentersDeployAll.push(costCenterD[0]);
+            }
+            costCenters = costCentersDeployAll;
         } else if (type == AnalysisType.DEPARTMENT) {
-            costCenters = costCentersDepart;
+            for (let i = 0; i < costCentersDepart.length; i++) {
+                let costCenterD = await Models.costCenterDeploy.all({where: {costCenterId: costCentersDepart[i].id}});
+                if (!costCenterD)
+                    continue;
+                costCentersDeployDepart.push(costCenterD[0]);
+            }
+            costCenters = costCentersDeployDepart;
         } else if (type == AnalysisType.PROJECT) {
-            costCenters = costCentersProj;
+            for (let i = 0; i < costCentersProj.length; i++) {
+                let costCenterD = await Models.costCenterDeploy.all({where: {costCenterId: costCentersProj[i].id}});
+                if (!costCenterD)
+                    continue;
+                costCentersDeployProj.push(costCenterD[0]);
+            }
+            costCenters = costCentersDeployProj;
         } else {
             console.log("type类型错误!");
             throw Error("type类型错误！");
@@ -477,13 +499,16 @@ export default class CostCenterModule {
            if (temp.budget == 0) {
                continue;
            }
-           let plannedBudget: number = API.tripPlan.getPlannedBudget({companyId: companyId, departmentOrProjectId: costCenters[j].id});
+           let plannedBudget: number = await API.tripPlan.getPlannedBudget({companyId: companyId, departmentOrProjectId: costCenter.id});
            temp.budgetAndExpenditure = costCenters[j].expendBudget + plannedBudget;
            let beginDate: Date = costCenters[j].beginDate || moment().startOf('Y').format();
            let endDate: Date = costCenters[j].endDate || moment().endOf('Y').format();
            let now: Date = moment().format();
-           let periodDays: number = moment(endDate).diff(beginDate, 'D') + 1;
-           let passedDays: number = moment(now).diff(beginDate, 'D') + 1;
+           let periodDays: number = moment(endDate).diff(beginDate, 'Day') + 1;
+           let passedDays: number = moment(now).diff(beginDate, 'Day') + 1;
+           if (passedDays > periodDays) {
+               passedDays = periodDays;
+           }
            let periodBudget: number = costCenters[j].selfBudget * (passedDays/ periodDays);
            temp.budgetExecuteRate = (costCenters[j].expendBudget + plannedBudget) / costCenters[j].selfBudget;
            temp.budgetExecuteBias = (costCenters[j].expendBudget + plannedBudget) / periodBudget - 1;
@@ -510,24 +535,32 @@ export default class CostCenterModule {
         for (let i = 0; i < projects.length; i++) {
             allIds.push(projects[i].id);
         }
-        let costCentersAll: CostCenterDeploy[] = await Models.costCenterDeploy.all({where:{id: {$in: allIds}, createdAt: {$gte: moment().startOf('Y').format().toString()}}});
-        let budgetData: CostCenterAnalysis;
-        budgetData.costCenterName = '';
+        let costCentersAll: CostCenter[] = await Models.costCenter.all({where:{id: {$in: allIds}, createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+        let costCentersDeploy: CostCenterDeploy[] = [];
         for (let i = 0; i < costCentersAll.length; i++) {
-            budgetData.budget += costCentersAll[i].selfBudget;
-            let plannedBudget: number = API.tripPlan.getPlannedBudget({companyId: companyId, departmentOrProjectId: costCentersAll[i].id});
-            budgetData.budgetAndExpenditure += (costCentersAll[i].expendBudget + plannedBudget);
+            let costCenterDeploy = await Models.costCenterDeploy.all({where: {costCenterId: costCentersAll[i].id}});
+            costCentersDeploy.push(costCenterDeploy[0]);
         }
-        if (budgetData.budget == 0) {
-            budgetData.budgetExecuteBias = 0;
-            budgetData.budgetAndExpenditure = 0;
-            budgetData.budgetExecuteRate = 0;
+        let budgetData: CostCenterAnalysis = {costCenterName: '', budget: 0, budgetAndExpenditure: 0, budgetExecuteBias: 0, budgetExecuteRate: 0};
+        budgetData['costCenterName'] = '123';
+        for (let i = 0; i < costCentersDeploy.length; i++) {
+            budgetData['budget'] += costCentersDeploy[i].selfBudget;
+            let costCenter = await Models.costCenter.get(costCentersDeploy[i].costCenterId);
+            let plannedBudget: number = await API.tripPlan.getPlannedBudget({companyId: companyId, departmentOrProjectId: costCenter.id});
+            budgetData['budgetAndExpenditure'] += (costCentersDeploy[i].expendBudget + plannedBudget);
+        }
+        if (budgetData['budget'] == 0) {
+            budgetData['budgetExecuteBias'] = 0;
+            budgetData['budgetAndExpenditure'] = 0;
+            budgetData['budgetExecuteRate'] = 0;
             return budgetData;
         }
-        budgetData.budgetExecuteRate = budgetData.budgetAndExpenditure / budgetData.budget;
-        let periodDays: number = moment().endOf('Y').format().diff(moment().startOf('Y').format(), 'D');
-        let passedDays: number = moment().format().diff(moment().startOf('Y').format(), 'D'); 
-        budgetData.budgetExecuteBias = budgetData.budgetAndExpenditure / (budgetData.budget * periodDays / passedDays);
+        budgetData['budgetExecuteRate'] = budgetData.budgetAndExpenditure / budgetData.budget;
+        let periodDays: number = moment().endOf('Y').diff(moment().startOf('Y'), 'Day');
+        let passedDays: number = moment().diff(moment().startOf('Y'), 'Day'); 
+        if (passedDays > periodDays) 
+            passedDays = periodDays;
+        budgetData['budgetExecuteBias'] = budgetData.budgetAndExpenditure / (budgetData.budget * passedDays / periodDays);
 
         return budgetData;
     }
@@ -571,7 +604,7 @@ export interface ICostCenterDeploy {
 }
 
 export interface CostCenterAnalysis {
-    costCenterName: string,
+    costCenterName?: string,
     budget: number,
     budgetAndExpenditure?: number,
     budgetExecuteRate?: number,
