@@ -548,6 +548,12 @@ export default class ApiTravelBudget {
             }
         }
 
+        let mergeIndex: number[] = [];
+        newBudget.forEach((b) => {
+            if (b.index == 0) {
+                mergeIndex.push(b.type)
+            }
+        })
         newBudget.forEach((item) => {
             if(item.index == 0 && mergeItem){
                 //拼接budgetItem
@@ -559,9 +565,11 @@ export default class ApiTravelBudget {
                         if(item.type == ETripType.HOTEL) item.checkInDate = oldItem.checkInDate;
                         if(item.type == ETripType.SUBSIDY) item.fromDate = oldItem.fromDate;
                         resultBudget.splice(index, 1, item);
-                    }else{
-                        if(item.type == ETripType.HOTEL) item.checkOutDate = new Date();
-                        if(item.type == ETripType.SUBSIDY) item.endDate = new Date();
+                    }
+                    if(oldItem.index == oldIndex && oldItem.budgetSource == 'oldBudgetIncomplete' && mergeIndex.indexOf(oldItem.type) < 0){
+                        if(oldItem.type == ETripType.HOTEL) oldItem.checkOutDate = new Date();
+                        if(oldItem.type == ETripType.SUBSIDY) oldItem.endDate = new Date();
+                        resultBudget.splice(index, 1, oldItem);
                     }
                 })
 
