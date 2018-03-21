@@ -1,5 +1,5 @@
 'use strict';
-import {AbstractController, Restful, Router} from "@jingli/restful";
+import {AbstractController, Restful, Router, Group} from "@jingli/restful";
 import API from '@jingli/dnode-api';
 import { Request, Response, NextFunction } from 'express-serve-static-core';
 
@@ -9,6 +9,7 @@ export enum addCoinType {
 }
 
 
+@Group('openapi')
 @Restful()
 export class CoinController extends AbstractController {
 

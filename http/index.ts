@@ -21,6 +21,10 @@ let router = express.Router();
 scannerDecoration(path.join(__dirname, 'controller'));
 registerControllerToRouter(router);
 
+let openapiRouter = express.Router();
+scannerDecoration(path.join(__dirname, 'controller'));
+registerControllerToRouter(openapiRouter, { group: 'openapi' });
+
 let allowOrigin = [
     "localhost",
     "jingli365"
@@ -58,6 +62,10 @@ export async function initHttp(app: Application) {
     // app.use('/api/v1', authenticate, router);
 
     conf.setConfig(5 * 60 * 1000, [/^\/wechat/, /^\/workWechat/i], cache, getAppSecretByAppId)
+    /**
+     * /api/v1 主要用于前端页面或者企业与本系统通信
+     * appid, appsecret 为分配给企业的appid, appsecret
+     */
     app.use('/api/v1', jlReply)
     app.use('/api/v1', allowCrossDomain);
     app.use('/api/v1', (req: Request, res: any, next?: NextFunction) => {
@@ -74,6 +82,11 @@ export async function initHttp(app: Application) {
             return res.sendStatus(403)
         })
     }, router);
+    /**
+     * openapi主要用于可信的第三方系统与本系统通信
+     * appid, appsecret 为 本系统分配给第三方系统的key和秘钥,切勿与 企业appid, appsecret混淆.
+     * 通信算法与企业API通信算法相同
+     */
     app.use('/openapi/v1', jlReply);
     app.use('/openapi/v1', (req: Request, res: Response, next?: NextFunction) => {
         if (!next) return;
@@ -87,7 +100,7 @@ export async function initHttp(app: Application) {
             return next();
         }
         return res.sendStatus(403);
-    }, router);
+    }, openapiRouter);
 }
 
 export function jlReply(req: any, res: any, next?: NextFunction) {
