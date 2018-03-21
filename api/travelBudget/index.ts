@@ -489,9 +489,18 @@ export default class ApiTravelBudget {
                                 oldBudgets.push(b);
                             }
 
-                            if((b.type == ETripType.HOTEL || b.type == ETripType.SUBSIDY) && days > 0){
+                            if(b.type == ETripType.HOTEL || b.type == ETripType.SUBSIDY){
                                 b.budgetSource = "oldBudgetIncomplete";
                                 b.price = b.singlePrice * days;
+                                if( b.type == ETripType.SUBSIDY){
+                                    let templates = b.templates;
+                                    if(templates && templates.length){
+                                        templates.forEach((t: any) => {
+                                            t.price = t.money * days;
+                                        })
+                                    }
+
+                                }
                                 b.duringDays = days;
                                 oldBudgets.push(b);
                             }
@@ -550,6 +559,9 @@ export default class ApiTravelBudget {
                         if(item.type == ETripType.HOTEL) item.checkInDate = oldItem.checkInDate;
                         if(item.type == ETripType.SUBSIDY) item.fromDate = oldItem.fromDate;
                         resultBudget.splice(index, 1, item);
+                    }else{
+                        if(item.type == ETripType.HOTEL) item.checkOutDate = new Date();
+                        if(item.type == ETripType.SUBSIDY) item.endDate = new Date();
                     }
                 })
 
