@@ -355,7 +355,11 @@ class TripPlanModule {
     @requireParams(['id'])
     @modelNotNull('tripDetail')
     static async getTripDetail(params: { id: string, notRetChild: boolean }): Promise<TripDetail> {
-        return Models.tripDetail.get(params.id, { notRetChild: true });
+
+        let tripDetail = await  Models.tripDetail.get(params.id, { notRetChild: true });
+        console.log("===============>tripDetails: ", tripDetail)
+        return tripDetail;
+        // return Models.tripDetail.get(params.id, { notRetChild: true });
     }
 
     @clientExport
