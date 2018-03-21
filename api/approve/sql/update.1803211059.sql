@@ -1,0 +1,1 @@
+update approve.approves set modify_status = 1 where modify_status is null;

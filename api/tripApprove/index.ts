@@ -151,6 +151,7 @@ export default class TripApproveModule {
         tripApprove.staffListSnapshot = approve.staffListSnapshot;
         tripApprove.oldId = approve.oldId;
         tripApprove.modifyStatus = approve.modifyStatus;
+        tripApprove.modifyReason = query.modifyReason;
 
         //自动审批关闭
         if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {

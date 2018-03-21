@@ -1970,6 +1970,7 @@ class TripPlanModule {
 
         if(approve.oldId){
             tripPlan.oldId = approve.oldId;
+            tripPlan.modifyReason = query.modifyReason;
             let modifiedTripPlan = await Models.tripPlan.get(approve.oldId);
             if(modifiedTripPlan){
                 modifiedTripPlan.modifyStatus = EModifyStatus.MODIFIED;
