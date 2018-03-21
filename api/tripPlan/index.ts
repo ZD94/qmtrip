@@ -31,7 +31,7 @@ import { AgencyUser, Agency } from "_types/agency";
 import { makeSpendReport } from './spendReport';
 import { TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice } from "_types/tripPlan";
 import { ENoticeType } from "_types/notice/notice";
-import { MPlaneLevel, MTrainLevel } from "_types";
+import { MPlaneLevel, MTrainLevel, EModifyStatus } from "_types";
 import { ISegment, ExpendItem } from '_types/tripPlan'
 const projectCols = Project['$fieldnames'];
 import { restfulAPIUtil } from "api/restful"
@@ -1968,6 +1968,15 @@ class TripPlanModule {
 
         tripPlan.budget = totalBudget;
 
+        if(approve.oldId){
+            tripPlan.oldId = approve.oldId;
+            tripPlan.modifyReason = query.modifyReason;
+            let modifiedTripPlan = await Models.tripPlan.get(approve.oldId);
+            if(modifiedTripPlan){
+                modifiedTripPlan.modifyStatus = EModifyStatus.MODIFIED;
+                await modifiedTripPlan.save();
+            }
+        }
         let log = TripPlanLog.create({ tripPlanId: tripPlan.id, userId: tryObjId(approveUser), remark: `出差审批通过，生成出差记录` });
         await Promise.all([tripPlan.save(), log.save()]);
 

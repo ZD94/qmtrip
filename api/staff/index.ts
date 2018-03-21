@@ -17,7 +17,7 @@ import L from '@jingli/language';
 import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
-import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo, EAddWay, Linkman, Feedback} from "_types/staff";
+import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus, StaffSupplierInfo, EAddWay, Linkman, Feedback, IdentityInfo} from "_types/staff";
 import { EAgencyUserRole } from "_types/agency";
 import { Models, EAccountType, EGender } from '_types';
 import {conditionDecorator, condition} from "../_decorator";
@@ -33,6 +33,7 @@ const invitedLinkCols = InvitedLink['$fieldnames'];
 const staffSupplierInfoCols = StaffSupplierInfo['$fieldnames'];
 const staffAllCols = Staff['$getAllFieldNames']();
 const feedbackCols = Feedback['$fieldnames'];
+const identityInfoCols = IdentityInfo['$fieldnames']
 let systemNoticeEmails = require('@jingli/config').system_notice_emails;
 
 if(staffAllCols.indexOf("departmentIds") < 0){
@@ -1980,6 +1981,36 @@ class StaffModule{
         return {ids: feedbacks.map((s)=> {return s.id;}), count: feedbacks['total']};
     }
 
+    @clientExport
+    @requireParams(identityInfoCols)
+    static async createIdentityInfo(params: IdentityInfo) {
+        const iis = await Models.identityInfo.find({
+            where: { staffId: params.staffId, certificateType: params.certificateType }
+        })
+        if (iis && iis.length > 0) throw new L.ERROR_CODE_C(400, '证件重复！')
+        const entity = Models.identityInfo.create(params)
+        return await entity.save()
+    }
+
+    @clientExport
+    @requireParams(['staffId', 'certificateType'])
+    static async getIdentityInfoBy(params: {staffId: string, certificateType: number}) {
+        const {staffId, certificateType} = params
+        return _.first(await Models.identityInfo.find({
+            where: { staffId, certificateType }
+        }))
+    }
+
+    @clientExport
+    @requireParams(['staffs'])
+    static async getIdentityInfosBy(params: { staffs: Array<{ staffId: string, certificateType: number }> }) {
+        const results = await Promise.all(params.staffs.map(({ staffId, certificateType }) =>
+            Models.identityInfo.find({
+                where: { staffId, certificateType }
+            })))
+        return _.flatten(results)
+    }
+
 }
 
 //生成邀请链接参数
@@ -1988,4 +2019,5 @@ function makeLinkSign(linkToken: string, invitedLinkId: string, timestamp: numbe
     StaffDepartment
     return utils.md5(originStr);
 }
+
 export = StaffModule;
