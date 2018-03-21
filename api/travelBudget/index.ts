@@ -491,7 +491,8 @@ export default class ApiTravelBudget {
 
                             if(b.type == ETripType.HOTEL || b.type == ETripType.SUBSIDY){
                                 b.budgetSource = "oldBudgetIncomplete";
-                                b.price = b.singlePrice * days;
+                                let singlePrice = b.price/b.duringDays;
+                                b.price = singlePrice * days;
                                 if( b.type == ETripType.SUBSIDY){
                                     let templates = b.templates;
                                     if(templates && templates.length){
