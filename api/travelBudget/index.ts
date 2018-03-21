@@ -631,6 +631,11 @@ export default class ApiTravelBudget {
                 if(pts && pts.length){
                     params.travelPolicyId = pts[0].travelPolicyId;
                 }
+                let project = await Models.project.get(params.feeCollected);
+                params.feeCollectedInfo = {id: project ? project.id : '', name: project ? project.name : ''};
+            }else if(cc && cc.type == ECostCenterType.DEPARTMENT){
+                let dept = await Models.department.get(params.feeCollected);
+                params.feeCollectedInfo = {id: dept ? dept.id : '', name: dept ? dept.name : ''};
             }
 
         }

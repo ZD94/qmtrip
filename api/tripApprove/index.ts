@@ -152,6 +152,7 @@ export default class TripApproveModule {
         tripApprove.oldId = approve.oldId;
         tripApprove.modifyStatus = approve.modifyStatus;
         tripApprove.modifyReason = query.modifyReason;
+        tripApprove.costCenterId = query.feeCollected;
 
         //自动审批关闭
         if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
