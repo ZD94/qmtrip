@@ -41,7 +41,7 @@ import { ITravelBudgetInfo } from 'http/controller/budget';
 let RestfulAPIUtil = restfulAPIUtil;
 import { Company } from '_types/company';
 import { CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE } from '_types/coin';
-import { BUDGET_CHANGE_TYPE, ECostCenterType, CostCenter, CostCenterDeploy } from '_types/costCenter';
+import { BUDGET_CHANGE_TYPE, ECostCenterType, CostCenter } from '_types/costCenter';
 import { ICity } from 'api/travelBudget';
 
 interface ReportInvoice {

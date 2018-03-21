@@ -560,7 +560,7 @@ export default class CostCenterModule {
         let passedDays: number = moment().diff(moment().startOf('Y'), 'Day'); 
         if (passedDays > periodDays) 
             passedDays = periodDays;
-        budgetData['budgetExecuteBias'] = budgetData.budgetAndExpenditure / (budgetData.budget * passedDays / periodDays);
+        budgetData['budgetExecuteBias'] = budgetData.budgetAndExpenditure / (budgetData.budget * passedDays / periodDays) - 1;
 
         return budgetData;
     }
