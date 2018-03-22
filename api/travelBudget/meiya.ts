@@ -712,6 +712,7 @@ function transferTrainData(meiyaTrainData: IMeiyaTrain, originalData: ISearchTic
                 "other": {}
             }
         ],
+        "ServicePrice":config.trainServicePrice,
         "duration": 411,
         "destination": originalData.destinationId,
         "originPlace": originalData.originPlaceId,
