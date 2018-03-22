@@ -11,11 +11,13 @@ import { genSign } from '@jingli/sign';
 const cache = require('common/cache')
 const config = require('@jingli/config')
 
+var API = require('@jingli/dnode-api');
 import path = require("path");
 import express = require("express");
 import { Request, Response, NextFunction } from 'express';
 import { Application } from 'express-serve-static-core';
 import { verifySign } from 'server-auth/node_modules/@jingli/sign';
+import { parseAuthString, AuthResponse } from '_types/auth';
 
 let router = express.Router();
 scannerDecoration(path.join(__dirname, 'controller'));
@@ -24,6 +26,9 @@ registerControllerToRouter(router);
 let openapiRouter = express.Router();
 scannerDecoration(path.join(__dirname, 'controller'));
 registerControllerToRouter(openapiRouter, { group: 'openapi' });
+let staffapiRouter = express.Router();
+scannerDecoration(path.join(__dirname, 'controller'));
+registerControllerToRouter(staffapiRouter, {group: 'staffapi'});
 
 let allowOrigin = [
     "localhost",
@@ -101,6 +106,27 @@ export async function initHttp(app: Application) {
         }
         return res.sendStatus(403);
     }, openapiRouter);
+
+    app.use('/staffapi/v1', jlReply);
+    app.use('/staffapi/v1', allowCrossDomain);
+    app.use('/staffapi/v1', async (req: Request, res: Response, next?: NextFunction) => {
+        let {authstr, staffid} = req.headers;
+        let token = parseAuthString(authstr);
+        let verification: AuthResponse = await API.auth.authentication(token);
+        if (!verification) {
+            console.log('auth failed...', JSON.stringify(req.cookies));
+            return res.sendStatus(401);
+        }
+        try {
+            await API.auth.setCurrentStaffId({
+                accountId: verification.accountId,
+                staffId: staffid
+            })
+        } catch(err) {
+            return res.sendStatus(401);
+        }
+        next && next();
+    }, staffapiRouter);
 }
 
 export function jlReply(req: any, res: any, next?: NextFunction) {
