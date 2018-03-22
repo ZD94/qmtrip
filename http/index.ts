@@ -16,12 +16,16 @@ import path = require("path");
 import express = require("express");
 import { Request, Response, NextFunction } from 'express';
 import { Application } from 'express-serve-static-core';
+import { verifySign } from 'server-auth/node_modules/@jingli/sign';
 import { parseAuthString, AuthResponse } from '_types/auth';
 
 let router = express.Router();
 scannerDecoration(path.join(__dirname, 'controller'));
 registerControllerToRouter(router);
 
+let openapiRouter = express.Router();
+scannerDecoration(path.join(__dirname, 'controller'));
+registerControllerToRouter(openapiRouter, { group: 'openapi' });
 let staffapiRouter = express.Router();
 scannerDecoration(path.join(__dirname, 'controller'));
 registerControllerToRouter(staffapiRouter, {group: 'staffapi'});
@@ -63,6 +67,10 @@ export async function initHttp(app: Application) {
     // app.use('/api/v1', authenticate, router);
 
     conf.setConfig(5 * 60 * 1000, [/^\/wechat/, /^\/workWechat/i], cache, getAppSecretByAppId)
+    /**
+     * /api/v1 主要用于前端页面或者企业与本系统通信
+     * appid, appsecret 为分配给企业的appid, appsecret
+     */
     app.use('/api/v1', jlReply)
     app.use('/api/v1', allowCrossDomain);
     app.use('/api/v1', (req: Request, res: any, next?: NextFunction) => {
@@ -79,6 +87,25 @@ export async function initHttp(app: Application) {
             return res.sendStatus(403)
         })
     }, router);
+    /**
+     * openapi主要用于可信的第三方系统与本系统通信
+     * appid, appsecret 为 本系统分配给第三方系统的key和秘钥,切勿与 企业appid, appsecret混淆.
+     * 通信算法与企业API通信算法相同
+     */
+    app.use('/openapi/v1', jlReply);
+    app.use('/openapi/v1', (req: Request, res: Response, next?: NextFunction) => {
+        if (!next) return;
+        let appId: string = req.headers['appid'];
+        let sign: string = req.headers['sign'];
+        if (!appId || !sign || appId != config.openapi.appId) {
+            return res.sendStatus(403);
+        }
+        let appSecret: string = config.openapi.appSecret;
+        if (verifySign(getParams(req), sign, appSecret)) {
+            return next();
+        }
+        return res.sendStatus(403);
+    }, openapiRouter);
 
     app.use('/staffapi/v1', jlReply);
     app.use('/staffapi/v1', allowCrossDomain);
@@ -114,4 +141,18 @@ export function jlReply(req: any, res: any, next?: NextFunction) {
         res.end();
     }
     next && next();
+}
+
+export function getParams(req: Request) {
+    const { method } = req
+
+    switch (method.toUpperCase()) {
+        case 'GET':
+            return req.query;
+        case 'POST':
+        case 'PUT':
+            return req.body;
+        case 'DELETE':
+            return Object.create(null);
+    }
 }
