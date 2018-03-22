@@ -335,7 +335,7 @@ export default class ApiTravelBudget {
 
     //用于接收更新预算，并更新approve表和tripapprove上次
     @clientExport
-    static async updateBudget(params: { approveId: string, budgetResult: any, isFinalFirstResponse?: boolean }) {
+    static async updateBudget(params: { approveId: string, budgetResult: any, isFinalFirstResponse?: boolean, alreadyMerged?: boolean }) {
         let approve = await Models.approve.get(params.approveId);
 
         let oldId = approve.oldId;
@@ -375,21 +375,25 @@ export default class ApiTravelBudget {
             let companyId = staff.company.id;
 
             let _budgets = params.budgetResult.budgets;
+            
             //预算服务回调更新预算是也需要做新老预算合并
             let oldBudgets = [];
-            if(oldId){
-                let data = approve.data;
-                if(typeof data == 'string') data = JSON.parse(data);
-                let params = data.query;
-                if(typeof params == 'string') params = JSON.parse(params);
-                // let modifyParams = await ApiTravelBudget.dealModifyParams(params);
-                // oldBudgets = modifyParams.oldBudgets;
-                oldBudgets = data.oldBudgets;
+            if(!params.alreadyMerged){
+                if(oldId){
+                    let data = approve.data;
+                    if(typeof data == 'string') data = JSON.parse(data);
+                    let params = data.query;
+                    if(typeof params == 'string') params = JSON.parse(params);
+                    let modifyParams = await ApiTravelBudget.dealModifyParams(params);
+                    oldBudgets = modifyParams.oldBudgets;
+                    // oldBudgets = data.oldBudgets;
+                }
+    
+                if(oldId && oldBudgets && oldBudgets.length){
+                    _budgets = await ApiTravelBudget.mergeBudget(oldBudgets, _budgets);
+                }
             }
-
-            if(oldId && oldBudgets && oldBudgets.length){
-                _budgets = await ApiTravelBudget.mergeBudget(oldBudgets, _budgets);
-            }
+            
             let ps: Promise<any>[] = _budgets.map(async (item: ICreateBudgetAndApproveParamsNew) => {
                 return await ApiTravelBudget.transformBudgetData(item, companyId);
             });
@@ -539,7 +543,7 @@ export default class ApiTravelBudget {
      * @returns {any[]}
      */
     static async mergeBudget(oldbudget: any[], newBudget: any[]){
-        let resultBudget: any[] = oldbudget;
+        let resultBudget: any[] =  _.cloneDeep(oldbudget);
         let oldIndex = oldbudget[oldbudget.length -1].index + 1;
         let mergeItem = false;
         for(let budget of oldbudget){
@@ -839,7 +843,8 @@ export default class ApiTravelBudget {
                 await ApiTravelBudget.updateBudget({
                     approveId: approveId || '',
                     budgetResult: budgetResult,
-                    isFinalFirstResponse: (isIntoApprove ? false : true)
+                    isFinalFirstResponse: (isIntoApprove ? false : true),
+                    alreadyMerged: true
                 });
             }
         }).catch(async function (err: Error) {
