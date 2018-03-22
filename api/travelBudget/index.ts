@@ -382,9 +382,9 @@ export default class ApiTravelBudget {
                 if(typeof data == 'string') data = JSON.parse(data);
                 let params = data.query;
                 if(typeof params == 'string') params = JSON.parse(params);
-                let modifyParams = await ApiTravelBudget.dealModifyParams(params);
-                oldBudgets = modifyParams.oldBudgets;
-                // oldBudgets = data.oldBudgets;
+                // let modifyParams = await ApiTravelBudget.dealModifyParams(params);
+                // oldBudgets = modifyParams.oldBudgets;
+                oldBudgets = data.oldBudgets;
             }
 
             if(oldId && oldBudgets && oldBudgets.length){
