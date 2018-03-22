@@ -153,6 +153,10 @@
     "appId": "${JL_APP_CLOUD_APP_ID}",
     "appSecret": "${JL_APP_CLOUD_APP_SECRET}"
   },
+  "openapi": {
+    "appId": "${JL_APP_OPENAPI_APP_ID}",
+    "appSecret": "${JL_APP_OPENAPI_APP_SECRET}"
+  },
   "mail": {
     "service": "QQex",
     "auth": {
