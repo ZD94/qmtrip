@@ -225,10 +225,15 @@ class Proxy {
                 if (/^https:/.test(proxyUrl)) { 
                     isHttps = true;
                 }
+                let parseReqBody = true;
+                if (req.headers['content-type'].indexOf('multipart') >= 0) { 
+                    parseReqBody = false;
+                }
+                console.log("need parseReqBoyd ====>", parseReqBody)
                 // console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', req.url, 'appid: ', appid, '===request params: ', params)
                 let opts = {
                     reqAsBuffer: true,
-                    // parseReqBody: false,
+                    parseReqBody: parseReqBody,
                     https: isHttps,
                     proxyReqPathResolver: (req: any) => { 
                         let url = req.url.replace(/^\/java\//, '/');
