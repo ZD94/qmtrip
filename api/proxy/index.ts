@@ -145,6 +145,96 @@ class Proxy {
             return res.json(result);
         });
 
+        app.all(/^\/jlbudget.*$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: any, res: Response, next?: Function) => {
+
+
+            //公有云验证
+            let {staffid}  = req.headers;
+            let staff = await Models.staff.get(staffid);
+            if (!staff) throw new Error('staff is null')
+            let companyId: string = staff.company.id;
+            let companyToken: string | null = await getCompanyTokenByAgent(companyId);
+            if (!companyToken) {
+                throw new Error('换取 token 失败！');
+            }
+            
+            //request to JLCloud(jlbudget) 
+            let result: any;
+            let pathstr: string = req.path;
+            pathstr = pathstr.replace('/jlbudget', '');
+            let JLOpenApi: string = config.cloudAPI;
+            let url: string = `${JLOpenApi}${pathstr}`;
+
+            result = await new Promise((resolve, reject) => {
+                return request({
+                    uri: url,
+                    body: req.body,
+                    json: true,
+                    method: req.method,
+                    qs: req.query,
+                    headers: {
+                        token: companyToken,
+                        companyId: companyId
+                    }
+                }, (err: Error, resp: any, result: object) => {
+                    if (err) {
+                        logger.error("url:", url, err.stack);
+                        return reject(err);
+                    }
+                    if (typeof result == 'string') {
+                        try {
+                            result = JSON.parse(result);
+                        } catch (err) { 
+                            logger.error('url:', url, err.stack);
+                            return reject(err);
+                        }
+                    }
+                    resolve(result);
+                });
+            });
+            return res.json(result);
+        });
+        
+
+        app.all(/^\/java.*$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function) => {
+            let {staffid} = req.headers;
+            let params =  req.body;
+            if(req.method == 'GET') {
+                params = req.query;
+            }
+            let staff = await Models.staff.get(staffid);
+            let appSecret = config.pay.appSecret;
+            let pathstring = req.path;
+            let timestamp = Math.floor(Date.now()/1000);
+            pathstring = pathstring.replace("/java", '');
+            let sign = genSign(params, timestamp, appSecret)
+            let url = `${config.java.orderLink}${pathstring}`;
+            console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.java.appId, '===request params: ', params) 
+            let result = await new Promise((resolve, reject) => {
+                request({
+                    uri: url,
+                    body: req.body,
+                    json: true,
+                    method: req.method,
+                    qs: req.query,
+                    headers: {
+                        sign: sign,
+                        appid: config.java.appId,
+                        staffid: staff.id, 
+                        companyid: staff.companyId,
+                        accountid: staff.accountId
+                    }
+                }, (err: Error, resp: any, result: object) => {
+                    if (err) {
+                        console.log("-=========>err: ", err);
+                        reject(err);
+                    }
+                    resolve(result);
+                });
+            });
+            return res.json(result);
+        });
+
         /**
          * @method 提供中台、app端的订单转发请求
          *  1. app端根据tripDetailId创、退、改一系列订单请求
