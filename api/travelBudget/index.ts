@@ -382,8 +382,9 @@ export default class ApiTravelBudget {
                 if(typeof data == 'string') data = JSON.parse(data);
                 let params = data.query;
                 if(typeof params == 'string') params = JSON.parse(params);
-                let modifyParams = await ApiTravelBudget.dealModifyParams(params);
-                oldBudgets = modifyParams.oldBudgets;
+                // let modifyParams = await ApiTravelBudget.dealModifyParams(params);
+                // oldBudgets = modifyParams.oldBudgets;
+                oldBudgets = data.oldBudgets;
             }
 
             if(oldId && oldBudgets && oldBudgets.length){
@@ -406,7 +407,7 @@ export default class ApiTravelBudget {
                 if (typeof approve.data == 'string') {
                     approve.data = JSON.parse(approve.data);
                 }
-                approve.data = {budgets: budgets, query: approve.data.query};
+                approve.data = {budgets: budgets, query: approve.data.query, oldBudgets: oldBudgets};
                 approve = await approve.save();
                 if (approve.step === STEP.FINAL && company.oa != EApproveChannel.AUTO) {
                     let params = {approveNo: approve.id};
@@ -491,7 +492,8 @@ export default class ApiTravelBudget {
 
                             if(b.type == ETripType.HOTEL || b.type == ETripType.SUBSIDY){
                                 b.budgetSource = "oldBudgetIncomplete";
-                                b.price = b.singlePrice * days;
+                                let singlePrice = b.price/b.duringDays;
+                                b.price = singlePrice * days;
                                 if( b.type == ETripType.SUBSIDY){
                                     let templates = b.templates;
                                     if(templates && templates.length){
@@ -797,6 +799,7 @@ export default class ApiTravelBudget {
         
         let obj: any = {};
         obj.budgets = budgets;
+        obj.oldBudgets = oldBudgets;
         obj.query = params;
         obj.createAt = Date.now();
 
