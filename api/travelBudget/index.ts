@@ -382,9 +382,9 @@ export default class ApiTravelBudget {
                 if(typeof data == 'string') data = JSON.parse(data);
                 let params = data.query;
                 if(typeof params == 'string') params = JSON.parse(params);
-                // let modifyParams = await ApiTravelBudget.dealModifyParams(params);
-                // oldBudgets = modifyParams.oldBudgets;
-                oldBudgets = data.oldBudgets;
+                let modifyParams = await ApiTravelBudget.dealModifyParams(params);
+                oldBudgets = modifyParams.oldBudgets;
+                // oldBudgets = data.oldBudgets;
             }
 
             if(oldId && oldBudgets && oldBudgets.length){
@@ -539,7 +539,7 @@ export default class ApiTravelBudget {
      * @returns {any[]}
      */
     static async mergeBudget(oldbudget: any[], newBudget: any[]){
-        let resultBudget: any[] = oldbudget;
+        let resultBudget: any[] =  _.cloneDeep(oldbudget);
         let oldIndex = oldbudget[oldbudget.length -1].index + 1;
         let mergeItem = false;
         for(let budget of oldbudget){
