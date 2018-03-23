@@ -5,7 +5,7 @@
 
 'use strict';
 import {clientExport, requireParams} from "@jingli/dnode-api/dist/src/helper";
-import {Models} from "_types/index";
+import {EModifyStatus, Models} from "_types/index";
 import {QMEApproveStatus, EApproveResult, ETripType, TripPlanLog} from "_types/tripPlan/tripPlan";
 import moment = require("moment/moment");
 import {Staff, EStaffStatus, EStaffRole} from "_types/staff/staff";
@@ -149,6 +149,10 @@ export default class TripApproveModule {
         tripApprove.submitterSnapshot = approve.submitterSnapshot;
         tripApprove.approveUserSnapshot = approve.approveUserSnapshot;
         tripApprove.staffListSnapshot = approve.staffListSnapshot;
+        tripApprove.oldId = approve.oldId;
+        tripApprove.modifyStatus = approve.modifyStatus;
+        tripApprove.modifyReason = query.modifyReason;
+        tripApprove.costCenterId = query.feeCollected;
 
         //自动审批关闭
         if(tripApprove.status == QMEApproveStatus.WAIT_APPROVE) {
@@ -526,7 +530,7 @@ export default class TripApproveModule {
             await plugins.qm.tripApproveUpdateNotify(null, {
                 approveNo: tripApprove.id,
                 status: tripApprove.status,
-                approveUser: staff.id,
+                approveUser: approveUser.id,
                 outerId: tripApprove.id,
                 data: budgetInfo,
                 oa: 'qm',
@@ -732,6 +736,15 @@ export default class TripApproveModule {
                     await API.notify.submitNotify({userId: user && user.id, key: 'qm_notify_approve_not_pass',
                         values: { tripApprove: tripApprove, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE}});
                 } catch(err) { console.error(err);}
+
+                //审批驳回恢复被修改行程修改状态
+                if(tripApprove.oldId){
+                    let tripPlan = await Models.tripPlan.get(tripApprove.oldId);
+                    if(tripPlan){
+                        tripPlan.modifyStatus = EModifyStatus.NORMAL;
+                        await tripPlan.save();
+                    }
+                }
             }
 
             if(approveResult == EApproveResult.PASS && query && query.feeCollected){

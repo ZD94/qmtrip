@@ -7,6 +7,8 @@ import { findChildren } from 'api/department';
 import { Department } from '_types/department';
 import { DB } from '@jingli/database';
 import { L } from '@jingli/language';
+import { AnalysisType, Project } from '_types/tripPlan';
+var API = require('@jingli/dnode-api');
 const _ = require('lodash/fp')
 const moment = require('moment')
 
@@ -427,6 +429,183 @@ export default class CostCenterModule {
         cost.isSendNotice = false;
         await cost.save()
     }
+
+    /**
+     * 预算执行分析之成本中心分析
+     * @author lizeilin
+     * @param {companyId: string, type: AnalysisType}
+     * @return {CostCenterAnlysis[]}
+     */
+    static async costCenterAnalysis(params: {companyId: string, type: AnalysisType}): Promise<CostCenterAnalysis[]> {
+        let {companyId, type} = params;
+        let departments: Department[] = await Models.department.all({where: {companyId: companyId}});
+        let projects: Project[] = await Models.project.all({where: {companyId: companyId}});
+        
+        let departmentIds: string[] = [];
+        let projectIds: string[] = [];
+        let allIds: string[] = [];
+
+        for (let i = 0; i < departments.length; i++) {
+            departmentIds.push(departments[i].id);
+        }
+        for (let i = 0; i < projects.length; i++) {
+            projectIds.push(projects[i].id);
+        }
+        allIds = departmentIds.concat(projectIds); 
+
+        let analysisData: CostCenterAnalysis[] = [];
+        let temp: CostCenterAnalysis = {costCenterName: '', budget: 0, budgetAndExpenditure: 0, budgetExecuteBias: 0, budgetExecuteRate: 0};
+        let costCentersAll: CostCenter[] = await Models.costCenter.all({where:{id: {$in: allIds}, createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+        let costCentersDepart: CostCenter[] = await Models.costCenter.all({where: {id: {$in: departmentIds}, createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+        let costCentersProj: CostCenter[] = await Models.costCenter.all({where: {id: {$in: projectIds}, createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+
+        let costCentersDeployAll: CostCenterDeploy[] = [];
+        let costCentersDeployDepart: CostCenterDeploy[] = [];
+        let costCentersDeployProj: CostCenterDeploy[] = [];
+
+        let costCenters: CostCenterDeploy[] = [];
+        if (type == AnalysisType.TOTAL) {
+            for (let i = 0; i < costCentersAll.length; i++) {
+                let costCenterD = await Models.costCenterDeploy.all({where: {costCenterId: costCentersAll[i].id}});
+                if (!costCenterD)
+                    continue;
+                costCentersDeployAll.push(costCenterD[0]);
+            }
+            costCenters = costCentersDeployAll;
+        } else if (type == AnalysisType.DEPARTMENT) {
+            for (let i = 0; i < costCentersDepart.length; i++) {
+                let costCenterD = await Models.costCenterDeploy.all({where: {costCenterId: costCentersDepart[i].id}});
+                if (!costCenterD)
+                    continue;
+                costCentersDeployDepart.push(costCenterD[0]);
+            }
+            costCenters = costCentersDeployDepart;
+        } else if (type == AnalysisType.PROJECT) {
+            for (let i = 0; i < costCentersProj.length; i++) {
+                let costCenterD = await Models.costCenterDeploy.all({where: {costCenterId: costCentersProj[i].id}});
+                if (!costCenterD)
+                    continue;
+                costCentersDeployProj.push(costCenterD[0]);
+            }
+            costCenters = costCentersDeployProj;
+        } else {
+            console.log("type类型错误!");
+            throw Error("type类型错误！");
+        }
+        for (let j = 0; j < costCenters.length; j++) {
+           let costCenter: CostCenter = await Models.costCenter.get(costCenters[j].costCenterId);
+           temp.costCenterName = costCenter.name;
+           temp.budget = costCenters[j].selfBudget;
+           if (temp.budget == 0) {
+               continue;
+           }
+           let plannedBudget: number = await API.tripPlan.getPlannedBudget({companyId: companyId, departmentOrProjectId: costCenter.id});
+           temp.budgetAndExpenditure = costCenters[j].expendBudget + plannedBudget;
+           let beginDate: Date = costCenters[j].beginDate || moment().startOf('Y').format();
+           let endDate: Date = costCenters[j].endDate || moment().endOf('Y').format();
+           let now: Date = moment().format();
+           let periodDays: number = moment(endDate).diff(beginDate, 'Day') + 1;
+           let passedDays: number = moment(now).diff(beginDate, 'Day') + 1;
+           if (passedDays > periodDays) {
+               passedDays = periodDays;
+           }
+           let periodBudget: number = costCenters[j].selfBudget * (passedDays/ periodDays);
+           temp.budgetExecuteRate = (costCenters[j].expendBudget + plannedBudget) / costCenters[j].selfBudget;
+           temp.budgetExecuteBias = (costCenters[j].expendBudget + plannedBudget) / periodBudget - 1;
+
+           analysisData.push(temp);
+        }
+        return analysisData;
+    }
+
+    /**
+     * 预算执行分析之总预算相关
+     * @author lizeilin
+     * @param {companyId}
+     * @return {CostCenterAnlysis}
+     */
+    static async budgetAnalysis(companyId: string) {
+        let departments: Department[] = await Models.department.all({where: {companyId: companyId}});
+        let projects: Project[] = await Models.project.all({where: {companyId: companyId}});
+        let allIds: string[] = [];
+
+        for (let i = 0; i < departments.length; i++) {
+            allIds.push(departments[i].id);
+        }
+        for (let i = 0; i < projects.length; i++) {
+            allIds.push(projects[i].id);
+        }
+        let costCentersAll: CostCenter[] = await Models.costCenter.all({where:{id: {$in: allIds}, createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+        let costCentersDeploy: CostCenterDeploy[] = [];
+        for (let i = 0; i < costCentersAll.length; i++) {
+            let costCenterDeploy = await Models.costCenterDeploy.all({where: {costCenterId: costCentersAll[i].id}});
+            costCentersDeploy.push(costCenterDeploy[0]);
+        }
+        let budgetData: CostCenterAnalysis = {costCenterName: '', budget: 0, budgetAndExpenditure: 0, budgetExecuteBias: 0, budgetExecuteRate: 0};
+        budgetData['costCenterName'] = '123';
+        for (let i = 0; i < costCentersDeploy.length; i++) {
+            budgetData['budget'] += costCentersDeploy[i].selfBudget;
+            let costCenter = await Models.costCenter.get(costCentersDeploy[i].costCenterId);
+            let plannedBudget: number = await API.tripPlan.getPlannedBudget({companyId: companyId, departmentOrProjectId: costCenter.id});
+            budgetData['budgetAndExpenditure'] += (costCentersDeploy[i].expendBudget + plannedBudget);
+        }
+        if (budgetData['budget'] == 0) {
+            budgetData['budgetExecuteBias'] = 0;
+            budgetData['budgetAndExpenditure'] = 0;
+            budgetData['budgetExecuteRate'] = 0;
+            return budgetData;
+        }
+        budgetData['budgetExecuteRate'] = budgetData.budgetAndExpenditure / budgetData.budget;
+        let periodDays: number = moment().endOf('Y').diff(moment().startOf('Y'), 'Day');
+        let passedDays: number = moment().diff(moment().startOf('Y'), 'Day'); 
+        if (passedDays > periodDays) 
+            passedDays = periodDays;
+        budgetData['budgetExecuteBias'] = budgetData.budgetAndExpenditure / (budgetData.budget * passedDays / periodDays) - 1;
+
+        return budgetData;
+    }
+
+    /**
+     * 预算执行之图表
+     * @author lizeilin
+     */
+    static async budgetDataChart(companyId: string) {
+        let budgetInfo = await CostCenterModule.budgetAnalysis(companyId);
+        let budget = budgetInfo.budget;
+        let departments: Department[] = await Models.department.all({where: {companyId: companyId}});
+        let projects: Project[] = await Models.project.all({where: {companyId: companyId}});
+        let allIds: string[] = [];
+
+        for (let i = 0; i < departments.length; i++) {
+            allIds.push(departments[i].id);
+        }
+        for (let i = 0; i < projects.length; i++) {
+            allIds.push(projects[i].id);
+        }
+        let costCentersAll: CostCenter[] = await Models.costCenter.all({where:{id: {$in: allIds}, createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+        let costCentersDeploy: CostCenterDeploy[] = [];
+        for (let i = 0; i < costCentersAll.length; i++) {
+            let costCenterDeploy = await Models.costCenterDeploy.all({where: {costCenterId: costCentersAll[i].id}});
+            costCentersDeploy.push(costCenterDeploy[0]);
+        }
+        
+        let currentBudgetExp = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        for (let i = 0; i < costCentersDeploy.length; i++){
+            let month: number = moment(costCentersDeploy[i].createdAt).month();
+            currentBudgetExp[month] += costCentersDeploy[i].expendBudget;
+        }
+        let periodBudget = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];  
+        let temp: number = 0;
+        for (let j = 0; j < 12; j++) {
+            temp += currentBudgetExp[j];
+            periodBudget[j] = temp;
+        }
+        let budgetData = {
+            budget: budget,
+            currentBudgetExp: periodBudget
+        };
+        return budgetData;
+    }
 }
 
 async function getTotalTempBudgetSumOf(costIds: string[], period: { start: Date, end: Date } ) {
@@ -464,4 +643,12 @@ export interface ICostCenterDeploy {
     period: { start: Date, end: Date },
     operator: string,
     appendBudget?: number
+}
+
+export interface CostCenterAnalysis {
+    costCenterName?: string,
+    budget: number,
+    budgetAndExpenditure?: number,
+    budgetExecuteRate?: number,
+    budgetExecuteBias?: number
 }
