@@ -7,7 +7,7 @@
 import {scannerDecoration, registerControllerToRouter} from "@jingli/restful";
 import { conf, auth } from 'server-auth';
 import { Models } from '_types';
-import { genSign } from '@jingli/sign';
+import { genSign, verifySign } from '@jingli/sign';
 const cache = require('common/cache')
 const config = require('@jingli/config')
 
@@ -16,7 +16,6 @@ import path = require("path");
 import express = require("express");
 import { Request, Response, NextFunction } from 'express';
 import { Application } from 'express-serve-static-core';
-import { verifySign } from 'server-auth/node_modules/@jingli/sign';
 import { parseAuthString, AuthResponse } from '_types/auth';
 
 let router = express.Router();

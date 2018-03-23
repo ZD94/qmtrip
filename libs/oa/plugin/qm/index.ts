@@ -20,6 +20,7 @@ import {DB} from "@jingli/database";
 import {OAAddResult} from "../../../../_types/approve/index";
 import {ERejectApproveTypes} from "_types/tripApprove";
 import { EApproveStatus } from '_types/approve/types';
+
 export class QmPlugin extends AbstractOAPlugin {
     constructor() {
         super();
