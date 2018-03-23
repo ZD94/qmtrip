@@ -4,7 +4,7 @@ const _ = require('lodash');
 
 export class SavingEvent extends BaseEvent {
 
-    async emitTripSaving(params: { data: any, companyId: string }): Promise<any> {
+    async emitTripSaving(params: { coins: number, orderNo: string, staffId: string, companyId: string }): Promise<any> {
         let { companyId } = params;
         if (!companyId) {
             throw L.ERR.INVALID_ARGUMENT("companyId");
@@ -14,8 +14,8 @@ export class SavingEvent extends BaseEvent {
         const eventListener = await super.findEventListener(eventName, companyId)
         if (!eventListener) return null
 
-        let url = _.template(eventListener.url)(params.data)
-        super.sendEventNotice({ url, body: { ...params, eventName } })
+        let url = _.template(eventListener.url)(params)
+        return await super.sendEventNotice({ url, body: { ...params, eventName } })
     }
 
 }
