@@ -3114,17 +3114,14 @@ class TripPlanModule {
 
             let tripPlansDepart: TripPlan[] = [];
             let tripPlansProj: TripPlan[] = [];
-        console.log('length------>   ', tripPlans.length);
             for (let i = 0; i < tripPlans.length; i++) {
                 let costCenter: CostCenter = await Models.costCenter.get(tripPlans[i].costCenterId);
             if (!costCenter)
                 continue;
                 if (costCenter.type == ECostCenterType.DEPARTMENT) {
-                console.log('tripPlans    ', tripPlans[i]);
                     tripPlansDepart.push(tripPlans[i]);
                 }
                 if (costCenter.type == ECostCenterType.PROJECT) {
-                console.log('tripPlanss---  >', tripPlans[i]);
                     tripPlansProj.push(tripPlans[i]);
                 }
             }

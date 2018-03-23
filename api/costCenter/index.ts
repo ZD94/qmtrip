@@ -564,6 +564,42 @@ export default class CostCenterModule {
 
         return budgetData;
     }
+
+    /**
+     * 预算执行之图表
+     * @author lizeilin
+     */
+    static async budgetDataChart(companyId: string) {
+        let budgetInfo = await CostCenterModule.budgetAnalysis(companyId);
+        let budget = budgetInfo.budget;
+        let departments: Department[] = await Models.department.all({where: {companyId: companyId}});
+        let projects: Project[] = await Models.project.all({where: {companyId: companyId}});
+        let allIds: string[] = [];
+
+        for (let i = 0; i < departments.length; i++) {
+            allIds.push(departments[i].id);
+        }
+        for (let i = 0; i < projects.length; i++) {
+            allIds.push(projects[i].id);
+        }
+        let costCentersAll: CostCenter[] = await Models.costCenter.all({where:{id: {$in: allIds}, createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+        let costCentersDeploy: CostCenterDeploy[] = [];
+        for (let i = 0; i < costCentersAll.length; i++) {
+            let costCenterDeploy = await Models.costCenterDeploy.all({where: {costCenterId: costCentersAll[i].id}});
+            costCentersDeploy.push(costCenterDeploy[0]);
+        }
+        
+        let currentBudgetExp = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        for (let i = 0; i < costCentersDeploy.length; i++){
+            let month: number = moment(costCentersDeploy[i].createdAt).month();
+            currentBudgetExp[month] += costCentersDeploy[i].expendBudget;
+        }
+        let budgetData = {
+            budget: budget,
+            currentBudgetExp: currentBudgetExp
+        };
+        return budgetData;
+    }
 }
 
 async function getTotalTempBudgetSumOf(costIds: string[], period: { start: Date, end: Date } ) {
