@@ -157,4 +157,21 @@ export class AnalysisController extends AbstractController {
             res.json(this.reply(0, null));
         }
     }
+
+    /**
+     * @author lizeilin
+     */
+    @Router("/:companyId/budgetDataChart", "GET")
+    async getBudgetDataChart(req: Request, res: Response, next: NextFunction) {
+        let {companyId} = req.params;
+        if (!companyId) 
+            return res.json(this.reply(400, null));
+        try {
+            let budgetData = await API.costCenter.budgetDataChart(companyId);
+            res.json(this.reply(0, budgetData));
+        } catch(err) {
+            console.error(err);
+            res.json(this.reply(0, null));
+        }
+    }
 }
