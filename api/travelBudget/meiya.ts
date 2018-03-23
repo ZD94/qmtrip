@@ -71,7 +71,7 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
 
     let data = [];
     let meiyaParam = {
-       
+
         depDate: moment(params.leaveDate).format("YYYY-MM-DD")
     };
     let urlFlight = config.orderSysConfig.orderLink + "/tmc/searchFlight/getList/" + `${params.originPlaceId}/${params.destinationId}/${meiyaParam.depDate}`;
@@ -121,7 +121,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
     // let arrival = await API.place.getCityInfo({ cityCode: params.destinationId });
     let data: Array<IMeiyaTrain> = []
     // let trainData: {[index: string]: Array<IMeiyaTrain>} = {};
-    
+
     let meiyaParam = {
         depCity: params.originPlaceId,
         arrCity: params.destinationId,
@@ -138,7 +138,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
         let agentType = item.agentType;
         // console.log('agenttype---->   ', agentType, 'typeof------  ', typeof agentType);
         isBindService = (type == `${TmcServiceType.TRAIN}` || type == `${TmcServiceType.TRAIN_ABROAD}`) ? true : false;
-        let meiyaResult = isBindService 
+        let meiyaResult = isBindService
         ? await request({
 
             url: urlTrain,
@@ -151,7 +151,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
             }
         }).catch((e: Error) => {
             console.log(e)
-        }) 
+        })
         : null;
             try {
                 meiyaResult = JSON.parse(meiyaResult);
@@ -434,6 +434,10 @@ function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHot
         star = 2
     }else {
         star = meiyaHotelData.starRating
+    }
+    let hotelPicture = [];
+    for(let item of meiyaHotelData.hotelPictureList){
+        hotelPicture.push(item.url)
     }
         let model = {
         "name": meiyaHotelData.cnName,
