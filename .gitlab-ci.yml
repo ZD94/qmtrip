@@ -98,6 +98,11 @@ deploy:master:
     JL_APP_PERMISSION_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-auth
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_JAVA_APP_ORDER_LINK: https://l.jingli365.com/svc
+    JL_APP_JAVA_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92 
+    JL_APP_JAVA_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_OPENAPI_APP_ID: 8218a6b0-2d74-11e8-9997-218659f8f259
+    JL_APP_OPENAPI_APP_SECRET: ffdfbf70-2d74-11e8-9997-218659f8f259
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
@@ -148,6 +153,11 @@ deploy:test:
     JL_APP_PERMISSION_ORDER_LINK: https://t.jingli365.com/svc/java-jingli-auth
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_JAVA_APP_ORDER_LINK: https://t.jingli365.com/svc
+    JL_APP_JAVA_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92 
+    JL_APP_JAVA_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_OPENAPI_APP_ID: 8218a6b0-2d74-11e8-9997-218659f8f259
+    JL_APP_OPENAPI_APP_SECRET: ffdfbf70-2d74-11e8-9997-218659f8f259
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
@@ -199,6 +209,11 @@ deploy:release:
     JL_APP_PERMISSION_ORDER_LINK: https://j.jingli365.com/svc/java-jingli-auth
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_JAVA_APP_ORDER_LINK: https://j.jingli365.com/svc
+    JL_APP_JAVA_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92 
+    JL_APP_JAVA_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_OPENAPI_APP_ID: 8218a6b0-2d74-11e8-9997-218659f8f259
+    JL_APP_OPENAPI_APP_SECRET: ffdfbf70-2d74-11e8-9997-218659f8f259
 
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
@@ -251,6 +266,11 @@ deploy:demo:
     JL_APP_PERMISSION_ORDER_LINK: https://demo.jingli365.com/svc/java-jingli-auth
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_JAVA_APP_ORDER_LINK: https://demo.jingli365.com/svc
+    JL_APP_JAVA_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92 
+    JL_APP_JAVA_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_OPENAPI_APP_ID: 8218a6b0-2d74-11e8-9997-218659f8f259
+    JL_APP_OPENAPI_APP_SECRET: ffdfbf70-2d74-11e8-9997-218659f8f259
 
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
@@ -298,6 +318,8 @@ deploy:tester:
     JL_APP_PERMISSION_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-auth
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
+    JL_APP_OPENAPI_APP_ID: 8218a6b0-2d74-11e8-9997-218659f8f259
+    JL_APP_OPENAPI_APP_SECRET: ffdfbf70-2d74-11e8-9997-218659f8f259
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
