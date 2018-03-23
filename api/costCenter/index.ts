@@ -594,9 +594,15 @@ export default class CostCenterModule {
             let month: number = moment(costCentersDeploy[i].createdAt).month();
             currentBudgetExp[month] += costCentersDeploy[i].expendBudget;
         }
+        let periodBudget = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];  
+        let temp: number = 0;
+        for (let j = 0; j < 12; j++) {
+            temp += currentBudgetExp[j];
+            periodBudget[j] = temp;
+        }
         let budgetData = {
             budget: budget,
-            currentBudgetExp: currentBudgetExp
+            currentBudgetExp: periodBudget
         };
         return budgetData;
     }
