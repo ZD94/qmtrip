@@ -20,7 +20,7 @@ const R = require('lodash/fp')
 import { requireParams, clientExport } from '@jingli/dnode-api/dist/src/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
-    EPayType, ESourceType, EInvoiceStatus, TrafficEInvoiceFeeTypes, ProjectStaff, EProjectStatus, ETripDetailStatus, EOrderStatus, AnalysisType
+    EPayType, ESourceType, EInvoiceStatus, TrafficEInvoiceFeeTypes, ProjectStaff, EProjectStatus, ETripDetailStatus, EOrderStatus
 } from "_types/tripPlan";
 import {Models} from "_types";
 import {FindResult} from "common/model/interface";
@@ -3050,26 +3050,30 @@ class TripPlanModule {
      */
     static async getCompanySavedChart(params: {companyId: string}) {
         let {companyId} = params;
+        let beginDate: Date = moment().startOf('M').subtract(11, 'M');
         let tripPlans: TripPlan[] = await Models.tripPlan.all({where: {companyId: companyId, 
                 status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
                 auditStatus: {$in: [EAuditStatus.INVOICE_PASS, EAuditStatus.NO_NEED_AUDIT]}, 
-                createdAt: {$gte: moment().startOf('Y').format().toString()}}, order: [["created_at", "asc"]]});
+                createdAt: {$gte: beginDate.toString()}}, order: [["created_at", "asc"]]});
         let budgets: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; //for 12 months
         for (let i = 0; i < tripPlans.length; i++) {
             let month: number = moment(tripPlans[i].createdAt).month();
             budgets[month] += tripPlans[i].companySaved;
         }
+        let monthNow = moment().month() + 1;
+        budgets = budgets.slice(monthNow - 12).concat(budgets.slice(0, monthNow)); 
+
         return budgets;
     }
 
     /**
      * 获取企业/部门/项目 已确认支出或节省
      * @author lizeilin
-     * @param {companyId: string, type: AnalysisType, isSaved: boolean}
+     * @param {companyId: string}
      * @return {isSaved ? saved : expenditure}
      */
-    static async getConfirmedExpenditureOrSaved(params:{companyId: string, type: AnalysisType, isSaved: boolean, beginDate?: Date, endDate?: Date}) {
-        let {companyId, type, isSaved, beginDate, endDate} = params;
+    static async getConfirmedExpenditureAndSaved(params:{companyId: string, beginDate?: Date, endDate?: Date}) {
+        let {companyId, beginDate, endDate} = params;
         let tripPlans: TripPlan[] = [];
         let _tripPlans: TripPlan[] = [];
         if (!beginDate && !endDate) {
@@ -3088,6 +3092,8 @@ class TripPlanModule {
                 status: {$in: [EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
                 auditStatus: EAuditStatus.INVOICE_PASS}});
             temp = temp.concat(_tripPlans);
+            beginDate = moment(beginDate).startOf('M');
+            endDate = moment(endDate).endOf('M');
             for (let i = 0; i < temp.length; i++) {
                 if (moment(temp[i].createdAt).isSameOrAfter(beginDate) && moment(temp[i].createdAt).isSameOrBefore(endDate)) {
                     tripPlans.push(temp[i]);
@@ -3095,41 +3101,48 @@ class TripPlanModule {
             }
         }
         
-        let expenditure: number = 0;
-        let saved: number = 0;
-        if (type == AnalysisType.TOTAL) {
+        let expenditureAll: number = 0;
+        let savedAll: number = 0;
+        let expenditureDepart: number = 0;
+        let savedDepart: number = 0;
+        let expenditureProj: number = 0;
+        let savedProj: number = 0;
             for (let i = 0; i < tripPlans.length; i++) {
-                expenditure += tripPlans[i].expenditure;
-                saved += tripPlans[i].saved;
+            expenditureAll += tripPlans[i].expenditure;
+            savedAll += tripPlans[i].saved;
             }
-            return isSaved ? saved : expenditure;
-        } else if (type == AnalysisType.DEPARTMENT || type == AnalysisType.PROJECT) {
+
             let tripPlansDepart: TripPlan[] = [];
             let tripPlansProj: TripPlan[] = [];
+        console.log('length------>   ', tripPlans.length);
             for (let i = 0; i < tripPlans.length; i++) {
                 let costCenter: CostCenter = await Models.costCenter.get(tripPlans[i].costCenterId);
+            if (!costCenter)
+                continue;
                 if (costCenter.type == ECostCenterType.DEPARTMENT) {
+                console.log('tripPlans    ', tripPlans[i]);
                     tripPlansDepart.push(tripPlans[i]);
                 }
                 if (costCenter.type == ECostCenterType.PROJECT) {
+                console.log('tripPlanss---  >', tripPlans[i]);
                     tripPlansProj.push(tripPlans[i]);
                 }
             }
-            if (type == AnalysisType.DEPARTMENT) {
                 for (let j = 0; j < tripPlansDepart.length; j++) {
-                    expenditure += tripPlansDepart[j].expenditure;
-                    saved += tripPlansDepart[j].saved;
+            expenditureDepart += tripPlansDepart[j].expenditure;
+            savedDepart += tripPlansDepart[j].saved;
                 }
-            }
-            if (type == AnalysisType.PROJECT) {
                 for (let j = 0; j < tripPlansProj.length; j++) {
-                    expenditure += tripPlansProj[j].expenditure;
-                    saved += tripPlansProj[j].saved;
+            expenditureProj += tripPlansProj[j].expenditure;
+            savedProj += tripPlansProj[j].saved;
                 }
-            }
-            return isSaved ? saved : expenditure;
-        } else {
-            throw Error('type类型错误！');
+        return {
+            expenditureAll: expenditureAll,
+            savedAll: savedAll,
+            expenditureDepart: expenditureDepart,
+            savedDepart: savedDepart,
+            expenditureProj: expenditureProj,
+            savedProj: savedProj
         }
     }
 
@@ -3139,8 +3152,8 @@ class TripPlanModule {
      * @param {companyId: string, type: AnalysisType}
      * @return {budget}
      */
-    static async getPlannedBudget(params: {companyId: string, type?: AnalysisType, departmentOrProjectId?: string, beginDate?: Date, endDate?: Date}) {
-        let {companyId, type, departmentOrProjectId, beginDate, endDate} = params;
+    static async getPlannedBudget(params: {companyId: string, departmentOrProjectId?: string, beginDate?: Date, endDate?: Date}) {
+        let {companyId, departmentOrProjectId, beginDate, endDate} = params;
         let tripPlans: TripPlan[] = [];
         let _tripPlans: TripPlan[] = [];
         if (!beginDate && !endDate) {
@@ -3159,6 +3172,8 @@ class TripPlanModule {
                 status: {$in: [EPlanStatus.EXPIRED, EPlanStatus.RESERVED]},
                 auditStatus: {$in: [EAuditStatus.WAIT_COMMIT, EAuditStatus.WAIT_UPLOAD, EAuditStatus.AUDITING]}}});
             temp = temp.concat(_tripPlans);
+            beginDate = moment(beginDate).startOf('M');
+            endDate = moment(endDate).endOf('M');
             for (let i = 0; i < temp.length; i++) {
                 if (moment(temp[i].createdAt).isSameOrAfter(beginDate) && moment(temp[i].createdAt).isSameOrBefore(endDate)) {
                     tripPlans.push(temp[i]);
@@ -3167,17 +3182,20 @@ class TripPlanModule {
         }
         
         let budget: number = 0;
-        if (type != null && departmentOrProjectId == null) {
-            if (type == AnalysisType.TOTAL) {
+        let budgetAll: number = 0;
+        let budgetDepart: number = 0;
+        let budgetProj: number = 0;
+        if (departmentOrProjectId == null) {
                 for (let i = 0; i < tripPlans.length; i++) {
-                    budget += tripPlans[i].budget;
+                budgetAll += tripPlans[i].budget;
                 }
-                return budget;
-            } else if (type == AnalysisType.DEPARTMENT || type == AnalysisType.PROJECT) {
                 let tripPlansDepart: TripPlan[] = [];
                 let tripPlansProj: TripPlan[] = [];
                 for (let i = 0; i < tripPlans.length; i++) {
                     let costCenter: CostCenter = await Models.costCenter.get(tripPlans[i].costCenterId);
+                if (!costCenter)
+                    continue;
+
                     if (costCenter.type == ECostCenterType.DEPARTMENT) {
                         tripPlansDepart.push(tripPlans[i]);
                     }
@@ -3185,21 +3203,18 @@ class TripPlanModule {
                         tripPlansProj.push(tripPlans[i]);
                     }
                 }
-                if (type == AnalysisType.DEPARTMENT) {
                     for (let j = 0; j < tripPlansDepart.length; j++) {
-                        budget += tripPlansDepart[j].budget;
-                    }
+                budgetDepart += tripPlansDepart[j].budget;
                 }
-                if (type ==AnalysisType.PROJECT) {
                     for (let j = 0; j < tripPlansProj.length; j++) {
-                        budget += tripPlansProj[j].budget;
-                    }
+                budgetProj += tripPlansProj[j].budget;
                 }
-                return budget;
+            return {
+                budgetAll: budgetAll,
+                budgetDepart: budgetDepart,
+                budgetProj: budgetProj
+            };
             } else {
-                throw Error("type类型错误！");
-            }
-        } else if (type == null && departmentOrProjectId != null) {
             let tripPlans: TripPlan[] = await Models.tripPlan.all({where: {costCenterId: departmentOrProjectId, 
                 status: EPlanStatus.WAIT_RESERVE, auditStatus: EAuditStatus.NO_NEED_AUDIT, 
                 createdAt: {$gte: moment().startOf('Y').format().toString()}}});
@@ -3212,10 +3227,7 @@ class TripPlanModule {
                 budget += tripPlans[i].budget;
             }
             return budget;
-        } else {
-            throw Error('type & id都不存在！');
         }
-        
     }
 
 
