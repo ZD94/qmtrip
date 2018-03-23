@@ -436,9 +436,12 @@ function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHot
         star = meiyaHotelData.starRating
     }
     let hotelPicture = [];
-    for(let item of meiyaHotelData.hotelPictureList){
-        hotelPicture.push(item.url)
+    if(meiyaHotelData.hotelPictureList && meiyaHotelData.hotelPictureList.length) {
+        for(let item of meiyaHotelData.hotelPictureList){
+            hotelPicture.push(item.url)
+        }
     }
+
         let model = {
         "name": meiyaHotelData.cnName,
         "star": star,
