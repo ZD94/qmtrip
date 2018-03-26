@@ -1,34 +1,34 @@
 /**
  * Created by wangyali on 2017/5/4.
  */
-import {Models} from "_types";
-import {EApproveResult} from "_types/tripPlan";
-import { TripApprove } from '_types/tripApprove';
+import { Models } from "_types";
+import { EApproveResult } from "_types/tripPlan";
 import { Staff } from '_types/staff';
+import { ITripApprove } from '_types/tripApprove';
 const _ = require('lodash/fp');
 const moment = require("moment");
 var API = require('@jingli/dnode-api');
 require('moment-timezone')
 
 export = async function transform(values: {
-    tripApprove: TripApprove,
+    tripApprove: ITripApprove,
     tripPlan: any,
     companyId: string,
     startAt: string,
     backAt: string,
     cityMap: any,
-    approveUserMap: {[key: string]: Staff},
+    approveUserMap: { [key: string]: Staff },
     isAutoApprove: boolean,
     staffs: string[]
-}): Promise<any>{
+}): Promise<any> {
     let tripApprove = values.tripApprove;
     let tripPlan = values.tripPlan;
-    let cityMap:any = {};
-    let approveUserMap:any = {};
+    let cityMap: any = {};
+    let approveUserMap: any = {};
     let companyId = values.companyId;
-    if(tripPlan && tripPlan.id){
-        tripApprove = await API.tripApprove.retrieveDetailFromApprove({approveNo: tripPlan.id})
-        if(tripApprove)
+    if (tripPlan && tripPlan.id) {
+        tripApprove = await API.tripApprove.retrieveDetailFromApprove({ approveNo: tripPlan.id })
+        if (tripApprove)
             values.tripApprove = tripApprove;
         else
             values.tripApprove = tripPlan;
@@ -44,33 +44,33 @@ export = async function transform(values: {
 
 
     }
-    if(!values.tripApprove || !values.tripApprove.id){
+    if (!values.tripApprove || !values.tripApprove.id) {
         return values;
     }
-    if(!companyId){
+    if (!companyId) {
         companyId = tripApprove.companyId;
     }
     let arrivalCityCodes = tripApprove.arrivalCityCodes;
-    if(typeof arrivalCityCodes == 'string')arrivalCityCodes = JSON.parse(arrivalCityCodes);
+    if (typeof arrivalCityCodes == 'string') arrivalCityCodes = JSON.parse(arrivalCityCodes);
     tripApprove.arrivalCityCodes = arrivalCityCodes;
-    if(arrivalCityCodes && arrivalCityCodes.length > 0){
+    if (arrivalCityCodes && arrivalCityCodes.length > 0) {
         let arrCityList = await Promise.all(arrivalCityCodes.map(async (item: string) => {
-            let arrivalInfo = await API.place.getCityInfo({cityCode: item, companyId});
+            let arrivalInfo = await API.place.getCityInfo({ cityCode: item, companyId });
             cityMap[item] = arrivalInfo;
             return arrivalInfo;
         }))
         values['arrivalCities'] = tripApprove['isRoundTrip'] ? arrCityList.slice(0, -1) : arrCityList
-        let firstDeptTz =  arrCityList[0]["timezone"] ? arrCityList[0]["timezone"]: "Asia/shanghai";
-        let lastDeptTz =  arrCityList[arrCityList.length - 1]["timezone"] ? arrCityList[arrCityList.length - 1]["timezone"]: "Asia/shanghai";
+        let firstDeptTz = arrCityList[0]["timezone"] ? arrCityList[0]["timezone"] : "Asia/shanghai";
+        let lastDeptTz = arrCityList[arrCityList.length - 1]["timezone"] ? arrCityList[arrCityList.length - 1]["timezone"] : "Asia/shanghai";
         values.startAt = moment(tripApprove.startAt).tz(firstDeptTz).format("MM-DD HH:mm");
         values.backAt = moment(tripApprove.backAt).tz(lastDeptTz).format("MM-DD HH:mm");
     }
 
     values.cityMap = cityMap;
-    if(tripApprove && tripApprove.approvedUsers != null){
+    if (tripApprove && tripApprove.approvedUsers != null) {
         let approvedUsers = tripApprove.approvedUsers.split(',');
-        await Promise.all(approvedUsers.map(async function(item: string){
-            if(item && item != ''){
+        await Promise.all(approvedUsers.map(async function (item: string) {
+            if (item && item != '') {
                 let staff = await Models.staff.get(item);
                 approveUserMap[item] = staff;
             }
@@ -82,10 +82,10 @@ export = async function transform(values: {
     }
     values.approveUserMap = approveUserMap;
 
-    let logs = await Models.tripPlanLog.find({where: {tripPlanId: tripApprove.id, approveStatus: EApproveResult.AUTO_APPROVE}});
-    if(logs && logs.length > 0){
+    let logs = await Models.tripPlanLog.find({ where: { tripPlanId: tripApprove.id, approveStatus: EApproveResult.AUTO_APPROVE } });
+    if (logs && logs.length > 0) {
         values.isAutoApprove = true;
-    }else{
+    } else {
         values.isAutoApprove = false;
     }
 
@@ -95,6 +95,10 @@ export = async function transform(values: {
         values.tripApprove['applicant'] = staffNames.length > 1
             ? staffNames[0] + ` 等${staffNames.length}人`
             : staffNames[0]
+        const { projectId, costCenterId } = tripApprove
+        const costOwnership = projectId && await Models.project.get(projectId) || costCenterId && await Models.costCenter.get(costCenterId)
+        values.tripApprove['costOwnership'] = costOwnership && costOwnership.name || ''
     }
+
     return values;
 }
