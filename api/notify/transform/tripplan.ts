@@ -55,7 +55,7 @@ export = async function transform(values: {
     tripApprove.arrivalCityCodes = arrivalCityCodes;
     if(arrivalCityCodes && arrivalCityCodes.length > 0){
         let arrCityList = await Promise.all(arrivalCityCodes.map(async (item: string) => {
-            let arrivalInfo = await API.place.getCityInfo({cityCode: item, companyId: companyId});
+            let arrivalInfo = await API.place.getCityInfo({cityCode: item, companyId});
             cityMap[item] = arrivalInfo;
             return arrivalInfo;
         }))
