@@ -59,7 +59,9 @@ export = async function transform(values: {
             cityMap[item] = arrivalInfo;
             return arrivalInfo;
         }))
+        // 多行程地点信息 (不包含返回地
         values['arrivalCities'] = tripApprove['isRoundTrip'] ? arrCityList.slice(0, -1) : arrCityList
+
         let firstDeptTz = arrCityList[0]["timezone"] ? arrCityList[0]["timezone"] : "Asia/shanghai";
         let lastDeptTz = arrCityList[arrCityList.length - 1]["timezone"] ? arrCityList[arrCityList.length - 1]["timezone"] : "Asia/shanghai";
         values.startAt = moment(tripApprove.startAt).tz(firstDeptTz).format("MM-DD HH:mm");
@@ -79,6 +81,7 @@ export = async function transform(values: {
         let lastApproveUser = await Models.staff.get(tripApprove.approveUserId);
         if (!lastApproveUser) throw new Error('lastApproveUser is null')
         approveUserMap[lastApproveUser.id] = lastApproveUser;
+        values.tripApprove['approveUser'] = lastApproveUser
     }
     values.approveUserMap = approveUserMap;
 
