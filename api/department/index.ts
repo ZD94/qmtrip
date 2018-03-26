@@ -15,7 +15,7 @@ import * as sequelize from 'sequelize'
 
 const departmentCols = Department['$fieldnames'];
 const staffDepartmentCols = StaffDepartment['$fieldnames'];
-export default class DepartmentModule {
+export class DepartmentModule {
     /**
      * 创建部门
      * @param data
@@ -28,7 +28,7 @@ export default class DepartmentModule {
         { if: condition.isCompanyAgency("0.companyId") },
         { if: condition.isCompanyDepartment("0.parentId") }
     ])
-    static async createDepartment (params: Department): Promise<Department>{
+    async createDepartment (params: Department): Promise<Department>{
 
         let result = await Models.department.find({ where: { name: params.name, companyId: params.companyId } });
 
@@ -58,7 +58,7 @@ export default class DepartmentModule {
         { if: condition.isDepartmentAdminOrOwner("0.id") },
         { if: condition.isDepartmentAgency("0.id") }
     ])
-    static async deleteDepartment(params: {id: string}): Promise<any>{
+    async deleteDepartment(params: {id: string}): Promise<any>{
         var department = await Models.department.get(params.id);
         let staffs = await department.getStaffs();
         if (staffs && staffs.length > 0) {
@@ -92,9 +92,9 @@ export default class DepartmentModule {
         { if: condition.isDepartmentAdminOrOwner("0.id") },
         { if: condition.isDepartmentAgency("0.id") }
     ])
-    static async updateDepartment(params: Department): Promise<Department>{
+    async updateDepartment(params: Department): Promise<Department>{
         if(params.parentId){
-            let ids = await DepartmentModule.getAllChildDepartmentsId({parentId: params.id});
+            let ids = await this.getAllChildDepartmentsId({parentId: params.id});
             if(ids.indexOf(params.parentId) >= 0){
                 throw L.ERR.INVALID_ARGUMENT("parentId");
             }
@@ -126,7 +126,7 @@ export default class DepartmentModule {
         { if: condition.isSelfDepartment("0.id") },
         { if: condition.isDepartmentAgency("0.id") }
     ])
-    static async getDepartment(params: { id: string, companyId?: string }): Promise<Department> {
+    async getDepartment(params: { id: string, companyId?: string }): Promise<Department> {
         let id = params.id;
         let dept = await Models.department.get(id);
         return dept;
@@ -145,7 +145,7 @@ export default class DepartmentModule {
         { if: condition.isCompanyAgency("0.where.companyId") },
         { if: condition.isCompanyStaff("0.where.companyId") }
     ])
-    static async getDepartments(params: FindOptions<any>) :Promise<FindResult>{
+    async getDepartments(params: FindOptions<any>) :Promise<FindResult>{
         params.order = params.order || [['createdAt', 'desc']];
 
         let paginate = await Models.department.find(params);
@@ -165,7 +165,7 @@ export default class DepartmentModule {
         { if: condition.isCompanyAdminOrOwner("0.companyId") },
         { if: condition.isCompanyAgency("0.companyId") }
     ])
-    static async getFirstClassDepartments(params: { companyId: string }): Promise<PaginateInterface<Department>> {
+    async getFirstClassDepartments(params: { companyId: string }): Promise<PaginateInterface<Department>> {
         var staff = await Staff.getCurrent();
         let options: any = {};
         params['parentId'] = null;
@@ -190,7 +190,7 @@ export default class DepartmentModule {
         { if: condition.isDepartmentAdminOrOwner("0.parentId") },
         { if: condition.isDepartmentAgency("0.parentId") }
     ])
-    static async getChildDepartments(params: { parentId: string, companyId?: string }): Promise<PaginateInterface<Department>> {
+    async getChildDepartments(params: { parentId: string, companyId?: string }): Promise<PaginateInterface<Department>> {
         var staff = await Staff.getCurrent();
         var options: any = {};
         options.where = params;
@@ -214,7 +214,7 @@ export default class DepartmentModule {
         { if: condition.isDepartmentAdminOrOwner("0.parentId") },
         { if: condition.isDepartmentAgency("0.parentId") }
     ])
-    static async getAllChildren(params: { parentId: string }) {
+    async getAllChildren(params: { parentId: string }) {
         var sql = "with RECURSIVE cte as " +
             "( select a.id,a.name,a.parent_id from department.departments a where id='" + params.parentId + "' " +
             "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id " +
@@ -229,13 +229,13 @@ export default class DepartmentModule {
         { if: condition.isDepartmentAdminOrOwner("0.parentId") },
         { if: condition.isDepartmentAgency("0.parentId") }
     ])
-    static async getAllChildDepartments(params: { companyId?: string, parentId: string }) {
+    async getAllChildDepartments(params: { companyId?: string, parentId: string }) {
         var staff = await Staff.getCurrent();
         if (staff) {
             params.companyId = staff["companyId"];//只允许查询该企业下的部门
         }
 
-        return DepartmentModule.getAllChildren(params);
+        return this.getAllChildren(params);
 
     }
 
@@ -249,7 +249,7 @@ export default class DepartmentModule {
         { if: condition.isDepartmentAdminOrOwner("0.parentId") },
         { if: condition.isDepartmentAgency("0.parentId") }
     ])
-    static async getAllChildDepartmentsId(params: { parentId: string }): Promise<string[]> {
+    async getAllChildDepartmentsId(params: { parentId: string }): Promise<string[]> {
         var ids: string[] = [];
         var sql = "with RECURSIVE cte as " +
             "( select a.id,a.name,a.parent_id from department.departments a where id='" + params.parentId + "' " +
@@ -272,8 +272,8 @@ export default class DepartmentModule {
         { if: condition.isDepartmentAdminOrOwner("0.departmentId") },
         { if: condition.isDepartmentAgency("0.departmentId") }
     ])
-    static async getAllStaffNum(params: { departmentId: string }): Promise<number> {
-        let ids = await DepartmentModule.getAllChildDepartmentsId({ parentId: params.departmentId });
+    async getAllStaffNum(params: { departmentId: string }): Promise<number> {
+        let ids = await this.getAllChildDepartmentsId({ parentId: params.departmentId });
         let idsStr = ids.join("','");
         let sql = "select count(*) from" +
             " (select distinct staff_id from department.staff_departments where department_id in ('" + idsStr + "') and deleted_at is null) as a";
@@ -282,7 +282,7 @@ export default class DepartmentModule {
     }
 
     @clientExport
-    static async getStaffs(params: { options?: any, id: string }): Promise<PaginateInterface<Staff>> {
+    async getStaffs(params: { options?: any, id: string }): Promise<PaginateInterface<Staff>> {
         let currentStaff = await Staff.getCurrent();
         let options = params.options;
         if (!options) options = { where: {} };
@@ -348,7 +348,7 @@ export default class DepartmentModule {
         return staffs;
     }
 
-    static async deleteDepartmentByTest(params: {name: string, companyId: string}){
+    async deleteDepartmentByTest(params: {name: string, companyId: string}){
         await DB.models.Department.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}});
         return true;
     }
@@ -362,7 +362,7 @@ export default class DepartmentModule {
      */
     @clientExport
     @requireParams(["departmentId", "staffId"], staffDepartmentCols)
-    static async createStaffDepartment (params: StaffDepartment) : Promise<StaffDepartment>{
+    async createStaffDepartment (params: StaffDepartment) : Promise<StaffDepartment>{
         var staffDepartment = StaffDepartment.create(params);
         var already = await Models.staffDepartment.find({ where: { departmentId: params.departmentId, staffId: params.staffId } });
         if (already && already.length > 0) {
@@ -380,7 +380,7 @@ export default class DepartmentModule {
      */
     @clientExport
     @requireParams(["id"])
-    static async deleteStaffDepartment(params: {id: string}) : Promise<any>{
+    async deleteStaffDepartment(params: {id: string}) : Promise<any>{
         var id = params.id;
         var ah_delete = await Models.staffDepartment.get(id);
 
@@ -397,7 +397,7 @@ export default class DepartmentModule {
      */
     @clientExport
     @requireParams(["id"], staffDepartmentCols)
-    static async updateStaffDepartment(params: StaffDepartment) : Promise<StaffDepartment>{
+    async updateStaffDepartment(params: StaffDepartment) : Promise<StaffDepartment>{
         var id = params.id;
 
         var ah = await Models.staffDepartment.get(id);
@@ -414,7 +414,7 @@ export default class DepartmentModule {
      */
     @clientExport
     @requireParams(["id"])
-    static async getStaffDepartment(params: { id: string }): Promise<StaffDepartment> {
+    async getStaffDepartment(params: { id: string }): Promise<StaffDepartment> {
         let id = params.id;
         var ah = await Models.staffDepartment.get(id);
 
@@ -428,7 +428,7 @@ export default class DepartmentModule {
      * @returns {*}
      */
     @clientExport
-    static async getStaffDepartments(params: FindOptions<any>): Promise<FindResult>{
+    async getStaffDepartments(params: FindOptions<any>): Promise<FindResult>{
         let paginate = await Models.staffDepartment.find(params);
         let ids = paginate.map(function (t) {
             return t.id;
@@ -441,18 +441,19 @@ export default class DepartmentModule {
      * @param deptId
      */
     @clientExport
-    static async findParentManagers(deptId: string): Promise<string[]> {
+    async findParentManagers(deptId: string): Promise<string[]> {
+        let self = this;
         const dept = await Models.department.get(deptId)
         const { manager, parent } = dept
         if (parent == null && manager == null) return []
 
         return manager && parent == null
             ? [manager.id]
-            : [manager.id, ... await DepartmentModule.findParentManagers(parent.id)]
+            : [manager.id, ... await self.findParentManagers(parent.id)]
     }
 }
 
-
+export default new DepartmentModule();
 /**
  * 获取部门树形机构            
  * @param deptId 根部门 Id
@@ -490,16 +491,3 @@ async function f([x, ...xs]: Department[]): Promise<Department[]> {
         ? []
         : [... await findChildren(x.id), ... await f(xs)]
 }
-
-/**
- * 查询该部门的所有上级部门
- * @param deptId 
- */
-// async function findParents(deptId: string): Promise<Array<Department>> {
-//     const dept = await Models.department.get(deptId)
-//     if (!dept) return []
-
-//     return dept.parent == void 0
-//         ? [dept]
-//         : [... await findParents(dept.parent.id)]
-// }

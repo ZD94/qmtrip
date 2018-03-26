@@ -8,7 +8,7 @@ var API = require("@jingli/dnode-api");
 import {Place, AirCompany, Airport} from '_types/place';
 import {FindResult} from "common/model/interface";
 
-class ApiPlace {
+export class ApiPlace {
     static __public = true;
 
     /**
@@ -29,7 +29,7 @@ class ApiPlace {
      * });
      * ```
      */
-    static async queryPlace(params: {keyword: string, isAbroad?: boolean}):Promise<FindResult> {
+    async queryPlace(params: {keyword: string, isAbroad?: boolean}):Promise<FindResult> {
         let _params: any = params;
         if (!_params) {
             _params = {};
@@ -54,7 +54,7 @@ class ApiPlace {
      * @param {String} params.code 城市代码
      * @return {Promise} [{"id":"ID", "name": "Name"}, {"id":"ID2", "name": "NAME2"}]
      */
-    static queryBusinessDistrict(params: {keyword?: string, code?: string}) :Promise<Place> {
+    queryBusinessDistrict(params: {keyword?: string, code?: string}) :Promise<Place> {
         return API.place.queryBusinessDistrict(params)
             .then(function(places: Place[]) {
                 let arr = places.map(function(place) {
@@ -73,7 +73,7 @@ class ApiPlace {
      * @param {Number} params.limit
      * @return {Promise} [{id: "ID", name: "Name"}]
      */
-    static hotCities(params: {limit?: number, isAbroad?: boolean}) :Promise<Array<Place>> {
+    hotCities(params: {limit?: number, isAbroad?: boolean}) :Promise<Array<Place>> {
         return API.place.queryHotCity(params)
             .then(function(places: Place[]) {
                 let arr:Array<Place> = places.map(function(place) {
@@ -92,7 +92,7 @@ class ApiPlace {
      * @param {String} params.cityId 城市ID
      * @return {Promise} [{id:"ID", name:"Name"}]
      */
-    static hotBusinessDistricts(params: {cityId: string, limit?: number}) :Promise<Array<Place>> {
+    hotBusinessDistricts(params: {cityId: string, limit?: number}) :Promise<Array<Place>> {
         return API.place.hotBusinessDistricts(params)
             .then(function(places: Place[]) {
                 var arr: Array<Place> = places.map(function(place) {
@@ -109,7 +109,7 @@ class ApiPlace {
      * @param {string} params.cityCode 城市代码
      * @return {Promise} {id: id, name: name}
      */
-    static getCityInfo(params: {cityCode: string, isAbroad?: boolean}) : Promise<Place> {
+    getCityInfo(params: {cityCode: string, isAbroad?: boolean}) : Promise<Place> {
         if (!params.cityCode) {
             throw new Error("cityCode require but is " + params.cityCode);
         }
@@ -128,7 +128,7 @@ class ApiPlace {
      * @param   {string}    params.cityCode 城市代码
      * @type {Promise} array
      */
-    static getAirPortsByCity(params: {cityCode: string}) : Promise<Array<Airport>> {
+    getAirPortsByCity(params: {cityCode: string}) : Promise<Array<Airport>> {
         if (!params.cityCode) {
             throw new Error("cityCode require but is empty!");
         }
@@ -146,7 +146,7 @@ class ApiPlace {
      * 通过id获取机场信息
      * @param params
      */
-    static getAirportById(params: {id: string}) :Promise<Airport> {
+    getAirportById(params: {id: string}) :Promise<Airport> {
         return API.place.getAirportById(params)
             .then(function(airport: Airport) {
                 return new Airport(airport);
@@ -159,14 +159,14 @@ class ApiPlace {
      * @param params
      * @returns {*}
      */
-    static getAirportByCode(params: {code: string}) :Promise<Airport> {
+    getAirportByCode(params: {code: string}) :Promise<Airport> {
         return API.place.getAirportBySkyCode(params)
             .then(function(airport: Airport) {
                 return new Airport(airport);
             })
     }
 
-    static getAirCompanyById(params: {id: string}) : Promise<AirCompany> {
+    getAirCompanyById(params: {id: string}) : Promise<AirCompany> {
         return API.place.getAirCompanyById(params)
             .then(function(airCompany: AirCompany) {
                 return new AirCompany(airCompany);
@@ -177,7 +177,7 @@ class ApiPlace {
      * @method getAirCompanyByCode 获取航空公司
      * @param params
      */
-    static getAirCompanyByCode(params: {code: string}) :Promise<AirCompany> {
+    getAirCompanyByCode(params: {code: string}) :Promise<AirCompany> {
         return API.place.getAirCompanyByCode(params)
             .then(function(airCompany: AirCompany) {
                 return new AirCompany(airCompany)
@@ -189,7 +189,7 @@ class ApiPlace {
      * @param params
      * @returns {any}
      */
-    static getAllCities(params: {type: number, isAbroad?: boolean}) :Promise<Place> {
+    getAllCities(params: {type: number, isAbroad?: boolean}) :Promise<Place> {
         if (!params || !params.type) params.type = 2;
         return API.place.getAllCities(params);
     }
@@ -199,7 +199,7 @@ class ApiPlace {
      * @param
      * @returns []
      */
-    static getCitiesByLetter(params: {}) : Promise<Place>{
+    getCitiesByLetter(params: {}) : Promise<Place>{
         return API.place.getCitiesByLetter(params);
     }
 
@@ -208,9 +208,9 @@ class ApiPlace {
      * @param params
      * @returns {any}
      */
-    static queryCitiesGroupByLetter(params: {isAbroad?: boolean}) {
+    queryCitiesGroupByLetter(params: {isAbroad?: boolean}) {
         return API.place.queryCitiesGroupByLetter(params);
     }
 }
 
-export= ApiPlace
+export default new ApiPlace();

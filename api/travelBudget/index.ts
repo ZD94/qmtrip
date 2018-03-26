@@ -141,9 +141,9 @@ export interface ISearchTicketParams {
 }
 
 
-export default class ApiTravelBudget {
+export class ApiTravelBudget {
     @clientExport
-    static async getBudgetInfo(params: { id: string, accountId?: string }) {
+    async getBudgetInfo(params: { id: string, accountId?: string }) {
         let {id, accountId} = params;
         if (!accountId || accountId == 'undefined') {
             let staff = await Staff.getCurrent();
@@ -155,12 +155,12 @@ export default class ApiTravelBudget {
     }
 
     @clientExport
-    static getDefaultPrefer() {
+    getDefaultPrefer() {
         // return {};
     }
 
     @clientExport
-    static async sendSaleSteam(params: any) {
+    async sendSaleSteam(params: any) {
         try {
             await API.notify.submitNotify({
                 key: 'qm_tmc',
@@ -175,7 +175,7 @@ export default class ApiTravelBudget {
 
     
     @clientExport
-    static async getHotelsData(params: ISearchHotelParams): Promise<any> {
+    async getHotelsData(params: ISearchHotelParams): Promise<any> {
         let commonData;
         // let result;
         // try {
@@ -190,7 +190,7 @@ export default class ApiTravelBudget {
         // } catch (err) {
         //     console.log(err);
         // }
-        let companyInfo = await ApiTravelBudget.getCompanyInfo(null, null, null, TMCStatus.OK_USE);
+        let companyInfo = await this.getCompanyInfo(null, null, null, TMCStatus.OK_USE);
         let data = companyInfo ? companyInfo : await getJLAgents();
         // console.log('hoteldata ----->    ', data);
 
@@ -232,7 +232,7 @@ export default class ApiTravelBudget {
     }
 
     @clientExport
-    static async getTrafficsData(params: ISearchTicketParams): Promise<any> {
+    async getTrafficsData(params: ISearchTicketParams): Promise<any> {
         let commonData: any[] = [];
         let commonData2: any[] = [];
         // let result;
@@ -254,7 +254,7 @@ export default class ApiTravelBudget {
 
 
 
-        let companyInfo = await ApiTravelBudget.getCompanyInfo(null, null, null, TMCStatus.OK_USE); 
+        let companyInfo = await this.getCompanyInfo(null, null, null, TMCStatus.OK_USE);
         let data = companyInfo ? companyInfo : await getJLAgents();
         // console.log('trafficdata ----->   ', data);
 
@@ -307,7 +307,7 @@ export default class ApiTravelBudget {
     }
 
     @clientExport
-    static async getTripTravelPolicy(travelPolicyId: string, destinationId: string) {
+    async getTripTravelPolicy(travelPolicyId: string, destinationId: string) {
         let result;
         try {
             result = await RestfulAPIUtil.operateOnModel({
@@ -335,9 +335,9 @@ export default class ApiTravelBudget {
 
     //用于接收更新预算，并更新approve表和tripapprove上次
     @clientExport
-    static async updateBudget(params: { approveId: string, budgetResult: any, isFinalFirstResponse?: boolean, alreadyMerged?: boolean }) {
+    async updateBudget(params: { approveId: string, budgetResult: any, isFinalFirstResponse?: boolean, alreadyMerged?: boolean }) {
         let approve = await Models.approve.get(params.approveId);
-
+        let self = this;
         let oldId = approve.oldId;
         if(!approve || !approve.id)
             return;
@@ -384,18 +384,18 @@ export default class ApiTravelBudget {
                     if(typeof data == 'string') data = JSON.parse(data);
                     let params = data.query;
                     if(typeof params == 'string') params = JSON.parse(params);
-                    let modifyParams = await ApiTravelBudget.dealModifyParams(params);
+                    let modifyParams = await self.dealModifyParams(params);
                     oldBudgets = modifyParams.oldBudgets;
                     // oldBudgets = data.oldBudgets;
                 }
     
                 if(oldId && oldBudgets && oldBudgets.length){
-                    _budgets = await ApiTravelBudget.mergeBudget(oldBudgets, _budgets);
+                    _budgets = await self.mergeBudget(oldBudgets, _budgets);
                 }
             }
             
             let ps: Promise<any>[] = _budgets.map(async (item: ICreateBudgetAndApproveParamsNew) => {
-                return await ApiTravelBudget.transformBudgetData(item, companyId);
+                return await self.transformBudgetData(item, companyId);
             });
             let budgets = await Promise.all(ps);
             let totalBudget = 0;
@@ -434,7 +434,7 @@ export default class ApiTravelBudget {
                         });
                         await tripPlanLog.save();
                         await API.tripApprove.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
-                        await ApiTravelBudget.sendTripApproveNoticeToSystem({approveId: tripApprove.id, staffId: staffId});
+                        await self.sendTripApproveNoticeToSystem({approveId: tripApprove.id, staffId: staffId});
                     }
 
                 }
@@ -463,7 +463,7 @@ export default class ApiTravelBudget {
      * @param {string} approveId
      * @returns {Promise<{params: any; oldBudgets: any; _index: number}>}
      */
-    static async dealModifyParams(_params: ICreateBudgetAndApproveParamsNew): Promise<{params: any, oldBudgets: any, _index: number}>{
+    async dealModifyParams(_params: ICreateBudgetAndApproveParamsNew): Promise<{params: any, oldBudgets: any, _index: number}>{
         let params = _.cloneDeep(_params);
         let approveId = params.modifiedId;
         let destinationPlacesInfo = params.destinationPlacesInfo;
@@ -542,7 +542,7 @@ export default class ApiTravelBudget {
      * @param {any[]} newBudget
      * @returns {any[]}
      */
-    static async mergeBudget(oldbudget: any[], newBudget: any[]){
+    async mergeBudget(oldbudget: any[], newBudget: any[]){
         let resultBudget: any[] =  _.cloneDeep(oldbudget);
         let oldIndex = oldbudget[oldbudget.length -1].index + 1;
         let mergeItem = false;
@@ -614,7 +614,7 @@ export default class ApiTravelBudget {
      * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
      */
     @clientExport
-    static async getTravelPolicyBudgetNew(params: ICreateBudgetAndApproveParamsNew, isIntoApprove: boolean, approveId?: string): Promise<any> {
+    async getTravelPolicyBudgetNew(params: ICreateBudgetAndApproveParamsNew, isIntoApprove: boolean, approveId?: string): Promise<any> {
         //测试
         /*params.modifiedId = '4b8aec10-2b4a-11e8-a6d1-5f5b59e775c0';
         params.destinationPlacesInfo.forEach((d, index) => {
@@ -626,6 +626,7 @@ export default class ApiTravelBudget {
         let modifiedId = params.modifiedId;
         let getBudgetParams = params;
         let oldBudgets = [];
+        let self = this;
 
         let staffId = params['staffId'];
         let preferedCurrency = params["preferedCurrency"];
@@ -742,12 +743,12 @@ export default class ApiTravelBudget {
         }
 
         if(modifiedId){
-            let modifyParams = await ApiTravelBudget.dealModifyParams(params);
+            let modifyParams = await self.dealModifyParams(params);
             getBudgetParams = modifyParams.params;
             oldBudgets = modifyParams.oldBudgets;
         }
 
-        let budgetResult: any = await ApiTravelBudget.createNewBudget({
+        let budgetResult: any = await self.createNewBudget({
             callbackUrl: `${config.host}/api/v1/budget/${approveId}/updateBudget`,
             preferedCurrency: preferedCurrency,
             travelPolicyId: travelPolicy['id'],
@@ -765,12 +766,12 @@ export default class ApiTravelBudget {
 
 
         let ps: Promise<any>[] = segmentsBudget.map(async (item: any) => {
-            return await ApiTravelBudget.transformBudgetData(item, companyId);
+            return await self.transformBudgetData(item, companyId);
         });
         let budgets = await Promise.all(ps);
 
         if(modifiedId && oldBudgets && oldBudgets.length){
-            budgets = await ApiTravelBudget.mergeBudget(oldBudgets, budgets);
+            budgets = await self.mergeBudget(oldBudgets, budgets);
         }
 
 
@@ -840,7 +841,7 @@ export default class ApiTravelBudget {
                 await updateBudget.save();
             }
             if (budgetResult.step == 'FIN' && eachBudgetSegIsOk) {
-                await ApiTravelBudget.updateBudget({
+                await self.updateBudget({
                     approveId: approveId || '',
                     budgetResult: budgetResult,
                     isFinalFirstResponse: (isIntoApprove ? false : true),
@@ -858,13 +859,13 @@ export default class ApiTravelBudget {
         let _id = Date.now() + utils.getRndStr(6);
         let key = `budgets:${staffId}:${_id}`;
         await cache.write(key, JSON.stringify(obj));
-        // await ApiTravelBudget.sendTripApproveNoticeToSystem({cacheId: _id, staffId: staffId});
+        // await self.sendTripApproveNoticeToSystem({cacheId: _id, staffId: staffId});
         return {approveId: approveId, budgetId: _id};
     }
 
     //获取公司信息
     @clientExport
-    static async getCompanyInfo(sname?:string, staffId?: string, type?: number, status?: number): Promise<any> {
+    async getCompanyInfo(sname?:string, staffId?: string, type?: number, status?: number): Promise<any> {
         let staff: Staff;
         if(staffId) staff = await Models.staff.get(staffId);
         if(!staffId) {
@@ -897,7 +898,7 @@ export default class ApiTravelBudget {
 
     }
 
-    static async transformBudgetData(budget: any, companyId: string) {
+    async transformBudgetData(budget: any, companyId: string) {
         budget.index = budget.index;
         delete budget.markedScoreData;
         delete budget.prefers;
@@ -947,7 +948,7 @@ export default class ApiTravelBudget {
     }
 
 
-    static async sendTripApproveNoticeToSystem(params: { staffId: string, cacheId?: string,  approveId?: string}) {
+    async sendTripApproveNoticeToSystem(params: { staffId: string, cacheId?: string,  approveId?: string}) {
         let {cacheId, staffId, approveId} = params;
         if (!staffId || staffId == 'undefined') {
             let currentStaff = await Staff.getCurrent();
@@ -983,16 +984,16 @@ export default class ApiTravelBudget {
 
     // 获取鲸力供应商信息
     @clientExport 
-    static async getJLAgentSupplier() {
+    async getJLAgentSupplier() {
         let agents = await getJLAgents();
         return agents;
     }
 
     @clientExport
-    static async reportBudgetError(params: { budgetId: string }) {
+    async reportBudgetError(params: { budgetId: string }) {
         let staff = await Staff.getCurrent();
         let {budgetId} = params;
-        let content = await ApiTravelBudget.getBudgetInfo({id: budgetId, accountId: staff.id});
+        let content = await this.getBudgetInfo({id: budgetId, accountId: staff.id});
         let budgets = content.budgets;
         let ps = budgets.map(async (budget: any): Promise<any> => {
             if (!budget.id) {
@@ -1008,7 +1009,7 @@ export default class ApiTravelBudget {
     }
 
     // params: IQueryBudgetParams
-    static async createNewBudget(params: any) {
+    async createNewBudget(params: any) {
         let result;
         try {
             result = await RestfulAPIUtil.operateOnModel({
@@ -1028,7 +1029,7 @@ export default class ApiTravelBudget {
         return result.data;
     }
 
-    static async getBudgetById(params: { id: string }) {
+    async getBudgetById(params: { id: string }) {
         let result;
         try {
             result = await RestfulAPIUtil.operateOnModel({
@@ -1044,7 +1045,7 @@ export default class ApiTravelBudget {
         return result.data;
     }
 
-    static __initHttpApp(app: Application) {
+    __initHttpApp(app: Application) {
 
         function _auth_middleware(req: Request, res: Response, next?: NextFunction) {
             let key = req.query.key;
@@ -1087,6 +1088,7 @@ export default class ApiTravelBudget {
     }
 }
 
+export default new ApiTravelBudget();
 /* as ICreateBudgetAndApproveParamsNew; */
 // let param = {
 //     checkInDate: "2018-02-21",

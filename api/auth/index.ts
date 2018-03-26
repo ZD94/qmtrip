@@ -46,7 +46,7 @@ function makeLinkSign(linkToken: string, invitedLinkId: string, timestamp: numbe
  * @class API.auth 认证类
  * @constructor
  */
-export default class ApiAuth {
+export class ApiAuth {
 
     static __public: boolean = true;
 
@@ -57,7 +57,7 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(['mobile', 'msgCode', 'msgTicket'])
-    static async validateMsgCheckCode(params: {mobile: string, msgCode: string, msgTicket: string}) {
+    async validateMsgCheckCode(params: {mobile: string, msgCode: string, msgTicket: string}) {
         var mobile = params.mobile;
         var msgCode = params.msgCode;
         var msgTicket = params.msgTicket;
@@ -106,7 +106,7 @@ export default class ApiAuth {
      * @return {Promise}
      */
     @clientExport
-    static async resetPwdByMobile(params: {accountId: string, sign: string, timestamp: number, pwd: string}) {
+    async resetPwdByMobile(params: {accountId: string, sign: string, timestamp: number, pwd: string}) {
         var accountId = params.accountId;
         var sign = params.sign;
         var timestamp = params.timestamp;
@@ -155,7 +155,7 @@ export default class ApiAuth {
      * @return {Promise} true|error
      */
     @clientExport
-    static async resetPwdByEmail(params: {accountId: string, sign: string, timestamp: number, pwd: string}) {
+    async resetPwdByEmail(params: {accountId: string, sign: string, timestamp: number, pwd: string}) {
 
         var accountId = params.accountId;
         var sign = params.sign;
@@ -200,7 +200,7 @@ export default class ApiAuth {
      * @returns {boolean}
      */
     @clientExport
-    static async reSendActiveLink(params: {email: string, accountId?: string, origin?: string, version?: number}): Promise<boolean> {
+    async reSendActiveLink(params: {email: string, accountId?: string, origin?: string, version?: number}): Promise<boolean> {
         var mobileOrEmail = params.email;
         var accountId = params.accountId;
         var account: Account;
@@ -235,9 +235,9 @@ export default class ApiAuth {
      * @returns {boolean}
      */
     @clientExport
-    static async reSendActiveSms(params: {accountId: string}): Promise<boolean> {
+    async reSendActiveSms(params: {accountId: string}): Promise<boolean> {
         let accountId = params.accountId;
-        let account = await ApiAuth.getPrivateInfo({id: accountId});
+        let account = await this.getPrivateInfo({id: accountId});
         let currentStaff = await Staff.getCurrent();
 
         if (!account) {
@@ -270,9 +270,10 @@ export default class ApiAuth {
      * @returns {boolean}
      */
     @clientExport
-    static async reSendJoinedSms(params: {accountId: string, inviterStaffId: string, targetStaffName: string}): Promise<boolean> {
+    async reSendJoinedSms(params: {accountId: string, inviterStaffId: string, targetStaffName: string}): Promise<boolean> {
+        let self = this;
         let accountId = params.accountId;
-        let account = await ApiAuth.getPrivateInfo({id: accountId});
+        let account = await self.getPrivateInfo({id: accountId});
 
         if (!account.mobile) {
             throw L.ERR.MOBILE_NOT_CORRECT();
@@ -311,7 +312,7 @@ export default class ApiAuth {
      * @public
      */
     @clientExport
-    static async activeByEmail(data: {sign: string, accountId: string, timestamp: number}): Promise<any> {
+    async activeByEmail(data: {sign: string, accountId: string, timestamp: number}): Promise<any> {
         var sign = data.sign;
         var accountId = data.accountId;
         var timestamp = data.timestamp;
@@ -354,7 +355,7 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(['mobile', 'msgCode', 'msgTicket'])
-    static async activeByMobile(data: {mobile: string, msgCode: string, msgTicket: number}): Promise<any> {
+    async activeByMobile(data: {mobile: string, msgCode: string, msgTicket: number}): Promise<any> {
         var mobile = data.mobile;
         var msgCode = data.msgCode;
         var msgTicket = data.msgTicket;
@@ -396,7 +397,7 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(['pwd', 'msgCode', 'msgTicket', 'accountId'])
-    static async activeByModifyPwd(data: {pwd: string, msgCode: string, msgTicket: number, accountId: string}): Promise<boolean> {
+    async activeByModifyPwd(data: {pwd: string, msgCode: string, msgTicket: number, accountId: string}): Promise<boolean> {
         let account = await Models.staff.get(data.accountId);
         let pwd = data.pwd;
         let msgCode = data.msgCode;
@@ -434,7 +435,7 @@ export default class ApiAuth {
      * @returns {{inviter: Staff, company: Company}}
      */
     @clientExport
-    static async checkInvitedLink(data: {sign: string, linkId: string, timestamp: number}): Promise<any> {
+    async checkInvitedLink(data: {sign: string, linkId: string, timestamp: number}): Promise<any> {
         var sign = data.sign;
         var linkId = data.linkId;
         var timestamp = data.timestamp;
@@ -469,7 +470,7 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(['mobile', 'name', 'companyId', 'msgCode', 'msgTicket', 'pwd'], ['avatarColor'])
-    static async invitedStaffRegister(data: {
+    async invitedStaffRegister(data: {
         msgCode: string, msgTicket: string,
         mobile: string, name: string, pwd: string, 
         companyId: string, avatarColor?: string
@@ -492,22 +493,6 @@ export default class ApiAuth {
         var ckeckMsgCode = await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
 
         if(ckeckMsgCode) {
-            /*var company = await Models.company.get(companyId);
-             var defaultDeptment = await company.getDefaultDepartment();
-             var defaultTravelPolicy = await company.getDefaultTravelPolicy();
-             var staff = Staff.create({
-             mobile: mobile,
-             name: name,
-             pwd: utils.md5(pwd),
-             status: ACCOUNT_STATUS.ACTIVE,
-             isValidateMobile: true
-             })
-             staff.company = company;
-             if(defaultDeptment) {
-             staff.department = defaultDeptment;
-             }
-             staff["travelPolicyId"] = defaultTravelPolicy ? defaultTravelPolicy.id : null;
-             staff = await staff.save();*/
 
             var staff = await API.staff.registerStaff({
                 mobile: mobile,
@@ -535,7 +520,7 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(['mobile', 'name', 'companyId', 'msgTicket', 'pwd'], ['avatarColor', 'sex'])
-    static async invitedNewStaffRegister(data: {
+    async invitedNewStaffRegister(data: {
         sex: EGender, msgTicket: string,
         mobile: string, name: string, pwd: string, 
         companyId: string, avatarColor?: string
@@ -577,7 +562,7 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(['mobile', 'msgCode', 'msgTicket'])
-    static async inviteStaffone( params: {
+    async inviteStaffone( params: {
         mobile: string, msgCode: string, msgTicket: string
     }) : Promise<any>{
         let mobile = params.mobile && params.mobile.toString(),
@@ -627,7 +612,7 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(["msgTicket", "mobile", "companyId"])
-    static async joinAnCompany( params: {mobile: string, msgTicket: string, companyId: string} ) : Promise<any>{
+    async joinAnCompany( params: {mobile: string, msgTicket: string, companyId: string} ) : Promise<any>{
         let mobile = params.mobile,
             msgTicket=params.msgTicket,
             companyId=params.companyId;
@@ -700,7 +685,7 @@ export default class ApiAuth {
      * @returns {boolean}
      */
     @clientExport
-    static async checkEmailAndMobile(data: {email?: string, mobile?: string}) {
+    async checkEmailAndMobile(data: {email?: string, mobile?: string}) {
         if(data.email && !validator.isEmail(data.email)) {
             throw L.ERR.EMAIL_FORMAT_INVALID();
         }
@@ -757,7 +742,7 @@ export default class ApiAuth {
      * @return {Promise}
      */
     @clientExport
-    static async resetPwdByOldPwd(params: {oldPwd: string, newPwd: string}): Promise<boolean> {
+    async resetPwdByOldPwd(params: {oldPwd: string, newPwd: string}): Promise<boolean> {
         let session = getSession();
         let oldPwd = params.oldPwd;
         let newPwd = params.newPwd;
@@ -797,7 +782,7 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(['mobile', 'name', 'userName', 'pwd', 'msgCode', 'msgTicket'], ['email', 'agencyId', 'remark', 'description', 'promoCode', 'referrerMobile', 'source'])
-    static async registerCompany(params: {name: string, userName: string, email?: string, mobile: string, pwd: string,
+    async registerCompany(params: {name: string, userName: string, email?: string, mobile: string, pwd: string,
         msgCode: string, msgTicket: string, agencyId?: string, promoCode?: string, referrerMobile?: string, source?: number}) {
         var companyName = params.name;
         var name = params.userName;
@@ -898,7 +883,7 @@ export default class ApiAuth {
      * @returns {Promise} true|error
      */
     @clientExport
-    static async sendResetPwdEmail(params: {email: string, mobile?: string, type?: Number, isFirstSet?: boolean, companyName?: string}): Promise<boolean> {
+    async sendResetPwdEmail(params: {email: string, mobile?: string, type?: Number, isFirstSet?: boolean, companyName?: string}): Promise<boolean> {
         var email = params.email;
         var mobile = params.mobile;
         var isFirstSet = params.isFirstSet;
@@ -971,7 +956,7 @@ export default class ApiAuth {
      * @returns {Promise} true|error
      */
     @clientExport
-    static async sendImportStaffEmail(params: {accountId: string, version?: number}): Promise<boolean> {
+    async sendImportStaffEmail(params: {accountId: string, version?: number}): Promise<boolean> {
         var accountId = params.accountId;
 
         if(!accountId) {
@@ -1015,7 +1000,7 @@ export default class ApiAuth {
     }
 
     @clientExport
-    static async getAccountStatus(params: {id: string}): Promise<Account|undefined> {
+    async getAccountStatus(params: {id: string}): Promise<Account|undefined> {
         let acc: Account | undefined;
         let args: any = {attributes: ["status"]};
         args.where = {id: params.id};
@@ -1042,7 +1027,8 @@ export default class ApiAuth {
      * @public
      */
     @requireParams(["email"], accountCols)
-    static async newAccount(data: {email: string, mobile?: string, pwd?: string, type?: Number, status?: Number, companyName?: string, id?: string, version?: number}) {
+    async newAccount(data: {email: string, mobile?: string, pwd?: string, type?: Number, status?: Number, companyName?: string, id?: string, version?: number}) {
+        let self = this;
         if(!data) {
             throw L.ERR.DATA_NOT_EXIST();
         }
@@ -1102,7 +1088,7 @@ export default class ApiAuth {
         var account = await accountObj.save();
 
         if(!account.pwd) {
-            return ApiAuth.sendResetPwdEmail({
+            return self.sendResetPwdEmail({
                 email: account.email,
                 type: 1,
                 isFirstSet: true,
@@ -1121,17 +1107,6 @@ export default class ApiAuth {
         }
     }
 
-    // /**
-    //  * 创建Account
-    //  * @param params
-    //  * @returns {Promise<Account>}
-    //  */
-    // @clientExport
-    // static async createAccount(params): Promise<Account> {
-    //     var acc = Account.create(params);
-    //     return acc.save();
-    // }
-
 
     /**
      * 更新account(为员工添加资金账户时用【改进后可删除】)
@@ -1140,7 +1115,7 @@ export default class ApiAuth {
      * @returns {*}
      */
     @clientExport
-    static async updateAccount(params: Account) : Promise<Account>{
+    async updateAccount(params: Account) : Promise<Account>{
         var id = params.id;
         console.log("更新字段:====>", params);
         var ah = await Models.account.get(id);
@@ -1157,7 +1132,7 @@ export default class ApiAuth {
      */
     @clientExport
     @requireParams(["id"])
-    static async getAccount(params: {id: string}) {
+    async getAccount(params: {id: string}) {
         var id = params.id;
         var options: any = {};
         var acc = await Models.account.get(id, options);
@@ -1170,7 +1145,7 @@ export default class ApiAuth {
      * @returns {*}
      */
     @requireParams(["id"])
-    static async getPrivateInfo(params: {id: string}) {
+    async getPrivateInfo(params: {id: string}) {
         var id = params.id;
         var acc = await Models.account.get(id);
         return acc;
@@ -1182,7 +1157,7 @@ export default class ApiAuth {
      * @returns {*}
      */
     @clientExport
-    static async getAccounts(params: {where: any, order?: any, attributes?: any, $or?: any, paranoid?: boolean}) {
+    async getAccounts(params: {where: any, order?: any, attributes?: any, $or?: any, paranoid?: boolean}) {
         if(!params.where) {
             params.where = {};
         }
@@ -1199,54 +1174,13 @@ export default class ApiAuth {
     }
 
     /**
-     * 修改账户信息
-     * @param id
-     * @param data
-     * @param companyName
-     * @returns {*}
-     */
-    /*@clientExport
-     @requireParams(["id"], accountCols)
-     static async updateAccount(params) {
-     var id = params.id;
-     var accobj = await Models.account.get(id);
-     var staff = await Staff.getCurrent();
-     if(params.email && staff && staff.company["domainName"] && params.email.indexOf(staff.company["domainName"]) == -1) {
-     throw L.ERR.INVALID_ARGUMENT('email');
-     }
-
-     if(params.email && accobj["status"] != 0 && accobj.email != params.email) {
-     // throw {code: -2, msg: "该账号不允许修改邮箱"};
-     throw L.ERR.NOTALLOWED_MODIFY_EMAIL();
-     }
-
-
-     for(var key in params) {
-     accobj[key] = params[key];
-     }
-     var newAcc = await accobj.save();
-     return newAcc;
-
-     /!*if(accobj.email == newAcc.email){
-     return newAcc;
-     }
-
-     var staff = await Models.staff.get(id);
-     var companyName = (staff && staff.company) ? staff.company.name : "";
-     return ApiAuth.sendResetPwdEmail({companyName: companyName, email: newAcc.email, type: 1, isFirstSet: true})
-     .then(function() {
-     return newAcc;
-     });*!/
-     }*/
-
-    /**
      * 删除Account
      * @param params
      * @returns {boolean}
      */
     @clientExport
     // @requireParams(["id"])
-    static async deleteAccount(params: any): Promise<any> {
+    async deleteAccount(params: any): Promise<any> {
         /*let deleteAcc = await Models.account.get(params.id);
          await deleteAcc.destroy();*/
         return true;
@@ -1258,7 +1192,7 @@ export default class ApiAuth {
      * @returns {*}
      */
     @clientExport
-    static async checkAccExist(params: {[key: string]: any}, companyId: string): Promise<{isExist: boolean, accountId: string}> {
+    async checkAccExist(params: {[key: string]: any}, companyId: string): Promise<{isExist: boolean, accountId: string}> {
         var accounts = await Models.account.find(params);
         let isExist = false;
         let accountId = '';
@@ -1279,7 +1213,7 @@ export default class ApiAuth {
 
 
     @requireParams(["id"])
-    static async judgeRoleById(params: {id: string}) {
+    async judgeRoleById(params: {id: string}) {
         var account = await Models.account.get(params.id);
         if(!account) {
             throw L.ERR.ACCOUNT_NOT_EXIST();
@@ -1297,7 +1231,7 @@ export default class ApiAuth {
      * @returns {boolean}
      */
     @clientExport
-    static async registerCheckEmailMobile(data: {email?: string, mobile?: string}) {
+    async registerCheckEmailMobile(data: {email?: string, mobile?: string}) {
         if(data.email && !validator.isEmail(data.email)) {
             throw L.ERR.INVALID_FORMAT('email');
         }
@@ -1324,55 +1258,55 @@ export default class ApiAuth {
     }
 
 
-    static __initHttpApp(app: Application) {
+    __initHttpApp(app: Application) {
         wechat.__initHttpApp(app);
         qrcode.__initHttp(app);
     }
 
 
     @clientExport
-    static authWeChatLogin = wechat.authWeChatLogin;
+    authWeChatLogin = wechat.authWeChatLogin;
     @clientExport
-    static getWeChatLoginUrl = wechat.getWeChatLoginUrl;
+    getWeChatLoginUrl = wechat.getWeChatLoginUrl;
     @clientExport
-    static saveOrUpdateOpenId = wechat.saveOrUpdateOpenId;
+    saveOrUpdateOpenId = wechat.saveOrUpdateOpenId;
     @clientExport
-    static destroyWechatOpenId = wechat.destroyWechatOpenId;
+    destroyWechatOpenId = wechat.destroyWechatOpenId;
 
     @requireParams(["openId"])
-    static getAccountIdByOpenId = wechat.getAccountIdByOpenId;
+    getAccountIdByOpenId = wechat.getAccountIdByOpenId;
     @requireParams(["openId"])
-    static getOpenIdByAccount = wechat.getOpenIdByAccount;
+    getOpenIdByAccount = wechat.getOpenIdByAccount;
 
 
     @clientExport
-    static login = authentication.login;
+    login = authentication.login;
     @clientExport
-    static loginByLdap = authentication.loginByLdap;
+    loginByLdap = authentication.loginByLdap;
     @clientExport
-    static logout = authentication.logout;
+    logout = authentication.logout;
 
     @clientExport
-    static authentication = authentication.checkTokenAuth;
-    static makeAuthenticateToken = authentication.makeAuthenticateToken;
+    authentication = authentication.checkTokenAuth;
+    makeAuthenticateToken = authentication.makeAuthenticateToken;
 
     @clientExport
-    static setCurrentStaffId = authentication.setCurrentStaffId;
+    setCurrentStaffId = authentication.setCurrentStaffId;
 
     @clientExport
     @requireParams(["jpushId"])
-    static saveOrUpdateJpushId = messagePush.saveOrUpdateJpushId;
+    saveOrUpdateJpushId = messagePush.saveOrUpdateJpushId;
     @clientExport
-    static destroyJpushId = messagePush.destroyJpushId;
+    destroyJpushId = messagePush.destroyJpushId;
 
     @requireParams(["accountId"])
-    static getJpushIdByAccount = messagePush.getJpushIdByAccount;
+    getJpushIdByAccount = messagePush.getJpushIdByAccount;
 
     @clientExport
     @requireParams(["backUrl"])
-    static getQRCodeUrl = qrcode.getQRCodeUrl;
+    getQRCodeUrl = qrcode.getQRCodeUrl;
 
-    static removeByTest = byTest.removeByTest;
+    removeByTest = byTest.removeByTest;
 }
 
 async function _sendActiveEmail(accountId: string, origin?: string, version?: number) {
@@ -1420,3 +1354,5 @@ async function _sendActiveEmail(accountId: string, origin?: string, version?: nu
     ]);
 
 }
+
+export default new ApiAuth();

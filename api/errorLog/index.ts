@@ -7,9 +7,9 @@ import {Models} from "_types/index";
 import { Application } from 'express';
 
 
-export default class ErrorRecord {
+export class ErrorRecord {
 
-    static __initHttpApp(app: Application) {
+    __initHttpApp(app: Application) {
 
         app.use('/e', function(req, res, next) {
             let {s, u} = req.query || req.body;
@@ -25,3 +25,5 @@ export default class ErrorRecord {
         });
     }
 }
+
+export default new ErrorRecord();

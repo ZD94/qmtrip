@@ -16,8 +16,8 @@ var API = require("@jingli/dnode-api");
  * @param data.userId  反馈人id
  * @returns {*}
  */
-class FeedBackModule {
-    static sendFeedback(data: {content: string, companyName: string, userName?: string}) {
+export class FeedBackModule {
+    sendFeedback(data: {content: string, companyName: string, userName?: string}) {
         var content = data.content;
         if(!content){
             throw {code: -1, msg:"content不能为空"};
@@ -43,4 +43,4 @@ class FeedBackModule {
     }
 }
 
-export= FeedBackModule;
+export default new FeedBackModule();

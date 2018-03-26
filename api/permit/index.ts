@@ -147,55 +147,60 @@ function getRoleList(roles: any){
             return {id:id, name:roles[id].name};
         });
 }
-export function listRoles( params: any, callback: any) {
-    var type = params.type || 1;
-    var list;
-    switch(type){
-        case 1:
-            list = getRoleList(roles);
-            break;
-        case 2:
-            list = getRoleList(agency_roles);
-            break;
-        default:
-            throw L.ERR.NOT_FOUND();
+
+export class PermitModule{
+     listRoles( params: any, callback: any) {
+        var type = params.type || 1;
+        var list;
+        switch(type){
+            case 1:
+                list = getRoleList(roles);
+                break;
+            case 2:
+                list = getRoleList(agency_roles);
+                break;
+            default:
+                throw L.ERR.NOT_FOUND();
+        }
+        return Promise.resolve(list);
     }
-    return Promise.resolve(list);
-};
 
-/**
- * 检查用户是否拥有权限
- *
- * @param {Object} params
- * @param {UUID} params.accountId 账号ID
- * @param {String} params.permission 要检查的权限
- * @param {String} params.type 权限所属 1.企业 2.代理商 默认 1.企业
- */
-export async function checkPermission(params: any): Promise<boolean> {
-    var accountId = params.accountId;
-    var permissions = params.permission;
+    /**
+     * 检查用户是否拥有权限
+     *
+     * @param {Object} params
+     * @param {UUID} params.accountId 账号ID
+     * @param {String} params.permission 要检查的权限
+     * @param {String} params.type 权限所属 1.企业 2.代理商 默认 1.企业
+     */
+    async checkPermission(params: any): Promise<boolean> {
+        var accountId = params.accountId;
+        var permissions = params.permission;
 
-    if (!permissions || !permissions.length) {
+        if (!permissions || !permissions.length) {
+            return true;
+        }
+
+        if (typeof permissions == 'string') {
+            permissions = [permissions];
+        }
+        var type = params.type || EAccountType.STAFF;
+        //如果要验证代理商权限,直接返回True
+        //todo 实现代理商权限认证
+        var role: any;
+        if (type == EAccountType.AGENCY) {
+            role = await getRoleOfAgency({accountId: accountId});
+        } else {
+            role = await getRoleOfAccount({accountId: accountId});
+        }
+        if(role == undefined)
+            throw L.ERR.NOT_FOUND();
+        for(var p of permissions){
+            if(role.permission[p] != true)
+                throw L.ERR.PERMISSION_DENY();
+        }
         return true;
     }
+}
 
-    if (typeof permissions == 'string') {
-        permissions = [permissions];
-    }
-    var type = params.type || EAccountType.STAFF;
-    //如果要验证代理商权限,直接返回True
-    //todo 实现代理商权限认证
-    var role: any;
-    if (type == EAccountType.AGENCY) {
-        role = await getRoleOfAgency({accountId: accountId});
-    } else {
-        role = await getRoleOfAccount({accountId: accountId});
-    }
-    if(role == undefined)
-        throw L.ERR.NOT_FOUND();
-    for(var p of permissions){
-        if(role.permission[p] != true)
-            throw L.ERR.PERMISSION_DENY();
-    }
-    return true;
-};
+export default new PermitModule();

@@ -13,7 +13,7 @@ var utils = require("common/utils");
 
 var baseUrl = "https://www.duiba.com.cn/autoLogin/autologin"
 
-class DuiBa {
+export class DuiBa {
     /**
      * 获取免登陆url
      * @param params
@@ -21,7 +21,7 @@ class DuiBa {
      * @returns {string}
      */
     @clientExport
-    static async getLoginUrl(params?: {
+    async getLoginUrl(params?: {
         uid?: string,
         credits?: number,
         appKey?: string,
@@ -29,6 +29,7 @@ class DuiBa {
         timestamp?: number,
         sign?: string
     }) :Promise<string>{
+        let self = this;
         var staff = await Staff.getCurrent();
         if(!params) params = {};
         params.uid = staff.accountId;
@@ -46,7 +47,7 @@ class DuiBa {
         params.appSecret = config.duiba.appSecret;
         if(!params.timestamp) params.timestamp = new Date().getTime();
 
-        let sign = await DuiBa.getSign(params);
+        let sign = await self.getSign(params);
         params.sign = sign;
 
         if(params.hasOwnProperty("appSecret")){
@@ -58,7 +59,7 @@ class DuiBa {
         return url;
     }
 
-    static async getSign(params: {[key: string]: any}) :Promise<string>{
+    async getSign(params: {[key: string]: any}) :Promise<string>{
         if(params.hasOwnProperty("sign")){
             delete params.sign;
         }
@@ -75,8 +76,8 @@ class DuiBa {
         return sign;
     }
 
-    static __initHttpApp = require('./duiba');
+    __initHttpApp = require('./duiba');
 }
 
 
-export = DuiBa
+export default new DuiBa();

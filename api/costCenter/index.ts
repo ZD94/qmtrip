@@ -12,7 +12,7 @@ var API = require('@jingli/dnode-api');
 const _ = require('lodash/fp')
 const moment = require('moment')
 
-export default class CostCenterModule {
+export class CostCenterModule {
 
     /**
      * 创建成本中心记录
@@ -223,7 +223,7 @@ export default class CostCenterModule {
      */
     @clientExport
     @requireParams(["id"])
-    static async getBudgetLog(params: { id: string }): Promise<BudgetLog> {
+    async getBudgetLog(params: { id: string }): Promise<BudgetLog> {
         let id = params.id;
         var ah = await Models.budgetLog.get(id);
 
@@ -237,7 +237,7 @@ export default class CostCenterModule {
      * @returns {*}
      */
     @clientExport
-    static async getBudgetLogs(params: any): Promise<FindResult> {
+    async getBudgetLogs(params: any): Promise<FindResult> {
         let paginate = await Models.budgetLog.find(params);
         let ids = paginate.map(function (t) {
             return t.id;
@@ -251,7 +251,7 @@ export default class CostCenterModule {
      * 获取追加预算
      */
     @clientExport
-    static async getAppendBudget(costId: string, showTime: Date) {
+    async getAppendBudget(costId: string, showTime: Date) {
         return _.first(await Models.budgetLog.find({
             where: { costCenterId: costId, type: BUDGET_CHANGE_TYPE.APPEND_BUDGET, showTime },
             order: [['created_at', 'desc']]
@@ -265,7 +265,7 @@ export default class CostCenterModule {
      * @param budget 
      */
     @clientExport
-    static async appendBudget({ costId, operator, budget, showTime }: { costId: string, operator: string, budget: number, showTime: Date }) {
+    async appendBudget({ costId, operator, budget, showTime }: { costId: string, operator: string, budget: number, showTime: Date }) {
         const rootDept = await Models.department.get(costId)
         const log = BudgetLog.create({
             companyId: rootDept.company.id, costCenterId: costId, value: budget,
@@ -281,7 +281,7 @@ export default class CostCenterModule {
      * @param period 
      */
     @clientExport
-    static async listDeptBudget(deptId: string, period: { start: Date, end: Date }) {
+    async listDeptBudget(deptId: string, period: { start: Date, end: Date }) {
         const children = await findChildren(deptId)
         const where = constructWhereCondition(deptId, period)
         const costs = await Promise.all([
@@ -300,7 +300,7 @@ export default class CostCenterModule {
      * @param param0 
      */
     @clientExport
-    static async initBudget({ budgets, period, operator, costId }: ICostCenterDeploy) {
+    async initBudget({ budgets, period, operator, costId }: ICostCenterDeploy) {
         const promises: Promise<any>[] = []
         const where = constructWhereCondition('', period)
         let totalBudget = 0;
@@ -335,7 +335,7 @@ export default class CostCenterModule {
      * @param param0 
      */
     @clientExport
-    static async changeBudget({ budgets, period, operator, costId, appendBudget }: ICostCenterDeploy) {
+    async changeBudget({ budgets, period, operator, costId, appendBudget }: ICostCenterDeploy) {
         const tempSum = _.compose(_.sum, _.map(_.prop('selfTempBudget')))(budgets),
             where = constructWhereCondition(costId, period)
         const rootCost = _.first(await Models.costCenterDeploy.find({ where }))
@@ -381,7 +381,7 @@ export default class CostCenterModule {
      * @param operator 
      */
     @clientExport
-    static async applyConf(costId: string, period: { start: Date, end: Date }, operator: string) {
+    async applyConf(costId: string, period: { start: Date, end: Date }, operator: string) {
         const where = constructWhereCondition(costId, period)
         const root = _.first(await Models.costCenterDeploy.find({ where }))
         let totalBudget = 0
@@ -415,7 +415,7 @@ export default class CostCenterModule {
     }
 
     @clientExport
-    static async setEarlyWarning(costId: string,
+    async setEarlyWarning(costId: string,
         setting: { type: number, rate: number, audienceTypes: number[] },
         period?: { start: Date, end: Date }) {
         let cost: CostCenterDeploy;
@@ -436,7 +436,7 @@ export default class CostCenterModule {
      * @param {companyId: string, type: AnalysisType}
      * @return {CostCenterAnlysis[]}
      */
-    static async costCenterAnalysis(params: {companyId: string, type: AnalysisType}): Promise<CostCenterAnalysis[]> {
+    async costCenterAnalysis(params: {companyId: string, type: AnalysisType}): Promise<CostCenterAnalysis[]> {
         let {companyId, type} = params;
         let departments: Department[] = await Models.department.all({where: {companyId: companyId}});
         let projects: Project[] = await Models.project.all({where: {companyId: companyId}});
@@ -524,7 +524,7 @@ export default class CostCenterModule {
      * @param {companyId}
      * @return {CostCenterAnlysis}
      */
-    static async budgetAnalysis(companyId: string) {
+    async budgetAnalysis(companyId: string) {
         let departments: Department[] = await Models.department.all({where: {companyId: companyId}});
         let projects: Project[] = await Models.project.all({where: {companyId: companyId}});
         let allIds: string[] = [];
@@ -565,6 +565,9 @@ export default class CostCenterModule {
         return budgetData;
     }
 }
+
+
+export default new CostCenterModule();
 
 async function getTotalTempBudgetSumOf(costIds: string[], period: { start: Date, end: Date } ) {
     const ids = costIds.map(id => `'${id}'`).join(',')
