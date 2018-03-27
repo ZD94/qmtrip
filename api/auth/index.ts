@@ -1,6 +1,8 @@
 ﻿/**
  * @module auth
  */
+
+
 "use strict";
 import { requireParams, clientExport } from "@jingli/dnode-api/dist/src/helper";
 import { Models, EAccountType, EGender, EPlaneLevel, ETrainLevel, EHotelLevel } from "_types";
@@ -24,6 +26,8 @@ var accountCols = Account['$fieldnames'];
 import { getSession } from "@jingli/dnode-api";
 import { Application } from 'express-serve-static-core';
 import { ICompanyRegion } from '_types/travelPolicy';
+import {AuthRequest, AuthResponse, LoginResponse} from "../../_types/auth/auth-cert";
+import {Token} from "../../_types/auth/token";
 const _ = require('lodash/fp')
 
 let codeTicket = "checkcode:ticket:";
@@ -1265,48 +1269,80 @@ export class ApiAuth {
 
 
     @clientExport
-    authWeChatLogin = wechat.authWeChatLogin;
+    async authWeChatLogin(params: {code: string}): Promise<LoginResponse | boolean> {
+        return wechat.authWeChatLogin(params);
+    }
     @clientExport
-    getWeChatLoginUrl = wechat.getWeChatLoginUrl;
+    async getWeChatLoginUrl(params: {redirectUrl: string}) {
+        return wechat.getWeChatLoginUrl(params);
+    }
     @clientExport
-    saveOrUpdateOpenId = wechat.saveOrUpdateOpenId;
+    async saveOrUpdateOpenId(params: {code: string}) {
+        return wechat.saveOrUpdateOpenId(params);
+    }
     @clientExport
-    destroyWechatOpenId = wechat.destroyWechatOpenId;
-
+    async destroyWechatOpenId(params: {}) {
+        return wechat.destroyWechatOpenId(params);
+    }
     @requireParams(["openId"])
-    getAccountIdByOpenId = wechat.getAccountIdByOpenId;
-    @requireParams(["openId"])
-    getOpenIdByAccount = wechat.getOpenIdByAccount;
+    async getAccountIdByOpenId(params: {openId: string}) {
+        return wechat.getAccountIdByOpenId(params);
+    }
+    @requireParams(["accountId"])
+    async getOpenIdByAccount(params: {accountId: string}) {
+        return wechat.getOpenIdByAccount(params);
+    }
 
 
     @clientExport
-    login = authentication.login;
+    async login(params: {account?: string, pwd: string, type?: Number, email?: string}): Promise<LoginResponse> {
+        return authentication.login(params);
+    }
     @clientExport
-    loginByLdap = authentication.loginByLdap;
+    async loginByLdap(data: {account?: string, pwd: string, companyId: string}): Promise<LoginResponse>{
+        return authentication.loginByLdap(data);
+    }
     @clientExport
-    logout = authentication.logout;
+    async logout(params: {}): Promise<boolean> {
+        return authentication.logout(params);
+    }
+    @clientExport
+    async authentication(params: AuthRequest): Promise<AuthResponse|null>{
+        return authentication.checkTokenAuth(params);
+    }
+    async makeAuthenticateToken(accountId: string, os?: string, expireAt?: Date): Promise<LoginResponse> {
+        return authentication.makeAuthenticateToken(accountId, os, expireAt);
+    }
 
     @clientExport
-    authentication = authentication.checkTokenAuth;
-    makeAuthenticateToken = authentication.makeAuthenticateToken;
-
-    @clientExport
-    setCurrentStaffId = authentication.setCurrentStaffId;
+    async setCurrentStaffId( params : {
+        staffId : string,
+        accountId ? : string
+    } ): Promise<Staff | null> {
+        return authentication.setCurrentStaffId(params);
+    }
 
     @clientExport
     @requireParams(["jpushId"])
-    saveOrUpdateJpushId = messagePush.saveOrUpdateJpushId;
+    async saveOrUpdateJpushId(params: any): Promise<Token>  {
+        return messagePush.saveOrUpdateJpushId(params);
+    }
     @clientExport
-    destroyJpushId = messagePush.destroyJpushId;
-
+    async destroyJpushId(params?: any): Promise<boolean> {
+        return messagePush.destroyJpushId(params);
+    }
     @requireParams(["accountId"])
-    getJpushIdByAccount = messagePush.getJpushIdByAccount;
-
+    async getJpushIdByAccount(params: {accountId: string}): Promise<string[]|null> {
+        return messagePush.getJpushIdByAccount(params);
+    }
     @clientExport
     @requireParams(["backUrl"])
-    getQRCodeUrl = qrcode.getQRCodeUrl;
-
-    removeByTest = byTest.removeByTest;
+    async getQRCodeUrl(params: {backUrl: string}): Promise<string> {
+        return qrcode.getQRCodeUrl(params);
+    }
+    async removeByTest(data: {accountId: string, email: string, mobile?: string, type?: Number}) {
+        return byTest.removeByTest(data);
+    }
 }
 
 async function _sendActiveEmail(accountId: string, origin?: string, version?: number) {
