@@ -22,7 +22,9 @@ export class BaseEvent {
             else
                 return null;
         } catch (err) {
-            throw err;
+            console.log('err: ', err)
+            // throw err;
+            return this.sendEventNotice(params)
         }
     }
 
