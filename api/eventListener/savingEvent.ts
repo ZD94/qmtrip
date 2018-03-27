@@ -4,7 +4,8 @@ const _ = require('lodash');
 
 export class SavingEvent extends BaseEvent {
 
-    async emitTripSaving(params: { coins: number, orderNo: string, staffId: string, companyId: string, type: number }): Promise<any> {
+    async emitTripSaving(params: { coins: number, orderNo: string, staffId: string,
+        companyId: string, type: number, record: object }): Promise<any> {
         let { companyId } = params;
         if (!companyId) {
             throw L.ERR.INVALID_ARGUMENT("companyId");
