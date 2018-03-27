@@ -3,7 +3,7 @@ import { initModels } from '_types';
 
 
 
-import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo, StaffProperty, Linkman, Feedback} from '_types/staff';
+import { Staff, Credential, PointChange, InvitedLink, StaffSupplierInfo, StaffProperty, Linkman, Feedback, IdentityInfo} from '_types/staff';
 import { Company, MoneyChange, Supplier, TripPlanNumChange, CompanyProperty, InvoiceTitle, CompanyScoreRatioChange } from '_types/company';
 
 import { Department, StaffDepartment, DepartmentProperty } from '_types/department';
@@ -45,6 +45,7 @@ initModels({
     invitedLink: createServerService<InvitedLink>(InvitedLink),
     staffSupplierInfo: createServerService<StaffSupplierInfo>(StaffSupplierInfo),
     feedback: createServerService<Feedback>(Feedback),
+    identityInfo: createServerService<IdentityInfo>(IdentityInfo),
     company: createServerService<Company>(Company),
     companyProperty: createServerService<CompanyProperty>(CompanyProperty),
     supplier: createServerService<Supplier>(Supplier),

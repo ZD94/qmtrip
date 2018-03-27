@@ -1,0 +1,1 @@
+update trip_plan.trip_plans set modify_status = 1 where modify_status is null;
