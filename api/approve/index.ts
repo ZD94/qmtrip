@@ -159,7 +159,8 @@ class ApproveModule {
             if (!approve) throw new Error('approve is null')
             approve.status = EApproveStatus.CANCEL;
             approve.tripApproveStatus = QMEApproveStatus.CANCEL;
-            let query = typeof approve.data == 'string' ? JSON.parse(approve.data) : approve.data;
+            let data = typeof approve.data == 'string' ? JSON.parse(approve.data) : approve.data;
+            let query = data.query;
             let frozenNum = query.frozenNum;
             frozenNum = typeof frozenNum == 'string' ? JSON.parse(frozenNum) : frozenNum;
             frozenNum.extraFrozen = 0;
