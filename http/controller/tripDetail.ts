@@ -46,7 +46,7 @@ export class TripDetailController extends AbstractController {
                 await SavingEvent.emitTripSaving({
                     coins, orderNo: params.orderNo, staffId: staff.id,
                     companyId: staff.company.id, type: 2,
-                    other: {
+                    record: {
                         date: new Date(),
                         companyName: staff.company.name,
                         staffName: staff.name,
