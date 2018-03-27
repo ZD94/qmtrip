@@ -569,8 +569,8 @@ export class CostCenterModule {
      * 预算执行之图表
      * @author lizeilin
      */
-    static async budgetDataChart(companyId: string) {
-        let budgetInfo = await CostCenterModule.budgetAnalysis(companyId);
+    async budgetDataChart(companyId: string) {
+        let budgetInfo = await this.budgetAnalysis(companyId);
         let budget = budgetInfo.budget;
         let departments: Department[] = await Models.department.all({where: {companyId: companyId}});
         let projects: Project[] = await Models.project.all({where: {companyId: companyId}});
