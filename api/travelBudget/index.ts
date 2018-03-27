@@ -11,6 +11,7 @@ import {Approve, EApproveStatus, EApproveChannel} from '_types/approve';
 import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
 import L from '@jingli/language';
+import TripApproveEvent from '../eventListener/tripApproveEvent'
 
 require("moment-timezone");
 const cache = require("common/cache");
@@ -416,8 +417,8 @@ export class ApiTravelBudget {
                 if (approve.step === STEP.FINAL && company.oa != EApproveChannel.AUTO) {
                     let params = {approveNo: approve.id};
                     let tripApprove = await API.tripApprove.retrieveDetailFromApprove(params);
-
-                    let returnApprove = await API.eventListener.sendEventNotice({ eventName: "NEW_TRIP_APPROVE", data: tripApprove, companyId: approve.companyId });
+                    
+                    let returnApprove = await TripApproveEvent.emitNewTripApprove({ data: tripApprove, companyId: approve.companyId });
                     if(returnApprove){
                         if(oldId){
                             let modifiedTripPlan = await Models.tripPlan.get(oldId);
@@ -641,7 +642,7 @@ export class ApiTravelBudget {
         let staff = await Models.staff.get(staffId);
         let submitterSnapshot = await staff.getStaffSnapshot();
         if (!staff) {
-            throw L.ERR.ERROR_CODE_C(500, '用户不存在或者已被删除')
+            throw new L.ERROR_CODE_C(500, '用户不存在或者已被删除')
         }
         let companyId = staff.companyId;
         let company = await Models.company.get(companyId);
@@ -799,7 +800,7 @@ export class ApiTravelBudget {
             }
         }
         if (!eachBudgetSegIsOk) {
-            throw L.ERR.ERROR_CODE_C(500, '获取预算失败，请稍后重试');
+            throw new L.ERROR_CODE_C(500, '获取预算失败，请稍后重试');
         }
         
         let obj: any = {};
@@ -810,7 +811,7 @@ export class ApiTravelBudget {
 
         await DB.transaction(async function (t: Transaction) {
             if (!company || !staff) {
-                throw L.ERR.ERROR_CODE_C(500, '企业信息或员工信息有误');
+                throw new L.ERROR_CODE_C(500, '企业信息或员工信息有误');
             }
             let result = await API.company.verifyCompanyTripNum({
                 tripNum: tripNumCost,
@@ -853,7 +854,7 @@ export class ApiTravelBudget {
             // company.tripPlanFrozenNum = originTripPlanFrozenNum;
             company && await company.reload();
             console.info(err);
-            throw L.ERR.ERROR_CODE_C(500, '提交审批失败,请稍后重试');
+            throw new L.ERROR_CODE_C(500, '提交审批失败,请稍后重试');
         });
 
         let _id = Date.now() + utils.getRndStr(6);

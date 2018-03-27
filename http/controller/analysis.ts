@@ -66,7 +66,7 @@ export class AnalysisController extends AbstractController {
      * @param {body: type: AnalysisType, isSaved: boolean} 
      * @return {expenditure or saved}
      */
-    @Router("/:companyId/confirmedExpenditureOrSaved", "POST")
+    @Router("/:companyId/confirmedExpenditureAndSaved", "POST")
     async getConfirmedExpenditure(req: Request, res: Response, next: NextFunction) {
         let {companyId} = req.params;
         if (!companyId) {
@@ -76,18 +76,11 @@ export class AnalysisController extends AbstractController {
         if (typeof body == 'string') {
             body = JSON.parse(body);
         }
-        let isSaved: boolean = body.isSaved;
-        let type: AnalysisType = body.type;
         let beginDate: Date = body.beginDate || null;
         let endDate: Date = body.endDate || null;
         try {
-            if (!isSaved) {
-                let confirmedExpenditure: number = await API.tripPlan.getConfirmedExpenditureOrSaved({companyId: companyId, type: type, isSaved: false, beginDate: beginDate, endDate: endDate})
-                res.json(this.reply(0, confirmedExpenditure));
-            } else {
-                let confirmedSaved: number = await API.tripPlan.getConfirmedExpenditureOrSaved({companyId: companyId, type: type, isSaved: true, beginDate: beginDate, endDate: endDate});
-                res.json(this.reply(0, confirmedSaved));
-            }
+            let data: any = await API.tripPlan.getConfirmedExpenditureAndSaved({companyId: companyId, beginDate: beginDate, endDate: endDate})
+            res.json(this.reply(0, data));
         } catch(err) {
             console.error(err);
             res.json(this.reply(0, null));
@@ -109,12 +102,11 @@ export class AnalysisController extends AbstractController {
         if (typeof body == 'string') {
             body = JSON.parse(body);
         }
-        let type: AnalysisType = body.type;
         let beginDate: Date = body.beginDate || null;
         let endDate: Date = body.endDate || null;
 
         try {
-            let plannedBudget: number = await API.tripPlan.getPlannedBudget({companyId: companyId, type: type, beginDate: beginDate, endDate: endDate});
+            let plannedBudget: number = await API.tripPlan.getPlannedBudget({companyId: companyId, beginDate: beginDate, endDate: endDate});
             res.json(this.reply(0, plannedBudget));
         } catch(err) {
             console.error(err);
@@ -160,6 +152,23 @@ export class AnalysisController extends AbstractController {
         try {
             let analysisData = await API.costCenter.costCenterAnalysis({companyId: companyId, type: type});
             res.json(this.reply(0, analysisData));
+        } catch(err) {
+            console.error(err);
+            res.json(this.reply(0, null));
+        }
+    }
+
+    /**
+     * @author lizeilin
+     */
+    @Router("/:companyId/budgetDataChart", "GET")
+    async getBudgetDataChart(req: Request, res: Response, next: NextFunction) {
+        let {companyId} = req.params;
+        if (!companyId) 
+            return res.json(this.reply(400, null));
+        try {
+            let budgetData = await API.costCenter.budgetDataChart(companyId);
+            res.json(this.reply(0, budgetData));
         } catch(err) {
             console.error(err);
             res.json(this.reply(0, null));
