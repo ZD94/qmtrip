@@ -32,7 +32,7 @@ export class TripDetailController extends AbstractController {
             if (saving > 0) {
                 let coins = saving * 0.05
                 coins = coins > 100 ? coins : 100
-                await SavingEvent.emitTripSaving({ coins, orderNo: params.orderNo, staffId: staff.id, companyId: staff.company.id })
+                await SavingEvent.emitTripSaving({ coins, orderNo: params.orderNo, staffId: staff.id, companyId: staff.company.id, type: 2 })
             }
         }
         let obj: {[index: string]: string} = {};
