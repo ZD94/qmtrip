@@ -3227,10 +3227,40 @@ class TripPlanModule {
         }
     }
 
+     /**
+     * 总揽获取企业补助预算
+     * @author lizeilin
+     */
+    static async getSubsidyBudget(params: {companyId: string, beginDate?: Date, endDate?: Date}) {
+        let {companyId, beginDate, endDate} = params;
+        let tripPlans: TripPlan[] = [];
+        let _tripPlans: TripPlan[] = [];
+        if (!beginDate && !endDate) {
+            tripPlans = await Models.tripPlan.all({where: {companyId: companyId, 
+                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
+                auditStatus: {$in: [EAuditStatus.INVOICE_PASS, EAuditStatus.NO_NEED_AUDIT]}, 
+                createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+        } else {
+            _tripPlans = await Models.tripPlan.all({where: {companyId: companyId,
+                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
+                auditStatus: {$in: [EAuditStatus.INVOICE_PASS, EAuditStatus.NO_NEED_AUDIT]}}});
+            for (let i = 0; i < _tripPlans.length; i++) {
+                if (moment(_tripPlans[i].createdAt).isSameOrAfter(beginDate) && moment(_tripPlans[i].createdAt).isSameOrBefore(endDate)) {
+                    tripPlans.push(_tripPlans[i]);
+                }
+            } 
+        }
+        let subsidyBudget: number = 0;
+        for (let i = 0; i < tripPlans.length; i++) {
+            let tripDetails: TripDetail[] = await Models.tripDetail.all({where: {tripPlanId: tripPlans[i].id, type: ETripType.SUBSIDY}});
+            for (let j = 0; j < tripDetails.length; j++) {
+                subsidyBudget += tripDetails[j].budget;
+            }
+        }
+        return subsidyBudget;
 
     
-
-
+    }
     static async getProjectByName(params: any) {
         let projects = await Models.project.find({ where: { name: params.name } });
 
