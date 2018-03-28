@@ -60,6 +60,7 @@ export class TripDetailController extends AbstractController {
             if (saving > 0) {
                 let coins = saving * 0.05
                 coins = coins > 100 ? coins : 100
+                const tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId)
                 await SavingEvent.emitTripSaving({
                     coins, orderNo, staffId: staff.id,
                     companyId, type: 2, record: {
@@ -74,7 +75,7 @@ export class TripDetailController extends AbstractController {
                         saving,
                         ratio: 0.05,
                         coins,
-                        currStatus: tripDetail.tripPlan.status
+                        currStatus: tripPlan.status
                     }
                 })
             }
