@@ -43,6 +43,7 @@ import { Company } from '_types/company';
 import { CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE } from '_types/coin';
 import { BUDGET_CHANGE_TYPE, ECostCenterType, CostCenter } from '_types/costCenter';
 import { ICity } from 'api/travelBudget';
+import SavingEvent from '../eventListener/savingEvent';
 
 interface ReportInvoice {
     type: string;
@@ -480,6 +481,7 @@ class TripPlanModule {
                     log.remark = `已预订`;
                     await log.save();
                 }
+                await calculateBudget({ expenditure: tripDetail.expenditure, id: tripDetail.id, orderNo: tripDetail.orderNo })
                 tripDetails = [];
                 break;
             case EOrderStatus.ENDORSEMENT_SUCCESS: 
@@ -3525,6 +3527,47 @@ function getOrderNo(): string {
     var rnd = (Math.ceil(Math.random() * 1000));
     var str = `${d.getFullYear()}${d.getMonth() + 1}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}-${rnd}`;
     return str;
+}
+
+async function calculateBudget(params: { expenditure: number, id: string, orderNo: string }) {
+    const { expenditure, id, orderNo } = params
+    const tripDetail = await Models.tripDetail.get(id)
+    const staff = await Models.staff.get(tripDetail.accountId)
+    const saving = tripDetail.budget - expenditure
+    console.log('saving==========', saving)
+    if (saving <= 0) return
+
+    const companyId = staff.company.id
+    let route = ''
+    if ([ETripType.BACK_TRIP, ETripType.OUT_TRIP].indexOf(tripDetail.type) != -1) {
+        const tripDetailTraffic = await Models.tripDetailTraffic.get(tripDetail.id)
+        const cityNames = R.pluck('name', await Promise.all([API.place.getCityById(tripDetailTraffic.deptCity, companyId), API.place.getCityById(tripDetailTraffic.arrivalCity, companyId)]))
+        route = cityNames.join('-')
+    } else if (tripDetail.type == ETripType.HOTEL) {
+        const tripDetailHotel = await Models.tripDetailHotel.get(tripDetail.id)
+        route = tripDetailHotel.city
+    }
+
+    let coins = saving * 0.05
+    coins = coins > 100 ? coins : 100
+    const tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId)
+        await SavingEvent.emitTripSaving({
+            coins, orderNo, staffId: staff.id,
+            companyId, type: 2, record: {
+                date: new Date(),
+                companyName: staff.company.name,
+                staffName: staff.name,
+                mobile: staff.mobile,
+                reserveStatus: EOrderStatus.SUCCESS,
+                route,
+                budget: tripDetail.budget,
+                realCost: expenditure,
+                saving,
+                ratio: 0.05,
+                coins,
+                currStatus: tripPlan.status
+            }
+    })
 }
 
 

@@ -20,7 +20,6 @@ export class TripDetailController extends AbstractController {
     }
 
     async update(req: Request, res: Response, next: NextFunction) {
-        
         let params = req.body;
         let id = req.params.id;
         if (id == void 0) {
