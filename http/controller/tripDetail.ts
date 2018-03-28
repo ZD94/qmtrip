@@ -46,8 +46,8 @@ export class TripDetailController extends AbstractController {
             const tripDetail = await Models.tripDetail.get(id)
             const staff = await Models.staff.get(tripDetail.accountId)
             const saving = tripDetail.budget - expenditure
-
-            if (saving <= 0) return res.send(200)
+            console.log('saving==========', saving)
+            // if (saving <= 0) return res.send(200)
 
             const companyId = staff.company.id
             let route = ''
