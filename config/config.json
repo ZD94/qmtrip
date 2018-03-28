@@ -127,6 +127,10 @@
     "appId": "${JL_APP_ORDERVALIDATE_APP_ID}",
     "appSecret": "${JL_APP_ORDERVALIDATE_APP_SECRET}"
   },
+  "java-jingli-activity": {
+    "appId": "${JL_APP_ACTIVITY_APP_ID}",
+    "appSecret": "${JL_APP_ACTIVITY_APP_SECRET}" 
+  },
   "java": {
     "getway": "${JL_APP_JAVA_GETWAY}"
   },

@@ -39,7 +39,7 @@ export class AnalysisController extends AbstractController {
             res.json(this.reply(0, companySaved));
         } catch(err) {
             console.error(err);
-            res.json(this.reply(0, null));
+            res.json(this.reply(400, err));
         }
     }
 
@@ -57,7 +57,7 @@ export class AnalysisController extends AbstractController {
             return res.json(this.reply(0, budgets));
         } catch(err) {
             console.error(err);
-            res.json(this.reply(0, null));
+            res.json(this.reply(400, err));
         }
     }
 
@@ -83,7 +83,7 @@ export class AnalysisController extends AbstractController {
             res.json(this.reply(0, data));
         } catch(err) {
             console.error(err);
-            res.json(this.reply(0, null));
+            res.json(this.reply(400, err));
         }
     }
 
@@ -110,7 +110,7 @@ export class AnalysisController extends AbstractController {
             res.json(this.reply(0, plannedBudget));
         } catch(err) {
             console.error(err);
-            res.json(this.reply(0, null));
+            res.json(this.reply(400, err));
         }
     }
     
@@ -130,7 +130,7 @@ export class AnalysisController extends AbstractController {
             res.json(this.reply(0, budgetData));
         } catch(err) {
             console.error(err);
-            res.json(this.reply(0, null));
+            res.json(this.reply(400, err));
         }
     }
 
@@ -154,7 +154,7 @@ export class AnalysisController extends AbstractController {
             res.json(this.reply(0, analysisData));
         } catch(err) {
             console.error(err);
-            res.json(this.reply(0, null));
+            res.json(this.reply(400, err));
         }
     }
 
@@ -171,7 +171,31 @@ export class AnalysisController extends AbstractController {
             res.json(this.reply(0, budgetData));
         } catch(err) {
             console.error(err);
-            res.json(this.reply(0, null));
+            res.json(this.reply(400, err));
+        }
+    }
+
+    /**
+     * @author lizeilin
+     */
+    @Router("/:companyId/subsidyBudget", "POST")
+    async getSubsidyBudget(req: Request, res: Response, next: NextFunction) {
+        let {companyId} = req.params;
+        if (!companyId)
+            return res.json(this.reply(400, null));
+        let body = req.body;
+        if (typeof body == 'string') {
+            body = JSON.parse(body);
+        }
+        let beginDate: Date = body.beginDate || null;
+        let endDate: Date = body.endDate || null;
+
+        try {
+            let subsidyBudget = await API.tripPlan.getSubsidyBudget({companyId: companyId, beginDate: beginDate, endDate: endDate});
+            res.json(this.reply(0, subsidyBudget));
+        } catch(err){
+            console.error(err);
+            res.json(this.reply(400, err));
         }
     }
 }
