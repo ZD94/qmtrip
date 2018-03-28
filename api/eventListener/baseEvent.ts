@@ -75,6 +75,4 @@ export class BaseEvent {
 
 }
 
-const baseEvent = new BaseEvent()
-
-export default baseEvent
+export default new BaseEvent()
