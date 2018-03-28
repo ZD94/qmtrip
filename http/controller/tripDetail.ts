@@ -46,6 +46,9 @@ export class TripDetailController extends AbstractController {
             const tripDetail = await Models.tripDetail.get(id)
             const staff = await Models.staff.get(tripDetail.accountId)
             const saving = tripDetail.budget - expenditure
+
+            if (saving <= 0) return res.send(200)
+
             const companyId = staff.company.id
             let route = ''
             if ([ETripType.BACK_TRIP, ETripType.OUT_TRIP].indexOf(tripDetail.type) != -1) {
@@ -56,31 +59,30 @@ export class TripDetailController extends AbstractController {
                 const tripDetailHotel = await Models.tripDetailHotel.get(tripDetail.id)
                 route = tripDetailHotel.city
             }
-
-            if (saving > 0) {
-                let coins = saving * 0.05
-                coins = coins > 100 ? coins : 100
-                await SavingEvent.emitTripSaving({
-                    coins, orderNo, staffId: staff.id,
-                    companyId, type: 2, record: {
-                        date: new Date(),
-                        companyName: staff.company.name,
-                        staffName: staff.name,
-                        mobile: staff.mobile,
-                        reserveStatus: EOrderStatus.SUCCESS,
-                        route,
-                        budget: tripDetail.budget,
-                        realCost: expenditure,
-                        saving,
-                        ratio: 0.05,
-                        coins,
-                        currStatus: tripDetail.tripPlan.status
-                    }
-                })
-            }
-
-            res.send(200)
+            
+            let coins = saving * 0.05
+            coins = coins > 100 ? coins : 100
+            const tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId)
+            await SavingEvent.emitTripSaving({
+                coins, orderNo, staffId: staff.id,
+                companyId, type: 2, record: {
+                    date: new Date(),
+                    companyName: staff.company.name,
+                    staffName: staff.name,
+                    mobile: staff.mobile,
+                    reserveStatus: EOrderStatus.SUCCESS,
+                    route,
+                    budget: tripDetail.budget,
+                    realCost: expenditure,
+                    saving,
+                    ratio: 0.05,
+                    coins,
+                    currStatus: tripPlan.status
+                }
+            })
         }
+
+        res.send(200)
     }
 
 }
