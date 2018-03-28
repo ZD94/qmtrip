@@ -43,7 +43,7 @@ export class BaseEvent {
                 result = JSON.parse(result);
             }
             console.log('response is', result)
-            if (result && result.code == 0) {
+            if (result && result.code == 0 || result.code == 200) {
                 return result.data;
             }
         } catch (err) {
