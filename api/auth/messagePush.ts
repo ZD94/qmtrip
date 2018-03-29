@@ -31,19 +31,19 @@ export async function destroyJpushId(params?: any): Promise<boolean> {
  */
 export async function saveOrUpdateJpushId(params: any): Promise<Token>  {
     let staff = await Staff.getCurrent();
-    let list = await Models.token.find({where: {token: params.jpushId, type:'jpush_id', accountId: {$ne: staff.id}}});
+    let list = await Models.token.find({where: {token: params.jpushId, type:'jpush_id', accountId: {$ne: staff.accountId}}});
 
     if(list && list.length > 0) {
         await Promise.all(list.map((op) => op.destroy()));
     }
 
-    let selfList = await Models.token.find({where: {token: params.jpushId, type:'jpush_id', accountId: staff.id}});
+    let selfList = await Models.token.find({where: {token: params.jpushId, type:'jpush_id', accountId: staff.accountId}});
 
     if(selfList && selfList.length > 0) {
         return selfList[0];
     }
 
-    let obj = Models.token.create({token: params.jpushId, accountId: staff.id, type:'jpush_id'});
+    let obj = Models.token.create({token: params.jpushId, accountId: staff.accountId, type:'jpush_id'});
     return obj.save();
 }
 

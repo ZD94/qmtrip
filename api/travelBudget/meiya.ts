@@ -71,7 +71,7 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
 
     let data = [];
     let meiyaParam = {
-       
+
         depDate: moment(params.leaveDate).format("YYYY-MM-DD")
     };
     let urlFlight = config['java-jingli-order1'].orderLink + "/tmc/searchFlight/getList/" + `${params.originPlaceId}/${params.destinationId}/${meiyaParam.depDate}`;
@@ -121,7 +121,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
     // let arrival = await API.place.getCityInfo({ cityCode: params.destinationId });
     let data: Array<IMeiyaTrain> = []
     // let trainData: {[index: string]: Array<IMeiyaTrain>} = {};
-    
+
     let meiyaParam = {
         depCity: params.originPlaceId,
         arrCity: params.destinationId,
@@ -138,7 +138,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
         let agentType = item.agentType;
         // console.log('agenttype---->   ', agentType, 'typeof------  ', typeof agentType);
         isBindService = (type == `${TmcServiceType.TRAIN}` || type == `${TmcServiceType.TRAIN_ABROAD}`) ? true : false;
-        let meiyaResult = isBindService 
+        let meiyaResult = isBindService
         ? await request({
 
             url: urlTrain,
@@ -151,7 +151,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
             }
         }).catch((e: Error) => {
             console.log(e)
-        }) 
+        })
         : null;
             try {
                 meiyaResult = JSON.parse(meiyaResult);
@@ -435,6 +435,13 @@ function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHot
     }else {
         star = meiyaHotelData.starRating
     }
+    let hotelPicture = [];
+    if(meiyaHotelData.hotelPictureList && meiyaHotelData.hotelPictureList.length) {
+        for(let item of meiyaHotelData.hotelPictureList){
+            hotelPicture.push(item.url)
+        }
+    }
+
         let model = {
         "name": meiyaHotelData.cnName,
         "star": star,
@@ -459,6 +466,7 @@ function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHot
                 }
             }
         ],
+        hotelPicture,
         "latitude": meiyaHotelData.latitude,
         "longitude": meiyaHotelData.longitude,
         "shortName": meiyaHotelData.cnName,
@@ -538,6 +546,7 @@ async function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: I
                 "price": item.price,
                 "discount": item.discount,
                 "cabin": item.cabin,
+                "cabinType":item.cabinType,
                 "seatNum":item.seatNum,
                 "refundChangeInfo":item.refundChangeInfo,
                 "urlParams": {
@@ -552,6 +561,9 @@ async function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: I
     let model = {
         "No": meiyaFlightData.flightNo,
         "carrier":meiyaFlightData.carrier,
+        "isCodeShare":meiyaFlightData.isCodeShare,
+        "planeMode":meiyaFlightData.planeMode,
+        "meal":meiyaFlightData.meal,
         stopItemList,
         "segs": [
             {
@@ -1033,6 +1045,7 @@ export interface IMeiyaHotel {
     mobile?: string
     otherName?: string;
     hotelUrl?: string;
+    hotelPicture?:string
     hotelOpeningTime?: string | Date;
     hotelDecorationTime?: string | Date;
     RecommendCode?: string;
