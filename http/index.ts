@@ -72,18 +72,20 @@ export async function initHttp(app: Application) {
      */
     app.use('/api/v1', jlReply)
     app.use('/api/v1', allowCrossDomain);
-    app.use('/api/v1', (req: Request, res: any, next?: NextFunction) => {
-        if (!next) return
+    app.use('/api/v1', (req: Request, res: any, next: NextFunction) => {
         auth(req, res, next, async (err, isValid, data) => {
-               console.log("======auth request: ", err, isValid, data)
-            if (isValid) {
-                const companies = await Models.company.find({
-                    where: { appId: data.appId }
-                })
-                res.session = { ...data, companyId: companies[0] && companies[0].id }
-                return next()
+            try {
+                if (isValid) {
+                    const companies = await Models.company.find({
+                        where: { appId: data.appId }
+                    })
+                    res.session = { ...data, companyId: companies[0] && companies[0].id }
+                    return next()
+                }
+                return res.sendStatus(403)
+            } catch (err) { 
+                return next(err);
             }
-            return res.sendStatus(403)
         })
     }, router);
     /**
