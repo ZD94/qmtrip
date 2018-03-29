@@ -13,6 +13,9 @@ export class SavingEvent extends BaseEvent {
 
         const eventName = 'TRIP_SAVING'
         const eventListener = await super.findEventListener(eventName, companyId)
+
+        console.log('eventListener=========', eventListener)
+
         if (!eventListener) return null
 
         let url = _.template(eventListener.url)(params)
