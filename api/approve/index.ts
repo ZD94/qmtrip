@@ -16,6 +16,7 @@ var API = require("@jingli/dnode-api");
 import {ISegment, ICreateBudgetAndApproveParams, QMEApproveStatus} from '_types/tripPlan';
 import L from '@jingli/language';
 import * as CLS from 'continuation-local-storage';
+const scheduler = require('common/scheduler');
 
 import {DB} from "@jingli/database";
 import { ITravelBudgetInfo } from 'http/controller/budget';
