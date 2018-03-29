@@ -1888,6 +1888,8 @@ class TripPlanModule {
         }
         let companyTotalSaved: number = 0;
         for (let i = 0; i < budget.length; i++) {
+            if (budget[i].type == ETripType.SUBSIDY)
+                continue;
             companyTotalSaved += (budget[i].highestPrice - budget[i].price);
         }
 
