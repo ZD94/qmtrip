@@ -70,6 +70,11 @@ export default class DepartmentModule {
             throw { code: -2, msg: '该部门下有子级部门，暂不能删除' };
         }
 
+        let waitApproveNumber = await department.getWaitApproveTripNumber();
+        if(waitApproveNumber && waitApproveNumber>0){
+            throw {code: -3, msg: "该部门有未审批出差申请不能被删除"};
+        }
+
         await department.destroy();
         return true;
     }

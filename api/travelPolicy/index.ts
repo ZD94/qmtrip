@@ -799,7 +799,7 @@ export default class TravelPolicyModule{
             group: 2
         }];
     
-        let defaultPlaceId = [[DefaultRegionId.domestic], [DefaultRegionId.aborad], DefaultRegionId.specialDistrict];
+        let defaultPlaceId = [[DefaultRegionId.domestic], [DefaultRegionId.abroad], DefaultRegionId.specialDistrict];
     
         for (let i = 0; i < defaultRegion.length; i++) {
             let companyRegion: any = await API.travelPolicy.createCompanyRegion({

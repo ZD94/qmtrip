@@ -13,7 +13,7 @@ let logger = new Logger("tripPlan");
 const config = require("@jingli/config");
 
 let scheduler = require('common/scheduler');
-import moment = require("moment");
+const moment = require("moment");
 require("moment-timezone");
 import _ = require('lodash');
 const R = require('lodash/fp')
@@ -31,7 +31,7 @@ import { AgencyUser, Agency } from "_types/agency";
 import { makeSpendReport } from './spendReport';
 import { TripDetailTraffic, TripDetailHotel, TripDetailSubsidy, TripDetailSpecial, TripDetailInvoice } from "_types/tripPlan";
 import { ENoticeType } from "_types/notice/notice";
-import { MPlaneLevel, MTrainLevel } from "_types";
+import { MPlaneLevel, MTrainLevel, EModifyStatus } from "_types";
 import { ISegment, ExpendItem } from '_types/tripPlan'
 const projectCols = Project['$fieldnames'];
 import { restfulAPIUtil } from "api/restful"
@@ -41,9 +41,10 @@ import { ITravelBudgetInfo } from 'http/controller/budget';
 let RestfulAPIUtil = restfulAPIUtil;
 import { Company } from '_types/company';
 import { CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE } from '_types/coin';
-import { BUDGET_CHANGE_TYPE, ECostCenterType } from '_types/costCenter';
+import { BUDGET_CHANGE_TYPE, ECostCenterType, CostCenter } from '_types/costCenter';
 import { ICity } from 'api/travelBudget';
 import sequelize from 'sequelize'
+import SavingEvent from '../eventListener/savingEvent';
 
 interface ReportInvoice {
     type: string;
@@ -356,7 +357,10 @@ class TripPlanModule {
     @requireParams(['id'])
     @modelNotNull('tripDetail')
     static async getTripDetail(params: { id: string, notRetChild: boolean }): Promise<TripDetail> {
-        return Models.tripDetail.get(params.id, { notRetChild: true });
+
+        let tripDetail = await  Models.tripDetail.get(params.id, { notRetChild: true });
+        return tripDetail;
+        // return Models.tripDetail.get(params.id, { notRetChild: true });
     }
 
     @clientExport
@@ -478,6 +482,7 @@ class TripPlanModule {
                     log.remark = `已预订`;
                     await log.save();
                 }
+                await calculateBudget({ expenditure: tripDetail.expenditure, id: tripDetail.id, orderNo: tripDetail.orderNo })
                 tripDetails = [];
                 break;
             case EOrderStatus.ENDORSEMENT_SUCCESS: 
@@ -527,8 +532,6 @@ class TripPlanModule {
         await tripPlan.save();
         return true;
     }
-
- 
 
     /**
      * 根据出差记录id获取出差详情(包括已删除的)
@@ -1877,6 +1880,15 @@ class TripPlanModule {
         let query: any = approve.data.query;   //查询条件
         if (typeof query == 'string')
             query = JSON.parse(query);
+        
+        let budget: any = approve.data.budgets;
+        if (typeof budget == 'string') {
+            budget = JSON.parse(budget);
+        }
+        let companyTotalSaved: number = 0;
+        for (let i = 0; i < budget.length; i++) {
+            companyTotalSaved += (budget[i].highestPrice - budget[i].price);
+        }
 
         if (typeof query.destinationPlacesInfo == 'string')
             query.destinationPlacesInfo = JSON.parse(query.destinationPlacesInfo);
@@ -1955,6 +1967,7 @@ class TripPlanModule {
         tripPlan.submitterSnapshot = approve.submitterSnapshot;
         tripPlan.auditUserSnapshot = approve.approveUserSnapshot;
         tripPlan.staffListSnapshot = approve.staffListSnapshot;
+        tripPlan.companySaved = companyTotalSaved;
 
         tripPlan.readNumber = 0;
 
@@ -1969,6 +1982,15 @@ class TripPlanModule {
 
         tripPlan.budget = totalBudget;
 
+        if(approve.oldId){
+            tripPlan.oldId = approve.oldId;
+            tripPlan.modifyReason = query.modifyReason;
+            let modifiedTripPlan = await Models.tripPlan.get(approve.oldId);
+            if(modifiedTripPlan){
+                modifiedTripPlan.modifyStatus = EModifyStatus.MODIFIED;
+                await modifiedTripPlan.save();
+            }
+        }
         let log = TripPlanLog.create({ tripPlanId: tripPlan.id, userId: tryObjId(approveUser), remark: `出差审批通过，生成出差记录` });
         await Promise.all([tripPlan.save(), log.save()]);
 
@@ -2140,20 +2162,19 @@ class TripPlanModule {
             logger.error(err);
         }
 
-        try {
-            await API.tripApprove.sendApprovePassNoticeToCompany({ approveId: approve.id });
-        } catch (err) {
-            console.error(err);
-        }
+        API.tripApprove.sendApprovePassNoticeToCompany({ approveId: approve.id })
+        .catch((err: Error) => { 
+            logger.error('发送审批通过通知给企业时发生错误:', err);
+        })
+
         let tplName = 'qm_notify_approve_pass';
-        try {
-            await API.notify.submitNotify({
-                userId: account.id, key: tplName,
-                values: { tripPlan: tripPlan, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE }
-            });
-        } catch (err) {
-            console.error(err);
-        }
+        API.notify.submitNotify({
+            userId: account.id, key: tplName,
+            values: { tripPlan: tripPlan, detailUrl: self_url, appMessageUrl: appMessageUrl, noticeType: ENoticeType.TRIP_APPROVE_NOTICE }
+        }).catch((err: Error) => {
+            logger.error('发送审批通过通知给用户时发生错误:', err);
+        })
+
         /*try {
             await API.ddtalk.sendLinkMsg({ accountId: account.id, text: '您的预算已审批完成', url: self_url });
         } catch (err) {
@@ -2991,6 +3012,256 @@ class TripPlanModule {
         });
     }*/
 
+    /**
+     * 获取企业节省金额
+     * @author lizeilin
+     * @param {companyId: string, beginDate, endDate}
+     * @return {companySaved: number}
+     */
+    static async getCompanySaved(params: {companyId: string, beginDate?: Date, endDate?: Date}) {
+        let {companyId, beginDate, endDate} = params;
+        let tripPlans: TripPlan[] = [];
+        let _tripPlans: TripPlan[] = [];
+        if (!beginDate && !endDate) {
+            tripPlans = await Models.tripPlan.all({where: {companyId: companyId, 
+                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
+                auditStatus: {$in: [EAuditStatus.INVOICE_PASS, EAuditStatus.NO_NEED_AUDIT]}, 
+                createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+        } else {
+            _tripPlans = await Models.tripPlan.all({where: {companyId: companyId,
+                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
+                auditStatus: {$in: [EAuditStatus.INVOICE_PASS, EAuditStatus.NO_NEED_AUDIT]}}});
+            for (let i = 0; i < _tripPlans.length; i++) {
+                if (moment(_tripPlans[i].createdAt).isSameOrAfter(beginDate) && moment(_tripPlans[i].createdAt).isSameOrBefore(endDate)) {
+                    tripPlans.push(_tripPlans[i]);
+                }
+            }
+        }
+        let companySaved: number = 0;
+        for (let i = 0; i < tripPlans.length; i++) {
+            companySaved += tripPlans[i].companySaved;
+        }
+        return companySaved;
+    }
+
+    /**
+     * 获取企业节省 12月分布数据
+     * @author lizeilin
+     * 
+     */
+    static async getCompanySavedChart(params: {companyId: string}) {
+        let {companyId} = params;
+        let beginDate: Date = moment().startOf('M').subtract(11, 'M');
+        let tripPlans: TripPlan[] = await Models.tripPlan.all({where: {companyId: companyId, 
+                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
+                auditStatus: {$in: [EAuditStatus.INVOICE_PASS, EAuditStatus.NO_NEED_AUDIT]}, 
+                createdAt: {$gte: beginDate.toString()}}, order: [["created_at", "asc"]]});
+        let budgets: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; //for 12 months
+        for (let i = 0; i < tripPlans.length; i++) {
+            let month: number = moment(tripPlans[i].createdAt).month();
+            budgets[month] += tripPlans[i].companySaved;
+        }
+        let monthNow = moment().month() + 1;
+        budgets = budgets.slice(monthNow - 12).concat(budgets.slice(0, monthNow)); 
+
+        return budgets;
+    }
+
+    /**
+     * 获取企业/部门/项目 已确认支出或节省
+     * @author lizeilin
+     * @param {companyId: string}
+     * @return {isSaved ? saved : expenditure}
+     */
+    static async getConfirmedExpenditureAndSaved(params:{companyId: string, beginDate?: Date, endDate?: Date}) {
+        let {companyId, beginDate, endDate} = params;
+        let tripPlans: TripPlan[] = [];
+        let _tripPlans: TripPlan[] = [];
+        if (!beginDate && !endDate) {
+            tripPlans = await Models.tripPlan.all({where: {companyId: companyId, 
+                status: EPlanStatus.COMPLETE, auditStatus: EAuditStatus.NO_NEED_AUDIT, 
+                createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+            _tripPlans = await Models.tripPlan.all({where: {companyId: companyId,
+                status: {$in: [EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
+                auditStatus: EAuditStatus.INVOICE_PASS, 
+                createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+            tripPlans = tripPlans.concat(_tripPlans);
+        } else {
+            let temp: TripPlan[] = await Models.tripPlan.all({where: {companyId: companyId, 
+                status: EPlanStatus.COMPLETE, auditStatus: EAuditStatus.NO_NEED_AUDIT}}); 
+            _tripPlans = await Models.tripPlan.all({where: {companyId: companyId,
+                status: {$in: [EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
+                auditStatus: EAuditStatus.INVOICE_PASS}});
+            temp = temp.concat(_tripPlans);
+            beginDate = moment(beginDate).startOf('M');
+            endDate = moment(endDate).endOf('M');
+            for (let i = 0; i < temp.length; i++) {
+                if (moment(temp[i].createdAt).isSameOrAfter(beginDate) && moment(temp[i].createdAt).isSameOrBefore(endDate)) {
+                    tripPlans.push(temp[i]);
+                }
+            }
+        }
+        
+        let expenditureAll: number = 0;
+        let savedAll: number = 0;
+        let expenditureDepart: number = 0;
+        let savedDepart: number = 0;
+        let expenditureProj: number = 0;
+        let savedProj: number = 0;
+            for (let i = 0; i < tripPlans.length; i++) {
+            expenditureAll += tripPlans[i].expenditure;
+            savedAll += tripPlans[i].saved;
+            }
+
+            let tripPlansDepart: TripPlan[] = [];
+            let tripPlansProj: TripPlan[] = [];
+            for (let i = 0; i < tripPlans.length; i++) {
+                let costCenter: CostCenter = await Models.costCenter.get(tripPlans[i].costCenterId);
+            if (!costCenter)
+                continue;
+                if (costCenter.type == ECostCenterType.DEPARTMENT) {
+                    tripPlansDepart.push(tripPlans[i]);
+                }
+                if (costCenter.type == ECostCenterType.PROJECT) {
+                    tripPlansProj.push(tripPlans[i]);
+                }
+            }
+                for (let j = 0; j < tripPlansDepart.length; j++) {
+            expenditureDepart += tripPlansDepart[j].expenditure;
+            savedDepart += tripPlansDepart[j].saved;
+                }
+                for (let j = 0; j < tripPlansProj.length; j++) {
+            expenditureProj += tripPlansProj[j].expenditure;
+            savedProj += tripPlansProj[j].saved;
+                }
+        return {
+            expenditureAll: expenditureAll,
+            savedAll: savedAll,
+            expenditureDepart: expenditureDepart,
+            savedDepart: savedDepart,
+            expenditureProj: expenditureProj,
+            savedProj: savedProj
+        }
+    }
+
+    /**
+     * 获取企业/部门/项目 已计划预算
+     * @author lizeilin
+     * @param {companyId: string, type: AnalysisType}
+     * @return {budget}
+     */
+    static async getPlannedBudget(params: {companyId: string, departmentOrProjectId?: string, beginDate?: Date, endDate?: Date}) {
+        let {companyId, departmentOrProjectId, beginDate, endDate} = params;
+        let tripPlans: TripPlan[] = [];
+        let _tripPlans: TripPlan[] = [];
+        if (!beginDate && !endDate) {
+            tripPlans = await Models.tripPlan.all({where: {companyId: companyId, 
+                status: EPlanStatus.WAIT_RESERVE, auditStatus: EAuditStatus.NO_NEED_AUDIT,
+                createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+            _tripPlans = await Models.tripPlan.all({where: {companyId: companyId,
+                status: {$in: [EPlanStatus.EXPIRED, EPlanStatus.RESERVED]},
+                auditStatus: {$in: [EAuditStatus.WAIT_COMMIT, EAuditStatus.WAIT_UPLOAD, EAuditStatus.AUDITING]},
+                createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+            tripPlans = tripPlans.concat(_tripPlans);
+        } else {
+            let temp: TripPlan[] = await Models.tripPlan.all({where: {companyId: companyId, 
+                status: EPlanStatus.WAIT_RESERVE, auditStatus: EAuditStatus.NO_NEED_AUDIT}}); 
+            _tripPlans = await Models.tripPlan.all({where: {companyId: companyId,
+                status: {$in: [EPlanStatus.EXPIRED, EPlanStatus.RESERVED]},
+                auditStatus: {$in: [EAuditStatus.WAIT_COMMIT, EAuditStatus.WAIT_UPLOAD, EAuditStatus.AUDITING]}}});
+            temp = temp.concat(_tripPlans);
+            beginDate = moment(beginDate).startOf('M');
+            endDate = moment(endDate).endOf('M');
+            for (let i = 0; i < temp.length; i++) {
+                if (moment(temp[i].createdAt).isSameOrAfter(beginDate) && moment(temp[i].createdAt).isSameOrBefore(endDate)) {
+                    tripPlans.push(temp[i]);
+                }
+            }
+        }
+        
+        let budget: number = 0;
+        let budgetAll: number = 0;
+        let budgetDepart: number = 0;
+        let budgetProj: number = 0;
+        if (departmentOrProjectId == null) {
+                for (let i = 0; i < tripPlans.length; i++) {
+                budgetAll += tripPlans[i].budget;
+                }
+                let tripPlansDepart: TripPlan[] = [];
+                let tripPlansProj: TripPlan[] = [];
+                for (let i = 0; i < tripPlans.length; i++) {
+                    let costCenter: CostCenter = await Models.costCenter.get(tripPlans[i].costCenterId);
+                if (!costCenter)
+                    continue;
+
+                    if (costCenter.type == ECostCenterType.DEPARTMENT) {
+                        tripPlansDepart.push(tripPlans[i]);
+                    }
+                    if (costCenter.type == ECostCenterType.PROJECT) {
+                        tripPlansProj.push(tripPlans[i]);
+                    }
+                }
+                    for (let j = 0; j < tripPlansDepart.length; j++) {
+                budgetDepart += tripPlansDepart[j].budget;
+                }
+                    for (let j = 0; j < tripPlansProj.length; j++) {
+                budgetProj += tripPlansProj[j].budget;
+                }
+            return {
+                budgetAll: budgetAll,
+                budgetDepart: budgetDepart,
+                budgetProj: budgetProj
+            };
+            } else {
+            let tripPlans: TripPlan[] = await Models.tripPlan.all({where: {costCenterId: departmentOrProjectId, 
+                status: EPlanStatus.WAIT_RESERVE, auditStatus: EAuditStatus.NO_NEED_AUDIT, 
+                createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+            let _tripPlans: TripPlan[] = await Models.tripPlan.all({where: {costCenterId: departmentOrProjectId,
+                status: {$in: [EPlanStatus.EXPIRED, EPlanStatus.RESERVED]}, 
+                auditStatus: {$in: [EAuditStatus.WAIT_COMMIT, EAuditStatus.WAIT_UPLOAD, EAuditStatus.AUDITING]}, 
+                createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+            tripPlans = tripPlans.concat(_tripPlans);
+            for (let i = 0; i < tripPlans.length; i++) {
+                budget += tripPlans[i].budget;
+            }
+            return budget;
+        }
+    }
+
+     /**
+     * 总揽获取企业补助预算
+     * @author lizeilin
+     */
+    static async getSubsidyBudget(params: {companyId: string, beginDate?: Date, endDate?: Date}) {
+        let {companyId, beginDate, endDate} = params;
+        let tripPlans: TripPlan[] = [];
+        let _tripPlans: TripPlan[] = [];
+        if (!beginDate && !endDate) {
+            tripPlans = await Models.tripPlan.all({where: {companyId: companyId, 
+                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
+                auditStatus: {$in: [EAuditStatus.INVOICE_PASS, EAuditStatus.NO_NEED_AUDIT]}, 
+                createdAt: {$gte: moment().startOf('Y').format().toString()}}});
+        } else {
+            _tripPlans = await Models.tripPlan.all({where: {companyId: companyId,
+                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
+                auditStatus: {$in: [EAuditStatus.INVOICE_PASS, EAuditStatus.NO_NEED_AUDIT]}}});
+            for (let i = 0; i < _tripPlans.length; i++) {
+                if (moment(_tripPlans[i].createdAt).isSameOrAfter(beginDate) && moment(_tripPlans[i].createdAt).isSameOrBefore(endDate)) {
+                    tripPlans.push(_tripPlans[i]);
+                }
+            } 
+        }
+        let subsidyBudget: number = 0;
+        for (let i = 0; i < tripPlans.length; i++) {
+            let tripDetails: TripDetail[] = await Models.tripDetail.all({where: {tripPlanId: tripPlans[i].id, type: ETripType.SUBSIDY}});
+            for (let j = 0; j < tripDetails.length; j++) {
+                subsidyBudget += tripDetails[j].budget;
+            }
+        }
+        return subsidyBudget;
+
+    
+    }
     static async getProjectByName(params: any) {
         let projects = await Models.project.find({ where: { name: params.name } });
 
@@ -3408,6 +3679,47 @@ function getOrderNo(): string {
     var rnd = (Math.ceil(Math.random() * 1000));
     var str = `${d.getFullYear()}${d.getMonth() + 1}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}-${rnd}`;
     return str;
+}
+
+async function calculateBudget(params: { expenditure: number, id: string, orderNo: string }) {
+    const { expenditure, id, orderNo } = params
+    const tripDetail = await Models.tripDetail.get(id)
+    const staff = await Models.staff.get(tripDetail.accountId)
+    const saving = tripDetail.budget - expenditure
+    console.log('saving==========', saving)
+    if (saving <= 0) return
+
+    const companyId = staff.company.id
+    let route = ''
+    if ([ETripType.BACK_TRIP, ETripType.OUT_TRIP].indexOf(tripDetail.type) != -1) {
+        const tripDetailTraffic = await Models.tripDetailTraffic.get(tripDetail.id)
+        const cityNames = R.pluck('name', await Promise.all([API.place.getCityById(tripDetailTraffic.deptCity, companyId), API.place.getCityById(tripDetailTraffic.arrivalCity, companyId)]))
+        route = cityNames.join('-')
+    } else if (tripDetail.type == ETripType.HOTEL) {
+        const tripDetailHotel = await Models.tripDetailHotel.get(tripDetail.id)
+        route = tripDetailHotel.city
+    }
+
+    let coins = saving * 0.05
+    coins = coins > 100 ? coins : 100
+    const tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId)
+        await SavingEvent.emitTripSaving({
+            coins, orderNo, staffId: staff.id,
+            companyId, type: 2, record: {
+                date: new Date(),
+                companyName: staff.company.name,
+                staffName: staff.name,
+                mobile: staff.mobile,
+                reserveStatus: EOrderStatus.SUCCESS,
+                route,
+                budget: tripDetail.budget,
+                realCost: expenditure,
+                saving,
+                ratio: 0.05,
+                coins,
+                currStatus: tripPlan.status
+            }
+    })
 }
 
 

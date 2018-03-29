@@ -108,25 +108,31 @@
     "appKey": "3fFDdkKxibDiRjwy9DqaPwasvAup",
     "appSecret": "2FaLAocgDodNqCFa9PU8cyCk4Fnw"
   },
-  "mall": {
+  "java-jingli-mall": {
     "orderLink": "${JL_APP_MALL_ORDER_LINK}",
     "appId": "${JL_APP_MALL_APP_ID}",
     "appSecret": "${JL_APP_MALL_APP_SECRET}"
   },
-  "pay": {
+  "java-jingli-pay": {
     "orderLink": "${JL_APP_PAY_ORDER_LINK}",
     "appId": "${JL_APP_PAY_APP_ID}",
     "appSecret": "${JL_APP_PAY_APP_SECRET}"
   },
-  "bill": {
-    "orderLink": "${JL_APP_BILL_ORDER_LINK}",
-    "appId": "${JL_APP_BILL_APP_ID}",
-    "appSecret": "${JL_APP_BILL_APP_SECRET}"
-  },
-  "permission": {
+  "java-jingli-auth": {
     "orderLink": "${JL_APP_PERMISSION_ORDER_LINK}",
     "appId": "${JL_APP_PERMISSION_APP_ID}",
     "appSecret": "${JL_APP_PERMISSION_APP_SECRET}"
+  },
+  "java-jingli-ordervalidate": {
+    "appId": "${JL_APP_ORDERVALIDATE_APP_ID}",
+    "appSecret": "${JL_APP_ORDERVALIDATE_APP_SECRET}"
+  },
+  "java-jingli-activity": {
+    "appId": "${JL_APP_ACTIVITY_APP_ID}",
+    "appSecret": "${JL_APP_ACTIVITY_APP_SECRET}" 
+  },
+  "java": {
+    "getway": "${JL_APP_JAVA_GETWAY}"
   },
   "is_init_test_company": "JL_APP_INIT_TESTDATA",
   "ddconfig": {
@@ -140,6 +146,7 @@
     "reg_go": true,
     "dd_online_url": "https://j.jingli365.com"
   },
+  "trainServicePrice":10,
   "perDayRegisterEmail": "",
   "cloud": "${JL_APP_CLOUD}",
   "cloudAPI": "${JL_APP_CLOUDAPI}",
@@ -147,6 +154,10 @@
   "agent": {
     "appId": "${JL_APP_CLOUD_APP_ID}",
     "appSecret": "${JL_APP_CLOUD_APP_SECRET}"
+  },
+  "openapi": {
+    "appId": "${JL_APP_OPENAPI_APP_ID}",
+    "appSecret": "${JL_APP_OPENAPI_APP_SECRET}"
   },
   "mail": {
     "service": "QQex",
@@ -164,7 +175,7 @@
   "wxSharedSecret": "+lx/c62ImCuU6533C73RwOn1mA4=",
   "tmcUrl": "${JL_APP_TMC}",
   "tmcFake": "${JL_APP_TMC_FAKE}",
-  "orderSysConfig": {
+  "java-jingli-order1": {
     "tripDetailMonitorUrl": "${JL_APP_TD_MONITORURL}",
     "orderLink": "${JL_APP_ORDER_LINK}",
     "appId": "${JL_APP_ORDER_APP_ID}",
@@ -179,4 +190,5 @@
     "suiteSecret": "7GnoFq32hgkE27kkBFPZxeetnhyQxtFk2OvHFjtrW4I"
   },
   "isVerify": false
+  
 }
