@@ -43,7 +43,6 @@ import { Company } from '_types/company';
 import { CoinAccount, CoinAccountChange, COIN_CHANGE_TYPE } from '_types/coin';
 import { BUDGET_CHANGE_TYPE, ECostCenterType, CostCenter } from '_types/costCenter';
 import { ICity } from 'api/travelBudget';
-import sequelize from 'sequelize'
 import SavingEvent from '../eventListener/savingEvent';
 
 interface ReportInvoice {
