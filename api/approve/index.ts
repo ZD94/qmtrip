@@ -478,7 +478,7 @@ class ApproveModule {
 
     static _scheduleTask() {
         let taskId = "processTimeoutApproves";
-        scheduler('0 */1 * * * *', taskId, async function () {
+        scheduler('0 */5 * * * *', taskId, async function () {
             console.log('run task processTimeoutApproves')
             const approves = await Models.approve.find({
                 where: {
