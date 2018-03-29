@@ -3,9 +3,10 @@
  */
 
 'use strict';
-import {AbstractController, Restful, Router, ERR} from "@jingli/restful";
-import { Request, Response, NextFunction} from 'express';
-import {EventListener} from "_types/eventListener";
+import { AbstractController, Restful, Router } from "@jingli/restful";
+import { Request, Response, NextFunction } from 'express';
+import { EventListener } from "_types/eventListener";
+import { Models } from '_types';
 
 @Restful()
 export class EventsController extends AbstractController {
@@ -19,40 +20,25 @@ export class EventsController extends AbstractController {
     }
 
     @Router('/registry-event-listener', "POST")
-    async registryEventListener(req: Request, res: Response, next: NextFunction){
-        try{
-            let {events, url, method, companyId} = req.body;
-            if(typeof events == "string"){
-                events = JSON.parse(events);
+    async registryEventListener(req: Request, res: Response, next: NextFunction) {
+        try {
+            let { event, url, companyId, startDate, endDate } = req.body;
+            const eventListeners = await Models.eventListener.find({
+                where: { event, companyId, startDate, endDate }
+            })
+            if (eventListeners && eventListeners.length) {
+                res.json(this.reply(0, eventListeners[0]))
+                return
             }
-            let eventListener = EventListener.create({events, url, method, companyId});
+            let eventListener = EventListener.create({ event, url, companyId, startDate, endDate });
             eventListener = await eventListener.save();
 
-            // let rest = await API.eventListener.sendEventNotice({eventName: "new_trip_approve", data: {"s":"w"," value": "rrr"}, companyId: "1a1a4330-046b-11e7-b585-933198eebdaa"});
-            // res.json(this.reply(ERR.OK, rest));
-
-            res.json(this.reply(ERR.OK, eventListener));
-        }catch (e){
-            res.json(this.reply(ERR.REQ_PARAM_ERROR, e));
+            res.json(this.reply(0, eventListener));
+        } catch (e) {
+            res.json(this.reply(500, e));
         }
-
     }
 
-    @Router('/trip_approve', "POST")
-    async tripApprove(req: Request, res: Response, next: NextFunction){
-        try{
-
-            console.info(req.body);
-            console.info(req.query);
-            console.info(typeof req.body);
-            console.info(typeof req.query);
-            console.info("tripApprove===================");
-            res.json(this.reply(ERR.OK, {msg: "第三方返回信息======"}));
-        }catch (e){
-            res.json(this.reply(ERR.REQ_PARAM_ERROR, e));
-        }
-
-    }
 
 }
 
