@@ -20,7 +20,7 @@ const R = require('lodash/fp')
 import { requireParams, clientExport } from '@jingli/dnode-api/dist/src/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
-    EPayType, ESourceType, EInvoiceStatus, TrafficEInvoiceFeeTypes, ProjectStaff, EProjectStatus, ETripDetailStatus, EOrderStatus, AnalysisType
+    EPayType, ESourceType, EInvoiceStatus, TrafficEInvoiceFeeTypes, ProjectStaff, EProjectStatus, ETripDetailStatus, EOrderStatus
 } from "_types/tripPlan";
 import {Models} from "_types";
 import {FindResult} from "common/model/interface";
