@@ -226,7 +226,7 @@ class Proxy {
                     isHttps = true;
                 }
                 let parseReqBody = true;
-                if (req.headers['content-type'].indexOf('multipart') >= 0) { 
+                if (req.headers['content-type'] && req.headers['content-type'].indexOf('multipart') >= 0) { 
                     parseReqBody = false;
                 }
                 console.log("need parseReqBoyd ====>", parseReqBody)
