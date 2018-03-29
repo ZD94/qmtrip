@@ -3021,25 +3021,11 @@ class TripPlanModule {
      * @param {companyId: string, beginDate, endDate}
      * @return {companySaved: number}
      */
-    static async getCompanySaved(params: {companyId: string, beginDate?: Date, endDate?: Date}) {
-        let {companyId, beginDate, endDate} = params;
+    static async getCompanySaved(companyId: string) {
         let tripPlans: TripPlan[] = [];
-        let _tripPlans: TripPlan[] = [];
-        if (!beginDate && !endDate) {
-            tripPlans = await Models.tripPlan.all({where: {companyId: companyId, 
-                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
-                auditStatus: {$in: [EAuditStatus.INVOICE_PASS, EAuditStatus.NO_NEED_AUDIT]}, 
-                createdAt: {$gte: moment().startOf('Y').format().toString()}}});
-        } else {
-            _tripPlans = await Models.tripPlan.all({where: {companyId: companyId,
-                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
-                auditStatus: {$in: [EAuditStatus.INVOICE_PASS, EAuditStatus.NO_NEED_AUDIT]}}});
-            for (let i = 0; i < _tripPlans.length; i++) {
-                if (moment(_tripPlans[i].createdAt).isSameOrAfter(beginDate) && moment(_tripPlans[i].createdAt).isSameOrBefore(endDate)) {
-                    tripPlans.push(_tripPlans[i]);
-                }
-            }
-        }
+        let beginDate: Date = moment().startOf('M').subtract(11, 'M');
+        tripPlans = await Models.tripPlan.all({where: {companyId: companyId, 
+            createdAt: {$gte: beginDate.toString()}}});
         let companySaved: number = 0;
         for (let i = 0; i < tripPlans.length; i++) {
             companySaved += tripPlans[i].companySaved;
@@ -3052,13 +3038,10 @@ class TripPlanModule {
      * @author lizeilin
      * 
      */
-    static async getCompanySavedChart(params: {companyId: string}) {
-        let {companyId} = params;
+    static async getCompanySavedChart(companyId: string) {
         let beginDate: Date = moment().startOf('M').subtract(11, 'M');
         let tripPlans: TripPlan[] = await Models.tripPlan.all({where: {companyId: companyId, 
-                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
-                auditStatus: {$in: [EAuditStatus.INVOICE_PASS, EAuditStatus.NO_NEED_AUDIT]}, 
-                createdAt: {$gte: beginDate.toString()}}, order: [["created_at", "asc"]]});
+            createdAt: {$gte: beginDate.toString()}}, order: [["created_at", "asc"]]});
         let budgets: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; //for 12 months
         for (let i = 0; i < tripPlans.length; i++) {
             let month: number = moment(tripPlans[i].createdAt).month();
@@ -3262,8 +3245,6 @@ class TripPlanModule {
             }
         }
         return subsidyBudget;
-
-    
     }
 
 
