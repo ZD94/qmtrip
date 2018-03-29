@@ -3157,7 +3157,7 @@ class TripPlanModule {
         let _tripPlans: TripPlan[] = [];
         if (!beginDate && !endDate) {
             tripPlans = await Models.tripPlan.all({where: {companyId: companyId, 
-                status: EPlanStatus.WAIT_RESERVE, auditStatus: EAuditStatus.NO_NEED_AUDIT,
+                status: {$in: [EPlanStatus.WAIT_RESERVE, EPlanStatus.RESERVED]}, auditStatus: EAuditStatus.NO_NEED_AUDIT,
                 createdAt: {$gte: moment().startOf('Y').format().toString()}}});
             _tripPlans = await Models.tripPlan.all({where: {companyId: companyId,
                 status: {$in: [EPlanStatus.EXPIRED, EPlanStatus.RESERVED]},
@@ -3166,7 +3166,7 @@ class TripPlanModule {
             tripPlans = tripPlans.concat(_tripPlans);
         } else {
             let temp: TripPlan[] = await Models.tripPlan.all({where: {companyId: companyId, 
-                status: EPlanStatus.WAIT_RESERVE, auditStatus: EAuditStatus.NO_NEED_AUDIT}}); 
+                status: {$in: [EPlanStatus.WAIT_RESERVE, EPlanStatus.RESERVED]}, auditStatus: EAuditStatus.NO_NEED_AUDIT}}); 
             _tripPlans = await Models.tripPlan.all({where: {companyId: companyId,
                 status: {$in: [EPlanStatus.EXPIRED, EPlanStatus.RESERVED]},
                 auditStatus: {$in: [EAuditStatus.WAIT_COMMIT, EAuditStatus.WAIT_UPLOAD, EAuditStatus.AUDITING]}}});
@@ -3215,7 +3215,7 @@ class TripPlanModule {
             };
         } else {
             let tripPlans: TripPlan[] = await Models.tripPlan.all({where: {costCenterId: departmentOrProjectId, 
-                status: EPlanStatus.WAIT_RESERVE, auditStatus: EAuditStatus.NO_NEED_AUDIT, 
+                status: {$in: [EPlanStatus.WAIT_RESERVE, EPlanStatus.RESERVED]}, auditStatus: EAuditStatus.NO_NEED_AUDIT, 
                 createdAt: {$gte: moment().startOf('Y').format().toString()}}});
             let _tripPlans: TripPlan[] = await Models.tripPlan.all({where: {costCenterId: departmentOrProjectId,
                 status: {$in: [EPlanStatus.EXPIRED, EPlanStatus.RESERVED]}, 
@@ -3239,12 +3239,12 @@ class TripPlanModule {
         let _tripPlans: TripPlan[] = [];
         if (!beginDate && !endDate) {
             tripPlans = await Models.tripPlan.all({where: {companyId: companyId, 
-                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
+                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.EXPIRED]},
                 auditStatus: {$in: [EAuditStatus.INVOICE_PASS, EAuditStatus.NO_NEED_AUDIT]}, 
                 createdAt: {$gte: moment().startOf('Y').format().toString()}}});
         } else {
             _tripPlans = await Models.tripPlan.all({where: {companyId: companyId,
-                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
+                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.EXPIRED]},
                 auditStatus: {$in: [EAuditStatus.INVOICE_PASS, EAuditStatus.NO_NEED_AUDIT]}}});
             for (let i = 0; i < _tripPlans.length; i++) {
                 if (moment(_tripPlans[i].createdAt).isSameOrAfter(beginDate) && moment(_tripPlans[i].createdAt).isSameOrBefore(endDate)) {
