@@ -16,6 +16,7 @@ var API = require("@jingli/dnode-api");
 import {ISegment, ICreateBudgetAndApproveParams, QMEApproveStatus} from '_types/tripPlan';
 import L from '@jingli/language';
 import * as CLS from 'continuation-local-storage';
+const scheduler = require('common/scheduler');
 
 import {DB} from "@jingli/database";
 import { ITravelBudgetInfo } from 'http/controller/budget';
@@ -474,6 +475,46 @@ class ApproveModule {
             throw err;
         }
     }
+
+    static _scheduleTask() {
+        let taskId = "processTimeoutApproves";
+        scheduler('0 */5 * * * *', taskId, async function () {
+            console.log('run task processTimeoutApproves')
+            const approves = await Models.approve.find({
+                where: {
+                    status: EApproveStatus.WAIT_APPROVE,
+                    startAt: { $lt: new Date() }
+                },
+                limit: 10
+            })
+
+            approves.forEach(async ap => {
+                const tripApprove = await API.tripApprove.getTripApprove({id: ap.id})
+                if (!tripApprove) return
+                ap.status = EApproveStatus.TIMEOUT
+                const log = Models.tripPlanLog.create({ tripPlanId: ap.id, remark: '超时未审批', approveStatus: EApproveStatus.TIMEOUT });
+                await Promise.all([
+                    API.tripApprove.updateTripApprove({
+                        id: ap.id,
+                        companyId: ap.companyId,
+                        status: QMEApproveStatus.TIMEOUT
+                    }),
+                    ap.save(), log.save()
+                ])
+            })
+
+            // const ps: Promise<any>[] = _.flatten(approves.map(ap => {
+            //     ap.status = EApproveStatus.TIMEOUT
+            //     return [API.tripApprove.updateTripApprove({
+            //         id: ap.id,
+            //         companyId: ap.companyId,
+            //         status: QMEApproveStatus.TIMEOUT
+            //     }), ap.save()]
+            // }))
+
+            // await Promise.all(ps)
+        })
+    }
 }
 
 //监听审批单变化
@@ -516,5 +557,7 @@ emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result: {approveNo: string, outer
         console.error(err.stack);
     });
 })
+
+ApproveModule._scheduleTask()
 
 export= ApproveModule;
