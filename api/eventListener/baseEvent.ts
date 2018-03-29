@@ -6,7 +6,6 @@ import L from '@jingli/language';
 const request = require("request-promise");
 
 export class BaseEvent {
-    private maxTryTimes = 5;
     private getDelay(count: number): number {
         let seconds: number = 0;
         switch (count) {
