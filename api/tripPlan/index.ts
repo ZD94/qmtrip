@@ -1888,6 +1888,8 @@ class TripPlanModule {
         }
         let companyTotalSaved: number = 0;
         for (let i = 0; i < budget.length; i++) {
+            if (budget[i].type == ETripType.SUBSIDY)
+                continue;
             companyTotalSaved += (budget[i].highestPrice - budget[i].price);
         }
 
@@ -3019,25 +3021,11 @@ class TripPlanModule {
      * @param {companyId: string, beginDate, endDate}
      * @return {companySaved: number}
      */
-    static async getCompanySaved(params: {companyId: string, beginDate?: Date, endDate?: Date}) {
-        let {companyId, beginDate, endDate} = params;
+    static async getCompanySaved(companyId: string) {
         let tripPlans: TripPlan[] = [];
-        let _tripPlans: TripPlan[] = [];
-        if (!beginDate && !endDate) {
-            tripPlans = await Models.tripPlan.all({where: {companyId: companyId, 
-                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
-                auditStatus: {$in: [EAuditStatus.INVOICE_PASS, EAuditStatus.NO_NEED_AUDIT]}, 
-                createdAt: {$gte: moment().startOf('Y').format().toString()}}});
-        } else {
-            _tripPlans = await Models.tripPlan.all({where: {companyId: companyId,
-                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
-                auditStatus: {$in: [EAuditStatus.INVOICE_PASS, EAuditStatus.NO_NEED_AUDIT]}}});
-            for (let i = 0; i < _tripPlans.length; i++) {
-                if (moment(_tripPlans[i].createdAt).isSameOrAfter(beginDate) && moment(_tripPlans[i].createdAt).isSameOrBefore(endDate)) {
-                    tripPlans.push(_tripPlans[i]);
-                }
-            }
-        }
+        let beginDate: Date = moment().startOf('M').subtract(11, 'M');
+        tripPlans = await Models.tripPlan.all({where: {companyId: companyId, 
+            createdAt: {$gte: beginDate.toString()}}});
         let companySaved: number = 0;
         for (let i = 0; i < tripPlans.length; i++) {
             companySaved += tripPlans[i].companySaved;
@@ -3050,13 +3038,10 @@ class TripPlanModule {
      * @author lizeilin
      * 
      */
-    static async getCompanySavedChart(params: {companyId: string}) {
-        let {companyId} = params;
+    static async getCompanySavedChart(companyId: string) {
         let beginDate: Date = moment().startOf('M').subtract(11, 'M');
         let tripPlans: TripPlan[] = await Models.tripPlan.all({where: {companyId: companyId, 
-                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
-                auditStatus: {$in: [EAuditStatus.INVOICE_PASS, EAuditStatus.NO_NEED_AUDIT]}, 
-                createdAt: {$gte: beginDate.toString()}}, order: [["created_at", "asc"]]});
+            createdAt: {$gte: beginDate.toString()}}, order: [["created_at", "asc"]]});
         let budgets: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; //for 12 months
         for (let i = 0; i < tripPlans.length; i++) {
             let month: number = moment(tripPlans[i].createdAt).month();
@@ -3157,7 +3142,7 @@ class TripPlanModule {
         let _tripPlans: TripPlan[] = [];
         if (!beginDate && !endDate) {
             tripPlans = await Models.tripPlan.all({where: {companyId: companyId, 
-                status: EPlanStatus.WAIT_RESERVE, auditStatus: EAuditStatus.NO_NEED_AUDIT,
+                status: {$in: [EPlanStatus.WAIT_RESERVE, EPlanStatus.RESERVED]}, auditStatus: EAuditStatus.NO_NEED_AUDIT,
                 createdAt: {$gte: moment().startOf('Y').format().toString()}}});
             _tripPlans = await Models.tripPlan.all({where: {companyId: companyId,
                 status: {$in: [EPlanStatus.EXPIRED, EPlanStatus.RESERVED]},
@@ -3166,7 +3151,7 @@ class TripPlanModule {
             tripPlans = tripPlans.concat(_tripPlans);
         } else {
             let temp: TripPlan[] = await Models.tripPlan.all({where: {companyId: companyId, 
-                status: EPlanStatus.WAIT_RESERVE, auditStatus: EAuditStatus.NO_NEED_AUDIT}}); 
+                status: {$in: [EPlanStatus.WAIT_RESERVE, EPlanStatus.RESERVED]}, auditStatus: EAuditStatus.NO_NEED_AUDIT}}); 
             _tripPlans = await Models.tripPlan.all({where: {companyId: companyId,
                 status: {$in: [EPlanStatus.EXPIRED, EPlanStatus.RESERVED]},
                 auditStatus: {$in: [EAuditStatus.WAIT_COMMIT, EAuditStatus.WAIT_UPLOAD, EAuditStatus.AUDITING]}}});
@@ -3215,7 +3200,7 @@ class TripPlanModule {
             };
         } else {
             let tripPlans: TripPlan[] = await Models.tripPlan.all({where: {costCenterId: departmentOrProjectId, 
-                status: EPlanStatus.WAIT_RESERVE, auditStatus: EAuditStatus.NO_NEED_AUDIT, 
+                status: {$in: [EPlanStatus.WAIT_RESERVE, EPlanStatus.RESERVED]}, auditStatus: EAuditStatus.NO_NEED_AUDIT, 
                 createdAt: {$gte: moment().startOf('Y').format().toString()}}});
             let _tripPlans: TripPlan[] = await Models.tripPlan.all({where: {costCenterId: departmentOrProjectId,
                 status: {$in: [EPlanStatus.EXPIRED, EPlanStatus.RESERVED]}, 
@@ -3239,12 +3224,12 @@ class TripPlanModule {
         let _tripPlans: TripPlan[] = [];
         if (!beginDate && !endDate) {
             tripPlans = await Models.tripPlan.all({where: {companyId: companyId, 
-                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
+                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.EXPIRED]},
                 auditStatus: {$in: [EAuditStatus.INVOICE_PASS, EAuditStatus.NO_NEED_AUDIT]}, 
                 createdAt: {$gte: moment().startOf('Y').format().toString()}}});
         } else {
             _tripPlans = await Models.tripPlan.all({where: {companyId: companyId,
-                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.RESERVED, EPlanStatus.EXPIRED]},
+                status: {$in: [EPlanStatus.COMPLETE, EPlanStatus.EXPIRED]},
                 auditStatus: {$in: [EAuditStatus.INVOICE_PASS, EAuditStatus.NO_NEED_AUDIT]}}});
             for (let i = 0; i < _tripPlans.length; i++) {
                 if (moment(_tripPlans[i].createdAt).isSameOrAfter(beginDate) && moment(_tripPlans[i].createdAt).isSameOrBefore(endDate)) {
@@ -3260,8 +3245,6 @@ class TripPlanModule {
             }
         }
         return subsidyBudget;
-
-    
     }
 
 
@@ -3593,7 +3576,7 @@ async function calculateBudget(params: { expenditure: number, id: string, orderN
         route = tripDetailHotel.city
     }
 
-    let coins = saving * 0.05
+    let coins = saving * 0.05 * 100
     coins = coins > 100 ? coins : 100
     const tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId)
         await SavingEvent.emitTripSaving({
