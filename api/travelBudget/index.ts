@@ -10,7 +10,7 @@ import {
 import {Approve, EApproveStatus, EApproveChannel} from '_types/approve';
 import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
-import L from '@jingli/language';
+import L, { ERROR_CODE_C } from '@jingli/language';
 import TripApproveEvent from '../eventListener/tripApproveEvent'
 
 require("moment-timezone");
@@ -192,7 +192,14 @@ export default class ApiTravelBudget {
         //     console.log(err);
         // }
         let companyInfo = await ApiTravelBudget.getCompanyInfo(null, null, null, TMCStatus.OK_USE);
-        let data = companyInfo ? companyInfo : await getJLAgents();
+        let data;
+        if (!companyInfo)
+            data = await getJLAgents();
+        else
+            data = await ApiTravelBudget.getCompanyInfo(null, null, TmcServiceType.HOTEL, TMCStatus.OK_USE)
+        
+        if (!data)
+            throw L.ERR.ERROR_CODE_C(500, "企业未配置住宿供应商")
         // console.log('hoteldata ----->    ', data);
 
         let authData: IMeiyaAuthData[] = [];
@@ -256,7 +263,21 @@ export default class ApiTravelBudget {
 
 
         let companyInfo = await ApiTravelBudget.getCompanyInfo(null, null, null, TMCStatus.OK_USE); 
-        let data = companyInfo ? companyInfo : await getJLAgents();
+        let data = [];
+        if (!companyInfo)
+            data = await getJLAgents();
+        else {
+            let dataFlight = await ApiTravelBudget.getCompanyInfo(null, null, TmcServiceType.FLIGHT, TMCStatus.OK_USE)
+            let dataTrain = await ApiTravelBudget.getCompanyInfo(null, null, TmcServiceType.TRAIN, TMCStatus.OK_USE)
+            for (let df in dataFlight){
+                data.push(dataFlight[df])
+            }
+            for (let dt in dataTrain){
+                data.push(dataTrain[dt])
+            }
+            if (!data)
+                throw L.ERR.ERROR_CODE_C(500, "企业未配置火车和飞机供应商")
+        }
         // console.log('trafficdata ----->   ', data);
 
         let authData: IMeiyaAuthData[] = [];
