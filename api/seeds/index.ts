@@ -6,14 +6,14 @@ let moment = require("moment");
 import { DB } from '@jingli/database';
 let typeString = ['TripPlanNo', 'AgencyNo', 'CompanyNo', 'CoinAccountNo'];
 
-class SeedModule {
+export class SeedModule {
     /**
      * 获取团队信息
      * @param params
      * @param params.type goods_no:商品编号 goods_order_no:实物商品订单编号
      * @param cb
      */
-    static async getSingleSeedCode(type: string, options: { minNo?: number, maxNo?: number, formatDate?: string }) {
+    async getSingleSeedCode(type: string, options: { minNo?: number, maxNo?: number, formatDate?: string }) {
         if (!options) {
             options = {};
         }
@@ -48,12 +48,13 @@ class SeedModule {
         return rows[0].nowNo;
     }
 
-    static getSeedNo(type: string, options: { formatDate?: string }) {
+    getSeedNo(type: string, options: { formatDate?: string }) {
+        let self = this;
         if (!options) {
             options = {};
         }
         let formatDate = options.formatDate || "YYMMDDHHmmss";
-        return SeedModule.getSingleSeedCode(type, options)
+        return self.getSingleSeedCode(type, options)
             .then(function (seeds) {
                 let now = moment().format(formatDate);
                 return now + seeds;
@@ -61,4 +62,4 @@ class SeedModule {
     }
 }
 
-export = SeedModule;
+export default new SeedModule();

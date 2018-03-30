@@ -10,7 +10,7 @@ import { FindOptions } from 'sequelize';
 
 const promoCodeCols = PromoCode['$fieldnames'];
 
-class PromoCodeModule{
+export class PromoCodeModule{
     /**
      * 创建优惠码
      * @param data
@@ -18,7 +18,7 @@ class PromoCodeModule{
      */
     @clientExport
     @requireParams(["code","type"], promoCodeCols)
-    static async createPromoCode (params: {code: string}) : Promise<PromoCode>{
+    async createPromoCode (params: {code: string}) : Promise<PromoCode>{
         let result = await Models.promoCode.find({where: {code: params.code}});
         if(result && result.length>0){
             throw {msg: "该城市优惠码已设置"};
@@ -37,7 +37,7 @@ class PromoCodeModule{
      */
     @clientExport
     @requireParams(["id"])
-    static async deletePromoCode(params: {id: string}) : Promise<any>{
+    async deletePromoCode(params: {id: string}) : Promise<any>{
         var id = params.id;
         var pc_delete = await Models.promoCode.get(id);
 
@@ -54,7 +54,7 @@ class PromoCodeModule{
      */
     @clientExport
     @requireParams(["id"], promoCodeCols)
-    static async updatePromoCode(params: PromoCode) : Promise<PromoCode>{
+    async updatePromoCode(params: PromoCode) : Promise<PromoCode>{
         var id = params.id;
 
         var ah = await Models.promoCode.get(id);
@@ -71,7 +71,7 @@ class PromoCodeModule{
      */
     @clientExport
     @requireParams(["id"])
-    static async getPromoCode(params: {id: string}) : Promise<PromoCode>{
+    async getPromoCode(params: {id: string}) : Promise<PromoCode>{
         let id = params.id;
         var ah = await Models.promoCode.get(id);
 
@@ -85,7 +85,7 @@ class PromoCodeModule{
      * @returns {*}
      */
     @clientExport
-    static async getPromoCodes(params: FindOptions<PromoCode>): Promise<FindResult>{
+    async getPromoCodes(params: FindOptions<PromoCode>): Promise<FindResult>{
         params.order = params.order || [['createdAt', 'desc']];
 
         let paginate = await Models.promoCode.find(params);
@@ -118,4 +118,4 @@ function randomWord(randomFlag: boolean, min: number, max: number){
     return str;
 }
 
-export = PromoCodeModule;
+export default new PromoCodeModule();

@@ -34,13 +34,13 @@ function resetTimeout(req: Request, res: Response, next?: NextFunction){
 const projects = require('./proxy-project');
 const proxy = require("express-http-proxy");
 
-class Proxy {
+export class Proxy {
     /**
      * @method 注册获取订单详情事件
      * @param app {Express} 
      * @return {}
      */
-    static __initHttpApp(app: Application){
+    __initHttpApp(app: Application){
 
         app.options(/^\/(order|travel|mall|supplier|bill|permission)*/, cors(corsOptions), (req: Request, res: Response, next?: Function) => {         
             return res.sendStatus(200);
@@ -571,7 +571,7 @@ class Proxy {
         });
     }
 }
-export default Proxy;
+export default new Proxy();
 
 async function verify(req: Request, res: Response, next?: Function) {
     if(req.method == 'OPTIONS') {
