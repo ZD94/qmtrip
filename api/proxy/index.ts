@@ -391,183 +391,205 @@ export class Proxy {
         });
         
         app.all(/^\/mall.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function)=> {
-            let {staffid} = req.headers;
-            let params =  req.body;
-            if(req.method == 'GET') {
-                params = req.query;
+            try {
+                let {staffid} = req.headers;
+                let params =  req.body;
+                if(req.method == 'GET') {
+                    params = req.query;
+                }
+                let staff = await Models.staff.get(staffid);
+                let appSecret = config['java-jingli-mall'].appSecret;
+                let pathstring = req.path;
+                let timestamp = Math.floor(Date.now()/1000);
+                pathstring = pathstring.replace("/mall", '');
+                let sign = genSign(params, timestamp, appSecret)
+                let isHttps: boolean = false
+                if (/^https:/.test(config['java-jingli-mall'].orderLink)){
+                    isHttps = true
+                }
+                let parseReqBody: boolean = true 
+                if (req.headers['content-type'] && req.headers['content-type'].indexOf('multipart') >= 0) {
+                    parseReqBody = false
+                }
+                console.log("need parseReqBody =====>  ", parseReqBody)
+
+                let opts = {
+                    reaAsBuffer: true,
+                    parseReqBody: parseReqBody,
+                    https: isHttps,
+                    proxyReqPathResolver: (req: any) => {
+                        return pathstring
+                    },
+                    proxyReqOptDecorator: (proxyReqOpts: any, srcReq: any) => {
+                        proxyReqOpts.headers['appid'] = config['java-jingli-mall'].appId 
+                        proxyReqOpts.headers['sign'] = sign
+                        proxyReqOpts.headers['companyid'] = staff ? staff.companyId : ''
+                        proxyReqOpts.headers['accountid'] = staff ? staff.compnayId : ''
+                        proxyReqOpts.headers['staffid'] = staff ? staff.id : ''
+                        return proxyReqOpts
+                    }
+                }
+                return proxy(config['java-jingli-mall'].orderLink, opts)(req, res, next)
+            } catch(err) {
+                return next(err)
             }
-            let staff = await Models.staff.get(staffid);
-            let appSecret = config['java-jingli-mall'].appSecret;
-            let pathstring = req.path;
-            let timestamp = Math.floor(Date.now()/1000);
-            pathstring = pathstring.replace("/mall", '');
-            let sign = genSign(params, timestamp, appSecret)
-            let url = `${config['java-jingli-mall'].orderLink}${pathstring}`;
-            console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config['java-jingli-mall'].appId, '===request params: ', params) 
-            let result = await new Promise((resolve, reject) => {
-                if (!staff) return reject(new Error('staff is null'))
-                request({
-                    uri: url,
-                    body: req.body,
-                    json: true,
-                    method: req.method,
-                    qs: req.query,
-                    headers: {
-                        sign: sign,
-                        appid: config['java-jingli-mall'].appId,
-                        staffid: staff.id, 
-                        companyid: staff.companyId,
-                        accountid: staff.accountId
-                    }
-                }, (err: Error, resp: any, result: object) => {
-                    if (err) {
-                        console.log("-=========>err: ", err);
-                        reject(err);
-                    }
-                    resolve(result);
-                });
-            });
-            return res.json(result);
         });
 
         app.all(/^\/pay.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
-            let {staffid} = req.headers;
-            let params =  req.body;
-            if(req.method == 'GET') {
-                params = req.query;
+            try {
+                let {staffid} = req.headers;
+                let params =  req.body;
+                if(req.method == 'GET') {
+                    params = req.query;
+                }
+                let staff = await Models.staff.get(staffid);
+                let appSecret = config['java-jingli-pay'].appSecret;
+                let pathstring = req.path;
+                let timestamp = Math.floor(Date.now()/1000);
+                pathstring = pathstring.replace("/pay", '');
+                let sign = genSign(params, timestamp, appSecret)
+                let isHttps: boolean = false
+                if (/^https:/.test(config['java-jingli-pay'].orderLink)){
+                    isHttps = true
+                }
+                let parseReqBody: boolean = true 
+                if (req.headers['content-type'] && req.headers['content-type'].indexOf('multipart') >= 0) {
+                    parseReqBody = false
+                }
+                console.log("need parseReqBody =====>  ", parseReqBody)
+
+                let opts = {
+                    reaAsBuffer: true,
+                    parseReqBody: parseReqBody,
+                    https: isHttps,
+                    proxyReqPathResolver: (req: any) => {
+                        return pathstring
+                    },
+                    proxyReqOptDecorator: (proxyReqOpts: any, srcReq: any) => {
+                        proxyReqOpts.headers['appid'] = config['java-jingli-pay'].appId 
+                        proxyReqOpts.headers['sign'] = sign
+                        proxyReqOpts.headers['companyid'] = staff ? staff.companyId : ''
+                        proxyReqOpts.headers['accountid'] = staff ? staff.compnayId : ''
+                        proxyReqOpts.headers['staffid'] = staff ? staff.id : ''
+                        return proxyReqOpts
+                    }
+                }
+                return proxy(config['java-jingli-pay'].orderLink, opts)(req, res, next) 
+            } catch(err) {
+                return next(err)
             }
-            let staff = await Models.staff.get(staffid);
-            let appSecret = config['java-jingli-pay'].appSecret;
-            let pathstring = req.path;
-            let timestamp = Math.floor(Date.now()/1000);
-            pathstring = pathstring.replace("/pay", '');
-            let sign = genSign(params, timestamp, appSecret)
-            let url = `${config['java-jingli-pay'].orderLink}${pathstring}`;
-            console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config['java-jingli-pay'].appId, '===request params: ', params) 
-            let result = await new Promise((resolve, reject) => {
-                request({
-                    uri: url,
-                    body: req.body,
-                    json: true,
-                    method: req.method,
-                    qs: req.query,
-                    headers: {
-                        sign: sign,
-                        appid: config['java-jingli-pay'].appId,
-                        staffid: staff.id, 
-                        companyid: staff.companyId,
-                        accountid: staff.accountId
-                    }
-                }, (err: Error, resp: any, result: object) => {
-                    if (err) {
-                        console.log("-=========>err: ", err);
-                        reject(err);
-                    }
-                    resolve(result);
-                });
-            });
-            return res.json(result);
         });
 
 
         app.all(/^\/bill.*$/ ,cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function)=> {
-            let {staffid} = req.headers;
-            let params =  req.body;
-            if(req.method == 'GET') {
-                params = req.query;
+            try {
+                let {staffid} = req.headers;
+                let params =  req.body;
+                if(req.method == 'GET') {
+                    params = req.query;
+                }
+                let appSecret = config['java-jingli-order1'].appSecret;
+                let staff = await Models.staff.get(staffid)
+                let pathstring = req.path;
+                let timestamp = Math.floor(Date.now()/1000);
+                pathstring = pathstring.replace("/bill", '');
+                let sign = genSign(params, timestamp, appSecret)
+                let isHttps: boolean = false
+                if (/^https:/.test(config['java-jingli-order1'].orderLink)){
+                    isHttps = true
+                }
+                let parseReqBody: boolean = true 
+                if (req.headers['content-type'] && req.headers['content-type'].indexOf('multipart') >= 0) {
+                    parseReqBody = false
+                }
+                console.log("need parseReqBody =====>  ", parseReqBody)
+
+                let opts = {
+                    reaAsBuffer: true,
+                    parseReqBody: parseReqBody,
+                    https: isHttps,
+                    proxyReqPathResolver: (req: any) => {
+                        return pathstring
+                    },
+                    proxyReqOptDecorator: (proxyReqOpts: any, srcReq: any) => {
+                        proxyReqOpts.headers['appid'] = config['java-jingli-order1'].appId 
+                        proxyReqOpts.headers['sign'] = sign
+                        proxyReqOpts.headers['companyid'] = staff ? staff.companyId : ''
+                        proxyReqOpts.headers['accountid'] = staff ? staff.compnayId : ''
+                        proxyReqOpts.headers['staffid'] = staff ? staff.id : ''
+                        return proxyReqOpts
+                    }
+                }
+                return proxy(config['java-jingli-order1'].orderLink, opts)(req, res, next) 
+            } catch(err) {
+                return next(err)
             }
-            let appSecret = config['java-jingli-order1'].appSecret;
-            let staff = await Models.staff.get(staffid)
-            let pathstring = req.path;
-            let timestamp = Math.floor(Date.now()/1000);
-            pathstring = pathstring.replace("/bill", '');
-            let sign = genSign(params, timestamp, appSecret)
-            let url = `${config['java-jingli-order1'].orderLink}${pathstring}`;
-            console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config['java-jingli-order1'].appId, '===request params: ', params) 
-            let result = await new Promise((resolve, reject) => {
-                if (!staff) return reject(new Error('staff is null'))
-                return request({
-                    uri: url,
-                    body: req.body,
-                    json: true,
-                    method: req.method,
-                    qs: req.query,
-                    headers: {
-                        sign: sign,
-                        appid: config['java-jingli-order1'].appId,
-                        staffid: staff.id, 
-                        companyid: staff.companyId,
-                        accountid: staff.accountId
-                    }
-                }, (err: Error, resp: any, result: object) => {
-                    if (err) {
-                        reject(err);
-                    }
-                    resolve(result);
-                });
-            });
-            return res.json(result);
         });
 
         
         app.all(/^\/permission.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function)=> {
-      
-            let {staffid} = req.headers;
-            let params =  req.body;
-            if(req.method == 'GET') {
-                params = req.query;
-            }
-            let staff = await Models.staff.get(staffid);
-            if (!staff) return res.sendStatus(404)
-            let role: any = null ;
-
-            if(staff.roleId == EStaffRole.OWNER) {
-                role = 'defaultCreater'; //表示创建者身份
-            }
-            if(staff.roleId == EStaffRole.ADMIN) {
-                role = 'manager'; //表示管理员身份
-            }
-
-            if(!role){
-                let managers: Department[] | Project[] = await Models.department.find({where: {managerId: staff.id}});
-                if(managers && managers.length) role = 'departmentManager';
-                if(!role){
-                    managers =  await Models.project.find({where: {managerId: staff.id}})
-                    if(managers && managers.length)  role = 'projectManager';
+            try {
+                let {staffid} = req.headers;
+                let params =  req.body;
+                if(req.method == 'GET') {
+                    params = req.query;
                 }
+                let staff = await Models.staff.get(staffid);
+                if (!staff) return res.sendStatus(404)
+                let role: any = null ;
+
+                if(staff.roleId == EStaffRole.OWNER) {
+                    role = 'defaultCreater'; //表示创建者身份
+                }
+                if(staff.roleId == EStaffRole.ADMIN) {
+                    role = 'manager'; //表示管理员身份
+                }
+
+                if(!role){
+                    let managers: Department[] | Project[] = await Models.department.find({where: {managerId: staff.id}});
+                    if(managers && managers.length) role = 'departmentManager';
+                    if(!role){
+                        managers =  await Models.project.find({where: {managerId: staff.id}})
+                        if(managers && managers.length)  role = 'projectManager';
+                    }
+                }
+            
+                let appSecret = config['java-jingli-auth'].appSecret;
+                let pathstring = req.path;
+                let timestamp = Math.floor(Date.now()/1000);
+                pathstring = pathstring.replace("/permission", '');
+                let sign = genSign(params, timestamp, appSecret);
+                let isHttps: boolean = false
+                if (/^https:/.test(config['java-jingli-auth'].orderLink)){
+                    isHttps = true
+                }
+                let parseReqBody: boolean = true 
+                if (req.headers['content-type'] && req.headers['content-type'].indexOf('multipart') >= 0) {
+                    parseReqBody = false
+                }
+                console.log("need parseReqBody =====>  ", parseReqBody)
+
+                let opts = {
+                    reaAsBuffer: true,
+                    parseReqBody: parseReqBody,
+                    https: isHttps,
+                    proxyReqPathResolver: (req: any) => {
+                        return pathstring
+                    },
+                    proxyReqOptDecorator: (proxyReqOpts: any, srcReq: any) => {
+                        proxyReqOpts.headers['appid'] = config['java-jingli-auth'].appId 
+                        proxyReqOpts.headers['sign'] = sign
+                        proxyReqOpts.headers['companyid'] = staff ? staff.companyId : ''
+                        proxyReqOpts.headers['accountid'] = staff ? staff.compnayId : ''
+                        proxyReqOpts.headers['staffid'] = staff ? staff.id : ''
+                        proxyReqOpts.headers['role'] = role
+                        return proxyReqOpts
+                    }
+                }
+                return proxy(config['java-jingli-auth'].orderLink, opts)(req, res, next) 
+            } catch(err) {
+                return next(err)
             }
-         
-            let appSecret = config['java-jingli-auth'].appSecret;
-            let pathstring = req.path;
-            let timestamp = Math.floor(Date.now()/1000);
-            pathstring = pathstring.replace("/permission", '');
-            let sign = genSign(params, timestamp, appSecret);
-            let url = `${config['java-jingli-auth'].orderLink}${pathstring}`;
-            console.log("==timestamp:  ", timestamp, "===>sign:  ", sign, '====>url:  ', url, 'appid: ', config['java-jingli-auth'].appId, '===request params: ', params);
-            let result = await new Promise((resolve, reject) => {
-                if (!staff) return reject(new Error('staff is null'))
-                return request({
-                    uri: url,
-                    body: req.body,
-                    json: true,
-                    method: req.method,
-                    qs: req.query,
-                    headers: {
-                        sign: sign,
-                        appid: config['java-jingli-auth'].appId,
-                        staffid: staff.id,
-                        companyid: staff.companyId,
-                        accountid: staff.accountId,
-                        role: role
-                    }
-                }, (err: Error, resp: any, result: object) => {
-                    if (err) {
-                        return reject(err);
-                    }
-                    resolve(result);
-                });
-            });
-            return res.json(result);
         });
     }
 }
