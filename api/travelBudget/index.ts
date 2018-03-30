@@ -10,7 +10,7 @@ import {
 import {Approve, EApproveStatus, EApproveChannel} from '_types/approve';
 import { Staff } from "_types/staff";
 const API = require("@jingli/dnode-api");
-import L, { ERROR_CODE_C } from '@jingli/language';
+import L from '@jingli/language';
 import TripApproveEvent from '../eventListener/tripApproveEvent'
 
 require("moment-timezone");
