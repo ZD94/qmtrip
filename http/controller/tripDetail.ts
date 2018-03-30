@@ -62,7 +62,7 @@ export class TripDetailController extends AbstractController {
                 route = tripDetailHotel.city
             }
             
-            let coins = saving * 0.05
+            let coins = saving * 0.05 * 100
             coins = coins > 100 ? coins : 100
             const tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId)
             await SavingEvent.emitTripSaving({
