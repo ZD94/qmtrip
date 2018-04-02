@@ -481,14 +481,15 @@ export class ApproveModule {
 
     _scheduleTask() {
         let taskId = "processTimeoutApproves";
-        scheduler('0 */5 * * * *', taskId, async function () {
+        scheduler('*/30 * * * * *', taskId, async function () {
             console.log('run task processTimeoutApproves')
             const approves = await Models.approve.find({
                 where: {
                     status: EApproveStatus.WAIT_APPROVE,
                     startAt: { $lt: new Date() }
                 },
-                limit: 10
+                limit: 10,
+                order: [['created_at', 'desc']]
             })
 
             approves.forEach(async ap => {
