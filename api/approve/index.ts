@@ -485,7 +485,8 @@ class ApproveModule {
                     status: EApproveStatus.WAIT_APPROVE,
                     startAt: { $lt: new Date() }
                 },
-                limit: 10
+                limit: 10,
+                order: [['created_at', 'desc']]
             })
 
             approves.forEach(async ap => {
