@@ -17,7 +17,6 @@ import {ISegment, ICreateBudgetAndApproveParams, QMEApproveStatus} from '_types/
 import L from '@jingli/language';
 import * as CLS from 'continuation-local-storage';
 const scheduler = require('common/scheduler');
-import moment = require('moment')
 
 import {DB} from "@jingli/database";
 import { ITravelBudgetInfo } from 'http/controller/budget';
