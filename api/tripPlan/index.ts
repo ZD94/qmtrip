@@ -3400,7 +3400,7 @@ export class TripPlanModule {
             // ],
             where: {
                 // ...params.where,
-                // companyId: params.companyId,
+                companyId: params.companyId,
                 status: EPlanStatus.COMPLETE,
                 createdAt: {
                     $gte: moment(params.startAt).format(),
@@ -3426,7 +3426,7 @@ export class TripPlanModule {
             where: {
                 // ...params.where,
                 companyId: params.companyId,
-                // status: EPlanStatus.COMPLETE,
+                status: EPlanStatus.COMPLETE,
                 createdAt: {
                     $gte: moment(params.date).format(),
                     $lt: moment(params.date).add(1, 'month').format()
