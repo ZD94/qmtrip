@@ -432,7 +432,7 @@ class TripPlanModule {
         let tripDetail =  await Models.tripDetail.get(params.id); 
         if(!tripDetail) 
             throw new Error(`指定tripDetail不存在, id: ${params.id}`)
-            
+        const {expenditure} = params
         if([EOrderStatus.SUCCESS, EOrderStatus.ENDORSEMENT_SUCCESS, EOrderStatus.REFUND_SUCCESS, EOrderStatus.DEAL_DONE].indexOf(params.reserveStatus) < 0){
             if(params.expenditure) delete params.expenditure;
         }
@@ -481,7 +481,7 @@ class TripPlanModule {
                     log.remark = `已预订`;
                     await log.save();
                 }
-                await calculateBudget({ expenditure: tripDetail.expenditure, id: tripDetail.id, orderNo: tripDetail.orderNo })
+                await calculateBudget({ expenditure, id: tripDetail.id, orderNo: tripDetail.orderNo })
                 tripDetails = [];
                 break;
             case EOrderStatus.ENDORSEMENT_SUCCESS: 
