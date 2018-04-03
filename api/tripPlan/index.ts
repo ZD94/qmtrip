@@ -3597,6 +3597,7 @@ async function calculateBudget(params: { expenditure: number, id: string, orderN
             mobile: staff.mobile,
             reserveStatus: EOrderStatus.SUCCESS,
             route,
+            type: tripDetail.orderType,
             budget: tripDetail.budget,
             realCost: expenditure,
             saving,
