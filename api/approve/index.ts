@@ -487,7 +487,7 @@ class ApproveModule {
                     startAt: { $lt: new Date() }
                 },
                 limit: 10,
-                order: [['created_at', 'desc']]
+                order: [['startAt', 'asc']]
             })
 
             approves.forEach(async ap => {
