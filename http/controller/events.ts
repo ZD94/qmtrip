@@ -7,6 +7,7 @@ import { AbstractController, Restful, Router } from "@jingli/restful";
 import { Request, Response, NextFunction } from 'express';
 import { EventListener } from "_types/eventListener";
 import { Models } from '_types';
+import moment = require('moment')
 
 @Restful()
 export class EventsController extends AbstractController {
@@ -30,7 +31,11 @@ export class EventsController extends AbstractController {
                 res.json(this.reply(0, eventListeners[0]))
                 return
             }
-            let eventListener = EventListener.create({ event, url, companyId, startDate, endDate });
+            let eventListener = EventListener.create({
+                event, url, companyId,
+                startDate: moment(startDate).toDate(),
+                endDate: moment(endDate).toDate()
+            });
             eventListener = await eventListener.save();
 
             res.json(this.reply(0, eventListener));
