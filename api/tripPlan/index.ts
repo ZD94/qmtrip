@@ -3371,8 +3371,8 @@ export class TripPlanModule {
     @clientExport
     async tripList(params: {where: object, companyId: string, type: number, startAt: string, endAt: string, limit: number, offset: number}) {
         const status = params.type == 1 ? EPlanStatus.COMPLETE : { $ne: EPlanStatus.COMPLETE }
-        const limit = params.limit || 20,
-            offset = params.offset || 0
+        const {limit = 20, offset = 1} = params
+
         const tripPlans = await Models.tripPlan.find({
             where: {
                 // ...params.where,
@@ -3384,7 +3384,7 @@ export class TripPlanModule {
                 }
             },
             limit,
-            offset: limit * offset,
+            offset: limit * (offset - 1),
             order: [['created_at', 'asc']]
         })
         return {data: await transform(tripPlans, params.companyId), total: tripPlans.total}
