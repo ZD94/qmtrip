@@ -59,14 +59,14 @@ interface ReportInvoice {
     duration?: string;
 }
 
-class TripPlanModule {
+export class TripPlanModule {
 
     /**
      * 获取出差计划中发送邮件的模板数据详情
      * @param tripPlan
      * @returns {{go: string, back: string, hotel: string}}
      */
-    static async getPlanEmailDetails(tripPlan: TripPlan): Promise<{ go: string, back: string, hotel: string, subsidy: string, special?: string }> {
+    async getPlanEmailDetails(tripPlan: TripPlan): Promise<{ go: string, back: string, hotel: string, subsidy: string, special?: string }> {
         let go = '', back = '', hotelStr = '', subsidyStr = '', specialStr = '';
         let sumSubsidy = 0;
 
@@ -121,7 +121,7 @@ class TripPlanModule {
         return { go: go, back: back, hotel: hotelStr, subsidy: subsidyStr, special: specialStr };
     }
 
-    static async getEmailInfoFromDetails(details: TripDetail[]): Promise<{ go: string, back: string, hotel: string, subsidy: string, special?: string }> {
+    async getEmailInfoFromDetails(details: TripDetail[]): Promise<{ go: string, back: string, hotel: string, subsidy: string, special?: string }> {
         let goStr = '', backStr = '', hotelStr = '', subsidyStr = '', specialStr = '';
         let sumSubsidy = 0;
         let ps = details.map(async (d) => {
@@ -179,7 +179,7 @@ class TripPlanModule {
     @requireParams(['id'])
     @modelNotNull('tripPlan')
     @conditionDecorator([{ if: condition.canGetTripPlan('0.id') }])
-    static getTripPlan(params: { id: string }): Promise<TripPlan> {
+    getTripPlan(params: { id: string }): Promise<TripPlan> {
         return Models.tripPlan.get(params.id);
     }
 
@@ -193,7 +193,7 @@ class TripPlanModule {
         'deptCityCode', 'arrivalCity', 'arrivalCityCode', 'startAt', 'backAt', 'remark', 'readNumber'])
     @modelNotNull('tripPlan')
     @conditionDecorator([{ if: condition.isMyTripPlan('0.id') }])
-    static async updateTripPlan(params: TripPlan): Promise<TripPlan> {
+    async updateTripPlan(params: TripPlan): Promise<TripPlan> {
         let tripPlan = await Models.tripPlan.get(params.id);
         for (let key in params) {
             tripPlan[key] = params[key];
@@ -207,7 +207,7 @@ class TripPlanModule {
      * @param params.id tripPlan id
      */
     @clientExport
-    static async autoSettleReward(params: {id: string,}): Promise<boolean> {
+    async autoSettleReward(params: {id: string,}): Promise<boolean> {
         if (typeof params == 'string') {
             params = JSON.parse(params);
         }
@@ -316,7 +316,7 @@ class TripPlanModule {
      * @returns {*}
      */
     @clientExport
-    static async listTripPlans(options: FindOptions<TripPlan>): Promise<FindResult> {
+    async listTripPlans(options: FindOptions<TripPlan>): Promise<FindResult> {
         options.order = options.order || [['start_at', 'desc'], ['created_at', 'desc']];
         let paginate = await Models.tripPlan.find(options);
         return { ids: paginate.map((plan) => { return plan.id; }), count: paginate["total"] }
@@ -331,7 +331,7 @@ class TripPlanModule {
     @requireParams(['id'])
     @modelNotNull('tripPlan')
     @conditionDecorator([{ if: condition.isMyTripPlan('0.id') }])
-    static async deleteTripPlan(params: { id: string }): Promise<boolean> {
+    async deleteTripPlan(params: { id: string }): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
         let tripDetails = await tripPlan.getTripDetails({ where: {} });
         await tripPlan.destroy();
@@ -346,7 +346,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['tripPlanId', 'type', 'startTime', 'invoiceType', 'budget'])
-    static saveTripDetail(params: {
+    saveTripDetail(params: {
         tripPlanId: string, type: number, startTime: string, invoiceType: number, budget: number
     }): Promise<TripDetail> {
         return Models.tripDetail.create(params).save();
@@ -355,7 +355,7 @@ class TripPlanModule {
     @clientExport
     @requireParams(['id'])
     @modelNotNull('tripDetail')
-    static async getTripDetail(params: { id: string, notRetChild: boolean }): Promise<TripDetail> {
+    async getTripDetail(params: { id: string, notRetChild: boolean }): Promise<TripDetail> {
 
         let tripDetail = await  Models.tripDetail.get(params.id, { notRetChild: true });
         return tripDetail;
@@ -364,7 +364,7 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['id'])
-    static async getOddBudget(params: { id: string }) {
+    async getOddBudget(params: { id: string }) {
         var tripPlan = await Models.tripPlan.get(params.id);
         var oddBudget = tripPlan.budget;
         var details = await Models.tripDetail.find({
@@ -379,25 +379,25 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['id'])
-    static async getTripDetailTraffic(params: { id: string }): Promise<TripDetailTraffic> {
+    async getTripDetailTraffic(params: { id: string }): Promise<TripDetailTraffic> {
         return Models.tripDetailTraffic.get(params.id);
     }
 
     @clientExport
     @requireParams(["id"])
-    static async getTripDetailHotel(params: { id: string }): Promise<TripDetailHotel> {
+    async getTripDetailHotel(params: { id: string }): Promise<TripDetailHotel> {
         return Models.tripDetailHotel.get(params.id);
     }
 
     @clientExport
     @requireParams(["id"])
-    static async getTripDetailSubsidy(params: { id: string }): Promise<TripDetailSubsidy> {
+    async getTripDetailSubsidy(params: { id: string }): Promise<TripDetailSubsidy> {
         return Models.tripDetailSubsidy.get(params.id)
     }
 
     @clientExport
     @requireParams(["id"])
-    static async getTripDetailSpecial(params: { id: string }): Promise<TripDetailSpecial> {
+    async getTripDetailSpecial(params: { id: string }): Promise<TripDetailSpecial> {
         return Models.tripDetailSpecial.get(params.id);
     }
 
@@ -405,7 +405,7 @@ class TripPlanModule {
     @clientExport
     @requireParams(['id'], TripDetail['$fieldnames'])
     @modelNotNull('tripDetail')
-    static async updateTripDetail(params: TripDetail): Promise<TripDetail> {
+    async updateTripDetail(params: TripDetail): Promise<TripDetail> {
         let tripDetail =  await Models.tripDetail.get(params.id);
         if(!tripDetail) 
             throw new Error(`指定tripDetail不存在, id: ${params.id}`)
@@ -428,7 +428,7 @@ class TripPlanModule {
      * @return {Promise<boolan>}
      */
     @clientExport
-    static async updateTripDetailReserveStatus(params: TripDetail): Promise<boolean> {
+    async updateTripDetailReserveStatus(params: TripDetail): Promise<boolean> {
         let tripDetail =  await Models.tripDetail.get(params.id); 
         if(!tripDetail) 
             throw new Error(`指定tripDetail不存在, id: ${params.id}`)
@@ -540,7 +540,7 @@ class TripPlanModule {
     @requireParams([], ['where.tripPlanId', 'where.type', 'where.status', 'where.id', 'where.accountId', 
     'where.orderNo', 'where.reserveStatus', 'where.orderType', 'where.expenditure'])
     @clientExport
-    static async getTripDetails(options: {where: any, offset?: number, limit?: number}): Promise<FindResult> {
+    async getTripDetails(options: {where: any, offset?: number, limit?: number}): Promise<FindResult> {
         if(!options || !options.where)
             throw L.ERR.INVALID_ARGUMENT("参数错误, 参数不能为空")
         if(!options.where.tripPlanId && !options.where.accountId)
@@ -560,7 +560,7 @@ class TripPlanModule {
     @clientExport
     @requireParams(['id'])
     @modelNotNull('tripDetail')
-    static async deleteTripDetail(params: { id: string }): Promise<boolean> {
+    async deleteTripDetail(params: { id: string }): Promise<boolean> {
         let tripDetail = await Models.tripDetail.get(params.id);
         await tripDetail.destroy();
         return true;
@@ -579,9 +579,10 @@ class TripPlanModule {
     @requireParams(['id'])
     @modelNotNull('tripPlan')
     @conditionDecorator([{ if: condition.isMyTripPlan('0.id') }])
-    static async commitTripPlan(params: { id: string, staffId: string, version?: number }): Promise<boolean> {
+    async commitTripPlan(params: { id: string, staffId: string, version?: number }): Promise<boolean> {
         let { id, staffId } = params;
 
+        let self = this;
         let currentStaff = await Staff.getCurrent();
         staffId = currentStaff.id;
 
@@ -621,7 +622,7 @@ class TripPlanModule {
         } else {
             notifyUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId=${tripPlan.id}`;
         }
-        await TripPlanModule.notifyDesignatedAcount({ notifyUrl: notifyUrl, staffId: staffId });
+        await self.notifyDesignatedAcount({ notifyUrl: notifyUrl, staffId: staffId });
 
         let default_agency = config.default_agency;
         if (default_agency && default_agency.manager_email) {
@@ -677,8 +678,9 @@ class TripPlanModule {
     @clientExport
     @requireParams(['id', 'auditResult', "invoiceId"], ["reason", "expenditure"])
     @modelNotNull('tripDetail')
-    static async auditPlanInvoice(params: { id: string, auditResult: EAuditStatus, expenditure?: number, reason?: string, invoiceId?: string, version?: number }): Promise<boolean> {
+    async auditPlanInvoice(params: { id: string, auditResult: EAuditStatus, expenditure?: number, reason?: string, invoiceId?: string, version?: number }): Promise<boolean> {
 
+        let self = this;
         let tripDetail = await Models.tripDetail.get(params.id);
         let tripPlanId = tripDetail.tripPlanId;
         let tripPlan = await Models.tripPlan.get(tripPlanId);
@@ -969,7 +971,7 @@ class TripPlanModule {
                 staff.balancePoints = staff.balancePoints + tripPlan.reward;
                 let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: user.id, remark: `增加员工${tripPlan.score}积分`});
                 await Promise.all([staff.save(), log.save()]);
-                await TripPlanModule.autoSettleReward({ id: tripPlan.id });  //出差完成自动结算奖励 
+                await self.autoSettleReward({ id: tripPlan.id });  //出差完成自动结算奖励
             }
             return true;
         }).catch(async function (err: Error) {
@@ -996,7 +998,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(["id", "expenditure"], ["version"])
-    static async finishTripPlan(params: { id: string, expendArray: Array<ExpendItem>, version?: number }) {
+    async finishTripPlan(params: { id: string, expendArray: Array<ExpendItem>, version?: number }) {
 
         let expendArray = params.expendArray;
         let tripPlan = await Models.tripPlan.get(params.id);
@@ -1210,7 +1212,7 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['emails', 'projectId'])
-    static async sendProjectReport(params: { emails: string[], projectId: string }): Promise<boolean> {
+    async sendProjectReport(params: { emails: string[], projectId: string }): Promise<boolean> {
         let data: any = { project: {}, costCenter: {}, projectStaffs: [] };
         let project = await Models.project.get(params.projectId);
         data.project = project;
@@ -1260,7 +1262,7 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['name', 'companyId'], projectCols)
-    static async createProject(params: {name: string, companyId: string, code?: string}): Promise<Project | null> {
+    async createProject(params: {name: string, companyId: string, code?: string}): Promise<Project | null> {
         let _projects = await Models.project.find({ where: { code: params.code, companyId: params.companyId } });
         if (_projects && _projects.length) {
             return null;
@@ -1270,7 +1272,7 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(["id"], projectCols)
-    static async updateProject(params: Project): Promise<Project> {
+    async updateProject(params: Project): Promise<Project> {
         let project = await Models.project.get(params.id);
 
         if (project.status == EProjectStatus.START) {
@@ -1285,13 +1287,13 @@ class TripPlanModule {
     @clientExport
     @requireParams(['id'])
     @modelNotNull('project')
-    static getProjectById(params: { id: string }): Promise<Project> {
+    getProjectById(params: { id: string }): Promise<Project> {
         return Models.project.get(params.id);
     }
 
     @clientExport
     @requireParams(['where.companyId'], ['where.name'])
-    static async getProjectList(options: FindOptions<Project>): Promise<FindResult> {
+    async getProjectList(options: FindOptions<Project>): Promise<FindResult> {
         options.order = options.order || [['weight', 'desc'], ['created_at', 'desc']];
         let projects = await Models.project.find(options);
         return { ids: projects.map((p) => { return p.id }), count: projects['total'] };
@@ -1300,7 +1302,7 @@ class TripPlanModule {
     @clientExport
     @requireParams(['id'])
     @modelNotNull('project')
-    static async deleteProject(params: { id: string }): Promise<boolean> {
+    async deleteProject(params: { id: string }): Promise<boolean> {
         let project = await Models.project.get(params.id);
         let trips = await Models.tripPlan.find({ where: { projectId: project.id } });
         if (trips && trips.length > 0) {
@@ -1321,7 +1323,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(["projectId", "staffId"])
-    static async createProjectStaff(params: {projectId: string, staffId: string}): Promise<ProjectStaff> {
+    async createProjectStaff(params: {projectId: string, staffId: string}): Promise<ProjectStaff> {
         var projectStaff = ProjectStaff.create(params);
         var already = await Models.projectStaff.find({ where: { projectId: params.projectId, staffId: params.staffId } });
         if (already && already.length > 0) {
@@ -1339,7 +1341,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(["id"])
-    static async deleteProjectStaff(params: {id: string}): Promise<any> {
+    async deleteProjectStaff(params: {id: string}): Promise<any> {
         var id = params.id;
         var ah_delete = await Models.projectStaff.get(id);
 
@@ -1356,7 +1358,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(["id"], ["projectId", "staffId"])
-    static async updateProjectStaff(params: {id: string}): Promise<ProjectStaff> {
+    async updateProjectStaff(params: {id: string}): Promise<ProjectStaff> {
         var id = params.id;
 
         var ah = await Models.projectStaff.get(id);
@@ -1373,7 +1375,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(["id"])
-    static async getProjectStaff(params: { id: string }): Promise<ProjectStaff> {
+    async getProjectStaff(params: { id: string }): Promise<ProjectStaff> {
         let id = params.id;
         var ah = await Models.projectStaff.get(id);
 
@@ -1387,7 +1389,7 @@ class TripPlanModule {
      * @returns {*}
      */
     @clientExport
-    static async getProjectStaffs(params: FindOptions<ProjectStaff>): Promise<FindResult> {
+    async getProjectStaffs(params: FindOptions<ProjectStaff>): Promise<FindResult> {
         let paginate = await Models.projectStaff.find(params);
         let ids = paginate.map(function (t) {
             return t.id;
@@ -1404,7 +1406,7 @@ class TripPlanModule {
      * @type {saveTripPlanLog}
      */
     @requireParams(['tripPlanId', 'remark'], ['tripDetailId'])
-    static async saveTripPlanLog(params: {
+    async saveTripPlanLog(params: {
         tripPlanId: string, remark: string, userId?: string, tripDetailId?: string
     }): Promise<TripPlanLog> {
         let staff = await Staff.getCurrent();
@@ -1420,7 +1422,7 @@ class TripPlanModule {
     @clientExport
     @requireParams(['id'])
     @modelNotNull('tripPlanLog')
-    static getTripPlanLog(params: { id: string }): Promise<TripPlanLog> {
+    getTripPlanLog(params: { id: string }): Promise<TripPlanLog> {
         return Models.tripPlanLog.get(params.id);
     }
 
@@ -1428,13 +1430,13 @@ class TripPlanModule {
      * @method updateTripPlanLog
      * @param param
      */
-    static updateTripPlanLog(): Promise<TripPlanLog> {
+    updateTripPlanLog(): Promise<TripPlanLog> {
         throw { code: -1, msg: '不能更新日志' };
     }
 
     @clientExport
     @requireParams(['where.tripPlanId'], ['where.tripDetailId'])
-    static async getTripPlanLogs(options: FindOptions<TripPlanLog>): Promise<FindResult> {
+    async getTripPlanLogs(options: FindOptions<TripPlanLog>): Promise<FindResult> {
         options.order = options.order || [['created_at', 'desc']];
         let paginate = await Models.tripPlanLog.find(options);
         return { ids: paginate.map((plan) => { return plan.id; }), count: paginate["total"] }
@@ -1448,7 +1450,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['id'], ['remark'])
-    static async cancelTripPlan(params: { id: string, remark?: string }): Promise<boolean> {
+    async cancelTripPlan(params: { id: string, remark?: string }): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
 
         if( tripPlan.status != EPlanStatus.NO_BUDGET && tripPlan.status != EPlanStatus.WAIT_RESERVE) {
@@ -1494,7 +1496,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['companyId', 'month'])
-    static async statisticTripPlanOfMonth(params: { companyId: string, month: string }) {
+    async statisticTripPlanOfMonth(params: { companyId: string, month: string }) {
         let staff = await Staff.getCurrent();
         let companyId = staff.company.id;
         let month = params.month;
@@ -1533,7 +1535,7 @@ class TripPlanModule {
 
     @clientExport
     @requireParams([], ['startTime', 'endTime'])
-    static async statisticProjectTripBudget(params: { startTime?: Date, endTime?: Date }) {
+    async statisticProjectTripBudget(params: { startTime?: Date, endTime?: Date }) {
         let staff = await Staff.getCurrent();
         let companyId = staff.company.id;
         let formatStr = 'YYYY-MM-DD HH:mm:ss';
@@ -1587,7 +1589,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams([], ['startTime', 'endTime', 'isStaff'])
-    static async statisticTripBudget(params: { startTime?: Date, endTime?: Date, isStaff?: boolean }) {
+    async statisticTripBudget(params: { startTime?: Date, endTime?: Date, isStaff?: boolean }) {
         let staff = await Staff.getCurrent();
         let companyId = staff.company.id;
         let formatStr = 'YYYY-MM-DD HH:mm:ss';
@@ -1654,7 +1656,7 @@ class TripPlanModule {
 
     @clientExport
     @requireParams([], ['startTime', 'endTime'])
-    static async statisticSaveAndWaste(params: { startTime?: Date, endTime?: Date }) {
+    async statisticSaveAndWaste(params: { startTime?: Date, endTime?: Date }) {
         let staff = await Staff.getCurrent();
         let companyId = staff.company.id;
         let formatStr = 'YYYY-MM-DD HH:mm:ss';
@@ -1723,7 +1725,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['startTime', 'endTime', 'type'], ['keyWord'])
-    static async statisticBudgetsInfo(params: { startTime: string, endTime: string, type: string, keyWord?: string, unComplete?: boolean }) {
+    async statisticBudgetsInfo(params: { startTime: string, endTime: string, type: string, keyWord?: string, unComplete?: boolean }) {
         let staff = await Staff.getCurrent();
         let company = staff.company;
         let completeSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status=${EPlanStatus.COMPLETE} and all_invoices_pass_time>'${params.startTime}' and all_invoices_pass_time<'${params.endTime}'`;
@@ -1867,7 +1869,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['tripApproveId'], ["version"])
-    static async saveTripPlanByApprove(params: { tripApproveId: string, version?: number }): Promise<TripPlan> {
+    async saveTripPlanByApprove(params: { tripApproveId: string, version?: number }): Promise<TripPlan> {
         let approve = await Models.approve.get(params.tripApproveId);
         let account = await Models.staff.get(approve.submitter);
         let approveUser = await Models.staff.get(approve.approveUser);
@@ -2196,7 +2198,7 @@ class TripPlanModule {
 
     @clientExport
     @requireParams([], ['limit', 'staffId', 'startTime', 'endTime'])
-    static async tripPlanSaveRank(params: { limit?: number | string, staffId?: string, startTime?: string, endTime?: string }) {
+    async tripPlanSaveRank(params: { limit?: number | string, staffId?: string, startTime?: string, endTime?: string }) {
         let staff = await Staff.getCurrent();
         let companyId = staff.company.id;
         let limit = params.limit || 10;
@@ -2229,7 +2231,7 @@ class TripPlanModule {
     }
 
     @clientExport
-    static async getTripPlanSave(params: { accountId: string }) {
+    async getTripPlanSave(params: { accountId: string }) {
         let staff = await Models.staff.get(params.accountId);
         let accountId = params.accountId;
         let companyId = staff.company.id;
@@ -2247,7 +2249,7 @@ class TripPlanModule {
      * 更改首页tripPlan展示状态 
      */
     @clientExport
-    static async changeTripPlanDisplayStatus(params: {tripPlanId: string, status: number}) {
+    async changeTripPlanDisplayStatus(params: {tripPlanId: string, status: number}) {
         let {tripPlanId, status} = params
         let tripPlan = await Models.tripPlan.get(tripPlanId);
         tripPlan.displayStatus = status;
@@ -2256,7 +2258,7 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(["tripPlanId"])
-    static async makeFinalBudget(params: { tripPlanId: string }) {
+    async makeFinalBudget(params: { tripPlanId: string }) {
         let accountId = getSession()["accountId"];
         let tripPlanId = params.tripPlanId;
         if (!accountId) {
@@ -2314,7 +2316,7 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(["tripPlanId"], ["version"])
-    static async makeSpendReport(params: { tripPlanId: string, version?: number }) {
+    async makeSpendReport(params: { tripPlanId: string, version?: number }) {
         var money2hanzi = require("money2hanzi");
         let staff = await Staff.getCurrent()
         let { tripPlanId } = params;
@@ -2550,7 +2552,7 @@ class TripPlanModule {
     }
 
     @clientExport
-    static async getTripDetailInvoices(options: { where: any, limit?: any, order?: any }): Promise<FindResult> {
+    async getTripDetailInvoices(options: { where: any, limit?: any, order?: any }): Promise<FindResult> {
         if (!options || !options.where) throw new Error('查询条件不能为空');
         let where = options.where;
         if (!where.tripDetailId) throw new Error('查询条件错误');
@@ -2572,13 +2574,13 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['id'])
-    static async getTripDetailInvoice(params: { id: string }): Promise<TripDetailInvoice> {
+    async getTripDetailInvoice(params: { id: string }): Promise<TripDetailInvoice> {
         return Models.tripDetailInvoice.get(params.id);
     }
 
     @clientExport
     @requireParams(['tripDetailId', 'totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark'], ['id', 'pictureFileId', 'accountId', 'orderId', 'sourceType', 'status', 'supplierId'])
-    static async saveTripDetailInvoice(params: TripDetailInvoice): Promise<TripDetailInvoice> {
+    async saveTripDetailInvoice(params: TripDetailInvoice): Promise<TripDetailInvoice> {
         let tripDetailInvoice = Models.tripDetailInvoice.create(params);
         tripDetailInvoice = await tripDetailInvoice.save();
 
@@ -2592,7 +2594,7 @@ class TripPlanModule {
         return tripDetailInvoice;
     }
 
-    static async notifyDesignatedAcount(params: { notifyUrl?: string, staffId: string }): Promise<any> {
+    async notifyDesignatedAcount(params: { notifyUrl?: string, staffId: string }): Promise<any> {
         let staffId = params.staffId;
         if (!staffId || staffId == 'undefined') {
             throw L.ERR.USER_NOT_EXIST();
@@ -2617,9 +2619,10 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['detailId', 'orderIds', 'supplierId'])
-    static async relateOrders(params: {
+    async relateOrders(params: {
         detailId: string, orderIds: string[], supplierId: string
     }): Promise<any> {
+        let self = this;
         let result: { success: any[], failed: any[] } = { success: [], failed: [] };
         let currentStaff = await Staff.getCurrent();
         let orders = await currentStaff.getOrders({ supplierId: params.supplierId });
@@ -2654,7 +2657,7 @@ class TripPlanModule {
             invoice.type = o.orderType;
             invoice.status = EInvoiceStatus.AUDIT_PASS;
             invoice.supplierId = params.supplierId;
-            await TripPlanModule.saveTripDetailInvoice(invoice);
+            await self.saveTripDetailInvoice(invoice);
             result.success.push({ desc: o.desc, remark: '关联成功' });
             return o.id;
         })
@@ -2664,7 +2667,7 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(["id"], ['totalMoney', 'payType', 'invoiceDateTime', 'type', 'remark', 'pictureFileId'])
-    static async updateTripDetailInvoice(params: any): Promise<TripDetailInvoice> {
+    async updateTripDetailInvoice(params: any): Promise<TripDetailInvoice> {
         let { id, totalMoney } = params;
         let oldMoney = 0;
         let newMoney = 0;
@@ -2697,7 +2700,7 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['id'])
-    static async deleteTripDetailInvoice(params: { id: string }): Promise<boolean> {
+    async deleteTripDetailInvoice(params: { id: string }): Promise<boolean> {
         let { id } = params;
         let tripDetailInvoice = await Models.tripDetailInvoice.get(id);
         let tripDetailId = tripDetailInvoice.tripDetailId;
@@ -2716,7 +2719,7 @@ class TripPlanModule {
 
     //预订跳转
     @clientExport
-    static async getBookLink(params: { reserveType: string, data: object }): Promise<any> {
+    async getBookLink(params: { reserveType: string, data: object }): Promise<any> {
         let transfer = {
             ctrip: {
                 supplierKey: 'ctrip_com',
@@ -2775,7 +2778,7 @@ class TripPlanModule {
 
 
 
-    static __initHttpApp = require('./invoice');
+    __initHttpApp = require('./invoice');
 
     /**
      * @method 定时器处理过期的行程单及其详情
@@ -2785,7 +2788,7 @@ class TripPlanModule {
      *        若全部在鲸力系统预定，且补助需要上传票据，且在行程结束前票据已完全提交，此时需要将tripPlan置为wait_commit
      *        若全部在鲸力系统预定，且酒店是到店支付，且在行程结束前票据已完全提交，此时需要将tripPlan置为wait_commit
      */
-    static _scheduleTask() {
+    _scheduleTask() {
         let taskId = "autoCheckTripPlanIsOverDate";
         logger.info('run task  ' + taskId);
         scheduler('0 0 0 * * *', taskId, function() {
@@ -2853,7 +2856,7 @@ class TripPlanModule {
         });
     }
 
-    /*static _scheduleTask () {
+    /*_scheduleTask () {
         let taskId = "authApproveTrainPlan";
         logger.info('run task ' + taskId);
         scheduler('0 *!/5 * * * *', taskId, async function() {
@@ -3017,7 +3020,7 @@ class TripPlanModule {
      * @param {companyId: string, beginDate, endDate}
      * @return {companySaved: number}
      */
-    static async getCompanySaved(params: {companyId: string, beginDate?: Date, endDate?: Date}) {
+    async getCompanySaved(params: {companyId: string, beginDate?: Date, endDate?: Date}) {
         let {companyId, beginDate, endDate} = params;
         let tripPlans: TripPlan[] = [];
         let _tripPlans: TripPlan[] = [];
@@ -3048,7 +3051,7 @@ class TripPlanModule {
      * @author lizeilin
      * 
      */
-    static async getCompanySavedChart(params: {companyId: string}) {
+    async getCompanySavedChart(params: {companyId: string}) {
         let {companyId} = params;
         let beginDate: Date = moment().startOf('M').subtract(11, 'M');
         let tripPlans: TripPlan[] = await Models.tripPlan.all({where: {companyId: companyId, 
@@ -3072,7 +3075,7 @@ class TripPlanModule {
      * @param {companyId: string}
      * @return {isSaved ? saved : expenditure}
      */
-    static async getConfirmedExpenditureAndSaved(params:{companyId: string, beginDate?: Date, endDate?: Date}) {
+    async getConfirmedExpenditureAndSaved(params:{companyId: string, beginDate?: Date, endDate?: Date}) {
         let {companyId, beginDate, endDate} = params;
         let tripPlans: TripPlan[] = [];
         let _tripPlans: TripPlan[] = [];
@@ -3149,7 +3152,7 @@ class TripPlanModule {
      * @param {companyId: string, type: AnalysisType}
      * @return {budget}
      */
-    static async getPlannedBudget(params: {companyId: string, departmentOrProjectId?: string, beginDate?: Date, endDate?: Date}) {
+    async getPlannedBudget(params: {companyId: string, departmentOrProjectId?: string, beginDate?: Date, endDate?: Date}) {
         let {companyId, departmentOrProjectId, beginDate, endDate} = params;
         let tripPlans: TripPlan[] = [];
         let _tripPlans: TripPlan[] = [];
@@ -3261,7 +3264,7 @@ class TripPlanModule {
 
     
     }
-    static async getProjectByName(params: any) {
+    async getProjectByName(params: any) {
         let projects = await Models.project.find({ where: { name: params.name } });
 
         if (projects && projects.length > 0) {
@@ -3277,7 +3280,7 @@ class TripPlanModule {
 
     //approve, trip_approve, trip_plan保存travelPolicyId
     @clientExport
-    static async saveTravelPolicyId(tripApproveId: string): Promise<any> {
+    async saveTravelPolicyId(tripApproveId: string): Promise<any> {
         let tripApprove = await API.tripApprove.getTripApprove({ id: tripApproveId });
         let approve = await Models.approve.get(tripApproveId);
         let submitUser = await Models.staff.get(tripApprove.accountId);
@@ -3310,7 +3313,8 @@ class TripPlanModule {
      * @param params 
      */
     @clientExport
-    static async completeTrip(params: { id: string }) {
+    async completeTrip(params: { id: string }) {
+        let self = this;
         // Filter inoperable status
         const tripPlan = await Models.tripPlan.get(params.id)
         if (moment().milliseconds < moment(tripPlan.backAt).milliseconds)
@@ -3355,7 +3359,7 @@ class TripPlanModule {
             // Special approve can't settle reward
             if (tripPlan.isSpecialApprove) return
 
-            const isSuccess = await TripPlanModule.autoSettleReward(params)
+            const isSuccess = await self.autoSettleReward(params)
             if (!isSuccess) {
                 throw new L.ERROR_CODE_C(400, '企业余额不足')
             }
@@ -3365,27 +3369,29 @@ class TripPlanModule {
     }
 
     @clientExport
-    static async tripList(params: {where: object, companyId: string, type: number, startAt: string, endAt: string, limit: number, offset: number}) {
+    async tripList(params: {where: object, companyId: string, type: number, startAt: string, endAt: string, limit: number, offset: number}) {
         const status = params.type == 1 ? EPlanStatus.COMPLETE : { $ne: EPlanStatus.COMPLETE }
+        const limit = params.limit || 20,
+            offset = params.offset || 0
         const tripPlans = await Models.tripPlan.find({
             where: {
                 // ...params.where,
                 status,
-                // companyId: params.companyId,
+                companyId: params.companyId,
                 createdAt: {
                     $gte: moment(params.startAt).format(),
                     $lte: moment(params.endAt).format()
                 }
             },
-            limit: params.limit,
-            offset: params.limit * params.offset,
+            limit,
+            offset: limit * offset,
             order: [['created_at', 'asc']]
         })
-        return await transform(tripPlans)
+        return {data: await transform(tripPlans, params.companyId), total: tripPlans.total}
     }
 
     @clientExport
-    static async tripStatistics(params: {where: object, companyId: string, startAt: Date, endAt: Date}) {
+    async tripStatistics(params: {where: object, companyId: string, startAt: Date, endAt: Date}) {
 
         const tripPlans = await Models.tripPlan.all({
             // attributes: [
@@ -3415,7 +3421,7 @@ class TripPlanModule {
     }
 
     @clientExport
-    static async perMonthStatistics(params: {where: object, companyId: string, date: Date}) {
+    async perMonthStatistics(params: {where: object, companyId: string, date: Date}) {
         const tripPlans = await Models.tripPlan.all({
             where: {
                 // ...params.where,
@@ -3439,7 +3445,7 @@ class TripPlanModule {
     }
 
     @clientExport
-    static async unfinishedTrip(params: {companyId: string}) {
+    async unfinishedTrip(params: {companyId: string}) {
         const tripPlans = await Models.tripPlan.all({
             where: {
                 companyId: params.companyId,
@@ -3455,14 +3461,14 @@ class TripPlanModule {
 
 }
 
-async function transform(tripPlans: TripPlan[]) {
+async function transform(tripPlans: TripPlan[], companyId: string) {
     return Promise.all(tripPlans.map(async tp => {
         const arrivalCityCodes: string[] = (typeof tp.arrivalCityCodes == 'string' 
             ? JSON.parse(tp.arrivalCityCodes) : tp.arrivalCityCodes)
             || []
         const routeCities: ICity[] = await Promise.all(arrivalCityCodes
             .reverse()
-            .map(id => API.place.getCityById(id, '8f3b7d60-c45e-11e7-b46f-31fe577f3630')))
+            .map(id => API.place.getCityById(id, companyId)))
             || []
         const travelRoute: string[] = R.pluck('name', routeCities)
         const staffs: string[] = R.pluck('name', await Promise.all(tp.staffList.map(id => Models.staff.get(id)))) || []
@@ -3699,29 +3705,29 @@ async function calculateBudget(params: { expenditure: number, id: string, orderN
         route = tripDetailHotel.city
     }
 
-    let coins = saving * 0.05
+    let coins = saving * 0.05 * 100
     coins = coins > 100 ? coins : 100
     const tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId)
-        await SavingEvent.emitTripSaving({
-            coins, orderNo, staffId: staff.id,
-            companyId, type: 2, record: {
-                date: new Date(),
-                companyName: staff.company.name,
-                staffName: staff.name,
-                mobile: staff.mobile,
-                reserveStatus: EOrderStatus.SUCCESS,
-                route,
-                budget: tripDetail.budget,
-                realCost: expenditure,
-                saving,
-                ratio: 0.05,
-                coins,
-                currStatus: tripPlan.status
-            }
+    await SavingEvent.emitTripSaving({
+        coins, orderNo, staffId: staff.id,
+        companyId, type: 2, record: {
+            date: new Date(),
+            companyName: staff.company.name,
+            staffName: staff.name,
+            mobile: staff.mobile,
+            reserveStatus: EOrderStatus.SUCCESS,
+            route,
+            budget: tripDetail.budget,
+            realCost: expenditure,
+            saving,
+            ratio: 0.05,
+            coins,
+            currStatus: tripPlan.status
+        }
     })
 }
 
 
-TripPlanModule._scheduleTask();
-
-export = TripPlanModule;
+let tripPlanModule = new TripPlanModule();
+tripPlanModule._scheduleTask();
+export default tripPlanModule;

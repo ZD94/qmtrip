@@ -112,10 +112,10 @@ let ddTalkMsgHandle = {
 let DDEventCorpId : any = {};
 
 
-export default class DDTalk {
+export class DDTalk {
     static __public: boolean = true;
 
-    static __initHttpApp(app: Application) {
+    __initHttpApp(app: Application) {
 
         let self = this;
 
@@ -228,7 +228,7 @@ export default class DDTalk {
         });
     }
 
-    static async dealEvent(corpId: string){
+    async dealEvent(corpId: string){
         let key = 'company_events:' + corpId;
         let msg : { EventType : string } = await cache.lpop(key);
         if(!msg){
@@ -245,7 +245,7 @@ export default class DDTalk {
         await this.dealEvent( corpId );
     }
 
-    static async eventPush( msg: IMsg ){
+    async eventPush( msg: IMsg ){
         let corpId = msg.CorpId;
         if (corpId) {
             let key = 'company_events:' + corpId;
@@ -262,7 +262,7 @@ export default class DDTalk {
     }
 
     @clientExport
-    static async getJSAPIConfig(params: any) {
+    async getJSAPIConfig(params: any) {
         let {orgid, agentid, url} = params;
         let timestamp = Math.floor(Date.now() / 1000);
         let noncestr = getRndStr(6);
@@ -304,7 +304,7 @@ export default class DDTalk {
     }
 
     @clientExport
-    static async loginByDdTalkCode(params: any) : Promise<any> {
+    async loginByDdTalkCode(params: any) : Promise<any> {
         console.log("enter In loginByDdTalkCode" , params);
         let {corpid, code} = params;
         // let corps = await Models.ddtalkCorp.find({ where: {corpId: corpid}, limit: 1});
@@ -356,7 +356,7 @@ export default class DDTalk {
     }
 
     @clientExport
-    static async sendLinkMsg(params: any): Promise<any> {
+    async sendLinkMsg(params: any): Promise<any> {
         let {accountId, text, url, picurl} = params;
         text = text || '您有一条新消息'
         url = url || '#';
@@ -402,10 +402,12 @@ export default class DDTalk {
     *  同步钉钉组织架构
     */
     @clientExport
-    static async synchroDDorganization(){
+    async synchroDDorganization(){
         return DealEvent.synchroDDorganization();
     }
 }
+
+export default new DDTalk();
 
 function getRndStr(length: number) : string {
     let ret = '';

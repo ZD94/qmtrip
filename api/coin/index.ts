@@ -15,7 +15,7 @@ import { Company } from '_types/company';
 import { addCoinType } from 'http/controller/coin';
 
 
-class CoinModule {
+export class CoinModule {
 
     /**
      * 企业或员工增加鲸币接口
@@ -23,7 +23,7 @@ class CoinModule {
      * @param {type: addCoinType, coins: number, id: string, remark: string}
      * @return {coinAccount, coinAccountChange}
      */
-    static async addJLCoin(params: {type: addCoinType, coins: number, id: string, remark: string}): Promise<any> {
+    async addJLCoin(params: {type: addCoinType, coins: number, id: string, remark: string}): Promise<any> {
         let {type, coins, id, remark} = params;
         let result: any;
         let idOfCompanyOrStaff: string;
@@ -51,7 +51,7 @@ class CoinModule {
     }
 
     @requireParams(["companyId", "coins"], ['remark'])
-    static async companyCharge(params: ICompanyChargeParam) :Promise<CoinAccount>{
+    async companyCharge(params: ICompanyChargeParam) :Promise<CoinAccount>{
         let {companyId, coins, remark} = params;
         if (!remark) {
             remark = '企业充值';
@@ -73,7 +73,7 @@ class CoinModule {
 
     @clientExport
     @requireParams(['staffId', "points"])
-    static async staffPoint2Coin(params: IStaffPoint2CoinParam) :Promise<CoinAccount> {
+    async staffPoint2Coin(params: IStaffPoint2CoinParam) :Promise<CoinAccount> {
         let {staffId, points} = params;
         let staff = await Models.staff.get(staffId);
         if (!staff) throw new Error('staff is null')
@@ -122,7 +122,7 @@ class CoinModule {
     }
 
     @requireParams(["staffId", "coins"], ["remark"])
-    static async staffCostCoin(params: IStaffCostCoinParam) :Promise<CoinAccount> {
+    async staffCostCoin(params: IStaffCostCoinParam) :Promise<CoinAccount> {
         let {staffId, coins, remark} = params;
         if (!remark) {
             remark = `消费`;
@@ -136,20 +136,20 @@ class CoinModule {
         return await coinAccount.costCoin(coins, remark)
     }
 
-    static async createCoinAccount (params: {[key: string]: any}) : Promise<CoinAccount>{
+    async createCoinAccount (params: {[key: string]: any}) : Promise<CoinAccount>{
         var ca = CoinAccount.create(params);
         return ca.save();
     }
 
     @clientExport
     @requireParams(["id"])
-    static async getCoinAccount(params: {id: string}) {
+    async getCoinAccount(params: {id: string}) {
         return Models.coinAccount.get(params.id);
     }
 
     @clientExport
     @requireParams(["id"])
-    static async getCoinAccountChange(params: {id: string}): Promise<CoinAccountChange | null> {
+    async getCoinAccountChange(params: {id: string}): Promise<CoinAccountChange | null> {
         return Models.coinAccountChange.get(params.id);
     }
 
@@ -159,7 +159,7 @@ class CoinModule {
      * @returns {*}
      */
     @clientExport
-    static async getCoinAccountChanges(params: {
+    async getCoinAccountChanges(params: {
         order: any
     }): Promise<FindResult>{
         params.order = params.order || [['createdAt', 'desc']];
@@ -171,11 +171,4 @@ class CoinModule {
     }
 }
 
-/*function getOrderNo() : string {
-    var d = new Date();
-    var rnd =  (Math.ceil(Math.random() * 1000));
-    var str = `${d.getFullYear()}${d.getMonth()+1}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}-${rnd}`;
-    return str;
-}*/
-
-export = CoinModule
+export default new CoinModule();

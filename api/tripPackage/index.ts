@@ -6,7 +6,7 @@ import {requireParams, clientExport} from '@jingli/dnode-api/dist/src/helper';
 import { Models } from '_types';
 import { TripBasicPackage, TripFuelAddPackage } from '_types/tripPackage';
 
-class TripPackageModule{
+export class TripPackageModule{
     @clientExport
     @requireParams(["id"])
     static getBasicTripPackage(params: {id: string}): Promise<TripBasicPackage | null> {
@@ -21,4 +21,4 @@ class TripPackageModule{
 
 }
 
-export = TripPackageModule
+export default new TripPackageModule();

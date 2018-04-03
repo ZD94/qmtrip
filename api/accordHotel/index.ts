@@ -11,7 +11,7 @@ import {FindResult} from "common/model/interface";
 
 const accordHotelCols = AccordHotel['$fieldnames'];
 
-class AccordHotelModule{
+export class AccordHotelModule{
     /**
      * 创建协议酒店
      * @param data
@@ -23,7 +23,7 @@ class AccordHotelModule{
         {if: condition.isCompanyAdminOrOwner("0.companyId")},
         {if: condition.isCompanyAgency("0.companyId")}
     ])
-    static async createAccordHotel (params: {[key: string]: any}) : Promise<AccordHotel>{
+    async createAccordHotel (params: {[key: string]: any}) : Promise<AccordHotel>{
 
         let result = await Models.accordHotel.find({where: {cityCode: params.cityCode, companyId: params.companyId}});
         if(result && result.length>0){
@@ -45,7 +45,7 @@ class AccordHotelModule{
         {if: condition.isAccordHotelAdminOrOwner("0.id")},
         {if: condition.isAccordHotelAgency("0.id")}
     ])
-    static async deleteAccordHotel(params: {id: string}) : Promise<boolean>{
+    async deleteAccordHotel(params: {id: string}) : Promise<boolean>{
         var id = params.id;
         var ah_delete = await Models.accordHotel.get(id);
 
@@ -66,7 +66,7 @@ class AccordHotelModule{
         {if: condition.isAccordHotelAdminOrOwner("0.id")},
         {if: condition.isAccordHotelAgency("0.id")}
     ])
-    static async updateAccordHotel(params: {[key: string]: any}) : Promise<AccordHotel>{
+    async updateAccordHotel(params: {[key: string]: any}) : Promise<AccordHotel>{
         var id = params.id;
 
         var ah = await Models.accordHotel.get(id);
@@ -88,7 +88,7 @@ class AccordHotelModule{
         {if: condition.isAccordHotelAdminOrOwner("0.id")},
         {if: condition.isAccordHotelAgency("0.id")}
     ])
-    static async getAccordHotel(params: {id: string, companyId?: string}) : Promise<AccordHotel>{
+    async getAccordHotel(params: {id: string, companyId?: string}) : Promise<AccordHotel>{
         let id = params.id;
         var ah = await Models.accordHotel.get(id);
 
@@ -102,7 +102,7 @@ class AccordHotelModule{
      */
     @clientExport
     @requireParams(["cityCode"])
-    static async getAccordHotelByCity(params: {cityId: string}) : Promise<AccordHotel>{
+    async getAccordHotelByCity(params: {cityId: string}) : Promise<AccordHotel>{
         let cityId = params.cityId;
         var staff = await Staff.getCurrent();
         var options: any = {
@@ -132,7 +132,7 @@ class AccordHotelModule{
         {if: condition.isCompanyAdminOrOwner("0.where.companyId")},
         {if: condition.isCompanyAgency("0.where.companyId")}
     ])
-    static async getAccordHotels(params: {order:any, where: any}): Promise<FindResult>{
+    async getAccordHotels(params: {order:any, where: any}): Promise<FindResult>{
         var staff = await Staff.getCurrent();
         params.order = params.order || [['createdAt', 'desc']];
 
@@ -148,4 +148,4 @@ class AccordHotelModule{
 
 }
 
-export = AccordHotelModule;
+export default new AccordHotelModule();

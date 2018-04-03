@@ -6,13 +6,13 @@
 
 const qr = require('qr-image');
 
-class QrcodeModule {
+export class QrcodeModule {
 
-    static async makeQrcode(params: {content: string}) {
+    async makeQrcode(params: {content: string}) {
         let {content} = params;
         let bfs = qr.imageSync(content, {type: 'png', ec_level: 'L'});
         return bfs.toString('base64');
     }
 }
 
-export= QrcodeModule
+export default new QrcodeModule();
