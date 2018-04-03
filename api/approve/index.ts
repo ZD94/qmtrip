@@ -23,6 +23,7 @@ import {DB} from "@jingli/database";
 import { ITravelBudgetInfo } from 'http/controller/budget';
 var CLSNS = CLS.getNamespace('dnode-api-context');
 CLSNS.bindEmitter(emitter);
+import moment = require('moment')
 
 function oaStr2Enum(str: string) :EApproveChannel{
     let obj = {
