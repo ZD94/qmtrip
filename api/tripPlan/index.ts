@@ -3561,7 +3561,7 @@ async function calculateBudget(params: { expenditure: number, id: string, orderN
     const { expenditure, id, orderNo } = params
     const tripDetail = await Models.tripDetail.get(id)
     const staff = await Models.staff.get(tripDetail.accountId)
-    const saving = tripDetail.budget - expenditure || 0
+    const saving = tripDetail.budget - expenditure
 
     const companyId = staff.company.id
     let route = ''
