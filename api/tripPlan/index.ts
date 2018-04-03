@@ -3574,14 +3574,9 @@ async function calculateBudget(params: { expenditure: number, id: string, orderN
         route = tripDetailHotel.city
     }
 
-    const rmb = saving > 0 ? saving * 0.5 : 1
-    let coins = Math.ceil(rmb * 100)
-    if (coins < 2000) coins = 2000
-    if (coins > 5000) coins = 5000
-    
     const tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId)
         await SavingEvent.emitTripSaving({
-            coins, orderNo, staffId: staff.id,
+            orderNo, staffId: staff.id,
             companyId, type: 2, record: {
                 date: new Date(),
                 companyName: staff.company.name,
@@ -3593,7 +3588,6 @@ async function calculateBudget(params: { expenditure: number, id: string, orderN
                 realCost: expenditure,
                 saving,
                 ratio: 0.05,
-                coins,
                 currStatus: tripPlan.status
             }
     })
