@@ -3422,25 +3422,31 @@ export class TripPlanModule {
 
     @clientExport
     async perMonthStatistics(params: {where: object, companyId: string, date: Date}) {
+        const {companyId, date} = params
         const tripPlans = await Models.tripPlan.all({
             where: {
                 // ...params.where,
-                companyId: params.companyId,
+                companyId: companyId,
                 // status: EPlanStatus.COMPLETE,
                 createdAt: {
-                    $gte: moment(params.date).format(),
-                    $lt: moment(params.date).add(1, 'month').format()
+                    $gte: moment(date).format(),
+                    $lt: moment(date).add(1, 'month').format()
                 }
             },
             order: [['created_at', 'asc']]
         })
         const res = R.groupBy((tp: TripPlan) => moment(tp.createdAt).format('YYYY-MM-DD'), tripPlans)
+
+        let days = moment(date).endOf('month').diff(moment(date).startOf('month'), 'day') + 1
+        const oneMonth = Array.from({ length: days }).map((_, i) => moment(date).add(i + 1, 'day').format('YYYY-MM-DD'))
+
         const result = []
-        for (let date in res) {
-            const expenditure = R.sumBy((tp: TripPlan) => tp.expenditure, res[date]),
-                saving = R.sumBy((tp: TripPlan) => tp.saved, res[date])
+        for (let date of oneMonth) {
+            const expenditure = R.sumBy((tp: TripPlan) => tp.expenditure, res[date] || []),
+                saving = R.sumBy((tp: TripPlan) => tp.saved, res[date] || [])
             result.push({date, expenditure, saving, ratio: 0})
         }
+
         return result
     }
 
