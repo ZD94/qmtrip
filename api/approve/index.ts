@@ -22,6 +22,7 @@ import {DB} from "@jingli/database";
 import { ITravelBudgetInfo } from 'http/controller/budget';
 var CLSNS = CLS.getNamespace('dnode-api-context');
 CLSNS.bindEmitter(emitter);
+import moment = require('moment')
 
 function oaStr2Enum(str: string) :EApproveChannel{
     let obj = {
@@ -491,8 +492,10 @@ class ApproveModule {
 
             approves.forEach(async ap => {
                 const tripApprove = await API.tripApprove.getTripApprove({id: ap.id})
-                if (!tripApprove) return
                 ap.status = EApproveStatus.TIMEOUT
+                if (!tripApprove && moment().diff(ap.startAt, 'day') >= 3) {
+                    return await ap.save()
+                }
                 const log = Models.tripPlanLog.create({ tripPlanId: ap.id, remark: '超时未审批', approveStatus: EApproveStatus.TIMEOUT });
                 await Promise.all([
                     API.tripApprove.updateTripApprove({
