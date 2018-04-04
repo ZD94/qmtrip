@@ -3443,8 +3443,9 @@ export class TripPlanModule {
         const result = []
         for (let date of oneMonth) {
             const expenditure = R.sumBy((tp: TripPlan) => tp.expenditure, res[date] || []),
+                budget = R.sumBy((tp: TripPlan) => tp.budget, res[date] || []),
                 saving = R.sumBy((tp: TripPlan) => tp.saved, res[date] || [])
-            result.push({date, expenditure, saving, ratio: 0})
+            result.push({date, expenditure, saving, ratio: budget == 0 ? 0 : (saving / budget).toFixed(2)})
         }
 
         return result
