@@ -3427,7 +3427,7 @@ export class TripPlanModule {
             where: {
                 // ...params.where,
                 companyId: companyId,
-                // status: EPlanStatus.COMPLETE,
+                status: EPlanStatus.COMPLETE,
                 createdAt: {
                     $gte: moment(date).format(),
                     $lt: moment(date).add(1, 'month').format()
@@ -3438,7 +3438,7 @@ export class TripPlanModule {
         const res = R.groupBy((tp: TripPlan) => moment(tp.createdAt).format('YYYY-MM-DD'), tripPlans)
 
         let days = moment(date).endOf('month').diff(moment(date).startOf('month'), 'day') + 1
-        const oneMonth = Array.from({ length: days }).map((_, i) => moment(date).add(i + 1, 'day').format('YYYY-MM-DD'))
+        const oneMonth = Array.from({ length: days }).map((_, i) => moment(date).add(i, 'day').format('YYYY-MM-DD'))
 
         const result = []
         for (let date of oneMonth) {
