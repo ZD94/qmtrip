@@ -65,7 +65,7 @@ export async function initHttp(app: Application) {
     // app.use('/api/v1', allowCrossDomain, router);
     // app.use('/api/v1', authenticate, router);
 
-    conf.setConfig(5 * 60 * 1000, [/^\/wechat/, /^\/workWechat/i, /^\/tripPlan/i], cache, getAppSecretByAppId)
+    conf.setConfig(5 * 60 * 1000, [/^\/wechat/, /^\/workWechat/i], cache, getAppSecretByAppId)
     /**
      * /api/v1 主要用于前端页面或者企业与本系统通信
      * appid, appsecret 为分配给企业的appid, appsecret
