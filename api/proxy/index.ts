@@ -201,7 +201,7 @@ export class Proxy {
         });
         
 
-        app.all(/^\/java\/([^\/]+)(.*)?$/, cors(corsOptions), resetTimeout, verifyToken, timeout('120s'),  async (req: Request, res: Response, next?: Function) => {
+        app.all(/^\/java\/([^\/]+)(.*)?$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function) => {
             try {
                 let projectName = req.params[0];
                 let realUrl = req.params[1];
