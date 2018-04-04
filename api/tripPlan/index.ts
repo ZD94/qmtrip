@@ -3371,18 +3371,12 @@ export class TripPlanModule {
     @clientExport
     async tripList(params: {where: object, companyId: string, type: number, startAt: string, endAt: string, limit: number, offset: number}) {
         const status = params.type == 1 ? EPlanStatus.COMPLETE : { $ne: EPlanStatus.COMPLETE }
-        const {limit = 20, offset = 1} = params
+        const {limit = 20, offset = 1, startAt, endAt, companyId} = params
+        let where: object = {status, companyId}
+        where = startAt ? { ...where, createdAt: { $gte: moment(startAt).format(), $lte: moment(endAt).format() }} : where
 
         const tripPlans = await Models.tripPlan.find({
-            where: {
-                // ...params.where,
-                status,
-                companyId: params.companyId,
-                createdAt: {
-                    $gte: moment(params.startAt).format(),
-                    $lte: moment(params.endAt).format()
-                }
-            },
+            where,
             limit,
             offset: limit * (offset - 1),
             order: [['created_at', 'asc']]
