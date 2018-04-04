@@ -507,7 +507,8 @@ async function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: I
     let name;
     let stopItemList;
     if( meiyaFlightData.stopNumber == 1){
-       let  urlStop = config.orderSysConfig.orderLink + "/tmc/stopItems/" + `${meiyaFlightData.flightNo}/${meiyaFlightData.depDate}`;
+       let stopsNo = (meiyaFlightData.carrierNo) ? meiyaFlightData.carrierNo : meiyaFlightData.flightNo;
+       let  urlStop = config.orderSysConfig.orderLink + "/tmc/stopItems/" + `${stopsNo}/${meiyaFlightData.depDate}`;
        let  stopItem = await request({
             url: urlStop,
             method: "get",
@@ -1014,6 +1015,7 @@ export interface IMeiyaFlight {
     depTerm?: string | number;
     agent?: string;
     agentType?: string;
+    carrierNo?: string;
 }
 
 export interface IMeiyaTrainSeat {
