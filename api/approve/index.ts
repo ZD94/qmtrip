@@ -496,6 +496,7 @@ export class ApproveModule {
             approves.forEach(async ap => {
                 const tripApprove = await API.tripApprove.getTripApprove({id: ap.id})
                 ap.status = EApproveStatus.TIMEOUT
+                ap.tripApproveStatus = QMEApproveStatus.TIMEOUT
                 if (!tripApprove && moment().diff(ap.startAt, 'day') >= 3) {
                     return await ap.save()
                 }
