@@ -13,7 +13,7 @@ let logger = new Logger("tripPlan");
 const config = require("@jingli/config");
 
 let scheduler = require('common/scheduler');
-let moment = require("moment");
+const moment = require("moment");
 require("moment-timezone");
 import _ = require('lodash');
 const R = require('lodash/fp')
@@ -3353,8 +3353,125 @@ export class TripPlanModule {
         if (costCenterDeploy)
             await costCenterDeploy.checkoutBudgetNotice()
     }
-   
 
+    @clientExport
+    async tripList(params: {where: object, companyId: string, type: number, startAt: string, endAt: string, limit: number, offset: number}) {
+        const status = params.type == 1 ? EPlanStatus.COMPLETE : { $ne: EPlanStatus.COMPLETE }
+        const {limit = 20, offset = 1, startAt, endAt, companyId} = params
+        let where: object = {status, companyId}
+        where = startAt ? { ...where, createdAt: { $gte: moment(startAt).format(), $lte: moment(endAt).format() }} : where
+
+        const tripPlans = await Models.tripPlan.find({
+            where,
+            limit,
+            offset: limit * (offset - 1),
+            order: [['created_at', 'asc']]
+        })
+        return {data: await transform(tripPlans, params.companyId), total: tripPlans.total}
+    }
+
+    @clientExport
+    async tripStatistics(params: {where: object, companyId: string, startAt: Date, endAt: Date}) {
+
+        const tripPlans = await Models.tripPlan.all({
+            // attributes: [
+            //     [sequelize.fn('sum', sequelize.col('budget')), 'totalBudget'],
+            //     [sequelize.fn('sum', sequelize.col('expenditure')), 'expenditure']
+            // ],
+            where: {
+                // ...params.where,
+                companyId: params.companyId,
+                status: EPlanStatus.COMPLETE,
+                createdAt: {
+                    $gte: moment(params.startAt).format(),
+                    $lte: moment(params.endAt).format()
+                }
+            }
+        })
+
+        // const sql = `SELECT sum(budget) budget, sum(expenditure) expenditure
+        //     FROM trip_plan.trip_plans WHERE created_at >= '${moment(params.startAt).format('YYYY-MM-DD')}'
+        //     and created_at <= '${moment(params.endAt).format('YYYY-MM-DD')}' and status = ${EPlanStatus.COMPLETE}`
+        // const result = _.first(await DB.query(sql))[0]
+
+        const budget = R.sumBy((tp: TripPlan) => tp.budget, tripPlans) || 0,
+            expenditure = R.sumBy((tp: TripPlan) => tp.expenditure, tripPlans) || 0
+
+        return {budget, expenditure, ratio: 0}
+    }
+
+    @clientExport
+    async perMonthStatistics(params: {where: object, companyId: string, date: Date}) {
+        const {companyId, date} = params
+        const tripPlans = await Models.tripPlan.all({
+            where: {
+                // ...params.where,
+                companyId: companyId,
+                status: EPlanStatus.COMPLETE,
+                createdAt: {
+                    $gte: moment(date).format(),
+                    $lt: moment(date).add(1, 'month').format()
+                }
+            },
+            order: [['created_at', 'asc']]
+        })
+        const res = R.groupBy((tp: TripPlan) => moment(tp.createdAt).format('YYYY-MM-DD'), tripPlans)
+
+        let days = moment(date).endOf('month').diff(moment(date).startOf('month'), 'day') + 1
+        const oneMonth = Array.from({ length: days }).map((_, i) => moment(date).add(i, 'day').format('YYYY-MM-DD'))
+
+        const result = []
+        for (let date of oneMonth) {
+            const expenditure = R.sumBy((tp: TripPlan) => tp.expenditure, res[date] || []),
+                budget = R.sumBy((tp: TripPlan) => tp.budget, res[date] || []),
+                saving = R.sumBy((tp: TripPlan) => tp.saved, res[date] || [])
+            result.push({date, expenditure, saving, ratio: budget == 0 ? 0 : (saving / budget).toFixed(2)})
+        }
+
+        return result
+    }
+
+    @clientExport
+    async unfinishedTrip(params: {companyId: string}) {
+        const tripPlans = await Models.tripPlan.all({
+            where: {
+                companyId: params.companyId,
+                status: { $ne: EPlanStatus.COMPLETE }
+            }
+        })
+       return {
+            tripCount: tripPlans.length,
+            budget: R.sumBy((tp: TripPlan) => tp.budget, tripPlans),
+            personCount: R.sumBy((tp: TripPlan) => tp.staffList.length, tripPlans)
+        }
+    }
+
+}
+
+async function transform(tripPlans: TripPlan[], companyId: string) {
+    return Promise.all(tripPlans.map(async tp => {
+        const arrivalCityCodes: string[] = (typeof tp.arrivalCityCodes == 'string' 
+            ? JSON.parse(tp.arrivalCityCodes) : tp.arrivalCityCodes)
+            || []
+        const routeCities: ICity[] = await Promise.all(arrivalCityCodes
+            .reverse()
+            .map(id => API.place.getCityById(id, companyId)))
+            || []
+        const travelRoute: string[] = R.pluck('name', routeCities)
+        const staffs: string[] = R.pluck('name', await Promise.all(tp.staffList.map(id => Models.staff.get(id)))) || []
+
+        return {
+            staffs,
+            id: tp.id,
+            saving: tp.saved,
+            endAt: tp.backAt,
+            status: tp.status,
+            budget: tp.budget,
+            startAt: tp.startAt,
+            expenditure: tp.expenditure,
+            travelRoute: tp.isRoundTrip ? [...travelRoute, travelRoute[0]] : travelRoute
+        }
+    }))
 }
 
 async function updateTripDetailExpenditure(tripDetail: TripDetail) {
