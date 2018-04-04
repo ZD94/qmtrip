@@ -52,7 +52,7 @@ function makeLinkSign(linkToken: string, invitedLinkId: string, timestamp: numbe
  */
 export class ApiAuth {
 
-    public __public: boolean = true;
+    static __public: boolean = true;
 
     /**
      * 验证验证码(通过手机重置密码第一步)
