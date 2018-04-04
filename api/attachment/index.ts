@@ -35,7 +35,7 @@ function signFileId(fileid: string, expirttime: number) {
     return md5(str);
 }
 
-class ApiAttachment {
+export class ApiAttachment {
 
     /**
      * @method saveAttachment
@@ -48,7 +48,7 @@ class ApiAttachment {
      * @param {String} params.contentType http contentType 详情见http://tool.oschina.net/commons
      * @return {Promise} "32位唯一串"
      */
-    static async saveAttachment(params: {content: any, contentType: string, isPublic?: boolean}): Promise<any> {
+    async saveAttachment(params: {content: any, contentType: string, isPublic?: boolean}): Promise<any> {
         var content = params.content;
         var isPublic = params.isPublic || false;
         var contentType = params.contentType;
@@ -89,7 +89,7 @@ class ApiAttachment {
      * @param params.id uuid
      * @returns {*|Boolean|Promise.<undefined>|Promise.<Integer>}
      */
-    static async removeFileAndAttach(params: {id: string}): Promise<boolean> {
+    async removeFileAndAttach(params: {id: string}): Promise<boolean> {
         var id = params.id;
         var file = await Models.relateFile.get(id);
         if (!file) throw new Error('file is null')
@@ -109,7 +109,7 @@ class ApiAttachment {
      * @param {String} params.id 文件ID
      * @return {Promise} 附件信息 {id: "ID", content: "内容", "isPublic": "true|false"}
      */
-    static async getAttachment(params: {id: string, width?: number, height?: number}): Promise<any> {
+    async getAttachment(params: {id: string, width?: number, height?: number}): Promise<any> {
         var id = params.id;
 
         var file = await Models.relateFile.get(id)
@@ -133,7 +133,7 @@ class ApiAttachment {
      * @param {String} params.fileId
      * @param {UUID} params.accountId
      */
-    static bindOwner(params: {fileId: string, accountId: string}) {
+    bindOwner(params: {fileId: string, accountId: string}) {
         var fileId = params.fileId;
         var accountId = params.accountId;
         return Owner.create({
@@ -142,7 +142,7 @@ class ApiAttachment {
         })
     }
 
-    static getOwner(params: {fileId: string, user_id: string}) {
+    getOwner(params: {fileId: string, user_id: string}) {
         var fileId = params.fileId;
         var accountId = params.user_id;
         return Owner.findOne({where:{accountId: accountId, fileId: fileId}})
@@ -162,7 +162,7 @@ class ApiAttachment {
      * @param {String} params.fileId
      * @param {UUID} params.accountId
      */
-    static async getSelfAttachment(params: {fileId: string}) {
+    async getSelfAttachment(params: {fileId: string}) {
         var fileId = params.fileId;
         /*let staff = await Staff.getCurrent();
         let attachments = await Models.attachment.find({where: {id: fileId, staffId: staff.id}});
@@ -176,7 +176,8 @@ class ApiAttachment {
         return attachment;
     }
 
-    static async getFileCache(params: {id: string, isPublic: boolean}) {
+    async getFileCache(params: {id: string, isPublic: boolean}) {
+        let self = this;
         try{
             var id = params.id;
             var isPublic = params.isPublic;
@@ -191,7 +192,7 @@ class ApiAttachment {
 
             var cache_exist = await fs_exists(filepath);
             if(!cache_exist){
-                var attachment = await ApiAttachment.getAttachment({id: id});
+                var attachment = await self.getAttachment({id: id});
                 if(!attachment) {
                     return null;
                 }
@@ -217,7 +218,7 @@ class ApiAttachment {
         }
     }
 
-    static __initHttpApp = require('./upload');
+    __initHttpApp = require('./upload');
 }
 
-export= ApiAttachment;
+export default new ApiAttachment();

@@ -19,14 +19,14 @@ let logger = new Logger("agency");
 import * as CLS from 'continuation-local-storage';
 let CLSNS = CLS.getNamespace('dnode-api-context');
 
-class AgencyModule {
+export class AgencyModule {
     /**
      * @method createAgency
      * 创建代理商
      * @param params
      * @returns {Promise<Agency>}
      */
-    static async createAgency(params:{name:string, email:string, pwd:string, id?:string, mobile?:string,description?:string,
+    async createAgency(params:{name:string, email:string, pwd:string, id?:string, mobile?:string,description?:string,
         remark?:string, status?:number}):Promise<Agency> {
         let _agency = await Models.agency.find({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
 
@@ -54,7 +54,7 @@ class AgencyModule {
      */
     @clientExport
     @requireParams(['name', 'email', 'mobile', 'userName'], ['description', 'remark', 'pwd', 'sex'])
-    static async registerAgency(params: IAgency): Promise<Agency> {
+    async registerAgency(params: IAgency): Promise<Agency> {
         let email = params.email;
         let mobile = params.mobile;
         let password = params.pwd || "123456";
@@ -88,7 +88,7 @@ class AgencyModule {
     @requirePermit('user.query', 2)
     @modelNotNull('agency')
     @conditionDecorator([{if: condition.isMyAgency('0.id')}])
-    static getAgencyById(params: {id: string}): Promise<Agency>{
+    getAgencyById(params: {id: string}): Promise<Agency>{
         return Models.agency.get(params.id);
     }
 
@@ -104,7 +104,7 @@ class AgencyModule {
     @conditionDecorator([{if: condition.isMyAgency('0.id')}])
     @requirePermit('user.edit', 2)
     @modelNotNull('agency')
-    static async updateAgency(params: IAgency): Promise<Agency> {
+    async updateAgency(params: IAgency): Promise<Agency> {
         let agency = await Models.agency.get(params.id);
 
         for(let key in params) {
@@ -121,7 +121,7 @@ class AgencyModule {
      * @returns {Promise<string[]>}
      */
     @clientExport
-    static async listAgency(): Promise<FindResult>{
+    async listAgency(): Promise<FindResult>{
         let agencies = await Models.agency.find({});
         let ids =  agencies.map((agency) => agency.id);
         return {ids: ids, count: agencies['total']}
@@ -138,7 +138,7 @@ class AgencyModule {
     @requirePermit('user.delete', 2)
     @conditionDecorator([{if: condition.isMyAgency('0.id')}])
     @modelNotNull('agency')
-    static async deleteAgency(params: {id: string}): Promise<boolean> {
+    async deleteAgency(params: {id: string}): Promise<boolean> {
         let agency = await Models.agency.get(params.id);
         await agency.destroy();
         return true;
@@ -153,7 +153,7 @@ class AgencyModule {
      */
     @clientExport
     @requireParams(['mobile', 'name'], ['email', 'sex', 'avatar', 'roleId', 'pwd'])
-    static async createAgencyUser(params: IAgencyUser): Promise<AgencyUser> {
+    async createAgencyUser(params: IAgencyUser): Promise<AgencyUser> {
         let curUser = await AgencyUser.getCurrent();
 
         if(!curUser) {
@@ -186,7 +186,7 @@ class AgencyModule {
     @requirePermit('user.query', 2)
     @modelNotNull('agencyUser')
     @conditionDecorator([{if: condition.isSameAgency('0.id')}])
-    static getAgencyUser(params: {id: string}): Promise<AgencyUser> {
+    getAgencyUser(params: {id: string}): Promise<AgencyUser> {
         return Models.agencyUser.get(params.id);
     }
 
@@ -206,7 +206,7 @@ class AgencyModule {
     @conditionDecorator([{if: condition.isSameAgency('0.id')}])
     @requireParams(['id'], ['status', 'name', 'sex', 'mobile', 'avatar', 'roleId'])
     @modelNotNull('agencyUser')
-    static async updateAgencyUser(params: {id: string, status?: number, name?: string, sex?: EGender, email?: string,
+    async updateAgencyUser(params: {id: string, status?: number, name?: string, sex?: EGender, email?: string,
         mobile?: string, avatar?: string, roleId?: number}): Promise<AgencyUser> {
         let target = await Models.agencyUser.get(params.id);
         for(let key in params) {
@@ -226,7 +226,7 @@ class AgencyModule {
     @requirePermit("user.delete", 2)
     @conditionDecorator([{if: condition.isSameAgency('0.id')}])
     @modelNotNull('agencyUser')
-    static async deleteAgencyUser(params: {id: string}): Promise<boolean> {
+    async deleteAgencyUser(params: {id: string}): Promise<boolean> {
         let target = await Models.agencyUser.get(params.id);
         await target.destroy();
         return true;
@@ -239,7 +239,7 @@ class AgencyModule {
      * @param params.email 邮箱
      */
     @requireParams(['email'])
-    static async agencyByEmail(params: {email: string}): Promise<Agency> {
+    async agencyByEmail(params: {email: string}): Promise<Agency> {
         let agencies = await Models.agency.find({where: params});
         return agencies[0];
     }
@@ -250,7 +250,7 @@ class AgencyModule {
      * @param options options.perPage 每页条数 options.page当前页
      */
     @clientExport
-    static async listAgencyUser(options: {where: {[key: string]: any}, perPage?: number, page?: number}) :Promise<FindResult> {
+    async listAgencyUser(options: {where: {[key: string]: any}, perPage?: number, page?: number}) :Promise<FindResult> {
         let curUser = await AgencyUser.getCurrent();
         if(!options.where) {
             options.where = {}
@@ -266,7 +266,7 @@ class AgencyModule {
      * 测试用例使用删除代理商和用户的操作，不在client里调用
      * @param params
      */
-    static async deleteAgencyByTest(params: IAgency) {
+    async deleteAgencyByTest(params: IAgency) {
         let email = params.email;
         let mobile = params.mobile;
         let name = params.name;
@@ -279,7 +279,7 @@ class AgencyModule {
     }
 
 
-    static async __initOnce() {
+    async __initOnce() {
         logger.info("init default agency...");
         let default_agency = require('@jingli/config').default_agency;
         let email = default_agency.email;
@@ -319,7 +319,7 @@ class AgencyModule {
     }
 
     @clientExport
-    static async getAgencyOperateLogs(options: any) :Promise<FindResult> {
+    async getAgencyOperateLogs(options: any) :Promise<FindResult> {
         options.where = options.where || {};
         options.order = options.order || [["created_at", "desc"]];
         let agencyUser = await AgencyUser.getCurrent();
@@ -333,7 +333,7 @@ class AgencyModule {
     }
 
     @clientExport
-    static async getAgencyOperateLog(params: {id: string}): Promise<AgencyOperateLog|null> {
+    async getAgencyOperateLog(params: {id: string}): Promise<AgencyOperateLog|null> {
         let agencyUser = await AgencyUser.getCurrent();
         let {id} = params;
         let log = await Models.agencyOperateLog.get(id);
@@ -344,4 +344,4 @@ class AgencyModule {
     }
 }
 
-export = AgencyModule;
+export default new AgencyModule();

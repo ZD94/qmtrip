@@ -39,7 +39,7 @@ export enum HotelPriceLimitType {
     Price_Limit_Both = 2
 }
 
-export default class CompanyModule {
+export class CompanyModule {
     /**
      * 创建企业
      * @param {Object} params
@@ -49,7 +49,7 @@ export default class CompanyModule {
      * @returns {Promise<Company>}
      */
     @requireParams(['createUser', 'name', 'domainName', 'mobile', 'email', 'agencyId'], ['id', 'description', 'telephone', 'remark'])
-    static async createCompany(params: Company): Promise<Company> {
+    async createCompany(params: Company): Promise<Company> {
         let results = await Models.company.find({ where: { $or: [{ email: params.email }, { mobile: params.mobile }] } });
 
         if (results && results.length > 0) {
@@ -77,12 +77,13 @@ export default class CompanyModule {
     @clientExport
     @requireParams(['mobile', 'name', 'pwd', 'userName'],
         ['email', 'status', 'isValidateMobile', 'promoCode', 'referrerMobile', 'ldapUrl', 'ldapBaseDn'])
-    static async registerCompany(params: {
+    async registerCompany(params: {
         mobile: string, name: string, email?: string, userName: string,
         pwd: string, status?: number, isValidateMobile?: boolean, promoCode?: string,
         referrerMobile?: string, ldapUrl?: string, ldapBaseDn?: string, ldapStaffRootDn?: string,
         ldapDepartmentRootDn?: string, ldapAdminPassword?: string, ldapAdminDn?: string
     }): Promise<any> {
+        let self = this;
         let session = getSession();
         let pwd = params.pwd;
         let defaultAgency = await Models.agency.find({ where: { email: C.default_agency.email } });//Agency.__defaultAgencyId;
@@ -178,32 +179,7 @@ export default class CompanyModule {
         //默认开启所有公有预订服务商
         await company.setDefaultSupplier();
 
-        await CompanyModule.syncCompanyToJLCloud(company, pwd, params.mobile);
-
-        //jlbudget create company record.
-        // try {
-        //     await RestfulAPIUtil.operateOnModel({
-        //         model: "agent",
-        //         params: {
-        //             fields: {
-        //                 name: company.name,
-        //                 priceLimitType: HotelPriceLimitType.NO_SET,
-        //                 appointedPubilcSuppliers: company.appointedPubilcSuppliers,
-        //                 companyId: company.id,
-        //                 mobile: params.mobile,
-        //                 password: md5(pwd)
-        //             },
-        //             method: "post"
-        //         },
-        //         addUrl: 'company/create',
-        //         useProxy: false
-        //     });
-
-        // } catch (e) {
-        //     throw e;
-        // }
-
-        //jlbudget create account record. Waiting jlbudget account identifie online.
+        await self.syncCompanyToJLCloud(company, pwd, params.mobile);
 
         //默认添加 中国大陆(国内）、通用地区（国际）、港澳台 三个地区用于差旅、限价等的管理,  补助的一类、二类地区
         await API.travelPolicy.initDefaultCompanyRegion({companyId: company.id});
@@ -217,7 +193,7 @@ export default class CompanyModule {
      * @param company 
      */
     @clientExport
-    static async syncCompanyToJLCloud(company: Company, pwd: string, mobile?: string): Promise<boolean> {
+    async syncCompanyToJLCloud(company: Company, pwd: string, mobile?: string): Promise<boolean> {
         let staff: Staff | null = null;
         if(!mobile) {
             if(company.createUser)
@@ -265,7 +241,7 @@ export default class CompanyModule {
     @requirePermit('company.edit', 2)
     @requireParams(['id'], ['agencyId', 'name', 'description', 'mobile', 'remark', 'status'])
     @modelNotNull('company')
-    static async updateCompany(params: Company): Promise<Company> {
+    async updateCompany(params: Company): Promise<Company> {
         let companyId = params.id;
         let company = await Models.company.get(companyId);
         if (!company) throw new Error('company is null')
@@ -289,7 +265,7 @@ export default class CompanyModule {
         { if: condition.isMyCompany("0.id") },
         { if: condition.isCompanyAgency("0.id") }
     ])
-    static getCompany(params: { id: string }) {
+     getCompany(params: { id: string }) {
         return Models.company.get(params.id);
     }
 
@@ -300,7 +276,7 @@ export default class CompanyModule {
      */
     @clientExport
     @requireParams([], ['where.status'])
-    static async listCompany(options: {
+    async listCompany(options: {
         order: any, where: any
     }): Promise<FindResult> {
         let agencyUser = await AgencyUser.getCurrent();
@@ -314,7 +290,7 @@ export default class CompanyModule {
         return { ids: ids, count: companies['total'] };
     }
 
-    static async getCompanyNoAgency(): Promise<PaginateInterface<Company>> {
+    async getCompanyNoAgency(): Promise<PaginateInterface<Company>> {
         let agencies = await Models.company.find({ where: { agencyId: null } });
         return agencies;
     }
@@ -328,7 +304,7 @@ export default class CompanyModule {
     @requirePermit('company.delete', 2)
     @requireParams(['id'])
     @modelNotNull('company')
-    static async deleteCompany(params: { id: string }): Promise<boolean> {
+    async deleteCompany(params: { id: string }): Promise<boolean> {
         let companyId = params.id;
         let company = await Models.company.get(companyId);
         company && await company.destroy();
@@ -343,7 +319,7 @@ export default class CompanyModule {
      * @param params.companyId 企业id
      */
     @requireParams(['companyId', 'userId'])
-    static async checkAgencyCompany(params: {companyId: string, userId: string}): Promise<boolean> {
+    async checkAgencyCompany(params: {companyId: string, userId: string}): Promise<boolean> {
         var c = await Models.company.get(params.companyId);
         var user = await Models.agencyUser.get(params.userId);
         if (!user) throw new Error('user is null')
@@ -367,7 +343,7 @@ export default class CompanyModule {
      */
     @clientExport
     @requireParams(['companyId', 'tripNum', 'query', 'accountId', 'isCheckTripNumStillLeft'])
-    static async verifyCompanyTripNum(params: {
+    async verifyCompanyTripNum(params: {
         tripNum: number,
         companyId: string,
         accountId: string,
@@ -413,7 +389,7 @@ export default class CompanyModule {
      * @param params
      * @returns {Promise<MoneyChange>}
      */
-    static async saveMoneyChange(params: { companyId: string, money: number, channel: number, userId: string, remark: string }): Promise<MoneyChange> {
+    async saveMoneyChange(params: { companyId: string, money: number, channel: number, userId: string, remark: string }): Promise<MoneyChange> {
         return MoneyChange.create(params).save();
     }
 
@@ -425,7 +401,7 @@ export default class CompanyModule {
     @clientExport
     @requireParams(['id'])
     @modelNotNull('moneyChange')
-    static getMoneyChange(params: { id: string }) {
+     getMoneyChange(params: { id: string }) {
         return Models.moneyChange.get(params.id);
     }
 
@@ -436,7 +412,7 @@ export default class CompanyModule {
      * @returns {Promise<string[]>}
      */
     @clientExport
-    static async listMoneyChange(options: {where: any}): Promise<FindResult> {
+    async listMoneyChange(options: {where: any}): Promise<FindResult> {
         let staff = await Staff.getCurrent();
         if (!options.where) {
             options.where = {}
@@ -459,7 +435,7 @@ export default class CompanyModule {
      * @returns {Promise}
      */
     @requireParams(['channel', 'money', 'companyId'], ['remark'])
-    static fundsCharge(params: { channel: string, money: number, companyId: string, remark?: string }) {
+     fundsCharge(params: { channel: string, money: number, companyId: string, remark?: string }) {
         let self: any = this;
         params['userId'] = self.accountId;
         params['type'] = 1;
@@ -477,7 +453,7 @@ export default class CompanyModule {
      * @returns {Promise}
      */
     @requireParams(['money', 'companyId'], ['channel'])
-    static frozenMoney(params: { channel?: string, money: number, companyId: string }) {
+     frozenMoney(params: { channel?: string, money: number, companyId: string }) {
         let self: any = this;
         params.channel = params.channel || '冻结';
         params['userId'] = self.accountId;
@@ -493,7 +469,7 @@ export default class CompanyModule {
      * @param params
      * @returns {Promise}
      */
-    static consumeMoney(params: { userId: string, type: number,
+     consumeMoney(params: { userId: string, type: number,
         channel: string, remark: string
     }) {
         let self: any = this;
@@ -514,7 +490,7 @@ export default class CompanyModule {
      * @return {Promise} true|false
      */
     @requireParams(['domain'])
-    static async domainIsExist(params: {domain: string}) {
+    async domainIsExist(params: {domain: string}) {
         if (C.is_allow_domain_repeat) {
             return false;
         }
@@ -533,7 +509,7 @@ export default class CompanyModule {
      * @return {Promise}
      */
     @requireParams(['domain'])
-    static async isBlackDomain(params: { domain: string }) {
+    async isBlackDomain(params: { domain: string }) {
         //var domain = params.domain.toLowerCase();
         // let black = await DB.models.BlackDomain.findAll({where: params});
         // if(black && black.length > 0) {
@@ -547,7 +523,7 @@ export default class CompanyModule {
      * @param params
      * @returns {*}
      */
-    static async deleteCompanyByTest(params: { mobile: string, email: string }) {
+    async deleteCompanyByTest(params: { mobile: string, email: string }) {
         var mobile = params.mobile;
         var email = params.email;
         await DB.models.Company.destroy({ where: { $or: [{ mobile: mobile }, { email: email }] } });
@@ -565,14 +541,14 @@ export default class CompanyModule {
     // @conditionDecorator([
     //     {if: condition.isCompanyAdminOrOwner("0.companyId")}
     // ])
-    // static async createSupplier (params) : Promise<Supplier>{
+    // async createSupplier (params) : Promise<Supplier>{
     //     var supplier = Supplier.create(params);
     //     return supplier.save();
     // }
 
     @clientExport
     // @requireParams(['name', 'companyId'])
-    static async createSupplier(params: object): Promise<Supplier> {
+    async createSupplier(params: object): Promise<Supplier> {
         let resCreate = await RestfulAPIUtil.operateOnModel({
             model: 'supplier',
             params: {
@@ -594,7 +570,7 @@ export default class CompanyModule {
     // @conditionDecorator([
     //     {if: condition.isSupplierAdminOrOwner("0.id")}
     // ])
-    // static async deleteSupplier(params: any) : Promise<any>{
+    // async deleteSupplier(params: any) : Promise<any>{
     //     var id = params.id;
     //     var st_delete = await Models.supplier.get(id);
     //
@@ -604,7 +580,7 @@ export default class CompanyModule {
 
     @clientExport
     // @requireParams(['id'])
-    static async deleteSupplier(params: object): Promise<any> {
+    async deleteSupplier(params: object): Promise<any> {
         let resDelete = await RestfulAPIUtil.operateOnModel({
             model: 'supplier',
             params: {
@@ -627,7 +603,7 @@ export default class CompanyModule {
     // @conditionDecorator([
     //     {if: condition.isSupplierAdminOrOwner("0.id")}
     // ])
-    // static async updateSupplier(params: any) : Promise<Supplier>{
+    // async updateSupplier(params: any) : Promise<Supplier>{
     //     var id = params.id;
     //
     //     var sp = await Models.supplier.get(id);
@@ -639,7 +615,7 @@ export default class CompanyModule {
 
     @clientExport
     // @requireParams(['id'])
-    static async updateSupplier(params: object): Promise<any> {
+    async updateSupplier(params: object): Promise<any> {
         console.log('updateparams', params);
         let resUpdate = await RestfulAPIUtil.operateOnModel({
             model: 'supplier',
@@ -658,7 +634,7 @@ export default class CompanyModule {
      */
     // @clientExport
     // @requireParams(["id"])
-    // static async getSupplier(params: {id: string}) : Promise<Supplier>{
+    // async getSupplier(params: {id: string}) : Promise<Supplier>{
     //     let id = params.id;
     //     var ah = await Models.supplier.get(id);
     //
@@ -667,7 +643,7 @@ export default class CompanyModule {
 
     @clientExport
     // @requireParams(['id'])
-    static async getSupplier(params: { id: string }): Promise<Supplier> {
+    async getSupplier(params: { id: string }): Promise<Supplier> {
         // console.log('getsupplier', params);
         let resGet = await RestfulAPIUtil.operateOnModel({
             model: 'supplier',
@@ -687,7 +663,7 @@ export default class CompanyModule {
      * @returns {*}
      */
     // @clientExport
-    // static async getSuppliers(params: any): Promise<FindResult>{
+    // async getSuppliers(params: any): Promise<FindResult>{
     //     params.order = params.order || [['created_at', 'desc']];
     //
     //     let paginate = await Models.supplier.find(params);
@@ -699,7 +675,7 @@ export default class CompanyModule {
 
     @clientExport
     // @requireParams(['companyId'])
-    static async getSuppliers(params: object): Promise<any> {
+    async getSuppliers(params: object): Promise<any> {
         // console.log('getsuppliers', params);
         let resGets = await RestfulAPIUtil.operateOnModel({
             model: 'supplier',
@@ -719,7 +695,7 @@ export default class CompanyModule {
      * @returns {*}
      */
     // @clientExport
-    // static async getPublicSuppliers(params: any): Promise<FindResult>{
+    // async getPublicSuppliers(params: any): Promise<FindResult>{
     //     params.order = params.order || [['created_at', 'desc']];
     //
     //     params.where.companyId = null;//查询companyId为空的公共供应商
@@ -735,7 +711,7 @@ export default class CompanyModule {
      * get public suppliers' id
      */
     @clientExport
-    static async getPublicSuppliersId(params: {companyId: string}): Promise<any> {
+    async getPublicSuppliersId(params: {companyId: string}): Promise<any> {
         // console.log('publicparams', params);
         let resPublic = await RestfulAPIUtil.operateOnModel({
             model: 'company',
@@ -755,7 +731,7 @@ export default class CompanyModule {
      * get all suppliers' id
      */
     @clientExport
-    static async getAllSuppliers(params: object): Promise<any> {
+    async getAllSuppliers(params: object): Promise<any> {
         console.log('allparams', params);
         let resPri = await RestfulAPIUtil.operateOnModel({
             model: 'supplier',
@@ -785,7 +761,7 @@ export default class CompanyModule {
      * get all used suppliers' id
      */
     @clientExport
-    static async getAllUsedSuppliersId(params: {companyId: string}): Promise<any> {
+    async getAllUsedSuppliersId(params: {companyId: string}): Promise<any> {
         // console.log('allusedparams',params);
         console.log('id:', params['companyId']);
         let resPublic = await RestfulAPIUtil.operateOnModel({
@@ -823,7 +799,7 @@ export default class CompanyModule {
      * get public common suppliers
      */
     @clientExport
-    static async getCommonSupplier(params: object): Promise<any> {
+    async getCommonSupplier(params: object): Promise<any> {
         let commonSuppliers = await RestfulAPIUtil.operateOnModel({
             model: 'supplierAlternateName',
             params: {
@@ -868,14 +844,14 @@ export default class CompanyModule {
     /*************************************企业行程点数变更日志begin***************************************/
 
     @clientExport
-    static async createTripPlanNumChange(params: object): Promise<TripPlanNumChange> {
+    async createTripPlanNumChange(params: object): Promise<TripPlanNumChange> {
         var tpc = TripPlanNumChange.create(params);
         return tpc.save();
     }
 
     @clientExport
     @requireParams(["id"])
-    static async getTripPlanNumChange(params: {id: string}) {
+    async getTripPlanNumChange(params: {id: string}) {
         return Models.tripPlanNumChange.get(params.id);
     }
 
@@ -885,7 +861,7 @@ export default class CompanyModule {
      * @returns {*}
      */
     @clientExport
-    static async getTripPlanNumChanges(params: {
+    async getTripPlanNumChanges(params: {
         order: any
     }): Promise<FindResult> {
         params.order = params.order || [['createdAt', 'desc']];
@@ -897,7 +873,7 @@ export default class CompanyModule {
     }
 
     @clientExport
-    static async getSelfCompanies(): Promise<Company[]> {
+    async getSelfCompanies(): Promise<Company[]> {
         let session = getSession();
         let accountId = session["accountId"]
         let staffs = await Models.staff.all({ where: { accountId: accountId } });
@@ -909,7 +885,7 @@ export default class CompanyModule {
 
     /*************************************企业行程点数变更日志end***************************************/
 
-    static async urgentResetTripPlanNum() {
+    async urgentResetTripPlanNum() {
         let companies = await Models.company.all({ where: { expiryDate: { $gt: moment().format('YYYY-MM-DD HH:mm:ss') }, type: ECompanyType.PAYED } });
         await Promise.all(companies.map(async (co) => {
             let tripBasicPackage = co.tripBasicPackage;
@@ -941,7 +917,7 @@ export default class CompanyModule {
         }))
     }
 
-    static async resetTripPlanNum() {
+    async resetTripPlanNum() {
         let companies = await Models.company.all({ where: { expiryDate: { $gt: moment().format('YYYY-MM-DD HH:mm:ss') }, type: ECompanyType.PAYED } });
         await Promise.all(companies.map(async (co) => {
             let tripBasicPackage = co.tripBasicPackage;
@@ -977,7 +953,7 @@ export default class CompanyModule {
         }))
     }
 
-    static async initCompanyRegion() {
+    async initCompanyRegion() {
         let companies = await Models.company.all({ where: {} });
         await Promise.all(companies.map(async (co) => {
             await API.travelPolicy.initSubsidyRegions({ companyId: co.id });
@@ -987,7 +963,7 @@ export default class CompanyModule {
 
     /* ============= company.invoiceTitle api ========== */
 
-    static async isRepeatInvoice(params: { companyId: string, name: string }) {
+    async isRepeatInvoice(params: { companyId: string, name: string }) {
         let invoices = await Models.invoiceTitle.find({
             where: {
                 companyId: params.companyId,
@@ -1000,7 +976,7 @@ export default class CompanyModule {
 
     @clientExport
     @requireParams(["id"])
-    static async getInvoiceTitle(params: { id: string }) {
+    async getInvoiceTitle(params: { id: string }) {
         let id = params.id;
         let result = await Models.invoiceTitle.get(id);
 
@@ -1008,7 +984,7 @@ export default class CompanyModule {
     }
 
     @clientExport
-    static async getInvoiceTitles(params: {order: any, where: any}): Promise<FindResult> {
+    async getInvoiceTitles(params: {order: any, where: any}): Promise<FindResult> {
         params.order = params.order || [['created_at', 'desc']];
         params.where = params.where || {};
         let invoices = await Models.invoiceTitle.find(params);
@@ -1019,9 +995,9 @@ export default class CompanyModule {
     }
 
     @clientExport
-    static async createInvoiceTitle(params: InvoiceTitle): Promise<InvoiceTitle> {
+    async createInvoiceTitle(params: InvoiceTitle): Promise<InvoiceTitle> {
 
-        let isRepeat = await CompanyModule.isRepeatInvoice({
+        let isRepeat = await this.isRepeatInvoice({
             companyId: params.companyId,
             name: params.name
         });
@@ -1036,7 +1012,8 @@ export default class CompanyModule {
 
     @clientExport
     @requireParams(["id"], InvoiceTitle['$fieldnames'])
-    static async updateInvoiceTitle(params: {id: string, name: string}): Promise<InvoiceTitle> {
+    async updateInvoiceTitle(params: {id: string, name: string}): Promise<InvoiceTitle> {
+        let self = this;
         let id = params.id;
         let staff = await Staff.getCurrent();
 
@@ -1047,7 +1024,7 @@ export default class CompanyModule {
         }
 
         if (params.name) {
-            let isRepeat = await CompanyModule.isRepeatInvoice({
+            let isRepeat = await self.isRepeatInvoice({
                 companyId: staff.company.id,
                 name: params.name
             });
@@ -1065,7 +1042,7 @@ export default class CompanyModule {
 
     @clientExport
     @requireParams(["id"])
-    static async deleteInvoiceTitle(params: {id: string}): Promise<any> {
+    async deleteInvoiceTitle(params: {id: string}): Promise<any> {
         let id = params.id;
         let staff = await Staff.getCurrent();
         let st_delete = await Models.invoiceTitle.get(id);
@@ -1082,7 +1059,7 @@ export default class CompanyModule {
      * 获取企业 国内，国际偏好设置 (或者，中国大陆，通用地区)
     */
     @clientExport
-    static async getCompanyPrefer(companyId?: string): Promise<any> {
+    async getCompanyPrefer(companyId?: string): Promise<any> {
         if (!companyId) {
             let staff = await Staff.getCurrent();
             companyId = staff.company.id;
@@ -1137,7 +1114,7 @@ export default class CompanyModule {
 
     @clientExport
     @requireParams(['companyId'])
-    static async getApproveRuleByCompanyId(params: {companyId: string}) {
+    async getApproveRuleByCompanyId(params: {companyId: string}) {
         let company = await Models.company.get(params.companyId)
         return {
             approveRule: 1,
@@ -1151,7 +1128,7 @@ export default class CompanyModule {
 
     @clientExport
     @requireParams(['companyId', 'mode'])
-    static async setApproveMode(params: {companyId: string, mode: number}) {
+    async setApproveMode(params: {companyId: string, mode: number}) {
         let approveMode = toEnum(EApproveChannelObj, params.mode)
         if (!approveMode) throw new L.ERROR_CODE_C(400, '审批选项错误')
         let company = await Models.company.get(params.companyId)
@@ -1161,7 +1138,7 @@ export default class CompanyModule {
 
     @clientExport
     @requireParams(['companyId', 'mode'], ['time'])
-    static async autoApproveSetting(params: {companyId: string, mode: number, time?: number}) {
+    async autoApproveSetting(params: {companyId: string, mode: number, time?: number}) {
         let autoMode = toEnum(AutoApproveTypeObj, params.mode)
         let company = await Models.company.get(params.companyId)
         company.autoApproveType = autoMode
@@ -1182,12 +1159,13 @@ export default class CompanyModule {
     /* ====================== END ======================= */
 
 
-    static _scheduleTask() {
+    _scheduleTask() {
+        let self = this;
         let taskId = "resetTripPlanPassNum";
         scheduler('0 5 0 1 * *', taskId, function () {
             //每月1号付费企业消耗行程数，冻结数归零
             (async () => {
-                await CompanyModule.resetTripPlanNum();
+                await self.resetTripPlanNum();
             })()
                 .catch((err) => {
                     logger.error(`执行任务${taskId}错误:${err.stack}`);
@@ -1480,10 +1458,6 @@ export default class CompanyModule {
 
 }
 
-
-CompanyModule._scheduleTask();
-// export = CompanyModule;
-
-
-
-
+let companyModule = new CompanyModule();
+companyModule._scheduleTask();
+export default companyModule;

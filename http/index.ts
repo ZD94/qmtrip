@@ -111,22 +111,22 @@ export async function initHttp(app: Application) {
     app.use('/staffapi/v1', jlReply);
     app.use('/staffapi/v1', allowCrossDomain);
     app.use('/staffapi/v1', async (req: Request, res: Response, next?: NextFunction) => {
-        let {authstr, staffid} = req.headers;
-        let token = parseAuthString(authstr);
-        let verification: AuthResponse = await API.auth.authentication(token);
-        if (!verification) {
-            console.log('auth failed...', JSON.stringify(req.cookies));
-            return res.sendStatus(401);
-        }
         try {
+            let { authstr, staffid } = req.headers;
+            let token = parseAuthString(authstr);
+            let verification: AuthResponse = await API.auth.authentication(token);
+            if (!verification) {
+                console.log('auth failed...', JSON.stringify(req.cookies));
+                return res.sendStatus(401);
+            }
             await API.auth.setCurrentStaffId({
                 accountId: verification.accountId,
                 staffId: staffid
             })
-        } catch(err) {
-            return res.sendStatus(401);
+            next && next();
+        } catch (err) { 
+            return next(err);
         }
-        next && next();
     }, staffapiRouter);
 }
 

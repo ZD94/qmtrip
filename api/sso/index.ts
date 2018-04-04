@@ -26,14 +26,14 @@ const crypto = new wxCrypto(config.workWechat.token, config.workWechat.encodingA
 const SUITE_TOKEN_URL = 'https://qyapi.weixin.qq.com/cgi-bin/service/get_suite_token'
 const USER_INFO_URL = 'https://qyapi.weixin.qq.com/cgi-bin/service/getuserinfo3rd'
 
-export default class SSOModule {
+export class SSOModule {
     cache: RedisCache;
     constructor(){
         this.cache = new RedisCache();
 
     }
 
-    static __initHttpApp(app: Application) {
+    __initHttpApp(app: Application) {
         app.all('/wechat/receive', receive)
         app.all('/wechat/data/callback', dataCallback)
         app.all('/wechat/test', async (req, res, next) =>{
@@ -42,7 +42,7 @@ export default class SSOModule {
     }
 
     @clientExport
-    static async getSuiteToken() {
+    async getSuiteToken() {
         const suite_token = await cache.read('suite_token')
         if (suite_token) return suite_token
 
@@ -62,7 +62,7 @@ export default class SSOModule {
 
     @clientExport
     @requireParams(['code'])
-    static async getUserInfo({ code }: { code: string }): Promise<WeChatUsrInfo> {
+    async getUserInfo({ code }: { code: string }): Promise<WeChatUsrInfo> {
         const suite_token = await API.sso.getSuiteToken()
         const res = await axios.get(`${USER_INFO_URL}?access_token=${suite_token}&code=${code}`)
         if (res.status == 200 && res.data.errcode == 0) {
@@ -85,13 +85,13 @@ export default class SSOModule {
         let company: Company | null = null;
         let permanentCode: string = '';
         let hasJLCloudNotified = true;
-        let suiteToken: string = await SSOModule.getSuiteToken();
+        let suiteToken: string = await self.getSuiteToken();
         let staff = await Staff.getCurrent();
         let comProperty: {company: Company, corpId?: string, permanentCode?: string} | undefined;
         
         if(staff){
             try{
-                comProperty = await SSOModule.checkCompanyRegistered({companyId: staff.company.id});
+                comProperty = await self.checkCompanyRegistered({companyId: staff.company.id});
                 if(comProperty && comProperty.company) company = comProperty.company;
             } catch(err) {}   
         }   
@@ -107,7 +107,7 @@ export default class SSOModule {
             corpId = permanentResult.corpId
 
             try{
-                comProperty = await SSOModule.checkCompanyRegistered({corpId});
+                comProperty = await self.checkCompanyRegistered({corpId});
             } catch(err) {}    
             if(!comProperty) {
                 let com =await self.initializeCompany(permanentResult);
@@ -141,7 +141,7 @@ export default class SSOModule {
      * @param permanentCode 
      */
     @clientExport
-    static async checkCompanyRegistered(params: {companyId?:string, corpId?: string}): Promise<{company: Company, corpId: string, permanentCode: string}> {
+    async checkCompanyRegistered(params: {companyId?:string, corpId?: string}): Promise<{company: Company, corpId: string, permanentCode: string}> {
         let {companyId, corpId} = params;
         let company: Company | null = null;
         if(!companyId && !corpId) throw new L.ERROR_CODE_C(404, '参数错误')
@@ -246,7 +246,7 @@ export default class SSOModule {
         }
     }
 
-    static _scheduleTask() {
+    _scheduleTask() {
         let taskId = "syncWechatEnterpriseOrganization";
         logger.info('run task ' + taskId);
         scheduler('* */1 * * * *', taskId, async function () {
@@ -288,7 +288,7 @@ export default class SSOModule {
 
     @clientExport
     @requireParams(['code'])
-    static async loginByWechatCode(params: { code: string }) {
+    async loginByWechatCode(params: { code: string }) {
         const usrInfo: WeChatUsrInfo = await API.sso.getUserInfo(params)
         console.log('usr:', usrInfo)
         const companyProperties = await Models.companyProperty.find({
@@ -313,8 +313,9 @@ export default class SSOModule {
 
 }
 
-SSOModule._scheduleTask();
 let sso = new SSOModule()
+sso._scheduleTask();
+export default sso;
 
 async function receive(req: Request, res: Response) {
     const { timestamp, nonce, msg_signature, echostr } = req.query
@@ -424,8 +425,8 @@ const changeContactEventHandlers = {
     //新增员工
     async create_user(xml: IWCreateUser) {
         console.log("事件通知-----新增员工, info: ", xml)
-        let suiteToken = await SSOModule.getSuiteToken();
-        let {permanentCode, company} = await SSOModule.checkCompanyRegistered({corpId: xml.AuthCorpId[0]});
+        let suiteToken = await sso.getSuiteToken();
+        let {permanentCode, company} = await sso.checkCompanyRegistered({corpId: xml.AuthCorpId[0]});
         let accessToken = await API.sso.getAccessToken(xml.AuthCorpId[0], permanentCode ,suiteToken)
         let restApi = new RestApi(accessToken);
         if(!company || !restApi) throw L.ERR.METHOD_NOT_SUPPORT();
@@ -436,8 +437,8 @@ const changeContactEventHandlers = {
     //更新员工
     async update_user(xml: IWUpdateUser) {
         console.log("事件通知-----更新员工, info: ", xml)
-        let suiteToken = await SSOModule.getSuiteToken();
-        let {permanentCode, company} = await SSOModule.checkCompanyRegistered({corpId: xml.AuthCorpId[0]});
+        let suiteToken = await sso.getSuiteToken();
+        let {permanentCode, company} = await sso.checkCompanyRegistered({corpId: xml.AuthCorpId[0]});
         let accessToken = await API.sso.getAccessToken(xml.AuthCorpId[0], permanentCode ,suiteToken)
 
         let restApi = new RestApi(accessToken);
@@ -456,8 +457,8 @@ const changeContactEventHandlers = {
     //创建部门
     async create_party(xml: IWCreateDepartment) {
         console.log("事件通知-----新增部门 info: ", xml)
-        let suiteToken = await SSOModule.getSuiteToken();
-        let {permanentCode, company} = await SSOModule.checkCompanyRegistered({corpId: xml.AuthCorpId[0]});
+        let suiteToken = await sso.getSuiteToken();
+        let {permanentCode, company} = await sso.checkCompanyRegistered({corpId: xml.AuthCorpId[0]});
         let accessToken = await API.sso.getAccessToken(xml.AuthCorpId[0], permanentCode ,suiteToken)
 
         let restApi = new RestApi(accessToken);
@@ -470,8 +471,8 @@ const changeContactEventHandlers = {
     //更新部门
     async update_party(xml: IWUpdateDepartment) {
         console.log("事件通知-----更新部门 info: ", xml)
-        let suiteToken = await SSOModule.getSuiteToken();
-        let {permanentCode, company} = await SSOModule.checkCompanyRegistered({corpId: xml.AuthCorpId[0]});
+        let suiteToken = await sso.getSuiteToken();
+        let {permanentCode, company} = await sso.checkCompanyRegistered({corpId: xml.AuthCorpId[0]});
         let accessToken = await API.sso.getAccessToken(xml.AuthCorpId[0], permanentCode ,suiteToken)
         let restApi = new RestApi(accessToken);
         if(!company || !restApi) throw L.ERR.METHOD_NOT_SUPPORT();

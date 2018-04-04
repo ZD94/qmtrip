@@ -3,11 +3,11 @@ import { restfulAPIUtil } from '../restful'
 var _ = require("lodash");
 const cache = require("common/cache")
 const cityPrefix = 'city:info:id:v3'
-export default class PlaceModule {
+export class PlaceModule {
 
     @clientExport
     @requireParams(['id'])
-    static async getCityById(id: string, companyId?: string) {
+    async getCityById(id: string, companyId?: string) {
         if(!id) return null;
         let city :any = await cache.read(`${cityPrefix}:${id}`)
         if(typeof city == 'string') 
@@ -44,7 +44,7 @@ export default class PlaceModule {
     }
 
     @clientExport
-    static async findByKeyword(keyword: string) {
+    async findByKeyword(keyword: string) {
         let city = await restfulAPIUtil.operateOnModel({
             model: `place`,
             params: {
@@ -58,7 +58,7 @@ export default class PlaceModule {
     }
 
     @clientExport
-    static async findSubCities(parentId: string) {
+    async findSubCities(parentId: string) {
         let subcities = await restfulAPIUtil.operateOnModel({
             model: `place`,
             params: {
@@ -72,7 +72,7 @@ export default class PlaceModule {
     }
 
     @clientExport
-    static async findNearCitiesByGC(longitude: number, latitude: number) {
+    async findNearCitiesByGC(longitude: number, latitude: number) {
         let neighbors = await restfulAPIUtil.operateOnModel({
             model: `place`,
             params: {
@@ -86,7 +86,7 @@ export default class PlaceModule {
     }
 
     @clientExport
-    static async getCitiesByLetter(params: {isAbroad?: boolean, letter?: string, limit?: number, page?: number, type: number}){
+    async getCitiesByLetter(params: {isAbroad?: boolean, letter?: string, limit?: number, page?: number, type: number}){
         let cities = await restfulAPIUtil.operateOnModel({
             model: `place`,
             params: {
@@ -100,7 +100,7 @@ export default class PlaceModule {
     }
 
     @clientExport
-    static async getCityInfoByName(params: {name?: string}){
+    async getCityInfoByName(params: {name?: string}){
         let cities = await restfulAPIUtil.operateOnModel({
             model: `place`,
             params: {
@@ -120,7 +120,7 @@ export default class PlaceModule {
     }
 
     @clientExport
-    static async getAirPortsByCity(params: {id: string}){
+    async getAirPortsByCity(params: {id: string}){
         let airports = await restfulAPIUtil.operateOnModel({
             model: `place`,
             params: {
@@ -134,15 +134,15 @@ export default class PlaceModule {
     }
 
     @clientExport
-    static async getCityInfo(params: {cityCode: string, companyId?: string}){
+    async getCityInfo(params: {cityCode: string, companyId?: string}){
         let { cityCode, companyId } = params;
-        let city = await  PlaceModule.getCityById(cityCode, companyId);
+        let city = await  this.getCityById(cityCode, companyId);
         return city;
 
     }
 
     @clientExport
-    static async queryHotCity(params: {limit?: number, isAbroad: boolean }){
+    async queryHotCity(params: {limit?: number, isAbroad: boolean }){
         let cities = await  restfulAPIUtil.operateOnModel({
             model: `place`,
             params: {
@@ -156,7 +156,7 @@ export default class PlaceModule {
     }
 
     @clientExport 
-    static async queryCity(params: {keyword?: number|string, isAbroad: boolean, max?: number }){
+    async queryCity(params: {keyword?: number|string, isAbroad: boolean, max?: number }){
         let addUrl = 'search';
         let cities = await restfulAPIUtil.operateOnModel({
             model: `place`,
@@ -177,3 +177,5 @@ export default class PlaceModule {
     }
 
 }
+
+export default new PlaceModule();
