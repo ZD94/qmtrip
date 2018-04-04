@@ -22,7 +22,7 @@ export class AnalysisController extends AbstractController {
      * @param {companyId}
      * @return {companySaved}
      */
-    @Router("/:companyId/companySaved", "POST")
+    @Router("/:companyId/companySaved", "GET")
     async getCompanySaved(req: Request, res: Response, next: NextFunction) {
         let {companyId} = req.params;
         if (!companyId) {
@@ -32,10 +32,8 @@ export class AnalysisController extends AbstractController {
         if (typeof body == 'string') {
             body = JSON.parse(body);
         }
-        let beginDate: Date = body.beginDate || null;
-        let endDate: Date = body.endDate || null
         try {
-            let companySaved: number = await API.tripPlan.getCompanySaved({companyId: companyId, beginDate: beginDate, endDate: endDate});
+            let companySaved: number = await API.tripPlan.getCompanySaved(companyId);
             res.json(this.reply(0, companySaved));
         } catch(err) {
             console.error(err);
@@ -53,7 +51,7 @@ export class AnalysisController extends AbstractController {
             return res.json(this.reply(400, null));
         }
         try {
-            let budgets: number[] = await API.tripPlan.getCompanySavedChart({companyId: companyId});
+            let budgets: number[] = await API.tripPlan.getCompanySavedChart(companyId);
             return res.json(this.reply(0, budgets));
         } catch(err) {
             console.error(err);

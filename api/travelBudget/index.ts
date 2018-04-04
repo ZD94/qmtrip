@@ -178,21 +178,16 @@ export class ApiTravelBudget {
     @clientExport
     async getHotelsData(params: ISearchHotelParams): Promise<any> {
         let commonData;
-        // let result;
-        // try {
-        //     result = await RestfulAPIUtil.operateOnModel({
-        //         params: {
-        //             method: 'post',
-        //             fields: params
-        //         },
-        //         addUrl: 'getHotelsData',
-        //         model: "budget"
-        //     })
-        // } catch (err) {
-        //     console.log(err);
-        // }
-        let companyInfo = await this.getCompanyInfo(null, null, null, TMCStatus.OK_USE);
-        let data = companyInfo ? companyInfo : await getJLAgents();
+        let self = this;
+        let companyInfo = await self.getCompanyInfo(null, null, null, TMCStatus.OK_USE);
+        let data;
+        if (!companyInfo)
+            data = await getJLAgents();
+        else
+            data = await self.getCompanyInfo(null, null, TmcServiceType.HOTEL, TMCStatus.OK_USE)
+        
+        if (!data)
+            throw L.ERR.ERROR_CODE_C(500, "企业未配置住宿供应商")
         // console.log('hoteldata ----->    ', data);
 
         let authData: IMeiyaAuthData[] = [];
@@ -236,27 +231,23 @@ export class ApiTravelBudget {
     async getTrafficsData(params: ISearchTicketParams): Promise<any> {
         let commonData: any[] = [];
         let commonData2: any[] = [];
-        // let result;
-        // try {
-        //     result = await RestfulAPIUtil.operateOnModel({
-        //         params: {
-        //             method: 'post',
-        //             fields: params
-        //         },
-        //         addUrl: 'getTrafficsData',
-        //         model: "budget"
-        //     })
-        //
-        // } catch (err) {
-        //     console.log(err);
-        // }
-
-
-
-
-
-        let companyInfo = await this.getCompanyInfo(null, null, null, TMCStatus.OK_USE);
-        let data = companyInfo ? companyInfo : await getJLAgents();
+        let self = this;
+        let companyInfo = await self.getCompanyInfo(null, null, null, TMCStatus.OK_USE);
+        let data = [];
+        if (!companyInfo)
+            data = await getJLAgents();
+        else {
+            let dataFlight = await self.getCompanyInfo(null, null, TmcServiceType.FLIGHT, TMCStatus.OK_USE)
+            let dataTrain = await self.getCompanyInfo(null, null, TmcServiceType.TRAIN, TMCStatus.OK_USE)
+            for (let df in dataFlight){
+                data.push(dataFlight[df])
+            }
+            for (let dt in dataTrain){
+                data.push(dataTrain[dt])
+            }
+            if (!data)
+                throw L.ERR.ERROR_CODE_C(500, "企业未配置火车和飞机供应商")
+        }
         // console.log('trafficdata ----->   ', data);
 
         let authData: IMeiyaAuthData[] = [];
