@@ -1,4 +1,1 @@
-审批人：<%=tripApprove.approveUser.name || '' %>
-日期：<%=moment(tripApprove.startAt).format('YYYY.MM.DD') || '' %> 至 <%=moment(tripApprove.backAt).format('YYYY.MM.DD') || '' %>
-行程：<%=tripApprove.deptCity || '' %><%=(tripApprove.deptCity) ? '-' : ''%><%=tripApprove.arrivalCity || '' %>
-预算：￥<%=tripApprove.budget || '' %>
+您<%=moment(tripApprove.startAt).format('YYYY.MM.DD')%>起到<%=arrivalCities.map(citi => citi.name).join("、")%>的出差申请被驳回,点击此处查看详情<%=detailUrl || ''%>
