@@ -1,4 +1,1 @@
-您的出差申请已经生成:
-日期：<%=moment(tripApprove.startAt).format('YYYY.MM.DD') || '' %> 至 <%=moment(tripApprove.backAt).format('YYYY.MM.DD') || '' %>
-行程：<%=tripApprove.deptCity || '' %> <%=(tripApprove.deptCity) ? '-' : ''%> <%=tripApprove.arrivalCity || '' %>
-预算：￥<%=tripApprove.budget || '' %>
+员工 <%= staffs.join('、')%>, <%=moment(tripApprove.startAt).format('YYYY.MM.DD') || ''%>起到<%=arrivalCities && arrivalCities.map(c=>c.name).join('、') || ''%>的出差申请已发送给您, 点击此处进行审批 <%=detailUrl || ''%>

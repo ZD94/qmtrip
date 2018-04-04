@@ -270,7 +270,7 @@ export class Proxy {
             }
             let {tripDetailId} = req.query;
             let {authStr} = req.body;
-           
+
             let listeningon: string = '';
             if(!tripDetailId || typeof tripDetailId == undefined){
                 if(req.body.tripDetailId) {
@@ -284,7 +284,7 @@ export class Proxy {
                 if(!tripDetail) {
                     console.log("tripDetail not found");
                     return res.sendStatus(403);
-                }       
+                }
                 if(!staff) {
                     staff = await Models.staff.get(tripDetail.accountId);
                 }
@@ -376,6 +376,7 @@ export class Proxy {
                 }
                 return res.json(500, null);
             }
+
             if(!result)
                 return res.json(null);
             if(typeof result == 'string') {

@@ -49,6 +49,8 @@ export class TripDetailController extends AbstractController {
             const staff = await Models.staff.get(tripDetail.accountId)
             const saving = tripDetail.budget - expenditure
 
+            if (saving <= 0) return res.send(200)
+
             const companyId = staff.company.id
             let route = ''
             if ([ETripType.BACK_TRIP, ETripType.OUT_TRIP].indexOf(tripDetail.type) != -1) {
@@ -59,7 +61,6 @@ export class TripDetailController extends AbstractController {
                 const tripDetailHotel = await Models.tripDetailHotel.get(tripDetail.id)
                 route = tripDetailHotel.city
             }
-
             const tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId)
             await SavingEvent.emitTripSaving({
                 orderNo, staffId: staff.id,

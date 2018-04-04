@@ -13,13 +13,14 @@ import {ETripType} from "_types/tripPlan/tripPlan";
 import _ = require('lodash');
 let Config = require('@jingli/config');
 var API = require("@jingli/dnode-api");
-import {ISegment, ICreateBudgetAndApproveParams, QMEApproveStatus} from '_types/tripPlan';
+import {ISegment, ICreateBudgetAndApproveParams, QMEApproveStatus, EApproveResult} from '_types/tripPlan';
 import L from '@jingli/language';
 import * as CLS from 'continuation-local-storage';
 const scheduler = require('common/scheduler');
 
 import {DB} from "@jingli/database";
 import { ITravelBudgetInfo } from 'http/controller/budget';
+import TripApproveEvent from '../eventListener/tripApproveEvent';
 var CLSNS = CLS.getNamespace('dnode-api-context');
 CLSNS.bindEmitter(emitter);
 import moment = require('moment')
@@ -455,6 +456,8 @@ export class ApproveModule {
                 oa: oaEnum2Str(channel) || 'auto',
                 version: version
             });
+        } else {
+            await ensureCreateTripApprove(approve)
         }
         return approve;
     }
@@ -565,6 +568,26 @@ emitter.on(EVENT.TRIP_APPROVE_UPDATE, function(result: {approveNo: string, outer
         console.error(err.stack);
     });
 })
+
+async function ensureCreateTripApprove(approve: Approve) {
+    setTimeout(async () => {
+        let tripApprove = await API.tripApprove.getTripApprove({id: approve.id})
+        if (tripApprove) return
+        tripApprove = await API.tripApprove.retrieveDetailFromApprove({approveNo: approve.id});
+        const returnApprove = await TripApproveEvent.emitNewTripApprove({ data: tripApprove, companyId: approve.companyId });
+        if(returnApprove){
+            let tripPlanLog = Models.tripPlanLog.create({
+                tripPlanId: approve.id,
+                userId: approve.submitter,
+                remark: '提交审批单，等待审批',
+                approveStatus: EApproveResult.WAIT_APPROVE
+            });
+            await tripPlanLog.save();
+            await API.tripApprove.sendTripApproveNotice({approveId: tripApprove.id, nextApprove: false});
+            await API.travelBudget.sendTripApproveNoticeToSystem({approveId: tripApprove.id, staffId: approve.submitter});
+        }
+    }, 5 * 60 * 1000)
+}
 
 let approveModule = new ApproveModule();
 approveModule._scheduleTask()
