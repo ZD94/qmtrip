@@ -9,13 +9,13 @@ import { TripBasicPackage, TripFuelAddPackage } from '_types/tripPackage';
 export class TripPackageModule{
     @clientExport
     @requireParams(["id"])
-    static getBasicTripPackage(params: {id: string}): Promise<TripBasicPackage | null> {
+    getBasicTripPackage(params: {id: string}): Promise<TripBasicPackage | null> {
         return Models.tripBasicPackage.get(params.id);
     }
 
     @clientExport
     @requireParams(["id"])
-    static getFuelAddPackage(params: {id: string}): Promise<TripFuelAddPackage | null> {
+    getFuelAddPackage(params: {id: string}): Promise<TripFuelAddPackage | null> {
         return Models.tripFuelAddPackage.get(params.id);
     }
 
