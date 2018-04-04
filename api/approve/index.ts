@@ -503,15 +503,17 @@ export class ApproveModule {
                 if (!tripApprove && moment().diff(ap.startAt, 'day') >= 3) {
                     return await ap.save()
                 }
-                const log = Models.tripPlanLog.create({ tripPlanId: ap.id, remark: '超时未审批', approveStatus: EApproveStatus.TIMEOUT });
-                await Promise.all([
-                    API.tripApprove.updateTripApprove({
-                        id: ap.id,
-                        companyId: ap.companyId,
-                        status: QMEApproveStatus.TIMEOUT
-                    }),
-                    ap.save(), log.save()
-                ])
+                if (tripApprove) {
+                    const log = Models.tripPlanLog.create({ tripPlanId: ap.id, remark: '超时未审批', approveStatus: EApproveStatus.TIMEOUT });
+                    await Promise.all([
+                        API.tripApprove.updateTripApprove({
+                            id: ap.id,
+                            companyId: ap.companyId,
+                            status: QMEApproveStatus.TIMEOUT
+                        }),
+                        ap.save(), log.save()
+                    ])
+                }
             })
 
 
