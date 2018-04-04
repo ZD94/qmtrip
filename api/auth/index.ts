@@ -689,7 +689,7 @@ export class ApiAuth {
      * @returns {boolean}
      */
     @clientExport
-    async checkEmailAndMobile(data: {email?: string, mobile?: string}) {
+    async checkEmailAndMobile(data: {email?: string, mobile?: string}): Promise<boolean> {
         if(data.email && !validator.isEmail(data.email)) {
             throw L.ERR.EMAIL_FORMAT_INVALID();
         }
