@@ -1,1 +1,1 @@
-您<%=moment(tripPlan.startAt).format('YYYY.MM.DD')%>到<%= arrivalCities && arrivalCities.map(c=>c.name).join('、') || '' %>的出差申请已审核通过,点击此处查看详情<%=detailUrl || ''%>
+您<%=moment(tripPlan.startAt).format('YYYY.MM.DD')%>到<%= arrivalCities && arrivalCities.map(c=>c.name).join('、') || '' %>的出差申请已审核通过,请在<%=detailUrl || ''%>查看，过期无法预订
