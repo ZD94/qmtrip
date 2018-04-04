@@ -4,7 +4,9 @@ const projects = [
     'java-jingli-mall',
     'java-jingli-order1',
     'java-jingli-ordervalidate',
-    'java-jingli-activity'
+    'java-jingli-activity',
+    'java-jingli-auth',
+    'java-jingli-pay'
 ]
 
 const setting = {};
