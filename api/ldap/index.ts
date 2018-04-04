@@ -26,7 +26,7 @@ export let departmentOpts = {
     attributes: ['*', 'entryUUID']
 };
 export class LdapModule {
-    static __public: boolean = true;
+    __public: boolean = true;
     __initHttpApp(app: Application) {
 
         app.get("/initLdap", async (req, res, next)=>{

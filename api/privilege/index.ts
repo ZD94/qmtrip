@@ -21,7 +21,7 @@ function resetTimeout(req: Request, res: Response, next?: NextFunction){
 }
 
 export class Privilege {
-    static __public: boolean = true;
+    __public: boolean = true;
 
     __initHttpApp(app: Application) {
         let self = this;

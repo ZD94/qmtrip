@@ -9,7 +9,7 @@ import {Place, AirCompany, Airport} from '_types/place';
 import {FindResult} from "common/model/interface";
 
 export class ApiPlace {
-    static __public = true;
+    __public = true;
 
     /**
      * @method queryPlace

@@ -26,7 +26,7 @@ export interface PicCheckCode {
 }
 
 export class ApiCheckCode {
-    static __public: boolean = true;
+    __public: boolean = true;
 
     /**
      * @method getMsgCheckCode

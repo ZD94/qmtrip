@@ -21,7 +21,7 @@ import {CompanyProperty, CPropertyType} from "../../_types/company/company-prope
 const logger = new Logger("wangxin")
 
 export class WangXinModule {
-    static __public: boolean = true;
+    __public: boolean = true;
 
     /**
      * 网信的自动登录。

@@ -113,7 +113,7 @@ let DDEventCorpId : any = {};
 
 
 export class DDTalk {
-    static __public: boolean = true;
+    __public: boolean = true;
 
     __initHttpApp(app: Application) {
 
