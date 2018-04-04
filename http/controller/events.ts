@@ -25,7 +25,7 @@ export class EventsController extends AbstractController {
         try {
             let { event, url, companyId, startDate, endDate } = req.body;
             const eventListeners = await Models.eventListener.find({
-                where: { event, companyId, startDate, endDate }
+                where: { event, companyId, startDate: new Date(startDate), endDate: new Date(endDate) }
             })
             if (eventListeners && eventListeners.length) {
                 res.json(this.reply(0, eventListeners[0]))

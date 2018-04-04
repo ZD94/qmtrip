@@ -1,4 +1,1 @@
-申请人：<%=account.name || '' %>
-日期：<%=moment(tripPlan.startAt).format('YYYY.MM.DD') || '' %> 至 <%=moment(tripPlan.backAt).format('YYYY.MM.DD') || '' %>
-行程：<%=tripPlan.deptCity || '' %> <%=(tripPlan.deptCity) ? '-' : ''%> <%=tripPlan.arrivalCity || '' %>
-预算：￥<%=tripPlan.budget || '' %>
+<%=account.name || '' %>,您好，您的票据审核已全部通过

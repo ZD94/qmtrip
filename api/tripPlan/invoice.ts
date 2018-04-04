@@ -23,6 +23,7 @@ async function checkInvoicePermission(userId: string, tripDetailId: string){
     var tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId);
     var account = await Models.account.get(userId);
     if (!tripPlan || !account) return false
+    const applicant = await Models.staff.get(tripPlan.accountId)
     if(account.type == EAccountType.STAFF){
 
         var staffs = await Models.staff.all({ where: {accountId: userId}});
@@ -30,11 +31,11 @@ async function checkInvoicePermission(userId: string, tripDetailId: string){
             return false;
         let isHasPermit = false;
         for(let staff of staffs) {
-            if(staff.id == tripPlan.account.id){
+            if(staff.id == tripPlan.accountId){
                 isHasPermit = true;
                 break;
             }
-            if(staff.company.id == tripPlan.account.company.id &&
+            if(staff.company.id == applicant.company.id &&
                 (staff.roleId == EStaffRole.ADMIN || staff.roleId == EStaffRole.OWNER)) {
                 isHasPermit = true;
                 break;
@@ -46,7 +47,7 @@ async function checkInvoicePermission(userId: string, tripDetailId: string){
         var agencyUser = await Models.agencyUser.get(userId);
         if(!agencyUser)
             return false;
-        var needAgency = await tripPlan.account.company.getAgency();
+        var needAgency = await applicant.company.getAgency();
         if(agencyUser.agency.id == needAgency.id)
             return true;
     }
