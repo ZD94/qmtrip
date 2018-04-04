@@ -432,7 +432,7 @@ export class TripPlanModule {
         let tripDetail =  await Models.tripDetail.get(params.id); 
         if(!tripDetail) 
             throw new Error(`指定tripDetail不存在, id: ${params.id}`)
-            
+        const {expenditure} = params
         if([EOrderStatus.SUCCESS, EOrderStatus.ENDORSEMENT_SUCCESS, EOrderStatus.REFUND_SUCCESS, EOrderStatus.DEAL_DONE].indexOf(params.reserveStatus) < 0){
             if(params.expenditure) delete params.expenditure;
         }
@@ -481,7 +481,7 @@ export class TripPlanModule {
                     log.remark = `已预订`;
                     await log.save();
                 }
-                await calculateBudget({ expenditure: tripDetail.expenditure, id: tripDetail.id, orderNo: tripDetail.orderNo })
+                await calculateBudget({ expenditure, id: tripDetail.id, orderNo: tripDetail.orderNo })
                 tripDetails = [];
                 break;
             case EOrderStatus.ENDORSEMENT_SUCCESS: 
@@ -3697,8 +3697,6 @@ async function calculateBudget(params: { expenditure: number, id: string, orderN
     const tripDetail = await Models.tripDetail.get(id)
     const staff = await Models.staff.get(tripDetail.accountId)
     const saving = tripDetail.budget - expenditure
-    console.log('saving==========', saving)
-    if (saving <= 0) return
 
     const companyId = staff.company.id
     let route = ''
@@ -3711,11 +3709,9 @@ async function calculateBudget(params: { expenditure: number, id: string, orderN
         route = tripDetailHotel.city
     }
 
-    let coins = saving * 0.05 * 100
-    coins = coins > 100 ? coins : 100
     const tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId)
     await SavingEvent.emitTripSaving({
-        coins, orderNo, staffId: staff.id,
+        orderNo, staffId: staff.id,
         companyId, type: 2, record: {
             date: new Date(),
             companyName: staff.company.name,
@@ -3723,11 +3719,11 @@ async function calculateBudget(params: { expenditure: number, id: string, orderN
             mobile: staff.mobile,
             reserveStatus: EOrderStatus.SUCCESS,
             route,
+            type: tripDetail.orderType,
             budget: tripDetail.budget,
             realCost: expenditure,
             saving,
             ratio: 0.05,
-            coins,
             currStatus: tripPlan.status
         }
     })
