@@ -13,7 +13,7 @@ let moment = require("moment");
 import {MTrainLevel, MPlaneLevel} from "_types";
 import { IHotel, IFlightAgent } from '_types/travelbudget';
 
-
+console.log("config===>", config);
 /* 判断是否需要美亚数据 */
 export async function meiyaJudge() {
     let currentStaff = await Staff.getCurrent();
