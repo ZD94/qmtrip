@@ -13,7 +13,7 @@ let moment = require("moment");
 import {MTrainLevel, MPlaneLevel} from "_types";
 import { IHotel, IFlightAgent } from '_types/travelbudget';
 
-console.log("config===>", config);
+
 /* 判断是否需要美亚数据 */
 export async function meiyaJudge() {
     let currentStaff = await Staff.getCurrent();
@@ -184,7 +184,7 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
     // let destination = await API.place.getCityInfo({ cityCode: params.cityId });
     params.checkInDate = moment(params.checkInDate).format("YYYY-MM-DD");
     params.checkOutDate = moment(params.checkOutDate).format("YYYY-MM-DD");
-    let urlHotel = config.orderSysConfig.orderLink + "/tmc/searchHotel";
+    let urlHotel = config['java-jingli-order1'].orderLink + "/tmc/searchHotel";
     console.log("urlHotel =====>", urlHotel);
     let meiyaResult;
     for (let item of authData) {
@@ -514,7 +514,7 @@ async function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: I
     let stopItemList;
     if( meiyaFlightData.stopNumber == 1){
        let stopsNo = (meiyaFlightData.carrierNo) ? meiyaFlightData.carrierNo : meiyaFlightData.flightNo;
-       let  urlStop = config.orderSysConfig.orderLink + "/tmc/stopItems/" + `${stopsNo}/${meiyaFlightData.depDate}`;
+       let  urlStop = config['java-jingli-order1'].orderLink + "/tmc/stopItems/" + `${stopsNo}/${meiyaFlightData.depDate}`;
        let  stopItem = await request({
             url: urlStop,
             method: "get",
