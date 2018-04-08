@@ -184,8 +184,7 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
     // let destination = await API.place.getCityInfo({ cityCode: params.cityId });
     params.checkInDate = moment(params.checkInDate).format("YYYY-MM-DD");
     params.checkOutDate = moment(params.checkOutDate).format("YYYY-MM-DD");
-    let urlHotel = `${params.cityId}/${params.checkInDate}/${params.checkOutDate}`;
-    urlHotel = config['java-jingli-order1'].orderLink + "/tmc/searchHotel/getList/" + urlHotel;
+    let urlHotel = config.orderSysConfig.orderLink + "/tmc/searchHotel";
     console.log("urlHotel =====>", urlHotel);
     let meiyaResult;
     for (let item of authData) {
@@ -196,7 +195,14 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
 
         meiyaResult = await request({
             url: urlHotel,
-            method: "get",
+            method: "POST",
+            body: {
+                city: params.cityId,
+                checkInDate: params.checkInDate,
+                checkOutDate: params.checkOutDate,
+                pageSize: params.pageSize,
+                pageNo: params.pageNo
+            },
             // qs: meiyaParam,
             headers: {
                 auth: meiyaAuth(info),
@@ -507,7 +513,8 @@ async function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: I
     let name;
     let stopItemList;
     if( meiyaFlightData.stopNumber == 1){
-       let  urlStop = config['java-jingli-order1'].orderLink + "/tmc/stopItems/" + `${meiyaFlightData.flightNo}/${meiyaFlightData.depDate}`;
+       let stopsNo = (meiyaFlightData.carrierNo) ? meiyaFlightData.carrierNo : meiyaFlightData.flightNo;
+       let  urlStop = config.orderSysConfig.orderLink + "/tmc/stopItems/" + `${stopsNo}/${meiyaFlightData.depDate}`;
        let  stopItem = await request({
             url: urlStop,
             method: "get",
@@ -1014,6 +1021,7 @@ export interface IMeiyaFlight {
     depTerm?: string | number;
     agent?: string;
     agentType?: string;
+    carrierNo?: string;
 }
 
 export interface IMeiyaTrainSeat {
