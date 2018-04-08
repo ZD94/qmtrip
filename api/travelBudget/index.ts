@@ -131,7 +131,9 @@ export interface ISearchHotelParams {
     location?: {
         latitude: number,
         longitude: number,
-    }
+    },
+    pageSize?: number,
+    pageNo?: number
 }
 
 export interface ISearchTicketParams {

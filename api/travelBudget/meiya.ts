@@ -184,8 +184,7 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
     // let destination = await API.place.getCityInfo({ cityCode: params.cityId });
     params.checkInDate = moment(params.checkInDate).format("YYYY-MM-DD");
     params.checkOutDate = moment(params.checkOutDate).format("YYYY-MM-DD");
-    let urlHotel = `${params.cityId}/${params.checkInDate}/${params.checkOutDate}`;
-    urlHotel = config.orderSysConfig.orderLink + "/tmc/searchHotel/getList/" + urlHotel;
+    let urlHotel = config.orderSysConfig.orderLink + "/tmc/searchHotel";
     console.log("urlHotel =====>", urlHotel);
     let meiyaResult;
     for (let item of authData) {
@@ -196,7 +195,14 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
 
         meiyaResult = await request({
             url: urlHotel,
-            method: "get",
+            method: "POST",
+            body: {
+                city: params.cityId,
+                checkInDate: params.checkInDate,
+                checkOutDate: params.checkOutDate,
+                pageSize: params.pageSize,
+                pageNo: params.pageNo
+            },
             // qs: meiyaParam,
             headers: {
                 auth: meiyaAuth(info),
