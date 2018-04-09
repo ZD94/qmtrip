@@ -209,7 +209,7 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
             meiyaResult = await request({
                 url: urlHotel,
                 method: "POST",
-                body: body,
+                body: JSON.stringify(body),
                 // qs: meiyaParam,
                 headers: headers,
             })
