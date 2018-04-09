@@ -4,7 +4,7 @@ const _ = require('lodash');
 
 export class SavingEvent extends BaseEvent {
 
-    async emitTripSaving(params: { coins: number, orderNo: string, staffId: string,
+    async emitTripSaving(params: { orderNo: string, staffId: string,
         companyId: string, type: number, record: object }): Promise<any> {
         let { companyId } = params;
         if (!companyId) {

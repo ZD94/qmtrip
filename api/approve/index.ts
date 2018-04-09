@@ -16,12 +16,14 @@ var API = require("@jingli/dnode-api");
 import {ISegment, ICreateBudgetAndApproveParams, QMEApproveStatus, EApproveResult} from '_types/tripPlan';
 import L from '@jingli/language';
 import * as CLS from 'continuation-local-storage';
+const scheduler = require('common/scheduler');
 
 import {DB} from "@jingli/database";
 import { ITravelBudgetInfo } from 'http/controller/budget';
 import TripApproveEvent from '../eventListener/tripApproveEvent';
 var CLSNS = CLS.getNamespace('dnode-api-context');
 CLSNS.bindEmitter(emitter);
+import moment = require('moment')
 
 function oaStr2Enum(str: string) :EApproveChannel{
     let obj = {
@@ -40,16 +42,17 @@ function oaEnum2Str(e: EApproveChannel) {
     return obj[e];
 }
 
-class ApproveModule {
+export class ApproveModule {
     @clientExport
     @requireParams(['id'])
-    static async getApprove(params: {id: string}) {
+    async getApprove(params: {id: string}) {
         return Models.approve.get(params.id);
     }
 
     @clientExport
     @requireParams(["budgetId"], ["approveUser", "project", "submitter", "version"])
-    static async submitApprove(params: {budgetId: string, approveUser?: Staff, submitter?: Staff, version: number}) :Promise<Approve>{
+    async submitApprove(params: {budgetId: string, approveUser?: Staff, submitter?: Staff, version: number}) :Promise<Approve>{
+        let self = this;
         let {budgetId, approveUser} = params;
         let submitter = await Staff.getCurrent() || params.submitter;
         let company = submitter.company;
@@ -105,7 +108,7 @@ class ApproveModule {
                 query.projectName = project && project.name || '';
             }
 
-            let approve = await ApproveModule._submitApprove({
+            let approve = await self._submitApprove({
                 submitter: submitter.id,
                 data: budgetInfo,
                 title: query.projectName,
@@ -154,7 +157,7 @@ class ApproveModule {
     }
 
     @clientExport
-    static async cancelApprove(params: {approveId: string}): Promise<any> {  //tripApprove未生成前取消行程，改变approve状态，和冻结点数(非必要)
+    async cancelApprove(params: {approveId: string}): Promise<any> {  //tripApprove未生成前取消行程，改变approve状态，和冻结点数(非必要)
         try {
             let approve = await Models.approve.get(params.approveId);
             if (!approve) throw new Error('approve is null')
@@ -178,7 +181,8 @@ class ApproveModule {
 
     @clientExport
     @requireParams(["approveId"], ["approveUser", "project", "submitter", "version"])
-    static async submitApproveNew(params: {approveId: string, budgetId?: string, approveUser?: Staff, submitter?: Staff, version: number}) :Promise<Approve>{
+    async submitApproveNew(params: {approveId: string, budgetId?: string, approveUser?: Staff, submitter?: Staff, version: number}) :Promise<Approve>{
+        let self = this;
         let {approveUser} = params;
         let submitter = await Staff.getCurrent() || params.submitter;
         let company = submitter.company;
@@ -236,7 +240,7 @@ class ApproveModule {
             let frozenNum = result.frozenNum;
             budgetInfo.query.frozenNum = frozenNum;
 
-            let approve = await ApproveModule._submitApproveNew({
+            let approve = await self._submitApproveNew({
                 approveId: params.approveId, 
                 submitter: submitter.id,
                 data: budgetInfo,
@@ -287,7 +291,8 @@ class ApproveModule {
 
     @clientExport
     @requireParams(['query', 'budget'], ['project', 'specialApproveRemark', 'approveUser', 'version'])
-    static async submitSpecialApprove(params: {query: any, budget: number, specialApproveRemark?: string, approveUser?: Staff, version?: number}):Promise<Approve> {
+    async submitSpecialApprove(params: {query: any, budget: number, specialApproveRemark?: string, approveUser?: Staff, version?: number}):Promise<Approve> {
+        let self = this;
         let {query, budget, specialApproveRemark, approveUser} = params;
         let submitter = await Staff.getCurrent();
 
@@ -349,7 +354,7 @@ class ApproveModule {
         }
 
         return DB.transaction(async function(t){
-            return ApproveModule._submitApprove({
+            return self._submitApprove({
                 submitter: submitter.id,
                 data: budgetInfo,
                 title: query.projectName,
@@ -369,7 +374,7 @@ class ApproveModule {
         });
     }
 
-    static async _submitApprove(params: {
+    async _submitApprove(params: {
         submitter: string,
         data?: any,
         approveUser?: Staff,
@@ -412,7 +417,7 @@ class ApproveModule {
         return approve;
     }
 
-    static async _submitApproveNew(params: {
+    async _submitApproveNew(params: {
         approveId: string,
         submitter: string,
         data?: any,
@@ -458,7 +463,7 @@ class ApproveModule {
     }
 
     @clientExport
-    static async reportHimOA(params: {oaName: string, oaUrl?: string}) {
+    async reportHimOA(params: {oaName: string, oaUrl?: string}) {
         let {oaName, oaUrl} = params;
         let staff = await Staff.getCurrent();
         try {
@@ -476,6 +481,53 @@ class ApproveModule {
         } catch( err) {
             throw err;
         }
+    }
+
+    _scheduleTask() {
+        let taskId = "processTimeoutApproves";
+        scheduler('0 */5 * * * *', taskId, async function () {
+            console.log('run task processTimeoutApproves')
+            const approves = await Models.approve.find({
+                where: {
+                    status: EApproveStatus.WAIT_APPROVE,
+                    startAt: { $lt: new Date() }
+                },
+                limit: 10,
+                order: [['startAt', 'asc']]
+            })
+
+            approves.forEach(async ap => {
+                const tripApprove = await API.tripApprove.getTripApprove({id: ap.id})
+                ap.status = EApproveStatus.TIMEOUT
+                ap.tripApproveStatus = QMEApproveStatus.TIMEOUT
+                if (!tripApprove && moment().diff(ap.startAt, 'day') >= 3) {
+                    return await ap.save()
+                }
+                if (tripApprove) {
+                    const log = Models.tripPlanLog.create({ tripPlanId: ap.id, remark: '超时未审批', approveStatus: EApproveStatus.TIMEOUT });
+                    await Promise.all([
+                        API.tripApprove.updateTripApprove({
+                            id: ap.id,
+                            companyId: ap.companyId,
+                            status: QMEApproveStatus.TIMEOUT
+                        }),
+                        ap.save(), log.save()
+                    ])
+                }
+            })
+
+
+            // const ps: Promise<any>[] = _.flatten(approves.map(ap => {
+            //     ap.status = EApproveStatus.TIMEOUT
+            //     return [API.tripApprove.updateTripApprove({
+            //         id: ap.id,
+            //         companyId: ap.companyId,
+            //         status: QMEApproveStatus.TIMEOUT
+            //     }), ap.save()]
+            // }))
+
+            // await Promise.all(ps)
+        })
     }
 }
 
@@ -540,4 +592,7 @@ async function ensureCreateTripApprove(approve: Approve) {
     }, 5 * 60 * 1000)
 }
 
-export= ApproveModule;
+let approveModule = new ApproveModule();
+approveModule._scheduleTask()
+
+export default approveModule;

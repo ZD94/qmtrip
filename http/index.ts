@@ -65,25 +65,27 @@ export async function initHttp(app: Application) {
     // app.use('/api/v1', allowCrossDomain, router);
     // app.use('/api/v1', authenticate, router);
 
-    conf.setConfig(5 * 60 * 1000, [/^\/wechat/, /^\/workWechat/i], cache, getAppSecretByAppId)
+    conf.setConfig(5 * 60 * 1000, [/^\/wechat/, /^\/workWechat/i, /^\/tripPlan/i], cache, getAppSecretByAppId)
     /**
      * /api/v1 主要用于前端页面或者企业与本系统通信
      * appid, appsecret 为分配给企业的appid, appsecret
      */
     app.use('/api/v1', jlReply)
     app.use('/api/v1', allowCrossDomain);
-    app.use('/api/v1', (req: Request, res: any, next?: NextFunction) => {
-        if (!next) return
+    app.use('/api/v1', (req: Request, res: any, next: NextFunction) => {
         auth(req, res, next, async (err, isValid, data) => {
-               console.log("======auth request: ", err, isValid, data)
-            if (isValid) {
-                const companies = await Models.company.find({
-                    where: { appId: data.appId }
-                })
-                res.session = { ...data, companyId: companies[0] && companies[0].id }
-                return next()
+            try {
+                if (isValid) {
+                    const companies = await Models.company.find({
+                        where: { appId: data.appId }
+                    })
+                    res.session = { ...data, companyId: companies[0] && companies[0].id }
+                    return next()
+                }
+                return res.sendStatus(403)
+            } catch (err) { 
+                return next(err);
             }
-            return res.sendStatus(403)
         })
     }, router);
     /**
@@ -109,22 +111,22 @@ export async function initHttp(app: Application) {
     app.use('/staffapi/v1', jlReply);
     app.use('/staffapi/v1', allowCrossDomain);
     app.use('/staffapi/v1', async (req: Request, res: Response, next?: NextFunction) => {
-        let {authstr, staffid} = req.headers;
-        let token = parseAuthString(authstr);
-        let verification: AuthResponse = await API.auth.authentication(token);
-        if (!verification) {
-            console.log('auth failed...', JSON.stringify(req.cookies));
-            return res.sendStatus(401);
-        }
         try {
+            let { authstr, staffid } = req.headers;
+            let token = parseAuthString(authstr);
+            let verification: AuthResponse = await API.auth.authentication(token);
+            if (!verification) {
+                console.log('auth failed...', JSON.stringify(req.cookies));
+                return res.sendStatus(401);
+            }
             await API.auth.setCurrentStaffId({
                 accountId: verification.accountId,
                 staffId: staffid
             })
-        } catch(err) {
-            return res.sendStatus(401);
+            next && next();
+        } catch (err) { 
+            return next(err);
         }
-        next && next();
     }, staffapiRouter);
 }
 

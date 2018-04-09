@@ -12,6 +12,7 @@ var request = require("request-promise");
 let moment = require("moment");
 import {MTrainLevel, MPlaneLevel} from "_types";
 import { IHotel, IFlightAgent } from '_types/travelbudget';
+import { L } from '@jingli/language';
 
 
 /* 判断是否需要美亚数据 */
@@ -43,7 +44,7 @@ export function meiyaAuth(info?: object) {
 /* 获取鲸力供应商 */
 export async function getJLAgents() {
     let result;
-    let reqUrl = config.orderSysConfig.orderLink + "/tmc/suppliers";
+    let reqUrl = config['java-jingli-order1'].orderLink + "/tmc/suppliers";
     // let reqUrl = "http://192.168.1.144:8080/jingli-order1/tmc/suppliers";
 
     result = await request({
@@ -74,7 +75,7 @@ export async function getMeiyaFlightData(params: ISearchTicketParams, authData: 
 
         depDate: moment(params.leaveDate).format("YYYY-MM-DD")
     };
-    let urlFlight = config.orderSysConfig.orderLink + "/tmc/searchFlight/getList/" + `${params.originPlaceId}/${params.destinationId}/${meiyaParam.depDate}`;
+    let urlFlight = config['java-jingli-order1'].orderLink + "/tmc/searchFlight/getList/" + `${params.originPlaceId}/${params.destinationId}/${meiyaParam.depDate}`;
     console.log("urlFlight====>", urlFlight);
     let meiyaResult;
     let isBindService: boolean = false;
@@ -127,7 +128,7 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
         arrCity: params.destinationId,
         depDate: moment(params.leaveDate).format("YYYY-MM-DD")
     };
-    let urlTrain = config.orderSysConfig.orderLink + "/tmc/searchTrains/getList" + `/${meiyaParam.depCity}/${meiyaParam.arrCity}/${meiyaParam.depDate}`;
+    let urlTrain = config['java-jingli-order1'].orderLink + "/tmc/searchTrains/getList" + `/${meiyaParam.depCity}/${meiyaParam.arrCity}/${meiyaParam.depDate}`;
     console.log("urlTrain===================>", urlTrain);
 
     let isBindService: boolean = false;
@@ -180,52 +181,50 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
  */
 export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IMeiyaAuthData[]) {
     let data: Array<IMeiyaHotel> = [];
-    // let hotelData: {[index: string]: Array<IMeiyaHotel>} = {};
-    // let destination = await API.place.getCityInfo({ cityCode: params.cityId });
     params.checkInDate = moment(params.checkInDate).format("YYYY-MM-DD");
     params.checkOutDate = moment(params.checkOutDate).format("YYYY-MM-DD");
-    let urlHotel = `${params.cityId}/${params.checkInDate}/${params.checkOutDate}`;
-    urlHotel = config.orderSysConfig.orderLink + "/tmc/searchHotel/getList/" + urlHotel;
-    console.log("urlHotel =====>", urlHotel);
+    let urlHotel = config['java-jingli-order1'].orderLink + "/tmc/searchHotel";
     let meiyaResult;
+    console.log("urlHotel==>", urlHotel)
     for (let item of authData) {
         let info = item.identify;
         let sname = item.sname;
         let agentType = item.agentType;
-        // console.log('agenttype---->   ', agentType, 'typeof------  ', typeof agentType);
 
-        meiyaResult = await request({
-            url: urlHotel,
-            method: "get",
-            // qs: meiyaParam,
-            headers: {
-                auth: meiyaAuth(info),
-                supplier: sname,
-                agentType: (agentType && agentType == '2') ? AgentType.JL : AgentType.CORP
-
-            }
-        }).catch((e: Error) => {
-            console.log(e)
-        });
+        let body = {
+            city: params.cityId,
+            checkInDate: params.checkInDate,
+            checkOutDate: params.checkOutDate,
+            pageSize: params.pageSize || 50,
+            pageNo: params.pageNo || 1,
+        }
+        console.log("body==>", body);
+        let headers = {
+            auth: meiyaAuth(info),
+            supplier: sname,
+            agentType: (agentType && agentType == '2') ? AgentType.JL : AgentType.CORP
+        }
+        console.log("headers", headers);
         try {
+            meiyaResult = await request({
+                url: urlHotel,
+                method: "POST",
+                body: JSON.stringify(body),
+                // qs: meiyaParam,
+                headers: headers,
+            })
             meiyaResult = JSON.parse(meiyaResult);
-            if(meiyaResult.code == 0){
-                // hotelData[sname] = meiyaResult.data;
+            if (meiyaResult.code == 0) {
                 data.push(...meiyaResult.data);
-                // meiyaResult.data = data
-            }else{
-                console.log(meiyaResult)
+            } else { 
+                throw new L.ERROR_CODE_C(meiyaResult.code, '获取供应商数据错误');
             }
-        } catch (e) {
-            console.log(e)
+        } catch (err) { 
+            console.error('获取美亚数据时错误:', err);
+            throw new L.ERROR_CODE_C(500, '获取美亚数据时错误');
         }
     }
-        return data;
-    // if (meiyaResult && meiyaResult.code == 0) {
-    //     return meiyaResult.data;
-    // } else {
-    //     return [];
-    // }
+    return data;
 }
 
 
@@ -507,7 +506,8 @@ async function transferFlightData(meiyaFlightData: IMeiyaFlight, originalData: I
     let name;
     let stopItemList;
     if( meiyaFlightData.stopNumber == 1){
-       let  urlStop = config.orderSysConfig.orderLink + "/tmc/stopItems/" + `${meiyaFlightData.flightNo}/${meiyaFlightData.depDate}`;
+       let stopsNo = (meiyaFlightData.carrierNo) ? meiyaFlightData.carrierNo : meiyaFlightData.flightNo;
+       let  urlStop = config['java-jingli-order1'].orderLink + "/tmc/stopItems/" + `${stopsNo}/${meiyaFlightData.depDate}`;
        let  stopItem = await request({
             url: urlStop,
             method: "get",
@@ -1014,6 +1014,7 @@ export interface IMeiyaFlight {
     depTerm?: string | number;
     agent?: string;
     agentType?: string;
+    carrierNo?: string;
 }
 
 export interface IMeiyaTrainSeat {

@@ -20,11 +20,11 @@ function resetTimeout(req: Request, res: Response, next?: NextFunction){
     next && next();
 }
 
-class Privilege {
-    static __public: boolean = true;
+export class Privilege {
+    __public: boolean = true;
 
-    static __initHttpApp(app: Application) {
-
+    __initHttpApp(app: Application) {
+        let self = this;
         app.get('/privilege/:id/getBalance', resetTimeout, cors(corsOptions), timeout('120s'), verifyToken, async function(req: Request, res: Response, next?: NextFunction) {
             let {id} = req.params;
             if (!id) {
@@ -33,7 +33,7 @@ class Privilege {
             }
             let balance: number;
             try {
-                balance = await Privilege.getCompanyBalance(id);
+                balance = await self.getCompanyBalance(id);
             } catch(err) {
                 return res.json({
                     msg: err, 
@@ -62,9 +62,9 @@ class Privilege {
                     if (typeof body == 'string') {
                         body = JSON.parse(body);
                     }
-                    balanceRecords =  await Privilege.getCompanyBalanceRecords({id, body});
+                    balanceRecords =  await self.getCompanyBalanceRecords({id, body});
                 } else {
-                    balanceRecords = await Privilege.getCompanyBalanceRecords(id);
+                    balanceRecords = await self.getCompanyBalanceRecords(id);
                 }
             } catch(err) {
                 return res.json({
@@ -89,7 +89,7 @@ class Privilege {
             }
             let result;
             try {
-                result = await Privilege.getCompanyScoreRatio(id);
+                result = await self.getCompanyScoreRatio(id);
             } catch(err) {
                 return res.json({
                     data: null,
@@ -116,7 +116,7 @@ class Privilege {
             }
             let result;
             try {
-                result = await Privilege.setCompanyScoreRatio({id: id, data: body});
+                result = await self.setCompanyScoreRatio({id: id, data: body});
             } catch(err) {
                 return res.json({
                     data: null,
@@ -139,7 +139,7 @@ class Privilege {
             }
             let result;
             try {
-                result = await Privilege.getCompanyScoreRatioChange(id);
+                result = await self.getCompanyScoreRatioChange(id);
             } catch(err) {
                 return res.json({
                     data: null,
@@ -162,7 +162,7 @@ class Privilege {
             }
             let result;
             try {
-                result = await Privilege.getAllUnsettledRewardByStaff(id);
+                result = await self.getAllUnsettledRewardByStaff(id);
             } catch(err) {
                 return res.json({
                     data: null,
@@ -181,7 +181,7 @@ class Privilege {
             let {id} = req.params;
             let result;
             try {
-                result = await Privilege.getAllUnsettledRewardByTripplan(id);
+                result = await self.getAllUnsettledRewardByTripplan(id);
             } catch(err) {
                 return res.json({
                     data: null,
@@ -200,7 +200,7 @@ class Privilege {
 
     //获取企业福利账户余额
     @clientExport
-    static async getCompanyBalance(companyId: string): Promise<number> {
+    async getCompanyBalance(companyId: string): Promise<number> {
         let company: Company | null = await Models.company.get(companyId);
         let coinAccount: CoinAccount | null = await Models.coinAccount.get(company && company.coinAccountId);
         let companyBalance: number = coinAccount && coinAccount.income - coinAccount.consume - coinAccount.locks || 0;
@@ -209,7 +209,7 @@ class Privilege {
 
     //获取企业福利账户余额变动记录
     @clientExport
-    static async getCompanyBalanceRecords(params: {id: string, body?: any}): Promise<any> {
+    async getCompanyBalanceRecords(params: {id: string, body?: any}): Promise<any> {
         let {id, body} = params;
         let companyId: string = id;
         let queryDateData: any = body;
@@ -237,7 +237,7 @@ class Privilege {
 
      //获得企业节省奖励比例
      @clientExport
-     static async getCompanyScoreRatio(companyId: string): Promise<any> {
+     async getCompanyScoreRatio(companyId: string): Promise<any> {
          let company: Company | null = await Models.company.get(companyId);
          let scoreRatio: number = company && company.scoreRatio || 0;
          return scoreRatio;
@@ -245,7 +245,7 @@ class Privilege {
 
      //企业节省奖励比例设置
     @clientExport
-    static async setCompanyScoreRatio(params: {id: string, data: object}) {
+    async setCompanyScoreRatio(params: {id: string, data: object}) {
         let {data} = params;
         let setData: any = data;
         let staffId: string = setData.staffId;
@@ -273,7 +273,7 @@ class Privilege {
 
     //企业节省奖励比例设置记录
     @clientExport
-    static async getCompanyScoreRatioChange(staffId: string) {
+    async getCompanyScoreRatioChange(staffId: string) {
         let staff: Staff | null = await Models.staff.get(staffId);
         if (!staff) return []
         let companyId: string = staff.company.id;
@@ -284,7 +284,7 @@ class Privilege {
 
      //查询全部未结算奖励按出差人展示
      @clientExport
-     static async getAllUnsettledRewardByStaff(companyId: string): Promise<any> {
+     async getAllUnsettledRewardByStaff(companyId: string): Promise<any> {
          let staffs: Staff[] = await Models.staff.all({where: {companyId: companyId, balancePoints: {$gt: 0}}});
          let staffsHaveUnsettledReward: Staff[] = [];
          for (let i = 0; i < staffs.length; i++) {
@@ -297,7 +297,7 @@ class Privilege {
 
      //查询全部未结算奖励按tripPlan展示
      @clientExport
-     static async getAllUnsettledRewardByTripplan(companyId: string): Promise<any> {
+     async getAllUnsettledRewardByTripplan(companyId: string): Promise<any> {
          let tripPlansHaveUnsettledReward: TripPlan[] = await Models.tripPlan.all({
              where: {
                  companyId: companyId, 
@@ -308,7 +308,7 @@ class Privilege {
      }
 }
 
-export = Privilege;
+export default new Privilege();
 
 
 async function verify(req: Request, res: Response, next: Function) {

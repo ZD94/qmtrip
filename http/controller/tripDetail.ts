@@ -20,6 +20,8 @@ export class TripDetailController extends AbstractController {
     }
 
     async update(req: Request, res: Response, next: NextFunction) {
+        console.log('tripDetail update========>', req.method, req.body)
+
         let params = req.body;
         let id = req.params.id;
         if (id == void 0) {
@@ -59,12 +61,9 @@ export class TripDetailController extends AbstractController {
                 const tripDetailHotel = await Models.tripDetailHotel.get(tripDetail.id)
                 route = tripDetailHotel.city
             }
-            
-            let coins = saving * 0.05
-            coins = coins > 100 ? coins : 100
             const tripPlan = await Models.tripPlan.get(tripDetail.tripPlanId)
             await SavingEvent.emitTripSaving({
-                coins, orderNo, staffId: staff.id,
+                orderNo, staffId: staff.id,
                 companyId, type: 2, record: {
                     date: new Date(),
                     companyName: staff.company.name,
@@ -76,7 +75,6 @@ export class TripDetailController extends AbstractController {
                     realCost: expenditure,
                     saving,
                     ratio: 0.05,
-                    coins,
                     currStatus: tripPlan.status
                 }
             })

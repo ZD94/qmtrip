@@ -4,30 +4,30 @@ import { Models } from '_types';
 import { clientExport } from '@jingli/dnode-api/dist/src/helper';
 import { ModelInterface, ModelObjInterface, FindResult } from 'common/model/interface';
 
-export default class ModelForClient{
+export class ModelForClient{
     @clientExport
-    static async create<T extends ModelObjInterface>(modelType: string, obj: Object): Promise<T>{
+    async create<T extends ModelObjInterface>(modelType: string, obj: Object): Promise<T>{
         let model = Models[modelType] as ModelInterface<T>;
         if(!model)
             throw L.ERR.INVALID_ARGUMENT('modelType');
         return model.create(obj);
     }
     @clientExport
-    static async get<T extends ModelObjInterface>(modelType: string, id: string, options?: any): Promise<T|null>{
+    async get<T extends ModelObjInterface>(modelType: string, id: string, options?: any): Promise<T|null>{
         let model = Models[modelType] as ModelInterface<T>;
         if(!model)
             throw L.ERR.INVALID_ARGUMENT('modelType');
         return model.get(id, options);
     }
     @clientExport
-    static async find<T extends ModelObjInterface>(modelType: string, options: any): Promise<FindResult>{
+    async find<T extends ModelObjInterface>(modelType: string, options: any): Promise<FindResult>{
         let model = Models[modelType] as ModelInterface<T>;
         if(!model)
             throw L.ERR.INVALID_ARGUMENT('modelType');
         return model.$find(options);
     }
     @clientExport
-    static async update<T extends ModelObjInterface>(modelType: string, id: string, props: object, options: any): Promise<T>{
+    async update<T extends ModelObjInterface>(modelType: string, id: string, props: object, options: any): Promise<T>{
         let model = Models[modelType] as ModelInterface<T>;
         if(!model)
             throw L.ERR.INVALID_ARGUMENT('modelType');
@@ -41,7 +41,7 @@ export default class ModelForClient{
         return obj.save();
     }
     @clientExport
-    static async destory(modelType: string, id: string, options: any): Promise<any>{
+    async destory(modelType: string, id: string, options: any): Promise<any>{
         let model = Models[modelType] as ModelInterface<ModelObjInterface>;
         if(!model)
             throw L.ERR.INVALID_ARGUMENT('modelType');
@@ -51,7 +51,7 @@ export default class ModelForClient{
         return obj.destroy();
     }
     @clientExport
-    static async call(modelType: string, method: string, id: string, args: any[]): Promise<any>{
+    async call(modelType: string, method: string, id: string, args: any[]): Promise<any>{
         let model = Models[modelType] as ModelInterface<any>;
         if(!model)
             throw L.ERR.INVALID_ARGUMENT('modelType');
@@ -66,3 +66,4 @@ export default class ModelForClient{
     }
 }
 
+export default new ModelForClient();

@@ -77,7 +77,6 @@ export class BaseEvent {
 
         return result
     }
-
 }
 
 export default new BaseEvent()

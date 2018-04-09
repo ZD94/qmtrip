@@ -20,8 +20,8 @@ import {CompanyProperty, CPropertyType} from "../../_types/company/company-prope
 
 const logger = new Logger("wangxin")
 
-export default class WangXinModule {
-    static __public: boolean = true;
+export class WangXinModule {
+    __public: boolean = true;
 
     /**
      * 网信的自动登录。
@@ -29,7 +29,7 @@ export default class WangXinModule {
      * @returns {Promise<any>}
      */
     @clientExport
-    static async loginByWangXin(params: {token: string, companyId?: string}): Promise<any> {
+    async loginByWangXin(params: {token: string, companyId?: string}): Promise<any> {
         let {token, companyId} = params
         console.info(`loginByWangXin--> token: ${token}, companyId: ${companyId}`)
         /*let wangxCompany = new WangxCompany({id: companyId})
@@ -56,7 +56,7 @@ export default class WangXinModule {
     *  同步组织架构
     */
     @clientExport
-    static async syncOrganization(){
+    async syncOrganization(){
         console.info("同步网信通讯录begin================================");
         let sysCode = C.wxSysCode;
         let name = "网信演示企业";
@@ -96,3 +96,5 @@ export default class WangXinModule {
     }
 
 }
+
+export default new WangXinModule();

@@ -15,7 +15,7 @@
   },
   "license": "ISC",
   "dependencies": {
-    "@jingli/config": "^1.1.1",
+    "@jingli/config": "1.1.1",
     "@jingli/database": "^1.0.1",
     "@jingli/dnode-api": "^2.0.3",
     "@jingli/error": "^0.0.1",
@@ -75,7 +75,7 @@
     "dnode": "^1.2.2",
     "exif-js": "^2.1.1",
     "express": "4.14.0",
-    "express-http-proxy": "^0.11.0",
+    "express-http-proxy": "^1.1.0",
     "express-request-proxy": "^2.0.0",
     "formidable": "^1.0.17",
     "haversine": "^1.1.0",

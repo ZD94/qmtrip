@@ -25,8 +25,8 @@ export interface PicCheckCode {
     captcha?: string
 }
 
-export default class ApiCheckCode {
-    static __public: boolean = true;
+export class ApiCheckCode {
+    __public: boolean = true;
 
     /**
      * @method getMsgCheckCode
@@ -49,7 +49,7 @@ export default class ApiCheckCode {
      *   })
      * ```
      */
-    static getMsgCheckCode(params: MsgCheckCode) : Promise<MsgCheckCode> {
+    getMsgCheckCode(params: MsgCheckCode) : Promise<MsgCheckCode> {
         var type = 1;
         params.type = type;
         return API.checkcode.getMsgCheckCode(params)
@@ -77,7 +77,7 @@ export default class ApiCheckCode {
      *  })
      * ```
      */
-    static getPicCheckCode(params: PicCheckCode) : Promise<PicCheckCode> {
+    getPicCheckCode(params: PicCheckCode) : Promise<PicCheckCode> {
         var type = 1;
         params.type = type;
         return API.checkcode.getPicCheckCode(params)
@@ -110,7 +110,7 @@ export default class ApiCheckCode {
      *  })
      * ```
      */
-    static isMatchPicCheckCode(params: PicCheckCode) :Promise<boolean> {
+    isMatchPicCheckCode(params: PicCheckCode) :Promise<boolean> {
         return API.checkcode.isMatchPicCheckCode(params)
             .then(function(result: any) {
                 return Boolean(result);
@@ -142,7 +142,7 @@ export default class ApiCheckCode {
      * })
      * ```
      */
-    static isMatchMsgCheckCode(params: MsgCheckCode) : Promise<boolean> {
+    isMatchMsgCheckCode(params: MsgCheckCode) : Promise<boolean> {
         return API.checkcode.isMatchMsgCheckCode(params)
             .then(function(result: any) {
                 return Boolean(result);
@@ -150,4 +150,4 @@ export default class ApiCheckCode {
     }
 }
 
-//export= ApiCheckCode;
+export default new ApiCheckCode();

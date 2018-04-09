@@ -8,13 +8,13 @@ import {Models} from "_types/index";
 import {TripDetail, TripPlan} from "_types/tripPlan";
 const L = require("@jingli/language");
 
-class FinanceModule {
+export class FinanceModule {
 
-    static __public: boolean = true;
+    __public: boolean = true;
 
     @clientExport
     @requireParams(["tripPlanId", "code"])
-    static async getTripPlan(params: {tripPlanId: string, code: string}): Promise<TripPlan | null> {
+    async getTripPlan(params: {tripPlanId: string, code: string}): Promise<TripPlan | null> {
         let {tripPlanId, code} = params;
         if (!isValidCode(tripPlanId, code)) {
             throw L.ERR.PERMISSION_DENY();
@@ -24,7 +24,7 @@ class FinanceModule {
 
     @clientExport
     @requireParams(['tripPlanId', 'code'])
-    static async getTripDetails(params: {tripPlanId: string, code: string }) :Promise<TripDetail[]>{
+    async getTripDetails(params: {tripPlanId: string, code: string }) :Promise<TripDetail[]>{
         let {tripPlanId, code} = params;
         if (!isValidCode(tripPlanId, code)) {
             throw L.ERR.PERMISSION_DENY();
@@ -40,7 +40,7 @@ class FinanceModule {
 
     @clientExport
     @requireParams(['tripPlanId', 'code'])
-    static async getTripPlanStaff(params: {tripPlanId: string, code: string}) :Promise<any> {
+    async getTripPlanStaff(params: {tripPlanId: string, code: string}) :Promise<any> {
         let {tripPlanId, code} = params;
         if (!isValidCode(tripPlanId, code)) {
             throw L.ERR.PERMISSION_DENY();
@@ -54,7 +54,7 @@ class FinanceModule {
 
     @clientExport
     @requireParams(['tripPlanId', 'code', 'tripDetailId'])
-    static async getTripDetail(params: {tripPlanId: string, tripDetailId: string, code: string}) {
+    async getTripDetail(params: {tripPlanId: string, tripDetailId: string, code: string}) {
         let {tripPlanId, tripDetailId, code} = params;
         if (!isValidCode(tripPlanId, code)) {
             throw L.ERR.PERMISSION_DENY();
@@ -74,4 +74,4 @@ async function isValidCode(tripPlanId: string, code: string) {
     return false;
 }
 
-export= FinanceModule;
+export default new FinanceModule();

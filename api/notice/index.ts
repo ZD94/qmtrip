@@ -16,7 +16,7 @@ var API = require("@jingli/dnode-api");
 const noticeCols = Notice['$fieldnames'];
 const noticeAccountCols = NoticeAccount['$fieldnames'];
 
-class NoticeModule{
+export class NoticeModule{
     /**
      * 创建通知通告
      * @param data
@@ -80,7 +80,7 @@ class NoticeModule{
      */
     @clientExport
     @requireParams(["id"])
-    static async deleteNotice(params: {id: string}) : Promise<any>{
+    async deleteNotice(params: {id: string}) : Promise<any>{
         var id = params.id;
         var ah_delete = await Models.notice.get(id);
 
@@ -103,7 +103,7 @@ class NoticeModule{
      */
     @clientExport
     @requireParams(["id"], noticeCols)
-    static async updateNotice(params: Notice) : Promise<Notice>{
+    async updateNotice(params: Notice) : Promise<Notice>{
         var id = params.id;
 
         var ah = await Models.notice.get(id);
@@ -121,7 +121,7 @@ class NoticeModule{
      */
     @clientExport
     @requireParams(["id"])
-    static async getNotice(params: {id: string, companyId?: string}) : Promise<Notice>{
+    async getNotice(params: {id: string, companyId?: string}) : Promise<Notice>{
         let id = params.id;
         var ah = await Models.notice.get(id);
 
@@ -135,7 +135,7 @@ class NoticeModule{
      * @returns {*}
      */
     @clientExport
-    static async getNotices(params: FindOptions<Notice>): Promise<FindResult>{
+    async getNotices(params: FindOptions<Notice>): Promise<FindResult>{
         params.order = params.order || [['createdAt', 'desc']];
         let paginate = await Models.notice.find(params);
         let ids =  paginate.map(function(t){
@@ -150,7 +150,7 @@ class NoticeModule{
      * @returns {*}
      */
     @clientExport
-    static async statisticNoticeByType(): Promise<any>{
+    async statisticNoticeByType(): Promise<any>{
         var staff = await Staff.getCurrent();
         var sql1 = `select b.type, count(b.id) from notice.notice_accounts a right join notice.notices b " +
             "on a.notice_id = b.id where (a.account_id='${staff.id}' or b.send_type = ${ESendType.ALL_ACCOUNT}) " +
@@ -170,7 +170,7 @@ class NoticeModule{
      */
     @clientExport
     @requireParams(["accountId","noticeId",], noticeAccountCols)
-    static async createNoticeAccount (params: NoticeAccount) : Promise<NoticeAccount>{
+    async createNoticeAccount (params: NoticeAccount) : Promise<NoticeAccount>{
         var noticeAccount = NoticeAccount.create(params);
         var already = await Models.noticeAccount.find({where: {noticeId: params.noticeId, accountId: params.accountId}});
         if(already && already.length>0){
@@ -188,7 +188,7 @@ class NoticeModule{
      */
     @clientExport
     @requireParams(["id"])
-    static async deleteNoticeAccount(params: {id: string}) : Promise<any>{
+    async deleteNoticeAccount(params: {id: string}) : Promise<any>{
         var id = params.id;
         var ah_delete = await Models.noticeAccount.get(id);
         var notice = await Models.notice.get(ah_delete.noticeId);
@@ -209,7 +209,7 @@ class NoticeModule{
      */
     @clientExport
     @requireParams(["id"], noticeAccountCols)
-    static async updateNoticeAccount(params: NoticeAccount) : Promise<NoticeAccount>{
+    async updateNoticeAccount(params: NoticeAccount) : Promise<NoticeAccount>{
         var id = params.id;
 
         var ah = await Models.noticeAccount.get(id);
@@ -226,7 +226,7 @@ class NoticeModule{
      */
     @clientExport
     @requireParams(["id"])
-    static async getNoticeAccount(params: {id: string}) : Promise<NoticeAccount>{
+    async getNoticeAccount(params: {id: string}) : Promise<NoticeAccount>{
         let id = params.id;
         var ah = await Models.noticeAccount.get(id);
 
@@ -240,7 +240,7 @@ class NoticeModule{
      * @returns {*}
      */
     @clientExport
-    static async getNoticeAccounts(params: FindOptions<NoticeAccount>): Promise<FindResult>{
+    async getNoticeAccounts(params: FindOptions<NoticeAccount>): Promise<FindResult>{
         await Staff.getCurrent();
         let paginate = await Models.noticeAccount.find(params);
         let ids =  paginate.map(function(t){
@@ -252,4 +252,4 @@ class NoticeModule{
     /****************************************NoticeAccount end************************************************/
 }
 
-export = NoticeModule;
+export default new NoticeModule();

@@ -8,6 +8,7 @@ var ApiTravelBudget = require('api/travelBudget');
 import { EOrderStatus, TripDetail, ETripDetailStatus, EPayType, Project } from "_types/tripPlan";
 var request = require("request");
 var _ = require("lodash");
+import L from '@jingli/language';
 var cors = require('cors');
 const config = require("@jingli/config");
 const API = require("@jingli/dnode-api");
@@ -29,13 +30,17 @@ function resetTimeout(req: Request, res: Response, next?: NextFunction){
     req['clearTimeout']();
     next && next();
 }
-class Proxy {
+
+const projects = require('./proxy-project');
+const proxy = require("express-http-proxy");
+
+export class Proxy {
     /**
      * @method 注册获取订单详情事件
      * @param app {Express} 
      * @return {}
      */
-    static __initHttpApp(app: Application){
+    __initHttpApp(app: Application){
 
         app.options(/^\/(order|travel|mall|supplier|bill|permission)*/, cors(corsOptions), (req: Request, res: Response, next?: Function) => {         
             return res.sendStatus(200);
@@ -196,43 +201,56 @@ class Proxy {
         });
         
 
-        app.all(/^\/java.*$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function) => {
-            let {staffid} = req.headers;
-            let params =  req.body;
-            if(req.method == 'GET') {
-                params = req.query;
+        app.all(/^\/java\/([^\/]+)(.*)?$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function) => {
+            try {
+                let projectName = req.params[0];
+                let realUrl = req.params[1];
+                if (!realUrl) {
+                    realUrl = '/';
+                }
+                let { staffid } = req.headers;
+                let projectConfig = projects[projectName];
+                if (!projectConfig) {
+                    throw new L.ERROR_CODE_C(404, '您请求的地址不存在或者已关闭访问');
+                }
+                let { appId, appSecret } = projectConfig;
+                //计算转发过去的签名
+                let params = req.body;
+                let staff = await Models.staff.get(staffid);
+                let timestamp = Math.floor(Date.now() / 1000);
+                let sign = genSign(params, timestamp, appSecret)
+                //最终地址
+                let proxyUrl = config.java.getway;
+                let isHttps = false;
+                if (/^https:/.test(proxyUrl)) { 
+                    isHttps = true;
+                }
+                let parseReqBody = true;
+                if (req.headers['content-type'] && req.headers['content-type'].indexOf('multipart') >= 0) { 
+                    parseReqBody = false;
+                }
+                console.log("need parseReqBoyd ====>", parseReqBody)
+                // console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', req.url, 'appid: ', appid, '===request params: ', params)
+                let opts = {
+                    reqAsBuffer: true,
+                    parseReqBody: parseReqBody,
+                    https: isHttps,
+                    proxyReqPathResolver: (req: any) => { 
+                        let url = req.url.replace(/^\/java\//, '/');
+                        return '/svc' + url;
+                    },
+                    proxyReqOptDecorator: (proxyReqOpts: any, srcReq: any) => { 
+                        proxyReqOpts.headers['appid'] = appId;
+                        proxyReqOpts.headers['sign'] = sign;
+                        proxyReqOpts.headers['companyid'] = staff ? staff.companyId : '';
+                        proxyReqOpts.headers['accountid'] = staff ? staff.accountId : '';
+                        return proxyReqOpts;
+                    }
+                }
+                return proxy(proxyUrl, opts)(req, res, next);
+            } catch (err) { 
+                return next(err);
             }
-            let staff = await Models.staff.get(staffid);
-            let appSecret = config.pay.appSecret;
-            let pathstring = req.path;
-            let timestamp = Math.floor(Date.now()/1000);
-            pathstring = pathstring.replace("/java", '');
-            let sign = genSign(params, timestamp, appSecret)
-            let url = `${config.java.orderLink}${pathstring}`;
-            console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.java.appId, '===request params: ', params) 
-            let result = await new Promise((resolve, reject) => {
-                request({
-                    uri: url,
-                    body: req.body,
-                    json: true,
-                    method: req.method,
-                    qs: req.query,
-                    headers: {
-                        sign: sign,
-                        appid: config.java.appId,
-                        staffid: staff.id, 
-                        companyid: staff.companyId,
-                        accountid: staff.accountId
-                    }
-                }, (err: Error, resp: any, result: object) => {
-                    if (err) {
-                        console.log("-=========>err: ", err);
-                        reject(err);
-                    }
-                    resolve(result);
-                });
-            });
-            return res.json(result);
         });
 
         /**
@@ -270,7 +288,7 @@ class Proxy {
                 if(!staff) {
                     staff = await Models.staff.get(tripDetail.accountId);
                 }
-                listeningon = `${config.orderSysConfig.tripDetailMonitorUrl}/${tripDetail.id}`;
+                listeningon = `${config['java-jingli-order1'].tripDetailMonitorUrl}/${tripDetail.id}`;
                 if(req.body.jlPayType == EPayType.PERSONAL_PAY) {
                     await API.tripPlan.updateTripDetail({
                         id: tripDetailId,
@@ -307,7 +325,7 @@ class Proxy {
             // let auth : string = identify;
 
             let headers: {[index: string]: any} = {
-               appid: config.orderSysConfig.appId,
+               appid: config['java-jingli-order1'].appId,
                sign: null,
                auth: auth,
                supplier,
@@ -323,19 +341,19 @@ class Proxy {
             let timestamp = Math.floor(Date.now()/1000);       
             let sign: string;
             if(req.method == 'GET') {
-                sign = genSign(qs, timestamp, config.orderSysConfig.appSecret);
+                sign = genSign(qs, timestamp, config['java-jingli-order1'].appSecret);
                 headers['sign'] = sign;
                 _.assign(headers, addon)
             } else {
                 _.assign(headers, addon)
                 _.assign(body, addon);
-                sign = genSign(body, timestamp, config.orderSysConfig.appSecret);
+                sign = genSign(body, timestamp, config['java-jingli-order1'].appSecret);
                 headers['sign'] = sign;
             }
 
             let pathstring = req.path;
             pathstring = pathstring.replace("/order", '');
-            let url = `${config.orderSysConfig.orderLink}${pathstring}`;
+            let url = `${config['java-jingli-order1'].orderLink}${pathstring}`;
             let result:any;
             console.log("===========url: ", url, '===tripDetailId: ', tripDetailId, '====>method:', req.method, '=======> body: ', req.body);
             try{
@@ -374,199 +392,117 @@ class Proxy {
         });
         
         app.all(/^\/mall.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function)=> {
-            let {staffid} = req.headers;
-            let params =  req.body;
-            if(req.method == 'GET') {
-                params = req.query;
+            try {
+                let pathstring = req.path;
+                pathstring = pathstring.replace("/mall", "/java/java-jingli-mall");
+                let baseUrl = config.host ;
+                let opts = {
+                    reaAsBuffer: true,
+                    https: true,
+                    proxyReqPathResolver: (req: any) => {
+                        return pathstring
+                    }
+                };
+                return proxy(baseUrl, opts)(req, res, next);
+            } catch(err) {
+                return next(err)
             }
-            let staff = await Models.staff.get(staffid);
-            let appSecret = config.mall.appSecret;
-            let pathstring = req.path;
-            let timestamp = Math.floor(Date.now()/1000);
-            pathstring = pathstring.replace("/mall", '');
-            let sign = genSign(params, timestamp, appSecret)
-            let url = `${config.mall.orderLink}${pathstring}`;
-            console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.mall.appId, '===request params: ', params) 
-            let result = await new Promise((resolve, reject) => {
-                if (!staff) return reject(new Error('staff is null'))
-                request({
-                    uri: url,
-                    body: req.body,
-                    json: true,
-                    method: req.method,
-                    qs: req.query,
-                    headers: {
-                        sign: sign,
-                        appid: config.mall.appId,
-                        staffid: staff.id, 
-                        companyid: staff.companyId,
-                        accountid: staff.accountId
-                    }
-                }, (err: Error, resp: any, result: object) => {
-                    if (err) {
-                        console.log("-=========>err: ", err);
-                        reject(err);
-                    }
-                    resolve(result);
-                });
-            });
-            return res.json(result);
         });
 
         app.all(/^\/pay.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
-            let {staffid} = req.headers;
-            let params =  req.body;
-            if(req.method == 'GET') {
-                params = req.query;
+            try {
+                let pathstring = req.path;
+                pathstring = pathstring.replace("/pay", "/java/java-jingli-pay");
+                let baseUrl = config.host ;
+                let opts = {
+                    reaAsBuffer: true,
+                    https: true,
+                    proxyReqPathResolver: (req: any) => {
+                        return pathstring
+                    }
+                };
+                return proxy(baseUrl, opts)(req, res, next);
+            } catch(err) {
+                return next(err)
             }
-            let staff = await Models.staff.get(staffid);
-            let appSecret = config.pay.appSecret;
-            let pathstring = req.path;
-            let timestamp = Math.floor(Date.now()/1000);
-            pathstring = pathstring.replace("/pay", '');
-            let sign = genSign(params, timestamp, appSecret)
-            let url = `${config.pay.orderLink}${pathstring}`;
-            console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.pay.appId, '===request params: ', params) 
-            let result = await new Promise((resolve, reject) => {
-                request({
-                    uri: url,
-                    body: req.body,
-                    json: true,
-                    method: req.method,
-                    qs: req.query,
-                    headers: {
-                        sign: sign,
-                        appid: config.pay.appId,
-                        staffid: staff.id, 
-                        companyid: staff.companyId,
-                        accountid: staff.accountId
-                    }
-                }, (err: Error, resp: any, result: object) => {
-                    if (err) {
-                        console.log("-=========>err: ", err);
-                        reject(err);
-                    }
-                    resolve(result);
-                });
-            });
-            return res.json(result);
         });
-
 
         app.all(/^\/bill.*$/ ,cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function)=> {
-    
-            let {staffid} = req.headers;
-            let params =  req.body;
-            if(req.method == 'GET') {
-                params = req.query;
+            try {
+                let pathstring = req.path;
+                pathstring = pathstring.replace("/bill", "/java/java-jingli-order1");
+                let baseUrl = config.host ;
+                let opts = {
+                    reaAsBuffer: true,
+                    https: true,
+                    proxyReqPathResolver: (req: any) => {
+                        return pathstring
+                    }
+                };
+                return proxy(baseUrl, opts)(req, res, next);
+            } catch(err) {
+                return next(err)
             }
-            let appSecret = config.bill.appSecret;
-            let staff = await Models.staff.get(staffid)
-            let pathstring = req.path;
-            let timestamp = Math.floor(Date.now()/1000);
-            pathstring = pathstring.replace("/bill", '');
-            let sign = genSign(params, timestamp, appSecret)
-            let url = `${config.bill.orderLink}${pathstring}`;
-            console.log("==timestamp:  ", timestamp, "===>sign", sign, '====>url', url, 'appid: ', config.bill.appId, '===request params: ', params) 
-            let result = await new Promise((resolve, reject) => {
-                if (!staff) return reject(new Error('staff is null'))
-                return request({
-                    uri: url,
-                    body: req.body,
-                    json: true,
-                    method: req.method,
-                    qs: req.query,
-                    headers: {
-                        sign: sign,
-                        appid: config.bill.appId,
-                        staffid: staff.id, 
-                        companyid: staff.companyId,
-                        accountid: staff.accountId
-                    }
-                }, (err: Error, resp: any, result: object) => {
-                    if (err) {
-                        reject(err);
-                    }
-                    resolve(result);
-                });
-            });
-            return res.json(result);
         });
 
-        
         app.all(/^\/permission.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function)=> {
-      
-            let {staffid} = req.headers;
-            let params =  req.body;
-            if(req.method == 'GET') {
-                params = req.query;
-            }
-            let staff = await Models.staff.get(staffid);
-            if (!staff) return res.sendStatus(404)
-            let role: any = null ;
+            try {
+                let {staffid} = req.headers;
+                let staff = await Models.staff.get(staffid);
+                if (!staff) return res.sendStatus(404)
+                let role: any = null ;
 
-            if(staff.roleId == EStaffRole.OWNER) {
-                role = 'defaultCreater'; //表示创建者身份
-            }
-            if(staff.roleId == EStaffRole.ADMIN) {
-                role = 'manager'; //表示管理员身份
-            }
-
-            if(!role){
-                let managers: Department[] | Project[] = await Models.department.find({where: {managerId: staff.id}});
-                if(managers && managers.length) role = 'departmentManager';
-                if(!role){
-                    managers =  await Models.project.find({where: {managerId: staff.id}})
-                    if(managers && managers.length)  role = 'projectManager';
+                if(staff.roleId == EStaffRole.OWNER) {
+                    role = 'defaultCreater'; //表示创建者身份
                 }
+                if(staff.roleId == EStaffRole.ADMIN) {
+                    role = 'manager'; //表示管理员身份
+                }
+
+                if(!role){
+                    let managers: Department[] | Project[] = await Models.department.find({where: {managerId: staff.id}});
+                    if(managers && managers.length) role = 'departmentManager';
+                    if(!role){
+                        managers =  await Models.project.find({where: {managerId: staff.id}})
+                        if(managers && managers.length)  role = 'projectManager';
+                    }
+                }
+                let pathstring = req.path;
+                pathstring = pathstring.replace("/permission", "/java/java-jingli-auth");
+                let baseUrl = config.host ;
+                let opts = {
+                    reaAsBuffer: true,
+                    https: true,
+                    proxyReqPathResolver: (req: any) => {
+                        return pathstring
+                    },
+                    proxyReqOptDecorator: (proxyReqOpts: any, srcReq: any) => {
+                        proxyReqOpts.headers['role'] = role
+                        return proxyReqOpts
+                    }
+                };
+                return proxy(baseUrl, opts)(req, res, next);
+            } catch(err) {
+                return next(err)
             }
-         
-            let appSecret = config.permission.appSecret;
-            let pathstring = req.path;
-            let timestamp = Math.floor(Date.now()/1000);
-            pathstring = pathstring.replace("/permission", '');
-            let sign = genSign(params, timestamp, appSecret);
-            let url = `${config.permission.orderLink}${pathstring}`;
-            console.log("==timestamp:  ", timestamp, "===>sign:  ", sign, '====>url:  ', url, 'appid: ', config.permission.appId, '===request params: ', params);
-            let result = await new Promise((resolve, reject) => {
-                if (!staff) return reject(new Error('staff is null'))
-                return request({
-                    uri: url,
-                    body: req.body,
-                    json: true,
-                    method: req.method,
-                    qs: req.query,
-                    headers: {
-                        sign: sign,
-                        appid: config.permission.appId,
-                        staffid: staff.id,
-                        companyid: staff.companyId,
-                        accountid: staff.accountId,
-                        role: role
-                    }
-                }, (err: Error, resp: any, result: object) => {
-                    if (err) {
-                        return reject(err);
-                    }
-                    resolve(result);
-                });
-            });
-            return res.json(result);
         });
     }
 }
-export default Proxy;
+export default new Proxy();
 
 async function verify(req: Request, res: Response, next?: Function) {
     if(req.method == 'OPTIONS') {
         return next && next();
     }
-    let {authstr, staffid} = req.headers;
+    let { authstr, staffid } = req.headers;
+    if (!authstr) { 
+        return res.sendStatus(403);
+    }
     let token = parseAuthString(authstr);
     let verification: AuthResponse = await API.auth.authentication(token);
     if(!verification) {
         console.log("auth failed", JSON.stringify(req.cookies))
-        return res.sendStatus(401);
+        return res.sendStatus(403);
     }
     try{
         await API.auth.setCurrentStaffId({
@@ -574,9 +510,9 @@ async function verify(req: Request, res: Response, next?: Function) {
             staffId   : staffid
         })
     } catch(err) { 
-        return res.sendStatus(401);
+        return res.sendStatus(403);
     }
-    next && next();
+    return next && next();
 }
 var verifyToken = CLSNS.bind(verify, CLSNS.createContext())
 
