@@ -192,7 +192,7 @@ class NotifyTemplate{
             let content;
             let title = this.appmessage.title(data);
             let description = this.appmessage.text(data);
-            const msg = this.appmessage.msg(data);
+            const msg = this.appmessage.msg && this.appmessage.msg(data) || '';
             if(this.appmessage.html){
                 let context = Object.create(data);
                 context.include = function(incname: string){

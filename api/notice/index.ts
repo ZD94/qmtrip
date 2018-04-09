@@ -24,10 +24,10 @@ export class NoticeModule{
      */
     @clientExport
     @requireParams(["title","content","description", "sendType", "msg"], noticeCols)
-    static async createNotice (params: Notice) : Promise<Notice>{
+    async createNotice (params: Notice) : Promise<Notice>{
         const { description } = params
         delete params.description
-        var notice = Notice.create({...params, description: params.msg});
+        var notice = Notice.create({...params, description: params.msg || description});
         result = await notice.save();
         var result:Notice;
         var link = '#/notice/detail?noticeId='+result.id;
