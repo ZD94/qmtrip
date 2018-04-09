@@ -192,7 +192,7 @@ class NotifyTemplate{
             let content;
             let title = this.appmessage.title(data);
             let description = this.appmessage.text(data);
-            const notice = this.appmessage.msg(data);
+            const msg = this.appmessage.msg(data);
             if(this.appmessage.html){
                 let context = Object.create(data);
                 context.include = function(incname: string){
@@ -200,7 +200,7 @@ class NotifyTemplate{
                 };
                 content = this.appmessage.html(context);
             }
-            await API.notice.createNotice({title, content, description, notice, staffId: to.accountId, sendType: ESendType.ONE_ACCOUNT, type: data.noticeType || ENoticeType.SYSTEM_NOTICE});
+            await API.notice.createNotice({title, content, description, msg, staffId: to.accountId, sendType: ESendType.ONE_ACCOUNT, type: data.noticeType || ENoticeType.SYSTEM_NOTICE});
             logger.info('成功发送通知:', data.account.name, this.name);
         } catch(err) {
             logger.error(err);
