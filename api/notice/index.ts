@@ -23,9 +23,11 @@ class NoticeModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["title","content","description", "sendType"], noticeCols)
+    @requireParams(["title","content","description", "sendType", "msg"], noticeCols)
     static async createNotice (params: Notice) : Promise<Notice>{
-        var notice = Notice.create(params);
+        const { description } = params
+        delete params.description
+        var notice = Notice.create({...params, description: params.msg});
         result = await notice.save();
         var result:Notice;
         var link = '#/notice/detail?noticeId='+result.id;
@@ -41,7 +43,7 @@ class NoticeModule{
                 link = result.content.substring(9);
             }
             if(jpushId){
-                await API.jpush.pushAppMessage({content: result.description, title: result.title, link: link, jpushId: jpushId});
+                await API.jpush.pushAppMessage({content: description, title: result.title, link, jpushId});
             }
             
         }else if(params.sendType == ESendType.MORE_ACCOUNT){
@@ -61,11 +63,11 @@ class NoticeModule{
                 }
             }))
 
-            await API.jpush.pushAppMessage({content: result.description, title: result.title, link: link, jpushId: jpushIds});
+            await API.jpush.pushAppMessage({content: description, title: result.title, link, jpushId: jpushIds});
 
         }else if(params.sendType == ESendType.ALL_ACCOUNT){
             var jpushId = JPush.ALL;
-            await API.jpush.pushAppMessage({content: result.description, title: result.title, link: link, jpushId: jpushId});
+            await API.jpush.pushAppMessage({content: description, title: result.title, link, jpushId});
         }
         return result;
     }
