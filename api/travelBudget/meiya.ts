@@ -12,6 +12,7 @@ var request = require("request-promise");
 let moment = require("moment");
 import {MTrainLevel, MPlaneLevel} from "_types";
 import { IHotel, IFlightAgent } from '_types/travelbudget';
+import { L } from '@jingli/language';
 
 
 /* 判断是否需要美亚数据 */
@@ -180,58 +181,50 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
  */
 export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IMeiyaAuthData[]) {
     let data: Array<IMeiyaHotel> = [];
-    // let hotelData: {[index: string]: Array<IMeiyaHotel>} = {};
-    // let destination = await API.place.getCityInfo({ cityCode: params.cityId });
     params.checkInDate = moment(params.checkInDate).format("YYYY-MM-DD");
     params.checkOutDate = moment(params.checkOutDate).format("YYYY-MM-DD");
     let urlHotel = config['java-jingli-order1'].orderLink + "/tmc/searchHotel";
-    console.log("urlHotel =====>", urlHotel);
     let meiyaResult;
+    console.log("urlHotel==>", urlHotel)
     for (let item of authData) {
         let info = item.identify;
         let sname = item.sname;
         let agentType = item.agentType;
-        // console.log('agenttype---->   ', agentType, 'typeof------  ', typeof agentType);
 
-        meiyaResult = await request({
-            url: urlHotel,
-            method: "POST",
-            body: {
-                city: params.cityId,
-                checkInDate: params.checkInDate,
-                checkOutDate: params.checkOutDate,
-                pageSize: params.pageSize,
-                pageNo: params.pageNo
-            },
-            // qs: meiyaParam,
-            headers: {
-                auth: meiyaAuth(info),
-                supplier: sname,
-                agentType: (agentType && agentType == '2') ? AgentType.JL : AgentType.CORP
-
-            }
-        }).catch((e: Error) => {
-            console.log(e)
-        });
+        let body = {
+            city: params.cityId,
+            checkInDate: params.checkInDate,
+            checkOutDate: params.checkOutDate,
+            pageSize: params.pageSize,
+            pageNo: params.pageNo
+        }
+        console.log("body==>", body);
+        let headers = {
+            auth: meiyaAuth(info),
+            supplier: sname,
+            agentType: (agentType && agentType == '2') ? AgentType.JL : AgentType.CORP
+        }
+        console.log("headers", headers);
         try {
+            meiyaResult = await request({
+                url: urlHotel,
+                method: "POST",
+                body: body,
+                // qs: meiyaParam,
+                headers: headers,
+            })
             meiyaResult = JSON.parse(meiyaResult);
-            if(meiyaResult.code == 0){
-                // hotelData[sname] = meiyaResult.data;
+            if (meiyaResult.code == 0) {
                 data.push(...meiyaResult.data);
-                // meiyaResult.data = data
-            }else{
-                console.log(meiyaResult)
+            } else { 
+                throw new L.ERROR_CODE_C(meiyaResult.code, '获取供应商数据错误');
             }
-        } catch (e) {
-            console.log(e)
+        } catch (err) { 
+            console.error('获取美亚数据时错误:', err);
+            throw new L.ERROR_CODE_C(500, '获取美亚数据时错误');
         }
     }
-        return data;
-    // if (meiyaResult && meiyaResult.code == 0) {
-    //     return meiyaResult.data;
-    // } else {
-    //     return [];
-    // }
+    return data;
 }
 
 
