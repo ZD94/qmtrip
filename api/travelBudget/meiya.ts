@@ -195,8 +195,8 @@ export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IM
             city: params.cityId,
             checkInDate: params.checkInDate,
             checkOutDate: params.checkOutDate,
-            pageSize: params.pageSize,
-            pageNo: params.pageNo
+            pageSize: params.pageSize || 50,
+            pageNo: params.pageNo || 1,
         }
         console.log("body==>", body);
         let headers = {
