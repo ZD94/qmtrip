@@ -64,8 +64,9 @@ class NotifyTemplate{
         title?: Function;
         html?: Function;
         text?: Function;
+        msg?: Function;
     };
-    constructor(public name: string, sms_text: string, wechat_json: string, email_title: string, email_html: string, email_text: string, appmessage_title: string, appmessage_html: string, appmessage_text: string){
+    constructor(public name: string, sms_text: string, wechat_json: string, email_title: string, email_html: string, email_text: string, appmessage_title: string, appmessage_html: string, appmessage_text: string, appmessage_msg: string){
         if(sms_text)
             this.sms = _.template(sms_text, {imports: common_imports});
         if(wechat_json){
@@ -88,6 +89,8 @@ class NotifyTemplate{
                 this.appmessage.html = _.template(appmessage_html, {imports: common_imports});
             if(appmessage_text)
                 this.appmessage.text = _.template(appmessage_text, {imports: common_imports});
+            if(appmessage_msg)
+                this.appmessage.msg = _.template(appmessage_msg, {imports: common_imports});
         }
     }
 
@@ -189,6 +192,7 @@ class NotifyTemplate{
             let content;
             let title = this.appmessage.title(data);
             let description = this.appmessage.text(data);
+            const msg = this.appmessage.msg && this.appmessage.msg(data) || '';
             if(this.appmessage.html){
                 let context = Object.create(data);
                 context.include = function(incname: string){
@@ -196,7 +200,7 @@ class NotifyTemplate{
                 };
                 content = this.appmessage.html(context);
             }
-            await API.notice.createNotice({title: title, content: content, description: description, staffId: to.accountId, sendType: ESendType.ONE_ACCOUNT, type: data.noticeType || ENoticeType.SYSTEM_NOTICE});
+            await API.notice.createNotice({title, content, description, msg, staffId: to.accountId, sendType: ESendType.ONE_ACCOUNT, type: data.noticeType || ENoticeType.SYSTEM_NOTICE});
             logger.info('成功发送通知:', data.account.name, this.name);
         } catch(err) {
             logger.error(err);
@@ -212,6 +216,7 @@ async function loadTemplate(name: string, dir: string) {
         tryReadFile(path.join(dir, 'appmessage.title')),
         tryReadFile(path.join(dir, 'appmessage.html')),
         tryReadFile(path.join(dir, 'appmessage.txt')),
+        tryReadFile(path.join(dir, 'appmessage.msg')),
         tryReadFile(path.join(dir, 'sms.txt')),
         tryReadFile(path.join(dir, 'wechat.json')),
     ];
@@ -222,10 +227,11 @@ async function loadTemplate(name: string, dir: string) {
         appmessage_title,
         appmessage_html,
         appmessage_text,
+        appmessage_msg,
         sms_text,
         wechat_json,
     ] = await Promise.all(loadqueue);
-    return new NotifyTemplate(name, sms_text, wechat_json, email_title, email_html, email_text, appmessage_title, appmessage_html, appmessage_text);
+    return new NotifyTemplate(name, sms_text, wechat_json, email_title, email_html, email_text, appmessage_title, appmessage_html, appmessage_text, appmessage_msg);
 }
 async function loadTemplates(): Promise<NotifyTemplateMap> {
     var dirs = [];
