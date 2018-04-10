@@ -113,8 +113,10 @@ deploy:master:
 
 deploy:test:
   <<: *deploy_template
+  when: manual
   only:
     - /^test$/
+    - /^preview$/
     - /^review\//
   variables:
     <<: *common_variables
@@ -126,9 +128,9 @@ deploy:test:
 
 deploy:release:
   <<: *deploy_template
+  when: manual
   only:
     - /^release$/
-  when: manual
   variables:
     <<: *common_variables
     ENVIROMENT_NAME: release
