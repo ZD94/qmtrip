@@ -1,1 +1,1 @@
-<%=account.name || '' %>,您好，您有1张<%=tripType || '' %>票据被审核通过
+<%=account.name || '' %>,您好，您有<%= notPassedInvoices %>张票据被审核通过
