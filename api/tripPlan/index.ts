@@ -721,7 +721,7 @@ export class TripPlanModule {
                 switch (item.status) {
                     case EInvoiceStatus.WAIT_AUDIT:
                         allInvoicePass = false;
-                        // isNeedMsg = false;
+                        isNeedMsg = false;
                         break;
                     case EInvoiceStatus.AUDIT_PASS:
                         break;
@@ -875,13 +875,14 @@ export class TripPlanModule {
                     finalUrl = encodeURIComponent(finalUrl);
                     appMessageUrl = `#/judge-permission/index?id=${tripPlan.id}&modelName=tripPlan&finalUrl=${finalUrl}`;
                 }
-
+                const notPassedInvoices = tripDetailInvoices.filter(x => x.status == EInvoiceStatus.AUDIT_FAIL).length
                 try {
                     await API.notify.submitNotify({
                         key: templateName,
                         userId: staff.id,
                         values: {
-                            tripPlan: tripPlan, tripType: InvoiceFeeTypeNames[invoice.type], detailUrl: self_url, appMessageUrl: appMessageUrl,
+                            tripPlan: tripPlan, tripType: InvoiceFeeTypeNames[invoice.type],
+                            detailUrl: self_url, appMessageUrl, notPassedInvoices,
                             noticeType: ENoticeType.TRIP_APPROVE_NOTICE, reason: "图片不清楚"
                         }
                     });

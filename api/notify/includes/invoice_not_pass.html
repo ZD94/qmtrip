@@ -12,7 +12,7 @@
             <% if (tripApprove.deptCity) { %>
                 <%= tripApprove.deptCity %>-
             <% } %>
-            <% if (arrivalCities.length == 1) { %>
+            <% if (!tripApprove.deptCity && arrivalCities.length == 1) { %>
                 <%= arrivalCities[0].name %>(仅住宿)
             <% } else { %>
                 <%= arrivalCities && arrivalCities.map(c=>c.name).join('-') %>
