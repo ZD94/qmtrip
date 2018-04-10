@@ -20,7 +20,7 @@ const R = require('lodash/fp')
 import { requireParams, clientExport } from '@jingli/dnode-api/dist/src/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, TripPlanLog, ETripType, EAuditStatus, EInvoiceType,
-    EPayType, ESourceType, EInvoiceStatus, TrafficEInvoiceFeeTypes, ProjectStaff, EProjectStatus, ETripDetailStatus, EOrderStatus
+    EPayType, ESourceType, EInvoiceStatus, TrafficEInvoiceFeeTypes, ProjectStaff, EProjectStatus, ETripDetailStatus, EOrderStatus, InvoiceFeeTypeNames
 } from "_types/tripPlan";
 import {Models} from "_types";
 import {FindResult} from "common/model/interface";
@@ -721,7 +721,7 @@ export class TripPlanModule {
                 switch (item.status) {
                     case EInvoiceStatus.WAIT_AUDIT:
                         allInvoicePass = false;
-                        isNeedMsg = false;
+                        // isNeedMsg = false;
                         break;
                     case EInvoiceStatus.AUDIT_PASS:
                         break;
@@ -881,7 +881,7 @@ export class TripPlanModule {
                         key: templateName,
                         userId: staff.id,
                         values: {
-                            tripPlan: tripPlan, detailUrl: self_url, appMessageUrl: appMessageUrl,
+                            tripPlan: tripPlan, tripType: InvoiceFeeTypeNames[invoice.type], detailUrl: self_url, appMessageUrl: appMessageUrl,
                             noticeType: ENoticeType.TRIP_APPROVE_NOTICE, reason: "图片不清楚"
                         }
                     });
