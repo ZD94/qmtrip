@@ -1,1 +1,1 @@
-您【<%=tripApprove.deptCity || '' %>】到【<%=tripApprove.arrivalCity || '' %>】的出差申请已审核通过,点击此处查看
+您<%=tripApprove.deptCity && `【${tripApprove.deptCity}】` %>到【<%= arrivalCities.map(citi => citi.name).join("、") %>】的出差申请已审核通过,点击此处查看

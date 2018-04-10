@@ -21,11 +21,9 @@ export = async function transform(values: {
     isAutoApprove: boolean,
     staffs: string[]
 }): Promise<any> {
-    let tripApprove = values.tripApprove;
-    let tripPlan = values.tripPlan;
+    let { tripApprove, tripPlan, companyId } = values
     let cityMap: any = {};
     let approveUserMap: any = {};
-    let companyId = values.companyId;
     if (tripPlan && tripPlan.id) {
         tripApprove = await API.tripApprove.retrieveDetailFromApprove({ approveNo: tripPlan.id })
         if (tripApprove)
@@ -98,7 +96,7 @@ export = async function transform(values: {
         values.tripApprove['applicant'] = staffNames.length > 1
             ? staffNames[0] + ` 等${staffNames.length}人`
             : staffNames[0]
-        const { projectId, costCenterId } = tripApprove
+        const { projectId = tripPlan.projectId, costCenterId = tripPlan.costCenterId } = tripApprove
         const costOwnership = projectId && await Models.project.get(projectId) || costCenterId && await Models.costCenter.get(costCenterId)
         values.tripApprove['costOwnership'] = costOwnership && costOwnership.name || ''
     }
