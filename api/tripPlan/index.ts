@@ -875,7 +875,7 @@ export class TripPlanModule {
                     finalUrl = encodeURIComponent(finalUrl);
                     appMessageUrl = `#/judge-permission/index?id=${tripPlan.id}&modelName=tripPlan&finalUrl=${finalUrl}`;
                 }
-                const notPassedInvoices = tripDetailInvoices.filter(x => x.status == EInvoiceStatus.AUDIT_FAIL).length
+                const notPassedInvoices = invoices.filter(x => x.status == EInvoiceStatus.AUDIT_FAIL).length
                 try {
                     await API.notify.submitNotify({
                         key: templateName,
