@@ -849,7 +849,7 @@ export function similarityMatch(params: {
     ignores?: Array<string>,
     minimalLength?: number
 }): boolean {
-    let {base, target, minimalLength = 8, ignores} = params;
+    let {base, target, ignores} = params;
     if (!base || !target) return false;
     if (ignores) {
         ignores.forEach((ignoreString: any) => {
@@ -863,40 +863,42 @@ export function similarityMatch(params: {
         });
     }
     //互换，设置base为较长的字符
-    if (base.length - target.length < 0) {
-        let temp = target;
-        target = base;
-        base = temp;
-    }
-    let similarity = 0;
-    if (base.length < minimalLength || target.length < minimalLength) {
+    // if (base.length - target.length < 0) {
+    //     let temp = target;
+    //     target = base;
+    //     base = temp;
+    // }
+    // let similarity = 0;
+    // if (base.length < minimalLength || target.length < minimalLength) {
         //两字符串长度关系，相似度加(减)0.1
-        if (target.length / base.length >= 0.7) {
-            similarity += 0.05;
-        } else {
-            similarity -= 0.05;
-        }
-    }
+    //     if (target.length / base.length >= 0.7) {
+    //         similarity += 0.05;
+    //     } else {
+    //         similarity -= 0.05;
+    //     }
+    // }
     //满足子字符串关系，相似度添加0.8
-    if (base.indexOf(target) > -1)
-        similarity += 0.8;
+    // if (base.indexOf(target) > -1)
+    //     similarity += 0.8;
 
-    //单个字符进行位置匹配, 总相似度不超过0.2
-    for (let i = 0; i < target.length; i++) {
-        let actualPos = (base.indexOf(target.charAt(i)) + 1) / base.length;
-        if (actualPos <= 0) continue;
-        let expectedPos = (i + 1) / target.length;
-        if (Math.abs(actualPos - expectedPos) <= 0.4) {
-            similarity += 0.6 / target.length;
-        }
-        if (Math.abs(actualPos - expectedPos) > 0.4) {
-            similarity -= 0.2 / target.length;
+    // //单个字符进行位置匹配, 总相似度不超过0.2
+    // for (let i = 0; i < target.length; i++) {
+    //     let actualPos = (base.indexOf(target.charAt(i)) + 1) / base.length;
+    //     if (actualPos <= 0) continue;
+    //     let expectedPos = (i + 1) / target.length;
+    //     if (Math.abs(actualPos - expectedPos) <= 0.4) {
+    //         similarity += 0.6 / target.length;
+    //     }
+    //     if (Math.abs(actualPos - expectedPos) > 0.4) {
+    //         similarity -= 0.2 / target.length;
 
-        }
-    }
+    //     }
+    // }
     // console.log("=====hotelmatch========similarity: ", similarity)
-    if (similarity >= 0.5) //暂定0.5，则返回
-        return true;
+    // if (similarity >= 0.5) //暂定0.5，则返回
+    //     return true;
+    if (base == target) 
+        return true
     return false;
 }
 
