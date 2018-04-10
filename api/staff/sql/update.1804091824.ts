@@ -23,7 +23,7 @@ async function dealData(DB: Sequelize, t: Transaction) {
                 pinyin = _pinyin.toLowerCase().replace(/\s/g, "");
                 let _letter = _pinyin.match(/[A-Z]/g);
                 if(_letter){
-                    _letter = _letter.join('')
+                    _letter = _letter.join('');
                     letter = _letter.toLowerCase();
                 }
             }
