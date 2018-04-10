@@ -467,8 +467,17 @@ function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHot
             }
         ],
         hotelPicture,
+        "hotelMinPrice":meiyaHotelData.hotelMinPrice,
+
         "latitude": meiyaHotelData.latitude,
         "longitude": meiyaHotelData.longitude,
+        "baidulongitude":meiyaHotelData.baidulongitude,
+        "baidulatitude":meiyaHotelData.baidulatitude,
+        "category":meiyaHotelData.category,
+        "trafficStation":meiyaHotelData.trafficStation,
+        "districtZoneName":meiyaHotelData.districtZoneName,
+        "businessZoneName":meiyaHotelData.businessZoneName,
+        "bedType":meiyaHotelData.bedType,
         "shortName": meiyaHotelData.cnName,
         "checkInDate": originalData.checkInDate,
         "checkOutDate": originalData.checkOutDate,
@@ -1049,6 +1058,13 @@ export interface IMeiyaHotel {
     hotelUrl?: string;
     hotelPicture?:string
     hotelOpeningTime?: string | Date;
+    baidulongitude?:string;
+    baidulatitude?:string;
+    category?:string;
+    trafficStation?:string;
+    districtZoneName?:string;
+    businessZoneName?:string;
+    bedType?:string;
     hotelDecorationTime?: string | Date;
     RecommendCode?: string;
     hotelBusinessCircle?: any;
