@@ -1316,7 +1316,7 @@ export class ApiAuth {
 
     @clientExport
     @requireParams(['mobile'])
-    async loginByAgent(params: {mobile: string}) {
+    async loginForAgent(params: {mobile: string}) {
         const accounts = await Models.account.find({
             where: { mobile: params.mobile }
         })
