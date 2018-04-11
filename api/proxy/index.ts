@@ -1,8 +1,6 @@
 import {Request, Response, Application, NextFunction} from "express-serve-static-core";
-import {parseAuthString} from "_types/auth/auth-cert";
 import { Staff, EStaffRole } from "_types/staff";
 import { Models } from "_types";
-import { AuthResponse } from '_types/auth';
 import {getCompanyTokenByAgent} from '../restful';
 var ApiTravelBudget = require('api/travelBudget');
 import { EOrderStatus, TripDetail, ETripDetailStatus, EPayType, Project } from "_types/tripPlan";
