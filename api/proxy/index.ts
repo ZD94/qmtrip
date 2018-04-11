@@ -504,21 +504,21 @@ async function verify(req: Request, res: Response, next?: Function) {
     }
     let { authstr, staffid } = req.headers;
     if (!authstr) { 
-        return res.sendStatus(403);
+        throw new L.ERROR_CODE_C(403, '缺少登录凭证');
     }
     let token = parseAuthString(authstr);
     let verification: AuthResponse = await API.auth.authentication(token);
     if(!verification) {
-        console.log("auth failed", JSON.stringify(req.cookies))
-        return res.sendStatus(403);
+        throw new L.ERROR_CODE_C(403, '登录凭证已失效');
     }
     try{
         await API.auth.setCurrentStaffId({
             accountId : verification.accountId,
             staffId   : staffid
         })
-    } catch(err) { 
-        return res.sendStatus(403);
+    } catch (err) { 
+        logger.error(err);
+        throw new L.ERROR_CODE_C(403, '员工信息不存在或者已被删除');
     }
     return next && next();
 }
