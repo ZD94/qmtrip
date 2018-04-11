@@ -421,19 +421,12 @@ export class Proxy {
             }
         });
 
-        app.all(/^\/pay.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
+        app.all(/^\/pay\/(.*)$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next: Function)=> {
             try {
-                let pathstring = req.path;
-                pathstring = pathstring.replace("/pay", "/java/java-jingli-pay");
-                let baseUrl = config.host ;
-                let opts = {
-                    reaAsBuffer: true,
-                    https: true,
-                    proxyReqPathResolver: (req: any) => {
-                        return pathstring
-                    }
-                };
-                return proxy(baseUrl, opts)(req, res, next);
+                req.params[1] = req.params[0];
+                req.params[0] = 'java-jingli-pay';
+                req.url = '/java/' + req.params[0] + '/' + req.params[1];
+                return handleJavaProxy(req, res, next);
             } catch(err) {
                 return next(err)
             }
@@ -475,7 +468,7 @@ export class Proxy {
                 }
                 req.headers['role'] = role;
                 req.params[1] = req.params[0];
-                req.params[0] = '/java/java-jingli-auth';
+                req.params[0] = 'java-jingli-auth';
                 req.url = '/java/' + req.params[0] + '/' + req.params[1];
                 return handleJavaProxy(req, res, next);
             } catch (err) {
