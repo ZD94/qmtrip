@@ -1156,6 +1156,13 @@ export class CompanyModule {
         await company.save()
     }
 
+    @clientExport
+    async setReservePreference(params: { companyId: string, days: number }) {
+        const company = await Models.company.get(params.companyId)
+        company.reservePreference = params.days
+        return await company.save()
+    }
+
     /* ====================== END ======================= */
 
 
