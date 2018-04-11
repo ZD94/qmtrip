@@ -18,6 +18,7 @@ import { Department } from '_types/department';
 import Logger from '@jingli/logger';
 import { ITMCSupplier, TMCStatus } from 'api/travelBudget';
 import { AgentType } from 'api/travelBudget/meiya';
+import { parseAuthString, AuthResponse } from '_types/auth';
 const logger = new Logger("proxy");
 const corsOptions = { 
     origin: true, 
@@ -505,27 +506,27 @@ export class Proxy {
 export default new Proxy();
 
 async function verify(req: Request, res: Response, next?: Function) {
-    // if(req.method == 'OPTIONS') {
-    //     return next && next();
-    // }
-    // let { authstr, staffid } = req.headers;
-    // if (!authstr) { 
-    //     throw new L.ERROR_CODE_C(403, '缺少登录凭证');
-    // }
-    // let token = parseAuthString(authstr);
-    // let verification: AuthResponse = await API.auth.authentication(token);
-    // if(!verification) {
-    //     throw new L.ERROR_CODE_C(403, '登录凭证已失效');
-    // }
-    // try{
-    //     await API.auth.setCurrentStaffId({
-    //         accountId : verification.accountId,
-    //         staffId   : staffid
-    //     })
-    // } catch (err) { 
-    //     logger.error(err);
-    //     throw new L.ERROR_CODE_C(403, '员工信息不存在或者已被删除');
-    // }
+    if(req.method == 'OPTIONS') {
+        return next && next();
+    }
+    let { authstr, staffid } = req.headers;
+    if (!authstr) { 
+        throw new L.ERROR_CODE_C(403, '缺少登录凭证');
+    }
+    let token = parseAuthString(authstr);
+    let verification: AuthResponse = await API.auth.authentication(token);
+    if(!verification) {
+        throw new L.ERROR_CODE_C(403, '登录凭证已失效');
+    }
+    try{
+        await API.auth.setCurrentStaffId({
+            accountId : verification.accountId,
+            staffId   : staffid
+        })
+    } catch (err) { 
+        logger.error(err);
+        throw new L.ERROR_CODE_C(403, '员工信息不存在或者已被删除');
+    }
     return next && next();
 }
 var verifyToken = CLSNS.bind(verify, CLSNS.createContext())
