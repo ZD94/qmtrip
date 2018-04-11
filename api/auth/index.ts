@@ -847,7 +847,7 @@ export class ApiAuth {
             promoCode: params.promoCode,
             referrerMobile: referrerMobile,
         });
-        if (params.source == 1) {
+        // if (params.source == 1) {
             let companyId = result.company.id
             const staff = await Models.staff.get(result.staffId)
             const companyRegions: ICompanyRegion[] = _.filter((cr: ICompanyRegion) => !/(一|二)类/.test(cr.name), _.prop('data', await API.travelPolicy.getCompanyRegions({companyId})))
@@ -872,7 +872,7 @@ export class ApiAuth {
             staff.travelPolicyId = travelPolicies[0].id
             promises.push(staff.save())
             await Promise.all(promises)
-        }
+        // }
         return result;
     }
 
