@@ -249,6 +249,7 @@ export class Proxy {
                 }
                 return proxy(proxyUrl, opts)(req, res, next);
             } catch (err) { 
+                logger.error('转发java请求时失败:', req.originalUrl, err);
                 return next(err);
             }
         });
