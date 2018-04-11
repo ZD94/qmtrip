@@ -395,10 +395,14 @@ export class Proxy {
             try {
                 let pathstring = req.path;
                 pathstring = pathstring.replace("/mall", "/java/java-jingli-mall");
-                let baseUrl = config.host ;
+                let baseUrl = config.host;
+                let isHttp = false;
+                if (/^https:/.test(baseUrl)) { 
+                    isHttp = true;
+                }
                 let opts = {
                     reaAsBuffer: true,
-                    https: true,
+                    https: isHttp,
                     proxyReqPathResolver: (req: any) => {
                         return pathstring
                     }
@@ -469,10 +473,14 @@ export class Proxy {
                 }
                 let pathstring = req.path;
                 pathstring = pathstring.replace("/permission", "/java/java-jingli-auth");
-                let baseUrl = config.host ;
+                let baseUrl = config.host;
+                let isHttp = false;
+                if (/^https:/.test(baseUrl)) { 
+                    isHttp = true;
+                }
                 let opts = {
                     reaAsBuffer: true,
-                    https: true,
+                    https: isHttp,
                     proxyReqPathResolver: (req: any) => {
                         return pathstring
                     },
