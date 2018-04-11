@@ -847,32 +847,33 @@ export class ApiAuth {
             promoCode: params.promoCode,
             referrerMobile: referrerMobile,
         });
-        // if (params.source == 1) {
-            let companyId = result.company.id
-            const staff = await Models.staff.get(result.staffId)
-            const companyRegions: ICompanyRegion[] = _.filter((cr: ICompanyRegion) => !/(一|二)类/.test(cr.name), _.prop('data', await API.travelPolicy.getCompanyRegions({companyId})))
-            const travelPolicies = _.pluck('data', await Promise.all([API.travelPolicy.createTravelPolicy({companyId, name: '员工级', isDefault: true }),
-                API.travelPolicy.createTravelPolicy({companyId, name: '高管级' })]))
-            const promises = [...companyRegions.map(cr =>
-                    API.travelPolicy.createTravelPolicyRegion({
-                        travelPolicyId: travelPolicies[0].id,
-                        companyRegionId: cr.id,
-                        planeLevels: [EPlaneLevel.ECONOMY],
-                        trainLevels: [ETrainLevel.SECOND_SEAT],
-                        hotelLevels: [EHotelLevel.THREE_STAR]
-                }))]
-            promises.push(...companyRegions.map(cr =>
+
+        const companyId = result.company.id
+        const staff = await Models.staff.get(result.staffId)
+        const companyRegions: ICompanyRegion[] = _.filter((cr: ICompanyRegion) => !/(一|二)类/.test(cr.name), _.prop('data', await API.travelPolicy.getCompanyRegions({companyId})))
+        const travelPolicies = _.pluck('data', await Promise.all([API.travelPolicy.createTravelPolicy({companyId, name: '员工级', isDefault: true }),
+            API.travelPolicy.createTravelPolicy({companyId, name: '高管级' })]))
+        const promises = [...companyRegions.map(cr =>
                 API.travelPolicy.createTravelPolicyRegion({
-                    travelPolicyId: travelPolicies[1].id,
+                    companyId,
+                    travelPolicyId: travelPolicies[0].id,
                     companyRegionId: cr.id,
-                    planeLevels: [EPlaneLevel.BUSINESS],
-                    trainLevels: [ETrainLevel.BUSINESS_SEAT],
-                    hotelLevels: [EHotelLevel.FIVE_STAR]
-            })))
-            staff.travelPolicyId = travelPolicies[0].id
-            promises.push(staff.save())
-            await Promise.all(promises)
-        // }
+                    planeLevels: [EPlaneLevel.ECONOMY],
+                    trainLevels: [ETrainLevel.SECOND_SEAT],
+                    hotelLevels: [EHotelLevel.THREE_STAR]
+            }))]
+        promises.push(...companyRegions.map(cr =>
+            API.travelPolicy.createTravelPolicyRegion({
+                companyId,
+                travelPolicyId: travelPolicies[1].id,
+                companyRegionId: cr.id,
+                planeLevels: [EPlaneLevel.BUSINESS],
+                trainLevels: [ETrainLevel.BUSINESS_SEAT],
+                hotelLevels: [EHotelLevel.FIVE_STAR]
+        })))
+        staff.travelPolicyId = travelPolicies[0].id
+        promises.push(staff.save())
+        await Promise.all(promises)
         return result;
     }
 
