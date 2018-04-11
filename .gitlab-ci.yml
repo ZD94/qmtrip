@@ -3,13 +3,8 @@ variables:
   DOCKER_NAME: $CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
   DOCKER_CI_NAME: $DOCKER_REG/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME:$CI_COMMIT_SHA
   DOCKER_BRANCH_NAME: $DOCKER_REG/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME:$CI_COMMIT_REF_SLUG
-  NPM_CACHE_DIR: /cache/build-cache/npmhash/
-  JL_APP_DAEMON: "true"
-  JL_APP_COMMAND: node server.js >/data/log/nohup.out 2>&1
-  JL_APP_DAEMON_WAIT_INIT: log/nohup.out
+  JL_APP_COMMAND: node server.js
   JL_APP_PORT: 8080
-  JL_APP_CLOUD_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-  JL_APP_CLOUD_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
   JL_APP_LINK_VERSION: 2
   JL_APP_INIT_TESTDATA: "false"
 
@@ -20,16 +15,11 @@ stages:
 
 image: docker:git
 
-before_script:
-  - 'eval $(ssh-agent -s) && echo "$SSH_PRIVATE_KEY">.k && chmod 600 .k && ssh-add .k && rm -f .k'
-  - 'mkdir -p ~/.ssh && echo -e "Host *\n\tStrictHostKeyChecking no\n\tSendEnv JL_APP_*\n\n" > ~/.ssh/config'
-  - mkdir -p /cache/build-cache/.npm && ln -s /cache/build-cache/.npm ~/
-
 build:dist:
   stage: build
   only:
     - branches
-  image: $DOCKER_REG/jl-build:v3
+  image: $DOCKER_REG/jl-build:v4
   tags:
     - serial
   cache:
@@ -37,12 +27,10 @@ build:dist:
     paths:
       - dist/
   script:
-    - mkdir -p $NPM_CACHE_DIR/`npmhash`/node_modules && ln -s $NPM_CACHE_DIR/`npmhash`/node_modules .
-    - echo `npmhash`
     - git submodule update --init --checkout
+    - npmcache
     - npm install
     - gulp tarball -n $CI_COMMIT_REF_SLUG
-    - scp $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-*.tar.gz test@git.l.jingli365.com:~/versions/
 
 build:image:
   stage: docker
@@ -52,292 +40,147 @@ build:image:
       - dist/
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
-    - echo $DOCKER_CI_NAME
     - docker build . -t $DOCKER_CI_NAME  --build-arg NPM_TOKEN=$NPM_TOKEN
     - docker push $DOCKER_CI_NAME
 
-deploy:master:
+.deploy_template: &deploy_template
   stage: deploy
-  only:
-    - /^master$/
   environment:
-    name: dev
-    url: https://l.jingli365.com
-  variables:
-    JL_APP_DEBUG: 1
+    name: $ENVIROMENT_NAME
+    url: https://$ENVIROMENT_HOST/proj/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME/
+  before_script:
+    - 'eval $(ssh-agent -s) && echo "$SSH_PRIVATE_KEY" | ssh-add -'
+    - 'mkdir -p ~/.ssh && echo -e "Host *\n\tStrictHostKeyChecking no\n\tSendEnv JL_APP_*\n\n" > ~/.ssh/config'
+  script:
+    - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
+    - docker pull $DOCKER_CI_NAME
+    - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
+    - docker push $DOCKER_BRANCH_NAME
+    - echo deploy to $CI_ENVIRONMENT_URL
+    - ssh test@$ENVIROMENT_HOST /home/test/bin/docker_service.sh $DOCKER_REG $DOCKER_NAME $CI_COMMIT_REF_SLUG $CI_ENVIRONMENT_SLUG -p $JL_APP_PORT
+
+.common_variables: &common_variables
+    JL_APP_DEBUG: 0
     JL_APP_HOST: $CI_ENVIRONMENT_URL
-    JL_APP_POSTGRES: postgres://times:time0418@l.jingli365.com:15432/times
     JL_APP_REDIS: redis://l.jingli365.com:16379
-    JL_APP_COMAPI_HOST: api.l.jingli365.com
+    JL_APP_COMAPI_HOST: api.$ENVIROMENT_HOST
     JL_APP_COMAPI_PORT: 14101
-    JL_APP_BUDGET_HOST: l.jingli365.com
+    JL_APP_BUDGET_HOST: $ENVIROMENT_HOST
     JL_APP_BUDGET_PORT: 14103
     JL_APP_NOTICE_EMAIL: testteam@jingli365.com
-    JL_APP_V2_HOST: https://l.jingli365.com/index-v2.html
-    JL_APP_APPROVE_SERVER_URL: https://l.jingli365.com/proj/svr-trip-approve/api/v1
-    JL_APP_TMC: https://l.jingli365.com/proj/svr-tmc
+    JL_APP_V2_HOST: https://$ENVIROMENT_HOST/index-v2.html
+    JL_APP_APPROVE_SERVER_URL: https://$ENVIROMENT_HOST/proj/svr-trip-approve/api/v1
+    JL_APP_TMC: https://$ENVIROMENT_HOST/proj/svr-tmc
     JL_APP_TMC_FAKE: 0
-    JL_APP_TD_MONITORURL: https://l.jingli365.com/proj/old-qmtrip/api/v1/tripDetail
+    JL_APP_TD_MONITORURL: https://$ENVIROMENT_HOST/proj/old-qmtrip/api/v1/tripDetail
     JL_APP_CLOUDKEY: jinglicloud2017
-    JL_APP_CLOUDAPI: https://l.jingli365.com/proj/svr-jlbudget/api/v1
-    JL_APP_CLOUD: https://l.jingli365.com/proj/web-cloud-mgr
+    JL_APP_CLOUDAPI: https://$ENVIROMENT_HOST/proj/svr-jlbudget/api/v1
+    JL_APP_CLOUD: https://$ENVIROMENT_HOST/proj/web-cloud-mgr
     JL_APP_CLOUD_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_CLOUD_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1
+    JL_APP_ORDER_LINK: https://$ENVIROMENT_HOST/svc/java-jingli-order1
     JL_APP_ORDER_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_ORDER_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_MALL_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-mall
+    JL_APP_MALL_ORDER_LINK: https://$ENVIROMENT_HOST/svc/java-jingli-mall
     JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_PAY_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-pay
+    JL_APP_PAY_ORDER_LINK: https://$ENVIROMENT_HOST/svc/java-jingli-pay
     JL_APP_PAY_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PAY_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_PERMISSION_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-auth
+    JL_APP_PERMISSION_ORDER_LINK: https://$ENVIROMENT_HOST/svc/java-jingli-auth
     JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_JAVA_GETWAY: https://l.jingli365.com
+    JL_APP_JAVA_GETWAY: https://$ENVIROMENT_HOST
     JL_APP_OPENAPI_APP_ID: 8218a6b0-2d74-11e8-9997-218659f8f259
     JL_APP_OPENAPI_APP_SECRET: ffdfbf70-2d74-11e8-9997-218659f8f259
     JL_APP_ORDERVALIDATE_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_ORDERVALIDATE_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
     JL_APP_ACTIVITY_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
     JL_APP_ACTIVITY_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-  script:
-    - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
-    - docker pull $DOCKER_CI_NAME
-    - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
-    - docker push $DOCKER_BRANCH_NAME
-    - echo deploy to https://l.jingli365.com
-    - ssh test@l.jingli365.com /home/test/bin/docker_swarm.sh $DOCKER_REG $DOCKER_NAME $CI_COMMIT_REF_SLUG -p 8080
+
+deploy:master:
+  <<: *deploy_template
+  only:
+    - /^master$/
+  variables:
+    <<: *common_variables
+    ENVIROMENT_NAME: master
+    ENVIROMENT_HOST: l.jingli365.com
+    JL_APP_DEBUG: 1
+    JL_APP_POSTGRES: postgres://times:time0418@l.jingli365.com:15432/times
+    JL_APP_COMAPI_PORT: 14101
+    JL_APP_BUDGET_PORT: 14103
 
 deploy:test:
-  stage: deploy
+  <<: *deploy_template
+  when: manual
   only:
     - /^test$/
-  environment:
-    name: test
-    url: https://t.jingli365.com
+    - /^preview$/
+    - /^review\//
   variables:
-    JL_APP_DEBUG: 0
-    JL_APP_HOST: $CI_ENVIRONMENT_URL
+    <<: *common_variables
+    ENVIROMENT_NAME: test
+    ENVIROMENT_HOST: t.jingli365.com
     JL_APP_POSTGRES: postgres://times:time0418@t.jingli365.com:15432/time_test
-    JL_APP_REDIS: redis://t.jingli365.com:16379
-    JL_APP_COMAPI_HOST: api.t.jingli365.com
     JL_APP_COMAPI_PORT: 14201
-    JL_APP_BUDGET_HOST: l.jingli365.com
     JL_APP_BUDGET_PORT: 14113
-    JL_APP_NOTICE_EMAIL: testteam@jingli365.com
-    JL_APP_V2_HOST: https://t.jingli365.com/index-v2.html
-    JL_APP_APPROVE_SERVER_URL: https://t.jingli365.com/proj/svr-trip-approve/api/v1
-    JL_APP_TD_MONITORURL: https://t.jingli365.com/proj/old-qmtrip/api/v1/tripDetail
-    JL_APP_TMC: https://t.jingli365.com/proj/svr-tmc
-    JL_APP_TMC_FAKE: 0
-    JL_APP_CLOUDKEY: jinglicloud2017
-    JL_APP_CLOUDAPI: https://t.jingli365.com/proj/svr-jlbudget/api/v1
-    JL_APP_CLOUD: https://t.jingli365.com/proj/web-cloud-mgr
-    JL_APP_CLOUD_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_CLOUD_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_ORDER_LINK: https://t.jingli365.com/svc/java-jingli-order1
-    JL_APP_ORDER_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_ORDER_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_MALL_ORDER_LINK: https://t.jingli365.com/svc/java-jingli-mall
-    JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_PAY_ORDER_LINK: https://t.jingli365.com/svc/java-jingli-pay
-    JL_APP_PAY_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_PAY_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_PERMISSION_ORDER_LINK: https://t.jingli365.com/svc/java-jingli-auth
-    JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_JAVA_GETWAY: https://t.jingli365.com
-    JL_APP_OPENAPI_APP_ID: 8218a6b0-2d74-11e8-9997-218659f8f259
-    JL_APP_OPENAPI_APP_SECRET: ffdfbf70-2d74-11e8-9997-218659f8f259
-    JL_APP_ORDERVALIDATE_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_ORDERVALIDATE_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_ACTIVITY_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_ACTIVITY_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-  script:
-    - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
-    - docker pull $DOCKER_CI_NAME
-    - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
-    - docker push $DOCKER_BRANCH_NAME
-    - echo deploy to https://t.jingli365.com
-    - ssh test@l.jingli365.com /home/test/bin/docker_swarm.sh $DOCKER_REG $DOCKER_NAME $CI_COMMIT_REF_SLUG -p 8080
 
 deploy:release:
-  stage: deploy
+  <<: *deploy_template
+  when: manual
   only:
     - /^release$/
-  when: manual
-  environment:
-    name: release
-    url: https://j.jingli365.com
   variables:
-    JL_APP_DEBUG: 0
-    JL_APP_HOST: $CI_ENVIRONMENT_URL
+    <<: *common_variables
+    ENVIROMENT_NAME: release
+    ENVIROMENT_HOST: j.jingli365.com
     JL_APP_POSTGRES: postgres://jingli:J1n9L1.t3ch@j.jingli365.com:5432/qmtrip
     JL_APP_REDIS: redis://j.jingli365.com
-    JL_APP_COMAPI_HOST: api.j.jingli365.com
     JL_APP_COMAPI_PORT: 4201
-    JL_APP_BUDGET_HOST: j.jingli365.com
     JL_APP_BUDGET_PORT: 4103
     JL_APP_NOTICE_EMAIL: tbudget@jingli365.com
-    JL_APP_V2_HOST: https://j.jingli365.com/index-v2.html
-    JL_APP_APPROVE_SERVER_URL: https://j.jingli365.com/proj/svr-trip-approve/api/v1
-    JL_APP_TMC: https://j.jingli365.com/proj/svr-tmc
-    JL_APP_TMC_FAKE: 0
-    JL_APP_TD_MONITORURL: https://j.jingli365.com/proj/old-qmtrip/api/v1/tripDetail
-    JL_APP_CLOUDKEY: jinglicloud2017
-    JL_APP_CLOUDAPI: https://j.jingli365.com/proj/svr-jlbudget/api/v1
-    JL_APP_CLOUD: https://j.jingli365.com/proj/web-cloud-mgr
-    JL_APP_CLOUD_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_CLOUD_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_ORDER_LINK: https://j.jingli365.com/svc/java-jingli-order1
-    JL_APP_ORDER_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_ORDER_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_MALL_ORDER_LINK: https://j.jingli365.com/svc/java-jingli-mall
-    JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_PAY_ORDER_LINK: https://j.jingli365.com/svc/java-jingli-pay
-    JL_APP_PAY_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_PAY_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_PERMISSION_ORDER_LINK: https://j.jingli365.com/svc/java-jingli-auth
-    JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_JAVA_GETWAY: https://j.jingli365.com
-    JL_APP_OPENAPI_APP_ID: 8218a6b0-2d74-11e8-9997-218659f8f259
-    JL_APP_OPENAPI_APP_SECRET: ffdfbf70-2d74-11e8-9997-218659f8f259
-    JL_APP_ORDERVALIDATE_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_ORDERVALIDATE_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_ACTIVITY_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_ACTIVITY_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-  script:
-    - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
-    - docker pull $DOCKER_CI_NAME
-    - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
-    - docker push $DOCKER_BRANCH_NAME
-    - echo deploy to https://j.jingli365.com
-    - ssh test@j.jingli365.com /home/test/bin/docker_swarm.sh $DOCKER_REG $DOCKER_NAME $CI_COMMIT_REF_SLUG -p 8080
 
 deploy:demo:
-  stage: deploy
+  <<: *deploy_template
   only:
     - /^demo$/
   when: manual
-  environment:
-    name: demo
-    url: https://demo.jingli365.com
   variables:
-    JL_APP_DEBUG: 0
-    JL_APP_HOST: $CI_ENVIRONMENT_URL
+    <<: *common_variables
+    ENVIROMENT_NAME: demo
+    ENVIROMENT_HOST: demo.jingli365.com
     JL_APP_POSTGRES: postgres://jingli:J1n9L1.t3ch@j.jingli365.com:5432/qmtrip-demo
     JL_APP_REDIS: redis://demo.jingli365.com
-    JL_APP_COMAPI_HOST: api.j.jingli365.com
     JL_APP_COMAPI_PORT: 4201
-    JL_APP_BUDGET_HOST: demo.jingli365.com
     JL_APP_BUDGET_PORT: 24103
     JL_APP_NOTICE_EMAIL: tbudget@jingli365.com
-    JL_APP_V2_HOST: https://demo.jingli365.com/index-v2.html
-    JL_APP_APPROVE_SERVER_URL: https://demo.jingli365.com/proj/svr-trip-approve/api/v1
     JL_APP_TMC: https://j.jingli365.com/proj/svr-tmc
-    JL_APP_TMC_FAKE: 0
-    JL_APP_TD_MONITORURL: https://demo.jingli365.com/proj/old-qmtrip/api/v1/tripDetail
-    JL_APP_CLOUDKEY: jinglicloud2017
-    JL_APP_CLOUDAPI: https://demo.jingli365.com/proj/svr-jlbudget/api/v1
-    JL_APP_CLOUD: https://demo.jingli365.com/proj/web-cloud-mgr
-    JL_APP_CLOUD_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_CLOUD_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_ORDER_LINK: https://demo.jingli365.com/svc/java-jingli-order1
-    JL_APP_ORDER_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_ORDER_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_MALL_ORDER_LINK: https://demo.jingli365.com/svc/java-jingli-mall
-    JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_PAY_ORDER_LINK: https://demo.jingli365.com/svc/java-jingli-pay
-    JL_APP_PAY_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_PAY_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_PERMISSION_ORDER_LINK: https://demo.jingli365.com/svc/java-jingli-auth
-    JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_JAVA_GETWAY: https://demo.jingli365.com
-    JL_APP_OPENAPI_APP_ID: 8218a6b0-2d74-11e8-9997-218659f8f259
-    JL_APP_OPENAPI_APP_SECRET: ffdfbf70-2d74-11e8-9997-218659f8f259
-    JL_APP_ORDERVALIDATE_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_ORDERVALIDATE_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_ACTIVITY_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_ACTIVITY_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-  script:
-    - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
-    - docker pull $DOCKER_CI_NAME
-    - docker tag $DOCKER_CI_NAME $DOCKER_BRANCH_NAME
-    - docker push $DOCKER_BRANCH_NAME
-    - echo deploy to https://demo.jingli365.com
-    - ssh test@demo.jingli365.com /home/test/bin/docker_swarm.sh $DOCKER_REG $DOCKER_NAME $CI_COMMIT_REF_SLUG -p 8080
 
 deploy:tester:
-  stage: deploy
+  <<: *deploy_template
   when: manual
-  environment:
-    name: tester/$GITLAB_USER_ID
-    url: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
   variables:
-    JL_APP_HOST: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
+    <<: *common_variables
+    ENVIROMENT_NAME: tester-$GITLAB_USER_ID
+    ENVIROMENT_HOST: tester-$GITLAB_USER_ID.l.jingli365.com
     JL_APP_POSTGRES: postgres://test:JingliTest0418@dockerhost:15432/tester_$GITLAB_USER_ID
     JL_APP_POSTGRES_INITDB: tester_$GITLAB_USER_ID
     JL_APP_REDIS: redis://dockerhost:16379
-    JL_APP_COMAPI_HOST: api.l.jingli365.com
+    JL_APP_COMAPI_HOST: l.jingli365.com
     JL_APP_COMAPI_PORT: 14101
-    JL_APP_BUDGET_HOST: l.jingli365.com
     JL_APP_BUDGET_PORT: 14103
-    JL_APP_NOTICE_EMAIL: testteam@jingli365.com
-    JL_APP_V2_HOST: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME/index-v2.html
     JL_APP_APPROVE_SERVER_URL: https://l.jingli365.com/proj/svr-trip-approve/api/v1
     JL_APP_TMC: http://l.jingli365.com/proj/svr-tmc
-    JL_APP_TMC_FAKE: 0
-    JL_APP_TD_MONITORURL: https://review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME/api/v1/tripDetail
-    JL_APP_CLOUDKEY: jinglicloud2017
     JL_APP_CLOUDAPI: https://l.jingli365.com/proj/svr-jlbudget/api/v1
     JL_APP_CLOUD: https://l.jingli365.com/cloud
-    JL_APP_CLOUD_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_CLOUD_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
     JL_APP_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-order1
-    JL_APP_ORDER_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_ORDER_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
     JL_APP_MALL_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-mall
-    JL_APP_MALL_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_MALL_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
     JL_APP_PERMISSION_ORDER_LINK: https://l.jingli365.com/svc/java-jingli-auth
-    JL_APP_PERMISSION_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_PERMISSION_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
-    JL_APP_OPENAPI_APP_ID: 8218a6b0-2d74-11e8-9997-218659f8f259
-    JL_APP_OPENAPI_APP_SECRET: ffdfbf70-2d74-11e8-9997-218659f8f259
-    JL_APP_ACTIVITY_APP_ID: 756b12b3-e243-41ae-982f-dbdfb7ea7e92
-    JL_APP_ACTIVITY_APP_SECRET: 6c8f2cfd-7aa4-48c7-9d5e-913896acec12
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
     - docker tag $DOCKER_CI_NAME $DOCKER_REG/$DOCKER_NAME:tester-$GITLAB_USER_ID
     - docker push $DOCKER_REG/$DOCKER_NAME:tester-$GITLAB_USER_ID
-    - echo deploy to https://review.l.jingli365.com/tester/$GITLAB_USER_ID
-    - ssh test@l.jingli365.com /home/test/bin/docker_swarm.sh $DOCKER_REG $DOCKER_NAME tester-$GITLAB_USER_ID -p 8080
-
-deploy:vm:
-  stage: deploy
-  when: manual
-  environment:
-    name: vm/$GITLAB_USER_ID
-    url: https://review.l.jingli365.com/vm/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
-  variables:
-    JL_APP_HOST: https://review.l.jingli365.com/vm/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME
-    JL_APP_V2_HOST: //review.l.jingli365.com/tester/$GITLAB_USER_ID/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME/index-v2.html
-    JL_APP_REDIS: redis://l.jingli365.com:16379
-    JL_APP_POSTGRES: postgres://test:JingliTest0418@l.jingli365.com:15432/tester_$GITLAB_USER_ID
-    JL_APP_POSTGRES_INITDB: vm_$GITLAB_USER_ID
-  script:
-    - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
-    - docker pull $DOCKER_CI_NAME
-    - docker tag $DOCKER_CI_NAME $DOCKER_REG/$DOCKER_NAME:vm-$GITLAB_USER_ID
-    - docker push $DOCKER_REG/$DOCKER_NAME:vm-$GITLAB_USER_ID
-    - echo deploy to https://review.l.jingli365.com/vm/$GITLAB_USER_ID
-    - ssh test@192.168.1.140 /home/test/bin/docker_swarm.sh $DOCKER_REG $DOCKER_NAME vm-$GITLAB_USER_ID -p 8080
-
+    - echo deploy to $CI_ENVIRONMENT_URL
+    - ssh test@l.jingli365.com /home/test/bin/docker_service.sh $DOCKER_REG $DOCKER_NAME tester-$GITLAB_USER_ID tester-$GITLAB_USER_ID -p 8080
