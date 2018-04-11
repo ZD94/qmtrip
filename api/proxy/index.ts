@@ -208,8 +208,7 @@ export class Proxy {
             }
         });
         
-
-        app.all(/^\/java\/([^\/]+)(.*)?$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function) => {
+        async function handleJavaProxy (req: Request, res: Response, next?: Function) {
             try {
                 let projectName = req.params[0];
                 let realUrl = req.params[1];
@@ -230,11 +229,11 @@ export class Proxy {
                 //最终地址
                 let proxyUrl = config.java.getway;
                 let isHttps = false;
-                if (/^https:/.test(proxyUrl)) { 
+                if (/^https:/.test(proxyUrl)) {
                     isHttps = true;
                 }
                 let parseReqBody = true;
-                if (req.headers['content-type'] && req.headers['content-type'].indexOf('multipart') >= 0) { 
+                if (req.headers['content-type'] && req.headers['content-type'].indexOf('multipart') >= 0) {
                     parseReqBody = false;
                 }
                 console.log("need parseReqBoyd ====>", parseReqBody)
@@ -243,13 +242,13 @@ export class Proxy {
                     reqAsBuffer: true,
                     parseReqBody: parseReqBody,
                     https: isHttps,
-                    proxyReqPathResolver: (req: any) => { 
+                    proxyReqPathResolver: (req: any) => {
                         let url = req.url.replace(/^\/java\//, '/');
                         console.log("SERVER==>", proxyUrl)
                         console.log("URL==>", '/svc' + url);
                         return '/svc' + url;
                     },
-                    proxyReqOptDecorator: (proxyReqOpts: any, srcReq: any) => { 
+                    proxyReqOptDecorator: (proxyReqOpts: any, srcReq: any) => {
                         proxyReqOpts.headers['appid'] = appId;
                         proxyReqOpts.headers['sign'] = sign;
                         proxyReqOpts.headers['companyid'] = staff ? staff.companyId : '';
@@ -258,11 +257,12 @@ export class Proxy {
                     }
                 }
                 return proxy(proxyUrl, opts)(req, res, next);
-            } catch (err) { 
+            } catch (err) {
                 logger.error('转发java请求时失败:', req.originalUrl, err);
                 return next(err);
             }
-        });
+        }
+        app.all(/^\/java\/([^\/]+)(.*)?$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, handleJavaProxy);
 
         /**
          * @method 提供中台、app端的订单转发请求
@@ -407,23 +407,12 @@ export class Proxy {
             }
         });
         
-        app.all(/^\/mall.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function)=> {
+        app.all(/^\/mall\/(.*)$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function)=> {
             try {
-                let pathstring = req.path;
-                pathstring = pathstring.replace("/mall", "/java/java-jingli-mall");
-                let baseUrl = config.host;
-                let isHttp = false;
-                if (/^https:/.test(baseUrl)) { 
-                    isHttp = true;
-                }
-                let opts = {
-                    reaAsBuffer: true,
-                    https: isHttp,
-                    proxyReqPathResolver: (req: any) => {
-                        return pathstring
-                    }
-                };
-                return proxy(baseUrl, opts)(req, res, next);
+                req.params[1] = req.params[0];
+                req.params[0] = 'java-jingli-mall';
+                req.url = '/java/' + req.params[0] + '/'+ req.params[1];
+                return handleJavaProxy(req, res, next);
             } catch (err) {
                 logger.error(err);
                 return next(err)
