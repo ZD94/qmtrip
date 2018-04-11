@@ -182,9 +182,14 @@ export class ApiTravelBudget {
         let commonData;
         let self = this;
         let companyInfo = await self.getCompanyInfo(null, null, null, TMCStatus.OK_USE);
-        let data;
-        if (!companyInfo)
-            data = await getJLAgents();
+        let data: any[] = [];
+        if (!companyInfo) {
+            let agentData = await getJLAgents();
+            agentData.map((item: any) => {
+                if (item.type == TmcServiceType.HOTEL)
+                    data.push(item);
+            })
+        }
         else
             data = await self.getCompanyInfo(null, null, TmcServiceType.HOTEL, TMCStatus.OK_USE)
         
@@ -235,9 +240,17 @@ export class ApiTravelBudget {
         let commonData2: any[] = [];
         let self = this;
         let companyInfo = await self.getCompanyInfo(null, null, null, TMCStatus.OK_USE);
-        let data = [];
-        if (!companyInfo)
-            data = await getJLAgents();
+        let data: any[] = [];
+        if (!companyInfo) {
+            let agentData = await getJLAgents();
+            agentData.map((item: any) => {
+                if (item.type == TmcServiceType.TRAIN)
+                    data.push(item);
+                if (item.type == TmcServiceType.FLIGHT)
+                    data.push(item);
+            })
+
+        }
         else {
             let dataFlight = await self.getCompanyInfo(null, null, TmcServiceType.FLIGHT, TMCStatus.OK_USE)
             let dataTrain = await self.getCompanyInfo(null, null, TmcServiceType.TRAIN, TMCStatus.OK_USE)
