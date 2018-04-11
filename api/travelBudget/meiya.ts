@@ -761,8 +761,7 @@ export function combineData(Data: Array<any>, match: string, mergeProperty: stri
             if(/[\u4e00-\u9fa5]/.test(Data[i][match]) && /[\u4e00-\u9fa5]/.test(Data[j][match])){  //包含中文使用相似度匹配
                 let isSame = similarityMatch({
                     base: Data[i][match],
-                    target:Data[j][match],
-                    ignores: ['酒店', '旅店', '{}', '()']
+                    target:Data[j][match]
                 });
                 if(isSame){
                     Data[i][mergeProperty] = _.concat(Data[i][mergeProperty], Data[j][mergeProperty]);
@@ -806,8 +805,7 @@ export function compareHotelData(origin: any[], meiyaData: any[]) {
                 //添加模糊匹配逻辑
                 let isMatched = similarityMatch({
                     base: item.name,
-                    target: meiya.cnName,
-                    ignores: ['酒店', '旅店', '{}', '()']
+                    target: meiya.cnName
                 });
                 if (!isMatched) continue;
                 console.log("meiyaHotel in:", meiya.cnName);
@@ -858,54 +856,10 @@ export function similarityMatch(params: {
     ignores?: Array<string>,
     minimalLength?: number
 }): boolean {
-    let {base, target, minimalLength = 8, ignores} = params;
+    let {base, target} = params;
     if (!base || !target) return false;
-    if (ignores) {
-        ignores.forEach((ignoreString: any) => {
-            if (ignoreString == '()') {
-                base = base.replace(/\(.*\)/g, '');
-                target = target.replace(/\(.*\)/g, '');
-            } else {
-                base = base.replace(ignoreString, '');
-                target = target.replace(ignoreString, '');
-            }
-        });
-    }
-    //互换，设置base为较长的字符
-    if (base.length - target.length < 0) {
-        let temp = target;
-        target = base;
-        base = temp;
-    }
-    let similarity = 0;
-    if (base.length < minimalLength || target.length < minimalLength) {
-        //两字符串长度关系，相似度加(减)0.1
-        if (target.length / base.length >= 0.7) {
-            similarity += 0.05;
-        } else {
-            similarity -= 0.05;
-        }
-    }
-    //满足子字符串关系，相似度添加0.8
-    if (base.indexOf(target) > -1)
-        similarity += 0.8;
-
-    //单个字符进行位置匹配, 总相似度不超过0.2
-    for (let i = 0; i < target.length; i++) {
-        let actualPos = (base.indexOf(target.charAt(i)) + 1) / base.length;
-        if (actualPos <= 0) continue;
-        let expectedPos = (i + 1) / target.length;
-        if (Math.abs(actualPos - expectedPos) <= 0.4) {
-            similarity += 0.6 / target.length;
-        }
-        if (Math.abs(actualPos - expectedPos) > 0.4) {
-            similarity -= 0.2 / target.length;
-
-        }
-    }
-    // console.log("=====hotelmatch========similarity: ", similarity)
-    if (similarity >= 0.5) //暂定0.5，则返回
-        return true;
+    if (base == target) 
+        return true
     return false;
 }
 
