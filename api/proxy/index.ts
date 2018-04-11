@@ -45,6 +45,7 @@ export class Proxy {
             return res.sendStatus(200);
         })
 
+        
         // verifyToken
 
         app.all(/^\/travel.*$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: any, res: Response, next?: Function) => {
@@ -438,25 +439,19 @@ export class Proxy {
             }
         });
 
-        app.all(/^\/bill.*$/ ,cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function)=> {
+        app.all(/^\/bill\/(.*)$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function) => {
             try {
-                let pathstring = req.path;
-                pathstring = pathstring.replace("/bill", "/java/java-jingli-order1");
-                let baseUrl = config.host ;
-                let opts = {
-                    reaAsBuffer: true,
-                    https: true,
-                    proxyReqPathResolver: (req: any) => {
-                        return pathstring
-                    }
-                };
-                return proxy(baseUrl, opts)(req, res, next);
-            } catch(err) {
+                req.params[1] = req.params[0];
+                req.params[0] = 'java-jingli-order1';
+                req.url = '/java/' + req.params[0] + '/' + req.params[1];
+                return handleJavaProxy(req, res, next);
+            } catch (err) {
+                logger.error("处理bill错误:", err);
                 return next(err)
             }
         });
 
-        app.all(/^\/permission.*$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function)=> {
+        app.all(/^\/permission\/(.*)$/ ,cors(corsOptions),resetTimeout, timeout('120s'), verifyToken, async (req: Request, res: Response, next?: Function)=> {
             try {
                 let {staffid} = req.headers;
                 let staff = await Models.staff.get(staffid);
@@ -478,56 +473,56 @@ export class Proxy {
                         if(managers && managers.length)  role = 'projectManager';
                     }
                 }
-                let pathstring = req.path;
-                pathstring = pathstring.replace("/permission", "/java/java-jingli-auth");
-                let baseUrl = config.host;
-                let isHttp = false;
-                if (/^https:/.test(baseUrl)) { 
-                    isHttp = true;
-                }
-                let opts = {
-                    reaAsBuffer: true,
-                    https: isHttp,
-                    proxyReqPathResolver: (req: any) => {
-                        return pathstring
-                    },
-                    proxyReqOptDecorator: (proxyReqOpts: any, srcReq: any) => {
-                        proxyReqOpts.headers['role'] = role
-                        return proxyReqOpts
-                    }
-                };
-                return proxy(baseUrl, opts)(req, res, next);
-            } catch(err) {
+                req.headers['role'] = role;
+                req.params[1] = req.params[0];
+                req.params[0] = '/java/java-jingli-auth';
+                req.url = '/java/' + req.params[0] + '/' + req.params[1];
+                return handleJavaProxy(req, res, next);
+            } catch (err) {
+                logger.error("处理persisson代理时错误:", err);
                 return next(err)
             }
         });
+
+        app.use((err: any, req: Request, res: Response, next: Function) => {
+            if (err && err.code && err.msg) {
+                return res.json({ code: err.code, msg: err.msg });
+            }
+            return next(err);
+        })
+
+        
     }
 }
 export default new Proxy();
 
 async function verify(req: Request, res: Response, next?: Function) {
-    if(req.method == 'OPTIONS') {
+    try {
+        if (req.method == 'OPTIONS') {
+            return next && next();
+        }
+        let { authstr, staffid } = req.headers;
+        if (!authstr) {
+            throw new L.ERROR_CODE_C(403, '缺少登录凭证');
+        }
+        let token = parseAuthString(authstr);
+        let verification: AuthResponse = await API.auth.authentication(token);
+        if (!verification) {
+            throw new L.ERROR_CODE_C(403, '登录凭证已失效');
+        }
+        try {
+            await API.auth.setCurrentStaffId({
+                accountId: verification.accountId,
+                staffId: staffid
+            })
+        } catch (err) {
+            logger.error(err);
+            throw new L.ERROR_CODE_C(403, '员工信息不存在或者已被删除');
+        }
         return next && next();
-    }
-    let { authstr, staffid } = req.headers;
-    if (!authstr) { 
-        throw new L.ERROR_CODE_C(403, '缺少登录凭证');
-    }
-    let token = parseAuthString(authstr);
-    let verification: AuthResponse = await API.auth.authentication(token);
-    if(!verification) {
-        throw new L.ERROR_CODE_C(403, '登录凭证已失效');
-    }
-    try{
-        await API.auth.setCurrentStaffId({
-            accountId : verification.accountId,
-            staffId   : staffid
-        })
     } catch (err) { 
-        logger.error(err);
-        throw new L.ERROR_CODE_C(403, '员工信息不存在或者已被删除');
+        return next(err);
     }
-    return next && next();
 }
 var verifyToken = CLSNS.bind(verify, CLSNS.createContext())
 
