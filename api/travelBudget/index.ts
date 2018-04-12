@@ -24,15 +24,15 @@ const DefaultCurrencyUnit = 'CNY';
 import {restfulAPIUtil} from "api/restful";
 import {
     getJLAgents,
-    getMeiyaFlightData,
-    getMeiyaTrainData,
-    getMeiyaHotelData,
+    getFlightData,
+    getTrainData,
+    getHotelData,
     handleTrainData,
     handleFlightData,
     handelHotelsData,
-    IMeiyaAuthData,
+    IAuthData,
     combineData
-} from "./meiya";
+} from "./getData";
 import {Application, Request, Response, NextFunction} from 'express';
 var moment = require('moment');
 let RestfulAPIUtil = restfulAPIUtil;
@@ -108,19 +108,6 @@ export interface IQueryBudgetParams {
 }
 
 
-// interface SegmentsBudgetResult {
-//     id: string;
-//     cities: string[];
-//     /**
-//      * 数组每一项为多人每段预算信息,分为交通与住宿
-//      */
-//     budgets: Array<{
-//         hotel: any[],   //数组每项为每个人的住宿预算
-//         traffic: any[]  //数组每项为每个人的交通预算
-//         subsidy: any  //每个人的补助
-//     }>
-// }
-
 export interface ISearchHotelParams {
     checkInDate: string;
     checkOutDate: string;
@@ -159,7 +146,6 @@ export class ApiTravelBudget {
 
     @clientExport
     getDefaultPrefer() {
-        // return {};
     }
 
     @clientExport
@@ -197,7 +183,7 @@ export class ApiTravelBudget {
             throw L.ERR.ERROR_CODE_C(500, "企业未配置住宿供应商")
         // console.log('hoteldata ----->    ', data);
 
-        let authData: IMeiyaAuthData[] = [];
+        let authData: IAuthData[] = [];
         data.map((item: {identify: any, sname: string, type: string, agentType: string}) => {
             let identify = item.identify ? item.identify : null;
             let sname = item.sname;
@@ -207,22 +193,11 @@ export class ApiTravelBudget {
             return authData
         })
 
-        // if (result.code == 0) {
-        //     commonData = result.data.data;
-        // }
-
-        // if (!commonData || typeof commonData == 'undefined')
-        //     return [];
-        // 检查是否需要美亚数据，返回美亚数据
-        // let needMeiya = await meiyaJudge();
-        // if (!needMeiya) {
-        //     return commonData;
-        // }
         if (config.tmcFake == 1) {
             console.log("getHotelsData ===> fake data.");
             return require("meiyaFake/finallyUsingHotel");
         } else {
-            let meiyaHotel = await getMeiyaHotelData(params, authData);
+            let meiyaHotel = await getHotelData(params, authData);
             console.log("meiyaHotel ===> meiyaHotel data.", meiyaHotel.length);
             if (meiyaHotel && meiyaHotel.length){
                 commonData = handelHotelsData(meiyaHotel, params);
@@ -263,9 +238,8 @@ export class ApiTravelBudget {
             if (!data)
                 throw L.ERR.ERROR_CODE_C(500, "企业未配置火车和飞机供应商")
         }
-        // console.log('trafficdata ----->   ', data);
 
-        let authData: IMeiyaAuthData[] = [];
+        let authData: IAuthData[] = [];
         data.map((item: {identify: any, sname: string, type: string, agentType: string}) => {
             let identify = item.identify ? item.identify : null;
             let sname = item.sname;
@@ -274,18 +248,6 @@ export class ApiTravelBudget {
             authData.push({identify, sname, type, agentType});
             return authData
         });
-        // if (result.code == 0) {
-        //     commonData = result.data.data;
-        // }
-        //
-        // if (!commonData || typeof commonData == 'undefined')
-        //     return [];
-        //检查是否需要美亚数据，返回美亚数据
-        // let needMeiya = await meiyaJudge();
-        // if (!needMeiya) {
-        //     return commonData;
-        // }
-        // console.log("commonData ===> commonData data.", commonData.length)
 
         
         if (config.tmcFake == 1) {
@@ -293,8 +255,8 @@ export class ApiTravelBudget {
             return require("meiyaFake/finallyUsingTraffic");
         } else {
             let arr = await Promise.all([
-                await getMeiyaTrainData(params, authData),
-                await getMeiyaFlightData(params, authData)
+                await getTrainData(params, authData),
+                await getFlightData(params, authData)
             ]);
             let meiyaTrain = arr[0];
             let meiyaFlight = arr[1];
