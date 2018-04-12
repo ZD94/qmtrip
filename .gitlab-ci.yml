@@ -61,7 +61,7 @@ build:image:
 
 .common_variables: &common_variables
     JL_APP_DEBUG: 0
-    JL_APP_HOST: $CI_ENVIRONMENT_URL
+    JL_APP_HOST: https://$ENVIROMENT_HOST/proj/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME/
     JL_APP_REDIS: redis://l.jingli365.com:16379
     JL_APP_COMAPI_HOST: api.$ENVIROMENT_HOST
     JL_APP_COMAPI_PORT: 14101
