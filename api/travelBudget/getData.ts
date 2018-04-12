@@ -1,14 +1,12 @@
-import * as fs from "fs";
-import * as path from "path";
+
 const config = require("@jingli/config");
-var haversine = require("haversine");
+
 const _ = require("lodash");
 import {ISearchHotelParams, ISearchTicketParams, TmcServiceType} from "./index";
 
 var request = require("request-promise");
 let moment = require("moment");
-import {MTrainLevel, MPlaneLevel} from "_types";
-import { IHotel, IFlightAgent } from '_types/travelbudget';
+
 import { L } from '@jingli/language';
 
 
@@ -163,157 +161,6 @@ export async function getHotelData(params: ISearchHotelParams, authData: IAuthDa
 }
 
 
-export function writeData(filename: string, data: object) {
-    let dirPath = path.join(process.cwd(), "./mytest", "data");
-    let source = fs.createWriteStream(path.join(dirPath, filename));
-    let result = JSON.stringify(data, null, 4);
-
-    source.write(result);
-    source.end(() => {
-        console.log("数据记录结束 :", filename);
-    });
-}
-
-/**
- * @method 匹配jlbudget飞机数据为基础，meiya不一定都有
- */
-export function compareFlightData(origin: IFlightAgent[], tmcData: ITMCFlight[]) {
-    console.log("compareTrainData origin.length===>", origin.length);
-    console.log("compareTrainData tmcData.length===>", tmcData.length);
-    if (!origin || typeof (origin) == 'undefined')
-        return [];
-    if (!tmcData || typeof (tmcData) == 'undefined' || !tmcData.length)
-        return origin;
-
-    origin = origin.map((item: any) => {
-        if (!item) return null;
-        if (item.type != 1)
-            return item;
-        for (let flight of tmcData) {
-            if (!flight.flightNo) return;
-            if (item.No && flight.flightNo && item.No.trim() != flight.flightNo.trim())
-                continue;
-            if (!flight.flightPriceInfoList || typeof (flight.flightPriceInfoList) == 'undefined')
-                continue;
-
-            let cabins = flight.flightPriceInfoList.map((flightDetail: any) => {
-                if (!flightDetail) return null;
-                let agentCabin = {
-                    name: 2,
-                    price: flightDetail.price,
-                    cabin: flightDetail.cabin,
-                    urlParams: {
-                        No: flight.flightNo,
-                        priceId: flightDetail.priceID
-                    }
-                };
-
-                for (let key in MPlaneLevel) {
-                    if (MPlaneLevel[key] == flightDetail.cabin) {
-                        agentCabin.name = Number(key);
-                    }
-                }
-                return agentCabin;
-            }).filter((agentCabin: any) => {
-                if (!agentCabin || typeof (agentCabin) == 'undefined') return false;
-                return true;
-            });
-
-            if (!item.agents) {
-                item.agents = [{
-                    name: "meiya", cabins: cabins, other: {
-                        fAmount: item.fAmount,  //头等舱全价
-                        cAmount: item.cAmount,  //商务舱全价
-                        yAmount: item.yAmount   //经济舱全价
-                    }
-                }];
-            }
-
-            if (item.agents) {
-                item.agents.push({
-                    name: "meiya", cabins: cabins, other: {
-                        fAmount: item.fAmount,  //头等舱全价
-                        cAmount: item.cAmount,  //商务舱全价
-                        yAmount: item.yAmount   //经济舱全价
-                    }
-                });
-            }
-        }
-        return item;
-    }).filter((item: any) => {
-        if (!item || typeof (item) == 'undefined') return false;
-        return true;
-    });
-
-    console.log("compareTrainData origin.length===>", origin.length);
-    return origin;
-}
-
-/**
- * @method 火车数据匹配，以meiya为基础数据
- */
-export function compareTrainData(origin: any[], tmcData: ITMCTrain[]) {
-    console.log("compareTrainData origin.length===>", origin.length);
-    console.log("compareTrainData tmcData.length===>", tmcData.length);
-    if (!origin || typeof (origin) == 'undefined')
-        return [];
-    if (!tmcData || typeof (tmcData) == 'undefined' || !tmcData.length)
-        return origin;
-    origin = origin.map((item) => {
-        if (!item) return null;
-        if (item.type != 0) {
-            return item;
-        }
-        for (let train of tmcData) {
-            if (!train.TrainNumber) continue;
-            if (item.No && train.TrainNumber && item.No.trim() != train.TrainNumber.trim())
-                continue;
-            if (!train.SeatList || typeof (train.SeatList) == 'undefined') {
-                continue;
-            }
-
-            let cabins = train.SeatList.map((seat: any) => {
-                if (!seat) return null;
-                let agentCabin = {
-                    name: 3,
-                    price: seat.SeatPrice,
-                    cabin: seat.SeatName,
-                    urlParams: {
-                        No: train.TrainNumber,
-                        seatName: seat.SeatName,
-                        price: seat.SeatPrice
-                    }
-                };
-
-                for (let key in MTrainLevel) {
-                    if (MTrainLevel[key] == seat.SeatName) {
-                        agentCabin.name = Number(key);
-                    }
-                }
-                return agentCabin;
-            }).filter((agentCabin) => {
-                if (!agentCabin || typeof (agentCabin) == 'undefined') return false;
-                return true;
-            });
-
-
-            if (!item.agents)
-                item.agents = [{name: "meiya", cabins: cabins, other: {}}];
-            if (item.agents)
-                item.agents.push({name: "meiya", cabins: cabins, other: {}});
-
-        }
-        return item;
-    }).filter((item: any) => {
-        if (!item || typeof (item) == 'undefined') return false;
-        return true;
-    });
-
-    if (!origin)
-        return [];
-    console.log("after ===============compareTrainData tmcData.length===>", origin.length);
-    return origin;
-}
 
 //处理美亚酒店数据
 export function handelHotelsData(tmcHotelData: Array<ITMCHotel>, originalData: ISearchHotelParams) {
@@ -428,7 +275,7 @@ async function transferFlightData(tmcFlightData: ITMCFlight, originalData: ISear
             json:true,
             headers: {
                 auth: authentic(),
-                supplier: "tmc"
+                supplier: "meiya"
             }
         })
         stopItemList = stopItem.data
@@ -669,70 +516,7 @@ export function combineData(Data: Array<any>, match: string, mergeProperty: stri
     return Data;
 }
 
-/**
- * @method 酒店数据匹配，以meiya为基础数据
- *    3km范围内的模糊匹配，和3km范围外的严格匹配
- * @param origin {Array} 来自jlbudget的数据
- * @param tmcData {Array} 来自tmc数据
- * @return {Array}
- */
-export function compareHotelData(origin: any[], tmcData: any[]) {
-    console.log("compareHotelData tmcData.length==== >  ", tmcData.length);
-    if (!origin || typeof (origin) == 'undefined')
-        return [];
-    if (!tmcData || typeof (tmcData) == 'undefined')
-        return origin;
-    for (let item of origin) {
-        let start = {latitude: item.latitude, longitude: item.longitude};
-        let isNearby = false;
-        for (let tmc of tmcData) {
-            if (!tmc.cnName) continue;
-            let agentTmc: { [index: string]: any } | undefined;
-            if (item.latitude && item.longitude && tmc.latitude && tmc.longitude) { //若存在等于0等情况，此时精确度已超过允许范围，直接跳过模糊匹配      
-                let end = {latitude: tmc.latitude, longitude: tmc.longitude};
-                isNearby = haversine(start, end, {threshold: 3, unit: 'km'}); //距离不超过3km，return true
-            }
-            if (isNearby) {
-                //添加模糊匹配逻辑
-                let isMatched = similarityMatch({
-                    base: item.name,
-                    target: tmc.cnName
-                });
-                if (!isMatched) continue;
-                console.log("tmcHotel in:", tmc.cnName);
-                let price = Math.ceil(Math.random() * 500) + 300;
-                agentTmc = {
-                    name: "meiya",
-                    price,
-                    urlParams: {
-                        hotelId: tmc.hotelId
-                    }
-                }
-            }
-            if (!isNearby) {
-                if (tmc.cnName && item.name && tmc.cnName.trim() != item.name.trim())
-                    continue;
-                console.log("tmcHotel in:", tmc.cnName);
-                let price = Math.ceil(Math.random() * 500) + 300;
-                agentTmc = {
-                    name: "meiya",
-                    price,
-                    urlParams: {
-                        hotelId: tmc.hotelId
-                    }
-                }
-            }
-            if (agentTmc && typeof agentTmc != 'undefined') {
-                if (!item.agents)
-                    item.agents = [agentTmc];
-                if (item.agents)
-                    item.agents.push(agentTmc);
-            }
-        }
-    }
-    console.log("after ===============compareHotelData tmcData.length===>", tmcData.length);
-    return matchTmcHotel(origin, tmcData);
-}
+
 
 /**
  * @method 中文相似度匹配-初用于酒店名
@@ -752,60 +536,6 @@ export function similarityMatch(params: {
     if (base == target) 
         return true
     return false;
-}
-
-export function matchTmcHotel(origin: IHotel[], tmcData: ITMCHotel[]) {
-    let names: string[] = [];
-    let result: IHotel[] = [];
-    origin.map((hotel, index: number) => {
-        let hasMeiya = false;
-        for (let agent of hotel.agents) {
-            if (agent.name == "meiya") {
-                names.push(hotel.name);
-                hasMeiya = true;
-                break;
-            }
-        }
-
-        if (hasMeiya) {
-            result.push(hotel);
-        }
-    });
-
-    let checkInDate = origin[0].checkInDate,
-        checkOutDate = origin[0].checkOutDate;
-
-    for (let tmc of tmcData) {
-        if (tmc.name && names.indexOf(tmc.name) > -1) {
-            continue;
-        }
-
-        let data = {
-            "name": tmc.cnName,
-            "star": tmc.starRating,
-            "agents": [
-                {
-                    "name": "meiya",
-                    "price": Math.ceil(Math.random() * 500) + 300,
-                    urlParams: {
-                        hotelId: tmc.hotelId
-                    }
-                }
-            ],
-            "latitude": tmc.latitude,
-            "longitude": tmc.longitude,
-            "checkInDate": checkInDate,
-            "checkOutDate": checkOutDate,
-            "commentScore": Math.ceil(Math.random() * 2) + 8,
-            "distance": 2000
-        }
-        console.log("add one in meiya");
-        result.push(data as IHotel);
-    }
-
-    console.log("matchMeiyaHotel matchMeiyaHotel matchMeiyaHotel===>", result.length)
-
-    return result;
 }
 
 /**
