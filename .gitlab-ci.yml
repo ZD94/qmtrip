@@ -15,6 +15,10 @@ stages:
 
 image: docker:git
 
+before_script:
+  - 'eval $(ssh-agent -s) && echo "$SSH_PRIVATE_KEY" | ssh-add -'
+  - 'mkdir -p ~/.ssh && echo -e "Host *\n\tStrictHostKeyChecking no\n\tSendEnv JL_APP_*\n\n" > ~/.ssh/config'
+
 build:dist:
   stage: build
   only:
@@ -48,9 +52,6 @@ build:image:
   environment:
     name: $ENVIROMENT_NAME
     url: https://$ENVIROMENT_HOST/proj/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME/
-  before_script:
-    - 'eval $(ssh-agent -s) && echo "$SSH_PRIVATE_KEY" | ssh-add -'
-    - 'mkdir -p ~/.ssh && echo -e "Host *\n\tStrictHostKeyChecking no\n\tSendEnv JL_APP_*\n\n" > ~/.ssh/config'
   script:
     - docker login -u dockeruser -p $DOCKER_PASSWD $DOCKER_REG
     - docker pull $DOCKER_CI_NAME
@@ -61,7 +62,7 @@ build:image:
 
 .common_variables: &common_variables
     JL_APP_DEBUG: 0
-    JL_APP_HOST: $CI_ENVIRONMENT_URL
+    JL_APP_HOST: https://$ENVIROMENT_HOST/proj/$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME/
     JL_APP_REDIS: redis://l.jingli365.com:16379
     JL_APP_COMAPI_HOST: api.$ENVIROMENT_HOST
     JL_APP_COMAPI_PORT: 14101
@@ -128,9 +129,9 @@ deploy:test:
 
 deploy:release:
   <<: *deploy_template
-  when: manual
   only:
     - /^release$/
+  when: manual
   variables:
     <<: *common_variables
     ENVIROMENT_NAME: release
