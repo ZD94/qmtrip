@@ -197,10 +197,10 @@ export class ApiTravelBudget {
             console.log("getHotelsData ===> fake data.");
             return require("meiyaFake/finallyUsingHotel");
         } else {
-            let meiyaHotel = await getHotelData(params, authData);
-            console.log("meiyaHotel ===> meiyaHotel data.", meiyaHotel.length);
-            if (meiyaHotel && meiyaHotel.length){
-                commonData = handelHotelsData(meiyaHotel, params);
+            let tmcHotel = await getHotelData(params, authData);
+            console.log("tmcHotel ===> tmcHotel data.", tmcHotel.length);
+            if (tmcHotel && tmcHotel.length){
+                commonData = handelHotelsData(tmcHotel, params);
                 commonData = combineData(commonData, 'name', 'agents');
                 return commonData;
             }else { 
@@ -258,17 +258,17 @@ export class ApiTravelBudget {
                 await getTrainData(params, authData),
                 await getFlightData(params, authData)
             ]);
-            let meiyaTrain = arr[0];
-            let meiyaFlight = arr[1];
-            console.log("meiyaFlight ===> meiyaFlight data.", meiyaFlight.length);
-            console.log("meiyaTrain ===> meiyaTrain data.", meiyaTrain.length);
+            let tmcTrain = arr[0];
+            let tmcFlight = arr[1];
+            console.log("tmcFlight ===> tmcFlight data.", tmcFlight.length);
+            console.log("tmcTrain ===> tmcTrain data.", tmcTrain.length);
 
-            if (meiyaFlight && meiyaFlight.length) {
-                commonData = await handleFlightData(meiyaFlight,params);
+            if (tmcFlight && tmcFlight.length) {
+                commonData = await handleFlightData(tmcFlight,params);
                 commonData = combineData(commonData, 'No', 'agents')
             }    
-            if (meiyaTrain && meiyaTrain.length){      
-                commonData2 = handleTrainData(meiyaTrain, params)
+            if (tmcTrain && tmcTrain.length){      
+                commonData2 = handleTrainData(tmcTrain, params)
                 commonData2 = combineData(commonData2, 'No', 'agents')
             }   
             return [...commonData, ...commonData2];
