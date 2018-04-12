@@ -17,7 +17,7 @@ import { genSign } from "@jingli/sign";
 import { Department } from '_types/department';
 import Logger from '@jingli/logger';
 import { ITMCSupplier, TMCStatus } from 'api/travelBudget';
-import { AgentType } from 'api/travelBudget/meiya';
+import { AgentType } from 'api/travelBudget/getData';
 import { parseAuthString, AuthResponse } from '_types/auth';
 const logger = new Logger("proxy");
 const corsOptions = { 
