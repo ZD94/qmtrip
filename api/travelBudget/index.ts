@@ -24,15 +24,15 @@ const DefaultCurrencyUnit = 'CNY';
 import {restfulAPIUtil} from "api/restful";
 import {
     getJLAgents,
-    getMeiyaFlightData,
-    getMeiyaTrainData,
-    getMeiyaHotelData,
+    getFlightData,
+    getTrainData,
+    getHotelData,
     handleTrainData,
     handleFlightData,
     handelHotelsData,
-    IMeiyaAuthData,
+    IAuthData,
     combineData
-} from "./meiya";
+} from "./getData";
 import {Application, Request, Response, NextFunction} from 'express';
 var moment = require('moment');
 let RestfulAPIUtil = restfulAPIUtil;
@@ -108,19 +108,6 @@ export interface IQueryBudgetParams {
 }
 
 
-// interface SegmentsBudgetResult {
-//     id: string;
-//     cities: string[];
-//     /**
-//      * 数组每一项为多人每段预算信息,分为交通与住宿
-//      */
-//     budgets: Array<{
-//         hotel: any[],   //数组每项为每个人的住宿预算
-//         traffic: any[]  //数组每项为每个人的交通预算
-//         subsidy: any  //每个人的补助
-//     }>
-// }
-
 export interface ISearchHotelParams {
     checkInDate: string;
     checkOutDate: string;
@@ -159,7 +146,6 @@ export class ApiTravelBudget {
 
     @clientExport
     getDefaultPrefer() {
-        // return {};
     }
 
     @clientExport
@@ -182,9 +168,14 @@ export class ApiTravelBudget {
         let commonData;
         let self = this;
         let companyInfo = await self.getCompanyInfo(null, null, null, TMCStatus.OK_USE);
-        let data;
-        if (!companyInfo)
-            data = await getJLAgents();
+        let data: any[] = [];
+        if (!companyInfo) {
+            let agentData = await getJLAgents();
+            agentData.map((item: any) => {
+                if (item.type == TmcServiceType.HOTEL)
+                    data.push(item);
+            })
+        }
         else
             data = await self.getCompanyInfo(null, null, TmcServiceType.HOTEL, TMCStatus.OK_USE)
         
@@ -192,7 +183,7 @@ export class ApiTravelBudget {
             throw L.ERR.ERROR_CODE_C(500, "企业未配置住宿供应商")
         // console.log('hoteldata ----->    ', data);
 
-        let authData: IMeiyaAuthData[] = [];
+        let authData: IAuthData[] = [];
         data.map((item: {identify: any, sname: string, type: string, agentType: string}) => {
             let identify = item.identify ? item.identify : null;
             let sname = item.sname;
@@ -202,25 +193,14 @@ export class ApiTravelBudget {
             return authData
         })
 
-        // if (result.code == 0) {
-        //     commonData = result.data.data;
-        // }
-
-        // if (!commonData || typeof commonData == 'undefined')
-        //     return [];
-        // 检查是否需要美亚数据，返回美亚数据
-        // let needMeiya = await meiyaJudge();
-        // if (!needMeiya) {
-        //     return commonData;
-        // }
         if (config.tmcFake == 1) {
             console.log("getHotelsData ===> fake data.");
             return require("meiyaFake/finallyUsingHotel");
         } else {
-            let meiyaHotel = await getMeiyaHotelData(params, authData);
-            console.log("meiyaHotel ===> meiyaHotel data.", meiyaHotel.length);
-            if (meiyaHotel && meiyaHotel.length){
-                commonData = handelHotelsData(meiyaHotel, params);
+            let tmcHotel = await getHotelData(params, authData);
+            console.log("tmcHotel ===> tmcHotel data.", tmcHotel.length);
+            if (tmcHotel && tmcHotel.length){
+                commonData = handelHotelsData(tmcHotel, params);
                 commonData = combineData(commonData, 'name', 'agents');
                 return commonData;
             }else { 
@@ -235,9 +215,17 @@ export class ApiTravelBudget {
         let commonData2: any[] = [];
         let self = this;
         let companyInfo = await self.getCompanyInfo(null, null, null, TMCStatus.OK_USE);
-        let data = [];
-        if (!companyInfo)
-            data = await getJLAgents();
+        let data: any[] = [];
+        if (!companyInfo) {
+            let agentData = await getJLAgents();
+            agentData.map((item: any) => {
+                if (item.type == TmcServiceType.TRAIN)
+                    data.push(item);
+                if (item.type == TmcServiceType.FLIGHT)
+                    data.push(item);
+            })
+
+        }
         else {
             let dataFlight = await self.getCompanyInfo(null, null, TmcServiceType.FLIGHT, TMCStatus.OK_USE)
             let dataTrain = await self.getCompanyInfo(null, null, TmcServiceType.TRAIN, TMCStatus.OK_USE)
@@ -250,9 +238,8 @@ export class ApiTravelBudget {
             if (!data)
                 throw L.ERR.ERROR_CODE_C(500, "企业未配置火车和飞机供应商")
         }
-        // console.log('trafficdata ----->   ', data);
 
-        let authData: IMeiyaAuthData[] = [];
+        let authData: IAuthData[] = [];
         data.map((item: {identify: any, sname: string, type: string, agentType: string}) => {
             let identify = item.identify ? item.identify : null;
             let sname = item.sname;
@@ -261,18 +248,6 @@ export class ApiTravelBudget {
             authData.push({identify, sname, type, agentType});
             return authData
         });
-        // if (result.code == 0) {
-        //     commonData = result.data.data;
-        // }
-        //
-        // if (!commonData || typeof commonData == 'undefined')
-        //     return [];
-        //检查是否需要美亚数据，返回美亚数据
-        // let needMeiya = await meiyaJudge();
-        // if (!needMeiya) {
-        //     return commonData;
-        // }
-        // console.log("commonData ===> commonData data.", commonData.length)
 
         
         if (config.tmcFake == 1) {
@@ -280,20 +255,20 @@ export class ApiTravelBudget {
             return require("meiyaFake/finallyUsingTraffic");
         } else {
             let arr = await Promise.all([
-                await getMeiyaTrainData(params, authData),
-                await getMeiyaFlightData(params, authData)
+                await getTrainData(params, authData),
+                await getFlightData(params, authData)
             ]);
-            let meiyaTrain = arr[0];
-            let meiyaFlight = arr[1];
-            console.log("meiyaFlight ===> meiyaFlight data.", meiyaFlight.length);
-            console.log("meiyaTrain ===> meiyaTrain data.", meiyaTrain.length);
+            let tmcTrain = arr[0];
+            let tmcFlight = arr[1];
+            console.log("tmcFlight ===> tmcFlight data.", tmcFlight.length);
+            console.log("tmcTrain ===> tmcTrain data.", tmcTrain.length);
 
-            if (meiyaFlight && meiyaFlight.length) {
-                commonData = await handleFlightData(meiyaFlight,params);
+            if (tmcFlight && tmcFlight.length) {
+                commonData = await handleFlightData(tmcFlight,params);
                 commonData = combineData(commonData, 'No', 'agents')
             }    
-            if (meiyaTrain && meiyaTrain.length){      
-                commonData2 = handleTrainData(meiyaTrain, params)
+            if (tmcTrain && tmcTrain.length){      
+                commonData2 = handleTrainData(tmcTrain, params)
                 commonData2 = combineData(commonData2, 'No', 'agents')
             }   
             return [...commonData, ...commonData2];

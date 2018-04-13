@@ -66,7 +66,7 @@ export class StaffModule{
 
         let accountId = params.accountId;
         if(params.email){
-            let staff1 = await API.auth.checkAccExist({where: {email: params.email}, companyId: company.id});
+            let staff1 = await API.auth.checkAccExist({where: {email: params.email}}, company.id);
             if(staff1.isExist){
                 throw L.ERR.EMAIL_HAS_REGISTRY();
             }else{
@@ -74,7 +74,7 @@ export class StaffModule{
             }
         }
         if(params.mobile){
-            let staff2 = await API.auth.checkAccExist({where: {mobile: params.mobile}, companyId: company.id});
+            let staff2 = await API.auth.checkAccExist({where: {mobile: params.mobile}}, company.id);
             if(staff2.isExist){
                 throw L.ERR.MOBILE_HAS_REGISTRY();
             }else{
@@ -112,7 +112,6 @@ export class StaffModule{
         }else{
             //检查邮箱 手机号码是否合法
             // await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
-
             let pwd = '';
 
             staff = Staff.create(params);
@@ -781,8 +780,8 @@ export class StaffModule{
                     departments.push(defaultDept);
                 }
                 staffObj.departments = departments;
-                let staff1 = await API.auth.checkAccExist({where: {email: staffObj.email, type: 1}, companyId: companyId});
-                let staff2 = await API.auth.checkAccExist({where: {mobile: staffObj.mobile, type: 1}, companyId: companyId});
+                let staff1 = await API.auth.checkAccExist({where: {email: staffObj.email, type: 1}}, companyId);
+                let staff2 = await API.auth.checkAccExist({where: {mobile: staffObj.mobile, type: 1}}, companyId);
                 if(staff1.isExist && staffObj.email && staffObj.email != ""){
                     staffObj.reason = "邮箱与已有用户重复";
                     s[7] = "邮箱与已有用户重复";
@@ -793,7 +792,7 @@ export class StaffModule{
                     s[7] = "手机号与已有用户重复";
                     noAddObj.push(staffObj);
                     downloadNoAddObj.push(s);
-                }else{
+                }else if(!staff1.isExist && !staff2.isExist){
                     if(staff1.accountId || staff2.accountId){
                         staffObj.accountId = staff1.accountId || staff2.accountId;
                     }
@@ -823,7 +822,6 @@ export class StaffModule{
                 downloadNoAddObj.push(obj);
             }
         }
-
         //addObj中删除重复邮箱的用户
         let repeatMobileStr = repeatMobile.join(",");
         for(let i=0;i<addObj.length;i++){
@@ -838,7 +836,6 @@ export class StaffModule{
                 downloadNoAddObj.push(obj);
             }
         }
-
 
         await Promise.all(addObj.map(async function(item, index){
             let depts = item.departments;
