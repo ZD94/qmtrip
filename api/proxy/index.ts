@@ -486,6 +486,85 @@ export class Proxy {
                 return next(err)
             }
         });
+
+        app.post("/addOrder" ,cors(corsOptions),resetTimeout, timeout('120s'),  async (req: Request, res: Response, next?: Function)=> {
+            let url = `${config['java-jingli-order1'].orderLink}/interop`;
+            let body = req.body;
+            body.name = '';
+            body.phone = '';
+            let type = body.type;
+            if(type) delete body.type;
+            if(type == 'flights') url = `${url}/flights`;
+            if(type == 'hotels') url = `${url}/hotels`;
+            if(body.staffId){
+                let staff = await Models.staff.get(body.staffId);
+                if(staff){
+                    body.name = staff.name;
+                    body.phone = staff.mobile;
+                }
+            }
+            console.log("===========url: ", url, '===tripDetailId: ', '=======> method: ', req.method, '=======> body: ', req.body);
+            try {
+                let proxyUrl = config.java.getway;
+                let opts = {
+                    reaAsBuffer: true,
+                    https: true,
+                    proxyReqPathResolver: (req: any) => {
+                        return url;
+                    }
+                };
+                return proxy(proxyUrl, opts)(req, res, next);
+            } catch(err) {
+                return next(err)
+            }
+            /*try{
+
+                result = await new Promise((resolve, reject) => {
+                    return request({
+                        uri: url,
+                        body: req.body,
+                        json: true,
+                        method: req.method,
+                        qs: req.query,
+                        headers: req.headers,
+                        rejectUnauthorized: false
+                    }, (err: Error, resp: any, data: object) => {
+                        if (err) {
+                            logger.error("url:", url, err.stack);
+                            return reject(err);
+                        }
+                        if (typeof data == 'string') {
+                            try {
+                                console.info("data==>>data:", data);
+                                data = JSON.parse(data);
+                            } catch (err) {
+                                logger.error('url:', url, err.stack);
+                                return reject(err);
+                            }
+                        }
+                        resolve(data);
+                    });
+                });
+
+            }catch(err) {
+                if(err) {
+                    console.log("请求添加订单错误: ", err)
+                }
+                return res.json(500, null);
+            }
+
+            if(!result)
+                return res.json(null);
+            console.info(result, "result##################");
+            if(typeof result == 'string') {
+                result = JSON.parse(result);
+            }
+
+            return res.json(result);*/
+
+        });
+
+
     }
 }
 export default new Proxy();
