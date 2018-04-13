@@ -507,50 +507,6 @@ export class Proxy {
             } catch(err) {
                 return next(err)
             }
-            /*try{
-
-                result = await new Promise((resolve, reject) => {
-                    return request({
-                        uri: url,
-                        body: req.body,
-                        json: true,
-                        method: req.method,
-                        qs: req.query,
-                        headers: req.headers,
-                        rejectUnauthorized: false
-                    }, (err: Error, resp: any, data: object) => {
-                        if (err) {
-                            logger.error("url:", url, err.stack);
-                            return reject(err);
-                        }
-                        if (typeof data == 'string') {
-                            try {
-                                console.info("data==>>data:", data);
-                                data = JSON.parse(data);
-                            } catch (err) {
-                                logger.error('url:', url, err.stack);
-                                return reject(err);
-                            }
-                        }
-                        resolve(data);
-                    });
-                });
-
-            }catch(err) {
-                if(err) {
-                    console.log("请求添加订单错误: ", err)
-                }
-                return res.json(500, null);
-            }
-
-            if(!result)
-                return res.json(null);
-            console.info(result, "result##################");
-            if(typeof result == 'string') {
-                result = JSON.parse(result);
-            }
-
-            return res.json(result);*/
 
         });
 
