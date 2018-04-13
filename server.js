@@ -48,7 +48,16 @@ var cache = require("common/cache");
 cache.init({redis_conf: config.redis.url, prefix: 'times:cache:'+config.appName});
 
 var database = require('@jingli/database');
-database.init(config.postgres.url);
+database.init(config.postgres.url, {
+    pool: {
+        pool: {
+            max: 10,
+            min: 2,
+            acquire: 30000,
+            idle: 10000
+        }
+    }
+});
 
 var API = require('@jingli/dnode-api');
 
