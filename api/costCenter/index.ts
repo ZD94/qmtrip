@@ -492,6 +492,15 @@ export class CostCenterModule {
             console.log("type类型错误!");
             throw Error("type类型错误！");
         }
+        if (costCenters.length == 0) {
+            return [{
+                costCenterName: '',
+                budget: 0,
+                budgetAndExpenditure: 0,
+                budgetExecuteRate: 0,
+                budgetExecuteBias: 0
+            }]
+        }
         for (let j = 0; j < costCenters.length; j++) {
            let costCenter: CostCenter = await Models.costCenter.get(costCenters[j].costCenterId);
            temp.costCenterName = costCenter.name;
@@ -537,12 +546,21 @@ export class CostCenterModule {
         }
         let costCentersAll: CostCenter[] = await Models.costCenter.all({where:{id: {$in: allIds}, createdAt: {$gte: moment().startOf('Y').format().toString()}}});
         let costCentersDeploy: CostCenterDeploy[] = [];
+        if (costCentersAll.length == 0) {
+            return {
+                costCenterName: '', 
+                budget: 0, 
+                budgetAndExpenditure: 0, 
+                budgetExecuteBias: 0, 
+                budgetExecuteRate: 0 
+            }
+        }
         for (let i = 0; i < costCentersAll.length; i++) {
             let costCenterDeploy = await Models.costCenterDeploy.all({where: {costCenterId: costCentersAll[i].id}});
             costCentersDeploy.push(costCenterDeploy[0]);
         }
         let budgetData: CostCenterAnalysis = {costCenterName: '', budget: 0, budgetAndExpenditure: 0, budgetExecuteBias: 0, budgetExecuteRate: 0};
-        budgetData['costCenterName'] = '123';
+        budgetData['costCenterName'] = '';
         for (let i = 0; i < costCentersDeploy.length; i++) {
             budgetData['budget'] += costCentersDeploy[i].selfBudget;
             let costCenter = await Models.costCenter.get(costCentersDeploy[i].costCenterId);
@@ -584,6 +602,12 @@ export class CostCenterModule {
         }
         let costCentersAll: CostCenter[] = await Models.costCenter.all({where:{id: {$in: allIds}, createdAt: {$gte: moment().startOf('Y').format().toString()}}});
         let costCentersDeploy: CostCenterDeploy[] = [];
+        if (costCentersAll.length == 0) {
+            return {
+                budget: 0,
+                currentBudgetExp: 0
+            };
+        }
         for (let i = 0; i < costCentersAll.length; i++) {
             let costCenterDeploy = await Models.costCenterDeploy.all({where: {costCenterId: costCentersAll[i].id}});
             costCentersDeploy.push(costCenterDeploy[0]);
