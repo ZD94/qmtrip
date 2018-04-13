@@ -12,6 +12,7 @@ var request = require("request-promise");
 let moment = require("moment");
 import {MTrainLevel, MPlaneLevel} from "_types";
 import { IHotel, IFlightAgent } from '_types/travelbudget';
+import { L } from '@jingli/language';
 
 
 /* 判断是否需要美亚数据 */
@@ -180,58 +181,50 @@ export async function getMeiyaTrainData(params: ISearchTicketParams, authData: I
  */
 export async function getMeiyaHotelData(params: ISearchHotelParams, authData: IMeiyaAuthData[]) {
     let data: Array<IMeiyaHotel> = [];
-    // let hotelData: {[index: string]: Array<IMeiyaHotel>} = {};
-    // let destination = await API.place.getCityInfo({ cityCode: params.cityId });
     params.checkInDate = moment(params.checkInDate).format("YYYY-MM-DD");
     params.checkOutDate = moment(params.checkOutDate).format("YYYY-MM-DD");
     let urlHotel = config['java-jingli-order1'].orderLink + "/tmc/searchHotel";
-    console.log("urlHotel =====>", urlHotel);
     let meiyaResult;
+    console.log("urlHotel==>", urlHotel)
     for (let item of authData) {
         let info = item.identify;
         let sname = item.sname;
         let agentType = item.agentType;
-        // console.log('agenttype---->   ', agentType, 'typeof------  ', typeof agentType);
 
-        meiyaResult = await request({
-            url: urlHotel,
-            method: "POST",
-            body: {
-                city: params.cityId,
-                checkInDate: params.checkInDate,
-                checkOutDate: params.checkOutDate,
-                pageSize: params.pageSize,
-                pageNo: params.pageNo
-            },
-            // qs: meiyaParam,
-            headers: {
-                auth: meiyaAuth(info),
-                supplier: sname,
-                agentType: (agentType && agentType == '2') ? AgentType.JL : AgentType.CORP
-
-            }
-        }).catch((e: Error) => {
-            console.log(e)
-        });
+        let body = {
+            city: params.cityId,
+            checkInDate: params.checkInDate,
+            checkOutDate: params.checkOutDate,
+            pageSize: params.pageSize || 50,
+            pageNo: params.pageNo || 1,
+        }
+        console.log("body==>", body);
+        let headers = {
+            auth: meiyaAuth(info),
+            supplier: sname,
+            agentType: (agentType && agentType == '2') ? AgentType.JL : AgentType.CORP
+        }
+        console.log("headers", headers);
         try {
+            meiyaResult = await request({
+                url: urlHotel,
+                method: "POST",
+                body: JSON.stringify(body),
+                // qs: meiyaParam,
+                headers: headers,
+            })
             meiyaResult = JSON.parse(meiyaResult);
-            if(meiyaResult.code == 0){
-                // hotelData[sname] = meiyaResult.data;
+            if (meiyaResult.code == 0) {
                 data.push(...meiyaResult.data);
-                // meiyaResult.data = data
-            }else{
-                console.log(meiyaResult)
+            } else { 
+                throw new L.ERROR_CODE_C(meiyaResult.code, '获取供应商数据错误');
             }
-        } catch (e) {
-            console.log(e)
+        } catch (err) { 
+            console.error('获取美亚数据时错误:', err);
+            throw new L.ERROR_CODE_C(500, '获取美亚数据时错误');
         }
     }
-        return data;
-    // if (meiyaResult && meiyaResult.code == 0) {
-    //     return meiyaResult.data;
-    // } else {
-    //     return [];
-    // }
+    return data;
 }
 
 
@@ -473,8 +466,17 @@ function transferHotelData(meiyaHotelData: IMeiyaHotel, originalData: ISearchHot
             }
         ],
         hotelPicture,
+        "hotelMinPrice":meiyaHotelData.hotelMinPrice,
+
         "latitude": meiyaHotelData.latitude,
         "longitude": meiyaHotelData.longitude,
+        "baidulongitude":meiyaHotelData.baidulongitude,
+        "baidulatitude":meiyaHotelData.baidulatitude,
+        "category":meiyaHotelData.category,
+        "trafficStation":meiyaHotelData.trafficStation,
+        "districtZoneName":meiyaHotelData.districtZoneName,
+        "businessZoneName":meiyaHotelData.businessZoneName,
+        "bedType":meiyaHotelData.bedType,
         "shortName": meiyaHotelData.cnName,
         "checkInDate": originalData.checkInDate,
         "checkOutDate": originalData.checkOutDate,
@@ -759,8 +761,7 @@ export function combineData(Data: Array<any>, match: string, mergeProperty: stri
             if(/[\u4e00-\u9fa5]/.test(Data[i][match]) && /[\u4e00-\u9fa5]/.test(Data[j][match])){  //包含中文使用相似度匹配
                 let isSame = similarityMatch({
                     base: Data[i][match],
-                    target:Data[j][match],
-                    ignores: ['酒店', '旅店', '{}', '()']
+                    target:Data[j][match]
                 });
                 if(isSame){
                     Data[i][mergeProperty] = _.concat(Data[i][mergeProperty], Data[j][mergeProperty]);
@@ -804,8 +805,7 @@ export function compareHotelData(origin: any[], meiyaData: any[]) {
                 //添加模糊匹配逻辑
                 let isMatched = similarityMatch({
                     base: item.name,
-                    target: meiya.cnName,
-                    ignores: ['酒店', '旅店', '{}', '()']
+                    target: meiya.cnName
                 });
                 if (!isMatched) continue;
                 console.log("meiyaHotel in:", meiya.cnName);
@@ -856,54 +856,10 @@ export function similarityMatch(params: {
     ignores?: Array<string>,
     minimalLength?: number
 }): boolean {
-    let {base, target, minimalLength = 8, ignores} = params;
+    let {base, target} = params;
     if (!base || !target) return false;
-    if (ignores) {
-        ignores.forEach((ignoreString: any) => {
-            if (ignoreString == '()') {
-                base = base.replace(/\(.*\)/g, '');
-                target = target.replace(/\(.*\)/g, '');
-            } else {
-                base = base.replace(ignoreString, '');
-                target = target.replace(ignoreString, '');
-            }
-        });
-    }
-    //互换，设置base为较长的字符
-    if (base.length - target.length < 0) {
-        let temp = target;
-        target = base;
-        base = temp;
-    }
-    let similarity = 0;
-    if (base.length < minimalLength || target.length < minimalLength) {
-        //两字符串长度关系，相似度加(减)0.1
-        if (target.length / base.length >= 0.7) {
-            similarity += 0.05;
-        } else {
-            similarity -= 0.05;
-        }
-    }
-    //满足子字符串关系，相似度添加0.8
-    if (base.indexOf(target) > -1)
-        similarity += 0.8;
-
-    //单个字符进行位置匹配, 总相似度不超过0.2
-    for (let i = 0; i < target.length; i++) {
-        let actualPos = (base.indexOf(target.charAt(i)) + 1) / base.length;
-        if (actualPos <= 0) continue;
-        let expectedPos = (i + 1) / target.length;
-        if (Math.abs(actualPos - expectedPos) <= 0.4) {
-            similarity += 0.6 / target.length;
-        }
-        if (Math.abs(actualPos - expectedPos) > 0.4) {
-            similarity -= 0.2 / target.length;
-
-        }
-    }
-    // console.log("=====hotelmatch========similarity: ", similarity)
-    if (similarity >= 0.5) //暂定0.5，则返回
-        return true;
+    if (base == target) 
+        return true
     return false;
 }
 
@@ -1055,6 +1011,13 @@ export interface IMeiyaHotel {
     hotelUrl?: string;
     hotelPicture?:string
     hotelOpeningTime?: string | Date;
+    baidulongitude?:string;
+    baidulatitude?:string;
+    category?:string;
+    trafficStation?:string;
+    districtZoneName?:string;
+    businessZoneName?:string;
+    bedType?:string;
     hotelDecorationTime?: string | Date;
     RecommendCode?: string;
     hotelBusinessCircle?: any;
