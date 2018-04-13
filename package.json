@@ -16,7 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "@jingli/config": "1.1.1",
-    "@jingli/database": "^1.0.1",
+    "@jingli/database": "^1.0.3",
     "@jingli/dnode-api": "^2.0.7",
     "@jingli/error": "^0.0.1",
     "@jingli/fs-promisify": "^1.0.0",
