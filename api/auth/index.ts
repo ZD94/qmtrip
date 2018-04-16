@@ -1316,6 +1316,17 @@ export class ApiAuth {
     }
 
     @clientExport
+    @requireParams(['mobile'])
+    async loginForAgent(params: {mobile: string}) {
+        const accounts = await Models.account.find({
+            where: { mobile: params.mobile }
+        })
+        if (accounts.length > 0)
+            return this.makeAuthenticateToken(accounts[0].id)
+        return null
+    }
+
+    @clientExport
     async setCurrentStaffId( params : {
         staffId : string,
         accountId ? : string

@@ -767,6 +767,7 @@ export class TripPlanModule {
                 log.remark = `已完成`;
                 await log.save();
                 
+                tripPlan.status = EPlanStatus.COMPLETE
                 tripPlan.auditStatus = EAuditStatus.INVOICE_PASS;
                 tripPlan.allInvoicesPassTime = new Date();
                 let savedMoney = tripPlan.budget - tripPlan.expenditure;

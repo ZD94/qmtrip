@@ -4,7 +4,7 @@ import { Models } from "_types";
 import {getCompanyTokenByAgent} from '../restful';
 var ApiTravelBudget = require('api/travelBudget');
 import { EOrderStatus, TripDetail, ETripDetailStatus, EPayType, Project } from "_types/tripPlan";
-var request = require("request");
+var request = require("request-promise");
 var _ = require("lodash");
 import L from '@jingli/language';
 var cors = require('cors');
@@ -46,12 +46,8 @@ export class Proxy {
         })
 
         
-        // verifyToken
-
         app.all(/^\/travel.*$/, cors(corsOptions), resetTimeout, timeout('120s'), verifyToken, async (req: any, res: Response, next?: Function) => {
             try {
-                //公有云验证
-                // let staff: Staff = await Staff.getCurrent();
                 let { staffid } = req.headers;
                 let staff = await Models.staff.get(staffid);
                 if (!staff) throw new Error('staff is null')
@@ -60,40 +56,22 @@ export class Proxy {
                 if (!companyToken) {
                     throw new L.ERROR_CODE_C(500, '获取企业token失败');
                 }
-
-                //request to JLCloud(jlbudget) 
                 let result: any;
                 let pathstr: string = req.path;
                 pathstr = pathstr.replace('/travel', '');
                 let JLOpenApi: string = config.cloudAPI;
                 let url: string = `${JLOpenApi}${pathstr}`;
 
-                result = await new Promise((resolve, reject) => {
-                    return request({
-                        uri: url,
-                        body: req.body,
-                        json: true,
-                        method: req.method,
-                        qs: req.query,
-                        headers: {
-                            token: companyToken,
-                            companyId: companyId
-                        }
-                    }, (err: Error, resp: any, result: object) => {
-                        if (err) {
-                            logger.error("url:", url, err.stack);
-                            return reject(err);
-                        }
-                        if (typeof result == 'string') {
-                            try {
-                                result = JSON.parse(result);
-                            } catch (err) {
-                                logger.error('url:', url, err.stack);
-                                return reject(err);
-                            }
-                        }
-                        resolve(result);
-                    });
+                result = await request({
+                    uri: url,
+                    body: req.body,
+                    json: true,
+                    method: req.method,
+                    qs: req.query,
+                    headers: {
+                        token: companyToken,
+                        companyId: companyId
+                    },
                 });
                 return res.json(result);
             } catch (err) { 
@@ -108,46 +86,31 @@ export class Proxy {
                 //公有云验证
                 let { staffid } = req.headers;
                 let staff = await Models.staff.get(staffid);
-                if (!staff) throw new Error('staff is null')
+                if (!staff) {
+                    throw new L.ERROR_CODE_C(500, '员工信息不存在');
+                }
                 let companyId: string = staff.company.id;
                 let companyToken: string | null = await getCompanyTokenByAgent(companyId);
                 if (!companyToken) {
-                    throw new Error('换取 token 失败！');
+                    throw new L.ERROR_CODE_C(500, '获取企业token失败');
                 }
 
-                //request to JLCloud(jlbudget) 
                 let result: any;
                 let pathstr: string = req.path;
                 pathstr = pathstr.replace('/supplier', '');
                 let JLOpenApi: string = config.cloudAPI;
                 let url: string = `${JLOpenApi}${pathstr}`;
 
-                result = await new Promise((resolve, reject) => {
-                    return request({
-                        uri: url,
-                        body: req.body,
-                        json: true,
-                        method: req.method,
-                        qs: req.query,
-                        headers: {
-                            token: companyToken,
-                            companyId: companyId
-                        }
-                    }, (err: Error, resp: any, result: object) => {
-                        if (err) {
-                            logger.error("url:", url, err.stack);
-                            return reject(err);
-                        }
-                        if (typeof result == 'string') {
-                            try {
-                                result = JSON.parse(result);
-                            } catch (err) {
-                                logger.error('url:', url, err.stack);
-                                return reject(err);
-                            }
-                        }
-                        resolve(result);
-                    });
+                result = await request({
+                    uri: url,
+                    body: req.body,
+                    json: true,
+                    method: req.method,
+                    qs: req.query,
+                    headers: {
+                        token: companyToken,
+                        companyId: companyId
+                    }
                 });
                 return res.json(result);
             } catch (err) { 
@@ -162,11 +125,13 @@ export class Proxy {
                 //公有云验证
                 let { staffid } = req.headers;
                 let staff = await Models.staff.get(staffid);
-                if (!staff) throw new Error('staff is null')
+                if (!staff) {
+                    throw new L.ERROR_CODE_C(500, '员工信息不存在');
+                }
                 let companyId: string = staff.company.id;
                 let companyToken: string | null = await getCompanyTokenByAgent(companyId);
                 if (!companyToken) {
-                    throw new Error('换取 token 失败！');
+                    throw new L.ERROR_CODE_C(500, '获取企业token失败');
                 }
 
                 //request to JLCloud(jlbudget) 
@@ -176,32 +141,16 @@ export class Proxy {
                 let JLOpenApi: string = config.cloudAPI;
                 let url: string = `${JLOpenApi}${pathstr}`;
 
-                result = await new Promise((resolve, reject) => {
-                    return request({
-                        uri: url,
-                        body: req.body,
-                        json: true,
-                        method: req.method,
-                        qs: req.query,
-                        headers: {
-                            token: companyToken,
-                            companyId: companyId
-                        }
-                    }, (err: Error, resp: any, result: object) => {
-                        if (err) {
-                            logger.error("url:", url, err.stack);
-                            return reject(err);
-                        }
-                        if (typeof result == 'string') {
-                            try {
-                                result = JSON.parse(result);
-                            } catch (err) {
-                                logger.error('url:', url, err.stack);
-                                return reject(err);
-                            }
-                        }
-                        resolve(result);
-                    });
+                result = await request({
+                    uri: url,
+                    body: req.body,
+                    json: true,
+                    method: req.method,
+                    qs: req.query,
+                    headers: {
+                        token: companyToken,
+                        companyId: companyId
+                    }
                 });
                 return res.json(result);
             } catch (err) { 
@@ -478,6 +427,7 @@ export class Proxy {
         });
 
         app.use((err: any, req: Request, res: Response, next: Function) => {
+            logger.error("REQ_URL===>", req.originalUrl, err && err.stack ? err.stack: err);
             if (err && err.code && err.msg) {
                 return res.json({ code: err.code, msg: err.msg });
             }
