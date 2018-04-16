@@ -228,7 +228,7 @@ function transferHotelData(tmcHotelData: ITMCHotel, originalData: ISearchHotelPa
         ],
         hotelPicture,
         "hotelMinPrice":tmcHotelData.hotelMinPrice,
-
+        "address":tmcHotelData.address,
         "latitude": tmcHotelData.latitude,
         "longitude": tmcHotelData.longitude,
         "baidulongitude":tmcHotelData.baidulongitude,
