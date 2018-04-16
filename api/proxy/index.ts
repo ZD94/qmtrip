@@ -426,6 +426,40 @@ export class Proxy {
             }
         });
 
+        app.post("/addOrder" ,cors(corsOptions),resetTimeout, timeout('120s'),  async (req: Request, res: Response, next?: Function)=> {
+            let url = `${config['java-jingli-order1'].orderLink}/interop`;
+            let body = req.body;
+            body.name = '';
+            body.phone = '';
+            let type = body.type;
+            if(type) delete body.type;
+            if(type == 'flights') url = `${url}/flights`;
+            if(type == 'hotels') url = `${url}/hotels`;
+            if(body.staffId){
+                let staff = await Models.staff.get(body.staffId);
+                if(staff){
+                    body.name = staff.name;
+                    body.phone = staff.mobile;
+                }
+            }
+            console.log("===========url: ", url, '===tripDetailId: ', '=======> method: ', req.method, '=======> body: ', req.body);
+            try {
+                let proxyUrl = config.java.getway;
+                let opts = {
+                    reaAsBuffer: true,
+                    https: true,
+                    proxyReqPathResolver: (req: any) => {
+                        return url;
+                    }
+                };
+                return proxy(proxyUrl, opts)(req, res, next);
+            } catch(err) {
+                return next(err)
+            }
+
+        });
+
+
         app.use((err: any, req: Request, res: Response, next: Function) => {
             logger.error("REQ_URL===>", req.originalUrl, err && err.stack ? err.stack: err);
             if (err && err.code && err.msg) {
