@@ -13,6 +13,9 @@ const API = require("@jingli/dnode-api");
 import L from '@jingli/language';
 import TripApproveEvent from '../eventListener/tripApproveEvent'
 
+import Logger from '@jingli/logger';
+const logger = new Logger('budget');
+
 require("moment-timezone");
 const cache = require("common/cache");
 const utils = require("common/utils");
@@ -989,11 +992,11 @@ export class ApiTravelBudget {
                 model: "budget"
             })
         } catch (err) {
-            console.log(err);
+            logger.error(`获取预算失败:`, err.stack);
         }
-        console.info("result============",result);
+        // console.info("result============",result);
         if(!result || !result.data) {
-            throw new Error("拉取预算失败");
+            throw new L.ERROR_CODE_C(500, "获取预算失败，请稍后重试!");
         }
         return result.data;
     }
